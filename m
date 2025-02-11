@@ -1,107 +1,108 @@
-Return-Path: <netdev+bounces-165273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A305FA315EC
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:51:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68398A315EA
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:51:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ED9E3A91A9
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:51:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633AE7A180C
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D742638A3;
-	Tue, 11 Feb 2025 19:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454091E5B6D;
+	Tue, 11 Feb 2025 19:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1V5wWrO9"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="db1f3CP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC414263884
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECAC260A28
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303263; cv=none; b=q7pBmaku21DQfElfPJWr3yoSobtqJk+cPKbKGPTgWNiv3CrN+t09vo7LZeDqzZTnRJt6rValt0Yw86To9HK0WnD/tCtnexCQMty8LjAOklbuv6+xMsTzqlbM6Zpr5u+SkvRoQFfL4KV90C1e0APmP0xMvduvEamt3u5HsSWdqmI=
+	t=1739303359; cv=none; b=oRMjwifQZO+WVGLqi8OLMYrHENYs0bukA7sRwLhPNPhwBNBgoOxFnPrrt1RgUB/0NAVZ0u1BXUzoOX+HEl67E2BWiJFef59oh3CvX4C//zlbetU34oh7674VCNDfgpqPw3qycS1sV4MoHU6pPcggSBZkg0ee0MVY9tmq9zgXXbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303263; c=relaxed/simple;
-	bh=pJv71v/cri0TPX1o0+CLzhGyaVlgIxqgIFLIPmHfKVg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gT0ytTOi0aoR53iPUyWyObhAyGKFPLVVoXv5VcxX4XSSj/oX2JVzwva6Eq50nZHg0lDnquuG0dTFSsStfpVpJ8M8Csx7LFDNYXdKQtrZhJK2YkEDGZgyfctCyYaYoMk8aeP6qimJt4nHkWfdaBYcrMXrxe7j77tU8sgxDsZV3f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1V5wWrO9; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa166cf656so11158151a91.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:47:41 -0800 (PST)
+	s=arc-20240116; t=1739303359; c=relaxed/simple;
+	bh=s7NVXSVJC7penh2CLto1//eL+1PRqkwMLEsQSDpt8+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BbwaDLEsAgMyLqFW6h7qZhiWK+nLEepw0F6IgV/xqM/0ZbP6sysYUASAjj34YnbcSOAS13iUOpIebP5BYrqotVKn9cci2C8zavjDFv9A8gFJ1W4f2VePNTLKTbzrCnKbz8OtYZao2woqjwZkNbW0YC7z9wKVAjb2jltbtaxzgpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=db1f3CP4; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f5660c2fdso85760675ad.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:49:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739303261; x=1739908061; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dHh4Wwsziy+3nuZCP27QtsSzjh5eaqEICsFmTBKoA8k=;
-        b=1V5wWrO9Zo8so1CNWkgLFqm0DUdqe/ok7yz9plhDdObXhyB+pQS3CkElc8LB1YgOfO
-         +U5Zh4qJjEFIYUzJ79uWbBFrWQqaHc2lvDVCdbn39G/w3Qlqyel4gmGIRCoJ+NgshRYW
-         qIreBxJMXtRric9LYVn01GL5AMOp9TwwnMsJU+pymEc9f7xGd01TWKbl+ACuuYh7GPvI
-         Eb02U/QO/Q7IUBey/eDfpSAxeI9QSyPXVWRV3GE2uHK14WkJLrNErPQ4Ti0uDXlMvTq0
-         21PAVbORCz01Oz1qm0kgAjm3ripMA/a/EUfX5JDKH2uHzLnaX4nfjO5VtP4cozlfb8bB
-         synw==
+        d=fastly.com; s=google; t=1739303357; x=1739908157; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pwkLROQpNJJVBhe+NGJ4m/fDtdeo/U2RKsuOJgTzB5U=;
+        b=db1f3CP414adIXONZQO9Cla5GHi38PvndXu4Rjh5XZ3M692lWpkgCOHEyoVSaia+wD
+         Zd1MeEG6LRU3JTj73RIlgTiZjzycRIyWASu0+xT5IzoFaZZiZMFchJ0xWpDG0IArGkmJ
+         E71v8D9mlKtWAYMq4K1ZhEjTT8nmDf8mktwHo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739303261; x=1739908061;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dHh4Wwsziy+3nuZCP27QtsSzjh5eaqEICsFmTBKoA8k=;
-        b=sDlqfidrsg2aty/B3ariczlSfo6ISb8wEjH1tEZbuSXx0///V1jO8DEfckqqtBmii5
-         uWSiSbsPQCbi9UNVfhhUQ/QlXCD9V+eMWy7XqHmJQfX4qoMbyWJgDjG0sNNpATIRb4PM
-         kc/t8b6cxnBt3yIkRydc8qHkxgqYGJ8Z5UwxUKz1QPYiVS4AmQtn2LO3CtPy4jAxrXdI
-         hwe0iMYF0vXgsuBoGUhKhf1HKOaOzexRM8kd3TkNVD2QoCLvCc8yimr0wNqlAcKXr5Jn
-         wM3U1pjVhFz5mCqkegTXZELFjG+ZfyddbpX+wztM2a94tPG+fQdHhRscvQePFgEEdmCv
-         p16A==
-X-Gm-Message-State: AOJu0YyIItpmrxzxpCbarT2GzRLdYdD2vDt2J+v9RZT94SLzonSbOmP5
-	x54yic1Bc9/XozboKAbStdQ2KYmaCrEYhjQQ7LAFm88zXHtkaN08XFt1oNlx+CK++RG+Ppbafjd
-	0O9lgv1FkfXvPrsaq32KoCayRd401VdQLsEBjGCADAn/of91pn2KE1DC9ivHXKDsZJyviyYQ4ML
-	mk9wt3yeO0WdGQ3Jj42cBydq14DAAEqeBSiM/c92HH0jw=
-X-Google-Smtp-Source: AGHT+IEU3hX9hycREpNQY0Z67pvynsSq9jxI1tO/uK5JEcjk9RVvajVETUlyD2AoizOa0zkv2TYNTqvTt/zONA==
-X-Received: from pjbpv5.prod.google.com ([2002:a17:90b:3c85:b0:2f2:e5c9:de99])
- (user=jeroendb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:c88e:b0:2fa:1f1b:3db2 with SMTP id 98e67ed59e1d1-2fbf5c58cf7mr529268a91.25.1739303261059;
- Tue, 11 Feb 2025 11:47:41 -0800 (PST)
-Date: Tue, 11 Feb 2025 11:47:26 -0800
+        d=1e100.net; s=20230601; t=1739303357; x=1739908157;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pwkLROQpNJJVBhe+NGJ4m/fDtdeo/U2RKsuOJgTzB5U=;
+        b=hUByjqnUa/2vmBuwlYdPIT6IdUu2AwDOTGqTCPRd2JvefYMussXamCzyJm9C4nKOnv
+         QNsj1K45CtDMWDaGOwutWzwajCRnUwIp4Zg1PG5xghy2HrBcV/01fbSfIyUo8FxNVRoK
+         3x7GRH4w3Gr4rAXaP4MwXsluIMwMchwQ6XHt+d13TGKwRDza6qkhYPI/OHIsptoQHygD
+         IFBBRkE6ZneeYHmbzTr3+rrlwSB2IKGZfpYw7c781Njsc+2kTb2qboPInkUXSFTk9TvM
+         FkYNTuxdtMi84heHHJ40fS9dlm8wA0xgSRzjYklKxQrJn9yM0g0CqIN/641h8NRtbZpw
+         lIMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXEasYd7SiEe5HtZmSsHYN5d0GBo6wO3NnGjBJCCfPD+1HfXTdm5PNeCAmXmnpAXZn5RMmFq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEqJnyfEcD0R6i3zN68DmzkT7ncsKVCSr4/gytoehkHGCqZJts
+	0Wua2Zeu5tlJS15x+JOYRIwMkpXQtOXuJvIq8lr7pVqONQfIwmJdRXJsMGdyajo=
+X-Gm-Gg: ASbGnct0KOVndoczT25GRMiZucVBcNf9ardwfm3/IGKzN12kmmIZfIUILVKJlRjI5sT
+	EiBjGb5m/O5WAxichJZ/5PZxiessA++arur3qYABWqQ71YB8ntSrDke5BsLwpZyScAIbFxHwBr9
+	2ckrH7mWC5Q1rTHxRZdp4WLBOOVbgUq6yMv0EajqYNN+xfS60ZTTq+RQu6dl9lxkAkAPgZN7Wp+
+	aNPwntuJRV8axDisbDh2OSyqPtBJvOpI600BqMgSXc/4kJY/fJLJQuXVY8HhQUcBfeHzZNF1zmL
+	df3/CH836bOWplQqIIHMXV8wL1+2uVmAQ9/vb08mlHyhbIaC+22gtQH2eA==
+X-Google-Smtp-Source: AGHT+IFAZm1SodjyhE3yXt20E728QpsRv6/CwCnhQp76zKhTJB4HXoWp0W/4n/66mnQu1qhtikUfzQ==
+X-Received: by 2002:a17:903:32cb:b0:21c:17b2:d345 with SMTP id d9443c01a7336-220bbb11376mr7568995ad.3.1739303356857;
+        Tue, 11 Feb 2025 11:49:16 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f368aac7fsm101133015ad.221.2025.02.11.11.49.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 11:49:16 -0800 (PST)
+Date: Tue, 11 Feb 2025 11:49:13 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, alexanderduyck@fb.com, netdev@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	horms@kernel.org
+Subject: Re: [PATCH net-next 3/5] eth: fbnic: report software Rx queue stats
+Message-ID: <Z6upuZVox2MbeX9X@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	alexanderduyck@fb.com, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250211181356.580800-1-kuba@kernel.org>
+ <20250211181356.580800-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250211194726.1593170-1-jeroendb@google.com>
-Subject: [PATCH NET] gve: Update MAINTAINERS
-From: Jeroen de Borst <jeroendb@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	willemb@google.com, Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250211181356.580800-4-kuba@kernel.org>
 
-Updating MAINTAINERS to include active contributers.
+On Tue, Feb 11, 2025 at 10:13:54AM -0800, Jakub Kicinski wrote:
+> Gather and report software Rx queue stats - checksum stats
+> and allocation failures.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  5 +++
+>  .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 12 +++++-
+>  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 43 +++++++++++++++----
+>  3 files changed, 51 insertions(+), 9 deletions(-)
 
-Signed-off-by: Jeroen de Borst <jeroendb@google.com>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e1bc31a6624b..a0e92051ac60 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8711,8 +8711,8 @@ F:	drivers/input/touchscreen/goodix*
- 
- GOOGLE ETHERNET DRIVERS
- M:	Jeroen de Borst <jeroendb@google.com>
--M:	Catherine Sullivan <csully@google.com>
--R:	Shailend Chand <shailend@google.com>
-+M:	Joshua Washington <joshwash@google.com>
-+M:	Harshitha Ramamurthy <hramamurthy@google.com>
- L:	netdev@vger.kernel.org
- S:	Supported
- F:	Documentation/networking/device_drivers/ethernet/google/gve.rst
--- 
-2.48.1.502.g6dc24dfdaf-goog
-
+Acked-by: Joe Damato <jdamato@fastly.com>
 
