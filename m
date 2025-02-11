@@ -1,156 +1,121 @@
-Return-Path: <netdev+bounces-165279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5791CA31663
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 21:06:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F611A31679
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 21:13:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 534967A298A
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:05:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E88AB188A619
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE29262D14;
-	Tue, 11 Feb 2025 20:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D982E26157D;
+	Tue, 11 Feb 2025 20:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="twsj5kPc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l3D5aU1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20911E47B3
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 20:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138CB265604
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 20:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739304367; cv=none; b=cOOK3IHMJX8kIvu86qVjcda1hUL6y7eWBAK082xnVrMzhKToW6DtVrzms90Ldg/TxkW6XelMev6FMhIANeg8gHMKwuAOAEuUHiUaYmDYN4DGIvcIwFWYcQZTcN6HLNbt7q8XG+BPF8Ch0zw02cw+bNnCU49CSy531YEbVoDBDIc=
+	t=1739304822; cv=none; b=nKJkYhSbFkZ8ufVpw6XdBBFyk5NRRTO4dpy+cwbEUn2UCUEI1QbIQApi1a5XUV2XNpCo3VRi3/ddmam3EaWWlEajLV/aLT5zlGqLzNelb2LZEtFOStPTVAj6aCM760vXf4o4dWmYOhkFlmbp/vOJIIl/gSB0w7YY4KG/1MIzZas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739304367; c=relaxed/simple;
-	bh=ft0iTXOlvHUjc3hz8JBZEHUjPHt9IGzMRpYUZVq8nDk=;
-	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=hjCK0UvcrSrenxM9BHhXdJ5rImDtzg1eR9XSbzX3lY1iZp/C27JeXgHBPpRj1fTp4i9ILEgXI1Lyj3A5YRfFIqUuoPXU/YOtMdIwKsg+TnvrFuspmgVFSKMw8mZReCD8GYNEt6Z6FPdpucxBulaU5h40eWqzOPsRPbe2aPlQsPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=twsj5kPc; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1319678666b.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 12:06:05 -0800 (PST)
+	s=arc-20240116; t=1739304822; c=relaxed/simple;
+	bh=Uedl/hZfkHtMDkwJdqMeHKYIm4IvVtHdH3+Q69k2Tow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GjJst8Yvz0w4pkOehLMTc9EKvAGOp+qXLRGRlBc7FUalHox3TguQWX1Ih8rrFQytvkjY53UYGUyVPPISgH2/9EYS3Te65xvYZylemWFipxmS5lI/9bwM6WriS/qz7+UL/Js7MTZ3BYwlen25E7rxf1t3BMaM3ytYSixtoEKqnak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l3D5aU1Q; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dca468c5e4so8415530a12.1
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 12:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739304364; x=1739909164; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Nxkie6yLM0q2pX+0WAYEdeQeZkDttdl+fqsW8wL2k/g=;
-        b=twsj5kPcxUDuVWjBv9vg518yUWxM4dXIEiKPGZm0+MKODqD8lGnR1yluoDEsaV/3vF
-         ogdYolUyq6Tou1SUyRnYa9bIpNA+eXIQT2oCuhYfJ5GUpkvAemGwXuMGjNCkj3/sFpGI
-         0FvoD4SEOUh9RuzTr04S4Q194TuiPUGp0bGeI=
+        d=google.com; s=20230601; t=1739304819; x=1739909619; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Uedl/hZfkHtMDkwJdqMeHKYIm4IvVtHdH3+Q69k2Tow=;
+        b=l3D5aU1QXx/ZXypb64aEX+UXU/t9U9cNFuqOxxzU1+yCriZStGVcNnUGNm9On4nw1E
+         eMQ53M0okZQkc2sqA8lQkmaQi/s+MiYjCUFlY4hTksaIELfvEqDQhXGpZ9CGTfSemkuq
+         1VtYgUnrVQQH4yRI202mybJmKZNb2J03UP2a8vvFnT+u5ZqviZQW/l5gM3zLwXZ1B5+U
+         wQIkpcABN4S2EyqFogEbvpdxei75rHQSjhStlKnxHWmnYpLLnZ5hymSUVJ7HAnVkWX69
+         +p+GnBReQEK5exBTr5dW6g7W8E6iR7V8KJ4/g8B/zLNpmWAjlp+q5Y2TAhr7jox4nH8i
+         0hqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739304364; x=1739909164;
-        h=cc:to:subject:message-id:date:mime-version:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nxkie6yLM0q2pX+0WAYEdeQeZkDttdl+fqsW8wL2k/g=;
-        b=oZzWZwhf+VUGHE0Oxr0MGsUAbSKoxCncIl52dLIZNHg1ipOMIHAbKx9GM7mmP2sknp
-         IzHvyeeMs9ysc4k2MfGm220jowZDEXHolv8RrTbbmVYkX/hdzwXZk4iH88Fl3iJJRJ/K
-         MmIEYHrrxVObVTkBHLiHDONfqCJwnTGLovAHSiy2N6VljUznhkJtEjL/Lgi1w4wR7rEk
-         XdIX5+DiEwjVLulD5w8i8+23KS7NUhL08gQl+0YN5850pxn2Rp1R+1zGaTEtTpBGhjeD
-         jcF4swq+exOUrYY2vX62fEIMCVTrROtMHpr4t/69Xa4oJYnNCm3NdzIFjioCPGu4HgWQ
-         X8uA==
-X-Gm-Message-State: AOJu0YzWLbo3PeNqv3nURe6vzjwF4QY4QJK10cXCIHmVkmvfFJDfagkX
-	+9VZ0AKIYzDGCQN+kPl2ofp7PUDR8Wrvzr/zUYgLaB3EYA0VM+pCNPrRFgRMwWnEhfVW4QaTp33
-	KhJM0IdpLpZvyJCgFo5qQZPB5h8fkEZsAnx25UrAX9VAhRLF+WXI=
-X-Gm-Gg: ASbGncvtrmvHE6XSCJuulnPSjbZ2m95LoJYUjIB4xsgsoTCSE1Bxxz4EqwwNiT4NC/S
-	WzMUEbE1b/HjWEq9ye72UQ7FJ5QOl0KbydAioiuVuFmL80pgCm697lIopWaevP9IEb5UzaU4Ii2
-	Pmn4V/qSOWiJayV7hDGsM1zknC
-X-Google-Smtp-Source: AGHT+IHoKfgQCKWZr7QsjqOlhYz8Ox3tvPFbg93XOMkmh6ra72F9JlcLUDZxrph5gh4NGZsFZXFolvtA6RlQNHopUqo=
-X-Received: by 2002:a17:907:6d05:b0:aab:8ca7:43df with SMTP id
- a640c23a62f3a-ab7f347db66mr24967366b.39.1739304363872; Tue, 11 Feb 2025
- 12:06:03 -0800 (PST)
-Received: from 155257052529 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 11 Feb 2025 20:06:03 +0000
-From: Joe Damato <jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1739304819; x=1739909619;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Uedl/hZfkHtMDkwJdqMeHKYIm4IvVtHdH3+Q69k2Tow=;
+        b=lBc++63CjookW4GEBV5iF9oiieR5XeZ6phQ5dkmcP4yA2kjzI1mz/i296tw2IDNNPj
+         btnYA2TCGbcBFsXpfJqXRF+/WDL6pm+F9zfOdLP5zPk0KxMTQ0bEnRGkjcMrd3V8TnNk
+         PU5MR/dmMmf9K6qegDk12KMxSGKL3tWBuQ6oAz7qd3rCaDkVuJMicKoqd3aqckCd/Q+F
+         YsNZJMA5zteAEskaHdh5ARICzMs3eWR/7EWJID4siGOE9I0qowz4xhyIKg13T2w5bIrD
+         RAU/wkoBA1X2JESmUxI1C5bdTiU5cf3uyYdqRdKLE2I13k8QoH7o+0mumZfqQjePKNQ9
+         NVaw==
+X-Gm-Message-State: AOJu0YwVNzB+nuPws19PpXpa2vin9MxCoECH+D8Fq1CfFvoi6mCDFuok
+	T8ihLBOUXfh02hu2+sHnEjh/wia/s3bc/iEBk15O1cglvJWUgU5+xbFNVQM9MG/Jawm9uAiXWjh
+	EHM0Rvuf314YMzgN2YRBDDD16j35KMFBQ7Uoet2MzCZ8k17Bs2Q==
+X-Gm-Gg: ASbGncvZmKnNrrK8ClsNG0rX1Cj/vIOL9vyBFuxS4Vho1PcRY0TrvnlgsHWzN088acU
+	RXCq+IW1mISokR1e8KvAtFLmd2cnMDWQdjOMIxVD8i0At/Le4vE7e1hj3tyax8OUhPXqUxnmqSw
+	==
+X-Google-Smtp-Source: AGHT+IEJjb6tWYiNTW02ZcIr7ZLjIryfI5rXp59GccwGSkvO1uN7uR2Gd7ClCTi4dNVzeR38WeKhPmjhJH0oCLGcyng=
+X-Received: by 2002:a05:6402:3512:b0:5d0:c801:560 with SMTP id
+ 4fb4d7f45d1cf-5deade0471emr397624a12.20.1739304819194; Tue, 11 Feb 2025
+ 12:13:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 11 Feb 2025 20:06:03 +0000
-X-Gm-Features: AWEUYZm9IYCWBJGOUEwrC9uMXesN9YSdVvlwLoAEoxsHN8IrvsvNvDyqzWHbUjM
-Message-ID: <CALALjgz_jtONSFLAhOTYFcfL2-UwDct9AxhaT4BFGOnnt2UF8A@mail.gmail.com>
-Subject: [PATCH net-next v2] documentation: networking: Add NAPI config
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, rdunlap@infradead.org, bagasdotme@gmail.com, 
-	ahmed.zaki@intel.com, Joe Damato <jdamato@fastly.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <dbd18c8a1171549f8249ac5a8b30b1b5ec88a425.1739294057.git.pabeni@redhat.com>
+In-Reply-To: <dbd18c8a1171549f8249ac5a8b30b1b5ec88a425.1739294057.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 11 Feb 2025 21:13:27 +0100
+X-Gm-Features: AWEUYZmRZ6Vcg51b-l57bZLHCVjmqSKyA_l29GsGMmKFusjBqo7CzxC1if3DNvM
+Message-ID: <CANn89iKVb1s4qz=L76E78zXQapc992C+zMLs9mjzxaQbff4tgg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: avoid unconditionally touching sk_tsflags
+ on RX
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document the existence of persistent per-NAPI configuration space and
-the API that drivers can opt into.
+On Tue, Feb 11, 2025 at 6:17=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> After commit 5d4cc87414c5 ("net: reorganize "struct sock" fields"),
+> the sk_tsflags field shares the same cacheline with sk_forward_alloc.
+>
+> The UDP protocol does not acquire the sock lock in the RX path;
+> forward allocations are protected via the receive queue spinlock;
+> additionally udp_recvmsg() calls sock_recv_cmsgs() unconditionally
+> touching sk_tsflags on each packet reception.
+>
+> Due to the above, under high packet rate traffic, when the BH and the
+> user-space process run on different CPUs, UDP packet reception
+> experiences a cache miss while accessing sk_tsflags.
+>
+> The receive path doesn't strictly need to access the problematic field;
+> change sock_set_timestamping() to maintain the relevant information
+> in a newly allocated sk_flags bit, so that sock_recv_cmsgs() can
+> take decisions accessing the latter field only.
+>
+> With this patch applied, on an AMD epic server with i40e NICs, I
+> measured a 10% performance improvement for small packets UDP flood
+> performance tests - possibly a larger delta could be observed with more
+> recent H/W.
+>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Update stale documentation which suggested that NAPI IDs cannot be
-queried from userspace.
+Thanks a lot Paolo
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- v2:
-   - Reword the Persistent Napi config section using some suggestions
-     from Jakub.
-
- Documentation/networking/napi.rst | 33 ++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/napi.rst
-b/Documentation/networking/napi.rst
-index f970a2be271a..d0e3953cae6a 100644
---- a/Documentation/networking/napi.rst
-+++ b/Documentation/networking/napi.rst
-@@ -171,12 +171,43 @@ a channel as an IRQ/NAPI which services queues
-of a given type. For example,
- a configuration of 1 ``rx``, 1 ``tx`` and 1 ``combined`` channel is expected
- to utilize 3 interrupts, 2 Rx and 2 Tx queues.
-
-+Persistent NAPI config
-+----------------------
-+
-+Drivers often allocate and free NAPI instances dynamically. This leads to loss
-+of NAPI-related user configuration each time NAPI instances are reallocated.
-+The netif_napi_add_config() API prevents this loss of configuration by
-+associating each NAPI instance with a persistent NAPI configuration based on
-+a driver defined index value, like a queue number.
-+
-+Using this API allows for persistent NAPI IDs (among other settings), which can
-+be beneficial to userspace programs using ``SO_INCOMING_NAPI_ID``. See the
-+sections below for other NAPI configuration settings.
-+
-+Drivers should try to use netif_napi_add_config() whenever possible.
-+
- User API
- ========
-
- User interactions with NAPI depend on NAPI instance ID. The instance IDs
- are only visible to the user thru the ``SO_INCOMING_NAPI_ID`` socket option.
--It's not currently possible to query IDs used by a given device.
-+
-+Users can query NAPI IDs for a device or device queue using netlink. This can
-+be done programmatically in a user application or by using a script included in
-+the kernel source tree: ``tools/net/ynl/pyynl/cli.py``.
-+
-+For example, using the script to dump all of the queues for a device (which
-+will reveal each queue's NAPI ID):
-+
-+.. code-block:: bash
-+
-+   $ kernel-source/tools/net/ynl/pyynl/cli.py \
-+             --spec Documentation/netlink/specs/netdev.yaml \
-+             --dump queue-get \
-+             --json='{"ifindex": 2}'
-+
-+See ``Documentation/netlink/specs/netdev.yaml`` for more details on
-+available operations and attributes.
-
- Software IRQ coalescing
- -----------------------
-
-base-commit: ae9b3c0e79bcc154f80f6e862d3085de31bcb3ce
--- 
-2.43.0
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
