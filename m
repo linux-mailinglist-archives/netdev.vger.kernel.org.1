@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-165074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CC3BA304E3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:52:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD565A304F0
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:56:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB0C73A24B0
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:51:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99A273A41A5
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A7A1EDA35;
-	Tue, 11 Feb 2025 07:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44391EE035;
+	Tue, 11 Feb 2025 07:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1ucOxjFb";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nzTOMVSh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3Ohyi+g"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E61F1E9B39
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F36C1D54C2;
+	Tue, 11 Feb 2025 07:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739260323; cv=none; b=LOanV8Fm1zXxjsOAphYGOS3bBg0X3X4pCN7v5KZeZoXimPkrDMReZZcPgP0STEg2wK/UFzcOLOFUK5ZW0feLtAOwkdzXvjSKuHjUu4FWbgRZi8l+k1rEL5PFU7CYbZdJOiTsMWOGA3IC1N9KxBjXtvGGJ9j4nRm+zUPWEZkukIw=
+	t=1739260560; cv=none; b=Tq2pYpr4ayWsNAKL5++sEXSwi+yicc01RRMuOUh6oFgkNYFNjdKec/D7afV5v2ZkQFnoH+2jeEqYvAPhwcMBC5+kJYswdZtW/UuXyeYsL/ku915X1ifrhqwyX5Z4dnluC2neIw3DngjJWbwcxiCgG1R1EuND5HNo1K3G8+pPWMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739260323; c=relaxed/simple;
-	bh=HtGaK6oDX0UG40KmmNZSuzPzVh7amRv0wg9jndXZgY8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=huFhMFfVgLs1Qg1I5gPR2tQbgx7I/Yw7yt0muNNhyviYX1i4cOktUZLW1Y2OayNcHu2GPYA/2Oh6ozjx+BmKH1A+pxUxaYMxENiE9d0zbkCaXVxBS0jjBg5/zkJTlUCfJRzOn/gO3HUYyhdjGPFMV2OkESW+4EAIimH/6xd2Fz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1ucOxjFb; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nzTOMVSh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1739260320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtGaK6oDX0UG40KmmNZSuzPzVh7amRv0wg9jndXZgY8=;
-	b=1ucOxjFbt/LvXdvt3KBvM1c1DVWfuOQdlmexn5FdHa98NgqcWceV2GReD3SnKJRC+tDB/f
-	tOVRag6GGi4/Zuh21eQoSi9PsmZLbhHXQ3tiEcVqkp8RzODODJUVfKK3Fh0Dp2MQXoSkSz
-	aCjzl28CiS4wToV5Ysz8vB24YUS5EgS4Gi4zWJ6hqtN5ELbkHOwx5LrEwZkQ1ha+9Of8aq
-	RCP+AarfuNHJgWXd0ta8XbNija8YPCS78JkUPnz3ICmVwxiXUe5+FouywzrCLFJF9b/zHB
-	j1P4/1C5anuX6aCHsQFHUsy7bsEsNjqIYLcH9yaG9y8Yd0U1gyrXAuW9fikpfQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1739260320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtGaK6oDX0UG40KmmNZSuzPzVh7amRv0wg9jndXZgY8=;
-	b=nzTOMVShrhsUPaj9YUfVjWmKgI88INRVn6xKDWVEwROHUgOgd73ivfyHjUTAOOPIhvGQsB
-	2oepvfeyV3S3wQAQ==
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Joe Damato <jdamato@fastly.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Tony Nguyen
- <anthony.l.nguyen@intel.com>
-Subject: Re: [PATCH 3/3] igb: Get rid of spurious interrupts
-In-Reply-To: <b1b3e5e1-b1fe-4816-85eb-61ac7ea2d46d@engleder-embedded.com>
-References: <20250210-igb_irq-v1-0-bde078cdb9df@linutronix.de>
- <20250210-igb_irq-v1-3-bde078cdb9df@linutronix.de>
- <b1b3e5e1-b1fe-4816-85eb-61ac7ea2d46d@engleder-embedded.com>
-Date: Tue, 11 Feb 2025 08:51:58 +0100
-Message-ID: <87y0ycor4x.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1739260560; c=relaxed/simple;
+	bh=FELs+YTJY5wG1fT/XXOisUg9dVRRC8S4Idi6jI4jsP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=abFGcaewlxAdTu3vsOrxXdRQVNCGTR6ZN4HL9j5+sXuxRHeZN0J5V4JHHJvOJHrsoPLpk7XtWzgvnt+ftAiuhvIHwOQsPegIv+qFhbbtYjrfY9fLqepxecWR0PYA8MU7wVzFKerfZHsO9ylT/IHKSgevq5ohl8Op3Y5tdjSpCus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3Ohyi+g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A839C4CEDD;
+	Tue, 11 Feb 2025 07:55:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739260559;
+	bh=FELs+YTJY5wG1fT/XXOisUg9dVRRC8S4Idi6jI4jsP8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t3Ohyi+gbS9BSClkhjavMy30VcCoo4YwwtZXQ9CPju2TActO/eM8iFP9kooICHeTA
+	 LAo/p/bohI/WTXYKIX/ry85w4tOnhw6Zgi+Yg02uzpr1Vt4X+92FjjDduMquF1sPSO
+	 fyh9R0f8DC3tQx74N3ITFaaeHZeXow8IHRKkJ7Au/5UgKlDvR2IFsbiib0C7zJhvP6
+	 BkQVexRj23EzHICjCcA4SsDpAMvS9fhzECBuNbypW7VpYE3oC18/J7pSNxnS9/JC2m
+	 a0OezbLMWAJfIb7gIPk/ng2WKOCntFyqD/r+XKnBeRE8DG6YqKJLersMh7d1lgQlIk
+	 CUE6+f2ULccjQ==
+Date: Tue, 11 Feb 2025 09:55:53 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"Nelson, Shannon" <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
+Message-ID: <20250211075553.GF17863@unreal>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <20250206164449.52b2dfef@kernel.org>
+ <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+ <20250207073648.1f0bad47@kernel.org>
+ <Z6ZsOMLq7tt3ijX_@x130>
+ <20250207135111.6e4e10b9@kernel.org>
+ <20250208011647.GH3660748@nvidia.com>
+ <20250210170423.62a2f746@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210170423.62a2f746@kernel.org>
 
---=-=-=
-Content-Type: text/plain
+On Mon, Feb 10, 2025 at 05:04:23PM -0800, Jakub Kicinski wrote:
+> On Fri, 7 Feb 2025 21:16:47 -0400 Jason Gunthorpe wrote:
+> > On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
+> > 
+> > > But if you agree the netdev doesn't need it seems like a fairly
+> > > straightforward way to unblock your progress.  
+> > 
+> > I'm trying to understand what you are suggesting here.
+> > 
+> > We have many scenarios where mlx5_core spawns all kinds of different
+> > devices, including recovery cases where there is no networking at all
+> > and only fwctl. So we can't just discard the aux dev or mlx5_core
+> > triggered setup without breaking scenarios.
+> > 
+> > However, you seem to be suggesting that netdev-only configurations (ie
+> > netdev loaded but no rdma loaded) should disable fwctl. Is that the
+> > case? All else would remain the same. It is very ugly but I could see
+> > a technical path to do it, and would consider it if that brings peace.
+> 
+> Yes, when RDMA driver is not loaded there should be no access to fwctl.
 
-On Mon Feb 10 2025, Gerhard Engleder wrote:
-> On 10.02.25 10:19, Kurt Kanzenbach wrote:
->> When running the igc with XDP/ZC in busy polling mode with deferral of hard
->> interrupts, interrupts still happen from time to time. That is caused by
->> the igc task watchdog which triggers Rx interrupts periodically.
->
-> igc or igb?
+There are users mentioned in cover letter, which need FWCTL without RDMA.
+https://lore.kernel.org/all/0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com/
 
-igb of course. Thanks.
+I want to suggest something different. What about to move all XXX_core
+logic (mlx5_core, bnxt_core, e.t.c.) from netdev to some other dedicated
+place?
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+There is no technical need to have PCI/FW logic inside networking stack.
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmerAZ8THGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzghbyEACnG4nKwnwLzG7XqGFj1yLSRInPQBav
-XxoMAy9cLeh9Apn65tVBBvcycgGgX2SaDQeMhKFYw9DNrmNTvo3ZqPVemNksQC2D
-YO9IlDKQzRPT5mWTLT/95vM0qUYl3MSt54RkiiY/d38zwUF/PtXJU4lKPap45zfu
-KI4D7MCuDftc35PoFDU1h/JiLeO5QmRS4S0VKvZQx6vU0XyMhGMQR7DOIFT/DySI
-kYX05LLnHR+N/zqyvC5z3dSCf+datdfKibpoOUzZx/+ZVU72cpGrh7gKMThLh4Ql
-mOPiORXwFtW7cuIuTvuzwAotaCOOj6E0fGVKH3lvBGKyG60iQdMCu5sZLGAVx+FJ
-9kaesl3JGIuCRvqulE6EZzEJn2xqVQCCl4lTaknBEcR7HElliQ0Lka/6CZrWtPMP
-1EAkMU437NxuKzSNdbXVyEp0EMMFaA93/vbZUw8WEPahikqOxYdmb0EJ7sfsvC/n
-IQNISTt0/FLZYj+FlgEuL0Kr4xnS22ld4fkZNnyQQ7kTIWSC7ClI40yNaUNq2rCG
-4RFXLzoTBpuw7gXtR+mUg4ZYUklNC1UMJv5k5JLxCquwoRG/jB1VoUUq3Jsqs4Rs
-3OWNUiJKbXw5uU50ZGFzR8F4mZJFo6BOatcfvCGZwUGtVGJ6nxaIcg3MZwWeclkT
-UbrZ+5MKsyneEg==
-=TTNU
------END PGP SIGNATURE-----
---=-=-=--
+Thanks
 
