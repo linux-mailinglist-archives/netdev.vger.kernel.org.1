@@ -1,2142 +1,252 @@
-Return-Path: <netdev+bounces-165155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 764E4A30B14
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:04:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86290A30B17
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961F13A981D
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:03:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0C33A10AF
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548111FCF74;
-	Tue, 11 Feb 2025 12:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E7B1FBC85;
+	Tue, 11 Feb 2025 12:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jooJYfwC"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="owgJosIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2040.outbound.protection.outlook.com [40.92.62.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5BB2206B5;
-	Tue, 11 Feb 2025 12:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739275317; cv=none; b=VhHX2tF50wHHbQcvqmeMJHcRQRrFeDSJiv3IKFq8FbRmzlm2+K1pn1QiEqS4MBlsvR8q0/NaQg3kmzHe+/gh4chRKUmGqtN1gx3hSwH8xFOSvbFcvosEuvlfic2d7Vg5/UmU9Qg8LepT0Yu5fgBZTJOWgKLNfCHcFOMkHQcGQ2k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739275317; c=relaxed/simple;
-	bh=5h3d+hDFZgiBzzKkkNO3eYJz7i3ksjWKPp/oakZoF7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R414mJHsni0c7GEcRJAXHF2kjaFrFteL755L+uqypD+tDAC3Cp00IdjRym8i8k9X6Ayo9vU8HCPtGKX0tWF+MsKhsmhj1crmzvYdMRXYjZXl+GLua9UsAwNmJdZkuEMFZmGI2jMUXrOmfx9ZRxKvHw55xkZBpFRBtZSKW9LByYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jooJYfwC; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38dc9eba8a1so3428798f8f.1;
-        Tue, 11 Feb 2025 04:01:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739275312; x=1739880112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cR78AkxIa2Az7+jLUIlRk9lQTkKC8dZbc8Nu2FqeNnc=;
-        b=jooJYfwCU8bpOo/COtCslTJj0nEi01kSH0iZaZ6rqSsqMBDjY0eD52FIQd++OUUeSe
-         k4DAa66K4nLyZ+5/gI0fU+f2Qn40TEzpdqzUmdvXIOlBwHexq+bCzYz696VuSpnBGoEz
-         pZ/XY6EByJNB/6AE6nowRiXDxgP/T/96rZ6GzHy2evXLqr2c13Y1uhncUa4SAwoUOR1k
-         izgQBQljG1YHtRZDRv64TeYcCqKMk6iIY15pD9jq4lRJk++xOcVYbkylqQ+8oQfjA9rc
-         lEo4LAhEpZrB5trF1kdfexQSfcHz/YilQGwpe77PeNOdrYDXtqtl9a7JxeFnS4dLfhxv
-         kR4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739275312; x=1739880112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cR78AkxIa2Az7+jLUIlRk9lQTkKC8dZbc8Nu2FqeNnc=;
-        b=OeShEM3MEhxsf4isVJdHYpL/c8blg9FG7n8YM23rXd0hnqUFpxad0LZhvv2MjEOo1C
-         bXCy195ncah2fyVN7wx1ZnFE3A3RwPSltmsBCb0oyJvFG6/oSafmCH9dU7Etp1JNXcVl
-         JlFoe8akT8x+hXG/uRGAhaP5BZzfR/J4xyoNWImpbHs3i2IdXtQG3I5lTpSSiKL9hYpT
-         iwO+kwmJ3x85evDhAFbyZfEOGwC4NoWu0WzDgXy6FXIjTjw5PiZsgxxYNpbUAVOwmLmH
-         SAPVYufVZEIh+7peRn2mWHjgh6LugceSInuxU7S9okmVPhRvzVOufeVP91SGLwiuDQLF
-         KW7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUbVmKV9bk8Js1whRt//WSr1NOsZM80H6RbcWg1NFKkackZ8dkuuQ0cL3HSKqMJvH/ZCkqwRttHAZsL/LBdRA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV89J6NQeQMndgqoRiO99KYDeXB7+7ssJzS+X+20VSpIRiIY1V
-	U3N9TwbjcpuvMwQouMBLjR4G2Z0T1bxSRagApBQT6SxjspSaKGeb7aziEQ==
-X-Gm-Gg: ASbGnctLM8DJtisy57c/4Y/acsoVkoh2JHBklW+qvsq7BoTQrTJJSoCWJpe474SoYE0
-	qRZk70zrbvAbZLXNb2jqLjw6MKFAlKp6BRUYpcw2H0UG8O+GyYaTo0CqSfGBa3+08QiuofoVH+2
-	rihoIWQ31WwIiyC6uYvC5rCLXJaZAIlDgwwhsqtIoH5CMNb8to9sIZMXzkMCx/DKfmWbldyXya0
-	Zd4RP9T+b4GciH+IBMw/AEDhHlI3Iggn5yv9sCKsAjhl1dbFzajWjAInGkPhzkLpPBG3bafpkVf
-	9nPulq34v5o0YbcVD8xPNAPfdbLhcVe+xQ==
-X-Google-Smtp-Source: AGHT+IHSCYuAx911i65Wa/bhjFfYraBmUr0//nvn3VkY/9Q6cMRGNt29yeI/+/J71dDcXnpLJqM1zQ==
-X-Received: by 2002:a5d:6da8:0:b0:38d:e57e:d21 with SMTP id ffacd0b85a97d-38de57e0e7dmr1750312f8f.30.1739275311340;
-        Tue, 11 Feb 2025 04:01:51 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:ac07:4372:f96c:546e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc933ff9fsm12466658f8f.96.2025.02.11.04.01.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 04:01:50 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v5 10/10] netlink: specs: wireless: add a spec for nl80211
-Date: Tue, 11 Feb 2025 12:01:27 +0000
-Message-ID: <20250211120127.84858-11-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250211120127.84858-1-donald.hunter@gmail.com>
-References: <20250211120127.84858-1-donald.hunter@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92701FA165;
+	Tue, 11 Feb 2025 12:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739275485; cv=fail; b=onmV/OHlYn6RSeDTyJvNzSuULJQ06VybqRyKGK8LDKjsDqXghgnr5UEZ/KdqrHYOkTjiztciBkQHGMFS5Ak2uPqDTA6zMolhJz1hbvUQ76fD0LmCYeLSW/knLKgjT4TvaOH35K0AXFQKwAYkEAEt6oZXU500xwLH8NHQeXIC3y0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739275485; c=relaxed/simple;
+	bh=wUIinRgUjSTbL3FrovJlpEMJ4QusJwtPAW5L9oXyhKs=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=IdL4eJcaIFnQZLUqd3vJzHbBD81sSu9WPWx5/oCDRcFlIUbhYXRjMhBFbaQmlDQWGcSfCjqV+xLRol+M6PPnkv4vklRkGQfOdvoXORnpXfohEJTdMJeFOzHFWY25AqJe29D2Q80ABN/TPoSY2wl0BG0FeiGJ+R3NlhkoHKzb1Pg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=owgJosIC; arc=fail smtp.client-ip=40.92.62.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hC1zT6I7LTYahTXS6U6BVNnlDrM/tUUC8mvat6ugj0DRjMK9Y70okjJ9vffWvNJAIn/2802BJnwY0nsrEoqtnlEQ8HrfoQQ2TIoumqePvg8QmHKFguKpE3HSZNnCt1p9ShFORx4dxTrRBguffktJmBshVfsAIS+X1PVJUUiCF7XgVEvAIpY6Ti87TfhRM+cGZ8PzoynocpD8h8Gbf3XdIv7yXK4LfBWXMGikTn6aB8M398MFCDFv3J9q0AReHB9WbsltlHDHobk/195MRJ0TuB7XxyM86umbgvXhi5n1bqjq8tsFSSVRst/F+c9JigU+LeJq3KQCL7ft00Qlrd+82Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wUIinRgUjSTbL3FrovJlpEMJ4QusJwtPAW5L9oXyhKs=;
+ b=srZWoIcFzwHqlF1aRpbtYK3LzqrvGg/vY8FYUzMgr55FD7cLR9aIGWzosd7cL23en3oHjPJTpRP046m2lrdzwnqNeFvN/Fg8ngNGdyqVJODK7r0J9O5fHwUQmi7iaXswSUKXx9pfjzQpU7dXjHNAICuEUo7I+e1ecuRhAqUDVmMBWGFZa6B5cbTTKF1W9ha4RmeYILMG60KvzOesZGspbtigEgRY7QCjqX7lehWV5u7PH5xpZavKGaVN5Q4RE1Yravs37nhjDR7WLXV934lwDhIspldS2yW0+ramjy6d0YkZ3aTB9u2c4BKy66+OWL+qDUBHTJOyFRSreDIeUF836g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wUIinRgUjSTbL3FrovJlpEMJ4QusJwtPAW5L9oXyhKs=;
+ b=owgJosICEJ0+8e4idnaMSDfCJAaJa2ui99bsxMkrH7aFOCfSSHBjuPmWUSo68wpmItay6xlgMAfCMkNkWftrVmuqZX8RUgEU2im/hLJSWEg7Ahn5/49khyTf2ti+Le497OgV3SOPPP6Pku9YaaPyaLv6Km0U/glrcLBAWp/nxc621DhAd5Ff8OzszA8Bf8BOnuIzRo6OIkBdkpmCZJqwDgkdVNgcx1Kg8+5C7aVtzALT5Mvmy0va05B+sOeuUrEO0TkE6L1FBAz5SDYI3oTN5TUPSP1CS1hIHs6w8ZyUHacA4qCoS5VG5rURLpqZj/0vP7HrpQ2qbBhmvPAnDBMZSg==
+Received: from SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:293::17)
+ by SY7P300MB0082.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:235::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.12; Tue, 11 Feb
+ 2025 12:04:39 +0000
+Received: from SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::c7a9:a687:779f:a9cc]) by SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::c7a9:a687:779f:a9cc%5]) with mapi id 15.20.8422.015; Tue, 11 Feb 2025
+ 12:04:39 +0000
+From: YAN KANG <kangyan91@outlook.com>
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>
+Subject: BUG: corrupted list in nsim_fib6_rt_destroy 
+Thread-Topic: BUG: corrupted list in nsim_fib6_rt_destroy 
+Thread-Index: AQHbfHrdylM4SOk1skCPmn4ZvjefYg==
+Date: Tue, 11 Feb 2025 12:04:39 +0000
+Message-ID:
+ <SY8P300MB0421A0CA0D6C69A8BE4767A7A1FD2@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SY8P300MB0421:EE_|SY7P300MB0082:EE_
+x-ms-office365-filtering-correlation-id: 720f59f8-e9e7-4c06-4a8e-08dd4a9442eb
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199028|8060799006|8062599003|7092599003|15080799006|13031999003|19110799003|15030799003|102099032|3412199025|440099028|12091999003;
+x-microsoft-antispam-message-info:
+ =?gb2312?B?VGQ4MnlhQlkrZzNkWFVTUUkydFN1MStlS0E0dkRJNGVSd0t3S0lzekQ1MTBi?=
+ =?gb2312?B?ejVqRGRSQVJTME9Xbk9uTlZFU2pkQ08vMWszWTgrbGtpV0UxcGtPeTVUeFhW?=
+ =?gb2312?B?L1poWmtLK0JlZmZCd2Y1UXdMK1UvTVpBUHI2anJLa3U0eDBBdVVxK29DczZ6?=
+ =?gb2312?B?eUlEVUt5WjFiY3kwbmsybkQySkRBaTJ6UVdTSHBaOEc0OHk3ZHJGZG9oNXRj?=
+ =?gb2312?B?d0laZFZMLzJNVXRGTStjWVZZWnFyLzcreElGeG1obks1bzBaV1o1QkVwaGtk?=
+ =?gb2312?B?VDRPVVowb0hBZzVjUHVWWnUxR09lamlONlpQVnVvV3lsdHdBQ2ZGR05LUWZS?=
+ =?gb2312?B?K0FVaEh5V0F3L1ljSHh0Q1EvTkt4NVJ6Rk9nUWdjU2VkbWd3bzVTNCs5VDhX?=
+ =?gb2312?B?N0tnWDlJWnR2VzlLcUxxQm9aVmVhUmQzRmwxTzRUZzR1TlNockdhSXMxckJP?=
+ =?gb2312?B?ODIrM3ovM1RxbVRrdkRPdFRuV1JoWSs3SXlGVnVJSDdhL2ppdzdYbTFuUXRC?=
+ =?gb2312?B?a0hGeXFnbVFidG5aRUJuSzFTaHlVZjJUb3lVUENsRjJWYTRUZStBV09lZW9t?=
+ =?gb2312?B?T1VRVC9KNUxWaE9mYjd3U1hZY2NxVnJ2V2VudVF0aHpGZW9lUEdRN2tvd1ZR?=
+ =?gb2312?B?WENWR0FNb3JwMkZSd1R2SWIzWC81aS9mVlFsMmo1dzBROThLUDVwcXNZM1Bn?=
+ =?gb2312?B?eVdXbkQ5SWx5OG9uSFlUYU5OSUVWVlJYL3l3SWVCZ1BHbEp6eGlCZXoxUkF6?=
+ =?gb2312?B?bU5nVXA5SEsrVmYxV0txUlN6WW1HTkNqaDZ6Q0o4Rm1yZ2NKK0ROeFNoejNH?=
+ =?gb2312?B?a096OE1POEVhWjdaWWtMNkdlcU5Ya0xLT2x2dUY2VW5CV3JQbkc4MVByNHEz?=
+ =?gb2312?B?Q05PRGVaL1dmZWtRcUpUSE5kOWExVmUvSFJoS0h1Y2ZrRjQzaktaVC9CU3NY?=
+ =?gb2312?B?MHV4ekl3Zmw0bkhvc00wWExtb1h4eHlsK3JBWkxXekQyc3FrL0QvTEFraThy?=
+ =?gb2312?B?N0FRU2hKRlhabnhhY3liZEFNS295UzhlMUpMM3JxZFg1RTdOUWVVTGpYT1NQ?=
+ =?gb2312?B?SHgzOHJ4UEJqL01LLzdRNFlnTS9ybWlpWE1RYi9VNXJXTC9qR2c3RDFOOXlt?=
+ =?gb2312?B?aFNJSU15N1FuazlNZmhZcjNpTTBEV2xKd3YrMXBhZVgrekZaQ0FsRFBpK1lE?=
+ =?gb2312?B?VWJVU05wbUorSzdodW5VS2pLOUl6UlNPZVpXZisyK2hHOFVubEVUSlI1MHVm?=
+ =?gb2312?B?VklqL0o3QWVtMHdzbXR5Y2pIZlBEZUlTYWM5cmNwbnA3SlF5bENTNGFTUFF1?=
+ =?gb2312?B?MWdGdVdNTU5CRjc2SzZYS3B6emtKRm5SV05SNm9ISlZRRC9Va2p6Zyt0YWtF?=
+ =?gb2312?B?ZjdOWGZvOUlWMGtaeUhraDI2VDAxNm1TdCsreHdGekhGZFpYUFQrS3VyVGpt?=
+ =?gb2312?B?TXdOOWVvK3JGNWJYZnMwNmhFT0EwbTlKTGdtSzVXaGpwaHl2WkJKY3hZV3Nm?=
+ =?gb2312?B?bk55cU1qQkp1VktZVXVNdDBxZ3JHS1BCaTNuR1QzbDFYbDdaVXdmOHJhdUk3?=
+ =?gb2312?Q?pjJAu8RDUuBCcdOEvSuGEIX8Y=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?gb2312?B?aDd0TzJoaUxNUVB6RDJldEFiVWJkdTlYMUNpM2g4elM2cVZNT1VNRzAwT3N0?=
+ =?gb2312?B?U2FoNWE3RUZMaGY4MDNaejRxQlBOMTZ4RlFPcllETlFqQ0MvVW9RZktQc3dV?=
+ =?gb2312?B?ZHNYdFc3cDZDcThtb3RrL3ZHeWp5R0ZtOWsxb29pLzFGTEIxbTBMcld1L3hJ?=
+ =?gb2312?B?Wnc3dzRTT3dFYWU5YnlVMG8zVnozZ2VXalVaZmh6cGVJWVRKb3BnYUN2M0Zj?=
+ =?gb2312?B?OEppQ1ZiaEpubG10LzEvN1hRaEJEcVU1dndmdXJSd2hGKzVrWWt0dHlnYXc3?=
+ =?gb2312?B?SkJQQTdSakdHZTlZeGREbEt2OEtOeXhJUGRHVElVYitXNkZHU0lDM1RFS2RU?=
+ =?gb2312?B?VE05NmFZWUZNOTVZQXpNR01RK1VYRTBCWUF4MVlKaHBsdi9nRnh4QVhFdWZV?=
+ =?gb2312?B?Mm1aNUZZdWZFYk81TlBHQmcyblpoRWNNVWN3R3E1WTJRK0NGNjhncThxcGxP?=
+ =?gb2312?B?ekptZlk5a21mVG4zbXBHOHVlaHgremtsTU5DYUJ2aHVXRzJ5SkZSaHJZU0JB?=
+ =?gb2312?B?OVZKZ29YS2ZPWnNIMUpsR3N2ZXJSVjM2QjcyTkZtMERVa01rTjY0VG1ZdTNi?=
+ =?gb2312?B?eXNDQmdwUTFJOFFCaHhpTWp0RmxNekFXR0JvOGhYSS9JVW5iak43ZTl4eHFM?=
+ =?gb2312?B?QWN4U2JBdE8valFaTnNXNzUvb3VuVkx1elBNNzVaVXcwZHBFVVZXQzNiN201?=
+ =?gb2312?B?cE1BUnhXYzNPTnVzSlhoNmRLMXBIaFl5bDNMQjRTb0l6LzJiM3JXZGlLVlVo?=
+ =?gb2312?B?b09OaTdWb1hFN3FobmgxTnNIVW0wYmZRSUVsenFHQmhLSkNxMUpycFhPWDdp?=
+ =?gb2312?B?d3B4V3RoVjA3VTdLTmZ0RjhCd1kzQ0xKYkxKUXFRRFl1RllWL0pXc3RIS0pn?=
+ =?gb2312?B?dnVqdEpIWVp2alV1cFJTRDBvWUwrUXlWMSs3cmRETG1Hcjkyb1JkQngyT2xO?=
+ =?gb2312?B?d0tzQW1mSU9RdzRwMWU5dW9oRlJ3dld4bko2UTFVcHljTWRYT3BQRlQ0ekFu?=
+ =?gb2312?B?Nkkzd3pnWngrb2ZRQndPakdJV3FRZmhyOG11eDc1bkFuejNGRnJLVXVsNjZ3?=
+ =?gb2312?B?KzZ4eGg4aWZ4d1MzWHlyQzJQczF2SmlLc3YrL05pcXRTZDNvb3d1WmN6RTRK?=
+ =?gb2312?B?MTVpM1JOWkdHM1ZaVzVlSDFBd2lnaGFEVXlpWjFIdmI0SUtkWjBqYS8rQmFm?=
+ =?gb2312?B?RGV4YnlidzJCOWNONmg1YTZVOGpDbnRjSlZza2xHZlBsUGExVG1uWE1wVkVZ?=
+ =?gb2312?B?WUZnUWMzcFNqdmlnMi96UVV4TXpZdFQxK0h4WXUxMlV4STkxZFUzYlpiWmQr?=
+ =?gb2312?B?TzNVclJ4V2tLUjB0VUcya2VRc2twV29FNlpBTDR1OUFhbG5wVG1wNkxPWXB3?=
+ =?gb2312?B?KzJpUHdZdlN1QlQrb0tiV1Z5dmF6a1VNcFVwWlVsWm1tY1FDd1FQMHVjaGxO?=
+ =?gb2312?B?K1h0azhyNUgwYlE4UVRrYlRlUXZnSEgyNHNSOHVHVlpRZm1KNHlqL1RlYXBJ?=
+ =?gb2312?B?WW1WL0VEeGdWSUgxNnVWdWRCc2tsTktzTlg5Y1laZXdlQ3o0ZVc2VDlUT2t4?=
+ =?gb2312?B?T1NveWJzZC85Y2NDajFDbHhnUHQ2Z0t0bElvZmZCTHkvWitzQm5NWG56NWkr?=
+ =?gb2312?B?cVNLaHkzK0ZYeERzRGtTeFN4aGZWVE5wM1JRQk55NnhvQXZkRG5vcmtOdFVP?=
+ =?gb2312?B?bml3MDY5Q2NaaDJaTzh5cmpkMEVJUXF3bU1mNVlOb0x4ZmsvaVYyMTRCNHZD?=
+ =?gb2312?Q?aE33QXtA+Nxworrxu8=3D?=
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 720f59f8-e9e7-4c06-4a8e-08dd4a9442eb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2025 12:04:39.4712
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY7P300MB0082
 
-Add a rudimentary YNL spec for nl80211 that covers get-wiphy,
-get-interface and get-protocol-features.
-
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --do get-protocol-features
-{'protocol-features': {'split-wiphy-dump'}}
-
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --dump get-wiphy --json '{ "split-wiphy-dump": true }'
-
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --dump get-interface
-
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-Acked-by: Johannes Berg <johannes@sipsolutions.net>
----
- Documentation/netlink/specs/nl80211.yaml | 2000 ++++++++++++++++++++++
- tools/net/ynl/Makefile.deps              |    1 +
- 2 files changed, 2001 insertions(+)
- create mode 100644 Documentation/netlink/specs/nl80211.yaml
-
-diff --git a/Documentation/netlink/specs/nl80211.yaml b/Documentation/netlink/specs/nl80211.yaml
-new file mode 100644
-index 000000000000..1ec49c3562cd
---- /dev/null
-+++ b/Documentation/netlink/specs/nl80211.yaml
-@@ -0,0 +1,2000 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: nl80211
-+protocol: genetlink-legacy
-+
-+doc:
-+  Netlink API for 802.11 wireless devices
-+
-+definitions:
-+  -
-+    name: commands
-+    type: enum
-+    entries:
-+      - unspec
-+      - get-wiphy
-+      - set-wiphy
-+      - new-wiphy
-+      - del-wiphy
-+      - get-interface
-+      - set-interface
-+      - new-interface
-+      - del-interface
-+      - get-key
-+      - set-key
-+      - new-key
-+      - del-key
-+      - get-beacon
-+      - set-beacon
-+      - new-beacon
-+      - del-beacon
-+      - get-station
-+      - set-station
-+      - new-station
-+      - del-station
-+      - get-mpath
-+      - set-mpath
-+      - new-mpath
-+      - del-mpath
-+      - set-bss
-+      - set-reg
-+      - req-set-reg
-+      - get-mesh-config
-+      - set-mesh-config
-+      - set-mgmt-extra-ie
-+      - get-reg
-+      - get-scan
-+      - trigger-scan
-+      - new-scan-results
-+      - scan-aborted
-+      - reg-change
-+      - authenticate
-+      - associate
-+      - deauthenticate
-+      - disassociate
-+      - michael-mic-failure
-+      - reg-beacon-hint
-+      - join-ibss
-+      - leave-ibss
-+      - testmode
-+      - connect
-+      - roam
-+      - disconnect
-+      - set-wiphy-netns
-+      - get-survey
-+      - new-survey-results
-+      - set-pmksa
-+      - del-pmksa
-+      - flush-pmksa
-+      - remain-on-channel
-+      - cancel-remain-on-channel
-+      - set-tx-bitrate-mask
-+      - register-action
-+      - action
-+      - action-tx-status
-+      - set-power-save
-+      - get-power-save
-+      - set-cqm
-+      - notify-cqm
-+      - set-channel
-+      - set-wds-peer
-+      - frame-wait-cancel
-+      - join-mesh
-+      - leave-mesh
-+      - unprot-deauthenticate
-+      - unprot-disassociate
-+      - new-peer-candidate
-+      - get-wowlan
-+      - set-wowlan
-+      - start-sched-scan
-+      - stop-sched-scan
-+      - sched-scan-results
-+      - sched-scan-stopped
-+      - set-rekey-offload
-+      - pmksa-candidate
-+      - tdls-oper
-+      - tdls-mgmt
-+      - unexpected-frame
-+      - probe-client
-+      - register-beacons
-+      - unexpected-4-addr-frame
-+      - set-noack-map
-+      - ch-switch-notify
-+      - start-p2p-device
-+      - stop-p2p-device
-+      - conn-failed
-+      - set-mcast-rate
-+      - set-mac-acl
-+      - radar-detect
-+      - get-protocol-features
-+      - update-ft-ies
-+      - ft-event
-+      - crit-protocol-start
-+      - crit-protocol-stop
-+      - get-coalesce
-+      - set-coalesce
-+      - channel-switch
-+      - vendor
-+      - set-qos-map
-+      - add-tx-ts
-+      - del-tx-ts
-+      - get-mpp
-+      - join-ocb
-+      - leave-ocb
-+      - ch-switch-started-notify
-+      - tdls-channel-switch
-+      - tdls-cancel-channel-switch
-+      - wiphy-reg-change
-+      - abort-scan
-+      - start-nan
-+      - stop-nan
-+      - add-nan-function
-+      - del-nan-function
-+      - change-nan-config
-+      - nan-match
-+      - set-multicast-to-unicast
-+      - update-connect-params
-+      - set-pmk
-+      - del-pmk
-+      - port-authorized
-+      - reload-regdb
-+      - external-auth
-+      - sta-opmode-changed
-+      - control-port-frame
-+      - get-ftm-responder-stats
-+      - peer-measurement-start
-+      - peer-measurement-result
-+      - peer-measurement-complete
-+      - notify-radar
-+      - update-owe-info
-+      - probe-mesh-link
-+      - set-tid-config
-+      - unprot-beacon
-+      - control-port-frame-tx-status
-+      - set-sar-specs
-+      - obss-color-collision
-+      - color-change-request
-+      - color-change-started
-+      - color-change-aborted
-+      - color-change-completed
-+      - set-fils-aad
-+      - assoc-comeback
-+      - add-link
-+      - remove-link
-+      - add-link-sta
-+      - modify-link-sta
-+      - remove-link-sta
-+      - set-hw-timestamp
-+      - links-removed
-+      - set-tid-to-link-mapping
-+  -
-+    name: feature-flags
-+    type: flags
-+    entries:
-+      - sk-tx-status
-+      - ht-ibss
-+      - inactivity-timer
-+      - cell-base-reg-hints
-+      - p2p-device-needs-channel
-+      - sae
-+      - low-priority-scan
-+      - scan-flush
-+      - ap-scan
-+      - vif-txpower
-+      - need-obss-scan
-+      - p2p-go-ctwin
-+      - p2p-go-oppps
-+      - reserved
-+      - advertise-chan-limits
-+      - full-ap-client-state
-+      - userspace-mpm
-+      - active-monitor
-+      - ap-mode-chan-width-change
-+      - ds-param-set-ie-in-probes
-+      - wfa-tpc-ie-in-probes
-+      - quiet
-+      - tx-power-insertion
-+      - ackto-estimation
-+      - static-smps
-+      - dynamic-smps
-+      - supports-wmm-admission
-+      - mac-on-create
-+      - tdls-channel-switch
-+      - scan-random-mac-addr
-+      - sched-scan-random-mac-addr
-+      - no-random-mac-addr
-+  -
-+    name: ieee80211-mcs-info
-+    type: struct
-+    members:
-+      -
-+        name: rx-mask
-+        type: binary
-+        len: 10
-+      -
-+        name: rx-highest
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-params
-+        type: u8
-+      -
-+        name: reserved
-+        type: binary
-+        len: 3
-+  -
-+    name: ieee80211-vht-mcs-info
-+    type: struct
-+    members:
-+      -
-+        name: rx-mcs-map
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: rx-highest
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-mcs-map
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-highest
-+        type: u16
-+        byte-order: little-endian
-+  -
-+    name: ieee80211-ht-cap
-+    type: struct
-+    members:
-+      -
-+        name: cap-info
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: ampdu-params-info
-+        type: u8
-+      -
-+        name: mcs
-+        type: binary
-+        struct: ieee80211-mcs-info
-+      -
-+        name: extended-ht-cap-info
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-bf-cap-info
-+        type: u32
-+        byte-order: little-endian
-+      -
-+        name: antenna-selection-info
-+        type: u8
-+  -
-+    name: channel-type
-+    type: enum
-+    entries:
-+      - no-ht
-+      - ht20
-+      - ht40minus
-+      - ht40plus
-+  -
-+    name: sta-flag-update
-+    type: struct
-+    members:
-+      -
-+        name: mask
-+        type: u32
-+      -
-+        name: set
-+        type: u32
-+  -
-+    name: protocol-features
-+    type: flags
-+    entries:
-+      - split-wiphy-dump
-+
-+attribute-sets:
-+  -
-+    name: nl80211-attrs
-+    name-prefix: nl80211-attr-
-+    enum-name: nl80211-attrs
-+    attr-max-name: num-nl80211-attr
-+    attributes:
-+      -
-+        name: wiphy
-+        type: u32
-+      -
-+        name: wiphy-name
-+        type: string
-+      -
-+        name: ifindex
-+        type: u32
-+      -
-+        name: ifname
-+        type: string
-+      -
-+        name: iftype
-+        type: u32
-+      -
-+        name: mac
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: key-data
-+        type: binary
-+      -
-+        name: key-idx
-+        type: u8
-+      -
-+        name: key-cipher
-+        type: u32
-+      -
-+        name: key-seq
-+        type: binary
-+      -
-+        name: key-default
-+        type: flag
-+      -
-+        name: beacon-interval
-+        type: u32
-+      -
-+        name: dtim-period
-+        type: u32
-+      -
-+        name: beacon-head
-+        type: binary
-+      -
-+        name: beacon-tail
-+        type: binary
-+      -
-+        name: sta-aid
-+        type: u16
-+      -
-+        name: sta-flags
-+        type: binary # TODO: nest
-+      -
-+        name: sta-listen-interval
-+        type: u16
-+      -
-+        name: sta-supported-rates
-+        type: binary
-+      -
-+        name: sta-vlan
-+        type: u32
-+      -
-+        name: sta-info
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-bands
-+        type: nest
-+        nested-attributes: wiphy-bands
-+      -
-+        name: mntr-flags
-+        type: binary # TODO: nest
-+      -
-+        name: mesh-id
-+        type: binary
-+      -
-+        name: sta-plink-action
-+        type: u8
-+      -
-+        name: mpath-next-hop
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: mpath-info
-+        type: binary # TODO: nest
-+      -
-+        name: bss-cts-prot
-+        type: u8
-+      -
-+        name: bss-short-preamble
-+        type: u8
-+      -
-+        name: bss-short-slot-time
-+        type: u8
-+      -
-+        name: ht-capability
-+        type: binary
-+      -
-+        name: supported-iftypes
-+        type: nest
-+        nested-attributes: supported-iftypes
-+      -
-+        name: reg-alpha2
-+        type: binary
-+      -
-+        name: reg-rules
-+        type: binary # TODO: nest
-+      -
-+        name: mesh-config
-+        type: binary # TODO: nest
-+      -
-+        name: bss-basic-rates
-+        type: binary
-+      -
-+        name: wiphy-txq-params
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-freq
-+        type: u32
-+      -
-+        name: wiphy-channel-type
-+        type: u32
-+        enum: channel-type
-+      -
-+        name: key-default-mgmt
-+        type: flag
-+      -
-+        name: mgmt-subtype
-+        type: u8
-+      -
-+        name: ie
-+        type: binary
-+      -
-+        name: max-num-scan-ssids
-+        type: u8
-+      -
-+        name: scan-frequencies
-+        type: binary # TODO: nest
-+      -
-+        name: scan-ssids
-+        type: binary # TODO: nest
-+      -
-+        name: generation
-+        type: u32
-+      -
-+        name: bss
-+        type: binary # TODO: nest
-+      -
-+        name: reg-initiator
-+        type: u8
-+      -
-+        name: reg-type
-+        type: u8
-+      -
-+        name: supported-commands
-+        type: indexed-array
-+        sub-type: u32
-+        enum: commands
-+      -
-+        name: frame
-+        type: binary
-+      -
-+        name: ssid
-+        type: binary
-+      -
-+        name: auth-type
-+        type: u32
-+      -
-+        name: reason-code
-+        type: u16
-+      -
-+        name: key-type
-+        type: u32
-+      -
-+        name: max-scan-ie-len
-+        type: u16
-+      -
-+        name: cipher-suites
-+        type: binary
-+        sub-type: u32
-+        display-hint: hex
-+      -
-+        name: freq-before
-+        type: binary # TODO: nest
-+      -
-+        name: freq-after
-+        type: binary # TODO: nest
-+      -
-+        name: freq-fixed
-+        type: flag
-+      -
-+        name: wiphy-retry-short
-+        type: u8
-+      -
-+        name: wiphy-retry-long
-+        type: u8
-+      -
-+        name: wiphy-frag-threshold
-+        type: u32
-+      -
-+        name: wiphy-rts-threshold
-+        type: u32
-+      -
-+        name: timed-out
-+        type: flag
-+      -
-+        name: use-mfp
-+        type: u32
-+      -
-+        name: sta-flags2
-+        type: binary
-+        struct: sta-flag-update
-+      -
-+        name: control-port
-+        type: flag
-+      -
-+        name: testdata
-+        type: binary
-+      -
-+        name: privacy
-+        type: flag
-+      -
-+        name: disconnected-by-ap
-+        type: flag
-+      -
-+        name: status-code
-+        type: u16
-+      -
-+        name: cipher-suites-pairwise
-+        type: binary
-+      -
-+        name: cipher-suite-group
-+        type: u32
-+      -
-+        name: wpa-versions
-+        type: u32
-+      -
-+        name: akm-suites
-+        type: binary
-+      -
-+        name: req-ie
-+        type: binary
-+      -
-+        name: resp-ie
-+        type: binary
-+      -
-+        name: prev-bssid
-+        type: binary
-+      -
-+        name: key
-+        type: binary # TODO: nest
-+      -
-+        name: keys
-+        type: binary # TODO: nest
-+      -
-+        name: pid
-+        type: u32
-+      -
-+        name: 4addr
-+        type: u8
-+      -
-+        name: survey-info
-+        type: binary # TODO: nest
-+      -
-+        name: pmkid
-+        type: binary
-+      -
-+        name: max-num-pmkids
-+        type: u8
-+      -
-+        name: duration
-+        type: u32
-+      -
-+        name: cookie
-+        type: u64
-+      -
-+        name: wiphy-coverage-class
-+        type: u8
-+      -
-+        name: tx-rates
-+        type: binary # TODO: nest
-+      -
-+        name: frame-match
-+        type: binary
-+      -
-+        name: ack
-+        type: flag
-+      -
-+        name: ps-state
-+        type: u32
-+      -
-+        name: cqm
-+        type: binary # TODO: nest
-+      -
-+        name: local-state-change
-+        type: flag
-+      -
-+        name: ap-isolate
-+        type: u8
-+      -
-+        name: wiphy-tx-power-setting
-+        type: u32
-+      -
-+        name: wiphy-tx-power-level
-+        type: u32
-+      -
-+        name: tx-frame-types
-+        type: nest
-+        nested-attributes: iftype-attrs
-+      -
-+        name: rx-frame-types
-+        type: nest
-+        nested-attributes: iftype-attrs
-+      -
-+        name: frame-type
-+        type: u16
-+      -
-+        name: control-port-ethertype
-+        type: flag
-+      -
-+        name: control-port-no-encrypt
-+        type: flag
-+      -
-+        name: support-ibss-rsn
-+        type: flag
-+      -
-+        name: wiphy-antenna-tx
-+        type: u32
-+      -
-+        name: wiphy-antenna-rx
-+        type: u32
-+      -
-+        name: mcast-rate
-+        type: u32
-+      -
-+        name: offchannel-tx-ok
-+        type: flag
-+      -
-+        name: bss-ht-opmode
-+        type: u16
-+      -
-+        name: key-default-types
-+        type: binary # TODO: nest
-+      -
-+        name: max-remain-on-channel-duration
-+        type: u32
-+      -
-+        name: mesh-setup
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-antenna-avail-tx
-+        type: u32
-+      -
-+        name: wiphy-antenna-avail-rx
-+        type: u32
-+      -
-+        name: support-mesh-auth
-+        type: flag
-+      -
-+        name: sta-plink-state
-+        type: u8
-+      -
-+        name: wowlan-triggers
-+        type: binary # TODO: nest
-+      -
-+        name: wowlan-triggers-supported
-+        type: nest
-+        nested-attributes: wowlan-triggers-attrs
-+      -
-+        name: sched-scan-interval
-+        type: u32
-+      -
-+        name: interface-combinations
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: if-combination-attributes
-+      -
-+        name: software-iftypes
-+        type: nest
-+        nested-attributes: supported-iftypes
-+      -
-+        name: rekey-data
-+        type: binary # TODO: nest
-+      -
-+        name: max-num-sched-scan-ssids
-+        type: u8
-+      -
-+        name: max-sched-scan-ie-len
-+        type: u16
-+      -
-+        name: scan-supp-rates
-+        type: binary # TODO: nest
-+      -
-+        name: hidden-ssid
-+        type: u32
-+      -
-+        name: ie-probe-resp
-+        type: binary
-+      -
-+        name: ie-assoc-resp
-+        type: binary
-+      -
-+        name: sta-wme
-+        type: binary # TODO: nest
-+      -
-+        name: support-ap-uapsd
-+        type: flag
-+      -
-+        name: roam-support
-+        type: flag
-+      -
-+        name: sched-scan-match
-+        type: binary # TODO: nest
-+      -
-+        name: max-match-sets
-+        type: u8
-+      -
-+        name: pmksa-candidate
-+        type: binary # TODO: nest
-+      -
-+        name: tx-no-cck-rate
-+        type: flag
-+      -
-+        name: tdls-action
-+        type: u8
-+      -
-+        name: tdls-dialog-token
-+        type: u8
-+      -
-+        name: tdls-operation
-+        type: u8
-+      -
-+        name: tdls-support
-+        type: flag
-+      -
-+        name: tdls-external-setup
-+        type: flag
-+      -
-+        name: device-ap-sme
-+        type: u32
-+      -
-+        name: dont-wait-for-ack
-+        type: flag
-+      -
-+        name: feature-flags
-+        type: u32
-+        enum: feature-flags
-+        enum-as-flags: True
-+      -
-+        name: probe-resp-offload
-+        type: u32
-+      -
-+        name: probe-resp
-+        type: binary
-+      -
-+        name: dfs-region
-+        type: u8
-+      -
-+        name: disable-ht
-+        type: flag
-+      -
-+        name: ht-capability-mask
-+        type: binary
-+        struct: ieee80211-ht-cap
-+      -
-+        name: noack-map
-+        type: u16
-+      -
-+        name: inactivity-timeout
-+        type: u16
-+      -
-+        name: rx-signal-dbm
-+        type: u32
-+      -
-+        name: bg-scan-period
-+        type: u16
-+      -
-+        name: wdev
-+        type: u64
-+      -
-+        name: user-reg-hint-type
-+        type: u32
-+      -
-+        name: conn-failed-reason
-+        type: u32
-+      -
-+        name: auth-data
-+        type: binary
-+      -
-+        name: vht-capability
-+        type: binary
-+      -
-+        name: scan-flags
-+        type: u32
-+      -
-+        name: channel-width
-+        type: u32
-+      -
-+        name: center-freq1
-+        type: u32
-+      -
-+        name: center-freq2
-+        type: u32
-+      -
-+        name: p2p-ctwindow
-+        type: u8
-+      -
-+        name: p2p-oppps
-+        type: u8
-+      -
-+        name: local-mesh-power-mode
-+        type: u32
-+      -
-+        name: acl-policy
-+        type: u32
-+      -
-+        name: mac-addrs
-+        type: binary # TODO: nest
-+      -
-+        name: mac-acl-max
-+        type: u32
-+      -
-+        name: radar-event
-+        type: u32
-+      -
-+        name: ext-capa
-+        type: binary
-+      -
-+        name: ext-capa-mask
-+        type: binary
-+      -
-+        name: sta-capability
-+        type: u16
-+      -
-+        name: sta-ext-capability
-+        type: binary
-+      -
-+        name: protocol-features
-+        type: u32
-+        enum: protocol-features
-+      -
-+        name: split-wiphy-dump
-+        type: flag
-+      -
-+        name: disable-vht
-+        type: flag
-+      -
-+        name: vht-capability-mask
-+        type: binary
-+      -
-+        name: mdid
-+        type: u16
-+      -
-+        name: ie-ric
-+        type: binary
-+      -
-+        name: crit-prot-id
-+        type: u16
-+      -
-+        name: max-crit-prot-duration
-+        type: u16
-+      -
-+        name: peer-aid
-+        type: u16
-+      -
-+        name: coalesce-rule
-+        type: binary # TODO: nest
-+      -
-+        name: ch-switch-count
-+        type: u32
-+      -
-+        name: ch-switch-block-tx
-+        type: flag
-+      -
-+        name: csa-ies
-+        type: binary # TODO: nest
-+      -
-+        name: cntdwn-offs-beacon
-+        type: binary
-+      -
-+        name: cntdwn-offs-presp
-+        type: binary
-+      -
-+        name: rxmgmt-flags
-+        type: binary
-+      -
-+        name: sta-supported-channels
-+        type: binary
-+      -
-+        name: sta-supported-oper-classes
-+        type: binary
-+      -
-+        name: handle-dfs
-+        type: flag
-+      -
-+        name: support-5-mhz
-+        type: flag
-+      -
-+        name: support-10-mhz
-+        type: flag
-+      -
-+        name: opmode-notif
-+        type: u8
-+      -
-+        name: vendor-id
-+        type: u32
-+      -
-+        name: vendor-subcmd
-+        type: u32
-+      -
-+        name: vendor-data
-+        type: binary
-+      -
-+        name: vendor-events
-+        type: binary
-+      -
-+        name: qos-map
-+        type: binary
-+      -
-+        name: mac-hint
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: wiphy-freq-hint
-+        type: u32
-+      -
-+        name: max-ap-assoc-sta
-+        type: u32
-+      -
-+        name: tdls-peer-capability
-+        type: u32
-+      -
-+        name: socket-owner
-+        type: flag
-+      -
-+        name: csa-c-offsets-tx
-+        type: binary
-+      -
-+        name: max-csa-counters
-+        type: u8
-+      -
-+        name: tdls-initiator
-+        type: flag
-+      -
-+        name: use-rrm
-+        type: flag
-+      -
-+        name: wiphy-dyn-ack
-+        type: flag
-+      -
-+        name: tsid
-+        type: u8
-+      -
-+        name: user-prio
-+        type: u8
-+      -
-+        name: admitted-time
-+        type: u16
-+      -
-+        name: smps-mode
-+        type: u8
-+      -
-+        name: oper-class
-+        type: u8
-+      -
-+        name: mac-mask
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: wiphy-self-managed-reg
-+        type: flag
-+      -
-+        name: ext-features
-+        type: binary
-+      -
-+        name: survey-radio-stats
-+        type: binary
-+      -
-+        name: netns-fd
-+        type: u32
-+      -
-+        name: sched-scan-delay
-+        type: u32
-+      -
-+        name: reg-indoor
-+        type: flag
-+      -
-+        name: max-num-sched-scan-plans
-+        type: u32
-+      -
-+        name: max-scan-plan-interval
-+        type: u32
-+      -
-+        name: max-scan-plan-iterations
-+        type: u32
-+      -
-+        name: sched-scan-plans
-+        type: binary # TODO: nest
-+      -
-+        name: pbss
-+        type: flag
-+      -
-+        name: bss-select
-+        type: binary # TODO: nest
-+      -
-+        name: sta-support-p2p-ps
-+        type: u8
-+      -
-+        name: pad
-+        type: binary
-+      -
-+        name: iftype-ext-capa
-+        type: binary # TODO: nest
-+      -
-+        name: mu-mimo-group-data
-+        type: binary
-+      -
-+        name: mu-mimo-follow-mac-addr
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: scan-start-time-tsf
-+        type: u64
-+      -
-+        name: scan-start-time-tsf-bssid
-+        type: binary
-+      -
-+        name: measurement-duration
-+        type: u16
-+      -
-+        name: measurement-duration-mandatory
-+        type: flag
-+      -
-+        name: mesh-peer-aid
-+        type: u16
-+      -
-+        name: nan-master-pref
-+        type: u8
-+      -
-+        name: bands
-+        type: u32
-+      -
-+        name: nan-func
-+        type: binary # TODO: nest
-+      -
-+        name: nan-match
-+        type: binary # TODO: nest
-+      -
-+        name: fils-kek
-+        type: binary
-+      -
-+        name: fils-nonces
-+        type: binary
-+      -
-+        name: multicast-to-unicast-enabled
-+        type: flag
-+      -
-+        name: bssid
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: sched-scan-relative-rssi
-+        type: s8
-+      -
-+        name: sched-scan-rssi-adjust
-+        type: binary
-+      -
-+        name: timeout-reason
-+        type: u32
-+      -
-+        name: fils-erp-username
-+        type: binary
-+      -
-+        name: fils-erp-realm
-+        type: binary
-+      -
-+        name: fils-erp-next-seq-num
-+        type: u16
-+      -
-+        name: fils-erp-rrk
-+        type: binary
-+      -
-+        name: fils-cache-id
-+        type: binary
-+      -
-+        name: pmk
-+        type: binary
-+      -
-+        name: sched-scan-multi
-+        type: flag
-+      -
-+        name: sched-scan-max-reqs
-+        type: u32
-+      -
-+        name: want-1x-4way-hs
-+        type: flag
-+      -
-+        name: pmkr0-name
-+        type: binary
-+      -
-+        name: port-authorized
-+        type: binary
-+      -
-+        name: external-auth-action
-+        type: u32
-+      -
-+        name: external-auth-support
-+        type: flag
-+      -
-+        name: nss
-+        type: u8
-+      -
-+        name: ack-signal
-+        type: s32
-+      -
-+        name: control-port-over-nl80211
-+        type: flag
-+      -
-+        name: txq-stats
-+        type: nest
-+        nested-attributes: txq-stats-attrs
-+      -
-+        name: txq-limit
-+        type: u32
-+      -
-+        name: txq-memory-limit
-+        type: u32
-+      -
-+        name: txq-quantum
-+        type: u32
-+      -
-+        name: he-capability
-+        type: binary
-+      -
-+        name: ftm-responder
-+        type: binary # TODO: nest
-+      -
-+        name: ftm-responder-stats
-+        type: binary # TODO: nest
-+      -
-+        name: timeout
-+        type: u32
-+      -
-+        name: peer-measurements
-+        type: binary # TODO: nest
-+      -
-+        name: airtime-weight
-+        type: u16
-+      -
-+        name: sta-tx-power-setting
-+        type: u8
-+      -
-+        name: sta-tx-power
-+        type: s16
-+      -
-+        name: sae-password
-+        type: binary
-+      -
-+        name: twt-responder
-+        type: flag
-+      -
-+        name: he-obss-pd
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-edmg-channels
-+        type: u8
-+      -
-+        name: wiphy-edmg-bw-config
-+        type: u8
-+      -
-+        name: vlan-id
-+        type: u16
-+      -
-+        name: he-bss-color
-+        type: binary # TODO: nest
-+      -
-+        name: iftype-akm-suites
-+        type: binary # TODO: nest
-+      -
-+        name: tid-config
-+        type: binary # TODO: nest
-+      -
-+        name: control-port-no-preauth
-+        type: flag
-+      -
-+        name: pmk-lifetime
-+        type: u32
-+      -
-+        name: pmk-reauth-threshold
-+        type: u8
-+      -
-+        name: receive-multicast
-+        type: flag
-+      -
-+        name: wiphy-freq-offset
-+        type: u32
-+      -
-+        name: center-freq1-offset
-+        type: u32
-+      -
-+        name: scan-freq-khz
-+        type: binary # TODO: nest
-+      -
-+        name: he-6ghz-capability
-+        type: binary
-+      -
-+        name: fils-discovery
-+        type: binary # TOOD: nest
-+      -
-+        name: unsol-bcast-probe-resp
-+        type: binary # TOOD: nest
-+      -
-+        name: s1g-capability
-+        type: binary
-+      -
-+        name: s1g-capability-mask
-+        type: binary
-+      -
-+        name: sae-pwe
-+        type: u8
-+      -
-+        name: reconnect-requested
-+        type: binary
-+      -
-+        name: sar-spec
-+        type: nest
-+        nested-attributes: sar-attributes
-+      -
-+        name: disable-he
-+        type: flag
-+      -
-+        name: obss-color-bitmap
-+        type: u64
-+      -
-+        name: color-change-count
-+        type: u8
-+      -
-+        name: color-change-color
-+        type: u8
-+      -
-+        name: color-change-elems
-+        type: binary # TODO: nest
-+      -
-+        name: mbssid-config
-+        type: binary # TODO: nest
-+      -
-+        name: mbssid-elems
-+        type: binary # TODO: nest
-+      -
-+        name: radar-background
-+        type: flag
-+      -
-+        name: ap-settings-flags
-+        type: u32
-+      -
-+        name: eht-capability
-+        type: binary
-+      -
-+        name: disable-eht
-+        type: flag
-+      -
-+        name: mlo-links
-+        type: binary # TODO: nest
-+      -
-+        name: mlo-link-id
-+        type: u8
-+      -
-+        name: mld-addr
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: mlo-support
-+        type: flag
-+      -
-+        name: max-num-akm-suites
-+        type: binary
-+      -
-+        name: eml-capability
-+        type: u16
-+      -
-+        name: mld-capa-and-ops
-+        type: u16
-+      -
-+        name: tx-hw-timestamp
-+        type: u64
-+      -
-+        name: rx-hw-timestamp
-+        type: u64
-+      -
-+        name: td-bitmap
-+        type: binary
-+      -
-+        name: punct-bitmap
-+        type: u32
-+      -
-+        name: max-hw-timestamp-peers
-+        type: u16
-+      -
-+        name: hw-timestamp-enabled
-+        type: flag
-+      -
-+        name: ema-rnr-elems
-+        type: binary # TODO: nest
-+      -
-+        name: mlo-link-disabled
-+        type: flag
-+      -
-+        name: bss-dump-include-use-data
-+        type: flag
-+      -
-+        name: mlo-ttlm-dlink
-+        type: u16
-+      -
-+        name: mlo-ttlm-ulink
-+        type: u16
-+      -
-+        name: assoc-spp-amsdu
-+        type: flag
-+      -
-+        name: wiphy-radios
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-interface-combinations
-+        type: binary # TODO: nest
-+      -
-+        name: vif-radio-mask
-+        type: u32
-+  -
-+    name: frame-type-attrs
-+    subset-of: nl80211-attrs
-+    attributes:
-+      -
-+        name: frame-type
-+  -
-+    name: wiphy-bands
-+    name-prefix: nl80211-band-
-+    attr-max-name: num-nl80211-bands
-+    attributes:
-+      -
-+        name: 2ghz
-+        doc: 2.4 GHz ISM band
-+        value: 0
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 5ghz
-+        doc: around 5 GHz band (4.9 - 5.7 GHz)
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 60ghz
-+        doc: around 60 GHz band (58.32 - 69.12 GHz)
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 6ghz
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: s1ghz
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: lc
-+        type: nest
-+        nested-attributes: band-attrs
-+  -
-+    name: band-attrs
-+    enum-name: nl80211-band-attr
-+    name-prefix: nl80211-band-attr-
-+    attributes:
-+      -
-+        name: freqs
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: frequency-attrs
-+      -
-+        name: rates
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: bitrate-attrs
-+      -
-+        name: ht-mcs-set
-+        type: binary
-+        struct: ieee80211-mcs-info
-+      -
-+        name: ht-capa
-+        type: u16
-+      -
-+        name: ht-ampdu-factor
-+        type: u8
-+      -
-+        name: ht-ampdu-density
-+        type: u8
-+      -
-+        name: vht-mcs-set
-+        type: binary
-+        struct: ieee80211-vht-mcs-info
-+      -
-+        name: vht-capa
-+        type: u32
-+      -
-+        name: iftype-data
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: iftype-data-attrs
-+      -
-+        name: edmg-channels
-+        type: binary
-+      -
-+        name: edmg-bw-config
-+        type: binary
-+      -
-+        name: s1g-mcs-nss-set
-+        type: binary
-+      -
-+        name: s1g-capa
-+        type: binary
-+  -
-+    name: bitrate-attrs
-+    name-prefix: nl80211-bitrate-attr-
-+    attributes:
-+      -
-+        name: rate
-+        type: u32
-+      -
-+        name: 2ghz-shortpreamble
-+        type: flag
-+  -
-+    name: frequency-attrs
-+    name-prefix: nl80211-frequency-attr-
-+    attributes:
-+      -
-+        name: freq
-+        type: u32
-+      -
-+        name: disabled
-+        type: flag
-+      -
-+        name: no-ir
-+        type: flag
-+      -
-+        name: no-ibss
-+        name-prefix: __nl80211-frequency-attr-
-+        type: flag
-+      -
-+        name: radar
-+        type: flag
-+      -
-+        name: max-tx-power
-+        type: u32
-+      -
-+        name: dfs-state
-+        type: u32
-+      -
-+        name: dfs-time
-+        type: binary
-+      -
-+        name: no-ht40-minus
-+        type: binary
-+      -
-+        name: no-ht40-plus
-+        type: binary
-+      -
-+        name: no-80mhz
-+        type: binary
-+      -
-+        name: no-160mhz
-+        type: binary
-+      -
-+        name: dfs-cac-time
-+        type: binary
-+      -
-+        name: indoor-only
-+        type: binary
-+      -
-+        name: ir-concurrent
-+        type: binary
-+      -
-+        name: no-20mhz
-+        type: binary
-+      -
-+        name: no-10mhz
-+        type: binary
-+      -
-+        name: wmm
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: wmm-attrs
-+      -
-+        name: no-he
-+        type: binary
-+      -
-+        name: offset
-+        type: u32
-+      -
-+        name: 1mhz
-+        type: binary
-+      -
-+        name: 2mhz
-+        type: binary
-+      -
-+        name: 4mhz
-+        type: binary
-+      -
-+        name: 8mhz
-+        type: binary
-+      -
-+        name: 16mhz
-+        type: binary
-+      -
-+        name: no-320mhz
-+        type: binary
-+      -
-+        name: no-eht
-+        type: binary
-+      -
-+        name: psd
-+        type: binary
-+      -
-+        name: dfs-concurrent
-+        type: binary
-+      -
-+        name: no-6ghz-vlp-client
-+        type: binary
-+      -
-+        name: no-6ghz-afc-client
-+        type: binary
-+      -
-+        name: can-monitor
-+        type: binary
-+      -
-+        name: allow-6ghz-vlp-ap
-+        type: binary
-+  -
-+    name: if-combination-attributes
-+    enum-name: nl80211-if-combination-attrs
-+    name-prefix: nl80211-iface-comb-
-+    attr-max-name: max-nl80211-iface-comb
-+    attributes:
-+      -
-+        name: limits
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: iface-limit-attributes
-+      -
-+        name: maxnum
-+        type: u32
-+      -
-+        name: sta-ap-bi-match
-+        type: flag
-+      -
-+        name: num-channels
-+        type: u32
-+      -
-+        name: radar-detect-widths
-+        type: u32
-+      -
-+        name: radar-detect-regions
-+        type: u32
-+      -
-+        name: bi-min-gcd
-+        type: u32
-+  -
-+    name: iface-limit-attributes
-+    enum-name: nl80211-iface-limit-attrs
-+    name-prefix: nl80211-iface-limit-
-+    attr-max-name: max-nl80211-iface-limit
-+    attributes:
-+      -
-+        name: max
-+        type: u32
-+      -
-+        name: types
-+        type: nest
-+        nested-attributes: supported-iftypes
-+  -
-+    name: iftype-data-attrs
-+    name-prefix: nl80211-band-iftype-attr-
-+    attributes:
-+      -
-+        name: iftypes
-+        type: binary
-+      -
-+        name: he-cap-mac
-+        type: binary
-+      -
-+        name: he-cap-phy
-+        type: binary
-+      -
-+        name: he-cap-mcs-set
-+        type: binary
-+      -
-+        name: he-cap-ppe
-+        type: binary
-+      -
-+        name: he-6ghz-capa
-+        type: binary
-+      -
-+        name: vendor-elems
-+        type: binary
-+      -
-+        name: eht-cap-mac
-+        type: binary
-+      -
-+        name: eht-cap-phy
-+        type: binary
-+      -
-+        name: eht-cap-mcs-set
-+        type: binary
-+      -
-+        name: eht-cap-ppe
-+        type: binary
-+  -
-+    name: iftype-attrs
-+    enum-name: nl80211-iftype
-+    name-prefix: nl80211-iftype-
-+    attributes:
-+      -
-+        name: unspecified
-+        type: nest
-+        value: 0
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: adhoc
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: station
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ap
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ap-vlan
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: wds
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: monitor
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: mesh-point
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-client
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-go
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-device
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ocb
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: nan
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+  -
-+    name: sar-attributes
-+    enum-name: nl80211-sar-attrs
-+    name-prefix: nl80211-sar-attr-
-+    attributes:
-+      -
-+        name: type
-+        type: u32
-+      -
-+        name: specs
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: sar-specs
-+  -
-+    name: sar-specs
-+    enum-name: nl80211-sar-specs-attrs
-+    name-prefix: nl80211-sar-attr-specs-
-+    attributes:
-+      -
-+        name: power
-+        type: s32
-+      -
-+        name: range-index
-+        type: u32
-+      -
-+        name: start-freq
-+        type: u32
-+      -
-+        name: end-freq
-+        type: u32
-+  -
-+    name: supported-iftypes
-+    enum-name: nl80211-iftype
-+    name-prefix: nl80211-iftype-
-+    attributes:
-+      -
-+        name: adhoc
-+        type: flag
-+      -
-+        name: station
-+        type: flag
-+      -
-+        name: ap
-+        type: flag
-+      -
-+        name: ap-vlan
-+        type: flag
-+      -
-+        name: wds
-+        type: flag
-+      -
-+        name: monitor
-+        type: flag
-+      -
-+        name: mesh-point
-+        type: flag
-+      -
-+        name: p2p-client
-+        type: flag
-+      -
-+        name: p2p-go
-+        type: flag
-+      -
-+        name: p2p-device
-+        type: flag
-+      -
-+        name: ocb
-+        type: flag
-+      -
-+        name: nan
-+        type: flag
-+  -
-+    name: txq-stats-attrs
-+    name-prefix: nl80211-txq-stats-
-+    attributes:
-+      -
-+        name: backlog-bytes
-+        type: u32
-+      -
-+        name: backlog-packets
-+        type: u32
-+      -
-+        name: flows
-+        type: u32
-+      -
-+        name: drops
-+        type: u32
-+      -
-+        name: ecn-marks
-+        type: u32
-+      -
-+        name: overlimit
-+        type: u32
-+      -
-+        name: overmemory
-+        type: u32
-+      -
-+        name: collisions
-+        type: u32
-+      -
-+        name: tx-bytes
-+        type: u32
-+      -
-+        name: tx-packets
-+        type: u32
-+      -
-+        name: max-flows
-+        type: u32
-+  -
-+    name: wmm-attrs
-+    enum-name: nl80211-wmm-rule
-+    name-prefix: nl80211-wmmr-
-+    attributes:
-+      -
-+        name: cw-min
-+        type: u16
-+      -
-+        name: cw-max
-+        type: u16
-+      -
-+        name: aifsn
-+        type: u8
-+      -
-+        name: txop
-+        type: u16
-+  -
-+    name: wowlan-triggers-attrs
-+    enum-name: nl80211-wowlan-triggers
-+    name-prefix: nl80211-wowlan-trig-
-+    attr-max-name: max-nl80211-wowlan-trig
-+    attributes:
-+      -
-+        name: any
-+        type: flag
-+      -
-+        name: disconnect
-+        type: flag
-+      -
-+        name: magic-pkt
-+        type: flag
-+      -
-+        name: pkt-pattern
-+        type: flag
-+      -
-+        name: gtk-rekey-supported
-+        type: flag
-+      -
-+        name: gtk-rekey-failure
-+        type: flag
-+      -
-+        name: eap-ident-request
-+        type: flag
-+      -
-+        name: 4way-handshake
-+        type: flag
-+      -
-+        name: rfkill-release
-+        type: flag
-+      -
-+        name: wakeup-pkt-80211
-+        type: flag
-+      -
-+        name: wakeup-pkt-80211-len
-+        type: flag
-+      -
-+        name: wakeup-pkt-8023
-+        type: flag
-+      -
-+        name: wakeup-pkt-8023-len
-+        type: flag
-+      -
-+        name: tcp-connection
-+        type: flag
-+      -
-+        name: wakeup-tcp-match
-+        type: flag
-+      -
-+        name: wakeup-tcp-connlost
-+        type: flag
-+      -
-+        name: wakeup-tcp-nomoretokens
-+        type: flag
-+      -
-+        name: net-detect
-+        type: flag
-+      -
-+        name: net-detect-results
-+        type: flag
-+      -
-+        name: unprotected-deauth-disassoc
-+        type: flag
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: get-wiphy
-+      doc: |
-+        Get information about a wiphy or dump a list of all wiphys. Requests to dump get-wiphy
-+        should unconditionally include the split-wiphy-dump flag in the request.
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 1
-+          attributes:
-+            - wiphy
-+            - wdev
-+            - ifindex
-+        reply:
-+          value: 3
-+          attributes: &wiphy-reply-attrs
-+            - bands
-+            - cipher-suites
-+            - control-port-ethertype
-+            - ext-capa
-+            - ext-capa-mask
-+            - ext-features
-+            - feature-flags
-+            - generation
-+            - ht-capability-mask
-+            - interface-combinations
-+            - mac
-+            - max-csa-counters
-+            - max-match-sets
-+            - max-num-akm-suites
-+            - max-num-pmkids
-+            - max-num-scan-ssids
-+            - max-num-sched-scan-plans
-+            - max-num-sched-scan-ssids
-+            - max-remain-on-channel-duration
-+            - max-scan-ie-len
-+            - max-scan-plan-interval
-+            - max-scan-plan-iterations
-+            - max-sched-scan-ie-len
-+            - offchannel-tx-ok
-+            - rx-frame-types
-+            - sar-spec
-+            - sched-scan-max-reqs
-+            - software-iftypes
-+            - support-ap-uapsd
-+            - supported-commands
-+            - supported-iftypes
-+            - tdls-external-setup
-+            - tdls-support
-+            - tx-frame-types
-+            - txq-limit
-+            - txq-memory-limit
-+            - txq-quantum
-+            - txq-stats
-+            - vht-capability-mask
-+            - wiphy
-+            - wiphy-antenna-avail-rx
-+            - wiphy-antenna-avail-tx
-+            - wiphy-antenna-rx
-+            - wiphy-antenna-tx
-+            - wiphy-bands
-+            - wiphy-coverage-class
-+            - wiphy-frag-threshold
-+            - wiphy-name
-+            - wiphy-retry-long
-+            - wiphy-retry-short
-+            - wiphy-rts-threshold
-+            - wowlan-triggers-supported
-+      dump:
-+        request:
-+          attributes:
-+            - wiphy
-+            - wdev
-+            - ifindex
-+            - split-wiphy-dump
-+        reply:
-+          attributes: *wiphy-reply-attrs
-+    -
-+      name: get-interface
-+      doc: Get information about an interface or dump a list of all interfaces
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 5
-+          attributes:
-+            - ifname
-+        reply:
-+          value: 7
-+          attributes: &interface-reply-attrs
-+            - ifname
-+            - iftype
-+            - ifindex
-+            - wiphy
-+            - wdev
-+            - mac
-+            - generation
-+            - txq-stats
-+            - 4addr
-+      dump:
-+        request:
-+          attributes:
-+            - ifname
-+        reply:
-+          attributes: *interface-reply-attrs
-+    -
-+      name: get-protocol-features
-+      doc: Get information about supported protocol features
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 95
-+          attributes:
-+            - protocol-features
-+        reply:
-+          value: 95
-+          attributes:
-+            - protocol-features
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: config
-+    -
-+      name: scan
-+    -
-+      name: regulatory
-+    -
-+      name: mlme
-+    -
-+      name: vendor
-+    -
-+      name: nan
-+    -
-+      name: testmode
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index d027a07c1e2c..f3269ce39e5b 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -23,6 +23,7 @@ CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
- CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
- CFLAGS_net_shaper:=$(call get_hdr_inc,_LINUX_NET_SHAPER_H,net_shaper.h)
- CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
-+CFLAGS_nl80211:=$(call get_hdr_inc,__LINUX_NL802121_H,nl80211.h)
- CFLAGS_nlctrl:=$(call get_hdr_inc,__LINUX_GENERIC_NETLINK_H,genetlink.h)
- CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
- CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
--- 
-2.48.1
-
+RGVhciBtYWludGFpbmVycywKCkkgZm91bmQgYSBrZXJuZWwgIGJ1ZyB0aXRpbGVkICJCVUc6IGNv
+cnJ1cHRlZCBsaXN0IGluIG5zaW1fZmliNl9ydF9kZXN0cm95ICIgd2hpbGUgdXNpbmcgbW9kaWZp
+ZWQgc3l6a2FsbGVyIGZ1enppbmcgdG9vbC4gSSBJdGVzdGVkIGl0IG9uIHRoZSBsYXRlc3QgTGlu
+dXggdXBzdHJlYW0gdmVyc2lvbiAoNi4xMy4wLXJjNykgLiAKCgpBZnRlciBwcmVsaW1pbmFyeSBh
+bmFseXNpcywgdGhlIGJ1ZyBpcyB0cmlnZ2VyZCBpbiAgbnNpbV9maWI2X3J0X2Rlc3Ryb3kgZnVu
+Y3Rpb24gIGRyaXZlcnMvbmV0L25ldGRldnNpbS9maWIuYwp3aGVuIGtlcm5lbCB0cnkgdG8gZGVs
+ZXRlIG5vZGUgZnJvbSBsaXN0IDogIGxpc3RfZGVsKCZmaWJfcnQtPmxpc3QpOwp0aGUgbm9kZSBo
+YXMgYWxyZWFkeSB1bmxpbmsgZnJvbSB0aGUgbGlzdC4KCgpJZiB5b3UgZml4IHRoaXMgaXNzdWUs
+IHBsZWFzZSBhZGQgdGhlIGZvbGxvd2luZyB0YWcgdG8gdGhlIGNvbW1pdDoKUmVwb3J0ZWQtYnk6
+IHlhbiBrYW5nIDxrYW5neWFuOTFAb3V0bG9vay5jb20+ClJlcG9ydGVkLWJ5OiB5dWUgc3VuIDxz
+YW1zdW4xMDA2MjE5QGdtYWlsLmNvbQoKCkkgaG9wZSBpdCBoZWxwcy4KQmVzdCByZWdhcmRzCnlh
+biBrYW5nCgpLZXJuZWwgY3Jhc2ggbG9nICBhbmQgcmVwcm9kdWNlciBhcmUgbGlzdGVkIGJlbG93
+LgoKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09ClN5emthbGxlciBoaXQgJ0JVRzogY29ycnVwdGVkIGxpc3QgaW4gbnNpbV9m
+aWI2X3J0X2Rlc3Ryb3knIGJ1Zy4KCm5ldGRldnNpbSBuZXRkZXZzaW0wIG5ldGRldnNpbTAgKHVu
+cmVnaXN0ZXJpbmcpOiB1bnNldCBbMSwgMF0gdHlwZSAyIGZhbWlseSAwIHBvcnQgNjA4MSAtIDAK
+bGlzdF9kZWwgY29ycnVwdGlvbi4gcHJldi0+bmV4dCBzaG91bGQgYmUgZmZmZjg4ODExMmIxNmYy
+OCwgYnV0IHdhcyAwMDAwMDAwMDAwMDAwMDAwLiAocHJldj1mZmZmODg4MTA4MzE4NGE4KQotLS0t
+LS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0Ka2VybmVsIEJVRyBhdCBsaWIvbGlzdF9k
+ZWJ1Zy5jOjYyIQpPb3BzOiBpbnZhbGlkIG9wY29kZTogMDAwMCBbIzFdIFBSRUVNUFQgU01QIEtB
+U0FOIFBUSQpDUFU6IDAgVUlEOiAwIFBJRDogOTkxMSBDb21tOiBrd29ya2VyL3U4OjQgTm90IHRh
+aW50ZWQgNi4xMy4wLXJjMSAjNQpIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQw
+RlggKyBQSUlYLCAxOTk2KSwgQklPUyAxLjE2LjItZGViaWFuLTEuMTYuMi0xIDA0LzAxLzIwMTQK
+V29ya3F1ZXVlOiBuZXRucyBjbGVhbnVwX25ldApSSVA6IDAwMTA6X19saXN0X2RlbF9lbnRyeV92
+YWxpZF9vcl9yZXBvcnQrMHgxMmMvMHgxYzAgbGliL2xpc3RfZGVidWcuYzo2MgpDb2RlOiBlOCA2
+OSBlMiBkNyBmYyA5MCAwZiAwYiA0OCA4OSBjYSA0OCBjNyBjNyBlMCBiOCBkMSA4YiBlOCA1NyBl
+MiBkNyBmYyA5MCAwZiAwYiA0OCA4OSBjMiA0OCBjNyBjNyA0MCBiOSBkMSA4YiBlOCA0NSBlMiBk
+NyBmYyA5MCA8MGY+IDBiIDQ4IDg5IGQxIDQ4IGM3IGM3IGMwIGI5IGQxIDhiIDQ4IDg5IGMyIGU4
+IDMwIGUyIGQ3IGZjIDkwIDBmClJTUDogMDAxODpmZmZmYzkwMDExYWVmODIwIEVGTEFHUzogMDAw
+MTAyODYKUkFYOiAwMDAwMDAwMDAwMDAwMDZkIFJCWDogZmZmZjg4ODExMmIxNmYzOCBSQ1g6IGZm
+ZmZmZmZmODE3OGI5ZjkKUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmY4MTc5NjJm
+NiBSREk6IDAwMDAwMDAwMDAwMDAwMDUKUkJQOiBmZmZmODg4MTEyYjE2ZjI4IFIwODogMDAwMDAw
+MDAwMDAwMDAwNSBSMDk6IDAwMDAwMDAwMDAwMDAwMDAKUjEwOiAwMDAwMDAwMDgwMDAwMDAwIFIx
+MTogMDAwMDAwMDAwMDAwMDAwMSBSMTI6IGZmZmY4ODgxMTJiMTZmMDAKUjEzOiBmZmZmODg4MTEy
+YjE2ZjMwIFIxNDogZmZmZjg4ODExMmIxNmYzOCBSMTU6IGZmZmY4ODgxMTJiMTZmMzgKRlM6ICAw
+MDAwMDAwMDAwMDAwMDAwKDAwMDApIEdTOmZmZmY4ODgwNjI4MDAwMDAoMDAwMCkga25sR1M6MDAw
+MDAwMDAwMDAwMDAwMApDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgw
+MDUwMDMzCkNSMjogMDAwMDdmZWUzNGZkZTgyOCBDUjM6IDAwMDAwMDAxMGQ5ODIwMDAgQ1I0OiAw
+MDAwMDAwMDAwNzUyZWYwCkRSMDogMDAwMDAwMDAwMDAwMDAwMCBEUjE6IDAwMDAwMDAwMDAwMDAw
+MDAgRFIyOiAwMDAwMDAwMDAwMDAwMDAwCkRSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAw
+MDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAwClBLUlU6IDU1NTU1NTU0CkNhbGwgVHJh
+Y2U6CiA8VEFTSz4KIF9fbGlzdF9kZWxfZW50cnlfdmFsaWQgaW5jbHVkZS9saW51eC9saXN0Lmg6
+MTI0IFtpbmxpbmVdCiBfX2xpc3RfZGVsX2VudHJ5IGluY2x1ZGUvbGludXgvbGlzdC5oOjIxNSBb
+aW5saW5lXQogbGlzdF9kZWwgaW5jbHVkZS9saW51eC9saXN0Lmg6MjI5IFtpbmxpbmVdCiBuc2lt
+X2ZpYl9ydF9maW5pIGRyaXZlcnMvbmV0L25ldGRldnNpbS9maWIuYzoyNTUgW2lubGluZV0KIG5z
+aW1fZmliNl9ydF9kZXN0cm95KzB4ZGUvMHgyNzAgZHJpdmVycy9uZXQvbmV0ZGV2c2ltL2ZpYi5j
+OjU4NQogbnNpbV9maWI2X3J0X2ZyZWUgZHJpdmVycy9uZXQvbmV0ZGV2c2ltL2ZpYi5jOjEwNjkg
+W2lubGluZV0KIG5zaW1fZmliX3J0X2ZyZWUrMHgxZTYvMHgzZTAgZHJpdmVycy9uZXQvbmV0ZGV2
+c2ltL2ZpYi5jOjEwODIKIHJoYXNodGFibGVfZnJlZV9vbmUgbGliL3JoYXNodGFibGUuYzoxMTEz
+IFtpbmxpbmVdCiByaGFzaHRhYmxlX2ZyZWVfYW5kX2Rlc3Ryb3krMHg2MTMvMHg5OTAgbGliL3Jo
+YXNodGFibGUuYzoxMTY0CiBuc2ltX2ZpYl9kZXN0cm95KzB4YWUvMHgxYjAgZHJpdmVycy9uZXQv
+bmV0ZGV2c2ltL2ZpYi5jOjE2NjAKIG5zaW1fZGV2X3JlbG9hZF9kZXN0cm95KzB4MTZlLzB4NGQw
+IGRyaXZlcnMvbmV0L25ldGRldnNpbS9kZXYuYzoxNjY1CiBuc2ltX2Rldl9yZWxvYWRfZG93bisw
+eDZlLzB4ZDAgZHJpdmVycy9uZXQvbmV0ZGV2c2ltL2Rldi5jOjk2OAogZGV2bGlua19yZWxvYWQr
+MHgxN2YvMHg3YTAgbmV0L2RldmxpbmsvZGV2LmM6NDYxCiBkZXZsaW5rX3Blcm5ldF9wcmVfZXhp
+dCsweDE5NC8weDJhMCBuZXQvZGV2bGluay9jb3JlLmM6NTA5CiBvcHNfcHJlX2V4aXRfbGlzdCBu
+ZXQvY29yZS9uZXRfbmFtZXNwYWNlLmM6MTYyIFtpbmxpbmVdCiBjbGVhbnVwX25ldCsweDQ4OC8w
+eGI0MCBuZXQvY29yZS9uZXRfbmFtZXNwYWNlLmM6NjEyCiBwcm9jZXNzX29uZV93b3JrKzB4OWM1
+LzB4MWJhMCBrZXJuZWwvd29ya3F1ZXVlLmM6MzIyOQogcHJvY2Vzc19zY2hlZHVsZWRfd29ya3Mg
+a2VybmVsL3dvcmtxdWV1ZS5jOjMzMTAgW2lubGluZV0KIHdvcmtlcl90aHJlYWQrMHg2YzgvMHhm
+MDAga2VybmVsL3dvcmtxdWV1ZS5jOjMzOTEKIGt0aHJlYWQrMHgyYzEvMHgzYTAga2VybmVsL2t0
+aHJlYWQuYzozODkKIHJldF9mcm9tX2ZvcmsrMHg0NS8weDgwIGFyY2gveDg2L2tlcm5lbC9wcm9j
+ZXNzLmM6MTQ3CiByZXRfZnJvbV9mb3JrX2FzbSsweDFhLzB4MzAgYXJjaC94ODYvZW50cnkvZW50
+cnlfNjQuUzoyNDQKIDwvVEFTSz4KTW9kdWxlcyBsaW5rZWQgaW46Ci0tLVsgZW5kIHRyYWNlIDAw
+MDAwMDAwMDAwMDAwMDAgXS0tLQpSSVA6IDAwMTA6X19saXN0X2RlbF9lbnRyeV92YWxpZF9vcl9y
+ZXBvcnQrMHgxMmMvMHgxYzAgbGliL2xpc3RfZGVidWcuYzo2MgpDb2RlOiBlOCA2OSBlMiBkNyBm
+YyA5MCAwZiAwYiA0OCA4OSBjYSA0OCBjNyBjNyBlMCBiOCBkMSA4YiBlOCA1NyBlMiBkNyBmYyA5
+MCAwZiAwYiA0OCA4OSBjMiA0OCBjNyBjNyA0MCBiOSBkMSA4YiBlOCA0NSBlMiBkNyBmYyA5MCA8
+MGY+IDBiIDQ4IDg5IGQxIDQ4IGM3IGM3IGMwIGI5IGQxIDhiIDQ4IDg5IGMyIGU4IDMwIGUyIGQ3
+IGZjIDkwIDBmClJTUDogMDAxODpmZmZmYzkwMDExYWVmODIwIEVGTEFHUzogMDAwMTAyODYKUkFY
+OiAwMDAwMDAwMDAwMDAwMDZkIFJCWDogZmZmZjg4ODExMmIxNmYzOCBSQ1g6IGZmZmZmZmZmODE3
+OGI5ZjkKUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmY4MTc5NjJmNiBSREk6IDAw
+MDAwMDAwMDAwMDAwMDUKUkJQOiBmZmZmODg4MTEyYjE2ZjI4IFIwODogMDAwMDAwMDAwMDAwMDAw
+NSBSMDk6IDAwMDAwMDAwMDAwMDAwMDAKUjEwOiAwMDAwMDAwMDgwMDAwMDAwIFIxMTogMDAwMDAw
+MDAwMDAwMDAwMSBSMTI6IGZmZmY4ODgxMTJiMTZmMDAKUjEzOiBmZmZmODg4MTEyYjE2ZjMwIFIx
+NDogZmZmZjg4ODExMmIxNmYzOCBSMTU6IGZmZmY4ODgxMTJiMTZmMzgKRlM6ICAwMDAwMDAwMDAw
+MDAwMDAwKDAwMDApIEdTOmZmZmY4ODgwNjI4MDAwMDAoMDAwMCkga25sR1M6MDAwMDAwMDAwMDAw
+MDAwMApDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzCkNS
+MjogMDAwMDdmYmYyODA0ODE4OCBDUjM6IDAwMDAwMDAwMjJlNzQwMDAgQ1I0OiAwMDAwMDAwMDAw
+NzUyZWYwCkRSMDogMDAwMDAwMDAwMDAwMDAwMCBEUjE6IDAwMDAwMDAwMDAwMDAwMDAgRFIyOiAw
+MDAwMDAwMDAwMDAwMDAwCkRSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwZmZmZTBm
+ZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAwClBLUlU6IDU1NTU1NTU0CgoKU3l6a2FsbGVyIHJlcHJv
+ZHVjZXI6CiMge1RocmVhZGVkOnRydWUgUmVwZWF0OnRydWUgUmVwZWF0VGltZXM6MCBQcm9jczo0
+IFNsb3dkb3duOjEgU2FuZGJveDpub25lIFNhbmRib3hBcmc6MCBMZWFrOmZhbHNlIE5ldEluamVj
+dGlvbjp0cnVlIE5ldERldmljZXM6dHJ1ZSBOZXRSZXNldDp0cnVlIENncm91cHM6dHJ1ZSBCaW5m
+bXRNaXNjOnRydWUgQ2xvc2VGRHM6dHJ1ZSBLQ1NBTjpmYWxzZSBEZXZsaW5rUENJOmZhbHNlIE5p
+Y1ZGOmZhbHNlIFVTQjp0cnVlIFZoY2lJbmplY3Rpb246dHJ1ZSBXaWZpOnRydWUgSUVFRTgwMjE1
+NDp0cnVlIFN5c2N0bDp0cnVlIFN3YXA6dHJ1ZSBVc2VUbXBEaXI6dHJ1ZSBIYW5kbGVTZWd2OnRy
+dWUgVHJhY2U6ZmFsc2UgTGVnYWN5T3B0aW9uczp7Q29sbGlkZTpmYWxzZSBGYXVsdDpmYWxzZSBG
+YXVsdENhbGw6MCBGYXVsdE50aDowfX0KcjAgPSBzeXpfb3Blbl9kZXYkc2coJigweDdmMDAwMDAw
+MDA4MCksIDB4MCwgMHg4MjAwKQppb2N0bCRTQ1NJX0lPQ1RMX1NFTkRfQ09NTUFORChyMCwgMHgx
+LCAmKDB4N2YwMDAwMDAwMGMwKT1BTlk9W0BBTllCTE9CPSIwMDAwMDAwMDA4MDAwMDAwODUwYjE5
+IiwgQEFOWVJFU09DVD1yMF0p
 
