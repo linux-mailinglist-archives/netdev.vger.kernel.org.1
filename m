@@ -1,178 +1,127 @@
-Return-Path: <netdev+bounces-165095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A94EA30681
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:57:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA45A306AE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:12:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5301A3A4495
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:57:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB92B7A229E
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CBE1F0E3C;
-	Tue, 11 Feb 2025 08:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5061F03D2;
+	Tue, 11 Feb 2025 09:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyPA6XyV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dncp8XJx"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6EE1F0E20
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5542426BDA6
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 09:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739264272; cv=none; b=eLe7dOYdQ2EWDU9yDOZlwjNOGwSkc+4leSIb0wY5QTO6PQP6L9+x3Hjz7u1AaFgRrgG+xED6gLGRLbCKT1JhkiH1rw5BirCXwFyDNzRSMLihTRD2ndwMXGHsvb2rp4pcO2WDK7EiuD/2IbbX1a+pnZM6P3/GxWLHcHKWkufP6hA=
+	t=1739265140; cv=none; b=C3v7qoaAVLBTLCOiOEosQbWPWRz01iGFIctKCyWPVI5acH+4Ez9qS2Sqw6FAbWk3rdw78PsCmMH84NAoEEHRDkWywG6do/3w1W/DqStqLsli3po/boaz6TYRuoaAe4epkcQ991goM/HmOURP/YNdHm+j+TJLw9RwB1apBXulojI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739264272; c=relaxed/simple;
-	bh=HDnBlOyPw8QhBcGdjodP9zFRxyfM6MYgL5alIXcYcHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWZ93VgdkoIFZF0KrNxgVv7qYCcu5dRy//lyouZS8nS7wu/+RT/aZhFYyKp77tBU21O06yNYq7ByRF0gXmljb3jSbFSQ62NvlllTRABvhumAYqvIIGiizYF7XuUskG1gkjcwo6dFQiMTyjsQZ6g/gL967OS2If7daSG7EH71vOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LyPA6XyV; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1739265140; c=relaxed/simple;
+	bh=NhwlTUXIj7yyzmg24IsX2W2CXzFsDWUHHY5PNW7DIio=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ed97Y8f4Nkue55c6E0+lAal/i8lzLXT8LNDQSIU6HSiRl2nyEN/RTDurb3rTsO5u0ku/WVfklBvhPbTlWDMy4rJSOwknLrudkmuGuD4gLmeVBjj9CHrbkgrktyTFJRlfrKbpiVNNxe2+qG34w2uRf4MtgEIrRXnpmukbcj51DZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dncp8XJx; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739264269;
+	s=mimecast20190719; t=1739265138;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zIQbPjiqwmwUxZhJUEjUvnEZCNp6KfZmxpyLl8jvIIY=;
-	b=LyPA6XyVAdjwn8AdhpPcHzpjM+x8ib5qWeiEaK9HraQntPbi180TXgUUOZjujRhG0/Pjgh
-	3WSPfFYbs0Xsdq6ydUi5gVD0nYTzkdZcxnmzrdx6e7nwkmkpdVQVH+vc8TthXy2uph/qcV
-	aevO9HCzQ0MUsFSdeMh1fbq0NKGZcC0=
+	bh=O7zYp0aE1/AT7My9gGTVYIn4NVYUz/DCgEYzci8JuU4=;
+	b=Dncp8XJx0K1WUj5dbGaOLcoK/bai3R0y8FrC/tj9WpjCY88MMR9I0QuvlrfjqA19GvSvWj
+	nrxlDcFx3yKoG+cL4ZY1fzhEThpKNkoiwOHo9fxTtnj3kstf+jukuj6FvpyfMskBJ5U+Sc
+	VOrnPh7OI6dpIY/U9vXgenhgXwrr+Gw=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-jf7MDbRHOmKrW42CqHTegw-1; Tue, 11 Feb 2025 03:57:48 -0500
-X-MC-Unique: jf7MDbRHOmKrW42CqHTegw-1
-X-Mimecast-MFC-AGG-ID: jf7MDbRHOmKrW42CqHTegw
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43933eb7e1dso18855795e9.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:57:47 -0800 (PST)
+ us-mta-671-QfYQExRgOFOqMBboLI7hLw-1; Tue, 11 Feb 2025 04:12:16 -0500
+X-MC-Unique: QfYQExRgOFOqMBboLI7hLw-1
+X-Mimecast-MFC-AGG-ID: QfYQExRgOFOqMBboLI7hLw
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43933eb7e1dso18976695e9.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 01:12:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739264267; x=1739869067;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zIQbPjiqwmwUxZhJUEjUvnEZCNp6KfZmxpyLl8jvIIY=;
-        b=rLKAfUkAL7l7SdmFr7+DvvK913aoNiX7+YBuPy/UsS/1SWG4xfhe2+gqiNZ28UGexO
-         1ZJKedFrj0uqSguEVF7ukWF/AM/l/0CGu9CRFze+XgY221xGcH+XKCfwvm3KsQ849n5e
-         4ikaA7NnuaJQ3Qk6lS5zUHaGd3WJuAHnhlEZTN0+3a3v8xuR+dyo6d6jELnx9/dU84kA
-         uBn6D8MbBwlsTHALPH2mj60vLaltVaqTZBcsNB5O3Yd7FdkzEyJeEQ8TXDkGeFAVqBNC
-         yoNb81jtbtqC6dlMUS0Rq/BfqvCkfkFaf0OOAatoTVcoB6Bj4v/FhHm7dpmpuBtN8Hhm
-         kFRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHRQ7JwEzYHlzQJ30LyOfbkatdYawld8GBx2i9OcIzqefB/VOya6Vt1Iy7ZV/EVJKf92jG4B4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7atnOKyjJfDEk+NjMH7mXEAkguJ5y5KTJxQi7bKtDwZ20YETb
-	togDhzWX4YBndJu5hN04Y9hrmYmsJYGyhuUBE4itqnbqpweFNvc3kofbU0KvtqFJtsy997/0BxI
-	uREr0Bqu2lUhG2vP57yWe0ClsY0K4fJLMzv6LPun9QAx3Y1+s1N6eoA==
-X-Gm-Gg: ASbGncvM5rcPFGr5HTgs1K1Z0jOZqATXmZNk040kIVACTmsuJ4OMvxZv2pRPM4ePAdA
-	VY8jLef0/ppesYIh6dF2G1PRMvyqeNzJQmpvTgnZXK5ARdFzDcDrXZTDNo9UbKiZ/dXOBHOc/K6
-	Uwz1PRVpsmn1s+vzuTMX/C5i77vedxDyIff6feI3iHj6u7WLye8ZArB9xUCCcdz9AEhWYuxRHew
-	n5qjrL/ZgEa4OOKxkyCo8dcmdz0FZ/6wYFJSpBMzNVxCxdFc90bGcySAdAkbnMssa6/tYXYQyUa
-	9BZwQqdLcgh50/B1mLomhiQWvGPy3vvfQLVe29EnX3tgk+97GvndzQ==
-X-Received: by 2002:a5d:438f:0:b0:386:3835:9fec with SMTP id ffacd0b85a97d-38dc935fba0mr13080912f8f.44.1739264266785;
-        Tue, 11 Feb 2025 00:57:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG9gS/8oWxy2/+63oWaWVYrKsS8WPZEr2M1pgDTFIO4r0DJWvdJ3n9OPtCV6k/zDtewXv+XUA==
-X-Received: by 2002:a5d:438f:0:b0:386:3835:9fec with SMTP id ffacd0b85a97d-38dc935fba0mr13080869f8f.44.1739264266036;
-        Tue, 11 Feb 2025 00:57:46 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da9652bsm173908095e9.2.2025.02.11.00.57.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 00:57:45 -0800 (PST)
-Date: Tue, 11 Feb 2025 09:57:41 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, horms@kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	q1.huang@samsung.com, ying01.gao@samsung.com, ying123.xu@samsung.com, 
-	lei19.wang@samsung.com
-Subject: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
- rx_buf_max_nr when resuming
-Message-ID: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
-References: <20250211071922.2311873-1-junnan01.wu@samsung.com>
- <CGME20250211071941epcas5p308a13898102cf851bc9988c0e2766c5e@epcas5p3.samsung.com>
- <20250211071922.2311873-2-junnan01.wu@samsung.com>
+        d=1e100.net; s=20230601; t=1739265135; x=1739869935;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O7zYp0aE1/AT7My9gGTVYIn4NVYUz/DCgEYzci8JuU4=;
+        b=h9wAWbpLgNjK146u85l3zJK/TtKKDnLstcfsLdgjpn+X9zsic8CxQnGiMkpg/wS+wz
+         XBT9VtQgUwtHusIOw72ZiNv3kPFQt0BgIEmI/E8AG7aQcL6ciw8pBmIMlxWitN9xD06l
+         j7VgTSetx7BBJ6Lrhib3K+03b28TYwB4dhXJAfXifGwCW7uiKiWT1Fcc52FSXyDjHd8u
+         txhvD3bp7BJwXr45QVkyxNLzVPWiiSjRx4EYChlC94LNWFcSwoo+D2K5BIRf6pikLSYz
+         oNAlaj+5Nn0mUJDBoYmmiu1yzwYK8gMpotG9qvaqpogeA6cw24JOGm6iS9XpqkQLw9l8
+         cguA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBHCmXpBNC7AU2AqAwU67hCQXUZc2dRAQ57NvH23F4PonhR4xYqFF26UMccY6M2RoRVVdYigs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ3Hnyil+g8K9j7lFCnbXH95yyks2AqWb4AggRIUNl+wFVEE10
+	9XTyn/1lWt79z+9/mx5erW6vTLEYyHtJCgbak74Q4UZag2n7yuIW0hPygxizbJd8OrALXCIZEpJ
+	suv4ICvDgZP6hUqn9zM1e2YMHYF+5OySe3DKRpo4HWdD0pWn6lU67Mm2Rn0JBzA==
+X-Gm-Gg: ASbGnctgXT2mcA3ntflyxOWCqzTk9wWjVp7n+0Jm5kUlhBuIAMsZJ6QBEsvZfZalcjx
+	trBKdO8O8aJrkgkDEzkyeuK2OIXX08EDrfeSivPtKKS7/VBwRkfLIO0RH27N1dETAP6rmtuX3no
+	/TeuMZGytsQb9k9mwbogcStUn0x/4wPRYZ05ma24fIUSC84QAImeJYY/hA1OIWJOLNqFGjVDIUk
+	fBYV2fphuJfOOGpyEj6GGg9nliaTr8sG9BgPHRPmxvGpbMjPoIfoZZL/fWn2/mrZQNBeJd8PHe4
+	QOD1MZdoGDNWecF4YEvfUKOK8gzXedegkCM=
+X-Received: by 2002:a05:600c:1e21:b0:439:3eed:1cf9 with SMTP id 5b1f17b1804b1-4393eed2360mr80626935e9.17.1739265134982;
+        Tue, 11 Feb 2025 01:12:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGLd1KuZ86QqoelLRtvt0R+BxUp3UQrAkuNkZ87NGVRH9NTAh2bXSXPnQXKhTP6jWz4JZmjEw==
+X-Received: by 2002:a05:600c:1e21:b0:439:3eed:1cf9 with SMTP id 5b1f17b1804b1-4393eed2360mr80626725e9.17.1739265134703;
+        Tue, 11 Feb 2025 01:12:14 -0800 (PST)
+Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcd21fe18sm11190310f8f.91.2025.02.11.01.12.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Feb 2025 01:12:14 -0800 (PST)
+Message-ID: <c3aec7d5-8c28-49f8-ac0c-18436d5b4da5@redhat.com>
+Date: Tue, 11 Feb 2025 10:12:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250211071922.2311873-2-junnan01.wu@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] icmp: MUST silently discard certain extended echo
+ requests
+To: Will Hawkins <hawkinsw@obs.cr>, netdev@vger.kernel.org
+References: <20250206015711.2627417-1-hawkinsw@obs.cr>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250206015711.2627417-1-hawkinsw@obs.cr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 2/6/25 2:57 AM, Will Hawkins wrote:
+> Per RFC 8335 Section 4,
+> """
+> When a node receives an ICMP Extended Echo Request message and any of
+> the following conditions apply, the node MUST silently discard the
+> incoming message:
+> 
+> ...
+> - The Source Address of the incoming message is not a unicast address.
+> - The Destination Address of the incoming message is a multicast address.
+> """
 
-You need to update the title now that you're moving also queued_replies.
+I think it would be helpful mentioning this is for ICMP PROBE extension.
 
-On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
->When executing suspend to ram twice in a row,
->the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
->Then after virtqueue_get_buf and `rx_buf_nr` decreased
->in function virtio_transport_rx_work,
->the condition to fill rx buffer
->(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
->
->It is because that `rx_buf_nr` and `rx_buf_max_nr`
->are initialized only in virtio_vsock_probe(),
->but they should be reset whenever virtqueues are recreated,
->like after a suspend/resume.
->
->Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
->virtio_vsock_vqs_init(), so we are sure that they are properly
->initialized, every time we initialize the virtqueues, either when we
->load the driver or after a suspend/resume.
->At the same time, also move `queued_replies`.
+> Packets meeting the former criteria do not pass martian detection, but
+> packets meeting the latter criteria must be explicitly dropped.
+> 
+> Signed-off-by: Will Hawkins <hawkinsw@obs.cr>
 
-Why?
+The patch should target the net-next tree, and you should add a related
+self-test (i.e. extending icmp.sh). Also even if the new behavior will
+respect the RFC, changing the established behavior could break existing
+setups, I *think* we would need at least a sysctl to revert to the old one.
 
-As I mentioned the commit description should explain why the changes are 
-being made for both reviewers and future references to this patch.
-
-The rest LGTM.
-
-Stefano
-
->
->Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
->Co-developed-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
->---
-> net/vmw_vsock/virtio_transport.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index b58c3818f284..f0e48e6911fc 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
-> 	};
-> 	int ret;
->
->+	mutex_lock(&vsock->rx_lock);
->+	vsock->rx_buf_nr = 0;
->+	vsock->rx_buf_max_nr = 0;
->+	mutex_unlock(&vsock->rx_lock);
->+
->+	atomic_set(&vsock->queued_replies, 0);
->+
-> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
-> 	if (ret < 0)
-> 		return ret;
->@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->
-> 	vsock->vdev = vdev;
->
->-	vsock->rx_buf_nr = 0;
->-	vsock->rx_buf_max_nr = 0;
->-	atomic_set(&vsock->queued_replies, 0);
->
-> 	mutex_init(&vsock->tx_lock);
-> 	mutex_init(&vsock->rx_lock);
->-- 
->2.34.1
->
+/P
 
 
