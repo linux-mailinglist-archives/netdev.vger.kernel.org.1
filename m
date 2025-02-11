@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-165035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F3CA30226
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 04:30:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68160A30228
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 04:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE63718838A5
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 596FF165BEF
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883B11CB51B;
-	Tue, 11 Feb 2025 03:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197071D61A7;
+	Tue, 11 Feb 2025 03:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUNMdRGV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbt18T0R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632A813C695
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 03:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D884A1D6194;
+	Tue, 11 Feb 2025 03:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739244612; cv=none; b=Hp7YBDKJJt/5x0LlMbUxczTRHuAVOjg5uXOPbhwIhcao6LsWKJZDha1Yc/9hM+Oc9OJYeFMyYJttnX/irLfNyRBWy6eIWauboU+FuCZ/3EX58iFvoMSDtov6pjt34BBXUzIjnJRCxvaxEwrXCjGd8D+H5gS2qzyqWKdDOg3XP6Y=
+	t=1739244614; cv=none; b=bYt7d2DFtTnFuDXDj/auNExGcnx948XsA/oloqEdlzipNInORCf18AqoHSFFusgd3h1uVXICETs+G++KGPJfVT2BoJeBXy53aTxaLaqzvp+WwMR+DriCJeVar07KAEdSMw639aBlvZ+JNA5l8JeqqBQsurJ9MbmLARYLAW24ehU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739244612; c=relaxed/simple;
-	bh=ior5/BYtAnV/u0eVZCyQMDknrSntdDgbxOqId9y8BNI=;
+	s=arc-20240116; t=1739244614; c=relaxed/simple;
+	bh=Td1U0MsX4jwP0X608ibiA1txDzrYo+jkLqYHfL6unXc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GiO1SlLL8iG493spE5Rv6zm64Evu5Bsi1RKdYRfzyJpvlig28BwVquTgHzoa4Wlv3Zi754VGI0M5oerkR+GaKXqjHYV8H/Qh+tjZZwH+lLEFC7V4pjNmfmEPQ+9Cai8ejlQxOV21Cjy0UDgFaVotAc6jTm+6tMhZvpB6KD+RV2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUNMdRGV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD2CEC4CED1;
-	Tue, 11 Feb 2025 03:30:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qwqGY5CvkV25yXYpzyk/UL9w4wBS4eTpyZRH6oqn0uELQew9ShxsLhKL3zIbj9c+7XneNCLgitMrQT8PqW5+C657+9O5VcJ6x9oz2gmfYZq2imb2jxk5ZYaeiSHfYE3NNHl9elIRqXiuI4vFJJWa740Yj+FHzXXwqfP4joJFzHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbt18T0R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A01C4CEEA;
+	Tue, 11 Feb 2025 03:30:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739244611;
-	bh=ior5/BYtAnV/u0eVZCyQMDknrSntdDgbxOqId9y8BNI=;
+	s=k20201202; t=1739244613;
+	bh=Td1U0MsX4jwP0X608ibiA1txDzrYo+jkLqYHfL6unXc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uUNMdRGVUfPfZGeu9L4096Jr/wPx3OmsoyGfMT4WDQc23Q+4TpzkH1sM/A9CYmEly
-	 s6S/yU9upCKusOrjBPBgXyLjcZKIdcLDcanzC0AHywDZwm7JHBW0vnGHpRzG3dl1xV
-	 +sYDJBFkWXkq5MLAF7VpvkJ6imBZhKQr6LoLC9X6wf/17mU90tc7rGdNlKTzZDauOR
-	 RZN3THrOiZwAP65ZpcskllKXa5RZ7Kf1vGRwFOjFCDX+c93PdpI5ZaFzKmr85TEOX7
-	 Tj31eq1jzemhOuoojOlhDDs7yz5ZWkuooOBibKhuWJwiWWPWX0aMC0Og7PA0KIbRHw
-	 NLbKVeowarqDA==
+	b=gbt18T0RcqqWiwoOTneZSCFnbdT9Fh21yaei243no3AOA6QOtjPweKQuRpUQSF1oP
+	 z9Lztst6r2SkNca/uGAtFwlQ2IquVXqAUCAHbPY7tuhm5fMn8ebzZAk7fu4WeD3hnn
+	 QOIQSJsL7MRnGD0JSM+yz9/9KmDw4PEuCi9rO5V+2O3lNm4INPGEfZsZba8sYwJVSi
+	 vfyPUVCxJ4HjKfZlK4LiJPMIQJEg6dzI5wSYXdlXkcwxf2qqGjKW0lJYwl76oeWDY7
+	 M+/QswcMvpB5c4SKp1VT6ExvkdahmqBBGejG54v2Ynq1kJPlPnNaSEO8Gu5gT97iWJ
+	 QRNI6EVZuTfVg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE639380AA7A;
-	Tue, 11 Feb 2025 03:30:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DDF380AA7A;
+	Tue, 11 Feb 2025 03:30:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,53 +52,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/8] fib: rules: Convert RTM_NEWRULE and
- RTM_DELRULE to per-netns RTNL.
+Subject: Re: [PATCH net-next v6 0/7] tun: Unify vnet implementation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173924464024.3948401.6072585471419171429.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Feb 2025 03:30:40 +0000
-References: <20250207072502.87775-1-kuniyu@amazon.com>
-In-Reply-To: <20250207072502.87775-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, idosch@idosch.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+ <173924464176.3948401.17256177133677367804.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Feb 2025 03:30:41 +0000
+References: <20250207-tun-v6-0-fb49cf8b103e@daynix.com>
+In-Reply-To: <20250207-tun-v6-0-fb49cf8b103e@daynix.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: corbet@lwn.net, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mst@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ yuri.benditovich@daynix.com, andrew@daynix.com, stephen@networkplumber.org,
+ gur.stavi@huawei.com, devel@daynix.com, willemb@google.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 7 Feb 2025 16:24:54 +0900 you wrote:
-> Patch 1 ~ 2 are small cleanup, and patch 3 ~ 8 make fib_nl_newrule()
-> and fib_nl_delrule() hold per-netns RTNL.
+On Fri, 07 Feb 2025 15:10:50 +0900 you wrote:
+> When I implemented virtio's hash-related features to tun/tap [1],
+> I found tun/tap does not fill the entire region reserved for the virtio
+> header, leaving some uninitialized hole in the middle of the buffer
+> after read()/recvmesg().
 > 
-> 
-> Changes:
->   v2:
->     * Add patch 4 & 5
->     * Don't use !!extack to check if RTNL is held
+> This series fills the uninitialized hole. More concretely, the
+> num_buffers field will be initialized with 1, and the other fields will
+> be inialized with 0. Setting the num_buffers field to 1 is mandated by
+> virtio 1.0 [2].
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next,1/8] net: fib_rules: Don't check net in rule_exists() and rule_find().
-    https://git.kernel.org/netdev/net-next/c/7b7df666a233
-  - [v2,net-next,2/8] net: fib_rules: Pass net to fib_nl2rule() instead of skb.
-    https://git.kernel.org/netdev/net-next/c/a9ffd24b5528
-  - [v2,net-next,3/8] net: fib_rules: Split fib_nl2rule().
-    https://git.kernel.org/netdev/net-next/c/8b498773c861
-  - [v2,net-next,4/8] ip: fib_rules: Fetch net from fib_rule in fib[46]_rule_configure().
-    https://git.kernel.org/netdev/net-next/c/5a1ccffd30a0
-  - [v2,net-next,5/8] net: fib_rules: Factorise fib_newrule() and fib_delrule().
-    https://git.kernel.org/netdev/net-next/c/a0596c2c63fc
-  - [v2,net-next,6/8] net: fib_rules: Convert RTM_NEWRULE to per-netns RTNL.
-    https://git.kernel.org/netdev/net-next/c/98d3a6f681ca
-  - [v2,net-next,7/8] net: fib_rules: Add error_free label in fib_delrule().
-    https://git.kernel.org/netdev/net-next/c/1cf770da0112
-  - [v2,net-next,8/8] net: fib_rules: Convert RTM_DELRULE to per-netns RTNL.
-    https://git.kernel.org/netdev/net-next/c/88b9cfca8d77
+  - [net-next,v6,1/7] tun: Refactor CONFIG_TUN_VNET_CROSS_LE
+    https://git.kernel.org/netdev/net-next/c/5a9c5e5d8a1b
+  - [net-next,v6,2/7] tun: Keep hdr_len in tun_get_user()
+    https://git.kernel.org/netdev/net-next/c/07e8b3bae2f8
+  - [net-next,v6,3/7] tun: Decouple vnet from tun_struct
+    https://git.kernel.org/netdev/net-next/c/60df67b94804
+  - [net-next,v6,4/7] tun: Decouple vnet handling
+    https://git.kernel.org/netdev/net-next/c/2506251e81d1
+  - [net-next,v6,5/7] tun: Extract the vnet handling code
+    https://git.kernel.org/netdev/net-next/c/1d41e2fa93f7
+  - [net-next,v6,6/7] tap: Keep hdr_len in tap_get_user()
+    https://git.kernel.org/netdev/net-next/c/74212f20f366
+  - [net-next,v6,7/7] tap: Use tun's vnet-related code
+    https://git.kernel.org/netdev/net-next/c/6a53fc5a8770
 
 You are awesome, thank you!
 -- 
