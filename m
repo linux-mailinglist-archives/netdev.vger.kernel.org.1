@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-165242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E227EA313CF
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:14:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 581DAA313D0
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E187E7A069A
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 18:13:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D401D7A3474
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 18:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5401E47A6;
-	Tue, 11 Feb 2025 18:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6901E47C9;
+	Tue, 11 Feb 2025 18:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORGGg+bt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZejL14ds"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0651E3DEC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096871E47AE
 	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739297642; cv=none; b=WJM1VfOtvg0pU40VJOWQfUwAB/8nVGCxJ0N9hnzcg8fXB82ULVBtsh0WaXUBbxMUGH9qnFETK/GnQPqs/o5wgAUhJUgyrg5zc+go6586LVZFfFKLe5TgBmixl48Qf8Zh1NKEIjwDiEVa8MMS7MifPsGccnYt6X1mKD8CH+nHMc4=
+	t=1739297643; cv=none; b=ryahHxm5LXC7fNIcVc8uu+tFI58wrHkOk5wly7Xh3UYRM2lcykCAImzuaqfYJYNb7s3V2C3qrb9L/GhzjoBa0XP6UjTDmzQCt+wtsbSchS874eIA78Vx+1a8yM/4ovcyK2zl5O4IJP3ywGKyhNaIyoEvrhElDg3gWS+v/YWN37Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739297642; c=relaxed/simple;
-	bh=u6BAnU3rqBdcQTY0+FEqwYQ/ZkOPr0nw31oH7bYMdn0=;
+	s=arc-20240116; t=1739297643; c=relaxed/simple;
+	bh=qCWrBrnoIq0DABjL3DtB9fhpu2usvA2j4sIYRr502hk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LlOFzKePf0KbANLgl4PN1IaLsxjwWCMBYKp9nh/dDgu1dWTnfsbVm5YHRkkwags6fgxJwFPyyZgjuUsH2n7ahSx6tO1EzMblpr/P5wzIpZodRdR5eTZ1max9RoRZWAQiSUDkqkRXyqvnSo2/XFIYzliJXGf3KvS5dwtYzgX+uIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORGGg+bt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981C0C4CEE8;
-	Tue, 11 Feb 2025 18:14:01 +0000 (UTC)
+	 MIME-Version; b=b7Od+ZGNjA/+VoFdXw0RegDMkcrmIM3zgqoufTHCOaB6aJ96y5YZsh8Aeo0/fx0Rj0JiosgCg58a4/PdRrCHnzb0MO7TXCCGwaO2E7chDOhcRIAJpQtYRJE2rRTC3FZpMiTNd18QXRz5eu/imk/bRez1w3hmeBJdFuSjPPADIuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZejL14ds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 319DEC4CEE9;
+	Tue, 11 Feb 2025 18:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739297642;
-	bh=u6BAnU3rqBdcQTY0+FEqwYQ/ZkOPr0nw31oH7bYMdn0=;
+	bh=qCWrBrnoIq0DABjL3DtB9fhpu2usvA2j4sIYRr502hk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ORGGg+bt0xDVZYy9T77ERpQTLs+g/GE4pE2zUW6Tp9/A5QBzxmvxwzMGlWRz1mCT6
-	 Dj8sbQNA5VbJuD6hp2l0P6aqQCIL1F4Z7s6rRwpRSzhH6i7KderpqsG6+Ps2eJTMY0
-	 c+RPLmHMXXq3nY9yKWogqbB4knKLrt5nKyiV/JkZIW1jEIOLCDuO2C5h+MrulwSpM3
-	 +cZO0ugXQwdJdE/D884xI+v7zjBHlJ2ohoizY20DR7zAUHfsouCNp+OHxJNjg7Qab/
-	 5gulEBlUKlYtqrH6zlK0WUV56QJ63RELXushJnUsVh9WC1iR+oxKTytgWn2iSlpSoi
-	 nCp9Yr7ENrDIQ==
+	b=ZejL14ds6m0f5sK1LNQKARCVn5fb1m21/4deYyZTg4SSWevuryBx4GwcIu6xBeDOk
+	 /F/XkASyX/jZWM5hpiboDI4AMDjHI+S3zjljCcteHmuZMXyPK+x/pRRAlF0Wgunalm
+	 JlWZil/h3c7tNdU71lJf0dl0Fe610YoUuUarGG/Bc3r+eBBGF43umB8EBwP3cn0VOw
+	 JyY5zLOJi12mfw5atRLeORJ6+X9ALFaaWc/ob9B5jOQcg2jLul9xtAQigONPhKBcWl
+	 PlIPNbXsuzllRrbK/jmry7jdGGu/kxlba3LnmP8MJBm6Ou3XdKDP0TWHyJwJnKckCm
+	 FwI1LBbGNq76Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: alexanderduyck@fb.com,
@@ -49,11 +49,10 @@ Cc: alexanderduyck@fb.com,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	jdamato@fastly.com
-Subject: [PATCH net-next 1/5] net: report csum_complete via qstats
-Date: Tue, 11 Feb 2025 10:13:52 -0800
-Message-ID: <20250211181356.580800-2-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 2/5] eth: fbnic: wrap tx queue stats in a struct
+Date: Tue, 11 Feb 2025 10:13:53 -0800
+Message-ID: <20250211181356.580800-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250211181356.580800-1-kuba@kernel.org>
 References: <20250211181356.580800-1-kuba@kernel.org>
@@ -65,42 +64,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 13c7c941e729 ("netdev: add qstat for csum complete") reserved
-the entry for csum complete in the qstats uAPI. Start reporting this
-value now that we have a driver which needs it.
+The queue stats struct is used for Rx and Tx queues. Wrap
+the Tx stats in a struct and a union, so that we can reuse
+the same space for Rx stats on Rx queues.
+
+This also makes it easy to add an assert to the stat handling
+code to catch new stats not being aggregated on shutdown.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: jdamato@fastly.com
----
- include/net/netdev_queues.h | 1 +
- net/core/netdev-genl.c      | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h    |  8 ++++++--
+ drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c |  8 ++++----
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c    | 10 ++++++----
+ 3 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 73d3401261a6..825141d675e5 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -23,6 +23,7 @@ struct netdev_queue_stats_rx {
- 	u64 hw_drops;
- 	u64 hw_drop_overruns;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index c2a94f31f71b..d6ae8462584f 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -57,8 +57,12 @@ struct fbnic_queue_stats {
+ 	u64 packets;
+ 	u64 bytes;
+ 	u64 dropped;
+-	u64 ts_packets;
+-	u64 ts_lost;
++	union {
++		struct {
++			u64 ts_packets;
++			u64 ts_lost;
++		} twq;
++	};
+ 	struct u64_stats_sync syncp;
+ };
  
-+	u64 csum_complete;
- 	u64 csum_unnecessary;
- 	u64 csum_none;
- 	u64 csum_bad;
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 0dcd4faefd8d..c18bb53d13fd 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -581,6 +581,7 @@ netdev_nl_stats_write_rx(struct sk_buff *rsp, struct netdev_queue_stats_rx *rx)
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_ALLOC_FAIL, rx->alloc_fail) ||
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_HW_DROPS, rx->hw_drops) ||
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS, rx->hw_drop_overruns) ||
-+	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_CSUM_COMPLETE, rx->csum_complete) ||
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY, rx->csum_unnecessary) ||
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_CSUM_NONE, rx->csum_none) ||
- 	    netdev_stat_put(rsp, NETDEV_A_QSTATS_RX_CSUM_BAD, rx->csum_bad) ||
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+index 9503c36620c6..fb7139a1da46 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+@@ -1224,14 +1224,14 @@ static void fbnic_get_ts_stats(struct net_device *netdev,
+ 	unsigned int start;
+ 	int i;
+ 
+-	ts_stats->pkts = fbn->tx_stats.ts_packets;
+-	ts_stats->lost = fbn->tx_stats.ts_lost;
++	ts_stats->pkts = fbn->tx_stats.twq.ts_packets;
++	ts_stats->lost = fbn->tx_stats.twq.ts_lost;
+ 	for (i = 0; i < fbn->num_tx_queues; i++) {
+ 		ring = fbn->tx[i];
+ 		do {
+ 			start = u64_stats_fetch_begin(&ring->stats.syncp);
+-			ts_packets = ring->stats.ts_packets;
+-			ts_lost = ring->stats.ts_lost;
++			ts_packets = ring->stats.twq.ts_packets;
++			ts_lost = ring->stats.twq.ts_lost;
+ 		} while (u64_stats_fetch_retry(&ring->stats.syncp, start));
+ 		ts_stats->pkts += ts_packets;
+ 		ts_stats->lost += ts_lost;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index d4d7027df9a0..b60dd1c9918e 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -444,7 +444,7 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
+ 	if (unlikely(discard)) {
+ 		u64_stats_update_begin(&ring->stats.syncp);
+ 		ring->stats.dropped += total_packets;
+-		ring->stats.ts_lost += ts_lost;
++		ring->stats.twq.ts_lost += ts_lost;
+ 		u64_stats_update_end(&ring->stats.syncp);
+ 
+ 		netdev_tx_completed_queue(txq, total_packets, total_bytes);
+@@ -507,7 +507,7 @@ static void fbnic_clean_tsq(struct fbnic_napi_vector *nv,
+ 
+ 	skb_tstamp_tx(skb, &hwtstamp);
+ 	u64_stats_update_begin(&ring->stats.syncp);
+-	ring->stats.ts_packets++;
++	ring->stats.twq.ts_packets++;
+ 	u64_stats_update_end(&ring->stats.syncp);
+ }
+ 
+@@ -1065,8 +1065,10 @@ void fbnic_aggregate_ring_tx_counters(struct fbnic_net *fbn,
+ 	fbn->tx_stats.bytes += stats->bytes;
+ 	fbn->tx_stats.packets += stats->packets;
+ 	fbn->tx_stats.dropped += stats->dropped;
+-	fbn->tx_stats.ts_lost += stats->ts_lost;
+-	fbn->tx_stats.ts_packets += stats->ts_packets;
++	fbn->tx_stats.twq.ts_lost += stats->twq.ts_lost;
++	fbn->tx_stats.twq.ts_packets += stats->twq.ts_packets;
++	/* Remember to add new stats here */
++	BUILD_BUG_ON(sizeof(fbn->tx_stats.twq) / 8 != 2);
+ }
+ 
+ static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
 -- 
 2.48.1
 
