@@ -1,137 +1,102 @@
-Return-Path: <netdev+bounces-164998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C62A2FF92
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:49:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F47DA2FFB0
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:52:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33049188B6DA
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:48:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 187EF188C2F4
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828F1F152E;
-	Tue, 11 Feb 2025 00:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6741C3BF9;
+	Tue, 11 Feb 2025 00:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="EAKAP+gH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VH88J0Nb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450671F0E58
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3587413BACC
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739234504; cv=none; b=hXH1uxqzHdnjrvcsgBYc6FxmrPgwxtvyPCO1uNm0klocN3bUhymod3lRIXIVlOnt00vHJLKcP0c/gKzfHwcSQuvrNZmqst6e2YTuderRWeeD2Xt6898H7sVflImCWflYTbqRAmBW/b35DwsXfx+Z4lWYThCkwcK2cfdvrEmHPQw=
+	t=1739234640; cv=none; b=Z8f/NWMg+HUpDHnKJzSFS5b1w9ZRw0OjJ/XpPMMgHI6dt7SfuU2t/Rouer4zkHDbGq0rnuJeilxRzqqMGqAjK4l7uJTjTqRRn1F5cCZ+VTssPsSbvTKzLwIUOBfCTuZo7EMrKArEqGHevVzJ2QdYDiHMK7NmfTxL+nY/FJCgj1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739234504; c=relaxed/simple;
-	bh=8xMoMq4/HmCsbbhmmUU+CjrB8VVYxxsj4UGn48mpUmA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KBJnzDTJej8Q5aRdnVJ7p2AiZU74gLfhAbLuLp8QUCgBj7dpBh3zUDJaTmsRhhI27jv06mzzgR+mRtw6ErMYRLvnpVe2aY4zoP9WGrrIv5ABz3wMUYeOajXHE27S4k+X+EoVnLcMQOQ+pQCRsFHDhIHa2Q4ouoehmw72F4kGb9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=EAKAP+gH; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so34256535e9.1
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 16:41:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1739234500; x=1739839300; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0H4op0ePLiNdUHXM7R2dSoMw+sTN1l4LiLoSsD6CY0o=;
-        b=EAKAP+gHFnbMMSaAc4suj0odDs9wwUwRke7rSkY5idjAOB4lCgqDmWx4YEtmairfaS
-         boGJwprgoyeoygwhK/EUACs/hHMRPI284N4n5RPg3S5UUu4edNWkdogW2sZ1jxYRrUTX
-         18ufbME79A/vHkFokyaVEJYAucAlAj/04rEHc134zsAXRBfmCktLeyvI1bdLWDZ8Jy4u
-         WnRbRPBse0BhJuFeQJHWBqb2IBM09MHOLKuyzMZpyVtiDu6SvSQgfxnSOZBHbEardpbe
-         W56M7VdQlnnYwG5rfOzPp58/L3pMNPEvjOJbCgWniAowBy10I1YctVQpNA2gPEUQ/NH8
-         Lmdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739234500; x=1739839300;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0H4op0ePLiNdUHXM7R2dSoMw+sTN1l4LiLoSsD6CY0o=;
-        b=sYeVR4xuJu+nbL87QHMbLL4Lb/1DZfA2xVYrtLgxlOIM12VSQcFO6jLUll0aLhWigu
-         L5QspsBHbySbvlgAIwvhZnnZXcEwsUyhb00ODfyt17gSLaSAm9TvWjfrfcDGqU4ADgvS
-         ZYqbGHw3NtvVgpdV4eq5mkpXUP7nEMELqw2kyzHEcG+U7sWIjEqmZUfULc4BaBOMF+De
-         4Qr832bsTFAYRwIh/LzdXSiuqhIn2crGyJJ43Zjq01Cbw2g0GXTDvhylbIj7e++cxS53
-         eLFtVgxrruwBfzxNdX4cws3i3/DK/uUmtP8agpP+ORwLbs4Vh/814Kq1q6zJ55j2UhV7
-         5yVw==
-X-Gm-Message-State: AOJu0YzD1Qv81zRW8tJKmew7p6ebv8jodfGdRoJrahUcR0zo4WeFT7Fh
-	SUBQveYYMnYfyGl0NvBaQYgNmh7U36Kg/NrirD31wj2s0MI3G07FYHsTUXLJ/g8=
-X-Gm-Gg: ASbGncvLQsMFqQbwyb3Yn+DTWLfjBhnvcPjJdY0R36S/2B6Wf9/8Y6KbZjpW5N23bEA
-	VzVol8SBADoxA0oNYXcHZ7A9yNEfN/fH3qMPQ46bjDm8CTOXjvDaai50yCGk76O7IarvYhoMZoS
-	3dmVfO9uPcy4e8uJ+CLseDE5cimp8mD+d4C05m6mxncpj/FCmVgNalR8IVibTeCDf706e7GgABz
-	LsISPbOMuiQuxQu1OlR0TAgqVh84uhAl52r1C11enHESN45L4KWhFaGLdvLiGQ3CosbMLkqqNDi
-	GhXZyQMDx+sBAweXXrrIJefo71k=
-X-Google-Smtp-Source: AGHT+IHjHENWeREsEhAJYoT3TQ2FFR8LSRFgAVO/2HRjTSK8uZkQIeJT/gCfk0HOYKp+KwyLvV3/jA==
-X-Received: by 2002:a05:600c:1549:b0:434:f0df:a14 with SMTP id 5b1f17b1804b1-4392496ec4amr124415175e9.2.1739234499835;
-        Mon, 10 Feb 2025 16:41:39 -0800 (PST)
-Received: from serenity.mandelbit.com ([2001:67c:2fbc:1:1255:949f:f81c:4f95])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4394dc1bed2sm3388435e9.0.2025.02.10.16.41.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 16:41:38 -0800 (PST)
-From: Antonio Quartulli <antonio@openvpn.net>
-Date: Tue, 11 Feb 2025 01:40:19 +0100
-Subject: [PATCH net-next v19 26/26] mailmap: remove unwanted entry for
- Antonio Quartulli
+	s=arc-20240116; t=1739234640; c=relaxed/simple;
+	bh=YMmaKEak/03dwbRH8YweIpN1T4YJ+s4Tz7bZtxPZan8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YGTvSIgnxhmvSWdhUTBDkrPsiaDNGycdL9KmGSgx453NakZiRL/dR+8w4BR+pr3zffh7AEF4jrLm7CbNlNOFD/jB0rjB5wMveW5r3/SzhM4bUq34FCuBq3EynchuOaS02X9SrgZpUoXGgU5qBW3VAxVRPSMht0WnARA581UzoKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VH88J0Nb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA265C4CED1;
+	Tue, 11 Feb 2025 00:43:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739234639;
+	bh=YMmaKEak/03dwbRH8YweIpN1T4YJ+s4Tz7bZtxPZan8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VH88J0Nb8hFvwrmN4T9tM9X8/Cxtu509TKSkI7uugbTYbsd9mGvd9VM280ZzBYyAh
+	 syrHScdbheKi45nfLEelhvEOY8NUOGxMnQoZ3CkeZnY0F53P1/XLrxSJDb6dHLS0y9
+	 iLH63WOyUFeOR4ZqMP/sI68vOOPbrCOPxA7z4A2QYcpDI2smgCGXu+H80FIT4oJNS7
+	 gQtSDU1w3adsUYe7jgxh5e9A5IxRxln5nk5LTiaY923ve3HJQZj0bUN8KkzxWF+76i
+	 aHP2aoBiwqma1Uc0NeKa1Kc9RYvHM98W1vxp0LnPAxlPyyWoqN41hkBeT+Id6ILIQy
+	 98sJ+WF0Tlmhw==
+Date: Mon, 10 Feb 2025 16:43:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Arinzon, David" <darinzon@amazon.com>
+Cc: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
+ "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+ <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
+ <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+ <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+ "Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+ <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+ <amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud,
+ Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>,
+ "Tabachnik, Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek"
+ <maciek@machnikowski.net>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal
+ Pressman <gal@nvidia.com>
+Subject: Re: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
+Message-ID: <20250210164358.11091722@kernel.org>
+In-Reply-To: <01fd0c4d50c7493986d80e22b0506fdf@amazon.com>
+References: <20250206141538.549-1-darinzon@amazon.com>
+	<20250206141538.549-4-darinzon@amazon.com>
+	<20250207165516.2f237586@kernel.org>
+	<01fd0c4d50c7493986d80e22b0506fdf@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250211-b4-ovpn-v19-26-86d5daf2a47a@openvpn.net>
-References: <20250211-b4-ovpn-v19-0-86d5daf2a47a@openvpn.net>
-In-Reply-To: <20250211-b4-ovpn-v19-0-86d5daf2a47a@openvpn.net>
-To: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Antonio Quartulli <antonio@openvpn.net>, Shuah Khan <shuah@kernel.org>, 
- sd@queasysnail.net, ryazanov.s.a@gmail.com, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>, 
- Andrew Morton <akpm@linux-foundation.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=985; i=antonio@openvpn.net;
- h=from:subject:message-id; bh=8xMoMq4/HmCsbbhmmUU+CjrB8VVYxxsj4UGn48mpUmA=;
- b=owEBbQGS/pANAwAIAQtw5TqgONWHAcsmYgBnqpyPvVsBe5Cp3g3R9CiRk7YQ+2PHwNnzZlA1Q
- 0pnAm9TrPSJATMEAAEIAB0WIQSZq9xs+NQS5N5fwPwLcOU6oDjVhwUCZ6qcjwAKCRALcOU6oDjV
- h0aWCAC5uaeXlErFy1AmTjZtoAcj6luKEQPtxVbrLDJsiviSBdiwut1GgVdTkBDCil4TEcwZom9
- jOCIdcc9Ht7m3jWSRLxy5doFfUq71IVnVIRMOux/JzLd1chD3WBtZsX0ygKE03TMyM28kJjDrzX
- fx5V9/rHYb3aNjqZI1VEfNtBDxMWOrmd7Cot92HOOtzs6B3UZOlzU2zUfK1ESIeOASPlMAYR5Al
- h7ufHlD67uFoa1abb9kgLFHR9rdyIij8NFXiqmksKnYU+CRfUJMN73QaQg4PWJInRiFtb/tDqiK
- eS60/cTK1Fg7hSyJDYeHXQQkwrJaQAOIYfBJ9qHv17feug3Q
-X-Developer-Key: i=antonio@openvpn.net; a=openpgp;
- fpr=CABDA1282017C267219885C748F0CCB68F59D14C
 
-antonio@openvpn.net is still used for sending
-patches under the OpenVPN Inc. umbrella, therefore this
-address should not be re-mapped.
+On Mon, 10 Feb 2025 15:28:19 +0000 Arinzon, David wrote:
+> You are right in the regard that it is not a network specific functionality.
+> Having said that, PHC is a network card capability, making it a network-related component rather than purely a timekeeping feature.
+> Moreover we failed to find an existing tool which would allow users to get valuable feedback of the system's overall health.
+> 
+> Researching its existing support in the kernel we noted that:
+> - PHC is embedded in network NIC and is supported by multiple NIC vendors in the kernel
+> - PHC information is visible through ethtool -T
+> - The Linux networking stack uses PHC for timekeeping as well as for packet timestamping (via SO_TIMESTAMPING).
+>   Packet timestamping statistics are available through ethtool get_ts_stats hook
+> 
+> We have found `ethtool -S` as a suitable location for exposing these statistics, which are unique to the ENA NIC.
+> 
+> We'd appreciate your thoughts on the matter, is there an alternative tool you can recommend?
 
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
----
- .mailmap | 1 -
- 1 file changed, 1 deletion(-)
+We try to steer folks towards read-only debugfs files for stuff
+that's not strictly networking related. You also add a custom
+sysfs file in patch 4, I reckon adding stats there may also be
+a natural place for the user? 
 
-diff --git a/.mailmap b/.mailmap
-index ae0adc499f4acba5b6220762c1beccceeb5e8ddf..9877cf1ebf5480b80bbb9df73e1096147fb256a4 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -88,7 +88,6 @@ Antonio Quartulli <antonio@mandelbit.com> <antonio@open-mesh.com>
- Antonio Quartulli <antonio@mandelbit.com> <antonio.quartulli@open-mesh.com>
- Antonio Quartulli <antonio@mandelbit.com> <ordex@autistici.org>
- Antonio Quartulli <antonio@mandelbit.com> <ordex@ritirata.org>
--Antonio Quartulli <antonio@mandelbit.com> <antonio@openvpn.net>
- Antonio Quartulli <antonio@mandelbit.com> <a@unstable.cc>
- Anup Patel <anup@brainfault.org> <anup.patel@wdc.com>
- Archit Taneja <archit@ti.com>
-
--- 
-2.45.3
-
+Patch 4 FWIW is lacking slightly in the justification, would 
+be good to clarify why it's disabled by default. Single sentence
+of "why" would be great.
 
