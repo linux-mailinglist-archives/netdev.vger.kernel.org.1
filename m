@@ -1,89 +1,108 @@
-Return-Path: <netdev+bounces-165033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 115B7A30219
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 04:21:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD2FA30225
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 04:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6A0B3A7072
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC28E169366
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E071D54C0;
-	Tue, 11 Feb 2025 03:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15571D5CDD;
+	Tue, 11 Feb 2025 03:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmElfvy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSVGuwGv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B46726BD95;
-	Tue, 11 Feb 2025 03:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85441D5CCD;
+	Tue, 11 Feb 2025 03:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739244060; cv=none; b=mVv3vrBqk3RZLPnnUY0ieSHPnrR3RGVOgO5M8d4xmEqByubEVYPpTLgTdjTlLbP9zuqd5nUHwWqsfWxax0MRGBZeRTaZzjyT7+KvYQeeqCZjIK/wGiCxa8Shuxw6O9vY+kjj9RbPncpEiZGWywBlZqKvQX+uLnx6jhcPr41v6iY=
+	t=1739244604; cv=none; b=oKsnHaYlRLz7OHLQE6Cys/kONLlF9iiPw54T/YWYZQZTQRY+oFfC6QNr5Of1V9MdkUh7kaxZvIdF0RdN7IFjEw8ZzdvXUUKHjzPK9rH9wb4N/r02LOERCWPjnphk5tQlfAiNxRyxpbTw9CQaF+sWahSC4sHeRo5wLgBQ3dPfzhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739244060; c=relaxed/simple;
-	bh=TyqVUC1ihDVGaqOg4m/1cz3ovyquVJjJPV218ZwgmqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nkic996jVQjMYsIF5Rg88vnrcvVCPcFKWqb4bUHTlg89dTG03vvBYRt8Ht2Zuxi6OSRVy2lTPORvxODnkTXev9etrj2Vhauzis7ZK0H6YLwqBt/Pg+Dojrva1VkSC8XoMRF/v7g3QjiNpjWDkOR+WzjiINUGZufx3wqodT+XGlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GmElfvy9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F25C4CED1;
-	Tue, 11 Feb 2025 03:20:59 +0000 (UTC)
+	s=arc-20240116; t=1739244604; c=relaxed/simple;
+	bh=mBv5aXOGOSy28qBAESOh3mSl0P8bzvNPXse3HG5iaAo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AC8vmGVgu6RnRWX+aJrle5b+iZvFtPrnX47DrA6tUfRNEysjY/0IHQ7RsaiRM6UxzhiorTzFn4lomlO1H0VZ7mPTVBCA7oeD17F8BjQuTpHkhzofKzM0TN/8RvHR/tEDr7JvlVSFkO0LYUr9hTkHZymRdk8LT6ql0/ILBTU0124=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSVGuwGv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15C29C4CED1;
+	Tue, 11 Feb 2025 03:30:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739244059;
-	bh=TyqVUC1ihDVGaqOg4m/1cz3ovyquVJjJPV218ZwgmqI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GmElfvy9kgokaLWPK4tcitOrHQw+ylSMeM57QOSOM+KN126V8JZnPPtGaUX3uM+e6
-	 jydcB2zcQi45b/Q11W6NCK2D6aKtMaRIHBBzhFcKo6jpzS2Q0+KGfis3+6WtDhXwxS
-	 2V1SmT8Fg2Mgz3fRcuANriUU2AErzOVNvaZqfQhCuMbxpDiYr8CDozODjukp0XP23V
-	 D5At4CjdQrxJoZJK/hxF3hAn3aNhjvRv65I9qKD4pYEDGXS2Xkk83OevMOG0PYx4vU
-	 qP3MYCgEVVQef/zPJZjAQazBHmxFMqStNF2rRFy0JYZQWLM6q6h80gtSqjNujAMSx9
-	 z902gCWqDk5lw==
-Date: Mon, 10 Feb 2025 19:20:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, ahmed.zaki@intel.com, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] documentation: networking: Add NAPI config
-Message-ID: <20250210192058.26b59185@kernel.org>
-In-Reply-To: <Z6q7B79h73ydzOhM@LQ3V64L9R2>
-References: <20250208012822.34327-1-jdamato@fastly.com>
-	<20250210181635.2c84f2e1@kernel.org>
-	<Z6q7B79h73ydzOhM@LQ3V64L9R2>
+	s=k20201202; t=1739244604;
+	bh=mBv5aXOGOSy28qBAESOh3mSl0P8bzvNPXse3HG5iaAo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aSVGuwGvy6wr/I8w9T0QV57OZ5h6HWva29Mj1TaQjB6ztksAKcC2GdJDjk0f6S1G/
+	 MQbRxMvolwjnlFCd9ZU+cQhapxf57F7gig2QBjGXmDYNRQDDLkjhkU/fZ0qa3ZuZuE
+	 Iux8Mlz5yijL/bZeVY8Vb3s2Aclm8VxtBBiqXVz4RQ/4gxvLu6VDpsqAGIxHoL+KuL
+	 dMg8NoKthsl9ZvFGzf+P3KI2tdKnSXFAJHEeETCcmzHyYf4j99l5v3PPqZxjbMUbpo
+	 6q0ffXDJV5avxVvJbLYTMShAUAL4s5WLFSyPjziOczB6KUeqEwy5tTUdrKHgUvgnN8
+	 fzIosp0nIP/LQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB05E380AA7A;
+	Tue, 11 Feb 2025 03:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/6] Documentation/networking: fix basic node example
+ document ISO 15765-2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173924463278.3948401.2091237100978886483.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Feb 2025 03:30:32 +0000
+References: <20250208115120.237274-2-mkl@pengutronix.de>
+In-Reply-To: <20250208115120.237274-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, reyders1@gmail.com,
+ horms@kernel.org, socketcan@hartkopp.net
 
-On Mon, 10 Feb 2025 18:50:47 -0800 Joe Damato wrote:
-> On Mon, Feb 10, 2025 at 06:16:35PM -0800, Jakub Kicinski wrote:
-> > On Sat,  8 Feb 2025 01:28:21 +0000 Joe Damato wrote:  
-> > > +Persistent NAPI config
-> > > +----------------------
-> > > +
-> > > +Drivers can opt-in to using a persistent NAPI configuration space by calling  
-> > 
-> > Should we be more forceful? I think for new drivers the _add_config() 
-> > API should always be preferred given the benefits.  
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Sat,  8 Feb 2025 12:45:14 +0100 you wrote:
+> From: Reyders Morales <reyders1@gmail.com>
 > 
-> How about: "Drivers should opt-in ..." instead? I have no strong
-> preference.
+> In the current struct sockaddr_can tp is member of can_addr. tp is not
+> member of struct sockaddr_can.
+> 
+> Signed-off-by: Reyders Morales <reyders1@gmail.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> Link: https://patch.msgid.link/20250203224720.42530-1-reyders1@gmail.com
+> Fixes: 67711e04254c ("Documentation: networking: document ISO 15765-2")
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> 
+> [...]
 
-A bit more editing may be beneficial, lead with the problem:
+Here is the summary with links:
+  - [net,1/6] Documentation/networking: fix basic node example document ISO 15765-2
+    https://git.kernel.org/netdev/net/c/d0b197b6505f
+  - [net,2/6] can: j1939: j1939_sk_send_loop(): fix unable to send messages with data length zero
+    https://git.kernel.org/netdev/net/c/44de577e61ed
+  - [net,3/6] can: ctucanfd: handle skb allocation failure
+    https://git.kernel.org/netdev/net/c/9bd24927e3ee
+  - [net,4/6] can: c_can: fix unbalanced runtime PM disable in error path
+    https://git.kernel.org/netdev/net/c/257a2cd3eb57
+  - [net,5/6] can: etas_es58x: fix potential NULL pointer dereference on udev->serial
+    https://git.kernel.org/netdev/net/c/a1ad2109ce41
+  - [net,6/6] can: rockchip: rkcanfd_handle_rx_fifo_overflow_int(): bail out if skb cannot be allocated
+    https://git.kernel.org/netdev/net/c/f7f0adfe64de
 
-  Drivers often allocate and free NAPI instances dynamically. This leads
-  to loss of NAPI-related user configuration, each time NAPI instances
-  are reallocated. The netif_napi_add_config() API prevents this loss of
-  configuration by associating each NAPI instance with...
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Drivers should try to use netif_napi_add_config() whenever possible.
+
 
