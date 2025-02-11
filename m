@@ -1,185 +1,111 @@
-Return-Path: <netdev+bounces-165142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D20A30AB5
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:48:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8505A30ABB
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:49:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E439F3A4B09
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:46:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 052D47A075A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A498124E4B1;
-	Tue, 11 Feb 2025 11:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614081F8AC5;
+	Tue, 11 Feb 2025 11:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="J07MyjBm"
+	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="I0uQU/F2"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A711624C69D;
-	Tue, 11 Feb 2025 11:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE871F754A;
+	Tue, 11 Feb 2025 11:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739274201; cv=none; b=jXAuwBZv6hhssErJ1T3wAfQmUue8toBiIfzKPLHH5LcHBXuCiQF3TLXC3zbDyDjjwLVcpC33uQz/BUvq9gwCESAiHVJ1lSNG0ExLvFgUJ5GEF//8+qTG9MRfeHq4+tE8KmGGceXwEWCorX+fC+8I30tiyzSjzt/PKDEkXpeloB8=
+	t=1739274567; cv=none; b=oJkfZCQsEXNj8sn0+b/OT10ABkf3o8nu+x+iZN9P+bI8s/NQFuBhwjzQxxF4/6rjLw/GKjZq8kW+IwucIcVvD9Q4T87FIv666umY7OIjOhKCv4hhA4RxWg13VWV0m0RglUXawBZ97T56QwmVXvLIqkmAFYHqc4veDRq/I3EhapU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739274201; c=relaxed/simple;
-	bh=12MzYizbbPSbp4udes42xYP8cXF305cfWeIimY26ew4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sdBJyKZhHqMa3NZBX+3fv+c3OVO3skCa9qgwfu7sOqjjmlPFniDCuELzG6/OFefo1ARMcqz6ZIfP2R1WkOY+Jt1fkxRmjQW9HaPJTaoCYl3gtFdGMLas6luqSNvOJL6pNYC0tDlPcYOuv7WtJnVYMfVkRfXPp6DFOCMppQlVgEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=J07MyjBm; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id B1B012B3;
-	Tue, 11 Feb 2025 12:41:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1739274119;
-	bh=12MzYizbbPSbp4udes42xYP8cXF305cfWeIimY26ew4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J07MyjBmzRaoN4BB2HKRXu7o23wKFsqKr9k+Bdn1fG9n3ii9IddAKwQEL3fXlM5cl
-	 ZT0nKcyROe7aaz53SQaneoY8e04z+JE2jzEZIsTlpxaq2ABkmUYb8WELnQ99WQRhk/
-	 aPtzy/pVz3wxa2fo2yrYMlqFfKtp/b6c1mxRUrKk=
-Date: Tue, 11 Feb 2025 13:43:07 +0200
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: "zhangzekun (A)" <zhangzekun11@huawei.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, robh@kernel.org,
-	saravanak@google.com, justin.chen@broadcom.com,
-	florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
-	kuba@kernel.org, kory.maincent@bootlin.com,
-	jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
-	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, taras.chornyi@plvision.eu,
-	edumazet@google.com, pabeni@redhat.com, sudeep.holla@arm.com,
-	cristian.marussi@arm.com, arm-scmi@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	chenjun102@huawei.com
-Subject: Re: [PATCH 1/9] of: Add warpper function
- of_find_node_by_name_balanced()
-Message-ID: <20250211114307.GB5888@pendragon.ideasonboard.com>
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-2-zhangzekun11@huawei.com>
- <Z6XDKi_V0BZSdCeL@pengutronix.de>
- <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
- <20250207153722.GA24886@pendragon.ideasonboard.com>
- <c48952c7-716c-4302-949c-2c66ea102a3e@huawei.com>
- <20250210100307.GA2966@pendragon.ideasonboard.com>
- <664185f4-b87a-4635-9ee9-2f0e7494195a@huawei.com>
+	s=arc-20240116; t=1739274567; c=relaxed/simple;
+	bh=RSrR31etPfWErYWuQDOoH5CdG8ajOEflXt5lHMpkXhI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=BuEIp/1mlr4+uzmBFjSrvD6YYFCkjiH4us6nrPFcKV3JjkC/5y0CW1gFHZlE996ZGW3DhR4/izlluPboP8KuLQyhoFtLnfzgJ0L+OdAL4/ePK3lSbFa9MXabx77w2z6wwN61C2g2k6lu5n9fjbjw89HBiv+1SC9wwomVe+t6UEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=I0uQU/F2; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
+  s=amazon201209; t=1739274566; x=1770810566;
+  h=from:to:cc:subject:date:message-id:content-id:
+   content-transfer-encoding:mime-version;
+  bh=RSrR31etPfWErYWuQDOoH5CdG8ajOEflXt5lHMpkXhI=;
+  b=I0uQU/F2yTvmAtnd2DrEOjBWSOFKtXtN0qsH++nvUL1yFe1eByiKtjeO
+   gb3J2XVUXSz2ALEGODKygE37T4TLp1ME7vHv6ZBBhcmEEu1PzkG/nM5lQ
+   kChX1Fz4dyAyPW5H+4aMt/RUzaXHKfrWF6Xk06VF9ZXdU2VNbVKOAtcZz
+   s=;
+X-IronPort-AV: E=Sophos;i="6.13,277,1732579200"; 
+   d="scan'208";a="461536813"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 11:49:18 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:24326]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.31:2525] with esmtp (Farcaster)
+ id 5ec35c9f-088f-4516-adef-c68c778defd9; Tue, 11 Feb 2025 11:49:16 +0000 (UTC)
+X-Farcaster-Flow-ID: 5ec35c9f-088f-4516-adef-c68c778defd9
+Received: from EX19D004ANA004.ant.amazon.com (10.37.240.146) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 11 Feb 2025 11:49:16 +0000
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19D004ANA004.ant.amazon.com (10.37.240.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Feb 2025 11:49:14 +0000
+Received: from EX19D004ANA001.ant.amazon.com ([fe80::f099:cbca:cc6b:91ec]) by
+ EX19D004ANA001.ant.amazon.com ([fe80::f099:cbca:cc6b:91ec%5]) with mapi id
+ 15.02.1544.014; Tue, 11 Feb 2025 11:49:14 +0000
+From: "Iwashima, Kuniyuki" <kuniyu@amazon.co.jp>
+To: Breno Leitao <leitao@debian.org>, Uday Shankar <ushankar@purestorage.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "kernel-team@meta.com" <kernel-team@meta.com>
+Subject: Re: [PATCH net-next v2 2/2] net: Add dev_getbyhwaddr_rtnl() helper
+Thread-Topic: [PATCH net-next v2 2/2] net: Add dev_getbyhwaddr_rtnl() helper
+Thread-Index: AQHbfHr5TbFo5KdF2Umd+m4rD5vlBA==
+Date: Tue, 11 Feb 2025 11:49:14 +0000
+Message-ID: <9B3D8CD0-65DE-43FE-88BA-55902DE96496@amazon.co.jp>
+Accept-Language: ja-JP, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <629AC6E3330F8B459433207CFDFB63DF@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <664185f4-b87a-4635-9ee9-2f0e7494195a@huawei.com>
 
-On Tue, Feb 11, 2025 at 07:26:18PM +0800, zhangzekun (A) wrote:
-> 在 2025/2/10 18:03, Laurent Pinchart 写道:
-> > On Mon, Feb 10, 2025 at 02:47:28PM +0800, zhangzekun (A) wrote:
-> >>> I think we all agree that of_find_node_by_name() is miused, and that it
-> >>> shows the API isn't optimal. What we have different opinions on is how
-> >>> to make the API less error-prone. I think adding a new
-> >>> of_find_node_by_name_balanced() function works around the issue and
-> >>> doesn't improve the situation much, I would argue it makes things even
-> >>> more confusing.
-> >>>
-> >>> We have only 20 calls to of_find_node_by_name() with a non-NULL first
-> >>> argument in v6.14-rc1:
-> >>>
-> >>> arch/powerpc/platforms/chrp/pci.c:      rtas = of_find_node_by_name (root, "rtas");
-> >>>
-> >>> The 'root' variable here is the result of a call to
-> >>> 'of_find_node_by_path("/")', so I think we could pass a null pointer
-> >>> instead to simplify things.
-> >>>
-> >>> arch/powerpc/platforms/powermac/pic.c:          slave = of_find_node_by_name(master, "mac-io");
-> >>>
-> >>> Here I believe of_find_node_by_name() is called to find a *child* node
-> >>> of 'master'. of_find_node_by_name() is the wrong function for that.
-> >>>
-> >>> arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(rootnp, "GAISLER_IRQMP");
-> >>> arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(rootnp, "01_00d");
-> >>> arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(nnp, "GAISLER_GPTIMER");
-> >>> arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(nnp, "01_011");
-> >>>
-> >>> Here too the code seems to be looking for child nodes only (but I
-> >>> couldn't find a DT example or binding in-tree, so I'm not entirely
-> >>> sure).
-> >>>
-> >>> drivers/clk/ti/clk.c:   return of_find_node_by_name(from, tmp);
-> >>>
-> >>> Usage here seems correct, the reference-count decrement is intended.
-> >>>
-> >>> drivers/media/i2c/max9286.c:    i2c_mux = of_find_node_by_name(dev->of_node, "i2c-mux");
-> >>> drivers/media/platform/qcom/venus/core.c:       enp = of_find_node_by_name(dev->of_node, node_name);
-> >>> drivers/net/dsa/bcm_sf2.c:      ports = of_find_node_by_name(dn, "ports");
-> >>> drivers/net/dsa/hirschmann/hellcreek_ptp.c:     leds = of_find_node_by_name(hellcreek->dev->of_node, "leds");
-> >>> drivers/net/ethernet/broadcom/asp2/bcmasp.c:    ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
-> >>> drivers/net/ethernet/marvell/prestera/prestera_main.c:  ports = of_find_node_by_name(sw->np, "ports");
-> >>> drivers/net/pse-pd/tps23881.c:  channels_node = of_find_node_by_name(priv->np, "channels");
-> >>> drivers/regulator/scmi-regulator.c:     np = of_find_node_by_name(handle->dev->of_node, "regulators");
-> >>> drivers/regulator/tps6594-regulator.c:          np = of_find_node_by_name(tps->dev->of_node, multi_regs[multi].supply_name);
-> >>>
-> >>> Incorrect usage, as far as I understand all those drivers are looking
-> >>> for child nodes only.
-> >>>
-> >>> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest16");
-> >>> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest17");
-> >>> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest18");
-> >>> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest19");
-> >>>
-> >>> Here too I think only child nodes are meant to be considered.
-> >>>
-> >>> of_find_node_by_name() is very much misused as most callers want to find
-> >>> child nodes, while of_find_node_by_name() will walk the whole DT from a
-> >>> given starting point.
-> >>>
-> >>> I think the right fix here is to
-> >>>
-> >>> - Replace of_find_node_by_name(root, ...) with
-> >>>     of_find_node_by_name(NULL, ...) in arch/powerpc/platforms/chrp/pci.c
-> >>>     (if my understanding of the code is correct).
-> >>
-> >> For arch/powerpc/platforms/chrp/pci.c, noticing that there is a comment
-> >> in setup_peg2():
-> >>    /* keep the reference to the root node */
-> >>
-> >> It might can not be convert to of_find_node_by_name(NULL, ...), and the
-> >> origin use of of_find_node_by_name() put the ref count which want to be
-> >> kept.
-> > 
-> > But the reference is dropped by of_find_node_by_name(). Unless I'm
-> > missing something, dropping the lien
-> > 
-> > 	struct device_node *root = of_find_node_by_path("/");
-> > 
-> > and changing
-> > 
-> > 	rtas = of_find_node_by_name (root, "rtas");
-> > 
-> > to
-> > 
-> > 	rtas = of_find_node_by_name (NULL, "rtas");
-> > 
-> > will not change the behaviour of the code.
-> 
-> Hi, Laurent,
-> 
-> I think that the original code try to keep the refcount get by 
-> of_find_node_by_path(), but leak it accidently by 
-> of_find_node_by_name(). I am not sure that what driver really wants to 
-> do and if it has a bug here.
-
-Looking at the git history, I don't think the code needs or tries to
-keep a reference to the root node.
-
--- 
-Regards,
-
-Laurent Pinchart
+RnJvbTogQnJlbm8gTGVpdGFvIDxsZWl0YW9AZGViaWFuLm9yZz4NCkRhdGU6IFR1ZSwgMTEgRmVi
+IDIwMjUgMDM6MzY6NDMgLTA4MDANCj4gPiA+ICtzdHJ1Y3QgbmV0X2RldmljZSAqZGV2X2dldGJ5
+aHdhZGRyKHN0cnVjdCBuZXQgKm5ldCwgdW5zaWduZWQgc2hvcnQgdHlwZSwNCj4gPiA+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCBjaGFyICpoYSkNCj4gPiA+ICt7DQo+ID4g
+PiArICAgc3RydWN0IG5ldF9kZXZpY2UgKmRldjsNCj4gPiA+ICsNCj4gPiA+ICsgICBBU1NFUlRf
+UlROTCgpOw0KPiA+ID4gKyAgIGZvcl9lYWNoX25ldGRldihuZXQsIGRldikNCj4gPiA+ICsgICAg
+ICAgICAgIGlmIChkZXZfY29tcF9hZGRyKGRldiwgdHlwZSwgaGEpKQ0KPiA+ID4gKyAgICAgICAg
+ICAgICAgICAgICByZXR1cm4gZGV2Ow0KPiA+ID4gKw0KPiA+ID4gKyAgIHJldHVybiBOVUxMOw0K
+PiA+ID4gK30NCj4gPiA+ICtFWFBPUlRfU1lNQk9MKGRldl9nZXRieWh3YWRkcik7DQo+ID4NCj4g
+PiBDb21taXQgdGl0bGUgc2hvdWxkIGNoYW5nZSB0byByZWZsZWN0IHRoZSBuZXcgZnVuY3Rpb24g
+bmFtZSBpbiB2Mi4NCj4gPg0KPiA+IFNlcGFyYXRlbHkgLSBob3cgc2hvdWxkIEkgY29tYmluZSB0
+aGlzIHdpdGgNCj4gPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9uZXRkZXYvMjAyNTAyMDUtbmV0
+Y29uc29sZS12My0wLTEzMmEzMWYxNzE5OUBwdXJlc3RvcmFnZS5jb20vPw0KPiA+IEkgc2VlIHRo
+cmVlIG9wdGlvbnM6DQo+ID4gLSBjb21iaW5lIHRoZSB0d28gc2VyaWVzIGludG8gb25lDQo+IA0K
+PiBJIHdvdWxkIHN1Z2dlc3QgeW91IGNvbWJpbmUgdGhlIHR3byBzZXJpZXMgaW50byBvbmUuDQo+
+IA0KPiBJIHdpbGwgc2VuZCBhIHYzIHRvZGF5IGFkanVzdGluZyB0aGUgY29tbWVudHMsIGFuZCB5
+b3UgY2FuIGludGVncmF0ZWQNCj4gdGhlbSBpbnRvIHlvdXIgcGF0Y2hzZXQuDQoNCkkgc3VnZ2Vz
+dCBCcmVubyBwb3N0IHYzIGZvciBuZXQuZ2l0IHdpdGggYXJwIGZpeCBhbmQgdGhlbiBuZXQuZ2l0
+DQp3aWxsIGJlIG1lcmdlZCB0byBuZXQtbmV4dCBvbiBUaHVyc2RheSwgdGhlbiBVZGF5IGNhbiBy
+ZXNwaW4uDQoNCklmIHRoaXMgaXMgcG9zdGVkIHRvIG5ldC1uZXh0LmdpdCwgdGhlIGZvbGxvd2lu
+ZyBhcnAgZml4IG5lZWRzIHRvDQp3YWl0IGZvciB0aGUgbmV4dCBjeWNsZSBzbyB0aGF0IG5ldC1u
+ZXh0LmdpdCB3aWxsIGJlIG1lcmdlZCB0bw0KbmV0LmdpdC4NCg0K
 
