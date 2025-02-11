@@ -1,185 +1,221 @@
-Return-Path: <netdev+bounces-165161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD27A30BE3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:38:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1E5BA30BF3
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFCCD188AEB3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:38:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4915A18876A1
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B69220B81B;
-	Tue, 11 Feb 2025 12:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BB220C473;
+	Tue, 11 Feb 2025 12:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LFEZNeQU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mTbMUEEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D28204873;
-	Tue, 11 Feb 2025 12:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739277476; cv=none; b=iNnvynZG3Ua4fuPWhsizv1HrM18rB7Mj9hqd4LUxy1NJnxhOXUK2Y00tJmaFXiem4LAFTdKhxJ627oG4V2lcJFeJ4MA/+ZbXvIVI8cAsVVZ4hn8H8porbIDQsP9C03DYEhRaGRh+yI+oArqmaAxBZi5I9/oZO12SR6kLM8r/PbU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739277476; c=relaxed/simple;
-	bh=9FFcc2GB0jSxjG8mkUaYtqfXPHpoxeLtabpNTGFeG4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=nWH5y8FyjjXnDbtPKZa+9o5Vxpqu084keGD36LRHMTP21DB7Bo0xW4WjWo3PKPTRWDwkPap0VuR+2PyvClRtXeUyU4cJLZTPH9RImH3QpZtUHLgqeTMLIrCjgRNGxyMzlwbm4/j0dlge63sVV8yQEg2CBMFnstvqnafaSaKLSCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LFEZNeQU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51B94jQp008337;
-	Tue, 11 Feb 2025 12:37:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	+ShQz5N2nxj49mik6Xuy9nBMQQOaIIynX9b3fSGhxsg=; b=LFEZNeQUlwmQ7HAZ
-	8Wyar+uSmq+UpgF3Ih6JZuM1oS8lZYmL40/ekviaI1v2aF3kzTW4Y15UdIBlliSr
-	PRPNAY0GPPbOSDSXx6QYj5e2RwbMaHPcPoLylvra5o4sCp3eGQmxQAGtLfuphxG0
-	j6pYLu2YSUcTfk+eKdIhWW2/2QOyk7Z41B49I0EmbqVKIDjxJUx2IISfmWUMdype
-	teialJ/uHKeYJhnOAOLfuK2Bn/TRmk6qlYz3u6hPYBfaTIg5fxZLZJrfq/xMUsVP
-	afKApbCNstTFFsIvzrr3kIfQYFaTyFPpY7jG1sl/XdKa9H6jv4oCfTfV/8eneqTR
-	1M6ehw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44qewh41bh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Feb 2025 12:37:34 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51BCbXSP004532
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Feb 2025 12:37:33 GMT
-Received: from [10.253.72.242] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 11 Feb
- 2025 04:37:26 -0800
-Message-ID: <387fbaa0-4210-4e75-aa15-003866c7735f@quicinc.com>
-Date: Tue, 11 Feb 2025 20:36:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549E31F0E32
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 12:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739277907; cv=fail; b=fY9BwfL8Q1PaeY/4I9utHFSqqBM6rwucptcenHzs0TyRcd0fHivSKXb0JBdW/fvxmAUFaD/rQWvFKsRVbvIPiTTF2AOCQykyK6GnXhEqcxWGZ6liAfMxh35pBR/EF3L4e6gSM03h+P/2gTUUNDzTAeDc4KMRauS+B486bBNJtZA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739277907; c=relaxed/simple;
+	bh=254xqfWkZu0gsGEJ9OyP7l6sCCAxd37RQJkY4e/iYyw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Dzv9aUHU/tmagafjM20mp39UA3TgWoNlUZ6OJMb8TuvFkb5OMmI1hnn4GAHejRHeRWYEkByVfXvkNnHvfCb+vkxXPEv1/KKYDDdZiS3QFYftm/5qY3Cj8b7d9TjoHdY9R0Ii33rVrXRQgBzQxh/y6qI06CUkVIGLpGlmcR0eydk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mTbMUEEB; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739277906; x=1770813906;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=254xqfWkZu0gsGEJ9OyP7l6sCCAxd37RQJkY4e/iYyw=;
+  b=mTbMUEEBJ7JZazv3dFNlycMPwaUeQIfdqWUO622+dn9U9gxl2ylQne6S
+   lXImnQC8C0cUZ0Kr9+MHosdcpXBfnuyuJ+WdGOkvw30qk89srJa1aUq3X
+   UzTRMK9Z9BQAiGIw3JQ0CPDPhGS069mSU5HWAxNNWBceJECRdnnedNB7/
+   A/pgxDvDFqfYCykA/oAyYfffYOOzj0NBlVCIuTVjZIvlK0A61EWxQlL2s
+   nQfYnwCy3h2ekxAQojEdJlxK9oepCcxo2PeRAO/vR28+knms+VEtkJj4N
+   ihy2DCeBWnzhg5bm2hkA64dib34sjYon6ZZrAJplPhTAwwU4tAd3IeEkO
+   A==;
+X-CSE-ConnectionGUID: QZ59Flo9Qxu9eDk4RyF7IQ==
+X-CSE-MsgGUID: 382OCa/GSf+zvD4+ieT41Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="27493610"
+X-IronPort-AV: E=Sophos;i="6.13,277,1732608000"; 
+   d="scan'208";a="27493610"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 04:45:05 -0800
+X-CSE-ConnectionGUID: xxIIfghCQEu4is9HcvDbbQ==
+X-CSE-MsgGUID: OBVPtUgRSyOhDhZJI3CDow==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="149686036"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Feb 2025 04:45:06 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 11 Feb 2025 04:45:04 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 11 Feb 2025 04:45:04 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 11 Feb 2025 04:45:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q49Yj6mE19uE5N6gO/e5RzrtCNvV7WZKtldVL+DbpA2imGqe4SyGbw2VUUvNJSAdag45hJcSav7LP6X4/vK4TVoFJwClw3Nd49tB8gfIGRiHg2BmyCXBObFJxWKNRsaCNmZoINNyC9/af4X6HI5GLiizRhsathoyyaBaHG5bbO9zGHpSJA5DRstp4Gj1iFVrIOcwylXCdfezmB+wxXfnKuabdFyq+Lmdb1RxkHsa2erwuvlz3JW43pQQ4MYoYML2LuHN9+4ZwpmzwyvbBTVVBExiOzUhFzYvNGJOIsgySaJnqTNg+noPMeO3nkp+PnnPU1+MdA08MyrcT+5PBIpPVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QVMYVUVw3vyl47EsVzYGF23DglS1nN0sPTbCH0qtIrg=;
+ b=qUpwCGm9yZDHuxwaC8tOBBCUoJGaUgNHxg0BcbOYPdGcwRtDlYdHVBN+BCf1X3NFae81iFgSvYTjb6wfUlDWequlgev6XUWFZqCShQHpsoFgouwBtlay5wDq9DP7stzkz000oVvTkKdaU9Y31Ny+wheCQ3UeYascUZOM0VpSN2lFeE+XgfPJhhkrPD9EURAMOImAb9LdZ5RYoB6q0ITBRW/0ZqmLCFDi/FGtCflF/odtsgXLqIbfAsB/wqdn0ncafBJWXGGeKQ4ZCKVE1eqsl6yeQtq+3Bp3Hk3ZU5P5mVCFOJBrBoRZ9CxFBt9E2dM2IZITBgZEwimyP7d2mspoLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
+ by SA2PR11MB5098.namprd11.prod.outlook.com (2603:10b6:806:11c::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Tue, 11 Feb
+ 2025 12:44:34 +0000
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739%4]) with mapi id 15.20.8422.015; Tue, 11 Feb 2025
+ 12:44:34 +0000
+From: "R, Bharath" <bharath.r@intel.com>
+To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next] ixgbe: add PTP support for
+ E610 device
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] ixgbe: add PTP support for
+ E610 device
+Thread-Index: AQHbdtRGrnryYDcJV0S436zPtA1IDrNCFkaA
+Date: Tue, 11 Feb 2025 12:44:34 +0000
+Message-ID: <PH8PR11MB7965152D078C063F1E0B2250F7FD2@PH8PR11MB7965.namprd11.prod.outlook.com>
+References: <20250204071259.15510-1-piotr.kwapulinski@intel.com>
+In-Reply-To: <20250204071259.15510-1-piotr.kwapulinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|SA2PR11MB5098:EE_
+x-ms-office365-filtering-correlation-id: eab3d40c-d2b4-49d9-3be6-08dd4a99d640
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?vYtAUVXpvmOpCMjo3NY7wkidEcNoLLI3f2KCm5ymKldke7ICIFN045qq/sPg?=
+ =?us-ascii?Q?AMqorVXDC9e2z+rtb0ySaLFenu5F7/GIb3Lz339azSippRT+kQUk4k4rozcm?=
+ =?us-ascii?Q?7QY+bh1aab0ORtrzrDcH3ElX++np4DIe6dWRw9ZW4QqVQfTBiWS5UjLSpQO2?=
+ =?us-ascii?Q?aCfrEXK75/yR1JTwJpmKUacbCIrl9uLcE3Lb45dSo68LepPjZo/Nvlkl4/aj?=
+ =?us-ascii?Q?+lJufXUJp169d1ZA4C/+cI0TX1nF69113zUnC8jTluRXNXKPbIQWGSWXyEf+?=
+ =?us-ascii?Q?fl7/EICZIg2NKosuxLtU7McxuIow3b13e0uEL8xnwksGVKRdomsqiZh7ZZoL?=
+ =?us-ascii?Q?G+y1Ub48hMLjcu5vTykK4foiYoPkVnIB4YjImhZM4IAHlGC1weAFb0AhPhGZ?=
+ =?us-ascii?Q?BdaG4RhHrgSX3+mKNItaZFEAlMpU0sSnPG0HtahAMfiGJwMOIDuFincRQEVk?=
+ =?us-ascii?Q?DQQ+2pwjtfgW5cm4QRoVhFqeXAHZ4hPTdQUbHH2ScCJs+EzaaIiaRD7NKVIw?=
+ =?us-ascii?Q?xJ+LLR0feQ2BBUE9e+DkViwOg9YQJ7K2qNk2y4gdLcCkRCJeHmNxE5ZBiAmk?=
+ =?us-ascii?Q?C2iHwfHVcNtlOacmBCyFpykXcvz7/y/3DLrv79X8UplJ6PdQ9Zg2iOOTnc1w?=
+ =?us-ascii?Q?y2C9587t86pjR6oNU8vfaMVlFIczpUdNCmbbUcdTz2BqLJ5PxjzIlG6O0P6y?=
+ =?us-ascii?Q?/rc5tG/llNhgncYL0oCmfRpiJu5qJ6yEi8DSCerfDX3wF5x2nO0Ypx5chi4g?=
+ =?us-ascii?Q?uEr7l/FsDseNq4/iHmieBM4gPplVyU/HyuqT+tR3CeCAbQF1kUBeDFSIy0RA?=
+ =?us-ascii?Q?QfTPz+6rZIJ01SMqQRlhxOnOciE4NNLYnK3pSIW2cdBInkJRDDZ2NOlwZLXk?=
+ =?us-ascii?Q?jLvCjAP/SWpRX7ysFNcTl+LyRUo3wUcxwB6cEeFc9EkDm3IRi5n6ZA6TKWIN?=
+ =?us-ascii?Q?LUFPjYSCIMnoCupHEG4aCgvVHJyZOOtCYUJng4DI4Cz/lpqi3BN9MgFyeNkT?=
+ =?us-ascii?Q?NT4bJcGsR8ipvLl4pUvwAsaQScsZbT3v5tafpaZYk2x3s5RkNMC9nSDk7JOw?=
+ =?us-ascii?Q?GTDrs9STD45OjDKIaph+k/MLxe9aRmPrrRy8RPdtChoIwWiXu0mPohcqrMzA?=
+ =?us-ascii?Q?h2ftYcn7EK/Bz+YRZxF0F+7u0NC2PkmNrhfZE5vb4MNkGEBswC0yH2vuciHu?=
+ =?us-ascii?Q?Hr3++SHvsPQZO17I8LMdKT8EnNpnImYHdXU+beLayNSs4ocqeiBXWGCmGhUi?=
+ =?us-ascii?Q?ZHbV1gKwPA5n9PWdmMNH59f+tB/VkRVOQW2ssSvCFRVrc4cflOEc1hMNIVhD?=
+ =?us-ascii?Q?fjpVsynaqF965rx+j7Pk5r4dk/2iCw5Guf1XXGr2MniG/rMfDxTdGdfB5xMq?=
+ =?us-ascii?Q?tN+gTg3+OumPJNVFd3E3GDWskG+Xt7bf5zWxgAzPAkgCpG5S55V9QhNNowhJ?=
+ =?us-ascii?Q?VEeu3aTU6EfssKDRUafBTIk1KHe85cFS?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?vJ7vmfvdb76qBvktjroqzrjBj5u5nfAweq3ybB3OuR+PWhMCbaotjtFhsP/6?=
+ =?us-ascii?Q?tYw/fpWrCVDXiC5QLLD2AJXrgys6CS5x9kaot/ySgJgfVX3/zg4H4HdOBFDB?=
+ =?us-ascii?Q?Rdb9QYu0aXuDzDH4fKzOlapw4uU2fcmHPf1Zsrbi2+zVTnogQrgkOeYvzTWL?=
+ =?us-ascii?Q?5OuWl7H9jwwcngvGeZM8AiKMovMQtT10aTJF3N1ofI+Kn9VUGaXtQgSGqqh8?=
+ =?us-ascii?Q?wTKy8NCMNTaMamXICSBQzJ80Zq2p6blWKMxQYEvi0DAlbMGR9yMQUvqaQctQ?=
+ =?us-ascii?Q?jUznN6PkbPI5ssrS/31EMn7zz9Esm4dd+RVnY2zr3LMag9NtWvOSpwLMHJyZ?=
+ =?us-ascii?Q?lLZkqJnukd+Tl6Qo3aIZFBwyWh8XiEPD/uipjf5xo9zz5UuX76OqLhs15XTP?=
+ =?us-ascii?Q?OeJiBamF3r21GWng5PazfIn4/Q+O4xEEM4b2nS4UiMo3IuhC+ehG3Y/IbeWJ?=
+ =?us-ascii?Q?K4YK0CRdP+OFstMO0KxemHAdjsPcjRD5sMcguNkG/a//eICB560mtC8fJo1p?=
+ =?us-ascii?Q?mdMl9P/ENvxtlkRxZK16GAMyETBY0ZzffzYP2CZtcq50paYm3ea21j2QJnaU?=
+ =?us-ascii?Q?HVZzHipVpfoDyQ0ZLKJF9jHoluhfqjG5yLXi2mI2xaFl1jkQH0ZOoiz8++NA?=
+ =?us-ascii?Q?8G1CiD4Co4dIue43C76KdyH/WuyDfRwWBgpKKaQoWHqy7lpvnm6+Yojzy/bV?=
+ =?us-ascii?Q?hcFLPq1PRi5zqOYqcGyM9ntC5OxXFwvgD0j9kVOZPb6c5W9/JMK+W1oIiGSy?=
+ =?us-ascii?Q?7NR4JduxHJgd42Q6N5e9j5enSArJO3hjKhgKyGt9ANI+1r1E4uMGas/sP6tx?=
+ =?us-ascii?Q?TeUFBPBNWGMZt5apxBd6FMAYeWqTzcKwJi6jDsYcbFRuo3f3EQ47MsapRwa1?=
+ =?us-ascii?Q?7g0qheJgAz9WCPIS7ET9ID8hi+t8piwkp7GQzn3JLazohrL44SB30LVPLjQ8?=
+ =?us-ascii?Q?ZZwH6bwpMIT+jVPvVWNrI/RfdH9LHMvy1iyyiXV+e/CnYGio8Z5DnUePi4Mc?=
+ =?us-ascii?Q?7XyKX+7GlPoMG3D4c6Dx8cQ7o0RwwUdTrK3ijR47WnWuY7gI0VMEKrp5OwHS?=
+ =?us-ascii?Q?LTF5MpyeRbj1mbI4GnfdxHerR23taFR3nDLedEzZ3L5rhKM/7z+r7YSoFflR?=
+ =?us-ascii?Q?hT5Mmuwk5SwF+Z1VGs8lYL4dJY3vYrSyNLXmomVYshS5DJWozOl1YkWHjlRn?=
+ =?us-ascii?Q?XruYJuEhst/NmMyUuCPHMgVOVGS1MNhiqXOXuKrzVWqkiOZSMDRloJ7lq9tZ?=
+ =?us-ascii?Q?VE4wgEuz5bhgHX1oErFFH1NeM+shMi3/O1n0srfMihJKJrL/O9XMkFSi6bfP?=
+ =?us-ascii?Q?+pzm9GrdyyTkglaOmXLbaIkeoxpTmnMfP7V/q/LjTJUXygk2I3KUyQRyESTu?=
+ =?us-ascii?Q?a58nL5aYELX073k7iIhdeBkMVztANH1GkEPMFW67/EeRrsWcYNEmVPIJJfOi?=
+ =?us-ascii?Q?X2T8i2Y/yW8tulsUSYaTaE/vEHl17pr7WZWcVDoZJm9cKIxxd8JL6c4yBPPk?=
+ =?us-ascii?Q?nu45d0sP7PJFFcgo1BBvwxUomLolT1huPF9O8dvqiwOJtQkpx6aJiKdtXHHe?=
+ =?us-ascii?Q?SBzGqMXytLyGRbIt+VA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 02/14] docs: networking: Add PPE driver
- documentation for Qualcomm IPQ9574 SoC
-To: Bagas Sanjaya <bagasdotme@gmail.com>, Luo Jie <quic_luoj@quicinc.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof
- Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Suruchi
- Agarwal <quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>, "Simon Horman" <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Kees
- Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp Zabel" <p.zabel@pengutronix.de>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-2-453ea18d3271@quicinc.com>
- <Z6lhPB1y3BBFI4ux@archie.me>
-Content-Language: en-US
-From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <Z6lhPB1y3BBFI4ux@archie.me>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: JSPcQpJY_klIsepDx3cn02vvpTQmds5h
-X-Proofpoint-GUID: JSPcQpJY_klIsepDx3cn02vvpTQmds5h
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-11_05,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- impostorscore=0 mlxlogscore=999 phishscore=0 clxscore=1011 adultscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502110081
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eab3d40c-d2b4-49d9-3be6-08dd4a99d640
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2025 12:44:34.1387
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: APgZeNRgfzfsqcLN0eEzIoBoUS2bYbbYtUt0889uiPHOxHg2FNZ3uLv8ESTpjo3hxilqyIttGO12x2gbWzi+Aw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5098
+X-OriginatorOrg: intel.com
 
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Piotr Kwapulinski
+> Sent: Tuesday, February 4, 2025 12:43 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; richardcochran@gmail.com; Kwapulinski, Piotr
+> <piotr.kwapulinski@intel.com>; Olech, Milena <milena.olech@intel.com>;
+> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next] ixgbe: add PTP support for E6=
+10
+> device
+>=20
+> Add PTP support for E610 adapter. The E610 is based on X550 and adds
+> firmware managed link, enhanced security capabilities and support for
+> updated server manageability. It does not introduce any new PTP features
+> compared to X550.
+>=20
+> Reviewed-by: Milena Olech <milena.olech@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  1 +
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c     | 13 +++++++++++--
+>  2 files changed, 12 insertions(+), 2 deletions(-)
+>=20
 
-
-On 2/10/2025 10:15 AM, Bagas Sanjaya wrote:
-> On Sun, Feb 09, 2025 at 10:29:36PM +0800, Luo Jie wrote:
->> +The Ethernet functionality in the PPE (Packet Process Engine) is comprised of three
->> +components: the switch core, port wrapper and Ethernet DMA.
->> +
->> +The Switch core in the IPQ9574 PPE has maximum of 6 front panel ports and two FIFO
->> +interfaces. One of the two FIFO interfaces is used for Ethernet port to host CPU
->> +communication using Ethernet DMA. The other is used communicating to the EIP engine
->                                      "The other one is used ..."
-
-OK, I will fix here in next update.
-
->> +which is used for IPsec offload. On the IPQ9574, the PPE includes 6 GMAC/XGMACs that
->> +can be connected with external Ethernet PHY. Switch core also includes BM (Buffer
->> +Management), QM (Queue Management) and SCH (Scheduler) modules for supporting the
->> +packet processing.
->> +
->> <snipped>...
->> +The PPE driver files in drivers/net/ethernet/qualcomm/ppe/ are listed as below:
->> +
->> +- Makefile
->> +- ppe.c
->> +- ppe.h
->> +- ppe_config.c
->> +- ppe_config.h
->> +- ppe_debugfs.c
->> +- ppe_debugfs.h
->> +- ppe_regs.h
-> 
-> If somehow new source files were added, should the list above be updated to
-> keep up?
-> 
-
-Yes, the list will be updated when new files added in the following PPE 
-MAC and EDMA patch series.
-
->> +Enabling the Driver
->> +===================
->> +
->> +The driver is located in the menu structure at:
->> +
->> +  -> Device Drivers
->> +    -> Network device support (NETDEVICES [=y])
->> +      -> Ethernet driver support
->> +        -> Qualcomm devices
->> +          -> Qualcomm Technologies, Inc. PPE Ethernet support
-> 
-> Literal code block should format above nicer, but plain paragraph is fine.
-> 
-
-OK, I will use Literal code block by using "at::" to replace "at:" here. 
-hope it is fine.
-
->> +
->> +If this driver is built as a module, we can use below commands to install and remove it:
->> +
->> +- insmod qcom-ppe.ko
->> +- rmmod qcom-ppe.ko
-> 
-> "If the driver is built as a module, the module will be called qcom-ppe."
-> (I assume that readers know how to insert/remove modules).
-> 
-
-OK, I will modify this sentence in next update.
-
-> Thanks.
-> 
-
+Tested-by: Bharath R <bharath.r@intel.com>
 
