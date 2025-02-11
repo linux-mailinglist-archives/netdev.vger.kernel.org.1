@@ -1,138 +1,129 @@
-Return-Path: <netdev+bounces-165188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A6AA30E08
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:17:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8725AA30E0A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B49166273
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:17:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 026411665F7
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBFB24C67A;
-	Tue, 11 Feb 2025 14:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A812524C693;
+	Tue, 11 Feb 2025 14:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XoZpnJdO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z8M7eBdy"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8A521CFF7;
-	Tue, 11 Feb 2025 14:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0313824FC16
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 14:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739283452; cv=none; b=bKiRfl/dL2cyhS7u/fjdx6q30RCo7oii3tpRpKxCn/Qb8a76/B2xzmqEtoGA6uv5M/RDpuneUPMOX+Nn6Sr8/UzZYDXmAlZ16+JgWkEjibffKDCTxrf/uSu6CK2dma+nr3siz/4RTbQ8VrfAiV2bkoSdLRbNjGZxWCx8ENXYhQc=
+	t=1739283458; cv=none; b=QI6tgDGhobUxb4IkpnkWdtxRs1GtW0rXLvZ4qBayYyvE1hzUpbD3SEnLk03p+iFxbqNamIiwinZeo9gAoHhZRTss9MWhYj1Yeb1ypNaQUGBti3Q7VgqrWiteSqfJHQPJ4Nwanz91ipBzEr/6QF0bhpa7dLsKYry7md/3qkXTHEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739283452; c=relaxed/simple;
-	bh=SmwVOJacQQIK0j96xWuWDgRYwecrtkIrxPxHtNzHsyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YRPnFWQNQnn4vDdDqc0NS1OeFz7wTS1iRpdfd2Cwl2zRam6W691nwJyqxj9YEkpwb9nPiHcX/S6VFBlV796l3DznUM55nrHDxiztyIfrDSl8qNYN7Eqh528cQ/kdpPdISl3IIdWWFuupvizUj44cI6dSA8hvcN+NRJG7DMIgKng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XoZpnJdO; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 905ED442DD;
-	Tue, 11 Feb 2025 14:17:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739283448;
+	s=arc-20240116; t=1739283458; c=relaxed/simple;
+	bh=fHGmL3imBwVTsko40k8hSfSoegWXvwQZ0WU74iXTHPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yq9hVz2OKINRvVe6zTHIxnERJQH0I+ykasrnLChgdhU36cdiqzhyWxqS4mTld0ggj8dCoMFOcIDg8T3OdsDON/S3BJCRmOlPF6MAMGdYEj+JLtqkw1zTtE9YvtosMne/2KCtsNFHRY/taAoX2Yz5LEEkzvISrj8WPTVMMcH2XFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z8M7eBdy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739283455;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=U3cEbMgdG/cSxsTwGIcw+aHcYtjO45AnThYLCWBr9Ns=;
-	b=XoZpnJdO7lsGL2P7mxYF0Ti8Rm8DTDdofRUkWH2Us/cNi+tQS5ZzA+7McFDisNb5hzLthn
-	wqnDYt2Qknn18l8DHvezjeshVUY3CXY67Ih3TCJ/GJz059KBTHEZzsDkiyqKikCvto87fk
-	6p+vtyeajKRhneYboAvf/wzuVe2ZR8RmoyKfIXI2mVbugt36sqnzBTP+m7UgowoJL/FGZl
-	IC8fmP58UwVuEoyBqIRinlb55pYW0ZSmeNbHYVwBJI126Hb3diE7uJOdAddzwV4v8d36vm
-	zYfp4NG8AWH2UBwM+mqmrmoj2HGe3UObW9+F7mBQJiuMKuv7gPnU99vcbzKvlg==
-Date: Tue, 11 Feb 2025 15:17:23 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 03/13] net: phy: Introduce PHY ports
- representation
-Message-ID: <20250211151723.22a922b0@fedora.home>
-In-Reply-To: <0ae41811-e16b-4e64-9fc4-9cb4ea1da697@lunn.ch>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
-	<20250207223634.600218-4-maxime.chevallier@bootlin.com>
-	<20250211143209.74f84a10@kmaincent-XPS-13-7390>
-	<0ae41811-e16b-4e64-9fc4-9cb4ea1da697@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=3dZxzK6zQLSRGW305iGRO4RnSN/mCl6UDA/xY7zEHlA=;
+	b=Z8M7eBdycdr7HLvV/H5Dj4Pw8D1iBZjOGNLpSqJKmL+twmIv5mcwEGsVmzCkKeJvL10/Gr
+	PnfW/xpiQnRz/zU7JyZr5YivqkYIgkjjum950GKa9srZW4TTUyzn39MtPnD8530GDa+2v0
+	d5lMBmihqjXkb0bEOrbdQgMLrTnmK30=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-aEbvi6eYP7ChqrYpvZ6K_Q-1; Tue, 11 Feb 2025 09:17:34 -0500
+X-MC-Unique: aEbvi6eYP7ChqrYpvZ6K_Q-1
+X-Mimecast-MFC-AGG-ID: aEbvi6eYP7ChqrYpvZ6K_Q
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43933bdcce0so22148135e9.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:17:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739283453; x=1739888253;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dZxzK6zQLSRGW305iGRO4RnSN/mCl6UDA/xY7zEHlA=;
+        b=UAj5rWJir4tVgke/vWw5MHCVpgwRHc6xgHwHqrC1+On3JmMje+YSJlvkkmBx4vL6wv
+         sL90kEiFHMR9pUu2/eydODhd3KyCxZMbJ1wudBhhb6vumR1kS413/aqSh0lUgrfiYwz8
+         DrzPBwKwjSKsYRvml4v6Ef+MdDXM2oBNOQZW2pj2PFELhJk+5NAlKn27EkmLkKJszJfK
+         ciuQajid2AdeeJvO0xdFrTaYlljmFmQ4BtIVq14MsU/NyYPaEe2M1bKGZejrRayNNDZh
+         kTPtVSsN56iiFuUEvYhuD/904w0OYaxLzwGvKAeo9fEgP4LlAbD3vlsTvo3nIbCjnEah
+         AyYg==
+X-Forwarded-Encrypted: i=1; AJvYcCWL53xSEPoeK+NU/ZMARZ/fEJKSE9n/CKBSQv0qMW9MTq6jywr7UinKkRARV4fvvgytHiso3Vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMVkn/jhbigHhBtEBLX7XrVhd+V8nJ+e6whiS8N6VTWuxW4Bf1
+	HM+4BsjwYa91Umk8/N5BnFYcbA7HQ2Sj84Fadd9AOhCrWgvrEK2nuCNAtWT1rY45I8gGH3s414q
+	7n0sJvQ6k74JKSr8j11PcTiNIpQ39PqyDTcQ/aJr3CCQlwTasRF7gfQ==
+X-Gm-Gg: ASbGncuSBkOTih3ghvMwSBonAmglfcwXsMBaBQUuI+9zx/Ip8lvtbcTbi2VwtikblZo
+	yWzOEynArBYe+9tB+MeUQYe5OsTlM/xIRTtvykrmT8yt0auP5uI99h6ZYY/3Z1KB9keaP82cLvt
+	aaKo2B1+5Q+ipfvf+xKcUkdmzxzqJ24nz951gMkIXbuBWviaaTO8N22H2PwIRJxXwZAXdWcdWfq
+	CEiHDziSvL3F959/I1FGGK9o0W7TCOhNEjESC4XEl6O/zdpz4X6QseX++7Df1TABVdaIUuKGiOA
+	hl44tWS2tYezTDTc8y7YniXXdVXEFGqLk50=
+X-Received: by 2002:a05:600c:1c94:b0:439:5590:6d2f with SMTP id 5b1f17b1804b1-43955906f3cmr19754135e9.12.1739283453510;
+        Tue, 11 Feb 2025 06:17:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFu6DhLw3phykq5CKlEilxji2nk3kDuVQY+D0h8PqErfcfqr8yNj4raF/yweEUNcSpgAaAc9Q==
+X-Received: by 2002:a05:600c:1c94:b0:439:5590:6d2f with SMTP id 5b1f17b1804b1-43955906f3cmr19752935e9.12.1739283452174;
+        Tue, 11 Feb 2025 06:17:32 -0800 (PST)
+Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43936bcc04fsm102681885e9.20.2025.02.11.06.17.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Feb 2025 06:17:31 -0800 (PST)
+Message-ID: <a800d740-0c28-4982-913b-a74e2e427f25@redhat.com>
+Date: Tue, 11 Feb 2025 15:17:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] vxlan: Join / leave MC group after remote
+ changes
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Menglong Dong <menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>
+References: <cover.1738949252.git.petrm@nvidia.com>
+ <6986ccd18ece80d1c1adb028972a2bca603b9c11.1738949252.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <6986ccd18ece80d1c1adb028972a2bca603b9c11.1738949252.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeguddvvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdpr
- hgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, 11 Feb 2025 15:04:27 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+On 2/7/25 6:34 PM, Petr Machata wrote:
+> @@ -3899,6 +3904,11 @@ static void vxlan_config_apply(struct net_device *dev,
+>  			dev->mtu = conf->mtu;
+>  
+>  		vxlan->net = src_net;
+> +
+> +	} else if (vxlan->dev->flags & IFF_UP) {
+> +		if (vxlan_addr_multicast(&vxlan->default_dst.remote_ip) &&
+> +		    rem_changed)
+> +			vxlan_multicast_leave(vxlan);
 
-> > With net drivers having PHY managed by the firmware or DSA, there is no linux
-> > description of their PHYs.  
-> 
-> DSA should not be special, Linux is driving the PHY so it has to exist
-> as a linux device.
-> 
-> Firmware is a different case. If the firmware has decided to hide the
-> PHY, the MAC driver is using a higher level API, generally just
-> ksetting_set etc. It would be up to the MAC driver to export its PHY
-> topology and provide whatever other firmware calls are needed. We
-> should keep this in mind when designing the kAPI, but don't need to
-> actually implement it. The kAPI should not directly reference a
-> phydev/phylink instance, but an abstract object which represents a
-> PHY.
+AFAICS vxlan_vni_update_group() is not completely ignore
+vxlan_multicast_{leave,join} errors. Instead is bailing out as soon as
+any error happens. For consistency's sake I think it would be better do
+the same here.
 
-That's fine by me for the port representation, and I'm on the same page
-here. In the end, the ways for a NIC to register its interfaces would
-be :
+Also I have the feeling that ending-up in an inconsistent status with no
+group joined would be less troublesome than the opposite.
 
- - phylib, as done in this series. The port is controlled by the PHY,
-the phy_port_ops are implemented in the PHY driver + phylib, we
-discover the ports based on what the PHY reports, the new port binding
-and the presence of an SFP phandle under the PHY.
+/P
 
- - phylink, and what I mean by phylink is actually SFP (phylink is the
-SFP upstream in PHY-less SFP setups, so it would create the phy_port,
-nothing more). what we cover here are MACs that are connected directly
-to an SFP cage. This is simply because phylink parses the sfp phandle,
-so it's an easy spot to make sure we create the NIC's port without
-rewriting all drivers.
-
- - NIC drivers themselves, for drivers that don't use phylink/phylib.
-
-For now this series only has the "phy_add_port" kAPI, which only really
-covers case 1. But netdev_add_port() can clearly be implemented as well.
-
-I'm having a hard time splitting that work in digestable chunks :(
-I've focused on PHY as a reference use for ports, but the end-goal
-clearly is a generic way to expose what interfaces a netdev has, either
-through PHY, SFP or firmware.
-
-Thanks,
-
-Maxime
 
