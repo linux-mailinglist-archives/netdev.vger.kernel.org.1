@@ -1,79 +1,68 @@
-Return-Path: <netdev+bounces-165097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651D9A306BD
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:17:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80C0A3071E
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6A65188A106
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:17:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 851B33A64FE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7521F12E3;
-	Tue, 11 Feb 2025 09:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6CD1F2362;
+	Tue, 11 Feb 2025 09:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T7xACDYR"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="alM7hX1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D941EF0A9;
-	Tue, 11 Feb 2025 09:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E76B1F0E5C;
+	Tue, 11 Feb 2025 09:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739265464; cv=none; b=ERo9iRbeu3kW2UNmTDD8omUFHfkB9ZRHieZzoLz1y7anFYqu7kS/zMvn5dWNrs0S3n2sjitw1aZrfrkP5+4jXDnvI2Nt1CX3do78NAtHsWUbfIubVDmPxjzJqh7LawX1JB1gb0eYZ7+CMnPLS+dLTtVicN6DJx3JICy3A4IbVHA=
+	t=1739266211; cv=none; b=i37u2eVegp3lzUdLpUQjhCmujGCy5EuoA29RCwsvc/1lh1eGorllebBUxGKEPugv/D/HUhWYSj2O9Ez0+tdjYaLDvqBCEtQ0Il0f1VmNf4CI7rx2HYHNqVim1Zu8Z97DRH7BavXt3I3rgAZ3m/ODOnw7HWK3aAY5P9BtgFO0wso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739265464; c=relaxed/simple;
-	bh=q1ph39zTYKj5k8jovBlZb0OmW0D/Cl5sBfBfHNGZ+Fs=;
+	s=arc-20240116; t=1739266211; c=relaxed/simple;
+	bh=kh1RoAOMTmHyrqSjIKrarn+yEalDE2KGW1HPIU+MCRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sj2SKqN90VXUsvBQDvoqT6M/yy2K4pK+ydhrrB//S6ljnfhZ2FrEeBq8rlga0mHVhs+MlvxxsDBeU/Ks8hpEnTTtTp8qD8Gp1jGz51a9b312jEUtZLmHlD1MB+1XVRhXwBYERTl4G6xgwxkFLn65vDhdYXV+bgZNErWAiXgzmpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T7xACDYR; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 27539433D9;
-	Tue, 11 Feb 2025 09:17:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739265459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T128NbBeShVjgHAQHFQBVXrcbz3LydX8l7wGrFI7ueM=;
-	b=T7xACDYRo4ZKNUXI1/0DERPK7oBUD4COOhQeQ03s6RH8EOyByC+6pjBEZ6OzrOskPxeFuS
-	bj1x1oMaVubfmt3p26TgQVuUpl2zcK0XoiUC456N7+IGvvckqpqJgCItd7YswXw26TdEOJ
-	M91jZud9cbdMfRKvKG0rkxCGpLdYdpRNO1gh9mW3iT33Ge4lrkju+oPKRM6FENGcYAigOS
-	AMmT/wHxfjhD2hbhK6CFJZvEZDF1S2DQtqSVDuLGIfB4sw7wuuj4cIXdgh7E5LPVHPgIIh
-	G5b8e1G431JQKCpx/CGPenErBzIhdyOHy2eojCn4jjfcomZSr06/ZsDQrE6S7g==
-Date: Tue, 11 Feb 2025 10:17:35 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: kernel test robot <lkp@intel.com>
-Cc: davem@davemloft.net, llvm@lists.linux.dev,
- oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk@kernel.org>, Rob Herring <robh@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>, Robert Marko <robert.marko@sartura.hr>
-Subject: Re: [PATCH net-next 11/13] net: phy: Only rely on phy_port for
- PHY-driven SFP
-Message-ID: <20250211101735.0af025c4@fedora-1.home>
-In-Reply-To: <202502082347.tFufJ529-lkp@intel.com>
-References: <20250207223634.600218-12-maxime.chevallier@bootlin.com>
-	<202502082347.tFufJ529-lkp@intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 MIME-Version:Content-Type; b=SppA0u1u2OMgZAWOai51Wsd59yXVHEt6BMCbyBdhjnQIoIVnHdB1zhX0AZHRH9fDMwbYEdecs8CtruBeUYY9BwS8zvL6LDUhbkT7da2GOsWsZCphG2Y1gP4Yn7LQhwuNqFc85yz3iK087poqqfmSeAL4k1I4ZNiJtkDLwVIFu7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=alM7hX1q; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1739266201; x=1739871001; i=ps.report@gmx.net;
+	bh=wPhcP0ysWo8kiC7tYIfKR/lpoPsbi4VO9OoHCHU8r3c=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=alM7hX1qBVd6fvxF8urV62Jd6EGPbq9RvKsYyZMZvHtNf1PYTsrrAKVlchb06krh
+	 /nGOn9fME7qG1t+jqZ3p+us9kGVK5bkuuSc8UttDjezv8KNqpkerKcXu/apnoabra
+	 ZlrzBZAIqQLLeOae+HTJiDyAzMFLPMDn9dnJ9lMepVn3LNl2V/PJtK+I1ggEwgW/G
+	 YPRJmy8rFJHMNTmkML4JBPJ+NX3107ChRl779ADi9YrvWOwShjGpcFXLDPP2zGQJ8
+	 G7boVTsCAq5HDgfmbwSDmjAKaOpH9Wmqk/WYpGGBRX+X15TQg/OZmYNyzbNN9+/Vr
+	 XAloG4cQET9BHwC1Pg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([82.135.81.30]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MyKHm-1tTfTo3Nq0-00sfdw; Tue, 11
+ Feb 2025 10:30:00 +0100
+Date: Tue, 11 Feb 2025 10:29:59 +0100
+From: Peter Seiderer <ps.report@gmx.net>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next v4 09/17] net: pktgen: align some variable
+ declarations to the most common pattern
+Message-ID: <20250211102959.4aeeb806@gmx.net>
+In-Reply-To: <20250206132538.GU554665@kernel.org>
+References: <20250205131153.476278-1-ps.report@gmx.net>
+	<20250205131153.476278-10-ps.report@gmx.net>
+	<20250206132538.GU554665@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,68 +70,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegtdeivdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeifeejgeevhffhhfefvdfhgefgudefkeefgeeivdeuveejueeljeekgfffieeihfenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghdptddurdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdquddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedvpdhrtghpthhtoheplhhkphesihhnthgvlhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtr
- dhnvghtpdhrtghpthhtoheplhhlvhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepohgvqdhksghuihhlugdqrghllheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:q80QNBi+mJdxRVtoALQDPCsn0ntljixSQm1+/52vqpAYjyfu5H+
+ rC0XAmxfBPETOon9BrIi85OQR80Q2h056GPCQ9d8o6+Nskz+BLtxrx5H5lhKh6Md3hTQcKs
+ OAua78GFQhmNlNAJKs2kMex4rt07d9ILIboGs29ePvDELSMDiGpvz0aBYXrvZa+6QUJbiNK
+ YE79Men49QssJA0OOQBGg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:4lyfgqOCAV0=;raGpbA+rgF/FhrQImWdd3OWWvx1
+ +Oo8jrA9hNP92lgMFIPStEkyFC/IJxIX2GPTKeJ4iJrLA6mB3YZOubq4BYcdhRFEKitt00iJ3
+ sVzWUOSRquZCP5s8ZCP4Wi+VmemdxDvNmKBuG1FeDI6MwziyaJhyyJdgQRrqPNhKsXXIIzYkM
+ ZMafGzwp1PxYFl8wgBnw2PkW3o0gbrhFbxQvyvie3B4RMXCfi5HvEm+DA3SVCsS7NpWCl9ZUa
+ bzG3gvGPPFJso1gJA5xIg9KG0l1g5ZKMgQ1DOHJnaGDyXOsFfJPoglE4iOJJfCt5CWkxyyVEi
+ r2D7XsE9gq8YPhST+D4cLWJtSn4yJN/nvv7Almpz1DN1orEgrjODyRlzyK+/0PIvcHy4bOIuq
+ ESric4Eem+zxNOFK4vQBtrx75fjdR21nkygnLzTkXl9TSZuYSTYHXXhu3qyWugxtHTOenEKKw
+ HiF5XaGGhMwYZZvsUte7/HGlFt8+huQgB9Z+bWKsVOg0G8d0Z9huXD2lbEXC0p4YSCPwjPbek
+ mwCv7OcSdwnfOPYvv8NFuwHV/9Sp2cUGMvEisWM3vGGV+B4ZfVyunpCs4rwexjeGFL788cbWw
+ J0+KqZhD4OeTUxv0lxdEEPi8URHuwRNXgZK9vtehnTTB5tEee4Ap3pGvtwhQ6worxaccvGiRT
+ p362BpzP+rtZLdmwSe6YF2JUrmgy6D1KFn+3na+GCYXQqbUnUByycMZoZ+7MkA2E8w8517yam
+ zS8isVAF+puXK8L55M734xdV0EgcQeCCqrcLJXkfiPSl8kXR558VtFWsL6mGZSr0waMvaLAFr
+ kuZTxWWUg3QOYpai8A7j/U4ZHppTUC7Fd8ltOS8Apkmrc94w3Acf2MJXgFsloRoj2vokj2N61
+ gu8ocEvUH06KW5lm+sb+sr7Fsn7+N6kUqkysgeqS29lPwoS8WugjX7NouTMpA74pWZ9KKObsY
+ NtH/GdhB9HNdOKzoD7NPXn4SYrE5o7wnEYt3I1m0ZIsoazC6XW5tezFY9H2Q2qs+b1fjsrJL7
+ ih7jlDJCh2rgprVJrTItX9rnlhV73hv850A4Hh+5C3J/YR2/6IuuHmS8Vej9zCHdK6r7qoOzi
+ msqgF/+uhKRMbiajBEgr9CoSRR8KVx+EIhCq7Pyj576h96RasPEDJNnMjRgIzsK5SAY9oHbbU
+ wE6OgZCNBKuYbUSCi+S7MPIV6ttz26d0j3cHmXBNvbs7FK+Co4rD0qtsJ1j3eFremrGGGEBXu
+ Qmhy/+U99tALuyL/aHB0IpgEUhaMCMtIDmR0q6ZCNux2Qp7n03tEhmJgbKv+Unp4bmJtAFxwo
+ HZRncB4suxHo1zHmLt5FvNab95gWMgSeqgg0BUdEPdpit+If15J1jQrn4+dn5M8XnVhZnYzZ+
+ UXO9OZOBNKu8CMq7QqrYRqqTTQ7sQEdE3Q3ISi4xtTK5yPBB9RE2yD6SYrcR1zbUSzuFeV936
+ braH0K8XJ6MIMqfNT7Ds3jUboQu8=
 
-Hi,
+Hello Simon,
 
-On Sun, 9 Feb 2025 00:04:55 +0800
-kernel test robot <lkp@intel.com> wrote:
+On Thu, 6 Feb 2025 13:25:38 +0000, Simon Horman <horms@kernel.org> wrote:
 
-> Hi Maxime,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-ethtool-Introduce-ETHTOOL_LINK_MEDIUM_-values/20250208-064223
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20250207223634.600218-12-maxime.chevallier%40bootlin.com
-> patch subject: [PATCH net-next 11/13] net: phy: Only rely on phy_port for PHY-driven SFP
-> config: i386-buildonly-randconfig-005-20250208 (https://download.01.org/0day-ci/archive/20250208/202502082347.tFufJ529-lkp@intel.com/config)
-> compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250208/202502082347.tFufJ529-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202502082347.tFufJ529-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> drivers/net/phy/qcom/qca807x.c:698:12: error: use of undeclared identifier 'phy_sfp_attach'; did you mean 'phy_attach'?  
->      698 |         .attach = phy_sfp_attach,
->          |                   ^~~~~~~~~~~~~~
->          |                   phy_attach
->    include/linux/phy.h:1912:20: note: 'phy_attach' declared here
->     1912 | struct phy_device *phy_attach(struct net_device *dev, const char *bus_id,
->          |                    ^
-> >> drivers/net/phy/qcom/qca807x.c:699:12: error: use of undeclared identifier 'phy_sfp_detach'; did you mean 'phy_detach'?  
->      699 |         .detach = phy_sfp_detach,
->          |                   ^~~~~~~~~~~~~~
->          |                   phy_detach
->    include/linux/phy.h:1924:6: note: 'phy_detach' declared here
->     1924 | void phy_detach(struct phy_device *phydev);
->          |      ^
-> >> drivers/net/phy/qcom/qca807x.c:702:17: error: use of undeclared identifier 'phy_sfp_connect_phy'  
->      702 |         .connect_phy = phy_sfp_connect_phy,
->          |                        ^
-> >> drivers/net/phy/qcom/qca807x.c:703:20: error: use of undeclared identifier 'phy_sfp_disconnect_phy'  
->      703 |         .disconnect_phy = phy_sfp_disconnect_phy,
->          |                           ^
-> >> drivers/net/phy/qcom/qca807x.c:748:9: error: call to undeclared function 'phy_sfp_probe'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]  
->      748 |                 ret = phy_sfp_probe(phydev, &qca807x_sfp_ops);
->          |                       ^
->    5 errors generated.
+> On Wed, Feb 05, 2025 at 02:11:45PM +0100, Peter Seiderer wrote:
+> > Align some variable declarations (in get_imix_entries and get_labels) =
+to
+> > the most common pattern (int instead of ssize_t/long) and adjust funct=
+ion
+> > return value accordingly.
+> >
+> > Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+>
+> Hi Peter,
+>
+> These comments are is true in general of this patchset, but particularly=
+ so
+> in the case of this patch:
+>
+> * I think a more succinct subject would be nice.
+> * I think the patch description should provide some reason
+>   _why_ the change is being made.
 
-Ah damned, I missed that qca807x now also supports SFP. I'll include a
-conversion fr that driver too in V2 (and add Robert in CC:)
+Yep, will improve...
 
-Thanks,
+>
+> Also, specifically relating to this patch, I wonder if it's scope ought =
+to
+> be extended. For example, the two callers of num_arg(), get_imix_entries=
+() and
+> pktgen_if_write() assign the return value of num_arg() to len, which is =
+now
+> an int in both functions. But num_args() returns a long.
 
-Maxime
+Aim was to get rid of the int/long mixture in the code (which works flawle=
+ss
+because no one writes to proc with more than a few bytes AND count is limi=
+ted
+to INT_MAX - PAGE_SIZE in vfs_write (see [1], [2])...
+
+I believe the clean way is to use
+
+  size_t i, max;
+  ssize_t len;
+
+consequently through out the code and adjust the function signatures
+accordingly...., will re-spin...
+
+>
+> > ---
+> > Changes v3 -> v4
+> >   - new patch (factored out of patch 'net: pktgen: fix access outside =
+of user
+> >     given buffer in pktgen_if_write()')
+> > ---
+> >  net/core/pktgen.c | 14 ++++++--------
+> >  1 file changed, 6 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> > index 4f201a2db2dc..279910367ad4 100644
+> > --- a/net/core/pktgen.c
+> > +++ b/net/core/pktgen.c
+> > @@ -850,12 +850,11 @@ static int strn_len(const char __user * user_buf=
+fer, unsigned int maxlen)
+> >   * where each entry consists of size and weight delimited by commas.
+> >   * "size1,weight_1 size2,weight_2 ... size_n,weight_n" for example.
+> >   */
+> > -static ssize_t get_imix_entries(const char __user *buffer,
+> > -				struct pktgen_dev *pkt_dev)
+> > +static int get_imix_entries(const char __user *buffer,
+> > +			    struct pktgen_dev *pkt_dev)
+> >  {
+> > -	int i =3D 0;
+> > -	long len;
+> >  	char c;
+> > +	int i =3D 0, len;
+>
+> Given it can be achieved with exactly the same lines changed, just in a
+> different order, please arrange the local variable declarations in rever=
+se
+> xmas tree order - longest line to shortest.
+>
+> Likewise for the other hunk of this patch.  And I believe there are also
+> other cases in this patchset where this comment applied.
+>
+> The following tool can be useful:
+> https://github.com/ecree-solarflare/xmastree
+
+O.k. will take a look at it...
+
+Thanks for review!
+
+Regards,
+Peter
+
+
+[1] https://elixir.bootlin.com/linux/v6.13.1/source/fs/read_write.c#L673
+[2] https://elixir.bootlin.com/linux/v6.13.1/source/include/linux/fs.h#L27=
+04
 
