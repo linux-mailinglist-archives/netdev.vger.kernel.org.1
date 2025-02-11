@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-165181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20751A30DB3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:05:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2282EA30DB7
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:06:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC6563A3CFD
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8DAA167B4D
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FB024F5A1;
-	Tue, 11 Feb 2025 14:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA5A24C66D;
+	Tue, 11 Feb 2025 14:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QNZeXL/p"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JzpGIwRG"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BBC215799;
-	Tue, 11 Feb 2025 14:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B64424CECB
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 14:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739282690; cv=none; b=P+WG4Cc3mnl2GsN7C3Cis7PLyfTUbkMPvHOk2CaS7Er57ZkWwbFN/2WIPtvJ0khbyBAd0COhzsZakXKybi4kUOSLr+csVIacyskH4/4IuoOAK6AJ/g9gS2Eb7BfKchkT1Kwwx6SPlW7FBFOhvBi4yirxpflOMFn46MQJFrzAL/k=
+	t=1739282728; cv=none; b=Ne95ga29AGqSKglw/YvA8gmI11NmkCYukEzrZYwiL56eDzlrRz9zOsTFAZYuH95iL4QEPVgigL3mewuyobXVRinkJZ9ARbp1Uf8OtKH2KOqtlDUAmMMlRcoguJy+a7ggON9EXpC9bKu+9bWx8NJnD1uwkgrNmiQllSetcDHICJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739282690; c=relaxed/simple;
-	bh=5Dq8VZkw9xNox4d9nXP+NDsofsDFpbC12ldyftrP/PY=;
+	s=arc-20240116; t=1739282728; c=relaxed/simple;
+	bh=Vjp8BGagJBy5zyknqMToYmpH2sSSMz4ci/YY3lj8NTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DnxOTS6oOwmAUD4licrOHU2N5kInx92KN1gaQHG0Quc2L5eDeRzu5L0bxpA3XejNZxrmVyHyk44Ru4g9TmRSr6F4G1MI1mMr5EL6rHl4Yg+R1VQoTNbAixccqtr5pFOCvzmAbI1ZbIqUsWmtTWAr/mMT7DStmIbgyZAZRYuOZvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QNZeXL/p; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GPLw0SLbxnJYvj1EyIiYG/TvIYOTTzblQM7xH2EkZKN3+2dxfSXL8uFabihL5Gg6ieXuaPBFWy0kaJoX02I7dMWz/IyU7K/qEgvetm8dXQoO6wdwWAGggEGRiZ4Vcb2NdY0bGxnAu993On9YlXuzWjLAG8WzschYcoEKajsSlq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JzpGIwRG; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,42 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VSeuhfOw8yfHQ+TWsCEpeuHvxKiIbFJlwEB/VaRLJIo=; b=QNZeXL/pfPJhHnQAz1R1qzLi/w
-	OXuJqpxpgy+GIdKnoz+ivHnrTcVOJCAocPLD/vCv7xQKdndoeO0D2qz5w+wltF5y9aOof+SxqAzKM
-	KSWnELbT/2kglIv9CgYbcoMgLbTf7acKQyJ29q2shPGklCJADXPgB5JOHE4ek1FKiLtk=;
+	bh=Z3YTgAjKxNgsED33gsgTJw1o12Ejo0oERoakUKGqqGA=; b=JzpGIwRG/6drwOt74hbjtUqul/
+	A4FiBlL3Fbqw3JsF/Z95vlEc/SH06o2V4oZC8jFXfktSSV2mvd0bJ+elczomN5gtt7IoVQf24nmZt
+	dq+AfHqyqlH0todQRM23m9/aXR7bIB26nmeZElM18ISl1tfmqXDAX9nBpdQgHc4rWEjI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1thqsF-00D4ti-T7; Tue, 11 Feb 2025 15:04:27 +0100
-Date: Tue, 11 Feb 2025 15:04:27 +0100
+	id 1thqt6-00D4vC-Te; Tue, 11 Feb 2025 15:05:20 +0100
+Date: Tue, 11 Feb 2025 15:05:20 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 03/13] net: phy: Introduce PHY ports
- representation
-Message-ID: <0ae41811-e16b-4e64-9fc4-9cb4ea1da697@lunn.ch>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
- <20250207223634.600218-4-maxime.chevallier@bootlin.com>
- <20250211143209.74f84a10@kmaincent-XPS-13-7390>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] net: phy: rename eee_broken_modes to
+ eee_disabled_modes
+Message-ID: <a6bc4c6c-f5e2-4bce-aa8c-fd2bd85dab94@lunn.ch>
+References: <d7924d4e-49b0-4182-831f-73c558d4425e@gmail.com>
+ <6cd11422-dd67-4c87-a642-308de694af92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,23 +63,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250211143209.74f84a10@kmaincent-XPS-13-7390>
+In-Reply-To: <6cd11422-dd67-4c87-a642-308de694af92@gmail.com>
 
-> With net drivers having PHY managed by the firmware or DSA, there is no linux
-> description of their PHYs.
+On Mon, Feb 10, 2025 at 09:49:22PM +0100, Heiner Kallweit wrote:
+> This bitmap is used also if the MAC doesn't support an EEE mode.
+> So the mode isn't necessarily broken in the PHY. Therefore rename
+> the bitmap.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-DSA should not be special, Linux is driving the PHY so it has to exist
-as a linux device.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Firmware is a different case. If the firmware has decided to hide the
-PHY, the MAC driver is using a higher level API, generally just
-ksetting_set etc. It would be up to the MAC driver to export its PHY
-topology and provide whatever other firmware calls are needed. We
-should keep this in mind when designing the kAPI, but don't need to
-actually implement it. The kAPI should not directly reference a
-phydev/phylink instance, but an abstract object which represents a
-PHY.
-
-	Andrew
-
+    Andrew
 
