@@ -1,111 +1,177 @@
-Return-Path: <netdev+bounces-165069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1F0A304A6
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:38:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A938DA304B2
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:42:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A9683A4974
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:38:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEC683A036B
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0D11EDA17;
-	Tue, 11 Feb 2025 07:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314C11EDA32;
+	Tue, 11 Feb 2025 07:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aa+HQy3O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1100F1EDA12;
-	Tue, 11 Feb 2025 07:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8157F1EDA27
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739259525; cv=none; b=GuCTkSor87MI1G8k5kE9sdQSaKxZPPtJ2RCytdORAyliVi7ZfsunMsrKbncijBmnjjHRrnQgxtTpOsff5jeCSiu5ZX/gnVFB9lj3F5v7aSGdD3yUx5r1clDhJ9z3olR7fJiMD05WFnjO45vrG7ZLuaV7fh/NxL1Pymu0TfKW3zs=
+	t=1739259721; cv=none; b=HQVZZprpdqy0kSYTCtUyzameCYH86FPFO7elSXcAlIkInUW8UJQzW2a9sFbfkPXQRbK9wI/wP1lu/i/BkLqiHH8tB1AXJnhvqXz5vX5zhVzHJHjnSxhWGkWt+s9fsplcZ9zESMJrTvOpzQ51vYvET+OPu04YTbVcafRF2YXh4OA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739259525; c=relaxed/simple;
-	bh=u1NJ1ciVlQws/QcFOQtfIJK1KkyuDVjMomMI59lszVg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a7GastQf4ldyXvVThOZ5CXHcFo3VAtyOLLSLsEoN2C6O29QTGM2XrvNn9Yx/EcWZVL8NWAedtVDEThu/vCOVInCq7Dcwl8ATbqQDP3bwj37QlYHb0z+QOdSlb7hXiZpaU5qY6EDm+oBaEXpEeXtlErrYbVDWtQSM3JHvspQi+nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de5a853090so6171019a12.3;
-        Mon, 10 Feb 2025 23:38:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739259522; x=1739864322;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+h2QReZ15bqMLKzGDZ+kWkspjV7JoJpdMRoNWSsRFpU=;
-        b=I/L6Ntiat/kDCGW5Kfm+EEqsEX+LmqetnTqnNg5Gyylu/EqEoFDw9RapX8s5vR1RvN
-         W9E8vr7m/gM82RzIq/XZ5KQDbWogwH54mp18w4hfmTGm0hhAFG1+u0cNP3VkRci3Jpu0
-         bUiH8AgyD+kVhObzXIEruDklncRk5wBP5CVRRdaEm5mryA1xNOhFxyNlzsOBmrmBrxEx
-         6euBMLuOeNgR5Q0pAeuZkc122zRav+ebzt3u2nd5Z8IrdUSpsVoUFdHP2Y2ZwubKaDDE
-         skkKol00ZYzXBSN4eIlYuRB0QsThD/VJe44q0pSZ0wrIazEVLP0DtY/ROG4056Jg0UcJ
-         MUhg==
-X-Forwarded-Encrypted: i=1; AJvYcCU926rXmGuV7RTaaNlh8P8RhzV4sH8+N20ZPkGd865GXHWJ5XXk9GBDy6XMwSw+RRyFQ93Pra/GP5rObrwikM3ZafE=@vger.kernel.org, AJvYcCWZjIdbCuTAh9fm67vOLo+fl7l233WbisscxoLWffnWzrqXb2PhLXBOjtv4DFqM5gRdAwLw2reN@vger.kernel.org, AJvYcCWrC28HMPfnwNPZtHlhCU/OOpfiQf1dadNR46X/VAOwTzxKNrrO6SjXNAvEm4+OgbXyqMEKxjNAsH2q@vger.kernel.org, AJvYcCXMwEHi2dHzZuHbbdeT7czvaDcbUSFlMzLBkOiIKoFBKT5SAJXtzwg47Pw30LVZMBYcQG5ZQcJkEI2DK/kI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0Y4aq7GY0yIidtXvNSZRkF+5/0o1itCpgNycDc8OUJ2XRcZs6
-	kVXXAzNAh09SeREEwRkYw7XalFSLHacGRPzVD0QXYjZ1dNO7YVQ7Q6h5Z5WoI40=
-X-Gm-Gg: ASbGncvjVQV8WPVT/9KP2LTOEE3gWXSoBJbmqb0UNMuo5neQwWjIu8Z/hHNgZA+Pd2Q
-	vAOvQYgZjOdRpris/RBAGWak+wFxqVuIiLMTTt2Li2DwX1I3OyIKN68KlAlXZv+EJoZh8j80Ofp
-	uvcPRaLE8Ep+6w/eaXDY2o+wLn8CidEXdorf/BxrqPf9MJf8sq/iOTPPnJfxIi1MZmfWf6kRv7Y
-	KK9jmqSzKKfvJUWTW0uozwhFadxyZug0/pmaUgeW7lIZFn6KPefbxhoa/nK9pCOckvJZrE+vtqS
-	Uqqt/pDuSfI7In6euiDGOFJIF9uCVVTF+8hIzefaqn2k6ZlFngEyAg==
-X-Google-Smtp-Source: AGHT+IEFWybpNFUF9K73xguzOXbYjtETD/P3ZeG8RbZexjMPEulKDAYr10fGvqyueRM/AtYuo7H+lw==
-X-Received: by 2002:a05:6402:4012:b0:5d3:cfd0:8d46 with SMTP id 4fb4d7f45d1cf-5de450d6aadmr18829272a12.30.1739259521335;
-        Mon, 10 Feb 2025 23:38:41 -0800 (PST)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com. [209.85.208.48])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5de4aa38a1asm7567797a12.79.2025.02.10.23.38.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Feb 2025 23:38:40 -0800 (PST)
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5de5a853090so6170958a12.3;
-        Mon, 10 Feb 2025 23:38:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUqibg/c25l5VP0TRHsCOX0J3wJWqTdsC19R6ztY9zuqkuvvX2Fa5oQDdvc15NNFNXKywPjhY4TaAA/zsAO@vger.kernel.org, AJvYcCV0y0nn5eDs3fewHU3dYzfOcZ9j5IVKvhuRhk7O7mgc2uqUWM8tfKZJgOG4E6+DRi9EBVcsF0I0ZZkp@vger.kernel.org, AJvYcCV5r8rB1TGjiRCMJCgTzvSYaN1CWs5gCYAsx7/WiDcIylg3ghCJ0r4SRj8cUDIH5GdcwFiSZlmp@vger.kernel.org, AJvYcCWFyimYx6nDnhUS3HjxCk7GKNxR4nTFht7P9uHbWUR5IVrpxmSFnJz5qc7AhEbTn2m4u/S7R/+wYhUlZLHLJ8DZ7rg=@vger.kernel.org
-X-Received: by 2002:a05:6402:40c6:b0:5cf:bb9e:cca7 with SMTP id
- 4fb4d7f45d1cf-5de450d6a0dmr15871546a12.28.1739259520331; Mon, 10 Feb 2025
- 23:38:40 -0800 (PST)
+	s=arc-20240116; t=1739259721; c=relaxed/simple;
+	bh=wqPEFEJXhPEgjqvvQPs60/jcXvpEwF4YVlTJ2HH8uGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yot5cqcuqHyMBuMFQI/QAkSiEEJc7PzJAZ0IgERG09Azy6HCjB49PPQwtdX/NfCZSmoIGllP6Ie7GTcXZd6Lx5xPT9Ra8tVeQn7Be0+tzz2t1yqyW5Bqg9yZ3iRPuuI3+hMbozXfNzDSkF8jq/SV51tiVSdq9XQNJMIPl+G0E2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aa+HQy3O; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e419521b-c38e-41e0-a4da-93dcbb820486@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739259716;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IK3saGkhNUN12X4MEcIQMxeGOn/ySxBzESpOffbZkYk=;
+	b=aa+HQy3OJeJqCqRsPbZP0SYjMFY+g9LHtxvV6MKruPh3Iz0kKvu5GfIizpKUJCEdaF0YyZ
+	F0NSVxv5wkTjVTUhA7vyYpomOLRMNEmi8CotroixHi1ksHiEbQQbypMSsLhlJqISyXh4/A
+	2oFRHe3vFaCmr6TsMnZc/+Gc5Y8F+S8=
+Date: Mon, 10 Feb 2025 23:41:49 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210232552.1545887-1-chenyuan0y@gmail.com>
-In-Reply-To: <20250210232552.1545887-1-chenyuan0y@gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 11 Feb 2025 08:38:27 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVoU3UNie4cqm-sD4bNpfiR2xFGZdrFpDA8X8KOf4B-rA@mail.gmail.com>
-X-Gm-Features: AWEUYZkevKwcST6SF1HxbrIo8R-IX_Zhn3gxXY4brgnNilTDBjG3uyqpL8i_H48
-Message-ID: <CAMuHMdVoU3UNie4cqm-sD4bNpfiR2xFGZdrFpDA8X8KOf4B-rA@mail.gmail.com>
-Subject: Re: [PATCH] pinctrl: Fix potential NULL pointer dereference
-To: Chenyuan Yang <chenyuan0y@gmail.com>
-Cc: linus.walleij@linaro.org, richardcochran@gmail.com, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, linux-renesas-soc@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zzjas98@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH bpf-next v9 11/12] bpf: support selective sampling for bpf
+ timestamping
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
+ <20250208103220.72294-12-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250208103220.72294-12-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 11 Feb 2025 at 00:25, Chenyuan Yang <chenyuan0y@gmail.com> wrote:
-> The `chip.label` could be NULL. Add missing check in the
-> rza2_gpio_register().
-> This is similar to commit 3027e7b15b02
-> ("ice: Fix some null pointer dereference issues in ice_ptp.c").
-> Besides, mediatek_gpio_bank_probe() in drivers/gpio/gpio-mt7621.c also
-> has a very similar check.
->
-> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+On 2/8/25 2:32 AM, Jason Xing wrote:
+> Use __bpf_kfunc feature to allow bpf prog dynamically and selectively
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-i.e. will queue in renesas-pinctrl for v6.15.
+s/Use/Add/
 
-Gr{oetje,eeting}s,
+Remove "dynamically". A kfunc can only be called dynamically at runtime.
 
-                        Geert
+Like:
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+"Add the bpf_sock_ops_enable_tx_tstamp kfunc to allow BPF programs to 
+selectively enable TX timestamping on a skb during tcp_sendmsg..."
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> to sample/track the skb. For example, the bpf prog will limit tracking
+> X numbers of packets and then will stop there instead of tracing
+> all the sendmsgs of matched flow all along.
+ > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>   kernel/bpf/btf.c  |  1 +
+>   net/core/filter.c | 27 ++++++++++++++++++++++++++-
+>   2 files changed, 27 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 8396ce1d0fba..a65e2eeffb88 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -8535,6 +8535,7 @@ static int bpf_prog_type_to_kfunc_hook(enum bpf_prog_type prog_type)
+>   	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
+>   	case BPF_PROG_TYPE_CGROUP_SOCKOPT:
+>   	case BPF_PROG_TYPE_CGROUP_SYSCTL:
+> +	case BPF_PROG_TYPE_SOCK_OPS:
+>   		return BTF_KFUNC_HOOK_CGROUP;
+>   	case BPF_PROG_TYPE_SCHED_ACT:
+>   		return BTF_KFUNC_HOOK_SCHED_ACT;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 7f56d0bbeb00..db20a947e757 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -12102,6 +12102,21 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
+>   #endif
+>   }
+>   
+> +__bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops)
+
+I am ok to always enable txstamp_ack here. Please still add a second "u64 flags" 
+argument such that future disable/enable is still possible.
+
+> +{
+> +	struct sk_buff *skb;
+> +
+> +	if (skops->op != BPF_SOCK_OPS_TS_SND_CB)
+ > +		return -EOPNOTSUPP;> +
+> +	skb = skops->skb;
+> +	TCP_SKB_CB(skb)->txstamp_ack = 2;
+
+Willem (thanks!) has already mentioned there is a bug.
+
+This also brought up that a test is missing: the bpf timestamping and user 
+space's SO_TIMESTAMPING can work without interfering others. The current test 
+only has SK_BPF_CB_TX_TIMESTAMPING on. A test is needed when both 
+SK_BPF_CB_TX_TIMESTAMPING and the user space's SO_TIMESTAMPING are on. The 
+expectation is both of them will work together.
+
+> +	skb_shinfo(skb)->tx_flags |= SKBTX_BPF;
+> +	skb_shinfo(skb)->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> +
+> +	return 0;
+> +}
+> +
+>   __bpf_kfunc_end_defs();
+>   
+>   int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> @@ -12135,6 +12150,10 @@ BTF_KFUNCS_START(bpf_kfunc_check_set_tcp_reqsk)
+>   BTF_ID_FLAGS(func, bpf_sk_assign_tcp_reqsk, KF_TRUSTED_ARGS)
+>   BTF_KFUNCS_END(bpf_kfunc_check_set_tcp_reqsk)
+>   
+> +BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
+> +BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp, KF_TRUSTED_ARGS)
+> +BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
+> +
+>   static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+>   	.owner = THIS_MODULE,
+>   	.set = &bpf_kfunc_check_set_skb,
+> @@ -12155,6 +12174,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_tcp_reqsk = {
+>   	.set = &bpf_kfunc_check_set_tcp_reqsk,
+>   };
+>   
+> +static const struct btf_kfunc_id_set bpf_kfunc_set_sock_ops = {
+> +	.owner = THIS_MODULE,
+> +	.set = &bpf_kfunc_check_set_sock_ops,
+> +};
+> +
+>   static int __init bpf_kfunc_init(void)
+>   {
+>   	int ret;
+> @@ -12173,7 +12197,8 @@ static int __init bpf_kfunc_init(void)
+>   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
+>   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+>   					       &bpf_kfunc_set_sock_addr);
+> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> +	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, &bpf_kfunc_set_sock_ops);
+>   }
+>   late_initcall(bpf_kfunc_init);
+>   
+
 
