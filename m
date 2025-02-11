@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-165013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D1A3A30137
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:00:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F187EA3013A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB5C33A5F27
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:00:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D857167831
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D57155336;
-	Tue, 11 Feb 2025 02:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E461CAA75;
+	Tue, 11 Feb 2025 02:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSvOVYiY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4LHJvei"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E5214A629;
-	Tue, 11 Feb 2025 02:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08751C5F26;
+	Tue, 11 Feb 2025 02:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739239206; cv=none; b=fZN1tUI0NO+/YNJtp9Y49CKJatsaG4igGKQBv4hC2NBtUAS4tDXZ3DX9WlH5us3SrdLP3XqNTPpDx7MUCH6+hfBk58zNO7W4vt3aHGDVQRtAnKrtZ8DJLA3ymnqOZx1CMgW8IGWTuwgv7f4UkLLYve10ll1yO4sw9Od9op/f2j4=
+	t=1739239207; cv=none; b=mcPpioY06ceF9kgyLuE6/LmS1X2PLkIMvzhgeFIEGU7YUDtXB4pfQlTEN/fghXwoxdZi5SwXBweR1EZ/oIyaGaTk7LUo3S6oiBIL5CUzcVGwdmM74/FZdolEXdsGv484UAx0J0pgf6hKwIN7IDecl3PHSMyz95zZGaaUAAdmQtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739239206; c=relaxed/simple;
-	bh=kFUJr5TD/M4NAgCQXUCTrLJ56MU+Zqi0WBhtlptFbD0=;
+	s=arc-20240116; t=1739239207; c=relaxed/simple;
+	bh=atbq5gGaQJhG/f9qRXyS6T4mf5Vi8I+Sp3R2VsFrCR0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DezfutNKqOpbXQ0HqTn86i8lELNNqnzQxNRj1hQ4+SbOf4Y+0M3NwtrHAE6lkda+Z/Pfm45jNipePYROUexVWJ8EIjHld9wxvvRcV7zU2UH3GIujkcnHFzjgEkOxKii5zw8pB8hkGLimZ0nifboZ1IAI9V9FVXX3mhLm0bgrwKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tSvOVYiY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EC28C4CED1;
-	Tue, 11 Feb 2025 02:00:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dvL5yEHo5OhlwkAlKBcvJ3VE+7JA/DCUbDSyDWdb+Hidd53xAsBU6JnUL3oI//Ihp0BvtNwsj1fHVp+ECwibkV8Y51vjZhBVjdi3PxlAfyPY0XUEEwXrrOvLNgLdfhu9WVGvtpWQR44C3j+mu8CtI2b8QPmIt/77WX+EkDD/dMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4LHJvei; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16C59C4CEE5;
+	Tue, 11 Feb 2025 02:00:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739239205;
-	bh=kFUJr5TD/M4NAgCQXUCTrLJ56MU+Zqi0WBhtlptFbD0=;
+	s=k20201202; t=1739239207;
+	bh=atbq5gGaQJhG/f9qRXyS6T4mf5Vi8I+Sp3R2VsFrCR0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tSvOVYiYXQm8Hn9Y3tri5ZIKFUwf2TDB0mOBv/ajJiE9nRPTsd4sESh6IZ90NGJzT
-	 2wehiDd0FjHr33vOKT/gax7foWX5K7NkS1LVHcCCUMwGxXGaVxJhYVd+1VGyZ9J56v
-	 cpVlkvaVHME6kenmQ++ljPajjTd6gsdiAX6plLvdMK1gznI/oQmKaK2zMeLOFcF+Yh
-	 FbPRft7BTKC8pVJ+B2dJUkn5Kqg2zoyko9oPZnbgXjuYRN3HT6pIHbueRk/2Cq+PU1
-	 FAAAl4maHBO4JBAGmn6ljIBh370UZKd9X2YXYrfdDfXIw8DqWl51CYo0NNU0VIt4Wp
-	 5QwVMOWHBmkhg==
+	b=b4LHJveiJwR2C5B2I263dkH3Qtyocai0kZ3Av1LcP/MyXAykK8h1Ios3iKFBI+Co9
+	 cr4fjzqdDk+2QJ09f/O4WmpQMboUPcbGui/cMHa/pmrKvhQGLqPiF3h5RUX86enEt9
+	 9awX7ORzDjL06eQapJ38wg9SvUw+7QqDeQlJ+qQw6ouCNOe5BaXTWlY1zz0jHtckIi
+	 aPQjMj6fyp6wQ1txNXdaQ0LLM4XxeVg7tkPXECxREn/mbX9kenUg69+C4XQ00ZJSVT
+	 Y6SEhiQvA097Uq88PU5j/rAbCQ34+udkuLoGtWeUl50eDm2Bgk+Bvn1w3/SEdrJsDo
+	 ihWmSSVsr5pLg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71193380AA7A;
-	Tue, 11 Feb 2025 02:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3C3380AA7A;
+	Tue, 11 Feb 2025 02:00:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] xsk: the lost bits from Chapter III
+Subject: Re: [PATCH net-next v1 1/1] net: phy: dp83td510: introduce LED framework
+ support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173923923427.3912925.6550641983549468638.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Feb 2025 02:00:34 +0000
-References: <20250206182630.3914318-1-aleksander.lobakin@intel.com>
-In-Reply-To: <20250206182630.3914318-1-aleksander.lobakin@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, andrii@kernel.org, jose.marchesi@oracle.com,
- toke@redhat.com, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- przemyslaw.kitszel@intel.com, jbaron@akamai.com, casey@schaufler-ca.com,
- nathan@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <173923923552.3912925.4342744972876594638.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Feb 2025 02:00:35 +0000
+References: <20250205103846.2273833-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250205103846.2273833-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux@armlinux.org.uk
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  6 Feb 2025 19:26:25 +0100 you wrote:
-> Before introducing libeth_xdp, we need to add a couple more generic
-> helpers. Notably:
+On Wed,  5 Feb 2025 11:38:46 +0100 you wrote:
+> Add LED brightness, mode, HW control and polarity functions to enable
+> external LED control in the TI DP83TD510 PHY.
 > 
-> * 01: add generic loop unrolling hint helpers;
-> * 04: add helper to get both xdp_desc's DMA address and metadata
->   pointer in one go, saving several cycles and hotpath object
->   code size in drivers (especially when unrolling).
-> 
-> [...]
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/phy/dp83td510.c | 187 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 187 insertions(+)
 
 Here is the summary with links:
-  - [net-next,1/4] unroll: add generic loop unroll helpers
-    https://git.kernel.org/netdev/net-next/c/c6594d642717
-  - [net-next,2/4] i40e: use generic unrolled_count() macro
-    (no matching commit)
-  - [net-next,3/4] ice: use generic unrolled_count() macro
-    (no matching commit)
-  - [net-next,4/4] xsk: add helper to get &xdp_desc's DMA and meta pointer in one go
-    https://git.kernel.org/netdev/net-next/c/23d9324a27a4
+  - [net-next,v1,1/1] net: phy: dp83td510: introduce LED framework support
+    https://git.kernel.org/netdev/net-next/c/5b281fe7e396
 
 You are awesome, thank you!
 -- 
