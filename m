@@ -1,129 +1,99 @@
-Return-Path: <netdev+bounces-165131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C712A309B1
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:16:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D969A309BE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80C0B188B77E
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:16:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFC19188C25A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B12D1F9406;
-	Tue, 11 Feb 2025 11:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3jPZYLO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA831F4262;
+	Tue, 11 Feb 2025 11:18:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B771F8921
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7980B1CEACB
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739272536; cv=none; b=dGiMzi9EXuGmc1ke+2eDVP4I1HPILfGXbvkdWQwqXCUy86QRlqtRdUdt+uFNfq3J52N8fM39JJMoXGDmY4Bt30cOh6Z5TQj5S+VTYJs7b3kHdkjNh+sNt09M1dqAtlXbnWecOPGecot++B9VxWZSqDSAnqCNzU0E4/Evnuwhoww=
+	t=1739272680; cv=none; b=goMKldh/gGYCwdHEQ5ZEeGD9rkiGtcMkpTIEz5hpVfPy8f9UUCd0EXgv6c2A5koeIQWXcVLprWxIrAI+cP2+0TMIsl+mz41BsFVqkF+p0nCbizHEh3JH3loazrrUXf0JnAtepilVSZBkRQLNUcRPNMErRITcOJ6B4VprbuQ/2nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739272536; c=relaxed/simple;
-	bh=8l8FP7dj+1NJWawu0WDpUgtCnN886pFUV0K1G2Xj/d4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L1V2LN7XMVi77Py+o83ut3RJEhhvVLGW5QwSKkbe2ngE6d6or22/UqQ9uyLW3lLemXTKtp+bUmzECR054FBOGsXlFfzo3xFhBwNXRJin7wRbq4fndOskDKpfHLIcr7sOdCrni+mV2QzElruKaAxPSzYTR+BtSkNZKv4iHm9/voI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T3jPZYLO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739272533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oTT52xz0DA74wg1Fq9YWmZolWlBYBYiMJjpLvmR40n8=;
-	b=T3jPZYLOik450CzKiVWSpb1ATI197riEyExPNJtv5TNFkeLUR/A5yEoSXDtfjzr+tZhibe
-	BYBvkGqMXwidLYiuOh7cPdyWbJUjxXp6qNtVo6BpsQGfwRcZztDabco4oUzHczOXBWzyIM
-	py1rO94Nm4xGy3Ib5tbKMuASpWXVs+Y=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-Ugn2AIL9NNu5ygJHZL3FzQ-1; Tue, 11 Feb 2025 06:15:31 -0500
-X-MC-Unique: Ugn2AIL9NNu5ygJHZL3FzQ-1
-X-Mimecast-MFC-AGG-ID: Ugn2AIL9NNu5ygJHZL3FzQ
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-6f6d40a61e7so65850347b3.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 03:15:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739272530; x=1739877330;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oTT52xz0DA74wg1Fq9YWmZolWlBYBYiMJjpLvmR40n8=;
-        b=CJ5VUR0ihjSgx3UOVkbw0ih/Ffw1kzfL7SlAZXaD5QSAByzSGZU1jcD982gH56+y4N
-         DjDiIWVlmVyTmGH2l+pNmitCsaCtj39UMwuNOnt30ZAZu4VEOsN9kp/7e3xjmJ2Fji/T
-         vs8WJeubeb3XSVEp85eRoDvIeapQ7+dn0ynZ7K2pjjJLnHZUDt9+XZmhK0IDLbjBUZDK
-         p0fEhEisFU3EC/RHi/bx4sfZVpVomRIl3H34njYYAhMifTCCA70ZBCKcGURf1lI1TJ66
-         wut/i+/uCDnxivv1VZcxPV7/RB15h+O62K+kg/ejVx0qbexA287DkMm81YXYSFlQIjj/
-         aHGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVt+aiplYp3qcjuRV1OgFUZQ3lt+jV/tmPYOC7lqEcDQkmDprhdDXqFIJK7N8o0Z/f4U4ncyiw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfrxDAdcA0UGmQsUyeCXzxhZBxKN7x6/LsMC2hL1RNcgE7AgY/
-	06ggLXxe7MACdNCcWMOjK/i1UvBaq4PJLiG/g8bQKIM8gtqFGQI7Wd7bvGKNKG+OF73Ya5uvz9I
-	ibwJ373PXE9ZdOTx8ISBZEDnn6obHRam6vnrSy7CC1Ta93Gcxdt4LwQHhsOC+0MQHIh4ZsWhL45
-	hPbCxxOLc11YFL5NikvxWLAsTCHw2X
-X-Gm-Gg: ASbGnctYiDlC9zOE3S28zX6qeD0Uk2wt5mc5ao1/AVKGVO3vuhsDF6ehenjpKGMUSgt
-	+FPm3Syz1rZ3/aRlsHLhlIlEZqENp93+p5vN5TDz497r0JCqeqA38KDkkCGj3pijD5urFqSaY9L
-	OEyk8YebYChFlyptNV
-X-Received: by 2002:a05:690c:62c1:b0:6ef:5013:bfd9 with SMTP id 00721157ae682-6f9b2848b45mr165172317b3.10.1739272530407;
-        Tue, 11 Feb 2025 03:15:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNF6T2I8g7g0eCN2cY1s9w09QLGZQ32g2apXNz7Z6C1M9fCo1UadwH6c2YV8TO6JEjik4xnO/AMPiw7BaFxTE=
-X-Received: by 2002:a05:690c:62c1:b0:6ef:5013:bfd9 with SMTP id
- 00721157ae682-6f9b2848b45mr165172257b3.10.1739272530161; Tue, 11 Feb 2025
- 03:15:30 -0800 (PST)
+	s=arc-20240116; t=1739272680; c=relaxed/simple;
+	bh=K1d0tx3PaHBtI6Q44wAHQKRnhl2rM8eeQ97J0PsPlGw=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=TarPtvIsmOTKE8ovboOAbIj2HZs1hkMZwunmoLz/406dVT7Wm1kH8BTAdxR/uxkgNPAwG63V35FBWKA2XKseXO2KYMnEkGyMD2qE1UaVi2PTxMc0ag2KFWXwhQABu6yj62/INncIESpLkHc8EoPVVtLyodospQwPohfP+2xHGnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp89t1739272651tofnbwrp
+X-QQ-Originating-IP: P5U8U1wrOZTiqP5qZxqquvqM2S7v0NeiIWXNSWTYSw4=
+Received: from smtpclient.apple ( [183.157.104.65])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 11 Feb 2025 19:17:28 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 3854022505142321806
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250207121507.94221-1-donald.hunter@gmail.com>
- <20250207121507.94221-11-donald.hunter@gmail.com> <599a281f-d468-4b92-8b15-6f1292888dd9@redhat.com>
-In-Reply-To: <599a281f-d468-4b92-8b15-6f1292888dd9@redhat.com>
-From: Donald Hunter <donald.hunter@redhat.com>
-Date: Tue, 11 Feb 2025 11:15:17 +0000
-X-Gm-Features: AWEUYZlorL5Ekx5ZkbVkyzU115bFfmicFvXWD4bbSdvoDWFeQqMhOAs-Co6t8ok
-Message-ID: <CAAf2ycnV42g0YHMU9Jdv47J-5p44m2bgj6rjkpxBnXUUrWROzw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 10/10] netlink: specs: wireless: add a spec
- for nl80211
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, linux-wireless@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
+Subject: Re: [PATCH net-next v7 3/6] net: libwx: Redesign flow when sriov is
+ enabled
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <20250207171552.35446145@kernel.org>
+Date: Tue, 11 Feb 2025 19:17:15 +0800
+Cc: netdev@vger.kernel.org,
+ jiawenwu@trustnetic.com,
+ duanqiangwen@net-swift.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FC1A7A5B-0648-407D-8F2F-0B300FB47710@net-swift.com>
+References: <20250206103750.36064-1-mengyuanlou@net-swift.com>
+ <20250206103750.36064-4-mengyuanlou@net-swift.com>
+ <20250207171552.35446145@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3818.100.11.1.3)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: NNC6H2+gqsu3zZEbTjJQ2jv5TkyPOFD8iLBs6Wxqtb5OpjBwz6t1vpBD
+	VB8TL2gB/KpgBFVj7toKUrOdR5rIT0MSg7VP7SQr4KyPEMa3ddphECF5xPWPeD5iL+voKll
+	s1VGlHFbn51lR6i/fFyl55XznQ7Dmfim5kGu/UO31mgNytuAgAsAGt8WX8yVXbMBVMTqug7
+	3zW5QIlugST8zhBCU2Vz4YvM5l3/jP8tSKSZ2uih2m/z854GQL4noVdNio9Ddwz6dwQVp+o
+	29yt+HHIjqUQ01YgMvxT77B3MjxG92SDAcentkUmPf3R0s4Oi+9p3hW96nQAck6FDSTdIX3
+	VTcJn4rA1ehL3FICa/3WBtnMS4BUf7rjQeeOkNw8oPQImbZBg3Js7KiD5+ua0mEr8JLBTUn
+	lmXgnAcl2jBIfxQ2CisWO9GbEIgm1nn/TMYnmP7I0AXqqriutNHLFUcPndjO13l3+KQ3Gl5
+	OFHEqkM4kccE1Ot1/tiotF6ZECdH5UhvXXVuzX7CbYCG4JHmsHnJKqIanzb8oMZRPe+c2SD
+	z8hD4UHNxf8CnS9dNeR6n77hlvc0ELGw1YMVzygGsNJVpkXxzsMF+ErRL/b5JMY/2ObvNtw
+	uV+nIS5gs6QvEv4QHQKjsJGa2bFUKin1LdnXvHyb8bSXiZXx3Al1wYRr0hDuXzBwBVg888p
+	WWlHSvkjMnAjI0lamlDcMYVwTMCeKqem6dGo9OajsU1PnKgavQuVZpiXRnkseDkU3s6Qple
+	zV/b/Zm2brbG/2Nql2PpZFLZvl3IX5R4u4DXwuvwFm0AEcxGQ6DCwxLV4lb8SCwR3YOOdIe
+	6P+5wGB6D641/SvZxlatY56CM9IWqeesqEIOBxxidW4AnNI4qMU9IJ0FlfttPLrXZGxoxyA
+	8BGToab/OKXyWVx7rtXnjGPo31UtBrOj2/cyJl4+UXnD2Bj95HF4J8F/Ny3+58M+ZFy4Ox+
+	2NyFLXeSkJWmcyPjWGCyRiN5ATsxftDjQp0JFCRX5VZmJ2VLEPJsVdJNZS7w4gZzLXG3A01
+	dnt7VlBkmNSX6OtJNVJFK4Kw1gCUs=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-On Tue, 11 Feb 2025 at 10:59, Paolo Abeni <pabeni@redhat.com> wrote:
->
-> On 2/7/25 1:15 PM, Donald Hunter wrote:
-> > +        type: binary
-> > +  -
-> > +    name: nl80211-iftype-attrs
->
-> I'm unsure if a respin is worth, but the above yields a strange looking
-> c-struct name in generated/nl80211-user.h:
->
-> struct nl80211_nl80211_iftype_attrs { //...
->
-> All the cross-references looks correct, but replacing the above with:
->
-> name: iftype-attrs
->
-> AFAICS will also generate correct cross-reference and a more usual:
->
-> struct nl80211_iftype_attrs { // ...
 
-Yes, well spotted. I'll spin a v5. I've been making the same comment
-on other reviews so I definitely need to heed the same advice.
 
-> Also waiting for some explicit ack from wireless.
->
-> Cheers,
->
-> Paolo
->
+> 2025=E5=B9=B42=E6=9C=888=E6=97=A5 09:15=EF=BC=8CJakub Kicinski =
+<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Thu,  6 Feb 2025 18:37:47 +0800 mengyuanlou wrote:
+>> + vector_reg =3D (vfinfo->vf_mc_hashes[j] >> 5) &
+>> +     GENMASK(6, 0);
+>> + vector_bit =3D vfinfo->vf_mc_hashes[j] & GENMASK(4, 0);
+>=20
+> Can you add proper defines for these fields and use FIELD_GET() ?
+>=20
+Thanks for reminding.
+>=20
 
 
