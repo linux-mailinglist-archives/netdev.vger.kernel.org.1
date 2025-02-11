@@ -1,87 +1,70 @@
-Return-Path: <netdev+bounces-165199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A944AA30EBD
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:47:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04D81A30ED6
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F34E18884FA
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:48:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43B347A13AE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58800250BE1;
-	Tue, 11 Feb 2025 14:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A9824C671;
+	Tue, 11 Feb 2025 14:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZA1exyO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czIi/RUW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C5F1F2367;
-	Tue, 11 Feb 2025 14:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF5420B81B;
+	Tue, 11 Feb 2025 14:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739285270; cv=none; b=B74irqo25kHibFRK/mhPuRz2zQII+IFTcl1LTbXpOdDjYLnU3RHZxQ9waP0iCg+DfjZRIx8QIYhJ4+vt1cFp6IBqmyjIlZi6l9CgFXjDNekB5pEXXjPmvZ0d0DtPumDHJy76LXlK1N503WTiPG1yyG6Fo7bpn9hN2IyeD3Fu+c4=
+	t=1739285631; cv=none; b=ErwswfktA0KwMgbpbSFWfps1MmxAXsvc/U85RkbJU4IMWRiExrMIm78DWFHmXXiScEBd7jMpvaPsHH7aNs+xHm30zY+H0datJ+MQhZyyaZJ3Bxdzy9nNGW28/Q9otBDCWKlmwQN9BmZ0r5hKwZtAhTz0L8vp3vKI6eDGEOXYr6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739285270; c=relaxed/simple;
-	bh=7FXmIfHKI0A24C9ZdNlzK1EB/0enzRYaBWrf7AXQ7cI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sW2Bf+OV0FI+rHPHajN0qc4oRG0ZFB+ZtVs0OSZ64gvLCVpp5upB1ZH1RpfSoQr3k8z/zcJizXHkK+FldgzAAvMmAVX3gJJah8MFFr0RM6oRgCFGiM441oD/Vr5Avr2Ow7jtosx9Kv00cJAYSHB++mo/7kuqagvGt3bfFDwx+WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZA1exyO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F54C4CEE5;
-	Tue, 11 Feb 2025 14:47:47 +0000 (UTC)
+	s=arc-20240116; t=1739285631; c=relaxed/simple;
+	bh=WdVAVaZxF6vQNa24ce3PcHCsxJB++m/FAab+HhTJpro=;
+	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GDtqWZiEV6/zVz26Q0GtX+JjBdTdxqS0S83lopuwdhkLwwjGFQRALGCh1w1qHGhKZPbJir9/2pFe1Wk143qG9qU/mudBxK1ByPqSUxzuEJ/FQI/fNSkYkGa9B/GouQH5uvY6IqQlAQXTtbAehREPdv22tp1qyZh+mHBbCitJ6TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czIi/RUW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D928C4CEDD;
+	Tue, 11 Feb 2025 14:53:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739285270;
-	bh=7FXmIfHKI0A24C9ZdNlzK1EB/0enzRYaBWrf7AXQ7cI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rZA1exyObdvvQijM1159sv1Zp6pLGVO6ohzPFABo5GuL4S/yCFo9zu1eVpvYuH/uM
-	 t4xiXC2pL6FCRHRdL213SVgavYtWf7j1WiOGvML047g/nvaHGyQaIf5iDqt9eXGEOt
-	 3wmHvrAgn3WYDU+ygtgb8cxCzOGSXMly8DUraBWt608Fv8CfDnzEjxCU30rhoIUG0m
-	 R847A0XTDUrCtFOun7azHzlkRvdmJ4my0S0sA/T7mBFJ0dKkOmkJ94JEuxtDsyNlhJ
-	 suvvJoMIYcD740BIopH9hjDz2xObrCEMPKhmpGL8/V2AwxvsSN2bM9iwAzPYQcEpTf
-	 woVU+fKYZ8tGQ==
-Date: Tue, 11 Feb 2025 14:47:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH] blackhole_dev: convert self-test to KUnit
-Message-ID: <20250211144744.GA1615191@kernel.org>
-References: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
+	s=k20201202; t=1739285630;
+	bh=WdVAVaZxF6vQNa24ce3PcHCsxJB++m/FAab+HhTJpro=;
+	h=Date:From:To:Subject:In-Reply-To:References:From;
+	b=czIi/RUWpUqH8Rh+boqotzR9d+kzHDUjZf0Z7z3wx9Tcv06NhsritCMdg2ZFDdhiB
+	 mw8kZbgUtzuhHIWdWWz58DKF6zPKiIxXUvLJA9WDn8BJdbRtfkrpzU161MtLfITNvP
+	 ALdRPhfmo+UO9vL//XKy4UZ6YAQcVRsmeohN7BJKUc3/PEkS3xHWr/fMD6OwNS5IUq
+	 /M7Bg7DdJyTAww9+E95/B7qVTN83Y1ywt+qNglu76XIDshGp/b2jftyJ6T8YBcCIOO
+	 758B0AeQrLoDsQGyfe990yo/7g2svl2JihZVGoxJQCE5Nf3hd9E6NTPYbS3X6gbcvo
+	 RR6FNhRK56FAg==
+Date: Tue, 11 Feb 2025 06:53:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: Re: [ANN] netdev call - Feb 11th
+Message-ID: <20250211065348.24502ae2@kernel.org>
+In-Reply-To: <20250210084151.160d5d4f@kernel.org>
+References: <20250210084151.160d5d4f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 07, 2025 at 06:38:41PM -0500, Tamir Duberstein wrote:
-> Convert this very simple smoke test to a KUnit test.
-
-Hi Tamir,
-
-I think some text explaining why this change is being made is
-warranted here.
-
+On Mon, 10 Feb 2025 08:41:51 -0800 Jakub Kicinski wrote:
+> Hi!
 > 
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
-> I tested this using:
+> The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
+> 5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
 > 
-> $ tools/testing/kunit/kunit.py run --arch arm64 --make_options LLVM=1 --kconfig_add CONFIG_NET=y blackholedev
+> I'm not aware of any topics so please share some, if nobody
+> does we'll cancel.
 
-...
+Looks like we have no topics, so canceling.
 
