@@ -1,141 +1,130 @@
-Return-Path: <netdev+bounces-165080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA0BA3054B
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:10:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16BBFA30560
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:13:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 021373A47A2
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:10:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A613A7015
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE151EE7AA;
-	Tue, 11 Feb 2025 08:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F041EE7DF;
+	Tue, 11 Feb 2025 08:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UIhc03Z4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbYM5IJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f231.google.com (mail-il1-f231.google.com [209.85.166.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7881EE01A
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49E81EE7A5
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739261406; cv=none; b=UrZySWbjBm3GE7XhDRZtZmzzuOrXgzk7G2CIjRvD8YjyF1KXmgP+19VXk4C91NurioDmWv2AXdpzJYR9XkBxWVXyi4CZ99sTG0BtAwDaDODJkSyz7Z86Y+hBQvy80+tbiN7+uhsBWT6JrCyZiAHBijdRxtVICBobbtXSHuab53E=
+	t=1739261626; cv=none; b=lvlX+6o9QWlZqgndmdCk9H7ebcCxDRxPd6mQAENynWva1zm/sSis6vBAiUSr1gwBh2QAUKnZ9HYmCJOa9PKIWoMEOnTcgOL5/CwFJXN+uHcV4cdzEQ8jvLMT6M8dVrB8ITiM1d2OmS9u+V8N/iN9ptCeERDopa7NwwbTCJQUu5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739261406; c=relaxed/simple;
-	bh=3dRlfMGan+sGfVh6Lt0DKEdfT3ApcFxw4JVYFKt8r2Q=;
+	s=arc-20240116; t=1739261626; c=relaxed/simple;
+	bh=0dvMrOU+jpUj7tdCPK1OdWeuBFlDOcoyCJs0wbTUm44=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qcHKqhU6Dxi89DQpIUKb80KpxbXg/jjiEJSNcwDCj/5BvGvEpHb0ggsYY5gbdt/91WBvYLHztIFiZft8Y9RtIyfCtvl/yVFmnVVCTSO7cB/nVqlbbNUU57plmlG/w+rlt/qs/l9StCvLObKv2L+1C2brhHX8dZ0RfqOzBXnSKOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UIhc03Z4; arc=none smtp.client-ip=209.85.166.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-il1-f231.google.com with SMTP id e9e14a558f8ab-3cfe17f75dfso49767815ab.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:10:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1739261403; x=1739866203; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kaDCkKqlT5ei2VTbS0zVOlN4mD2KGs0Tmc410291NFk=;
-        b=UIhc03Z4S0HE6y8QVOMg7BhSuf5zzNVGYJavDJLSyjyfhKN/kyG0mqNPbv7V9deKGj
-         GI89F5vc7qRTBnLCM5KjchDWTivSmmrcke6gXT4d/jV7uyjQanppeSIrUXj9qUwGu0NF
-         IovxdUmIP7L9m+mQTu3gyOaFty7ypYOhNYFFChoSuW1WIbaF38wJ+7pdegRnEltWElDM
-         ogE1Ahzt8MeRanjPgjmj/n7HkG49snp3oUJhc3HYrPsOSNkgBdKqgXYf4LjCaYDqJtwg
-         IglwyYUQdkx2bVXoFUve7czrv/FSF1XoHBjc0wDLhy6MqVnVU/3iY8fwv4GKsR/NSY4a
-         vE4Q==
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBYT9ktWQpoXqioKrf++CPO043U8hNbosEdbIsrbitNkw/zi51YL3HrxemQN+6+R2Hrya6/wXp7APYkzDJ+PpVEARXeBVdNVatXbDYNMzJdeZKLitppYqa6nppe0lt0V72tqZexqMgwQ8LAX1X6jD2gIsVJygiV1CccuZFqpE9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbYM5IJW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739261623;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1n8vkK3pIQpfbo4j0Rb3+1FkQLwn21MZFeg/srwCbfE=;
+	b=DbYM5IJWEctXRUCDhqF7daBrdse4KcN5gk15oEMl+Z4lq6hBDz9bkNvtARHIjWHi8uXpz7
+	OA3XossWiwzlHO7RSrU4JRjcDI3gTjsAWqSCGcXtJMW+4uZNe6h5Ax5VkP93cvKsxjFLy5
+	IK8HyJNABgfRizR7d8iZ85XO3ePZCOk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-507-vz7MTIc2P6O-U3m13HZ-Ig-1; Tue, 11 Feb 2025 03:13:42 -0500
+X-MC-Unique: vz7MTIc2P6O-U3m13HZ-Ig-1
+X-Mimecast-MFC-AGG-ID: vz7MTIc2P6O-U3m13HZ-Ig
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dc56ef418so1908328f8f.1
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:13:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739261403; x=1739866203;
+        d=1e100.net; s=20230601; t=1739261620; x=1739866420;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kaDCkKqlT5ei2VTbS0zVOlN4mD2KGs0Tmc410291NFk=;
-        b=Lh38S4x0Wh/q2lB69dRg0UYfGsOdor6TSb3XA9yLE78rFQFM/WJR7YqfcHKugr9mze
-         ZYyrxeabXKzmvqkEr4nkFgPna+D2soUKL5k+xSbXATF90V2H7EbSXMKnlTxT9DcMAYbr
-         EY6TrjcBzwhrohVyVlQrTxU9tJcgPJ1YqL0ZdIQR1jgV/82t2Uf5fyy0H2dUOGEiRFzh
-         f5EQ/xRi1uDEH+fUputvqu5c2bY2uxU9FEdQSlsq456/V6rh3w3kuilvKXulWvQ2ghkW
-         bfd7FdDBPaNQ0tzQdgbg0+EGFgHikWSQcJdfe13+8ghh58t5BX5KfzsMJmbskCI7mP77
-         dZZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWptg3wD7U3cRGr1nc0jVjAs5AeJo8vnQEKl3PGv1QAtVWqVR9cijbye82BuSGvlJqsk/Tm5Dk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvwDxJm0ByjJI+GHvkbtXMvbeOB5qeiqlOSThZQIHyYmVJnPOI
-	ZMUBTL20GDv+yYLW/M2JfAkfj+DrTjLjOEqs/unbb+wsCSWgZqBQpLXNxKt6lgz6eB/kLXRCSBU
-	CzWqfp5bpoWBzomXV63AjVJWDZ/Jc0Ryu
-X-Gm-Gg: ASbGnctICmP6PIAF08UuRSUyDg3mIMfGnZQXM63lzXerER572CTbWIdZ4RIvDmM388P
-	2OqB2vgwkic+7pCSUc+TguV464nPh/2tprIxuu45pVHWarWQqfr7csR3hGnZwDL8dYLDkHk7myt
-	1Q0t/NvX0Q5CLRQ6ymrkKzDvCOc+8FnG6wuEpxB4sYY3ftXGXAhILT6XA6vueWE+Gi6NrMH7wAJ
-	tB9g3rWKI1sT3GmL5I/+gKACOxgC3MpBshaW/d4M0ckZ0rZA6dKFOrun5uHUxbreZZp3nsKzrG9
-	chNJeMbQv/CAozUBa7+b3ZuE/vcwC1bfhh15xHQ=
-X-Google-Smtp-Source: AGHT+IEMwo5VjdKz2jhvwbTMazKMW9LXnW0ar4oDIFk5cA8yF4AeeZYqTwfueN3DZErI+7kGC7U5TQe6tpAs
-X-Received: by 2002:a05:6e02:2199:b0:3d0:2548:83c1 with SMTP id e9e14a558f8ab-3d13dd29dd9mr119458835ab.6.1739261403668;
-        Tue, 11 Feb 2025 00:10:03 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3d161a40055sm2226935ab.4.2025.02.11.00.10.02
+        bh=1n8vkK3pIQpfbo4j0Rb3+1FkQLwn21MZFeg/srwCbfE=;
+        b=uvUpT8uwylZkySxl3D2q4SbrSpwOzzN/88CLP0syfRP1pmXQWyiTvafqJh8f96yqaN
+         MWdhz6iqdEphCEBswe4QdYlte8edeWG46ap+P3mPGZedPJ1zVkh0+xp1+dN+/A23a+q3
+         zzCklPWn0y9cjgcou2c2Vbiuasn+9k11LzAD5VSqeq1qvhBAaOKGBjz9q9Q/AEkVjLPx
+         m56cp/YAALv3sumVeJ8Idtis7TeRM1IB+m/b6S+Pg/PXAh3/DgSFjSTJhMp84QSgWe/v
+         Xnh2l5QtBN4Wq+XZ0sdAtIdyf1nLfaB9wa/VS9+3cwcIys2UVLO9fELpQ2NzNnmelX+d
+         3TJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOoEvElpw0tlLCaPlncfOQP7+ZcNFt1yO+MgUV55v9HA+YwPDvXK4tsA++YOGvDA441zlDIBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFy8LO6N3RsOh1QZdAuarE3U2i8TxroChOBMyrr9SJoboJ9HDr
+	BU+nlZjmRrbEadsmMFMpH8H6t+ELGkR4pIrFgkNuvyDxGdVoxYIUDCNCyahL+HIt/tmNYcyZ3Fk
+	0284VtH8U6r7p1GXn7pNYPVKfzRCIsbuGak8J2La4RyFboZPz7lf6hA==
+X-Gm-Gg: ASbGncuMlhscfr0hrS4cWpySVU6Er/Nf9ujn1E3/y4ViXW067FJk3eTFN6/01ohc8/m
+	mz/ueFeP5Qva1lgcMKEPBr0moicoSIRATMrcDSXa2qAhjGrR5ViLbSDpK5My/GlLBHUQTPy6Ng4
+	Pdvno0wspYtJMPOipKv4e72goSesAVyINIM78dIAxI1AHdbMDYz/rWy73W6C6wQwWBDWSjTe9ij
+	JcRTHacscibTa6665LDnKaxjiEWgBmSoJ4qn9M7LMvrHycdGeK4QVmLRZxppHnnGRdJUPOXkeGm
+	etKTUrOwKHFSm2DO2kDu6kqEXNNxc8PwpEDgLVwuBhXPnKDru0JCGQ==
+X-Received: by 2002:a5d:64a6:0:b0:38d:dcf1:d191 with SMTP id ffacd0b85a97d-38ddcf1d528mr8272417f8f.21.1739261620710;
+        Tue, 11 Feb 2025 00:13:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESlByLWTFDUB78pjxA1Dd6V3iLKw47Bgjaj5JruimINPkrnWdgcGJctJ+ryQRtChMGWsKZHA==
+X-Received: by 2002:a5d:64a6:0:b0:38d:dcf1:d191 with SMTP id ffacd0b85a97d-38ddcf1d528mr8272350f8f.21.1739261620000;
+        Tue, 11 Feb 2025 00:13:40 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd6080926sm8087046f8f.83.2025.02.11.00.13.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 00:10:03 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 0A6D33407B0;
-	Tue, 11 Feb 2025 01:10:02 -0700 (MST)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id F18B9E40D80; Tue, 11 Feb 2025 01:10:01 -0700 (MST)
-Date: Tue, 11 Feb 2025 01:10:01 -0700
-From: Uday Shankar <ushankar@purestorage.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-team@meta.com, kuniyu@amazon.com
-Subject: Re: [PATCH net-next v2 2/2] net: Add dev_getbyhwaddr_rtnl() helper
-Message-ID: <Z6sF2RZRdqnH6MQR@dev-ushankar.dev.purestorage.com>
-References: <20250210-arm_fix_selftest-v2-0-ba84b5bc58c8@debian.org>
- <20250210-arm_fix_selftest-v2-2-ba84b5bc58c8@debian.org>
+        Tue, 11 Feb 2025 00:13:39 -0800 (PST)
+Date: Tue, 11 Feb 2025 09:13:36 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: syzbot <syzbot+71613b464c8ef17ab718@syzkaller.appspotmail.com>
+Cc: bobby.eshleman@bytedance.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, leonardi@redhat.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, v4bel@theori.io, virtualization@lists.linux-foundation.org, 
+	virtualization@lists.linux.dev
+Subject: Re: [syzbot] [net?] [virt?] general protection fault in
+ vsock_stream_has_data
+Message-ID: <xx2igtwgro5ffbmdaahbwz6irolnfh4ktmdfatfrl72kppne7m@rp2ajscxfpp2>
+References: <67867937.050a0220.216c54.007c.GAE@google.com>
+ <67aaa81c.050a0220.3d72c.0059.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250210-arm_fix_selftest-v2-2-ba84b5bc58c8@debian.org>
+In-Reply-To: <67aaa81c.050a0220.3d72c.0059.GAE@google.com>
 
-On Mon, Feb 10, 2025 at 03:56:14AM -0800, Breno Leitao wrote:
-> +/**
-> + *	dev_getbyhwaddr - find a device by its hardware address
-> + *	@net: the applicable net namespace
-> + *	@type: media type of device
-> + *	@ha: hardware address
-> + *
-> + *	Similar to dev_getbyhwaddr_rcu(), but the owner needs to hold
-> + *	rtnl_lock.
-> + *
-> + *	Return: pointer to the net_device, or NULL if not found
-> + */
-> +struct net_device *dev_getbyhwaddr(struct net *net, unsigned short type,
-> +				   const char *ha)
-> +{
-> +	struct net_device *dev;
-> +
-> +	ASSERT_RTNL();
-> +	for_each_netdev(net, dev)
-> +		if (dev_comp_addr(dev, type, ha))
-> +			return dev;
-> +
-> +	return NULL;
-> +}
-> +EXPORT_SYMBOL(dev_getbyhwaddr);
+#syz fix: vsock/virtio: cancel close work in the destructor
 
-Commit title should change to reflect the new function name in v2.
-
-Separately - how should I combine this with
-https://lore.kernel.org/netdev/20250205-netconsole-v3-0-132a31f17199@purestorage.com/?
-I see three options:
-- combine the two series into one
-- wait for your series to land before mine
-- figure out how to use take and use RCU correctly to avoid the warning,
-  then revert those changes and use your new helper in your series
-  (would want to avoid this, as it's more work for everyone)
+On Mon, Feb 10, 2025 at 05:30:04PM -0800, syzbot wrote:
+>syzbot suspects this issue was fixed by commit:
+>
+>commit df137da9d6d166e87e40980e36eb8e0bc90483ef
+>Author: Stefano Garzarella <sgarzare@redhat.com>
+>Date:   Fri Jan 10 08:35:09 2025 +0000
+>
+>    vsock/virtio: cancel close work in the destructor
+>
+>bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12bb31b0580000
+>start commit:   25cc469d6d34 net: phy: micrel: use helper phy_disable_eee
+>git tree:       net-next
+>kernel config:  https://syzkaller.appspot.com/x/.config?x=d50f1d63eac02308
+>dashboard link: https://syzkaller.appspot.com/bug?extid=71613b464c8ef17ab718
+>syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125a3218580000
+>C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=147f11df980000
+>
+>If the result looks correct, please mark the issue as fixed by replying with:
+>
+>#syz fix: vsock/virtio: cancel close work in the destructor
+>
+>For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+>
 
 
