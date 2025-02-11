@@ -1,221 +1,288 @@
-Return-Path: <netdev+bounces-165174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FE8A30D4F
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:52:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37115A30D8D
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25972188708B
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:52:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB02B1662BF
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EEA2451F3;
-	Tue, 11 Feb 2025 13:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85696220681;
+	Tue, 11 Feb 2025 14:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MMI/CAm2"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="RUhRtJvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174EF26BD9A;
-	Tue, 11 Feb 2025 13:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B9F1E376E;
+	Tue, 11 Feb 2025 14:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739281955; cv=none; b=dKWv/DaQCx14gfcKZU+52Yp8PaZhWS8oilReqmWNF82qlLgBgqCed7BPxU9xXFoXmTdGpb5Gx8F7FD0Nk9BOf+PW/KggHsc8br1RuAgoUaIZ70bPCBDI7MJXRwlolmmf4H6DbuUJubQLBD5uPlcgZnWIyvxuF4+egB8LiFwTzU0=
+	t=1739282499; cv=none; b=ItmiBaXQkWZKsRFJm5ag/sz7HpsTkHwg+DEr80aWTmJBUaoUeqqh/NstcZ0QeiYBUaEoACtTn1n+UvB/yHXazQUU+cyqQ3xB/TupM7gzPLERsOr/eKpnDnSoqt01d9d34c4Kn+pzbVRoRLnYfIfuvoZkzipzjMwQY7BUvvru6A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739281955; c=relaxed/simple;
-	bh=3/NbMsRL+5uZOQswpSFVczltg1Yfbc3HqpnQ2stAv4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sur+PFPfhBWo5gJ+panRnZlGBuCvgvmG54GwyUVxRyCCqYnDR2CQ4Yd/HPdhSNkoh1tKDZjVl6HU998QkOcIn/I1F/V8LRMSFgc10ETrhXyg0T939jQMHtcscfyWj3zkmIi4UyJUClxOG6UmZTfjSaWinfj2B/lUTKGTiYulh30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MMI/CAm2; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A761544214;
-	Tue, 11 Feb 2025 13:52:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739281951;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lJYnHq/sEIobe9VCr0dLddOsYZHMnYLJhMmVGTUEBgc=;
-	b=MMI/CAm2RVUEankum6M+P6dyFrnzmDJKaFY5Irg/kep2quAF7z1RgKFW8dshZtVI5Br8IF
-	FsXzMyRx8GQU1Rk8ZMWIYKYlme+2NX+I8WJ48zpjE7NTpTwwxi2bJP1LOKVuC96K02RGwv
-	FX35CyLr7JCltCoSLQZF5M51ej1FxhS3Tzqw9dMr4buz+FB8aaBBMpInH9uqX2HKqsRBkB
-	YrgBgk7h2y/ZcHVQYouvtwYGr+BzQG70uydW5kLcmc38uwxgnf5Ettmb0bo8nHwK8XSKl3
-	qANRLTdRhCbQhuwUj6T91muApa5ijBlocf10KX+zF/mp3BJ9hVWCXGG3bkj1WQ==
-Date: Tue, 11 Feb 2025 14:52:28 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 03/13] net: phy: Introduce PHY ports
- representation
-Message-ID: <20250211145228.06408469@kmaincent-XPS-13-7390>
-In-Reply-To: <20250211144243.6190005a@fedora.home>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
-	<20250207223634.600218-4-maxime.chevallier@bootlin.com>
-	<20250211143209.74f84a10@kmaincent-XPS-13-7390>
-	<20250211144243.6190005a@fedora.home>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1739282499; c=relaxed/simple;
+	bh=tL9O+uEh0ILH739lliOo8AMi2wqhWQL+dKG8bMas4mc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=RR60Rk3pEWGb2313y3sbyiMsrE0ev0Io7unCXQIZbw5fgA6AH5XMq3g/rRHzWuUxpsM+6RQ2nakk0OfcW5LwIglQoC6wRt2+vUdExXHjBoQbWWIz5JIM6VZz1w6EDhsw8mS15LldOPsH8AsEO1/XuYlSbOdrvN5dvyX3h8liyY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=RUhRtJvE; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id CF773234F0;
+	Tue, 11 Feb 2025 15:55:26 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=g2Omdx+gC2VgWT+qBhjHWyxng8Qdk36CSx5aBDN/WYc=; b=RUhRtJvEltA0
+	kGC14MNbugq34P1kIz+l/q108own4UKmGAlom7ntH9q2ahzzp9+mQypRjEcAaBs3
+	YrKlYgdmsLbpQDSW2x8kI5RiqJR1cLj5nflAvEmTVVMiPHMXm5xpAm7ZGwvFlGnB
+	Fn88I6JA/vvrv2YAZ3SqgxDR7NVtn50mTn22UDKp9bYL3+e8Tf0VzlDsRFI0i7oe
+	YMVv4JfQfnaiE7hR4KFMPupN0R0wfSRRBPECJJm5m2OvHaCktUZkT38uWNtRuDK2
+	PTqan5qRWA5IRSlLYfi+9UpR7TJemmxooYhs+6wvsCTLrw9Vs7Ef9bkazr25hTB/
+	IeCcdpeBla5F+lO8u72kd2WSOSFc4e8jvumN1/aQeo6tUQfVStIjE1k9LEiUYVq1
+	r2WSqUbvdR2G27ND5tIPsmZhaxY9lV4z2f+nbnT7eR0EoM+ZCgyBkG5IrRlh0Cak
+	zuYUopMoaYxM8toiWFoZYL/kyrckHPE7jWWXVRtq1LL5KA6fdTAt62orESJNvEp6
+	n+e++iXeeDlnbAYbbmVph9ZbBtCAFFcSVJ02J1TAJKei+Z4zcUF5kLGl7hFaK1jU
+	h9ZqvlztB5lx3ct7qaEGfrAfbr2S6KVGakgpWjAcmA6DwF+Ei/rIWN9R9tJ4Ihyi
+	CCphLm3TDUPW1uobQ6YBX0unICHq5O4=
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Tue, 11 Feb 2025 15:55:25 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 615C117093;
+	Tue, 11 Feb 2025 15:55:18 +0200 (EET)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 51BDt7l9025873;
+	Tue, 11 Feb 2025 15:55:10 +0200
+Date: Tue, 11 Feb 2025 15:55:07 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: mengkanglai <mengkanglai2@huawei.com>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yanan (Euler)" <yanan@huawei.com>,
+        "Fengtao (fengtao, Euler)" <fengtao40@huawei.com>,
+        "gaoxingwang (A)" <gaoxingwang1@huawei.com>, lvs-devel@vger.kernel.org
+Subject: Re: ftp ipvs connect failed in ipv6
+In-Reply-To: <e1527ca5f8f84be09022859f5e33b584@huawei.com>
+Message-ID: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg>
+References: <e1527ca5f8f84be09022859f5e33b584@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeguddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqfedtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhjeevfeeggeeghffgudfhhedvvedvueekleevjeduvddutefhvddugedtfeeludenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgv
- ghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
 
-On Tue, 11 Feb 2025 14:42:43 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-> Hi K=C3=B6ry,
->=20
-> On Tue, 11 Feb 2025 14:32:09 +0100
-> Kory Maincent <kory.maincent@bootlin.com> wrote:
->=20
-> > On Fri,  7 Feb 2025 23:36:22 +0100
-> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> >  =20
-> > > Ethernet provides a wide variety of layer 1 protocols and standards f=
-or
-> > > data transmission. The front-facing ports of an interface have their =
-own
-> > > complexity and configurability.
-> > >=20
-> > > Introduce a representation of these front-facing ports. The current c=
-ode
-> > > is minimalistic and only support ports controlled by PHY devices, but
-> > > the plan is to extend that to SFP as well as raw Ethernet MACs that
-> > > don't use PHY devices.
-> > >=20
-> > > This minimal port representation allows describing the media and numb=
-er
-> > > of lanes of a port. From that information, we can derive the linkmodes
-> > > usable on the port, which can be used to limit the capabilities of an
-> > > interface.
-> > >=20
-> > > For now, the port lanes and medium is derived from devicetree, defined
-> > > by the PHY driver, or populated with default values (as we assume that
-> > > all PHYs expose at least one port).
-> > >=20
-> > > The typical example is 100M ethernet. 100BaseT can work using only 2
-> > > lanes on a Cat 5 cables. However, in the situation where a 10/100/1000
-> > > capable PHY is wired to its RJ45 port through 2 lanes only, we have no
-> > > way of detecting that. The "max-speed" DT property can be used, but a
-> > > more accurate representation can be used :
-> > >=20
-> > > mdi {
-> > > 	port@0 {
-> > > 		media =3D "BaseT";
-> > > 		lanes =3D <2>;
-> > > 	};
-> > > };
-> > >=20
-> > > From that information, we can derive the max speed reachable on the
-> > > port.
-> > >=20
-> > > Another benefit of having that is to avoid vendor-specific DT propert=
-ies
-> > > (micrel,fiber-mode or ti,fiber-mode).
-> > >=20
-> > > This basic representation is meant to be expanded, by the introduction
-> > > of port ops, userspace listing of ports, and support for multi-port
-> > > devices.   =20
-> >=20
-> > This patch is tackling the support of ports only for the PHY API. Keepi=
-ng in
-> > mind that this port abstraction support will also be of interest to the
-> > NICs. Isn't it preferable to handle port in a standalone API? =20
->=20
-> The way I see it, nothing prevents from using the port definition in
-> ethernet-port.yml in DSA/raw nics.
->=20
-> > With net drivers having PHY managed by the firmware or DSA, there is no
-> > linux description of their PHYs. On that case, if we want to use port
-> > abstraction, what is the best? Register a virtual phy_device to use the
-> > abstraction port or use the port abstraction API directly which meant t=
-hat
-> > it is not related to any PHY? =20
->=20
-> I think the next steps will be to have net_device have a list of ports
-> (maintained in the phy_link_topology) that aggregates ports from all
-> its PHYs/SFPs/raw interfaces. in that case net_device will be the
-> direct parent. I haven't worked on the bindings for that though,
-> especially for DSA :'(
+	Hello,
 
-Having it under phy_link_topology is a great idea!
-=20
-> I don't think the virtual phydev is going to be helpful. I'm hitting
-> the 15 patches limit, but a possible extension is to make so that
-> phylink also creates a port when it finds an SFP (hence, when upstream
-> is a MAC).
+On Mon, 10 Feb 2025, mengkanglai wrote:
 
-I would say not only for SFP but phylink should create a port when it can f=
-ind
-a mdi description in the devicetree. Port with PoE, leds or whatever future
-supported features should be created by phylink.=20
+> Hello:
+> I found a problem with ftp ipvs.
+> I create 3 virtual machine in one host. One is the FTP client, the other is the ipvs transition host, and the other is the FTP server.
+> The ftp connection is successful in ipv4 address,but failed in ipv6 address.
+> The failure is tcp6 checksum error in tcp_dnat_handler(tcp_dnat_handler-> tcp_csum_check->csum_ipv6_magic),
+> I trace back where skb->csum is assigned and found skb->csum is assigned in nf_ip6_checksum in case CHECKSUM_NONE(ipv6_conntrack_in=> nf_conntrack_in => nf_conntrack_tcp_packet => nf_ip6_checksum).
+> I don't know much about ipv6 checksums,why ipv6 nf_conntrack assign skb->csum but check error in ipvs tcp_dnat_handler?
 
-> This is why phy_port has these fields :
->=20
->=20
-> enum phy_port_parent {
-> 	PHY_PORT_PHY,
-> };
->=20
-> struct phy_port {
-> 	...
-> 	enum phy_port_parent parent_type;
-> 	union {
-> 		struct phy_device *phy;
-> 	};
->=20
-> };
->=20
-> The parent type may (will) be extended with PORT_PHY_MAC, and that's
-> also why the parent pointer is in a union :)
+	Looks like the checksum validation does not use correct
+offset for the protocol header in the case with IPv6. Do you
+see extension headers before the final IPv6 header that
+points to TCP header? If that is the case, the following patch
+can help. If you prefer, you can apply just the TCP part for
+the FTP test. Let me know if this solves the problem, thanks!
 
-Ok for me!
-=20
-> I'm trying hard to make so that phy_port doesn't depend on phylib
-> (altough, phylib depends on phy_port). There's a dependency on some
-> core stuff (converting from medium =3D> linkmodes) and phylink
-> (converting the interfaces list to linkmodes), but we can extract these
-> fairly easily.
->=20
-> You're correct in that for now, the integration is with phylib only
-> though, but let's make sure this will also work for phy-less devices.
->=20
-> Thanks a lot for your input,
+[PATCH] ipvs: provide correct ipv6 proto offset for csum checks
 
-Thanks for your work, it will be really helpful to add support for PoE in D=
-SA.=20
+Protocol checksum validation fails if there are multiple IPv6 headers
+before the protocol header. iph->len already contains its offset, so
+use it to fix the problem.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Signed-off-by: Julian Anastasov <ja@ssi.bg>
+---
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 ++++++------------
+ net/netfilter/ipvs/ip_vs_proto_tcp.c  | 19 ++++++-------------
+ net/netfilter/ipvs/ip_vs_proto_udp.c  | 18 ++++++------------
+ 3 files changed, 18 insertions(+), 37 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+index 83e452916403..63c78a1f3918 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+@@ -10,7 +10,8 @@
+ #include <net/ip_vs.h>
+ 
+ static int
+-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++		unsigned int sctphoff);
+ 
+ static int
+ sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -108,7 +109,7 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!sctp_csum_check(cp->af, skb, pp))
++		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -156,7 +157,7 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!sctp_csum_check(cp->af, skb, pp))
++		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -185,19 +186,12 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ }
+ 
+ static int
+-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++		unsigned int sctphoff)
+ {
+-	unsigned int sctphoff;
+ 	struct sctphdr *sh;
+ 	__le32 cmp, val;
+ 
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		sctphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		sctphoff = ip_hdrlen(skb);
+-
+ 	sh = (struct sctphdr *)(skb->data + sctphoff);
+ 	cmp = sh->checksum;
+ 	val = sctp_compute_cksum(skb, sctphoff);
+diff --git a/net/netfilter/ipvs/ip_vs_proto_tcp.c b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+index 7da51390cea6..dabdb9d3b479 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_tcp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+@@ -29,7 +29,8 @@
+ #include <net/ip_vs.h>
+ 
+ static int
+-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int tcphoff);
+ 
+ static int
+ tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -166,7 +167,7 @@ tcp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!tcp_csum_check(cp->af, skb, pp))
++		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -244,7 +245,7 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!tcp_csum_check(cp->af, skb, pp))
++		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -301,17 +302,9 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 
+ 
+ static int
+-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int tcphoff)
+ {
+-	unsigned int tcphoff;
+-
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		tcphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		tcphoff = ip_hdrlen(skb);
+-
+ 	switch (skb->ip_summed) {
+ 	case CHECKSUM_NONE:
+ 		skb->csum = skb_checksum(skb, tcphoff, skb->len - tcphoff, 0);
+diff --git a/net/netfilter/ipvs/ip_vs_proto_udp.c b/net/netfilter/ipvs/ip_vs_proto_udp.c
+index 68260d91c988..e99e7c5df869 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_udp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_udp.c
+@@ -25,7 +25,8 @@
+ #include <net/ip6_checksum.h>
+ 
+ static int
+-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int udphoff);
+ 
+ static int
+ udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -155,7 +156,7 @@ udp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!udp_csum_check(cp->af, skb, pp))
++		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -238,7 +239,7 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!udp_csum_check(cp->af, skb, pp))
++		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -297,17 +298,10 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 
+ 
+ static int
+-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int udphoff)
+ {
+ 	struct udphdr _udph, *uh;
+-	unsigned int udphoff;
+-
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		udphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		udphoff = ip_hdrlen(skb);
+ 
+ 	uh = skb_header_pointer(skb, udphoff, sizeof(_udph), &_udph);
+ 	if (uh == NULL)
+-- 
+2.48.1
+
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
