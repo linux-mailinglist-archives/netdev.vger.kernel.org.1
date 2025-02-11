@@ -1,188 +1,127 @@
-Return-Path: <netdev+bounces-165225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE9CA31192
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:33:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E838AA31190
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1405164F25
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:33:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29293A41AD
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4B5256C71;
-	Tue, 11 Feb 2025 16:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95C2255E25;
+	Tue, 11 Feb 2025 16:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1ru+DTz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXQ8MtrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F7C256C6A;
-	Tue, 11 Feb 2025 16:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68404255E32
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 16:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739291574; cv=none; b=mUcdwYTcbxY68DnvtrNSWYcS++hyew79dRdDEbvd1a8KCN2omyYi1jYm07rYb3c3uvmuInKVui59DePMrXKaPrQ3zYqrpnadYIjOPCnfgLzh2f5cNkAbnnQ/0scWVyWYVmyYggb2BpuHY9IBJ1a2n5lmd+d1FjeN1JFqRLSzTVY=
+	t=1739291579; cv=none; b=esT9Oep9JW7n+WG7kbklKpcBsOacxorbSIV2aGMDtxVAMpNiEQWUrtuoKb4LimTazZ1woVTWrsDF0NQqf5QWaIAjCqz4NL1xSvPPDvs8IpWzGYL/7bQhLkl1HFYvoQN6GSWelEOkqGnrCbA5IOizKvS6QuIj7AOeIh6rdjbCRM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739291574; c=relaxed/simple;
-	bh=gVBL4F8jU3SJlilexW8hvt6+wtNPSAz34HLk7+XFdww=;
+	s=arc-20240116; t=1739291579; c=relaxed/simple;
+	bh=e85HWHgoBQOm4j1abf5gLl/lX/2Ykg2xZnhWLvM8Vdw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g++3/eja2TeSN5/6dmw76IXj6NmfZo/U6wkxjt38gBiKGSSkZqePcF2S5GqAIU9zuzv/F5FHebHmb3CoDOosPt+JyXTrA+sJv7y9Ge1yTCVU83LSlgAcTXsRPmKkO7URrLXorKnWBySHpfoUbZJLo8Vs+1EUNVFZaDZy0x99Qfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1ru+DTz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5EDC4CEDD;
-	Tue, 11 Feb 2025 16:32:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739291573;
-	bh=gVBL4F8jU3SJlilexW8hvt6+wtNPSAz34HLk7+XFdww=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q1ru+DTzVqEPsgCq+7MeCU7Y9eGN/HEfpggxdgyY7Vh0GNULJRF5QK2xI3f0PtPGa
-	 56oYv4BgfXoTc1jYeUIcAeLQwRhrf8+T/C7gdBzJJv2XT0u3UbkMxAwi3BOhm4/pPB
-	 m9hBfO3Jq0PAlMszXLj1nwei618R6cyJ6w+OuSlpFImcCUaH5MEe7U8lwF21rqT5dx
-	 o4sdaDxGAgm6ySmKMfsetSPkHReQhzFTJT/Fka+gbk/OuLt90VA5rm/8er2m5+WeZJ
-	 MgOmnKAN9ga7ITrXzQlHTrQIBKDp4BD0cop1Tb56el/oTKWFiXJ1aAxEgRR6yYLKMj
-	 55946rlOWNVhg==
-Date: Tue, 11 Feb 2025 17:32:51 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next v3 11/16] dt-bindings: arm: airoha: Add the NPU
- node for EN7581 SoC
-Message-ID: <Z6t7s0m1xzsnjAsV@lore-desk>
-References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
- <20250209-airoha-en7581-flowtable-offload-v3-11-dba60e755563@kernel.org>
- <20250211-judicious-polite-capuchin-ff8cdf@krzk-bin>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OsOkf1Z2wjLa2ULkrxqm5j8QJVprr1F95fuSszuqB8cynYzDxKCxUUURL8eamgHKI+2zCBOBFUyViZFSve8rERRcGidHyZzT8j4m13Q7220lmdVDPMCv3TCQxw8jU/R+wQzHUIst/0F8ZNM6mdgrIp2t2CIVe8rTVZTIQjIh9KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXQ8MtrC; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21f6a47d617so57557935ad.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:32:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739291578; x=1739896378; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A5/z+2AkX14OVBfSBzvANjsGUw8qqOk+bTDpMOl03dA=;
+        b=QXQ8MtrCzGWB2wV1+gPeUG6iK7J9oLE78yzWX3/n5Aao5y8PrmdSZqpZJVzpY8+wu9
+         ZvFZJJu75BNlNggotwJcIVAx+zfFr/lF5fO4DIRzvRVhucqtqCX5k+C6U98qhkhngSTp
+         m5VgkisNti/W0SqU3f1y8TlhmOAiH/ML7U0perQdJb9DpDEEj1yf1Kt2mRjT+ohrKAUM
+         o/zYI43eA9XCABv8jZsE68WXrvo9OKD3fJm4AF5L9tBrBWXj6AeanYIAxRAa1F07UEEh
+         b25nTaQhLRqNdcnvzlsi+vpJdqBNa1K2DkhQCaeJfG/J19js8jrc2gkIjylyBB3AojbH
+         8UhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739291578; x=1739896378;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A5/z+2AkX14OVBfSBzvANjsGUw8qqOk+bTDpMOl03dA=;
+        b=jNIRJRogom2bDjT7uk/ESuf6NO4reABW+bq59Kht63hK8Pkmucg/C0jbqjqcevskEq
+         q5V5XTJ/IwoDx7nd9Aer6+iqML8HDtAC805Pg9qZaAyq3EFsIBH/efl6GpjYYPmOkoZc
+         e4ppnZnSK1Hiy62j3hnZSalDB+LkXL1pMbYoJDQLaMAvscU09upEC7hJBnkb96Q9D+jH
+         BBe2BlOEv9Vy/ZBREEYGG+AUjKBnObVEyj0JuM5kVUshCYVBZw+djkP6vfEoEeyWFSY6
+         pbnB7iZ/XS9KGf6pHSYQBN3IRck1gYS6k+zJWPXyhErRlZkW6Ue+00Qwq47xlpswl1p2
+         NOAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLTGJu7xu7faAU4BC5Ynlfb0Nyp9GciAxe6OU0Fwib3AikmZMSROx2vm1PzYBkLNBIf6J+72Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOgNKdSHdS8fcy4/V0scJiDjsSAlwMEPnj/swBVi5JJ7AGHSSV
+	OlAi6ohs3orL0EU1sHLokqafULbniCO37I0SI3hQh5F3jbwE38k=
+X-Gm-Gg: ASbGncurKKvE9QovnX6cJb4Xi5uJbACp0VjPYKIAHFbmxJBRUFi1eXlsi3G2MsX9TST
+	Z6Zr7/qwmVbZtA50hVsTeDYZQob4SaD6Df1MNoSJHsVtDaMY9g1+IiI7C3ln7vRpJoX5K16SXpX
+	GSadSBzFf53hOCB3fHj/lCXgYR5S4Th+9zB0TnnBbEejICW5VzkhUJeou1lSmcdr2408RKl7YoF
+	A/Q5hu/fTGbyuedbY3m8KvNQ1JrMyf1CYUvaGKLKgPK9dWO1bzwwttjhF/MtrIU7vMIYQFLTrGt
+	0CEorcpfnjvzIlY=
+X-Google-Smtp-Source: AGHT+IFat0G7HhNeYeKUsWDr3KgwrFNW75mw6kVWT17FjiObx98gq2CIoJqz/DfNT9Aw37wUcqQYYw==
+X-Received: by 2002:a05:6a21:b8b:b0:1d9:3957:8a14 with SMTP id adf61e73a8af0-1ee03a21cfemr31578020637.1.1739291576165;
+        Tue, 11 Feb 2025 08:32:56 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73048a9d7aesm9591487b3a.33.2025.02.11.08.32.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 08:32:55 -0800 (PST)
+Date: Tue, 11 Feb 2025 08:32:54 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: kernel test robot <lkp@intel.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Saeed Mahameed <saeed@kernel.org>
+Subject: Re: [PATCH net-next 04/11] net: hold netdev instance lock during
+ rtnetlink operations
+Message-ID: <Z6t7tlSr8W9SznXO@mini-arch>
+References: <20250210192043.439074-5-sdf@fomichev.me>
+ <202502112254.DdkYlmMx-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5YUTzFhuFvIYeyt1"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250211-judicious-polite-capuchin-ff8cdf@krzk-bin>
+In-Reply-To: <202502112254.DdkYlmMx-lkp@intel.com>
 
+On 02/11, kernel test robot wrote:
+> Hi Stanislav,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on net-next/main]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-hold-netdev-instance-lock-during-ndo_open-ndo_stop/20250211-032336
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250210192043.439074-5-sdf%40fomichev.me
+> patch subject: [PATCH net-next 04/11] net: hold netdev instance lock during rtnetlink operations
+> config: arc-randconfig-001-20250211 (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/config)
+> compiler: arceb-elf-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202502112254.DdkYlmMx-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    net/core/dev.c: In function 'dev_set_mtu':
+>    net/core/dev.c:9320:15: error: implicit declaration of function 'netdev_set_mtu_ext_locked'; did you mean 'netdev_ops_assert_locked'? [-Werror=implicit-function-declaration]
+>     9320 |         err = netdev_set_mtu_ext_locked(dev, new_mtu, &extack);
+>          |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+>          |               netdev_ops_assert_locked
+>    net/core/dev.c: At top level:
 
---5YUTzFhuFvIYeyt1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Feb 11, Krzysztof Kozlowski wrote:
-> On Sun, Feb 09, 2025 at 01:09:04PM +0100, Lorenzo Bianconi wrote:
-> > This patch adds the NPU document binding for EN7581 SoC.
-> > The Airoha Network Processor Unit (NPU) provides a configuration interf=
-ace
-> > to implement wired and wireless hardware flow offloading programming Pa=
-cket
-> > Processor Engine (PPE) flow table.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  .../devicetree/bindings/arm/airoha,en7581-npu.yaml | 71 ++++++++++++++=
-++++++++
-> >  1 file changed, 71 insertions(+)
-> >=20
-> > diff --git a/Documentation/devicetree/bindings/arm/airoha,en7581-npu.ya=
-ml b/Documentation/devicetree/bindings/arm/airoha,en7581-npu.yaml
-> > new file mode 100644
-> > index 0000000000000000000000000000000000000000..a5bcfa299e7cd54f51e70f7=
-ded113f1efcd3e8b7
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/arm/airoha,en7581-npu.yaml
->=20
-> arm is for top-level nodes, this has to go to proper directory or as
-> last-resort to the soc.
->=20
-> > @@ -0,0 +1,71 @@
-> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/arm/airoha,en7581-npu.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Airoha Network Processor Unit for EN7581 SoC
-> > +
-> > +maintainers:
-> > +  - Lorenzo Bianconi <lorenzo@kernel.org>
-> > +
-> > +description:
-> > +  The Airoha Network Processor Unit (NPU) provides a configuration int=
-erface
-> > +  to implement wired and wireless hardware flow offloading programming=
- Packet
-> > +  Processor Engine (PPE) flow table.
->=20
-> Sounds like network device, so maybe net?
-
-yes. Do you mean to move it in Documentation/devicetree/bindings/net/ ?
-
->=20
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - airoha,en7581-npu
-> > +      - const: syscon
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 15
->=20
-> You need to list the items.
-
-ack, I will fix it.
-
->=20
-> > +
-> > +  memory-region:
-> > +    maxItems: 1
-> > +    description:
-> > +      Phandle to the node describing memory used to store NPU firmware=
- binary.
->=20
-> s/Phandle to the node describing//
-
-ack, I will fix it.
-
-Regards,
-Lorenzo
-
->=20
-> Best regards,
-> Krzysztof
->=20
-
---5YUTzFhuFvIYeyt1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6t7sgAKCRA6cBh0uS2t
-rEcNAP9MlnGQ2GW0xvg4g0/eolQXH1kOd7wal6bxIySJIMBQNgEAqs/5Z011yWwQ
-5DcNR5bUJWyr9AmldMOhCQ88BjX9Vwg=
-=rkEw
------END PGP SIGNATURE-----
-
---5YUTzFhuFvIYeyt1--
+Looks like my rebase error, will fix it in v2. Should hopefully not
+affect the review overall..
 
