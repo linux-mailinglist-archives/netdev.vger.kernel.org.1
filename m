@@ -1,201 +1,170 @@
-Return-Path: <netdev+bounces-165098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80C0A3071E
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:30:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6595A30726
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 851B33A64FE
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:30:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50FF7166F7C
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6CD1F2362;
-	Tue, 11 Feb 2025 09:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B041F1511;
+	Tue, 11 Feb 2025 09:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="alM7hX1q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRmoxrpq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E76B1F0E5C;
-	Tue, 11 Feb 2025 09:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18751F0E49;
+	Tue, 11 Feb 2025 09:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739266211; cv=none; b=i37u2eVegp3lzUdLpUQjhCmujGCy5EuoA29RCwsvc/1lh1eGorllebBUxGKEPugv/D/HUhWYSj2O9Ez0+tdjYaLDvqBCEtQ0Il0f1VmNf4CI7rx2HYHNqVim1Zu8Z97DRH7BavXt3I3rgAZ3m/ODOnw7HWK3aAY5P9BtgFO0wso=
+	t=1739266270; cv=none; b=AGgtq7aO4W4HvrKZ2b4v4NE0B0Pv+E5Yvjhji/osD9xIioHJQ9RZSdYPMZO/yNHAJJGa3gqXHe+Us/V5cFgn2CW1hZBCglHAXtPetgbqhmIbqDuvt+kCWxieBBWEp6IKYVu6lEqa02+rU9bVS9d1GoISc1XlZ6cHp5KTU5Yw/sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739266211; c=relaxed/simple;
-	bh=kh1RoAOMTmHyrqSjIKrarn+yEalDE2KGW1HPIU+MCRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SppA0u1u2OMgZAWOai51Wsd59yXVHEt6BMCbyBdhjnQIoIVnHdB1zhX0AZHRH9fDMwbYEdecs8CtruBeUYY9BwS8zvL6LDUhbkT7da2GOsWsZCphG2Y1gP4Yn7LQhwuNqFc85yz3iK087poqqfmSeAL4k1I4ZNiJtkDLwVIFu7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=alM7hX1q; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1739266201; x=1739871001; i=ps.report@gmx.net;
-	bh=wPhcP0ysWo8kiC7tYIfKR/lpoPsbi4VO9OoHCHU8r3c=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=alM7hX1qBVd6fvxF8urV62Jd6EGPbq9RvKsYyZMZvHtNf1PYTsrrAKVlchb06krh
-	 /nGOn9fME7qG1t+jqZ3p+us9kGVK5bkuuSc8UttDjezv8KNqpkerKcXu/apnoabra
-	 ZlrzBZAIqQLLeOae+HTJiDyAzMFLPMDn9dnJ9lMepVn3LNl2V/PJtK+I1ggEwgW/G
-	 YPRJmy8rFJHMNTmkML4JBPJ+NX3107ChRl779ADi9YrvWOwShjGpcFXLDPP2zGQJ8
-	 G7boVTsCAq5HDgfmbwSDmjAKaOpH9Wmqk/WYpGGBRX+X15TQg/OZmYNyzbNN9+/Vr
-	 XAloG4cQET9BHwC1Pg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost ([82.135.81.30]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MyKHm-1tTfTo3Nq0-00sfdw; Tue, 11
- Feb 2025 10:30:00 +0100
-Date: Tue, 11 Feb 2025 10:29:59 +0100
-From: Peter Seiderer <ps.report@gmx.net>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net-next v4 09/17] net: pktgen: align some variable
- declarations to the most common pattern
-Message-ID: <20250211102959.4aeeb806@gmx.net>
-In-Reply-To: <20250206132538.GU554665@kernel.org>
-References: <20250205131153.476278-1-ps.report@gmx.net>
-	<20250205131153.476278-10-ps.report@gmx.net>
-	<20250206132538.GU554665@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1739266270; c=relaxed/simple;
+	bh=rZ/L/eDctQHAU5B9MiJ71+NBc1VaWKjoU0bJIk5EbsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TwuCtoLIE/CQ9rxSwjPPE3rOAwIZxpCXihzmL1Ist5TEWyCmyDLgeUal3qo1A0ZCRJPy09E/B/DRrU6FzYHXfVGrVQdlhW0Oh4MyUWNlnIvFg5rrcHmtp6yUIV7GKWfbceUOe0yyVgGk8oRDRrxgC0vTZUrSX5GXPEklhFIGhAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRmoxrpq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38449C4CEDD;
+	Tue, 11 Feb 2025 09:31:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739266270;
+	bh=rZ/L/eDctQHAU5B9MiJ71+NBc1VaWKjoU0bJIk5EbsY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rRmoxrpqxpxP4nCESTR6EmlmZbVv5vNsHxr5cI4VQo4XEuz/1skNPTFX2at6sVoyE
+	 chByaTrWUGHW7Z0sfJ++NNR8wpa2C1IGECMhudsJeE1DcecxDDC9CufoJKPemsWAE5
+	 HREQsPN0pyhnIJFnTdpmFAUFouVq0Uj1idmBIiOLA8Co1VZqELGwxnmIPOIv9Mflvd
+	 AQX3x0jL4PLGDhshyHB5jM5Fg+d1jAjTPVAOkooHnHI2ums4av/Tr6RyBnir4enEWf
+	 o7R3HTskKaWNpHMsTTF3q+nrdpraNrK5b9aoBw0yIU2iRZxhT1/dWTQLNfmiVfoBry
+	 cbhBFNw+dDGgA==
+Message-ID: <adeff1d6-f80b-4a2c-b4bb-da44ecd5b747@kernel.org>
+Date: Tue, 11 Feb 2025 10:31:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:q80QNBi+mJdxRVtoALQDPCsn0ntljixSQm1+/52vqpAYjyfu5H+
- rC0XAmxfBPETOon9BrIi85OQR80Q2h056GPCQ9d8o6+Nskz+BLtxrx5H5lhKh6Md3hTQcKs
- OAua78GFQhmNlNAJKs2kMex4rt07d9ILIboGs29ePvDELSMDiGpvz0aBYXrvZa+6QUJbiNK
- YE79Men49QssJA0OOQBGg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:4lyfgqOCAV0=;raGpbA+rgF/FhrQImWdd3OWWvx1
- +Oo8jrA9hNP92lgMFIPStEkyFC/IJxIX2GPTKeJ4iJrLA6mB3YZOubq4BYcdhRFEKitt00iJ3
- sVzWUOSRquZCP5s8ZCP4Wi+VmemdxDvNmKBuG1FeDI6MwziyaJhyyJdgQRrqPNhKsXXIIzYkM
- ZMafGzwp1PxYFl8wgBnw2PkW3o0gbrhFbxQvyvie3B4RMXCfi5HvEm+DA3SVCsS7NpWCl9ZUa
- bzG3gvGPPFJso1gJA5xIg9KG0l1g5ZKMgQ1DOHJnaGDyXOsFfJPoglE4iOJJfCt5CWkxyyVEi
- r2D7XsE9gq8YPhST+D4cLWJtSn4yJN/nvv7Almpz1DN1orEgrjODyRlzyK+/0PIvcHy4bOIuq
- ESric4Eem+zxNOFK4vQBtrx75fjdR21nkygnLzTkXl9TSZuYSTYHXXhu3qyWugxtHTOenEKKw
- HiF5XaGGhMwYZZvsUte7/HGlFt8+huQgB9Z+bWKsVOg0G8d0Z9huXD2lbEXC0p4YSCPwjPbek
- mwCv7OcSdwnfOPYvv8NFuwHV/9Sp2cUGMvEisWM3vGGV+B4ZfVyunpCs4rwexjeGFL788cbWw
- J0+KqZhD4OeTUxv0lxdEEPi8URHuwRNXgZK9vtehnTTB5tEee4Ap3pGvtwhQ6worxaccvGiRT
- p362BpzP+rtZLdmwSe6YF2JUrmgy6D1KFn+3na+GCYXQqbUnUByycMZoZ+7MkA2E8w8517yam
- zS8isVAF+puXK8L55M734xdV0EgcQeCCqrcLJXkfiPSl8kXR558VtFWsL6mGZSr0waMvaLAFr
- kuZTxWWUg3QOYpai8A7j/U4ZHppTUC7Fd8ltOS8Apkmrc94w3Acf2MJXgFsloRoj2vokj2N61
- gu8ocEvUH06KW5lm+sb+sr7Fsn7+N6kUqkysgeqS29lPwoS8WugjX7NouTMpA74pWZ9KKObsY
- NtH/GdhB9HNdOKzoD7NPXn4SYrE5o7wnEYt3I1m0ZIsoazC6XW5tezFY9H2Q2qs+b1fjsrJL7
- ih7jlDJCh2rgprVJrTItX9rnlhV73hv850A4Hh+5C3J/YR2/6IuuHmS8Vej9zCHdK6r7qoOzi
- msqgF/+uhKRMbiajBEgr9CoSRR8KVx+EIhCq7Pyj576h96RasPEDJNnMjRgIzsK5SAY9oHbbU
- wE6OgZCNBKuYbUSCi+S7MPIV6ttz26d0j3cHmXBNvbs7FK+Co4rD0qtsJ1j3eFremrGGGEBXu
- Qmhy/+U99tALuyL/aHB0IpgEUhaMCMtIDmR0q6ZCNux2Qp7n03tEhmJgbKv+Unp4bmJtAFxwo
- HZRncB4suxHo1zHmLt5FvNab95gWMgSeqgg0BUdEPdpit+If15J1jQrn4+dn5M8XnVhZnYzZ+
- UXO9OZOBNKu8CMq7QqrYRqqTTQ7sQEdE3Q3ISi4xtTK5yPBB9RE2yD6SYrcR1zbUSzuFeV936
- braH0K8XJ6MIMqfNT7Ds3jUboQu8=
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v3 01/15] mptcp: pm: drop info of
+ userspace_pm_remove_id_zero_address
+Content-Language: en-GB
+To: Simon Horman <horms@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-0-71753ed957de@kernel.org>
+ <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-1-71753ed957de@kernel.org>
+ <20250210194934.GO554665@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250210194934.GO554665@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Simon,
+Hi Simon,
 
-On Thu, 6 Feb 2025 13:25:38 +0000, Simon Horman <horms@kernel.org> wrote:
+On 10/02/2025 20:49, Simon Horman wrote:
+> On Fri, Feb 07, 2025 at 02:59:19PM +0100, Matthieu Baerts (NGI0) wrote:
+>> From: Geliang Tang <tanggeliang@kylinos.cn>
+>>
+>> The only use of 'info' parameter of userspace_pm_remove_id_zero_address()
+>> is to set an error message into it.
+>>
+>> Plus, this helper will only fail when it cannot find any subflows with a
+>> local address ID 0.
+>>
+>> This patch drops this parameter and sets the error message where this
+>> function is called in mptcp_pm_nl_remove_doit().
+>>
+>> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+>> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-> On Wed, Feb 05, 2025 at 02:11:45PM +0100, Peter Seiderer wrote:
-> > Align some variable declarations (in get_imix_entries and get_labels) =
-to
-> > the most common pattern (int instead of ssize_t/long) and adjust funct=
-ion
-> > return value accordingly.
-> >
-> > Signed-off-by: Peter Seiderer <ps.report@gmx.net>
->
-> Hi Peter,
->
-> These comments are is true in general of this patchset, but particularly=
- so
-> in the case of this patch:
->
-> * I think a more succinct subject would be nice.
-> * I think the patch description should provide some reason
->   _why_ the change is being made.
+Thank you for the review, and this message!
 
-Yep, will improve...
+> A minor nit, perhaps it has been discussed before:
+> 
+> I'm not sure that your Reviewed-by is needed if you also provide
+> your Signed-off-by. Because it I think that the latter implies the former.
 
->
-> Also, specifically relating to this patch, I wonder if it's scope ought =
-to
-> be extended. For example, the two callers of num_arg(), get_imix_entries=
-() and
-> pktgen_if_write() assign the return value of num_arg() to len, which is =
-now
-> an int in both functions. But num_args() returns a long.
+This has been discussed a while ago, but only on the MPTCP list I think.
+To be honest, we didn't find a precise answer in the doc [1], and maybe
+we are doing it wrong for all this time :)
 
-Aim was to get rid of the int/long mixture in the code (which works flawle=
-ss
-because no one writes to proc with more than a few bytes AND count is limi=
-ted
-to INT_MAX - PAGE_SIZE in vfs_write (see [1], [2])...
+Technically, when someone shares a patch on the MPTCP ML, someone else
+does the review, sent the "Reviewed-by" tag, then the patch is queued,
+and the one sending the patch to the netdev ML adds a "Signed-off-by"
+tag. With this patch here, I did both.
 
-I believe the clean way is to use
+Before, we were removing the RvB tag when it was the same as the SoB
+one, but we stopped doing that because we thought that was not correct
+and / or not needed. We can re-introduce this if preferred. My
+understanding is that the SoB tag is for the authors and the
+intermediate maintainers -- who might have not done a full review --
+while the RvB one seems to indicate that a "proper" review has been
+done. If someone else does a review on a patch, I can add my SoB tag
+when "forwarding" the patch, trusting the review done by someone else.
 
-  size_t i, max;
-  ssize_t len;
+Do you think it is better to remove the RvB tag if there is a SoB one
+for the same person?
 
-consequently through out the code and adjust the function signatures
-accordingly...., will re-spin...
+[1] https://docs.kernel.org/process/submitting-patches.html
 
->
-> > ---
-> > Changes v3 -> v4
-> >   - new patch (factored out of patch 'net: pktgen: fix access outside =
-of user
-> >     given buffer in pktgen_if_write()')
-> > ---
-> >  net/core/pktgen.c | 14 ++++++--------
-> >  1 file changed, 6 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> > index 4f201a2db2dc..279910367ad4 100644
-> > --- a/net/core/pktgen.c
-> > +++ b/net/core/pktgen.c
-> > @@ -850,12 +850,11 @@ static int strn_len(const char __user * user_buf=
-fer, unsigned int maxlen)
-> >   * where each entry consists of size and weight delimited by commas.
-> >   * "size1,weight_1 size2,weight_2 ... size_n,weight_n" for example.
-> >   */
-> > -static ssize_t get_imix_entries(const char __user *buffer,
-> > -				struct pktgen_dev *pkt_dev)
-> > +static int get_imix_entries(const char __user *buffer,
-> > +			    struct pktgen_dev *pkt_dev)
-> >  {
-> > -	int i =3D 0;
-> > -	long len;
-> >  	char c;
-> > +	int i =3D 0, len;
->
-> Given it can be achieved with exactly the same lines changed, just in a
-> different order, please arrange the local variable declarations in rever=
-se
-> xmas tree order - longest line to shortest.
->
-> Likewise for the other hunk of this patch.  And I believe there are also
-> other cases in this patchset where this comment applied.
->
-> The following tool can be useful:
-> https://github.com/ecree-solarflare/xmastree
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-O.k. will take a look at it...
-
-Thanks for review!
-
-Regards,
-Peter
-
-
-[1] https://elixir.bootlin.com/linux/v6.13.1/source/fs/read_write.c#L673
-[2] https://elixir.bootlin.com/linux/v6.13.1/source/include/linux/fs.h#L27=
-04
 
