@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-165264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33C8FA314ED
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:22:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FEFA314EE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:22:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D1C07A25B3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:21:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B141B3A8770
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08843264604;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CB3267B63;
 	Tue, 11 Feb 2025 19:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5hzdK3D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gcFgMXga"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68BA2638B9
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEAB26462F
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739301716; cv=none; b=aA9q8MO8yct2/rX45tuTnf6ulejKCZDaJxNmnhcv82gM5HDVl+57CApwNXmENIvFNqswb0a49QB5YELh7TsQe0M8xCH+uxzmpYBMDjFr2G8z6x9zKlSp8570I7TR+rS99v9te5xDFUL3zaLZOXIGl5JfWPKLVJb+x0Fy8p7Buhc=
+	t=1739301717; cv=none; b=YiAFmmyZZi0gf4InIs5v32tr+r32bTbyT+i0ici3PzS4IgRqde0I9jxy6EbQLbpFz8YaIaVSYIXSJzR6Lkch6n6Zk6Eyda2ShheAz/vSz7lfoQtUth1isCo+OkkXpUYqqrhnIuxBEsMccQyESFv29zzPTaqfwz7ikxNHhvmwSOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739301716; c=relaxed/simple;
-	bh=fSPkE7Mv3vTWh6CGvDBIhihiYlnu+RRShY7EuN6XNWk=;
+	s=arc-20240116; t=1739301717; c=relaxed/simple;
+	bh=CArz82Anvc/7F9u1LnrrHmskQGbrAGkvw6Iw0x+5aGU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QYwOhgB1yqTcb/c3kHSqRBAb40z0qKxC1w2K9LT8bPGtWhILuug84yYSyarAuPfcDVCsN3c4GYjHwvWMD+VtjlTo74ot+VMsl6shkEBKW55FYGq0vTIc826aEVjHpYHJ9SaY1zEcRsCh2FA0xlEGwlFZefMRpdAh0aCo8mk9gxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5hzdK3D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50049C4CEED;
+	 MIME-Version; b=HI3jOUJdWdNoIEs+o61QTnsQBHzdtWlSe8ZXGaScJfoKnKpK/R46wOZxCn0JMo1M2PGO1R2yZiP2C4+BILLes1/eAs2cBk7yefbb7bC4UwCiCcpoePkqxi5caUIZSIGJZ1w0NiTLdYFvxMcnDzMrgUFHch3K5HvUTmSjXIOMAU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gcFgMXga; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08B8C4CEE7;
 	Tue, 11 Feb 2025 19:21:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739301716;
-	bh=fSPkE7Mv3vTWh6CGvDBIhihiYlnu+RRShY7EuN6XNWk=;
+	s=k20201202; t=1739301717;
+	bh=CArz82Anvc/7F9u1LnrrHmskQGbrAGkvw6Iw0x+5aGU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h5hzdK3DQbJr/NRg1iUfupXxI3XQQfTEabY9xuPhsrDTIARhim4LpeuvJ2Le5hyyu
-	 TaWC1ao7ZPeEyu6iuYSd/GjoqiJJz75xBxOvilgJmXylcX8hpgk2SYks2M/1u9sG0A
-	 SJ7tnt7+Abu0TsfOuhX464a9Ps5wriEeEG5UXgFdLWL2qvaCyXDMulnRqyP8Wn1AlF
-	 KOxtitY5zK7Q0ZT5JLqzSt/6xjIFOgIxqtEjOiTpSCt5RmY1hP1CaBv1fR1AL/5NA8
-	 AXwbXxeu+pPhR+jLXyVprB+z10O5VMkYjTVmkK7xEvIRU4tL8OyujB/m45/qcEZk9O
-	 hrzESJTGvPf1A==
+	b=gcFgMXgaSYtOmxkIxN9OZD4uoTUt6Oeq6lZnvFYgVuFoafVmssPQ+WxFvjRyvE8V4
+	 Pw0/odxUD048dPV0/2iGAmDvsxeCVyrJlL7La7ouSBpPnKRMlttXhJNtd7aczpbKEs
+	 RswHuh/pprkzHqAzU8m1JlXHnFBqtTyv9MYxIDaT31VRNZB++XQzsAb3mQ8eTwcNGf
+	 MH3wtdMu0WHn7hWc9F9aFzxsSGPP2JVANTCNhfkst4p57QuryrMKvWjrbooPrg2nPW
+	 D1S7PaMERRtpsQUbn9xD9e7gVbw1j/yuRbsrzotdAsi1/7fZxzCpFYvBkyPR8zEMXZ
+	 650PZXpwlJqQw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: tariqt@nvidia.com,
@@ -52,9 +52,9 @@ Cc: tariqt@nvidia.com,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/4] eth: mlx4: remove the local XDP fast-recycling ring
-Date: Tue, 11 Feb 2025 11:21:40 -0800
-Message-ID: <20250211192141.619024-4-kuba@kernel.org>
+Subject: [PATCH net-next v2 4/4] eth: mlx4: use the page pool for Rx buffers
+Date: Tue, 11 Feb 2025 11:21:41 -0800
+Message-ID: <20250211192141.619024-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250211192141.619024-1-kuba@kernel.org>
 References: <20250211192141.619024-1-kuba@kernel.org>
@@ -66,141 +66,207 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It will be replaced with page pool's built-in recycling.
+Simple conversion to page pool. Preserve the current fragmentation
+logic / page splitting. Each page starts with a single frag reference,
+and then we bump that when attaching to skbs. This can likely be
+optimized further.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2: no change
+v2:
+ - remove unnecessary .max_len setting
+v1: https://lore.kernel.org/20250205031213.358973-5-kuba@kernel.org
 ---
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h | 11 ------
- drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 40 --------------------
- drivers/net/ethernet/mellanox/mlx4/en_tx.c   | 11 +-----
- 3 files changed, 2 insertions(+), 60 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  1 -
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 55 +++++++-------------
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  8 +--
+ 3 files changed, 25 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-index 29f48e63081b..97311c98569f 100644
+index 97311c98569f..ad0d91a75184 100644
 --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
 +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-@@ -253,14 +253,6 @@ struct mlx4_en_rx_alloc {
+@@ -247,7 +247,6 @@ struct mlx4_en_tx_desc {
  
- #define MLX4_EN_CACHE_SIZE (2 * NAPI_POLL_WEIGHT)
- 
--struct mlx4_en_page_cache {
--	u32 index;
--	struct {
--		struct page	*page;
--		dma_addr_t	dma;
--	} buf[MLX4_EN_CACHE_SIZE];
--};
--
- enum {
- 	MLX4_EN_TX_RING_STATE_RECOVERING,
+ struct mlx4_en_rx_alloc {
+ 	struct page	*page;
+-	dma_addr_t	dma;
+ 	u32		page_offset;
  };
-@@ -343,7 +335,6 @@ struct mlx4_en_rx_ring {
- 	void *buf;
- 	void *rx_info;
- 	struct bpf_prog __rcu *xdp_prog;
--	struct mlx4_en_page_cache page_cache;
- 	unsigned long bytes;
- 	unsigned long packets;
- 	unsigned long csum_ok;
-@@ -708,8 +699,6 @@ netdev_tx_t mlx4_en_xmit_frame(struct mlx4_en_rx_ring *rx_ring,
- 			       struct mlx4_en_priv *priv, unsigned int length,
- 			       int tx_ind, bool *doorbell_pending);
- void mlx4_en_xmit_doorbell(struct mlx4_en_tx_ring *ring);
--bool mlx4_en_rx_recycle(struct mlx4_en_rx_ring *ring,
--			struct mlx4_en_rx_alloc *frame);
  
- int mlx4_en_create_tx_ring(struct mlx4_en_priv *priv,
- 			   struct mlx4_en_tx_ring **pring,
 diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-index da57ab39d4bd..38d2d3aaf1e6 100644
+index 38d2d3aaf1e6..8dddf2e897e2 100644
 --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
 +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-@@ -142,18 +142,6 @@ static int mlx4_en_prepare_rx_desc(struct mlx4_en_priv *priv,
- 		(index << ring->log_stride);
- 	struct mlx4_en_rx_alloc *frags = ring->rx_info +
- 					(index << priv->log_rx_info);
--	if (likely(ring->page_cache.index > 0)) {
--		/* XDP uses a single page per frame */
--		if (!frags->page) {
--			ring->page_cache.index--;
--			frags->page = ring->page_cache.buf[ring->page_cache.index].page;
--			frags->dma  = ring->page_cache.buf[ring->page_cache.index].dma;
--		}
--		frags->page_offset = XDP_PACKET_HEADROOM;
--		rx_desc->data[0].addr = cpu_to_be64(frags->dma +
--						    XDP_PACKET_HEADROOM);
--		return 0;
--	}
+@@ -52,57 +52,39 @@
  
- 	return mlx4_en_alloc_frags(priv, ring, rx_desc, frags, gfp);
+ #include "mlx4_en.h"
+ 
+-static int mlx4_alloc_page(struct mlx4_en_priv *priv,
+-			   struct mlx4_en_rx_alloc *frag,
+-			   gfp_t gfp)
+-{
+-	struct page *page;
+-	dma_addr_t dma;
+-
+-	page = alloc_page(gfp);
+-	if (unlikely(!page))
+-		return -ENOMEM;
+-	dma = dma_map_page(priv->ddev, page, 0, PAGE_SIZE, priv->dma_dir);
+-	if (unlikely(dma_mapping_error(priv->ddev, dma))) {
+-		__free_page(page);
+-		return -ENOMEM;
+-	}
+-	frag->page = page;
+-	frag->dma = dma;
+-	frag->page_offset = priv->rx_headroom;
+-	return 0;
+-}
+-
+ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
+ 			       struct mlx4_en_rx_ring *ring,
+ 			       struct mlx4_en_rx_desc *rx_desc,
+ 			       struct mlx4_en_rx_alloc *frags,
+ 			       gfp_t gfp)
+ {
++	dma_addr_t dma;
+ 	int i;
+ 
+ 	for (i = 0; i < priv->num_frags; i++, frags++) {
+ 		if (!frags->page) {
+-			if (mlx4_alloc_page(priv, frags, gfp)) {
++			frags->page = page_pool_alloc_pages(ring->pp, gfp);
++			if (!frags->page) {
+ 				ring->alloc_fail++;
+ 				return -ENOMEM;
+ 			}
++			page_pool_fragment_page(frags->page, 1);
++			frags->page_offset = priv->rx_headroom;
++
+ 			ring->rx_alloc_pages++;
+ 		}
+-		rx_desc->data[i].addr = cpu_to_be64(frags->dma +
+-						    frags->page_offset);
++		dma = page_pool_get_dma_addr(frags->page);
++		rx_desc->data[i].addr = cpu_to_be64(dma + frags->page_offset);
+ 	}
+ 	return 0;
  }
-@@ -431,26 +419,6 @@ void mlx4_en_recover_from_oom(struct mlx4_en_priv *priv)
+ 
+ static void mlx4_en_free_frag(const struct mlx4_en_priv *priv,
++			      struct mlx4_en_rx_ring *ring,
+ 			      struct mlx4_en_rx_alloc *frag)
+ {
+-	if (frag->page) {
+-		dma_unmap_page(priv->ddev, frag->dma,
+-			       PAGE_SIZE, priv->dma_dir);
+-		__free_page(frag->page);
+-	}
++	if (frag->page)
++		page_pool_put_full_page(ring->pp, frag->page, false);
+ 	/* We need to clear all fields, otherwise a change of priv->log_rx_info
+ 	 * could lead to see garbage later in frag->page.
+ 	 */
+@@ -167,7 +149,7 @@ static void mlx4_en_free_rx_desc(const struct mlx4_en_priv *priv,
+ 	frags = ring->rx_info + (index << priv->log_rx_info);
+ 	for (nr = 0; nr < priv->num_frags; nr++) {
+ 		en_dbg(DRV, priv, "Freeing fragment:%d\n", nr);
+-		mlx4_en_free_frag(priv, frags + nr);
++		mlx4_en_free_frag(priv, ring, frags + nr);
  	}
  }
  
--/* When the rx ring is running in page-per-packet mode, a released frame can go
-- * directly into a small cache, to avoid unmapping or touching the page
-- * allocator. In bpf prog performance scenarios, buffers are either forwarded
-- * or dropped, never converted to skbs, so every page can come directly from
-- * this cache when it is sized to be a multiple of the napi budget.
-- */
--bool mlx4_en_rx_recycle(struct mlx4_en_rx_ring *ring,
--			struct mlx4_en_rx_alloc *frame)
--{
--	struct mlx4_en_page_cache *cache = &ring->page_cache;
--
--	if (cache->index >= MLX4_EN_CACHE_SIZE)
--		return false;
--
--	cache->buf[cache->index].page = frame->page;
--	cache->buf[cache->index].dma = frame->dma;
--	cache->index++;
--	return true;
--}
--
- void mlx4_en_destroy_rx_ring(struct mlx4_en_priv *priv,
- 			     struct mlx4_en_rx_ring **pring,
- 			     u32 size, u16 stride)
-@@ -476,14 +444,6 @@ void mlx4_en_destroy_rx_ring(struct mlx4_en_priv *priv,
- void mlx4_en_deactivate_rx_ring(struct mlx4_en_priv *priv,
- 				struct mlx4_en_rx_ring *ring)
- {
--	int i;
--
--	for (i = 0; i < ring->page_cache.index; i++) {
--		dma_unmap_page(priv->ddev, ring->page_cache.buf[i].dma,
--			       PAGE_SIZE, priv->dma_dir);
--		put_page(ring->page_cache.buf[i].page);
--	}
--	ring->page_cache.index = 0;
- 	mlx4_en_free_rx_buf(priv, ring);
- 	if (ring->stride <= TXBB_SIZE)
- 		ring->buf -= TXBB_SIZE;
+@@ -470,7 +452,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
+ 		if (unlikely(!page))
+ 			goto fail;
+ 
+-		dma = frags->dma;
++		dma = page_pool_get_dma_addr(page);
+ 		dma_sync_single_range_for_cpu(priv->ddev, dma, frags->page_offset,
+ 					      frag_size, priv->dma_dir);
+ 
+@@ -481,6 +463,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
+ 		if (frag_info->frag_stride == PAGE_SIZE / 2) {
+ 			frags->page_offset ^= PAGE_SIZE / 2;
+ 			release = page_count(page) != 1 ||
++				  atomic_long_read(&page->pp_ref_count) != 1 ||
+ 				  page_is_pfmemalloc(page) ||
+ 				  page_to_nid(page) != numa_mem_id();
+ 		} else if (!priv->rx_headroom) {
+@@ -494,10 +477,9 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
+ 			release = frags->page_offset + frag_info->frag_size > PAGE_SIZE;
+ 		}
+ 		if (release) {
+-			dma_unmap_page(priv->ddev, dma, PAGE_SIZE, priv->dma_dir);
+ 			frags->page = NULL;
+ 		} else {
+-			page_ref_inc(page);
++			page_pool_ref_page(page);
+ 		}
+ 
+ 		nr++;
+@@ -767,7 +749,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 			/* Get pointer to first fragment since we haven't
+ 			 * skb yet and cast it to ethhdr struct
+ 			 */
+-			dma = frags[0].dma + frags[0].page_offset;
++			dma = page_pool_get_dma_addr(frags[0].page);
++			dma += frags[0].page_offset;
+ 			dma_sync_single_for_cpu(priv->ddev, dma, sizeof(*ethh),
+ 						DMA_FROM_DEVICE);
+ 
+@@ -806,7 +789,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 			void *orig_data;
+ 			u32 act;
+ 
+-			dma = frags[0].dma + frags[0].page_offset;
++			dma = page_pool_get_dma_addr(frags[0].page);
++			dma += frags[0].page_offset;
+ 			dma_sync_single_for_cpu(priv->ddev, dma,
+ 						priv->frag_info[0].frag_size,
+ 						DMA_FROM_DEVICE);
+@@ -869,6 +853,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 		skb = napi_get_frags(&cq->napi);
+ 		if (unlikely(!skb))
+ 			goto next;
++		skb_mark_for_recycle(skb);
+ 
+ 		if (unlikely(ring->hwtstamp_rx_filter == HWTSTAMP_FILTER_ALL)) {
+ 			u64 timestamp = mlx4_en_get_cqe_ts(cqe);
 diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-index 6e077d202827..fe1378a689a1 100644
+index fe1378a689a1..87f35bcbeff8 100644
 --- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
 +++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-@@ -350,16 +350,9 @@ u32 mlx4_en_recycle_tx_desc(struct mlx4_en_priv *priv,
+@@ -44,6 +44,7 @@
+ #include <linux/ipv6.h>
+ #include <linux/indirect_call_wrapper.h>
+ #include <net/ipv6.h>
++#include <net/page_pool/helpers.h>
+ 
+ #include "mlx4_en.h"
+ 
+@@ -350,9 +351,10 @@ u32 mlx4_en_recycle_tx_desc(struct mlx4_en_priv *priv,
  			    int napi_mode)
  {
  	struct mlx4_en_tx_info *tx_info = &ring->tx_info[index];
--	struct mlx4_en_rx_alloc frame = {
--		.page = tx_info->page,
--		.dma = tx_info->map0_dma,
--	};
++	struct page_pool *pool = ring->recycle_ring->pp;
  
--	if (!napi_mode || !mlx4_en_rx_recycle(ring->recycle_ring, &frame)) {
--		dma_unmap_page(priv->ddev, tx_info->map0_dma,
--			       PAGE_SIZE, priv->dma_dir);
--		put_page(tx_info->page);
--	}
-+	dma_unmap_page(priv->ddev, tx_info->map0_dma, PAGE_SIZE, priv->dma_dir);
-+	put_page(tx_info->page);
+-	dma_unmap_page(priv->ddev, tx_info->map0_dma, PAGE_SIZE, priv->dma_dir);
+-	put_page(tx_info->page);
++	/* Note that napi_mode = 0 means ndo_close() path, not budget = 0 */
++	page_pool_put_full_page(pool, tx_info->page, !!napi_mode);
  
  	return tx_info->nr_txbb;
  }
+@@ -1189,7 +1191,7 @@ netdev_tx_t mlx4_en_xmit_frame(struct mlx4_en_rx_ring *rx_ring,
+ 	tx_desc = ring->buf + (index << LOG_TXBB_SIZE);
+ 	data = &tx_desc->data;
+ 
+-	dma = frame->dma;
++	dma = page_pool_get_dma_addr(frame->page);
+ 
+ 	tx_info->page = frame->page;
+ 	frame->page = NULL;
 -- 
 2.48.1
 
