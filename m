@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-165019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA77A30164
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:20:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9448A30165
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF2143A32E9
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:20:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612033A452F
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16A126BDAE;
-	Tue, 11 Feb 2025 02:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CDE34CF5;
+	Tue, 11 Feb 2025 02:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CB0ANQiT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEeKJRlj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA65626BD92
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 02:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B0622087;
+	Tue, 11 Feb 2025 02:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739240406; cv=none; b=F7dLiLk3HBnOsqSwDnYIA1HezNNvTvOlAffTm4kcqXoEMt+k1Q7+nq9rJLf0A8JYzhY+j5jyQ38PF3i58XFI5hwiv9dW8C52cL3j5j5ovo2b+l5rr1o7QOUqsWTlF1NaEYWXONQTQ/GSdBaDHQqiAAm0VMzeBd1vHEEwxQ045k8=
+	t=1739240408; cv=none; b=kNPiPnsnop3jUdSdPw6hGpmH8oEPVbA2GEPX8NCNrV5cz4V7g9G44Q3soSGGYjKv/lszWsOYIdFSnvG7KShS6i8LRIM4mw5yMBrGUeChjdSBW5XHrzwtqZeRFV4RbgWOS8exkrs2jtvB5ReQ2jp2W0SEgrmmZBrvZOqLbPPO7aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739240406; c=relaxed/simple;
-	bh=Udl6tAWiWvjs8bz2XMX2HX45zAXK/jzTJp/So4sYzUM=;
+	s=arc-20240116; t=1739240408; c=relaxed/simple;
+	bh=VY+/8ionxKmfwjQxsDXYmmBDjQzQPrPKcY7WRlFwnjo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sVQFoA5Ei4z+R+kTKm6FTa/cTXeDkbJqXopxLmWxCM31+Xd3SUiBRa9LjnB0xkQVHdw/OxHdCM7ZC6xzuXZ+bTbISRJ3go3oJ6H1lsczeOSfTU4Jhq5wJEkJlyuzy3ysO+vfMUbN0u3KXE/gScU2xbgtLJJB+RL9Hzu6gjfyaCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CB0ANQiT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2403CC4CED1;
-	Tue, 11 Feb 2025 02:20:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mIlkZLjkul6mUgOX5AM46vZEy22i2ZR+Z3MRBHEt6RPRj+YB8KImPOHHiwMc7aUO8cq79r/4wC86FOx/8vyOXurQn4KNsKwAd8P4t2Xt8XDdW45VtHQBgfR9QlXbK8ZHUyiX7QjXtgJ3hM76V5hH2ieoa6WORGZxy6fJmmMmiO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEeKJRlj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9062FC4CEDF;
+	Tue, 11 Feb 2025 02:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739240406;
-	bh=Udl6tAWiWvjs8bz2XMX2HX45zAXK/jzTJp/So4sYzUM=;
+	s=k20201202; t=1739240407;
+	bh=VY+/8ionxKmfwjQxsDXYmmBDjQzQPrPKcY7WRlFwnjo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CB0ANQiTWCkLI12rpBpsyEsPapz+eH2WdwpG9dy4yU9BuqA+iFRBR1Q7EDrf4fIGc
-	 rhISgAVJJKz7tRuF+9sbiBVOiF2AxBIyNnddZa96D2ZjknKQJt7wqkthoV9AhxSlz4
-	 bKOmGuFaxZgtNwM+osLR6gTdE02wJH+06DIS0ACLEzeqVmcIk1ZBLIuCEUwSBsmvqv
-	 S+449euqfD+O7lHmpld57nURYTtGvBAqCXQBjnzGdvOZ1PpRbAjib+u1jwhDT8Z4+1
-	 gmRS3PtvYa+X/Y2HyHutR2DBeRjadN7H0LDSzC0KxhtH2lw8InEm+ekIFu2q4xMkSa
-	 edr//NBlk4tOw==
+	b=TEeKJRljgA6FLMCQ8FzM5xdzc4Of4tRmtNjqw0zN64ab1nI+J05Dmk+1mIDlegX7s
+	 q+qbII7/VKR7Z91PKpLt6RiLKZtMSb25hVl0gYR2b70nr1aP7Tahdg3ITJC2sa7fO5
+	 dzGvrbFEeTn2X8tRsjVeiNH7NsQtlspnaLBuHps3Vo2yI62yhJC4jWN29LZgnfLDwu
+	 01WWKmd3ksBFInw/jYxycxmXV8C1vpMjI+DPxi5CBtvnP2OYnHwlO5HUA5XAke+NAl
+	 0Kl8wsjpLnqvmBPmUsjC3TMvg86xZ5WBRXgqhhXjHQuYSG/lNsFnRlJhydkOKcD4w5
+	 +ftthsMP/roAg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4AB380AA7A;
-	Tue, 11 Feb 2025 02:20:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EC0380AA7A;
+	Tue, 11 Feb 2025 02:20:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,51 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/8] net: second round to use dev_net_rcu()
+Subject: Re: pull-request: wireless-2025-02-07
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173924043476.3915440.8394495190939470240.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Feb 2025 02:20:34 +0000
-References: <20250207135841.1948589-1-edumazet@google.com>
-In-Reply-To: <20250207135841.1948589-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, dsahern@kernel.org, kuniyu@amazon.com,
- horms@kernel.org, eric.dumazet@gmail.com
+ <173924043599.3915440.14928432497399020410.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Feb 2025 02:20:35 +0000
+References: <20250207182957.23315C4CED1@smtp.kernel.org>
+In-Reply-To: <20250207182957.23315C4CED1@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  7 Feb 2025 13:58:32 +0000 you wrote:
-> dev_net(dev) should either be protected by RTNL or RCU.
+On Fri,  7 Feb 2025 18:29:56 +0000 (UTC) you wrote:
+> Hi,
 > 
-> There is no LOCKDEP support yet for this helper.
+> here's a pull request to net tree, more info below. Please let me know if there
+> are any problems.
 > 
-> Adding it would trigger too many splats.
-> 
-> This second series fixes some of them.
+> Kalle
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/8] ndisc: ndisc_send_redirect() must use dev_get_by_index_rcu()
-    https://git.kernel.org/netdev/net/c/48145a57d4bb
-  - [net,2/8] ndisc: use RCU protection in ndisc_alloc_skb()
-    https://git.kernel.org/netdev/net/c/628e6d18930b
-  - [net,3/8] neighbour: use RCU protection in __neigh_notify()
-    https://git.kernel.org/netdev/net/c/becbd5850c03
-  - [net,4/8] arp: use RCU protection in arp_xmit()
-    https://git.kernel.org/netdev/net/c/a42b69f69216
-  - [net,5/8] openvswitch: use RCU protection in ovs_vport_cmd_fill_info()
-    https://git.kernel.org/netdev/net/c/90b2f49a502f
-  - [net,6/8] vrf: use RCU protection in l3mdev_l3_out()
-    https://git.kernel.org/netdev/net/c/6d0ce46a9313
-  - [net,7/8] ndisc: extend RCU protection in ndisc_send_skb()
-    https://git.kernel.org/netdev/net/c/ed6ae1f325d3
-  - [net,8/8] ipv6: mcast: extend RCU protection in igmp6_send()
-    https://git.kernel.org/netdev/net/c/087c1faa594f
+  - pull-request: wireless-2025-02-07
+    https://git.kernel.org/netdev/net/c/17847ea6ced8
 
 You are awesome, thank you!
 -- 
