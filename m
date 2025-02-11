@@ -1,230 +1,189 @@
-Return-Path: <netdev+bounces-165092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D18A3063C
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:48:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D139A30646
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CFCC3A415A
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:47:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36DA61882EC6
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503131F1311;
-	Tue, 11 Feb 2025 08:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68431F0E32;
+	Tue, 11 Feb 2025 08:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxbS8OPr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRhP0661"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AB11EF081;
-	Tue, 11 Feb 2025 08:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB651EF08E
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739263648; cv=none; b=CG7031uHLfg+3yMm7AYW8Tu1O7vWQyxo3RnNPc4Ud2ybXtvdA59Bnlp4l5MMy0uc1wB/mJKQ/7cIsffyRKujzuydfAialjvgumUFXQgn7LGO9wwtNUZyDkRQrlpJOZm+m2D/y1i84RIwGclpS450hD3nn3O9hDnz/w5YOpPzV/w=
+	t=1739263783; cv=none; b=JAlrx6vhCh9P+v6J7nG5vzEQyBHAW9kD9T/PLwYLNVQC719CHe0KQebmoQ3350spw6kodfZ2kI1gpXdIJf6/MlAOguL++tjSI1EqLspOX1XUABxhn8FNADz/FrMCH3ENpEUVgdAUVpcZHEZkhbllawECrNwpAn7YLClVwVupo40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739263648; c=relaxed/simple;
-	bh=k21+EIxAbZ2RNWIs6sTtq5HkT0oP1NdfuQqJ3Cg0Xns=;
+	s=arc-20240116; t=1739263783; c=relaxed/simple;
+	bh=tGGe6R9k07bfXinl0nS+60J8kkCn9Msd7ZYZxAChr1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AoWNOU4hFQ0TYVb0c8ipLHEZyyDINvoxWl6PpWXeSODNcvEYwdzTLbey7NcxX0QNQL2gbMtDt5kA8Ln6YMODFze18JZV92G9d8ZdJBcqJvzGJ3KtSr6sQWIDa3NLWbvtXNqvEI3fYgfewA1tTLtUvXmUn10EBxe/OJV9gpACvto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxbS8OPr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0A91C4CEE4;
-	Tue, 11 Feb 2025 08:47:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739263647;
-	bh=k21+EIxAbZ2RNWIs6sTtq5HkT0oP1NdfuQqJ3Cg0Xns=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hxbS8OPr0wU/c6E85F335oSSbrLRCaeujvXRA/pMYWGZJfoXEbIJdZBcnJWK0L3Uj
-	 9g1oOOPo3F/iK9m+/pCESvVcC2ygY+Z+4K+6vWgREaNUoPOox7gvJvLCyR4lH7pzBs
-	 kDZlUtdKVIa1h7cXUo0xolCxaGzYoSq53xtDrybMSGYzKC1i3TIHOX3SeJdqMCIKBK
-	 D/Lv3AS6he/Q363o079npAvyOhBtCXTg4A/fZZp3RxXaHPLPFg0SU24Pb111btNqrY
-	 HtgBzYCsg1HQIUcvilN8c9+Dzhc4efaErZsasZj4LHMV9Z8fz1qokGa5BJZHIyeH7o
-	 hWsPzX+uPwscQ==
-Date: Tue, 11 Feb 2025 09:47:24 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>, 
-	Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, upstream@airoha.com
-Subject: Re: [PATCH net-next v3 13/16] net: airoha: Introduce PPE
- initialization via NPU
-Message-ID: <20250211-fanatic-smoky-wren-f0dcc9@krzk-bin>
-References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
- <20250209-airoha-en7581-flowtable-offload-v3-13-dba60e755563@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p9DezdFZ4YlWBhVpmB4tCRxhhpQtLdd77cPV4XB6qcw7AqfTe/o61i1y2El+SpZ3bzNHS/QL9W/rsBmIsF4PnOkCmE1YgXzk+bVdq5sReEAWeG95kwIvExmv3aJNR/hXLDnk73wHJDWgnKu36667vYAcOaWIWs4juPm5LHIOTX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRhP0661; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739263781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LRMrU6yeeMWRAhnsRZJcbJf4YV+OqMKei44I5o7lAMg=;
+	b=CRhP0661Y7fWgDMgWjdBkixpKdUX+Mwj36oK/xgbczE9/IbIKvkVuxAfmjcMyWaPxcAzjP
+	gvzjVeoffj1AIzC8uI6ixxvbJMnstWvVOEgkD96cy7mnHRjgIoyzeEJ5NhNUoWgH2ctI6W
+	Ng3VRyivbnKMh5StutajlP5HcdFOmWs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-sZQdrHf6OF-fpSZRuS8Q4w-1; Tue, 11 Feb 2025 03:49:39 -0500
+X-MC-Unique: sZQdrHf6OF-fpSZRuS8Q4w-1
+X-Mimecast-MFC-AGG-ID: sZQdrHf6OF-fpSZRuS8Q4w
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38dc6aad9f8so2047566f8f.1
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:49:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739263778; x=1739868578;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LRMrU6yeeMWRAhnsRZJcbJf4YV+OqMKei44I5o7lAMg=;
+        b=ks+ZEzHhB2a0Ckju874J+UN6QAgW2SVyq6OeFoXNyWCvZusySNKlmdP0zXKzu64wIj
+         gsEDv6ZCfAvzNItp39QVl13EuB198moE/eWnHisMG1s0q/1v7HeTgEbx6ZFRfP5CcOh5
+         yi1J96nOsC3eXt7uoJ9TMgFyljJ1EXr37H0yncLZZBP3nAHk2pNphm1+DEii0UtJeaIa
+         TH2ebi0ON/HNrrbJ9je+UwZjBpvbOsrrNG9LM2SflUqQ9fCZxEG5b3n45+DAPy8uFl9m
+         SE5I7Dx9OJmHEBpQLEnGjmktN590JwYR798vn4sEi3ZKOY/iExu0p12i4w+yhCAoPzZ9
+         BCJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVivlc5lo8qI7t188G1FTncDjvNgafuqdmxMW/qz9agSD4sxX7waxibbj4Gpgq2phY1DFvsJEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEEqz3uS3kIHvlDjJdfLegtjLRl3tsqwjnBmbUn7GOdKj2dbq9
+	liurBuWgBFsavXV+gupl+Vd72+HBgC3aKV6q8cF7/iWIprL5O/oeU+YytOP7VBEf3yehAG7BAjg
+	bQH7NyXNyHdbIaWdmo55aiM5BavwfEkxZe+J94PaPXBU7M+/8aXD1Mg==
+X-Gm-Gg: ASbGncv2H3QC/OaWHCGQWqGUdmxOvpa7wRBd+ONkpPej+zDJYrnblzVJcbgVe8Dp5CR
+	cFlJBaKPZPcoBpNOq1p96UX+i1jfXYImEOUNXsYh59aYJnzan4GpqQ49GDJ3d74kRNP3vKCgctV
+	ZW1MFKmRpYrIkFFJIzWBNWdYyGjQctIWCTbIIMKDMpMJ8nb8cqPW6dcSqpGtD6E6FI5j26cHNKP
+	bWKRcCtVBn3zRy9q5puNRPv0DSge+ax/Rh8dhuX6WFnxSBCgpDsSq1+jyo2N8iLgDk/WqzZ9rLz
+	9/TxfPlWx6k7aRTKfS2gqGR1AsT/1j4YDY57S2jWNphRXufWLQNA5g==
+X-Received: by 2002:a05:6000:1a8e:b0:38d:dffc:c14f with SMTP id ffacd0b85a97d-38de438e616mr1875227f8f.1.1739263778446;
+        Tue, 11 Feb 2025 00:49:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGeTzJoifNHnY5TL4dY0IJ4mNA0Zko6YQk6M6uAACokDE0hpUh2u8Fm8WqTwc8m/eZy3oWQ1Q==
+X-Received: by 2002:a05:6000:1a8e:b0:38d:dffc:c14f with SMTP id ffacd0b85a97d-38de438e616mr1875201f8f.1.1739263777811;
+        Tue, 11 Feb 2025 00:49:37 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d94d7c7sm202714805e9.14.2025.02.11.00.49.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 00:49:37 -0800 (PST)
+Date: Tue, 11 Feb 2025 09:49:32 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Junnan Wu <junnan01.wu@samsung.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, horms@kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	q1.huang@samsung.com, ying01.gao@samsung.com, ying123.xu@samsung.com, 
+	lei19.wang@samsung.com
+Subject: Re: [Patch net 2/2] vsock/virtio: Don't reset the created SOCKET
+ during suspend to ram
+Message-ID: <cmpw6mtpzkhsdqvsls6zutnswwgf3exuwdqvw5f5673fzuktol@y6fpwfcb73ns>
+References: <20250211071922.2311873-1-junnan01.wu@samsung.com>
+ <CGME20250211071946epcas5p3c2afde3813ab81142e81cff110ab7afa@epcas5p3.samsung.com>
+ <20250211071922.2311873-3-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250209-airoha-en7581-flowtable-offload-v3-13-dba60e755563@kernel.org>
+In-Reply-To: <20250211071922.2311873-3-junnan01.wu@samsung.com>
 
-On Sun, Feb 09, 2025 at 01:09:06PM +0100, Lorenzo Bianconi wrote:
-> +static irqreturn_t airoha_npu_wdt_handler(int irq, void *core_instance)
-> +{
-> +	struct airoha_npu_core *core = core_instance;
-> +	struct airoha_npu *npu = core->npu;
-> +	int c = core - &npu->cores[0];
-> +	u32 val;
-> +
-> +	airoha_npu_rmw(npu, REG_WDT_TIMER_CTRL(c), 0, WDT_INTR_MASK);
-> +	val = airoha_npu_rr(npu, REG_WDT_TIMER_CTRL(c));
-> +	if (FIELD_GET(WDT_EN_MASK, val))
-> +		schedule_work(&core->wdt_work);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +struct airoha_npu *airoha_npu_init(struct airoha_eth *eth)
-> +{
-> +	struct reserved_mem *rmem;
-> +	int i, irq, err = -ENODEV;
-> +	struct airoha_npu *npu;
-> +	struct device_node *np;
-> +
-> +	npu = devm_kzalloc(eth->dev, sizeof(*npu), GFP_KERNEL);
-> +	if (!npu)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	npu->np = of_parse_phandle(eth->dev->of_node, "airoha,npu", 0);
-> +	if (!npu->np)
-> +		return ERR_PTR(-ENODEV);
+On Tue, Feb 11, 2025 at 03:19:22PM +0800, Junnan Wu wrote:
+>Function virtio_vsock_vqs_del will be invoked in 2 cases
+>virtio_vsock_remove() and virtio_vsock_freeze().
+>
+>And when driver freeze, the connected socket will be set to TCP_CLOSE
+>and it will cause that socket can not be unusable after resume.
+>
+>Refactor function virtio_vsock_vqs_del to differentiate the 2 use cases.
+>
+>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 18 ++++++++++++------
+> 1 file changed, 12 insertions(+), 6 deletions(-)
 
-Why? The property is not required, so how can missing property fail the
-probe?
+We are still discussing this in v1:
 
-This is also still unnecessary ABI break without explanation/reasoning.
+https://lore.kernel.org/virtualization/iv6oalr6yuwsfkoxnorp4t77fdjheteyojauwf2phshucdxatf@ominy3hfcpxb/T/#u
 
-> +
-> +	npu->pdev = of_find_device_by_node(npu->np);
-> +	if (!npu->pdev)
-> +		goto error_of_node_put;
+Please stop sending new versions before reaching an agreement!
 
-You should also add device link and probably try_module_get. See
-qcom,ice (patch for missing try_module_get is on the lists).
+BTW I still think this is wrong, so:
 
-> +
-> +	get_device(&npu->pdev->dev);
+Nacked-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Why? of_find_device_by_node() does it.
 
-> +
-> +	npu->base = devm_platform_ioremap_resource(npu->pdev, 0);
-> +	if (IS_ERR(npu->base))
-> +		goto error_put_dev;
-> +
-> +	np = of_parse_phandle(npu->np, "memory-region", 0);
-> +	if (!np)
-> +		goto error_put_dev;
-> +
-> +	rmem = of_reserved_mem_lookup(np);
-> +	of_node_put(np);
-> +
-> +	if (!rmem)
-> +		goto error_put_dev;
-> +
-> +	irq = platform_get_irq(npu->pdev, 0);
-> +	if (irq < 0) {
-> +		err = irq;
-> +		goto error_put_dev;
-> +	}
-> +
-> +	err = devm_request_irq(&npu->pdev->dev, irq, airoha_npu_mbox_handler,
-> +			       IRQF_SHARED, "airoha-npu-mbox", npu);
-> +	if (err)
-> +		goto error_put_dev;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++) {
-> +		struct airoha_npu_core *core = &npu->cores[i];
-> +
-> +		spin_lock_init(&core->lock);
-> +		core->npu = npu;
-> +
-> +		irq = platform_get_irq(npu->pdev, i + 1);
-> +		if (irq < 0) {
-> +			err = irq;
-> +			goto error_put_dev;
-> +		}
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index f0e48e6911fc..909048c9069b 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -716,14 +716,20 @@ static void virtio_vsock_vqs_start(struct virtio_vsock *vsock)
+> 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> }
+>
+>-static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
+>+static void virtio_vsock_vqs_del(struct virtio_vsock *vsock, bool vsock_reset)
+> {
+> 	struct virtio_device *vdev = vsock->vdev;
+> 	struct sk_buff *skb;
+>
+>-	/* Reset all connected sockets when the VQs disappear */
+>-	vsock_for_each_connected_socket(&virtio_transport.transport,
+>-					virtio_vsock_reset_sock);
+>+	/* When driver is removed, reset all connected
+>+	 * sockets because the VQs disappear.
 
-This is all confusing. Why are you requesting IRQs for other - the npu -
-device? That device driver is responsible for its interrupts, not you
-here. This breaks encapsulation. And what do you do if the other device
-starts handling interrupts on its own? This is really unexpected to see
-here.
+You wrote it here too, you have to reset them because the VQs are going 
+to disappear, isn't it the same after the freeze?
 
-> +
-> +		err = devm_request_irq(&npu->pdev->dev, irq,
-> +				       airoha_npu_wdt_handler, IRQF_SHARED,
-> +				       "airoha-npu-wdt", core);
-> +		if (err)
-> +			goto error_put_dev;
-> +
-> +		INIT_WORK(&core->wdt_work, airoha_npu_wdt_work);
-> +	}
-> +
-> +	if (dma_set_coherent_mask(&npu->pdev->dev, 0xbfffffff))
-> +		dev_err(&npu->pdev->dev,
-> +			"failed coherent DMA configuration\n");
-> +
-> +	err = airoha_npu_run_firmware(npu, rmem);
-> +	if (err)
-> +		goto error_put_dev;
-> +
-> +	airoha_npu_wr(npu, REG_CR_NPU_MIB(10),
-> +		      rmem->base + NPU_EN7581_FIRMWARE_RV32_MAX_SIZE);
-> +	airoha_npu_wr(npu, REG_CR_NPU_MIB(11), 0x40000); /* SRAM 256K */
-> +	airoha_npu_wr(npu, REG_CR_NPU_MIB(12), 0);
-> +	airoha_npu_wr(npu, REG_CR_NPU_MIB(21), 1);
-> +	msleep(100);
-> +
-> +	/* setting booting address */
-> +	for (i = 0; i < AIROHA_NPU_NUM_CORES; i++)
-> +		airoha_npu_wr(npu, REG_CR_BOOT_BASE(i), rmem->base);
-> +	usleep_range(1000, 2000);
-> +
-> +	/* enable NPU cores */
-> +	/* do not start core3 since it is used for WiFi offloading */
-> +	airoha_npu_wr(npu, REG_CR_BOOT_CONFIG, 0xf7);
-> +	airoha_npu_wr(npu, REG_CR_BOOT_TRIGGER, 0x1);
-> +	msleep(100);
-> +
-> +	return npu;
-> +
-> +error_put_dev:
-> +	put_device(&npu->pdev->dev);
-
-Missing platform_device_put()
-
-> +error_of_node_put:
-> +	of_node_put(npu->np);
-> +
-> +	return ERR_PTR(err);
-> +}
-> +
-> +void airoha_npu_deinit(struct airoha_npu *npu)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++)
-> +		cancel_work_sync(&npu->cores[i].wdt_work);
-> +
-
-Leaking device put.
-
-> +	put_device(&npu->pdev->dev);
-> +	of_node_put(npu->np);
-
-Best regards,
-Krzysztof
+>+	 * When driver is just freezed, don't do that because the connected
+>+	 * socket still need to use after restore.
+>+	 */
+>+	if (vsock_reset) {
+>+		vsock_for_each_connected_socket(&virtio_transport.transport,
+>+						virtio_vsock_reset_sock);
+>+	}
+>
+> 	/* Stop all work handlers to make sure no one is accessing the device,
+> 	 * so we can safely call virtio_reset_device().
+>@@ -831,7 +837,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+> 	rcu_assign_pointer(the_virtio_vsock, NULL);
+> 	synchronize_rcu();
+>
+>-	virtio_vsock_vqs_del(vsock);
+>+	virtio_vsock_vqs_del(vsock, true);
+>
+> 	/* Other works can be queued before 'config->del_vqs()', so we flush
+> 	 * all works before to free the vsock object to avoid use after free.
+>@@ -856,7 +862,7 @@ static int virtio_vsock_freeze(struct virtio_device *vdev)
+> 	rcu_assign_pointer(the_virtio_vsock, NULL);
+> 	synchronize_rcu();
+>
+>-	virtio_vsock_vqs_del(vsock);
+>+	virtio_vsock_vqs_del(vsock, false);
+>
+> 	mutex_unlock(&the_virtio_vsock_mutex);
+>
+>-- 
+>2.34.1
+>
 
 
