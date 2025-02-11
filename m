@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-165066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43EBEA3047F
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:31:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B981A30495
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:36:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF8773A6AF1
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:31:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E41D166086
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6561E3DF7;
-	Tue, 11 Feb 2025 07:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eqomc+Ec"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0941EDA08;
+	Tue, 11 Feb 2025 07:36:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D48128819;
-	Tue, 11 Feb 2025 07:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAE11EB186;
+	Tue, 11 Feb 2025 07:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739259094; cv=none; b=AKfhVBG+iEER95zwnTGy2oFPtYZ/JNDf0e3WkLJOm2AO7AN071kiDGOnM8JI1StvxkwpTCRdwu8vt4HsDHyuBWAVUnQCMsrVN/iNsBbOPo5JKlu5z2kqGBnnPBn84fLkNwBQp2RQQzFYxqs7YuFXmO4RFO4ung76kzz7UEvFeJA=
+	t=1739259370; cv=none; b=UfuqLro+YyLiqu7kncg72Abz4wn1+2wJQEzE571MjKp/bsgyYQ0Oi/JJJXMoMIpYrY0MKqH+bq1ZCRm1o7sEjul/de1TcO9964UXWxNHauoPmklFR6qCkNX9YpHwa6UbYj5Kq+4g630ukf0zIhAXWjTzDHZHc8EnyKUEa+CPcBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739259094; c=relaxed/simple;
-	bh=fNXHZD0w81zVXb5WMwE53i1fejXnfLGbij1wF8RDOLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wttk61aKgwNvgpElNfy2n130mvgmkfmDeDx+ILKRvjf+jGPOgETdulLUGa3sWFe1Nl4E89cqA+01UmdDcdqQbKuCnv4OXK26kw2L97DY7L+ahyTcDnpRPB55M7daf1kL3nXkW7heSlMf6VYpfc1PLbXaUizI0f8E8EkhgrJ3JZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eqomc+Ec; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1739259370; c=relaxed/simple;
+	bh=ca9qHkrngL3pZjIQUsPXDFnGS5wTD5NqFcVTg825OqQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ACm9WPqY4cWJoigST/Gns/UtFyxeGOcz0AQ0gyBdDQj0BTbO9zP5ynckw4YsZ6vo5+IBBixVLDOtuEnE2aN+lgbVYYGsra5TZJlE1PW+uRKLstuIGgway+rWOtS25291KbmBuBLUWlp3Mb0uY+lCP9v+KdwW+Yb0YHY9itg2964=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21f6a47d617so45973025ad.2;
-        Mon, 10 Feb 2025 23:31:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739259092; x=1739863892; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hTH7Pm5uOLfD5YPyyOM3Aj+5Tf2V89zBjuGRtkm1M5Q=;
-        b=Eqomc+Ec4f8HzCKQSOY8u4l+px0Wwu4fov2gr5J5FyXOpZjdV1hcurW9gRxYcn6i+U
-         Y7gT/rX4RdIjEPbZUX+OZ++tGN6BotVN33ljT/mSXxL9VUFAKtSEFJUu33dATCdLSdzl
-         /fQuYVqAw6ro7tvbz/CtilCn5k8PA4czy4QiaE08UMKQluxaCVW6zZLV0QLjOm9zVcau
-         ECw44SZmFvdcLA+W6CG4lTlTeQKvsQP6zzIx43YjIiW79CSvvlyli+hSzAeqRN8Rkd83
-         t2ypM7HQT8WSyXww4ysdSefCOEtWO1uSp/3adXwl23wPZc++kv4fvveM/Gua+BsULS5s
-         EkRg==
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-866f0d69843so2839387241.3;
+        Mon, 10 Feb 2025 23:36:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739259092; x=1739863892;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hTH7Pm5uOLfD5YPyyOM3Aj+5Tf2V89zBjuGRtkm1M5Q=;
-        b=EJfMfM0eBYB98D53Ncx0/+sR1Bt66k53STmuvRl5hKaIB0LIw510TgYaHDz4Ae2wOd
-         0gUpVKvm7d2BdrPQca30Y2n6JwF+N6vjGsi6Di0FDRfgb2AY6AAMJfUmgdOfnybbcjPY
-         1lzYxZoo+2KjzH1rQzA0LdWzPeR1bb8YmVn5X6RW98xKIMdg6ts5i0R2MOj87v9bpkvV
-         m6TeQ0RLyYu+QXwtO65xNptlw9dTq0O0CcMpTEs6PTSprJRpV1CkTBEyAgG3Ud4QSryh
-         dhG9Jdtr5l8ImUGQJVjEs5EjcyXDkbr+doOF8C37q4NbWhDskMHgbMyLK5todE72RIiU
-         lTtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9xa/k+gaKGa6DNkFAfSfRM04lTlgCrKJopkl0Ped2GSgj/WtgQWSkpkACwNuNWPctwN2CwZoJBHaM2/WFfdBB@vger.kernel.org, AJvYcCX+l3XX/3/uJs3SO4xxIacAbJRp+VELcgv8n7rniPxNu1Y+dtTFQBVUrP/I9tv4NarPRWyXLq4U/GgJg6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEsAXhBDooK6ywbeLqRVy6bV/K2NRHWMUa+CWXoiaj6N3Kh+l0
-	E05VM310/AJPsTFDREhxm50KsEP2QO4YWh3XwKPWkRlg8eDdNoEzzaZE/oWff14=
-X-Gm-Gg: ASbGncs1vDO56IGWigpPbEcHRMuCYDp7vG+QnuPE0VO/AHMP3geG9MhVckl+6oMuY+Y
-	l6PbFrzQk6dmKmriKFD/2otzPbZX2vkZYRr3Rx3zSDS0C9jUs6hvOTjUJyPjjyB8ch4Mf4TWM3h
-	D1gnPsh5tVMjkNMonv4YiA9GtrYEqlxwSdBdsFlXQjYTTYwdrWSncIbYCH71T0anvAPOcyXjzxW
-	wsb1EpP1XrOesU/1ZDblXuXSTy56K6uvrewedADmaL8s4yjo9zd4Q87FlcMCyFq0uHMOPZ8Lm/d
-	4QbgfIBytuvGcgG4odKI
-X-Google-Smtp-Source: AGHT+IGs30M56X5gAKQnZAxB9fHIUoYBdvgrpgSZIn7PFxqdfYyq2SNPZej4vAjy56zlwVX1mmBcEw==
-X-Received: by 2002:a17:902:c94c:b0:21f:4c65:6290 with SMTP id d9443c01a7336-21f4e6a0641mr305340305ad.1.1739259092134;
-        Mon, 10 Feb 2025 23:31:32 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3687e68bsm89975435ad.169.2025.02.10.23.31.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 23:31:30 -0800 (PST)
-Date: Tue, 11 Feb 2025 07:31:23 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
-Message-ID: <Z6r8y1U4C_s1-3jV@fedora>
-References: <20250207092920.543458-1-liuhangbin@gmail.com>
- <Z6b67YBbERi5v9gt@fedora>
+        d=1e100.net; s=20230601; t=1739259364; x=1739864164;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v4rL6fRpPDW3WWAnvPDGJsUVffkkAT6CPBcGQAburtc=;
+        b=IjCQCuDLwRcOSFOLv2XBVUPIC7LM7UPQ2rt9+biA3Eq9/BU1SFLzTFzVWoTsJ8Auaa
+         09EfbP5mdx0BCZWT1aydakQyOmxGbOiZcNEC0yyH7KKrCUi1ZVR7WudYSAe+AVGrpd+l
+         gjSBjYkHv6MHJGQBrCE+e94DV8yRpyGM6zGvRERya34RL/9cDvSmfEJ4xrTi8yqgyMiP
+         V3/gA9Nd9078zDqLm60FC7p3r9RXu1auF4urVmiaGWfEFiJUoXdtbU0g3OHfs3vBNB8o
+         JDHi6CobSYnSQ7UjX7FHo7LD+yrXQrDy0PSlBbz+ABjCUhkx8WGlcO83IyrlD1daJS9G
+         2Teg==
+X-Forwarded-Encrypted: i=1; AJvYcCUu2s9tK68BWK66zYL+zJh0M5SsPqEdzmHn30Y7FWyI2ka8ULSBmXWDNOZlW0ydiJDCcPhCQgaF37d2wYBC@vger.kernel.org, AJvYcCV4nMmbydhW60EY8ivDbl+4MaVajgnbTVGrlTae2VWjIYbc2Q11gB2Yo3I658QBMRpyvuNkC3r/ogKj@vger.kernel.org, AJvYcCVmB7yfD0rMA7UysIiF64ma0X2nIXE5gLwd20nAQrOWinW7Y06Iw/UdinxRp3Ihba4X7o5fqusA@vger.kernel.org, AJvYcCWdwuab1uXU4rVW1R59AiqpyHjvmxa+EB0lVovXslfIe1LGt7/d2H8zJzja3PUyFN2jGblmMrq/UmXNTZs=@vger.kernel.org, AJvYcCX8NZb3kS42V6UpVR8cNg6nvYx0tRNRMZCKk6jUAO9dHtLWk9u9rAjXhfUq9tM3LTuTChvpI4wsK2fp@vger.kernel.org, AJvYcCXgx3xBK2mtkA8G6cIV/l1pIZIRT5TjsunMr8XdRp4yatTC/KhyivlcVmWE+KWhu9f75hZPvx4uyOEf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx88uvnu4sYV79zRyfMdM3lyM/X4jJZp3UgYWc07+xMbpVYrkEx
+	rtMJv1Hr/eDffDzdwoXnxwhVSkXKTMEUBU2feHmpyAg9z3ykScQ9En06YrbE
+X-Gm-Gg: ASbGnctsyU7at4vXDHYGb0+TEGT2uguqgFm26YaTBmVSi0MVZsaCjeiOOMip2rCHHUz
+	3TutCLaHkFs8sX8kRvrepCKDmOoAqjaQS1WqVTcLdJkbfFHcNApmyLsBUC+xMwN+ANDhceX8zwP
+	2+nIdrX09N3v5rf2iHMoysDfhM2DObtuCfqMnRs+ti5aFLl4ya9olQYuRiIwYWNTxZFjKWcPsuN
+	gmJUjHSR2xEi9Uy6poJ8avXc/0eSQonHdzkgRocuOWpgL9RQy1IqxBcCw0X5oauow2W4gnUnyri
+	h6jcZ+c2r3605fWgCQIewAZCSjSe1XgWPFIvTpJGienAFZ+Kx1cJ7Y+UEA==
+X-Google-Smtp-Source: AGHT+IH64OMvNI//DHpqIhBXMfnM3nyG8byXREG186/r6xJVCGhlgNO0z9wcmRT5dF5guMFstYW10w==
+X-Received: by 2002:a05:6102:2ad2:b0:4bb:dc3c:1b71 with SMTP id ada2fe7eead31-4bbdc3c2999mr2831244137.13.1739259363945;
+        Mon, 10 Feb 2025 23:36:03 -0800 (PST)
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com. [209.85.221.169])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4bbbebc1fa0sm891895137.15.2025.02.10.23.36.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Feb 2025 23:36:02 -0800 (PST)
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5203e0d0139so1197419e0c.1;
+        Mon, 10 Feb 2025 23:36:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU+kKNVvHLE2TTHJH5UfWbOsVz9muNHonu5dCRZzdFKsKUyZr5FAbq7AEe9UcURNu6pveFMYGLnNZho@vger.kernel.org, AJvYcCUcwtAIrcYbnU91dowQJWRxG/47CVPCU5f9nddEkXwaIwCggJVxhL9CUQm+K4Y038GUWe/1XQQNRLA4@vger.kernel.org, AJvYcCUjf+3CsH2Z2UZr5HFghS8YMRUx1GWrjica4Rg5ddFCIPf4woAie+G7Pg6d2Lh9s88bZVh//mQdyUkjK5I=@vger.kernel.org, AJvYcCVVHf3ee+qZhIBFB/drNez6MsADke/1F+Qax3Oyb6PQ3+AfCeF9Isn7CQDKr6AL+qPxzcb6Ui6Q/Ev3@vger.kernel.org, AJvYcCWDmpd2eZQ0DV0Rq+wdnMMSw+NVxYSoRIEfC8NFz5aMgBtFwAkZ7J6gLCcZHU1lFO57KJlwDWx2@vger.kernel.org, AJvYcCX49hiBd4gA6pGNwslE80tPwtcXHY2VBRxyj6Lysa1xo9ORhQWfwHCYCJyKUjMmxHqEEl7vX+X94BoM2Hvp@vger.kernel.org
+X-Received: by 2002:a05:6122:1d44:b0:520:61ee:c7f9 with SMTP id
+ 71dfb90a1353d-52061eecb62mr56803e0c.7.1739259362582; Mon, 10 Feb 2025
+ 23:36:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6b67YBbERi5v9gt@fedora>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com> <20250210-gpio-set-array-helper-v3-1-d6a673674da8@baylibre.com>
+In-Reply-To: <20250210-gpio-set-array-helper-v3-1-d6a673674da8@baylibre.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 11 Feb 2025 08:35:51 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXFXbzeus6yzeBsjOvTsD+AOLKjyRySCYo4YkjSZByZAQ@mail.gmail.com>
+X-Gm-Features: AWEUYZkcG2r9GXDExtVTd3MXygmVQFQr3aQqn2D5K57fCGs7Av6ow06VQ5r6ees
+Message-ID: <CAMuHMdXFXbzeus6yzeBsjOvTsD+AOLKjyRySCYo4YkjSZByZAQ@mail.gmail.com>
+Subject: Re: [PATCH v3 01/15] gpiolib: add gpiod_multi_set_value_cansleep()
+To: David Lechner <dlechner@baylibre.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Andy Shevchenko <andy@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jay,
-On Sat, Feb 08, 2025 at 06:34:21AM +0000, Hangbin Liu wrote:
-> Please hold on this patch. Our QE reported that with bare NIC, the
-> backup NIC can't receive the NS messages even after joining the multicast
-> MAC group. But after remove the backup NIC from bond, the NIC interface
-> could receive the NS message.
-> 
-> This is weird, it looks the backup NIC dropped the NS message somewhere,
-> even using tcpdump (the NIC will be in promisc mode) I can't capture the
-> NS message on backup slave.
-> 
-> I need to debug more.
+On Mon, 10 Feb 2025 at 23:37, David Lechner <dlechner@baylibre.com> wrote:
+> Add a new gpiod_multi_set_value_cansleep() helper function with fewer
+> parameters than gpiod_set_array_value_cansleep().
+>
+> Calling gpiod_set_array_value_cansleep() can get quite verbose. In many
+> cases, the first arguments all come from the same struct gpio_descs, so
+> having a separate function where we can just pass that cuts down on the
+> boilerplate.
+>
+> Signed-off-by: David Lechner <dlechner@baylibre.com>
 
-After debug, I find it's a driver issue. The issue exists with ice dirver NIC.
-I tried with a mlx5 NIC and the patch works good for me.
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-So I think you can start review this patch when you have time. I will debug
-the ice driver later.
+Gr{oetje,eeting}s,
 
-Thanks
-Hangbin
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
