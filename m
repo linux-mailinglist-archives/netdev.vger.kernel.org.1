@@ -1,108 +1,221 @@
-Return-Path: <netdev+bounces-165007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D14A2FFED
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:09:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790EEA30002
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CBA18836D4
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:09:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 446F73A3C14
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6A22BD11;
-	Tue, 11 Feb 2025 01:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933C61ADC68;
+	Tue, 11 Feb 2025 01:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TXOta40J"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NC6uAbMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E531805E;
-	Tue, 11 Feb 2025 01:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918C0158538;
+	Tue, 11 Feb 2025 01:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739236188; cv=none; b=Uxh088xA9V3wxXdNeTNTDZ2GB1VfM17tgr4bTxSC7n971k5Zu+T+39cVOCbuA8B2Rrs9g29diDGegNBrKGhUnyjioZTFlTwy06Ncv6F0TEhXaVyv3YJnOmcXTGW9GKWB+OjShgZVLRVOVInxhgyaHdPbQxfMjx3rO2JKnwXitU0=
+	t=1739236875; cv=none; b=qkYjHFraI8ZZoQC02H/1+puSVDCeQXL67VLVC4wBsvQsVBx3G9X9eE7p2TRzbqc/8AcMWdopZnH+mpaexGL3dTdTPge22KCBtGWeqH8xYPj+roYVcVjGd8bfbbSf2b3wiYgHj8m71Fk/b56w59YJUWKCbFnqI8E3K3SXurqi7R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739236188; c=relaxed/simple;
-	bh=6Idg8uJ9iPDpsfQccDDDicevNwmyMCS8+ONKoz3yRB0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gk6g1PXEjzF5ptGVjkk86Z46xpnoo0Oj7sxFNbIQLp3/Jl51WyY7KL/7rWgezvE0of2aovYx9o9lOeu/KJNju23rB05Dua0hn44Qgd760SIfXr4BzuoiWYZzfJ9CZMvMqI8hoXvndupUr+76Ll5SvoMPTjvAsszQBOOWpGKk19c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TXOta40J; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739236187; x=1770772187;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UlwViKvkK8zcGDuf7UucAahjqpx6kwc7K2f51BR+Ko8=;
-  b=TXOta40JgDChxQFyF+JT8MkbeAj0R1FItBk9GijzgWyBxKLxgPtp8CGy
-   mUOZSQqoBhWGJ85PpFuneh2xvoozhhjyKiwltLCwH9vsSEjNjYk2L8JI7
-   wn+W4iQj+khTO+gZ9xdXL5QESmWm1WWdf/BZK8K9oT28LnoLRWDt1cyl0
-   k=;
-X-IronPort-AV: E=Sophos;i="6.13,276,1732579200"; 
-   d="scan'208";a="717705807"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 01:09:42 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:57671]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.136:2525] with esmtp (Farcaster)
- id dfd31b59-b323-4be3-91e5-ad497774b6bf; Tue, 11 Feb 2025 01:09:41 +0000 (UTC)
-X-Farcaster-Flow-ID: dfd31b59-b323-4be3-91e5-ad497774b6bf
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 11 Feb 2025 01:09:40 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.10.138) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Feb 2025 01:09:36 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kernel-team@meta.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <ushankar@purestorage.com>
-Subject: Re: [PATCH net-next v2 0/2] net: core: improvements to device lookup by hardware address.
-Date: Tue, 11 Feb 2025 10:09:27 +0900
-Message-ID: <20250211010927.86214-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250210-arm_fix_selftest-v2-0-ba84b5bc58c8@debian.org>
-References: <20250210-arm_fix_selftest-v2-0-ba84b5bc58c8@debian.org>
+	s=arc-20240116; t=1739236875; c=relaxed/simple;
+	bh=iURoQpV90d9Rs//Ogmq+bSJCz4CRlpfHqq0YxSnxuec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hWEwAP9qZWLbvZemsEp31QK9z6i9QMvN4bhIgPHqOCUsel5Ok6AgnEB0bsoYf1iEth445knH8bglo7nr8mU6+/LZll9dpFcC5fMH8gTSbpUPMUStjstFTx/W0j7BYa93gw7I7HR2eb0zG5m5wxe/J3Z03BEkknLrFUv2ogKzD5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NC6uAbMK; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51AKuNiO031300;
+	Tue, 11 Feb 2025 01:20:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Lgxx79rg+zY8ZhEl6UOYRyZEbwvUp3kyXUYU+30FnDM=; b=NC6uAbMK2VkWajXR
+	578zpcNbOhxTXpIOOQ/5c9+i54PQ3KlmV8F1EVNixJdcfzn0kDkPJGMqzYU+hwpP
+	7q+V0vSXWqEETvQqkI93bNb7pkC7ANgorZ6FF6tis8nqy/4H8JksO+n3JdPbAVu8
+	rtr59FceO3umtR+JW7GVATGyFuy0MyJ4i1hBoTg6B4d1fVKhAHqbcJSZsf1HdG57
+	wQPT4JLakhExqrBYZKlo+LvE0HjlwnjB57fZN8ShVBTTPlRa4apPGf43hJbkd/zh
+	R4BMbKnHe10PWMZLrXJIt1s1eGWwr9Gms1vAPXJiAjXeEN/RRaTNDfLRvz1niPkm
+	JdIkgg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44p0ese5cf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 01:20:30 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51B1KTEG030819
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 01:20:29 GMT
+Received: from [10.253.11.86] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 10 Feb
+ 2025 17:20:23 -0800
+Message-ID: <80762356-f827-4a78-9ccf-dbe644248667@quicinc.com>
+Date: Tue, 11 Feb 2025 09:20:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
+ configured with rgmii-id
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski
+	<krzk@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+ <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+ <30450f09-83d4-4ff0-96b2-9f251f0c0896@kernel.org>
+ <48ce7924-bbb7-4a0f-9f56-681c8b2a21bd@quicinc.com>
+ <2bd19e9e-775d-41b0-99d4-accb9ae8262d@kernel.org>
+ <71da0edf-9b2a-464e-8979-8e09f7828120@oss.qualcomm.com>
+ <46423f11-9642-4239-af5d-3eb3b548b98c@quicinc.com>
+ <60fecdb9-d039-4f76-a368-084664477160@oss.qualcomm.com>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <60fecdb9-d039-4f76-a368-084664477160@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 10 Feb 2025 03:56:12 -0800
-> The first patch adds a new dev_getbyhwaddr() helper function for
-
-nit: second
-
-> finding devices by hardware address when the RTNL lock is held. This
-> prevents PROVE_LOCKING warnings that occurred when RTNL was held but the
-
-Same comment for patch 2, this itself doens't fix the warning.
-Also, patch 2 & 3 should be net.git materials ?  Maybe squash
-the two and add a Fixes tag then.
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: JmCXu3hZE9gZMZDOFI493sN8LmLBXd38
+X-Proofpoint-ORIG-GUID: JmCXu3hZE9gZMZDOFI493sN8LmLBXd38
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-11_01,2025-02-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ suspectscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502110005
 
 
-> RCU read lock wasn't. The common address comparison logic is extracted
-> into dev_comp_addr() to avoid code duplication.
+
+On 2025-02-11 02:01, Konrad Dybcio wrote:
+> On 10.02.2025 4:09 AM, Yijie Yang wrote:
+>>
+>>
+>> On 2025-01-27 18:49, Konrad Dybcio wrote:
+>>> On 22.01.2025 10:48 AM, Krzysztof Kozlowski wrote:
+>>>> On 22/01/2025 09:56, Yijie Yang wrote:
+>>>>>
+>>>>>
+>>>>> On 2025-01-21 20:47, Krzysztof Kozlowski wrote:
+>>>>>> On 21/01/2025 08:54, Yijie Yang wrote:
+>>>>>>> The Qualcomm board always chooses the MAC to provide the delay instead of
+>>>>>>> the PHY, which is completely opposite to the suggestion of the Linux
+>>>>>>> kernel.
+>>>>>>
+>>>>>>
+>>>>>> How does the Linux kernel suggest it?
+>>>>>>
+>>>>>>> The usage of phy-mode in legacy DTS was also incorrect. Change the
+>>>>>>> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
+>>>>>>> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
+>>>>>>> the definition.
+>>>>>>> To address the ABI compatibility issue between the kernel and DTS caused by
+>>>>>>> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
+>>>>>>> code, as it is the only legacy board that mistakenly uses the 'rgmii'
+>>>>>>> phy-mode.
+>>>>>>>
+>>>>>>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>>>>>>> ---
+>>>>>>>     .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
+>>>>>>>     1 file changed, 13 insertions(+), 5 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>>>>>>> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
+>>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>>>>>>> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
+>>>>>>>     static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
+>>>>>>>     {
+>>>>>>>         struct device *dev = &ethqos->pdev->dev;
+>>>>>>> -    int phase_shift;
+>>>>>>> +    int phase_shift = 0;
+>>>>>>>         int loopback;
+>>>>>>>            /* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
+>>>>>>> -    if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
+>>>>>>> -        ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
+>>>>>>> -        phase_shift = 0;
+>>>>>>> -    else
+>>>>>>> +    if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
+>>>>>>>             phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
+>>>>>>>            /* Disable loopback mode */
+>>>>>>> @@ -810,6 +807,17 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>>>>>>>         ret = of_get_phy_mode(np, &ethqos->phy_mode);
+>>>>>>>         if (ret)
+>>>>>>>             return dev_err_probe(dev, ret, "Failed to get phy mode\n");
+>>>>>>> +
+>>>>>>> +    root = of_find_node_by_path("/");
+>>>>>>> +    if (root && of_device_is_compatible(root, "qcom,qcs404-evb-4000"))
+>>>>>>
+>>>>>>
+>>>>>> First, just check if machine is compatible, don't open code it.
+>>>>>>
+>>>>>> Second, drivers should really, really not rely on the machine. I don't
+>>>>>> think how this resolves ABI break for other users at all.
+>>>>>
+>>>>> As detailed in the commit description, some boards mistakenly use the
+>>>>> 'rgmii' phy-mode, and the MAC driver has also incorrectly parsed and
+>>>>
+>>>> That's a kind of an ABI now, assuming it worked fine.
+>>>
+>>> I'm inclined to think it's better to drop compatibility given we're talking
+>>> about rather obscure boards here.
+>>>
+>>> $ rg 'mode.*=.*"rgmii"' arch/arm64/boot/dts/qcom -l
+>>>
+>>> arch/arm64/boot/dts/qcom/sa8155p-adp.dts
+>>> arch/arm64/boot/dts/qcom/qcs404-evb-4000.dts
+>>>
+>>> QCS404 seems to have zero interest from anyone (and has been considered
+>>> for removal upstream..).
+>>>
+>>> The ADP doesn't see much traction either, last time around someone found
+>>> a boot breaking issue months after it was committed.
+>>
+>> But what about the out-of-tree boards that Andrew mentioned? We need to ensure we don't break them, right?
 > 
-> The second patch adds missing documentation for the return value of
+> No. What's not on the list, doesn't exist
 
-nit: first
+Okay, I understand.
 
+> 
+> Konrad
 
-> dev_getbyhwaddr_rcu(), fixing a warning reported by NIPA. The kdoc
-> comment now properly specifies that the function returns either a
-> pointer to net_device or NULL when no matching device is found.
+-- 
+Best Regards,
+Yijie
+
 
