@@ -1,144 +1,114 @@
-Return-Path: <netdev+bounces-165057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC03A303BF
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:41:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61203A303D9
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 196353A57F9
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:41:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9EC51888E2E
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C7B1E6DCF;
-	Tue, 11 Feb 2025 06:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14D01E9B2E;
+	Tue, 11 Feb 2025 06:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LVV9yuvb"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="s8oe5aJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BF6433BE
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBB01E9B12;
+	Tue, 11 Feb 2025 06:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739256093; cv=none; b=R4yg3tRtnGD+qsQKXWhH02rMUUG2wgN2GD0RD/PqiR3nN47DadHPvZqOkwBqXMe2cjdRBZPuDbGBaRW/SsukP7JfvjxeFmPAyEdlWdA7FTkdJ+XaO/uNxqwAkVaaUWjAIIIltG/TkjuPYV5sNEp75CC/1XZq6DugLmu0MeSBGsA=
+	t=1739256600; cv=none; b=kaQzISHk8o5hPDvPEmQQn6RKjKa+t9WKCZXOY2NMreIhYT+55ps6Pc0e9jTzA9I4BAnlwWm2jIQFeJkObRGuF3EJdl2lUIW1Y8lUBNNhpoO51qMDlzbOdma7PYtk0UUE0LHghU1fSyQ903UZQnmxVcQ5mlEYAs/YnPaImxRPK24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739256093; c=relaxed/simple;
-	bh=GyCUMivS4VJlWOBBze0/WQTviEBkzALAjaWeS3LlRMw=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ie3NFPbWb/Y6znYBT0vYlcodo7DEB35Px+da625a+AIlrYNBb6yKGCZuBv+k+AY3tfHHuHFxNrZA1+nlqe1lewPmMK83lfEFdMZqAa9vOTsctamzimK/a8GkRpMjyIv5qXYRPqoLAaOF7+Tdxe2N0n8VI3SMnVHPIZLzbHFbE9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LVV9yuvb; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739256092; x=1770792092;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=kgEZXMTyNo/0vBWc6Ot4NuneWyKQNfqazBxrkuQHgkY=;
-  b=LVV9yuvbLSJXtSNxedGvG69ZAgXXDPdb8qwcbjxKqzzq/pVmXhxGpszw
-   EuR67s1Oj5m9HQMHRCA0ehpuZz7q/tm7j6Y945iRiB4vAPtL+uwoB3xRk
-   7ArACBhlSPpAKzlrtY2jYkOA5s0El5IBlf77Hp/t2ivR8OJtZLAul2oAz
-   U=;
-X-IronPort-AV: E=Sophos;i="6.13,276,1732579200"; 
-   d="scan'208";a="171400092"
-Subject: RE: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 06:41:29 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:57085]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.229:2525] with esmtp (Farcaster)
- id ed518b41-7f26-4356-870c-cd93c9d093c3; Tue, 11 Feb 2025 06:41:28 +0000 (UTC)
-X-Farcaster-Flow-ID: ed518b41-7f26-4356-870c-cd93c9d093c3
-Received: from EX19D002EUA002.ant.amazon.com (10.252.50.7) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 11 Feb 2025 06:41:28 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D002EUA002.ant.amazon.com (10.252.50.7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Feb 2025 06:41:27 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.039; Tue, 11 Feb 2025 06:41:27 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
-	<richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Thread-Index: AQHbeKGvfULVz4EhOUW1QOSyLY+8YrM8lvgAgAQX1OCAAJwCAIAAY1Ow
-Date: Tue, 11 Feb 2025 06:41:27 +0000
-Message-ID: <796881fe22cc4129b69eadad7ff37a8b@amazon.com>
-References: <20250206141538.549-1-darinzon@amazon.com>
-	<20250206141538.549-4-darinzon@amazon.com>
-	<20250207165516.2f237586@kernel.org>
-	<01fd0c4d50c7493986d80e22b0506fdf@amazon.com>
- <20250210164358.11091722@kernel.org>
-In-Reply-To: <20250210164358.11091722@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1739256600; c=relaxed/simple;
+	bh=/72hblTAr0ml+v4ncYL24QnW3hc34oy4og4/RR+FOMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A8/tYvi9Ai2K22wT4XomxfP+7yp0odiVlvLD4M5wNJAM4UU5gFkl9uvBhKzZJ6iGN0yu7LE7s39sGBShbaWMc7Qvvkfpr1Kc6pkhtUV8fUrOuZUZKdrc6oPe+ezCBVi36/itWCVQhYGdPedI2alhBkyZ4uTwLN8JjPHM2m2gDFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=s8oe5aJc; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 46D8B2107A99; Mon, 10 Feb 2025 22:49:53 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 46D8B2107A99
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1739256593;
+	bh=BS9tA2SNyXv7FIdpYEaWS+oZRZ0ThGbQVd0wOfdmQsA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s8oe5aJcB4/HLlM7JrcXOBPm3lkZjNiLQcm9vXVXZ00Qz9zGY1vDe9xPaflZ9ider
+	 TyebF2YMfEywsCIq/oeJxFu0k5LDdgA6ezTJbaEYv1KvgZj3e/Gl5nX3l4mSzVIPGp
+	 8szFKJhTCE5L8oQ0iyzZK35oaXpxVWK5eYUcsz+E=
+Date: Mon, 10 Feb 2025 22:49:53 -0800
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v2 net-next 1/2] net: mana: Allow tso_max_size to go
+ up-to GSO_MAX_SIZE
+Message-ID: <20250211064953.GA26170@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1739162392-6356-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <1739162428-6679-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <CANn89iJ3cT6BWLmFpdkxn6EeeLTM7rF0pwWGArq1gG8pk8orsg@mail.gmail.com>
+ <20250210175753.GA17857@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20250210175931.GA18891@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CANn89i+ovDB+qLBV3DEx5eB4vDZq=X+rWUZgR7qHjDLc4=UN2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANn89i+ovDB+qLBV3DEx5eB4vDZq=X+rWUZgR7qHjDLc4=UN2w@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-> > You are right in the regard that it is not a network specific functiona=
-lity.
-> > Having said that, PHC is a network card capability, making it a network=
--
-> related component rather than purely a timekeeping feature.
-> > Moreover we failed to find an existing tool which would allow users to =
-get
-> valuable feedback of the system's overall health.
+On Mon, Feb 10, 2025 at 07:02:04PM +0100, Eric Dumazet wrote:
+> On Mon, Feb 10, 2025 at 6:59???PM Shradha Gupta
+> <shradhagupta@linux.microsoft.com> wrote:
 > >
-> > Researching its existing support in the kernel we noted that:
-> > - PHC is embedded in network NIC and is supported by multiple NIC
-> > vendors in the kernel
-> > - PHC information is visible through ethtool -T
-> > - The Linux networking stack uses PHC for timekeeping as well as for pa=
-cket
-> timestamping (via SO_TIMESTAMPING).
-> >   Packet timestamping statistics are available through ethtool
-> > get_ts_stats hook
-> >
-> > We have found `ethtool -S` as a suitable location for exposing these
-> statistics, which are unique to the ENA NIC.
-> >
-> > We'd appreciate your thoughts on the matter, is there an alternative to=
-ol
-> you can recommend?
->=20
-> We try to steer folks towards read-only debugfs files for stuff that's no=
-t
-> strictly networking related. You also add a custom sysfs file in patch 4,=
- I
-> reckon adding stats there may also be a natural place for the user?
->=20
-> Patch 4 FWIW is lacking slightly in the justification, would be good to c=
-larify
-> why it's disabled by default. Single sentence of "why" would be great.
+> > On Mon, Feb 10, 2025 at 09:57:53AM -0800, Shradha Gupta wrote:
+> > > On Mon, Feb 10, 2025 at 04:55:54PM +0100, Eric Dumazet wrote:
+> > > > On Mon, Feb 10, 2025 at 5:40???AM Shradha Gupta
+> > > > <shradhagupta@linux.microsoft.com> wrote:
+> > > > >
+> > > > > Allow the max aggregated pkt size to go up-to GSO_MAX_SIZE for MANA NIC.
+> > > > > This patch only increases the max allowable gso/gro pkt size for MANA
+> > > > > devices and does not change the defaults.
+> > > > > Following are the perf benefits by increasing the pkt aggregate size from
+> > > > > legacy gso_max_size value(64K) to newer one(up-to 511K)
+> > > > >
+> > > > > for i in {1..10}; do netperf -t TCP_RR  -H 10.0.0.5 -p50000 -- -r80000,80000
+> > > > > -O MIN_LATENCY,P90_LATENCY,P99_LATENCY,THROUGHPUT|tail -1; done
+> > > >
+> > > > Was this tested with IPv6 ?
+> > >
+> > > Hi Eric,
+> > > yes, sanity and functional testing where performed(manually) and passed on azure
+> > > VMs with IPv6.
+> > Forgot to mention that the tests were performed on both IPv4 and IPv6
+> > and these numbers are from IPv4 testing
+> 
+> Where is the IPv6 jumbo header removed ?
+I think this is missed in this patchset. In our IPv6 tests, patch sanity was
+performed without changing the default values.
+I will add this support, thorughly test IPv6 and send out another
+version with complete IPv6 support and numbers.
 
-Hi Jakub,
+Thanks for the pointers Eric.
 
-Thank you for the feedback and the recommendations, we will incorporate the=
-m in v7.
+Regards,
+Shradha Gupta.
 
