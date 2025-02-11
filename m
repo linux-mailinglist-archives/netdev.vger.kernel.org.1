@@ -1,137 +1,93 @@
-Return-Path: <netdev+bounces-165186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AB9A30DFD
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:16:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9AEAA30E03
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:17:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164261886F13
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:16:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41E321887E5F
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D9D21CFF7;
-	Tue, 11 Feb 2025 14:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C768524CEEE;
+	Tue, 11 Feb 2025 14:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="CIoCgiDr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jI9/2iGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B70C26BD81;
-	Tue, 11 Feb 2025 14:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2697824CEE5
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 14:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739283404; cv=none; b=C+LmhIRsEtMB1zpDrXq8fbmQ64idsIqRcgJA7i0PFPpo6iyBN2M5m4bb95IuEhulmqwAerUIrE4+X6e2si2ITcCZ1LXOlcfQY3t4e27N3Glo2QSDbmhfj6uIHew7F9RilWQx5sXVkoPF5sGuAGTa16ePgFcXkOWPNBUJsy7pBhc=
+	t=1739283415; cv=none; b=Xk+xWzCzcfC5Eka9k3mc9EKbw4S9qZOxw9anYdPOaGVBgqC0nBOMy/Ot+n4v19Mmb5MFhVnD7DHI2RJppmmXLyHaS3NTxr4U8dAQtvF1eph6W/f02FBd1IcNTF8ImPiDqeFztXzwt+b9Pjvnc5xYnsRyySVe5dWpgikkM5/dWf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739283404; c=relaxed/simple;
-	bh=Av6E65X93ZDV7ReN7FBX9WeuiuZfRC5v81xAZZU2K2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ZGjahQJw+ppi1t5HWYFQuT6bm3CncNmXUlPXdEmQE35j7m/4VKcJEDU0xVWyIIL18VciKuD+gjevwC2GWA9LAF984B31pJ5BoUWiAfg4Eu/0TyqBSwF4CDcF++0a1+KQ5csYJllwlebQSZckCRjlJljMBMiY5JlzqugmA8RVtZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=CIoCgiDr; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id DC83412000C;
-	Tue, 11 Feb 2025 17:16:34 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru DC83412000C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1739283394;
-	bh=a9bkt3y3P97QXCwMrtbY2A0SpgcCvcSFAyWcYlq9ZMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=CIoCgiDrMl5ZIV5lLG4AK3tLdI1jiyPY6fYBFL4Y8vaDaqKLtOi11XFq4ZDs15Kw0
-	 ZSNg0uOib3sduFNy2dT4G9Fv9CRRqpWGEIMfc744TaOSDWc4902xM+sSRgROtbrM5b
-	 vYIOWBVdJWSkKcHzORXUw1voROX8YkZmVJd8G71UX7JQz18zsxk1WQ4nNVm7RN1Hna
-	 5ASJHUkpjJMGX5zlFy/P4a/+/d4tbuBUEXPo4gSVLip+7oE4NptF8ZhxWpuluOJ0kX
-	 aduiYb5mg454dg9l/OBYNBYBxgEkMuaoMxPCfJZIL2YXXF0dp7wTIgwOk1iqNOI4Eb
-	 OaUkPPbUfTvZg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 11 Feb 2025 17:16:34 +0300 (MSK)
-Message-ID: <e8b8686f-8de1-aa25-9707-fcad4ffa5710@salutedevices.com>
-Date: Tue, 11 Feb 2025 17:16:29 +0300
+	s=arc-20240116; t=1739283415; c=relaxed/simple;
+	bh=RoLrFS9DskrVuK6skz+TWguAjtx8dYeqtIvn6Hhzydk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hTN1XBfhR2gtYqFCzN+yFWsH8UbBLYzpVN6oaA36iLCPqwLJAaXjyTL6Cze6xa/K0ZWOUZfi/uLlkytEQD+qRmH7hauM7M6aelQaxtWI1RVMCea6PfOgTC8vsXM8U6JV6H3ZUBrKpLTyP78D65Q3RCxCrGx9rlOGmA3/vvGrGL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jI9/2iGS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MHoZjbvXKpF/JWLLQoRJo6AmGuTjc7g47NiAq5yc2Gg=; b=jI9/2iGSopbwXMPv5YRoojOaQP
+	0uXqUZBP6tSnNqdwbjbameYwGw/61ZPxu2jKPwPfIoabYATOVYv0XYgv9/w3JPTpCHRZZIf9I2i7x
+	uDoQ8iPvgYI2bjMpOBVi92IIBck8XbawtMOkrLuxvbUXU3nU9/8mBYgtSFp8H//nAd50=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1thr4A-00D58x-IZ; Tue, 11 Feb 2025 15:16:46 +0100
+Date: Tue, 11 Feb 2025 15:16:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: add support for
+ thermal sensor event reception
+Message-ID: <f8c9cc3f-4cba-488b-9c93-c31b404f4d63@lunn.ch>
+References: <20250210104017.62838-1-jedrzej.jagielski@intel.com>
+ <87644679-1f6c-45f4-b9fd-eff1a5117b7b@molgen.mpg.de>
+ <DS0PR11MB77854D8F8DEEE0A44BB0E17EF0F22@DS0PR11MB7785.namprd11.prod.outlook.com>
+ <442420d6-3911-4956-95f1-c9b278d45cd6@molgen.mpg.de>
+ <7085302f-af69-484a-8558-2aa823379fbe@lunn.ch>
+ <DS0PR11MB77856580F83D80DE883C82F0F0FD2@DS0PR11MB7785.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [DMARC error] Re: [syzbot] [bluetooth?] KASAN:
- slab-use-after-free Read in skb_queue_purge_reason (2)
-Content-Language: en-US
-To: <hdanton@sina.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
-	<luiz.von.dentz@intel.com>, <marcel@holtmann.org>, <netdev@vger.kernel.org>,
-	<syzkaller-bugs@googlegroups.com>
-References: <67a9e24a.050a0220.3d72c.0050.GAE@google.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <67a9e24a.050a0220.3d72c.0050.GAE@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 190939 [Feb 11 2025]
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, syzkaller.appspot.com:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1;goo.gl:5.0.1,7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2025/02/11 13:33:00
-X-KSMG-LinksScanning: Clean, bases: 2025/02/11 13:29:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/02/11 08:54:00 #27149591
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB77856580F83D80DE883C82F0F0FD2@DS0PR11MB7785.namprd11.prod.outlook.com>
 
-Hi, I guess problem here is that, if hci_uart_tty_close() will be called between
-setting HCI_UART_PROTO_READY and skb_queue_head_init(), in that case mrvl_close()
-will access uninitialized data.
+> Actually there is only one adapter across all portfolio of ixgbe adapters
+> which supports this feature. That is 82599, none other supports it.
+> Even next generations (x540, x550) didn't provide support for reading thermal
+> data sensor.
+> As E610 is some type of extending x550 it also follows this path at this point.
 
-hci_uart_set_proto() {
-        ...
-        set_bit(HCI_UART_PROTO_READY, &hu->flags);
-                                                   
-        err = hci_uart_register_dev(hu);
-                mrvl_open()
-                    skb_queue_head_init();
+It is something you should consider. The machine disappears off the
+net for no obvious reason, and needs a cold boot to get it back? vs
+HWMON entries you can monitor, a warning when the critical value is
+reached, which probably reaches the network console and so gets logged
+somewhere, and then the emergency value which shuts down the NIC
+without any notification getting out of the box.
 
-        if (err) {
-                return err;
-        }
-        ...
-}
+Also, if there is temperature information, Linux can take an active
+part in managing it. If the critical value is reached, it could
+downshift to a lower link mode. Better to have a slower link than no
+link and a cold boot.
 
-Thanks
-
-On 10.02.2025 14:26, syzbot wrote:
-> syzbot has bisected this issue to:
-> 
-> commit c411c62cc13319533b1861e00cedc4883c3bc1bb
-> Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> Date:   Thu Jan 30 18:43:26 2025 +0000
-> 
->     Bluetooth: hci_uart: fix race during initialization
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=116cebdf980000
-> start commit:   40b8e93e17bf Add linux-next specific files for 20250204
-> git tree:       linux-next
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=136cebdf980000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=156cebdf980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ec880188a87c6aad
-> dashboard link: https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b7eeb0580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f74f64580000
-> 
-> Reported-by: syzbot+683f8cb11b94b1824c77@syzkaller.appspotmail.com
-> Fixes: c411c62cc133 ("Bluetooth: hci_uart: fix race during initialization")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	Andrew
 
