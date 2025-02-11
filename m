@@ -1,212 +1,152 @@
-Return-Path: <netdev+bounces-165062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8313A30436
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:12:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7197A3045A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFEB77A1AA9
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:11:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF961889309
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC4E1E9B39;
-	Tue, 11 Feb 2025 07:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A880A1EB9F9;
+	Tue, 11 Feb 2025 07:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mSLJyMVg"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="b8DXhJMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48A626BDB6
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552AB1EB192
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739257950; cv=none; b=ZCV4Afk/o0+HaZEEXQ207oxt79bg4bbN355LiHzH11RyJcKFFpmlu4b+iBnPAC++P8koj+PvCAKUl76M9Jz3RqPNBJvkjV0pRY0WYZBiStQYp84Z+5AlBXQ0XW+GMiA3gYPmUfGgBVUyEyelJt5+oAmZFbt2yjHrybKW8u5ug54=
+	t=1739258607; cv=none; b=JaXPuLDwgKtWohfwhn6ssBYmte16SdfjKxl7KcRuiaju6LDrLyOXshGobnav44jMA4pNbF+iW5IZxSu1dVP2kug/4mauQax/iq2uuTiCJ7grZM7zdvUYrrEJUwDQQIC4H2Y3pls2hHrzbNTbvHhQDXSSwEGiuMfioG9iyFT3wW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739257950; c=relaxed/simple;
-	bh=Vt7v5URqxF8orVeDqpKNv9nVBi5rowXTGbUZ9gle0NQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W28ssgD11Sy7g5lSvmPJW97PCIBZM6H/j26wIuiT/xNiJnQpetyJINj7IDB3I17G3XZxZL6Yf0GGTlLwpvIh9QdmHOuMswd+Kcl01GiAxRFqk8FYJj6Nu1UAI+ys3euXeKEB8agUruVpgY2/P+k3zhqy72Pj3BubT0AOwmxPHz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mSLJyMVg; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2d9da8b0-5246-4760-abf8-dc70d7a5e3ee@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739257945;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YrGz1a6HN3IJF7A0YIdxK2o+nLMgzSKJDA/ph+Nkhvw=;
-	b=mSLJyMVgDede1YuwptrYFhrtNFxS1fGuFHHrENaPbLWorWnTiV+mpZ+ByO86PZnLOslluq
-	QyR+V0Bl7M5i354S/KwuueTiCITtdkmnj1tBdm3lRHPD5crMC8Imam0htW9Wx044fShSku
-	xwG0UwtsUTn8ymxj9zPLJxOBahyYeuY=
-Date: Mon, 10 Feb 2025 23:12:18 -0800
+	s=arc-20240116; t=1739258607; c=relaxed/simple;
+	bh=5tQjiIQk2nuzxRJad588bn9deftW0ZNoEH56ATm3DXY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=f+aOlxAs7mSkQh/fPFeNH80b9NUsvFriwNNzM8maIjXZx6+4ecu48+Q4ODStgAjqYpwrydtj/bvOwEzIp8j+3VKSQuxEmT3QYTPrx+WaQqjYns1NbL6IeFsS1r6In+fyRCzpIndV+ROidrElC1dq9GFd9jpqb8PIc3fg20ZcGqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=b8DXhJMG; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250211072316epoutp033a637093c8e350ec61429d656b65a26e~jFnqUuKgK3092230922epoutp03I
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:23:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250211072316epoutp033a637093c8e350ec61429d656b65a26e~jFnqUuKgK3092230922epoutp03I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1739258596;
+	bh=G6avid1hrwNJPrhgZ7UQBMr1iT6oxnJhYUfx9eOouYA=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=b8DXhJMGXuEE9MQIJk36NgFENkhX3Zpz51zpRdYrijixuUOTqTMRkg+o3yRUkSRZ6
+	 3aVQul4maquBZkUqy31WVfFGUuwgcWHMxUmWNSeifcqXDE5mzw/K2ffDxcrOPMp8R6
+	 U9M/whJgKyhQq6D48eZSfD6mMJ4EnB1ZeOLxIJOk=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20250211072315epcas5p2e343d70ffe99c82d9313aaadff90e7ef~jFnpeOHZp2733327333epcas5p2K;
+	Tue, 11 Feb 2025 07:23:15 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4YsXwf4Tsbz4x9Q7; Tue, 11 Feb
+	2025 07:23:14 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	47.B5.29212.2EAFAA76; Tue, 11 Feb 2025 16:23:14 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2~jFkXYbuoh0889308893epcas5p2-;
+	Tue, 11 Feb 2025 07:19:30 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250211071930epsmtrp2d5e817728b2b7e36619d54991cd86cd4~jFkXXZJ4a0103201032epsmtrp2h;
+	Tue, 11 Feb 2025 07:19:30 +0000 (GMT)
+X-AuditID: b6c32a50-7ebff7000000721c-30-67aafae28315
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D8.58.18949.20AFAA76; Tue, 11 Feb 2025 16:19:30 +0900 (KST)
+Received: from asg29.. (unknown [109.105.129.29]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250211071927epsmtip18b2e100e232e16e03af55d6fa339fd3b~jFkUZCSIX1188211882epsmtip1B;
+	Tue, 11 Feb 2025 07:19:27 +0000 (GMT)
+From: Junnan Wu <junnan01.wu@samsung.com>
+To: stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com,
+	jasowang@redhat.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, horms@kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, q1.huang@samsung.com, ying01.gao@samsung.com,
+	ying123.xu@samsung.com, lei19.wang@samsung.com, Junnan Wu
+	<junnan01.wu@samsung.com>
+Subject: [Patch net 0/2] vsock suspend/resume fix
+Date: Tue, 11 Feb 2025 15:19:20 +0800
+Message-Id: <20250211071922.2311873-1-junnan01.wu@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v9 06/12] bpf: support SCM_TSTAMP_SCHED of
- SO_TIMESTAMPING
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
- <20250208103220.72294-7-kerneljasonxing@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250208103220.72294-7-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TbUxbVRj29HLLhVh3B4jHIqNeRWWz0LpSDvLhFomr20yqxB8sLtjBTSGU
+	tuttxzSGzEIwYzDBMQa0W0C2Cp3bTKnIxncZCCgro4rDMBcKM3NAIVbAMBBLW3T/nvc57/M+
+	5zkfBBYyweYSuUotrVHKFBQ7OKC1L+YVvnPVLBeM9z2PjPbiAHR/wBmIps83ByLn54NsZBpz
+	s9Dd8X1otPU0joxnj6KSNgeOHDeMbPTTxbJAtLH6EEcD9eFo+Yc5gC7Nj2BopGIRR3bjBoZm
+	v9jAUf93zTga1yM0etMztdtZi+8Jl1ibJ1iSeotOYjGfZEuuTyVKHrTUAslC189syWmrGUjc
+	lh1S4lBecg4ty6Y1PFqZpcrOVcpTqAPpmW9mxosFQr4wESVQPKUsn06h0g5K+W/lKjzRKN4x
+	mULnoaQyhqHiUpM1Kp2W5uWoGG0KRauzFWqROpaR5TM6pTxWSWtfFwoEr8V7Gj/My7ls/xRX
+	r2PH1yqLwAlgxkpBEAFJEWzpnwOlIJgIITsAdC6f8hd/Arj4i5XtK5YBNNdUs7ckK/pxzLfQ
+	CeADy6xf8juAvznd3i42GQMHO5q88jCyEUB70xK+WWBkOws2/OoGm12hpBDenKz04gAyGq6W
+	urxqDpkKZ++acJ9fFOzuHcF8/HY4VDsTsIkxD1/0rcEfY5CAY+1hPpwG18+t+vcaCh9+bw30
+	YS50uzr9fB4s79/q0cJTrjG/VxK0X/3MM5PwzI+B127E+ehIeHb4Kstn+xQsfzTD8vEc2HZh
+	ExMeHA0XKj7x0RGw2WLxu0rgVxN/eROGkIfhVEcjXgGi6h4LU/dYmLr/jesBZgZcWs3ky+ms
+	eLWQr6QL/rvaLFW+BXjf+E5pG7j8zXqsDbAIYAOQwKgwjqihSR7CyZZ99DGtUWVqdAqasYF4
+	zxFXYtyns1SeT6LUZgpFiQKRWCwWJe4WC6lnOEXXi+UhpFympfNoWk1rtnQsIoh7glWTUKAT
+	BKem0W0/cqpvQcforTvHmr/edeDMkUXDnuqlJHfJYX3pu9EffPneC49Mb/BGSJcmadcTGdnc
+	96/s7ovP4Jycs6o3Il2N+6YyrtwZMSkO7gdnnmPqJMJq48Vp/iFVYWFP7Dy2LWogwrDWeFs/
+	/LZt5ll9Z8G1FXLIWhg83k8tlHcXF2zfZuzorRIU5K4XHpWz/ik7N8bd2GvTt6fFTavKXh3K
+	EkujS6s4+j8wPGhirS7yyXt73+kSrV5KH04PNcwZGuYmE1+ELkdEl2ktvfflnnt2ccbS3/Wt
+	t3sSVDtMyFES7lgpL6x5aZLhpyQvHK+Ou19lcI2V7G+pOjJPBTA5MuFOTMPI/gVzSuvUbAQA
+	AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphkeLIzCtJLcpLzFFi42LZdlhJTpfp16p0g0vHuS3mnG9hsXh67BG7
+	xeO5K9ktHvWfYLNYdukzk8Xda+4WF7b1sVrMmVpo0bbjMqvF5V1z2CyuLOlht/j/6xWrxbEF
+	YhbfTr9htFj69iyzxdkJH1gtzs/5z2zxetJ/Vouj21eyWlxrsrC4cARo6v5HM1kdxDy2rLzJ
+	5LFgU6nHplWdbB47H1p6vNg8k9Hj/b6rbB59W1YxenzeJBfAEcVlk5Kak1mWWqRvl8CVsfp8
+	I2vBX+aKPxObGRsYVzF3MXJySAiYSHxvugZkc3EICexmlPjYPhcqIS3R9bsNyhaWWPnvOTtE
+	0RNGiU/zN7CDJNgENCVO7FnBBmKLCKxllNi0zxCkiFngJJPErRkTwLqFBQwljtyZyAhiswio
+	SvzqegfWwCtgJ/H67jJWiA3yEvsPnmWGiAtKnJz5hAXEZgaKN2+dzTyBkW8WktQsJKkFjEyr
+	GCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCI0pLawfjnlUf9A4xMnEwHmKU4GBWEuE1
+	WbgiXYg3JbGyKrUoP76oNCe1+BCjNAeLkjjvt9e9KUIC6YklqdmpqQWpRTBZJg5OqQamSakH
+	a9k7z6wP2n28MmdTXHLAlJ6/h5qy5esarpy2nv1KrfdFZdfhgtbSf4tO3dhrZHzu9ZS3O+8F
+	v0l6GPbmbZJmkt+zyzHXpeIc51l+3D/LkCVX+8hCmUhnPetP6kJ+b3JFXq3RDnZ89/NH9rNq
+	Zln9j3I/d7AEfbwaeOspZymzzK4rTK8tNmSpR6qwBAaczja/lPTP77vNB52eSFOLxl61DW96
+	96cEbPcrujblete2LtZ326VrFv2/X7JdqHbCx1599l+2WW8PMZv9UtZwVg2ddTtgVvW1TO0b
+	2yoezz1zUSOG4ej6bZP4199fvrFegTsmPL708TzjLdODys6817wZU3z8fnDmCc0gzQYJJZbi
+	jERDLeai4kQAQC26ihcDAAA=
+X-CMS-MailID: 20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2
+References: <CGME20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2@epcas5p2.samsung.com>
 
-On 2/8/25 2:32 AM, Jason Xing wrote:
-> Support SCM_TSTAMP_SCHED case. Introduce SKBTX_BPF used as
-> an indicator telling us whether the skb should be traced
-> by the bpf prog.
+CC all maintainers and reviews.
+Modify commits accroding to reviewers' comments.
+Re-organize the patches, cover letter, tag, Signed-Off, Co-worker etc.
 
-The BPF side does not exactly support SCM_TSTAMP_SCHED as a report value.
+Junnan Wu (2):
+  vsock/virtio: initialize rx_buf_nr and rx_buf_max_nr when resuming
+  vsock/virtio: Don't reset the created SOCKET during suspend to ram
 
-What this patch does is:
+ net/vmw_vsock/virtio_transport.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-Add a new sock_ops callback, BPF_SOCK_OPS_TS_SCHED_OPT_CB. This callback will 
-occur at the same timestamping point as the user space's SCM_TSTAMP_SCHED. The
-BPF program can use it to get the same SCM_TSTAMP_SCHED timestamp without 
-modifying the user-space application.
 
-A new SKBTX_BPF flag is added to mark skb_shinfo(skb)->tx_flags, ensuring that 
-the new BPF timestamping and the current user space's SO_TIMESTAMPING do not 
-interfere with each other.
-
-I would remove most of the SO_TIMESTAMPING comments from the commit messages. 
-The timestamping points are the same but there is not much overlapping on the 
-API side.
-
-Subject could be:
-bpf: Add BPF_SOCK_OPS_TS_SCHED_OPT_CB callback
-
-[ The same probably for patch 7-9. ]
-
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   include/linux/skbuff.h         |  6 +++++-
->   include/uapi/linux/bpf.h       |  4 ++++
->   net/core/dev.c                 |  3 ++-
->   net/core/skbuff.c              | 20 ++++++++++++++++++++
->   tools/include/uapi/linux/bpf.h |  4 ++++
->   5 files changed, 35 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index bb2b751d274a..52f6e033e704 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -489,10 +489,14 @@ enum {
->   
->   	/* generate software time stamp when entering packet scheduling */
->   	SKBTX_SCHED_TSTAMP = 1 << 6,
-> +
-> +	/* used for bpf extension when a bpf program is loaded */
-> +	SKBTX_BPF = 1 << 7,
->   };
->   
->   #define SKBTX_ANY_SW_TSTAMP	(SKBTX_SW_TSTAMP    | \
-> -				 SKBTX_SCHED_TSTAMP)
-> +				 SKBTX_SCHED_TSTAMP | \
-> +				 SKBTX_BPF)
->   #define SKBTX_ANY_TSTAMP	(SKBTX_HW_TSTAMP | \
->   				 SKBTX_HW_TSTAMP_USE_CYCLES | \
->   				 SKBTX_ANY_SW_TSTAMP)
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 6116eb3d1515..30d2c078966b 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -7032,6 +7032,10 @@ enum {
->   					 * by the kernel or the
->   					 * earlier bpf-progs.
->   					 */
-> +	BPF_SOCK_OPS_TS_SCHED_OPT_CB,	/* Called when skb is passing through
-> +					 * dev layer when SK_BPF_CB_TX_TIMESTAMPING
-> +					 * feature is on.
-> +					 */
->   };
->   
->   /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index afa2282f2604..d57946c96511 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4500,7 +4500,8 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
->   	skb_reset_mac_header(skb);
->   	skb_assert_len(skb);
->   
-> -	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
-> +	if (unlikely(skb_shinfo(skb)->tx_flags &
-> +		     (SKBTX_SCHED_TSTAMP | SKBTX_BPF)))
->   		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
->   
->   	/* Disable soft irqs for various locks below. Also
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 46530d516909..6f55eb90a632 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -5555,6 +5555,23 @@ static bool skb_tstamp_tx_report_so_timestamping(struct sk_buff *skb,
->   	return false;
->   }
->   
-> +static void skb_tstamp_tx_report_bpf_timestamping(struct sk_buff *skb,
-> +						  struct sock *sk,
-> +						  int tstype)
-> +{
-> +	int op;
-> +
-> +	switch (tstype) {
-> +	case SCM_TSTAMP_SCHED:
-> +		op = BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> +		break;
-> +	default:
-> +		return;
-> +	}
-> +
-> +	bpf_skops_tx_timestamping(sk, skb, op);
-> +}
-> +
->   void __skb_tstamp_tx(struct sk_buff *orig_skb,
->   		     const struct sk_buff *ack_skb,
->   		     struct skb_shared_hwtstamps *hwtstamps,
-> @@ -5567,6 +5584,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
->   	if (!sk)
->   		return;
->   
-> +	if (skb_shinfo(orig_skb)->tx_flags & SKBTX_BPF)
-> +		skb_tstamp_tx_report_bpf_timestamping(orig_skb, sk, tstype);
-> +
->   	if (!skb_tstamp_tx_report_so_timestamping(orig_skb, tstype, sw))
->   		return;
->   
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 70366f74ef4e..eed91b7296b7 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -7025,6 +7025,10 @@ enum {
->   					 * by the kernel or the
->   					 * earlier bpf-progs.
->   					 */
-> +	BPF_SOCK_OPS_TS_SCHED_OPT_CB,	/* Called when skb is passing through
-> +					 * dev layer when SK_BPF_CB_TX_TIMESTAMPING
-> +					 * feature is on.
-> +					 */
->   };
->   
->   /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
+base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
+-- 
+2.34.1
 
 
