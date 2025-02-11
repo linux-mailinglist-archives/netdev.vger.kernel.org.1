@@ -1,136 +1,144 @@
-Return-Path: <netdev+bounces-165056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC13A303A3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:35:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC03A303BF
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:41:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6A0216759F
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:34:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 196353A57F9
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259561EC011;
-	Tue, 11 Feb 2025 06:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C7B1E6DCF;
+	Tue, 11 Feb 2025 06:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F3k+NiMq"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LVV9yuvb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9751D5161
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BF6433BE
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739255663; cv=none; b=bblmtCpvzCd1lTgaazNCFfqkXWky8jqApcpkGYHTEwBkedJoU5LqCvqsWom9oRgJUOr5heBEWGmdvFWZHFWLTnuV2+aS8+iFduFir97ZcOU4LqBpKBu3TkqIoKOj3ESHS6Cei9v64kFbF1ulCduyd2gDJxxQmrXN1z5gYHnPBn0=
+	t=1739256093; cv=none; b=R4yg3tRtnGD+qsQKXWhH02rMUUG2wgN2GD0RD/PqiR3nN47DadHPvZqOkwBqXMe2cjdRBZPuDbGBaRW/SsukP7JfvjxeFmPAyEdlWdA7FTkdJ+XaO/uNxqwAkVaaUWjAIIIltG/TkjuPYV5sNEp75CC/1XZq6DugLmu0MeSBGsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739255663; c=relaxed/simple;
-	bh=o22PPYCuKrympHClzmOiV9eSI+dq/O5DlAO1b8EMGzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kV6nOr59eQWn+z1Fri7A9WmPaoxXymw7NI9cMI6UkOdZ1fZ0ZH3ZUQWQyzkOpINH/cZp9Yv2Ci4cfkdzlot5fxuyha7pqA9438gqraoA4oPfTxEaoWwxA6pBSuEwjIcgFLlEijDeOqulHBDgq8UEPMSszmHPmG4PhsJVNbBXrl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F3k+NiMq; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1ac825c7-e685-4363-ba9d-db0d983ce9f2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739255655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B66XgQ63HyJZMIT1F+CZdr2+zUWMbchUde75HiXLy5U=;
-	b=F3k+NiMqo9dUW1oGLTszTiDngxO5iqh7+HmVyd+l24qzOdmbgs72BNZ/1bF0nr/w9Me7My
-	lfCpe1RqnVrS/PfL9ymaZ75ZNzfS5ohjFcV7Q2ScACuDTkEybIKnGWEARd/vkkrWS9AQaF
-	eZHqHLOYT5zqi93hFbvTxFAGzQNXh8c=
-Date: Mon, 10 Feb 2025 22:34:08 -0800
+	s=arc-20240116; t=1739256093; c=relaxed/simple;
+	bh=GyCUMivS4VJlWOBBze0/WQTviEBkzALAjaWeS3LlRMw=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ie3NFPbWb/Y6znYBT0vYlcodo7DEB35Px+da625a+AIlrYNBb6yKGCZuBv+k+AY3tfHHuHFxNrZA1+nlqe1lewPmMK83lfEFdMZqAa9vOTsctamzimK/a8GkRpMjyIv5qXYRPqoLAaOF7+Tdxe2N0n8VI3SMnVHPIZLzbHFbE9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LVV9yuvb; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739256092; x=1770792092;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=kgEZXMTyNo/0vBWc6Ot4NuneWyKQNfqazBxrkuQHgkY=;
+  b=LVV9yuvbLSJXtSNxedGvG69ZAgXXDPdb8qwcbjxKqzzq/pVmXhxGpszw
+   EuR67s1Oj5m9HQMHRCA0ehpuZz7q/tm7j6Y945iRiB4vAPtL+uwoB3xRk
+   7ArACBhlSPpAKzlrtY2jYkOA5s0El5IBlf77Hp/t2ivR8OJtZLAul2oAz
+   U=;
+X-IronPort-AV: E=Sophos;i="6.13,276,1732579200"; 
+   d="scan'208";a="171400092"
+Subject: RE: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
+Thread-Topic: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 06:41:29 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:57085]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.229:2525] with esmtp (Farcaster)
+ id ed518b41-7f26-4356-870c-cd93c9d093c3; Tue, 11 Feb 2025 06:41:28 +0000 (UTC)
+X-Farcaster-Flow-ID: ed518b41-7f26-4356-870c-cd93c9d093c3
+Received: from EX19D002EUA002.ant.amazon.com (10.252.50.7) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 11 Feb 2025 06:41:28 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D002EUA002.ant.amazon.com (10.252.50.7) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Feb 2025 06:41:27 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.039; Tue, 11 Feb 2025 06:41:27 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
+	<richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
+	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Thread-Index: AQHbeKGvfULVz4EhOUW1QOSyLY+8YrM8lvgAgAQX1OCAAJwCAIAAY1Ow
+Date: Tue, 11 Feb 2025 06:41:27 +0000
+Message-ID: <796881fe22cc4129b69eadad7ff37a8b@amazon.com>
+References: <20250206141538.549-1-darinzon@amazon.com>
+	<20250206141538.549-4-darinzon@amazon.com>
+	<20250207165516.2f237586@kernel.org>
+	<01fd0c4d50c7493986d80e22b0506fdf@amazon.com>
+ <20250210164358.11091722@kernel.org>
+In-Reply-To: <20250210164358.11091722@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v9 03/12] bpf: stop unsafely accessing TCP fields
- in bpf callbacks
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
- <20250208103220.72294-4-kerneljasonxing@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250208103220.72294-4-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2/8/25 2:32 AM, Jason Xing wrote:
-> The "is_locked_tcp_sock" flag is added to indicate that the callback
-> site has a tcp_sock locked.
+> > You are right in the regard that it is not a network specific functiona=
+lity.
+> > Having said that, PHC is a network card capability, making it a network=
+-
+> related component rather than purely a timekeeping feature.
+> > Moreover we failed to find an existing tool which would allow users to =
+get
+> valuable feedback of the system's overall health.
+> >
+> > Researching its existing support in the kernel we noted that:
+> > - PHC is embedded in network NIC and is supported by multiple NIC
+> > vendors in the kernel
+> > - PHC information is visible through ethtool -T
+> > - The Linux networking stack uses PHC for timekeeping as well as for pa=
+cket
+> timestamping (via SO_TIMESTAMPING).
+> >   Packet timestamping statistics are available through ethtool
+> > get_ts_stats hook
+> >
+> > We have found `ethtool -S` as a suitable location for exposing these
+> statistics, which are unique to the ENA NIC.
+> >
+> > We'd appreciate your thoughts on the matter, is there an alternative to=
+ol
+> you can recommend?
+>=20
+> We try to steer folks towards read-only debugfs files for stuff that's no=
+t
+> strictly networking related. You also add a custom sysfs file in patch 4,=
+ I
+> reckon adding stats there may also be a natural place for the user?
+>=20
+> Patch 4 FWIW is lacking slightly in the justification, would be good to c=
+larify
+> why it's disabled by default. Single sentence of "why" would be great.
 
-It should mention that the later TX timestamping callbacks will not own the 
-lock. This is what this patch is primarily for. We know the background, but 
-future code readers may not. We will eventually become the readers of this patch 
-in a few years' time.
+Hi Jakub,
 
-> 
-> Apply the new member is_locked_tcp_sock in the existing callbacks
-
-It is hard to read "Apply the new member....". "Apply" could mean a few things. 
-"Set to 1" is clearer.
-
-
-> where is_fullsock is set to 1 can stop UDP socket accessing struct
-
-The UDP part is future proof. This set does not support UDP which has to be 
-clear in the commit message. This has been brought up before also.
-
-> tcp_sock and stop TCP socket without sk lock protecting does the
-> similar thing, or else it could be catastrophe leading to panic.
-> 
-> To keep it simple, instead of distinguishing between read and write
-> access, users aren't allowed all read/write access to the tcp_sock
-> through the older bpf_sock_ops ctx. The new timestamping callbacks
-> can use newer helpers to read everything from a sk (e.g. bpf_core_cast),
-> so nothing is lost.
-
-(Subject):
-bpf: Prevent unsafe access to the sock fields in the BPF timestamping callback
-
-(Why):
-The subsequent patch will implement BPF TX timestamping. It will call the 
-sockops BPF program without holding the sock lock.
-
-This breaks the current assumption that all sock ops programs will hold the sock 
-lock. The sock's fields of the uapi's bpf_sock_ops requires this assumption.
-
-(What and How):
-To address this,
-a new "u8 is_locked_tcp_sock;" field is added. This patch sets it in the current 
-sock_ops callbacks. The "is_fullsock" test is then replaced by the 
-"is_locked_tcp_sock" test during sock_ops_convert_ctx_access().
-
-The new TX timestamping callbacks added in the subsequent patch will not have 
-this set. This will prevent unsafe access from the new timestamping callbacks.
-
-Potentially, we could allow read-only access. However, this would require 
-identifying which callback is read-safe-only and also requires additional BPF 
-instruction rewrites in the covert_ctx. Since the BPF program can always read 
-everything from a socket (e.g., by using bpf_core_cast), this patch keeps it 
-simple and disables all read and write access to any socket fields through the 
-bpf_sock_ops UAPI from the new TX timestamping callback.
-
-Moreover, note that some of the fields in bpf_sock_ops are specific to tcp_sock, 
-and sock_ops currently only supports tcp_sock. In the future, UDP timestamping 
-will be added, which will also break this assumption. The same idea used in this 
-patch will be reused. Considering that the current sock_ops only supports 
-tcp_sock, the variable is named is_locked_"tcp"_sock.
-
-
-
+Thank you for the feedback and the recommendations, we will incorporate the=
+m in v7.
 
