@@ -1,229 +1,388 @@
-Return-Path: <netdev+bounces-165337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082AEA31B00
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:09:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7956A31B36
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D05D91888C41
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:09:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A0A3A4C96
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3516B29405;
-	Wed, 12 Feb 2025 01:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C969339A1;
+	Wed, 12 Feb 2025 01:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nfNOsH/r";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="D4Okt1AC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUpwbLP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC13200B0;
-	Wed, 12 Feb 2025 01:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739322532; cv=fail; b=D7xSGG+20K3sHnZtDDDPWt4GbzZceOW9CFr0hBnqQ6LDh4vco7t28+SVVPwlnIgPuVRG+PQkeUkque5p1vOVwVXtQtvCw6/l9Qkfyua3UeAYyhFLoWfXgeFXl8ZUafYC83Kf/7UXcZI3rCtQw8332YJ27+tD7oKwq/QI8oTizm4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739322532; c=relaxed/simple;
-	bh=n/b10zdJgq9Wp5er0u3u8PwY6L5QQwyr5nC2zgnoKyk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FO2Z0ccRwvx7DR/omSq4iN1KKOlJsKpIaVmhqXTzOHA5zOLVRb2OQ7Z6Rr/rYoKEL3LmF6inUjcrJxEUzOq0s40N/T90szN+5p2yfZxlDi0GFhwmCbvgJA2piuef1W/co5G4oSm7aRG+tZii5Ymy3ZuUDHPxMmyE+j3b21ymxUM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=nfNOsH/r; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=D4Okt1AC; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51BLfTR8009691;
-	Wed, 12 Feb 2025 01:08:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=e14S7Fag7zMFT4WNROQZjlDmBXMMj9AbBLZHccZziEg=; b=
-	nfNOsH/rUgeSHcLaQNyBvq2fwZBP/Ve/UGb6+1PikMj3ykMVRUp6ubK2CT2shxjc
-	rENObzbXGejGtS7sSLRCqlfKNzV4LPEG8eLa8Iokmm1XJngUo3g1UdbDcOHDXp37
-	LfWQYBclvKMndoAuH/Xbku9e0J//33qW9ej4jdJULb+Ea4ZURAAN8Pt/IANDLDFk
-	6KxdjOXEPo9+y997gCGuYiV5sFT1iRNgK4APB/BL/dCEyI1sSyz3k0TV/4+1xHPR
-	4G2jRQTCGEygjV2BB/lVPOs3viLC55v4m6G2ic84E2Vz5LOUm8CLWcrnRsQAi36B
-	9y95uYFHIL7mdFsrrljvvw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44p0sq6hvu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Feb 2025 01:08:44 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 51C0ig9k002660;
-	Wed, 12 Feb 2025 01:08:43 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 44nwq9mext-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Feb 2025 01:08:43 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=syECddAWwDZc6eORYE8EKmsE/EPxVzBRZ7n7HXMzt2O9rTvxNUbTQvQ5PZFqp1ZpIdfQjJGoOGvfKHL/m8awQ0K8IFCqEWvMPl84nna3ImATiG/sBsKqNM9a0LpVRxxjzRKyP363xoUr/gIwovvgXbgGWY5eHBx9F9pjZOGcaWO8lEAVMJDJVcbeYKWfcJGecnj4a0UgGLqJZu2I654xVcgOwlZU3D4c6joZa5Yl9G6l1b1lZZWymaToRCewwP7CxtMvmHX1ELFvTiOUpdIQHYZMMdEFF/BRLm4cGGU9HeNa1rXE9eGqYMMXcE6QH+zHUdH1BcIKZTlNTN1sA59TIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e14S7Fag7zMFT4WNROQZjlDmBXMMj9AbBLZHccZziEg=;
- b=vwwrz8MvDO+zeMen60XTwEKg6PJhX1DeA+heUcmYf8v8kpLeTFVHELPUdD3ybLyq/qfFqiuDx7ntseQ64hC7ypyGXkLEDMq9DNh75S52JXMqud5nif0B1tsKtdIFGwZ3Fg4VVra5QnC9qaONTx11cHMbVuSdSYt/mULutykRB5SDnZofuCCsc1EOFKk3xBrwqJCJaL53IT2EGEhcqb6ppFR55Q4kr3fHGKhQhiGreT2dIAZWBfiJITcS6aOKE444gy+3Qq/mOYDHkPhvGb0xibTHQNNvTz9kv0f4KEsuAhFEhb8b8EE+5Z6REw7GM67ndTPIw5Fa1UQfAuFnnrfK2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA612AEE3;
+	Wed, 12 Feb 2025 01:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739324010; cv=none; b=Gf11JNYULntg+ceg1EOs/aDqUOtpxeknrniTviFdrrIrCXTd9uAT/r4GXU+kD9JKmSP6Z6ywgr73QgQIg4m/pl8fHPBA86xR14lv0c/t4ZxKr3D9jtHnLS1nddCxKnUhlmURbk8EqMU7SuP9McFynh5TZs3iWsaBiIJBGX61BJI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739324010; c=relaxed/simple;
+	bh=bt+gsvDLxq5yFDAbBIctYDejdXEGvc9ZUACCqOiEUb0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cUAykrTL+cBfbWz/efN3dst/hsCMuGWgmcOQ5Phb/G5ve/s02ZrvZvP34Kr4X+xyY7jAxaxKPCvLwYozSTXZno2mN8BTi42EBWQp/TV6WoFp63BUdFBaWmm4baHU4g9x6GySmrCLri8Y+92G3537L97n7+4Vpopq4PnGP+Yyvrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUpwbLP2; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4679eacf2c5so62923831cf.0;
+        Tue, 11 Feb 2025 17:33:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e14S7Fag7zMFT4WNROQZjlDmBXMMj9AbBLZHccZziEg=;
- b=D4Okt1ACjG5GJ1QLewpgFVrC9piA7NyqY2MirE9gqwXsilmBPxVTkBLj1dcfgHX6ql3FqgSreaZe1c/Bg37mUaw7LzLpt25DsDipXNt7D9/I++c3OxfrIdwPOGxXrbIBZycAPVBjX4Nwt3UKSCV3nLr+ObPcQbtOfo2XqNsmRyk=
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com (2603:10b6:930:7c::10)
- by SJ0PR10MB4528.namprd10.prod.outlook.com (2603:10b6:a03:2d4::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.19; Wed, 12 Feb
- 2025 01:08:41 +0000
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::b779:d0be:9e3a:34f0]) by CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::b779:d0be:9e3a:34f0%4]) with mapi id 15.20.8445.008; Wed, 12 Feb 2025
- 01:08:41 +0000
-Message-ID: <a6ea0706-e8b0-4416-86b3-c6eeeda49760@oracle.com>
-Date: Tue, 11 Feb 2025 19:08:39 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/9] vhost-scsi: log control queue write descriptors
-To: Dongli Zhang <dongli.zhang@oracle.com>, virtualization@lists.linux.dev,
-        netdev@vger.kernel.org, kvm@vger.kernel.org
-Cc: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, joao.m.martins@oracle.com,
-        joe.jin@oracle.com, si-wei.liu@oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20250207184212.20831-1-dongli.zhang@oracle.com>
- <20250207184212.20831-6-dongli.zhang@oracle.com>
-Content-Language: en-US
-From: Mike Christie <michael.christie@oracle.com>
-In-Reply-To: <20250207184212.20831-6-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0299.namprd03.prod.outlook.com
- (2603:10b6:610:e6::34) To CY8PR10MB7243.namprd10.prod.outlook.com
- (2603:10b6:930:7c::10)
+        d=gmail.com; s=20230601; t=1739324007; x=1739928807; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tE3GA90GrW0w6tRwYGDghmrthDfVKU/PTEoSDpTx3LI=;
+        b=HUpwbLP2qnkX4p1ghWkB18gGzSTNSILe3W2dXO9mLRh0r9vKYxHsJIhlcWTnQrII/V
+         tRKWylaTm4l6z5aozdHD/Lizv7hd9JaA7UEqMUEKCfBfeHSLC8HwjfPZcKeKTR6+9rd6
+         Wvvh2BkMUbc1joa32ATaJpqIWKQyBv6rcnIKXkMEbwfNUrASwhSHYB6xI1Nwnd9uBl3f
+         h9XGT2+FqeJf6tJalfSPyVioN8gGRV152SAjyN8O3p0s6IiSbRKJQo8BvkcQtKcpoW+D
+         yxWUjGuvUbUAYX15VSUsGJfJrXSQTnSQUQY1DQuXAGnsRCN+DdUyZowGLQAy09OBF+kx
+         l9HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739324007; x=1739928807;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tE3GA90GrW0w6tRwYGDghmrthDfVKU/PTEoSDpTx3LI=;
+        b=rXQa/QIo1Nl4xhg+DJWYMqrAir2ofAU8wFcvO4vkgtnwUZVX75ocWnl8KUbgy8s2Ii
+         WYVvFtHS307cB0XlwT4i/wFLntcGCGNF0LgW8YUwN8A5yIdBXnv2KCfjIZu1ewHB+YD7
+         P+cLl3+vCTRedxK++fpf9maY3Rv4rVpQHdLdi/uz3kYd2cbmL1IQBUbbYLY2S3Kcgtwi
+         M/Aq97sBu8YQUmaEhYE0LOO7VVFRXjqt8eG1y9Og/CgwhbRD/BhUzmMOjn8QyWq9Ltpb
+         pqqyyEOl5jAbX0BXsSzzqMANwRy4l7L5oaS/8ZKJK43Ucsvp/MGiwAOtsq6IBbIwTXmd
+         2kzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvzYDijAKkRH/lzRffpvUJDslCzyaNJb8ookDUjs9V/BZWuh0Wcu2XWNCmOHX3WRROEXSEDNnHVrtfCvO6Pac=@vger.kernel.org, AJvYcCW7f9iwmGbxijWJYqG3gjyti32Pk/ewMa3GxuVuXfFKKN1VFC3VDfTaq3dIYonvID3wPYgyOm8y@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1oY3XMnCCXC6Ghbu6cshcoeNJCjjrcBmbjQ/tljDXTOfwqRAI
+	BvUnc847kiRuhVUKGs79aTZV1hnrx2TtX3FpiC0DDVnRmzXWzhZmZTVtpg==
+X-Gm-Gg: ASbGncvOtQ+xeVt73/6MM70cC+2/8TT3nHea4q5KtM8t4hB0jgSRKxByNH/P85YGaIO
+	tfslj4p+fkqQ37dQRmsuB/6psYSYGjlf6A/sTMGvYObdswVJ51PUMxmZ5Cdt6jVa6/PE3Ktk634
+	ZzvoCf5Sjubx6/02/3OlW0sS4JWsZQZCKKNof07Jw8MTZ3zXCaWO4DwJQjFHSq9MB8TOY5k7TAH
+	IADPoqngeO/t9HrLim+MMIbQiX3Vq40fS+ZM48apn4E8yLJ8vpBmdLYUqsCYtzNyD1aIeMRhv9C
+	KzHGfj4qsoyL4HBegVDVaYesrI5t2XbLKZIElQattIfAtNAMYCADqe+q9qHBPXg=
+X-Google-Smtp-Source: AGHT+IG+bfzCvJjk9A6j0ujipKYo1yWj4wSoJmLekPiAvZd8cI3bWU37LxOZOatiXlqXaQ6Do2O2QQ==
+X-Received: by 2002:a05:6214:b6a:b0:6e1:afcf:8748 with SMTP id 6a1803df08f44-6e46eda2de1mr27857346d6.19.1739324007269;
+        Tue, 11 Feb 2025 17:33:27 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e4564086ccsm45498346d6.17.2025.02.11.17.33.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 17:33:26 -0800 (PST)
+Date: Tue, 11 Feb 2025 20:33:25 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Pauli Virtanen <pav@iki.fi>, 
+ linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org
+Message-ID: <67abfa65cce76_155892294dc@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CABBYNZJvP6mZoE4L5XME=kDkDTKiFdX=36VXGDAfHyLi7tJKdw@mail.gmail.com>
+References: <cover.1739097311.git.pav@iki.fi>
+ <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+ <67a972a6e2704_14761294b0@willemb.c.googlers.com.notmuch>
+ <0c86c0db795e1571143539ec7b3ea73d21f521a5.camel@iki.fi>
+ <67aa48e647f87_74092294e9@willemb.c.googlers.com.notmuch>
+ <CABBYNZJvP6mZoE4L5XME=kDkDTKiFdX=36VXGDAfHyLi7tJKdw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR10MB7243:EE_|SJ0PR10MB4528:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1cc949bb-2489-4495-702f-08dd4b01c9e2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aklidnRzeDA5K3Q3bmx4VjdOOXNWeGN3eHBBZFQxUitoaHM0TC9XMlNpV09O?=
- =?utf-8?B?UUxDNGI1MnVGZ3NFQkpDc0t2bEh4TXRwQ3BpNDVuNW5yeDVyamVpa2Z6R3RQ?=
- =?utf-8?B?MkpidTg0Q01qOURzT1JLZ3Q5Wlk4R3YrbG9lenlaeFVRRS9JUS9iQXBwbGl2?=
- =?utf-8?B?bEI1QWRGaXJXcmNUclVna29DU1VxQ2tETXc1UHRLRjErRjNramN4bHhhcDNL?=
- =?utf-8?B?bytiR1VVSnJzalRsK0FtZk93cVZTcnlZZnB4UG9VVnhsSTBlNTc4OFlPWGxO?=
- =?utf-8?B?YTJNZkxtZlltOHhWTEk5VGUyK01jbW1oWFVGZ0NtSHIyb251RDFnUGdScDJL?=
- =?utf-8?B?Uk5TT2lqNGN0amxkOEg2UStXZFIzZHVUOXVPeW5IL3NHb0ZxN2FXc3gxU05U?=
- =?utf-8?B?SHUwWmdXcFBLK2h0Z252NUg2aXM1ODBERC9FR3JUbWg3cXVsdTNtbncxMFdz?=
- =?utf-8?B?YklYV3kwWjJNNkczT21kWmdGSzVnTDQybldQTkV4M1JaWWMxdHZ6cGFrdGp3?=
- =?utf-8?B?STZxZ3BXRzk5eTJhVlVOM2JNV2d1UDZOYlFURGZuNlY2MWh2STdWNnUzYm9M?=
- =?utf-8?B?cGtVZGE2eFpnMHhWOTdlcTJxTXZEUlhaenByWk5ZSlR1cWlIa3l2eS93clRK?=
- =?utf-8?B?WWxsNXo5dWY2UHMvRFA0alJmdXVnZEt2bWdBa0dxYWp1VGsxYi94R2xHdEZM?=
- =?utf-8?B?VFFMZGdPblZNOGhKUlRjcUJGZXZ5NTdzZnJ2TisrNS9VL2c3R3BjdUZyMmpn?=
- =?utf-8?B?dlZlTTV1K08zS1pVS0RsaGdiR0tPck1BY08zUThac1dZODBpdjFxWXJFZXRD?=
- =?utf-8?B?c3lYNHh4Y1RqSTRxUG00MllOMkg0NzFYai9lcDZHa1NwWHlXUVdFNXRTK0Zp?=
- =?utf-8?B?R0hOUEpJNkcxM3NtYXJ6OS9kMFVlWENvc1h3b2EzNWtxV2RXdW5jNXBlYTZk?=
- =?utf-8?B?alVxZkNmS3Q5WVp4dElESmV2OHVrQzkrd2NYZVRPejY1OWpoZjNqd1UrWmZt?=
- =?utf-8?B?NXRpYVlrK3pOYisyUW5iU28ydVBsYkN5anNHUG1zRlQ0ZHlUUFgzN0Qwc21a?=
- =?utf-8?B?SVBiRlBLR1crNVdabWZ4cThMWkN1QXIwVUdxSXMrRFdhci9PL2hycERHTGNH?=
- =?utf-8?B?Q00vdDZySE40Z09BQ0NKZCtOdVhqSjFPSXhEZERFTjRzRW5Hd29HVW9RYzBm?=
- =?utf-8?B?cFVUa1F1VFNoWTk0S05QU01McndtbWxJQ28veXdZcHJwVEJWazNSSlgrakx0?=
- =?utf-8?B?YmdmUEF2NXlXaStkMmQyeVFRUE9STGlGN2NIOWJsRzhiTFcrLzExQ0pvbUc1?=
- =?utf-8?B?NEVVQTVaZDZnNWF5eVVuYkhhNndDZ05QU2VTZ0UwTG1sencwRXdUZkFaNktO?=
- =?utf-8?B?NmNWRWkvdS9IaHZTQWpJbHBnRnB5M1hxSG5QUkVURmJyd25lMzBoTjFYb2du?=
- =?utf-8?B?ZUhQWWp5LzQvM25KRGJjSWNHYnZsRk9vVW5RdUplb1NuZVBQNFprRWorbmJS?=
- =?utf-8?B?QnpoV3hWZmtGU3BEUWtDN2JpU0gwdEdqMFVqb09ndmRGMnd2cHB2ZllXdVhm?=
- =?utf-8?B?ZlNGOHRTWEpFQWx2a2c1SlBncXdpWFFmUU1oR1p2Z1IwSllucGpTS2Myd0ZF?=
- =?utf-8?B?YmRhWXJXbTYrSCt1dHZMaHMxNXZ6N2sySFRZRW53ZytMNDZBVysrL1BTa0t1?=
- =?utf-8?B?QmxWRTE1dkFmOE5Lc3k1TitoRHVtMERoV1NpMWFTTi9RTE1FSU9kWWpZQzc5?=
- =?utf-8?B?MGE5TSttdVNQNUpjZGlrQkJ2bHdRV29LVGtsT2JFOUZIM0xSSDBaTTNGS3pO?=
- =?utf-8?B?NUlHdThudjZRY3hQNDdKK291R2wzdVlrZmd0aEZ2NEpNYmZPM0RCaHptanNm?=
- =?utf-8?Q?6Jx7QKUu+7mvW?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR10MB7243.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cmkyQ3hIVzVoYm5tQTBxdlRNK2xCNXVSaFZSc1FNNEVYeG4ydXNzSTROZ3Jw?=
- =?utf-8?B?cGRiSVR6c2FpRHdSLzhRVTJLUFFya1ZLVDdJM0s4OWwvNHl4QnkzRURVWEZG?=
- =?utf-8?B?NkNTcVVDeFNJOGpyeTJaOGs1czYyVFQ3RHluaXhkQmZqbG9ydGlpcjVTcGVS?=
- =?utf-8?B?U3RBWnMrZXdUY0dTQjl2ditxUmR2bEJjOXlSYWNKZVdvamVjcTVJclpDVEQr?=
- =?utf-8?B?VDU0R1pVZUNoUlFRKzBpNzZndVdXa1ZrSGJJSjd0eWJKTCs4TjlSWmdaK3Bs?=
- =?utf-8?B?R1pub1lWM0VuWjM3WDEzSWwxdGpOODk5bUVra3RoLzdQZkpKLzJsQTM0cms2?=
- =?utf-8?B?c3ovY3o1cksyayt4RTFsamJSblJBOXYvRkdKdlliaWcxbm1wa0lvWDlzc1dG?=
- =?utf-8?B?WWdxOXBJZ3k5N1laL2hZdUY5ZmRjRTJCV3RwQTdwMmUwQlFRUVp5Z0xzQXc4?=
- =?utf-8?B?Y3N3TFFEb2Rxd3lESWdMZlRqR3ZDTUFsRUk2WE1OelJXWW84V0tYckxkM3Nv?=
- =?utf-8?B?WnV0M2M5R1hLNkVVRUM2eGxRdDRqNHZPSG85cjZmNldIclNZMlJzZWpuQk40?=
- =?utf-8?B?UjRaNW1kZGRkeFdjWlJEMTdCSXprZzRrdFJEcEVFNm1hM1ZaL25SV0JCTDU4?=
- =?utf-8?B?eXVKanJvWjN6NVhHWmQwaXozOXlmYnZvcnBXSUZxdk5yTURwTFU3ZEwxTWFT?=
- =?utf-8?B?VXpIcEFlTjRxWERtOU9pK2h2V3Z0SmZGN1M0TTh3bHJwaVh1MDJYYzdiRW9u?=
- =?utf-8?B?NWdITVJsS0lZQjlleERlUTBJci9PL0NCUmJlUUtlUnFkbkFDbGVjdDVJREg4?=
- =?utf-8?B?QTF0Kytsa25yTk5la1lmN01rdFk1dzVid0dNUFNBdHlCWkZpVlhlUWlOQ1VW?=
- =?utf-8?B?R2kzTlRLWVp2Q016UlBJei9XWTNnaVJ1TTJzWS9rWWxyMXlMYUxLWlZCemo4?=
- =?utf-8?B?TmZTalRCUDh5OElkWW5FQ3pBamg2N1NGYnJSN3pKWGd1ZUs1RFZaM1NRaTZz?=
- =?utf-8?B?MUdhL1VLWmlEZ2I4dVJ4NWd2MU05UlFyZTY2RTF5azFKbjlxUkJ0NDNyZmtD?=
- =?utf-8?B?ZmkycE5BSDFPN0xPc3ZtTEltbHAvd0FReHcvLzhTampzVCtPZlM5TU5wdUsy?=
- =?utf-8?B?clh4bGxCNXFtNitMVWlFZXNTeStnbTFXMWN2MUpLS2lKdzFqTGNQazBjV2hj?=
- =?utf-8?B?QlBvMklSUnVhczVuMGRXZnBiNFJPejU5bHpYUEhMTXNzMm9mcU1EUTZjTVBz?=
- =?utf-8?B?aEtOaE9ETWltWEs5Z1gzamhCNU5oYXRVNjcyTGIxWTRGN3Uwc0J4S3lBcmhq?=
- =?utf-8?B?L3V0MzdVdnl0QnZQZDVKNkluQmRiNlJ2QjBBTmROQXkrTjZIT2lGaXNvZ1Ax?=
- =?utf-8?B?b01uMms4R1JHVkFZMUdZOVFUb2VrS1E2YWt1VFpEYnVEdllPRjRITWhQYnlD?=
- =?utf-8?B?TFZPbS9PNUM5RXltMXg0VkJpUFFxYWhnaFYyalJ5RkV2QkRsSGpNbDAzUmhV?=
- =?utf-8?B?em94N2hxM2VyOHRrM092cllINlQ1aVFzVHQ5VzJDVndCcnEyVE5URXBBZGpI?=
- =?utf-8?B?Y1lBK1FTZXBHLzYrem5YRkNXem92Yzc0alNENThwaGZERmFhSXNWbE1MZG84?=
- =?utf-8?B?VTZtak4xRFlQQnc1TXh2QzN2M29MMHUyOVN3NEMzL0sxTGgyVS9lbmxma3Vn?=
- =?utf-8?B?UTRUWVltQ0NvQWxERzRQbmRVcWhPdVFXRTg2STNuZEVmV3g2VnVDVWQvWm5J?=
- =?utf-8?B?aEx0bmx3b0ZRVWtEQWNUV3FWclg5aS85dHE3UllHNnhjdzlpcHA3Z25Vak9T?=
- =?utf-8?B?NGFrbGFhWnUxNXBxTUpQZlh4ZXFlR1ZaTnVrUFFxb2hObnNZMTZGejB4TmFr?=
- =?utf-8?B?QWQ4cmRHelAxWExwZ2NRMWxBM2xqVW9uTXdXYWhBUlNzS1ArZjZtcFVhdVkr?=
- =?utf-8?B?NTdZZWNMNk9jMEZOMjZWRHVsSzc5TTVBWUZCcC9FME56Yy8vRnhNZk1NaHF5?=
- =?utf-8?B?b2VoUlB5eE5HcXRlcHdDc25uaVFpbkNqU1VPTWxnc2JuMW1YWlR3V2hGZGRE?=
- =?utf-8?B?OWZDbWJuTDVlOTU2NTkxRWk3ZndsWG9sSldDVjdCY2VxelozcXFZU0RsRnAw?=
- =?utf-8?B?bEZQb3JBWXJ0VDJZZldncjMvVjRZNCtmVFJVTlkxbkp2OGswanpuOEswSW5E?=
- =?utf-8?B?RFE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	/s9gtQna8RCYoeouvZDlSUuaVQm/JbW9IKH2egqsZwaYY7dQkyh8277HVIRik/2wSUS1FJzsRLBq/FkA5AgOYgj9CVJ7Bnx3oO5+LMhWVmCgybQr4H6MGDZ1zNPK2UwX9E6FzsTqPRrOG2kQbSrV7SwWNsbXWuqq821qyR+iJQKrhUyRZ3Q79r0otNGFxBdz4KMWPWMx0E+0vFTSfa4+rQekPiOH9qLE223fjiCBU3nYqK5W6tiQmlgWMcR0AtsNgvfVqOEMiXnlVVxfUEppC+vgqF+/4Fn3xe5/GslJXpJoYYFP3WLCTRFSSnU3jy29sHUuhxxTMmzGqmOMpBM17REmp098JPSQnVjoCS3/ykdlWKZ2+Inlgv6r1+AzwS5UC9irMPVOtOuFkgESdAcn/V5Twk5+/t2NibGMXyaorZI/vqIXvhEC44oEu1Abfq8xIL4mq2TNEWwgczYXVs6gcg1b6bS0E2a4NeLm5CiJM+f0URg/br54VoER+UbbfGZ9EwgwKNapGZeQAnm/xKRFNjYH0GY1Jwkj4YJFDjfUR8dPJ9Jwaq3y+UZig5O6aJdY2oIF55GTRqPPqDESyh3ssCMDvmwXn8h1pWkppRZ+P1E=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1cc949bb-2489-4495-702f-08dd4b01c9e2
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR10MB7243.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 01:08:41.3283
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1mbkBQGgIMCYzRHjFsYkdKpnESwxnwpyyQk/G4wXbFkYkaTCXWCOlC6dybUqOgRjoWSBxuVmb5e7S94vfttRTPvE6YEJk3QDh+2FFgSzXXQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4528
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-11_10,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 malwarescore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
- definitions=main-2502120007
-X-Proofpoint-ORIG-GUID: _mp4vHPru8sCpIiY3nwwKJWfE120vUhS
-X-Proofpoint-GUID: _mp4vHPru8sCpIiY3nwwKJWfE120vUhS
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2/7/25 12:41 PM, Dongli Zhang wrote:
-> @@ -378,6 +384,11 @@ static void vhost_scsi_release_tmf_res(struct vhost_scsi_tmf *tmf)
->  {
->  	struct vhost_scsi_inflight *inflight = tmf->inflight;
->  
-> +	if (tmf->tmf_log_num) {
-> +		kfree(tmf->tmf_log);
-> +		tmf->tmf_log_num = 0;
+Luiz Augusto von Dentz wrote:
+> Hi Willem,
+> =
 
-Just a small nit. We can drop this line above. We free
-the struct on the next line so it's not useful.
+> On Mon, Feb 10, 2025 at 1:43=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Pauli Virtanen wrote:
+> > > Hi,
+> > >
+> > > su, 2025-02-09 kello 22:29 -0500, Willem de Bruijn kirjoitti:
+> > > > Pauli Virtanen wrote:
+> > > > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software t=
+imestamp
+> > > > > when hardware reports a packet completed.
+> > > > >
+> > > > > Completion tstamp is useful for Bluetooth, where hardware tx ti=
+mestamps
+> > > > > cannot be obtained except for ISO packets, and the hardware has=
+ a queue
+> > > > > where packets may wait.  In this case the software SND timestam=
+p only
+> > > > > reflects the kernel-side part of the total latency (usually sma=
+ll) and
+> > > > > queue length (usually 0 unless HW buffers congested), whereas t=
+he
+> > > > > completion report time is more informative of the true latency.=
 
-> +	}
-> +
->  	kfree(tmf);
+> > > > >
+> > > > > It may also be useful in other cases where HW TX timestamps can=
+not be
+> > > > > obtained and user wants to estimate an upper bound to when the =
+TX
+> > > > > probably happened.
+> > > >
+> > > > Getting the completion timestamp may indeed be useful more broadl=
+y.
+> > > >
+> > > > Alternatively, the HW timestamp is relatively imprecisely defined=
+ so
+> > > > you could even just use that. Ideally, a hw timestamp conforms to=
+ IEEE
+> > > > 1588v2 PHY: first symbol on the wire IIRC. But in many cases this=
+ is
+> > > > not the case. It is not feasible at line rate, or the timestamp i=
+s
+> > > > only taken when the completion is written over PCI, which may be
+> > > > subject to PCI backpressure and happen after transmission on the =
+wire.
+> > > > As a result, the worst case hw tstamp must already be assumed not=
+ much
+> > > > earlier than a completion timestamp.
+> > >
+> > > For BT ISO packets, in theory hw-provided TX timestamps exist, and =
+we
+> > > might want both (with separate flags for enabling them). I don't re=
+ally
+> > > know, last I looked Intel HW didn't support them, and it's not clea=
+r to
+> > > which degree they are useful.
+> >
+> > That's reason enough to separate these measurement types.
+> >
+> > If we don't do it properly now, we won't be able to update drivers
+> > later once users depend on requesting hw timestamps when they mean to=
+
+> > get completion timestamps.
+> >
+> > > > That said, +1 on adding explicit well defined measurement point
+> > > > instead.
+> > > >
+> > > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > > > ---
+> > > > >  Documentation/networking/timestamping.rst | 9 +++++++++
+> > > > >  include/linux/skbuff.h                    | 6 +++++-
+> > > > >  include/uapi/linux/errqueue.h             | 1 +
+> > > > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
+> > > > >  net/ethtool/common.c                      | 1 +
+> > > > >  net/socket.c                              | 3 +++
+> > > > >  6 files changed, 23 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/Documentation/networking/timestamping.rst b/Docume=
+ntation/networking/timestamping.rst
+> > > > > index 61ef9da10e28..de2afed7a516 100644
+> > > > > --- a/Documentation/networking/timestamping.rst
+> > > > > +++ b/Documentation/networking/timestamping.rst
+> > > > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+> > > > >    cumulative acknowledgment. The mechanism ignores SACK and FA=
+CK.
+> > > > >    This flag can be enabled via both socket options and control=
+ messages.
+> > > > >
+> > > > > +SOF_TIMESTAMPING_TX_COMPLETION:
+> > > > > +  Request tx timestamps on packet tx completion.  The completi=
+on
+> > > > > +  timestamp is generated by the kernel when it receives packet=
+ a
+> > > > > +  completion report from the hardware. Hardware may report mul=
+tiple
+> > > > > +  packets at once, and completion timestamps reflect the timin=
+g of the
+> > > > > +  report and not actual tx time. The completion timestamps are=
+
+> > > > > +  currently implemented only for: Bluetooth L2CAP and ISO.  Th=
+is
+> > > > > +  flag can be enabled via both socket options and control mess=
+ages.
+> > > > > +
+> > > >
+> > > > Either we should support this uniformly, or it should be possible=
+ to
+> > > > query whether a driver supports this.
+> > > >
+> > > > Unfortunately all completion callbacks are driver specific.
+> > > >
+> > > > But drivers that support hwtstamps will call skb_tstamp_tx with
+> > > > nonzero hwtstamps. We could use that also to compute and queue
+> > > > a completion timestamp if requested. At least for existing NIC
+> > > > drivers.
+> > >
+> > > Ok. If possible, I'd like to avoid changing the behavior of the non=
+-
+> > > Bluetooth parts of net/ here, as I'm not familiar with those.
+> > >
+> > > I guess a simpler solution could be that sock_set_timestamping() ch=
+ecks
+> > > the type of the socket, and gives EINVAL if the flag is set for non=
+-
+> > > Bluetooth sockets?
+> >
+> > Actually, I'd prefer to have this completion timestamp ability for al=
+l
+> > drivers. And avoid creating subsystem private mechanisms.
+> >
+> > I suppose we can punt on the get_ts_info control API if need be.
+> =
+
+> I guess that it is reasonable if we don't have to do the work for
+> drivers other than Bluetooth otherwise I'd say you are probably asking
+> too much here,
+
+I was mainly agreeing to Pauli's implementation in this series.
+Not asking to do any work irrelevant to BT.
+
+> also doesn't this land on the TSN space if one needs to
+> tightly control timings? I suspect if this sort of change was not
+> necessary for TSN then perhaps it wouldn't be of much value to try to
+> generalize this.
+
+I don't fully follow. But in general SO_TIMESTAMPING is not limited to
+TSN.
+
+> =
+
+> > > One could then postpone having to invent how to check the driver
+> > > support, and user would know non-supported status from setsockopt
+> > > failing.
+> > >
+> > > > >  1.3.2 Timestamp Reporting
+> > > > >  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > > > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > > > > index bb2b751d274a..3707c9075ae9 100644
+> > > > > --- a/include/linux/skbuff.h
+> > > > > +++ b/include/linux/skbuff.h
+> > > > > @@ -489,10 +489,14 @@ enum {
+> > > > >
+> > > > >   /* generate software time stamp when entering packet scheduli=
+ng */
+> > > > >   SKBTX_SCHED_TSTAMP =3D 1 << 6,
+> > > > > +
+> > > > > + /* generate software time stamp on packet tx completion */
+> > > > > + SKBTX_COMPLETION_TSTAMP =3D 1 << 7,
+> > > > >  };
+> > > > >
+> > > > >  #define SKBTX_ANY_SW_TSTAMP      (SKBTX_SW_TSTAMP    | \
+> > > > > -                          SKBTX_SCHED_TSTAMP)
+> > > > > +                          SKBTX_SCHED_TSTAMP | \
+> > > > > +                          SKBTX_COMPLETION_TSTAMP)
+> > > >
+> > > > These fields are used in the skb_shared_info tx_flags field.
+> > > > Which is a very scarce resource. This takes the last available bi=
+t.
+> > > > That is my only possible concern: the opportunity cost.
+> > >
+> > > If doing it per-protocol sounds ok, it could be put in bt_skb_cb
+> > > instead.
+> > >
+> > > Since the completion timestamp didn't already exist, it maybe means=
+
+> > > it's probably not that important for other parts of net/
+> >
+> > I can see its value especially for hardware that does not support
+> > hardware timestamps, or hw timestamps at line rate.
+> >
+> > This gives a reasonable estimation of transmission time and
+> > measure of device delay.
+> >
+> > It is device specific whether it will be an over- or under-estimation=
+,
+> > depending on whether the completion is queued to the host after or
+> > before the data is written on the wire. But either way, it will
+> > include the delay in processing the tx queue, which on multi-queue
+> > NICs and with TSO may be substantial (even before considering HW
+> > rate limiting).
+> >
+> > > > >  #define SKBTX_ANY_TSTAMP (SKBTX_HW_TSTAMP | \
+> > > > >                            SKBTX_HW_TSTAMP_USE_CYCLES | \
+> > > > >                            SKBTX_ANY_SW_TSTAMP)
+> > > > > diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux=
+/errqueue.h
+> > > > > index 3c70e8ac14b8..1ea47309d772 100644
+> > > > > --- a/include/uapi/linux/errqueue.h
+> > > > > +++ b/include/uapi/linux/errqueue.h
+> > > > > @@ -73,6 +73,7 @@ enum {
+> > > > >   SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */=
+
+> > > > >   SCM_TSTAMP_SCHED,       /* data entered the packet scheduler =
+*/
+> > > > >   SCM_TSTAMP_ACK,         /* data acknowledged by peer */
+> > > > > + SCM_TSTAMP_COMPLETION,  /* packet tx completion */
+> > > > >  };
+> > > > >
+> > > > >  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> > > > > diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/lin=
+ux/net_tstamp.h
+> > > > > index 55b0ab51096c..383213de612a 100644
+> > > > > --- a/include/uapi/linux/net_tstamp.h
+> > > > > +++ b/include/uapi/linux/net_tstamp.h
+> > > > > @@ -44,8 +44,9 @@ enum {
+> > > > >   SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
+> > > > >   SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
+> > > > >   SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
+> > > > > + SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
+> > > > >
+> > > > > - SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
+> > > > > + SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
+> > > > >   SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
+> > > > >                            SOF_TIMESTAMPING_LAST
+> > > > >  };
+> > > > > @@ -58,7 +59,8 @@ enum {
+> > > > >  #define SOF_TIMESTAMPING_TX_RECORD_MASK  (SOF_TIMESTAMPING_TX_=
+HARDWARE | \
+> > > > >                                    SOF_TIMESTAMPING_TX_SOFTWARE=
+ | \
+> > > > >                                    SOF_TIMESTAMPING_TX_SCHED | =
+\
+> > > > > -                                  SOF_TIMESTAMPING_TX_ACK)
+> > > > > +                                  SOF_TIMESTAMPING_TX_ACK | \
+> > > > > +                                  SOF_TIMESTAMPING_TX_COMPLETI=
+ON)
+> > > > >
+> > > > >  /**
+> > > > >   * struct so_timestamping - SO_TIMESTAMPING parameter
+> > > > > diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> > > > > index 2bd77c94f9f1..75e3b756012e 100644
+> > > > > --- a/net/ethtool/common.c
+> > > > > +++ b/net/ethtool/common.c
+> > > > > @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GST=
+RING_LEN] =3D {
+> > > > >   [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
+> > > > >   [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-t=
+cp",
+> > > > >   [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-=
+filter",
+> > > > > + [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "completion=
+-transmit",
+> > > >
+> > > > just "tx-completion"?
+> > >
+> > > Ok.
+> > >
+> > > --
+> > > Pauli Virtanen
+> >
+> >
+> =
+
+> =
+
+> -- =
+
+> Luiz Augusto von Dentz
+
 
 
