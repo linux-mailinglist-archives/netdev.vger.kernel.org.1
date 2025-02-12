@@ -1,162 +1,189 @@
-Return-Path: <netdev+bounces-165576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4E60A32999
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:12:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9896A32992
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:11:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B41F7A0F6E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 331991886FBA
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A61021128B;
-	Wed, 12 Feb 2025 15:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E019211285;
+	Wed, 12 Feb 2025 15:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b="kz9BXHLv"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bwC5rewM";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o/HgXyp8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E1E205AD9
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 15:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30212211276
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 15:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739373124; cv=none; b=EAxb/ZuraABM42cjOOF18bA26bfCASpUEoN7hEPvP3Q8B9i0S6Ns4jBALS+FqI2iN5QmHehVhUJXj7hjSmsgPB1cJr4Xr6DIP22xD3/9jlstOZccpnVIUd+51sT4mnOU5TxoibOrf2KuKS04DpXQ/guBCREUhCsw7k5cTrmjPX8=
+	t=1739373074; cv=none; b=WDbFCujbaiAoGrtZr5cUCguNiaXt0h0nyA0SCCV7C7Dl7DuVyzFDcsjjOOP0t87h8LnZUvrUFh2qEbznet69yIQ4H+LBmuGVzgrMX8ACN/DrNv+vPDv4c9+ObixrNoeC7lOa1KV1NInoOYqTRniL9qnUjbTFZqeUzSDCossvMYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739373124; c=relaxed/simple;
-	bh=iYYgOVh/wMPRfKLMkmfkwGvXX3aTI7asNbgiuPtLu7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PWW9Q22yDtJ/RGdq00QJZPThYGDU4/XuWAMiTVMFHWUNaaeoIH8WnliXRW7FkiTXTMCWY+6jLw/ZWstM3xeayBU17Nbeoj7TtwNwEDOh2Q+x77sc9byuxfQl5Dt/fDZZqbi0X5Y82v0GIYtQRlyoTpHSAX7CJ/5i06u8CTI4T2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b=kz9BXHLv; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
-	s=s42582890; t=1739373110; x=1739977910; i=max.schulze@online.de;
-	bh=69iOg/ICZX5QDn2FKF/ks/dYJcXUBDzwvR/qt3V+nNg=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=kz9BXHLvd7Flo9CkJD/itQxMUI9zh9C0HwNKPCxH48bxpPSplMdO+rGSxtnxz4Sy
-	 j+P6ymb6SZr8TKxBjFLOkT+IPbVFpbencFTtiTueNIYw58/7e9gdTYTWteLwPktvd
-	 4JCNFqdLW63nCL/z8nOF0mOg64MNgJcVa24xAI/OSLrn+m7puChLcJikc4c16gvsj
-	 mWsbJgmlhOtiWKFtbX+gGipFwZFN4I9mOuCEtSXjwRuQ3BJ21zRS6nuhJstS4zhxm
-	 +MuftuHQMa40Bon0qvh1ajnEGoFSFqfwbKqxOfRkx1HN1tbyZdrbr6xnr8y7NVCCu
-	 hLcnPZm3a6peN0egYw==
-X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
-Received: from ubu24desk.fritz.box ([84.160.55.49]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N7Qkv-1tJ5Kd0WIX-00w0Qq; Wed, 12 Feb 2025 16:11:50 +0100
-From: Max Schulze <max.schulze@online.de>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch
-Cc: Max Schulze <max.schulze@online.de>,
-	David Hollis <dhollis@davehollis.com>,
-	Sven Kreiensen <s.kreiensen@lyconsys.com>
-Subject: [PATCH net v3] net: usb: asix_devices: add FiberGecko DeviceID
-Date: Wed, 12 Feb 2025 16:09:51 +0100
-Message-ID: <20250212150957.43900-2-max.schulze@online.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250126114203.12940-1-max.schulze@online.de>
-References: <20250126114203.12940-1-max.schulze@online.de>
+	s=arc-20240116; t=1739373074; c=relaxed/simple;
+	bh=82qqi7EhBcHhvR+S/WkfkXa0RYZNI9DIYY5fDYXpCNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rahT+7NziBCXSTX8GlWDxJeYO2ob/Xz9RzT9V+qPGmnhg4xcruugWpls1jeGtNyXWgs5e756zYcJBQSOhviijs2j8fDyiVp8FHGxzImNuWJ53eRv2gJhTFK6fq90f3GfmWbpS9hO7TyJp8/TauQWVhbTVFuA+HdPzQge76ums2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bwC5rewM; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o/HgXyp8; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 12 Feb 2025 16:11:08 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1739373070;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9SrfOWDCT3XuVLyeucGyiCbsN3LAsppGk75lAUq/SMs=;
+	b=bwC5rewMj4IiTKRVeoaFCl3ZEAWop6emxipwa6BMA4/fCHtzKaYn+EI4P+DGRI3kozJMDc
+	x2JIUDdg9OMpF2Vqchi7IIHryBwaqvssgk/NpeuE5p9Ty73Zii7A6sZ8JbLak87/DVvzLR
+	e+tV+PtROlAaitsiGhgEfA2IGr50N+GjOT1141DgpaOwUTqbSzqwIBrIWAkEcKR28r0XVn
+	jD1RoGV6y7UeIQlB4OMCfD5T20FHdAnyyuPSrPQTIHU8YM4wetZCIgaNPATEZUFhpU6viw
+	D2TLMt6dMaFbi5xlgkKZFrEY3y35+CNpjVh9RdOjESXfE2N1yl5XTLbBQpXezQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1739373070;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9SrfOWDCT3XuVLyeucGyiCbsN3LAsppGk75lAUq/SMs=;
+	b=o/HgXyp8ZAFpI+kXnPtVxC36730434MotVM6XITNddzybVCSipIvUNpBOGw7Hk2ufBW1v4
+	If0ijLensOdwkJCQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Wander Lairson Costa <wander@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	andrew+netdev@lunn.ch, netdev@vger.kernel.org, rostedt@goodmis.org,
+	clrkwllms@kernel.org, jgarzik@redhat.com, yuma@redhat.com,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
+ for PREEMPT_RT
+Message-ID: <20250212151108.jI8qODdD@linutronix.de>
+References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
+ <20250205094818.I-Jl44AK@linutronix.de>
+ <mrw3tpwsravsaibkcpptdkko3ff6qtk6w6ernqvjisk4l7owok@q6hmxkzcdkey>
+ <20250206115914.VfzGTwD8@linutronix.de>
+ <zy3irjybyc32hnow3ckhkfsrtfm5nev44aeovinlkkfc6tyyjv@gcblibp5ng3o>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:FpQOv4c81lDl0TY7hu4HmoYJXfhtj5eMm0a+IF0S/wTTHXdqqdO
- H68pxB94g7xeiaEKbOn+3RgaYDx4k7rS9rxAGwzoQg0Aqe3owoN9CHrmdBZKdad34gv6Qjy
- di4MDdKWYI2I+G+bM5ea2EuTqAUnr/BJRrPLOvUt2XrWjAKNDOaPabLq+H/hzZrMIsiXQc5
- RSNB8N46LfAnGdRxImzag==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:AxDoK1LWJpM=;tV7ojFVKSpd3BJCmVkPZnYb/Wuv
- tGmwzKkC3YzuHoLTR624M3q9dNnZIb9RGfkTuJlqSy9SAOCaGFmhkPryO4oBuWx1k8ZTt/kWc
- 9Oc9PQ9QziyFGc1+27g4BFH1sj0RzVJCCwyeW5f2nJQptNQ/EZujHDkn3slFS53YD9X7npBZj
- OW5Cny5essFtNW+hGo4ZNY4biPpEj+SPoWtNQwW1YWEMGc5+aeVeTpVp2Qkb2NUINSuXlTqPP
- uDTDjABPLqL2oHtyE5BHq9zc0xPP9uKf0uRc6Ikkd9vO6D9OcQJj2+lO1tq//eTVpl/ql9RHU
- nTgo96yMETsBTZK69xWqgcB74PRNdwyCosgbKQZr4o+KnW2AHmAaclO6BMYuDzMfSYmfZn1rm
- c1Vpo73GpR4/8svvvUiZ+W/EuY71e76YiHHJBnSgdDCQl3AzJpOX5APPBO4Heec3PkiuNRO8v
- 3+0VaJVE/xtnFWKMo2OjVhTiSqg1XUW5ltNfIylASNaVETy8ZR7WJLstNbLcWxPawISqbOgcD
- Tb8SQcz3YvWYJPdugDuHebyb93B/O/i6zkLyj6y2VbQtSTangbzAw6asMgpB7Upg8BUCwarHq
- qqm38TljLHiKok1c5VnIUsk6RHM0MO88YKtxlfxDamJxQxRcx8IaQJcpf9/gVl+VTYi8/mu4u
- B2vO7HgayisXg81uMKs3q8zbVV+TOvpekdt2dJqb9EtXw5+njnv2yNlba5RAt1itwrtBkrwx1
- ypLmhsVwj4Fo89F0XMcarMA9yReG4fQgGKb11HQVBG1/JXD2ZZaWM+8tNpE00dZZlfVolgc1M
- SY3mG6EzEhl08d0m18ZTBwT9Rlw/ohCZLt3MArRkyeJc4T18RU8raX7qidezipjqKu0Y2GK8o
- ihVQm0t3yZkwBmgcGKNhanFrSOJoNV9eDT7SUk5mMYuK9Hf4gHk0ijJWR6ll9cD92OL+lauAO
- HEmDSA8GGPlhRfeVLIyJ5FCKSVXaUDgcuXJvc0jdZ2kUapJrPsabhKo1Ad5ROqGAsQ0wfoLNo
- F7hwnX3Z7w63unsDDCwTLS9jbXo5/Q0z7QiZmiOFlnWdyJo1AnF3onMcX/yGoYbOg55zrMX9a
- /X11jHpnMrwQgmyE2kOhi3WbuoBWfOnIujG/JuVfVyKC7KtH6n2KAFaBpKxheTKW/+uNqJe2/
- K/a0DIKVwdGmBRjdXBAdxkNSgSihZEVUCVc3gg24HPy/KPMM5muK7WkvEdDdzhir0cZJPMcUA
- pUx9/bOeI4hr3rlKRmlf5COBHBSFoQo25R7wIasB2WhbWezHd18XnpXQ9+oNjv90jLWJ8TSzi
- d7gGaGOcPMQe97KC7CLCMUf4hSiI9rlukCGV+4KqzSB27IY4e6znsPFpA1R3FfauAl9
+In-Reply-To: <zy3irjybyc32hnow3ckhkfsrtfm5nev44aeovinlkkfc6tyyjv@gcblibp5ng3o>
 
-The FiberGecko is a small USB module that connects a 100 Mbit/s SFP
+On 2025-02-12 08:56:47 [-0300], Wander Lairson Costa wrote:
+> > What disables preemption? On PREEMPT_RT the spin_lock() does not disable
+> > preemption. You shouldn't spin that long. When was interrupt scheduled.
+> > _Why_ is the interrupt delayed that long.
+> >=20
+> When I was using trace-cmd report -l, it omitted some fields, one of
+> them is preempt-lazy-depth (which was something new to me), and it seems
+> this is what affects interrupts. It comes from here [1]. I had the logs,
+> but the machine went under maintenance  before I could save them. Once
+> it comes back, I can grab them and post here.
+>=20
+> [1] https://elixir.bootlin.com/linux/v6.13.2/source/drivers/net/ethernet/=
+intel/igbvf/netdev.c#L1522
 
-Signed-off-by: Max Schulze <max.schulze@online.de>
-Tested-by: Max Schulze <max.schulze@online.de>
-Suggested-by: David Hollis <dhollis@davehollis.com>
-Reported-by: Sven Kreiensen <s.kreiensen@lyconsys.com>
+If you do send patches against mainline please test against mainline. As
+of today we have preempt-disable and migrate-disable depth. We don't
+do lazy-depth anymore, we just have a bit now (which is [lLbB]).
+The referenced line will only disable migration, not preemption.
 
-=2D--
+It is important to understand what exactly is going on.
 
-v3: resend out of merge-window, with commit message
+> > diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/et=
+hernet/intel/igb/igb_main.c
+> > index d368b753a4675..6fe37b8001c36 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> > +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> > @@ -912,7 +912,7 @@ static int igb_request_msix(struct igb_adapter *ada=
+pter)
+> >  	struct net_device *netdev =3D adapter->netdev;
+> >  	int i, err =3D 0, vector =3D 0, free_vector =3D 0;
+> > =20
+> > -	err =3D request_irq(adapter->msix_entries[vector].vector,
+> > +	err =3D request_threaded_irq(adapter->msix_entries[vector].vector, NU=
+LL,
+> >  			  igb_msix_other, 0, netdev->name, adapter);
+> >  	if (err)
+> >  		goto err_out;
+> >=20
+> > just to see if it solves the problem?
+> >=20
+> I have two test cases:
+>=20
+> 1) Boot the machine with nr_cpus=3D1. The driver reports "PF still
+> resetting" message continuously. This issue is gone.
 
-v2: change Spacing on Initializer, change Mailing List link
-This patch had previously been suggested at
-https://lore.kernel.org/netdev/1407426826-11335-2-git-send-email-dhollis@d=
-avehollis.com/
+good.
 
-However, I found that the flag quirk is not necessary and I suspect
-it has never worked (because it references ".flag" whereas the
-identifying value is in ".data")
+> 2) Run the following script:
+>=20
+>     ipaddr_vlan=3D3
+>     nic_test=3Dens14f0
+>     vf=3D${nic_test}v0 # The main testing steps:
+>     while true; do
+>         ip link set ${nic_test} mtu 1500
+>         ip link set ${vf} mtu 1500
+>         ip link set $vf up
+>         # 3. set vlan and ip for VF
+>         ip link set ${nic_test} vf 0 vlan ${ipaddr_vlan}
+>         ip addr add 172.30.${ipaddr_vlan}.1/24 dev ${vf}
+>         ip addr add 2021:db8:${ipaddr_vlan}::1/64 dev ${vf}
+>         # 4. check the link state for VF and PF
+>         ip link show ${nic_test}
+>         if ! ip link show $vf | grep 'state UP'; then
+>             echo 'Error found'
+>             break
+>         fi
+>         ip link set $vf down
+>     done
+>=20
+> This one eventually fails. It is the first time that one works and the
+> other fails. So far, it has been all or nothing. I didn't have time yet to
+> investigate why this happens.
 
-I have compiled this and tested successfully with two devices.
-As it now only adds the USB Id it generates no extra maintenance
-burden that's why I suggest it for inclusion.
+"eventually fails". Does this mean it passes the first few iterations
+but then it times out? In that case it might be something else
 
- drivers/net/usb/asix_devices.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+I managed to find a "Intel Corporation I350 Gigabit Network Connection
+(rev 01)" and I end up in a warning if I start the script (without the
+while true):
 
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices=
-.c
-index 57d6e5abc30e..ef7aae8f3594 100644
-=2D-- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -1421,6 +1421,19 @@ static const struct driver_info hg20f9_info =3D {
- 	.data =3D FLAG_EEPROM_MAC,
- };
+|8021q: adding VLAN 0 to HW filter on device eno0v0
+|igbvf 0000:08:10.0: Vlan id 0 is not added
+|igb 0000:07:00.0: Setting VLAN 3, QOS 0x0 on VF 0
+|igb 0000:07:00.0: VF 0 attempted to set invalid MAC filter
+|------------[ cut here ]------------
+|WARNING: CPU: 25 PID: 3013 at drivers/net/ethernet/intel/igbvf/netdev.c:17=
+77 igbvf_close+0x111/0x120
+=E2=80=A6
+|CPU: 25 UID: 0 PID: 3013 Comm: ip Not tainted 6.14.0-rc1-rt1+ #186 PREEMPT=
+_RT+LAZY 39474a76e7562bb76173f4b98cf194301d39bf7f
+|igbvf 0000:08:10.0: Link is Up 1000 Mbps Full Duplex
+|---[ end trace 0000000000000000 ]---
+|igb 0000:07:00.0: VF 0 attempted to set invalid MAC filter
+|igb 0000:07:00.0: VF 0 attempted to set invalid MAC filter
+|igb 0000:07:00.0: VF 0 attempted to set invalid MAC filter
+|8021q: adding VLAN 0 to HW filter on device eno0v0
+|igb 0000:07:00.0: VF 0 attempted to override administratively set VLAN tag
+|Reload the VF driver to resume operations
+|igbvf 0000:08:10.0: Link is Up 1000 Mbps Full Duplex
+|igb 0000:07:00.0: VF 0 attempted to set invalid MAC filter
 
-+static const struct driver_info lyconsys_fibergecko100_info =3D {
-+	.description =3D "LyconSys FiberGecko 100 USB 2.0 to SFP Adapter",
-+	.bind =3D ax88178_bind,
-+	.status =3D asix_status,
-+	.link_reset =3D ax88178_link_reset,
-+	.reset =3D ax88178_link_reset,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
-+		 FLAG_MULTI_PACKET,
-+	.rx_fixup =3D asix_rx_fixup_common,
-+	.tx_fixup =3D asix_tx_fixup,
-+	.data =3D 0x20061201,
-+};
-+
- static const struct usb_device_id	products [] =3D {
- {
- 	// Linksys USB200M
-@@ -1578,6 +1591,10 @@ static const struct usb_device_id	products [] =3D {
- 	// Linux Automation GmbH USB 10Base-T1L
- 	USB_DEVICE(0x33f7, 0x0004),
- 	.driver_info =3D (unsigned long) &lxausb_t1l_info,
-+}, {
-+	/* LyconSys FiberGecko 100 */
-+	USB_DEVICE(0x1d2a, 0x0801),
-+	.driver_info =3D (unsigned long) &lyconsys_fibergecko100_info,
- },
- 	{ },		// END
- };
-=2D-
-2.43.0
+and the state is down ('Error found' is printed). But if I do it
+manually, line by line, then it all passes without the warning and the
+state of the VF device is up.
 
+Sebastian
 
