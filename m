@@ -1,53 +1,79 @@
-Return-Path: <netdev+bounces-165686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C88A3308D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 21:14:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF4C0A330A1
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 21:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EF523A2AC9
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:13:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BF731889869
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8147B201017;
-	Wed, 12 Feb 2025 20:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF3920103B;
+	Wed, 12 Feb 2025 20:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="Zx93pNZQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtdnYSKp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07lb.world4you.com (mx07lb.world4you.com [81.19.149.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD21201015
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 20:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B41A200B99
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 20:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739391237; cv=none; b=oczjpHo7YcWeLzQlduHmHrn0xSL0b8V+1lPXsXJD6OX0hns/d4Yu/+KuK5d8RgjR3hDAXcygaktEJk5WeXlOF4c28ochMMIRy4HTFSt4l2eoXAnjgGV7NWWGtbjjpLehfy81hsNILgi5wFLlRxbo0lYAc/pggmVO4H7s+eAUMmU=
+	t=1739391552; cv=none; b=bt1hgTHkJ5b/ZqL5mmjAWRapJLBxwrE4lwbqV3HZ05o6CI0ssUMYR0EL1/VOcPDiUFdGVHYXwICEDtDH7u6OhoNCdilMiSsJsmzQQOo00HjqPArtS9FQ4nO/f2P7bPkVuidxfhGqtFUmUyZsQ3nZWGSvsbFxttUfJlRgNHdNMms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739391237; c=relaxed/simple;
-	bh=p0dyme5MgxjPo1iE+IDplCUV0X5hCrjKGXqqGyMmRmI=;
+	s=arc-20240116; t=1739391552; c=relaxed/simple;
+	bh=dMVqM910/4bbLi/eahTQPA3WJgvEnnkSIGXcWE5qgvI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WR7lNFO/62sU7PfsI51ttsp5GhZdE7js0nMeWZ0+/WZY5gibmw9y9cbsCiKkStn3HOwu6LcdsjX2jBVj6XpEVAHhgB47H+0qB5enh+zh9eAD77QkwOdn5idjxR5B/99Xq4sZHIvhvTLd38wCjCoySYrAj0hZopE5o1Hv3h7MVGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=Zx93pNZQ; arc=none smtp.client-ip=81.19.149.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pS9rYmfqnfEJ1IEQstJJhJId9THBjfKcj+wW1KHg92g=; b=Zx93pNZQRc5LOglQ9X08pvsFin
-	OIhbsU41ISkzC5guiVl9UE8n80NPAZU9cmuHItV3JnGnyNs8LWNkuNt9bRXtiJGcXyOj1W++waCbO
-	1Oi2eQfdxzxb6XN5tCkl7j4Iq+F9kjp4NyQGaPyyh8sEVQVsBQ4KXk7sPclpgue3DK1M=;
-Received: from [88.117.55.1] (helo=[10.0.0.160])
-	by mx07lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tiJ7H-000000004IK-2XtB;
-	Wed, 12 Feb 2025 21:13:52 +0100
-Message-ID: <b18971f2-0edf-4fa7-be1b-eec8392665f0@engleder-embedded.com>
-Date: Wed, 12 Feb 2025 21:13:50 +0100
+	 In-Reply-To:Content-Type; b=k7SvDz9Ezj0sBgtKJnfiJMpJ+bT6NoJ5HY+dlGXXuq26A8rXtVbvVw1PCHCC3EKcigeB+9MEUsm43CMC3opqfjbSvyb5hTI730OWnaQb+Guy6Az6GD7CA8T9ce2PvtRcJ51486U1LjuTie1i320XQENNTqDf/dFoezB51pfFyPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtdnYSKp; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-38dcac27bcbso817243f8f.0
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 12:19:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739391549; x=1739996349; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lFGAIRUJ9rl/1zx2uS5K/+14c6cyexGuZ8eUNxfrKJI=;
+        b=KtdnYSKpnR3E3tsZ9N9HoAb4TibixA9PNVLqg5uVxUCVSkO0bScPB5OQvzGZyuFq1u
+         rtlTRgVqJujYgYV5GQDonORc388lX+1H5/m/2MUrQ/cVQOMotoovVH7UPTqCKdZf9+tx
+         yt2nlBj45oGXLCfgah03r5OW6m6BIp7o2d6vW529jf9WN/ZqvqaBe4nyGTiQNqCeJgjd
+         7bUN8TWnQm7TQXrBnqZn3uB4cM5PLFj5lVfibLjOwNkjXRnPTcyiUugeq4Rra4f9F7b8
+         OyQBcdn6czBPS073bnu3SDCa80+Bc+03NkprQNG4uYInZHy++B1zNhyKG8KYn9XJbeIM
+         5T3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739391549; x=1739996349;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lFGAIRUJ9rl/1zx2uS5K/+14c6cyexGuZ8eUNxfrKJI=;
+        b=Ehzil3YcqAPf9Mo4iFt1ogrXmjY0aXO0fDbTFecyhin3hXuTvhGEir4SCBue2zh35r
+         i7xU2rBe1/5DTdfAVyGB9EJg2q7p+F9ZK25Ms/ji21T75NbNXbBpg9Magm03yrwrtKqS
+         J0r+OgDi3hk929QyDUV9Hpj4kSAAqf9Lo6MAgvPrwzr8+j0v11QJy0fo/Qhs7AGE0oN7
+         0wpkHBDTxopMkNX8+I0Oyuq+89KKCedzV8WI0670ErRTlisZs+yf3iLYnfy93Mk9g4R0
+         0pan9vIttltNFUu/EqL3GQtIV7YNpmbgNdg1RFQV4CafIGJBKIp6o7xeXIcHMXcuV2zu
+         zeyg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4OIbgYL1jRboMSSRGtWWJ8rA+OVN1DiZWlF88EClsIWAEitI1pZ5dleUQxgTDal59H7OM/rI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMQaHIpcJmlHETe/b79H69w3mQRqwlC/y9lkTxBQrbdVk/BCJI
+	YSPbS1rneVAMv5bQU8VdeOQyQZT2VKVj7617p1XTXuydui9A5rmA
+X-Gm-Gg: ASbGncu95k8Ub6fej12qJeUK98gFbYwUAcoUD45wLZrQZEGgXjUhThpzsNQHXN5Znor
+	pL/WBqj2NTnzGBgnrmcB83m8hpRx7BK5r1TXUNhNKlL4MUAr1luf/y917IeVAWvub6jhQKIZYMZ
+	fImnNQ/TuVJkLx923Msmky46j+0ltzTuBY87ckJ1x6LYALLfSpyF5jQMzfU0+reLAK0O/NqoTU8
+	yq9DUx4R42ABYYgY+dIUTGUnI22or7jG77R6mNKycrKVpswbfxUs7YstnSJ/s+mGy8F9hPLjtTr
+	bI4UGKB6AbfiLYXbBCfBk+9PlRZaIwL6bw==
+X-Google-Smtp-Source: AGHT+IEoTtMqXkAZj+eJGXSW6GGMOheYlzTommxgqoff4yfuCr2qzRFgChXGqHR4z3w8PRotbx9T7w==
+X-Received: by 2002:a05:6000:41e8:b0:38d:d533:d9a2 with SMTP id ffacd0b85a97d-38f24d1012emr316415f8f.13.1739391548825;
+        Wed, 12 Feb 2025 12:19:08 -0800 (PST)
+Received: from [192.168.0.106] ([77.124.90.14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcb781bdcsm15114197f8f.23.2025.02.12.12.19.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2025 12:19:08 -0800 (PST)
+Message-ID: <eae73b75-52f7-486a-9f98-91c9ca6f6611@gmail.com>
+Date: Wed, 12 Feb 2025 22:19:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,53 +81,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 6/7] net: selftests: Export
- net_test_phy_loopback_*
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>
-References: <20250209190827.29128-1-gerhard@engleder-embedded.com>
- <20250209190827.29128-7-gerhard@engleder-embedded.com>
- <d6cb7957-1a54-4386-8e10-17cea49851df@lunn.ch>
+Subject: Re: [PATCH net-next 00/15] Rate management on traffic classes + misc
+To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Carolina Jubran <cjubran@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+ Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+References: <20250209101716.112774-1-tariqt@nvidia.com>
+ <20250211193628.2490eb49@kernel.org>
 Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <d6cb7957-1a54-4386-8e10-17cea49851df@lunn.ch>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250211193628.2490eb49@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
 
-On 12.02.25 03:23, Andrew Lunn wrote:
-> On Sun, Feb 09, 2025 at 08:08:26PM +0100, Gerhard Engleder wrote:
->> net_selftests() provides a generic set of selftests for netdevs with
->> PHY. Those selftests rely on an existing link to inherit the speed for
->> the loopback mode.
+
+
+On 12/02/2025 5:36, Jakub Kicinski wrote:
+> On Sun, 9 Feb 2025 12:17:01 +0200 Tariq Toukan wrote:
+>> This feature extends the devlink-rate API to support traffic class (TC)
+>> bandwidth management, enabling more granular control over traffic
+>> shaping and rate limiting across multiple TCs. The API now allows users
+>> to specify bandwidth proportions for different traffic classes in a
+>> single command. This is particularly useful for managing Enhanced
+>> Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+>> allowing precise bandwidth allocation across traffic classes.
 >>
->> net_selftests() is not designed to extend existing selftests of drivers,
->> but with net_test_phy_loopback_* it contains useful test infrastructure.
+>> Additionally, it refines the QoS handling in net/mlx5 to support TC
+>> arbitration and bandwidth management on vports and rate nodes.
+>>
+>> Discussions on traffic class shaping in net-shapers began in V5 [2],
+>> where we discussed with maintainers whether net-shapers should support
+>> traffic classes and how this could be implemented.
+>>
+>> Later, after further conversations with Paolo Abeni and Simon Horman,
+>> Cosmin provided an update [3], confirming that net-shapers' tree-based
+>> hierarchy aligns well with traffic classes when treated as distinct
+>> subsets of netdev queues. Since mlx5 enforces a 1:1 mapping between TX
+>> queues and traffic classes, this approach seems feasible, though some
+>> open questions remain regarding queue reconfiguration and certain mlx5
+>> scheduling behaviors.
 > 
-> It might not of originally been designed for that, but i think it can
-> be used as an extension. I've done the same for statistics, which uses
-> the same API.
+> /trim CC, add Carolina.
 > 
-> For get_sset_count() you call net_selftest_get_count() and then add on
-> the number of driver specific tests. For ethtool_get_strings() first
-> call net_selftest_get_strings() and then append the driver tests
-> afterwards. For self_test, first call net_selftest() and then do the
-> driver specific tests.
+> I don't understand what the plan is for shapers. As you say at netdev
+> level the classes will likely be associated with queues, so there isn't
+> much to do. So how will we represent the TCs based on classification?
+> I appreciate you working with Paolo and Simon, but from my perspective
+> none of the questions have been answered.
 > 
-> I also think you can extend these tests to cover different speeds.
-> There are plenty of ethtool_test_flags bit free, so you can use one of
-> them to indicate the reserved value in ethtool_test contains a speed.
-> Everybody then gains from your work.
+> I'm not even asking you to write the code, just to have a solid plan.
+> 
 
-Reusing the complete test set as extension is not feasible as the first
-test requires an existing link and for loopback test no link is
-necessary. But yes, I can do better and rework it to reusable tests.
-I'm not sure if I will use ethtool_test_flags as IMO ideally all tests
-run always to ensure easy use.
+This is WIP. We'll share more details soon.
 
-Thank you for the review!
+Tariq.
 
-Gerhard
 
