@@ -1,110 +1,132 @@
-Return-Path: <netdev+bounces-165391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24D8A31D31
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 05:00:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D6FA31D7F
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 05:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F95B3A526B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:59:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 202367A3C04
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 04:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBCB1E7C1E;
-	Wed, 12 Feb 2025 04:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC341E5707;
+	Wed, 12 Feb 2025 04:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsLvIwWO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOZTHdkk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481EC1E7C0E
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 04:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC7B27183B
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 04:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739332804; cv=none; b=RWf2ucpkn0fO2WgiU8okkolzXEK5KsGeKP2VKTYujyMfcuLFXwXIyIHgPQ5Re5Qh2iWATDsaOoutHxt50I00pBhQFTScQSHk38GDWNagGo+C2LDehliYnmllZJGlUExzQo4pe5IIgbDhLqFXJFFHwVUcdeeILL8UusQHZiehmMI=
+	t=1739335147; cv=none; b=kn4qh+OsyeR0ad3Q1qdoOq/ylrELk12L6h69wgQfo7zlH8FbbeE0b68bqregD56SS7SDe3GujDO3lEaYDeGtc6M4YyTfTWJw0waK05R8OfZuHmn3iMZg4ypAKoBXuFZFx6KZFeDSYlTNY/PUQpqX4JIj2W6xWcmTdKle/24JPbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739332804; c=relaxed/simple;
-	bh=MBGU+Pq0MBuQC+vgEt5exhhxwTNOYq2/S9TaX4AIpiQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ipEhiIf1pfKRwl0j5XadpcoFRHKzXeQNKYlJYIW1KbnQPJTnJXnX2loMXs5x9TZqNUdBU/V9up6eItxhAmHAxJHzc9K3JPOm+9W8MMvD12bCC4oitRSXmC7EulFma629IVz1MQBwP5UE8i9u5wISmEoy1JEskyvhUXsyFynxL+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsLvIwWO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A954DC4CEDF;
-	Wed, 12 Feb 2025 04:00:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739332803;
-	bh=MBGU+Pq0MBuQC+vgEt5exhhxwTNOYq2/S9TaX4AIpiQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bsLvIwWOzXHBgwjocTPVrnT9qD48TTSMDvweE5de+mQIMSrBtVySNFY6QJp0v6+Tb
-	 XL2LZtU7+9HefnXq2aJOKVH3iHkaBbuERI82/kJGZDMsDPHDejdrxh/HVmjKZI4J9R
-	 9mxG26KrZPyK02UrJP7KyYYRZ8xQ/tcrTk5SC1jENXmIZuzMUhif23Svl9FrbiFHr5
-	 fdsBOPWq6jQAzEIUAbhwB5QbqOJP73EIFSojGVn395jN2oX+W6EZRRdX+nVBYr8awu
-	 XRUzMrAcY6dbYfnJ3mlzbLl5AjEcQiOMi2oMNUWO580UvbqGH9dFR29YnNXR69j172
-	 kJqOPI7bDD/BQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF479380AAFF;
-	Wed, 12 Feb 2025 04:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739335147; c=relaxed/simple;
+	bh=j1QzW7ga8E0hkg3bXAdQF9Xq6LBFRXiViv0nXjGrGOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R/vbKlI49KsH0P6JKOx3ltq3LiOyerCii0HMvMG3EgbjiKOFl2UelDvdaKtW/Lq76O6m0rXvAMVMXWBxdLROHN6bDKiNnoZ2IYwlZAyQysZJx1nnY+LD94Y4djcwWwK8eSnDElfnjuzF/JwLH15T8daHCEOGq9c26Jv9Tv/zaeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aOZTHdkk; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d162ecb2beso8821545ab.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 20:39:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739335144; x=1739939944; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j1QzW7ga8E0hkg3bXAdQF9Xq6LBFRXiViv0nXjGrGOA=;
+        b=aOZTHdkksiZLaftqB2MKZFtc5FhU5/E9Lhw01ZbXx3IUpoxp6BxDc4VElc2f+uvxF6
+         5KH9XAPh6pMzMNyjBBVsMmmgpCfO2ChIulRqOt2EzPXfARnxzRbrI64oejtjcq9syIq6
+         f5jDnbORZqSSBNmxAgypjLJiABrW+sxG3kh+4ZK1g9qnO8OSV/fJbCwswSN1xUPJ4TAE
+         9nHE3sJqc6SV2jGY287TosdxliUE8pHVBXZ1ZpZlK5PUvf07dLSeQRMjZ3NV6hwYQlJe
+         I+/FOwVdgffe8g91Q5sOC9iViEsoZWABBdJ3o+10xv5Y78LqUjKI2q+VyhI8wPceR2zR
+         8NiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739335144; x=1739939944;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j1QzW7ga8E0hkg3bXAdQF9Xq6LBFRXiViv0nXjGrGOA=;
+        b=vUi9wr5xZJXWRWVRnjQ5qJINbrahBdJd/dPUkA6D9vZdZ9tQeB7gpPJfmrroJ6c7jX
+         UX5JjvUb0tBLOZEM6inGHR0sJTLs2UPjzQI59CuavgvQlXModtCt64urH7Zzj+NonOOc
+         RlcGrpVGHIcI1Yvhg7HynbHJWcN8vCR7uqPf8OHas3cu8img1xLsFzQGd9OpREyn1DWo
+         PWPM1rem59hW05+jtz2AaHk6QCjsl6l6K3r8DTRQs5qW1NE10A8H9zdtJ3/t7Mkvc2Zw
+         5HHlb3J6tlB09e+knROWZB2fA23Un8YXF6UJFYyEc+QGkmNsol15hI5zpoAWZ3hRrCMW
+         TLDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfdlJ8GJDAZzWoBEBgzUNrjoHKg2+TRmEdCVhW9SHe61WUfATKuIM556S7dlxt2/Rw3aCkTx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtNhPI0bR4JdAhR2pjohwe5mvPaGR8Qhv6iOEuvT2KVHPSkhag
+	z030c46bL7uU63sC4UMYYm1kAIJTsq/fExP6PFIK7upcg3qeDFRL7bd+K6nl989KnQ/H5+z3q8t
+	CXJv0bdA4EF7YmMP6wvQ5VgmWjfU=
+X-Gm-Gg: ASbGncsleq1Mrgg0+tgpvynpEkC1H8OecUJuavQZCqTY8vrt415LOyLXm+DcUw/K79E
+	HY20F/lFKz7+p/VLuYNlxyARzNpEA7xz+7CGRCgnA7l9jJbTKoIhaORdamaAYYvv+Sqgk9tGV
+X-Google-Smtp-Source: AGHT+IGge03btSeyyYm6hyNU6SCjOrx1HX8tl1bYW14ncL+TRsUHJOLXRB9VLJPwCdIEgaZX5lkDYyJePQyUgcso6aE=
+X-Received: by 2002:a05:6e02:338a:b0:3cf:ae67:4115 with SMTP id
+ e9e14a558f8ab-3d17be21c71mr18347965ab.8.1739335144630; Tue, 11 Feb 2025
+ 20:39:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10][pull request] Intel Wired LAN Driver Updates
- 2025-02-10 (ice, igc, e1000e)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173933283233.91069.10683338308401242928.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Feb 2025 04:00:32 +0000
-References: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+References: <20250210130953.26831-1-kerneljasonxing@gmail.com>
+ <CAHS8izMznEB7TWkc4zxBhFF+8JVmstFoRfqfsRLOOMbcuUoRRA@mail.gmail.com>
+ <20250211184619.7d69c99d@kernel.org> <CAL+tcoA3uqfu2=va_Giub7jxLzDLCnvYhB51Q2UQ2ECcE5R86w@mail.gmail.com>
+ <20250211194326.63ac6be7@kernel.org>
+In-Reply-To: <20250211194326.63ac6be7@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 12 Feb 2025 12:38:28 +0800
+X-Gm-Features: AWEUYZl0_l8z-M8OIdpbXje2xvb0UpSW6mjTG6PIgMB8Lg_OmfFOmEPPckttte0
+Message-ID: <CAL+tcoATHuHxpZ+4ofEkg7cba=OZxnHJSbqNHxMC5s+ZMQNR9A@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] page_pool: avoid infinite loop to schedule
+ delayed worker
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	horms@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, Feb 12, 2025 at 11:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 12 Feb 2025 11:20:16 +0800 Jason Xing wrote:
+> > On Wed, Feb 12, 2025 at 10:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+> > >
+> > > On Tue, 11 Feb 2025 18:37:22 -0800 Mina Almasry wrote:
+> > > > Isn't it the condition in page_pool_release_retry() that you want. =
+to
+> > > > modify? That is the one that handles whether the worker keeps spinn=
+ing
+> > > > no?
+> > >
+> > > +1
+> > >
+> > > A code comment may be useful BTW.
+> >
+> > I will add it in the next version. Yes, my intention is to avoid
+> > initializing the delayed work since we don't expect the worker in
+> > page_pool_release_retry() to try over and over again.
+>
+> Initializing a work isn't much cost, is it?
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+Not that much, but it's pointless to start a kworker under this
+circumstance, right? And it will flood the dmesg.
 
-On Mon, 10 Feb 2025 11:23:38 -0800 you wrote:
-> For ice:
-> 
-> Karol, Jake, and Michal add PTP support for E830 devices. Karol
-> refactors and cleans up PTP code. Jake allows for a common
-> cross-timestamp implementation to be shared for all devices and
-> Michal adds E830 support.
-> 
-> [...]
+>
+> Just to state the obvious the current patch will not catch the
+> situation when there is traffic outstanding (inflight is positive)
+> at the time of detach from the driver. But then the inflight goes
+> negative before the work / time kicks in.
 
-Here is the summary with links:
-  - [net-next,01/10] ice: Don't check device type when checking GNSS presence
-    https://git.kernel.org/netdev/net-next/c/e2c6737e6e82
-  - [net-next,02/10] ice: Remove unnecessary ice_is_e8xx() functions
-    https://git.kernel.org/netdev/net-next/c/9973ac9f23a7
-  - [net-next,03/10] ice: Use FIELD_PREP for timestamp values
-    https://git.kernel.org/netdev/net-next/c/ea7029fe10f4
-  - [net-next,04/10] ice: Process TSYN IRQ in a separate function
-    https://git.kernel.org/netdev/net-next/c/f9472aaabd1f
-  - [net-next,05/10] ice: Add unified ice_capture_crosststamp
-    https://git.kernel.org/netdev/net-next/c/92456e795ac6
-  - [net-next,06/10] ice: Refactor ice_ptp_init_tx_*
-    https://git.kernel.org/netdev/net-next/c/381d5779623a
-  - [net-next,07/10] ice: Implement PTP support for E830 devices
-    https://git.kernel.org/netdev/net-next/c/f00307522786
-  - [net-next,08/10] ice: refactor ice_fdir_create_dflt_rules() function
-    https://git.kernel.org/netdev/net-next/c/5a7b0b6ff49b
-  - [net-next,09/10] igc: Avoid unnecessary link down event in XDP_SETUP_PROG process
-    https://git.kernel.org/netdev/net-next/c/be324b790368
-  - [net-next,10/10] e1000e: Fix real-time violations on link up
-    https://git.kernel.org/netdev/net-next/c/13e22972471d
+Right, only mitigating the side effect. I will add this statement as
+well while keeping the code itself as-is.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Jason
 
