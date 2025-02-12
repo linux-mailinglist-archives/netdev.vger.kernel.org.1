@@ -1,189 +1,179 @@
-Return-Path: <netdev+bounces-165543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A87FA32754
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:43:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E382A3275D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B085163E30
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:43:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A49123A8A1E
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E849820E6FD;
-	Wed, 12 Feb 2025 13:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D93213E89;
+	Wed, 12 Feb 2025 13:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="AwiZsHXW"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ObAogfSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03BB20E6FB;
-	Wed, 12 Feb 2025 13:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C57A20F07B
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 13:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739367716; cv=none; b=OfX7dXvp8eAAoFFMan2KOEKbmI42ng5J7ZdRBGQJNG2DUtJDvBAhIdiU9GPiQhX6nWzAD2Muvpn2V05Uh6CEtwdwV5UOxZ40WkAUyDBLZrhVXo9snWU7/EycHr6OE23K4Onr2J1aPDvYyvmnYGHbIBC2UTU/9RFwpKxTLlrovQM=
+	t=1739367725; cv=none; b=IWqvt2MsJZ3161AaCd08Ol9ucL6oL2oaH1oBFua2yO/6hMsIQ/dnTLCHg0nZOcPkZOJ8sptP/W4d8j7XGH0VUL7g5b/RIJfWC6wjzs8KZC9CoEr7SPPodDhiIw3FgWLzPVG2NIiMVaTl+JJjgOG5xQ5lthGJ48RdvRaNAZgmSCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739367716; c=relaxed/simple;
-	bh=TZT5R2eitdFgRj0GA9fKVPD0Pm3cWU0d9sQiyh5DmcU=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=dzstz3F7NsmIk0uS31fNhZYMBC3EpmV3tqMly+afrxQsYFSqPER06jvnNL2InGMlltJeAC1DiMLPiaMgzOHLvwrYzFtOA4/zlFplx1frvj/p9ARYLLfks17hdrzaf03rKMw/3afZG07M8kf7gZvflmJBNhe3gAz/GzJDjBp8J3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=AwiZsHXW; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id BF277106B922;
-	Wed, 12 Feb 2025 16:41:51 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru BF277106B922
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1739367712; bh=/bAj5hq2MsJG0KFKRNkqn4MOUfRTT/Tgyz72UhKpIzY=;
-	h=From:To:CC:Subject:Date:From;
-	b=AwiZsHXW3oUF2F6fQeYVPMLgvMEe3uGZFTzDOThcF81u6/gPijzZV4P/6UtBqVZ68
-	 Z5YWZDaojQbEFi7aKRzgFOKDTOVja4KjkvKuB0ORxUUmR3E/QmaexJB5985wXl2o5I
-	 /kxVWkj2sAI5Gnoyftube5izbWK0enSJuN78GbkY=
-Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
-	by mx0.infotecs-nt (Postfix) with ESMTP id BBE233063333;
-	Wed, 12 Feb 2025 16:41:51 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Neil Horman <nhorman@tuxdriver.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: [PATCH net] drop_monitor: fix incorrect initialization order
-Thread-Topic: [PATCH net] drop_monitor: fix incorrect initialization order
-Thread-Index: AQHbfVPeGhCgtX+tO0OFhEPE/MmNpQ==
-Date: Wed, 12 Feb 2025 13:41:51 +0000
-Message-ID: <20250212134150.377169-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1739367725; c=relaxed/simple;
+	bh=HzA97DPnn+U2gZkXV8YQI5t4LN4Nd9v0u24mxG8tzFo=;
+	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=a/XbYyQtQqK7WGTdzxVXlYMFTZ4IL2W6sLCE8U4Y++hkGXPudOPstkePYQ9ZhOLQAPUsj/UlufQ4IdlJU3pEQ/A7Wip2Sl2V7a6O30fJ8cBn4fQR3thzjwaL5EgRWolIvzTdaohoJvvSuAvL2Nf+ikXFDFepI5SI3DlGlouvXDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ObAogfSp; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5de849a0b6cso6144229a12.2
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 05:42:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1739367721; x=1739972521; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Vx4K/GwJmSxxuxEf9CYEVojUHCwqS7V2m4wDGfnHgXs=;
+        b=ObAogfSp60miJjwQ2qilScjFLmjvSMi58i905OlYlQxPJxDUpLIIIiPpeQPDsnr8Oo
+         fn2QLXm+eRI9aodVrw7FVGGz/I/KiARDksK0Q0jUNXZx6RtuHB7uhzv4T/d94hzOBaii
+         gF2xLtnYxowDS5lGEP4f4rjWtq8Qg+1oEskR0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739367721; x=1739972521;
+        h=cc:to:subject:message-id:date:mime-version:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vx4K/GwJmSxxuxEf9CYEVojUHCwqS7V2m4wDGfnHgXs=;
+        b=nCSfz9DXHnoXFh3NL5gh/BvuANtCyEoUIZrgHelUK1UrOdvHxcHXxGPW6scEfRmqAx
+         R/amxdXg9mAc2exVPMawzFfp9p7yd+3jnj6L0Np9J+w+k6iniGmceDKcbdrXM0FSXnl1
+         //dshmlgdydsViBrVOs9dxsRxVAs4py0bDYrI/OpHRz7xy0Rg4XYWDmbgGyXKfLf1R0x
+         Xr5nVYBL8NA5qQIQExFcUpyjg/XqVNzaAND8wjMlXfKC+apecWeCStObzJ9wj9n+NfDh
+         46l1QocAtJyE0bbLoRoihqsMBiDctx32KOZ2Y9TrohnWrBp8m50r6Es7tnmfv27FKGxq
+         CgSQ==
+X-Gm-Message-State: AOJu0YwuPyNGDWG8X0f/i4rERakn/cdgxAj3tA0RZkOizvqTL1qRMXzO
+	DshrB3Z1oMhlQhdltmicjQCoYF/2qxBYPJD4FLKZP7r62hg4uk/1g8CtuepRA3MgH8W98c/WFvD
+	yK2QeLNmpapUH9b8yoibp6E+TuVQbHgh7J1bruY1/gHLvmu22w/E=
+X-Gm-Gg: ASbGncsod1XEhQiXChc0RFMFSmvrvOv88eTWrE4N0nlYxjs3o9KQk8kBsgNSL9McBxq
+	Hv30qz30rk4Gi/3EfTIFn9secpCMNPrknIoIM5Iw8OrMS9iZMY7Ji+Hd/ACLezs2CcrWjxdC1ce
+	omV9JMrQYcetB95/E+3mlVwKm4
+X-Google-Smtp-Source: AGHT+IExY+577RFSkgohoQb2qPrtldLo7ZoR+uTGSWF+pFLzLK8mEvgKjNwZyU3Yafymz93SmD9UC67l3DwKniJi9kE=
+X-Received: by 2002:a05:6402:4606:b0:5dc:da2f:9cd1 with SMTP id
+ 4fb4d7f45d1cf-5deadd7ff22mr2750686a12.14.1739367721337; Wed, 12 Feb 2025
+ 05:42:01 -0800 (PST)
+Received: from 155257052529 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 12 Feb 2025 08:41:59 -0500
+From: Joe Damato <jdamato@fastly.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2025/02/12 10:45:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/02/12 10:17:00 #27183182
-X-KLMS-AntiVirus-Status: Clean, skipped
+Date: Wed, 12 Feb 2025 08:41:59 -0500
+X-Gm-Features: AWEUYZlwmvHKRwI2fJFJaa53LoTAcn2hU8f5TdJuaF-vAvBD-4SwZmnDN9AK2pE
+Message-ID: <CALALjgw_h9ToEaiQdKebyp0KLgJvaHJuxyLh3ZXAYgz6v5SL-w@mail.gmail.com>
+Subject: [PATCH net-next v7 0/3] netdev-genl: Add an xsk attribute to queues
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com, stfomichev@gmail.com, horms@kernel.org, kuba@kernel.org, 
+	Joe Damato <jdamato@fastly.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Amritha Nambiar <amritha.nambiar@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Daniel Jurgens <danielj@nvidia.com>, "David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Mina Almasry <almasrymina@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Syzkaller reports the following bug:
+Greetings:
 
-BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
- lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu:=
- 0
-CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+=
- #1
-Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference=
- Platform, BIOS 6.00 11/12/2020
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x119/0x179 lib/dump_stack.c:118
- debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
- do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
- _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
- reset_per_cpu_data+0xe6/0x240 [drop_monitor]
- net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
- genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
- genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
- sock_sendmsg_nosec net/socket.c:651 [inline]
- __sock_sendmsg+0x157/0x190 net/socket.c:663
- ____sys_sendmsg+0x712/0x870 net/socket.c:2378
- ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
- __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
- do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x62/0xc7
-RIP: 0033:0x7f3f9815aee9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 =
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
-f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
-RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
-RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
+Welcome to v7. Added CONFIG_XDP_SOCKETS to the selftests/driver/net
+kernel config in patch 3. Updated the xdp_helper.c to return -1 on
+AF_XDP non-existence, and updated queues.py to skip the test if AF_XDP
+does not exist (but fail in other failure cases). Tested on kernels with
+and without CONFIG_XDP_SOCKETS enabled.
 
-If drop_monitor is built as a kernel module, syzkaller may have time
-to send a netlink NET_DM_CMD_START message during the module loading.
-This will call the net_dm_monitor_start() function that uses
-a spinlock that has not yet been initialized.
+This is an attempt to followup on something Jakub asked me about [1],
+adding an xsk attribute to queues and more clearly documenting which
+queues are linked to NAPIs...
 
-To fix this, let's place resource initialization above the registration
-of a generic netlink family.
+After the RFC [2], Jakub suggested creating an empty nest for queues
+which have a pool, so I've adjusted this version to work that way.
 
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with SVACE.
+The nest can be extended in the future to express attributes about XSK
+as needed. Queues which are not used for AF_XDP do not have the xsk
+attribute present.
 
-Fixes: 9a8afc8d3962 ("Network Drop Monitor: Adding drop monitor implementat=
-ion & Netlink protocol")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
----
- net/core/drop_monitor.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+I've run the included test on:
+  - my mlx5 machine (via NETIF=)
+  - without setting NETIF
 
-diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
-index 6efd4cccc9dd..9755d2010e70 100644
---- a/net/core/drop_monitor.c
-+++ b/net/core/drop_monitor.c
-@@ -1734,6 +1734,11 @@ static int __init init_net_drop_monitor(void)
- 		return -ENOSPC;
- 	}
-=20
-+	for_each_possible_cpu(cpu) {
-+		net_dm_cpu_data_init(cpu);
-+		net_dm_hw_cpu_data_init(cpu);
-+	}
-+
- 	rc =3D genl_register_family(&net_drop_monitor_family);
- 	if (rc) {
- 		pr_err("Could not create drop monitor netlink family\n");
-@@ -1749,11 +1754,6 @@ static int __init init_net_drop_monitor(void)
-=20
- 	rc =3D 0;
-=20
--	for_each_possible_cpu(cpu) {
--		net_dm_cpu_data_init(cpu);
--		net_dm_hw_cpu_data_init(cpu);
--	}
--
- 	goto out;
-=20
- out_unreg:
-@@ -1772,13 +1772,12 @@ static void exit_net_drop_monitor(void)
- 	 * Because of the module_get/put we do in the trace state change path
- 	 * we are guaranteed not to have any current users when we get here
- 	 */
-+	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
-=20
- 	for_each_possible_cpu(cpu) {
- 		net_dm_hw_cpu_data_fini(cpu);
- 		net_dm_cpu_data_fini(cpu);
- 	}
--
--	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
- }
-=20
- module_init(init_net_drop_monitor);
---=20
-2.39.5
+And the test seems to pass in both cases.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20250113143109.60afa59a@kernel.org/
+[2]: https://lore.kernel.org/netdev/20250129172431.65773-1-jdamato@fastly.com/
+
+v7:
+  - Added CONFIG_XDP_SOCKETS to selftests/driver/net/config as suggested
+    by Stanislav.
+  - Updated xdp_helper.c to return -1 for AF_XDP non-existence, but 1
+    for other failures.
+  - Updated queues.py to mark test as skipped if AF_XDP does not exist.
+
+v6: https://lore.kernel.org/bpf/20250210193903.16235-1-jdamato@fastly.com/
+  - Added ifdefs for CONFIG_XDP_SOCKETS in patch 2 as Stanislav
+    suggested.
+
+v5: https://lore.kernel.org/bpf/20250208041248.111118-1-jdamato@fastly.com/
+  - Removed unused ret variable from patch 2 as Simon suggested.
+
+v4: https://lore.kernel.org/lkml/20250207030916.32751-1-jdamato@fastly.com/
+  - Add patch 1, as suggested by Jakub, which adds an empty nest helper.
+  - Use the helper in patch 2, which makes the code cleaner and prevents
+    a possible bug.
+
+v3: https://lore.kernel.org/netdev/20250204191108.161046-1-jdamato@fastly.com/
+  - Change comment format in patch 2 to avoid kdoc warnings. No other
+    changes.
+
+v2: https://lore.kernel.org/all/20250203185828.19334-1-jdamato@fastly.com/
+  - Switched from RFC to actual submission now that net-next is open
+  - Adjusted patch 1 to include an empty nest as suggested by Jakub
+  - Adjusted patch 2 to update the test based on changes to patch 1, and
+    to incorporate some Python feedback from Jakub :)
+
+rfc: https://lore.kernel.org/netdev/20250129172431.65773-1-jdamato@fastly.com/
+
+
+
+Joe Damato (3):
+  netlink: Add nla_put_empty_nest helper
+  netdev-genl: Add an XSK attribute to queues
+  selftests: drv-net: Test queue xsk attribute
+
+ Documentation/netlink/specs/netdev.yaml       | 13 ++-
+ include/net/netlink.h                         | 15 +++
+ include/uapi/linux/netdev.h                   |  6 ++
+ net/core/netdev-genl.c                        | 12 +++
+ tools/include/uapi/linux/netdev.h             |  6 ++
+ .../testing/selftests/drivers/net/.gitignore  |  2 +
+ tools/testing/selftests/drivers/net/Makefile  |  3 +
+ tools/testing/selftests/drivers/net/config    |  1 +
+ tools/testing/selftests/drivers/net/queues.py | 42 +++++++-
+ .../selftests/drivers/net/xdp_helper.c        | 98 +++++++++++++++++++
+ 10 files changed, 194 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/.gitignore
+ create mode 100644 tools/testing/selftests/drivers/net/xdp_helper.c
+
+
+base-commit: 4e41231249f4083a095085ff86e317e29313c2c3
+-- 
+2.43.0
 
