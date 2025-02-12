@@ -1,109 +1,105 @@
-Return-Path: <netdev+bounces-165432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9805A32016
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 08:40:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65911A3203F
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 08:46:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 412F31888EBC
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:40:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF87916167B
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537492045B9;
-	Wed, 12 Feb 2025 07:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="D1JxIgDm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63511FECDB;
+	Wed, 12 Feb 2025 07:46:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA021DACB1
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 07:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD94E1D86F2
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 07:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739346023; cv=none; b=PR0S0J2EV/qe8+k0pW8akJWCI/GX2r5TEkrWjMHAWS99eis+vlfGeA3jy9RVPmePikc1edQJR7ERLUXIzqGDD7Qk42p2ARKSY5stAx++6CvnJDMbUg3erjJ44jxfvysx/cQcz0+v9/xZktnHneHLALtQYnv5dHi4cZ6l7QDhbaI=
+	t=1739346371; cv=none; b=cM724V/7yMkSETITq3CSDnJnyTnCgitcmpWQ+04yJLuUV6y3bwKUW8hHQR0bdlhq3b8oB8bXtHeggb3KaR90tV4vYeJ+K0idInRyDzYLuBt+M+qw+wU/QbOBwwgyXR/Ij1w3H11wD3y0K+/KPnHgg9dWGIER+zThlOlwYDu0zi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739346023; c=relaxed/simple;
-	bh=hs6BY2QISLEAveo5AmnXRiOaxnhIetTdLDHToyO7fjg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L5ZozBkQy9LK6WJkj9uXRjFlWa9PgMRfSIBtAni7D3BA9nSpd9pM3Uwe4DXns5dAuQo96inWibzfim+P8DDzT+z4N65T4pGnI3rQ2oj0BAQiEwJhVb3t6wVQ+UYDaDW+m+x2bkmP1KlFHkMRVma1r6KDOdYVaxXRIdCM/+xoVho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=D1JxIgDm; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739346021; x=1770882021;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yd+aBZwAY3LPD+fJ7tXuheB0NRV0BlVs5v2fSEAqLak=;
-  b=D1JxIgDmVdVDBJ8eVt3pb1LlZxh/sjvG/KntsgQDwcXodYR902gAL4BZ
-   5hcmhuaEklDpXlsAKCuexVpGo/ked3d0Xv16SLnh6/l6/XqTM9GUnXIFa
-   5NeVxut4wdqsdk9PPi1vn4W2X5NV7Q9gEh+h0p5QKRVnnxam/UFcbGHqs
-   o=;
-X-IronPort-AV: E=Sophos;i="6.13,279,1732579200"; 
-   d="scan'208";a="270468140"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 07:40:18 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:50360]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.59:2525] with esmtp (Farcaster)
- id caa8fb00-1bc1-4266-b6d6-65264d534716; Wed, 12 Feb 2025 07:40:17 +0000 (UTC)
-X-Farcaster-Flow-ID: caa8fb00-1bc1-4266-b6d6-65264d534716
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 12 Feb 2025 07:40:11 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.118.243.86) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Feb 2025 07:40:07 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<willemb@google.com>
-Subject: Re: [PATCH net-next] net: avoid unconditionally touching sk_tsflags on RX
-Date: Wed, 12 Feb 2025 16:39:55 +0900
-Message-ID: <20250212073955.25603-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <dbd18c8a1171549f8249ac5a8b30b1b5ec88a425.1739294057.git.pabeni@redhat.com>
-References: <dbd18c8a1171549f8249ac5a8b30b1b5ec88a425.1739294057.git.pabeni@redhat.com>
+	s=arc-20240116; t=1739346371; c=relaxed/simple;
+	bh=hwWb1wVG+pxRACceH5Y/Z4L2LC/F2lEB6ut57arU0+s=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=O7DzTUyn4elzJbacQuyE2REaHBEOxxjnGGKN+6z2qQ3Q6Y7hESvLboO4vZXuQ7Lnloo4tqv9RAmqgYdjVxCMPqt9NbWdwwS6Qp1IQSk7QVbQCpYIY2TXgjGVUU7+o8bpB3Zl95+VHHbiX0nKSOY9WjFWslbNoQJFYzo/n2OyfCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas3t1739346354t040t56172
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [218.72.127.28])
+X-QQ-SSF:0001000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 8872732260127881257
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<jacob.e.keller@intel.com>,
+	<netdev@vger.kernel.org>,
+	<vadim.fedorenko@linux.dev>,
+	<mengyuanlou@net-swift.com>
+References: <20250208031348.4368-1-jiawenwu@trustnetic.com>	<20250208031348.4368-2-jiawenwu@trustnetic.com> <20250211160706.15eb0d2a@kernel.org>
+In-Reply-To: <20250211160706.15eb0d2a@kernel.org>
+Subject: RE: [PATCH net-next v6 1/4] net: wangxun: Add support for PTP clock
+Date: Wed, 12 Feb 2025 15:45:52 +0800
+Message-ID: <03a901db7d22$24628cc0$6d27a640$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA001.ant.amazon.com (10.13.139.110) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJXwZRMfGviYJJJcTt9wh3IJl38oQJEsXdoAdgOcqeyKdZssA==
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MfQnJH+7WKv67jG52lgqXD4r0dQSwOrIhLDsKH3rrmkKmXAqySQUVMqp
+	RVjJdg9SWSsYaW/gB8qeOjApPP/2WV0P34K25PAKSVNJ7jBiO7H5mmxeE8YYDfQJLaGlELy
+	C6HPxAFW11+knGcHZbxIaCf9hB5U+6OAWBMjE/1sh7Sm81qMU8UG5auJ6XdjO8b1Cke7oDV
+	sJkXlMy1E7rEqrfS8AfGJjswvzv7RBcSRvanh5OAC+q9W3UWMf2MOxce5un1JX7XpcLwCGd
+	5/XruPmmx8eUSkoSd53mDD7p6dyhS9PNTByNJWsInG3U5KLRccWmEI5RlE9rP/Zpb5FA4Pk
+	hYUW+VkCyaQGTIGDPYDGOScp+9vb55QvwPd/ifYMmfIABFCSLHTrD2fobfLEpAdtL3JgN+u
+	kVQvyQqZJrDYAVve7eKKp0rKDHwd0jxmZqYjps9ZiJWD9UvxT8GiB1+feSEjbBJ79XNx9dw
+	zKYlRjXDZaxL279myeX461nhJuVKTNWYWXooi/ZmfQppbZvU4bRkUXG1JNNy0oyl0XJ1ub6
+	xOYUA7EBNq/oYD5YWgd2OSrDttqLZbi4XzcXa+BmjF0hWpr+c1IzVnK/hvR9I628yghjKcC
+	gXR/Z0k/g3oDI4Fn5xLMlatClEpvV4UBYOIA5bn/dnr7rB7rUgjwihl0sw5RRbxc8DJ2w+b
+	uKPC+JL2Upyxi3lPdCkQXkvsFsqjs9HYr64vPrt3W7ionoeJdE2PRaopQsUopg6vZ4XU/rN
+	XJDH4XNByeKhFal12FT7OtPzP/uUOZC//fn6y3APH2MVDPmX2xRCeEfwcnGoKRUoHUqMoWC
+	+BH/DDw3M1nJXDadWjjcISVfiDDIPwJBN44VDuVL2qmEpHzMfTUWQYpZlCoVN0FR2BRXZ+E
+	TtX2qfNEANi0INSOLEyLf7MP6cpHNmaecjQXQMsBjnY+KVfARdeVsGpjQusQqaEsM1HALwi
+	Q9J+V/vBUF/KksrPMGDNaElKi5h2Gcb/t3XDoNo3H7Efb+Z5ZWCZXxrTrQFtHpktRurGxYc
+	cc3vz0kg==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 11 Feb 2025 18:17:31 +0100
-> After commit 5d4cc87414c5 ("net: reorganize "struct sock" fields"),
-> the sk_tsflags field shares the same cacheline with sk_forward_alloc.
+On Wed, Feb 12, 2025 8:07 AM, Jakub Kicinski wrote:
+> On Sat,  8 Feb 2025 11:13:45 +0800 Jiawen Wu wrote:
+> > + * wx_ptp_tx_hwtstamp_work
+> > + * @work: pointer to the work struct
+> > + *
+> > + * This work item polls TSC_1588_CTL valid bit to determine when a Tx hardware
+> > + * timestamp has been taken for the current skb. It is necessary, because the
+> > + * descriptor's "done" bit does not correlate with the timestamp event.
 > 
-> The UDP protocol does not acquire the sock lock in the RX path;
-> forward allocations are protected via the receive queue spinlock;
-> additionally udp_recvmsg() calls sock_recv_cmsgs() unconditionally
-> touching sk_tsflags on each packet reception.
-> 
-> Due to the above, under high packet rate traffic, when the BH and the
-> user-space process run on different CPUs, UDP packet reception
-> experiences a cache miss while accessing sk_tsflags.
-> 
-> The receive path doesn't strictly need to access the problematic field;
-> change sock_set_timestamping() to maintain the relevant information
-> in a newly allocated sk_flags bit, so that sock_recv_cmsgs() can
-> take decisions accessing the latter field only.
-> 
-> With this patch applied, on an AMD epic server with i40e NICs, I
-> measured a 10% performance improvement for small packets UDP flood
-> performance tests - possibly a larger delta could be observed with more
-> recent H/W.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Why not use the aux_work for this?
+> IIUC aux_work often has lower latency since it's a dedicated thread.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+I think this task for checking TX timestamp is immediate and continuous
+after the skbuff is sent, and can be stopped after polling a valid timestamp.
+But aux_work for detecting overflow and error cases is a periodic task that
+is always carried out. It looks a little bit clearer if they were separated, but
+I could also try to merge it into aux_work if I need to.
+
 
