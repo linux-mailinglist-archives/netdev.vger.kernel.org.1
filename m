@@ -1,106 +1,96 @@
-Return-Path: <netdev+bounces-165678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F77A32FD8
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:35:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5712CA32FDD
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:36:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EEED3A9E5E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:35:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CCD6168E87
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCBD1FF1CB;
-	Wed, 12 Feb 2025 19:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7AE1FF1DA;
+	Wed, 12 Feb 2025 19:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="XG2Gk+9G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCRsPeDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88ECC1FF1B7
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 19:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ED61FECA2;
+	Wed, 12 Feb 2025 19:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739388942; cv=none; b=mNH4DfZhAqoyrs8ttMf2H5BAxr9hrzuPjlQySW210yGwt26Y78oQYfY/xC8C9MZaY0G7Bnzgm6N9ANPd7ObQk5B5NIYda8Xx8MLR6qsSj8VlVAzaWP2K0MqLtjC8XdZ4xLoHgIHHwGHx7V5Xbf8EPXin5Jbif3IbxLDTqOpx2GM=
+	t=1739389000; cv=none; b=VtwkvdNjYsxanVscSPxU3ApmpQB4xCCZ+Es+79cQdzpGWgmlgiFWfb4fmU5pfxyPIQBxuJusfFffhshuTicWMxKnh46isQ8LR0oPWqFjycatLvWosALRvALeTybKTJJ0PEbTdax0UkKThSLOUa2RMaIdZzwOyohAuNWF6uEKALY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739388942; c=relaxed/simple;
-	bh=vmAvWbsGdYNKRmni5mBBWvqq4sSKlumOWOmZ0JYXLzE=;
+	s=arc-20240116; t=1739389000; c=relaxed/simple;
+	bh=//U/YEf4GTn80X/Yqah8NCCGVUUA/kgq9Vwzb7fid1s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0zXE5MFoTkBQgR/CaQ0sdoDzuW67B3uJVNJj7/GcOiLt1jd6yIEuQfZ83vL4yZNfE8EMR/92qMfRbA1Si+ALhGE4l8dYm0OlYkz381OOTzf13l0kilCEcVHFZghA8wvZmUL7edjTrWVIzhJ4GJax3TLrSvYLNr/kdN+dOTQ5zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=XG2Gk+9G; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f4af4f9ddso513605ad.1
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 11:35:40 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tLpkGR6nfiwpfllwcg+QG40gyHyGeCudUwD1fIqvUaO93QjqnJH3B7bYd5gLIA6vGOFIf/rLgLYt3246/Au/uKsMJDRVEFIAAn+V2Z73HS4Ve+K/ta5XAeCp5uvF5gFh5424vVrELVoIM1WCF5655coT73GAErJ4jiBLS/retvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCRsPeDi; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ab7d583d2afso223171666b.0;
+        Wed, 12 Feb 2025 11:36:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739388940; x=1739993740; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5gM8cfuxuqg3cm9VTQK30nhz59V/mbnlWePA/01igcE=;
-        b=XG2Gk+9GoSkTYjSUzDPl+TKQmAoOdcpgWRmB3LUILlgocLW3+QjsDjAs16PBgwAQAi
-         ONP1OBnGPRwgEal+YDj1ZfzhgkPc7JKAy+EPnZQ/qE/yaTHWHbi0wcq/fHH3Lj16NR3w
-         WHgfYPkXJgEA20ng0vbQRvwNaxEp3fhuoBpZs=
+        d=gmail.com; s=20230601; t=1739388997; x=1739993797; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xrkhdUFQwi4/lCMpN9Y5pmHU3syxsdq4GG+NHqwz2EU=;
+        b=fCRsPeDidHSXbqfT9QA+RcXH+KwqJAso69utADADSTp9QNzyvASU+rdazj/J3j6uEb
+         E0xpDT1nWwpmgeyhmT/UPDQpnQRVS83/ydc7Pua5qspkKBXkR1bbInGupJrnBe6KMw8h
+         NPCnx1RLu3ygXm8ZggKAIFTeqT/LE+dmwtmdXrNEkMhZB+pZaoWimGLX5jPsQFO340Ku
+         oEtx8niqK+xfyV5BXldslLRKZkiLYJVIp/ec7hEBEskRhTkHMR74uUbowGiPkpqThjMU
+         oyGqDFrl6Ha9fHnkFV30jdDlcbtktE4ayhWG5qh5CXx/GWBAql/9bhswrTsuTOiUI0Az
+         FKpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739388940; x=1739993740;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5gM8cfuxuqg3cm9VTQK30nhz59V/mbnlWePA/01igcE=;
-        b=VzqGi2DQ8yZl7Z+PTzyg4qOKMiYWJAHFKyNh7A04FdB0SmbMT9HPACTMMm0CQlM6ne
-         GGfXPCzVMcknIpRPMaDcl2Wv08cRghQtBFnAbedH0BOYGDfvGqA5mMUJShKmChOCBz8E
-         0fiGki9bi3474Re83Ln6KhLAcumHwjEDAJKdthNdwAjm/j0LjNCMTFUwvhAiM4p6H5LE
-         ubYEIULGU0pHFWLArGdd6z06eZoKK5bUyNiw3ppOgKdTHIwrjf5HvWs5nm6w389hSHoh
-         0eacVTC51g2agJo/sFld+BlOD6ATCv0uBvNLb2kNlKfIid1ZGS8iMRWT3bgDLbiNBp7+
-         0eHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4nQhn4TAafByYyHivTccBbQRjBNuC6LDnTapj1xdqPJm9xqeTqloEGZKwJakE56MooY/tAUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9fPLHgk+p0QjHabE4V27Dl7Ft9zaD0lc8hkYFdcC8BLzQbSuw
-	/EKZCRiYgMiRJyWJHI5FQzMHIvsRTXi5tYB2G70bVAGGDlS3P2wZ48wRV4ddyuo=
-X-Gm-Gg: ASbGncvsuMyklEgWyrRq94q9i984gWiV5PcJol568cpb8sPDvg8TgOkg0b88gWGMG/U
-	BRE3fuqu4hqprUWCXUCq0vPTbOFr3DwiUysmpHMyRsj9vVfqybJwJ0EvxCH787fKEHbKakSvZFR
-	TmsrdC/WUilGERKrxDPMQdGY1Xw80GnJK2PoNL/bijR/MkxxxOFs+Wc4hLdeFz/YY6UO6zCynIZ
-	kfkyMwVDOZt9sOgFEEKNlxmt9XfF9fiiFwoZlkhJR4Al19u7+hF+TMpj/nTaQQ9dfmsKJ3G1gzZ
-	22gqewPlMdS7JJ6HcZbl7yTVsJcl7RcZ6W71FiYrTTAqM5LDKU9igDjcRA==
-X-Google-Smtp-Source: AGHT+IEg+ioBMU+Ca/G1OAdLCJnP2ms61SibWzHwbJn0apwKLa2R4j3/nJXUxKb9+FoRp0a41HzDeg==
-X-Received: by 2002:a17:902:ecd1:b0:215:9470:7e82 with SMTP id d9443c01a7336-220d1ea097emr9340915ad.4.1739388939724;
-        Wed, 12 Feb 2025 11:35:39 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220cd96ae5asm3486845ad.247.2025.02.12.11.35.38
+        d=1e100.net; s=20230601; t=1739388997; x=1739993797;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xrkhdUFQwi4/lCMpN9Y5pmHU3syxsdq4GG+NHqwz2EU=;
+        b=lojY54psPx5zg2CWrpJxZxLVdZQq2VDAtx6n3j5lnYctPh22jx+7ua2UWvVe7DsoXb
+         vbSkJO+D8VgViokKFDTObL+L1TFRiHMaxSSyZnZrN2PlHrJjUk9iKXhj+Ly+XKrx3t+Z
+         xpTt3cZVXptridhTtI5TKInUTB6oq47+HjkD0+4WZiIjVlxg0qVUOTeRuCZkYiu+KR82
+         vU8iNK/VL/ECRNZKSgUCFS/1fmkQWK3xO47enJ1npJHySIIvdESTAuhyxhJfDLVMOckq
+         gJzGJX2jb9I4cyPxLgyxfyZeykQg646TnVksBRnCjzWOpH31B+2rVOCB8YFBpZzVILr6
+         ncVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAjf7CGE7GzyAIXTWIE9mvfU40iGYJ33sCXNVHhw4mU1wVIaWw+OinMLnBbm1unp8vulSJdY+11j6qe7MW@vger.kernel.org, AJvYcCVZ01jKD4d1npidL38+9+jetTLWoTQvXKUp3qWDBu50q2tlZJaYsG2JFz9IdcK1HMeepGDHXk6C1Lq8@vger.kernel.org, AJvYcCWi++cTvAtFABzNX1fWyViEN8QyO8MbW04yGJ9wwIZU3N9y0jDNsPHOFWy64kX1AW8pMG13xgiR@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD/2XgYg908mJE7STdTDK5BI5NxvQXS1kLmdKT5wzrTdIuvTwP
+	VOWtZ6w+TwaavvmpiLKvvUwUY4b8FjBxh4lK2aJrRaVeXCg5tSBN
+X-Gm-Gg: ASbGncvbDol0OSjfzYguG8C/TUJPugWhguHjzyQlucEuIsFeRVZlD53yh6ZBWQLjFiv
+	YZEWsBlmKbIxr2CoXwZ8A5VARXVXkFuv10pBjzCVoRF3bd33eD7F3XdIQFXVevy674WXjrPJYML
+	jIqKHEDDXngQcqh9b6qDvK6Vvad7gWCOAygxbWidQqreIDGUh3vqv3hEGCUZI95lrjxMfSNjyuf
+	EvsQpG7ASHVyYRraiO88MZdVZD1rpP/zNIqsZihTGn03pVVmmfEuGwJamvmIH300ro5A/JejxWb
+	B4ZDeP5wXlo9
+X-Google-Smtp-Source: AGHT+IGhGb+HhZEKckwfH7aJO5Cb7saEPI0QiOmLhZBlsGU0FWR3LegRggw8s/DtIXNo0IZ0iXpWPg==
+X-Received: by 2002:a17:907:7f8c:b0:ab3:a18e:c8b6 with SMTP id a640c23a62f3a-aba5145d897mr12342666b.10.1739388996714;
+        Wed, 12 Feb 2025 11:36:36 -0800 (PST)
+Received: from debian ([2a00:79c0:659:fd00:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7b9bfd2c4sm731681366b.43.2025.02.12.11.36.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 11:35:39 -0800 (PST)
-Date: Wed, 12 Feb 2025 11:35:36 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH net] s390/qeth: move netif_napi_add_tx() and
- napi_enable() from under BH
-Message-ID: <Z6z4CMhLo0aj5YEN@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Wed, 12 Feb 2025 11:36:36 -0800 (PST)
+Date: Wed, 12 Feb 2025 20:36:32 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-References: <20250212163659.2287292-1-wintera@linux.ibm.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/3] net: phy: Add helper for getting tx
+ amplitude gain
+Message-ID: <20250212193632.GC4383@debian>
+References: <20250211-dp83822-tx-swing-v4-0-1e8ebd71ad54@liebherr.com>
+ <20250211-dp83822-tx-swing-v4-2-1e8ebd71ad54@liebherr.com>
+ <84b5b401-e48b-4328-84b2-f795c1404630@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,33 +99,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250212163659.2287292-1-wintera@linux.ibm.com>
+In-Reply-To: <84b5b401-e48b-4328-84b2-f795c1404630@lunn.ch>
 
-On Wed, Feb 12, 2025 at 05:36:59PM +0100, Alexandra Winter wrote:
-> Like other drivers qeth is calling local_bh_enable() after napi_schedule()
-> to kick-start softirqs [0].
-> Since netif_napi_add_tx() and napi_enable() now take the netdev_lock()
-> mutex [1], move them out from under the BH protection. Same solution as in
-> commit a60558644e20 ("wifi: mt76: move napi_enable() from under BH")
+Am Wed, Feb 12, 2025 at 02:15:08PM +0100 schrieb Andrew Lunn:
+> > @@ -3133,12 +3126,12 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
+> >  s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
+> >  			   const int *delay_values, int size, bool is_rx)
+> >  {
+> > -	s32 delay;
+> > -	int i;
+> > +	u32 delay;
+> > +	int i, ret;
 > 
-> Fixes: 1b23cdbd2bbc ("net: protect netdev->napi_list with netdev_lock()")
+> Networking uses reverse christmass tree. So you need to sort these two
+> longest first.
+>
+Will fix it.
 
-Hm, I wonder if the fixes should be for commit 413f0271f396 ("net:
-protect NAPI enablement with netdev_lock()") instead ?
+> > +int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
+> > +			      enum ethtool_link_mode_bit_indices linkmode,
+> > +			      u32 *val)
+> 
+> Since this is an exported symbol, it would be nice to have some
+> kerneldoc for it.
+>
+Yes.
 
-> Link: https://lore.kernel.org/netdev/20240612181900.4d9d18d0@kernel.org/ [0]
-> Link: https://lore.kernel.org/netdev/20250115035319.559603-1-kuba@kernel.org/ [1]
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
->  drivers/s390/net/qeth_core_main.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> > +{
+> > +	switch (linkmode) {
+> > +	case ETHTOOL_LINK_MODE_100baseT_Full_BIT:
+> > +		return phy_get_u32_property(dev,
+> > +					    "tx-amplitude-100base-tx-percent",
+> > +					    val);
+> 
+> So no handling of the default value here. This would be the logical
+> place to have the 100 if the value is not in device tree.
+> 
+I will get rid of the default value.
 
-Other than the above, I briefly scanned the driver source and the
-change seems reasonable.
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL(phy_get_tx_amplitude_gain);
+> 
+> I would prefer EXPORT_SYMBOL_GPL, but up to you.
+>
+Ok.
 
-I am not sure whether a different Fixes is needed or not (I'll leave
-that to the maintainers to decide), but whether this is fine as is
-or is re-posted with a new Fixes tag:
-
-Acked-by: Joe Damato <jdamato@fastly.com>
+Best regards,
+Dimitri Fedrau
 
