@@ -1,95 +1,110 @@
-Return-Path: <netdev+bounces-165452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4D0A321BF
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:07:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2DDA321DD
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:16:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA06A3A5B37
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:07:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E1D57A19D5
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A898205AB1;
-	Wed, 12 Feb 2025 09:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450CB2054EC;
+	Wed, 12 Feb 2025 09:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l5DppFAX"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Lc/11+AA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0EA1D86F2;
-	Wed, 12 Feb 2025 09:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042CE1EF0BC;
+	Wed, 12 Feb 2025 09:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739351263; cv=none; b=VA4N2ms1uGGIpkktKNzPZgylqPc3XRc4DBKEelQeCcSeRjBkc0t2MrA7TGy76/4N+6P1ST6zFVdZ25CU3a6SWiorM8P9fE/OT22feHRbqBH4FobGJS3JH4y1RibDTndbs7/yN3AnsK6lIS/3xzfD4I+cNhOU4PgWzU9yUMkTvPM=
+	t=1739351766; cv=none; b=ZKMWvFQPVznA4OdUHrVBFYljfo9fnxQRpj1SAlmW64tkJ1VKEIRwwQ2TvgN9G4M8VimPRb7R5oLYQAm1uq1nIRdTAEJJ68ll9LwSt5AMChmDtcze/Yhwpz3QoJ2/31Rvd30Mjt/3B2Xb+txDWCa6kvYmV3JNxmwN/yD7zbKleoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739351263; c=relaxed/simple;
-	bh=4vWwTPj7CPp+P6c0oReSosDGvc+tz5Kxfec4CrpBq/k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W+fk0viqMqsBqL2j2FREtqEokm9TmGnv38iN2hCjnoSnrHLSd3YKn+iT7jF7/Z+2wvXN//FxuJXmmFA3oEbaWPILYOPt1plepIHktgl0jJbO+JMSbSmvGOMU3YGx6z2FwkRUiXSFP2zUyDJFhykyR4FBOJpbH+zG7EzaVZ+QJb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l5DppFAX; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6EA6A204A8;
-	Wed, 12 Feb 2025 09:07:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739351259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=goUycZkn0foMdzRm1ILExkPq1ZpIX7VLEl5diWuJzUI=;
-	b=l5DppFAXBP9XMVJojhRDgAuY9zRuB+J0n9pa+IcFl+k182795VmZh7UeXjjMn5p6LkIs0g
-	Nu0PcWy8SmyzIoDOTrhcFABom430/SwItcxqCQbi4QzrgfWPMGbBn4jPPNJTuCUjT9N1pY
-	nqPm95X5HS1mP08yv7kLVtFKtWJkHmi9R0/IRNDUuacaSNHHcUr5HKGw+byAKzJBn7Mtg5
-	/7++wEyky6rAfgBWlhn8kn3+d5Hu+qDZc2qx5SN7jP4FOrxHOsm7SNkQOJ0w4iTHwrLIQD
-	dUsmCFXtGU5YiWfDYXsyaCtHinvNhi3Jz7fClMkUG425zU1TM6BIDFa0wCLXDg==
-Message-ID: <edb5f1ba-52b8-4c18-be31-a24491c79d66@bootlin.com>
-Date: Wed, 12 Feb 2025 10:07:37 +0100
+	s=arc-20240116; t=1739351766; c=relaxed/simple;
+	bh=586BzYlk+Ygs9JfrWVlD0JG3qFFy+8RrRzgbZRazOq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kn5ZXmP5ExhY5vc3vD/JRUQhPBQloYa4nnodvJVHLJ9rFaesm/Li7cvr95i6Ug1e1fjChv8umfm9mrp/iiVMrZvWPBLeWHTdQEGXYgbzMFWw4Hb4saYxEvxfvRMGpzSDScmGGLvjbL0KbWZkJb5qncjM0AOXecumPEGMo3utEmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Lc/11+AA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC868C4CEDF;
+	Wed, 12 Feb 2025 09:16:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1739351765;
+	bh=586BzYlk+Ygs9JfrWVlD0JG3qFFy+8RrRzgbZRazOq4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lc/11+AAksnYQFMkVCEPipEVinpyH3Q1FStBJ42OJJqKzVTDCgZoy22d9/C+tl+zW
+	 fOIGghIU9nYrZxnh4+qn7L0PKNhcUtk9J4apl1ZwXrDg0DtnvJAp4pib+qoG8uYhpE
+	 rbc+5nF9laDV4czP2FF1c2rNf/dKRPcQuKhpO2HQ=
+Date: Wed, 12 Feb 2025 10:15:01 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Santosh Puranik <spuranik@nvidia.com>
+Subject: Re: [PATCH net-next v2 1/2] usb: Add base USB MCTP definitions
+Message-ID: <2025021240-perplexed-hurt-2adb@gregkh>
+References: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
+ <20250212-dev-mctp-usb-v2-1-76e67025d764@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] rtnetlink: Fix rtnl_net_cmp_locks() when DEBUG is
- off
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexis.lothore@bootlin.com, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, razor@blackwall.org,
- stable@vger.kernel.org, thomas.petazzoni@bootlin.com
-References: <20250212-rtnetlink_leak-v1-1-27bce9a3ac9a@bootlin.com>
- <20250212084519.38648-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <20250212084519.38648-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegfeegjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpeeurghsthhivghnucevuhhruhhttghhvghtuceosggrshhtihgvnhdrtghurhhuthgthhgvthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfehgefgteffkeehveeuvdekvddvueefgeejvefgleevveevteffveefgfehieejnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrudegngdpmhgrihhlfhhrohhmpegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehkuhhnihihuhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlr
- dhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: bastien.curutchet@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212-dev-mctp-usb-v2-1-76e67025d764@codeconstruct.com.au>
 
-On 2/12/25 9:45 AM, Kuniyuki Iwashima wrote:
-> From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-> Date: Wed, 12 Feb 2025 09:23:47 +0100
->> rtnl_net_cmp_locks() always returns -1 if CONFIG_DEBUG_NET_SMALL_RTNL is
->> disabled. However, if CONFIG_DEBUG_NET_SMALL_RTNL is enabled, it returns 0
->> when both inputs are equal. It is then used by rtnl_nets_add() to call
->> put_net() if the net to be added is already present in the struct
->> rtnl_nets. As a result, when rtnl_nets_add() is called on an already
->> present net, put_net() is called only if DEBUG is on.
+On Wed, Feb 12, 2025 at 10:46:50AM +0800, Jeremy Kerr wrote:
+> Upcoming changes will add a USB host (and later gadget) driver for the
+> MCTP-over-USB protocol. Add a header that provides common definitions
+> for protocol support: the packet header format and a few framing
+> definitions. Add a define for the MCTP class code, as per
+> https://usb.org/defined-class-codes.
 > 
-> If CONFIG_DEBUG_NET_SMALL_RTNL is disabled, every duplicate net is
-> added to rtnl_nets, so put_net() is expected to be called for each
-> in rtnl_nets_destroy().
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+> 
+> ---
+> v2:
+>  - add reference & URL to DSP0283
+>  - update copyright year
+> ---
+>  MAINTAINERS                  |  1 +
+>  include/linux/usb/mctp-usb.h | 30 ++++++++++++++++++++++++++++++
+>  include/uapi/linux/usb/ch9.h |  1 +
+>  3 files changed, 32 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 67665d9dd536873e94afffc00393c2fe2e8c2797..e7b326dba9a9e6f50c3beeb172d93641841f6242 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -13903,6 +13903,7 @@ L:	netdev@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/networking/mctp.rst
+>  F:	drivers/net/mctp/
+> +F:	include/linux/usb/mctp-usb.h
+>  F:	include/net/mctp.h
+>  F:	include/net/mctpdevice.h
+>  F:	include/net/netns/mctp.h
+> diff --git a/include/linux/usb/mctp-usb.h b/include/linux/usb/mctp-usb.h
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..b19392aa29310eda504f65bd098c849bd02dc0a1
+> --- /dev/null
+> +++ b/include/linux/usb/mctp-usb.h
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
 
-I see, sorry for the irrelevant series then ...
+I missed this the last time, sorry, but I have to ask, do you really
+mean v2 or later?  If so, that's fine, just want to make sure.
 
-Best regards,
-Bastien
+Whichever you pick is fine with me, so:
+
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
