@@ -1,631 +1,254 @@
-Return-Path: <netdev+bounces-165415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB6EA31EA4
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:21:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD51DA31EEE
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33D3D188C08C
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:21:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829ED3A97CC
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EF91FECD2;
-	Wed, 12 Feb 2025 06:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7115A1FF1B7;
+	Wed, 12 Feb 2025 06:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dxi9KlMI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2u+pa9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22751FC7E6;
-	Wed, 12 Feb 2025 06:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468101FBEA6;
+	Wed, 12 Feb 2025 06:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739341215; cv=none; b=RGXx0onDmwwudCiJdrQ9uaAmPjBlqk8an0QGNZN4yhKGIx7qOAj1oRmbV+XfFKeeZuqnfCs5+VgfMgNZOudO8o4KBSwcEdHGoyleZzqCmSZW0GalTHGORO48BmlzbzvDO6gUqXHLzCqgt1mbvIgjrj7oYQjU3ZM10Ci/lcDW7gE=
+	t=1739341632; cv=none; b=QTtPhzF5Ah9qHeJY0hiITBTwbrBwUPdjj1vYngIZ2yjJQFOTSY6MWFSrBj0sArQWjLvR0axq9Daxq7WuoF5BhC+GIAx66s3OUvIQUu/j1gNTcbET6JHp9idVx6G2miyrFhNclONAmysl2f0byJcctqvaoajHA0K7VUU2ZkCkfvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739341215; c=relaxed/simple;
-	bh=Nd9Mnp3wcTiXYfdo/0yJYA8WYGTxK7m2qjZF+iR2p+Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mkx8QcxKp69FQSNyguM38eilUminqt6Q0I+5oZxFAwFEsGEiI1nPKzzxv1uN89OcT4ZUW5dHgw2CKcjWsSUvxH6CSPud11i9jOmvrx9pa/yffSRg1NPi4kN8b5QxDZcrAqKE+Dz7B5vcCoY8WukWaSHeiq5DniPANygTEw64TNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dxi9KlMI; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-220bfdfb3f4so6366405ad.2;
-        Tue, 11 Feb 2025 22:20:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739341213; x=1739946013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8HcrWAqvgwDqLBJmnhyxw1if59WWrRJdLalmBU6VEIo=;
-        b=Dxi9KlMIh8zimRQSIItzITRfMtZiZTU1QK4QuqvKsfXM4R5ILn6U/JUhs7KPy/o+zY
-         batTHpXE0SeFZnD03aLF5rBwPBy4U+cX/trygP/vxpGhTOznYJ2nr4SCGVYkHU84sWCs
-         7nq4zf9PQ+XsAhP/TiFMJQvGUbs1Acuhwg9nrhOV1Tce6hx1dFgq4w/I7BKfzGo5rx+L
-         D4aI+NkcF4fMRb7f+kswOggVveX3uzj7iBJmeDF0vZdCLI+SCdL5uoEASg/l5RJXvHzA
-         kgDqKKcfa638DOt0AV6pTiYf+RKhnvgVLftK4Lt4IQEutXjUtcLtKK/HckjwuEzuQqkL
-         NSWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739341213; x=1739946013;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8HcrWAqvgwDqLBJmnhyxw1if59WWrRJdLalmBU6VEIo=;
-        b=v2PMtTcW+0aYYE1SuM3MIdb9OxfjH9/SI2Wl91FBcA5l5iiUAPldNhXLUJwHe/wsHt
-         BqyZYGfzTqBJzwY8STclRt3FA4kdcgkqZw8ow6Nr7M2IgPEWNre5opT0NpHjsfF4Z4OE
-         mYY5HRFLDK/YYR3RDBQ2pdnAY/3KtaLqjJeI4wucpTPhHwm0DBwJ6/bW6vKSnI7y3gvh
-         zZ690PDNG2w4d5/oaBCPGvGHfUgUQISuUmJsvMhNhczDzCrIlQQjXYUL1lD/tYSAWOLg
-         4216I+wBbOzVXMeJ5O7pac5VwdmEY18e2RwV5fbTJaArAHgo0hhzhWxhdZoPHTKBYjyP
-         DxPg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5FmdiLTdmJO35olurkym0XQwLtX5RPVLddu+mJ4bqOJtT1TyI8C9jiYXDC8/ljEze9GThvig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaEVI5coW6IiFjZtSFy6IglQV/3cGg+teaaTat1a66OnJBAJJj
-	uKxB/V6o0omZWpONT5PutNrl7IL2Uq24XW3kSmzCifrtg5aOJfQy
-X-Gm-Gg: ASbGncu1YuQyJS2zHAsNmJNPs7TNN5SvQefJyh+EbR82gFJYd+2bYTIijgjkvw8kIh8
-	Ttx65V6nsnhUTSm3hFRzcbqbwGiNnO+gYOvVl350yvYyDr/RMz8AkWWBhieruE8N5xH92m0KRyw
-	+a1Vqn/nJl1DC/dv5zHU3MAjLwzklvmtZFY0exoOTZj4vdlv/O/YjGvnc0q6fPZiRIOsk9ceK4/
-	pYxyHIrgHiuu7EeOkb9rCW812mb6fyAupnnl71rmFldLFuWuHUh2mZG5gGQu1AxoYQzPtBeExVf
-	GO8yRvSVVuHqP4HvHWbZdjLnUOtfhnsvE+wjRGjLM4f6J82NuSNNNhCBCL/3VsQ=
-X-Google-Smtp-Source: AGHT+IECRi2o3JNE0SDCsaCRP1UNJ2Yngga9k1BIv8WRNJrHywdc8YD2XHtvrVA5vS+BLZz/bt0CbQ==
-X-Received: by 2002:a17:903:41d2:b0:216:3633:36e7 with SMTP id d9443c01a7336-220bbb08de9mr31818365ad.26.1739341213128;
-        Tue, 11 Feb 2025 22:20:13 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3683dac7sm105277835ad.142.2025.02.11.22.20.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 22:20:12 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	shuah@kernel.org,
-	ykolal@fb.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH bpf-next v10 12/12] selftests/bpf: add simple bpf tests in the tx path for timestamping feature
-Date: Wed, 12 Feb 2025 14:18:55 +0800
-Message-Id: <20250212061855.71154-13-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250212061855.71154-1-kerneljasonxing@gmail.com>
-References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1739341632; c=relaxed/simple;
+	bh=1/zhjK+0+G05v1hwwn5tz/H+8Cz4vmPRU7clBN3k0ls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uNSptziFxPq6H6XF5WtnqlOK1qoa0x/TqTPDJeBZS5LAPESU8GpVl1ie+NwPNwgIXEAiDFMLZqVwH+h2xNdhHtRxQkkPuwLEnzOZv0JXxIavCSuVsTFBRzk9uSt7Dyxl+5ZfAaRirLg5XdK4jfidDAxDCtouKgqjUwlS+AmcCk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2u+pa9v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 920F6C4CEE6;
+	Wed, 12 Feb 2025 06:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739341631;
+	bh=1/zhjK+0+G05v1hwwn5tz/H+8Cz4vmPRU7clBN3k0ls=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=j2u+pa9v36ZbhRZph5rV/yE+zheeNljbSA2hCK+QxpqUUozTROOu+Bp9e9rPsiCn4
+	 sr/F2tK6INMhPIZHrkjHpv/yxCHNwYrsM+87zlpR119ozsWj1qVRrCYlXouW0KM8W4
+	 CQR6VyZyoMu8gqW16WkpKAebx/0UiE8DIPWFsHGgqX9w/f6KStjHuQaWA3TaVQnBm3
+	 NV/kFzuXc1SiT0U9sZz0+JGhp0Bo+Ds8/saVBFz20xn9tx3GXscJj15FDGXCD0aJL4
+	 BG11EpfhoMYdyx7SIPli3YJUVgVKGqVRDm1/mm/Yv3o+k4aL5Sc1l+OQaJwLQhtaEW
+	 3qW5TzMlSD/lA==
+Message-ID: <66b554f0-e11c-4801-9a5e-2ccb85a105fe@kernel.org>
+Date: Wed, 12 Feb 2025 07:27:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 13/16] net: airoha: Introduce PPE
+ initialization via NPU
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+ upstream@airoha.com
+References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
+ <20250209-airoha-en7581-flowtable-offload-v3-13-dba60e755563@kernel.org>
+ <20250211-fanatic-smoky-wren-f0dcc9@krzk-bin> <Z6t7SuFurbGwJjt_@lore-desk>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <Z6t7SuFurbGwJjt_@lore-desk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-BPF program calculates a couple of latency deltas between each tx
-timestamping callbacks. It can be used in the real world to diagnose
-the kernel behaviour in the tx path.
+On 11/02/2025 17:31, Lorenzo Bianconi wrote:
+>> On Sun, Feb 09, 2025 at 01:09:06PM +0100, Lorenzo Bianconi wrote:
+>>> +static irqreturn_t airoha_npu_wdt_handler(int irq, void *core_instance)
+>>> +{
+>>> +	struct airoha_npu_core *core = core_instance;
+>>> +	struct airoha_npu *npu = core->npu;
+>>> +	int c = core - &npu->cores[0];
+>>> +	u32 val;
+>>> +
+>>> +	airoha_npu_rmw(npu, REG_WDT_TIMER_CTRL(c), 0, WDT_INTR_MASK);
+>>> +	val = airoha_npu_rr(npu, REG_WDT_TIMER_CTRL(c));
+>>> +	if (FIELD_GET(WDT_EN_MASK, val))
+>>> +		schedule_work(&core->wdt_work);
+>>> +
+>>> +	return IRQ_HANDLED;
+>>> +}
+>>> +
+>>> +struct airoha_npu *airoha_npu_init(struct airoha_eth *eth)
+>>> +{
+>>> +	struct reserved_mem *rmem;
+>>> +	int i, irq, err = -ENODEV;
+>>> +	struct airoha_npu *npu;
+>>> +	struct device_node *np;
+>>> +
+>>> +	npu = devm_kzalloc(eth->dev, sizeof(*npu), GFP_KERNEL);
+>>> +	if (!npu)
+>>> +		return ERR_PTR(-ENOMEM);
+>>> +
+>>> +	npu->np = of_parse_phandle(eth->dev->of_node, "airoha,npu", 0);
+>>> +	if (!npu->np)
+>>> +		return ERR_PTR(-ENODEV);
+>>
+>> Why? The property is not required, so how can missing property fail the
+>> probe?
+> 
+> similar to mtk_wed device, airoha_npu is not modeled as a standalone driver,
+> but it is part of the airoha_eth driver. If you think it is better, I can
+> rework it implementing a dedicated driver for it. What do you think?
 
-Check the safety issues by accessing a few bpf calls in
-bpf_test_access_bpf_calls() which are implemented in the patch 3 and 4.
 
-Check if the bpf timestamping can co-exist with socket timestamping.
+Whether it is separate or not, does not matter. Behavior in both cases
+would be the same so does not answer my question. But below does however:
 
-There remains a few realistic things[1][2] to highlight:
-1. in general a packet may pass through multiple qdiscs. For instance
-with bonding or tunnel virtual devices in the egress path.
-2. packets may be resent, in which case an ACK might precede a repeat
-SCHED and SND.
-3. erroneous or malicious peers may also just never send an ACK.
+> 
+>>
+>> This is also still unnecessary ABI break without explanation/reasoning.
+> 
+> At the moment if airoha_npu_init() fails (e.g. if the npu node is not present),
+> it will not cause any failure in airoha_hw_init() (so in the core ethernet
+> driver probing).
 
-[1]: https://lore.kernel.org/all/67a389af981b0_14e0832949d@willemb.c.googlers.com.notmuch/
-[2]: https://lore.kernel.org/all/c329a0c1-239b-4ca1-91f2-cb30b8dd2f6a@linux.dev/
 
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
----
- .../bpf/prog_tests/net_timestamping.c         | 231 +++++++++++++++++
- .../selftests/bpf/progs/net_timestamping.c    | 244 ++++++++++++++++++
- 2 files changed, 475 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/net_timestamping.c
- create mode 100644 tools/testing/selftests/bpf/progs/net_timestamping.c
+Indeed, it will fail airoha_ppe_init() but airoha_ppe_init() is not
+fatal. You will have dmesg errors though, so this should be probably
+dev_warn.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/net_timestamping.c b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-new file mode 100644
-index 000000000000..dcdc40473a7d
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-@@ -0,0 +1,231 @@
-+#include <linux/net_tstamp.h>
-+#include <sys/time.h>
-+#include <linux/errqueue.h>
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "net_timestamping.skel.h"
-+
-+#define CG_NAME "/net-timestamping-test"
-+#define NSEC_PER_SEC    1000000000LL
-+
-+static const char addr4_str[] = "127.0.0.1";
-+static const char addr6_str[] = "::1";
-+static struct net_timestamping *skel;
-+static int cfg_payload_len = 30;
-+static struct timespec usr_ts;
-+static u64 delay_tolerance_nsec = 10000000000; /* 10 seconds */
-+int SK_TS_SCHED;
-+int SK_TS_TXSW;
-+int SK_TS_ACK;
-+
-+static int64_t timespec_to_ns64(struct timespec *ts)
-+{
-+	return ts->tv_sec * NSEC_PER_SEC + ts->tv_nsec;
-+}
-+
-+static void validate_key(int tskey, int tstype)
-+{
-+	static int expected_tskey = -1;
-+
-+	if (tstype == SCM_TSTAMP_SCHED)
-+		expected_tskey = cfg_payload_len - 1;
-+
-+	ASSERT_EQ(expected_tskey, tskey, "tskey mismatch");
-+
-+	expected_tskey = tskey;
-+}
-+
-+static void validate_timestamp(struct timespec *cur, struct timespec *prev)
-+{
-+	int64_t cur_ns, prev_ns;
-+
-+	cur_ns = timespec_to_ns64(cur);
-+	prev_ns = timespec_to_ns64(prev);
-+
-+	ASSERT_TRUE((cur_ns - prev_ns) < delay_tolerance_nsec, "latency");
-+}
-+
-+static void test_socket_timestamp(struct scm_timestamping *tss, int tstype,
-+				  int tskey)
-+{
-+	static struct timespec *prev_ts = &usr_ts;
-+
-+	validate_key(tskey, tstype);
-+
-+	switch (tstype) {
-+	case SCM_TSTAMP_SCHED:
-+		validate_timestamp(&tss->ts[0], prev_ts);
-+		SK_TS_SCHED = 1;
-+		SK_TS_TXSW = SK_TS_ACK = 0;
-+		break;
-+	case SCM_TSTAMP_SND:
-+		validate_timestamp(&tss->ts[0], prev_ts);
-+		SK_TS_TXSW = 1;
-+		break;
-+	case SCM_TSTAMP_ACK:
-+		validate_timestamp(&tss->ts[0], prev_ts);
-+		SK_TS_ACK = 1;
-+		break;
-+	}
-+
-+	prev_ts = &tss->ts[0];
-+}
-+
-+static void test_recv_errmsg_cmsg(struct msghdr *msg)
-+{
-+	struct sock_extended_err *serr = NULL;
-+	struct scm_timestamping *tss = NULL;
-+	struct cmsghdr *cm;
-+
-+	for (cm = CMSG_FIRSTHDR(msg);
-+	     cm && cm->cmsg_len;
-+	     cm = CMSG_NXTHDR(msg, cm)) {
-+		if (cm->cmsg_level == SOL_SOCKET &&
-+		    cm->cmsg_type == SCM_TIMESTAMPING) {
-+			tss = (void *) CMSG_DATA(cm);
-+		} else if ((cm->cmsg_level == SOL_IP &&
-+			    cm->cmsg_type == IP_RECVERR) ||
-+			   (cm->cmsg_level == SOL_IPV6 &&
-+			    cm->cmsg_type == IPV6_RECVERR) ||
-+			   (cm->cmsg_level == SOL_PACKET &&
-+			    cm->cmsg_type == PACKET_TX_TIMESTAMP)) {
-+			serr = (void *) CMSG_DATA(cm);
-+			ASSERT_EQ(serr->ee_origin, SO_EE_ORIGIN_TIMESTAMPING,
-+				    "cmsg type");
-+		}
-+
-+		if (serr && tss)
-+			test_socket_timestamp(tss, serr->ee_info,
-+					      serr->ee_data);
-+	}
-+}
-+
-+static bool socket_recv_errmsg(int fd)
-+{
-+	static char ctrl[1024 /* overprovision*/];
-+	char data[cfg_payload_len];
-+	static struct msghdr msg;
-+	struct iovec entry;
-+	int n = 0;
-+
-+	memset(&msg, 0, sizeof(msg));
-+	memset(&entry, 0, sizeof(entry));
-+	memset(ctrl, 0, sizeof(ctrl));
-+
-+	entry.iov_base = data;
-+	entry.iov_len = cfg_payload_len;
-+	msg.msg_iov = &entry;
-+	msg.msg_iovlen = 1;
-+	msg.msg_name = NULL;
-+	msg.msg_namelen = 0;
-+	msg.msg_control = ctrl;
-+	msg.msg_controllen = sizeof(ctrl);
-+
-+	n = recvmsg(fd, &msg, MSG_ERRQUEUE);
-+	if (n == -1)
-+		ASSERT_EQ(errno, EAGAIN, "recvmsg MSG_ERRQUEUE");
-+
-+	if (n >= 0)
-+		test_recv_errmsg_cmsg(&msg);
-+
-+	return n == -1;
-+
-+}
-+
-+static void test_socket_timestamping(int fd)
-+{
-+	while (!socket_recv_errmsg(fd));
-+
-+	ASSERT_EQ(SK_TS_SCHED, 1, "SCM_TSTAMP_SCHED");
-+	ASSERT_EQ(SK_TS_TXSW, 1, "SCM_TSTAMP_SND");
-+	ASSERT_EQ(SK_TS_ACK, 1, "SCM_TSTAMP_ACK");
-+}
-+
-+static void test_tcp(int family)
-+{
-+	struct net_timestamping__bss *bss = skel->bss;
-+	char buf[cfg_payload_len];
-+	int sfd = -1, cfd = -1;
-+	unsigned int sock_opt;
-+	int ret;
-+
-+	memset(bss, 0, sizeof(*bss));
-+
-+	sfd = start_server(family, SOCK_STREAM,
-+			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
-+	if (!ASSERT_OK_FD(sfd, "start_server"))
-+		goto out;
-+
-+	cfd = connect_to_fd(sfd, 0);
-+	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
-+		goto out;
-+
-+	sock_opt = SOF_TIMESTAMPING_SOFTWARE |
-+		   SOF_TIMESTAMPING_OPT_ID |
-+		   SOF_TIMESTAMPING_TX_SCHED |
-+		   SOF_TIMESTAMPING_TX_SOFTWARE |
-+		   SOF_TIMESTAMPING_TX_ACK;
-+	ret = setsockopt(cfd, SOL_SOCKET, SO_TIMESTAMPING,
-+			 (char *) &sock_opt, sizeof(sock_opt));
-+	if (!ASSERT_OK(ret, "setsockopt SO_TIMESTAMPING"))
-+		goto out;
-+
-+	ret = clock_gettime(CLOCK_REALTIME, &usr_ts);
-+	if (!ASSERT_OK(ret, "get user time"))
-+		goto out;
-+
-+	ret = write(cfd, buf, sizeof(buf));
-+	if (!ASSERT_EQ(ret, sizeof(buf), "send to server"))
-+		goto out;
-+
-+	/* Test if socket timestamping works correctly even with bpf
-+	 * extension enabled.
-+	 */
-+	test_socket_timestamping(cfd);
-+
-+	ASSERT_EQ(bss->nr_active, 1, "nr_active");
-+	ASSERT_EQ(bss->nr_snd, 2, "nr_snd");
-+	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
-+	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
-+	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-+
-+out:
-+	if (sfd >= 0)
-+		close(sfd);
-+	if (cfd >= 0)
-+		close(cfd);
-+}
-+
-+void test_net_timestamping(void)
-+{
-+	struct netns_obj *ns;
-+	int cg_fd;
-+
-+	cg_fd = test__join_cgroup(CG_NAME);
-+	if (!ASSERT_OK_FD(cg_fd, "join cgroup"))
-+		return;
-+
-+	ns = netns_new("net_timestamping_ns", true);
-+	if (!ASSERT_OK_PTR(ns, "create ns"))
-+		goto done;
-+
-+	skel = net_timestamping__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skel"))
-+		goto done;
-+
-+	if (!ASSERT_OK(net_timestamping__attach(skel), "attach skel"))
-+		goto done;
-+
-+	skel->links.skops_sockopt =
-+		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
-+	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
-+		goto done;
-+
-+	test_tcp(AF_INET6);
-+	test_tcp(AF_INET);
-+
-+done:
-+	net_timestamping__destroy(skel);
-+	netns_free(ns);
-+	close(cg_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/net_timestamping.c b/tools/testing/selftests/bpf/progs/net_timestamping.c
-new file mode 100644
-index 000000000000..d3e1da599626
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/net_timestamping.c
-@@ -0,0 +1,244 @@
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#include <errno.h>
-+
-+#define SK_BPF_CB_FLAGS 1009
-+#define SK_BPF_CB_TX_TIMESTAMPING 1
-+
-+int nr_active;
-+int nr_snd;
-+int nr_passive;
-+int nr_sched;
-+int nr_txsw;
-+int nr_ack;
-+
-+struct sk_stg {
-+	__u64 sendmsg_ns;	/* record ts when sendmsg is called */
-+};
-+
-+struct sk_tskey {
-+	u64 cookie;
-+	u32 tskey;
-+};
-+
-+struct delay_info {
-+	u64 sendmsg_ns;		/* record ts when sendmsg is called */
-+	u32 sched_delay;	/* SCHED_OPT_CB - sendmsg_ns */
-+	u32 sw_snd_delay;	/* SW_OPT_CB - SCHED_OPT_CB */
-+	u32 ack_delay;		/* ACK_OPT_CB - SW_OPT_CB */
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
-+	__uint(map_flags, BPF_F_NO_PREALLOC);
-+	__type(key, int);
-+	__type(value, struct sk_stg);
-+} sk_stg_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_HASH);
-+	__type(key, struct sk_tskey);
-+	__type(value, struct delay_info);
-+	__uint(max_entries, 1024);
-+} time_map SEC(".maps");
-+
-+static u64 delay_tolerance_nsec = 10000000000; /* 10 second as an example */
-+
-+extern int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops, u64 flags) __ksym;
-+
-+static int bpf_test_sockopt(void *ctx, const struct sock *sk, int expected)
-+{
-+	int tmp, new = SK_BPF_CB_TX_TIMESTAMPING;
-+	int opt = SK_BPF_CB_FLAGS;
-+	int level = SOL_SOCKET;
-+
-+	if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)) != expected)
-+		return 1;
-+
-+	if (bpf_getsockopt(ctx, level, opt, &tmp, sizeof(tmp)) != expected ||
-+	    (!expected && tmp != new))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static bool bpf_test_access_sockopt(void *ctx, const struct sock *sk)
-+{
-+	if (bpf_test_sockopt(ctx, sk, -EOPNOTSUPP))
-+		return true;
-+	return false;
-+}
-+
-+static bool bpf_test_access_load_hdr_opt(struct bpf_sock_ops *skops)
-+{
-+	u8 opt[3] = {0};
-+	int load_flags = 0;
-+	int ret;
-+
-+	ret = bpf_load_hdr_opt(skops, opt, sizeof(opt), load_flags);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool bpf_test_access_cb_flags_set(struct bpf_sock_ops *skops)
-+{
-+	int ret;
-+
-+	ret = bpf_sock_ops_cb_flags_set(skops, 0);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+/* In the timestamping callbacks, we're not allowed to call the following
-+ * BPF CALLs for the safety concern. Return false if expected.
-+ */
-+static bool bpf_test_access_bpf_calls(struct bpf_sock_ops *skops,
-+				     const struct sock *sk)
-+{
-+	if (bpf_test_access_sockopt(skops, sk))
-+		return true;
-+
-+	if (bpf_test_access_load_hdr_opt(skops))
-+		return true;
-+
-+	if (bpf_test_access_cb_flags_set(skops))
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool bpf_test_delay(struct bpf_sock_ops *skops, const struct sock *sk)
-+{
-+	struct bpf_sock_ops_kern *skops_kern;
-+	u64 timestamp = bpf_ktime_get_ns();
-+	struct skb_shared_info *shinfo;
-+	struct delay_info dinfo = {0};
-+	struct sk_tskey key = {0};
-+	struct delay_info *val;
-+	struct sk_buff *skb;
-+	struct sk_stg *stg;
-+	u64 prior_ts, delay;
-+
-+	if (bpf_test_access_bpf_calls(skops, sk))
-+		return false;
-+
-+	skops_kern = bpf_cast_to_kern_ctx(skops);
-+	skb = skops_kern->skb;
-+	shinfo = bpf_core_cast(skb->head + skb->end, struct skb_shared_info);
-+
-+	key.cookie = bpf_get_socket_cookie(skops);
-+	if (!key.cookie)
-+		return false;
-+
-+	if (skops->op == BPF_SOCK_OPS_TS_SND_CB) {
-+		stg = bpf_sk_storage_get(&sk_stg_map, (void *)sk, 0, 0);
-+		if (!stg)
-+			return false;
-+		dinfo.sendmsg_ns = stg->sendmsg_ns;
-+		bpf_sock_ops_enable_tx_tstamp(skops_kern, 0);
-+		key.tskey = shinfo->tskey;
-+		if (!key.tskey)
-+			return false;
-+		bpf_map_update_elem(&time_map, &key, &dinfo, BPF_ANY);
-+		return true;
-+	}
-+
-+	key.tskey = shinfo->tskey;
-+	if (!key.tskey)
-+		return false;
-+
-+	val = bpf_map_lookup_elem(&time_map, &key);
-+	if (!val)
-+		return false;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		delay = val->sched_delay = timestamp - val->sendmsg_ns;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		prior_ts = val->sched_delay + val->sendmsg_ns;
-+		delay = val->sw_snd_delay = timestamp - prior_ts;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		prior_ts = val->sw_snd_delay + val->sched_delay + val->sendmsg_ns;
-+		delay = val->ack_delay = timestamp - prior_ts;
-+		break;
-+	}
-+
-+	if (delay >= delay_tolerance_nsec)
-+		return false;
-+
-+	/* Since it's the last one, remove from the map after latency check */
-+	if (skops->op == BPF_SOCK_OPS_TS_ACK_OPT_CB)
-+		bpf_map_delete_elem(&time_map, &key);
-+
-+	return true;
-+}
-+
-+SEC("fentry/tcp_sendmsg_locked")
-+int BPF_PROG(trace_tcp_sendmsg_locked, struct sock *sk, struct msghdr *msg, size_t size)
-+{
-+	u64 timestamp = bpf_ktime_get_ns();
-+	u32 flag = sk->sk_bpf_cb_flags;
-+	struct sk_stg *stg;
-+
-+	if (!flag)
-+		return 0;
-+
-+	stg = bpf_sk_storage_get(&sk_stg_map, sk, 0,
-+				 BPF_SK_STORAGE_GET_F_CREATE);
-+	if (!stg)
-+		return 0;
-+
-+	stg->sendmsg_ns = timestamp;
-+	nr_snd += 1;
-+	return 0;
-+}
-+
-+SEC("sockops")
-+int skops_sockopt(struct bpf_sock_ops *skops)
-+{
-+	struct bpf_sock *bpf_sk = skops->sk;
-+	const struct sock *sk;
-+
-+	if (!bpf_sk)
-+		return 1;
-+
-+	sk = (struct sock *)bpf_skc_to_tcp_sock(bpf_sk);
-+	if (!sk)
-+		return 1;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-+		nr_active += !bpf_test_sockopt(skops, sk, 0);
-+		break;
-+	case BPF_SOCK_OPS_TS_SND_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_snd += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_sched += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_txsw += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_ack += 1;
-+		break;
-+	}
-+
-+	return 1;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.5
+> 
+>>
+>>> +
+>>> +	npu->pdev = of_find_device_by_node(npu->np);
+>>> +	if (!npu->pdev)
+>>> +		goto error_of_node_put;
+>>
+>> You should also add device link and probably try_module_get. See
+>> qcom,ice (patch for missing try_module_get is on the lists).
+> 
+> thx for the pointer, I will take a look to it.
+> 
+>>
+>>> +
+>>> +	get_device(&npu->pdev->dev);
+>>
+>> Why? of_find_device_by_node() does it.
+> 
+> ack, I will fix it.
+> 
+>>
+>>> +
+>>> +	npu->base = devm_platform_ioremap_resource(npu->pdev, 0);
+>>> +	if (IS_ERR(npu->base))
+>>> +		goto error_put_dev;
+>>> +
+>>> +	np = of_parse_phandle(npu->np, "memory-region", 0);
+>>> +	if (!np)
+>>> +		goto error_put_dev;
+>>> +
+>>> +	rmem = of_reserved_mem_lookup(np);
+>>> +	of_node_put(np);
+>>> +
+>>> +	if (!rmem)
+>>> +		goto error_put_dev;
+>>> +
+>>> +	irq = platform_get_irq(npu->pdev, 0);
+>>> +	if (irq < 0) {
+>>> +		err = irq;
+>>> +		goto error_put_dev;
+>>> +	}
+>>> +
+>>> +	err = devm_request_irq(&npu->pdev->dev, irq, airoha_npu_mbox_handler,
+>>> +			       IRQF_SHARED, "airoha-npu-mbox", npu);
+>>> +	if (err)
+>>> +		goto error_put_dev;
+>>> +
+>>> +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++) {
+>>> +		struct airoha_npu_core *core = &npu->cores[i];
+>>> +
+>>> +		spin_lock_init(&core->lock);
+>>> +		core->npu = npu;
+>>> +
+>>> +		irq = platform_get_irq(npu->pdev, i + 1);
+>>> +		if (irq < 0) {
+>>> +			err = irq;
+>>> +			goto error_put_dev;
+>>> +		}
+>>
+>> This is all confusing. Why are you requesting IRQs for other - the npu -
+>> device? That device driver is responsible for its interrupts, not you
+>> here. This breaks encapsulation. And what do you do if the other device
+>> starts handling interrupts on its own? This is really unexpected to see
+>> here.
+> 
+> As pointed out above, there is no other driver for airoha_npu at the moment,
+> but I am fine to implement it.
 
+I see. The second driver is there - syscon - just provided by MFD core.
+It also looks like the NPU is some sort of mailbox, so maybe NPU should
+not have been syscon in the first place, but mailbox?
+
+
+
+Best regards,
+Krzysztof
 
