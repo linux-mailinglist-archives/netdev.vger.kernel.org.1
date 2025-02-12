@@ -1,48 +1,79 @@
-Return-Path: <netdev+bounces-165416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD51DA31EEE
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:29:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4659A31EF9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:33:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829ED3A97CC
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:28:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AABFA1886B2D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7115A1FF1B7;
-	Wed, 12 Feb 2025 06:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88071FF608;
+	Wed, 12 Feb 2025 06:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2u+pa9v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AfQ32H2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468101FBEA6;
-	Wed, 12 Feb 2025 06:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF53A1FBEA3
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739341632; cv=none; b=QTtPhzF5Ah9qHeJY0hiITBTwbrBwUPdjj1vYngIZ2yjJQFOTSY6MWFSrBj0sArQWjLvR0axq9Daxq7WuoF5BhC+GIAx66s3OUvIQUu/j1gNTcbET6JHp9idVx6G2miyrFhNclONAmysl2f0byJcctqvaoajHA0K7VUU2ZkCkfvA=
+	t=1739341946; cv=none; b=TSw2U+R0BqXZwPgkBbr8nmR/+XASYnmDH1mXpfSqaPLOxXFK1Rgb5DxfY7p+SV5BhRJ3iTK0LXxIC/BprkhbspOUoayikGB5hNYTa8GO9Ben7+mVmK79R0rBxVgorQmek3SVBmxVzJfs9h72pbBvuc7OXMJ6oR7u8Gaodeo0Qnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739341632; c=relaxed/simple;
-	bh=1/zhjK+0+G05v1hwwn5tz/H+8Cz4vmPRU7clBN3k0ls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uNSptziFxPq6H6XF5WtnqlOK1qoa0x/TqTPDJeBZS5LAPESU8GpVl1ie+NwPNwgIXEAiDFMLZqVwH+h2xNdhHtRxQkkPuwLEnzOZv0JXxIavCSuVsTFBRzk9uSt7Dyxl+5ZfAaRirLg5XdK4jfidDAxDCtouKgqjUwlS+AmcCk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2u+pa9v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 920F6C4CEE6;
-	Wed, 12 Feb 2025 06:27:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739341631;
-	bh=1/zhjK+0+G05v1hwwn5tz/H+8Cz4vmPRU7clBN3k0ls=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j2u+pa9v36ZbhRZph5rV/yE+zheeNljbSA2hCK+QxpqUUozTROOu+Bp9e9rPsiCn4
-	 sr/F2tK6INMhPIZHrkjHpv/yxCHNwYrsM+87zlpR119ozsWj1qVRrCYlXouW0KM8W4
-	 CQR6VyZyoMu8gqW16WkpKAebx/0UiE8DIPWFsHGgqX9w/f6KStjHuQaWA3TaVQnBm3
-	 NV/kFzuXc1SiT0U9sZz0+JGhp0Bo+Ds8/saVBFz20xn9tx3GXscJj15FDGXCD0aJL4
-	 BG11EpfhoMYdyx7SIPli3YJUVgVKGqVRDm1/mm/Yv3o+k4aL5Sc1l+OQaJwLQhtaEW
-	 3qW5TzMlSD/lA==
-Message-ID: <66b554f0-e11c-4801-9a5e-2ccb85a105fe@kernel.org>
-Date: Wed, 12 Feb 2025 07:27:00 +0100
+	s=arc-20240116; t=1739341946; c=relaxed/simple;
+	bh=20QpVWvUkpwzsIzjnZfqaoDaX/8En8lsgOt/fRAU1VU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=OhmMmxstNnuRD8E0G/SHCVHcv6STI3S/TsOik+/J9iJE4o+Nr8OQeB7fVRAdqIpzisOOSDDG+H1WFrtcwySHRHqT4mdRkuV02vPrJXXdKyLRlQH5luwP6NaS0Y17PPp5j0dKisI/GYwFroCgDDDStNv4D4XTOgDfRNK7fbXS8QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AfQ32H2v; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab744d5e567so89823366b.1
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 22:32:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739341943; x=1739946743; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=c54Mzn2O0wyzs6HJus5W4wtILQV+Yc6pzW9uAzIPgvU=;
+        b=AfQ32H2vRIWRJtltmcX3ucw9fCMrTSW8S5F6AsU+EP02vOmIbtwgSHhplcJ7Awi0ZA
+         n8cqW0oYvfQEJ7LAHLaRVkveeGDkVJ7T4FxDtXXxctxKqub7lwKTAV/ll6QBfFBrKZt5
+         QMnXWhjrYzzqxbhnbOFPvKuSsxFvpGugyNyIX7zMJ1RPk+e08IlnEyJpbWE2VemSZIia
+         4b8g0qRhapqNEdmehXGxXlgMObPw9+vS1pQ8hKUqIJk8hEvw0DU4JZlruZPbrFyhZdKj
+         N7ojLAyrfSzgotj2paf5oDyYzu5Fo3nAaFjr2U1r6sHHu5c5LoqnLdstGZ3dEap6zIR0
+         FR0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739341943; x=1739946743;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c54Mzn2O0wyzs6HJus5W4wtILQV+Yc6pzW9uAzIPgvU=;
+        b=HT+sEjCeNCCQE3cp8SZXx53l5jWp0wPtPaXkvUGSbAh/9StM+RA/f9NHgrs9EgAvfI
+         Wns+tlp2Qsra8CdRKVNQtpLDvBHFbUoQgWtNTII39zoSI/T6K2s/bl0g/IrxsruLt53f
+         FE4YsSjb0y8iWbyddT9S5Otm146aWuCH5HChrxBxBaAJkmze5/kZu7pQMB9rcVymu6DO
+         dasu25SwIEO/IWKYDNITM5hvnsmk9hlR1trVXUu97DdbKh5uLGPy695ol2ugVGTGKfly
+         R9LLbj8M3v9DoWrR4+bzcCqdTUeEmy0WkxbFg+JOgIFJn3oa1ZsSCYzO+ODGps2wXoi7
+         0QtA==
+X-Gm-Message-State: AOJu0YwiI/HBVO+dOhGgxZN1MVdS5u/rDtaUp1UHKizVznRaBQVSie+j
+	y7EOmCV9fktR19OqGNABdDE04KxK66FVnJL0WS6LQz6iIY2zMN4y/Hu0Fg==
+X-Gm-Gg: ASbGncsAL6Y9hClmGhE0e46Yd9GEUBP2CKjpW68+nOqKLxYrb3BAeCcfKZtATZRp5WD
+	VCxo1WE8zYFGHEwoYDwd8alNbVDpv3FvsSREjdqHhPa0XOI6jOqKhpMhUITrOZNOuPL5h3Vf18f
+	NuvfhzBEPJV9yII5OQD5F+oMGnUfktfFX6UiPSOtmgVeTxRLYsbP2K0I3ijdiIkWs1a5sXPOQR8
+	o7/RKsI9aJ1PMRNxaYH3kN1TE42dVFoiDlPk9dRK4D4DFl0SKi1XveByERNANx0y0E17bcMfp0D
+	918rhvhElqgnd/sO1Cbiv11gDiSCWOshXgIpKpjBnMiOvYUqrhCR7QuqTIHYQXE0+Q9MWHUttVt
+	Fy9wWMh3B49wvkL64iICrMePKJktj0vl7PQ1ECMsZI7GVPo0r8HcEg7gjXEvYf47f/CUq+t6TSu
+	hgKWxfdSo=
+X-Google-Smtp-Source: AGHT+IGQo9hMkNNyD4+bf6FdGp4OlnIjQssKZUE0expmqbrHPpaJOeMiB2p/TvVtzxQ1VjzOWcB7lQ==
+X-Received: by 2002:a17:907:c50f:b0:ab6:fe30:f49e with SMTP id a640c23a62f3a-ab7f30f60b1mr140147266b.28.1739341942858;
+        Tue, 11 Feb 2025 22:32:22 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a541:5e00:c559:b395:f808:a611? (dynamic-2a02-3100-a541-5e00-c559-b395-f808-a611.310.pool.telefonica.de. [2a02:3100:a541:5e00:c559:b395:f808:a611])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab7b4724caesm677441466b.145.2025.02.11.22.32.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Feb 2025 22:32:21 -0800 (PST)
+Message-ID: <be356a21-5a1a-45b3-9407-3a97f3af4600@gmail.com>
+Date: Wed, 12 Feb 2025 07:32:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,205 +81,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 13/16] net: airoha: Introduce PPE
- initialization via NPU
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
- upstream@airoha.com
-References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
- <20250209-airoha-en7581-flowtable-offload-v3-13-dba60e755563@kernel.org>
- <20250211-fanatic-smoky-wren-f0dcc9@krzk-bin> <Z6t7SuFurbGwJjt_@lore-desk>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH v2 net-next] ixgene-v2: prepare for phylib stop exporting
+ phy_10_100_features_array
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+ Keyur Chudgar <keyur@os.amperecomputing.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <Z6t7SuFurbGwJjt_@lore-desk>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/02/2025 17:31, Lorenzo Bianconi wrote:
->> On Sun, Feb 09, 2025 at 01:09:06PM +0100, Lorenzo Bianconi wrote:
->>> +static irqreturn_t airoha_npu_wdt_handler(int irq, void *core_instance)
->>> +{
->>> +	struct airoha_npu_core *core = core_instance;
->>> +	struct airoha_npu *npu = core->npu;
->>> +	int c = core - &npu->cores[0];
->>> +	u32 val;
->>> +
->>> +	airoha_npu_rmw(npu, REG_WDT_TIMER_CTRL(c), 0, WDT_INTR_MASK);
->>> +	val = airoha_npu_rr(npu, REG_WDT_TIMER_CTRL(c));
->>> +	if (FIELD_GET(WDT_EN_MASK, val))
->>> +		schedule_work(&core->wdt_work);
->>> +
->>> +	return IRQ_HANDLED;
->>> +}
->>> +
->>> +struct airoha_npu *airoha_npu_init(struct airoha_eth *eth)
->>> +{
->>> +	struct reserved_mem *rmem;
->>> +	int i, irq, err = -ENODEV;
->>> +	struct airoha_npu *npu;
->>> +	struct device_node *np;
->>> +
->>> +	npu = devm_kzalloc(eth->dev, sizeof(*npu), GFP_KERNEL);
->>> +	if (!npu)
->>> +		return ERR_PTR(-ENOMEM);
->>> +
->>> +	npu->np = of_parse_phandle(eth->dev->of_node, "airoha,npu", 0);
->>> +	if (!npu->np)
->>> +		return ERR_PTR(-ENODEV);
->>
->> Why? The property is not required, so how can missing property fail the
->> probe?
-> 
-> similar to mtk_wed device, airoha_npu is not modeled as a standalone driver,
-> but it is part of the airoha_eth driver. If you think it is better, I can
-> rework it implementing a dedicated driver for it. What do you think?
+As part of phylib cleanup we plan to stop exporting the feature arrays.
+So explicitly remove the modes not supported by the MAC. The media type
+bits don't have any impact on kernel behavior, so don't touch them.
+
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+v2:
+- use phy_remove_link_mode()
+---
+ drivers/net/ethernet/apm/xgene-v2/mdio.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/apm/xgene-v2/mdio.c b/drivers/net/ethernet/apm/xgene-v2/mdio.c
+index eba06831a..6a17045a5 100644
+--- a/drivers/net/ethernet/apm/xgene-v2/mdio.c
++++ b/drivers/net/ethernet/apm/xgene-v2/mdio.c
+@@ -97,7 +97,6 @@ void xge_mdio_remove(struct net_device *ndev)
+ 
+ int xge_mdio_config(struct net_device *ndev)
+ {
+-	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
+ 	struct xge_pdata *pdata = netdev_priv(ndev);
+ 	struct device *dev = &pdata->pdev->dev;
+ 	struct mii_bus *mdio_bus;
+@@ -137,17 +136,12 @@ int xge_mdio_config(struct net_device *ndev)
+ 		goto err;
+ 	}
+ 
+-	linkmode_set_bit_array(phy_10_100_features_array,
+-			       ARRAY_SIZE(phy_10_100_features_array),
+-			       mask);
+-	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, mask);
+-	linkmode_set_bit(ETHTOOL_LINK_MODE_AUI_BIT, mask);
+-	linkmode_set_bit(ETHTOOL_LINK_MODE_MII_BIT, mask);
+-	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, mask);
+-	linkmode_set_bit(ETHTOOL_LINK_MODE_BNC_BIT, mask);
+-
+-	linkmode_andnot(phydev->supported, phydev->supported, mask);
+-	linkmode_copy(phydev->advertising, phydev->supported);
++	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
++	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
++	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
++	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
++	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
++
+ 	pdata->phy_speed = SPEED_UNKNOWN;
+ 
+ 	return 0;
+-- 
+2.48.1
 
 
-Whether it is separate or not, does not matter. Behavior in both cases
-would be the same so does not answer my question. But below does however:
-
-> 
->>
->> This is also still unnecessary ABI break without explanation/reasoning.
-> 
-> At the moment if airoha_npu_init() fails (e.g. if the npu node is not present),
-> it will not cause any failure in airoha_hw_init() (so in the core ethernet
-> driver probing).
-
-
-Indeed, it will fail airoha_ppe_init() but airoha_ppe_init() is not
-fatal. You will have dmesg errors though, so this should be probably
-dev_warn.
-
-> 
->>
->>> +
->>> +	npu->pdev = of_find_device_by_node(npu->np);
->>> +	if (!npu->pdev)
->>> +		goto error_of_node_put;
->>
->> You should also add device link and probably try_module_get. See
->> qcom,ice (patch for missing try_module_get is on the lists).
-> 
-> thx for the pointer, I will take a look to it.
-> 
->>
->>> +
->>> +	get_device(&npu->pdev->dev);
->>
->> Why? of_find_device_by_node() does it.
-> 
-> ack, I will fix it.
-> 
->>
->>> +
->>> +	npu->base = devm_platform_ioremap_resource(npu->pdev, 0);
->>> +	if (IS_ERR(npu->base))
->>> +		goto error_put_dev;
->>> +
->>> +	np = of_parse_phandle(npu->np, "memory-region", 0);
->>> +	if (!np)
->>> +		goto error_put_dev;
->>> +
->>> +	rmem = of_reserved_mem_lookup(np);
->>> +	of_node_put(np);
->>> +
->>> +	if (!rmem)
->>> +		goto error_put_dev;
->>> +
->>> +	irq = platform_get_irq(npu->pdev, 0);
->>> +	if (irq < 0) {
->>> +		err = irq;
->>> +		goto error_put_dev;
->>> +	}
->>> +
->>> +	err = devm_request_irq(&npu->pdev->dev, irq, airoha_npu_mbox_handler,
->>> +			       IRQF_SHARED, "airoha-npu-mbox", npu);
->>> +	if (err)
->>> +		goto error_put_dev;
->>> +
->>> +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++) {
->>> +		struct airoha_npu_core *core = &npu->cores[i];
->>> +
->>> +		spin_lock_init(&core->lock);
->>> +		core->npu = npu;
->>> +
->>> +		irq = platform_get_irq(npu->pdev, i + 1);
->>> +		if (irq < 0) {
->>> +			err = irq;
->>> +			goto error_put_dev;
->>> +		}
->>
->> This is all confusing. Why are you requesting IRQs for other - the npu -
->> device? That device driver is responsible for its interrupts, not you
->> here. This breaks encapsulation. And what do you do if the other device
->> starts handling interrupts on its own? This is really unexpected to see
->> here.
-> 
-> As pointed out above, there is no other driver for airoha_npu at the moment,
-> but I am fine to implement it.
-
-I see. The second driver is there - syscon - just provided by MFD core.
-It also looks like the NPU is some sort of mailbox, so maybe NPU should
-not have been syscon in the first place, but mailbox?
-
-
-
-Best regards,
-Krzysztof
 
