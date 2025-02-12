@@ -1,52 +1,51 @@
-Return-Path: <netdev+bounces-165375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82217A31C3B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:47:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641A3A31C3C
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:47:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 327A216195E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:47:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2AAB188591D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761B01D47AD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56EF1D5CC5;
 	Wed, 12 Feb 2025 02:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="nRH0J9zY"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="J50MWAYo"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310F927183C;
-	Wed, 12 Feb 2025 02:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7163154426;
+	Wed, 12 Feb 2025 02:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739328441; cv=none; b=hv7iyfgIIDKW7bWReh7sO3y9x/pbsgzPTd6tI0jId1jZXFPps2Y1MgOGb2gaGSs7070x0n1+FRjF0i3d3gbXJCqQTLamY6jeJMhK9KRnUcyvX1YxJe2JTs4dF4QCrc5P7Q1d8RQ8KT68vmGo1q0098qv+/evOfPU7I5pQclHFF8=
+	t=1739328441; cv=none; b=bFB5MYroQ+9o2OTPIqJH0ayV9KXrckSLWcdLlSzuFQUX60Eev60z+NXvaE72Gj+1n8799LNnX8qnBJS4c9W5r6wdzGYzvp3xvglnzgtcKOQolAcP8JEObUYjhShxSB9RqSyrZYsmkLKEm7C9nUBsTkbM3GxYex0FVIcligbfYbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739328441; c=relaxed/simple;
-	bh=8U7BxGlajuRx1zgtQoYLcdsAt3WP9jTukvHfgBFw524=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=PgXlHORS2QYjBJIiaehYOKGEJEGggnIQ3qbBLUxOVSIAdQhtxB48+6OTV+7i0UCV25UFk2VWAMy9/6AYXrQQ4TsD3BfpTSibWIwda+JjLvlGWi50seBllgP37jINJkeiDWwreFLHylbrQdhehoMg9SUG8jwv1A5A+m54PMrUueM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=nRH0J9zY; arc=none smtp.client-ip=203.29.241.158
+	bh=iQWcraTsdGnPAfOCu3SSeB8ldVoydp4XA3qwnW186NA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=iFwBMVpYut5CYdAJCkWWlmY/8uST+SQVyonSt383l/tOalvzbkZlVQN5MwbcNenKwryTJPDh1RS2awlf7AqDRqcc0MepEBTZrJHRvvL68hwoQuvJFN+Gc1/C6r2u7nPP1xWeuIxnxTzyYgu0ikLHdk4qYRQYYADtaO1sx9z5vCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=J50MWAYo; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1739328431;
-	bh=JNPZnHcItB3V8s4XgYQvSmAMqku9yB/jh5nDCelGUI4=;
-	h=From:Subject:Date:To:Cc;
-	b=nRH0J9zYFZGTgPY5gQ7WcqmvKWtDEQ/S6hPr08K0CnDNMA/9zbXG1CbPLRD8ojMMC
-	 fibk+aS+HUKn5IaE2cP1eALWcV6/8oIT3N8zluieDj8mPj/OdFrR2xrB3/nqhqwCKG
-	 WYN6OKagBcPM7iq+CJL/jIYEx7zltpeWCfzQGuolMD1YLiq7uhiYT6oJyp0aK13E6V
-	 Nz1GwIRmfJH5pSy52KzqwMS5yIs1yBGCXzZK5W1oEhdNpJg4mV0VtMv7IvvL98V0Bd
-	 7VAumPypGLHcWb23kA+n1rWBbkNHmnNIURRIzIyoTu3v6xZr8yebMghUTXw1NyFXyt
-	 mqflBtNUnZVsw==
+	bh=WSkuDrCPHTBcR4s2iQvBzrYE7fMkGLA9E5ojLKGNvz4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=J50MWAYosytUcKDQmg+NKpOLyRhVv9CVjaziixzjRhRb1+EXAom5APj9GzAsOw74S
+	 VsTxsP7dZUifVBlgOYdrozXzy2CqNJrWQxhZtTc77nzbAyFeRxsD/C6bAXxoCf4HYG
+	 IPI7XuC8CjE/p2EIABwxyPITI76albHqlQG8L6mT478G0xzxmJ8HcKDqpWaXa/5/N2
+	 GtwwdDrvRtj3YZhLumCLkWUEqztlwTEaeP7bhU93fNWziW9sZQJF8RQQl93MyUrfI2
+	 Nak5AndxtnAbaMO2q9kjusw3vpUlcSPkRDUjyj6rycEjZQ5qnMbjQm95XCdL6umTUv
+	 59iYpojO25N8Q==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 60EEF75693; Wed, 12 Feb 2025 10:47:11 +0800 (AWST)
+	id B65577570B; Wed, 12 Feb 2025 10:47:11 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Subject: [PATCH net-next v2 0/2] mctp: Add MCTP-over-USB hardware transport
- binding
-Date: Wed, 12 Feb 2025 10:46:49 +0800
-Message-Id: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
+Date: Wed, 12 Feb 2025 10:46:50 +0800
+Subject: [PATCH net-next v2 1/2] usb: Add base USB MCTP definitions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,11 +54,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJkLrGcC/22NQQ6DIBBFr9LMumMAi6ld9R6NCzqMlYVgAImN8
- e4lrrt8efnv75A4Ok7wuOwQubjkgq+grhegyfgPo7OVQQmlhRIdWi44U15wTW8k3Vs2VbW9hjp
- ZIo9uO3Mv8JzR85ZhqGZyKYf4PX+KPP3/ZJEo8C5vuh1ZdaaTTwqWKfiU40q5oTA3ZoXhOI4fo
- Ky7ob0AAAA=
-X-Change-ID: 20250206-dev-mctp-usb-c59dea025395
+Message-Id: <20250212-dev-mctp-usb-v2-1-76e67025d764@codeconstruct.com.au>
+References: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
+In-Reply-To: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -69,46 +66,86 @@ Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
  Santosh Puranik <spuranik@nvidia.com>
 X-Mailer: b4 0.14.2
 
-Add an implementation of the DMTF standard DSP0283, providing an MCTP
-channel over high-speed USB.
-
-This is a fairly trivial first implementation, in that we only submit
-one tx and one rx URB at a time. We do accept multi-packet transfers,
-but do not yet generate them on transmit.
-
-Of course, questions and comments are most welcome, particularly on the
-USB interfaces.
+Upcoming changes will add a USB host (and later gadget) driver for the
+MCTP-over-USB protocol. Add a header that provides common definitions
+for protocol support: the packet header format and a few framing
+definitions. Add a define for the MCTP class code, as per
+https://usb.org/defined-class-codes.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
----
-Changes in v2:
-- greg k-h claims that it is 2025; update copyright year
-- Add spec references
-- Clean up dbg/warn output
-- Changes from Oliver Neukum: drop usbdev ref, avoid a GFP_ATOMIC alloc
-- Changes from Simon Horman: do rx stats before netif_rx
-- Add module metadata
-- specify phys binding type
-- Link to v1: https://lore.kernel.org/r/20250206-dev-mctp-usb-v1-0-81453fe26a61@codeconstruct.com.au
 
 ---
-Jeremy Kerr (2):
-      usb: Add base USB MCTP definitions
-      net: mctp: Add MCTP USB transport driver
-
- MAINTAINERS                  |   1 +
- drivers/net/mctp/Kconfig     |  10 ++
- drivers/net/mctp/Makefile    |   1 +
- drivers/net/mctp/mctp-usb.c  | 368 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/usb/mctp-usb.h |  30 ++++
- include/uapi/linux/usb/ch9.h |   1 +
- 6 files changed, 411 insertions(+)
+v2:
+ - add reference & URL to DSP0283
+ - update copyright year
 ---
-base-commit: be1d2a1b151deb195cd9749988163aa26ad6f616
-change-id: 20250206-dev-mctp-usb-c59dea025395
+ MAINTAINERS                  |  1 +
+ include/linux/usb/mctp-usb.h | 30 ++++++++++++++++++++++++++++++
+ include/uapi/linux/usb/ch9.h |  1 +
+ 3 files changed, 32 insertions(+)
 
-Best regards,
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 67665d9dd536873e94afffc00393c2fe2e8c2797..e7b326dba9a9e6f50c3beeb172d93641841f6242 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13903,6 +13903,7 @@ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/networking/mctp.rst
+ F:	drivers/net/mctp/
++F:	include/linux/usb/mctp-usb.h
+ F:	include/net/mctp.h
+ F:	include/net/mctpdevice.h
+ F:	include/net/netns/mctp.h
+diff --git a/include/linux/usb/mctp-usb.h b/include/linux/usb/mctp-usb.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..b19392aa29310eda504f65bd098c849bd02dc0a1
+--- /dev/null
++++ b/include/linux/usb/mctp-usb.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * mctp-usb.h - MCTP USB transport binding: common definitions,
++ * based on DMTF0283 specification:
++ * https://www.dmtf.org/sites/default/files/standards/documents/DSP0283_1.0.1.pdf
++ *
++ * These are protocol-level definitions, that may be shared between host
++ * and gadget drivers.
++ *
++ * Copyright (C) 2024-2025 Code Construct Pty Ltd
++ */
++
++#ifndef __LINUX_USB_MCTP_USB_H
++#define __LINUX_USB_MCTP_USB_H
++
++#include <linux/types.h>
++
++struct mctp_usb_hdr {
++	__be16	id;
++	__u8	rsvd;
++	__u8	len;
++} __packed;
++
++#define MCTP_USB_XFER_SIZE	512
++#define MCTP_USB_BTU		68
++#define MCTP_USB_MTU_MIN	MCTP_USB_BTU
++#define MCTP_USB_MTU_MAX	(U8_MAX - sizeof(struct mctp_usb_hdr))
++#define MCTP_USB_DMTF_ID	0x1ab4
++
++#endif /*  __LINUX_USB_MCTP_USB_H */
+diff --git a/include/uapi/linux/usb/ch9.h b/include/uapi/linux/usb/ch9.h
+index 91f0f7e214a5a57c8bee3f44c4dbf7b175843d8c..052290652046591fba46f1f0cb5cf77fd965f555 100644
+--- a/include/uapi/linux/usb/ch9.h
++++ b/include/uapi/linux/usb/ch9.h
+@@ -330,6 +330,7 @@ struct usb_device_descriptor {
+ #define USB_CLASS_AUDIO_VIDEO		0x10
+ #define USB_CLASS_BILLBOARD		0x11
+ #define USB_CLASS_USB_TYPE_C_BRIDGE	0x12
++#define USB_CLASS_MCTP			0x14
+ #define USB_CLASS_MISC			0xef
+ #define USB_CLASS_APP_SPEC		0xfe
+ #define USB_SUBCLASS_DFU			0x01
+
 -- 
-Jeremy Kerr <jk@codeconstruct.com.au>
+2.39.5
 
 
