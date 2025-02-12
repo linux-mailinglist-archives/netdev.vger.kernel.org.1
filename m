@@ -1,106 +1,144 @@
-Return-Path: <netdev+bounces-165379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3CAA31C5F
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:54:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF2C3A31C6A
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24F743A4D8E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:54:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97E45166AD5
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511B71D5CCC;
-	Wed, 12 Feb 2025 02:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACC91D7E2F;
+	Wed, 12 Feb 2025 02:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYaBA3Sf"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDAA1CAA7F;
-	Wed, 12 Feb 2025 02:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5751D47AD;
+	Wed, 12 Feb 2025 02:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739328874; cv=none; b=gXdZOR+dCZYhdTIZO8hX2arAFkJXhrWi43Z4nYmLx8LOumsALB03ODFArvTSgoKpfS+ztIZIkayP1NjITsfqx2F2v0I/kuJhxuzDegSu/b1RSaTBsKxVmenXX47xLR7xy7rTvkLKC+1R27esQwDNhnANUT9hmFQiiTa4aWGuKUw=
+	t=1739329097; cv=none; b=uMi2jNaVNia4hq0IZm42dhYBd79zipAE/at5vkUfc2H2SimS40ApG7Tpex8xVvnpZCGL/wq9Am2FYvJboOlN3y3O3/6EMmyjMS3mkRUk7bPZZ65Cy3BCtqz+A9kXSsB/khbBjbdivULZ++zfqpfeIjFD+d1nqQJNcnPtLgVOlGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739328874; c=relaxed/simple;
-	bh=5e4nqBQj9+FTs/Lw1huds1GxtSzJtquW0xbwEbljHYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nvonzPXasodvIwzjTS1HOE6OYawTzQiOwLXBmHLv9mO+RI1k1jomDju72dQRYByLcFgIQgJVB7oLzcoclsfUQ+x0ehaRu+WlgBPR5Mh12ZDT8brxdHod0enZrImRkjU3OFIj0xDcyVH1kj9YX6Gx+LKLazHh0dDMFJ0nHr3q5xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowAAnVPtaDaxnZnmTDA--.32612S2;
-	Wed, 12 Feb 2025 10:54:20 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] tls: Check return value of get_cipher_desc in fill_sg_out
-Date: Wed, 12 Feb 2025 10:53:50 +0800
-Message-ID: <20250212025351.380-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1739329097; c=relaxed/simple;
+	bh=dpHXdTTTzOTlYDNw+0rMw4yjpufMEd7BmBsMD427saM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s0Nf6qSF1WvW4cnsJVt5TwA9W7SlJr1HRelRd7yU3zD2As7ICGxv8/iGoxsgH8k/og9/uJkBhFJVPoQCzs6ITGdWxzG0vJr2hWQzaXFAnlWtRyTFNsVKlyuu6DI+IFzAJeinJt8pR5kyq9uJTxY2EdUWPnBZLAvkaXcJuIDrWjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYaBA3Sf; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6fb0de4ecd4so14699287b3.3;
+        Tue, 11 Feb 2025 18:58:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739329094; x=1739933894; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ghF3Hq1lteYIWO1zRuLq/VRrfWBkqaOQHyBkZfebU1k=;
+        b=bYaBA3SfNjtGL9gkcmrtv4CBpdXg1cI0fIqfp30Hb2qo3q56P0TL1ZBigaza352i4d
+         W9zfdilbqrRgsUP01tUO97Vai0d0kIw/z48KYqXQg0ACrlBBG97YbOw7u4GQBMAIWSWz
+         hdRZ2yDNojYagyFp3q4l6FgF1c36pz6fcfEEOgK7fDFtUT+S9OnJUmHabtyG/U2NCVmh
+         vtTprTFqDyGg2xumfxYYkuN12YAjFRaT0AIea+PiYW7h1kobPjdQLLzM2P85+7Wzm/vd
+         mxZJjl9cgVlBuE8nkyurZ2aYIhACLiGw3LDS1HuGvH3lsqd9JjcWKCAtiOfqaeUaduXH
+         E8eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739329094; x=1739933894;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ghF3Hq1lteYIWO1zRuLq/VRrfWBkqaOQHyBkZfebU1k=;
+        b=DYpX0gQ/JVeBjWj3ex1qvJbgVYkfvNLjxn5LvtYHnD+KJNrh6XN+Ix9QH8qJK1Ga1o
+         DOQ2uOZD83lu23+LHRsENIDXrrmYxpsDEJBM7dC9LdoMn8JEMTSfdQpeon4OoMRwYZ8W
+         lfPFIAFm02R6Iuwdwj/QbU7rDjpJNXIeeDgikoweygNSQC7lmG5lP8skP3P4rEubwsSb
+         JX0fnqnnExSFbYdD+LtUdtESqV+7VGZ8cnBSiKJmKFB1uQs3RAO0i/NvpiCqPtXSSVBl
+         utgWLdZsP+AoUF2MFYhad6vT+fJ3zucQMxewBeioNq1kNWPmZjUm/EpX91cgojb2MR6U
+         avrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEnkqKcPZ/N7yVEuQ+BNBfKu8QHpqdUnrQpcM/2uydJ6c5GuciVjEJLeinRQLsCNd6NzfYQbF3fkE=@vger.kernel.org, AJvYcCUyyQS/62mVfRls6sDQEIfyRxBIlMHljLeKI4gGflMMR0qLkql5YRfa/aCwj93cV1/jE5NBhzh2TMGLP8g=@vger.kernel.org, AJvYcCV4t6hW0RhRKFoV+bD4ri5oY3xsXVyaAeScqBAZRu9VfZwHopWgWkSOBeHPzQ1ZjXDh48xDBqCwVuUC@vger.kernel.org, AJvYcCVo57m2V7pmaEuhUIwqGWH+zVfmE1ixZxTkd5n5LaIWJvrDCypJo99c85/HM0pz6L8FzNLvhtfBGYt2@vger.kernel.org, AJvYcCVzy9RE4ltqfxzw7AbCOFAoBCmp2ssFeN2zRZtePhOKhdMk3bLona2jJHKwbF2Q6g6XninIUuBo0NxW@vger.kernel.org, AJvYcCWL0wYwokgjebxTwdRyXcIDAIYPIh08dfhXMfXdVZREFWl2uTx7fyH09jFHi94Ne1zw21fdAa8Yi4A7PK9f@vger.kernel.org, AJvYcCWs+sAsShu0dZnWBW9lwte2zKkvqYGiJwjhBtsju+waW3YrHX751yRcnvEW8Qg4zI43cRmVbrtxHZhoNw==@vger.kernel.org, AJvYcCX1vcRxBZdoj377Ct+t3DdQU/iNgN/4P8HYyTv0X6XF0i2YkfuIjl4Cm8PjlF/No0cTcAUVsJoHITPAts/+nLs=@vger.kernel.org, AJvYcCXG0O1emb2i9wsyoo8CzHLaefzT3K1DuEQqmcl5ArtSAx6CFg2e8lVtaee0nUF9mlIl2d8U4sGM@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe0WMxqoAgdtlo3+VCCO6rvbxwyW6t1Y3ljTtUXug9/Et+GK6b
+	1wRa4j9vpudkKdqY2wDb87feFayyod6e3PTCY3kH+bTAvKkjuUs+4/07M5n6zkG5pkcWmBwSzD+
+	eP5IkFmZPJH2fj6RWef+TbCKrhkE=
+X-Gm-Gg: ASbGnctdB/qLYFGbrcVAXjw3hfl5EgTxvMWFwAvBmQFCOfnmPuazzwNHwdRf0ahZwvf
+	j6/aJq5AoreWZYwPxyxFp3JVFZsqAhAFWQvMGnTYO2a29B63cJWf4WszJljFmtT9VXO9xniWe2c
+	AmmAhqdEXQpLMBYWGzM/2Ba1dAEdg+Z5E=
+X-Google-Smtp-Source: AGHT+IFKY9my2Mv2OyawicWmvsTiPPrg1FpdmnOOVsezjy/oHTQdlNbpQ9V/afgOZCXiHY1UWHQDp4ZlhYp2zbadPiA=
+X-Received: by 2002:a05:690c:892:b0:6ef:7370:96ee with SMTP id
+ 00721157ae682-6fb21b00513mr11775887b3.12.1739329094572; Tue, 11 Feb 2025
+ 18:58:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAnVPtaDaxnZnmTDA--.32612S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw4fCr18tF1UXry7Cr47CFg_yoW8Jw1Upr
-	yq9FZ7K345WF15t3WUAF1kWa47Can0yay3Wr48ZryjkrsxtrWDJFy8JrWYyF45X39xAFyv
-	yryqgw1fZ3WDCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
-	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
-	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
-	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRELA2esAO8qlgAAsI
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-5-a0282524688@gmail.com> <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+ <9a3f1242-794e-41f1-80a5-bc6d18ff6641@wanadoo.fr>
+In-Reply-To: <9a3f1242-794e-41f1-80a5-bc6d18ff6641@wanadoo.fr>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 12 Feb 2025 10:58:02 +0800
+X-Gm-Features: AWEUYZl54-xZLEN8OeOBxenzu1HA2sNuQj1p9av_bN6w1NsNLHVF_aDMJX4KeNI
+Message-ID: <CAOoeyxWF-B90NyinEQVzpU1hqGewGR-29+Q+1ADe_W8r7y5oQw@mail.gmail.com>
+Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, tmyu0@nuvoton.com, lee@kernel.org, 
+	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The function get_cipher_desc() may return NULL if the cipher type is
-invalid or unsupported. In fill_sg_out(), the return value is used
-without any checks, which could lead to a NULL pointer dereference.
+Dear Vincent,
 
-This patch adds a DEBUG_NET_WARN_ON_ONCE check to ensure that
-cipher_desc is valid and offloadable before proceeding. This prevents
-potential crashes and provides a clear warning in debug builds.
+Thank you for reviewing,
+this part is as Marc mentioned.
 
-Fixes: 8db44ab26beb ("tls: rename tls_cipher_size_desc to tls_cipher_desc")
-Cc: stable@vger.kernel.org # 6.6+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/tls/tls_device_fallback.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
-index f9e3d3d90dcf..0f93a0833ec2 100644
---- a/net/tls/tls_device_fallback.c
-+++ b/net/tls/tls_device_fallback.c
-@@ -306,6 +306,7 @@ static void fill_sg_out(struct scatterlist sg_out[3], void *buf,
- {
- 	const struct tls_cipher_desc *cipher_desc =
- 		get_cipher_desc(tls_ctx->crypto_send.info.cipher_type);
-+	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
- 
- 	sg_set_buf(&sg_out[0], dummy_buf, sync_size);
- 	sg_set_buf(&sg_out[1], nskb->data + tcp_payload_offset, payload_len);
--- 
-2.42.0.windows.2
+Best regards,
+Ming
 
+Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B42=E6=9C=
+=887=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=8811:01=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+>
+> On 07/02/2025 at 21:15, Marc Kleine-Budde wrote:
+> > On 07.02.2025 15:44:59, Ming Yu wrote:
+>
+> (...)
+>
+> >> +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
+> >> +                                      struct net_device *ndev)
+> >> +{
+> >> +    struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> >> +
+> >> +    if (can_dev_dropped_skb(ndev, skb))
+> >> +            return NETDEV_TX_OK;
+> >> +
+> >> +    netif_stop_queue(ndev);
+> >> +    can_put_echo_skb(skb, ndev, 0, 0);
+> >> +    queue_work(priv->wq, &priv->tx_work);
+>
+> What is the reason to use a work queue here? xmit() is not a hard IRQ.
+> Also, the other USB CAN devices just directly send the USB message in
+> their xmit() without the need to rely on such worker.
+>
+> Sorry if this was discussed in the past, I can not remember if this
+> question has already been raised.
+>
+> >> +    return NETDEV_TX_OK;
+> >> +}
+>
+> (...)
+>
+> Yours sincerely,
+> Vincent Mailhol
+>
 
