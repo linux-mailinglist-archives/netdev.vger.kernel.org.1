@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-165627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DB9A32DD4
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:47:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734B8A32DD6
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:48:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F162D162673
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:47:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D85F3A267A
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230612586C6;
-	Wed, 12 Feb 2025 17:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F16925D553;
+	Wed, 12 Feb 2025 17:47:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEFF256C70;
-	Wed, 12 Feb 2025 17:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EF025C6E2;
+	Wed, 12 Feb 2025 17:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739382462; cv=none; b=Zh0QigoPOJ2naod1w/DlRp/16GAdrgUeIp4JrgGFDWbXNiI+EMODk5pgjJoO4BAc3gzeiDOCD6LlnYlyB9Q+NFwwWRGxPCeQUAcj42VLFuRebt8iyx/NLQRQzaVEyDj1GTUpVSDmyjZIORncfw4p5yta0eKhNWZThpy8+ho4nUs=
+	t=1739382464; cv=none; b=tOeTwc27QAN40VjdSxneD2qEBvIJYgFCepP42SZsIC648uCq8lGPvhw05GOPAalOUjg+F6CuZGQLdurxuYUfM5CTgtYF6XHkiC283LfwYBC0tGnp80LMfC6KxHuzb97T8kna4xLmCysjAKrwxybmT02nujyzSjIJMkk2wHz8k3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739382462; c=relaxed/simple;
-	bh=ucsm6sBSBsAgH7j0WZaNAqkfAINXI0ndAlQASzkfYXw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=bzJumYOiBNrpug5k94AySIlH9TXKqSuFXNOPmbsFKUjTTOcemkRS7lacWZ2i/CbUsuqwFnFNBnXmySOtAUYKd+KzAbzs45aGBIB96z2BK2WG8xLGguSPK6JFglCpYuXABp6kaBmIArZJu9LRP6pBV4MMKCmb1+k9gZDgoiW4py8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1739382464; c=relaxed/simple;
+	bh=TeA4rNuL5OilOfZvcur4gi/G5KqrL8dSVvG7Yj3C6lo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=pb3n5GACzhDYROyLmNNCckzAFkNMBuJNZvqXxSTzSAYQ6KL4vccLaDrM61Qgf5Yh+TBEOxWHratBDUcTp0otAl3Vy0DrwHc2y3VOHfeFjEuvvQ23K8sZaGjCiEqXrNfOFmfxXlcrg2puJEzazjf+tOQnU4NB85LWHOSh1Iq+buA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ab7e9254bb6so7293166b.1;
-        Wed, 12 Feb 2025 09:47:39 -0800 (PST)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5de3c29e9b3so10261718a12.3;
+        Wed, 12 Feb 2025 09:47:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739382458; x=1739987258;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b8R6SEYjUrW1in7V0EGXb9bOA/jMJDxBdUk3K+qnY1I=;
-        b=BLbsKTu0Vp6eeEMBV/CFuV6Xd4I1oGhf4ojuniOH0XNI4/cp/+2g0Xwt01D9bAJGom
-         zHw6Ww9573FuhvfVgC2HiM1+b2DKsvDzJFWln68j0ArSEQ/UDGPqwwm9U8uGSKVwaM3t
-         hE2n0Mqj8P5SPsBlMRXzH6WAt8MeHkunh/bwJ5W6wCm/A4nVu45P5L/VJtgztdsNEhVv
-         vYNpwPNje3Q4/jXYUdImr2AGHuvs2xcPnBZVgDxjSG+lbAy7pKAN3ROcGmJp+mK4Ae2x
-         t8PU6xqWQrg/I7EwVzB0ZxBfo/juMuhwulNhuGaQifPHBMgzU20nAp7qDn97j658k+/P
-         ogdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjyDmUvSB4z9B/orNVSRxDyY/HefCBY1/v/ZzcctqDZ7CpQnKpNDT4vvJ0HccalW1y+gDTie0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuvlB1UpiqWIvq4cgCFdylWO8hVbTGgE8R2wEyAoIC7bqaDJDb
-	bjEXKJkpCZwt5ZJkC7BqFMcLZCr7SPyoZYAoPRP/z/ORDmVk4Qux
-X-Gm-Gg: ASbGnctkALkLpeuA7TeM6RB8LBG3Gbqr/ykIioaM2EQVsBkFPrySzHNk7YYPRpgAg7w
-	prOT8roInLKgKFxuGUCUdnSGKgmdui6QrBAejjIv656hrxK6VXgd4pWLG4FGzp7KNvuTNFFxSMQ
-	SJ17072yKbE+UD/0sb3uh+1BbsSU9wu0uBHi6gQ5bqgsXw3kB7jioSpzny/bXkt8CwWR5fc2P1z
-	hzSb1hb0fmaCTU2oEfqspL4/8P8QKK8+75QDTyjRCS1LujsdMRgDYiIU5eH1TtJIB+095APEnmX
-	hSAvKg==
-X-Google-Smtp-Source: AGHT+IG9LHBsJ17Owfwx71M/3TSTvaJ19msX1xru9qKG8OHNDp4WJ8qLHyrzAIG6fuCZb/bjBfNQKw==
-X-Received: by 2002:a17:907:72d2:b0:ab2:ffcb:edb4 with SMTP id a640c23a62f3a-ab7f33d9d34mr337981066b.25.1739382458033;
-        Wed, 12 Feb 2025 09:47:38 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7c4a50e73sm633936366b.36.2025.02.12.09.47.37
+        d=1e100.net; s=20230601; t=1739382460; x=1739987260;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/PlI7Euhz3cVYOptWlk1i3+8t3ZB9LyqCsQJyf6fbRE=;
+        b=LwOppqdneMGIsh9v//xK7Q+TDJdaWagsMrliiFxL8ZdOHmVjcF/dB4hpHbk/IH0n08
+         8eBMv/YjT0Cdbyd8T16WXlpZRZYBkJ9Tkps3nCDOziIMUksmRLJb0aOqz2tF955zbr4q
+         gqgX0gnzPrnlvWzQK8mpa+7yp3CgOmTFfJz8Xe8pP7wlzmNHYYXHjKfY3wC2XHe8eNMN
+         ZtBVzUv2jxiI5dnCH+BwMyZqxT2dGkAWuByeU9nFqbukpvAdFb3HnfD1LlfDrPDbtAeB
+         C/TfM9wqxu5/P4cwhiCGteSCSFdXYXFYCkf8gWLz2YXWXdODWlibKUtJL/Y+pkgiJLh9
+         tqPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpMIchfDn+zevm4Fsh6LHK0woEhcWEwCtjNxIu5/NV+FuoMW0elfFfYhSCDlIRw41SZcA6los=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXP1Y/ctWpOjIRmY0Sh2giW4TXF4ZeaYlca1awHNBEH0LM01Ue
+	yz5tSl7pTHOUOLKLl7M5d+8/nWD/zVuMfRIcP7XYhGOIzA5ZTNxdYGAPWg==
+X-Gm-Gg: ASbGnctYu3lGHPVHPAYuFLKid14PcoDd7YzRNoTtN2Bf/zFIc/Pa2YRg6XoxZlYAZX8
+	J+DHjMtfGmmBoWWkrn9AdYnXsD28adHntfMvg8CbjDLx7J+fsLm5KPr6/e/qnsIIBNSiUEOwAuP
+	I9U6IVmpQXoNfjsfq41BoWIJAsfdjctpKDqAwmt7VjhsumwbICcpzNDIzKrTNxdcSLHkYG5ecbg
+	bYdSL2RM4p1GwOffEESuTXnJnDehN6W0K5febicYP7lcImLDBfocCvlUTOxTqgn/4cT3Qk9rMzP
+	M4zSCA==
+X-Google-Smtp-Source: AGHT+IFQ6AXnCUzQg+LgZ3Efwdyng6Ds2X9cEWDrALy2Ek+L2XpuZ/lsaMLczjpCTWPastKX78OrHg==
+X-Received: by 2002:a17:906:fe02:b0:aa6:84c3:70e2 with SMTP id a640c23a62f3a-aba4ebbcdc5mr4066566b.20.1739382459695;
+        Wed, 12 Feb 2025 09:47:39 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:3::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7b32a8953sm794068566b.97.2025.02.12.09.47.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 09:47:37 -0800 (PST)
+        Wed, 12 Feb 2025 09:47:39 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next v3 0/3] net: core: improvements to device lookup
- by hardware address.
-Date: Wed, 12 Feb 2025 09:47:23 -0800
-Message-Id: <20250212-arm_fix_selftest-v3-0-72596cb77e44@debian.org>
+Date: Wed, 12 Feb 2025 09:47:24 -0800
+Subject: [PATCH net-next v3 1/3] net: document return value of
+ dev_getbyhwaddr_rcu()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,11 +70,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKzerGcC/4WOywqDMBQFfyXctSlJfEVX/Y9SJI+rDbSxJEEs4
- r8XXVlo6fowM2eBiMFhhJYsEHBy0Y0eWpJnBMxN+QGps9ASEEyUTLCaqvDoejd3Ee99wpgoomi
- sNnmuWAUZgWfA3s278gIeE/U4J7hmBG4upjG89tbE9/23duKUU2YrRM0K0TR4tqid8qcxDFvmD
- 1nIuuTSit5ycyS3H5M4tDn7YhCUUa1koUttSmnkh2Fd1zdIKxTBNwEAAA==
-X-Change-ID: 20250207-arm_fix_selftest-ee29dbc33a06
+Message-Id: <20250212-arm_fix_selftest-v3-1-72596cb77e44@debian.org>
+References: <20250212-arm_fix_selftest-v3-0-72596cb77e44@debian.org>
+In-Reply-To: <20250212-arm_fix_selftest-v3-0-72596cb77e44@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -84,68 +82,54 @@ Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  ushankar@purestorage.com, kernel-team@meta.com, 
  Kuniyuki Iwashima <kuniyu@amazon.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1821; i=leitao@debian.org;
- h=from:subject:message-id; bh=ucsm6sBSBsAgH7j0WZaNAqkfAINXI0ndAlQASzkfYXw=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnrN647ffaRfYdvi93rNjAPSbQqJSAi5Ch7aN8/
- lMtbtXAjpqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6zeuAAKCRA1o5Of/Hh3
- bTMgD/4mU845Zu9P5ShPRHE4FDDrN+aH7oVRrzz4ZApMqp/4ShbnaYQhnLEpNEUe0DdZM2e3b2Q
- cA4+v9NjlFwvvMJIAedQOcJD6gvDfiZP4fziioyKZdYRiRndAESUaKCgDrfKnpbU21rxakVTBLX
- pLiSyi+fn2U3y0xwgcuxYf6ctpQBT5PzBxFiUncxcpvFFlXg6HMVjDFjybCVIyCB+kNGEXuTi8t
- pANftrg4P1MadiadMNuqvtXKWvF1WSIhe73crjNdOee/nm+qA6G/zFsZjIL9BJaPXhJSfjyfWpm
- puhfeRs/zNBK6jaz8QRD4n8PewTamMTILnfQWJH62T0xTQxyaIZGY664N2nE8ntdeRBExDypVBw
- MgmHU1eZGkiJ77eMXviZtWp9OPelqmBiX+QsFDMZeUK9BjUG8jUMR3iP/D2Hc5bqSDXdISSIPUF
- OoyIw4V9Srul5rhBNGm/t978K4808Mvn1OdI1mZDKX5t8Yt3+cgHuZhC+TIh3vmoyn77k3ZS13C
- ZAPxfsNSl4XZ2PdETvjqh38aQEuroKc6gRTSejJcnTvMl4pAeV/AH8kbUAuP2mpMpWpiHdMPiV8
- FqJ2G72t7H2JAD3W1gwMhzio5ZOqxHj8kv3wJ6TEZImf5VZq4RjP7AgeIjiw51kcQLJSH/y+Cmj
- zNkWEUR8pz+KHDg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1189; i=leitao@debian.org;
+ h=from:subject:message-id; bh=TeA4rNuL5OilOfZvcur4gi/G5KqrL8dSVvG7Yj3C6lo=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnrN64uIDIAhvtuQXtaG22KtbAaQbnZ2sNS0y8W
+ xA7EXf4sS6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6zeuAAKCRA1o5Of/Hh3
+ bVfDD/9r3XSIuSjHh5TI1VxCYT8uN8LZxD3WwQxKy5zUfnU45UmhS8EdTey0LWlMJy4/c3k3qGk
+ aiZYPWGtAM3j8WA7B56kEqAzPHTtLsbGnnqe/ygPWe0fM4ZHmHd6x0+kjN7XkhTIl/43nS8U23+
+ uDWxpx7p3w+ZHuNgZ+iiElquV3ouba2u3Nn4KsW3qAOpTsVJZNbRQk5FaPMKOD18aA5qTq48a0c
+ kxMt6RfD2eveMQdeeqYqHkp/QjHFk/kCfkO4tP3ABcz39QTk/j9WrRGolGnVeqy9V63Hv/jyT5m
+ eT8iaDbd0ES7M1G4eXwC84re0krWbK0bcpNgb1DEMd5RT0kj3LWbNtnGlYEQqZI5m8uWYcPk9dS
+ Nf2C/FeMg5+ZjJHAmgXjSlqoMIdhKHbfYy5WqQ0npnwapkTcvvvtCiKIwC2Pel7MGmAcqfWNoRZ
+ baNqZQAyFAcHzSdo+YymTQZFLAs0NcTUmaWFqIhmzbkf8f9fhfsCN0V2Gy4DhWTV5YwQPRzvGvA
+ MPhaGjCAqAFnDWS/RSkem7AnUsKcBIIBrPtQpn0F3IVnZ+pSjFy9WR4AQXJdsaSuPYpXPVa2ty1
+ RxFccu9iQ7XcYFkYEgwsmOwvqlRcXBC9B5un+Nw/Ku7z/utBlpWsOocQtMTtrJ/0NPcFpEOXVJ3
+ A3YuiZWbtPfCb1g==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-The first patch adds missing documentation for the return value of
-dev_getbyhwaddr_rcu(), fixing a warning reported by NIPA. The kdoc
-comment now properly specifies that the function returns either a
-pointer to net_device or NULL when no matching device is found.
+Add missing return value documentation in the kernel-doc comment for
+dev_getbyhwaddr_rcu(), clarifying that it returns either a pointer to
+net_device or NULL if no matching device is found.
 
-The second patch adds a new dev_getbyhwaddr() helper function for
-finding devices by hardware address when the RTNL lock is held. This
-prevents PROVE_LOCKING warnings that occurred when RTNL was held but the
-RCU read lock wasn't. The common address comparison logic is extracted
-into dev_comp_addr() to avoid code duplication.
+This fix a warning found in NIPA[1]:
 
-The third part coverts arp_req_set_public() to the new helper.
+	net/core/dev.c:1141: warning: No description found for return value of 'dev_getbyhwaddr_rcu'
 
+Link: https://netdev.bots.linux.dev/static/nipa/931564/13964899/kdoc/summary [1]
 Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-Changes in v3:
-- Fixed the cover letter (Kuniyuki Iwashima)
-- Added a third patch converting arp_req_set_public() to the new helper
-  (Kuniyuki Iwashima)
-- Link to v2:
-  https://lore.kernel.org/r/20250210-arm_fix_selftest-v2-0-ba84b5bc58c8@debian.org
+ net/core/dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Changes in v2:
-- Fixed the documentation (Jakub)
-- Renamed the function from dev_getbyhwaddr_rtnl() to dev_getbyhwaddr()
-  (Jakub)
-- Exported the function in the header (Jakub)
-- Link to v1: https://lore.kernel.org/r/20250207-arm_fix_selftest-v1-1-487518d2fd1c@debian.org
+diff --git a/net/core/dev.c b/net/core/dev.c
+index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..0b3480a125fcaa6f036ddf219c29fa362ea0cb29 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1134,8 +1134,8 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
+  *	The returned device has not had its ref count increased
+  *	and the caller must therefore be careful about locking
+  *
++ *	Return: pointer to the net_device, or NULL if not found
+  */
+-
+ struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
+ 				       const char *ha)
+ {
 
----
-Breno Leitao (3):
-      net: document return value of dev_getbyhwaddr_rcu()
-      net: Add dev_getbyhwaddr_rtnl() helper
-      arp: switch to dev_getbyhwaddr() in arp_req_set_public()
-
- include/linux/netdevice.h |  2 ++
- net/core/dev.c            | 38 ++++++++++++++++++++++++++++++++++----
- net/ipv4/arp.c            |  2 +-
- 3 files changed, 37 insertions(+), 5 deletions(-)
----
-base-commit: 4e41231249f4083a095085ff86e317e29313c2c3
-change-id: 20250207-arm_fix_selftest-ee29dbc33a06
-
-Best regards,
 -- 
-Breno Leitao <leitao@debian.org>
+2.43.5
 
 
