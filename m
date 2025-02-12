@@ -1,269 +1,179 @@
-Return-Path: <netdev+bounces-165515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B3AA326BA
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:14:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DFFDA326B5
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9083A76F5
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:14:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3B357A1FDB
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645A720E31E;
-	Wed, 12 Feb 2025 13:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEBD20E314;
+	Wed, 12 Feb 2025 13:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aVJgq2/I"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Fkvpz7Ag"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2058.outbound.protection.outlook.com [40.107.101.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C9C20E332
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 13:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739366017; cv=none; b=tdvKy+d7ME6QOfFqmczIbRmugojjnldKqpvH0ZUuY4EhwkQmDzdWCc567oIO96dbrC/OSMFzYte0ULbfomYTGT4W6ixEIJrO4DuLPi3pQ1jX7Z/MOqR5aNpViGfSqx6NgkCe8qetz/vxWKAUmAVWRckH5HtOd6At4hfBOTSZLLM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739366017; c=relaxed/simple;
-	bh=VSUoxJXGe14tF3DdmTl+gVJ/A9/G9sdsIdw9GYj2Opk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lA35KAHUeywc+ea54lAtvnWkBOw5fDF/C8fNToMcOyQy5g5LqonfFVfI0Dd0vRP3yflC7n8A2joZwiwl0Qv3ela6RPmRJWxmSSawolWqIvsQLg3qLWNygD0dH8HBKzuhQUMLuJLOi63OvNANkeS6Re8XlYor+SkPYS2kA+0XVaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aVJgq2/I; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-471b9ccf86dso5339321cf.3
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 05:13:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739366014; x=1739970814; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2W3DSQyzKm60sxGI2lx2gpnMLFsJSreBDk/Uk4I4YC4=;
-        b=aVJgq2/IsAQzDHzBLbM4lNS+bojlSkqEfXYVs/Iv0+/O6C3kXuwymgC+IQ/VIeyVuO
-         FIFoyDUMiS6app9Aq0bx/ufzaZ55zvIJzFqeeeADvBI3nPCyY8RuFZT2y49NF5DA10ia
-         YOzQBC+nFFvg9JJAVNaLmqi31EfPcI9U/di+RdDEw2mI2YLPA67AKDWx3xTE9g7J8C0j
-         f2uroH+/SboXMG2v5/rd/wtlPbRzYZbN7WTkuA2proUcnPd9YKMibBLLrT5A6KFr4Jzu
-         8EAIeY86Q1TlBRNejlFNktsDJC++WMR9u7AyyZxQtFhmMgmSAxsvGQbBePWjNHEM6nPT
-         G3nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739366014; x=1739970814;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2W3DSQyzKm60sxGI2lx2gpnMLFsJSreBDk/Uk4I4YC4=;
-        b=bNKH8fhMuk+4LNovYNm/DSQFB0clBri3KFVMAfMt76UlF1OFB+nn50pARzgm1KdrVs
-         nplUWWMZdwdnDUV0H6bizp2KW88gUU1BD3wnrqSAiZ1CjiT4tuSSYx9iVRB6LB19Kh4o
-         QsCowXqNswNxcQmK/z0JxlI38FYUssRjp7xnBb/8JE15kQLUxIuf700V5c8Jznnk2pZR
-         pAEajPIGsJ4r2Z1w1Atz/vLhatztuE6WSFWpd+7XkVLeK9Ok1a0E0Xo4UE5ahZqtK0HM
-         1aoZzNlCl1mh2Gb5OmXPhKYZ9joQuqrfOLxo31Fe2D+u0gk5GvqeaJ21dikJUI4QnNcK
-         cAng==
-X-Gm-Message-State: AOJu0Yyoi1avV74WqO/2igPw2bh9jmXIkSAgjdIF4EmJTDqY3OOI/p6j
-	qVHpukVjbi306OA18H6Am9eUZRe8wZWwvkGnoqBmgPTp2ONb/SjPBe9vKHfT+sl2bjG4tq2XFGd
-	mvW6neK6hQw==
-X-Google-Smtp-Source: AGHT+IH7WhbTMh/KV2r/stnCMVK8cjhZs3C3XLs2c6E/w3i5qSbcPXlCUeqwfQjPe0GHvCE4J4671kktAcpYtw==
-X-Received: from qtbfb16.prod.google.com ([2002:a05:622a:4810:b0:471:919a:e569])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5fd2:0:b0:471:959e:bc13 with SMTP id d75a77b69052e-471afecce0amr39155491cf.40.1739366014366;
- Wed, 12 Feb 2025 05:13:34 -0800 (PST)
-Date: Wed, 12 Feb 2025 13:13:28 +0000
-In-Reply-To: <20250212131328.1514243-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F9120E30F;
+	Wed, 12 Feb 2025 13:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739366030; cv=fail; b=KmEutK2xkCa2xgUjqaXHpn1HBMTjGvQ4oNEiS55DmsvLGiqoVOGwXX5Fv5pJCNhGQJ7uBgoqGuLk2iWcv3RT/9NZ3lCLMTNRGJL2auzWGKR1+SKjkWdeFdLx3tj6fw5ucBIW/eoiXMbrE4grvipXbV/W+rxCBciVv1fMZzD2Lek=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739366030; c=relaxed/simple;
+	bh=1PXqknboHaSSuQJfNJN2geQxSiZQj7/Rjq2b+ZV/bEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=o6HQYXIJrK33iOoz/SnOa4+/Aj1hEnYNRLxbM5lIrBvSQpUUiuHXMKgr4dsALRXCkoBM74lj57eqqTl4ONNnJ6cGcEu0rjFk3tUzter7DrHwqVwweh4pZ3Puinzj6bhl5YYiIs9kx4WZDpVF+cLREvfWfrthWS3deSFgap2HVH0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Fkvpz7Ag; arc=fail smtp.client-ip=40.107.101.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ba+eEGlNKTCldm99XeeudkGsoX19cNd4/CqCDrZ6wLtvSZ4/ql6HCNOcWpoxfxduKak8ekcPoTGtahUzUtco1u6YFj6OTrM1CM31FtotbCjriONGtf0HfvuuTT45Y+zF+uFhoUoPbiGOIYwwFWeOQQ5M3+Rv5s1OiAIjEB1qkk8Y3bkWUfembPXa++WQY2E2IEA5Txv+TiRcxc/T1GP32ZbafszoRqdiYPr+OgcrJZCbf8p5Gid/GQcGNjYQ4LRRzp6tTMvwHQATkS8pdWhd5UNKulsxsWkXf4hXubGLlloUYqqIvR4Cj6M1EgiQJwv5jqy5XwXOpNWknTmS3mpbpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W+U9doUJ1lLTIWpJuCg1yvI4eXv8iPGMljwd6VTGdWM=;
+ b=pL2wIj3SWhRqLGlJ5hRqMIlQj5GYb00RxtGmj+lFNXNWRU1DsN0qmOVhWCG2VZLGkA0dlZEQYLMxzKR6KquBSmV5S9g3kR1DwsFoe1qsdjHbPHui1Cso3EnD2e9sH5asd7o2WBEuID8fJdXD31QfcKYK8XgusooCu8fvX90t8FgJkN3VxZSRZ9Orld8QRXDnpVvQTZGb0rKrooE+X3JjF3KCXYsOCNwhjxdkVaigJdgTKbmUqyOo8C+RLNftsxzz5G2HfoipJmcH8kZzIUnsLReP8u2MoA1+vrX6WC7gww8lQZpu0FMXMHdzOpevlo4iv8y3o5rn6Ek5LnkRwKfhFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W+U9doUJ1lLTIWpJuCg1yvI4eXv8iPGMljwd6VTGdWM=;
+ b=Fkvpz7AgpK35rgdFJnMOCdZnzv7sUNyrPh4si9Lke9HSlOfIuQ7n1yAtqq46HLvnzudkoWn28BXdb7j1/R7EJdeuMzvULyiy0HXVj5O1uFWWTIDDe8l6Uk1ZCd9T0QgNBS54o9YjCPX+bicfkhgLH86LY2PJh8/A7qgzasQiOS2mlPeO3Ez2AFTc8t7+2PpnlFpnOq9HO882+557QfzIbfMLUQHQmIV+vVLh7WWTAeQnjcM7KSOiQoPRbu9PGF27tsurG9jOHzDNk71aukRDM0OdZHLQDzEqNw6arSvFDIQQydkhWiYP/V2w0UvBpGGDh4TSaAaEYXW0Th4GafJYwg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW6PR12MB8663.namprd12.prod.outlook.com (2603:10b6:303:240::9)
+ by PH7PR12MB6933.namprd12.prod.outlook.com (2603:10b6:510:1b7::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Wed, 12 Feb
+ 2025 13:13:46 +0000
+Received: from MW6PR12MB8663.namprd12.prod.outlook.com
+ ([fe80::594:5be3:34d:77f]) by MW6PR12MB8663.namprd12.prod.outlook.com
+ ([fe80::594:5be3:34d:77f%2]) with mapi id 15.20.8422.015; Wed, 12 Feb 2025
+ 13:13:46 +0000
+Date: Wed, 12 Feb 2025 09:13:44 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Shannon Nelson <shannon.nelson@amd.com>, andrew.gospodarek@broadcom.com,
+	aron.silverton@oracle.com, dan.j.williams@intel.com,
+	daniel.vetter@ffwll.ch, dave.jiang@intel.com, dsahern@kernel.org,
+	gospo@broadcom.com, hch@infradead.org, itayavr@nvidia.com,
+	jiri@nvidia.com, kuba@kernel.org, lbloch@nvidia.com,
+	leonro@nvidia.com, saeedm@nvidia.com, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	brett.creeley@amd.com
+Subject: Re: [RFC PATCH fwctl 5/5] pds_fwctl: add Documentation entries
+Message-ID: <20250212131344.GS3754072@nvidia.com>
+References: <20250211234854.52277-1-shannon.nelson@amd.com>
+ <20250211234854.52277-6-shannon.nelson@amd.com>
+ <20250212125149.00004980@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212125149.00004980@huawei.com>
+X-ClientProxiedBy: BL1PR13CA0127.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::12) To MW6PR12MB8663.namprd12.prod.outlook.com
+ (2603:10b6:303:240::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250212131328.1514243-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250212131328.1514243-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] inet: consolidate inet_csk_clone_lock()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW6PR12MB8663:EE_|PH7PR12MB6933:EE_
+X-MS-Office365-Filtering-Correlation-Id: d720a703-0d35-440b-6f5a-08dd4b6714e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aP4i7ygSUp92e7p8vqr+1pCdXRRr9x70OJUIwyId4oTucdIcny8PHbVUiyzG?=
+ =?us-ascii?Q?vBPgnwFwpz5uKcbQlPbHJsZMDb+/by0oBJAVTvxLvNgKBSD+mcd2Iqu1xLSz?=
+ =?us-ascii?Q?lUzT1vFe7Pmd0z5TW3TIAus9k9bN+8Q0BdWCuIl8apmka3BzoJe8SuRyUdn8?=
+ =?us-ascii?Q?eYMdWI9wS475T5ql1+7tyWm1rOqBU6TPjCaa/TEtUWa0jX2QrmOdWX3md6Ob?=
+ =?us-ascii?Q?grkuBh2SZiyvJg37ScNirObnW9FUkJYpqujSV1fgm+qP/YDnDBRfFq+/3yRc?=
+ =?us-ascii?Q?Wvww0SHaMUvRGmeO7Uu2+rfLJjCVoffge6KXOkT7GaNC8wKTJMDRPih/XGYt?=
+ =?us-ascii?Q?zCidHPhKNfGXItV2HJkM+2kjwCX89aIyl5gg6t4qModWAQssazG3w/xbu2vJ?=
+ =?us-ascii?Q?yrChJnC9+fZJ6vk+DXA1PrQEwfsL64kV6NoK4RuwFliH6R8UW050W0f+1KrF?=
+ =?us-ascii?Q?Ai+EmTZlSyzn+4br7xp8uxBQ6GmPWpiMueqM2WIAqC10d6Po5vB9BzKCQImU?=
+ =?us-ascii?Q?uObz3yyqo64ODiFjVugr05zDsvC+takxIG0Iez+ewndUUuCJ5dBIo7/3ycAc?=
+ =?us-ascii?Q?NfVRpWdsLPPN1uLycNIOvY+m2tIQY10MCnWcFMTtJz3Uz9NYKCpryctMYhVx?=
+ =?us-ascii?Q?21OeHLIbBSs1RoUjAQ1yvUFsjhQGt7xgQ6oBjMJRnqEUbxAF9G30P0nBbOGK?=
+ =?us-ascii?Q?a5NgDJYi25SZnEk6ZLhmpcwOV89s82iTUlHZV5VA6UwcfWfiUa8ORl7XxorI?=
+ =?us-ascii?Q?6TeRnJdj36QpV3hTeUa9cvLyTPkxEzH9utpBu59u5Zw7sBfwO1czFjQ/24+P?=
+ =?us-ascii?Q?Wu+dI5sgHfGA75ARIKEX56O2ZPENKw2l0wTzwY/ZaiX1w92HFCenilLQYMIJ?=
+ =?us-ascii?Q?u/rFsy/lsQZjB+Ri+Kf4UxkLBZ3cvT97t5NnNIYWYt+h5MNlw8PSJ3k6Uf6Q?=
+ =?us-ascii?Q?HxqvQNJTofScVUDV3hiaWNFVuNzgF2PNWu614xeAm+Ds8uDQ97r8E35unmzH?=
+ =?us-ascii?Q?2WYwbcZ/vSjRJQuLZzroz+6O7fH57dAIef8LlmV2Eb5XpVVSCJBvHlAIB+SJ?=
+ =?us-ascii?Q?PopmjDaHw9jktP+wQLFCZ85COigBngk1HX8ki94OI2wa0YRkj4t6JvkaEpmf?=
+ =?us-ascii?Q?c1h4qh7r9LMJ+ysHy8/j1eFuG0ZxHktffPDYtEdPdCkgbkLAwNGXZcZvDoz3?=
+ =?us-ascii?Q?n4gnNGfrzxtY9chSbiWpYlsTrbneo1Vab2+4Vpnr9tGzcBwFQzMUMJFi0dtS?=
+ =?us-ascii?Q?PYAS9AwlEr9UVcs/FtwTdX6WjT79cHIIzhhROkt/t7Vi1B1JPRyyblVyLctu?=
+ =?us-ascii?Q?3WCfvmyGQpWg69PXLtXYdF8F5zUBnDKP1LDzbdA4L8QAp9mThXE6E34u5I12?=
+ =?us-ascii?Q?U2Ix7q7i8LusQlBet/+l14c8fOp+?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB8663.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NroDaCV3dyKF98bhHiBISSr0uqqBRls/2WJNcL7dET6G+g3Bw3KwiSGbV2qO?=
+ =?us-ascii?Q?5BTfY/WpCzz3+71pGRTGnVh9Vru/12xr8ShxJzPuLK/wuEZ7gLV6x+z8zaLH?=
+ =?us-ascii?Q?3LzBfoCIOmJuzA4+tW9ZDGTsG1z7EyYVbwkuft5/npBDYVAC4ygemCmzqrb0?=
+ =?us-ascii?Q?myC7GcdMP1PLv5Jp/SYskcycKO/CFZG5eW0KNms9baUIF8gFD/cRonssw+85?=
+ =?us-ascii?Q?WFaMmhbiOYdh6valw7UzyzmJDdW7Z6treJdGs08yWn1sPwpgEAw5kHs6WSm1?=
+ =?us-ascii?Q?tenx2fnqgtXcVZ4jzw0EuhBVDhbeOAH57BvIbqHV7a8gtNrLBjmA4WcMjVcS?=
+ =?us-ascii?Q?yIq9RMlNzxvEePvaTO0SDdUiNFT/BuFslv0fwDKPQC/1K3JlS3dnGYmddKls?=
+ =?us-ascii?Q?JMoxFFh/JoKCh1NN3FNROHUDG2sQL6lG8ky34AJMqGacKuQdgjw8fM6kt3M+?=
+ =?us-ascii?Q?anxN3Gnn5kxMvTu9qom7n/BQTxZb9C+YacXgTrot0+GyBAAO9pcy++KFfsSU?=
+ =?us-ascii?Q?uCUynbNqXooXwb+eJNiz+cB2ACvLoliWi3Ghhh8LnnnpOQ3zJMgSZf6xt+ED?=
+ =?us-ascii?Q?HgduqbzhTwuYq7D6hFaqiwNKFUqhgfpC1J7q5goPGAC9deWU8Q9S9fEbf0tc?=
+ =?us-ascii?Q?aHHGa1pnZ+UAgq04vU8koY5lTsPtIN5+3juT44kh7zLo8PcA+DJeHu5fcHhn?=
+ =?us-ascii?Q?sE2sdfQEOI30F+aPuoP/1JwWSN1Bwkpt5inlJcPbxBqusJfs+38AgXH6hVQZ?=
+ =?us-ascii?Q?vLfhWxm6d/+iKauFuL4t3Eu+yJYNKJGiyLi70w35mOT8/CAnrJ5BKzLqhj6N?=
+ =?us-ascii?Q?wBhZQ7951ecOqE3TjVKn7Nu5mL/PSeVp47UjIOlKLmXlZWtFDV3Gj588F6eo?=
+ =?us-ascii?Q?e5QSn1ygfWJI1Cr6R9xJH30SGC0smHxYxlhIaU5N3uAYwpYytlbTUgB8p9vE?=
+ =?us-ascii?Q?pbcJZzk5/X+hgRUNJhF/+AsM2pBLGwFyN7upH/5npJ614r2uTj9auSAqz0Zp?=
+ =?us-ascii?Q?tuKHx2IAfEN51+s0WUc1sIgYiTneGeurPUPxTqA44UiznDJ7UXcAWzBMNdqR?=
+ =?us-ascii?Q?8Nv0fOzVBD2Q7ybX8tXmkiFcdOMGHfem4qE6Ra9RxCj23UgAW07N23NDIVTG?=
+ =?us-ascii?Q?3cXWtYiVVH+xFVqD4arcoe1CjTfHx+uMibOQbX6jhRdzJUUVnzN15Xay7aAS?=
+ =?us-ascii?Q?HEkmx2R0EJWA4q8WXHrnRBKvqSm6go+TYhaGbAxR5dKXPAAfGkgWYclqsgzW?=
+ =?us-ascii?Q?9OgOtn6+AL+HwuGPPEKPYtPUBh4+ciV+iQTcvwoR/g2b9XK3LNvhjA3+pUL0?=
+ =?us-ascii?Q?JfctZ/oYNfOTrspAohC6c/cW/SNqLL0bl/3WAZP0tva0wumIz/Oe39HOqTu4?=
+ =?us-ascii?Q?FBiEF8cq3PY/tqYDoxHpStAYHZqzksu1nETfCzk+mIP2SW2D6epEfMZxZKdn?=
+ =?us-ascii?Q?RAnlUVF0gXz/QomrT4C1FM/naAqOYElgq3KvZpB7P7WGdM2cHKuQNZEYjGJy?=
+ =?us-ascii?Q?+MgC1L9qGx++TuT4DcttFGPm4Nl2czw6WGQkxdMFgVVKVvmk1XZQWAykIg2Q?=
+ =?us-ascii?Q?JnhSoBSlIboHWl9l6dU2nF1c+jM24GjZ43lZw4cy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d720a703-0d35-440b-6f5a-08dd4b6714e3
+X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB8663.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 13:13:46.2364
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LubaE1UL3cY2GjsSpsx/M8GipN/gET+khtbyrcb5htwxTcLlQsgHXgHlwdgGz/Eb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6933
 
-Current inet_sock_set_state trace from inet_csk_clone_lock() is missing
-many details :
+On Wed, Feb 12, 2025 at 12:51:49PM +0000, Jonathan Cameron wrote:
+> > +The PDS Core device makes an fwctl service available through an
+> > +auxiliary_device named pds_core.fwctl.N.  The pds_fwctl driver binds
+> > +to this device and registers itself with the fwctl bus.  The resulting
+> > +userspace interface is used by an application that is a part of the
+> > +AMD/Pensando software package for the Distributed Service Card (DSC).
+> 
+> Jason, where did we get to on the question of a central open repo etc?
 
-... sock:inet_sock_set_state: family=AF_INET6 protocol=IPPROTO_TCP \
-    sport=4901 dport=0 \
-    saddr=127.0.0.6 daddr=0.0.0.0 \
-    saddrv6=:: daddrv6=:: \
-    oldstate=TCP_LISTEN newstate=TCP_SYN_RECV
+I it is something I would like to do and support, but I haven't seen
+any proposal what it would look like just yet. Right now people seem
+to be porting their existing tools rather than building new stuff from
+scratch.
 
-Only the sport gives the listener port, no other parts of the n-tuple are correct.
+I have some thoughts around provisioning but that's all.
 
-In this patch, I initialize relevant fields of the new socket before
-calling inet_sk_set_state(newsk, TCP_SYN_RECV).
-
-We now have a trace including all the source/destination bits.
-
-... sock:inet_sock_set_state: family=AF_INET6 protocol=IPPROTO_TCP \
-    sport=4901 dport=47648 \
-    saddr=127.0.0.6 daddr=127.0.0.6 \
-    saddrv6=2002:a05:6830:1f85:: daddrv6=2001:4860:f803:65::3 \
-    oldstate=TCP_LISTEN newstate=TCP_SYN_RECV
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/dccp/ipv4.c                 |  3 ---
- net/dccp/ipv6.c                 |  9 +++------
- net/ipv4/inet_connection_sock.c | 24 ++++++++++++++++++++----
- net/ipv4/tcp_ipv4.c             |  4 ----
- net/ipv6/tcp_ipv6.c             |  8 ++------
- 5 files changed, 25 insertions(+), 23 deletions(-)
-
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index be515ba821e2d4d6a7bca973b5e7c2363a2f13cc..bfa529a54acab6abd279c9e4a600e699e8904d8a 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -426,9 +426,6 @@ struct sock *dccp_v4_request_recv_sock(const struct sock *sk,
- 
- 	newinet		   = inet_sk(newsk);
- 	ireq		   = inet_rsk(req);
--	sk_daddr_set(newsk, ireq->ir_rmt_addr);
--	sk_rcv_saddr_set(newsk, ireq->ir_loc_addr);
--	newinet->inet_saddr	= ireq->ir_loc_addr;
- 	RCU_INIT_POINTER(newinet->inet_opt, rcu_dereference(ireq->ireq_opt));
- 	newinet->mc_index  = inet_iif(skb);
- 	newinet->mc_ttl	   = ip_hdr(skb)->ttl;
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index d6649246188d72b3df6c74750779b7aa5910dcb7..39ae9d89d7d43fc8730dd2ec20d6e1cf72d20bf3 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -365,6 +365,9 @@ static int dccp_v6_conn_request(struct sock *sk, struct sk_buff *skb)
- 	ireq = inet_rsk(req);
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
-+	ireq->ir_rmt_addr = LOOPBACK4_IPV6;
-+	ireq->ir_loc_addr = LOOPBACK4_IPV6;
-+
- 	ireq->ireq_family = AF_INET6;
- 	ireq->ir_mark = inet_request_mark(sk, skb);
- 
-@@ -504,10 +507,7 @@ static struct sock *dccp_v6_request_recv_sock(const struct sock *sk,
- 
- 	memcpy(newnp, np, sizeof(struct ipv6_pinfo));
- 
--	newsk->sk_v6_daddr	= ireq->ir_v6_rmt_addr;
- 	newnp->saddr		= ireq->ir_v6_loc_addr;
--	newsk->sk_v6_rcv_saddr	= ireq->ir_v6_loc_addr;
--	newsk->sk_bound_dev_if	= ireq->ir_iif;
- 
- 	/* Now IPv6 options...
- 
-@@ -546,9 +546,6 @@ static struct sock *dccp_v6_request_recv_sock(const struct sock *sk,
- 
- 	dccp_sync_mss(newsk, dst_mtu(dst));
- 
--	newinet->inet_daddr = newinet->inet_saddr = LOOPBACK4_IPV6;
--	newinet->inet_rcv_saddr = LOOPBACK4_IPV6;
--
- 	if (__inet_inherit_port(sk, newsk) < 0) {
- 		inet_csk_prepare_forced_close(newsk);
- 		dccp_done(newsk);
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 1c00069552ccfbf8c0d0d91d14cf951a39711273..bf9ce0c196575910b4b03fca13001979d4326297 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1238,19 +1238,33 @@ struct sock *inet_csk_clone_lock(const struct sock *sk,
- {
- 	struct sock *newsk = sk_clone_lock(sk, priority);
- 	struct inet_connection_sock *newicsk;
-+	struct inet_request_sock *ireq;
-+	struct inet_sock *newinet;
- 
- 	if (!newsk)
- 		return NULL;
- 
- 	newicsk = inet_csk(newsk);
-+	newinet = inet_sk(newsk);
-+	ireq = inet_rsk(req);
- 
--	inet_sk_set_state(newsk, TCP_SYN_RECV);
- 	newicsk->icsk_bind_hash = NULL;
- 	newicsk->icsk_bind2_hash = NULL;
- 
--	inet_sk(newsk)->inet_dport = inet_rsk(req)->ir_rmt_port;
--	inet_sk(newsk)->inet_num = inet_rsk(req)->ir_num;
--	inet_sk(newsk)->inet_sport = htons(inet_rsk(req)->ir_num);
-+	newinet->inet_dport = ireq->ir_rmt_port;
-+	newinet->inet_num = ireq->ir_num;
-+	newinet->inet_sport = htons(ireq->ir_num);
-+
-+	newsk->sk_bound_dev_if = ireq->ir_iif;
-+
-+	newsk->sk_daddr = ireq->ir_rmt_addr;
-+	newsk->sk_rcv_saddr = ireq->ir_loc_addr;
-+	newinet->inet_saddr = ireq->ir_loc_addr;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	newsk->sk_v6_daddr = ireq->ir_v6_rmt_addr;
-+	newsk->sk_v6_rcv_saddr = ireq->ir_v6_loc_addr;
-+#endif
- 
- 	/* listeners have SOCK_RCU_FREE, not the children */
- 	sock_reset_flag(newsk, SOCK_RCU_FREE);
-@@ -1270,6 +1284,8 @@ struct sock *inet_csk_clone_lock(const struct sock *sk,
- 	memset(&newicsk->icsk_accept_queue, 0,
- 	       sizeof(newicsk->icsk_accept_queue));
- 
-+	inet_sk_set_state(newsk, TCP_SYN_RECV);
-+
- 	inet_clone_ulp(req, newsk, priority);
- 
- 	security_inet_csk_clone(newsk, req);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index d1fd2128ac6cce9b845b1f8d278a194c511db87b..56949eb289ce330448b771f91d5c3130d6b2ac96 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1769,10 +1769,6 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
- 	newtp		      = tcp_sk(newsk);
- 	newinet		      = inet_sk(newsk);
- 	ireq		      = inet_rsk(req);
--	sk_daddr_set(newsk, ireq->ir_rmt_addr);
--	sk_rcv_saddr_set(newsk, ireq->ir_loc_addr);
--	newsk->sk_bound_dev_if = ireq->ir_iif;
--	newinet->inet_saddr   = ireq->ir_loc_addr;
- 	inet_opt	      = rcu_dereference(ireq->ireq_opt);
- 	RCU_INIT_POINTER(newinet->inet_opt, inet_opt);
- 	newinet->mc_index     = inet_iif(skb);
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 2debdf085a3b4d2452b2b316cb5368507b17efc8..a806082602985fd351c5184f52dc3011c71540a9 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -798,6 +798,8 @@ static void tcp_v6_init_req(struct request_sock *req,
- 
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
-+	ireq->ir_rmt_addr = LOOPBACK4_IPV6;
-+	ireq->ir_loc_addr = LOOPBACK4_IPV6;
- 
- 	/* So that link locals have meaning */
- 	if ((!sk_listener->sk_bound_dev_if || l3_slave) &&
-@@ -1451,10 +1453,7 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 
- 	ip6_dst_store(newsk, dst, NULL, NULL);
- 
--	newsk->sk_v6_daddr = ireq->ir_v6_rmt_addr;
- 	newnp->saddr = ireq->ir_v6_loc_addr;
--	newsk->sk_v6_rcv_saddr = ireq->ir_v6_loc_addr;
--	newsk->sk_bound_dev_if = ireq->ir_iif;
- 
- 	/* Now IPv6 options...
- 
-@@ -1507,9 +1506,6 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 
- 	tcp_initialize_rcv_mss(newsk);
- 
--	newinet->inet_daddr = newinet->inet_saddr = LOOPBACK4_IPV6;
--	newinet->inet_rcv_saddr = LOOPBACK4_IPV6;
--
- #ifdef CONFIG_TCP_MD5SIG
- 	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
- 
--- 
-2.48.1.502.g6dc24dfdaf-goog
-
+Jason
 
