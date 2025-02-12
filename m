@@ -1,107 +1,149 @@
-Return-Path: <netdev+bounces-165640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C4BA32EAE
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:29:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EC9A32EB3
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1E2188882F
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:29:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454971888EF1
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83B125E454;
-	Wed, 12 Feb 2025 18:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DDD21129C;
+	Wed, 12 Feb 2025 18:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eF44JGYY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqwa+ufn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8942E2116E0;
-	Wed, 12 Feb 2025 18:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD0C1D516D;
+	Wed, 12 Feb 2025 18:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739384978; cv=none; b=rKvJqCOzJGX8JLKP8kGYGcmPIQ/js1dx16KhOERP8cnASiZVkKKsQ2anFOfCdtvulQC3PxhOwdi1vKIrBMgEDIjshHabrcm3pF3eUMiuByYaEFGFeSveTxDIwYWq47fk61+/i0Sq2d6v547j/FhIGw2begL2JO77YEkO7IjVOBc=
+	t=1739385025; cv=none; b=iAiXGfTirSRHogcrBFbdqAowtZdVNXW8Gwdt8GClNUy5muDWvFHJmXBGMN9s37NgJdNE1ZDLymMH66ZsUdU/th2ZBuv+zr3jeJbGwL4u5Qp07rNbX176SRZ614CZwfc1EpCiGI0dRhnqhzv849MYsyoDzd+4X1jadSlighH0KCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739384978; c=relaxed/simple;
-	bh=/sWCr49y4RKiGymT+GIb+7irPIxq1eSs9+acjXDs/Sk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ArrCe2dfCe9MM4Dcz4I1QisX4tgM1BCQfZW26yrSVdhY9ogxciD5WIiQXBnQzqZPTVA94TaUKxaqO+26eivRuVG+Ndne1VaJ+XdTx/gruH/Yh7ss1b8BaqAXKTb9bLREZksxqCSahmZqFqgmkpkjEaBGJJtb3aqKoerTXCv63zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eF44JGYY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61BF9C4CEDF;
-	Wed, 12 Feb 2025 18:29:37 +0000 (UTC)
+	s=arc-20240116; t=1739385025; c=relaxed/simple;
+	bh=IwYdqSQJRgLMoeK/GduEZ3/5ddSRX0H7Vbfl6aPdU38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/vWZtfCLY38Rt7VFWdUtO6wIwo+vOxCGheQ+rPMrpxliCoLIfPLDpNwnEn+LUUD9dLPKHTNdpL8kdHYkCZVN73aR6+q/jwb6lzgQe7oovJMf9e0RI1TNgjSz8RBgOhHpcY1GDPOsrUwht7hRdGCuLX1rCwQ8Ym1eI7xDrolELg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqwa+ufn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68581C4CEE2;
+	Wed, 12 Feb 2025 18:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739384978;
-	bh=/sWCr49y4RKiGymT+GIb+7irPIxq1eSs9+acjXDs/Sk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eF44JGYYDXc5yymVFpeGzq0PrSiCXOlTo/i9DbrI2F/C//8gq+ZsXqdp5uKKoJCen
-	 MQYu05o3kXklsCW1AvkGPoFYi6UPN2JlGWEpgh94QLtTzRrQp6G+Hln0zlwlT7W35L
-	 GSZJ8NPCdQA6w2sYxDGz9/8ELHKDdb2k6oa3otqXOgF1L9+uT5zxKEEixT4PQdK9M3
-	 1Wrm4Iiim0Kj6j4rJ5IINbqvPCwfJRuiHwWtkQ3ex0C3p70q7KXpf18hGZdqAhN2Ic
-	 XuEQ5W/0HH5MsGrlDdOerdd2TOb3g44uU9T63hDCXo1W2HjBK22meNUZSmACH5igLy
-	 f/7IYXHsTgM4g==
-Date: Wed, 12 Feb 2025 10:29:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
- <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 0/8] bpf: cpumap: enable GRO for XDP_PASS
- frames
-Message-ID: <20250212102936.23617f03@kernel.org>
-In-Reply-To: <1dd14ece-578b-4fe6-8ef1-557b0f5d3144@intel.com>
-References: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
-	<79d05c4b-bcfb-4dd3-84d9-b44e64eb4e66@intel.com>
-	<CANn89iLpDW5GK5WJcKezFY17hENaC2EeUW7BkkbJZuzJc5r5bw@mail.gmail.com>
-	<7003bc18-bbff-4edd-9db5-dd1c17a88cc0@intel.com>
-	<20250210163529.1ba7360a@kernel.org>
-	<0a8aac38-a221-4046-8c8a-a019602e25dc@intel.com>
-	<1dd14ece-578b-4fe6-8ef1-557b0f5d3144@intel.com>
+	s=k20201202; t=1739385025;
+	bh=IwYdqSQJRgLMoeK/GduEZ3/5ddSRX0H7Vbfl6aPdU38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hqwa+ufnSv0IcEn77bHXu6UWAhbLM9qwv4zwh4whoZENjzMlpT3DQrM5ng9LpHoPA
+	 J3ZtEZtegITE0Z30rG9vSqDjJTFUJ8M6Ad2WPXj2nqBbQu4uuRDOeWd5q04Kc4fzbX
+	 pliIvYE/3XLJhBtBlRni1rbJLOgqD7sg0XiiCI0OyXlpUJOjZaDSHYmV+RIYZbgIrt
+	 YqkRZbETkwETttlGxPI6oJ+KCpbyZYDyjf5B4gHGZknk+nguQFLazHEkIi4KQxnsfP
+	 s55AEti2WyAo5wvzb4aOz9Q1t/J5b0b2apm71AXEkzK3GIotVmkSlrNBuS87HWJf+E
+	 DQauwx8FDeysA==
+Date: Wed, 12 Feb 2025 20:30:20 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+	Jay Vosburgh <jv@jvosburgh.net>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Louis Peens <louis.peens@corigine.com>, netdev@vger.kernel.org,
+	oss-drivers@corigine.com, Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Ilia Lin <ilia.lin@kernel.org>
+Subject: Re: [PATCH ipsec-next 2/5] xfrm: simplify SA initialization routine
+Message-ID: <20250212183020.GJ17863@unreal>
+References: <cover.1738778580.git.leon@kernel.org>
+ <dcadf7c144207017104657f85d512889a2d1a09e.1738778580.git.leon@kernel.org>
+ <Z6yMgPSfPzgGHTkD@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6yMgPSfPzgGHTkD@gauss3.secunet.de>
 
-On Wed, 12 Feb 2025 16:55:52 +0100 Alexander Lobakin wrote:
-> > You mean to cache napi_id in gro_node?
+On Wed, Feb 12, 2025 at 12:56:48PM +0100, Steffen Klassert wrote:
+> On Wed, Feb 05, 2025 at 08:20:21PM +0200, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
 > > 
-> > Then we get +8 bytes to sizeof(napi_struct) for little reason...
-
-Right but I think the expectation would be that we don't ever touch
-that on the fast path, right? The "real" napi_id would basically
-go down below:
-
-	/* control-path-only fields follow */
-
-8B of cold data doesn't matter at all. But I haven't checked if
-we need the napi->napi_id access anywhere hot, do we?
-
-> > Dunno, if you really prefer, I can do it that way.  
+> > SA replay mode is initialized differently for user-space and
+> > kernel-space users, but the call to xfrm_init_replay() existed in
+> > common path with boolean protection. That caused to situation where
+> > we have two different function orders.
+> > 
+> > So let's rewrite the SA initialization flow to have same order for
+> > both in-kernel and user-space callers.
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  include/net/xfrm.h    |  3 +--
+> >  net/xfrm/xfrm_state.c | 22 ++++++++++------------
+> >  net/xfrm/xfrm_user.c  |  2 +-
+> >  3 files changed, 12 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > index 28355a5be5b9..58f8f7661ec4 100644
+> > --- a/include/net/xfrm.h
+> > +++ b/include/net/xfrm.h
+> > @@ -1770,8 +1770,7 @@ void xfrm_spd_getinfo(struct net *net, struct xfrmk_spdinfo *si);
+> >  u32 xfrm_replay_seqhi(struct xfrm_state *x, __be32 net_seq);
+> >  int xfrm_init_replay(struct xfrm_state *x, struct netlink_ext_ack *extack);
+> >  u32 xfrm_state_mtu(struct xfrm_state *x, int mtu);
+> > -int __xfrm_init_state(struct xfrm_state *x, bool init_replay,
+> > -		      struct netlink_ext_ack *extack);
+> > +int __xfrm_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack);
+> >  int xfrm_init_state(struct xfrm_state *x);
+> >  int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type);
+> >  int xfrm_input_resume(struct sk_buff *skb, int nexthdr);
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 568fe8df7741..42799b0946a3 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -3120,8 +3120,7 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
+> >  }
+> >  EXPORT_SYMBOL_GPL(xfrm_state_mtu);
+> >  
+> > -int __xfrm_init_state(struct xfrm_state *x, bool init_replay,
+> > -		      struct netlink_ext_ack *extack)
+> > +int __xfrm_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
 > 
-> Alternative to avoid +8 bytes:
+> The whole point of having __xfrm_init_state was to
+> sepatate codepaths that need init_replay and those
+> who don't need it. That was a bandaid for something,
+> unfortunately I don't remenber for what.
 > 
-> struct napi_struct {
-> 	...
+> If we don't need that anymore, maybe we can merge
+> __xfrm_init_state into xfrm_init_state, as it was
+> before.
+
+Main difference between __xfrm_init_state and xfrm_init_state is that
+latter is called without extack, which doesn't exist in kernel path.
+
+E.g  xfrm_init_state(struct xfrm_state *x) vs. __xfrm_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack).
+So if we merge them, we will need to change all xfrm_init_state()
+callers to provide extack == NULL.
+
+IMHO, such churn of changing xfrm_init_state() callers is not worth it for now.
+
+Thanks
+
 > 
-> 	union {
-> 		struct gro_node	gro;
-> 		struct {
-> 			u8 pad[offsetof(struct gro_node, napi_id)];
-> 			u32 napi_id;
-> 		};
-> 	};
-> 
-> This is effectively the same what struct_group() does, just more ugly.
-> But allows to declare gro_node separately.
+> The rest of the patchset looks OK to me.
 
