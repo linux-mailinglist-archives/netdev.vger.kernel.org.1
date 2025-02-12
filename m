@@ -1,106 +1,130 @@
-Return-Path: <netdev+bounces-165562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69B3A32840
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:19:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C59BA32844
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D4501887E9D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:19:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CAC73A5BA7
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CA020F09F;
-	Wed, 12 Feb 2025 14:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF3920FA8F;
+	Wed, 12 Feb 2025 14:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbplJdvZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DEE1A5AA;
-	Wed, 12 Feb 2025 14:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC06320F08F;
+	Wed, 12 Feb 2025 14:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739369956; cv=none; b=BZpJSeO0A+3zLNHS002kKx+xYGwh19YG/W+/JYWIeg7p4JVPQzrgR0U4Kgp5C+CYJuA1RxpZgxrFv3FRqaShHHsPIL3PX0KCS5d9uUp+2q2BRquJF6ety6Wrxbq617qjyDlQGPZ2vCoq5VwjcxHJB9xjaUK6QHWQR9owJVm7DMM=
+	t=1739370018; cv=none; b=l2aTw7WdXfMUPjYeGolcpZMp7WrzW5ZgDP3sILZWoAClG8dR7xVNYk/zWejVc+yVvQZavnqjsa+cMslVgfVW4m9V0ABvKxt1lWfZigJVfkH3DS1wqiXQ5kaxpOp9ay2MG1ViIFVOUHOWiH3+ZBTusyO+HfwK2OzKSHjB+DE9MlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739369956; c=relaxed/simple;
-	bh=hePOXBAyH+DtbFWymWK4E16ILxWpqBJfArdmWI3Upn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bEdYn6KUX2jqD7IMGyWVtlalcq8GQOJsN2PEVYMPzKP46ulpKSjy24o6k0NIfWxrRIJHd1eYhdteCNI8TEpwSP8xYte+OsKub4z93blvk+udfzO2COZsz4MbRXBRWAIltpddYTN82y+x8SiHR3yEXsp9BkPtR4TTkHiDhe138CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-05 (Coremail) with SMTP id zQCowAD3YMrEraxnexx3DA--.41351S2;
-	Wed, 12 Feb 2025 22:18:46 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com
-Cc: UNGLinuxDriver@microchip.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] net: microchip: sparx5: Fix potential NULL pointer dereference
-Date: Wed, 12 Feb 2025 22:18:28 +0800
-Message-ID: <20250212141829.1214-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1739370018; c=relaxed/simple;
+	bh=W76h+CLfCyTTdsAX/7kJMTRrDvwOck8HYBZvhglAEO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kKOH27l5pQYW/juWIePHmYpOpK+hMowUOgJvFeC7mMZfCNH1gIC0L7YSZNtGcK4K0R8bKpAoasOLjz4U06LV3WuS0s93vzZnFszFrUbF3GIYCXozZxZgxSHIhxMWEhoayn+lYtiAE6eW5Rv0YnVdLN5iZTwnM4Y8qPgT62TH9tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbplJdvZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60ADBC4CEDF;
+	Wed, 12 Feb 2025 14:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739370018;
+	bh=W76h+CLfCyTTdsAX/7kJMTRrDvwOck8HYBZvhglAEO4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sbplJdvZjHhY8XDZUmGI4C0Xkpaj+HvVxCjfRZL9fIMNcksBce30FIRYX4jbzmsgJ
+	 kXRnfadJ7kyCveNMfheNoc42Oj36V52dDZxQ0dBHtDAGGEvmkG+nmMRjxlzy6hY2DD
+	 GY1tvgSqit6YQ4ZimW2xCBiMe0yvqA5y+tsd6fbwlRxjduJ8155Q3KiogWqFAxoXrw
+	 KhnPPUkRbkz7d/zLKJxCoLJIrF4kVghFad9FC+/DhSRgpfDx/teNmEVyXDBYXqNFC/
+	 g3w6rN5PS43enSbGM6frtQQtXQpTI9U4BABwAvKvSZiRcQNce8Icd1P+Uh61bJfDBY
+	 55/eINUud5IeQ==
+Date: Wed, 12 Feb 2025 16:20:13 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"Nelson, Shannon" <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
+Message-ID: <20250212142013.GH17863@unreal>
+References: <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <20250206164449.52b2dfef@kernel.org>
+ <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+ <20250207073648.1f0bad47@kernel.org>
+ <Z6ZsOMLq7tt3ijX_@x130>
+ <20250207135111.6e4e10b9@kernel.org>
+ <20250208011647.GH3660748@nvidia.com>
+ <20250210170423.62a2f746@kernel.org>
+ <20250211075553.GF17863@unreal>
+ <CACDg6nWiSbBV=Ls=Rts=vsx0V7pKHX0ZztbKJL_UM0+u34uiZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAD3YMrEraxnexx3DA--.41351S2
-X-Coremail-Antispam: 1UD129KBjvJXoWrZw4rAF47Zw4xWw13KrWDtwb_yoW8Jr13pa
-	1DuFy5Ww4kArsxG347Cw48Xry8Xan0gF93WrWrCwn5ZFnYqrZ3Xr1rCrWF9ryFqrZxGrnx
-	tF4Yva9IyF1qyrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUb8hL5UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoLA2espowP7AABsG
+In-Reply-To: <CACDg6nWiSbBV=Ls=Rts=vsx0V7pKHX0ZztbKJL_UM0+u34uiZg@mail.gmail.com>
 
-Check the return value of vcap_keyfields() in
-vcap_debugfs_show_rule_keyset(). If vcap_keyfields()
-returns NULL, skip the keyfield to prevent a NULL pointer
-dereference when calling vcap_debugfs_show_rule_keyfield().
+On Tue, Feb 11, 2025 at 09:27:08AM -0500, Andy Gospodarek wrote:
+> On Tue, Feb 11, 2025 at 2:55 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Mon, Feb 10, 2025 at 05:04:23PM -0800, Jakub Kicinski wrote:
+> > > On Fri, 7 Feb 2025 21:16:47 -0400 Jason Gunthorpe wrote:
+> > > > On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
+> > > >
+> > > > > But if you agree the netdev doesn't need it seems like a fairly
+> > > > > straightforward way to unblock your progress.
+> > > >
+> > > > I'm trying to understand what you are suggesting here.
+> > > >
+> > > > We have many scenarios where mlx5_core spawns all kinds of different
+> > > > devices, including recovery cases where there is no networking at all
+> > > > and only fwctl. So we can't just discard the aux dev or mlx5_core
+> > > > triggered setup without breaking scenarios.
+> > > >
+> > > > However, you seem to be suggesting that netdev-only configurations (ie
+> > > > netdev loaded but no rdma loaded) should disable fwctl. Is that the
+> > > > case? All else would remain the same. It is very ugly but I could see
+> > > > a technical path to do it, and would consider it if that brings peace.
+> > >
+> > > Yes, when RDMA driver is not loaded there should be no access to fwctl.
+> >
+> > There are users mentioned in cover letter, which need FWCTL without RDMA.
+> > https://lore.kernel.org/all/0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com/
+> >
+> > I want to suggest something different. What about to move all XXX_core
+> > logic (mlx5_core, bnxt_core, e.t.c.) from netdev to some other dedicated
+> > place?
+> >
+> 
+> I understand the logic in your statement, but I do not want to
+> separate/split PCI driver from the NIC driver for bnxt-based devices.
 
-Fixes: 610c32b2ce66 ("net: microchip: vcap: Add vcap_get_rule")
-Cc: stable@vger.kernel.org # 6.2+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c | 2 ++
- 1 file changed, 2 insertions(+)
+It is just an idea and there is no need to worry yet. There is no
+evidence that netdev community will allow such move. 
 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c b/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-index 59bfbda29bb3..e9e2f7af9be3 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-@@ -202,6 +202,8 @@ static int vcap_debugfs_show_rule_keyset(struct vcap_rule_internal *ri,
- 
- 	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list) {
- 		keyfield = vcap_keyfields(vctrl, admin->vtype, ri->data.keyset);
-+		if (!keyfield)
-+			continue;
- 		vcap_debugfs_show_rule_keyfield(vctrl, out, ckf->ctrl.key,
- 						keyfield, &ckf->data);
- 	}
--- 
-2.42.0.windows.2
+> 
+> We can look at doing that for future generations of hardware, but
+> splitting/switching drivers for existing hardware creates a poor
+> user-experience for distro users.
 
+It is already solved with module autoload, dependencies and aliases.
+
+Thanks
 
