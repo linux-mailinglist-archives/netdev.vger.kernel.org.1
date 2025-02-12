@@ -1,117 +1,172 @@
-Return-Path: <netdev+bounces-165473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B80D0A32316
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 11:03:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D21A32362
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 11:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F228165CB5
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:03:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0EF11887928
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401301FC102;
-	Wed, 12 Feb 2025 10:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E75A207E1E;
+	Wed, 12 Feb 2025 10:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqHoJrai"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w3RGNjl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8DD1F12EC
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 10:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2241E500C;
+	Wed, 12 Feb 2025 10:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739354607; cv=none; b=lEQ1zvMqEEOISCiAdgNze5IVFAeZ/yQUwrz95fqAz25e+DbcWZcujgJrdf0h40SoHHRaquHx8Jye8q+x8n4RXXAGEXNwFmfSkqDdcBy6mb1FOOo+iOPItdVR3Tj1racW1eCF7OWFCfzlPwhsqfTW/OUCoKREr8QA5sVpbRoCAs0=
+	t=1739355616; cv=none; b=ZdOE9XBGl6Q5zQudmU+hCUELQrYanCI2KmejaXbssWnWcdlsX+Z9zZ3b5CalPLOu3F7Tzrhr6Q/GdYZRdkE0Py3gQzvtDKOCIjwWFMIK8qcmEULP/9xuuUvMD8ndUOBjcxZWiwpB5cvcbrzrWKy/VPWTMGpaIWWwk8Ba/hXv2hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739354607; c=relaxed/simple;
-	bh=5nIGClIepa3vn8Kx0AIIOulxeLtJZx+xFkAW9HB1GUk=;
+	s=arc-20240116; t=1739355616; c=relaxed/simple;
+	bh=RCfAMMxOOEEkjSQj2Z4giICANWiUwwtkqv87A6WeoKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sTYXqrIHouGiHzkYUHQa8D2gjz9XxYgT34+WAz7/mYsRMgj+B/0M8GGxm9FoaMhJ9mYuKu+AjBLsx6qSHqfzuGgDsx0QoXfUknxp2ZqY3mHvswhe3mKfwWS7IHAnUaO0jfehMEAX/bwcrXOMlc+qQDBsRzES+DKjANobbOCkoyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rqHoJrai; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF3EC4CEDF;
-	Wed, 12 Feb 2025 10:03:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739354606;
-	bh=5nIGClIepa3vn8Kx0AIIOulxeLtJZx+xFkAW9HB1GUk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rqHoJraiptilXADmxS1SNDibvf5crLWII9M2ufZI3e4Z2XrwTmbv6qisVhe45f93S
-	 lrwsDxa6P8OJPIhUXN7nRDvl+598EkGzmOq3/dyQeweypW1YNDh9aodQTV0LkXc/Em
-	 wFUmaV3ig8z5Ge6TIdC2UtGOdPtyDV0xTqdGFBOD7vWzzm257JI6/yXi3ccrmWkecp
-	 fx1b3McW81oKzUOUdv8gn2/e+hDKR3ZG5oVd7g10HBhkZKJfZK/tdbYfP6iHd6ytCr
-	 njiagqgMKdmwhh/Rqi9Lu9Gr4m7WMuoHEOUbz4bIkwY2fX5jZYTqMjkx9PFBFoforC
-	 NQT/mujTJuMMw==
-Date: Wed, 12 Feb 2025 11:03:24 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=WqP+/CocraQIZYWes9rgnDkMuh4Co/3yLEO4bSJBwYx4M3jw7OlBd2JamKMfkILP2H92+Krr7UouIwbkfbDlPoY5JNvPNkbjPXnZ+h4590E/GYYrXExStYvr0ofxpknW2ceUZUqcm8xo0yiFOlLeQIvFKpjcRdslFAeljRzf/N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w3RGNjl7; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=y8IN83D0tylBbKwg7C8Aw8PwV2/BnkhsqgeFy96LOxI=; b=w3RGNjl7vBZRtVLEfS8UB+J+Ea
+	RCafq7gKeGXNuTpE24NzRQPhZjFSNKP/Mf8ho4hrnWSOdre7vkZ2ZK2HxLCdxtWjtHgKLmfZX67W0
+	b7UWLcLKXrldSPS5rKde59jxxemk/JWyZBlrU96lLCrx77kG5hzBAoZtJeHmr3PZi+Ue5MfTLswJI
+	wdkVYWme3pMqbFxEz7TVAEj2Z+8iya9vbf/nEZp3OmPPzYwPiGfYJXHQ7s2sqHobbf+PHShb7OyFc
+	IIRZUvDSiAwk55zScuDwgECc9pfeZO+LrKqg7jaoGYS69iypBWKbD7V1tOveHr7NmJm7t+lYyw6h9
+	dvLlGyWg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47876)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ti9qU-0005Tj-1n;
+	Wed, 12 Feb 2025 10:19:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ti9qO-00012C-32;
+	Wed, 12 Feb 2025 10:19:48 +0000
+Date: Wed, 12 Feb 2025 10:19:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Lei Wei <quic_leiwei@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] Enable TSO for DSA ports on Airoha EN7581
- SoC
-Message-ID: <Z6xx7AwglUEt_9J0@lore-desk>
-References: <20250212-airoha-fix-tso-v1-0-1652558a79b4@kernel.org>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
+	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
+	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+	vsmuthu@qti.qualcomm.com, john@phrozen.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
+Message-ID: <Z6x1xD0krK0_eycB@shell.armlinux.org.uk>
+References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
+ <20250211195934.47943371@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="K9tnhGwKobYJn02N"
-Content-Disposition: inline
-In-Reply-To: <20250212-airoha-fix-tso-v1-0-1652558a79b4@kernel.org>
-
-
---K9tnhGwKobYJn02N
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250211195934.47943371@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> Add missing vlan_features configuration to enable TSO/Scatter Gather for
-> airoha_eth lan ports.
-> Fix checksum configuration for TSO packets with cloned headers.
->=20
-> ---
-> Lorenzo Bianconi (2):
->       net: airoha: Fix TSO support for header cloned skbs
->       net: airoha: Enable TSO/Scatter Gather for LAN port
->=20
->  drivers/net/ethernet/mediatek/airoha_eth.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> ---
-> base-commit: 4e41231249f4083a095085ff86e317e29313c2c3
-> change-id: 20250211-airoha-fix-tso-44a6f9cb14c0
+On Tue, Feb 11, 2025 at 07:59:34PM -0800, Jakub Kicinski wrote:
+> On Fri, 7 Feb 2025 23:53:11 +0800 Lei Wei wrote:
+> > The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
+> > PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
+> > mode PCS (XPCS) functions, and supports various interface modes for
+> > the connectivity between the Ethernet MAC and the external PHYs/Switch.
+> > There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
+> > Ethernet ports.
+> > 
+> > This patch series adds base driver support for initializing the PCS,
+> > and PCS phylink ops for managing the PCS modes/states. Support for
+> > SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
+> > 
+> > The Ethernet driver which handles the MAC operations will create the
+> > PCS instances and phylink for the MAC, by utilizing the API exported
+> > by this driver.
+> > 
+> > While support is being added initially for IPQ9574, the driver is
+> > expected to be easily extendable later for other SoCs in the IPQ
+> > family such as IPQ5332.
+> 
+> Could someone with PHY, or even, dare I say, phylink expertise
+> take a look here?
 
-Hi,
+I've not had the time, sorry. Looking at it now, I have lots of
+questions over this.
 
-I figured out I am missing a patch in this series, please drop it, I will
-repost. Sorry for the noise.
+1) clocks.
 
-Regards,
-Lorenzo
+- Patch 2 provides clocks from this driver which are exported to the
+  NSCCC block that are then used to provide the MII clocks.
+- Patch 3 consumes clocks from the NSCCC block for use with each PCS.
 
->=20
-> Best regards,
-> --=20
-> Lorenzo Bianconi <lorenzo@kernel.org>
->=20
+Surely this leads to a circular dependency, where the MSCCC driver
+can't get the clocks it needs until this driver has initialised, but
+this driver can't get the clocks it needs for each PCS from the NSCCC
+because the MSCCC driver needs this driver to initialise.
 
---K9tnhGwKobYJn02N
-Content-Type: application/pgp-signature; name="signature.asc"
+2) there's yet another open coded "_get" function for getting the
+PCS given a DT node which is different from every other "_get"
+function - this one checks the parent DT node has an appropriate
+compatible whereas others don't. The whole poliferation of "_get"
+methods that are specific to each PCS still needs solving, and I
+still have the big question around what happens when the PCS driver
+gets unbound - and whether that causes the kernel to oops. I'm also
+not a fan of "look up the struct device and then get its driver data".
+There is *no* locking over accessing the driver data.
 
------BEGIN PGP SIGNATURE-----
+3) doesn't populate supported_interfaces for the PCS - which would
+make ipq_pcs_validate() unnecessary until patch 4 (but see 6 below.)
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6xx6wAKCRA6cBh0uS2t
-rJm3AQDXbXlIcf436GJupafNCG7ANsY51fU/rVvITbR48Yhd4wEA766hQ2x5T3rJ
-s/ksDQ/sB+rrQKgeQJ9wUZu2gGC2FQM=
-=bCuL
------END PGP SIGNATURE-----
+4)
+"+       /* Nothing to do here as in-band autoneg mode is enabled
++        * by default for each PCS MII port."
 
---K9tnhGwKobYJn02N--
+"by default" doesn't matter - what if in-band is disabled and then
+subsequently enabled.
+
+5) there seems to be an open-coded decision about the clock rate but
+there's also ipq_pcs_clk_rate_get() which seems to make the same
+decision.
+
+6) it seems this block has N PCS, but all PCS must operate in the same
+mode (e.g. one PCS can't operate in SGMII mode, another in USXGMII
+mode.) Currently, the last "config" wins over previous configs across
+all interfaces. Is this the best solution? Should we be detecting
+conflicting configurations? Unfortunately, pcs->supported_interfaces
+can't really be changed after the PCS is being used, so I guess
+any such restrictions would need to go in ipq_pcs_validate() which
+should work fine - although it would mean that a MAC populating
+its phylink_config->supported_interfaces using pcs->supported_interfaces
+may end up with too many interface bits set.
+
+(1), (2) and (6) are probably the major issues at the moment, and (2)
+has been around for a while.
+
+Given (1), I'm just left wondering whether this has been runtime
+tested, and how the driver model's driver dependencies cope with it
+if the NSCCC driver is both a clock consumer of/provider to this
+driver.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
