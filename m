@@ -1,192 +1,123 @@
-Return-Path: <netdev+bounces-165417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4659A31EF9
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:33:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D14EBA31F3D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:42:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AABFA1886B2D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:33:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552F0188C452
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88071FF608;
-	Wed, 12 Feb 2025 06:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1DF1FCF4F;
+	Wed, 12 Feb 2025 06:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AfQ32H2v"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Luud9pZm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF53A1FBEA3
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D341B1FC114
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739341946; cv=none; b=TSw2U+R0BqXZwPgkBbr8nmR/+XASYnmDH1mXpfSqaPLOxXFK1Rgb5DxfY7p+SV5BhRJ3iTK0LXxIC/BprkhbspOUoayikGB5hNYTa8GO9Ben7+mVmK79R0rBxVgorQmek3SVBmxVzJfs9h72pbBvuc7OXMJ6oR7u8Gaodeo0Qnk=
+	t=1739342548; cv=none; b=OY12kGHupm1M0ujCO/IZ32SVoSl/1pBMiVVoR35+hy3oPQx7Jtb610K3ng2eRUhQrHXAYrjzydhOtgt2kS43/FfRijTsSrjA4KDwz2wWKudJfs791nNk7MSn+ZpuWc/zndHX6FdSldi9jH4Qgdb9ymcOJDfmYpbNlUamABWhgsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739341946; c=relaxed/simple;
-	bh=20QpVWvUkpwzsIzjnZfqaoDaX/8En8lsgOt/fRAU1VU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=OhmMmxstNnuRD8E0G/SHCVHcv6STI3S/TsOik+/J9iJE4o+Nr8OQeB7fVRAdqIpzisOOSDDG+H1WFrtcwySHRHqT4mdRkuV02vPrJXXdKyLRlQH5luwP6NaS0Y17PPp5j0dKisI/GYwFroCgDDDStNv4D4XTOgDfRNK7fbXS8QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AfQ32H2v; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab744d5e567so89823366b.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 22:32:24 -0800 (PST)
+	s=arc-20240116; t=1739342548; c=relaxed/simple;
+	bh=fnNW6bOisEG233d9nvyp1AttvKM4+bJNAwN/n2MfVHU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=szND0Xk+dXE8J5SLz/UFUgToNk2fgbx2LaXPYB74zUd8WFT8ScwLcEu9ealU4xoKBAVNHCtHO+KxjO5Gd1V9kM9WVdSH0BGWAxODGRIrlF4Xx8IOH+memoeOcEJJbT0XkXNWEXQxS6XkXbmoN6p94NSkvPj9+x7YiX2mPLRkhWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Luud9pZm; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739341943; x=1739946743; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=c54Mzn2O0wyzs6HJus5W4wtILQV+Yc6pzW9uAzIPgvU=;
-        b=AfQ32H2vRIWRJtltmcX3ucw9fCMrTSW8S5F6AsU+EP02vOmIbtwgSHhplcJ7Awi0ZA
-         n8cqW0oYvfQEJ7LAHLaRVkveeGDkVJ7T4FxDtXXxctxKqub7lwKTAV/ll6QBfFBrKZt5
-         QMnXWhjrYzzqxbhnbOFPvKuSsxFvpGugyNyIX7zMJ1RPk+e08IlnEyJpbWE2VemSZIia
-         4b8g0qRhapqNEdmehXGxXlgMObPw9+vS1pQ8hKUqIJk8hEvw0DU4JZlruZPbrFyhZdKj
-         N7ojLAyrfSzgotj2paf5oDyYzu5Fo3nAaFjr2U1r6sHHu5c5LoqnLdstGZ3dEap6zIR0
-         FR0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739341943; x=1739946743;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c54Mzn2O0wyzs6HJus5W4wtILQV+Yc6pzW9uAzIPgvU=;
-        b=HT+sEjCeNCCQE3cp8SZXx53l5jWp0wPtPaXkvUGSbAh/9StM+RA/f9NHgrs9EgAvfI
-         Wns+tlp2Qsra8CdRKVNQtpLDvBHFbUoQgWtNTII39zoSI/T6K2s/bl0g/IrxsruLt53f
-         FE4YsSjb0y8iWbyddT9S5Otm146aWuCH5HChrxBxBaAJkmze5/kZu7pQMB9rcVymu6DO
-         dasu25SwIEO/IWKYDNITM5hvnsmk9hlR1trVXUu97DdbKh5uLGPy695ol2ugVGTGKfly
-         R9LLbj8M3v9DoWrR4+bzcCqdTUeEmy0WkxbFg+JOgIFJn3oa1ZsSCYzO+ODGps2wXoi7
-         0QtA==
-X-Gm-Message-State: AOJu0YwiI/HBVO+dOhGgxZN1MVdS5u/rDtaUp1UHKizVznRaBQVSie+j
-	y7EOmCV9fktR19OqGNABdDE04KxK66FVnJL0WS6LQz6iIY2zMN4y/Hu0Fg==
-X-Gm-Gg: ASbGncsAL6Y9hClmGhE0e46Yd9GEUBP2CKjpW68+nOqKLxYrb3BAeCcfKZtATZRp5WD
-	VCxo1WE8zYFGHEwoYDwd8alNbVDpv3FvsSREjdqHhPa0XOI6jOqKhpMhUITrOZNOuPL5h3Vf18f
-	NuvfhzBEPJV9yII5OQD5F+oMGnUfktfFX6UiPSOtmgVeTxRLYsbP2K0I3ijdiIkWs1a5sXPOQR8
-	o7/RKsI9aJ1PMRNxaYH3kN1TE42dVFoiDlPk9dRK4D4DFl0SKi1XveByERNANx0y0E17bcMfp0D
-	918rhvhElqgnd/sO1Cbiv11gDiSCWOshXgIpKpjBnMiOvYUqrhCR7QuqTIHYQXE0+Q9MWHUttVt
-	Fy9wWMh3B49wvkL64iICrMePKJktj0vl7PQ1ECMsZI7GVPo0r8HcEg7gjXEvYf47f/CUq+t6TSu
-	hgKWxfdSo=
-X-Google-Smtp-Source: AGHT+IGQo9hMkNNyD4+bf6FdGp4OlnIjQssKZUE0expmqbrHPpaJOeMiB2p/TvVtzxQ1VjzOWcB7lQ==
-X-Received: by 2002:a17:907:c50f:b0:ab6:fe30:f49e with SMTP id a640c23a62f3a-ab7f30f60b1mr140147266b.28.1739341942858;
-        Tue, 11 Feb 2025 22:32:22 -0800 (PST)
-Received: from ?IPV6:2a02:3100:a541:5e00:c559:b395:f808:a611? (dynamic-2a02-3100-a541-5e00-c559-b395-f808-a611.310.pool.telefonica.de. [2a02:3100:a541:5e00:c559:b395:f808:a611])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab7b4724caesm677441466b.145.2025.02.11.22.32.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 22:32:21 -0800 (PST)
-Message-ID: <be356a21-5a1a-45b3-9407-3a97f3af4600@gmail.com>
-Date: Wed, 12 Feb 2025 07:32:52 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739342547; x=1770878547;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jL3JrYPivToC4/XcN4RTV1bApa9ixZZXsbc1+iiv4Ok=;
+  b=Luud9pZmjtYz84drn8sjJxhIRm7wa4lu2mEFnXwNsDsTDumDlXW67KGm
+   ONwdunVFUZI00nJ7boUGnO2yTeUAMBrOuXj2zMU481vIGOYHAFEwE/EGv
+   d3I/vskyAHVQt+Up6pohMCx0Ef2qQuh2/0xMnSU9rQT8QrcFJX6dmqYM9
+   U=;
+X-IronPort-AV: E=Sophos;i="6.13,279,1732579200"; 
+   d="scan'208";a="493191814"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 06:42:21 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:3159]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.65:2525] with esmtp (Farcaster)
+ id d5848b8d-475f-4b30-bee9-2e6bfbe782d1; Wed, 12 Feb 2025 06:42:20 +0000 (UTC)
+X-Farcaster-Flow-ID: d5848b8d-475f-4b30-bee9-2e6bfbe782d1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Wed, 12 Feb 2025 06:42:20 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.118.243.86) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 12 Feb 2025 06:42:16 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v4 net 0/3] net: Fix race of rtnl_net_lock(dev_net(dev)).
+Date: Wed, 12 Feb 2025 15:42:03 +0900
+Message-ID: <20250212064206.18159-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net-next] ixgene-v2: prepare for phylib stop exporting
- phy_10_100_features_array
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
- Iyappan Subramanian <iyappan@os.amperecomputing.com>,
- Keyur Chudgar <keyur@os.amperecomputing.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-As part of phylib cleanup we plan to stop exporting the feature arrays.
-So explicitly remove the modes not supported by the MAC. The media type
-bits don't have any impact on kernel behavior, so don't touch them.
+Yael Chemla reported that commit 7fb1073300a2 ("net: Hold rtnl_net_lock()
+in (un)?register_netdevice_notifier_dev_net().") started to trigger KASAN's
+use-after-free splat.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- use phy_remove_link_mode()
----
- drivers/net/ethernet/apm/xgene-v2/mdio.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+The problem is that dev_net(dev) fetched before rtnl_net_lock() might be
+different after rtnl_net_lock().
 
-diff --git a/drivers/net/ethernet/apm/xgene-v2/mdio.c b/drivers/net/ethernet/apm/xgene-v2/mdio.c
-index eba06831a..6a17045a5 100644
---- a/drivers/net/ethernet/apm/xgene-v2/mdio.c
-+++ b/drivers/net/ethernet/apm/xgene-v2/mdio.c
-@@ -97,7 +97,6 @@ void xge_mdio_remove(struct net_device *ndev)
- 
- int xge_mdio_config(struct net_device *ndev)
- {
--	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
- 	struct xge_pdata *pdata = netdev_priv(ndev);
- 	struct device *dev = &pdata->pdev->dev;
- 	struct mii_bus *mdio_bus;
-@@ -137,17 +136,12 @@ int xge_mdio_config(struct net_device *ndev)
- 		goto err;
- 	}
- 
--	linkmode_set_bit_array(phy_10_100_features_array,
--			       ARRAY_SIZE(phy_10_100_features_array),
--			       mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_AUI_BIT, mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_MII_BIT, mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_BNC_BIT, mask);
--
--	linkmode_andnot(phydev->supported, phydev->supported, mask);
--	linkmode_copy(phydev->advertising, phydev->supported);
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Full_BIT);
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
-+
- 	pdata->phy_speed = SPEED_UNKNOWN;
- 
- 	return 0;
+The patch 2 fixes the issue by checking dev_net(dev) after rtnl_net_lock(),
+and the patch 3 fixes the same potential issue that would emerge once RTNL
+is removed.
+
+
+Changes:
+  v4:
+    * Add patch 1
+    * Fix build failure for !CONFIG_NET_NS in patch 2
+
+  v3:
+    * Bump net->passive instead of maybe_get_net()
+    * Remove msleep(1) loop
+    * Use rcu_access_pointer() instead of rcu_read_lock().
+
+  v2:
+    * Use dev_net_rcu()
+    * Use msleep(1) instead of cond_resched() after maybe_get_net()
+    * Remove cond_resched() after net_eq() check
+
+  v1: https://lore.kernel.org/netdev/20250130232435.43622-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (3):
+  net: Add net_passive_inc() and net_passive_dec().
+  net: Fix dev_net(dev) race in unregister_netdevice_notifier_dev_net().
+  dev: Use rtnl_net_dev_lock() in unregister_netdev().
+
+ include/net/net_namespace.h | 11 ++++++++
+ net/core/dev.c              | 51 +++++++++++++++++++++++++++++++------
+ net/core/net_namespace.c    |  8 +++---
+ 3 files changed, 58 insertions(+), 12 deletions(-)
+
 -- 
-2.48.1
-
+2.39.5 (Apple Git-154)
 
 
