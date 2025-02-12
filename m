@@ -1,92 +1,109 @@
-Return-Path: <netdev+bounces-165550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1A6A32784
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:49:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C30A32797
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88721166794
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:49:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C74FE3A2185
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1A92046BF;
-	Wed, 12 Feb 2025 13:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF2C20E009;
+	Wed, 12 Feb 2025 13:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dQ61uXg/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ez9AR5s2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AD41C695;
-	Wed, 12 Feb 2025 13:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BFE27181F
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 13:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739368192; cv=none; b=QVwFpPjka2t7945jvl24XtA/GDgtHh/5Tahx3RMDtEH9Z6JHxjSIe7brPO7jSZyzYU5x1eN/Y0tpwMPRFsovr9bqxwIJTFUTPfa1QV8riJexMuOTqHO4YPtDvnW13JlNue31UYdV9q9bvPxd4LKnP/nNft0NiFlLB61X26lR15c=
+	t=1739368393; cv=none; b=Pt97HG5gnoiA7bwTzZZdffWEQbP0OcwTAJtnHCrDOGOEYxNp4coY77TVKuxSL96VDrlyvD5gsU1P+iPpoGt0KeyVfYeAS1lpzz7/CKu7E8UST+W64P9mQyAmMgVk0434pHc5nhJvK5gxG5uCbxQo4ATVvRXRfUrWvjkh+My6UXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739368192; c=relaxed/simple;
-	bh=RcEvR6kg6kxofvCyZBw+YcQC8qJGSVlA6wGyaOGGXVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fe5Ls93O3VCzmWEqQo3UVNeJnLf4kvL85M7cng3EgX5SuPYV9QTM0BgeIMiODQHC5zPUlOUgexkVtaFz+SdfLwl+cYl1e3tUW77V6oXZUoW6FCreR8ae6YbLg+9x1TCYfcWRTwhgR9s90hcASG7m7p4mD/EZt/eTvx0+9Y/fOC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dQ61uXg/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=V8awgjnRjIsQYZrQ1w+BZZzdEbNxt1fTjOjgKBl+PTA=; b=dQ61uXg/y0xbYja2bf7zcT/eVR
-	zapLmhSRz5uBvVcFNUDd+FGSKT1XYRt65ZGx9yYTNQE2UjzMajSjXy6ntPXGIVQETeEi9r1EGhvGd
-	0NxNkxkoZrqwEPu3cQ561OSAW7fs49NlMDif0v764+I2bWTZ++ZKLDxeZbkEiJVk/dMQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiD7S-00DPPM-4W; Wed, 12 Feb 2025 14:49:38 +0100
-Date: Wed, 12 Feb 2025 14:49:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: microchip: sparx5: Fix potential NULL pointer
- dereference in debugfs
-Message-ID: <86cd2c99-7006-4ce1-abb1-8fe5e535fedb@lunn.ch>
-References: <20250212091846.1166-1-vulab@iscas.ac.cn>
+	s=arc-20240116; t=1739368393; c=relaxed/simple;
+	bh=duIGeCD7DQqBaSaKDgFs86FOwXOQSYFI2hjJ0M1RGhk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IfDwXuTcaCV/CtOXHnS+MNrc0+qZ6cgcjkvx9kwgYCq73KbQcH34tKfIQeTCH+Fn7skvxXWbcrpoQbXJ4ORP6+Lq7XU+H4NAnSpXMLUJRynH1/38yboHRkx/UA9myGQ3X2CVTpidn1x1X5c/jkMyn/3CMRdrV3fXOS3W16Vfwmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ez9AR5s2; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5de6ff9643fso6899397a12.3
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 05:53:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739368390; x=1739973190; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=duIGeCD7DQqBaSaKDgFs86FOwXOQSYFI2hjJ0M1RGhk=;
+        b=Ez9AR5s2eKWt37YZxlEFnSWYga466dELkDP0AM0ErnvdzkiZF6l0qZ4qfeJbD/CQCn
+         QtfvMYUFxLppT5sH2IZjGC4RlxRLw1DdnrdO/uFMX23HH3jLMaRnmmM4k5tZNl+UJWrE
+         YyZMQviqwfQMQVsqlz2LIdYsbDzbUa6kApvDEyWcAbXq6Io4OSSYeKYUEgGDRvlBAYMm
+         hQetb9iDSAe99bKKUp89zXZeOGKMx9C5CetkxisNbVcuYnpSWkUGfQAzyUp1t2Qxpm3c
+         kPFWwpQ3afYmHnSxfKCSPTQsaPTWFlWYSlj1qgphx2j6k8a8kJ0jHECHKnZHHbkojR5L
+         dM/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739368390; x=1739973190;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=duIGeCD7DQqBaSaKDgFs86FOwXOQSYFI2hjJ0M1RGhk=;
+        b=cHgDdvG7gmIkxLGCNPAw+Rkiqthl9Et9cUj110SEZzC8Zj6uNilfK1Ey1O8DsAEO4Z
+         9DEEthVs0+mb8IkhoJCgP1HpSWmrta0mTTsK+BhSj1+UgfaX5oDxJnmTUIW15RJvW/q7
+         D1G89zdeJjaTXg6czxa1CVAlmJe05E+TfGPiQs7awyGOtSfZXv5vCjlIh2hG9910Gw1E
+         14aeyFdLhiFnoeQGaMAVe6S9e1IF4+FX3tl0l5e5wZk+1paSJTkxetg7DHgioEY7Ad47
+         1Ovf5RkvbEvdMIeNkh8DFY6+1hSRi++BtJ+J9ZC9wWImGNSaePzcllQH4y2Smc4DlJoh
+         2HoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWslttk8h0WuDdP1hoY4M7vNpfZzeypMr9HeuyLP/DUSS+Zp7qPgwgyU9JjYmmLflVAC6+q1IQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuLfcJbCIIDxKWvkqNv8GG585KxkDjNeoERTsjWxIlJOTdf0QA
+	DXescfWyYyC0VRytvEIw6tb0izQukrKd2RJbOTDbsL1pip3Y8CXzAxjjg3uGkyNK1IiDsoQynvS
+	P+i8F7B0CKR5mYvygyWLFiQAP3Oie1pBV2anVBoOdKntozbDgBQ==
+X-Gm-Gg: ASbGncv74o/uaUUzQL2vfdjWruRTpVI2I58dZ1gZEf/Ut67GH9TINSemf6HTNS/KEhM
+	ispfzMCpLYs9u5/INH6oCGmTWAPmgjCvQOTqu+HCfEB/GK9rQXjyLsQObDow57xIIjFK2vHIGFg
+	==
+X-Google-Smtp-Source: AGHT+IHWT3Fw99k8rmUsBupjchI529P8UaEs+qwtxt1zBa+t8emzveHsEDNtlwslxSSpDudwkGyUNsJVISQu3Jyz5Bs=
+X-Received: by 2002:a05:6402:238d:b0:5de:a76c:9c7c with SMTP id
+ 4fb4d7f45d1cf-5deaddb918cmr2348294a12.17.1739368389961; Wed, 12 Feb 2025
+ 05:53:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250212091846.1166-1-vulab@iscas.ac.cn>
+References: <20250212064206.18159-1-kuniyu@amazon.com> <20250212064206.18159-2-kuniyu@amazon.com>
+In-Reply-To: <20250212064206.18159-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Feb 2025 14:52:59 +0100
+X-Gm-Features: AWEUYZm5g-y54DjnKyJOkMPY7FLFaqe2F3rapksQifQzfxt3ZYRRGP9x2Krrhpk
+Message-ID: <CANn89iL3kZ3e5peUwO8k=5mC5nzbzSA7QM8wUKBmc-RBmr6tng@mail.gmail.com>
+Subject: Re: [PATCH v4 net 1/3] net: Add net_passive_inc() and net_passive_dec().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 12, 2025 at 05:18:46PM +0800, Wentao Liang wrote:
-> In vcap_debugfs_show_rule_keyset(), the function vcap_keyfields()
-> returns a NULL pointer upon allocation failure.
+On Wed, Feb 12, 2025 at 7:42=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> net_drop_ns() is NULL when CONFIG_NET_NS is disabled.
+>
+> The next patch introduces a function that increments
+> and decrements net->passive.
+>
+> As a prep, let's rename and export net_free() to
+> net_passive_dec() and add net_passive_inc().
+>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Link: https://lore.kernel.org/netdev/CANn89i+oUCt2VGvrbrweniTendZFEh+nwS=
+=3Duonc004-aPkWy-Q@mail.gmail.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
 
-/* Return the list of keyfields for the keyset */
-const struct vcap_field *vcap_keyfields(struct vcap_control *vctrl,
-					enum vcap_type vt,
-					enum vcap_keyfield_set keyset)
-{
-	/* Check that the keyset exists in the vcap keyset list */
-	if (keyset >= vctrl->vcaps[vt].keyfield_set_size)
-		return NULL;
-	return vctrl->vcaps[vt].keyfield_set_map[keyset];
-}
-
-I don't see any allocations here which can fail. I do agree it can
-return NULL thought. So you code change looks correct, but you commit
-message is broken.
-
-
-    Andrew
-
----
-pw-bot: cr
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
