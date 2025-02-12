@@ -1,124 +1,193 @@
-Return-Path: <netdev+bounces-165701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA66A33216
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:08:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFE0A3321C
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB6E61681DF
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:08:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 958F27A45C2
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8872036E6;
-	Wed, 12 Feb 2025 22:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C16C2040BD;
+	Wed, 12 Feb 2025 22:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOdeaRY2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3uDUavh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C1C20011E
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34545204095;
+	Wed, 12 Feb 2025 22:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739398117; cv=none; b=PbbuS6PPt8vCJmrtlHvjReztaWfd+ZL1KWwvPku2RArEcCvs7YMR405ZjK/d4wGci0Rx2f0iH0iMJjmOOta07h34uVTYnTvZ37s0cH9yqc2D8zC9ebprSeddzXLkvNPfmD9K5RnvkdQmuLV87R4Bx+1/OVHAMBpFnHFbE7SHsGU=
+	t=1739398135; cv=none; b=TA+/3l7JA+l/D2YHm8katm25KYS4tGyOTOq8rX23ROsPP3A+GZ1OgzqvmdHy/9jZunkQh85bwNlfgFHkgv+cvfrL1o5Ws9UcLmRfgvmClHdWL/1PM44nAs/z4awBsMS6dH7/uUN1OJr4WWFbUg4PkDpClKLHgdjD0tLXus5a4WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739398117; c=relaxed/simple;
-	bh=Ro2MVt8tW1Gnnh74OercKd727stShUoKnHVmKhWiYg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DvFl1rmncfUZE8lMVSDgX/OxVCKEhaelyArmELvvoXSn1eF753n9h5aKGXttnAlJJZ2WG2fm6HNjhM0z9ytq7iL8RVbIN2/9bfGBlVsY1lBugVhJVf9vypeEHdhfpGHHqU3gZ/O+3M2uHBqPjeSl8v2UC+wU/rjIoT8TbWeDdrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aOdeaRY2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739398113;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tOR1P5WoGAyvX9t1uWMUcn4uIp0BivM1RbHensx2710=;
-	b=aOdeaRY2EakCHQ0Gxq8mCwBWl+R2oWQ4F6Sv5HM+Fmw7RlGOQwA/Kj88p1bI5b+GgcBJ2J
-	DVOJphdFh//OS7GCG/2fg2OYdOUM0wW9jwEkT8BuVPq8TBb9Pi5UvG2nwNLUP/yLhS6cn9
-	aASHfCP7Hjm7jiweO/nUlYHrMzF0sE4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-JIPmJOEJOq2ITePzKLHp6A-1; Wed, 12 Feb 2025 17:08:31 -0500
-X-MC-Unique: JIPmJOEJOq2ITePzKLHp6A-1
-X-Mimecast-MFC-AGG-ID: JIPmJOEJOq2ITePzKLHp6A
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dc88ed7caso127144f8f.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 14:08:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739398110; x=1740002910;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOR1P5WoGAyvX9t1uWMUcn4uIp0BivM1RbHensx2710=;
-        b=OMF+K7NWEXr5s3l+fobRAX8+7IU418Us6qBuenr++Bf9eG43RDsqiDC16xttcoeLHu
-         /h9ldPUP3crJfPgVoA2RUebGfKmWvyKOjns5jylVHWyyEfgSyqCr5my0ne3vraQ8rExf
-         8qbDCIktu8mAlJ3Rsxzm4OnrIIYOEsCD827H6iiSPYuVsaKeAk21KM6Up02KlU2rNn0d
-         ZYp1+yoHnTE9W+D0HmaJ5dVc9FswNKwaa8wLgM4b9t6kFMcIbaB64n281Iqs/4lCit6l
-         uQmihM09ssmVsL0hOj2zmRUEz8gjhZG0bmBcgZkyhEx2vNjFQ6w6RhVdi1Gn3sJkk/Ga
-         dorQ==
-X-Gm-Message-State: AOJu0Ywwoe7Bo9DyNoS5+bjS/SbQwtiiirna0x2+S9HGIzyrdKo6Xs2I
-	BYK1PWeXbh6Q/u0WJaz1/vodrTxGEAKLKKjo6omSgamYUjuvTs2x4rB65kFpaWd/6AfTA5lHBLR
-	fU+1WABDCCsDGlZ6VYqJ130GJfoW+MpygWCPqxMS41dzQ1CCitRiE9g==
-X-Gm-Gg: ASbGncv+A0rZIIylKiJyZsHc95CHOzZx8n1CY/g1tjkD7EaNP7GQ0JNkkeJAss2tqBd
-	Y1VvKKPFSWSuf3GE6aDoMUdVzXkObVKXI/F+jdIT4+mF0uN6+o5jeYPqGPdO0oqplheKaRAkFwL
-	B3iAy06g7VPtvtHqdDIOi9YDOfWz3pqwwYNWNGqWs0N5jieY4JGyP1MqvkFEHQmEVSEGziuha/D
-	2UExgGV8f4NLP6ETdDwNuJc2AkpFow9GxduBee3RjBA4cAG/q8KUwYjP94R3gHeWL1qO7SyetMW
-	FMFrljEtXYWbcPqwJ13Q0n8nToz/JHpcDrI=
-X-Received: by 2002:a5d:5f51:0:b0:38d:d969:39c1 with SMTP id ffacd0b85a97d-38dea25279bmr4046721f8f.5.1739398110533;
-        Wed, 12 Feb 2025 14:08:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNX5XhjWipbCPE9R0NHr0tKFkz/A4fBe7y3TjA/LUzhnrvL8f+ER/PvEGOupaTx2odBGgvTw==
-X-Received: by 2002:a5d:5f51:0:b0:38d:d969:39c1 with SMTP id ffacd0b85a97d-38dea25279bmr4046709f8f.5.1739398110030;
-        Wed, 12 Feb 2025 14:08:30 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ccd46sm99738f8f.21.2025.02.12.14.08.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 14:08:29 -0800 (PST)
-Message-ID: <504a90ea-8234-4732-b4d0-ec498312dcd9@redhat.com>
-Date: Wed, 12 Feb 2025 23:08:28 +0100
+	s=arc-20240116; t=1739398135; c=relaxed/simple;
+	bh=RSxeycxN+OR2igWs7iCrFsgBzSuOib+ZW47/gosGsbo=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=l5VtPGxfS4bqFGfcTONf/oAJ4BAsPis8Sod3438iboTYixdn+N+r/DTC1kWPIykTPoBN9LEUsRu5V/6nwlHseSR7hosgrVFNNSNumo1I70Z2PVhoy0HgGBeRlaDCRn8d3RtEOkj/VNf8fghrESlejxZfVCZNMswsZBMDjQtPRiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3uDUavh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D87C4CEE5;
+	Wed, 12 Feb 2025 22:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739398134;
+	bh=RSxeycxN+OR2igWs7iCrFsgBzSuOib+ZW47/gosGsbo=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=S3uDUavh3srVd/+ScWyYzIgrv9yfSjD3VWdiUs8F90WyBe+qeaVzl7rfrHgoMyJna
+	 5O92+xsrNLpe8Wx74mhBcJRud9eVDTo0YFmFEk3RWeQroO9xJAnWW1X1GgvcQYHeDc
+	 HpTA6edH7JXUog7PEVIKlfYfWRbVkXJR0GOFahCYDF8FksTcB+kh1HkuvX7BoeJPha
+	 lntcn9Jr6Zsvj8tcwZKvZSWpgHDCaDHIcvwvqwnJxZj5OPg+BxwbdUrK9c5YcqPVgE
+	 CgIAv9ML+/T+BA9G46HeWIU/vjVCmXh8IHjnpZBCDBE9yGB2T52Nf1ixzUnRR8Ct02
+	 XkDycYYo+ykow==
+Date: Wed, 12 Feb 2025 16:08:53 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: allow small head cache usage with large
- MAX_SKB_FRAGS values
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
- <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ Ajay Singh <ajay.kathat@microchip.com>, Simon Horman <horms@kernel.org>, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Kalle Valo <kvalo@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, Marek Vasut <marex@denx.de>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Marcel Holtmann <marcel@holtmann.org>, Conor Dooley <conor+dt@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+To: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+In-Reply-To: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+Message-Id: <173939808305.598743.2426492109317429179.robh@kernel.org>
+Subject: Re: [PATCH 00/12] bluetooth: hci_wilc: add new bluetooth driver
 
-On 2/12/25 9:47 PM, Eric Dumazet wrote:
-> This patch still gives a warning if  MAX_TCP_HEADER < GRO_MAX_HEAD +
-> 64 (in my local build)
 
-Oops, I did not consider MAX_TCP_HEADER and GRO_MAX_HEAD could diverge.
+On Wed, 12 Feb 2025 16:46:19 +0100, Alexis Lothoré wrote:
+> Hello,
+> 
+> WILC3000 ([1]) is a combo chip exposing 802.11b/g/n and Bluetooth 5.
+> Support for the wlan part has recently been integrated upstream ([2]) in
+> the existing wilc1000 driver. This new series aims to bring support for
+> the bluetooth side.
+> 
+> The WILC3000 chip is controlled through a SDIO or SPI bus for the wlan
+> part (similarly to wilc1000), and uses standard HCI commands over a UART
+> bus for the bluetooth operations. This work is based on the code
+> available in the vendor kernel ([3]), in which bluetooth is managed
+> directly in the wireless driver, and relies on user to trigger the
+> hardware configuration (chardev manipulations + hciattach). The series
+> brings a new dedicated bluetooth driver to support the bluetooth feature
+> from the chip, without relying on the user to perform the device
+> bringup. However, getting completely rid of the wlan driver dependency
+> is not possible: it is still needed for early BT CPU configuration and
+> BT firmware download, so the new driver still have a dependency of the
+> wlan one, with an approach similar to the one used by the rsi driver.
+> 
+> - Patch 1 brings the new dt binding
+> - Patch 2-9 prepares the wlan side, either by exposing the needed
+>   functions to initialize BT, or by mitigating behavior which would
+>   prevent BT and WLAN from runnning in parallel
+> - Patch 10 brings the new bluetooth driver
+> - Patch 11 updates the device tree description for sama5d27_wlsom1_ek
+>   board (which I used to validate this series) to use the new driver
+> - Patch 12 adds a new entry for this driver in the MAINTAINERS files
+> 
+> This series has been tested with WILC3000 both in SDIO mode (with the
+> chip embedded on the sama5d27_wlsom1_ek) and SPI mode (custom wiring on
+> an SPI on the same eval board, with a WILC3000-SD).
+> 
+> Since this works needs new code in both the existing wlan driver and the
+> new driver, I have included both linux-wireless and bluetooth mailing
+> lists, while keeping the entire series for clarity, but let me know if
+> you want to proceed differently.
+> 
+> [1] https://www.microchip.com/en-us/product/atwilc3000
+> [2] https://lore.kernel.org/linux-wireless/20241004114551.40236-1-marex@denx.de/
+> [3] https://github.com/linux4microchip/linux/tree/linux-6.6-mchp/drivers/net/wireless/microchip/wilc1000
+> 
+> ---
+> Alexis Lothoré (12):
+>       dt-bindings: bluetooth: describe wilc 3000 bluetooth chip
+>       wifi: wilc1000: add a read-modify-write API for registers accesses
+>       wifi: wilc1000: add lock to prevent concurrent firmware startup
+>       wifi: wilc1000: allow to use acquire/release bus in other parts of driver
+>       wifi: wilc1000: do not depend on power save flag to wake up chip
+>       wifi: wilc1000: remove timeout parameter from set_power_mgmt
+>       wifi: wilc1000: reorganize makefile objs into sorted list
+>       wifi: wilc1000: add basic functions to allow bluetooth bringup
+>       wifi: wilc1000: disable firmware power save if bluetooth is in use
+>       bluetooth: hci_wilc: add wilc hci driver
+>       ARM: dts: at91-sama5d27_wlsom1: update bluetooth chip description
+>       MAINTAINERS: add entry for new wilc3000 bluetooth driver
+> 
+>  .../net/bluetooth/microchip,wilc3000-bt.yaml       |  41 +++
+>  MAINTAINERS                                        |   7 +
+>  .../boot/dts/microchip/at91-sama5d27_wlsom1.dtsi   |   8 +
+>  .../boot/dts/microchip/at91-sama5d27_wlsom1_ek.dts |  10 -
+>  drivers/bluetooth/Kconfig                          |  13 +
+>  drivers/bluetooth/Makefile                         |   3 +-
+>  drivers/bluetooth/hci_uart.h                       |   1 +
+>  drivers/bluetooth/hci_wilc.c                       | 333 ++++++++++++++++++++
+>  drivers/net/wireless/microchip/wilc1000/Kconfig    |   3 +
+>  drivers/net/wireless/microchip/wilc1000/Makefile   |  11 +-
+>  drivers/net/wireless/microchip/wilc1000/bt.c       | 345 +++++++++++++++++++++
+>  drivers/net/wireless/microchip/wilc1000/cfg80211.c |   7 +-
+>  drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
+>  drivers/net/wireless/microchip/wilc1000/hif.h      |   2 +-
+>  drivers/net/wireless/microchip/wilc1000/netdev.c   |  14 +
+>  drivers/net/wireless/microchip/wilc1000/netdev.h   |   5 +
+>  drivers/net/wireless/microchip/wilc1000/sdio.c     | 101 ++++--
+>  drivers/net/wireless/microchip/wilc1000/spi.c      |  43 +++
+>  drivers/net/wireless/microchip/wilc1000/wlan.c     | 154 ++++-----
+>  drivers/net/wireless/microchip/wilc1000/wlan.h     |  23 ++
+>  include/net/wilc.h                                 |  19 ++
+>  21 files changed, 996 insertions(+), 149 deletions(-)
+> ---
+> base-commit: 95f6f2d73dc40ab53a94756689ce5cfd2f23361a
+> change-id: 20240828-wilc3000_bt-fa452f2a93ad
+> 
+> Best regards,
+> --
+> Alexis Lothoré, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+> 
+> 
 
-> Why not simply use SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) , and
-> remove the 1024 value ?
 
-With CONFIG_MAX_SKB_FRAGS=17, SKB_SMALL_HEAD_CACHE_SIZE is considerably
-smaller than 1024, I feared decreasing such limit could re-introduce a
-variation of the issue addressed by commit 3226b158e67c ("net: avoid 32
-x truesize under-estimation for tiny skbs").
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-Do you feel it would be safe?
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-Thanks,
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-Paolo
+  pip3 install dtschema --upgrade
+
+
+New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/microchip/' for 20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com:
+
+arch/arm/boot/dts/microchip/at91-sama5d3_eds.dtb: nand-controller: #address-cells: 1 was expected
+	from schema $id: http://devicetree.org/schemas/mtd/nand-controller.yaml#
+arch/arm/boot/dts/microchip/at91-sama5d27_wlsom1_ek.dtb: serial@200: Unevaluated properties are not allowed ('bluetooth@0' was unexpected)
+	from schema $id: http://devicetree.org/schemas/serial/atmel,at91-usart.yaml#
+
+
+
+
 
 
