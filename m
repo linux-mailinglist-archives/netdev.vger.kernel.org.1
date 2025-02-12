@@ -1,535 +1,317 @@
-Return-Path: <netdev+bounces-165554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44499A327BB
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:56:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A24BA327F9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F33877A19E4
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:55:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C93A91648EC
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DC420E326;
-	Wed, 12 Feb 2025 13:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760C620E718;
+	Wed, 12 Feb 2025 14:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbwdwCcO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MbWJqNZl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2044.outbound.protection.outlook.com [40.107.94.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642D120AF89;
-	Wed, 12 Feb 2025 13:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739368579; cv=none; b=rcpFx2Q/HYR9hqxUJ6zg+zY4Z0CObhCTeehAodubBY7kPNhqGiunK4BsW3tAPdKcTlescw4dfnRKxT2uVf6M1wYq1bBjtM7ld5uRfHCdn8L+S3rqC8qT0mT1WsZ21Ow+jhG/VaKpYYzR+VQoqhbV4VKtEqucfddeyox+ACQu8R4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739368579; c=relaxed/simple;
-	bh=BzAkMONxLE+pzP4f0umHoxNcbDJmrQ2tjulSgksZOgg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I7GTi1m+xJ+2A8z3lcCO6/2oKVAMIVO6DRO53SqmHnpb5IvIYlUtPC8QF0VSgROEMTpZI3HpJ1+PXHkrjkg14MAtjtfxyWsiVNlARpgbXOJtL0Ntq7c1e9IG6GAqFbBsEPiGIXnQualTKzOpDq3dOoueGUuH6+4yc/6Zp1mraJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbwdwCcO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 144F2C4CEDF;
-	Wed, 12 Feb 2025 13:56:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739368578;
-	bh=BzAkMONxLE+pzP4f0umHoxNcbDJmrQ2tjulSgksZOgg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bbwdwCcO+mXK7qD2YtCIT183Hjipbd8L6wK4DweQ0X3dCpOTUUvwMh1/M6z38Ioxi
-	 z5hbH6OAHlPVl9Hf9XQHc9p4zh8sb7r0iEZDobarmGp/pdZcO0UwAPufdqdymmLP3K
-	 YBlkeVSWFPU6JchJ8Dsg+O/onSb39VxlRXapoiTEsML39S9nFcB24CFtVbdFPEc6Kj
-	 HDNU9xC0vlYMXbltelw5CZ3aqDDCTscTlD14/LQ0NDktwChM3iyXbOWfI0Aaq8hBrm
-	 YEw01gNYtC9Wtd+oUpAzyjHMtdH3SImGf0nvVNzVKTs1QqFNL8uEAuCdmoBV4gKKeX
-	 5x5SrA1lvLxkg==
-Message-ID: <152b032e-fcd9-4d49-8154-92a475c0670c@kernel.org>
-Date: Wed, 12 Feb 2025 15:56:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9DF2AD2A;
+	Wed, 12 Feb 2025 14:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739369253; cv=fail; b=H6RO1V+gMzgIhk3PNT5gLglrWsyMAjeufF/FiYfHZXbZjDxpxTC731L1KrKzFZf0ygZRYrkB8P3umAVOlZiv+MtPGFS8HRt6hj80dLi7irgZeOqq8qXLeMKj0uYjmZf865uJZTBNhKV9rQiLaDV4BeNJVVCjQOm8YuRGfs08LVI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739369253; c=relaxed/simple;
+	bh=fyBNE22IB466ttLX050co0MlvmvKZvVFevGj08Nhx0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WyZu5d+pbJhrlCRsVs6OlTh6H1qo51MMG3kIajhHqncUNbZZQLLi+GkCdn3/MVNRvgRmJxq3Mi1pKbVX4h6HiLD4Kr1Y/pNNGJpYHRlyaQ2ZnGv9dqgBrdJnPpPop6UPc1MVumizjpbfdXkrRNaJAfapiv/f59PklPnBqjnE4Nc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MbWJqNZl; arc=fail smtp.client-ip=40.107.94.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yqJmRZR1xaUbDyAsek9rFeapC8lxVj/a2sa8QE0Tf4m4tMlcQwNKOvPdzkkAOMu/QNKqftg26zOgZC2PvzSGRMeuUggiE3iVFBtQVJryNIASa4QhOGyNQn3Eji+xRUUN9RT6zOX30UhADRraENh23e8TiltHIIChPGdwpeZRyU5aF+Ufwe4PdPm3ZjFbxQ6YFudW4n//AtJPbfiwFgsUEUrYg2orE9RlULkgin6kcGwKFdwLzrmL62sUsdpH4/W/XitWytL2Y14QBzltCkypgl9nyeGnIIpbizAazEowOlA6CP/P5YSwXLwIZWnY+sseL93fsJqOikh5Ua19Blfq7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DtHTHFJGd9vQWYz4qO/RjQyfPF47uj8KBfY84+j9mpk=;
+ b=KhlJ0ezgcUdp2egryPmEW2y8d5SgLc8CMAiqCA/imez9VBVLwh7Hs73lxb9gYq7NmsGCGM6RJ8MS8VElrwtOsbSDxdqHWrVNPKRtUSKAhZJkHS5JpaZvfLeOqqO3M5qMa1Lj7q4FgQ0iMJG6HFsvqkwhjNMXLQz/MMk9b8fC+MfOnDZuIIcgZIg9FSYe9HZp4/PeTVA0FvkJQ1hHfmekmFDsnkosRU7Lax5gu1u4WeLXjbbQDt0cTCSgsFN1k9Olz3IHa9oRiJbDU2tyCj21a6fR/IZc/qbj9IL1+PeP18XsmVrfxohaMCNsK3Xnjl4lF8ljVM275fBzjc2pjRYGOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DtHTHFJGd9vQWYz4qO/RjQyfPF47uj8KBfY84+j9mpk=;
+ b=MbWJqNZlnUhq086gVNAdnVNdl/web9qH2yvG9/sc+cDppDIdyIBzhr8STWZ7qe9FrwtU2GFrHGYe/PFYIgrMeZqq/9XvZNWCWgVDJL6+6cCyj/amzHsNWvx8Uh3Q/AXNWnPITUI33rLDtnnDzgcL3At7nYfidsTAtcom/YcD8g8uJKNAU6GmNUfpZuw97dezi7T3hXi1ACVfOVrLFWkOhXF6Ry0e13ZYCw/7o9Y7SFsVKOlQ38CcCYZD3ud+d3to3br7BDo/8JLPxXoazkv8zrsNrEMGoRm4z2/AWLjooGJtSpHsELydi/56Mw1XP0V44fLGmB9ZSh2ldMbrcr4YFw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by SJ2PR12MB7824.namprd12.prod.outlook.com (2603:10b6:a03:4c4::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.18; Wed, 12 Feb
+ 2025 14:07:24 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%7]) with mapi id 15.20.8422.015; Wed, 12 Feb 2025
+ 14:07:24 +0000
+Date: Wed, 12 Feb 2025 16:07:12 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, amcohen@nvidia.com
+Subject: Re: [RFC PATCH v1 net-next] net: mlxsw_sp: Use
+ switchdev_handle_port_obj_add_foreign() for vxlan
+Message-ID: <Z6yrEKgtv0xQfMDF@shredder>
+References: <20250208141518.191782-1-ericwouds@gmail.com>
+ <Z6mhQL-b58L5xkK4@shredder>
+ <20250210152246.4ajumdchwhvbarik@skbuf>
+ <Z6tfT6r2NjLQJkrw@shredder>
+ <20250211152353.5szhbv7kdlf6bca3@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250211152353.5szhbv7kdlf6bca3@skbuf>
+X-ClientProxiedBy: LO4P123CA0422.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18b::13) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] net: ti: icssg-prueth: Use page_pool API
- for RX buffer allocation
-To: Meghana Malladi <m-malladi@ti.com>, danishanwar@ti.com,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- u.kleine-koenig@baylibre.com, krzysztof.kozlowski@linaro.org,
- dan.carpenter@linaro.org, schnelle@linux.ibm.com, glaroque@baylibre.com,
- rdunlap@infradead.org, diogo.ivo@siemens.com, jan.kiszka@siemens.com,
- john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
- ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
-References: <20250210103352.541052-1-m-malladi@ti.com>
- <20250210103352.541052-2-m-malladi@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20250210103352.541052-2-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SJ2PR12MB7824:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7520903-7c50-4206-64c3-08dd4b6e92c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?JKr0PAIAVsIG7WJ342t3BXeTR8uekO//Bm9fRTNt3D6e1e5NVfZ6fWfD1XHU?=
+ =?us-ascii?Q?RnR4vxCrdc44OWdRxdi4ij1TvSoeZDZOCx6w3B4yY5UcbUlL0cY5ToAPHOei?=
+ =?us-ascii?Q?+8oarsR1GL1OlI74jkyztJ+9ZrLnkwoqY/XlcrBf7YBV8KLyFriryTN+qF8m?=
+ =?us-ascii?Q?ESAvdA97b63QIu+1N4NXVYZqHPPz/7rpCaDmixqkP5/iOdq4fe87jOZrszq5?=
+ =?us-ascii?Q?UgBqRQHcT3q48OJWe6S7iei6a4yp4u76YXdQSrOzqg9tZBx50ZWnD66dIZb7?=
+ =?us-ascii?Q?eZeaKZY5YIfmTFC1WEzeAyy4JS95km4pN4P/h/BzlFjTgA1mBHRJW9X+ZGAd?=
+ =?us-ascii?Q?k/jArJHLIEkldMGUm7wMz/ElR20MSuXgJUYSukRvA8bIBstho1dAmunxQwwD?=
+ =?us-ascii?Q?M8DqhzCUrtzALmAA8mJz2m6P4yQV9bKZfxC/Z7nLHkuJgFO8wTTHReBotd77?=
+ =?us-ascii?Q?Se4P5IjmsuWy8veylKbiglvw4gtt7Jssz874HWdUYPVV9N/dlhHMDyE7JQ2S?=
+ =?us-ascii?Q?AXzJ9OAA3aIncP4kbQKOKV9dihSEjFW/vPZtimwHcNTAmNmPzTlxLmCXqUL8?=
+ =?us-ascii?Q?hDZwr4DjNdz9pKyurm3EFDjKv8sNJcuQHnenZGn2BDN8hsWWaeo7wzJhyECI?=
+ =?us-ascii?Q?Ghl4Db1IAQfmk1NocOdngOQAsHqoYme9O7qxAI80DZawODHSQHxNNrXS0mMb?=
+ =?us-ascii?Q?rXsW02Aq5vlKr2rVRjK7OsSJYuXFdEP/xIQoxUIUiCh4g1uRf7EGUWkqsWid?=
+ =?us-ascii?Q?rQoLP4dp4yyN4NrD5TjGJ4wCoa+UE165tKTP6JjbAQ16OR8RrJh0jATDoNym?=
+ =?us-ascii?Q?PqqhFLSL41uPk01EWWFHOGewsXzuVD+yjKhWXsrfSID5kwCZVbxdlxsDszpc?=
+ =?us-ascii?Q?hWtpE7HV6+Ulfup1c7+qRC3Tr9PzGLTkqe71M313nGJF8tC9YBWkB11luUuO?=
+ =?us-ascii?Q?ztf23myRMGiz3dLJbQDzMuYads9PbiUuX7Hf99NfGFKL+JKx3K714CWKNvwg?=
+ =?us-ascii?Q?JUB15UujSaoahJ3MuqKb93PILZ3Ha6Bkp0i0SBsXO+2laYIC0oQY5VIK3He0?=
+ =?us-ascii?Q?aw5cjjRWwMHaaGTN7Cy/Uw9YSX5+XnRVV/SV473TPuK9F7rwL/jwPToc9Ba5?=
+ =?us-ascii?Q?xiHJtY+jIax2WcGzB8dLY93xly5JyRbJv8nJuunvY8iNZqn/F5a5jEvISOrC?=
+ =?us-ascii?Q?/3nzoMwHHunpie90mrxqdcleuIcGxTY3SYMFXlTfPj6B3fJ+hw7dQn/VjtiM?=
+ =?us-ascii?Q?dxcR91SK5Ahr4aHuW0SmTfmu9MRDqXw/cePKbzLicHqM/pAx27gWsQM/8pXL?=
+ =?us-ascii?Q?j+ukjn8sMT9iZFFze8bJAVtPmcCpZItvCxVvbex+nwsMgHpOnZqMsBoQUiKF?=
+ =?us-ascii?Q?pjog3ePuLRBMhJMoazeJy9nofqSi?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wuBnDCqs23B6HBsvwPtjMdvb4HB+Z6R6gvD/f5YV8VW4/0WU/OPkXkPsVNFq?=
+ =?us-ascii?Q?p6ZdgXnJjVtq4qBPTgbtNuHo90ow7KtZ1PbvYXaTsTiwrbg6I/EFgsq+U0Yi?=
+ =?us-ascii?Q?6B0LKZLW08rmELB+lWzXX1k/I50iscAEnPeXcWykRCnMjbQjd2va7WzGzw6n?=
+ =?us-ascii?Q?1VuvMpFj2KUpFVV1akKrLwUqKvk17Ow5m70pgo7Otn2R5k7DD4+9VycfI7SX?=
+ =?us-ascii?Q?Vh9UtsfOYo5bpdFPOPjBEILx8kdulLD98rrNfA2Jxm6jAu779VMr5yqKU8uK?=
+ =?us-ascii?Q?gg97h5kYjZK0DaDYGUEf7ABvOVPf6idjh+ih2sUYAvqD38S6+ngPP5ZEDoRC?=
+ =?us-ascii?Q?Qh5DlUjl8zQtuiX2FHIDbwHk2LxPvAMHqzPBQCVNSLu2vaiYv/OfzbilEvVt?=
+ =?us-ascii?Q?19AiWIwLiL5Txf9UxsMOHpMjFQbF90fE/++GNvNkxV7GNQNAXeBLtONSzPLf?=
+ =?us-ascii?Q?ESj3QQwbdmJNf+rlRCu2xnU6tFssAab5c3clEV0DuzZ6cSHVsWhdC6EbGzAo?=
+ =?us-ascii?Q?YvP3p0CN17XSWTM3scGrBKYXyjR5TgGz9KzJupBZNx0qMa41SjkEe2eeXRNR?=
+ =?us-ascii?Q?3QM75RhPL1E5QI8D7RpcEfvmxDPOy9JSUvn7y6qRJPCf1ncNsj11Q651O3bq?=
+ =?us-ascii?Q?kgkPq9FCDJKaRCOgpfAlPGt01n2mhq7JuwgpytLIcHNEU5ETJdN04IX810CM?=
+ =?us-ascii?Q?DOrquCub4vVa68LqR3cvsJH8BmrznmbDXhJyv6Bjna8b0JGOuuTjjdvX677w?=
+ =?us-ascii?Q?iVMP1mVPniDKRdQPqVznsBOD2OXdz27Q745d0AumNXmUeC6jVzigIw5V5SES?=
+ =?us-ascii?Q?TMUSPTLW4bDPSgt7dmGaNOXn9Hh+S9LnsrTIytpmcu5zLmUIgM9zbVnSlr8L?=
+ =?us-ascii?Q?j16amgP6mgCns3+xuJin7a1ic2WG6kGuT0lcXtebGFEevJob58157Ff7Fb+u?=
+ =?us-ascii?Q?IfEq097NGtuIB2f9HuVIdbOEbC0RB3MzLGLF3N0mOf5TB5/35pxo/P7A9fFQ?=
+ =?us-ascii?Q?5oOrKBcs5xaQc71Wd6Do0jIP/URqubp9PXFG3c6nObWcxwvfHpFgF+5cUjG5?=
+ =?us-ascii?Q?Phc1/JZFGrWPH0hWYwtIJ8nEg7bi6Az4F+XKecNAS8d7QPZHC6DXNanvrgE5?=
+ =?us-ascii?Q?PR6CNikkr0CDEoUFcW53/zwO5/S3ZrDW947leJ46kF2S3PcDjvIu1KgY4n6Q?=
+ =?us-ascii?Q?EhhSrzX7Y5o5hNu2tVD8NMlYPdMgtkrwhki1WA5+mhG2tH7f3Qz+M2gyIYQG?=
+ =?us-ascii?Q?cuNENqmtETzKnavMYHF3DHG7xSmO6MrJirzGqIApZmTuEmKw3k/Rg0d9yT1F?=
+ =?us-ascii?Q?4eUt7NvH05NIWmWZwH4yp7z6SZfaI6v4Ym8QViAr80ErTU7vvXqPVAvuk/bl?=
+ =?us-ascii?Q?4wiPFB2h5pPB+7mpPDgHuzIdMCySgf9EUpjiuSTOraeDWhwDotb1DGceRPB9?=
+ =?us-ascii?Q?xXFMtS32KC2GJ8g37grAYvbjoe5l1KpazgP5dJlwzQ6F3Q90rvdUNesNjvvE?=
+ =?us-ascii?Q?4u8Wi8m9ou9qTZxxuTRQixsxDc74Qa6SfAKIrRxTLAsFrH8eu3BerY5dM2kF?=
+ =?us-ascii?Q?HXss2hKP2N/wOs7MisNtEONeF1H+PKRI2uvHhsFi?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7520903-7c50-4206-64c3-08dd4b6e92c9
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 14:07:24.0606
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wf098OOTgVTaZJc0sBWiJ8fgvxmgTxUqNiW7qqSCzEo88NGNtSIePJdGp0pZnWVXpn0dknc7O7kH2VR8HiDYSQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7824
 
-
-
-On 10/02/2025 12:33, Meghana Malladi wrote:
-> From: Roger Quadros <rogerq@kernel.org>
+On Tue, Feb 11, 2025 at 05:23:53PM +0200, Vladimir Oltean wrote:
+> On Tue, Feb 11, 2025 at 04:31:43PM +0200, Ido Schimmel wrote:
+> > On Mon, Feb 10, 2025 at 05:22:46PM +0200, Vladimir Oltean wrote:
+> > > On Mon, Feb 10, 2025 at 08:48:32AM +0200, Ido Schimmel wrote:
+> > > > On Sat, Feb 08, 2025 at 03:15:18PM +0100, Eric Woudstra wrote:
+> > > > > Sending as RFC as I do not own this hardware. This code is not tested.
+> > > > > 
+> > > > > Vladimir found this part of the spectrum switchdev, while looking at
+> > > > > another issue here:
+> > > > > 
+> > > > > https://lore.kernel.org/all/20250207220408.zipucrmm2yafj4wu@skbuf/
+> > > > > 
+> > > > > As vxlan seems a foreign port, wouldn't it be better to use
+> > > > > switchdev_handle_port_obj_add_foreign() ?
+> > > > 
+> > > > Thanks for the patch, but the VXLAN port is not foreign to the other
+> > > > switch ports. That is, forwarding between these ports and VXLAN happens
+> > > > in hardware. And yes, switchdev_bridge_port_offload() does need to be
+> > > > called for the VXLAN port so that it's assigned the same hardware domain
+> > > > as the other ports.
+> > > 
+> > > Thanks, this is useful. I'm not providing a patch yet because there are
+> > > still things I don't understand.
+> > > 
+> > > Have you seen any of the typical problems associated with the software
+> > > bridge thinking vxlan isn't part of the same hwdom as the ingress
+> > > physical port, and, say, flooding packets twice to vxlan, when the
+> > > switch had already forwarded a copy of the packet? In almost 4 years
+> > > since commit 2f5dc00f7a3e ("net: bridge: switchdev: let drivers inform
+> > > which bridge ports are offloaded"), I would have expected such issues
+> > > would have been noticed?
+> > 
+> > I'm aware of one report from QA that is on my list. They configured a
+> > VXLAN tunnel that floods packets to two remote VTEPs:
+> > 
+> > 00:00:00:00:00:00 dev vx100 dst 1.1.1.2
+> > 00:00:00:00:00:00 dev vx100 dst 1.1.1.3
+> > 
+> > The underlay routes used to forward the VXLAN encapsulated traffic are:
+> > 
+> > 1.1.1.2 via 10.0.0.2 dev swp13
+> > 1.1.1.3 via 10.0.0.6 dev swp15
+> > 
+> > But they made sure not to configure 10.0.0.6 at the other end. What
+> > happens is that traffic for 1.1.1.2 is correctly forwarded in hardware,
+> > but traffic for 1.1.1.3 encounters a neighbour miss and trapped to
+> > the CPU which then forwards it again to 1.1.1.2.
+> > 
+> > Putting the VXLAN device in the same hardware domain as the other switch
+> > ports should solve this "double forwarding" scenario.
 > 
-> This is to prepare for native XDP support.
+> Let me see if I understand what you are saying based on the code (please
+> bear with me, VXLAN tunnels are way outside of my area).
 > 
-> The page pool API is more faster in allocating pages than
-> __alloc_skb(). Drawback is that it works at PAGE_SIZE granularity
-> so we are not efficient in memory usage.
-> i.e. we are using PAGE_SIZE (4KB) memory for 1.5KB max packet size.
+> So in this case, the packet hits a neighbor miss in the VXLAN underlay
+> and reaches the CPU through the
+> MLXSW_SP_TRAP_EXCEPTION(UNRESOLVED_NEIGH, L3_EXCEPTIONS) trap. That is
+> defined to call mlxsw_sp_rx_mark_listener(), which sets
+> skb->offload_fwd_mark = 1 (aka packet was forwarded in L2) but not
+> skb->offload_l3_fwd_mark (aka packet was not forwarded in L3).
+> This corresponds to expected reality: neighbor miss packets should not
+> re-enter the bridge forwarding path in the overlay towards the VXLAN.
 > 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
-> v1: https://lore.kernel.org/all/20250122124951.3072410-1-m-malladi@ti.com/
+> Yet they still do, because although skb->offload_fwd_mark is correctly
+> set, it only skips software forwarding towards other physical (and/or
+> LAG) mlxsw bridge ports.
 > 
-> Changes since v1 (v2-v1):
-> - Recycle pages wherever necessary using skb_mark_for_recycle()
-> - Use napi_build_skb() instead of build_skb()
-> - Update with correct frag_size argument in napi_build_skb()
-> - Use napi_gro_receive() instead of netif_receive_skb()
-> - Use PP_FLAG_DMA_SYNC_DEV to enable DMA sync with device
-> - Use page_pool_dma_sync_for_cpu() to sync Rx page pool for CPU
+> If my understanding is correct, then yes, I agree that making the hwdomain
+> of the vxlan tunnel coincide with that of the other bridge ports should
+> suppress this packet.
+
+Yes, the above is correct.
+
 > 
-> All the above changes have been suggested by Ido Schimmel <idosch@idosch.org>
+> > > Do we require a Fixes: tag for this?
+> > 
+> > It's not strictly a regression (never worked) and it's not that critical
+> > IMO, so I prefer targeting net-next.
 > 
->  drivers/net/ethernet/ti/Kconfig               |   1 +
->  drivers/net/ethernet/ti/icssg/icssg_common.c  | 174 ++++++++++++------
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  14 +-
->  .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  21 ++-
->  4 files changed, 140 insertions(+), 70 deletions(-)
+> Yes, I agree. Before that commit, the bridge would look by itself at the
+> bridge port, recursively searching for lower interfaces until something
+> returned something positively in dev_get_port_parent_id(). Which was a
+> limiting model. If anything, solving the "double forwarding of vxlan exception
+> packets" issue would have required an alternative switchdev bridge port
+> offloading model anyway, like the explicit one that exists now, which is
+> more flexible.
+
+Yes.
+
 > 
-> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-> index 0d5a862cd78a..b461281d31b6 100644
-> --- a/drivers/net/ethernet/ti/Kconfig
-> +++ b/drivers/net/ethernet/ti/Kconfig
-> @@ -204,6 +204,7 @@ config TI_ICSSG_PRUETH_SR1
->  	select PHYLIB
->  	select TI_ICSS_IEP
->  	select TI_K3_CPPI_DESC_POOL
-> +	select PAGE_POOL
->  	depends on PRU_REMOTEPROC
->  	depends on NET_SWITCHDEV
->  	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> index 74f0f200a89d..c3c1e2bf461e 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> @@ -45,6 +45,11 @@ void prueth_cleanup_rx_chns(struct prueth_emac *emac,
->  			    struct prueth_rx_chn *rx_chn,
->  			    int max_rflows)
->  {
-> +	if (rx_chn->pg_pool) {
-> +		page_pool_destroy(rx_chn->pg_pool);
-> +		rx_chn->pg_pool = NULL;
-> +	}
-> +
->  	if (rx_chn->desc_pool)
->  		k3_cppi_desc_pool_destroy(rx_chn->desc_pool);
->  
-> @@ -461,17 +466,17 @@ int prueth_init_rx_chns(struct prueth_emac *emac,
->  }
->  EXPORT_SYMBOL_GPL(prueth_init_rx_chns);
->  
-> -int prueth_dma_rx_push(struct prueth_emac *emac,
-> -		       struct sk_buff *skb,
-> -		       struct prueth_rx_chn *rx_chn)
-> +int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
-> +			      struct prueth_rx_chn *rx_chn,
-> +			      struct page *page, u32 buf_len)
->  {
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
-> -	u32 pkt_len = skb_tailroom(skb);
->  	dma_addr_t desc_dma;
->  	dma_addr_t buf_dma;
->  	void **swdata;
->  
-> +	buf_dma = page_pool_get_dma_addr(page) + PRUETH_HEADROOM;
->  	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
->  	if (!desc_rx) {
->  		netdev_err(ndev, "rx push: failed to allocate descriptor\n");
-> @@ -479,25 +484,18 @@ int prueth_dma_rx_push(struct prueth_emac *emac,
->  	}
->  	desc_dma = k3_cppi_desc_pool_virt2dma(rx_chn->desc_pool, desc_rx);
->  
-> -	buf_dma = dma_map_single(rx_chn->dma_dev, skb->data, pkt_len, DMA_FROM_DEVICE);
-> -	if (unlikely(dma_mapping_error(rx_chn->dma_dev, buf_dma))) {
-> -		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
-> -		netdev_err(ndev, "rx push: failed to map rx pkt buffer\n");
-> -		return -EINVAL;
-> -	}
-> -
->  	cppi5_hdesc_init(desc_rx, CPPI5_INFO0_HDESC_EPIB_PRESENT,
->  			 PRUETH_NAV_PS_DATA_SIZE);
->  	k3_udma_glue_rx_dma_to_cppi5_addr(rx_chn->rx_chn, &buf_dma);
-> -	cppi5_hdesc_attach_buf(desc_rx, buf_dma, skb_tailroom(skb), buf_dma, skb_tailroom(skb));
-> +	cppi5_hdesc_attach_buf(desc_rx, buf_dma, buf_len, buf_dma, buf_len);
->  
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	*swdata = skb;
-> +	*swdata = page;
->  
-> -	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, 0,
-> +	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, PRUETH_RX_FLOW_DATA,
->  					desc_rx, desc_dma);
->  }
-> -EXPORT_SYMBOL_GPL(prueth_dma_rx_push);
-> +EXPORT_SYMBOL_GPL(prueth_dma_rx_push_mapped);
->  
->  u64 icssg_ts_to_ns(u32 hi_sw, u32 hi, u32 lo, u32 cycle_time_ns)
->  {
-> @@ -541,12 +539,16 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->  	u32 buf_dma_len, pkt_len, port_id = 0;
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
-> -	struct sk_buff *skb, *new_skb;
->  	dma_addr_t desc_dma, buf_dma;
-> +	struct page *page, *new_page;
-> +	struct page_pool *pool;
-> +	struct sk_buff *skb;
->  	void **swdata;
->  	u32 *psdata;
-> +	void *pa;
->  	int ret;
->  
-> +	pool = rx_chn->pg_pool;
->  	ret = k3_udma_glue_pop_rx_chn(rx_chn->rx_chn, flow_id, &desc_dma);
->  	if (ret) {
->  		if (ret != -ENODATA)
-> @@ -558,15 +560,10 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->  		return 0;
->  
->  	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
-> -
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	skb = *swdata;
-> -
-> -	psdata = cppi5_hdesc_get_psdata(desc_rx);
-> -	/* RX HW timestamp */
-> -	if (emac->rx_ts_enabled)
-> -		emac_rx_timestamp(emac, skb, psdata);
-> +	page = *swdata;
->  
-Unnecessary blank line.
+> > > And then, switchdev_bridge_port_offload() has a brport_dev argument,
+> > > which would pretty clearly be passed as vxlan_dev by
+> > > mlxsw_sp_bridge_8021d_vxlan_join() and
+> > > mlxsw_sp_bridge_vlan_aware_vxlan_join(), but it also has one other
+> > > "struct net_device *dev" argument, on which br_switchdev_port_offload()
+> > > wants to call dev_get_port_parent_id(), to see what hwdom (what other
+> > > bridge ports) to associate it to.
+> > 
+> > Right.
+> > 
+> > > Usually we use the mlxsw_sp_port->dev as the second argument, but which
+> > > port to use here? Any random port that's under the bridge, or is there a
+> > > specific one for the vxlan that should be used?
+> > 
+> > Any random port is fine as they all share the same parent ID.
+> > 
+> > BTW, I asked Amit (Cced) to look into this as there might be some issues
+> > with ARP suppression that will make it a bit more complicated to patch.
+> > Are you OK with that or do you want the authorship? We can put any tag
+> > you choose. I am asking so that it won't appear like I am trying to
+> > discredit you.
+> 
+> It is completely fine for Amit to take a look at this, I could really do
+> without yet another thing that is completely over my head :)
 
-> +	page_pool_dma_sync_for_cpu(pool, page, 0, PAGE_SIZE);
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
->  	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
-> @@ -574,32 +571,51 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->  	pkt_len -= 4;
->  	cppi5_desc_get_tags_ids(&desc_rx->hdr, &port_id, NULL);
->  
-> -	dma_unmap_single(rx_chn->dma_dev, buf_dma, buf_dma_len, DMA_FROM_DEVICE);
->  	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
->  
-> -	skb->dev = ndev;
-> -	new_skb = netdev_alloc_skb_ip_align(ndev, PRUETH_MAX_PKT_SIZE);
->  	/* if allocation fails we drop the packet but push the
-> -	 * descriptor back to the ring with old skb to prevent a stall
-> +	 * descriptor back to the ring with old page to prevent a stall
->  	 */
-> -	if (!new_skb) {
-> +	new_page = page_pool_dev_alloc_pages(pool);
-> +	if (unlikely(!new_page)) {
-> +		new_page = page;
->  		ndev->stats.rx_dropped++;
-> -		new_skb = skb;
-> -	} else {
-> -		/* send the filled skb up the n/w stack */
-> -		skb_put(skb, pkt_len);
-> -		if (emac->prueth->is_switch_mode)
-> -			skb->offload_fwd_mark = emac->offload_fwd_mark;
-> -		skb->protocol = eth_type_trans(skb, ndev);
-> -		napi_gro_receive(&emac->napi_rx, skb);
-> -		ndev->stats.rx_bytes += pkt_len;
-> -		ndev->stats.rx_packets++;
-> +		goto requeue;
-> +	}
-> +
-> +	/* prepare skb and send to n/w stack */
-> +	pa = page_address(page);
-> +	skb = napi_build_skb(pa, PAGE_SIZE);
-> +	if (!skb) {
-> +		ndev->stats.rx_dropped++;
-> +		page_pool_recycle_direct(pool, page);
-> +		goto requeue;
->  	}
->  
-> +	skb_reserve(skb, PRUETH_HEADROOM);
-> +	skb_put(skb, pkt_len);
-> +	skb->dev = ndev;
-> +
-> +	psdata = cppi5_hdesc_get_psdata(desc_rx);
-> +	/* RX HW timestamp */
-> +	if (emac->rx_ts_enabled)
-> +		emac_rx_timestamp(emac, skb, psdata);
-> +
-> +	if (emac->prueth->is_switch_mode)
-> +		skb->offload_fwd_mark = emac->offload_fwd_mark;
-> +	skb->protocol = eth_type_trans(skb, ndev);
-> +
-> +	skb_mark_for_recycle(skb);
-> +	napi_gro_receive(&emac->napi_rx, skb);
-> +	ndev->stats.rx_bytes += pkt_len;
-> +	ndev->stats.rx_packets++;
-> +
-> +requeue:
->  	/* queue another RX DMA */
-> -	ret = prueth_dma_rx_push(emac, new_skb, &emac->rx_chns);
-> +	ret = prueth_dma_rx_push_mapped(emac, &emac->rx_chns, new_page,
-> +					PRUETH_MAX_PKT_SIZE);
->  	if (WARN_ON(ret < 0)) {
-> -		dev_kfree_skb_any(new_skb);
-> +		page_pool_recycle_direct(pool, new_page);
->  		ndev->stats.rx_errors++;
->  		ndev->stats.rx_dropped++;
->  	}
-> @@ -611,22 +627,17 @@ static void prueth_rx_cleanup(void *data, dma_addr_t desc_dma)
->  {
->  	struct prueth_rx_chn *rx_chn = data;
->  	struct cppi5_host_desc_t *desc_rx;
-> -	struct sk_buff *skb;
-> -	dma_addr_t buf_dma;
-> -	u32 buf_dma_len;
-> +	struct page_pool *pool;
-> +	struct page *page;
->  	void **swdata;
->  
-> +	pool = rx_chn->pg_pool;
-> +
-here too.
+Great, thanks!
 
->  	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	skb = *swdata;
-> -	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
-> -	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
-> -
-> -	dma_unmap_single(rx_chn->dma_dev, buf_dma, buf_dma_len,
-> -			 DMA_FROM_DEVICE);
-> +	page = *swdata;
-> +	page_pool_recycle_direct(pool, page);
->  	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
-> -
-> -	dev_kfree_skb_any(skb);
->  }
->  
->  static int prueth_tx_ts_cookie_get(struct prueth_emac *emac)
-> @@ -907,29 +918,71 @@ int icssg_napi_rx_poll(struct napi_struct *napi_rx, int budget)
->  }
->  EXPORT_SYMBOL_GPL(icssg_napi_rx_poll);
->  
-> +static struct page_pool *prueth_create_page_pool(struct prueth_emac *emac,
-> +						 struct device *dma_dev,
-> +						 int size)
-> +{
-> +	struct page_pool_params pp_params = { 0 };
-> +	struct page_pool *pool;
-> +
-> +	pp_params.order = 0;
-> +	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-> +	pp_params.pool_size = size;
-> +	pp_params.nid = dev_to_node(emac->prueth->dev);
-> +	pp_params.dma_dir = DMA_BIDIRECTIONAL;
-> +	pp_params.dev = dma_dev;
-> +	pp_params.napi = &emac->napi_rx;
-> +	pp_params.max_len = PAGE_SIZE;
-> +
-> +	pool = page_pool_create(&pp_params);
-> +	if (IS_ERR(pool))
-> +		netdev_err(emac->ndev, "cannot create rx page pool\n");
-> +
-> +	return pool;
-> +}
-> +
->  int prueth_prepare_rx_chan(struct prueth_emac *emac,
->  			   struct prueth_rx_chn *chn,
->  			   int buf_size)
->  {
-> -	struct sk_buff *skb;
-> +	struct page_pool *pool;
-> +	struct page *page;
->  	int i, ret;
->  
-> +	pool = prueth_create_page_pool(emac, chn->dma_dev, chn->descs_num);
-> +	if (IS_ERR(pool))
-> +		return PTR_ERR(pool);
-> +
-> +	chn->pg_pool = pool;
-> +
->  	for (i = 0; i < chn->descs_num; i++) {
-> -		skb = __netdev_alloc_skb_ip_align(NULL, buf_size, GFP_KERNEL);
-> -		if (!skb)
-> -			return -ENOMEM;
-> +		/* NOTE: we're not using memory efficiently here.
-> +		 * 1 full page (4KB?) used here instead of
-> +		 * PRUETH_MAX_PKT_SIZE (~1.5KB?)
-> +		 */
-> +		page = page_pool_dev_alloc_pages(pool);
+> 
+> Just one indication from my side on how I would approach things:
+> 
+> Because spectrum bridge ports come and go, and the vxlan tunnel bridge
+> port may stay, its hwdom may change over time (depending on how many
+> cards there are plugged in the system). Also, it probably won't work to
+> combine spectrum bridge ports spanning multiple cards in the same
+> bridge. For those reasons, br_switchdev_port_offload() supports multiple
+> calls made to the same vxlan_dev, and behind the scenes, it will just
+> bump the net_bridge_port->offload_count.
+> 
+> Thinking a bit more, I think you want exactly that: a vxlan bridge port
+> needs to have an offload_count equal to the number of other spectrum
+> ports in the same bridge. This way, it only stops being offloaded when
+> there are no spectrum ports left (and the offload_count drops to 0).
+> But this needs handling from both directions: when a vxlan joins a
+> bridge with spectrum ports, and when a spectrum port joins a bridge with
+> vxlan tunnels. Plus every leave operation having to call
+> br_switchdev_port_unoffload(), for things to stay balanced.
+> 
+> Probably there are tons of other restrictions to be aware of, but I just
+> wanted to say this, because in the previous email we talked about "just
+> any random port" and it seems like it actually needs to be "all ports".
 
-Did you evaluate Ido's suggestion to use page_pool_alloc_frag()?
-
-> +		if (!page) {
-> +			netdev_err(emac->ndev, "couldn't allocate rx page\n");
-> +			ret = -ENOMEM;
-> +			goto recycle_alloc_pg;
-> +		}
->  
-> -		ret = prueth_dma_rx_push(emac, skb, chn);
-> +		ret = prueth_dma_rx_push_mapped(emac, chn, page, buf_size);
->  		if (ret < 0) {
->  			netdev_err(emac->ndev,
-> -				   "cannot submit skb for rx chan %s ret %d\n",
-> +				   "cannot submit page for rx chan %s ret %d\n",
->  				   chn->name, ret);
-> -			kfree_skb(skb);
-> -			return ret;
-> +			page_pool_recycle_direct(pool, page);
-> +			goto recycle_alloc_pg;
->  		}
->  	}
->  
->  	return 0;
-> +
-> +recycle_alloc_pg:
-> +	prueth_reset_rx_chan(&emac->rx_chns, PRUETH_MAX_RX_FLOWS, false);
-> +
-> +	return ret;
->  }
->  EXPORT_SYMBOL_GPL(prueth_prepare_rx_chan);
->  
-> @@ -958,6 +1011,9 @@ void prueth_reset_rx_chan(struct prueth_rx_chn *chn,
->  					  prueth_rx_cleanup, !!i);
->  	if (disable)
->  		k3_udma_glue_disable_rx_chn(chn->rx_chn);
-> +
-> +	page_pool_destroy(chn->pg_pool);
-> +	chn->pg_pool = NULL;
->  }
->  EXPORT_SYMBOL_GPL(prueth_reset_rx_chan);
->  
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index 329b46e9ee53..c7b906de18af 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -33,6 +33,8 @@
->  #include <linux/dma/k3-udma-glue.h>
->  
->  #include <net/devlink.h>
-> +#include <net/xdp.h>
-> +#include <net/page_pool/helpers.h>
->  
->  #include "icssg_config.h"
->  #include "icss_iep.h"
-> @@ -131,6 +133,7 @@ struct prueth_rx_chn {
->  	u32 descs_num;
->  	unsigned int irq[ICSSG_MAX_RFLOWS];	/* separate irq per flow */
->  	char name[32];
-> +	struct page_pool *pg_pool;
->  };
->  
->  /* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
-> @@ -210,6 +213,10 @@ struct prueth_emac {
->  	struct netdev_hw_addr_list vlan_mcast_list[MAX_VLAN_ID];
->  };
->  
-> +/* The buf includes headroom compatible with both skb and xdpf */
-> +#define PRUETH_HEADROOM_NA (max(XDP_PACKET_HEADROOM, NET_SKB_PAD) + NET_IP_ALIGN)
-> +#define PRUETH_HEADROOM  ALIGN(PRUETH_HEADROOM_NA, sizeof(long))
-> +
->  /**
->   * struct prueth_pdata - PRUeth platform data
->   * @fdqring_mode: Free desc queue mode
-> @@ -410,9 +417,10 @@ int prueth_init_rx_chns(struct prueth_emac *emac,
->  			struct prueth_rx_chn *rx_chn,
->  			char *name, u32 max_rflows,
->  			u32 max_desc_num);
-> -int prueth_dma_rx_push(struct prueth_emac *emac,
-> -		       struct sk_buff *skb,
-> -		       struct prueth_rx_chn *rx_chn);
-> +int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
-> +			      struct prueth_rx_chn *rx_chn,
-> +			      struct page *page, u32 buf_len);
-> +unsigned int prueth_rxbuf_total_len(unsigned int len);
->  void emac_rx_timestamp(struct prueth_emac *emac,
->  		       struct sk_buff *skb, u32 *psdata);
->  enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev);
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> index 64a19ff39562..aeeb8a50376b 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> @@ -274,10 +274,12 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
->  	struct prueth_rx_chn *rx_chn = &emac->rx_mgm_chn;
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
-> -	struct sk_buff *skb, *new_skb;
-> +	struct page *page, *new_page;
->  	dma_addr_t desc_dma, buf_dma;
->  	u32 buf_dma_len, pkt_len;
-> +	struct sk_buff *skb;
-
-Can we get rid of SKB entirely from the management channel code?
-The packet received on this channel is never passed to user space so
-I don't see why SKB is required.
-
->  	void **swdata;
-> +	void *pa;
->  	int ret;
->  
->  	ret = k3_udma_glue_pop_rx_chn(rx_chn->rx_chn, flow_id, &desc_dma);
-> @@ -299,32 +301,35 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
->  	}
->  
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	skb = *swdata;
-> +	page = *swdata;
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
->  
->  	dma_unmap_single(rx_chn->dma_dev, buf_dma, buf_dma_len, DMA_FROM_DEVICE);
->  	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
->  
-> -	new_skb = netdev_alloc_skb_ip_align(ndev, PRUETH_MAX_PKT_SIZE);
-> +	new_page = page_pool_dev_alloc_pages(rx_chn->pg_pool);
->  	/* if allocation fails we drop the packet but push the
->  	 * descriptor back to the ring with old skb to prevent a stall
->  	 */
-> -	if (!new_skb) {
-> +	if (!new_page) {
->  		netdev_err(ndev,
-> -			   "skb alloc failed, dropped mgm pkt from flow %d\n",
-> +			   "page alloc failed, dropped mgm pkt from flow %d\n",
->  			   flow_id);
-> -		new_skb = skb;
-> +		new_page = page;
->  		skb = NULL;	/* return NULL */
->  	} else {
->  		/* return the filled skb */
-> +		pa = page_address(page);
-> +		skb = napi_build_skb(pa, PAGE_SIZE);
->  		skb_put(skb, pkt_len);
->  	}
->  
->  	/* queue another DMA */
-> -	ret = prueth_dma_rx_push(emac, new_skb, &emac->rx_mgm_chn);
-> +	ret = prueth_dma_rx_push_mapped(emac, &emac->rx_chns, new_page,
-> +					PRUETH_MAX_PKT_SIZE);
->  	if (WARN_ON(ret < 0))
-> -		dev_kfree_skb_any(new_skb);
-> +		page_pool_recycle_direct(rx_chn->pg_pool, new_page);
->  
->  	return skb;
->  }
-
--- 
-cheers,
--roger
-
+I think that "any random port" is fine as the second argument of
+switchdev_bridge_port_offload() is only used to derive the parent ID
+which is the same for all mlxsw ports belonging to the same PCI card.
+And yes, it won't work if you combine ports from different cards in the
+same bridge, but it's not really a realistic configuration. Packets
+entering the bridge via the first card would have to go to the CPU if
+they need to egress ports belonging to the second card. I don't know why
+anyone would want that. A more realistic way to support multi-ASIC
+systems is to reload each devlink instance (i.e., ASIC / card) to a
+different namespace via something like "devlink dev reload
+pci/0000:01:00.0 netns ns1" or use PCI passthrough to assign each card
+to a different VM.
 
