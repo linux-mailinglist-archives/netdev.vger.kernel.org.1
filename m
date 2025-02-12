@@ -1,157 +1,268 @@
-Return-Path: <netdev+bounces-165367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74FE5A31C04
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:28:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A482A31C13
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B07D7A2D11
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:27:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D712B188238A
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42101D5AA7;
-	Wed, 12 Feb 2025 02:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5542AF1B;
+	Wed, 12 Feb 2025 02:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZhxnhDH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U38ppGdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188CB1CAA7F;
-	Wed, 12 Feb 2025 02:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68373271817
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739327268; cv=none; b=CIFE/P/+pf00xhCPoRkVwxJPM/5LC2pHRjgyz/E/zTrjUHeDUkeCybETM8my2NugsG8FmXbiwag+ilsX16sO9Zjkq3JpaGo+Le6ttK8SnWlBo3fFTP0ZNLgjuVI+iaiWpEs2ji0Z2i/0hK8/RMS7wBIvtaFcH/mPTlhPMVFlrLE=
+	t=1739327497; cv=none; b=gNlRpBGRvm0sBbfG4PsgGNKDKPFWeh1n3kjWIJRtFLi1FVZxYYEtMkloHemqorivp1rH8y22hrqGZKSMGdtm4Gzo8aAwXHuZow8I+VQ9bQZlIGm/Ae7TBIesC5H/mV/RaH/NSSOIXjPStRfR9tSjitKQAOKNlJvX18wUEQSNymU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739327268; c=relaxed/simple;
-	bh=XNTpRhZ3fxRHmJEWAMolHb8JRph6LE03ym0ZpWAutSY=;
+	s=arc-20240116; t=1739327497; c=relaxed/simple;
+	bh=eo3wLUwhBmcOz/Oe33WpzD5W+tGA19ZexWX3W+MC9kM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nua2o3VPYj7LOiYccljNmmCZUdqJE0eMLInA5thuWcBeUYSWTSIhBgUwIJrYx4/aLVL9MTY0mY3OXeoBpK133TAso7mWOfZKNA5XELL1WUEqAploiSXTOSGoNSuN0dMgbtatnMRA057nc89Kop6EOT2uwXYk1/3zrzFrbBxj+n0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZhxnhDH; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6f77b9e0a34so46456287b3.2;
-        Tue, 11 Feb 2025 18:27:45 -0800 (PST)
+	 To:Cc:Content-Type; b=heAeIPlNwOgdU5UvE56OiZH9TagoXDYxhh8916iIeA4xVytiOkqIx0/cjIKI3nejmBbbJovC/CJ6BplWGiBW9pE++/tpuR+GwiaLaFKVBskJoV8MhIiV49nnTl2D3DV0QIfkCXWDqBnbVRv9erqOGc6hiFV3Bx4E2LkFEBuDMKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U38ppGdf; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ab7d3bcf1ceso372996566b.3
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:31:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739327265; x=1739932065; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i6F4L4SaFXOFnk/DwcnTDSe6yOs/RUxwb5c9eaTPL0A=;
-        b=TZhxnhDHQwSTJCV0+CQ6hm7PFfhD4jDWMgf4x0E3WmNvLdFb3qcMyyI/6ig2qNMmos
-         kTmurabQshN/1l4Dn/mLSNgasfzlXKSRFpNYYAG9Miw9vsMYR5zTuYTSx+m+dlZkbhxP
-         HWEJ+w+vbk0np0Uam+0+ugisHLcXIVjBOrWDh7TjbTS0bvMUrumjzLq1/fTH/ja/aCAd
-         dSuME6S2WJBO0HlafKPVv0Dhrl80RjXuDRAfhkv/hWwCP/lwAWhNUbw4tM2h1xrFsZJN
-         NZCW+pGqFngyoMYU5EHb9rFNKm61hwMdgY9Dtqc63Ut/ukurs+HEzICAnGB25QVvJ31k
-         R+Bg==
+        d=broadcom.com; s=google; t=1739327494; x=1739932294; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jEJClt2k4Vmv1QsMA4NHlYUHw/TYZVwCPi3mj7Yr2zY=;
+        b=U38ppGdfuB2D+Be8/r/f48CM+OnAqcyKH7bKYCTDFrsP0ChE+m8VxyWRSKtKVK302/
+         3p5x34eINooyt29tectsLwlHdgHx97pU6uF3qrBdT2SrZRLR183UfPaeFpZny6O5GcBS
+         DeItOA85qHrEp74mIc+HZ3Y2iZNd14G4PQ0l8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739327265; x=1739932065;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i6F4L4SaFXOFnk/DwcnTDSe6yOs/RUxwb5c9eaTPL0A=;
-        b=uYABGZaBF/jHmGXkN0epA5gqa6XBVrE2jhrkIUZgNOt4jdY1cB9KMnEFGtK/bzfVJX
-         V9J8mnqE6Fnc6QJoaShl4BKymELbQynR4I+s+YfVk+sEqwlQEmQNcwz0lXy6eDWR+fv7
-         8HDv5028d59jY8EDjVlJ1XETYTIpCh5q663dHvFGj0/PHIte7e8H05H8HZ51pPlMn3RX
-         NilI7sQt5/Tkdbg0K87CfwTagMBIhgIfbZQUVZVsQpMyz8cRrkvD8+MHZw126PpHgtxH
-         ZZj873+hg9jm7woXH7ryai4daoGzhV4J7DoMaXlhlsTGIkrzQ9i7vGGxJ4EXmRTZTpKV
-         /Nxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjYsbjtmTgOfJ69eVXqci2d4MEdwOSPKT/fzfLX2V71OMs3un4YHs43OU0bAmwZL/rJTB4avOv@vger.kernel.org, AJvYcCUzQZs/j/3WevJdmK+WPIB48mSudx8D78StpbhmLmTIA2v9XxdaxcG1aFlT7MW5GLLxaZLRXOaK16BQ@vger.kernel.org, AJvYcCVJTHsKMhpjESUj0AtyBd2g+yPl3TzzstNOq/aIo12+fEkM07DJpVHpi4RYe3+nVnYFiA7WsWGfaZyef4BF@vger.kernel.org, AJvYcCVK4UOd1jWyu//0OBlGQ9UAGmLV/2Pgq2dbGYO8OAa4aVUVg1bVpGvGBjFG0f/WV1J8RS7Ae3mF3X/p34c=@vger.kernel.org, AJvYcCWHJz9hRZMnj5cym9ZfH+zHclKri2hC2x4p0ii1ZxVSm+DQQKJPK0HyiWZGJDvKrY2aH7T+lGvn/yyY@vger.kernel.org, AJvYcCWtyPeeAlwRn4S2kxnopBEM6ybyKAW7b8LpdUI/VT0adgbYm75R8LFWcxL7rQ5DR4hXvtzrpWwzDHU=@vger.kernel.org, AJvYcCXNHtUu+eeb8dqr09v2QUEKerxdz1as7+Iu8YFdAkIfYXBQQLWsCpxN3QZVp3Wk2uaKWtUvsZeJaSey02aXg1A=@vger.kernel.org, AJvYcCXUVs0BRZavrv7M8wxVzNryb5jJv2Bz73ec8wJKFbSSAM0jFUdnnzr0Xjg7551PEhSkSprb/Jr++OTV@vger.kernel.org, AJvYcCXvxT61kfmVmICqwn7NppD50JZF67fsYqdHth7WvtW9zZ9DVIEmuz/c2Knlt/hnJGjxFofR86rMiXKJ6w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzA05BTCcGvrdpPafDmxGzfmeDvLJIVrEcLrwkEnHjiKhc23cRM
-	icRXUTqIGgjkToZ+jsaMq5xwm4TyqF/ZMDeukV6fFzTJapqvvoejXr1XczxZrhKPrDtHlbz05lU
-	XW6OHgATNJjXfeY6KF4m70lEUAes=
-X-Gm-Gg: ASbGnctif47bAfKPbdqkcNY6w4Sg0ZRBIIXswDeKJl3tbwL6By8yFcKNHCNFm11xuT2
-	lwKzhskG0GG2b/T0YHAPrmZDTjDVwkWqtePjaxTQfSV8t5Qz1ucJBHlkMABod/ZLNQiia/pIp3I
-	U8kjdMhpfXg5Ku3qX/f/ZRnC5abvD7790=
-X-Google-Smtp-Source: AGHT+IGulwT7PweDVmkr4+FYlxSo7B/VIPVfzNPz8aOBhzRqp88wCHV/cWMR2HEkNYYGahtbaGGkuIKK7iWPIbqnZIc=
-X-Received: by 2002:a05:690c:46c1:b0:6f9:82fa:6d96 with SMTP id
- 00721157ae682-6fb1f19bbe5mr24081647b3.11.1739327264826; Tue, 11 Feb 2025
- 18:27:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739327494; x=1739932294;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jEJClt2k4Vmv1QsMA4NHlYUHw/TYZVwCPi3mj7Yr2zY=;
+        b=D+Me4Yb2GRs6n5404PkwEMGLrgGu5ZOIpYb07HZYYjkpfqx1voBMbGf4gBFHRvfTcN
+         DhD+fv5VnEzrX5D4+3d2yuyp1RWZtPBpDVtyhjwAkZHrrggxq5+KIGucq4S7qtLD9xzP
+         YyRzl1m47a+DaghEiaenPffwXzuN3IUcEx+ndE7ueII/AEVOb4VjAseYYFcV8uWo2G4O
+         pH6RSgQ7YqrpRoRRDxhdL37Q0Pm8Pn5CuzCrMY6+MkNL/SDEvk5tc9QjilW/J18GiGGK
+         vK8Zwr+GiD2KiNdN4O1c78/O+SDzG3W4WaXfi/pcqtRG08UXQEe0LZCvFOvuxDfOvHol
+         3G4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUWZjuaiQLUuWL5ytiU2se0onjV/O5+YMUkD9qpcySIKdJjN89dJxb9oxFo45xpFwA4hsQ3Ans=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3Q1T48klZ4nmb4YEPfcEKIpkEzSsEBs8vIORAVu75Y7eD99XW
+	byy1ZwMJ9vliTJqpbzJsdP+NDugeZABrtfSexaUOqW1vVK8bobGgYj/lfCBc5pPBbCYO/sZXl43
+	dGX+5or3bWfns1I2PLdsNh40P8gt+bCWVoTTQ
+X-Gm-Gg: ASbGnctdozN5N/s6wwaq/n8GT227TLfjcihdDSoSTNrvCGoZARMUjWjgXywoGV2yuxw
+	8cBzqucBkXM/LtQBXcRdFVVWNarxu0v2dGwans+tkW2y9m7VZeqqfJhWeTbkeIcWlNsGVeCM=
+X-Google-Smtp-Source: AGHT+IGZzDgYZzri5cLyQ9YfZ1qMxSJ42XJL8epEE5Fh7WkK4uMByLuSC45LYm9P2oFVcUWWy7MQuVwlVQHjKL0yW4w=
+X-Received: by 2002:a17:907:1c85:b0:aa6:9624:78f1 with SMTP id
+ a640c23a62f3a-ab7f3714978mr114404566b.9.1739327493592; Tue, 11 Feb 2025
+ 18:31:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-6-a0282524688@gmail.com> <9b451153-41b4-4c15-a586-01cb5126e207@wanadoo.fr>
-In-Reply-To: <9b451153-41b4-4c15-a586-01cb5126e207@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Wed, 12 Feb 2025 10:27:33 +0800
-X-Gm-Features: AWEUYZkhU0SYHW9fyypqI2zEJgjkjlaLa0F4ZfNBX2YLvjUCEHwSXFQN1lr6P_Q
-Message-ID: <CAOoeyxUthDO8wo5fbMuNyJBd-YKD9TrCE5Lr3ve=Z+rndm6X5g@mail.gmail.com>
-Subject: Re: [PATCH v7 5/7] watchdog: Add Nuvoton NCT6694 WDT support
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20250208202916.1391614-1-michael.chan@broadcom.com>
+ <20250208202916.1391614-10-michael.chan@broadcom.com> <20250211174438.3b8493fe@kernel.org>
+In-Reply-To: <20250211174438.3b8493fe@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 11 Feb 2025 18:31:21 -0800
+X-Gm-Features: AWEUYZlzSgRZDo_iS0D-Tch2bCdpuA3XymOG1r3romYuCMFcD0Riiiur7NhhwYU
+Message-ID: <CACKFLi=jHfL2iAP-hVm=MmLDBD+wOOHrHsNNM21dCRAjRu7o7A@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 09/10] bnxt_en: Extend queue stop/start for TX rings
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
+	andrew.gospodarek@broadcom.com, michal.swiatkowski@linux.intel.com, 
+	helgaas@kernel.org, horms@kernel.org, 
+	Somnath Kotur <somnath.kotur@broadcom.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>, 
+	David Wei <dw@davidwei.uk>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000006d9820062de8bd75"
+
+--0000000000006d9820062de8bd75
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Dear Christophe,
+On Tue, Feb 11, 2025 at 5:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat,  8 Feb 2025 12:29:15 -0800 Michael Chan wrote:
+> > +             rc =3D bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
+> > +             if (rc)
+> > +                     return rc;
+> > +
+> > +             rc =3D bnxt_hwrm_tx_ring_alloc(bp, txr, false);
+> > +             if (rc)
+> > +                     return rc;
+>
+> Under what circumstances can these alloc calls fail?
+> "alloc" sounds concerning in a start call.
 
-Thank you for reviewing,
+The ring has been previously reserved with FW, so it normally should
+not fail.  I'll need to ask the FW team for some possible failure
+scenarios.
 
-Christophe JAILLET <christophe.jaillet@wanadoo.fr> =E6=96=BC 2025=E5=B9=B42=
-=E6=9C=888=E6=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8A=E5=8D=884:30=E5=AF=AB=E9=
-=81=93=EF=BC=9A
 >
-> Le 07/02/2025 =C3=A0 08:45, Ming Yu a =C3=A9crit :
-> > This driver supports Watchdog timer functionality for NCT6694 MFD
-> > device based on USB interface.
+> > +             txr->tx_prod =3D 0;
+> > +             txr->tx_cons =3D 0;
+> > +             txr->tx_hw_cons =3D 0;
 >
-> ...
+> >       cpr->sw_stats->rx.rx_resets++;
+> >
+> > +     if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
+> > +             cpr->sw_stats->tx.tx_resets++;
 >
-> > +static int nct6694_wdt_probe(struct platform_device *pdev)
-> > +{
-> > +     const struct mfd_cell *cell =3D mfd_get_cell(pdev);
-> > +     struct device *dev =3D &pdev->dev;
-> > +     struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
-> > +     struct nct6694_wdt_data *data;
-> > +     struct watchdog_device *wdev;
-> > +
-> > +     data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-> > +     if (!data)
-> > +             return -ENOMEM;
-> > +
-> > +     data->msg =3D devm_kzalloc(dev, sizeof(union nct6694_wdt_msg),
-> > +                              GFP_KERNEL);
-> > +     if (!data->msg)
-> > +             return -ENOMEM;
-> > +
-> > +     data->dev =3D dev;
-> > +     data->nct6694 =3D nct6694;
-> > +     data->wdev_idx =3D cell->id;
-> > +
-> > +     wdev =3D &data->wdev;
-> > +     wdev->info =3D &nct6694_wdt_info;
-> > +     wdev->ops =3D &nct6694_wdt_ops;
-> > +     wdev->timeout =3D timeout;
-> > +     wdev->pretimeout =3D pretimeout;
-> > +     if (timeout < pretimeout) {
-> > +             dev_warn(data->dev, "pretimeout < timeout. Setting to zer=
-o\n");
-> > +             wdev->pretimeout =3D 0;
+> Is there a reason why queue op stop/start cycles are counted as resets?
+> IIUC previously only faults (~errors) would be counted as resets.
+> ifdown / ifup or ring reconfig (ethtool -L / -G) would not increment
+> resets. I think queue reconfig is more like ethtool -L than a fault.
+> It'd be more consistent with existing code not to increment these
+> counters.
+
+I think David's original code increments the rx_reset counter for
+every queue_start.  We're just following that.  Maybe it came from the
+original plan to use HWRM_RING_RESET to do the RX
+queue_stop/queue_start.  We can remove the reset counters for all
+queue_stop/queue_start if that makes more sense.
+
+>
+> > +             rc =3D bnxt_tx_queue_start(bp, idx);
+> > +             if (rc) {
+> > +                     netdev_warn(bp->dev,
+> > +                                 "tx queue restart failed: rc=3D%d\n",=
+ rc);
+> > +                     bnapi->tx_fault =3D 1;
+> > +                     goto err_reset;
+> > +             }
 > > +     }
 > > +
-> > +     wdev->min_timeout =3D 1;
-> > +     wdev->max_timeout =3D 255;
+> > +     napi_enable(&bnapi->napi);
+>
+> Here you first start the queue then enable NAPI...
+>
+> > +     bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
 > > +
-> > +     devm_mutex_init(dev, &data->lock);
+> >       for (i =3D 0; i <=3D BNXT_VNIC_NTUPLE; i++) {
+> >               vnic =3D &bp->vnic_info[i];
+> >
 >
-> Error handling?
-> (also apply for patch 1/7 and 6/7)
+> > @@ -15716,17 +15820,25 @@ static int bnxt_queue_stop(struct net_device =
+*dev, void *qmem, int idx)
+> >       /* Make sure NAPI sees that the VNIC is disabled */
+> >       synchronize_net();
+> >       rxr =3D &bp->rx_ring[idx];
+> > -     cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
+> > +     bnapi =3D rxr->bnapi;
+> > +     cpr =3D &bnapi->cp_ring;
+> > +     cancel_work_sync(&cpr->dim.work);
+> >       bnxt_hwrm_rx_ring_free(bp, rxr, false);
+> >       bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+> >       page_pool_disable_direct_recycling(rxr->page_pool);
+> >       if (bnxt_separate_head_pool())
+> >               page_pool_disable_direct_recycling(rxr->head_pool);
+> >
+> > +     if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+> > +             bnxt_tx_queue_stop(bp, idx);
+> > +
+> > +     napi_disable(&bnapi->napi);
 >
-I will add error handling for these in the next patch.
+> ... but here you do the opposite, and require extra synchronization
+> in bnxt_tx_queue_stop() to set your magic flag, sync the NAPI etc.
+> Why can't the start and stop paths be the mirror image?
 
+The ring free operation requires interrupt/NAPI to be working.  FW
+signals the completion of the ring free command on the completion ring
+associated with the ring we're freeing.  When we see this completion
+during NAPI, it guarantees that this is the last DMA on that ring.
+Only ring free FW commands are handled this way, requiring NAPI.
 
-Best regards,
-Ming
+--0000000000006d9820062de8bd75
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP9fIHe9CTted7oswJ3DRbqylqR3yqDX
+9qnZgERa7c3XMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIx
+MjAyMzEzNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCxAcaboTe0GFys8tGyyi87Ibd2yMQFSNWWREFnC23xd6ew4UDH
+sL4WKoVxRvWRFJYVXRdRH9VhZs7o50j8iv2+FZkt63K0kSAuCN2CagyCRcCAgn94xkL+zwtpg5qf
+5zARlBgBF1M4cevMTK57O18OTutuU7+NwEpYVkRDb9P3nIoiAfB8+9X3AH8oYna1FGsvSvOMW3ug
+rKS9frr+mR3FkL0LXf3x8mhaLXlubxzDIxXBs7/wAaYaV8qd/RsSON4P2jy1jbijZxyKQEZHnTlc
+9iz+qsp1IF0Hex/rwzTtS0MfmUXRhfCK+Dc3wvRFQElFNi0NKwpLgkjR0wyWJPHA
+--0000000000006d9820062de8bd75--
 
