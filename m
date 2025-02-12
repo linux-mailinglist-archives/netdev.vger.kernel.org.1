@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-165394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEEA1A31E14
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:42:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B31A31E33
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41DC4188B9B7
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 05:42:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 730BC188B754
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 05:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF39D1F866A;
-	Wed, 12 Feb 2025 05:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972231F8AC8;
+	Wed, 12 Feb 2025 05:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6dGSUBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEY6BjB6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81100271837;
-	Wed, 12 Feb 2025 05:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F9C2BD10;
+	Wed, 12 Feb 2025 05:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739338968; cv=none; b=rLQsxCumcJP73ByNz9LGJR5QjUvMycck1ArcnLVPEvgS55UXGvvGapd8tVaqNoKdqASS1apddjg6ziVO5RVBlBI+LZHHoPtbfmZiYGlKyfkVgb7bGH4fQ0X83AGdJdBHZHhDMjyQXr66CPLhGzZNbctqURKANYKFuzoILfMtqkY=
+	t=1739339253; cv=none; b=PsFmL0YA7+K9EYtAYCG2RFaiCmqax7htM7uZEKzIi+FUM5OS7wMeCH9Bbt33RsD4kLi/OqfFFn9anwzkE/hWOU96Nwyv2sLG5CMFRt4RYtqF6YYLW2qpk1yGqk4YUajm1TRCTN3Hiz5NooECjOTHCAL4OsjWzUf49s0bph+kbn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739338968; c=relaxed/simple;
-	bh=xvcbtv9IFmooAu7P4df86saRb78Gr/1zViD2XIOy+Q8=;
+	s=arc-20240116; t=1739339253; c=relaxed/simple;
+	bh=ilS7Vyw4k14KiS1Avo6VfcY56qUDNzLPX44dUnRds40=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tUKVWgsEMmkxPUZ+JlySq6vUsbABvPIQOz0743Gb3+w1egq8iZnrGJomXLnwt+hrWFlhxeQN5ervjAQDleCd10zSMPTFApXIzh2+ZG5yzogJPQowfumcRDScLuATNTmdFF0SQsHBvQAYfOEd215Ha7dtGoUuWJCo3QGcN3eXKJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6dGSUBy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 450C0C4CEDF;
-	Wed, 12 Feb 2025 05:42:44 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=BaHyk0gZGg1wZ132QkuPb+s6mUBPP0ovBwwmuxmKGu7hyVXHDNZbmPwks/IQCHBd1Yngjv8eQcrKwVnte4pMk+c263mBNjkrr6gKx0p4Grs0vZAlXd6QmE6WeVXYdePYbaoa/QPGDdtLMRU05B7zkvVW8whcawXeLhZS6f8w0GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEY6BjB6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE5EC4CEDF;
+	Wed, 12 Feb 2025 05:47:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739338967;
-	bh=xvcbtv9IFmooAu7P4df86saRb78Gr/1zViD2XIOy+Q8=;
+	s=k20201202; t=1739339252;
+	bh=ilS7Vyw4k14KiS1Avo6VfcY56qUDNzLPX44dUnRds40=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=u6dGSUByjWYrMTfYu1jX2AMuRGUkb+BEeox9ufmm/KWVQfBOEpOUqrMvRj413C01V
-	 rhI8U1kkt4TjIdp1N+PlFHIreru//WzSghO9t/OmEtDlIUJyto14+rtljr+D5k2slM
-	 /MZfjMXwrOHFycYrDP/oqDbgfSrx7qjUIKBTyOW9CIVyzhppUYeAAtZicBDHQHaVYR
-	 DIAJBdF7sIp50t7SezFYRHDpK6xNX4HYeLG48K+OXonTCuRtvRZbdlrXgFtOYLDjOj
-	 QibHGWkZBct6vtVwoDAxsZTclsYbhdDjB+BtzBPCnhVnT2d7Jy2M3iFfAIs8O3MyYY
-	 O3zXPcy2zO12w==
-Message-ID: <1def2434-9033-4c83-b7de-c6364b7d3003@kernel.org>
-Date: Wed, 12 Feb 2025 06:42:42 +0100
+	b=OEY6BjB6CkYChOeih1Nh4KTQb5T3hOPO5/BHvi7V1yaiUS6QYrxbrMpu0V9TvJU9J
+	 PwMtEHJOV6jMdEDMrdF4qoiQ9afZeuZ6U3krh0RCknAFygY+3WJGg7Kih9DhWHKuSv
+	 i/NuEcces9zbZEenBCoX3iPwqBRmIs7J7JJgst006EuNAjOkCEUt+SsxGWFqfhCp88
+	 cUBp1jdnSvjeMgknSBOmx7GTlxJPM03xAa0VK2sY1ujBxaB2ENY3MKmls+qnGaSwJu
+	 qzkT/pTUkgod6PlEHu19Q/f8NAeU6ZmA7G/R1fLahfBESpsq3/opCLlle12M5ej6zZ
+	 VtgyK3wzJuDfw==
+Message-ID: <e7a1b608-2bad-41d4-844a-07fd73818bb3@kernel.org>
+Date: Wed, 12 Feb 2025 06:47:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] net: stmmac: dwmac-loongson: Add fix_soc_reset()
- callback
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>, kuba@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
-Cc: chenhuacai@kernel.org, si.yanteng@linux.dev, fancer.lancer@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Huacai Chen <chenhuacai@loongson.cn>
-References: <20250212023622.14512-1-zhaoqunqin@loongson.cn>
+Subject: Re: [PATCH 1/9] of: Add warpper function
+ of_find_node_by_name_balanced()
+To: Zhang Zekun <zhangzekun11@huawei.com>, robh@kernel.org,
+ saravanak@google.com, justin.chen@broadcom.com,
+ florian.fainelli@broadcom.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+ o.rempel@pengutronix.de, kory.maincent@bootlin.com,
+ jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
+ laurent.pinchart+renesas@ideasonboard.com, maddy@linux.ibm.com,
+ mpe@ellerman.id.au, npiggin@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, taras.chornyi@plvision.eu, edumazet@google.com,
+ pabeni@redhat.com, sudeep.holla@arm.com, cristian.marussi@arm.com
+Cc: arm-scmi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-media@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, chenjun102@huawei.com
+References: <20250207013117.104205-1-zhangzekun11@huawei.com>
+ <20250207013117.104205-2-zhangzekun11@huawei.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,17 +111,41 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250212023622.14512-1-zhaoqunqin@loongson.cn>
+In-Reply-To: <20250207013117.104205-2-zhangzekun11@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/02/2025 03:36, Qunqin Zhao wrote:
-> Loongson's DWMAC device may take nearly two seconds to complete DMA reset,
-> however, the default waiting time for reset is 200 milliseconds.
+On 07/02/2025 02:31, Zhang Zekun wrote:
+> There are many drivers use of_find_node_by_name() with a not-NULL
+> device_node pointer, and a number of callers would require a call to
+> of_node_get() before using it. There are also some drivers who forget
+> to call of_node_get() which would cause a ref count leak[1]. So, Add a
+> wraper function for of_find_node_by_name(), drivers may use this function
+> to call of_find_node_by_name() with the refcount already balanced.
 > 
-> Fixes: 803fc61df261 ("net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support")
+> [1] https://lore.kernel.org/all/20241024015909.58654-1-zhangzekun11@huawei.com/
+> 
+> Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
+> ---
+>  include/linux/of.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/include/linux/of.h b/include/linux/of.h
+> index eaf0e2a2b75c..b7c6d7ff278c 100644
+> --- a/include/linux/of.h
+> +++ b/include/linux/of.h
+> @@ -268,6 +268,11 @@ static inline const char *of_node_full_name(const struct device_node *np)
+>  #define for_each_of_allnodes(dn) for_each_of_allnodes_from(NULL, dn)
+>  extern struct device_node *of_find_node_by_name(struct device_node *from,
+>  	const char *name);
+> +static inline struct device_node *of_find_node_by_name_balanced(struct device_node *from,
+> +								const char *name)
+> +{
+> +	return of_find_node_by_name(of_node_get(from), name);
 
-You still miss cc-stable.
+I don't think that solution to people not reading API description is to
+create more API with similar but a bit different behavior, especially
+undocumented.
 
 Best regards,
 Krzysztof
