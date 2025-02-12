@@ -1,67 +1,75 @@
-Return-Path: <netdev+bounces-165518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A6FDA326D9
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:18:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8357EA326DD
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1CFB1882484
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:18:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FDCB163DA7
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D22D209681;
-	Wed, 12 Feb 2025 13:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FD520B800;
+	Wed, 12 Feb 2025 13:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZdtUsX4n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czDy20IB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92673134A8;
-	Wed, 12 Feb 2025 13:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9D3134A8;
+	Wed, 12 Feb 2025 13:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739366311; cv=none; b=cxezbm2VW4w5oUEqTOprTQAXw8/16FEPsq1DhNtbS38RCF/qJeJG2xQt4E35GIUZ/z2y+c3klmTxsh3Rw0pi0MuAzoxz30039zqltyar0SdRApC6yiQNhnhQkwh+0t2fawC9W1FJUt61lbqxKENuQascHPOLdURtRgLCboyFdvk=
+	t=1739366556; cv=none; b=dBph558Y03B1Y7tsFo4sQWSqyOWThxuw1Dy1/EOItF5BjRRwbIsqLwgGKt2saSlJDDtiFzkCeHYY5MfDIGrR6RUmGygVyzoQVHJSVKH4TzIfD+J93xRSNsc+4OCbI3OioniBpxDkspijyqIr2fP8ERgN7AJMfc9vIgCnlGKe5Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739366311; c=relaxed/simple;
-	bh=0AYpcltqec6u1p0gyS++tFAR2YVtjSupqee/DsRmCkU=;
+	s=arc-20240116; t=1739366556; c=relaxed/simple;
+	bh=Iw9Q4GGHRyGE9ebPmgJQrAAQ5nea+Wdg8JZGirbM2a4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uKZtvMr/0HNcU3fxojjzZTnbzUVQiQg8idT8adwMASHQwI8Erq4I8w2Yyx0Npn7M1cNUDL5UVdh4FeVPBb9Dy6Lu6lgFKzJvjhuZWq/epBk6ZlmJvK6BIN/+zP4cAJzjgxKKtAYcwD+XgLeewryeYNPfTfM1N004oOxOXUztPoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZdtUsX4n; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3HekB3x4ewBgrycoUmahaMTe1OuakWg2M5alpZ2tkms=; b=ZdtUsX4nApgHpGRyh9rkaCaxZS
-	Et+jDBkPBq/nKoFP5ippcss/lTrgrtf8GYDcKfo7ohxIKo6Q3BnA9A40glYU1lJEESLmoKY5LXBAc
-	8GrQsb0TbLyVUlmviQS33F73VDPoI/cp4jH/aOPZl+nqNjMT1rlPNIwoDivOUAEH9P4s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiCd9-00DOqE-C3; Wed, 12 Feb 2025 14:18:19 +0100
-Date: Wed, 12 Feb 2025 14:18:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: dimitri.fedrau@liebherr.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dimitri Fedrau <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v4 3/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
-Message-ID: <0ab7e964-3e0a-487c-885a-6d20f4482762@lunn.ch>
-References: <20250211-dp83822-tx-swing-v4-0-1e8ebd71ad54@liebherr.com>
- <20250211-dp83822-tx-swing-v4-3-1e8ebd71ad54@liebherr.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QxFN+eccSpln0c52tPliuijwoPp2Y0YDdn8ZslPLqaJomNXA3uwpCs4r66tKa+jzx8wIQt3PhF60OL3AN11SC3Q3cu3YTgkWK5nX1sn/FvUBBTqC/x86eFPwfz3A+NgwWy4x7c2KNm4JNYFvYRIZXS+4pVkCsj5lsfUIQhEDaSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czDy20IB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C01C4CEDF;
+	Wed, 12 Feb 2025 13:22:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739366554;
+	bh=Iw9Q4GGHRyGE9ebPmgJQrAAQ5nea+Wdg8JZGirbM2a4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=czDy20IBbzFHzTpsT0tDbijpAdUr3Bvk19g0vX8vtzN1tAFlTwx5RBgKrlKOw3mIu
+	 ZUeOVVylbx2YdE1Wsa6j8lTryiccxYsgCgrxNpSB3K0rMZA0bK+sVGFq+HOGFGxmBU
+	 om0fW7rWvFnXHCPU6XDCOjfEjPdwpZWBL6WELGuVzLh458HNmADkGH8oFGM8xQGs/1
+	 rMIzYDRjIPJXj5qBfrr7IkB7OE/eLNNRqqSwnSuxv5VSGMrO75EQ1Yp/8VHod1Wou8
+	 YyXM9Dw9JDuocxsyJlZpPD6jf+xJDCFkADJQpShTVHrqg0VUtTyu2HOGqJDDG5rmA4
+	 8kSnAQmFBKMzQ==
+Date: Wed, 12 Feb 2025 15:22:29 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: "Nelson, Shannon" <shannon.nelson@amd.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Michael Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
+Message-ID: <20250212132229.GG17863@unreal>
+References: <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <20250206164449.52b2dfef@kernel.org>
+ <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+ <20250207073648.1f0bad47@kernel.org>
+ <Z6ZsOMLq7tt3ijX_@x130>
+ <20250207135111.6e4e10b9@kernel.org>
+ <20250208011647.GH3660748@nvidia.com>
+ <20250210170423.62a2f746@kernel.org>
+ <20250211075553.GF17863@unreal>
+ <b0395452-dc56-414d-950c-9d0c68cf0f4a@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,16 +78,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250211-dp83822-tx-swing-v4-3-1e8ebd71ad54@liebherr.com>
+In-Reply-To: <b0395452-dc56-414d-950c-9d0c68cf0f4a@amd.com>
 
-> +	if (dp83822->tx_amplitude_100base_tx_index >= 0)
-> +		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_LDCTRL,
-> +			       DP83822_100BASE_TX_LINE_DRIVER_SWING,
-> +			       FIELD_PREP(DP83822_100BASE_TX_LINE_DRIVER_SWING,
-> +					  dp83822->tx_amplitude_100base_tx_index));
+On Tue, Feb 11, 2025 at 10:36:37AM -0800, Nelson, Shannon wrote:
+> On 2/10/2025 11:55 PM, Leon Romanovsky wrote:
+> > 
+> > On Mon, Feb 10, 2025 at 05:04:23PM -0800, Jakub Kicinski wrote:
+> > > On Fri, 7 Feb 2025 21:16:47 -0400 Jason Gunthorpe wrote:
+> > > > On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
+> > > > 
+> > > > > But if you agree the netdev doesn't need it seems like a fairly
+> > > > > straightforward way to unblock your progress.
+> > > > 
+> > > > I'm trying to understand what you are suggesting here.
+> > > > 
+> > > > We have many scenarios where mlx5_core spawns all kinds of different
+> > > > devices, including recovery cases where there is no networking at all
+> > > > and only fwctl. So we can't just discard the aux dev or mlx5_core
+> > > > triggered setup without breaking scenarios.
+> > > > 
+> > > > However, you seem to be suggesting that netdev-only configurations (ie
+> > > > netdev loaded but no rdma loaded) should disable fwctl. Is that the
+> > > > case? All else would remain the same. It is very ugly but I could see
+> > > > a technical path to do it, and would consider it if that brings peace.
+> > > 
+> > > Yes, when RDMA driver is not loaded there should be no access to fwctl.
+> > 
+> > There are users mentioned in cover letter, which need FWCTL without RDMA.
+> > https://lore.kernel.org/all/0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com/
+> > 
+> > I want to suggest something different. What about to move all XXX_core
+> > logic (mlx5_core, bnxt_core, e.t.c.) from netdev to some other dedicated
+> > place?
+> > 
+> > There is no technical need to have PCI/FW logic inside networking stack.
+> > 
+> > Thanks
+> 
+> Our pds_core device fits this description as well: it is not an ethernet PCI
+> device, but helps manage the FW/HW for Eth and other things that are
+> separate PCI functions.  We ended up in the netdev arena because we first
+> went in as a support for vDPA VFs.
+> 
+> Should these 'core' devices live in linux-pci land?  Is it possible that
+> some 'core' things might be platform devices rather than PCI?
 
-So the driver leaves the value unchanged by default. Please make the
-code and the binding match.
+IMHO, linux-pci was right place before FWCTL and auxbus arrived, but now
+these core drivers can be placed in drivers/fwctl instead. It will be natural
+place for them as they will be located near the UAPI which provides an access
+to them.
 
-	Andrew
+All other components will be auxbus devices in their respective
+subsystems (eth, RDMA ...).
+
+Thanks
+
+> 
+> sln
+> 
+> 
 
