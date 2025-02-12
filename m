@@ -1,188 +1,382 @@
-Return-Path: <netdev+bounces-165503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FEA1A32623
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:47:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8259FA32629
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:47:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CC43A4556
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:46:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A71D188C4C9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D2B1E87B;
-	Wed, 12 Feb 2025 12:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="yZCqFt1D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9D020E02D;
+	Wed, 12 Feb 2025 12:47:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33587B673;
-	Wed, 12 Feb 2025 12:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5C7B673;
+	Wed, 12 Feb 2025 12:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739364420; cv=none; b=HzqlnEl/AEBptXdAkbt1Kl/Ce20HJ5URIZpU9pJHuvAo+2WqIvAhU3uRAaSuvRFAlr+DsuOswEVPWpNdbLWZYDUi3J7d8IIhVz0T10FMx46Gi1BS/WHEJhJuTDS2/OyNX9i8JQMdcUt8jnSu3kkCjvP/OL0XwfiTWEgTPM3VWks=
+	t=1739364429; cv=none; b=T3qrfPoLDdHyTXOjJ3GQLGRCQ1H2AD5XB3YdV2MJdCx0K7xQGcik+mjdzNjmQDAyZPqC9Lzm//7hsMJdVtwAMlyLHCaDfAUYvI0dqGbEG0K+31VgYrvl9i+SLDmLrWTqSMq4WKT9Jcnh3xuUWoxJ9SNhuj8R/rOrLgjXt5M/wmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739364420; c=relaxed/simple;
-	bh=abNS+SlQsH7zUv/rrq3F4u5WzmNh3AVn3E329/VKTRI=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=fbp2Wg/DV293bfqVQkl2tGattU+S0sOdYKc497TJqo4p5eu6MO3x8PduAyC13zwtbuldYSwUPJiZXzbkFbL5EoeboV4PKz5ULmd6dSc1E2MgwUwBqUVmo2OXK9GPKMbLZDdcDPNzSluR78nJokiuxH1LGm37QyriCGlw7cq/eUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=yZCqFt1D; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 736191077FB9;
-	Wed, 12 Feb 2025 15:46:54 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 736191077FB9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1739364414; bh=gbwi/FK25uRXyNl2UyXm8Vw8PER/cVoK4GZhMFjqzPo=;
-	h=From:To:CC:Subject:Date:From;
-	b=yZCqFt1DuPdRAU7nD+lSWy929B5w/nSk9k6AZMw/CYmK/ipBDMk1NUa+gG56QAsmz
-	 92ubghJz4NPLkIbS0asZCOhBnSH43esIEkpFZIJ/SXN1+5iss2AI679lPt20y36sQj
-	 5KkotLJAMvWGGSEA1/no9ygdOztFMHvcBq/+GrIU=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 707423045337;
-	Wed, 12 Feb 2025 15:46:54 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Neil Horman <nhorman@tuxdriver.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: [PATCH net] drop_monitor: fix incorrect initialization order
-Thread-Topic: [PATCH net] drop_monitor: fix incorrect initialization order
-Thread-Index: AQHbfUwxqBopjNb91026ifHBiYFNFQ==
-Date: Wed, 12 Feb 2025 12:46:54 +0000
-Message-ID: <20250212124653.297647-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1739364429; c=relaxed/simple;
+	bh=EtjadoyVk7jETEyltx1iX1caTwhJuaqujhLdLpbQ+UA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FtDf85u8GLr6OUEkXPDP/+T9uA5LaHy8aOiXFl7KZbKyaJj2M7/3huO2ogshJ8KkVeH5V97/Yt04Jnb+S+Vz48rZTZVY1GGv16GzjUmV6Tn62rYiNpDY9o65omlR+eQL/Ude1VyGzDyy35HdpmimVPNgE+FAuuahPGWD+zQR6h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YtJ110QNPz6J7dt;
+	Wed, 12 Feb 2025 20:44:37 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4FFE6140B2A;
+	Wed, 12 Feb 2025 20:47:02 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 12 Feb
+ 2025 13:47:01 +0100
+Date: Wed, 12 Feb 2025 12:47:00 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+CC: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
+	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
+	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
+	<gospo@broadcom.com>, <hch@infradead.org>, <itayavr@nvidia.com>,
+	<jiri@nvidia.com>, <kuba@kernel.org>, <lbloch@nvidia.com>,
+	<leonro@nvidia.com>, <saeedm@nvidia.com>, <linux-cxl@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<brett.creeley@amd.com>
+Subject: Re: [RFC PATCH fwctl 4/5] pds_fwctl: add rpc and query support
+Message-ID: <20250212124700.00005f62@huawei.com>
+In-Reply-To: <20250211234854.52277-5-shannon.nelson@amd.com>
+References: <20250211234854.52277-1-shannon.nelson@amd.com>
+	<20250211234854.52277-5-shannon.nelson@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2025/02/12 10:45:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/02/12 10:17:00 #27183182
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-Syzkaller reports the following bug:
+On Tue, 11 Feb 2025 15:48:53 -0800
+Shannon Nelson <shannon.nelson@amd.com> wrote:
 
-BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
- lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu:=
- 0
-CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+=
- #1
-Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference=
- Platform, BIOS 6.00 11/12/2020
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x119/0x179 lib/dump_stack.c:118
- debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
- do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
- _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
- reset_per_cpu_data+0xe6/0x240 [drop_monitor]
- net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
- genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
- genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
- sock_sendmsg_nosec net/socket.c:651 [inline]
- __sock_sendmsg+0x157/0x190 net/socket.c:663
- ____sys_sendmsg+0x712/0x870 net/socket.c:2378
- ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
- __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
- do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x62/0xc7
-RIP: 0033:0x7f3f9815aee9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 =
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
-f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
-RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
-RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
+> From: Brett Creeley <brett.creeley@amd.com>
+> 
+> The pds_fwctl driver doesn't know what RPC operations are available
+> in the firmware, so also doesn't know what scope they might have.  The
+> userland utility supplies the firmware "endpoint" and "operation" id values
+> and this driver queries the firmware for endpoints and their available
+> operations.  The operation descriptions include the scope information
+> which the driver uses for scope testing.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Various comments inline.  I haven't looked closely at the actual interface
+yet though as running out of time today.
 
-If drop_monitor is built as a kernel module, syzkaller may have time
-to send a netlink NET_DM_CMD_START message during the module loading.
-This will call the net_dm_monitor_start() function that uses
-a spinlock that has not yet been initialized.
+Jonathan
 
-To fix this, let's place resource initialization above the registration
-of a generic netlink family.
+> ---
+>  drivers/fwctl/pds/main.c       | 369 ++++++++++++++++++++++++++++++++-
+>  include/linux/pds/pds_adminq.h | 187 +++++++++++++++++
+>  include/uapi/fwctl/pds.h       |  16 ++
+>  3 files changed, 569 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/fwctl/pds/main.c b/drivers/fwctl/pds/main.c
+> index 24979fe0deea..b60a66ef1fac 100644
+> --- a/drivers/fwctl/pds/main.c
+> +++ b/drivers/fwctl/pds/main.c
+> @@ -15,12 +15,22 @@
+>  #include <linux/pds/pds_adminq.h>
+>  #include <linux/pds/pds_auxbus.h>
+>  
+> +DEFINE_FREE(kfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T));
+> +DEFINE_FREE(kvfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kvfree(_T));
 
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with SVACE.
+I'm lost. These look same as the ones in slab.h for kfree and kvfree
+which already handle error pointers.  Maybe based on an old kernel?
 
-Fixes: 9a8afc8d3962 ("Network Drop Monitor: Adding drop monitor implementat=
-ion & Netlink protocol")
-Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
----
- net/core/drop_monitor.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+> +static struct pds_fwctl_query_data *pdsfc_get_operations(struct pdsfc_dev *pdsfc,
+> +							 dma_addr_t *pa, u32 ep)
+> +{
+> +	struct pds_fwctl_query_data_operation *entries = NULL;
 
-diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
-index 6efd4cccc9dd..9755d2010e70 100644
---- a/net/core/drop_monitor.c
-+++ b/net/core/drop_monitor.c
-@@ -1734,6 +1734,11 @@ static int __init init_net_drop_monitor(void)
- 		return -ENOSPC;
- 	}
-=20
-+	for_each_possible_cpu(cpu) {
-+		net_dm_cpu_data_init(cpu);
-+		net_dm_hw_cpu_data_init(cpu);
-+	}
-+
- 	rc =3D genl_register_family(&net_drop_monitor_family);
- 	if (rc) {
- 		pr_err("Could not create drop monitor netlink family\n");
-@@ -1749,11 +1754,6 @@ static int __init init_net_drop_monitor(void)
-=20
- 	rc =3D 0;
-=20
--	for_each_possible_cpu(cpu) {
--		net_dm_cpu_data_init(cpu);
--		net_dm_hw_cpu_data_init(cpu);
--	}
--
- 	goto out;
-=20
- out_unreg:
-@@ -1772,13 +1772,12 @@ static void exit_net_drop_monitor(void)
- 	 * Because of the module_get/put we do in the trace state change path
- 	 * we are guaranteed not to have any current users when we get here
- 	 */
-+	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
-=20
- 	for_each_possible_cpu(cpu) {
- 		net_dm_hw_cpu_data_fini(cpu);
- 		net_dm_cpu_data_fini(cpu);
- 	}
--
--	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
- }
-=20
- module_init(init_net_drop_monitor);
---=20
-2.39.5
+Always set before use so don't initialize here.
+
+> +	struct device *dev = &pdsfc->fwctl.dev;
+> +	union pds_core_adminq_comp comp = {0};
+> +	union pds_core_adminq_cmd cmd = {0};
+> +	struct pds_fwctl_query_data *data;
+> +	dma_addr_t data_pa;
+> +	int err;
+> +	int i;
+> +
+> +	/* Query the operations list for the given endpoint */
+> +	data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
+> +	err = dma_mapping_error(dev->parent, data_pa);
+> +	if (err) {
+> +		dev_err(dev, "Failed to map operations list\n");
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	cmd.fwctl_query.opcode = PDS_FWCTL_CMD_QUERY;
+> +	cmd.fwctl_query.entity = PDS_FWCTL_RPC_ENDPOINT;
+> +	cmd.fwctl_query.version = 0;
+> +	cmd.fwctl_query.query_data_buf_len = cpu_to_le32(PAGE_SIZE);
+> +	cmd.fwctl_query.query_data_buf_pa = cpu_to_le64(data_pa);
+> +	cmd.fwctl_query.ep = cpu_to_le32(ep);
+> +
+> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
+> +	if (err) {
+> +		dev_err(dev, "Failed to send adminq cmd opcode: %u entity: %u err: %d\n",
+> +			cmd.fwctl_query.opcode, cmd.fwctl_query.entity, err);
+> +		dma_free_coherent(dev->parent, PAGE_SIZE, data, data_pa);
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	*pa = data_pa;
+> +
+> +	entries = (struct pds_fwctl_query_data_operation *)data->entries;
+> +	dev_dbg(dev, "num_entries %d\n", data->num_entries);
+> +	for (i = 0; i < data->num_entries; i++)
+> +		dev_dbg(dev, "endpoint %d operation: id %x scope %d\n",
+> +			ep, entries[i].id, entries[i].scope);
+> +
+> +	return data;
+> +}
+
+> +
+>  static void *pdsfc_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
+>  			  void *in, size_t in_len, size_t *out_len)
+>  {
+> -	return NULL;
+> +	struct pdsfc_dev *pdsfc = container_of(uctx->fwctl, struct pdsfc_dev, fwctl);
+> +	struct fwctl_rpc_pds *rpc = (struct fwctl_rpc_pds *)in;
+In is a void * so never any need to cast it to another pointer type.
+
+> +	void *out_payload __free(kfree_errptr) = NULL;
+
+Similar comment on style for these following documentation in cleanup.h
+That is tricky in this case but you can at least declare them and set
+them NULL just before they are conditionally assigned.
+
+> +	void *in_payload __free(kfree_errptr) = NULL;
+> +	struct device *dev = &uctx->fwctl->dev;
+> +	union pds_core_adminq_comp comp = {0};
+> +	dma_addr_t out_payload_dma_addr = 0;
+> +	union pds_core_adminq_cmd cmd = {0};
+> +	dma_addr_t in_payload_dma_addr = 0;
+> +	void *out = NULL;
+> +	int err;
+> +
+> +	err = pdsfc_validate_rpc(pdsfc, rpc, scope);
+> +	if (err) {
+> +		dev_err(dev, "Invalid RPC request\n");
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	if (rpc->in.len > 0) {
+> +		in_payload = kzalloc(rpc->in.len, GFP_KERNEL);
+> +		if (!in_payload) {
+> +			dev_err(dev, "Failed to allocate in_payload\n");
+> +			out = ERR_PTR(-ENOMEM);
+> +			goto done;
+
+As before avoid the gotos mixed with free.
+Easiest might be a little helper function for this setup of
+the input buffer and one for the output buffer.
+Probably not combined with __free that isn't giving much advantage
+here anyway.
+
+For this particular one can just return the error anyway as
+nothing to do.
+
+> +		}
+> +
+> +		if (copy_from_user(in_payload, u64_to_user_ptr(rpc->in.payload),
+> +				   rpc->in.len)) {
+> +			dev_err(dev, "Failed to copy in_payload from user\n");
+> +			out = ERR_PTR(-EFAULT);
+> +			goto done;
+> +		}
+> +
+> +		in_payload_dma_addr = dma_map_single(dev->parent, in_payload,
+> +						     rpc->in.len, DMA_TO_DEVICE);
+> +		err = dma_mapping_error(dev->parent, in_payload_dma_addr);
+> +		if (err) {
+> +			dev_err(dev, "Failed to map in_payload\n");
+> +			out = ERR_PTR(err);
+> +			goto done;
+> +		}
+> +	}
+> +
+> +	if (rpc->out.len > 0) {
+> +		out_payload = kzalloc(rpc->out.len, GFP_KERNEL);
+> +		if (!out_payload) {
+> +			dev_err(dev, "Failed to allocate out_payload\n");
+> +			out = ERR_PTR(-ENOMEM);
+> +			goto done;
+> +		}
+> +
+> +		out_payload_dma_addr = dma_map_single(dev->parent, out_payload,
+> +						      rpc->out.len, DMA_FROM_DEVICE);
+> +		err = dma_mapping_error(dev->parent, out_payload_dma_addr);
+> +		if (err) {
+> +			dev_err(dev, "Failed to map out_payload\n");
+> +			out = ERR_PTR(err);
+> +			goto done;
+> +		}
+> +	}
+> +
+> +	cmd.fwctl_rpc.opcode = PDS_FWCTL_CMD_RPC;
+> +	cmd.fwctl_rpc.flags = PDS_FWCTL_RPC_IND_REQ | PDS_FWCTL_RPC_IND_RESP;
+> +	cmd.fwctl_rpc.ep = cpu_to_le32(rpc->in.ep);
+> +	cmd.fwctl_rpc.op = cpu_to_le32(rpc->in.op);
+> +	cmd.fwctl_rpc.req_pa = cpu_to_le64(in_payload_dma_addr);
+> +	cmd.fwctl_rpc.req_sz = cpu_to_le32(rpc->in.len);
+> +	cmd.fwctl_rpc.resp_pa = cpu_to_le64(out_payload_dma_addr);
+> +	cmd.fwctl_rpc.resp_sz = cpu_to_le32(rpc->out.len);
+> +
+> +	dev_dbg(dev, "%s: ep %d op %x req_pa %llx req_sz %d req_sg %d resp_pa %llx resp_sz %d resp_sg %d\n",
+> +		__func__, rpc->in.ep, rpc->in.op,
+> +		cmd.fwctl_rpc.req_pa, cmd.fwctl_rpc.req_sz, cmd.fwctl_rpc.req_sg_elems,
+> +		cmd.fwctl_rpc.resp_pa, cmd.fwctl_rpc.resp_sz, cmd.fwctl_rpc.resp_sg_elems);
+> +
+> +	dynamic_hex_dump("in ", DUMP_PREFIX_OFFSET, 16, 1, in_payload, rpc->in.len, true);
+> +
+> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
+> +	if (err) {
+> +		dev_err(dev, "%s: ep %d op %x req_pa %llx req_sz %d req_sg %d resp_pa %llx resp_sz %d resp_sg %d err %d\n",
+> +			__func__, rpc->in.ep, rpc->in.op,
+> +			cmd.fwctl_rpc.req_pa, cmd.fwctl_rpc.req_sz, cmd.fwctl_rpc.req_sg_elems,
+> +			cmd.fwctl_rpc.resp_pa, cmd.fwctl_rpc.resp_sz, cmd.fwctl_rpc.resp_sg_elems,
+> +			err);
+> +		out = ERR_PTR(err);
+> +		goto done;
+> +	}
+> +
+> +	dynamic_hex_dump("out ", DUMP_PREFIX_OFFSET, 16, 1, out_payload, rpc->out.len, true);
+> +
+> +	dev_dbg(dev, "%s: status %d comp_index %d err %d resp_sz %d color %d\n",
+> +		__func__, comp.fwctl_rpc.status, comp.fwctl_rpc.comp_index,
+> +		comp.fwctl_rpc.err, comp.fwctl_rpc.resp_sz,
+> +		comp.fwctl_rpc.color);
+> +
+> +	if (copy_to_user(u64_to_user_ptr(rpc->out.payload), out_payload, rpc->out.len)) {
+> +		dev_err(dev, "Failed to copy out_payload to user\n");
+> +		out = ERR_PTR(-EFAULT);
+> +		goto done;
+> +	}
+> +
+> +	rpc->out.retval = le32_to_cpu(comp.fwctl_rpc.err);
+> +	*out_len = in_len;
+> +	out = in;
+> +
+> +done:
+> +	if (in_payload_dma_addr)
+> +		dma_unmap_single(dev->parent, in_payload_dma_addr,
+> +				 rpc->in.len, DMA_TO_DEVICE);
+> +
+> +	if (out_payload_dma_addr)
+> +		dma_unmap_single(dev->parent, out_payload_dma_addr,
+> +				 rpc->out.len, DMA_FROM_DEVICE);
+> +
+> +	return out;
+>  }
+>  
+>  static const struct fwctl_ops pdsfc_ops = {
+> @@ -150,16 +504,23 @@ static int pdsfc_probe(struct auxiliary_device *adev,
+>  		return err;
+>  	}
+>  
+> +	err = pdsfc_init_endpoints(pdsfc);
+> +	if (err) {
+> +		dev_err(dev, "Failed to init endpoints, err %d\n", err);
+> +		goto free_ident;
+> +	}
+> +
+>  	err = fwctl_register(&pdsfc->fwctl);
+>  	if (err) {
+>  		dev_err(dev, "Failed to register device, err %d\n", err);
+> -		return err;
+> +		goto free_endpoints;
+
+Mixing the __free() magic and gotos is 'probably' ok in this case
+but high risk.
+
+https://elixir.bootlin.com/linux/v6.13.1/source/include/linux/cleanup.h#L135
+Makes a fairly strong statement on this.  I'd suggest either figuring
+out a code reorg that avoids need for gotos or stopping using __free in this
+function.  This looks like similar question to earlier one of
+why are these cached as opposed to done inside open/close callbacks
+for specific RPC calls?
+
+>  	}
+> -
+
+Noise that shouldn't be here.
+
+>  	auxiliary_set_drvdata(adev, no_free_ptr(pdsfc));
+>  
+>  	return 0;
+>  
+> +free_endpoints:
+> +	pdsfc_free_endpoints(pdsfc);
+>  free_ident:
+>  	pdsfc_free_ident(pdsfc);
+>  	return err;
+> @@ -170,6 +531,8 @@ static void pdsfc_remove(struct auxiliary_device *adev)
+>  	struct pdsfc_dev *pdsfc  __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
+>  
+>  	fwctl_unregister(&pdsfc->fwctl);
+> +	pdsfc_free_operations(pdsfc);
+> +	pdsfc_free_endpoints(pdsfc);
+>  	pdsfc_free_ident(pdsfc);
+>  }
+
+
+
+> +/**
+> + * struct pds_fwctl_query_data - query data structure
+> + * @version:     Version of the query data structure
+> + * @rsvd:        Word boundary padding
+> + * @num_entries: Number of entries in the union
+> + * @entries:     Array of query data entries, depending on the entity type.
+> + */
+> +struct pds_fwctl_query_data {
+> +	u8      version;
+> +	u8      rsvd[3];
+> +	__le32  num_entries;
+> +	uint8_t entries[];
+__counted_by_le(num_entries)
+probably appropriate here.
+> +} __packed;
+> +
+
+> +/**
+> + * struct pds_sg_elem - Transmit scatter-gather (SG) descriptor element
+> + * @addr:	DMA address of SG element data buffer
+> + * @len:	Length of SG element data buffer, in bytes
+> + * @rsvd:	Word boundary padding
+> + */
+> +struct pds_sg_elem {
+> +	__le64 addr;
+> +	__le32 len;
+> +	__le16 rsvd[2];
+
+Why not an __le32?
+It's reserved and naturally aligned so who cares on type ;)
+
+> +} __packed;
+
 
