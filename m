@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-165418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14EBA31F3D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:42:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 458F3A31F44
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552F0188C452
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:42:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD5F2188ACDE
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1DF1FCF4F;
-	Wed, 12 Feb 2025 06:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A1B1FCF55;
+	Wed, 12 Feb 2025 06:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Luud9pZm"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kjDV2SdR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D341B1FC114
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD021FCD1A
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739342548; cv=none; b=OY12kGHupm1M0ujCO/IZ32SVoSl/1pBMiVVoR35+hy3oPQx7Jtb610K3ng2eRUhQrHXAYrjzydhOtgt2kS43/FfRijTsSrjA4KDwz2wWKudJfs791nNk7MSn+ZpuWc/zndHX6FdSldi9jH4Qgdb9ymcOJDfmYpbNlUamABWhgsQ=
+	t=1739342573; cv=none; b=AKsiLv8Qs9cVBuczWQxyy+IypqQwOq2E95MMEfPYsHRCKUVSg1Glru+W9YsP2/o528rRCAFfSkrplwD+MmmLKD9CY8JhWvY8eTnMHGjNDyAq/oDQkWWueENm6H61Tn+um+GRQWFC46GhbujVncllo+5TX/jZKjBfH4MagGetiDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739342548; c=relaxed/simple;
-	bh=fnNW6bOisEG233d9nvyp1AttvKM4+bJNAwN/n2MfVHU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=szND0Xk+dXE8J5SLz/UFUgToNk2fgbx2LaXPYB74zUd8WFT8ScwLcEu9ealU4xoKBAVNHCtHO+KxjO5Gd1V9kM9WVdSH0BGWAxODGRIrlF4Xx8IOH+memoeOcEJJbT0XkXNWEXQxS6XkXbmoN6p94NSkvPj9+x7YiX2mPLRkhWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Luud9pZm; arc=none smtp.client-ip=207.171.184.29
+	s=arc-20240116; t=1739342573; c=relaxed/simple;
+	bh=V7ZR7uJgZtG1yLIPbOn1zlxlX1bIHI0cjLiVct8srrU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QZq1ycoo5RKCc5Cq4sbqKAyxC6NsfWqX6Jfal9bJdS14wqjzhPU6sL0tuUiw2VQyimu1Cqrk8x3NBmUAzxDmIckPyofx4YkKt3WrQKP/4aBgO6co7KIlahhotqulxpS5m1IbBdbDuiNM/IgBHqMFNuZkkVkxenfwnAAQs55q8Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kjDV2SdR; arc=none smtp.client-ip=52.95.48.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739342547; x=1770878547;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jL3JrYPivToC4/XcN4RTV1bApa9ixZZXsbc1+iiv4Ok=;
-  b=Luud9pZmjtYz84drn8sjJxhIRm7wa4lu2mEFnXwNsDsTDumDlXW67KGm
-   ONwdunVFUZI00nJ7boUGnO2yTeUAMBrOuXj2zMU481vIGOYHAFEwE/EGv
-   d3I/vskyAHVQt+Up6pohMCx0Ef2qQuh2/0xMnSU9rQT8QrcFJX6dmqYM9
-   U=;
+  t=1739342573; x=1770878573;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+hhIvxy2uEPcR1i2bzY+SncfAJ73BVPOCfkwgVvtcbE=;
+  b=kjDV2SdRGCMUXOIzYayfW/1gLRr05NX+WjyMpTKz3zPED/unmSFm6Jod
+   5K9q8aigj3ltlmPe68MNXXRmZLOu1xqLh/DJhsBq2HPzNdM0jbIauSsrQ
+   i+62ypWXhNKlN/tlU3DM2c54MPmLxIbYmInHXfhlppItMDyJMP/E0ot5r
+   w=;
 X-IronPort-AV: E=Sophos;i="6.13,279,1732579200"; 
-   d="scan'208";a="493191814"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 06:42:21 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:3159]
+   d="scan'208";a="461804627"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 06:42:49 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:7806]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.65:2525] with esmtp (Farcaster)
- id d5848b8d-475f-4b30-bee9-2e6bfbe782d1; Wed, 12 Feb 2025 06:42:20 +0000 (UTC)
-X-Farcaster-Flow-ID: d5848b8d-475f-4b30-bee9-2e6bfbe782d1
+ id 560d50e7-18ed-4096-a5aa-d554c15aeb03; Wed, 12 Feb 2025 06:42:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 560d50e7-18ed-4096-a5aa-d554c15aeb03
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 12 Feb 2025 06:42:20 +0000
+ Wed, 12 Feb 2025 06:42:47 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.118.243.86) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Feb 2025 06:42:16 +0000
+ Wed, 12 Feb 2025 06:42:43 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v4 net 0/3] net: Fix race of rtnl_net_lock(dev_net(dev)).
-Date: Wed, 12 Feb 2025 15:42:03 +0900
-Message-ID: <20250212064206.18159-1-kuniyu@amazon.com>
+Subject: [PATCH v4 net 1/3] net: Add net_passive_inc() and net_passive_dec().
+Date: Wed, 12 Feb 2025 15:42:04 +0900
+Message-ID: <20250212064206.18159-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250212064206.18159-1-kuniyu@amazon.com>
+References: <20250212064206.18159-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,49 +77,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Yael Chemla reported that commit 7fb1073300a2 ("net: Hold rtnl_net_lock()
-in (un)?register_netdevice_notifier_dev_net().") started to trigger KASAN's
-use-after-free splat.
+net_drop_ns() is NULL when CONFIG_NET_NS is disabled.
 
-The problem is that dev_net(dev) fetched before rtnl_net_lock() might be
-different after rtnl_net_lock().
+The next patch introduces a function that increments
+and decrements net->passive.
 
-The patch 2 fixes the issue by checking dev_net(dev) after rtnl_net_lock(),
-and the patch 3 fixes the same potential issue that would emerge once RTNL
-is removed.
+As a prep, let's rename and export net_free() to
+net_passive_dec() and add net_passive_inc().
 
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/CANn89i+oUCt2VGvrbrweniTendZFEh+nwS=uonc004-aPkWy-Q@mail.gmail.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/net_namespace.h | 11 +++++++++++
+ net/core/net_namespace.c    |  8 ++++----
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-Changes:
-  v4:
-    * Add patch 1
-    * Fix build failure for !CONFIG_NET_NS in patch 2
-
-  v3:
-    * Bump net->passive instead of maybe_get_net()
-    * Remove msleep(1) loop
-    * Use rcu_access_pointer() instead of rcu_read_lock().
-
-  v2:
-    * Use dev_net_rcu()
-    * Use msleep(1) instead of cond_resched() after maybe_get_net()
-    * Remove cond_resched() after net_eq() check
-
-  v1: https://lore.kernel.org/netdev/20250130232435.43622-1-kuniyu@amazon.com/
-
-
-Kuniyuki Iwashima (3):
-  net: Add net_passive_inc() and net_passive_dec().
-  net: Fix dev_net(dev) race in unregister_netdevice_notifier_dev_net().
-  dev: Use rtnl_net_dev_lock() in unregister_netdev().
-
- include/net/net_namespace.h | 11 ++++++++
- net/core/dev.c              | 51 +++++++++++++++++++++++++++++++------
- net/core/net_namespace.c    |  8 +++---
- 3 files changed, 58 insertions(+), 12 deletions(-)
-
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index 7ba1402ca779..f467a66abc6b 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -297,6 +297,7 @@ static inline int check_net(const struct net *net)
+ }
+ 
+ void net_drop_ns(void *);
++void net_passive_dec(struct net *net);
+ 
+ #else
+ 
+@@ -326,8 +327,18 @@ static inline int check_net(const struct net *net)
+ }
+ 
+ #define net_drop_ns NULL
++
++static inline void net_passive_dec(struct net *net)
++{
++	refcount_dec(&net->passive);
++}
+ #endif
+ 
++static inline void net_passive_inc(struct net *net)
++{
++	refcount_inc(&net->passive);
++}
++
+ /* Returns true if the netns initialization is completed successfully */
+ static inline bool net_initialized(const struct net *net)
+ {
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index cb39a12b2f82..4303f2a49262 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -464,7 +464,7 @@ static void net_complete_free(void)
+ 
+ }
+ 
+-static void net_free(struct net *net)
++void net_passive_dec(struct net *net)
+ {
+ 	if (refcount_dec_and_test(&net->passive)) {
+ 		kfree(rcu_access_pointer(net->gen));
+@@ -482,7 +482,7 @@ void net_drop_ns(void *p)
+ 	struct net *net = (struct net *)p;
+ 
+ 	if (net)
+-		net_free(net);
++		net_passive_dec(net);
+ }
+ 
+ struct net *copy_net_ns(unsigned long flags,
+@@ -523,7 +523,7 @@ struct net *copy_net_ns(unsigned long flags,
+ 		key_remove_domain(net->key_domain);
+ #endif
+ 		put_user_ns(user_ns);
+-		net_free(net);
++		net_passive_dec(net);
+ dec_ucounts:
+ 		dec_net_namespaces(ucounts);
+ 		return ERR_PTR(rv);
+@@ -672,7 +672,7 @@ static void cleanup_net(struct work_struct *work)
+ 		key_remove_domain(net->key_domain);
+ #endif
+ 		put_user_ns(net->user_ns);
+-		net_free(net);
++		net_passive_dec(net);
+ 	}
+ 	cleanup_net_task = NULL;
+ }
 -- 
 2.39.5 (Apple Git-154)
 
