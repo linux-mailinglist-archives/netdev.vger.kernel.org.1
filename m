@@ -1,54 +1,62 @@
-Return-Path: <netdev+bounces-165455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A4EA321F0
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:19:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8740EA32236
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E4EF3A5324
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:19:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D42E18881B4
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1F8205E10;
-	Wed, 12 Feb 2025 09:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F2A204682;
+	Wed, 12 Feb 2025 09:33:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1A8205ADD;
-	Wed, 12 Feb 2025 09:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FBD1F0E56;
+	Wed, 12 Feb 2025 09:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739351981; cv=none; b=Bm0lvGvPfpYF+EdJSdFCdNWMvbbYpPxAPUVJnPlLdA3MuzVH74wZZyqSOuoTHS7GscnyBeX9FqTmoampRU3ElHtneLKwxtpir6Y/x8mWB/6wO7bCn2EcS8x85M4VHewUFE9dRAgNOX83ClV4uJyoK3Z06zFUK4suZ0bTcTqlCyk=
+	t=1739352799; cv=none; b=Q1JudiKATVQOhIxsbF2VHg01gSNhPi6pSdEuJdlZRK6Ik+fJ4CHRM/wPvzfUyXRhY7rlx/ZoxD0vjDK6vBH7IsiTLSvbGj3QlwxpbmCsoOQrTWWTtCdwKUP1Ec3GtgnlDQnOdBvcKgSMypwlNPUrqkTBDXFM9Y1H+9hHrUK5IZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739351981; c=relaxed/simple;
-	bh=2IQGUnrfpIddw8m2be7/PbtVzTD7MU+eoP3y4GoMQmw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZinIqQ5a8zTGZpM6OClRnt6FiYyH5Q41Ux7uRLrQT2ny++UhoCdqIqX/7KzudkVszaDKmfS6pB/ChI75kbHjrlgzz0b7EkffM3tCUMaLUNvw1fW44VNc2c6fYJ6lYkXi1Ytoq/PvFB+C8zYiqaw7phvq2KVfF4dpLi2mS3sbiP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowACXkziTZ6xnDxaiDA--.30403S2;
-	Wed, 12 Feb 2025 17:19:17 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com
-Cc: UNGLinuxDriver@microchip.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: microchip: sparx5: Fix potential NULL pointer dereference in debugfs
-Date: Wed, 12 Feb 2025 17:18:46 +0800
-Message-ID: <20250212091846.1166-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1739352799; c=relaxed/simple;
+	bh=715Z4OdSCHh6MXtC19TgD3L3sLnavMWEJw8JmA8boCo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dX1VIMZOrKxvE5RKJxpfy1c13V6LWGpIuebMzK58rCxP63v72TXuiHmX2rExoD/iLc2LuELo2mTTPDU88k5wxJ1d69Mod3NidODbnf6LklYQOlbHDAfFrljsQBpP4iBBTvnQVTUGI6FFZWKFcNFji3ZRm6YRtpK/L5y/kZreohU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4YtCgq66YKz1V6dV;
+	Wed, 12 Feb 2025 17:29:27 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 428F7180069;
+	Wed, 12 Feb 2025 17:33:14 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 12 Feb 2025 17:33:13 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, IOMMU <iommu@lists.linux.dev>, MM
+	<linux-mm@kvack.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+Subject: [PATCH net-next v9 0/4] fix the DMA API misuse problem for page_pool
+Date: Wed, 12 Feb 2025 17:25:47 +0800
+Message-ID: <20250212092552.1779679-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,52 +64,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACXkziTZ6xnDxaiDA--.30403S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFWftrykur4rZFWkKw4fAFb_yoW8JFWDpa
-	1DuFyYg3ykAwsxGw17Cw48XFyrWan0gFyfWrWruwn5ZFnYgFZ3Xr15CrWF9ryFqrZxGrnx
-	tF45Za9IyF1qyFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUb8hL5UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAcLA2esWj42QgAAsY
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-In vcap_debugfs_show_rule_keyset(), the function vcap_keyfields()
-returns a NULL pointer upon allocation failure. This can lead to
-a NULL pointer dereference in vcap_debugfs_show_rule_keyfield().
-To prevent this, add a check for a NULL return value from
-vcap_keyfields() and continue the loop if it is NULL.
+This patchset fix the dma API misuse problem as mentioned in [1].
 
-Fixes: 610c32b2ce66 ("net: microchip: vcap: Add vcap_get_rule")
-Cc: stable@vger.kernel.org # 6.2+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c | 2 ++
- 1 file changed, 2 insertions(+)
+From the below performance data, the overhead is not so obvious
+due to performance variations in arm64 server and less than 1 ns in
+x86 server for time_bench_page_pool01_fast_path() and
+time_bench_page_pool02_ptr_ring, and there is about 10~20ns overhead
+for time_bench_page_pool03_slow(), see more detail in [2].
 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c b/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-index 59bfbda29bb3..e9e2f7af9be3 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_debugfs.c
-@@ -202,6 +202,8 @@ static int vcap_debugfs_show_rule_keyset(struct vcap_rule_internal *ri,
- 
- 	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list) {
- 		keyfield = vcap_keyfields(vctrl, admin->vtype, ri->data.keyset);
-+		if (!keyfield)
-+			continue;
- 		vcap_debugfs_show_rule_keyfield(vctrl, out, ckf->ctrl.key,
- 						keyfield, &ckf->data);
- 	}
+arm64 server:
+Before this patchset:
+              fast_path              ptr_ring            slow
+1.         31.171 ns               60.980 ns          164.917 ns
+2.         28.824 ns               60.891 ns          170.241 ns
+3.         14.236 ns               60.583 ns          164.355 ns
+
+With patchset:
+6.         26.163 ns               53.781 ns          189.450 ns
+7.         26.189 ns               53.798 ns          189.466 ns
+
+X86 server:
+| Test name  |Cycles |   1-5 |    | Nanosec |    1-5 |        |      % |
+| (tasklet_*)|Before | After |diff|  Before |  After |   diff | change |
+|------------+-------+-------+----+---------+--------+--------+--------|
+| fast_path  |    19 |    19 |   0|   5.399 |  5.492 |  0.093 |    1.7 |
+| ptr_ring   |    54 |    57 |   3|  15.090 | 15.849 |  0.759 |    5.0 |
+| slow       |   238 |   284 |  46|  66.134 | 78.909 | 12.775 |   19.3 |
+
+And about 16 bytes of memory is also needed for each page_pool owned
+page to fix the dma API misuse problem 
+
+1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+2. https://lore.kernel.org/all/f558df7a-d983-4fc5-8358-faf251994d23@kernel.org/
+
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: Robin Murphy <robin.murphy@arm.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: IOMMU <iommu@lists.linux.dev>
+CC: MM <linux-mm@kvack.org>
+
+Change log:
+V9.
+  1. Drop the fix of a possible time window problem for NPAI recycling.
+  2. Add design description for the fix in patch 2.
+
+V8:
+  1. Drop last 3 patch as it causes observable performance degradation
+     for x86 system.
+  2. Remove rcu read lock in page_pool_napi_local().
+  3. Renaming item function more consistently.
+
+V7:
+  1. Fix a used-after-free bug reported by KASAN as mentioned by Jakub.
+  2. Fix the 'netmem' variable not setting up correctly bug as mentioned
+     by Simon.
+
+V6:
+  1. Repost based on latest net-next.
+  2. Rename page_pool_to_pp() to page_pool_get_pp().
+
+V5:
+  1. Support unlimit inflight pages.
+  2. Add some optimization to avoid the overhead of fixing bug.
+
+V4:
+  1. use scanning to do the unmapping
+  2. spilt dma sync skipping into separate patch
+
+V3:
+  1. Target net-next tree instead of net tree.
+  2. Narrow the rcu lock as the discussion in v2.
+  3. Check the ummapping cnt against the inflight cnt.
+
+V2:
+  1. Add a item_full stat.
+  2. Use container_of() for page_pool_to_pp().
+
+Yunsheng Lin (4):
+  page_pool: introduce page_pool_get_pp() API
+  page_pool: fix IOMMU crash when driver has already unbound
+  page_pool: support unlimited number of inflight pages
+  page_pool: skip dma sync operation for inflight pages
+
+ drivers/net/ethernet/freescale/fec_main.c     |   8 +-
+ .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  14 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   3 +-
+ drivers/net/netdevsim/netdev.c                |   6 +-
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   2 +-
+ include/linux/mm_types.h                      |   2 +-
+ include/linux/skbuff.h                        |   1 +
+ include/net/libeth/rx.h                       |   3 +-
+ include/net/netmem.h                          |  31 +-
+ include/net/page_pool/helpers.h               |  15 +
+ include/net/page_pool/memory_provider.h       |   2 +-
+ include/net/page_pool/types.h                 |  46 +-
+ net/core/devmem.c                             |   6 +-
+ net/core/netmem_priv.h                        |   5 +-
+ net/core/page_pool.c                          | 423 ++++++++++++++++--
+ net/core/page_pool_priv.h                     |  10 +-
+ 19 files changed, 504 insertions(+), 83 deletions(-)
+
 -- 
-2.42.0.windows.2
+2.33.0
 
 
