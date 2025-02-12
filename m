@@ -1,178 +1,102 @@
-Return-Path: <netdev+bounces-165401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7998A31E7D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:10:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67328A31E80
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A6B1889633
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11917167038
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E911FBC8D;
-	Wed, 12 Feb 2025 06:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5FD1FBC9C;
+	Wed, 12 Feb 2025 06:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FVYB+/vZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSCHCxWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE10311CA9;
-	Wed, 12 Feb 2025 06:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229671FBC8C;
+	Wed, 12 Feb 2025 06:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739340622; cv=none; b=FChcSjRCJ8E/RCfZy3ZZ2xzvYVpeeZgoXP7GlNlA7wwqbHJ7xUt04gmki6I8Ofy7AKChRrgMRK1OfuEcZ4tTEZMHFzmZOluokhFOpWaUvfzCouu3zM0vzUuLJKorHZfC3mP1Z5qBLyfPOKwwCjd7gY9ER+SJhkssEbeOCRktrYo=
+	t=1739340809; cv=none; b=BETcVDsTJ8xWRen1NHmnYqtMaBNEcLqBQqVE7zlf9w3ky3vbG3biklNQDKHGgZf2B6b5Zc2UBO9yoL9t6/RFilrkiLPgdO2YF73WyqWVeWVL0CKIysSpnB+breYnPuGmpQF9Wtq5d8QBZeft8ATRp1aqmtlvlP8VU/0akjT4ds0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739340622; c=relaxed/simple;
-	bh=R3qNJM5/PD4yUcE7z/fFu4EBll49affaVVrEUATUk0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/RFnSdxrmt5WPGRU05ByQjucfhcjfDuqipCNb6ec36PiyT5ev/Dpq1Z/RQgCajp8IiN4n93Al+5JIFMuLtaUBVfHtPGNruA8hIuLhC4MOyHm/pdPeXFQ7VCz12RL+5qQX+DQMvAhkAZT9Hidei0sO81PjbwWkJ6cwf0raYnPDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FVYB+/vZ; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=6Str7oYfWxLuaggMpptgbjOvLpW/PIrDwAfbw2hzR4U=; b=FVYB+/vZ7haImdT9Ge0ChwYHQa
-	ldelcQbeWnBkjM1UWgAJZxIdhqaRDqnDvFt8smLLi6etUpKcdfVzJLGtHcbyvwDWEMN6t0Ue4dTDS
-	fLSf/G9D2xRf7sSbknmU2xyZZcJzDXHoQQU+Jgmt4SRgexxRRyThT51kfdl0VT62RXZZCq7gbEi7v
-	JtiZAwxfjjSytnSvqxPZoJRlx5e1p1HuReYaq+V0sFZ9kP0S/hrfloAjCywOlFkzulpzBJ4dTEUpZ
-	kZ/nDd9UruHK6p5em1/ji690ITqPRZAuR94K+6DeaYoS4NI/Mv+5YuoVhDB4F1prf+o5abEWVFYQv
-	ijgw0nug==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ti5jq-00HEde-2a;
-	Wed, 12 Feb 2025 14:10:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 12 Feb 2025 14:10:07 +0800
-Date: Wed, 12 Feb 2025 14:10:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: syzbot <syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] crypto: null - Use spin lock instead of mutex
-Message-ID: <Z6w7Pz8jBeqhijut@gondor.apana.org.au>
-References: <6772f2f4.050a0220.2f3838.04cb.GAE@google.com>
+	s=arc-20240116; t=1739340809; c=relaxed/simple;
+	bh=Q2n2L7drLejKZWief1GLgiaDi8zcqK17/orvNRzGfqA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CaeX/msLZ1moOBlftvcg2E6Ed2YCxBs76nlqHQTLSTiZL4BUhSoHZa+w9ArQ3TDT6AMUYj3L8lQ6IlcMmiXFXoGQ8JupbwmXCjRmfC4AFEUSrLFMXHaQ+JtSPJ1FJ2c2eO5ohE4UJLHMA0LvcWR1oyMYg4vi9/zAVfP8+2qBmSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tSCHCxWG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80257C4CEE4;
+	Wed, 12 Feb 2025 06:13:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739340808;
+	bh=Q2n2L7drLejKZWief1GLgiaDi8zcqK17/orvNRzGfqA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tSCHCxWGZIA/a5Qd0sMtoNpEYpsDkQvDBqZZ1yzrua+bd6DqCM6b1UPoiUiCMH8KC
+	 +cM7p3qagVUJcrij3JozhLhQQuh1TXoBrtFNUfnYGMahJPIZdwmjpo7ofAAM5ewbS4
+	 1DXXLzaBoIivSltILPtL8v/5w5TsCs/AOdjriIOLpTZ6ZncLNKb4sKrwV8bK63bYlS
+	 yaV5lBUQrZzhNQ9dVPb9NQOyq0fVT1DZzdpX4EREb8L5DLCQGnnwPxHcy9zb/XVrBo
+	 xQMI1T09nbINii/AjCycQ1AVsj4ZGfBtzBV9MDsrrUNAy1GFnMBjM/RxDgQOj3P7hA
+	 ZrjD+bdcP2zNQ==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dccc90a52eso10365034a12.0;
+        Tue, 11 Feb 2025 22:13:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVXjESUW3JFRj6czlHTMjku3tOyKRddWrJ4jMa+Wl9HwGQZJR7qyXLOEKcZfpoIa5oTUL46Z7EvbYVBTIc=@vger.kernel.org, AJvYcCW3g0omEP9R+lb3ZDlBHoygtlXrEQOd5iK7Xkzd2ZFJ7CU5SqOe1ARrE4YQa14QNTNtVM6HfCnX@vger.kernel.org, AJvYcCXBIZqcM7xXKzv6ErII0qXmp3EMQ2FxtZQQv7UwgBV/2hj9A7iLCB2bc9JNrL4ZdzJhrwec0RcX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPe3DnhdjVsdO1jwAFU9ePGo12YAHw5qiJ9Gt610A0vQq7oyh1
+	4HMmc2s8nIvW+Tcw+jV19qGoZpiBfDY4OZUHuu6RkhEL8Csg0poyxGAxxfbhQOYPwN0lphgmPBe
+	p1jqsRDx9zJSsHK3l6dJACn9oYzU=
+X-Google-Smtp-Source: AGHT+IEJhoWFl0B4q/EurHfiRdKwpyjTEuXQGyI1KUIAgu6VYDgxiA1ICSJ87mafKbliIZMIdgftEGnT2vDgyRXpem0=
+X-Received: by 2002:a05:6402:42c8:b0:5d3:cfd0:8d46 with SMTP id
+ 4fb4d7f45d1cf-5deade0a6c9mr1645295a12.30.1739340807021; Tue, 11 Feb 2025
+ 22:13:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6772f2f4.050a0220.2f3838.04cb.GAE@google.com>
+References: <20250212023622.14512-1-zhaoqunqin@loongson.cn>
+ <1def2434-9033-4c83-b7de-c6364b7d3003@kernel.org> <63882ba5-0b19-308c-d3d8-0dca7509c105@loongson.cn>
+In-Reply-To: <63882ba5-0b19-308c-d3d8-0dca7509c105@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 12 Feb 2025 14:13:16 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5207Mf5QCHfT-Of-e=66snNrC9F-3T24JUaTGMf1xdcA@mail.gmail.com>
+X-Gm-Features: AWEUYZlxxc4vXn4MSbFenkrvUBI50CIAeOo2v3NoRWN9gng5nZcpiW1XwYm8G1Y
+Message-ID: <CAAhV-H5207Mf5QCHfT-Of-e=66snNrC9F-3T24JUaTGMf1xdcA@mail.gmail.com>
+Subject: Re: [PATCH V2] net: stmmac: dwmac-loongson: Add fix_soc_reset() callback
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, kuba@kernel.org, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	si.yanteng@linux.dev, fancer.lancer@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Huacai Chen <chenhuacai@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 30, 2024 at 11:22:28AM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    a024e377efed net: llc: reset skb->transport_header
-> git tree:       net
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c7f0b0580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b3e02953598f447d4d2a
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bce818580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12bce818580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f2ea524d69fe/disk-a024e377.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/b39d227b097d/vmlinux-a024e377.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/8ee66636253f/bzImage-a024e377.xz
+On Wed, Feb 12, 2025 at 2:03=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
+> wrote:
+>
+>
+> =E5=9C=A8 2025/2/12 =E4=B8=8B=E5=8D=881:42, Krzysztof Kozlowski =E5=86=99=
+=E9=81=93:
+> > On 12/02/2025 03:36, Qunqin Zhao wrote:
+> >> Loongson's DWMAC device may take nearly two seconds to complete DMA re=
+set,
+> >> however, the default waiting time for reset is 200 milliseconds.
+> >>
+> >> Fixes: 803fc61df261 ("net: stmmac: dwmac-loongson: Add Loongson Multi-=
+channels GMAC support")
+> > You still miss cc-stable.
+> OK, thanks.
+You can copy-paste the error message to commit message since you need
+V3, and the title should begin with [PATCH net V3].
 
----8<---
-As the null algorithm may be freed in softirq context through
-af_alg, use spin locks instead of mutexes to protect the default
-null algorithm.
+Huacai
 
-Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
-index 5b84b0f7cc17..337867028653 100644
---- a/crypto/crypto_null.c
-+++ b/crypto/crypto_null.c
-@@ -17,10 +17,10 @@
- #include <crypto/internal/skcipher.h>
- #include <linux/init.h>
- #include <linux/module.h>
--#include <linux/mm.h>
-+#include <linux/spinlock.h>
- #include <linux/string.h>
- 
--static DEFINE_MUTEX(crypto_default_null_skcipher_lock);
-+static DEFINE_SPINLOCK(crypto_default_null_skcipher_lock);
- static struct crypto_sync_skcipher *crypto_default_null_skcipher;
- static int crypto_default_null_skcipher_refcnt;
- 
-@@ -152,23 +152,32 @@ MODULE_ALIAS_CRYPTO("cipher_null");
- 
- struct crypto_sync_skcipher *crypto_get_default_null_skcipher(void)
- {
-+	struct crypto_sync_skcipher *ntfm = NULL;
- 	struct crypto_sync_skcipher *tfm;
- 
--	mutex_lock(&crypto_default_null_skcipher_lock);
-+	spin_lock_bh(&crypto_default_null_skcipher_lock);
- 	tfm = crypto_default_null_skcipher;
- 
- 	if (!tfm) {
--		tfm = crypto_alloc_sync_skcipher("ecb(cipher_null)", 0, 0);
--		if (IS_ERR(tfm))
--			goto unlock;
-+		spin_unlock_bh(&crypto_default_null_skcipher_lock);
- 
--		crypto_default_null_skcipher = tfm;
-+		ntfm = crypto_alloc_sync_skcipher("ecb(cipher_null)", 0, 0);
-+		if (IS_ERR(ntfm))
-+			return ntfm;
-+
-+		spin_lock_bh(&crypto_default_null_skcipher_lock);
-+		tfm = crypto_default_null_skcipher;
-+		if (!tfm) {
-+			tfm = ntfm;
-+			ntfm = NULL;
-+			crypto_default_null_skcipher = tfm;
-+		}
- 	}
- 
- 	crypto_default_null_skcipher_refcnt++;
-+	spin_unlock_bh(&crypto_default_null_skcipher_lock);
- 
--unlock:
--	mutex_unlock(&crypto_default_null_skcipher_lock);
-+	crypto_free_sync_skcipher(ntfm);
- 
- 	return tfm;
- }
-@@ -176,12 +185,16 @@ EXPORT_SYMBOL_GPL(crypto_get_default_null_skcipher);
- 
- void crypto_put_default_null_skcipher(void)
- {
--	mutex_lock(&crypto_default_null_skcipher_lock);
-+	struct crypto_sync_skcipher *tfm = NULL;
-+
-+	spin_lock_bh(&crypto_default_null_skcipher_lock);
- 	if (!--crypto_default_null_skcipher_refcnt) {
--		crypto_free_sync_skcipher(crypto_default_null_skcipher);
-+		tfm = crypto_default_null_skcipher;
- 		crypto_default_null_skcipher = NULL;
- 	}
--	mutex_unlock(&crypto_default_null_skcipher_lock);
-+	spin_unlock_bh(&crypto_default_null_skcipher_lock);
-+
-+	crypto_free_sync_skcipher(tfm);
- }
- EXPORT_SYMBOL_GPL(crypto_put_default_null_skcipher);
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> >
+> > Best regards,
+> > Krzysztof
+>
 
