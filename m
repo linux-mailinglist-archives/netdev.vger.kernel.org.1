@@ -1,141 +1,121 @@
-Return-Path: <netdev+bounces-165643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E4AA32EC1
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:34:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0556CA32ECF
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8613A39E4
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:34:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACCDE1633BA
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A4625D52E;
-	Wed, 12 Feb 2025 18:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A79525E44A;
+	Wed, 12 Feb 2025 18:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C+R1sIAV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149AC27180B;
-	Wed, 12 Feb 2025 18:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD36E27180B
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 18:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739385281; cv=none; b=suhs5Oke8YphULahJj5paPemGe/N0GOgUukdZ9G2KcrBc/bawXnHoGkOPI5Mgy2FGAQXmKJYvnMle80PhYNcPBSB6iG9EPTrnZCryJ8Q7EGYBGzDWwhVq4M+HR8wYzzT2AEIvsDX/kZltJLMv2k3fqB5rMPQQXOA6/6HWU97ihA=
+	t=1739385517; cv=none; b=Vqzk11HdC1TGHp2Oam2tC0DQVMwdiFGahCN0f3AT+Vfvzswd0vUHWE1H7C+VTHhIlLQ+CjZ5FYekQGJStlqsE+xSU/HyopcqLu/R0RTyEMVboYMc1DBg23RVfSML2+vPthp6kAbH4UMofC86xzvzUaUzu9eClciF5o8b9rytUsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739385281; c=relaxed/simple;
-	bh=u8Mj2f4Ky3af2LxP5bM5f51X8/5c/v2NRTvy9yypnhk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=d3wK+v0b9n86LB6f0+9SBLJvrCm5ZMnGl6tdFD4Ycw5hGAgosURDn/AbxvPLZlFEKxUcLRc5z8LKnBdA27i98EJ3Q9m5hCi7YvKk0nNix73wifAHU0h/NIMulwSacQRm9NswOIaW5zuMKNCEAYlFLKXScNM1ibnj7WbfU88J9ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ab744d5e567so4657166b.1;
-        Wed, 12 Feb 2025 10:34:39 -0800 (PST)
+	s=arc-20240116; t=1739385517; c=relaxed/simple;
+	bh=QVCYTVU8LiGmk0M3iNqijrKpq1UDqWpQa6sejgp2Ys4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qJkB+dm1ZUGEmnzdvfHxpulMK41997/hwaGdtPXrcCE3CFsGmPC6pKXeWEJa9zaSVCvQzJ/u6RMf1tu/u+L/+xi/VLpW7H8w1W+ifWgsXwWa75fyYSJ7hGxtR3vdgRNSQ667/CqNPm0hpznku2WUbRIDC3ZavD3jzzQq2euV+Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C+R1sIAV; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5de4c7720bcso8879461a12.0
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 10:38:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739385513; x=1739990313; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C5jTIzx/bPufJIf1+ZJKOm91YQoGHKq4l5RNGzz7IbI=;
+        b=C+R1sIAVCOsWiE9HQtEG1iNNoN+zKe5moR4fRBBJh9NavXMPybwS04cnrUlrDvgrqS
+         qg/glZzUB7y+/jbc5We5rz3nmUEL8sTdxKzlEx180xCGX9qjh6hpFQreYio8jjJkqauZ
+         PvUCZ343AnHDtifbqcu09hQHyTnKiZhXO2fj2bYEqRLK6XBVwypqadRnRDDIqi6PgbyK
+         8ZdpEJcd6Z3eVwTUUcWJ176rXOLAHJ2zf3YDuF+e6nhhQo3TvVyQVRrufnPijqVUBIU9
+         AeL0lJO4Tji1OqOi7jjC03XUSq2fI8vRcDlAtYw20p7Un7p8GsPrevtNG+W8VDKX/KOv
+         U0gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739385278; x=1739990078;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z+nB/4+H4IgI8wgO/HTb7HVIL1m/yp3K3cNW/qW6EO4=;
-        b=XBkXZheEqIl16nezeMSKtXn6T3PO3jBTEsn+C4p4QjM4saSMiv6MxR65mdHjODcv1d
-         6BSXF2mCXUnSstZeGrBj12nw+iQKu+XpKSmxCIGZ/RcOzg3Hgx/uLl5pHktieDm7tmvb
-         0bstXxYKUNDFmLyw6f79gEnnIlf+lhN4i0TxOzNWQUwCn4NofsqvrdW/k3ZijC+Z1AfI
-         h2n0bOjgKvHXq76goDNk4WQu1feQjpIy1v6Em9CBV4BTlxLlDysCXOFpE46nmQoLbIyc
-         76pUnWAM8aQ6m80C3B1uhx1WnCzeCNxEGXFYdidIRNmzR5F7MoGV5gZ35rBtF22vXc4t
-         oVUg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6cP1ckWzOX67BWONP18nFc3u6wJxM0gKszB5sMlrEGPD6cEtLM/QEbq9mk7sW7KRiQrOW01OA@vger.kernel.org, AJvYcCVuhmVgZ+0kqWMKum5zp7Md/8NdWXUetOYGaHNKfa/33zXe1UjzCZh1dl19UVtNu4dt43XRHNhQjVn8PHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM2gcvJ3HZSYiikiu9+WPNdAmIPK0KOqGwy++U9HPfXEEzzxAA
-	HHjAzdd7PiUWJc9q3bW2QWsomV206qDjte3FmrEVywak1/ZoxbSI
-X-Gm-Gg: ASbGnctG333i7yVJBV23QnHSjHLewmAcoCfbjb1HLm8x84eu2IWbjX4MdhrLinMr32y
-	fCkq4wjrhrzb+BBHRtNTfPZbs6LvDVNsYBjtDWlUPCr+MyWdLZVLkQOrNr89rqa2mR8mKgKUkAE
-	4inYN9mU83VdoX5WS/XyFWHms9VBBlA/smIr6Ddp9PhLvxRY0B9uVierEa/DUq2JwyifyEwk9Iu
-	7MNYlSdMIIjsfJKt5Ht8GkFWQ5njDtstET7sFEK1zxrG4LBqrdR1n7WUJLc48mjzuXuM/Srhq8E
-	F3etrgs=
-X-Google-Smtp-Source: AGHT+IFCX0Y3wgXy426TeuJE+FiQhABLo3aftnl060EWxggaUXQjHOuam39ExfyyTi9NkjJiI+zHlQ==
-X-Received: by 2002:a17:907:d1c:b0:ab7:d44b:355f with SMTP id a640c23a62f3a-aba17159e9amr33003866b.25.1739385278058;
-        Wed, 12 Feb 2025 10:34:38 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7d855b61fsm433358166b.124.2025.02.12.10.34.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 10:34:37 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 12 Feb 2025 10:34:22 -0800
-Subject: [PATCH net] netdevsim: disable local BH when scheduling NAPI
+        d=1e100.net; s=20230601; t=1739385513; x=1739990313;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C5jTIzx/bPufJIf1+ZJKOm91YQoGHKq4l5RNGzz7IbI=;
+        b=EQqcR/QmFteuvvNvK/rCL94xf4IwANv1yhQ5YoCgBBPZjipEYU6FxMBjN2p26KzhHV
+         O1x9JmAKavtKTTPFOD0KkwzRxZ1UFNWcP0N5xYdcGeUgv537EVDIAkLfU4uhVSWXzfi2
+         eM1wUd3u8evnu1SC8nJUQQ2vOK65pG1VfDqxjxT90DLvPig838GZ87ioOhbNqI5u6rLe
+         jwWDmSXAMBALKveyQHpdqsY+a4++QUYW9V8z4XqtD6s+0Inx0p+Vtj5kgRu4CvCZKRM8
+         VQJJTZwDD6W0V6WmmqUudtOQvXmdM/LdPhO1env02x/4rRfxUDPvq5wsDnTKsMZn+cj3
+         3cvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvSQoOmY/ZUDbh5JZ78sVSyCZ2D8Jcl29w/cjGO1DmcMiRUFSeh9qFPdUgu2TxYJMJVg/wVNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAv8qyHLtdV1gFEOBUKsei1b2P1AGFKxHKZddLeh+SPm0ez349
+	Qzi55pD9iHHZRqP8qz2xsDPEJoYdC7E/4BcDSVoJOC/PZGH7oIWhhWiAOL2MLCGrtGBf7gnkSKB
+	moyHxPIhxICA0j78n3RuvvYqSseHYKUWh3K+U
+X-Gm-Gg: ASbGncuHrzMQG2DZpEzDaoMrva1qJpAfiabUB1GGKEIF5KCIkOEv/1P47I3rJXT+YZy
+	faRuAtYjIk1dbKNnZALSvIkgYHaQ/VZiHhNz08m7mGWSJsVn9iKoRLdLNKGbeMwrEJnImiMMN/Q
+	==
+X-Google-Smtp-Source: AGHT+IEqzrGCoCKzyE7nbWSFFqAJZYcAj4nVo8djy3ULQafbk14rQlv917mN/v2a7FHeqYwE+erP5dC3RuTZGs2zaQY=
+X-Received: by 2002:a05:6402:510f:b0:5de:5cea:869e with SMTP id
+ 4fb4d7f45d1cf-5deade0125emr3765753a12.32.1739385512953; Wed, 12 Feb 2025
+ 10:38:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250212-netdevsim-v1-1-20ece94daae8@debian.org>
-X-B4-Tracking: v=1; b=H4sIAK7prGcC/x3MQQqAIBAF0KsMf62QA1Z4lWgROdUsstCQILp70
- DvAe1AkqxQEepClatEjIZAzhHmb0ipWIwKBG/YNO7ZJrii16G7Z95Fjy73rPAzhzLLo/V8Dklw
- Y3/cD5KbPaWAAAAA=
-X-Change-ID: 20250212-netdevsim-258d2d628175
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- paulmck@kernel.org, kernel-team@meta.com, stable@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1420; i=leitao@debian.org;
- h=from:subject:message-id; bh=u8Mj2f4Ky3af2LxP5bM5f51X8/5c/v2NRTvy9yypnhk=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnrOm8K0cdWJEi+dhd9KtwveqxaxumG27ROINAA
- yYK31zDnaGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6zpvAAKCRA1o5Of/Hh3
- bZWRD/9PFlyKC8K71F3bBSy9LDPmdO4A1AWtnouoP8B8PIolh0Ayx4Ef9ZSAr7V8+9/WsTNZo0R
- AOIWnkhQCgYNJs+2nF6feU7rql3w/UEPI5Y3+Qqq6TCkSLnCLdBbO7WX5k5G6OsWRw+oIMVhxBq
- SYQacu2IJuI5zygw9rOhd0+Jjcsajsodsu6lpwciUdqZeu4b61xFJ3SPuAlU/hk6wbdBNCAj+0k
- +hicJPwH2GljOqT2k27O60CtTXhJfH2ZydafJTXdp2c9AVPEUogw+HDlYfg8EfvwNd7uaLxnZup
- SnWoRr9PX3OfpPSvXtGnf0kv7+HZ+hSi4Deky156ctghkV4lLQMTuJ4FtBvvmu3XiBs5nFYxDz7
- hUpiL6DcZInOSzg7WBoRUwY5atOhjqlbLB4rmdKsTasw1f2ahcrS2B1Uh1VnhRi3QaNGoax7aGx
- 1Ha93QvzfAw+tvpAog+gwSLLtJZkjWld7EUWtlKAbzciv9lO1nWVr7Y5YJuc7fSMsthPlF/rGzb
- uGDVXPEco8bhdsa0mPG+Q3MXeSyT3mOJNDW0TsjNm/aJXSnNf6pqSZWDn6qK1ZsJm6mvoyiDaVc
- vvI1dfq0QOzoF1WP8Xt5uoIwA/WCwaQqzX3DIo8MKc5j3qMQcc8i5zG8gzhtqqrRi9Itc1jNAr9
- mcuHh6OfBiU0gpQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250212164323.2183023-1-edumazet@google.com> <20250212164323.2183023-3-edumazet@google.com>
+ <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
+In-Reply-To: <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Feb 2025 19:38:21 +0100
+X-Gm-Features: AWEUYZnVtUPoGPe1z13LSHIVV_GE1j5vuxJ_e89clDVaahbpK6uYv_ruyQqY8_E
+Message-ID: <CANn89iLiEcbnbMj7MdCTPsxoT3fHANALZ9LAAsG9T+sWcv-vew@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] ipv6: fix blackhole routes
+To: David Ahern <dsahern@kernel.org>, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Paul Ripke <stix@google.com>, 
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The netdevsim driver was getting NOHZ tick-stop errors during packet
-transmission due to pending softirq work when calling napi_schedule().
+On Wed, Feb 12, 2025 at 7:00=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> On 2/12/25 9:43 AM, Eric Dumazet wrote:
+> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> > index 78362822b9070df138a0724dc76003b63026f9e2..335cdbfe621e2fc4a71badf=
+4ff834870638d5e13 100644
+> > --- a/net/ipv6/route.c
+> > +++ b/net/ipv6/route.c
+> > @@ -1048,7 +1048,7 @@ static const int fib6_prop[RTN_MAX + 1] =3D {
+> >       [RTN_BROADCAST] =3D 0,
+> >       [RTN_ANYCAST]   =3D 0,
+> >       [RTN_MULTICAST] =3D 0,
+> > -     [RTN_BLACKHOLE] =3D -EINVAL,
+> > +     [RTN_BLACKHOLE] =3D 0,
+> >       [RTN_UNREACHABLE] =3D -EHOSTUNREACH,
+> >       [RTN_PROHIBIT]  =3D -EACCES,
+> >       [RTN_THROW]     =3D -EAGAIN,
+>
+> EINVAL goes back to ef2c7d7b59708 in 2012, so this is a change in user
+> visible behavior. Also this will make ipv6 deviate from ipv4:
+>
+>         [RTN_BLACKHOLE] =3D {
+>                 .error  =3D -EINVAL,
+>                 .scope  =3D RT_SCOPE_UNIVERSE,
+>         },
 
-This is showing the following message when running netconsole selftest.
-
-	NOHZ tick-stop error: local softirq work is pending, handler #08!!!
-
-Add local_bh_disable()/enable() around the napi_schedule() call to
-prevent softirqs from being handled during this xmit.
-
-Cc: stable@vger.kernel.org
-Fixes: 3762ec05a9fb ("netdevsim: add NAPI support")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netdevsim/netdev.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 42f247cbdceecbadf27f7090c030aa5bd240c18a..6aeb081b06da226ab91c49f53d08f465570877ae 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -87,7 +87,9 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
- 		goto out_drop_cnt;
- 
-+	local_bh_disable();
- 	napi_schedule(&rq->napi);
-+	local_bh_enable();
- 
- 	rcu_read_unlock();
- 	u64_stats_update_begin(&ns->syncp);
-
----
-base-commit: cf33d96f50903214226b379b3f10d1f262dae018
-change-id: 20250212-netdevsim-258d2d628175
-
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
-
+Should we create a new RTN_SINK (or different name), for both IPv4 and IPv6=
+ ?
 
