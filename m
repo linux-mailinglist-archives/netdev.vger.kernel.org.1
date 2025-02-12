@@ -1,152 +1,150 @@
-Return-Path: <netdev+bounces-165372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9F6A31C29
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:37:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B600AA31C34
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:43:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7B1D1883B6D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:37:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63C527A3DBD
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9696088F;
-	Wed, 12 Feb 2025 02:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B552A1D6DBB;
+	Wed, 12 Feb 2025 02:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qE0t9QcM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psCFYWjA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CD31CDA3F
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9134E1D54F7
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739327858; cv=none; b=izny7NAq91Neytb+TNUFxe1sdz5Jaxf8Tf82JN4TTAG3bKnlcqwFQWuE7Sg3T38mWub8rZV8pwLPz5f+aQZ8g/VwECw5+8awzjVH2j5Mh1xMCt7SjyXs3mMFhv7IuaPdWgo/sD0RF1dNPq+dxJi9vmY0DUZCSW9nzBheglMVOME=
+	t=1739328187; cv=none; b=q0BjveqjuTNQ9/kePKgmqwIiEf+XfqCZohwq/zyoQi/GhyL4f+X1i3/AkqvKHatAlhSy9MSuwG5INs0ERKjFZp65fsxilhZLRHBfvUiILt/mT7hUuulx2DH8uFUNBS7gM5RjVCMl8W2cYolyfJMWHrUqARSYia6UZCk29Cb+sm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739327858; c=relaxed/simple;
-	bh=AVN3fq0fK8td22J9STtE2VkdJuJXh7A42TYyuGhWLO0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=atNkLLqIu1TWiaLldGEv8Uj2u8Q8Nt41qr1Mn+jxYGLsrjV+CW2lu7AK1S741d+xtLTJxQTbHlF4yjfvXmb3KVVAv66HpWz1d0GTMAjgzgCq5S2NqJ8+/LhIQTZeuJ0LyF9UveHsGfThF7mUKYnylNWMw1d50Nlr4ck7IBP0wGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qE0t9QcM; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21f032484d4so86765ad.0
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:37:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739327856; x=1739932656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jtwBPxIBW5ZYQFBSkC6Tdxc8rD2cooruZFJv84hKkIc=;
-        b=qE0t9QcMh9syiWMTeraljaZOxlI7oPOXXmbbg4rP8vvmtOTKF1xXJthJg6hT8Z+Sdv
-         QAavO32ijG8b8s3ZmXV9N60mB9S0kKkITaLudJ7+kTrk4QdX1mJbvT6C/87iqKPf2oge
-         iXt6KbOykbqdIbW68SovSAOGd3b8Phr2vkMy4pXSco2L4vosDJCEAExMRzIj+cMJalCc
-         FjSfgtH7FNz7ctesPVquh+//azr4SIVkcY5ysU1r/eN/PbFSh7tsLxC+b3c9IruvZElc
-         HcEpDHs7OlYbQEF9Ot+qMHn6XCqQ0ruyP7GT+3b0VOcJhLKEUu1AP1O1TpcFruAZTqax
-         d+Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739327856; x=1739932656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jtwBPxIBW5ZYQFBSkC6Tdxc8rD2cooruZFJv84hKkIc=;
-        b=iLmj5KxMYoR5j64tPSOr/9tlikGpFRO01NL9W4PPKJ2mX8j9CCFWJ8u1yGgaDZphMv
-         o9XniH114t7at5igcuKXqu4ZncpE6NyPI7RpDD6y8pvApnA69stXnkXWgwPlwTrlVJRa
-         ldeETuYrADX56fIBUd+X5kdrH8d6xJXG8zJFN1OyVZNbA9MxmEAMk9eKrXeN6Fz+GKSD
-         z0Mz9R7pdLj3pgTCPgE/2BWsRvgLyi1V6TOKwoPVioEiBb5O8AxUFqD7cmPkRtZ5TP49
-         vBw2a91JBOindDDYsrbhnjpI9eK21ZYP16C86w2K4Gl5F/g9XzONtsjJZ3F1bMcr/A18
-         3A9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVQdUp6rDqY6hsu/9H6AXsSgOkRac37kZoiV6yQt89GIWEdTvF2qDN81D0IcELOESlo3ivyNf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9Fy5HpdJvF84EJZRYHR2OZftlNIc7j7cLka5Ur6Jl3EKsVR4o
-	ibuTnNllGw6Zf4O101aFtZDkITY2mTdwOxGMmsi9NfstsbZPBwxE3IlPtCemmOIVR+DbV9PpXxA
-	82RxeEeSAmaVJGORua0tejzf4piCLVFLY+3Nx
-X-Gm-Gg: ASbGncuZKRhaE0vCYrOyUKqoM6jOKtv5agBeKXeaSvGKGb+QGoP2uCtVneosiRVhUeW
-	VZHAeQL5fFmsmHSzpbyc1GxALFZtWvCoBpMf1s877HXQ7cm0QJLg4AgkHQNZudGpcp9UbIqFd
-X-Google-Smtp-Source: AGHT+IEuXE204G5qn+n2x8FoYbwoknYJeRvyrebKxrwSDGxlGD8/pEYetMzZRjMZIkkz6rR7w4Oj8swQ67P9OFGN8Pc=
-X-Received: by 2002:a17:902:9a44:b0:21f:3e29:9cd1 with SMTP id
- d9443c01a7336-220bf1b786amr865225ad.1.1739327855745; Tue, 11 Feb 2025
- 18:37:35 -0800 (PST)
+	s=arc-20240116; t=1739328187; c=relaxed/simple;
+	bh=eIQuwGOW1w/b8CVUofqcAUf6x7lb34kw2HNoaBxUqtA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bGg7fPUiO8LHwlwIS8LGQnPi1oqChHshJoxvS8gKnAQZg9WMDoh/2daOWw+sgYCtPi6MTZb120J8ZzyHtFcZYKMJuNJSQ+t5l5zI7Somq8D0XG+L2X05sba6H9TK0YfaXu1u9VlrExigq4QooroEulSFeHdt2WvBs77r1uEfmSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psCFYWjA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FA7C4CEDD;
+	Wed, 12 Feb 2025 02:43:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739328186;
+	bh=eIQuwGOW1w/b8CVUofqcAUf6x7lb34kw2HNoaBxUqtA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=psCFYWjA4a00KfMda7j9Bp+ZdsvLrE9jMvSxSMPFBAamSkOhLdSiAZKAp2Z3zyMhX
+	 utYPQYtUI4HGgvVKEvfF5D2KY0AZ0I2pdtIFtZX3HHPGZKvNSc1qa/t9fLfUKZUic4
+	 MZ9rfKXIpiybYqXbkfcUt0bPx+Jqf5bFrotNDvyNXJ5Fdaotij2IkY+bx7BW3oFKRg
+	 Jw53ZDjAa3h7fbIv2xLHCejYDXIDX7vpbgxFre5mO9av4C4j9a9O/TfvgL00btbH52
+	 /NtLxy2mvbUD26aW6P8HqYJD15kCUa120emDPFp/kXg0+xBbq5anKFGy03AM3Y33sM
+	 cAJqgpvl/fxIQ==
+Date: Tue, 11 Feb 2025 18:43:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com, michal.swiatkowski@linux.intel.com,
+ helgaas@kernel.org, horms@kernel.org, Somnath Kotur
+ <somnath.kotur@broadcom.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>,
+ David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net-next v4 09/10] bnxt_en: Extend queue stop/start for
+ TX rings
+Message-ID: <20250211184305.2605e4fb@kernel.org>
+In-Reply-To: <CACKFLi=jHfL2iAP-hVm=MmLDBD+wOOHrHsNNM21dCRAjRu7o7A@mail.gmail.com>
+References: <20250208202916.1391614-1-michael.chan@broadcom.com>
+	<20250208202916.1391614-10-michael.chan@broadcom.com>
+	<20250211174438.3b8493fe@kernel.org>
+	<CACKFLi=jHfL2iAP-hVm=MmLDBD+wOOHrHsNNM21dCRAjRu7o7A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210130953.26831-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250210130953.26831-1-kerneljasonxing@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 11 Feb 2025 18:37:22 -0800
-X-Gm-Features: AWEUYZlufc4G24yesQ9j4Bqckcs_zvD8v4cNyRg3blxwk7qQQfeQcsxiiWw6SdA
-Message-ID: <CAHS8izMznEB7TWkc4zxBhFF+8JVmstFoRfqfsRLOOMbcuUoRRA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] page_pool: avoid infinite loop to schedule
- delayed worker
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	horms@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2025 at 5:10=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> If the buggy driver causes the inflight less than 0 [1] and warns
+On Tue, 11 Feb 2025 18:31:21 -0800 Michael Chan wrote:
+> On Tue, Feb 11, 2025 at 5:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > On Sat,  8 Feb 2025 12:29:15 -0800 Michael Chan wrote: =20
+> > > +             rc =3D bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
+> > > +             if (rc)
+> > > +                     return rc;
+> > > +
+> > > +             rc =3D bnxt_hwrm_tx_ring_alloc(bp, txr, false);
+> > > +             if (rc)
+> > > +                     return rc; =20
+> >
+> > Under what circumstances can these alloc calls fail?
+> > "alloc" sounds concerning in a start call. =20
+>=20
+> The ring has been previously reserved with FW, so it normally should
+> not fail.  I'll need to ask the FW team for some possible failure
+> scenarios.
 
-How does a buggy driver trigger this?
+Thanks, expectation is that start never fails.
+If the FW team comes back with "should never happen if rings=20
+are reserved" please add a comment to that effect here. Since
+this is one of very few implementations people may read it
+and incorrectly assume that allocating is okay.
+If the FW team comes back with a list of possible but unlikely
+scenarios I'm afraid a rework will be needed.
 
-> us in page_pool_inflight(), it means we should not expect the
-> whole page_pool to get back to work normally.
->
-> We noticed the kworker is waken up repeatedly and infinitely[1]
-> in production. If the page pool detect the error happening,
-> probably letting it go is a better way and do not flood the
-> var log messages. This patch mitigates the adverse effect.
->
-> [1]
-> [Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
-> [Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
-> ...
-> [Mon Feb 10 20:36:11 2025] Call Trace:
-> [Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
-> [Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
-> [Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
-> [Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
-> [Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
-> [Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
-> [Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
-> [Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
->
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->  net/core/page_pool.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 1c6fec08bc43..8e9f5801aabb 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -1167,7 +1167,7 @@ void page_pool_destroy(struct page_pool *pool)
->         page_pool_disable_direct_recycling(pool);
->         page_pool_free_frag(pool);
->
-> -       if (!page_pool_release(pool))
-> +       if (page_pool_release(pool) <=3D 0)
->                 return;
+> > >       cpr->sw_stats->rx.rx_resets++;
+> > >
+> > > +     if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
+> > > +             cpr->sw_stats->tx.tx_resets++; =20
+> >
+> > Is there a reason why queue op stop/start cycles are counted as resets?
+> > IIUC previously only faults (~errors) would be counted as resets.
+> > ifdown / ifup or ring reconfig (ethtool -L / -G) would not increment
+> > resets. I think queue reconfig is more like ethtool -L than a fault.
+> > It'd be more consistent with existing code not to increment these
+> > counters. =20
+>=20
+> I think David's original code increments the rx_reset counter for
+> every queue_start.  We're just following that.  Maybe it came from the
+> original plan to use HWRM_RING_RESET to do the RX
+> queue_stop/queue_start.  We can remove the reset counters for all
+> queue_stop/queue_start if that makes more sense.
 
-Isn't it the condition in page_pool_release_retry() that you want. to
-modify? That is the one that handles whether the worker keeps spinning
-no?
+I vote remove, just to be crystal clear.
 
-I also wonder also whether if the check in page_pool_release() itself
-needs to be:
+> > > @@ -15716,17 +15820,25 @@ static int bnxt_queue_stop(struct net_devic=
+e *dev, void *qmem, int idx)
+> > >       /* Make sure NAPI sees that the VNIC is disabled */
+> > >       synchronize_net();
+> > >       rxr =3D &bp->rx_ring[idx];
+> > > -     cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
+> > > +     bnapi =3D rxr->bnapi;
+> > > +     cpr =3D &bnapi->cp_ring;
+> > > +     cancel_work_sync(&cpr->dim.work);
+> > >       bnxt_hwrm_rx_ring_free(bp, rxr, false);
+> > >       bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+> > >       page_pool_disable_direct_recycling(rxr->page_pool);
+> > >       if (bnxt_separate_head_pool())
+> > >               page_pool_disable_direct_recycling(rxr->head_pool);
+> > >
+> > > +     if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+> > > +             bnxt_tx_queue_stop(bp, idx);
+> > > +
+> > > +     napi_disable(&bnapi->napi); =20
+> >
+> > ... but here you do the opposite, and require extra synchronization
+> > in bnxt_tx_queue_stop() to set your magic flag, sync the NAPI etc.
+> > Why can't the start and stop paths be the mirror image? =20
+>=20
+> The ring free operation requires interrupt/NAPI to be working.  FW
+> signals the completion of the ring free command on the completion ring
+> associated with the ring we're freeing.  When we see this completion
+> during NAPI, it guarantees that this is the last DMA on that ring.
+> Only ring free FW commands are handled this way, requiring NAPI.
 
-if (inflight < 0)
-  __page_pool_destroy();
-
-otherwise the pool will never be destroyed no?
-
---=20
-Thanks,
-Mina
+Ugh, I feel like this was explained to me before, sorry.
+Again, a comment in the code would go a long way for non-Broadcom
+readers.
 
