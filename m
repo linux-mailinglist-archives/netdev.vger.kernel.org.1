@@ -1,164 +1,114 @@
-Return-Path: <netdev+bounces-165505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C706A3264A
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:52:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058D8A32665
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:58:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F41151691A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:52:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9818E7A1BFB
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFDE20C499;
-	Wed, 12 Feb 2025 12:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAF020E005;
+	Wed, 12 Feb 2025 12:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYoHh9I8"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5971C1E87B;
-	Wed, 12 Feb 2025 12:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C3120CCF5;
+	Wed, 12 Feb 2025 12:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739364717; cv=none; b=b69f4RS2OgNd9kHnK0dxtRruDUrSBc2mX4ETI3s7W+OOkT2N8UHSC24nVy0+XVg6I20Vq4mx48tSCE9+BoSCITfc1UljqcWkQE3Cd5c/YSTx/Fvk6Mgwgw4aUgLAu7gPHsa1Luhewx7STMCdhJHZLE69WDMxsEBo7B5/E5/Is2s=
+	t=1739365100; cv=none; b=At1IHgq7R16M8Jm4y7dHwYS6ZWxWRc3My/jtmhG5N8kDlTmrPR4GQ+n6QkTOnWjat3NtP/6W6WkzVeI8VxtWpIYI5eydGpp1yqnRZhWniBW4IMk1J1Kq/HwJqsbTMsYLX6vULPP0g2pqZpS1Wymgr+rf3AFwTmJL/nSPUU0Mokk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739364717; c=relaxed/simple;
-	bh=f739d2dmhPkx5OpsbJlmk/luXaGPXX4YyozCGqM6oFc=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q+9EIaBFvEoQPcSDVLEaBFlP4Vu8+wjGHzlz+mFHkM2NdisUwh1mPQFO0x4hwwWeoLmMZbFZohyGWFrnQtb4GZSmXmcQfiYW0IkoqeOWgC6SNRurlt5ws4ZVgDJEXV4s9CcDYqpTtqWq2PECNR7QJTNmmrTj4XROeTnJ2ienNe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YtJ7w4QtWz6D8YD;
-	Wed, 12 Feb 2025 20:50:36 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2B71D1400CB;
-	Wed, 12 Feb 2025 20:51:52 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 12 Feb
- 2025 13:51:51 +0100
-Date: Wed, 12 Feb 2025 12:51:49 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-CC: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
-	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
-	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
-	<gospo@broadcom.com>, <hch@infradead.org>, <itayavr@nvidia.com>,
-	<jiri@nvidia.com>, <kuba@kernel.org>, <lbloch@nvidia.com>,
-	<leonro@nvidia.com>, <saeedm@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<brett.creeley@amd.com>
-Subject: Re: [RFC PATCH fwctl 5/5] pds_fwctl: add Documentation entries
-Message-ID: <20250212125149.00004980@huawei.com>
-In-Reply-To: <20250211234854.52277-6-shannon.nelson@amd.com>
-References: <20250211234854.52277-1-shannon.nelson@amd.com>
-	<20250211234854.52277-6-shannon.nelson@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1739365100; c=relaxed/simple;
+	bh=+rUyy8CCsAX49LoyMo4QlyZTIfngKhPrGjoTwwC4T/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IwiesL5Qg9yxLF/KybMQcb7AMBL76/rOW+jnC2+dwYMrLrSw55v189nkfspgUZYA5JLxc2g19y0b9VihFE/05/75r8H5wJI1o/XHeXMxkZjSr2jm5I5UyikYKxQMDBgzajQGj5R9XUHLHDTtSHksGgM+WWpQtGI8qXMALLi10xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYoHh9I8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC30EC4CEDF;
+	Wed, 12 Feb 2025 12:58:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739365099;
+	bh=+rUyy8CCsAX49LoyMo4QlyZTIfngKhPrGjoTwwC4T/4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aYoHh9I8hOFC/rd6q6DuWBa0ELk6Z7OMZH+d1Po86Hca4RmKPfp6Iy748FXUdyIlI
+	 tgH/3yl0mOAPAoIko670EqeX9y9i+3JZ/uI7ZsPHzcVNNFWCQ27UkVj53+bdt/O6h1
+	 tp2zNyvG6uiP3W6uc1ax8M6WidyQaPTSueZo4zk6WWNhXIYT0nyl+heT4KgnulLxOT
+	 VgWKUUVaGzBd9JgaNBnvjddPhhnrvtOVueKPNh9Ht9jYirxxZuEV9VqTmcHVbKcyW5
+	 ewHSt4dDIHHeiLGHQBiKMVEehzQ+s32Auf+U/HtB+/DzK1kpDbUrePlehroB/oTObM
+	 X96pQV4d2Rp4A==
+Date: Wed, 12 Feb 2025 13:58:08 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, linux-kernel@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Andreas Noever <andreas.noever@gmail.com>, Avadhut
+ Naik <avadhut.naik@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Hu Haowen
+ <2023002089@link.tyut.edu.cn>, Lars-Peter Clausen <lars@metafoo.de>,
+ Michael Jamet <michael.jamet@intel.com>, Mika Westerberg
+ <mika.westerberg@linux.intel.com>, Paolo Abeni <pabeni@redhat.com>, Sean
+ Young <sean@mess.org>, Yanteng Si <si.yanteng@linux.dev>, Yehezkel Bernat
+ <YehezkelShB@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michael
+ Ellerman <mpe@ellerman.id.au>, Shrikanth Hegde <sshegde@linux.ibm.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, James Morse <james.morse@arm.com>,
+ "Nysal Jan K.A" <nysal@linux.ibm.com>, Tom Lendacky
+ <thomas.lendacky@amd.com>, Sourabh Jain <sourabhjain@linux.ibm.com>,
+ Stephen Rothwell <sfr@canb.auug.org.au>, Frederic Barrat
+ <fbarrat@linux.ibm.com>, Andrew Donnellan <ajd@linux.ibm.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao
+ <naveen@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 0/9] Extend automarkup support for ABI symbols
+Message-ID: <20250212135808.58d2f032@foz.lan>
+In-Reply-To: <Z6yFG_NntQfkwYli@archie.me>
+References: <cover.1739254867.git.mchehab+huawei@kernel.org>
+	<Z6yFG_NntQfkwYli@archie.me>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- frapeml500008.china.huawei.com (7.182.85.71)
 
-On Tue, 11 Feb 2025 15:48:54 -0800
-Shannon Nelson <shannon.nelson@amd.com> wrote:
+Em Wed, 12 Feb 2025 18:25:15 +0700
+Bagas Sanjaya <bagasdotme@gmail.com> escreveu:
 
-> Add pds_fwctl to the driver and fwctl documentation pages.
+> On Tue, Feb 11, 2025 at 07:22:54AM +0100, Mauro Carvalho Chehab wrote:
+> > Now that ABI creates a python dictionary, use automarkup to create cross
+> > references for ABI symbols as well.   
 > 
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
->  Documentation/userspace-api/fwctl/index.rst   |  1 +
->  .../userspace-api/fwctl/pds_fwctl.rst         | 41 +++++++++++++++++++
->  3 files changed, 43 insertions(+)
->  create mode 100644 Documentation/userspace-api/fwctl/pds_fwctl.rst
+> I get three new warnings:
 > 
-> diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
-> index 428f6f5bb9b4..72853b0d3dc8 100644
-> --- a/Documentation/userspace-api/fwctl/fwctl.rst
-> +++ b/Documentation/userspace-api/fwctl/fwctl.rst
-> @@ -150,6 +150,7 @@ fwctl User API
->  
->  .. kernel-doc:: include/uapi/fwctl/fwctl.h
->  .. kernel-doc:: include/uapi/fwctl/mlx5.h
-> +.. kernel-doc:: include/uapi/fwctl/pds.h
->  
->  sysfs Class
->  -----------
-> diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
-> index 06959fbf1547..12a559fcf1b2 100644
-> --- a/Documentation/userspace-api/fwctl/index.rst
-> +++ b/Documentation/userspace-api/fwctl/index.rst
-> @@ -10,3 +10,4 @@ to securely construct and execute RPCs inside device firmware.
->     :maxdepth: 1
->  
->     fwctl
-> +   pds_fwctl
-> diff --git a/Documentation/userspace-api/fwctl/pds_fwctl.rst b/Documentation/userspace-api/fwctl/pds_fwctl.rst
-> new file mode 100644
-> index 000000000000..9fb1b4ac0a5e
-> --- /dev/null
-> +++ b/Documentation/userspace-api/fwctl/pds_fwctl.rst
-> @@ -0,0 +1,41 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +================
-> +fwctl pds driver
-> +================
-> +
-> +:Author: Shannon Nelson
-> +
-> +Overview
-> +========
-> +
-> +The PDS Core device makes an fwctl service available through an
-> +auxiliary_device named pds_core.fwctl.N.  The pds_fwctl driver binds
-> +to this device and registers itself with the fwctl bus.  The resulting
-> +userspace interface is used by an application that is a part of the
-> +AMD/Pensando software package for the Distributed Service Card (DSC).
+> WARNING: /sys/devices/system/cpu/cpuX/topology/physical_package_id is defined 2 times: /home/bagas/repo/linux-kernel/Documentation/ABI/stable/sysfs-devices-system-cpu:27; /home/bagas/repo/linux-kernel/Documentation/ABI/testing/sysfs-devices-system-cpu:70
+> WARNING: /sys/devices/system/cpu/cpuX/topology/ppin is defined 2 times: /home/bagas/repo/linux-kernel/Documentation/ABI/stable/sysfs-devices-system-cpu:89; /home/bagas/repo/linux-kernel/Documentation/ABI/testing/sysfs-devices-system-cpu:70
 
-Jason, where did we get to on the question of a central open repo etc?
+Those two are new reports that get_abi.py detects after the recent changes.
+In the past, symbol duplication were detected only within the same group
+(testing, stable, ...). The new version can detect symbols that are
+duplicated on different parts of the ABI. In this specific case, the same
+symbols exist on both stable and testing.
 
-> +
-> +The pds_fwctl driver has little knowledge of the firmware's internals,
-> +only knows how to send adminq commands for fwctl requests.  The set of
-> +operations available through this interface depends on the firmware in
-> +the DSC, and the userspace application version must match the firmware
-> +so that they can talk to each other.
-> +
-> +This set of available operations is not known to the pds_fwctl driver.
-> +When a connection is created the pds_fwctl driver requests from the
-> +firmware list of endpoints and a list of operations for each endpoint.
-> +This list of operations includes a minumum scope level that the pds_fwctl
-> +driver can use for filtering privilege levels.
+There is a fix for them already at:
 
-Ah. Ok. So the scope is provided in the replies to these queries.
-Do we have anything to verify that today?
-Also, I wasn't sure when reading driver on whether the operations list
-is dynamic or something we can read once and cache?
+https://lore.kernel.org/linux-doc/673e9543783349b0fcf625018e38e4e93fe98f52.1738020236.git.mchehab+huawei@kernel.org/
 
-> +
-> +pds_fwctl User API
-> +==================
-> +
-> +.. kernel-doc:: include/uapi/fwctl/pds.h
-> +
-> +Each RPC request includes the target endpoint and the operation id, and in
-> +and out buffer lengths and pointers.  The driver verifies the existence
-> +of the requested endpoint and operations, then checks the current scope
-> +against the required scope of the operation.  The adminq request is then
+> WARNING: Documentation/ABI/testing/sysfs-class-cxl not found
 
-Spell out admin q (or is that a typo?)
+I need to double-check verify this one, as it didn't appear on
+my tests. Are you getting it against docs-next or linux-next?
 
-> +put together with the request data and sent to the firmware, and the
-> +results are returned to the caller.
-> +
-
+Thanks,
+Mauro
 
