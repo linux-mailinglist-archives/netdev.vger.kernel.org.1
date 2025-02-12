@@ -1,225 +1,109 @@
-Return-Path: <netdev+bounces-165571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17F1CA32965
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:00:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D4CA3297D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6679188CC17
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:59:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99ED61883BEA
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A06210F53;
-	Wed, 12 Feb 2025 14:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE5220B7F0;
+	Wed, 12 Feb 2025 15:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHVQnH6C"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RiwgJU9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3AC2101BE;
-	Wed, 12 Feb 2025 14:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC0F2066E2
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 15:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739372355; cv=none; b=R0fce9w41+EoZN/ezLJ8u+5VsXxiqHY/KBf1udVWm0rdoRtsrvHszIwj79d/JzI5rfOj9FANex6RrAxiRM+d3/4UJGLia4MqagpB1OvVkL4uLHO5P80hcKMqgRzLFrs+wQWbdIEDdaO76NAQPUiK+Ad7EZ/ObfJnsFU988SOlwY=
+	t=1739372709; cv=none; b=d+Xgu3s9OvuUzK2Jyb1uBn2CZWOLj0wXok0yfKc2UB3X2Lh/jwBI3yPSc7m6ZR1i/buWUJDaDXwQ6K2eEBxYsqU627s+t5RbFM46WOpslcucolk747MuRaVMnBWfZJLLLGisssLJs6dojEvWG6ClDcLAsK03rrdxvol8yUoXB/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739372355; c=relaxed/simple;
-	bh=oCvq9gSavJWl2kDBTfPs3YD8zX+/lohqwlywSoG+xkQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jO4NIOQyHvW0a0d+SkT1qKmNMeCyyybUjYxL8tVK3wBYebU6t9xfRdHiW2Fz0gToWac0BTW+Ctuk4mi5h9Xeu7Osa0rnBK5UGHm7F2t4qp/1IsrIjCPAJo/zFH3oKHuBCQQ8EvEZzBVuGtn9mwoU77Nkeq91ScJhOMBarxbX+EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHVQnH6C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C524C4CEDF;
-	Wed, 12 Feb 2025 14:59:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739372353;
-	bh=oCvq9gSavJWl2kDBTfPs3YD8zX+/lohqwlywSoG+xkQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hHVQnH6CNr1DzWYc7ti8auIZ/FJHzitoE4i/mpGQgFTAleKGfwLoybhM9Pyoop3SW
-	 qEwgOvKAQvnZm1sJliTrLgmB74tMM1OGMmzzm/+KuOfYCjKCHFMZBkC49DPz5eoC7o
-	 3q6hox23kgW2BrozBC5dt0lXhATKjuMUwfnkR0utm9dwqq5hPKRxlaHXKMAPGCzzWc
-	 d/5D1MW5Vf+NBRv7b2xL0TQs2Ib7FRaJhrWTQhV0Jkrq34z9bNgUYWy7MPdeN//8qa
-	 sMprTgrL6hVlfF50Ut2YlltyO+xk0b2JZyZoclBGdPliHjbfAVGWTelTS8U+GbGLgU
-	 T1DYxD/Orn1PA==
-From: Philipp Stanner <phasta@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Philipp Stanner <pstanner@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] stmmac: Replace deprecated PCI functions
-Date: Wed, 12 Feb 2025 15:58:32 +0100
-Message-ID: <20250212145831.101719-2-phasta@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1739372709; c=relaxed/simple;
+	bh=uEgBbu7R39tGn44Uv+G5+df2/9K6EbmaHoqznv75zWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HfwdqWleCHludqrn9ysrKIlfLdbVOyrzgtjp3Iv29QDgiBVOm7FCUbMlBwQexZHoapmlO2Q/Jtr78odQ9qqZ6O72k4coDkQur/5cqvRAu0nptLILUgcz/SWfWeOF7rF5PrDYs/k11it75P6PmbVcPdmat3X4KCyVwg1Fug2cctc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=RiwgJU9w; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-38dd935a267so3190501f8f.1
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 07:05:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1739372706; x=1739977506; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uEgBbu7R39tGn44Uv+G5+df2/9K6EbmaHoqznv75zWU=;
+        b=RiwgJU9w41NdEAxv4hkagevqg/K71IxWPfPCwK4OSx13DtczeEXYxt7+hzGAt/rAPc
+         SW7hHe3Sq2Z3HZcudAz/BwBtNs36QZa8wi4WPevlqo9o5WhmEPMgr8PYJdx1BXu/0B75
+         ZXKlSk33QLubChd3s5p5jRnNDS7O9cNwRO5mDV5+Czaqowip95EcZu5yTf2knL9doKdH
+         p4wusZWaph43oIytrjMfrQY9bX7JoR0oWE+4wBVcdAuo2Gndhf0VAIAsyb/7oLOfo/KB
+         kbgoqXYZLjPrKriMe8i1REzKZTI2jOrj+IlnoY62BZO1f8xt3pn/O31dddDRUaCbTmLq
+         mEKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739372706; x=1739977506;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uEgBbu7R39tGn44Uv+G5+df2/9K6EbmaHoqznv75zWU=;
+        b=tBlR+TTRRVTL8v0PdfcaM0MOMjHZId50CIfLcQG/E2CSYUt30DXaRFnWgGefeFjAyH
+         DDZFYtND0In3sQdO0WsBXvK26PPfUr2DXuyDO6phxVsTPNqLvBrWZd790Vz3q41MKkYx
+         R7mqVdqGUTNMkLBwj/tPKqmtMkPTHpE7YtUfwAqU9vPZr9eZmvS/H/rsuQHjRd4WiKGz
+         AHTSyDAXwHNmXqhxqRK1ze5FJRd0QvU+a9yKg4T/YyBBQ9Xd/2F+4J0WxUbwN6C2Eujt
+         PoVrNf4YZJLcPl5LGe+cKgq+R0xncfY3+AwLdCeJJwLC01j1BBrONWc+4RC2nHxGg556
+         1HYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0LiaRyzBXwxIEi8JomuwPkX/R2UHqgKyXdwLhVssVR8QX3Vcn8NfGN8oUrwBMNWu0Z8v0/k4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2CY4hfEv6AJcJWg1hNkvOouoJa1q4OczUt2XGxnh0OudI0sj7
+	InHKLuInBDFcQA7RqK1g7C9zJbXY+82ow/Df1gtiIQzBhCKOFNslWp7jZ8dQDheUmTdn6F6PoPz
+	OPMM=
+X-Gm-Gg: ASbGnctEvuaIZ0oQuu0iKn+W/lTjxdGyVp5QNeYfqRZ33hYj/ZAEN3Glkucyt/w7Qx+
+	zXdYiRilXimn5bXSdWHcHTFwaJJsIOZVCpjwbOft9ijNpDFRoUWAoPayF8tVDkNsgNAeRoQIehR
+	ZpdkuOtKLnfTA1aAWTfChLWt/NcJDWtaYFHMY2Nklh+bSKnwy0fFXui3Qxcvidg6TppV66RfOxA
+	uF6mJ1m3V1dh3SurjFzoK/mGEOnyO6CpaAui1tMMMPTjtOZUyC8sxlUheeZRhBBTzyYBZrH6Dg7
+	OOZZYYPaUvTDrXEldE+DqsHJPf6xQxqWSblF33W0FqJ4rRlA9czjTEsdpaw/bg==
+X-Google-Smtp-Source: AGHT+IGzKbsKrCgNCVEhSwFx5eAnnx98CSh7rT9yENu6S1whVmV5on9d5MRdPkQtEuutZZiB8OvE6g==
+X-Received: by 2002:a05:6000:1f88:b0:38d:ba81:b5c2 with SMTP id ffacd0b85a97d-38dea2f875dmr2961632f8f.47.1739372705508;
+        Wed, 12 Feb 2025 07:05:05 -0800 (PST)
+Received: from jiri-mlt (194-212-255-194.customers.tmcz.cz. [194.212.255.194])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dbdd7f039sm18033234f8f.59.2025.02.12.07.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 07:05:04 -0800 (PST)
+Date: Wed, 12 Feb 2025 16:05:01 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
+	netdev@vger.kernel.org, horms@kernel.org, 
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: Re: [PATCH iwl-next v3 03/14] ixgbe: add handler for devlink
+ .info_get()
+Message-ID: <73u3dz34jdnsgoujbjdokzh7tvvdubqmsngaa77a2feedbtulm@v5lnrqvaethe>
+References: <20250212131413.91787-1-jedrzej.jagielski@intel.com>
+ <20250212131413.91787-4-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212131413.91787-4-jedrzej.jagielski@intel.com>
 
-From: Philipp Stanner <pstanner@redhat.com>
+Wed, Feb 12, 2025 at 02:14:02PM +0100, jedrzej.jagielski@intel.com wrote:
+>Provide devlink .info_get() callback implementation to allow the
+>driver to report detailed version information. The following info
+>is reported:
+>
+> "serial_number" -> The PCI DSN of the adapter
+> "fw.bundle_id" -> Unique identifier for the combined flash image
+> "fw.undi" -> Version of the Option ROM containing the UEFI driver
+> "board.id" -> The PBA ID string
 
-The PCI functions
-  - pcim_iomap_regions()
-  - pcim_iomap_table() and
-  - pcim_iounmap_regions()
-have been deprecated.
-
-The usage of pcim_* cleanup functions in the driver detach path (remove
-callback) is actually not necessary, since they perform that cleanup
-automatically.
-
-Replace them with pcim_iomap_region().
-
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
----
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 28 ++++++-------------
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 24 ++++------------
- 2 files changed, 14 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index bfe6e2d631bd..19b16df864dd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -11,6 +11,8 @@
- #include "dwmac_dma.h"
- #include "dwmac1000.h"
- 
-+#define DRIVER_NAME "dwmac-loongson-pci"
-+
- /* Normal Loongson Tx Summary */
- #define DMA_INTR_ENA_NIE_TX_LOONGSON	0x00040000
- /* Normal Loongson Rx Summary */
-@@ -520,7 +522,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- {
- 	struct plat_stmmacenet_data *plat;
- 	struct stmmac_pci_info *info;
--	struct stmmac_resources res;
-+	struct stmmac_resources res = {};
- 	struct loongson_data *ld;
- 	int ret, i;
- 
-@@ -552,17 +554,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 	pci_set_master(pdev);
- 
- 	/* Get the base address of device */
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (pci_resource_len(pdev, i) == 0)
--			continue;
--		ret = pcim_iomap_regions(pdev, BIT(0), pci_name(pdev));
--		if (ret)
--			goto err_disable_device;
--		break;
--	}
--
--	memset(&res, 0, sizeof(res));
--	res.addr = pcim_iomap_table(pdev)[0];
-+	res.addr = pcim_iomap_region(pdev, 0, DRIVER_NAME);
-+	ret = PTR_ERR_OR_ZERO(res.addr);
-+	if (ret)
-+		goto err_disable_device;
- 
- 	plat->bsp_priv = ld;
- 	plat->setup = loongson_dwmac_setup;
-@@ -617,13 +612,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
- 	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
- 		loongson_dwmac_msi_clear(pdev);
- 
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (pci_resource_len(pdev, i) == 0)
--			continue;
--		pcim_iounmap_regions(pdev, BIT(i));
--		break;
--	}
--
- 	pci_disable_device(pdev);
- }
- 
-@@ -673,7 +661,7 @@ static const struct pci_device_id loongson_dwmac_id_table[] = {
- MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
- 
- static struct pci_driver loongson_dwmac_driver = {
--	.name = "dwmac-loongson-pci",
-+	.name = DRIVER_NAME,
- 	.id_table = loongson_dwmac_id_table,
- 	.probe = loongson_dwmac_probe,
- 	.remove = loongson_dwmac_remove,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 352b01678c22..f3279c4387c5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -155,7 +155,7 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- {
- 	struct stmmac_pci_info *info = (struct stmmac_pci_info *)id->driver_data;
- 	struct plat_stmmacenet_data *plat;
--	struct stmmac_resources res;
-+	struct stmmac_resources res = {};
- 	int i;
- 	int ret;
- 
-@@ -188,13 +188,13 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 		return ret;
- 	}
- 
--	/* Get the base address of device */
-+	/* The first BAR > 0 is the base IO addr of our device. */
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 		if (pci_resource_len(pdev, i) == 0)
- 			continue;
--		ret = pcim_iomap_regions(pdev, BIT(i), pci_name(pdev));
--		if (ret)
--			return ret;
-+		res.addr = pcim_iomap_region(pdev, i, STMMAC_RESOURCE_NAME);
-+		if (IS_ERR(res.addr))
-+			return PTR_ERR(res.addr)
- 		break;
- 	}
- 
-@@ -204,8 +204,6 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 	if (ret)
- 		return ret;
- 
--	memset(&res, 0, sizeof(res));
--	res.addr = pcim_iomap_table(pdev)[i];
- 	res.wol_irq = pdev->irq;
- 	res.irq = pdev->irq;
- 
-@@ -226,21 +224,11 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
-  * stmmac_pci_remove
-  *
-  * @pdev: platform device pointer
-- * Description: this function calls the main to free the net resources
-- * and releases the PCI resources.
-+ * Description: Main driver resource release function
-  */
- static void stmmac_pci_remove(struct pci_dev *pdev)
- {
--	int i;
--
- 	stmmac_dvr_remove(&pdev->dev);
--
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (pci_resource_len(pdev, i) == 0)
--			continue;
--		pcim_iounmap_regions(pdev, BIT(i));
--		break;
--	}
- }
- 
- static int __maybe_unused stmmac_pci_suspend(struct device *dev)
--- 
-2.47.1
+Do you have some board.serial_number by any chance? This could be handy
+in some cases, for example if you have a board with multiple nic asics.
 
 
