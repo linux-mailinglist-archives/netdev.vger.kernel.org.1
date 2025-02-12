@@ -1,167 +1,133 @@
-Return-Path: <netdev+bounces-165362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0CC3A31BDB
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:20:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D31A31BE0
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 717173A7A84
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:20:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756F93A7B7D
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25803D3B8;
-	Wed, 12 Feb 2025 02:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAEA18D65E;
+	Wed, 12 Feb 2025 02:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDkWAW8N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoCH0xs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C48B2AE69
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5894B78F4E;
+	Wed, 12 Feb 2025 02:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739326818; cv=none; b=ZXBAKLYTtjopjcAZHeiBVn9iok6VeANFq2aGAp4bQNBBX4WJj9Y/RK/k1KpTKlhsBDDTn0fTikO3nhb1KG/X0NZvXV2ztZ4L2+tUos8HAFtWiKVEPRGki52M9mJ3r0+ujrgUAHUwUQ5vVXzHQG2LhKV7hmZXQKWiud1I0a1EZ8Y=
+	t=1739326839; cv=none; b=rDo0wjM14EvB+N2uuFAEXdM+GPWT07RgUkKx9AavsVs+u61ueWWcbw/r8pK3Sg4xR8esJkcbXFLlqnflVEUZrIrDGkm6lqF4Q19GYRhqqMRBxo5pvtYWiyKhFVBqjqdyzBKr482tG4Q0tJ2ZaDovN/j10PjU+mSY2+qLhPhvbi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739326818; c=relaxed/simple;
-	bh=z8d1oU6wRhXkHJ/jG+tASq7NOJws2vZt0NFFq32/fLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K+sZwcGEuxbTV29WMiKgMNh2wMvRzvyzsthT6lHtIy5aWsAYEp8FlCOntgVXvZUevEwskoUT+yL9pTRqjgAukOr7XTqsVFm+nl4lXGhXInMoPUY3nU1z3HMGJ+dy5HNKmUOqbwdEHVoeK7z8e6BGejbAPdWYGm6LvBtRNg4uVx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDkWAW8N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4EDC4CEDD;
-	Wed, 12 Feb 2025 02:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739326818;
-	bh=z8d1oU6wRhXkHJ/jG+tASq7NOJws2vZt0NFFq32/fLY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VDkWAW8NsLCmgNbqJf6p24aRKs/53MvuCNsJgkp7A6VZ4fUeuSPCpDXi4+LrX0Uws
-	 N7fcuOYkPyxggkG53yzmy7eRJqUqBmgNTm4e9tyQ/Q2cycjbtwBGZrqD5rayvT55Br
-	 jzaRSYlXk/d1aJ5LNBu5eIruEIfhxRDj0Ap4H0Nih1GZDZelpsjblD+NqkocK+JgiU
-	 zBTKwmzT9GVDorzOmmJSU401osCK3r9rwjCb6OV8imlplZpMGrCmjtvSgaT/RxbQ1J
-	 5kUCX9Rjd8rNguu17WmUPaphRXj8BAPhzBgpegWCzqzYFgJwZUkRWOnwIJ9w4ew6eP
-	 NhtOipM6iZaXA==
-Date: Tue, 11 Feb 2025 18:20:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [PATCH net-next 02/11] net: hold netdev instance lock during
- ndo_setup_tc
-Message-ID: <20250211182016.305f1c77@kernel.org>
-In-Reply-To: <20250210192043.439074-3-sdf@fomichev.me>
-References: <20250210192043.439074-1-sdf@fomichev.me>
-	<20250210192043.439074-3-sdf@fomichev.me>
+	s=arc-20240116; t=1739326839; c=relaxed/simple;
+	bh=BGF4WgRFYes+wXFKDiff8lSB4cxf0V4m7cSG+sh0234=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K154mY3x0vTwNDNl5/IQdCsw5vK/95r++ZuMLnt3Wg7eSbLkz0bYsDA3Q//leYdmzniLoufDIDGeAg9JbwDzFtZuGKTRf230WNg7WPSj0GWTbTyTZvGX5sskWVllFLu0lsHReRJlStE71J67yS7aRA6jmpjRWOeuwspXHaS3YTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MoCH0xs4; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6f9b8291c49so37446507b3.1;
+        Tue, 11 Feb 2025 18:20:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739326837; x=1739931637; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BGF4WgRFYes+wXFKDiff8lSB4cxf0V4m7cSG+sh0234=;
+        b=MoCH0xs47Oufjn9oslv7MF59r/clAlbm/A38hhpc5XBd9klopVBnmDKOi7szex/0c+
+         e3zvOf8G9auXKVjjrZxDvXk3TRjkeDpH3+ECT5z3imEOzK2I8orFX0W0Pms6iO8EzFm/
+         paHha4KTNNdCPqmlKj/N677cmRbIdeWQrRSs+XVWb3b5vTGALIFEwsELdKOwMTjGex9U
+         sVv3t1KNyHOqgYinWdebs2oaO7vjr3rQDmX2qAT72CvZLsutjIOmjth3HNNElySR/IP7
+         SVm++FZUF4wyOJVto3G42jGbTOb+My0ug9/GN2F2nTExMHKNKjWyCW9iRoUgtGBlU3J/
+         mk0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739326837; x=1739931637;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BGF4WgRFYes+wXFKDiff8lSB4cxf0V4m7cSG+sh0234=;
+        b=Vmce9+IvquEaC3gRTyou0OD8QwgAdmpOFE8VH8yVFpErZmiJSWy9tQ3yeZwWfGE1Kw
+         zrDlygOyN1xjYeyiSD0rr2g5cZz5TNje/UHD8yEoZCsiClP6caUFezG8fZY8mQBAvOCm
+         HKOGNMv//prVP63rLW5MdFN2stwnFAy6P7CPLiHqCQJwDKml3TvD3NA8US3FlgkmOAub
+         Z7OmwfrKfwJJK6Aeptha/nCxpY81PhocIewjOuDBluaufB0UDAXV9IaM+5RcRiF0Wrin
+         YvTNumXBKANRh9WycFmyO48XpCv5x+s3jK+wrs9rqSJb9tPGbIWcGRl3pEWoWMqkHBZ8
+         LyVw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3/RfjS8j4hO+tj/utkMXvhi8D51kOKyn6kxDTGfsIwJaXHdH0tpFX4zaf4VTGj0tSpbmyGX/tkqFCHwDANAU=@vger.kernel.org, AJvYcCUCS8qPEJiFXH8gUZaenfpHBUBvncH23prSEr/ppzCLGQKI9DK0NE2XqjuGukHlj9vwW1YqpkxUaJv9@vger.kernel.org, AJvYcCUhlJ1j3DZvJvRybAMWJ6qh1vjI1pxF5v+8Vtzf1c6H0cns6NuoVYdvWnO9PYK6B4o7K+bIhbfC4cE=@vger.kernel.org, AJvYcCVGZQfdreBJDj/zl/Kzf42VXic1IAorRmkK1yrTw4np3ujFjI5oy6ccBr9xAPXtRdMCkBhlMrSmLnrxPQ==@vger.kernel.org, AJvYcCW8cERn8w1aRtCbl4jtTam7Z7yBRyS94ZJOHnzj0ef/I511ED5L4S1F91uysqyeKOrn9+IQnmwrW0f2@vger.kernel.org, AJvYcCWJrh00gxBxBJMaxyhNSaiP3q1OlKXt3FLgzugsJJHUIkg00gtuHtxTH4yljrzEU6VAK6ICOX/GBaooaX3b@vger.kernel.org, AJvYcCWoloS8fg3dSEXyJOq9SZM9mWhJgUMhDNEI6y6mdMVF31gelqt7CniLtOkjg6FMQDi9dhtRZxiWS2TqQXQ=@vger.kernel.org, AJvYcCWtLSP9qRTt0OYqk6Gi4fGavkSPgIQk2ID3AdklMQAYFeiGGT/dGv6v2mGKehWoYtbHeMPUm8Dr@vger.kernel.org, AJvYcCXO7MotSiF0Bsb2goPvVuxF8f6CBJOU32cxpkB3u97zOkelaVQd5WsnyrNDXrl50p1MjnD08oJUje6T@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVSMJqCNkrbzyHMEaTQHB1rVYpe48Wzk5KklgR2vtVZVvV7OIj
+	RWjztbiNChd++deA0N1CiqisoYevGSzk3e/MIMuDV6Nw9BsyGnwuRsXwi5alNJMzgElBfxaz/cG
+	OBX0hRWnEGtS+/by+nlQ7SHvl8+lnFg==
+X-Gm-Gg: ASbGncu/lHuLWlgRLhtRokGP0QSzvFo7QYBpk9D3dK/9JQLgB6w8f3OwuhnUORkgX4C
+	5GqaPq+kOtFDolD4NgTm52JwNTmfW6fSRzC5VlqI7cnK0v9+A43+PUPP54wU6PToNlJb75YVOMs
+	KUYFalNkfQL0iuxB7hFiYA5j4919gtjLU=
+X-Google-Smtp-Source: AGHT+IF+oFBT4/eJC7fxrqCxEqFTUuytLV8FG9XSBDtcVlHz7Ohthj7nFqSBcKDND+KZxt4lh4ibh6h6TvJDsK+a7jk=
+X-Received: by 2002:a05:690c:6811:b0:6f9:8845:cfbf with SMTP id
+ 00721157ae682-6fb1f1e638emr16843557b3.22.1739326837122; Tue, 11 Feb 2025
+ 18:20:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-2-a0282524688@gmail.com> <1ee664ec-f912-467e-aedb-81208987ea2a@wanadoo.fr>
+In-Reply-To: <1ee664ec-f912-467e-aedb-81208987ea2a@wanadoo.fr>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 12 Feb 2025 10:20:26 +0800
+X-Gm-Features: AWEUYZk7swZO7fFhHB97EG7zyv5Dg2IiX0RdzYvso9G14rlwE4a_llIRTcKsa5A
+Message-ID: <CAOoeyxVUN9A3gKB_vMH_d2gzRSznF_DVifJ3ie7BgKhZU+P6Pg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 10 Feb 2025 11:20:34 -0800 Stanislav Fomichev wrote:
-> Introduce new dev_setup_tc that handles the details and call it from
-> all qdiscs/classifiers. The instance lock is still applied only to
-> the drivers that implement shaper API so only iavf is affected.
+Dear Christophe,
 
-> +int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
-> +		 void *type_data)
-> +{
-> +	const struct net_device_ops *ops = dev->netdev_ops;
-> +
-> +	ASSERT_RTNL();
-> +
-> +	if (tc_can_offload(dev) && ops->ndo_setup_tc) {
-> +		int ret = -ENODEV;
-> +
-> +		if (netif_device_present(dev)) {
-> +			netdev_lock_ops(dev);
-> +			ret = ops->ndo_setup_tc(dev, type, type_data);
-> +			netdev_unlock_ops(dev);
-> +		}
-> +
-> +		return ret;
-> +	}
-> +
-> +	return -EOPNOTSUPP;
+Thank you for reviewing,
 
-Why the indent? IMHO this would be cleaner:
-
-	if (!tc_can_offload || !ops...
-		return -ENOPNOTSUPP;
-	if (!netif_device_present(dev))
-		return -ENODEV:
-
-	netdev_lock_ops(dev);
-	...
-
-> diff --git a/net/dsa/user.c b/net/dsa/user.c
-> index 291ab1b4acc4..f2ac7662e4cc 100644
-> --- a/net/dsa/user.c
-> +++ b/net/dsa/user.c
-> @@ -1729,10 +1729,7 @@ static int dsa_user_setup_ft_block(struct dsa_switch *ds, int port,
->  {
->  	struct net_device *conduit = dsa_port_to_conduit(dsa_to_port(ds, port));
->  
-> -	if (!conduit->netdev_ops->ndo_setup_tc)
-> -		return -EOPNOTSUPP;
-> -
-> -	return conduit->netdev_ops->ndo_setup_tc(conduit, TC_SETUP_FT, type_data);
-> +	return dev_setup_tc(conduit, TC_SETUP_FT, type_data);
-
-The netfilter / flow table offloads don't seem to test tc_can_offload(),
-should we make that part of the check optional in dev_setup_tc() ?
-Add a bool argument to ignore  tc_can_offload() ?
-
-> @@ -855,10 +853,7 @@ void qdisc_offload_graft_helper(struct net_device *dev, struct Qdisc *sch,
->  	bool any_qdisc_is_offloaded;
->  	int err;
->  
-> -	if (!tc_can_offload(dev) || !dev->netdev_ops->ndo_setup_tc)
-> -		return;
-> -
-> -	err = dev->netdev_ops->ndo_setup_tc(dev, type, type_data);
-> +	err = dev_setup_tc(dev, type, type_data);
-
-Probably need to handle -EOPNOTSUPP here now?
-
->  	/* Don't report error if the graft is part of destroy operation. */
->  	if (!err || !new || new == &noop_qdisc)
-
-> -	err = ops->ndo_setup_tc(dev, TC_SETUP_QDISC_CBS, &cbs);
-> +	err = dev_setup_tc(dev, TC_SETUP_QDISC_CBS, &cbs);
->  	if (err < 0)
->  		pr_warn("Couldn't disable CBS offload for queue %d\n",
->  			cbs.queue);
-> @@ -294,7 +289,7 @@ static int cbs_enable_offload(struct net_device *dev, struct cbs_sched_data *q,
->  	cbs.idleslope = opt->idleslope;
->  	cbs.sendslope = opt->sendslope;
->  
-> -	err = ops->ndo_setup_tc(dev, TC_SETUP_QDISC_CBS, &cbs);
-> +	err = dev_setup_tc(dev, TC_SETUP_QDISC_CBS, &cbs);
-
-$ for f in $(git grep --files-with-matches TC_SETUP_QDISC_CBS -- drivers/ ); do \
-	d=$(dirname $f); \
-	git grep HW_TC -- $d || echo No match in $d; \
-done
-
-No match in drivers/net/dsa/microchip
-No match in drivers/net/dsa/ocelot
-No match in drivers/net/dsa/sja1105
-drivers/net/ethernet/freescale/enetc/enetc_pf.c:        if (changed & NETIF_F_HW_TC) {
-drivers/net/ethernet/freescale/enetc/enetc_pf.c:                err = enetc_set_psfp(ndev, !!(features & NETIF_F_HW_TC));
-drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:         ndev->features |= NETIF_F_HW_TC;
-drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:         ndev->hw_features |= NETIF_F_HW_TC;
-drivers/net/ethernet/intel/igb/igb_main.c:              netdev->features |= NETIF_F_HW_TC;
-drivers/net/ethernet/intel/igc/igc_main.c:      netdev->features |= NETIF_F_HW_TC;
-drivers/net/ethernet/microchip/lan966x/lan966x_main.c:                   NETIF_F_HW_TC;
-drivers/net/ethernet/microchip/lan966x/lan966x_main.c:  dev->hw_features |= NETIF_F_HW_TC;
-drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:              ndev->hw_features |= NETIF_F_HW_TC;
-drivers/net/ethernet/ti/am65-cpsw-nuss.c:                                 NETIF_F_HW_TC;
-drivers/net/ethernet/ti/cpsw_new.c:                               NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_TC;
+Christophe JAILLET <christophe.jaillet@wanadoo.fr> =E6=96=BC 2025=E5=B9=B42=
+=E6=9C=888=E6=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8A=E5=8D=882:37=E5=AF=AB=E9=
+=81=93=EF=BC=9A
+>
+> Le 07/02/2025 =C3=A0 08:44, Ming Yu a =C3=A9crit :
+> > The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> > 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> > PWM, and RTC.
+> >
+> > This driver implements USB device functionality and shares the
+> > chip's peripherals as a child device.
+> >
+> > Each child device can use the USB functions nct6694_read_msg()
+> > and nct6694_write_msg() to issue a command. They can also request
+> > interrupt that will be called when the USB device receives its
+> > interrupt pipe.
+>
+> ...
+>
+> > +static struct irq_chip nct6694_irq_chip =3D {
+>
+> This could be const.
+>
+> (I'm working on a serie that should constify struct irq_chip, so this
+> one would already be done)
+>
+Okay, I will fix it in the next patch.
 
 
-Looks like some the these qdiscs will need to ignore the features too :(
+Best regards,
+Ming
 
