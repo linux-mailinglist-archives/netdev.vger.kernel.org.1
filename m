@@ -1,125 +1,117 @@
-Return-Path: <netdev+bounces-165328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC20A31A8F
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:37:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A567DA31A99
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B8967A2AF0
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 00:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24DF418878D5
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 00:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D647117C2;
-	Wed, 12 Feb 2025 00:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F1A271827;
+	Wed, 12 Feb 2025 00:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vNovxPUW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LcRi+QvG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF8BFBF6
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 00:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF4979F2
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 00:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739320660; cv=none; b=M9rMjenKDzUIkvKw3kib14OSJEz1Jr4ETbiU6cetx0xli0gGaM4Po0fZFB/FYeXq+iz1/xt40RX/w23BsXDje8U1dfXMqgysMcQ4U9Dh/SC3C3x6R4l5Oi957kzQOdCyJdDjE6AWbOfNsS3Wyyy1Ce+4h52NbNNY9p69Kf3zcqE=
+	t=1739320804; cv=none; b=e+fiAgCvG7icNLgEXVF0UxBZBUqIW2BKXC/Hm9GNHKFs3LDoOeOW9lJvtVSbmYeR2c0irbPpn3Dz8pPI95wQuU9FbRyRsSom0FvpXinrf6+8PmF91T0kcbHJ+boXfVfAVSggj4M4LKVxDH0aptCnvLQ0RcbcQ/AUCjnpsmy2wto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739320660; c=relaxed/simple;
-	bh=YSvSdah0bKTEIup9mhuKAIdnz9EFwCw2r1vehy/Wxd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BoNiNEeXTxEcyeBM/HxY7IppoPxZz93PJ2knD5k9eResIMFjVO0ayASfilwCtIr7kBxqHUDZttyxQ+mWO85mXHGV0lVDKK2lLY8Z824u7Jzf5d4/YBv4qjicg4LzdN4/qeWM/5yMvBbSEPHT1hvnW5KHxMNMxpoe7yWA+6xLMIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vNovxPUW; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fa8ada6662so4307497a91.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 16:37:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1739320658; x=1739925458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ikhPyTe6NtiZ3aec/ge2RXv/HlgjomU3KdF4rZpkmkY=;
-        b=vNovxPUWmyCdUa27ZztBjXg3ZyJv16SLVjMPfk/2lt3R5W45LEj/Ouhvo/F2YK6/jN
-         3lp+TN4R9ZkGzdBgWJ2j0TFzqk+xFnYpTziC8fI1ffk+Oz0ZAhIe8lxf3B0XsStNb1sL
-         xIJWnehvBj1CVuGckYxUHrQUJwVPjHzMfV+yivky0inj/GiaHZbstJtU1WlI4r8130l1
-         UVxXRSLgbsZ2g1jLHS7eoB+OqKZ/vCGEvYOxLIkbJdH6beTGMFu0uNLnuKv/5FW6d22y
-         8Psfcq6TBGnzrpaJDHpEUOzDC8RIlKXiOsHbF1+J5HzCzw7IW8haua6oOK0QMv28yiLR
-         mPvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739320658; x=1739925458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ikhPyTe6NtiZ3aec/ge2RXv/HlgjomU3KdF4rZpkmkY=;
-        b=wLg9so7nkT1NGT2ac9wAqf36T5OeYtvhnMl/TqE2DYypGTE2XbfYglA8H1EGU40KT2
-         gXJkaBKpbSppe6KpBbqo0ZH3ij6joF40l56y2geStgWQmloufgNe2fJD9BO6Yztl+Dz8
-         2BEOJpU3vuacjNyA6Cqf4atiW+WqV0Hm4sL+VWd4w66mk16YrmoI2M3dIGnwqkYQV6hI
-         H3gcjC+MZoiYD4KU+rTB56mOgEaMAURX+hKc4ppxEJsRO8am5E0oqHWFnlZNUGpyjCRj
-         5T9/AftaHAKbK+gVSisbKIEitDlWxOLlPLyaX+KarvSBbH7qPNuM3VVHqbXdXhD3cqsA
-         NwCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcPPH71hbMLdFMBDHGINmfOJdW8MhFJbrnnRmr761lplYllxnLVnGOb/4h3fNGPLudecUNUVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQOHXp9Wp3eW9WQcYKh4Nu8gGnKvBUz+HJb2h/60RX0b0It/dd
-	9QArZKukKupHssyYXb9BVKWj3hSKANDS71aady9h4pWQAIlwS2JfZ5ZtRjR3Kfg=
-X-Gm-Gg: ASbGncudVT41vW5W+/q8V9BnbxP49MmoBpM54XMfTawjZvvxOekrJsuTWc7irQKk0s7
-	IOqYkgOTNLdNJV06nMoVvfzLL7vCj5Ui/tSBQfDGLwJX918/meKRqIsJdIpriU2gEHJibrFmaE/
-	SrlpQWoVf2l6NPXc0adR+Z2rz6q/OpjiPuG0p1Bu8i60DWjLbTc2fLbafnIB8GHWv5eZKewhYjh
-	FrMNFwh304Tq0mELAJsxo/nsNK4RNTv0mNcE8P6aM3UMAKIAqZOHpfA3lpXCLKQwYWWjqAsLnHP
-	skkhq5PCiCECeVuqWU/pCbyO0dhT70Vwb+1ofsPpSinxuR3MnjzLawoJWcqlmphqwnF6
-X-Google-Smtp-Source: AGHT+IFLyeYwU6Oy0JIVL6fTE1Wf/d8hPAYNZvjz9ExKRE039OR/aOJBA99Q95y1XNDQNeGgxslDfA==
-X-Received: by 2002:a05:6a00:1789:b0:730:7d3f:8c78 with SMTP id d2e1a72fcca58-7322c376a27mr1967734b3a.3.1739320658388;
-        Tue, 11 Feb 2025 16:37:38 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7308ac1a373sm4641127b3a.41.2025.02.11.16.37.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 16:37:38 -0800 (PST)
-Date: Tue, 11 Feb 2025 16:37:35 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: longli@linuxonhyperv.com, Jason Gunthorpe <jgg@ziepe.ca>, Leon
- Romanovsky <leon@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
- Konstantin Taranov <kotaranov@microsoft.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, Long Li
- <longli@microsoft.com>
-Subject: Re: [PATCH net-next v3] hv_netvsc: Set device flags for properly
- indicating bonding in Hyper-V
-Message-ID: <20250211163735.18d0fd02@hermes.local>
-In-Reply-To: <20250211162026.593b0b93@kernel.org>
-References: <1738965337-23085-1-git-send-email-longli@linuxonhyperv.com>
-	<20250211162026.593b0b93@kernel.org>
+	s=arc-20240116; t=1739320804; c=relaxed/simple;
+	bh=4gYRKeV/o9Fd5EHF13nzi+WcSxVwigz8FEYtKFA/3Hw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Jvt+doX+Xd/th+eIX2CnrmDJxn8ndOsNRVWFGF29a17FNQMuGVzH2abz3zFqbqLbmQbhQ8FfTOurW/rCp4zFI6uZJ13rUUXEJaUCqEVNFTyeaYiluAO6ngXhumugqIskGUizwsa6iw/QCw6Hz2qtWfEFDQFZWWAGz7e/1pYQN7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcRi+QvG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4417C4CEDD;
+	Wed, 12 Feb 2025 00:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739320803;
+	bh=4gYRKeV/o9Fd5EHF13nzi+WcSxVwigz8FEYtKFA/3Hw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LcRi+QvGerp2A/95CkifoUqSNAdbDRxiYwAeGnbSYmCec+4Q7A0DOCIDR9CupzUMt
+	 vEJgAYpZOtnz2nHLUU6qd5p7BKIROClPW+PyeofcktUQfwx/YG76QxtsKGaVgrbG4o
+	 OD4nT0jrR7fM8wCrqr9SBKuVSUMCaI+a5ecd4NNj7kCNSGPdEFsrXmM3mD2Zf+e50m
+	 D0XGxYCddPyrzpb+I6qtEjMz2tGbH3KtprpPS/zn8YNGIsX/iugxuhkSGUnmFXvDth
+	 +CI552Fa3KodVsdaTju7Ty0tLwtwPa55l9fbpk5u0kQqhrFlRlt1amMKJ2TjBxOLlm
+	 Fgwnf59q7S9uA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC614380AA7A;
+	Wed, 12 Feb 2025 00:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] vxlan: check vxlan_vnigroup_init() return value
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173932083277.51333.10241799841415185239.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Feb 2025 00:40:32 +0000
+References: <20250210105242.883482-1-edumazet@google.com>
+In-Reply-To: <20250210105242.883482-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
+ syzbot+6a9624592218c2c5e7aa@syzkaller.appspotmail.com, roopa@nvidia.com
 
-On Tue, 11 Feb 2025 16:20:26 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hello:
 
-> On Fri,  7 Feb 2025 13:55:37 -0800 longli@linuxonhyperv.com wrote:
-> > On Hyper-V platforms, a slave VF netdev always bonds to Netvsc and remains
-> > as Netvsc's only active slave as long as the slave device is present. This
-> > behavior is the same as a bonded device, but it's not user-configurable.
-> > 
-> > Some kernel APIs (e.g those in "include/linux/netdevice.h") check for
-> > IFF_MASTER, IFF_SLAVE and IFF_BONDING for determing if those are used in
-> > a master/slave bonded setup. Netvsc's bonding setup with its slave device
-> > falls into this category.  
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 10 Feb 2025 10:52:42 +0000 you wrote:
+> vxlan_init() must check vxlan_vnigroup_init() success
+> otherwise a crash happens later, spotted by syzbot.
 > 
-> Again, this is way too much of a hack. You're trying to make
-> netif_is_bond_master() return true for your franken-interfaces
-> with minimal effort. 
+> Oops: general protection fault, probably for non-canonical address 0xdffffc000000002c: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000160-0x0000000000000167]
+> CPU: 0 UID: 0 PID: 7313 Comm: syz-executor147 Not tainted 6.14.0-rc1-syzkaller-00276-g69b54314c975 #0
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+>  RIP: 0010:vxlan_vnigroup_uninit+0x89/0x500 drivers/net/vxlan/vxlan_vnifilter.c:912
+> Code: 00 48 8b 44 24 08 4c 8b b0 98 41 00 00 49 8d 86 60 01 00 00 48 89 c2 48 89 44 24 10 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 4d 04 00 00 49 8b 86 60 01 00 00 48 ba 00 00 00
+> RSP: 0018:ffffc9000cc1eea8 EFLAGS: 00010202
+> RAX: dffffc0000000000 RBX: 0000000000000001 RCX: ffffffff8672effb
+> RDX: 000000000000002c RSI: ffffffff8672ecb9 RDI: ffff8880461b4f18
+> RBP: ffff8880461b4ef4 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000020000
+> R13: ffff8880461b0d80 R14: 0000000000000000 R15: dffffc0000000000
+> FS:  00007fecfa95d6c0(0000) GS:ffff88806a600000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fecfa95cfb8 CR3: 000000004472c000 CR4: 0000000000352ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>   vxlan_uninit+0x1ab/0x200 drivers/net/vxlan/vxlan_core.c:2942
+>   unregister_netdevice_many_notify+0x12d6/0x1f30 net/core/dev.c:11824
+>   unregister_netdevice_many net/core/dev.c:11866 [inline]
+>   unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11736
+>   register_netdevice+0x1829/0x1eb0 net/core/dev.c:10901
+>   __vxlan_dev_create+0x7c6/0xa30 drivers/net/vxlan/vxlan_core.c:3981
+>   vxlan_newlink+0xd1/0x130 drivers/net/vxlan/vxlan_core.c:4407
+>   rtnl_newlink_create net/core/rtnetlink.c:3795 [inline]
+>   __rtnl_newlink net/core/rtnetlink.c:3906 [inline]
+> 
+> [...]
 
-Agree but disagree as to reasoning.
+Here is the summary with links:
+  - [net] vxlan: check vxlan_vnigroup_init() return value
+    https://git.kernel.org/netdev/net/c/5805402dcc56
 
-The way bonding is handled in the kernel internal API's is ad-hoc.
-Really a better solution is needed.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-The real problem is in any code (other than the bonding driver itself)
-looking at IFF_BONDING is broken. All that code won't work if used over team
-or failover devices (luckily no one ever seems to use them).
+
 
