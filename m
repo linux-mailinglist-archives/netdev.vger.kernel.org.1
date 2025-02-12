@@ -1,193 +1,157 @@
-Return-Path: <netdev+bounces-165668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F92A32F89
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:24:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A604A32F8E
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 20:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F44E167108
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:24:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 810BD7A1C6B
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 19:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F53261391;
-	Wed, 12 Feb 2025 19:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E979F2627E4;
+	Wed, 12 Feb 2025 19:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="06z5riO5"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TuOGU+hS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBA61DEFDD
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 19:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CB61DEFDD;
+	Wed, 12 Feb 2025 19:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739388286; cv=none; b=QsEu0zxIMbPLFdVAu19vMVzb4iJFH6TZZk2kCin3dpMXJ3HcrClF0iF4YbQEd5uWkedix4/sbePxgr5kGnvFjMouyNWT72x0hX5PtwmbgdFRDDwKWha+Oi8zOezvFrk64JACbCoIqRwfSoASOM0vrq77o7L4rEAl3esRDDXsPag=
+	t=1739388330; cv=none; b=oqizEWcVfM5pGLXHV4Hiz7A8LlkyT19TDuYKI3t5CycZHG53S1zTO2fQzPym24RXRVnaqi6kxPsvxV0D6BwDYt6Czugtlw5SGmNYKsAXSP1dEh+0aHyM1b3Ucn10Pyf5QafYgGpwaUSnvz05B5acw1nfQB6HbTyeSx9NuBNn+Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739388286; c=relaxed/simple;
-	bh=l+cWqnamQoHx+N7Kimd8YxSbO37JRmdE1+IO4t9I5w8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WuNRJN6xyv9Dqm0/YQn2fDOWnS5GIQvoPELHsRvgXErnqkgkwSYrSVb4P0mfklsU8lGlgnnRYGOTaM7x7/Cd5AwdVavP0x4jgTnG/TQo1V0tnj27oJtx85wIX7QtkW5rGIEQRV6nPzeQU7L6rFP4Ih8Bm4wkOxgf48ru+EfQ0AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=06z5riO5; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21f72fac367so221575ad.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 11:24:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739388284; x=1739993084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ysBI1lKJKiCXV640ptiNSZHDkjEc3qz7bqsceA80Sdg=;
-        b=06z5riO58YhK+AZKh4yrOWQZ8CWguvYzgQ3NE7m/KUEI5tkYIgpjJd/U4YWXMZBU9y
-         HXRvAJNt8LkPBjBVjugAuVNE1UrjnSuukN9esrH5ixcDVrPf9GMEs7u12hRxMzC2fAkE
-         CaD8DU6LfROPhwMzwvaz0O2DvuBKMbvYMJOkHLApANIi5fCOInbWkx3fzNJ1QPouvipC
-         wE1eFqGaaCggJewC1kejDuZCTCvDJ/ApzbmSqZWEansP0KJhnuirNHxRAZVLaiO45NkN
-         aYJJXV6H+bTAQamgg5ZbpaV4oq1X5da+xFhf0qYrYqzj1zo1QNaKQLXKsCEQbkUy8YnT
-         TrjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739388284; x=1739993084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ysBI1lKJKiCXV640ptiNSZHDkjEc3qz7bqsceA80Sdg=;
-        b=YSZEEnGJbmCoeo9XIlOWf6P1lMc05+zpWQEWE7+bIPpC5LZOuN1aXjj3w1vkCbeEXl
-         cHMcXtyt3JkMno4uLQAOb4STNFdr1kHr/5+y+584Sko0xqMxQ32zfoeWoXnQ7Wq5dZjD
-         7dmKiWvmh9lGtjIOKcari5MNqyw9BEhhhLocWxXQ9CXPXcJYBQdjuzavycmjTAtdwujQ
-         2UNlJQiZn1yzjRp/kwRdFbfKP3Ev7lcE1ZabbgNMUTsDif+HE96kbEk6lfzQOjUzHdKu
-         dg9ZRQR4Sql/ddoiekBEvYW97cbL50cSFw9VWOvbYgmxbQ2z67IYY0mBmCkm6l0EHv7a
-         zY9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUzSg8wQDzyzXRuOOTJmq3GwttpOq0DYFDSIN2QSwxLgiY7VLxkez+ugkUO8FBW2cLR1iKthLQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe0o0a4z6wsUWNRm/sN9c334HO0i+zoeQgCKZGBr/pp7Ww48BR
-	EVyLdyUEsfC2jb9KHy3ucZmS9EMHa0HApDKLJ7VoMAN1DJZUpHj13AKnJa+bsQUl50XNGnM4huS
-	+ggIwzaDwy1QLXZtrQvh7keixdCgbVz3xHEwg
-X-Gm-Gg: ASbGncudqt/z/gFl0XSmoRa0mG3vp+RAFGu/RcWkix9+ildAtkCDzDsW+ymldtD9Q/R
-	SlvG5GpsubDWRU+eEdbOnIZGn08ulvAKYWuXc6fOjiGO2TzapuE8aX0muLk5rgWh3wsiipa57
-X-Google-Smtp-Source: AGHT+IG3mH0V0pqhkUrHd7i53pO09w3W4FM+WXo+DDwzObVvZimRDXWUBCK6ZJ6lGbkRD5mGoTECZFIJIWbQCd1Xlv8=
-X-Received: by 2002:a17:902:fc86:b0:21f:2306:e453 with SMTP id
- d9443c01a7336-220d37075a4mr78545ad.7.1739388284328; Wed, 12 Feb 2025 11:24:44
- -0800 (PST)
+	s=arc-20240116; t=1739388330; c=relaxed/simple;
+	bh=HBBqqi+x0G8qDpmtHU+9cA14OLmLrDmPMXDs7u256ZM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZO+4J8kS6CModUcTwK9V4wf04Dsa32kTSIynA4SUPcOuoDdfg3tdIqoOD43i4H7FSiaTq8JF9l9rZWIXwwHKsenFcHUgbYbleamUawD2KkXN/tA092sQPoQQOUUqGMLRbB/8x9CbWRRW8bTfLnP8Rst3nHPsVndp6u+4b08anJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TuOGU+hS; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51C9hFbv026890;
+	Wed, 12 Feb 2025 11:25:06 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=Wufsjz4xcZASzpC++jwn8Zg
+	FIphgLQj/6xicRGnRsws=; b=TuOGU+hSoXt2d1JkBG0/3Rd3yPNae2D1+/neiMo
+	rBCmkv9BfCNNmYfR1fzJCae4/ApzPeD7gvURubpgekABS1L8sT5P7cinOaSgNHx4
+	n3z0Rbdsh9jlHhQZDSAUx538yRaMRXaIe2PA/owbNyxTmN50EkdnDgn6r53ifegQ
+	3g+Wb5RrOj7Pu+c+voqtM7Y+enmPEXA0QXLrpihIEi1tDvmXO0hRFC7Mja2PDTFq
+	t24PBLwfL05eMjBjy5cigINp5dXZoPQEeKeRFRObwJRnXSqyoigNqgqVnYLEGOn1
+	grcc0k9Ps+Pny9eVu2+AfQV9GcnYMHW/ZXDpW5TFTdp2Q+A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 44rs80s6pw-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 11:25:06 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 12 Feb 2025 11:25:04 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 12 Feb 2025 11:25:04 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 978603F7043;
+	Wed, 12 Feb 2025 11:24:58 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <horms@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <john.fastabend@gmail.com>, <bbhushan2@marvell.com>, <hawk@kernel.org>,
+        <andrew+netdev@lunn.ch>, <ast@kernel.org>, <daniel@iogearbox.net>,
+        <bpf@vger.kernel.org>, <larysa.zaremba@intel.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH v6 0/6] Add af_xdp support for cn10k
+Date: Thu, 13 Feb 2025 00:54:50 +0530
+Message-ID: <20250212192456.2771997-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210130953.26831-1-kerneljasonxing@gmail.com>
- <CAHS8izMznEB7TWkc4zxBhFF+8JVmstFoRfqfsRLOOMbcuUoRRA@mail.gmail.com> <CAL+tcoDrxSgGU3G0a=OqpYVD2WAayLKGy=po5p7Tm+eHiodtNw@mail.gmail.com>
-In-Reply-To: <CAL+tcoDrxSgGU3G0a=OqpYVD2WAayLKGy=po5p7Tm+eHiodtNw@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 12 Feb 2025 11:24:31 -0800
-X-Gm-Features: AWEUYZl2GLgD-49XjfTGwLqGK2I-bG3cTjdo_9LJeB-0uQwwIptMQ0n0Ccuw_hw
-Message-ID: <CAHS8izNSG_fC7t3cAaN0s3W2Mo-7J2UW8c-OxPSpdeuvK-mxxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] page_pool: avoid infinite loop to schedule
- delayed worker
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	horms@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Rinfm1qGTwGETJh9yn1X50WAG7h-QOC4
+X-Proofpoint-ORIG-GUID: Rinfm1qGTwGETJh9yn1X50WAG7h-QOC4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-12_06,2025-02-11_01,2024-11-22_01
 
-On Tue, Feb 11, 2025 at 7:14=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Wed, Feb 12, 2025 at 10:37=E2=80=AFAM Mina Almasry <almasrymina@google=
-.com> wrote:
-> >
-> > On Mon, Feb 10, 2025 at 5:10=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > If the buggy driver causes the inflight less than 0 [1] and warns
-> >
-> > How does a buggy driver trigger this?
->
-> We're still reproducing and investigating. With a certain version of
-> driver + XDP installed, we have a very slight chance to see this
-> happening.
->
-> >
-> > > us in page_pool_inflight(), it means we should not expect the
-> > > whole page_pool to get back to work normally.
-> > >
-> > > We noticed the kworker is waken up repeatedly and infinitely[1]
-> > > in production. If the page pool detect the error happening,
-> > > probably letting it go is a better way and do not flood the
-> > > var log messages. This patch mitigates the adverse effect.
-> > >
-> > > [1]
-> > > [Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
-> > > [Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
-> > > ...
-> > > [Mon Feb 10 20:36:11 2025] Call Trace:
-> > > [Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
-> > > [Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
-> > > [Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
-> > > [Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
-> > > [Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
-> > > [Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
-> > > [Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
-> > > [Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
-> > >
-> > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > ---
-> > >  net/core/page_pool.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > > index 1c6fec08bc43..8e9f5801aabb 100644
-> > > --- a/net/core/page_pool.c
-> > > +++ b/net/core/page_pool.c
-> > > @@ -1167,7 +1167,7 @@ void page_pool_destroy(struct page_pool *pool)
-> > >         page_pool_disable_direct_recycling(pool);
-> > >         page_pool_free_frag(pool);
-> > >
-> > > -       if (!page_pool_release(pool))
-> > > +       if (page_pool_release(pool) <=3D 0)
-> > >                 return;
-> >
-> > Isn't it the condition in page_pool_release_retry() that you want. to
-> > modify? That is the one that handles whether the worker keeps spinning
-> > no?
->
-> Right, do you mean this patch?
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 8e9f5801aabb..7dde3bd5f275 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -1112,7 +1112,7 @@ static void page_pool_release_retry(struct
-> work_struct *wq)
->         int inflight;
->
->         inflight =3D page_pool_release(pool);
-> -       if (!inflight)
-> +       if (inflight < 0)
->                 return;
->
-> It has the same behaviour as the current patch does. I thought we
-> could stop it earlier.
->
+This patchset includes changes to support AF_XDP for cn10k chipsets. Both
+non-zero copy and zero copy will be supported after these changes. Also,
+the RSS will be reconfigured once a particular receive queue is
+added/removed to/from AF_XDP support.
 
-Yes I mean this.
+Patch #1: octeontx2-pf: use xdp_return_frame() to free xdp buffers
 
-> >
-> > I also wonder also whether if the check in page_pool_release() itself
-> > needs to be:
-> >
-> > if (inflight < 0)
-> >   __page_pool_destroy();
-> >
-> > otherwise the pool will never be destroyed no?
->
-> I'm worried this would have a more severe impact because it's
-> uncertain if in this case the page pool can be released? :(
->
+Patch #2: octeontx2-pf: Add AF_XDP non-zero copy support
 
-Makes sense indeed. We can't be sure if the page_pool has already been
-destroyed if inflight < 0. Ignore the earlier suggestion from me,
-thanks.
+Patch #3: octeontx2-pf: AF_XDP zero copy receive support
 
---=20
-Thanks,
-Mina
+Patch #4: octeontx2-pf: Reconfigure RSS table after enabling AF_XDP
+zerocopy on rx queue
+
+Patch #5: octeontx2-pf: Prepare for AF_XDP transmit
+
+Patch #6: octeontx2-pf: AF_XDP zero copy transmit support
+
+Geetha sowjanya (1):
+  octeontx2-pf: use xdp_return_frame() to free xdp buffers
+
+Hariprasad Kelam (2):
+  octeontx2-pf: Prepare for AF_XDP
+  octeontx2-pf: AF_XDP zero copy transmit support
+
+Suman Ghosh (3):
+  octeontx2-pf: Add AF_XDP non-zero copy support
+  octeontx2-pf: AF_XDP zero copy receive support
+  octeontx2-pf: Reconfigure RSS table after enabling AF_XDP zerocopy on
+    rx queue
+
+v6 changes:
+- Updated patch #1,#3,#5 and #6 to address review comments
+  from Simon for some code re-arrangement
+
+v5 changes:
+- Updated patch #1 to use xdp_return_frame 
+- Updated patch #6 to use xdp_return_frame
+
+v4 changes:
+- Addressed minor comments from Paolo regarding adding fixes tag in patch#2
+  and removed one unnecessary NULL check from patch#3
+
+v3 changes:
+- Rearrenged patch ordering to fix individual patch compilation issue
+- Fixed un-initialized variable declaration and reverse x-mas tree issue
+  pointed by Simon
+
+v2 changes:
+- Addressed minor review comments from Simon regrading smatch warnings
+
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |   7 +-
+ .../marvell/octeontx2/nic/otx2_common.c       | 122 +++++++---
+ .../marvell/octeontx2/nic/otx2_common.h       |  17 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   6 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  32 +--
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 188 +++++++++++----
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   9 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  12 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.c | 225 ++++++++++++++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.h |  24 ++
+ .../ethernet/marvell/octeontx2/nic/qos_sq.c   |   2 +-
+ 12 files changed, 554 insertions(+), 92 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
+
+-- 
+2.25.1
+
 
