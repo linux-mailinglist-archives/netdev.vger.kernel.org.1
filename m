@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-165358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EBE4A31BBF
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:12:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D07A31BC0
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EA4A1889A2E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:12:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82D9A18899AF
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938E11CAA7F;
-	Wed, 12 Feb 2025 02:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2AA71D515A;
+	Wed, 12 Feb 2025 02:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6Q1NPcK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FaTB330s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39DD192B74
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D426F1C462D
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739326312; cv=none; b=PLJlVwVj04O6l7Aj3N4/Qq3Km1BKf6tBCLnFaaUVospJcbVjZNZY3YBSIlq8ehIyxIQR91Um8J42Kd1uCbgsdBy7dBor/WXIApj5b3Y802PpIlB+I1QcgfSIYpneHjRjCuWGmaIl0aLF20xXLLCe7YUYZ9C4s4pkefMPlyYa7Dg=
+	t=1739326313; cv=none; b=ExrHg2Upx2sIox/Lytp7jcd9y+RP5/BYLHPZoMU4cgcoYc8L8+ESokqVLZycJWKDDpVw/UlbubDxkwFA15nD0Ow81EHJAHQUPT/kZrGeUE1Sno2cJEGQg0QiMTbIIzzick5NbYHEV3nsbKSxGxkIP4vYEFiASZqWQLNt5CDWuUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739326312; c=relaxed/simple;
-	bh=CBxGCPW4+yvar/wF401UTO44GTJBd0WBDE+y6QfJYf0=;
+	s=arc-20240116; t=1739326313; c=relaxed/simple;
+	bh=m4S/w2T8OkBnZvB+e9Gt8KisVeTLYNX5SCtA76hGXHk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FHFKdhoZk1QUaVWWxOfKIexhpFlQae0Wf53pvE32tkhbkJoLUKR+mm0zqO+JfBFsJMXLRMiVfzXs3aGlrE8yo3fcHEYQhlhx8lkWcis30xgbA8VxvaHyP8YD/HSbcC6VB+9KUt+Mivk8EUSxpG7hgpL5kHTuAqYYkM1TxnwoLRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V6Q1NPcK; arc=none smtp.client-ip=209.85.219.48
+	 MIME-Version; b=YW2Sx41eFzzMxyW6lNe/t/x24IxI24piWv3zAx+p3rQ2MBdBdWB5q/mIJu8lvOTypMH0xl3kiyGD0pkN++jLFf0VER3SxbKhnG82nN2Wa5tOB4ZPt05o/Mcms1yIkTqSUpTo5nZcRnaZKLGkuAD1E+Uhfhcj2xBsfZTGxzANkm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FaTB330s; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d8e8445219so50380906d6.0
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:11:50 -0800 (PST)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e432beabbdso47266776d6.3
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:11:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739326310; x=1739931110; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739326311; x=1739931111; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ve+mcTbttDFJtOFy5NeJamyMZhH67HVi6U3zxdpocD8=;
-        b=V6Q1NPcKeYgzjw8kFh+SL5GbMtK+XbtZNJyU/6nsgPZRA/Fij/DErWmfccWv6ls5aD
-         NAvMR+LRnHVx6QI0ct00SiwgTaZ00a220pkc5ulmRF1ZNKfK5kxQZclb5fgVfhK50l4T
-         +aLDdHJUME/3+nlXh+qTwDzDL3sF/syq9cmlVRgM4/R4mD/1zuYrij1b/1RFWLDJn3xj
-         iFs5BqH/XbcRx9Upr3KhIGCsNCjNpL3cI5UM9JKdo8cXSOj7EHM4NF6tMbDDyr+XIdYa
-         zinJH76xmEp1kVKMDDzq0/zUcnaq5q57R7N4O32jWb1/bhfogmuYhc2C+z1/CkH7TKtr
-         Rj1Q==
+        bh=kbajb8qUJqVRLMyDn6njuBObgVVKqIDxpjIdJ1kBpV0=;
+        b=FaTB330sr7ZXWI+oDwk7jQ9WaeMu/4H9cZrOm9jE6P9DkhgNa22ifaMUtoNw55ZUie
+         FQQ/DfU8dSyow+z7v2EbTCxDvXE0TWXOAba71HJ5mbk/TYwaRdHuYk0rMP7DMV8Q6Ig3
+         SyRguNe3Ofhp3iLKV6w5y0+D1IHwb30+sX4Ni1gw4iKAQ1r3RSifWsd8L6WP6bmZu7Ay
+         Mr2asAGjpPfq3MGiqfjfuIvRvimXdUjKb328WreyZ3/1jddLkxEmYzULNU4PZGFtdYWO
+         KwgmG62mTXmElJq3cgLS8LDOB/ZGcu/9bPmA5h9IQijq/N5tkzycJNwbNMCmrlkJ8UPD
+         M7Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739326310; x=1739931110;
+        d=1e100.net; s=20230601; t=1739326311; x=1739931111;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ve+mcTbttDFJtOFy5NeJamyMZhH67HVi6U3zxdpocD8=;
-        b=N3EuA/GxfRSRyiFJpqNhW5nrazeuI/leOf/D77WLFfCLVilLMiZkoxDBTwHC9aeGZ+
-         IArfQtDzx4bKzZq+2kc30up5JNGorpRHSx7u7t0mBT9+p5j+XzD50Ltl3pGZP9aO8mI/
-         eAgGIU0MbgAuaPb8Epc8P4D/UqWJedd6+O33InBHkI5SlL5knMdFlWPz7vPZ+3XIrvHH
-         XB26tcrUCd+6Sl6U6kZx55WScQbMphb1cxt56MDqZP+GTIvtc8lfEwuHztQLBENXr0Qy
-         vFXsmsA29wkiHxpOfDCoX+I7rQtxVP7OJTTYeLDdJ+4l91JFWRItCSIo/AiO3bgHG229
-         gdcw==
-X-Gm-Message-State: AOJu0Ywzy01Nd6iKd3cvtSPdsmD906IERWAUOHf3VLG4bMc15O42HTtP
-	vNEXsfVU27Cco34eC3640petDzJhxe6mFKHYPCAtdH7RYXiMSeRy4HksYw==
-X-Gm-Gg: ASbGncsyCMNcvYSJm9ueK3F1jVknMu9RMN0Mk9WpcqUZcTp36IA4W3Y5vb23X4YeIag
-	TiJ9O46fJPJbWIfToROcGFOJfsFHCHaHYYPSmuHCjkBI/jxh/ywYyS47h+pjEViKyudnS3KbVzV
-	DHLgIAfPBt0Id+fXCs5MI0KkmfFZy8Bbos2X2zMHPPSXAWLLOpX+65l1f9yZkbY6AtJa4o7J1Rx
-	Z8q6LSJzqfu9/XbYGsFLr9RSahEajE/6bWttrHDjkuVRvk5E5OYlxQ0rVcG0/XIFLO8/SfMQ/Kc
-	hey9eCrMHt5jl/oVt7iEF66JDm08EO8DoQE28+fSKfwrc69eohSi5F5ork+Fuyt1xEK2tMw4s4d
-	OhmhP5tVtSA==
-X-Google-Smtp-Source: AGHT+IFsQPxjxZkxCrkvMrOzMyvFbqbnz1TkQx21sl9acx/LhK0PxWg/Hr9OHYksNiy6syOfkHKlng==
-X-Received: by 2002:a05:6214:d46:b0:6dd:d3b:de27 with SMTP id 6a1803df08f44-6e46ed828c9mr27651946d6.18.1739326309987;
-        Tue, 11 Feb 2025 18:11:49 -0800 (PST)
+        bh=kbajb8qUJqVRLMyDn6njuBObgVVKqIDxpjIdJ1kBpV0=;
+        b=B3IzMikhxgol6rDgzvX6cVufzJ3K3qYlcA50MJgSsF402Z8vS9VJbIGYwyK3f8h68y
+         CAptnhUx0dCmjtpW+TR+5ld9Ia5NQwNL9hmBv+qj6JEJrJCPhng/C0DSqpf8p6H/ofVR
+         TKwA047hukYunQxruf3JMmzTk55lJYv5UDSjPIb2HlvX1cnf1vfdruZcz1uxO8BsedsB
+         5lPUwsjsPdHw0B17J5fdpwOPm8R6xCu1kO5aFbmksxZg6bcZcnREz88ciWzxUKiqFfLq
+         fyDQ2kGZna1Eb1jjPIyRK/6sHP1Ntv9I9EJDt0FngU3iANSIPVPwMAp9Tb9csnTR7fqP
+         juzA==
+X-Gm-Message-State: AOJu0Yxvm96qrBCNJdM9eCpWDSixNdO+e2/7N61f8Fh78WXLFMZB0Cfx
+	3qG5skiwKq6OAXUznsVg8E1dRvO1rnkkTFnCtZMJ+RvQHsrC5spfTNQIMQ==
+X-Gm-Gg: ASbGncuNMWu6TzntlRk/ABgE8P72ksAcdANP/FZ4T2yIw58WVEo9isLu69SGZAZBVyl
+	9d8I/BC+ABLD5cLzrh9ckBZWwGgDn6BF2+KXihG/Wbp3iii9VvKF/Z+75AiHCsd3OD53uKk4WGk
+	barBwTvmJjDOUX832G1njOS/GH84qr2rxmOg4RBxrdjhyFttFPjvDdq9z7eswIWuWYkigcTfeYh
+	UjdnlpawdRAMFYHXGK7plRYlpMoru9sQ2NE8F+g5s72a1YrSwLLdAqDCn++QJQsu7jKwyuoaB78
+	7Hkf7a5kmfE9IepZNL4B2EE4Dz9A10atC3NSKkcbko5tLqzZFwMr8cmzWMrh+ybyhsgPJJ7cg2u
+	uS0fJXQxyVw==
+X-Google-Smtp-Source: AGHT+IHEKDNNLaPHACXCSZMOfN7ollBlODSM8YsI+Z4mhTrlO2nSE/xzZCaYoXq2c3FAfYQ4X9Vurw==
+X-Received: by 2002:a05:6214:d0c:b0:6e2:3721:f2c6 with SMTP id 6a1803df08f44-6e46edabd02mr26538586d6.33.1739326310719;
+        Tue, 11 Feb 2025 18:11:50 -0800 (PST)
 Received: from willemb.c.googlers.com.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44a9a524esm58256126d6.5.2025.02.11.18.11.49
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44a9a524esm58256126d6.5.2025.02.11.18.11.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 18:11:49 -0800 (PST)
+        Tue, 11 Feb 2025 18:11:50 -0800 (PST)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -81,9 +81,9 @@ Cc: davem@davemloft.net,
 	dsahern@kernel.org,
 	horms@kernel.org,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 5/7] icmp: reflect tos through ip cookie rather than updating inet_sk
-Date: Tue, 11 Feb 2025 21:09:51 -0500
-Message-ID: <20250212021142.1497449-6-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next v2 6/7] ipv6: replace ipcm6_init calls with ipcm6_init_sk
+Date: Tue, 11 Feb 2025 21:09:52 -0500
+Message-ID: <20250212021142.1497449-7-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
 In-Reply-To: <20250212021142.1497449-1-willemdebruijn.kernel@gmail.com>
 References: <20250212021142.1497449-1-willemdebruijn.kernel@gmail.com>
@@ -97,56 +97,140 @@ Content-Transfer-Encoding: 8bit
 
 From: Willem de Bruijn <willemb@google.com>
 
-Do not modify socket fields if it can be avoided.
+This initializes tclass and dontfrag before cmsg parsing, removing the
+need for explicit checks against -1 in each caller.
 
-The current code predates the introduction of ip cookies in commit
-aa6615814533 ("ipv4: processing ancillary IP_TOS or IP_TTL"). Now that
-cookies exist and support tos, update that field directly.
+Leave hlimit set to -1, because its full initialization
+(in ip6_sk_dst_hoplimit) requires more state (dst, flowi6, ..).
 
-v1->v2:
-  - remove no longer used local variable inet
+This also prepares for calling sockcm_init in a follow-on patch.
 
 Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- net/ipv4/icmp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ include/net/ipv6.h  | 9 ---------
+ net/ipv6/raw.c      | 8 +-------
+ net/ipv6/udp.c      | 7 +------
+ net/l2tp/l2tp_ip6.c | 8 +-------
+ 4 files changed, 3 insertions(+), 29 deletions(-)
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 094084b61bff..c42030fb4ff6 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -405,7 +405,6 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	bool apply_ratelimit = false;
- 	struct flowi4 fl4;
- 	struct sock *sk;
--	struct inet_sock *inet;
- 	__be32 daddr, saddr;
- 	u32 mark = IP4_REPLY_MARK(net, skb->mark);
- 	int type = icmp_param->data.icmph.type;
-@@ -424,12 +423,11 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	sk = icmp_xmit_lock(net);
- 	if (!sk)
- 		goto out_bh_enable;
--	inet = inet_sk(sk);
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index f5c43ad1565e..46a679d9b334 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -363,15 +363,6 @@ struct ipcm6_cookie {
+ 	struct ipv6_txoptions *opt;
+ };
  
- 	icmp_param->data.icmph.checksum = 0;
+-static inline void ipcm6_init(struct ipcm6_cookie *ipc6)
+-{
+-	*ipc6 = (struct ipcm6_cookie) {
+-		.hlimit = -1,
+-		.tclass = -1,
+-		.dontfrag = -1,
+-	};
+-}
+-
+ static inline void ipcm6_init_sk(struct ipcm6_cookie *ipc6,
+ 				 const struct sock *sk)
+ {
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index a45aba090aa4..ae68d3f7dd32 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -777,7 +777,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	fl6.flowi6_mark = READ_ONCE(sk->sk_mark);
+ 	fl6.flowi6_uid = sk->sk_uid;
  
- 	ipcm_init(&ipc);
--	inet->tos = ip_hdr(skb)->tos;
-+	ipc.tos = ip_hdr(skb)->tos;
- 	ipc.sockc.mark = mark;
- 	daddr = ipc.addr = ip_hdr(skb)->saddr;
- 	saddr = fib_compute_spec_dst(skb);
-@@ -735,8 +733,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	icmp_param.data.icmph.checksum	 = 0;
- 	icmp_param.skb	  = skb_in;
- 	icmp_param.offset = skb_network_offset(skb_in);
--	inet_sk(sk)->tos = tos;
- 	ipcm_init(&ipc);
-+	ipc.tos = tos;
- 	ipc.addr = iph->saddr;
- 	ipc.opt = &icmp_param.replyopts.opt;
- 	ipc.sockc.mark = mark;
+-	ipcm6_init(&ipc6);
++	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
+ 	ipc6.sockc.mark = fl6.flowi6_mark;
+ 	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
+@@ -891,9 +891,6 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (hdrincl)
+ 		fl6.flowi6_flags |= FLOWI_FLAG_KNOWN_NH;
+ 
+-	if (ipc6.tclass < 0)
+-		ipc6.tclass = np->tclass;
+-
+ 	fl6.flowlabel = ip6_make_flowinfo(ipc6.tclass, fl6.flowlabel);
+ 
+ 	dst = ip6_dst_lookup_flow(sock_net(sk), sk, &fl6, final_p);
+@@ -904,9 +901,6 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (ipc6.hlimit < 0)
+ 		ipc6.hlimit = ip6_sk_dst_hoplimit(np, &fl6, dst);
+ 
+-	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+-
+ 	if (msg->msg_flags&MSG_CONFIRM)
+ 		goto do_confirm;
+ 
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index c6ea438b5c75..7096b7e84c10 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1494,7 +1494,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	int is_udplite = IS_UDPLITE(sk);
+ 	int (*getfrag)(void *, char *, int, int, int, struct sk_buff *);
+ 
+-	ipcm6_init(&ipc6);
++	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.gso_size = READ_ONCE(up->gso_size);
+ 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
+ 	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
+@@ -1704,9 +1704,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ 	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
+ 
+-	if (ipc6.tclass < 0)
+-		ipc6.tclass = np->tclass;
+-
+ 	fl6->flowlabel = ip6_make_flowinfo(ipc6.tclass, fl6->flowlabel);
+ 
+ 	dst = ip6_sk_dst_lookup_flow(sk, fl6, final_p, connected);
+@@ -1752,8 +1749,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	WRITE_ONCE(up->pending, AF_INET6);
+ 
+ do_append_data:
+-	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+ 	up->len += ulen;
+ 	err = ip6_append_data(sk, getfrag, msg, ulen, sizeof(struct udphdr),
+ 			      &ipc6, fl6, dst_rt6_info(dst),
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index f4c1da070826..b98d13584c81 100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -547,7 +547,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	fl6.flowi6_mark = READ_ONCE(sk->sk_mark);
+ 	fl6.flowi6_uid = sk->sk_uid;
+ 
+-	ipcm6_init(&ipc6);
++	ipcm6_init_sk(&ipc6, sk);
+ 
+ 	if (lsa) {
+ 		if (addr_len < SIN6_LEN_RFC2133)
+@@ -634,9 +634,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ 	security_sk_classify_flow(sk, flowi6_to_flowi_common(&fl6));
+ 
+-	if (ipc6.tclass < 0)
+-		ipc6.tclass = np->tclass;
+-
+ 	fl6.flowlabel = ip6_make_flowinfo(ipc6.tclass, fl6.flowlabel);
+ 
+ 	dst = ip6_dst_lookup_flow(sock_net(sk), sk, &fl6, final_p);
+@@ -648,9 +645,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	if (ipc6.hlimit < 0)
+ 		ipc6.hlimit = ip6_sk_dst_hoplimit(np, &fl6, dst);
+ 
+-	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+-
+ 	if (msg->msg_flags & MSG_CONFIRM)
+ 		goto do_confirm;
+ 
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
