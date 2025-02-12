@@ -1,153 +1,125 @@
-Return-Path: <netdev+bounces-165487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6116EA3249B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:16:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC39A324B4
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACE8A18822A8
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 11:16:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC0B27A3A50
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 11:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBA520ADF0;
-	Wed, 12 Feb 2025 11:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420DE209674;
+	Wed, 12 Feb 2025 11:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iKnKNN+R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDtHNWdJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA5020ADD5
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 11:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC072080F4
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 11:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739358956; cv=none; b=fkwQlGITkXxbQrWxhmyhvwifkgGCP0FH8x1zBJwESQ9bUEOzyD5CvHj/+lELId6n2RCY/8Jwo9qMPC6yJnvnj7u4MZ1OlWdrmiFTky0mhpYeLCnxl5fuuF3pZucQlGf3tv4rG58AsA2DVqFOYr40tKSlhvWxXeo1+7Q+qoif+bw=
+	t=1739359296; cv=none; b=lY2aU45lqrO48FxKXrq+je83pi3VSh4ETt6umJNZXOZKg1DeAnlOkSPDBF2tMxx/CCkYWcHZSvyPnbjU/CcuOwX53apBmoIp7Ff1HzQOTi80OTgcY3j2E9F1MIUQtGbSStHfKRN625OUD9XxK10UWICxkTO/dTHCWEnb6Ys2QLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739358956; c=relaxed/simple;
-	bh=KmLVO3U+iYEBCW5o4eq2WIngopSvAfgV6pjFjxxYZ5Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f9izC5geT4BJ7DnMn7EFP4yjCNfCEEa2gG1IIcIIOAC8/fWLgGTlN5SMU2xACDt79CbtiWX4G3NcqHGOPlukCLHAev9e9KakQgzMMrEX2FrAJIRWG+TVpFFnU/Hs/x5j9J5XrPnVVkUjf01Wd7jWuU1fNuj4LcM0/G32fx0P6rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iKnKNN+R; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38dcc6bfbccso2948821f8f.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 03:15:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739358952; x=1739963752; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WWxCp0GqUGglcxropI6IErz42Kj74gEydU4plAioMCA=;
-        b=iKnKNN+R7tePyntGwRysOoG/b4ZHGPKpSRPTognZfRc9J8kR9Qk8b5EuJtZTjkmvKC
-         T65zey4BdRtBVr3bNo7wA43zTExEyzjVio54RUU28kRAjtujLRrZGgU9P2eSil4wkMDx
-         sSV2jTzd1ejdroDVj3GU69/VnEH2Sc0yWxmxE+V5kDIJcWhr+yjz9sLbJ8wuuWsvr/Xt
-         99rJmG+1NihsjOQuzA90/pK0HUcld+O6Hk8gOtoOoestzH725EqS2wCjh+efAPIDQ2mH
-         xAu00eYJRI/nFj5I8RMAiox9G4wBEhgbmimYCyp9JIKMhrfJZdBkKwrNhJ3PWuFMFx5a
-         zWyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739358952; x=1739963752;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WWxCp0GqUGglcxropI6IErz42Kj74gEydU4plAioMCA=;
-        b=jE29020rLnvxsIh3dGvd4h1BgZodiSx4SSWMceBEVdj4s+7gy2OSt+ZZUJP7HoDr1z
-         s5otuRZDOvep5Kg5Z9sbxZKxNVfnViM1fjZHb3qa1ss7BILI0QH3/hiIwnnSo4bypbsv
-         LrQiVfZfmBtDGNBgecis6rIKYHFRjsHCErbvy1WyZFtRvoRVg41yatHuYVT6Bov1M+jA
-         3yb5ebV9czL0t+95zjnWIMJFp6Pb0H+eUOmf5H/zYtxlVY5FkA45c61BNfdLutvw+DwI
-         s4vPNEgtWjiLk7gZ9FFT9AaevnA4m7K6GJwtdkXE+0RZA9cUiWWjmS8GRaop10fKF95d
-         jOXw==
-X-Gm-Message-State: AOJu0Ywo0QoDcTrOegmpDoScWEz2K4U2yqeJGsDcDGh2wzDWogamSBk+
-	sLxk5uUwAcF5iTC/o0g11pon5GoMbon4dFaLa8xVbIbNXCSE8hURK8LcZMRZglY=
-X-Gm-Gg: ASbGncuKxtKkV3IRyqk0WOgXLNntHr1XiYZCb8SimypUs2GFQP2vrsVzTzMK6Gy/Qdj
-	nYsRS985BCfdRUoTXL4ol3ifL9zcae3e+AuiEHJoS75K6xZDRAxa5ovQaQQb/UUpURHtsjlkf/d
-	wgqmUTUkbBRp5+56fE2yO0yPJOA+b1XSYqWusUyoJtS6XQTf+017n0TnSoODt4qWVtfNU4TRdZK
-	WkQ8kMb46gJl4qXi0tjf5zBG7bXVVA82jtMGGkQ96yvOrP5SFRLZlDIFzqEyUoyh+TK4QQ4QsV+
-	hN5Bg7c35s4tfB0eCnIEZBc=
-X-Google-Smtp-Source: AGHT+IEB8DPUJVTBcgIwTQ6Z6zvG98TpNWXfZaHucYN4Dxa3b44v/ASA0iItfsERoar6F0CFs4PV1Q==
-X-Received: by 2002:adf:e60e:0:b0:38b:f4dc:4483 with SMTP id ffacd0b85a97d-38dea28c1e0mr1755786f8f.29.1739358952465;
-        Wed, 12 Feb 2025 03:15:52 -0800 (PST)
-Received: from [127.0.0.2] ([92.206.191.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a07ce08sm16538325e9.39.2025.02.12.03.15.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 03:15:52 -0800 (PST)
-From: Stephan Gerhold <stephan.gerhold@linaro.org>
-Date: Wed, 12 Feb 2025 12:15:35 +0100
-Subject: [PATCH net-next] net: wwan: mhi_wwan_mbim: Silence sequence number
- glitch errors
+	s=arc-20240116; t=1739359296; c=relaxed/simple;
+	bh=9zjcqeUtecmQeRWAWpi41Dkd2R98ynxq3ouQNuuU3ns=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=H69/g03KRiHSG1Ovvdc9oK4jvnOrgrk/hb3Ev+BJSw1bTEvzIs3/hRcvRFswiP9gHVnushvCN49hxTWSP/fYI9WSr1E+HmIrtTl6S152d6ySZ0VoMcMZDRJFyMbJZixSpnr66dOHaNJBoWMt1oDq94sUBd2nydiwleA0nKwraXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDtHNWdJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739359293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NuZ2sxYlFvOf7TTka/ZiERQ0yfFGzXJI8jS/5gyfwX0=;
+	b=YDtHNWdJGcGCSJLme9Sf9rUhCvml/kqIz3dwnG99n+iXLMa9WkgZUdxvpZHOPLljTBP1x0
+	mChdcgx+k9Gzf8thtRrPQUJDDzwQZkKtnspXpnfpyIs1CYQDQsqyqs5jiutM/FoaXhvJUm
+	kJ7QdChUplO+sb3pe7g2InUWrrA6jkw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-307-X9bnpjtdOgy9mUdRJ-bm0w-1; Wed,
+ 12 Feb 2025 06:21:30 -0500
+X-MC-Unique: X9bnpjtdOgy9mUdRJ-bm0w-1
+X-Mimecast-MFC-AGG-ID: X9bnpjtdOgy9mUdRJ-bm0w
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76D941800983;
+	Wed, 12 Feb 2025 11:21:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8EE46180056F;
+	Wed, 12 Feb 2025 11:21:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH net] rxrpc: Fix ipv6 path MTU discovery
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250212-mhi-wwan-mbim-sequence-glitch-v1-1-503735977cbd@linaro.org>
-X-B4-Tracking: v=1; b=H4sIANaCrGcC/x3MQQrCMBAF0KuUWTsQI3XhVcRFJ/k2A2bUJNpC6
- d0NLt/mbVRRFJUuw0YFX636tI7jYaCQJpvBGrvJOz86786ck/KyTMZZNHPF+wML4PmhLSQOUaK
- PMspJhPrxKrjr+v+vZGhsWBvd9v0HyF3ou3kAAAA=
-X-Change-ID: 20250206-mhi-wwan-mbim-sequence-glitch-cdbd2db5b3bb
-To: Loic Poulain <loic.poulain@linaro.org>, 
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Johan Hovold <johan@kernel.org>, Abel Vesa <abel.vesa@linaro.org>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3517282.1739359284.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Feb 2025 11:21:24 +0000
+Message-ID: <3517283.1739359284@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-When using the Qualcomm X55 modem on the ThinkPad X13s, the kernel log is
-constantly being filled with errors related to a "sequence number glitch",
-e.g.:
+rxrpc path MTU discovery currently only makes use of ICMPv4, but not
+ICMPv6, which means that pmtud for IPv6 doesn't work correctly.  Fix it to
+check for ICMPv6 messages also.
 
-	[ 1903.284538] sequence number glitch prev=16 curr=0
-	[ 1913.812205] sequence number glitch prev=50 curr=0
-	[ 1923.698219] sequence number glitch prev=142 curr=0
-	[ 2029.248276] sequence number glitch prev=1555 curr=0
-	[ 2046.333059] sequence number glitch prev=70 curr=0
-	[ 2076.520067] sequence number glitch prev=272 curr=0
-	[ 2158.704202] sequence number glitch prev=2655 curr=0
-	[ 2218.530776] sequence number glitch prev=2349 curr=0
-	[ 2225.579092] sequence number glitch prev=6 curr=0
-
-Internet connectivity is working fine, so this error seems harmless. It
-looks like modem does not preserve the sequence number when entering low
-power state; the amount of errors depends on how actively the modem is
-being used.
-
-A similar issue has also been seen on USB-based MBIM modems [1]. However,
-in cdc_ncm.c the "sequence number glitch" message is a debug message
-instead of an error. Apply the same to the mhi_wwan_mbim.c driver to
-silence these errors when using the modem.
-
-[1]: https://lists.freedesktop.org/archives/libmbim-devel/2016-November/000781.html
-
-Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
+Fixes: eeaedc5449d9 ("rxrpc: Implement path-MTU probing using padded PING =
+ACKs (RFC8899)")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
 ---
- drivers/net/wwan/mhi_wwan_mbim.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/rxrpc/peer_event.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index d5a9360323d29df4b6665bef0949e017c90876a4..8755c5e6a65b302c9ba2fe463e9eac58d956eaff 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -220,7 +220,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
- 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
- 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
- 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
--		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
-+		net_dbg_ratelimited("sequence number glitch prev=%d curr=%d\n",
- 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
+diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
+index e874c31fa901..bc283da9ee40 100644
+--- a/net/rxrpc/peer_event.c
++++ b/net/rxrpc/peer_event.c
+@@ -169,6 +169,13 @@ void rxrpc_input_error(struct rxrpc_local *local, str=
+uct sk_buff *skb)
+ 		goto out;
  	}
- 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
+ =
 
----
-base-commit: 4e41231249f4083a095085ff86e317e29313c2c3
-change-id: 20250206-mhi-wwan-mbim-sequence-glitch-cdbd2db5b3bb
-
-Best regards,
--- 
-Stephan Gerhold <stephan.gerhold@linaro.org>
++	if ((serr->ee.ee_origin =3D=3D SO_EE_ORIGIN_ICMP6 &&
++	     serr->ee.ee_type =3D=3D ICMPV6_PKT_TOOBIG &&
++	     serr->ee.ee_code =3D=3D 0)) {
++		rxrpc_adjust_mtu(peer, serr->ee.ee_info);
++		goto out;
++	}
++
+ 	rxrpc_store_error(peer, skb);
+ out:
+ 	rxrpc_put_peer(peer, rxrpc_peer_put_input_error);
 
 
