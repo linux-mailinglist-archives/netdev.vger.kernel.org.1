@@ -1,199 +1,377 @@
-Return-Path: <netdev+bounces-165709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B2EA33303
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:00:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A18A33333
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:10:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46673A243C
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:59:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DF716806C
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694022036E2;
-	Wed, 12 Feb 2025 22:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB6E205AC3;
+	Wed, 12 Feb 2025 23:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VQh5ZPva"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EDhWvl4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2043.outbound.protection.outlook.com [40.107.21.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825541FBC9C
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739401198; cv=none; b=tkHorty5qialp5HbPR1l4KM7WXLfiQyxOLXwWm2T5FEMqUJfLs99eKYcHS3SUX8cWMJmjyGDjs1rhQajerZXWnr0nz4Izwh2uFmotJotsKfWxDwGZ5UaXgZTEwZ43Ph2GwVmm+fkE4QFsm6WqzyBXaxIj3SmZFunUMKG87ORRs0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739401198; c=relaxed/simple;
-	bh=BNo86KZuD7rhjuC2n6sDiXT9q8BQN7zmKka2xR0jf4Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aBCn2TV0Gq74mnzimN9i7wgRvpSV6sTQR455NIKY9+f9dQxVIh4JWafwAJ4RiLdm3zGVG3NZ22QqI7LHog6GjtnKCSmA9OEK9eYUb+X2aSkyauLDJarbUNdSrtv+43KbnjBhjoog+FPFtykAkCBg0QG1Aitu98nIBK2+mwEQ9uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VQh5ZPva; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5debbced002so464276a12.1
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 14:59:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1739401195; x=1740005995; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UORAExcOb6F1C8aB2DrPpzefAFwPpCu6YmtRKkXFN3A=;
-        b=VQh5ZPva5fIX5jwfULML8i91zC18ilXhiA7+cIGhZ+EP+aFeBatKUFCLKWvx5yJbeT
-         5Qx1VxOPeyvaFaoXRtLmyk0qlo0WTRsparE6kqhmc0IU/f/WgEpgNSlfeb+MHkJInpCD
-         lTvqiqdWezP6BJeWzy5XyIPPgmPj5NHGueBIo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739401195; x=1740005995;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UORAExcOb6F1C8aB2DrPpzefAFwPpCu6YmtRKkXFN3A=;
-        b=qcLDe+estlWKP5hwzQjzIZnM2JcPWXLMKJQOX0UhI1UaFG9qXUIkzWm8C37rpfCKOS
-         xiRkFRia3vCTUgi8Jgt1fsiyIXUEacsHWh9ZleLOaZIS0n8nSLRSZ1BMuvy0vzzL8YsJ
-         fsn1y2xrS3KQKSCeLmPkTjTxnw1EMNagHFwjdCjBc+yf1mXwofdobOMVS1c856QDoDRW
-         oM9u1xa8LnQ/DsP1L9hhTuQAFaz2FPHhd7NT9OKsS81+64ly3APN59L2nU6vaKmlyOLr
-         FeNhUUjXhCIz9YaQaPYp1HjX2o0orM6Z0CvQOkjhvf5MGmSjrzBEhhshbVR4mIi4sDwC
-         juXw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMH5u387O9KbEW0FZ0BsaatQ606fyUZKGi4JOdLNPzlSXT/L4Wmse9yXHNFTerk3h4yPBTYl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx337+RmXXSwM+bLFLWV+MwoqgGPqLVDb0WutmEKJ/HhbgnzzVi
-	JhnLcVEs9WlPYxuNj2/z3HigUWGKcdm/jdSJVsTq89o2Q0WODbJ5uFFTCvzCxCgp57kalQHhQDo
-	yKoHidhsJ6IlQ6xR0keXIiZDFSSuQA4KW87tg
-X-Gm-Gg: ASbGnctUBS6/2+Ist4FnfJgFjA0IpzCoDh/6oj/8OexukTIcbceTX5Vvzz3ZvTsV7lO
-	TANPHOYVeQqGLj74GeA3iRAVNaUUSpHW2iQOPyk8Oiyi2mXTrrSY76jlORJ0rKTkUzU1lqtz6KQ
-	==
-X-Google-Smtp-Source: AGHT+IFbS/AhpfHNHesmEtNjmXm8Vi4x9pOaPQgLDyY1nNWSQltONPWk5O0y+1kn8uARNHcBpgksAGvjJv6yN4RJqzI=
-X-Received: by 2002:a05:6402:210b:b0:5de:5899:e735 with SMTP id
- 4fb4d7f45d1cf-5decb909bb2mr624362a12.14.1739401194824; Wed, 12 Feb 2025
- 14:59:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8ACC1FF7D8;
+	Wed, 12 Feb 2025 23:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739401800; cv=fail; b=qJpbVog7JKrVMzdI5cZ7adO2QM+L2nghGP+c2o0/ycJZO4RKX8+3V52rKFMTfAFwmBwUhSQfOJMv1BhEkJlbZld+osK7s3+uETl5s9kiz/3J5e035VU6AoTN+fsRs9ZsNa5he88vWCz7GUjLObs4PoT5Tbb1SgyipI6ZGOyr1jI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739401800; c=relaxed/simple;
+	bh=s4JdDPuUESl7212yiE4IxnsIkU8AM4LFsHLuXGOqvPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SrM1QbK1GJb5Vkd/ilej7evNZZ7MPRSacFyxjO7wJUkWdsPP+DfJE2V4MTCeh52OamRPuIiNA4hBZ7WcHYvZfVLKsCgbjRj0ShrHlATTqQRr6fKiCHRfKr+qfOTFysAZxCTkngTdb0TKrTKSJE18mbpUeWc7MCRdHb15UdQNbGk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EDhWvl4J; arc=fail smtp.client-ip=40.107.21.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AKlngkmdNDJh/yWq7HGn2fmvOj5Lcg9zuALE5GeR1SbG/ktPlBMk+jC07PvIgou7Z8Dk7N8kZrfH08YreAQoNHWDkhCm671M630rMb4a3vpdwo7wlJNDlS+b6RK2mn1+xxgYQdKjq9hzj9b8mZC6p0ZKo2Tn3ZFowIVi8baxVuBaOISc9Oxfn2f8bOb1Xg8+pjbPtRZ5ysVHQgtEE6aubVqzOWkX6173aVqLLldBBN69TjTkZ43ZuCnx5Wwcc6SL2WGngzJKKXgd8Fby3/Mgrcr4N5SIoKZ5Da24czvny6wIGU76Nbaq6JF5KVUuSOVuZYxTPweh6ZcUth/1eI9Ayw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=N6ufTQ+UPzzgBestUZjKF4q9YoZVKOh1u7P6OWeSFlI=;
+ b=MumjsyksA1eoI118RJCtuNJB4lWSSequsHNQ6auqfp+XxBU+Te+qBMj3pa+LzoES0M8L/yyQMPaDUnF2Kmlu0edMCc+serH8yFH2KJvhED9LzXNvM3xLnKIDSyUWHeACvAa3muRxXNM1E2FjmwZwil+kwn5s9tTe5LI8prDGifoeNjLWTX5MYnoOIbqJBXTE8gqN0WJ6Jl5J1EjNSWNjhkIvGn7ROmWYITp/ZUWZdA++u8V8mzvaQxHU8EHZGMqn58Pjnce0rDbToe0F/RF5s2bwMlv/iKlG7ci/p1NduFokS02raSxi7Snk+P0zvVlAa/apc+bjIHe7OUWS7y2eOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N6ufTQ+UPzzgBestUZjKF4q9YoZVKOh1u7P6OWeSFlI=;
+ b=EDhWvl4J27Hgq3Cx4yEMwh6N3llQMVbcWUt/me0lZWWytHPpyGls7+ypwyws5m3zXzMnuSr4ABK8F1CUGGXoOS2n1TJmHkh2jQt0NxPz+W/SeSR4vhjopyRPpktIDji9LiuOTC1fUAGYHebK0ab1FKzQ+kTP74BkzpQhxbY+y19PcWIoejJaYL6w7fBkrgmM7wuM+05QJ5nY80YoMNm9NY8UAgJZAo/Npf5WbGfhfUbylMUGbCnQVldG8mwNIaIXX6dCg0fu8JWTEvbIHn+dPRyUl5va51RkEvGlr3BXLXtTBX0i7iCIEnek3/2ltYDdOVvz/ig9mrgMuUI7bI6j8w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AS4PR04MB9550.eurprd04.prod.outlook.com (2603:10a6:20b:4f9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.12; Wed, 12 Feb
+ 2025 23:09:55 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8445.013; Wed, 12 Feb 2025
+ 23:09:55 +0000
+Date: Thu, 13 Feb 2025 01:09:51 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v4 1/9] net: ethtool: mm: extract stmmac
+ verification logic into common library
+Message-ID: <20250212230951.2lx7fba6avurmgls@skbuf>
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-2-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210070207.2615418-2-faizal.abdul.rahim@linux.intel.com>
+X-ClientProxiedBy: VI1PR09CA0098.eurprd09.prod.outlook.com
+ (2603:10a6:803:78::21) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250208202916.1391614-1-michael.chan@broadcom.com>
- <20250208202916.1391614-10-michael.chan@broadcom.com> <20250211174438.3b8493fe@kernel.org>
- <CACKFLi=jHfL2iAP-hVm=MmLDBD+wOOHrHsNNM21dCRAjRu7o7A@mail.gmail.com> <20250211184305.2605e4fb@kernel.org>
-In-Reply-To: <20250211184305.2605e4fb@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 12 Feb 2025 14:59:42 -0800
-X-Gm-Features: AWEUYZldQClwe33uZdoZHUv41VXzxFsGfWEhlgDL625fhpk_LLmFPbV6Cbuh3O8
-Message-ID: <CACKFLimn1pKDJH3QSi+X5adhnHy_yLV=LJ9fz6_9YB_G64xf-A@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 09/10] bnxt_en: Extend queue stop/start for TX rings
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
-	andrew.gospodarek@broadcom.com, michal.swiatkowski@linux.intel.com, 
-	helgaas@kernel.org, horms@kernel.org, 
-	Somnath Kotur <somnath.kotur@broadcom.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>, 
-	David Wei <dw@davidwei.uk>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005b7d8d062df9e6dd"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS4PR04MB9550:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c1aa7b5-79d4-41e2-508f-08dd4bba5cbd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/VbmTTswx1grzUsbL4w4FNmjYeduuirTcNDWJaFSYaEfRQUpVd8u7xSeNe0K?=
+ =?us-ascii?Q?48iadAOqfqJfmxUwP/ehBKX0wEoSCmkI+TTUUpSazVovVr72vluBEra6ay7Z?=
+ =?us-ascii?Q?wo5cDtL4lhSxf7/iVclxYk6zQgTc88YVKw68dvrLAhzkDkmzvFwZGvCNHlAI?=
+ =?us-ascii?Q?xAu7ZuH0X357r4w9mwK+HPfHNFMV+g5W0AGYjC+BvS62ieMiPGPTEYkIIT0R?=
+ =?us-ascii?Q?/+S+h2zfMRjHBeAKJOGt5uYw+mjLAxnA7pmYmZ+us1cRrTY6nxAjsFTV6XIQ?=
+ =?us-ascii?Q?fdnAr0j73Hx9ZGRMnXiN0kbgxj4ehgvxvGSJuDlHUyeseKSxXqZXX0BpAoyW?=
+ =?us-ascii?Q?UbeUcTLnAGrf7+sqgp3u0py6RInl919YjI+FhGG9iWwlt57pRdUFpu/gXWMP?=
+ =?us-ascii?Q?h4zjNknLfl1LjsLDTL9uKhpUNJb2QEoFg60NrQGTQQkaLze7/c4HUpgnyFta?=
+ =?us-ascii?Q?tRxAIln5eiKm4IA3o+mQ3m7LeELRj4EMEY6ZwHoNSE9BcD02mR2jpl76XLus?=
+ =?us-ascii?Q?vd8ZOHuU/XK1RTRopyiT71GI0JvGxseclxGt0Cu4YjVv4t4L1CstTNYIMHIT?=
+ =?us-ascii?Q?utCriQ3Q4ZZt2p1cAij4e0mxIZL9SsV7LZfBu2DnVxGKEUbpKUFLdOI1vRCx?=
+ =?us-ascii?Q?xuscBgY+QCs/q0UJrjJ2/UMMaWm3umqScYVDXwwvOha6kBhxAMCcqaNUezvK?=
+ =?us-ascii?Q?8bn734kHVdeVP77FWbK1LS4M2qslxA7DmxDnHsUTlpE5fFBcva8vvDaCGGoq?=
+ =?us-ascii?Q?gpUj/08Fu7qEbrop4NqObPfx3Soa8Ir8kJMN0ouX9SMrLH6QZ7MQloLTeO6u?=
+ =?us-ascii?Q?9OW91GMyTwzm1sYPS9+3cINLnYwMZossLBKBiCQcOnYgf1OKzgYljy78Ey7U?=
+ =?us-ascii?Q?ZbpdfpHrW8nrzOBTiaBBML0sxw0NLA3D5BE6z2w6mlrDc2LOpYSi5ilNwrxs?=
+ =?us-ascii?Q?K9tFjH9cvhVnWyVUmSJ4aq4mu6jYwIC6cqKcS0jxHfoqBoPK0jbho/FLuxLP?=
+ =?us-ascii?Q?3hnM92Dlyj+yLAgVFmxt8gwPZuL9JVrRdKOlHv6pZOHuIq+8wQsfyvDmxWCF?=
+ =?us-ascii?Q?9fNyAEcNcm6rCsgsViTs6yZCy1JEkOWeeeBWENfLepRM13OlBqWHiKHszU8w?=
+ =?us-ascii?Q?5U8HcBK9pgeIfh+qnDUniIPwVTYNnPU0T1sukNKXitBH8tFt4hMgedsK9qaS?=
+ =?us-ascii?Q?tLJxX4h/qcvMsBrkYtvfTgr9F8AfYyKPmb8cdpdLB2jrsbqoe1/e5FPz5ANe?=
+ =?us-ascii?Q?KKz8kqQ7e/MgrbCMweoytujZL1mgmxxqdcVpSQVlJykhUnpjhgG1oX9dR7l4?=
+ =?us-ascii?Q?RITOmSV3dEpsuj+RQWLNmkG3UIet846iPC89IiK9SH5mZhfdOYy80qbYmtzX?=
+ =?us-ascii?Q?HzcUp6DQhlAjPP1rbhKRI7RC73sB?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?p/uXpMvc55azn4LvZiYHOHDuW04DH1UyJA6zjl5s06dbW8OX8MEVAA7Seo+5?=
+ =?us-ascii?Q?y8Rbr0sR01mwhSfkbnhdCfBuCMfYt0x8sI1XazUgygiLELc3NBBnIb3qJqzl?=
+ =?us-ascii?Q?Qgi/vePsO1nu/BoIQBS2dn+nA+0jJSknDkshPw5XEu9zWffrDlZRy7kypuMg?=
+ =?us-ascii?Q?FCORfBch3fRLiIOEfLZYLaI7cHWNnQNBaTWEPA5zdko46XOR05akTitpxL56?=
+ =?us-ascii?Q?eVPcINFkjktyZY0qoBNIEd2bgKe8srj7Umx3lqY4+cP0fSbKCaoP4pvkal1z?=
+ =?us-ascii?Q?IFopVNJUrtbGq35TBvUTU4FvwihmXK5D+NtMfR+dUqqU7bGCK9KAiOM8aBkZ?=
+ =?us-ascii?Q?EwQD1mTA8BHn/hFwZmpyz0n1+llxOpuZtv0lRcWPqGqj39NHhcBP8DFMgE/x?=
+ =?us-ascii?Q?x2XjZ1BxJGJ0gP6G4rIr4zF4BVHnIcZ1ECdaahYPM15/eOkEKPmxsKrYdPyn?=
+ =?us-ascii?Q?6PGsHcdXUDBVFBK90VKP6W+DQrkCvH+b2OUilz5ETdCNC0bFNbliMB70RxUa?=
+ =?us-ascii?Q?HhTeWEb66kf6kC6UVEGevj7K9uZxZMdVXq/prHamRdNIAFi78eM+RrB0//jH?=
+ =?us-ascii?Q?xZwKw4D1qxN8ZtcpUZOFIV4z0pD/AOHzWzIOGPwVcWfJUMT++zaWYe5TLXD5?=
+ =?us-ascii?Q?Ssknpm0ztWl5OqY6yKc9pFFYct1TJ9Apuu3a/BF96ZtR+RbxQ8hAWiXprDsS?=
+ =?us-ascii?Q?/6L+MW5JHNY/rIkF07CLhvmx4syIZyWdXMHkerDyROr6iMqvwvgrQe9RHxk6?=
+ =?us-ascii?Q?NmlI9H1FmEJsgRz3w5f1MA0fWPeGc7fG8pgtFpY91SFX5M3MZZbDB9bF6mBq?=
+ =?us-ascii?Q?r/KeZXVFD5d9+5n9G3UtPBfCE4DNS4qLm7mam7U+i93PWiMzaclJ++IUyIYM?=
+ =?us-ascii?Q?AFEUQXAn6mRHOf54L5lKzIvoKzrNfFqlFubD5ZANiRT8iaQsI0lPOxiaojjo?=
+ =?us-ascii?Q?KgS03PWQ3GivUD6HAKAbsAAS7FczProQuc0uNJsugmXZDI3IWTgJTKlbtqO5?=
+ =?us-ascii?Q?aesbocI3MR5bUoDScD8So9EzHLHkxNVoFlbrOKfuWVcsfniWktaj+NW8dgwP?=
+ =?us-ascii?Q?iYNVPMzVu8lSRpL3QhWAyyqk054Oa1QA3T0t6loDKl61N2XFy4E+qxh+usTL?=
+ =?us-ascii?Q?OXFpZk6p36HHe3n3HGbhdsj0vYa/Vd2ZNENfUxuBDmPUtBRhzlRCwD65Rqmn?=
+ =?us-ascii?Q?YWw4DNcFwB7+ov191omWaxD6olkHrf5Fl1LepQMWHRBuf6j4PvXVtHJUiQ/8?=
+ =?us-ascii?Q?Fd8e8uwWUO6gusMn/Gb69ippvcHDlsqRi/Tly04XCCZE8SyjUNsYya+e+uC8?=
+ =?us-ascii?Q?2oSkOe4/S92b9Pqb/XAbBdS2C3SXyBKIVdteFX6IIH6aSGl45Ptp6UU0ihSP?=
+ =?us-ascii?Q?2Ug1usYPFHCHdng5Ukh0dgiIrQTtBeXOkKOf14cb5t7SdV6wu7l6U104htSl?=
+ =?us-ascii?Q?OiURj1Du7EGppNM1Wq/BK2nZGRhFiyi/+VvdCqQsrqF6u0uaQBZpDlW2VZQn?=
+ =?us-ascii?Q?sI8myPcq+4i/gEbyQCEQRW2l4w+AbnajFQ38GpeyDHXQ0RVohxupky8yYQ1I?=
+ =?us-ascii?Q?6CILFs8mzMU+RPJ+yOpCs2bTr3Pw2EOJQfSklyhU0xfS93riDLtjyWwaqK5e?=
+ =?us-ascii?Q?kw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c1aa7b5-79d4-41e2-508f-08dd4bba5cbd
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 23:09:55.0475
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qhM67HiNf4vrlXJrqZcsgT9iezgfER7q52NTJPqQXn2KVQRxtYFk0T0atQh2XqwMDW8XG1RohkINZSlpnc4T+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9550
 
---0000000000005b7d8d062df9e6dd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Feb 10, 2025 at 02:01:59AM -0500, Faizal Rahim wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> It appears that stmmac is not the only hardware which requires a
+> software-driven verification state machine for the MAC Merge layer.
+> 
+> While on the one hand it's good to encourage hardware implementations,
+> on the other hand it's quite difficult to tolerate multiple drivers
+> implementing independently fairly non-trivial logic.
+> 
+> Extract the hardware-independent logic from stmmac into library code and
+> put it in ethtool. Name the state structure "mmsv" for MAC Merge
+> Software Verification. Let this expose an operations structure for
+> executing the hardware stuff: sync hardware with the tx_active boolean
+> (result of verification process), enable/disable the pMAC, send mPackets,
+> notify library of external events (reception of mPackets), as well as
+> link state changes.
+> 
+> Note that it is assumed that the external events are received in hardirq
+> context. If they are not, it is probably a good idea to disable hardirqs
+> when calling ethtool_mmsv_event_handle(), because the library does not
+> do so.
+> 
+> Also, the MM software verification process has no business with the
+> tx_min_frag_size, that is all the driver's to handle.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Co-developed-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> Co-developed-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> Tested-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  16 +-
+>  .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  41 +---
+>  .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 174 +++-----------
+>  .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |   5 -
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |   8 +-
+>  include/linux/ethtool.h                       |  61 +++++
+>  net/ethtool/mm.c                              | 222 ++++++++++++++++++
+>  7 files changed, 327 insertions(+), 200 deletions(-)
 
-On Tue, Feb 11, 2025 at 6:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 11 Feb 2025 18:31:21 -0800 Michael Chan wrote:
-> > The ring has been previously reserved with FW, so it normally should
-> > not fail.  I'll need to ask the FW team for some possible failure
-> > scenarios.
->
-> Thanks, expectation is that start never fails.
-> If the FW team comes back with "should never happen if rings
-> are reserved" please add a comment to that effect here. Since
-> this is one of very few implementations people may read it
-> and incorrectly assume that allocating is okay.
-> If the FW team comes back with a list of possible but unlikely
-> scenarios I'm afraid a rework will be needed.
->
+So I'm not exactly sure how this is supposed to work, but this is moving
+a non-negligible portion of code from stmmac_fpe.c which has Furong Xu's
+copyright, to ethtool/mm.c which doesn't. That being said, commit
+8d43e99a5a03 ("net: stmmac: refactor FPE verification process") which
+added that logic said that it was co-developed together with me (NXP),
+and I clearly remember both of us contributing to it. So, how about
+expanding NXP's current 2022-2023 copyright in ethtool/mm.c to
+2022-2025 (date of commit 8d43e99a5a03 plus date of this patch), and
+also copy Furong's copyright 2024 line?
 
-The FW team has confirmed that it should never fail in this case.  The
-ring has been previously reserved and allocated.  Re-allocating it
-with essentially the same parameters should never fail.  I will be
-sending V5 soon.  Thanks.
+> @@ -710,6 +714,63 @@ struct ethtool_mm_stats {
+>  	u64 MACMergeHoldCount;
+>  };
+>  
+> +enum ethtool_mmsv_event {
+> +	ETHTOOL_MMSV_LP_SENT_VERIFY_MPACKET,
+> +	ETHTOOL_MMSV_LD_SENT_VERIFY_MPACKET,
+> +	ETHTOOL_MMSV_LP_SENT_RESPONSE_MPACKET,
+> +};
+> +
+> +/* MAC Merge verification mPacket type */
+> +enum ethtool_mpacket {
+> +	ETHTOOL_MPACKET_VERIFY,
+> +	ETHTOOL_MPACKET_RESPONSE,
+> +};
+> +
+> +struct ethtool_mmsv;
+> +
+> +struct ethtool_mmsv_ops {
 
---0000000000005b7d8d062df9e6dd
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Since these are driver-facing API, how about a kernel-doc? The content
+is subject to further review comments, of course.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINzafYoR2YZl31KRL16gJG2C14gFN1gf
-WY8mCPgqxu+PMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIx
-MjIyNTk1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAHTqVmkcXtuCkBWT75cd2N3OtHquHKmw7moT3TYIhhPewj3MhE
-RhyKjIPnetHAaW2IUzngYatkrMB+q37RG6O5BCSdhw6Tv2sr8zoF4WxegM//ynPXOeTicIuouz8c
-xLBZcxTWh0YX997AZVvnqHIxxNcTFfc0LniULXsBh1RxZqfGj69VS3Gl/q8QJOk7gfUAcYgqRyzd
-nq61X3X0tAKpzdUxX+Gpu3t82tCGQA1RHgXGSE4cuR5RPU26mmI4yRrvyohkzNUr3wkkjdUA8+wl
-LIqLonmfk31n9x1H/YvqWVKRQypZ4W5FhTHm03aRE0ruc+N+u+qQendJM62UQDcF
---0000000000005b7d8d062df9e6dd--
+/**
+ * struct ethtool_mmsv_ops - Operations for MAC Merge Software Verification
+ * @configure_tx: Driver callback for the event where the preemptible TX
+ *		  becomes active or inactive. Preemptible traffic
+ *		  classes must be committed to hardware only while
+ *		  preemptible TX is active.
+ * @configure_pmac: Driver callback for the event where the pMAC state
+ *		    changes as result of an administrative setting
+ *		    (ethtool) or a call to ethtool_mmsv_link_state_handle().
+ * @send_mpacket: Driver-provided method for sending a Verify or a Response
+ *		  mPacket.
+ */
+
+> +	void (*configure_tx)(struct ethtool_mmsv *mmsv, bool tx_active);
+> +	void (*configure_pmac)(struct ethtool_mmsv *mmsv, bool pmac_enabled);
+> +	void (*send_mpacket)(struct ethtool_mmsv *mmsv, enum ethtool_mpacket mpacket);
+> +};
+> +
+> +/**
+> + * struct ethtool_mmsv - MAC Merge Software Verification
+> + * @ops: operations for MAC Merge Software Verification
+> + * @dev: pointer to net_device structure
+> + * @lock: serialize access to MAC Merge state between
+> + *	  ethtool requests and link state updates.
+> + * @status: current verification FSM state
+> + * @verify_timer: timer for verification in local TX direction
+> + * @verify_enabled: indicates if verification is enabled
+> + * @verify_retries: number of retries for verification
+> + * @pmac_enabled: indicates if the preemptible MAC is enabled
+> + * @verify_time: time for verification in milliseconds
+> + * @tx_enabled: indicates if transmission is enabled
+> + */
+> +struct ethtool_mmsv {
+> +	const struct ethtool_mmsv_ops *ops;
+> +	struct net_device *dev;
+> +	spinlock_t lock;
+> +	enum ethtool_mm_verify_status status;
+> +	struct timer_list verify_timer;
+> +	bool verify_enabled;
+> +	int verify_retries;
+> +	bool pmac_enabled;
+> +	u32 verify_time;
+> +	bool tx_enabled;
+> +};
+> +
+
+/**
+ * ethtool_mmsv_stop() - Stop MAC Merge Software Verification
+ * @mmsv: MAC Merge Software Verification state
+ *
+ * Drivers should call this method in a state where the hardware is
+ * about to lose state, like ndo_stop() or suspend(), and turning off
+ * MAC Merge features would be superfluous. Otherwise, prefer
+ * ethtool_mmsv_link_state_handle() with up=false.
+ */
+> +void ethtool_mmsv_stop(struct ethtool_mmsv *mmsv);
+
+/**
+ * ethtool_mmsv_link_state_handle() - Inform MAC Merge Software Verification
+ *				      of link state changes
+ * @mmsv: MAC Merge Software Verification state
+ * @up: True if device carrier is up and able to pass verification packets
+ *
+ * Calling context is expected to be from a thread, interrupts enabled.
+ */
+> +void ethtool_mmsv_link_state_handle(struct ethtool_mmsv *mmsv, bool up);
+
+/**
+ * ethtool_mmsv_event_handle() - Inform MAC Merge Software Verification
+ *				 of interrupt-based events
+ * @mmsv: MAC Merge Software Verification state
+ * @event: Event which took place (packet transmission or reception)
+ *
+ * Calling context expects to have interrupts disabled.
+ */
+> +void ethtool_mmsv_event_handle(struct ethtool_mmsv *mmsv,
+> +			       enum ethtool_mmsv_event event);
+
+/**
+ * ethtool_mmsv_get_mm() - get_mm() hook for MAC Merge Software Verification
+ * @mmsv: MAC Merge Software Verification state
+ * @state: see struct ethtool_mm_state
+ *
+ * Drivers are expected to call this from their ethtool_ops :: get_mm()
+ * method.
+ */
+> +void ethtool_mmsv_get_mm(struct ethtool_mmsv *mmsv,
+> +			 struct ethtool_mm_state *state);
+
+/**
+ * ethtool_mmsv_set_mm() - set_mm() hook for MAC Merge Software Verification
+ * @mmsv: MAC Merge Software Verification state
+ * @state: see struct ethtool_mm_state
+ *
+ * Drivers are expected to call this from their ethtool_ops :: set_mm()
+ * method.
+ */
+> +void ethtool_mmsv_set_mm(struct ethtool_mmsv *mmsv, struct ethtool_mm_cfg *cfg);
+
+/**
+ * ethtool_mmsv_init() - Initialize MAC Merge Software Verification state
+ * @mmsv: MAC Merge Software Verification state
+ * @dev: Pointer to network interface
+ * @ops: Methods for implementing the generic functionality
+ *
+ * The MAC Merge Software Verification is a timer- and event-based state
+ * machine intended for network interfaces which lack a hardware-based
+ * TX verification process (as per IEEE 802.3 clause 99.4.3). The timer
+ * is managed by the core code, whereas events are supplied by the
+ * driver explicitly calling one of the other API functions.
+ */
+> +void ethtool_mmsv_init(struct ethtool_mmsv *mmsv, struct net_device *dev,
+> +		       const struct ethtool_mmsv_ops *ops);
+> +
+>  /**
+>   * struct ethtool_rxfh_param - RXFH (RSS) parameters
+>   * @hfunc: Defines the current RSS hash function used by HW (or to be set to).
 
