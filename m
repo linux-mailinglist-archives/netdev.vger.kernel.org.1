@@ -1,162 +1,73 @@
-Return-Path: <netdev+bounces-165381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DF1A31C73
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:59:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8FE1A31C87
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 04:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 722B8166AB8
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:59:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42ED11882848
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7B81D7998;
-	Wed, 12 Feb 2025 02:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6259C15383A;
+	Wed, 12 Feb 2025 03:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ahTuZaHh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Akw0HM1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7BA1D79A0;
-	Wed, 12 Feb 2025 02:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E35BC148
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 03:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739329174; cv=none; b=lGTLQOxx1ad+4DCT8j6s0kChEsRpzx0ihJV4quqKI8lfq61/vPlqgxH/cFdrn7PDCD6bkfpyH4SPwweT8y5ACr0iLM3/CjY4Vgu3NwGDAUOi1rEOFR9vtQtsI2SVUr/HMNe/Rw558MgiE4rfT2+IPTb7dqrbY+FSopUpCX8jkno=
+	t=1739329363; cv=none; b=FFDZza7fInG+/sU6qRNSBWqaOJZH8qqz/azjoTNqCb2fF5oRW9xDVL/wJ7t++FaItF5hnvRhVfJYvlN4r8MuVAcLhWny7jsN8i7SmoXqW+9Cx1eKTtkUm9TDMUZ0i3qR0Fd/rNfsXmZlD7/hQM9S583YklJaq6Cdm3AWiG413bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739329174; c=relaxed/simple;
-	bh=DooFRktCEVvA6ei7DrdVf0d7v1fgelgEfdO5aKcqTDc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XjDV4Kp7yFCeROoTJ0v8eRqvAwD+Be01DJlIEAgceLHuP4AzA5hHVZuFgtrC97yZpwbjv3hOymEgi1Vjd62VY7HHIIgeOdWuslQAdWMX0SvzIinA4AutMpVhlPe2ZZ9izHB5UUOGvch5T37JVt7VV2pUa/IIQ7VAcu/CuokkEw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ahTuZaHh; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6f972c031efso3614467b3.1;
-        Tue, 11 Feb 2025 18:59:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739329171; x=1739933971; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KFr81poCk30co8Z6rUcjrZ/vaw48HOEFaFkI76fkyJc=;
-        b=ahTuZaHhgBht2YLJHM+JHOGjrQX3MYf0ZgEq0CqXS3suSQMY9idO0xn0ZcYyGD69Pu
-         6ZeFqj/tJlfRpDBWqYGwBQJFTRY7DttKUsGYBekG7QeQFwafAmVLg1LQYAkcHahclBrH
-         N4LHFT8XB4My3wcFsHgu3256+SubaBxH/0JxwKBBfVUOeI6ZqcUm8cGFpFVsoNLaGm9n
-         XQKglwaiF25WMtWNA9qt+x55jMMeGiLUkotg81o/eCEViiJr91BFvQZ/ywGBOen14fl4
-         u09r0JKXci8fEaiEAoN4wck31IOg2aoaY2v3R1IE+X7drlFK0lL/473tZnKLfzpk76dP
-         4/aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739329171; x=1739933971;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KFr81poCk30co8Z6rUcjrZ/vaw48HOEFaFkI76fkyJc=;
-        b=BD6rLZrQK70FhrVK3/3T19gS8auyk3quoQXHbN/w1Ui0Ppcj4LX47+ydBS7PwSSXjk
-         sPYXkFZxU3kY0W3SgOT7wF5KgUDaU/bNugeXpl+BW6SzxUsQ1dIdVnRoG6TDteRQwbfl
-         5pWLenew031rJkDGtQrFhtdLXXZ6jSCO5Rtc0Co+IXt5ZkWoAL4Ddx2ERWgr5IvC7TCz
-         fqke+GBDz6bX8fo+ce4qYgbEdtit1+1g2zmeBjsHM7JQEcbQNbx3K6le625iwmU8GGWa
-         2Ae/CQhYBXuc1oW9baGpzWWfKlrMm9gj8v/E2+F7inAfVn753AtiSDRcbCmtLcV7+zWJ
-         YhlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUh4OI3Dzt0ey7mFqpC1zLfK7NfV7xoA0Nkuv2SpvLN51+DkINssiZmanwnre99gCT8o+0Vue4ZD/8=@vger.kernel.org, AJvYcCUlPqYB+LqnYo0L+gmYkIMlSB0gJCLQ9gHs6Tjz5O2983ClxD1j6wtq3FKru85+GlvBmbK2JQ5O@vger.kernel.org, AJvYcCVGK2WM0Gd8O2KV/ggfY5my+kchSTW01Jcp4FpL7ebwvJYn5aWgXXdgajNtTrPQIlJbnC83WXXK6/nc@vger.kernel.org, AJvYcCWawiVqSlZ843MTNpZwXUkdG9PwRwuY/hqf2Jn+ZY4SWSHqxGOiF/0FYxNbxyVk9b9+SHvPkD6uEi6F@vger.kernel.org, AJvYcCWc41cql8FYlVh0dLU2rGiV7OGM7rqAHQpShOzEDDYE3sqzSqGz4Mdzvca4bAjHCPCVrVcVJ6uKacmh@vger.kernel.org, AJvYcCWehDpp4nb/F8EQo3qCrnGCshWvkDnANbi8tCnsUGVsHXmDM7G9GxUb9uWZiPU4c4SfHRVuIlxURy17RHk=@vger.kernel.org, AJvYcCWnXdKPVmcjHCP8ap1s2YdKniGoskvAC43C8WA3PgkWAO3hROxp8n5GODyex7UFRpJ3aZEWk7VOjjYzYEjfI3U=@vger.kernel.org, AJvYcCWzO+MXdJTCHumWhMz5NmkCELZ/pMfBf2ZrF8uQ1e0SnolEVQzu5ZQiNn0gmC6ds2TDxOR0iLztohuitP2W@vger.kernel.org, AJvYcCXi1/0JgWBXGzs8TnyduKD1uZRHyZGyq7OyARTE80RwMJHryd+it/P+Swe3Fl13VzfQeD2zzIIFNpYlvw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9LH8w9CSIz6XleCnBtjz1tWYiBHMqvAAtiyZ8ecoDrx6naCSj
-	WYsVAShiWCA7EjO00hQS6IdW2b/te4IwNpCRREPjZjXeA+yiSfZCaDI1dzbfB641mkgQ6JlKVsE
-	gO2IrU+H2/oN3YpipVnnv/3pX1y8=
-X-Gm-Gg: ASbGnctqdGJr/xiXqg/xV3NIJBYnkUXc+oNEq06uAHFU8C60NRkUUOkwRKNBuaiBePk
-	3qNKlE9xS/WmSwI0WBzxK7ywyoMbaIkERnkK78qfFvlNk0u4O1Lby6zNMdzWwOeTSXnNHg987mZ
-	oXgAmlnt/pKOxGGz0wnI3Z1xarR3ksZ6o=
-X-Google-Smtp-Source: AGHT+IGAAjKu3ijuvkklPj1UHUI20qu2CCBoL8o01Rki7jfm8ulRSwOxj+9C0sqtYuH7rLF8eGtDo4a4fre+pXEsE2k=
-X-Received: by 2002:a05:690c:c01:b0:6f9:4f93:c80f with SMTP id
- 00721157ae682-6fb208b8e92mr12977497b3.6.1739329171475; Tue, 11 Feb 2025
- 18:59:31 -0800 (PST)
+	s=arc-20240116; t=1739329363; c=relaxed/simple;
+	bh=vOtXrMZVuVAChfp83EQX9/gKCDpjnIKI1OOcyKNzrOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I04d9DRDikYki9/sqNaGvky+wTB8aJl02u0pqSwnP2II39yIvIQt6k+KA3D90lwItB19tPbR8z5RzSRsPjqxvVvRlbtB7cA7409d5C19Jh+NCRI0tWTRTOII3diQ6bexIKoL2xnaHWQFS4H+Y746egUdV5zw1P00mOZQNzo0MwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Akw0HM1U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A75EC4CEDD;
+	Wed, 12 Feb 2025 03:02:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739329362;
+	bh=vOtXrMZVuVAChfp83EQX9/gKCDpjnIKI1OOcyKNzrOw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Akw0HM1Ukvbhu8xCCnlJxpkiVM0Vq9DNAuO4V9i9NvKQvRYN3uP9l4MkGlDaJE8BC
+	 WMxl0NklBrhwVL9+cyvdp+8QTC54i0w9Vg0eYa5H/Q6EC5D+WPGSJ2a22LcmGfzi9l
+	 /aYmQwn3xWyZZzA8oJhvTSuJwsKj/2HsL1khapC+RW/LXBL0lL2WJYsgFRoKHGYaLk
+	 d4iqIwPXsqb+mrGSBRp8Ocf/2hho2sGsm07SLxdpUONaLx1hEj8zNRTr99sBGF0efC
+	 Y+JYcEDOdtm9o3liLSluvVXdSI2H5EDpbrqBPoGNoa3QtSIqviHWNkMqRsOvqyqLz7
+	 ufxakifqfEAsQ==
+Date: Tue, 11 Feb 2025 19:02:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH net-next] net: sfp: add quirk for 2.5G OEM BX SFP
+Message-ID: <20250211190241.6c978f6a@kernel.org>
+In-Reply-To: <96223803-95a8-4879-8a26-bc13b66a6e6b@birger-koblitz.de>
+References: <96223803-95a8-4879-8a26-bc13b66a6e6b@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-5-a0282524688@gmail.com> <c714463f-e027-470d-82d8-3905f5107d6c@wanadoo.fr>
-In-Reply-To: <c714463f-e027-470d-82d8-3905f5107d6c@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Wed, 12 Feb 2025 10:59:20 +0800
-X-Gm-Features: AWEUYZlq8C-6fOlQaMyUi7TbWeoU_-OcuCn2P7TSMwOHCZmUYpYmx6cJl4mufqA
-Message-ID: <CAOoeyxUu+RuLsuctC-swDWmNi1WTVrVv26FuDOUmibaL7njXzw@mail.gmail.com>
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Dear Christophe,
+On Sun, 9 Feb 2025 12:01:55 +0100 Birger Koblitz wrote:
+>    	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
 
-Thank you for reviewing,
-I will make the change in the next patch.
+The patch is corrupted, there is an extra space at the start
+of each context line. Perhaps try resending with git send-email?
+Before resending please add Daniel's review tag to the commit message.
 
-
-Best regards,
-Ming
-
-Christophe JAILLET <christophe.jaillet@wanadoo.fr> =E6=96=BC 2025=E5=B9=B42=
-=E6=9C=888=E6=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8A=E5=8D=883:18=E5=AF=AB=E9=
-=81=93=EF=BC=9A
->
-> Le 07/02/2025 =C3=A0 08:44, Ming Yu a =C3=A9crit :
-> > This driver supports Socket CANFD functionality for NCT6694 MFD
-> > device based on USB interface.
->
-> ...
->
-> > +static int nct6694_can_start(struct net_device *ndev)
-> > +{
-> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +     struct nct6694_can_setting *setting;
->
-> Could be:
-> struct nct6694_can_setting *setting __free(kfree) =3D NULL;
->
-> to slightly simplify code below.
->
->
-> > +     struct nct6694_cmd_header cmd_hd =3D {
-> > +             .mod =3D NCT6694_CAN_MOD,
-> > +             .cmd =3D NCT6694_CAN_SETTING,
-> > +             .sel =3D priv->can_idx,
-> > +             .len =3D cpu_to_le16(sizeof(*setting))
-> > +     };
->
-> ...
->
-> > +static int nct6694_can_get_clock(struct nct6694_can_priv *priv)
-> > +{
-> > +     struct nct6694_can_information *info;
->
-> Could be:
-> struct nct6694_can_information *info __free(kfree) =3D NULL;
->
-> to slightly simplify code below.
->
-> > +     static const struct nct6694_cmd_header cmd_hd =3D {
-> > +             .mod =3D NCT6694_CAN_MOD,
-> > +             .cmd =3D NCT6694_CAN_INFORMATION,
-> > +             .sel =3D NCT6694_CAN_INFORMATION_SEL,
-> > +             .len =3D cpu_to_le16(sizeof(*info))
-> > +     };
-> > +     int ret, can_clk;
-> > +
-> > +     info =3D kzalloc(sizeof(*info), GFP_KERNEL);
-> > +     if (!info)
-> > +             return -ENOMEM;
->
-> ...
->
-> CJ
->
+>   	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+> +	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
+> +	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
+-- 
+pw-bot: cr
 
