@@ -1,439 +1,647 @@
-Return-Path: <netdev+bounces-165559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2192EA3281D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:11:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774E9A32817
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:10:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 269D71887D57
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47A2C1630B9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149CB20F072;
-	Wed, 12 Feb 2025 14:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F7F20FA84;
+	Wed, 12 Feb 2025 14:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PQtAGGdJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J3pnZqNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2072.outbound.protection.outlook.com [40.107.93.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B106F20AF62;
-	Wed, 12 Feb 2025 14:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A9920F088;
+	Wed, 12 Feb 2025 14:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.72
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739369455; cv=fail; b=UrHaWtAlqMWrbWPMuIMDHdKG7OBEeBl3cs//ZrylyvLA8pWw+wHpLsX70HT5AkAgBqOLiEqxne5TAoV9qS6N20X4VXF97Ynv+hTElzcOuemD8cnqKGq3YnTJUnVeTLUomsskUigU/HU0Er6YQfssf2mhhv6uIVVCxoa+dBu8bC0=
+	t=1739369435; cv=fail; b=uBZMP6t6UpaSe0vqBMSALGemlagHQEzp9b+tUVdgKg15hJOvVur1qfoDETanFw4pW6Eo5WhPrPXmof7/Ig598pEgpRIYn0qVhUvp+wlfkem636i09B9wG9BW3nEmOPi1jCCnXFvKhGyFtgx48I6466yAHuvfsyUaQgVAuBETW4o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739369455; c=relaxed/simple;
-	bh=WzXvOB+SOalproSY0Sm7Ig453dGQj+vdwGm6jEK7s6M=;
-	h=Subject:To:References:From:Message-ID:Date:In-Reply-To:
-	 Content-Type:MIME-Version; b=ifbbjGuIo5BQ49/BBTtX4oBsXf7qmVeAFbcrs6zfoIFbfC8C7lILjC2V8ff9vcrpFjsH2qVwyeBRllgLJ1wGD9g1ZZlBD1wsgxPpJ/AAYlr+nyXUqNWbpFh7GT4MxzxrMeTZ5Tn11WLEcBMU6JaVII5wb/8pcvi9/kEIx7bBARs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PQtAGGdJ; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739369454; x=1770905454;
-  h=subject:to:references:from:message-id:date:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=WzXvOB+SOalproSY0Sm7Ig453dGQj+vdwGm6jEK7s6M=;
-  b=PQtAGGdJq1JW/ZQ76J7L7TfD/VhQwjsiVYw8jwdjzKYtccL8zm84Ylqn
-   nTpburVpwXPWllKujC/PkGZVBq7/KmmERXTm5WU/OfFRBaNGmEB4HUreX
-   dIzL3ydJAmT3whb/vpMPBIXhm0VdJg+v2kMcaHNCke9TZCEKS+eb2Ad1X
-   pKVV77gH5CWAcC50aTAuByOR2nB/keXqOuuKU7TG4s2Je+AOfqkJPDGUB
-   fVWE/vRSg7/kLqGG6uH8PSptkTUWK6+MJfNX20G3QjcQMHeH2i87ELO5D
-   W8mv8fLdLIXfkDerhUSzQK6uMeRDgz58JAAsfvI65npeyki2lFdT36JCJ
-   Q==;
-X-CSE-ConnectionGUID: iEAoD0/iRiaGCtw3aljBcw==
-X-CSE-MsgGUID: RWu9vyc/RmKXAKqCNOMbRQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="40055239"
-X-IronPort-AV: E=Sophos;i="6.13,280,1732608000"; 
-   d="scan'208";a="40055239"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 06:07:36 -0800
-X-CSE-ConnectionGUID: oqXOeUfbSM6ae4B2dC/D9w==
-X-CSE-MsgGUID: GO1PXG2MTxWt/okO8rXmSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="143752535"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 06:07:34 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 12 Feb 2025 06:07:34 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 12 Feb 2025 06:07:34 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 12 Feb 2025 06:07:34 -0800
+	s=arc-20240116; t=1739369435; c=relaxed/simple;
+	bh=VC15e1XcG9db2hoKfZ1xPv+h/ts85m0HqKrnec0poYI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Mfe3jMX99/J/gQd12HpVfBNHQU6p308oHCYKCKvFQCOuegpK4dWeEtR9zL6pLx7CknANPhToRbBBe8oRNl79HXSOov74O9B5soIi6sTrwAsCB3L/g62kSRZXCAByLbVsOh/Sl6nRI0qeqgpgUqAriJLHEKGzWH2qiVc7jcpvGUw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=J3pnZqNi; arc=fail smtp.client-ip=40.107.93.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V9K0X1SOM/ds9aW72HXfoc5uv0dxU3zJyBcOVHxTlXBlrBQfrJ8nW0PM/v3AhACHoNV6HZ/dYufYz1dDyN26Y8JqRQzn0Zd7hJCN2G/kqTMMxHfM5TNCReNzJQvVd960HHTwJUHk0Lu4owD2Shmt/73pvzFYb9gRAecNiiJh1JvVX66iC3RCK1NJIUG+ySktN3JI9D38fIO7/sxuMERgGTVoQ0khVj3sz5fNLSecjwPp98ZxhDazEJzEYI/xzicAfku1UMfy3rxZzU/lQd0K/6YcYiIiiYTVPZ2GCGFNfcr2GPG+9oFvfLjwi6KpkAdDOfUUVqD5GVQz9IjOhmnUTA==
+ b=odUTDVOlbIZgvaPhWwyUzAkjLpA7jJwtn0iqzqZqqjKJ7fUhnkatF9LeW1D0Z5TCAm23WsgH1E1/yo7EPqVu1aarFSdJ7OhIPu8W3+QoQJUjj/5RTPLW9oxUyV8/EOJPE+3rMH+3bwJHr6BNm1/r8W6aBU/oYHwfmozMDWGUX7dwJ2JhsjIZF0DCWycYtgnJxDHhrxcbjm8gZISWgDIgzGEbdJ+HrPBLVnWacD656807yQLfBP/9kPDcbVjn63twzVouGJZJWGAdmBBU/l34RWu5oty5UQEJQDi9s1vgjOTJyY3pRcSsqIHFRUPU3811A/tn84vNVyPF3pn14x0glQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rMx5TkJOv50jazTmCfwJUNFpnZKRSE6+oa6oet3O8Lk=;
- b=mH4mmqc8/P2pWgEsDqdDT201oARPEHSPWDzByc+D03ur9Pq0NXxlixaqQQoIoqT/lQFTxYLCrOPLh6LzEUu341uC+ykLJdeA0jbx6a2C/svzI4IDYV3UEICAwmgSX5QaoL82IIhNlGIbWod6ntqUwb4oSShFRjYsi4DNyZfZvbeFpkPcU9i0gv3b0EQZGKANyrxMqaDPI+ok24/jRKyHW/dt8TGh3KFz8jyj36r3IfNrw+EuThHGkrue/gGYmvTPesvTmpDS6re79Log+qzRV7tCZPkpksmEXKoaPn8lVzrspYyf56yKKezM7Uaevc8nUMS5txqDKNiT5YQVB9XK/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
- by IA1PR11MB7295.namprd11.prod.outlook.com (2603:10b6:208:428::15) with
+ bh=GBDRC2hvF9Yfh5EF5qj4jjbRej0z0FK7+5dJkGzayvY=;
+ b=U0MHNatc/b07fTP5Tu8OjhipAIX9qIKIDIIeCorYSuRpzOdFN46MXxOWu7jwxv5qx9LS1VA8jPrnrOMwkwdGllDhj4WqilP18Y4GDt1lSRT9feiezS3joQ0mp/56atyMFSxTtnPA+ppVpcdtBvi6pr7TUMdD/jVgvnPMODXjnhWNw0JHxGygCbBod4FIIC++zOY7LV1VtztYNrH4RzRlsERJFsb8/NzsJJH1URy3le9nAieKuWdLtQchpayecszh1qjn0VEFWdW655at99xlxwQLGfaufAU3q2VxgdRl5nK74SA/bQN6Jjc2aTDuXTJupmQbpyXCvtd7/MbhLNpikA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GBDRC2hvF9Yfh5EF5qj4jjbRej0z0FK7+5dJkGzayvY=;
+ b=J3pnZqNiLrtygQGWtnDV0/WQ7SnaebUbjafYe38r7lyK5R9ZbWtoUE4AhBMuRkWRb+inRO5e0L2UMZu1/xKbzAFgwYRYRf4YIEEeRCWbkeINIaxLIxN5uXke+of22mieb/rraI3EeYo5jwFtsHeqK+jjXGr6dZZ71OAKOfkDjWnjXuxSifRDQIvltP9E7O52fW7vI9Z4P5Ffdzv6WhWjgc2iTZI7NJKhROkpxAzPxbd+ueYRDroJkj2i607n91g+mLfKvwHttxwD+c3b1mgKmkkBcee5lGp5rBv9PVZDHR7I4/XDpjmBtRZHjjQSoRtW97ZwtsBJZyxkaHPmBbJCpQ==
+Received: from SJ0PR05CA0022.namprd05.prod.outlook.com (2603:10b6:a03:33b::27)
+ by PH7PR12MB6884.namprd12.prod.outlook.com (2603:10b6:510:1ba::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.18; Wed, 12 Feb
- 2025 14:07:31 +0000
-Received: from PH0PR11MB5949.namprd11.prod.outlook.com
- ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
- ([fe80::1c5d:e556:f779:e861%4]) with mapi id 15.20.8422.015; Wed, 12 Feb 2025
- 14:07:31 +0000
-Subject: Re: [Intel-wired-lan] [PATCH v2] net: e1000e: convert to
- ndo_hwtstamp_get() and ndo_hwtstamp_set()
-To: Piotr Wejman <wejmanpm@gmail.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250208154350.75316-1-wejmanpm@gmail.com>
-From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Message-ID: <7d0fccb0-6fee-44d9-8f1c-455c889a21a1@intel.com>
-Date: Wed, 12 Feb 2025 16:07:25 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-In-Reply-To: <20250208154350.75316-1-wejmanpm@gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0014.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::17) To PH0PR11MB5949.namprd11.prod.outlook.com
- (2603:10b6:510:144::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Wed, 12 Feb
+ 2025 14:10:23 +0000
+Received: from SJ1PEPF00002314.namprd03.prod.outlook.com
+ (2603:10b6:a03:33b:cafe::9c) by SJ0PR05CA0022.outlook.office365.com
+ (2603:10b6:a03:33b::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.12 via Frontend Transport; Wed,
+ 12 Feb 2025 14:10:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF00002314.mail.protection.outlook.com (10.167.242.168) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8445.10 via Frontend Transport; Wed, 12 Feb 2025 14:10:23 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 12 Feb
+ 2025 06:10:06 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 12 Feb
+ 2025 06:10:06 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 12
+ Feb 2025 06:10:01 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Tariq Toukan <tariqt@nvidia.com>, Louis Peens <louis.peens@corigine.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Pravin B
+ Shelar" <pshelar@ovn.org>, Yotam Gigi <yotam.gi@gmail.com>, Jamal Hadi Salim
+	<jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>, Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva"
+	<gustavoars@kernel.org>, <dev@openvswitch.org>,
+	<linux-hardening@vger.kernel.org>, Ilya Maximets <i.maximets@ovn.org>, "Gal
+ Pressman" <gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH net-next v2] net: Add options as a flexible array to struct ip_tunnel_info
+Date: Wed, 12 Feb 2025 16:09:53 +0200
+Message-ID: <20250212140953.107533-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|IA1PR11MB7295:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33f8df51-d0e9-474c-db34-08dd4b6e9749
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002314:EE_|PH7PR12MB6884:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62318a9d-ccba-4f9d-75c7-08dd4b6efdb5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RnVjMGc0dE1RRm0rZjI5cFV0VWZ1TU9lYVYvUmZ0VWF3MS8vaVQxbGIzVXFD?=
- =?utf-8?B?SEVJNkNBNGNyekduYVI4K1ptbmhCcnN1VzJYdWJFdU0xYWpTTUdSZnF4Vmpp?=
- =?utf-8?B?TWJJNTZiUW1rb1VMUjVKcms3OVhuZkJIVnlLRUtCY29PWFR1T1VzL2tuSUtt?=
- =?utf-8?B?Y0NPcmh2T3I1TmNsaDJVb1JDUy9TS0hiMHhMWDliQlpmTldDek9yNzc4TTJN?=
- =?utf-8?B?eEVIdHBZV0JqRFdZSXp2eHN2dWhlb1Avd1AyVmJtYkVPNTdnL24vSTZYb25r?=
- =?utf-8?B?SVU5cmhUUERwQUVRN05kcStITUxWRGJkc3pSWjdPT1MxRS83MHdpSFdHalgz?=
- =?utf-8?B?R0NCT0hnMUh1WlVmTzU1T21rMmptQkhJUUdpSGFUTGV3RDNQckI0Sm9Xd2xx?=
- =?utf-8?B?SnpzRTNaWElvYWxWZzRzaExMdHhDeUY2UURGRDNtbmtJM2ZTejFJZmN0QlQy?=
- =?utf-8?B?c1ZMY3lXT0x1QlRlYlB0YnZ4VmNqSlArUWR3Z3BSNWRmT0FVeTFlZGhDcFpE?=
- =?utf-8?B?Z0V2elZoSytzSEtadmFDcTdoREtvS2VKZk1ZV3RpUVlROVpsNTFhWmFzd0xo?=
- =?utf-8?B?UmJhdWVFTTZocFVEN3MrUXo3dzB0WHdGQzM5Q2EyL2s4ZW93ZjFjRFRLZEdV?=
- =?utf-8?B?WmVuRGNSME1XSGlLY2xHNGFmUFlBSDFlVm4zMHIzWGhmZHgyQ0k5UHgxdy83?=
- =?utf-8?B?WWgyK3llb25nK3lsTXJUYlh0b0xPN2FmYUUraUVqVVB6RCs5azFTTndvWGdW?=
- =?utf-8?B?Sm1UUGljYnpWRHJtd2xjSG1FdVJlQmRjeVpaVUcyeEtlUllQL2o4OVNhaU5t?=
- =?utf-8?B?clAybmJ3MGQ2Z3ByaWtZZGVrV1AzRUZzT2VoR29FcmZEeWZaNWFYSHM3a2xH?=
- =?utf-8?B?ZDN2alE0OEt4akF2MDM5NDBVdkVacFhEcFk3Uk8vQWszQVQ4MmpjRXVWR3lD?=
- =?utf-8?B?a3NuYkE4QnVNbThkYlRkWHhIaUY2Q2FQblRZQmplOHY2MG5zbFhLSDk5VW5x?=
- =?utf-8?B?OGxFR3U3OU0zaW5kK2ZuVWx3L1orT3Rsa0pHZTJBVUh0dnFXZDYySFJISm11?=
- =?utf-8?B?L3daRVB0WUNHTXl1aHFuanJxV05Na2FTS1l3VTU3a2NYR3hBeVhXMllZckla?=
- =?utf-8?B?eTNhaytpbjlDLzZYTlc0UTdkMjdlQTduYXp5a2YxbUsxcFo0M3VqdGUzTnYw?=
- =?utf-8?B?aWhjRmRXbUpOOHByUFRPNDFpbUZKVlRNVEpURm9ERXo1WFJWS1UvL1Q3T3FJ?=
- =?utf-8?B?QWhLRWpBR2FuM0ExM2dTYjVhYkVIejJMK3pxcU4xcUh4LzJaUVNoSGpMV2tD?=
- =?utf-8?B?cktSS2VFMFJTUUR2QWZmZUwvSlVxb0x6d1d3RVJ6akFZYVptT1RpWjJjb21R?=
- =?utf-8?B?Mmtjd2dhZE4wS3UrL2toNzRZMlN2Y3REci9BOW1nQXVoREcvRDNFVEV5bDB4?=
- =?utf-8?B?ekxxdEVRbXdWcDdoVlByNkJMM1VSaWEwcVNkWGdZMkgzMXIzOHZtb21SdGoz?=
- =?utf-8?B?ejRxWmVsT0NkV2s3cHlMTUN4VEo1MUNTbWhWWE9HVVpXMzlXQTg1U0U5dmpK?=
- =?utf-8?B?Y2hrZS9lWHRnYWJYOHBYL3ZVam8yNVQ0VWFCUTZxMXJIdmR2WDJwalFtYzBj?=
- =?utf-8?B?alVVbE1nZ1ZJRWtXc3dWV2FjajREQ0dFMzFqdEYxMk9LbVZxUnRYSGlxL2xJ?=
- =?utf-8?B?RGZrZkVZSWQ1SHNYby9NeUc2bFFDQ3gxblhyUFJFL29VUndsMXhpNWk5ZlBv?=
- =?utf-8?B?L0sxNWx5MGxJMkdsY1Rxb0U5bEF0Q2QyOElDRnJRUHNoZWUvcDlQa05IMWZD?=
- =?utf-8?B?VHJWbE0xL0ZmQVVVUGY2NytMaHZRNW9HaWJ2c1FjUjFCZHo3VUIzbzI5NTVN?=
- =?utf-8?B?V1hQTTFiYW54OU9zNTZFVEhFNXR6eis4ZVM2MHZCbTdjSFhLQ29GME5UVG1i?=
- =?utf-8?Q?jUwBEfeP158=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eVlycWlxTWtaWUgxcEJRMUhQQTdTdEtvSmQvQmJ1VHNjZkF4SXBPR0VraWVH?=
- =?utf-8?B?RS9Obm9HWlh2SlhFcmhMajVPYmNKNUxlQ2x5KzFrSWJOWkZlWnJqejQrYml0?=
- =?utf-8?B?ZXAvdmdTNnYwZzQ0Skw2ZWZBaEcwaHRLZXR0Y0xZWGlqU3htS1ZUSVhWR29V?=
- =?utf-8?B?c3NoUkNNVWxGK2tYUk93NTJYT1pZOWJYS25OcmJFMUVuT29wS2xQanB6NUVu?=
- =?utf-8?B?NitzNDBMRGxwZzFIWE52R2l4bjB2ZUs2b0ZSUTZuWUZualZCbDlNb3VuRXN1?=
- =?utf-8?B?T01nM1lLT01GUTZxVndRSDNMRHUraUNtNmd4dmx0akdVdlYyelRPbEJ5V0RN?=
- =?utf-8?B?QlZuL3VOQXJkK2NENU9yaGxZTG5LSjcxREJURmxMZjZMeGh6MVBUaWhnbHFx?=
- =?utf-8?B?RmtNQlM1UktMcUFoS1hvU0dYUFZqUlpPYys1QUFtWGNGMlREU1c2NnJNOEtG?=
- =?utf-8?B?cjZWSmNDbVVCMmdoUk9XVE81OFBoZ3lmL2laZXEzN2xRMUEyTXBHK2h3ZXVG?=
- =?utf-8?B?QjFnQjlMUmRXMEdvVGYyRURNakI5dXhvYlhwUWpGYmN4MlJyQjhmTm9tek45?=
- =?utf-8?B?dW4rT0xYMEgva256VlVQK1ZMUFo5Sk5WVVJsQzhXODMxMUgvb2IrZmNqdVpM?=
- =?utf-8?B?enI0RnluVE9jRlFrdFhxREMraWZubDU4TGxDWFU3OVlvMWcxMVhiUlNyMm9j?=
- =?utf-8?B?REcxbDhoWUdYQ3d6QzhzZ2lybEMwVkYrcEcxYlVMeE1MVFUyZytTalpFUkJY?=
- =?utf-8?B?V1A1Ym1iNnIveHUySGdNN3VNWWZscWlkM0I1S25WYnlWdWJSY2NkYnpLbEpo?=
- =?utf-8?B?bUg1SGtBK1ZUN0FkS2p3Y3ZKNmkzMjhFT1hPWDMzajB3Rk5WcVowUFQ4VUo1?=
- =?utf-8?B?dGtsOXYyVHZyazdwTUNaTStkTEEycDhIb0M2S25BYkUzekQ5eTRudGtCbXBH?=
- =?utf-8?B?ZXorYUZIVXNlc2xJRGhQSnh0c2pMeW82UGptVnMxVE5zZWhyWWhwQ0ZuVy93?=
- =?utf-8?B?TzI2SnVFV0RVUHJicXdrMDNUOHZ0ZXdzRndWYy9jb05ydnhKaGpBS05ianZV?=
- =?utf-8?B?NlBISHJHWFVwN0UvWndWWDZ1b0xEZ0ZJdXRxZHMvOXoxaHZSZVZTM0FpUzBZ?=
- =?utf-8?B?N2lxS1JQQzZTZ3ZNNVlQbmxmNkhlV2dtWUxtVjAvZWcvYzkzV2JPeHo1bzY4?=
- =?utf-8?B?UUtLdzcxTDUxYzJQRDdZcjEwRm9FU29nWFZGbC9DZWRHNkRUS0F2d2NWcWlo?=
- =?utf-8?B?WmJuODBLS3p4NVV3Q255YUczUHovQzJ2bmlEdER3R3FXU3ZycUsrdkMvMWY3?=
- =?utf-8?B?MXpwcnVLQ2pvRXBZTTl0Y09RK0JydnExK2VHR3VwYzdCT1dibEJzczUwZ0tI?=
- =?utf-8?B?QThBNXJhOHMrRkllZFdPczgwUkhaU3ZhWjBJVzArNE9KUzF6Nlk1TVpKRWlj?=
- =?utf-8?B?VFhCTEFSRlZ1VGF1ZHhpeUdwMVY5YkdSSktRcUt5b21xdlcyamJacGE3eEhs?=
- =?utf-8?B?S2ZZWENXNFBWZUsxWndmcUFwT0huYk55MFBiaXlCYVA3K2dmMUlVNGtMU2JX?=
- =?utf-8?B?clFLN2QzT2FzWFdhSEZGVkU1d0NVRWFtbk83eGkxdXVYNUJXLy85RkZBVjl2?=
- =?utf-8?B?bmg3ZEZyVE5kcXVjSFJzNGZXaUwyRXJpdkJqTFBQYU1hYnQvdkRibkxlMUI2?=
- =?utf-8?B?dTltbTFwVDY2QStndHRvNG05ODhhTThPSXVIZUgxcjVJTGdUb09UbWZBbWtJ?=
- =?utf-8?B?aUx1WGd4ZUNKcjN2YmFJT0s5cjVoeEdzbUh6eEhVNWJyUGVBcDRwaEIySWYx?=
- =?utf-8?B?MzM2SmhDVEZ6ZzdGM1N2dDVoV0hNVVdvSVJneWFYc1JkaHNUMk9tbUFzWVVM?=
- =?utf-8?B?UWROQ2hJSmwzRjF4Rkc5VmJ6aFlETXFkUTB3UG9sZzNEWVA1aGF4TnJWVzVu?=
- =?utf-8?B?UXZ1M2pkTnJjeFFjbVg2SzRQQUZNSU51SGVublo5Zi9jRTdHYzh3c04yR1RB?=
- =?utf-8?B?bk45K2hXa0xQaE1EYXJ0bzY4SGZYT2JMd3M4ZFk4UDEyNHNvQ1RVc0ZPTjUy?=
- =?utf-8?B?cmxYcnp4NEtaSTZ0cUtxbHZBWTdlS0lwbUpOVkVmS25WSUdtdi9VQ2hTY3dy?=
- =?utf-8?B?bk5HL2pGajU3aXUxbDBXN0MzUXlkMWkyTmExQVgrVzJPK0lwUWU3NW5tWU5m?=
- =?utf-8?B?SlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33f8df51-d0e9-474c-db34-08dd4b6e9749
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 14:07:31.4486
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?IzhoQaFlt4PNXPW4xljXz5byBAKZ9lLe8KR5sQK4FFyxzK/O2bb6sSao6k/s?=
+ =?us-ascii?Q?YcVj0HPxbFPCdro15b4UWYRO9u9F5mUuZ3lUZ3ePkcFyymAlnCBB35k4H/Lv?=
+ =?us-ascii?Q?iTi0FyE5WffmUq6WnqUORafivubclWloYx7Rl8UMBhkli4j1CQRyQtuisAg0?=
+ =?us-ascii?Q?cQ3uth7z13jsUc7wrxDBj9qoKjYOy6I1VezJsVBrqxV8QMmF5u9bX9dOR9lV?=
+ =?us-ascii?Q?BI/+389dXm0xlndDRwjfuxldyi6qGaQZ1kMzL7PwPJ71KP6Orm50geLCnMdE?=
+ =?us-ascii?Q?HjPd8eVOkX9DQq+3DGGawKjcrnw0yF9zhzYaZMH182zXa3LSqyim7xEXOG12?=
+ =?us-ascii?Q?afAWbQqNFQ/FzK+kZtp9mrGsY9rZEx6Wfb+wPpSJU0E60BBQa9FpSyz6H1vU?=
+ =?us-ascii?Q?SJQ5Vm9ueL7zr5DCiXeCvnv3Ef1cAPA+k65ix1wZwGZe/xXgGwwJKfF1FvbS?=
+ =?us-ascii?Q?MrSBaYEJHEbOSpdn9AC1zQKx/z9a5m1LUbdO+/H3AYO+8/h90/89M0aMH6VL?=
+ =?us-ascii?Q?xi18UgUfkOnLtf+t3YLc2F5pxfRaeblkIv4PwSQxydqIA0BDH232cFfQjfNP?=
+ =?us-ascii?Q?Ygc64HgulstOlI9YBifTxR8ZzIaVyptGuDfKUM8ow0p3zi5ZNxYamEY42d4D?=
+ =?us-ascii?Q?tT/BZ0BO8BU5vaeZdh/Jrf34st9/6/keR6OMkDp9IBg8ZQJjoJ2oHr3XnGBj?=
+ =?us-ascii?Q?+t7g1S+KdGl07X6GX4CXW4YlKz25H2sTw4JauamvsofC/ujz4/gUSYTnoLfD?=
+ =?us-ascii?Q?2gfBWela+LTVdB02biStDRNXHj7ioIM/V578HFjHSlq72F588NMcZlud8J+L?=
+ =?us-ascii?Q?52cA2/i2QdkG3YKPXBw+XhmB9SXsfUlZ4QxVvU/uIiDtlHIQHmcAtsf3J0su?=
+ =?us-ascii?Q?J0BIFrUMZIEtFrhEQ5O+wXAda3pBG1eVlzoJxPKyK/NIDrQAF7HnvqyK+MZV?=
+ =?us-ascii?Q?NWG6aj96sbYb5TtZKbTSSW+OE3wgzezS27U/LdPGRNx6F5X9tndDVGF88jzo?=
+ =?us-ascii?Q?ALH1wOmHHIRTzPhcKZm9G/SB2jGGtUgJBkijZ3Sns4kos9zV5OF/QUb+28Ue?=
+ =?us-ascii?Q?SfimuIvf2p/idO/ZDOjOyLt1+prFMQNJ7PTSL79Lwq/92eZHslLcPy5yvXNt?=
+ =?us-ascii?Q?8R4cjrKgceTcTAO+SB83EiyHwTX9wmlcgBfy7gBwn1EvY2X81JmkiNWRwEDW?=
+ =?us-ascii?Q?XCERI8MHutLB7uidqbITveGraedQhftU1IUTE8znbmCDldw0olksLQ0/LynW?=
+ =?us-ascii?Q?z7qpIS/J92NI/o0HizRBodSgVONQL8aFJ0kPd+ERm/QikxBLn/jX9W7eLhCt?=
+ =?us-ascii?Q?UNh2Wp8g1fY1DD40MfgMYKsms385RlYCkyTauSjZ9Z7FvFRN1Bh0FCIsiaTE?=
+ =?us-ascii?Q?9MWDbyQO7orJFDGRHXS6MHnr8/VREnTxE7kOpTdY239ySh3LCdYJ5JYyBG83?=
+ =?us-ascii?Q?LQyPIzgfEGLN1k9ZHJY7eAIOjzs32m2p8mo7IXYr+AglPG1tMWw/zdxpqcdd?=
+ =?us-ascii?Q?VZSjokmRqTRsx8k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 14:10:23.0085
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: M41GhZ8JWt2jYI2AxsLNKOc7Tzdo3iYO6wvwTbZ2xyKjwTEI/mtqZnl0a4DYxiguybCPRX6CGFxw/flXuEN8EkkiPGzOaN3CozJn0EuV4zM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7295
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62318a9d-ccba-4f9d-75c7-08dd4b6efdb5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002314.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6884
 
+Remove the hidden assumption that options are allocated at the end of
+the struct, and teach the compiler about them using a flexible array.
 
+With this, we can revert the unsafe_memcpy() call we have in
+tun_dst_unclone() [1], and resolve the false field-spanning write
+warning caused by the memcpy() in ip_tunnel_info_opts_set().
 
-On 2/8/2025 5:43 PM, Piotr Wejman wrote:
-> Update the driver to use the new hardware timestamping API added in commit
-> 66f7223039c0 ("net: add NDOs for configuring hardware timestamping").
-> Use Netlink extack for error reporting in e1000e_hwtstamp_set.
-> Align the indentation of net_device_ops.
-> 
-> Signed-off-by: Piotr Wejman <wejmanpm@gmail.com>
-> ---
-> Changes in v2:
->    - amend commit message
->    - use extack for error reporting
->    - rename e1000_mii_ioctl to e1000_ioctl
->    - Link to v1: https://lore.kernel.org/netdev/20250202170839.47375-1-piotrwejman90@gmail.com/
-> 
->   drivers/net/ethernet/intel/e1000e/e1000.h  |  2 +-
->   drivers/net/ethernet/intel/e1000e/netdev.c | 68 ++++++++++------------
->   2 files changed, 31 insertions(+), 39 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-> index ba9c19e6994c..952898151565 100644
-> --- a/drivers/net/ethernet/intel/e1000e/e1000.h
-> +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-> @@ -319,7 +319,7 @@ struct e1000_adapter {
->   	u16 tx_ring_count;
->   	u16 rx_ring_count;
->   
-> -	struct hwtstamp_config hwtstamp_config;
-> +	struct kernel_hwtstamp_config hwtstamp_config;
->   	struct delayed_work systim_overflow_work;
->   	struct sk_buff *tx_hwtstamp_skb;
->   	unsigned long tx_hwtstamp_start;
-> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-> index 286155efcedf..43933e64819b 100644
-> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
-> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-> @@ -3574,6 +3574,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
->    * e1000e_config_hwtstamp - configure the hwtstamp registers and enable/disable
->    * @adapter: board private structure
->    * @config: timestamp configuration
-> + * @extack: netlink extended ACK for error report
->    *
->    * Outgoing time stamping can be enabled and disabled. Play nice and
->    * disable it when requested, although it shouldn't cause any overhead
-> @@ -3587,7 +3588,8 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
->    * exception of "all V2 events regardless of level 2 or 4".
->    **/
->   static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
-> -				  struct hwtstamp_config *config)
-> +				  struct kernel_hwtstamp_config *config,
-> +				  struct netlink_ext_ack *extack)
->   {
->   	struct e1000_hw *hw = &adapter->hw;
->   	u32 tsync_tx_ctl = E1000_TSYNCTXCTL_ENABLED;
-> @@ -3598,8 +3600,10 @@ static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
->   	bool is_l2 = false;
->   	u32 regval;
->   
-> -	if (!(adapter->flags & FLAG_HAS_HW_TIMESTAMP))
-> +	if (!(adapter->flags & FLAG_HAS_HW_TIMESTAMP)) {
-> +		NL_SET_ERR_MSG(extack, "No HW timestamp support\n");
->   		return -EINVAL;
-> +	}
->   
->   	switch (config->tx_type) {
->   	case HWTSTAMP_TX_OFF:
-> @@ -3608,6 +3612,7 @@ static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
->   	case HWTSTAMP_TX_ON:
->   		break;
->   	default:
-> +		NL_SET_ERR_MSG(extack, "Unsupported TX HW timestamp type\n");
->   		return -ERANGE;
->   	}
->   
-> @@ -3681,6 +3686,7 @@ static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
->   		config->rx_filter = HWTSTAMP_FILTER_ALL;
->   		break;
->   	default:
-> +		NL_SET_ERR_MSG(extack, "Unsupported RX HW timestamp filter\n");
->   		return -ERANGE;
->   	}
->   
-> @@ -3693,7 +3699,7 @@ static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
->   	ew32(TSYNCTXCTL, regval);
->   	if ((er32(TSYNCTXCTL) & E1000_TSYNCTXCTL_ENABLED) !=
->   	    (regval & E1000_TSYNCTXCTL_ENABLED)) {
-> -		e_err("Timesync Tx Control register not set as expected\n");
-> +		NL_SET_ERR_MSG(extack, "Timesync Tx Control register not set as expected\n");
+The layout of struct ip_tunnel_info remains the same with this patch.
+Before this patch, there was an implicit padding at the end of the
+struct, options would be written at 'info + 1' which is after the
+padding.
+This will remain the same as this patch explicitly aligns 'options'.
+The alignment is needed as the options are later casted to different
+structs, and might result in unaligned memory access.
 
-In the case where this function is being called from e1000e_systim_reset 
-function, won't it cause this debug print to do nothing?
+Pahole output before this patch:
+struct ip_tunnel_info {
+    struct ip_tunnel_key       key;                  /*     0    64 */
 
->   		return -EAGAIN;
->   	}
->   
-> @@ -3706,7 +3712,7 @@ static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
->   				 E1000_TSYNCRXCTL_TYPE_MASK)) !=
->   	    (regval & (E1000_TSYNCRXCTL_ENABLED |
->   		       E1000_TSYNCRXCTL_TYPE_MASK))) {
-> -		e_err("Timesync Rx Control register not set as expected\n");
+    /* XXX last struct has 1 byte of padding */
 
-Same question here.
+    /* --- cacheline 1 boundary (64 bytes) --- */
+    struct ip_tunnel_encap     encap;                /*    64     8 */
+    struct dst_cache           dst_cache;            /*    72    16 */
+    u8                         options_len;          /*    88     1 */
+    u8                         mode;                 /*    89     1 */
 
-> +		NL_SET_ERR_MSG(extack, "Timesync Rx Control register not set as expected\n");
->   		return -EAGAIN;
->   	}
->   
-> @@ -3932,7 +3938,7 @@ static void e1000e_systim_reset(struct e1000_adapter *adapter)
->   	spin_unlock_irqrestore(&adapter->systim_lock, flags);
->   
->   	/* restore the previous hwtstamp configuration settings */
-> -	e1000e_config_hwtstamp(adapter, &adapter->hwtstamp_config);
-> +	e1000e_config_hwtstamp(adapter, &adapter->hwtstamp_config, NULL);
->   }
->   
->   /**
-> @@ -6079,8 +6085,8 @@ static int e1000_change_mtu(struct net_device *netdev, int new_mtu)
->   	return 0;
->   }
->   
-> -static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
-> -			   int cmd)
-> +static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr,
-> +		       int cmd)
->   {
->   	struct e1000_adapter *adapter = netdev_priv(netdev);
->   	struct mii_ioctl_data *data = if_mii(ifr);
-> @@ -6140,7 +6146,8 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
->   /**
->    * e1000e_hwtstamp_set - control hardware time stamping
->    * @netdev: network interface device structure
-> - * @ifr: interface request
-> + * @config: timestamp configuration
-> + * @extack: netlink extended ACK report
->    *
->    * Outgoing time stamping can be enabled and disabled. Play nice and
->    * disable it when requested, although it shouldn't cause any overhead
-> @@ -6153,20 +6160,18 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
->    * specified. Matching the kind of event packet is not supported, with the
->    * exception of "all V2 events regardless of level 2 or 4".
->    **/
-> -static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
-> +static int e1000e_hwtstamp_set(struct net_device *netdev,
-> +			       struct kernel_hwtstamp_config *config,
-> +			       struct netlink_ext_ack *extack)
->   {
->   	struct e1000_adapter *adapter = netdev_priv(netdev);
-> -	struct hwtstamp_config config;
->   	int ret_val;
->   
-> -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
-> -		return -EFAULT;
-> -
-> -	ret_val = e1000e_config_hwtstamp(adapter, &config);
-> +	ret_val = e1000e_config_hwtstamp(adapter, config, extack);
->   	if (ret_val)
->   		return ret_val;
->   
-> -	switch (config.rx_filter) {
-> +	switch (config->rx_filter) {
->   	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
->   	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
->   	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-> @@ -6178,38 +6183,23 @@ static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
->   		 * by hardware so notify the caller the requested packets plus
->   		 * some others are time stamped.
->   		 */
-> -		config.rx_filter = HWTSTAMP_FILTER_SOME;
-> +		config->rx_filter = HWTSTAMP_FILTER_SOME;
->   		break;
->   	default:
->   		break;
->   	}
->   
-> -	return copy_to_user(ifr->ifr_data, &config,
-> -			    sizeof(config)) ? -EFAULT : 0;
-> +	return 0;
->   }
->   
-> -static int e1000e_hwtstamp_get(struct net_device *netdev, struct ifreq *ifr)
-> +static int e1000e_hwtstamp_get(struct net_device *netdev,
-> +			       struct kernel_hwtstamp_config *kernel_config)
->   {
->   	struct e1000_adapter *adapter = netdev_priv(netdev);
->   
-> -	return copy_to_user(ifr->ifr_data, &adapter->hwtstamp_config,
-> -			    sizeof(adapter->hwtstamp_config)) ? -EFAULT : 0;
-> -}
-> +	*kernel_config = adapter->hwtstamp_config;
->   
-> -static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-> -{
-> -	switch (cmd) {
-> -	case SIOCGMIIPHY:
-> -	case SIOCGMIIREG:
-> -	case SIOCSMIIREG:
-> -		return e1000_mii_ioctl(netdev, ifr, cmd);
-> -	case SIOCSHWTSTAMP:
-> -		return e1000e_hwtstamp_set(netdev, ifr);
-> -	case SIOCGHWTSTAMP:
-> -		return e1000e_hwtstamp_get(netdev, ifr);
-> -	default:
-> -		return -EOPNOTSUPP;
-> -	}
-> +	return 0;
->   }
->   
->   static int e1000_init_phy_wakeup(struct e1000_adapter *adapter, u32 wufc)
-> @@ -7346,9 +7336,11 @@ static const struct net_device_ops e1000e_netdev_ops = {
->   #ifdef CONFIG_NET_POLL_CONTROLLER
->   	.ndo_poll_controller	= e1000_netpoll,
->   #endif
-> -	.ndo_set_features = e1000_set_features,
-> -	.ndo_fix_features = e1000_fix_features,
-> +	.ndo_set_features	= e1000_set_features,
-> +	.ndo_fix_features	= e1000_fix_features,
->   	.ndo_features_check	= passthru_features_check,
-> +	.ndo_hwtstamp_get	= e1000e_hwtstamp_get,
-> +	.ndo_hwtstamp_set	= e1000e_hwtstamp_set,
->   };
->   
->   /**
-> 
+    /* size: 96, cachelines: 2, members: 5 */
+    /* padding: 6 */
+    /* paddings: 1, sum paddings: 1 */
+    /* last cacheline: 32 bytes */
+};
 
+Pahole output after this patch:
+struct ip_tunnel_info {
+   struct ip_tunnel_key       key;                  /*     0    64 */
 
-Also you are missing a subject prefix, I assume that you mean to send it
-to iwl-next since it is not a bug fix. Please add it to your patch.
+   /* XXX last struct has 1 byte of padding */
+
+   /* --- cacheline 1 boundary (64 bytes) --- */
+   struct ip_tunnel_encap     encap;                /*    64     8 */
+   struct dst_cache           dst_cache;            /*    72    16 */
+   u8                         options_len;          /*    88     1 */
+   u8                         mode;                 /*    89     1 */
+
+   /* XXX 6 bytes hole, try to pack */
+
+   u8                         options[] __attribute__((__aligned__(8))); /*    96     0 */
+
+   /* size: 96, cachelines: 2, members: 6 */
+   /* sum members: 90, holes: 1, sum holes: 6 */
+   /* paddings: 1, sum paddings: 1 */
+   /* forced alignments: 1, forced holes: 1, sum forced holes: 6 */
+   /* last cacheline: 32 bytes */
+} __attribute__((__aligned__(8)));
+
+[1] Commit 13cfd6a6d7ac ("net: Silence false field-spanning write warning in metadata_dst memcpy")
+
+Link: https://lore.kernel.org/all/53D1D353-B8F6-4ADC-8F29-8C48A7C9C6F1@kernel.org/
+Suggested-by: Kees Cook <kees@kernel.org>
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+Changelog -
+v1->v2: https://lore.kernel.org/netdev/20250209101853.15828-1-gal@nvidia.com/
+* Remove change in struct layout, align 'options' field explicitly (Ilya, Kees, Jakub).
+* Change allocation I missed in v1 in metadata_dst_alloc_percpu().
+---
+ .../mellanox/mlx5/core/en/tc_tun_encap.c      |  4 +---
+ .../mellanox/mlx5/core/en/tc_tun_vxlan.c      |  2 +-
+ .../ethernet/netronome/nfp/flower/action.c    |  4 ++--
+ drivers/net/pfcp.c                            |  2 +-
+ drivers/net/vxlan/vxlan_core.c                |  4 ++--
+ include/net/dst_metadata.h                    |  7 ++----
+ include/net/ip_tunnels.h                      | 11 +++------
+ net/core/dst.c                                |  6 +++--
+ net/ipv4/ip_gre.c                             |  4 ++--
+ net/ipv4/ip_tunnel_core.c                     | 24 +++++++++----------
+ net/ipv6/ip6_gre.c                            |  4 ++--
+ net/openvswitch/flow_netlink.c                |  4 ++--
+ net/psample/psample.c                         |  2 +-
+ net/sched/act_tunnel_key.c                    | 12 +++++-----
+ 14 files changed, 41 insertions(+), 49 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+index e7e01f3298ef..d9f40cf8198d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+@@ -620,9 +620,7 @@ bool mlx5e_tc_tun_encap_info_equal_options(struct mlx5e_encap_key *a,
+ 	b_info = container_of(b->ip_tun_key, struct ip_tunnel_info, key);
+ 
+ 	return a_info->options_len == b_info->options_len &&
+-	       !memcmp(ip_tunnel_info_opts(a_info),
+-		       ip_tunnel_info_opts(b_info),
+-		       a_info->options_len);
++	       !memcmp(a_info->options, b_info->options, a_info->options_len);
+ }
+ 
+ static int cmp_decap_info(struct mlx5e_decap_key *a,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+index e4e487c8431b..561c874b0825 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+@@ -100,7 +100,7 @@ static int mlx5e_gen_ip_tunnel_header_vxlan(char buf[],
+ 	vxh->vx_flags = VXLAN_HF_VNI;
+ 	vxh->vx_vni = vxlan_vni_field(tun_id);
+ 	if (test_bit(IP_TUNNEL_VXLAN_OPT_BIT, tun_key->tun_flags)) {
+-		md = ip_tunnel_info_opts(e->tun_info);
++		md = (struct vxlan_metadata *)e->tun_info->options;
+ 		vxlan_build_gbp_hdr(vxh, md);
+ 	}
+ 
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/action.c b/drivers/net/ethernet/netronome/nfp/flower/action.c
+index aca2a7417af3..6dd8817771b5 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/action.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/action.c
+@@ -333,7 +333,7 @@ nfp_fl_push_geneve_options(struct nfp_fl_payload *nfp_fl, int *list_len,
+ {
+ 	struct ip_tunnel_info *ip_tun = (struct ip_tunnel_info *)act->tunnel;
+ 	int opt_len, opt_cnt, act_start, tot_push_len;
+-	u8 *src = ip_tunnel_info_opts(ip_tun);
++	u8 *src = ip_tun->options;
+ 
+ 	/* We need to populate the options in reverse order for HW.
+ 	 * Therefore we go through the options, calculating the
+@@ -370,7 +370,7 @@ nfp_fl_push_geneve_options(struct nfp_fl_payload *nfp_fl, int *list_len,
+ 
+ 	act_start = *list_len;
+ 	*list_len += tot_push_len;
+-	src = ip_tunnel_info_opts(ip_tun);
++	src = ip_tun->options;
+ 	while (opt_cnt) {
+ 		struct geneve_opt *opt = (struct geneve_opt *)src;
+ 		struct nfp_fl_push_geneve *push;
+diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
+index 68d0d9e92a22..4963f85ad807 100644
+--- a/drivers/net/pfcp.c
++++ b/drivers/net/pfcp.c
+@@ -71,7 +71,7 @@ static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ 	if (unlikely(!tun_dst))
+ 		goto drop;
+ 
+-	md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++	md = (struct pfcp_metadata *)tun_dst->u.tun_info.options;
+ 	if (unlikely(!md))
+ 		goto drop;
+ 
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 05c10acb2a57..9fd1832af6b0 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1756,7 +1756,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ 			goto drop;
+ 		}
+ 
+-		md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++		md = (struct vxlan_metadata *)tun_dst->u.tun_info.options;
+ 
+ 		skb_dst_set(skb, (struct dst_entry *)tun_dst);
+ 	} else {
+@@ -2459,7 +2459,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		if (test_bit(IP_TUNNEL_VXLAN_OPT_BIT, info->key.tun_flags)) {
+ 			if (info->options_len < sizeof(*md))
+ 				goto drop;
+-			md = ip_tunnel_info_opts(info);
++			md = (struct vxlan_metadata *)info->options;
+ 		}
+ 		ttl = info->key.ttl;
+ 		tos = info->key.tos;
+diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+index 84c15402931c..4160731dcb6e 100644
+--- a/include/net/dst_metadata.h
++++ b/include/net/dst_metadata.h
+@@ -163,11 +163,8 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+ 	if (!new_md)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	unsafe_memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+-		      sizeof(struct ip_tunnel_info) + md_size,
+-		      /* metadata_dst_alloc() reserves room (md_size bytes) for
+-		       * options right after the ip_tunnel_info struct.
+-		       */);
++	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
++	       sizeof(struct ip_tunnel_info) + md_size);
+ #ifdef CONFIG_DST_CACHE
+ 	/* Unclone the dst cache if there is one */
+ 	if (new_md->u.tun_info.dst_cache.cache) {
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 1aa31bdb2b31..517f78070be0 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -93,12 +93,6 @@ struct ip_tunnel_encap {
+ 	GENMASK((sizeof_field(struct ip_tunnel_info,		\
+ 			      options_len) * BITS_PER_BYTE) - 1, 0)
+ 
+-#define ip_tunnel_info_opts(info)				\
+-	_Generic(info,						\
+-		 const struct ip_tunnel_info * : ((const void *)((info) + 1)),\
+-		 struct ip_tunnel_info * : ((void *)((info) + 1))\
+-	)
+-
+ struct ip_tunnel_info {
+ 	struct ip_tunnel_key	key;
+ 	struct ip_tunnel_encap	encap;
+@@ -107,6 +101,7 @@ struct ip_tunnel_info {
+ #endif
+ 	u8			options_len;
+ 	u8			mode;
++	u8			options[] __aligned(sizeof(void *)) __counted_by(options_len);
+ };
+ 
+ /* 6rd prefix/relay information */
+@@ -650,7 +645,7 @@ static inline void iptunnel_xmit_stats(struct net_device *dev, int pkt_len)
+ static inline void ip_tunnel_info_opts_get(void *to,
+ 					   const struct ip_tunnel_info *info)
+ {
+-	memcpy(to, info + 1, info->options_len);
++	memcpy(to, info->options, info->options_len);
+ }
+ 
+ static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
+@@ -659,7 +654,7 @@ static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
+ {
+ 	info->options_len = len;
+ 	if (len > 0) {
+-		memcpy(ip_tunnel_info_opts(info), from, len);
++		memcpy(info->options, from, len);
+ 		ip_tunnel_flags_or(info->key.tun_flags, info->key.tun_flags,
+ 				   flags);
+ 	}
+diff --git a/net/core/dst.c b/net/core/dst.c
+index 9552a90d4772..c99b95cf9cbb 100644
+--- a/net/core/dst.c
++++ b/net/core/dst.c
+@@ -286,7 +286,8 @@ struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
+ {
+ 	struct metadata_dst *md_dst;
+ 
+-	md_dst = kmalloc(sizeof(*md_dst) + optslen, flags);
++	md_dst = kmalloc(struct_size(md_dst, u.tun_info.options, optslen),
++			 flags);
+ 	if (!md_dst)
+ 		return NULL;
+ 
+@@ -314,7 +315,8 @@ metadata_dst_alloc_percpu(u8 optslen, enum metadata_type type, gfp_t flags)
+ 	int cpu;
+ 	struct metadata_dst __percpu *md_dst;
+ 
+-	md_dst = __alloc_percpu_gfp(sizeof(struct metadata_dst) + optslen,
++	md_dst = __alloc_percpu_gfp(struct_size(md_dst, u.tun_info.options,
++						optslen),
+ 				    __alignof__(struct metadata_dst), flags);
+ 	if (!md_dst)
+ 		return NULL;
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index ed1b6b44faf8..e061aec6e7bf 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -334,7 +334,7 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
+ 			     skb_network_header_len(skb);
+ 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
+ 							    sizeof(*ershdr));
+-			md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++			md = (struct erspan_metadata *)tun_dst->u.tun_info.options;
+ 			md->version = ver;
+ 			md2 = &md->u.md2;
+ 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
+@@ -556,7 +556,7 @@ static void erspan_fb_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		goto err_free_skb;
+ 	if (tun_info->options_len < sizeof(*md))
+ 		goto err_free_skb;
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct erspan_metadata *)tun_info->options;
+ 
+ 	/* ERSPAN has fixed 8 byte GRE header */
+ 	version = md->version;
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index a3676155be78..e0b0169175e5 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -147,8 +147,7 @@ struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+ 		dst->key.u.ipv4.dst = src->key.u.ipv4.src;
+ 	ip_tunnel_flags_copy(dst->key.tun_flags, src->key.tun_flags);
+ 	dst->mode = src->mode | IP_TUNNEL_INFO_TX;
+-	ip_tunnel_info_opts_set(dst, ip_tunnel_info_opts(src),
+-				src->options_len, tun_flags);
++	ip_tunnel_info_opts_set(dst, src->options, src->options_len, tun_flags);
+ 
+ 	return res;
+ }
+@@ -490,7 +489,8 @@ static int ip_tun_parse_opts_geneve(struct nlattr *attr,
+ 		return -EINVAL;
+ 
+ 	if (info) {
+-		struct geneve_opt *opt = ip_tunnel_info_opts(info) + opts_len;
++		struct geneve_opt *opt =
++			(struct geneve_opt *)(info->options + opts_len);
+ 
+ 		memcpy(opt->opt_data, nla_data(attr), data_len);
+ 		opt->length = data_len / 4;
+@@ -521,7 +521,7 @@ static int ip_tun_parse_opts_vxlan(struct nlattr *attr,
+ 
+ 	if (info) {
+ 		struct vxlan_metadata *md =
+-			ip_tunnel_info_opts(info) + opts_len;
++			(struct vxlan_metadata *)(info->options + opts_len);
+ 
+ 		attr = tb[LWTUNNEL_IP_OPT_VXLAN_GBP];
+ 		md->gbp = nla_get_u32(attr);
+@@ -562,7 +562,7 @@ static int ip_tun_parse_opts_erspan(struct nlattr *attr,
+ 
+ 	if (info) {
+ 		struct erspan_metadata *md =
+-			ip_tunnel_info_opts(info) + opts_len;
++			(struct erspan_metadata *)(info->options + opts_len);
+ 
+ 		md->version = ver;
+ 		if (ver == 1) {
+@@ -746,7 +746,7 @@ static int ip_tun_fill_encap_opts_geneve(struct sk_buff *skb,
+ 		return -ENOMEM;
+ 
+ 	while (tun_info->options_len > offset) {
+-		opt = ip_tunnel_info_opts(tun_info) + offset;
++		opt = (struct geneve_opt *)(tun_info->options + offset);
+ 		if (nla_put_be16(skb, LWTUNNEL_IP_OPT_GENEVE_CLASS,
+ 				 opt->opt_class) ||
+ 		    nla_put_u8(skb, LWTUNNEL_IP_OPT_GENEVE_TYPE, opt->type) ||
+@@ -772,7 +772,7 @@ static int ip_tun_fill_encap_opts_vxlan(struct sk_buff *skb,
+ 	if (!nest)
+ 		return -ENOMEM;
+ 
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct vxlan_metadata *)tun_info->options;
+ 	if (nla_put_u32(skb, LWTUNNEL_IP_OPT_VXLAN_GBP, md->gbp)) {
+ 		nla_nest_cancel(skb, nest);
+ 		return -ENOMEM;
+@@ -792,7 +792,7 @@ static int ip_tun_fill_encap_opts_erspan(struct sk_buff *skb,
+ 	if (!nest)
+ 		return -ENOMEM;
+ 
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct erspan_metadata *)tun_info->options;
+ 	if (nla_put_u8(skb, LWTUNNEL_IP_OPT_ERSPAN_VER, md->version))
+ 		goto err;
+ 
+@@ -875,7 +875,7 @@ static int ip_tun_opts_nlsize(struct ip_tunnel_info *info)
+ 
+ 		opt_len += nla_total_size(0);	/* LWTUNNEL_IP_OPTS_GENEVE */
+ 		while (info->options_len > offset) {
+-			opt = ip_tunnel_info_opts(info) + offset;
++			opt = (struct geneve_opt *)(info->options + offset);
+ 			opt_len += nla_total_size(2)	/* OPT_GENEVE_CLASS */
+ 				   + nla_total_size(1)	/* OPT_GENEVE_TYPE */
+ 				   + nla_total_size(opt->length * 4);
+@@ -886,7 +886,8 @@ static int ip_tun_opts_nlsize(struct ip_tunnel_info *info)
+ 		opt_len += nla_total_size(0)	/* LWTUNNEL_IP_OPTS_VXLAN */
+ 			   + nla_total_size(4);	/* OPT_VXLAN_GBP */
+ 	} else if (test_bit(IP_TUNNEL_ERSPAN_OPT_BIT, info->key.tun_flags)) {
+-		struct erspan_metadata *md = ip_tunnel_info_opts(info);
++		struct erspan_metadata *md =
++			(struct erspan_metadata *)info->options;
+ 
+ 		opt_len += nla_total_size(0)	/* LWTUNNEL_IP_OPTS_ERSPAN */
+ 			   + nla_total_size(1)	/* OPT_ERSPAN_VER */
+@@ -920,8 +921,7 @@ static int ip_tun_cmp_encap(struct lwtunnel_state *a, struct lwtunnel_state *b)
+ 	return memcmp(info_a, info_b, sizeof(info_a->key)) ||
+ 	       info_a->mode != info_b->mode ||
+ 	       info_a->options_len != info_b->options_len ||
+-	       memcmp(ip_tunnel_info_opts(info_a),
+-		      ip_tunnel_info_opts(info_b), info_a->options_len);
++	       memcmp(info_a->options, info_b->options, info_a->options_len);
+ }
+ 
+ static const struct lwtunnel_encap_ops ip_tun_lwt_ops = {
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 235808cfec70..35b0fb2162d7 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -575,7 +575,7 @@ static int ip6erspan_rcv(struct sk_buff *skb,
+ 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
+ 							    sizeof(*ershdr));
+ 			info = &tun_dst->u.tun_info;
+-			md = ip_tunnel_info_opts(info);
++			md = (struct erspan_metadata *)info->options;
+ 			md->version = ver;
+ 			md2 = &md->u.md2;
+ 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
+@@ -1022,7 +1022,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct sk_buff *skb,
+ 			goto tx_err;
+ 		if (tun_info->options_len < sizeof(*md))
+ 			goto tx_err;
+-		md = ip_tunnel_info_opts(tun_info);
++		md = (struct erspan_metadata *)tun_info->options;
+ 
+ 		tun_id = tunnel_id_to_key32(key->tun_id);
+ 		if (md->version == 1) {
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+index 881ddd3696d5..2c0ebc9890e4 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -980,7 +980,7 @@ int ovs_nla_put_tunnel_info(struct sk_buff *skb,
+ 			    struct ip_tunnel_info *tun_info)
+ {
+ 	return __ip_tun_to_nlattr(skb, &tun_info->key,
+-				  ip_tunnel_info_opts(tun_info),
++				  tun_info->options,
+ 				  tun_info->options_len,
+ 				  ip_tunnel_info_af(tun_info), tun_info->mode);
+ }
+@@ -3753,7 +3753,7 @@ static int set_action_to_attr(const struct nlattr *a, struct sk_buff *skb)
+ 			return -EMSGSIZE;
+ 
+ 		err =  ip_tun_to_nlattr(skb, &tun_info->key,
+-					ip_tunnel_info_opts(tun_info),
++					tun_info->options,
+ 					tun_info->options_len,
+ 					ip_tunnel_info_af(tun_info), tun_info->mode);
+ 		if (err)
+diff --git a/net/psample/psample.c b/net/psample/psample.c
+index 25f92ba0840c..8ed75e83826e 100644
+--- a/net/psample/psample.c
++++ b/net/psample/psample.c
+@@ -217,7 +217,7 @@ static int __psample_ip_tun_to_nlattr(struct sk_buff *skb,
+ 			      struct ip_tunnel_info *tun_info)
+ {
+ 	unsigned short tun_proto = ip_tunnel_info_af(tun_info);
+-	const void *tun_opts = ip_tunnel_info_opts(tun_info);
++	const void *tun_opts = tun_info->options;
+ 	const struct ip_tunnel_key *tun_key = &tun_info->key;
+ 	int tun_opts_len = tun_info->options_len;
+ 
+diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
+index af7c99845948..5bb7d32967da 100644
+--- a/net/sched/act_tunnel_key.c
++++ b/net/sched/act_tunnel_key.c
+@@ -303,7 +303,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_GENEVE:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_GENEVE_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -311,7 +311,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_VXLAN:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_VXLAN_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -319,7 +319,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_ERSPAN:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -572,7 +572,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
+ 				       const struct ip_tunnel_info *info)
+ {
+ 	int len = info->options_len;
+-	u8 *src = (u8 *)(info + 1);
++	u8 *src = (u8 *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_GENEVE);
+@@ -603,7 +603,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
+ static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
+ 				      const struct ip_tunnel_info *info)
+ {
+-	struct vxlan_metadata *md = (struct vxlan_metadata *)(info + 1);
++	struct vxlan_metadata *md = (struct vxlan_metadata *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_VXLAN);
+@@ -622,7 +622,7 @@ static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
+ static int tunnel_key_erspan_opts_dump(struct sk_buff *skb,
+ 				       const struct ip_tunnel_info *info)
+ {
+-	struct erspan_metadata *md = (struct erspan_metadata *)(info + 1);
++	struct erspan_metadata *md = (struct erspan_metadata *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_ERSPAN);
+-- 
+2.40.1
+
 
