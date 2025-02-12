@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-165427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4748AA31F7B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:52:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAA2A31F7C
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05221888B4A
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:52:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5BA73A53D7
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5771FF1AB;
-	Wed, 12 Feb 2025 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A941FDE29;
+	Wed, 12 Feb 2025 06:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rB88eptI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iS47+CZi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7706A1FECDF
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252FE1FBCB3
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 06:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739343134; cv=none; b=efiwEZy195MVEVIHhNwucjJl7Wq8fXUEU6dEZg9yG1kzLi7G5W+Kl8jhU5/I+EDFdjdHo3MBojJJYLswzGPjIZt1O5/CZyXZwLiPOekQHeVlzioeunvcUNLGFlEJH5+ltQuW2M/pwTXJS1HLHgMpBq/L+9CKQPIM3wXE8ozqRXo=
+	t=1739343139; cv=none; b=XZZMFbggDofvahcljSSpX8g42ReCS9d2gerE83QS8UOd/YmXuxxHPeuWQabcSYEx2SkCaWKVtRsBn4Mb961c4B2svhVI+l30UlfN93WzdUt0CU8DOj/2YOt8x+x+qdseq007WMQ0bXRoDh9OSL8rJA3KxMbcD1uGtqDg4pjh6pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739343134; c=relaxed/simple;
-	bh=ZR5/2ulMQlwhUwl/HtlTLXlzn5sAotIiGMhXEhkdb3s=;
+	s=arc-20240116; t=1739343139; c=relaxed/simple;
+	bh=oNuvzrX0ScmnFLsPRD7UuqsTQ2lVnZz8AOiY3gY+NZs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ijy+1Bluliw7LmVL1H8I7F0JeAHm9bR7g+joLTQuoJ5rN2uMjGPGey/g4jJ4ZSUyJFqSqpMK7bpMfS8yq3SS5+pLcJCi7r6/UVfak2VpYZiuyVzNpvXJTwheGDd62pu6btqEhKYKccRviH+6WvSda7WvYkqQeeGep8iGQ2iMjHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rB88eptI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D355C4CEDF;
-	Wed, 12 Feb 2025 06:52:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p/rSEkYqGTvkP5BDPXYzBNKHuRGFU8lBztIt0N5cpOE6Qu9EwVJ00qbVtfFzDrimTv0pYnZOqZ4uMmMa4nVyZaqUnng/A9M/nFU995YzymjmS5RakH/G6cAP3k5vowDYtnqSKZpPcSK7vDJSEfx2aHI6eGHOWGcOwdWgnOCNMVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iS47+CZi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40045C4CEDF;
+	Wed, 12 Feb 2025 06:52:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739343133;
-	bh=ZR5/2ulMQlwhUwl/HtlTLXlzn5sAotIiGMhXEhkdb3s=;
+	s=k20201202; t=1739343136;
+	bh=oNuvzrX0ScmnFLsPRD7UuqsTQ2lVnZz8AOiY3gY+NZs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=rB88eptIRhWJaqF3WPpr08Ft5KB7I/GhHDFkfLzvTd+lGjkFJJBEfn3C9/jWKDybf
-	 3X+Pc3kyzxQSONHBSye6YqFG5jzExQe9QzaSkaZKt13+GhcUNhLwjclwjg2KXDpRGe
-	 LsY5GceWC4otQA7u8/GlFtVucBQyUSTwUqq0C+UdMLbdKk1R3f/zMaslE9CDBwE/TB
-	 mxy0QqhTWr0xMKr+NshuwevoVXlBBxOz9J9dvAiTdXgS8Y2wJtCBJQmgUPnhnUhFMB
-	 UEiVSTtpQAsNVX3e3iNeN6/LRQhZjZprRFFWko7dNsy4bnTm8s65Y3Pwc8ZDqcfMES
-	 mZspdKOl19NTg==
+	b=iS47+CZiIjvI+nlWbAE37Zd4ChrRWym+nToPuDtYNeXBfYWg9VqhmNOAH9jCRQbSv
+	 Novnyz7ViJoZUlQ0J1QHdgMyXB3vsi/6ortYFNBSG6LWN8hvNnjSCWVCt7MB5xvI7r
+	 t1zS8VU7ZdQXHuY/5OF23qrcspKRzcEsmwS7LXWJqXYx/yDR1ib7LZE/hp7d9WJ45q
+	 1hemK6W6LWcSfMQg8wx+Q4uhbRF+gunxJpTky0uk40oVB4hFqM2ckK6mKuiUqSIqvk
+	 WzcbPFZ3tPMm0RqSCB1X2Mc94+gUJPfFUbGTVw6XoxuckB+RPqYehi9hQ8c5PzhI4p
+	 QeLWoVWnmCzrg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 12 Feb 2025 07:51:47 +0100
-Subject: [PATCH net-next 1/2] net: airoha: Fix TSO support for header
- cloned skbs
+Date: Wed, 12 Feb 2025 07:51:48 +0100
+Subject: [PATCH net-next 2/2] net: airoha: Enable TSO/Scatter Gather for
+ LAN port
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250212-airoha-fix-tso-v1-1-1652558a79b4@kernel.org>
+Message-Id: <20250212-airoha-fix-tso-v1-2-1652558a79b4@kernel.org>
 References: <20250212-airoha-fix-tso-v1-0-1652558a79b4@kernel.org>
 In-Reply-To: <20250212-airoha-fix-tso-v1-0-1652558a79b4@kernel.org>
 To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
@@ -67,58 +67,26 @@ Cc: linux-arm-kernel@lists.infradead.org,
  Lorenzo Bianconi <lorenzo@kernel.org>
 X-Mailer: b4 0.14.2
 
-For GSO packets, skb_cow_head() will reallocate the skb for TSO header
-cloned skbs in airoha_dev_xmit(). For this reason, sinfo pointer can be
-no more valid. Fix the issue relying on skb_shinfo() macro directly in
-airoha_dev_xmit().
-This is not a user visible issue since we can't currently enable TSO for
-DSA user ports since we are missing to initialize net_device
-vlan_features field.
+Set net_device vlan_features in order to enable TSO and Scatter Gather
+for DSA user ports.
 
-Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/mediatek/airoha_eth.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mediatek/airoha_eth.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 09f448f291240257c5748725848ede231c502fbd..aa5f220ddbcf9ca5bee1173114294cb3aec701c9 100644
+index aa5f220ddbcf9ca5bee1173114294cb3aec701c9..321e5d15198c5ec6a0764be418aa447e8d9e4512 100644
 --- a/drivers/net/ethernet/mediatek/airoha_eth.c
 +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -2556,11 +2556,10 @@ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
- static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 				   struct net_device *dev)
- {
--	struct skb_shared_info *sinfo = skb_shinfo(skb);
- 	struct airoha_gdm_port *port = netdev_priv(dev);
-+	u32 nr_frags = 1 + skb_shinfo(skb)->nr_frags;
- 	u32 msg0, msg1, len = skb_headlen(skb);
- 	struct airoha_qdma *qdma = port->qdma;
--	u32 nr_frags = 1 + sinfo->nr_frags;
- 	struct netdev_queue *txq;
- 	struct airoha_queue *q;
- 	void *data = skb->data;
-@@ -2583,8 +2582,9 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 		if (skb_cow_head(skb, 0))
- 			goto error;
- 
--		if (sinfo->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) {
--			__be16 csum = cpu_to_be16(sinfo->gso_size);
-+		if (skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 |
-+						 SKB_GSO_TCPV6)) {
-+			__be16 csum = cpu_to_be16(skb_shinfo(skb)->gso_size);
- 
- 			tcp_hdr(skb)->check = (__force __sum16)csum;
- 			msg0 |= FIELD_PREP(QDMA_ETH_TXMSG_TSO_MASK, 1);
-@@ -2613,7 +2613,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	for (i = 0; i < nr_frags; i++) {
- 		struct airoha_qdma_desc *desc = &q->desc[index];
- 		struct airoha_queue_entry *e = &q->entry[index];
--		skb_frag_t *frag = &sinfo->frags[i];
-+		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
- 		dma_addr_t addr;
- 		u32 val;
- 
+@@ -3188,6 +3188,7 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
+ 			   NETIF_F_SG | NETIF_F_TSO |
+ 			   NETIF_F_HW_TC;
+ 	dev->features |= dev->hw_features;
++	dev->vlan_features = dev->hw_features;
+ 	dev->dev.of_node = np;
+ 	dev->irq = qdma->irq;
+ 	SET_NETDEV_DEV(dev, eth->dev);
 
 -- 
 2.48.1
