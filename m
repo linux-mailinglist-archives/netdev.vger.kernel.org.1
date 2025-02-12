@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-165354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD2C1A31BBC
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:11:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37113A31BBD
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:12:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A4E4188980B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:12:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AB0F1889911
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6836F155389;
-	Wed, 12 Feb 2025 02:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6170218BBA8;
+	Wed, 12 Feb 2025 02:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gvExjHDs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XwmRZH3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31531482F2
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E3F1531C5
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 02:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739326309; cv=none; b=NpDTku8pJcJheQNq1/O4BkU3Oik5Kaex3Y25saoL9BOIoGTfYaJcUxIamY1N7oQXPZS4aWijjGN61Lho07JTswWB7q2uuTRSe3DhqoZoHnpAk+0pJdKiPgBu2WHgU9f/Xb8FnC9hTww00AfMVkkXG8D5/OJJ8iNUiBEUJkM75QI=
+	t=1739326310; cv=none; b=ZAuwGu4QBT4Xgb8fHbKpUnTdDrPalJ5ouR0G8nlLhZg3aN0QCK+SaAg/+Z/LcVgg8qJG7ghw+jua5Waq2tNWy4O/XhJc3GnjoU58RHCeMPWZbLdeEbKvqjAkUx8BfN3iqZ65hHCLBkPXAniUZxeknd7+wUURuBIpw2emB/pr5NI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739326309; c=relaxed/simple;
-	bh=29T/1d3clUmyUSHtHun1fPMlpB4FKy7uaBxDpsIl8Vk=;
+	s=arc-20240116; t=1739326310; c=relaxed/simple;
+	bh=SUQ36dT7NCquYR/J3wrYi9DAuLdQ7lLdOj3bIwQ95TE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IxiTZNXggl1AWnLVQxz+rU6Hk2tdjtaWNoNPIY07t7csJJeS2wsWQ8RYKULUQ7/FS6Omf9sV95qlSFv7X60NaQTMfOmjF3T3FwI9UqzUJIO1rBeL2pOxKAk+LTWJAAx3eko8BHJQaVryS8sHHoJZQwpKe5uW6AxsKe/BDQ16zT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gvExjHDs; arc=none smtp.client-ip=209.85.222.175
+	 MIME-Version; b=QFHLvGTBncMrJUZN42OvSkE+Wf3M353kkUwG3e+srivuV8RDmrARuQK3+KucsgFanhDH8sEst/TZoRDlEiKbfyX7xbIFZeNtLB01c+DJJEqIwSjCFH81mzvcnaUT0aO+VBg/aHcGEjCkRSVnwS25+8uOIupJR7SjUhMBBpENLfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XwmRZH3c; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7be8efa231aso644845885a.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:11:47 -0800 (PST)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c05f3dde21so345740885a.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:11:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739326306; x=1739931106; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739326307; x=1739931107; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Kbp0x58wnaxWx2OQ8r+M2p008qFTUoMNTJXOqZPPDes=;
-        b=gvExjHDsu7th+WD2UMas0+9UAZ69HObWXF15LjEeqIDQVSkI70D/MRfWrYU1/q9Zfi
-         CDSVwSA8XRUjEjWW4DXfNAy5sjdI84AlgXIBDjHW01+yck5jKIey6c671ewYD0daUjwO
-         haC7NdYxDVkH71uEjQ/xsGFJALYZls0/0XpYzL+wjFY3SAuPSvn2WLAC8gNlhhnK5fOt
-         6ARSAgErUMw9GQQ5z2Ho/Xhcc8+8+qaNWY7RCRrFrdFE7gOVW2KXjj4MBrNSepkYF/Wb
-         VWfhS/uUq1XmnjOFdu3A0r3izRvh9wrjAyuuKP6je0sfjSYOqAiwvUEzpHDhWxwOi4ST
-         VL/Q==
+        bh=jR573iXHDE6qn0yhJ5BDmPlNhijejbGjKbJBvKgVCss=;
+        b=XwmRZH3cbXKQKY0m4hIOT7UaE8F39GU7LfSbH1RqfOQQN/l7FYMuKPLg02n+q8+sB6
+         528j3cK0dnUiS2q2cvceaasrICC/LxDAMu/bg4FpcWirWRFm/mttFu4HwJKZig/4Aeau
+         kPTLpDdGbAwsTAgkw9ioELnADFT4SD6UXnVlbzftOvqLaAtmyXzDepQqCmwkOWgZZJyC
+         vERd2DR4o+ey6TKT/1mDshtBG2cfTGQtVRmC2QxVhui574r2OlMyyZEydTCfQYnRN4Ta
+         LcpHTnLly9adIzW300LIX+F9/APA/p/XVoYRv7ICqLn3hqlUNnIzPcqXcy8/p+grwp2+
+         Fsjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739326306; x=1739931106;
+        d=1e100.net; s=20230601; t=1739326307; x=1739931107;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Kbp0x58wnaxWx2OQ8r+M2p008qFTUoMNTJXOqZPPDes=;
-        b=LVzqOpvneztv7Wn2+2856d/qLugQdys/+Cpi4pl+LSZjEZhtSxDe5kXQwIHnzx+ty1
-         BaulLNbvn4xG6hHkZnLIaa5Qr5U+v4g6GOxDxdVHL1/d4obvFC4OcAYoYLIyN1KC3PyK
-         ud2GrZY+Q4eMIf4rzyAbc5uYV91tqBnUsPRGzpE76dlAvJ6YXU1iTQo02ZPysOSkzDMF
-         ykq82rDKw8myxdPyJmjo0TxjcQfKCA8MMMZ0IA3l2EzaZfv/O/Bar4a9smhghYv8ClUY
-         9zLAFeCAAOs1SErhpFs1SYJDYzLgZaHhAjCln2beX92jA0cTQvWBCCtDL//sANEN6bpl
-         cBRw==
-X-Gm-Message-State: AOJu0YygnSVFGmf0YDKZgPCB/CW/NgAaeU/PRdNM69lVw8L3klOiiYvm
-	dfKvQMIwe1QkrERH43Q3p5W6Rt/l5yx+DzcwY7bBDqAY8Qk70zk/aIr+/g==
-X-Gm-Gg: ASbGncv4H197T9WLWRsXCoC9CliayMWwLQ4M57yCUBQC5AXsWhpTV7Bz+wcgtPWbAQa
-	l/b/w8UGl5DNHC75LPimEHw3S+fBOTFPJGVV676MNMrCQwBPJ+ed7BSyD5okl7p37ceINmRwffz
-	wrPUUY5pR+iTyO8WcBvQi3PpePs/SrGVQrikYoQVQsgUsdDh8UyIGYNB6mH+MKqRK8DGorqMJtM
-	ExrICHVl6PcE/Uq9AZZvX/fDQXhcMeq+92b6bsM/m+Y7qU81tZMocfHl1DfF+v0ZfnMF7ZXGWRr
-	23jj2Y3H7/tx0m8E7pG6HivCxapBzwr7HZo9vZisTAgee2Q9DHCs4QIiTZSLS6ECjVaqwX//ySB
-	H0h5332txGg==
-X-Google-Smtp-Source: AGHT+IGsuUJ6x8c/Kmlo+7xDnfFcZI5NthfxvdjTRwqKJoCKZAJaT2PnD5Pyh6y18iCrwJbji91GCw==
-X-Received: by 2002:a05:6214:19c8:b0:6e4:42c2:dd9a with SMTP id 6a1803df08f44-6e46edbf613mr25590576d6.45.1739326306663;
-        Tue, 11 Feb 2025 18:11:46 -0800 (PST)
+        bh=jR573iXHDE6qn0yhJ5BDmPlNhijejbGjKbJBvKgVCss=;
+        b=tS9c6BLt9JQlRyOLRKstfe6xFeCcXRf+5nNwmEFZZ47+PieIe0icZ73GqoMVrSl7O9
+         b73wcyxb/l0H5ZFUEedG0KLvHxBoFs3FgENIPr7TfSJnfxsX6RtT/EtsTyoQVfXkjFyQ
+         4sbagu0WKiSDG35Uho3rwgvAtT6nacMOB/FNEzrFS9DReRT9FTvI6Lnvg1oS4ZKVfIkJ
+         tf8vyLwqGZRWPKC/7mxEEAjZRtrq1Z/DKAQI2IZehUtD1KIW+B4J2qdir54GFSJwDtRh
+         D9W5TbunQsbNzp52TB4SVXkIS+QN8L/SJ+TcpFy2L4uCv+k+ywBxPf6HhjAu1Tps0Sur
+         lm9A==
+X-Gm-Message-State: AOJu0YzEUTzs5qiUsmw9x9BAI4YT98PldgzPedUMwz35YwqCPMmpLCJa
+	JdAOkP+mGywDU0hZoohZT5Z4BNpY4MOyZy3iDEn3125W/mdYqp8W7bA9CA==
+X-Gm-Gg: ASbGncsPmeKRayJqvp7k5BI1DJZSARXy5lOvT3uDDWIuZ0ENzqc+LKMxXIa+XxKfkk6
+	S7U499Aghw1xpDPfhLrve81uMfgA2Y3nvcuEYpfjFfvb5uSly+5HowlV1K1Eoyyq1xplpKto5HX
+	XojV8XvgCIdsZfz5IYRHsylv4LyHCBpQ4vg/fFFx7zyeumBX3tdZXFEHdjceI0pdgod4dV17fZZ
+	uhz4AIr+5oAdE+SygHCn5IfzpNuUlrVFsGVoFD0EDlvydtrFuoFOGdT3+AurezcZ3EoXimohBmf
+	nNkA5zcgbksD+bwelWfR9tFnc3kqUo118XyWhvlgKMOAhVrA/cLs03JRSnZvLMqs7LpUMRyfOOn
+	uEomBl56jBw==
+X-Google-Smtp-Source: AGHT+IHd0KHmhhGVX3ciUGzERKrhWqJ2KmhDf5zr5yP43a494Nx/YN5+ZA59tIgARNpPGzgMrnvPOQ==
+X-Received: by 2002:a05:6214:110b:b0:6e4:6ff6:bac2 with SMTP id 6a1803df08f44-6e46ff6bbc3mr9824506d6.40.1739326307464;
+        Tue, 11 Feb 2025 18:11:47 -0800 (PST)
 Received: from willemb.c.googlers.com.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44a9a524esm58256126d6.5.2025.02.11.18.11.45
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e44a9a524esm58256126d6.5.2025.02.11.18.11.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 18:11:46 -0800 (PST)
+        Tue, 11 Feb 2025 18:11:47 -0800 (PST)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -81,9 +81,9 @@ Cc: davem@davemloft.net,
 	dsahern@kernel.org,
 	horms@kernel.org,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 1/7] tcp: only initialize sockcm tsflags field
-Date: Tue, 11 Feb 2025 21:09:47 -0500
-Message-ID: <20250212021142.1497449-2-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next v2 2/7] net: initialize mark in sockcm_init
+Date: Tue, 11 Feb 2025 21:09:48 -0500
+Message-ID: <20250212021142.1497449-3-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
 In-Reply-To: <20250212021142.1497449-1-willemdebruijn.kernel@gmail.com>
 References: <20250212021142.1497449-1-willemdebruijn.kernel@gmail.com>
@@ -97,26 +97,84 @@ Content-Transfer-Encoding: 8bit
 
 From: Willem de Bruijn <willemb@google.com>
 
-TCP only reads the tsflags field. Don't bother initializing others.
+Avoid open coding initialization of sockcm fields.
+Avoid reading the sk_priority field twice.
+
+This ensures all callers, existing and future, will correctly try a
+cmsg passed mark before sk_mark.
+
+This patch extends support for cmsg mark to:
+packet_spkt and packet_tpacket and net/can/raw.c.
+
+This patch extends support for cmsg priority to:
+packet_spkt and packet_tpacket.
 
 Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- net/ipv4/tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/sock.h     | 1 +
+ net/can/raw.c          | 2 +-
+ net/packet/af_packet.c | 9 ++++-----
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 992d5c9b2487..5798a900b7bf 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1127,7 +1127,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 		/* 'common' sending to sendq */
- 	}
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 8036b3b79cd8..767a60e80086 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1828,6 +1828,7 @@ static inline void sockcm_init(struct sockcm_cookie *sockc,
+ 			       const struct sock *sk)
+ {
+ 	*sockc = (struct sockcm_cookie) {
++		.mark = READ_ONCE(sk->sk_mark),
+ 		.tsflags = READ_ONCE(sk->sk_tsflags),
+ 		.priority = READ_ONCE(sk->sk_priority),
+ 	};
+diff --git a/net/can/raw.c b/net/can/raw.c
+index 46e8ed9d64da..9b1d5f036f57 100644
+--- a/net/can/raw.c
++++ b/net/can/raw.c
+@@ -963,7 +963,7 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
  
--	sockcm_init(&sockc, sk);
-+	sockc = (struct sockcm_cookie) { .tsflags = READ_ONCE(sk->sk_tsflags)};
+ 	skb->dev = dev;
+ 	skb->priority = sockc.priority;
+-	skb->mark = READ_ONCE(sk->sk_mark);
++	skb->mark = sockc.mark;
+ 	skb->tstamp = sockc.transmit_time;
+ 
+ 	skb_setup_tx_timestamp(skb, &sockc);
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index c131e5ceea37..3e9ddf72cd03 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2102,8 +2102,8 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+ 
+ 	skb->protocol = proto;
+ 	skb->dev = dev;
+-	skb->priority = READ_ONCE(sk->sk_priority);
+-	skb->mark = READ_ONCE(sk->sk_mark);
++	skb->priority = sockc.priority;
++	skb->mark = sockc.mark;
+ 	skb_set_delivery_type_by_clockid(skb, sockc.transmit_time, sk->sk_clockid);
+ 	skb_setup_tx_timestamp(skb, &sockc);
+ 
+@@ -2634,8 +2634,8 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
+ 
+ 	skb->protocol = proto;
+ 	skb->dev = dev;
+-	skb->priority = READ_ONCE(po->sk.sk_priority);
+-	skb->mark = READ_ONCE(po->sk.sk_mark);
++	skb->priority = sockc->priority;
++	skb->mark = sockc->mark;
+ 	skb_set_delivery_type_by_clockid(skb, sockc->transmit_time, po->sk.sk_clockid);
+ 	skb_setup_tx_timestamp(skb, sockc);
+ 	skb_zcopy_set_nouarg(skb, ph.raw);
+@@ -3039,7 +3039,6 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
+ 		goto out_unlock;
+ 
+ 	sockcm_init(&sockc, sk);
+-	sockc.mark = READ_ONCE(sk->sk_mark);
  	if (msg->msg_controllen) {
  		err = sock_cmsg_send(sk, msg, &sockc);
- 		if (unlikely(err)) {
+ 		if (unlikely(err))
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
