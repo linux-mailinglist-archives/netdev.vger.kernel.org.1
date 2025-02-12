@@ -1,137 +1,126 @@
-Return-Path: <netdev+bounces-165341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44168A31B71
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:45:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA40A31B7F
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E20A01672D1
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:45:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1ABF18860B9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 01:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8FF78F20;
-	Wed, 12 Feb 2025 01:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7CB1CA9C;
+	Wed, 12 Feb 2025 01:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tnzHSsTD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="J55hrgTK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABBC3D3B8
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 01:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02EDA50
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 01:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739324681; cv=none; b=B6F91Xvs//9ofnenAsFJXG3CIoRWs0NSG1q215g+t1bWUFG3gAOrdDk1sLZuR0TrPfOKbmV/F4CLP+sXbMD7w7anHRGVpWqFng05fxP/AVj97KzX4M682PjhqFanAILWLfHiqCruyyxc2sPDyfjsEYcGD+HPp0h3p4wFaiL14kA=
+	t=1739324942; cv=none; b=JP20Jfl3HER9jsmj6U9FVj5Emxu68yNBnYqH4YjSZj98Scw3QDPKASLaQu6cDXJgrZpDZXxt2pUKMxGkzU8g5xZvye5y7KEXwX7Ngrqpl5s1WOiWtAaiyfWbLcTcXrlfoxUMpSrOAaunDX+dcv1d5BwhjpfZ6tba3cXpvMdAlpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739324681; c=relaxed/simple;
-	bh=vwjvqa486loabkKY0VkIST3XHnIBYBzMM7doYaiNR/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZdV0hHidPrWZH5nwkp9adieFybnucRvo4XK7KbOXZhm1YvfwYjryC010rWD7H7ER9LOA29shAFjXhHAv+eDLDHuPerHWrZaxiOHgRqd1Gk/n67EpYZ8YpHIdzq3j9y2upSpWdh1j72Lw9djRcszFHLmzY6OAlkICjZ6bX9PleAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tnzHSsTD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE539C4CEDD;
-	Wed, 12 Feb 2025 01:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739324680;
-	bh=vwjvqa486loabkKY0VkIST3XHnIBYBzMM7doYaiNR/Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tnzHSsTD/QT5FAF40L1aBMrcQtToDNbmGxNMBlmZ58KUsqPptYyLKEUJigqU6BkAl
-	 5P1W4Ew7QpxreIHsWkETl2ymBmS9SWfmqKrzfBza6udRpi0NkGbN1+mbIL+DwcYwF/
-	 9GNfuODXi1dc79tftUV7eDK6Hno7RtjElviRPKtZf9ZG3oCj8QoR7QcKDX5RMmQVnV
-	 BTb5Ny5aYvzcGDJZhZSNVVXuDzhFU4VExvYLPsDEto4bxyMW+WQbEk2m02ycnoTCbs
-	 qOe8whEsaDWHhuSAZ3wVbU2+V9T2D7ANR84Du0p0eV/0d9bSXv9BdKbkge2VodnvwZ
-	 bGEKB3wJe1OYA==
-Date: Tue, 11 Feb 2025 17:44:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, michal.swiatkowski@linux.intel.com,
- helgaas@kernel.org, horms@kernel.org, Somnath Kotur
- <somnath.kotur@broadcom.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>,
- David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next v4 09/10] bnxt_en: Extend queue stop/start for
- TX rings
-Message-ID: <20250211174438.3b8493fe@kernel.org>
-In-Reply-To: <20250208202916.1391614-10-michael.chan@broadcom.com>
-References: <20250208202916.1391614-1-michael.chan@broadcom.com>
-	<20250208202916.1391614-10-michael.chan@broadcom.com>
+	s=arc-20240116; t=1739324942; c=relaxed/simple;
+	bh=HC+70OmC/K9tDRFpVOB0d0icK0tVN2JIdDajikQjzrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nu60S0U11SQD42P+nWUqrh3zjHw0L2OSYZGLV+FKEqOgCAC4l4U0FOZuEB0GBEaLfA1/icxTD2v2fLdW/+7HJ2OsbFr5yHEf7083/n9oZXZkIeHSrb0hJCSJWVqulOm3YfIWIgUlQ9/C/yXCcDB/hXi2t2O1TRVZeDat0Oc83CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=J55hrgTK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0vBjQKFm9bLB7d7bWC5R45kW4Z8b7qy0/auV0S7iVnU=; b=J55hrgTKGY29+Co5zQvZ2z1jHy
+	Xvdrp0AvWvACrLTKTZIbyeD0mo3PJ3oqpENw/1oySYz433JBGXuT5IAKkLeSmSsX//ysHyeBxkpFa
+	iV3fhqfcQrQA4mY1lCuhgQWw1zJkGs3hqxDawrbSvzhHAClzzzfCmpTZgQLNJUVf6Cx4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ti1rm-00DF1x-Su; Wed, 12 Feb 2025 02:48:42 +0100
+Date: Wed, 12 Feb 2025 02:48:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v6 2/7] net: phy: Support speed selection for
+ PHY loopback
+Message-ID: <57e02f9b-ff5e-44fa-b2fa-cbd7dd93408a@lunn.ch>
+References: <20250209190827.29128-1-gerhard@engleder-embedded.com>
+ <20250209190827.29128-3-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250209190827.29128-3-gerhard@engleder-embedded.com>
 
-On Sat,  8 Feb 2025 12:29:15 -0800 Michael Chan wrote:
-> +		rc = bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
-> +		if (rc)
-> +			return rc;
+> +int phy_loopback(struct phy_device *phydev, bool enable, int speed)
+> +{
+> +	bool link_up = false;
+> +	int ret = 0;
 > +
-> +		rc = bnxt_hwrm_tx_ring_alloc(bp, txr, false);
-> +		if (rc)
-> +			return rc;
+> +	if (!phydev->drv)
+> +		return -EIO;
+> +
+> +	mutex_lock(&phydev->lock);
+> +
+> +	if (enable && phydev->loopback_enabled) {
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	if (!enable && !phydev->loopback_enabled) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if (enable) {
+> +		/*
+> +		 * Link up is signaled with a defined speed. If speed changes,
+> +		 * then first link down and after that link up needs to be
+> +		 * signaled.
+> +		 */
+> +		if (phydev->link && phydev->state == PHY_RUNNING) {
+> +			/* link is up and signaled */
+> +			if (speed && phydev->speed != speed) {
+> +				/* signal link down and up for new speed */
+> +				phydev->link = false;
+> +				phydev->state = PHY_NOLINK;
+> +				phy_link_down(phydev);
 
-Under what circumstances can these alloc calls fail?
-"alloc" sounds concerning in a start call.
+If you set the link down here...
 
-> +		txr->tx_prod = 0;
-> +		txr->tx_cons = 0;
-> +		txr->tx_hw_cons = 0;
-
->  	cpr->sw_stats->rx.rx_resets++;
->  
-> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
-> +		cpr->sw_stats->tx.tx_resets++;
-
-Is there a reason why queue op stop/start cycles are counted as resets?
-IIUC previously only faults (~errors) would be counted as resets.
-ifdown / ifup or ring reconfig (ethtool -L / -G) would not increment
-resets. I think queue reconfig is more like ethtool -L than a fault.
-It'd be more consistent with existing code not to increment these
-counters.
-
-> +		rc = bnxt_tx_queue_start(bp, idx);
-> +		if (rc) {
-> +			netdev_warn(bp->dev,
-> +				    "tx queue restart failed: rc=%d\n", rc);
-> +			bnapi->tx_fault = 1;
-> +			goto err_reset;
+> +
+> +				link_up = true;
+> +			}
+> +		} else {
+> +			/* link is not signaled */
+> +			if (speed) {
+> +				/* signal link up for new speed */
+> +				link_up = true;
+> +			}
 > +		}
 > +	}
 > +
-> +	napi_enable(&bnapi->napi);
-
-Here you first start the queue then enable NAPI...
-
-> +	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+> +	if (phydev->drv->set_loopback)
+> +		ret = phydev->drv->set_loopback(phydev, enable, speed);
+> +	else
+> +		ret = genphy_loopback(phydev, enable, speed);
 > +
->  	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
->  		vnic = &bp->vnic_info[i];
->  
+> +	if (ret)
+> +		goto out;
 
-> @@ -15716,17 +15820,25 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
->  	/* Make sure NAPI sees that the VNIC is disabled */
->  	synchronize_net();
->  	rxr = &bp->rx_ring[idx];
-> -	cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
-> +	bnapi = rxr->bnapi;
-> +	cpr = &bnapi->cp_ring;
-> +	cancel_work_sync(&cpr->dim.work);
->  	bnxt_hwrm_rx_ring_free(bp, rxr, false);
->  	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
->  	page_pool_disable_direct_recycling(rxr->page_pool);
->  	if (bnxt_separate_head_pool())
->  		page_pool_disable_direct_recycling(rxr->head_pool);
->  
-> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
-> +		bnxt_tx_queue_stop(bp, idx);
-> +
-> +	napi_disable(&bnapi->napi);
+and this fails, you leave the link down. You should make an attempt to
+restore the link to the old state before returning the error.
 
-... but here you do the opposite, and require extra synchronization 
-in bnxt_tx_queue_stop() to set your magic flag, sync the NAPI etc.
-Why can't the start and stop paths be the mirror image?
+	Andrew
 
