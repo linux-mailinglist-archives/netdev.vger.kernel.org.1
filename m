@@ -1,109 +1,345 @@
-Return-Path: <netdev+bounces-165511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE77A32684
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:04:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7E0A3269E
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 518717A2613
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:03:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D1B13A7493
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C952F20D51C;
-	Wed, 12 Feb 2025 13:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wtnCllAT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A1820CCF5;
+	Wed, 12 Feb 2025 13:10:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1190120CCF5;
-	Wed, 12 Feb 2025 13:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED65D209F4B
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 13:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739365457; cv=none; b=cdCSntr+fU+6Z7JIbwBhE7nWSEa6WQYed02ydVtRGwU4vjMuoIWB8E38bArcIKzfFXxzaDghKnuJRBFDdyZx7FUJCbvgc+tbdMTlLk/kYYzmNWzbhHxOuOX6T5T405SUHjsLpQud1Uhm8FArJQm+h9QXpfR89SSHdClhNiVN03w=
+	t=1739365819; cv=none; b=CnfPD+Cekc9Q9+AYWZwxJaPDjZhWdfPGtrCJhyCSuEhqbKokOftqM/idhV2r7X/KxFItJgBv0Y5bOSqHiR6vjoF9kEMjzaONvGqurjXAVOx1wQ2Gi+4+YYlDtcmu6xcmlfLvrqdLmGXf351VQjedEpzF6+NSqpDiAmb7oqWm8R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739365457; c=relaxed/simple;
-	bh=XF3aE4u9MDVcJXLrzb1xDxpA18U3deRBPV3zVRngzZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INkivKTbYv3cpkcooFGouFSssYNBAWyp3Kr0KL2fR6YcmXO6s8l1DAmdCNUZHe8zE+A2kKfarQFHyfanlUvCIDOG9cy+aD6YIJKpqqS+Z5UsylXFdk1PCPvIT9G4lIB0W3R4VZELxYWQchlaEO8XYpN2NxD7z/EWrjVJUfQ4sS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wtnCllAT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0sj66E/QwXcmygIYcoyyi03W/kyTbRiJl+nH/qypQi4=; b=wtnCllATKXlCUCZrSQr5izWyYq
-	Epn0gtEFhBE+wa6RvEeGujY1/zSRdCrl23VYsm8ydYVWqTg2sByVFqyOo+ofpuvSc/Xgp08UAgVgn
-	KAweVTGJ7rGbmTYmV4IjEfLTdAyd6qX5uHVUOgSCxUpGK7xMcEApf7ZSSig1Xw1pyY50=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiCPK-00DOcU-H1; Wed, 12 Feb 2025 14:04:02 +0100
-Date: Wed, 12 Feb 2025 14:04:02 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: dimitri.fedrau@liebherr.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dimitri Fedrau <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v4 1/3] dt-bindings: net: ethernet-phy: add
- property tx-amplitude-100base-tx-percent
-Message-ID: <b60f286a-75c8-4b60-9707-6d834fd4d3ad@lunn.ch>
-References: <20250211-dp83822-tx-swing-v4-0-1e8ebd71ad54@liebherr.com>
- <20250211-dp83822-tx-swing-v4-1-1e8ebd71ad54@liebherr.com>
+	s=arc-20240116; t=1739365819; c=relaxed/simple;
+	bh=rClQzl+3KBIDp1f9tM3icHJo+ZtGCrRxski1EQrIZIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BtbzeSFn6CQn/EZpSnij1gRg00D4dsquu4lcamimtCTY7AGp0oOI7MoCaiXoa6O09cHtT4Xv2Kc+J7IDyT2HMqHq9YwgrxSupH356cNeKTVRabX7tja18JeHRZVH1FTJp2Ch0GaKS2KbvfcVM4KQlFpild9hk5fQgQQCFJCWW+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0BBBE61E64787;
+	Wed, 12 Feb 2025 14:09:18 +0100 (CET)
+Message-ID: <350aa6d3-05cd-4a5b-b43a-deb5c9e8f5aa@molgen.mpg.de>
+Date: Wed, 12 Feb 2025 14:09:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250211-dp83822-tx-swing-v4-1-1e8ebd71ad54@liebherr.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next v2 1/4] ixgbe: add MDD support
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ marcin.szycik@linux.intel.com, jedrzej.jagielski@intel.com,
+ przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
+ anthony.l.nguyen@intel.com, dawid.osuchowski@intel.com, horms@kernel.org
+References: <20250212075724.3352715-1-michal.swiatkowski@linux.intel.com>
+ <20250212075724.3352715-2-michal.swiatkowski@linux.intel.com>
+ <cadb0151-8713-4bf7-810c-569559afc969@molgen.mpg.de>
+ <Z6ybMegMoaoMLfLq@mev-dev.igk.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <Z6ybMegMoaoMLfLq@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 11, 2025 at 09:33:47AM +0100, Dimitri Fedrau via B4 Relay wrote:
-> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Dear Michal,
+
+
+Am 12.02.25 um 13:59 schrieb Michal Swiatkowski:
+> On Wed, Feb 12, 2025 at 09:07:18AM +0100, Paul Menzel wrote:
+
+>> Thank you for your patch. For the summary/title you could use:
+>>
+>> ixgbe: Support Malicious Driver Detection (MDD)
+>>
+>> Am 12.02.25 um 08:57 schrieb Michal Swiatkowski:
+>>> From: Paul Greenwalt <paul.greenwalt@intel.com>
+>>>
+>>> Add malicious driver detection. Support enabling MDD, disabling MDD,
+>>> handling a MDD event, and restoring a MDD VF.
+>>
+>> a*n* MDD
+>>
+>> Could you please elaborate? List the commands to enable/disable MDD?
+>>
+>> Also, please include a reference to the datasheet section for this feature.
+>> I am a little confused, as the Linux driver should never be “malicious”,
+>> shouldn’t it? So what is this feature?
+>>
+>> Which devices support this? From the diff it looks like X550? Please add
+>> that.
+>>
+>> How did you test it?
+>>
+>> How are the events logged?
+
+> I will elaborate it in the commit message if it is needed. The VF created
+> on X550 device can use malicious driver for example.
+
+I guess, I still do not know, what “driver” refers to here exactly.
+
+> I tested it by
+> changing Tx descriptor to be invalid (TSO on, with invalid length in
+> descriptor, but any type of invalid descriptor should cause MDD).
+
+Could these invalid(?) values be prevented from being set in the first 
+place?
+
+> It is enabled all time. Simple netif_warn() is called with more
+> information about MDD. After 4 events on the same VF the link status is
+> force to be down to turn off malicious VF.
+
+Thank you for elaborating. It’d be great if you updated the commit 
+message, and also pasted one of these log lines, and maybe a test script 
+how to trigger the MDD.
+
+>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+>>> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>>> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+>>> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>>> ---
+>>>    drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  28 ++++
+>>>    drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   5 +
+>>>    drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |   4 +
+>>>    drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 120 ++++++++++++++++++
+>>>    4 files changed, 157 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+>>> index 5fdf32d79d82..d446c375335a 100644
+>>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+>>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+>>> @@ -2746,6 +2746,28 @@ enum ixgbe_fdir_pballoc_type {
+>>>    #define FW_PHY_INFO_ID_HI_MASK		0xFFFF0000u
+>>>    #define FW_PHY_INFO_ID_LO_MASK		0x0000FFFFu
+>>> +/* There are only 3 options for VFs creation on this device:
+>>> + * 16 VFs pool with 8 queues each
+>>> + * 32 VFs pool with 4 queues each
+>>> + * 64 VFs pool with 2 queues each
+>>> + *
+>>> + * That means reading some VF registers that map VF to queue depending on
+>>> + * chosen option. Define values that help dealing with each scenario.
+>>> + */
+>>> +/* Number of queues based on VFs pool */
+>>> +#define IXGBE_16VFS_QUEUES		8
+>>> +#define IXGBE_32VFS_QUEUES		4
+>>> +#define IXGBE_64VFS_QUEUES		2
+>>> +/* Mask for getting queues bits based on VFs pool */
+>>> +#define IXGBE_16VFS_BITMASK		GENMASK(IXGBE_16VFS_QUEUES - 1, 0)
+>>> +#define IXGBE_32VFS_BITMASK		GENMASK(IXGBE_32VFS_QUEUES - 1, 0)
+>>> +#define IXGBE_64VFS_BITMASK		GENMASK(IXGBE_64VFS_QUEUES - 1, 0)
+>>> +/* Convert queue index to register number.
+>>> + * We have 4 registers with 32 queues in each.
+>>> + */
+>>> +#define IXGBE_QUEUES_PER_REG		32
+>>> +#define IXGBE_QUEUES_REG_AMOUNT		4
+>>> +
+>>>    /* Host Interface Command Structures */
+>>>    struct ixgbe_hic_hdr {
+>>>    	u8 cmd;
+>>> @@ -3534,6 +3556,12 @@ struct ixgbe_mac_operations {
+>>>    	int (*dmac_config_tcs)(struct ixgbe_hw *hw);
+>>>    	int (*read_iosf_sb_reg)(struct ixgbe_hw *, u32, u32, u32 *);
+>>>    	int (*write_iosf_sb_reg)(struct ixgbe_hw *, u32, u32, u32);
+>>> +
+>>> +	/* MDD events */
+>>> +	void (*enable_mdd)(struct ixgbe_hw *hw);
+>>> +	void (*disable_mdd)(struct ixgbe_hw *hw);
+>>> +	void (*restore_mdd_vf)(struct ixgbe_hw *hw, u32 vf);
+>>> +	void (*handle_mdd)(struct ixgbe_hw *hw, unsigned long *vf_bitmap);
+>>>    };
+>>>    struct ixgbe_phy_operations {
+>>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+>>> index 3e4092f8da3e..2a11147fb1bc 100644
+>>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+>>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+>>> @@ -17,4 +17,9 @@ void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
+>>>    void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
+>>>    					    bool enable, int vf);
+>>> +void ixgbe_enable_mdd_x550(struct ixgbe_hw *hw);
+>>> +void ixgbe_disable_mdd_x550(struct ixgbe_hw *hw);
+>>> +void ixgbe_restore_mdd_vf_x550(struct ixgbe_hw *hw, u32 vf);
+>>> +void ixgbe_handle_mdd_x550(struct ixgbe_hw *hw, unsigned long *vf_bitmap);
+>>> +
+>>>    #endif /* _IXGBE_X550_H_ */
+>>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>>> index cb07ecd8937d..788f3372ebf1 100644
+>>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+>>> @@ -2630,6 +2630,10 @@ static const struct ixgbe_mac_operations mac_ops_e610 = {
+>>>    	.prot_autoc_write		= prot_autoc_write_generic,
+>>>    	.setup_fc			= ixgbe_setup_fc_e610,
+>>>    	.fc_autoneg			= ixgbe_fc_autoneg_e610,
+>>> +	.enable_mdd			= ixgbe_enable_mdd_x550,
+>>> +	.disable_mdd			= ixgbe_disable_mdd_x550,
+>>> +	.restore_mdd_vf			= ixgbe_restore_mdd_vf_x550,
+>>> +	.handle_mdd			= ixgbe_handle_mdd_x550,
+>>>    };
+>>>    static const struct ixgbe_phy_operations phy_ops_e610 = {
+>>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+>>> index 277ceaf8a793..b5cbfd1f71fd 100644
+>>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+>>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+>>> @@ -3800,6 +3800,122 @@ static int ixgbe_write_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
+>>>    	return status;
+>>>    }
+>>> +static void ixgbe_set_mdd_x550(struct ixgbe_hw *hw, bool ena)
+>>> +{
+>>> +	u32 reg_dma, reg_rdr;
+>>> +
+>>> +	reg_dma = IXGBE_READ_REG(hw, IXGBE_DMATXCTL);
+>>> +	reg_rdr = IXGBE_READ_REG(hw, IXGBE_RDRXCTL);
+>>> +
+>>> +	if (ena) {
+>>> +		reg_dma |= (IXGBE_DMATXCTL_MDP_EN | IXGBE_DMATXCTL_MBINTEN);
+>>> +		reg_rdr |= (IXGBE_RDRXCTL_MDP_EN | IXGBE_RDRXCTL_MBINTEN);
+>>> +	} else {
+>>> +		reg_dma &= ~(IXGBE_DMATXCTL_MDP_EN | IXGBE_DMATXCTL_MBINTEN);
+>>> +		reg_rdr &= ~(IXGBE_RDRXCTL_MDP_EN | IXGBE_RDRXCTL_MBINTEN);
+>>> +	}
+>>> +
+>>> +	IXGBE_WRITE_REG(hw, IXGBE_DMATXCTL, reg_dma);
+>>> +	IXGBE_WRITE_REG(hw, IXGBE_RDRXCTL, reg_rdr);
+>>> +}
+>>> +
+>>> +/**
+>>> + * ixgbe_enable_mdd_x550 - enable malicious driver detection
+>>> + * @hw: pointer to hardware structure
+>>> + */
+>>> +void ixgbe_enable_mdd_x550(struct ixgbe_hw *hw)
+>>> +{
+>>> +	ixgbe_set_mdd_x550(hw, true);
+>>> +}
+>>> +
+>>> +/**
+>>> + * ixgbe_disable_mdd_x550 - disable malicious driver detection
+>>> + * @hw: pointer to hardware structure
+>>> + */
+>>> +void ixgbe_disable_mdd_x550(struct ixgbe_hw *hw)
+>>> +{
+>>> +	ixgbe_set_mdd_x550(hw, false);
+>>> +}
+>>> +
+>>> +/**
+>>> + * ixgbe_restore_mdd_vf_x550 - restore VF that was disabled during MDD event
+>>> + * @hw: pointer to hardware structure
+>>> + * @vf: vf index
+>>> + */
+>>> +void ixgbe_restore_mdd_vf_x550(struct ixgbe_hw *hw, u32 vf)
+>>> +{
+>>> +	u32 idx, reg, val, num_qs, start_q, bitmask;
+>>> +
+>>> +	/* Map VF to queues */
+>>> +	reg = IXGBE_READ_REG(hw, IXGBE_MRQC);
+>>> +	switch (reg & IXGBE_MRQC_MRQE_MASK) {
+>>> +	case IXGBE_MRQC_VMDQRT8TCEN:
+>>> +		num_qs = IXGBE_16VFS_QUEUES;
+>>> +		bitmask = IXGBE_16VFS_BITMASK;
+>>> +		break;
+>>> +	case IXGBE_MRQC_VMDQRSS32EN:
+>>> +	case IXGBE_MRQC_VMDQRT4TCEN:
+>>> +		num_qs = IXGBE_32VFS_QUEUES;
+>>> +		bitmask = IXGBE_32VFS_BITMASK;
+>>> +		break;
+>>> +	default:
+>>> +		num_qs = IXGBE_64VFS_QUEUES;
+>>> +		bitmask = IXGBE_64VFS_BITMASK;
+>>> +		break;
+>>> +	}
+>>> +	start_q = vf * num_qs;
+>>> +
+>>> +	/* Release vf's queues by clearing WQBR_TX and WQBR_RX (RW1C) */
+>>> +	idx = start_q / IXGBE_QUEUES_PER_REG;
+>>> +	val = bitmask << (start_q % IXGBE_QUEUES_PER_REG);
+>>> +	IXGBE_WRITE_REG(hw, IXGBE_WQBR_TX(idx), val);
+>>> +	IXGBE_WRITE_REG(hw, IXGBE_WQBR_RX(idx), val);
+>>> +}
+>>> +
+>>> +/**
+>>> + * ixgbe_handle_mdd_x550 - handle malicious driver detection event
+>>> + * @hw: pointer to hardware structure
+>>> + * @vf_bitmap: output vf bitmap of malicious vfs
+>>> + */
+>>> +void ixgbe_handle_mdd_x550(struct ixgbe_hw *hw, unsigned long *vf_bitmap)
+>>> +{
+>>> +	u32 i, j, reg, q, div, vf;
+>>
+>> Why fix the length of the count variables?
 > 
-> Add property tx-amplitude-100base-tx-percent in the device tree bindings
-> for configuring the tx amplitude of 100BASE-TX PHYs. Modifying it can be
-> necessary to compensate losses on the PCB and connector, so the voltages
-> measured on the RJ45 pins are conforming.
-> 
-> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> ---
->  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> index 2c71454ae8e362e7032e44712949e12da6826070..e0c001f1690c1eb9b0386438f2d5558fd8c94eca 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> @@ -232,6 +232,12 @@ properties:
->        PHY's that have configurable TX internal delays. If this property is
->        present then the PHY applies the TX delay.
->  
-> +  tx-amplitude-100base-tx-percent:
-> +    description:
-> +      Transmit amplitude gain applied for 100BASE-TX. When omitted, the PHYs
-> +      default will be left as is.
-> +    default: 100
+> Do you mean why u32 insted of int?
 
-Doesn't having a default statement contradict the text? Maybe the
-bootloader has set it to 110%, the text suggests it will be left at
-that, but the default value of 100 means it will get set back to 100%?
+Yes, that is my question.
 
-What do your driver changes actually do?
+>>> +	unsigned long wqbr;
+>>> +
+>>> +	/* figure out pool size for mapping to vf's */
+>>> +	reg = IXGBE_READ_REG(hw, IXGBE_MRQC);
+>>> +	switch (reg & IXGBE_MRQC_MRQE_MASK) {
+>>> +	case IXGBE_MRQC_VMDQRT8TCEN:
+>>> +		div = IXGBE_16VFS_QUEUES;
+>>> +		break;
+>>> +	case IXGBE_MRQC_VMDQRSS32EN:
+>>> +	case IXGBE_MRQC_VMDQRT4TCEN:
+>>> +		div = IXGBE_32VFS_QUEUES;
+>>> +		break;
+>>> +	default:
+>>> +		div = IXGBE_64VFS_QUEUES;
+>>> +		break;
+>>> +	}
+>>> +
+>>> +	/* Read WQBR_TX and WQBR_RX and check for malicious queues */
+>>> +	for (i = 0; i < IXGBE_QUEUES_REG_AMOUNT; i++) {
+>>> +		wqbr = IXGBE_READ_REG(hw, IXGBE_WQBR_TX(i)) |
+>>> +		       IXGBE_READ_REG(hw, IXGBE_WQBR_RX(i));
+>>> +		if (!wqbr)
+>>> +			continue;
+>>> +
+>>> +		/* Get malicious queue */
+>>> +		for_each_set_bit(j, (unsigned long *)&wqbr,
+>>> +				 IXGBE_QUEUES_PER_REG) {
+>>> +			/* Get queue from bitmask */
+>>> +			q = j + (i * IXGBE_QUEUES_PER_REG);
+>>> +			/* Map queue to vf */
+>>> +			vf = q / div;
+>>> +			set_bit(vf, vf_bitmap);
+>>> +		}
+>>> +	}
+>>> +}
+>>> +
+>>>    #define X550_COMMON_MAC \
+>>>    	.init_hw			= &ixgbe_init_hw_generic, \
+>>>    	.start_hw			= &ixgbe_start_hw_X540, \
+>>> @@ -3863,6 +3979,10 @@ static const struct ixgbe_mac_operations mac_ops_X550 = {
+>>>    	.prot_autoc_write	= prot_autoc_write_generic,
+>>>    	.setup_fc		= ixgbe_setup_fc_generic,
+>>>    	.fc_autoneg		= ixgbe_fc_autoneg,
+>>> +	.enable_mdd		= ixgbe_enable_mdd_x550,
+>>> +	.disable_mdd		= ixgbe_disable_mdd_x550,
+>>> +	.restore_mdd_vf		= ixgbe_restore_mdd_vf_x550,
+>>> +	.handle_mdd		= ixgbe_handle_mdd_x550,
+>>>    };
+>>>    static const struct ixgbe_mac_operations mac_ops_X550EM_x = {
 
-	Andrew
+Kind regards,
+
+Paul
 
