@@ -1,264 +1,367 @@
-Return-Path: <netdev+bounces-165703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D77A33258
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:21:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3901A332B4
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E93C1642B9
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:21:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EDAE164C03
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3E71FF1D6;
-	Wed, 12 Feb 2025 22:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59B920408A;
+	Wed, 12 Feb 2025 22:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vhKDFuYT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVgzoqot"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E9C190470
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC6D202C50;
+	Wed, 12 Feb 2025 22:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739398903; cv=none; b=rCsLDSQEgwoDMyPUbdywy9ihwOLiiTu6JPb9A6RcB+kJapgkpN35hiLF4OmQpX9Uchv7eak1/ZeAMmfEAWtRZueXr9taQtklmFQ0dNpwvblkv3t8RQC9gcu+s+GQFRXrpSS0k7ZigqYgL3r32Y+7z+p3dAu2StUD/VJ/vFdCV7g=
+	t=1739399580; cv=none; b=RoQ5VMNTknmgnxn+poWwc4co80beoD/LVrVHoX3GyPCoE0BQyx6pXTvUQjfkPUeOpeeiiK0yH0uoL3lfhgVSptyPLP1WVZQM1IepGuXmlnElaeeo2WY8MGf6LuuAtjkaG6dKblb9jCSth1OoVlG4P6UOV726aD7x372pfTEHV/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739398903; c=relaxed/simple;
-	bh=AfhynHGRbH0gMXRJkvIVbIvpzdPQS9W+xRsY08e4EXU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r8JjcWiItta738ER7Oyvbufdi2Zu+TPj/9/1qivSlpTWysjftkjQ2DvqVdB9+ZKQPQt2hRO0RWuMVC3I0hNOnFWNRKaZcg/giidr+7FE9KcwSkAu7sEbChFrkEoBP4BmlsmkhhahESuMNAls4cRQ6CWy/3tuJ4BIf2rc4BHd3Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vhKDFuYT; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2f762254-3912-4a8d-97a4-51a9bc7be74b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739398897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O2/mEf+N9Ckmk5bgWQ5dh9b2BxLFZgefgkcJwKHRJTc=;
-	b=vhKDFuYTJKe1e+8LoMCiE6aVX4ptQjk6hcW0HS1wgd31KtMSuy026j+XlTvMSUupePSa+X
-	vd9IHFerfUby+4AnGRKerQRM8Py0jaiBv+rqmD7pg++Q7njDcZzbbF0Op/riZTx+gl9dJ8
-	Y1ECbb6SuqqrHL9uvPkgDRgfn9EX0cM=
-Date: Wed, 12 Feb 2025 23:21:29 +0100
+	s=arc-20240116; t=1739399580; c=relaxed/simple;
+	bh=Kht5JajSoFbjqk7SI1NfFmvei1QSTACfDSlpKDRNAMI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IHD5jY4zUZTrEr1lQ55SADp7ctxyQG+itqV4GYSgJLGXyhPkhSfjj+ef30Fmj28ANnWLIca3WayFDlCTZUnRHdhXiYxo3oxp7zxGBMWv+4kImrdHaHgsscaWA10sfxT3/f+0+d6XheZsL7hsF3Tnlynq+xXK9LmBoMz4+s7DGuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVgzoqot; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-866e8a51fa9so118547241.1;
+        Wed, 12 Feb 2025 14:32:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739399578; x=1740004378; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AjD5c5Z/nOcFqJ1zoOXQlAY5nML8UX6BLoysdrIad+g=;
+        b=EVgzoqotRmebpYI2ouivokutJvWtP2uC8re/43FORdzWU0YPK1HZsPcxtnUth/7aQp
+         gXpdT78oiNu38MVxl4N4+ycw8p+Wmbgxfq1DkaeA5TMEgCdA37+Nm4KWc4/iYbeWiZOa
+         Ue6wchMHCi0ARwL0ZsBo0inJnD1jGsU9bjzkyBQjEuTDTO6VvRMBdLGOFfXlqweoXpAk
+         uu1giRZLjJXoDvSzp59zfg0OhDAuRrEwsCB/TrUmYyXNd6Lj1AwqN6e9NJXDr0QoaetK
+         A+PYXr4+xkH11/tl0XSZ4AqsqsIvTuZa5aETHsjFbvzTq5atCuQ/m7Zjv89wKn4KWSCm
+         jB5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739399578; x=1740004378;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AjD5c5Z/nOcFqJ1zoOXQlAY5nML8UX6BLoysdrIad+g=;
+        b=LPhDaq7TiUfJ57tVcvP18EosYi6ErjlcU/OVq2gtYlsqAifwHQnGF1AufzSXzAunYT
+         W1FPXkbhJ0lMNnyIYVWkhQHFIOgoYu13OKbNNxEuG+eDVEoEJh//h1cdbcUj5bGgnhKm
+         SDU3GhTVr9YXWn4LX9LUfQZFrHRj3gWcYjsy+e292/gtQNkpNg6vgKUJ2vKpJn4ml5pp
+         aLaRqvmvTeMxstBFIIBHp7yVorPZOlUFxMkTn/k621PSE7RU3mbg3fut2852kz7PdCnw
+         viYEXJ4kMAHVcGvunYh1CbHqCZ0j9fxn2cAaaWleGzCjjV4QHH2r0ckcTFG7aoGC4CEW
+         cMkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrNecVBvPhUUH5gBKKp/jKlOmQ2v7tZ+tl2cWTQaGNH07fgdp5Z9loNCqPbnOo7/h/9DbG9ONyKUW+soY=@vger.kernel.org, AJvYcCXb7ozutBy1rc/Qlw3bA6sFbe7q89X+0sPzO2rBs+X+4GdcClSL8HcO1axNrb1IZTeBkzbcHobM@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqcMV9Cs/sptA1aMEhUdGVcnXIROhGp+y3N3jMnja8g+QoU1kR
+	JzBIvoMrxHk72Eym2cmAXBBZ8vn1vzrRa3aYQKqyNIXCpH3/Dt2J2SgfykK2ixku7ntGKXZG/DH
+	KLzRsPqC3EGflE2gSr/ardwX+a5w=
+X-Gm-Gg: ASbGncuY3oLfH4USnOQiban0Z7GqjuMtlW5n6N0HMWMZ7QXbzlJcCiX3bnO6Wl1ee1C
+	vDNZwUpUFWoN4HRYdGgLM3Dz6kG8MfqQAbc44XEzUqEHiZySbKJszoXtJZRl6tDhtDLznSz5R6g
+	dnz4mf4tWM+6dCliTy4YatQhM4Bgv6
+X-Google-Smtp-Source: AGHT+IEc/svxJP9ZEqxO5z1spAxd5auUZZJlH9tuH8voVu2R9q6y4QOFPq0FU+OTG7o6Xj5WRxohz7nCkF9vt/f/ozY=
+X-Received: by 2002:a05:6102:511f:b0:4bb:ccf5:c24b with SMTP id
+ ada2fe7eead31-4bc04dc08famr990664137.2.1739399577848; Wed, 12 Feb 2025
+ 14:32:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 00/10] Introduce fwctl subystem
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
- David Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>,
- Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
- Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
- "Nelson, Shannon" <shannon.nelson@amd.com>
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250208154350.75316-1-wejmanpm@gmail.com> <7d0fccb0-6fee-44d9-8f1c-455c889a21a1@intel.com>
+In-Reply-To: <7d0fccb0-6fee-44d9-8f1c-455c889a21a1@intel.com>
+From: Piotr Wejman <wejmanpm@gmail.com>
+Date: Wed, 12 Feb 2025 23:32:46 +0100
+X-Gm-Features: AWEUYZn2ddEQE9HrtaK8of06GwCrWd9kvlYSrFkI_l8dCvrsOFD7F0AasaLhrvs
+Message-ID: <CAMRHcQyp0MppaoL8fT+U7hh45zkZbFFRsDFU=nrYBpqFptTu6g@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2] net: e1000e: convert to
+ ndo_hwtstamp_get() and ndo_hwtstamp_set()
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-在 2025/2/7 1:13, Jason Gunthorpe 写道:
-> [
-> Many people were away around the holiday period, but work is back in full
-> swing now with Dave already at v3 on his CXL work over the past couple
-> weeks. We are looking at a good chance of reaching this merge window. I
-> will work out some shared branches with CXL and get it into linux-next
-> once all three drivers can be assembled and reviews seem to be concluding.
-> 
-> There are couple open notes
->   - Greg was interested in a new name, but nobody offered any bikesheds
->   - I would like a co-maintainer
-> ]
-> 
-> fwctl is a new subsystem intended to bring some common rules and order to
-> the growing pattern of exposing a secure FW interface directly to
-> userspace. Unlike existing places like RDMA/DRM/VFIO/uacce that are
-> exposing a device for datapath operations fwctl is focused on debugging,
-> configuration and provisioning of the device. It will not have the
-> necessary features like interrupt delivery to support a datapath.
-> 
-> This concept is similar to the long standing practice in the "HW" RAID
-> space of having a device specific misc device to manage the RAID
-> controller FW. fwctl generalizes this notion of a companion debug and
-> management interface that goes along with a dataplane implemented in an
-> appropriate subsystem.
-> 
-> The need for this has reached a critical point as many users are moving to
-> run lockdown enabled kernels. Several existing devices have had long
-> standing tooling for management that relied on /sys/../resource0 or PCI
-> config space access which is not permitted in lockdown. A major point of
-> fwctl is to define and document the rules that a device must follow to
-> expose a lockdown compatible RPC.
-> 
-> Based on some discussion fwctl splits the RPCs into four categories
-> 
-> 	FWCTL_RPC_CONFIGURATION
-> 	FWCTL_RPC_DEBUG_READ_ONLY
-> 	FWCTL_RPC_DEBUG_WRITE
-> 	FWCTL_RPC_DEBUG_WRITE_FULL
-> 
-> Where the latter two trigger a new TAINT_FWCTL, and the final one requires
-> CAP_SYS_RAWIO - excluding it from lockdown. The device driver and its FW
-> would be responsible to restrict RPCs to the requested security scope,
-> while the core code handles the tainting and CAP checks.
-> 
-> For details see the final patch which introduces the documentation.
-> 
-> The CXL FWCTL driver is now in it own series on v3:
->   https://lore.kernel.org/r/20250204220430.4146187-1-dave.jiang@intel.com
-> 
-> I'm expecting a 3rd driver (from Shannon @ Pensando) to be posted right
-> away, the github version I saw looked good. I've got soft commitments for
-> about 6 drivers in total now.
-> 
-> There have been three LWN articles written discussing various aspects of
-> this proposal:
-> 
->   https://lwn.net/Articles/955001/
->   https://lwn.net/Articles/969383/
->   https://lwn.net/Articles/990802/
-> 
-> A really giant ksummit thread preceding a discussion at the Maintainer
-> Summit:
-> 
->   https://lore.kernel.org/ksummit/668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch/
-> 
-> Several have expressed general support for this concept:
-> 
->   AMD/Pensando - https://lore.kernel.org/linux-rdma/20241205222818.44439-1-shannon.nelson@amd.com
->   Broadcom Networking - https://lore.kernel.org/r/Zf2n02q0GevGdS-Z@C02YVCJELVCG
->   Christoph Hellwig - https://lore.kernel.org/r/Zcx53N8lQjkpEu94@infradead.org
->   Daniel Vetter - https://lore.kernel.org/r/ZrHY2Bds7oF7KRGz@phenom.ffwll.local
->   Enfabrica - https://lore.kernel.org/r/9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org
->   NVIDIA Networking
->   Oded Gabbay/Habana - https://lore.kernel.org/r/ZrMl1bkPP-3G9B4N@T14sgabbay.
->   Oracle Linux - https://lore.kernel.org/r/6lakj6lxlxhdgrewodvj3xh6sxn3d36t5dab6najzyti2navx3@wrge7cyfk6nq
->   SuSE/Hannes - https://lore.kernel.org/r/2fd48f87-2521-4c34-8589-dbb7e91bb1c8@suse.com
-> 
-> Work is ongoing for userspace, currently the mellanox tool suite has been
-> ported over:
->    https://github.com/Mellanox/mstflint
-> 
-> And a more simplified example how to use it:
->    https://github.com/jgunthorpe/mlx5ctl.git
+On Wed, Feb 12, 2025 at 3:10=E2=80=AFPM Lifshits, Vitaly
+<vitaly.lifshits@intel.com> wrote:
+>
+>
+>
+> On 2/8/2025 5:43 PM, Piotr Wejman wrote:
+> > Update the driver to use the new hardware timestamping API added in com=
+mit
+> > 66f7223039c0 ("net: add NDOs for configuring hardware timestamping").
+> > Use Netlink extack for error reporting in e1000e_hwtstamp_set.
+> > Align the indentation of net_device_ops.
+> >
+> > Signed-off-by: Piotr Wejman <wejmanpm@gmail.com>
+> > ---
+> > Changes in v2:
+> >    - amend commit message
+> >    - use extack for error reporting
+> >    - rename e1000_mii_ioctl to e1000_ioctl
+> >    - Link to v1: https://lore.kernel.org/netdev/20250202170839.47375-1-=
+piotrwejman90@gmail.com/
+> >
+> >   drivers/net/ethernet/intel/e1000e/e1000.h  |  2 +-
+> >   drivers/net/ethernet/intel/e1000e/netdev.c | 68 ++++++++++-----------=
+-
+> >   2 files changed, 31 insertions(+), 39 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/et=
+hernet/intel/e1000e/e1000.h
+> > index ba9c19e6994c..952898151565 100644
+> > --- a/drivers/net/ethernet/intel/e1000e/e1000.h
+> > +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+> > @@ -319,7 +319,7 @@ struct e1000_adapter {
+> >       u16 tx_ring_count;
+> >       u16 rx_ring_count;
+> >
+> > -     struct hwtstamp_config hwtstamp_config;
+> > +     struct kernel_hwtstamp_config hwtstamp_config;
+> >       struct delayed_work systim_overflow_work;
+> >       struct sk_buff *tx_hwtstamp_skb;
+> >       unsigned long tx_hwtstamp_start;
+> > diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/e=
+thernet/intel/e1000e/netdev.c
+> > index 286155efcedf..43933e64819b 100644
+> > --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> > +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> > @@ -3574,6 +3574,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter =
+*adapter, u32 *timinca)
+> >    * e1000e_config_hwtstamp - configure the hwtstamp registers and enab=
+le/disable
+> >    * @adapter: board private structure
+> >    * @config: timestamp configuration
+> > + * @extack: netlink extended ACK for error report
+> >    *
+> >    * Outgoing time stamping can be enabled and disabled. Play nice and
+> >    * disable it when requested, although it shouldn't cause any overhea=
+d
+> > @@ -3587,7 +3588,8 @@ s32 e1000e_get_base_timinca(struct e1000_adapter =
+*adapter, u32 *timinca)
+> >    * exception of "all V2 events regardless of level 2 or 4".
+> >    **/
+> >   static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
+> > -                               struct hwtstamp_config *config)
+> > +                               struct kernel_hwtstamp_config *config,
+> > +                               struct netlink_ext_ack *extack)
+> >   {
+> >       struct e1000_hw *hw =3D &adapter->hw;
+> >       u32 tsync_tx_ctl =3D E1000_TSYNCTXCTL_ENABLED;
+> > @@ -3598,8 +3600,10 @@ static int e1000e_config_hwtstamp(struct e1000_a=
+dapter *adapter,
+> >       bool is_l2 =3D false;
+> >       u32 regval;
+> >
+> > -     if (!(adapter->flags & FLAG_HAS_HW_TIMESTAMP))
+> > +     if (!(adapter->flags & FLAG_HAS_HW_TIMESTAMP)) {
+> > +             NL_SET_ERR_MSG(extack, "No HW timestamp support\n");
+> >               return -EINVAL;
+> > +     }
+> >
+> >       switch (config->tx_type) {
+> >       case HWTSTAMP_TX_OFF:
+> > @@ -3608,6 +3612,7 @@ static int e1000e_config_hwtstamp(struct e1000_ad=
+apter *adapter,
+> >       case HWTSTAMP_TX_ON:
+> >               break;
+> >       default:
+> > +             NL_SET_ERR_MSG(extack, "Unsupported TX HW timestamp type\=
+n");
+> >               return -ERANGE;
+> >       }
+> >
+> > @@ -3681,6 +3686,7 @@ static int e1000e_config_hwtstamp(struct e1000_ad=
+apter *adapter,
+> >               config->rx_filter =3D HWTSTAMP_FILTER_ALL;
+> >               break;
+> >       default:
+> > +             NL_SET_ERR_MSG(extack, "Unsupported RX HW timestamp filte=
+r\n");
+> >               return -ERANGE;
+> >       }
+> >
+> > @@ -3693,7 +3699,7 @@ static int e1000e_config_hwtstamp(struct e1000_ad=
+apter *adapter,
+> >       ew32(TSYNCTXCTL, regval);
+> >       if ((er32(TSYNCTXCTL) & E1000_TSYNCTXCTL_ENABLED) !=3D
+> >           (regval & E1000_TSYNCTXCTL_ENABLED)) {
+> > -             e_err("Timesync Tx Control register not set as expected\n=
+");
+> > +             NL_SET_ERR_MSG(extack, "Timesync Tx Control register not =
+set as expected\n");
+>
+> In the case where this function is being called from e1000e_systim_reset
+> function, won't it cause this debug print to do nothing?
 
-Hi, Jason
+Yes, you're right.
 
-I read all the threads about this fwctl subsystem carefully. I think 
-that this fwctl tool is very nice and helpful in our work. But I can not 
-find a user guide in the threads.
+>
+> >               return -EAGAIN;
+> >       }
+> >
+> > @@ -3706,7 +3712,7 @@ static int e1000e_config_hwtstamp(struct e1000_ad=
+apter *adapter,
+> >                                E1000_TSYNCRXCTL_TYPE_MASK)) !=3D
+> >           (regval & (E1000_TSYNCRXCTL_ENABLED |
+> >                      E1000_TSYNCRXCTL_TYPE_MASK))) {
+> > -             e_err("Timesync Rx Control register not set as expected\n=
+");
+>
+> Same question here.
+>
+> > +             NL_SET_ERR_MSG(extack, "Timesync Rx Control register not =
+set as expected\n");
+> >               return -EAGAIN;
+> >       }
+> >
+> > @@ -3932,7 +3938,7 @@ static void e1000e_systim_reset(struct e1000_adap=
+ter *adapter)
+> >       spin_unlock_irqrestore(&adapter->systim_lock, flags);
+> >
+> >       /* restore the previous hwtstamp configuration settings */
+> > -     e1000e_config_hwtstamp(adapter, &adapter->hwtstamp_config);
+> > +     e1000e_config_hwtstamp(adapter, &adapter->hwtstamp_config, NULL);
 
-I want to have a try in our debug work with mlx5 devices. Can you share 
-a link of a user guide with us?
+I'll pass an extack instead of NULL and add a print here.
 
-Your helps are much appreciated.
-
-Thanks a lot.
-Zhu Yanjun
-
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/fwctl
-> 
-> v4:
->   - Rebase to v6.14-rc1
->   - Fine tune comments and rst documentatin
->   - Adjust cleanup.h usage - remove places that add more ofuscation than
->     value
->   - CXL is back to its own independent series
->   - Increase FWCTL_MAX_DEVICES to 4096, someone hit the limit
->   - Fix mlx5ctl_validate_rpc() logic around scope checking
->   - Disable mlx5ctl on SFs
-> v3: https://patch.msgid.link/r/0-v3-960f17f90f17+516-fwctl_jgg@nvidia.com
->   - Rebase to v6.11-rc4
->   - Add a squashed version of David's CXL series as the 2nd driver
->   - Add missing includes
->   - Improve comments based on feedback
->   - Use the kdoc format that puts the member docs inside the struct
->   - Rewrite fwctl_alloc_device() to be clearer
->   - Incorporate all remarks for the documentation
-> v2: https://lore.kernel.org/r/0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com
->   - Rebase to v6.10-rc5
->   - Minor style changes
->   - Follow the style consensus for the guard stuff
->   - Documentation grammer/spelling
->   - Add missed length output for mlx5 get_info
->   - Add two more missed MLX5 CMD's
->   - Collect tags
-> v1: https://lore.kernel.org/r/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> 
-> Andy Gospodarek (2):
->    fwctl/bnxt: Support communicating with bnxt fw
->    bnxt: Create an auxiliary device for fwctl_bnxt
-> 
-> Jason Gunthorpe (6):
->    fwctl: Add basic structure for a class subsystem with a cdev
->    fwctl: Basic ioctl dispatch for the character device
->    fwctl: FWCTL_INFO to return basic information about the device
->    taint: Add TAINT_FWCTL
->    fwctl: FWCTL_RPC to execute a Remote Procedure Call to device firmware
->    fwctl: Add documentation
-> 
-> Saeed Mahameed (2):
->    fwctl/mlx5: Support for communicating with mlx5 fw
->    mlx5: Create an auxiliary device for fwctl_mlx5
-> 
->   Documentation/admin-guide/tainted-kernels.rst |   5 +
->   Documentation/userspace-api/fwctl/fwctl.rst   | 285 ++++++++++++
->   Documentation/userspace-api/fwctl/index.rst   |  12 +
->   Documentation/userspace-api/index.rst         |   1 +
->   .../userspace-api/ioctl/ioctl-number.rst      |   1 +
->   MAINTAINERS                                   |  16 +
->   drivers/Kconfig                               |   2 +
->   drivers/Makefile                              |   1 +
->   drivers/fwctl/Kconfig                         |  32 ++
->   drivers/fwctl/Makefile                        |   6 +
->   drivers/fwctl/bnxt/Makefile                   |   4 +
->   drivers/fwctl/bnxt/bnxt.c                     | 167 +++++++
->   drivers/fwctl/main.c                          | 416 ++++++++++++++++++
->   drivers/fwctl/mlx5/Makefile                   |   4 +
->   drivers/fwctl/mlx5/main.c                     | 340 ++++++++++++++
->   drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   3 +
->   drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   3 +
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 126 +++++-
->   drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |   4 +
->   drivers/net/ethernet/mellanox/mlx5/core/dev.c |   9 +
->   include/linux/fwctl.h                         | 135 ++++++
->   include/linux/panic.h                         |   3 +-
->   include/uapi/fwctl/bnxt.h                     |  27 ++
->   include/uapi/fwctl/fwctl.h                    | 140 ++++++
->   include/uapi/fwctl/mlx5.h                     |  36 ++
->   kernel/panic.c                                |   1 +
->   tools/debugging/kernel-chktaint               |   8 +
->   27 files changed, 1782 insertions(+), 5 deletions(-)
->   create mode 100644 Documentation/userspace-api/fwctl/fwctl.rst
->   create mode 100644 Documentation/userspace-api/fwctl/index.rst
->   create mode 100644 drivers/fwctl/Kconfig
->   create mode 100644 drivers/fwctl/Makefile
->   create mode 100644 drivers/fwctl/bnxt/Makefile
->   create mode 100644 drivers/fwctl/bnxt/bnxt.c
->   create mode 100644 drivers/fwctl/main.c
->   create mode 100644 drivers/fwctl/mlx5/Makefile
->   create mode 100644 drivers/fwctl/mlx5/main.c
->   create mode 100644 include/linux/fwctl.h
->   create mode 100644 include/uapi/fwctl/bnxt.h
->   create mode 100644 include/uapi/fwctl/fwctl.h
->   create mode 100644 include/uapi/fwctl/mlx5.h
-> 
-> 
-> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-
+> >   }
+> >
+> >   /**
+> > @@ -6079,8 +6085,8 @@ static int e1000_change_mtu(struct net_device *ne=
+tdev, int new_mtu)
+> >       return 0;
+> >   }
+> >
+> > -static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *if=
+r,
+> > -                        int cmd)
+> > +static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr,
+> > +                    int cmd)
+> >   {
+> >       struct e1000_adapter *adapter =3D netdev_priv(netdev);
+> >       struct mii_ioctl_data *data =3D if_mii(ifr);
+> > @@ -6140,7 +6146,8 @@ static int e1000_mii_ioctl(struct net_device *net=
+dev, struct ifreq *ifr,
+> >   /**
+> >    * e1000e_hwtstamp_set - control hardware time stamping
+> >    * @netdev: network interface device structure
+> > - * @ifr: interface request
+> > + * @config: timestamp configuration
+> > + * @extack: netlink extended ACK report
+> >    *
+> >    * Outgoing time stamping can be enabled and disabled. Play nice and
+> >    * disable it when requested, although it shouldn't cause any overhea=
+d
+> > @@ -6153,20 +6160,18 @@ static int e1000_mii_ioctl(struct net_device *n=
+etdev, struct ifreq *ifr,
+> >    * specified. Matching the kind of event packet is not supported, wit=
+h the
+> >    * exception of "all V2 events regardless of level 2 or 4".
+> >    **/
+> > -static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq=
+ *ifr)
+> > +static int e1000e_hwtstamp_set(struct net_device *netdev,
+> > +                            struct kernel_hwtstamp_config *config,
+> > +                            struct netlink_ext_ack *extack)
+> >   {
+> >       struct e1000_adapter *adapter =3D netdev_priv(netdev);
+> > -     struct hwtstamp_config config;
+> >       int ret_val;
+> >
+> > -     if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+> > -             return -EFAULT;
+> > -
+> > -     ret_val =3D e1000e_config_hwtstamp(adapter, &config);
+> > +     ret_val =3D e1000e_config_hwtstamp(adapter, config, extack);
+> >       if (ret_val)
+> >               return ret_val;
+> >
+> > -     switch (config.rx_filter) {
+> > +     switch (config->rx_filter) {
+> >       case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+> >       case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+> >       case HWTSTAMP_FILTER_PTP_V2_SYNC:
+> > @@ -6178,38 +6183,23 @@ static int e1000e_hwtstamp_set(struct net_devic=
+e *netdev, struct ifreq *ifr)
+> >                * by hardware so notify the caller the requested packets=
+ plus
+> >                * some others are time stamped.
+> >                */
+> > -             config.rx_filter =3D HWTSTAMP_FILTER_SOME;
+> > +             config->rx_filter =3D HWTSTAMP_FILTER_SOME;
+> >               break;
+> >       default:
+> >               break;
+> >       }
+> >
+> > -     return copy_to_user(ifr->ifr_data, &config,
+> > -                         sizeof(config)) ? -EFAULT : 0;
+> > +     return 0;
+> >   }
+> >
+> > -static int e1000e_hwtstamp_get(struct net_device *netdev, struct ifreq=
+ *ifr)
+> > +static int e1000e_hwtstamp_get(struct net_device *netdev,
+> > +                            struct kernel_hwtstamp_config *kernel_conf=
+ig)
+> >   {
+> >       struct e1000_adapter *adapter =3D netdev_priv(netdev);
+> >
+> > -     return copy_to_user(ifr->ifr_data, &adapter->hwtstamp_config,
+> > -                         sizeof(adapter->hwtstamp_config)) ? -EFAULT :=
+ 0;
+> > -}
+> > +     *kernel_config =3D adapter->hwtstamp_config;
+> >
+> > -static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr, i=
+nt cmd)
+> > -{
+> > -     switch (cmd) {
+> > -     case SIOCGMIIPHY:
+> > -     case SIOCGMIIREG:
+> > -     case SIOCSMIIREG:
+> > -             return e1000_mii_ioctl(netdev, ifr, cmd);
+> > -     case SIOCSHWTSTAMP:
+> > -             return e1000e_hwtstamp_set(netdev, ifr);
+> > -     case SIOCGHWTSTAMP:
+> > -             return e1000e_hwtstamp_get(netdev, ifr);
+> > -     default:
+> > -             return -EOPNOTSUPP;
+> > -     }
+> > +     return 0;
+> >   }
+> >
+> >   static int e1000_init_phy_wakeup(struct e1000_adapter *adapter, u32 w=
+ufc)
+> > @@ -7346,9 +7336,11 @@ static const struct net_device_ops e1000e_netdev=
+_ops =3D {
+> >   #ifdef CONFIG_NET_POLL_CONTROLLER
+> >       .ndo_poll_controller    =3D e1000_netpoll,
+> >   #endif
+> > -     .ndo_set_features =3D e1000_set_features,
+> > -     .ndo_fix_features =3D e1000_fix_features,
+> > +     .ndo_set_features       =3D e1000_set_features,
+> > +     .ndo_fix_features       =3D e1000_fix_features,
+> >       .ndo_features_check     =3D passthru_features_check,
+> > +     .ndo_hwtstamp_get       =3D e1000e_hwtstamp_get,
+> > +     .ndo_hwtstamp_set       =3D e1000e_hwtstamp_set,
+> >   };
+> >
+> >   /**
+> >
+>
+>
+> Also you are missing a subject prefix, I assume that you mean to send it
+> to iwl-next since it is not a bug fix. Please add it to your patch.
 
