@@ -1,231 +1,188 @@
-Return-Path: <netdev+bounces-165459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ED42A32242
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:34:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78AEFA32230
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 10:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91E033A7033
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:33:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A063A6226
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 09:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7F82063F4;
-	Wed, 12 Feb 2025 09:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622771F0E56;
+	Wed, 12 Feb 2025 09:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjTfijJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A7D1F1311;
-	Wed, 12 Feb 2025 09:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29EE2B9BC;
+	Wed, 12 Feb 2025 09:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739352818; cv=none; b=Fjm6FIQPtAPxafm6fI5pQujIhC04m5O9lEGK2/e5cyag6XS85YIkyswzSjJwRTd7eRzBfDhw/gUyNS3sY1YKaLuiJYeChREvaXosSohXbXhiiIxZbX67c9Vddem8FjgQrmPcR/72lQGQ7EZY+CZt94AAdvLKLgYyHAgV82jIqfE=
+	t=1739352725; cv=none; b=d1XLIMsw7B+siI9dXHqG/erQCI1cUbE20fw4ljlbiUw287/L2HRBdGvmfzxm1bXK5s0KkG8+NC107n3DSnJJtzvI2zZf8VMawm0WFXNTDlU8R4/4/gMd4HFYAS29qLehsGVw7ImbuPCzghSENsfthySFpIqmv5eYLssSD5+bLzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739352818; c=relaxed/simple;
-	bh=Hg6WYBnUALheHyD/7kcY/M+qg7WLjoBxxp+fryEYI0g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MXOFnRT+tL8oY+xYY11a+ezGpCkpzIU9G+3wtfYBBAV97bpPLkWFjQP7QlgRonigt9VkWCXQQLCQH/tu7JjgFf6Yu5Od3una3ONMMsSqO2ayyhEbKdG71lQe3FF/y7m2gnaSuz/LKsjcXkrPL/vOa1JlTXf79SPwXy6I14im1k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4YtCn567xSz20pj3;
-	Wed, 12 Feb 2025 17:34:01 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6C8C4140368;
-	Wed, 12 Feb 2025 17:33:32 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 12 Feb 2025 17:33:32 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Robin Murphy
-	<robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, IOMMU
-	<iommu@lists.linux.dev>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v9 4/4] page_pool: skip dma sync operation for inflight pages
-Date: Wed, 12 Feb 2025 17:25:51 +0800
-Message-ID: <20250212092552.1779679-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250212092552.1779679-1-linyunsheng@huawei.com>
-References: <20250212092552.1779679-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1739352725; c=relaxed/simple;
+	bh=9pTolNQ+XqJ4URq9Vk/Xw++m/9IEeXkG2WXe/BEl7xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jUUNhWxHwvdLoC86UjIVdQsVugkn1xYRqKOP3cNtspCI4CZ891gFAhUDrGT/8W90JiJL1x21nbmZHo2muYxJJrnoQPH1VgxPYod+dtC6EDt/N1J0AdTldqh/PwdkCWas+Vw/MgyG5LT3j325BDW7oV9cZ0vPuJcrKr253snisJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KjTfijJL; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2fa1c093d6eso7947465a91.0;
+        Wed, 12 Feb 2025 01:32:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739352723; x=1739957523; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5DmmKO72SaGBOzQSc/JkhpJVRIV+UZwXCKdV/BgHww=;
+        b=KjTfijJL71BIHyDbzQxawS3ZL3weSZokIxQ3i7bvPeMjQUt4fz7diUYb51IbRZKNdy
+         5dT17zvU7nJkxLBv1Sic2a28jp3/xf1b/iHK+A5H3qgKZ25GM+I1pWvMx0gsX6QI9AVP
+         +WYZ2+nx8LxojgDs6CF5LSx0YjIEGqGPqumC48FA9B3EOHuz3pz7YtbAOsGdo6M+Uffg
+         fhLXZdd4d5u6iHtLFo7Bd3Cbrcv8LMUGFQuSlEYh4pK2h02VR6hsz6WILFH57uTfk6O6
+         Dp6a9SeXG8bUfH5nKvmrAs63YAWCbva4IDibKjMFqGmM5Pg3sqRduk8YUnBkjRg7RnfB
+         HtpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739352723; x=1739957523;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V5DmmKO72SaGBOzQSc/JkhpJVRIV+UZwXCKdV/BgHww=;
+        b=X3HK6EXHGmUDs+6xN+ZAin9h1PsF9j4YRWKWyyppy1PGwoH7xNS0R0r9We0Xe/Yks6
+         /9syJbuoA5z0mHjc9AjAaFEmbuELlQff6e0/1leIh9ry4THcG6dXQEQk5ZTRDQxAcRwa
+         pmTDrEuOddLfr6rI1Ch9ahy1DFzLjQXv0dlCTOLi13AC5XRvu4euYgRq/ozWQxv0vExw
+         PvGcWzBCt+YqszK9Rs422A6bNVsS2YlSopPUlTJJfmU3gHhTwdH/KGfSodVYZVW+PyjT
+         jLdRKUrpOd7l+DO75C3v+fTDdxO71pv22b+3cxDYKPEAxn9xWPqm7lf3FVhSA33j/uOe
+         3u+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUAfxPNMBDITRcKiRiRaGMcFeAYGwIa/NA4JVEkFQvVHA1MJ4ZaBSPZKt6gT/tMuipOhnWBi/A1BG9S00i4@vger.kernel.org, AJvYcCUkezG5Y1aFc13AJl72BDw1wSI32WuGO43fXtALz12XKzWDXG1MKGcPZyQMK3D10CrbL6Y72WT2@vger.kernel.org, AJvYcCW5MTxGol+6uOBxInmevJuOIZ11TYO9YgCUizDLWYT0uct1I8S2uOn9g+Z2o7XfO/qSwv5Tn67ovpU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfDPRvJ/4BaObC/jA0dK4bJPAPj3Z/O4jeKwj7HEhow5JO5bik
+	IPZ9qWZN+yNP+LCj6HiFLBLxOlMzu6sc06sZmivuSLgXVzXgn1mi
+X-Gm-Gg: ASbGncve0sPLUK9V0uF76+iQ650VMHvfG517jj0/lJVWL/IISdwt1Zhbsbigv+gxQ39
+	6kbUJ0uFcJgYHevec8nXMQFi5beXnoYnr+sVv9Qp/fYbWKPP+OPxBXK/qnhvSTMJtij+A3y43Ju
+	/FyISpiFPFCxRHoD52ryLsFGbFfZ+8wnrDxy85wWWS+Lj1HSKGld6gNLsq4WiurW2lDUW65ohWf
+	oj7IIyYp2y4FPXx/GX1MXZMN3cOsbreq7QDOkn3Hxft6a4/JzeqklygXTD+aoB5cjTCXnJdOwnl
+	kSNRg9nmfxf8o+M=
+X-Google-Smtp-Source: AGHT+IHmRC7uaZIrF/FOX0ISVnivbMGm9aw43E3iyh18+4pTXlXSwaj4w0wma18l2IjmXtm4CB974w==
+X-Received: by 2002:a17:90b:4c04:b0:2f2:a796:26b with SMTP id 98e67ed59e1d1-2fbf5bc07famr3593478a91.1.1739352722791;
+        Wed, 12 Feb 2025 01:32:02 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fbf98b79easm1020925a91.14.2025.02.12.01.32.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 01:32:01 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id B1DE741F5559; Wed, 12 Feb 2025 16:31:54 +0700 (WIB)
+Date: Wed, 12 Feb 2025 16:31:54 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, rdunlap@infradead.org, ahmed.zaki@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] documentation: networking: Add NAPI config
+Message-ID: <Z6xqipobYH_Ood7A@archie.me>
+References: <CALALjgz_jtONSFLAhOTYFcfL2-UwDct9AxhaT4BFGOnnt2UF8A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cF2FwkLKTADE1R5c"
+Content-Disposition: inline
+In-Reply-To: <CALALjgz_jtONSFLAhOTYFcfL2-UwDct9AxhaT4BFGOnnt2UF8A@mail.gmail.com>
 
-Skip dma sync operation for inflight pages before the
-sync operation in page_pool_item_unmap() as DMA API
-expects to be called with a valid device bound to a
-driver as mentioned in [1].
 
-After page_pool_destroy() is called, the page is not
-expected to be recycled back to pool->alloc cache and
-dma sync operation is not needed when the page is not
-recyclable or pool->ring is full, so only skip the dma
-sync operation for the infilght pages by clearing the
-pool->dma_sync, as rcu sync operation in
-page_pool_destroy() is paired with rcu lock in
-page_pool_recycle_in_ring() to ensure that there is no
-dma sync operation called after rcu sync operation.
+--cF2FwkLKTADE1R5c
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-1. https://lore.kernel.org/all/caf31b5e-0e8f-4844-b7ba-ef59ed13b74e@arm.com/
-CC: Robin Murphy <robin.murphy@arm.com>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-CC: IOMMU <iommu@lists.linux.dev>
-Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- net/core/page_pool.c | 56 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 42 insertions(+), 14 deletions(-)
+On Tue, Feb 11, 2025 at 08:06:03PM +0000, Joe Damato wrote:
+> diff --git a/Documentation/networking/napi.rst
+> b/Documentation/networking/napi.rst
+> index f970a2be271a..d0e3953cae6a 100644
+> --- a/Documentation/networking/napi.rst
+> +++ b/Documentation/networking/napi.rst
+> @@ -171,12 +171,43 @@ a channel as an IRQ/NAPI which services queues
+> of a given type. For example,
+>  a configuration of 1 ``rx``, 1 ``tx`` and 1 ``combined`` channel is expe=
+cted
+>  to utilize 3 interrupts, 2 Rx and 2 Tx queues.
+>=20
+> +Persistent NAPI config
+> +----------------------
+> +
+> +Drivers often allocate and free NAPI instances dynamically. This leads t=
+o loss
+> +of NAPI-related user configuration each time NAPI instances are realloca=
+ted.
+> +The netif_napi_add_config() API prevents this loss of configuration by
+> +associating each NAPI instance with a persistent NAPI configuration base=
+d on
+> +a driver defined index value, like a queue number.
+> +
+> +Using this API allows for persistent NAPI IDs (among other settings), wh=
+ich can
+> +be beneficial to userspace programs using ``SO_INCOMING_NAPI_ID``. See t=
+he
+> +sections below for other NAPI configuration settings.
+> +
+> +Drivers should try to use netif_napi_add_config() whenever possible.
+> +
+>  User API
+>  =3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+>  User interactions with NAPI depend on NAPI instance ID. The instance IDs
+>  are only visible to the user thru the ``SO_INCOMING_NAPI_ID`` socket opt=
+ion.
+> -It's not currently possible to query IDs used by a given device.
+> +
+> +Users can query NAPI IDs for a device or device queue using netlink. Thi=
+s can
+> +be done programmatically in a user application or by using a script incl=
+uded in
+> +the kernel source tree: ``tools/net/ynl/pyynl/cli.py``.
+> +
+> +For example, using the script to dump all of the queues for a device (wh=
+ich
+> +will reveal each queue's NAPI ID):
+> +
+> +.. code-block:: bash
+> +
+> +   $ kernel-source/tools/net/ynl/pyynl/cli.py \
+> +             --spec Documentation/netlink/specs/netdev.yaml \
+> +             --dump queue-get \
+> +             --json=3D'{"ifindex": 2}'
+> +
+> +See ``Documentation/netlink/specs/netdev.yaml`` for more details on
+> +available operations and attributes.
+>=20
+>  Software IRQ coalescing
+>  -----------------------
+>=20
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 3109bf015225..01cb8404924d 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -281,9 +281,6 @@ static int page_pool_init(struct page_pool *pool,
- 	/* Driver calling page_pool_create() also call page_pool_destroy() */
- 	refcount_set(&pool->user_cnt, 1);
- 
--	if (pool->dma_map)
--		get_device(pool->p.dev);
--
- 	if (pool->slow.flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM) {
- 		/* We rely on rtnl_lock()ing to make sure netdev_rx_queue
- 		 * configuration doesn't change while we're initializing
-@@ -330,9 +327,6 @@ static void page_pool_uninit(struct page_pool *pool)
- {
- 	ptr_ring_cleanup(&pool->ring, NULL);
- 
--	if (pool->dma_map)
--		put_device(pool->p.dev);
--
- #ifdef CONFIG_PAGE_POOL_STATS
- 	if (!pool->system)
- 		free_percpu(pool->recycle_stats);
-@@ -480,6 +474,16 @@ static void page_pool_item_unmap(struct page_pool *pool)
- 	if (!pool->dma_map || pool->mp_priv)
- 		return;
- 
-+	/* After page_pool_destroy() is called, the page is not expected to be
-+	 * recycled back to pool->alloc cache and dma sync operation is not
-+	 * needed when the page is not recyclable or pool->ring is full, skip
-+	 * the dma sync operation for the infilght pages by clearing the
-+	 * pool->dma_sync, and the below synchronize_net() is paired with rcu
-+	 * lock when page is recycled back into ptr_ring to ensure that there is
-+	 * no dma sync operation called after rcu sync operation.
-+	 */
-+	pool->dma_sync = false;
-+
- 	/* Paired with rcu read lock in __page_pool_release_page_dma() to
- 	 * synchronize dma unmapping operations.
- 	 */
-@@ -764,6 +768,25 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
- 		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
- }
- 
-+static __always_inline void
-+page_pool_dma_sync_for_device_rcu(const struct page_pool *pool,
-+				  netmem_ref netmem,
-+				  u32 dma_sync_size)
-+{
-+	if (!pool->dma_sync || !dma_dev_need_sync(pool->p.dev))
-+		return;
-+
-+	rcu_read_lock();
-+
-+	/* Recheck the dma_sync under rcu lock to pair with rcu sync operation
-+	 * in page_pool_destroy().
-+	 */
-+	if (pool->dma_sync)
-+		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
-+
-+	rcu_read_unlock();
-+}
-+
- static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
- {
- 	struct page_pool_item *item;
-@@ -1001,7 +1024,8 @@ void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
- 	 */
- }
- 
--static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
-+static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem,
-+				      unsigned int dma_sync_size)
- {
- 	int ret;
- 	/* BH protection not needed if current is softirq */
-@@ -1010,12 +1034,12 @@ static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
- 	else
- 		ret = ptr_ring_produce_bh(&pool->ring, (__force void *)netmem);
- 
--	if (!ret) {
-+	if (likely(!ret)) {
-+		page_pool_dma_sync_for_device_rcu(pool, netmem, dma_sync_size);
- 		recycle_stat_inc(pool, ring);
--		return true;
- 	}
- 
--	return false;
-+	return !ret;
- }
- 
- /* Only allow direct recycling in special circumstances, into the
-@@ -1068,10 +1092,10 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
- 	if (likely(__page_pool_page_can_be_recycled(netmem))) {
- 		/* Read barrier done in page_ref_count / READ_ONCE */
- 
--		page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
--
--		if (allow_direct && page_pool_recycle_in_cache(netmem, pool))
-+		if (allow_direct && page_pool_recycle_in_cache(netmem, pool)) {
-+			page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
- 			return 0;
-+		}
- 
- 		/* Page found as candidate for recycling */
- 		return netmem;
-@@ -1127,7 +1151,7 @@ void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
- 
- 	netmem =
- 		__page_pool_put_page(pool, netmem, dma_sync_size, allow_direct);
--	if (netmem && !page_pool_recycle_in_ring(pool, netmem)) {
-+	if (netmem && !page_pool_recycle_in_ring(pool, netmem, dma_sync_size)) {
- 		/* Cache full, fallback to free pages */
- 		recycle_stat_inc(pool, ring_full);
- 		page_pool_return_page(pool, netmem);
-@@ -1153,14 +1177,18 @@ static void page_pool_recycle_ring_bulk(struct page_pool *pool,
- 	/* Bulk produce into ptr_ring page_pool cache */
- 	in_softirq = page_pool_producer_lock(pool);
- 
-+	rcu_read_lock();
- 	for (i = 0; i < bulk_len; i++) {
- 		if (__ptr_ring_produce(&pool->ring, (__force void *)bulk[i])) {
- 			/* ring full */
- 			recycle_stat_inc(pool, ring_full);
- 			break;
- 		}
-+
-+		page_pool_dma_sync_for_device(pool, bulk[i], -1);
- 	}
- 
-+	rcu_read_unlock();
- 	page_pool_producer_unlock(pool, in_softirq);
- 	recycle_stat_add(pool, ring, i);
- 
--- 
-2.33.0
+Looks good, thanks!
 
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--cF2FwkLKTADE1R5c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZ6xqgQAKCRD2uYlJVVFO
+o81lAP4z/yUAyaOjOOztxdyySiDTD32H5qQDDqSlytkoDtTUjAD9HiD25Uc/PYP3
+amQcPLgp9Og74lJ41fy+4Yw+Lil98ww=
+=e5TW
+-----END PGP SIGNATURE-----
+
+--cF2FwkLKTADE1R5c--
 
