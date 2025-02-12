@@ -1,62 +1,137 @@
-Return-Path: <netdev+bounces-165705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A9F3A332B9
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:34:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09579A332DA
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:45:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02A447A285B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:33:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CBC63A4AE9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4816204086;
-	Wed, 12 Feb 2025 22:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F5721480C;
+	Wed, 12 Feb 2025 22:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XeuB0rWW"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LUNIucAr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36EB1FFC59
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC53B204582
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739399666; cv=none; b=LAIcOMgVQHuBdIW7N/AtFsJgi58GISeSxNvMSMnDl6+I1zz3xjeOyRNXxBHCePw7qb/XE/EwXS55XUSWb9ih4xKYRBKeF6epW5vGQ+infb137Q0Hz0deVWwz8b8IzDlIv1o9mAFvUxqC2yiS6sn/ONPLmgAitIrevn2FEJDv19M=
+	t=1739400319; cv=none; b=PIjTLOh2hKup6gmgO0XJc7KJs9VMaxY3B+SEqrcFsPjpl7fGqhIQP3r/AkiPhdsj1EouPizkhN3NFw0GxEldFUUpbx4WpS2lXk2MGZ/PHLbFDWFsaLkmkf32paSdwjDvPInrjZxZr5uEwzVYSidz2mZj5IxBVZ6Z2tfXYNKjLes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739399666; c=relaxed/simple;
-	bh=FpGKY+sTkvZImSJW0DdMUosikAOQrEExtE06HFGtmmM=;
+	s=arc-20240116; t=1739400319; c=relaxed/simple;
+	bh=TrYhj9YtDhjs2+zWIm8UW+a8Ijj+74m1trvWbyQOCSY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GIxWEGguKGQ1oI8oM+EMbOiJq8NcfO5uJXCh6yB5NiFrfbEOr8WBqpi3m2vS7qmi7lXQzVToUHGL+xTA+9pdatmN8M6LZEonSWk85Joet5Wl4yZzs88w4fxiUuIAHjG25hSfuHnT2UmAwECIcP5BBuWC8zh36LDsV8bHgr+TX7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XeuB0rWW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GdCuUfOaA3CLNlzAqIMj780+oKCRDr01MGaKBeFrH9g=; b=XeuB0rWW5G3kR+WFOcZvfHMIlI
-	UaKpMztMDjNb2lr+jsCPuhv3WuT8TOHPLJqzgKYoNBnI8lHMV11JSb/EVZLmQUBl4y1cLnfgie44Z
-	lY44QDi7av2C6yHOdFzgEdDxuUR1J8KJabkybzQrwpU75EBUOXOBAd5KEq/EA3+LWzS4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiLJ8-00DX3k-2p; Wed, 12 Feb 2025 23:34:14 +0100
-Date: Wed, 12 Feb 2025 23:34:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v6 6/7] net: selftests: Export
- net_test_phy_loopback_*
-Message-ID: <464ec7ed-2943-4696-a198-2495d4035f91@lunn.ch>
-References: <20250209190827.29128-1-gerhard@engleder-embedded.com>
- <20250209190827.29128-7-gerhard@engleder-embedded.com>
- <d6cb7957-1a54-4386-8e10-17cea49851df@lunn.ch>
- <b18971f2-0edf-4fa7-be1b-eec8392665f0@engleder-embedded.com>
- <c1229fd9-2f65-40dd-bbb5-9f0f3e3b2c2c@lunn.ch>
- <09a4cd33-3170-4f87-a84b-5e1734d97206@engleder-embedded.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BKq3Cw7Yai7jk2U2SmQOWhEiSpJ0o7UNoiYWADQE7aHVBpdfDFOvP+kfEiMv329zQdl3pDzS73onnPOzi7AQCbVLSoPc7/Y+mqaZ7tIZIKs1HGoKJDZLFpTsWBUYS+FAjdLn5o0N3oS/G/FrlzEvCRSimOkm58FvCGgz86+dnNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LUNIucAr; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f6f18b474so2172395ad.1
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 14:45:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1739400317; x=1740005117; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wxmsI4n3mNC29jNhrwky8mt9Y2e3VkJ4dixbH6NADTc=;
+        b=LUNIucArorYsj2QN+oCyqiEc2Od7dBSV+ZjPnevnjEjxbZhfKGMumO2ZzVzkBwu/Ey
+         2lInL35zv8oPciwRZn/7czzNrsBg+nlUyMwCvc8zzgRTmklGBobSmcg3iOYgZdCCf16p
+         1F3mY7XrLro9P7leQ6T6w4g4vxBH8hqzj8j+s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739400317; x=1740005117;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxmsI4n3mNC29jNhrwky8mt9Y2e3VkJ4dixbH6NADTc=;
+        b=Ev2DrDrc1RH0aLdI0z/S0eUm6ZxHRkDdzIX12IcbZkNocQEDRFbh4kTdUwIdmWaWhb
+         xpoEURYuDlfiJvDnKRmIxJ/mHyZMkwdC0lBFtkbjr7dLMp3fFh9QKWT5R7WA0Hxmi8yJ
+         g/4aQLiEas/znZhqqdFBYi5oEgRhknujPXx3jd67MH7VVHw5cZrGW070mP3cgDtGBQcn
+         nF123UNdsqzC8D1hyN8Bm00JyHp45LEM5TXlT3Hr+eJL8vle935+n1UoHhOybwir+ufo
+         Zs3Z2VsKLWaMHHCQomsnIHTTS5C2y/luKDzOyC4sy8vqQm8afclkQB4l5/79vVmQUsvY
+         SSbg==
+X-Gm-Message-State: AOJu0YxFtJkmjJMzBsawja3m41ACh7jlmv0AhDPaoyB8V4wYUg5/IgfF
+	oUZt7284hEXW0wmjczLgzv26A97Y1VgimAmGQfdaDOUFQB6WtaWIa7MaVpREn0A=
+X-Gm-Gg: ASbGncs+CL1u9pKKy4JchmIq/avYLCUQQCZnwvN84kVcrJyJ0ImGJTKtnz1ZJ5GBZgV
+	5OxYJx0W9QBgr4uSZk8w8X3Yg4IIH+Unb15vWKivaaCBW+jHpUKzBdNLjX9oY+eNycDOtirt/eA
+	XnAXvda0L9uBCSTxLYpSCQq+KkULFgDa4rwGHqbrkwV1V29hl0Vw86GARj1+FnLNSM3uICElSFD
+	0N25qrm3JwOYUfGbxbReGekSrzMF0fzCiL3CRPAmxsjYd63OR+ODX55BQ+XjzY0CC0I+vGsgN2w
+	rXNJ0ETHAwkt+9gngFqdD79O3xEsy1+P1ybspAYanHzwJnd+DPp4tQSBPQ==
+X-Google-Smtp-Source: AGHT+IFUBiyhDYvXIFj3i8/1IXRfWTJGO1CJwO79pTr/N2oVci7/x1idO4rC9J9iW9gid4RM7SPniA==
+X-Received: by 2002:a17:902:f682:b0:220:cab1:810e with SMTP id d9443c01a7336-220cab18355mr25527595ad.6.1739400316978;
+        Wed, 12 Feb 2025 14:45:16 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d55858d6sm541515ad.223.2025.02.12.14.45.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 14:45:16 -0800 (PST)
+Date: Wed, 12 Feb 2025 14:45:12 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Stefano Jordhani <sjordhani@gmail.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Mina Almasry <almasrymina@google.com>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:IO_URING" <io-uring@vger.kernel.org>,
+	"open list:XDP SOCKETS (AF_XDP)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: use napi_id_valid helper
+Message-ID: <Z60keJDOL_50cGbY@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stefano Jordhani <sjordhani@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Mina Almasry <almasrymina@google.com>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:IO_URING" <io-uring@vger.kernel.org>,
+	"open list:XDP SOCKETS (AF_XDP)" <bpf@vger.kernel.org>
+References: <CAEEYqun=uM-VuWZJ5puHnyp7CY06fr5kOU3hYwnOG+AydhhmNA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,62 +140,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <09a4cd33-3170-4f87-a84b-5e1734d97206@engleder-embedded.com>
+In-Reply-To: <CAEEYqun=uM-VuWZJ5puHnyp7CY06fr5kOU3hYwnOG+AydhhmNA@mail.gmail.com>
 
-On Wed, Feb 12, 2025 at 10:36:00PM +0100, Gerhard Engleder wrote:
-> On 12.02.25 21:46, Andrew Lunn wrote:
-> > > Reusing the complete test set as extension is not feasible as the first
-> > > test requires an existing link and for loopback test no link is
-> > > necessary. But yes, I can do better and rework it to reusable tests.
-> > > I'm not sure if I will use ethtool_test_flags as IMO ideally all tests
-> > > run always to ensure easy use.
-> > 
-> > We try to ensure backwards/forwards compatibly between ethtool and the
-> > kernel.
-> > 
-> > The point about ethtool_test_flags is that for older versions of
-> > ethtool, you have no idea what the reserved field contains. Has it
-> > always been set to zero? If there is a flag indicating reserved
-> > contains a value, you then know it is safe to use it.
+On Wed, Feb 12, 2025 at 04:15:05PM -0500, Stefano Jordhani wrote:
+> In commit 6597e8d35851 ("netdev-genl: Elide napi_id when not present"),
+> napi_id_valid function was added. Use the helper to refactor open-coded
+> checks in the source.
 > 
-> I'm not sure if I understand the last sentence. Do you mean it is safe
-> to use a flag that was previously marked as reserved if the clients did
-> set it to zero, but for ethtool_test_flags this is not the case?
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Stefano Jordhani <sjordhani@gmail.com>
+> ---
+>  fs/eventpoll.c            | 8 ++++----
+>  include/net/busy_poll.h   | 4 ++--
+>  io_uring/napi.c           | 4 ++--
+>  net/core/dev.c            | 6 +++---
+>  net/core/netdev-genl.c    | 2 +-
+>  net/core/page_pool_user.c | 2 +-
+>  net/core/sock.c           | 2 +-
+>  net/xdp/xsk.c             | 2 +-
+>  8 files changed, 15 insertions(+), 15 deletions(-)
 
-We have:
+Thanks for the cleanup. As far as I can tell, LGTM.
 
-struct ethtool_test {
-	__u32	cmd;
-	__u32	flags;
-	__u32	reserved;
-	__u32	len;
-	__u64	data[];
-};
-
-where flags takes a bitmap from:
-
-enum ethtool_test_flags {
-	ETH_TEST_FL_OFFLINE	= (1 << 0),
-	ETH_TEST_FL_FAILED	= (1 << 1),
-	ETH_TEST_FL_EXTERNAL_LB	= (1 << 2),
-	ETH_TEST_FL_EXTERNAL_LB_DONE	= (1 << 3),
-};
-
-I've not looked at ethtool, but it is possible the struct ethtool_test
-is on the stack, or the heap, and not zeroed. So reserved contains
-random junk. flags is however given a value, bad things would happen
-otherwise. So we know the bits which are currently unused should be
-zero. A new flag can be added, which indicates user space wants to set
-the speed, and that the speed is in the reserved field. Without the
-flag being set, reserved contains random junk, with it set, we know we
-have a version of ethtool which sets it to a specific value.
-
-It might however be that we cannot rename reserved, it is now part of
-the kAPI, and changing it to another name would break the compilation
-of something. That is one of the advantages of netlink API, you can
-add new attributes without having to worry about breaking older
-builds. Unfortunately, the self test is still using the IOCTL, it has
-not been converted to netlink.
-
-    Andrew
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
