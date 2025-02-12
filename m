@@ -1,133 +1,188 @@
-Return-Path: <netdev+bounces-165502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01F5A32620
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:45:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEA1A32623
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D15168812
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:45:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CC43A4556
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C7A20D4E0;
-	Wed, 12 Feb 2025 12:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D2B1E87B;
+	Wed, 12 Feb 2025 12:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="PJjHheBp"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="yZCqFt1D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B572046BE;
-	Wed, 12 Feb 2025 12:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33587B673;
+	Wed, 12 Feb 2025 12:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739364330; cv=none; b=omiyqU4ZVyiB610Qe6zH+LLCSnivOw+W+YBsrJW0gIas7gaXt+6ysFQg8ZKb80acvn4g+bdkPamCtpTdi42TvEcSWOUjyr6bHo+tE2vjX2rJYqlGnkdNmrrIn8jlPFynkm9P6QE9IE6F+Jc9nvx2693TINqmZ9oGszenZ7CBXw8=
+	t=1739364420; cv=none; b=HzqlnEl/AEBptXdAkbt1Kl/Ce20HJ5URIZpU9pJHuvAo+2WqIvAhU3uRAaSuvRFAlr+DsuOswEVPWpNdbLWZYDUi3J7d8IIhVz0T10FMx46Gi1BS/WHEJhJuTDS2/OyNX9i8JQMdcUt8jnSu3kkCjvP/OL0XwfiTWEgTPM3VWks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739364330; c=relaxed/simple;
-	bh=4JRn5iL42MJEpQHlbzIijk4WcEtoHNrpGhgeTaJH47M=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=r2/JbVqMSDLPLHyGSqV9jXDstHlAd64rocxTlC0NLJOZQXFF1CB5oyy35kJDLg/eh+m88OtI8WMwdjU73+Qf0e4m8dj6FiW2LvvMbbSygEk47DGYhx+Zda7JRRyus9bRnY6MjcbbrpHhzvaJgKr+j8EGtrwt0xLV26ys04OcQF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=PJjHheBp; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1739364319; x=1739969119; i=markus.elfring@web.de;
-	bh=4JRn5iL42MJEpQHlbzIijk4WcEtoHNrpGhgeTaJH47M=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=PJjHheBpgdSXsx+Umol8T4yAdHWvj+q6JEM1R+fHcAJj4aShKG2t7Fbc7E8cHDVU
-	 U9AqmWFUcHLiRk9Cy3Vq9gNuajj1WxIbXcUhJwQUuLqpVEorfg06OS2NV+TSvlHdU
-	 pfb2kdngqIh0l6u3BCSNviBVtM1Q6dIG2coiN3FFz5dSxCSvzWmomdA31f/ldG50Z
-	 EAucS96Ngx7tWglfg8YWhsLnk9OhovsbTfUz4IfUIA5Wb/zJVgLnlwFquyttjDeQB
-	 zjjE9Ffof7JcnCS1f+8N97nHo+Vc05RqLxWx5IP3vbVbj6HpduET0hbrrfUxuN+3r
-	 6l8n5xq2K8M3dChoPA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.11]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M5j5y-1tkvvo3XqM-00EmgE; Wed, 12
- Feb 2025 13:45:18 +0100
-Message-ID: <93a7e08f-8a3b-42cc-8d36-f570f02087c8@web.de>
-Date: Wed, 12 Feb 2025 13:45:18 +0100
+	s=arc-20240116; t=1739364420; c=relaxed/simple;
+	bh=abNS+SlQsH7zUv/rrq3F4u5WzmNh3AVn3E329/VKTRI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=fbp2Wg/DV293bfqVQkl2tGattU+S0sOdYKc497TJqo4p5eu6MO3x8PduAyC13zwtbuldYSwUPJiZXzbkFbL5EoeboV4PKz5ULmd6dSc1E2MgwUwBqUVmo2OXK9GPKMbLZDdcDPNzSluR78nJokiuxH1LGm37QyriCGlw7cq/eUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=yZCqFt1D; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id 736191077FB9;
+	Wed, 12 Feb 2025 15:46:54 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 736191077FB9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1739364414; bh=gbwi/FK25uRXyNl2UyXm8Vw8PER/cVoK4GZhMFjqzPo=;
+	h=From:To:CC:Subject:Date:From;
+	b=yZCqFt1DuPdRAU7nD+lSWy929B5w/nSk9k6AZMw/CYmK/ipBDMk1NUa+gG56QAsmz
+	 92ubghJz4NPLkIbS0asZCOhBnSH43esIEkpFZIJ/SXN1+5iss2AI679lPt20y36sQj
+	 5KkotLJAMvWGGSEA1/no9ygdOztFMHvcBq/+GrIU=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id 707423045337;
+	Wed, 12 Feb 2025 15:46:54 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: Neil Horman <nhorman@tuxdriver.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Subject: [PATCH net] drop_monitor: fix incorrect initialization order
+Thread-Topic: [PATCH net] drop_monitor: fix incorrect initialization order
+Thread-Index: AQHbfUwxqBopjNb91026ifHBiYFNFQ==
+Date: Wed, 12 Feb 2025 12:46:54 +0000
+Message-ID: <20250212124653.297647-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Chenyuan Yang <chenyuan0y@gmail.com>, linux-gpio@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- Angelo Gioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Linus Walleij <linus.walleij@linaro.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Zijie Zhao <zzjas98@gmail.com>
-References: <20250210232552.1545887-1-chenyuan0y@gmail.com>
-Subject: Re: [PATCH] pinctrl: Fix potential NULL pointer dereference
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250210232552.1545887-1-chenyuan0y@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:rgoJ3QjOvQt09jtD0DLsUfO5e7MhvKcjufuUn6etTbSAzv4U3ac
- mZO2uQndJA0ga8cEN0mJUO7oXcxaYpMFY4RDMlOyxT+a4HIL4TGFY4vQPnpx0TxVMaDme/N
- 2oE4qiIj6hRvywCy1WMJoEMADsVbNlUwrGdl4la3Ogabz//TqoALd2fRq5spvNDS0GXlS9V
- n8BGpZnWcfcJeldkOI+Bg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:D62wot44SxI=;8nMv1FZOUoEfbybwFK41pXY7feP
- d/BWTy/ImuK4OscXNFI38Xsa90iI36mjKKyFNI0bPSN/TjPL5C519qpb3RVGa6zAIfrBmlmeJ
- sUNCUJBtKWIS9jkIMMGW9vUBSnJf+OeUtmSUe292FVTiHLl57aDN1dK2AQ2KRzwhFuH9ALz8D
- jaBb6kWanEwB6un6a8dvylEiAJL/4WExurSjoAPKbNWXaNr16dqTf1CGNRZix0YAhumzYMHYj
- g2d/Y1sfDSxZJe22alEHkOfWfkghKY0mWmdo/1cphaUoRNDUij9QYbmOphuQIwP+kV9uz97cQ
- ZzBPrSvGWlIseb2YFPW8Gk/LHpLiDRGwx6eGDae1oMezV7T1huDhSl8rEn4XvYGno74Qs009a
- fJ8zYam0zHV8pwEj1nhm7njhdgUT5/F/jz+vgoamr1bKKagjb0a2oK8YvjGOU1HgHAXRkqj96
- w5h2vg0ZprrCVqva+er7ymeDBteHG14HikBBHX38JMH+1ZMq8+G9eceRM/sGhXTSPtPOx8KSM
- aX2Y4epXX+DE7i2nD45dHh5UwcMzsPlPjz1sUJcGgy5cuJTDdn6snivIrR8WrRZztEOHxgDRK
- hf5pH8Xk3EqI8TnKGOPupUOUb1+mTbfsaf+2s8NFufajv7/5KjvMHcJLrD2aY4ha6uXAIQM9q
- g1Xmm+aiZW2S8E50DbxYtH10UDdOX3v1ByxFj2RsYu/z2olaf7n27tth3pCc6pphLAH7xrjrM
- hmj4NN9sKPyD/OVNIxk9IPWV2qCa4D58Odte99iRPUzv3mFdyPAfi32bZF1yp/BnW334i6hkY
- 5LdKCxqHpLp1MPSNHBNARN6ZOJTm4C/7/k0HJWzwNgr6P8Z25jG5r56wkQ92hwspGUhxz2VXU
- xoODn8+KDzgUxfcdoXRyXE4XUQVs73s56X2GdxqxjbKjPk7LSFRR9vbZHSPbrhfru0doStKj9
- 0FcSNa274heNYQG317LjsmIrhvuai1WJffle1FiZ6R3bfo/3goHC8tStc+3zKO5IZ94FAENWD
- hc9UW7SAXqZR5AUBHjmPiKVS4GLvRtFvKYhC1dA3fo/YoyVqPoEI6309ZlsicNVbHl91EoBZi
- 4RrK9UmrpBmxbqMud1afkbfyMLHFSoW6H1tE6awMURL6Qf8oOy/zQkG+fVTN62C2fZyKCZnXT
- 2ED5zeQZp7zHvHR6W2/50wp0f849FSAD0L6nYnwcpMM45d8tc3L61JGu3tu4yLJ5/X2X6kKm9
- swn73UsGU6FDm62xdjYfbcgMpDEzyDIVN0x+1ondfl0VnnfHTJNYXssze6O4QT7AxKMxSx0d3
- FHMwLtnTd+K80y45d0gRHNL/+umnxQCxX9HHBHnTghRAZdaIR987f/JYbhOevjhl9aYnnJlTi
- EL79gWpvgOLe2Eh5TSbJJoHCuoo3Ci8cQBvJRdSYB7jiJ8oL5xTWbQs50srgYQvjtO4B4jhTS
- xUzyDxw==
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2025/02/12 10:45:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/02/12 10:17:00 #27183182
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-> The `chip.label` could be NULL. Add missing check in the
-> rza2_gpio_register().
+Syzkaller reports the following bug:
 
-Another wording suggestion:
-The data structure member =E2=80=9Cchip.label=E2=80=9D could become NULL
-after a failed devm_kasprintf() call in the implementation
-of the function =E2=80=9Crza2_gpio_register=E2=80=9D.
-Thus add a check for such a return value.
+BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
+ lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu:=
+ 0
+CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+=
+ #1
+Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference=
+ Platform, BIOS 6.00 11/12/2020
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x119/0x179 lib/dump_stack.c:118
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
+ do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
+ _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
+ reset_per_cpu_data+0xe6/0x240 [drop_monitor]
+ net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
+ genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
+ genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
+ sock_sendmsg_nosec net/socket.c:651 [inline]
+ __sock_sendmsg+0x157/0x190 net/socket.c:663
+ ____sys_sendmsg+0x712/0x870 net/socket.c:2378
+ ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
+ __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
+ do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x62/0xc7
+RIP: 0033:0x7f3f9815aee9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 =
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
+f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
+RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
+RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
 
+If drop_monitor is built as a kernel module, syzkaller may have time
+to send a netlink NET_DM_CMD_START message during the module loading.
+This will call the net_dm_monitor_start() function that uses
+a spinlock that has not yet been initialized.
 
-How do you think about to add any tags (like =E2=80=9CFixes=E2=80=9D and =
-=E2=80=9CCc=E2=80=9D) accordingly?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.14-rc2#n145
+To fix this, let's place resource initialization above the registration
+of a generic netlink family.
 
+Found by InfoTeCS on behalf of Linux Verification Center
+(linuxtesting.org) with SVACE.
 
-Can a summary phrase like =E2=80=9CPrevent null pointer dereference in rza=
-2_gpio_register()=E2=80=9D
-be nicer?
+Fixes: 9a8afc8d3962 ("Network Drop Monitor: Adding drop monitor implementat=
+ion & Netlink protocol")
+Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+---
+ net/core/drop_monitor.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-
-> This is similar to commit 3027e7b15b02
-> ("ice: Fix some null pointer dereference issues in ice_ptp.c").
-> Besides, mediatek_gpio_bank_probe() in drivers/gpio/gpio-mt7621.c also
-> has a very similar check.
-
-I find such auxiliary information not so relevant here.
-
-Regards,
-Markus
+diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
+index 6efd4cccc9dd..9755d2010e70 100644
+--- a/net/core/drop_monitor.c
++++ b/net/core/drop_monitor.c
+@@ -1734,6 +1734,11 @@ static int __init init_net_drop_monitor(void)
+ 		return -ENOSPC;
+ 	}
+=20
++	for_each_possible_cpu(cpu) {
++		net_dm_cpu_data_init(cpu);
++		net_dm_hw_cpu_data_init(cpu);
++	}
++
+ 	rc =3D genl_register_family(&net_drop_monitor_family);
+ 	if (rc) {
+ 		pr_err("Could not create drop monitor netlink family\n");
+@@ -1749,11 +1754,6 @@ static int __init init_net_drop_monitor(void)
+=20
+ 	rc =3D 0;
+=20
+-	for_each_possible_cpu(cpu) {
+-		net_dm_cpu_data_init(cpu);
+-		net_dm_hw_cpu_data_init(cpu);
+-	}
+-
+ 	goto out;
+=20
+ out_unreg:
+@@ -1772,13 +1772,12 @@ static void exit_net_drop_monitor(void)
+ 	 * Because of the module_get/put we do in the trace state change path
+ 	 * we are guaranteed not to have any current users when we get here
+ 	 */
++	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
+=20
+ 	for_each_possible_cpu(cpu) {
+ 		net_dm_hw_cpu_data_fini(cpu);
+ 		net_dm_cpu_data_fini(cpu);
+ 	}
+-
+-	BUG_ON(genl_unregister_family(&net_drop_monitor_family));
+ }
+=20
+ module_init(init_net_drop_monitor);
+--=20
+2.39.5
 
