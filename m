@@ -1,534 +1,217 @@
-Return-Path: <netdev+bounces-165589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D7CA32A7D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:49:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5723AA32AE6
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 184B41611B7
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8919B1677D1
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 15:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8A7255E42;
-	Wed, 12 Feb 2025 15:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799AF25A622;
+	Wed, 12 Feb 2025 15:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I55bVViz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6VymOBh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0E921504F
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 15:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739375274; cv=fail; b=sVymXDSnfGHQQgv15D0XU3VyV19PyQrye+8UAtyFSxkZVbr2f1WiyKr5cGIRzzYBu3Kya/CyWeUKcMaAv0si+RB3LpHaDTpeaOUDhc8tM2GoY7BewOD+XR5LE3STwEftUKMryUDv5yDps0BRqTqBUxo0cZi3ve+D2G6gT0zIofY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739375274; c=relaxed/simple;
-	bh=7BwKoOMM4pADvw9dAGADKFWH29CqgH1vqB/CPRbLnt8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pCok+SoH9MI/tPyiaQsS1I47H2Wc7O/C6iKXBFDwt7UAw779LSEPzmMc3vWA5Pd+8YJ9CI0aGifJUSCW5aOuk7CtCW6CMB6FuNOZE1lA226SCVs87eLh3KmBLxvaV5OLXEQQHntxeBZD8q7cYolTMmXEOSRbiXReZ5EQQfF6crw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I55bVViz; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739375272; x=1770911272;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7BwKoOMM4pADvw9dAGADKFWH29CqgH1vqB/CPRbLnt8=;
-  b=I55bVVizWfAhNxcuQ8Fn5LupeyE2S6kAi4TMTi418wy7vG/fwX0kHv9N
-   Z6oLqaUixzjrf9k1TygiGl44vLFHxQghQdt+npOtRsjWR/28tElb/LMqU
-   lUQBhk1aVvaBMJMKU/JZ3TpVLz6rbm++M9E844Rnt6ELyfCjXrb7yFF32
-   Idf2MtT8+Po0qYmwoPbsU7jbd+/9pk4DiX9FJbjVS1CWGlR1YTqCXyXf/
-   9k5ISs09kCxoFdJurtM5Pr7PpmR4GUVPrv87aTHENsjWP52fPF+sRHFqe
-   oz1fP1DLLyYhf7BWo7nbxuzHVJh+olIqCDYU5c5M0gQVKZtXVG9Xf5FVs
-   Q==;
-X-CSE-ConnectionGUID: WPnx59hkSOeOQq5mrXv32Q==
-X-CSE-MsgGUID: UwVhwnweQ+Gg+ERfVnQJRA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="39922919"
-X-IronPort-AV: E=Sophos;i="6.13,280,1732608000"; 
-   d="scan'208";a="39922919"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 07:47:51 -0800
-X-CSE-ConnectionGUID: t+jR5tXOSqWF1QRsa6WYOg==
-X-CSE-MsgGUID: h01dRipFQIKCmZrH2d60Ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="117789986"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 07:47:51 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 12 Feb 2025 07:47:50 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 12 Feb 2025 07:47:50 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 12 Feb 2025 07:47:47 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n6htBn0BqbHE8zgXHTZlxRYoogi6e6pqVwoxTzeC4Lvx+iBjlxm4IZ4HsQT7Y/oJae596cn2O7iKQi7vFrmaUpOPdDIZlGkwd+rx1hNcXTwKX49I8x954XFcRVVo/Fp2EIMyoB3CgxKuOCi30fgjMQTWmCu2NKvG8uTbCW1GRObSjcI5mmnB2uyag17UWCn08yPCahMeOXCl5xFFCwqKv/N6u7bT4YhakFEym9+eXzjq/kYXRvAO4XAH6wt47PVRpT3eSTvoxjL1OOeEs3fY8PjyMwF4yYIcrjqI8nC9UPKu7TMU0zpsmedHnVQ/QitYq0mvTziI5inywgWpH/A6vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g2/nzlZ/C6zGRamf3dYe7GiaYRsU9+xsdtbsLng4jTM=;
- b=Fr6p4Xihk/E0DwmITkz5d2fX0ejxQNaFGN1OLcgkhMwnWGBB01fb0LDaXM1g/Rsv+TuoDO7XwXEIYgvbeon+Bt1aaErvDLVrTPMksk/jlJb6P0lfrab7yxtANegSbWAVLyJN5QLk1hM/dlBkOO1MccDMr7iO0PqilSbTLMdcc4UzDAE/w9GnZEt7dYFhFgBuo2w7ACyUBvOD6IIc8vAHdzB6PV0ksoHnkf70ghXHFMgq6mdEbOUr+HmSt3oBLgsDl+Dfdf7h75GxsEBJIARm3GiyVkJwCWWxS7swQGDFwAur2vVVITOY7nb7yvDR+FtH8/GQxvZYD5qUDxcVS6vMsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com (2603:10b6:8:f1::8) by
- BL1PR11MB5977.namprd11.prod.outlook.com (2603:10b6:208:384::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.19; Wed, 12 Feb
- 2025 15:47:43 +0000
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18]) by DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18%6]) with mapi id 15.20.8445.008; Wed, 12 Feb 2025
- 15:47:43 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>, "Polchlopek,
- Mateusz" <mateusz.polchlopek@intel.com>
-Subject: RE: [PATCH iwl-next v3 02/14] ixgbe: add initial devlink support
-Thread-Topic: [PATCH iwl-next v3 02/14] ixgbe: add initial devlink support
-Thread-Index: AQHbfVHxnRg9R1v3qEurn8j/j8wkurNDxYmAgAAIjJA=
-Date: Wed, 12 Feb 2025 15:47:42 +0000
-Message-ID: <DS0PR11MB7785E7F829BFD1A59AF16048F0FC2@DS0PR11MB7785.namprd11.prod.outlook.com>
-References: <20250212131413.91787-1-jedrzej.jagielski@intel.com>
- <20250212131413.91787-3-jedrzej.jagielski@intel.com>
- <cmywoei5shisdjbt7ipv6rmfxx6jgafu2ccb4xr3phq3ealx3n@kxsdwd6u5bgk>
-In-Reply-To: <cmywoei5shisdjbt7ipv6rmfxx6jgafu2ccb4xr3phq3ealx3n@kxsdwd6u5bgk>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7785:EE_|BL1PR11MB5977:EE_
-x-ms-office365-filtering-correlation-id: 563132f8-1cac-4317-bb80-08dd4b7c9681
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?hsCodac8+d3NpX4Q0XK5aFCZ/ifWXaqqfuFy1NGq7BlQy4MMe1PsQJcPHrjI?=
- =?us-ascii?Q?wdAcW3UOgIx+f/tMICiTzpijtGeI+4HO58rH9gBb8E1YOAR0v7klDiZHZMVS?=
- =?us-ascii?Q?rI2gNsefY8KpRuer1WJF5vKXUWOPOON74xsR7eSeIajDZLAsYEtGcAmS0Eu1?=
- =?us-ascii?Q?WqGtwvYFAkxLzFlM2K0KPNRmDhRN4UqND6ET5t41eNRysw7SPk/R857r8VUW?=
- =?us-ascii?Q?aCodIl2Bu2n1DQYHQnQo1D3S33+oW/kp2pFY0CiadbWumpP+DNu/GKtnn7jA?=
- =?us-ascii?Q?h50NpYW2pM1eCpkB+frZ5ug3suYX6vva2C5u/CUEtF5KDZoRgTUJJareSHQs?=
- =?us-ascii?Q?QxlCGHYfsFJkDKNXj3DEKMqaUA6joE+dj880SaualQSsG3OaFqXb71x72oyy?=
- =?us-ascii?Q?+/0GL7oIAGqk6k94S08LHXHv972sMeqdaO+Wm3HJRk28TlOtvbNzA2rTvTfU?=
- =?us-ascii?Q?jpiEDbwzm5MB2zS1kDr0kGxbPs8mVrj2ZbUImiAGqFL7nwfPIHXb5a2iHhuc?=
- =?us-ascii?Q?Qvq7MqKoQlNJn63JCFZEx7Zos/hmSwzSimh5SDnuA3wfXktgit2D6Q0j5kFZ?=
- =?us-ascii?Q?NKVQHlTH+OupE+cKF2pj2fgbD6axdLdRJ4EqYxkc0cTbVE5I1V23yJ0c3U7g?=
- =?us-ascii?Q?pKIMgUlNDwPEUlP1U7oLw83hb8IpS7Ju4F3006GJa76nyifCiFNaTb2jonoR?=
- =?us-ascii?Q?gLtmE3kv6I6kXgWfUMMHcVxKBm1bFiWEWBx2C1dCT+Zwh+ZK+flXqJzmxlfr?=
- =?us-ascii?Q?Ohly19ruDALPFNGPJPeslfPUtJX4+FkpzJT93HdmWWQ/PtWZM+rucFxTuAx7?=
- =?us-ascii?Q?yHmAUzY2EuSieTCRvzI9Te3PlYX70CIyPBQjFt4YP4z7j+K+72oQFp/zTVlB?=
- =?us-ascii?Q?rK4Di55vzCigGJkh22+/3iA/y8GulTLIK+/Gasnr4GLec4LiVlb0snaPxm0l?=
- =?us-ascii?Q?mK2Y6LcaCsoyawMPWfs/R7+oZvt/Pt7Ux3M+dxKPp6us20sOGRJm/NGV6xqa?=
- =?us-ascii?Q?B+fW9EDKwSgQCCuhFf3IZK8bQXXu2ZkwBxRaLJzzRUBloqE7CWvh4/N+xy/o?=
- =?us-ascii?Q?VZPLi5DIIY92ULyFJdQdqgyXatw8czDfsnq50lzQI7O/mZ5apBW/W/4iOmJK?=
- =?us-ascii?Q?Yrh587gYwp0zGDOVQxUKmvr8H/0svY0/S9EqQIvhqoblMM8uhzbaE2OjJMhJ?=
- =?us-ascii?Q?vnC5Kc+EA/tHii4XkfEMAecHSUCC0FgY1NwGYIjsaInWC2F06+Qlfo4rc8MZ?=
- =?us-ascii?Q?rgKEkHHqdtGI4/x5rYbntGdmKVE1uPg/wtrXwRa38v4cvHq7dl/2kEAtUUTR?=
- =?us-ascii?Q?lRdzBk4frTsF4TLstHXqWldk/E7y4ye6en6DMmz66NmINqqiLdv0OK2/cnJ4?=
- =?us-ascii?Q?gMBFiW/+Nm4XPEFpZgclsBwRdX1fl91DcpzIJB/nErC2zOrB40sGdRFs1K+v?=
- =?us-ascii?Q?c0CMpVSIR19TDp4UgHXrnI3WLmw8i0BN?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7785.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ifHPPz29z/OG0TxnqBdXMYGaiQ63CNLdxxzDgnqKr1DeBq5CE97N2PgRRiHG?=
- =?us-ascii?Q?rrxueeeahm3q6p05p304jL+D7lOd25/DwRRwbf1MRXTo8oU20irM5BewXChX?=
- =?us-ascii?Q?Um+WS1xA6UntXWYJaBnCB05vno4OQuusBk33wBPwIzYpNpuFG6J1gcnExqs+?=
- =?us-ascii?Q?avhNgAhqae1VuoGmf9JltCKSXS38PFeImxVv7Aznu0yPSakISi/zv0Yln1Zi?=
- =?us-ascii?Q?ynfOYRapfGb7kW/q7pcDRSzwFNhVKYynUG52Hn8zrIgzCBDkuObIo2NzL8S8?=
- =?us-ascii?Q?4WGxqkWPDkDSnelR6BRhSIsaGFjYJoO/8DQd8AKvDf7Mh6vvn9q7Zg4ZkwfE?=
- =?us-ascii?Q?krBZ+gPeht5S8kE/Z34b8jblC0Zr2MHTj+F7+2jdqIpokocLvtRWk/fgI8KK?=
- =?us-ascii?Q?gXCJFws8YAxU+FIHTOBU0d45rQuGxmBuH+p1IPu7fWhqbhbrUD5uhgDceCLp?=
- =?us-ascii?Q?+I7mSgKa9lHdQ75pxnLd0fS2UOqCCpXqG/4VMuIc++4alt8vFwWpXcNw3Anq?=
- =?us-ascii?Q?to4h/GqZY5Q1G7MMZeC1FZ3Wjg1BucIHDSONuEDm4IL26HxrEOWsd12X/UT/?=
- =?us-ascii?Q?7QTD9smypcubyeuBi27rJJlY1FnimiwsiJe9GEfO1JCZdmz6ycUJ1hLqk8WY?=
- =?us-ascii?Q?mP8FDIaPDx7awdqOg0F4qTRVglQs1S4IKCWH0kfryrHyncOZuTpvQftUYU0Y?=
- =?us-ascii?Q?ypD8EBYVWDMkiRQDpXVji0YpZZ+ZT63GLsQ8hYTnN55M2G7F8p3DdRUK3VKX?=
- =?us-ascii?Q?XXN0ticcxvUcOgqMPpgoJfyTHqVJdUSSYuQCa8tcpYPpzLII3xq6zYDxYGXn?=
- =?us-ascii?Q?eCXE142y0RzRlxHgxP57v5RkWglB1DO3iRdpGi0K3eJ/eB9A8WyoYOPVePwv?=
- =?us-ascii?Q?TZEf/lVPDEhf65CaF8vGNBydPaXUaGyn1ku8V0fIE68v3DsHjiL6f6L9SND2?=
- =?us-ascii?Q?nw9OR/NhJa3/HSCk4hCcR2WLNYt9CwZ6CSyqAXtjvVFQcVZ+zjBmTsYmrIVs?=
- =?us-ascii?Q?raVIC2olFIO2+Ocpz89xfLRHsO3WEnvWbjFNct9D6U2nAHTwrMX1LmRhUNZ0?=
- =?us-ascii?Q?myXmw1rr41+Gr+YqaPIV02AyYwtnQ7XDZFbyZzdnZFZ32GApklVMYbASSSZ3?=
- =?us-ascii?Q?Z8p8XSD984BQFW0oJF5sbfK62+YRniQKRkdAMX3aBEsUJU/TGHraL/1b2enV?=
- =?us-ascii?Q?6m+D0MetWUWzkprqt5wl4EXSWtIJAq9Fa6sfAA+GMhs5+6mj+NkiFw+Rl9oe?=
- =?us-ascii?Q?lGnFqDphBwURDZdKVlazQtCpsrasIILRve5oGrPFnghuKTL75O00nNy+Hc2v?=
- =?us-ascii?Q?eiIrDQyKIyqK4Un4b6QXdMmpn9DuoxVD8rvvqc4ks1XCWFnddvtLwSeWdZSi?=
- =?us-ascii?Q?o2YAlSGS1HYf0ycCNVl3E+r6RKBBdMDfFwqJrH3geE+AZILA01w8sXBy77/e?=
- =?us-ascii?Q?tEOe0GUIr6jmxjExXOGUbCBr5rStGwiAHCVRZDH0yXImuOLpYd0YKlfRm2KR?=
- =?us-ascii?Q?g06q1SMUq3WY1KTg9ofTluPlfkOM63kgvSNUngvWdO3yIqkRKv7OVr2mNJ7w?=
- =?us-ascii?Q?MCWMDgjH9sBWnm14bswvSTRTKzkJvcwwaceu/XM2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782D625A354;
+	Wed, 12 Feb 2025 15:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739375547; cv=none; b=VMHzuF+UjhM5Y1WIEB0SJJ7ojoCKQpqVROnw4tM4yqPmrEXNQeAgypTViE72rOyeDR8N9O0KK82/j9cgF5/IKw0ErVrAX0oPHW/Z45dSj4B0AlpXzz/psjqM0UC8pMiwgiQtIHWfWHbjzxM2+GByPRjKCPH6PUjwAWSisOzGds4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739375547; c=relaxed/simple;
+	bh=jrXhWYnImskFko9wBtv2JPSJVKz9x+wgYx6uQ0eFWZk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bN73G3vBx2WUxXzEXmPlJS22Qaa2I/4tpoXJzZTleFmsFAbGGJEd5nhOSS8/syCqWaqWZsVw/s7uI3huIGuDsLYSe8bu4ItZ8ysD+1/51qWdq22EFtHHNBT4zkOTF7J0/iJF2gappwQMTG30dmPt0u1ynDrTaw1RsG2L2U5w/No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G6VymOBh; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38dd011ff8bso4197151f8f.0;
+        Wed, 12 Feb 2025 07:52:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739375544; x=1739980344; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zy76W96ncGtjcIE/1RFX9zT9Pr7PxW1QtkdC0k/xF7g=;
+        b=G6VymOBhgDwpbDuyoMazrUbYpQA1hTntdHRYV8udjB+/YX39Jyow/mkBf9q8Ixhlsm
+         e5/WAJ++wRXMIc6wgVDzlwotBh7bit3Tz2009rjRm+0vkrTWZ9s+qM3NLVLICknLGJ9s
+         TDfILeiDXZ9Hqj8wtmxa6wkMXjgYhANBRsPNTg+TzKXreqHzXSglGhZ9rzsO0WHL7RSb
+         uSjTanDr8JBmEuxXT2894gJBEoVNC1IwTwHRpWwLiGpfe4vvFUsDl4uEroWw0ki9jt6O
+         G9Np5FZzCDVix5/Xd5r8l+rBrAGinJ5q276GReQ8xRZ4qY3+V3CqAoZIbNx17SWtiX1F
+         tuTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739375544; x=1739980344;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zy76W96ncGtjcIE/1RFX9zT9Pr7PxW1QtkdC0k/xF7g=;
+        b=K1t2mony+93uNOUBe2OeMaBnZK53aZX2e06bkVnMm6IsW7H9CrZTy2VK4yHg21eyP2
+         FsLZV+xSbAeWBONGkTA+UWKzO8JWGEHlCU75p7OBRs+o7HSG84lEhv+q1NIV7BGR1Dfw
+         8p0n4XUSx2h06Qsn8/8aqsliiB2tWjoMqoEgFbd48CE8nu1s35FzyDqb8PSAkxbWg0Gn
+         1PKwbJcFJ8MgNOHBvc1FQmbl/5SXQpVvLsbaXIVQpQwq7pDjvTrSbIJndMDw3uGgeykJ
+         arxd8Qgvm8fybksXjQpdz7IUX3hVIRb7Pn2L5CE/I7u9kmtpAJbQ1cYj5Twk+0zhcnU2
+         90KQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUojgXkHg/X5fKScukYx0kqlGZ6sV7YrMSZ8irgdkuS6ylW20P6LCyBwIBG5mBJD71VhktI66hKsTdE@vger.kernel.org, AJvYcCVcXpwq22D9ieFDb/A/UFwCQploM88/0+SHC4q+CvaSZz1rUIv+cV0akL6EHauomrQQ5YSwCSyhx8/wlZa1@vger.kernel.org, AJvYcCXqPva3JfLbkPCGeThY+HbX4f3591hBig4Og5Ox24CkcKc33U9rnbLOUbH4+Gs9qp8K3Z1nejvUFpdX4RehaJb+@vger.kernel.org, AJvYcCXw3ewdCD5CpWMwFynXXYQGkGygYz/pE6Hl34mL1W6rS2YiPBlsDf/5TncXnjAdKL1j/Eo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUBxLzRXpkDL7j2KWsPZ7uAdvgzkIeHgvWeL5dc+7wddWmRsam
+	5s6jcASjd427GsK+wY85U5reHA7a9qzmbB4HZC0U2kBAgHPTfk1k
+X-Gm-Gg: ASbGnctLi4wEw195lN3JkPNtq01Vm7ICHrEWA/U4X2hmmK8ctCjnyJoHbUYQEY+vv/J
+	6QPG8A5bVuVkgJ6b3Cdm9VnZHIiQmb/5zHwIItMjTHzcou5xhuM4Qac+cnJzrQzozTEu+GaeN1L
+	dIfXEYrv0b/dA11S8oVkFb/DwywMat+5Q6swtcKQYmt163JCG+8aHGSgs0kQY+nE8t3cRUQ1xEk
+	+Aw9DLML/U6nEBfaYNG99H7yK5lbqLpNcS1jsrWvUMasPlAsITScAWVVtT9ny9tn/v44O/9XcbD
+	jCh6OWNPHVGKFmlZM0+c54/p
+X-Google-Smtp-Source: AGHT+IGpD+27wLo/4uLAUDA60FDap/eR74/Ue8vD3BXCKcQh+GD2m9lFZwxy9qa3lhW3DrbvJ0WWIw==
+X-Received: by 2002:a5d:6da5:0:b0:38d:eb33:79c2 with SMTP id ffacd0b85a97d-38deb337a6cmr2961051f8f.32.1739375543490;
+        Wed, 12 Feb 2025 07:52:23 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a04ee2fsm23278465e9.4.2025.02.12.07.52.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2025 07:52:22 -0800 (PST)
+Message-ID: <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com>
+Date: Wed, 12 Feb 2025 15:53:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7785.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 563132f8-1cac-4317-bb80-08dd4b7c9681
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Feb 2025 15:47:42.9061
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Sn4fqVtZ2ihIsWzfXx6Wyl0xpGBy2ALcQxoZj1AChhZhrenu/Z6Zh4GIx7wsHXUdy+PFuixs2AAJNTVIAHZ2y2wXfTcAovGvSM72ERy4TtE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5977
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-6-almasrymina@google.com>
+ <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+ <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@resnulli.us>=20
-Sent: Wednesday, February 12, 2025 4:09 PM
->Wed, Feb 12, 2025 at 02:14:01PM +0100, jedrzej.jagielski@intel.com wrote:
->>Add an initial support for devlink interface to ixgbe driver.
+On 2/10/25 21:09, Mina Almasry wrote:
+> On Wed, Feb 5, 2025 at 4:20 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
 >>
->>Similarly to i40e driver the implementation doesn't enable
->>devlink to manage device-wide configuration. Devlink instance
->>is created for each physical function of PCIe device.
+>> On 2/3/25 22:39, Mina Almasry wrote:
+>> ...
+>>> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+>>> index bb2b751d274a..3ff8f568c382 100644
+>>> --- a/include/linux/skbuff.h
+>>> +++ b/include/linux/skbuff.h
+>>> @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct sock *sk, size_t size,
+>> ...
+>>>    int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+>>>                                struct iov_iter *from, size_t length);
+>>> @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+>>>    static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
+>>>                                          struct msghdr *msg, int len)
+>>>    {
+>>> -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter, len);
+>>> +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter, len,
+>>> +                                    NULL);
 >>
->>Create separate directory for devlink related ixgbe files
->>and use naming scheme similar to the one used in the ice driver.
->>
->>Add a stub for Documentation, to be extended by further patches.
->>
->>Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->>---
->>v2: fix error patch in probe; minor tweaks
->>---
->> Documentation/networking/devlink/index.rst    |  1 +
->> Documentation/networking/devlink/ixgbe.rst    |  8 ++
->> drivers/net/ethernet/intel/Kconfig            |  1 +
->> drivers/net/ethernet/intel/ixgbe/Makefile     |  3 +-
->> .../ethernet/intel/ixgbe/devlink/devlink.c    | 80 +++++++++++++++++++
->> .../ethernet/intel/ixgbe/devlink/devlink.h    | 10 +++
->> drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  8 ++
->> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 22 +++++
->> 8 files changed, 132 insertions(+), 1 deletion(-)
->> create mode 100644 Documentation/networking/devlink/ixgbe.rst
->> create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
->> create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
->>
->>diff --git a/Documentation/networking/devlink/index.rst b/Documentation/n=
-etworking/devlink/index.rst
->>index 948c8c44e233..8319f43b5933 100644
->>--- a/Documentation/networking/devlink/index.rst
->>+++ b/Documentation/networking/devlink/index.rst
->>@@ -84,6 +84,7 @@ parameters, info versions, and other features it suppor=
-ts.
->>    i40e
->>    ionic
->>    ice
->>+   ixgbe
->>    mlx4
->>    mlx5
->>    mlxsw
->>diff --git a/Documentation/networking/devlink/ixgbe.rst b/Documentation/n=
-etworking/devlink/ixgbe.rst
->>new file mode 100644
->>index 000000000000..c04ac51c6d85
->>--- /dev/null
->>+++ b/Documentation/networking/devlink/ixgbe.rst
->>@@ -0,0 +1,8 @@
->>+.. SPDX-License-Identifier: GPL-2.0
->>+
->>+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>+ixgbe devlink support
->>+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>+
->>+This document describes the devlink features implemented by the ``ixgbe`=
-`
->>+device driver.
->>diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/in=
-tel/Kconfig
->>index 1640d2f27833..56ee58c9df21 100644
->>--- a/drivers/net/ethernet/intel/Kconfig
->>+++ b/drivers/net/ethernet/intel/Kconfig
->>@@ -147,6 +147,7 @@ config IXGBE
->> 	depends on PCI
->> 	depends on PTP_1588_CLOCK_OPTIONAL
->> 	select MDIO
->>+	select NET_DEVLINK
->> 	select PHYLIB
->> 	help
->> 	  This driver supports Intel(R) 10GbE PCI Express family of
->>diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethe=
-rnet/intel/ixgbe/Makefile
->>index b456d102655a..11f37140c0a3 100644
->>--- a/drivers/net/ethernet/intel/ixgbe/Makefile
->>+++ b/drivers/net/ethernet/intel/ixgbe/Makefile
->>@@ -4,12 +4,13 @@
->> # Makefile for the Intel(R) 10GbE PCI Express ethernet driver
->> #
->>=20
->>+subdir-ccflags-y +=3D -I$(src)
->> obj-$(CONFIG_IXGBE) +=3D ixgbe.o
->>=20
->> ixgbe-y :=3D ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
->>            ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
->>            ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o=
- \
->>-           ixgbe_xsk.o ixgbe_e610.o
->>+           ixgbe_xsk.o ixgbe_e610.o devlink/devlink.o
->>=20
->> ixgbe-$(CONFIG_IXGBE_DCB) +=3D  ixgbe_dcb.o ixgbe_dcb_82598.o \
->>                               ixgbe_dcb_82599.o ixgbe_dcb_nl.o
->>diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c b/drivers=
-/net/ethernet/intel/ixgbe/devlink/devlink.c
->>new file mode 100644
->>index 000000000000..c052e95c9496
->>--- /dev/null
->>+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
->>@@ -0,0 +1,80 @@
->>+// SPDX-License-Identifier: GPL-2.0
->>+/* Copyright (c) 2025, Intel Corporation. */
->>+
->>+#include "ixgbe.h"
->>+#include "devlink.h"
->>+
->>+static const struct devlink_ops ixgbe_devlink_ops =3D {
->>+};
->>+
->>+/**
->>+ * ixgbe_allocate_devlink - Allocate devlink instance
->>+ * @adapter: pointer to the device adapter structure
->>+ *
->>+ * Allocate a devlink instance for this physical function.
->>+ *
->>+ * Return: 0 on success, -ENOMEM when allocation failed.
->>+ */
->>+int ixgbe_allocate_devlink(struct ixgbe_adapter *adapter)
->>+{
->>+	struct ixgbe_devlink_priv *devlink_private;
->>+	struct device *dev =3D &adapter->pdev->dev;
->>+	struct devlink *devlink;
->>+
->>+	devlink =3D devlink_alloc(&ixgbe_devlink_ops,
->>+				sizeof(*devlink_private), dev);
->>+	if (!devlink)
->>+		return -ENOMEM;
->>+
->>+	devlink_private =3D devlink_priv(devlink);
->>+	devlink_private->adapter =3D adapter;
->
->struct ixgbe_adapter * should be returned by devlink_priv(), that is the
->idea, to let devlink allocate the driver private for you.
+>> Instead of propagating it all the way down and carving a new path, why
+>> not reuse the existing infra? You already hook into where ubuf is
+>> allocated, you can stash the binding in there. And
+> 
+> It looks like it's not possible to increase the side of ubuf_info at
+> all, otherwise the BUILD_BUG_ON in msg_zerocopy_alloc() fires.
+> 
+> It's asserting that sizeof(ubuf_info_msgzc) <= sizeof(skb->cb), and
+> I'm guessing increasing skb->cb size is not really the way to go.
+> 
+> What I may be able to do here is stash the binding somewhere in
+> ubuf_info_msgzc via union with fields we don't need for devmem, and/or
 
-Using ixgbe_devlink_priv here is a workaround which i decided to introduce
-to mitigate the fact that ixgbe_adapter is used to alloc netdev with
-alloc_etherdev_mq().
-This would require general ixgbe refactoring.
+It doesn't need to account the memory against the user, and you
+actually don't want that because dmabuf should take care of that.
+So, it should be fine to reuse ->mmp.
 
+It's also not a real sk_buff, so maybe maintainers wouldn't mind
+reusing some more space out of it, if that would even be needed.
 
->
->
->
->>+
->>+	adapter->devlink =3D devlink;
->>+
->>+	return 0;
->>+}
->>+
->>+/**
->>+ * ixgbe_devlink_set_switch_id - Set unique switch ID based on PCI DSN
->>+ * @adapter: pointer to the device adapter structure
->>+ * @ppid: struct with switch id information
->>+ */
->>+static void ixgbe_devlink_set_switch_id(struct ixgbe_adapter *adapter,
->>+					struct netdev_phys_item_id *ppid)
->>+{
->>+	u64 id =3D pci_get_dsn(adapter->pdev);
->>+
->>+	ppid->id_len =3D sizeof(id);
->>+	put_unaligned_be64(id, &ppid->id);
->>+}
->>+
->>+/**
->>+ * ixgbe_devlink_register_port - Register devlink port
->>+ * @adapter: pointer to the device adapter structure
->>+ *
->>+ * Create and register a devlink_port for this physical function.
->>+ *
->>+ * Return: 0 on success, error code on failure.
->>+ */
->>+int ixgbe_devlink_register_port(struct ixgbe_adapter *adapter)
->>+{
->>+	struct devlink_port *devlink_port =3D &adapter->devlink_port;
->>+	struct devlink *devlink =3D adapter->devlink;
->>+	struct device *dev =3D &adapter->pdev->dev;
->>+	struct devlink_port_attrs attrs =3D {};
->>+	int err;
->>+
->>+	attrs.flavour =3D DEVLINK_PORT_FLAVOUR_PHYSICAL;
->>+	attrs.phys.port_number =3D adapter->hw.bus.func;
->>+	ixgbe_devlink_set_switch_id(adapter, &attrs.switch_id);
->>+
->>+	devlink_port_attrs_set(devlink_port, &attrs);
->>+
->>+	err =3D devl_port_register(devlink, devlink_port, 0);
->>+	if (err) {
->>+		dev_err(dev,
->>+			"devlink port registration failed, err %d\n", err);
->>+	}
->
->Don't use "{}" for single statement.
+> stashing the binding in ubuf_info_ops (very hacky). Neither approach
+> seems ideal, but the former may work and may be cleaner.
+> 
+> I'll take a deeper look here. I had looked before and concluded that
+> we're piggybacking devmem TX on MSG_ZEROCOPY path, because we need
+> almost all of the functionality there (no copying, send complete
+> notifications, etc), with one minor change in the skb filling. I had
+> concluded that if MSG_ZEROCOPY was never updated to use the existing
+> infra, then it's appropriate for devmem TX piggybacking on top of it
 
-Sure, will be changed.
->
->
->>+
->>+	return err;
->>+}
->>diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h b/drivers=
-/net/ethernet/intel/ixgbe/devlink/devlink.h
->>new file mode 100644
->>index 000000000000..d73c57164aef
->>--- /dev/null
->>+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
->>@@ -0,0 +1,10 @@
->>+/* SPDX-License-Identifier: GPL-2.0 */
->>+/* Copyright (c) 2025, Intel Corporation. */
->>+
->>+#ifndef _IXGBE_DEVLINK_H_
->>+#define _IXGBE_DEVLINK_H_
->>+
->>+int ixgbe_allocate_devlink(struct ixgbe_adapter *adapter);
->>+int ixgbe_devlink_register_port(struct ixgbe_adapter *adapter);
->>+
->>+#endif /* _IXGBE_DEVLINK_H_ */
->>diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ether=
-net/intel/ixgbe/ixgbe.h
->>index e6a380d4929b..37d761f8c409 100644
->>--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->>+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->>@@ -17,6 +17,8 @@
->> #include <linux/net_tstamp.h>
->> #include <linux/ptp_clock_kernel.h>
->>=20
->>+#include <net/devlink.h>
->>+
->> #include "ixgbe_type.h"
->> #include "ixgbe_common.h"
->> #include "ixgbe_dcb.h"
->>@@ -612,6 +614,8 @@ struct ixgbe_adapter {
->> 	struct bpf_prog *xdp_prog;
->> 	struct pci_dev *pdev;
->> 	struct mii_bus *mii_bus;
->>+	struct devlink *devlink;
->>+	struct devlink_port devlink_port;
->>=20
->> 	unsigned long state;
->>=20
->>@@ -830,6 +834,10 @@ struct ixgbe_adapter {
->> 	spinlock_t vfs_lock;
->> };
->>=20
->>+struct ixgbe_devlink_priv {
->>+	struct ixgbe_adapter *adapter;
->>+};
->>+
->> static inline int ixgbe_determine_xdp_q_idx(int cpu)
->> {
->> 	if (static_key_enabled(&ixgbe_xdp_locking_key))
->>diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/=
-ethernet/intel/ixgbe/ixgbe_main.c
->>index 7236f20c9a30..1617ece95f1f 100644
->>--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->>+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->>@@ -49,6 +49,7 @@
->> #include "ixgbe_sriov.h"
->> #include "ixgbe_model.h"
->> #include "ixgbe_txrx_common.h"
->>+#include "devlink/devlink.h"
->>=20
->> char ixgbe_driver_name[] =3D "ixgbe";
->> static const char ixgbe_driver_string[] =3D
->>@@ -11275,6 +11276,10 @@ static int ixgbe_probe(struct pci_dev *pdev, con=
-st struct pci_device_id *ent)
->> 	hw->back =3D adapter;
->> 	adapter->msg_enable =3D netif_msg_init(debug, DEFAULT_MSG_ENABLE);
->>=20
->>+	err =3D ixgbe_allocate_devlink(adapter);
->>+	if (err)
->>+		goto err_devlink;
->>+
->> 	hw->hw_addr =3D ioremap(pci_resource_start(pdev, 0),
->> 			      pci_resource_len(pdev, 0));
->> 	adapter->io_addr =3D hw->hw_addr;
->>@@ -11613,6 +11618,11 @@ static int ixgbe_probe(struct pci_dev *pdev, con=
-st struct pci_device_id *ent)
->> 	}
->> 	strcpy(netdev->name, "eth%d");
->> 	pci_set_drvdata(pdev, adapter);
->>+
->>+	devl_lock(adapter->devlink);
->>+	ixgbe_devlink_register_port(adapter);
->>+	SET_NETDEV_DEVLINK_PORT(adapter->netdev, &adapter->devlink_port);
->>+
->> 	err =3D register_netdev(netdev);
->> 	if (err)
->> 		goto err_register;
->>@@ -11667,11 +11677,15 @@ static int ixgbe_probe(struct pci_dev *pdev, co=
-nst struct pci_device_id *ent)
->> 	if (err)
->> 		goto err_netdev;
->>=20
->>+	devl_register(adapter->devlink);
->>+	devl_unlock(adapter->devlink);
->> 	return 0;
->>=20
->> err_netdev:
->> 	unregister_netdev(netdev);
->> err_register:
->>+	devl_port_unregister(&adapter->devlink_port);
->>+	devl_unlock(adapter->devlink);
->> 	ixgbe_release_hw_control(adapter);
->> 	ixgbe_clear_interrupt_scheme(adapter);
->> 	if (hw->mac.type =3D=3D ixgbe_mac_e610)
->>@@ -11685,6 +11699,8 @@ static int ixgbe_probe(struct pci_dev *pdev, cons=
-t struct pci_device_id *ent)
->> 	kfree(adapter->rss_key);
->> 	bitmap_free(adapter->af_xdp_zc_qps);
->> err_ioremap:
->>+	devlink_free(adapter->devlink);
->>+err_devlink:
->> 	disable_dev =3D !test_and_set_bit(__IXGBE_DISABLED, &adapter->state);
->> 	free_netdev(netdev);
->> err_alloc_etherdev:
->>@@ -11717,6 +11733,8 @@ static void ixgbe_remove(struct pci_dev *pdev)
->> 		return;
->>=20
->> 	netdev  =3D adapter->netdev;
->>+	devl_lock(adapter->devlink);
->>+	devl_unregister(adapter->devlink);
->> 	ixgbe_dbg_adapter_exit(adapter);
->>=20
->> 	set_bit(__IXGBE_REMOVING, &adapter->state);
->>@@ -11752,6 +11770,10 @@ static void ixgbe_remove(struct pci_dev *pdev)
->> 	if (netdev->reg_state =3D=3D NETREG_REGISTERED)
->> 		unregister_netdev(netdev);
->>=20
->>+	devl_port_unregister(&adapter->devlink_port);
->>+	devl_unlock(adapter->devlink);
->>+	devlink_free(adapter->devlink);
->>+
->> 	ixgbe_stop_ipsec_offload(adapter);
->> 	ixgbe_clear_interrupt_scheme(adapter);
->>=20
->>--=20
->>2.31.1
+MSG_ZEROCOPY does use the common infra, i.e. passing ubuf_info,
+but doesn't need ->sg_from_iter as zerocopy_fill_skb_from_iter()
+and it's what was there first.
+
+> to follow that. I would not want to get into a refactor of
+> MSG_ZEROCOPY for no real reason.
+> 
+> But I'll take a deeper look here and see if I can make something
+> slightly cleaner work.
+> 
+>> zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
+>> see __zerocopy_sg_from_iter().
 >>
+>> ...
+>>> diff --git a/net/core/datagram.c b/net/core/datagram.c
+>>> index f0693707aece..c989606ff58d 100644
+>>> --- a/net/core/datagram.c
+>>> +++ b/net/core/datagram.c
+>>> @@ -63,6 +63,8 @@
+>>> +static int
+>>> +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *from,
+>>> +                           int length,
+>>> +                           struct net_devmem_dmabuf_binding *binding)
+>>> +{
+>>> +     int i = skb_shinfo(skb)->nr_frags;
+>>> +     size_t virt_addr, size, off;
+>>> +     struct net_iov *niov;
+>>> +
+>>> +     while (length && iov_iter_count(from)) {
+>>> +             if (i == MAX_SKB_FRAGS)
+>>> +                     return -EMSGSIZE;
+>>> +
+>>> +             virt_addr = (size_t)iter_iov_addr(from);
+>>
+>> Unless I missed it somewhere it needs to check that the iter
+>> is iovec based.
+>>
+> 
+> How do we end up here with an iterator that is not iovec based? Is the
+> user able to trigger that somehow and I missed it?
+
+Hopefully not, but for example io_uring passes bvecs for a number of
+requests that can end up in tcp_sendmsg_locked(). Those probably
+would work with the current patch, but check the order of some of the
+checks it will break. And once io_uring starts passing bvecs for
+normal send[msg] requests, it'd definitely be possible. And there
+are other in kernel users apart from send(2) path, so who knows.
+
+The api allows it and therefore should be checked, it's better to
+avoid quite possible latent bugs.
+
+-- 
+Pavel Begunkov
+
 
