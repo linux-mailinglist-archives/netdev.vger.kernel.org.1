@@ -1,515 +1,893 @@
-Return-Path: <netdev+bounces-165377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BAECA31C3E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:47:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB33DA31C53
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:50:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5937A3A801E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:47:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F38E81889197
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120AC1D6DBB;
-	Wed, 12 Feb 2025 02:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8CE1D6DBB;
+	Wed, 12 Feb 2025 02:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="DCx06lAV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIlQez6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E710C150980;
-	Wed, 12 Feb 2025 02:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0949F78F5D;
+	Wed, 12 Feb 2025 02:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739328442; cv=none; b=U15itl5lPCy5nFsNo+b00uE9jCLrPK9MngDY2rdOC1G3dwb1QWH++jnkVvLI/LYqE2Eb5D6zdANcWHrkz2LfrJEbvOx4J6dcdMm3k8iET6EsdTkxLvFnj+PGdYafTTm71IHP27bgy5t01tWE1WFeAcSXPdnIOaqAD0AGHN90hl8=
+	t=1739328598; cv=none; b=q9OId6MaHpybG0eQy+nqrSGXL9NvDk3ahWPnfrt19WxHsJms20kN5jjz7VVDsrO+nFfh2PO065fHY2QrhldZKLNkOfidi+8q6GBmli2OrZfMPYSt6wwgky2BvG2T9d0ot1upnxJIIT7t1r5fm+deCUsa30tKTXAZRHUsfKNaLS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739328442; c=relaxed/simple;
-	bh=ve8fJtYeHIFH2g6yvYdQbHXP047CV65mtNiKhnhLJis=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DoZAhvXsIJ3zDesrjBLciwgoREiUS69FjiwV6YhUKGrlpMjLjbIJxmXmQhcxyRiFvc17hZgD1MHcv/5AwA/JoUP3MOo/Lbr9cg2wHSY0XmTjdYdL+mSIDAQ3IUPQHgrXn2+6JsqiSz8DTQnbKzBDyJdyxTcAfDQxnZ3p4yE/AlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=DCx06lAV; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1739328598; c=relaxed/simple;
+	bh=75WbVlIulPllI8IGzSeA0N5ptGhmxGXBkEZwmeHX0j0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KtTcJnWVfakmJ0ZakmZaofK2b3frt8g8lX5aWYNwEcBBbaSJoPol0ygv4djduYelo9kARAOl7fvX80bHJbOUnPRKsyJKpkCUGpDGiyDA0LVrlZKrjar/XG+fjZrimZa0JDjGOqlc7IfuH1zuCrfXcxmKntjGpuWER4JhSlrc9AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIlQez6+; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f9aa66cbe8so46985147b3.1;
+        Tue, 11 Feb 2025 18:49:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1739328432;
-	bh=basBbk10Agy1MOiWnNRtzNJPgaW1hgUu6zqmz130jnw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=DCx06lAVF7dFTEMVtNpRSjst9XByaFAja1v/8BrKZbZ27fEbylGElsiXFFaf5T5bL
-	 9XuBYRbvOu4bNvhpliAF5vwJnc2OhSLX4BEQlfuYs6XGR0KtegO+FKrOvzPTyFCOl4
-	 GSId07dO514ijPJOhXqRUxZeh6lNUaAaP3cq+M65trIx0EATN9Ap8i4iAndRjqa+8G
-	 EVeUBAflc4qt0/w9xXAJPl4zPULXsDd98kDpjao8s+ml2zwhVG91YFz6TL3IZyYw8M
-	 pMUfdk8UJpRG3go3AVFkeywByjOGEaVpvokYYabsSmlrQnPu8ZPZQdPcwJxmCh1RoX
-	 q4fir+2yIcH9g==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 2E9C2756DC; Wed, 12 Feb 2025 10:47:12 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Wed, 12 Feb 2025 10:46:51 +0800
-Subject: [PATCH net-next v2 2/2] net: mctp: Add MCTP USB transport driver
+        d=gmail.com; s=20230601; t=1739328595; x=1739933395; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3OFjQV9KxOR8usKYsZuCWzHZV3UKgC2zTUyoTT0Ohho=;
+        b=gIlQez6+GM4bPh9NTEQEM7uf3qF/LZfsYOniMnZQv1DOn3sX7hs/c47W3qU4fI6KA0
+         0jkCovg68eCCX/LxW+NBuFZPuzkUtfPrcjBWMClmEK5ZDh5iVxu4Og8tGuj/th6kDALN
+         V8VyCARH692Wqd4B9DhAgSX7M943g1n+dkcw2yyf1GIT3I6t5V+guQM0tGseUlm/gZBN
+         OBtlK9nsi8r83LaPbgPpinMAQ0fz8FGEDJORzRgQLjSS5btx5uRPhkPF4ktQhlbA6gs3
+         MAd7OeF29XmiLI2vTLa6w2vAQm7pn2EAilEOZw/iruAau5ap3t/8PQ5/Le/fveptcxce
+         32Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739328595; x=1739933395;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3OFjQV9KxOR8usKYsZuCWzHZV3UKgC2zTUyoTT0Ohho=;
+        b=QMjhI2g9SsymAhPhykVYG5ZKVImMdlUXI3aMPlpp4X1Mcx9AgD9lNQcUacfw4w29KE
+         LldNNNG5km5bFlb1sBM8TkY2BItDePGvkcs9vwUWSTRnzk2E4ZkcHvS6Y22csAIm8cgj
+         6n/iHthyAfNbY3x4ew4EL9PH2Fls667FLib0jwJsHJMfEelTBrKATKhRqlCyGmoX1Hnk
+         7sXdbxMpfghWo4gtKTJDQLp11zj7BRVaA79A0rI9Ipr8m/HhOdtyQ36EREhiu5qkkyPH
+         WHrc0Yn4ll/lD8wux4iDgXNPYh7LxTNxKx7VsT3iKoiaQ+lP7wzpmNYQgxJ7SD8RWnpn
+         FGBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkIj8rpSke+jraUGmIJ1z/b2CwTOjh8FEUL2+AJrQiIi3HYAB0J5/SG5GmKFg8py8wkL1grDV3I+Yn@vger.kernel.org, AJvYcCVpEJ91FGhH1QxvAYvVcx8eNQ/6Q5fi/yjOyA3TRXVfC2PmH/pQGAaQoVX7cGxxr+/KuPjhTOUCdmWA12qG@vger.kernel.org, AJvYcCVwUMMygcCAo3yBZPsfJhPYELuGJLFotGRE7hOGz9FTg/em+9NVmPW2CAWvPicLyqXOw0LsitL5kNw=@vger.kernel.org, AJvYcCW288DsTNfeEBekJhsgQ/XCwWbiA7upf0PzALq1OlVdiAZ9xtzgPoWv9EW9pJGusfczhe83dlbIH/CgR/mCytg=@vger.kernel.org, AJvYcCWIosAZM+KKKvQGPMgTUrRzC/vIJg2qKbLfxvXDapT9rPEEB2Ue8zcVCW3qu5tGd6cnHwk+oXPyn/Cs@vger.kernel.org, AJvYcCWukcvoz1VP/E9qd2mpJ61j19weydTM4yCWvdVk9DiVSqbZ3P1RojgXryeX8Glxd3Z0VmBX7rHXNxKw0Q==@vger.kernel.org, AJvYcCXTSRvY9MNPiQqePNedMbSvQ3pOZEwiRlOHwNuVXcBaH+f1ItnusBajmhWugHSm/ktJDT1hFpHT@vger.kernel.org, AJvYcCXeMumcBCjvrLkS1UDvrorsIjlQKdrj88A9K258Gpt3x5kGhhnkB3UmLb4MejFo+7OzN/UWnQNkPGeB@vger.kernel.org, AJvYcCXthJmf3VoxzaxS/juMbK78Dj2kLURnZ9Iu1jGRY6cK3njvHGz+4Kpsc+Ibd2GNGLuadduV8IbczDlL490=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoPsXr4PTb+dcTVw0QXHUyawIg4FdO0zNXDH1WaiKp3SHWUsNi
+	u78MZkDh3VCkykg42KMOSzqqGLqzHgJZsCzQBwKpyJSJM++sXaZzLJs6tog8RDh7Xbpg8iZENja
+	snPnOeGrb2fl27B2PtLrP9CfFbbc=
+X-Gm-Gg: ASbGnctSOhW0IOrcDYFktlM18rwlO8Ewn5JQAj3MJoOImKFfUMFzyIBNHtJpuLfGEtc
+	zNjUti0Nmw8B5FUvDnEee2YAdGOV7Xy+zFAm4owUgLiRuCC+sN0FZyKA8QEu/6OfAAJe1nWkAbF
+	L+1suotlp75Sc4e478j9G8txWV6hWhqho=
+X-Google-Smtp-Source: AGHT+IHCfMLv4SCyfWv/GyglmXZIvTQ+EOSxbRFXJ1ei9e9yljKIiG+wiYtIOWT+3jwglkwkmPXe6Fiw/MMu8DHLl/c=
+X-Received: by 2002:a05:690c:892:b0:6f5:3e17:7ea5 with SMTP id
+ 00721157ae682-6fb1f171da6mr19242137b3.7.1739328594696; Tue, 11 Feb 2025
+ 18:49:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250212-dev-mctp-usb-v2-2-76e67025d764@codeconstruct.com.au>
-References: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
-In-Reply-To: <20250212-dev-mctp-usb-v2-0-76e67025d764@codeconstruct.com.au>
-To: Matt Johnston <matt@codeconstruct.com.au>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
- Santosh Puranik <spuranik@nvidia.com>
-X-Mailer: b4 0.14.2
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-5-a0282524688@gmail.com> <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+In-Reply-To: <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 12 Feb 2025 10:49:43 +0800
+X-Gm-Features: AWEUYZmvwDIMk4-fdBjlV8o0spq55ZlW0LcOy_YgVp-WEl_BGkdbw71NI97UOm8
+Message-ID: <CAOoeyxWKWA=OJB_MdWPdJQDic8=AXEbJiu2qW5u=CvphyAykzQ@mail.gmail.com>
+Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add an implementation for DMTF DSP0283, which defines a MCTP-over-USB
-transport. As per that spec, we're restricted to full speed mode,
-requiring 512-byte transfers.
+Dear Marc,
 
-Each MCTP-over-USB interface is a peer-to-peer link to a single MCTP
-endpoint, so no physical addressing is required (of course, that MCTP
-endpoint may then bridge to further MCTP endpoints). Consequently,
-interfaces will report with no lladdr data:
+Thank you for reviewing,
 
-    # mctp link
-    dev lo index 1 address 00:00:00:00:00:00 net 1 mtu 65536 up
-    dev mctpusb0 index 6 address none net 1 mtu 68 up
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B42=E6=9C=887=
+=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=888:15=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Nuvoton NCT6694 Socket CANfd driver based on USB interface.
+> > + *
+> > + * Copyright (C) 2024 Nuvoton Technology Corp.
+> > + */
+>
+> /* net-dev style multiline
+>  * comments look like this
+>  */
+>
 
-This is a simple initial implementation, with single rx & tx urbs, and
-no multi-packet tx transfers - although we do accept multi-packet rx
-from the device.
+Okay, I will fix these comments in the next patch.
 
-Includes suggested fixes from Santosh Puranik <spuranik@nvidia.com>.
+> > +
+> > +#include <linux/can/dev.h>
+> > +#include <linux/can/rx-offload.h>
+> > +#include <linux/ethtool.h>
+> > +#include <linux/irqdomain.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/mfd/core.h>
+> > +#include <linux/mfd/nct6694.h>
+> > +#include <linux/module.h>
+> > +#include <linux/netdevice.h>
+> > +#include <linux/platform_device.h>
+> > +
+> > +#define DRVNAME "nct6694_canfd"
+> > +
+> > +/*
+> > + * USB command module type for NCT6694 CANfd controller.
+> > + * This defines the module type used for communication with the NCT669=
+4
+> > + * CANfd controller over the USB interface.
+> > + */
+>
+> /* net-dev style multiline
+>  * comments look like this
+>  */
+>
+> or remove the comment altogether as it's stating the obvious :)
+>
 
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Santosh Puranik <spuranik@nvidia.com>
+Okay, I will remove it in the next patch.
 
----
-v2:
- - update copyright year to 2025
- - improve dbg messages: use netdev, demote from _err, remove __func__
- - pass gfp_t to mctp_usb_rx_queue, allocate first as GFP_KERNEL
- - release ->usbdev on disconnect
- - include MODULE_{DESCRIPTION,AUTHOR,DEVICE_TABLE}
- - more sensible driver->name
- - do rx stats update before netif_rx()
- - specify phys binding type via mctp_register_netdev()
----
- drivers/net/mctp/Kconfig    |  10 ++
- drivers/net/mctp/Makefile   |   1 +
- drivers/net/mctp/mctp-usb.c | 368 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 379 insertions(+)
+> > +#define NCT6694_CAN_MOD                      0x05
+> > +
+> > +/* Command 00h - CAN Setting and Initialization */
+> > +#define NCT6694_CAN_SETTING          0x00
+> > +#define NCT6694_CAN_SETTING_CTRL1_MON        BIT(0)
+> > +#define NCT6694_CAN_SETTING_CTRL1_NISO       BIT(1)
+> > +#define NCT6694_CAN_SETTING_CTRL1_LBCK       BIT(2)
+> > +
+> > +/* Command 01h - CAN Information */
+> > +#define NCT6694_CAN_INFORMATION              0x01
+> > +#define NCT6694_CAN_INFORMATION_SEL  0x00
+> > +
+> > +/* Command 02h - CAN Event */
+> > +#define NCT6694_CAN_EVENT            0x02
+> > +#define NCT6694_CAN_EVENT_SEL(idx, mask)     \
+> > +     ((idx ? 0x80 : 0x00) | ((mask) & 0x7F))
+> > +
+> > +#define NCT6694_CAN_EVENT_MASK               GENMASK(5, 0)
+> > +#define NCT6694_CAN_EVT_TX_FIFO_EMPTY        BIT(7)  /* Read-clear */
+> > +#define NCT6694_CAN_EVT_RX_DATA_LOST BIT(5)  /* Read-clear */
+> > +#define NCT6694_CAN_EVT_RX_DATA_IN   BIT(7)  /* Read-clear*/
+> > +
+> > +/* Command 10h - CAN Deliver */
+> > +#define NCT6694_CAN_DELIVER          0x10
+> > +#define NCT6694_CAN_DELIVER_SEL(buf_cnt)     \
+> > +     ((buf_cnt) & 0xFF)
+> > +
+> > +/* Command 11h - CAN Receive */
+> > +#define NCT6694_CAN_RECEIVE          0x11
+> > +#define NCT6694_CAN_RECEIVE_SEL(idx, buf_cnt)        \
+> > +     ((idx ? 0x80 : 0x00) | ((buf_cnt) & 0x7F))
+> > +
+> > +#define NCT6694_CAN_FRAME_TAG_CAN0   0xC0
+> > +#define NCT6694_CAN_FRAME_TAG_CAN1   0xC1
+>
+> in "include/linux/mfd/nct6694.h" it's CAN1 and CAN2, can you make it "0"
+> based everywhere?
+>
 
-diff --git a/drivers/net/mctp/Kconfig b/drivers/net/mctp/Kconfig
-index 15860d6ac39fef62847d7186f1f0d81c1d3cd619..cf325ab0b1ef555e21983ace1b838e10c7f34570 100644
---- a/drivers/net/mctp/Kconfig
-+++ b/drivers/net/mctp/Kconfig
-@@ -47,6 +47,16 @@ config MCTP_TRANSPORT_I3C
- 	  A MCTP protocol network device is created for each I3C bus
- 	  having a "mctp-controller" devicetree property.
- 
-+config MCTP_TRANSPORT_USB
-+	tristate "MCTP USB transport"
-+	depends on USB
-+	help
-+	  Provides a driver to access MCTP devices over USB transport,
-+	  defined by DMTF specification DSP0283.
-+
-+	  MCTP-over-USB interfaces are peer-to-peer, so each interface
-+	  represents a physical connection to one remote MCTP endpoint.
-+
- endmenu
- 
- endif
-diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
-index e1cb99ced54ac136db0347a9ee0435a5ed938955..c36006849a1e7d04f2cafafb8931329fc0992b63 100644
---- a/drivers/net/mctp/Makefile
-+++ b/drivers/net/mctp/Makefile
-@@ -1,3 +1,4 @@
- obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
- obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
- obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
-+obj-$(CONFIG_MCTP_TRANSPORT_USB) += mctp-usb.o
-diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..9ffca70811cffbd609aeb2ac7f6df3ba69b8008a
---- /dev/null
-+++ b/drivers/net/mctp/mctp-usb.c
-@@ -0,0 +1,368 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * mctp-usb.c - MCTP-over-USB (DMTF DSP0283) transport binding driver.
-+ *
-+ * DSP0283 is available at:
-+ * https://www.dmtf.org/sites/default/files/standards/documents/DSP0283_1.0.1.pdf
-+ *
-+ * Copyright (C) 2024-2025 Code Construct Pty Ltd
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/netdevice.h>
-+#include <linux/usb.h>
-+#include <linux/usb/mctp-usb.h>
-+
-+#include <net/mctp.h>
-+#include <net/mctpdevice.h>
-+#include <net/pkt_sched.h>
-+
-+#include <uapi/linux/if_arp.h>
-+
-+struct mctp_usb {
-+	struct usb_device *usbdev;
-+	struct usb_interface *intf;
-+
-+	struct net_device *netdev;
-+
-+	__u8 ep_in;
-+	__u8 ep_out;
-+
-+	struct urb *tx_urb;
-+	struct urb *rx_urb;
-+};
-+
-+static void mctp_usb_stat_tx_dropped(struct net_device *dev)
-+{
-+	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
-+
-+	u64_stats_update_begin(&dstats->syncp);
-+	u64_stats_inc(&dstats->tx_drops);
-+	u64_stats_update_end(&dstats->syncp);
-+}
-+
-+static void mctp_usb_stat_tx_done(struct net_device *dev, unsigned int len)
-+{
-+	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
-+
-+	u64_stats_update_begin(&dstats->syncp);
-+	u64_stats_inc(&dstats->tx_packets);
-+	u64_stats_add(&dstats->tx_bytes, len);
-+	u64_stats_update_end(&dstats->syncp);
-+}
-+
-+static void mctp_usb_out_complete(struct urb *urb)
-+{
-+	struct sk_buff *skb = urb->context;
-+	struct net_device *netdev = skb->dev;
-+	int status;
-+
-+	status = urb->status;
-+
-+	switch (status) {
-+	case -ENOENT:
-+	case -ECONNRESET:
-+	case -ESHUTDOWN:
-+	case -EPROTO:
-+		mctp_usb_stat_tx_dropped(netdev);
-+		break;
-+	case 0:
-+		mctp_usb_stat_tx_done(netdev, skb->len);
-+		netif_wake_queue(netdev);
-+		consume_skb(skb);
-+		return;
-+	default:
-+		netdev_dbg(netdev, "unexpected tx urb status: %d\n", status);
-+		mctp_usb_stat_tx_dropped(netdev);
-+	}
-+
-+	kfree_skb(skb);
-+}
-+
-+static netdev_tx_t mctp_usb_start_xmit(struct sk_buff *skb,
-+				       struct net_device *dev)
-+{
-+	struct mctp_usb *mctp_usb = netdev_priv(dev);
-+	struct mctp_usb_hdr *hdr;
-+	unsigned int plen;
-+	struct urb *urb;
-+	int rc;
-+
-+	plen = skb->len;
-+
-+	if (plen + sizeof(*hdr) > MCTP_USB_XFER_SIZE)
-+		goto err_drop;
-+
-+	hdr = skb_push(skb, sizeof(*hdr));
-+	if (!hdr)
-+		goto err_drop;
-+
-+	hdr->id = cpu_to_be16(MCTP_USB_DMTF_ID);
-+	hdr->rsvd = 0;
-+	hdr->len = plen + sizeof(*hdr);
-+
-+	urb = mctp_usb->tx_urb;
-+
-+	usb_fill_bulk_urb(urb, mctp_usb->usbdev,
-+			  usb_sndbulkpipe(mctp_usb->usbdev, mctp_usb->ep_out),
-+			  skb->data, skb->len,
-+			  mctp_usb_out_complete, skb);
-+
-+	rc = usb_submit_urb(urb, GFP_ATOMIC);
-+	if (rc)
-+		goto err_drop;
-+	else
-+		netif_stop_queue(dev);
-+
-+	return NETDEV_TX_OK;
-+
-+err_drop:
-+	mctp_usb_stat_tx_dropped(dev);
-+	kfree_skb(skb);
-+	return NETDEV_TX_OK;
-+}
-+
-+static void mctp_usb_in_complete(struct urb *urb);
-+
-+static int mctp_usb_rx_queue(struct mctp_usb *mctp_usb, gfp_t gfp)
-+{
-+	struct sk_buff *skb;
-+	int rc;
-+
-+	skb = __netdev_alloc_skb(mctp_usb->netdev, MCTP_USB_XFER_SIZE, gfp);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	usb_fill_bulk_urb(mctp_usb->rx_urb, mctp_usb->usbdev,
-+			  usb_rcvbulkpipe(mctp_usb->usbdev, mctp_usb->ep_in),
-+			  skb->data, MCTP_USB_XFER_SIZE,
-+			  mctp_usb_in_complete, skb);
-+
-+	rc = usb_submit_urb(mctp_usb->rx_urb, gfp);
-+	if (rc) {
-+		netdev_err(mctp_usb->netdev, "rx urb submit failure: %d\n", rc);
-+		kfree_skb(skb);
-+	}
-+
-+	return rc;
-+}
-+
-+static void mctp_usb_in_complete(struct urb *urb)
-+{
-+	struct sk_buff *skb = urb->context;
-+	struct net_device *netdev = skb->dev;
-+	struct pcpu_dstats *dstats = this_cpu_ptr(netdev->dstats);
-+	struct mctp_usb *mctp_usb = netdev_priv(netdev);
-+	struct mctp_skb_cb *cb;
-+	unsigned int len;
-+	int status;
-+
-+	status = urb->status;
-+
-+	switch (status) {
-+	case -ENOENT:
-+	case -ECONNRESET:
-+	case -ESHUTDOWN:
-+	case -EPROTO:
-+		kfree_skb(skb);
-+		return;
-+	case 0:
-+		break;
-+	default:
-+		netdev_dbg(netdev, "unexpected rx urb status: %d\n", status);
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	len = urb->actual_length;
-+	__skb_put(skb, len);
-+
-+	while (skb) {
-+		struct sk_buff *skb2 = NULL;
-+		struct mctp_usb_hdr *hdr;
-+		u8 pkt_len; /* length of MCTP packet, no USB header */
-+
-+		hdr = skb_pull_data(skb, sizeof(*hdr));
-+		if (!hdr)
-+			break;
-+
-+		if (be16_to_cpu(hdr->id) != MCTP_USB_DMTF_ID) {
-+			netdev_dbg(netdev, "rx: invalid id %04x\n",
-+				   be16_to_cpu(hdr->id));
-+			break;
-+		}
-+
-+		if (hdr->len <
-+		    sizeof(struct mctp_hdr) + sizeof(struct mctp_usb_hdr)) {
-+			netdev_dbg(netdev, "rx: short packet (hdr) %d\n",
-+				   hdr->len);
-+			break;
-+		}
-+
-+		/* we know we have at least sizeof(struct mctp_usb_hdr) here */
-+		pkt_len = hdr->len - sizeof(struct mctp_usb_hdr);
-+		if (pkt_len > skb->len) {
-+			netdev_dbg(netdev,
-+				   "rx: short packet (xfer) %d, actual %d\n",
-+				   hdr->len, skb->len);
-+			break;
-+		}
-+
-+		if (pkt_len < skb->len) {
-+			/* more packets may follow - clone to a new
-+			 * skb to use on the next iteration
-+			 */
-+			skb2 = skb_clone(skb, GFP_ATOMIC);
-+			if (skb2) {
-+				if (!skb_pull(skb2, pkt_len)) {
-+					kfree_skb(skb2);
-+					skb2 = NULL;
-+				}
-+			}
-+			skb_trim(skb, pkt_len);
-+		}
-+
-+		u64_stats_update_begin(&dstats->syncp);
-+		u64_stats_inc(&dstats->rx_packets);
-+		u64_stats_add(&dstats->rx_bytes, skb->len);
-+		u64_stats_update_end(&dstats->syncp);
-+
-+		skb->protocol = htons(ETH_P_MCTP);
-+		skb_reset_network_header(skb);
-+		cb = __mctp_cb(skb);
-+		cb->halen = 0;
-+		netif_rx(skb);
-+
-+		skb = skb2;
-+	}
-+
-+	if (skb)
-+		kfree_skb(skb);
-+
-+	mctp_usb_rx_queue(mctp_usb, GFP_ATOMIC);
-+}
-+
-+static int mctp_usb_open(struct net_device *dev)
-+{
-+	struct mctp_usb *mctp_usb = netdev_priv(dev);
-+
-+	return mctp_usb_rx_queue(mctp_usb, GFP_KERNEL);
-+}
-+
-+static int mctp_usb_stop(struct net_device *dev)
-+{
-+	struct mctp_usb *mctp_usb = netdev_priv(dev);
-+
-+	netif_stop_queue(dev);
-+	usb_kill_urb(mctp_usb->rx_urb);
-+	usb_kill_urb(mctp_usb->tx_urb);
-+
-+	return 0;
-+}
-+
-+static const struct net_device_ops mctp_usb_netdev_ops = {
-+	.ndo_start_xmit = mctp_usb_start_xmit,
-+	.ndo_open = mctp_usb_open,
-+	.ndo_stop = mctp_usb_stop,
-+};
-+
-+static void mctp_usb_netdev_setup(struct net_device *dev)
-+{
-+	dev->type = ARPHRD_MCTP;
-+
-+	dev->mtu = MCTP_USB_MTU_MIN;
-+	dev->min_mtu = MCTP_USB_MTU_MIN;
-+	dev->max_mtu = MCTP_USB_MTU_MAX;
-+
-+	dev->hard_header_len = sizeof(struct mctp_usb_hdr);
-+	dev->tx_queue_len = DEFAULT_TX_QUEUE_LEN;
-+	dev->addr_len = 0;
-+	dev->flags = IFF_NOARP;
-+	dev->netdev_ops = &mctp_usb_netdev_ops;
-+	dev->needs_free_netdev = false;
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
-+}
-+
-+static int mctp_usb_probe(struct usb_interface *intf,
-+			  const struct usb_device_id *id)
-+{
-+	struct usb_endpoint_descriptor *ep_in, *ep_out;
-+	struct usb_host_interface *iface_desc;
-+	struct net_device *netdev;
-+	struct mctp_usb *dev;
-+	int rc;
-+
-+	/* only one alternate */
-+	iface_desc = intf->cur_altsetting;
-+
-+	rc = usb_find_common_endpoints(iface_desc, &ep_in, &ep_out, NULL, NULL);
-+	if (rc) {
-+		dev_err(&intf->dev, "invalid endpoints on device?\n");
-+		return rc;
-+	}
-+
-+	netdev = alloc_netdev(sizeof(*dev), "mctpusb%d", NET_NAME_ENUM,
-+			      mctp_usb_netdev_setup);
-+	if (!netdev)
-+		return -ENOMEM;
-+
-+	SET_NETDEV_DEV(netdev, &intf->dev);
-+	dev = netdev_priv(netdev);
-+	dev->netdev = netdev;
-+	dev->usbdev = usb_get_dev(interface_to_usbdev(intf));
-+	dev->intf = intf;
-+	usb_set_intfdata(intf, dev);
-+
-+	dev->ep_in = ep_in->bEndpointAddress;
-+	dev->ep_out = ep_out->bEndpointAddress;
-+
-+	dev->tx_urb = usb_alloc_urb(0, GFP_KERNEL);
-+	dev->rx_urb = usb_alloc_urb(0, GFP_KERNEL);
-+	if (!dev->tx_urb || !dev->rx_urb) {
-+		rc = -ENOMEM;
-+		goto err_free_urbs;
-+	}
-+
-+	rc = mctp_register_netdev(netdev, NULL, MCTP_PHYS_BINDING_USB);
-+	if (rc)
-+		goto err_free_urbs;
-+
-+	return 0;
-+
-+err_free_urbs:
-+	usb_free_urb(dev->tx_urb);
-+	usb_free_urb(dev->rx_urb);
-+	free_netdev(netdev);
-+	return rc;
-+}
-+
-+static void mctp_usb_disconnect(struct usb_interface *intf)
-+{
-+	struct mctp_usb *dev = usb_get_intfdata(intf);
-+
-+	mctp_unregister_netdev(dev->netdev);
-+	usb_free_urb(dev->tx_urb);
-+	usb_free_urb(dev->rx_urb);
-+	usb_put_dev(dev->usbdev);
-+	free_netdev(dev->netdev);
-+}
-+
-+static const struct usb_device_id mctp_usb_devices[] = {
-+	{ USB_INTERFACE_INFO(USB_CLASS_MCTP, 0x0, 0x1) },
-+	{ 0 },
-+};
-+
-+MODULE_DEVICE_TABLE(usb, mctp_usb_devices);
-+
-+static struct usb_driver mctp_usb_driver = {
-+	.name		= "mctp-usb",
-+	.id_table	= mctp_usb_devices,
-+	.probe		= mctp_usb_probe,
-+	.disconnect	= mctp_usb_disconnect,
-+};
-+
-+module_usb_driver(mctp_usb_driver)
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Jeremy Kerr <jk@codeconstruct.com.au>");
-+MODULE_DESCRIPTION("MCTP USB transport");
+Understood. I will update these macros in the header.
 
--- 
-2.39.5
+> what about making it:
+>
+> #define NCT6694_CAN_FRAME_TAG_CAN(idx)  (0xC0 | (idx))
+>
 
+Fix it in the v8.
+
+> > +#define NCT6694_CAN_FRAME_FLAG_EFF   BIT(0)
+> > +#define NCT6694_CAN_FRAME_FLAG_RTR   BIT(1)
+> > +#define NCT6694_CAN_FRAME_FLAG_FD    BIT(2)
+> > +#define NCT6694_CAN_FRAME_FLAG_BRS   BIT(3)
+> > +#define NCT6694_CAN_FRAME_FLAG_ERR   BIT(4)
+> > +
+> > +#define NCT6694_NAPI_WEIGHT          32
+> > +
+...
+> > +struct nct6694_can_priv {
+> > +     struct can_priv can;    /* must be the first member */
+> > +     struct can_rx_offload offload;
+> > +     struct net_device *ndev;
+> > +     struct nct6694 *nct6694;
+> > +     struct workqueue_struct *wq;
+> > +     struct work_struct tx_work;
+> > +     struct nct6694_can_frame tx;
+> > +     struct nct6694_can_frame rx;
+> > +     struct nct6694_can_event event[2];
+> > +     struct can_berr_counter bec;
+> > +     unsigned char can_idx;
+>
+> can you use ndev->dev_port instead?
+>
+
+Fix it in the v8.
+
+> > +};
+> > +
+...
+> > +static void nct6694_can_rx(struct net_device *ndev, u8 rx_evt)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +     struct nct6694_can_frame *frame =3D &priv->rx;
+> > +     struct nct6694_cmd_header cmd_hd =3D {
+> > +             .mod =3D NCT6694_CAN_MOD,
+> > +             .cmd =3D NCT6694_CAN_RECEIVE,
+> > +             .sel =3D NCT6694_CAN_RECEIVE_SEL(priv->can_idx, 1),
+> > +             .len =3D cpu_to_le16(sizeof(*frame))
+> > +     };
+> > +     struct sk_buff *skb;
+> > +     int ret;
+> > +
+> > +     ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, frame);
+> > +     if (ret)
+> > +             return;
+> > +
+> > +     if (frame->flag & NCT6694_CAN_FRAME_FLAG_FD) {
+> > +             struct canfd_frame *cfd;
+> > +
+> > +             skb =3D alloc_canfd_skb(priv->ndev, &cfd);
+> > +             if (!skb)
+> > +                     return;
+> > +
+> > +             cfd->can_id =3D le32_to_cpu(frame->id);
+> > +             cfd->len =3D canfd_sanitize_len(frame->length);
+> > +             if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
+> > +                     cfd->can_id |=3D CAN_EFF_FLAG;
+> > +             if (frame->flag & NCT6694_CAN_FRAME_FLAG_BRS)
+> > +                     cfd->flags |=3D CANFD_BRS;
+> > +             if (frame->flag & NCT6694_CAN_FRAME_FLAG_ERR)
+> > +                     cfd->flags |=3D CANFD_ESI;
+> > +
+> > +             memcpy(cfd->data, frame->data, cfd->len);
+> > +     } else {
+> > +             struct can_frame *cf;
+> > +
+> > +             skb =3D alloc_can_skb(priv->ndev, &cf);
+> > +             if (!skb)
+> > +                     return;
+> > +
+> > +             cf->can_id =3D le32_to_cpu(frame->id);
+> > +             cf->len =3D min_t(u8, frame->length, CAN_MAX_DLEN);
+>
+> use can_cc_dlc2len()
+>
+
+Fix it in the v8.
+
+> > +             if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
+> > +                     cf->can_id |=3D CAN_EFF_FLAG;
+> > +
+> > +             if (frame->flag & NCT6694_CAN_FRAME_FLAG_RTR)
+> > +                     cf->can_id |=3D CAN_RTR_FLAG;
+> > +             else
+> > +                     memcpy(cf->data, frame->data, cf->len);
+> > +     }
+> > +
+> > +     nct6694_can_rx_offload(&priv->offload, skb);
+> > +}
+> > +
+> > +static int nct6694_can_get_berr_counter(const struct net_device *ndev,
+> > +                                     struct can_berr_counter *bec)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +
+> > +     *bec =3D priv->bec;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void nct6694_can_handle_state_change(struct net_device *ndev,
+> > +                                         enum can_state new_state)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +     struct can_berr_counter bec;
+> > +     struct can_frame *cf;
+> > +     struct sk_buff *skb;
+> > +
+> > +     skb =3D alloc_can_err_skb(ndev, &cf);
+> > +
+> > +     nct6694_can_get_berr_counter(ndev, &bec);
+> > +
+> > +     switch (new_state) {
+> > +     case CAN_STATE_ERROR_ACTIVE:
+> > +             priv->can.can_stats.error_warning++;
+>                                     ^^^^^^^^^^^^^
+> > +             priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
+> > +             if (cf)
+> > +                     cf->data[1] |=3D CAN_ERR_CRTL_ACTIVE;
+> > +             break;
+> > +     case CAN_STATE_ERROR_WARNING:
+> > +             priv->can.can_stats.error_warning++;
+> > +             priv->can.state =3D CAN_STATE_ERROR_WARNING;
+> > +             if (cf) {
+> > +                     cf->can_id |=3D CAN_ERR_CRTL;
+> > +                     if (bec.txerr > bec.rxerr)
+> > +                             cf->data[1] =3D CAN_ERR_CRTL_TX_WARNING;
+> > +                     else
+> > +                             cf->data[1] =3D CAN_ERR_CRTL_RX_WARNING;
+> > +                     cf->data[6] =3D bec.txerr;
+> > +                     cf->data[7] =3D bec.rxerr;
+> > +             }
+> > +             break;
+> > +     case CAN_STATE_ERROR_PASSIVE:
+> > +             priv->can.can_stats.error_passive++;
+> > +             priv->can.state =3D CAN_STATE_ERROR_PASSIVE;
+> > +             if (cf) {
+> > +                     cf->can_id |=3D CAN_ERR_CRTL;
+> > +                     cf->data[1] |=3D CAN_ERR_CRTL_RX_PASSIVE;
+> > +                     if (bec.txerr >=3D CAN_ERROR_PASSIVE_THRESHOLD)
+> > +                             cf->data[1] |=3D CAN_ERR_CRTL_TX_PASSIVE;
+> > +                     cf->data[6] =3D bec.txerr;
+> > +                     cf->data[7] =3D bec.rxerr;
+> > +             }
+> > +             break;
+> > +     case CAN_STATE_BUS_OFF:
+> > +             priv->can.state =3D CAN_STATE_BUS_OFF;
+> > +             priv->can.can_stats.bus_off++;
+> > +             if (cf)
+> > +                     cf->can_id |=3D CAN_ERR_BUSOFF;
+> > +             can_free_echo_skb(ndev, 0, NULL);
+> > +             netif_stop_queue(ndev);
+> > +             can_bus_off(ndev);
+> > +             break;
+> > +     default:
+> > +             break;
+> > +     }
+> > +
+> > +     nct6694_can_rx_offload(&priv->offload, skb);
+> > +}
+> > +
+> > +static void nct6694_can_handle_state_errors(struct net_device *ndev, u=
+8 status)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+>
+> It seems you don't have dedicated RX and TX states, so call
+> nct6694_can_get_berr_counter() and use can_state_get_by_berr_counter()
+> to get the states. Then basically do that what what
+> mcp251xfd_handle_cerrif() does, starting with "new_state =3D max(tx_state=
+, rx_state);"
+>
+
+Excuse me, do you mean that nct6694_can_handle_state_change() the flow
+should like v5?
+https://lore.kernel.org/linux-can/CAMZ6RqLHEoukxDfV33iDWXjM1baK922QnWSkOP01=
+VzZ0S_9H8g@mail.gmail.com/
+
+> > +
+> > +     if (status =3D=3D NCT6694_CAN_EVT_STS_ERROR_ACTIVE &&
+> > +         priv->can.state !=3D CAN_STATE_ERROR_ACTIVE) {
+> > +             netdev_dbg(ndev, "Error, entered active state\n");
+> > +             nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_ACT=
+IVE);
+> > +     }
+> > +
+> > +     if (status =3D=3D NCT6694_CAN_EVT_STS_WARNING &&
+> > +         priv->can.state !=3D CAN_STATE_ERROR_WARNING) {
+> > +             netdev_dbg(ndev, "Error, entered warning state\n");
+> > +             nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_WAR=
+NING);
+> > +     }
+> > +
+> > +     if (status =3D=3D NCT6694_CAN_EVT_STS_ERROR_PASSIVE &&
+> > +         priv->can.state !=3D CAN_STATE_ERROR_PASSIVE) {
+> > +             netdev_dbg(ndev, "Error, entered passive state\n");
+> > +             nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_PAS=
+SIVE);
+> > +     }
+> > +
+> > +     if (status =3D=3D NCT6694_CAN_EVT_STS_BUS_OFF &&
+> > +         priv->can.state !=3D CAN_STATE_BUS_OFF) {
+> > +             netdev_dbg(ndev, "Error, entered bus-off state\n");
+> > +             nct6694_can_handle_state_change(ndev, CAN_STATE_BUS_OFF);
+> > +     }
+> > +}
+> > +
+> > +static void nct6694_can_handle_bus_err(struct net_device *ndev, u8 bus=
+_err)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +     struct can_frame *cf;
+> > +     struct sk_buff *skb;
+> > +
+> > +     if (bus_err =3D=3D NCT6694_CAN_EVT_ERR_NO_ERROR)
+> > +             return;
+> > +
+> > +     priv->can.can_stats.bus_error++;
+> > +
+> > +     skb =3D alloc_can_err_skb(ndev, &cf);
+> > +     if (skb)
+> > +             cf->can_id |=3D CAN_ERR_PROT | CAN_ERR_BUSERROR;
+> > +
+> > +     switch (bus_err) {
+> > +     case NCT6694_CAN_EVT_ERR_CRC_ERROR:
+> > +             netdev_dbg(ndev, "CRC error\n");
+> > +             ndev->stats.rx_errors++;
+> > +             if (skb)
+> > +                     cf->data[3] |=3D CAN_ERR_PROT_LOC_CRC_SEQ;
+> > +             break;
+> > +
+> > +     case NCT6694_CAN_EVT_ERR_STUFF_ERROR:
+> > +             netdev_dbg(ndev, "Stuff error\n");
+> > +             ndev->stats.rx_errors++;
+> > +             if (skb)
+> > +                     cf->data[2] |=3D CAN_ERR_PROT_STUFF;
+> > +             break;
+> > +
+> > +     case NCT6694_CAN_EVT_ERR_ACK_ERROR:
+> > +             netdev_dbg(ndev, "Ack error\n");
+> > +             ndev->stats.tx_errors++;
+> > +             if (skb) {
+> > +                     cf->can_id |=3D CAN_ERR_ACK;
+> > +                     cf->data[2] |=3D CAN_ERR_PROT_TX;
+> > +             }
+> > +             break;
+> > +
+> > +     case NCT6694_CAN_EVT_ERR_FORM_ERROR:
+> > +             netdev_dbg(ndev, "Form error\n");
+> > +             ndev->stats.rx_errors++;
+> > +             if (skb)
+> > +                     cf->data[2] |=3D CAN_ERR_PROT_FORM;
+> > +             break;
+> > +
+> > +     case NCT6694_CAN_EVT_ERR_BIT_ERROR:
+> > +             netdev_dbg(ndev, "Bit error\n");
+> > +             ndev->stats.tx_errors++;
+> > +             if (skb)
+> > +                     cf->data[2] |=3D CAN_ERR_PROT_TX | CAN_ERR_PROT_B=
+IT;
+> > +             break;
+> > +
+> > +     default:
+> > +             break;
+> > +     }
+> > +
+>
+> missing check:
+>
+>         if (skb)
+>
+
+Fix it in the v8.
+
+> > +     nct6694_can_rx_offload(&priv->offload, skb);
+> > +}
+> > +
+> > +static void nct6694_can_tx_irq(struct net_device *ndev)
+> > +{
+> > +     struct net_device_stats *stats =3D &ndev->stats;
+> > +
+> > +     stats->tx_bytes +=3D can_get_echo_skb(ndev, 0, NULL);
+>
+> use can_rx_offload_get_echo_skb_queue_tail() here
+>
+
+Fix it in the v8.
+
+> > +     stats->tx_packets++;
+> > +     netif_wake_queue(ndev);
+> > +}
+> > +
+> > +static irqreturn_t nct6694_can_irq(int irq, void *data)
+> > +{
+> > +     struct net_device *ndev =3D data;
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +     struct nct6694_can_event *evt =3D priv->event;
+> > +     struct nct6694_cmd_header cmd_hd =3D {
+> > +             .mod =3D NCT6694_CAN_MOD,
+> > +             .cmd =3D NCT6694_CAN_EVENT,
+> > +             .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, NCT6694_CAN=
+_EVENT_MASK),
+> > +             .len =3D cpu_to_le16(sizeof(priv->event))
+> > +     };
+> > +     irqreturn_t handled =3D IRQ_NONE;
+> > +     int can_idx =3D priv->can_idx;
+> > +     int ret;
+>
+> it would make sense to have a event pointer here instead of the can_idx?
+>
+>         const struct nct6694_can_event *event =3D &priv->event[priv->can_=
+idx];
+>
+
+Fix it in the v8.
+
+> > +
+> > +     ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, evt);
+> > +     if (ret < 0)
+> > +             return handled;
+> > +
+> > +     if (priv->event[can_idx].rx_evt & NCT6694_CAN_EVT_RX_DATA_IN) {
+> > +             nct6694_can_rx(ndev, priv->event[can_idx].rx_evt);
+> > +             handled =3D IRQ_HANDLED;
+> > +     }
+> > +
+> > +     if (priv->event[can_idx].rx_evt & NCT6694_CAN_EVT_RX_DATA_LOST) {
+> > +             nct6694_can_handle_lost_msg(ndev);
+> > +             handled =3D IRQ_HANDLED;
+> > +     }
+> > +
+> > +     if (priv->event[can_idx].status) {
+> > +             nct6694_can_handle_state_errors(ndev, priv->event[can_idx=
+].status);
+> > +             handled =3D IRQ_HANDLED;
+> > +     }
+> > +
+> > +     if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
+> > +             nct6694_can_handle_bus_err(ndev, priv->event[can_idx].err=
+);
+> > +             handled =3D IRQ_HANDLED;
+> > +     }
+> > +
+> > +     if (handled)
+> > +             can_rx_offload_threaded_irq_finish(&priv->offload);
+> > +
+> > +     if (priv->event[can_idx].tx_evt & NCT6694_CAN_EVT_TX_FIFO_EMPTY)
+> > +             nct6694_can_tx_irq(ndev);
+>
+> Move this in front of the handled check and add "handled =3D IRQ_HANDLED;=
+"
+> to the if-block.
+>
+
+Fix it in the v8.
+
+> > +
+> > +     priv->bec.rxerr =3D priv->event[can_idx].rec;
+> > +     priv->bec.txerr =3D priv->event[can_idx].tec;
+> > +
+> > +     return handled;
+> > +}
+> > +
+> > +static void nct6694_can_tx_work(struct work_struct *work)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D container_of(work,
+> > +                                                  struct nct6694_can_p=
+riv,
+> > +                                                  tx_work);
+> > +     struct nct6694_can_frame *frame =3D &priv->tx;
+> > +     struct net_device *ndev =3D priv->ndev;
+> > +     struct net_device_stats *stats =3D &ndev->stats;
+> > +     struct sk_buff *skb =3D priv->can.echo_skb[0];
+> > +     static const struct nct6694_cmd_header cmd_hd =3D {
+> > +             .mod =3D NCT6694_CAN_MOD,
+> > +             .cmd =3D NCT6694_CAN_DELIVER,
+> > +             .sel =3D NCT6694_CAN_DELIVER_SEL(1),
+> > +             .len =3D cpu_to_le16(sizeof(*frame))
+> > +     };
+> > +     u32 txid;
+> > +     int err;
+> > +
+> > +     memset(frame, 0, sizeof(*frame));
+> > +
+> > +     if (priv->can_idx =3D=3D 0)
+> > +             frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN0;
+> > +     else
+> > +             frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN1;
+>
+>         frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN(priv->can_idx);
+>
+
+Fix it in the v8.
+
+> > +
+> > +     if (can_is_canfd_skb(skb)) {
+> > +             struct canfd_frame *cfd =3D (struct canfd_frame *)skb->da=
+ta;
+> > +
+> > +             if (cfd->flags & CANFD_BRS)
+> > +                     frame->flag |=3D NCT6694_CAN_FRAME_FLAG_BRS;
+> > +
+> > +             if (cfd->can_id & CAN_EFF_FLAG) {
+> > +                     txid =3D cfd->can_id & CAN_EFF_MASK;
+> > +                     frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
+> > +             } else {
+> > +                     txid =3D cfd->can_id & CAN_SFF_MASK;
+> > +             }
+> > +             frame->flag |=3D NCT6694_CAN_FRAME_FLAG_FD;
+> > +             frame->id =3D cpu_to_le32(txid);
+> > +             frame->length =3D cfd->len;
+> > +
+> > +             memcpy(frame->data, cfd->data, cfd->len);
+> > +     } else {
+> > +             struct can_frame *cf =3D (struct can_frame *)skb->data;
+> > +
+> > +             if (cf->can_id & CAN_EFF_FLAG) {
+> > +                     txid =3D cf->can_id & CAN_EFF_MASK;
+> > +                     frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
+> > +             } else {
+> > +                     txid =3D cf->can_id & CAN_SFF_MASK;
+> > +             }
+> > +
+> > +             if (cf->can_id & CAN_RTR_FLAG)
+> > +                     frame->flag |=3D NCT6694_CAN_FRAME_FLAG_RTR;
+> > +             else
+> > +                     memcpy(frame->data, cf->data, cf->len);
+> > +
+> > +             frame->id =3D cpu_to_le32(txid);
+> > +             frame->length =3D cf->len;
+> > +     }
+> > +
+> > +     err =3D nct6694_write_msg(priv->nct6694, &cmd_hd, frame);
+> > +     if (err) {
+> > +             netdev_err(ndev, "%s: TX FIFO is full!\n", __func__);
+> > +             can_free_echo_skb(ndev, 0, NULL);
+> > +             stats->tx_dropped++;
+> > +             stats->tx_errors++;
+> > +             netif_wake_queue(ndev);
+> > +     }
+> > +}
+> > +
+> > +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
+> > +                                       struct net_device *ndev)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +
+> > +     if (can_dev_dropped_skb(ndev, skb))
+> > +             return NETDEV_TX_OK;
+> > +
+> > +     netif_stop_queue(ndev);
+> > +     can_put_echo_skb(skb, ndev, 0, 0);
+> > +     queue_work(priv->wq, &priv->tx_work);
+> > +
+> > +     return NETDEV_TX_OK;
+> > +}
+> > +
+> > +static int nct6694_can_start(struct net_device *ndev)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +     struct nct6694_can_setting *setting;
+> > +     struct nct6694_cmd_header cmd_hd =3D {
+> > +             .mod =3D NCT6694_CAN_MOD,
+> > +             .cmd =3D NCT6694_CAN_SETTING,
+> > +             .sel =3D priv->can_idx,
+> > +             .len =3D cpu_to_le16(sizeof(*setting))
+> > +     };
+> > +     const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> > +     const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
+>
+> nitpick:
+> move these 2 right after priv and d_bt first.
+>
+
+Fix it in the v8.
+
+> > +     int ret;
+> > +
+> > +     setting =3D kzalloc(sizeof(*setting), GFP_KERNEL);
+> > +     if (!setting)
+> > +             return -ENOMEM;
+> > +
+> > +     setting->nbr =3D cpu_to_le32(n_bt->bitrate);
+> > +     setting->dbr =3D cpu_to_le32(d_bt->bitrate);
+> > +
+> > +     if (priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY)
+> > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1=
+_MON);
+> > +
+> > +     if ((priv->can.ctrlmode & CAN_CTRLMODE_FD) &&
+> > +         priv->can.ctrlmode & CAN_CTRLMODE_FD_NON_ISO)
+>
+> We should move this check into the infrastructure. Please only check for
+> CAN_CTRLMODE_FD_NON_ISO.
+>
+
+Fix it in the v8.
+
+> > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1=
+_NISO);
+> > +
+> > +     if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
+> > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1=
+_LBCK);
+> > +
+> > +     ret =3D nct6694_write_msg(priv->nct6694, &cmd_hd, setting);
+> > +     if (ret)
+> > +             goto exit;
+> > +
+> > +     priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
+> > +
+> > +exit:
+> > +     kfree(setting);
+> > +     return ret;
+> > +}
+> > +
+> > +static int nct6694_can_stop(struct net_device *ndev)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +
+>
+> How does the device know, that it should leave the CAN bus? Is there a
+> message you can send to it? If not put it at least into listen only mode.
+>
+
+My device only resets upon receiving the initial command, so can I
+assign priv->can.ctrlmode =3D CAN_CTRLMODE_LISTENONLY directly?
+
+> > +     netif_stop_queue(ndev);
+> > +     free_irq(ndev->irq, ndev);
+> > +     destroy_workqueue(priv->wq);
+> > +     priv->wq =3D NULL;
+>
+> no need to set wq to NULL
+>
+
+Fix it in the v8.
+
+> > +     priv->can.state =3D CAN_STATE_STOPPED;
+> > +     can_rx_offload_disable(&priv->offload);
+>
+> Please change move can_rx_offload_disable() in front of "priv->can.state
+> =3D CAN_STATE_STOPPED".
+>
+
+Fix it in the v8.
+
+> > +     close_candev(ndev);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static int nct6694_can_set_mode(struct net_device *ndev, enum can_mode=
+ mode)
+> > +{
+> > +     switch (mode) {
+> > +     case CAN_MODE_START:
+> > +             nct6694_can_start(ndev);
+>
+> please add error checking
+>
+
+Fix it in the v8.
+
+> > +             netif_wake_queue(ndev);
+> > +             return 0;
+> > +     default:
+> > +             return -EOPNOTSUPP;
+> > +     }
+> > +}
+> > +
+...
+> > +static int nct6694_can_probe(struct platform_device *pdev)
+> > +{
+> > +     const struct mfd_cell *cell =3D mfd_get_cell(pdev);
+> > +     struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> > +     struct nct6694_can_priv *priv;
+> > +     struct net_device *ndev;
+> > +     int ret, irq, can_clk;
+> > +
+> > +     irq =3D irq_create_mapping(nct6694->domain,
+> > +                              NCT6694_IRQ_CAN1 + cell->id);
+> > +     if (!irq)
+> > +             return irq;
+> > +
+> > +     ndev =3D alloc_candev(sizeof(struct nct6694_can_priv), 1);
+> > +     if (!ndev)
+> > +             return -ENOMEM;
+> > +
+> > +     ndev->irq =3D irq;
+> > +     ndev->flags |=3D IFF_ECHO;
+> > +     ndev->dev_port =3D cell->id;
+> > +     ndev->netdev_ops =3D &nct6694_can_netdev_ops;
+> > +     ndev->ethtool_ops =3D &nct6694_can_ethtool_ops;
+> > +
+> > +     priv =3D netdev_priv(ndev);
+> > +     priv->nct6694 =3D nct6694;
+> > +     priv->ndev =3D ndev;
+> > +
+> > +     can_clk =3D nct6694_can_get_clock(priv);
+> > +     if (can_clk < 0) {
+> > +             ret =3D dev_err_probe(&pdev->dev, can_clk,
+> > +                                 "Failed to get clock\n");
+> > +             goto free_candev;
+> > +     }
+> > +
+> > +     INIT_WORK(&priv->tx_work, nct6694_can_tx_work);
+> > +
+> > +     priv->can_idx =3D cell->id;
+> > +     priv->can.state =3D CAN_STATE_STOPPED;
+>
+> The device is allocated with CAN_STATE_STOPPED set, can be removed.
+>
+
+Fix it in the v8.
+
+> > +     priv->can.clock.freq =3D can_clk;
+> > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_nominal_cons=
+t;
+> > +     priv->can.data_bittiming_const =3D &nct6694_can_bittiming_data_co=
+nst;
+> > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
+> > +     priv->can.do_get_berr_counter =3D nct6694_can_get_berr_counter;
+> > +
+> > +     priv->can.ctrlmode =3D CAN_CTRLMODE_FD;
+> > +
+> > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK           =
+ |
+> > +                                    CAN_CTRLMODE_LISTENONLY          |
+> > +                                    CAN_CTRLMODE_FD                  |
+> > +                                    CAN_CTRLMODE_FD_NON_ISO          |
+> > +                                    CAN_CTRLMODE_BERR_REPORTING;
+>
+> nitpick: one space in front of "|" please
+>
+> Does your device run in CAN-FD mode all the time? If so, please use
+> can_set_static_ctrlmode() to set it after priv->can.ctrlmode_supported
+> and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+>
+
+Fix it in the v8.
+
+> > +
+> > +     ret =3D can_rx_offload_add_manual(ndev, &priv->offload,
+> > +                                     NCT6694_NAPI_WEIGHT);
+> > +     if (ret) {
+> > +             dev_err_probe(&pdev->dev, ret, "Failed to add rx_offload\=
+n");
+> > +             goto free_candev;
+> > +     }
+> > +
+> > +     platform_set_drvdata(pdev, priv);
+> > +     SET_NETDEV_DEV(priv->ndev, &pdev->dev);
+> > +
+> > +     ret =3D register_candev(priv->ndev);
+> > +     if (ret)
+> > +             goto del_rx_offload;
+> > +
+> > +     return 0;
+> > +
+> > +del_rx_offload:
+>
+> nitpick: please rename to rx_offload_del or can_rx_offload_del
+>
+
+Fix it in the v8.
+
+> > +     can_rx_offload_del(&priv->offload);
+> > +free_candev:
+> > +     free_candev(ndev);
+> > +     return ret;
+> > +}
+> > +
+> > +static void nct6694_can_remove(struct platform_device *pdev)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D platform_get_drvdata(pdev);
+> > +
+> > +     cancel_work_sync(&priv->tx_work);
+>
+> The workqueue has already been destroyed in nct6694_can_stop(), so more
+> work should be pending.
+>
+
+Fix it in the v8.
+
+> > +     unregister_candev(priv->ndev);
+> > +     can_rx_offload_del(&priv->offload);
+> > +     free_candev(priv->ndev);
+> > +}
+> > +
+
+
+Best regards,
+Ming
 
