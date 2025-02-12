@@ -1,129 +1,105 @@
-Return-Path: <netdev+bounces-165370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D25A31C22
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:37:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D157A31C28
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 03:37:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38CE33A53F5
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:36:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB1457A3E00
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 02:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867F11CD1E1;
-	Wed, 12 Feb 2025 02:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E128A1D5143;
+	Wed, 12 Feb 2025 02:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5AD6OPj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D98F9D6;
-	Wed, 12 Feb 2025 02:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91211CAA87;
+	Wed, 12 Feb 2025 02:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739327815; cv=none; b=LTR+V1w3gUXjue0vx8zs5syoPYNjyaEXc5w10y7qb3EPo8GPE8xLCtziL1FApjY7IIEMG2Q8qVk4aFO9jfoCzQnsLeSS5fOnLUK1ya3PzOYOYC0cApmNqrsmiopsAK61PzzjyD3X1XRKfhNf6D9AwLDg9lCtkf2cB+smshxnueY=
+	t=1739327828; cv=none; b=Ydo7eAPCs9lWTmxhpdfRddmIwa/KjGlwWyLS2WCuFYY7jOrSqyCHgeDzmNY4TRwha+S8EbcLXhQO3zZ1tbWsYJHDGVbePUGc0dZTB/QxPeh4vpTXzmMF+aZDVlxC558SjtrSj2yASr5YMDVhDOySZjrEPMtqrPWhtW/U8nonX3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739327815; c=relaxed/simple;
-	bh=1hPQZXw3sYAjcb0udzB6W2GZ3v0KxEWv2cuZtZv3/q8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r7upD4loihlNXJg9kr2x9SHFRTZW8k5dpAY1bHyHFt44gugDAmsc4hBz0vqtEjsW1KsF9pGnWM60kvX5lgw1QcYR1Vj5CJO2NP9uwQ469a4UDLFVpUrcsOZVhwLUez/OwuJcPC77W6qg2f8ADVGWKZGDNFqomuQQrZN8w/oeLLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.40.54.90])
-	by gateway (Coremail) with SMTP id _____8CxG6w8CaxnPsRyAA--.36701S3;
-	Wed, 12 Feb 2025 10:36:44 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.40.54.90])
-	by front1 (Coremail) with SMTP id qMiowMCx_cY6Caxn_wINAA--.51666S2;
-	Wed, 12 Feb 2025 10:36:43 +0800 (CST)
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-To: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: chenhuacai@kernel.org,
-	si.yanteng@linux.dev,
-	fancer.lancer@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH V2] net: stmmac: dwmac-loongson: Add fix_soc_reset() callback
-Date: Wed, 12 Feb 2025 10:36:22 +0800
-Message-Id: <20250212023622.14512-1-zhaoqunqin@loongson.cn>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1739327828; c=relaxed/simple;
+	bh=YaAR5QiuZynmHcyvLV6BKRsvj5JY5bABea9gGeDWeFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iUafXH21OI30uj1QEBDbimBSznFPeQQ8v1jha3kt9gVi6IveY0T5uToABJcQtkq0G5oFIjRevVZ3sSgBD/EiFIx53DKLoxVF7brCu6z+EvSdGuojNNdD+fpySQrXaF8nzv2YF/VqfmLH4NIEVievp1Vs1L+YdEt+j+xWWKNmmh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5AD6OPj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6255DC4CEDD;
+	Wed, 12 Feb 2025 02:37:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739327828;
+	bh=YaAR5QiuZynmHcyvLV6BKRsvj5JY5bABea9gGeDWeFY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N5AD6OPj27Wkl3Luv+2FQWbuMklKx+34Rn1CtdQ7zsG0l3BSPFpgbnfhOv049+xE3
+	 9IGOPTvYzEW72lzsJFiv4Mkj9ZD4yK2lEADua433cG9lJtFl1MStAzbNaqvdOzvz1U
+	 BQWV5tkZeD3kF8BKP1x2l9IjHq0hj4w7zSJWn8hpzebjQdp52kcVYL9Lu6VhhkvRjk
+	 juBJIrur3mliULP8YoLOx6fB5NDfc6+BmRUTR9DTHudrkd/6whs+4GtlZRVagu0Tpz
+	 n1r/gk1+3jHIg9XDqmtU97wUfq86b0Wm4nyj2scSKQCaiLO463n+M27lcwDEk6W0mN
+	 FfonvHT/opiAA==
+Date: Tue, 11 Feb 2025 18:37:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Joe Damato <jdamato@fastly.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, horms@kernel.org, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, open list <linux-kernel@vger.kernel.org>, "open
+ list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, "open
+ list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)"
+ <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v6 3/3] selftests: drv-net: Test queue xsk
+ attribute
+Message-ID: <20250211183706.5b53ee5e@kernel.org>
+In-Reply-To: <Z6vY_LXp3LTp7qWV@mini-arch>
+References: <20250210193903.16235-1-jdamato@fastly.com>
+	<20250210193903.16235-4-jdamato@fastly.com>
+	<13afab27-2066-4912-b8f6-15ee4846e802@redhat.com>
+	<Z6uM1IDP9JgvGvev@LQ3V64L9R2>
+	<Z6urp3d41nvBoSbG@LQ3V64L9R2>
+	<Z6usZlrFJShn67su@mini-arch>
+	<Z6vRD0agypHWDGkG@LQ3V64L9R2>
+	<Z6vY_LXp3LTp7qWV@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCx_cY6Caxn_wINAA--.51666S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7tr1Uuw4fWFy5WF13Gw1fXwc_yoW8Cw1Upr
-	W3Aa43KrySqry2yan8ArZ8AFyrurWFgr97WFZ2ywna9a9Yy34jqrWYgFWjyr47ArZ5KF13
-	ZFyjkr48uF1DC3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
-	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
-	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Loongson's DWMAC device may take nearly two seconds to complete DMA reset,
-however, the default waiting time for reset is 200 milliseconds.
+On Tue, 11 Feb 2025 15:10:52 -0800 Stanislav Fomichev wrote:
+> > I can't comment on NIPA because I have no idea how it works. Maybe
+> > there is a kernel with some options enabled and other kernels with
+> > various options disabled?  
+> 
+> Sorry, should've been more clear. My suggestion is to add 
+> CONFIG_XDP_SOCKETS to tools/testing/selftests/drivers/net/config
+> to make your new testcase run in a proper environment with XSKs enabled.
 
-Fixes: 803fc61df261 ("net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support")
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
----
-v2: Added comments. Changed callback name to loongson_dwmac_fix_reset.
++1 this we need for sure
 
- .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+> > I wonder if that's a separate issue though?
+> >
+> > In other words: maybe writing the test as I've mentioned above so it
+> > works regardless of whether CONFIG_XDP_SOCKETS is set or not is a
+> > good idea just on its own?
+> > 
+> > I'm just not sure if there's some other pattern I should be
+> > following other than what I proposed above. I'm hesitant to re-spin
+> > until I get feedback on the proposed approach.  
+> 
+> I'd keep your test as is (fail hard if XSK is not there), but 
+> let's see if Paolo/Jakub have any other suggestions.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index bfe6e2d631bd..f5acfb7d4ff6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -516,6 +516,19 @@ static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
- 	return 0;
- }
- 
-+/* Loongson's DWMAC device may take nearly two seconds to complete DMA reset */
-+static int loongson_dwmac_fix_reset(void *priv, void __iomem *ioaddr)
-+{
-+	u32 value = readl(ioaddr + DMA_BUS_MODE);
-+
-+	value |= DMA_BUS_MODE_SFT_RESET;
-+	writel(value, ioaddr + DMA_BUS_MODE);
-+
-+	return readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
-+				  !(value & DMA_BUS_MODE_SFT_RESET),
-+				  10000, 2000000);
-+}
-+
- static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct plat_stmmacenet_data *plat;
-@@ -566,6 +579,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 
- 	plat->bsp_priv = ld;
- 	plat->setup = loongson_dwmac_setup;
-+	plat->fix_soc_reset = loongson_dwmac_fix_reset;
- 	ld->dev = &pdev->dev;
- 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
- 
-
-base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
--- 
-2.43.0
-
+No strong preference. Stan is right that validating the environment 
+is definitely a non-goal for the upstream tests. But if you already
+added and tested the checks Joe you can keep them, up to you.
 
