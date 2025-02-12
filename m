@@ -1,164 +1,154 @@
-Return-Path: <netdev+bounces-165609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C1CA32BAE
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:34:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F4E9A32BEF
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40BCF188918F
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:34:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB46C188AFF3
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 16:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D27244E8F;
-	Wed, 12 Feb 2025 16:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3559244E8F;
+	Wed, 12 Feb 2025 16:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sZtczy56"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V+QW4Ya3"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD0620A5DD;
-	Wed, 12 Feb 2025 16:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739378046; cv=fail; b=NTjc3I3jUwEGcC3p63yACbmQeASkRjtsJP55tCfVJrwZnxWw/goX1Pr+xHpUkoMaN1SMjxPOLhygNChmPxiEYItFqDm7J+K3yG2rQuobGqzHkGrizSOXOLMUSQ6nZSMm4wiObYM94bGu7xyfSMafAtMM4GRWefzoqVYI2boeIvo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739378046; c=relaxed/simple;
-	bh=MDuYX0VRcKArKXBiwJ2+SEQJyu4o8Fh8sg3v0LuOv6o=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=H2rI/j1OZh1OUb3+LbhhUz7fyJjcM51PV4DfKYm4qI08GKvttM4/MTzJuuOquCtwBiyRhJ95oi8IS+tKLWkcxRTwZyYavVxdUHAdhkB5F07wmRJNOmMmomoGpb/mAG8VojMyAIGB04xjwef6xycwOwgiiIgT9Qq1eK48d77cOXA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sZtczy56; arc=fail smtp.client-ip=40.107.244.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VLoAd1aqFsI2Wrt4gUNMbXrw2k5HwZlcr4xH4KRCpdgTrz3Kj92xrth5rJtJ3fXcSegZCS6VB6unT6cg8IrwMv94WbkUU4TKRaVFVGtFHNDR0NSEadHZtb/7z94Pfd/2FR/qjXbfR3tNZRj7IwRnlZI5j0wfuESF2IwhVHhWZK7trCoTHb2TaRYWKcXJyl1IfCgvD8I+oJ1CGiD/zy+65/FROgs+21Fr8HLzrG5X4VYf58xNDKm25AFgl6oY6Aj8Ivg/FZWMoHMa07AaM9Wi/q4/cX1IG+JfBerT87csD5/jgjCrkxdlS3Fdu8WLq/MVXjq+hguKRUxv/Zyz6XMA8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MDuYX0VRcKArKXBiwJ2+SEQJyu4o8Fh8sg3v0LuOv6o=;
- b=A5pE+IRvScYAKX5F0z7tIsdbH0XSjJ2CR8/NVY8nfB+8c9KA3V/sdXhTK9UcMYlW8gIScZgRqXohUU+/7B03nbB3cPSdjrLTydl+tQmsuKxyFVpzspWO0IdTCORyqjpHPq16r+AOtnRl/wSjRM2a3qjs0eFO0TniY2rSfgdIDJL7ih/bmeffjKXDhTqm9NLtfzybZYkrN7bXs6ryQYvtwVATr2ggYpc63Wo8UW4F23969yHFVX7P7n02o9YwBL7WYrUq+0DfWadgGo0DqeleH5myvCdVitMsYApKNyn6Hbu42HyGR2qwrGO+GD9eiff+RPX3fNMtBZwHhKWU5DGFvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MDuYX0VRcKArKXBiwJ2+SEQJyu4o8Fh8sg3v0LuOv6o=;
- b=sZtczy56Pu5ppnnXSd7fRDS3x1Ar7klkjn9uqx4j+AddJYg6FKsBN07xh1JVcsLYUaCN5Hw6Kys39cWjyRok16N3hVOJYuiY8Y9zaQCXAAQJ8J75uhS6VDmxhCzdFYnUIdCn0yZqYw/abPSd5/dTXaYQFcdKBHnwVJRniBfMCH1RKTGPIloA/XtKrcqiYEsEluuP6C8L+42e9icrwDuoA/67DQH1Yo2Tgyb0ge8iXbbN5FCtvL2CTBpDKAMUYOg5AadE2TW3z+9nUCzxXaKNm4UJedId9LirljSpy0ThRx9TgVcWwoRdcCbwyLk1Myh8mmRJAPx5vJcGLROusU4l6w==
-Received: from CH0P221CA0042.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::26)
- by MN0PR12MB5908.namprd12.prod.outlook.com (2603:10b6:208:37c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Wed, 12 Feb
- 2025 16:34:00 +0000
-Received: from DS3PEPF000099D5.namprd04.prod.outlook.com
- (2603:10b6:610:11d:cafe::d5) by CH0P221CA0042.outlook.office365.com
- (2603:10b6:610:11d::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.13 via Frontend Transport; Wed,
- 12 Feb 2025 16:34:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS3PEPF000099D5.mail.protection.outlook.com (10.167.17.6) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Wed, 12 Feb 2025 16:34:00 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 12 Feb
- 2025 08:33:44 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 12 Feb
- 2025 08:33:39 -0800
-References: <20250212152311.1332-1-vulab@iscas.ac.cn>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Wentao Liang <vulab@iscas.ac.cn>
-CC: <idosch@nvidia.com>, <petrm@nvidia.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH] mlxsw: Add return value check for
- mlxsw_sp_port_get_stats_raw()
-Date: Wed, 12 Feb 2025 17:32:15 +0100
-In-Reply-To: <20250212152311.1332-1-vulab@iscas.ac.cn>
-Message-ID: <87wmdvcecg.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFA6256C74;
+	Wed, 12 Feb 2025 16:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739378239; cv=none; b=jCZMr8zRtSDOX0iTD9Zi4lbQQzLzUu3oN2rIFrapJJUhSMlmzAtqwsxyRsV4XniazYeRY5CbEEHVRNso38uAH4X+cqqDQWhXXSplvMZ2j+2KXWqTOj/WGHxsihNPQrQyq9Ea0QVmYARDbrquuNKwT9X6xOpKA99SN8vcnLfL994=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739378239; c=relaxed/simple;
+	bh=81vufag9QYMCMT3+26a0Zhg5TKB87NY4aCq/Ag+FxgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sysc0J4D/pNQWIrnINVxXlRskmAhAjmnDIV1CYgtoIKI6GoHuBf7s5ffKhSaRG5Kq1DfprlkXebT81aA5+nRyOujqF21NPpNcVIZT1aRr5DfYj8CWtxHWas/eud8f6WQwWIp6CnDlnxINEZZDIhBLADBdJDS0LFmBUcq5mrMH2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V+QW4Ya3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51CGXfjH029508;
+	Wed, 12 Feb 2025 16:37:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=tC30YY7Dq02s0isivKXEgkOELRTi3AhieaLmOPz/D
+	rQ=; b=V+QW4Ya32bO7o3NDEeA95pWIGIX9afK5W7cmNpQ7h1B6S9OYHAuLIF6Sh
+	7cnX4ZAjV1Ig1QXuirsQFTW1hJBc5eBX+th5qWfpANjDHMXVB1u0Qr6mkxG4KGD8
+	4IJhQ+0X4grsRWRMVda+f0ng0iTt73A+gR4WAb7ojsQH+NlLrbi1fpQ7M85+sYrI
+	acKzOJXjx/2BqqJWQqKoMH53SP8CcDkliIb///HcoCQ5lBFqzGfnhPLiktmQ19NW
+	pkHOquq2qvAZQCi/FZH6lK9cdION6MwsrMCWi+ohBZELV3gEEu+GxkrZBtc9cvH5
+	kORuH20w9DcRYbgiZ4Rn8i+eIQR5w==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rqbpaxem-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 16:37:04 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51CGTFsU010180;
+	Wed, 12 Feb 2025 16:37:04 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rqbpaxeh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 16:37:04 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51CGU2rY011605;
+	Wed, 12 Feb 2025 16:37:03 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44pktk1hu0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 16:37:03 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51CGaxpA17039632
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Feb 2025 16:36:59 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F58A20043;
+	Wed, 12 Feb 2025 16:36:59 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8DDB520040;
+	Wed, 12 Feb 2025 16:36:59 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 12 Feb 2025 16:36:59 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 3607CE07F0; Wed, 12 Feb 2025 17:36:59 +0100 (CET)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+        Joe Damato <jdamato@fastly.com>
+Subject: [PATCH net] s390/qeth: move netif_napi_add_tx() and napi_enable() from under BH
+Date: Wed, 12 Feb 2025 17:36:59 +0100
+Message-ID: <20250212163659.2287292-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D5:EE_|MN0PR12MB5908:EE_
-X-MS-Office365-Filtering-Correlation-Id: ebfbd517-f96b-452d-d4ba-08dd4b830e19
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rsLIYFi1ME7IphF/qJJw3wk5FIWuBmM+zQZr+/xFDsta4DD4mR/2+KmImZdD?=
- =?us-ascii?Q?XPVprQ8pTwFB2toyey2QltReQYuAEpZ+SVf6wvn6gKDOEEURSJlU9f9WL9gf?=
- =?us-ascii?Q?qqFZOYzBalyHD4EVBNg+goKsgcJJIpiE1CaoVZXD0nmlghZsdxdOqJx8nYQJ?=
- =?us-ascii?Q?RuinznnIpAkrKJ+GnaiK1D0oLQUMiHg3N6qPaSPe2a3OsZOpaMz7vgP6HFan?=
- =?us-ascii?Q?E22USwlA6gDnMrRZspzfPFRWrdHG+UHk2+jgbiQ93UHGhomxw05qY8L6oULv?=
- =?us-ascii?Q?PWA+/tJSS0CYmT0tf8lbwJYj4c8x+WVBAeJ1Kp7NeoTEoA2okmadvIjo98ZG?=
- =?us-ascii?Q?ms+E2ZdsmJ8l5ueX9M+W2TEjhrfxPQYlA6FA8icmMNCq8wtUwlAlm13Z2K8i?=
- =?us-ascii?Q?jIxknNYsXUmvRAisRCGaxoBfsmlZx+cGkDSMdJWk6cilOrnHYGQZ20gMDXg6?=
- =?us-ascii?Q?vij3kwYPmeL1Pz8Ta9XlXJ3mDRKiBqhJErSTD2ZKHFYtba52LitdIeAO6zbP?=
- =?us-ascii?Q?QMBg9MHQqft1h2z5Ozu/R3ptyCNkMqk9iczn7GmFgPb/vl9jGkHtA27mFOOy?=
- =?us-ascii?Q?V0r+MEVguCli/DrjjO+zGel08KTcxk63ZdIEbkdxlOW+kqhN2N5T3DdoJFlA?=
- =?us-ascii?Q?rTSjF9J74sDe2MHXk2pBCpGVTmOkNCzJZpVkhh7GFz5IeYIUo/0xgctqjZES?=
- =?us-ascii?Q?fuEKJibzIqpVHX4Orj99O6utBSVsXyyEpWoAjn/WULIC80CBezeu5Tn5w3IF?=
- =?us-ascii?Q?jOTP9f6e4U8FWUUh7pC/TYyLskFES/WvRU3JWAxPDkTq8FX+r07ri43eIwzW?=
- =?us-ascii?Q?1CpIluczHcvUpeHhNyhsaLnc5piO7cLE064l+z/1et9oZrxMKlVthHubIucu?=
- =?us-ascii?Q?RjzkArP3Y7EPH9m0X7eN9MxnebpzGZRLhMIInIjPX2iHo+t8VPcDd01huk84?=
- =?us-ascii?Q?rmBJjxTB5upsjVpK/fqLnYoui7SipXP7wu+48eXfpUYHnGXaGzDMmtoiblIR?=
- =?us-ascii?Q?5gcmY51S7XbdsGiK/p7FcJE865n/pLsFXGLJJOEr/LQLA2yLAtO/c76jZ5IO?=
- =?us-ascii?Q?LXJGHMdNnABOx6fN2aIEesE+mB/GM9uesBt0+fqBw85mQ/uCWmO7MOemVogb?=
- =?us-ascii?Q?13YOzXRsAPy2q7PBVO83EEXdHsyqa50cyhxCsGVNCAmSCy5JRgXJ0ls1yYwz?=
- =?us-ascii?Q?LxzfpOA8SxyQfOobX/EcL30KMzwyeU8lx2tCkXNIddJbAJxEp9/APhYbLMVg?=
- =?us-ascii?Q?+ZFdzy5KARQErAPZTFGwzGrigxPGveTZ6+5CEXvK1lPjj4n/XElC491loNVj?=
- =?us-ascii?Q?t9jZLIC4GFgKpvJPHJAjd9rFcZ0VCcxQMnEa/BBCbEdg/YVKrq4KcRJigHd3?=
- =?us-ascii?Q?gS8YM1JAt9qunsDSiEg2gAweHW+MFtIolsSOYD/kRMUUi53dLmGvSOoiv2mx?=
- =?us-ascii?Q?apsWyHIJjd80oJw7qQLeDkD2te+oqByRzPYnjxPZzgKs8t/w11+3KCdy3zji?=
- =?us-ascii?Q?y+1JJ29aKNKTFIg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 16:34:00.4288
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebfbd517-f96b-452d-d4ba-08dd4b830e19
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099D5.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5908
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: S6ETxGMwYkgPLUW7M1YX1PLUVePRYZGx
+X-Proofpoint-ORIG-GUID: boSTjGIhFiKXgGNfSFKo_ts6aYVB3joY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-12_05,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ suspectscore=0 phishscore=0 adultscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=987 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502120122
 
+Like other drivers qeth is calling local_bh_enable() after napi_schedule()
+to kick-start softirqs [0].
+Since netif_napi_add_tx() and napi_enable() now take the netdev_lock()
+mutex [1], move them out from under the BH protection. Same solution as in
+commit a60558644e20 ("wifi: mt76: move napi_enable() from under BH")
 
-Wentao Liang <vulab@iscas.ac.cn> writes:
+Fixes: 1b23cdbd2bbc ("net: protect netdev->napi_list with netdev_lock()")
+Link: https://lore.kernel.org/netdev/20240612181900.4d9d18d0@kernel.org/ [0]
+Link: https://lore.kernel.org/netdev/20250115035319.559603-1-kuba@kernel.org/ [1]
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+---
+ drivers/s390/net/qeth_core_main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> Add a check for the return value of mlxsw_sp_port_get_stats_raw()
-> in __mlxsw_sp_port_get_stats(). If mlxsw_sp_port_get_stats_raw()
-> returns an error, exit the function to prevent further processing
-> with potentially invalid data.
->
-> Fixes: 614d509aa1e7 ("mlxsw: Move ethtool_ops to spectrum_ethtool.c")
-> Cc: stable@vger.kernel.org # 5.9+
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
+index a3adaec5504e..20328d695ef9 100644
+--- a/drivers/s390/net/qeth_core_main.c
++++ b/drivers/s390/net/qeth_core_main.c
+@@ -7050,14 +7050,16 @@ int qeth_open(struct net_device *dev)
+ 	card->data.state = CH_STATE_UP;
+ 	netif_tx_start_all_queues(dev);
+ 
+-	local_bh_disable();
+ 	qeth_for_each_output_queue(card, queue, i) {
+ 		netif_napi_add_tx(dev, &queue->napi, qeth_tx_poll);
+ 		napi_enable(&queue->napi);
+-		napi_schedule(&queue->napi);
+ 	}
+-
+ 	napi_enable(&card->napi);
++
++	local_bh_disable();
++	qeth_for_each_output_queue(card, queue, i) {
++		napi_schedule(&queue->napi);
++	}
+ 	napi_schedule(&card->napi);
+ 	/* kick-start the NAPI softirq: */
+ 	local_bh_enable();
+-- 
+2.45.2
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-
-Thanks!
 
