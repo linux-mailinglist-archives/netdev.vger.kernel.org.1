@@ -1,193 +1,264 @@
-Return-Path: <netdev+bounces-165702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBFE0A3321C
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:09:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D77A33258
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 23:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 958F27A45C2
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:08:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E93C1642B9
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 22:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C16C2040BD;
-	Wed, 12 Feb 2025 22:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3E71FF1D6;
+	Wed, 12 Feb 2025 22:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3uDUavh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vhKDFuYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34545204095;
-	Wed, 12 Feb 2025 22:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E9C190470
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739398135; cv=none; b=TA+/3l7JA+l/D2YHm8katm25KYS4tGyOTOq8rX23ROsPP3A+GZ1OgzqvmdHy/9jZunkQh85bwNlfgFHkgv+cvfrL1o5Ws9UcLmRfgvmClHdWL/1PM44nAs/z4awBsMS6dH7/uUN1OJr4WWFbUg4PkDpClKLHgdjD0tLXus5a4WU=
+	t=1739398903; cv=none; b=rCsLDSQEgwoDMyPUbdywy9ihwOLiiTu6JPb9A6RcB+kJapgkpN35hiLF4OmQpX9Uchv7eak1/ZeAMmfEAWtRZueXr9taQtklmFQ0dNpwvblkv3t8RQC9gcu+s+GQFRXrpSS0k7ZigqYgL3r32Y+7z+p3dAu2StUD/VJ/vFdCV7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739398135; c=relaxed/simple;
-	bh=RSxeycxN+OR2igWs7iCrFsgBzSuOib+ZW47/gosGsbo=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=l5VtPGxfS4bqFGfcTONf/oAJ4BAsPis8Sod3438iboTYixdn+N+r/DTC1kWPIykTPoBN9LEUsRu5V/6nwlHseSR7hosgrVFNNSNumo1I70Z2PVhoy0HgGBeRlaDCRn8d3RtEOkj/VNf8fghrESlejxZfVCZNMswsZBMDjQtPRiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3uDUavh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D87C4CEE5;
-	Wed, 12 Feb 2025 22:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739398134;
-	bh=RSxeycxN+OR2igWs7iCrFsgBzSuOib+ZW47/gosGsbo=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=S3uDUavh3srVd/+ScWyYzIgrv9yfSjD3VWdiUs8F90WyBe+qeaVzl7rfrHgoMyJna
-	 5O92+xsrNLpe8Wx74mhBcJRud9eVDTo0YFmFEk3RWeQroO9xJAnWW1X1GgvcQYHeDc
-	 HpTA6edH7JXUog7PEVIKlfYfWRbVkXJR0GOFahCYDF8FksTcB+kh1HkuvX7BoeJPha
-	 lntcn9Jr6Zsvj8tcwZKvZSWpgHDCaDHIcvwvqwnJxZj5OPg+BxwbdUrK9c5YcqPVgE
-	 CgIAv9ML+/T+BA9G46HeWIU/vjVCmXh8IHjnpZBCDBE9yGB2T52Nf1ixzUnRR8Ct02
-	 XkDycYYo+ykow==
-Date: Wed, 12 Feb 2025 16:08:53 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1739398903; c=relaxed/simple;
+	bh=AfhynHGRbH0gMXRJkvIVbIvpzdPQS9W+xRsY08e4EXU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r8JjcWiItta738ER7Oyvbufdi2Zu+TPj/9/1qivSlpTWysjftkjQ2DvqVdB9+ZKQPQt2hRO0RWuMVC3I0hNOnFWNRKaZcg/giidr+7FE9KcwSkAu7sEbChFrkEoBP4BmlsmkhhahESuMNAls4cRQ6CWy/3tuJ4BIf2rc4BHd3Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vhKDFuYT; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2f762254-3912-4a8d-97a4-51a9bc7be74b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739398897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O2/mEf+N9Ckmk5bgWQ5dh9b2BxLFZgefgkcJwKHRJTc=;
+	b=vhKDFuYTJKe1e+8LoMCiE6aVX4ptQjk6hcW0HS1wgd31KtMSuy026j+XlTvMSUupePSa+X
+	vd9IHFerfUby+4AnGRKerQRM8Py0jaiBv+rqmD7pg++Q7njDcZzbbF0Op/riZTx+gl9dJ8
+	Y1ECbb6SuqqrHL9uvPkgDRgfn9EX0cM=
+Date: Wed, 12 Feb 2025 23:21:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- Ajay Singh <ajay.kathat@microchip.com>, Simon Horman <horms@kernel.org>, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kalle Valo <kvalo@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
- linux-arm-kernel@lists.infradead.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, Marek Vasut <marex@denx.de>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Marcel Holtmann <marcel@holtmann.org>, Conor Dooley <conor+dt@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-To: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-In-Reply-To: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
-Message-Id: <173939808305.598743.2426492109317429179.robh@kernel.org>
-Subject: Re: [PATCH 00/12] bluetooth: hci_wilc: add new bluetooth driver
+Subject: Re: [PATCH v4 00/10] Introduce fwctl subystem
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ David Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>,
+ Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
+ Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ "Nelson, Shannon" <shannon.nelson@amd.com>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-
-On Wed, 12 Feb 2025 16:46:19 +0100, Alexis Lothoré wrote:
-> Hello,
+在 2025/2/7 1:13, Jason Gunthorpe 写道:
+> [
+> Many people were away around the holiday period, but work is back in full
+> swing now with Dave already at v3 on his CXL work over the past couple
+> weeks. We are looking at a good chance of reaching this merge window. I
+> will work out some shared branches with CXL and get it into linux-next
+> once all three drivers can be assembled and reviews seem to be concluding.
 > 
-> WILC3000 ([1]) is a combo chip exposing 802.11b/g/n and Bluetooth 5.
-> Support for the wlan part has recently been integrated upstream ([2]) in
-> the existing wilc1000 driver. This new series aims to bring support for
-> the bluetooth side.
+> There are couple open notes
+>   - Greg was interested in a new name, but nobody offered any bikesheds
+>   - I would like a co-maintainer
+> ]
 > 
-> The WILC3000 chip is controlled through a SDIO or SPI bus for the wlan
-> part (similarly to wilc1000), and uses standard HCI commands over a UART
-> bus for the bluetooth operations. This work is based on the code
-> available in the vendor kernel ([3]), in which bluetooth is managed
-> directly in the wireless driver, and relies on user to trigger the
-> hardware configuration (chardev manipulations + hciattach). The series
-> brings a new dedicated bluetooth driver to support the bluetooth feature
-> from the chip, without relying on the user to perform the device
-> bringup. However, getting completely rid of the wlan driver dependency
-> is not possible: it is still needed for early BT CPU configuration and
-> BT firmware download, so the new driver still have a dependency of the
-> wlan one, with an approach similar to the one used by the rsi driver.
+> fwctl is a new subsystem intended to bring some common rules and order to
+> the growing pattern of exposing a secure FW interface directly to
+> userspace. Unlike existing places like RDMA/DRM/VFIO/uacce that are
+> exposing a device for datapath operations fwctl is focused on debugging,
+> configuration and provisioning of the device. It will not have the
+> necessary features like interrupt delivery to support a datapath.
 > 
-> - Patch 1 brings the new dt binding
-> - Patch 2-9 prepares the wlan side, either by exposing the needed
->   functions to initialize BT, or by mitigating behavior which would
->   prevent BT and WLAN from runnning in parallel
-> - Patch 10 brings the new bluetooth driver
-> - Patch 11 updates the device tree description for sama5d27_wlsom1_ek
->   board (which I used to validate this series) to use the new driver
-> - Patch 12 adds a new entry for this driver in the MAINTAINERS files
+> This concept is similar to the long standing practice in the "HW" RAID
+> space of having a device specific misc device to manage the RAID
+> controller FW. fwctl generalizes this notion of a companion debug and
+> management interface that goes along with a dataplane implemented in an
+> appropriate subsystem.
 > 
-> This series has been tested with WILC3000 both in SDIO mode (with the
-> chip embedded on the sama5d27_wlsom1_ek) and SPI mode (custom wiring on
-> an SPI on the same eval board, with a WILC3000-SD).
+> The need for this has reached a critical point as many users are moving to
+> run lockdown enabled kernels. Several existing devices have had long
+> standing tooling for management that relied on /sys/../resource0 or PCI
+> config space access which is not permitted in lockdown. A major point of
+> fwctl is to define and document the rules that a device must follow to
+> expose a lockdown compatible RPC.
 > 
-> Since this works needs new code in both the existing wlan driver and the
-> new driver, I have included both linux-wireless and bluetooth mailing
-> lists, while keeping the entire series for clarity, but let me know if
-> you want to proceed differently.
+> Based on some discussion fwctl splits the RPCs into four categories
 > 
-> [1] https://www.microchip.com/en-us/product/atwilc3000
-> [2] https://lore.kernel.org/linux-wireless/20241004114551.40236-1-marex@denx.de/
-> [3] https://github.com/linux4microchip/linux/tree/linux-6.6-mchp/drivers/net/wireless/microchip/wilc1000
+> 	FWCTL_RPC_CONFIGURATION
+> 	FWCTL_RPC_DEBUG_READ_ONLY
+> 	FWCTL_RPC_DEBUG_WRITE
+> 	FWCTL_RPC_DEBUG_WRITE_FULL
 > 
-> ---
-> Alexis Lothoré (12):
->       dt-bindings: bluetooth: describe wilc 3000 bluetooth chip
->       wifi: wilc1000: add a read-modify-write API for registers accesses
->       wifi: wilc1000: add lock to prevent concurrent firmware startup
->       wifi: wilc1000: allow to use acquire/release bus in other parts of driver
->       wifi: wilc1000: do not depend on power save flag to wake up chip
->       wifi: wilc1000: remove timeout parameter from set_power_mgmt
->       wifi: wilc1000: reorganize makefile objs into sorted list
->       wifi: wilc1000: add basic functions to allow bluetooth bringup
->       wifi: wilc1000: disable firmware power save if bluetooth is in use
->       bluetooth: hci_wilc: add wilc hci driver
->       ARM: dts: at91-sama5d27_wlsom1: update bluetooth chip description
->       MAINTAINERS: add entry for new wilc3000 bluetooth driver
+> Where the latter two trigger a new TAINT_FWCTL, and the final one requires
+> CAP_SYS_RAWIO - excluding it from lockdown. The device driver and its FW
+> would be responsible to restrict RPCs to the requested security scope,
+> while the core code handles the tainting and CAP checks.
 > 
->  .../net/bluetooth/microchip,wilc3000-bt.yaml       |  41 +++
->  MAINTAINERS                                        |   7 +
->  .../boot/dts/microchip/at91-sama5d27_wlsom1.dtsi   |   8 +
->  .../boot/dts/microchip/at91-sama5d27_wlsom1_ek.dts |  10 -
->  drivers/bluetooth/Kconfig                          |  13 +
->  drivers/bluetooth/Makefile                         |   3 +-
->  drivers/bluetooth/hci_uart.h                       |   1 +
->  drivers/bluetooth/hci_wilc.c                       | 333 ++++++++++++++++++++
->  drivers/net/wireless/microchip/wilc1000/Kconfig    |   3 +
->  drivers/net/wireless/microchip/wilc1000/Makefile   |  11 +-
->  drivers/net/wireless/microchip/wilc1000/bt.c       | 345 +++++++++++++++++++++
->  drivers/net/wireless/microchip/wilc1000/cfg80211.c |   7 +-
->  drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
->  drivers/net/wireless/microchip/wilc1000/hif.h      |   2 +-
->  drivers/net/wireless/microchip/wilc1000/netdev.c   |  14 +
->  drivers/net/wireless/microchip/wilc1000/netdev.h   |   5 +
->  drivers/net/wireless/microchip/wilc1000/sdio.c     | 101 ++++--
->  drivers/net/wireless/microchip/wilc1000/spi.c      |  43 +++
->  drivers/net/wireless/microchip/wilc1000/wlan.c     | 154 ++++-----
->  drivers/net/wireless/microchip/wilc1000/wlan.h     |  23 ++
->  include/net/wilc.h                                 |  19 ++
->  21 files changed, 996 insertions(+), 149 deletions(-)
-> ---
-> base-commit: 95f6f2d73dc40ab53a94756689ce5cfd2f23361a
-> change-id: 20240828-wilc3000_bt-fa452f2a93ad
+> For details see the final patch which introduces the documentation.
 > 
-> Best regards,
-> --
-> Alexis Lothoré, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+> The CXL FWCTL driver is now in it own series on v3:
+>   https://lore.kernel.org/r/20250204220430.4146187-1-dave.jiang@intel.com
+> 
+> I'm expecting a 3rd driver (from Shannon @ Pensando) to be posted right
+> away, the github version I saw looked good. I've got soft commitments for
+> about 6 drivers in total now.
+> 
+> There have been three LWN articles written discussing various aspects of
+> this proposal:
+> 
+>   https://lwn.net/Articles/955001/
+>   https://lwn.net/Articles/969383/
+>   https://lwn.net/Articles/990802/
+> 
+> A really giant ksummit thread preceding a discussion at the Maintainer
+> Summit:
+> 
+>   https://lore.kernel.org/ksummit/668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch/
+> 
+> Several have expressed general support for this concept:
+> 
+>   AMD/Pensando - https://lore.kernel.org/linux-rdma/20241205222818.44439-1-shannon.nelson@amd.com
+>   Broadcom Networking - https://lore.kernel.org/r/Zf2n02q0GevGdS-Z@C02YVCJELVCG
+>   Christoph Hellwig - https://lore.kernel.org/r/Zcx53N8lQjkpEu94@infradead.org
+>   Daniel Vetter - https://lore.kernel.org/r/ZrHY2Bds7oF7KRGz@phenom.ffwll.local
+>   Enfabrica - https://lore.kernel.org/r/9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org
+>   NVIDIA Networking
+>   Oded Gabbay/Habana - https://lore.kernel.org/r/ZrMl1bkPP-3G9B4N@T14sgabbay.
+>   Oracle Linux - https://lore.kernel.org/r/6lakj6lxlxhdgrewodvj3xh6sxn3d36t5dab6najzyti2navx3@wrge7cyfk6nq
+>   SuSE/Hannes - https://lore.kernel.org/r/2fd48f87-2521-4c34-8589-dbb7e91bb1c8@suse.com
+> 
+> Work is ongoing for userspace, currently the mellanox tool suite has been
+> ported over:
+>    https://github.com/Mellanox/mstflint
+> 
+> And a more simplified example how to use it:
+>    https://github.com/jgunthorpe/mlx5ctl.git
+
+Hi, Jason
+
+I read all the threads about this fwctl subsystem carefully. I think 
+that this fwctl tool is very nice and helpful in our work. But I can not 
+find a user guide in the threads.
+
+I want to have a try in our debug work with mlx5 devices. Can you share 
+a link of a user guide with us?
+
+Your helps are much appreciated.
+
+Thanks a lot.
+Zhu Yanjun
+
+> 
+> This is on github: https://github.com/jgunthorpe/linux/commits/fwctl
+> 
+> v4:
+>   - Rebase to v6.14-rc1
+>   - Fine tune comments and rst documentatin
+>   - Adjust cleanup.h usage - remove places that add more ofuscation than
+>     value
+>   - CXL is back to its own independent series
+>   - Increase FWCTL_MAX_DEVICES to 4096, someone hit the limit
+>   - Fix mlx5ctl_validate_rpc() logic around scope checking
+>   - Disable mlx5ctl on SFs
+> v3: https://patch.msgid.link/r/0-v3-960f17f90f17+516-fwctl_jgg@nvidia.com
+>   - Rebase to v6.11-rc4
+>   - Add a squashed version of David's CXL series as the 2nd driver
+>   - Add missing includes
+>   - Improve comments based on feedback
+>   - Use the kdoc format that puts the member docs inside the struct
+>   - Rewrite fwctl_alloc_device() to be clearer
+>   - Incorporate all remarks for the documentation
+> v2: https://lore.kernel.org/r/0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com
+>   - Rebase to v6.10-rc5
+>   - Minor style changes
+>   - Follow the style consensus for the guard stuff
+>   - Documentation grammer/spelling
+>   - Add missed length output for mlx5 get_info
+>   - Add two more missed MLX5 CMD's
+>   - Collect tags
+> v1: https://lore.kernel.org/r/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> 
+> Andy Gospodarek (2):
+>    fwctl/bnxt: Support communicating with bnxt fw
+>    bnxt: Create an auxiliary device for fwctl_bnxt
+> 
+> Jason Gunthorpe (6):
+>    fwctl: Add basic structure for a class subsystem with a cdev
+>    fwctl: Basic ioctl dispatch for the character device
+>    fwctl: FWCTL_INFO to return basic information about the device
+>    taint: Add TAINT_FWCTL
+>    fwctl: FWCTL_RPC to execute a Remote Procedure Call to device firmware
+>    fwctl: Add documentation
+> 
+> Saeed Mahameed (2):
+>    fwctl/mlx5: Support for communicating with mlx5 fw
+>    mlx5: Create an auxiliary device for fwctl_mlx5
+> 
+>   Documentation/admin-guide/tainted-kernels.rst |   5 +
+>   Documentation/userspace-api/fwctl/fwctl.rst   | 285 ++++++++++++
+>   Documentation/userspace-api/fwctl/index.rst   |  12 +
+>   Documentation/userspace-api/index.rst         |   1 +
+>   .../userspace-api/ioctl/ioctl-number.rst      |   1 +
+>   MAINTAINERS                                   |  16 +
+>   drivers/Kconfig                               |   2 +
+>   drivers/Makefile                              |   1 +
+>   drivers/fwctl/Kconfig                         |  32 ++
+>   drivers/fwctl/Makefile                        |   6 +
+>   drivers/fwctl/bnxt/Makefile                   |   4 +
+>   drivers/fwctl/bnxt/bnxt.c                     | 167 +++++++
+>   drivers/fwctl/main.c                          | 416 ++++++++++++++++++
+>   drivers/fwctl/mlx5/Makefile                   |   4 +
+>   drivers/fwctl/mlx5/main.c                     | 340 ++++++++++++++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   3 +
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   3 +
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 126 +++++-
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |   4 +
+>   drivers/net/ethernet/mellanox/mlx5/core/dev.c |   9 +
+>   include/linux/fwctl.h                         | 135 ++++++
+>   include/linux/panic.h                         |   3 +-
+>   include/uapi/fwctl/bnxt.h                     |  27 ++
+>   include/uapi/fwctl/fwctl.h                    | 140 ++++++
+>   include/uapi/fwctl/mlx5.h                     |  36 ++
+>   kernel/panic.c                                |   1 +
+>   tools/debugging/kernel-chktaint               |   8 +
+>   27 files changed, 1782 insertions(+), 5 deletions(-)
+>   create mode 100644 Documentation/userspace-api/fwctl/fwctl.rst
+>   create mode 100644 Documentation/userspace-api/fwctl/index.rst
+>   create mode 100644 drivers/fwctl/Kconfig
+>   create mode 100644 drivers/fwctl/Makefile
+>   create mode 100644 drivers/fwctl/bnxt/Makefile
+>   create mode 100644 drivers/fwctl/bnxt/bnxt.c
+>   create mode 100644 drivers/fwctl/main.c
+>   create mode 100644 drivers/fwctl/mlx5/Makefile
+>   create mode 100644 drivers/fwctl/mlx5/main.c
+>   create mode 100644 include/linux/fwctl.h
+>   create mode 100644 include/uapi/fwctl/bnxt.h
+>   create mode 100644 include/uapi/fwctl/fwctl.h
+>   create mode 100644 include/uapi/fwctl/mlx5.h
 > 
 > 
-
-
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/microchip/' for 20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com:
-
-arch/arm/boot/dts/microchip/at91-sama5d3_eds.dtb: nand-controller: #address-cells: 1 was expected
-	from schema $id: http://devicetree.org/schemas/mtd/nand-controller.yaml#
-arch/arm/boot/dts/microchip/at91-sama5d27_wlsom1_ek.dtb: serial@200: Unevaluated properties are not allowed ('bluetooth@0' was unexpected)
-	from schema $id: http://devicetree.org/schemas/serial/atmel,at91-usart.yaml#
-
-
-
-
+> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
 
 
