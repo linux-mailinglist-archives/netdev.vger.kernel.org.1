@@ -1,143 +1,93 @@
-Return-Path: <netdev+bounces-165396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40B8A31E4B
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:53:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E2CA31E6E
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 07:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D75161CA1
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 05:53:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE374167C21
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 06:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F3B1F9F70;
-	Wed, 12 Feb 2025 05:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zx3D+BuL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C4D1F2367;
+	Wed, 12 Feb 2025 06:03:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF778271834;
-	Wed, 12 Feb 2025 05:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689B02B9BC;
+	Wed, 12 Feb 2025 06:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739339578; cv=none; b=VKqItfIOieNB/rB67OpOH+drK8W47ONudmdMXm3JHaGcgtc065DX9fHWywu3p45cugLKT1M+l6QzUzykKJf2EiF/fyHn0fAeJ7GSU92olmzdgW8I5MqxxYrW2AdbhB2kgYHBYxItbQ7/tFtx9Dtm9whCLfgsYahM3667hZT+QMc=
+	t=1739340223; cv=none; b=Z1lXfFlkLWSWMRZzMEscT+8TvL6GTr0imct2CkCcF5DSE8dOkeYGwrXg/j8N3+fwXASXKTiYd1XZZLhd3PB5eg7Sx3rv7e+rnIqID7C+//JL/zv8KQnLrmrvXMZIf3sFDKYGnN878lnzvZKqPBrEm699nrhkkstiK7N7Y+zF+c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739339578; c=relaxed/simple;
-	bh=7ABNck4OSdeOsAGaKMgFtu9kfL0XbHjNUpueljNrBmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X37mAIEPUY1VN5scKf5ZlU0VkPRHqJHcKerynfTeK2DmNZs5qQxYQgCLkhTmfbDE1VFmmRXxp2o4h1Q35hKUDtG/gCwPT84/0QipRbXP9UyaaTeTnv0BjjsszJKJGkxcowlWoySEOnHQ7C1hDQUsfGSpz1YnxPwEEQRgH8BnVxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zx3D+BuL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6DCBC4CEDF;
-	Wed, 12 Feb 2025 05:52:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739339577;
-	bh=7ABNck4OSdeOsAGaKMgFtu9kfL0XbHjNUpueljNrBmU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Zx3D+BuLnJMdMW33p7kLC9PykFcyt0BhStNllTw2J0jO/6f//eB3WxZGNTN5q+7R8
-	 0o2UxTRcMfbawSjnT+PNhIFCUCbqiz+DCX/NcIIs/txS2hI3nlEG1+n+73XAyl2Qlt
-	 yqkybpddM7K9ink5eomzh35ThmguCqHnJ0xZZRcIkxwowccaLVhYFE0WwerrUP9fti
-	 YLl+3w6x/AiuBWyz3ZfDxdMWdqMawHojpOqgaMiP4cSZ/vy4CxxeXrddFXa8EciCU1
-	 W5sDKNhiVualLJGqQJDgiuDSmNUib2dPmDrIFyYar527jTjYAm8qjBzzD8tPAcL/ro
-	 J09i7CUDr7L0w==
-Message-ID: <cb2db0c4-6f3a-4d44-90e5-b37cbe5e66fb@kernel.org>
-Date: Wed, 12 Feb 2025 06:52:46 +0100
+	s=arc-20240116; t=1739340223; c=relaxed/simple;
+	bh=A7bUJ9Tj4Ai/7lw/dplhZEAaZKBpK26vmJNoCkPBTNM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=LxJP4Mmljwkv4ZdjLFGRfWBiIukhu8wFnZbPZGB56FL9u69gMqhTnvj+jx+Kr0bv9yRyltmlZxqdpOCBw4m3+kcXXt5sF9olEA3IMJKdpmbOobA97VfTjnJAxydFK60omUcd0I5vIa6XdM4mU37luwh2UdlkxMuSex2NFCpslNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8CxdXC4OaxnMONyAA--.3417S3;
+	Wed, 12 Feb 2025 14:03:36 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMAxSsS2OaxnsTsNAA--.1048S2;
+	Wed, 12 Feb 2025 14:03:35 +0800 (CST)
+Subject: Re: [PATCH V2] net: stmmac: dwmac-loongson: Add fix_soc_reset()
+ callback
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, chenhuacai@kernel.org,
+ si.yanteng@linux.dev, fancer.lancer@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ Huacai Chen <chenhuacai@loongson.cn>
+References: <20250212023622.14512-1-zhaoqunqin@loongson.cn>
+ <1def2434-9033-4c83-b7de-c6364b7d3003@kernel.org>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <63882ba5-0b19-308c-d3d8-0dca7509c105@loongson.cn>
+Date: Wed, 12 Feb 2025 14:04:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] net: bcmasp: Add missing of_node_get() before
- of_find_node_by_name()
-To: Zhang Zekun <zhangzekun11@huawei.com>, robh@kernel.org,
- saravanak@google.com, justin.chen@broadcom.com,
- florian.fainelli@broadcom.com, andrew+netdev@lunn.ch, kuba@kernel.org,
- o.rempel@pengutronix.de, kory.maincent@bootlin.com,
- jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
- laurent.pinchart+renesas@ideasonboard.com, maddy@linux.ibm.com,
- mpe@ellerman.id.au, npiggin@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, taras.chornyi@plvision.eu, edumazet@google.com,
- pabeni@redhat.com, sudeep.holla@arm.com, cristian.marussi@arm.com
-Cc: arm-scmi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-media@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, chenjun102@huawei.com
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-3-zhangzekun11@huawei.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <1def2434-9033-4c83-b7de-c6364b7d3003@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250207013117.104205-3-zhangzekun11@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qMiowMAxSsS2OaxnsTsNAA--.1048S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
+	BjDU0xBIdaVrnRJUUUPKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
+	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
+	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
+	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxAqzxv262kKe7AKxVWUAVWUtwCF54CYxVCY1x02
+	62kKe7AKxVWUAVWUtwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07j83kZUUUUU=
 
-On 07/02/2025 02:31, Zhang Zekun wrote:
-> of_find_node_by_name() will decrease the refcount of the device_node.
-> So, get the device_node before passing to it.
-> 
-> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
-> ---
->  drivers/net/ethernet/broadcom/asp2/bcmasp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> index a68fab1b05f0..093c8ea72af9 100644
-> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> @@ -1367,7 +1367,7 @@ static int bcmasp_probe(struct platform_device *pdev)
->  	bcmasp_core_init(priv);
->  	bcmasp_core_init_filters(priv);
->  
-> -	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
-> +	ports_node = of_find_node_by_name_balanced(dev->of_node, "ethernet-ports");
 
-Why this cannot be of_get_child_by_name()?
+在 2025/2/12 下午1:42, Krzysztof Kozlowski 写道:
+> On 12/02/2025 03:36, Qunqin Zhao wrote:
+>> Loongson's DWMAC device may take nearly two seconds to complete DMA reset,
+>> however, the default waiting time for reset is 200 milliseconds.
+>>
+>> Fixes: 803fc61df261 ("net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support")
+> You still miss cc-stable.
+OK, thanks.
+>
+> Best regards,
+> Krzysztof
 
-Best regards,
-Krzysztof
 
