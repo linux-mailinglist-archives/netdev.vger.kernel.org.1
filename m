@@ -1,266 +1,116 @@
-Return-Path: <netdev+bounces-165496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD8AA325C2
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:22:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23D1A325C7
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:23:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA452188B1A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:22:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABD3D168883
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D5727183F;
-	Wed, 12 Feb 2025 12:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3247B205AD4;
+	Wed, 12 Feb 2025 12:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPEp72qX"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD4BF4FA;
-	Wed, 12 Feb 2025 12:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63032271829
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 12:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739362943; cv=none; b=iKW4eDoIDfCpzwEM9aTII1oJ87pm1EGYv6lYzcW7awYN2haSKFZoMVOOFvBDixoNpn0xojS7Yy64AhXvE5HTv5S7tr4W8l6EDAMOh86yGxlXGCiZ7Riy2h1MVy1vi1L/ZeWdA4LqU6ot2Jf4o0mIhBKYp5dQbptlL6YbZ81YnbQ=
+	t=1739363032; cv=none; b=DFjqLtQC/VrlMQCzM+11HT7rRw7dbsw3xCbOyP4SH0E7nwy3FFldlYw6hT5Veo7By0kAhvD2Na66QFOrPos+02jRwKg5eI56twlIYt5yo61KMwTfj7+p5s1EhRj0qw6Ox6M8UhqWee+3lI0JqTZv+Ew9lYZIMFCz0BwwLiyBcdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739362943; c=relaxed/simple;
-	bh=cCIJduEuJ3qTG4czoWe3x6ybI1Ydl1gfGQHplij7Lqo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M9hPz62bvFZQBm2O5CuUt/yas+et7q/9IW8qDCZr8TaxJ4+iAg7s9j/tYEnmYWAYVtNh6TKkw78/72cJTfsmVyWSK7pcGOQ0DbM6phxsCA7BDfuhhXhJ/GzLk9fTdnhw/F2XCGJIz2wXEi5RxBlyKcorrVMORR+vn1Sbu82AUqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YtHTp54lkz6D8Y6;
-	Wed, 12 Feb 2025 20:21:02 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5092C140441;
-	Wed, 12 Feb 2025 20:22:18 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 12 Feb
- 2025 13:22:17 +0100
-Date: Wed, 12 Feb 2025 12:22:15 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-CC: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
-	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
-	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
-	<gospo@broadcom.com>, <hch@infradead.org>, <itayavr@nvidia.com>,
-	<jiri@nvidia.com>, <kuba@kernel.org>, <lbloch@nvidia.com>,
-	<leonro@nvidia.com>, <saeedm@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<brett.creeley@amd.com>
-Subject: Re: [RFC PATCH fwctl 3/5] pds_fwctl: initial driver framework
-Message-ID: <20250212122215.000001a0@huawei.com>
-In-Reply-To: <20250211234854.52277-4-shannon.nelson@amd.com>
-References: <20250211234854.52277-1-shannon.nelson@amd.com>
-	<20250211234854.52277-4-shannon.nelson@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1739363032; c=relaxed/simple;
+	bh=P8wr2M3nvuWSPpOqgXYZf1pQ9j88n247IgRWZk8kZ8Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKPyrLtY16/5bYkW8v//Essnp33ZHJCJFCtNLWwB/BqPNmg0gnySU//sCsbA20ifvcUp8CxevU/6XV2llTwErn5lDeUFAr1JbOe6Eul+iJt48OTDzVdPstN8xjips/tEhyweK05erkmwgiz8IOlhmCGgTzdjs5yebjdmkHrrspo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPEp72qX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739363029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JZQefua5AebH/+/11zGJwh/06CwZX5nV/z+iB9+OeAs=;
+	b=jPEp72qXRrJNhdxNizvEFFQx/SKj7LmbVTxKO1ecNyhNOmYtmnbiqRAtuz9LDIAJf1OMbW
+	MvjXn/fT796TdRYW/7abvAsSeyDAxbD/ENCWk9246eDEPM76TzlaH95OEywNdyWMkW/D8R
+	NU1TBtMkcLzSdJSbBjz/Ck4bMVuN8ys=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-296-RsnC697eMIynRDxQX1m45Q-1; Wed,
+ 12 Feb 2025 07:23:46 -0500
+X-MC-Unique: RsnC697eMIynRDxQX1m45Q-1
+X-Mimecast-MFC-AGG-ID: RsnC697eMIynRDxQX1m45Q_1739363025
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DAADD19560AD;
+	Wed, 12 Feb 2025 12:23:44 +0000 (UTC)
+Received: from rhel-developer-toolbox.redhat.com (unknown [10.45.224.146])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F3F8318004A7;
+	Wed, 12 Feb 2025 12:23:41 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Michal Kubecek <mkubecek@suse.cz>,
+	Fabian Pfitzner <f.pfitzner@pengutronix.de>,
+	Corinna Vinschen <vinschen@redhat.com>,
+	Ivan Vecera <ivecera@redhat.com>
+Subject: [PATCH ethtool] fix MDI-X showing as Unknown instead of "off (auto)"
+Date: Wed, 12 Feb 2025 13:23:27 +0100
+Message-ID: <20250212122327.42074-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, 11 Feb 2025 15:48:52 -0800
-Shannon Nelson <shannon.nelson@amd.com> wrote:
+The current version of ethtool is unable to show the correct MDI-X info:
+ # ethtool --version
+ ethtool version 6.11
+ # ethtool enp0s31f6 | grep MDI
+     MDI-X: Unknown
 
-> Initial files for adding a new fwctl driver for the AMD/Pensando PDS
-> devices.  This sets up a simple auxiliary_bus driver that registers
-> with fwctl subsystem.  It expects that a pds_core device has set up
-> the auxiliary_device pds_core.fwctl
-> 
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
-Hi Shannon,
-A few comments inline
+For comparison, an older version shows it correctly:
+ # ./ethtool --version
+ ethtool version 6.2
+ # ./ethtool enp0s31f6 | grep MDI
+     MDI-X: off (auto)
 
-Jonathan
+The blamed commit accidentally removed the ETH_TP_MDI switch case
+in dump_mdix(). As a result, ETH_TP_MDI is treated like Unknown.
 
+Fix it by restoring the ETH_TP_MDI case and breaking out.
+'mdi_x' is initialized to false, which is correct for this case.
 
+Fixes: bd1341cd2146 ("add json support for base command")
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ common.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> diff --git a/drivers/fwctl/pds/main.c b/drivers/fwctl/pds/main.c
-> new file mode 100644
-> index 000000000000..24979fe0deea
-> --- /dev/null
-> +++ b/drivers/fwctl/pds/main.c
-> @@ -0,0 +1,195 @@
-
-> +
-> +static int pdsfc_identify(struct pdsfc_dev *pdsfc)
-> +{
-> +	struct device *dev = &pdsfc->fwctl.dev;
-> +	union pds_core_adminq_comp comp = {0};
-> +	union pds_core_adminq_cmd cmd = {0};
-> +	struct pds_fwctl_ident *ident;
-> +	dma_addr_t ident_pa;
-> +	int err = 0;
-> +
-> +	ident = dma_alloc_coherent(dev->parent, sizeof(*ident), &ident_pa, GFP_KERNEL);
-> +	err = dma_mapping_error(dev->parent, ident_pa);
-> +	if (err) {
-> +		dev_err(dev, "Failed to map ident\n");
-> +		return err;
-> +	}
-> +
-> +	cmd.fwctl_ident.opcode = PDS_FWCTL_CMD_IDENT;
-> +	cmd.fwctl_ident.version = 0;
-> +	cmd.fwctl_ident.len = cpu_to_le32(sizeof(*ident));
-> +	cmd.fwctl_ident.ident_pa = cpu_to_le64(ident_pa);
-
-Could save intializing cmd above and do it here where all
-the data is available.
-
-	cmd = (union pds_core_adminq_cmd) {
-		.fwctl_ident = {
-			.opcode = ...
-etc. Up to you.
-
-
-	}
-> +
-> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
-> +	if (err) {
-> +		dma_free_coherent(dev->parent, PAGE_SIZE, ident, ident_pa);
-> +		dev_err(dev, "Failed to send adminq cmd opcode: %u entity: %u err: %d\n",
-> +			cmd.fwctl_query.opcode, cmd.fwctl_query.entity, err);
-> +		return err;
-> +	}
-> +
-> +	pdsfc->ident = ident;
-> +	pdsfc->ident_pa = ident_pa;
-
-I guess it will become clear in later patches, but I'm not immediately sure why
-it makes sense to keep a copy of ident and the dma mappings live etc.
-Does it change at runtime?
-
-
-> +
-> +	dev_dbg(dev, "ident: version %u max_req_sz %u max_resp_sz %u max_req_sg_elems %u max_resp_sg_elems %u\n",
-> +		ident->version, ident->max_req_sz, ident->max_resp_sz,
-> +		ident->max_req_sg_elems, ident->max_resp_sg_elems);
-> +
-> +	return 0;
-> +}
-
-> +static int pdsfc_probe(struct auxiliary_device *adev,
-> +		       const struct auxiliary_device_id *id)
-> +{
-> +	struct pdsfc_dev *pdsfc __free(pdsfc_dev);
-Convention for these is to put the constructor and destructor definitions
-on one line.  I'm too lazy to find the email from Linus where he
-specified this but Dan did add docs to cleanup.h.
-https://elixir.bootlin.com/linux/v6.14-rc2/source/include/linux/cleanup.h#L129
-is referring to setting this to NULL, which is minimum that should be done
-as future code changes might mean there is a failure path between
-declaration and use.  Anyhow, it argues in favor of inline as shown
-below.
-
-
-> +	struct pds_auxiliary_dev *padev;
-> +	struct device *dev = &adev->dev;
-> +	int err = 0;
-Set in all paths where it is used so no need to set it here.
-
-> +
-> +	padev = container_of(adev, struct pds_auxiliary_dev, aux_dev);
-	struct pdsfc_dev *pdsfc __free(pdsfc_dev) = 
- 		fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
-> +				   struct pdsfc_dev, fwctl);
-> +	pdsfc = fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
-> +				   struct pdsfc_dev, fwctl);
-> +	if (!pdsfc) {
-> +		dev_err(dev, "Failed to allocate fwctl device struct\n");
-> +		return -ENOMEM;
-> +	}
-> +	pdsfc->padev = padev;
-> +
-> +	err = pdsfc_identify(pdsfc);
-> +	if (err) {
-> +		dev_err(dev, "Failed to identify device, err %d\n", err);
-> +		return err;
-
-Perhaps use return dev_err_probe() just to get the pretty printing.
-Note though that it won't print for enomem cases.
-
-> +	}
-> +
-> +	err = fwctl_register(&pdsfc->fwctl);
-> +	if (err) {
-> +		dev_err(dev, "Failed to register device, err %d\n", err);
-> +		return err;
-> +	}
-> +
-> +	auxiliary_set_drvdata(adev, no_free_ptr(pdsfc));
-> +
-> +	return 0;
-> +
-> +free_ident:
-
-Nothing goes here. Which is good as missing __free magic with gotos
-is a recipe for pain.
-
-> +	pdsfc_free_ident(pdsfc);
-> +	return err;
-> +}
-> +
-> +static void pdsfc_remove(struct auxiliary_device *adev)
-> +{
-> +	struct pdsfc_dev *pdsfc  __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
-> +
-> +	fwctl_unregister(&pdsfc->fwctl);
-> +	pdsfc_free_ident(pdsfc);
-> +}
-
-> diff --git a/include/linux/pds/pds_adminq.h b/include/linux/pds/pds_adminq.h
-> index 4b4e9a98b37b..7fc353b63353 100644
-> --- a/include/linux/pds/pds_adminq.h
-> +++ b/include/linux/pds/pds_adminq.h
-> @@ -1179,6 +1179,78 @@ struct pds_lm_host_vf_status_cmd {
->  	u8     status;
->  };
->  
-> +enum pds_fwctl_cmd_opcode {
-> +	PDS_FWCTL_CMD_IDENT		= 70,
-> +};
-> +
-> +/**
-> + * struct pds_fwctl_cmd - Firmware control command structure
-> + * @opcode: Opcode
-> + * @rsvd:   Word boundary padding
-> + * @ep:     Endpoint identifier.
-> + * @op:     Operation identifier.
-> + */
-> +struct pds_fwctl_cmd {
-> +	u8     opcode;
-> +	u8     rsvd[3];
-> +	__le32 ep;
-> +	__le32 op;
-> +} __packed;
-None of these actually need to be packed given explicit padding to
-natural alignment of all fields.  Arguably it does no harm though
-so up to you.
-
-> +
-> +/**
-> + * struct pds_fwctl_comp - Firmware control completion structure
-> + * @status:     Status of the firmware control operation
-> + * @rsvd:       Word boundary padding
-> + * @comp_index: Completion index in little-endian format
-> + * @rsvd2:      Word boundary padding
-> + * @color:      Color bit indicating the state of the completion
-> + */
-> +struct pds_fwctl_comp {
-> +	u8     status;
-> +	u8     rsvd;
-> +	__le16 comp_index;
-> +	u8     rsvd2[11];
-> +	u8     color;
-> +} __packed;
+diff --git a/common.c b/common.c
+index 4fda4b49d2fd..1ba27e7577b4 100644
+--- a/common.c
++++ b/common.c
+@@ -171,6 +171,8 @@ void dump_mdix(u8 mdix, u8 mdix_ctrl)
+ 		mdi_x_forced = true;
+ 	} else {
+ 		switch (mdix) {
++		case ETH_TP_MDI:
++			break;
+ 		case ETH_TP_MDI_X:
+ 			mdi_x = true;
+ 			break;
+-- 
+2.48.1
 
 
