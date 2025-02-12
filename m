@@ -1,140 +1,119 @@
-Return-Path: <netdev+bounces-165519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8357EA326DD
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:22:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 685E8A326E4
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 14:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FDCB163DA7
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:22:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43F187A2C66
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FD520B800;
-	Wed, 12 Feb 2025 13:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99C120DD54;
+	Wed, 12 Feb 2025 13:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czDy20IB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hKUjmH/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9D3134A8;
-	Wed, 12 Feb 2025 13:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D4020C489
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 13:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739366556; cv=none; b=dBph558Y03B1Y7tsFo4sQWSqyOWThxuw1Dy1/EOItF5BjRRwbIsqLwgGKt2saSlJDDtiFzkCeHYY5MfDIGrR6RUmGygVyzoQVHJSVKH4TzIfD+J93xRSNsc+4OCbI3OioniBpxDkspijyqIr2fP8ERgN7AJMfc9vIgCnlGKe5Q8=
+	t=1739366662; cv=none; b=rbyXLQQovz7/AkCtQex0MeyDhv0yeWbVibvmP/ztHenlCGKqa18uNKBg4kf4ia4XqPuAAbxFKBfe8VkX/usiiOChSwcshIhi45CQggCDeyPKUWkZqDpPlJruRSh0bugTcekXXdgNyjrJV8t9ZRszfhkAbsppZv6otOzWvk/Z6y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739366556; c=relaxed/simple;
-	bh=Iw9Q4GGHRyGE9ebPmgJQrAAQ5nea+Wdg8JZGirbM2a4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QxFN+eccSpln0c52tPliuijwoPp2Y0YDdn8ZslPLqaJomNXA3uwpCs4r66tKa+jzx8wIQt3PhF60OL3AN11SC3Q3cu3YTgkWK5nX1sn/FvUBBTqC/x86eFPwfz3A+NgwWy4x7c2KNm4JNYFvYRIZXS+4pVkCsj5lsfUIQhEDaSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czDy20IB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C01C4CEDF;
-	Wed, 12 Feb 2025 13:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739366554;
-	bh=Iw9Q4GGHRyGE9ebPmgJQrAAQ5nea+Wdg8JZGirbM2a4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=czDy20IBbzFHzTpsT0tDbijpAdUr3Bvk19g0vX8vtzN1tAFlTwx5RBgKrlKOw3mIu
-	 ZUeOVVylbx2YdE1Wsa6j8lTryiccxYsgCgrxNpSB3K0rMZA0bK+sVGFq+HOGFGxmBU
-	 om0fW7rWvFnXHCPU6XDCOjfEjPdwpZWBL6WELGuVzLh458HNmADkGH8oFGM8xQGs/1
-	 rMIzYDRjIPJXj5qBfrr7IkB7OE/eLNNRqqSwnSuxv5VSGMrO75EQ1Yp/8VHod1Wou8
-	 YyXM9Dw9JDuocxsyJlZpPD6jf+xJDCFkADJQpShTVHrqg0VUtTyu2HOGqJDDG5rmA4
-	 8kSnAQmFBKMzQ==
-Date: Wed, 12 Feb 2025 15:22:29 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
-	Andy Gospodarek <gospo@broadcom.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>
-Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
-Message-ID: <20250212132229.GG17863@unreal>
-References: <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
- <20250206164449.52b2dfef@kernel.org>
- <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
- <20250207073648.1f0bad47@kernel.org>
- <Z6ZsOMLq7tt3ijX_@x130>
- <20250207135111.6e4e10b9@kernel.org>
- <20250208011647.GH3660748@nvidia.com>
- <20250210170423.62a2f746@kernel.org>
- <20250211075553.GF17863@unreal>
- <b0395452-dc56-414d-950c-9d0c68cf0f4a@amd.com>
+	s=arc-20240116; t=1739366662; c=relaxed/simple;
+	bh=l9RpDYY3hYUTBJ103nDK+D1Q05QGtcvA2ULMmKvPzeo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=njiQS34AX6gj2o2+E1FvFr16eWRUo7bRoGP8X0BvHhrKj2PmpHMBBNkFMzVypKKqrFMZ7tTRpnY6JabP7+6umsHHEjdt1K65c34fws5rVeulnVe09OwbBNHioUnPEd3n1avYD/xCiGWhzQV8gvpuAaMtup67UrepICjVY8rKxes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hKUjmH/Q; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7c0784e91e4so17234585a.1
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 05:24:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739366660; x=1739971460; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=a2Y/48dGXo8vc0V4fBMDgf/zAAYoMSFACYCj11vlC1M=;
+        b=hKUjmH/Q8dJ+Z31VBwTQCUJj1LKwQHYcn+LKUcHVtRQ1Nl0F2cDHAuZMJoU/WjBwpS
+         x+p4wdbNEhH/Dq3DQSn7RhNITomo8lS9AtUTy4yAdYbj5axsaNQeKhO40CengTudsdWw
+         bRV23kTZFb0jxnLZKoLTl/cAzWlIk9T0dqAvmETwQ+zC3TBqw30N7ZINnPhKTQvDoECL
+         6v0B0LRXdQBaARenfb6PmX6iNUGxnIfrYlkFroROoJU3t2oPP5btgifbC3buTYlqGmLa
+         C8wEyH7cNDKMQJrG7zdKtOyPpGZk9gpYekrm8eFnK2kcxhPNes0GE8PMr4+CL4FSP1/d
+         SUnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739366660; x=1739971460;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a2Y/48dGXo8vc0V4fBMDgf/zAAYoMSFACYCj11vlC1M=;
+        b=C3EuuLMSl8bLqmWxMOTiW9IBX7ROuuJEkm4t4aCSWHsiv5NZd0MSd8XF543Vgta2wo
+         2xV8WZ5enl9d/8iPL/nPZJR8XK0CerOU6xAIW4FfrTyUvRD/bqSOQCi50pgnYolkl6nq
+         jduJl0c7eGbDNh0Qi3/elmc//aeGzXHD/7xLHT3iG+djpBV4V1hc6Ba33arMdwyvqRoU
+         hB0ZlDhpgW4k2gMoOHNoYMMiAHRxY5dI+rnmVp+u627J9Cf/XkahkNUw9PBA5cF49AQG
+         A5ewStF7Fm1Ksyy6xiewfOMM32mx2FEQ0mSnUJ6sNTwxo0pykxJ55tefY0vKM6ZQJ0Lx
+         cvxg==
+X-Gm-Message-State: AOJu0YwYF0kUilkX8izGZg8TgvgihunSoVpASFPVAbOL+QtjgNUG34q2
+	EqY3+cdX2VYhAL9uIMTy5aAKfmgln8n5sRXLdu7Cz14E3RIVFw1iUbsWl2s9nPpFxtq4HTlTXro
+	E1Usr6AyPaw==
+X-Google-Smtp-Source: AGHT+IEyoeQ52CBCiL1jPqNsiK4wCnQICtZDn/kC9LIDsiJYcPUL4mU6D2LvtotBNyo25iBDb3nModjaBN1jRg==
+X-Received: from qvbon7.prod.google.com ([2002:a05:6214:4487:b0:6e4:2e6e:d5f5])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2b0e:b0:6d8:b594:c590 with SMTP id 6a1803df08f44-6e46ed78024mr41102906d6.6.1739366660053;
+ Wed, 12 Feb 2025 05:24:20 -0800 (PST)
+Date: Wed, 12 Feb 2025 13:24:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0395452-dc56-414d-950c-9d0c68cf0f4a@amd.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250212132418.1524422-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/4] net: add EXPORT_IPV6_MOD()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 11, 2025 at 10:36:37AM -0800, Nelson, Shannon wrote:
-> On 2/10/2025 11:55 PM, Leon Romanovsky wrote:
-> > 
-> > On Mon, Feb 10, 2025 at 05:04:23PM -0800, Jakub Kicinski wrote:
-> > > On Fri, 7 Feb 2025 21:16:47 -0400 Jason Gunthorpe wrote:
-> > > > On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
-> > > > 
-> > > > > But if you agree the netdev doesn't need it seems like a fairly
-> > > > > straightforward way to unblock your progress.
-> > > > 
-> > > > I'm trying to understand what you are suggesting here.
-> > > > 
-> > > > We have many scenarios where mlx5_core spawns all kinds of different
-> > > > devices, including recovery cases where there is no networking at all
-> > > > and only fwctl. So we can't just discard the aux dev or mlx5_core
-> > > > triggered setup without breaking scenarios.
-> > > > 
-> > > > However, you seem to be suggesting that netdev-only configurations (ie
-> > > > netdev loaded but no rdma loaded) should disable fwctl. Is that the
-> > > > case? All else would remain the same. It is very ugly but I could see
-> > > > a technical path to do it, and would consider it if that brings peace.
-> > > 
-> > > Yes, when RDMA driver is not loaded there should be no access to fwctl.
-> > 
-> > There are users mentioned in cover letter, which need FWCTL without RDMA.
-> > https://lore.kernel.org/all/0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com/
-> > 
-> > I want to suggest something different. What about to move all XXX_core
-> > logic (mlx5_core, bnxt_core, e.t.c.) from netdev to some other dedicated
-> > place?
-> > 
-> > There is no technical need to have PCI/FW logic inside networking stack.
-> > 
-> > Thanks
-> 
-> Our pds_core device fits this description as well: it is not an ethernet PCI
-> device, but helps manage the FW/HW for Eth and other things that are
-> separate PCI functions.  We ended up in the netdev arena because we first
-> went in as a support for vDPA VFs.
-> 
-> Should these 'core' devices live in linux-pci land?  Is it possible that
-> some 'core' things might be platform devices rather than PCI?
+In this series I am adding EXPORT_IPV6_MOD and EXPORT_IPV6_MOD_GPL()
+so that we can replace some EXPORT_SYMBOL() when IPV6 is
+not modular.
 
-IMHO, linux-pci was right place before FWCTL and auxbus arrived, but now
-these core drivers can be placed in drivers/fwctl instead. It will be natural
-place for them as they will be located near the UAPI which provides an access
-to them.
+This is making all the selected symbols internal to core
+linux networking.
 
-All other components will be auxbus devices in their respective
-subsystems (eth, RDMA ...).
+v2: add feedback from Mateusz, Willem and Sabrina.
 
-Thanks
+v1: https://lore.kernel.org/netdev/20250210082805.465241-2-edumazet@google.com/T/
 
-> 
-> sln
-> 
-> 
+Eric Dumazet (4):
+  net: introduce EXPORT_IPV6_MOD() and EXPORT_IPV6_MOD_GPL()
+  inetpeer: use EXPORT_IPV6_MOD[_GPL]()
+  tcp: use EXPORT_IPV6_MOD[_GPL]()
+  udp: use EXPORT_IPV6_MOD[_GPL]()
+
+ include/net/ip.h         |  8 +++++
+ net/core/secure_seq.c    |  2 +-
+ net/ipv4/inetpeer.c      |  8 ++---
+ net/ipv4/syncookies.c    |  8 ++---
+ net/ipv4/tcp.c           | 44 ++++++++++++++--------------
+ net/ipv4/tcp_fastopen.c  |  2 +-
+ net/ipv4/tcp_input.c     | 14 ++++-----
+ net/ipv4/tcp_ipv4.c      | 47 +++++++++++++++---------------
+ net/ipv4/tcp_minisocks.c | 11 ++++---
+ net/ipv4/tcp_output.c    | 12 ++++----
+ net/ipv4/tcp_timer.c     |  4 +--
+ net/ipv4/udp.c           | 63 ++++++++++++++++++++--------------------
+ 12 files changed, 114 insertions(+), 109 deletions(-)
+
+-- 
+2.48.1.502.g6dc24dfdaf-goog
+
 
