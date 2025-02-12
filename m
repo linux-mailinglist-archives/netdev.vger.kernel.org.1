@@ -1,114 +1,81 @@
-Return-Path: <netdev+bounces-165506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058D8A32665
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:58:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE85DA3266C
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 13:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9818E7A1BFB
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:57:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA62B1880799
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 12:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAF020E005;
-	Wed, 12 Feb 2025 12:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A03220D516;
+	Wed, 12 Feb 2025 12:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYoHh9I8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mhwoy63m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C3120CCF5;
-	Wed, 12 Feb 2025 12:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0F92080F9;
+	Wed, 12 Feb 2025 12:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739365100; cv=none; b=At1IHgq7R16M8Jm4y7dHwYS6ZWxWRc3My/jtmhG5N8kDlTmrPR4GQ+n6QkTOnWjat3NtP/6W6WkzVeI8VxtWpIYI5eydGpp1yqnRZhWniBW4IMk1J1Kq/HwJqsbTMsYLX6vULPP0g2pqZpS1Wymgr+rf3AFwTmJL/nSPUU0Mokk=
+	t=1739365160; cv=none; b=s/eqJqECoyq1V3Jk4rCzYRGUNisljYaAZO3A98W5Pc2rIi7YIpH41TEIJcN4i/jS/HEiC9bvMdtV2ZGgh4YB0qkLqwib3OE7SNMWf4fXqj9xkPmBxeR/t1nJXkgT0v27LfIUbVJcusMXVfVhOxJDAch4gb4q4GEh0YTg4IO7dUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739365100; c=relaxed/simple;
-	bh=+rUyy8CCsAX49LoyMo4QlyZTIfngKhPrGjoTwwC4T/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IwiesL5Qg9yxLF/KybMQcb7AMBL76/rOW+jnC2+dwYMrLrSw55v189nkfspgUZYA5JLxc2g19y0b9VihFE/05/75r8H5wJI1o/XHeXMxkZjSr2jm5I5UyikYKxQMDBgzajQGj5R9XUHLHDTtSHksGgM+WWpQtGI8qXMALLi10xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYoHh9I8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC30EC4CEDF;
-	Wed, 12 Feb 2025 12:58:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739365099;
-	bh=+rUyy8CCsAX49LoyMo4QlyZTIfngKhPrGjoTwwC4T/4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aYoHh9I8hOFC/rd6q6DuWBa0ELk6Z7OMZH+d1Po86Hca4RmKPfp6Iy748FXUdyIlI
-	 tgH/3yl0mOAPAoIko670EqeX9y9i+3JZ/uI7ZsPHzcVNNFWCQ27UkVj53+bdt/O6h1
-	 tp2zNyvG6uiP3W6uc1ax8M6WidyQaPTSueZo4zk6WWNhXIYT0nyl+heT4KgnulLxOT
-	 VgWKUUVaGzBd9JgaNBnvjddPhhnrvtOVueKPNh9Ht9jYirxxZuEV9VqTmcHVbKcyW5
-	 ewHSt4dDIHHeiLGHQBiKMVEehzQ+s32Auf+U/HtB+/DzK1kpDbUrePlehroB/oTObM
-	 X96pQV4d2Rp4A==
-Date: Wed, 12 Feb 2025 13:58:08 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, linux-kernel@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Andreas Noever <andreas.noever@gmail.com>, Avadhut
- Naik <avadhut.naik@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Eric Dumazet <edumazet@google.com>, Hu Haowen
- <2023002089@link.tyut.edu.cn>, Lars-Peter Clausen <lars@metafoo.de>,
- Michael Jamet <michael.jamet@intel.com>, Mika Westerberg
- <mika.westerberg@linux.intel.com>, Paolo Abeni <pabeni@redhat.com>, Sean
- Young <sean@mess.org>, Yanteng Si <si.yanteng@linux.dev>, Yehezkel Bernat
- <YehezkelShB@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michael
- Ellerman <mpe@ellerman.id.au>, Shrikanth Hegde <sshegde@linux.ibm.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Pawan Gupta
- <pawan.kumar.gupta@linux.intel.com>, James Morse <james.morse@arm.com>,
- "Nysal Jan K.A" <nysal@linux.ibm.com>, Tom Lendacky
- <thomas.lendacky@amd.com>, Sourabh Jain <sourabhjain@linux.ibm.com>,
- Stephen Rothwell <sfr@canb.auug.org.au>, Frederic Barrat
- <fbarrat@linux.ibm.com>, Andrew Donnellan <ajd@linux.ibm.com>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao
- <naveen@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 0/9] Extend automarkup support for ABI symbols
-Message-ID: <20250212135808.58d2f032@foz.lan>
-In-Reply-To: <Z6yFG_NntQfkwYli@archie.me>
-References: <cover.1739254867.git.mchehab+huawei@kernel.org>
-	<Z6yFG_NntQfkwYli@archie.me>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1739365160; c=relaxed/simple;
+	bh=INNdk73tt5KZwVnkb/EbeN+grvLXD+L0A75MdDaM6i8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBbtqMMwndRNvuaD1pjfvCMJ+0cZhqohDN6gSxlNWxoPmB0vLZOlHjE3rQpgQCnOfoCYvjKZUG6uNeh+Lzitbibj13wKnHanuU9NuuIuh76ZoF39A6rd8XZwV0psM/tqpwvSGVPFUPrFN1CuFfZPceN5IJwuvhledNjFdo9i6yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mhwoy63m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=V0dhtfuDMhyaOzCKj2LA/b865CHvuu3FURUtctL4FEE=; b=mhwoy63mn6iHrx6gmilA20aa0j
+	jsaZYTd93fYDSePQnFeHek0xu8GHAxSg+SzCj7DpaG4xBa/N8WdRNzk/XH1oqa7QedcLEFK3XT5YX
+	oRQttGnIlMK86maJaOz0nN9Z1fNF1S1jQrBFZqaO+OGS2kRxET7KjCPynQ+iWjF/dHrA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tiCKX-00DOWk-2L; Wed, 12 Feb 2025 13:59:05 +0100
+Date: Wed, 12 Feb 2025 13:59:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 1/2] net: phy: Add support for
+ driver-specific next update time
+Message-ID: <1ffe26ac-c2f2-4947-a570-3dc7e5d05813@lunn.ch>
+References: <20250210082358.200751-1-o.rempel@pengutronix.de>
+ <20250210082358.200751-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210082358.200751-2-o.rempel@pengutronix.de>
 
-Em Wed, 12 Feb 2025 18:25:15 +0700
-Bagas Sanjaya <bagasdotme@gmail.com> escreveu:
-
-> On Tue, Feb 11, 2025 at 07:22:54AM +0100, Mauro Carvalho Chehab wrote:
-> > Now that ABI creates a python dictionary, use automarkup to create cross
-> > references for ABI symbols as well.   
+On Mon, Feb 10, 2025 at 09:23:57AM +0100, Oleksij Rempel wrote:
+> Introduce the `phy_get_next_update_time` function to allow PHY drivers
+> to dynamically determine the time (in jiffies) until the next state
+> update event. This enables more flexible and adaptive polling intervals
+> based on the link state or other conditions.
 > 
-> I get three new warnings:
-> 
-> WARNING: /sys/devices/system/cpu/cpuX/topology/physical_package_id is defined 2 times: /home/bagas/repo/linux-kernel/Documentation/ABI/stable/sysfs-devices-system-cpu:27; /home/bagas/repo/linux-kernel/Documentation/ABI/testing/sysfs-devices-system-cpu:70
-> WARNING: /sys/devices/system/cpu/cpuX/topology/ppin is defined 2 times: /home/bagas/repo/linux-kernel/Documentation/ABI/stable/sysfs-devices-system-cpu:89; /home/bagas/repo/linux-kernel/Documentation/ABI/testing/sysfs-devices-system-cpu:70
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Those two are new reports that get_abi.py detects after the recent changes.
-In the past, symbol duplication were detected only within the same group
-(testing, stable, ...). The new version can detect symbols that are
-duplicated on different parts of the ABI. In this specific case, the same
-symbols exist on both stable and testing.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-There is a fix for them already at:
-
-https://lore.kernel.org/linux-doc/673e9543783349b0fcf625018e38e4e93fe98f52.1738020236.git.mchehab+huawei@kernel.org/
-
-> WARNING: Documentation/ABI/testing/sysfs-class-cxl not found
-
-I need to double-check verify this one, as it didn't appear on
-my tests. Are you getting it against docs-next or linux-next?
-
-Thanks,
-Mauro
+    Andrew
 
