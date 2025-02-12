@@ -1,108 +1,165 @@
-Return-Path: <netdev+bounces-165622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22A7A32D7E
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:29:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B440A32DAF
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 18:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAFF188177D
-	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:29:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16DD91886A6A
+	for <lists+netdev@lfdr.de>; Wed, 12 Feb 2025 17:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86ED7257AD7;
-	Wed, 12 Feb 2025 17:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92C325C718;
+	Wed, 12 Feb 2025 17:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GHyFBImX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDp5X9FR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FDE1DC075
-	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0D625A35E
+	for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739381355; cv=none; b=mf7RsEPOQQfMD4ZtCBBeos3Q7CxKZFLrYZWDV+/vpBdxw5rZCXVxN4gKpbyShy7oLr3cJWPz8engH5p6vSfiZzYG1dkWU+bx3dtJFwAbOR0dN8d2Pzdif1jR0wl2++VAuXuiaeV2z1MtkQDxnNTcbTZlsWecOoBDXX7esBgFkho=
+	t=1739382175; cv=none; b=NsLrSauYyrkh4AMiDKI3DUsTfgsUWRGHNH7pECceQUr3fOmednI5xc6H4jqkB3AV0nrER+rYLeHke8Yz9qhvob14itlfQuPe2n4Skg/QnvUMqQlKaKyWRABUcPhkxQrrFxk7m+Mhrq3XcN/Q9OzZ+dxSFgMiy+8k2DXcTpgimJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739381355; c=relaxed/simple;
-	bh=v1E0baCYwvPTm6W2l7mhYSDoo8BYoAb0Zh7kaADVDQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RkssKUxa5j6siNd0rCnEbmeSj9GQfbV/kMlrC1sVCQq3t5M45w8oathlsa2yn6pOTqjJjU5MXnJRJ3iQcN4fBhATciHE78w487cOZMT5sAFnuM0p4PKKP7LqM+6bszFgOftGUZjrlCgWf+XuiGzg4g/mA1LI5mxj0uRu1F5ka9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GHyFBImX; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6ddcff5a823so341806d6.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 09:29:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739381353; x=1739986153; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gquHr0eT2+B6bx9x04CQUMoJUVGXo0TIanyPjb2fHkM=;
-        b=GHyFBImXoKYpaJLH0jS9V0i7iYzkC4DxH3N2q3YKZsGeOJdBrxiossETK46ubAeQaN
-         oTke4evi216ERhawBRt+/jbbHZiLccFQ6omBRA5owDm6I8F7PXkTpLm0j3LFsEEorT8T
-         elgNAEgal5wMGkVZhOlRYOfKTVNYXdix8rUCBvmAn1cdBJ9HoyVDmdUkFw6XNMBxiwCF
-         nmM5vu8qzI8W2Vary8/FIbRqGN17dh4RE3aFGDfWW9Ef5/calZz62v4/FXgDF4z4K3Dz
-         lgjKbtr4QDe95qs1nD8eovSNqv5B8ZvtDpZ1WxyWkiAqdv+JDpvC4vq/DTzQfvkYmxcI
-         3BGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739381353; x=1739986153;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gquHr0eT2+B6bx9x04CQUMoJUVGXo0TIanyPjb2fHkM=;
-        b=ul4rkbcEVaXshMHAAMM29qurTjVCSVS4ZUPzMKCu3tSzUue+gBxSwXpIi/27tj45PD
-         bEj72GL86kZaDxESbNXxTG6iMnZtP+ddIBf5Cf7Xfi22cS05Z2qmK6rMzx730HYrBXHQ
-         6VF2/KSDkS1/9ebQCKwsu2IfLI2XINA3BFpbdbiSyYTfBdTJynKUNbLKit6cIOBLBX+8
-         d+PdsYnkiHxHF/eaJy+J2BdtALFUWyBYwd0pmu0y10/1cbZ3Q7KFypDKYV96sV6Quenj
-         UoCC4Yas8bauyo5DMVm3SoMwxgp9pZg6fHy8bzPF5Y1I7KJjwgxpsIz4k1e7Wkuxnkgs
-         RG9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWgzrcJHGstlf83Pb6DJq8fRv2NFTZvAzJoX2g9IsbKZj9YOuu/2+1ic0Jj5nb6t7uroNqUACA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4XjAbtRq2WF2z52yUqz33U43NI65WOoZ3DoaRF6CHKS59OK8j
-	p83Nz5OB29qP9KGqcfOkEbfEz60l+4ZJqGets7YcX7U9Rp5tIWwEP4HeBaVnmQm/nv07si4r796
-	AQGCFRDSKvANVY7b3bR2yJXjIQGNlgU/JajL0
-X-Gm-Gg: ASbGnctlw/l0ZhFGvefyv5mlOWzywqiNvS15r0me8Me1egeDOJcyzlXDJNp3ZBKRPDT
-	51LKfylIV5ns/0xzrUI/UyJtpi13JdPKuykSS7f+97EoU/rYDTvv/GH7kL0hZY/6c0WlJ3CbPZf
-	5gT0JZ8ji8fCzsuOHeZPFYvGmsPVQ=
-X-Google-Smtp-Source: AGHT+IGyUbj2hccuFFHlk1Hhvr5KM33hs3n3t+wSbcCxGyj6DvlsLf+y7cGmeGwq95MetrI7dseIGPBZiiNjexR0q7E=
-X-Received: by 2002:a05:6214:19cc:b0:6e1:a51d:e96f with SMTP id
- 6a1803df08f44-6e46ed8e6d5mr68013576d6.8.1739381352553; Wed, 12 Feb 2025
- 09:29:12 -0800 (PST)
+	s=arc-20240116; t=1739382175; c=relaxed/simple;
+	bh=cFVjTnrBFZ29R9fM9ym1OGKlwlDseY4yYFwww8wOgXo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kQjfWG4FnV4RBsuMGKMJ9I2zaFnJcn45jtrXWW8ggvAC0INKTNOlla6kJsIwmi+udUSPMCUqqFFUHQDsjlJOCmjT4XAFKPOm607vjpkowegp1oA8nXtZnHvJugZLlxLgSPbwjVdbUyTlO9QXHod3+kxG70ZlsPAqTH8A+1acm9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FDp5X9FR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739382171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BBjestB/6yAiyimbrN+FhxgWi21vyAUwfoacKXfmaTI=;
+	b=FDp5X9FRKqP31V4fB5/fTBdYgg/XLKtchGtGxrgWYy8OKJvdP+avVZNos6ou4fmLZW1cD0
+	7djTTyRB8ZowYQHuG37J5RgxsoL27Aft8X9qUGN0SoMgcAMznxVv58TuECs0cTJBMpJmu2
+	ct7dTYV8bwVg4ePyt7RWV4C+lXaM4xM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-mZe1c6X-NMiIqWeAUZpemQ-1; Wed,
+ 12 Feb 2025 12:42:48 -0500
+X-MC-Unique: mZe1c6X-NMiIqWeAUZpemQ-1
+X-Mimecast-MFC-AGG-ID: mZe1c6X-NMiIqWeAUZpemQ
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADDE119560AE;
+	Wed, 12 Feb 2025 17:42:46 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.226.167])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 16BDA18004A7;
+	Wed, 12 Feb 2025 17:42:43 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH net] net: allow small head cache usage with large MAX_SKB_FRAGS values
+Date: Wed, 12 Feb 2025 18:42:32 +0100
+Message-ID: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <SY8P300MB0421FF8BC82A17CA7A892675A1F42@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
-In-Reply-To: <SY8P300MB0421FF8BC82A17CA7A892675A1F42@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
-From: Alexander Potapenko <glider@google.com>
-Date: Wed, 12 Feb 2025 18:28:36 +0100
-X-Gm-Features: AWEUYZlUvPCrE_W2ZQDiIkwuwePQ9_OsUYB2xuuCg9zu3mpKV7G1pBpzp4LkW9M
-Message-ID: <CAG_fn=Wh-Z12SaBNgXJNqKyfODwxUAYJqyc86hguXn2M2Fv=nA@mail.gmail.com>
-Subject: Re: general protection fault in __fib6_drop_pcpu_from [CVE-2024-40905
- Incomplete fix]
-To: YAN KANG <kangyan91@outlook.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"syzkaller@googlegroups.com" <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Feb 4, 2025 at 5:27=E2=80=AFAM YAN KANG <kangyan91@outlook.com> wro=
-te:
->
-> Dear developers and maintainers,
->
-> I found a new kernel UAF  bug titiled "general protection fault in __fib6=
-_drop_pcpu_from" while using modified syzkaller fuzzing tool. I Itested it =
-on the latest Linux upstream version (6.13.0-rc1), and it was able to be tr=
-iggered many times .
->
-I was running an unmodified syzkaller build today for a different
-reason, and came across this bug within 40 minutes of fuzzing.
-Just giving you a heads-up for the case you will be evaluating the
-fuzzer modifications.
+Sabrina reported the following splat:
+
+    WARNING: CPU: 0 PID: 1 at net/core/dev.c:6935 netif_napi_add_weight_locked+0x8f2/0xba0
+    Modules linked in:
+    CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.14.0-rc1-net-00092-g011b03359038 #996
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+    RIP: 0010:netif_napi_add_weight_locked+0x8f2/0xba0
+    Code: e8 c3 e6 6a fe 48 83 c4 28 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc c7 44 24 10 ff ff ff ff e9 8f fb ff ff e8 9e e6 6a fe <0f> 0b e9 d3 fe ff ff e8 92 e6 6a fe 48 8b 04 24 be ff ff ff ff 48
+    RSP: 0000:ffffc9000001fc60 EFLAGS: 00010293
+    RAX: 0000000000000000 RBX: ffff88806ce48128 RCX: 1ffff11001664b9e
+    RDX: ffff888008f00040 RSI: ffffffff8317ca42 RDI: ffff88800b325cb6
+    RBP: ffff88800b325c40 R08: 0000000000000001 R09: ffffed100167502c
+    R10: ffff88800b3a8163 R11: 0000000000000000 R12: ffff88800ac1c168
+    R13: ffff88800ac1c168 R14: ffff88800ac1c168 R15: 0000000000000007
+    FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    CR2: ffff888008201000 CR3: 0000000004c94001 CR4: 0000000000370ef0
+    DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    Call Trace:
+    <TASK>
+    gro_cells_init+0x1ba/0x270
+    xfrm_input_init+0x4b/0x2a0
+    xfrm_init+0x38/0x50
+    ip_rt_init+0x2d7/0x350
+    ip_init+0xf/0x20
+    inet_init+0x406/0x590
+    do_one_initcall+0x9d/0x2e0
+    do_initcalls+0x23b/0x280
+    kernel_init_freeable+0x445/0x490
+    kernel_init+0x20/0x1d0
+    ret_from_fork+0x46/0x80
+    ret_from_fork_asm+0x1a/0x30
+    </TASK>
+    irq event stamp: 584330
+    hardirqs last  enabled at (584338): [<ffffffff8168bf87>] __up_console_sem+0x77/0xb0
+    hardirqs last disabled at (584345): [<ffffffff8168bf6c>] __up_console_sem+0x5c/0xb0
+    softirqs last  enabled at (583242): [<ffffffff833ee96d>] netlink_insert+0x14d/0x470
+    softirqs last disabled at (583754): [<ffffffff8317c8cd>] netif_napi_add_weight_locked+0x77d/0xba0
+
+on kernel built with MAX_SKB_FRAGS=45.
+
+In such built, SKB_WITH_OVERHEAD(1024) is smaller than GRO_MAX_HEAD, and
+thus after commit 011b03359038 ("Revert "net: skb: introduce and use a
+single page frag cache"") napi_get_frags() ends up using the page frag
+allocator, triggering the splat.
+
+Address the issue updating napi_alloc_skb() and __netdev_alloc_skb() to
+allow kmalloc() usage for GRO_MAX_HEAD allocation, regardless of the
+configured MAX_SKB_FRAGS value.
+
+Note that even before the mentioned revert, __netdev_alloc_skb() was
+not using the small head cache for GRO_MAX_HEAD-size allocation for
+MAX_SKB_FRAGS=45 kernel build, which is sort of unexpected.
+
+Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+Fixes: 011b03359038 ("Revert "net: skb: introduce and use a single page frag cache"")
+Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAGS")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ net/core/skbuff.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6a99c453397f..6afd99a2736d 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -661,7 +661,7 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+ 	/* If requested length is either too small or too big,
+ 	 * we use kmalloc() for skb->head allocation.
+ 	 */
+-	if (len <= SKB_WITH_OVERHEAD(1024) ||
++	if (len <= SKB_WITH_OVERHEAD(max(1024, SKB_SMALL_HEAD_CACHE_SIZE)) ||
+ 	    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+ 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+ 		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX, NUMA_NO_NODE);
+@@ -739,7 +739,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+ 	/* If requested length is either too small or too big,
+ 	 * we use kmalloc() for skb->head allocation.
+ 	 */
+-	if (len <= SKB_WITH_OVERHEAD(1024) ||
++	if (len <= SKB_WITH_OVERHEAD(max(1024, SKB_SMALL_HEAD_CACHE_SIZE)) ||
+ 	    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
+ 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
+ 		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX | SKB_ALLOC_NAPI,
+-- 
+2.48.1
+
 
