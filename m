@@ -1,132 +1,129 @@
-Return-Path: <netdev+bounces-165849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BC01A33860
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:59:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 452D2A3387D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:06:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44B927A1551
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:58:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A803A906B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB056207DEF;
-	Thu, 13 Feb 2025 06:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EEA207E17;
+	Thu, 13 Feb 2025 07:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SHVBOqRa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QgfaSyLr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECACC207A11;
-	Thu, 13 Feb 2025 06:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF9F20764A;
+	Thu, 13 Feb 2025 07:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739429933; cv=none; b=N5x9mI6gGGvk9QRDyltVB+hyNSGuXI64xTisTL+xbnOxqcJlFAUL6kuHOa0cl4fqMX8abdZJ39rbeI4nPrITMYOyU+3mZGNB7/pd0DGG13F2lID9uQ/jyJcp32l5N7doMkezRhxcZuI5YvqGf7NAI8iiao6jDgcQqu+aRBKiCr8=
+	t=1739430358; cv=none; b=Ge3JwAu16qDyA+sPwZ3b/HstrfdVrB40OqvYx7G0foin6/MkQFrQDWLoRfdx70og90UM3U4MSAs2ALTEB21Rsp0+X1Vxjvcf7EM2lBSdaTJKH/KULQzuU8pMUf4MtNJ1KoInGP7cqqbi1yv2cP8vYWwf+DNC5/9CE9TFKMifgWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739429933; c=relaxed/simple;
-	bh=IuDkSPusWTCLmutvKrUiCtONzQj5Xn2RbA/VhezuVxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyieYX1Uzw2yd1VskxNA/B9eI3BxC6mciyZj1kUjkOdLGYvxlv1xCeXpHyAxlqnBvoZwY63YxS6fomYbZ4kZic5Y39n6QwONLZtpfKwYe4e9MDlajZE8pokYndQ9OD+lD+OzlQtQJbmxl1OsxTKeDfFPI4ru29nJz3dsptNZHsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SHVBOqRa; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739429932; x=1770965932;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IuDkSPusWTCLmutvKrUiCtONzQj5Xn2RbA/VhezuVxA=;
-  b=SHVBOqRaLQEjouentecf0eiV2j3zV+hTODC9h4VCh21No3/c+MScuUtK
-   /VKSw4cenwwFJh1bVE6r8r/hvC7d8TsMZQRYB7aadGOdy+z15SHi72d5y
-   o4g9XttTDBg6VGfjt6bJQ6Jezr4ul6rwS4SmguYbfscpqVlGV2cmZbJna
-   sYYFEEVjfjl2vJJRhTqxxRKdVCeOmdOEEtFijU430yDIvn0Bm6qtTu+LX
-   cFIw8jpFDNx2kK4szvjcfp7N1WES5UYdFT+XgJA1fI6QT5+x0yVom4Ks6
-   Lio7JHf5lHHI7QWXuMQWS7W6j/x9yvbSszlMG5tkTGNv2VMZCwqJ1Hyba
-   g==;
-X-CSE-ConnectionGUID: VznTinZERAuXRqGoZHMz9A==
-X-CSE-MsgGUID: 1EALNzy+RPmZQ5jEx0JKNw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="39818279"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="39818279"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:58:49 -0800
-X-CSE-ConnectionGUID: KUJW1hv9RVqsIDMDOXu40g==
-X-CSE-MsgGUID: Uu0E+VmgQ9e+/yLUUhvqhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="150223547"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:58:46 -0800
-Date: Thu, 13 Feb 2025 07:55:12 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] ice: Fix signedness bug in
- ice_init_interrupt_scheme()
-Message-ID: <Z62XUG6JzoD0sGAb@mev-dev.igk.intel.com>
-References: <b16e4f01-4c85-46e2-b602-fce529293559@stanley.mountain>
+	s=arc-20240116; t=1739430358; c=relaxed/simple;
+	bh=kmgtqvckZ0e6iFNH8XDXdMK5sQI2GFWf7IJ95MBADfA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K5gWreDSseocFp+5sW6swJWeKNKPHwe+tp2E7y4Ef59dfBikrDYmZzKPoJTvv5Y4A7lJ2C6/luZTV0J4Z2jlSuDgaf9D5D67oAhubxb+nN0W/cxfA7UwQeBmlfSLkgj1UAqfFHKWc89YkWCKXditO9czA0CailBD7mF+LixWabY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QgfaSyLr; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739430357; x=1770966357;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HIz1Atlqpi5tnoN7n4BPu3eHETPxx2TUlMkVpEwhuEo=;
+  b=QgfaSyLrgHl/mTSXPfa1O1cScChJD9IlWGd8eMDbkZuzCWMyBI5znAao
+   +oebj9g9O3QcE4mKdwnQ324nwwAjpwy0Ll9o74E1a4i7iPpaPXhr9EYbH
+   Bz+dF79qwKu5tSpHFMLm+9JFzuSw5Q33bGG/M3J5HJNyiPfAy7o+cNlGM
+   w=;
+X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
+   d="scan'208";a="462133403"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 07:05:51 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:18133]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.208:2525] with esmtp (Farcaster)
+ id 044845a0-eb50-4d20-a33f-ef53eec55ed0; Thu, 13 Feb 2025 07:05:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 044845a0-eb50-4d20-a33f-ef53eec55ed0
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 07:05:50 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 07:05:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <shaw.leon@gmail.com>
+CC: <alex.aring@gmail.com>, <andrew+netdev@lunn.ch>,
+	<b.a.t.m.a.n@lists.open-mesh.org>, <bpf@vger.kernel.org>,
+	<bridge@lists.linux.dev>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-ppp@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
+	<netdev@vger.kernel.org>, <osmocom-net-gprs@lists.osmocom.org>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <stefan@datenfreihafen.org>,
+	<steffen.klassert@secunet.com>, <wireguard@lists.zx2c4.com>
+Subject: Re: [PATCH net-next v9 06/11] net: ipv6: Use link netns in newlink() of rtnl_link_ops
+Date: Thu, 13 Feb 2025 16:05:33 +0900
+Message-ID: <20250213070533.9926-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250210133002.883422-7-shaw.leon@gmail.com>
+References: <20250210133002.883422-7-shaw.leon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b16e4f01-4c85-46e2-b602-fce529293559@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 13, 2025 at 09:31:41AM +0300, Dan Carpenter wrote:
-> If pci_alloc_irq_vectors() can't allocate the minimum number of vectors
-> then it returns -ENOSPC so there is no need to check for that in the
-> caller.  In fact, because pf->msix.min is an unsigned int, it means that
-> any negative error codes are type promoted to high positive values and
-> treated as success.  So here, the "return -ENOMEM;" is unreachable code.
-> Check for negatives instead.
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Mon, 10 Feb 2025 21:29:57 +0800
+> When link_net is set, use it as link netns instead of dev_net(). This
+> prepares for rtnetlink core to create device in target netns directly,
+> in which case the two namespaces may be different.
 > 
-> Now that we're only dealing with error codes, it's easier to propagate
-> the error code from pci_alloc_irq_vectors() instead of hardcoding
-> -ENOMEM.
+> Set correct netns in priv before registering device, and avoid
+> overwriting it in ndo_init() path.
 > 
-> Fixes: 79d97b8cf9a8 ("ice: remove splitting MSI-X between features")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
 > ---
-> v2: Fix my scripts to say [PATCH net-next]
->     Propagate the error code.
+>  net/ipv6/ip6_gre.c    | 20 ++++++++++----------
+>  net/ipv6/ip6_tunnel.c | 13 ++++++++-----
+>  net/ipv6/ip6_vti.c    | 10 ++++++----
+>  net/ipv6/sit.c        | 11 +++++++----
+>  4 files changed, 31 insertions(+), 23 deletions(-)
 > 
->  drivers/net/ethernet/intel/ice/ice_irq.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
-> index cbae3d81f0f1..30801fd375f0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_irq.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
-> @@ -149,8 +149,8 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+> index 863852abe8ea..108600dc716f 100644
+> --- a/net/ipv6/ip6_gre.c
+> +++ b/net/ipv6/ip6_gre.c
+> @@ -1498,7 +1498,8 @@ static int ip6gre_tunnel_init_common(struct net_device *dev)
+>  	tunnel = netdev_priv(dev);
 >  
->  	vectors = pci_alloc_irq_vectors(pf->pdev, pf->msix.min, vectors,
->  					PCI_IRQ_MSIX);
-> -	if (vectors < pf->msix.min)
-> -		return -ENOMEM;
-> +	if (vectors < 0)
-> +		return vectors;
->  
->  	ice_init_irq_tracker(pf, pf->msix.max, vectors);
->  
+>  	tunnel->dev = dev;
+> -	tunnel->net = dev_net(dev);
+> +	if (!tunnel->net)
+> +		tunnel->net = dev_net(dev);
 
-Thanks,
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Same question as patch 5 for here and other parts.
+Do we need this check and assignment ?
 
-> -- 
-> 2.47.2
-> 
+ip6gre_newlink_common
+-> nt->net = dev_net(dev)
+-> register_netdevice
+  -> ndo_init / ip6gre_tunnel_init()
+    -> ip6gre_tunnel_init_common
+      -> tunnel->net = dev_net(dev)
 
