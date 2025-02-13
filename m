@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-166218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04ED2A350B1
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:49:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CFCBA350B2
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 603F316204F
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:48:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D243C16504C
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BADD266B6F;
-	Thu, 13 Feb 2025 21:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3AE269806;
+	Thu, 13 Feb 2025 21:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PH+5PQ+T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnTapvyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E35200132
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 21:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B4D245AF6
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 21:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739483329; cv=none; b=cfoGkfnoy3ANQws64z4OcmVAx+vv/i2BnhIvxoZXZvRNphuw06HIUqBnpZV+I3gVsFD0TnXOeBSsouzgsERzwIAYf9uvPMsIIk863+4mwtzk2BBBrFC+N/cjc3nvP1NWwaXAwbyGOZ5mp12wNhKY7LFsetkQUEGAgfdtpV+5Y50=
+	t=1739483372; cv=none; b=mu/iKF/RzlE2FHVXA/waovPiEGIZNBuOKJwzB9pGI/VmPqnXSSp+It6sYwPOj5w8k7zy6lMlUJo0JtBXyrSVS3xChOaYBceSOC/xRQ0gQAZUGePf+O1DybCbTCc0YD8Ubrlprn1ZSwLc2HZ7Dio3abhlJZxTJyhsP3FvELxrsL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739483329; c=relaxed/simple;
-	bh=3ng2k+vsaRTqhuQp+8rlHVCqdtQycv27IfJnSSZDulk=;
+	s=arc-20240116; t=1739483372; c=relaxed/simple;
+	bh=Zk4QDkA44tWiNc4z/YOWAiAEwT4xFqJn2oisOWTt8Q8=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ys5Vf/LdBwsyQbQwgun2KXSKtZI5ICcTWCv9YX04l1uBHs4+kDHFKr5SC3LtEO0SMfPVBmw4+RGHK/hKC1v1W+qOLPpUIq4NI2IrlXazYKxyTb0cm7NhUfkWLXIbpElH3+KA+1dj6DIC0hWj47Ar5v9lD7tFn/unfkMN635DadM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PH+5PQ+T; arc=none smtp.client-ip=209.85.218.53
+	 In-Reply-To:Content-Type; b=IYvLwdlQrCRnrkShOjzcDvOxZSqTIumcg7skDho3XW+UdPzYhG01SwgmpYq9zqpMt+ygKfljJv+asRJWB1EvUDOkne2XvIhVav0iq+zb6Nk0y1/DTr3jiwuIGxNf/NhHzfohu8oQdadg3btKROkxbtSjJhEm9hIcwPGJKLhIdp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnTapvyH; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7cc0c1a37so262645766b.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:48:47 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de5a853090so3019441a12.3
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:49:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739483325; x=1740088125; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739483369; x=1740088169; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=WrInHI6x5g7wz8uecKXZn0Eb/BTtMocQUlkdMAo/LSE=;
-        b=PH+5PQ+ToCanlwHqdNQEeS/6DyIWdsbCTToFPCxmZnPZS8qC8DVBkhu+vkrN2uhEIN
-         5tje5r+vuGmUBbDkryauC73PQQJyj6AMbeNBXheO1jeRpy6XZo83dlFvDVDAsXAUaSBR
-         uh9uqhSjTsZev42gcuR+hrwwxI2uqeojScxRZKdJIaKtUJAI2y+5OLeO9Xx25EUtI0mg
-         IA+gLsJFV3nqtKsvMRV3lQy7QxPZX0id9vx8dPox6zJnnATOwyKo9JqVSk4VdV+A1ZM3
-         W0WjNzgRloTColVEYRn8eAMMGqDiLF8AnKJmlrpAvIfgeOpQp8pv+DjyAfi+53Il6P02
-         Q04w==
+        bh=0piG3yjRjEusyNC4nYKHzEr7L31oYL8tLO8Yfned4Ho=;
+        b=nnTapvyH6AkoArWl6GRgkvT0YEFqMLDzDY5D2iW+FpIOPZL+neMizLwzGznlZ0O/4r
+         3I6+2v/uld5+ZzFSVsg7dYhweJULWgtOfI6/KneIfBgrfyCZonu0FggRUAF1UHhXKZBC
+         RRnJ1UkMekZj2kZRLyDS+UwDL5cMX34M1gzLK+FRnPkm0HUBSyW9jyKgcj2pkhQq3F92
+         PDMviVNCLoBK4m7mIzHGtHLofwmEoimkV3OGVI8OlKop9y2Z1qAM7P63h5dCy+jz5lGE
+         e5WWRK6Q3uwLrv8COk22I2phWCf8zaNtCPzjbqMVwsV/6uEZamCPEaIEISyzTN9DrYQM
+         Bchg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739483325; x=1740088125;
+        d=1e100.net; s=20230601; t=1739483369; x=1740088169;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WrInHI6x5g7wz8uecKXZn0Eb/BTtMocQUlkdMAo/LSE=;
-        b=GyTIvFbwZmEAiL83ydYDdYPID4c1CPThogEH0QR22pRUNkK0CMMCZpmwhgGPyMlDGt
-         nj6gxP0EBphA5zA44IBDCS9Yo3EetY3Sm7bRyoIqeNKM2+w+4uE4lunex8UXRA+A/4S6
-         k4zFbt/VRj0fvnnibY0SYy6oL2hZXLot1hp4jiNGSpN0vMqEPM1W+GgDOXF5/CZg0nMe
-         u7GEkT03rMN0/eFMeMTlzHh7xVPz+bcRQ6/3NmcFhkbTn4tKCpMBgoRZ4RqUQvtIxa/8
-         HC01fNTrWBJdDL6Tg3PSOrnXxiZBomQcRzfwixjs3JEHsItmLZrGEOceLDRjLBEnKDo7
-         s0JQ==
-X-Gm-Message-State: AOJu0Yy1Au4BUVRWIei1gD4CLaEkEP/bMP/oOfnSu3FjggaEjPYeO+FG
-	wvCCFh0fJa+dv84KPDGBWu3c2/LkaI2Jcs49RnFiZKcoThaPAh9t
-X-Gm-Gg: ASbGnct12BWRRBy6i/lqXh9rjd/hBeNxrkNPnZMH4DuVODXx/JeTW/btdZLh3A43YEe
-	MAI3UqKfvaDY0N1qdD9ZoFmVdCuEFCTCATltl1bTWLXXnpxSIZ2y1PJFLD1XbG4PiiX+MPdqMTj
-	CUjWWj1C0r3L8DRT/Jd86tPmAQiqR974mYgPzhnQBm8XuEOkGdEfUTWhglLgrKtu1Pxj+C8aTLK
-	E3G1QT2VR3HVeXJFtlKwox/uD7Ege0Y7jJ3qfrry21mfbY4rxaWCRMHMXcc93rChYNNDTc4zsEK
-	WSIUXPyWqN8EF0PlhDfHHrIXBBc48z+ErywSMllkL5dsWHxFOMe2bs+dPK1oDtCBF8q6/87l8ZL
-	csKHEj7aqu75SlwbHezMnL04f1OPhgKWobGa4vfgIppU+YSvPEqKL5zJqhWxgDBOdxvXxu9N8ng
-	x/XEf/
-X-Google-Smtp-Source: AGHT+IHhGL8Ot8KXZBMQlMim51xzcgXrx9A57jkgfyjcJtoHHV/iUD2RiohrjFDKrEqm9kR+dRja3Q==
-X-Received: by 2002:a17:906:c110:b0:ab7:cc00:4d4a with SMTP id a640c23a62f3a-ab7f347eademr697276066b.35.1739483325387;
-        Thu, 13 Feb 2025 13:48:45 -0800 (PST)
+        bh=0piG3yjRjEusyNC4nYKHzEr7L31oYL8tLO8Yfned4Ho=;
+        b=QwykkyroxS1RHCoeLe+AeL9z90+W8rqDjlLMpwox7unPfE2TRQD4QwWc9U6KwW1RTU
+         fSd+LiYkYqR/CJY05coEGsRfxI4Ib7acd3VY/9cQJjoAce4P2RhcXxUG2VzAlPb21RWI
+         W79oFciWGZvojILcEXCjR8mEkD3S/4jxD2AqJgbftkEU8Ipaew+/syQlB4O+p6ITFZdz
+         HIa7Q31FhB9GNJY3JUuKx0kh70VItqqSBYzgLcRc9oLSi3Humgx452yL3ez953EljFKb
+         BCCyej3HZcOAkqSpLruWGaAFigLmce6ec3kq3101XO4HKtXOSc8hNZKbEkIQl219PuHx
+         wV/g==
+X-Gm-Message-State: AOJu0Yw55fjP+3VEfpR9syxcL9PnKignAGNPKer6CUzznXYPY0sHj/5m
+	sSBUYMMiuWl4npxILL6cD3avJyBaUQ4kbx5uzJcCzAbpxEHGbiZ+
+X-Gm-Gg: ASbGnct4s9OCfExsqaVuxyIumpBupndVtZncvG0tNUXj5Dbp7qo61PJmJsgoRfTwWjQ
+	1LfDgez3MeIyXz1YUsFTg2+xYRZJZEG/2K0hRjoXsAxjss5RCAmfUc8oflRDw4BYrhLdk+yWrZJ
+	jNRBMFuNWRpaO53eqn+6GZFDpmdjZ9LAhnwWBnFfZdfqASAmYTs5Kcm3DtyOB+aFcunmKL68Fak
+	fAMrVPc4rIiy0W3hz5ytkkXmLVAMorywahYvNOhCCKxYRtrF2E4wXA9fvTEi0qZDa0eRkj5KFTd
+	3IL8razi1huirNLlkX6XrOub85rdRfRYVPxRhUMUuqAo3QSJWb/XA6Te8ojjf/FkvdrsaRcOXT7
+	+b2tiXO3kOutH7LCGxXGE8lKbTDkJfmAZGqHML+TlD9Bquc9P+Td39I9Z7c6dspnEAVeThzRjkd
+	AdHGy3
+X-Google-Smtp-Source: AGHT+IHqHV9JLFLPGkLf9AelCYI7plNgMaDf0eeurp33KCxJZxh3K6/lzJBbSsQxihtO2ifXLpxW2A==
+X-Received: by 2002:a05:6402:27d3:b0:5dc:9002:3164 with SMTP id 4fb4d7f45d1cf-5deadd7b9e2mr9151301a12.5.1739483368934;
+        Thu, 13 Feb 2025 13:49:28 -0800 (PST)
 Received: from ?IPV6:2a02:3100:9dea:b00:8140:d035:b1a4:911d? (dynamic-2a02-3100-9dea-0b00-8140-d035-b1a4-911d.310.pool.telefonica.de. [2a02:3100:9dea:b00:8140:d035:b1a4:911d])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aba53258215sm206454066b.53.2025.02.13.13.48.44
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5dece1c43b6sm1823890a12.26.2025.02.13.13.49.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 13:48:44 -0800 (PST)
-Message-ID: <01886672-4880-4ca8-b7b0-94d40f6e0ec5@gmail.com>
-Date: Thu, 13 Feb 2025 22:49:19 +0100
+        Thu, 13 Feb 2025 13:49:27 -0800 (PST)
+Message-ID: <16986d3d-7baf-4b02-a641-e2916d491264@gmail.com>
+Date: Thu, 13 Feb 2025 22:50:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/4] net: phy: stop exporting feature arrays which
- aren't used outside phylib
+Subject: [PATCH net-next 3/4] net: phy: stop exporting phy_queue_state_machine
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -140,88 +139,46 @@ In-Reply-To: <d14f8a69-dc21-4ff7-8401-574ffe2f4bc5@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Stop exporting feature arrays which aren't used outside phylib.
+phy_queue_state_machine() isn't used outside phy.c,
+so stop exporting it.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy_device.c | 22 ++++++----------------
- include/linux/phy.h          |  5 -----
- 2 files changed, 6 insertions(+), 21 deletions(-)
+ drivers/net/phy/phy.c | 4 ++--
+ include/linux/phy.h   | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 14c312ad2..1c10c774b 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -91,37 +91,28 @@ static const int phy_all_ports_features_array[7] = {
- 	ETHTOOL_LINK_MODE_Backplane_BIT,
- };
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index d0c1718e2..8738ffb4c 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -520,12 +520,12 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+  * @phydev: the phy_device struct
+  * @jiffies: Run the state machine after these jiffies
+  */
+-void phy_queue_state_machine(struct phy_device *phydev, unsigned long jiffies)
++static void phy_queue_state_machine(struct phy_device *phydev,
++				    unsigned long jiffies)
+ {
+ 	mod_delayed_work(system_power_efficient_wq, &phydev->state_queue,
+ 			 jiffies);
+ }
+-EXPORT_SYMBOL(phy_queue_state_machine);
  
--const int phy_10_100_features_array[4] = {
-+static const int phy_10_100_features_array[4] = {
- 	ETHTOOL_LINK_MODE_10baseT_Half_BIT,
- 	ETHTOOL_LINK_MODE_10baseT_Full_BIT,
- 	ETHTOOL_LINK_MODE_100baseT_Half_BIT,
- 	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
- };
--EXPORT_SYMBOL_GPL(phy_10_100_features_array);
- 
--const int phy_basic_t1_features_array[3] = {
-+static const int phy_basic_t1_features_array[3] = {
- 	ETHTOOL_LINK_MODE_TP_BIT,
- 	ETHTOOL_LINK_MODE_10baseT1L_Full_BIT,
- 	ETHTOOL_LINK_MODE_100baseT1_Full_BIT,
- };
--EXPORT_SYMBOL_GPL(phy_basic_t1_features_array);
- 
--const int phy_basic_t1s_p2mp_features_array[2] = {
-+static const int phy_basic_t1s_p2mp_features_array[2] = {
- 	ETHTOOL_LINK_MODE_TP_BIT,
- 	ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT,
- };
--EXPORT_SYMBOL_GPL(phy_basic_t1s_p2mp_features_array);
- 
--const int phy_gbit_features_array[2] = {
-+static const int phy_gbit_features_array[2] = {
- 	ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
- 	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
- };
--EXPORT_SYMBOL_GPL(phy_gbit_features_array);
--
--const int phy_10gbit_features_array[1] = {
--	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
--};
--EXPORT_SYMBOL_GPL(phy_10gbit_features_array);
- 
- static const int phy_eee_cap1_features_array[] = {
- 	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-@@ -196,9 +187,8 @@ static void features_init(void)
- 	linkmode_set_bit_array(phy_gbit_features_array,
- 			       ARRAY_SIZE(phy_gbit_features_array),
- 			       phy_10gbit_features);
--	linkmode_set_bit_array(phy_10gbit_features_array,
--			       ARRAY_SIZE(phy_10gbit_features_array),
--			       phy_10gbit_features);
-+	linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
-+			 phy_10gbit_features);
- 
- 	linkmode_set_bit_array(phy_eee_cap1_features_array,
- 			       ARRAY_SIZE(phy_eee_cap1_features_array),
+ /**
+  * phy_trigger_machine - Trigger the state machine to run now
 diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 96e427c2c..33e2c2c93 100644
+index 33e2c2c93..bb7454364 100644
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -54,11 +54,6 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
- #define PHY_EEE_CAP2_FEATURES ((unsigned long *)&phy_eee_cap2_features)
- 
- extern const int phy_basic_ports_array[3];
--extern const int phy_10_100_features_array[4];
--extern const int phy_basic_t1_features_array[3];
--extern const int phy_basic_t1s_p2mp_features_array[2];
--extern const int phy_gbit_features_array[2];
--extern const int phy_10gbit_features_array[1];
- 
- /*
-  * Set phydev->irq to PHY_POLL if interrupts are not supported,
+@@ -2061,7 +2061,6 @@ int phy_drivers_register(struct phy_driver *new_driver, int n,
+ 			 struct module *owner);
+ void phy_error(struct phy_device *phydev);
+ void phy_state_machine(struct work_struct *work);
+-void phy_queue_state_machine(struct phy_device *phydev, unsigned long jiffies);
+ void phy_trigger_machine(struct phy_device *phydev);
+ void phy_mac_interrupt(struct phy_device *phydev);
+ void phy_start_machine(struct phy_device *phydev);
 -- 
 2.48.1
 
