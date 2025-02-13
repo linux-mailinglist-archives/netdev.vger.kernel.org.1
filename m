@@ -1,141 +1,120 @@
-Return-Path: <netdev+bounces-166034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D41A34060
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:28:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B13A34062
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8D79188B74D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:28:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56D47188C8D5
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51077227EAE;
-	Thu, 13 Feb 2025 13:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7532F227EAA;
+	Thu, 13 Feb 2025 13:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QKQ+xC5M"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ODzZaBT/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765E6227E98
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26A223F405;
+	Thu, 13 Feb 2025 13:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739453320; cv=none; b=CgMJP28cloSTj7W1+L5izEzdTs2infz6ARma+8LcmpY2/QAFQ1C5rcfm+fhw3ZIHzZt7tQ0jBmTIq8c4t2k+oq9kl4+Z7D58dgP54k7OWPreBzp2hbEwJcs/WGH2XCDD/9YM7kXyy4uEzFu6iTZzNrJNJod1gKcg5idm2vYGfrs=
+	t=1739453397; cv=none; b=KKFk7XlBUtmk85QNN7sh61o6gZpYEsjRs2D9JHV08lxG5pnJ1esh4yp0qCuboT7UJJvBP9sdNV1mM+z0Xit9om2mTYy02YrXYrOkgQafbHeimsTVE/d+4V8nRropG+/PyZWQG2o/osiMS8oDfkA73foFDvJWt2FdQubq8wejzCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739453320; c=relaxed/simple;
-	bh=/Qn77Ocxe2sbex4mb5tdrKAaEqON4VTAP1evl/u6Uew=;
+	s=arc-20240116; t=1739453397; c=relaxed/simple;
+	bh=u+0TFlvAcTgqS+Pq+6Q91tIBM3Sa6hihqUkBue9AVGM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=evywovXJmHULm3rkOQw00J+iFNx6/Nc6EXGVpg6ugEq+VvOgBw04xf20cva69sFwh4QtmQ3EO+QnOWxsp44WrFOBQ4LvTVy6IrxFilFUSpf/OJwdw0lKDUKeffkX40oTiNi1sb1LqxPnF7PKs9+3bH89sPjWQVlZmqb2jk7SCr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QKQ+xC5M; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 34ACC114012C;
-	Thu, 13 Feb 2025 08:28:37 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Thu, 13 Feb 2025 08:28:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1739453317; x=1739539717; bh=OepDTwXHKL8Rz7EnGtrIUBcgHm7TFwIup3O
-	HKhJ9sNU=; b=QKQ+xC5MiokoOI6Yu7qwSpJzoTHS+YTD9eL+RvZuXArt3JC+9RZ
-	R/d4964S3G+VXsbiBoQ+++F/v0J0tyt0aCoIWh3+HJpjieBIPXCXx1tgf9+0TWzT
-	uy+B+uvoBGwbBlY7cYkS+Fs54lZgwUpSl+9gBnQ3msHORi6g79S4XodIzFUSBkoS
-	olMurHvyoq6L0oU2daXeGnM5EtMtaPfhcNfPgJiBLKAhg0td1cpHPZJJ1k8tl+uT
-	+At2/3PSwXc7cuPdSrkRxdSol8TZo6+vIFpVwCm1iCv7dCgfcYdwjdzNMEA844L7
-	fvDxkf522DJXJhNWC4AomjVmPw2Seq19AeA==
-X-ME-Sender: <xms:g_OtZ6BE69h4R87xIy3vP9RB7NFEaFa25hvRIOJLJvoKZ_3pOFbP4A>
-    <xme:g_OtZ0gUSgdWBQw_l4wlR1CTq1EJN30Yc2QVddKB7FgLvxOaPFuI5TdJhf8Alpo5L
-    CDOIbzyNNPKfeE>
-X-ME-Received: <xmr:g_OtZ9mqg8IjTMdDRH6CIuIDwBb2B57phMyKUtYtsxJ1d_HEu2da61PIhBM9ZVhKIEPAcSU_MZCBLUrkPC8TpDJl07w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegieeklecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefg
-    udffvdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
-    sehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehjuhhsthhinhdrihhurhhmrghnsehulhhivghgvgdrsggvpdhr
-    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrhhn
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:g_OtZ4wgfhDQ3JN85Aiz15h2XFXsGf18Bf--z15y_Ntu75yxdeAWtA>
-    <xmx:g_OtZ_RnRfxXuHLfBbdljBme8_1v5YFToEX-X_gPuw7R3o9WyEgF6A>
-    <xmx:g_OtZzYXybIfmXWmINt8tw3p1MfkAx0EtJItFeRLQiJU1gCmh-RjhQ>
-    <xmx:g_OtZ4T33nbkLZpbCzJu4NuK8wxrlijk7HQtOjk7mz7p7EaHP_NVdQ>
-    <xmx:hfOtZ098zIg6lcDp1oH3Wa3iZFMqF2pi09AiELSntw4dlZCTQMv_1c7g>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 13 Feb 2025 08:28:35 -0500 (EST)
-Date: Thu, 13 Feb 2025 15:28:32 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, Alexander Aring <alex.aring@gmail.com>,
-	David Lebrun <dlebrun@google.com>
-Subject: Re: [PATCH net v2 2/3] net: ipv6: fix lwtunnel loops in ioam6, rpl
- and seg6
-Message-ID: <Z63zgLQ_ZFmkO9ys@shredder>
-References: <20250211221624.18435-1-justin.iurman@uliege.be>
- <20250211221624.18435-3-justin.iurman@uliege.be>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kJJkbaGLGNh5bBnCp2uxJC7sVgT9rT4BJdRY8PxZF7PgYkW7ABotSLM2wqTIBv9Uo1RH9xdySCJmBWkAeKQ/nu30jNqcvQJVt37+31gkoGhK3dL+aFs2a6qWCgiFImX3GfH9bMKFmB4pePvXlv3g3/ytWw3yiWEXZRAMp8ESWT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ODzZaBT/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=LofFdn71YhJEfg4gK8mqJ2EQ/Xufw9Ujp/0BZNUiuSw=; b=OD
+	zZaBT/rDCeCpGiGnVgl4VG7kyi4r7LH/9K2ox5F62nicWoK8i2mLmNKkByiaAy2NSuSk8r3qvc5ch
+	ENTTTHgM30/v41WWLAEXjHmi7Mek6IZjtfCR/+O9p3Rd5TEjR8gtzOterexQlXHMnelpHb9xYAt/p
+	EGpe3aVaxfoZOZM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tiZHb-00DkP8-9Z; Thu, 13 Feb 2025 14:29:35 +0100
+Date: Thu, 13 Feb 2025 14:29:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "dqfext@gmail.com" <dqfext@gmail.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
+Subject: Re: [PATCH net-next 1/3] net: phy: mediatek: Add token ring access
+ helper functions in mtk-phy-lib
+Message-ID: <64b70b2d-b9b6-4925-b3f6-f570ddb70e95@lunn.ch>
+References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
+ <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
+ <5546788b-606e-489b-bb1a-2a965e8b2874@lunn.ch>
+ <385ba7224bbcc5ad9549b1dfb60ace63e80f2691.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250211221624.18435-3-justin.iurman@uliege.be>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <385ba7224bbcc5ad9549b1dfb60ace63e80f2691.camel@mediatek.com>
 
-On Tue, Feb 11, 2025 at 11:16:23PM +0100, Justin Iurman wrote:
-> When the destination is the same post-transformation, we enter a
-> lwtunnel loop. This is true for ioam6_iptunnel, rpl_iptunnel, and
-> seg6_iptunnel, in both input() and output() handlers respectively, where
-> either dst_input() or dst_output() is called at the end. It happens for
-> instance with the ioam6 inline mode, but can also happen for any of them
-> as long as the post-transformation destination still matches the fib
-> entry. Note that ioam6_iptunnel was already comparing the old and new
-> destination address to prevent the loop, but it is not enough (e.g.,
-> other addresses can still match the same subnet).
-> 
-> Here is an example for rpl_input():
-> 
-> dump_stack_lvl+0x60/0x80
-> rpl_input+0x9d/0x320
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> [...]
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> lwtunnel_input+0x64/0xa0
-> ip6_sublist_rcv_finish+0x85/0x90
-> ip6_sublist_rcv+0x236/0x2f0
-> 
-> ... until rpl_do_srh() fails, which means skb_cow_head() failed.
-> 
-> This patch prevents that kind of loop by redirecting to the origin
-> input() or output() when the destination is the same
-> post-transformation.
+On Thu, Feb 13, 2025 at 07:39:39AM +0000, SkyLake Huang (黃啟澤) wrote:
+> On Sun, 2025-01-19 at 18:12 +0100, Andrew Lunn wrote:
+> > 
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> > 
+> > 
+> > > +/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x1 */
+> > > +/* MrvlTrFix100Kp */
+> > > +#define MRVL_TR_FIX_100KP_MASK                       GENMASK(22,
+> > > 20)
+> > > +/* MrvlTrFix100Kf */
+> > > +#define MRVL_TR_FIX_100KF_MASK                       GENMASK(19,
+> > > 17)
+> > > +/* MrvlTrFix1000Kp */
+> > > +#define MRVL_TR_FIX_1000KP_MASK                      GENMASK(16,
+> > > 14)
+> > > +/* MrvlTrFix1000Kf */
+> > > +#define MRVL_TR_FIX_1000KF_MASK                      GENMASK(13,
+> > > 11)
+> > 
+> > What does the Mrvl prefix stand for?
+> > 
+> > This patch is pretty much impossible to review because it makes so
+> > many changes. Please split it up into lots of small simple changes.
+> > 
+> >     Andrew
+> > 
+> > ---
+> > pw-bot: cr
+> Those registers with Mrvl* prefix were originally designed for
+> connection with certain Marvell devices. It's our DSP parameters.
 
-A loop was reported a few months ago with a similar stack trace:
-https://lore.kernel.org/netdev/2bc9e2079e864a9290561894d2a602d6@akamai.com/
+Will this code work with real Marvell devices? Is this PHY actually
+licensed from Marvell?
 
-But even with this series applied my VM gets stuck. Can you please check
-if the fix is incomplete?
+	Andrew
 
