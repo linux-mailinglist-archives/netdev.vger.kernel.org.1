@@ -1,236 +1,295 @@
-Return-Path: <netdev+bounces-166105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7B6A3486D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06424A34870
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2731886E67
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:43:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 447651881890
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2571993B9;
-	Thu, 13 Feb 2025 15:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AC318A6A7;
+	Thu, 13 Feb 2025 15:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2Ly/3Ov"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O99Sx1t7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5A626B087
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 15:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739461399; cv=none; b=tmi2ojjH+MbouOOcUS5iir1N/EVhFzNRlFlBfHTQOggQAoChtWsJdID1upfMDhsAi4Wly2jWfXxpzz+gakA22TyCUl0qJbMEO3Fb2JN8+BWnxqkRYZH5uIV4eucsiz6WkVfdoC+POlp1fng5jg2SONQbS3v1MuU4rO9EkdczWN4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739461399; c=relaxed/simple;
-	bh=uLiZ1rCqYfK/j8eSgyeV2MyQP8gfHxF6rrcTwqcvaaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tpaUgE1xtl083a2I/b0Njuu4h8Emme7+R0/U3MZzQW18HYH9DnoKvkRQG55KLT18TDyjwMN0S5vY1MiF8WT3ZCiP+PoCWLoYv3zwF4oRZRtm7p3rcyMm8rvmdcg77ASUeL9t2/IBm6CSS65qZv63YK8c4ZmRsBnGAS/zv6ph7xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g2Ly/3Ov; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739461396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yzI2r5nmEeXgT2ts1VutUTn2sHSIfm7BIbhjPpBpcIA=;
-	b=g2Ly/3OvR6mtGYXlVfLToj0OYk3cMlr9GTC/GXMZUO9jtSJFoVp8uRZjpymLRfs8yPUZqj
-	bY4dfTlxXY0e5Yc/WmFyArx+0UG2ZNuMHOikJ7gbGtp7nV3/fV1r4rtTXlNoxef5hCKhIT
-	NSuNFf0QN2svZVLLqSZ7UBHgclMMDZw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-9PQeoaArMVu0Z-nO8IPt6w-1; Thu, 13 Feb 2025 10:43:15 -0500
-X-MC-Unique: 9PQeoaArMVu0Z-nO8IPt6w-1
-X-Mimecast-MFC-AGG-ID: 9PQeoaArMVu0Z-nO8IPt6w_1739461394
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aa6b904a886so91633766b.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 07:43:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739461394; x=1740066194;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yzI2r5nmEeXgT2ts1VutUTn2sHSIfm7BIbhjPpBpcIA=;
-        b=xK8qTf21CGh18TIlLaxbqiYHwjkiNwBqz3o26Ri3PgclZ5Q0w6yDZZ4yCYObhtA1A2
-         3uUwtC4ER0qWjbLjLU5ayxe2HBgD2ODN/C8kS8Q0D901mUiqjNoB4bADBW5Fg7OLzHHp
-         z8VkRbbbjJl8UrKcFehT6LPDDJBbndWxsJiXeO5pv4tmS6onLrphgpyi+h3pjt70K5Dy
-         5LIeDJEP3O5dSTlMWESOfyopnmU0kvsMxEq6y1CkhZKX7+A6sWZ0kfSk/f4vD5SM39wc
-         T6DuCNJsL4svKRJLvcukXZYOX+A5mkFX2eBkWeB+En5JXjw22AlTX8Bi5Jjy6m1wFGFS
-         Igkw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6UCYeIAjqVGY0sd5nFIlX9/n8jamlxy5cTpY1ubR68g/8qWxAwib275OfAY/xTc20en8d6c4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8iTnidvcfsy478k2CHgElvhV55XockiVCsbhF2QO3p2E9D8bI
-	LcaZW8fr/fY9BOTgPIF22p2k5v2kiknvTqFSrsqYRFcTWidtLqGlBIlc4xI59Q0EQJGEgbuvDc5
-	w4oPJQs42FTpH/bThPoDaqfCqU/1S33HvYvshcq5CVNHJ/CFu1n2N4w==
-X-Gm-Gg: ASbGncuziRuFSgrBen1TlvnQK1zInHpel4D2snzbjdQpcHxt0bhW+v8U4N1xf6wckeg
-	U8XYiOLOfu3llP1Wk1T1UMnv5ptK9vnF21nzyMDhGrLUN/h+Om3S4KqsYbA+D2KS/LM3CwdrHdY
-	CtnmDgD/TYvM/VKYWDHa1T/U4G0XL3JJNTw/YVSqobDl7eDlfdiPHIqPUGCuvfJCiRHQKGTxr/C
-	AIrdu4WQtDw2N7bbiicmDSJvyjsXui4dj4xGlwayJj/KPBCa0XPK512HEjRHvasKTx5muBTuA==
-X-Received: by 2002:a17:907:96ac:b0:ab7:cd83:98b6 with SMTP id a640c23a62f3a-ab7f336d4dcmr727681466b.6.1739461393908;
-        Thu, 13 Feb 2025 07:43:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMjEK63T1Hvw2DRYuMNZ0QhIbCttTcpsK+feVhTHyAb3Qwlg1NW7Q7NJFwB80xOR6TDebhgw==
-X-Received: by 2002:a17:907:96ac:b0:ab7:cd83:98b6 with SMTP id a640c23a62f3a-ab7f336d4dcmr727676966b.6.1739461393478;
-        Thu, 13 Feb 2025 07:43:13 -0800 (PST)
-Received: from redhat.com ([2a02:14f:171:92b6:64de:62a8:325e:4f1d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53376abbsm153403066b.93.2025.02.13.07.43.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 07:43:12 -0800 (PST)
-Date: Thu, 13 Feb 2025 10:43:07 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-kselftest@vger.kernel.org,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH net-next] tun: Pad virtio headers
-Message-ID: <20250213103636-mutt-send-email-mst@kernel.org>
-References: <20250213-buffers-v1-1-ec4a0821957a@daynix.com>
- <20250213020702-mutt-send-email-mst@kernel.org>
- <0fa16c0e-8002-4320-b7d3-d3d36f80008c@daynix.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDED6F073
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 15:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739461543; cv=fail; b=tDwQ1n1IeW63TBLTZbnhvCPf+aRq+ym+w6ZNukzOPh3It1UFjR2p9491E4/mNfd7gVjT2QXJZBQqfhMK3mfYPAlenyfDQ8o5MQY/AqgPj085JaMB2DOHIpj5KxjxdxDzkw0qUScrfM/ng+YbTupxFrimHNAqes3SwhD3K0kq5Wg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739461543; c=relaxed/simple;
+	bh=PrlFI/cuTSCyBLQF0PQGZThO24SPmEXCJzBIdmRoTYA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=G6iOj1OfozyO/Gka8HpV9yq/KVYfnX0a0H6TCtEDZ75dqs2QujAZUIA2xSOSCqOx68rPdBXEkuMYw0/o3MGGqtkrACxYYi2iRu5Wppwltk382HSwbVKFFv637zVpfSm4/+oknWC/kgBf2F80BrX+SojuJvDnB85hJlDV+nQ6isk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O99Sx1t7; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739461542; x=1770997542;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PrlFI/cuTSCyBLQF0PQGZThO24SPmEXCJzBIdmRoTYA=;
+  b=O99Sx1t7dkxHFNSlvYVzREfm9pFbV8Nr4FW95YOr2v+r8ODBvoYxUMeq
+   Hr1TQjNq2+WrzwfTh/zLAnuAASjJX5oPJQTqYX1mPyc1XokQBKODBM/Gc
+   JljIPn8w/PBR6wn9JT+jKqZvaOc3s3EeG2udWu206bhpKDXepWP8/9s/R
+   Acrs1s2hK7XnsXwqCF2t4GDwNeNt/fgKHUGbhWAhBaC437RlL4aylrcun
+   DLGcBiRWKoD7e2DC8dLw1YeY5620i+sQ4VJMbDoiBCN/2JGMDgTJkpfz7
+   Y8SAnF8HJBjBursptM9qPMUaPp8zMAmIwx/b4+YPelNLvaSH7hUU4zV+m
+   Q==;
+X-CSE-ConnectionGUID: iJphHFeXTs25jKDCbj5jjA==
+X-CSE-MsgGUID: xrOD4NUzTRq4VLojgPIrmw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="40320828"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="40320828"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 07:45:41 -0800
+X-CSE-ConnectionGUID: kTgZgiTKRtmpmTKsWP2OwA==
+X-CSE-MsgGUID: GDmpDHyNSQqO6JQuViqCzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="113702997"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2025 07:45:40 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 13 Feb 2025 07:45:39 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 13 Feb 2025 07:45:39 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Feb 2025 07:45:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m5RjsuBQ07VFUcKv9w1ldC7jqFKEnJfIXl5rq06/D00ToDGt2Br0EiJhlSgER1TbnU1N/OOrm10LtOLqFHH6xNRIYIwN2wdjdSYs7efTEt+azbyc1OLIxCxhfXNSUhJFq4tQXyLvBmbN0uZbrfW09LPDtL5+tG/EVmqUb6f7MOH1QX2Zx4j0QJa4swIGvyLlRksTj66VRXkdrZHcseY3AoOWi4ZAzad6eMqiCruYLMD9EFltrRYLzpzZF7BV2DnIo66eecmia40QjwquRhacUxJzJK5Dp7r8TKdJmU2fEe+dv9EjWNUyfC2gLzQ2ZxOpYaqdDW1aLlFFQwb3yIENmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q+pjpR4cHZiphx7SLMcF1rWly6u+5WI7EitRre5sVc8=;
+ b=VTu0Jtgk1W3VZkb5C5a8uTvX1dKimrpWt2gVhRzAPMFX9gjDQ50VCMxuOAj0OS0Dq5mLIlEL++zZ1JN9RVmFQZWXIKdNG4ZS9xMe+36T7+vqzhkEL1z1zNf0bqq6zqP46rSiVSod69xekwimt7/f49Kcthn4jFnsnOEGR7wmx9qcrgqurljHVEwU0svXSTKban5CbB2j2o2e/31KWBq8e6pG0JrkSuRsETK92kXklyFrPnc8e+9iFILgk9GZP1mqh3zpP5SZX+hBw3lENoG5zgczn4MlTwgOve545VHUYSZnCYje08krFJSlekPKgGHmfKjAUsnRXAykifrpud7OHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by CYYPR11MB8385.namprd11.prod.outlook.com (2603:10b6:930:c1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Thu, 13 Feb
+ 2025 15:45:35 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.8445.013; Thu, 13 Feb 2025
+ 15:45:35 +0000
+Message-ID: <7dd230fb-ca58-4407-98df-03ddb2ac68a9@intel.com>
+Date: Thu, 13 Feb 2025 08:45:21 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 3/6] net: napi: add CPU affinity to
+ napi_config
+To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <andrew+netdev@lunn.ch>,
+	<edumazet@google.com>, <kuba@kernel.org>, <horms@kernel.org>,
+	<davem@davemloft.net>, <michael.chan@broadcom.com>, <tariqt@nvidia.com>,
+	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<jdamato@fastly.com>, <shayd@nvidia.com>, <akpm@linux-foundation.org>,
+	<shayagr@amazon.com>, <kalesh-anakkur.purayil@broadcom.com>,
+	<pavan.chebbi@broadcom.com>
+References: <20250211210657.428439-1-ahmed.zaki@intel.com>
+ <20250211210657.428439-4-ahmed.zaki@intel.com>
+ <738fed19-378f-4aa9-8d42-5c18b8ea321d@redhat.com>
+Content-Language: en-US
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <738fed19-378f-4aa9-8d42-5c18b8ea321d@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0038.namprd03.prod.outlook.com
+ (2603:10b6:303:8e::13) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0fa16c0e-8002-4320-b7d3-d3d36f80008c@daynix.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|CYYPR11MB8385:EE_
+X-MS-Office365-Filtering-Correlation-Id: 176df74b-5825-4d4e-2c0a-08dd4c4574c9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?K2VyYzhvYlBPQUxKSEpFNHRKSmg4OHlHNW1oejNWQUJwM1NHb043ZitTQU5S?=
+ =?utf-8?B?QUJKeU84dDd2MzlzNVBZZzd5UGk2R21lWVFxeng0N0FKVDkzczY2YTZZa2s1?=
+ =?utf-8?B?UVNkZmdZRW5kRnkyYlZDbUhSQS9aMjcrNzFTN2FJRXRBN1dGWGFXL3JLemU0?=
+ =?utf-8?B?RWQ1aUF3SFRVSEREeEZ3UHluYkxhSWJFcm5ZaDYraFlsWm1PSXYyYTZGUmdY?=
+ =?utf-8?B?QlhCbWMrenQ5UVZLaGtRRW5KVzliTXFsV0ZPT3FUb3MzczFKUEJDQ0MxZU4w?=
+ =?utf-8?B?MG9rUnBRUFpReHUzVXNOMzlKUEJ2U3dOT2hDTFdlY3BjY20zbjZTRnFmMUZ3?=
+ =?utf-8?B?RUZFK0dQckc1MEpkUVdoL1F0c0FkRFZrQ1p3SU9GTnJKU2RWZmN2bnl4MjJt?=
+ =?utf-8?B?WkxEeFZieis2VWkwRjVnWGE3enkxQlJEakFtNzFwak14Q1QveUtHcHNLZVJ2?=
+ =?utf-8?B?NkJxMXVXR2ZJSkFTU2NEbjBWS1U4RDJncUF2ODl1anJsUDZhbzYyUHFwaGFS?=
+ =?utf-8?B?WENZM3R1KzhEeG5lVHl2Q3VPTUJIRzF0WXlDQ2p0Z3hLVVQ4TXk4bFhXOGNu?=
+ =?utf-8?B?ZnZkUms3ZlNhc0VwMkdWWVFTamdjU0RzenhpWjZHU3ovR0g5NEhtNGFIdDlh?=
+ =?utf-8?B?UGNGSmZzL2ZoWktSTk1BSklFNXZITnlOS1NMc0pwY0RCMFc0d09tTDV1MFN3?=
+ =?utf-8?B?V2FEOUhZeC9qeWk1ZFFVcXlBaUlPWmlvWlFtSTQ1TXBCWTRjQnBzL2tsVW1n?=
+ =?utf-8?B?aFROd0libDdGdVY1NStiM3NnR2hVbXFFYnhYZkhheGFTMXVSUk45VHBZTVBZ?=
+ =?utf-8?B?UlN6QjNyT2FlN1lUUnhLMUI0WHMyVE5OUm5nN3Q4SXZQbDloNkZUM25hd1Mr?=
+ =?utf-8?B?TW5wNEdndHR1NGtHS2FFdXFoZDIrSVpJM2Y3SXAzY1VjN1ByVUJ6V1VPSkd1?=
+ =?utf-8?B?d2RKTkc0R3IvME5oVm5Ec1VqSGUwcmpZRC9DQVA4ZW1GWitiYzFJTUJacVdp?=
+ =?utf-8?B?eitvYnQ4aFh0c2VKRmF0RmpsajY5aW92ZDNrNFF0VzBlTm9qcDR5STZ3NlI1?=
+ =?utf-8?B?T3VoQnBOWHYyWGQ1SWF4QXlSNFltRzl0bS9XM1JtQytGWmY0WFlVM1V2SzZD?=
+ =?utf-8?B?ZFh6RUJyWTlnMTlXUGUydGNQOS9nejhpNnpTbjhGWGtMTm9ncnhTUDQzclIz?=
+ =?utf-8?B?RWd3RjdPeTVXb0Z4TXVMUDRjVFRMTkp2ZU1pV0dRcndOMzR0VjhnQkVYbGgr?=
+ =?utf-8?B?c3IyajNpOXlIZ0pLdjNHYm93R3VTY3hRVFZqNGlzdmR2S3Znc1hPRElYTS81?=
+ =?utf-8?B?cmd5UFAyRHQ3ZC9DT21iZldleXNWc2ZjY0lYaU8xbk1SMnk4aFNQeXhVUk9h?=
+ =?utf-8?B?RDgrMURabkJ6ampwOTlmTEhoMFE5cHQva05VY3dhNkc2djJVZkZGZVNqNG80?=
+ =?utf-8?B?T3dxN294Y1BDS2tUcUpRNGsvODI2TG5HcXlPMlRRd2pSeXVrTDRLdmdTOGw4?=
+ =?utf-8?B?QVV2dUhMdFUrbW5lTFJidGpWOU9IR0hPcC84NEF3L3VVRVd3TzJHSEowS1dZ?=
+ =?utf-8?B?N0ZkcEIwaHF0dEZjTjc4cnVna3lVVGRvSGFOS3RDZk9OTXBTVFd6NS9UbGxk?=
+ =?utf-8?B?TUhkaHVoRW5KdmZYdFBXd0hoVTQ3NjhZUEsrWUZ4TlVPbHI5ekNEdlROTjBI?=
+ =?utf-8?B?WGFZMzBWeENTZDQyT0REdDJBRDZyVXRGWkVGcThNMDRmZ3FEdzlwY2tQNGpE?=
+ =?utf-8?B?d1J2WnNLdG9jUHNkRndUd2JmUlZuWjBlcjF3VXVGVnl2WG5iMWRIYzl5MTVC?=
+ =?utf-8?B?SmpKRUYzWmpCVHRoM3o5bjBQTjZHQXVmQmVPcStRbC8wK3h4cEppanRKWDNv?=
+ =?utf-8?Q?PFFErgi8YFxtg?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cWJCWlUybVNJbUNzVXVteVNMcHJSUWMzZkhqSHF5dDdGV0tNNmsxOVkwaWl5?=
+ =?utf-8?B?V2Q1WUJDcFdxbEJzaXZQbHpINDdCbXAzektnZGlnbVlXQUtVTXN0eUJFU2ZC?=
+ =?utf-8?B?WlYzeGYzQ2dJSmc3UHNHWEZTdjYxdU9xQ29xWGQzU2plUk5NQnlDeGQvVFBV?=
+ =?utf-8?B?aXI1Y21teTJBbDZsUnRsaVJzcDl5ZzRKay9zeDdLUUVGNlBVT0hHUmIyZHNG?=
+ =?utf-8?B?YjlZVUROK04rZ0dyL3kvazhGcStLNWdjOER3V01EaDd4RVI1NTdZMS96VG5a?=
+ =?utf-8?B?TDg4bUVQbXkyVm03alhHZVpCYU1TNnIwTUo3RFQrYlNrcC9zTzZib2haRWZa?=
+ =?utf-8?B?bUdxNU9OV0pwZ1VHUlFCT1ZpODcvc05TMW5ha0tIeHVGTWgxcjVGWmFMY2l1?=
+ =?utf-8?B?cnVaOStXZ1dFWlRYdDhzblpXK0pxU0p5RG5iQ2NaV3p1WlBVdjJzTUVTUU1w?=
+ =?utf-8?B?RVdhbDNkKzFsZGdidjBOc2xnajhSL05MMUZySklYaFF5MTY0YVB1N3UvTklX?=
+ =?utf-8?B?OFNaVVAvME1BWVdiZFNIK1d5aXk1cmhOMVI3TThhYWpLYW1qdkQzTUUya2xY?=
+ =?utf-8?B?czFkd2I1aWZnVGtLalIvOTIwYVM0VnRjK3kweldxQ3lLQ1BnQ3F2Y0NBVlZW?=
+ =?utf-8?B?bmRYeS9MWGMzRnR5Rm5GVXpRY2NoVTFQWkNVUWtGcW9aVjVSVGpJaXk5aXly?=
+ =?utf-8?B?Sk83cXJ5RUhwQ0xzRm0wNG96aVdYUC9Zckc1bXcwU1VKbDFRWVhrYmR6VEJx?=
+ =?utf-8?B?TWJnZWwzVXg5RkRRSEJIdnFIR21KNURWeHZYNklzL05EMEhFeldEVmNQaWtE?=
+ =?utf-8?B?L0hzL2pXUGtISXNOTGpBeVNGYUNTblgzQ0hFRzhmL3BUdWMwTGRCaWh2SDQr?=
+ =?utf-8?B?eW1nQm5RNDFMb2VQQkdKRmd1VHBqZlZYYUNuVDY4UHdkMHVLLzVyRllJNng4?=
+ =?utf-8?B?TWxxelNrRHloWTZ2ME52K0ZGNllkWE0zOU80dDZmZkFIbEd6TlBSK1E3dC83?=
+ =?utf-8?B?S251S0JidTJvZGZjZlR4dmU3a3d0RThJdEcwNGVNZ2JCcXRRbVhhR0RYTUxL?=
+ =?utf-8?B?UDl6MXBHTkxpTFdKWi9rN1UvZGZuTG9Wcm1nZ3lEV0VoUDdQTHdLY1Bnc2FU?=
+ =?utf-8?B?N1BVSHlRaTM0bTNpd3RnVXVNZ3NlaUFhMmE4cG1BQ2QwRUQycGVOZmRtWVps?=
+ =?utf-8?B?TUJkc3IxQU9UTGQwWk5SeHZXYm1RZGVRbTFUbGNvQ005Tk1LT1lXcnZTZlQr?=
+ =?utf-8?B?eUFMa2s2N0F0Z2hQZHVFZGxja0NaT2dNSXR0NDRlY1dYQmcrQm8xeERRZEZw?=
+ =?utf-8?B?aVc0UlBBTjQ4OERPbnE5SlJwRGxJdUo3a2dBZGhsQTdUcUJuWXVwZ3BPNlBZ?=
+ =?utf-8?B?TWM1YTViVHpZYjFYYjR6ak9SU2h5YmQ0MGo5UXFhRURwM2JGcWh4VnUyMFdS?=
+ =?utf-8?B?RHdWK0dhenI2bi94cS9aRmxlSE11cCtoaWZUZ0JvUC9vWkFYRms5T1FCTjBV?=
+ =?utf-8?B?UnRoTjJ3eFJMRlpub2N3WHF0aTV3QTFRbGM5U250RVZoaWZrc3l3RVAzY1Uw?=
+ =?utf-8?B?NmRTN01TZHV0UnZvU2d1VFVoaDZlWVVwYU9KclNpbkhqUGppSjBYeVJaZ3VN?=
+ =?utf-8?B?OTdqZXVFZEdRZCtsaE5rT2ZvMytIT2lXT2hRWm9oK2FCV2UvZTRsYm1DOFhu?=
+ =?utf-8?B?dy9Qa2MxRFVYN3VjbGVUM2Z4VVR0cy84MmsyU0NsSlZaRmdiNHhJSnRqWUxi?=
+ =?utf-8?B?ME5ZUWVCZHZRT3lEbTdNU2ErTkhHYjMzdE9sRmc3RERQY0FMSUpYd3dxY3RZ?=
+ =?utf-8?B?YVZobXhYcVpqQ1lmQTFEMGFWR0ZCK3h0SDFoZmxTdTdXM1dkNjk0b05DZEVJ?=
+ =?utf-8?B?eGNrNkF1UVBWVE4yUjViVFJNS2pTT1puSWhmUmtCVXloaG9YeURvUHlGNkZm?=
+ =?utf-8?B?NG15UlpaTnJNb1Q2WVUweTNVd1F2ZTZCOHNnSkEvWGQwb0FoNzhmL25NZ1Qr?=
+ =?utf-8?B?OVZQRWNub0hmQXFxTU5JeE9aVW9ZQzVVWk56bi95OUc2ZGVJNHdCeHdNUk1C?=
+ =?utf-8?B?OENaZGUrYjBFMHk0RFcyR2h5WTMvc1kyTFNRc3U5N2Y4LzhETUVwSnduaitj?=
+ =?utf-8?Q?J1gXlYzWBHkv0HaE1E72bQPSE?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 176df74b-5825-4d4e-2c0a-08dd4c4574c9
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 15:45:35.4118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +1IUnAyndUswevGwWxgxadRtbncKhk9d2RzGG0Q/Q+f6fIH9Y/JgLDy6DGxVFeg7KHBxiEYj++ehnvDY1xhTkQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8385
+X-OriginatorOrg: intel.com
 
-On Thu, Feb 13, 2025 at 06:23:55PM +0900, Akihiko Odaki wrote:
-> On 2025/02/13 16:18, Michael S. Tsirkin wrote:
-> > 
-> > Commit log needs some work.
-> > 
-> > So my understanding is, this patch does not do much functionally,
-> > but makes adding the hash feature easier. OK.
-> > 
-> > On Thu, Feb 13, 2025 at 03:54:06PM +0900, Akihiko Odaki wrote:
-> > > tun used to simply advance iov_iter when it needs to pad virtio header,
-> > > which leaves the garbage in the buffer as is. This is especially
-> > > problematic
-> > 
-> > I think you mean "this will become especially problematic"
-> > 
-> > > when tun starts to allow enabling the hash reporting
-> > > feature; even if the feature is enabled, the packet may lack a hash
-> > > value and may contain a hole in the virtio header because the packet
-> > > arrived before the feature gets enabled or does not contain the
-> > > header fields to be hashed. If the hole is not filled with zero, it is
-> > > impossible to tell if the packet lacks a hash value.
-> > > 
-> > > In theory, a user of tun can fill the buffer with zero before calling
-> > > read() to avoid such a problem, but leaving the garbage in the buffer is
-> > > awkward anyway so fill the buffer in tun.
-> > 
-> > 
-> > What is missing here is description of what the patch does.
-> > I think it is
-> > "Replace advancing the iterator with writing zeros".
-> > 
-> > There could be performance cost to the dirtying extra cache lines, though.
-> > Could you try checking that please?
+
+
+On 2025-02-13 5:26 a.m., Paolo Abeni wrote:
+> On 2/11/25 10:06 PM, Ahmed Zaki wrote:
+>> @@ -394,10 +395,8 @@ struct napi_struct {
+>>   	struct list_head	dev_list;
+>>   	struct hlist_node	napi_hash_node;
+>>   	int			irq;
+>> -#ifdef CONFIG_RFS_ACCEL
+>>   	struct irq_affinity_notify notify;
+>>   	int			napi_rmap_idx;
+>> -#endif
 > 
-> It will not dirty extra cache lines; an explanation follows later. Because
-> of that, any benchmark are likely to show only noises, but if you have an
-> idea of workloads that should be tested, please tell me.
+> I'm sorry for the late doubt, but it's not clear to me why you need to
+> add the #ifdef in the previous patch ?!?
 
-pktgen usually
+It was there to make the code consistent, since the rmap and the 
+notifier were only needed for ARFS.
 
-
-
-> > 
-> > I think we should mention the risks of the patch, too.
-> > Maybe:
-> > 
-> > 	Also in theory, a user might have initialized the buffer
-> > 	to some non-zero value, expecting tun to skip writing it.
-> > 	As this was never a documented feature, this seems unlikely.
-> > >
-> > > 
-> > > The specification also says the device MUST set num_buffers to 1 when
-> > > the field is present so set it when the specified header size is big
-> > > enough to contain the field.
-> > 
-> > This part I dislike. tun has no idea what the number of buffers is.
-> > Why 1 specifically?
-> 
-> That's a valid point. I rewrote the commit log to clarify, but perhaps we
-> can drop the code to set the num_buffers as "[PATCH] vhost/net: Set
-> num_buffers for virtio 1.0" already landed.
-
-
-I think I'd prefer that second option. it allows userspace
-to reliably detect the new behaviour, by setting the value
-to != 0.
-
+It can be removed, although I am not sure if there would be any warnings 
+since on !CONFIG_ARFS_ACCEL the fields would never be used.
 
 > 
-> Below is the rewritten commit log, which incorporates your suggestions and
-> is extended to cover the performance implication and reason the num_buffers
-> initialization:
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 209296cef3cd..d2c942bbd5e6 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -6871,28 +6871,39 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+>>   }
+>>   EXPORT_SYMBOL(netif_queue_set_napi);
+>>   
+>> -#ifdef CONFIG_RFS_ACCEL
+>>   static void
+>> -netif_irq_cpu_rmap_notify(struct irq_affinity_notify *notify,
+>> -			  const cpumask_t *mask)
+>> +netif_napi_irq_notify(struct irq_affinity_notify *notify,
+>> +		      const cpumask_t *mask)
+>>   {
+>>   	struct napi_struct *napi =
+>>   		container_of(notify, struct napi_struct, notify);
+>> +#ifdef CONFIG_RFS_ACCEL
+>>   	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
+>>   	int err;
+>> +#endif
+>>   
+>> -	err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
+>> -	if (err)
+>> -		netdev_warn(napi->dev, "RMAP update failed (%d)\n",
+>> -			    err);
+>> +	if (napi->config && napi->dev->irq_affinity_auto)
+>> +		cpumask_copy(&napi->config->affinity_mask, mask);
+>> +
+>> +#ifdef CONFIG_RFS_ACCEL
+>> +	if (napi->dev->rx_cpu_rmap_auto) {
+>> +		err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
+>> +		if (err)
+>> +			netdev_warn(napi->dev, "RMAP update failed (%d)\n",
+>> +				    err);
+>> +	}
+>> +#endif
 > 
-> tun simply advances iov_iter when it needs to pad virtio header,
-> which leaves the garbage in the buffer as is. This will become
-> especially problematic when tun starts to allow enabling the hash
-> reporting feature; even if the feature is enabled, the packet may lack a
-> hash value and may contain a hole in the virtio header because the
-> packet arrived before the feature gets enabled or does not contain the
-> header fields to be hashed. If the hole is not filled with zero, it is
-> impossible to tell if the packet lacks a hash value.
+> Minor nit: if you provide a netif_rx_cpu_rmap() helper returning
+> dev->rx_cpu_rmap or NULL for !CONFIG_RFS_ACCEL build, you can avoid the
+> above 2 ifdefs and possibly more below.
 > 
-> In theory, a user of tun can fill the buffer with zero before calling
-> read() to avoid such a problem, but leaving the garbage in the buffer is
-> awkward anyway so replace advancing the iterator with writing zeros.
+
+Thanks, I will add this if there is a new version.
+
+
+>> @@ -6915,7 +6926,6 @@ static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
+>>   	if (rc)
+>>   		goto err_set;
+>>   
+>> -	set_bit(NAPI_STATE_HAS_NOTIFIER, &napi->state);
 > 
-> A user might have initialized the buffer to some non-zero value,
-> expecting tun to skip writing it. As this was never a documented
-> feature, this seems unlikely. Neither is there a non-zero value that can
-> be determined and set before receiving the packet; the only exception
-> is the num_buffers field, which is expected to be 1 for version 1 when
-> VIRTIO_NET_F_HASH_REPORT is not negotiated.
-
-you need mergeable buffers instead i presume.
-
-> This field is specifically
-> set to 1 instead of 0.
+> Minor nit: I think it would be better if the previous patch would add
+> directly this line in netif_napi_set_irq_locked() (avoding the removal
+> here).
 > 
-> The overhead of filling the hole in the header is negligible as the
-> entire header is already placed on the cache when a header size defined
 
-
-what does this mean?
-
-> in the current specification is used even if the cache line is small
-> (16 bytes for example).
-> 
-> Below are the header sizes possible with the current specification:
-> a) 10 bytes if the legacy interface is used
-> b) 12 bytes if the modern interface is used
-> c) 20 bytes if VIRTIO_NET_F_HASH_REPORT is negotiated
-> 
-> a) and b) obviously fit in a cache line. c) uses one extra cache line,
-> but the cache line also contains the first 12 bytes of the packet so
-> it is always placed on the cache.
-
-
-Hmm. But it could be clean so shared. write makes it dirty and so
-not shared.
-
--- 
-MST
+yes, it just made more sense for that patch.
 
 
