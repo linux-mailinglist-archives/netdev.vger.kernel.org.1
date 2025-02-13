@@ -1,54 +1,79 @@
-Return-Path: <netdev+bounces-166233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3743A351B7
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:58:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B21A351F0
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80190188F6DA
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 231DE16BD01
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A65275401;
-	Thu, 13 Feb 2025 22:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748D122D787;
+	Thu, 13 Feb 2025 23:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="B3SbRHb0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7IEZMT7"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E0C2753E9
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 22:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739487482; cv=none; b=NaWBML3FSS94CXtfM5e9FNErvbqINT8ASUZfsD4HV5+elqmlwVnpltz8G+cH+JeFZ3YkKHlJ7JumoRTGkEQPMoxW4m6p7r6aAGaO5mBD6TbcKoTE+2qdGfrTFVV5YkLFrzfOPrSukYrjKkOYLYMS8ot1Y90NGPYWFm97+i1A3L4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739487482; c=relaxed/simple;
-	bh=hOkcymzifOW+LcwUuISCfUyRkuevObnwB7RCKwYXv5w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r1QJuMVOg/n0XNPq3gth0epSmIUvzieRGgFvaG3E90QTbxqgy67tW2Hv74KKhEcG2JQ+aWn2LHcDrshy1lZC192wv8kUHF8PLc5Hq+Pj7LLiD6fCfQXJzzHJeTuPSfSaOaBeUSdb9FRYGrqFHDx8uGuf0l0rsYmocwGmtbi2vfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=B3SbRHb0; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [10.136.6.34] (unknown [213.221.151.18])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id E439B200E1DC;
-	Thu, 13 Feb 2025 23:57:57 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be E439B200E1DC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1739487478;
-	bh=bIquwMcCJQuP1gBaOjF0UYzCXiJRgVcFheIQwRprq5A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=B3SbRHb0yXMZIA8ZikAwCzqKeYdrVD+g0WiDy81ikwrHbk95JVF1+sOv/XMnnWyug
-	 H4DWdwH2zgOyxYhavXwvEAJmdSQjETSi2nooSv+QQuga8QFTd3/LuwHcFQRxk7qXok
-	 Am6D/eoOpWexZDCLlaNAb/9dSqDQgJjCpyfrZzPzGm6ZzfYi0MpYnwVG2216GPOQG7
-	 G55uhQDCh2Nv1eVF5YSD1kIHRCjmP+9KjcIZ74H4w7aHeh29Pbft+CfmT8plo5pAXg
-	 q6f8Mw3k9ChEdY7GW+Fbhx53Q+mRb7oBCFMznbOuqJMafV5qA81MFvZWv7Gr1zgD1B
-	 hpUo43rZ1TRzg==
-Message-ID: <e5d30bbd-4dfc-4a97-9eaf-39e0dfe51826@uliege.be>
-Date: Thu, 13 Feb 2025 23:57:57 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CA52753F3;
+	Thu, 13 Feb 2025 23:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739487687; cv=none; b=Q9cv8wHzKDMNYiTSZGcXzEzlThiObCazudNWSreWETZmmRCqHV4yl8ivDIluLvf9zf24TFWV29eQkyGdLtKFrhIMAcmNXDgF+aNYi4XQ10+wwsPySmA0GRQJ0EIRfDrxpQgWXoGwZ65JGvPugXJXnIYgDC9pUZFsSMT6L9B2WCY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739487687; c=relaxed/simple;
+	bh=f+VqCUKTXO/xssWz2k13fbba3g2FgBnxzvZXnRXuEfM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MuFk8sbYKmKcaGdppeqL7/PEBrrzZxoi2wEp7ljzoigUvmgf6VLYnhRPqJDQW95EyYoJVYW9ZtGaJnbA3m0Y0vuWjU3mbLxszHpCjhA5Lh1D9FITlPVoyMiFmeF/wdT23w1DcpoBNWSnLXP7VjQBE5mELIYMeLd7sEsBJW4GDHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7IEZMT7; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38dd14c99c3so667551f8f.3;
+        Thu, 13 Feb 2025 15:01:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739487684; x=1740092484; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hUsP2+hCOBdUxXA2EqnEJAQRbP8eK0Kie8gPA7PXpDs=;
+        b=C7IEZMT7CCXrPyIAgDb5S7zNveDSY/zAw3Ih1wXxyTTtn5r4IcgyLu5lSKIXiDUBMB
+         fWVyjvQHUYio9MUD60NVYdfps+Qg/8WQSdIAFH3Efqj2AuUi9au0+OwuqkW8s6YVO7WW
+         ff23z7deCLuBxfiWRk/3bAxcieRZT0KF0tyic++SJiYDoSx/RJL2z18sA0xzXETr1Ziy
+         jL0LOGcRV1c3Pl+yBcT8PIBZaGhBvA1qkjgTA5wRIPOJAV/rco6+TrRBXVF8sx47vuEA
+         CW9cVFnwol3EiSvwLUyyYQY4A7Sx5PnepGinjO1WI2iim/zktgsdHYMicff68xJej8du
+         sTaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739487684; x=1740092484;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hUsP2+hCOBdUxXA2EqnEJAQRbP8eK0Kie8gPA7PXpDs=;
+        b=RLTx8/Xx+DVTzoz57C3pgWLtjJDAkqkK8rXS8sTRhR0NJ+TdTfOHdjUCQbv8O8Yr25
+         q7rwAT25qpKhuhAIowfXYyZT38VYh8ffOiDM6KX1p8CiiXOCWmjD+jyTxPXR385UwalE
+         O9nQDJqc6Huk915oh9TPHnisD9Wj87hMM5d3CYy3af2ak0paXeI2JXG2TarGHcc1XbVQ
+         hzIt2IQxLYEVF8zbDyhb7cf5wJdCWwMKrrjFGhpb8VTS3qK7Sm9kanBecmkc/9rubGwp
+         8M6SIG9VavvQQTepeUp2i82NQglOHIa3HTHtzEqOKlysWlw1vqAbeVG4Qf9l790dtvYl
+         cY2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5emhx92bFkni5/MUP+EVCf4U23CqPe93rSmzIcw6TdRxJflyo+73c9+4MuTQy4loBIXwNJ5V3@vger.kernel.org, AJvYcCXEj7ah+cDk57xYvbwr8aB2cMH0UNnoCCr2X4zsuEFM0WVWAktYhZzgJDvHrZ547CIJ9EhDLs+OVg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YySql0IYGe+I4+k2MnT4x8pnSCiVKAg0znL5tzjcu+8GodEB1gB
+	lejewU+F7FAhLNLW4IQf0RVSMZDmos2DQ//gfy9l25nlr+0o28eT
+X-Gm-Gg: ASbGncuUtdDzOoRdL9SQLP94V71UneS3C+bjn2jVNIPe2Hro49nrJEFL1jAyY+X+on/
+	tuBbvuKY4YDUQpUT+wfSsjTaGxcVAGSausIbdx5H0hIwd0NXbcdySw98ZSFcxQKXTWwuLE0fkoZ
+	plaxr5WbM7XrlLE23zAHzhzQRPAtaUxjLtQS+Ut0MpAOzr6eHn10sIEgXXyPY/G3kCC0IHBRKbW
+	ezr3GmItZDvm+DKSlGbxO8gczAK/6SpzDIyLWAY19cMibDDWzUy1USHouQUCn34CVJc1Sgb7o+E
+	56C4PUpgDJw/gp+SnuHLqEp3Rw==
+X-Google-Smtp-Source: AGHT+IGxqTAbOhE84Dw5KDxc0yjXSmm1K8s3yvP71PdF6ThtbrAzzMXfkX/gNrEhMBrFu87kEnyuPA==
+X-Received: by 2002:a05:6000:1a8b:b0:38d:dffc:c133 with SMTP id ffacd0b85a97d-38dea2e8191mr11348806f8f.44.1739487683969;
+        Thu, 13 Feb 2025 15:01:23 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.146.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d58f3sm2992510f8f.73.2025.02.13.15.01.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 15:01:23 -0800 (PST)
+Message-ID: <72ba3146-2b9a-4e39-a3cc-6fe0bd75041e@gmail.com>
+Date: Thu, 13 Feb 2025 23:02:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,69 +81,32 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 3/3] net: ipv6: fix consecutive input and output
- transformation in lwtunnels
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org
-References: <20250211221624.18435-1-justin.iurman@uliege.be>
- <20250211221624.18435-4-justin.iurman@uliege.be>
- <231856f0-deb8-4550-bdf3-b0ef065f7b7b@redhat.com>
+Subject: Re: [PATCH v13 00/11] io_uring zero copy rx
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250212185859.3509616-1-dw@davidwei.uk>
 Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <231856f0-deb8-4550-bdf3-b0ef065f7b7b@redhat.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250212185859.3509616-1-dw@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 2/12/25 18:57, David Wei wrote:
+> This patchset contains io_uring patches needed by a new io_uring request
+> implementing zero copy rx into userspace pages, eliminating a kernel to
+> user copy.
 
+Hah, I just noticed that patches are marked net-next, so just
+to avoid confusion, this set should go through the io_uring tree.
 
-On 2/13/25 15:33, Paolo Abeni wrote:
-> On 2/11/25 11:16 PM, Justin Iurman wrote:
->> Some lwtunnel users implement both lwt input and output handlers. If the
->> post-transformation destination on input is the same, the output handler
->> is also called and the same transformation is applied (again). Here are
->> the users: ila, bpf, rpl, seg6. The first one (ila) does not need this
->> fix, since it already implements a check to avoid such a duplicate. The
->> second (bpf) may need this fix, but I'm not familiar with that code path
->> and will keep it out of this patch. The two others (rpl and seg6) do
->> need this patch.
->>
->> Due to the ila implementation (as an example), we cannot fix the issue
->> in lwtunnel_input() and lwtunnel_output() directly. Instead, we need to
->> do it on a case-by-case basis. This patch fixes both rpl_iptunnel and
->> seg6_iptunnel users. The fix re-uses skb->redirected in input handlers
->> to notify corresponding output handlers that the transformation was
->> already applied and to skip it. The "redirected" field seems safe to be
->> used here.
->>
->> Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
->> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and injection with lwtunnels")
->> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
->> ---
->>   net/ipv6/rpl_iptunnel.c  | 14 ++++++++++++--
->>   net/ipv6/seg6_iptunnel.c | 16 +++++++++++++---
->>   2 files changed, 25 insertions(+), 5 deletions(-)
->>
->> diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
->> index dc004e9aa649..2dc1f2297e39 100644
->> --- a/net/ipv6/rpl_iptunnel.c
->> +++ b/net/ipv6/rpl_iptunnel.c
->> @@ -208,6 +208,12 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->>   	struct rpl_lwt *rlwt;
->>   	int err;
->>   
->> +	/* Don't re-apply the transformation when rpl_input() already did it */
->> +	if (skb_is_redirected(skb)) {
-> 
-> This check looks false-positive prone, i.e. if packet lands on an LWT
-> tunnel due to an tc redirect from another non lwt device.
+-- 
+Pavel Begunkov
 
-True, it was indeed a trade-off solution :-/
-
-> On the flip side I don't see any good method to propagate the relevant
-> information. A skb ext would work, but I would not call that a good method.
-
-Agree :-( Did not check but maybe we could also look at 
-skb->tc_at_ingress in that case? Not sure it'd help though. Or... any 
-chance we could find a hole in sk_buff for a new :1 field?
 
