@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-165794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4B9A33681
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:02:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B375A33695
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FFB33A4A43
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C562168ED0
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DD7204F6C;
-	Thu, 13 Feb 2025 04:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE25B205AC3;
+	Thu, 13 Feb 2025 04:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpvGkPoa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqOaTuaR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63CE1EA84
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB7F205512;
+	Thu, 13 Feb 2025 04:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739419374; cv=none; b=bUdrtOR35+Qi8R6uxjp26MWKRrGip9ZjbKPQjhTx6Bd8gtQadzjNt4DdvhqUhBywGn/dialv1679xjHcRVqQIca/mOk85FZeDMU/RMB6/QKWFna/Cy6aSIMeYMc+jcL+lOXBQ1nEVa9eAveocnDVJ6u60fubyvaKStsQKO4aHZE=
+	t=1739419568; cv=none; b=CNm4QUoZjoCXrqUHwWQ+rzdfOfsHZgwkljc1KiLtwu/k1KibHSAM4PTAPJLi1PdD40tVWXwaloiXr0R6MwsQrQrj03/2554yD4J0YmGgStI3RV/oJ7gApF72SA2xg6gZmkBHBk/BZYgalN+nweKG4Vk8vodAvo2QE+POYAj02yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739419374; c=relaxed/simple;
-	bh=9rRXEi2v0VIFD6ZpN+qZPMjw7SCcwViZNoY80B5PzJ8=;
+	s=arc-20240116; t=1739419568; c=relaxed/simple;
+	bh=2qAEKldKxjDMlgop/J9s2nwKY2jZLURRUinqIzr3DpA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OWBn/3mSoP3KGzw2Bkg+4r0kOFqDDn4sQc0OH/EkUlDdi7+Lpd49mwmKl37Ka5cok/fnNKEGvekQH1vCXyFsYey2/bPnIYSOEyCxkyvpjtB1bYk9goZFnmE8UL+muaxov1hlG3EXjYVw8Qkrd1EVM3PEq1XjGnH6fw2qV+r8wFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpvGkPoa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0F6FC4CED1;
-	Thu, 13 Feb 2025 04:02:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UXAUO5+My53dt09KptUKDNgT0DiFXtbghSIjLzEeq2iBYNhi9RkTjKp9EpuuN5TS6q2cFY5LLCHmsPDOBxGcVpWdDRmKTsNhh76SP/4TyHF9+oJ1CvUM3/3ruLFbfspoo8vM6r2fLCTPOmK2DWATeJ5WnGChm8Q2PLJ7y5lj+aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqOaTuaR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 927F3C4CEE4;
+	Thu, 13 Feb 2025 04:06:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739419374;
-	bh=9rRXEi2v0VIFD6ZpN+qZPMjw7SCcwViZNoY80B5PzJ8=;
+	s=k20201202; t=1739419568;
+	bh=2qAEKldKxjDMlgop/J9s2nwKY2jZLURRUinqIzr3DpA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qpvGkPoaRh4nwYObphYPMSnwJc/NPALmV00PoHR/5xGuE65pHYUugdhF9kTld0yak
-	 GR66gITRQ5i1420NSqsLX6mAnxDgPZmaFVNg2ShjHjNc+LSXfn3MKB9JceRgNawbaC
-	 d6ptLEdsN9soaGoN9YmoPZ1Kr8Lp/B/d/2xhsYC+ANfdL7IK7WFhv57k4tcpsC6Fg/
-	 d49PY+nF1kLX6Zf44NDp4hkWRbNSPmLlZHGU0WZ6+zEzhAVySDcEap1TR1v3RJ7upX
-	 A3EoxITWyO+ayPrCVAG9fX//91ZRWqmWmYarBeShtemnl/ZejauCaQzOCZPAFbMsBS
-	 FvDQyjLxaiQEA==
-Date: Wed, 12 Feb 2025 20:02:53 -0800
+	b=DqOaTuaRoaAli5GYGECbqmxAX+mm7CyoQpfW32UF7De6zOenUyp4j+WTkTCGxlHWe
+	 AqM3jWhIlANjHxS52UhWIAbp9X4na338CbOwMETnYZKB06APU5meC5u2F7hiFEtzV5
+	 iRAu4y36nwyAL26/pfeJKVMGxADMaNdkIVJrsFUL5yDhZloKHbOg3bAy685AFmW7f7
+	 YI0LGxT8q/HX3x1T4qFTDi8GQGXWpd/LUlXZIrkoijig9HlgxqBhXzD9Lu/takwR59
+	 Io8nUjvpwUqAaAbMvZbiZzXdgcbE2t5++kDBeyMHH2Rv+Qp1dkUHJeSOnuyIs38noO
+	 0Y6GZ8injrrjw==
+Date: Wed, 12 Feb 2025 20:06:06 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org,
- syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, Luigi Leonardi
- <leonardi@redhat.com>
-Subject: Re: [PATCH net v3 0/2] vsock: null-ptr-deref when SO_LINGER enabled
-Message-ID: <20250212200253.4a34cdab@kernel.org>
-In-Reply-To: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
-References: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
+To: Huacai Chen <chenhuacai@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Yanteng Si
+ <si.yanteng@linux.dev>, Feiyang Chen <chris.chenfeiyang@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Serge Semin <fancer.lancer@gmail.com>,
+ loongarch@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, Simon Horman
+ <horms@kernel.org>, Chong Qiao <qiaochong@loongson.cn>
+Subject: Re: [PATCH net V2] net: stmmac: dwmac-loongson: Set correct
+ {tx,rx}_fifo_size
+Message-ID: <20250212200606.0638ed60@kernel.org>
+In-Reply-To: <20250210134328.2755328-1-chenhuacai@loongson.cn>
+References: <20250210134328.2755328-1-chenhuacai@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,9 +67,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 10 Feb 2025 13:14:59 +0100 Michal Luczaj wrote:
-> Fixes fcdd2242c023 ("vsock: Keep the binding until socket destruction").
+On Mon, 10 Feb 2025 21:43:28 +0800 Huacai Chen wrote:
+> Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
+> zero. This means dwmac-loongson doesn't support changing MTU because in
+> stmmac_change_mtu() it requires the fifo size be no less than MTU. Thus,
+> set the correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by
+> queue counts).
 
-I don't think it's a good idea to put Fixes tags into the cover letters.
-Not sure what purpose it'd serve.
+Not all drivers support changing MTU. Supporting jumbo frames 
+is a feature, so this commit enables the use of a feature. 
+As such it is not a fix. I'm applying this to net-next.
 
