@@ -1,174 +1,293 @@
-Return-Path: <netdev+bounces-166009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C7BA33EB2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C620A33EB8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0426E188F388
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:01:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76A7A188E611
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22421221541;
-	Thu, 13 Feb 2025 12:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88F321D3F1;
+	Thu, 13 Feb 2025 12:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2KjB/5D"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zgzXshca"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F4721D3D0;
-	Thu, 13 Feb 2025 12:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78CD227E9A;
+	Thu, 13 Feb 2025 12:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739448040; cv=none; b=FD76h0NNLzX1U5613aCea8pi/ns0CWI1WX2iqFZcE9EtlDVAW3BR7r9Y+vyWeC7QmgEO05rpFOuAjVDi7Q6XSmwtlgo/DuImfpeyXTUv91sE2HCCXjvdsyFYx8BRu2dIZZ2Te5Lpt6RRcsc8zQhv75N9d0mWQJdOR6M7gUtgSbc=
+	t=1739448080; cv=none; b=QNKxfxaZPxc7x1spuqr5cqBYiHUwkI9sJFy4J4I80LsHE6UCDO7ZtSfRkCeMggx7yKy3si4+KdtEP0cZUjdJ94HUSYgaa3NSAH0RzShn5lQTF6YCOvdGbiqmETVgxxit3DDXM96lAoHHBJyY3wW13WbEQy2G+ed/9007kFmkZl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739448040; c=relaxed/simple;
-	bh=Im1yH1OaxGaQ2gF3haVRxuvOsoSb/cXP6pcFJC0G8lU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=thDqGaw6QqvVObYc0Kt7d5UUtD/GzfYv6LYOzSKCnHEEQq5laEiZKTERIwdNXLVv0KhUzrTbmtYoaP3qLzXYXxLQ12QizpqnPYFjVejXdkeC8Kr0D8bFb3nKQwxoHzViUh8sAoQoD6nZA+wEypSTTPRmhv+rkazQaAGxvY+O9xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2KjB/5D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33D96C4CED1;
-	Thu, 13 Feb 2025 12:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739448039;
-	bh=Im1yH1OaxGaQ2gF3haVRxuvOsoSb/cXP6pcFJC0G8lU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e2KjB/5DklF5stBkR/Rwr1LFFRl0LF6gegGMYBLhQFTwRBv1gIkYeKv35kuKR9FVh
-	 qP3uXc1qZX4MK8kNpSnVGGFtdZsfDVe1qBwo7n/23DT2h8fT0NIPbGoXPlQSoqO4jj
-	 I6uQaXpROVvWWVbPZp0PDAUx5rsPnaWBmw1HfZekjeEOYxMoiSwgxmW5OLgbYlpddT
-	 kIETC45TRppDZpdYBZqHi7UztpMAaQ//7eLTy4GZh8SCoa5RAYdj1r9Th4v090W4Ie
-	 DoE3dWfH7u1H44sFwswMWQcTMtKALNOrsKc5FqKbO+H0W91Rk3EYnjEl/IqDH1sIjV
-	 gTYyYP86Nd/Xw==
-Message-ID: <27b0f5c5-ae51-4192-8847-20e471c55be7@kernel.org>
-Date: Thu, 13 Feb 2025 13:00:31 +0100
+	s=arc-20240116; t=1739448080; c=relaxed/simple;
+	bh=HJF8uqGrOuATo8/+jy1r5pFiXU5AHEnxl2LgMaUc9JI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dxNJb+/5meWH+EAQihRztePTJGFRRytmnS3jrOZOUQj5nQduUki+DLjUdt954tpaJQdiERKM9UWd59fx2BrGarQaDw7LxQP14KvUI60exdB7KIfZZRSOkm9AMK5ljDEjrEh7fPJkUjfsEKr0/HjHi3m2NJu5Ui5KjYqe+cO2H94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zgzXshca; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IN5tQBJ5OYpI5nGC4M6G5NrdEBDX6SDkgwt1Z5AgcCY=; b=zgzXshcahgHMKyju5baTzXfR3t
+	x6jLg0qJKDd5KqAubwx9GMsho8FKYA9PCF+7TGTw+mXl7k88/5Tb3DGVEwVcUe5Ro/jVlinhQ5AUi
+	3PT/CtnLr7DySPa15p4+A+11pd0Jq31Iq59e24bfjtXTZUvu/0umhssvGi+XBl5Kx+3xM7tO7Qrjw
+	49wTHq264Gnv6rJBuPSYOs0u5u9CE5wB6PuW1MPh1/L2+vwBlPETcDQXnxeoIO6cTt+64Kp947Gix
+	ByNg/hM2aHy2GBUIEmIpyygESm2W4hJ0KocNhg+os5hpNCQqVe0pMIMEiVZYjY7zqyE5IzuVTpfUC
+	m1EqhUPg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33834)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tiXts-00012J-1t;
+	Thu, 13 Feb 2025 12:01:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tiXtp-00026x-13;
+	Thu, 13 Feb 2025 12:00:57 +0000
+Date: Thu, 13 Feb 2025 12:00:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+Message-ID: <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
+References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+ <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
+ <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+ <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
- bindings
-To: Swathi K S <swathi.ks@samsung.com>
-Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- conor+dt@kernel.org, richardcochran@gmail.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250213044624.37334-1-swathi.ks@samsung.com>
- <CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
- <20250213044624.37334-2-swathi.ks@samsung.com>
- <20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
- <009a01db7e07$132feb60$398fc220$@samsung.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <009a01db7e07$132feb60$398fc220$@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 13/02/2025 12:04, Swathi K S wrote:
+On Thu, Feb 13, 2025 at 11:37:17AM +0000, Russell King (Oracle) wrote:
+> On Thu, Feb 13, 2025 at 11:05:01AM +0000, Jon Hunter wrote:
+> > Hi Russell,
+> > 
+> > On 15/01/2025 20:43, Russell King (Oracle) wrote:
+> > > Convert stmmac to use phylink managed EEE support rather than delving
+> > > into phylib:
+> > > 
+> > > 1. Move the stmmac_eee_init() calls out of mac_link_down() and
+> > >     mac_link_up() methods into the new mac_{enable,disable}_lpi()
+> > >     methods. We leave the calls to stmmac_set_eee_pls() in place as
+> > >     these change bits which tell the EEE hardware when the link came
+> > >     up or down, and is used for a separate hardware timer. However,
+> > >     symmetrically conditionalise this with priv->dma_cap.eee.
+> > > 
+> > > 2. Update the current LPI timer each time LPI is enabled - which we
+> > >     need for software-timed LPI.
+> > > 
+> > > 3. With phylink managed EEE, phylink manages the receive clock stop
+> > >     configuration via phylink_config.eee_rx_clk_stop_enable. Set this
+> > >     appropriately which makes the call to phy_eee_rx_clock_stop()
+> > >     redundant.
+> > > 
+> > > 4. From what I can work out, all supported interfaces support LPI
+> > >     signalling on stmmac (there's no restriction implemented.) It
+> > >     also appears to support LPI at all full duplex speeds at or over
+> > >     100M. Set these capabilities.
+> > > 
+> > > 5. The default timer appears to be derived from a module parameter.
+> > >     Set this the same, although we keep code that reconfigures the
+> > >     timer in stmmac_init_phy().
+> > > 
+> > > 6. Remove the direct call to phy_support_eee(), which phylink will do
+> > >     on the drivers behalf if phylink_config.eee_enabled_default is set.
+> > > 
+> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > ---
+> > >   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 57 +++++++++++++++----
+> > >   1 file changed, 45 insertions(+), 12 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > index acd6994c1764..c5d293be8ab9 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > @@ -988,8 +988,8 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+> > >   	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> > >   	stmmac_mac_set(priv, priv->ioaddr, false);
+> > > -	stmmac_eee_init(priv, false);
+> > > -	stmmac_set_eee_pls(priv, priv->hw, false);
+> > > +	if (priv->dma_cap.eee)
+> > > +		stmmac_set_eee_pls(priv, priv->hw, false);
+> > >   	if (stmmac_fpe_supported(priv))
+> > >   		stmmac_fpe_link_state_handle(priv, false);
+> > > @@ -1096,13 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+> > >   		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
+> > >   	stmmac_mac_set(priv, priv->ioaddr, true);
+> > > -	if (phy && priv->dma_cap.eee) {
+> > > -		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
+> > > -					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
+> > > -		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+> > > -		stmmac_eee_init(priv, phy->enable_tx_lpi);
+> > > +	if (priv->dma_cap.eee)
+> > >   		stmmac_set_eee_pls(priv, priv->hw, true);
+> > > -	}
+> > >   	if (stmmac_fpe_supported(priv))
+> > >   		stmmac_fpe_link_state_handle(priv, true);
+> > > @@ -1111,12 +1106,32 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+> > >   		stmmac_hwtstamp_correct_latency(priv, priv);
+> > >   }
+> > > +static void stmmac_mac_disable_tx_lpi(struct phylink_config *config)
+> > > +{
+> > > +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> > > +
+> > > +	stmmac_eee_init(priv, false);
+> > > +}
+> > > +
+> > > +static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+> > > +				    bool tx_clk_stop)
+> > > +{
+> > > +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> > > +
+> > > +	priv->tx_lpi_timer = timer;
+> > > +	stmmac_eee_init(priv, true);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > >   static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+> > >   	.mac_get_caps = stmmac_mac_get_caps,
+> > >   	.mac_select_pcs = stmmac_mac_select_pcs,
+> > >   	.mac_config = stmmac_mac_config,
+> > >   	.mac_link_down = stmmac_mac_link_down,
+> > >   	.mac_link_up = stmmac_mac_link_up,
+> > > +	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
+> > > +	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
+> > >   };
+> > >   /**
+> > > @@ -1189,9 +1204,6 @@ static int stmmac_init_phy(struct net_device *dev)
+> > >   			return -ENODEV;
+> > >   		}
+> > > -		if (priv->dma_cap.eee)
+> > > -			phy_support_eee(phydev);
+> > > -
+> > >   		ret = phylink_connect_phy(priv->phylink, phydev);
+> > >   	} else {
+> > >   		fwnode_handle_put(phy_fwnode);
+> > > @@ -1201,7 +1213,12 @@ static int stmmac_init_phy(struct net_device *dev)
+> > >   	if (ret == 0) {
+> > >   		struct ethtool_keee eee;
+> > > -		/* Configure phylib's copy of the LPI timer */
+> > > +		/* Configure phylib's copy of the LPI timer. Normally,
+> > > +		 * phylink_config.lpi_timer_default would do this, but there is
+> > > +		 * a chance that userspace could change the eee_timer setting
+> > > +		 * via sysfs before the first open. Thus, preserve existing
+> > > +		 * behaviour.
+> > > +		 */
+> > >   		if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
+> > >   			eee.tx_lpi_timer = priv->tx_lpi_timer;
+> > >   			phylink_ethtool_set_eee(priv->phylink, &eee);
+> > > @@ -1234,6 +1251,9 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+> > >   	/* Stmmac always requires an RX clock for hardware initialization */
+> > >   	priv->phylink_config.mac_requires_rxc = true;
+> > > +	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
+> > > +		priv->phylink_config.eee_rx_clk_stop_enable = true;
+> > > +
+> > >   	mdio_bus_data = priv->plat->mdio_bus_data;
+> > >   	if (mdio_bus_data)
+> > >   		priv->phylink_config.default_an_inband =
+> > > @@ -1255,6 +1275,19 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+> > >   				 priv->phylink_config.supported_interfaces,
+> > >   				 pcs->supported_interfaces);
+> > > +	if (priv->dma_cap.eee) {
+> > > +		/* Assume all supported interfaces also support LPI */
+> > > +		memcpy(priv->phylink_config.lpi_interfaces,
+> > > +		       priv->phylink_config.supported_interfaces,
+> > > +		       sizeof(priv->phylink_config.lpi_interfaces));
+> > > +
+> > > +		/* All full duplex speeds above 100Mbps are supported */
+> > > +		priv->phylink_config.lpi_capabilities = ~(MAC_1000FD - 1) |
+> > > +							MAC_100FD;
+> > > +		priv->phylink_config.lpi_timer_default = eee_timer * 1000;
+> > > +		priv->phylink_config.eee_enabled_default = true;
+> > > +	}
+> > > +
+> > >   	fwnode = priv->plat->port_node;
+> > >   	if (!fwnode)
+> > >   		fwnode = dev_fwnode(priv->device);
+> > 
+> > 
+> > I have been tracking down a suspend regression on Tegra186 and bisect is
+> > pointing to this change. If I revert this on top of v6.14-rc2 then
+> > suspend is working again. This is observed on the Jetson TX2 board
+> > (specifically tegra186-p2771-0000.dts).
 > 
+> Thanks for the report.
 > 
->> -----Original Message-----
->> From: Krzysztof Kozlowski <krzk@kernel.org>
->> Sent: 13 February 2025 13:24
->> To: Swathi K S <swathi.ks@samsung.com>
->> Cc: krzk+dt@kernel.org; andrew+netdev@lunn.ch; davem@davemloft.net;
->> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
->> robh@kernel.org; conor+dt@kernel.org; richardcochran@gmail.com;
->> mcoquelin.stm32@gmail.com; alexandre.torgue@foss.st.com;
->> rmk+kernel@armlinux.org.uk; netdev@vger.kernel.org;
->> devicetree@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
->> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org
->> Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
->> bindings
->>
->> On Thu, Feb 13, 2025 at 10:16:23AM +0530, Swathi K S wrote:
->>> +  clock-names:
->>> +    minItems: 5
->>> +    maxItems: 10
->>> +    contains:
->>> +      enum:
->>> +        - ptp_ref
->>> +        - master_bus
->>> +        - slave_bus
->>> +        - tx
->>> +        - rx
->>> +        - master2_bus
->>> +        - slave2_bus
->>> +        - eqos_rxclk_mux
->>> +        - eqos_phyrxclk
->>> +        - dout_peric_rgmii_clk
->>
->> This does not match the previous entry. It should be strictly ordered with
->> minItems: 5.
+> > This device is using NFS for testing. So it appears that for this board
+> > networking does not restart and the board hangs. Looking at the logs I
+> > do see this on resume ...
+> > 
+> > [   64.129079] dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
+> > [   64.133125] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine initialization failed
+> > 
+> > My first thought was if 'dma_cap.eee' is not supported for this device,
+> > but from what I can see it is and 'dma_cap.eee' is true. Here are some
+> > more details on this device regarding the ethernet controller.
 > 
-> Hi Krzysztof,
-> Thanks for reviewing.
-> In FSD SoC, we have 2 instances of ethernet in two blocks.
-> One instance needs 5 clocks and the other needs 10 clocks.
+> Could you see whether disabling EEE through ethtool (maybe first try
+> turning tx-lpi off before using the "eee off") to see whether that
+> makes any difference please?
 
-I understand and I do not think this is contradictory to what I asked.
-If it is, then why/how?
+One thing that I'm wondering is - old code used to do:
 
-> 
-> I tried to understand this by looking at some other dt-binding files as given below, but looks like they follow similar approach
-> Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-> 
-> Could you please guide me on how to implement this?
-> Also, please help me understand what is meant by 'strictly ordered'
+-             phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
+-                                          STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
 
-Every other 99% of bindings. Just like your clocks property.
+The new code sets:
 
-Best regards,
-Krzysztof
++     if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
++             priv->phylink_config.eee_rx_clk_stop_enable = true;
+
+which does the same thing in phylink - phylink_bringup_phy() will call
+phy_eee_rx_clock_stop() when the PHY is attahed. So this happens at a
+different time.
+
+We know that stmmac_reset() can fail when the PHY receive clock is
+stopped - at least with some cores.
+
+So, I'm wondering whether I've inadvertently fixed another bug in stmmac
+which has uncovered a different bug - maybe the PHY clock must never be
+stopped even in LPI - or maybe we need to have a way of temporarily
+disabling the PHY's clock-stop ability during stmmac_reset().
+
+In addition to what I asked previously, could you also intrument
+phy_eee_rx_clock_stop() and test before/after this patch to see
+(a) whether it gets called at all before this patch and (b) confirm
+the enable/disable state before and after.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
