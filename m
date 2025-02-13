@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-166203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE88A34ECD
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:56:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6B0A34EE3
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F1FF3AC306
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:55:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D6E5188CDF1
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A195F24BBEC;
-	Thu, 13 Feb 2025 19:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8D024A078;
+	Thu, 13 Feb 2025 19:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W4mfyfic"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LHWbAqQs"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5C8266B62;
-	Thu, 13 Feb 2025 19:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB2924A076;
+	Thu, 13 Feb 2025 19:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739476505; cv=none; b=f8jz1U7Pvh0hL5Zg6A5m/nvVkCzxTfB3JkOyEqCOJ1YoyAIvOXvlSvmsbdXS+scDBIpQFEPUwCh6/OokATlkysbdwDxQfuD8PnSwxEfD+DJtsJZz5x4UM9VgKxnNHlZsWfd3s/1DdNRHV1i1XC4UtImCkzLnS0UOyvyhU2k7pis=
+	t=1739476787; cv=none; b=WF6UG1i1EYonhHxc85K43v+0RkIRH67cbyVmHdhJdmlZltrnH+Q+qst4ZzV0vwEn1aoIc0kQReZv8FeNaQ0FHFiY5OD7oWNXMjTe+yYH3Ai3vHH6FFd9EKyO2vz0wN6Fj4/xvHPBfUUWZnHnhgifW4zEjFG7mI1NRrY5UV5SKRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739476505; c=relaxed/simple;
-	bh=3ph/sVj9uFbBjTAgcfcM1g7k+e3uf+Q4Jk8v0dYrjlQ=;
+	s=arc-20240116; t=1739476787; c=relaxed/simple;
+	bh=3Sowh1r0kWd47yhxz2HEHH0eC2Ler+ksBAJZHwtixVY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/fb2JJ8OBD1IRohBjMT0cGq5xCti3Pd7U8ZrXcNJ6OfLWsBMFXaw2QOCJKEVrtNXyMCnKHEAROFJib6/a68YJKLCMUEw681e6YiHMNY4KqF01n4IZC1wvDpdbZ5iE+VXTAKDTvsovCTNL7UL/AlEbHPkSrzMnbFoqo2szVqaPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W4mfyfic; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=XqA3LjT8mCEec9YoRG69eHetvNhTmq/9I/X2QzyRoUwT5FXqNv3fZPICKalq9WXm1tey0lgBZAmW6VXDEcO1nwxbk8sO13ZvTzf4Bhtg2i2KedO3PTHBRvXq62Q32ovrGAfyr5gx0OpA2YpjDuLIGajgO4NX2GQYoiGbbeQRqcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LHWbAqQs; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=k2ipZEKqxXNF4XLP52ASASuGbRiJWj39yrm5/DIG5rQ=; b=W4mfyficfnZaIx5BOl7wBgMGoy
-	2vYXN+02xuLAAT6Mghfe7A+RzA5os+3vs6vh/cUaepdil/VuwyDeC8FFMkdpLudtprrRQLgQA5qqa
-	mtCYjVmFcJcpcXf1FmbrYIkpxXsPWPQGXINQuBPSV3xZt1omYB/6d0qGeacZscnhMMAU=;
+	bh=RZlI4HGYXokTX4zqJIJa74/QdyZEoxz2ZxabCm7uDZY=; b=LHWbAqQsNs8Xcff5WtgJG4/ujL
+	qWk/OzDcgaCgtZisxmAGVbkKlgq7ZYX1sDUxg9MweYPa+fQaY/GLYuUTpfODMeSvLCgd96Dxr8tSN
+	Bd5xru0cOVZfwBDAXsIasqAN3rIehsObeqHTrmdczlS6Grw8k97DSbN6p8rTQ+sbdg9s=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tifIQ-00DqQQ-Nn; Thu, 13 Feb 2025 20:54:50 +0100
-Date: Thu, 13 Feb 2025 20:54:50 +0100
+	id 1tifN4-00DqVU-Hb; Thu, 13 Feb 2025 20:59:38 +0100
+Date: Thu, 13 Feb 2025 20:59:38 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -54,11 +54,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
 	salil.mehta@huawei.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/7] net: hibmcge: Add dump statistics supported
- in this module
-Message-ID: <47e8bab3-61cb-4c5a-9b40-03011b6267b3@lunn.ch>
+Subject: Re: [PATCH net-next 2/7] net: hibmcge: Add self test supported in
+ this module
+Message-ID: <6501012c-fecf-42b3-a70a-2c8a968b6fbd@lunn.ch>
 References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-2-shaojijie@huawei.com>
+ <20250213035529.2402283-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,21 +67,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250213035529.2402283-2-shaojijie@huawei.com>
+In-Reply-To: <20250213035529.2402283-3-shaojijie@huawei.com>
 
-On Thu, Feb 13, 2025 at 11:55:23AM +0800, Jijie Shao wrote:
-> The driver supports many hw statistics. This patch supports
-> dump statistics through ethtool_ops and ndo.get_stats64().
+On Thu, Feb 13, 2025 at 11:55:24AM +0800, Jijie Shao wrote:
+> This patch supports many self test: Mac, SerDes and Phy.
 > 
-> The type of hw statistics register is u32,
-> To prevent the statistics register from overflowing,
-> the driver dump the statistics every 5 minutes
-> in a scheduled task.
+> To implement self test, this patch implements a simple packet sending and
+> receiving function in the driver. By sending a packet in a specific format,
+> driver considers that the test is successful if the packet is received.
+> Otherwise, the test fails.
+> 
+> The SerDes hardware is on the BMC side, Therefore, when the SerDes loopback
+> need enabled, driver notifies the BMC through an event message.
+> 
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-u32 allows the counter to reach 4294967295 before wrapping. So over 5
-minutes, that is around 14,316,557 per second. Say this is your
-received byte counter? That means your line rate cannot be higher than
-114Mbps? Is this device really only Fast Ethernet?
+Please take a look at the work Gerhard Engleder is doing, and try not
+to reinvent net/core/selftest.c
 
-	 Andrew
+    Andrew
+
+---
+pw-bot: cr
 
