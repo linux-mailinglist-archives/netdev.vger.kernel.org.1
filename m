@@ -1,103 +1,147 @@
-Return-Path: <netdev+bounces-165869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E192A3392C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:48:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF636A33948
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA16D165E23
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:48:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC4F6162C1B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D035D207A14;
-	Thu, 13 Feb 2025 07:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E47E20ADF8;
+	Thu, 13 Feb 2025 07:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ta7wYWH/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GkKfm+0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B162BA2D;
-	Thu, 13 Feb 2025 07:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9BC20A5CE;
+	Thu, 13 Feb 2025 07:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739432887; cv=none; b=tu7paVI/6pNkc+47imMVT6S3rw6C+8v/3ORjToCbetxdEBJqvilJtWXQ0eqASl3LnMR6IuaF3eD5jSpYMWyAFP/Dc6v3PM+U9xEcnSCdOqA6+30W4aHn3/BNrsRdq7ZboUpxWyq/ScFtKE2JK0i1Z9wD3R9TrLIStZYOi4VKSjU=
+	t=1739433253; cv=none; b=eM9pJOQPifsdzbS+d9/0MPz8hQQZbYOxo6NEpYwlq38mznekautfx5x8KarDHpS+IG1z1vVpGLFD3JdAmqhRcwJ9MO/lKhqXn6ASl8o/KrMBs7Ci2CsvNJ6W1r2QarXqBOi/RQ311zGyCAHr/7t6u7bIUh5PP4H7xB32p9TmdAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739432887; c=relaxed/simple;
-	bh=dhAj+kXaTDh6GRxeXB3ePgoHwZ6bN1ob6iqWi2XoFFw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sN6aokGMw4zSFtv2eKIlIROt2jUe7CGPHdeph6D23qD+GhsiQ3gJ1/0nGBG/IAQ0MzTC1JjDjn+Hm/8KsiE/c6RF8+nwzjR5K/JCF2t2m6pyEDjBm5g+qfMhiOCiid86tj9LoZnzL0f9CDDQ80sdGZp6eVzcAY+yAuJejb6Nukg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ta7wYWH/; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739432886; x=1770968886;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gMGZnrkj1PsBzrRBaQa/AOARDe2r9siZ+blzTwbHXc8=;
-  b=ta7wYWH/uVNakP8KZedwtb9yXl7JP6t+9ahatgSejvRpSHKefwYroUT5
-   mgYsQ59zZn28p25lDtfB95qrVfm090dBnHacvmuhHcOk9TZ3YKA6pIs3G
-   zlwvGQ/an4X5A2HWpaCnyjHoX0Eqo4R2Be3p+YR4I0qylgciN297pVqQz
-   w=;
-X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
-   d="scan'208";a="169283745"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 07:48:05 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:21723]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.187:2525] with esmtp (Farcaster)
- id 4f82d4bf-d41e-457b-8d40-10c81143e6ba; Thu, 13 Feb 2025 07:48:05 +0000 (UTC)
-X-Farcaster-Flow-ID: 4f82d4bf-d41e-457b-8d40-10c81143e6ba
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 13 Feb 2025 07:48:02 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Feb 2025 07:47:57 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <leitao@debian.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <ushankar@purestorage.com>
-Subject: Re: [PATCH net-next v3 1/3] net: document return value of dev_getbyhwaddr_rcu()
-Date: Thu, 13 Feb 2025 16:47:48 +0900
-Message-ID: <20250213074748.16001-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250213073646.14847-1-kuniyu@amazon.com>
-References: <20250213073646.14847-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1739433253; c=relaxed/simple;
+	bh=56Ta27lSOpZW6WT1dfipytAfcqD14QNHO7m6Mo7UhBY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QkR8O0OD+T6WjWf8ryu9hFVWN7ZyTd1r4aZh5dRWB+dT+qXotBqmugEITdSX6aswjRfEjSvZsuXTsoDFvEfN/wuliG5qaF7tTgB94SPBnrGhSsi5FwPkTlcYZ14WdW49nnaAVLvdK7l92i+1pRAbiibeAp/QquO1MzF4qnJr3Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GkKfm+0z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B991C4CED1;
+	Thu, 13 Feb 2025 07:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739433252;
+	bh=56Ta27lSOpZW6WT1dfipytAfcqD14QNHO7m6Mo7UhBY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GkKfm+0z1/NQtvj5DekG7tlgJXv7KvTYjV7uBiZCErsGUfI88dj0z4vErZav2EL04
+	 H9SIpabXaoUXbWxWg/s9f/pJaJW/ux2aWLSHp/Ud3SkJGU5QW91S2oY052y1q57ohM
+	 TFw0DXIBakxQmtCdF4c/xrs3SGT0kHWTIl5NT1CaV9ycuzmTyO+WZVuHFD6BDLDHF7
+	 DWnCV9GdRsg13axmldqBa1yZ5sx0bTnDw5syFgZYGB4/k71TZChpkQc2ieAJfaBfBZ
+	 T5APTSqFiLrYNV4UFPgdPGmN8utVYIWp++nRPuYHcmeH1iTwpZn/E/YOFXWguOcKUj
+	 RGy9TQHVMsG2Q==
+Date: Thu, 13 Feb 2025 08:54:09 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, 
+	conor+dt@kernel.org, richardcochran@gmail.com, mcoquelin.stm32@gmail.com, 
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Message-ID: <20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
+References: <20250213044624.37334-1-swathi.ks@samsung.com>
+ <CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
+ <20250213044624.37334-2-swathi.ks@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250213044624.37334-2-swathi.ks@samsung.com>
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Thu, 13 Feb 2025 16:36:46 +0900
-> From: Breno Leitao <leitao@debian.org>
-> Date: Wed, 12 Feb 2025 09:47:24 -0800
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..0b3480a125fcaa6f036ddf219c29fa362ea0cb29 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -1134,8 +1134,8 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
-> >   *	The returned device has not had its ref count increased
-> >   *	and the caller must therefore be careful about locking
-> >   *
-> > + *	Return: pointer to the net_device, or NULL if not found
-> >   */
-> 
-> I noticed here we still mention RTNL and it should be removed.
+On Thu, Feb 13, 2025 at 10:16:23AM +0530, Swathi K S wrote:
+> +  clock-names:
+> +    minItems: 5
+> +    maxItems: 10
+> +    contains:
+> +      enum:
+> +        - ptp_ref
+> +        - master_bus
+> +        - slave_bus
+> +        - tx
+> +        - rx
+> +        - master2_bus
+> +        - slave2_bus
+> +        - eqos_rxclk_mux
+> +        - eqos_phyrxclk
+> +        - dout_peric_rgmii_clk
 
-I missed this part is removed in patch 2, but the Return: part
-is still duplicate.
+This does not match the previous entry. It should be strictly ordered
+with minItems: 5.
+
+
+> +
+> +  iommus:
+> +    maxItems: 1
+> +
+> +  phy-mode:
+> +    enum:
+> +      - rgmii-id
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +  - iommus
+> +  - phy-mode
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/fsd-clk.h>
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    soc {
+> +        #address-cells = <2>;
+> +        #size-cells = <2>;
+> +        ethernet1: ethernet@14300000 {
+> +            compatible = "tesla,fsd-ethqos";
+> +            reg = <0x0 0x14300000 0x0 0x10000>;
+> +            interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
+> +            interrupt-names = "macirq";
+> +            clocks = <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_PTP_REF_I>,
+> +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_ACLK_I>,
+> +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_HCLK_I>,
+> +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_RGMII_CLK_I>,
+> +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_RX_I>,
+> +                     <&clock_peric PERIC_BUS_D_PERIC_IPCLKPORT_EQOSCLK>,
+> +                     <&clock_peric PERIC_BUS_P_PERIC_IPCLKPORT_EQOSCLK>,
+> +                     <&clock_peric PERIC_EQOS_PHYRXCLK_MUX>,
+> +                     <&clock_peric PERIC_EQOS_PHYRXCLK>,
+> +                     <&clock_peric PERIC_DOUT_RGMII_CLK>;
+> +            clock-names = "ptp_ref", "master_bus", "slave_bus","tx",
+> +                          "rx", "master2_bus", "slave2_bus", "eqos_rxclk_mux",
+> +                          "eqos_phyrxclk","dout_peric_rgmii_clk";
+> +            pinctrl-names = "default";
+> +            pinctrl-0 = <&eth1_tx_clk>, <&eth1_tx_data>, <&eth1_tx_ctrl>,
+> +                        <&eth1_phy_intr>, <&eth1_rx_clk>, <&eth1_rx_data>,
+> +                        <&eth1_rx_ctrl>, <&eth1_mdio>;
+> +            iommus = <&smmu_peric 0x0 0x1>;
+> +            phy-mode = "rgmii-id";
+> +       };
+
+Misaligned/misindented.
+
+Best regards,
+Krzysztof
+
 
