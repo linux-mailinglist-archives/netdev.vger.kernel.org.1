@@ -1,103 +1,82 @@
-Return-Path: <netdev+bounces-166061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC2D9A34391
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:52:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F17EA343B1
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:56:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFFF0166174
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:48:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91731893A76
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4387266184;
-	Thu, 13 Feb 2025 14:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6939B227E88;
+	Thu, 13 Feb 2025 14:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VVcpiBLZ";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ou1Wd0gc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KKFwHl0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2065.outbound.protection.outlook.com [40.107.236.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC31274277;
-	Thu, 13 Feb 2025 14:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F163202C3A
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 14:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739457895; cv=fail; b=YemZvLzOl21/hwhhZZynJ5MPLxHxcIpEubiY2unjdwNTxN/XTctuEu+Qf6AGog/Wh8lFGvvVGdyNo0yydBe5hn4AhYQbIoY7wIKtclLLhrRZbRQdQLl4lxa2zqRyOyaqd5pdCrIx/oa9l6SYVN96i0MQA+6Uem7Vs5lNMZUdfB0=
+	t=1739457932; cv=fail; b=PS7kVrJvah0+q1tMM/siPUbq+a4xMGfCZ+zsPTgNV5AHdX8O6nrJRex33BNy0Fbr2jWxdHa/TYKk8AJHsZ+saDJOx9+sIieDzlVI/edVR7xn39L4pWKnZYtvkcTLL/4LyQ+OPIXyBrDv5jZ4K0yklY4tIGoImzOjUA7uL+dXOcQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739457895; c=relaxed/simple;
-	bh=Lln2/92jDP4nNtDxfoiovf+CqbZXlpP6kAHOsH/SVgw=;
+	s=arc-20240116; t=1739457932; c=relaxed/simple;
+	bh=3KV+8xMLG3AbAy2jPWvQVqhZQWEHaNtB19w5C350zJc=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oaY0qXotMUd3z4MJn1gPcesjvTbbRsn3p+FKQeA4w4Yy4nu3jRmP5l05xEhfBsM6FuFCSkjoay1eq4BpmpJ+tbFjs/q9EUQUGyEtRZNEKnqi2scwBz/7F7HQ/c6N4CwIgnXGpCdCYm5wVzCB5+ElDAP0+n9BL7aikrAcI790LOk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VVcpiBLZ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ou1Wd0gc; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51D8fekT001627;
-	Thu, 13 Feb 2025 14:44:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=kP8mfV+ermlZJIlCt75lVvAFOaHZvwzM19S71abqWoY=; b=
-	VVcpiBLZFAohKsyxkAT1PHWqQbvJlaTTt0NTbv/AMmOrMfyDkAzWMPeiIuvjPAZy
-	blyAsFeAR9azEEk2v0bt7DWYpW3MNSzldZrWdOE4jXOnbdwdb/LRnH13Nfv8uHKc
-	mPsvRaIDt7iUxVf21wgpkWo7sycCOwgB5B3i100EPfDWzuxMwK2EhENPUftlFGor
-	2NvtKuGRf9STA/NDbQp6p0lOk82sgDz/u3PbBQgAQYQYvqM/1ida5VHn4/m60oXh
-	fgNkZ03Q6aJz6l3q2fed5xBZ0AFNgubLIPVQ660CSEPen4vCzHQOb0p23K64nQhW
-	D1/hv5OgT/4vVSIGnLCkdw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44p0qahp8n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Feb 2025 14:44:39 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 51DEOqd0016237;
-	Thu, 13 Feb 2025 14:44:38 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2045.outbound.protection.outlook.com [104.47.56.45])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 44nwqbtvwa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Feb 2025 14:44:38 +0000
+	 Content-Type:MIME-Version; b=I7eS4jtWsi8hb3mIMXXonwZ2hiGX2eoHCo0mC9H4b0d90FQDbI1OnqUS20S8luWyC7gbB9ONXcBSUWShJHUa81zxo5eNrdRXB03IyFy/FHRUpqdpgayFxIlxbsAp1M4LXeXAQ+8w7px1KZxBRmmcmYS7p3uEwXNnvhuz2uux5UI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KKFwHl0n; arc=fail smtp.client-ip=40.107.236.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yJnMSlcuno2qtfnPz9SxDNyGE61OgAgMJdQu06jnFkmh1HmxkEyTNfqARgAUukV22lM52pL1Ru3Qo4plZwwNoTNbwFLZvlD07IJxNKsQ3aiRdt0S8HxxgxDkdaY3eycG3rgdXFWLl5y6IgRLPcCHyMQN6tGP7hVQ//10umOEC0wUQWPR1jD3cO5glnQfZSgcOpSQWLYjacCtxg9QrxkVDT698oBRfdT7gr2+TGAklgUVUQRbN1k8+8HE6onFJ3SWAvaCBsTF7kHDVMPJAacTVA2c/OQtkD9al86BE8q1UCxy5CN6waVSx6hAAmITChsvshSp6WzZBBduadL3nBenGQ==
+ b=yQ1NJ2AIULtAnngk2vWTTfqwBud6WOr4j9dvA89A5ZmCIi1M+npy2f2dWvtUDJmRGCh5qskF9ZDk8SbKbGr4Yr321JJM+IEK9DVVfz9l2TupXgiEVLkFv8MkEsA0ohXpkzNs3viVMWkw+Ny4USDLtGu7qaHgQ5vUECsak6SVsp/LBX2E5EjlhAAljgnDWlAKohd/3B2iStOFJcRYDeo6edn1RDoreGgkXBSQEqZQXIhkHS0Ef1TwFnqh5603x0+dWDTFCDThabmZi5F2/g/zmbBCuCY8utSijjXm3+suankQWdRM1EDcTMRW3FgwPedbRWu9QSyBPLu4YACMd6wk3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kP8mfV+ermlZJIlCt75lVvAFOaHZvwzM19S71abqWoY=;
- b=otdu9GfsdrkorScq5HAz7c3yCPtDr3RO13hc0WHSrAZ/9BRQuPWh5dJ1RQaiDBI0UhJnN3/XCKGimCb39NfmzHeuPoqv0+rbaGsfV5BVQ/iN7LHUnYBhO334h/Knrkz9S/UggvIe/f/10b2k0JlnHfDk6KOCgfE8wzRswDkmdow8ZtrzkeZyIkoV9yf//dIw/dVKtFUV2V47lZCRpwwGG6wgX4+7s3Y+8MU+lRo3PPVJyQ++DynIE6tNsMsLVt/o0FxHyPKcPqEBROQ3/4QupmCwS9PvYxkAibGh6OFhOcKt44yDJvviVZH5PDGrhgOC9VePa/jJ2nMomfuf0YnBlg==
+ bh=QpP1zLWxZiHTirdkpzbGqkOGKdjvo+4VFWhBpp6AYZw=;
+ b=MlpkU9HlmDwYB9O2pmNUTmZw6x21LkAx+QPh47sTFYtvMZmBKF7dfrW3Y5WIN1SBJPdQ7NO9C3XctWn309C67F9ZCPagvLJUoAOpZBPr104qznb1nCA2h3HBAe2mXBDbpmpjPP/b5Tvlr/qPBKHkqNNSjsv/gEAquRQIaOSklIVbsqe9LHloweJTBEl5rJr997Liq54ZIkzCJ2tI4MgQhaf8XC6cBhld8/cH4kmRWkWFen0So2qq1130rPn39Dv0XHpVYbTwAoKPIAcX5bO4uAtIiqlKTrhvp6H6n4pAqzFWRsO2JpUMOZVRLcWgPztHsX3YkJzMdeVU0MUKRp66Wg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kP8mfV+ermlZJIlCt75lVvAFOaHZvwzM19S71abqWoY=;
- b=ou1Wd0gcAQL26sjK+3oBOmk0qgNftdQyQRAH/ezMwjKmR/eeD1ss7GIgzoPKD4M5bo61E1E791BJI9Nt0LJHeNpDMVTWQqrsK/UgwR5B2isox9MzpUufMWDqzknEslTNgy/u3nzaDKbuxYYYziMUXRuqqpN0iMtK86tu/d4iRIA=
-Received: from DM4PR10MB6886.namprd10.prod.outlook.com (2603:10b6:8:102::10)
- by IA1PR10MB5971.namprd10.prod.outlook.com (2603:10b6:208:3ed::12) with
+ bh=QpP1zLWxZiHTirdkpzbGqkOGKdjvo+4VFWhBpp6AYZw=;
+ b=KKFwHl0n+H3/XZBdJ37VeUgPcyDay38pLst5oAb7PLOC4P+ekAx3rX0K0ashtLYiJTN0ODEQRqzc6Fs3X/t3xGI2YS8Bp2jJrIEgWxSiPxfTMg7IOz+QSkuOQCNAiQnajZquUjiOIK6oFPhTqH6RMvjZuaV2PKbrhKF/nWgY+57+Yu8N7iV1gLnXfrRHe1qK28Tkt/f3aNnoDifljEHPj9/5NseosMyslf6KqfL6TOdBfXZWPKY9GXm79juxOGt9UcRAxTs6hf+sawJ2FTXWidUTrV1407RrJmKxU0o9oebLcABF4aF8jvEfYNbupj/v4fqivhblGQHufvcRe2wi9A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6322.namprd12.prod.outlook.com (2603:10b6:930:21::21)
+ by PH0PR12MB7094.namprd12.prod.outlook.com (2603:10b6:510:21d::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Thu, 13 Feb
- 2025 14:44:36 +0000
-Received: from DM4PR10MB6886.namprd10.prod.outlook.com
- ([fe80::bdcc:98f5:ebd5:cd38]) by DM4PR10MB6886.namprd10.prod.outlook.com
- ([fe80::bdcc:98f5:ebd5:cd38%5]) with mapi id 15.20.8422.021; Thu, 13 Feb 2025
- 14:44:35 +0000
-Message-ID: <a33f888c-2121-46c0-8fcb-7ba469309a8b@oracle.com>
-Date: Thu, 13 Feb 2025 20:14:25 +0530
+ 2025 14:45:20 +0000
+Received: from CY5PR12MB6322.namprd12.prod.outlook.com
+ ([fe80::76a1:4b0d:132:1f8e]) by CY5PR12MB6322.namprd12.prod.outlook.com
+ ([fe80::76a1:4b0d:132:1f8e%4]) with mapi id 15.20.8422.012; Thu, 13 Feb 2025
+ 14:45:20 +0000
+Message-ID: <83806014-4e57-4974-b188-14c87a4cef8f@nvidia.com>
+Date: Thu, 13 Feb 2025 16:45:16 +0200
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6.12.y 0/2] Fix rtnetlink.sh kselftest failures in stable
-To: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sasha Levin <sashal@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-        jiri@resnulli.us, liuhangbin@gmail.com, kuba@kernel.org,
-        netdev@vger.kernel.org, stfomichev@gmail.com, shannon.nelson@amd.com,
-        darren.kenny@oracle.com
-References: <20250208185521.2998155-1-harshit.m.mogalapalli@oracle.com>
+Subject: Re: [PATCH net-next 3/3] tcp: try to send bigger TSO packets
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
+ Kevin Yang <yyd@google.com>, eric.dumazet@gmail.com,
+ Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <20240418214600.1291486-1-edumazet@google.com>
+ <20240418214600.1291486-4-edumazet@google.com>
 Content-Language: en-US
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-In-Reply-To: <20250208185521.2998155-1-harshit.m.mogalapalli@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR06CA0204.apcprd06.prod.outlook.com (2603:1096:4:1::36)
- To DM4PR10MB6886.namprd10.prod.outlook.com (2603:10b6:8:102::10)
+From: Shahar Shitrit <shshitrit@nvidia.com>
+In-Reply-To: <20240418214600.1291486-4-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P123CA0533.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c5::18) To CY5PR12MB6322.namprd12.prod.outlook.com
+ (2603:10b6:930:21::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,172 +84,282 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR10MB6886:EE_|IA1PR10MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 645e650b-9ed7-4a63-e4ce-08dd4c3cef12
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6322:EE_|PH0PR12MB7094:EE_
+X-MS-Office365-Filtering-Correlation-Id: d78f2980-c108-422f-350b-08dd4c3d09fe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SjU3Nk1IRm5FZ1JJSnhVZWdMa1FFTmw0QUFkck55KzJ6TXcyc09lMmI3elZh?=
- =?utf-8?B?a3ZDYWR3MzF3bzcwcTF5d3NBM3dYdmxsYzIzekk3djFvU0E5cHA5blZNNHdZ?=
- =?utf-8?B?amhyUG9uY1pUT1dmU0R0QXhkYSs5dGd4blV6YUh1RlQvMmRJRlhiNnY1aU5l?=
- =?utf-8?B?K2NpdSs4Y3BuQ3BhUHZaRTMzelN2d3RuYk5FMmMyOUNmLzF1U1JvVGFyQmZx?=
- =?utf-8?B?Yy9hTGJCSjlCVEpJN0JMNGE3eW9iNlhEWkRxNU5SeXA3dmliNmkwTGxEOGxB?=
- =?utf-8?B?SnZpSFRYajNhNytMblBjK1RBWExpZk9rSzErcktETGxCTndXbmtlT1FQeFR5?=
- =?utf-8?B?bVFxN3BxSGVkRVB2UjBHYlUwLzAxYWh1WTRNbFV0dENFMzV5Y1Vub2NFTmFa?=
- =?utf-8?B?dllacFNobk1ZZ0pNcFNiL1pKZFV5MU4wdkdTOEd5SS9kLzVlS3FyTEV2bEli?=
- =?utf-8?B?OTlGOTJoZmpObjFFNmZqNWRLbkpFWkFNV3d5U04vTU51Nlk0TXB2Sm8wdGsv?=
- =?utf-8?B?N0ljUGl3SENRd3VNT2g2ajRwZ2R6UUU3VERGTkdhOEdjY3FXSFVWT0lMQncr?=
- =?utf-8?B?d2xsNVBFdWt3SjJXcmsrM2VlZUhQRWpwWTBhZU95UzZPUTNuSEZJUWY3TEtF?=
- =?utf-8?B?aFo1OVMwNjFVRzFneUlWek1FWFRnNE1lREJVeWx0endvb2s5ZEE1WjNBS2Yw?=
- =?utf-8?B?RFo1MnVvR0RaRzhCcDljVEpERlZoZmovQnpqY0lFUDl4SjNLU1g0a2k5elpl?=
- =?utf-8?B?NXltZ0FCSUJNU00vRExLL1pJa3RUNjRxN3M5TnVsenY0THY2Rzh2ekExS0JV?=
- =?utf-8?B?RnNBYjJEV2xEa004bTlFQlVFWm1SelFuYTJ1RHlHU1MrNndIcjBjVnd0RzFw?=
- =?utf-8?B?RkNycklja3FuMXJVR2JKd0lubFdEOFBocWtSaE9oQzRSZHI0Zkx2MEVOUm5z?=
- =?utf-8?B?eWQzUFlieks3ajM4RUlobDNYYkNIdWFmMnFZY01ZZlVGUDhsNTQ4ckh5Y0Uz?=
- =?utf-8?B?WEZ1bFl1TWtwODRzdHh1RjZNRFc1MVc1Qk5FUVozeTVucFI3NHJMcmtnZjR3?=
- =?utf-8?B?SWNweTBSRnU5cW9KUytuOFEyd0dFUndiL0hrUHdsQmpvNExXMktrVDVCME9C?=
- =?utf-8?B?NDBNRDJJOFU3NDBEOTZUclg3SDJHWUQra0RpU0VUUk8vMWhlQmpwLzY0a1BX?=
- =?utf-8?B?WDNOL0ZsZmN3V1NyYXpZNkN2OVNtOEhITlFSYkdZYzFMMVQ2d0wxbFo2NTBQ?=
- =?utf-8?B?SUZrSHRUN3NhOXh2UkoyZ09KZGFBSTVPQ2xaU2tzaEpldkJYUXV1UXQ3ejdz?=
- =?utf-8?B?SXovWnAyUXBRZnJBam54dXhLQVJwTU9DTElrN3lPTW50RUZrMGJjMFJLSjRP?=
- =?utf-8?B?TEFYUUx0T2hzaWpzQmhPTjB5RWF4RmFickY5WHJ2RGIwcDZwMzI5TlFLSnIw?=
- =?utf-8?B?N0VLTnRocDhUTDh0bVpPU245cm9aQlpVR1k4cnRybDhwOUZLYlRMUXJIZVV0?=
- =?utf-8?B?WDY4ZysxazRpdWc3TFJVU28ySUl1ZFpPYVNKV3djYk9tN0RFZE1LVURHSS9l?=
- =?utf-8?B?ckdvUlFORmV2NkRleGxXb0VOUXdqTDBGZ2hGdk9mY29WSDFsWmNuQy9YNm4r?=
- =?utf-8?B?Wm5DM3dFd2pGQkJIaVAveVpBZzZScDFpVSs0bm1IMEFhWGtFWGsxRVFMZmtu?=
- =?utf-8?B?RXBRU1NoYnlHc2xMZzVsNnpJNGFVbk5QK1VkVldpclR1cWZXT3NNSk9GclpS?=
- =?utf-8?B?eEpYZFFSU1pTWUFRMjFVTE5udUhkN0xoeXgzZFE1ajY2Yk9jaWYvRTdGL2JS?=
- =?utf-8?B?eTVPQTJ0VUpOaUVMUjYzcnJObzhtelZVeS9WV1F5YS9JNDlTSkp5OVg1b0VN?=
- =?utf-8?B?ckkvUDhXTU9ZMEVRVXovQUtkaTNmc0tEMHN5WlE0R05KNUE9PQ==?=
+	=?utf-8?B?Q2VPWkNPRFgzMWFVQk5lOVE4UFZpK2sxNnNsb1JVcW5PZDdDQlFiMjJQdFYy?=
+ =?utf-8?B?cXpPbWZBMnNFbEtWdW9jak8rcXVVRjljSnpTUkJGMnZNT2RvTWtjTFdnK0Fw?=
+ =?utf-8?B?d25heUVjRGVSZDVxLzlxWHJFT2dWQnFVdTRQdmxGeElDT1F3d2ZJSzNMMWJ4?=
+ =?utf-8?B?T1lIdW4zaUYxRFZTTlIwL0dxWVhNRkRaSm1FemxIcG54eFloREJucmhHMSsw?=
+ =?utf-8?B?ekh1ZXhHSUdnYjRPaTJpb2hLR1BxQi8rT2FjTnBwaUQ3WTRTZlM1b2xMZTVq?=
+ =?utf-8?B?VTBFZklBWXpLRHRjeG9mUXZXR20yN2dlcGdLZmJpV09SY3hkTFlRUWdxQ3d5?=
+ =?utf-8?B?aGRKQk9GSTk4K081VXpNa0o1OFFET1NLRS9ZeGs3K3NqNzNjNHlwY3Vmck9Z?=
+ =?utf-8?B?Y3liR0RJOVZUQlRNMlFPQisyNUNzK2pKc25vQXAxQUJ3TDVVeDJQcndNZHo0?=
+ =?utf-8?B?d2tjSHd6MjBVcmUrOEQ0VEZjUlJoeDMrYVcxekl4cGRJeFg5ZUJSU2c0RzlO?=
+ =?utf-8?B?QUx6REtLUjhrZmpVQkpmUlAvSjdwQTJIbHcrNjdFckQ0bGhpdEFudVREODBY?=
+ =?utf-8?B?MUNKdjV3Q21hb2FZMHFZS0l3VjVZYTM3eFRUaFN2MmxwN1VFTFh0WGxkVFg2?=
+ =?utf-8?B?WjdwU0VtVU1YMTQybmVnVFFUUkNwYWQrTk45YXlaS1pyK21vYmc2alJwZjBx?=
+ =?utf-8?B?MWY1akN6eWN4QW5PWmFTR3gxZUR2Ly9uRVB2VU1EMGpHTU9Oa0ZDN3VBdTdr?=
+ =?utf-8?B?T2hpV1NEWjYwR2tsL1kxcWNpUVNZbHJtdWRraUU4REdBNFpxMHQ1STdUdDNl?=
+ =?utf-8?B?cmgyOTR2WkwyODRXMnJGdVJuL3JrN1ZCL3V6Tm9jYzJkNHF4RzZHamdjR2Nn?=
+ =?utf-8?B?aEVBOXo4N0JFVlAwUTYySXZwd0lsZVFJLy81all0cHlIakFBMklReGNxR0Yv?=
+ =?utf-8?B?U1ZNd2F5RThjR3lMdG9wY1V5VktKMVdWK0d4bGVMY0hpQnFQQmFKTllDUzhU?=
+ =?utf-8?B?QjBWYmFsYzVsZkVvVER1eDY5bHVmNXMwRVNuaE5iZjYxcDZzMWx2bU1keC9l?=
+ =?utf-8?B?L3dlWmo0TklHN1Y4VXBweFhGS1VIQmF5UVVPWkdaa0h5ZVVCRm9iRTlOcUxF?=
+ =?utf-8?B?RGZWclpEekJYVHErWlppeDFLUmdPYjVsLzNhUzE3MWk3eWRqdUt1d3JhVi9G?=
+ =?utf-8?B?L2pZaEdSaklKdm51YWQrTDdoMkJvOU02YW1Ta2JNTDRGbDVYVFJZVCtScUZM?=
+ =?utf-8?B?dFBrejI1T1IwTDFkQzhrNTZGdmFJZGVWMEI4Zm5CS1c1YWlQbkVZeWtQZGJl?=
+ =?utf-8?B?dVJucVdFRDNkNjBWNjVROXRueFZhdWZpNXNqaEN3MXRzUURZclJNWUNSMk9H?=
+ =?utf-8?B?MDNDM29IbVhFMm5JcnBhZ0l6aTZmaUhsSzB5ZlhNajVwRTJZdFFIMXAyQm1t?=
+ =?utf-8?B?UDErQ0Zwd3F0N1o1L1U0T3IrWHZyekNraHlob1NQWng0M2xvejQyMkswc0lr?=
+ =?utf-8?B?Yk42MUZOOHVaQkVIOEN2OEdwM0NObFBxenJQejNiRllNSDlPdmJVS01jaU9p?=
+ =?utf-8?B?Z0ZNSUNzVUlTR2E4Z1RqUjlFbGdmOEFOYllyMVNTZU5HdFJxRGZpenp0NjFu?=
+ =?utf-8?B?NFRqdFArSThXMjFHQmdYSTRCenMvaXluQzlrSTJmUlBmZnZORjJ5elE1cERq?=
+ =?utf-8?B?OU1EclpONmJaL01rNzRlbEd6Si9WWkVsYUh1U3o0OWFNYUxFWCtxUGRLaEdB?=
+ =?utf-8?B?T0tSVkRqdkJqem9kOGJVK2RQK1VYcVR5OWJ6OEZDY1BUOGxHSjI3STNxdmxI?=
+ =?utf-8?B?N2hRb21uV2xXc3BVMTlpOG5ucTRsSFhGRnRESUphZ2pxMnB5UmxjS0sxenpy?=
+ =?utf-8?Q?riFW+K6ZN60Ew?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB6886.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6322.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Yk5aTW41WkozZHNxNVczc056cEwyQ0dnc3oySlRiYmlHN3dEUTE5a1lxaFNh?=
- =?utf-8?B?Y0RQbW8xUUp0TWYxeG9abkFBU1ZxbTdYbGkwb09jNVhzQnZyZGg3N3lTVW0z?=
- =?utf-8?B?Y3VOSTUyZFZiMHlHbUdDbXJkcjUwUVlsTHdBWCtRdm5sc3NpVisrOHpoUmVn?=
- =?utf-8?B?QkdwVXJsd0pXNEhmVFQzWTJ1VDF1N3E0RGZmd2tla3plMDY1SGxTV0owRHho?=
- =?utf-8?B?eCs1LzZuZU1LMko2RjI0Vml5Qmh3UHFySm9kcUpaUmoyOXVNTlBkR3NHVmRx?=
- =?utf-8?B?aTdtOGZycHBXODA0cGJJVHZORUxBMi91cGhhZStsRUJLSCtvckMrY0lJZTZQ?=
- =?utf-8?B?NFBubUM3TWdGNHVoajFNTzhUVHZYNWhTRVQzUnUxY0dYbkVac0dPOTNDQWdL?=
- =?utf-8?B?OTAzY2pPUjhZRnhtaVIyVUVJQWVtUU1iTEo5TUVhOTRuVjgrVzdGMVdPajVL?=
- =?utf-8?B?eHoxZ0d0TzdGL1lKM0JpSHBnMmh3c2ZMdmpUSUo0S1VpUEoxc01Sdzdwc3Q3?=
- =?utf-8?B?ckwrM1V1QW0yN3NNalN1ZVJyMlMvMzRxWlBoTWRoRUJIdlowVzlQNExWc2xk?=
- =?utf-8?B?RUZDOWh5cWUzREhwc1I0VkVoWm9iY21UZVp2elExampqV1U3T2dZeXlXcnBW?=
- =?utf-8?B?SGhUZHJjQk52T2hhYXppSjgwYVhCTHYxeWtrdXA5ZFREbzNrL0k3ZkRsSEpr?=
- =?utf-8?B?U1Z4MFE2aGhkOWp4RUp4UHpLREpxbGZHZ3hRYkRYbVhBUnI4M2dpcWkxOC9Q?=
- =?utf-8?B?ZGIzRyt2d0I2dXdVdDdPeUVzR0dMMjVKck5iMVk3bUFVdDdQNk1xTXZzQUE1?=
- =?utf-8?B?SUNCeUM1M2lZQkpQQlQwTnd4SUI2NjBiZURzU1J4L1FvYysyYmZlVS9ZT0Nv?=
- =?utf-8?B?eVo4YjB1eHZVeGsyMUVjdmlKbGFEeS9XTGxEMXBkNzhreEc0RU90UmFwY1Rw?=
- =?utf-8?B?QVZGeDZENE9uVVF3K21qakQ1blgvVWZSTmhGR1B2eExsODkxQVdCVUJlSWpT?=
- =?utf-8?B?L0Y2V1VZSENTQ21rU3p2K2hLT3FvVmNDRVE2dE9uTjlsUUszTG5KUGNrZndN?=
- =?utf-8?B?Rm9aQWVFMXBFZHAzbyt0czVYdHF1VFJBeXA0ZkRjQkhjWXdXMVBvSllUOTVV?=
- =?utf-8?B?eklXcWlEWmdNaGRYazNERHk4cm1QQmlmS3ptN0ZOR2xVYkYwTXl3akZ6ZjNs?=
- =?utf-8?B?WU5zUVhQSWFMSHgzSnA2THZ6OS9LVGlSZzA5NGMxa3lNdlRHTnZiZFVPZlBM?=
- =?utf-8?B?V0VoaHJWamFySy93ZFNiTSs0L0VvdSsxcFhNWnpaRFZ6b1BjZkVEWFYxK1R4?=
- =?utf-8?B?T1p6MWhiTlJybk5MZkd1SlM1Z0EranF6WUt2QURiRDJHQWJQUS8vcnJ6ejFw?=
- =?utf-8?B?YnpkUWZNMzh1emtzSTkzUExCSTlWYkJyL3g4OEROSkdFaGRtNyt4eDZ5TWl6?=
- =?utf-8?B?UFBYMUMwTnpUUkkyb3QweHl4cU9TSjRqRW93d2t3cXZTWHJtVkZhNVpoeCtm?=
- =?utf-8?B?NDR0MVp4ejJLWlFVN2xubk5CTFErTzBxdnZZejVvT3ljNjM5M2xTMkJzYm8z?=
- =?utf-8?B?VXhseVFsWmM5c1NHQURaQmJneHdXRTZUNkRvZ3lsVTF6am5mdktyUmJlaTFS?=
- =?utf-8?B?WDRES3plM3IzMjR5aXptN2FjU2J2cEpXUzdjcnpGVmRIT2hnZ0laSkxPVDBI?=
- =?utf-8?B?dzZUeFJETDNOWVQ4TmRNQzM2SVdPTktCSVRjdEtXZE9mUDZaNGREaDlROCtq?=
- =?utf-8?B?WlpvelIvSDU3QjJzNlN1MzY2OWlOTXcwWFdjQlVyNmM4Smo4NGhZaFFHNFZv?=
- =?utf-8?B?ajZGQk85aUZGTVpwcThzMEZmdlhGSDFISG95TEVpcktnM3ViRWEvTlJoc3k3?=
- =?utf-8?B?S25sWTVRUjkrYVQvM2xoc25RUjhLbmM1ZEpiTUJxVXgvYlNjREhvdEJFejFy?=
- =?utf-8?B?Y3RMNlMwZnFtbTNzT0pwNkRMQjM3VzdzQ215Y04ydnVyVkhxNEMxOFFnS3gr?=
- =?utf-8?B?VFljYnpmK0xmaVJ0YStCdjNkb3NKaEhDb3luUldIM3RXcGczT1FIWDJQMHFV?=
- =?utf-8?B?bnBQT1BqSENRdW9MRG51dlF1aFZQOENFcnViTEpUSXlwOGhWa1JHMFZLZndk?=
- =?utf-8?B?ME9WZmc5U2tSOStjOGpiMHFDWHNtTTVtbzdYN2JQRFoyU3UvbmpiRC9zdDZD?=
- =?utf-8?Q?HuYyIUOHTX4bGrB3LDRbIas=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Umdvb1fVM0GIg0EcInUrYXeHz2jvzXSix4cGh2Gw7FSIK7nA7dEYR2obkddClmdixgQA4vJzRKJuugRAH1s8X74ipMMBzC/wm5fyrnLky3YZf+A3Ro3nR3TDPkLUfD4IGewqASTRn6e6AwU3YrdEDwFS7cX+yC2yubBbJptJyEFHLA2BBhhmJF5CjT3EPGK53YZuzgPXSq92exjYWY2Vv0OddOLTTO+9t3VwTuoB7g7iBAeFHFSE1LpEOCWtKyu2IAAThec56n75LR9I3px29wfviAvIUPwKmY7cYmeUsyGyxxNT8EmnhQEEVdypXS/cUU7z0bUls8HubGMU+1anZNgeD0llaV/0kl0VzWp6fUPkLCngN22Vu+t2fmqYLtHbG7NkCXO3V9IV15NNJRgQtlQdgJ+3GofEENq69n7hhTdwzJBmy6FXxXau3J9ta12XLJDmxh13+ZDkpTJp+LST5VOmM38U77NAxz8j7AFAsDLmI5J76JgkE/yuGs9AMVf641BcYDOifFc8eTCBWj5rE+iL0Bi2KpMlGnaFhMnHtZYGL2wRzAgvsyjnjEG/vK0YY6PtPVQ8j+0XWFwJZ+Er81NqmcXgrzQPjHcy/AvCoxU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 645e650b-9ed7-4a63-e4ce-08dd4c3cef12
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB6886.namprd10.prod.outlook.com
+	=?utf-8?B?My9wUklUQWkzTnFtWUhMVjB1bE5sdS9jcUVMNlRXRmtkTHplcno2NVhuUHBE?=
+ =?utf-8?B?a0lIZ0t5Unl2WVk4clp3NWlOM3Y0ME1LNlhDMUtScWlIVTVwUzlZdm1ab3Fl?=
+ =?utf-8?B?K05wcU9lWEJGZDMvR2YwRG9UdTh1UVFkZks5Nit5c1E5OXl0S3dzZHZERWY5?=
+ =?utf-8?B?M0xXQjh4T0FvMkQ1UjFqZFBKeHcyQ1F5UTJmc3FjV3dCVXluT01BcTdJVkR0?=
+ =?utf-8?B?L21pRk9xSzJoM0ZjYXgySmlhc3FSTUNzVGdJeFRCczU1UXJxMlFNbmExVUdC?=
+ =?utf-8?B?cllad2Z3L2MvOTh2YTdPNWxTRlNBdzB3cHQxd3ErZzdZblBnM3haWmJjbTQ5?=
+ =?utf-8?B?c0syRW9iSWdtSCs2TDk1UlMrL1BPd3pVZWc4TGNSRGdhbXhwZExHZms1QkEr?=
+ =?utf-8?B?L1BVeElqQzdvNERtOWI5RXhVSWFFNGczSHZ3MGxNSXBIZVZlWWtQVlNWSkQ3?=
+ =?utf-8?B?eng1SGprTkxwcncwamRWMjlNUGkyZXF1UVhQOGxpeDdDWUNKR2lrUnNJbUV3?=
+ =?utf-8?B?YVRMaUZSNUZPRFN2MW5NcVpad0NkSE4vVXhMT2RxODhqSVhLNG9CUjlDR1lX?=
+ =?utf-8?B?TVhwcGJyRUpYNnE3L29leTg2M2E4elVHdnlLSVhtODBwQ3RaRHd5czUyN1Z0?=
+ =?utf-8?B?Kyt5ZXA5amkrRUZGQkF4NU5Pa0Y3RVdweVV4UkJ3NlBxU0V3NEU5SnFoVmZY?=
+ =?utf-8?B?MzF5aWhCVGFWQkMvb2pEN2xFWHhMektzbzFUV3Y3WURaTlNzVWFoRk5XWGxM?=
+ =?utf-8?B?Z0IzSWpGUi9XWEtXYTVkcTh2QjM1aDBsbDZ4WThVbEJBSlc0c1FTLzhyMFRs?=
+ =?utf-8?B?cHdZVlpZTStpWGxxTU92Nkt5Q3dXSFNyVlJFdXhpN3lqL1A3Tng0aG1FdXVH?=
+ =?utf-8?B?ejRQVWZXOTBsRUphakVTRzRJMHA2Z2F3T09VSTVpSlB6Y3BTYk11MmpkY1pZ?=
+ =?utf-8?B?THlPTEl5UDRlZU4rSGI5eEVIOERjeEN0bGVjVndvbmdUUDhHUURLMTlJSGdW?=
+ =?utf-8?B?QlNaVTVMc2VwUzgrMUZnSjVNenpQT3k5OTJPcUZkVWFVdFAwVXkxY3VaZHFt?=
+ =?utf-8?B?MlFvdWVhc1pMUkNLSXdYckt0eEVpWUVsdndNUlJndjhhZkphVHB5SWZGakZp?=
+ =?utf-8?B?WkxKNnZtaW44Um5IdmNwaVBrWXFSVlV0WFNxL1lYRU5SMDN6NTdFYnkrNlRj?=
+ =?utf-8?B?UEVUL3Y3UjhmUkE2azBVUzQ0VHZ5UEI0L3hqU3pVWmQ3MVIybGN0emM4clRv?=
+ =?utf-8?B?R3haRlNQbEtXQlR3R21EQjlHUXpoUlJ6b1dKQ1h3SlVTeVAzaTYyS2Y4S2hp?=
+ =?utf-8?B?NFpkdXErQ1oxTU9qSHRFcVN4QWk4cDVvQ3h0elpzTitSZENxb25OZzRiSlA4?=
+ =?utf-8?B?VUR2SlVzWjJlNnpBS1AzbytOMStycWYzQi9xS1A3d252VzNNT1Y2SDcwUzRL?=
+ =?utf-8?B?b0w3VFg4UGFjdnhiUWpEZVU2TWpON1FtTXRQK0xUQVcvRUV6SThudzRqMnJ3?=
+ =?utf-8?B?bVk0L0VZc2tVRElDQS9uVE5ITTR2aGlqeFlLb20yUlowTjhCTzFJU1RaQXJw?=
+ =?utf-8?B?WlBxSjk5dVo3VE44d0x2ZFByTzVxTysreU5DN1phcEM1cFozMXc2R0lkR1px?=
+ =?utf-8?B?d08zN2VybTU5ZEFlaWtBZW9YL2R1VDZTdkJzNzl2UjZGeXlFY0lJZUQ2bTg0?=
+ =?utf-8?B?cDRaZ3dabHVrSHhlYWZrclN2NS9qbkM0TGE0dGpZaDQrQkVRWUVjK2NFdnVm?=
+ =?utf-8?B?WmVtUlBKOG1kS3R6MlRtbEZldHFuaTFjNnVxTmN5T0o3NVhIZk8vT0p1UW81?=
+ =?utf-8?B?dWZHUzBqMTdWS0k3a3dnV1gxWW5QUWIrZ3ZlRTA3ZUxwYXErR2hMajN0Y0p3?=
+ =?utf-8?B?cWNMV2NTRDAvNy92QTRoQ1lZRmFpelZBamJiVkF4RFlrRkdtVXN4ZzZSSEQ5?=
+ =?utf-8?B?cThjMUZITEx1a2N2ck9CMEY4aG9XanNPWUVTVjlFc1VTVHVJbGdkK01hMDVl?=
+ =?utf-8?B?TThxcnlsWEFIR2tCTUpEVWNBSTAyUGRNMWszNG5DbG5xallicU5LTVVqM2Yy?=
+ =?utf-8?B?ZUMwVkJ5QVdxVEEwZ1FYZitIZ3F2eFpKa2JxTFVONmhNNU00b3U3cjJtbjZr?=
+ =?utf-8?Q?gXIolyA6t3KROUINrzyO5wZgd?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d78f2980-c108-422f-350b-08dd4c3d09fe
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6322.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 14:44:35.2820
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 14:45:20.3482
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o1PrJmEfDJouaPlSXG1f/+7Za1vuY9IADWCF4pd1x6Ai6VbySVXDOZ5ilzORiQ4Vp/q0tdwLq513bw4AfxGyeIYK70lDVVxy20YfRzCvxfD9OdgF3SzSczr6IF/SWV5Q
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB5971
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-13_06,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 malwarescore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
- definitions=main-2502130110
-X-Proofpoint-GUID: PsZTy5YQtH_n4SitvhdTbzQz3UowfGF5
-X-Proofpoint-ORIG-GUID: PsZTy5YQtH_n4SitvhdTbzQz3UowfGF5
+X-MS-Exchange-CrossTenant-UserPrincipalName: One95K/F61QlpQEHbXxGA6hBD/THu+G62vmerjA2Kmuqo3cd9yzItT2q/o4P7Mdaa6nmj5KiYOEq0ppkklR9jA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7094
 
-Hi Greg,
+Hello,
 
-On 09/02/25 00:25, Harshit Mogalapalli wrote:
-> This is reproducible on on stable kernels after the backport of commit:
-> 2cf567f421db ("netdevsim: copy addresses for both in and out paths") to
-> stable kernels.
-> 
-> Using a single cover letter for all stable kernels but will send
-...
-> Solution:
-> ========
-> 
-> Backport both the commits commit: c71bc6da6198 ("netdevsim: print human
-> readable IP address") and script fixup commit: 3ec920bb978c ("selftests:
-> rtnetlink: update netdevsim ipsec output format") to all stable kernels
-> which have commit: 2cf567f421db ("netdevsim: copy addresses for both in
-> and out paths") in them.
-> 
-> Another clue to say this is right way to do this is that these above
-> three patches did go as patchset into net/ [1].
-> 
-> I am sending patches for all stable trees differently, however I am
-> using same cover letter.
-> 
-> Tested all stable kernels after patching. This failure is no more
-> reproducible.
-> 
+I'm troubleshooting an issue and would appreciate your input.
 
-Ping on this series:
+The problem occurs when the SYNPROXY extension is configured with
+iptables on the server side, and the rmem_max value is set to 512MB on
+the same server. The combination of these two settings results in a
+significant performance drop - specifically, it reduces the iperf3
+bitrate from approximately 30 Gbps to a few Gbps (around 5).
 
-6.12.y: 
-https://lore.kernel.org/all/20250208185521.2998155-1-harshit.m.mogalapalli@oracle.com/
+Here are some key points from my investigation:
+• When either of these configurations is applied independently, there is
+no noticeable impact on performance. The issue only arises when they are
+used together.
+• The issue persists even when TSO, GSO, and GRO are disabled on both sides.
+• The issue persists also with different congestion control algorithms.
+• In the pcap, I observe that the server's window size remains small (it
+only increases up to 9728 bytes, compared to around 64KB in normal traffic).
+• In the tcp_select_window() function, I noticed that increasing the
+rmem_max value causes tp->rx_opt.rcv_wscale to become larger (14 instead
+of the default value of 7). This, in turn, reduces the window size
+returned from the function because it gets shifted by
+tp->rx_opt.rcv_wscale. Additionally, sk->sk_rcvbuf stays stuck at its
+initial value (tcp_rmem[1]), whereas with normal traffic, it grows
+throughout the test. Similarly, sk->sk_backlog.len and sk->sk_rmem_alloc
+do not increase and remain at 0 for most of the traffic.
+• It appears that there may be an issue with the server’s ability to
+receive the skbs, which could explain why sk->sk_rmem_alloc doesn’t grow.
+• Based on the iptables counters, there doesn’t seem to be an issue with
+the SYNPROXY processing more packets than expected.
 
-6.6.y: 
-https://lore.kernel.org/all/20250208185711.2998210-1-harshit.m.mogalapalli@oracle.com/
+Additionally, with a kernel version containing the commit below, the
+traffic performance worsens even further, dropping to 95 Kbps. As
+observed in the pcap, the server's window size remains at 512 bytes
+until it sends a RST. Moreover, from a certain point there's a 4-ms
+delay in the server ACK that persists until the RST. No retransmission
+is observed.
+One indicator of the issue is that the TSO counters don't increment and
+remain at 0, which is how we initially identified the problem.
+I'm still not sure what might be the connection between the described
+issue to this commit.
 
-6.1.y: 
-https://lore.kernel.org/all/20250208185756.2998240-1-harshit.m.mogalapalli@oracle.com/
 
-5.15.y: 
-https://lore.kernel.org/all/20250208185909.2998264-1-harshit.m.mogalapalli@oracle.com/
+I would appreciate any insights you might have on this issue, as well as
+suggestions for further investigation.
 
-5.10.y: 
-https://lore.kernel.org/all/20250208190215.2998554-1-harshit.m.mogalapalli@oracle.com/
+Steps to reproduce:
 
-I noticed new stable rc tags being released, so pinging. Sorry if I 
-pinged before you got to these.
+# server:
+ifconfig eth2 1.1.1.1
 
-Thanks,
-Harshit
-> Thanks,
-> Harshit
+sysctl -w net.netfilter.nf_conntrack_tcp_loose=0
+iptables -t raw -I PREROUTING -i eth2 -w 2 -p tcp -m tcp --syn -j CT
+--notrack
+iptables -A INPUT -i eth2 -w 2 -p tcp -m tcp -m state --state
+INVALID,UNTRACKED -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
+
+echo '536870912' > /proc/sys/net/core/rmem_max
+
+iperf3 -B 1.1.1.1 -s
+
+# client:
+ifconfig eth2 1.1.1.2
+
+iperf3 -B 1.1.1.2 -c 1.1.1.1
+
+
+If needed, I will send the pcaps.
+
+Thank you,
+Shahar Shitrit
+
+On 19/04/2024 0:46, Eric Dumazet wrote:
+> While investigating TCP performance, I found that TCP would
+> sometimes send big skbs followed by a single MSS skb,
+> in a 'locked' pattern.
 > 
-> [1] https://lore.kernel.org/all/172868703973.3018281.2970275743967117794.git-patchwork-notify@kernel.org/
+> For instance, BIG TCP is enabled, MSS is set to have 4096 bytes
+> of payload per segment. gso_max_size is set to 181000.
 > 
+> This means that an optimal TCP packet size should contain
+> 44 * 4096 = 180224 bytes of payload,
 > 
-> Hangbin Liu (2):
->    netdevsim: print human readable IP address
->    selftests: rtnetlink: update netdevsim ipsec output format
+> However, I was seeing packets sizes interleaved in this pattern:
 > 
->   drivers/net/netdevsim/ipsec.c            | 12 ++++++++----
->   tools/testing/selftests/net/rtnetlink.sh |  4 ++--
->   2 files changed, 10 insertions(+), 6 deletions(-)
+> 172032, 8192, 172032, 8192, 172032, 8192, <repeat>
 > 
+> tcp_tso_should_defer() heuristic is defeated, because after a split of
+> a packet in write queue for whatever reason (this might be a too small
+> CWND or a small enough pacing_rate),
+> the leftover packet in the queue is smaller than the optimal size.
+> 
+> It is time to try to make 'leftover packets' bigger so that
+> tcp_tso_should_defer() can give its full potential.
+> 
+> After this patch, we can see the following output:
+> 
+> 14:13:34.009273 IP6 sender > receiver: Flags [P.], seq 4048380:4098360, ack 1, win 256, options [nop,nop,TS val 3425678144 ecr 1561784500], length 49980
+> 14:13:34.010272 IP6 sender > receiver: Flags [P.], seq 4098360:4148340, ack 1, win 256, options [nop,nop,TS val 3425678145 ecr 1561784501], length 49980
+> 14:13:34.011271 IP6 sender > receiver: Flags [P.], seq 4148340:4198320, ack 1, win 256, options [nop,nop,TS val 3425678146 ecr 1561784502], length 49980
+> 14:13:34.012271 IP6 sender > receiver: Flags [P.], seq 4198320:4248300, ack 1, win 256, options [nop,nop,TS val 3425678147 ecr 1561784503], length 49980
+> 14:13:34.013272 IP6 sender > receiver: Flags [P.], seq 4248300:4298280, ack 1, win 256, options [nop,nop,TS val 3425678148 ecr 1561784504], length 49980
+> 14:13:34.014271 IP6 sender > receiver: Flags [P.], seq 4298280:4348260, ack 1, win 256, options [nop,nop,TS val 3425678149 ecr 1561784505], length 49980
+> 14:13:34.015272 IP6 sender > receiver: Flags [P.], seq 4348260:4398240, ack 1, win 256, options [nop,nop,TS val 3425678150 ecr 1561784506], length 49980
+> 14:13:34.016270 IP6 sender > receiver: Flags [P.], seq 4398240:4448220, ack 1, win 256, options [nop,nop,TS val 3425678151 ecr 1561784507], length 49980
+> 14:13:34.017269 IP6 sender > receiver: Flags [P.], seq 4448220:4498200, ack 1, win 256, options [nop,nop,TS val 3425678152 ecr 1561784508], length 49980
+> 14:13:34.018276 IP6 sender > receiver: Flags [P.], seq 4498200:4548180, ack 1, win 256, options [nop,nop,TS val 3425678153 ecr 1561784509], length 49980
+> 14:13:34.019259 IP6 sender > receiver: Flags [P.], seq 4548180:4598160, ack 1, win 256, options [nop,nop,TS val 3425678154 ecr 1561784510], length 49980
+> 
+> With 200 concurrent flows on a 100Gbit NIC, we can see a reduction
+> of TSO packets (and ACK packets) of about 30 %.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv4/tcp_output.c | 38 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 5e8665241f9345f38ce56afffe473948aef66786..99a1d88f7f47b9ef0334efe62f8fd34c0d693ced 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -2683,6 +2683,36 @@ void tcp_chrono_stop(struct sock *sk, const enum tcp_chrono type)
+>  		tcp_chrono_set(tp, TCP_CHRONO_BUSY);
+>  }
+>  
+> +/* First skb in the write queue is smaller than ideal packet size.
+> + * Check if we can move payload from the second skb in the queue.
+> + */
+> +static void tcp_grow_skb(struct sock *sk, struct sk_buff *skb, int amount)
+> +{
+> +	struct sk_buff *next_skb = skb->next;
+> +	unsigned int nlen;
+> +
+> +	if (tcp_skb_is_last(sk, skb))
+> +		return;
+> +
+> +	if (!tcp_skb_can_collapse(skb, next_skb))
+> +		return;
+> +
+> +	nlen = min_t(u32, amount, next_skb->len);
+> +	if (!nlen || !skb_shift(skb, next_skb, nlen))
+> +		return;
+> +
+> +	TCP_SKB_CB(skb)->end_seq += nlen;
+> +	TCP_SKB_CB(next_skb)->seq += nlen;
+> +
+> +	if (!next_skb->len) {
+> +		TCP_SKB_CB(skb)->end_seq = TCP_SKB_CB(next_skb)->end_seq;
+> +		TCP_SKB_CB(skb)->eor = TCP_SKB_CB(next_skb)->eor;
+> +		TCP_SKB_CB(skb)->tcp_flags |= TCP_SKB_CB(next_skb)->tcp_flags;
+> +		tcp_unlink_write_queue(next_skb, sk);
+> +		tcp_wmem_free_skb(sk, next_skb);
+> +	}
+> +}
+> +
+>  /* This routine writes packets to the network.  It advances the
+>   * send_head.  This happens as incoming acks open up the remote
+>   * window for us.
+> @@ -2723,6 +2753,7 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
+>  	max_segs = tcp_tso_segs(sk, mss_now);
+>  	while ((skb = tcp_send_head(sk))) {
+>  		unsigned int limit;
+> +		int missing_bytes;
+>  
+>  		if (unlikely(tp->repair) && tp->repair_queue == TCP_SEND_QUEUE) {
+>  			/* "skb_mstamp_ns" is used as a start point for the retransmit timer */
+> @@ -2744,6 +2775,10 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
+>  			else
+>  				break;
+>  		}
+> +		cwnd_quota = min(cwnd_quota, max_segs);
+> +		missing_bytes = cwnd_quota * mss_now - skb->len;
+> +		if (missing_bytes > 0)
+> +			tcp_grow_skb(sk, skb, missing_bytes);
+>  
+>  		tso_segs = tcp_set_skb_tso_segs(skb, mss_now);
+>  
+> @@ -2767,8 +2802,7 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
+>  		limit = mss_now;
+>  		if (tso_segs > 1 && !tcp_urg_mode(tp))
+>  			limit = tcp_mss_split_point(sk, skb, mss_now,
+> -						    min(cwnd_quota,
+> -							max_segs),
+> +						    cwnd_quota,
+>  						    nonagle);
+>  
+>  		if (skb->len > limit &&
 
 
