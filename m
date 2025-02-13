@@ -1,139 +1,116 @@
-Return-Path: <netdev+bounces-166120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E5CA34A72
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:45:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D3FA34A77
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D15753BCC3B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:38:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924A31894DB8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104A5200120;
-	Thu, 13 Feb 2025 16:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B72E221571;
+	Thu, 13 Feb 2025 16:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8tB+YQ+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djp5uQBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A5820013E
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 16:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80BC155326
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 16:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739464163; cv=none; b=NLxPsB4P2coa9ccoDUGMkug1rNqt7KaMXDVad+nt5T9Gus1hiCu6exQMPRIEdeQGgxH973Kdw7sTH8SSIEqSzD7UUfuSpeBTfsuOSm+Ts1csRoHZXXIyck+85H8+oZZX/QelhGXiN6EUEPGzCKbiZgvRkIy8HguMf2dQvgJBYWk=
+	t=1739464338; cv=none; b=Oga+k6Ve78BKFI9UT2SmiNhbAY2jSw70VA6Z4wVOlbvC2m4BawWYTEFJYgwrFBjyK3NSHZ3qd10UfVpiM61Pw6ygxXMnrYIK5gR1Edci+w+X3pBetP/hvxIbZ+2c2eXkbCf/OrxYpFaKrMKhrvOX2oFg0mwKHb1+38ipRZtr1O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739464163; c=relaxed/simple;
-	bh=ztckQ6veR3Zd+9ARIoiUSd1Tw2vbNbwZm1GWFQFfzbw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CS7jsXDplhvaRjo9hT3aOVgMvIcwDimJhPrh3F9XSgLfVSVQotJSUo6wHBLTzhqmyTpeR/JNL492vDI3ViE0gu3HEiygMdfwexLAeqFJFWnDG9q4bnDNPq3MMtywgzPlBJ7OtJm1B26DovFeFXWrUiuk43bjQ0auWBWNo/XsxoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8tB+YQ+; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c072d6199eso57103185a.1
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 08:29:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739464160; x=1740068960; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C84vkflEAu7H0CO5H72DucA0scUC8F3BsKYWxpQT/CU=;
-        b=T8tB+YQ+JKABNo9eN0Wd8OzGyRVY70wrtwRJ9w1ti1556yJgCf63smRc0kfqZ1SELS
-         sFfJf7kRPUqvYGdqYSNuz9kTMyl78kuesmbgIHxBJKtOC9tNmic7Ng2//Sxnc0GwHlzM
-         tFSG8MKpaDsXJZPbd8GQ5BQUobwiUU0A1v4F0JsanZ2GTMHrGcdTvDGvl6p/9GGRWyVf
-         EhdszWXSDOqF1q7981nINhnaeWd/uaeZoTI6dbOUySsxCEbiyjjMKlflO8Qz6SL4FF3P
-         IYIasmioqVBKKICYlhYQPMwxyMYDLi21pFNevFu4/LvE3EDBSceE0z7DMqbN8dOuubHB
-         yjBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739464160; x=1740068960;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C84vkflEAu7H0CO5H72DucA0scUC8F3BsKYWxpQT/CU=;
-        b=HhbXtfxOUiPI6Ik4HEbxy6pwY+v0NDeBbCfYU+5o9HF7z+LHWHTIOF0ht3NhgGdhoE
-         hLm3NElepSIztuPKj9w7vk1swEGAdkiOS9JtDDdKDV1PnvnFQ/528k8bZDhIUHz4dSEM
-         Q8SL0zMESixiI8M3iPtx2GLMFvGgj56bHuEAMr6Rdtigxbi8eSsYVvPUmfnHtKEEq4AI
-         QQ166ZCsMloePWCX12/EabZ9TIdJI2DsYDsUPWH/Zy6VFOs3JiQTksDACwklGF+2zlqc
-         y+V+ZFcsh25DMu5SrJhclIX2/c/3lROmli1WQmFTD40u9YxDgVjzBm31VuLHGWIIxdif
-         TmPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjVCwouew9M0ogb9TEdYS6fl/0FRBi/44MTA9eWa4UI1fTaro+tFA57tiJ1xVBHZHKOCNSyug=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3TQ5u3nJmRAIQD5KRcTYt/CRzfgd8RzILb7bnC4MJfKYq7BFe
-	6R2lS66EDoUFckDgK6XtF5b2INR5tWwAnl6C7Lt2c9gEt9wj8sYeE6d9Qw==
-X-Gm-Gg: ASbGncvpRu6XoYs5sS4Hb2uGwdQJYtZKDljt6VHuYy0U6cd2SORAmfdOpYbao0NbWoZ
-	0x9WWpK/wKaET6M/RjFT+r0HjWsuQoIw5RwIWbKUBuzO+milRFzBzv19SQYzwBDtWbzzVelfWoQ
-	S0AxYITFf4hPOQNSQ06OhMjrbwc1AgehT/3Ip+fMTlKJp0d0LUBPYvu7NgiSjV6+24vbdNvsGeX
-	FE2jq6tRJIRWrPGumLUozTaOkGbAjQ8wbhtUgEyeBgaVzN4l8p+Xws5OXRbQAAa7oKAVmfWagqZ
-	DiB0VNj5dzAtw6otxRRl680dcOfMsvDTEMOGkmCvbT75iGbN4x3ucX1lj1A0/Zo=
-X-Google-Smtp-Source: AGHT+IFEa+mJBymH6ocgMmuNPYJvx2JKWx7nFLzTX/i0uS8/ViOhs/UFGHzf2IF4myxrQjnzFrgglQ==
-X-Received: by 2002:a05:620a:2791:b0:7b6:d8da:9095 with SMTP id af79cd13be357-7c06fc6bf6fmr1216242985a.13.1739464160239;
-        Thu, 13 Feb 2025 08:29:20 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471c2a30b46sm9290171cf.36.2025.02.13.08.29.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 08:29:19 -0800 (PST)
-Date: Thu, 13 Feb 2025 11:29:19 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- dsahern@kernel.org, 
- horms@kernel.org, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <67ae1ddf79d37_254fdb2949f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67ae1c7ba11bf_25279029419@willemb.c.googlers.com.notmuch>
-References: <20250212021142.1497449-1-willemdebruijn.kernel@gmail.com>
- <20250212021142.1497449-5-willemdebruijn.kernel@gmail.com>
- <10ef7595-a74c-4915-b1f7-6635318410f7@redhat.com>
- <67ae1c7ba11bf_25279029419@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net-next v2 4/7] ipv4: remove get_rttos
+	s=arc-20240116; t=1739464338; c=relaxed/simple;
+	bh=tvox82U4+Hop8rGIYLrDX2FJipGXsxf9NheTw1Ppo2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QaST0/B7/MmfKw4FlYjO9+Qvuc8natZIllURJNSlypptpyFN0Po5J8Lm7ilGxHzcI8BvEdikfdwNBornIvdCeGkmojWk9cpJKMN8PW06zRXOZm1aCRfbWjRDNGB07M9/0gmmq5dicENbEnULw98mh53AQdbrXUzJk+bq1oYO3zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djp5uQBu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3ED6C4CED1;
+	Thu, 13 Feb 2025 16:32:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739464338;
+	bh=tvox82U4+Hop8rGIYLrDX2FJipGXsxf9NheTw1Ppo2c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=djp5uQBuSgUKeFYKJ2q+7A7tsAC2SGLWJHhFqPILGq89SesMJyS8E+YJWE17Zgpr2
+	 6ZoYmLEhnvfp0Vm9V8QnnY3FA5epi7PSow9F/NkVetYmweJzqbd2hOXtU8tzRz2afO
+	 /eK5eyagXR4IXD8Gh2GpmjI5brEXcw8VB20kjPBQ5zokf1GyiuOWR5oykxRU1ISslU
+	 mcc6NKcVzO2Uo4+0jSDIWsG3pqukVCrVba3ETFHRzPUEU7WN9BYpca53Eexlug0hBI
+	 3elUnr05QQ45pPNicQlLjeZarDJZZPtil3aOt5sYxbEK0Wzuj6OaduEbGR1PFWvYjm
+	 SwWkLFmw0xcFg==
+Date: Thu, 13 Feb 2025 08:32:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ <netdev@vger.kernel.org>, Yael Chemla <ychemla@nvidia.com>
+Subject: Re: [PATCH v4 net 2/3] net: Fix dev_net(dev) race in
+ unregister_netdevice_notifier_dev_net().
+Message-ID: <20250213083217.77e18e10@kernel.org>
+In-Reply-To: <20250212064206.18159-3-kuniyu@amazon.com>
+References: <20250212064206.18159-1-kuniyu@amazon.com>
+	<20250212064206.18159-3-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Willem de Bruijn wrote:
-> Paolo Abeni wrote:
-> > On 2/12/25 3:09 AM, Willem de Bruijn wrote:
-> > > From: Willem de Bruijn <willemb@google.com>
-> > > 
-> > > Initialize the ip cookie tos field when initializing the cookie, in
-> > > ipcm_init_sk.
-> > > 
-> > > The existing code inverts the standard pattern for initializing cookie
-> > > fields. Default is to initialize the field from the sk, then possibly
-> > > overwrite that when parsing cmsgs (the unlikely case).
-> > > 
-> > > This field inverts that, setting the field to an illegal value and
-> > > after cmsg parsing checking whether the value is still illegal and
-> > > thus should be overridden.
-> > > 
-> > > Be careful to always apply mask INET_DSCP_MASK, as before.
-> > 
-> > I have a similar doubt here. I'm unsure we can change an established
-> > behavior.
-> 
-> This patch does not change behavior.
-> 
-> Does not intend to, at least.
+On Wed, 12 Feb 2025 15:42:05 +0900 Kuniyuki Iwashima wrote:
+> +static void rtnl_net_dev_lock(struct net_device *dev)
+> +{
+> +	struct net *net;
+> +
+> +#ifdef CONFIG_NET_NS
+> +again:
+> +#endif
+> +	/* netns might be being dismantled. */
+> +	rcu_read_lock();
+> +	net = dev_net_rcu(dev);
+> +	net_passive_inc(net);
+> +	rcu_read_unlock();
+> +
+> +	rtnl_net_lock(net);
+> +
+> +#ifdef CONFIG_NET_NS
+> +	/* dev might have been moved to another netns. */
+> +	if (!net_eq(net, rcu_access_pointer(dev->nd_net.net))) {
+> +		rtnl_net_unlock(net);
+> +		net_passive_dec(net);
+> +		goto again;
+> +	}
+> +#endif
 
-I should have added that that is what the cmsg_ipv4 test extension is
-for. It was indeed not covered by existing tests, unlike much of the
-other changes.
+Is there a plan to clean this up in net-next? Or perhaps after Eric's
+dev_net() work? Otherwise I'm tempted to suggest to use a loop, maybe:
 
-That said, this is the least self evident patch of the series. If you
-prefer I can send without.
+	bool again;
 
-Either way, I'll follow up with a cmsg_ip.sh refactoring of 
-cmsg_ipv6.sh that extends coverage to IPv4.
+	do {
+		again = false;
 
+		/* netns might be being dismantled. */
+		rcu_read_lock();
+		net = dev_net_rcu(dev);
+		net_passive_inc(net);
+		rcu_read_unlock();
+
+		rtnl_net_lock(net);
+
+#ifdef CONFIG_NET_NS
+		/* dev might have been moved to another netns. */
+		if (!net_eq(net, rcu_access_pointer(dev->nd_net.net))) {
+			rtnl_net_unlock(net);
+			net_passive_dec(net);
+			again = true;
+		}
+#endif
+	} while (again);
 
