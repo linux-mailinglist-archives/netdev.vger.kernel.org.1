@@ -1,948 +1,614 @@
-Return-Path: <netdev+bounces-166240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E42A35239
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:34:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D243A35245
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E132D188AFB3
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:34:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D1C1888B83
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E841C84C0;
-	Thu, 13 Feb 2025 23:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CDB1C84BC;
+	Thu, 13 Feb 2025 23:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t1jBVZmX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uAc68Jn3"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C4D1C84A8;
-	Thu, 13 Feb 2025 23:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739489685; cv=fail; b=BRgy/U8XXM3pPNB+4kcx8iQVTNKFS2hlkXEAS38enrxilXrEUHED8gdPaflkyrzP4vlDIf4L3QOJD1sI0v94HqNxMoEhnECarWaKZVz1iIQ3wPd9mQRL3cak45IctxN6GxhVh1Q2lK8zr9BHN/Eeay3D/nyXJf+1oe4nTi00enQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739489685; c=relaxed/simple;
-	bh=ia9lhsRF/tDajOlFrvd8rjgwBi9chD4lRCLo35ovN9w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SRcVEK2Hfsx8oGL/F3+CTQzMfaNsdsK8yjG4WziAI1CZyAWOMB9smG7o3wFeN3R/b6KiiNmsSimCL7uQTHZy8Zd54XPmrskZ74l+y+ToxBJiwFc4UqbLs6gz4LNjmioQGojxQsd4lxJRrFflcJx9QbEXrrWZx5OMZmSE3JFwxro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t1jBVZmX; arc=fail smtp.client-ip=40.107.93.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yd7jsKCXx7fNn/Q5X4eXe8n294hvcA6aMHbI1CIz7a+RI+JXAfNTh6+98grj0TtNz9YDHC40QLmJRDvUsyBt0EaieLlGktjSRAkfMdqpboSGdlBibvMS3mERICwq2bWazqIzCrZgEMKsYviWMX6J10V6+YuktU2B6S3LK+msbspulCQsn2zQnD5QUY3XPiyyuGeycIB6IS7oNYbhoXoGOBqezLzwOzzdAc1U5h60I1qr3Nc8lteTc+AvQdv4042ZGRgUlrNVoB4bGzJ5QckaoRsz5Vr6rgsd8i5wKGmfSG6K9FpuQ2tlUKOSBOvnpmfjSodadshKgVtmo9U1E97hHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j0uVrLjiF+Iz6dIwsjJRDIbuIQzUZIPqtBVXw2+v1w0=;
- b=ugHthykk3lXLkSGoetqv5QKDem2EUc+m4kbAqt/aEp6LnHEi/DgkHGojSCPf+/xP8nyMUp+pQqj+8EwVD5OGQQVHle92Cnt7b78JbL5aQ6OS4NULvswttU5loxnqxJ7lOj3Id1NFDOywIxq7NPtT3RT45ou/jfPQgM9ZlmsqTQ+Pkr+xM4eCiuhVAStswjQoTtpJlZ/luse2a0YFhugKqhWpbkZBafrU9U+AwHUmAayUDZBxP7g26FZnjnYLheZuxMeTFi0UTmMsv4MFwuFZ1TeiXRONeR8Oe+XW49rB3OC9MCO8TqcScaCOjlXL/NZdZf5dUqW2iTbAkNzWgTN6iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j0uVrLjiF+Iz6dIwsjJRDIbuIQzUZIPqtBVXw2+v1w0=;
- b=t1jBVZmXFhPeyOP+12neUhUmY3RUkm5rrLv2LE5sE6HOnQAuJBLEpBytm74FT7D/XlUhMfO8rkcx/V31SI2H4lrLHJBcWvlv8HPN1gT8sU4vlc/YQY/Sf0pbISNZIPaq3/ABpxUNz2Eg0RMPf6HpBopPeM6U8xm5QIIH7c3lU1s=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- MN2PR12MB4208.namprd12.prod.outlook.com (2603:10b6:208:1d0::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.16; Thu, 13 Feb
- 2025 23:34:39 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%5]) with mapi id 15.20.8445.008; Thu, 13 Feb 2025
- 23:34:39 +0000
-Message-ID: <f83ee8a9-21ec-433f-9d5b-5c074d3288c0@amd.com>
-Date: Thu, 13 Feb 2025 15:34:37 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH fwctl 4/5] pds_fwctl: add rpc and query support
-To: Dave Jiang <dave.jiang@intel.com>, jgg@nvidia.com,
- andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
- dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dsahern@kernel.org,
- gospo@broadcom.com, hch@infradead.org, itayavr@nvidia.com, jiri@nvidia.com,
- Jonathan.Cameron@huawei.com, kuba@kernel.org, lbloch@nvidia.com,
- leonro@nvidia.com, saeedm@nvidia.com, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Cc: brett.creeley@amd.com
-References: <20250211234854.52277-1-shannon.nelson@amd.com>
- <20250211234854.52277-5-shannon.nelson@amd.com>
- <d8a77435-0a52-4f2e-8407-65a0e5cc14c3@intel.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <d8a77435-0a52-4f2e-8407-65a0e5cc14c3@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0168.namprd13.prod.outlook.com
- (2603:10b6:a03:2c7::23) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4994B2753F0
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 23:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739489938; cv=none; b=F2B7IyYqiedIcQKgTyL7gpu+NmPrk7CjGdWvVK6tMpZyI9onKzpCyScFYWon+l3vf5+Fe6LJnKwMCYatxsL6KlVwQDLJlfv2g035BRTrujFJ9ePyDAzRIpw1bpdGKp8Xn9zdgqCAWbLkGQjyu0tmDGY8aHKcQP5+xqLwuaTF3bs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739489938; c=relaxed/simple;
+	bh=DwJRp547xFOciXadMBi8eWO+MLa+71MK/2Kvpx+fo6I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Xuwg7blKhr4rR29NQ4wRD969s7bxpEgMhgM1UUFkBWxshSOrq5eErts3BW1gkk/wQPTTA39ULvooq7REXXXUx9yoVZIN4oiqeP461YXSFrSIXC+pyeYuFNGF03xvK54I7C/WP1HQCJRhUAuNrrAcwwdhPaQi88Zolae1SFiHY2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uAc68Jn3; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220d8599659so21385495ad.0
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 15:38:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739489935; x=1740094735; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4l1vbjD6i0+bfylYkqw0c/jINJJHc1B09Ag0OM8It5c=;
+        b=uAc68Jn3K7AthGPkr85l+4CAdnyNXmLIU7Cf3TeSojqPrbzhcdIKK89xz7RrkbguZs
+         3ki/qJ3bbEpRQAf+vwY1ycxYJaaAtCwj6boW8cN7IKWenkYwLgGIsa8wZBlOr8WZTZyf
+         ulSqO5vaUQngrF6CUEvyeKy6iBVWu3Xo7WADrobzVt7JCAo6A2qZuY4ZjUequYNQwdSI
+         k55tUeHhZKu8eVwfb0jv2xiH+Fa49tUaeJI9BE7SDCQUCqeiR6gj+PmDLF/cqZEEOTLu
+         38i8ppHM9mabul8F0ozYPYFaGLKO/dVFTH1G5usUDEu5cVoXgseCj6+43aNjenApyOki
+         PH1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739489935; x=1740094735;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4l1vbjD6i0+bfylYkqw0c/jINJJHc1B09Ag0OM8It5c=;
+        b=kG9EzZBYEOLY0X44mkrTnAkgj1D+yYqrfDgMtdhUuzWayFccu/IprzNdZCR9wVzDQn
+         CJc2yJP5C1aK0Bz8kxaW/NuGMF8XytwnJ0u8hfWo1srE3lP6R7rwgKXhIpuONI/NoEc/
+         SXRYQd3eEQ9cdR2LPK2uajPOWc+oP26hX8Sy+dEN8pcQ47WAnSuLphlLrFlWNd7/WheT
+         5920j1GOAvdT/poR5GVdcxjJK460hUQRVh5bsAXpjQXCuBXwXop0xpmBX4MS+y601B2a
+         UrM614L7GYw9qEjgnb4pKxG69cbg7rA4Gi8p8+PsaEl+ANWQ4FPPXmmiwTlvQ8EPI0O4
+         isrg==
+X-Gm-Message-State: AOJu0YzIZtz3a15u6shIkUsB36il0UaizmOBRVOF4GcF6W9xfLyQM2wS
+	hkU5iiiWZfb3fwUnZ0SJVfTMVfxS0BfEeGy9HZIyMbZQj9v8BKCfgsqU6FZZKNw3sNPBnM9uVTZ
+	8xWlmUFEcxP+qFEYKdnTwJiojiQhDA5ALBOLBnELkZiVW8Q7nlihfe5uEpRp0stid1dvOWhNbHU
+	wthr6g6cVIk04UQ4FAbnTNga+bL1wG7+T9GJT0eQPUNU0=
+X-Google-Smtp-Source: AGHT+IE4d2UzVUD7yYjCHtJQ7WpBhEm2/3sG+jAOuqlCc0NcxJ9XPHp63qUUvTtc+DHZopET11qkQMkdEqmGhw==
+X-Received: from pjbqc6.prod.google.com ([2002:a17:90b:2886:b0:2fc:2ee0:d38a])
+ (user=jeroendb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:d481:b0:21f:1549:a563 with SMTP id d9443c01a7336-220bbab334emr152335425ad.2.1739489935455;
+ Thu, 13 Feb 2025 15:38:55 -0800 (PST)
+Date: Thu, 13 Feb 2025 15:38:28 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MN2PR12MB4208:EE_
-X-MS-Office365-Filtering-Correlation-Id: a9d52fcc-67c1-461f-6d16-08dd4c86fc0e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RDI4cFR1cG5QWDBDVmRBcFJJdi9VWGl6SVpsSUNJTkhvVy94bkdocjNRdklZ?=
- =?utf-8?B?VEQyMnMvamc2aThyNzFhQ0V6R0x6anlWRXNWRjRuZTRjSDhOSHNWVUVBTDFG?=
- =?utf-8?B?TzFqYlVRUjFGVnVCRGJxN2UwOThjSWJDcEcybThVNWtteFRUMU8yMmtueExS?=
- =?utf-8?B?OGRiemZSSE85WmZMa2d2RERnb3NKdDlaMTNVb1NqVGwwendPdE03QzZkbXhR?=
- =?utf-8?B?cUJ5VzJ4aUdDN2ZET2IwVDVjZHVDUGtZSGJ2YWVXQXNZZTVkY0xlUFZ6UDZm?=
- =?utf-8?B?QVU0V0trWjJBck93TmxlL29ucFl0bHhObWFkK0p3a2lMbjg4cTltUG03OEdl?=
- =?utf-8?B?UHNzdmVxSDZ4cnN6TjdVendERDBBbGE3ZkZCTW8xZUlRY3BtSjN3Sy9GeWxj?=
- =?utf-8?B?bmNucWE4T1R6TlFLSGVtNDJualgrcXFjVWttbDVhZTI1YkVYc0NQem1pQ0lW?=
- =?utf-8?B?a1licWZOSHUvUmdNTzlUa25pTStzMlgrQmthd3I1ZnhiVWJzMDA4S2I5U3dl?=
- =?utf-8?B?c0JLTTFlM21mYnlrbzNXa2pPcG0veURmeGZ0NGtubUJlVWE5bFd0YytqNUFq?=
- =?utf-8?B?QWtZRDNqS2hDN09jMzZtRWFrbG9JWTVBdWFEU1ZOZE5MblkwcTF1MEpJUnNX?=
- =?utf-8?B?QUFqNE53bVVaUG1qYzZCUEErWmlGTWdTNkhSdnBVUDVOS1ZCYlBMRHJ3YWxO?=
- =?utf-8?B?VmZwdDBib0hlT3lxeC8wTXQ5VDdOUm5ZQ0xxNTlJaTRRQysxcmRBZGwvMlE0?=
- =?utf-8?B?eXVuNFV4czZsM0h6NmdiakNPSkNuSlgyNE1QR0tGd3U0S3RqYkZqb3MxZlRk?=
- =?utf-8?B?RFRwME54VXZFWGZiTGViMlNKYTI1aDZ6NmkybGZ6NWFPTU4zZjFya1VQa01M?=
- =?utf-8?B?aFoyWkNycFAxUjRDNWRYVmwvbHFSSEdISURiZUtJSWtobmNCYjRrYll6T0do?=
- =?utf-8?B?S0FSYitkL1B3M0ROTUx6Rm5NSVJVd0RCaXZCTG4zSkxvK3AyK01YZ1FIRXpy?=
- =?utf-8?B?dXJ6TGFVWXJGSmtiQTNRU2FVTzZ1SGpPckV1OHVDNU1JbXlwRzhBbnNPK2t6?=
- =?utf-8?B?RTN5Skl5ZGxUaVpSWWFnZ2w1K0Y0Y3ZNbUtwL0lJajE0c21xUmY0emltRFIy?=
- =?utf-8?B?elA0Um1YdkxDemwzejhnNEpIQlJMM1ltSlp1UFRZM3NaYTdmTHh4V1RkSXl2?=
- =?utf-8?B?Mjl5VWF0SGJQazBFdzNrSXJnYUVaMkhSTXM4MllMTjRzZXRkOGZrWk5rbUt3?=
- =?utf-8?B?NHdjNkU4dVJaUzMzMGY1WWdTaVZTK3M0ZDdXcXRxVFBTMnBoRXRLZktSTUJo?=
- =?utf-8?B?a0RYRWlPNHl5SlhvelJSNVVILzhvY0ptOVkrYnJuNW9GejBCQk84L3p3dndp?=
- =?utf-8?B?QWFITXVhRStvRGduWDhITHByTzYxSDhpVDR2bDNkcFRydEgrN20wY3g3clEx?=
- =?utf-8?B?OTNqUVBhQ0hVaWgyZFEvMUcyd2xWSXRLTmtndDVGeEt2YmIxM2RBbFBqK2RG?=
- =?utf-8?B?NUtSYTRSdlFxbDE3Uk5WaDFXdjFkeC9KYm9DR3VidUpDc1FvTHVBYisrQTFs?=
- =?utf-8?B?RnVtNHM2MGUwTkV0Y3RHL3g0REpaZmg5QU5acEgrZ3gvRG1hZUloSEtxclBj?=
- =?utf-8?B?N0RxT1NtV1NSTVdJY29UcWh1bld1YnNwbkx0YzlOZXg3Q1ZuSHFuaXpzYWFD?=
- =?utf-8?B?ejNtb3J1ZDBRSThEUnhmN09lSUF6V2NLTG96andYRVZCV3hFTmJiWE51dU1T?=
- =?utf-8?B?b0c5V2tBMDJCRERjL3lCc1k3NmZ4TU0wOEZqNkNJRXR1MUUrZ0gvNU15dnpw?=
- =?utf-8?B?K2ZwSlFQbjJnWnZJM0VFaFVEb1dQWXB1L0ZnQVFOVEkrdlpvaXZEeHZMSlN2?=
- =?utf-8?B?Z1F6aEtrZnIzVWFaRW9oMkRjK1YxWEs3cDBOUzZRYzVWbDExQ3JYRWhuSUZE?=
- =?utf-8?Q?bOp47efwBsg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MnFyZ3MxSjZrNjNSQmJDZHhCYnJIeFdxOFdmL05UYUw3MU13TWhQTjgxQWNT?=
- =?utf-8?B?QmMwNmR0blFqNGQwamp3T1AraVRaeEtwSjRsVStjM3lac0RndjVFWElTU0M2?=
- =?utf-8?B?aGZWUHFmRG1hT3Z1UWh6cmp0WVBES04wMnBsZlZPcy82T2lQWWtjZUwxQ3NW?=
- =?utf-8?B?WkVIa3lEaUZwaW1hbkdlU2lYNVVkdm13NVRNZkdBMVVyUXRmeXQxUklOd3ZQ?=
- =?utf-8?B?Z25UTWJucmU2R3pwaGtNNFdxRHRrbGVwemQ3YzZhdHlUOG1HWnQ2S0RxWHhi?=
- =?utf-8?B?YUxTNkFoZnI0eHd4c1VodkRTdStDR3BMRHlISHNDMFlCdEpYRy91MDBIcGVW?=
- =?utf-8?B?Uk5hanlNVU5YMjVSV1JUZUduVSthbmN0NzBENlI0dmQzM0U2MDh1bW15cjNh?=
- =?utf-8?B?QzhaQk8wc3JjTkNqTUhXQjRsNExPTDRsR3JqWEsvczB3LzVwVGF1V3BsVVJH?=
- =?utf-8?B?Sko5emRtQnp2V0tkdjZEeU9wZEJjODBNSXh3ZkZrOVllOWR2VEtaWWlUd3FE?=
- =?utf-8?B?RThFWmY1b3hjQTdWNC9XVzJYZEI5WndyaEtSVFJFRm9KU1BuWmNwbXRsdlA3?=
- =?utf-8?B?KzJFcGlqNW1LR1htZ3FBaTFnK3NaalgxWFpFMEF4OTRmbHhSc0RNZG5Wb2ZQ?=
- =?utf-8?B?dVZTYWk4akFFYXhsYlFnN08rZDBSVUdEdTkzaU95RStpcldTWVBvNDdvOHVj?=
- =?utf-8?B?WEs0b1o2ZlRsSnNyMW5qM09jMU5UaVhDRi9KZEIyR0NYUVBISGFQR2lFaWlu?=
- =?utf-8?B?QVExZ0JuVFpSVllwbVZtbThHdHZwYTdNZXdrRGV3NTVYOVRiUW0xdUhBaUJ2?=
- =?utf-8?B?YkJvd3VXUy9pTDFJTG91Z3ZvWiswNGM4eTE2QWxaTC9RM0cwNkVyUEhVZG5J?=
- =?utf-8?B?N2VCRnhFaUNZd1ExRDRldUNFZ1RURzljNDRaUGhtN2VpOW9lNUdzaDVwT0VD?=
- =?utf-8?B?Y1pVZWhFR3NkNHBndlNuWUVLaU5ZOHdVNFB5VnVZeXpQdUQxNEFDWkxSWWtl?=
- =?utf-8?B?SnZYcHlkWHJHSWdtT3RmZCswM3lMK25nTjNGckhFMUZVUEpsUXlyQ0NyUWM2?=
- =?utf-8?B?d0hGdFZhek1ieFB2YXlHbk10dGNrUUF0cGJhUVVMMEcvR1pqNDQ2RUMwTm1m?=
- =?utf-8?B?SDdURW5WdmhPdHkrMmU3RmFIOHBUSkN0Y1JnZXdPWFFnR2JvOENYMGc3ZkNT?=
- =?utf-8?B?dysvNDVSRFdDSmJ3dWtSemlCaTQ2WGxaZTlUMnJyeFozdWx6dXlkZGFXelNO?=
- =?utf-8?B?UW15d2hPSkd4TVdXQVdzUlZRN0ZzWldXbGZSWTMwekpBbnd1Skd4dUdsbEE1?=
- =?utf-8?B?ZDR6dWNWWjVpNEZtRlZPaXZGMmpRWVRSZG5DQWJSRzhTdXlwNkR2enlhdm52?=
- =?utf-8?B?OVJxU214RGh3SXdMbCtFZG5mVzRCOE8wUXZtQVprM3k0SWNNUVZQUlpmdGlX?=
- =?utf-8?B?UmozZTB1MmRFeGlsOGpVRCtBWnNHcld1L1RGSFkxeERWY2FYWEJQcm50M2Jz?=
- =?utf-8?B?TkYySjIva1p1MmhWYTNEMjdicEwzTE5wRzVQaG1ya1oxMDdHMU8rVDhrK1hs?=
- =?utf-8?B?cWVjOTNSVEtHbHVhOEMvUTJYeXEweGplMnVWZDNuNDN0eDFscFZZTEdyY3Nn?=
- =?utf-8?B?TTV0YmNCeE43cnhWWHZYYkw4clJ2MWo0M1owcEpEM0JPVXArbHR3T043Ukhh?=
- =?utf-8?B?aUh4NGhLWmNFMk1iTW1oK0hTR0gveVpGbEppZHFtV0JvN3JhVjNhWkpwNTF0?=
- =?utf-8?B?SjJzV2lOYXk2dC9RT3VveUlKQnNuQUZHQ01iWkx6eTVEY0d5d1dIRVBMdzVE?=
- =?utf-8?B?WXQxaVhHcVZEVmtUSHF5clNZOHE3MUh3TFFZRDl3S05oRFh1Qis3ZGJHOXZD?=
- =?utf-8?B?bHFrcVlpSytLQVhqZVk2WWduT295cnAxcHVDMmF6RmN1MnZMelM3dnAzTWNN?=
- =?utf-8?B?Ti9oQVFKbmJOYU5PVTEvUjgwR1EzSndueXRWRkJiMS80TmpkckV0UGJBYkZs?=
- =?utf-8?B?S29CZE42bHpmSmZ5YnVJQWg5bGVwS0tEb3owK1JNZzRMNlFxVW1JcGVGTGEy?=
- =?utf-8?B?T05pQ3VSZjdSdTZPMDFYWmtxbXBCY0dJNTNPSXFHc3Y0cEhIcTVzVkoyd0lV?=
- =?utf-8?Q?QMgAAqpsD2DJkVQd7ekoHC7BP?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9d52fcc-67c1-461f-6d16-08dd4c86fc0e
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 23:34:39.6330
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gjRsxLwnIRbi2GFRlSbVFkPl8cmbsB/NADV8PmDWo4QyzMLAIIu36MCwlH4CMYXzzLZRDX8E3XWUlzEzVpz6nA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4208
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250213233828.2044016-1-jeroendb@google.com>
+Subject: [PATCH net-next v3] gve: Add RSS cache for non RSS device option scenario
+From: Jeroen de Borst <jeroendb@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, jeroendb@google.com, andrew+netdev@lunn.ch, 
+	willemb@google.com, horms@kernel.org, Ziwei Xiao <ziweixiao@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/12/2025 5:02 PM, Dave Jiang wrote:
-> 
-> On 2/11/25 4:48 PM, Shannon Nelson wrote:
->> From: Brett Creeley <brett.creeley@amd.com>
->>
->> The pds_fwctl driver doesn't know what RPC operations are available
->> in the firmware, so also doesn't know what scope they might have.  The
->> userland utility supplies the firmware "endpoint" and "operation" id values
->> and this driver queries the firmware for endpoints and their available
->> operations.  The operation descriptions include the scope information
->> which the driver uses for scope testing.
->>
->> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
->> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
->> ---
->>   drivers/fwctl/pds/main.c       | 369 ++++++++++++++++++++++++++++++++-
->>   include/linux/pds/pds_adminq.h | 187 +++++++++++++++++
->>   include/uapi/fwctl/pds.h       |  16 ++
->>   3 files changed, 569 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/fwctl/pds/main.c b/drivers/fwctl/pds/main.c
->> index 24979fe0deea..b60a66ef1fac 100644
->> --- a/drivers/fwctl/pds/main.c
->> +++ b/drivers/fwctl/pds/main.c
->> @@ -15,12 +15,22 @@
->>   #include <linux/pds/pds_adminq.h>
->>   #include <linux/pds/pds_auxbus.h>
->>
->> +DEFINE_FREE(kfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T));
->> +DEFINE_FREE(kvfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kvfree(_T));
->> +
->>   struct pdsfc_uctx {
->>        struct fwctl_uctx uctx;
->>        u32 uctx_caps;
->>        u32 uctx_uid;
->>   };
->>
->> +struct pdsfc_rpc_endpoint_info {
->> +     u32 endpoint;
->> +     dma_addr_t operations_pa;
->> +     struct pds_fwctl_query_data *operations;
->> +     struct mutex lock;      /* lock for endpoint info management */
->> +};
->> +
->>   struct pdsfc_dev {
->>        struct fwctl_device fwctl;
->>        struct pds_auxiliary_dev *padev;
->> @@ -28,6 +38,9 @@ struct pdsfc_dev {
->>        u32 caps;
->>        dma_addr_t ident_pa;
->>        struct pds_fwctl_ident *ident;
->> +     dma_addr_t endpoints_pa;
->> +     struct pds_fwctl_query_data *endpoints;
->> +     struct pdsfc_rpc_endpoint_info *endpoint_info;
->>   };
->>   DEFINE_FREE(pdsfc_dev, struct pdsfc_dev *, if (_T) fwctl_put(&_T->fwctl));
->>
->> @@ -112,10 +125,351 @@ static int pdsfc_identify(struct pdsfc_dev *pdsfc)
->>        return 0;
->>   }
->>
->> +static void pdsfc_free_endpoints(struct pdsfc_dev *pdsfc)
->> +{
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +
->> +     if (pdsfc->endpoints) {
->> +             int i;
->> +
->> +             for (i = 0; pdsfc->endpoint_info && i < pdsfc->endpoints->num_entries; i++)
->> +                     mutex_destroy(&pdsfc->endpoint_info[i].lock);
->> +             vfree(pdsfc->endpoint_info);
->> +             pdsfc->endpoint_info = NULL;
->> +             dma_free_coherent(dev->parent, PAGE_SIZE,
->> +                               pdsfc->endpoints, pdsfc->endpoints_pa);
->> +             pdsfc->endpoints = NULL;
->> +             pdsfc->endpoints_pa = DMA_MAPPING_ERROR;
->> +     }
->> +}
->> +
->> +static void pdsfc_free_operations(struct pdsfc_dev *pdsfc)
->> +{
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     int i;
->> +
->> +     for (i = 0; i < pdsfc->endpoints->num_entries; i++) {
->> +             struct pdsfc_rpc_endpoint_info *ei = &pdsfc->endpoint_info[i];
->> +
->> +             if (ei->operations) {
->> +                     dma_free_coherent(dev->parent, PAGE_SIZE,
->> +                                       ei->operations, ei->operations_pa);
->> +                     ei->operations = NULL;
->> +                     ei->operations_pa = DMA_MAPPING_ERROR;
->> +             }
->> +     }
->> +}
->> +
->> +static struct pds_fwctl_query_data *pdsfc_get_endpoints(struct pdsfc_dev *pdsfc,
->> +                                                     dma_addr_t *pa)
->> +{
->> +     struct pds_fwctl_query_data_endpoint *entries = NULL;
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     union pds_core_adminq_comp comp = {0};
->> +     union pds_core_adminq_cmd cmd = {0};
->> +     struct pds_fwctl_query_data *data;
->> +     dma_addr_t data_pa;
->> +     int err;
->> +     int i;
->> +
->> +     data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
->> +     err = dma_mapping_error(dev, data_pa);
->> +     if (err) {
->> +             dev_err(dev, "Failed to map endpoint list\n");
->> +             return ERR_PTR(err);
->> +     }
->> +
->> +     cmd.fwctl_query.opcode = PDS_FWCTL_CMD_QUERY;
->> +     cmd.fwctl_query.entity = PDS_FWCTL_RPC_ROOT;
->> +     cmd.fwctl_query.version = 0;
->> +     cmd.fwctl_query.query_data_buf_len = cpu_to_le32(PAGE_SIZE);
->> +     cmd.fwctl_query.query_data_buf_pa = cpu_to_le64(data_pa);
->> +
->> +     dev_dbg(dev, "cmd: opcode %d entity %d version %d query_data_buf_len %d query_data_buf_pa %llx\n",
->> +             cmd.fwctl_query.opcode, cmd.fwctl_query.entity, cmd.fwctl_query.version,
->> +             le32_to_cpu(cmd.fwctl_query.query_data_buf_len),
->> +             le64_to_cpu(cmd.fwctl_query.query_data_buf_pa));
->> +
->> +     err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
->> +     if (err) {
->> +             dev_err(dev, "Failed to send adminq cmd opcode: %u entity: %u err: %d\n",
->> +                     cmd.fwctl_query.opcode, cmd.fwctl_query.entity, err);
->> +             dma_free_coherent(dev->parent, PAGE_SIZE, data, data_pa);
->> +             return ERR_PTR(err);
->> +     }
->> +
->> +     *pa = data_pa;
->> +
->> +     entries = (struct pds_fwctl_query_data_endpoint *)data->entries;
->> +     dev_dbg(dev, "num_entries %d\n", data->num_entries);
->> +     for (i = 0; i < data->num_entries; i++)
-> 
-> I think you need to convert num_entries from __le32 to host for the above 2 lines?
+From: Ziwei Xiao <ziweixiao@google.com>
 
-Hmm, I'll check that.
+Not all the devices have the capability for the driver to query for the
+registered RSS configuration. The driver can discover this by checking
+the relevant device option during setup. If it cannot, the driver needs
+to store the RSS config cache and directly return such cache when
+queried by the ethtool. RSS config is inited when driver probes. Also the
+default RSS config will be adjusted when there is RX queue count change.
 
-> 
->> +             dev_dbg(dev, "endpoint: id %d\n", entries[i].id);
->> +
->> +     return data;
->> +}
->> +
->> +static int pdsfc_init_endpoints(struct pdsfc_dev *pdsfc)
->> +{
->> +     struct pds_fwctl_query_data_endpoint *ep_entry;
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     int i;
->> +
->> +     pdsfc->endpoints = pdsfc_get_endpoints(pdsfc, &pdsfc->endpoints_pa);
->> +     if (IS_ERR(pdsfc->endpoints)) {
->> +             dev_err(dev, "Failed to query endpoints\n");
->> +             return PTR_ERR(pdsfc->endpoints);
->> +     }
->> +
->> +     pdsfc->endpoint_info = vcalloc(pdsfc->endpoints->num_entries,
->> +                                    sizeof(*pdsfc->endpoint_info));
->> +     if (!pdsfc->endpoint_info) {
->> +             dev_err(dev, "Failed to allocate endpoint_info array\n");
->> +             pdsfc_free_endpoints(pdsfc);
->> +             return -ENOMEM;
->> +     }
->> +
->> +     ep_entry = (struct pds_fwctl_query_data_endpoint *)pdsfc->endpoints->entries;
->> +     for (i = 0; i < pdsfc->endpoints->num_entries; i++) {
->> +             mutex_init(&pdsfc->endpoint_info[i].lock);
->> +             pdsfc->endpoint_info[i].endpoint = ep_entry[i].id;
->> +     }
->> +
->> +     return 0;
->> +}
->> +
->> +static struct pds_fwctl_query_data *pdsfc_get_operations(struct pdsfc_dev *pdsfc,
->> +                                                      dma_addr_t *pa, u32 ep)
->> +{
->> +     struct pds_fwctl_query_data_operation *entries = NULL;
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     union pds_core_adminq_comp comp = {0};
->> +     union pds_core_adminq_cmd cmd = {0};
->> +     struct pds_fwctl_query_data *data;
->> +     dma_addr_t data_pa;
->> +     int err;
->> +     int i;
->> +
->> +     /* Query the operations list for the given endpoint */
->> +     data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
->> +     err = dma_mapping_error(dev->parent, data_pa);
->> +     if (err) {
->> +             dev_err(dev, "Failed to map operations list\n");
->> +             return ERR_PTR(err);
->> +     }
->> +
->> +     cmd.fwctl_query.opcode = PDS_FWCTL_CMD_QUERY;
->> +     cmd.fwctl_query.entity = PDS_FWCTL_RPC_ENDPOINT;
->> +     cmd.fwctl_query.version = 0;
->> +     cmd.fwctl_query.query_data_buf_len = cpu_to_le32(PAGE_SIZE);
->> +     cmd.fwctl_query.query_data_buf_pa = cpu_to_le64(data_pa);
->> +     cmd.fwctl_query.ep = cpu_to_le32(ep);
->> +
->> +     err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
->> +     if (err) {
->> +             dev_err(dev, "Failed to send adminq cmd opcode: %u entity: %u err: %d\n",
->> +                     cmd.fwctl_query.opcode, cmd.fwctl_query.entity, err);
->> +             dma_free_coherent(dev->parent, PAGE_SIZE, data, data_pa);
->> +             return ERR_PTR(err);
->> +     }
->> +
->> +     *pa = data_pa;
->> +
->> +     entries = (struct pds_fwctl_query_data_operation *)data->entries;
->> +     dev_dbg(dev, "num_entries %d\n", data->num_entries);
->> +     for (i = 0; i < data->num_entries; i++)
->> +             dev_dbg(dev, "endpoint %d operation: id %x scope %d\n",
->> +                     ep, entries[i].id, entries[i].scope);
->> +
->> +     return data;
->> +}
->> +
->> +static int pdsfc_validate_rpc(struct pdsfc_dev *pdsfc,
->> +                           struct fwctl_rpc_pds *rpc,
->> +                           enum fwctl_rpc_scope scope)
->> +{
->> +     struct pds_fwctl_query_data_operation *op_entry = NULL;
->> +     struct pdsfc_rpc_endpoint_info *ep_info = NULL;
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     int i;
->> +
->> +     if (!pdsfc->ident) {
->> +             dev_err(dev, "Ident not available\n");
->> +             return -EINVAL;
->> +     }
->> +
->> +     /* validate rpc in_len & out_len based
->> +      * on ident->max_req_sz & max_resp_sz
->> +      */
->> +     if (rpc->in.len > pdsfc->ident->max_req_sz) {
->> +             dev_err(dev, "Invalid request size %u, max %u\n",
->> +                     rpc->in.len, pdsfc->ident->max_req_sz);
->> +             return -EINVAL;
->> +     }
->> +
->> +     if (rpc->out.len > pdsfc->ident->max_resp_sz) {
->> +             dev_err(dev, "Invalid response size %u, max %u\n",
->> +                     rpc->out.len, pdsfc->ident->max_resp_sz);
->> +             return -EINVAL;
->> +     }
->> +
->> +     for (i = 0; i < pdsfc->endpoints->num_entries; i++) {
->> +             if (pdsfc->endpoint_info[i].endpoint == rpc->in.ep) {
->> +                     ep_info = &pdsfc->endpoint_info[i];
->> +                     break;
->> +             }
->> +     }
->> +     if (!ep_info) {
->> +             dev_err(dev, "Invalid endpoint %d\n", rpc->in.ep);
->> +             return -EINVAL;
->> +     }
->> +
->> +     /* query and cache this endpoint's operations */
->> +     mutex_lock(&ep_info->lock);
->> +     if (!ep_info->operations) {
->> +             ep_info->operations = pdsfc_get_operations(pdsfc,
->> +                                                        &ep_info->operations_pa,
->> +                                                        rpc->in.ep);
->> +             if (!ep_info->operations) {
->> +                     mutex_unlock(&ep_info->lock);
->> +                     dev_err(dev, "Failed to allocate operations list\n");
->> +                     return -ENOMEM;
->> +             }
->> +     }
->> +     mutex_unlock(&ep_info->lock);
->> +
->> +     /* reject unsupported and/or out of scope commands */
->> +     op_entry = (struct pds_fwctl_query_data_operation *)ep_info->operations->entries;
->> +     for (i = 0; i < ep_info->operations->num_entries; i++) {
->> +             if (PDS_FWCTL_RPC_OPCODE_CMP(rpc->in.op, op_entry[i].id)) {
->> +                     if (scope < op_entry[i].scope)
->> +                             return -EPERM;
->> +                     return 0;
->> +             }
->> +     }
->> +
->> +     dev_err(dev, "Invalid operation %d for endpoint %d\n", rpc->in.op, rpc->in.ep);
->> +
->> +     return -EINVAL;
->> +}
->> +
->>   static void *pdsfc_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
->>                          void *in, size_t in_len, size_t *out_len)
->>   {
->> -     return NULL;
->> +     struct pdsfc_dev *pdsfc = container_of(uctx->fwctl, struct pdsfc_dev, fwctl);
->> +     struct fwctl_rpc_pds *rpc = (struct fwctl_rpc_pds *)in;
->> +     void *out_payload __free(kfree_errptr) = NULL;
->> +     void *in_payload __free(kfree_errptr) = NULL;
-> 
-> __free(kfree) should work from kzalloc(). No need to define special macro.
+At this point, only keys of GVE_RSS_KEY_SIZE and indirection tables of
+GVE_RSS_INDIR_SIZE are supported.
 
-Sure
+Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+--
+Changes in v3:
+ - Initialize reset_rss to address the clang warning (Simon Horman)
+ - Free lut memory in error case of
+   gve_adminq_configure_rss (Kalesh Anakkur Purayil)
+ - Simplify gve_alloc_rss_config_cache (Kalesh Anakkur Purayi)
 
-> 
->> +     struct device *dev = &uctx->fwctl->dev;
->> +     union pds_core_adminq_comp comp = {0};
->> +     dma_addr_t out_payload_dma_addr = 0;
->> +     union pds_core_adminq_cmd cmd = {0};
->> +     dma_addr_t in_payload_dma_addr = 0;
->> +     void *out = NULL;
->> +     int err;
->> +
->> +     err = pdsfc_validate_rpc(pdsfc, rpc, scope);
->> +     if (err) {
->> +             dev_err(dev, "Invalid RPC request\n");
->> +             return ERR_PTR(err);
->> +     }
->> +
->> +     if (rpc->in.len > 0) {
->> +             in_payload = kzalloc(rpc->in.len, GFP_KERNEL);
->> +             if (!in_payload) {
->> +                     dev_err(dev, "Failed to allocate in_payload\n");
->> +                     out = ERR_PTR(-ENOMEM);
->> +                     goto done;
->> +             }
->> +
->> +             if (copy_from_user(in_payload, u64_to_user_ptr(rpc->in.payload),
->> +                                rpc->in.len)) {
->> +                     dev_err(dev, "Failed to copy in_payload from user\n");
->> +                     out = ERR_PTR(-EFAULT);
->> +                     goto done;
->> +             }
-> 
-> So the cleanup macros and gotos here make things a bit messy. But maybe you can define a transient struct:
-> struct payload {
->          void *data;
->          dma_addr_t dma;
->          size_t len;
->          struct device *dev;
->          enum dma_data_direction dir;
-> };
-> 
-> static inline void cleanup_payload(struct payload *payload)
-> {
->          dma_unmap_single(payload->dev, payload->dma, payload->len, payload->dir);
->          kfree(payload->data);
->          kfree(payload);
-> }
-> DEFINE_FREE(free_payload, struct payload *, if (_T) cleanup_payload(_T));
-> 
-> static struct payload *alloc_payload(struct device *dev, size_t len, enum dma_data_direction dir)
-> {
->          dma_addr_t dma;
->          int err;
-> 
->          struct payload *p __free(kfree) = kzalloc(sizeof(*p), GFP_KERNEL);
->          if (!p)
->                  return NULL;
-> 
->          void *data __free(kfree) = kzalloc(len, GFP_KERNEL);
->          if (!data)
->                  return NULL;
-> 
->          dma = dma_map_single(dev, data, len, dir);
->          err = dma_mapping_error(dev, dma);
->          if (err)
->                  return NULL;
-> 
->          p->dma = dma;
->          p->len = len;
->          p->dir = dir;
->          p->data = no_free_ptr(data);
-> 
->          return no_free_ptr(p);
-> }
-> 
-> With that you can use __free() cleanly and then when your rpc function exits, it'll unmap and free everything automatically.
-> 
-> struct payload *p __free(free_payload) = alloc_payload(...);
-> 
-> Just a thought....
+Changes in v2:
+ - Change to initialize RSS config when the driver is up instead of
+   doing that when the user setting the RSS (Jakub Kicinski)
+ - Use NL_SET_ERR_MSG_MOD to log errors when there is extack
+   available (Jakub Kicinski)
+ - Use ethtool_rxfh_indir_default to set default RSS indir
+   table (Jakub Kicinski)
+ - Adjust the default RSS config when there is RX queue count change to
+   ensure the default RSS config is correct
 
-Thanks, I'll look at that.
+ drivers/net/ethernet/google/gve/gve.h         | 16 +++-
+ drivers/net/ethernet/google/gve/gve_adminq.c  | 66 +++++++++++---
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 60 +++++++++++--
+ drivers/net/ethernet/google/gve/gve_main.c    | 86 ++++++++++++++++++-
+ 4 files changed, 205 insertions(+), 23 deletions(-)
 
-
-> 
->> +
->> +             in_payload_dma_addr = dma_map_single(dev->parent, in_payload,
->> +                                                  rpc->in.len, DMA_TO_DEVICE);
->> +             err = dma_mapping_error(dev->parent, in_payload_dma_addr);
->> +             if (err) {
->> +                     dev_err(dev, "Failed to map in_payload\n");
->> +                     out = ERR_PTR(err);
->> +                     goto done;
->> +             }
->> +     }
->> +
->> +     if (rpc->out.len > 0) {
->> +             out_payload = kzalloc(rpc->out.len, GFP_KERNEL);
->> +             if (!out_payload) {
->> +                     dev_err(dev, "Failed to allocate out_payload\n");
->> +                     out = ERR_PTR(-ENOMEM);
->> +                     goto done;
->> +             }
->> +
->> +             out_payload_dma_addr = dma_map_single(dev->parent, out_payload,
->> +                                                   rpc->out.len, DMA_FROM_DEVICE);
->> +             err = dma_mapping_error(dev->parent, out_payload_dma_addr);
->> +             if (err) {
->> +                     dev_err(dev, "Failed to map out_payload\n");
->> +                     out = ERR_PTR(err);
->> +                     goto done;
->> +             }
->> +     }
->> +
->> +     cmd.fwctl_rpc.opcode = PDS_FWCTL_CMD_RPC;
->> +     cmd.fwctl_rpc.flags = PDS_FWCTL_RPC_IND_REQ | PDS_FWCTL_RPC_IND_RESP;
->> +     cmd.fwctl_rpc.ep = cpu_to_le32(rpc->in.ep);
->> +     cmd.fwctl_rpc.op = cpu_to_le32(rpc->in.op);
->> +     cmd.fwctl_rpc.req_pa = cpu_to_le64(in_payload_dma_addr);
->> +     cmd.fwctl_rpc.req_sz = cpu_to_le32(rpc->in.len);
->> +     cmd.fwctl_rpc.resp_pa = cpu_to_le64(out_payload_dma_addr);
->> +     cmd.fwctl_rpc.resp_sz = cpu_to_le32(rpc->out.len);
->> +
->> +     dev_dbg(dev, "%s: ep %d op %x req_pa %llx req_sz %d req_sg %d resp_pa %llx resp_sz %d resp_sg %d\n",
->> +             __func__, rpc->in.ep, rpc->in.op,
->> +             cmd.fwctl_rpc.req_pa, cmd.fwctl_rpc.req_sz, cmd.fwctl_rpc.req_sg_elems,
->> +             cmd.fwctl_rpc.resp_pa, cmd.fwctl_rpc.resp_sz, cmd.fwctl_rpc.resp_sg_elems);
->> +
->> +     dynamic_hex_dump("in ", DUMP_PREFIX_OFFSET, 16, 1, in_payload, rpc->in.len, true);
->> +
->> +     err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
->> +     if (err) {
->> +             dev_err(dev, "%s: ep %d op %x req_pa %llx req_sz %d req_sg %d resp_pa %llx resp_sz %d resp_sg %d err %d\n",
->> +                     __func__, rpc->in.ep, rpc->in.op,
->> +                     cmd.fwctl_rpc.req_pa, cmd.fwctl_rpc.req_sz, cmd.fwctl_rpc.req_sg_elems,
->> +                     cmd.fwctl_rpc.resp_pa, cmd.fwctl_rpc.resp_sz, cmd.fwctl_rpc.resp_sg_elems,
->> +                     err);
->> +             out = ERR_PTR(err);
->> +             goto done;
->> +     }
->> +
->> +     dynamic_hex_dump("out ", DUMP_PREFIX_OFFSET, 16, 1, out_payload, rpc->out.len, true);
->> +
->> +     dev_dbg(dev, "%s: status %d comp_index %d err %d resp_sz %d color %d\n",
->> +             __func__, comp.fwctl_rpc.status, comp.fwctl_rpc.comp_index,
->> +             comp.fwctl_rpc.err, comp.fwctl_rpc.resp_sz,
->> +             comp.fwctl_rpc.color);
->> +
->> +     if (copy_to_user(u64_to_user_ptr(rpc->out.payload), out_payload, rpc->out.len)) {
->> +             dev_err(dev, "Failed to copy out_payload to user\n");
->> +             out = ERR_PTR(-EFAULT);
->> +             goto done;
->> +     }
->> +
->> +     rpc->out.retval = le32_to_cpu(comp.fwctl_rpc.err);
->> +     *out_len = in_len;
->> +     out = in;
->> +
->> +done:
->> +     if (in_payload_dma_addr)
->> +             dma_unmap_single(dev->parent, in_payload_dma_addr,
->> +                              rpc->in.len, DMA_TO_DEVICE);
->> +
->> +     if (out_payload_dma_addr)
->> +             dma_unmap_single(dev->parent, out_payload_dma_addr,
->> +                              rpc->out.len, DMA_FROM_DEVICE);
->> +
->> +     return out;
->>   }
->>
->>   static const struct fwctl_ops pdsfc_ops = {
->> @@ -150,16 +504,23 @@ static int pdsfc_probe(struct auxiliary_device *adev,
->>                return err;
->>        }
->>
->> +     err = pdsfc_init_endpoints(pdsfc);
->> +     if (err) {
->> +             dev_err(dev, "Failed to init endpoints, err %d\n", err);
->> +             goto free_ident;
->> +     }
->> +
->>        err = fwctl_register(&pdsfc->fwctl);
->>        if (err) {
->>                dev_err(dev, "Failed to register device, err %d\n", err);
->> -             return err;
->> +             goto free_endpoints;
->>        }
->> -
->>        auxiliary_set_drvdata(adev, no_free_ptr(pdsfc));
->>
->>        return 0;
->>
->> +free_endpoints:
->> +     pdsfc_free_endpoints(pdsfc);
->>   free_ident:
->>        pdsfc_free_ident(pdsfc);
->>        return err;
->> @@ -170,6 +531,8 @@ static void pdsfc_remove(struct auxiliary_device *adev)
->>        struct pdsfc_dev *pdsfc  __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
->>
->>        fwctl_unregister(&pdsfc->fwctl);
->> +     pdsfc_free_operations(pdsfc);
->> +     pdsfc_free_endpoints(pdsfc);
->>        pdsfc_free_ident(pdsfc);
->>   }
->>
->> diff --git a/include/linux/pds/pds_adminq.h b/include/linux/pds/pds_adminq.h
->> index 7fc353b63353..33cd03388b15 100644
->> --- a/include/linux/pds/pds_adminq.h
->> +++ b/include/linux/pds/pds_adminq.h
->> @@ -1181,6 +1181,8 @@ struct pds_lm_host_vf_status_cmd {
->>
->>   enum pds_fwctl_cmd_opcode {
->>        PDS_FWCTL_CMD_IDENT             = 70,
->> +     PDS_FWCTL_CMD_RPC               = 71,
->> +     PDS_FWCTL_CMD_QUERY             = 72,
->>   };
->>
->>   /**
->> @@ -1251,6 +1253,187 @@ struct pds_fwctl_ident {
->>        u8     max_resp_sg_elems;
->>   } __packed;
->>
->> +enum pds_fwctl_query_entity {
->> +     PDS_FWCTL_RPC_ROOT      = 0,
->> +     PDS_FWCTL_RPC_ENDPOINT  = 1,
->> +     PDS_FWCTL_RPC_OPERATION = 2,
->> +};
->> +
->> +#define PDS_FWCTL_RPC_OPCODE_CMD_SHIFT       0
->> +#define PDS_FWCTL_RPC_OPCODE_CMD_MASK        GENMASK(15, PDS_FWCTL_RPC_OPCODE_CMD_SHIFT)
->> +#define PDS_FWCTL_RPC_OPCODE_VER_SHIFT       16
->> +#define PDS_FWCTL_RPC_OPCODE_VER_MASK        GENMASK(23, PDS_FWCTL_RPC_OPCODE_VER_SHIFT)
->> +
->> +#define PDS_FWCTL_RPC_OPCODE_GET_CMD(op)     \
->> +     (((op) & PDS_FWCTL_RPC_OPCODE_CMD_MASK) >> PDS_FWCTL_RPC_OPCODE_CMD_SHIFT)
->> +#define PDS_FWCTL_RPC_OPCODE_GET_VER(op)     \
->> +     (((op) & PDS_FWCTL_RPC_OPCODE_VER_MASK) >> PDS_FWCTL_RPC_OPCODE_VER_SHIFT)
->> +
->> +#define PDS_FWCTL_RPC_OPCODE_CMP(op1, op2) \
->> +     (PDS_FWCTL_RPC_OPCODE_GET_CMD(op1) == PDS_FWCTL_RPC_OPCODE_GET_CMD(op2) && \
->> +      PDS_FWCTL_RPC_OPCODE_GET_VER(op1) <= PDS_FWCTL_RPC_OPCODE_GET_VER(op2))
->> +
->> +/**
->> + * struct pds_fwctl_query_cmd - Firmware control query command structure
->> + * @opcode: Operation code for the command
->> + * @entity:  Entity type to query (enum pds_fwctl_query_entity)
->> + * @version: Version of the query data structure supported by the driver
->> + * @rsvd:    Word boundary padding
->> + * @query_data_buf_len: Length of the query data buffer
->> + * @query_data_buf_pa:  Physical address of the query data buffer
->> + * @ep:      Endpoint identifier to query  (when entity is PDS_FWCTL_RPC_ENDPOINT)
->> + * @op:      Operation identifier to query (when entity is PDS_FWCTL_RPC_OPERATION)
->> + *
->> + * This structure is used to send a query command to the firmware control
->> + * interface. The structure is packed to ensure there is no padding between
->> + * the fields.
->> + */
->> +struct pds_fwctl_query_cmd {
->> +     u8     opcode;
->> +     u8     entity;
->> +     u8     version;
->> +     u8     rsvd;
->> +     __le32 query_data_buf_len;
->> +     __le64 query_data_buf_pa;
->> +     union {
->> +             __le32 ep;
->> +             __le32 op;
->> +     };
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_query_comp - Firmware control query completion structure
->> + * @status:     Status of the query command
->> + * @rsvd:       Word boundary padding
->> + * @comp_index: Completion index in little-endian format
->> + * @version:    Version of the query data structure returned by firmware. This
->> + *            should be less than or equal to the version supported by the driver.
->> + * @rsvd2:      Word boundary padding
->> + * @color:      Color bit indicating the state of the completion
->> + */
->> +struct pds_fwctl_query_comp {
->> +     u8     status;
->> +     u8     rsvd;
->> +     __le16 comp_index;
->> +     u8     version;
->> +     u8     rsvd2[2];
->> +     u8     color;
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_query_data_endpoint - query data for entity PDS_FWCTL_RPC_ROOT
->> + * @id: The identifier for the data endpoint.
->> + */
->> +struct pds_fwctl_query_data_endpoint {
->> +     __le32 id;
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_query_data_operation - query data for entity PDS_FWCTL_RPC_ENDPOINT
->> + * @id:    Operation identifier.
->> + * @scope: Scope of the operation (enum fwctl_rpc_scope).
->> + * @rsvd:  Word boundary padding
->> + */
->> +struct pds_fwctl_query_data_operation {
->> +     __le32 id;
->> +     u8     scope;
->> +     u8     rsvd[3];
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_query_data - query data structure
->> + * @version:     Version of the query data structure
->> + * @rsvd:        Word boundary padding
->> + * @num_entries: Number of entries in the union
->> + * @entries:     Array of query data entries, depending on the entity type.
->> + */
->> +struct pds_fwctl_query_data {
->> +     u8      version;
->> +     u8      rsvd[3];
->> +     __le32  num_entries;
->> +     uint8_t entries[];
-> Why u8 above but uint8_t here?
-> 
-> u8 entries[] __counted_by_le(num_entries);
-
-Jonathan caught that as well - thanks.
-sln
-
-> 
-> DJ
-> 
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_rpc_cmd - Firmware control RPC command.
->> + * @opcode:        opcode PDS_FWCTL_CMD_RPC
->> + * @rsvd:          Word boundary padding
->> + * @flags:         Indicates indirect request and/or response handling
->> + * @ep:            Endpoint identifier.
->> + * @op:            Operation identifier.
->> + * @inline_req0:   Buffer for inline request
->> + * @inline_req1:   Buffer for inline request
->> + * @req_pa:        Physical address of request data.
->> + * @req_sz:        Size of the request.
->> + * @req_sg_elems:  Number of request SGs
->> + * @req_rsvd:      Word boundary padding
->> + * @inline_req2:   Buffer for inline request
->> + * @resp_pa:       Physical address of response data.
->> + * @resp_sz:       Size of the response.
->> + * @resp_sg_elems: Number of response SGs
->> + * @resp_rsvd:     Word boundary padding
->> + */
->> +struct pds_fwctl_rpc_cmd {
->> +     u8     opcode;
->> +     u8     rsvd;
->> +     __le16 flags;
->> +#define PDS_FWCTL_RPC_IND_REQ                0x1
->> +#define PDS_FWCTL_RPC_IND_RESP               0x2
->> +     __le32 ep;
->> +     __le32 op;
->> +     u8 inline_req0[16];
->> +     union {
->> +             u8 inline_req1[16];
->> +             struct {
->> +                     __le64 req_pa;
->> +                     __le32 req_sz;
->> +                     u8     req_sg_elems;
->> +                     u8     req_rsvd[3];
->> +             };
->> +     };
->> +     union {
->> +             u8 inline_req2[16];
->> +             struct {
->> +                     __le64 resp_pa;
->> +                     __le32 resp_sz;
->> +                     u8     resp_sg_elems;
->> +                     u8     resp_rsvd[3];
->> +             };
->> +     };
->> +} __packed;
->> +
->> +/**
->> + * struct pds_sg_elem - Transmit scatter-gather (SG) descriptor element
->> + * @addr:    DMA address of SG element data buffer
->> + * @len:     Length of SG element data buffer, in bytes
->> + * @rsvd:    Word boundary padding
->> + */
->> +struct pds_sg_elem {
->> +     __le64 addr;
->> +     __le32 len;
->> +     __le16 rsvd[2];
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_rpc_comp - Completion of a firmware control RPC.
->> + * @status:     Status of the command
->> + * @rsvd:       Word boundary padding
->> + * @comp_index: Completion index of the command
->> + * @err:        Error code, if any, from the RPC.
->> + * @resp_sz:    Size of the response.
->> + * @rsvd2:      Word boundary padding
->> + * @color:      Color bit indicating the state of the completion.
->> + */
->> +struct pds_fwctl_rpc_comp {
->> +     u8     status;
->> +     u8     rsvd;
->> +     __le16 comp_index;
->> +     __le32 err;
->> +     __le32 resp_sz;
->> +     u8     rsvd2[3];
->> +     u8     color;
->> +} __packed;
->> +
->>   union pds_core_adminq_cmd {
->>        u8     opcode;
->>        u8     bytes[64];
->> @@ -1291,6 +1474,8 @@ union pds_core_adminq_cmd {
->>
->>        struct pds_fwctl_cmd              fwctl;
->>        struct pds_fwctl_ident_cmd        fwctl_ident;
->> +     struct pds_fwctl_rpc_cmd          fwctl_rpc;
->> +     struct pds_fwctl_query_cmd        fwctl_query;
->>   };
->>
->>   union pds_core_adminq_comp {
->> @@ -1320,6 +1505,8 @@ union pds_core_adminq_comp {
->>        struct pds_lm_dirty_status_comp   lm_dirty_status;
->>
->>        struct pds_fwctl_comp             fwctl;
->> +     struct pds_fwctl_rpc_comp         fwctl_rpc;
->> +     struct pds_fwctl_query_comp       fwctl_query;
->>   };
->>
->>   #ifndef __CHECKER__
->> diff --git a/include/uapi/fwctl/pds.h b/include/uapi/fwctl/pds.h
->> index a01b032cbdb1..da6cd2d1c6fa 100644
->> --- a/include/uapi/fwctl/pds.h
->> +++ b/include/uapi/fwctl/pds.h
->> @@ -24,4 +24,20 @@ enum pds_fwctl_capabilities {
->>        PDS_FWCTL_QUERY_CAP = 0,
->>        PDS_FWCTL_SEND_CAP,
->>   };
->> +
->> +struct fwctl_rpc_pds {
->> +     struct {
->> +             __u32 op;
->> +             __u32 ep;
->> +             __u32 rsvd;
->> +             __u32 len;
->> +             __u64 payload;
->> +     } in;
->> +     struct {
->> +             __u32 retval;
->> +             __u32 rsvd[2];
->> +             __u32 len;
->> +             __u64 payload;
->> +     } out;
->> +};
->>   #endif /* _UAPI_FWCTL_PDS_H_ */
-> 
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 8167cc5fb0df..8e1e706c6f5e 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -68,6 +68,9 @@
+ #define GVE_FLOW_RULE_IDS_CACHE_SIZE \
+ 	(GVE_ADMINQ_BUFFER_SIZE / sizeof(((struct gve_adminq_queried_flow_rule *)0)->location))
+ 
++#define GVE_RSS_KEY_SIZE	40
++#define GVE_RSS_INDIR_SIZE	128
++
+ #define GVE_XDP_ACTIONS 5
+ 
+ #define GVE_GQ_TX_MIN_PKT_DESC_BYTES 182
+@@ -672,6 +675,7 @@ struct gve_rx_alloc_rings_cfg {
+ 	u16 packet_buffer_size;
+ 	bool raw_addressing;
+ 	bool enable_header_split;
++	bool reset_rss;
+ 
+ 	/* Allocated resources are returned here */
+ 	struct gve_rx_ring *rx;
+@@ -722,6 +726,11 @@ struct gve_flow_rules_cache {
+ 	u32 rule_ids_cache_num;
+ };
+ 
++struct gve_rss_config {
++	u8 *hash_key;
++	u32 *hash_lut;
++};
++
+ struct gve_priv {
+ 	struct net_device *dev;
+ 	struct gve_tx_ring *tx; /* array of tx_cfg.num_queues */
+@@ -842,6 +851,8 @@ struct gve_priv {
+ 
+ 	u16 rss_key_size;
+ 	u16 rss_lut_size;
++	bool cache_rss_config;
++	struct gve_rss_config rss_config;
+ };
+ 
+ enum gve_service_task_flags_bit {
+@@ -1210,13 +1221,16 @@ int gve_adjust_config(struct gve_priv *priv,
+ 		      struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
+ int gve_adjust_queues(struct gve_priv *priv,
+ 		      struct gve_queue_config new_rx_config,
+-		      struct gve_queue_config new_tx_config);
++		      struct gve_queue_config new_tx_config,
++		      bool reset_rss);
+ /* flow steering rule */
+ int gve_get_flow_rule_entry(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
+ int gve_get_flow_rule_ids(struct gve_priv *priv, struct ethtool_rxnfc *cmd, u32 *rule_locs);
+ int gve_add_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
+ int gve_del_flow_rule(struct gve_priv *priv, struct ethtool_rxnfc *cmd);
+ int gve_flow_rules_reset(struct gve_priv *priv);
++/* RSS config */
++int gve_init_rss_config(struct gve_priv *priv, u16 num_queues);
+ /* report stats handling */
+ void gve_handle_report_stats(struct gve_priv *priv);
+ /* exported by ethtool.c */
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+index aa7d723011d0..be7a423e5ab9 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.c
++++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+@@ -885,6 +885,15 @@ static void gve_set_default_desc_cnt(struct gve_priv *priv,
+ 	priv->min_rx_desc_cnt = priv->rx_desc_cnt;
+ }
+ 
++static void gve_set_default_rss_sizes(struct gve_priv *priv)
++{
++	if (!gve_is_gqi(priv)) {
++		priv->rss_key_size = GVE_RSS_KEY_SIZE;
++		priv->rss_lut_size = GVE_RSS_INDIR_SIZE;
++		priv->cache_rss_config = true;
++	}
++}
++
+ static void gve_enable_supported_features(struct gve_priv *priv,
+ 					  u32 supported_features_mask,
+ 					  const struct gve_device_option_jumbo_frames
+@@ -968,6 +977,10 @@ static void gve_enable_supported_features(struct gve_priv *priv,
+ 			be16_to_cpu(dev_op_rss_config->hash_key_size);
+ 		priv->rss_lut_size =
+ 			be16_to_cpu(dev_op_rss_config->hash_lut_size);
++		priv->cache_rss_config = false;
++		dev_dbg(&priv->pdev->dev,
++			"RSS device option enabled with key size of %u, lut size of %u.\n",
++			priv->rss_key_size, priv->rss_lut_size);
+ 	}
+ }
+ 
+@@ -1052,6 +1065,8 @@ int gve_adminq_describe_device(struct gve_priv *priv)
+ 	/* set default descriptor counts */
+ 	gve_set_default_desc_cnt(priv, descriptor);
+ 
++	gve_set_default_rss_sizes(priv);
++
+ 	/* DQO supports LRO. */
+ 	if (!gve_is_gqi(priv))
+ 		priv->dev->hw_features |= NETIF_F_LRO;
+@@ -1276,8 +1291,9 @@ int gve_adminq_reset_flow_rules(struct gve_priv *priv)
+ 
+ int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *rxfh)
+ {
++	const u32 *hash_lut_to_config = NULL;
++	const u8 *hash_key_to_config = NULL;
+ 	dma_addr_t lut_bus = 0, key_bus = 0;
+-	u16 key_size = 0, lut_size = 0;
+ 	union gve_adminq_command cmd;
+ 	__be32 *lut = NULL;
+ 	u8 hash_alg = 0;
+@@ -1287,7 +1303,7 @@ int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *r
+ 
+ 	switch (rxfh->hfunc) {
+ 	case ETH_RSS_HASH_NO_CHANGE:
+-		break;
++		fallthrough;
+ 	case ETH_RSS_HASH_TOP:
+ 		hash_alg = ETH_RSS_HASH_TOP;
+ 		break;
+@@ -1296,27 +1312,46 @@ int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *r
+ 	}
+ 
+ 	if (rxfh->indir) {
+-		lut_size = priv->rss_lut_size;
++		if (rxfh->indir_size != priv->rss_lut_size)
++			return -EINVAL;
++
++		hash_lut_to_config = rxfh->indir;
++	} else if (priv->cache_rss_config) {
++		hash_lut_to_config = priv->rss_config.hash_lut;
++	}
++
++	if (hash_lut_to_config) {
+ 		lut = dma_alloc_coherent(&priv->pdev->dev,
+-					 lut_size * sizeof(*lut),
++					 priv->rss_lut_size * sizeof(*lut),
+ 					 &lut_bus, GFP_KERNEL);
+ 		if (!lut)
+ 			return -ENOMEM;
+ 
+ 		for (i = 0; i < priv->rss_lut_size; i++)
+-			lut[i] = cpu_to_be32(rxfh->indir[i]);
++			lut[i] = cpu_to_be32(hash_lut_to_config[i]);
+ 	}
+ 
+ 	if (rxfh->key) {
+-		key_size = priv->rss_key_size;
++		if (rxfh->key_size != priv->rss_key_size) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		hash_key_to_config = rxfh->key;
++	} else if (priv->cache_rss_config) {
++		hash_key_to_config = priv->rss_config.hash_key;
++	}
++
++	if (hash_key_to_config) {
+ 		key = dma_alloc_coherent(&priv->pdev->dev,
+-					 key_size, &key_bus, GFP_KERNEL);
++					 priv->rss_key_size,
++					 &key_bus, GFP_KERNEL);
+ 		if (!key) {
+ 			err = -ENOMEM;
+ 			goto out;
+ 		}
+ 
+-		memcpy(key, rxfh->key, key_size);
++		memcpy(key, hash_key_to_config, priv->rss_key_size);
+ 	}
+ 
+ 	/* Zero-valued fields in the cmd.configure_rss instruct the device to
+@@ -1330,8 +1365,10 @@ int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *r
+ 					  BIT(GVE_RSS_HASH_TCPV6) |
+ 					  BIT(GVE_RSS_HASH_UDPV6)),
+ 		.hash_alg = hash_alg,
+-		.hash_key_size = cpu_to_be16(key_size),
+-		.hash_lut_size = cpu_to_be16(lut_size),
++		.hash_key_size =
++			cpu_to_be16((key_bus) ? priv->rss_key_size : 0),
++		.hash_lut_size =
++			cpu_to_be16((lut_bus) ? priv->rss_lut_size : 0),
+ 		.hash_key_addr = cpu_to_be64(key_bus),
+ 		.hash_lut_addr = cpu_to_be64(lut_bus),
+ 	};
+@@ -1341,11 +1378,11 @@ int gve_adminq_configure_rss(struct gve_priv *priv, struct ethtool_rxfh_param *r
+ out:
+ 	if (lut)
+ 		dma_free_coherent(&priv->pdev->dev,
+-				  lut_size * sizeof(*lut),
++				  priv->rss_lut_size * sizeof(*lut),
+ 				  lut, lut_bus);
+ 	if (key)
+ 		dma_free_coherent(&priv->pdev->dev,
+-				  key_size, key, key_bus);
++				  priv->rss_key_size, key, key_bus);
+ 	return err;
+ }
+ 
+@@ -1449,12 +1486,15 @@ static int gve_adminq_process_rss_query(struct gve_priv *priv,
+ 	rxfh->hfunc = descriptor->hash_alg;
+ 
+ 	rss_info_addr = (void *)(descriptor + 1);
+-	if (rxfh->key)
++	if (rxfh->key) {
++		rxfh->key_size = priv->rss_key_size;
+ 		memcpy(rxfh->key, rss_info_addr, priv->rss_key_size);
++	}
+ 
+ 	rss_info_addr += priv->rss_key_size;
+ 	lut = (__be32 *)rss_info_addr;
+ 	if (rxfh->indir) {
++		rxfh->indir_size = priv->rss_lut_size;
+ 		for (i = 0; i < priv->rss_lut_size; i++)
+ 			rxfh->indir[i] = be32_to_cpu(lut[i]);
+ 	}
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index bdfc6e77b2af..ed3c7b19ee0d 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -482,6 +482,7 @@ static int gve_set_channels(struct net_device *netdev,
+ 	struct ethtool_channels old_settings;
+ 	int new_tx = cmd->tx_count;
+ 	int new_rx = cmd->rx_count;
++	bool reset_rss = false;
+ 
+ 	gve_get_channels(netdev, &old_settings);
+ 
+@@ -498,16 +499,14 @@ static int gve_set_channels(struct net_device *netdev,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (!netif_running(netdev)) {
+-		priv->tx_cfg.num_queues = new_tx;
+-		priv->rx_cfg.num_queues = new_rx;
+-		return 0;
+-	}
++	if (new_rx != priv->rx_cfg.num_queues &&
++	    priv->cache_rss_config && !netif_is_rxfh_configured(netdev))
++		reset_rss = true;
+ 
+ 	new_tx_cfg.num_queues = new_tx;
+ 	new_rx_cfg.num_queues = new_rx;
+ 
+-	return gve_adjust_queues(priv, new_rx_cfg, new_tx_cfg);
++	return gve_adjust_queues(priv, new_rx_cfg, new_tx_cfg, reset_rss);
+ }
+ 
+ static void gve_get_ringparam(struct net_device *netdev,
+@@ -855,6 +854,25 @@ static u32 gve_get_rxfh_indir_size(struct net_device *netdev)
+ 	return priv->rss_lut_size;
+ }
+ 
++static void gve_get_rss_config_cache(struct gve_priv *priv,
++				     struct ethtool_rxfh_param *rxfh)
++{
++	struct gve_rss_config *rss_config = &priv->rss_config;
++
++	rxfh->hfunc = ETH_RSS_HASH_TOP;
++
++	if (rxfh->key) {
++		rxfh->key_size = priv->rss_key_size;
++		memcpy(rxfh->key, rss_config->hash_key, priv->rss_key_size);
++	}
++
++	if (rxfh->indir) {
++		rxfh->indir_size = priv->rss_lut_size;
++		memcpy(rxfh->indir, rss_config->hash_lut,
++		       priv->rss_lut_size * sizeof(*rxfh->indir));
++	}
++}
++
+ static int gve_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
+ {
+ 	struct gve_priv *priv = netdev_priv(netdev);
+@@ -862,18 +880,46 @@ static int gve_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rx
+ 	if (!priv->rss_key_size || !priv->rss_lut_size)
+ 		return -EOPNOTSUPP;
+ 
++	if (priv->cache_rss_config) {
++		gve_get_rss_config_cache(priv, rxfh);
++		return 0;
++	}
++
+ 	return gve_adminq_query_rss_config(priv, rxfh);
+ }
+ 
++static void gve_set_rss_config_cache(struct gve_priv *priv,
++				     struct ethtool_rxfh_param *rxfh)
++{
++	struct gve_rss_config *rss_config = &priv->rss_config;
++
++	if (rxfh->key)
++		memcpy(rss_config->hash_key, rxfh->key, priv->rss_key_size);
++
++	if (rxfh->indir)
++		memcpy(rss_config->hash_lut, rxfh->indir,
++		       priv->rss_lut_size * sizeof(*rxfh->indir));
++}
++
+ static int gve_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
+ 			struct netlink_ext_ack *extack)
+ {
+ 	struct gve_priv *priv = netdev_priv(netdev);
++	int err;
+ 
+ 	if (!priv->rss_key_size || !priv->rss_lut_size)
+ 		return -EOPNOTSUPP;
+ 
+-	return gve_adminq_configure_rss(priv, rxfh);
++	err = gve_adminq_configure_rss(priv, rxfh);
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Fail to configure RSS config\n");
++		return err;
++	}
++
++	if (priv->cache_rss_config)
++		gve_set_rss_config_cache(priv, rxfh);
++
++	return 0;
+ }
+ 
+ const struct ethtool_ops gve_ethtool_ops = {
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 533e659b15b3..1be7fc076772 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -184,6 +184,43 @@ static void gve_free_flow_rule_caches(struct gve_priv *priv)
+ 	flow_rules_cache->rules_cache = NULL;
+ }
+ 
++static int gve_alloc_rss_config_cache(struct gve_priv *priv)
++{
++	struct gve_rss_config *rss_config = &priv->rss_config;
++
++	if (!priv->cache_rss_config)
++		return 0;
++
++	rss_config->hash_key = kcalloc(priv->rss_key_size,
++				       sizeof(rss_config->hash_key[0]),
++				       GFP_KERNEL);
++	if (!rss_config->hash_key)
++		return -ENOMEM;
++
++	rss_config->hash_lut = kcalloc(priv->rss_lut_size,
++				       sizeof(rss_config->hash_lut[0]),
++				       GFP_KERNEL);
++	if (!rss_config->hash_lut)
++		goto free_rss_key_cache;
++
++	return 0;
++
++free_rss_key_cache:
++	kfree(rss_config->hash_key);
++	rss_config->hash_key = NULL;
++	return -ENOMEM;
++}
++
++static void gve_free_rss_config_cache(struct gve_priv *priv)
++{
++	struct gve_rss_config *rss_config = &priv->rss_config;
++
++	kfree(rss_config->hash_key);
++	kfree(rss_config->hash_lut);
++
++	memset(rss_config, 0, sizeof(*rss_config));
++}
++
+ static int gve_alloc_counter_array(struct gve_priv *priv)
+ {
+ 	priv->counter_array =
+@@ -575,9 +612,12 @@ static int gve_setup_device_resources(struct gve_priv *priv)
+ 	err = gve_alloc_flow_rule_caches(priv);
+ 	if (err)
+ 		return err;
+-	err = gve_alloc_counter_array(priv);
++	err = gve_alloc_rss_config_cache(priv);
+ 	if (err)
+ 		goto abort_with_flow_rule_caches;
++	err = gve_alloc_counter_array(priv);
++	if (err)
++		goto abort_with_rss_config_cache;
+ 	err = gve_alloc_notify_blocks(priv);
+ 	if (err)
+ 		goto abort_with_counter;
+@@ -611,6 +651,12 @@ static int gve_setup_device_resources(struct gve_priv *priv)
+ 		}
+ 	}
+ 
++	err = gve_init_rss_config(priv, priv->rx_cfg.num_queues);
++	if (err) {
++		dev_err(&priv->pdev->dev, "Failed to init RSS config");
++		goto abort_with_ptype_lut;
++	}
++
+ 	err = gve_adminq_report_stats(priv, priv->stats_report_len,
+ 				      priv->stats_report_bus,
+ 				      GVE_STATS_REPORT_TIMER_PERIOD);
+@@ -629,6 +675,8 @@ static int gve_setup_device_resources(struct gve_priv *priv)
+ 	gve_free_notify_blocks(priv);
+ abort_with_counter:
+ 	gve_free_counter_array(priv);
++abort_with_rss_config_cache:
++	gve_free_rss_config_cache(priv);
+ abort_with_flow_rule_caches:
+ 	gve_free_flow_rule_caches(priv);
+ 
+@@ -669,6 +717,7 @@ static void gve_teardown_device_resources(struct gve_priv *priv)
+ 	priv->ptype_lut_dqo = NULL;
+ 
+ 	gve_free_flow_rule_caches(priv);
++	gve_free_rss_config_cache(priv);
+ 	gve_free_counter_array(priv);
+ 	gve_free_notify_blocks(priv);
+ 	gve_free_stats_report(priv);
+@@ -1390,6 +1439,12 @@ static int gve_queues_start(struct gve_priv *priv,
+ 	if (err)
+ 		goto stop_and_free_rings;
+ 
++	if (rx_alloc_cfg->reset_rss) {
++		err = gve_init_rss_config(priv, priv->rx_cfg.num_queues);
++		if (err)
++			goto reset;
++	}
++
+ 	err = gve_register_qpls(priv);
+ 	if (err)
+ 		goto reset;
+@@ -1786,6 +1841,26 @@ static int gve_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	}
+ }
+ 
++int gve_init_rss_config(struct gve_priv *priv, u16 num_queues)
++{
++	struct gve_rss_config *rss_config = &priv->rss_config;
++	struct ethtool_rxfh_param rxfh = {0};
++	u16 i;
++
++	if (!priv->cache_rss_config)
++		return 0;
++
++	for (i = 0; i < priv->rss_lut_size; i++)
++		rss_config->hash_lut[i] =
++			ethtool_rxfh_indir_default(i, num_queues);
++
++	netdev_rss_key_fill(rss_config->hash_key, priv->rss_key_size);
++
++	rxfh.hfunc = ETH_RSS_HASH_TOP;
++
++	return gve_adminq_configure_rss(priv, &rxfh);
++}
++
+ int gve_flow_rules_reset(struct gve_priv *priv)
+ {
+ 	if (!priv->max_flow_rules)
+@@ -1834,7 +1909,8 @@ int gve_adjust_config(struct gve_priv *priv,
+ 
+ int gve_adjust_queues(struct gve_priv *priv,
+ 		      struct gve_queue_config new_rx_config,
+-		      struct gve_queue_config new_tx_config)
++		      struct gve_queue_config new_tx_config,
++		      bool reset_rss)
+ {
+ 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+@@ -1847,6 +1923,7 @@ int gve_adjust_queues(struct gve_priv *priv,
+ 	tx_alloc_cfg.qcfg = &new_tx_config;
+ 	rx_alloc_cfg.qcfg_tx = &new_tx_config;
+ 	rx_alloc_cfg.qcfg = &new_rx_config;
++	rx_alloc_cfg.reset_rss = reset_rss;
+ 	tx_alloc_cfg.num_rings = new_tx_config.num_queues;
+ 
+ 	/* Add dedicated XDP TX queues if enabled. */
+@@ -1858,6 +1935,11 @@ int gve_adjust_queues(struct gve_priv *priv,
+ 		return err;
+ 	}
+ 	/* Set the config for the next up. */
++	if (reset_rss) {
++		err = gve_init_rss_config(priv, new_rx_config.num_queues);
++		if (err)
++			return err;
++	}
+ 	priv->tx_cfg = new_tx_config;
+ 	priv->rx_cfg = new_rx_config;
+ 
+-- 
+2.48.1.601.g30ceb7b040-goog
 
 
