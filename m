@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-165871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00966A3396B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:58:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA4AA3391F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 721327A0FEA
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 299E73A5140
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F2C20AF80;
-	Thu, 13 Feb 2025 07:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FE82063F9;
+	Thu, 13 Feb 2025 07:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I+jeldV0"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XBvW1UTo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FAB20AF68
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 07:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5F3BA2D;
+	Thu, 13 Feb 2025 07:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739433515; cv=none; b=hPvqBYvjyFxUqX37RNFOHeLJI+D/ro7pEnrlxyN1bT6AVB4aiiROIzG0DKnwB2tCAsm3jTbxj9Lgf3lhH625DSuKpTkhx1SPZGkltTfcMB4YpiutVQNdNAENfqIZsd9ihzLVKcrK9GxNcRNn5G1pTMDxgPyVsQbUeMy3Sv5AFRc=
+	t=1739432775; cv=none; b=l6VDpwTTxk4eA3K0ZGqAIofPw1x6p6JZUGnvsatcK2wvVbVKHYdS/Dy4+Nq8AWPfAfKFZW9WCVEqddbyn6Lbo2YBDBSWSoV+pcUgXybSXDMXMuHudv7KEzd776g8POdGfpeXAJP0NRX3y+v89gXA5gjvCpLsC7Esm3NU4O7HzIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739433515; c=relaxed/simple;
-	bh=eO714YUOwB1fsBw+kHksu5IyTkPx0gHPMJKL78qm9/8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KpW1sT6i8DVZzWnI/gPydNfSCjBk0Bl9VkC2rZczITNAas/4QlMCmSCP9X1gPSwH8fgLl6XSOgsQZDiW/33MY6obVYhf5jHaR/Ekk/ZtJLkd4PosoUGaXoSH0NHpa+5vMZ8E2Jh+HuAiDh+esFh8xGZ6rkXavMN+7AIVf8LA+F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I+jeldV0; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739433514; x=1770969514;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eO714YUOwB1fsBw+kHksu5IyTkPx0gHPMJKL78qm9/8=;
-  b=I+jeldV0Cib+2Wu4m+X58hn2ZrO5HL8o5aZC9uFaqqi3t3tYan5Rev2/
-   OpgjFLlYo8U5CxmL52JBvgnUg+np+G9BJAT3O4sz3jNwdsZJViv6Dk3h+
-   WIVFD99Iz4UF+nuYNuu4jdq4XNMDHDpcwtAU8jOyB3lvYxVsm5qXwPhur
-   GcqrtkR872hV3ixWM03h/8a35UjcLCOwZ/b6F1KROaIjocOzH/BZpFEP7
-   kx8fNlkCwaTDlktadPYzMi4geXzpiG+zEmojyi33TJfVl/42j6M7zFOAP
-   cJuX3QPUbBp461GoAHtTEJJUWRmNAjWaqS0RkLh4gKxsyht37T2cdSfSm
-   w==;
-X-CSE-ConnectionGUID: QvmTbEUSSoe78mmmFdfDow==
-X-CSE-MsgGUID: nAxgM2FUR42f6uNnIVLH6A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="39986405"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="39986405"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 23:58:34 -0800
-X-CSE-ConnectionGUID: iBRmOTwyQCGy6LYpbhKGuQ==
-X-CSE-MsgGUID: VcGsciHLQsmNiuOLlqf80w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="118068872"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orviesa004.jf.intel.com with ESMTP; 12 Feb 2025 23:58:32 -0800
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	andrew@lunn.ch,
-	pmenzel@molgen.mpg.de,
-	netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v4] ixgbe: add support for thermal sensor event reception
-Date: Thu, 13 Feb 2025 08:44:52 +0100
-Message-Id: <20250213074452.95862-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1739432775; c=relaxed/simple;
+	bh=CyxknvaOEiYikBdtLM4EukNbG0aZA3Bdf2y1lR0exbQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ue8tgQ1zD5lTsp4jbhHNbvjgCgYvqElJ84lziaQYpKv20l5mMb0V2gTQeS5j8VVhGAHrSKeWUShuS3U5fqsFvyg5NpEAm3G9uebzHehSy1WdQKWlcJ83/fv3vXU/GQ5QXHwMHFQJsPUFe3Xk76RIFz0MlaCn6BY1+WLNT7X+P+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XBvW1UTo; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739432772; x=1770968772;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=D0cHoAmJCFDzyca0BXBQoIJ2zkSks/18FUWOioWw6J8=;
+  b=XBvW1UTohz/FytYaKzBC2XGkfJyRuj4jvVMGCYtoCVoELvbGa7jQjmmZ
+   53SO0aso//tu87Zj92A/mkGZdptYs7EzCZLZdlGWfsQ7r3ZCrdCsYabJz
+   YBgfA7HyzvSfeWBU5ayhwWsv4FDuYXj8e2QyAsMaOQI2rA+7azA3TyyXW
+   k=;
+X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
+   d="scan'208";a="22181104"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 07:46:10 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:54910]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.59:2525] with esmtp (Farcaster)
+ id eea6667e-3084-43a4-adc2-eeb014de29d1; Thu, 13 Feb 2025 07:46:09 +0000 (UTC)
+X-Farcaster-Flow-ID: eea6667e-3084-43a4-adc2-eeb014de29d1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 07:46:02 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 07:45:57 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <ushankar@purestorage.com>
+Subject: Re: [PATCH net-next v3 3/3] arp: switch to dev_getbyhwaddr() in arp_req_set_public()
+Date: Thu, 13 Feb 2025 16:45:46 +0900
+Message-ID: <20250213074546.15468-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250212-arm_fix_selftest-v3-3-72596cb77e44@debian.org>
+References: <20250212-arm_fix_selftest-v3-3-72596cb77e44@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,68 +77,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-E610 NICs unlike the previous devices utilizing ixgbe driver
-are notified in the case of overheating by the FW ACI event.
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 12 Feb 2025 09:47:26 -0800
+> The arp_req_set_public() function is called with the RTNL lock held,
+> which provides enough synchronization protection. This makes the RCU
+> variant of dev_getbyhwaddr() unnecessary. Switch to using the simpler
+> dev_getbyhwaddr() function since we already have the required rtnl
+> locking.
+> 
+> This change helps maintain consistency in the networking code by using
+> the appropriate helper function for the existing locking context.
+> 
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-In event of overheat when threshold is exceeded, FW suspends all
-traffic and sends overtemp event to the driver. Then driver
-logs appropriate message and closes the adapter instance.
-The card remains in that state until the platform is rebooted.
+Fixes: 941666c2e3e0 ("net: RCU conversion of dev_getbyhwaddr() and arp_ioctl()")
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-This approach is a solution to the fact current version of the
-E610 FW doesn't support reading thermal sensor data by the
-SW. So give to user at least any info that overtemp event
-has occurred, without interface disappearing from the OS
-without any note.
+I still think patch 2 & 3 should be posted to net separately.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
-v2,3,4 : commit msg tweaks
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 5 +++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 3 +++
- 2 files changed, 8 insertions(+)
+Documentation/process/maintainer-netdev.rst
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 7236f20c9a30..5c804948dd1f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -3165,6 +3165,7 @@ static void ixgbe_aci_event_cleanup(struct ixgbe_aci_event *event)
- static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
- {
- 	struct ixgbe_aci_event event __cleanup(ixgbe_aci_event_cleanup);
-+	struct net_device *netdev = adapter->netdev;
- 	struct ixgbe_hw *hw = &adapter->hw;
- 	bool pending = false;
- 	int err;
-@@ -3185,6 +3186,10 @@ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
- 		case ixgbe_aci_opc_get_link_status:
- 			ixgbe_handle_link_status_event(adapter, &event);
- 			break;
-+		case ixgbe_aci_opc_temp_tca_event:
-+			e_crit(drv, "%s\n", ixgbe_overheat_msg);
-+			ixgbe_close(netdev);
-+			break;
- 		default:
- 			e_warn(hw, "unknown FW async event captured\n");
- 			break;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index 8d06ade3c7cd..617e07878e4f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -171,6 +171,9 @@ enum ixgbe_aci_opc {
- 	ixgbe_aci_opc_done_alt_write			= 0x0904,
- 	ixgbe_aci_opc_clear_port_alt_write		= 0x0906,
- 
-+	/* TCA Events */
-+	ixgbe_aci_opc_temp_tca_event                    = 0x0C94,
-+
- 	/* debug commands */
- 	ixgbe_aci_opc_debug_dump_internals		= 0xFF08,
- 
--- 
-2.31.1
-
+---8<---
+the ``net`` tree is for fixes to existing code already in the
+mainline tree from Linus
+---8<---
 
