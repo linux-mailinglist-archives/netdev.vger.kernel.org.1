@@ -1,147 +1,109 @@
-Return-Path: <netdev+bounces-165782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE4AA335FA
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:15:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA859A33610
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 032627A25CE
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:14:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D2CB18868A3
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F29C20469F;
-	Thu, 13 Feb 2025 03:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D5F204C19;
+	Thu, 13 Feb 2025 03:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKKzWGgE"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PHoQ669Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B9C38F83;
-	Thu, 13 Feb 2025 03:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E71038F83
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739416524; cv=none; b=Ep6cwzWSGTYLf/JxiQRFnwgEQzQoKAoKTip/RO5/TirbwOPg5lqFq5gDzzl6F89CLI4im+C6Q/M4bKGOLoC8hh5Wm1zw1ZmOKColMo7NWVxjLddI/SZ+SCudrLxKnf55W4cDQJkcNRBOAxFMtiG53/kiSyWnzZBJY8aB/+CSNYs=
+	t=1739417181; cv=none; b=YUP20ePr/LTIbrzHwtpZ7Og0rgAI73JRwpSI4BT9HWdO18S5uSCiFtj9XPbOkqWcMpn85+i6gClQfGjzxzn39b2WXSNyBb8MPyqbwyVpNGN3LQqzSQ+MJmPmmRHd7vAcR82Q5PolFEBi+rfHkN3OE9cZQ8seMj3QB1FD+jfhGeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739416524; c=relaxed/simple;
-	bh=29qMRQN1MA426/zGCgS2bSS8TuL+QzLv8CgXd09oYg8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FWPHto51iiB2r9DewCpfb+73xwkhxlVIWcK76Fger8H+tfHF5O85uj6nyqwiEvnukW7Hd0+xM1iMYpG17UhNfutdm4o6SlYFkwelFLptq/bT9n85tfKiN7Gyf3+NtSY453xeU/Q58vBJ4kr/7uTiWVcqpZLPIvtrfY5IgmNNARg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GKKzWGgE; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3cf880d90bdso1184215ab.3;
-        Wed, 12 Feb 2025 19:15:22 -0800 (PST)
+	s=arc-20240116; t=1739417181; c=relaxed/simple;
+	bh=uopnS+g6jNyTHOVCgsy28PYDZHzAnKfp7mljzI1aols=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tcsj34Bl5yHsubwrY5FlipnS7eqRvX/jM06lioCMgZuf1BvLXFLwvNeNjjnWUpw71mxECWwsY7KccGzizRDvjxNO/ydB+E3p96dITljPPZPrmid1S+rRT/0Gf4IFke1rVu9UYS0zmUb0FRYKUetOITagZJYRSPNeH6YQh74oMmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PHoQ669Q; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739416522; x=1740021322; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3meNdx9mzPMuDDowoj6tZvUq/9zyqr9CaT+/L4OE29U=;
-        b=GKKzWGgEkOPGuYsfaf9cTMJu9F2CAsVIz40+U3/jOXcQUR4R4PfLPvVd7t5kYtlTmH
-         1TUACsNH/M/CXHGNZNk3wkUt5lVjxbjJpBm8hA8+geewPETRpRAaC29OjIBnWH/phX4P
-         L6Yym26Bg3FnJJjvCivr+GFPjytVnKqClIje7bdOgqGDpGjxfGyWgRe26IW0POcFKB9b
-         i/P+9YrIvLyIOh+7aprTzSHqiRDXs3bm43aWdgRaJ7rZKFvUPKKNKfnFp85lgEYp6mOk
-         LbkoHUiCkKjqFwzp0Nbm63GRx3/WWvufOqy/3NEWBnfKL4n7zvfgsJmPw6ksN+OEZJIb
-         jDKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739416522; x=1740021322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3meNdx9mzPMuDDowoj6tZvUq/9zyqr9CaT+/L4OE29U=;
-        b=clRRGYxBMycKW2nBiHkuGE+4OMOUeK1hBDB6xw7hd7oNCsNT97ov1CpyQfKrXeZscG
-         seGOo53y3vOw675oENHMQjPikxvyYrOSIYcVi21c7/5zMRIlh0bCdXXxhuBCkDoZR4U3
-         jM196yKUKTr4JbXiQWxag3iDD1fSEy9/XT811wNYHCgHsVUPY4IrHAJHHMqgNXS4l0HU
-         Vc5KzJF02MmLGYTcaJt1PKXoEJHOp2cFPWfVoaYWIzI2skD+gk4+9omCrzsAnt4ijOGI
-         4kgxnP67eDSeK3k7fj/ltajKU9hG9EuzvLQWcqaHs1GeKuR4npdYARYFXxqs6vKiiI8q
-         fUSA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+6Bs3sSkrhgKtgcp5+TzbR+AEefl09wQjmxDmziEHAS/bF9XzntqY6WzhQdK5WuG5ges=@vger.kernel.org, AJvYcCX+FotlsLO9VxAEKFHOpLtUVt5MSMMQoBPYs7mBb3qjBj9KRfHcMuLeSfakmnEyOFablJEwvDv/@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrbXfqAsl2i91jXdAkRoYcJ7/VHj+Hb+Umzy3QC9bTDi/IOx7E
-	BN0k+Q+Z492XNM3GKgNuI7wRZZozldfxj3E7//ZVHSG6gH2nJ9F7BOoEQU0odpN0wE3LSZMLK0E
-	zzVk16xpmBwoahbBRcyBZ2l6NmFM=
-X-Gm-Gg: ASbGncs/gbmc8jfqy4cz6ehtb/I/L1UbvdC7IJTsgnaBGlUzlpV5qdV0bx1pG34kYMZ
-	cOI0SDRj1F2V5CXukudgVp8P8j1DQdcPQm3r1i9/vrkpSBWsq7xl31r2q4pIHvW5ARpwY84wz
-X-Google-Smtp-Source: AGHT+IHeNXbj+21QyxNvJah3zZO+sdDUmynRSaSGeRpVaA26DK0D/T21UBXeGAVBN59zXZw8uMI0LN/4AgjQ1KuqF2I=
-X-Received: by 2002:a05:6e02:1ca4:b0:3cf:bc71:94ee with SMTP id
- e9e14a558f8ab-3d17bfe4532mr43466535ab.14.1739416521995; Wed, 12 Feb 2025
- 19:15:21 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739417180; x=1770953180;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=guon2+lC6H/KyeZq42JjZ/jp1VPn8rYYGuNtsl/fg8o=;
+  b=PHoQ669Q8KBCeyLG0Xs7ETykVooIuu/AVdP3aOaNFnJ8Z86J/2u7qB5r
+   uzrGOugzPKNU7RFUCW2FDI/cZlEvZQqCNRDGFq56avaeNU6AdQUo8Rtnh
+   kUlW+6WEIacnHp7qKuGng9yporBPPcaCgA3Fgg6IOQWLvNNoOXXo/sS2Z
+   c=;
+X-IronPort-AV: E=Sophos;i="6.13,281,1732579200"; 
+   d="scan'208";a="22139104"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 03:26:18 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:1833]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.59:2525] with esmtp (Farcaster)
+ id 64f1ea86-6d93-4509-9604-1e9b43b67ee3; Thu, 13 Feb 2025 03:26:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 64f1ea86-6d93-4509-9604-1e9b43b67ee3
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 03:26:17 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 03:26:13 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <ncardwell@google.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/2] inet: consolidate inet_csk_clone_lock()
+Date: Thu, 13 Feb 2025 12:26:03 +0900
+Message-ID: <20250213032604.83141-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250212131328.1514243-3-edumazet@google.com>
+References: <20250212131328.1514243-3-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250213022501.76123-1-kuniyu@amazon.com> <20250213023214.76562-1-kuniyu@amazon.com>
-In-Reply-To: <20250213023214.76562-1-kuniyu@amazon.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Feb 2025 11:14:45 +0800
-X-Gm-Features: AWEUYZkiO_7hY5YZDq-TBbPyxt_0ed3JKmu8S8CBliyMl4VF2Y5LFu0aVrNtxCw
-Message-ID: <CAL+tcoDKxNbhLTtL7i4WNGzEJxB1h1rAvYvmSvapnZjmdO=QuQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] bpf: add TCP_BPF_RTO_MAX for bpf_setsockopt
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org, 
-	eddyz87@gmail.com, edumazet@google.com, haoluo@google.com, horms@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, martin.lau@linux.dev, ncardwell@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 13, 2025 at 10:32=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date: Thu, 13 Feb 2025 11:25:01 +0900
-> > > diff --git a/net/core/filter.c b/net/core/filter.c
-> > > index 2ec162dd83c4..a21a147e0a86 100644
-> > > --- a/net/core/filter.c
-> > > +++ b/net/core/filter.c
-> > > @@ -5303,6 +5303,12 @@ static int bpf_sol_tcp_setsockopt(struct sock =
-*sk, int optname,
-> > >                     return -EINVAL;
-> > >             tp->bpf_sock_ops_cb_flags =3D val;
-> > >             break;
-> > > +   case TCP_BPF_RTO_MAX:
-> > > +           if (val > TCP_RTO_MAX_SEC * MSEC_PER_SEC ||
-> > > +               val < TCP_RTO_MAX_MIN_SEC * MSEC_PER_SEC)
-> > > +                   return -EINVAL;
-> > > +           inet_csk(sk)->icsk_rto_max =3D msecs_to_jiffies(val);
-> > > +           break;
-> > >     default:
-> > >             return -EINVAL;
-> > >     }
-> >
-> > You need not define TCP_BPF_RTO_MAX because TCP_RTO_MAX is not a
-> > BPF specific option, and you can just reuse do_tcp_setsockopt(),
-> > then bpf_getsockopt() also works.
-> >
-> > ---8<---
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 2ec162dd83c4..77732f10097c 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5382,6 +5382,7 @@ static int sol_tcp_sockopt(struct sock *sk, int o=
-ptname,
-> >       case TCP_USER_TIMEOUT:
-> >       case TCP_NOTSENT_LOWAT:
-> >       case TCP_SAVE_SYN:
-> > +     case TCP_RTO_MAX:
->
-> s/TCP_RTO_MAX/TCP_RTO_MAX_MS/ :)
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Feb 2025 13:13:28 +0000
+> Current inet_sock_set_state trace from inet_csk_clone_lock() is missing
+> many details :
+> 
+> ... sock:inet_sock_set_state: family=AF_INET6 protocol=IPPROTO_TCP \
+>     sport=4901 dport=0 \
+>     saddr=127.0.0.6 daddr=0.0.0.0 \
+>     saddrv6=:: daddrv6=:: \
+>     oldstate=TCP_LISTEN newstate=TCP_SYN_RECV
+> 
+> Only the sport gives the listener port, no other parts of the n-tuple are correct.
+> 
+> In this patch, I initialize relevant fields of the new socket before
+> calling inet_sk_set_state(newsk, TCP_SYN_RECV).
+> 
+> We now have a trace including all the source/destination bits.
+> 
+> ... sock:inet_sock_set_state: family=AF_INET6 protocol=IPPROTO_TCP \
+>     sport=4901 dport=47648 \
+>     saddr=127.0.0.6 daddr=127.0.0.6 \
+>     saddrv6=2002:a05:6830:1f85:: daddrv6=2001:4860:f803:65::3 \
+>     oldstate=TCP_LISTEN newstate=TCP_SYN_RECV
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Thanks for spotting this simpler approach. It works.
-
-Thanks,
-Jason
-
->
->
-> >               if (*optlen !=3D sizeof(int))
-> >                       return -EINVAL;
-> >               break;
-> > ---8<---
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
