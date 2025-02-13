@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-166058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B53FA342D1
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:43:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4F7A34539
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B8A3A623D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA2AA1730AE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42E8241679;
-	Thu, 13 Feb 2025 14:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B3718DF6D;
+	Thu, 13 Feb 2025 15:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WUxq5L5e"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Ybw808XE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7869A2222A9;
-	Thu, 13 Feb 2025 14:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C815B189BAF;
+	Thu, 13 Feb 2025 15:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739457454; cv=none; b=OpIBLuE8Y+LGADkDyFL0fzYY9YBhdW4CDO11EKDi7pv8MGcY9gW7BGrw6csDtpbgJOby0lzu2DrdTPIBG75ZWS+w14GAV3KAv1I+BoUDr/dcY1Moq/y/tO4WG+nNo3p1V15tts1gB2s12/2HBjpdF+JQ/ldUTmJhZJ+5occ+tJw=
+	t=1739458960; cv=none; b=Dx8eQ7ImfbrS2No1suJ/47JnhZxKJ0As+UqoalQ2qn4ms/81fidMkPik+4IR9YVcSLOeSYhQYceLoOrYJIOymP0YUEMl8BAa1uZ/w+UPbdGgxAcNF1joD1ysFpGZfBUqrRT79TvMTxUoxHX07LuX6nishhiQ+auVwQVdUQu8Krg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739457454; c=relaxed/simple;
-	bh=LgY6LwObS4dwKuRSajIOO2lIueqwd/ZiS+v80vlL/LY=;
+	s=arc-20240116; t=1739458960; c=relaxed/simple;
+	bh=EmxVxIPGz4HOpbWHwjiZIVlEniWaE2rYqEUYvmaCOgw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QBzs0vRmUqplRXeoE8NGWXqtiOS7e466PCxwyP1TdwN9QRCHJodTy3RLcCusfyDLzAwo0Ws9w7THCi2mlY7dYDxwZnyLLqQQevEWLyRBQonPG0s0eyLtxtWExo2X6TKHMRh1sJ9PJZqMNltZSBIuGNLqXPdfBiMK2I3K7jQr0tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WUxq5L5e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2211C4CED1;
-	Thu, 13 Feb 2025 14:37:33 +0000 (UTC)
+	 MIME-Version; b=RMEP/Bc7j5Y4jmUKqSF3rdZ/aHz5hwPqgiM7RZxT4/lkt6w8wt9yLG2LW8MuHuD+MrnM85BjwreUAaM01fAVeKa/XntSgZeeObfHL+gNDVKc0V++DgPp3zxCRqGWycrEqeptu8zv0NzrRmd5BSigdZXZ1AhGNbJQbuZPhpn0WzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Ybw808XE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6D7C4CED1;
+	Thu, 13 Feb 2025 15:02:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739457454;
-	bh=LgY6LwObS4dwKuRSajIOO2lIueqwd/ZiS+v80vlL/LY=;
+	s=korg; t=1739458960;
+	bh=EmxVxIPGz4HOpbWHwjiZIVlEniWaE2rYqEUYvmaCOgw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WUxq5L5ez7YbCMVZTBsi45OaB71SrC8IcPkxjK8eoF5qWsTgNBRNZjnAk6SXbPM8e
-	 Q0nG6hly/iNRaMGe4QSPVZzZDq2mXtAqDqSLukMIsDGWsJN1cmdv64PAehkCHvXQFK
-	 cbz4B9Nk9TUMJ2j3qOAehPMw3tsBFtPVD7yPqhhU=
+	b=Ybw808XEkyVkLkR6GqjkQ1YN8JI0oL+9XJz+SjESHXiIATMBwBosoH43bNRAQ2hPL
+	 AjyHa0SmK9n2LKdR2pvzZRSjxCT56Q56wWiyBaP6wNvlOeipY89dX8Xz3JHzlnY8ce
+	 Z3DjDdTDesyMoWDmytwmEEmQtmnRVuOrH1/E8mNo=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -52,12 +52,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-afs@lists.infradead.org,
 	netdev@vger.kernel.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 115/422] rxrpc: Fix the rxrpc_connection attend queue handling
-Date: Thu, 13 Feb 2025 15:24:24 +0100
-Message-ID: <20250213142440.990396528@linuxfoundation.org>
+Subject: [PATCH 6.13 127/443] rxrpc: Fix the rxrpc_connection attend queue handling
+Date: Thu, 13 Feb 2025 15:24:52 +0100
+Message-ID: <20250213142445.510181582@linuxfoundation.org>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250213142436.408121546@linuxfoundation.org>
-References: <20250213142436.408121546@linuxfoundation.org>
+In-Reply-To: <20250213142440.609878115@linuxfoundation.org>
+References: <20250213142440.609878115@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+6.13-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -111,7 +111,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 666fe1779ccc6..e1a37e9c2d42d 100644
+index 27c23873c8811..ee4030f2e99da 100644
 --- a/include/trace/events/rxrpc.h
 +++ b/include/trace/events/rxrpc.h
 @@ -218,6 +218,7 @@
@@ -159,7 +159,7 @@ index 2a1396cd892f3..ca5e694ab858b 100644
  
  	/* Process delayed ACKs whose time has come. */
 diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe74..7bc68135966e2 100644
+index 694c4df7a1a31..88b4aab5a0913 100644
 --- a/net/rxrpc/conn_object.c
 +++ b/net/rxrpc/conn_object.c
 @@ -67,6 +67,7 @@ struct rxrpc_connection *rxrpc_alloc_connection(struct rxrpc_net *rxnet,
