@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-165751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37289A33472
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:14:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 749C5A33471
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A2418890A0
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BC823A85DC
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F00186323;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5DE686349;
 	Thu, 13 Feb 2025 01:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X0YRHgGT"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="h6xR1/3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A4213BAF1
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2259781AC8
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739409215; cv=none; b=P8oRLCBF9cwUwhItnkoMzLl4UXm3kz1V1KcvOobrxzDcH6DqKOE7k7p9gbho8Bu6RPzwH4xkwLhelnccFlhSiLIkOChBp/0ala9ujFrynI9F+6kHcI7dIbZxuJhSCe983FoEuHJkAfQR7z+SNZfEq4r1n7rIC5P4MFQOniBtL9s=
+	t=1739409215; cv=none; b=FzR7egoAZ2T6S7+qjScw0DJrovI5KOadUQ4PBb+zF7KgC2ayne7RWBe9C4G6kWqr2AcFG2RlgC+5BchGLxZtS1bBAKWMhtPy/eVdbDbummPB2EfVeAHdTDr9xii0hC2Tk/WLdHR3zmkEsZQ8xgOchddF7bNPBiwSrimPjPNhRjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739409215; c=relaxed/simple;
-	bh=N4tPBq96MNEhuP9E/BsZZBcc9KAk6IUhpymzyYeQMxk=;
+	bh=3Wv6fRui6JUppkVHVPDhuyoEourXEdFIz2Ar68Mhcgo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LC3Hosua+dXtkez8fbTjdbSN1b5ot0Kf7C7UA4uLwr2stTpV87DxNwsMrwbFgh4RVmMksJXYqOF+tp+pESgmuvqrRPPWVF9F5IDGiVVWV+rQnBrUAeeEQdla056uY0DewPt6cFLpljg6RC5MSe2SMgq5QnItj4ZuZ0yvLF3Ufjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=X0YRHgGT; arc=none smtp.client-ip=209.85.210.54
+	 MIME-Version; b=mefaDLiAJhyWQM7E7ghm5bNISN4/QZGGLZ4BNNDeEFLnj587UEI00h490rGahGa0MB5Tu3YDoZAGxFK8IfBsvFqVoSuMQV/XgPPe7uDb87iyQh6DhCKimuo2MAjH7vNzHEiSjga5pxaDr+8wubOHptb1iWr3MZexKpxVEzDTwAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=h6xR1/3t; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-726f943b6f4so130045a34.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:13:30 -0800 (PST)
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-726ed359c56so318513a34.3
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:13:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1739409210; x=1740014010; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1739409213; x=1740014013; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cAnNmS1PpxNhoASBZ/NEPmOmzVWH3c4fcg+geDwoOGo=;
-        b=X0YRHgGTLJN31hETlnG1AE1XjdCTITPaQEvP9JSxHjj4Jvl6hj0QAIzIxNqec0ELFR
-         34GDQ99CjPjQur2gR4mVHLwbd1m1VIqODtgyRVmt6c56ByNhJfbd/GCfLVswXqiwR3PX
-         RGuD+sAxDGvV6hvWnQWEoQBaYfTWoWzkqLmCA=
+        bh=tYbE7VuTl9BMV8ls+ftV23iDp1ujBGiTUNoHs2AfpuI=;
+        b=h6xR1/3t6N66dwTLwLGvzi5TDsV0DqDmjh3gJp/Jjm5Dnech4O9rCh85/aQrsqd4F1
+         vsre7b/JmQbRqv5PRdyjH+6sR1A1gO9cZPDMFQ4e1A5+8ehfLM7LIthHU+TpbQG01FD+
+         J4aKrfHnvZDrPgpkUjrcdLjX24VPaQO8S+ot8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739409210; x=1740014010;
+        d=1e100.net; s=20230601; t=1739409213; x=1740014013;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cAnNmS1PpxNhoASBZ/NEPmOmzVWH3c4fcg+geDwoOGo=;
-        b=h6+5rywojO8H9U/+o/LajdM1tGDNXfcsStLqrpyyLj0NMvUitQJN5R30109/Pr2nFp
-         FC5SAqOJR5w3R/nlETl9nXZTQkdfxWUMpPSNx4lKFqiZHbE6VFFClgbtrSCRb0izLuwm
-         op80gDM2nN6S91xCLOCgG262BKvb57T5ooE00NglhbhPtohiHALQQf6RvZquaRX6caBo
-         00onMEQ8GvxDGzrXJXgkxWyNpw6sz12B7C9qpc8r4FzJnwa37YZHM/T4lJWO8zmk7ykV
-         /nTJHJF4LMFdT5Z2aOSyjQSM5dVNiv7g3j4PWU7itb16YmSCdklZou7yYDa/lS9IWK5Y
-         HKow==
-X-Gm-Message-State: AOJu0YzPK59NLV0ajSC3/so8cnW4fgOhqIXkAYJarY2AlWQunLFzyJTD
-	vIAB6RyEOiDf53VTgzsOoG2mBx2UKPgcV5EcWsdP+u3E6SQxyjA+Gp/VcXYH8w==
-X-Gm-Gg: ASbGncsoKdYKRQvwLtmHVIHKe4gugWB1zvYmsOGpWprMpVDvBWVnuNlKMnvH0xA5eYH
-	kjscC1DEkN6Zy6x+k3GYHJGoFbnfhEwuHbg7BGraJ+Pmv4GJUAA9cQ7mFXne7KHi6vyNDSYI7co
-	QstDfdqBAB14SEv2hAr9Y3Q3pbw9dzyIEraICw+hXHeCB1lnkYNkkmpQz/l6VV9y4ge86gZWH+U
-	p/TdsdjuQlLIJdkj4Y2Jxa4uSdoqVZthVV3BUhEkVTQ1CiStXY+lCnDTHtqY66gH3K5exrajLaa
-	cBLDwitX3iJgOAu+KA3ArD4X9yxzaQFTFmet4GhAg7uGBp2qHp5Sx4Jm+PqdQwgckgQ=
-X-Google-Smtp-Source: AGHT+IHOmzYRB3mHEOl2Yb2lOg3rtjKR5mQBbkRYGnYTmXjixbczwuwVoP2jtQ8Ib08grBd/0/1sag==
-X-Received: by 2002:a05:6830:f8a:b0:718:7c3:f86a with SMTP id 46e09a7af769-726fe758cebmr857175a34.6.1739409209809;
-        Wed, 12 Feb 2025 17:13:29 -0800 (PST)
+        bh=tYbE7VuTl9BMV8ls+ftV23iDp1ujBGiTUNoHs2AfpuI=;
+        b=Lsrd+pYMQzm2qIReIkF8av5M2ERY3FOKZ62TVHOCxvrs7noV214vsrSOgbl6BecynD
+         rtBjNrI3AAWPia5PtC0Uv6Br6LW+f+uHPbD35vgmY2aTDp8L+6WfC2Lfcvlgyi49skZG
+         q1WMoDh1JTpy8h1/v6AKHTNELfXYkz0Bd0juqrqK46HNymaoYecO4LrEqtqW14DZs5Sv
+         WX55pWrIHo4MpEJYAJ1jBfbTbwZUPVt07ixoT4goIpVOSIMlbSs+/dg76wpLMsU7mIBA
+         YTc7q0SgLNhIf65R2nzN5Mu2MjNGDHQf2CrCCuUzVErm8oVqOEBW5S0+WjN6clRFoACx
+         SkNw==
+X-Gm-Message-State: AOJu0Yzb4SEtskt6v4n+2xUs25mtdx05eYZxIPs1wjG1+WnHinSsQQO+
+	Zw0aW8craLrkt5jFvwIFzOR/AiBORXq4ys+Le7GkQBbKZd+GvfzrWHAH0x5KMw==
+X-Gm-Gg: ASbGnct55nsII08vgMwJ3btJLz++zXIbEqm5Zom8nE5cZIVTexhYAV+OzG5hGsvcZqr
+	F8jB/GDpviZ1RaOzK/x6ADT4EjHRBuFu7Ppbf50KqO6iR1L9EtmOvjuL1YIGnF3k2YyLA10xLrK
+	Xq+QSQRQTzWPPKNAvqTiPjY7c1CBwyWEN/0uxJssqc+tIBlO2mwdcfNFeCWV5Xboq0kF1x9ar4n
+	O5of2xmhTGSbpG/1xKPwFQdViS8R4lLemvOomJjpJfTPhUIPiMjEO7EqfEZRbKe9BVsK/YcEKSj
+	QsABL3HmHWpKZz/RjyBL4rO+B3MjeBz/ejGJGu1Umip9ALNbBHQIz1I/yMmYpYGgeFA=
+X-Google-Smtp-Source: AGHT+IH1X0NNE3pqbZwjNuV2aealYqQRH0pfK9uL7qenIbiPX003kYK+5F5tzCO/7XdOl4XScNL+Ag==
+X-Received: by 2002:a05:6830:3148:b0:727:bf:e433 with SMTP id 46e09a7af769-72700bfe60cmr183967a34.19.1739409211762;
+        Wed, 12 Feb 2025 17:13:31 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-727001cdb70sm195967a34.13.2025.02.12.17.13.27
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-727001cdb70sm195967a34.13.2025.02.12.17.13.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 17:13:28 -0800 (PST)
+        Wed, 12 Feb 2025 17:13:30 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -80,10 +80,11 @@ Cc: netdev@vger.kernel.org,
 	michal.swiatkowski@linux.intel.com,
 	helgaas@kernel.org,
 	horms@kernel.org,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v5 03/11] bnxt_en: Refactor TX ring allocation logic
-Date: Wed, 12 Feb 2025 17:12:31 -0800
-Message-ID: <20250213011240.1640031-4-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next v5 04/11] bnxt_en: Refactor completion ring free routine
+Date: Wed, 12 Feb 2025 17:12:32 -0800
+Message-ID: <20250213011240.1640031-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250213011240.1640031-1-michael.chan@broadcom.com>
 References: <20250213011240.1640031-1-michael.chan@broadcom.com>
@@ -95,68 +96,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a new bnxt_hwrm_tx_ring_alloc() function to handle allocating
-a transmit ring.  This will be useful later in the series.
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Add a wrapper routine to free L2 completion rings.  This will be
+useful later in the series.
+
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
-v2: Use const for a variable
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 ++++++++++++++---------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 0e16ea823fbd..8ab7345acb0a 100644
+index 8ab7345acb0a..52d4dc222759 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7218,6 +7218,20 @@ static int bnxt_hwrm_cp_ring_alloc_p5(struct bnxt *bp,
- 	return 0;
+@@ -7405,6 +7405,20 @@ static void bnxt_hwrm_rx_agg_ring_free(struct bnxt *bp,
+ 	bp->grp_info[grp_idx].agg_fw_ring_id = INVALID_HW_RING_ID;
  }
  
-+static int bnxt_hwrm_tx_ring_alloc(struct bnxt *bp,
-+				   struct bnxt_tx_ring_info *txr, u32 tx_idx)
++static void bnxt_hwrm_cp_ring_free(struct bnxt *bp,
++				   struct bnxt_cp_ring_info *cpr)
 +{
-+	struct bnxt_ring_struct *ring = &txr->tx_ring_struct;
-+	const u32 type = HWRM_RING_ALLOC_TX;
-+	int rc;
++	struct bnxt_ring_struct *ring;
 +
-+	rc = hwrm_ring_alloc_send_msg(bp, ring, type, tx_idx);
-+	if (rc)
-+		return rc;
-+	bnxt_set_db(bp, &txr->tx_db, type, tx_idx, ring->fw_ring_id);
-+	return 0;
++	ring = &cpr->cp_ring_struct;
++	if (ring->fw_ring_id == INVALID_HW_RING_ID)
++		return;
++
++	hwrm_ring_free_send_msg(bp, ring, RING_FREE_REQ_RING_TYPE_L2_CMPL,
++				INVALID_HW_RING_ID);
++	ring->fw_ring_id = INVALID_HW_RING_ID;
 +}
 +
- static int bnxt_hwrm_ring_alloc(struct bnxt *bp)
+ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
  {
- 	bool agg_rings = !!(bp->flags & BNXT_FLAG_AGG_RINGS);
-@@ -7254,23 +7268,17 @@ static int bnxt_hwrm_ring_alloc(struct bnxt *bp)
- 		}
- 	}
+ 	u32 type;
+@@ -7450,17 +7464,9 @@ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
+ 		struct bnxt_ring_struct *ring;
+ 		int j;
  
--	type = HWRM_RING_ALLOC_TX;
- 	for (i = 0; i < bp->tx_nr_rings; i++) {
- 		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
--		struct bnxt_ring_struct *ring;
--		u32 map_idx;
+-		for (j = 0; j < cpr->cp_ring_count && cpr->cp_ring_arr; j++) {
+-			struct bnxt_cp_ring_info *cpr2 = &cpr->cp_ring_arr[j];
++		for (j = 0; j < cpr->cp_ring_count && cpr->cp_ring_arr; j++)
++			bnxt_hwrm_cp_ring_free(bp, &cpr->cp_ring_arr[j]);
  
- 		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
- 			rc = bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
- 			if (rc)
- 				goto err_out;
- 		}
--		ring = &txr->tx_ring_struct;
--		map_idx = i;
--		rc = hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-+		rc = bnxt_hwrm_tx_ring_alloc(bp, txr, i);
- 		if (rc)
- 			goto err_out;
--		bnxt_set_db(bp, &txr->tx_db, type, map_idx, ring->fw_ring_id);
- 	}
- 
- 	for (i = 0; i < bp->rx_nr_rings; i++) {
+-			ring = &cpr2->cp_ring_struct;
+-			if (ring->fw_ring_id == INVALID_HW_RING_ID)
+-				continue;
+-			hwrm_ring_free_send_msg(bp, ring,
+-						RING_FREE_REQ_RING_TYPE_L2_CMPL,
+-						INVALID_HW_RING_ID);
+-			ring->fw_ring_id = INVALID_HW_RING_ID;
+-		}
+ 		ring = &cpr->cp_ring_struct;
+ 		if (ring->fw_ring_id != INVALID_HW_RING_ID) {
+ 			hwrm_ring_free_send_msg(bp, ring, type,
 -- 
 2.30.1
 
