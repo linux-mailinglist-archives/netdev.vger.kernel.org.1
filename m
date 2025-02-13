@@ -1,160 +1,160 @@
-Return-Path: <netdev+bounces-166100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A45A34852
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:47:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D7BA3429D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:39:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C439163372
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:39:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D88047A5890
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1B01632DD;
-	Thu, 13 Feb 2025 15:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4F323A98F;
+	Thu, 13 Feb 2025 14:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yKtY76j5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H1fT0tNS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91678145A11;
-	Thu, 13 Feb 2025 15:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF318221552
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 14:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739461163; cv=none; b=El12uo/VmffOXB8V318Gy35CKnQDTwd5KjfbVTnzw/Ajvte+3on4WefOTx0O7pKAx3ZJfbh7EUQePNHyr/23uzYWESI3tRImY3HEpvILiLNyBmQ/MdqSvquX8FysTyzTyNWuRO36A0UXtIgy0atoGVML5B9Nv8AHjLrk0I8/K0o=
+	t=1739457427; cv=none; b=nQuGVQEsci1dDHTdSO4BMsE7vvNmjyf3408TYHay+PSSBevEZk0I+sNC1/Iz1HKyfx8gWeBOmuxBWeucmx6JVreqjyWFFvE9ff6bRJ/a8T3c4ZL7Hxm5KuOIKCF7lREU04r9ZdzA398vblpyQBxIGm+pcdnxmyVoCXeEZjuTEkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739461163; c=relaxed/simple;
-	bh=6q/QewPzbnUsX7jiMLeE2mjex5cyWOE6tyicxoA6Dog=;
+	s=arc-20240116; t=1739457427; c=relaxed/simple;
+	bh=oO3CHfKpW6Oi/rSTeSXd/Q0m2FqUXJ3mReCxg8gF8fM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCza6QyG4Fs4goIQVTPmUlPfdLJ2bqxPvzODx+vn35jAkasY881rRtm2biTmaObUBV/NSaeDTrtneeQYdjN5JN7tAc5gNdHMlnnTKwEnq3P5dH90L1J74CmlrZozccntUD72OH6tJSyi5XjWw7Io65F6hTKv4lt6zEnJMcJETR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yKtY76j5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40FD7C4CED1;
-	Thu, 13 Feb 2025 15:39:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739461163;
-	bh=6q/QewPzbnUsX7jiMLeE2mjex5cyWOE6tyicxoA6Dog=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=HXCVFLHgDMwpgNgOkJFFI7FNaAJuLK4lUmTqGYycUTpd3D+Iq2NXV5A5U5tXvzAoXqDOkedEYRK9LX0o3PwsXnAct+cvJNcF/9s8XW8Bdp7dQ07HdF/X5xfwah+Hyi8F974rDuQMJ+FsJ0pWuco33NsbD+Wg/5HNjZEZb5evncc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H1fT0tNS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC02C4CED1;
+	Thu, 13 Feb 2025 14:37:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739457426;
+	bh=oO3CHfKpW6Oi/rSTeSXd/Q0m2FqUXJ3mReCxg8gF8fM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=yKtY76j52li0sEk5y5KPMU6muU6YekOq4KWdWkuzQRyQUaU6VWQp/uBAqzQ5ctSTy
-	 s0AbUnLkrGyTjPyPDtNcI38J2dZuq3C0P2N37SQ0mX+MsCcy9gMS9kRJ0VFRQ5AO+P
-	 O9OUyCgR3u9oJQTN7RffyfCc3+zp3+3/NLUR10fk=
-Date: Thu, 13 Feb 2025 15:35:45 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Hsin-chen Chuang <chharry@google.com>, linux-bluetooth@vger.kernel.org,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-Message-ID: <2025021347-exalted-calculate-b313@gregkh>
-References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021352-dairy-whomever-f8bd@gregkh>
- <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
- <2025021347-washboard-slashed-5d08@gregkh>
- <CADg1FFdbKx3z+SPWFmY4+xZmewh0MnnZp_gmYEdY0z-mxutmEw@mail.gmail.com>
- <2025021318-regretful-factsheet-79a1@gregkh>
- <CABBYNZL4tEBTT3Hrf3JUGNuseLg1SNLmazo88EitmMfhUWUQxw@mail.gmail.com>
+	b=H1fT0tNSkJfPIVvU9jzR93pDaEkJ0cV5acn9O+OrD4HdWXfcNJC/Y4AK9tgT3yfN3
+	 GZ/+ocVjmFEQhcQLl6RVpLQGPNXGowXHCPAWz1zkN6vLxEUxeDTeaikW9/GKoU4ROY
+	 SS8hSWSHgvEY00zmawje2/n+WFDKDt7O5W1gtB+uxPEshpckOzJ06Zozy1aXP8IY+G
+	 57XyOLkDxF7EibOsIDj7m9MgtFaPqRDkXT2p2LCAeTj8mqn+NKbG4Z4T4ihjcxmpWI
+	 cUBETUHTu2HErL0iRpjJGfHqGU1wjkN+bYNueLRvYe2WFps75HXVvTSeQvB8JM0VhZ
+	 0uEYvTJl1QExw==
+Date: Thu, 13 Feb 2025 16:37:02 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
+	weihg@yunsilicon.com, wanry@yunsilicon.com, horms@kernel.org,
+	parthiban.veerasooran@microchip.com, masahiroy@kernel.org
+Subject: Re: [PATCH v4 07/14] net-next/yunsilicon: Init auxiliary device
+Message-ID: <20250213143702.GN17863@unreal>
+References: <20250213091402.2067626-1-tianx@yunsilicon.com>
+ <20250213091418.2067626-8-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZL4tEBTT3Hrf3JUGNuseLg1SNLmazo88EitmMfhUWUQxw@mail.gmail.com>
+In-Reply-To: <20250213091418.2067626-8-tianx@yunsilicon.com>
 
-On Thu, Feb 13, 2025 at 09:22:28AM -0500, Luiz Augusto von Dentz wrote:
-> Hi Greg,
+On Thu, Feb 13, 2025 at 05:14:19PM +0800, Xin Tian wrote:
+> Initialize eth auxiliary device when pci probing
 > 
-> On Thu, Feb 13, 2025 at 8:45 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Feb 13, 2025 at 09:33:34PM +0800, Hsin-chen Chuang wrote:
-> > > On Thu, Feb 13, 2025 at 8:10 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > A: http://en.wikipedia.org/wiki/Top_post
-> > > > Q: Were do I find info about this thing called top-posting?
-> > > > A: Because it messes up the order in which people normally read text.
-> > > > Q: Why is top-posting such a bad thing?
-> > > > A: Top-posting.
-> > > > Q: What is the most annoying thing in e-mail?
-> > > >
-> > > > A: No.
-> > > > Q: Should I include quotations after my reply?
-> > > >
-> > > > http://daringfireball.net/2007/07/on_top
-> > > >
-> > > > On Thu, Feb 13, 2025 at 07:57:15PM +0800, Hsin-chen Chuang wrote:
-> > > > > The btusb driver data is allocated by devm_kzalloc and is
-> > > > > automatically freed on driver detach, so I guess we don't have
-> > > > > anything to do here.
-> > > >
-> > > > What?  A struct device should NEVER be allocated with devm_kzalloc.
-> > > > That's just not going to work at all.
-> > >
-> > > Noted. Perhaps that needs to be refactored together.
-> > >
-> > > >
-> > > > > Or perhaps we should move btusb_disconnect's content here? Luiz, what
-> > > > > do you think?
-> > > >
-> > > > I think something is really wrong here.  Why are you adding a new struct
-> > > > device to the system?  What requires that?  What is this new device
-> > > > going to be used for?
-> > >
-> > > The new device is only for exposing a new sysfs attribute.
-> >
-> > That feels crazy.
-> >
-> > > So originally we had a device called hci_dev, indicating the
-> > > implementation of the Bluetooth HCI layer. hci_dev is directly the
-> > > child of the usb_interface (the Bluetooth chip connected through USB).
-> > > Now I would like to add an attribute for something that's not defined
-> > > in the HCI layer, but lower layer only in Bluetooth USB.
-> > > Thus we want to rephrase the structure: usb_interface -> btusb (new
-> > > device) -> hci_dev, and then we could place the new attribute in the
-> > > new device.
-> > >
-> > > Basically I kept the memory management in btusb unchanged in this
-> > > patch, as the new device is only used for a new attribute.
-> > > Would you suggest we revise the memory management since we added a
-> > > device in this module?
-> >
-> > If you add a new device in the tree, it HAS to work properly with the
-> > driver core (i.e. life cycles are unique, you can't have empty release
-> > functions, etc.)  Put it on the proper bus it belongs to, bind the
-> > needed drivers to it, and have it work that way, don't make a "fake"
-> > device for no good reason.
-> 
-> Well we could just introduce it to USB device, since alternate setting
-> is a concept that is coming from there, but apparently the likes of
-> /sys/bus/usb/devices/usbX/bAlternateSetting is read-only, some
-> Bluetooth profiles (HFP) requires switching the alternate setting and
-> because Google is switching to handle this via userspace thus why
-> there was this request to add a new sysfs to control it.
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> ---
+>  .../ethernet/yunsilicon/xsc/common/xsc_core.h |  12 ++
+>  .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   3 +-
+>  .../net/ethernet/yunsilicon/xsc/pci/adev.c    | 110 ++++++++++++++++++
+>  .../net/ethernet/yunsilicon/xsc/pci/adev.h    |  14 +++
+>  .../net/ethernet/yunsilicon/xsc/pci/main.c    |  10 ++
+>  5 files changed, 148 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+>  create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
 
-That's fine, just don't add devices where there shouldn't be devices, or
-if you do, make them actually work properly (i.e. do NOT have empty
-release callbacks...)
+<...>
 
-If you want to switch alternate settings in a USB device, do it the
-normal way from userspace that has been there for decades!  Don't make
-up some other random sysfs file for this please, that would be crazy,
-and wrong.
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c b/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+> new file mode 100644
+> index 000000000..1f8f27d72
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+> @@ -0,0 +1,110 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+> +/*
+> + * Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+> + * All rights reserved.
+> + */
+> +
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/idr.h>
+> +
+> +#include "adev.h"
+> +
+> +static DEFINE_IDA(xsc_adev_ida);
+> +
+> +enum xsc_adev_idx {
+> +	XSC_ADEV_IDX_ETH,
+> +	XSC_ADEV_IDX_MAX
+> +};
+> +
+> +static const char * const xsc_adev_name[] = {
+> +	[XSC_ADEV_IDX_ETH] = XSC_ETH_ADEV_NAME,
+> +};
+> +
+> +static void xsc_release_adev(struct device *dev)
+> +{
+> +	/* Doing nothing, but auxiliary bus requires a release function */
+> +}
 
-So what's wrong with the current api we have today that doesn't work for
-bluetooth devices?
+It is unlikely to be true in driver lifetime model. At least you should
+free xsc_adev here.
 
-thanks,
+Thanks
 
-greg k-h
+> +
+> +static int xsc_reg_adev(struct xsc_core_device *xdev, int idx)
+> +{
+> +	struct auxiliary_device	*adev;
+> +	struct xsc_adev *xsc_adev;
+> +	int ret;
+> +
+> +	xsc_adev = kzalloc(sizeof(*xsc_adev), GFP_KERNEL);
+> +	if (!xsc_adev)
+> +		return -ENOMEM;
+> +
+> +	adev = &xsc_adev->adev;
+> +	adev->name = xsc_adev_name[idx];
+> +	adev->id = xdev->adev_id;
+> +	adev->dev.parent = &xdev->pdev->dev;
+> +	adev->dev.release = xsc_release_adev;
+> +	xsc_adev->xdev = xdev;
+> +
+> +	ret = auxiliary_device_init(adev);
+> +	if (ret)
+> +		goto err_free_adev;
+> +
+> +	ret = auxiliary_device_add(adev);
+> +	if (ret)
+> +		goto err_uninit_adev;
+> +
+> +	xdev->xsc_adev_list[idx] = xsc_adev;
+> +
+> +	return 0;
+> +err_uninit_adev:
+> +	auxiliary_device_uninit(adev);
+> +err_free_adev:
+> +	kfree(xsc_adev);
+> +
+> +	return ret;
+> +}
 
