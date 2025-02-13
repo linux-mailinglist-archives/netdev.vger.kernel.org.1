@@ -1,155 +1,174 @@
-Return-Path: <netdev+bounces-166008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B7CA33EA5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:01:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C7BA33EB2
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:02:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50E9916A535
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:00:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0426E188F388
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5DE23A99A;
-	Thu, 13 Feb 2025 11:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22421221541;
+	Thu, 13 Feb 2025 12:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="SbwUG6i8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2KjB/5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD7A221732;
-	Thu, 13 Feb 2025 11:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F4721D3D0;
+	Thu, 13 Feb 2025 12:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739447994; cv=none; b=DWeL16P6zd07VBY9MN7eJXNRrgY7XPn5GHNNmQSS1CrtExVw87F3O8x62k0ROn06W2bGB39GEoLdcYtXcDoIPV/9CV+IXV6q2mJjZ2U603EkK10MJ5JKiZVU4WhF+opYyq7UElNTs5rk4B42gigD4scnqnwlv7Ng7MuXyt8RegQ=
+	t=1739448040; cv=none; b=FD76h0NNLzX1U5613aCea8pi/ns0CWI1WX2iqFZcE9EtlDVAW3BR7r9Y+vyWeC7QmgEO05rpFOuAjVDi7Q6XSmwtlgo/DuImfpeyXTUv91sE2HCCXjvdsyFYx8BRu2dIZZ2Te5Lpt6RRcsc8zQhv75N9d0mWQJdOR6M7gUtgSbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739447994; c=relaxed/simple;
-	bh=fMoXLuF5d8eGMrBTitSutfWb/zAV/yVFvE4nKp2F/yg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=El4OXlx4s1z8U3TN0i1ov269RqjU1CcWjH0yIevBRxqyMVe49+jClZDVUdJiZ6A4DNE1sBFNFY4mYe3l8p6qo9qKBr+HrxivUIomsqE5uT3funzmEg64bHFuc0e9Fyf8VRORGe58cphhFO09+7rK50nhr/RchGztoY45Oz0vu1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=SbwUG6i8; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tiXsc-002IJt-Jo; Thu, 13 Feb 2025 12:59:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=7HwOodpeouGmCMVjpYK3Qh6CQjYz2QlZ4WQNHLx8gUE=; b=SbwUG6i8CBxSgLg+kO/ewCegmG
-	SOAcpo9fPBLs90OfMIRhPGThSJA8QOl5syRnt7VT+MFg1aWyumAKN53k5s42+M08JbqLRZQPsnALq
-	HIcZY4tysagJznG8NZ/KDARoAMZyTX2umd8mpvdj3aN5nnk+bn4wOk0ZevGuI4JCSasW4Bh48oZxS
-	kB3Z81XtLI0CD2qBdDCJYfJH8fHbalPvhH7wPzmz7Sc5qAG/JIpTw5i94PsVzBKTh3hw1lMw0PyiI
-	aw+OWahR9lbZ3mmNck4+A2oDEJfo3yDAjyIHG/lMMNFa5NdQ2Fr6vrBqbazWio+Eqb0XL9su0DJ+z
-	GHWaNorA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tiXsc-0004rG-4A; Thu, 13 Feb 2025 12:59:42 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tiXsE-008u87-1A; Thu, 13 Feb 2025 12:59:18 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 13 Feb 2025 12:58:52 +0100
-Subject: [PATCH net 4/4] selftest/bpf: Add vsock test for sockmap rejecting
- unconnected
+	s=arc-20240116; t=1739448040; c=relaxed/simple;
+	bh=Im1yH1OaxGaQ2gF3haVRxuvOsoSb/cXP6pcFJC0G8lU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=thDqGaw6QqvVObYc0Kt7d5UUtD/GzfYv6LYOzSKCnHEEQq5laEiZKTERIwdNXLVv0KhUzrTbmtYoaP3qLzXYXxLQ12QizpqnPYFjVejXdkeC8Kr0D8bFb3nKQwxoHzViUh8sAoQoD6nZA+wEypSTTPRmhv+rkazQaAGxvY+O9xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2KjB/5D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33D96C4CED1;
+	Thu, 13 Feb 2025 12:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739448039;
+	bh=Im1yH1OaxGaQ2gF3haVRxuvOsoSb/cXP6pcFJC0G8lU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e2KjB/5DklF5stBkR/Rwr1LFFRl0LF6gegGMYBLhQFTwRBv1gIkYeKv35kuKR9FVh
+	 qP3uXc1qZX4MK8kNpSnVGGFtdZsfDVe1qBwo7n/23DT2h8fT0NIPbGoXPlQSoqO4jj
+	 I6uQaXpROVvWWVbPZp0PDAUx5rsPnaWBmw1HfZekjeEOYxMoiSwgxmW5OLgbYlpddT
+	 kIETC45TRppDZpdYBZqHi7UztpMAaQ//7eLTy4GZh8SCoa5RAYdj1r9Th4v090W4Ie
+	 DoE3dWfH7u1H44sFwswMWQcTMtKALNOrsKc5FqKbO+H0W91Rk3EYnjEl/IqDH1sIjV
+	 gTYyYP86Nd/Xw==
+Message-ID: <27b0f5c5-ae51-4192-8847-20e471c55be7@kernel.org>
+Date: Thu, 13 Feb 2025 13:00:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ conor+dt@kernel.org, richardcochran@gmail.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250213044624.37334-1-swathi.ks@samsung.com>
+ <CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
+ <20250213044624.37334-2-swathi.ks@samsung.com>
+ <20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
+ <009a01db7e07$132feb60$398fc220$@samsung.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <009a01db7e07$132feb60$398fc220$@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250213-vsock-listen-sockmap-nullptr-v1-4-994b7cd2f16b@rbox.co>
-References: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
-In-Reply-To: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
-To: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, Stefano Garzarella <sgarzare@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Bobby Eshleman <bobby.eshleman@bytedance.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-Verify that for a connectible AF_VSOCK socket, merely having a transport
-assigned is insufficient; socket must be connected for the sockmap to
-accept.
+On 13/02/2025 12:04, Swathi K S wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski <krzk@kernel.org>
+>> Sent: 13 February 2025 13:24
+>> To: Swathi K S <swathi.ks@samsung.com>
+>> Cc: krzk+dt@kernel.org; andrew+netdev@lunn.ch; davem@davemloft.net;
+>> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+>> robh@kernel.org; conor+dt@kernel.org; richardcochran@gmail.com;
+>> mcoquelin.stm32@gmail.com; alexandre.torgue@foss.st.com;
+>> rmk+kernel@armlinux.org.uk; netdev@vger.kernel.org;
+>> devicetree@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
+>> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org
+>> Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
+>> bindings
+>>
+>> On Thu, Feb 13, 2025 at 10:16:23AM +0530, Swathi K S wrote:
+>>> +  clock-names:
+>>> +    minItems: 5
+>>> +    maxItems: 10
+>>> +    contains:
+>>> +      enum:
+>>> +        - ptp_ref
+>>> +        - master_bus
+>>> +        - slave_bus
+>>> +        - tx
+>>> +        - rx
+>>> +        - master2_bus
+>>> +        - slave2_bus
+>>> +        - eqos_rxclk_mux
+>>> +        - eqos_phyrxclk
+>>> +        - dout_peric_rgmii_clk
+>>
+>> This does not match the previous entry. It should be strictly ordered with
+>> minItems: 5.
+> 
+> Hi Krzysztof,
+> Thanks for reviewing.
+> In FSD SoC, we have 2 instances of ethernet in two blocks.
+> One instance needs 5 clocks and the other needs 10 clocks.
 
-This does not test datagram vsocks. Even though it hardly matters. VMCI is
-the only transport that features VSOCK_TRANSPORT_F_DGRAM, but it has an
-unimplemented vsock_transport::readskb() callback, making it unsupported by
-BPF/sockmap.
+I understand and I do not think this is contradictory to what I asked.
+If it is, then why/how?
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 30 ++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+> 
+> I tried to understand this by looking at some other dt-binding files as given below, but looks like they follow similar approach
+> Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> 
+> Could you please guide me on how to implement this?
+> Also, please help me understand what is meant by 'strictly ordered'
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 21793d8c79e12b6e607f59ecebb26448c310044b..05eb37935c3e290ee52b8d8c7c3e3a8db026cba2 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -1065,6 +1065,34 @@ static void test_sockmap_skb_verdict_vsock_poll(void)
- 	test_sockmap_pass_prog__destroy(skel);
- }
- 
-+static void test_sockmap_vsock_unconnected(void)
-+{
-+	struct sockaddr_storage addr;
-+	int map, s, zero = 0;
-+	socklen_t alen;
-+
-+	map = bpf_map_create(BPF_MAP_TYPE_SOCKMAP, NULL, sizeof(int),
-+			     sizeof(int), 1, NULL);
-+	if (!ASSERT_OK_FD(map, "bpf_map_create"))
-+		return;
-+
-+	s = xsocket(AF_VSOCK, SOCK_STREAM, 0);
-+	if (s < 0)
-+		goto close_map;
-+
-+	/* Fail connect(), but trigger transport assignment. */
-+	init_addr_loopback(AF_VSOCK, &addr, &alen);
-+	if (!ASSERT_ERR(connect(s, sockaddr(&addr), alen), "connect"))
-+		goto close_sock;
-+
-+	ASSERT_ERR(bpf_map_update_elem(map, &zero, &s, BPF_ANY), "map_update");
-+
-+close_sock:
-+	xclose(s);
-+close_map:
-+	xclose(map);
-+}
-+
- void test_sockmap_basic(void)
- {
- 	if (test__start_subtest("sockmap create_update_free"))
-@@ -1131,4 +1159,6 @@ void test_sockmap_basic(void)
- 		test_skmsg_helpers_with_link(BPF_MAP_TYPE_SOCKHASH);
- 	if (test__start_subtest("sockmap skb_verdict vsock poll"))
- 		test_sockmap_skb_verdict_vsock_poll();
-+	if (test__start_subtest("sockmap vsock unconnected"))
-+		test_sockmap_vsock_unconnected();
- }
+Every other 99% of bindings. Just like your clocks property.
 
--- 
-2.48.1
-
+Best regards,
+Krzysztof
 
