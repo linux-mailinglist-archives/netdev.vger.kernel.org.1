@@ -1,110 +1,149 @@
-Return-Path: <netdev+bounces-166026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88121A33F67
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:45:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D957DA33F68
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94673188B640
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:45:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F66E18852F7
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485153C47B;
-	Thu, 13 Feb 2025 12:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53081A5AA;
+	Thu, 13 Feb 2025 12:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bV/fqfcb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3IoHqDQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA8E33FE
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 12:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282D033FE;
+	Thu, 13 Feb 2025 12:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739450721; cv=none; b=tXP7FLyifqR4rkY2Uz0tZip2/izMZnGnfFfm8ka61uTmSsikFMyQcRpHzAQNZ0Vmbk2uCoZfm3IxgPXfmJY4GDOjHOD1Vab7GYYIQN7dTGOhk/mb/5pt1c+hugcH+rrRj1YsHA2wsPC2Y6TPzcyvD3oL+/UdQ2o3rR2ZfkPtjdI=
+	t=1739450806; cv=none; b=Nva/K0MEwfF5otgQyKHdzjS6aA2qWI3g91kiFC8y4KsLmm6Xqv8IbCw33l9jFU+JwSrak3tuO7tOlVuMx7ugCIxRJCFahp3CxyyuBjFq/VCp0SFmfoMf1KP56gLw7Jhfq67mrasWj7gi0NipIbOefPcpE3Uqf1ju0Vuya+utAaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739450721; c=relaxed/simple;
-	bh=eOtzoHmgTpONSOg+OU2CS1jgA5e0c3BX00ardee6k4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rjx6jVjcjiCrhWrYHS8bduLq+daxsKyBMTW7AjLMmpM8wtCecPPW1ZeAqaAbIMt85QobDFjH5lgLIZYgbZ5eq4VBCPsTeaxqaIXDEFLsWC2NrQ8gUOcnDwc3ArDruuoj2Tkv8RaKixfdTh4zlByvMkWuLs6QKTJC2IviEmrtVfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bV/fqfcb; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1739450806; c=relaxed/simple;
+	bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JYJQYJJ2GEa/rc7irkKkUKa+7ilWZpJ9nolo4RZ4Eq4xlXLUYhpV/vBFjig2n4BMpkeTar6DUR8+KBo5Nn4SJQq6o+e+IpucleQTW/Ae7Z+6as33/5pUCAHRnpCHlT29K/qRqF1zOGQX906IWiGemL5Z/VFttNGdPwgjklMM48U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3IoHqDQ; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f818a980cso11503875ad.3
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:45:19 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-220c665ef4cso10780925ad.3;
+        Thu, 13 Feb 2025 04:46:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739450719; x=1740055519; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a76iZQlqnM4e9UNOjC3LdRnY6h/+ohu6heGEqnGPQLs=;
-        b=bV/fqfcbrUsjrOTwNGu0RttTwFq+CZPB/7DfbD90k8xWkdkRLjWd5kOPyoxBOFvqQY
-         TjT6dOgh/21ki4wYkPFVnQP5yZXnrTdBkffklXhTlqfHKzoObgI+Nkx7MlovbrgezyDb
-         h6XjcxRE/S3gO+QEpWGnzulVd6C8aSsmTOGvXX2U2MgDvPkj6HLMqMXfkHnCpLxNeIMr
-         wovowNTkSxZUeNez0nBCNPyoeroBA/DH2rPovsxjaFv75oq0yo/4kEUtpH9Fn3bjHNJz
-         moCtRukoPATAAYDOmwL5S17HCE3f7YcgJwEcRvCppj0B/zRN/UjRYtD1IwIrNPmxKosQ
-         19UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739450719; x=1740055519;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1739450804; x=1740055604; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a76iZQlqnM4e9UNOjC3LdRnY6h/+ohu6heGEqnGPQLs=;
-        b=BsbZdsYMZjiZeEPIhtOUYg9P/ggPjrQ+MO16zm1dfGnaEzPxQpUl3N7rBwoiKVPv5B
-         gEmV0c1rvK53d9ANB8qo2NfGB393YVds0fzNuStpKpij5OMraM2GQs2rDXkwepOMRh+d
-         QPwUN5/0fP8K5x0SvlDuQCjtyC2UqAB2hGRCUAq9xwk77RP7BUqLOxzgfRESPcW0W142
-         9dgdqMdJ2ldWXD6h6ODYnz4g09hW4WfRvtU2NjPw85YCYGqrZrvHm61uVng2qcuvzjxM
-         bHx31UPabTJeErt+2/SGRHEyqQ6mhl9KK9F+Wmj5KagWR6AFpqPvBkJID4Qtnyiz32IE
-         wziQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0fRCPLRxWbiHvBkNWaaDYw1om0zD8nmY7dk7uI/AmgWXopoQjJ+slf1GndHBqMQzcNj+Utts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEDO37dwZhfbo5cshjhEFw4YJfpE8SuWNpLM4qxW77AKovamRO
-	R7M+KLxr+LV+3Hr3GFzFcfbLeYRV2fT5464ZIPlnZZrbr4lfxpEJ
-X-Gm-Gg: ASbGncu3Yg8XNndk1BFDk7IPykcJ8z4odVgMbJfiVMX3u20CLPBluxXfZK/RX0L2dax
-	euoHlyjvY6yLkWbu0QEyLt/QUK9JCUzv77sojet7IkFZ4dZ74SyBiiBFir5MG+fg6r6lONyPCUu
-	AOS83qefYtqdEbT9l+RbH0CgutkvM18lrawwLkcpA7Hsx741bd3H3zuUOji2uNsOD1hUlY8AUCL
-	76fi88lRUDz7GvvYNZKuI0P+iBdNHHtqUbI8L0WmNmq5P5IXo9730ooHsHxRMA9jfNfzkdnsFXh
-	ZWdou46xSrW6oPtoOLOwx5FwHUNTo5dYguw=
-X-Google-Smtp-Source: AGHT+IFedsMxw19lXJ8KHLVCCEe+tGL50He0RoYVH2rymQmCoTJrmpV9+pwjKlP+bv/UD5pEGad9Ug==
-X-Received: by 2002:a05:6a00:188c:b0:732:2269:a15c with SMTP id d2e1a72fcca58-7322c43451amr11372781b3a.20.1739450718959;
-        Thu, 13 Feb 2025 04:45:18 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568a9esm1188189b3a.45.2025.02.13.04.45.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 04:45:18 -0800 (PST)
-Date: Thu, 13 Feb 2025 04:45:16 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux@armlinux.org.uk, horms@kernel.org, jacob.e.keller@intel.com,
-	netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v6 1/4] net: wangxun: Add support for PTP clock
-Message-ID: <Z63pXJKUNJqZlwdu@hoboy.vegasvil.org>
-References: <20250208031348.4368-1-jiawenwu@trustnetic.com>
- <20250208031348.4368-2-jiawenwu@trustnetic.com>
- <20250211160706.15eb0d2a@kernel.org>
- <03a901db7d22$24628cc0$6d27a640$@trustnetic.com>
- <20250212181744.606e5193@kernel.org>
+        bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
+        b=h3IoHqDQTa/ea9i4BujCI73R4gBwGGmj+0kCghWCW4cZxb9VO5o8tnmkPrevSzHFyd
+         nJvhKVpNka8j+sFoUSlFjQPPGI8oNEZ5p2INz6FFruSTOsS+CYyxexw64oym498vjx2/
+         Q61NCF8peRsJSPQMym1TAW2Z9NrBGGktEOGoukP/SUjWZljeUVrLeeTxnn07VwJCKV7K
+         +YGHRThyyzeBPrCaQ+YK0zIBQArCp2nQmif4Gyp/OUpwZwx3c4hbfxQ/38rpHrVpqNO7
+         /cMZ44ev0aIlNavLmiEbTPJAM89GbW+7u26S6ACy289aOhCRQWJA2jfB5WosobOTa7nX
+         +Ijw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739450804; x=1740055604;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
+        b=UUsrASTP5FvA37etKU/5w3xSct3dlKrC5/yZSXHRRhQm/8DWfVnJH8/eU0V3XC2Cq6
+         bICoM04v4rT4rVO22kTa6h8odTyFI/+KeblXgtf2yz8q1Ox1G6TCnsDuHCpbf6cvP5f0
+         6MtkdRuZ/PbaD8kaBtylwCC4Xdrfl3Nz5AYRyg4sPX0JGp8DdZUUTM8v7iTnoXocaBA3
+         tzJwAIvRNfpXgQGJKVW9R+ytfgsJGTlESYPKghZSt8ANfuK/PkTwooQsoF8hMKLzosri
+         MdGQxllaqvDeEiw1e1lEmh9sgyshaCxHNeQuBVXlDF47lXa4b9Jgf5Lg/mShhhYqQyBF
+         k72w==
+X-Forwarded-Encrypted: i=1; AJvYcCXZVuTBvYf0Ww1JMvWFz7lUmwH24FDcBLRFNr3eJduLRLrrlSK8ibgB0fkDb/Iaj74Ky0LfHRzLsacn2uzhDI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1BKESgi8vrwqdimGUhbh7O6cuc/xCD+xUxck9hXfXsthWDaKn
+	7+wNnFjx4sCvQn2V3kICEXLzxTVM4FODKwRzxBipVE+K0or9zDEuJyBjRhpQxOhgr8kLh/Wmc1/
+	KMXKyGN3rVR2z4kFcqmgUp6zxsLo=
+X-Gm-Gg: ASbGncurt3YHzfNvzLv1Ss0HN8UqksEoBtgXol1Hn0oVPl5g/ofHa9fcXCUaxZOUAAN
+	CwvWDc95Gh9PNEeSWEIY5IxDjQ5empyA/NCpKaZlsnHKe0D4Pwo00DOn69oshGWb/aLfdSyH4Vn
+	VkArOcTveP5R1Lelqziaxb0nNsFvirkSc=
+X-Google-Smtp-Source: AGHT+IGo4Dtxm93cuOlhSc3E1FmPN8FqKY12aSYo8sYDDf6BK9+hgUS1SPClKHM6PQW4trUpjYmL5DGlG/70ge52IKQ=
+X-Received: by 2002:a17:90b:1b45:b0:2fa:15ab:4df1 with SMTP id
+ 98e67ed59e1d1-2fbf8c4fa79mr9152962a91.8.1739450804309; Thu, 13 Feb 2025
+ 04:46:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250212181744.606e5193@kernel.org>
+References: <20250210192216.37756-1-annaemesenyiri@gmail.com> <72634e76-7bb2-48d5-ab21-9d5e86adee9c@redhat.com>
+In-Reply-To: <72634e76-7bb2-48d5-ab21-9d5e86adee9c@redhat.com>
+From: Anna Nyiri <annaemesenyiri@gmail.com>
+Date: Thu, 13 Feb 2025 13:46:33 +0100
+X-Gm-Features: AWEUYZkXOPPOVIcRCAgC1-fIkyiyRh0dMjA8zTSwO3mZTEBWzMT6yY44fN_Nb1g
+Message-ID: <CAKm6_Rv4LCpy6KaV84gOi7wW7OKdasbx2zqfFwFG26=L6rkhgA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] selftests: net: Add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
+	kuba@kernel.org, willemb@google.com, idosch@idosch.org, horms@kernel.org, 
+	davem@davemloft.net, shuah@kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 12, 2025 at 06:17:44PM -0800, Jakub Kicinski wrote:
+Paolo Abeni <pabeni@redhat.com> ezt =C3=ADrta (id=C5=91pont: 2025. febr. 11=
+., K, 12:19):
+>
+> On 2/10/25 8:22 PM, Anna Emese Nyiri wrote:
+> > Introduce tests to verify the correct functionality of the SO_RCVMARK a=
+nd
+> > SO_RCVPRIORITY socket options.
+> >
+> > Key changes include:
+> >
+> > - so_rcv_listener.c: Implements a receiver application to test the corr=
+ect
+> > behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
+> > - test_so_rcv.sh: Provides a shell script to automate testing for these=
+ options.
+> > - Makefile: Integrates test_so_rcv.sh into the kernel selftests.
+> >
+> > v2:
+> >
+> > - Add the C part to TEST_GEN_PROGS and .gitignore.
+> > - Modify buffer space and add IPv6 testing option
+> > in so_rcv_listener.c.
+> > - Add IPv6 testing, remove unnecessary comment,
+> > add kselftest exit codes, run both binaries in a namespace,
+> > and add sleep in test_so_rcv.sh.
+> > The sleep was added to ensure that the listener process has
+> > enough time to start before the sender attempts to connect.
+> > - Rebased on net-next.
+> >
+> > v1:
+> >
+> > https://lore.kernel.org/netdev/20250129143601.16035-2-annaemesenyiri@gm=
+ail.com/
+>
+> Unfortunately the added self-test does not run successfully in the CI:
 
-> Give it a go, I think it will work better when machine is heavily
-> loaded and workqueues get blasted with other work items. But not
-> a hard requirement if it's difficult to get right.
+I think the test is not running because it is added to TEST_GEN_PROGS.
+However, after reconsidering, I'm not sure it should be there, since
+this test does not run on its own but is executed by the
+test_so_rcv.sh shell script.
+Wouldn't it be more appropriate to add so_rcv_listener to
+TEST_GEN_FILES instead?
 
-"work" items are essentially uncontrollable.  They should be avoided
-if you need any kind of QoS for work being done.
+> https://netdev-3.bots.linux.dev/vmksft-net/results/987742/117-so-rcv-list=
+ener/stdout
 
-Thanks,
-Richard
+> Please have a look at:
+>
+> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-=
+style
+>
+> to test the change locally in a CI-like way.
+>
+> Cheers,
+>
+> Paolo
+>
 
