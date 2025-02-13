@@ -1,131 +1,93 @@
-Return-Path: <netdev+bounces-165965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075DFA33CF5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:50:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E91A33CF3
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 267BD1695E5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:50:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E468A1889455
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278C321322B;
-	Thu, 13 Feb 2025 10:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99932212D7A;
+	Thu, 13 Feb 2025 10:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mjzdBwKX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNU7TkkE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37A9190477
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D8020E717
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739443813; cv=none; b=imy53fo3+iJX2wgpxSnCLgwCjlFTWDLAm2QFwSl9TTipqbc/7fTSqfI83R+lMl7OHwaTzHkqBG1jygMmwy/1bQr9nkF2mdChsdDnvjnJY14aYnFjHeww/APl24D4mzREpi9SuBOp19HaSCWTRz8AVjaO/jfkNUr/EXhMBO/w95A=
+	t=1739443802; cv=none; b=LPT0tcmV/z27EweUWVvm3bsSgrb3nLjI3KiLOxJE3DJlVJzIMR4j/LL+9NV2PmdJP3OcQhvAnVKH2g2Q9nPWb4L53XjtFKsj5nu0k0uef//rFsjTwNXq/qvoDoJnpS5t9AOkxbtXtxhRvLPGr7WQSp+50DrmWDM2KIxpObHU3eU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739443813; c=relaxed/simple;
-	bh=PZldEN6Abj+iXjTpspjBtDYDXPhcFFE2GIltlBfsO/w=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=tsXNyAz4SafbFpr/qcsJpsnNJtBKfeEO8+TRM3KrNOd4uxByCbfQgULB5OQLJl8VscN7XPMO2R6p+8B1AY1acjpipyVstltDRHnXIl7zutOzRb/BVWmanKOdkM/tTWcImvOvwFNBQFGrFs0gUPKe2IyOOtNEFAMoCZg7D6PVyGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mjzdBwKX; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739443798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PZldEN6Abj+iXjTpspjBtDYDXPhcFFE2GIltlBfsO/w=;
-	b=mjzdBwKXjH97PHuJxlrFYl9NA4VqpM+GHmQl0XhlHLn82l4KtFXVZNKx1YkSpjao357yJN
-	BdSs+mQcmyFRYpt7nyH5nlemg51obctsp+ED9ANbZo4kwWdVv/MMA1YTXmA/4OXjkAciDz
-	bE7d2qjq+medOvjwao3I0MqwQNKws0A=
+	s=arc-20240116; t=1739443802; c=relaxed/simple;
+	bh=EmgFZclLpQ6mkv0XEm01W/8nKRvFjm/b2ZRsTuA1oBc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tVupPRsm6uogVTfQhG0qJOvSFFEAEBhzoVBiWqyw+AGGcBP71217FDjOswdiqwsvX5ptSOFcFnEQEHUSYpsSC8biZ9Ih0SWnzAjnx9rTr97pb1rYq/AHVz9I2mDRyIbG1zNsqU7Q0xrqzdbzoXlmPFrHKFoHivehcuxzyi3JZrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNU7TkkE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E030CC4CED1;
+	Thu, 13 Feb 2025 10:50:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739443801;
+	bh=EmgFZclLpQ6mkv0XEm01W/8nKRvFjm/b2ZRsTuA1oBc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SNU7TkkE9+Pq83nxYt3ieBKPuPcfCcvDqf22n2dsiXU6/KQjYP2Vs3Y9FbMQjefac
+	 tBU4rSpbOi74RXCTPx6Wwnb++uJ+V8ld9gONM4mpjnOF2VkCtNmuwt3svVR7oaWVBt
+	 JIimvlYdA0fwr5FzQFasU7j6hsEEWoOSochaiffSKKcScYw5K+7IQDeE0F9onCQTsJ
+	 uxGcS9lK6UfL9tfYbWk4lSSVmWHPduMTUlmfkIXVqHjgBCLQCYqliyeq0GKVDtJW++
+	 bxP6F/Sd5RVkpw79Zwabhjp84fLVZ4vhBRqYfl1sFBsAxfjHgdLFKPkEC9OdLqJbhz
+	 AZhSrSBU+Dvgw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FD1380CEEF;
+	Thu, 13 Feb 2025 10:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
-Subject: Re: [PATCH net-next] sctp: Remove commented out code
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-In-Reply-To: <20250212195747.198419a3@kernel.org>
-Date: Thu, 13 Feb 2025 11:49:45 +0100
-Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Xin Long <lucien.xin@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- linux-sctp@vger.kernel.org,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F83DD790-9085-4670-9694-2668DACFB4C1@linux.dev>
-References: <20250211102057.587182-1-thorsten.blum@linux.dev>
- <b85e552d-5525-4179-a9c4-6553b711d949@intel.com>
- <6F08E5F2-761F-4593-9FEB-173ECF18CC71@linux.dev>
- <2c8985fa-4378-4aa2-a56d-c3ca04e8c74c@intel.com>
- <20250212195747.198419a3@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net-next] arp: Convert SIOCDARP and SIOCSARP to per-netns
+ RTNL.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173944383101.1182479.12815558202490033852.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 10:50:31 +0000
+References: <20250211045057.10419-1-kuniyu@amazon.com>
+In-Reply-To: <20250211045057.10419-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org
 
-Hi Jakub,
+Hello:
 
-> On 13. Feb 2025, at 04:57, Jakub Kicinski wrote:
-> On Tue, 11 Feb 2025 12:33:57 +0100 Mateusz Polchlopek wrote:
->>>> I don't think we want to remove that piece of code, please refer
->>>> to the discussion under the link:
->>>>=20
->>>> =
-https://lore.kernel.org/netdev/cover.1681917361.git.lucien.xin@gmail.com/ =
-=20
->>>=20
->>> Hm, the commit message (dbda0fba7a14) says payload was deleted =
-because
->>> "the member is not even used anywhere," but it was just commented =
-out.
->>> In the cover letter it then explains that "deleted" actually means
->>> "commented out."
->>>=20
->>> However, I can't follow the reasoning in the cover letter either:
->>>=20
->>> "Note that instead of completely deleting it, we just leave it as a
->>> comment in the struct, signalling to the reader that we do expect
->>> such variable parameters over there, as Marcelo suggested."
->>>=20
->>> Where do I find Marcelo's suggestion and the "variable parameters =
-over
->>> there?"
->>>=20
->>=20
->> That's good question, I can't find the Marcelo suggestion that author
->> mention. It's hard to find without links to previous series or
->> discussion :/
->>=20
->> I guess it should be also commented by maintainers, I see that in the
->> Xin's thread Kuba also commented change with commenting out instead
->> of removing code. Let's wait
->=20
-> In the linked thread the point was to document what struct will be =
-next
-> in memory. Here we'd be leaving an array of u8s which isn't very
-> informative. I see there's precedent in this file, but I vote we just
-> delete the line.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-This patch deletes the line and I'm wondering why the "cr"?
+On Tue, 11 Feb 2025 13:50:57 +0900 you wrote:
+> ioctl(SIOCDARP/SIOCSARP) operates on a single netns fetched from
+> an AF_INET socket in inet_ioctl().
+> 
+> Let's hold rtnl_net_lock() for SIOCDARP and SIOCSARP.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> [...]
 
-Were you referring to this patch maybe?
-=
-https://lore.kernel.org/r/20250114215439.916207-3-thorsten.blum@linux.dev/=
+Here is the summary with links:
+  - [v1,net-next] arp: Convert SIOCDARP and SIOCSARP to per-netns RTNL.
+    https://git.kernel.org/netdev/net-next/c/7aca0d8a727d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Should both payload fields just be deleted since they're not used?
-
-Thanks,
-Thorsten=
 
