@@ -1,120 +1,155 @@
-Return-Path: <netdev+bounces-166035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7B13A34062
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:30:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81BCA3406F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:34:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56D47188C8D5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:30:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC631667BA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7532F227EAA;
-	Thu, 13 Feb 2025 13:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7A4227EA3;
+	Thu, 13 Feb 2025 13:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ODzZaBT/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q9zWcLC5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26A223F405;
-	Thu, 13 Feb 2025 13:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E0322154A
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739453397; cv=none; b=KKFk7XlBUtmk85QNN7sh61o6gZpYEsjRs2D9JHV08lxG5pnJ1esh4yp0qCuboT7UJJvBP9sdNV1mM+z0Xit9om2mTYy02YrXYrOkgQafbHeimsTVE/d+4V8nRropG+/PyZWQG2o/osiMS8oDfkA73foFDvJWt2FdQubq8wejzCo=
+	t=1739453644; cv=none; b=P7eRxsq7WOBVSqBNFeNVHzhU4g39JwXmaa86SnpITcJuMqJGYnxQrcIv/a//N101Wk+0ZN55zsry8dBUx0MW0Eq8ZY7nD2+5wroBBJ5HJ8tT29+Pc2RREe/qOR4NUnT/uyl5nayuNngsIYz3tQLxYXLiSjSyt785FvTzNCH3R90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739453397; c=relaxed/simple;
-	bh=u+0TFlvAcTgqS+Pq+6Q91tIBM3Sa6hihqUkBue9AVGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kJJkbaGLGNh5bBnCp2uxJC7sVgT9rT4BJdRY8PxZF7PgYkW7ABotSLM2wqTIBv9Uo1RH9xdySCJmBWkAeKQ/nu30jNqcvQJVt37+31gkoGhK3dL+aFs2a6qWCgiFImX3GfH9bMKFmB4pePvXlv3g3/ytWw3yiWEXZRAMp8ESWT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ODzZaBT/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LofFdn71YhJEfg4gK8mqJ2EQ/Xufw9Ujp/0BZNUiuSw=; b=OD
-	zZaBT/rDCeCpGiGnVgl4VG7kyi4r7LH/9K2ox5F62nicWoK8i2mLmNKkByiaAy2NSuSk8r3qvc5ch
-	ENTTTHgM30/v41WWLAEXjHmi7Mek6IZjtfCR/+O9p3Rd5TEjR8gtzOterexQlXHMnelpHb9xYAt/p
-	EGpe3aVaxfoZOZM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiZHb-00DkP8-9Z; Thu, 13 Feb 2025 14:29:35 +0100
-Date: Thu, 13 Feb 2025 14:29:35 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: phy: mediatek: Add token ring access
- helper functions in mtk-phy-lib
-Message-ID: <64b70b2d-b9b6-4925-b3f6-f570ddb70e95@lunn.ch>
-References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
- <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
- <5546788b-606e-489b-bb1a-2a965e8b2874@lunn.ch>
- <385ba7224bbcc5ad9549b1dfb60ace63e80f2691.camel@mediatek.com>
+	s=arc-20240116; t=1739453644; c=relaxed/simple;
+	bh=1Zo/b2fnH+KRJJ+uyJsBTTf+jevAOBBplgRMa6qKklE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o+SawP5FfF+NP6ybKVYrfG6OQERY/dSrPrIytCOeUj7y6fLwogUKBPzfuq4SthfZcJ7xMPbuvZtpNl5CZxivKa4weMoC4XrAzx4KR8KQawd3222YzJoGTjW4a7OikV5V8gROt/9VH6rJ1zgY5xcr2w2Io83kC4H1aKnXwUV4w20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q9zWcLC5; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6f9cc6fefa8so5969367b3.3
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 05:34:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739453642; x=1740058442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DRxuVvwSNDjMnXgRSeSCG5b6A90Xszx88z8fNg1clK0=;
+        b=Q9zWcLC5MOx55iLr+RiiOPTjRTERPPm4EWn/zqn2wlrkxZnS6VXwKq1pH2VLIwFJ1r
+         w5VyxYwXWSHYbEEXMf8guc0ASjNIMgR8lBkJ8ceRF5jW0ZGL10eFRYOuPNqKidKrQZ1u
+         RhtYaYOyCXpGvrlO4p+AHgPB8cDGvlg6DOJ6DJLlTIwKcsUVQpMTc6Fl3gH1l+4uzOUD
+         npjEhZDmLQ7gNQ0jN6adx3moD3WpPZcODqwnxcuR1FhqjuEGNvf+Jqvxh9iltVHlVm6a
+         z55KGMtEOhvunWUcq3enTH+KtfxpXbvVon0pbki5rOxjpwXD5gmOvdsge+mq50Ew2qHF
+         i8Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739453642; x=1740058442;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DRxuVvwSNDjMnXgRSeSCG5b6A90Xszx88z8fNg1clK0=;
+        b=LfyJhE7AXndI6aNe9k21oLVA3DfnIKkZq1QxvZRnTWtUPNUWNltBXVTmQzKgv1BRVq
+         ylGd9lbDYqtWmq5Yqqdm/HGPwQpIUOz/VPmve0V3dj7De7PG0/d4Gk1N3PUs2rTb+F3N
+         YFeO+zF4lUtw443cyzNd24mcIOgNsRYO2UG8DRpfLwV67lRk1k46nHyABD2yRLjgc9BZ
+         6R00Zj10N8z9OanNuoAzdTAY2Jnjy4mPKFsUpG+rSswTHgw8cTUFKMTFQiIGjIDo/WWN
+         F3i5X0WZJHKYpbfRCnLlXzHE1i/9qaw+Iw+zIPeeXWPALfZDA2QP/JxZY3vrz4GHk2dz
+         qCNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVo3Qmjqs/u10YhTJJLAI8u43ADoPp6ivgRl1B9NRiPGp8Df1kx0GWkFYKGlqcEormEOaNdTSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfvbIRHf+bujgd/7ZdxAH0cAEY+dhutXczWpByOZLAK+vGOjxo
+	/sWQ3qM9dkSAU0szUsT9ZdaftSbQ4QC2BfKWk41tvoGbKOqTVEaFTvFx2ui7kZBP9M6A5+4qKAh
+	3l+Yu5Q69sBPNDp/paBTpjfeADeyFD60ifHpSwUFet5F3uxGRly39CX0=
+X-Gm-Gg: ASbGnculBcHnnWgAXZvlyK3EWRTc0k116D2YEOwrsxP+YD+/m2mwxeVDILfjQ7+NPuZ
+	xR9ux9FGlSSt2UIWuWVWlzAz5+iEBhMYQDhW2GIHtNE5VK36Wt8sO79VJb4SITeKASRamQQ==
+X-Google-Smtp-Source: AGHT+IF30ZkMMq8IrQ1Se84n4sKD0GvX5J7aA84qCQbXLCMSoSpfvD+rGWf1JdZYduPjA+px3O11cfkJuPs60tUkK7k=
+X-Received: by 2002:a05:690c:9a05:b0:6f7:50b7:8fe0 with SMTP id
+ 00721157ae682-6fb1f171ef9mr76470707b3.1.1739453641740; Thu, 13 Feb 2025
+ 05:34:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <385ba7224bbcc5ad9549b1dfb60ace63e80f2691.camel@mediatek.com>
+References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <2025021352-dairy-whomever-f8bd@gregkh> <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
+ <2025021347-washboard-slashed-5d08@gregkh>
+In-Reply-To: <2025021347-washboard-slashed-5d08@gregkh>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Thu, 13 Feb 2025 21:33:34 +0800
+X-Gm-Features: AWEUYZm_SnsYMtD42yF00_gIA0hMGPrnexms2cvVn9JmpgVsDbzt-5pObZIgJMo
+Message-ID: <CADg1FFdbKx3z+SPWFmY4+xZmewh0MnnZp_gmYEdY0z-mxutmEw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 13, 2025 at 07:39:39AM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Sun, 2025-01-19 at 18:12 +0100, Andrew Lunn wrote:
-> > 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> > 
-> > 
-> > > +/* ch_addr = 0x1, node_addr = 0xf, data_addr = 0x1 */
-> > > +/* MrvlTrFix100Kp */
-> > > +#define MRVL_TR_FIX_100KP_MASK                       GENMASK(22,
-> > > 20)
-> > > +/* MrvlTrFix100Kf */
-> > > +#define MRVL_TR_FIX_100KF_MASK                       GENMASK(19,
-> > > 17)
-> > > +/* MrvlTrFix1000Kp */
-> > > +#define MRVL_TR_FIX_1000KP_MASK                      GENMASK(16,
-> > > 14)
-> > > +/* MrvlTrFix1000Kf */
-> > > +#define MRVL_TR_FIX_1000KF_MASK                      GENMASK(13,
-> > > 11)
-> > 
-> > What does the Mrvl prefix stand for?
-> > 
-> > This patch is pretty much impossible to review because it makes so
-> > many changes. Please split it up into lots of small simple changes.
-> > 
-> >     Andrew
-> > 
-> > ---
-> > pw-bot: cr
-> Those registers with Mrvl* prefix were originally designed for
-> connection with certain Marvell devices. It's our DSP parameters.
+On Thu, Feb 13, 2025 at 8:10=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> A: http://en.wikipedia.org/wiki/Top_post
+> Q: Were do I find info about this thing called top-posting?
+> A: Because it messes up the order in which people normally read text.
+> Q: Why is top-posting such a bad thing?
+> A: Top-posting.
+> Q: What is the most annoying thing in e-mail?
+>
+> A: No.
+> Q: Should I include quotations after my reply?
+>
+> http://daringfireball.net/2007/07/on_top
+>
+> On Thu, Feb 13, 2025 at 07:57:15PM +0800, Hsin-chen Chuang wrote:
+> > The btusb driver data is allocated by devm_kzalloc and is
+> > automatically freed on driver detach, so I guess we don't have
+> > anything to do here.
+>
+> What?  A struct device should NEVER be allocated with devm_kzalloc.
+> That's just not going to work at all.
 
-Will this code work with real Marvell devices? Is this PHY actually
-licensed from Marvell?
+Noted. Perhaps that needs to be refactored together.
 
-	Andrew
+>
+> > Or perhaps we should move btusb_disconnect's content here? Luiz, what
+> > do you think?
+>
+> I think something is really wrong here.  Why are you adding a new struct
+> device to the system?  What requires that?  What is this new device
+> going to be used for?
+
+The new device is only for exposing a new sysfs attribute.
+
+So originally we had a device called hci_dev, indicating the
+implementation of the Bluetooth HCI layer. hci_dev is directly the
+child of the usb_interface (the Bluetooth chip connected through USB).
+Now I would like to add an attribute for something that's not defined
+in the HCI layer, but lower layer only in Bluetooth USB.
+Thus we want to rephrase the structure: usb_interface -> btusb (new
+device) -> hci_dev, and then we could place the new attribute in the
+new device.
+
+Basically I kept the memory management in btusb unchanged in this
+patch, as the new device is only used for a new attribute.
+Would you suggest we revise the memory management since we added a
+device in this module?
+
+>
+> confused,
+>
+>
+> greg k-h
+
+--=20
+Best Regards,
+Hsin-chen
 
