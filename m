@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-166152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD5AA34C3B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:45:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36CFA34C59
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:50:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 971323A338D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:44:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D9571889154
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC27422156F;
-	Thu, 13 Feb 2025 17:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788162222BD;
+	Thu, 13 Feb 2025 17:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fU9IlGGn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PnB0LNLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14A3202F97
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 17:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E31928A2D6;
+	Thu, 13 Feb 2025 17:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739468697; cv=none; b=Q8mMe/92/jdFBldZPinBVSaKEUY/fnhF5JJCsVbwlxe9t5ml/Xurd9+l1R2XfyvjjnqNTSn2tl1fjfDzG8OD5FWjExqCGeKMBNrAl/cPxQ6gtG3Yn1D8TBAeg4h0ukmcRZh/AycUzwJQ+wwqsraDkcWBHN/DjRx2tG9DE0EXHPk=
+	t=1739469004; cv=none; b=dwcAmGEhABrxy2yEVqHbhTjkgcD/alwiWLmPMjUZwYKO3v/M5O9wEoeoXBsGmX0777itTDFImnav7zkpfEEwop7iRndOMH9y8C0FCvkAJRFAY3N9SQomESUIrk3/tt6A8Bck97ykSV6DiJhxAQ2HI21s+PHnwy6f7HTGDh8jVyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739468697; c=relaxed/simple;
-	bh=hrpLg2JhgMbx+D1O6IZSnxWLxFOKlv+y7zfb9vkifI4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fgH9J4r8OEemb5pljkOiUcSHemxLmEGwrKQzgBXUQuhQY1fUFyXiFTQKgtv9U3gfhcDXDAXNBd5W+AtoMh0UEBIwzVqQMJtbSS1oi2V2rH4Erlg0H4gQjPqmVRf00/6nmz4O/GXNZUIGsG6EjVCmvAK4tTRqfpK3MKJpWL9h86k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fU9IlGGn; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-8553108e7a2so86089639f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:44:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739468695; x=1740073495; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bK6m8E4s0v6G7z1TcnwnBz+16kXFrHv6/vH+jaejNVY=;
-        b=fU9IlGGnZTAER9ZzOrPYzPP/ZE4t6rqkGjvr378Oc27I83kDQT0wdF2lN1euTw+R5M
-         DrTildnQ+cXwzhcPTsl5n7KCai55IHf4OxlpcrQnzjcmiNbPQMultRusJCV2Eze2b+ft
-         2C8T6z3lT/fv7JGOdkpl3qLk1s0P+BgCeNJ/oqjVEpDm/93cSKe1mDxU7NzA+MT+MgsY
-         B323HKEC5wTG9+3lxCz+LPFq8ruZJgyE2GHleou9wtu4VkJ285eNI1Saam+yLUdqY+Bo
-         vqY8tpTKIlOSkdZK2iMIVKqSF2EfBtn/nXe5NAlRLo2ezTs3tDR2k8drP85t7eLkzb7M
-         4+oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739468695; x=1740073495;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bK6m8E4s0v6G7z1TcnwnBz+16kXFrHv6/vH+jaejNVY=;
-        b=YoktTZl1h7oO+1Sm2IGkMe6uCOXpzbwDqLeNEp2T3gCI5TgCy/F+k0vk04fApr4m0P
-         XcNO9D5ZhAX9f5KgcLAk5OyZlzpLIjOWLXlN0bJdrccFvnLHy7rVpLS6odBPXGCtzEc1
-         g8VtMaiaPX064mPwc/eDRijaors4owhzNUN/hFSb0t9vR1RH8e/G3FE+EmI+5VoTdjdo
-         BT6EA+77ssuBXHb+sw2h0gMcocvv4fGAaqq5dyiA5W2mdjh6JaJL6ptG/AN6WiFxm8+7
-         UhwtK2TH50/zCG5TFvRusWTVfsYRv5dnmGHvq5CLHVsgJ5MQ86bYksh2asbBEiYzthvM
-         XFqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVa5grjuP9Ap3HZaDQ/TQGpXtYONgnke4FeFL9bk3BllHuIjDkaG76qnA26Sowda3CK/UJj3oU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX++xdiRwd9u3iR0jcPshoNKFx3a2dasFaVetzlBPF/G4GMkB8
-	31ZLN9s+Lspa4V8ogylJmnQsCEKvmwZbRSHjToulnZUEwuQe2NN5wo/POCrAP38=
-X-Gm-Gg: ASbGncsBjgGxWfu6xrIWJQ5oUGHRGiIqdnOklfR0v5x8mt7AGCroWn3xL48alEfNtl/
-	tP58/pRil5kh9WhPMjnNOOM+ksukYNi5jzAxotkJYhWmkADjuXoyfPvNtk+V5KSvs7D4b86Ngvq
-	Y9kimfIrhk9Rzu29P2QvR+6FNshtpsBsJzHmz9U1hdkEAfwN/Mzsv0chSqeIXug3duYBOnhQXt/
-	FAogXBBByqBAau6tj0/WHFKQBkoZUnmpGcW56Hsl7KhdycOsSFo4d7VBPITksdGpQlQWeO88/f9
-	VpV+YUQImRY=
-X-Google-Smtp-Source: AGHT+IE1Ezg0Y8aXI/E6ioGTW0+26Fz1xogeYAi7H3667OkEIBvf6oS6rUrX2UK7Mmd/m6ZRO2sM+g==
-X-Received: by 2002:a05:6e02:1d0a:b0:3d0:2548:83c1 with SMTP id e9e14a558f8ab-3d17be271c8mr74490995ab.6.1739468695007;
-        Thu, 13 Feb 2025 09:44:55 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ed2819d118sm409197173.65.2025.02.13.09.44.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 09:44:54 -0800 (PST)
-Message-ID: <b559f593-512d-48c3-81cc-ae85b3a194ec@kernel.dk>
-Date: Thu, 13 Feb 2025 10:44:53 -0700
+	s=arc-20240116; t=1739469004; c=relaxed/simple;
+	bh=GZMSTBr2rpSdNhxqSrf53W6uk2Y9irn1FNBDE035ABI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C+7lBy16nx1j0ywvNJ9+ZBEAjiKnrh6+aOcppe4wqM/syFP1ya51rr344XMTDf4bYEs8VmSUyF4Smeb7lJFzfiMrEvz3ToRH31ClljVnFuiGdm0FbJs5FicUJHWJPOUiXoMuT0Z2afKF+//A0VmjTMjjxXQIDLQdMINxm1y6WT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PnB0LNLI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CBAC4CED1;
+	Thu, 13 Feb 2025 17:50:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739469003;
+	bh=GZMSTBr2rpSdNhxqSrf53W6uk2Y9irn1FNBDE035ABI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PnB0LNLIizyzGRkWwgkeGq9Dgyef9IHsjK2U2t2G5lllj2fBIpPzeoMwG7ojL5udI
+	 rofWVxHGrQ2nevOPrnnNU+2Q49st9W1M8Y1hFRIWt1KPtH0fwKuzKjmEVJteC+YJ/a
+	 CdIdgm9HFVIa6QPT3T1Az6ReE0N/5aIBXLWKPrDR40RTV33unU3krlvCbUgtpQ5IFc
+	 QGhk/HbWTnGPWyE8Kse4We9UMIunHpymAKngw5rVfozMKtJDqPzugykFKIzzEBNLSq
+	 /CRBKWWmfMa1/GQAYMBlWvRFN3Q+n2CbdTBRVXPfyN9M/4LtBnRkOfIHTZwOrGCZH1
+	 c6AMnDitvkUgg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34028380CEEF;
+	Thu, 13 Feb 2025 17:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 00/11] io_uring zero copy rx
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20250212185859.3509616-1-dw@davidwei.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250212185859.3509616-1-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/1] Revert "netfilter: flowtable: teardown flow if cached
+ mtu is stale"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173946903302.1314369.16377887601628365815.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 17:50:33 +0000
+References: <20250213100502.3983-2-pablo@netfilter.org>
+In-Reply-To: <20250213100502.3983-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 
-On 2/12/25 11:57 AM, David Wei wrote:
-> This patchset contains io_uring patches needed by a new io_uring request
-> implementing zero copy rx into userspace pages, eliminating a kernel to
-> user copy.
+Hello:
 
-Still looks good to me - I'll be rebasing the for-6.15/io_uring branch
-post -rc3 this weekend, and then setup a branch for this and get it
-applied.
+This patch was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
+On Thu, 13 Feb 2025 11:05:02 +0100 you wrote:
+> This reverts commit b8baac3b9c5cc4b261454ff87d75ae8306016ffd.
+> 
+> IPv4 packets with no DF flag set on result in frequent flow entry
+> teardown cycles, this is visible in the network topology that is used in
+> the nft_flowtable.sh test.
+> 
+> nft_flowtable.sh test ocassionally fails reporting that the dscp_fwd
+> test sees no packets going through the flowtable path.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/1] Revert "netfilter: flowtable: teardown flow if cached mtu is stale"
+    https://git.kernel.org/netdev/net/c/cf56aa8dd263
+
+You are awesome, thank you!
 -- 
-Jens Axboe
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
