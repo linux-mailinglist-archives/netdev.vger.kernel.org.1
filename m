@@ -1,267 +1,379 @@
-Return-Path: <netdev+bounces-165993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E023A33DD9
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:24:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5491FA33D6A
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AEE47A4E70
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:22:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6838316A1BE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F342135AA;
-	Thu, 13 Feb 2025 11:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3A0214800;
+	Thu, 13 Feb 2025 11:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qj29tY/i"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QkW7cg5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2072.outbound.protection.outlook.com [40.107.236.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B142E20AF98
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739445716; cv=none; b=mkP8Rk1chWZatgT/pkDZy0l2tT+GVbwDo6Oc576mGvPZsbj+VjmIDp9cqKxl6GMQyvQCgmMRC1ZCKnzx+HjpgfEZb9lMynti4nqP+/hAD+6eQRFwPZ0dLFyPymHo4VVJL2C0TkBf2lgP1yD4gWZyrlBgEJfSgcHtNqb8Rli0Bck=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739445716; c=relaxed/simple;
-	bh=Pi4eMn80Vkv3stDJ2Ryeq1gBOrxrcjdgjXuoH7Kh8vw=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:Message-ID:MIME-Version:
-	 Content-Type:References; b=hGvw2a5FuxjSt6yiVRkISBTDwIBEUj9LzLjFbmb6P93iGxcW1E8jC2RYAfaURyFvxD6POY7NFJMewx1SmMSxaEn+hKuUOfNu7dGjLwo6BUdhvIzrVrryIV7Pw24xh5xrmZbolXsoleivx76Pv5uSyR35Gllw2bZ3vZK/le9Nu28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qj29tY/i; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250213112151epoutp046da4d44b55edc5ad455c78d06d57129c~jwKikNIMN0871908719epoutp04h
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:21:51 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250213112151epoutp046da4d44b55edc5ad455c78d06d57129c~jwKikNIMN0871908719epoutp04h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1739445711;
-	bh=FYeA0egZv4FF41HWS+5lY5RJ3ar8Pphs0FsmtbhyRSE=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-	b=qj29tY/iSIOX/IKeNwEWLUhYSOojk/p0yq39MyLUD5o9EhMrlTrfigvInh/f3eecq
-	 84a7nGp1x9AltRNUKXaTRFq1GhRgM7M05Jp+LqCej7VEd5vtVEEIO+C/IeAU42+Yjt
-	 9eaRUYaXidA013VMkA3nAAG5lk5HvpMbpBwigtMw=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20250213112150epcas5p432ded18de14682cc3b9c16d15c3a6f1b~jwKh9cVoO2775827758epcas5p4Q;
-	Thu, 13 Feb 2025 11:21:50 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Ytt710fwvz4x9Pr; Thu, 13 Feb
-	2025 11:21:49 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	AF.8A.19710.CC5DDA76; Thu, 13 Feb 2025 20:21:48 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20250213110439epcas5p4363f12d24845f86de9f5e0d1c15bcaf9~jv7hQbNb63061630616epcas5p4_;
-	Thu, 13 Feb 2025 11:04:39 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250213110439epsmtrp1713a253bece086c0e65de979af9e8830~jv7hPeule2200722007epsmtrp1E;
-	Thu, 13 Feb 2025 11:04:39 +0000 (GMT)
-X-AuditID: b6c32a44-363dc70000004cfe-d8-67add5cc2674
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	CF.18.23488.7C1DDA76; Thu, 13 Feb 2025 20:04:39 +0900 (KST)
-Received: from FDSFTE596 (unknown [107.122.82.131]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250213110436epsmtip2c8a8209a8c3b9ff20b96d86af3fac0e3~jv7ezI9zW2340823408epsmtip2R;
-	Thu, 13 Feb 2025 11:04:36 +0000 (GMT)
-From: "Swathi K S" <swathi.ks@samsung.com>
-To: "'Krzysztof Kozlowski'" <krzk@kernel.org>
-Cc: <krzk+dt@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<robh@kernel.org>, <conor+dt@kernel.org>, <richardcochran@gmail.com>,
-	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
-	<rmk+kernel@armlinux.org.uk>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-In-Reply-To: <20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
-Subject: RE: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
- bindings
-Date: Thu, 13 Feb 2025 16:34:29 +0530
-Message-ID: <009a01db7e07$132feb60$398fc220$@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A4B214227;
+	Thu, 13 Feb 2025 11:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739444720; cv=fail; b=lg6IzzjK/O2KFDokRcegI+otPVRIYsFioEh+dP9JMcVfgIyVl0B56btphKz1j/76paLrmfeSQrP+ds/7a50KiD9i/ISW10wM2K8uhT82jqk83syH4fJ0iT0hmoQ+EwbcLW8nOBEz/S+UVvLjuLo0McB7BmOldVY+azYuNqpUo2M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739444720; c=relaxed/simple;
+	bh=zmEyyqMHkqNeqn1zXcB/92BrjqGT92mOXwSLfDQ7SZM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JLo4w2+SF1fx6YjGIPIH7Gu7m69bBx03btILy4BgXemigrsFAlF8BobIpeNc14JjgT41ha5lfYhKWzow6/ZObJk02l3NamqBVr2XGdCQLg2VkTaBuNNUI++gQXRZEXb87W+2zwyj7eKLu9iROVcnSIc2rAA/sJXJeSZOp9/8aAk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QkW7cg5P; arc=fail smtp.client-ip=40.107.236.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qV4/EiYVYvLpM9dHCpvGAuQCV25v9RpfN9SZ1yahGm2HjIyG7llmsBv5mlcDS5pHHvI2GcySXDJ7QEzZekPw8vJTWyaoxXLrxe1HePb/sjvqRZORchd8IiG+mqxBqS2RUQvyhRircExqjiELOyxGh6hKcxI5M8WW0AWz+KciSQJFFtVX0okkkkb6SsF6F4ZjsVRs/Km99s+H2hrBChgtskVK+wDG/VaSSeWkmfpQqPds4pMai1mp5ptTRsIKYZ2DhLAg6GwjrQHsv3GxScVzoZw5XyWNEq/QUvAGjULrJ3H2Bi4ZZk0obK8qzGehQ3XuyJzVEjpipWyd+yWNHQE91g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z3h6hMKnZrb0Xjr2smmlfXtuC/KqrCTx9D+tgw06bCM=;
+ b=Z4rBWzjvOz5JD/nIYgcahSjHXMxDIlHndKHVuacv0SZWc2EUPIL5scuTAU2w2hbdqfJnRXRu2VeNrvAEpQckg34HmrkHFQrvcAmfWFPZICyawsHyuUtMbbs+uNrCAYfBQTYfstZbkWJIvyKFtqTvVmecytzPPoxJ8xafFs+0znIPvJTFdB0t1WX1hDy9LSj5fCu88hXYcTV5Dc0tS75sxrYNEBU7ILCVjPb0Gt7PJZH6ecVNSltHW5X6F3bZDBqtYtN5vWTBAXQoVNE1bK2O71MKKs9eLhOXaoFhNX4GMH/b+TqFeP5dZqsOr+1pPALkF8Ty9mexDQlORrhrl0EGfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z3h6hMKnZrb0Xjr2smmlfXtuC/KqrCTx9D+tgw06bCM=;
+ b=QkW7cg5PYbpugGuX3lrIUQx2288PCguPu8BOt4dqp1/hP4v6RZIIMA4Piuhk75IZ/S34IKAiidf2gSL+EJikAUMKXGDbMalPweJ7yFtaqjjPvXwMtoKQR3gYH7H2rK2W2ZVnamKv1MCVLFUBw0LiHpf2+CRb68gKuKIcKnM5YdEtJpDTT6Ag/IzvOzxfSl6d/ALuXf1j2MBRNfe58LUn68Xdwu0E3ad+emV5/oMFxeKzS9BFDgdFgUsFfde5Kv5UgAJU1ndZXDMwLR/3GzilKACzvAfCFpdZKx1jXiHc8I/2HlyKjGFh/7tSIwTt1uM2GIKF5LLIwawgmZSbTJO7RQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by DS7PR12MB8289.namprd12.prod.outlook.com (2603:10b6:8:d8::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8445.16; Thu, 13 Feb 2025 11:05:08 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%6]) with mapi id 15.20.8445.013; Thu, 13 Feb 2025
+ 11:05:08 +0000
+Message-ID: <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+Date: Thu, 13 Feb 2025 11:05:01 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Bryan Whitehead <bryan.whitehead@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+ <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MR1P264CA0127.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:501:51::13) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFMfZy5LnHh86L+CikZ+hKlrx3PbgHP/Q5uAh59lGQBgzSo3LQ3hOaA
-Content-Language: en-in
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta1BUZRjuO2cvB2mZ44LywUSuJ7twWdjFZT3bLFhKzhZWFD9yGJWOcGYX
-	2dvsLlJNTRZGiALSJLELrgsjFw1IF12X6wQhjkKAFzYoKBJIbjOMohgY0C4Hin/P9z7P+z3v
-	810wlD/NCcRStSbaoKXUBGcDy/FT8CvCrr4apWjotpycnygEZOWwk01WN3cjZEnPMRZ5tr2b
-	TY513OOSE5bfOWRPz0Uu2evIY5P2ERebvNNQwiFzXKNs0rpYwyY7bJvJuc5pQLZ3jaPk7fwC
-	hFxucnJf4yvuuG6hisvnBxDFWP4VrqLeMsRV2OzpCvuF4xxF3bnPFfXOWUQx09LHUbS2iBWz
-	9ufjvRPT5CqaSqENAlqbrEtJ1SqjibiEpN1JUVKRWCiWkTsIgZbS0NFE7N544Z5UtTsXIThC
-	qdPdpXjKaCQiYuQGXbqJFqh0RlM0QetT1HqJPtxIaYzpWmW4lja9KhaJIqPcwg/TVHXmZkTf
-	L/joQeEQ6yho9M8BXhjEJXDw7/sgB2zA+HgjgOaqRZaH4OMPAcy5F8YQcwDen/6StdZR9bAI
-	YYhmAK2OBpRZjAP4XfYj4FFx8BBYltfC9WA/XAjr+iu5HhGKD6PwZFHJylZeeAzMnc10Exjm
-	i78Hs675eMos/EVYUDLH8WAeLoNtrTdZDN4Ib5hHVzCKh8KK0imUmUgA58cq2IzXHvi0eAkw
-	Gn94bf7kynAQP+EFKx1ONtMQCwfrMjkM9oWT1y9zGRwIJ/KzVnES/D6vbzWyCg4tFKzqd8If
-	73rmx9wGwfCHhgimHARP36xFGF8fmPt0FGHqPOi0ruEX4OKUa3XLAOgon+GeAoRlXTTLumiW
-	dREs/7vZAOsCCKD1Ro2STo7Si7V0xn8XnqzT2MHKsw+JdYL+s0vhbQDBQBuAGEr48WBhtZLP
-	S6E+/oQ26JIM6Wra2Aai3OddgAZuSta5/43WlCSWyEQSqVQqkW2Xigl/Xmb9MSUfV1ImOo2m
-	9bRhrQ/BvAKPIgc6R20J2dih0IMR7KyNGO9464I690zYvi/eBI7HTwJcj4sOTVyJ9HZs23vu
-	ZdOmxbjSwb4y76L9w16/1XduaSWoLuuutPlk+tKIf6LQ/M6ULYgM3Uw0Fl/tiKm6WP3rQfR9
-	LeIzvlQxkLaj3CqMvH7a71NNwfmF7N3tQfWnmpb/GbYkbGFDyaQm8sHXR3wzUrfJ5Rr71pqr
-	5jFZ8K7Kv575Y1jfe2BfapP88I0Pen+Je/Qz/nbG5FuijlvWmbvdxW9cop6bebf3z5eeTYzM
-	bnrdpAz7Ft0pFwwcXlbXfmOuLaXPTA9FDQpkrv6ZphNSqq56ZHvtmKUs74ntM5+Y8v21X6ki
-	CJZRRYlDUIOR+hfqY4fEfwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsWy7bCSvO7xi2vTDTY+EbD4+XIao8XyBztY
-	LdbsPcdkMed8C4vF/CPnWC2eHnvEbvFy1j02i/PnN7BbXNjWx2qx6fE1VovLu+awWXRde8Jq
-	Me/vWlaLYwvELL6dfsNoceTMC2aLS/0TmSz+79nB7iDkcfnaRWaPLStvMnk87d/K7rFz1l12
-	jwWbSj02repk89i8pN5j547PTB7v911l8zi4z9Dj8ya5AO4oLpuU1JzMstQifbsErowFGyaw
-	FjyXr9jY3svcwHhCrIuRk0NCwERixacZTF2MXBxCArsZJWadX84MkZCU+NQ8lRXCFpZY+e85
-	O0TRM0aJvnUbGEESbAJaEov69rGD2CICuhKbbywHK2IW+MIsMfv+ZKixbxklrjYdYAGp4hSw
-	k+j93AzWISzgL/G+9ySYzSKgKjFxzjc2EJtXwFLi0MFTLBC2oMTJmU/AbGYBbYmnN5/C2csW
-	voY6VUHi59NlrBBXuEn8nv2PEaJGXOLozx7mCYzCs5CMmoVk1Cwko2YhaVnAyLKKUTK1oDg3
-	PTfZsMAwL7Vcrzgxt7g0L10vOT93EyM46rU0djC++9akf4iRiYPxEKMEB7OSCK/EtDXpQrwp
-	iZVVqUX58UWlOanFhxilOViUxHlXGkakCwmkJ5akZqemFqQWwWSZODilGpi6QvQf7P8iaav1
-	4mzOiq3nQy7PXRN8est2l/dRqXdY64ofqt09IMTynvtnrWVB0NezPutdg3yCGjhmeX06veyJ
-	mPB2izvXC/zU0vPPBuYdCJZJiBD1TEvhWnKrn4275uh649r6jXwL/GWz/M9+/uP2oNm//yfr
-	7xOvJ5eu8IrUd8zhV6n4/nTXuzuxFv95hZ6xG01qcFPiCTh5polz6oZ4Sx7Zd/mzN93f2Fcr
-	pl/w9u2cubtnyGiesm9R/Nebe/lY5nTBmqcPZvned5C0/6gmK1sWzrAs19Rk2tGGDcGzJOS2
-	dZX3TpvcO+POet7aXA6vFwGPUueLrJvacYm7b2NiNkuc7ZZNVlJThGt+7FBiKc5INNRiLipO
-	BACb1ffZaQMAAA==
-X-CMS-MailID: 20250213110439epcas5p4363f12d24845f86de9f5e0d1c15bcaf9
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff
-References: <20250213044624.37334-1-swathi.ks@samsung.com>
-	<CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
-	<20250213044624.37334-2-swathi.ks@samsung.com>
-	<20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|DS7PR12MB8289:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19ca038d-225a-4efe-81ff-08dd4c1e46eb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RDlZT3oxU0JBU1RaZVQrR2RyUGRwZ3k2UWphZU1Pd2IwSmh0TEFSdWQySG1I?=
+ =?utf-8?B?RUJBZ05hdWpjaWRFbGdvNmMxditQZ0tadWNFYmNlVlVNYXdUUUtJS1lyZW9G?=
+ =?utf-8?B?OWFFVlFTZmVCZVBPaWVuc2poNXdjSmppT01iSGdKbi8vNHhFdVFrN0lDdkpE?=
+ =?utf-8?B?aWJKVWdWancyTEFZSDl0UzY1NkJTVEZTU2RXd010dmg3bUVVZEY0UjUyUGhB?=
+ =?utf-8?B?NU9WbkJVSW14T202RHNnZ002Zi9QVGE5OTRjamZCS0ZBQ2VhaEk0Z09aNjgw?=
+ =?utf-8?B?a3EzYnh6YzA3bmMxWkxpMDhTQkxLWWZnSm5kY3RqZTFuMkpQekpnd3N2Tk12?=
+ =?utf-8?B?SEYwb0VCUHpFTWFnNm56SSswY0Nadm5RM1FENkZ6bUpreUU3T09ScXJFOTVp?=
+ =?utf-8?B?QW0xakI4VFZNZlZ0QnZ0eGFhbHdlRkxBUDJyMTBaMlcxek9XQi9VRDdUWlVl?=
+ =?utf-8?B?cUI3M1BLZ2p5eWludWRYS2J4ZVZLcWFLdmtSN240Mmx4czZ2dDNCY1kzYXFh?=
+ =?utf-8?B?c1FmUWwzaDdVRHA4R2pOenBIdWExTkJTM2ZuaUxUU2h4UXdnTHZVZjdsY1Fp?=
+ =?utf-8?B?eUIzdlFrOTYyZzUzbVdFMjVHV0IxWDRnSVQvN2ZES0o5Q1piT0hGRVlKb3Vl?=
+ =?utf-8?B?V1VWb1BZNEEvYzFQdUx6TVJTcG5XcWlIWHovUnR0TEozRVZpNkRORk0rZ1Bs?=
+ =?utf-8?B?cTYyeW5iUzJneW5VUE4xNk1EMThsbDFoaHFoczlGMVlQN0Z6RGJXOVZsWEg1?=
+ =?utf-8?B?cHVJUkZ3Tnl2ZGVqd1puSlU1dFduWTRRcjlQWVBrRSt3SDZhMHBaRWl3L3Bm?=
+ =?utf-8?B?cS81eE9rUk5uVnMxQm1KQ2NOMEdGWDUxNHpSOFFMVGd6S3JGSXdQNnFvN1Ja?=
+ =?utf-8?B?ZXZUZlpwNExCVjZOLzZSM1QzTWFvN01HajFnTHQyWEN3SU1iSzI4NnVtOGNh?=
+ =?utf-8?B?bWx3bXRmL3FxQ2dlRVI2ZHB6R1ZMKy9YbGNhRThEKzF2emU1RUhVM2tDYkYw?=
+ =?utf-8?B?cmJNdnd0SmxtS0NxWjErL0I0Y1IvVkI4QmE1UjVZczlwWGFVdW5WcE1EbnhH?=
+ =?utf-8?B?V0VjV1RadXYrTnRZWnQ4SFZWWHJiSnVTVnQ1Sm5lZjdqRHRYZm1Pa3BsSEZo?=
+ =?utf-8?B?MlZ2dU9uTUYwYnJwWnZucmtWWlFBbmRkSzNBdU92NlMvMGpDMlRPS0NaYWM0?=
+ =?utf-8?B?bDRKRW9rcWhiMXp4RTZ0TVlZc2tScUl3N2s2UVRvUndiMng3b2pPa0JlV05K?=
+ =?utf-8?B?SWpGc2sxOFdMZnlGdm1DQ2d1MU80WFRyMWtBeVFTbisyeFRoNGIyRmN5bjg4?=
+ =?utf-8?B?dTEyMmFIS2JXYXJONDB5ZjVpSXZyOVYvTHlDNGtZczVueGYrNnRuUk5ZZGpJ?=
+ =?utf-8?B?dG5HTHRmdXY5OFp2QVlGUDRldjJ2R0JpUU11SEo1UmhzdWs1NCtSQ2NDN2Q4?=
+ =?utf-8?B?czlYYUxab1R0RnQ3aEtQRmVtbFFoMTZwR1luTGxIRFNXckZrV3h1ZlpkVFNQ?=
+ =?utf-8?B?UGFPZ0kycjUvKzlGUGhOeERUcDVEK0pHdFJoN05tbkcycE1MS0J6SzM0UjE4?=
+ =?utf-8?B?WTZSVno2UkpKRUJRS3VXdmtodGl2aTNKMHQ2WXNCbDNHbGRHRks1bXdrTnNY?=
+ =?utf-8?B?eWVKZjRSaHJtVnowUEV1aFZ4MEw3U25aN2d3Y1Q2Q0Z1MXFtTkxMRndURGZK?=
+ =?utf-8?B?WDdjLzJWUDVsTWZ0VTk4d1FzYVJlQ1VwSTBTR2FqYzV1MVl0amNJaVo0Nm1k?=
+ =?utf-8?B?L3NDb3d3VnJMUWYxUnlERHFqMDZNelZlUjRwWGpJdjBkT0xxYXVTblhMZ1pI?=
+ =?utf-8?B?Z1VoamtobmdFckQzcWVzdERud24wODF6ZUFoVlh6U3hwZ0xBRWhMdEd5MXJM?=
+ =?utf-8?Q?VMYZ3VP2yM2bk?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bzUzSVpQQnJGVXROWnMwQUVrTnV1dExTTHZkUkpTaGMrV29QM2ZvU0lzY2JZ?=
+ =?utf-8?B?ZWtYTkxJR0QxS3hGbjlUT1Nod2FlaFBkWXVJb00xWkdWK2tyL2tQWXVhSmVs?=
+ =?utf-8?B?YXVlQ2FLTE05clp2L2R5bUdRZU51YlErM3oyMHN2TzVTMkpPNExVbWlCdFVs?=
+ =?utf-8?B?cFg3dGx1TmJtVk5Oa1gvUHlPbUY0TEtldnVTaEpkVHFkblNTUHZEMnc2QzZv?=
+ =?utf-8?B?YlRyc2NpeXBmRWdaaS9PdlFERWZmTmorS0lRcXZMRWoyT2RZWGZaMnNUVElp?=
+ =?utf-8?B?bVBYaHlTK1E5ekRSVGdCT2UwZDRCNFhOQWxYbTA5N3h2Z2pFbUN4NllLSVNs?=
+ =?utf-8?B?cTQyT3g5cmdya2pXTFczeURPSWRzcUJ4bzNya1VZSVFQTjhlaHE1QUFkbXVl?=
+ =?utf-8?B?bC9mdDF6N1F3KzduTVJKNmx2K00xSEpvMXl3YUNBY1V1SVd5R0pwU0hmWS9G?=
+ =?utf-8?B?UE5zdXVhZWp0ZmVDSXFWV1lacS9SQnZMbDlISnRWUVZhbHhTRE5IKzJOYW9v?=
+ =?utf-8?B?K2lSTUZ3SktacHc2RWtPSzYrR0sxSWRHVWEyNC9zRTFyTTRzSUdGTkpZdjlC?=
+ =?utf-8?B?OXdDdTlSdDdpZG15dVN2R1ZtcFBNYjFKa3F2dTgyRWc4RzFmWjZEZVB2Qk8r?=
+ =?utf-8?B?VzQ5VWNSSFNVU3F4dVZWSyszck5GZ3BEZGZEbFVWdnBYUjZiZUVjZG1Fc1FM?=
+ =?utf-8?B?aDg4dDE0VHZ3NGl0YzROeXJJTCtGc3QrbnVRTDBVYVFKWHR1UUIrT1NCQ3R5?=
+ =?utf-8?B?Q2JqVis2Z2tDd0wwaEhlZU1qS1pIYmNSZGZ1eVdoRXc5dFc1ak1CVGtTTElB?=
+ =?utf-8?B?RGZJMWpqdVFnU21JQWtCd1BiTUdkWktFQUphT1p1cGtSaFkveExhRG1PSUVv?=
+ =?utf-8?B?UVNXL3pBZ0FYSGl5c1Q0eklLVzBrbEpGWFZBMWZDZjQwbFVKSGgySDFPSC9U?=
+ =?utf-8?B?MVZmMU5ISTFGVXJONGRqNmEvRTdjTkQ5aTZLeEtOa0JBa2l3anJFWTZZSisx?=
+ =?utf-8?B?dzFjQVV0NEx1ZXlsWTZUWDR2bVVQaURIeURjdFZweXpwUHJubHA4QWNTeXFS?=
+ =?utf-8?B?b3RZdFBZUkQyRzFmc2kzNU9BUHlOZ1RSOWdhUG00U1ZkaWtOVFVud051Y1p4?=
+ =?utf-8?B?UEpTbjkzOEZxY1hxb1NwR0kwa0d5NUg1bzAyVTRvRjg1SkFwV21UL2dNei9x?=
+ =?utf-8?B?V1JZV0Zsc3BJNmZFQzZnT2RjeEZUOE4zM0NYMnVhd2NNWVkzNzNVZHNPUWM2?=
+ =?utf-8?B?dzNpbEU5ZTl5b1IyTTFXWVl6UzBsUnY0MXZ5TVkxZmRqczVzZGNSek43YXBj?=
+ =?utf-8?B?TmxVUVFSeWgxRUtiN0FwRUxIYU1lak9NajBLcWVrQ3orQzQvMVNEanRrWmxY?=
+ =?utf-8?B?MzBkQ0U1VDBXcTNyblpHblpkWG8xeldtV0NENHB2Vjk3QW4xaHF5d3Z0Y1Vn?=
+ =?utf-8?B?VDNnZGwvVTJZNGZSS20xYWpzaFFVb3V1YUxjVmE1bGtTTjlTUXVCcVY2b1R0?=
+ =?utf-8?B?a1R0NmpFcW9DZ3RaOFlqb1lRUUsrcHRObERMQm82dGFETHhKMW5STCtjSGV4?=
+ =?utf-8?B?Rk9nVUVZaUJMWTRqRGNQanAwd0l2Ry9qV084QWI1N3pSd3lqTjRPQVh1T2Nu?=
+ =?utf-8?B?bVVWcVBPTHZLam1KQTJzU3lMTmtoMWlpUnBpSmtEZHg0ZlhmSHZISkZ4clp1?=
+ =?utf-8?B?YTdQR2k3L004dHNoQ1B4anplOFhpVlNpTWl5NytBZ3Rpb3RCbUhIdjZ1UDFP?=
+ =?utf-8?B?bnpLQ1cyeG9MWFg2NDhiRjFienMzUkViTEtwbGxkNDlYUFYxNlFDcU9mYlk3?=
+ =?utf-8?B?K3ROMWc3WXdsSkRsS3p4NmxEWHFzSXBHdmVnZjNxamhQKzBZTi9EWEtSMlR0?=
+ =?utf-8?B?Vm5CUWhmMWhKKzRMbFZ0VlBncFVTVHBrSVY5OTBLYlBGRDRKSUpEaUdqZEow?=
+ =?utf-8?B?dnN4Q0hmWGw2S2c0djVsOUhNblU3R2Q1RXV4YTdHc2NMYUxlZEJRakgxRVll?=
+ =?utf-8?B?Rm5qb3QzZXRVbDB0dzJ0SDRhcm1SSUVhVmJ5T3N4RTFYVnA4TjUvbDN5UG9U?=
+ =?utf-8?B?SEwzZEJJNnh6NVRhZkd2NlpTR1ZuRGZuNTFUUW8wZlVFbW1xblZqVWt2VUls?=
+ =?utf-8?Q?yZp3Md42+7uTFHD4QKM3Vv51s?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19ca038d-225a-4efe-81ff-08dd4c1e46eb
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 11:05:08.1761
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: w+ZzVHv94B2t+h51M3gHMUo1wCbt/8AaSkj3FDeWRZ8pnjdJwlZHUaKABxVqiM9hU3awlhdZhiTL5fl/APrQAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8289
+
+Hi Russell,
+
+On 15/01/2025 20:43, Russell King (Oracle) wrote:
+> Convert stmmac to use phylink managed EEE support rather than delving
+> into phylib:
+> 
+> 1. Move the stmmac_eee_init() calls out of mac_link_down() and
+>     mac_link_up() methods into the new mac_{enable,disable}_lpi()
+>     methods. We leave the calls to stmmac_set_eee_pls() in place as
+>     these change bits which tell the EEE hardware when the link came
+>     up or down, and is used for a separate hardware timer. However,
+>     symmetrically conditionalise this with priv->dma_cap.eee.
+> 
+> 2. Update the current LPI timer each time LPI is enabled - which we
+>     need for software-timed LPI.
+> 
+> 3. With phylink managed EEE, phylink manages the receive clock stop
+>     configuration via phylink_config.eee_rx_clk_stop_enable. Set this
+>     appropriately which makes the call to phy_eee_rx_clock_stop()
+>     redundant.
+> 
+> 4. From what I can work out, all supported interfaces support LPI
+>     signalling on stmmac (there's no restriction implemented.) It
+>     also appears to support LPI at all full duplex speeds at or over
+>     100M. Set these capabilities.
+> 
+> 5. The default timer appears to be derived from a module parameter.
+>     Set this the same, although we keep code that reconfigures the
+>     timer in stmmac_init_phy().
+> 
+> 6. Remove the direct call to phy_support_eee(), which phylink will do
+>     on the drivers behalf if phylink_config.eee_enabled_default is set.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 57 +++++++++++++++----
+>   1 file changed, 45 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index acd6994c1764..c5d293be8ab9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -988,8 +988,8 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+>   	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+>   
+>   	stmmac_mac_set(priv, priv->ioaddr, false);
+> -	stmmac_eee_init(priv, false);
+> -	stmmac_set_eee_pls(priv, priv->hw, false);
+> +	if (priv->dma_cap.eee)
+> +		stmmac_set_eee_pls(priv, priv->hw, false);
+>   
+>   	if (stmmac_fpe_supported(priv))
+>   		stmmac_fpe_link_state_handle(priv, false);
+> @@ -1096,13 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>   		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
+>   
+>   	stmmac_mac_set(priv, priv->ioaddr, true);
+> -	if (phy && priv->dma_cap.eee) {
+> -		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
+> -					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
+> -		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
+> -		stmmac_eee_init(priv, phy->enable_tx_lpi);
+> +	if (priv->dma_cap.eee)
+>   		stmmac_set_eee_pls(priv, priv->hw, true);
+> -	}
+>   
+>   	if (stmmac_fpe_supported(priv))
+>   		stmmac_fpe_link_state_handle(priv, true);
+> @@ -1111,12 +1106,32 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>   		stmmac_hwtstamp_correct_latency(priv, priv);
+>   }
+>   
+> +static void stmmac_mac_disable_tx_lpi(struct phylink_config *config)
+> +{
+> +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> +
+> +	stmmac_eee_init(priv, false);
+> +}
+> +
+> +static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+> +				    bool tx_clk_stop)
+> +{
+> +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> +
+> +	priv->tx_lpi_timer = timer;
+> +	stmmac_eee_init(priv, true);
+> +
+> +	return 0;
+> +}
+> +
+>   static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+>   	.mac_get_caps = stmmac_mac_get_caps,
+>   	.mac_select_pcs = stmmac_mac_select_pcs,
+>   	.mac_config = stmmac_mac_config,
+>   	.mac_link_down = stmmac_mac_link_down,
+>   	.mac_link_up = stmmac_mac_link_up,
+> +	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
+> +	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
+>   };
+>   
+>   /**
+> @@ -1189,9 +1204,6 @@ static int stmmac_init_phy(struct net_device *dev)
+>   			return -ENODEV;
+>   		}
+>   
+> -		if (priv->dma_cap.eee)
+> -			phy_support_eee(phydev);
+> -
+>   		ret = phylink_connect_phy(priv->phylink, phydev);
+>   	} else {
+>   		fwnode_handle_put(phy_fwnode);
+> @@ -1201,7 +1213,12 @@ static int stmmac_init_phy(struct net_device *dev)
+>   	if (ret == 0) {
+>   		struct ethtool_keee eee;
+>   
+> -		/* Configure phylib's copy of the LPI timer */
+> +		/* Configure phylib's copy of the LPI timer. Normally,
+> +		 * phylink_config.lpi_timer_default would do this, but there is
+> +		 * a chance that userspace could change the eee_timer setting
+> +		 * via sysfs before the first open. Thus, preserve existing
+> +		 * behaviour.
+> +		 */
+>   		if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
+>   			eee.tx_lpi_timer = priv->tx_lpi_timer;
+>   			phylink_ethtool_set_eee(priv->phylink, &eee);
+> @@ -1234,6 +1251,9 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>   	/* Stmmac always requires an RX clock for hardware initialization */
+>   	priv->phylink_config.mac_requires_rxc = true;
+>   
+> +	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
+> +		priv->phylink_config.eee_rx_clk_stop_enable = true;
+> +
+>   	mdio_bus_data = priv->plat->mdio_bus_data;
+>   	if (mdio_bus_data)
+>   		priv->phylink_config.default_an_inband =
+> @@ -1255,6 +1275,19 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>   				 priv->phylink_config.supported_interfaces,
+>   				 pcs->supported_interfaces);
+>   
+> +	if (priv->dma_cap.eee) {
+> +		/* Assume all supported interfaces also support LPI */
+> +		memcpy(priv->phylink_config.lpi_interfaces,
+> +		       priv->phylink_config.supported_interfaces,
+> +		       sizeof(priv->phylink_config.lpi_interfaces));
+> +
+> +		/* All full duplex speeds above 100Mbps are supported */
+> +		priv->phylink_config.lpi_capabilities = ~(MAC_1000FD - 1) |
+> +							MAC_100FD;
+> +		priv->phylink_config.lpi_timer_default = eee_timer * 1000;
+> +		priv->phylink_config.eee_enabled_default = true;
+> +	}
+> +
+>   	fwnode = priv->plat->port_node;
+>   	if (!fwnode)
+>   		fwnode = dev_fwnode(priv->device);
 
 
+I have been tracking down a suspend regression on Tegra186 and bisect is
+pointing to this change. If I revert this on top of v6.14-rc2 then
+suspend is working again. This is observed on the Jetson TX2 board
+(specifically tegra186-p2771-0000.dts).
 
-> -----Original Message-----
-> From: Krzysztof Kozlowski <krzk=40kernel.org>
-> Sent: 13 February 2025 13:24
-> To: Swathi K S <swathi.ks=40samsung.com>
-> Cc: krzk+dt=40kernel.org; andrew+netdev=40lunn.ch; davem=40davemloft.net;
-> edumazet=40google.com; kuba=40kernel.org; pabeni=40redhat.com;
-> robh=40kernel.org; conor+dt=40kernel.org; richardcochran=40gmail.com;
-> mcoquelin.stm32=40gmail.com; alexandre.torgue=40foss.st.com;
-> rmk+kernel=40armlinux.org.uk; netdev=40vger.kernel.org;
-> devicetree=40vger.kernel.org; linux-stm32=40st-md-mailman.stormreply.com;
-> linux-arm-kernel=40lists.infradead.org; linux-kernel=40vger.kernel.org
-> Subject: Re: =5BPATCH v6 1/2=5D dt-bindings: net: Add FSD EQoS device tre=
-e
-> bindings
->=20
-> On Thu, Feb 13, 2025 at 10:16:23AM +0530, Swathi K S wrote:
-> > +  clock-names:
-> > +    minItems: 5
-> > +    maxItems: 10
-> > +    contains:
-> > +      enum:
-> > +        - ptp_ref
-> > +        - master_bus
-> > +        - slave_bus
-> > +        - tx
-> > +        - rx
-> > +        - master2_bus
-> > +        - slave2_bus
-> > +        - eqos_rxclk_mux
-> > +        - eqos_phyrxclk
-> > +        - dout_peric_rgmii_clk
->=20
-> This does not match the previous entry. It should be strictly ordered wit=
-h
-> minItems: 5.
+This device is using NFS for testing. So it appears that for this board
+networking does not restart and the board hangs. Looking at the logs I
+do see this on resume ...
 
-Hi Krzysztof,
-Thanks for reviewing.
-In FSD SoC, we have 2 instances of ethernet in two blocks.
-One instance needs 5 clocks and the other needs 10 clocks.
+[   64.129079] dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
+[   64.133125] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine initialization failed
 
-I tried to understand this by looking at some other dt-binding files as giv=
-en below, but looks like they follow similar approach
-Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+My first thought was if 'dma_cap.eee' is not supported for this device,
+but from what I can see it is and 'dma_cap.eee' is true. Here are some
+more details on this device regarding the ethernet controller.
 
-Could you please guide me on how to implement this?
-Also, please help me understand what is meant by 'strictly ordered'
+[    4.221837] dwc-eth-dwmac 2490000.ethernet: Adding to iommu group 3
+[    4.239289] dwc-eth-dwmac 2490000.ethernet: User ID: 0x10, Synopsys ID: 0x41
+[    4.244020] dwc-eth-dwmac 2490000.ethernet: 	DWMAC4/5
+[    4.249042] dwc-eth-dwmac 2490000.ethernet: DMA HW capability register supported
+[    4.256406] dwc-eth-dwmac 2490000.ethernet: RX Checksum Offload Engine supported
+[    4.263768] dwc-eth-dwmac 2490000.ethernet: TX Checksum insertion supported
+[    4.270700] dwc-eth-dwmac 2490000.ethernet: Wake-Up On Lan supported
+[    4.277063] dwc-eth-dwmac 2490000.ethernet: TSO supported
+[    4.282401] dwc-eth-dwmac 2490000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+[    4.290293] dwc-eth-dwmac 2490000.ethernet: Enabled L3L4 Flow TC (entries=8)
+[    4.297309] dwc-eth-dwmac 2490000.ethernet: Enabled RFS Flow TC (entries=10)
+[    4.304327] dwc-eth-dwmac 2490000.ethernet: TSO feature enabled
+[    4.310220] dwc-eth-dwmac 2490000.ethernet: Using 40/40 bits DMA host/device width
 
->=20
->=20
-> > +
-> > +  iommus:
-> > +    maxItems: 1
-> > +
-> > +  phy-mode:
-> > +    enum:
-> > +      - rgmii-id
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - interrupts
-> > +  - clocks
-> > +  - clock-names
-> > +  - iommus
-> > +  - phy-mode
-> > +
-> > +unevaluatedProperties: false
-> > +
-> > +examples:
-> > +  - =7C
-> > +    =23include <dt-bindings/clock/fsd-clk.h>
-> > +    =23include <dt-bindings/interrupt-controller/arm-gic.h>
-> > +    soc =7B
-> > +        =23address-cells =3D <2>;
-> > +        =23size-cells =3D <2>;
-> > +        ethernet1: ethernet=4014300000 =7B
-> > +            compatible =3D =22tesla,fsd-ethqos=22;
-> > +            reg =3D <0x0 0x14300000 0x0 0x10000>;
-> > +            interrupts =3D <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
-> > +            interrupt-names =3D =22macirq=22;
-> > +            clocks =3D <&clock_peric
-> PERIC_EQOS_TOP_IPCLKPORT_CLK_PTP_REF_I>,
-> > +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_ACLK_I>,
-> > +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_HCLK_I>,
-> > +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_RGMII_CLK_=
-I>,
-> > +                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_RX_I>,
-> > +                     <&clock_peric PERIC_BUS_D_PERIC_IPCLKPORT_EQOSCLK=
->,
-> > +                     <&clock_peric PERIC_BUS_P_PERIC_IPCLKPORT_EQOSCLK=
->,
-> > +                     <&clock_peric PERIC_EQOS_PHYRXCLK_MUX>,
-> > +                     <&clock_peric PERIC_EQOS_PHYRXCLK>,
-> > +                     <&clock_peric PERIC_DOUT_RGMII_CLK>;
-> > +            clock-names =3D =22ptp_ref=22, =22master_bus=22, =22slave_=
-bus=22,=22tx=22,
-> > +                          =22rx=22, =22master2_bus=22, =22slave2_bus=
-=22, =22eqos_rxclk_mux=22,
-> > +                          =22eqos_phyrxclk=22,=22dout_peric_rgmii_clk=
-=22;
-> > +            pinctrl-names =3D =22default=22;
-> > +            pinctrl-0 =3D <&eth1_tx_clk>, <&eth1_tx_data>, <&eth1_tx_c=
-trl>,
-> > +                        <&eth1_phy_intr>, <&eth1_rx_clk>, <&eth1_rx_da=
-ta>,
-> > +                        <&eth1_rx_ctrl>, <&eth1_mdio>;
-> > +            iommus =3D <&smmu_peric 0x0 0x1>;
-> > +            phy-mode =3D =22rgmii-id=22;
-> > +       =7D;
->=20
-> Misaligned/misindented.
+Let me know if you have any thoughts.
 
-Ack
+Thanks!
+Jon
 
->=20
-> Best regards,
-> Krzysztof
-
+-- 
+nvpublic
 
 
