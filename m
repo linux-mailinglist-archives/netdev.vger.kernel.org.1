@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-165768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9CD4A3350C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:59:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B14CCA33523
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:09:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96AF2167AA0
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:59:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E7781889330
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDFD13CA97;
-	Thu, 13 Feb 2025 01:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDD314A095;
+	Thu, 13 Feb 2025 02:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Un+iAw/y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxF7CT3v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2B7132117;
-	Thu, 13 Feb 2025 01:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488081494C3
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 02:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739411943; cv=none; b=LkD5RF9pkUtsUU7f4Kk0BJYBvD2ED/PlC3roOdjSu9Ychi7MAXwQ1zuU/P0ie8IGLBWh5vDpafVvhBuG6K2s3FjojAvns7BqTdRWZMQ0wFWaIdZQnReNcDhiWi9QVQISrnrWbSnBtOOEh9V6EiUu1bEwy9Odz8V2ipUqZs5EIio=
+	t=1739412554; cv=none; b=XS7/ysKV+VCJYdpKqfjNt4njMUaLf/sHO35efYcJRpiuVcZ919d08LH8CWMGvhvBKqlKL1itHrHia6pwIDwaJ+4LkEuvOgGeih8Hw4cmWEvhbh0D/3EEyi/p6UpnyEufA0j8VVR5j9fWdwdZ4tS0AhlPMLRVDIl9LXv0K1ePhG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739411943; c=relaxed/simple;
-	bh=5e9tQdjyUtvFsdWFPY66rgy1K6uwxdwMbTMFDYcH4wI=;
+	s=arc-20240116; t=1739412554; c=relaxed/simple;
+	bh=MpXHxY8lXOL0qK4ijqCbhMb4gs1/hlqrSeyrCqMA+Ss=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WX91gIAcWgcpSWRH7sJDD7gkZcgOpiIMmMnC9syKjG9/O+h0Tu9DRAJlB/FZ1Z/lBudurmhZM0QIjWfCdUqYcCY3WYYuD4pwdCfiJBgHvw/NHYj7rv6cGRWKQYqABbs2gcx9xz7zeoNQ2GCki79eH3x2BDgXMdb2+yCyQz2zXAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Un+iAw/y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE85C4CEDF;
-	Thu, 13 Feb 2025 01:59:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QRqcm140+ahsXB+vhuzUttpTxbOp1cbLlm7AyxJP373ifRiv+69qZCEhCrV5XQLvs3mItVi54vndgpgFrA16CMOtC0lfU8lliWxMG7YeAOo0hsGQxLFn2T5BYpTydqAHM/QpGnsUm3+D7h6RSf9OXZK6FrPEjh+neFoEwfdvdRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TxF7CT3v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C75C4CEDF;
+	Thu, 13 Feb 2025 02:09:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739411942;
-	bh=5e9tQdjyUtvFsdWFPY66rgy1K6uwxdwMbTMFDYcH4wI=;
+	s=k20201202; t=1739412553;
+	bh=MpXHxY8lXOL0qK4ijqCbhMb4gs1/hlqrSeyrCqMA+Ss=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Un+iAw/y1U6YD1qlsbtOYvwBpsZG4kOuALtUoheHGABfL+Eu7bruJ5XaiPm094Zx/
-	 KEFiM6zyg3J1Ym9fVWNxRCeulk3FdwvAj8e0RC1bo5BI7jvFjeqEv1lJxOJheUfD63
-	 TWX0DtHHX/pS1Xa9zHcwItl+LxS9DhXV1gp0Xb7bFLr28g6ZZKaI8+P27Y+OsA9ReS
-	 r7SJ9VpXDOlBx3hVZFWXYLhvgzLI8EsGrugVjyTBxwojBPZe90RiGgxVWWueOJZU7z
-	 zFwmUUjmKY82LWkOYDt+WJl/2rQR0x3s2aSZdd+4hFIIesZF/Sil6TxjzcV47xafi6
-	 tLTCI+eMv3+TQ==
-Date: Wed, 12 Feb 2025 17:59:01 -0800
+	b=TxF7CT3v2DQEsB05C5O52qGzhRkrCUn7ZsNYZsATZLZ+ho1oPfNaVnl5pzrJb31cB
+	 4kAzkDXeajOIZHngMn6yeyUZAw7W/l4baiWHpD+9n8oQLn3Fggu0ub+9eGxzfu4tmq
+	 hdJpbeXhP/MivY/GV0Ly9t6M5LLlmUY89uKeNz7ioZ/xX7OZyLqS0GTu+yM1Cuqs2A
+	 CvWQVLOKrbGSEc/IxmD6bAPBnRL9/s1g0ynFANJk7btbCpm6WgT9QFrfiTgHbybd2f
+	 now6zc6uBmAKtp9BtxoG7bBnG9Jm+omHcWF6SzuRqZhyuj2AnK8IMwXQ065EDtDFhG
+	 RKaoXLpWwjSqg==
+Date: Wed, 12 Feb 2025 18:09:12 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>,
- "Wojciech Drewek" <wojciech.drewek@intel.com>,
- <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH next] ice: Fix signedness bug in
- ice_init_interrupt_scheme()
-Message-ID: <20250212175901.11199ce1@kernel.org>
-In-Reply-To: <f66b15a3-1d83-43f9-8af2-071b76b133c0@intel.com>
-References: <14ebc311-6fd6-4b0b-b314-8347c4efd9fc@stanley.mountain>
-	<f66b15a3-1d83-43f9-8af2-071b76b133c0@intel.com>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+ duanqiangwen@net-swift.com
+Subject: Re: [PATCH net-next v7 5/6] net: ngbe: add sriov function support
+Message-ID: <20250212180912.7dc3e3cf@kernel.org>
+In-Reply-To: <DF81ED4C-F36A-4D6C-8993-0389E2F39615@net-swift.com>
+References: <20250206103750.36064-1-mengyuanlou@net-swift.com>
+	<20250206103750.36064-6-mengyuanlou@net-swift.com>
+	<20250207171940.34824424@kernel.org>
+	<09EC9A07-7DA7-4D3E-85EE-F56963B54A66@net-swift.com>
+	<20250211140652.6f1a2aa9@kernel.org>
+	<DF81ED4C-F36A-4D6C-8993-0389E2F39615@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,22 +64,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 12 Feb 2025 17:46:54 +0100 Alexander Lobakin wrote:
-> > [PATCH next] ice: Fix signedness bug in ice_init_interrupt_scheme()  
+On Wed, 12 Feb 2025 19:06:52 +0800 mengyuanlou@net-swift.com wrote:
+> > The goal should be to make sure the right handler is register
+> > for the IRQ, or at least do the muxing earlier in a safe fashion.
+> > Not decide that it was a packet IRQ half way thru a function called
+> > ngbe_msix_other  
 > 
-> I believe it should be "PATCH net" with
-> 
-> > If pci_alloc_irq_vectors() can't allocate the minimum number of vectors
-> > then it returns -ENOSPC so there is no need to check for that in the
-> > caller.  In fact, because pf->msix.min is an unsigned int, it means that
-> > any negative error codes are type promoted to high positive values and
-> > treated as success.  So here the "return -ENOMEM;" is unreachable code.
-> > Check for negatives instead.
-> > 
-> > Fixes: 79d97b8cf9a8 ("ice: remove splitting MSI-X between features")  
-> 
-> a 'Stable:' tag here.
+> Whether the first way(Alloc 9 irq vectors, but only request_irq for 0
+> and 8) can be better than reuse vector 0 in the real?
 
-Bug only exists in net-next if it comes from commit under Fixes.
-So I think the patch is good as is.
+I don't understand, sorry.
 
