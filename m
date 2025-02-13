@@ -1,74 +1,56 @@
-Return-Path: <netdev+bounces-165790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A2CA3366B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:53:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12CE2A33685
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 176BF167D58
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:53:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C322F1881393
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434A1158524;
-	Thu, 13 Feb 2025 03:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AAAitAAl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977DD2063DA;
+	Thu, 13 Feb 2025 04:03:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC45A537E5
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362BB204F88;
+	Thu, 13 Feb 2025 04:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739418826; cv=none; b=AUxb+hGw0n0N2r4LkuxYQIzE69CzgU9sYGTMDcWGM4NMd8a/s2JnjlqOE6BaBi2NWRV3oouIacFRdANyQUbd2Tpu73C8gYG18wv2QZnt5JrixfO2/k+l3gdYsgu3Dfad4zaM8GJFhYLf+0aY2LLdPRq5Agd/JDpOhtDy7GkOFAg=
+	t=1739419400; cv=none; b=LfvplM5cmCknTBwqFDhZrS7BqNodyBYUguigyD3CWdAs+JLBKCc+1bCsK3pdT4EoKRKNL5AWYk8xzdPh2Jo3EWRgOTXIpjTQJOa9DsGPD21Nfk8LFsk4IUd0gOhcHXKKobj2zsrSaDiPgccMy2VGgmhZVlMWzq3iJoiDGSKbMuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739418826; c=relaxed/simple;
-	bh=J4uFgwWvDx/OIx+HURNTpqkmivmbp35Ey5m5UcLmX8o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fbnDf3SLX/pKBDMWm59FRxiHWEvK77T67bKJOwXY8akDCRDPW91TtwQVzQxH6vCGB/wTU1KiY/OECbL1OXYc8j9IPGa1M6XvvX9zH4/5mYt7imlzs9lbx2x0zJ8RnWbfLyV+vB8fjdC75VaX+gPpIOOuoKFCkOeViCFcEqKSw5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AAAitAAl; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739418825; x=1770954825;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=P8BjVvabDWvRJ4Svrk7KS2Vwsz6FiT0ISCZD1tRCwRU=;
-  b=AAAitAAl+wmp5y2YxkTPvNo/QVTbBFGusZ2VV5DKxFi8fE6bzG8ktjR+
-   0jZf1Hl/B1DXQiKtla7enz2UsGk4mW0OeXgSK1LmJ10JPIl2FClbss7D6
-   5uGq8LgY2bl1kMmh/IMj5v+DPgr/WQaq05lsK2eZlGMKk7JQKSk581VG8
-   A=;
-X-IronPort-AV: E=Sophos;i="6.13,281,1732579200"; 
-   d="scan'208";a="798384652"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 03:53:39 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:16075]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.136:2525] with esmtp (Farcaster)
- id fe98330e-c787-450d-b24f-7adf958243bb; Thu, 13 Feb 2025 03:53:38 +0000 (UTC)
-X-Farcaster-Flow-ID: fe98330e-c787-450d-b24f-7adf958243bb
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 13 Feb 2025 03:53:38 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Feb 2025 03:53:33 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <mateusz.polchlopek@intel.com>,
-	<ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<sd@queasysnail.net>, <willemb@google.com>
-Subject: Re: [PATCH v2 net-next 2/4] inetpeer: use EXPORT_IPV6_MOD[_GPL]()
-Date: Thu, 13 Feb 2025 12:53:20 +0900
-Message-ID: <20250213035320.85876-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250212132418.1524422-3-edumazet@google.com>
-References: <20250212132418.1524422-3-edumazet@google.com>
+	s=arc-20240116; t=1739419400; c=relaxed/simple;
+	bh=JAfILeMeL04VzcAXg7ADNIDQVkJerVuvH9Bs20dOfig=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=vB05S73nY1JMEpeMiCL0xa/TuIPwtmQFczdLCY6G28Z6Toc3jsZDiTiz7QF/V/G9Pu5ptgFLOpJeOOvBH9Jgxhi1Uh5mRyfMVf+puUE4OYTVzwXBjdpZmsGhHaFjBTEI1qlLAjI0GRSVIJ0uZNyGb3SXTfRgqmhNWb/iYma8bb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4YthJV5R9Bz1V6g3;
+	Thu, 13 Feb 2025 11:59:22 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1FC6E140138;
+	Thu, 13 Feb 2025 12:03:10 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 13 Feb 2025 12:03:09 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH net-next 0/7] Support some enhances features for the HIBMCGE driver
+Date: Thu, 13 Feb 2025 11:55:22 +0800
+Message-ID: <20250213035529.2402283-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,15 +59,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 12 Feb 2025 13:24:16 +0000
-> Use EXPORT_IPV6_MOD[_GPL]() for symbols that do not need to
-> to be exported unless CONFIG_IPV6=m
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+In this patch set, we mainly implement some enhanced features.
+It mainly includes the statistics, self test, diagnosis, and ioctl to
+improve fault locating efficiency,
+abnormal irq and MAC link exception handling feature
+to enhance driver robustness,
+and rx checksum offload feature to improve performance 
+(tx checksum feature has been implemented).
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Jijie Shao (7):
+  net: hibmcge: Add dump statistics supported in this module
+  net: hibmcge: Add self test supported in this module
+  net: hibmcge: Add rx checksum offload supported in this module
+  net: hibmcge: Add abnormal irq handling feature in this module
+  net: hibmcge: Add mac link exception handling feature in this module
+  net: hibmcge: Add BMC diagnose feature in this module
+  net: hibmcge: Add ioctl supported in this module
+
+ .../net/ethernet/hisilicon/hibmcge/Makefile   |   2 +-
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   | 129 +++++
+ .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  |   7 +-
+ .../ethernet/hisilicon/hibmcge/hbg_diagnose.c | 348 +++++++++++++
+ .../ethernet/hisilicon/hibmcge/hbg_diagnose.h |  11 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.c  |  84 +++-
+ .../net/ethernet/hisilicon/hibmcge/hbg_err.h  |   2 +
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  | 474 ++++++++++++++++++
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.h  |   5 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  35 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   3 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  |  55 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 117 +++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c |  23 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |   2 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 106 ++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 182 ++++++-
+ 17 files changed, 1553 insertions(+), 32 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.h
+
+-- 
+2.33.0
+
 
