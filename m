@@ -1,85 +1,154 @@
-Return-Path: <netdev+bounces-165814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9CD2A336C6
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:18:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56CDA336C7
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D4171886A3D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:18:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82409160BB8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8DD2054E1;
-	Thu, 13 Feb 2025 04:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A542205E2E;
+	Thu, 13 Feb 2025 04:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RAH5t+hx"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="U6TQcmoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77CB78F29
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BD435949;
+	Thu, 13 Feb 2025 04:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739420296; cv=none; b=lC/dlb+7v6eThidUcecGS2QG1csf3Yw4NJDvwnzsyyxDrPL/nl9D1GtTX9n1elH3eLAOVzOAMHOiQVfz5UbYkTFqnBcXkx0fDE+2ATWyR7uQQKBYhOsrmb1PZID9WuDck0Mnc/LlH6IWTxn2YD2JYwrN7QGX/A6jfQ9hBf6NMP4=
+	t=1739420375; cv=none; b=p0hI+/AZk3ajNMGWxH8vOLIaSqHlaRzqPvpbYbGFEqzkUZbIuc4dCBTMgCP1g8nl46Q9efPJFVL5nc6axHzXEf+l6YJZHjZxaLWeoNJ3IOzaw1P/GyKdHP2sz1M7ouLnWrS+cnEEmTTI51hRipgkf/M6doU8/CHHCv4osSb2ffk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739420296; c=relaxed/simple;
-	bh=tryq4PXSjb8x/88a44RaEFQbhJLzK4Mly63mcyonQYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=suZ0fl7+S/P+14AHlA47ZO/ChyhvWCEHmRvAXvC82z348/oqeUEfGxNL1CQAfLUN6d/X1MR0+cHPNMWbn084tIGfyakbFWhoZNnFZoqOiK46iYs3LRM3Kn9ErJ5cwQUDLXuLR5ijMYvv5IG5B/XHR3e4KyhJQUOEktoxPkTguYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RAH5t+hx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C48A6C4CED1;
-	Thu, 13 Feb 2025 04:18:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739420295;
-	bh=tryq4PXSjb8x/88a44RaEFQbhJLzK4Mly63mcyonQYw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RAH5t+hxwaDxqTZUxXHQrTWwr0pYS22o7Fl6QE8ZfU24/p/s2XZjJW9jlompOQuqo
-	 NLBvTpSA/thdIn1DfCE/znlpN+Tdar5xOI+2+x/+o48+WlwTvfgllk6OY6TwrrDthr
-	 Ug7uM2sRFQZ78gxB6Ye4nO1rbh+lJx0mOAhcbVMZfS83TKDD+qfsXokIpAfAeGzZ75
-	 qsr3y0/kmpJl8D0rfGOeD9n89nrdgjQp8QyKdOWNam9/ImGevc25sUZXSOd1p/tVUM
-	 fxvKcHROnwlf+sMRNQsKk+SV/1hAvS1C/shht5wdKCxvO4gpBuhEyOnoFvepcL6gCK
-	 kfbH1K2iMCktw==
-Date: Wed, 12 Feb 2025 20:18:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- willemb@google.com, shuah@kernel.org, petrm@nvidia.com
-Subject: Re: [PATCH net-next 3/3] selftests: drv-net: add a simple TSO test
-Message-ID: <20250212201814.168bd1fb@kernel.org>
-In-Reply-To: <Z61dwqIp7PD_-m0B@mini-arch>
-References: <20250213003454.1333711-1-kuba@kernel.org>
-	<20250213003454.1333711-4-kuba@kernel.org>
-	<Z61dwqIp7PD_-m0B@mini-arch>
+	s=arc-20240116; t=1739420375; c=relaxed/simple;
+	bh=6HfRT/fnO/W8aeu78ZrIL+G349ObINelVdicx7iZ7qE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Tva8lkMoxZEyYQCBozWnD4G2e/VDs46IF5aa0IYORhiIFN3z4fv9UrguzwvSTaEkKadpk9qIgoYSFYACziBEPFKLzILL9FWzMsjz/7mcQyHlQR8zwIEz09c6pLS95O3gCYaMNAho0u7GiZa1f2VFgBkbyGOjwqctKzeCD+wbQKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=U6TQcmoS; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1739420369;
+	bh=2Ks13A/3NIuV2yBdwTh76NLt4bg5sihP3Ssn+/waTtM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=U6TQcmoSAld8SCykcX+u1e38eyNHTQmzBknpoAie3cZ9ublmfy1frTWKt+7Vu8Ui1
+	 pM749Qa45osqm3//mVNXti50q041Kovloa9Y5L0MH1Mj6oEarBqk7DVEnPV1nKpmBa
+	 tB/U1f56qOXF1s7CHbdXLAtlHaE6r3cMjAOZXiRvRK1ei8LEyi5kRxJ+pd/ilz8BYl
+	 qK4sjfcdJYkI0S3h2m/dpj7oUN0sT3vZ5VIH5Hpa0uuElnXz8/BBhNks4yHzcybgA9
+	 45IXGOjkBJbNo/ftqTcy6t6J/C805SfADEehJts7v3Bcn01yijfI7Vooa8mK8T2IAI
+	 RIRHzhOCRgYHw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ythlh4Knyz4x2J;
+	Thu, 13 Feb 2025 15:19:28 +1100 (AEDT)
+Date: Thu, 13 Feb 2025 15:19:27 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Kees Cook <kees@kernel.org>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Tamir Duberstein <tamird@gmail.com>
+Subject: linux-next: manual merge of the kspp tree with the net-next tree
+Message-ID: <20250213151927.1674562e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/9yxX6k3rdBpRL/u6GtMczE4";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/9yxX6k3rdBpRL/u6GtMczE4
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 12 Feb 2025 18:49:38 -0800 Stanislav Fomichev wrote:
-> > +            if cfg.have_stat_super_count:
-> > +                ksft_lt(qstat_new['tx-hw-gso-packets'] -
-> > +                        qstat_old['tx-hw-gso-packets'],
-> > +                        100, comment="Number of LSO super-packets with LSO disabled")
-> > +            if cfg.have_stat_wire_count:
-> > +                ksft_lt(qstat_new['tx-hw-gso-wire-packets'] -
-> > +                        qstat_old['tx-hw-gso-wire-packets'],
-> > +                        1000, comment="Number of LSO wire-packets with LSO disabled")  
-> 
-> Why do you expect there to be some noise (100/1000) with the feature
-> disabled?
+Hi all,
 
-We disable flag by flag. We may be disabling tunnel lso while some
-background daemon is sending stuff with normal lso.
+Today's linux-next merge of the kspp tree got a conflict in:
 
-Looking at those numbers now, tho, I think I went a bit high.
-100 * 64k = 6MB. We should probably set the noise to 10 super, 500 wire.
--- 
-pw-bot: cr
+  lib/Makefile
+
+between commit:
+
+  b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
+
+from the net-next tree and commit:
+
+  db6fe4d61ece ("lib: Move KUnit tests into tests/ subdirectory")
+
+from the kspp tree.
+
+I fixed it up (I used the latter version of this file and applied the
+following merge fix patch) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Thu, 13 Feb 2025 14:50:27 +1100
+Subject: [PATCH] fix up for "lib: Move KUnit tests into tests/ subdirectory"
+
+interacting with commit
+
+  b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
+
+from the net-next tree.
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ lib/tests/Makefile                    | 1 +
+ lib/{ =3D> tests}/blackhole_dev_kunit.c | 0
+ 2 files changed, 1 insertion(+)
+ rename lib/{ =3D> tests}/blackhole_dev_kunit.c (100%)
+
+diff --git a/lib/tests/Makefile b/lib/tests/Makefile
+index 8696d778d92f..8961fbcff7a4 100644
+--- a/lib/tests/Makefile
++++ b/lib/tests/Makefile
+@@ -6,6 +6,7 @@
+ CFLAGS_bitfield_kunit.o :=3D $(DISABLE_STRUCTLEAK_PLUGIN)
+ obj-$(CONFIG_BITFIELD_KUNIT) +=3D bitfield_kunit.o
+ obj-$(CONFIG_BITS_TEST) +=3D test_bits.o
++obj-$(CONFIG_BLACKHOLE_DEV_KUNIT_TEST) +=3D blackhole_dev_kunit.o
+ obj-$(CONFIG_CHECKSUM_KUNIT) +=3D checksum_kunit.o
+ obj-$(CONFIG_CMDLINE_KUNIT_TEST) +=3D cmdline_kunit.o
+ obj-$(CONFIG_CPUMASK_KUNIT_TEST) +=3D cpumask_kunit.o
+diff --git a/lib/blackhole_dev_kunit.c b/lib/tests/blackhole_dev_kunit.c
+similarity index 100%
+rename from lib/blackhole_dev_kunit.c
+rename to lib/tests/blackhole_dev_kunit.c
+--=20
+2.45.2
+
+
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/9yxX6k3rdBpRL/u6GtMczE4
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmetcs8ACgkQAVBC80lX
+0GyIkgf/W4SvrqVwfDAKHcFtXdrFrgyiVFwZKikEKyogQriGAdkHosZ3ItPDuo9i
+5TXf3zPeCxYKxR2z89UIQPO/74kA5sXLKTtlBDiWRq38Y0pMufavqUmnoxYsQ1o9
+9K96ARucHRBxRPhZj2jU7CE2ymCSTQigd6ib4A51tHZyWXYyp4mw3mqOaGA3boH1
+ygfLqz0t+CXBz75hLTmy8mha22ofgOg3Wp5sBFapzcZ0R2lQ/ZUdeOu3yQxMUgDK
+gMgpv/Nlu5pyu70BfGdAvLUFtZwxHVE2hkLyGguXf7IOLVelebF8dHODI8UCfiQd
+hTwSETuTRtNkFsXj513WgwG8k1ssXQ==
+=b42K
+-----END PGP SIGNATURE-----
+
+--Sig_/9yxX6k3rdBpRL/u6GtMczE4--
 
