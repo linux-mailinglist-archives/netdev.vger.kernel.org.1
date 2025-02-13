@@ -1,149 +1,161 @@
-Return-Path: <netdev+bounces-166027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D957DA33F68
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:46:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073C0A33F8B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 13:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F66E18852F7
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:46:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B25E17A1846
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53081A5AA;
-	Thu, 13 Feb 2025 12:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D21221572;
+	Thu, 13 Feb 2025 12:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3IoHqDQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d1T/yWN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282D033FE;
-	Thu, 13 Feb 2025 12:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D567221558;
+	Thu, 13 Feb 2025 12:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739450806; cv=none; b=Nva/K0MEwfF5otgQyKHdzjS6aA2qWI3g91kiFC8y4KsLmm6Xqv8IbCw33l9jFU+JwSrak3tuO7tOlVuMx7ugCIxRJCFahp3CxyyuBjFq/VCp0SFmfoMf1KP56gLw7Jhfq67mrasWj7gi0NipIbOefPcpE3Uqf1ju0Vuya+utAaI=
+	t=1739451271; cv=none; b=RlX4LkZRL1CjKRk+rRLxhN9Z2mgrFMBCqHuEmGZPl+AF1DDySMUjWF+paZOlR9PuBTDqYPbIFo1f9/iPIBhtmaJ47OAHmuNty87vVEXY/GGhZykOCAsYWhLUD8wuxkgeYi2eobLkFVWEMdMIAlsP79T7zPVUplm4as9ULpJRJMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739450806; c=relaxed/simple;
-	bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JYJQYJJ2GEa/rc7irkKkUKa+7ilWZpJ9nolo4RZ4Eq4xlXLUYhpV/vBFjig2n4BMpkeTar6DUR8+KBo5Nn4SJQq6o+e+IpucleQTW/Ae7Z+6as33/5pUCAHRnpCHlT29K/qRqF1zOGQX906IWiGemL5Z/VFttNGdPwgjklMM48U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3IoHqDQ; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-220c665ef4cso10780925ad.3;
-        Thu, 13 Feb 2025 04:46:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739450804; x=1740055604; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
-        b=h3IoHqDQTa/ea9i4BujCI73R4gBwGGmj+0kCghWCW4cZxb9VO5o8tnmkPrevSzHFyd
-         nJvhKVpNka8j+sFoUSlFjQPPGI8oNEZ5p2INz6FFruSTOsS+CYyxexw64oym498vjx2/
-         Q61NCF8peRsJSPQMym1TAW2Z9NrBGGktEOGoukP/SUjWZljeUVrLeeTxnn07VwJCKV7K
-         +YGHRThyyzeBPrCaQ+YK0zIBQArCp2nQmif4Gyp/OUpwZwx3c4hbfxQ/38rpHrVpqNO7
-         /cMZ44ev0aIlNavLmiEbTPJAM89GbW+7u26S6ACy289aOhCRQWJA2jfB5WosobOTa7nX
-         +Ijw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739450804; x=1740055604;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3w4eyl62/6vuKUAXXZB0G33wghT6GzKuZEu+/ovFzQM=;
-        b=UUsrASTP5FvA37etKU/5w3xSct3dlKrC5/yZSXHRRhQm/8DWfVnJH8/eU0V3XC2Cq6
-         bICoM04v4rT4rVO22kTa6h8odTyFI/+KeblXgtf2yz8q1Ox1G6TCnsDuHCpbf6cvP5f0
-         6MtkdRuZ/PbaD8kaBtylwCC4Xdrfl3Nz5AYRyg4sPX0JGp8DdZUUTM8v7iTnoXocaBA3
-         tzJwAIvRNfpXgQGJKVW9R+ytfgsJGTlESYPKghZSt8ANfuK/PkTwooQsoF8hMKLzosri
-         MdGQxllaqvDeEiw1e1lEmh9sgyshaCxHNeQuBVXlDF47lXa4b9Jgf5Lg/mShhhYqQyBF
-         k72w==
-X-Forwarded-Encrypted: i=1; AJvYcCXZVuTBvYf0Ww1JMvWFz7lUmwH24FDcBLRFNr3eJduLRLrrlSK8ibgB0fkDb/Iaj74Ky0LfHRzLsacn2uzhDI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1BKESgi8vrwqdimGUhbh7O6cuc/xCD+xUxck9hXfXsthWDaKn
-	7+wNnFjx4sCvQn2V3kICEXLzxTVM4FODKwRzxBipVE+K0or9zDEuJyBjRhpQxOhgr8kLh/Wmc1/
-	KMXKyGN3rVR2z4kFcqmgUp6zxsLo=
-X-Gm-Gg: ASbGncurt3YHzfNvzLv1Ss0HN8UqksEoBtgXol1Hn0oVPl5g/ofHa9fcXCUaxZOUAAN
-	CwvWDc95Gh9PNEeSWEIY5IxDjQ5empyA/NCpKaZlsnHKe0D4Pwo00DOn69oshGWb/aLfdSyH4Vn
-	VkArOcTveP5R1Lelqziaxb0nNsFvirkSc=
-X-Google-Smtp-Source: AGHT+IGo4Dtxm93cuOlhSc3E1FmPN8FqKY12aSYo8sYDDf6BK9+hgUS1SPClKHM6PQW4trUpjYmL5DGlG/70ge52IKQ=
-X-Received: by 2002:a17:90b:1b45:b0:2fa:15ab:4df1 with SMTP id
- 98e67ed59e1d1-2fbf8c4fa79mr9152962a91.8.1739450804309; Thu, 13 Feb 2025
- 04:46:44 -0800 (PST)
+	s=arc-20240116; t=1739451271; c=relaxed/simple;
+	bh=UN3Y9x428Mk8h/CXSju3Mtr+T4Cd2Rs3PZKgk+wNRiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hhwd0kI/NV6ty1FoewKXaMGacmgqPT5AThv5/mJHCO+ThJEnOJc0UzuehWf6ONsOscoeZ620uhiiZypjiQZGwuRZJIdcUjDQdqkxkUf8uKNx6fcrt35YfE9VcsXKqjBYXY+GJyXGIC71OBBks2HXTsFiTDjK2z28Xqwb/xqYd0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d1T/yWN0; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739451271; x=1770987271;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UN3Y9x428Mk8h/CXSju3Mtr+T4Cd2Rs3PZKgk+wNRiA=;
+  b=d1T/yWN0G92sRqAYEX3xaQwqApgD/o8kSIcCuyLvRSriiL/c5oBO6YEV
+   vqdDEjyC9xsS1df9nc7FCSp2iBJfDwjgyuZBWNL9d6SKfSp81k5mDYpk+
+   ItkM+ja5oX2OjwC1prNg79tHMlgGk1SPf/j6NcyBPzcPopyCYAjS4pyRA
+   S6XP6OwB5hkH/Fgu4RT/qBBIOky2AiFjS2Ywm4lQvCUQQfc3GLynHNtgz
+   NWLiBjGmLVf1natKrFI5xbh73coLdHhGnvUffmfGWe5DYZaHJycPFIRmi
+   AQcbTQJesmc6LEsCO/hPOW3CKIWwdj272ooq3/in0OmqcRA3EMomw9z0m
+   Q==;
+X-CSE-ConnectionGUID: 8D7kJjl+SzqGoMmApzEUrg==
+X-CSE-MsgGUID: IlSqQsgsReeKAe7Kf1SKmw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40266538"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="40266538"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 04:54:30 -0800
+X-CSE-ConnectionGUID: hz/02A95Toi+RKP8+COzSA==
+X-CSE-MsgGUID: 3oCHI4xJSWuWUpbQsVvUsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="150303991"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.42.34]) ([10.247.42.34])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 04:54:22 -0800
+Message-ID: <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
+Date: Thu, 13 Feb 2025 20:54:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210192216.37756-1-annaemesenyiri@gmail.com> <72634e76-7bb2-48d5-ab21-9d5e86adee9c@redhat.com>
-In-Reply-To: <72634e76-7bb2-48d5-ab21-9d5e86adee9c@redhat.com>
-From: Anna Nyiri <annaemesenyiri@gmail.com>
-Date: Thu, 13 Feb 2025 13:46:33 +0100
-X-Gm-Features: AWEUYZkXOPPOVIcRCAgC1-fIkyiyRh0dMjA8zTSwO3mZTEBWzMT6yY44fN_Nb1g
-Message-ID: <CAKm6_Rv4LCpy6KaV84gOi7wW7OKdasbx2zqfFwFG26=L6rkhgA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] selftests: net: Add support for testing
- SO_RCVMARK and SO_RCVPRIORITY
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
-	kuba@kernel.org, willemb@google.com, idosch@idosch.org, horms@kernel.org, 
-	davem@davemloft.net, shuah@kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
+ feature in IGC
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250212220121.ici3qll66pfoov62@skbuf>
+ <b19357dc-590d-458c-9646-ee5993916044@linux.intel.com>
+ <87cyfmnjdh.fsf@kurt.kurt.home>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <87cyfmnjdh.fsf@kurt.kurt.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Paolo Abeni <pabeni@redhat.com> ezt =C3=ADrta (id=C5=91pont: 2025. febr. 11=
-., K, 12:19):
->
-> On 2/10/25 8:22 PM, Anna Emese Nyiri wrote:
-> > Introduce tests to verify the correct functionality of the SO_RCVMARK a=
-nd
-> > SO_RCVPRIORITY socket options.
-> >
-> > Key changes include:
-> >
-> > - so_rcv_listener.c: Implements a receiver application to test the corr=
-ect
-> > behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
-> > - test_so_rcv.sh: Provides a shell script to automate testing for these=
- options.
-> > - Makefile: Integrates test_so_rcv.sh into the kernel selftests.
-> >
-> > v2:
-> >
-> > - Add the C part to TEST_GEN_PROGS and .gitignore.
-> > - Modify buffer space and add IPv6 testing option
-> > in so_rcv_listener.c.
-> > - Add IPv6 testing, remove unnecessary comment,
-> > add kselftest exit codes, run both binaries in a namespace,
-> > and add sleep in test_so_rcv.sh.
-> > The sleep was added to ensure that the listener process has
-> > enough time to start before the sender attempts to connect.
-> > - Rebased on net-next.
-> >
-> > v1:
-> >
-> > https://lore.kernel.org/netdev/20250129143601.16035-2-annaemesenyiri@gm=
-ail.com/
->
-> Unfortunately the added self-test does not run successfully in the CI:
 
-I think the test is not running because it is added to TEST_GEN_PROGS.
-However, after reconsidering, I'm not sure it should be there, since
-this test does not run on its own but is executed by the
-test_so_rcv.sh shell script.
-Wouldn't it be more appropriate to add so_rcv_listener to
-TEST_GEN_FILES instead?
 
-> https://netdev-3.bots.linux.dev/vmksft-net/results/987742/117-so-rcv-list=
-ener/stdout
+On 13/2/2025 8:01 pm, Kurt Kanzenbach wrote:
+> On Thu Feb 13 2025, Abdul Rahim, Faizal wrote:
+>> On 13/2/2025 6:01 am, Vladimir Oltean wrote:
+>>> On Mon, Feb 10, 2025 at 02:01:58AM -0500, Faizal Rahim wrote:
+>>>> Introduces support for the FPE feature in the IGC driver.
+>>>>
+>>>> The patches aligns with the upstream FPE API:
+>>>> https://patchwork.kernel.org/project/netdevbpf/cover/20230220122343.1156614-1-vladimir.oltean@nxp.com/
+>>>> https://patchwork.kernel.org/project/netdevbpf/cover/20230119122705.73054-1-vladimir.oltean@nxp.com/
+>>>>
+>>>> It builds upon earlier work:
+>>>> https://patchwork.kernel.org/project/netdevbpf/cover/20220520011538.1098888-1-vinicius.gomes@intel.com/
+>>>>
+>>>> The patch series adds the following functionalities to the IGC driver:
+>>>> a) Configure FPE using `ethtool --set-mm`.
+>>>> b) Display FPE settings via `ethtool --show-mm`.
+>>>> c) View FPE statistics using `ethtool --include-statistics --show-mm'.
+>>>> e) Enable preemptible/express queue with `fp`:
+>>>>      tc qdisc add ... root taprio \
+>>>>      fp E E P P
+>>>
+>>> Any reason why you are only enabling the preemptible traffic classes
+>>> with taprio, and not with mqprio as well? I see there will have to be
+>>> some work harmonizing igc's existing understanding of ring priorities
+>>> with what Kurt did in 9f3297511dae ("igc: Add MQPRIO offload support"),
+>>> and I was kind of expecting to see a proposal for that as part of this.
+>>>
+>>
+>> I was planning to enable fpe + mqprio separately since it requires extra
+>> effort to explore mqprio with preemptible rings, ring priorities, and
+>> testing to ensure it works properly and there are no regressions.
+> 
+> Well, my idea was to move the current mqprio offload implementation from
+> legacy TSN Tx mode to the normal TSN Tx mode. Then, taprio and mqprio
+> can share the same code (with or without fpe). I have a draft patch
+> ready for that. What do you think about it?
+> 
+> Thanks,
+> Kurt
 
-> Please have a look at:
->
-> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-=
-style
->
-> to test the change locally in a CI-like way.
->
-> Cheers,
->
-> Paolo
->
+Hi Kurt,
+
+I’m okay with including it in this series and testing fpe + mqprio, but I’m 
+not sure if others might be concerned about adding different functional 
+changes in this fpe series.
+
+Hi Vladimir,
+Any thoughts on this ?
+
+
 
