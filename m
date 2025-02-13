@@ -1,144 +1,218 @@
-Return-Path: <netdev+bounces-165720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C84DCA333CD
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:08:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64BAA333DE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 604563A6A94
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:07:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27772188A2EE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FE6EC4;
-	Thu, 13 Feb 2025 00:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970BC4A29;
+	Thu, 13 Feb 2025 00:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxriRjKa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EsMkzTfH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7DB1372;
-	Thu, 13 Feb 2025 00:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75519B663
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739405278; cv=none; b=BCbWHREBKH9mv07sZkGNuLItgge6VAFzN8g7JbDawiNBxJNZoy1IMWLGIMcMnd0qAgJ90fEO2xmZTJdmXOsIolCTBxAHgpnY2kBtUo1bUEw0YL/4tL8xFBgt4QQxBDEQwoFJvX3rXQ0X0DAbyWEiNdI+pt6Rito9Tnj1zv8jhfA=
+	t=1739405455; cv=none; b=p4Oq8vuL+YFlW2fENtR57GecvNEYM5O8pqjXRB2rj5WL2uDhP+wrQgnmVKOKOXMqm2ZNkWOqqziYEMFyF+3e8FRzS8maUvWlQS75PBVU9fA49xfem1EfuI/RpaSS45gOt1hw/XXz1aRvl1yp2qRVweLvKECY640Vageqjwv0Ul0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739405278; c=relaxed/simple;
-	bh=NMznk1UMIYoDm+rJ4hNUbPeS0XxK2OH3LPJoLq98XJA=;
+	s=arc-20240116; t=1739405455; c=relaxed/simple;
+	bh=SifCzjX4GY5GN2rUJ8a5yh5rfxDC24HGCOd98DeaIb4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sDoCoJ3vFyolzHiA9UuXLf5aQX1eb9wC1X7fsvTPHaeUdV6nrICZ/LfaUEq4J9BQ/Kf9QMJKA0UplvfzsxBOlGJRkdywSwq+Pmo0288O+o0h9SuS5lERDh8O4UhdZ/AwBuP1jxJyx/sM56bJT+Wj9/iNqIHohgDO/89CD6DKtsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxriRjKa; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3cf8e017abcso767365ab.1;
-        Wed, 12 Feb 2025 16:07:56 -0800 (PST)
+	 To:Cc:Content-Type; b=t7AnC84eorpOEE3SBo84jnwAcZC9aQHxF4ywib7GUIOgnwSz+3dIH5KL+1xXDIckZOGeKbi87YeAk0obN5Ycjh88csusr4T8HXjx5Q2MzNAGyaTje8ifMV2iR20E9Do/g4BeErQcwl6eyLwZ6L3RAHVvPeUFesjx3DWOMzNeQGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EsMkzTfH; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-8671441a730so120898241.0
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 16:10:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739405276; x=1740010076; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739405452; x=1740010252; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UPtlUBpGwdFfdn1u7pzV8qzAKEZ9WNRoW9pxUkJsTYo=;
-        b=TxriRjKacsgCIfuR21YYMxKyEAUP95RDVsr8/SDauXLhXbRMtsvVcOhdodZR8QrnaI
-         zniUmAnM4hF4xuYYLt/1BWQo+gMLu6qe7FaBwMWPk3FkeLivsiO9wMS8HDrh52x9YwXg
-         BtVcBDYe7S3Vv7M+iSTVBb/93CT4Sd0YcXupcGiai9tBg5RNnxITHF4vcDH2/KfKd0K/
-         VbpNhg8BJp5ePxi6kDybs+cagpb2cB1dkiIBkTlnkF7eU/meFD9xCsA/cAAyxfwl4PJy
-         B3bOm+Tc5AxcGNYrsmbsGOc0TyIqwRrxyeuK5vroCbyvu/xeLmIm3yLguob9yDmY3qqN
-         TgPA==
+        bh=s+WfHu/v5u/KfWiPWoeUIJ/AgU1PcO3O1k2ZFWW7w5c=;
+        b=EsMkzTfHZfKB8K2EWd4Cf1dwoDqLwkqBc5i0SbeyEeZG4DMz20nWPT10xodcREXCQ5
+         NPaN9UGXB9apCvROxz8FfI8hptTTNaJtsu2Mjv8X6SVYoToUEWI2BckhaVyfze+1ukOF
+         6THGobEFoAZAMUD2vL/GiN2MReNLSzLJXtm2DZyOS1ulJTsbghlpMuOLPWdbCfkShKIC
+         CplAZGNVF8qBtslAkTifgMwcBQ+vzv3wo0vcTs9o30zD6bCN96K2uTIiHpIKKjwgEvsM
+         IEZnqoz8haawfWup/d/rrFIuHm65zYeKYsgS5QXrNRDHU812FFQwl1LqeifO6MzI8N1m
+         YKuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739405276; x=1740010076;
+        d=1e100.net; s=20230601; t=1739405452; x=1740010252;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UPtlUBpGwdFfdn1u7pzV8qzAKEZ9WNRoW9pxUkJsTYo=;
-        b=isdZ+Nj4I9Aop/BnodJUSIDo+q/tlUCiO4fOvZ385R/K+nzLQ8QQKhQnxU5YOGqWlT
-         BhZKTAG2vqSFsZKW7K57kzV6TGa9EWmEcqRp6RGfvxGBx1OK4O8nMGIawvvdQ8zapMfd
-         eBgMvvItLWenV+VQ4MqzdU1LMTVWQPbwZ2JJ8v97f1zUGLU3BO7fXmC5T12/nbt8iCXD
-         Oh+DnAKF3N5IO5B7oYesSnNNVtTJiYjNYN0+8Ybn13NaENlATtegYS08sEMVYVxPOUuJ
-         JFGYUA8KvZHLzeSSevbCPP5jAOdCRCq/lyzb2KZLfw8dfSUZQZtUL/HmjQyjPUUnFWo5
-         ts6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVJloNfDMhdYTbsZ0tE8TiFA/qyp4dUH97QY9gNz2EjfOsqFIj5SrF/7Cc60PJa7HI6NCg=@vger.kernel.org, AJvYcCWLYw1314OdlK82QBDhnj5n0UO5KT8uE548PVxct2tlNmC61NS8SBp/2rPOMvz8+OZnPjXj9JSa@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6LW0qcl55bGWy9P/vgQdf7E+BEr3oY0kyeKIxNZNhUgQ6d5kt
-	nQ+G4GQz96Gbdg++DXa9lP7AvAQYhNfu9/H/HXFDbT6vR21EtQ3ROayVqVEBXdFOOrbVhkBFDbI
-	ah5Ebzf7XEuWpvlx8wRMtcYRvxAA=
-X-Gm-Gg: ASbGnctp0NCEHN77S/IPnLWAwo20gTSC9NBl2dHevbKLbkkN7ZrW1HcvfbvmZ6E0uNd
-	PxKuZ9ifmDaBTIEVPx/s0aq9aVZGiV4xhvVNO/Upc+D1hAt3sQiLEsjrq+MHf9xltSW8mgoQz
-X-Google-Smtp-Source: AGHT+IHne9nz+OCdlWoZXbFkEtWu2p2Eal1UmAvAlfjwRnsUHHvMH3ndvO+Mgvv98hoMOIK3hhKovKvjxAKrVLSatwg=
-X-Received: by 2002:a92:ca48:0:b0:3d1:883c:6e84 with SMTP id
- e9e14a558f8ab-3d18c22f15bmr10433845ab.8.1739405276074; Wed, 12 Feb 2025
- 16:07:56 -0800 (PST)
+        bh=s+WfHu/v5u/KfWiPWoeUIJ/AgU1PcO3O1k2ZFWW7w5c=;
+        b=YKusQQv8OfVKR8mo4lWb7YK9TUe6EWnf9Q3cqZhj8bDInqIyx5onmEfGG2FluzlFSl
+         xK7p21B8OXTpq39xPYeNHY3Mei8FOBxzyBks2l7Fq+TMqVLc8bQzFuMfRHWem0KbkmJS
+         E3/Ro6Yi3Vo/8M5JKUGOoa3stKPFL+hWF7Gt9ihZR0mkALEPrGcvwhKxcdSodaF1ulL+
+         QSCR/lZR/HueC9n2rIIQ1EaHpVBePKZ5i8/wqYUjF7Axsd8PSRNJPni2MtdUsyQ5ZPuI
+         4d5gJSeM5HM83tUfr1qrT79O2DaWv7weezbAgzTePgoRmiR7+rqok0bYJH62edDtvhG7
+         HWsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU20DJGJwEQ9PC3xdf++GEu99Gu/2MLUWb+L0HiQDrMvQz1ZEyjAZm2a54m9k7STfbmir1kgQI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqngifGemko3/zVHnn2kgCvjILxdgVak2xKBsf4xDZ9ZVCMxxF
+	3ZwXBHl6Yu724s8wAWauxPuGQckuLzkKyCRuZ4Rf3YZA8dLu8T1Tk6Gj4RFnQH6cWDmWIYNuhcA
+	2zSU+bfemzifUow3HHd0HfG6Bhq4bPHVwss5S
+X-Gm-Gg: ASbGncv8+L0o5ChsNIoL8e4RHm24ZrvnDzAZH0VYQavkzcapei6WJYAV8x0jsK2YqOg
+	AIl+Aiggd9ASC4+ZdwArq/IJb+xRSbUGntO8xPBvgljpj7DdiNiGJyH7P1U+8m8H/szbSjyjyrw
+	vc2DRkCb9a4QY/7CdA4+VMpfYAtA==
+X-Google-Smtp-Source: AGHT+IEUmixnq02JlWKfwvEaLZDC3tHu+8a5G6UODHmdG4Lm1heidGpNx7OzILYgZRHUPwr+ZA1zRmmMlpPG+CZd8NQ=
+X-Received: by 2002:a05:6102:2ad4:b0:4bb:5d61:1288 with SMTP id
+ ada2fe7eead31-4bbf231f56fmr6157553137.23.1739405452181; Wed, 12 Feb 2025
+ 16:10:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
- <20250212061855.71154-10-kerneljasonxing@gmail.com> <67acbdb3be6b5_1bcd3029470@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67acbdb3be6b5_1bcd3029470@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Feb 2025 08:07:19 +0800
-X-Gm-Features: AWEUYZlspLNXaO0uwKv0r8brZNX60ofeF66Vz1uXYdOosE6utUXFgpmJXSy5A74
-Message-ID: <CAL+tcoA-5noB0rfHwU=FxANd9yifADFoq-vGkkzW=ZJ=BOnGUA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v10 09/12] bpf: add BPF_SOCK_OPS_TS_ACK_OPT_CB callback
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250210174504.work.075-kees@kernel.org> <3biiqfwwvlbkvo5tx56nmcl4rzbq5w7u3kxn5f5ctwsolxpubo@isskxigmypwz>
+ <d11de4d4-1205-43d0-8a7d-a43d55a4f3eb@gmail.com>
+In-Reply-To: <d11de4d4-1205-43d0-8a7d-a43d55a4f3eb@gmail.com>
+From: Justin Stitt <justinstitt@google.com>
+Date: Wed, 12 Feb 2025 16:10:40 -0800
+X-Gm-Features: AWEUYZktjfLB0-Uv9mkLV-i_REAZ7bFxF9SxqOc292IN5aDUReN9RqbNh26rT8M
+Message-ID: <CAFhGd8om_1W7inq+V4a4EP3e5y1y+qw7C3wi3DR4WpspYzZenQ@mail.gmail.com>
+Subject: Re: [PATCH] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Kees Cook <kees@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Yishai Hadas <yishaih@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 12, 2025 at 11:26=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Tue, Feb 11, 2025 at 6:22=E2=80=AFAM Tariq Toukan <ttoukan.linux@gmail.c=
+om> wrote:
 >
-> Jason Xing wrote:
-> > Support the ACK case for bpf timestamping.
-> >
-> > Add a new sock_ops callback, BPF_SOCK_OPS_TS_ACK_OPT_CB. This
-> > callback will occur at the same timestamping point as the user
-> > space's SCM_TSTAMP_ACK. The BPF program can use it to get the
-> > same SCM_TSTAMP_ACK timestamp without modifying the user-space
-> > application.
-> >
-> > This patch extends txstamp_ack to two bits: 1 stands for
-> > SO_TIMESTAMPING mode, 2 bpf extension.
-> >
-> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > ---
-> >  include/net/tcp.h              | 6 ++++--
-> >  include/uapi/linux/bpf.h       | 5 +++++
-> >  net/core/skbuff.c              | 5 ++++-
-> >  net/dsa/user.c                 | 2 +-
-> >  net/ipv4/tcp.c                 | 2 +-
-> >  net/socket.c                   | 2 +-
-> >  tools/include/uapi/linux/bpf.h | 5 +++++
-> >  7 files changed, 21 insertions(+), 6 deletions(-)
 >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 0d704bda6c41..aa080f7ccea4 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -488,7 +488,7 @@ static void tcp_tx_timestamp(struct sock *sk, struc=
-t sockcm_cookie *sockc)
+>
+> On 11/02/2025 2:01, Justin Stitt wrote:
+> > On Mon, Feb 10, 2025 at 09:45:05AM -0800, Kees Cook wrote:
+> >> GCC can see that the value range for "order" is capped, but this leads
+> >> it to consider that it might be negative, leading to a false positive
+> >> warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
+> >>
+> >> ../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array sub=
+script -1 is below array bounds of 'long unsigned int *[2]' [-Werror=3Darra=
+y-bounds=3D]
+> >>    691 |                 i =3D find_first_bit(pgdir->bits[o], MLX4_DB_=
+PER_PAGE >> o);
+> >>        |                                    ~~~~~~~~~~~^~~
+> >>    'mlx4_alloc_db_from_pgdir': events 1-2
+> >>    691 |                 i =3D find_first_bit(pgdir->bits[o], MLX4_DB_=
+PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>        |                     |                         |              =
+                                     |                     |               =
+          (2) out of array bounds here
+> >>        |                     (1) when the condition is evaluated to tr=
+ue                             In file included from ../drivers/net/etherne=
+t/mellanox/mlx4/mlx4.h:53,
+> >>                   from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:4=
+2:
+> >> ../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
+> >>    664 |         unsigned long          *bits[2];
+> >>        |                                 ^~~~
+> >>
+> >> Switch the argument to unsigned int, which removes the compiler needin=
+g
+> >> to consider negative values.
+> >>
+> >> Signed-off-by: Kees Cook <kees@kernel.org>
+> >> ---
+> >> Cc: Tariq Toukan <tariqt@nvidia.com>
+> >> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> >> Cc: "David S. Miller" <davem@davemloft.net>
+> >> Cc: Eric Dumazet <edumazet@google.com>
+> >> Cc: Jakub Kicinski <kuba@kernel.org>
+> >> Cc: Paolo Abeni <pabeni@redhat.com>
+> >> Cc: Yishai Hadas <yishaih@nvidia.com>
+> >> Cc: netdev@vger.kernel.org
+> >> Cc: linux-rdma@vger.kernel.org
+> >> ---
+> >>   drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
+> >>   include/linux/mlx4/device.h                | 2 +-
+> >>   2 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/=
+ethernet/mellanox/mlx4/alloc.c
+> >> index b330020dc0d6..f2bded847e61 100644
+> >> --- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
+> >> +++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+> >> @@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(s=
+truct device *dma_device)
+> >>   }
+> >>
+> >>   static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+> >> -                                struct mlx4_db *db, int order)
+> >> +                                struct mlx4_db *db, unsigned int orde=
+r)
+> >>   {
+> >> -    int o;
+> >> +    unsigned int o;
+> >>      int i;
+> >>
+> >>      for (o =3D order; o <=3D 1; ++o) {
 > >
-> >               sock_tx_timestamp(sk, sockc, &shinfo->tx_flags);
-> >               if (tsflags & SOF_TIMESTAMPING_TX_ACK)
-> > -                     tcb->txstamp_ack =3D 1;
-> > +                     tcb->txstamp_ack =3D TSTAMP_ACK_SK;
+> >    ^ Knowing now that @order can only be 0 or 1 can this for loop (and
+> >    goto) be dropped entirely?
+> >
 >
-> Similar to the BPF code, should this by |=3D TSTAMP_ACK_SK?
->
-> Does not matter in practice if the BPF setter can never precede this.
+> Maybe I'm missing something...
+> Can you please explain why you think this can be dropped?
 
-I gave the same thought on this too. We've already fixed the position
-and order (of using socket timestamping and bpf timestamping).
+I meant "rewritten to use two if statements" instead of "dropped". I
+think "replaced" or "refactored" was the word I wanted.
 
-I have no strong preference. If you insist, I can surely adjust it.
-
-Thanks,
-Jason
+>
+>
+> >    The code is already short and sweet so I don't feel strongly either
+> >    way.
+> >
+> >> @@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db=
+_pgdir *pgdir,
+> >>      return 0;
+> >>   }
+> >>
+> >> -int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order=
+)
+> >> +int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned =
+int order)
+> >>   {
+> >>      struct mlx4_priv *priv =3D mlx4_priv(dev);
+> >>      struct mlx4_db_pgdir *pgdir;
+> >> diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+> >> index 27f42f713c89..86f0f2a25a3d 100644
+> >> --- a/include/linux/mlx4/device.h
+> >> +++ b/include/linux/mlx4/device.h
+> >> @@ -1135,7 +1135,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct =
+mlx4_mtt *mtt,
+> >>   int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+> >>                     struct mlx4_buf *buf);
+> >>
+> >> -int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order=
+);
+> >> +int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned =
+int order);
+> >>   void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
+> >>
+> >>   int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resourc=
+es *wqres,
+> >> --
+> >> 2.34.1
+> >>
+> >
+> > Justin
+> >
+>
 
