@@ -1,137 +1,140 @@
-Return-Path: <netdev+bounces-165863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99714A338F6
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:37:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6EAA338F8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DF2F3A47C7
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C58164734
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48920A5D3;
-	Thu, 13 Feb 2025 07:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A7020A5E7;
+	Thu, 13 Feb 2025 07:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CT1J+47Z"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EXjCDkj8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DE92080E0;
-	Thu, 13 Feb 2025 07:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FC2080E0;
+	Thu, 13 Feb 2025 07:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739432230; cv=none; b=r7ylCTODMdUFTViIYzDXSZDJ6qMCZLxuMLVHcM3GulDbXTJ6WuaZIsYBLFmjJx3OBzHYjFP2AvqhJKtlvmiU5L1VL4xuA50whTh0seKo1IdheQtUhD6wm/xsRRdBLMLmoZh2MDgqMzmfRWaNHTkMwlyusbgIhOFgNiU6nXoLxl8=
+	t=1739432238; cv=none; b=lDtKTeOcwKwZ3UUZHe+XjBKelnoXEokrLuFhOlcjT5E/LXZFCRhadNan29HBBItATMmxlYzPFoJEbKyo2DF28VLxWQWdSr8Ixbod75o4eBNHM9A1ZW6fgrwQ9YQAHxbg3n2jwTSvFvquH7Tt4dO5MJAUagXRi1ZzOgDjIo+lGWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739432230; c=relaxed/simple;
-	bh=k/s/blXMTPACoapYpKXgCGTKo9aQe999PkUXre5nUcg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jDuaq9dsjDOunMIA45qdoXUnMmIRt+9zdrWChc+pzfgkWGxcN+sJqGBBUYP3b+18US6k4d7lQM5oB8d9eiRQRYAuwwFoTp/aQm1oq6adOr08H/KXCgbsl3d91Cg+AigL6yQ8FhdbT20R3YvFXZDY1PRn8O4igkJtTU+LuRqrwI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CT1J+47Z; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739432228; x=1770968228;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ru75CHptJLbrNWfq0dXvP+XPh1CZ4Ep9tB4CcYplcjY=;
-  b=CT1J+47Z7eEhstWRqPHwNlR+Aa6lNdT1h9o5DbSAYOmLnKkILk36LKXx
-   ocJliOd6fJZ2pKPLHrvvxFJMp9nfPjbMmPMjahJsAZ4iNI+IJFxRH1uzw
-   4iLYCnmmQk6NaIy5nvCMih/b0oulIT4g0f9CgZtH+EN3zHriIlg40p27R
-   g=;
-X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
-   d="scan'208";a="376947896"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 07:37:07 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:24729]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.136:2525] with esmtp (Farcaster)
- id 84cc2de9-53bd-4327-a127-c9735fbdf4bd; Thu, 13 Feb 2025 07:37:06 +0000 (UTC)
-X-Farcaster-Flow-ID: 84cc2de9-53bd-4327-a127-c9735fbdf4bd
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 13 Feb 2025 07:36:59 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Feb 2025 07:36:55 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <ushankar@purestorage.com>
-Subject: Re: [PATCH net-next v3 1/3] net: document return value of dev_getbyhwaddr_rcu()
-Date: Thu, 13 Feb 2025 16:36:46 +0900
-Message-ID: <20250213073646.14847-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250212-arm_fix_selftest-v3-1-72596cb77e44@debian.org>
-References: <20250212-arm_fix_selftest-v3-1-72596cb77e44@debian.org>
+	s=arc-20240116; t=1739432238; c=relaxed/simple;
+	bh=Kk9E2Aw4aKdaVrLUFj8iF5eXQIQAQDKMc1UPai+7jzQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=iGHTWKyJTy/9xZ637ikOwqadYbx7NBjDCMWtHauVLCIMHXYQhQ7d0t5++Y6B/bGdI7IxHnDvcokcp4mpi6TMt9XBIMuWlyn8n3r4nAdicyUoyz71ZekWUQBlht1HrQXtYa/LbNPAE2k3cfbuT89MBoodggvBegW7uMGYeTekJcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EXjCDkj8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51D7X1jv014894;
+	Thu, 13 Feb 2025 07:37:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=dtdXfs
+	aTQY2dSp16b5HtCHbSWFjl0Gs64MpCFtjy0hA=; b=EXjCDkj8M8xjpvlLG5uOPr
+	xm9PGj3Ntfgi2sDSsrWCmrKGrmplqU7t+v1Sr24rPxtg/1WjvZCt5jpuenSPqyvr
+	4Nxyo9TBv0LQGoOEM5a/ZvnABZPh9af/r6hD4sCN0Ranumb2/rzv/95qHUobXUG+
+	h3TwJnrOfC49wAA9uw2x6LbrJNdDN6vgWCtVbD0ItYmx43nOAR4otkIieHqeDpJS
+	YUPZkNybVyJCe0iCsBCY6Nd6jAyz7rAuk/ufdiRdgIxK67hfoQN6FFhsFJ9+xWpV
+	DQukeGTWeRVodIXgjZ7YTziz9/qg2yuHuDTL+fJ+CfiZBH1HORRg5ffCvdioyxtQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44sceq00h3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 07:37:07 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51D7b6e1021622;
+	Thu, 13 Feb 2025 07:37:06 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44sceq00h0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 07:37:06 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51D6cpiQ021713;
+	Thu, 13 Feb 2025 07:37:05 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44phksw8fu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 07:37:05 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51D7b2mM35979654
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Feb 2025 07:37:02 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 307AD20043;
+	Thu, 13 Feb 2025 07:37:02 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E723E2004B;
+	Thu, 13 Feb 2025 07:37:01 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 13 Feb 2025 07:37:01 +0000 (GMT)
+Message-ID: <7ea4bc1b-96d8-47a3-8ca2-2baa862d8888@linux.ibm.com>
+Date: Thu, 13 Feb 2025 08:37:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] s390/qeth: move netif_napi_add_tx() and napi_enable()
+ from under BH
+To: Joe Damato <jdamato@fastly.com>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
+References: <20250212163659.2287292-1-wintera@linux.ibm.com>
+ <Z6z4CMhLo0aj5YEN@LQ3V64L9R2>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <Z6z4CMhLo0aj5YEN@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Nanqoqv8MSkkL_8wp_5a25A2rkQJ5mZt
+X-Proofpoint-ORIG-GUID: w9RXf_3TGi50qFznUVFogO5zBpQBP9Ve
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-13_02,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 mlxlogscore=689
+ clxscore=1015 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502130056
 
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 12 Feb 2025 09:47:24 -0800
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..0b3480a125fcaa6f036ddf219c29fa362ea0cb29 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -1134,8 +1134,8 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
->   *	The returned device has not had its ref count increased
->   *	and the caller must therefore be careful about locking
->   *
-> + *	Return: pointer to the net_device, or NULL if not found
->   */
 
-I noticed here we still mention RTNL and it should be removed.
 
-Could you update the comment like this to remove RTNL and fix
-mis-aligned notes ?
+On 12.02.25 20:35, Joe Damato wrote:
+> On Wed, Feb 12, 2025 at 05:36:59PM +0100, Alexandra Winter wrote:
+>> Like other drivers qeth is calling local_bh_enable() after napi_schedule()
+>> to kick-start softirqs [0].
+>> Since netif_napi_add_tx() and napi_enable() now take the netdev_lock()
+>> mutex [1], move them out from under the BH protection. Same solution as in
+>> commit a60558644e20 ("wifi: mt76: move napi_enable() from under BH")
+>>
+>> Fixes: 1b23cdbd2bbc ("net: protect netdev->napi_list with netdev_lock()")
+> Hm, I wonder if the fixes should be for commit 413f0271f396 ("net:
+> protect NAPI enablement with netdev_lock()") instead ?
 
----8<---
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d5ab9a4b318e..c0d6017a3840 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1123,17 +1123,17 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
- }
- 
- /**
-- *	dev_getbyhwaddr_rcu - find a device by its hardware address
-- *	@net: the applicable net namespace
-- *	@type: media type of device
-- *	@ha: hardware address
-+ * dev_getbyhwaddr_rcu - find a device by its hardware address
-+ * @net: the applicable net namespace
-+ * @type: media type of device
-+ * @ha: hardware address
-  *
-- *	Search for an interface by MAC address. Returns NULL if the device
-- *	is not found or a pointer to the device.
-- *	The caller must hold RCU or RTNL.
-- *	The returned device has not had its ref count increased
-- *	and the caller must therefore be careful about locking
-+ * Search for an interface by MAC address.  The returned device has
-+ * not had its ref count increased and the caller must therefore be
-+ * careful about locking
-  *
-+ * Context: The caller must hold RCU.
-+ * Return: pointer to the net_device, or NULL if not found
-  */
- 
- struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
----8<---
 
-Thanks!
+I was wondering about that too. netif_napi_add_tx() got  the lock in
+1b23cdbd2bbc and napi_enable() got the lock in 413f0271f396.
+I don't think I can have 2 Fixes tags, can I?
+(And I don't think it makes sense to split these few lines up into 2 commits)
+I chose 1b23cdbd2bbc because it is the earlier one.
+
 
