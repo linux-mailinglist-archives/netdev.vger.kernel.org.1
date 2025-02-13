@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-165820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C78CA33711
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:56:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5641A33719
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B853A8685
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DDB73A875A
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62722063F0;
-	Thu, 13 Feb 2025 04:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989F62063F0;
+	Thu, 13 Feb 2025 04:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="f4AGjI24"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="O9pQRz9t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD12F1FBE80
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B435E11CAF
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739422564; cv=none; b=XCe0W2jzRF0adkFxHWi/aOThczh1YupM+0EbDQ8JGp8CvCETdHYm8Hm/cMWCbSz1bA9XL6U3AMgyBzSYrOnSS6SnspFHE/S+PiQgvhNtAlyt7lVcQ4UBpb2Gy01hIX3yMwd1woLv9MlI6SWHbaIOiag4nwNKiPgGX0vGt/VeP2g=
+	t=1739422594; cv=none; b=QsbZoj5zYbyRTQE2FWAeB39C2Gw/Wgpe02IpVa2OEmZZoFRoHYs2pVGUNySqaPt/IDFDCbfm+I8fWQIER1Ym3oBqCKTwtlX9wG50HN8PhEJC+hvIIpRqriaCOPYOpkW5+w2rCfXRSYFe6at0eHbH1n2DlHSCuj17dw6BPsBaZco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739422564; c=relaxed/simple;
-	bh=8pkX9hqEXrpMa6BDEq/0XQ1iua4+qZyBfJvEDK0EGnA=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:References; b=ZH7Mj5tesrAKY236TTSGn9hCG993E2O4VfWLCX3Rm0nTB2J5Yj7yD3wPYsZ6r8qlngCEZZ1kKkMTaI1XDQDL7SFPbryfPdRpy71Zh+56Lqqalxfl82fp5SPnceprt0ZSv+uzbjSWqUOoT3nuGkUjaBNf3MugrLBfS1fA9RVaDm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=f4AGjI24; arc=none smtp.client-ip=203.254.224.24
+	s=arc-20240116; t=1739422594; c=relaxed/simple;
+	bh=Y8vyrsk1PlatHMeH/rmABEBQSJ6GS6k80BTDkoOf050=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:Content-Type:
+	 References; b=QlsbFbx+wMzqjf5ddl0g9eZzGKIBNoGelssbuY42ujOgo98fAE72hnZ45k42FL6CwR7CZ5hzAMCQ4x3AajnXc9PRenWIU0H7gbO2+iZdzV9Pj5DQ1TdTxBKTJF74JQ1cWveqfPY6APHLzPzxIcsaecmVAmeF1EChoWNxCxMpatI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=O9pQRz9t; arc=none smtp.client-ip=203.254.224.33
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250213045600epoutp015d3430c36f5cf2f4ac010ce563747e8a~jq5pywl7D2001020010epoutp01o
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:56:00 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250213045600epoutp015d3430c36f5cf2f4ac010ce563747e8a~jq5pywl7D2001020010epoutp01o
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250213045630epoutp036a40cad64dc4d8f7f7c4a32f43978904~jq6FjrSCO2807928079epoutp03Y
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:56:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250213045630epoutp036a40cad64dc4d8f7f7c4a32f43978904~jq6FjrSCO2807928079epoutp03Y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1739422560;
-	bh=IvA31ZbD3Zexo4H7INEaKo7X7KJqCF/0qKrLl6D23Yg=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=f4AGjI24g6vfdhDWi9jNytRlvg8AfYxeoS5kPlyK/jYkQW1o20j858HDje/wkvqVf
-	 risrbvZWPphe2BCx+lUaIYMf774w6sVp/PV/JqKsG77HMZmFKTJ2x35VJFGbTqVE6G
-	 zoGgarrJIpJr8zdMbYntG3h7Fvh2vE8QU+ig5nwQ=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20250213045600epcas5p4339919d365306e80caebf8739ab4304d~jq5pPueOt1374413744epcas5p4E;
-	Thu, 13 Feb 2025 04:56:00 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4YtjYp75BXz4x9Px; Thu, 13 Feb
-	2025 04:55:58 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	s=mail20170921; t=1739422590;
+	bh=Icv6vaaEtmCyNWbvWJMcNUIs0mrozuWDQz1ban0QBLM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=O9pQRz9tKXVIdWaazDlI05WeNOIafBGwLCxowCnrGhuu7CBUECMMt/CI2qd/G5Fse
+	 EoUkFwZQxo/0m7F1n8EK8gKFANqrQaGsiP5cyn6QCWFKOaMOYDpv2z2nQjc63wG3+M
+	 jOIcC0J/CcnDP3dbmrkRzH/XYFnmaOajucJsCfM8=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20250213045630epcas5p1035fd0e649f62cdf575a6dba0c2e50ea~jq6E7c_FJ0881008810epcas5p1j;
+	Thu, 13 Feb 2025 04:56:30 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4YtjZN10Q6z4x9Q1; Thu, 13 Feb
+	2025 04:56:28 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
 	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	1D.1B.19956.E5B7DA76; Thu, 13 Feb 2025 13:55:58 +0900 (KST)
+	03.3B.19956.B7B7DA76; Thu, 13 Feb 2025 13:56:28 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
 	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250213044950epcas5p1a7badb480a7e8d843fe0ff51bcf5cbf4~jq0Q09LC_2465824658epcas5p11;
-	Thu, 13 Feb 2025 04:49:50 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff~jq0VwNbxb0111401114epcas5p1U;
+	Thu, 13 Feb 2025 04:49:55 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
 	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250213044950epsmtrp25ca5594c3b92929b4c65f819f26d33a5~jq0Qzfr1Y1364113641epsmtrp25;
-	Thu, 13 Feb 2025 04:49:50 +0000 (GMT)
-X-AuditID: b6c32a4b-fd1f170000004df4-1a-67ad7b5eff71
+	20250213044955epsmtrp2c5bd77e2f6440781abb67fea4d3aee5e~jq0VvQKH71364113641epsmtrp2B;
+	Thu, 13 Feb 2025 04:49:55 +0000 (GMT)
+X-AuditID: b6c32a4b-fe9f470000004df4-7e-67ad7b7b8d27
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	58.A0.33707.EE97DA76; Thu, 13 Feb 2025 13:49:50 +0900 (KST)
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E3.C9.23488.3F97DA76; Thu, 13 Feb 2025 13:49:55 +0900 (KST)
 Received: from cheetah.samsungds.net (unknown [107.109.115.53]) by
 	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250213044947epsmtip24a8e5a1d81bad9d99d12448f2eda324e~jq0ODQcEX2154321543epsmtip2h;
-	Thu, 13 Feb 2025 04:49:47 +0000 (GMT)
+	20250213044952epsmtip2cb199537a88602e450ee7f98494782a4~jq0TBIMSB2199621996epsmtip2X;
+	Thu, 13 Feb 2025 04:49:52 +0000 (GMT)
 From: Swathi K S <swathi.ks@samsung.com>
 To: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
@@ -76,101 +77,224 @@ Cc: rmk+kernel@armlinux.org.uk, swathi.ks@samsung.com,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 0/2] net: stmmac: dwc-qos: Add FSD EQoS support
-Date: Thu, 13 Feb 2025 10:16:22 +0530
-Message-Id: <20250213044624.37334-1-swathi.ks@samsung.com>
+Subject: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree bindings
+Date: Thu, 13 Feb 2025 10:16:23 +0530
+Message-Id: <20250213044624.37334-2-swathi.ks@samsung.com>
 X-Mailer: git-send-email 2.17.1
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFJsWRmVeSWpSXmKPExsWy7bCmpm5c9dp0gyvd5hY/X05jtFj+YAer
-	xZq955gs5pxvYbGYf+Qcq8XTY4/YLW4e2Mlk8XLWPTaLC9v6WC02Pb7GanF51xw2i65rT1gt
-	5v1dy2pxbIGYxbfTbxgtFm39wm7x8MMedosjZ14wW1zqn8hk8X/PDnaLLxtvsjuIely+dpHZ
-	Y8vKm0weT/u3snvsnHWX3WPBplKPTas62Tw2L6n32LnjM5PH+31X2Tz6tqxi9Di4z9Dj8ya5
-	AJ6obJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wcoF+V
-	FMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQUmBXrFibnFpXnpenmpJVaGBgZGpkCF
-	CdkZz56cZi74wFPRPH8hSwPjGa4uRk4OCQETic9/fzN3MXJxCAnsZpS43PyZDcL5xChxf+sb
-	BGf+qQPMMC0Lb/5kgUjsBKqa+ZAVwvnCKLHm8gJWkCo2AQ2J6yu2s4MkRAR+MUp8mHQabAuz
-	wF1GiU29d9lAqoQFnCRWLvwCNpdFQFXi+KkDLCA2r4CVxPmpH9kg9slLrN4As/sEh8SlidUQ
-	tovE+Xkt7BC2sMSr41ugbCmJz+/2QvXGS6zuu8oCYWdI3P01ESpuL3HgyhygOAfQQZoS63fp
-	Q4RlJaaeWscEYjML8En0/n7CBBHnldgxD8ZWlvj7+hrUSEmJbUvfQ631kPjadhzseSGBWImO
-	iyeZJzDKzkLYsICRcRWjZGpBcW56arFpgXFeajk8qpLzczcxghOxlvcOxkcPPugdYmTiYDzE
-	KMHBrCTCKzFtTboQb0piZVVqUX58UWlOavEhRlNgkE1klhJNzgfmgrySeEMTSwMTMzMzE0tj
-	M0Mlcd7mnS3pQgLpiSWp2ampBalFMH1MHJxSDUzyYv4L5J4ssv6SrLjSvuOA991GhwnZF09r
-	XrxdYfv2sqpLWSefcdH59JOibpVv9O4Ll6btWd+4ap9OzJ0bqXuyas5vUU3ji3b18Mttvly5
-	R0r93Iwb77jbOsK/dXdFhn36//2bWGlUkEtg/eNl26wlDuTz8xS3J5/zlWKKOrc+5d5T9v0F
-	O/vW7X9WmCb5/tbMTXpfhWPitx6dIeF36t9ZXqdjCSs+9vKXGiue6PRYUuOlrGamUFvyad7F
-	I9Xz3Robvm7x6k/JmKe3sqXXM1NcuSX3QKtBeNMW0WWN99OSm07pfJirM9nv05+TsmfrVnW7
-	H+wJa5c5fe3AIseA41z89x1U83la/63V/tDspcRSnJFoqMVcVJwIAMa1SHxNBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrILMWRmVeSWpSXmKPExsWy7bCSvO67yrXpBv8WiVn8fDmN0WL5gx2s
-	Fmv2nmOymHO+hcVi/pFzrBZPjz1it7h5YCeTxctZ99gsLmzrY7XY9Pgaq8XlXXPYLLquPWG1
-	mPd3LavFsQViFt9Ov2G0WLT1C7vFww972C2OnHnBbHGpfyKTxf89O9gtvmy8ye4g6nH52kVm
-	jy0rbzJ5PO3fyu6xc9Zddo8Fm0o9Nq3qZPPYvKTeY+eOz0we7/ddZfPo27KK0ePgPkOPz5vk
-	AniiuGxSUnMyy1KL9O0SuDKePTnNXPCBp6J5/kKWBsYzXF2MnBwSAiYSC2/+ZOli5OIQEtjO
-	KHH5/SImiISkxKfmqawQtrDEyn/P2UFsIYFPjBJ7n4aA2GwCGhLXV2xnB2kWEehgktgz9SQz
-	iMMs8JhR4sGr/2wgVcICThIrF35hBrFZBFQljp86wAJi8wpYSZyf+pENYoO8xOoNB5gnMPIs
-	YGRYxSiaWlCcm56bXGCoV5yYW1yal66XnJ+7iREcC1pBOxiXrf+rd4iRiYPxEKMEB7OSCK/E
-	tDXpQrwpiZVVqUX58UWlOanFhxilOViUxHmVczpThATSE0tSs1NTC1KLYLJMHJxSDUxJxZUG
-	U1/wB+42V2J7sW3/05VGen+Oe631P3H808I3KtaT1Vzq94otitG5t855y/3njOIHflw75z7j
-	h5nIv0eL3l5e8M6Qr/bcueApiVorj+tIXJPW28XUOj9anGnn88OrunND7k/euWheW/huryuT
-	xENL9sr62Bw64TRj+7ULW4p2M+SoVjZ8V1dy0d6pqW2/pMCsdU3JwWczTP6Hls6XZpzux1pc
-	v3+Ke/u3SUrREhNX/b71uUJwktaK2ItJExp9xIyey0aw+tz+cuK5/gbRPSXWz5nnBnZs377b
-	TbWU6VVZyQGD02nfriyI+ezm9UFda9bHFesuHssKffDY2e5o9s5tLYwFQsa6caecVC+nK7EU
-	ZyQaajEXFScCAKiT7UT0AgAA
-X-CMS-MailID: 20250213044950epcas5p1a7badb480a7e8d843fe0ff51bcf5cbf4
+In-Reply-To: <20250213044624.37334-1-swathi.ks@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA0VTfUwbZRzOe9e7K0SWSwfzhSiQW9gAB6MC5YCyLRHdKVvGxtyc6LpKz8KA
+	a9Nr3YcLYxkZinzHITJA0mzq+F6FruBABqQQu4CTj4qGBRgEQeOKIGGQgdDr9L/n9/ye5/fk
+	/b3vK0YlVtxHnMbpWR2nzKBwd5G5Jygw5NLHDeowWxVCP50rA/Q3ExaMru8YQOjKwRwR/VXv
+	AEbPWKcIeqyrDaHnKh7h9E/mQow2PR7F6KH2SpzOG53G6OpnDRhtrdlBL9v+BLSxdYmgJx33
+	CLr3we8o/XNRCUJv3LMQ9NKdMeKAFzM0+hBlWm6PIcxMUSvBtFWME0yNycCYaj/Fme9uXmba
+	LIsI86RzBGcKW2oBc79TyiyafBNfeDddnsoqVazOn+VSNKo0Th1HJSQpXlNEysKkIdJoOory
+	55SZbBwVfygx5I20jM2zUv4fKTMMm1SikuepvfvkOo1Bz/qnanh9HMVqVRnaCG0or8zkDZw6
+	lGP1MdKwsFcjN4Vn0lMfG4cw7Y3d55v685Fs8PVLeUAshmQEtI5vywPuYgn5PYBNxU9FQvE3
+	gHM9VbhQLAN4t9mM5gE3p6M/dwMVGh0A2s0/YEKxBODiwwZkS4WTgdD+7V1iq+FJrgLoKLU5
+	LSg5DqCpYBzfUm0nE+DE3JdOh4gMgCvZdU7eg4yBtytvIkKeH6xr7nJmu5GxsKzUgQn8hBgu
+	TEsEHA9H2hpd+u1wvq+FELAPXPyrAxewAtYVjogEnArHV0tc/H7YNVwp2toGSgbBpva9Av0y
+	vP6jMBIlt8GCtWnXeA9oqX6Od8Jnf4y6RnpD860nrlgGNq3/4tpKIYDV1xqJYuBb8X9EDQC1
+	wJvV8plqlo/UhnPsuf+uLUWTaQLOBx2cYAFTE47QboCIQTeAYpTy9IBl9WqJh0p54SKr0yh0
+	hgyW7waRm/srQX28UjSbP4LTK6QR0WERMpksIjpcJqVe9LjalqOWkGqlnk1nWS2re+5DxG4+
+	2Yh5lyKZwJkHj/yPz430nG3dPaIaWDdVc25H+I3Tw6/IPr8ssrw5OKnyOxfVPt9Rfth+/eit
+	QUvvQqXfjcnoiyjcr114/3BOdkBdYWP5fFnBSvj55qgJ3w+Lsfic0OKd9rckXgeMjTvS1veF
+	WK/UyztLjsTOXH2dHY0ZTjCHrllz+M8Uhg8OORTa494gaSX2H9/6pmvJ5buMjoZT+bOzGptm
+	T6KI6jMGfTEbq6sVH4xy57I+WfUsLXrnZHBWVf8Fue3Er8n9vidPTZP2Pvlvxy6tLHe+3W9h
+	zxjs750OvH/w2J38PW5Y1syVANtZaZImV92cPHW0aq07ZboiJHfjRINRTon4VKU0GNXxyn8B
+	huaeV1kEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrHLMWRmVeSWpSXmKPExsWy7bCSvO7nyrXpBn1ftS1+vpzGaLH8wQ5W
+	izV7zzFZzDnfwmIx/8g5Vounxx6xW9w8sJPJ4uWse2wWF7b1sVpsenyN1eLyrjlsFl3XnrBa
+	zPu7ltXi2AIxi2+n3zBaLNr6hd3i4Yc97BZHzrxgtrjUP5HJ4v+eHewWXzbeZHcQ9bh87SKz
+	x5aVN5k8nvZvZffYOesuu8eCTaUem1Z1snlsXlLvsXPHZyaP9/uusnn0bVnF6HFwn6HH501y
+	ATxRXDYpqTmZZalF+nYJXBmPF11mLZitXrH+RA9TA+MymS5GTg4JAROJE+3/mbsYuTiEBHYz
+	Siz/t50ZIiEp8al5KiuELSyx8t9zdoiiT4wSb57cYwFJsAloSFxfsR0sISLQwSSxZ+pJsFHM
+	Ao8ZJR68+s8GUiUs4C3x4OVMJhCbRUBV4kfDarA4r4CVxMo5S5ggVshLrN5wAGw1p4C1xLRJ
+	H8BWCwHVrHq5j3ECI98CRoZVjJKpBcW56bnJhgWGeanlesWJucWleel6yfm5mxjBUaSlsYPx
+	3bcm/UOMTByMhxglOJiVRHglpq1JF+JNSaysSi3Kjy8qzUktPsQozcGiJM670jAiXUggPbEk
+	NTs1tSC1CCbLxMEp1cDU9/nk/P4JH3a47iuqunFVg0v80vM5jPI3lleu3qbwPrj3t2W96Fzb
+	2OXb2PvLvZhunLphOtvDJabmbdLcwm6WkGy97ikqS9/lmj618LmtpRrVOYfZ1PXi1EcP2q+J
+	r5oi9Sb0+X4N/v3f1vK8urrx6cmr/C6Fob1bY3M+SCYJpCR928P8vPy5S+bXU1rTdymr2Vj4
+	713BNCM+9MnRg50bD7VUv73+ZPsW3Z3VzhPOmh7XOlfsdOXT+jRz7h/Gtq0nl6czX63Ni5sZ
+	a+m3+2BQ4j1zJ5bb93S25IQ/VdDYNn+B8teAaentdgs/iNTwPbUMuMV85a9+y6P0dSKqrzav
+	zpnTcll7WmXBBp0H+x66KrEUZyQaajEXFScCAFwnPGcRAwAA
+X-CMS-MailID: 20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250213044950epcas5p1a7badb480a7e8d843fe0ff51bcf5cbf4
-References: <CGME20250213044950epcas5p1a7badb480a7e8d843fe0ff51bcf5cbf4@epcas5p1.samsung.com>
+X-CMS-RootMailID: 20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff
+References: <20250213044624.37334-1-swathi.ks@samsung.com>
+	<CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-FSD platform has two instances of EQoS IP, one is in FSYS0 block and
-another one is in PERIC block. This patch series add required DT binding
-and platform driver specific changes for the same.
+Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
+Ethernet YAML schema to enable the DT validation.
 
-Changes since v1:
-1. Updated dwc_eqos_setup_rxclock() function as per the review comments
-given by Andrew.
-
-Changes since v2:
-1. Addressed all the review comments suggested by Krzysztof with respect to
-DT binding file.
-2. Added SOB Swathi.
-
-Changes since v3:
-1. Avoided using alias-id to configure the HW.
-2. Modified the clock implementation.
-
-Changes since v4:
-1. Avoided switching between internal and external clocks for every open/
-close.
-2. Addressed the review comments on DT bindings
-
-Changes since v5:
-1. Addressed the review comment on correcting the intendation.
-2. Corrected the compatible name in dt-binding file.
-3. Listed and described the clocks in dt-binding.
-4. Modified FSD probe as per the changes in the refactoring patch given
-below: https://lore.kernel.org/netdev/20250207121849.55815-1-swathi.ks@samsung.com/
-
-Here is the link to v5 patches for reference:
-https://lore.kernel.org/netdev/1cb63ff4-8926-4bbc-8a78-59103d167140@kernel.org/
-
-Swathi K S (2):
-  dt-bindings: net: Add FSD EQoS device tree bindings
-  net: stmmac: dwc-qos: Add FSD EQoS support
-
+Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
+Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
+Signed-off-by: Swathi K S <swathi.ks@samsung.com>
+---
  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
  .../bindings/net/tesla,fsd-ethqos.yaml        | 114 ++++++++++++++++++
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        |  28 +++++
- 3 files changed, 145 insertions(+), 2 deletions(-)
+ 2 files changed, 117 insertions(+), 2 deletions(-)
  create mode 100644 Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml
 
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 91e75eb3f329..c7004eaa8eae 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -102,6 +102,7 @@ properties:
+         - snps,dwxgmac-2.10
+         - starfive,jh7100-dwmac
+         - starfive,jh7110-dwmac
++        - tesla,fsd-ethqos
+         - thead,th1520-gmac
+ 
+   reg:
+@@ -126,7 +127,7 @@ properties:
+ 
+   clocks:
+     minItems: 1
+-    maxItems: 8
++    maxItems: 10
+     additionalItems: true
+     items:
+       - description: GMAC main clock
+@@ -138,7 +139,7 @@ properties:
+ 
+   clock-names:
+     minItems: 1
+-    maxItems: 8
++    maxItems: 10
+     additionalItems: true
+     contains:
+       enum:
+diff --git a/Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml b/Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml
+new file mode 100644
+index 000000000000..9d7d632fcd92
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml
+@@ -0,0 +1,114 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/tesla,fsd-ethqos.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: FSD Ethernet Quality of Service
++
++maintainers:
++  - Swathi K S <swathi.ks@samsung.com>
++
++description:
++  Tesla ethernet devices based on dwmmac support Gigabit ethernet.
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++properties:
++  compatible:
++    const: tesla,fsd-ethqos
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-names:
++    items:
++      - const: macirq
++
++  clocks:
++    minItems: 5
++    items:
++      - description: PTP clock
++      - description: Master bus clock
++      - description: Slave bus clock
++      - description: MAC TX clock
++      - description: MAC RX clock
++      - description: Master2 bus clock
++      - description: Slave2 bus clock
++      - description: RX MUX clock
++      - description: PHY RX clock
++      - description: PERIC RGMII clock
++
++  clock-names:
++    minItems: 5
++    maxItems: 10
++    contains:
++      enum:
++        - ptp_ref
++        - master_bus
++        - slave_bus
++        - tx
++        - rx
++        - master2_bus
++        - slave2_bus
++        - eqos_rxclk_mux
++        - eqos_phyrxclk
++        - dout_peric_rgmii_clk
++
++  iommus:
++    maxItems: 1
++
++  phy-mode:
++    enum:
++      - rgmii-id
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++  - iommus
++  - phy-mode
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/fsd-clk.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    soc {
++        #address-cells = <2>;
++        #size-cells = <2>;
++        ethernet1: ethernet@14300000 {
++            compatible = "tesla,fsd-ethqos";
++            reg = <0x0 0x14300000 0x0 0x10000>;
++            interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
++            interrupt-names = "macirq";
++            clocks = <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_PTP_REF_I>,
++                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_ACLK_I>,
++                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_HCLK_I>,
++                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_RGMII_CLK_I>,
++                     <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_RX_I>,
++                     <&clock_peric PERIC_BUS_D_PERIC_IPCLKPORT_EQOSCLK>,
++                     <&clock_peric PERIC_BUS_P_PERIC_IPCLKPORT_EQOSCLK>,
++                     <&clock_peric PERIC_EQOS_PHYRXCLK_MUX>,
++                     <&clock_peric PERIC_EQOS_PHYRXCLK>,
++                     <&clock_peric PERIC_DOUT_RGMII_CLK>;
++            clock-names = "ptp_ref", "master_bus", "slave_bus","tx",
++                          "rx", "master2_bus", "slave2_bus", "eqos_rxclk_mux",
++                          "eqos_phyrxclk","dout_peric_rgmii_clk";
++            pinctrl-names = "default";
++            pinctrl-0 = <&eth1_tx_clk>, <&eth1_tx_data>, <&eth1_tx_ctrl>,
++                        <&eth1_phy_intr>, <&eth1_rx_clk>, <&eth1_rx_data>,
++                        <&eth1_rx_ctrl>, <&eth1_mdio>;
++            iommus = <&smmu_peric 0x0 0x1>;
++            phy-mode = "rgmii-id";
++       };
++    };
++
++...
 -- 
 2.17.1
 
