@@ -1,166 +1,123 @@
-Return-Path: <netdev+bounces-166178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2073A34D95
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:25:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B98A34DA5
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AD263A04D2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:25:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3273A10DE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5A524291D;
-	Thu, 13 Feb 2025 18:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16D724500D;
+	Thu, 13 Feb 2025 18:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyYidiRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4158241678
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 18:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CED24290E;
+	Thu, 13 Feb 2025 18:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739471125; cv=none; b=SMNlx2uFwj4AZaeBpD0skKK3yl1kVnqp0oFajsWsGCNra+7aAFwtEbZIGetvmhiKv6bg7FgnwM1FEqaqwYpGw9ow/NU7qlu5jwyzHOPIzo0MoEMorhNoKbgNp0jb1d7swve5wsvYeRuCr/EIXS69u8cQTwmCvHs3XoznynRXAHc=
+	t=1739471196; cv=none; b=PfUQT8z8wLgGit+B6xmm1+2yGE8WR6iW0HeHLf0I81nSNutFbHYCs3pdBV09MojtjciTmCJqvuUppPonmKdbw5lpxOPcLUqFkI6An5Vd1PwXMZJKZ58onjc8ZEAxndYFMdLHjgzo/mUXhJ9+/6KvU/vzI/zcWjFMsOKcoASkTW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739471125; c=relaxed/simple;
-	bh=fYT+0hn4LN4TCcfjDS0s+i8ggVVeBeWT+1SZ1n15P9U=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=K7AHiJvCGc8yHJ3aHJqxx1+TF/IbXtFEG0rIO8k+/0FTYT7h25PIFGMLsiLisO7h1yH47TYRdgCGw1CCCooDWo+FjBJhR3AwFD0XhbIKU+gM48O0SoKE0N9xAEvwJhzVpeXzdWRTEoSI+JkRYMXbw//FAJtHSLxUdzzwvTQ7NVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-855635c9cfaso173070039f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:25:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739471123; x=1740075923;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YmmpOVCfEgi0ptkqJPtsGe9FgkXLTDtXBsR9MtbAgF8=;
-        b=Fb9gkv8qXX0+9ZuLGKTzDWtyuct+LMUCAQuDGSY/+8qMW62XzLyKM4Eb+zDA8NMpZL
-         2wtnqyX6kou1PdBzYTjLoPXWD+S1CQ39b/XSY12wo4/Zv8cJmqRBfTkHMQxZKgoHMrl4
-         PFFiZ+CG1UURuFR8GtbkpdAanFFldaRx+DHMjGbZ7nOTGYUS1JIGd4gQMPC7MWchRA4h
-         bU94cdS0CW6Cei0uQ/IzR0qKqgXGpS9bvu8HvYTr0Re5T0GNCxD2y99iOHLYlHcVH2Fu
-         kThhzD7rKm0fFFihBfCPEb6Wd1vpSGTjLbbqXkBtdl6CiGz6w2X5ffSIRXtvqR5vXw+B
-         UoXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJCR//H4euyE71Cix9hyRxkwGkbjkrS5OjmAYwh0JlXec8RXM40py/t1o3XDVP+1Yw8oW+P/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9gtOumtQWAGzSAXQNg+qVv5iZW8uJ5syXliJSruWPfVmJGBQ/
-	wzR2pgTcuJLm6K7npI+s3bf5ZvSJpYWQXj3f5JCD8Akvs3pstrHPp8GoScz3EIjLR+thnKG358p
-	9O9zmWfdo37SlLSnzReYoQ7KamEcM15mK2tk4b5/PQECxw/Y36sdarOo=
-X-Google-Smtp-Source: AGHT+IHYJphH/00k6pql6g5oy6NLNRlrxwXkGv+8BX1jOE6w8Kfwtp0KM+x1CAZlZg3d4vGtfnUbvUcAcqS4wc1YZFa9JN7nMOmN
+	s=arc-20240116; t=1739471196; c=relaxed/simple;
+	bh=NhDUxXj3oz4V8+R+gygt7nMUyVRevYRPQIQD8pzOLW4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=IswPCtzf0KD8PDyFDqqdfUynTkYliqz3sBviD0vApmLsZAKuEb0NoXZxUCIpTD0x3krvp4o4j9j8LVETz7h2GGYt5iGRQIR/sJXTiX7rm7dStjIlHmPHgZycWwbWKdpVAkcHuynlbrrUKfFRloBhX3QVH8zt30D9bsm5W6tw9RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyYidiRl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A484EC4CED1;
+	Thu, 13 Feb 2025 18:26:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739471196;
+	bh=NhDUxXj3oz4V8+R+gygt7nMUyVRevYRPQIQD8pzOLW4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=HyYidiRl96qMUK43IQ2LEvdRgb7aV2nlKM2bLVVDdT0GLa2JiVVRRAqipVkb81xry
+	 FdB0y8AmenVdTI0LN6gNC315LwkL3WSjmGtmhbcYovNNpe4KcQUg6K80R+fSwNuSWN
+	 9Tvvdp9lXYLjA1wILVrcbu/9C54cWychEQaQ74rEDmEnNQYDHRUsjVkHjtYl2JnlRW
+	 k5b17R/FcBYhJkhchj9LuznGmJfEBUgCluEvJ4dyafeIi6pf+g6ZcpK7kyx08UM8a6
+	 mqHLPtCYVJmEpLmWGvO6BQDxpInUEMGAKW0soThrDxe0H28Ac2jqWQcqtOClR8v1mY
+	 v/NAMI419dweg==
+From: Mark Brown <broonie@kernel.org>
+To: Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Lars-Peter Clausen <lars@metafoo.de>, 
+ Michael Hennerich <Michael.Hennerich@analog.com>, 
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+ =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, 
+ Takashi Iwai <tiwai@suse.com>, David Lechner <dlechner@baylibre.com>
+Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+ linux-sound@vger.kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+In-Reply-To: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+Subject: Re: (subset) [PATCH v3 00/15] gpiolib: add
+ gpiod_multi_set_value_cansleep
+Message-Id: <173947119037.339941.1732579278867629226.b4-ty@kernel.org>
+Date: Thu, 13 Feb 2025 18:26:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:154e:b0:3d0:f2ca:659a with SMTP id
- e9e14a558f8ab-3d17d136916mr76258345ab.15.1739471122856; Thu, 13 Feb 2025
- 10:25:22 -0800 (PST)
-Date: Thu, 13 Feb 2025 10:25:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67ae3912.050a0220.21dd3.0021.GAE@google.com>
-Subject: [syzbot] [ppp?] KMSAN: uninit-value in ppp_sync_send (2)
-From: syzbot <syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-1b0d6
 
-Hello,
+On Mon, 10 Feb 2025 16:33:26 -0600, David Lechner wrote:
+> This series was inspired by some minor annoyance I have experienced a
+> few times in recent reviews.
+> 
+> Calling gpiod_set_array_value_cansleep() can be quite verbose due to
+> having so many parameters. In most cases, we already have a struct
+> gpio_descs that contains the first 3 parameters so we end up with 3 (or
+> often even 6) pointer indirections at each call site. Also, people have
+> a tendency to want to hard-code the first argument instead of using
+> struct gpio_descs.ndescs, often without checking that ndescs >= the
+> hard-coded value.
+> 
+> [...]
 
-syzbot found the following issue on:
+Applied to
 
-HEAD commit:    9946eaf552b1 Merge tag 'hardening-v6.14-rc2' of git://git...
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=131dabdf980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f20bce78db15972a
-dashboard link: https://syzkaller.appspot.com/bug?extid=29fc8991b0ecb186cf40
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17b142a4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14167df8580000
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/955ec208b383/disk-9946eaf5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ccb7613686d1/vmlinux-9946eaf5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/10b92522362a/bzImage-9946eaf5.xz
+Thanks!
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+[15/15] ASoC: adau1701: use gpiod_multi_set_value_cansleep
+        commit: ad0fbcebb5f6e093d433a0873758a2778d747eb8
 
-=====================================================
-BUG: KMSAN: uninit-value in ppp_sync_txmunge drivers/net/ppp/ppp_synctty.c:516 [inline]
-BUG: KMSAN: uninit-value in ppp_sync_send+0x21c/0xb00 drivers/net/ppp/ppp_synctty.c:568
- ppp_sync_txmunge drivers/net/ppp/ppp_synctty.c:516 [inline]
- ppp_sync_send+0x21c/0xb00 drivers/net/ppp/ppp_synctty.c:568
- ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2280 [inline]
- ppp_input+0x1f1/0xe60 drivers/net/ppp/ppp_generic.c:2304
- pppoe_rcv_core+0x1d3/0x720 drivers/net/ppp/pppoe.c:379
- sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1122
- __release_sock+0x1da/0x330 net/core/sock.c:3106
- release_sock+0x6b/0x250 net/core/sock.c:3660
- pppoe_sendmsg+0xb35/0xc50 drivers/net/ppp/pppoe.c:903
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:733
- ____sys_sendmsg+0x903/0xb60 net/socket.c:2573
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2627
- __sys_sendmmsg+0x2ff/0x880 net/socket.c:2716
- __do_sys_sendmmsg net/socket.c:2743 [inline]
- __se_sys_sendmmsg net/socket.c:2740 [inline]
- __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2740
- x64_sys_call+0x33c2/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:308
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
 
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4121 [inline]
- slab_alloc_node mm/slub.c:4164 [inline]
- kmem_cache_alloc_node_noprof+0x907/0xe00 mm/slub.c:4216
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
- alloc_skb include/linux/skbuff.h:1331 [inline]
- sock_wmalloc+0xfe/0x1a0 net/core/sock.c:2746
- pppoe_sendmsg+0x385/0xc50 drivers/net/ppp/pppoe.c:867
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:733
- ____sys_sendmsg+0x903/0xb60 net/socket.c:2573
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2627
- __sys_sendmmsg+0x2ff/0x880 net/socket.c:2716
- __do_sys_sendmmsg net/socket.c:2743 [inline]
- __se_sys_sendmmsg net/socket.c:2740 [inline]
- __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2740
- x64_sys_call+0x33c2/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:308
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
 
-CPU: 1 UID: 0 PID: 5806 Comm: syz-executor201 Not tainted 6.14.0-rc1-syzkaller-00235-g9946eaf552b1 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-=====================================================
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
 
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Thanks,
+Mark
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
