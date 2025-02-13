@@ -1,96 +1,87 @@
-Return-Path: <netdev+bounces-166202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A589FA34ECC
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:56:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE88A34ECD
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:56:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D423189088D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F1FF3AC306
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41F32661BC;
-	Thu, 13 Feb 2025 19:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A195F24BBEC;
+	Thu, 13 Feb 2025 19:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZVqHzfis"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W4mfyfic"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E006324BC0F
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 19:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5C8266B62;
+	Thu, 13 Feb 2025 19:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739476501; cv=none; b=El1UfV/VkAYozKd5XN2XR/B3U1iMcTJjPLm9XwLti0vBK5/oWNQYlwjrKK/NTaaldKyw8MiqNiRvONtt9/+RdNqumXycERnoHGBpUGCFRMCU196hOstxb6oYtk8x5cYTH4/Ex/p9b5Za9Gvf2jD/MVs6FtEraZHGEnhe4dpi1eU=
+	t=1739476505; cv=none; b=f8jz1U7Pvh0hL5Zg6A5m/nvVkCzxTfB3JkOyEqCOJ1YoyAIvOXvlSvmsbdXS+scDBIpQFEPUwCh6/OokATlkysbdwDxQfuD8PnSwxEfD+DJtsJZz5x4UM9VgKxnNHlZsWfd3s/1DdNRHV1i1XC4UtImCkzLnS0UOyvyhU2k7pis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739476501; c=relaxed/simple;
-	bh=gkhsxtf9qrRF8WXSpi9+XQph/BdpyHFwb9XUpfJkdek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RGiPsxeeZKweb4SAEL04EVN19y/Huq+58FPhZ+KhpJqHoT1vT/tLDHEULcMQ78M+xFdtKgBtBwt1dYQoUH2oaDIVb6j2bWjkZoT/iwGA+70nQA1jc8rPzeb3NpfNqvCcBPNaFuFl534IrDUikkOFFYnffdYFZSHIbdmmXYqn1NM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZVqHzfis; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0bee571a-927d-4042-9e89-53bf695ec054@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739476487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kq5wfnoFKln0Y2OzD3jZdnjsfuZI5Yaaccu5d5315Sk=;
-	b=ZVqHzfisqjB1D8ffEBfdpMuxGU2JY0k8Mfay+2bURk6tYJYzAhwkU3Pse7G/OeAolFuDxx
-	/qXtphDImXClZ9pzJ90Kfx7YO3fFUGh+B/V+ShYfAs95Tmn8fmU+hzuMOFrq5/snHcVd6D
-	nZepCTZJYU4KfJHLzk14IZq6+RvmS8M=
-Date: Thu, 13 Feb 2025 11:54:41 -0800
+	s=arc-20240116; t=1739476505; c=relaxed/simple;
+	bh=3ph/sVj9uFbBjTAgcfcM1g7k+e3uf+Q4Jk8v0dYrjlQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m/fb2JJ8OBD1IRohBjMT0cGq5xCti3Pd7U8ZrXcNJ6OfLWsBMFXaw2QOCJKEVrtNXyMCnKHEAROFJib6/a68YJKLCMUEw681e6YiHMNY4KqF01n4IZC1wvDpdbZ5iE+VXTAKDTvsovCTNL7UL/AlEbHPkSrzMnbFoqo2szVqaPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W4mfyfic; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=k2ipZEKqxXNF4XLP52ASASuGbRiJWj39yrm5/DIG5rQ=; b=W4mfyficfnZaIx5BOl7wBgMGoy
+	2vYXN+02xuLAAT6Mghfe7A+RzA5os+3vs6vh/cUaepdil/VuwyDeC8FFMkdpLudtprrRQLgQA5qqa
+	mtCYjVmFcJcpcXf1FmbrYIkpxXsPWPQGXINQuBPSV3xZt1omYB/6d0qGeacZscnhMMAU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tifIQ-00DqQQ-Nn; Thu, 13 Feb 2025 20:54:50 +0100
+Date: Thu, 13 Feb 2025 20:54:50 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/7] net: hibmcge: Add dump statistics supported
+ in this module
+Message-ID: <47e8bab3-61cb-4c5a-9b40-03011b6267b3@lunn.ch>
+References: <20250213035529.2402283-1-shaojijie@huawei.com>
+ <20250213035529.2402283-2-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v4 01/19] bpf: Make every prog keep a copy of
- ctx_arg_info
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- kuba@kernel.org, edumazet@google.com, xiyou.wangcong@gmail.com,
- cong.wang@bytedance.com, jhs@mojatatu.com, sinquersw@gmail.com,
- toke@redhat.com, jiri@resnulli.us, stfomichev@gmail.com,
- ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn,
- yepeilin.cs@gmail.com, kernel-team@meta.com
-References: <20250210174336.2024258-1-ameryhung@gmail.com>
- <20250210174336.2024258-2-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250210174336.2024258-2-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213035529.2402283-2-shaojijie@huawei.com>
 
-On 2/10/25 9:43 AM, Amery Hung wrote:
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 9971c03adfd5..a41ba019780f 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -22377,6 +22377,18 @@ static void print_verification_stats(struct bpf_verifier_env *env)
->   		env->peak_states, env->longest_mark_read_walk);
->   }
->   
-> +int bpf_prog_ctx_arg_info_init(struct bpf_prog *prog,
-> +			       const struct bpf_ctx_arg_aux *info, u32 cnt)
-> +{
-> +	prog->aux->ctx_arg_info = kcalloc(cnt, sizeof(*info), GFP_KERNEL);
+On Thu, Feb 13, 2025 at 11:55:23AM +0800, Jijie Shao wrote:
+> The driver supports many hw statistics. This patch supports
+> dump statistics through ethtool_ops and ndo.get_stats64().
+> 
+> The type of hw statistics register is u32,
+> To prevent the statistics register from overflowing,
+> the driver dump the statistics every 5 minutes
+> in a scheduled task.
 
-Missing a kfree.
+u32 allows the counter to reach 4294967295 before wrapping. So over 5
+minutes, that is around 14,316,557 per second. Say this is your
+received byte counter? That means your line rate cannot be higher than
+114Mbps? Is this device really only Fast Ethernet?
 
-> +	if (!prog->aux->ctx_arg_info)
-> +		return -ENOMEM;
-> +
-> +	memcpy(prog->aux->ctx_arg_info, info, sizeof(*info) * cnt);
-> +	prog->aux->ctx_arg_info_size = cnt;
-> +	return 0;
-> +}
-> +
+	 Andrew
 
