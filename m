@@ -1,145 +1,118 @@
-Return-Path: <netdev+bounces-165930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49148A33BDB
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:01:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1CCAA33BF8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB3BC3A7F5A
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:01:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192081685BD
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7385F20B21A;
-	Thu, 13 Feb 2025 10:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCADB2135B7;
+	Thu, 13 Feb 2025 10:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CT80kOy+"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="nJqs8vBA";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="nUg2jIhN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E6541C6A;
-	Thu, 13 Feb 2025 10:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BBA213244;
+	Thu, 13 Feb 2025 10:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440882; cv=none; b=sXe2YHJdpOkeIQRh1JB6uT52Vktzq3UNi3Nisz/0ss22ys0ZahIFk0jqvrrG61pBwGz812SA3EYxql4Tsg3/fEb7iNhKFZPhasIHR6Hub8v2Xz1pr7EaM3ONyqwNnF1/bu+DWnoLdcohxnqYajzEmTRIlZ2yRt7BXHNViG4NYmI=
+	t=1739441125; cv=none; b=cjh8CRsES4j5qscElW/kqknAPNfgWPk8RTxPGKRmn0PvrFUgN/UaYuaeQaB/LcKcScjv0RN1Of8NjIfOxntYuifHwd449j5IGtjcyc0sXXvowuOKDMW+lCgueBXvBxXPp2ruLB4tENUaLIxM4cK0ebbaAnGmQct4Niaa2NvR9/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440882; c=relaxed/simple;
-	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F5bVCcDDZWL4dOEniVPSVDUrylL4882Kbq55NhTstweSSNeLQrLE7toUELhMLEV7qR96vN+xTB00+BGY0Am9t+5lxbizfKVqr8guuW6zKo/4UeEnnEZpu8lrnD/c0gzo4zvjm30YPjlXj4aVh4pWhEMZ153tdLkuycenMGXUIWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CT80kOy+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE24CC4CED1;
-	Thu, 13 Feb 2025 10:01:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739440881;
-	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CT80kOy+UBc1F93xZBALWXH0fBw+w/Wl/AbuBRUZ5RA9pmydy3NjIF+nI0Cs6gAyB
-	 FaX6b6pwa36QQ5fOJUslSk9QaLd9e48+cI6/tJwSlRyRVa91hSeU11nCDDKuvkGhOQ
-	 167EKf9CBvO0ISoqVdxpt9jKdIZnJATxTOLRlXiQ=
-Date: Thu, 13 Feb 2025 11:01:17 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-Message-ID: <2025021352-dairy-whomever-f8bd@gregkh>
-References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+	s=arc-20240116; t=1739441125; c=relaxed/simple;
+	bh=knOoCyqKBam6Pf0TCdS+SFILRF2xIiNlVO7MLrcfpCI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ddA2oESHPjN5/BqXxfHwNwik+LzpLdCAZNrHTkT+keuDgpz1KG00CyGnqV57Aeag4vjUeOA+NgMvbtN+h2DtE+t28Yf99svPGXwVxSXB+OK1TgU8FkltS3p1ZzEFJr1sKtLrkHIiQ0pCmV8OlGuM+0lxULboI1jr8eIjJiysFsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=nJqs8vBA; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=nUg2jIhN; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id F2283603AA; Thu, 13 Feb 2025 11:05:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1739441115;
+	bh=swm0n+eXf4Aw19LZqJrL1ixb0Ye++eEGcYlKWWhEWrU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nJqs8vBA00Onmi2Yp0/N1e7WgGMITiQiZWBJDixxSazGynmBE7nnkpvMZ5q+vtgFw
+	 F9NkB/qo78maSJK75wl6zfO0OYAggoh6DzfKc4EmUVW+jf9E2NtjAVrDDAPjlSPqDv
+	 J5+G22YkMGCyUqAcGi9OOmmt/XZG+piPwDnoPBuNdh73aB8x6XU9PsX3JB99PHK14S
+	 Bw8kjevVPmE/SEaEN4Nm9+oYO7co0QP1E6rTGi1n3klol8VU6BCjwqnj1A1gK8GGEo
+	 tEEHnwqOIhSozZxVhz79q156kDvaoD1JCeLmbelwuQvfKhuA1gVWlodY1W9BDhEKBr
+	 wX0UiWgS0CErw==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 05B8C603AA;
+	Thu, 13 Feb 2025 11:05:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1739441113;
+	bh=swm0n+eXf4Aw19LZqJrL1ixb0Ye++eEGcYlKWWhEWrU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nUg2jIhNLmjEXvfp88oF++rB/L4SRyAkSO2RG0h/BU8ShEyPvuBWgIMvIwrrvYdYN
+	 30iAb1sRGCt7MiR7M6yeksqWFZ4K3ih6wMo40caFeOh5wmybEi/405P/9CvBaa8XDz
+	 ws7VPeoiDaXiAkpfVZbeNI5sCQkce5bq5Pd+bR47welAqVNiMDpnFxhheqy9BOpuSl
+	 tVnPz0ounh1G6lzBrTXyOgeZLnbfGIdIJHOeKchclvnETHQJNmYzrxQ/fFdMANPciO
+	 oqpL/QwQWer+DT0eat2RMPHCRyOd07HWrV0XTaKjOJxcb1AIaouiDiDM6pp2X42gLY
+	 gSI3tnTky6Mgg==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 0/1] Netfilter fixes for net
+Date: Thu, 13 Feb 2025 11:05:01 +0100
+Message-Id: <20250213100502.3983-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 13, 2025 at 11:43:59AM +0800, Hsin-chen Chuang wrote:
-> From: Hsin-chen Chuang <chharry@chromium.org>
-> 
-> Expose the isoc_alt attr with device group to avoid the racing.
-> 
-> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> it also becomes the parent device of hci dev.
-> 
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
-> 
-> Changes in v4:
-> - Create a dev node for btusb. It's now hci dev's parent and the
->   isoc_alt now belongs to it.
-> - Since the changes is almost limitted in btusb, no need to add the
->   callbacks in hdev anymore.
-> 
-> Changes in v3:
-> - Make the attribute exported only when the isoc_alt is available.
-> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
->   (which calls hci_init_sysfs).
-> - Since hci_init_sysfs is called before btusb could modify the hdev,
->   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
-> 
->  drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_sysfs.c        |  3 +-
->  3 files changed, 79 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 1caf7a071a73..cb3db18bb72c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -920,6 +920,8 @@ struct btusb_data {
->  	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->  
->  	struct qca_dump_info qca_dump;
-> +
-> +	struct device dev;
->  };
->  
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
->  	int alt;
->  	int ret;
->  
-> +	if (!data->hdev)
-> +		return -ENODEV;
-> +
->  	if (kstrtoint(buf, 10, &alt))
->  		return -EINVAL;
->  
-> @@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev,
->  
->  static DEVICE_ATTR_RW(isoc_alt);
->  
-> +static struct attribute *btusb_sysfs_attrs[] = {
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs);
-> +
-> +static void btusb_sysfs_release(struct device *dev)
-> +{
-> +	// Resource release is managed in btusb_disconnect
+Hi,
 
-That is NOT how the driver model works, do NOT provide an empty
-release() function just to silence the driver core from complaining
-about it.
+The following batch contains one revert for:
 
-If for some reason the code thinks it is handling devices differently
-than it should be, fix that instead.
+1) Revert flowtable entry teardown cycle when skbuff exceeds mtu to
+   deal with DF flag unset scenarios. This is reverts a patch coming
+   in the previous merge window (available in 6.14-rc releases).
 
-thanks,
+Please, pull these changes from:
 
-greg k-h
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-02-13
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit e589adf5b70c07b1ab974d077046fdbf583b2f36:
+
+  iavf: Fix a locking bug in an error path (2025-02-11 18:02:04 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-25-02-13
+
+for you to fetch changes up to cf56aa8dd26328a9af4ffe7fb0bd8fcfa9407112:
+
+  Revert "netfilter: flowtable: teardown flow if cached mtu is stale" (2025-02-12 10:35:20 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 25-02-13
+
+----------------------------------------------------------------
+Pablo Neira Ayuso (1):
+      Revert "netfilter: flowtable: teardown flow if cached mtu is stale"
+
+ net/netfilter/nf_flow_table_ip.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
