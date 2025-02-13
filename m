@@ -1,127 +1,153 @@
-Return-Path: <netdev+bounces-166206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3958CA34F1D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:13:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9409EA34F1F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:14:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D003AC0A9
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:13:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 319E47A4258
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAB024A07E;
-	Thu, 13 Feb 2025 20:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D1224A07E;
+	Thu, 13 Feb 2025 20:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hobx4y4p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AF/uQsLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9664928A2CB;
-	Thu, 13 Feb 2025 20:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A9E28A2CB
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 20:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739477594; cv=none; b=sOkLMPUMcZlOKOslvVQo2eQADmb7vFkC0cUcZAm59cW1sfqr7U4i2Qwg6aFcLWQ0odXSyPhPnmfz3dXzIfM2RzHz90ffy2v/w9Iib0t75WMLyE8RdVoLwQkoMCiQuc01E+mBX4+2P6YNCSLGQXEYG9qY0l8yhOpiWCgi6YREQ1o=
+	t=1739477660; cv=none; b=m9ogB2ZYhmzFsKyklLP9qu8fXAxLq9DvBmVRu4qu+IxGG17BboMQKxhYcLEga6jXDPiK0kDb9quFW0ok+GsAxAS7FmIRleboTvhTJX22m0AqJuujM3Md9DafeZUM6nICerwh1fO7JyU0U+GFBgX8KLiw/jkcgfKZT10faiXidCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739477594; c=relaxed/simple;
-	bh=5ZipYuMPgrN9n9uPJIkYegGgMsGv/UZehGDUEqj4LLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EU+rBmJjLdSHIYuuaym05ipYsgcGxAEA4j7ZTK88PfsbN02wo8yoLPHLPtEew/nk1ougjmyntU0jQv2VCyY+vZoyZFDX0sJQOZ0/He/CE+3P4FpcUJhYBS9HQRwotX1KC2vDBO/6dbOAEoiimGFFcizu1Sr/D1DB1APEKT1XCBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hobx4y4p; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0AvuaGU/cH1A/7IDZRhEkvHqA4F9A2Qjq+21qlNvMrk=; b=hobx4y4pjW4CvLaZgqgTHG/Ni2
-	HlN2dGSn7BwnXb4spg0TCKfBpblIJSchznx0NAKY9PmedV+BAyaSmB983ppEOB0AO9P79wDqdjNzF
-	JaiRJnUidqglZC/C6Ddi0LFGJNoxfld6pMusrW5UFSuL/i9hmYQPU35u6+1x8F672Fpg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tifa5-00DqgB-GW; Thu, 13 Feb 2025 21:13:05 +0100
-Date: Thu, 13 Feb 2025 21:13:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	sudongming1@huawei.com, xujunsheng@huawei.com,
-	shiyongbang@huawei.com, libaihan@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 7/7] net: hibmcge: Add ioctl supported in this
- module
-Message-ID: <c1d557b6-7f11-449e-aff7-dad974e1c7c9@lunn.ch>
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-8-shaojijie@huawei.com>
+	s=arc-20240116; t=1739477660; c=relaxed/simple;
+	bh=q5BYBj5HZixx6ywC6iODBrmgHLR1RkyERCgct7wK6Ag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d59uBwBRCivDh/mgfDOsmOkp4X8Us/edYRkcyCfMARc4npawlgvvYRk43ZxmcRFiK4xrCCA98i1WDygFYUUbJ1sg06+vun50eOSd3bvH9RDB2CzorsSeHbucWN2ncRVqzHQQABUp1IoGDdPe64Kwx0u4Ltzfxi8DHVRncU/Ov/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AF/uQsLP; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21f8c280472so26905ad.1
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 12:14:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739477658; x=1740082458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sj2t3514S+fGsSpJdcIv8lVN9kA0Cb6njvavzc1RZ9k=;
+        b=AF/uQsLPnqV3lN+2rIUD4xHxVjHI+/MdazORnOFndCC9FZ27fUy+ulcWenp50ZGe5l
+         +JhKYZF59Kh+62MnzkDIUBUY7DL/E6oUrD86fddBIkR6zIt90sXsEZBOzQL6bvOdY7sp
+         tCXMdYgVERji4BaeytcvsWaYD2NBpOSi/v4V16xxUxmE4d9N2XL6QrV15xUO9Hhj1zGU
+         LXj0jEau9Xrm+8gzEk9SiN92d56T2Hm0XeqU9Udu5nqrJhjUnhHucpmSiAMrNRbmTVYg
+         uPpmikDSIRGd1d7IgI94TGhQTWVNGDixDHaZz7MIzpPauoPxFr3W1/zPLKtqcGf3cYxC
+         t2wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739477658; x=1740082458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sj2t3514S+fGsSpJdcIv8lVN9kA0Cb6njvavzc1RZ9k=;
+        b=BjZ7AEJ03GIZF7U5p6wDDlPpZbG7xEfH+dBc0RhuQcMZpdR4YHziUIlFYVwNUFt6D7
+         q6c/YWXWAdkGem0dZz6dUI6+GxNuv11/Ma2luJqqpgCQx9dbSxJt9kNEgWFgTQpBRN6D
+         iV3vIfTKZrxihC+d7g/EDtCP5F2DBy0lbARPfgtb7okHac5qhfsIBrXH3qHVZQHJNcXQ
+         vULkHXVZ8FdP6EtHkbEm7oKqDoSLIz+5GG8n6C9afcir0AWGhQI0jhKZh2EoI4sriX+b
+         I+CuKGicQgDtVsj3SPr91KYV1T6UYNDN9coXzkWnIKyUOmIlBY59xnfJw2yqT7Yyc3eq
+         eo3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWgdTIEWhRBT3PIcKdrJnPaWyfwoOpWpFXXH/TOuTO/YzLQkInMLd7mhz4kvY0Ay4Zntjpiz+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7LmtWXy/VkZ60/MGenl53/x43TdbpRTA0wibYwUxrWGExxgBp
+	50RJBbNU+QGdokTkGQK7A4FE95VSc5mw2LpPtb4XAIq/tyOSKfwqHNRPYbhsAXB9iHhNIVDK2tw
+	4Io0HMq71kZwE3ZqCmQbrGjqrpBtXRT4h/kSM
+X-Gm-Gg: ASbGncsajj2Pb/1ANr1WxzSobwic+EqyUxFfZ6ki2zvA6ebMF/tMxoYDOy6kQIoHKS+
+	1qVd84V//G2rd00osycTR3inMkttq7D4d7OdwFxQ4Mew0ziil4qwMuFRG8oa2H7uJhyEJcPtF
+X-Google-Smtp-Source: AGHT+IHyBD5p90pqBaTdnXNe9dQV33638MOkRhooolsc65z1YZeaVDTLLC/9p0e/wj1fgHMPZivqYCidB1+k3hYMCj8=
+X-Received: by 2002:a17:902:6949:b0:21f:2828:dc82 with SMTP id
+ d9443c01a7336-220ecc255bamr389615ad.2.1739477657553; Thu, 13 Feb 2025
+ 12:14:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213035529.2402283-8-shaojijie@huawei.com>
+References: <20250213052150.18392-1-kerneljasonxing@gmail.com>
+ <94376281-1922-40ee-bfd6-80ff88b9eed7@redhat.com> <CAL+tcoC6r=ow4nfjDvv6tDEKgPVOf-c3aHD56_AXmqUrQMyCMg@mail.gmail.com>
+In-Reply-To: <CAL+tcoC6r=ow4nfjDvv6tDEKgPVOf-c3aHD56_AXmqUrQMyCMg@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 13 Feb 2025 12:14:04 -0800
+X-Gm-Features: AWEUYZlM3wqu2n1FKBGn2bv8ljUN7Ghj3NccOKAzpjZBlzFDVsPAIvNZZEKOlbQ
+Message-ID: <CAHS8izO0CdzNti7L3ktg4ynkJSptO96VtrzvtUEkzUiR7h38dg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] page_pool: avoid infinite loop to schedule
+ delayed worker
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	ilias.apalodimas@linaro.org, edumazet@google.com, kuba@kernel.org, 
+	horms@kernel.org, hawk@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 13, 2025 at 11:55:29AM +0800, Jijie Shao wrote:
-> This patch implements the ioctl interface to
-> read and write the PHY register.
-> 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  .../net/ethernet/hisilicon/hibmcge/hbg_main.c  | 18 ++++++++++++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c  | 10 ++++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h  |  2 ++
->  3 files changed, 30 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-> index 78999d41f41d..afd04ed65eee 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-> @@ -273,6 +273,23 @@ static netdev_features_t hbg_net_fix_features(struct net_device *netdev,
->  	return features & HBG_SUPPORT_FEATURES;
->  }
->  
-> +static int hbg_net_eth_ioctl(struct net_device *dev, struct ifreq *ifr, s32 cmd)
-> +{
-> +	struct hbg_priv *priv = netdev_priv(dev);
-> +
-> +	if (test_bit(HBG_NIC_STATE_RESETTING, &priv->state))
-> +		return -EBUSY;
-> +
-> +	switch (cmd) {
-> +	case SIOCGMIIPHY:
-> +	case SIOCGMIIREG:
-> +	case SIOCSMIIREG:
-> +		return hbg_mdio_ioctl(priv, ifr, cmd);
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
+On Thu, Feb 13, 2025 at 2:49=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Thu, Feb 13, 2025 at 4:32=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > On 2/13/25 6:21 AM, Jason Xing wrote:
+> > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > > index 1c6fec08bc43..e1f89a19a6b6 100644
+> > > --- a/net/core/page_pool.c
+> > > +++ b/net/core/page_pool.c
+> > > @@ -1112,13 +1112,12 @@ static void page_pool_release_retry(struct wo=
+rk_struct *wq)
+> > >       int inflight;
+> > >
+> > >       inflight =3D page_pool_release(pool);
+> > > -     if (!inflight)
+> > > -             return;
+> > >
+> > >       /* Periodic warning for page pools the user can't see */
+> > >       netdev =3D READ_ONCE(pool->slow.netdev);
+> >
+> > This causes UaF, as catched by the CI:
+> >
+> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/990441/34-udpgro=
+-bench-sh/stderr
+> >
+> > at this point 'inflight' could be 0 and 'pool' already freed.
+>
+> Oh, right, thanks for catching that.
+>
+> I'm going to use the previous approach (one-liner with a few comments):
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 1c6fec08bc43..209b5028abd7 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1112,7 +1112,13 @@ static void page_pool_release_retry(struct
+> work_struct *wq)
+>         int inflight;
+>
+>         inflight =3D page_pool_release(pool);
+> -       if (!inflight)
+> +       /* In rare cases, a driver bug may cause inflight to go negative.
+> +        * Don't reschedule release if inflight is 0 or negative.
+> +        * - If 0, the page_pool has been destroyed
+> +        * - if negative, we will never recover
+> +        *   in both cases no reschedule is necessary.
+> +        */
+> +       if (inflight <=3D 0)
+>                 return;
+>
 
-No need for this switch statement. phy_mii_ioctl() will return
-EOPNOTSUPP for any it does not support.
+I think it could still be good to have us warn once so that this bug
+is not silent.
 
-The general structure of an IOCTL handler is to have a switch
-statements for any IOCTL which are handled at this level and the
-default: case then calls into the next layer down.
+We can return early if page_pool_release(pool) =3D=3D 0, and then only
+schedule_delayed_work() after the warning if inflight is positive.
 
-> +int hbg_mdio_ioctl(struct hbg_priv *priv, struct ifreq *ifr, int cmd)
-> +{
-> +	struct hbg_mac *mac = &priv->mac;
-> +
-> +	if (!mac->phydev)
-> +		return -ENODEV;
-> +
-> +	return phy_mii_ioctl(mac->phydev, ifr, cmd);
-
-phy_do_ioctl(). This is assuming you follow the normal pattern of
-keeping the phydev pointer in the net_device structure.
-
-	Andrew
+--=20
+Thanks,
+Mina
 
