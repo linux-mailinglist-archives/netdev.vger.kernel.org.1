@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-166219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CFCBA350B2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:50:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4723A350B7
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D243C16504C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:49:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EDD33AE0D1
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3AE269806;
-	Thu, 13 Feb 2025 21:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A59826981B;
+	Thu, 13 Feb 2025 21:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnTapvyH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8ya4rUB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B4D245AF6
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 21:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5141E245AF6
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 21:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739483372; cv=none; b=mu/iKF/RzlE2FHVXA/waovPiEGIZNBuOKJwzB9pGI/VmPqnXSSp+It6sYwPOj5w8k7zy6lMlUJo0JtBXyrSVS3xChOaYBceSOC/xRQ0gQAZUGePf+O1DybCbTCc0YD8Ubrlprn1ZSwLc2HZ7Dio3abhlJZxTJyhsP3FvELxrsL8=
+	t=1739483483; cv=none; b=gWu8eBSZRfDj8s9piybMxYL50g6w1odMb61Tb7ImjoK9bth0nCdX8kc1SQWTS/e3JQOj5AP+2pbGfF99kvu3IDnTdE5qyZDSo/n88QJ/nEwXv+cHgLu/nQJBCTIWinf+eNaFEsZA8B1o0XYFnWszMi+OZs/lvUFkrRPXixaDPYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739483372; c=relaxed/simple;
-	bh=Zk4QDkA44tWiNc4z/YOWAiAEwT4xFqJn2oisOWTt8Q8=;
+	s=arc-20240116; t=1739483483; c=relaxed/simple;
+	bh=+vlRvOZdRRJ1sH8RUL5QSUlub92836ZrUVgFrM5Ak9s=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IYvLwdlQrCRnrkShOjzcDvOxZSqTIumcg7skDho3XW+UdPzYhG01SwgmpYq9zqpMt+ygKfljJv+asRJWB1EvUDOkne2XvIhVav0iq+zb6Nk0y1/DTr3jiwuIGxNf/NhHzfohu8oQdadg3btKROkxbtSjJhEm9hIcwPGJKLhIdp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnTapvyH; arc=none smtp.client-ip=209.85.208.41
+	 In-Reply-To:Content-Type; b=ZXnxHPPwXnC5nPCCaFimGJSD3I9JMot1iVMuiJSSCJIldHLF04uDO3nbj4ip7dHKpuZOxu7aVGOVKsjxo0qqx9+QrztKU4y5k/D9mR/AIED8UtzEiyaBWi4hK9A+a3X3nT7tlXjNQkZnQK6x4D0a68x5kYm8P8lrvEKpzW8tqJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8ya4rUB; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de5a853090so3019441a12.3
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:49:30 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ab7e80c4b55so286414166b.0
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:51:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739483369; x=1740088169; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739483479; x=1740088279; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0piG3yjRjEusyNC4nYKHzEr7L31oYL8tLO8Yfned4Ho=;
-        b=nnTapvyH6AkoArWl6GRgkvT0YEFqMLDzDY5D2iW+FpIOPZL+neMizLwzGznlZ0O/4r
-         3I6+2v/uld5+ZzFSVsg7dYhweJULWgtOfI6/KneIfBgrfyCZonu0FggRUAF1UHhXKZBC
-         RRnJ1UkMekZj2kZRLyDS+UwDL5cMX34M1gzLK+FRnPkm0HUBSyW9jyKgcj2pkhQq3F92
-         PDMviVNCLoBK4m7mIzHGtHLofwmEoimkV3OGVI8OlKop9y2Z1qAM7P63h5dCy+jz5lGE
-         e5WWRK6Q3uwLrv8COk22I2phWCf8zaNtCPzjbqMVwsV/6uEZamCPEaIEISyzTN9DrYQM
-         Bchg==
+        bh=16kLc939+TPQhGWtU56YbQZOiLpD6r+a3D8dt/D5Rag=;
+        b=Z8ya4rUB5he+AmYmVbOjkfvEH+P8s1uzwvbrgrhC6li+WKywEMtHGuuwqbsx652UAq
+         clK/lslP3cbE5f4Qtnfqp42cK4RwFnw1fWH/cFX1tm8S0M3SI2R9LMWk/WgVhY3z/JRR
+         /MDfMa3x2z0P/P6gekbe/8okiWuv7T68DxgNm0O9rdtkLmlc6TE5xr0s68KzWXRCtTG5
+         mtYZRbNCqOd/mZlFcxOS6+aeB9EG/svchu9mVb5soG4NvcfBIzVTooshQOhC8aYVpf7M
+         gNIwtILkWREtLXM2JGf4eTF3lCEdLCTwgd7sHsRzaJtBGkNIwRXr91h81M9nigqaZV8/
+         qiuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739483369; x=1740088169;
+        d=1e100.net; s=20230601; t=1739483479; x=1740088279;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0piG3yjRjEusyNC4nYKHzEr7L31oYL8tLO8Yfned4Ho=;
-        b=QwykkyroxS1RHCoeLe+AeL9z90+W8rqDjlLMpwox7unPfE2TRQD4QwWc9U6KwW1RTU
-         fSd+LiYkYqR/CJY05coEGsRfxI4Ib7acd3VY/9cQJjoAce4P2RhcXxUG2VzAlPb21RWI
-         W79oFciWGZvojILcEXCjR8mEkD3S/4jxD2AqJgbftkEU8Ipaew+/syQlB4O+p6ITFZdz
-         HIa7Q31FhB9GNJY3JUuKx0kh70VItqqSBYzgLcRc9oLSi3Humgx452yL3ez953EljFKb
-         BCCyej3HZcOAkqSpLruWGaAFigLmce6ec3kq3101XO4HKtXOSc8hNZKbEkIQl219PuHx
-         wV/g==
-X-Gm-Message-State: AOJu0Yw55fjP+3VEfpR9syxcL9PnKignAGNPKer6CUzznXYPY0sHj/5m
-	sSBUYMMiuWl4npxILL6cD3avJyBaUQ4kbx5uzJcCzAbpxEHGbiZ+
-X-Gm-Gg: ASbGnct4s9OCfExsqaVuxyIumpBupndVtZncvG0tNUXj5Dbp7qo61PJmJsgoRfTwWjQ
-	1LfDgez3MeIyXz1YUsFTg2+xYRZJZEG/2K0hRjoXsAxjss5RCAmfUc8oflRDw4BYrhLdk+yWrZJ
-	jNRBMFuNWRpaO53eqn+6GZFDpmdjZ9LAhnwWBnFfZdfqASAmYTs5Kcm3DtyOB+aFcunmKL68Fak
-	fAMrVPc4rIiy0W3hz5ytkkXmLVAMorywahYvNOhCCKxYRtrF2E4wXA9fvTEi0qZDa0eRkj5KFTd
-	3IL8razi1huirNLlkX6XrOub85rdRfRYVPxRhUMUuqAo3QSJWb/XA6Te8ojjf/FkvdrsaRcOXT7
-	+b2tiXO3kOutH7LCGxXGE8lKbTDkJfmAZGqHML+TlD9Bquc9P+Td39I9Z7c6dspnEAVeThzRjkd
-	AdHGy3
-X-Google-Smtp-Source: AGHT+IHqHV9JLFLPGkLf9AelCYI7plNgMaDf0eeurp33KCxJZxh3K6/lzJBbSsQxihtO2ifXLpxW2A==
-X-Received: by 2002:a05:6402:27d3:b0:5dc:9002:3164 with SMTP id 4fb4d7f45d1cf-5deadd7b9e2mr9151301a12.5.1739483368934;
-        Thu, 13 Feb 2025 13:49:28 -0800 (PST)
+        bh=16kLc939+TPQhGWtU56YbQZOiLpD6r+a3D8dt/D5Rag=;
+        b=wDVy/lXnL4XVlkNk9oQuAMRPyVNH5bXqS4MY/KHVSt+YOOtMVjjrZEIx4oMTqgt+cM
+         QV3xMy4bRmN4Cv8OlPqaoPtnbNvbIp2ia4zYUL2n1tQrsqgLEx1qmTavtyWZGYZyV4Ks
+         W1XI/H4UpudGPFJhWjlij7B095ZEjOHesjqzM8rG4vFlFKJdjN/P2RJuyhLJvRzfWpvD
+         WovgwVuFeZzwmnH/dV0ErquYtZSYpxC573GUBFeNcQOWlSC1wfYMoWYlXrk6Pq40d+OQ
+         Gd4qe2cdJDIfh/wqzkxcIBznTvDlk7Lowm9eNcXy0vPYYPXva3LpolRBEp7LwrCsA/+1
+         PtYg==
+X-Gm-Message-State: AOJu0Yw3u6O/TKr24/LxyDdABGQ8sEew7Lqis39rKXrlPNIBax4VvyVi
+	D/uoFTXaAyXeuXmlvRME1JYxuCZ1/3g3D2EX4XjVzGKEt+z1J987
+X-Gm-Gg: ASbGncuRGScanmwpS5k1yzJkgoGCVQis3TbdiBXk6fRMdV9IJtsgSJlwscbvdgaX7Hn
+	8PxZUsIOh9kaA0byXt6z1VKBqCvc0jl67Co1uxUmQ9UWay+1oy/Dc6zx8C3tMqPU7E+IIGg2tpO
+	iAqDuFqacH6Sg7uWP2lP9ObbhVqntTVRiPjdZhTFfZeLBnbwQWTCmdHnSy5w+9vXFQoGK8kmDZu
+	32moSbq/9aH2Yua+FRo2bmcPHZDSReKNw0KU/jRSy8Vv/f4SfGh4BXA02+h+H+7Jk0kwC1plYRg
+	KiMXl45L482Ehq8h1Po5ikKH5Z27cIa9Af7oEWK8wQCQ6HeNnKCVIuA7+ek1Pkz/qh0JOXDBRx6
+	DV2HALw+/8+nBM3U+/RqKsc5MM8zKYhFX0NsnwW3dBmtZXtbnFo18IZZiMqFJIdbukcr9O4ItM3
+	IWx6oP
+X-Google-Smtp-Source: AGHT+IGKXqB4YFJPO1uq3mDWXlg2H2f5Xu9slQTYuHrYMMc3yu7Lw3fuqWJZzAPIfPvYdxerHwmk2Q==
+X-Received: by 2002:a17:907:c10:b0:ab6:9534:98fc with SMTP id a640c23a62f3a-aba4ebcebb0mr486833466b.32.1739483479380;
+        Thu, 13 Feb 2025 13:51:19 -0800 (PST)
 Received: from ?IPV6:2a02:3100:9dea:b00:8140:d035:b1a4:911d? (dynamic-2a02-3100-9dea-0b00-8140-d035-b1a4-911d.310.pool.telefonica.de. [2a02:3100:9dea:b00:8140:d035:b1a4:911d])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5dece1c43b6sm1823890a12.26.2025.02.13.13.49.26
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aba53258196sm210439666b.60.2025.02.13.13.51.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 13:49:27 -0800 (PST)
-Message-ID: <16986d3d-7baf-4b02-a641-e2916d491264@gmail.com>
-Date: Thu, 13 Feb 2025 22:50:02 +0100
+        Thu, 13 Feb 2025 13:51:18 -0800 (PST)
+Message-ID: <f3f35265-80a9-4ed7-ad78-ae22c21e288b@gmail.com>
+Date: Thu, 13 Feb 2025 22:51:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/4] net: phy: stop exporting phy_queue_state_machine
+Subject: [PATCH net-next 4/4] net: phy: remove helper phy_is_internal
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -139,46 +139,62 @@ In-Reply-To: <d14f8a69-dc21-4ff7-8401-574ffe2f4bc5@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-phy_queue_state_machine() isn't used outside phy.c,
-so stop exporting it.
+Helper phy_is_internal() is just used in two places phylib-internally.
+So let's remove it from the API.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy.c | 4 ++--
- include/linux/phy.h   | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/phy/phy.c        | 2 +-
+ drivers/net/phy/phy_device.c | 2 +-
+ include/linux/phy.h          | 9 ---------
+ 3 files changed, 2 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index d0c1718e2..8738ffb4c 100644
+index 8738ffb4c..77b3fb843 100644
 --- a/drivers/net/phy/phy.c
 +++ b/drivers/net/phy/phy.c
-@@ -520,12 +520,12 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
-  * @phydev: the phy_device struct
-  * @jiffies: Run the state machine after these jiffies
-  */
--void phy_queue_state_machine(struct phy_device *phydev, unsigned long jiffies)
-+static void phy_queue_state_machine(struct phy_device *phydev,
-+				    unsigned long jiffies)
- {
- 	mod_delayed_work(system_power_efficient_wq, &phydev->state_queue,
- 			 jiffies);
- }
--EXPORT_SYMBOL(phy_queue_state_machine);
+@@ -302,7 +302,7 @@ void phy_ethtool_ksettings_get(struct phy_device *phydev,
+ 		cmd->base.port = PORT_BNC;
+ 	else
+ 		cmd->base.port = phydev->port;
+-	cmd->base.transceiver = phy_is_internal(phydev) ?
++	cmd->base.transceiver = phydev->is_internal ?
+ 				XCVR_INTERNAL : XCVR_EXTERNAL;
+ 	cmd->base.phy_address = phydev->mdio.addr;
+ 	cmd->base.autoneg = phydev->autoneg;
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 1c10c774b..35ec99b4d 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -544,7 +544,7 @@ phy_interface_show(struct device *dev, struct device_attribute *attr, char *buf)
+ 	struct phy_device *phydev = to_phy_device(dev);
+ 	const char *mode = NULL;
  
- /**
-  * phy_trigger_machine - Trigger the state machine to run now
+-	if (phy_is_internal(phydev))
++	if (phydev->is_internal)
+ 		mode = "internal";
+ 	else
+ 		mode = phy_modes(phydev->interface);
 diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 33e2c2c93..bb7454364 100644
+index bb7454364..8efbf62d8 100644
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -2061,7 +2061,6 @@ int phy_drivers_register(struct phy_driver *new_driver, int n,
- 			 struct module *owner);
- void phy_error(struct phy_device *phydev);
- void phy_state_machine(struct work_struct *work);
--void phy_queue_state_machine(struct phy_device *phydev, unsigned long jiffies);
- void phy_trigger_machine(struct phy_device *phydev);
- void phy_mac_interrupt(struct phy_device *phydev);
- void phy_start_machine(struct phy_device *phydev);
+@@ -1729,15 +1729,6 @@ static inline bool phy_is_default_hwtstamp(struct phy_device *phydev)
+ 	return phy_has_hwtstamp(phydev) && phydev->default_timestamp;
+ }
+ 
+-/**
+- * phy_is_internal - Convenience function for testing if a PHY is internal
+- * @phydev: the phy_device struct
+- */
+-static inline bool phy_is_internal(struct phy_device *phydev)
+-{
+-	return phydev->is_internal;
+-}
+-
+ /**
+  * phy_on_sfp - Convenience function for testing if a PHY is on an SFP module
+  * @phydev: the phy_device struct
 -- 
 2.48.1
 
