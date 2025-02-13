@@ -1,164 +1,176 @@
-Return-Path: <netdev+bounces-165956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F6CA33CAF
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:26:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72382A33CBB
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D37B3AC138
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:22:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9213A16F4
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4A2213E99;
-	Thu, 13 Feb 2025 10:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CTWWnjQi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297F8212B39;
+	Thu, 13 Feb 2025 10:29:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAB3212B35;
-	Thu, 13 Feb 2025 10:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E8E41C6A;
+	Thu, 13 Feb 2025 10:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739442141; cv=none; b=a6e/wi0X233YjQMGttVm3rJWQGwAu9mCpUbmyga3Bov1ZimGa1xqcNO4LX4+PcHR7xjQWXL6DOLskBV8ehNEhWC7rIKHvBSdxeCuV0EyseDpIea1MI3s6Tb678yyAW1yfcBMyYExt3AgwjxEapT2pGe1NfbI4+Ue+BIu4Ybynm0=
+	t=1739442585; cv=none; b=JNmH2M6asPXCCHLSGIQLv3ZOuat2S0JkMem0+x2PCuPaNUFaZmMbb6pcIgXINN1QXPchOIuA1HYH7yVcaymZkT0eNFu3nu1Ex+kgQTCyqZrBDt0jUL39OGt2H/N7kRQJanNgMbXiVKgrjNdqai8UQpBh01fZj5NAFdGjWrIhEbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739442141; c=relaxed/simple;
-	bh=E8K7OdmM5TDtx1MdCwoTg1FK1STUogCMX2UO9Gzh+1Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UZlnIxVVzSwpkaVnB+54Z7/J3OTAEBfM9DeDmooqpzl0KXkDuVTLWEcamUoj2ZZd78qYgIzRb8N0ICk8zX/5DlNUbcx0TveNreVvFqnbW/navBGgxhxK9x+5uZDYQuIyNPNRsrRlLxxaY6/jba59MCmi58L7nhiB9k8OifxWXRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CTWWnjQi; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51DALqDA3988680
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Feb 2025 04:21:52 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1739442112;
-	bh=gq7ND6kmYg+T1S0KrCZyvliNRe+2JR8aZgE6LYBivnI=;
-	h=From:To:CC:Subject:Date;
-	b=CTWWnjQigDlXoqighn2ZaQgQOLwJUB+Og4DOsg93qv1gboYxQx/dFzW14jTZkx8vC
-	 /48qtGiEH/ByGsKuCmcYdcob4cE/0lZaac7zgf7wgeeljNouvWz7gGDOxvBA8PsA9C
-	 ch9VUk4AQEe53QQIYhJYYT2RDY1IcRiDGEOM13LQ=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51DALqVX011050
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 13 Feb 2025 04:21:52 -0600
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 13
- Feb 2025 04:21:52 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 13 Feb 2025 04:21:52 -0600
-Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51DALpnC077706;
-	Thu, 13 Feb 2025 04:21:51 -0600
-From: Chintan Vankar <c-vankar@ti.com>
-To: Rosen Penev <rosenp@gmail.com>,
-        Christophe JAILLET
-	<christophe.jaillet@wanadoo.fr>,
-        Chintan Vankar <c-vankar@ti.com>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Russell King
-	<linux@armlinux.org.uk>,
-        Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn
-	<andrew@lunn.ch>
-CC: <s-vadapalli@ti.com>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [PATCH] net: phy: mscc: Add auto-negotiation feature to VSC8514
-Date: Thu, 13 Feb 2025 15:51:50 +0530
-Message-ID: <20250213102150.2400429-1-c-vankar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1739442585; c=relaxed/simple;
+	bh=HwZ1wnhGMDRvzC5/CiIbbh8YNJW3bp6hthYz06OuL+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7WqnQRjOBVya6grIAMKOeOUfpY4NGAPcxg1ZYmttrPLc8B81/5m5dWyRbx4BZ/BcXNRwjuHINRc+OEBWxHyJ+5fLA0YzaNgi9GNgffrSez/X5oDMREG8wC+U8YSo5IrP/hgUOqIGr838jfLSpLQp0w10q/CG1ExKuRrnTiuksA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso122512266b.1;
+        Thu, 13 Feb 2025 02:29:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739442581; x=1740047381;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eHMz81HNAoHjFTg7qKY5ym35WvloID/eRZqyssA2bH0=;
+        b=tKjmj4wTwYXP4LtqKCQC2ZufLg7S4Iky0gghd18YFGMk/HuTG9JX5YPdr3Pg06HMdi
+         xsJHUEVpKZFL7SZNaRFYuwQVSrMQaqJFPyqnu397cAM2X00zb/G394TQCpE2OtP9oohM
+         9KPHIj+Xqepr108Dh+XwYcYKagCqId50Nw8cQYm4gfX5Dyzv25b199wMjQUkYFDU3KQT
+         nPK6hMHItVVY3fqZ1tF28dvj+Uv9svE+0zUxIVC/8QYG/huFxyB5VJ1UowBX9fW6CIGj
+         9umRCHsj8ZIMcrLFBqBhX9J6reoNigwTbjKea4e7+3DwnRLXomGexHJA0s3T3qAd+oF+
+         V+pA==
+X-Forwarded-Encrypted: i=1; AJvYcCV15n8uuD+7yC9YSdHvA72CmMs9ryvxw7XhW0O7FAGxzgPKU2X7SDUPMS9nXh1/hQHE7qDfhZ9fpMVNpfA=@vger.kernel.org, AJvYcCWSuZ4u5Akvi129YTKTctwh3yVHWaEGljMw6PNQb4dNMhkUwRIZ03Px1z/tFCxXtJ5w2g0xSnEl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yynk7OvX05If0VFD7Bx/LACPK1Vb8bvBXFKkv0NRgUr1N8V3Dux
+	kl1IBSkG4ciAzwTsWxtTvBmoC8yAS10FJUKnSxhbc63zeTl0NGvo
+X-Gm-Gg: ASbGncumG+RqdBUsJBu3rpDBxRJy7d0pu1D0mkifhwPQynvZLZA9CM3Bm+/MUY86Y4d
+	37KF8BoPhv9gASEiYVpjLpuGPKpfb3ruN3V2Hq9UNuKPtC8opiLLmPxv/azphIdGJzOALC32zNK
+	lORIYjprysxn/18+vEnXi5NvUwJn3GBWlUirtIs5h8NEm5VvUSbViLsHX8sypQTV/SMVDcCAE/B
+	oByAtmpau5q6U9J9c6/25qufwGItIX7JV0+Ja8P22DrPW4FMN96uw8T1tzTFnxedtF/EuXUGDi0
+	V/grjfA=
+X-Google-Smtp-Source: AGHT+IEcXiR9DvkyBph6N2BufcLwHqGvfgWr/sKzoDXhuCOv3FoI7ud9NMgA/z3DYhMasNiK6zZmQA==
+X-Received: by 2002:a17:907:86a4:b0:ab7:d87f:6662 with SMTP id a640c23a62f3a-ab7f34a6156mr585936766b.52.1739442581073;
+        Thu, 13 Feb 2025 02:29:41 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:70::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba532322fcsm106491066b.15.2025.02.13.02.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 02:29:40 -0800 (PST)
+Date: Thu, 13 Feb 2025 02:29:38 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, horms@kernel.org, kernel-team@meta.com,
+	kuba@kernel.org, kuniyu@amazon.co.jp, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, ushankar@purestorage.com
+Subject: Re: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
+Message-ID: <20250213-prudent-olivine-bobcat-ffa64f@leitao>
+References: <20250212-arm_fix_selftest-v3-2-72596cb77e44@debian.org>
+ <20250213073129.14081-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213073129.14081-1-kuniyu@amazon.com>
 
-Add function vsc85xx_config_inband_aneg() in mscc_main.c to enable
-auto-negotiation. The function enables auto-negotiation by configuring
-the MAC SerDes PCS Control register of VSC8514.
+Hello Kuniyuki,
 
-Invoke the vsc85xx_config_inband_aneg() function from the
-vsc8514_config_init() function present in mscc_main.c to start the
-auto-negotiation process. This is required to get Ethernet working with
-the Quad port Ethernet Add-On card connected to J7 common processor board.
+On Thu, Feb 13, 2025 at 04:31:29PM +0900, Kuniyuki Iwashima wrote:
+> > Subject: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
+> 
+> s/_rtnl//
 
-Signed-off-by: Chintan Vankar <c-vankar@ti.com>
----
+Ack!
 
-This patch is based on commit '7b7a883c7f4d' of linux-next branch of
-Mainline Linux.
+> looks like Uday's comment was missed due to the lore issue.
 
-Regards,
-Chintan.
+hmm, I haven't seen Uday's comment. Didn't it reach lore?
 
- drivers/net/phy/mscc/mscc.h      |  2 ++
- drivers/net/phy/mscc/mscc_main.c | 20 ++++++++++++++++++++
- 2 files changed, 22 insertions(+)
+> From: Breno Leitao <leitao@debian.org>
+> Date: Wed, 12 Feb 2025 09:47:25 -0800
+> > +/**
+> > + *	dev_getbyhwaddr - find a device by its hardware address
+> 
+> While at it, could you replace '\t' after '*' to a single '\s'
+> for all kernel-doc comment lines below ?
+> 
+> 
+> > + *	@net: the applicable net namespace
+> > + *	@type: media type of device
+> > + *	@ha: hardware address
+> > + *
+> > + *	Similar to dev_getbyhwaddr_rcu(), but the owner needs to hold
+> > + *	rtnl_lock.
+> 
+> Otherwise the text here is mis-aligned.
 
-diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
-index 6a3d8a754eb8..3baa0a418bae 100644
---- a/drivers/net/phy/mscc/mscc.h
-+++ b/drivers/net/phy/mscc/mscc.h
-@@ -196,6 +196,8 @@ enum rgmii_clock_delay {
- #define MSCC_PHY_EXTENDED_INT_MS_EGR	  BIT(9)
- 
- /* Extended Page 3 Registers */
-+#define MSCC_PHY_SERDES_PCS_CTRL          16
-+#define MSCC_PHY_SERDES_ANEG              BIT(7)
- #define MSCC_PHY_SERDES_TX_VALID_CNT	  21
- #define MSCC_PHY_SERDES_TX_CRC_ERR_CNT	  22
- #define MSCC_PHY_SERDES_RX_VALID_CNT	  28
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 19cf12ee8990..f1f36ee1cc59 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -1699,6 +1699,21 @@ static int vsc8574_config_host_serdes(struct phy_device *phydev)
- 			   PROC_CMD_RST_CONF_PORT | PROC_CMD_FIBER_1000BASE_X);
- }
- 
-+static int vsc85xx_config_inband_aneg(struct phy_device *phydev, bool enabled)
-+{
-+	u16 reg_val = 0;
-+	int rc;
-+
-+	if (enabled)
-+		reg_val = MSCC_PHY_SERDES_ANEG;
-+
-+	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_3,
-+			      MSCC_PHY_SERDES_PCS_CTRL, MSCC_PHY_SERDES_ANEG,
-+			      reg_val);
-+
-+	return rc;
-+}
-+
- static int vsc8584_config_init(struct phy_device *phydev)
- {
- 	struct vsc8531_private *vsc8531 = phydev->priv;
-@@ -2107,6 +2122,11 @@ static int vsc8514_config_init(struct phy_device *phydev)
- 
- 	ret = genphy_soft_reset(phydev);
- 
-+	if (ret)
-+		return ret;
-+
-+	ret = vsc85xx_config_inband_aneg(phydev, true);
-+
- 	if (ret)
- 		return ret;
- 
--- 
-2.34.1
+Sorry, what is misaligned specifically? I generated the documentation,
+and I can't see it misaligned.
 
+This is what I see when generating the document (full log at
+https://pastebin.mozilla.org/YkotEoHh#L250,271)
+
+
+	dev_getbyhwaddr_rcu(9)                                                         Kernel Hacker's Manual                                                         dev_getbyhwaddr_rcu(9)
+
+	NAME
+	dev_getbyhwaddr_rcu - find a device by its hardware address
+
+	SYNOPSIS
+	struct net_device * dev_getbyhwaddr_rcu (struct net *net , unsigned short type , const char *ha );
+
+	ARGUMENTS
+	net         the applicable net namespace
+
+	type        media type of device
+
+	ha          hardware address
+
+			Search for an interface by MAC address. Returns NULL if the device is not found or a pointer to the device.  The caller must hold RCU.  The returned  device  has
+			not had its ref count increased and the caller must therefore be careful about locking
+
+	RETURN
+	pointer to the net_device, or NULL if not found
+
+	dev_getbyhwaddr(9)                                                             Kernel Hacker's Manual                                                             dev_getbyhwaddr(9)
+
+	NAME
+	dev_getbyhwaddr - find a device by its hardware address
+
+	SYNOPSIS
+	struct net_device * dev_getbyhwaddr (struct net *net , unsigned short type , const char *ha );
+
+	ARGUMENTS
+	net         the applicable net namespace
+
+	type        media type of device
+
+	ha          hardware address
+
+			Similar to dev_getbyhwaddr_rcu, but the owner needs to hold rtnl_lock.
+
+	RETURN
+	pointer to the net_device, or NULL if not found
+
+
+>   $ ./scripts/kernel-doc -man net/core/dev.c | \
+>     scripts/split-man.pl /tmp/man && \
+>     man /tmp/man/dev_getbyhwaddr.9
+> 
+> Also, the latter part should be in Context:
+> 
+> Context: rtnl_lock() must be held.
+
+Sure. Should I do something similar for _rcu function as well?
+
+	Context: caller must hold rcu_read_lock
+
+Thanks for the review
+--breno
 
