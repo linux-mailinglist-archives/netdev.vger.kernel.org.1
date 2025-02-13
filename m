@@ -1,62 +1,50 @@
-Return-Path: <netdev+bounces-165957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89431A33CB3
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:27:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0A7A33C8B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E09F3A56D6
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:25:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 822D17A2ABB
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2657D21128A;
-	Thu, 13 Feb 2025 10:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254F9212FB4;
+	Thu, 13 Feb 2025 10:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="nMTfaWoQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHZc6mRL"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward202a.mail.yandex.net (forward202a.mail.yandex.net [178.154.239.91])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD6C211A2B
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAE5212F98;
+	Thu, 13 Feb 2025 10:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739442309; cv=none; b=YqNNI0M/a82suAFN3QQBRNHZDxVUpl6F1zSmXxo7Bd6stTrfKJcR0rYrSm4nv+ic7VUGHyujteQALevjcpe2QF/JV971bW5vrz/gb+j/2x/Gnh79L+hDD4vxLejFw6dyFoO6muZwljlO8ZZzNJlHTt1wJY7HbXO2vVXH8k88tRs=
+	t=1739442003; cv=none; b=pjOI+y638csKJ9b177AeDbXTUs4qpC059ZqN7YcZDhaEosSUIzNcBD0BScqqXQzFZG7qcRkal5+Q8HLmRnI16lRKGPdZwebostEklxuebVU5KbVha+htyJ2EummngPRgSn29YFP0/mPLwpUTCFpugAJSuMyYa0+uChdJa8H4S3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739442309; c=relaxed/simple;
-	bh=sLmXcgWQPjdZ8YiDrrkRYYh/14fsaciQH9W4NMZijBs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f8u/ct8D/4B+HiNzocY0TyBe+liv1dTnLbUXg/KrV+J23W9BV74znFr56mzzPjAVerJ6piC1QGFsoH6xyxlFGwJmoHHvAODfZ1BSXq3nR24X9u/90uDCyxmaUy/IQIdUG5wyiCmnPukQd9Hw95nOdp7wqnExJRORnatVuDnmNuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=nMTfaWoQ; arc=none smtp.client-ip=178.154.239.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
-	by forward202a.mail.yandex.net (Yandex) with ESMTPS id 1970F68E15
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:17:40 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0d:9:0:640:2d51:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 7F0EC60C80;
-	Thu, 13 Feb 2025 13:17:32 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id UHN94v0OpKo0-SiMejDLf;
-	Thu, 13 Feb 2025 13:17:32 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1739441852; bh=okt5lvHNOAV/TQNY6M7BsY4Wv3YTcQzaa2a50WvPPnk=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=nMTfaWoQq7a0IKXyePlc3ORr9I3LFGBpMt5iMqC0MRSIsLGi5pqQwAZ62Ft0KtvHr
-	 hXdMztsOB0Ki4AQbBXiAMXNved9N3OR9soyy1QF0GdovDCr4a7YOUeOonQPv1roR9/
-	 WlTOqX0HwP8PVJgfaGSfcFNAob2zFOoEOII7Zc60=
-Authentication-Results: mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH net-next] net: skb: do not assume that ktime_t is equal to s64
-Date: Thu, 13 Feb 2025 13:16:58 +0300
-Message-ID: <20250213101658.1349753-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1739442003; c=relaxed/simple;
+	bh=ubDuH7hIXZ9K8tjHoZXSqPPrTCGD+bzOS8Ci1+eNjuM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UtTApEc+0CRHw/OYPFkd8E3rtXOHh0jJh77Q2UUf/x8++jp0pu/tL+b+k8jzn9xoAWWO2ksV4zcGgW0etfbYP2nnyCBHHMH3SndCwJgQIfR8i+kfqEDIV16roEzOQB/w/KRz67Pzu8wVFYuhjmHikoUGouQLvvb1K13pnIaZEO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHZc6mRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DCE0C4CED1;
+	Thu, 13 Feb 2025 10:20:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739442002;
+	bh=ubDuH7hIXZ9K8tjHoZXSqPPrTCGD+bzOS8Ci1+eNjuM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XHZc6mRLoraVJj6EP6646iMFnU41WR7jU/CbI7zLbx2JvzGHN6o8Dgyzq0c6B2u0u
+	 aeQfZxvwPETBQMkVeKJEBWRdgvEg5wYtPZkXFVg3iaqx4feqSvAjatEtfzbkSbkotI
+	 7CaB7jSovA5/ESZSlzjFbITNESJuD8RmhHZ7ybIGZfvntrH0rxxPLQFj9FPIXZASRD
+	 9nQLw48w0B+w7QMWjvIx6lQbSeqYpjwZxGy85h69YJLdgHJWFrFVTSZJVxk0Dc2SoH
+	 zekRhs9la6KQmrE0eVMnxgNHt+fzfX/P9hzEuqJlBNwHy5yX9vqqdsabv+UeE5ZRmz
+	 zxPxAh4ZopvoA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B05A9380CEEF;
+	Thu, 13 Feb 2025 10:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,32 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4] net: phy: marvell-88q2xxx: Add support for PHY
+ LEDs on 88q2xxx
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173944203151.1174456.330719028467783951.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 10:20:31 +0000
+References: <20250210-marvell-88q2xxx-leds-v4-1-3a0900dc121f@gmail.com>
+In-Reply-To: <20250210-marvell-88q2xxx-leds-v4-1-3a0900dc121f@gmail.com>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ niklas.soderlund+renesas@ragnatech.se, gregor.herburger@ew.tq-group.com,
+ eichest@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-In 'skb_get_timestamp()', do not assume that 'tstamp' of 'struct
-sk_buff' (which is 'ktime_t') may be implicitly converted to 's64'
-(which is expected by 'ns_to_kernel_old_timeval()') but use
-the convenient 'ktime_to_ns()' instead. Compile tested only.
+Hello:
 
-Fixes: 13c6ee2a9216 ("socket: Use old_timeval types for socket timestamps")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- include/linux/skbuff.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index bb2b751d274a..200b1dc48b27 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4307,7 +4307,7 @@ static inline ktime_t skb_get_ktime(const struct sk_buff *skb)
- static inline void skb_get_timestamp(const struct sk_buff *skb,
- 				     struct __kernel_old_timeval *stamp)
- {
--	*stamp = ns_to_kernel_old_timeval(skb->tstamp);
-+	*stamp = ns_to_kernel_old_timeval(ktime_to_ns(skb->tstamp));
- }
- 
- static inline void skb_get_new_timestamp(const struct sk_buff *skb,
+On Mon, 10 Feb 2025 15:53:40 +0100 you wrote:
+> Marvell 88Q2XXX devices support up to two configurable Light Emitting
+> Diode (LED). Add minimal LED controller driver supporting the most common
+> uses with the 'netdev' trigger.
+> 
+> Reviewed-by: Stefan Eichenberger <eichest@gmail.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v4] net: phy: marvell-88q2xxx: Add support for PHY LEDs on 88q2xxx
+    https://git.kernel.org/netdev/net-next/c/a3783dbf2574
+
+You are awesome, thank you!
 -- 
-2.48.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
