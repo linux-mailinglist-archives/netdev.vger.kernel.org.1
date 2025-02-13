@@ -1,91 +1,63 @@
-Return-Path: <netdev+bounces-165840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C675A337F8
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:31:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF0CA337FD
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:33:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53171161E27
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:31:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4C3165948
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932C5BA2D;
-	Thu, 13 Feb 2025 06:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F588206F2A;
+	Thu, 13 Feb 2025 06:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zui295ws"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkS4A/KV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC591FA15E
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 06:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B01BA2D;
+	Thu, 13 Feb 2025 06:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739428309; cv=none; b=oopZUmWSbkEw7FXmJ6CULB0mp9BPKIFBWjCeqDcYZyUqJ72KjPRGq1O+G5NqyCNVVUV7jD1VW4sh5cE/8ufcLJhCt5fVwjvaFIvc8VPWdN7qjdo/EyE1c29GzTmnVkkDeiRGksKZ+fKnCsRyjCKOJzRc1xcqsYo8imXIRzBYhfg=
+	t=1739428387; cv=none; b=hfWXhCnOpKhpnf8yxdsHK7o7ZfS7ZZ0nC2REU2N46DxXSGQ8XRiDzEmoQm5UVm09hMvqXvMgLG+bL4ODNYJGhga3aBjiF4FbUgyy+R8iKLPsqWy7gqJ6KO7jzZ2qOXl868wY5xLIBme5qr/4II6+RPSpt00BPo407beDxFMVFz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739428309; c=relaxed/simple;
-	bh=TSm+EhFKzQ+nmagJ+NpWIUWkYFzwrLV6u54VSh1bzrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QAG9wArMgtUF9BUxozQFqnzvq6Z67gNjesw4Ypt9l0zVsnuRvgSkrjrLmnB60nxcqaEztVFXYS1YH9aR6clJ3tpPVE7at+0YN1S6DFh1/oQkWFwZ8sg1nzAm/q611icu+zb0RaQJwBs4Od0hNinWaO8gtxYOw0daOSUY37SJI84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Zui295ws; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5de849a0b6cso859510a12.2
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:31:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739428305; x=1740033105; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lN2Y2nwgj5zUTnrECdXbocmCWoXI6GrsrPx3j3TC4Yk=;
-        b=Zui295ws93WTTPWNXD2buqZj+h98nk+ZKUPjjReH3vwTsDjRZFMZaPwPQvLSajTiAv
-         JomKw74jFwMnPz+dAqvKkttjodB+baMP561AxOryUtrehw1zJ5Ob7FWWXjntnpafstFl
-         LwUdkCM42isIwRjdXWN4HXNtIFZkkurnx0RDkZCES+iKm91ZigthbRK4EN2v5Axlidv7
-         d/onpbbgPaR7JgnRHljLL7ZEPaegRCdEgpdUk2e+9K6cLG1NV50qXh/rLGsmekTlE57s
-         Pk8DV2sqWghxRxh+2bB1YgDdM2Sl76O0cdbu6W2vOGJcy6aFhy6xByfnWxmCMp9zOdcM
-         xpiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739428305; x=1740033105;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lN2Y2nwgj5zUTnrECdXbocmCWoXI6GrsrPx3j3TC4Yk=;
-        b=m6vE3uYOiIbRhHRkOOVzwraHCAPACri52Cw/O353EHltHccAbOlvZo8mjHHS+hrgPN
-         9Do+Crj0UG4mljHFGfpFxqcp2mw2Y73PgbjjI4LLjqFlSEX2EhdgBkTgPfniB5NmFwmR
-         wD8/K4N7i4vbchdF2kONVPin4TRNrLgFs8MLikPiUZYDv2KIUq6H6pyp3BsUyaHd7o1p
-         0Szfe0zELK7yGVGMVbuiYl0InYFvjYu8pKsqizREpxgTKQypUFvomd+Lg4wlNGv4Sfyy
-         Kpw9JVcLgvxGJhJLy6/7vuqaFDCDAEJkyahNcR5Q/kQN6VsGwyGmHgqJ7KLTNCJqDuH0
-         H27g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhSGkQl73I1gC71CVupBmHtZBm0gXoHZ2IDNTIPa/SmO3mQXu2lCeoCYAfL1179SMOlNVyMHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvJZqE0ItVGrgknVnN3+DlmLX40rhBC7EveeUA86sz/X6qHO/S
-	/J2U8OCrSGRaJ7iMPhq6qJLmK+qsNQwtBv13YunnU8YuQ/1H8RmqjsMHj410TF0=
-X-Gm-Gg: ASbGncuVxfv/XTi6HbYK/lghmptjs9WuYpOz9adRCyTZTByalFSYT+93rq9ibSx+WEu
-	YjjvM+O2teSxZkOaMCyFL7IynNIRrW+iokd0utCvFbtflBvAiTo3ZpR+wzXGayQhGK5HRdp91MH
-	KH4xwSxQlBZfOHzS6n5aWHUrFGsZ0zzekqtAQiTMCNBovJgWH4ji3Id3fYbPCBYH1il72btrorT
-	5kHE7v9lni9jEYy7OHihaCWcXggxrbkcvlJrh+xW2HFmvw4z2jYtW32oIUJ+GF8qmzHwV/Cp8Z8
-	3Fz610MvJ1Rk1h/Bub9T
-X-Google-Smtp-Source: AGHT+IF4GmQVmoYV3tMifs3xYxMEmFp8h++H06hQyM0sB214aBjWO3g4Ojs0FH/d8ojvyeWMu3n5Fg==
-X-Received: by 2002:a05:6402:5d1:b0:5d9:a62:32b with SMTP id 4fb4d7f45d1cf-5dec9d326b0mr1910867a12.7.1739428305096;
-        Wed, 12 Feb 2025 22:31:45 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5dece2880e1sm596423a12.76.2025.02.12.22.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 22:31:44 -0800 (PST)
-Date: Thu, 13 Feb 2025 09:31:41 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH v2 net-next] ice: Fix signedness bug in
- ice_init_interrupt_scheme()
-Message-ID: <b16e4f01-4c85-46e2-b602-fce529293559@stanley.mountain>
+	s=arc-20240116; t=1739428387; c=relaxed/simple;
+	bh=EYlzHzMqG7RCe6q7JFcYu+FiAfG2RPpXS8EZEEWgLsw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GSEi15aSsSaEFJlhYeAyzY61crE3W4aYaclAdm82lotK1fwlmVV+YWEegp+OgKqhAX5tgC7eVn1Nf2scq07fO6VrtdxLWl8g8HYmPnGkQRQjyZkA92UN57kWMWJLtqKQieOOb5blaWvCqr71yQ5bUFAMa2aUhy+z9lkaNTkxjiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkS4A/KV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46F2DC4CED1;
+	Thu, 13 Feb 2025 06:33:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739428386;
+	bh=EYlzHzMqG7RCe6q7JFcYu+FiAfG2RPpXS8EZEEWgLsw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UkS4A/KV+3NNKiQjsxvFOCzRdT8eWvlDjxM2q4kcb2BJO337OWJX9LiciToHB4H5D
+	 betsxIK36VXW3NHNoB4lRt0NJXBcNvvIRD4TdwxZiVuUg3QYAeOYlV1HlcU0EOe6Iq
+	 PZLtnwxTCnRM2qsfunBg9CIOm9UrYC0WezluyZS+0WZx/wi4xyYmqrxjQWRSRydQv3
+	 JAKdnQbYR1WC1r7H2ZTQHeKSXHaJKzo/J/55xlp6TGxwvoKepy/NpWl6mEE7OkYIg4
+	 oMQ9JVu3HAPS0/XGVqxfYxi4AA4Ae/S7xImljyKO0EBVNzSAITvpy/EH7dB6z6x2NI
+	 wBiVk20+/3H9Q==
+Date: Wed, 12 Feb 2025 22:33:04 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <20250213063304.GA11664@sol.localdomain>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,44 +66,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
 
-If pci_alloc_irq_vectors() can't allocate the minimum number of vectors
-then it returns -ENOSPC so there is no need to check for that in the
-caller.  In fact, because pf->msix.min is an unsigned int, it means that
-any negative error codes are type promoted to high positive values and
-treated as success.  So here, the "return -ENOMEM;" is unreachable code.
-Check for negatives instead.
+On Thu, Feb 13, 2025 at 12:17:42PM +0800, Herbert Xu wrote:
+> On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
+> > [ This patchset keeps getting rejected by Herbert, who prefers a
+> >   complex, buggy, and slow alternative that shoehorns CPU-based hashing
+> >   into the asynchronous hash API which is designed for off-CPU offload:
+> >   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
+> >   This patchset is a much better way to do it though, and I've already
+> >   been maintaining it downstream as it would not be reasonable to go the
+> >   asynchronous hash route instead.  Let me know if there are any
+> >   objections to me taking this patchset through the fsverity tree, or at
+> >   least patches 1-5 as the dm-verity patches could go in separately. ]
+> 
+> Yes I object.  While I very much like this idea of parallel hashing
+> that you're introducing, shoehorning it into shash is restricting
+> this to storage-based users.
+> 
+> Networking is equally able to benefit from paralell hashing, and
+> parallel crypto (in particular, AEAD) in general.  In fact, both
+> TLS and IPsec can benefit directly from bulk submission instead
+> of the current scheme where a single packet is processed at a time.
 
-Now that we're only dealing with error codes, it's easier to propagate
-the error code from pci_alloc_irq_vectors() instead of hardcoding
--ENOMEM.
+I've already covered this extensively, but here we go again.  First there are
+more users of shash than ahash in the kernel, since shash is much easier to use
+and also a bit faster.  There is nothing storage specific about it.  You've
+claimed that shash is deprecated, but that reflects a misunderstanding of what
+users actually want and need.  Users want simple, fast, easy-to-use APIs.  Not
+APIs that are optimized for an obsolete form of hardware offload and have
+CPU-based crypto support bolted on as an afterthought.
 
-Fixes: 79d97b8cf9a8 ("ice: remove splitting MSI-X between features")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-v2: Fix my scripts to say [PATCH net-next]
-    Propagate the error code.
+Second, these days TLS and IPsec usually use AES-GCM, which is inherently
+parallelizable so does not benefit from multibuffer crypto.  This is a major
+difference between the AEADs and message digest algorithms in common use.  And
+it happens that I recently did a lot of work to optimize AES-GCM on x86_64; see
+my commits in v6.11 that made AES-GCM 2-3x as fast on VAES-capable CPUs.
 
- drivers/net/ethernet/intel/ice/ice_irq.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So anyone who cares about TLS or IPsec performance should of course be using
+AES-GCM, as it's the fastest by far, and it has no need for multibuffer.  But
+even for the rare case where someone is still using a legacy algorithm like
+"authenc(hmac(sha256),cbc(aes))" for some reason, as I've explained before there
+are much lower hanging fruit to optimizing it.  For example x86_64 still has no
+implementation of the authenc template, let alone one that interleaves the
+encryption with the MAC.  Both could be done today with the current crypto API.
+Meanwhile multibuffer crypto would be very hard to apply to that use case (much
+harder than the cases where I've applied it) and would not be very effective,
+for reasons such as the complexity of that combination of algorithms vs. just
+SHA-256.  Again, see
+https://lore.kernel.org/linux-crypto/20240605191410.GB1222@sol.localdomain/,
+https://lore.kernel.org/linux-crypto/20240606052801.GA324380@sol.localdomain/,
+https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomain/,
+https://lore.kernel.org/linux-crypto/20240611203209.GB128642@sol.localdomain/,
+https://lore.kernel.org/linux-crypto/20240611201858.GA128642@sol.localdomain/
+where I've already explained this in detail.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
-index cbae3d81f0f1..30801fd375f0 100644
---- a/drivers/net/ethernet/intel/ice/ice_irq.c
-+++ b/drivers/net/ethernet/intel/ice/ice_irq.c
-@@ -149,8 +149,8 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
- 
- 	vectors = pci_alloc_irq_vectors(pf->pdev, pf->msix.min, vectors,
- 					PCI_IRQ_MSIX);
--	if (vectors < pf->msix.min)
--		return -ENOMEM;
-+	if (vectors < 0)
-+		return vectors;
- 
- 	ice_init_irq_tracker(pf, pf->msix.max, vectors);
- 
--- 
-2.47.2
+You've drawn an analogy to TSO and claimed that submitting multiple requests to
+the crypto API at once would significantly improve performance even without
+support from the underlying algorithm.  But that is incorrect.  TSO saves a
+significant amount of time due to how the networking stack works.  In contrast,
+the equivalent in the crypto API would do very little.  It would at best save
+one indirect call per message, at the cost of adding the overhead of multi
+request support.  Even assuming it was beneficial at all, it would be a very
+minor optimization, and not worth it over other optimization opportunities that
+would not require making complex and error-prone extensions to the crypto API.
 
+I remain quite puzzled by your position here, as it makes no sense.  TBH, I
+think your opinions would be more informed if you had more experience with
+actually implementing and optimizing the various crypto algorithms.
+
+> But thanks for the reminder and I will be posting my patches soon.
+
+I am not really interested in using your patches, sorry.  They just seem like
+really poor engineering and a continuation of many of the worst practices of the
+kernel crypto API that we *know* are not working.  Especially for cryptography
+code, we need to do better.  (And I've even already done it!)
+
+- Eric
 
