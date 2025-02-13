@@ -1,208 +1,213 @@
-Return-Path: <netdev+bounces-166111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0282BA348A3
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:57:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DACA34907
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B7BB188616C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:57:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C75A3AEE64
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36A919C54A;
-	Thu, 13 Feb 2025 15:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815CA201026;
+	Thu, 13 Feb 2025 16:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGQR2TWq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfJBoFPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCEA15665C;
-	Thu, 13 Feb 2025 15:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C276C1E0087
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 16:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739462222; cv=none; b=DPgGxQ2MNpMnUcmQ7CRiGW7eiyASbdylY4NzdwaYUFRH34fY8HHxKj8CFPFRriS+i+N4hzC9Li22Uy6WvN4ncYfwlVZ14Oe2QIQfW92b0oQo62rWDXnT/VBc2BX+PDYzGP+PV3W1iT/1OpM0kF9E8/pjrqN/G03hnL9C1jech98=
+	t=1739462497; cv=none; b=ujbK48Btrk0d01WBaiGDvTnWV56agsTbals8sDoOUXIBrcRbxN1m2z9+Rw2K6VVd8xqSWObyz4EY3pUSshWuMGEGCH7jvQHv14M40EQ/HwDBOmUKAQPQjdPfcc8aPprA7bGOJFwB40BRYBniQ3+TGH3cwBhosmykNgDJdX0wFb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739462222; c=relaxed/simple;
-	bh=CPsLn0bAxRskox7Zk4+Jnqf4gQ19tw4HDvMfHr6jss4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BWIY9WNB07YzmxCosUZ+PyrNWrWVVYF1m48PKKMp5p2YCPT3RyMkLU0FRCQt449eW3GIoCzHS1tS7LNfvQsE79dX/7jUxx2JvH9gro5+j2I1qPl5z9cYHovOWVEbtUTiRZFpiWK1JDRh85pWoSV8k/zVKFdywpi1deTnvSJRXb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XGQR2TWq; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1739462497; c=relaxed/simple;
+	bh=Hfy6lAqDIDE1OOhjjOyqY3Hk/eK787fqBcZfdvyVNmU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=darx9k5UvuXGuvHsJ2NJmwLm60WQdSpmAYvIq9r0kkjTteNxLN6FxzXFI416bdAXIknXkzFKArV/D0/kPIf15ADzw1H2PmymTCA8ceqOVNzTM3d8Krh+x4OVGdV2ANL/xQ923BqWtfvqtp3KB1EHLZxaKOdm+KnB6T0F2xdTaLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfJBoFPH; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-308dfea77e4so11757221fa.1;
-        Thu, 13 Feb 2025 07:57:00 -0800 (PST)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c07351d2feso159165285a.3
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 08:01:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739462219; x=1740067019; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1739462494; x=1740067294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Wohe1kiU/4SHBHGO2JoWHLQq2uQTYRBlzz7SDmQrnVw=;
-        b=XGQR2TWqbdYczDGDoSKijSZwv9Bbhi40kAfHu4of+/CPJrA9LJkUqGBtGe/5cov4im
-         BAw31sglwstuOniCfs7f1DLnbSGcnAg9a95WaPLdNbUKEE7UIv3koDoAA2h9vsp3kwG9
-         i30OuJWsPfrriGtA/yuufEDI67C/Df9NvXhkdTvisY2nOAAuAkGBiM30t9jcaeJlWIAr
-         K3CKec66Uf3K1AgJ3MAuebJfzcgAkQlogGkhtV8HmOkGqKxjZ0SKV3R5Xm9cOiN28dg3
-         LD7tAOyGgiUCP1fO82OkHNF+nh6mEyDPTABtuXCmeFWf+4EihqZ72+gQjRz3JoNUaDeu
-         Ilhw==
+        bh=m82pVVXPI/Q3KBO/8frAJiJGmwq7GYTcGNiep1oopPM=;
+        b=kfJBoFPHs2fXOJTEjex0WJVi8RqhyTYdJxR+QdAdi6OpfXg5/MrJkx0GVv6kiUmPgf
+         wbVrs/XJD1P5nadygdj5dPTxt3VzDPUl6/45AXdHuB7vG9TkJsEqv/sJc7j4ERk3SSrM
+         3eToU0TA1jm9yJ7BC7K2eZK6Bj4KmJdU/oBUxqwm/C7epAUOO+CLLXOEInD/HzRKOhRB
+         sX1bakYiKwl7wG/1uvBEqBDI/BiVwjSzYxSLSQ7kWt6DZ6qVkzUQdafI33t7ofQfRnxw
+         UI6wo3FZH4UdvQgjPzjoG8z/3elizRd4uutHgyhuVlH8vy1xqvTZwerYR4kfUmzdrspe
+         IfAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739462219; x=1740067019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wohe1kiU/4SHBHGO2JoWHLQq2uQTYRBlzz7SDmQrnVw=;
-        b=oJ2XQlYBkkk8xUpBFL/4XWuD3Zcwkgvz6JLiR68tfWcBETfn4jbmkS+JAc0V/0XUlX
-         4idP8ZDYZVWEgqXh1Z44duQe8REQZwa184Rp6ivB+mwYGdwfKRGaGuTF/wSM7Ljpge9G
-         LdMVzm3SRec2ekp6uf7nrwEOytO+2KuflLY7eIXZOhFJKO99qlccoTsCifquncDJxx2w
-         XKbvmddQHNkh/CKJkGne+zRuLKnGyGqt7fnXFLEQQQagTVF1d3rqCG+jWJGT6szqhy0P
-         tAY+0+qbiaA1YYE0oLH6e7OmYqZd+QSprutbMbtrd/4GO8BTLcAy0V78rcDio4EflGFe
-         azUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUb6Pa1BAxe2GehGqa4rvVot+ZsKhMfxwfH31WZ6zPgMcs0gLNoFnB3nbGrfZhdlsxtkQxErcgj@vger.kernel.org, AJvYcCUtROBk3VrhKdKbk9RC5uvj1ixvuEzv1HswXDrVCBbL5w2Lm1SQUna2+8glZt+bsEy1YrhfcgccZl9TIneh@vger.kernel.org, AJvYcCV5HQ7NXFVXzdhQbhKRgpv6t6CPGAwU/0iHgwyYicdqLPGxgcr0FcWObO2mYBpGmfdcTOgS8ulgenKMnqg46LU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0sq45ILapWFCOiZ8OfNx0NJQSj0NFMO90ApyfWNhYbsqABsYN
-	FhOknwosek6vj7zWSri8THdJNY5rp4IDU+cpQa+61irm2rjJhjIXE7Wuj8Rhvg/Azgz/S25cYdb
-	93EjMfRjJUeo3B5EhzhZEoLtmxiI=
-X-Gm-Gg: ASbGnct2kXhrkjAqeeNb6ikYgxhbX5iu0KnxACWvOi0P+EWSPZub+LQlSu0KNQrlzNW
-	k3JK2Njl8rhNlck15z3ZDrLHV5fRzUpRAywDVSUe/bnG/+2hTf/fFLwJVYtkMRnp1rf23WRgX/w
-	==
-X-Google-Smtp-Source: AGHT+IGmC8N331fe5jVaEv6w7pRFwAgiWayB9yjYnjFrL9DBCBLv7feOVZmYQ6B8zOtNxJpOBxgF6liVGjfSnVir1Ss=
-X-Received: by 2002:a05:651c:210e:b0:308:f52c:7698 with SMTP id
- 38308e7fff4ca-3090f24961dmr15957711fa.13.1739462218458; Thu, 13 Feb 2025
- 07:56:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739462494; x=1740067294;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=m82pVVXPI/Q3KBO/8frAJiJGmwq7GYTcGNiep1oopPM=;
+        b=QuPaZ0grlNQvXH1UwofuMjyXFZ7XzfYqWoeBzpPRbIR4PqpGzQb5JEYHxmqaJOfBZk
+         BEfVOfUIA+ZEfT0J5gkePUTXpb2LYeJuQNzn51UXefF9pULLY0x0Mcqpbap8RnjEpp8m
+         MuY2dAggYWJjzvlkIruJmJizJA8sqziZaDQ2MT8UmYaav9+Y14FM+v5oqwAowxD+43pi
+         G2lUTEgEtVVc+1xeq1IV5A83wmCInWs0WBM6jNJ3/o2t2bskTQkZ4imVv6xZU9FOHa62
+         LWZMdAZ7/n09pSHmE62QvSRkOz/Llk1ax8lm5p08jI2yuavQmQvZCDQikuf55L2Tovcm
+         /IOQ==
+X-Gm-Message-State: AOJu0Yy4vEInUnTK5t86yrgQrlVVxmwYAVrte7gjOClvwHhGgPlEXafH
+	1HFq7xGm56qEklD7g90UmCGY6crPLQqyxUVlFAQk9UeNhZsuviVcER3OUA==
+X-Gm-Gg: ASbGncvc8GSBhTa0YeKSCcbUPaSOcU9YXUByDsXOul5kGjQXHHE57zIE9qiHfnTyi6d
+	UQABXUWYThmoXinJ+27yn12Vu3br+KBJxsLy6HIuibuuR/bTISsJmwDb+kCxUMLCZFKURdKB34X
+	JOCykBpTPclXvvPZGcTRPHkV1JG30yCW+xgVUscY30Y3mmjGRxCif+CW+RPiBwKi5+glw430bvv
+	kK+1u8tXQCP9Qu83bny1p/FpTEksF1mqWuTG9Y4S7RkP8V3yK20OxpyppRJvwxipVdwLobm5t4u
+	4ccEN4K0EXyvDvBif+906O5wAKf8JkRYUJswpgUVfHLq4y4GYuEtzvnVjW/MTFI=
+X-Google-Smtp-Source: AGHT+IFTdaSCukROAxayaQFytQZ1Xz2xBkTfiTMPW65j8nfkkh/bx4Kh0QPKkmFjymbeT9tCjQ/aGw==
+X-Received: by 2002:a05:620a:1986:b0:7bf:f916:faf3 with SMTP id af79cd13be357-7c07a112bdemr592682385a.8.1739462494383;
+        Thu, 13 Feb 2025 08:01:34 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c861afbsm103647585a.82.2025.02.13.08.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 08:01:33 -0800 (PST)
+Date: Thu, 13 Feb 2025 11:01:33 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ willemb@google.com, 
+ shuah@kernel.org, 
+ petrm@nvidia.com, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <67ae175d7a7fc_24be45294be@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250213003454.1333711-4-kuba@kernel.org>
+References: <20250213003454.1333711-1-kuba@kernel.org>
+ <20250213003454.1333711-4-kuba@kernel.org>
+Subject: Re: [PATCH net-next 3/3] selftests: drv-net: add a simple TSO test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021352-dairy-whomever-f8bd@gregkh> <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
- <2025021347-washboard-slashed-5d08@gregkh> <CADg1FFdbKx3z+SPWFmY4+xZmewh0MnnZp_gmYEdY0z-mxutmEw@mail.gmail.com>
- <2025021318-regretful-factsheet-79a1@gregkh> <CABBYNZL4tEBTT3Hrf3JUGNuseLg1SNLmazo88EitmMfhUWUQxw@mail.gmail.com>
- <2025021347-exalted-calculate-b313@gregkh>
-In-Reply-To: <2025021347-exalted-calculate-b313@gregkh>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 13 Feb 2025 10:56:46 -0500
-X-Gm-Features: AWEUYZlH41IYZTDQ5gWQZLNhQxsq-PhbEYweyOqHDZOfOQdgQJZzI1fD332TiCo
-Message-ID: <CABBYNZJSwQJ-KWacoXDGVJ5gni260FTi=XEpNw3ER2CJhpVrKg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Hsin-chen Chuang <chharry@google.com>, linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Greg,
+Jakub Kicinski wrote:
+> Add a simple test for TSO. Send a few MB of data and check device
+> stats to verify that the device was performing segmentation.
+> Do the same thing over a few tunnel types.
+> 
+> Injecting GSO packets directly would give us more ability to test
+> corner cases, but perhaps starting simple is good enough?
+> 
+>   # ./ksft-net-drv/drivers/net/hw/tso.py
+>   # Detected qstat for LSO wire-packets
+>   KTAP version 1
+>   1..14
+>   ok 1 tso.ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 2 tso.vxlan4_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 3 tso.vxlan6_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 4 tso.vxlan_csum4_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 5 tso.vxlan_csum6_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 6 tso.gre4_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 7 tso.gre6_ipv4 # SKIP Test requires IPv4 connectivity
+>   ok 8 tso.ipv6
+>   ok 9 tso.vxlan4_ipv6
+>   ok 10 tso.vxlan6_ipv6
+>   ok 11 tso.vxlan_csum4_ipv6
+>   ok 12 tso.vxlan_csum6_ipv6
+>   ok 13 tso.gre4_ipv6
+>   ok 14 tso.gre6_ipv6
+>   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:7 error:0
+> 
+> Note that the test currently depends on the driver reporting
+> the LSO count via qstat, which appears to be relatively rare
+> (virtio, cisco/enic, sfc/efc; but virtio needs host support).
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Thu, Feb 13, 2025 at 10:39=E2=80=AFAM Greg KH <gregkh@linuxfoundation.or=
-g> wrote:
->
-> On Thu, Feb 13, 2025 at 09:22:28AM -0500, Luiz Augusto von Dentz wrote:
-> > Hi Greg,
-> >
-> > On Thu, Feb 13, 2025 at 8:45=E2=80=AFAM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Thu, Feb 13, 2025 at 09:33:34PM +0800, Hsin-chen Chuang wrote:
-> > > > On Thu, Feb 13, 2025 at 8:10=E2=80=AFPM Greg KH <gregkh@linuxfounda=
-tion.org> wrote:
-> > > > >
-> > > > > A: http://en.wikipedia.org/wiki/Top_post
-> > > > > Q: Were do I find info about this thing called top-posting?
-> > > > > A: Because it messes up the order in which people normally read t=
-ext.
-> > > > > Q: Why is top-posting such a bad thing?
-> > > > > A: Top-posting.
-> > > > > Q: What is the most annoying thing in e-mail?
-> > > > >
-> > > > > A: No.
-> > > > > Q: Should I include quotations after my reply?
-> > > > >
-> > > > > http://daringfireball.net/2007/07/on_top
-> > > > >
-> > > > > On Thu, Feb 13, 2025 at 07:57:15PM +0800, Hsin-chen Chuang wrote:
-> > > > > > The btusb driver data is allocated by devm_kzalloc and is
-> > > > > > automatically freed on driver detach, so I guess we don't have
-> > > > > > anything to do here.
-> > > > >
-> > > > > What?  A struct device should NEVER be allocated with devm_kzallo=
-c.
-> > > > > That's just not going to work at all.
-> > > >
-> > > > Noted. Perhaps that needs to be refactored together.
-> > > >
-> > > > >
-> > > > > > Or perhaps we should move btusb_disconnect's content here? Luiz=
-, what
-> > > > > > do you think?
-> > > > >
-> > > > > I think something is really wrong here.  Why are you adding a new=
- struct
-> > > > > device to the system?  What requires that?  What is this new devi=
-ce
-> > > > > going to be used for?
-> > > >
-> > > > The new device is only for exposing a new sysfs attribute.
-> > >
-> > > That feels crazy.
-> > >
-> > > > So originally we had a device called hci_dev, indicating the
-> > > > implementation of the Bluetooth HCI layer. hci_dev is directly the
-> > > > child of the usb_interface (the Bluetooth chip connected through US=
-B).
-> > > > Now I would like to add an attribute for something that's not defin=
-ed
-> > > > in the HCI layer, but lower layer only in Bluetooth USB.
-> > > > Thus we want to rephrase the structure: usb_interface -> btusb (new
-> > > > device) -> hci_dev, and then we could place the new attribute in th=
-e
-> > > > new device.
-> > > >
-> > > > Basically I kept the memory management in btusb unchanged in this
-> > > > patch, as the new device is only used for a new attribute.
-> > > > Would you suggest we revise the memory management since we added a
-> > > > device in this module?
-> > >
-> > > If you add a new device in the tree, it HAS to work properly with the
-> > > driver core (i.e. life cycles are unique, you can't have empty releas=
-e
-> > > functions, etc.)  Put it on the proper bus it belongs to, bind the
-> > > needed drivers to it, and have it work that way, don't make a "fake"
-> > > device for no good reason.
-> >
-> > Well we could just introduce it to USB device, since alternate setting
-> > is a concept that is coming from there, but apparently the likes of
-> > /sys/bus/usb/devices/usbX/bAlternateSetting is read-only, some
-> > Bluetooth profiles (HFP) requires switching the alternate setting and
-> > because Google is switching to handle this via userspace thus why
-> > there was this request to add a new sysfs to control it.
->
-> That's fine, just don't add devices where there shouldn't be devices, or
-> if you do, make them actually work properly (i.e. do NOT have empty
-> release callbacks...)
->
-> If you want to switch alternate settings in a USB device, do it the
-> normal way from userspace that has been there for decades!  Don't make
-> up some other random sysfs file for this please, that would be crazy,
-> and wrong.
->
-> So what's wrong with the current api we have today that doesn't work for
-> bluetooth devices?
+> +def test_builder(name, cfg, ipv4, feature, tun=None, inner_ipv4=None):
+> +    """Construct specific tests from the common template."""
+> +    def f(cfg):
+> +        if ipv4:
+> +            cfg.require_v4()
+> +        else:
+> +            cfg.require_v6()
+> +
+> +        if not cfg.have_stat_super_count and \
+> +           not cfg.have_stat_wire_count:
+> +            raise KsftSkipEx(f"Device does not support LSO queue stats")
+> +
+> +        if tun:
+> +            remote_v4, remote_v6 = build_tunnel(cfg, ipv4, tun)
+> +        else:
+> +            remote_v4 = cfg.remote_v4
+> +            remote_v6 = cfg.remote_v6
+> +
+> +        has_gso_partial = tun and 'tx-gso-partial' in cfg.features
+> +
+> +        # First test without the feature enabled.
+> +        ethtool(f"-K {cfg.ifname} {feature} off")
+> +        if has_gso_partial:
+> +            ethtool(f"-K {cfg.ifname} tx-gso-partial off")
+> +        run_one_stream(cfg, ipv4, remote_v4, remote_v6, should_lso=False)
+> +
+> +        # Now test with the feature enabled.
+> +        if has_gso_partial:
+> +            ethtool(f"-K {cfg.ifname} tx-gso-partial on")
 
-Perhaps it is just lack of knowledge then, how userspace can request
-to switch alternate settings? If I recall correctly Hsin-chen tried
-with libusb, or something like that, but it didn't work for some
-reason.
+Is the special handling of GSO partial needed?
 
-@Hsin-chen Chuang I hope you can fill in the details since for the
-most part this is not a BlueZ feature. I'm just explaining what you
-guys are after but ultimately it is up to Google to drive this.
+This test is not trying to test that feature.
 
---=20
-Luiz Augusto von Dentz
+> +def main() -> None:
+> +    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
+> +        cfg.ethnl = EthtoolFamily()
+> +        cfg.netnl = NetdevFamily()
+> +
+> +        query_nic_features(cfg)
+> +
+> +        tun_info = (
+> +            # name,         ethtool_feature              tun:(type,    args   4/6 only)
+> +            ("",            "tx-tcp6-segmentation",          None),
+
+tx-tcp6-segmentation implies v6 only? The catch-all is tcp-segmentation-offload.
+
+> +            ("vxlan",       "tx-udp_tnl-segmentation",       ("vxlan", "id 100 dstport 4789 noudpcsum")),
+> +            ("vxlan_csum",  "tx-udp_tnl-csum-segmentation",  ("vxlan", "id 100 dstport 4789 udpcsum")),
+> +            ("gre",         "tx-udp_tnl-segmentation",       ("ipgre",  "",   True)),
+> +            ("gre",         "tx-udp_tnl-segmentation",       ("ip6gre", "",   False)),
+> +        )
+> +
+> +        cases = []
+> +        for outer_ipv4 in [True, False]:
+> +            for info in tun_info:
+> +                # Skip if it's tunnel which only works for a specific IP version
+> +                if info[2] and len(info[2]) > 2 and outer_ipv4 != info[2][2]:
+> +                    continue
+> +
+> +                cases.append(test_builder(info[0], cfg, outer_ipv4, info[1],
+> +                                          tun=info[2], inner_ipv4=True))
+> +                if info[2]:
+> +                    cases.append(test_builder(info[0], cfg, outer_ipv4, info[1],
+> +                                              tun=info[2], inner_ipv4=False))
+> +
+> +        ksft_run(cases=cases, args=(cfg, ))
+> +    ksft_exit()
+> +
+> +
+> +if __name__ == "__main__":
+> +    main()
+> -- 
+> 2.48.1
+> 
+
+
 
