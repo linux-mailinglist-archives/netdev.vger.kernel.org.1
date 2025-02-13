@@ -1,102 +1,80 @@
-Return-Path: <netdev+bounces-165811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB2DA336B6
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:11:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A53DAA336BA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB0A3A9E80
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:11:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5946C7A33E6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10DC207A05;
-	Thu, 13 Feb 2025 04:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472FE2063CD;
+	Thu, 13 Feb 2025 04:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PqeUku5p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulJj7GnK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00BE20767E;
-	Thu, 13 Feb 2025 04:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BAF205E0B;
+	Thu, 13 Feb 2025 04:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739419814; cv=none; b=HgQ5A1WgSzizztNEoBx2YkJr27xH8uTb5AY4dZX7zgBI0YbHyDpop8xtn6FgwwYH+6Me/3yN+w3kNsZ53z/JTEAnw3HpxkQyANHjRcRY6PY6PqCkG78Hd7apRNDo99VYuzSZsIOq9ln12EQABnCb8v4qG2Y5bkr0ZEPoLZP7TLs=
+	t=1739420073; cv=none; b=Tchgxe0f2LHGw5RgqCmOzXRESZeYPeNeJWLFoa7cJ9ZkfoEKWw3I94saZTEi6XNac8tDOWudn6+1Pv4eRwo512EgA5tzVsC7GuKgB+IJomGpUHeF6e0FfhiEYbSIjfFslpdN6xrbkzIsYvL207M4MT9+BLOvEVarkf8SbG7VJTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739419814; c=relaxed/simple;
-	bh=MEyXal3MsfePRCxvAxdgFK11qwUtLBoJ0dkXaaBRE6c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cs3EqPKKHSfo80aCVbNE+wz7zLrHhK1+tV3vcmrLa0gC4DON8KOtLRHXl8MItqP2ukeh8sXBpAt2kLH9NhyHt4k1SWRDtOE7uDWp98zBcJccfUqQu7R7acmdY995puLvEogsrjuZg3IuaUBtBIYiLxqSzrFRZuZxw9V5tHexhqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PqeUku5p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D93DC4CED1;
-	Thu, 13 Feb 2025 04:10:14 +0000 (UTC)
+	s=arc-20240116; t=1739420073; c=relaxed/simple;
+	bh=58Bzdokx7tiueOMeiMxU3AG2JHoBNNh+X3sxXba91X4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hRAsQhljv2MqEvANeDnuHENjluHt+eM2Zc+1hT8UWhzIaZrjCQxGj5D3ZGE84XISkU/pKtThPGIaBl3S0BAkHnBhB7QFTQX6j6298US6BCwhT7pD+nVmAJWJmKJAqQrFkFyoKXj4ytR7fq/ZFue+FFvY2t0NlIMsyf1vyaD+yTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulJj7GnK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3B53C4CED1;
+	Thu, 13 Feb 2025 04:14:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739419814;
-	bh=MEyXal3MsfePRCxvAxdgFK11qwUtLBoJ0dkXaaBRE6c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PqeUku5pp9tSCj7sjA13n7SR887NnREqN7L+n9/vJsUsm9+7KthEB5xw3LynRRpv6
-	 0SDWvjl70nDyFeGLowggSMUtanPFKX6Mie+e4Sq/ThDSl4xRYeV7oW4zHkA6d6n35S
-	 w68RL1EZ2NRbkBfjlDtkIMpyZHYnXduUGQaAA9Plmx4mqdX2LIp3ekftKKp5SnMY2t
-	 vt7kKBZCECuiKb/re0EGJgvcOq5vn/8V6yZOyt1a4LoqL3ngF6qEPYK0I3Pq59K1sr
-	 JLOxkGHMxynDYfWXSTAfB5zc0n8g4lgdebdM7U69oMogooTNBOZZSLkiHGKJ3wyh+G
-	 AyQcrb7kRHzSw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE5E1380CEDC;
-	Thu, 13 Feb 2025 04:10:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1739420072;
+	bh=58Bzdokx7tiueOMeiMxU3AG2JHoBNNh+X3sxXba91X4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ulJj7GnKRHEI1Hvnm/5qQ9PTuZ0Tta8Fv/0HhTDKNF/GVk6xYr/QUFEJw0WEEmKE7
+	 MqYFu3VNNbNQjq6VfOMk9SWHxt5ZvQ1L3niwLnMCR3K9t7LjmNNPGVmbRF6xqm2YAp
+	 uJDo8xp4FuFPOkfIUTViOPlPGdrEILQyw2kmSDguLdEiFAv9wVLM+MER2OE1ef03Ea
+	 sZcILjKUw9JLgl9sOnDe7UNi0oI6txmGg+bjZzb6fqAHrRT1ILky2sfjbSIPtoJfNh
+	 PxZSXb4Ux/4phZlgqLDoWQmbDn4mkd1JVKkASe6m/dZ4GkGKCrJS20P7xw1z/wfxBp
+	 N/xS2VQ108smw==
+Date: Wed, 12 Feb 2025 20:14:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Julien Panis <jpanis@baylibre.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, danishanwar@ti.com,
+ s-vadapalli@ti.com, srk@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net 1/3] net: ethernet: ti: am65-cpsw: fix memleak in
+ certain XDP cases
+Message-ID: <20250212201430.5bfaecc7@kernel.org>
+In-Reply-To: <20250210-am65-cpsw-xdp-fixes-v1-1-ec6b1f7f1aca@kernel.org>
+References: <20250210-am65-cpsw-xdp-fixes-v1-0-ec6b1f7f1aca@kernel.org>
+	<20250210-am65-cpsw-xdp-fixes-v1-1-ec6b1f7f1aca@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] net: stmmac: dwmac-loongson: Set correct
- {tx,rx}_fifo_size
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173941984332.756055.4356205354524855724.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 04:10:43 +0000
-References: <20250210134328.2755328-1-chenhuacai@loongson.cn>
-In-Reply-To: <20250210134328.2755328-1-chenhuacai@loongson.cn>
-To: Huacai Chen <chenhuacai@loongson.cn>
-Cc: chenhuacai@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- si.yanteng@linux.dev, chris.chenfeiyang@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
- loongarch@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, horms@kernel.org,
- qiaochong@loongson.cn
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 10 Feb 2025 16:52:15 +0200 Roger Quadros wrote:
+> -		/* Compute additional headroom to be reserved */
+> -		headroom = (xdp.data - xdp.data_hard_start) - skb_headroom(skb);
+> -		skb_reserve(skb, headroom);
+> +		headroom = xdp.data - xdp.data_hard_start;
+> +	}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 10 Feb 2025 21:43:28 +0800 you wrote:
-> Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
-> zero. This means dwmac-loongson doesn't support changing MTU because in
-> stmmac_change_mtu() it requires the fifo size be no less than MTU. Thus,
-> set the correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by
-> queue counts).
-> 
-> Here {tx,rx}_fifo_size is initialised with the initial value (also the
-> maximum value) of {tx,rx}_queues_to_use. So it will keep as 16KB if we
-> don't change the queue count, and will be larger than 16KB if we change
-> (decrease) the queue count. However stmmac_change_mtu() still work well
-> with current logic (MTU cannot be larger than 16KB for stmmac).
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,V2] net: stmmac: dwmac-loongson: Set correct {tx,rx}_fifo_size
-    https://git.kernel.org/netdev/net-next/c/8dbf0c755645
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'm gonna do a minor touch up here and set the headroom in "else" hope
+you don't mind. Easier to read the code if the init isnt all the way up
+at definition. Also that way reverse xmas tree is maintained.
 
