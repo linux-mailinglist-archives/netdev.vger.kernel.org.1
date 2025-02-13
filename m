@@ -1,242 +1,177 @@
-Return-Path: <netdev+bounces-165728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1C1A33413
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:38:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AA5A33429
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBB3F167590
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:38:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3FC7167F08
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D373D984;
-	Thu, 13 Feb 2025 00:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AEF4D8CB;
+	Thu, 13 Feb 2025 00:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nxiu3aeJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UEnWYm6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C903232
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17E92F44;
+	Thu, 13 Feb 2025 00:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739407100; cv=none; b=RX7BeyayMWl2sND0SWxYRrwxX+d4YYU0sMj+CoqDxqLd3C7QsgQFGjd04APsnkayE1qyeVa/sOw3V/UIBArDj2pgD4ZaEfjzvsv6vydAbfPKtBe1LlB7LNK+Q5VVy0Kj4oi5H04pLJph3aJykyCA4BPmQSlyY8uHgaPaQO9uMvc=
+	t=1739407261; cv=none; b=EageJZ8JTITu1V6z5eZMnPrCvkkaGzpSpvg68bDIUC5JpAuz4cV5b5Js5xbALiihImL8yHzLx101CDrkXOADGTINTldiE/b73KcXZQLsg3OBkMFP3gakacWvfQyOWb1fH84BEpdu7LPmlbsWCTgAMB2MidwhEG7vpMGexlOeozw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739407100; c=relaxed/simple;
-	bh=13UP63ZkmlzEcLIULb4lkVrpklgTXlFI3VAsBRP4lYI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LjpRGsxt28vtuyjr/7Ikmae3qzd833w5WiZX4bVsMdcvCYMCFiJJVnPeibHI0fsgNSM4+qYAJGCw/tldONjZjl++Z85J4lCQTAO0tkx8IgHeArabwZzcgpr4/O76I6duhn5Bs79Ob/tMWhk3IXEZ4Qkq3t/LR+7t8TN9PEOoJXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nxiu3aeJ; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f032484d4so28835ad.0
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 16:38:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739407098; x=1740011898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0EJboSgA5eBymMYU1PisqE5zQYXCC0Q7jB9CcaDtWkE=;
-        b=Nxiu3aeJS0xp6ERXoW4gnhpIGqpsFojzxSL1wMafnooICrnOqBRzMFGIVth4z7hH3E
-         9h4MuRGuV+RHHK7aylszAr0Ugp98xrQiuC4K+Y36/LlgkwkIwD/uxVcWrlFLuEU+DkuJ
-         UZrMuoJPeuN7iAokqXo43j3M2rQf4nm5lsxS1bEgnrumE86RWd0Qi3v3Ua3pv9el6M6v
-         6Jquey9wCaFjFLGZqKh47bR1Dd0TykMwmDTGcbThP4W7/BdfeP9c716dK/jY/+0/Vx+K
-         gyjleq6Cfm1/6M1OFzQfj60XdX0vaOMxrhSQyCCsdvamYtTh8IqPpG+HK2gxqrXPlXxR
-         G6Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739407098; x=1740011898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0EJboSgA5eBymMYU1PisqE5zQYXCC0Q7jB9CcaDtWkE=;
-        b=roCBfEImfK8i+tOJxWBHY/UxifioNQhjZkOx+CNMSIzgZ6dF1irDdhiPN8X+95ZEkU
-         U9p7J3MrDXHLTZEiVaiYqobqCjDzJMegDCknmDfBQUPUGa39LjG7RxxDEqYyo6/EneIA
-         +3mtwkx5uttKl7XVsWPiANRhIo3O1l0xPw3V1LwXabMMYzu6P1DhmyKT1/r2hgFidBhu
-         RaCn72vhAJIhzxm00FudU/kjieP0qiH/wxZdiis5bOD7Q5mDyYcIKELvYXd/RM0b/biM
-         9vi8huJT5nVcIZmUSZ7BlKYUAl7Dz/OLeqIhMpSs4FFaX4CiXxjl5yVeI2YCnVAtAhAg
-         MHUw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLXqBNRbB6iCTmpOUJpMY8rZXoFwEMaISdebruKeITDGN9HQg0HZBnsMpHoFwj3/3K3+/Li2s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw8Mxxf4BZ2JytrBeWFaFH29L4ePzHnI0uHwj3BNxaHpRedJQO
-	nPE2rbiL5a2YquossfUfnQ0H5OlLWBqgpl+QKXCSGcgzBAkODJaasbIGm8LYOk/mfEhWefOHqkJ
-	dhZJHJzMXvA2ARPZnS+ybCg+18XvLP7g/DYUB
-X-Gm-Gg: ASbGncs42IQPFsxD1XnF3x1DH7vJosqUW3LILI+CPruAsuqwSHoIYwBfm/8OOhCcQxN
-	+L9FNU0tTbvBgkJXx5K5aUnQDjL64d/eTZOuBedfx10rq8Ypo/GKZUzqeqSfjRnToFjV0VTvKBB
-	ruT67Lo3LfK1ccLQ/8c34QhxXqE3Q=
-X-Google-Smtp-Source: AGHT+IFO+TE/FjEdQkzgg0aeUryTdSY0OWjwgwMYriv+G9qBvrfKxF/qg2KxCqyED/w9UyNe0qZGLfug/6Cl2r8NX5w=
-X-Received: by 2002:a17:902:f689:b0:21f:40e8:6398 with SMTP id
- d9443c01a7336-220d35a2297mr1064725ad.26.1739407097596; Wed, 12 Feb 2025
- 16:38:17 -0800 (PST)
+	s=arc-20240116; t=1739407261; c=relaxed/simple;
+	bh=/5BdimO5ChYxqdyBHcKxk64mNtH5uMwvVg3cjZH2rKw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DcNAM9MAHppBk82uBdLd9NKjYo6hL8ahSN1O0U8fDI0djDkFfcDhYZUf8/tTYWWawvo7nVRCnoGSOzG39DvZUYW3r8S2eErbB44Q9wzTBS5C5WeI8a7Tbkna1m5kB3ETefrUl1RYhhwOIL7H+u1y6R2fEf9mu+pUfXaToZEPCOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UEnWYm6G; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51CKG8FP004594;
+	Thu, 13 Feb 2025 00:39:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=kvPsau
+	XDyf47SKQKq4L7sX8eCJo/Sjkz/am1Ygpjog8=; b=UEnWYm6GywtAWklet8Kgpk
+	ry9C4dDxYoUnjlmbMhR0g8vGlzqt9nrrYlr4pT4ZH/HFnl+aUieYO9JL0FaV0Z2X
+	wgnsvrixboTeC4h3j7FLogqEFZHRQqvix/eL8cCK2Ohx0ukW8Mgs4enLAb/QXKed
+	VHf0IriPmvQU0LL44IJypBnfxnTjiGkgyDoX6VdWGBzB420z/iDMFHPM7E6e13Cj
+	VfefLAUgEiGzBKNAz19wwzO3mdB2I/np6ENZCNvI2pgs8XbKcNCg3/flpn8DJAt/
+	g0RNpy4h0c26wxoO9h3vCnPGRgWEL2uboa5tLC5aq+yuCQ90coVWd+e2UlBVHyxA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rhqaefkc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 00:39:48 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51D0Yq7p011254;
+	Thu, 13 Feb 2025 00:39:47 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rhqaefka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 00:39:47 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51CNV6bh016749;
+	Thu, 13 Feb 2025 00:39:46 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pk3kbmxf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 00:39:46 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51D0diJD39125320
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Feb 2025 00:39:44 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2372E20040;
+	Thu, 13 Feb 2025 00:39:44 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9747620043;
+	Thu, 13 Feb 2025 00:39:43 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.63.197.14])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 13 Feb 2025 00:39:43 +0000 (GMT)
+Received: from jarvis.ozlabs.ibm.com (unknown [9.36.5.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 0DEA2600D7;
+	Thu, 13 Feb 2025 11:39:26 +1100 (AEDT)
+Message-ID: <835f0504d85398707997b7fe96b4f1a44179ff9a.camel@linux.ibm.com>
+Subject: Re: [PATCH 0/9] Extend automarkup support for ABI symbols
+From: Andrew Donnellan <ajd@linux.ibm.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Bagas Sanjaya
+	 <bagasdotme@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Jonathan Corbet	
+ <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+        "David S. Miller"	
+ <davem@davemloft.net>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Avadhut
+ Naik	 <avadhut.naik@amd.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Dumazet	 <edumazet@google.com>,
+        Hu Haowen
+ <2023002089@link.tyut.edu.cn>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg	
+ <mika.westerberg@linux.intel.com>,
+        Paolo Abeni <pabeni@redhat.com>, Sean
+ Young	 <sean@mess.org>,
+        Yanteng Si <si.yanteng@linux.dev>,
+        Yehezkel Bernat	
+ <YehezkelShB@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael
+ Ellerman	 <mpe@ellerman.id.au>,
+        Shrikanth Hegde <sshegde@linux.ibm.com>,
+        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>,
+        James Morse	 <james.morse@arm.com>,
+        "Nysal Jan K.A" <nysal@linux.ibm.com>,
+        Tom Lendacky	
+ <thomas.lendacky@amd.com>,
+        Sourabh Jain <sourabhjain@linux.ibm.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Frederic Barrat
+ <fbarrat@linux.ibm.com>,
+        Madhavan Srinivasan	 <maddy@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy	
+ <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, linux-arm-kernel@lists.infradead.org,
+        linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        workflows@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Date: Thu, 13 Feb 2025 11:39:20 +1100
+In-Reply-To: <20250212135808.58d2f032@foz.lan>
+References: <cover.1739254867.git.mchehab+huawei@kernel.org>
+		<Z6yFG_NntQfkwYli@archie.me> <20250212135808.58d2f032@foz.lan>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210130953.26831-1-kerneljasonxing@gmail.com>
- <CAHS8izMznEB7TWkc4zxBhFF+8JVmstFoRfqfsRLOOMbcuUoRRA@mail.gmail.com>
- <CAL+tcoDrxSgGU3G0a=OqpYVD2WAayLKGy=po5p7Tm+eHiodtNw@mail.gmail.com>
- <CAHS8izNSG_fC7t3cAaN0s3W2Mo-7J2UW8c-OxPSpdeuvK-mxxw@mail.gmail.com> <CAL+tcoD0CT_JmDcLEY6VGq2_+oU=TgHRfY6LPG70By3gm5CP0A@mail.gmail.com>
-In-Reply-To: <CAL+tcoD0CT_JmDcLEY6VGq2_+oU=TgHRfY6LPG70By3gm5CP0A@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 12 Feb 2025 16:38:04 -0800
-X-Gm-Features: AWEUYZldTMyPBIiMBwNXz7bPf1BS_rU5-upFJppzNFcrnh51o9iaPiQlHtA5QTg
-Message-ID: <CAHS8izNyeOThGCt=tO-0xoAEOsoQJLF_DJxF1iV8zJnJoyW-=g@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] page_pool: avoid infinite loop to schedule
- delayed worker
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	horms@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: OZ4Ih_TXKxH9HgohVnb0WeQrzyi138qF
+X-Proofpoint-GUID: _CytR_Qn18YZDyX1vFuvKdYXq73CWqPh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-12_08,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 mlxscore=0
+ spamscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 adultscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=609 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502130002
 
-On Wed, Feb 12, 2025 at 3:39=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Thu, Feb 13, 2025 at 3:24=E2=80=AFAM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > On Tue, Feb 11, 2025 at 7:14=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > On Wed, Feb 12, 2025 at 10:37=E2=80=AFAM Mina Almasry <almasrymina@go=
-ogle.com> wrote:
-> > > >
-> > > > On Mon, Feb 10, 2025 at 5:10=E2=80=AFAM Jason Xing <kerneljasonxing=
-@gmail.com> wrote:
-> > > > >
-> > > > > If the buggy driver causes the inflight less than 0 [1] and warns
-> > > >
-> > > > How does a buggy driver trigger this?
-> > >
-> > > We're still reproducing and investigating. With a certain version of
-> > > driver + XDP installed, we have a very slight chance to see this
-> > > happening.
-> > >
-> > > >
-> > > > > us in page_pool_inflight(), it means we should not expect the
-> > > > > whole page_pool to get back to work normally.
-> > > > >
-> > > > > We noticed the kworker is waken up repeatedly and infinitely[1]
-> > > > > in production. If the page pool detect the error happening,
-> > > > > probably letting it go is a better way and do not flood the
-> > > > > var log messages. This patch mitigates the adverse effect.
-> > > > >
-> > > > > [1]
-> > > > > [Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
-> > > > > [Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
-> > > > > ...
-> > > > > [Mon Feb 10 20:36:11 2025] Call Trace:
-> > > > > [Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
-> > > > > [Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
-> > > > > [Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
-> > > > > [Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
-> > > > > [Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
-> > > > > [Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
-> > > > > [Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
-> > > > > [Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
-> > > > >
-> > > > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > ---
-> > > > >  net/core/page_pool.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > > > > index 1c6fec08bc43..8e9f5801aabb 100644
-> > > > > --- a/net/core/page_pool.c
-> > > > > +++ b/net/core/page_pool.c
-> > > > > @@ -1167,7 +1167,7 @@ void page_pool_destroy(struct page_pool *po=
-ol)
-> > > > >         page_pool_disable_direct_recycling(pool);
-> > > > >         page_pool_free_frag(pool);
-> > > > >
-> > > > > -       if (!page_pool_release(pool))
-> > > > > +       if (page_pool_release(pool) <=3D 0)
-> > > > >                 return;
-> > > >
-> > > > Isn't it the condition in page_pool_release_retry() that you want. =
-to
-> > > > modify? That is the one that handles whether the worker keeps spinn=
-ing
-> > > > no?
-> > >
-> > > Right, do you mean this patch?
-> > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > > index 8e9f5801aabb..7dde3bd5f275 100644
-> > > --- a/net/core/page_pool.c
-> > > +++ b/net/core/page_pool.c
-> > > @@ -1112,7 +1112,7 @@ static void page_pool_release_retry(struct
-> > > work_struct *wq)
-> > >         int inflight;
-> > >
-> > >         inflight =3D page_pool_release(pool);
-> > > -       if (!inflight)
-> > > +       if (inflight < 0)
-> > >                 return;
-> > >
-> > > It has the same behaviour as the current patch does. I thought we
-> > > could stop it earlier.
-> > >
-> >
-> > Yes I mean this.
->
-> I'm going to post the above diff patch in V2. Am I understanding right?
->
+On Wed, 2025-02-12 at 13:58 +0100, Mauro Carvalho Chehab wrote:
+> > WARNING: Documentation/ABI/testing/sysfs-class-cxl not found
+>=20
+> I need to double-check verify this one, as it didn't appear on
+> my tests. Are you getting it against docs-next or linux-next?
+>=20
 
-Please also add Jakub's request, i.e. a code comment indicating why we
-return early.
+This is moved to obsolete/ by 5731d41af924b which was merged in rc1,
+and will be moved again to removed/ by [0].
 
-Also, now that I look more closely, we want to make sure we get at
-least one warning when inflight goes negative, so, maybe something
-like (untested, may need some iteration):
+Andrew
 
-```
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 2ea8041aba7e..6d62ea45571b 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1113,13 +1113,12 @@ static void page_pool_release_retry(struct
-work_struct *wq)
-        int inflight;
-
-        inflight =3D page_pool_release(pool);
--       if (!inflight)
--               return;
-
-        /* Periodic warning for page pools the user can't see */
-        netdev =3D READ_ONCE(pool->slow.netdev);
-        if (time_after_eq(jiffies, pool->defer_warn) &&
--           (!netdev || netdev =3D=3D NET_PTR_POISON)) {
-+           (!netdev || netdev =3D=3D NET_PTR_POISON) &&
-+           inflight !=3D 0) {
-                int sec =3D (s32)((u32)jiffies - (u32)pool->defer_start) / =
-HZ;
-
-                pr_warn("%s() stalled pool shutdown: id %u, %d
-inflight %d sec devmem=3D%d\n",
-@@ -1128,7 +1127,15 @@ static void page_pool_release_retry(struct
-work_struct *wq)
-                pool->defer_warn =3D jiffies + DEFER_WARN_INTERVAL;
-        }
-
--       /* Still not ready to be disconnected, retry later */
-+       /* In rare cases, a driver bug may cause inflight to go negative. D=
-on't
-+        * reschedule release if inflight is 0 or negative.
-+        *      - If 0, the page_pool has been destroyed
-+        *      - if negative, we will never recover
-+        * in both cases no reschedule necessary.
-+        */
-+       if (inflight < 1)
-+               return;
-+
-        schedule_delayed_work(&pool->release_dw, DEFER_TIME);
- }
-```
+[0]
+https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20250203072801.3655=
+51-3-ajd@linux.ibm.com/
 
 --=20
-Thanks,
-Mina
+Andrew Donnellan    OzLabs, ADL Canberra
+ajd@linux.ibm.com   IBM Australia Limited
 
