@@ -1,146 +1,135 @@
-Return-Path: <netdev+bounces-166137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F05A34BD1
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:25:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936FCA34BE8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01A501882A4D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:25:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A5A97A1915
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD7620409A;
-	Thu, 13 Feb 2025 17:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5312036FD;
+	Thu, 13 Feb 2025 17:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Qpw5VAZi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sg8eA3Pe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D312B2040B7
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 17:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB5A1C863C
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 17:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739467527; cv=none; b=c4WCoDZu1pTkxx3k0vBg8czB7tffaw3INXayJGLtMiD8OLMgP5i5jafJsPOvzwYqeCEPxo9xZdwwzegdTK6GnOtmHSI0hSI5gdIS9wYy1/+t1jHvP92tU4md1owHrpydQt+AJdGPZl+T2tzuakCH+zGF0kVhwI2PsZqWDNdwK6M=
+	t=1739467776; cv=none; b=RJFXQtMG/nn/naSLBxFY+oN3yulzDJ/4l7/5QOf8ccdo8ccfY10TxszufV/waywnAPGFf2eV9oZSkIaphAs7gwUAxWreTfjRyYFr+gnpg3QRlzMgVsTJ5SXkf5FWoIZ43HXsnR4zUYDnt0R81ec1hyfcAHrAzYYeNxm3SZ6mfyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739467527; c=relaxed/simple;
-	bh=h60vbM9Jm6zaTd85iyob/nz/7LZiBLiFuNTQdv/csWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iG50EZ6xa+xXmDRP+ulQFvsmzgkjx6o0DZozvlwI2dcvOKEYZBwJaK1AVruSwjngXQTROOwn2AFMCgxPr1gQfFkYYM0uVEpvsxia0EG4quZq4ikloY598OuSydYRirD9gp0ptMZ/aZW08KuGB9jx+cAwnO+89NZ4sQ1cAluXX/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Qpw5VAZi; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7270003d9c8so607275a34.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:25:24 -0800 (PST)
+	s=arc-20240116; t=1739467776; c=relaxed/simple;
+	bh=beEHYWfLW8uB+WEzhiwbEsKkojCix3lQoBcLZIbMJmY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DYf5rTBhI5ZiUXZiQZKezHV3s7KtFQgEFyuttMetPHVRADwoSIpX5cJEmTYWK1zK0HZCZPTkcptmLaDWtzK9BnN0ANtZNwIG98jPHgLXNmbgiOIJSD5AZq5pVi0Qfk8l0enIRBaPY+0BaC0CJhTEPqmqYMuWP3tViPS7OWvxWwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sg8eA3Pe; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5de3c29e9b3so1842266a12.3
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:29:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1739467524; x=1740072324; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mp8WnurnIDwQ4N7+32kRAbs4w5dFYFrQQIq32Y3ZWhU=;
-        b=Qpw5VAZiW0z1sw+g0eMb4K0BC7svOU1K4X5Tb33HGYlkaxm+tE6pgGP/ma6CQePrL5
-         SoKGuP5cBKtw40VCu0D7PR/TpvSGBjJXZYwnUvqTfllqoEcxTn5gG7DysyOMo9Xgz4q7
-         oyNI2Zc+07H/aUU9HLZaTdRINRovyxZdycQ2TE+ld82H2RC6tfAfXZYTHqdgIY6pIL5J
-         2yZ+UNlSPsYgWsbSRqJ4qzG+GnNnylbKyMQDgDtEgyeEYzX4FiTWp9xyIsodKTGXWiZv
-         FxKRtV2uYYF1PLVdW0/UedqZJ2uM7g+qNGOns8PI15O5SHczUo7Rgve6nXuTvmbZfz5x
-         Flsg==
+        d=google.com; s=20230601; t=1739467773; x=1740072573; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rxxFFdHrx4/pEU8chDYsT/kU3Mey57G9R2YibujipWM=;
+        b=sg8eA3Pej11OUxc8yccdtcrbkpU0snbWxY6NpBVJ7qWu+Xcfk6s84XM8hA/0TMYqHy
+         icRJSz7MX1del+O8/3NLqpgl7xQUxU4xtg0zN/j5R+h/4XqOX/qAyLHgPxzKUvZMHrzB
+         VjZb8O6JaiU0EYeG+C9tyxavobPBiAg6ST/VQbqMlJewBqrayOEF8LeEgXkAWCqMm0Yl
+         YHQ5SALSkAT1PI15RopCbpdMk+pnAAFll88jfnOl3uRCcqVk0qf8NGaUXezqOCSH8VuX
+         lDSXUsGaL//05dGCd870RKC3YT50WqHR664HcfJ3pExAri0VFYqhsWdu8j9Bfph7518K
+         AAsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739467524; x=1740072324;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mp8WnurnIDwQ4N7+32kRAbs4w5dFYFrQQIq32Y3ZWhU=;
-        b=hVi1tlMIIFEjfG6bd7QpXNEL3i+A9UoA/UYFn+nje1khCR7VZpBSKIN2KeTRqoSCt4
-         O+bMNe/fjQqCKEy6nFPo/g0JStLmMtUw+tmYq+L5DEh3UtjEa6lWeh6VN43Xyyo2QDYV
-         IYnDB42kTaMdoF4CFr5T5Si6t/++XjhI0VeyPG5JtSnvlOyRla+PoFnsoXYpCX9MmmxD
-         s9HvOAsk5NKuGCSX7dZfS6vdERXNJfHb6eM0jwVNqYEkU/4O2nOj73aw+a+uNySUv6ML
-         Iab7oP+SLDXne1+awUCr4hIPSMCASFny1p9GPBQeZOR4978xOg+b3M36FINE2JzTvc9j
-         ZtGg==
-X-Forwarded-Encrypted: i=1; AJvYcCViuCdrkqjtAzjSkVuy3sQptVepsJgUWkvSZOSnl4YHgRJONpdj0biMX3E+JizMNH9v3Ats9LY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdFoj++uzumMJL6vw4fyQfm/uSKT4Qe0PwYll7Vu8L4+kGjuCT
-	A18mffZVBoIeNrEOzhTae/EYn8DJ3AEvwSaWOAlnNJBwmE0kTs44FpcBic62E8E=
-X-Gm-Gg: ASbGnct0gaha1sYlXIcPt14qCsH8icQJDLai7BrI3DAWz5gBJmL+uYDgD6TJ3qzCnkP
-	eGzW5CjvifsZEEwETVjU+f8CEcvoK67dJ6e+cMc47rtr6pWzXtUE+VJ2jtDbyyaPNuORbmNqwjz
-	eMDlmBqyrpK5+gAbMUiOKrcVJySimGdi+RNrM1u8VCcIMae/wEZ6apEFzdZByKdc7LrwS0roUnx
-	nltC+lVSwqXf6+cFzz1nIz0M7HgqnetUMIj72lRMW0sI2+SuwA7/HMxNkTXDYLWYqDJbGwPbFa7
-	7o33dFl2xFXHRwjns+RkOlwYst0PjrRG7U1CpcMkGUGIwFwza4EU
-X-Google-Smtp-Source: AGHT+IFRLkc52JKi83ncUWwAgxo2TvaFCE/dbkTZNE6D15ISJ0Y8Jn4hp2Y0d5PwcxAk7Qj4zAr0dQ==
-X-Received: by 2002:a05:6830:6b03:b0:718:41b8:5d6d with SMTP id 46e09a7af769-726f1d8aaa8mr6076689a34.24.1739467523802;
-        Thu, 13 Feb 2025 09:25:23 -0800 (PST)
-Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7270025806bsm743771a34.53.2025.02.13.09.25.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 09:25:22 -0800 (PST)
-Message-ID: <801b5364-129f-42e9-bf9a-a90d9eeb4629@baylibre.com>
-Date: Thu, 13 Feb 2025 11:25:21 -0600
+        d=1e100.net; s=20230601; t=1739467773; x=1740072573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rxxFFdHrx4/pEU8chDYsT/kU3Mey57G9R2YibujipWM=;
+        b=b3fZvTVYZw2vDEmhUWpkRTK1EfKSdccrIUHlvalo1FRoOtAZVapx8xnvyEIuoEGtr9
+         so61CM6eIIdRqXRMDNzKff9+NIiru8JzUWssoihJJj/XFawcOkLCkhDJr6ke06tTXo7O
+         7d6/aZOIc0uZzzEcxYsz6N3j76vtRWrcDJQ1bIe0DNP10ckDFHg4ZDNxR/vOVmj6fr5I
+         s3HSs4LkgTy5bBrGkdy+LEt8LSlx1bHm6fxX5AuSxpwQvtEavMhEw0gEAKx31hI9OW3T
+         PFJPXHRSAFxFICgsXyEV6ZX+A38kyaz4uraCNzfv6owa8XkSoa38Wm+mXpWr2XJBywb2
+         ZIsw==
+X-Gm-Message-State: AOJu0YxbFBZ8U+SLiD9ymjjKSK1Bh8F0Eq94AI4SXEQemy54Jls7tzQp
+	b5EEVNw0I3WL24o1/Km2Fr3bZOCjYsR+eX3fM9Jf/OtUFxKKYdC7uum+6UEE2jP2oZ7iJkU7iQ5
+	5tutg+/ChPAcSR4NhlINrChthZJwSDO8xjQuo
+X-Gm-Gg: ASbGncsFcSKcHqeHgEm0+6gqsjTZx9L5WNC49riUPesdYvBo2Y5YMliVB2D0EL5RONJ
+	q0MPRJ/y9UT8UvNu88vizz3xkYa4Vx49sQJNtRbym3nTFFsBsyBuPQyxtQ412gfm8S7Ffo6+jew
+	==
+X-Google-Smtp-Source: AGHT+IEnc+n3yFYlhIOPv071hPzEGKuco0va2tIo22Ttk1SmKZo9OEqVXQeOv0crrmOfciMX/nJ7w3Ianh6R9lkkSeE=
+X-Received: by 2002:a05:6402:3593:b0:5de:5946:8a01 with SMTP id
+ 4fb4d7f45d1cf-5dec9d6731fmr3506421a12.2.1739467772931; Thu, 13 Feb 2025
+ 09:29:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: (subset) [PATCH v3 00/15] gpiolib: add
- gpiod_multi_set_value_cansleep
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
- Linus Walleij <linus.walleij@linaro.org>, Andy Shevchenko <andy@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Lars-Peter Clausen <lars@metafoo.de>,
- Michael Hennerich <Michael.Hennerich@analog.com>,
- Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
- <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
- <173935301204.11039.10193374588878813157.b4-ty@linaro.org>
-Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <173935301204.11039.10193374588878813157.b4-ty@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
+ <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
+ <504a90ea-8234-4732-b4d0-ec498312dcd9@redhat.com> <CANn89i+us2jYB6ayce=8GuSKJjjyfH4xj=FvB9ykfMD3=Sp=tw@mail.gmail.com>
+ <12199ed2-ca9e-4658-9fc0-44e5b05ca7c3@redhat.com>
+In-Reply-To: <12199ed2-ca9e-4658-9fc0-44e5b05ca7c3@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 13 Feb 2025 18:29:21 +0100
+X-Gm-Features: AWEUYZneaePz4OCi4M3MOUoH9UomRgkvYTbve7DqBu3dbVcbl6RPqkuTiH1pIxg
+Message-ID: <CANn89i+oxrDhKG+wM0TKkyyhXyYCMZBNYyY9aYAfFBDt3X35eg@mail.gmail.com>
+Subject: Re: [PATCH net] net: allow small head cache usage with large
+ MAX_SKB_FRAGS values
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/12/25 3:36 AM, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> 
-> On Mon, 10 Feb 2025 16:33:26 -0600, David Lechner wrote:
->> This series was inspired by some minor annoyance I have experienced a
->> few times in recent reviews.
->>
->> Calling gpiod_set_array_value_cansleep() can be quite verbose due to
->> having so many parameters. In most cases, we already have a struct
->> gpio_descs that contains the first 3 parameters so we end up with 3 (or
->> often even 6) pointer indirections at each call site. Also, people have
->> a tendency to want to hard-code the first argument instead of using
->> struct gpio_descs.ndescs, often without checking that ndescs >= the
->> hard-coded value.
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [06/15] gpio: max3191x: use gpiod_multi_set_value_cansleep
->         commit: eb2e9c308d2882d9d364af048eb3d8336d41c4bb
-> 
-> Best regards,
+On Thu, Feb 13, 2025 at 6:13=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 2/13/25 2:44 PM, Eric Dumazet wrote:
+> > On Wed, Feb 12, 2025 at 11:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> >>
+> >> On 2/12/25 9:47 PM, Eric Dumazet wrote:
+> >>> This patch still gives a warning if  MAX_TCP_HEADER < GRO_MAX_HEAD +
+> >>> 64 (in my local build)
+> >>
+> >> Oops, I did not consider MAX_TCP_HEADER and GRO_MAX_HEAD could diverge=
+.
+> >>
+> >>> Why not simply use SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) , and
+> >>> remove the 1024 value ?
+> >>
+> >> With CONFIG_MAX_SKB_FRAGS=3D17, SKB_SMALL_HEAD_CACHE_SIZE is considera=
+bly
+> >> smaller than 1024, I feared decreasing such limit could re-introduce a
+> >> variation of the issue addressed by commit 3226b158e67c ("net: avoid 3=
+2
+> >> x truesize under-estimation for tiny skbs").
+> >>
+> >> Do you feel it would be safe?
+> >
+> > As long as we are using kmalloc() for those, we are good I think.
+>
+> Due to ENOCOFFEE it took me a while to understand you mean that we just
+> need to ensure GRO_MAX_HEAD and GOOD_COPY_LEN allocations are backed by
+> kmalloc to avoid the mentioned issue.
+>
+> I guess eventual nic drivers shooting themselves in the foot
+> consistently doing napi_alloc_skb(<max small cache + 1>), if any should
+> be fixed in their own code.
+>
+> I concur using SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) as the limit
+> would be safe.
+>
+> Will you send formally the patch or do you prefer otherwise?
 
-Hi Bartosz,
-
-Do you plan to pick up the other patches that have been acked
-as well? It seems like most folks were OK with everything going
-though the gpio tree since the changes are small.
-
+Oh, please go ahead, I am busy with other bugs, thanks !
 
