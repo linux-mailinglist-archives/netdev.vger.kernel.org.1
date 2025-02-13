@@ -1,303 +1,242 @@
-Return-Path: <netdev+bounces-165892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6313EA33A8D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:02:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D77DA33A93
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:03:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FD473A5452
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:02:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B9B8188CC1D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FED020B7F1;
-	Thu, 13 Feb 2025 09:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EF020C488;
+	Thu, 13 Feb 2025 09:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ovk7ETsk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BCbMS/HN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B93201034;
-	Thu, 13 Feb 2025 09:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC34201034;
+	Thu, 13 Feb 2025 09:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739437356; cv=none; b=AhTIBad3YzKiOqTZ9gnAXhRdOJqCZhTz8BDmXbTph+vGKgAFnf18895f0Qc2Bc2Iv4hP3GNYl6f/uyo+lLocswt1Pdn9mG1qCQTVs12Dg0EhOOUVZ0ZM17ZUpa5JmrMQKipmjMhgewybd2yo3PXKN2bC5MR1CupgvzoPHi02bFc=
+	t=1739437394; cv=none; b=m6jOJkCseqZ59E7hh0xXv6XQRVzUan/ldHF/vCSsKNLu/F/zPzpZghcmYReJNYD+NAUk44nJJA8SKIj8x+HElVTfMymn7+faeUcZ5ZVvrX/fGyuZKFGKJstE1cr68c4Ud/dwOB9StSkhOSutvTGkk8qjiBFrbzmpWO6X8XPDrVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739437356; c=relaxed/simple;
-	bh=ua5WVx0I54fdUo13pJ7VbTe7xfRZawQhzWzOpvpRg1c=;
+	s=arc-20240116; t=1739437394; c=relaxed/simple;
+	bh=wyVqmKW6qzEXY/2+wreWQuYQKHFVrSv5qadbTzVZLSY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IgIkicS0g2kRpSoyZAYhpAmhpLTebWnXJ1VPm3aeMVvJkmOUtrVHWdmc91s1AkfvjEydLutfEe0/tJhXm0mjwsZaLqhfT4zZfD/c5fFKCs45BVXgZGSW5s/VSKhyVa+m+RtdZb37ojYm+jTwtHQ1oBjGwNpAu5dZ0u2CbuhmB2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ovk7ETsk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C5CC4CED1;
-	Thu, 13 Feb 2025 09:02:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739437355;
-	bh=ua5WVx0I54fdUo13pJ7VbTe7xfRZawQhzWzOpvpRg1c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ovk7ETsketUvOyZ4x0M+tYWtrM8P3TrEw/+n7GF9T7YrLRxw4AU7ZYRDEoljujezS
-	 AKAc9XP9P+4gbCsas1wjAxVjcDzy1n9OxHHIYQYAth2nefLNJ80T9nIW5uXdpF3wG1
-	 k+3IVIBYeMLwk9p5EPtOFaGJMp8zZ8mHFmu6M+XfuNXOWQ4Wg7AIhNyEHk6rKwfO8k
-	 pyZTIOox8EtBXITKJ/+Xmd38PoDvVB+fo+c01WaH9XzzEphXk6c/Nbe6K9ZtvuQl0r
-	 9E7+muEApvu00wTzkXK1KkMAMOv2PE9BdEneOA87POE8P1eJwnZjCBKal4Ga2PEtEG
-	 iqnncWVcn/HKQ==
-Date: Thu, 13 Feb 2025 10:02:31 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Amelie Delaunay <amelie.delaunay@foss.st.com>
-Cc: Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, devicetree@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 08/10] arm64: dts: st: introduce stm32mp21 SoCs family
-Message-ID: <20250213-accurate-acoustic-mushroom-a0dfbd@krzk-bin>
-References: <20250210-b4-stm32mp2_new_dts-v1-0-e8ef1e666c5e@foss.st.com>
- <20250210-b4-stm32mp2_new_dts-v1-8-e8ef1e666c5e@foss.st.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CcQ5Z7ZdSD4VeL016Xs+/uOcVDOhflzjVUF/NKR1gUS+A8xYviJ4/zxkvEI8C/wJVdamXmV7T0BEpDBrJGme7+aiI/cUhoFEtHQH88Zr9zeNn4zrtvpAV0AxL5Ht4I4eO7dUuPsgMD58XczX3F8y/0kB+vO2FX71TagCN9V1rR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BCbMS/HN; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739437393; x=1770973393;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wyVqmKW6qzEXY/2+wreWQuYQKHFVrSv5qadbTzVZLSY=;
+  b=BCbMS/HNHCJQBkE3pmbg8Tj7pqg15FpLV2xdcdye3JOKmfkUwJcHkRIc
+   nb6pk6itduYYf5Fsq1+HSFzVac46sqTFEk/mch4zkDPuxF4F6DkpSpSDk
+   XBGUzxTeG2nveGslG5I4l9OTxbh4I3d2i2TEIpl+E0txGauWr23v6jDW4
+   d4RgCZD7fui04zSvxMQztu+6rLf9Z7vRNFASJwM8RonTL/Mdw+KXfTqcH
+   nIL9YBTvWqtw/K4N4Kk9yNLDynu17vYAA4YeX+2qY5s/ldnetAWcR1+UC
+   zHtZj3SCdBbGDbDb+rvFHBK2zcEE8f7j0rd86APowFtSuYPdg2o/RpL2K
+   A==;
+X-CSE-ConnectionGUID: aoLaQNZYSnWMF3To2zvJgQ==
+X-CSE-MsgGUID: YppV2PRMSV+Mb22w8jxQRQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="42964606"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="42964606"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 01:03:11 -0800
+X-CSE-ConnectionGUID: xLD9b4BYSA2msdlFhvPgzA==
+X-CSE-MsgGUID: IVYzpRB/RkKRgnnvJ6SyEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="112851152"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 13 Feb 2025 01:03:06 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tiV7g-0016qp-1x;
+	Thu, 13 Feb 2025 09:03:04 +0000
+Date: Thu, 13 Feb 2025 17:02:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Philipp Stanner <phasta@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	Philipp Stanner <pstanner@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] stmmac: Replace deprecated PCI functions
+Message-ID: <202502131623.bMnlG9wy-lkp@intel.com>
+References: <20250212145831.101719-2-phasta@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250210-b4-stm32mp2_new_dts-v1-8-e8ef1e666c5e@foss.st.com>
+In-Reply-To: <20250212145831.101719-2-phasta@kernel.org>
 
-On Mon, Feb 10, 2025 at 04:21:02PM +0100, Amelie Delaunay wrote:
-> From: Alexandre Torgue <alexandre.torgue@foss.st.com>
-> 
-> STM32MP21 family is composed of 3 SoCs defined as following:
-> 
-> -STM32MP211: common part composed of 1*Cortex-A35, common peripherals
-> like SDMMC, UART, SPI, I2C, parallel display, 1*ETH ...
-> 
-> -STM32MP213: STM32MP211 + a second ETH, CAN-FD.
-> 
-> -STM32MP215: STM32MP213 + Display and CSI2.
-> 
-> A second diversity layer exists for security features/ A35 frequency:
-> -STM32MP21xY, "Y" gives information:
->  -Y = A means A35@1.2GHz + no cryp IP and no secure boot.
->  -Y = C means A35@1.2GHz + cryp IP and secure boot.
->  -Y = D means A35@1.5GHz + no cryp IP and no secure boot.
->  -Y = F means A35@1.5GHz + cryp IP and secure boot.
-> 
-> Signed-off-by: Alexandre Torgue <alexandre.torgue@foss.st.com>
-> Signed-off-by: Amelie Delaunay <amelie.delaunay@foss.st.com>
-> ---
->  arch/arm64/boot/dts/st/stm32mp211.dtsi  | 130 ++++++++++++++++++++++++++++++++
->  arch/arm64/boot/dts/st/stm32mp213.dtsi  |   9 +++
->  arch/arm64/boot/dts/st/stm32mp215.dtsi  |   9 +++
->  arch/arm64/boot/dts/st/stm32mp21xc.dtsi |   8 ++
->  arch/arm64/boot/dts/st/stm32mp21xf.dtsi |   8 ++
->  5 files changed, 164 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/st/stm32mp211.dtsi b/arch/arm64/boot/dts/st/stm32mp211.dtsi
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..d384359e0ea16e2593795ff48d4a699324c8ca75
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/st/stm32mp211.dtsi
-> @@ -0,0 +1,130 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
-> +/*
-> + * Copyright (C) STMicroelectronics 2025 - All Rights Reserved
-> + * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
-> + */
-> +#include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +/ {
-> +	#address-cells = <2>;
-> +	#size-cells = <2>;
-> +
-> +	cpus {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +
-> +		cpu0: cpu@0 {
-> +			compatible = "arm,cortex-a35";
-> +			device_type = "cpu";
-> +			reg = <0>;
-> +			enable-method = "psci";
-> +		};
-> +	};
-> +
-> +	arm-pmu {
-> +		compatible = "arm,cortex-a35-pmu";
-> +		interrupts = <GIC_SPI 368 IRQ_TYPE_LEVEL_HIGH>;
-> +		interrupt-affinity = <&cpu0>;
-> +		interrupt-parent = <&intc>;
-> +	};
-> +
-> +	arm_wdt: watchdog {
-> +		compatible = "arm,smc-wdt";
-> +		arm,smc-id = <0xbc000000>;
-> +		status = "disabled";
-> +	};
-> +
-> +	clocks {
-> +		ck_flexgen_08: ck-flexgen-08 {
-> +			#clock-cells = <0>;
-> +			compatible = "fixed-clock";
-> +			clock-frequency = <64000000>;
-> +		};
-> +
-> +		ck_flexgen_51: ck-flexgen-51 {
-> +			#clock-cells = <0>;
-> +			compatible = "fixed-clock";
-> +			clock-frequency = <200000000>;
-> +		};
-> +	};
-> +
-> +	firmware {
-> +		optee {
-> +			compatible = "linaro,optee-tz";
-> +			method = "smc";
-> +		};
-> +
-> +		scmi: scmi {
-> +			compatible = "linaro,scmi-optee";
-> +			#address-cells = <1>;
-> +			#size-cells = <0>;
-> +			linaro,optee-channel-id = <0>;
-> +
-> +			scmi_clk: protocol@14 {
-> +				reg = <0x14>;
-> +				#clock-cells = <1>;
-> +			};
-> +
-> +			scmi_reset: protocol@16 {
-> +				reg = <0x16>;
-> +				#reset-cells = <1>;
-> +			};
-> +		};
-> +	};
-> +
-> +	intc: interrupt-controller@4ac00000 {
+Hi Philipp,
 
-MMIO nodes belong to the soc.
+kernel test robot noticed the following build errors:
 
-> +		compatible = "arm,cortex-a7-gic";
-> +		#interrupt-cells = <3>;
-> +		interrupt-controller;
-> +		reg = <0x0 0x4ac10000 0x0 0x1000>,
-> +		      <0x0 0x4ac20000 0x0 0x2000>,
-> +		      <0x0 0x4ac40000 0x0 0x2000>,
-> +		      <0x0 0x4ac60000 0x0 0x2000>;
-> +	};
-> +
-> +	psci {
-> +		compatible = "arm,psci-1.0";
-> +		method = "smc";
-> +	};
-> +
-> +	timer {
-> +		compatible = "arm,armv8-timer";
-> +		interrupt-parent = <&intc>;
-> +		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
-> +			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
-> +			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
-> +			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>;
-> +		arm,no-tick-in-suspend;
-> +	};
-> +
-> +	soc@0 {
-> +		compatible = "simple-bus";
-> +		#address-cells = <1>;
-> +		#size-cells = <2>;
-> +		interrupt-parent = <&intc>;
-> +		ranges = <0x0 0x0 0x0 0x0 0x80000000>;
+[auto build test ERROR on linus/master]
+[also build test ERROR on v6.14-rc2 next-20250213]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-ranges is the second property. See DTS coding style.
+url:    https://github.com/intel-lab-lkp/linux/commits/Philipp-Stanner/stmmac-Replace-deprecated-PCI-functions/20250212-230254
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250212145831.101719-2-phasta%40kernel.org
+patch subject: [PATCH] stmmac: Replace deprecated PCI functions
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20250213/202502131623.bMnlG9wy-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250213/202502131623.bMnlG9wy-lkp@intel.com/reproduce)
 
-> +		dma-ranges = <0x0 0x0 0x80000000 0x1 0x0>;
-> +
-> +		rifsc: bus@42080000 {
-> +			compatible = "simple-bus";
-> +			reg = <0x42080000 0x0 0x1000>;
-> +			#address-cells = <1>;
-> +			#size-cells = <2>;
-> +			ranges;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502131623.bMnlG9wy-lkp@intel.com/
 
-and here is third.
+All errors (new ones prefixed by >>):
 
-> +			dma-ranges;
-> +
-> +			usart2: serial@400e0000 {
+   In file included from drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:13:
+   In file included from include/linux/pci.h:37:
+   In file included from include/linux/device.h:32:
+   In file included from include/linux/device/driver.h:21:
+   In file included from include/linux/module.h:19:
+   In file included from include/linux/elf.h:6:
+   In file included from arch/s390/include/asm/elf.h:181:
+   In file included from arch/s390/include/asm/mmu_context.h:11:
+   In file included from arch/s390/include/asm/pgalloc.h:18:
+   In file included from include/linux/mm.h:2224:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:197:28: error: expected ';' after return statement
+     197 |                         return PTR_ERR(res.addr)
+         |                                                 ^
+         |                                                 ;
+   3 warnings and 1 error generated.
 
-Although addresses seem wrong. How bus could start at 0x4208 but device
-at 0x400e?
 
-> +				compatible = "st,stm32h7-uart";
-> +				reg = <0x400e0000 0x0 0x400>;
-> +				interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
-> +				clocks = <&ck_flexgen_08>;
-> +				status = "disabled";
-> +			};
-> +		};
-> +
-> +		syscfg: syscon@44230000 {
-> +			compatible = "st,stm32mp25-syscfg", "syscon";
+vim +197 drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
 
-Which soc is this? DTSI says stm32mp211, commit STM32MP21, but
-compatible xxx25?
+   140	
+   141	/**
+   142	 * stmmac_pci_probe
+   143	 *
+   144	 * @pdev: pci device pointer
+   145	 * @id: pointer to table of device id/id's.
+   146	 *
+   147	 * Description: This probing function gets called for all PCI devices which
+   148	 * match the ID table and are not "owned" by other driver yet. This function
+   149	 * gets passed a "struct pci_dev *" for each device whose entry in the ID table
+   150	 * matches the device. The probe functions returns zero when the driver choose
+   151	 * to take "ownership" of the device or an error code(-ve no) otherwise.
+   152	 */
+   153	static int stmmac_pci_probe(struct pci_dev *pdev,
+   154				    const struct pci_device_id *id)
+   155	{
+   156		struct stmmac_pci_info *info = (struct stmmac_pci_info *)id->driver_data;
+   157		struct plat_stmmacenet_data *plat;
+   158		struct stmmac_resources res = {};
+   159		int i;
+   160		int ret;
+   161	
+   162		plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+   163		if (!plat)
+   164			return -ENOMEM;
+   165	
+   166		plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+   167						   sizeof(*plat->mdio_bus_data),
+   168						   GFP_KERNEL);
+   169		if (!plat->mdio_bus_data)
+   170			return -ENOMEM;
+   171	
+   172		plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+   173					     GFP_KERNEL);
+   174		if (!plat->dma_cfg)
+   175			return -ENOMEM;
+   176	
+   177		plat->safety_feat_cfg = devm_kzalloc(&pdev->dev,
+   178						     sizeof(*plat->safety_feat_cfg),
+   179						     GFP_KERNEL);
+   180		if (!plat->safety_feat_cfg)
+   181			return -ENOMEM;
+   182	
+   183		/* Enable pci device */
+   184		ret = pcim_enable_device(pdev);
+   185		if (ret) {
+   186			dev_err(&pdev->dev, "%s: ERROR: failed to enable device\n",
+   187				__func__);
+   188			return ret;
+   189		}
+   190	
+   191		/* The first BAR > 0 is the base IO addr of our device. */
+   192		for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+   193			if (pci_resource_len(pdev, i) == 0)
+   194				continue;
+   195			res.addr = pcim_iomap_region(pdev, i, STMMAC_RESOURCE_NAME);
+   196			if (IS_ERR(res.addr))
+ > 197				return PTR_ERR(res.addr)
+   198			break;
+   199		}
+   200	
+   201		pci_set_master(pdev);
+   202	
+   203		ret = info->setup(pdev, plat);
+   204		if (ret)
+   205			return ret;
+   206	
+   207		res.wol_irq = pdev->irq;
+   208		res.irq = pdev->irq;
+   209	
+   210		plat->safety_feat_cfg->tsoee = 1;
+   211		plat->safety_feat_cfg->mrxpee = 1;
+   212		plat->safety_feat_cfg->mestee = 1;
+   213		plat->safety_feat_cfg->mrxee = 1;
+   214		plat->safety_feat_cfg->mtxee = 1;
+   215		plat->safety_feat_cfg->epsi = 1;
+   216		plat->safety_feat_cfg->edpp = 1;
+   217		plat->safety_feat_cfg->prtyen = 1;
+   218		plat->safety_feat_cfg->tmouten = 1;
+   219	
+   220		return stmmac_dvr_probe(&pdev->dev, plat, &res);
+   221	}
+   222	
 
-> +			reg = <0x44230000 0x0 0x10000>;
-> +		};
-> +	};
-> +};
-> diff --git a/arch/arm64/boot/dts/st/stm32mp213.dtsi b/arch/arm64/boot/dts/st/stm32mp213.dtsi
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..22cdedd9abbf4efac2334d497618daa6cc76727b
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/st/stm32mp213.dtsi
-> @@ -0,0 +1,9 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
-> +/*
-> + * Copyright (C) STMicroelectronics 2024 - All Rights Reserved
-> + * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
-> + */
-> +#include "stm32mp211.dtsi"
-> +
-> +/ {
-> +};
-> diff --git a/arch/arm64/boot/dts/st/stm32mp215.dtsi b/arch/arm64/boot/dts/st/stm32mp215.dtsi
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..d2c63e92b3cc15ec64898374fd2e745a9c71eb6d
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/st/stm32mp215.dtsi
-> @@ -0,0 +1,9 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
-> +/*
-> + * Copyright (C) STMicroelectronics 2024 - All Rights Reserved
-> + * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
-> + */
-> +#include "stm32mp213.dtsi"
-> +
-> +/ {
-> +};
-
-What is the point of this file exactly?
-
-> diff --git a/arch/arm64/boot/dts/st/stm32mp21xc.dtsi b/arch/arm64/boot/dts/st/stm32mp21xc.dtsi
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..39507a7564c8488647a3276eb227eb5f446359e6
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/st/stm32mp21xc.dtsi
-> @@ -0,0 +1,8 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
-> +/*
-> + * Copyright (C) STMicroelectronics 2024 - All Rights Reserved
-> + * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
-> + */
-> +
-> +/ {
-> +};
-
-And this and others.
-
-Best regards,
-Krzysztof
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
