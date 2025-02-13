@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-165741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29BB7A3345E
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:05:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6397FA3345F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:06:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD4151888B18
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:05:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB4093A2ADE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F5727456;
-	Thu, 13 Feb 2025 01:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48627456;
+	Thu, 13 Feb 2025 01:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djD0smPx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSXupULA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921A86FC3
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0719B6FC3
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739408701; cv=none; b=CiuLJRxwOFH13ovQKuqIK0tesCCK6Czu6EyXdrPojipPknIHH0oz9q8yyey7kM2zGFcSHXHvrtdCmFq7bsx7s6+wlg3FuE2Fc4/zJQc7CtDZdmqm1st1C374frgkRM/VAyc5RJ98ipbGJnI5Y69K1W7ySzMQPuHCRYjNlwWKOrg=
+	t=1739408802; cv=none; b=i+etRuByz7BQ+zQ8DKDp1EgDAtKR6TOntcxjuv5HHNOavOXbtq/PSHvLOKCPlia/64O2GR0XxmKRi8h+GON5NeQO7e6dvRbi0YmeXuVDHtX/BWev9XW7PQCU56WLyTNvPR/WQFUq/liHhutrt0Y/5G9VQSM+KyRHNWS5uDqsjKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739408701; c=relaxed/simple;
-	bh=VCp+k0b0I8i8qNTDjUCqpTUw616ANXo4Ro4S57vttdk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A4QC4uAzlgTvEHnk265+gRqm0zTuiCzfYIun1WnKAZ2hg/wEijJ2mzH+rCIksh0Y82HjmVVsESoHH5gZcTjlFWpNd/W1F3FQ1gsn/cwpCYRxTQ6x9WZvhgO1pNKOk1OtjsKB9w8o3vUWS/5k2gIWJrLHIn0eTChes7iiDvMSBM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djD0smPx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD1F9C4CEDF;
-	Thu, 13 Feb 2025 01:05:00 +0000 (UTC)
+	s=arc-20240116; t=1739408802; c=relaxed/simple;
+	bh=oDlZKObnmYpTg4srCcVsOzTKALgSoyXvIgBU0rILKlk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mz70jj0yaCm+9P5EXmChc/OIM3vTSL0N3avr6BUKeg2TAFT9yAxEoITNyoo42TGFBvNq+VnpPm8pvqWSh2qJ2/cE0oOjQ2H10Ag7z8nJjd4XvZoia6C9H8e1GNdkPYxvQe4XKRprtHXh0I9/NsnhYbT6unwCGsUAFS2Dixfn8c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSXupULA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FB81C4CEDF;
+	Thu, 13 Feb 2025 01:06:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739408701;
-	bh=VCp+k0b0I8i8qNTDjUCqpTUw616ANXo4Ro4S57vttdk=;
+	s=k20201202; t=1739408801;
+	bh=oDlZKObnmYpTg4srCcVsOzTKALgSoyXvIgBU0rILKlk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=djD0smPxq/JbHicC6PGDIgvygsnp2NWaFEoGXTWMBHeIuL42J3SWSEn6vlyzagcF/
-	 aYjS3kEUs6uKPr5mFqg1dDV+bRD14oM3pHtfGkr5wlifuk879Lz7OA/SXBVo6nzzBO
-	 3s7TG6fNDnvQLfLjcgGHe40J+s18A5qC1n4C6bGLcyR6FsARZQRKPhtFhjPNNTGgqB
-	 CbaO9e0pmNbHTQKQg2vHfZsso4PaJMyWvpWHH0FC6g4lFiIltnMJAHhuh3ucYMeYGg
-	 ZGw6ApNncspFk9b2eiw4tMsHyo6laxC7ZXJ1P6n7SWu0yuQIK1Pu1v2Oo0Dt5Sqega
-	 JHa4g7v3YYYsA==
+	b=uSXupULAsSi5Fj8eL7B5XalcyuJL060IP1qjT9KnXp4Nk3G+ehtDyImx91v9J1ZVG
+	 DgMF9h0ZoE3dfKEqUeViLFScTpIGa0mVoiRoeK+FGmgjCUsfvL7nMzQjkkNKbAULcB
+	 WlybQ8/dDOQiMlaP7sJecx4vtdWKPfwavEyvAUKPrGZdiG21qRBWJ2+iNBC9+nA6TY
+	 wSCWqgUqeQ/jlwzjlEbkzb4JFNvE882VpK3ZUJ4C00c1fAgGQlhtWQXjW+Il8FHtPu
+	 O4BZ7YiDXETUze8hLqZdxA2WF/W55WR04zeCKj91AgBuHNELl+xihSaT4oJ6srWxU/
+	 UhEWxVFimhosw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
+Cc: tariqt@nvidia.com,
+	idosch@idosch.org,
+	hawk@kernel.org,
+	netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	willemb@google.com,
-	ecree.xilinx@gmail.com,
-	neescoba@cisco.com
-Subject: [PATCH net-next] netdev: clarify GSO vs csum in qstats
-Date: Wed, 12 Feb 2025 17:04:57 -0800
-Message-ID: <20250213010457.1351376-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v3 0/4] eth: mlx4: use the page pool for Rx buffers
+Date: Wed, 12 Feb 2025 17:06:31 -0800
+Message-ID: <20250213010635.1354034-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,44 +63,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Could be just me, but I had to pause and double check that the Tx csum
-counter in qstat should include GSO'd packets. GSO pretty much implies
-csum so one could possibly interpret the csum counter as pure csum offload.
+Convert mlx4 to page pool. I've been sitting on these patches for
+over a year, and Jonathan Lemon had a similar series years before.
+We never deployed it or sent upstream because it didn't really show
+much perf win under normal load (admittedly I think the real testing
+was done before Ilias's work on recycling).
 
-But the counters are based on virtio:
+During the v6.9 kernel rollout Meta's CDN team noticed that machines
+with CX3 Pro (mlx4) are prone to overloads (double digit % of CPU time
+spent mapping buffers in the IOMMU). The problem does not occur with
+modern NICs, so I dusted off this series and reportedly it still works.
+And it makes the problem go away, no overloads, perf back in line with
+older kernels. Something must have changed in IOMMU code, I guess.
 
-  [tx_needs_csum]
-      The number of packets which require checksum calculation by the device.
+This series is very simple, and can very likely be optimized further.
+Thing is, I don't have access to any CX3 Pro NICs. They only exist
+in CDN locations which haven't had a HW refresh for a while. So I can
+say this series survives a week under traffic w/ XDP enabled, but
+my ability to iterate and improve is a bit limited.
 
-  [rx_needs_csum]
-      The number of packets with VIRTIO_NET_HDR_F_NEEDS_CSUM.
+v3:
+ - use priv->rx_skb_size for buffer size calculation
+ - use priv->dma_dir for DMA mapping direction, instead of always BIDIR
+v2: https://lore.kernel.org/20250211192141.619024-1-kuba@kernel.org
+ - remove unnecessary .max_size (Nit by Ido.)
+ - change pool size
+ - fix xdp xmit support description.
+v1: https://lore.kernel.org/20250205031213.358973-1-kuba@kernel.org
 
-and VIRTIO_NET_HDR_F_NEEDS_CSUM gets set on GSO packets virtio sends.
+Jakub Kicinski (4):
+  eth: mlx4: create a page pool for Rx
+  eth: mlx4: don't try to complete XDP frames in netpoll
+  eth: mlx4: remove the local XDP fast-recycling ring
+  eth: mlx4: use the page pool for Rx buffers
 
-Clarify this in the spec to avoid any confusion.
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  15 +--
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 119 +++++++------------
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  17 ++-
+ 3 files changed, 52 insertions(+), 99 deletions(-)
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: willemb@google.com
-CC: ecree.xilinx@gmail.com
-CC: neescoba@cisco.com
----
- Documentation/netlink/specs/netdev.yaml | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 288923e965ae..0b311dc49691 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -457,6 +457,8 @@ name: netdev
-         name: tx-needs-csum
-         doc: |
-           Number of packets that required the device to calculate the checksum.
-+          This counter includes the number of GSO wire packets for which device
-+          calculated the L4 checksum (which means pretty much all of them).
-         type: uint
-       -
-         name: tx-hw-gso-packets
 -- 
 2.48.1
 
