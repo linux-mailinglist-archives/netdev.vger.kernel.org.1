@@ -1,129 +1,250 @@
-Return-Path: <netdev+bounces-166225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB36A3515C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:37:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7B4A3515B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEF6B3ACACA
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:37:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A6C77A2E18
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 22:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D5726B0B2;
-	Thu, 13 Feb 2025 22:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331842661B9;
+	Thu, 13 Feb 2025 22:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b="A2u7Y/t2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WaEr6+/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9EA28A2BF
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 22:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F9428A2BF;
+	Thu, 13 Feb 2025 22:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739486250; cv=none; b=M5+NOWQw4U2InNnEClFH5gqY0fV4R8aGocSypqNNbgZplabJhpsbaPEEMCiZtKwJSCI8SOuLDGfrSG4aDCQZwlmeOt1qE7KNhVom/ynf+8HPM9WwQELKCOjo/7Ek3/ULde39oLpWRBbobdO2hZxiLZCI7KItJLE5AYnwCGfsdTA=
+	t=1739486170; cv=none; b=EN1gdCu4Gb+Cj8DO/h5N+Yi26gGRtyTSw/6EVQ1EzJA4YiOAN5xeOgXzbwu5ufR6KarhzIEiuJVRKt7LK04n+NhWQp7BxTO5I68K5hKd9Yms3YHDovu49QXl569V3TbrkSL6LtzJYzDrzZb1OUUszSm1MTBlaW0La4/d7VyAgoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739486250; c=relaxed/simple;
-	bh=N/GtVIKbrNKHp7u3+KNILK8UBLBvStnUFI+L8StGAaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AL360OHlAiouuOZWvRKNNsGx4CVABZnuo6hbX2sAcudIbA/Y9+jOENEum4/iLYfBeBul3uTFyE8boWH7x0Se9KbAIzKKaeMJ9MUN2sp9X8NvLaLEZ7imQzkYZRYd2HyYIgNcP4O8c0Fl1hp+O0uns6ERAqxQNgbTZFnmnrN6nKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com; spf=pass smtp.mailfrom=stackhpc.com; dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b=A2u7Y/t2; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stackhpc.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ab7fa1bc957so269394566b.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 14:37:27 -0800 (PST)
+	s=arc-20240116; t=1739486170; c=relaxed/simple;
+	bh=b8YXK+PAQe7iLpKqfH4Zqyd1LiYtiuaDceGuhl4FWow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e2LJ6AsSiDRcP3tUn5I0gpOXrmhlhIFJP0++PleCzzn1PRk0zntiuUMX6RN+DgXXOAtvjO9noDXflLYGCF3DJYSwsBJj1c1EwmE5oytb6TMXz5C9PhAzTM3p6zI9c4ycEl+y+oBaMeACE/HjyKm+CEOI+GLJlQvugyp6GtORT60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WaEr6+/0; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38f29a1a93bso661932f8f.1;
+        Thu, 13 Feb 2025 14:36:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stackhpc-com.20230601.gappssmtp.com; s=20230601; t=1739486246; x=1740091046; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ti/+VOCIocKPttQDHr6Em+kigGLsq9eSkNytFJLAUac=;
-        b=A2u7Y/t2ehz7os7HGBH+Q6nQGAit08DAsKKfKJfPvjvjZkghmGfap/8zxANq/bwQVf
-         Ifgz1Vv5ERg7feko7Tl5UoZbFmy1A42MHQtl6zGfrBYNAsRNqB5gjkLR/AzSRebDQhny
-         eEIDgMfkCoyxid3I3+cfJqRB6HcF94JAckewZ2C6y7mi3i7PKdKG6YVtnJpUkaJZlpS7
-         wmczJQME7I938POjwRDk5Rc0TF9ZxikN5sS319/v8JfQZ99OL6OdrmwdBb/DRfH+NMXO
-         ANFWeoPjRuO8ec9ja/44t+JPFQo34hoALh4ySgci98qCJHCjt1iiheQ+/pGscqBUWZOs
-         PnTQ==
+        d=gmail.com; s=20230601; t=1739486166; x=1740090966; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8QgkM4CKIrOB7zZnNdSusnVoGaIEEu2025XfAbdmEc8=;
+        b=WaEr6+/0GilMOzM5COv+DopFsI+bOR2ZAN7ha11trDxSY9AU9NomCwCFvyRYLPwGk9
+         AnLakyPxcvb9hVNNwS878Oaj5JAzPCM0mdxZPAvJjii9ksGReVrJjV+d8V5G+o9aPH7n
+         JiVLep56eF3l7ItrRAEbx2IaTpoxH70aVGY+jQG0bXDKCjocqRcqmRvf7iewabjiU5DK
+         +HVuSPoQsaqO+86aQSMBL52EDV+wNDgHmlzWfH2xUoyN9ASQCUTleat07YtZEoXqsApo
+         54PgYm6HGxMWG3J2NE8HdWMkA75hLHmSvr1tnlIH5v05CieowDlL2J5eyz6Z7DF9OBjU
+         Smog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739486246; x=1740091046;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ti/+VOCIocKPttQDHr6Em+kigGLsq9eSkNytFJLAUac=;
-        b=chmDJ/0k6stdYATuf3aZAqPuBQURWp0j1B0CDVX9YdkaiGEqSNvB7gGbK8nE9LV6DN
-         0yGxLW38rjHWsyHX9jA5+QZ29V56nW5BPrcFhM1NoDLxr6EUixyx5rG23+ioU/nKmWG0
-         5RA0roiI+fFtWXYvuDyOt/hg8uCDhqoumd9O31TtnHz/yr3CWheq2fZ3LIeSV5s03jHA
-         G20ucMwD9BcMg32/iYhcRusyCOvMRN4E3+J0OtUyh9pnLK7iBgSq/3IU5NXki8HhMvGA
-         0SzdIR/rBxtVqUIrfiXBbHTDkznfecOEawGtSATWqehggmJdmWuzyvWLwFBAhpZjY2MD
-         pb7Q==
-X-Gm-Message-State: AOJu0YxsP0gBvILmlgAjFiXaEkxPOLiotL7MHZrzKQilHnMuYKKpX0xE
-	tR9Rm+4o32KohSvyBDdS6HhWu36SZzuXw3aXYb494XA9dUUPFWGWq7qp5YkNOQ5D3UgY+QtbrUv
-	56q4=
-X-Gm-Gg: ASbGncvJu4kcVoibQwYod/xWbk64HAzdDsMRD5J7iYUry2YHxOcWbNBh2N4eRaCtsAW
-	pFEvN221ga2Ha/SMOIupJuIb0uTI+uPIYRkjn22df2HHQtE+GEcB+3A76mOm+/IHugmUPibZHBr
-	MH55539uyw4wubjTScarryQ8Rz1c5Kx2fQXnS631Umijv+3t8koQtTIc7skpuqISwM4vEcgYD7M
-	/lPfEFwIzER50dVZIiE+v1q8fKu3GlniFKSjetnkNW/eQYUWfWXf/b/8wl4xCFGG6oV4ZzJb6Qe
-	nb7dC49n2OChBLEBuEqUEnPqEOFPUAyk9PNSn6u6Vw==
-X-Google-Smtp-Source: AGHT+IFuBSfVPFLF33nT61zGbV5yd7riktQvhGMwBwbDz01AUO1aLz2R/gLee3Suw5FJfRGW6bPCmA==
-X-Received: by 2002:a17:906:c111:b0:ab7:a679:4b00 with SMTP id a640c23a62f3a-aba5017ed23mr494191366b.40.1739486245814;
-        Thu, 13 Feb 2025 14:37:25 -0800 (PST)
-Received: from pierre-rl9.compute.sms-lab.cloud ([185.45.78.154])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba533c146asm211756866b.178.2025.02.13.14.37.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 14:37:25 -0800 (PST)
-From: Pierre Riteau <pierre@stackhpc.com>
-To: netdev@vger.kernel.org
-Cc: Pierre Riteau <pierre@stackhpc.com>
-Subject: [PATCH net] net/sched: cls_api: fix error handling causing NULL dereference
-Date: Thu, 13 Feb 2025 23:36:10 +0100
-Message-ID: <20250213223610.320278-1-pierre@stackhpc.com>
-X-Mailer: git-send-email 2.43.5
+        d=1e100.net; s=20230601; t=1739486166; x=1740090966;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8QgkM4CKIrOB7zZnNdSusnVoGaIEEu2025XfAbdmEc8=;
+        b=ubHxiWZKOIApp337+c04sSCmKhVgSq+RaJYA5WFOv3USrkrvT4h2MnOORVKtHMHjAJ
+         Eu8XWvyU5xH33b9IFuVrSLGp0sC0lejCqasJHEO6qNTXUtLeTmrz43aY1IotKvWHpf3O
+         wj4uJb18u6iGDogWfL578cvH5/RcNu7dh2e+4Ju8BeLPY77riVVvcHfz4dyGjB1t32pG
+         C4OWN7vwA+s1CUOaVObw2U2dpCSEw1MsgdrEbLxXPV1d4NjWUzKFgdw774PnyoA9y3kE
+         7AKtni4eysk+qVv1fPBcp6d2OGWWZ0oCinOYxF8CYNdptzG2b4Jq9lrgs4iizlk6KwX/
+         aR1g==
+X-Forwarded-Encrypted: i=1; AJvYcCU1DhcdqRk78JtrANdJManrJr9+jXc0gOEfWg6T5FKIK2GvpqrYPVSEawLYyaN5tYSGHqpgDOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtSksYNXfGO6kZ29oyEqa+2RYnSTWvSHkTYRedLqbQQ8gj4oGb
+	Rq/A5xYS1RkhSb3vjtnaXpcXqoOiJjQfVU9M+5G6F20tSkLl11r0
+X-Gm-Gg: ASbGnctjnInGn8/Ln8PH1ZSNernd8JMaKVmbymIcacd/UmLD2Rz2YfadkEqRH2nbYBu
+	bIclNr8ydAhtDmfhJzGR32c33INpDEUbM2YlGy/19iqmXKgi/x5ZRUeYZyTGtcmb6TQthvn50hz
+	TLKdAs/ZlEWqCnGDLXFqWD+Gf7KosKTs+RHxXEGJLmhnIce912XUxbNsU7nLi0hMEeq0nmK37wU
+	6VAFm4UjUBjDg6MqYT0CiT/0fsFOsxxr3v/9tUfpT9lyF53jTSk1mqD/VECFTAhq3jauntSMI1M
+	ERlASr1l0YQMrMuv8XmIS77hyw==
+X-Google-Smtp-Source: AGHT+IHK4mKvpdv5/hBcIIA/dl942KqPFgWt6hy/D76b3kdYk+8L7a0BtsljIet6ofJenfgHf7RgCg==
+X-Received: by 2002:a5d:6dae:0:b0:38d:dc57:855d with SMTP id ffacd0b85a97d-38dea2eadd8mr11646275f8f.35.1739486166259;
+        Thu, 13 Feb 2025 14:36:06 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.146.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f7df2sm2971447f8f.84.2025.02.13.14.36.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 14:36:04 -0800 (PST)
+Message-ID: <7565219f-cdbc-4ea4-9122-fe81b5363375@gmail.com>
+Date: Thu, 13 Feb 2025 22:37:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 04/11] io_uring/zcrx: implement zerocopy
+ receive pp memory provider
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250212185859.3509616-1-dw@davidwei.uk>
+ <20250212185859.3509616-5-dw@davidwei.uk>
+ <CAHS8izMOrPWx5X_i+xxjJ8XJyP0Kn-WEcgvK096-WEw1afQ75w@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMOrPWx5X_i+xxjJ8XJyP0Kn-WEcgvK096-WEw1afQ75w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-tcf_exts_miss_cookie_base_alloc() calls xa_alloc_cyclic() which can
-return 1 if the allocation succeeded after wrapping. This was treated as
-an error, with value 1 returned to caller tcf_exts_init_ex() which sets
-exts->actions to NULL and returns 1 to caller fl_change().
+On 2/13/25 20:57, Mina Almasry wrote:
+...
+>> +static void io_zcrx_scrub(struct io_zcrx_ifq *ifq)
+>> +{
+>> +       struct io_zcrx_area *area = ifq->area;
+>> +       int i;
+>> +
+>> +       if (!area)
+>> +               return;
+>> +
+>> +       /* Reclaim back all buffers given to the user space. */
+>> +       for (i = 0; i < area->nia.num_niovs; i++) {
+>> +               struct net_iov *niov = &area->nia.niovs[i];
+>> +               int nr;
+>> +
+>> +               if (!atomic_read(io_get_user_counter(niov)))
+>> +                       continue;
+>> +               nr = atomic_xchg(io_get_user_counter(niov), 0);
+>> +               if (nr && !page_pool_unref_netmem(net_iov_to_netmem(niov), nr))
+>> +                       io_zcrx_return_niov(niov);
+> 
+> I assume nr can be > 1? 
 
-fl_change() treats err == 1 as success, calling tcf_exts_validate_ex()
-which calls tcf_action_init() with exts->actions as argument, where it
-is dereferenced.
+Right
 
-Example trace:
+If it's always 1, then page_pool_put_netmem()
+> does the page_pool_unref_netmem() + page_pool_put_unrefed_netmem() a
+> bit more succinctly.
+...
+>> +       entries = io_zcrx_rqring_entries(ifq);
+>> +       entries = min_t(unsigned, entries, PP_ALLOC_CACHE_REFILL - pp->alloc.count);
+>> +       if (unlikely(!entries)) {
+>> +               spin_unlock_bh(&ifq->rq_lock);
+>> +               return;
+>> +       }
+>> +
+>> +       do {
+>> +               struct io_uring_zcrx_rqe *rqe = io_zcrx_get_rqe(ifq, mask);
+>> +               struct io_zcrx_area *area;
+>> +               struct net_iov *niov;
+>> +               unsigned niov_idx, area_idx;
+>> +
+>> +               area_idx = rqe->off >> IORING_ZCRX_AREA_SHIFT;
+>> +               niov_idx = (rqe->off & ~IORING_ZCRX_AREA_MASK) >> PAGE_SHIFT;
+>> +
+>> +               if (unlikely(rqe->__pad || area_idx))
+>> +                       continue;
+> 
+> nit: I believe a lot of the unlikely in the file are redundant. AFAIU
+> the compiler always treats the condition inside the if as unlikely by
+> default if there is no else statement.
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-CPU: 114 PID: 16151 Comm: handler114 Kdump: loaded Not tainted 5.14.0-503.16.1.el9_5.x86_64 #1
-RIP: 0010:tcf_action_init+0x1f8/0x2c0
-Call Trace:
- tcf_action_init+0x1f8/0x2c0
- tcf_exts_validate_ex+0x175/0x190
- fl_change+0x537/0x1120 [cls_flower]
+That'd be too presumptious of the compiler. Sections can be reshuffled,
+but even without that, the code generation often looks different. The
+annotation is in the right place.
 
-Fixes: 80cd22c35c90 ("net/sched: cls_api: Support hardware miss to tc action")
-Signed-off-by: Pierre Riteau <pierre@stackhpc.com>
----
- net/sched/cls_api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+...
+>> +static netmem_ref io_pp_zc_alloc_netmems(struct page_pool *pp, gfp_t gfp)
+>> +{
+>> +       struct io_zcrx_ifq *ifq = pp->mp_priv;
+>> +
+>> +       /* pp should already be ensuring that */
+>> +       if (unlikely(pp->alloc.count))
+>> +               goto out_return;
+>> +
+> 
+> As the comment notes, this is a very defensive check that can be
+> removed. We pp should never invoke alloc_netmems if it has items in
+> the cache.
 
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 8e47e5355be6..4f648af8cfaa 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -97,7 +97,7 @@ tcf_exts_miss_cookie_base_alloc(struct tcf_exts *exts, struct tcf_proto *tp,
- 
- 	err = xa_alloc_cyclic(&tcf_exts_miss_cookies_xa, &n->miss_cookie_base,
- 			      n, xa_limit_32b, &next, GFP_KERNEL);
--	if (err)
-+	if (err < 0)
- 		goto err_xa_alloc;
- 
- 	exts->miss_cookie_node = n;
+Maybe I'll kill it in the future, but it might be a good idea to
+leave it be as even page_pool.c itself doesn't trust it too much,
+see __page_pool_alloc_pages_slow().
+
+>> +       io_zcrx_ring_refill(pp, ifq);
+>> +       if (likely(pp->alloc.count))
+>> +               goto out_return;
+>> +
+>> +       io_zcrx_refill_slow(pp, ifq);
+>> +       if (!pp->alloc.count)
+>> +               return 0;
+>> +out_return:
+>> +       return pp->alloc.cache[--pp->alloc.count];
+>> +}
+>> +
+>> +static bool io_pp_zc_release_netmem(struct page_pool *pp, netmem_ref netmem)
+>> +{
+>> +       struct net_iov *niov;
+>> +
+>> +       if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+>> +               return false;
+>> +
+> 
+> Also a very defensive check that can be removed. There should be no
+> way for the pp to release a netmem to the provider that didn't come
+
+Agree, but it's a warning and I don't care about performance
+of this chunk to that extent. Maybe we'll remove it later.
+
+> from this provider. netmem should be guaranteed to be a net_iov, and
+
+Not like it matters for now, but I wouldn't say it should be
+net_iov, those callback were initially proposed for huge pages.
+
+> also an io_uring net_iov (not dma-buf one), and specifically be a
+> net_iov from this particular memory provider.
+> 
+>> +       niov = netmem_to_net_iov(netmem);
+>> +       net_mp_niov_clear_page_pool(niov);
+>> +       io_zcrx_return_niov_freelist(niov);
+>> +       return false;
+>> +}
+>> +
+>> +static int io_pp_zc_init(struct page_pool *pp)
+>> +{
+>> +       struct io_zcrx_ifq *ifq = pp->mp_priv;
+>> +
+>> +       if (WARN_ON_ONCE(!ifq))
+>> +               return -EINVAL;
+>> +       if (pp->dma_map)
+>> +               return -EOPNOTSUPP;
+> 
+> This condition should be flipped actually. pp->dma_map should be true,
+> otherwise the provider isn't supported.
+
+It's not implemented in this patch, which is why rejected.
+You can think of it as an unconditional failure, even though
+io_pp_zc_init is not reachable just yet.
+
+>  From the netmem.rst docs we require that netmem page_pools are
+> configured with PP_FLAG_DMA_MAP.
+> 
+> And we actually check that pp->dma_map == true before invoking
+> mp_ops->init(). This code shouldn't be working unless I missed
+> something.
+> 
+> Also arguably this check is defensive. The pp should confirm that
+
+Sure, and I have nothing against defensive checks in cold paths
+
+> pp->dma_map is true before invoking any memory provider, you should
+> assume it is true here (and the devmem provider doesn't check it
+> IIRU).
+
 -- 
-2.43.5
+Pavel Begunkov
 
 
