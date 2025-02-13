@@ -1,159 +1,95 @@
-Return-Path: <netdev+bounces-165954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87713A33C99
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:23:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89431A33CB3
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:27:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B427188F73E
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:21:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E09F3A56D6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F184E219A95;
-	Thu, 13 Feb 2025 10:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2657D21128A;
+	Thu, 13 Feb 2025 10:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="nMTfaWoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward202a.mail.yandex.net (forward202a.mail.yandex.net [178.154.239.91])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F38219A8B;
-	Thu, 13 Feb 2025 10:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD6C211A2B
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441803; cv=none; b=oY7sHJek6c4maQ1OgjkdO0KDuySq1PLLICo0Ite2L86yibFFnUj1xfn3gDFuEVFgwtnltNrqIpmKU5y3svsMJxK8sl4aSB3ZRIX7QKhUrIXFWE79DJW6Kns/dg4XcYDp+Fu07kgIj5/lns2m/BxItY+Zr2ezKkbtyNNNNgEnt0s=
+	t=1739442309; cv=none; b=YqNNI0M/a82suAFN3QQBRNHZDxVUpl6F1zSmXxo7Bd6stTrfKJcR0rYrSm4nv+ic7VUGHyujteQALevjcpe2QF/JV971bW5vrz/gb+j/2x/Gnh79L+hDD4vxLejFw6dyFoO6muZwljlO8ZZzNJlHTt1wJY7HbXO2vVXH8k88tRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441803; c=relaxed/simple;
-	bh=zA9d9gT4g9Tt3Lvb75vKHFhoyfPzrVq1krr7Du+1xjE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=URpxWY3sdtnZjUrKSfOnsb/ZtySo4/aAJQ5WL2T1liVOgPtXiszfZMDSlJzjGEwKSAKTuncG/H0s/yOyCdabcqg2ZWNSst2z3auWTKFU5jtPccV4k9Ngv0/lGAETX94BBKofMxjhmz73gHndo1kt/2i5E8Ww5hWa0bM09SjeM1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ab7ca64da5dso138943766b.0;
-        Thu, 13 Feb 2025 02:16:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739441799; x=1740046599;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AY3BpgsmGybHCIcIxGp6caLtrhAoBfIK+U+jcsUKwBE=;
-        b=Ds/Eec/gmBYgww+T5bMLI8Jh0ruxPiaISHuyW3IyitJtM8JnUUSLxDOcGNuZVOfsm4
-         MMq2fQU0TZrjVD2gNTd76UiELlhCXcp6rHLbk6SqyYo9dPq74t/kQCv5hfgdHexYkTZz
-         jm6W/A68bqFn8SvLOzuWkp1eHv3UglZq6Zyb7riBxw2VWY1I1TPq69ThlBgr0sC+U4dL
-         rNMafbdGXAdpbpcknYC1WsZnL3HxbrSo0h4uCVsTgv3px2s0uS0KZffLbDUt7n8MDpnq
-         bPlUqTQPZ5ml4FeG82EB4v6fBA/8lxvRrOlTj5Lb0cq1VZXlJ2o06DVgeaLTrOZcksUD
-         jXBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTLtROGBFexlWVy5MRZENk5Uih3OuAikP08/k2Lp5wv3bZ0Ia6Rnlh4O7kmDG7Pv2AesmbofxRO24gbcM=@vger.kernel.org, AJvYcCX0jsQJ19XncE9XKfjbU5P5qkTzfAtMWIcog5/ocIQKepXUYKpPF/1j3QLfzKUEH76df18M8XZf@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk04IliB5iDvNKna3E1O15iClK4t4pOCq6mfvGH1bS/EcormIx
-	fijn3Jxm6r3G4vZ8EYzL28zWEOkGDcI57yeD9n4Ksh0gROkfUHEb
-X-Gm-Gg: ASbGncv/TIRFAgXV2tfDGI0LKvPLBXZCoXqbXGL45q0avues8vys580m6Lb0WI8emwJ
-	PPisnlc8m0uMtPSbUavcgrZxh/wXYYVFpINIka/Vieo4BY21k8Lnt01lo0W+X+4po97PXD0C3US
-	ZdJWq7FH655kTBHb2vI4psMJEBm+oIP+E+Leck7jb91OwQUKoxAYD877l35wBk62uojrvW6cUtd
-	D3YR4iOD3bozSvJJEDb9ufXmFU1TO7MsB2QZrl07S9hibWafs7HNNNxrT9nUIGWylUeBh4e8+4v
-	x6a8MQ==
-X-Google-Smtp-Source: AGHT+IFK5rp9NhV5zaEVsy2IvOjKKd5D5sQXzWwTqZY7R2x3CwoFBJ3GXyVkM7BQHtWFQXtI0eF5fg==
-X-Received: by 2002:a17:906:fe02:b0:ab7:c11:a980 with SMTP id a640c23a62f3a-aba510aecf0mr192945766b.17.1739441799171;
-        Thu, 13 Feb 2025 02:16:39 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba533bf55bsm99631566b.184.2025.02.13.02.16.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 02:16:38 -0800 (PST)
-Date: Thu, 13 Feb 2025 02:16:36 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, horms@kernel.org, kernel-team@meta.com,
-	kuba@kernel.org, kuniyu@amazon.co.jp, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, ushankar@purestorage.com
-Subject: Re: [PATCH net-next v3 1/3] net: document return value of
- dev_getbyhwaddr_rcu()
-Message-ID: <20250213-kickass-orchid-wildebeest-3ec3ae@leitao>
-References: <20250213073646.14847-1-kuniyu@amazon.com>
- <20250213074748.16001-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1739442309; c=relaxed/simple;
+	bh=sLmXcgWQPjdZ8YiDrrkRYYh/14fsaciQH9W4NMZijBs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f8u/ct8D/4B+HiNzocY0TyBe+liv1dTnLbUXg/KrV+J23W9BV74znFr56mzzPjAVerJ6piC1QGFsoH6xyxlFGwJmoHHvAODfZ1BSXq3nR24X9u/90uDCyxmaUy/IQIdUG5wyiCmnPukQd9Hw95nOdp7wqnExJRORnatVuDnmNuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=nMTfaWoQ; arc=none smtp.client-ip=178.154.239.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
+	by forward202a.mail.yandex.net (Yandex) with ESMTPS id 1970F68E15
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 13:17:40 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0d:9:0:640:2d51:0])
+	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 7F0EC60C80;
+	Thu, 13 Feb 2025 13:17:32 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id UHN94v0OpKo0-SiMejDLf;
+	Thu, 13 Feb 2025 13:17:32 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1739441852; bh=okt5lvHNOAV/TQNY6M7BsY4Wv3YTcQzaa2a50WvPPnk=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=nMTfaWoQq7a0IKXyePlc3ORr9I3LFGBpMt5iMqC0MRSIsLGi5pqQwAZ62Ft0KtvHr
+	 hXdMztsOB0Ki4AQbBXiAMXNved9N3OR9soyy1QF0GdovDCr4a7YOUeOonQPv1roR9/
+	 WlTOqX0HwP8PVJgfaGSfcFNAob2zFOoEOII7Zc60=
+Authentication-Results: mail-nwsmtp-smtp-production-main-52.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH net-next] net: skb: do not assume that ktime_t is equal to s64
+Date: Thu, 13 Feb 2025 13:16:58 +0300
+Message-ID: <20250213101658.1349753-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213074748.16001-1-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-Hello Kuniyuki,
+In 'skb_get_timestamp()', do not assume that 'tstamp' of 'struct
+sk_buff' (which is 'ktime_t') may be implicitly converted to 's64'
+(which is expected by 'ns_to_kernel_old_timeval()') but use
+the convenient 'ktime_to_ns()' instead. Compile tested only.
 
-On Thu, Feb 13, 2025 at 04:47:48PM +0900, Kuniyuki Iwashima wrote:
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date: Thu, 13 Feb 2025 16:36:46 +0900
-> > From: Breno Leitao <leitao@debian.org>
-> > Date: Wed, 12 Feb 2025 09:47:24 -0800
-> > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..0b3480a125fcaa6f036ddf219c29fa362ea0cb29 100644
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -1134,8 +1134,8 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
-> > >   *	The returned device has not had its ref count increased
-> > >   *	and the caller must therefore be careful about locking
-> > >   *
-> > > + *	Return: pointer to the net_device, or NULL if not found
-> > >   */
-> > 
-I am a bit confused about what you are saying.
-> > I noticed here we still mention RTNL and it should be removed.
+Fixes: 13c6ee2a9216 ("socket: Use old_timeval types for socket timestamps")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ include/linux/skbuff.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I have no mention RTNL in this patch at all:
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index bb2b751d274a..200b1dc48b27 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4307,7 +4307,7 @@ static inline ktime_t skb_get_ktime(const struct sk_buff *skb)
+ static inline void skb_get_timestamp(const struct sk_buff *skb,
+ 				     struct __kernel_old_timeval *stamp)
+ {
+-	*stamp = ns_to_kernel_old_timeval(skb->tstamp);
++	*stamp = ns_to_kernel_old_timeval(ktime_to_ns(skb->tstamp));
+ }
+ 
+ static inline void skb_get_new_timestamp(const struct sk_buff *skb,
+-- 
+2.48.1
 
-	# git log -n1 --oneline HEAD~2
-	6d34fd4700231 net: document return value of dev_getbyhwaddr_rcu()
-	# git show  HEAD~2  | grep -i rtnl
-
-> I missed this part is removed in patch 2, but the Return: part
-> is still duplicate.
-
-This part is also unclear to me. What do you mean the "Return:" part is
-still duplicated?
-
-This is how the documentation looks like, after the patch applied:
-
-	/**
-	*      dev_getbyhwaddr_rcu - find a device by its hardware address
-	*      @net: the applicable net namespace
-	*      @type: media type of device
-	*      @ha: hardware address
-	*
-	*      Search for an interface by MAC address. Returns NULL if the device
-	*      is not found or a pointer to the device.
-	*      The caller must hold RCU.
-	*      The returned device has not had its ref count increased
-	*      and the caller must therefore be careful about locking
-	*
-	*      Return: pointer to the net_device, or NULL if not found
-	*/
-	struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
-						const char *ha)
-	{
-		<snip>
-	}
-
-	/**
-	*      dev_getbyhwaddr - find a device by its hardware address
-	*      @net: the applicable net namespace
-	*      @type: media type of device
-	*      @ha: hardware address
-	*
-	*      Similar to dev_getbyhwaddr_rcu(), but the owner needs to hold
-	*      rtnl_lock.
-	*
-	*      Return: pointer to the net_device, or NULL if not found
-	*/
-	struct net_device *dev_getbyhwaddr(struct net *net, unsigned short type,
-					const char *ha)
-	{
-		<snip>
-	}
-
-Where is the Return: part duplicated?
-
-Thanks for the review
---breno
 
