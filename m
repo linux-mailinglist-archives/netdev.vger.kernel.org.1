@@ -1,201 +1,164 @@
-Return-Path: <netdev+bounces-166243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C73A35248
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:43:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6CA0A35262
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:58:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED97B7A28F3
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:42:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E115188E65B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 23:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15E31C84C1;
-	Thu, 13 Feb 2025 23:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3437A1C8606;
+	Thu, 13 Feb 2025 23:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="glKGR2EU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCr8PLr5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3E62753F0
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 23:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B43E275419;
+	Thu, 13 Feb 2025 23:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739490193; cv=none; b=et9ATRgOOxPQw9HniIEwGSbIUnTIBSV1h1G6X+nY3WszLEyTOPlQ1EsTbr8cGtmSrg6bh6zEjSIUgkoWm0u2rTe40GnuH2iTlJzbLohsAVr1upZVM7lypupsHkzcLRJGhzZn5w8mUOSfYSXtEcytu3EBCms8J5ZFRShD6goHaGE=
+	t=1739491080; cv=none; b=Daoqt6JFozkwXZXdL5cntuUq44hZ6dL9Pn7xy0RO0R47gQfYnHAUYrOW18rlY/Jmr4Rj1X8D32amdOlXKUiVNIGUiKMtQ6KqxPsPAkivPc1Hkc2akyyaCe+wXiHZ4EnNc8da3Ui/4zILe+Ap/KpTi8Jj56/HCbXs85tVohymFxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739490193; c=relaxed/simple;
-	bh=vp8maQYM2NETy6d6HTRzgvMFwPBGc9crI8DYbZ/TEx0=;
+	s=arc-20240116; t=1739491080; c=relaxed/simple;
+	bh=CyJpugw1LsL86O0UFW0V7F890o+MkrUy62qQInp0k9g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TQYGG4ixMTgZ49KNCZa29tARpPhaGAgDQFndB9ehkcfRnA0YY6PhUUXi9IM1bZWKpiMrIAFk6HQ01V4fmJxj14wHuAhAH1b9wmJTxnG7rGMEr4LnAzuDNOTfe91W3kTJxv1nXyEDELZQji09/uq8DAzBtzFlPoH1Lj6XW0m4hO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=glKGR2EU; arc=none smtp.client-ip=209.85.166.44
+	 To:Cc:Content-Type; b=rB0WqgBRplMW5KsdvfeHMlp6Gk88SEQNqdxKHhsvYNjVz/qHCMwiuclY9LIO37+9AISUUrxjL0sZ9yCGvw/yyvvX4xCMnTcrtnsYTlEx52HGZ3QcMHABUZ2wrmXF5HtNakyZJqPkpHM+LNAYR/P685Hjrg1g4ScmmOn2Xq8o3Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aCr8PLr5; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-8553d7576daso44872139f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 15:43:11 -0800 (PST)
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3ce7c4115e8so8316165ab.1;
+        Thu, 13 Feb 2025 15:57:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739490190; x=1740094990; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739491077; x=1740095877; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nFeAELSTpJYJIDTrFfLsGAV6f5q4WkIpTckUd4qYPso=;
-        b=glKGR2EUTMqVYCq3BqTZDiqvu1t4dEMWt3YC1ogjFC+MaSSbWklHbmbTLN0Kk7n+LR
-         4THgUD6QF4vEkv146Pp3aHCHJWvPjB0l+kvsJ1zBDQD+rO119E9w4aFE9fJNf8auSLGV
-         azS191c/DLh83YvGT5m37w22nnvK+RpaDanK5xMwXGeNl8QMNy3395saMES8y/PEsYbo
-         oVFCH7pF+r2PDHFqURwbhhCOIYgDQ1o3sQGYipy+dokuT8lBY6oUliEE5t1aDmmHnn0Y
-         vBH/7dh/yFdUCRMGmPo1mgwYT9SstO3I0cO/9mny+nQADVDkqdka4vV7fGyABF/xqHlQ
-         GBwQ==
+        bh=qZ4F6FuyhbgtHMZad3+v5eAA4GhquyF3kxw424UiTto=;
+        b=aCr8PLr5ly+ncS2QbhX5Uz6xN7TSfYXg/MvaJwcik5TqTHmWyNPs/gd6BOb5i8grQV
+         0wep8Bw6GY3svjUwrhk/0Ug9zg+fHeNDOZcfmmgJCre3EsKo9R0a2epJuqQ8CTsEFV+x
+         sunKXIlO9sF4+NNnw2+tVdPnE0GH/Fdo0RtgleaO90e05/fMR8TPpG4NKQo51u4EGcMu
+         O+r54kpawt11s/POHIZXytNLXyNFmUevt6b5H4KGSQCeS16Fpo+pBXqXtJ+qJAuJ0Fsn
+         Rxscy1e5smYOHbj2StAFMgOHHATZpjDsKEQ4dbZnE+TkdEdPjGLR4mqgEsL6voYvVQv4
+         Opbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739490190; x=1740094990;
+        d=1e100.net; s=20230601; t=1739491077; x=1740095877;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nFeAELSTpJYJIDTrFfLsGAV6f5q4WkIpTckUd4qYPso=;
-        b=LA75JQ8xdh/j/e2HAXKiFLIeG1VtykgKBSNiOvgIZUUySSiAUNIqZ8qT43P1jN3ia5
-         XzTDi1RFWKPJc+ZLbi2EET61T0N/5hJ4ci8sK0huv6XN1XA7/wTtCK4Qnyl7yNYiXFc0
-         Fw0REGewnocLAWmi5y0zbwZ16sJlGDdSlzEihf/1XIH8hx73cXxX8+gszfLO7qSMlsRp
-         WFKH9kpzQTQ6epvui2jWIZIw2RyHDBFl+hbDSuxFJzKZpU/YY+yzFrm4Jm31zSHWCH5x
-         I9K5o59Zm6t2U1o7YGylY05V8z9xLBbTrI/AFntCbZY6bgpJAqM6SdO+hPiN7sCnL3Il
-         t47Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX48hhfRRrWYGnEYIorkV2Y7pAuRF3p6gpLZj1VCPua7Jv5nFEy80b+2YgmkxbtjDYw7qaed8c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfYBNLShH3rjbT1uKeeVeBEF3MGzxdqVFoPAkiwQ1ZhTlGmIda
-	RbCtAfyuS7cuUv/M0oVIblDMlPn8Lx3ZO78QWocJmp2wtyUizc0TuZSvApylKEjmYRQMUIJkfcw
-	cB6hmb4VjE+OcpSfcWfZ0ql/MpvE=
-X-Gm-Gg: ASbGnctgeYyWf4mCoKsCCkxgbLPKRSHqGjifj62RM9VcVozCmOsD+fgLvAWN+YgqtX/
-	8M9id2txCMKIHM12vARsTYir/7dG2VNY+7Di4pzjcPOGADeI7fwF3/E3btlwXa5rbqJeh+qc=
-X-Google-Smtp-Source: AGHT+IEM7EzWs6YT42s3AKN/FsDxk0f2GaQtvlhqwKvmsqBc1OHAClAjJ0j4DbrClq5hpR1AyxPs02VmYORDMW670rQ=
-X-Received: by 2002:a92:c569:0:b0:3cf:b9b8:5052 with SMTP id
- e9e14a558f8ab-3d18c21e82cmr48868285ab.3.1739490190545; Thu, 13 Feb 2025
- 15:43:10 -0800 (PST)
+        bh=qZ4F6FuyhbgtHMZad3+v5eAA4GhquyF3kxw424UiTto=;
+        b=DgF+X8AmTGYmPEtaHafTNMOKlyZejoYSJ9gM8rECcIyKdwWVKqSjS94G+XIHT8deZs
+         E/Yr4b4EYTfOSkcJKOt+XS5nCIBCQtWKnhoJeKQ1TkgBP2/o1GUL2VTL7z74uXylQmE5
+         pYz0mJT7GFe1+aT8DlIHzjg+C/7ciZxFyxVyq0+Y/oactQ+ynUDLcDHUSIu5+rRK5o+f
+         KwnQ9IWm5TSDR3onR2pmvO6EztyNOUia1sIOu0Rl0ysig1jbUVrFWh3KgfO4j12XyiA7
+         uraIZmQienmagmDjUiICmekFFiy6hYoIGi4VawreGNBtA4ZXsxoA28sl+ARQOL9CAnZI
+         4o0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXn7iD4l6S8NKk/hDE4gDfD0XKjlyhuDfMXNf5+d7OYWq/DG0zZ2YtcSB4497GNEwfpZFSRa2XQ@vger.kernel.org, AJvYcCXpZ/kyHCBYejVx/iuxnVq/HuW5bHmeBShaX2x+rQ9hHIc7ajUuixdJdAZoWHGiJaccOYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgLcoOEJ4Ucx9SAhsW0FjQG0+WYbseI6JPSGRVp7nMiq0dIloo
+	HYoCcU4Vj4SSU7nzF8gKSTQ0LFU4Z0sbPwIP3Pe0UH7SsXo09c5q3PQWzmP2MKuAnddK5eTfWTy
+	6iwc++O5YCqg00qyOaqj9AuMUYDs=
+X-Gm-Gg: ASbGncuZXv64Mc8oO4pH+mNUu2o5rkItLu3KBGtMozxrVy0yaiz0z6fY6HA0E/29aRe
+	t1gPHZAxlMY7cmGBCA/qdSq+chXUFdtUWwPe1cMJgwNQ4+ojROc/yLY7cRDlD+wyT+YeIlv4=
+X-Google-Smtp-Source: AGHT+IHs6ynJrCp6bpJTtUl/zWcPJBlR2RDsZk5mAx53baSU4wXUbrD+npo4H34S7yvmsRshYPIDDbFsjjTgoRotgCQ=
+X-Received: by 2002:a92:c547:0:b0:3d1:9bca:cf28 with SMTP id
+ e9e14a558f8ab-3d19bcacfe4mr5244415ab.8.1739491077589; Thu, 13 Feb 2025
+ 15:57:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250213052150.18392-1-kerneljasonxing@gmail.com>
- <94376281-1922-40ee-bfd6-80ff88b9eed7@redhat.com> <CAL+tcoC6r=ow4nfjDvv6tDEKgPVOf-c3aHD56_AXmqUrQMyCMg@mail.gmail.com>
- <CAHS8izO0CdzNti7L3ktg4ynkJSptO96VtrzvtUEkzUiR7h38dg@mail.gmail.com>
-In-Reply-To: <CAHS8izO0CdzNti7L3ktg4ynkJSptO96VtrzvtUEkzUiR7h38dg@mail.gmail.com>
+References: <20250213004355.38918-1-kerneljasonxing@gmail.com>
+ <20250213004355.38918-3-kerneljasonxing@gmail.com> <Z66DL7uda3fwNQfH@mini-arch>
+In-Reply-To: <Z66DL7uda3fwNQfH@mini-arch>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 14 Feb 2025 07:42:34 +0800
-X-Gm-Features: AWEUYZkmICFkEmEYImHxLh4sUJLDpNFlre_CLFRpR21OSifU6XWgYYl5PcONNEM
-Message-ID: <CAL+tcoAmYayRmZ=GFpzwczudT4pTwRpH+AMv4TkwSP39q3snDQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] page_pool: avoid infinite loop to schedule
- delayed worker
-To: Mina Almasry <almasrymina@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	ilias.apalodimas@linaro.org, edumazet@google.com, kuba@kernel.org, 
-	horms@kernel.org, hawk@kernel.org
+Date: Fri, 14 Feb 2025 07:57:21 +0800
+X-Gm-Features: AWEUYZlvZP8A6izvqVgz1orpaucnVyGGmfIAfGICcyEez1--no4p9Ag-oRPsCf8
+Message-ID: <CAL+tcoATv6HX5G6wOrquGyyj8C7bFgRZNnWBwnPTKD1gb4ZD=g@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] bpf: add TCP_BPF_RTO_MAX for bpf_setsockopt
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	ncardwell@google.com, kuniyu@amazon.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 14, 2025 at 4:14=E2=80=AFAM Mina Almasry <almasrymina@google.co=
-m> wrote:
+On Fri, Feb 14, 2025 at 7:41=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> On Thu, Feb 13, 2025 at 2:49=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
+> On 02/13, Jason Xing wrote:
+> > Support bpf_setsockopt() to set the maximum value of RTO for
+> > BPF program.
 > >
-> > On Thu, Feb 13, 2025 at 4:32=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> > >
-> > > On 2/13/25 6:21 AM, Jason Xing wrote:
-> > > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > > > index 1c6fec08bc43..e1f89a19a6b6 100644
-> > > > --- a/net/core/page_pool.c
-> > > > +++ b/net/core/page_pool.c
-> > > > @@ -1112,13 +1112,12 @@ static void page_pool_release_retry(struct =
-work_struct *wq)
-> > > >       int inflight;
-> > > >
-> > > >       inflight =3D page_pool_release(pool);
-> > > > -     if (!inflight)
-> > > > -             return;
-> > > >
-> > > >       /* Periodic warning for page pools the user can't see */
-> > > >       netdev =3D READ_ONCE(pool->slow.netdev);
-> > >
-> > > This causes UaF, as catched by the CI:
-> > >
-> > > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/990441/34-udpg=
-ro-bench-sh/stderr
-> > >
-> > > at this point 'inflight' could be 0 and 'pool' already freed.
+> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> > ---
+> >  Documentation/networking/ip-sysctl.rst | 3 ++-
+> >  include/uapi/linux/bpf.h               | 2 ++
+> >  net/core/filter.c                      | 6 ++++++
+> >  tools/include/uapi/linux/bpf.h         | 2 ++
+> >  4 files changed, 12 insertions(+), 1 deletion(-)
 > >
-> > Oh, right, thanks for catching that.
+> > diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/net=
+working/ip-sysctl.rst
+> > index 054561f8dcae..78eb0959438a 100644
+> > --- a/Documentation/networking/ip-sysctl.rst
+> > +++ b/Documentation/networking/ip-sysctl.rst
+> > @@ -1241,7 +1241,8 @@ tcp_rto_min_us - INTEGER
 > >
-> > I'm going to use the previous approach (one-liner with a few comments):
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index 1c6fec08bc43..209b5028abd7 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -1112,7 +1112,13 @@ static void page_pool_release_retry(struct
-> > work_struct *wq)
-> >         int inflight;
-> >
-> >         inflight =3D page_pool_release(pool);
-> > -       if (!inflight)
-> > +       /* In rare cases, a driver bug may cause inflight to go negativ=
-e.
-> > +        * Don't reschedule release if inflight is 0 or negative.
-> > +        * - If 0, the page_pool has been destroyed
-> > +        * - if negative, we will never recover
-> > +        *   in both cases no reschedule is necessary.
-> > +        */
-> > +       if (inflight <=3D 0)
-> >                 return;
-> >
+> >  tcp_rto_max_ms - INTEGER
+> >       Maximal TCP retransmission timeout (in ms).
+> > -     Note that TCP_RTO_MAX_MS socket option has higher precedence.
+> > +     Note that TCP_BPF_RTO_MAX and TCP_RTO_MAX_MS socket option have t=
+he
+> > +     higher precedence for configuring this setting.
 >
-> I think it could still be good to have us warn once so that this bug
-> is not silent.
+> The cover letter needs more explanation about the motivation. And
+> the precedence as well.
 
-Allow me to double-check what you meant here. Applying the above
-patch, we do at least see the warning once in
-page_pool_release_retry()->page_pool_release()->page_pool_inflight()->WARN(=
-)
-before stopping the reschedule.
+I am targeting the net-next tree because of recent changes[1] made by
+Eric. It probably hasn't merged into the bpf-next tree.
 
-Do you expect to see another warning, namely, pr_warn() in
-page_pool_release_retry()? If so, I assume you expect to only print
-out the pool->user.id?
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/co=
+mmit/?id=3Dae9b3c0e79bc
 
 >
-> We can return early if page_pool_release(pool) =3D=3D 0, and then only
-> schedule_delayed_work() after the warning if inflight is positive.
+> WRT precedence, can you install setsockopt cgroup program and filter out
+> calls to TCP_RTO_MAX_MS?
 
-Based on the above analysis, can we adjust in this way:
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 1c6fec08bc43..e1831cc23d9c 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -625,8 +625,8 @@ s32 page_pool_inflight(const struct page_pool
-*pool, bool strict)
+Yesterday, as suggested by Kuniyuki, I decided to re-use the same
+logic of TCP_RTO_MAX_MS for bpf_setsockopt():
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 2ec162dd83c4..ffec7b4357f9 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -5382,6 +5382,7 @@ static int sol_tcp_sockopt(struct sock *sk, int optna=
+me,
+        case TCP_USER_TIMEOUT:
+        case TCP_NOTSENT_LOWAT:
+        case TCP_SAVE_SYN:
++       case TCP_RTO_MAX_MS:
+                if (*optlen !=3D sizeof(int))
+                        return -EINVAL;
+                break;
 
-        if (strict) {
-                trace_page_pool_release(pool, inflight, hold_cnt, release_c=
-nt);
--               WARN(inflight < 0, "Negative(%d) inflight packet-pages",
--                    inflight);
-+               WARN(inflight < 0, "Pool id(%u): negative(%d) inflight
-packet-pages",
-+                    pool->user.id, inflight);
-        } else {
-                inflight =3D max(0, inflight);
-        }
-@@ -1112,7 +1112,13 @@ static void page_pool_release_retry(struct
-work_struct *wq)
-        int inflight;
+Are you referring to using the previous way (by introducing a new flag
+for BPF) because we need to know the explicit precedence between
+setsockopt() and bpf_setsockopt() or other reasons? If so, I think
+there are more places than setsockopt() to modify.
 
-        inflight =3D page_pool_release(pool);
--       if (!inflight)
-+       /* In rare cases, a driver bug may cause inflight to go negative.
-+        * Don't reschedule release if inflight is 0 or negative.
-+        * - If 0, the page_pool has been destroyed
-+        * - if negative, we will never recover
-+        *   in both cases no reschedule is necessary.
-+        */
-+       if (inflight <=3D 0)
-                return;
+And, sorry that I don't follow what you meant by saying "install
+setsockopt cgroup program" here. Please provide more hints.
+
+Thanks for the review:)
 
 Thanks,
 Jason
