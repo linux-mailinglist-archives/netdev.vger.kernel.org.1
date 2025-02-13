@@ -1,189 +1,138 @@
-Return-Path: <netdev+bounces-166003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB79A33E8B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:57:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63940A33E93
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDFDC16A3F8
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:57:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 178D97A473D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2005A21D3E0;
-	Thu, 13 Feb 2025 11:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E1D21D3EE;
+	Thu, 13 Feb 2025 11:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BmZ8DQav"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Km/QdEei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505E821D3CC
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA80207679;
+	Thu, 13 Feb 2025 11:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739447865; cv=none; b=tVkyLItfGcpkMhfKGh/2Pu3qBia4hTgeHHwVX2vBH0RuqDBNISqXDZ1U2ZVhIIlXP74leRinCIA8LEAGPDprGafkl6UWYy2hd7iHk7p2a4whZFwAoIR3OBvj19+Wv+mPgxcaQhExEDQ/t/tEXgXtpcXEgGmLhuzGg+lPyMUelnc=
+	t=1739447984; cv=none; b=Esqx3T8A7aPPBm8kCK0G/484nMVAFlEjvzTTYEg/6gCrOTGqkvvheqitX/bW0Jue75giKy/v/JNWbLgMZnjRhqNzCXtYIy+2L7fkHWKaZmBxq9SUQCdgePanDyo9yawQlDNg87TqrPnmO7pK2iJSSzbnnzhpPdZOCQTjmH2bqzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739447865; c=relaxed/simple;
-	bh=yzqgDzTGf/8C6C+JiXBBSxWVkV9g4M2mkZZB9M3Fjgs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=re4gE2tvZlLpYrb/sUR9wWOF1eFKUH1n8udX1V9DcnNfM0rYbQStTR8rp0SkS0d21CdaGfEBOncYe8jXxaEy/cgXrPnvn3VTuFrvl1usyS9pch+Z9tXeHgfj3r3lXmPNUDpZj4LYNe5n3ykc64Etcs2mbBwfvKXNxi0oVfII5yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BmZ8DQav; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e46ac799015so611449276.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:57:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739447862; x=1740052662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nAeTsbP8grO1Y1/oZD12vcfULFlMlyIveKrhN6hNGEI=;
-        b=BmZ8DQavkVD9Z95BQtugJILjJHgagnK1TT4UANbdnVLI0Uvg6IMSMg5U+XGZDA6DRK
-         M8KRZ5U46ho7vaEFIyZ9PT5RskQZMrxtLcPWdOHeJ4CkiinMwKkcnGiKywy8tQxSVkAm
-         A72uCu1Yb8XphMW+usdYrwwgaPGwDK/cdku7rxYsFH3m93DUHLJvImcXSGNqca1dszkt
-         ZhvARr4EimXEmo7ZNXQXz93CeHdl0bH1ucCOcdsC5HiLt2o6y2LGwW3UmsFr5490beZ+
-         L8VvqjIKMa4wUVko9KnZFQC6pnG/3H0dauwUN3Oteih/Qo9RMY05H59It/yJ9qYgMTS+
-         XuBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739447862; x=1740052662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nAeTsbP8grO1Y1/oZD12vcfULFlMlyIveKrhN6hNGEI=;
-        b=FKUy7tvG6J+OEylGKcaI8SrM2aCodzDVW8mKC+Hn6ceQmdPhEi9bN8tJMHw2bk05j0
-         wyPOct2WpztuLS4nJ5u05xy3Gg2Fb/t0kEAXU6ZlpmfW2lxeqp+MNdj44L0gPNByi4WH
-         SxS6mxCzw9TMCKSZMJ68QoItwhdtaFlt/2TTZ1w30LL8ZehIl6VPaF9HBz7a1fATggBb
-         7kIRKbfWXrXJ5eo31Zc9HF5Xo/9MQH3C52n6rQx0aE2qk0O4wO3wEYcafLCsvVZdfdEr
-         0yzSMPIcDp0md7SrBxnF+uR+v6/O4hfU/ujaJQ6TZu1zVMfdfNHyw5B7AbXy4P+zoV+T
-         Q3jA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1zR/lzZlQerkNEBj4l37VKAsEICAdBgyxLHhH5OAovKtQEcYJ3W2ji8ECxqEzsf1DwuyfbSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMOnlgUQR8B/VpAA3el+isNFCot5SQq2uKmwk+P0e9a2oJWp7P
-	iN4ttLYrwzuxpClcPM4YqDuW1Sk0DGPYls7eOPHNDDq2v8ceuB6n/oEm8t8fAZ+iyZQ/BND9KXz
-	xKmSdKcWxNKctvnXI/SY5WzKNqXuXY4NULqKg
-X-Gm-Gg: ASbGncsxH4WhUbi5iNhCyCkJW5ljyandY/KD3MS3o61WCWSMsyN9WCc3c2Ee/awwBf4
-	uaGaykcTVNn0L6rZ2CyB4iHmfyhaXS3dw5huuqxPHgZksaaEZ7IVHqx2GgdeoBoUJaBQgEg==
-X-Google-Smtp-Source: AGHT+IHTHu2Wq5Nkq1URd0WoKprD88+1HOlz9mbdLilD1o4mfqGQKrXJqnLzk82cnP2aJxrlsMsgC1wNWJ75V9QJuq0=
-X-Received: by 2002:a05:6902:2102:b0:e5a:c5d6:3948 with SMTP id
- 3f1490d57ef6-e5d9efe9db7mr6943660276.0.1739447862000; Thu, 13 Feb 2025
- 03:57:42 -0800 (PST)
+	s=arc-20240116; t=1739447984; c=relaxed/simple;
+	bh=M6xHy0PaBRNYWRNxSZCbYoFZj0B7Im/gkJxtcK2w4P0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CjtxCgOQLwC8OtbALr1zXjIYWwYBE4SHpHFHivuXiEtwFOwgqEvMaKB8YTDhoRlNlOxMo4hak44z7o6we/m18wwvkp11/nIBo9V8FnEiXAVHImN1gp5XBNjHJY+dZv6dtsE2Gt5pdHvgniuv/oeXiJspb+CG6Q9VBhNMYRyEfsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Km/QdEei; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tiXsR-002RrJ-Bp; Thu, 13 Feb 2025 12:59:31 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=MJxuBFt87kX2zvCd0qkdSTjP0KE9NQ09/Go+P1LdO8w=
+	; b=Km/QdEeiW+wJfB4HcnZ2vizgg/6ZsEd0R+Pywlq4RCj+ZvmL6z3AM1JTpsS4x10JeH+agLY7j
+	Ex5xZz8bOLyFybbpkSq2TENG9IldBecrzVsvY1GY0d7AI85SacJw9mS/X3oKkwDKd34h6zgve6ZFx
+	3IBaiegUy+RyaIAK8lktwkrVChpg784HWhoJFmZvLPjry+1Ap/eqbdpN+UqYOw6UCfYEgMKWxSES+
+	zcBJAknGqs5GZJ3/Xuw9kGF+sPydmyEHwFN/Yk+Za5Ql/K6cJW94n03x5AzIVvXV17YP5nFcCn5/4
+	sjiMO0kaBTQ7fHxY6oS31NDSVWU/mKPAm6fb1A==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tiXsP-0005H5-NV; Thu, 13 Feb 2025 12:59:29 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tiXs9-008u87-0O; Thu, 13 Feb 2025 12:59:13 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net 0/4] sockmap, vsock: For connectible sockets allow only
+ connected
+Date: Thu, 13 Feb 2025 12:58:48 +0100
+Message-Id: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021352-dairy-whomever-f8bd@gregkh>
-In-Reply-To: <2025021352-dairy-whomever-f8bd@gregkh>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Thu, 13 Feb 2025 19:57:15 +0800
-X-Gm-Features: AWEUYZlq75LIFYPIrtEvnz3TB7WFuT6LMkfSPqyFE9VT04sCMSzyEJ2iGUZu7t0
-Message-ID: <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>, luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHjerWcC/x3MywrCMBBG4Vcps3YgCVgvryIuQvzVwTgNmbQIp
+ e9udHe+zVnJUAVG52GlikVMJu3wu4HSM+oDLLduCi7sXfCOF5vSi7NYg/Kv37GwzjmXVhkjjiH
+ Fw2n0nvqiVNzl899fSNHoum1f0a+gwHMAAAA=
+X-Change-ID: 20250210-vsock-listen-sockmap-nullptr-e6e82ca79611
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, Stefano Garzarella <sgarzare@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-The btusb driver data is allocated by devm_kzalloc and is
-automatically freed on driver detach, so I guess we don't have
-anything to do here.
-Or perhaps we should move btusb_disconnect's content here? Luiz, what
-do you think?
+Series deals with one more case of vsock surprising BPF/sockmap by being
+inconsistency about (having an) assigned transport.
 
-On Thu, Feb 13, 2025 at 6:01=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Thu, Feb 13, 2025 at 11:43:59AM +0800, Hsin-chen Chuang wrote:
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > Expose the isoc_alt attr with device group to avoid the racing.
-> >
-> > Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> > it also becomes the parent device of hci dev.
-> >
-> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
-USB alt setting")
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> > Changes in v4:
-> > - Create a dev node for btusb. It's now hci dev's parent and the
-> >   isoc_alt now belongs to it.
-> > - Since the changes is almost limitted in btusb, no need to add the
-> >   callbacks in hdev anymore.
-> >
-> > Changes in v3:
-> > - Make the attribute exported only when the isoc_alt is available.
-> > - In btusb_probe, determine data->isoc before calling hci_alloc_dev_pri=
-v
-> >   (which calls hci_init_sysfs).
-> > - Since hci_init_sysfs is called before btusb could modify the hdev,
-> >   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs=
-.
-> >
-> >  drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
-> >  include/net/bluetooth/hci_core.h |  1 +
-> >  net/bluetooth/hci_sysfs.c        |  3 +-
-> >  3 files changed, 79 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 1caf7a071a73..cb3db18bb72c 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -920,6 +920,8 @@ struct btusb_data {
-> >       int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> >
-> >       struct qca_dump_info qca_dump;
-> > +
-> > +     struct device dev;
-> >  };
-> >
-> >  static void btusb_reset(struct hci_dev *hdev)
-> > @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
-> >       int alt;
-> >       int ret;
-> >
-> > +     if (!data->hdev)
-> > +             return -ENODEV;
-> > +
-> >       if (kstrtoint(buf, 10, &alt))
-> >               return -EINVAL;
-> >
-> > @@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev=
-,
-> >
-> >  static DEVICE_ATTR_RW(isoc_alt);
-> >
-> > +static struct attribute *btusb_sysfs_attrs[] =3D {
-> > +     NULL,
-> > +};
-> > +ATTRIBUTE_GROUPS(btusb_sysfs);
-> > +
-> > +static void btusb_sysfs_release(struct device *dev)
-> > +{
-> > +     // Resource release is managed in btusb_disconnect
->
-> That is NOT how the driver model works, do NOT provide an empty
-> release() function just to silence the driver core from complaining
-> about it.
->
-> If for some reason the code thinks it is handling devices differently
-> than it should be, fix that instead.
->
-> thanks,
->
-> greg k-h
+KASAN: null-ptr-deref in range [0x0000000000000120-0x0000000000000127]
+CPU: 7 UID: 0 PID: 56 Comm: kworker/7:0 Not tainted 6.14.0-rc1+
+Workqueue: vsock-loopback vsock_loopback_work
+RIP: 0010:vsock_read_skb+0x4b/0x90
+Call Trace:
+ sk_psock_verdict_data_ready+0xa4/0x2e0
+ virtio_transport_recv_pkt+0x1ca8/0x2acc
+ vsock_loopback_work+0x27d/0x3f0
+ process_one_work+0x846/0x1420
+ worker_thread+0x5b3/0xf80
+ kthread+0x35a/0x700
+ ret_from_fork+0x2d/0x70
+ ret_from_fork_asm+0x1a/0x30
 
---=20
-Best Regards,
-Hsin-chen
+This bug, similarly to commit f6abafcd32f9 ("vsock/bpf: return early if
+transport is not assigned"), could be fixed with a single NULL check. But
+instead, let's explore another approach: take a hint from
+vsock_bpf_update_proto() and teach sockmap to accept only vsocks that are
+already connected (no risk of transport being dropped or reassigned). At
+the same time straight reject the listeners (vsock listening sockets do not
+carry any transport anyway). This way BPF does not have to worry about
+vsk->transport becoming NULL.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (4):
+      sockmap, vsock: For connectible sockets allow only connected
+      vsock/bpf: Warn on socket without transport
+      selftest/bpf: Adapt vsock_delete_on_close to sockmap rejecting unconnected
+      selftest/bpf: Add vsock test for sockmap rejecting unconnected
+
+ net/core/sock_map.c                                |  3 +
+ net/vmw_vsock/af_vsock.c                           |  3 +
+ net/vmw_vsock/vsock_bpf.c                          |  2 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c       | 70 ++++++++++++++++------
+ 4 files changed, 59 insertions(+), 19 deletions(-)
+---
+base-commit: 9c01a177c2e4b55d2bcce8a1f6bdd1d46a8320e3
+change-id: 20250210-vsock-listen-sockmap-nullptr-e6e82ca79611
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
