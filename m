@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-166096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F06A3486F
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:49:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 835C3A3480F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:42:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C3013B5A0A
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:36:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923CF1893B57
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1161E0087;
-	Thu, 13 Feb 2025 15:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E262222C8;
+	Thu, 13 Feb 2025 15:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uO7a0ndR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlTmOBSF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739611D63C5;
-	Thu, 13 Feb 2025 15:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB7A1946C7;
+	Thu, 13 Feb 2025 15:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739460927; cv=none; b=LnYRVGE8CZGzpeXnnSm4xFEOjcQd9iB1oPscB7c9iJ8OF2MEjwHalIvJJ+CRqjufUWaxr60XOdhTAY6euLSZx4DAUAcsDg/b/OeXr/500RvkJm+jikbMwcrwnZ15LyKkrWZp+9b7VYzRmS+UIRc8DIigIjkU5exSZY7RwfDiYgA=
+	t=1739460930; cv=none; b=lEthUR4+Om03AHrmUSN6MtOS6hoCyhIpHYjQ3npABO7+aNqK0SNkYsBEAhJTWUNP98X5YuET2eyqAJXMz3QEqo9tYdZ7svAY2Lmpxg4KH5ry1rcG2IBQSd6/1dM4ItvU8uoqttfE2b/0fROXdJ7B9Yx7jnLg55FX6uhiccJIa7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739460927; c=relaxed/simple;
-	bh=ssU4RdqHTTIS99kGMo7vpAakHLKzzaATYvo+fq+A+cQ=;
+	s=arc-20240116; t=1739460930; c=relaxed/simple;
+	bh=1Rb+4jmHgXEuS60iJKLLggv5HEm6LdCrBtgbYBGoEos=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c8jqSLW3V2tTM284+TvWHAFprKY4vogQZYUBj2SuEzPuUAaHKPsj+yf4UxFr12iJzAyKCfF9NaFNjMvQ7jnh03f1xz9zX29/Jw8R2HMTJC47zvAgDIRmxqmUfNtEqcb2v7MZeOhuewMiROV8Xe1HAE+ewBida+hpDAIFq0D+20o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uO7a0ndR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0E55C4CED1;
-	Thu, 13 Feb 2025 15:35:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cnRYnRKheECpO/hogjg4WpedX+36Jxm0bpU8dIHSJ9WFl05c6syEP4SX2SXAHbcWECA4Bks6D05w1Z2PofQnGPwc+nDuUax5KGOhej2OaQo8vtmAZks5JAf/c0HucxWq/5rMdjuno+dDxE8SQCA+Jfyi3RKrvvgq9R92EASGQ2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlTmOBSF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FAF9C4CED1;
+	Thu, 13 Feb 2025 15:35:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739460927;
-	bh=ssU4RdqHTTIS99kGMo7vpAakHLKzzaATYvo+fq+A+cQ=;
+	s=k20201202; t=1739460929;
+	bh=1Rb+4jmHgXEuS60iJKLLggv5HEm6LdCrBtgbYBGoEos=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=uO7a0ndRYHxXSAXUlwo3Vox2zQ030aDqcqH4H0VYuj6IbM5nyKrpL7vZ1z8x6ifL9
-	 j+fjTyZtTyMczktbqf9XxPaQ12XQCX/4Lo4HP8mnlz107Hp/tNdZh4n/fS67DEC00B
-	 pWj/P6aL//jKb9WfH/mH2QjlBYCXQjMRbQJzOA26ON8+MQZfdnkc0S9HMBS086PcS/
-	 suScRpo6dJcHUwDqe2BiafRrb35M+xxWDlXyAKWB9I5DXgk22v0vJdFVBA5l++GMlW
-	 QBFL3v7iY2APqQfoXiypQFwH1eR1ssKO7/qOLUQSE1Mr7H1smAAR4MVv3w/GcYzhqk
-	 5Iz1appFygTgg==
+	b=rlTmOBSFo+RcrfcO8/EmCHfzZBHverrEfQsyN06895sn8vNq1ESdLEar9wl6ALNMa
+	 WCLJbzIuOrrVP/QY/7sJ+nBoUv4LTA0AClk6BFxKU80hsL2KO85UAzK8FeFQCa3BVX
+	 TNSDwiFbiqpC8feFfSy087Yyt9yAkQk1Z2lD96tulJWD9vJvmkPA0bQUnbxoUfRi8L
+	 JQu1hCbfiyzSL/mtwgvEryIa7Yxk7a0/lAD8VNwZixijgPta+K14y89bv/BIB6GapT
+	 W0sSwtfYuDPSaNTLmEwl/HKyqlnsAZ3HfoKuYEwmOJwCGPwpX0ZnIN5eFPLLG1Sbos
+	 /uk9x633BJLtA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 13 Feb 2025 16:34:34 +0100
-Subject: [PATCH net-next v4 15/16] net: airoha: Add loopback support for
- GDM2
+Date: Thu, 13 Feb 2025 16:34:35 +0100
+Subject: [PATCH net-next v4 16/16] net: airoha: Introduce PPE debugfs
+ support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250213-airoha-en7581-flowtable-offload-v4-15-b69ca16d74db@kernel.org>
+Message-Id: <20250213-airoha-en7581-flowtable-offload-v4-16-b69ca16d74db@kernel.org>
 References: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
 In-Reply-To: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,216 +73,293 @@ Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  upstream@airoha.com
 X-Mailer: b4 0.14.2
 
-Enable hw redirection for traffic received on GDM2 port to GDM{3,4}.
-This is required to apply Qdisc offloading (HTB or ETS) for traffic to
-and from GDM{3,4} port.
+Similar to PPE support for Mediatek devices, introduce PPE debugfs
+in order to dump binded and unbinded flows.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c  | 69 ++++++++++++++++++++++++++++++-
- drivers/net/ethernet/airoha/airoha_eth.h  |  7 ++++
- drivers/net/ethernet/airoha/airoha_ppe.c  | 13 +++---
- drivers/net/ethernet/airoha/airoha_regs.h | 29 +++++++++++++
- 4 files changed, 110 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/airoha/Makefile             |   1 +
+ drivers/net/ethernet/airoha/airoha_eth.h         |  14 ++
+ drivers/net/ethernet/airoha/airoha_ppe.c         |  17 ++-
+ drivers/net/ethernet/airoha/airoha_ppe_debugfs.c | 175 +++++++++++++++++++++++
+ 4 files changed, 203 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 3065f418c92ad51b4042433110a678b39702e9c7..d2fd4a4f6cd325e47e3d1273aad795faabe13def 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1588,14 +1588,79 @@ static int airoha_dev_set_macaddr(struct net_device *dev, void *p)
- 	return 0;
- }
+diff --git a/drivers/net/ethernet/airoha/Makefile b/drivers/net/ethernet/airoha/Makefile
+index 6deff2f16229a7638be0737caa06282ba63183a4..94468053e34bef8fd155760e13745a8663592f4a 100644
+--- a/drivers/net/ethernet/airoha/Makefile
++++ b/drivers/net/ethernet/airoha/Makefile
+@@ -5,4 +5,5 @@
  
-+static void airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
-+{
-+	u32 pse_port = port->id == 3 ? FE_PSE_PORT_GDM3 : FE_PSE_PORT_GDM4;
-+	struct airoha_eth *eth = port->qdma->eth;
-+	u32 chan = port->id == 3 ? 4 : 0;
-+
-+	/* Forward the traffic to the proper GDM port */
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(2), pse_port);
-+	airoha_fe_clear(eth, REG_GDM_FWD_CFG(2), GDM_STRIP_CRC);
-+
-+	/* Enable GDM2 loopback */
-+	airoha_fe_wr(eth, REG_GDM_TXCHN_EN(2), 0xffffffff);
-+	airoha_fe_wr(eth, REG_GDM_RXCHN_EN(2), 0xffff);
-+	airoha_fe_rmw(eth, REG_GDM_LPBK_CFG(2),
-+		      LPBK_CHAN_MASK | LPBK_MODE_MASK | LPBK_EN_MASK,
-+		      FIELD_PREP(LPBK_CHAN_MASK, chan) | LPBK_EN_MASK);
-+	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(2),
-+		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
-+		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-+		      FIELD_PREP(GDM_LONG_LEN_MASK, AIROHA_MAX_MTU));
-+
-+	/* Disable VIP and IFC for GDM2 */
-+	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(2));
-+	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(2));
-+
-+	if (port->id == 3) {
-+		/* FIXME: handle XSI_PCE1_PORT */
-+		airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(0),  0x5500);
-+		airoha_fe_rmw(eth, REG_FE_WAN_PORT,
-+			      WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
-+			      FIELD_PREP(WAN0_MASK, HSGMII_LAN_PCIE0_SRCPORT));
-+		airoha_fe_rmw(eth,
-+			      REG_SP_DFT_CPORT(HSGMII_LAN_PCIE0_SRCPORT >> 3),
-+			      SP_CPORT_PCIE0_MASK,
-+			      FIELD_PREP(SP_CPORT_PCIE0_MASK,
-+					 FE_PSE_PORT_CDM2));
-+	} else {
-+		/* FIXME: handle XSI_USB_PORT */
-+		airoha_fe_rmw(eth, REG_SRC_PORT_FC_MAP6,
-+			      FC_ID_OF_SRC_PORT24_MASK,
-+			      FIELD_PREP(FC_ID_OF_SRC_PORT24_MASK, 2));
-+		airoha_fe_rmw(eth, REG_FE_WAN_PORT,
-+			      WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
-+			      FIELD_PREP(WAN0_MASK, HSGMII_LAN_ETH_SRCPORT));
-+		airoha_fe_rmw(eth,
-+			      REG_SP_DFT_CPORT(HSGMII_LAN_ETH_SRCPORT >> 3),
-+			      SP_CPORT_ETH_MASK,
-+			      FIELD_PREP(SP_CPORT_ETH_MASK, FE_PSE_PORT_CDM2));
-+	}
-+}
-+
- static int airoha_dev_init(struct net_device *dev)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_eth *eth = port->qdma->eth;
-+	u32 pse_port;
- 
- 	airoha_set_macaddr(port, dev->dev_addr);
--	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(port->id),
--				    FE_PSE_PORT_PPE1);
-+
-+	switch (port->id) {
-+	case 3:
-+	case 4:
-+		airhoha_set_gdm2_loopback(port);
-+		fallthrough;
-+	case 2:
-+		pse_port = FE_PSE_PORT_PPE2;
-+		break;
-+	default:
-+		pse_port = FE_PSE_PORT_PPE1;
-+		break;
-+	}
-+
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(port->id), pse_port);
- 
- 	return 0;
- }
+ obj-$(CONFIG_NET_AIROHA) += airoha-eth.o
+ airoha-eth-y := airoha_eth.o airoha_ppe.o
++airoha-eth-$(CONFIG_DEBUG_FS) += airoha_ppe_debugfs.o
+ obj-$(CONFIG_NET_AIROHA_NPU) += airoha_npu.o
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 60f5dd9908b41f95b5b627640ff6b25c8e3e1706..064941348bd91f1115082bf5e7734f34007953f8 100644
+index 064941348bd91f1115082bf5e7734f34007953f8..18b5fed7ff286b813b260fae121892f44eb1cf8c 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.h
 +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -67,6 +67,13 @@ enum {
- 	QDMA_INT_REG_MAX
+@@ -7,6 +7,7 @@
+ #ifndef AIROHA_ETH_H
+ #define AIROHA_ETH_H
+ 
++#include <linux/debugfs.h>
+ #include <linux/etherdevice.h>
+ #include <linux/iopoll.h>
+ #include <linux/kernel.h>
+@@ -482,6 +483,8 @@ struct airoha_ppe {
+ 
+ 	struct hlist_head *foe_flow;
+ 	u16 foe_check_time[PPE_NUM_ENTRIES];
++
++	struct dentry *debugfs_dir;
  };
  
-+enum {
-+	HSGMII_LAN_PCIE0_SRCPORT = 0x16,
-+	HSGMII_LAN_PCIE1_SRCPORT,
-+	HSGMII_LAN_ETH_SRCPORT,
-+	HSGMII_LAN_USB_SRCPORT,
-+};
+ struct airoha_eth {
+@@ -535,5 +538,16 @@ int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
+ 				 void *cb_priv);
+ int airoha_ppe_init(struct airoha_eth *eth);
+ void airoha_ppe_deinit(struct airoha_eth *eth);
++struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
++						  u32 hash);
 +
- enum {
- 	XSI_PCIE0_VIP_PORT_MASK	= BIT(22),
- 	XSI_PCIE1_VIP_PORT_MASK	= BIT(23),
++#if CONFIG_DEBUG_FS
++int airoha_ppe_debugfs_init(struct airoha_ppe *ppe);
++#else
++static inline int airoha_ppe_debugfs_init(struct airoha_ppe *ppe)
++{
++	return 0;
++}
++#endif
+ 
+ #endif /* AIROHA_ETH_H */
 diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 346bbc9408628067102f5988a1e8f22237110747..71761a0a4b0e93587151e2eae55c090992ce85a2 100644
+index 71761a0a4b0e93587151e2eae55c090992ce85a2..f28ae8735639959a97b99358cfc7e44c1bcac11d 100644
 --- a/drivers/net/ethernet/airoha/airoha_ppe.c
 +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -213,21 +213,22 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
- 	      AIROHA_FOE_IB1_BIND_TTL;
- 	hwe->ib1 = val;
+@@ -377,8 +377,8 @@ static u32 airoha_ppe_foe_get_entry_hash(struct airoha_foe_entry *hwe)
+ 	return hash;
+ }
  
--	val = FIELD_PREP(AIROHA_FOE_IB2_PORT_AG, 0x1f);
-+	val = FIELD_PREP(AIROHA_FOE_IB2_PORT_AG, 0x1f) |
-+	      AIROHA_FOE_IB2_PSE_QOS;
- 	if (dsa_port >= 0)
- 		val |= FIELD_PREP(AIROHA_FOE_IB2_NBQ, dsa_port);
+-static struct airoha_foe_entry *
+-airoha_ppe_foe_get_entry(struct airoha_ppe *ppe, u32 hash)
++struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
++						  u32 hash)
+ {
+ 	if (hash < PPE_SRAM_NUM_ENTRIES) {
+ 		u32 *hwe = ppe->foe + hash * sizeof(struct airoha_foe_entry);
+@@ -845,7 +845,7 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, u16 hash)
+ int airoha_ppe_init(struct airoha_eth *eth)
+ {
+ 	struct airoha_ppe *ppe;
+-	int foe_size;
++	int foe_size, err;
+ 
+ 	ppe = devm_kzalloc(eth->dev, sizeof(*ppe), GFP_KERNEL);
+ 	if (!ppe)
+@@ -866,7 +866,15 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 	if (!ppe->foe_flow)
+ 		return -ENOMEM;
+ 
+-	return rhashtable_init(&eth->flow_table, &airoha_flow_table_params);
++	err = rhashtable_init(&eth->flow_table, &airoha_flow_table_params);
++	if (err)
++		return err;
 +
- 	if (dev) {
- 		struct airoha_gdm_port *port = netdev_priv(dev);
- 		u8 pse_port;
- 
--		pse_port = port->id == 4 ? FE_PSE_PORT_GDM4 : port->id;
-+		if (dsa_port >= 0)
-+			pse_port = port->id == 4 ? FE_PSE_PORT_GDM4 : port->id;
-+		else
-+			pse_port = 2; /* uplink relies on GDM2 loopback */
- 		val |= FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, pse_port);
- 	}
- 
--	/* FIXME: implement QoS support setting pse_port to 2 (loopback)
--	 * for uplink and setting qos bit in ib2
--	 */
--
- 	if (is_multicast_ether_addr(dest_mac))
- 		val |= AIROHA_FOE_IB2_MULTICAST;
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 6cc64c60953a3961b7c93dfa75a289a6f7a6599b..1aa06cdffe2320375e8710d58f2bbb056a330dfd 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -38,6 +38,12 @@
- #define FE_RST_CORE_MASK		BIT(0)
- 
- #define REG_FE_FOE_TS			0x0010
++	err = airoha_ppe_debugfs_init(ppe);
++	if (err)
++		rhashtable_destroy(&eth->flow_table);
 +
-+#define REG_FE_WAN_PORT			0x0024
-+#define WAN1_EN_MASK			BIT(16)
-+#define WAN1_MASK			GENMASK(12, 8)
-+#define WAN0_MASK			GENMASK(4, 0)
-+
- #define REG_FE_WAN_MAC_H		0x0030
- #define REG_FE_LAN_MAC_H		0x0040
++	return err;
+ }
  
-@@ -126,6 +132,7 @@
- #define GDM_IP4_CKSUM			BIT(22)
- #define GDM_TCP_CKSUM			BIT(21)
- #define GDM_UDP_CKSUM			BIT(20)
-+#define GDM_STRIP_CRC			BIT(16)
- #define GDM_UCFQ_MASK			GENMASK(15, 12)
- #define GDM_BCFQ_MASK			GENMASK(11, 8)
- #define GDM_MCFQ_MASK			GENMASK(7, 4)
-@@ -139,6 +146,16 @@
- #define GDM_SHORT_LEN_MASK		GENMASK(13, 0)
- #define GDM_LONG_LEN_MASK		GENMASK(29, 16)
+ void airoha_ppe_deinit(struct airoha_eth *eth)
+@@ -882,4 +890,5 @@ void airoha_ppe_deinit(struct airoha_eth *eth)
+ 	rcu_read_unlock();
  
-+#define REG_GDM_LPBK_CFG(_n)		(GDM_BASE(_n) + 0x1c)
-+#define LPBK_GAP_MASK			GENMASK(31, 24)
-+#define LPBK_LEN_MASK			GENMASK(23, 10)
-+#define LPBK_CHAN_MASK			GENMASK(8, 4)
-+#define LPBK_MODE_MASK			GENMASK(3, 1)
-+#define LPBK_EN_MASK			BIT(0)
+ 	rhashtable_destroy(&eth->flow_table);
++	debugfs_remove(eth->ppe->debugfs_dir);
+ }
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..f79788458903c93ca73d774edaca97f1e08f92a7
+--- /dev/null
++++ b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
+@@ -0,0 +1,175 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2025 AIROHA Inc
++ * Author: Lorenzo Bianconi <lorenzo@kernel.org>
++ */
 +
-+#define REG_GDM_TXCHN_EN(_n)		(GDM_BASE(_n) + 0x24)
-+#define REG_GDM_RXCHN_EN(_n)		(GDM_BASE(_n) + 0x28)
++#include "airoha_eth.h"
 +
- #define REG_FE_CPORT_CFG		(GDM1_BASE + 0x40)
- #define FE_CPORT_PAD			BIT(26)
- #define FE_CPORT_PORT_XFC_MASK		BIT(25)
-@@ -351,6 +368,18 @@
- 
- #define REG_MC_VLAN_DATA		0x2108
- 
-+#define REG_SP_DFT_CPORT(_n)		(0x20e0 + ((_n) << 2))
-+#define SP_CPORT_PCIE1_MASK		GENMASK(31, 28)
-+#define SP_CPORT_PCIE0_MASK		GENMASK(27, 24)
-+#define SP_CPORT_USB_MASK		GENMASK(7, 4)
-+#define SP_CPORT_ETH_MASK		GENMASK(7, 4)
++static void airoha_debugfs_ppe_print_tuple(struct seq_file *m,
++					   void *src_addr, void *dest_addr,
++					   u16 *src_port, u16 *dest_port,
++					   bool ipv6)
++{
++	__be32 n_addr[IPV6_ADDR_WORDS];
 +
-+#define REG_SRC_PORT_FC_MAP6		0x2298
-+#define FC_ID_OF_SRC_PORT27_MASK	GENMASK(28, 24)
-+#define FC_ID_OF_SRC_PORT26_MASK	GENMASK(20, 16)
-+#define FC_ID_OF_SRC_PORT25_MASK	GENMASK(12, 8)
-+#define FC_ID_OF_SRC_PORT24_MASK	GENMASK(4, 0)
++	if (ipv6) {
++		ipv6_addr_cpu_to_be32(n_addr, src_addr);
++		seq_printf(m, "%pI6", n_addr);
++	} else {
++		seq_printf(m, "%pI4h", src_addr);
++	}
++	if (src_port)
++		seq_printf(m, ":%d", *src_port);
 +
- #define REG_CDM5_RX_OQ1_DROP_CNT	0x29d4
- 
- /* QDMA */
++	seq_puts(m, "->");
++
++	if (ipv6) {
++		ipv6_addr_cpu_to_be32(n_addr, dest_addr);
++		seq_printf(m, "%pI6", n_addr);
++	} else {
++		seq_printf(m, "%pI4h", dest_addr);
++	}
++	if (dest_port)
++		seq_printf(m, ":%d", *dest_port);
++}
++
++static int airoha_ppe_debugfs_foe_show(struct seq_file *m, void *private,
++				       bool bind)
++{
++	static const char *const ppe_type_str[] = {
++		[PPE_PKT_TYPE_IPV4_HNAPT] = "IPv4 5T",
++		[PPE_PKT_TYPE_IPV4_ROUTE] = "IPv4 3T",
++		[PPE_PKT_TYPE_BRIDGE] = "L2B",
++		[PPE_PKT_TYPE_IPV4_DSLITE] = "DS-LITE",
++		[PPE_PKT_TYPE_IPV6_ROUTE_3T] = "IPv6 3T",
++		[PPE_PKT_TYPE_IPV6_ROUTE_5T] = "IPv6 5T",
++		[PPE_PKT_TYPE_IPV6_6RD] = "6RD",
++	};
++	static const char *const ppe_state_str[] = {
++		[AIROHA_FOE_STATE_INVALID] = "INV",
++		[AIROHA_FOE_STATE_UNBIND] = "UNB",
++		[AIROHA_FOE_STATE_BIND] = "BND",
++		[AIROHA_FOE_STATE_FIN] = "FIN",
++	};
++	struct airoha_ppe *ppe = m->private;
++	int i;
++
++	for (i = 0; i < PPE_NUM_ENTRIES; i++) {
++		const char *state_str, *type_str = "UNKNOWN";
++		u16 *src_port = NULL, *dest_port = NULL;
++		struct airoha_foe_mac_info_common *l2;
++		unsigned char h_source[ETH_ALEN] = {};
++		unsigned char h_dest[ETH_ALEN];
++		struct airoha_foe_entry *hwe;
++		u32 type, state, ib2, data;
++		void *src_addr, *dest_addr;
++		bool ipv6 = false;
++
++		hwe = airoha_ppe_foe_get_entry(ppe, i);
++		if (!hwe)
++			continue;
++
++		state = FIELD_GET(AIROHA_FOE_IB1_STATE, hwe->ib1);
++		if (!state)
++			continue;
++
++		if (bind && state != AIROHA_FOE_STATE_BIND)
++			continue;
++
++		state_str = ppe_state_str[state % ARRAY_SIZE(ppe_state_str)];
++		type = FIELD_GET(AIROHA_FOE_IB1_PACKET_TYPE, hwe->ib1);
++		if (type < ARRAY_SIZE(ppe_type_str) && ppe_type_str[type])
++			type_str = ppe_type_str[type];
++
++		seq_printf(m, "%05x %s %7s", i, state_str, type_str);
++
++		switch (type) {
++		case PPE_PKT_TYPE_IPV4_HNAPT:
++		case PPE_PKT_TYPE_IPV4_DSLITE:
++			src_port = &hwe->ipv4.orig_tuple.src_port;
++			dest_port = &hwe->ipv4.orig_tuple.dest_port;
++			fallthrough;
++		case PPE_PKT_TYPE_IPV4_ROUTE:
++			src_addr = &hwe->ipv4.orig_tuple.src_ip;
++			dest_addr = &hwe->ipv4.orig_tuple.dest_ip;
++			break;
++		case PPE_PKT_TYPE_IPV6_ROUTE_5T:
++			src_port = &hwe->ipv6.src_port;
++			dest_port = &hwe->ipv6.dest_port;
++			fallthrough;
++		case PPE_PKT_TYPE_IPV6_ROUTE_3T:
++		case PPE_PKT_TYPE_IPV6_6RD:
++			src_addr = &hwe->ipv6.src_ip;
++			dest_addr = &hwe->ipv6.dest_ip;
++			ipv6 = true;
++			break;
++		}
++
++		seq_puts(m, " orig=");
++		airoha_debugfs_ppe_print_tuple(m, src_addr, dest_addr,
++					       src_port, dest_port, ipv6);
++
++		switch (type) {
++		case PPE_PKT_TYPE_IPV4_HNAPT:
++		case PPE_PKT_TYPE_IPV4_DSLITE:
++			src_port = &hwe->ipv4.new_tuple.src_port;
++			dest_port = &hwe->ipv4.new_tuple.dest_port;
++			fallthrough;
++		case PPE_PKT_TYPE_IPV4_ROUTE:
++			src_addr = &hwe->ipv4.new_tuple.src_ip;
++			dest_addr = &hwe->ipv4.new_tuple.dest_ip;
++			seq_puts(m, " new=");
++			airoha_debugfs_ppe_print_tuple(m, src_addr, dest_addr,
++						       src_port, dest_port,
++						       ipv6);
++			break;
++		}
++
++		if (type >= PPE_PKT_TYPE_IPV6_ROUTE_3T) {
++			data = hwe->ipv6.data;
++			ib2 = hwe->ipv6.ib2;
++			l2 = &hwe->ipv6.l2;
++		} else {
++			data = hwe->ipv4.data;
++			ib2 = hwe->ipv4.ib2;
++			l2 = &hwe->ipv4.l2.common;
++			*((__be16 *)&h_source[4]) =
++				cpu_to_be16(hwe->ipv4.l2.src_mac_lo);
++		}
++
++		*((__be32 *)h_dest) = cpu_to_be32(l2->dest_mac_hi);
++		*((__be16 *)&h_dest[4]) = cpu_to_be16(l2->dest_mac_lo);
++		*((__be32 *)h_source) = cpu_to_be32(l2->src_mac_hi);
++
++		seq_printf(m, " eth=%pM->%pM etype=%04x data=%08x"
++			      " vlan=%d,%d ib1=%08x ib2=%08x\n",
++			   h_source, h_dest, l2->etype, data,
++			   l2->vlan1, l2->vlan2, hwe->ib1, ib2);
++	}
++
++	return 0;
++}
++
++static int airoha_ppe_debugfs_foe_all_show(struct seq_file *m, void *private)
++{
++	return airoha_ppe_debugfs_foe_show(m, private, false);
++}
++DEFINE_SHOW_ATTRIBUTE(airoha_ppe_debugfs_foe_all);
++
++static int airoha_ppe_debugfs_foe_bind_show(struct seq_file *m, void *private)
++{
++	return airoha_ppe_debugfs_foe_show(m, private, true);
++}
++DEFINE_SHOW_ATTRIBUTE(airoha_ppe_debugfs_foe_bind);
++
++int airoha_ppe_debugfs_init(struct airoha_ppe *ppe)
++{
++	ppe->debugfs_dir = debugfs_create_dir("ppe", NULL);
++	debugfs_create_file("entries", 0444, ppe->debugfs_dir, ppe,
++			    &airoha_ppe_debugfs_foe_all_fops);
++	debugfs_create_file("bind", 0444, ppe->debugfs_dir, ppe,
++			    &airoha_ppe_debugfs_foe_bind_fops);
++
++	return 0;
++}
 
 -- 
 2.48.1
