@@ -1,95 +1,88 @@
-Return-Path: <netdev+bounces-165759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A381FA33479
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:14:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CF6A334A6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:27:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFED2188A2C2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:14:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DC39188A1A8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DF113B58B;
-	Thu, 13 Feb 2025 01:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D3613B58B;
+	Thu, 13 Feb 2025 01:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DRGo163u"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uhhqpX35"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC00153598
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07757137C2A
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739409227; cv=none; b=cIKL57ZKwjyoNiZ7SoOp5uNAVzArOgufQdWFkYAC8oVAPpzCjlOzDGBnHXtkmUyd+782vN8toPBBSD+69Ra/uLKG+LRsOfLY92BlYuVv9R2sy0rsVsgIUBdm+uamOQD8e0g+xMZz+fuiAfI4VbJ/drKJkm8AhkxJWaZL0pnsj1A=
+	t=1739410057; cv=none; b=sbjKW6D2Rk13PefAIkIoQ9iVlAv4f7XmwULG6OMJqwNhwWnC/Y5Z/lc4dvZrD6Tmw4UTN6k1EcBHfNpxgDs8SoiXIaijrtXoA60fsEor8I2U4FWp8WewmQk65+rFUeHBdvQpcuS4cxhS051G7lxMnr5pADfin88doI/jae1hkE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739409227; c=relaxed/simple;
-	bh=t1ZTNMpHicfVMyIowy0DXLMxgE2fqOtZdkWdpAHwIUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8A+9kJb9HMtACqomVVqXon8c00w1EPauq/btpv08fm2C5m+7bWnEF5aMsK8BOKRv52JHI8K0GS/ABbTZt7pmRbFcXz8vhAOH7rUYzG11nxQQMTLwRbdv8jT/Hgo1owfNE9IxNBRg8wOwTwbjGDXQTnH7x3U/+4RvDzdnutT8f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DRGo163u; arc=none smtp.client-ip=209.85.210.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-726f1de8190so118268a34.3
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:13:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1739409224; x=1740014024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4R/yPIFFTjU1z1BbTkCQhD01Z9CT3ll1m6Xp1u1mhmY=;
-        b=DRGo163uBszmPi9AnYk+KW+doS9ICEzsfkslc6UhhJ0sXzBUQJAVqOr67biStp/D4U
-         slMUpltAvwuBAvLRYA5qmx4ovBzDg+4VMwEigw2/IkI8cRdIi4V87lTaUb7/sC6QiEej
-         BupWYHDJwPBW46RwdDDzaTvLnzFtB5DOtAb/U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739409224; x=1740014024;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4R/yPIFFTjU1z1BbTkCQhD01Z9CT3ll1m6Xp1u1mhmY=;
-        b=NkkNfjwKZr8EwtD53Sj/SX5AvHrqdnE5+n4NIzwjKVr857IIeMFd2u5EHl9OYs2Ygz
-         yp0/x/6NUQ79jnFicSLHLKOU8eZRtQTi7ZlVkIQ/StyBR/VZkbI3HlbjJPcvVQF8dIQ6
-         AkhlHVIxt2OCxnM0RYguXnEtwhIMF77CLQ4Vag7xflMreeXjEV+BxhumGowCDAqTzrCk
-         OZlLkSHeEJ3HlwPkEobq1RbSCOaJl6gCHCwFX8jevrn98GIP+bLkM3/IrDLBu3W5fqy/
-         4R9LuSr39SWMygOtPJKcMtuNe5XqMR1HB++0ljgz+hNc+P6GLgI3BdphIZAGl8n8MzZf
-         5eRw==
-X-Gm-Message-State: AOJu0YyVD1F4nuo1ufK74SnoLyaUR6j2nJpisXoMIG5edcgwWtn2J8IZ
-	27YcOsTxPaY+HVqn1yqvPt3M4nBkJ7zpDsnhbnDECiVAglwAX98IplxpjxvOrg==
-X-Gm-Gg: ASbGncvZakyH4XbIurZYX3Yju9jh0Tyn1doKvPxst1qHqg0RtHVcljcw/8pTRJ0Ta6/
-	Vkpo5nXQ691T3aCtireBvClNW+1uNBQ7LC/wz90xpZO0Tv6p9LaqDbdQnHyCGhvxHwXqBDl8rgE
-	ken3T//uj+FeI0k2RCUY/3BOS4Ku2l2vvy4+nFCl8bQH6PQCg93TvL8I4RkAiw3mnqcp5xGHmK/
-	yQXaCeBHtoQoV2Qjzqem/l0yJBJZJLtM0wKiBNxb5aUkcTyNO2N36ITHCJ1bCUDVgWOEBBs+lNe
-	GaXvpcy7pQOvBLq+1tIuFqCGhDJdksEfblb/0nVJQkdB/U8xmq0q8l/Nmdsq6BTuAuo=
-X-Google-Smtp-Source: AGHT+IFDgEgUU+aBUSTGDH1M5Hq/KLaD64Zz7BNNWUzXGYbKnm4egPysQsPnv6ceNlR5OFNcSV1DMg==
-X-Received: by 2002:a05:6830:3786:b0:71d:fb64:b606 with SMTP id 46e09a7af769-726fe7eea07mr924552a34.23.1739409223871;
-        Wed, 12 Feb 2025 17:13:43 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-727001cdb70sm195967a34.13.2025.02.12.17.13.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 17:13:43 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	michal.swiatkowski@linux.intel.com,
-	helgaas@kernel.org,
-	horms@kernel.org,
-	Manoj Panicker <manoj.panicker2@amd.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Wei Huang <wei.huang2@amd.com>,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v5 11/11] bnxt_en: Add TPH support in BNXT driver
-Date: Wed, 12 Feb 2025 17:12:39 -0800
-Message-ID: <20250213011240.1640031-12-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20250213011240.1640031-1-michael.chan@broadcom.com>
-References: <20250213011240.1640031-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1739410057; c=relaxed/simple;
+	bh=K1KJcO/iMIszsejQubSSJo5rLiAltDSQBLIwlW4rkFI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=syXb+dmEAzjo99LRBcz3dKKNgO0T+J0MHhM+YHqd9lJxIxe+0DlOa31xzlK4HHQCbNSZ3877gKJB36WkgasliZJinST+7Ol3p1buqzII+jx3MzzN4RnNmLXVSHweWub5f5ag6s2jDuAQiCyMqEkxx4I4NbBNwZ24hTXhBbiJ+24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=uhhqpX35; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250213012732epoutp01468def4ab3328c609f56a1ffdf7ba583~joDoA0Z6V0891508915epoutp01P
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:27:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250213012732epoutp01468def4ab3328c609f56a1ffdf7ba583~joDoA0Z6V0891508915epoutp01P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1739410052;
+	bh=cUNcxOwztr93Bkz78+ZRLsndQixwVjIGrEz9jLDFpWY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uhhqpX35kp9D1ni5no1E5IccHc23T2G9lyDkd13WwedzYz2vi0b8e4mi6Lnw4NDHZ
+	 sLPb0ZRzmLViLmp6nhMaD2gzJTXrY9PGP40QbkIY0sj0vU4txPjY767MljrQfxfTmL
+	 QCRlPdTB8LmR0rYCtZw0DAn7kDqTJ8I5ue5p3f6A=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250213012730epcas5p414b410c5ac1edad9af12bc84dfc954bf~joDm3sUjB1474714747epcas5p4v;
+	Thu, 13 Feb 2025 01:27:30 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4YtcxF4CRTz4x9Q7; Thu, 13 Feb
+	2025 01:27:29 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	81.B6.19933.18A4DA76; Thu, 13 Feb 2025 10:27:29 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8~joDezkhkP2020120201epcas5p2f;
+	Thu, 13 Feb 2025 01:27:22 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250213012722epsmtrp2151ed053faea735a7b8c7f91b215dcd6~joDesL5qW2391223912epsmtrp2B;
+	Thu, 13 Feb 2025 01:27:22 +0000 (GMT)
+X-AuditID: b6c32a4a-c1fda70000004ddd-79-67ad4a81014e
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F8.A4.18729.97A4DA76; Thu, 13 Feb 2025 10:27:21 +0900 (KST)
+Received: from asg29.. (unknown [109.105.129.29]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250213012719epsmtip2284086063341bdcb19d2c59a50b4a97f~joDcabYEG2733127331epsmtip2e;
+	Thu, 13 Feb 2025 01:27:19 +0000 (GMT)
+From: Junnan Wu <junnan01.wu@samsung.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, junnan01.wu@samsung.com,
+	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+	ying01.gao@samsung.com, ying123.xu@samsung.com
+Subject: Re: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
+ rx_buf_max_nr when resuming
+Date: Thu, 13 Feb 2025 09:28:05 +0800
+Message-Id: <20250213012805.2379064-1-junnan01.wu@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,229 +90,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTVxze6e29LSw1d6BygA2hDhfZgFZKORUhczLp1JGaLSRzcV1TbgoB
+	bksf2zAuwkQQFAcssBUYj4w5YKBYAXlKVh6DDQaTR1jASbEYAgpUJi4lGWt7cfO/7/f4ft/5
+	fuccLuZhJXy4SbSe0tKKFD7hzm7t3f9acOaxRpVg5q4vKh/NYqOFgXkOuv9tHQfNfzlIoKt3
+	1lno7lQsGmu9gqPy4jSU3TaOo/GOcgJN1FzmoC37Eo4GqnajjV8fAvT9oxEMjRSs4Wi0fAtD
+	y0VbOOq/VYejqS8QGutzTO2ZN+Jv7pY21/3BklaZDFJTfS4hbbdIpIs3jUC6enuSkF5prgfS
+	dZOfjHsq+VAipUigtP4UrVQnJNGqKP7x9+RH5OFigTBYKEERfH9akUpF8WNOyIKPJqU4rPH9
+	P1GkGBwpmUKn44dGH9KqDXrKP1Gt00fxKU1CikakCdEpUnUGWhVCU/qDQoHgQLij8ePkxI3c
+	ekIz7/VZUf8TkAH+8cwDblxIiuD9P2/iecCd60F2AmieWGYxwWMA/7rQBJhgA0BbexfxjGIu
+	aSeYQjeA31Vf3OY/ANAyVY07uwhyPxzsqnUxdpJecKyixsXAyE4Mzt3IdRU8SQoWPVxwEdhk
+	ILQNfe3CPDIajqzVchi5PbDnpxHMid3IOHjDuspmel6CQ0arC2OOnvMtZZhTAJJWLmzafOQ4
+	ONcRxMCJmmBmjidc+rl5e6YPXF/p3raTDPP77dtYDy+t3MEZHAlHr+VgzjGYw8z1jlAm/Qos
+	/uUai5HdAfM3rSwmz4NtFU7sVA2EqwVnmbQvrDOZtlWlDldDHGZX1QA+vprDKQD+pc+5KX3O
+	Ten/ylUAqwfelEaXqqJ04ZoDNPXpf7esVKeagOu5Bx1rA5a5tRAzYHGBGUAuxt/JgyUNKg9e
+	giL9DKVVy7WGFEpnBuGOdRdiPruUasd/ofVyoUgiEInFYpEkTCzke/HOt2epPEiVQk8lU5SG
+	0j7jsbhuPhks73OnopbSwi0yzu3MkuGI2oAhQUnowtshL4zPzkj2Xbe7W09bsivfVzaerGxr
+	3RFED0QX23Li5/TpEUGF8Q1xC0iJG5reZe/hrQ7abT8u9okjA//GYt0DRm99VHW2PS6jcNfe
+	d6ZZNWEfflVRkTnt2wrpDnl89oUu4/Lvh2V9cz60stiu4X5zsU4oOry3rFveUFnWVpj0op0Q
+	fJ5X5Pfq8NO3Zj1g5IPeN8K8+WemY0MpvOxgwLmWo4p8EhlmO23G07KV37IuvT67GbOVPpm9
+	OGxuuRc/V2O53NFI4DPpkoHJey3L6OWTx/clt3bybD8cedLrW/007UTPB36y/qUmIZ+tS1QI
+	gzCtTvEvluIvOHcEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDIsWRmVeSWpSXmKPExsWy7bCSvG6l19p0gytTrS3mnG9hsXh67BG7
+	xeO5K9ktHvWfYLNYdukzk8Xda+4WF7b1sVrMmVpo0bbjMqvF5V1z2CyuLOlht/j/6xWrxbEF
+	YhbfTr9htFj69iyzxdkJH1gtzs/5z2zxetJ/Vouj21eyWlxrsrC4cARo6v5HM1kdxDy2rLzJ
+	5LFgU6nHplWdbB47H1p6vNg8k9Hj/b6rbB59W1YxenzeJBfAEcVlk5Kak1mWWqRvl8CV8a1z
+	FVvBI/GKSUe/MjYw/hPuYuTkkBAwkTg0bSdbFyMXh5DAbkaJo68WMEEkpCW6frcxQ9jCEiv/
+	PWeHKHrCKPFm4l92kASbgKbEiT0r2EBsEQFxiQvzloBNYha4zCxx7ucdsCJhgWSJw9d2gE1i
+	EVCV+HhyOiuIzStgJ3H2wwp2iA3yEvsPngWr4RTwk9j45D0LiC0k4Cux9W4vO0S9oMTJmU/A
+	4sxA9c1bZzNPYBSYhSQ1C0lqASPTKkbJ1ILi3PTcYsMCw7zUcr3ixNzi0rx0veT83E2M4AjU
+	0tzBuH3VB71DjEwcjIcYJTiYlUR4JaatSRfiTUmsrEotyo8vKs1JLT7EKM3BoiTOK/6iN0VI
+	ID2xJDU7NbUgtQgmy8TBKdXANHH3p8SOik+a38N6D1w+9Gi6+BUj5ZgvKv2pL1b+jmI0/te5
+	2/rDjHPv7pyLnbkjP/2xb6XUP2ZpG+v/Dvf623L+y9ls+7137T83rfyOzywmmtcZPXME2Ngd
+	vnW6HTvpt+iqEMeUN3FKJjP3pKnP++p7/6yGXkl7mHFccNkauR1ufzVYmCZniX2Z850nLyN/
+	h4CGvtQO2d/Mm714TXarLk73M10++73Xg6U/5nj+3GX6VFZJ63bV2ZZv3B0snO8mBp3Zd3zK
+	XaPcTx8/zVhovbh9sn/ncp0JMulVVnJyivefPZ2ewPuN+4mZw5p5TElO3f36xat9uz+Lvnx+
+	N/J5ksau6fELH5ZkPZpoJOPMq8RSnJFoqMVcVJwIAOvmwtgvAwAA
+X-CMS-MailID: 20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8
+References: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
+	<CGME20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8@epcas5p2.samsung.com>
 
-From: Manoj Panicker <manoj.panicker2@amd.com>
+>You need to update the title now that you're moving also queued_replies.
+>
 
-Add TPH support to the Broadcom BNXT device driver. This allows the
-driver to utilize TPH functions for retrieving and configuring Steering
-Tags when changing interrupt affinity. With compatible NIC firmware,
-network traffic will be tagged correctly with Steering Tags, resulting
-in significant memory bandwidth savings and other advantages as
-demonstrated by real network benchmarks on TPH-capable platforms.
+Well, I will update the title in V3 version.
 
-Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Co-developed-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
-Cc: Bjorn Helgaas <helgaas@kernel.org>
+>On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
+>>When executing suspend to ram twice in a row,
+>>the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
+>>Then after virtqueue_get_buf and `rx_buf_nr` decreased
+>>in function virtio_transport_rx_work,
+>>the condition to fill rx buffer
+>>(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+>>
+>>It is because that `rx_buf_nr` and `rx_buf_max_nr`
+>>are initialized only in virtio_vsock_probe(),
+>>but they should be reset whenever virtqueues are recreated,
+>>like after a suspend/resume.
+>>
+>>Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+>>virtio_vsock_vqs_init(), so we are sure that they are properly
+>>initialized, every time we initialize the virtqueues, either when we
+>>load the driver or after a suspend/resume.
+>>At the same time, also move `queued_replies`.
+>
+>Why?
+>
+>As I mentioned the commit description should explain why the changes are 
+>being made for both reviewers and future references to this patch.
+>
 
-v3:
-Add MODULE_IMPORT_NS("NETDEV_INTERNAL")
+After your kindly remind, I have double checked all locations where `queued_replies`
+used, and we think for order to prevent erroneous atomic load operations 
+on the `queued_replies` in the virtio_transport_send_pkt_work() function
+which may disrupt the scheduling of vsock->rx_work
+when transmitting reply-required socket packets,
+this atomic variable must undergo synchronized initialization
+alongside the preceding two variables after a suspend/resume.
 
-Previous driver series fixing rtnl_lock and empty release function:
+If we reach agreement on it, I will add this description in V3 version.
 
-https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
+BRs
+Junnan Wu
 
-v5 of the PCI series using netdev_rx_queue_restart():
-
-https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
-
-v1 of the PCI series using open/close:
-
-https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 106 ++++++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |   5 +
- 2 files changed, 111 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 1997cdbd5801..15c57a06ecaf 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -55,6 +55,8 @@
- #include <net/page_pool/helpers.h>
- #include <linux/align.h>
- #include <net/netdev_queues.h>
-+#include <net/netdev_rx_queue.h>
-+#include <linux/pci-tph.h>
- 
- #include "bnxt_hsi.h"
- #include "bnxt.h"
-@@ -76,6 +78,7 @@
- #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
- 				 NETIF_MSG_TX_ERR)
- 
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Broadcom NetXtreme network driver");
- 
-@@ -11351,6 +11354,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
- 	return 0;
- }
- 
-+static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
-+				     const cpumask_t *mask)
-+{
-+	struct bnxt_irq *irq;
-+	u16 tag;
-+	int err;
-+
-+	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-+
-+	if (!irq->bp->tph_mode)
-+		return;
-+
-+	cpumask_copy(irq->cpu_mask, mask);
-+
-+	if (irq->ring_nr >= irq->bp->rx_nr_rings)
-+		return;
-+
-+	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
-+				cpumask_first(irq->cpu_mask), &tag))
-+		return;
-+
-+	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
-+		return;
-+
-+	rtnl_lock();
-+	if (netif_running(irq->bp->dev)) {
-+		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
-+		if (err)
-+			netdev_err(irq->bp->dev,
-+				   "RX queue restart failed: err=%d\n", err);
-+	}
-+	rtnl_unlock();
-+}
-+
-+static void bnxt_irq_affinity_release(struct kref *ref)
-+{
-+	struct irq_affinity_notify *notify =
-+		container_of(ref, struct irq_affinity_notify, kref);
-+	struct bnxt_irq *irq;
-+
-+	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-+
-+	if (!irq->bp->tph_mode)
-+		return;
-+
-+	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
-+		netdev_err(irq->bp->dev,
-+			   "Setting ST=0 for MSIX entry %d failed\n",
-+			   irq->msix_nr);
-+		return;
-+	}
-+}
-+
-+static void bnxt_release_irq_notifier(struct bnxt_irq *irq)
-+{
-+	irq_set_affinity_notifier(irq->vector, NULL);
-+}
-+
-+static void bnxt_register_irq_notifier(struct bnxt *bp, struct bnxt_irq *irq)
-+{
-+	struct irq_affinity_notify *notify;
-+
-+	irq->bp = bp;
-+
-+	/* Nothing to do if TPH is not enabled */
-+	if (!bp->tph_mode)
-+		return;
-+
-+	/* Register IRQ affinity notifier */
-+	notify = &irq->affinity_notify;
-+	notify->irq = irq->vector;
-+	notify->notify = bnxt_irq_affinity_notify;
-+	notify->release = bnxt_irq_affinity_release;
-+
-+	irq_set_affinity_notifier(irq->vector, notify);
-+}
-+
- static void bnxt_free_irq(struct bnxt *bp)
- {
- 	struct bnxt_irq *irq;
-@@ -11373,11 +11453,18 @@ static void bnxt_free_irq(struct bnxt *bp)
- 				free_cpumask_var(irq->cpu_mask);
- 				irq->have_cpumask = 0;
- 			}
-+
-+			bnxt_release_irq_notifier(irq);
-+
- 			free_irq(irq->vector, bp->bnapi[i]);
- 		}
- 
- 		irq->requested = 0;
- 	}
-+
-+	/* Disable TPH support */
-+	pcie_disable_tph(bp->pdev);
-+	bp->tph_mode = 0;
- }
- 
- static int bnxt_request_irq(struct bnxt *bp)
-@@ -11397,6 +11484,12 @@ static int bnxt_request_irq(struct bnxt *bp)
- #ifdef CONFIG_RFS_ACCEL
- 	rmap = bp->dev->rx_cpu_rmap;
- #endif
-+
-+	/* Enable TPH support as part of IRQ request */
-+	rc = pcie_enable_tph(bp->pdev, PCI_TPH_ST_IV_MODE);
-+	if (!rc)
-+		bp->tph_mode = PCI_TPH_ST_IV_MODE;
-+
- 	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
- 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
- 		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
-@@ -11420,8 +11513,11 @@ static int bnxt_request_irq(struct bnxt *bp)
- 
- 		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
- 			int numa_node = dev_to_node(&bp->pdev->dev);
-+			u16 tag;
- 
- 			irq->have_cpumask = 1;
-+			irq->msix_nr = map_idx;
-+			irq->ring_nr = i;
- 			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
- 					irq->cpu_mask);
- 			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
-@@ -11431,6 +11527,16 @@ static int bnxt_request_irq(struct bnxt *bp)
- 					    irq->vector);
- 				break;
- 			}
-+
-+			bnxt_register_irq_notifier(bp, irq);
-+
-+			/* Init ST table entry */
-+			if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
-+						cpumask_first(irq->cpu_mask),
-+						&tag))
-+				continue;
-+
-+			pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag);
- 		}
- 	}
- 	return rc;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 4e20878e7714..e85b5ce94f58 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1234,6 +1234,11 @@ struct bnxt_irq {
- 	u8		have_cpumask:1;
- 	char		name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
- 	cpumask_var_t	cpu_mask;
-+
-+	struct bnxt	*bp;
-+	int		msix_nr;
-+	int		ring_nr;
-+	struct irq_affinity_notify affinity_notify;
- };
- 
- #define HWRM_RING_ALLOC_TX	0x1
--- 
-2.30.1
-
+>The rest LGTM.
+>
+>Stefano
+>
+>>
+>>Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+>>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+>>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>>---
+>> net/vmw_vsock/virtio_transport.c | 10 +++++++---
+>> 1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>index b58c3818f284..f0e48e6911fc 100644
+>>--- a/net/vmw_vsock/virtio_transport.c
+>>+++ b/net/vmw_vsock/virtio_transport.c
+>>@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>> 	};
+>> 	int ret;
+>>
+>>+	mutex_lock(&vsock->rx_lock);
+>>+	vsock->rx_buf_nr = 0;
+>>+	vsock->rx_buf_max_nr = 0;
+>>+	mutex_unlock(&vsock->rx_lock);
+>>+
+>>+	atomic_set(&vsock->queued_replies, 0);
+>>+
+>> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+>> 	if (ret < 0)
+>> 		return ret;
+>>@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>
+>> 	vsock->vdev = vdev;
+>>
+>>-	vsock->rx_buf_nr = 0;
+>>-	vsock->rx_buf_max_nr = 0;
+>>-	atomic_set(&vsock->queued_replies, 0);
+>>
+>> 	mutex_init(&vsock->tx_lock);
+>> 	mutex_init(&vsock->rx_lock);
+>>-- 
+>>2.34.1
+>>
 
