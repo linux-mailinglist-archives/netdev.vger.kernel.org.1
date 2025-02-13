@@ -1,214 +1,149 @@
-Return-Path: <netdev+bounces-165961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99AC7A33CD4
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:36:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A78A33CEA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:46:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31BB51887C39
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:36:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 684523A444F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DE22080D4;
-	Thu, 13 Feb 2025 10:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B852080DD;
+	Thu, 13 Feb 2025 10:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a3dp+88D"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kcgsIF7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F16D201006
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739442975; cv=fail; b=kEeceIswMYxPVNKZSFNGisBwPbd9MJTLWd0FHqTGfp3CSz+dC6BL83fqR8R2vmcQLP+dYD7HE0npIci8cP/BQRAVBcx4cHd+UgqxffyJXeoI05nyN80+xqxKylr3vmsrhjb2OQI0Q4WgyIzG6ueDSEuiboqeEmGE9cVuPGuPjNA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739442975; c=relaxed/simple;
-	bh=ebHCKZJ0B+XAdEXl+QaipuVrfHXzeM55QiJZmL0u108=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IbU8lLS0xQBO9tbuRxRcr3AeGwr5LfVVZAocyN/OFGHapyUvW3tHwD3DEnYfnS+lP/HD1X8K6YWJGfaDpZFQVofOnmuHXI3ulh4secgsuk8TLTeEejSWU/ZOAZqbQahhY3mGiuDO/UrOmKj/92a+HZ/zEx6m8qtujgGEUor3hcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a3dp+88D; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739442974; x=1770978974;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ebHCKZJ0B+XAdEXl+QaipuVrfHXzeM55QiJZmL0u108=;
-  b=a3dp+88DOZd/9zyxe23bbXqklgJP7ddSu4oagGrOHfYAMMBURaGSU3zE
-   IDohVEr73ukJ2RmhVmGsEeveMYLQ7R9uZPwQpoG//FLVGSqHvonRMTaZR
-   olQxSrZXCbw/62mznvMhBIj6x+MxoscuZGHZesVbdMqkN6+IVmq/JFUhx
-   L+bXljZMhtG8sankSwKjubbMEvtGhZVGnB7QjHs9XX7znZbuX2XZrA/sT
-   b5dWA3TAfW2Gm7pa+9YbMWNtKZLjglXjlmqZA+LdgfasjWyLulxNYhwa8
-   XRfkeDea4nxQnf5nFPItFbNUlfvBDcHt3bowl3Wj7pLwbFP8nync2Z/hR
-   w==;
-X-CSE-ConnectionGUID: xd8LCuxvTrC8q42wskc7qQ==
-X-CSE-MsgGUID: InsFM6HjTxW9/hPy5a+NAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="40259927"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="40259927"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 02:36:13 -0800
-X-CSE-ConnectionGUID: Vj3Fr9TPQselWQak7MSD/w==
-X-CSE-MsgGUID: tlUrY+X1Rb+siSH6aFOQhQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="113636539"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2025 02:36:13 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 13 Feb 2025 02:36:12 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 13 Feb 2025 02:36:12 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 13 Feb 2025 02:36:12 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Dmlw7KFZlhDE1fwvyFvV3GZu0FCIm8f1Fm9bB5JkcDqVdGxrb1ny2JRLf4udi1pFCs0nl5RWpN1HR+JOLM47kcaz1T5CloZ+mDHDCeRQKbJCUWm34TEFj1UricNACouysRCE4Yu+32VqBi/9yWYm0j/GsJFMnZoZyOpYk9ELYeY873kC1Hzf8XKoRgQ/uaP5rq84DCvh+G4KYuUOu1+osrKM8Hv7GqA+nSz005aVniSabE2qYB9NQ8KRaGUNsCxKB1TfxS9YUx3LudI/zTBweJjSaNd85EDTcMqmjeuBY2T9DgLYgfAXYBvdBJ5VwdkOzaG8Z2ugflMsGWZlfLr+zw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ebHCKZJ0B+XAdEXl+QaipuVrfHXzeM55QiJZmL0u108=;
- b=BYlLuOP3GVqaimzQTuhxZsCJ47ddTP+MYLTTXOTFMhDvHPNj6EeG1NJvNMUZzcsnby/IKKmeSnFcaKVTcjczCkZbuHfHqXBme+o/tNt60UgwmBPs1TcPpvX+dZqkRFNt4SSfjpwOOUwZFT9QE0xwW0wTnKLQF8+mhzTr05+PD6odMuGb+nxBfXoAbrtyBPBtCQ7D6Z3w/a02Lou+Awh3GOOOvj6Jg8gH3j8hCgDH4kUELJbo//Fp4MJnVNlHPSHkXocv7grrXsPQOjMLWqFGmR7PRjZ3m6nTJxpyzrt72eXsHoIKFVbKiahg/9y4zquqqIQ105w/J1NGPdOciZhFOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com (2603:10b6:8:f1::8) by
- MN0PR11MB6277.namprd11.prod.outlook.com (2603:10b6:208:3c3::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Thu, 13 Feb
- 2025 10:35:51 +0000
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18]) by DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18%6]) with mapi id 15.20.8445.008; Thu, 13 Feb 2025
- 10:35:51 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>, "Polchlopek,
- Mateusz" <mateusz.polchlopek@intel.com>
-Subject: RE: [PATCH iwl-next v3 03/14] ixgbe: add handler for devlink
- .info_get()
-Thread-Topic: [PATCH iwl-next v3 03/14] ixgbe: add handler for devlink
- .info_get()
-Thread-Index: AQHbfVH2E3ifmam+8Ui3qX9OUqsv/7NDxFaAgAFG5FA=
-Date: Thu, 13 Feb 2025 10:35:51 +0000
-Message-ID: <DS0PR11MB77853E17402518C2B56AF240F0FF2@DS0PR11MB7785.namprd11.prod.outlook.com>
-References: <20250212131413.91787-1-jedrzej.jagielski@intel.com>
- <20250212131413.91787-4-jedrzej.jagielski@intel.com>
- <73u3dz34jdnsgoujbjdokzh7tvvdubqmsngaa77a2feedbtulm@v5lnrqvaethe>
-In-Reply-To: <73u3dz34jdnsgoujbjdokzh7tvvdubqmsngaa77a2feedbtulm@v5lnrqvaethe>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7785:EE_|MN0PR11MB6277:EE_
-x-ms-office365-filtering-correlation-id: b81ee16d-7da1-40ba-321c-08dd4c1a302a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?IH6zFFaFAwOxTcnSPB1+ulsBj5hzCKXdi/3FUulXuDoiMWWIAsKwRUnWDKzr?=
- =?us-ascii?Q?Mxp9oEB/nyvPCctBmZBkxvo6/WNM7NTW+FR0CPnGdJDq8r+ltfv3CMLS/z2d?=
- =?us-ascii?Q?nq7+ZY57z88OZJjNBIVVkXg8oquvn42aGViTly4W72i/qhxTiG3uyrfUreRe?=
- =?us-ascii?Q?UoLZsxaazCn+2nneWanx/lQinUVlUC3ots1cePBMViS9y2XTprgoV3TO/faW?=
- =?us-ascii?Q?Ubu0FRGNLTia/Ci0hR9WJ3D7pRx7RpcHWkWa/F2KeL5/YXYyO4GnU93cryzh?=
- =?us-ascii?Q?ydsBGh+aKM24YwORdiKSNvDsiPDo/eNNmrkRGMJ4zbUCjUSw1Nwy1aLD/fbt?=
- =?us-ascii?Q?KMGEz6JnK/H335nilnP/IZDQLw3rVbny+YEAVlIFrbkJeDHFO8TODXGyl7rX?=
- =?us-ascii?Q?RowpG/v6s/pPmWRnF9e3ztKTMJa90vCAkhJ44jsN2Hv9+eITmjriS+2/mZfx?=
- =?us-ascii?Q?DY9CtYR/Wt0A6e2oUk/HtJ1IKw5g9eWKbWF9LBJ/8aaSI6MCh3paaVcuQFFH?=
- =?us-ascii?Q?De+qh8uAbMMfbdw3EJOPvYAptzLTBtOnH+mgfsWufkOQWkByQ6/XEiTjwNOb?=
- =?us-ascii?Q?/bHFSCWYoZy/6Zt8tjhMOKjd1QPUNGIsn9tRdCHXyIR2PlG2rs/uTTGQYoW6?=
- =?us-ascii?Q?lcWPaoTO+atwYmyylGpVKAXB7zZoluP0ZUq12S9nwWnm8jGuPR0IjeSgaD1n?=
- =?us-ascii?Q?vfxRSwjKEDvxb71q7U274jJK/ytiXPASk3hFoytgz1DrBkyeYap+qCelIngL?=
- =?us-ascii?Q?mXBbmptQTwjpLtprfT7A1BFkT+/XbH4zVk8EibVAZKj+RDqPN2++0NjwOn4N?=
- =?us-ascii?Q?52xrCV1A1wg3j0jmQzqymQOAzbI2Rb1RRY5w5xqaDYRNfaFI1WrQcowUMpPr?=
- =?us-ascii?Q?3/67OCSfF5vrIIvP00E++1ncQmZ/KaUAQPDGNy25pP9Ow9eCbEyuqfrI9Y4T?=
- =?us-ascii?Q?D5CXPpczZ1ixTOLV1rB/Rwn+oeVzKEYmeFpFyY5tMek2G5xN7tzSUPLwpxV8?=
- =?us-ascii?Q?VL3Ezo1/SJUH/6L3CkU9p43v31AGBqBq6xYBQjKdHAtr8bwwfpw4J/6Xexvj?=
- =?us-ascii?Q?IgzicvN2Bj8g8ogzykSRduXmeemQ7Fc1keBfAwGZpcAYPvh4P8yd60AWHD/0?=
- =?us-ascii?Q?oMFHj1q7q9fYq9QeWMXpZl17voQPQKyjouTP9LtQgiwCmF2Det1KyMTbxaZa?=
- =?us-ascii?Q?xadlG8slEEFCboJwbYx43nAiKkmeTCbWak7ulCx/jbDBOD27kv1D3QmQaE/s?=
- =?us-ascii?Q?iZvwyxjpLV3KSCqEQafbMhcDBkiPLlSTzgTb+WzVbuytT299r8ZSErzqFW9K?=
- =?us-ascii?Q?eEcsNnPKVp2s4klpgft2qOatUR11T25VYW5QLsV2/BGZoaFUVQlaXWfoRlE4?=
- =?us-ascii?Q?Cv4ebyRZ07PPMABnIYNz/P5Wwa+MrmkT4QfhSGAlDc5fb/Dk25vhg4ZIqsj6?=
- =?us-ascii?Q?vA82bkLZFNtmGtlXoVuuldCnOhH2duhF?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7785.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7YZmVLu6cR2nqDuQquFpA69vVAGi0VET5cpkr/3FsmXbPh4MdOhTuBUafOqQ?=
- =?us-ascii?Q?wchT5zRz82m+q9l5nUw+BbbYLGH8F6LgObXfmRrpupQjbBbCzqaIVP92S79L?=
- =?us-ascii?Q?KgFf9uS+1eDCLoQDlie2qoEFPHthmrT1+apNwz4dgrDIzErA6iavg59MPyAq?=
- =?us-ascii?Q?khh/aHI2B9wkiW2yrItpo3j3diRcsZS3l5slm5eqO8jyHX8iXKTOqwvi6wld?=
- =?us-ascii?Q?aGthcrc3ISWPyoszYiAK9BHKW/wdh59rG6hB4zTr9Ttl2MTtXXm42qTgURNc?=
- =?us-ascii?Q?HzLWbwvYopvh718cqGWYz93TyV4VMo9PGrwiDmsaRysd9tVfGlaT4RIyjecv?=
- =?us-ascii?Q?kpHJUd3npYIIxA6868nk0TLyC0FEsJS9ebjL/eg959zSV4d8liMlkllN7gbb?=
- =?us-ascii?Q?Oeek2ba2Q5i+tqrQI23qaaccMFjN/uUgvhCc+yeZruT2YSqA8ufj+6C7sSFe?=
- =?us-ascii?Q?4WFe5hFmOvmByDlr06x7UY1lpspxp0GtcCJ/nPH6+4SCJDpFPCO51gnMy7yt?=
- =?us-ascii?Q?i40eDhrAX8VsXzYgblL+GsndYU+f5JGt1WVMdrtJvG6Q+49VVcFdrfyZNO+a?=
- =?us-ascii?Q?5EjmcgHHV+lXTYCmU6smtmnfzaQy0HtXPp6RidPygOF/6JqNo6qQgrUFLay+?=
- =?us-ascii?Q?qT/gXLbVyKrQMEeFR1G6w7LWXb+ET/lVES3FQ8+nMhFJ8f7lN7PTypOZDN+N?=
- =?us-ascii?Q?+Cc0QkVYqTtcNgRfAk1rIMMVe6Hk36nBvNMwn7sWCvihWpxrGCHTmkOTTQa6?=
- =?us-ascii?Q?8Hb/zcVumHbRlv7WnxJnxt3m5RTMrsl7II3FFi4TWsV2LwLrM1Nw3iEh50nl?=
- =?us-ascii?Q?pQXnRtM7kTKXXInd1I4BxCdOm4kv9Op/AmH3NTjKHbOVPv8VNlWXcby6aWju?=
- =?us-ascii?Q?cRDclQYWGpsam2qWqJs3za+EAIcFehfgWvf1cTPWFR7o7RPrFPCwnGkH1VGV?=
- =?us-ascii?Q?81Pby0r4D8/AXMiLP7cyXn0h3HSJkF4xFSNMH9vHHN7sGFMZMW99nA5eFDah?=
- =?us-ascii?Q?j+nTXStdrUxAUyjzt46LBNgQ22+lrSXgyjLCF6zl1o/Qm28GDJCw9OHtSJ0U?=
- =?us-ascii?Q?9ZqSwdwgt/aOzuO3YtvvsD8b0qw1oqrXaYH8TMAtp9F3gDlWhMtJDcVimT6R?=
- =?us-ascii?Q?EA+6UQN0wgqRNMIYF6RC7ctWQXffzjOFFnrpBVLszZCKSCOlTA0Ty5yFnyQu?=
- =?us-ascii?Q?cSvWWajmrTGOVW8MNiCC0UJX7ziZxw7wHb5STze/PzML/rRJYaZ/2AX67k9/?=
- =?us-ascii?Q?0VmVDtzod8C+bVPvGMFDpBDsGhyA20knkA1qcWBpgVpOrefTUKxAQvUxLEob?=
- =?us-ascii?Q?uN7xF/qdjpZhZt6Bc3YfyXu4FCq1KgX//0ltiB1wqgVEZ3c4JjLLegpoeLDO?=
- =?us-ascii?Q?5M2orX0i1AJpEsjzfFxiMxC3nKvxQN/QZIqelL0QGahcpwVpNZ2M+JZSLidV?=
- =?us-ascii?Q?9sK39wfZ7qbM2XguGUr7QMQ3EiCNZPjIa7H8EITQzS+X/QKlrCjMYQTTEE5q?=
- =?us-ascii?Q?Wk+6pwNNdptEpUtELe8CR/8PLZEXarU97pOifQnrWt38B+BTwrCUKNLe+BKv?=
- =?us-ascii?Q?3v1whtrYpH4uyBuVm0ePrKG4LRGORK068oPUZiS/?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311A141C6A;
+	Thu, 13 Feb 2025 10:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739443573; cv=none; b=pL1piTszIEgDv1zQiwbSaPUZGrDn4w2t0QyJC0sJGRhm1K9d8bk+eqI2+vuk3Cp9j/liIM5hRjL4EyJIBeZDcUqb2+BHHGzS5SYO0eIg5D/rpilxK3lmpEOFxAPJZa7uUiiusUGLVVrKfTx1UNW4yTkt3EaRa1emXuMI9WWp3/8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739443573; c=relaxed/simple;
+	bh=PRion708stDyzBpzkg+ZHWYiT0IPCeU96XYPIsMRHLA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f5lOztILNf4RbwFbuY+hnJq97N9p+ZixA7RSkdejqwd2KGV8Ekn804J4AaP2Yv0SsXNwGDvo+k1BIMFFAIBT0mzP3ICbLMnHve2DuUNCWPezUGEqcXTt0h8JvZLCvBOVnfkfb7XDw7cHkCiNpU+8reS0HK2+X2FSDT7WRQBl+fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kcgsIF7h; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739443571; x=1770979571;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=2T1/qBmI0DiKHiEvUpkWL+IkG1IE3CLB5FcNc97aZNM=;
+  b=kcgsIF7hO9fC4e/6wAtM4w7nZRwa4mMhw5wBf5EbbgBssKhvj7vYmj2Z
+   tuyckOs0aDbJOCHl4bqjmt7PQ35rfvxnB/6y8wBLTcO/zpddMaU5b7Buk
+   kjeZPVp1Y2VbmrKPB15FzFZNMcsAxJPtcFhEJYx5lu3Ru5d4Eu1BD+c5F
+   0=;
+X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
+   d="scan'208";a="718442685"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 10:45:48 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:48797]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.208:2525] with esmtp (Farcaster)
+ id 90872893-0365-47d5-86c4-9357a97ba155; Thu, 13 Feb 2025 10:45:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 90872893-0365-47d5-86c4-9357a97ba155
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 10:45:47 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 10:45:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <ushankar@purestorage.com>
+Subject: Re: [PATCH net-next v3 1/3] net: document return value of dev_getbyhwaddr_rcu()
+Date: Thu, 13 Feb 2025 19:45:31 +0900
+Message-ID: <20250213104531.36861-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250213-kickass-orchid-wildebeest-3ec3ae@leitao>
+References: <20250213-kickass-orchid-wildebeest-3ec3ae@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7785.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b81ee16d-7da1-40ba-321c-08dd4c1a302a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Feb 2025 10:35:51.6916
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hm4Tp93aH0AQDE9Bt7HjKvoWjKz1tE+EG5P2ErDmBkdzqlOC5w+wzBRc/QOEelKLWokVTy9pcUHSjoUKJYw7ez53kPDfQ5sHrWL0L66zn3o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6277
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Jiri Pirko <jiri@resnulli.us>=20
-Sent: Wednesday, February 12, 2025 4:05 PM
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 13 Feb 2025 02:16:36 -0800
+> Hello Kuniyuki,
+> 
+> On Thu, Feb 13, 2025 at 04:47:48PM +0900, Kuniyuki Iwashima wrote:
+> > From: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > Date: Thu, 13 Feb 2025 16:36:46 +0900
+> > > From: Breno Leitao <leitao@debian.org>
+> > > Date: Wed, 12 Feb 2025 09:47:24 -0800
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..0b3480a125fcaa6f036ddf219c29fa362ea0cb29 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -1134,8 +1134,8 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
+> > > >   *	The returned device has not had its ref count increased
+> > > >   *	and the caller must therefore be careful about locking
+> > > >   *
+> > > > + *	Return: pointer to the net_device, or NULL if not found
+> > > >   */
+> > > 
+> I am a bit confused about what you are saying.
+> > > I noticed here we still mention RTNL and it should be removed.
+> 
+> I have no mention RTNL in this patch at all:
 
->Wed, Feb 12, 2025 at 02:14:02PM +0100, jedrzej.jagielski@intel.com wrote:
->>Provide devlink .info_get() callback implementation to allow the
->>driver to report detailed version information. The following info
->>is reported:
->>
->> "serial_number" -> The PCI DSN of the adapter
->> "fw.bundle_id" -> Unique identifier for the combined flash image
->> "fw.undi" -> Version of the Option ROM containing the UEFI driver
->> "board.id" -> The PBA ID string
->
->Do you have some board.serial_number by any chance? This could be handy
->in some cases, for example if you have a board with multiple nic asics.
+Yes, and patch 2 removes the part from kernel-doc of
+dev_getbyhwaddr_rcu().
 
-Unfortunately i cannot spot nothing more for identification than
-the PCI DSN number.
 
+> 
+> 	# git log -n1 --oneline HEAD~2
+> 	6d34fd4700231 net: document return value of dev_getbyhwaddr_rcu()
+> 	# git show  HEAD~2  | grep -i rtnl
+> 
+> > I missed this part is removed in patch 2, but the Return: part
+> > is still duplicate.
+> 
+> This part is also unclear to me. What do you mean the "Return:" part is
+> still duplicated?
+> 
+> This is how the documentation looks like, after the patch applied:
+> 
+> 	/**
+> 	*      dev_getbyhwaddr_rcu - find a device by its hardware address
+> 	*      @net: the applicable net namespace
+> 	*      @type: media type of device
+> 	*      @ha: hardware address
+> 	*
+> 	*      Search for an interface by MAC address. Returns NULL if the device
+                                                       ^^^^^^^
+Sorry, I meant this part is redundant as we have Return: now.
+
+
+> 	*      is not found or a pointer to the device.
+> 	*      The caller must hold RCU.
+> 	*      The returned device has not had its ref count increased
+> 	*      and the caller must therefore be careful about locking
+> 	*
+> 	*      Return: pointer to the net_device, or NULL if not found
+> 	*/
+> 	struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
+> 						const char *ha)
+> 	{
+> 		<snip>
+> 	}
 
