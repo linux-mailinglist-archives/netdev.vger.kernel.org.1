@@ -1,138 +1,191 @@
-Return-Path: <netdev+bounces-165966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A429A33CFA
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:51:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21279A33D01
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 282061889629
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:51:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC65C169616
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768CA212D8D;
-	Thu, 13 Feb 2025 10:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FB2139C7;
+	Thu, 13 Feb 2025 10:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X/XnKPTb"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Mi6TSQLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE992054E4;
-	Thu, 13 Feb 2025 10:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF6E2135C0;
+	Thu, 13 Feb 2025 10:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739443886; cv=none; b=UHSCkJogeNweSZk9KsLCK8QTqDsdfZiIzh4Qgr6ZqXhOcLQgfNPQrVo15z9sT388XoJIoJLxj1vd8x0EcQeBu5qxap+KC8Q3BmyaFC1j6WA/SyZ8COkQHpyqScNVkX5S65T5IknKb88BcxT8wbKBeyz1eETptVIFgztmslVhF2k=
+	t=1739443958; cv=none; b=TeL/WuPQ9ucNuejySdio6iwnHzz4q4c8T59mJyy40pW/3M4ylUznhzmXC/kHZrsxVPRiACgwv80ehy6/MlS7jr8H+cR3mpRr4XpP3zsy+N76WEQ3kkS29UwEvAVVv8AAJc2hCpFqxPeSQwJQQfP53jGUuq/Bh9SqQouD71mFc28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739443886; c=relaxed/simple;
-	bh=IF3pV7l7zOjvvG/0UDfuSxAlR8BVTLZ4GNjgKKSCkmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LAe3ifnqdYgIZS1BKZPgN1EKQj8mq2AbzqBokUoyTvPQMdunBg9nWK5CZ11MhaXQWU7cBtqE0jDyNHLpShXnlzCTYw9WZjxfP11hNxCiximpY4+sh7C4pa0nVTueslx2uyOZPbnyEk1LybEmz0HukgIJVtvWzj7WQsBMLHGhbrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X/XnKPTb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=t+Sa1rIopsE4vpBI1kqaD2rohwmI2qAey/4fz9993mc=; b=X/XnKPTb2dokpBdeEwNhew0L1F
-	B+I44FJ50CE/Xs7CxZGHDwJ3TH4O8+W6KA/hZvX1JiGnZrJ98HujZJ5ChNpcp5D8mGcow579YLpVz
-	YG+kAlsPjl6AJmGrAu3vcY5995Z1q7UPL3liVu8qGcYnFAADjtNKz9jqMpC5tmJa1uMwvDV1w8nDT
-	CH5VY8Wl05Nr88D/uNFQlJexL6u9uGZZsCMac8HELUEAAPkKifa8NhD3s2d4iVfZI4GlJQyWVI7W1
-	bMONE0q26ZCGVLQC9RHn3HwC7rZsrzvWGClclXPZfh9NfEwlZ+xAlqLotpNyctkV3/K26wKepODna
-	NV43mtww==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51268)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tiWoK-0000pL-2u;
-	Thu, 13 Feb 2025 10:51:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tiWoH-00024b-0u;
-	Thu, 13 Feb 2025 10:51:09 +0000
-Date: Thu, 13 Feb 2025 10:51:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chintan Vankar <c-vankar@ti.com>
-Cc: Rosen Penev <rosenp@gmail.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, s-vadapalli@ti.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: phy: mscc: Add auto-negotiation feature to VSC8514
-Message-ID: <Z63OnZTBMeAbzxrB@shell.armlinux.org.uk>
-References: <20250213102150.2400429-1-c-vankar@ti.com>
+	s=arc-20240116; t=1739443958; c=relaxed/simple;
+	bh=ly+HI5iL3ovE/Qp0+AEPxYcJXgikpZNZ61yNY81pso0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=orujBMxvzzfgmBbv1JKUnk0BNSTHiW8C1AbIU+hJejMEZAHZJo9ECBRRSCuUdnJIMdZjSQt4V3S/C0+/FSNDrJjbxaDb3M526O/HS5EZE0VkdofY9wwrx8yH/7kcRCznzgtuQ4jKMn73K2qBdsYHvsbFWXUtnQefRHwTMgq6dE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Mi6TSQLO; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739443957; x=1770979957;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IgkvtMvOSSagKNz50Lh9hAQXzCe7woRbEqIyJBXRz38=;
+  b=Mi6TSQLOk26Z7SPnCQffJxy+SBK9oNUmxyfB4aVl6AWweJwH6bEkzsUy
+   8QDIEmA1HxrnMXlowNRV3VDIeZWjEP5TgkCeFOfx4ESny/DmvnB+9A2P8
+   WAvrkEFUU6t3PBlU8NGPxro4+wodN+iCyHH1EDzs/9vRCiJgV1V/EfIlp
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
+   d="scan'208";a="270834013"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 10:52:33 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:32225]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.187:2525] with esmtp (Farcaster)
+ id 0f73d3cd-62b2-4599-a33c-974a909bd3bb; Thu, 13 Feb 2025 10:52:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 0f73d3cd-62b2-4599-a33c-974a909bd3bb
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 10:52:31 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 10:52:26 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <ushankar@purestorage.com>
+Subject: Re: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
+Date: Thu, 13 Feb 2025 19:52:17 +0900
+Message-ID: <20250213105217.37429-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250213-prudent-olivine-bobcat-ffa64f@leitao>
+References: <20250213-prudent-olivine-bobcat-ffa64f@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213102150.2400429-1-c-vankar@ti.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 13, 2025 at 03:51:50PM +0530, Chintan Vankar wrote:
-> Add function vsc85xx_config_inband_aneg() in mscc_main.c to enable
-> auto-negotiation. The function enables auto-negotiation by configuring
-> the MAC SerDes PCS Control register of VSC8514.
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 13 Feb 2025 02:29:38 -0800
+> Hello Kuniyuki,
 > 
-> Invoke the vsc85xx_config_inband_aneg() function from the
-> vsc8514_config_init() function present in mscc_main.c to start the
-> auto-negotiation process. This is required to get Ethernet working with
-> the Quad port Ethernet Add-On card connected to J7 common processor board.
+> On Thu, Feb 13, 2025 at 04:31:29PM +0900, Kuniyuki Iwashima wrote:
+> > > Subject: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
+> > 
+> > s/_rtnl//
+> 
+> Ack!
+> 
+> > looks like Uday's comment was missed due to the lore issue.
+> 
+> hmm, I haven't seen Uday's comment. Didn't it reach lore?
 
-A few points:
+I saw the reply and my another one on lore but somehow they
+were removed :)
 
-1. please read the netdev FAQ:
-   https://www.kernel.org/doc/html/v5.6/networking/netdev-FAQ.html
-   specifically the first question. Please also note the delay
-   requirement for resending patches.
 
-2. Is this a fix? Does something not work at the moment?
+> 
+> > From: Breno Leitao <leitao@debian.org>
+> > Date: Wed, 12 Feb 2025 09:47:25 -0800
+> > > +/**
+> > > + *	dev_getbyhwaddr - find a device by its hardware address
+> > 
+> > While at it, could you replace '\t' after '*' to a single '\s'
+> > for all kernel-doc comment lines below ?
+> > 
+> > 
+> > > + *	@net: the applicable net namespace
+> > > + *	@type: media type of device
+> > > + *	@ha: hardware address
+> > > + *
+> > > + *	Similar to dev_getbyhwaddr_rcu(), but the owner needs to hold
+> > > + *	rtnl_lock.
+> > 
+> > Otherwise the text here is mis-aligned.
+> 
+> Sorry, what is misaligned specifically? I generated the documentation,
+> and I can't see it misaligned.
+> 
+> This is what I see when generating the document (full log at
+> https://pastebin.mozilla.org/YkotEoHh#L250,271)
+> 
+> 
+> 	dev_getbyhwaddr_rcu(9)                                                         Kernel Hacker's Manual                                                         dev_getbyhwaddr_rcu(9)
+> 
+> 	NAME
+> 	dev_getbyhwaddr_rcu - find a device by its hardware address
+> 
+> 	SYNOPSIS
+> 	struct net_device * dev_getbyhwaddr_rcu (struct net *net , unsigned short type , const char *ha );
+> 
+> 	ARGUMENTS
+> 	net         the applicable net namespace
+> 
+> 	type        media type of device
+> 
+> 	ha          hardware address
+> 
+> 			Search for an interface by MAC address. Returns NULL if the device is not found or a pointer to the device.  The caller must hold RCU.  The returned  device  has
+                        ^^^^^^
+This scentence starts from a weird position when we use '\t' after '*'.
+You will see it start from the head if '\s' follows '*'.
 
-3. Will always forcing the inband signalling to be enabled result in
-   another existing user that doesn't provide the inband signalling
-   now failing? Do you know for sure that this won't disrupt any other
-   users of this PHY?
 
-4. Maybe consider using phylink in the ethernet driver and populating
-   the .inband_caps() and .config_inband() methods which will allow
-   the inband signalling properties to be negotiated between the MAC's
-   PCS and the PHY.
+> 			not had its ref count increased and the caller must therefore be careful about locking
+> 
+> 	RETURN
+> 	pointer to the net_device, or NULL if not found
+> 
+> 	dev_getbyhwaddr(9)                                                             Kernel Hacker's Manual                                                             dev_getbyhwaddr(9)
+> 
+> 	NAME
+> 	dev_getbyhwaddr - find a device by its hardware address
+> 
+> 	SYNOPSIS
+> 	struct net_device * dev_getbyhwaddr (struct net *net , unsigned short type , const char *ha );
+> 
+> 	ARGUMENTS
+> 	net         the applicable net namespace
+> 
+> 	type        media type of device
+> 
+> 	ha          hardware address
+> 
+> 			Similar to dev_getbyhwaddr_rcu, but the owner needs to hold rtnl_lock.
+> 
+> 	RETURN
+> 	pointer to the net_device, or NULL if not found
+> 
+> 
+> >   $ ./scripts/kernel-doc -man net/core/dev.c | \
+> >     scripts/split-man.pl /tmp/man && \
+> >     man /tmp/man/dev_getbyhwaddr.9
+> > 
+> > Also, the latter part should be in Context:
+> > 
+> > Context: rtnl_lock() must be held.
+> 
+> Sure. Should I do something similar for _rcu function as well?
+> 
+> 	Context: caller must hold rcu_read_lock
 
-Other points inline below:
+Yes, that would be nice.
 
-> +static int vsc85xx_config_inband_aneg(struct phy_device *phydev, bool enabled)
-> +{
-> +	u16 reg_val = 0;
-> +	int rc;
-> +
-> +	if (enabled)
-> +		reg_val = MSCC_PHY_SERDES_ANEG;
-> +
-> +	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_3,
-> +			      MSCC_PHY_SERDES_PCS_CTRL, MSCC_PHY_SERDES_ANEG,
-> +			      reg_val);
-> +
-> +	return rc;
-
-Why not simply:
-
-	return phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_3,
-				MSCC_PHY_SERDES_PCS_CTRL,
-				MSCC_PHY_SERDES_ANEG,
-				reg_val);
-
-?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+https://lore.kernel.org/netdev/20250213073646.14847-1-kuniyu@amazon.com/
 
