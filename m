@@ -1,273 +1,409 @@
-Return-Path: <netdev+bounces-165746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE540A33463
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:06:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88AAEA33466
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C986165E30
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:06:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36DF2164A7F
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3221386B4;
-	Thu, 13 Feb 2025 01:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C105769D2B;
+	Thu, 13 Feb 2025 01:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZkXYCGY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="djyt42cF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC1D13774D
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769B027456
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739408804; cv=none; b=KheHvni3cLKG/NQMRnMN/f/xbgnYarmO1jsLBDE3UWWs2n1GesQMiiWJ0J3OnIaZwYVUvGoReCj28wRhs4R8fInlnzcJqRAw3dwbCJ9xf66jGtdaKHkbbABG91g+DcGIjJ+TinFCtoAyBH1gto5OVLWEDKU8oVh3vwqQKm7Ntoo=
+	t=1739408921; cv=none; b=ru9sEX6v3zmQbbPKVQiZ/ilnEDIsvyAr0Y1Ra+ll8FjErNgipT6SUjAGOZrUSOar34W4QWka3TMw7tOIDP13syN9AzT2Ve1dwzDd38RaAgmz7EfgWZtumVgXO6jdYkacU1CrAIFeWegCTb7EVcbPE8p/T7wx92veBvfjMWe7jMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739408804; c=relaxed/simple;
-	bh=hPQsxe/XjfjZ1RKv8rQ60pCX3IxmNrI8aJbj7oiPDGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X6ZMx1BYqSySumzYS/uFIAg0X9bMMbhcLflZ0xRSsevyuZsDpS76OQ2TG1zKdGeVKXc96ir6TPeT2+J7NjYlI7IAN0n2B+9YIPlPfUVt31sPCbPLAb01812CS5tw/TOVKU12AXEHyv/ACL4W1MdrirUzRfK/6lms56oItQeH/Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZkXYCGY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 342B1C4AF0B;
-	Thu, 13 Feb 2025 01:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739408803;
-	bh=hPQsxe/XjfjZ1RKv8rQ60pCX3IxmNrI8aJbj7oiPDGc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aZkXYCGYS7hRXJybuxYM3aXBcJlM4yMNJvgZ0MufHesBmjOjikEQYibbZNpvBaQG4
-	 G4SROOeHo2aRuq9oQ2gjbR/XmkBMn21OLvLOAeyM7DqIaZKFfn1JiBskYqGaMcbLKh
-	 uyqyIj3TyaTtMLyAIQOKPN2/XOg9wlglOCUvPhatA+9tviAq6WGUhQC7/MqsDPhjV5
-	 uLL3hPHaZHwyg4ghUTgT4PfGZjH9hT5WoPM2GNwAsd/u1fvXjrPOzLkxeL5qBPTlsb
-	 Fz6RwsLr4+OZdL3OTr6YuICB7INBQxNVzCSkFMBJivQZ6sBGFqKtrxR8ub+QYkzO06
-	 f11oq/8sTnohA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: tariqt@nvidia.com,
-	idosch@idosch.org,
-	hawk@kernel.org,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 4/4] eth: mlx4: use the page pool for Rx buffers
-Date: Wed, 12 Feb 2025 17:06:35 -0800
-Message-ID: <20250213010635.1354034-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250213010635.1354034-1-kuba@kernel.org>
-References: <20250213010635.1354034-1-kuba@kernel.org>
+	s=arc-20240116; t=1739408921; c=relaxed/simple;
+	bh=PMmIPAgsqFOn0YIn7JOjg/LM/WhKKAyJD2E/XFiw+OE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Iaoc5cmM4s7U2DWXwbLQAW/c6kmjVYqqLG9DbJaXonShBaUC4zh90zHHI+0g2r4TTJoGVj1NubUGd3B/+jtxRC5gCjtiHoqOiPW7MfVR5JctEkxOv/IgDPiWP3iJiVCSiIyPQ7ksCJk3UTpptGQLZxKRFv2/5H3fKKF3h4CRZ0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=djyt42cF; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4e51fae2-0b43-426f-8fae-ea267fe2839f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739408907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r0FiEdnI/5PV2tOdLNOpW9wnUSqBg5piDnE+78JJgz4=;
+	b=djyt42cFrjwns2v/ZfroXwFSvZOoFtz52uOYFIRpGOL9Xx+WR5loFFvfbcaDp+Te7ROWW6
+	ygfFoU8TmkafWFlnWCPYKl1CNfn1K7t15H4bdiUNv1OZNs888B1SEqna4iSyhUUvsFWGcG
+	3HrQOT0hIPGkVMWC3A+qJmf3vMqwBv8=
+Date: Wed, 12 Feb 2025 17:08:18 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v10 12/12] selftests/bpf: add simple bpf tests in
+ the tx path for timestamping feature
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
+ <20250212061855.71154-13-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250212061855.71154-13-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Simple conversion to page pool. Preserve the current fragmentation
-logic / page splitting. Each page starts with a single frag reference,
-and then we bump that when attaching to skbs. This can likely be
-optimized further.
+On 2/11/25 10:18 PM, Jason Xing wrote:
+> BPF program calculates a couple of latency deltas between each tx
+> timestamping callbacks. It can be used in the real world to diagnose
+> the kernel behaviour in the tx path.
+> 
+> Check the safety issues by accessing a few bpf calls in
+> bpf_test_access_bpf_calls() which are implemented in the patch 3 and 4.
+> 
+> Check if the bpf timestamping can co-exist with socket timestamping.
+> 
+> There remains a few realistic things[1][2] to highlight:
+> 1. in general a packet may pass through multiple qdiscs. For instance
+> with bonding or tunnel virtual devices in the egress path.
+> 2. packets may be resent, in which case an ACK might precede a repeat
+> SCHED and SND.
+> 3. erroneous or malicious peers may also just never send an ACK.
+> 
+> [1]: https://lore.kernel.org/all/67a389af981b0_14e0832949d@willemb.c.googlers.com.notmuch/
+> [2]: https://lore.kernel.org/all/c329a0c1-239b-4ca1-91f2-cb30b8dd2f6a@linux.dev/
+> 
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>   .../bpf/prog_tests/net_timestamping.c         | 231 +++++++++++++++++
+>   .../selftests/bpf/progs/net_timestamping.c    | 244 ++++++++++++++++++
+>   2 files changed, 475 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/prog_tests/net_timestamping.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/net_timestamping.c
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/net_timestamping.c b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
+> new file mode 100644
+> index 000000000000..dcdc40473a7d
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
+> @@ -0,0 +1,231 @@
+> +#include <linux/net_tstamp.h>
+> +#include <sys/time.h>
+> +#include <linux/errqueue.h>
+> +#include "test_progs.h"
+> +#include "network_helpers.h"
+> +#include "net_timestamping.skel.h"
+> +
+> +#define CG_NAME "/net-timestamping-test"
+> +#define NSEC_PER_SEC    1000000000LL
+> +
+> +static const char addr4_str[] = "127.0.0.1";
+> +static const char addr6_str[] = "::1";
+> +static struct net_timestamping *skel;
+> +static int cfg_payload_len = 30;
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - remove unnecessary .max_len setting
-v1: https://lore.kernel.org/20250205031213.358973-5-kuba@kernel.org
----
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  1 -
- drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 55 +++++++-------------
- drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  8 +--
- 3 files changed, 25 insertions(+), 39 deletions(-)
+const ?
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-index 97311c98569f..ad0d91a75184 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-@@ -247,7 +247,6 @@ struct mlx4_en_tx_desc {
- 
- struct mlx4_en_rx_alloc {
- 	struct page	*page;
--	dma_addr_t	dma;
- 	u32		page_offset;
- };
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-index d2cfbf2e38d9..b33285d755b9 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-@@ -52,57 +52,39 @@
- 
- #include "mlx4_en.h"
- 
--static int mlx4_alloc_page(struct mlx4_en_priv *priv,
--			   struct mlx4_en_rx_alloc *frag,
--			   gfp_t gfp)
--{
--	struct page *page;
--	dma_addr_t dma;
--
--	page = alloc_page(gfp);
--	if (unlikely(!page))
--		return -ENOMEM;
--	dma = dma_map_page(priv->ddev, page, 0, PAGE_SIZE, priv->dma_dir);
--	if (unlikely(dma_mapping_error(priv->ddev, dma))) {
--		__free_page(page);
--		return -ENOMEM;
--	}
--	frag->page = page;
--	frag->dma = dma;
--	frag->page_offset = priv->rx_headroom;
--	return 0;
--}
--
- static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
- 			       struct mlx4_en_rx_ring *ring,
- 			       struct mlx4_en_rx_desc *rx_desc,
- 			       struct mlx4_en_rx_alloc *frags,
- 			       gfp_t gfp)
- {
-+	dma_addr_t dma;
- 	int i;
- 
- 	for (i = 0; i < priv->num_frags; i++, frags++) {
- 		if (!frags->page) {
--			if (mlx4_alloc_page(priv, frags, gfp)) {
-+			frags->page = page_pool_alloc_pages(ring->pp, gfp);
-+			if (!frags->page) {
- 				ring->alloc_fail++;
- 				return -ENOMEM;
- 			}
-+			page_pool_fragment_page(frags->page, 1);
-+			frags->page_offset = priv->rx_headroom;
-+
- 			ring->rx_alloc_pages++;
- 		}
--		rx_desc->data[i].addr = cpu_to_be64(frags->dma +
--						    frags->page_offset);
-+		dma = page_pool_get_dma_addr(frags->page);
-+		rx_desc->data[i].addr = cpu_to_be64(dma + frags->page_offset);
- 	}
- 	return 0;
- }
- 
- static void mlx4_en_free_frag(const struct mlx4_en_priv *priv,
-+			      struct mlx4_en_rx_ring *ring,
- 			      struct mlx4_en_rx_alloc *frag)
- {
--	if (frag->page) {
--		dma_unmap_page(priv->ddev, frag->dma,
--			       PAGE_SIZE, priv->dma_dir);
--		__free_page(frag->page);
--	}
-+	if (frag->page)
-+		page_pool_put_full_page(ring->pp, frag->page, false);
- 	/* We need to clear all fields, otherwise a change of priv->log_rx_info
- 	 * could lead to see garbage later in frag->page.
- 	 */
-@@ -167,7 +149,7 @@ static void mlx4_en_free_rx_desc(const struct mlx4_en_priv *priv,
- 	frags = ring->rx_info + (index << priv->log_rx_info);
- 	for (nr = 0; nr < priv->num_frags; nr++) {
- 		en_dbg(DRV, priv, "Freeing fragment:%d\n", nr);
--		mlx4_en_free_frag(priv, frags + nr);
-+		mlx4_en_free_frag(priv, ring, frags + nr);
- 	}
- }
- 
-@@ -469,7 +451,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
- 		if (unlikely(!page))
- 			goto fail;
- 
--		dma = frags->dma;
-+		dma = page_pool_get_dma_addr(page);
- 		dma_sync_single_range_for_cpu(priv->ddev, dma, frags->page_offset,
- 					      frag_size, priv->dma_dir);
- 
-@@ -480,6 +462,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
- 		if (frag_info->frag_stride == PAGE_SIZE / 2) {
- 			frags->page_offset ^= PAGE_SIZE / 2;
- 			release = page_count(page) != 1 ||
-+				  atomic_long_read(&page->pp_ref_count) != 1 ||
- 				  page_is_pfmemalloc(page) ||
- 				  page_to_nid(page) != numa_mem_id();
- 		} else if (!priv->rx_headroom) {
-@@ -493,10 +476,9 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
- 			release = frags->page_offset + frag_info->frag_size > PAGE_SIZE;
- 		}
- 		if (release) {
--			dma_unmap_page(priv->ddev, dma, PAGE_SIZE, priv->dma_dir);
- 			frags->page = NULL;
- 		} else {
--			page_ref_inc(page);
-+			page_pool_ref_page(page);
- 		}
- 
- 		nr++;
-@@ -766,7 +748,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
- 			/* Get pointer to first fragment since we haven't
- 			 * skb yet and cast it to ethhdr struct
- 			 */
--			dma = frags[0].dma + frags[0].page_offset;
-+			dma = page_pool_get_dma_addr(frags[0].page);
-+			dma += frags[0].page_offset;
- 			dma_sync_single_for_cpu(priv->ddev, dma, sizeof(*ethh),
- 						DMA_FROM_DEVICE);
- 
-@@ -805,7 +788,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
- 			void *orig_data;
- 			u32 act;
- 
--			dma = frags[0].dma + frags[0].page_offset;
-+			dma = page_pool_get_dma_addr(frags[0].page);
-+			dma += frags[0].page_offset;
- 			dma_sync_single_for_cpu(priv->ddev, dma,
- 						priv->frag_info[0].frag_size,
- 						DMA_FROM_DEVICE);
-@@ -868,6 +852,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
- 		skb = napi_get_frags(&cq->napi);
- 		if (unlikely(!skb))
- 			goto next;
-+		skb_mark_for_recycle(skb);
- 
- 		if (unlikely(ring->hwtstamp_rx_filter == HWTSTAMP_FILTER_ALL)) {
- 			u64 timestamp = mlx4_en_get_cqe_ts(cqe);
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-index fe1378a689a1..87f35bcbeff8 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-@@ -44,6 +44,7 @@
- #include <linux/ipv6.h>
- #include <linux/indirect_call_wrapper.h>
- #include <net/ipv6.h>
-+#include <net/page_pool/helpers.h>
- 
- #include "mlx4_en.h"
- 
-@@ -350,9 +351,10 @@ u32 mlx4_en_recycle_tx_desc(struct mlx4_en_priv *priv,
- 			    int napi_mode)
- {
- 	struct mlx4_en_tx_info *tx_info = &ring->tx_info[index];
-+	struct page_pool *pool = ring->recycle_ring->pp;
- 
--	dma_unmap_page(priv->ddev, tx_info->map0_dma, PAGE_SIZE, priv->dma_dir);
--	put_page(tx_info->page);
-+	/* Note that napi_mode = 0 means ndo_close() path, not budget = 0 */
-+	page_pool_put_full_page(pool, tx_info->page, !!napi_mode);
- 
- 	return tx_info->nr_txbb;
- }
-@@ -1189,7 +1191,7 @@ netdev_tx_t mlx4_en_xmit_frame(struct mlx4_en_rx_ring *rx_ring,
- 	tx_desc = ring->buf + (index << LOG_TXBB_SIZE);
- 	data = &tx_desc->data;
- 
--	dma = frame->dma;
-+	dma = page_pool_get_dma_addr(frame->page);
- 
- 	tx_info->page = frame->page;
- 	frame->page = NULL;
--- 
-2.48.1
+> +static struct timespec usr_ts;
+> +static u64 delay_tolerance_nsec = 10000000000; /* 10 seconds */
+> +int SK_TS_SCHED;
+> +int SK_TS_TXSW;
+> +int SK_TS_ACK;
+> +
+> +static int64_t timespec_to_ns64(struct timespec *ts)
+> +{
+> +	return ts->tv_sec * NSEC_PER_SEC + ts->tv_nsec;
+> +}
+> +
+> +static void validate_key(int tskey, int tstype)
+> +{
+> +	static int expected_tskey = -1;
+> +
+> +	if (tstype == SCM_TSTAMP_SCHED)
+> +		expected_tskey = cfg_payload_len - 1;
+> +
+> +	ASSERT_EQ(expected_tskey, tskey, "tskey mismatch");
+> +
+> +	expected_tskey = tskey;
+> +}
+> +
+> +static void validate_timestamp(struct timespec *cur, struct timespec *prev)
+> +{
+> +	int64_t cur_ns, prev_ns;
+> +
+> +	cur_ns = timespec_to_ns64(cur);
+> +	prev_ns = timespec_to_ns64(prev);
+> +
+> +	ASSERT_TRUE((cur_ns - prev_ns) < delay_tolerance_nsec, "latency");
 
+ASSERT_LT()
+
+> +}
+> +
+> +static void test_socket_timestamp(struct scm_timestamping *tss, int tstype,
+> +				  int tskey)
+> +{
+> +	static struct timespec *prev_ts = &usr_ts;
+> +
+> +	validate_key(tskey, tstype);
+> +
+> +	switch (tstype) {
+> +	case SCM_TSTAMP_SCHED:
+> +		validate_timestamp(&tss->ts[0], prev_ts);
+> +		SK_TS_SCHED = 1;
+> +		SK_TS_TXSW = SK_TS_ACK = 0;
+> +		break;
+> +	case SCM_TSTAMP_SND:
+> +		validate_timestamp(&tss->ts[0], prev_ts);
+> +		SK_TS_TXSW = 1;
+> +		break;
+> +	case SCM_TSTAMP_ACK:
+> +		validate_timestamp(&tss->ts[0], prev_ts);
+> +		SK_TS_ACK = 1;
+> +		break;
+> +	}
+> +
+> +	prev_ts = &tss->ts[0];
+> +}
+> +
+> +static void test_recv_errmsg_cmsg(struct msghdr *msg)
+> +{
+> +	struct sock_extended_err *serr = NULL;
+> +	struct scm_timestamping *tss = NULL;
+> +	struct cmsghdr *cm;
+> +
+> +	for (cm = CMSG_FIRSTHDR(msg);
+> +	     cm && cm->cmsg_len;
+> +	     cm = CMSG_NXTHDR(msg, cm)) {
+> +		if (cm->cmsg_level == SOL_SOCKET &&
+> +		    cm->cmsg_type == SCM_TIMESTAMPING) {
+> +			tss = (void *) CMSG_DATA(cm);
+> +		} else if ((cm->cmsg_level == SOL_IP &&
+> +			    cm->cmsg_type == IP_RECVERR) ||
+> +			   (cm->cmsg_level == SOL_IPV6 &&
+> +			    cm->cmsg_type == IPV6_RECVERR) ||
+> +			   (cm->cmsg_level == SOL_PACKET &&
+> +			    cm->cmsg_type == PACKET_TX_TIMESTAMP)) {
+> +			serr = (void *) CMSG_DATA(cm);
+> +			ASSERT_EQ(serr->ee_origin, SO_EE_ORIGIN_TIMESTAMPING,
+> +				    "cmsg type");
+> +		}
+> +
+> +		if (serr && tss)
+> +			test_socket_timestamp(tss, serr->ee_info,
+> +					      serr->ee_data);
+> +	}
+> +}
+> +
+> +static bool socket_recv_errmsg(int fd)
+> +{
+> +	static char ctrl[1024 /* overprovision*/];
+> +	char data[cfg_payload_len];
+> +	static struct msghdr msg;
+> +	struct iovec entry;
+> +	int n = 0;
+> +
+> +	memset(&msg, 0, sizeof(msg));
+> +	memset(&entry, 0, sizeof(entry));
+> +	memset(ctrl, 0, sizeof(ctrl));
+> +
+> +	entry.iov_base = data;
+> +	entry.iov_len = cfg_payload_len;
+> +	msg.msg_iov = &entry;
+> +	msg.msg_iovlen = 1;
+> +	msg.msg_name = NULL;
+> +	msg.msg_namelen = 0;
+> +	msg.msg_control = ctrl;
+> +	msg.msg_controllen = sizeof(ctrl);
+> +
+> +	n = recvmsg(fd, &msg, MSG_ERRQUEUE);
+> +	if (n == -1)
+> +		ASSERT_EQ(errno, EAGAIN, "recvmsg MSG_ERRQUEUE");
+> +
+> +	if (n >= 0)
+> +		test_recv_errmsg_cmsg(&msg);
+> +
+> +	return n == -1;
+> +
+> +}
+> +
+> +static void test_socket_timestamping(int fd)
+> +{
+> +	while (!socket_recv_errmsg(fd));
+> +
+> +	ASSERT_EQ(SK_TS_SCHED, 1, "SCM_TSTAMP_SCHED");
+> +	ASSERT_EQ(SK_TS_TXSW, 1, "SCM_TSTAMP_SND");
+> +	ASSERT_EQ(SK_TS_ACK, 1, "SCM_TSTAMP_ACK");
+> +}
+> +
+> +static void test_tcp(int family)
+> +{
+> +	struct net_timestamping__bss *bss = skel->bss;
+> +	char buf[cfg_payload_len];
+> +	int sfd = -1, cfd = -1;
+> +	unsigned int sock_opt;
+> +	int ret;
+> +
+> +	memset(bss, 0, sizeof(*bss));
+
+No need to reset some of the new global variables, e.g. SK_TS_SCHED?
+
+> +
+> +	sfd = start_server(family, SOCK_STREAM,
+> +			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
+> +	if (!ASSERT_OK_FD(sfd, "start_server"))
+> +		goto out;
+> +
+> +	cfd = connect_to_fd(sfd, 0);
+> +	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
+> +		goto out;
+> +
+> +	sock_opt = SOF_TIMESTAMPING_SOFTWARE |
+> +		   SOF_TIMESTAMPING_OPT_ID |
+> +		   SOF_TIMESTAMPING_TX_SCHED |
+> +		   SOF_TIMESTAMPING_TX_SOFTWARE |
+> +		   SOF_TIMESTAMPING_TX_ACK;
+> +	ret = setsockopt(cfd, SOL_SOCKET, SO_TIMESTAMPING,
+> +			 (char *) &sock_opt, sizeof(sock_opt));
+
+It also needs the original test in v9 to check the bpf timestamping works 
+without the user space's SO_TIMESTAMPING, which is the major use case of this 
+series.
+
+It should be easy to do by conditionally enabling the SO_TIMESTAMPING here.
+
+> +	if (!ASSERT_OK(ret, "setsockopt SO_TIMESTAMPING"))
+> +		goto out;
+> +
+> +	ret = clock_gettime(CLOCK_REALTIME, &usr_ts);
+> +	if (!ASSERT_OK(ret, "get user time"))
+> +		goto out;
+> +
+> +	ret = write(cfd, buf, sizeof(buf));
+> +	if (!ASSERT_EQ(ret, sizeof(buf), "send to server"))
+> +		goto out;
+> +
+> +	/* Test if socket timestamping works correctly even with bpf
+> +	 * extension enabled.
+> +	 */
+> +	test_socket_timestamping(cfd);
+> +
+> +	ASSERT_EQ(bss->nr_active, 1, "nr_active");
+> +	ASSERT_EQ(bss->nr_snd, 2, "nr_snd");
+> +	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
+> +	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
+> +	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
+> +
+> +out:
+> +	if (sfd >= 0)
+> +		close(sfd);
+> +	if (cfd >= 0)
+> +		close(cfd);
+> +}
+> +
+> +void test_net_timestamping(void)
+> +{
+> +	struct netns_obj *ns;
+> +	int cg_fd;
+> +
+> +	cg_fd = test__join_cgroup(CG_NAME);
+> +	if (!ASSERT_OK_FD(cg_fd, "join cgroup"))
+> +		return;
+> +
+> +	ns = netns_new("net_timestamping_ns", true);
+> +	if (!ASSERT_OK_PTR(ns, "create ns"))
+> +		goto done;
+> +
+> +	skel = net_timestamping__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "open and load skel"))
+> +		goto done;
+> +
+> +	if (!ASSERT_OK(net_timestamping__attach(skel), "attach skel"))
+> +		goto done;
+> +
+> +	skel->links.skops_sockopt =
+> +		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
+> +	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
+> +		goto done;
+> +
+> +	test_tcp(AF_INET6);
+> +	test_tcp(AF_INET);
+
+Considering the w and w/o SO_TIMESTAMPING combinations (i.e. x2), it is worth to 
+have proper subtests. It is easy also. Take a look at the test__start_subtest() 
+usage `under the prog_tests/.
+
+> +
+> +done:
+> +	net_timestamping__destroy(skel);
+> +	netns_free(ns);
+> +	close(cg_fd);
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/net_timestamping.c b/tools/testing/selftests/bpf/progs/net_timestamping.c
+> new file mode 100644
+> index 000000000000..d3e1da599626
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/net_timestamping.c
+> @@ -0,0 +1,244 @@
+> +#include "vmlinux.h"
+> +#include "bpf_tracing_net.h"
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include "bpf_misc.h"
+> +#include "bpf_kfuncs.h"
+> +#include <errno.h>
+> +
+> +#define SK_BPF_CB_FLAGS 1009
+> +#define SK_BPF_CB_TX_TIMESTAMPING 1
+
+Remove these two defines. The vmlinux.h has it.
+
+[ ... ]
+
+> +SEC("fentry/tcp_sendmsg_locked")
+> +int BPF_PROG(trace_tcp_sendmsg_locked, struct sock *sk, struct msghdr *msg, size_t size)
+> +{
+> +	u64 timestamp = bpf_ktime_get_ns();
+> +	u32 flag = sk->sk_bpf_cb_flags;
+> +	struct sk_stg *stg;
+> +
+> +	if (!flag)
+
+I just noticed this one.
+
+Lets replace the "flag" check with a better check (e.g. pid check used in other 
+tests). Then it won't affect sk of other tests running in parallel.
+
+It is pretty easy. Take a look at how bpf_get_current_pid_tgid() is used in 
+progs/local_storage.c.
+
+
+> +		return 0;
+> +
+> +	stg = bpf_sk_storage_get(&sk_stg_map, sk, 0,
+> +				 BPF_SK_STORAGE_GET_F_CREATE);
+> +	if (!stg)
+> +		return 0;
+> +
+> +	stg->sendmsg_ns = timestamp;
+> +	nr_snd += 1;
+> +	return 0;
+> +}
+> +
 
