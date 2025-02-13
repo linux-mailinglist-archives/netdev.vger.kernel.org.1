@@ -1,144 +1,94 @@
-Return-Path: <netdev+bounces-166132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FD1A34B7C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:16:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53DA3A34B97
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:20:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DACB516C0F5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:13:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E640165F4D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC8F1C863C;
-	Thu, 13 Feb 2025 17:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E4F203710;
+	Thu, 13 Feb 2025 17:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VaXJvBPX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QqkS/4J8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700D21FFC75
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 17:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E165203719;
+	Thu, 13 Feb 2025 17:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739466786; cv=none; b=dRR3DyvQJi2yQ54SC/ULn1ReybGSEv7sF106zFazVXtrOUgv2prD1xSTwiMazpjh6RqAhJPHySktQbUl/W9Rq/4w5MZ5fCT2xE2IEo06qGC98c4AXIl972mDhFcAeEtRLoHE6r1emVsfJOchN7j4KV4GlDv4zKKYywAAKr6LAEA=
+	t=1739467161; cv=none; b=QRB8WnQ+ZmNQIdjsUjDllCWmuIThjPE1FF3Gkj35hZMHmi20/l2W/Pgn18R6g155Xva5coJDLxZXBzWBvRuqz1L8auvHLDl7ROfEBZUsAk0ToQFr9BQBdRTMAiYE5KkF4Tl5ZCzG+E68PwN0xGO4AiH7dgZkun4n/0aqPBIqolg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739466786; c=relaxed/simple;
-	bh=0GZ69eyNE1N4uiNq4iczn+3mHzCxciNa6ttKLEikQ+4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iHA4Nxc/K5fW3fvpIxnbXNRa75+r0vAoS5sQsae8cZI2QSwnwMv6qzSVwkLzZmM8rDG4gEBMqqTKCTT8wq4rim8MyMMrfARh/bnAnC9RFsXRoI1gugZrhlrZyiFdB9O196hwXtY54RlwqgZTxRuj+jKMfCg7xGB/lcv0mwxFTEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VaXJvBPX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739466783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2ltDbX9KEAdbsG/W4EuHH+sXIUdOFwfPGk5LTGWC0SY=;
-	b=VaXJvBPXFuT/2cJdsab2ittE415kTCZv02FtpItXqqtD1WGKflhj9yJootk5aLjUKzipG8
-	fLUBLDGXAIMe3gfuaweNM/xJdnamwP82kzn/6j2IxXExqH+1FBOb4KHse0VGRbJJCKFSef
-	Mah7ORTPSMYTatV33ppg4PwZwPrIqVM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-zzsPLAQPPBiONBY0ur7jdA-1; Thu, 13 Feb 2025 12:13:01 -0500
-X-MC-Unique: zzsPLAQPPBiONBY0ur7jdA-1
-X-Mimecast-MFC-AGG-ID: zzsPLAQPPBiONBY0ur7jdA
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-439640a1a8dso3925305e9.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:13:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739466780; x=1740071580;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ltDbX9KEAdbsG/W4EuHH+sXIUdOFwfPGk5LTGWC0SY=;
-        b=noy5SQjacm/IVClyll4Rdrd+92lkqLW/kMme2zH3ZF6oydJI080VNKM1FAjxkTSOhf
-         T4mUoNsclmvgfzfLpzmgE+ffApv1cIaiCEckwZ537hZaNfbr1qa+AEPvPf/SQIFDHtto
-         ostkqp7B/j71rKB3QnO51YiCadclRSwUafi6iZ9rP5eRplyadDPLqTGVxrvJJQ0P6KgR
-         e1C/7iXTjdmy8gWVHPNMTSZKmItPGPCabS+MR9cyxJujh6iDdRHyUtXleCtVwriGbXKb
-         zHx4jBySBZ+6PobgCe1gwmELRxNlxUxLZ0fvcJm+Lb4vK5T66IPrUE/4x1VZduwMSuaP
-         azIA==
-X-Gm-Message-State: AOJu0Yyd1EbOZxCFYalfzppL6/Gvz4+1mwCA48j5n539gaPoiYYG+/ps
-	EE03jNEA2OQC9Aou+9/vt3YO/6pMdbdOevxhUJZocCQKj5TulSf93Xf2NiLnaVvSfFP+Gsb3JV/
-	hsaxZlRdpKqv5/2blFheTJk24G0bQ698bajgBZLlyf+bv9seEW0EzcQ==
-X-Gm-Gg: ASbGnctlKGeMri9g8REc0wdZemdRbBerYLt1a9JEwqVYNRFTh2B/J6NybBEskLeqpa2
-	bhaG7P+m4JQXxJIl+BY6S/pkIHUHQYadiXE51Y4gbZoegjg66lWMhhL1qcg6s24BPCv7y0yjfj5
-	50d/PDV4FvF+sCB9meaG1WkSC8RWOIodKAOnDNZIrcfZ4OsuTB0dFEc/+WLfu8znqkqvJ6GlWPJ
-	B3NnZ2VO/7FsA4k7aIygdHlKUrCwTI8MgPF9BZ9+4wScJ0V8pyn0+X4eg/+9yex5fJDGrN4QMEv
-	PFfVnaQmui6GMLd94bJk5xmb8CX33Cb8+6s=
-X-Received: by 2002:a05:600c:4e16:b0:439:3050:1abc with SMTP id 5b1f17b1804b1-4395817a5edmr93856245e9.15.1739466780552;
-        Thu, 13 Feb 2025 09:13:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtTz73sGL0amgxoVi0AIn5/OLrwPdW0aUTYBPcG9DHJi03I6bWDq1emTkXoJ1lX/rzOvNqRw==
-X-Received: by 2002:a05:600c:4e16:b0:439:3050:1abc with SMTP id 5b1f17b1804b1-4395817a5edmr93855835e9.15.1739466780140;
-        Thu, 13 Feb 2025 09:13:00 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ddbe0sm2435158f8f.39.2025.02.13.09.12.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 09:12:59 -0800 (PST)
-Message-ID: <12199ed2-ca9e-4658-9fc0-44e5b05ca7c3@redhat.com>
-Date: Thu, 13 Feb 2025 18:12:58 +0100
+	s=arc-20240116; t=1739467161; c=relaxed/simple;
+	bh=9jSHN4ul3ZleLnTMDmLIZOfk8OvNXvpRioZv/TPSV6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fg7PfsYJpjO8MRLruAD9416zzGCkCAaHEmRLTrIDIwO9Aqwjm79YnxWuRLwwrK7xPaYPwqbTxFAcp5ZifQ9L4qJHAvrxpJ40DiBqSbD7Bhhb6XZT7gipL19Qb4pTJHPC80qpREcbmAyVpCjzdhCZ8JVxlG2ky+2hIctmLTMJwYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QqkS/4J8; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739467159; x=1771003159;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9jSHN4ul3ZleLnTMDmLIZOfk8OvNXvpRioZv/TPSV6Y=;
+  b=QqkS/4J8n5ysXdbooCQUoibIRiv7+6znDjufuE+Y0poa/fxzOu0w7qja
+   RbRU5kkk0Esm46pQcSC37aPJ5W1xuUqbggec0fQF0R5GwM7hS6NKc0U8t
+   MZZptK/W5iXg8VIS2cs9mwWx2nYuACAWurlkaqXF4yX1biTG9A03SQwww
+   XcwTxQBLmhRYeOZsta/vYnRYpHmkRam3X7jhU4hBcQ6AdZEbWGAi+JhGp
+   aD7sFnAlUGK3nOLVJHZNJcD8/5aVixckyrai93AQTUIdEErFzPd9mHvCp
+   GgIKWrlllpLsov9SPX6chDwF7gYk2ar44jRUxl3zUeQi2khc5PCYg5Aj2
+   g==;
+X-CSE-ConnectionGUID: XEfdE3R/T/q3JamtQqfJpQ==
+X-CSE-MsgGUID: LtPNf76JT8KTcNLz31aPGQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="40219580"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="40219580"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:19:18 -0800
+X-CSE-ConnectionGUID: 9N4MUBhwQU2v0fAwWmpkiQ==
+X-CSE-MsgGUID: MYE75GfASb6bCUWppIhORQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="150382550"
+Received: from dprybysh-mobl.ger.corp.intel.com (HELO intel.com) ([10.245.246.5])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:19:16 -0800
+Date: Thu, 13 Feb 2025 18:19:12 +0100
+From: Andi Shyti <andi.shyti@linux.intel.com>
+To: Markus Theil <theil.markus@gmail.com>
+Cc: linux-kernel@vger.kernel.org, andi.shyti@linux.intel.com,
+	intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
+	Jason@zx2c4.com, tytso@mit.edu
+Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
+Message-ID: <Z64pkN7eU6yHPifn@ashyti-mobl2.lan>
+References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
+ <20250211063332.16542-1-theil.markus@gmail.com>
+ <20250211063332.16542-2-theil.markus@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: allow small head cache usage with large
- MAX_SKB_FRAGS values
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
- <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
- <504a90ea-8234-4732-b4d0-ec498312dcd9@redhat.com>
- <CANn89i+us2jYB6ayce=8GuSKJjjyfH4xj=FvB9ykfMD3=Sp=tw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89i+us2jYB6ayce=8GuSKJjjyfH4xj=FvB9ykfMD3=Sp=tw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250211063332.16542-2-theil.markus@gmail.com>
 
-On 2/13/25 2:44 PM, Eric Dumazet wrote:
-> On Wed, Feb 12, 2025 at 11:08 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> On 2/12/25 9:47 PM, Eric Dumazet wrote:
->>> This patch still gives a warning if  MAX_TCP_HEADER < GRO_MAX_HEAD +
->>> 64 (in my local build)
->>
->> Oops, I did not consider MAX_TCP_HEADER and GRO_MAX_HEAD could diverge.
->>
->>> Why not simply use SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) , and
->>> remove the 1024 value ?
->>
->> With CONFIG_MAX_SKB_FRAGS=17, SKB_SMALL_HEAD_CACHE_SIZE is considerably
->> smaller than 1024, I feared decreasing such limit could re-introduce a
->> variation of the issue addressed by commit 3226b158e67c ("net: avoid 32
->> x truesize under-estimation for tiny skbs").
->>
->> Do you feel it would be safe?
+Hi Markus,
+
+On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
+> This is part of a prandom cleanup, which removes
+> next_pseudo_random32 and replaces it with the standard PRNG.
 > 
-> As long as we are using kmalloc() for those, we are good I think.
+> Signed-off-by: Markus Theil <theil.markus@gmail.com>
 
-Due to ENOCOFFEE it took me a while to understand you mean that we just
-need to ensure GRO_MAX_HEAD and GOOD_COPY_LEN allocations are backed by
-kmalloc to avoid the mentioned issue.
-
-I guess eventual nic drivers shooting themselves in the foot
-consistently doing napi_alloc_skb(<max small cache + 1>), if any should
-be fixed in their own code.
-
-I concur using SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) as the limit
-would be safe.
-
-Will you send formally the patch or do you prefer otherwise?
+I merged just this patch in drm-intel-gt-next.
 
 Thanks,
-
-Paolo
-
+Andi
 
