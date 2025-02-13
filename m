@@ -1,154 +1,96 @@
-Return-Path: <netdev+bounces-165815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56CDA336C7
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:19:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5F8A336CF
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 05:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82409160BB8
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:19:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A77601640F3
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 04:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A542205E2E;
-	Thu, 13 Feb 2025 04:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D4C41C6A;
+	Thu, 13 Feb 2025 04:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="U6TQcmoS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QrFQCtyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BD435949;
-	Thu, 13 Feb 2025 04:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D73D2063DA
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 04:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739420375; cv=none; b=p0hI+/AZk3ajNMGWxH8vOLIaSqHlaRzqPvpbYbGFEqzkUZbIuc4dCBTMgCP1g8nl46Q9efPJFVL5nc6axHzXEf+l6YJZHjZxaLWeoNJ3IOzaw1P/GyKdHP2sz1M7ouLnWrS+cnEEmTTI51hRipgkf/M6doU8/CHHCv4osSb2ffk=
+	t=1739420437; cv=none; b=XjqVmPRHvrTqFBvr77ESDejeW8rfiaVQii39wfU2PjNVO7rHh8o04FEA95b4NTUSr+dLqb/UtYLVZIwgqalDxBTDWenygXqtAYgnc/G9a8EQlUacnQBabjJ1lxa/6/7ve0kQvLrqUSVUFuPFqTJS+zstDNggykMUXT4ERtk731I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739420375; c=relaxed/simple;
-	bh=6HfRT/fnO/W8aeu78ZrIL+G349ObINelVdicx7iZ7qE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Tva8lkMoxZEyYQCBozWnD4G2e/VDs46IF5aa0IYORhiIFN3z4fv9UrguzwvSTaEkKadpk9qIgoYSFYACziBEPFKLzILL9FWzMsjz/7mcQyHlQR8zwIEz09c6pLS95O3gCYaMNAho0u7GiZa1f2VFgBkbyGOjwqctKzeCD+wbQKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=U6TQcmoS; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1739420369;
-	bh=2Ks13A/3NIuV2yBdwTh76NLt4bg5sihP3Ssn+/waTtM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=U6TQcmoSAld8SCykcX+u1e38eyNHTQmzBknpoAie3cZ9ublmfy1frTWKt+7Vu8Ui1
-	 pM749Qa45osqm3//mVNXti50q041Kovloa9Y5L0MH1Mj6oEarBqk7DVEnPV1nKpmBa
-	 tB/U1f56qOXF1s7CHbdXLAtlHaE6r3cMjAOZXiRvRK1ei8LEyi5kRxJ+pd/ilz8BYl
-	 qK4sjfcdJYkI0S3h2m/dpj7oUN0sT3vZ5VIH5Hpa0uuElnXz8/BBhNks4yHzcybgA9
-	 45IXGOjkBJbNo/ftqTcy6t6J/C805SfADEehJts7v3Bcn01yijfI7Vooa8mK8T2IAI
-	 RIRHzhOCRgYHw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ythlh4Knyz4x2J;
-	Thu, 13 Feb 2025 15:19:28 +1100 (AEDT)
-Date: Thu, 13 Feb 2025 15:19:27 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Kees Cook <kees@kernel.org>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Tamir Duberstein <tamird@gmail.com>
-Subject: linux-next: manual merge of the kspp tree with the net-next tree
-Message-ID: <20250213151927.1674562e@canb.auug.org.au>
+	s=arc-20240116; t=1739420437; c=relaxed/simple;
+	bh=GYX8efpz8hfwBimZ5FvgvvnBwWH/DufJNl96Tu+20R0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P1JprSb4NO73EcZbvfWElV4I/IRIAq3fSUyoRcihdmA3FumTlYkOKmGaio387aMvTirzk2+1BmG/+tX1tTsVRhcJhnUjpUWgKi8eT92CgnduOAbrtaw362Pnm1VMxM/pcc+sXGH2QlPHeq0ZrDPdxLofrjFW+Nf8RsPtDXeR6Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QrFQCtyc; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739420437; x=1770956437;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=29l9mthmpqUYTOFINgvO0y4kBGvDGGIo2PwSIp6tJBk=;
+  b=QrFQCtycEQeO+aRxSk3CiteinM3OpdmHotTdhXklQ0eDoy19Ia4MlM4V
+   a2AZfsGeiJBV58So1vGJF+EoIjHbvSBiLVADK0/1cVqxYkAp59Tn4hKyO
+   SILB87pgF8PP+1CTyFnW0DRgz6BRh1lUMwk4JHn6q/5gH9WKZBFV98ll6
+   U=;
+X-IronPort-AV: E=Sophos;i="6.13,281,1732579200"; 
+   d="scan'208";a="408212099"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 04:20:31 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:19610]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.133:2525] with esmtp (Farcaster)
+ id b89387e0-51b2-4f9a-b25d-5d19bad7a502; Thu, 13 Feb 2025 04:20:30 +0000 (UTC)
+X-Farcaster-Flow-ID: b89387e0-51b2-4f9a-b25d-5d19bad7a502
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 04:20:29 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 04:20:25 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <mateusz.polchlopek@intel.com>,
+	<ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<sd@queasysnail.net>, <willemb@google.com>
+Subject: Re: [PATCH v2 net-next 3/4] tcp: use EXPORT_IPV6_MOD[_GPL]()
+Date: Thu, 13 Feb 2025 13:20:14 +0900
+Message-ID: <20250213042014.89490-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250212132418.1524422-4-edumazet@google.com>
+References: <20250212132418.1524422-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9yxX6k3rdBpRL/u6GtMczE4";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
---Sig_/9yxX6k3rdBpRL/u6GtMczE4
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Feb 2025 13:24:17 +0000
+> Use EXPORT_IPV6_MOD[_GPL]() for symbols that don't need
+> to be exported unless CONFIG_IPV6=m
+> 
+> tcp_hashinfo and tcp_openreq_init_rwin() are no longer
+> used from any module anyway.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Hi all,
+allmodconfig + IPV6=y built successfully.
 
-Today's linux-next merge of the kspp tree got a conflict in:
-
-  lib/Makefile
-
-between commit:
-
-  b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
-
-from the net-next tree and commit:
-
-  db6fe4d61ece ("lib: Move KUnit tests into tests/ subdirectory")
-
-from the kspp tree.
-
-I fixed it up (I used the latter version of this file and applied the
-following merge fix patch) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Thu, 13 Feb 2025 14:50:27 +1100
-Subject: [PATCH] fix up for "lib: Move KUnit tests into tests/ subdirectory"
-
-interacting with commit
-
-  b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
-
-from the net-next tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- lib/tests/Makefile                    | 1 +
- lib/{ =3D> tests}/blackhole_dev_kunit.c | 0
- 2 files changed, 1 insertion(+)
- rename lib/{ =3D> tests}/blackhole_dev_kunit.c (100%)
-
-diff --git a/lib/tests/Makefile b/lib/tests/Makefile
-index 8696d778d92f..8961fbcff7a4 100644
---- a/lib/tests/Makefile
-+++ b/lib/tests/Makefile
-@@ -6,6 +6,7 @@
- CFLAGS_bitfield_kunit.o :=3D $(DISABLE_STRUCTLEAK_PLUGIN)
- obj-$(CONFIG_BITFIELD_KUNIT) +=3D bitfield_kunit.o
- obj-$(CONFIG_BITS_TEST) +=3D test_bits.o
-+obj-$(CONFIG_BLACKHOLE_DEV_KUNIT_TEST) +=3D blackhole_dev_kunit.o
- obj-$(CONFIG_CHECKSUM_KUNIT) +=3D checksum_kunit.o
- obj-$(CONFIG_CMDLINE_KUNIT_TEST) +=3D cmdline_kunit.o
- obj-$(CONFIG_CPUMASK_KUNIT_TEST) +=3D cpumask_kunit.o
-diff --git a/lib/blackhole_dev_kunit.c b/lib/tests/blackhole_dev_kunit.c
-similarity index 100%
-rename from lib/blackhole_dev_kunit.c
-rename to lib/tests/blackhole_dev_kunit.c
---=20
-2.45.2
-
-
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/9yxX6k3rdBpRL/u6GtMczE4
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmetcs8ACgkQAVBC80lX
-0GyIkgf/W4SvrqVwfDAKHcFtXdrFrgyiVFwZKikEKyogQriGAdkHosZ3ItPDuo9i
-5TXf3zPeCxYKxR2z89UIQPO/74kA5sXLKTtlBDiWRq38Y0pMufavqUmnoxYsQ1o9
-9K96ARucHRBxRPhZj2jU7CE2ymCSTQigd6ib4A51tHZyWXYyp4mw3mqOaGA3boH1
-ygfLqz0t+CXBz75hLTmy8mha22ofgOg3Wp5sBFapzcZ0R2lQ/ZUdeOu3yQxMUgDK
-gMgpv/Nlu5pyu70BfGdAvLUFtZwxHVE2hkLyGguXf7IOLVelebF8dHODI8UCfiQd
-hTwSETuTRtNkFsXj513WgwG8k1ssXQ==
-=b42K
------END PGP SIGNATURE-----
-
---Sig_/9yxX6k3rdBpRL/u6GtMczE4--
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
