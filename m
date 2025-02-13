@@ -1,191 +1,111 @@
-Return-Path: <netdev+bounces-165967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21279A33D01
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:52:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E36A33D0E
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC65C169616
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:52:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E3F4162EA1
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FB2139C7;
-	Thu, 13 Feb 2025 10:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13A521324D;
+	Thu, 13 Feb 2025 10:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Mi6TSQLO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epg7CZ1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF6E2135C0;
-	Thu, 13 Feb 2025 10:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3162080D4
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739443958; cv=none; b=TeL/WuPQ9ucNuejySdio6iwnHzz4q4c8T59mJyy40pW/3M4ylUznhzmXC/kHZrsxVPRiACgwv80ehy6/MlS7jr8H+cR3mpRr4XpP3zsy+N76WEQ3kkS29UwEvAVVv8AAJc2hCpFqxPeSQwJQQfP53jGUuq/Bh9SqQouD71mFc28=
+	t=1739444129; cv=none; b=JYscA0vs5qX5Y8BP27HFAEwCwuRKyEKDnmDqUDewJ9MKXvBm+1uqhmFcu2a2YBTN/oj5L9yT2rZUvlz5Q4iJ802gzcYZSe3rACGJmDqEMrj4INuYIcqVV32mMMVg7LcSLqwNxN8JBYToq5Q+xpnb553qTj0DDOzhsPVS1vSVuBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739443958; c=relaxed/simple;
-	bh=ly+HI5iL3ovE/Qp0+AEPxYcJXgikpZNZ61yNY81pso0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=orujBMxvzzfgmBbv1JKUnk0BNSTHiW8C1AbIU+hJejMEZAHZJo9ECBRRSCuUdnJIMdZjSQt4V3S/C0+/FSNDrJjbxaDb3M526O/HS5EZE0VkdofY9wwrx8yH/7kcRCznzgtuQ4jKMn73K2qBdsYHvsbFWXUtnQefRHwTMgq6dE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Mi6TSQLO; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739443957; x=1770979957;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=IgkvtMvOSSagKNz50Lh9hAQXzCe7woRbEqIyJBXRz38=;
-  b=Mi6TSQLOk26Z7SPnCQffJxy+SBK9oNUmxyfB4aVl6AWweJwH6bEkzsUy
-   8QDIEmA1HxrnMXlowNRV3VDIeZWjEP5TgkCeFOfx4ESny/DmvnB+9A2P8
-   WAvrkEFUU6t3PBlU8NGPxro4+wodN+iCyHH1EDzs/9vRCiJgV1V/EfIlp
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
-   d="scan'208";a="270834013"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 10:52:33 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:32225]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.187:2525] with esmtp (Farcaster)
- id 0f73d3cd-62b2-4599-a33c-974a909bd3bb; Thu, 13 Feb 2025 10:52:32 +0000 (UTC)
-X-Farcaster-Flow-ID: 0f73d3cd-62b2-4599-a33c-974a909bd3bb
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 13 Feb 2025 10:52:31 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Feb 2025 10:52:26 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.co.jp>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <ushankar@purestorage.com>
-Subject: Re: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
-Date: Thu, 13 Feb 2025 19:52:17 +0900
-Message-ID: <20250213105217.37429-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250213-prudent-olivine-bobcat-ffa64f@leitao>
-References: <20250213-prudent-olivine-bobcat-ffa64f@leitao>
+	s=arc-20240116; t=1739444129; c=relaxed/simple;
+	bh=6VBoxXaCyubvpY/RxuiFUTB3h2ZWmYG5OjQhekDJns8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHskkiM+Ux+BZhkbb5xu6Uiw2ZbkQlJDxfInQT7fJH3K79Sb89d6Hg5339Bk3F1DkNUh4b327LsfoZsSGKLOGCfBt5pHRG5H9KpqHhrnUk6e03iXvG55vMvoqBdBDY8zoApzYjpSmh0iewRHjJwO2rwyYBiZ7zBawxWDTOrXi2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epg7CZ1s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE900C4CEE2;
+	Thu, 13 Feb 2025 10:55:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739444129;
+	bh=6VBoxXaCyubvpY/RxuiFUTB3h2ZWmYG5OjQhekDJns8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=epg7CZ1sf9NcK+DmFPVrXBW9PWIaxkcIaoMPQWOYCVT0XSZuhNLYn3DpWNHmODj5Y
+	 K6ESEyvf+OFkkKN5/sELTRPcvtIwqKBtWvYRQGDQHVzPbYb0w64s9leEPlfIUgQiwF
+	 O2/xXtolDLWl3iJjAXak2JYiF/fFzMfqWNNk4wD3tr0YbkIOMrFvrJt4JInGtg9K11
+	 v3HcWVgIfjhUr0bk7vaSnvM62uFgPk0OQNZeCETvIHKNg5khJgBF7XZ7qIcpex3FRn
+	 fezGQNrGQUjsJ6jsCDnU4fpyzSkbV7XX70H/mLvShfysAKLwkKN7JkR4w3buk7BZp+
+	 wXkEYH57j5VMA==
+Date: Thu, 13 Feb 2025 10:55:25 +0000
+From: Simon Horman <horms@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	michal.swiatkowski@linux.intel.com,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Subject: Re: [PATCH iwl-net 1/2] ice: Fix deinitializing VF in error path
+Message-ID: <20250213105525.GJ1615191@kernel.org>
+References: <20250211174322.603652-1-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250211174322.603652-1-marcin.szycik@linux.intel.com>
 
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 13 Feb 2025 02:29:38 -0800
-> Hello Kuniyuki,
+On Tue, Feb 11, 2025 at 06:43:21PM +0100, Marcin Szycik wrote:
+> If ice_ena_vfs() fails after calling ice_create_vf_entries(), it frees
+> all VFs without removing them from snapshot PF-VF mailbox list, leading
+> to list corruption.
 > 
-> On Thu, Feb 13, 2025 at 04:31:29PM +0900, Kuniyuki Iwashima wrote:
-> > > Subject: [PATCH net-next v3 2/3] net: Add dev_getbyhwaddr_rtnl() helper
-> > 
-> > s/_rtnl//
-> 
-> Ack!
-> 
-> > looks like Uday's comment was missed due to the lore issue.
-> 
-> hmm, I haven't seen Uday's comment. Didn't it reach lore?
+> Reproducer:
+>   devlink dev eswitch set $PF1_PCI mode switchdev
+>   ip l s $PF1 up
+>   ip l s $PF1 promisc on
+>   sleep 1
+>   echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
 
-I saw the reply and my another one on lore but somehow they
-were removed :)
+Should the line above be "echo 0" to remove the VFs before creating VFs
+below (I'm looking at sriov_numvfs_store())?
 
+>   sleep 1
+>   echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
+> 
+> Trace (minimized):
+>   list_add corruption. next->prev should be prev (ffff8882e241c6f0), but was 0000000000000000. (next=ffff888455da1330).
+>   kernel BUG at lib/list_debug.c:29!
+>   RIP: 0010:__list_add_valid_or_report+0xa6/0x100
+>    ice_mbx_init_vf_info+0xa7/0x180 [ice]
+>    ice_initialize_vf_entry+0x1fa/0x250 [ice]
+>    ice_sriov_configure+0x8d7/0x1520 [ice]
+>    ? __percpu_ref_switch_mode+0x1b1/0x5d0
+>    ? __pfx_ice_sriov_configure+0x10/0x10 [ice]
+> 
+> Sometimes a KASAN report can be seen instead with a similar stack trace:
+>   BUG: KASAN: use-after-free in __list_add_valid_or_report+0xf1/0x100
+> 
+> VFs are added to this list in ice_mbx_init_vf_info(), but only removed
+> in ice_free_vfs(). Move the removing to ice_free_vf_entries(), which is
+> also being called in other places where VFs are being removed (including
+> ice_free_vfs() itself).
+> 
+> Fixes: 8cd8a6b17d27 ("ice: move VF overflow message count into struct ice_mbx_vf_info")
+> Reported-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+> Closes: https://lore.kernel.org/intel-wired-lan/PH0PR11MB50138B635F2E5CEB7075325D961F2@PH0PR11MB5013.namprd11.prod.outlook.com
+> Reviewed-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 
-> 
-> > From: Breno Leitao <leitao@debian.org>
-> > Date: Wed, 12 Feb 2025 09:47:25 -0800
-> > > +/**
-> > > + *	dev_getbyhwaddr - find a device by its hardware address
-> > 
-> > While at it, could you replace '\t' after '*' to a single '\s'
-> > for all kernel-doc comment lines below ?
-> > 
-> > 
-> > > + *	@net: the applicable net namespace
-> > > + *	@type: media type of device
-> > > + *	@ha: hardware address
-> > > + *
-> > > + *	Similar to dev_getbyhwaddr_rcu(), but the owner needs to hold
-> > > + *	rtnl_lock.
-> > 
-> > Otherwise the text here is mis-aligned.
-> 
-> Sorry, what is misaligned specifically? I generated the documentation,
-> and I can't see it misaligned.
-> 
-> This is what I see when generating the document (full log at
-> https://pastebin.mozilla.org/YkotEoHh#L250,271)
-> 
-> 
-> 	dev_getbyhwaddr_rcu(9)                                                         Kernel Hacker's Manual                                                         dev_getbyhwaddr_rcu(9)
-> 
-> 	NAME
-> 	dev_getbyhwaddr_rcu - find a device by its hardware address
-> 
-> 	SYNOPSIS
-> 	struct net_device * dev_getbyhwaddr_rcu (struct net *net , unsigned short type , const char *ha );
-> 
-> 	ARGUMENTS
-> 	net         the applicable net namespace
-> 
-> 	type        media type of device
-> 
-> 	ha          hardware address
-> 
-> 			Search for an interface by MAC address. Returns NULL if the device is not found or a pointer to the device.  The caller must hold RCU.  The returned  device  has
-                        ^^^^^^
-This scentence starts from a weird position when we use '\t' after '*'.
-You will see it start from the head if '\s' follows '*'.
+The comment above notwithstanding, I agree that this addresses the
+bug you have described.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> 			not had its ref count increased and the caller must therefore be careful about locking
-> 
-> 	RETURN
-> 	pointer to the net_device, or NULL if not found
-> 
-> 	dev_getbyhwaddr(9)                                                             Kernel Hacker's Manual                                                             dev_getbyhwaddr(9)
-> 
-> 	NAME
-> 	dev_getbyhwaddr - find a device by its hardware address
-> 
-> 	SYNOPSIS
-> 	struct net_device * dev_getbyhwaddr (struct net *net , unsigned short type , const char *ha );
-> 
-> 	ARGUMENTS
-> 	net         the applicable net namespace
-> 
-> 	type        media type of device
-> 
-> 	ha          hardware address
-> 
-> 			Similar to dev_getbyhwaddr_rcu, but the owner needs to hold rtnl_lock.
-> 
-> 	RETURN
-> 	pointer to the net_device, or NULL if not found
-> 
-> 
-> >   $ ./scripts/kernel-doc -man net/core/dev.c | \
-> >     scripts/split-man.pl /tmp/man && \
-> >     man /tmp/man/dev_getbyhwaddr.9
-> > 
-> > Also, the latter part should be in Context:
-> > 
-> > Context: rtnl_lock() must be held.
-> 
-> Sure. Should I do something similar for _rcu function as well?
-> 
-> 	Context: caller must hold rcu_read_lock
-
-Yes, that would be nice.
-
-https://lore.kernel.org/netdev/20250213073646.14847-1-kuniyu@amazon.com/
 
