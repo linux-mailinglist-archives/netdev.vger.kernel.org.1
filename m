@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-165844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5670CA33833
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:49:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCBE0A33837
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:51:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C34651887644
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:49:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F318F1887791
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21392207A11;
-	Thu, 13 Feb 2025 06:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD4A207A1C;
+	Thu, 13 Feb 2025 06:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ahmj0iaV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0K9ST1/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397A62063E8
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 06:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF562063E3
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 06:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739429391; cv=none; b=AeJZV0lrUR+2V3WzXTc/UoWhaWJBWr7LnOyt5tPvEONXfNTCX6uSEDPY+IFHP0tKZ9wxYZa35mFcp2uBpNSoY/qtK5H5WKcl3J+Yr2OU81ZVwtPh2rNVlVvs3GYctBf/ugv43FJ839VkNPG7z9xT1E+I5mo412Rhl87mvhDXugs=
+	t=1739429470; cv=none; b=mQOIDNmSk6WSy4scvR5xKM52DNNMRG9upbs66rA7GOcJdn+EoqkCfz0JB/ildXDzIgXJIXKGra8YQFMysMABgRoAt32rAS+uBGrzbbN5haRfFeJieHDkqQiLp43WN8FsJLsM/CApB1f7exqdWw8OujBNUU+cz7+m5p0T99s8HAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739429391; c=relaxed/simple;
-	bh=+nUse8LOFrqMjTAd7cBS0kvQ9pSPdEBXnj/Y4tc5PXs=;
+	s=arc-20240116; t=1739429470; c=relaxed/simple;
+	bh=AhzIdeUNW+hCq2NsK0teMbmcDd0av7JWUfWU+f4ZMRk=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=OBzb7NWjrCl8611Bn62gmC5RvHpgYtVlPVuhgyuFg4Ja+M4c241AHIG8Nhuo4/nJv0g6IO3q0ctpiX7se63wIHZPPqiboqFATFRzKGJTu0iRLviKMEHD3YFiYxAeGEtFT+BQHg8diSma8WJy6GEyplC3d7j/PP3noJSSV0i2jJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ahmj0iaV; arc=none smtp.client-ip=209.85.128.42
+	 In-Reply-To:Content-Type; b=Nr2sm1iv9gGuLo2hwk5pNzqH9WS+3WVpi4yF+yMbP7npmZPw/LHNL1KZTCbIcQJwoaruzkHXpZrkxYnE9HLqbqTPzng4qp/e2JWc8/kkjTz4759oYBd56El/ew2mWBGeIv+vF2AQ25ytt06RvHyfPLcTfbOBVCZAia++zgSAv0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0K9ST1/; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43948021a45so5233445e9.1
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:49:48 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4395b367329so2821995e9.3
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:51:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739429387; x=1740034187; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739429467; x=1740034267; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9GUu3EzRlS/ngFTHDdGEuuBCERvBzHDVB29DOiTeihs=;
-        b=ahmj0iaVVsKencnTjc4Vnh+OtSZXKHduyZrhIX3+MhCu+bNAcFPNWyOopCKknOsJcj
-         ZxNILcqNDg/JqZdFILCnlcD6bpy3K+3T82N4vo6zICc8XQedfXDkDrVcr5o0KAU7e8In
-         xr5OBDELMBJrGk94cLWUK906g68nY9cNDWS9oxHCKRac9aGviPMnNj+r26x7fYVyWkSH
-         nBNX9i8kcFB5aO+a+1RyYQZwJq5C9v1KJj3VRy4cXdy0h09td0641reiOZnqqNU62eEI
-         OqSGH8tfIXsGbwrUf2gIO7POLCUCtucXRseXVh3tRW3jRCKBsVY1woXZzbSbTNuzmO9b
-         rjAA==
+        bh=aqwR/OohvPeKiJLulmHUEaUwhhaHWF7qcqQ9CtgceOQ=;
+        b=m0K9ST1/yPSZ2XfDwi1xH/ob2FRBRpzZWAMl+d9EyqzZqZGzMPHLSwpnCwnxWiwsX/
+         9oZUJW+yydoj8PoT1HBbla+aZDXMNHAGXhGRPAJxuEFFkd1C8NoGGvDboxk8I/qpsnsw
+         kb9U5UMvyV57IvkQNpCEXSBQULtZJZmCv9F0BQCDRefj2x0ka9VDI39MwJUwTK8ZM3OA
+         XLCLz2+PkzEo/sUj0lFh8/V6HPc+M28mn4sVMx1r7HjGxrcaOCjGt2zo9psBnffWQaZp
+         H5nftJKZXV+rBlRB/YBrAqR0mMgLdxGIhqyTSlPEIgXpXJ/4zplgD/7XeO2rHD7DKL+T
+         SyJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739429387; x=1740034187;
+        d=1e100.net; s=20230601; t=1739429467; x=1740034267;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9GUu3EzRlS/ngFTHDdGEuuBCERvBzHDVB29DOiTeihs=;
-        b=okm92ajG8ZLpvVOgamBbIWxBJWvNyElz9Vuucbjjh9uwfyefCFcSX1A9/0yM7UZL6s
-         SEC4g2IJ3ilI1rH54SpS/mv77Zyq3vOgNgZSHmU4ZP3EIx2+zSmMrac3sJv1jDGh0XTp
-         1Ac6DlTGi2u1Fh66CmC3JXLTTU8GIySv0PO9rOaTaDHfOjo6HFluEvNCM5CBQ9zwhQFt
-         kZFapHWIctrvnOLr3iRx4lkZ70+24unz36Rl/GER328QqPEEsjWugyPl2FSzww5IK3pQ
-         DY1s71bmK4ZjTGkuQOBegFtrMSsQlDcyuDzvpgojZOXlXQMcmsdNQHr7mNWIbCX7p4qx
-         dK4Q==
-X-Gm-Message-State: AOJu0YzAp/bL8DMy7bbivj53DcXd0hovhaWLvxc17dQ6O/DFfXeesP28
-	B2ALQJTMswZGoqOlfTQhlpm0R0oVaVaVra3BmXhHn7lpfvI8ikli
-X-Gm-Gg: ASbGncsyWHWgxx3m9ocfA+NHamMgwopyTzl59bPHK1o1ELEvsnOsy1Rn+mI5APm4Jq6
-	9qVhZUvg3cafrt5+nUpN0Mp0PupJDNTQ5Kn1BiiSvL2ORMwF9baCQ3qGqy2rigZl3qS+4fwRTFk
-	5H89xGbp5TBJ7F/KvqLRLFpCjdBeqmLMrHEJ4Ol9oP/SvSpJhNJL3Bw/4OY4ENjVbU7vFiSFAR4
-	nXG7fXhPjF6VzGfyu6GVGofNyplKzYAgr44qZN9GpSGpSvRySwuvrkJN7EbAOzY+Z3HRHFHhHSL
-	2+dJj6GY2Mp0AkDPVk1SZQbUBc4i0SjkFSZ7tJ06BfAbQ+pIxA2N68YdNh8iY8SJoyCatd1aXQH
-	VDd5f3WNmCAiuwsdU96s3IaV2V5FkttbjUoX1oOGlFYftWNJUveUDwAay5Dwfwx1HRYxwf1iywL
-	dl1Sy3
-X-Google-Smtp-Source: AGHT+IHk8/I/QsNVijalWlJy48TnUsvJF6cT3CSMfRO53ImyHkmMW/oL14GlsKMdT4tcne1DoEsoXg==
-X-Received: by 2002:a05:600c:35ce:b0:436:ed38:5c7f with SMTP id 5b1f17b1804b1-43958176904mr65132325e9.12.1739429387338;
-        Wed, 12 Feb 2025 22:49:47 -0800 (PST)
+        bh=aqwR/OohvPeKiJLulmHUEaUwhhaHWF7qcqQ9CtgceOQ=;
+        b=qUAdoLCDwtTwND2kVSfKR4fn38oPmpuKN72Az2+dXR6VPyrhnqs1M6msDroIT8x8od
+         OgZRIqbf5juyZs7w0bNXe4KnMzZTf90R1Z5/58y5ek1xOOoHHlT21SwxWPkeE0vIl4QI
+         dnNQahgYf3pd+2WAuOK6a/r14cjeENJkv07pNGyG5biSt0txwMBhT/7Asm2LAEqhTGP1
+         bzclZ8Zih6QafHgt1zUXKIdo5wR+9lYL70q7ILt4Rap1/CYqz9KRrW0ybHV4v+W6+U3Q
+         I/K9nN0f1XZk/U7/sLTMW9w1JlvR6lnR05EC2rv036ML+4D8A5sv8r68SbgfG2S2z8Es
+         Eg+g==
+X-Gm-Message-State: AOJu0Ywv/GVT0xx00DG4OC+ZOvQ9Z+3iVyLSfkQqLyMGw65A2Ebz+uYP
+	+wLyua4pPHH/sscbgO47ZZRwxNzsBxHy8AhArCck6mUnbdQz0RWe
+X-Gm-Gg: ASbGncsFjvaArlZOIqfAQ6UKxL68mQSgTfaMV1FQRo8XyKlnmLi+KI0yBJ4RyinawJs
+	UkhlsAPp2KiW9Tdd14bKt/Wf9s5Dgb2IqdXD1ZrSP/eRdfi/vhAejF7cyU7cegk/NNpAoiEPQNC
+	1PcMmsyJw806Z1cM+GFk+2pKj43/ZV4wWAopJnRkPrxZpCQjZswwMMF7S19/UCf1fk+hrf+luzQ
+	9EdsrUwHtUgKHBGb9WTmQFXIAywCu9h6CJSLrPlGFV6oIrY0jGToZKlDFsDLiBdllMtF5v3xcaS
+	vLcxzuWcDNTqVC45qPceROTQIxKl+wbeDLvw1Pfuef3hxPjyBCTEgo/XSU5vnR8PPY7WVDL5LAF
+	LCcMXzhqB1mqyv6zGfA+PXRvLOwYBqUXUm3hNpXwcfpHQSFUxt+MmtUELRY41Wm8w4/dv6ueJhS
+	8YG4TW
+X-Google-Smtp-Source: AGHT+IGu1eNUwiFn+nUdopSVOr9fun/kqLG1NPYXuTvj1QveyTnF+yfbFrOIvoeWAZqh1J9QYFEVtQ==
+X-Received: by 2002:a05:600c:46cc:b0:439:5f5b:e98 with SMTP id 5b1f17b1804b1-439601a96f3mr17459435e9.27.1739429466931;
+        Wed, 12 Feb 2025 22:51:06 -0800 (PST)
 Received: from ?IPV6:2a02:3100:9dea:b00:8068:750d:197f:b741? (dynamic-2a02-3100-9dea-0b00-8068-750d-197f-b741.310.pool.telefonica.de. [2a02:3100:9dea:b00:8068:750d:197f:b741])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-439618a98f9sm8421945e9.39.2025.02.12.22.49.45
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38f25914d73sm991066f8f.54.2025.02.12.22.51.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 22:49:46 -0800 (PST)
-Message-ID: <6244841c-b517-4f26-b192-bfbd41846c5e@gmail.com>
-Date: Thu, 13 Feb 2025 07:50:18 +0100
+        Wed, 12 Feb 2025 22:51:05 -0800 (PST)
+Message-ID: <4a39826d-1dfd-4b93-80b6-c0da7c5109ec@gmail.com>
+Date: Thu, 13 Feb 2025 07:51:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/3] net: phy: realtek: improve MMD register access
- for internal PHY's
+Subject: [PATCH net-next 3/3] net: phy: realtek: switch from paged to MMD ops
+ in rtl822x functions
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -142,133 +142,51 @@ In-Reply-To: <ca05b98a-5830-4637-be72-c11d7418647a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-r8169 provides the MDIO bus for the internal PHY's. It has been extended
-with c45 access functions for addressing MDIO_MMD_VEND2 registers.
-So we can switch from paged access to directly addressing the
-MDIO_MMD_VEND2 registers.
+The MDIO bus provided by r8169 for the internal PHY's now supports
+c45 ops for the MDIO_MMD_VEND2 device. So we can switch to standard
+MMD ops here.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/realtek/realtek_main.c | 79 +++++++++++---------------
- 1 file changed, 33 insertions(+), 46 deletions(-)
+ drivers/net/phy/realtek/realtek_main.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 210fefac4..2e2c5353c 100644
+index 2e2c5353c..34be1d752 100644
 --- a/drivers/net/phy/realtek/realtek_main.c
 +++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -735,29 +735,31 @@ static int rtlgen_read_status(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtlgen_read_vend2(struct phy_device *phydev, int regnum)
-+{
-+	return __mdiobus_c45_read(phydev->mdio.bus, 0, MDIO_MMD_VEND2, regnum);
-+}
-+
-+static int rtlgen_write_vend2(struct phy_device *phydev, int regnum, u16 val)
-+{
-+	return __mdiobus_c45_write(phydev->mdio.bus, 0, MDIO_MMD_VEND2, regnum,
-+				   val);
-+}
-+
- static int rtlgen_read_mmd(struct phy_device *phydev, int devnum, u16 regnum)
+@@ -901,7 +901,7 @@ static int rtl822x_get_features(struct phy_device *phydev)
  {
- 	int ret;
+ 	int val;
  
--	if (devnum == MDIO_MMD_VEND2) {
--		rtl821x_write_page(phydev, regnum >> 4);
--		ret = __phy_read(phydev, 0x10 + ((regnum & 0xf) >> 1));
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE) {
--		rtl821x_write_page(phydev, 0xa5c);
--		ret = __phy_read(phydev, 0x12);
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV) {
--		rtl821x_write_page(phydev, 0xa5d);
--		ret = __phy_read(phydev, 0x10);
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_LPABLE) {
--		rtl821x_write_page(phydev, 0xa5d);
--		ret = __phy_read(phydev, 0x11);
--		rtl821x_write_page(phydev, 0);
--	} else {
-+	if (devnum == MDIO_MMD_VEND2)
-+		ret = rtlgen_read_vend2(phydev, regnum);
-+	else if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE)
-+		ret = rtlgen_read_vend2(phydev, 0xa5c4);
-+	else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV)
-+		ret = rtlgen_read_vend2(phydev, 0xa5d0);
-+	else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_LPABLE)
-+		ret = rtlgen_read_vend2(phydev, 0xa5d2);
-+	else
- 		ret = -EOPNOTSUPP;
--	}
+-	val = phy_read_paged(phydev, 0xa61, 0x13);
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xa616);
+ 	if (val < 0)
+ 		return val;
  
- 	return ret;
- }
-@@ -767,17 +769,12 @@ static int rtlgen_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
- {
- 	int ret;
+@@ -922,10 +922,9 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
+ 	if (phydev->autoneg == AUTONEG_ENABLE) {
+ 		u16 adv = linkmode_adv_to_mii_10gbt_adv_t(phydev->advertising);
  
--	if (devnum == MDIO_MMD_VEND2) {
--		rtl821x_write_page(phydev, regnum >> 4);
--		ret = __phy_write(phydev, 0x10 + ((regnum & 0xf) >> 1), val);
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV) {
--		rtl821x_write_page(phydev, 0xa5d);
--		ret = __phy_write(phydev, 0x10, val);
--		rtl821x_write_page(phydev, 0);
--	} else {
-+	if (devnum == MDIO_MMD_VEND2)
-+		ret = rtlgen_write_vend2(phydev, regnum, val);
-+	else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV)
-+		ret = rtlgen_write_vend2(phydev, regnum, 0xa5d0);
-+	else
- 		ret = -EOPNOTSUPP;
--	}
+-		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
+-					       MDIO_AN_10GBT_CTRL_ADV2_5G |
+-					       MDIO_AN_10GBT_CTRL_ADV5G,
+-					       adv);
++		ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2, 0xa5d4,
++					     MDIO_AN_10GBT_CTRL_ADV2_5G |
++					     MDIO_AN_10GBT_CTRL_ADV5G, adv);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+@@ -969,7 +968,7 @@ static int rtl822x_read_status(struct phy_device *phydev)
+ 	    !phydev->autoneg_complete)
+ 		return 0;
  
- 	return ret;
- }
-@@ -789,19 +786,12 @@ static int rtl822x_read_mmd(struct phy_device *phydev, int devnum, u16 regnum)
- 	if (ret != -EOPNOTSUPP)
- 		return ret;
+-	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
++	lpadv = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xa5d6);
+ 	if (lpadv < 0)
+ 		return lpadv;
  
--	if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE2) {
--		rtl821x_write_page(phydev, 0xa6e);
--		ret = __phy_read(phydev, 0x16);
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV2) {
--		rtl821x_write_page(phydev, 0xa6d);
--		ret = __phy_read(phydev, 0x12);
--		rtl821x_write_page(phydev, 0);
--	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_LPABLE2) {
--		rtl821x_write_page(phydev, 0xa6d);
--		ret = __phy_read(phydev, 0x10);
--		rtl821x_write_page(phydev, 0);
--	}
-+	if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE2)
-+		ret = rtlgen_read_vend2(phydev, 0xa6ec);
-+	else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV2)
-+		ret = rtlgen_read_vend2(phydev, 0xa6d4);
-+	else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_LPABLE2)
-+		ret = rtlgen_read_vend2(phydev, 0xa6d0);
- 
- 	return ret;
- }
-@@ -814,11 +804,8 @@ static int rtl822x_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
- 	if (ret != -EOPNOTSUPP)
- 		return ret;
- 
--	if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV2) {
--		rtl821x_write_page(phydev, 0xa6d);
--		ret = __phy_write(phydev, 0x12, val);
--		rtl821x_write_page(phydev, 0);
--	}
-+	if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV2)
-+		ret = rtlgen_write_vend2(phydev, 0xa6d4, val);
- 
- 	return ret;
- }
 -- 
 2.48.1
 
