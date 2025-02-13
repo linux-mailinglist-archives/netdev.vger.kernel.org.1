@@ -1,86 +1,79 @@
-Return-Path: <netdev+bounces-166001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13BDA33E57
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:45:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D6B7A33E66
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21057188CE6E
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:45:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1D5D16A175
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFDC21D3F6;
-	Thu, 13 Feb 2025 11:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96D32144CB;
+	Thu, 13 Feb 2025 11:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beg1QDjN"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="asilKgaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D25C2080DE
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F250212FB1
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739447111; cv=none; b=MIIwyGk1f/GpzkU8PaBVy2O1kyOFfqxPYGXGxOMmilqp38gLFub6lcGhBvH/uilNAYCvkVBYcg1ihNzuYkodRwT83jD3flBV8Qa4kxgX2aAxw/EObBSDrb4+/kyvVAk6bhXvref2OoXRwxq4yF4Cy9PyGBkFgoy8rkH7/cQL3l8=
+	t=1739447198; cv=none; b=Swe8uZXBluQ6j1me19KNCFzloNH1uByH4l4542njPWEwOr1Z6Cwq44GgRZK9woSF5NijmpeixFpp8e/hxXTtFDEHIhm3XVs+R0Wq0r2UhuCk72i+2LrLeB+AMvRLQ3KrtPsx4pwU7z05svG8dEsc7LBUZcI82CWq2M+aAcToTZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739447111; c=relaxed/simple;
-	bh=z4FzBPhL+KmxxVmJsJ8LIv/mETG7bxy17DamwT8n4wE=;
+	s=arc-20240116; t=1739447198; c=relaxed/simple;
+	bh=Gt0tMFFzR5IlIKVaO3OfCljuPflErhSeAuqyN39sKfo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HNc7aNsBNnfLahoTnrkuDBlJVbXJNM3fJk6KHCdX0wMacFutzAu4c8D02IMnRi8Xy5aAt0KiGMephVGlnAJynRavv5JokYvwLdpNsR8QojD3tHQUH9/2FYhbeTKwJx2l2WFLm3s6QT6aAH5z/i+H6RbNwSR+gb5bl0pvq2xRVL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=beg1QDjN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739447107;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Ail4YrUpEYkDWqUc8Ez27id76e/8NDgaGRJNAbGRmo=;
-	b=beg1QDjNvwnE7SxeIUE3jgKdZ9FI1yShicV41vfrU/iWdqQrkxoGchVXIcWPAK8Y1FWgd7
-	DReTdNXZTZ32se+T3hgF0txj0HBLnmD06vbvwf2lvyYR7AzbOs54Qz8lc3vRqKXRJ6nkmw
-	uiOxBnQnGMN8elLjPZ0zlgB8+PP5D3Y=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-_QHT7wNDMqODJLdWel32xw-1; Thu, 13 Feb 2025 06:45:05 -0500
-X-MC-Unique: _QHT7wNDMqODJLdWel32xw-1
-X-Mimecast-MFC-AGG-ID: _QHT7wNDMqODJLdWel32xw_1739447103
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4395f1c4354so5713475e9.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:45:05 -0800 (PST)
+	 In-Reply-To:Content-Type; b=R+o5MLih7P7En8o+wH1U6YT5pYTgmDShEvJoaJdDKuQz8OcCpTVa2Y4BsgQpdxqMumePZQ/9PaV7b6RROHrz478KvzbljQpy73IuHLp+e0OteJMb71USrYxxxG1EDE4LdNb88f4tqQa9fA3Z/HFBHnc1Uw5rc6HIvxF59ETw3V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=asilKgaf; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-38f24fc466aso514337f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:46:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1739447194; x=1740051994; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pLvkb9HlJyUozDiDHO4/drWQgsoe+VSaExuzLx0XOw4=;
+        b=asilKgafl9i0ISeFFmLW+GbaWANQDfufF85l3jcp/7fMv1EM07FN8Xvu+M777rF55d
+         rjyKhHCLztpaxK6ODjjm9z5bWRfdCoSQtChv3PUc5SVo1Rk74C5dVpgD5nVCHvpoX959
+         V4bUAntmme/R05biFpXM5gxoRCBza5CKpNbBRp7tyTVJR1JQgFYEN8EPwyo8dbXk1tv4
+         znVXNfZFlB0uCbsE6UKxgXlCA/qboU43F9W8a8Iwj5pUG+d5OIPF9w1Bp5YM5/kbPlQG
+         ZQNq5QiTyakSCVd8o9OR+HRWEK4wiGwElK7VfKHpW94ZV2SysvKBG65kQS4lfZ6o5PW2
+         hSPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739447103; x=1740051903;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ail4YrUpEYkDWqUc8Ez27id76e/8NDgaGRJNAbGRmo=;
-        b=HdYsl1BumWwPRwWESc2UofFcEI75PdT6Y675CU75r/3YHYJ/tHWF5TTsWHxeYDYlco
-         gJfjXDfy8tJMOmGf+z/qVx0Q3yhj5iUMjAPNy4Vajv2s/jUURpD4LQthrNETuU4gRXlO
-         b0PZDdVQFBuiR3L6mg4Pan0/pK2ZQukqO2MzmkAIxTQAQkQIIcjsa+aS9qeuzh3L1iZl
-         YnAXHssj6Pz0x60qcEsUXKVxzhmkUs+3lMfQtZ0gLdTTzd4O6szRwTdazWDl1chKPcmy
-         wxjxkN0EgTTWgpN+bl33n7EX5N7eD6s2UOKkQACyrQSRGPHrTYYyU3bZCFE49NrDl/St
-         00EQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKJRQJhOstcLJ64OUjtyPv1H9ghNsKQMesImW5hvjKWCqrPvxbeAdm9s3/etV+gF0w6hso9Lg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaFM4L4YAfKti4aXVpWqj4g9uO7x/qnTIm7EheAgvWsHyYLTkX
-	ZGZMvHfYOpO7xcv75JI7DH7Qo40JG8wZSxUz5EWz1rUEYkZNXYzKCwBvJNZdkAFfOwPAJvH38Sn
-	pUB919cCoi8l9E0zFqIO4UHTDna8BY8UvW44RenYkS4TSC/lo9ASdBgA22KO/Jg==
-X-Gm-Gg: ASbGncuIWSmmP94dQwBGq8Pef/N0vb0t4VIsJZ7sXq3tr88oSkXkhnY2OxR+IO74Yl3
-	3NlKYaFFE8FsAMszBv3ySbNhioSlSn0gJ9kEfggCt1z5EMM5MiAJE40yfK32fWJg5Mne8g6yZHk
-	qpZrOqtmoVBM+LwtW1nc7TsBEgG8sm5+uPOHXlyymBFg+GGR2DiiCA5RtDHbQQBd+aSVNptbfOw
-	ZRGi3K9jmRPFlOyNQvCQVqjpnFtEsNFnGeyWzCGGauoCznbJ5gkp8l0J0BfrDZUIub/vKtIlXVJ
-	KkE5ch11L/y7w28D/8yyDOvNvXzNPrR2QWs=
-X-Received: by 2002:a05:600c:3ba8:b0:439:4832:325f with SMTP id 5b1f17b1804b1-43958160560mr57564805e9.1.1739447103147;
-        Thu, 13 Feb 2025 03:45:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGsSaO9nwngXTwOiOIOnC4gfeygnFqnmDRDuBNDDrC1cNijFS2fay3xrPf6j87eCOO52vmu/Q==
-X-Received: by 2002:a05:600c:3ba8:b0:439:4832:325f with SMTP id 5b1f17b1804b1-43958160560mr57564445e9.1.1739447102713;
-        Thu, 13 Feb 2025 03:45:02 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439617da91asm15645415e9.2.2025.02.13.03.45.01
+        d=1e100.net; s=20230601; t=1739447194; x=1740051994;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pLvkb9HlJyUozDiDHO4/drWQgsoe+VSaExuzLx0XOw4=;
+        b=Gh/ywrk4Qu525VU+orYZfWDjp9DSxfOc99U5Re2+kul9YNUqA7Int3R2G81NEbV+3t
+         m8+r0GfVyRhDv38Dosp8DpP2pgOe0NbpnKwZrwF6Jou401pVecQqBrTQk5UsT63WczD9
+         9veVNXlceewYNOcqIjFdNkcSeKbthsxe7Aqk9NmFYwaN/p26RRmkwCDv4J5KLxvx9SAi
+         9UmLpBXYEJrB775+KQewVgWILvMnbphjL3Q0Tm8Bn0FToWgLNJNexwFYmmQmelR4EEdU
+         Eo47ukP1RFckeoohJj1WG5/dZC6tOeMX0HPeobVZJBUkllL5i1gZb/lbjHQf1xE2z9ZW
+         CURw==
+X-Gm-Message-State: AOJu0YxPgCKAUUq+Z2vKeOETEeJK1CwbKN/jdlc5ge2dEhkHSfRDZxTk
+	O5/0RVc9bRHil/obKFSsGDH7iodEFh58l2z2SPfCbqi+zmolhhbLj84cD8J/Ysc=
+X-Gm-Gg: ASbGncsdPbdEwgo13aELFeUHkfvb0Zmne/vLHxiA9pvIuBwDYgcpMwkt7sEcsUBU/Je
+	BaK2+3/uPFiAAL0QDMIvc10V+V8d44hXAYPvCpZA8dYSLYliVR7EB91k1/x7apZLDCUhXaXobVE
+	GIIQV+73f3FgGq+Tbr4MQi7lhRk9XezCh/o80w2Ky0/gjUQDXGeq5khHOXrgPFpLboVyIFCl4yY
+	wLh9F4Sg06ZpNcwjxrFrb/BfifK3RVG01L9BdzQrfGN5SNABTc/GB0y8/tDVF4aaWOa7dPVt2lg
+	UyYUL/zHtNqJAKmmYolJ1exButKQ5M3WgbmHmK8fp49hNTtnU8G3hA==
+X-Google-Smtp-Source: AGHT+IGc0R4jikBYLoD4kdApspmKli3hWqBkBAV/vMF0JaPNaKhRS5GIlRqwwYV+GGz7ZQ8tBLD2Fg==
+X-Received: by 2002:a05:6000:1ace:b0:38d:d0ca:fbad with SMTP id ffacd0b85a97d-38dea270cf3mr6983294f8f.14.1739447194514;
+        Thu, 13 Feb 2025 03:46:34 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:9591:8141:43d0:1ca6? ([2001:67c:2fbc:1:9591:8141:43d0:1ca6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f8217sm1658833f8f.90.2025.02.13.03.46.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 03:45:02 -0800 (PST)
-Message-ID: <013921c8-1fd0-410d-9034-278fc56ff8f5@redhat.com>
-Date: Thu, 13 Feb 2025 12:45:01 +0100
+        Thu, 13 Feb 2025 03:46:34 -0800 (PST)
+Message-ID: <090524ac-724d-4915-8699-fe2ae736ab8c@openvpn.net>
+Date: Thu, 13 Feb 2025 12:46:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,50 +81,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] documentation: networking: Add NAPI config
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, rdunlap@infradead.org, bagasdotme@gmail.com,
- ahmed.zaki@intel.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <CALALjgz_jtONSFLAhOTYFcfL2-UwDct9AxhaT4BFGOnnt2UF8A@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 00/26] Introducing OpenVPN Data Channel
+ Offload
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ steffen.klassert@secunet.com, antony.antony@secunet.com,
+ willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+References: <20250211-b4-ovpn-v19-0-86d5daf2a47a@openvpn.net>
+ <Z60wIRjw5Id1VTal@hog>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CALALjgz_jtONSFLAhOTYFcfL2-UwDct9AxhaT4BFGOnnt2UF8A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z60wIRjw5Id1VTal@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/11/25 9:06 PM, Joe Damato wrote:
-> Document the existence of persistent per-NAPI configuration space and
-> the API that drivers can opt into.
+On 13/02/2025 00:34, Sabrina Dubroca wrote:
+> Hello,
 > 
-> Update stale documentation which suggested that NAPI IDs cannot be
-> queried from userspace.
+> 2025-02-11, 01:39:53 +0100, Antonio Quartulli wrote:
+>> All minor and major reported problems have been finally addressed.
+>> Big thanks to Sabrina, who took the time to guide me through
+>> converting the peer socket to an RCU pointer.
 > 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  v2:
->    - Reword the Persistent Napi config section using some suggestions
->      from Jakub.
-> 
->  Documentation/networking/napi.rst | 33 ++++++++++++++++++++++++++++++-
->  1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/networking/napi.rst
-> b/Documentation/networking/napi.rst
-> index f970a2be271a..d0e3953cae6a 100644
-> --- a/Documentation/networking/napi.rst
-> +++ b/Documentation/networking/napi.rst
-> @@ -171,12 +171,43 @@ a channel as an IRQ/NAPI which services queues
-> of a given type. For example,
+> Something is off (not sure if it's new to this version): if I use
+> test-tcp.sh to setup a set of interfaces and peers (I stop the test
+> just after setup to keep the environment alive), then remove all netns
+> with "ip -all netns delete", I expect all devices to go away, but they
+> don't. With debug messages enabled I'm seeing some activity from the
+> module ("tun0: sending keepalive to peer 3" and so on), and
+> ovpn_net_uninit/ovpn_priv_free never got called.
 
-It looks like your client mangled the patch; the above lines are
-corrupted (there should be no line split)
+I can reproduce it. If later I rmmod ovpn I then get all the "Deleting 
+peer" messages.
+So instances are not being purged on netns exit.
 
-Please respin
+Will dive into it.
 
-/P
+> 
+> [...]
+>> So there is NO risk of deadlock (and indeed nothing hangs), but I
+>> couldn't find a way to make the warning go away.
+> 
+> I've spotted another splat on strparser cleanup that looked like an
+> actual deadlock, but it's not very reproducible. Still looking into
+> it, but I'm not convinced it's ok to call strp_done (as is done from
+> ovpn_tcp_socket_detach) while under lock_sock, because AFAIU
+> cancel_work_sync(&strp->work) may be waiting for a work that needs to
+> lock the socket (cb.lock in do_strp_work). I guess tcp_tx_work would
+> have the same problem.
+
+Will have a look here too.
+
+Thanks!
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
