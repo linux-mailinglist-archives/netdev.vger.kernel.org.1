@@ -1,102 +1,306 @@
-Return-Path: <netdev+bounces-166209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD79A34F83
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:38:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B569AA34F85
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 21:39:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D92C189010E
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BECF3AC0D1
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA99C2661A1;
-	Thu, 13 Feb 2025 20:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E362266196;
+	Thu, 13 Feb 2025 20:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EViDjZsQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nz8DFBDQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5CA245B08;
-	Thu, 13 Feb 2025 20:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739479095; cv=none; b=gdt3HvFFInubGR84CETZLyynua0QGL2Eyv0J9fXvVn1VD3tdage8qpBScgPksg32xmMOdvjA6wJ7oQSpDi7SLYVwtb4q01dyyuoJspkMl+fqtNDV4YpyAbkt6raQzWHIj+FdL6glz7Y08FRvlbaT7dteapXJ+v7OM9IP0i5Xh9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739479095; c=relaxed/simple;
-	bh=vRx3aCxKD64lcDldByrYSeK3x46VtWp7TM7XgTNx4Ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X20Tj+N7a7PuhpuqpDLO2G9Tf8N3cmANrpaOrgnWyZ5amn7suvQ4llIFOijnuxx6vN5J4YaZUZfKWuIHaOQp6L7yAR4Orn4A/33yIjyzlTVKbubke8MuwdxxnVHhMObuspmnFed2X+g8SEi+KxK6R1tc8KuVUQeVhKuUxPosL6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EViDjZsQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EBF5C4CEE4;
-	Thu, 13 Feb 2025 20:38:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739479095;
-	bh=vRx3aCxKD64lcDldByrYSeK3x46VtWp7TM7XgTNx4Ik=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EViDjZsQAtsBOdNMgWGCJ4XuI3GPwNvCUFM5TU7oaJAgR2UKLFcap62XsOTY9KOzo
-	 w6CyCch3eMERUT9YSBCp0P8IUrSzZvt14s0t4EYKPtg01fwzxsgdBwiVFRzrHEiBjD
-	 B+Qv7+3TBBJ2HIVxDg82zKqbY8H+1oO98Q9ExH4vVPb6c0wh6AwlDO+Bb7gypy98Q4
-	 TmmFN+w3h+wDWbLYi5P04BJxWVzKL+4m34pBEyQWEFyKHxzFuSjzYJuVfc7dHjmaSi
-	 douA1RxXNCWBJYgAxXICXwTWO/PFO8LCof93zOg61lgGg8MwFwJiAhFsspRDvYwB2x
-	 QwcF/ImUbtcaw==
-Date: Thu, 13 Feb 2025 21:38:12 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, LKML <linux-kernel@vger.kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: Assert proper context while calling
- napi_schedule()
-Message-ID: <Z65YNFGxh-ORF7hm@pavilion.home>
-References: <20250212174329.53793-1-frederic@kernel.org>
- <20250212174329.53793-2-frederic@kernel.org>
- <20250212194820.059dac6f@kernel.org>
- <20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
- <20250213071426.01490615@kernel.org>
- <20250213-camouflaged-shellfish-of-refinement-79e3df@leitao>
- <20250213110452.5684bc39@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7609200132
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 20:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739479152; cv=fail; b=e+ULhQhRuSg2ZGEc6pxPXGTFYoNMQRfSAJSSnJSHm99sfzaZ9m5g03p1GMrdz75ONAVCoJzvLhBE1Af7wSJY1LT6R3jLSjjS9yyn70dM6QD1QirYFo6uvBqL+QcIb8OiRIxrldZGXFAZDi0NjN8ZH+iqlzEepuScICCfhB1YxIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739479152; c=relaxed/simple;
+	bh=m2KAJw06GaHYWZ1dWeeiBxFbIi3GqZJfVJedy0kAcxs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=d97Ohs3jeVOB266437X2ppthvUpm/fwG5ye+xCed2IK2j/KVoVykisnzdjkhasO4gd8vtvPiKqQnK/EKZ7DW5AP4FNXFo5e9dBSbP4gI2Qi2un2irQiaGor/3c8EC4e4sa9ifH5LhwXtCZTO3D/55DAAJx5SQqViyyCkTJy49co=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nz8DFBDQ; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739479150; x=1771015150;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=m2KAJw06GaHYWZ1dWeeiBxFbIi3GqZJfVJedy0kAcxs=;
+  b=nz8DFBDQYH91hnRk9NvJ/vbYznScBh7hVIvEHuuaaDEUgCqd3oGsiZPu
+   XOz8lRiQ/D06yvAfvUI0w5DzmC27NzkQ1JabaQwS8rvGafxsSCksrGriO
+   JRpkOPrhe5Cih4elB+tkDbkd3G7JN3G9FHuBF/y54SKnI9MEOEJ3OJ7vc
+   nk9XarmFiAPE3EkUSSGBF/ELC4xh8tAcUS9EjFb0y+FHB6/9yb/VCc7Io
+   TtbuAMggThOksuMA75ncr3wv3V2jfU43p8jXhaEMNcWfkpLh8GkUj6/Ev
+   5BfmZZlBJXgcMFb8+p5GF5kOO68X0acZg80H2TADB1TVEoGU6jKXJyrs8
+   w==;
+X-CSE-ConnectionGUID: aSRhh/8LTDOdTCyuMHc3sQ==
+X-CSE-MsgGUID: 8d2Axvw0Qsqu9hmo544EUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="43041564"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="43041564"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 12:39:10 -0800
+X-CSE-ConnectionGUID: bMzU5LrmQ6qd1ApTk2ibWQ==
+X-CSE-MsgGUID: 0pi8jsftTTmz473KeA3nqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117381827"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2025 12:39:09 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 13 Feb 2025 12:39:09 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 13 Feb 2025 12:39:09 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Feb 2025 12:39:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lLpDFHhX+4uDWbr44BP6oCdk63d7lIC3q5yHVxtqLbJoX2SSeeKItNryjmOzqhYO4coY+HHooOV3Evc8KWyyGYc2QdwPXMAE3S8HOcKjyKfs8+eLug+2UV74LYHEflLpzCs29F8giQyaIzOWrglqxWsKHvjOYw023r+mzPis6d+E6q4+JOxg21x3tzQadrUy9oGuv6j2w4m2LygI9lEdL4/RqhlnlrQnxF4taTaTDYCzqyzKIkI2uqBk9TQTXY2IkYpX5+CwHKR36skd4K4YevUF5if83QEw0FuP7aXtYrp38fwrmYdmkfu/TrizDUTu7D3GbPp1m8+0vcICN/RSKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9sIr02i71qCmbbNaUZWqeW7MoJHrZ1NCVubxmIznQ7I=;
+ b=AV46jBNJmpAr5RUDT1kEaUmpWN+lwEgmu6+2Jh6rq7ueGPOI1F2LdiqaccKZaR/0gthF9hOCOV+0xRnBT6Bk1sTkSMniicmrux0CBBw/NdLWJTLM1vFW7Ow0dShBSe8sQxG/tX0NA8ersk5i1UuA/jZ5n99vn5PQAL3yG+TOy1y/Eo/9Fuqet41ekUnSDHHpGfrhaMuqNjSPPBr6txG9PExujoOQw94+ZVxO+jzRBG48Ly4IX3H8v9HHo5uMh9zAooti9z9uxKUYWVNX0dhCQxlcFmZ10+7JDVAZBoo23yxBqipASfECDbS2oXNhWXrUMM9yQ4o6oZ40dWSj9Gd/8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com (2603:10b6:303:57::12)
+ by IA0PR11MB8301.namprd11.prod.outlook.com (2603:10b6:208:48d::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.14; Thu, 13 Feb
+ 2025 20:39:06 +0000
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067]) by MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067%4]) with mapi id 15.20.8445.008; Thu, 13 Feb 2025
+ 20:39:06 +0000
+Message-ID: <00ecb5e5-00b9-4c30-a29a-37c9f268b389@intel.com>
+Date: Thu, 13 Feb 2025 12:39:03 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: check error for
+ register_netdev() on init
+To: Simon Horman <horms@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<decot@google.com>, <willemb@google.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <madhu.chittim@intel.com>
+References: <20250211023851.21090-1-emil.s.tantilov@intel.com>
+ <20250212182111.GH1615191@kernel.org>
+Content-Language: en-US
+From: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+In-Reply-To: <20250212182111.GH1615191@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0060.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c2::35) To MW3PR11MB4538.namprd11.prod.outlook.com
+ (2603:10b6:303:57::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250213110452.5684bc39@kernel.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR11MB4538:EE_|IA0PR11MB8301:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19418374-501d-4ce8-05a6-08dd4c6e75c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RG5qbGx6YzkyVzdEUkhtekg0UGU5Mmtnb2RFL3M1TjdkUWdlbWttQi82cjEy?=
+ =?utf-8?B?aGtteVBIKy81YTNWNXNtYy8xSGtBVlp2ZUV4WFljdHZmcXNuY2hnK3phZWxL?=
+ =?utf-8?B?NEdUMWh3cjdZQ0Q3T0FDR1QxQVg4M2o1TUNHZlBkNnJUdUFyUkJXd0cveUpL?=
+ =?utf-8?B?V1lxYTREcEpFckxuN25GbGdnRVNOZ2grcjFEM0MwMW9TaGJuTU1lb3ltNWF5?=
+ =?utf-8?B?SzZMQUxhazFPalk1Ujd4dm00VDR0bGFBS0RtV2xaRG9qZyt2clIyYlZTQUZ0?=
+ =?utf-8?B?aENLQzdJcnhWaS8weDU4YjZlMVppbmJlMUxFSDl5UHVLSWRiYlZQZ0d2d1V1?=
+ =?utf-8?B?MHZsaUl5QTVTakRucUhEbXdSM2R0eEVxemhLVGNTMTY1bVRXMDc2djhRNC9Y?=
+ =?utf-8?B?aW1DSVRhMEplVnNEVTNjclV0aWtZak9vT3BINDNrSW94N2lXOW1OOHlNTWh3?=
+ =?utf-8?B?eEM3V2IrNEpWQmdHVytBQVQ2c1Rmanp2QmhrbmQ4VVlBK1plbkI4Wmc1TkNT?=
+ =?utf-8?B?L3ErSnlIZ3NHRDhkdDNNamNVRnpvZVpleDA0WmFOeXNBSVdXcCtTUVM3WGt1?=
+ =?utf-8?B?K3V1Q3phd1l3NjExMTQxUnU0Q1RXUGhGK3pXY0VqTE5UZzlqamhsRGNjT3Zi?=
+ =?utf-8?B?Q1ViM25rbjhDSXVUUGFJaWd3Q0JRNW1DYUJKaXRYMS82UVNyM3ZuS2s4cU5l?=
+ =?utf-8?B?UWU0Wm41T3IwZURBRThWSEh1MG4wOW5ZdytTdnQyVEVxVkptZmVrV3Z2VDJj?=
+ =?utf-8?B?OXZCUXk2WE9JOUxhTU0rdmRFNjl1STNmVzFQbWZ5UldROEJ6R2I3TEpEYXVT?=
+ =?utf-8?B?aDJ5bEx3TkZ0emZwQ1RQMVY4TzNGb3YrS0FPcHZrSWhweHVNTUd5dE45b0hE?=
+ =?utf-8?B?ZG9GalQ4cDFEeEFsQzJualY4QW1JbEFLa2gxSTNZMWpVTDdqamN3cjMxVnNr?=
+ =?utf-8?B?S1pqMmQ0S3cxbUw3TkZBSVpVU2JJcDF2aTlHQStFNkxlMkw2bzYwb3dqVHRT?=
+ =?utf-8?B?bGtzaWFacDJHRGRycEdyM3dLM0FTV0RSK3JmK1Z0Z2JwTDFlRlhqTG52cUR1?=
+ =?utf-8?B?clZxUTN4L0FEbGNBMUFmT1B5ZE8yQXhWNlFVUmNMQzFVZmdlclU2MVo1N2lN?=
+ =?utf-8?B?VmFYYjFZOE9CTlB1Sm5IUUJtWlFrMFJBTER6ZmNhckxCUjdlMHVyRzlpdUMv?=
+ =?utf-8?B?RWtYbEFTeGU4M1NTSGhLZGZjNHZBZUZXWVg5ZWJJTFlnbHErWFhDZkEvbXR3?=
+ =?utf-8?B?UE1KSkNSL3Q3TzV2amJKUmlETnVvWjlGOVZnWmRFbkFnYnAwTkJkQ01PV2Yx?=
+ =?utf-8?B?S3M2dXRpUWZXUDd3TlR4a281dXdpbEMxcW5pdlJJN0pDVEppNkJhY3RZQXpR?=
+ =?utf-8?B?bW9LN0xwK0RSSjc2dEpOeDJpZUdlc0ppcjNoYkk1eFJDQ3N3bTdHV3l3Sndl?=
+ =?utf-8?B?Y0x1aktnMURvdVovUHl2V0ZwUnlReTdSSzZlb1ZHa2tlb0h5Si8zTGIzL0Mw?=
+ =?utf-8?B?S2Y5eGVqUnpleTZxT0VNams2L3J0MEFkL0tuY1JnNThMdFJ6dDdFSStlVFpl?=
+ =?utf-8?B?aVFtWWNVSkhYb3FvTnpRTEdOZklOYnlva3dHUFo3WmpJOWNpWUNpMXpCMVh0?=
+ =?utf-8?B?ZlVxTSs5d3FhM1MrMXpkTTBBajJGR2RxSHc1bkZkZnVKV1Y4aWJZT0g2cDZw?=
+ =?utf-8?B?MnhKc3h5ZERpeERGV1g3ajQ4MWVEdTBQblFSbWU3cGtQeHBZeGVLZmRCam1n?=
+ =?utf-8?B?YVRVOUE0NUpvSTRVUWUrYjNIdzJvbFlVMThRWm9HVzdUeWc5TTBPYk9na0Rr?=
+ =?utf-8?B?N3Zyc0F1WmlvWHpZbG5rOHZ6Qlh4MDkySnpHK0NsOFk5TDJ3UzRQQVUwbVdW?=
+ =?utf-8?Q?0JGhMn0qJZmVB?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4538.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vm13TWJsT1RsNDFjK1YxQlRmM2w1WjVrNzJETWtBSURHbHFDVXhySHJOaUI3?=
+ =?utf-8?B?bFNHZFowd3ZkVGwyMXNVaTBOaUlMQ1VTajFESGJCTitTWlNPckY0c0lUNVZl?=
+ =?utf-8?B?MlVpdUUwdGJ0MytXaWNkTE9pQnlWdHRYd3dIdHBuMk1mejI1WTd5b3UrTWRt?=
+ =?utf-8?B?K0pzS3NqL1RuNERCOHBuTldsQTdkRWlPdUxUVFRIRWtPYktZalN4ZzNaZGhW?=
+ =?utf-8?B?bHdwckdsekYzWENTTy92R1RNRzFqbG4wcmFVdDAzQUpyUlVmRnVlUFAwSk1C?=
+ =?utf-8?B?Mjl3TkIwVHk5c1BnSWNkMGYxcDlmNGNJN0EzUXJ0NkFvakxONEMrRUxzOGRV?=
+ =?utf-8?B?T0dYNEVoN3VvS3JOVTg0V0pCdytwd3VjaEdZbmpwYlJ5cTNjU1grOU95b1Nw?=
+ =?utf-8?B?NytvL3hJc3gySTNscFZlb0h6WW5wUU5OSGpxTjVTc2x6ajV0ckIwZC9oa000?=
+ =?utf-8?B?L05YaEQ5TVZoZzBhRmFxMm9idUlJZmpIMXpTUm5tcEVqUm9qbFV3WFdEMEI2?=
+ =?utf-8?B?M3IzUlhoSWF4OXR1MHVKVmVQekZSanVtRUpiYjNiMGU4MU42QlZ0V3dlUHQ3?=
+ =?utf-8?B?bk9XN1lCM01rd0tSMmcza3dBODdCdnpaaXgrSFl5eld4REJBanZKM3NPZTFy?=
+ =?utf-8?B?RnJ2Um5sTkYrTFpmeVNZc015OXkzT05vaXVCaWc4Ry83M0c1VGNQaHUwdnpi?=
+ =?utf-8?B?ME9OV1UyVXlXTmdCNkdtblRHOStoWGx2T0lFM0tpbytVTExlU2tJYTVFckNr?=
+ =?utf-8?B?QXNPaTByODVjR2VUMlVDYzRteklLK3ErbWxIUThUK0kyazRGeUQxNFhlNG1B?=
+ =?utf-8?B?SzVSYXVXUjRJZ2gyOGFrbkUwdFBOdHVZL042Nm1VR3pGN2VoSktKS0tVOVd2?=
+ =?utf-8?B?RFFwZFBJUzRZVnJOSmo4VXB5QjJBYk56emppcG54YWRBM3MrQkw5L2lZYzBm?=
+ =?utf-8?B?NzU0NUJHY0M3bVJ4RWxvTTNtRnZQTi9WYkJIYzhQc3pXYkNQb3VIL0xVRDNl?=
+ =?utf-8?B?S1pEU1AwZkZnWER1UEllb3JPczN5RUlwd25TSjhSYWJIclpIUVpaL2hIOUMw?=
+ =?utf-8?B?aG1nUzcrZXhLYnQ0OUpNOXc3SHBvUzdPY3d5K1JlU1FXQVZQT0I1UmRnTm1O?=
+ =?utf-8?B?bDRvdHFmdXJlWmNCYTNSL3FCQmk1NnJXNnNIcTJKaWl2dFgwN2RodUJDajZa?=
+ =?utf-8?B?ZEpDZGN1MC94MkdTMWJHV0xSejNSTTRJSlo0Yk9RMUpBWHMreUJhZWxjeWFj?=
+ =?utf-8?B?TmlCaER6NHFHaTB5S3lhdmt6dTFleFhIa204bXpsdFFldXRXNzYrWUsvbVRY?=
+ =?utf-8?B?S1U1bkczYkFBeEl3Skt1U25KUFdIYld3VFV3UGg4Y1ZqakttdGk2a1lHM2xw?=
+ =?utf-8?B?OTkzenFRcHFEaFFWZUNkdndiN1BuOC9aaFhFL1dqUVJyNVlJanI4K0JvMlMx?=
+ =?utf-8?B?T2NRdE1qQjlwTGRrNm1GRW83dzhDeVJHMzN4bXFnMno1cnRGS1Y0cHAwdXpK?=
+ =?utf-8?B?U1RqV0d4ME1GbTdwenBmZ2RqUEpkOW4yOGs2aVRubGwvdmJVcVFuc3pQdzNv?=
+ =?utf-8?B?M3pvbitNM3EzVDVlQjhGbW5BUEVWL3J2RElsa3RDRnZtQTdhZzFid0FPVTRH?=
+ =?utf-8?B?K215ZG5JdkFVK1owaG8xYVh2M0NaOVBmT25oOGVCYlNWZjBxK0RIOGZEYkd2?=
+ =?utf-8?B?RWd3dnB6ckRBY1V3NXJwOUZtbk9Fdnd2QlBwSHpHL0M2SGdUK0NNbUl1UzV5?=
+ =?utf-8?B?eTNwbXIrRUt3aUhaSlVOREpuWXpWaHQwbm1ubk95VDhVNm5DOXVyRlhITDhr?=
+ =?utf-8?B?L2Fqb0x2cG9veDFpOGtsKzBIeEZtYUQyOVZzU2VRQTJXY3hvQzZFYjRjM29E?=
+ =?utf-8?B?Wit4YXN2Y09PQWlTYlAxWVZNZlFmbjRERkI0ZmdZSEJtRU50dWxrejJlQloy?=
+ =?utf-8?B?dFhaMHRYSmVWMzZqM2d3N05KeEZVaG5TdWh2STVZMXA3OXhSYWkrdWFoTVZ1?=
+ =?utf-8?B?UzFtd1NGMHFrVXVjTWdwQllwL1UydGdXczZlOE9XL05WUFBmTnVnazFZZ21p?=
+ =?utf-8?B?NzJOTEEvOURSNC9ZSDhpc3liU1dIbTlYQWZ5blQvYzBsTFVWZ0dSSVJLc3Fv?=
+ =?utf-8?B?SDFSNjlzV3VWZFBzZGRycW12MWxhWXhTMXk4Wlg4MmpLUVgrMHRKU2doM1pB?=
+ =?utf-8?B?NEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19418374-501d-4ce8-05a6-08dd4c6e75c9
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4538.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 20:39:06.3967
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C/jiCg+5lD2sGeOtzXeuFbD0ZaaxQqrdfkk6McRJ6NATVcqT7oaYHhvFRqC29LmtV6cjfYjkaFH140YLLAueeVXvVaLJL/V2CGkIGTkct1Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8301
+X-OriginatorOrg: intel.com
 
-Le Thu, Feb 13, 2025 at 11:04:52AM -0800, Jakub Kicinski a écrit :
-> On Thu, 13 Feb 2025 10:14:02 -0800 Breno Leitao wrote:
-> > > The problem is a bit nasty, on a closer look. We don't know if netcons
-> > > is called in IRQ context or not. How about we add an hrtimer to netdevsim,
-> > > schedule it to fire 5usec in the future instead of scheduling NAPI
-> > > immediately? We can call napi_schedule() from a timer safely.
-> > > 
-> > > Unless there's another driver which schedules NAPI from xmit.
-> > > Then we'd need to try harder to fix this in netpoll.
-> > > veth does use NAPI on xmit but it sets IFF_DISABLE_NETPOLL already.  
-> > 
-> > Just to make sure I follow the netpoll issue. What would you like to fix
-> > in netpoll exactly?
+On 2/12/2025 10:21 AM, Simon Horman wrote:
+> On Mon, Feb 10, 2025 at 06:38:51PM -0800, Emil Tantilov wrote:
+>> Current init logic ignores the error code from register_netdev(),
+>> which will cause WARN_ON() on attempt to unregister it, if there was one,
+>> and there is no info for the user that the creation of the netdev failed.
+>>
+>> WARNING: CPU: 89 PID: 6902 at net/core/dev.c:11512 unregister_netdevice_many_notify+0x211/0x1a10
+>> ...
+>> [ 3707.563641]  unregister_netdev+0x1c/0x30
+>> [ 3707.563656]  idpf_vport_dealloc+0x5cf/0xce0 [idpf]
+>> [ 3707.563684]  idpf_deinit_task+0xef/0x160 [idpf]
+>> [ 3707.563712]  idpf_vc_core_deinit+0x84/0x320 [idpf]
+>> [ 3707.563739]  idpf_remove+0xbf/0x780 [idpf]
+>> [ 3707.563769]  pci_device_remove+0xab/0x1e0
+>> [ 3707.563786]  device_release_driver_internal+0x371/0x530
+>> [ 3707.563803]  driver_detach+0xbf/0x180
+>> [ 3707.563816]  bus_remove_driver+0x11b/0x2a0
+>> [ 3707.563829]  pci_unregister_driver+0x2a/0x250
+>>
+>> Introduce an error check and log the vport number and error code.
+>> On removal make sure to check VPORT_REG_NETDEV flag prior to calling
+>> unregister and free on the netdev.
+>>
+>> Add local variables for idx, vport_config and netdev for readability.
+>>
+>> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
+>> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+>> Suggested-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/idpf/idpf_lib.c | 27 ++++++++++++++--------
+>>   1 file changed, 18 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
 > 
-> Nothing in netpoll, the problem is that netdevsim calls napi_schedule
-> from the xmit path. That's incompatible with netpoll. We should fix
-> netdevsim instead (unless more real drivers need napi-from-xmit to
-> work).
+> ...
+> 
+>> @@ -1536,12 +1540,17 @@ void idpf_init_task(struct work_struct *work)
+>>   	}
+>>   
+>>   	for (index = 0; index < adapter->max_vports; index++) {
+>> -		if (adapter->netdevs[index] &&
+>> -		    !test_bit(IDPF_VPORT_REG_NETDEV,
+>> -			      adapter->vport_config[index]->flags)) {
+>> -			register_netdev(adapter->netdevs[index]);
+>> -			set_bit(IDPF_VPORT_REG_NETDEV,
+>> -				adapter->vport_config[index]->flags);
+>> +		struct idpf_vport_config *vport_config = adapter->vport_config[index];
+>> +		struct net_device *netdev = adapter->netdevs[index];
+>> +
+>> +		if (netdev && !test_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags)) {
+>> +			err = register_netdev(netdev);
+>> +			if (err) {
+>> +				dev_err(&pdev->dev, "failed to register netdev for vport %d: %pe\n",
+>> +					index, ERR_PTR(err));
+>> +				continue;
+>> +			}
+>> +			set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
+>>   		}
+>>   	}
+> 
+> Hi Emil,
+> 
+> I'm wondering if we could reduce indentation and lines longer
+> than 80 characters in the above like this (completely untested!):
+I was mostly trying to focus on the fix itself, since this patch is -net 
+bound. The >80 line came about from the introduction of the local netdev 
+and it seemed cleaner to keep it in one line. I can just split the check 
+as in the original code.
 
-Let me clarify, because I don't know much this area. If the problem is that xmit
-can't call napi_schedule() by design, then I defer to you. But if the problem is that
-napi_schedule() may or may not be called from an interrupt, please note that
-local_bh_enable() won't run softirqs from a hardirq and will instead defer to
-IRQ tail. So it's fine to do an unconditional pair of local_bh_disable() / local_bh_enable().
+> 
+> 
+> 	for (index = 0; index < adapter->max_vports; index++) {
+> 		struct idpf_vport_config *vport_config = adapter->vport_config[index];
+> 		struct net_device *netdev = adapter->netdevs[index];
+> 
+> 		if (!netdev ||
+> 		    test_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags))
+> 		    continue;
+Again, because its mainly to add the error checking I am not sure if its 
+OK to re-shuffle the logic.
 
-Thanks.
+> 
+> 		err = register_netdev(netdev);
+> 		if (err) {
+> 			dev_err(&pdev->dev, "failed to register netdev for vport %d: %pe\n",
+> 				index, ERR_PTR(err));
+> 			continue;
+> 		}
+> 		set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
+> 	}
+
+Don't mind re-spinning (and testing) v2 with the proposed change, if 
+it's not infringing on the guidelines for submission to -net.
+
+Thanks,
+Emil
 
