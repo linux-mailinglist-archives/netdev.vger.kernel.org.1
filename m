@@ -1,126 +1,193 @@
-Return-Path: <netdev+bounces-165885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30446A33A07
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:32:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F76A33A1A
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:36:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA92D16583A
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:32:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3116C7A3C88
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09FF2066D3;
-	Thu, 13 Feb 2025 08:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2272020C027;
+	Thu, 13 Feb 2025 08:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SW6MgKex"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MRc5W9mq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085831EF08E
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 08:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDED20C009;
+	Thu, 13 Feb 2025 08:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739435540; cv=none; b=NvNtTN/XVDbhTo2AuXiSAeO+Kg/7UuVqKvTnW+0DAYTgdaYphvNelR8CPGjS+hMvZYxxyJ4RnGDud+5iE9S06AlhhuD2Opaf8sMCb5PZpjvBk0fxVkFfh/PlCQdjQHKUtsfN+5GZQeMB2yyso5JVGL4qo5ggEXmDYiNAIa5+FTs=
+	t=1739435804; cv=none; b=VU9HhqIQ5jA3lzulC0VwfihacfVhclvYzL25La/F36/eeRiuPdxXABr3xJ6jKNMnWilWy8clHSLtJAfDjxlyWK19j6MOdLuQSEfGvwB9COMkE62tEOJQEcxqDtQgG7iNw/YxWmBmes9dVrh+EsHM4NT7YtVICRgvL3C0czRABf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739435540; c=relaxed/simple;
-	bh=YlefXjGTL0eSQvBmi2CslFXUiC166yKtYDiMoY6oWFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D08mkfPfvGorln/lVo+wjFaE56tx4v7LZXrp/WKyHRFN6nYEJl0+cxUErTyqZ1e4B4qRXPoFqOh9x0qwdSO9+zB1hI5vriRKQQuVFWsoBE8HxotFKx14w+cP1Scy+8CzV/m4e94gM+FutuWQyoRl52f5tYHewS5BTHBQAKYVn/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SW6MgKex; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739435538;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ENuQ32gYhMX1EzHPxj9FF4Xz7hJZvyYYLV1/58R+loo=;
-	b=SW6MgKextFI8/LoK6yOG4B0xCH/jPSQ0Mhp62VV4+NDnnTJS/Yt9aLPqM7f4xY3YM+pgPQ
-	t60fuMq17B6y1+vaSgb5HkovTqrtMaFXI665NwK997cw40RE0kJlI+cpIbHyzcLR/yWxt+
-	h25cPt6SJf+41HuGjWtI+vARA++ICFU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-1uILxxOvP_iPvA8JEuJVYQ-1; Thu, 13 Feb 2025 03:32:14 -0500
-X-MC-Unique: 1uILxxOvP_iPvA8JEuJVYQ-1
-X-Mimecast-MFC-AGG-ID: 1uILxxOvP_iPvA8JEuJVYQ
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dd533dad0so408503f8f.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:32:14 -0800 (PST)
+	s=arc-20240116; t=1739435804; c=relaxed/simple;
+	bh=tlbb2csC6KUltjhzwmihFO7uJRUrwtFdmIctqTsBzaU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l45VPRlX95txOl+FT2KmkG2A0wY/yNp6szT81rIwP1JXGgO5dXKAYyr3exohHF23hNpH2L/IRc3d9OE9MVSkZge0WQ0kYjA5gLFc65adrXoFE8w7znzhfhNLaJ5j5mQD+7rTKdAp6Hvx/vFg/Wl97a1HrwMtFHsCu95dkXoZxj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MRc5W9mq; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4364a37a1d7so6264055e9.3;
+        Thu, 13 Feb 2025 00:36:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739435800; x=1740040600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lEMTU9K2wwIY9JpwBI5RzgY3pZNF2c520syU90CJZKI=;
+        b=MRc5W9mq7XWPYx3SvFM8RXmtMCi5nLUksJm6GckYnj0La9E6L5SmbiryOTI23sZLdU
+         JRQXsJ6eiwj//NUc8Bexv85DuSlwnG17mPZNszNDdRv3J7kVcg68z7v4W6dZe2xxMYUe
+         Twhz+XKWat2E0PtD0mo6reNXQM1MTYhZl0heDlWxmuS82qxEFtCQzXpie5B73SSqnY7M
+         kV+qpYi/W8dw3rzpZPSGZyhxT1HoVcxhGh566g/4VTh2HLfhtXX7+Qe6g4WOYl+utYTi
+         /xma8sIfJM/Ddi90bD9WVLWxsH8CHA/td4JocfY5rXPAzFuF/pejagW/5kHhGEYrua+I
+         AACw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739435533; x=1740040333;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ENuQ32gYhMX1EzHPxj9FF4Xz7hJZvyYYLV1/58R+loo=;
-        b=lIIQWqVSpqgBOIYfl7zcgDprbKEM/7R5C+Hi1uMaZtg+3TInmfaY55Z1W18TTmaE6n
-         Nhrju3Fm20PlloFKlzvbMdCmlZvlwVM38MFG+1/MJIgQ4OSFe6fLIxxXQ2GB6LSAXrdw
-         aerLYsQ9FVQjG/d6uHsXqTpzORHd3dgwW1no9YTLZWlq9JULMlQ32XtIi9zOX6Dq5zxC
-         rKAJ/vepBYc7QH4OhIhcmwjM+sr2wk9JrAO51BoZLt37/gsg6Flx9NelB6XrKH2P4AS3
-         DlhPtrIjYHvwISUfsRTKglTm2NHRHXm2rpF7ho4ss8RozakaQtbXXxieUnoSaPP94Vnf
-         iubw==
-X-Gm-Message-State: AOJu0Yz3JyG/WgASdOC/WXHy+0lyGFp5zh/HaBuhjRI+KY+PXSGGcCks
-	cz8O3NevyquqE583JFcw+xLeNp5ZHEc8Pu4dCSJPsL/UgpzshPZ8hG3lPBXdl6SLWQ98kP1aRU1
-	4/YHqaraiyutH3cd6FBfEjKoJJf5LDyRY62TkrWmRspIP/1izgynfTA==
-X-Gm-Gg: ASbGncs1003e4w8R5Gj2OZiCMPOqhyk82cyRIxScoRlFeBZ07mXXhRZUEXxEi334hCH
-	IBQVCfGFTloK8BWEBDzMJAulG1zYoHLpReGyrfcWa4Mmwo5tgSJVrnuWxcq3UY7LJQo0Pf9PdFT
-	s6RRHZ336yzWI9jTk7YPtp7DSZ8+KiSn8zhUu7PhrP0Cai3hJlqQ0xv2zUO0+C4ptC0qWbCDGx5
-	slwkAkYNRrGQsxnEHC/O7Z34sc2zjA3bsLHWWYS5E906kg1EXlAIX8Ikv4q6KDWyhPRPP5zfrDg
-	QhbizIehzUt1Tqc0dzGvblAN1bc1hZD8MKo=
-X-Received: by 2002:a05:6000:1863:b0:38b:d9a3:6cff with SMTP id ffacd0b85a97d-38dea26e512mr6609021f8f.16.1739435533447;
-        Thu, 13 Feb 2025 00:32:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiFu/jSTpXC/+T3CTqn5p3U9vYIZMeiFX1UGb8dak8XGP707d4uTzj0+ewO+aRimLoPXa5Jg==
-X-Received: by 2002:a05:6000:1863:b0:38b:d9a3:6cff with SMTP id ffacd0b85a97d-38dea26e512mr6608990f8f.16.1739435533113;
-        Thu, 13 Feb 2025 00:32:13 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d5c29sm1188049f8f.72.2025.02.13.00.32.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 00:32:12 -0800 (PST)
-Message-ID: <94376281-1922-40ee-bfd6-80ff88b9eed7@redhat.com>
-Date: Thu, 13 Feb 2025 09:32:11 +0100
+        d=1e100.net; s=20230601; t=1739435800; x=1740040600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lEMTU9K2wwIY9JpwBI5RzgY3pZNF2c520syU90CJZKI=;
+        b=iPPEY9h+0YIZezivxrJqVmOtVoIw5FTm6jwMR4q6Qu8kkligFqywQu42pbwIiEOkZX
+         9TN0QjcSV26ySNYg2b5V3ynQ6w2zC8jldw3OdLvc/QiduV2v/WPjPpGiKY4ieFR/YxFr
+         PkLmUrJ82mBwi01csrlYsHbc3WQD1omAmeb5nhIvwqNbXtrwe9+QEm/VV7zroqcbyGxN
+         xzoLGOEip0/Ai2g2M79gsHf4V4hijdNIeBlxzlfhV3s/U1klq/D/N4OjEMAziEL7gcmf
+         JlIWejJF98HhyBg+VLk8Ae3Yk9vHhH+oaIbBvyv6gcF1cWyCNPCqjxDxKtpsnv0/QZ4H
+         6fwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+wIowBfr3qjbkuz8Kmb9aWLmdwM4yMsfF7LTUMrHUlNr4EnmBvKj3fxUGYNJIk7AlM+zttNuAZrbealLX@vger.kernel.org, AJvYcCUMch1ljQ35l93tIgHe25aGnTxhYPgCqkjNW221j8OvhTD+UemLc8GPzyj30g8QVjmMvtMk1OUMm52Amg==@vger.kernel.org, AJvYcCVFKuBzyfZ7MtjVY1hy/dxh2cUXqnS7my9uWIckKoK2t+kraSLR71XUrwixM6S95PTDWnM=@vger.kernel.org, AJvYcCW17oWKOe+viGpgFzuvIUO4NBohO0ZN1VVPk7Y2ZucmGCm3dehBpE9r5b9rCtGBqNcX7X1Q+fVkRfxU/ddEQ8o=@vger.kernel.org, AJvYcCW8+Y2HC01snaCkJgKt0HwGGNmHJCXvX2q8pR0/r8aIM2mxSnDX5p+Dss9TZdlOlGGEGAqizn406Bc8Gt7FX4jL@vger.kernel.org, AJvYcCWSf+mqjjFEKQvOyiq1ePUjDc/8QZKJZhtvGVQiyu4k3qCBWm8lOhLtiVASetASM7WeqwGiR8OTt4s0@vger.kernel.org, AJvYcCWfc+qu7YXE0ND1JsNWYOEdD4ruraA/472XRI5P21yNrkL5/NbGUJLEQ+nrjHuLTlJ6mX17vRrIXJxlLw==@vger.kernel.org, AJvYcCXcMsnwFCTC0ceYpDTN6522B7X4CVzvHr9QrYanzYqFcGz6JIXuhECwNgkvuE7wCnfUL1dGAGtGI/m5@vger.kernel.org, AJvYcCXtDAt6bHPvZS5FI/RaIehcSg7us9kRVvIxlAgxdUnJ96TGqz7g1MlbrS7Y2qjrFKTLOKayMdyB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2PFhFSikg0y+oPiCjYhL3K3ermxR0+tm9qmI2smWdl498flf1
+	wNOH3C2ee0qA3DB7S9V8+n32J+jXlKJ8q4t/ok3Hw7jgFSldqsJURkRNYXh5l8OZ2cS1W05fxrX
+	4vaxYe00u3/pvRcTezVyUJxkRQag=
+X-Gm-Gg: ASbGncvcV/qQ8bIfcb/ftwfvdhVmV6PRkHqg57nFt3b3Yu3tM9Hk5aWp4JVs2ufS1Iv
+	t3MdSyR39YNiOJTyl1LXhJ+ummvh0kyVzCUIiIwhLR6FNpkNgOKBz9boIycJ5qErSuSRMFZc=
+X-Google-Smtp-Source: AGHT+IEezeJ/RlI8/fvqsCpwdXF55uEWmtOYc3P4zBx3ojP1z2I7SGCdQ1/EUaOR3dd1EY2OITuGZF4nnmEaOHg8QZ0=
+X-Received: by 2002:a05:600c:19c8:b0:439:55fc:81a9 with SMTP id
+ 5b1f17b1804b1-4395816f13dmr68016965e9.7.1739435800139; Thu, 13 Feb 2025
+ 00:36:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] page_pool: avoid infinite loop to schedule
- delayed worker
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, ilias.apalodimas@linaro.org,
- edumazet@google.com, kuba@kernel.org, horms@kernel.org, hawk@kernel.org,
- almasrymina@google.com
-References: <20250213052150.18392-1-kerneljasonxing@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250213052150.18392-1-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250210133002.883422-3-shaw.leon@gmail.com> <20250213065348.8507-1-kuniyu@amazon.com>
+In-Reply-To: <20250213065348.8507-1-kuniyu@amazon.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Thu, 13 Feb 2025 16:36:02 +0800
+X-Gm-Features: AWEUYZncbGUNO7oNcYsuGlVcwlKbEKWZpPvVt5uCQTeloMATtiMLOZ95K2VoEX4
+Message-ID: <CABAhCOTw+CpiwwRGNtDS3gntTQe7XESNzzi6RXd9ju1xO_a5Hw@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 02/11] rtnetlink: Pack newlink() params into struct
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alex.aring@gmail.com, andrew+netdev@lunn.ch, 
+	b.a.t.m.a.n@lists.open-mesh.org, bpf@vger.kernel.org, bridge@lists.linux.dev, 
+	davem@davemloft.net, donald.hunter@gmail.com, dsahern@kernel.org, 
+	edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	osmocom-net-gprs@lists.osmocom.org, pabeni@redhat.com, shuah@kernel.org, 
+	stefan@datenfreihafen.org, steffen.klassert@secunet.com, 
+	wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/13/25 6:21 AM, Jason Xing wrote:
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 1c6fec08bc43..e1f89a19a6b6 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -1112,13 +1112,12 @@ static void page_pool_release_retry(struct work_struct *wq)
->  	int inflight;
->  
->  	inflight = page_pool_release(pool);
-> -	if (!inflight)
-> -		return;
->  
->  	/* Periodic warning for page pools the user can't see */
->  	netdev = READ_ONCE(pool->slow.netdev);
+On Thu, Feb 13, 2025 at 2:54=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+[...]
+> > diff --git a/include/linux/if_macvlan.h b/include/linux/if_macvlan.h
+> > index 523025106a64..0f7281e3e448 100644
+> > --- a/include/linux/if_macvlan.h
+> > +++ b/include/linux/if_macvlan.h
+> > @@ -59,8 +59,10 @@ static inline void macvlan_count_rx(const struct mac=
+vlan_dev *vlan,
+> >
+> >  extern void macvlan_common_setup(struct net_device *dev);
+> >
+> > -extern int macvlan_common_newlink(struct net *src_net, struct net_devi=
+ce *dev,
+> > -                               struct nlattr *tb[], struct nlattr *dat=
+a[],
+> > +struct rtnl_newlink_params;
+>
+> You can just include <net/rtnetlink.h> and remove it from .c
+> files, then this forward declaration will be unnecessary.
 
-This causes UaF, as catched by the CI:
+OK. Was not sure if it's desirable to include include/net files from
+include/linux.
 
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/990441/34-udpgro-bench-sh/stderr
+>
+>
+> > +
+> > +extern int macvlan_common_newlink(struct net_device *dev,
+> > +                               struct rtnl_newlink_params *params,
+> >                                 struct netlink_ext_ack *extack);
+> >
+> >  extern void macvlan_dellink(struct net_device *dev, struct list_head *=
+head);
+>
+>
+> [...]
+> > diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
+> > index bc0069a8b6ea..00c086ca0c11 100644
+> > --- a/include/net/rtnetlink.h
+> > +++ b/include/net/rtnetlink.h
+> > @@ -69,6 +69,42 @@ static inline int rtnl_msg_family(const struct nlmsg=
+hdr *nlh)
+> >               return AF_UNSPEC;
+> >  }
+> >
+> > +/**
+> > + *   struct rtnl_newlink_params - parameters of rtnl_link_ops::newlink=
+()
+>
+> The '\t' after '*' should be single '\s'.
+>
+> Same for lines below.
+>
 
-at this point 'inflight' could be 0 and 'pool' already freed.
+This is copied from other structs in the same file. Should I change it?
 
-/P
+>
+> > + *
+> > + *   @net: Netns of interest
+> > + *   @src_net: Source netns of rtnetlink socket
+> > + *   @link_net: Link netns by IFLA_LINK_NETNSID, NULL if not specified
+> > + *   @peer_net: Peer netns
+> > + *   @tb: IFLA_* attributes
+> > + *   @data: IFLA_INFO_DATA attributes
+> > + */
+> > +struct rtnl_newlink_params {
+>
+> [...]
+> > +/* Get effective link netns from newlink params. Generally, this is li=
+nk_net
+> > + * and falls back to src_net. But for compatibility, a driver may * ch=
+oose to
+> > + * use dev_net(dev) instead.
+> > + */
+> > +static inline struct net *rtnl_newlink_link_net(struct rtnl_newlink_pa=
+rams *p)
+> > +{
+> > +     return p->link_net ? : p->src_net;
+> > +}
+> > +
+> > +/* Get peer netns from newlink params. Fallback to link netns if peer =
+netns is
+> > + * not specified explicitly.
+> > + */
+> > +static inline struct net *rtnl_newlink_peer_net(struct rtnl_newlink_pa=
+rams *p)
+> > +{
+> > +     return p->peer_net ? : rtnl_newlink_link_net(p);
+> > +}
+>
+> These helpers should belong to patch 2 ?
 
+I was trying to split API and driver changes. Can move this to
+next patch if it's better.
 
