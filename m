@@ -1,262 +1,170 @@
-Return-Path: <netdev+bounces-165998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09889A33E37
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:37:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BE2A33E38
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:37:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB579168DE5
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:37:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4C407A0F92
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30F2227EB6;
-	Thu, 13 Feb 2025 11:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50802227EB6;
+	Thu, 13 Feb 2025 11:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ciyZL3RD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8zs1dNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2A1227E8D;
-	Thu, 13 Feb 2025 11:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB01227E8D
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739446662; cv=none; b=KTwdHG2ohsomlhunyAirfPpEn3jMGOrSgY0LqRL/whADA794qPtLIAdTMsz+OVv40mCrTgLAlF5Q/rfJA+xO0flEyhxUtjqjlq09pGjkfqWDRmKqtoY33kaT3PdJKq+OTtGzT2uI3gH8F0KPAWb9a4ur9IMow9fx/v/GxPbZ/hU=
+	t=1739446671; cv=none; b=G8+edQw3G1ZPh7hwEhgYnTL7ZQsb5i0XjnpxqlH43LWUfSsLab7W+BW2SBQvFeAE1RYLoWDOaeHP63SXm5S7ttHb3vJa/+1Y4sBBLucw0vpCxL/vwXiIcLjVm0Th88Q/Rj11d5iZsj+uqUFtE78ocC1WzwBuPIJDSJ/Rtr1Bka4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739446662; c=relaxed/simple;
-	bh=TPAyIIX/YfbPOxBlRz+HmUEInmJ/lGMaLvI/YohKVw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=joC8X5OcrBwInwh2lXzxbswAKtW+Ri5UDzAomU+qPSumydqwNq/+551jyFm7PgSkO2W+3BFz/ZKAo/ZLUch/TRQ+IhVjwNUnI6B8REpVm7E7qy6XxgDLpJb30w8xutAbG0SlUlUdraOImfspDbzsiC455/+W7qVrwQq6PLOdurc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ciyZL3RD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=272ecwD0qQOvyWC3T+Go9BkCCvBpAAQ1+7vxu5z9xyw=; b=ciyZL3RDpG3knXa8xEsj60OGWO
-	vmPEULi5M/IzT2AVQuPWwdP4dWxHaroeM/02ZttcGHJv6Kw8Fxyhq9VgvEkUvf9s3+Cy4dIzN+R4M
-	wQpjoalZ97eCdNRmbhQRnBGWUspHE9pDzMYfmjnBl9+vaO23BZprjYDpGYoYOQizWM9H40DHWLJ8g
-	wsXbi/w91EOndLeRgU2//n6JsIp6V7dFclLoKaMObplw2LcUcyQqJzFUuOxh3EcJcrUVhP9KGNGtL
-	N4uEhoN7v7wnnV8gv0fT1pmArPzDkziH49hPcXKdoDN+ebIG940bHtcDVLRV1YF8PJjXBnd2H82rf
-	W+Q9oUGQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44508)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tiXX0-0000xe-0h;
-	Thu, 13 Feb 2025 11:37:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tiXWv-00025n-1H;
-	Thu, 13 Feb 2025 11:37:17 +0000
-Date: Thu, 13 Feb 2025 11:37:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
- support
-Message-ID: <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
-References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
- <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
- <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+	s=arc-20240116; t=1739446671; c=relaxed/simple;
+	bh=sEjVcKabIC5q5CXCl0Zc3jOe4AF5dToYVjvV7OxKEAc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mnEnVo9Js4uFgrhdxetxVmxn+PiBlPo77BRORNf4q78RSHM8+am50TSika6nrNMyFkYpUsd+ugC7OjYcWYXe4s+yCo9e8fmaOylwni+/quQFgUDh4eJshnazCPGHNe76nNzTqdA1z2PIxwNdkb7zk0CQqfSukCn5h+kiXxFc+gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A8zs1dNf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739446668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W4OijfIsJy9yRvlkFW7fHaLrYrkAJ4i+aY9VG5Q1Rm0=;
+	b=A8zs1dNfttt5LQOzF4OpiCmtJdpimExT0ERBq5qRhsR32i7Xd7cCAhm7KllxsfR0gm8aUA
+	h5WkgundCmQIPLvQNv5N1Yo0SRRxy9l4VTRRcDUi17UVgeTNrcMqPhxREq70xs2xfTr30f
+	WesW5dNkNe/ZUW8mrdasWPfKAy0SimQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-X5NCLHlBMd23yBfwk_K0dw-1; Thu, 13 Feb 2025 06:37:47 -0500
+X-MC-Unique: X5NCLHlBMd23yBfwk_K0dw-1
+X-Mimecast-MFC-AGG-ID: X5NCLHlBMd23yBfwk_K0dw_1739446666
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43935bcec74so4223515e9.3
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:37:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739446665; x=1740051465;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W4OijfIsJy9yRvlkFW7fHaLrYrkAJ4i+aY9VG5Q1Rm0=;
+        b=MVLdVNqb4FDrfE4O0CghaX2yqsWjS4jxBm8xrI4Qu+MUXwoc2y+zc7d1KXyHRJjGJV
+         j17WSFxDjMLfZF/g+/4lzgqFDdyNx+UJXd8DxAtuyPGHkIN/x9QBIniDSEyWYL9e2YAr
+         kO+Q6r6vjHDvKU/qhqBLxYY/MqEwUk3wXdUuu2b3+RIepyl1fCJfEgg6xm3N4pKGcynA
+         a4cwrhNxncXljnukOzE/ATZdk/dauLTKEUlI5tiLCwwLlv+RZ3kpoERv86rzVhGLRPEQ
+         RTOzy0FvnL4pJSeoI6hMCPNjoWHZHku5MpIAhX9p55m6HGhJTncjKwGMHVkWhZMPk0FS
+         6wkg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5IzNdTGE+liZsK58m+30prziZqf3ifbN694CMTIJYS2oM6acYsFWepjD0FHuZIcWedIe8LVE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlR++8jyQ7sYKEAevgofu1PjwhpuDauulNdaYbhJMutPcXkZSO
+	vyuQ+HMPN4B2BZIyhhqgRyxebBm8iKzbngLILdC8+30yx9IeFsu68wAtNY9d3euiZDrJ9ofA1GO
+	B9cwEzgNF7gsSzl96FcaUplI3TUT9BQmIM5SZ9V+l74k9iY5hTfRDvZvkeS0/jQ==
+X-Gm-Gg: ASbGncvQPksZPCMfmEu0S/lt0tUlNp9iukr2fzoRGn2IrcWoMPl2IkJxhLZBD/lVQlv
+	aYBZoJXotauMgqjRqeQZOQIlF+JT8mvTyzmySJbyrxteEVG1TmRxWSd6QUNYZgp2kEHv0VQj08s
+	ZL69cDqsbRxKvR8tOFBh6YiNAZp7iSLprQiwqmzowUkSudmHXkJM0/U/a87bI1TB1lzZJBn10+j
+	Gaw8XQojzRSZDnxGbVe7CP4bienJ40B9AKR8G9wDmsKUA3gA0/1EBTtHZrS+xteLM7cbkknn2Jk
+	cDQ44BWGrS7LijC6JkXIhrPDzqENRXqh77U=
+X-Received: by 2002:a05:600c:1991:b0:434:a929:42bb with SMTP id 5b1f17b1804b1-43959a5290fmr62880805e9.18.1739446665524;
+        Thu, 13 Feb 2025 03:37:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/qJS/I9WQnlC47h7CMBYrw7MSkEivmYUNWNnliL5vRPpLogYMVyAbPyyhwNJJe7crdnyk4g==
+X-Received: by 2002:a05:600c:1991:b0:434:a929:42bb with SMTP id 5b1f17b1804b1-43959a5290fmr62880515e9.18.1739446665141;
+        Thu, 13 Feb 2025 03:37:45 -0800 (PST)
+Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a06cf2fsm46009225e9.19.2025.02.13.03.37.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 03:37:44 -0800 (PST)
+Message-ID: <a360c048-96f3-486e-a097-e3456a6243a8@redhat.com>
+Date: Thu, 13 Feb 2025 12:37:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] posix clocks: Store file pointer in clock
+ context
+To: Wojtek Wasko <wwasko@nvidia.com>, netdev@vger.kernel.org
+Cc: richardcochran@gmail.com, vadim.fedorenko@linux.dev, kuba@kernel.org,
+ horms@kernel.org, Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>
+References: <20250211150913.772545-1-wwasko@nvidia.com>
+ <20250211150913.772545-2-wwasko@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250211150913.772545-2-wwasko@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 13, 2025 at 11:05:01AM +0000, Jon Hunter wrote:
-> Hi Russell,
-> 
-> On 15/01/2025 20:43, Russell King (Oracle) wrote:
-> > Convert stmmac to use phylink managed EEE support rather than delving
-> > into phylib:
-> > 
-> > 1. Move the stmmac_eee_init() calls out of mac_link_down() and
-> >     mac_link_up() methods into the new mac_{enable,disable}_lpi()
-> >     methods. We leave the calls to stmmac_set_eee_pls() in place as
-> >     these change bits which tell the EEE hardware when the link came
-> >     up or down, and is used for a separate hardware timer. However,
-> >     symmetrically conditionalise this with priv->dma_cap.eee.
-> > 
-> > 2. Update the current LPI timer each time LPI is enabled - which we
-> >     need for software-timed LPI.
-> > 
-> > 3. With phylink managed EEE, phylink manages the receive clock stop
-> >     configuration via phylink_config.eee_rx_clk_stop_enable. Set this
-> >     appropriately which makes the call to phy_eee_rx_clock_stop()
-> >     redundant.
-> > 
-> > 4. From what I can work out, all supported interfaces support LPI
-> >     signalling on stmmac (there's no restriction implemented.) It
-> >     also appears to support LPI at all full duplex speeds at or over
-> >     100M. Set these capabilities.
-> > 
-> > 5. The default timer appears to be derived from a module parameter.
-> >     Set this the same, although we keep code that reconfigures the
-> >     timer in stmmac_init_phy().
-> > 
-> > 6. Remove the direct call to phy_support_eee(), which phylink will do
-> >     on the drivers behalf if phylink_config.eee_enabled_default is set.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 57 +++++++++++++++----
-> >   1 file changed, 45 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index acd6994c1764..c5d293be8ab9 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -988,8 +988,8 @@ static void stmmac_mac_link_down(struct phylink_config *config,
-> >   	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> >   	stmmac_mac_set(priv, priv->ioaddr, false);
-> > -	stmmac_eee_init(priv, false);
-> > -	stmmac_set_eee_pls(priv, priv->hw, false);
-> > +	if (priv->dma_cap.eee)
-> > +		stmmac_set_eee_pls(priv, priv->hw, false);
-> >   	if (stmmac_fpe_supported(priv))
-> >   		stmmac_fpe_link_state_handle(priv, false);
-> > @@ -1096,13 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
-> >   		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
-> >   	stmmac_mac_set(priv, priv->ioaddr, true);
-> > -	if (phy && priv->dma_cap.eee) {
-> > -		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
-> > -					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
-> > -		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
-> > -		stmmac_eee_init(priv, phy->enable_tx_lpi);
-> > +	if (priv->dma_cap.eee)
-> >   		stmmac_set_eee_pls(priv, priv->hw, true);
-> > -	}
-> >   	if (stmmac_fpe_supported(priv))
-> >   		stmmac_fpe_link_state_handle(priv, true);
-> > @@ -1111,12 +1106,32 @@ static void stmmac_mac_link_up(struct phylink_config *config,
-> >   		stmmac_hwtstamp_correct_latency(priv, priv);
-> >   }
-> > +static void stmmac_mac_disable_tx_lpi(struct phylink_config *config)
-> > +{
-> > +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> > +
-> > +	stmmac_eee_init(priv, false);
-> > +}
-> > +
-> > +static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-> > +				    bool tx_clk_stop)
-> > +{
-> > +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> > +
-> > +	priv->tx_lpi_timer = timer;
-> > +	stmmac_eee_init(priv, true);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >   static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
-> >   	.mac_get_caps = stmmac_mac_get_caps,
-> >   	.mac_select_pcs = stmmac_mac_select_pcs,
-> >   	.mac_config = stmmac_mac_config,
-> >   	.mac_link_down = stmmac_mac_link_down,
-> >   	.mac_link_up = stmmac_mac_link_up,
-> > +	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
-> > +	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
-> >   };
-> >   /**
-> > @@ -1189,9 +1204,6 @@ static int stmmac_init_phy(struct net_device *dev)
-> >   			return -ENODEV;
-> >   		}
-> > -		if (priv->dma_cap.eee)
-> > -			phy_support_eee(phydev);
-> > -
-> >   		ret = phylink_connect_phy(priv->phylink, phydev);
-> >   	} else {
-> >   		fwnode_handle_put(phy_fwnode);
-> > @@ -1201,7 +1213,12 @@ static int stmmac_init_phy(struct net_device *dev)
-> >   	if (ret == 0) {
-> >   		struct ethtool_keee eee;
-> > -		/* Configure phylib's copy of the LPI timer */
-> > +		/* Configure phylib's copy of the LPI timer. Normally,
-> > +		 * phylink_config.lpi_timer_default would do this, but there is
-> > +		 * a chance that userspace could change the eee_timer setting
-> > +		 * via sysfs before the first open. Thus, preserve existing
-> > +		 * behaviour.
-> > +		 */
-> >   		if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
-> >   			eee.tx_lpi_timer = priv->tx_lpi_timer;
-> >   			phylink_ethtool_set_eee(priv->phylink, &eee);
-> > @@ -1234,6 +1251,9 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
-> >   	/* Stmmac always requires an RX clock for hardware initialization */
-> >   	priv->phylink_config.mac_requires_rxc = true;
-> > +	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
-> > +		priv->phylink_config.eee_rx_clk_stop_enable = true;
-> > +
-> >   	mdio_bus_data = priv->plat->mdio_bus_data;
-> >   	if (mdio_bus_data)
-> >   		priv->phylink_config.default_an_inband =
-> > @@ -1255,6 +1275,19 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
-> >   				 priv->phylink_config.supported_interfaces,
-> >   				 pcs->supported_interfaces);
-> > +	if (priv->dma_cap.eee) {
-> > +		/* Assume all supported interfaces also support LPI */
-> > +		memcpy(priv->phylink_config.lpi_interfaces,
-> > +		       priv->phylink_config.supported_interfaces,
-> > +		       sizeof(priv->phylink_config.lpi_interfaces));
-> > +
-> > +		/* All full duplex speeds above 100Mbps are supported */
-> > +		priv->phylink_config.lpi_capabilities = ~(MAC_1000FD - 1) |
-> > +							MAC_100FD;
-> > +		priv->phylink_config.lpi_timer_default = eee_timer * 1000;
-> > +		priv->phylink_config.eee_enabled_default = true;
-> > +	}
-> > +
-> >   	fwnode = priv->plat->port_node;
-> >   	if (!fwnode)
-> >   		fwnode = dev_fwnode(priv->device);
-> 
-> 
-> I have been tracking down a suspend regression on Tegra186 and bisect is
-> pointing to this change. If I revert this on top of v6.14-rc2 then
-> suspend is working again. This is observed on the Jetson TX2 board
-> (specifically tegra186-p2771-0000.dts).
+Posix clock maintainers have not being CC-ed, adding them.
 
-Thanks for the report.
+The whole series is available at:
 
-> This device is using NFS for testing. So it appears that for this board
-> networking does not restart and the board hangs. Looking at the logs I
-> do see this on resume ...
+https://lore.kernel.org/all/20250211150913.772545-1-wwasko@nvidia.com/
+
+On 2/11/25 4:09 PM, Wojtek Wasko wrote:
+> Dynamic clocks (e.g. PTP clocks) need access to the permissions with
+> which the clock was opened to enforce proper access control.
 > 
-> [   64.129079] dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
-> [   64.133125] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine initialization failed
+> Native POSIX clocks have access to this information via
+> posix_clock_desc. However, it is not accessible from the implementation
+> of dynamic clocks.
 > 
-> My first thought was if 'dma_cap.eee' is not supported for this device,
-> but from what I can see it is and 'dma_cap.eee' is true. Here are some
-> more details on this device regarding the ethernet controller.
+> Add struct file* to POSIX clock context for access from dynamic clocks.
+> 
+> Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
+> ---
+>  include/linux/posix-clock.h | 6 +++++-
+>  kernel/time/posix-clock.c   | 1 +
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/posix-clock.h b/include/linux/posix-clock.h
+> index ef8619f48920..40fa204baafc 100644
+> --- a/include/linux/posix-clock.h
+> +++ b/include/linux/posix-clock.h
+> @@ -95,10 +95,13 @@ struct posix_clock {
+>   * struct posix_clock_context - represents clock file operations context
+>   *
+>   * @clk:              Pointer to the clock
+> + * @fp:               Pointer to the file used for opening the clock
+>   * @private_clkdata:  Pointer to user data
+>   *
+>   * Drivers should use struct posix_clock_context during specific character
+> - * device file operation methods to access the posix clock.
+> + * device file operation methods to access the posix clock. In particular,
+> + * the file pointer can be used to verify correct access mode for custom
+> + * ioctl calls.
+>   *
+>   * Drivers can store a private data structure during the open operation
+>   * if they have specific information that is required in other file
+> @@ -106,6 +109,7 @@ struct posix_clock {
+>   */
+>  struct posix_clock_context {
+>  	struct posix_clock *clk;
+> +	struct file *fp;
+>  	void *private_clkdata;
+>  };
+>  
+> diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
+> index 1af0bb2cc45c..4e114e34a6e0 100644
+> --- a/kernel/time/posix-clock.c
+> +++ b/kernel/time/posix-clock.c
+> @@ -129,6 +129,7 @@ static int posix_clock_open(struct inode *inode, struct file *fp)
+>  		goto out;
+>  	}
+>  	pccontext->clk = clk;
+> +	pccontext->fp = fp;
+>  	if (clk->ops.open) {
+>  		err = clk->ops.open(pccontext, fp->f_mode);
+>  		if (err) {
 
-Could you see whether disabling EEE through ethtool (maybe first try
-turning tx-lpi off before using the "eee off") to see whether that
-makes any difference please?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
 
