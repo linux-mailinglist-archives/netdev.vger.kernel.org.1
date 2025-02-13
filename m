@@ -1,170 +1,216 @@
-Return-Path: <netdev+bounces-165999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BE2A33E38
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:37:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683DEA33E3E
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 12:39:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4C407A0F92
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A90D71694F6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50802227EB6;
-	Thu, 13 Feb 2025 11:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3E420D514;
+	Thu, 13 Feb 2025 11:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8zs1dNf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QBQ/NvAF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB01227E8D
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D781212FB1;
+	Thu, 13 Feb 2025 11:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739446671; cv=none; b=G8+edQw3G1ZPh7hwEhgYnTL7ZQsb5i0XjnpxqlH43LWUfSsLab7W+BW2SBQvFeAE1RYLoWDOaeHP63SXm5S7ttHb3vJa/+1Y4sBBLucw0vpCxL/vwXiIcLjVm0Th88Q/Rj11d5iZsj+uqUFtE78ocC1WzwBuPIJDSJ/Rtr1Bka4=
+	t=1739446769; cv=none; b=OdDLi5CT7k28JWvKhVFgfTlbOG6qYk2Jk1SoUHhFngF5hsNBt9kpP5MAD9yuKhwnCWoaiTswleRkjxEb+qfiCF0e+4INUrDTnynkfdacx9GTwQ5VQCoG4MJvpJT1hBHeIiFuUARYNLbzSebK1ZFPrBsI5aLURrpuo3IhD/0A1Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739446671; c=relaxed/simple;
-	bh=sEjVcKabIC5q5CXCl0Zc3jOe4AF5dToYVjvV7OxKEAc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mnEnVo9Js4uFgrhdxetxVmxn+PiBlPo77BRORNf4q78RSHM8+am50TSika6nrNMyFkYpUsd+ugC7OjYcWYXe4s+yCo9e8fmaOylwni+/quQFgUDh4eJshnazCPGHNe76nNzTqdA1z2PIxwNdkb7zk0CQqfSukCn5h+kiXxFc+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A8zs1dNf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739446668;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W4OijfIsJy9yRvlkFW7fHaLrYrkAJ4i+aY9VG5Q1Rm0=;
-	b=A8zs1dNfttt5LQOzF4OpiCmtJdpimExT0ERBq5qRhsR32i7Xd7cCAhm7KllxsfR0gm8aUA
-	h5WkgundCmQIPLvQNv5N1Yo0SRRxy9l4VTRRcDUi17UVgeTNrcMqPhxREq70xs2xfTr30f
-	WesW5dNkNe/ZUW8mrdasWPfKAy0SimQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-281-X5NCLHlBMd23yBfwk_K0dw-1; Thu, 13 Feb 2025 06:37:47 -0500
-X-MC-Unique: X5NCLHlBMd23yBfwk_K0dw-1
-X-Mimecast-MFC-AGG-ID: X5NCLHlBMd23yBfwk_K0dw_1739446666
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43935bcec74so4223515e9.3
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 03:37:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739446665; x=1740051465;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4OijfIsJy9yRvlkFW7fHaLrYrkAJ4i+aY9VG5Q1Rm0=;
-        b=MVLdVNqb4FDrfE4O0CghaX2yqsWjS4jxBm8xrI4Qu+MUXwoc2y+zc7d1KXyHRJjGJV
-         j17WSFxDjMLfZF/g+/4lzgqFDdyNx+UJXd8DxAtuyPGHkIN/x9QBIniDSEyWYL9e2YAr
-         kO+Q6r6vjHDvKU/qhqBLxYY/MqEwUk3wXdUuu2b3+RIepyl1fCJfEgg6xm3N4pKGcynA
-         a4cwrhNxncXljnukOzE/ATZdk/dauLTKEUlI5tiLCwwLlv+RZ3kpoERv86rzVhGLRPEQ
-         RTOzy0FvnL4pJSeoI6hMCPNjoWHZHku5MpIAhX9p55m6HGhJTncjKwGMHVkWhZMPk0FS
-         6wkg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5IzNdTGE+liZsK58m+30prziZqf3ifbN694CMTIJYS2oM6acYsFWepjD0FHuZIcWedIe8LVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlR++8jyQ7sYKEAevgofu1PjwhpuDauulNdaYbhJMutPcXkZSO
-	vyuQ+HMPN4B2BZIyhhqgRyxebBm8iKzbngLILdC8+30yx9IeFsu68wAtNY9d3euiZDrJ9ofA1GO
-	B9cwEzgNF7gsSzl96FcaUplI3TUT9BQmIM5SZ9V+l74k9iY5hTfRDvZvkeS0/jQ==
-X-Gm-Gg: ASbGncvQPksZPCMfmEu0S/lt0tUlNp9iukr2fzoRGn2IrcWoMPl2IkJxhLZBD/lVQlv
-	aYBZoJXotauMgqjRqeQZOQIlF+JT8mvTyzmySJbyrxteEVG1TmRxWSd6QUNYZgp2kEHv0VQj08s
-	ZL69cDqsbRxKvR8tOFBh6YiNAZp7iSLprQiwqmzowUkSudmHXkJM0/U/a87bI1TB1lzZJBn10+j
-	Gaw8XQojzRSZDnxGbVe7CP4bienJ40B9AKR8G9wDmsKUA3gA0/1EBTtHZrS+xteLM7cbkknn2Jk
-	cDQ44BWGrS7LijC6JkXIhrPDzqENRXqh77U=
-X-Received: by 2002:a05:600c:1991:b0:434:a929:42bb with SMTP id 5b1f17b1804b1-43959a5290fmr62880805e9.18.1739446665524;
-        Thu, 13 Feb 2025 03:37:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/qJS/I9WQnlC47h7CMBYrw7MSkEivmYUNWNnliL5vRPpLogYMVyAbPyyhwNJJe7crdnyk4g==
-X-Received: by 2002:a05:600c:1991:b0:434:a929:42bb with SMTP id 5b1f17b1804b1-43959a5290fmr62880515e9.18.1739446665141;
-        Thu, 13 Feb 2025 03:37:45 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a06cf2fsm46009225e9.19.2025.02.13.03.37.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 03:37:44 -0800 (PST)
-Message-ID: <a360c048-96f3-486e-a097-e3456a6243a8@redhat.com>
-Date: Thu, 13 Feb 2025 12:37:43 +0100
+	s=arc-20240116; t=1739446769; c=relaxed/simple;
+	bh=x26+TIGrOJ0KNbq5bnCKvaiY72o7bCtil5dql0WTZB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtVqCoYVGEu20E4nn0YDoQgJW8gX8aZ54JFlRy73Kqi4Zw2NReFBHRScySIGPJOGUFKTvVYZuaE6YtedOwaO8sqvetb1NqzRSlNwK96gXlRMrpnfl11rSH60z2yCI+XP+pOI5XIq2osHZs6/ZxG5YnCCJxP9xQQ5fhjKGFWZlL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QBQ/NvAF; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739446768; x=1770982768;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=x26+TIGrOJ0KNbq5bnCKvaiY72o7bCtil5dql0WTZB8=;
+  b=QBQ/NvAFY4hu95eneJj2kfLy8MA+OZO4tswbj1+Li2U6yzfkvNMTmVKi
+   tYQUoGRADrlU9aXEUCAxQXxo2srnQG9DMEE8wziYrQSbF8NOXEBRp+Hvd
+   EnSXvydJ+dXQ+xAFFiH5bfOPHB9GbJjgQphB7jYRt7SF5vwz4WISGB/9N
+   rHXYs5k5xLcpSZsl05A2k5Ce54k1wEl8nlob9Nn4QxqUc72at2Wn6oz6S
+   nbPWHZo4tQAQc5Lyk+bQvhrIEKRn/FjaHsSw5R/n/uImDn15mAXpJ5LC+
+   iActcjxdZp/02N1K8Ccq+pFIb17b6cDJL/hd9t+XDM/ii80DTD9vYUNw5
+   g==;
+X-CSE-ConnectionGUID: UjYpJul0Ty+6NObtRZC0aw==
+X-CSE-MsgGUID: I5i2pIZ2QO6bQlAryj47cQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="40008154"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="40008154"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 03:39:27 -0800
+X-CSE-ConnectionGUID: V46oJ0FCR9maNBzHURCDUg==
+X-CSE-MsgGUID: w7kaAZwJSxGZvwrqs0ebwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="113648995"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 13 Feb 2025 03:39:22 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tiXYu-0016yx-1f;
+	Thu, 13 Feb 2025 11:39:20 +0000
+Date: Thu, 13 Feb 2025 19:39:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Philipp Stanner <phasta@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	Philipp Stanner <pstanner@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] stmmac: Replace deprecated PCI functions
+Message-ID: <202502131939.DdTP5mv1-lkp@intel.com>
+References: <20250212145831.101719-2-phasta@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] posix clocks: Store file pointer in clock
- context
-To: Wojtek Wasko <wwasko@nvidia.com>, netdev@vger.kernel.org
-Cc: richardcochran@gmail.com, vadim.fedorenko@linux.dev, kuba@kernel.org,
- horms@kernel.org, Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>
-References: <20250211150913.772545-1-wwasko@nvidia.com>
- <20250211150913.772545-2-wwasko@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250211150913.772545-2-wwasko@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212145831.101719-2-phasta@kernel.org>
 
-Posix clock maintainers have not being CC-ed, adding them.
+Hi Philipp,
 
-The whole series is available at:
+kernel test robot noticed the following build warnings:
 
-https://lore.kernel.org/all/20250211150913.772545-1-wwasko@nvidia.com/
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.14-rc2 next-20250213]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-On 2/11/25 4:09 PM, Wojtek Wasko wrote:
-> Dynamic clocks (e.g. PTP clocks) need access to the permissions with
-> which the clock was opened to enforce proper access control.
-> 
-> Native POSIX clocks have access to this information via
-> posix_clock_desc. However, it is not accessible from the implementation
-> of dynamic clocks.
-> 
-> Add struct file* to POSIX clock context for access from dynamic clocks.
-> 
-> Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
-> ---
->  include/linux/posix-clock.h | 6 +++++-
->  kernel/time/posix-clock.c   | 1 +
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/posix-clock.h b/include/linux/posix-clock.h
-> index ef8619f48920..40fa204baafc 100644
-> --- a/include/linux/posix-clock.h
-> +++ b/include/linux/posix-clock.h
-> @@ -95,10 +95,13 @@ struct posix_clock {
->   * struct posix_clock_context - represents clock file operations context
->   *
->   * @clk:              Pointer to the clock
-> + * @fp:               Pointer to the file used for opening the clock
->   * @private_clkdata:  Pointer to user data
->   *
->   * Drivers should use struct posix_clock_context during specific character
-> - * device file operation methods to access the posix clock.
-> + * device file operation methods to access the posix clock. In particular,
-> + * the file pointer can be used to verify correct access mode for custom
-> + * ioctl calls.
->   *
->   * Drivers can store a private data structure during the open operation
->   * if they have specific information that is required in other file
-> @@ -106,6 +109,7 @@ struct posix_clock {
->   */
->  struct posix_clock_context {
->  	struct posix_clock *clk;
-> +	struct file *fp;
->  	void *private_clkdata;
->  };
->  
-> diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
-> index 1af0bb2cc45c..4e114e34a6e0 100644
-> --- a/kernel/time/posix-clock.c
-> +++ b/kernel/time/posix-clock.c
-> @@ -129,6 +129,7 @@ static int posix_clock_open(struct inode *inode, struct file *fp)
->  		goto out;
->  	}
->  	pccontext->clk = clk;
-> +	pccontext->fp = fp;
->  	if (clk->ops.open) {
->  		err = clk->ops.open(pccontext, fp->f_mode);
->  		if (err) {
+url:    https://github.com/intel-lab-lkp/linux/commits/Philipp-Stanner/stmmac-Replace-deprecated-PCI-functions/20250212-230254
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250212145831.101719-2-phasta%40kernel.org
+patch subject: [PATCH] stmmac: Replace deprecated PCI functions
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20250213/202502131939.DdTP5mv1-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250213/202502131939.DdTP5mv1-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502131939.DdTP5mv1-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c: In function 'loongson_dwmac_probe':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:527:18: warning: unused variable 'i' [-Wunused-variable]
+     527 |         int ret, i;
+         |                  ^
+   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c: In function 'loongson_dwmac_remove':
+   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:604:13: warning: unused variable 'i' [-Wunused-variable]
+     604 |         int i;
+         |             ^
 
 
+vim +/i +527 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 
+126f4f96c41d2e Yanteng Si      2024-08-07  520  
+30bba69d7db40e Qing Zhang      2021-06-18  521  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+30bba69d7db40e Qing Zhang      2021-06-18  522  {
+30bba69d7db40e Qing Zhang      2021-06-18  523  	struct plat_stmmacenet_data *plat;
+0ec04d32b5e7f0 Yanteng Si      2024-08-07  524  	struct stmmac_pci_info *info;
+bd83fd598ba34f Philipp Stanner 2025-02-12  525  	struct stmmac_resources res = {};
+803fc61df261de Yanteng Si      2024-08-07  526  	struct loongson_data *ld;
+126f4f96c41d2e Yanteng Si      2024-08-07 @527  	int ret, i;
+30bba69d7db40e Qing Zhang      2021-06-18  528  
+30bba69d7db40e Qing Zhang      2021-06-18  529  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+30bba69d7db40e Qing Zhang      2021-06-18  530  	if (!plat)
+30bba69d7db40e Qing Zhang      2021-06-18  531  		return -ENOMEM;
+30bba69d7db40e Qing Zhang      2021-06-18  532  
+30bba69d7db40e Qing Zhang      2021-06-18  533  	plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+30bba69d7db40e Qing Zhang      2021-06-18  534  					   sizeof(*plat->mdio_bus_data),
+30bba69d7db40e Qing Zhang      2021-06-18  535  					   GFP_KERNEL);
+e87d3a1370ce9f Yanteng Si      2023-12-11  536  	if (!plat->mdio_bus_data)
+e87d3a1370ce9f Yanteng Si      2023-12-11  537  		return -ENOMEM;
+e87d3a1370ce9f Yanteng Si      2023-12-11  538  
+30bba69d7db40e Qing Zhang      2021-06-18  539  	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+126f4f96c41d2e Yanteng Si      2024-08-07  540  	if (!plat->dma_cfg)
+126f4f96c41d2e Yanteng Si      2024-08-07  541  		return -ENOMEM;
+30bba69d7db40e Qing Zhang      2021-06-18  542  
+803fc61df261de Yanteng Si      2024-08-07  543  	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+803fc61df261de Yanteng Si      2024-08-07  544  	if (!ld)
+803fc61df261de Yanteng Si      2024-08-07  545  		return -ENOMEM;
+803fc61df261de Yanteng Si      2024-08-07  546  
+30bba69d7db40e Qing Zhang      2021-06-18  547  	/* Enable pci device */
+30bba69d7db40e Qing Zhang      2021-06-18  548  	ret = pci_enable_device(pdev);
+30bba69d7db40e Qing Zhang      2021-06-18  549  	if (ret) {
+30bba69d7db40e Qing Zhang      2021-06-18  550  		dev_err(&pdev->dev, "%s: ERROR: failed to enable device\n", __func__);
+126f4f96c41d2e Yanteng Si      2024-08-07  551  		return ret;
+30bba69d7db40e Qing Zhang      2021-06-18  552  	}
+30bba69d7db40e Qing Zhang      2021-06-18  553  
+126f4f96c41d2e Yanteng Si      2024-08-07  554  	pci_set_master(pdev);
+126f4f96c41d2e Yanteng Si      2024-08-07  555  
+30bba69d7db40e Qing Zhang      2021-06-18  556  	/* Get the base address of device */
+bd83fd598ba34f Philipp Stanner 2025-02-12  557  	res.addr = pcim_iomap_region(pdev, 0, DRIVER_NAME);
+bd83fd598ba34f Philipp Stanner 2025-02-12  558  	ret = PTR_ERR_OR_ZERO(res.addr);
+30bba69d7db40e Qing Zhang      2021-06-18  559  	if (ret)
+fe5b3ce8b4377e Yang Yingliang  2022-11-08  560  		goto err_disable_device;
+30bba69d7db40e Qing Zhang      2021-06-18  561  
+803fc61df261de Yanteng Si      2024-08-07  562  	plat->bsp_priv = ld;
+803fc61df261de Yanteng Si      2024-08-07  563  	plat->setup = loongson_dwmac_setup;
+56dbe2c290bc58 Yanteng Si      2024-08-07  564  	ld->dev = &pdev->dev;
+803fc61df261de Yanteng Si      2024-08-07  565  	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+803fc61df261de Yanteng Si      2024-08-07  566  
+0ec04d32b5e7f0 Yanteng Si      2024-08-07  567  	info = (struct stmmac_pci_info *)id->driver_data;
+126f4f96c41d2e Yanteng Si      2024-08-07  568  	ret = info->setup(pdev, plat);
+0ec04d32b5e7f0 Yanteng Si      2024-08-07  569  	if (ret)
+0ec04d32b5e7f0 Yanteng Si      2024-08-07  570  		goto err_disable_device;
+0ec04d32b5e7f0 Yanteng Si      2024-08-07  571  
+126f4f96c41d2e Yanteng Si      2024-08-07  572  	if (dev_of_node(&pdev->dev))
+126f4f96c41d2e Yanteng Si      2024-08-07  573  		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+126f4f96c41d2e Yanteng Si      2024-08-07  574  	else
+126f4f96c41d2e Yanteng Si      2024-08-07  575  		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
+126f4f96c41d2e Yanteng Si      2024-08-07  576  	if (ret)
+0c979e6b55f99f Yanteng Si      2024-08-07  577  		goto err_disable_device;
+30bba69d7db40e Qing Zhang      2021-06-18  578  
+803fc61df261de Yanteng Si      2024-08-07  579  	/* Use the common MAC IRQ if per-channel MSIs allocation failed */
+803fc61df261de Yanteng Si      2024-08-07  580  	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
+803fc61df261de Yanteng Si      2024-08-07  581  		loongson_dwmac_msi_config(pdev, plat, &res);
+803fc61df261de Yanteng Si      2024-08-07  582  
+f2d45fdf9a0ed2 Yang Yingliang  2022-11-08  583  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+f2d45fdf9a0ed2 Yang Yingliang  2022-11-08  584  	if (ret)
+126f4f96c41d2e Yanteng Si      2024-08-07  585  		goto err_plat_clear;
+f2d45fdf9a0ed2 Yang Yingliang  2022-11-08  586  
+126f4f96c41d2e Yanteng Si      2024-08-07  587  	return 0;
+f2d45fdf9a0ed2 Yang Yingliang  2022-11-08  588  
+126f4f96c41d2e Yanteng Si      2024-08-07  589  err_plat_clear:
+126f4f96c41d2e Yanteng Si      2024-08-07  590  	if (dev_of_node(&pdev->dev))
+126f4f96c41d2e Yanteng Si      2024-08-07  591  		loongson_dwmac_dt_clear(pdev, plat);
+803fc61df261de Yanteng Si      2024-08-07  592  	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
+803fc61df261de Yanteng Si      2024-08-07  593  		loongson_dwmac_msi_clear(pdev);
+fe5b3ce8b4377e Yang Yingliang  2022-11-08  594  err_disable_device:
+fe5b3ce8b4377e Yang Yingliang  2022-11-08  595  	pci_disable_device(pdev);
+f2d45fdf9a0ed2 Yang Yingliang  2022-11-08  596  	return ret;
+30bba69d7db40e Qing Zhang      2021-06-18  597  }
+30bba69d7db40e Qing Zhang      2021-06-18  598  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
