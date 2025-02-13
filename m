@@ -1,150 +1,115 @@
-Return-Path: <netdev+bounces-166075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A223FA3467A
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:25:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6436A34732
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E21467A2863
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:24:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5FBB16BDE6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE74165F1F;
-	Thu, 13 Feb 2025 15:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397871662E9;
+	Thu, 13 Feb 2025 15:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zlt2CV4z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DEK2OViQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BD81411DE;
-	Thu, 13 Feb 2025 15:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F9526B0BD
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 15:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739460339; cv=none; b=V9ok485DrGketHw8hI8SqNpXl8SLErCh0idzSrzXg9COF2u3sWx7U2JP3RmAV4u1+kZeQJy+XAaTidgljA5i/d24NhWUHBmNwjCgkazXuYZg5DIyiVpot/hAbmPbrHw/i/em7gihuzKIdHi2JAR+Xub1Un3SPy3WlSJGsE3cjIw=
+	t=1739460389; cv=none; b=PWtLdT2SZXDSvQIeKnyagNs3RLI6IQ0aD7uhDX8aBN85wgMXbbU7XJTVhA7tBNM2jSBpQTV/Wv+QlwmTCSrKeigzu6fmkIbJxEEuK51TZQw4ylmCmyKcndbEjfeFtGIPpheMKgyg3QkVshd4pTj5/f+EU2usVh3wLgoS4qVVeWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739460339; c=relaxed/simple;
-	bh=TPjq4XjQPNfxakLg3n1C4p8+KUOyyY7/h6//Panzx9I=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RNX1TGiEWw2crqPzdVwHzYT3SsXETy95KaPXbb96mobx6cWYBSmmtNslv8urQE86QT2yFdrxc6Lr3Lc6uYfI6BBeSEAy1FUhBNCSx4ZB8RiACpF/o8L1b/S+y4Yl7mL3B2eoDe/6pyagnqLSYNjJDi9x6p3Nyo39/cffK40pugo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zlt2CV4z; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 09B78432B4;
-	Thu, 13 Feb 2025 15:25:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739460335;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lFuRc4vnJDC+U8vlunBJUoC5VAZxPPiCI440ctYMhMM=;
-	b=Zlt2CV4zcUYBMgVH8rk5q0w7VMbNXWZqUiByPBR1Qdrmcku9kewtaX4Fzk9SAgMH5rddsF
-	WixvDN8UgC5QEOGXUw5p+PRqfbJWjwzFG6FbnXlEI3/7TOE/Gr0oy0K896FcZwt3IVdXh6
-	e03IpWT0pHlAuodihUQTKMBMbNTcrGko5PwNzcp1InTVGKKwyc8QWr8dronU0o1m6aEUO5
-	OFWiNk02TA+bKSa5eSv3X9fSGXkXEA4GHF62aUDU3IMaa05LHhvBHxGfd3jZq9UVkIr25r
-	yipJY+cw7hVDkqCtszC5/xG+Q3q1EvJokHHpFgrh5LB0SK/ZZelOQ3kpvtD2Zw==
-Message-ID: <99247019-bb41-4fd9-bc0c-d31e5688533b@bootlin.com>
-Date: Thu, 13 Feb 2025 16:25:33 +0100
+	s=arc-20240116; t=1739460389; c=relaxed/simple;
+	bh=KUxFX+4f0Aizw7Mg85WPdNi8c0DEahMb6LLBmtuIvak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MPjPW5P2I67WeB5V4QtDxS/s39vKkykOV1WBjnwKza4vGnHuNneNFeG1zMtsH6kwsmTP7yV+cYqkdLVWLQipKxi4s3uGqzfHoSpSB6MUnZftjA4qe2Km1oGhapYOVMbR+0vx4IGEydgxiguDuMqtbiaU/ETe7/6A4/k7Zfh3V2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DEK2OViQ; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-220e989edb6so2843755ad.1
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 07:26:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739460386; x=1740065186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K89iMvYVIaxnJ+fqwfSq5htV0qyp5rhqJml9Bv4LRmc=;
+        b=DEK2OViQIDXz7k9j+atWOlt1aeI2gFEBWB8K4XLI3tqVm1ZMWjkiZw+6cZbFA79GC6
+         ioLQH+UfX6/tTxHd0Wm9CAZO+fIzmdBvUzdt7nx21tBqWAJVX/2KkOA83iltn5cC+tZL
+         uKQ6SkvWNkQfYAO8MVuMbspoKOGAgU35y6Y2LaTCvO+N/TX0M/L6Bi/rdgf1SwDMIvtV
+         uh1yRffTlh+EDFzORRtcmZCO9mh4uGoUFDqA5YFgKXBUQ0eb/YF8tINPDA5BpUH9ZPy/
+         lQwESN5mbPbaZuX0apk/uR3R4PA/WzvckyyHTDabwtzWYOmubJzQZ0rDssnqMi6pClKr
+         Z7mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739460386; x=1740065186;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K89iMvYVIaxnJ+fqwfSq5htV0qyp5rhqJml9Bv4LRmc=;
+        b=G9+NSLNNyzd+Cg63S3cVCUotfeldYbisn5CrnyrM/shvKaSZfc7EDEEJmmMFxmfZ4k
+         EBD9WcPU3qQKa7UF7e1Gt5K29cUdkGZBCxIonqccOBJJlQW69yaH56+EPFCR0HbbwNDz
+         0zF1zGtPkkzj0jwlU66KDgpLPkf5nJ32SKHdS/htUi7pSy7ZxgA05ZzD/3llHeFVB+es
+         C9JArShCYEy/RWf5/OcyxKp+8Z7ElzVmE81CdRWEvCBGofj7Ts5mdNrWHmcjaN04B9ml
+         ZEl1hUjaOb+76ci5j/A/HnicEK56E60H1dK/4ZhFsU/0X42jLvtcExEzEI0i2h0jh1wn
+         k8Iw==
+X-Gm-Message-State: AOJu0YwDGeTzqAb9i26nDVXawJCW6YoR2/lRzuTTqoeFBgn5Vswz9+/T
+	caylHrgB1WeH5HwDvEyIYirFsbA+BeF4MUXSrr4CnszUOKpeeZDY7BHKzO9a
+X-Gm-Gg: ASbGncvPWCnwvzKWESI8ERchuCvf+f6o2V3K2hMZL61Shm93E5xZHtRycyBHhnYLnSF
+	BIk8uOjEN2QBgkVNESvJrJ6h8GddkQFaIoiNfNvFyevxRnL777TDxhJHTpgp/KKTwW7g0/EpkTj
+	5fPtNJiUoys9eiMj30JLroL5SrojLV2UfqYDp/v+58LkTcs8KP1I+N9UocsPi70g7KXewn2AXqj
+	tQR15jG1QKxjUo0zUwKK22f5Vb/Q48xRFmnyTeB3/l1SVwFfjZLO25FRJpC8dnNDZSoRX0Anmow
+	Pz6cbU5OQm0sZnbJdpF9pILRt80SMCjt+g33Vg==
+X-Google-Smtp-Source: AGHT+IFipaKcWyFZaSEDZiGw02DfcykMmnnerthm7WE8jzcwMvin1u67jpRAWSD47lXTNrhIZQXsRQ==
+X-Received: by 2002:a05:6a00:399c:b0:724:59e0:5d22 with SMTP id d2e1a72fcca58-7323c1f5ab4mr4699239b3a.20.1739460386123;
+        Thu, 13 Feb 2025 07:26:26 -0800 (PST)
+Received: from localhost.localdomain ([2405:201:5c08:585d:6eb6:f5fb:b572:c7c7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-732425806f3sm1403499b3a.82.2025.02.13.07.26.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 07:26:25 -0800 (PST)
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	skhan@linuxfoundation.org,
+	Pranav Tyagi <pranav.tyagi03@gmail.com>
+Subject: [PATCH net-next] selftests: net: fix grammar in reuseaddr_ports_exhausted.c log message
+Date: Thu, 13 Feb 2025 20:56:11 +0530
+Message-ID: <20250213152612.4434-1-pranav.tyagi03@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Subject: Re: [PATCH 01/12] dt-bindings: bluetooth: describe wilc 3000
- bluetooth chip
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nicolas Ferre
- <nicolas.ferre@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Marek Vasut <marex@denx.de>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
- <20250212-wilc3000_bt-v1-1-9609b784874e@bootlin.com>
- <20250213-chamois-of-unexpected-glory-dd3eab@krzk-bin>
-Content-Language: en-US
-In-Reply-To: <20250213-chamois-of-unexpected-glory-dd3eab@krzk-bin>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegjedufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfhffuvfevfhgjtgfgsehtkeertddtvdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepleejhfevledvgeehvdevueejgeduhfelffegkeejteejveevieejvdeifeekuedtnecuffhomhgrihhnpehmihgtrhhotghhihhprdgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrvddungdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
- ehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghjrgihrdhkrghthhgrthesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvh
-X-GND-Sasl: alexis.lothore@bootlin.com
 
-Hi Krzysztof,
+This patch fixes a grammatical error in a test log message in
+reuseaddr_ports_exhausted.c for better clarity as a part of lfx
+application tasks
 
-On 2/13/25 10:25, Krzysztof Kozlowski wrote:
->> +  wlan:
->> +    $ref: /schemas/types.yaml#/definitions/phandle
->> +    description:
->> +      Phandle to the wlan part of the combo chip
-> 
-> No resources here and judging by the driver everything is part of wifi.
-> Either you wrote it to match driver or indeed hardware is like that. In
-> the first case, why this cannot be part of WiFi with phandle to serial
-> bus? In the second case, this needs to be proper hardware description
+Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+---
+ tools/testing/selftests/net/reuseaddr_ports_exhausted.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-First, I'd like to reclarify what the chip exactly is, to make sure that we are
-talking about the same thing. The wilc3000 ([1]) is a single physical device
-packaging two different discrete modules inside (one for 802.11, one for
-bluetooth). The WLAN part has its own binding integrated in upstream kernel
-([2]) and is based on a similar chip in the same family (wilc1000, which only
-have 802.11, and so only SPI/SDIO, no UART).
-
-Now that it is said, no, I did not write this binding only aiming to match the
-new driver. I tried to base this description on how similar WLAN/BT combo chips
-are usually described (based on those which have existing bindings), and they
-seem to describe distinctly the two internal parts of those chips as well. For
-those who use HCI commands over uart for the bluetooth part, they expose a
-dedicated child node of a serial controller (distinct from the wlan part,
-described as another node on PCI/SDIO/SPI/etc). The hardware architecture for
-wilc3000 is similar to those, so since the serial bus is the primary interface
-to operate the bluetooth part inside the chip, doesn't it makes sense to have it
-under a serial controller node (and then to refer to wlan for the additional
-operations needed on sdio/spi), than the other way around ?
-
-About the lack of other resources in the new node: there are indeed additional
-resources that affect bluetooth, but I am not sure how it should be handled:
-there are for example a reset input and a chip enable input exposed by this
-chip, which in fact do not only affect the WLAN part but the two parts inside
-the chip. But those are currently described and handled by the WLAN part. I
-guess that an improvement regarding this point could then be to move those out
-of the wlan binding, and find a way to describe it as shared resources between
-those two parts of the chip, but how should it be handled ? Is it ok to remove
-those from an existing binding (and if so, where to put those ? It is not
-bluetooth specific neither) ? Is the issue rather about current WILC3000 binding
-kind of mixing overall chip description and internal wlan part description ?
-
-Thanks,
-
-Alexis
-
-[1]
-https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/IEEE-802.11-b-g-n-Link-Controller-Module-with-Integrated-Bluetooth-5.0-DS70005327B.pdf
-[2]
-https://elixir.bootlin.com/linux/v6.12.6/source/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
-> Best regards,
-> Krzysztof
-> 
-
-
+diff --git a/tools/testing/selftests/net/reuseaddr_ports_exhausted.c b/tools/testing/selftests/net/reuseaddr_ports_exhausted.c
+index 066efd30e294..7b9bf8a7bbe1 100644
+--- a/tools/testing/selftests/net/reuseaddr_ports_exhausted.c
++++ b/tools/testing/selftests/net/reuseaddr_ports_exhausted.c
+@@ -112,7 +112,7 @@ TEST(reuseaddr_ports_exhausted_reusable_same_euid)
+ 		ASSERT_NE(-1, fd[0]) TH_LOG("failed to bind.");
+ 
+ 		if (opts->reuseport[0] && opts->reuseport[1]) {
+-			EXPECT_EQ(-1, fd[1]) TH_LOG("should fail to bind because both sockets succeed to be listened.");
++			EXPECT_EQ(-1, fd[1]) TH_LOG("should fail to bind because both sockets successfully listened.");
+ 		} else {
+ 			EXPECT_NE(-1, fd[1]) TH_LOG("should succeed to bind to connect to different destinations.");
+ 		}
 -- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.47.1
+
 
