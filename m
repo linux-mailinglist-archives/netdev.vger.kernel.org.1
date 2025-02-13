@@ -1,207 +1,241 @@
-Return-Path: <netdev+bounces-165959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58FD4A33CC2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:32:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BB5A33CC4
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:34:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08962168D99
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:32:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A4693A21A4
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FDA20E30A;
-	Thu, 13 Feb 2025 10:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF00207641;
+	Thu, 13 Feb 2025 10:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDt3hgyC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OT8GtHAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3992063D2
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739442750; cv=none; b=UCSIdLymt+sPJnvTQYldQULto2zceXqPXq+tPC3cxXT1xmVd9VWNFSNcdcM1aeI8hcHKqEeBtvV46OSWdLO2zMsOduj3XUGt+cjzajdEltiR/PbI6jzDCXNQi7Cf6g4ye7chkLWQWEv7Rimv3XFBwrsunicLQ2pxB9NoWMnokrE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739442750; c=relaxed/simple;
-	bh=RSb6AWuuOTKDXx/iwJOiFqPAdBRjDemlLkiLcOpxrPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cA2AdWSwX8prQEyQZ3BsefQdjqzJtR5N74Mp/W4R+JeB/TZbGzlEE78Auad323+aGL8ARWajJjA0juv6C/svR3a5twGLD6MhBg70E5dAxjXEAexJL5EQTvOJpTv/jfYFQjDhQc/IquiSWi1FzNdNPi+dVyLZoLpHdIMiwdUlqQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iDt3hgyC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739442747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ft4Xrl2F2mgPSEHxN3B5fwyLk6cWe4p7NtJxQ7scBGU=;
-	b=iDt3hgyCoxKwqHKUUsrDEn1vCALtGHkO87IkaHkk4sCosKqOKJTA+/9/v/MlEYhfk4WA7O
-	YEAIapYfpcYBMSHuM8nS3/v0EfYHbW1jk4M84ukpmH1G7sCaXfW3whuDHDZkryRNs3u3cV
-	+DzZZl3Rric16LYVsIKv3ckaqQ+Xtzg=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-Jve5j5qYO4uRhgSgf-YlUQ-1; Thu, 13 Feb 2025 05:32:25 -0500
-X-MC-Unique: Jve5j5qYO4uRhgSgf-YlUQ-1
-X-Mimecast-MFC-AGG-ID: Jve5j5qYO4uRhgSgf-YlUQ
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-545054b6a97so327081e87.1
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 02:32:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739442744; x=1740047544;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ft4Xrl2F2mgPSEHxN3B5fwyLk6cWe4p7NtJxQ7scBGU=;
-        b=Pkf3EQtgntbZdj2JrPkiej2sCqlDu+82WSoC10IYUDkXNxLbsB0YZm7zu2209lF0a1
-         dHN498GYXaXVb7ThW190pMCQpQm0RtKu2a3NqKsaioaY0yil7MIyZ7sBAXiI4+cRe2RB
-         +AffnSrR7vFgUg9oCiri/6G/bT7VNUjcXzJoeHWMit3G+ihrlgJPg3rozwsbb8R3/3MM
-         PSNh42Q9JEgKIHGWPZJuWPm+b0VIxPy4kyuRl2rL3XKBNZr5ttEcdEZkM93ywlBBeAsA
-         KY5Dovau5tjSP56nPp6jinAP1erOu2sISNUpjMlb8UUEGrxQnam2e1YdvO/bAX87Kyyv
-         X44Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWxKuJg/TMB/TRn/4DQ5xPYJgF35XzTDL9spOzi6CbCAYtpUWrPb0BFi9qM8tzkrH0ha+/d7tc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPRqB0nksEbE38N8QMlHDzuOA1ljQmGP8CG/UApzqWyPDtyria
-	SUmyQGO345UeiSzdMxlFkvV17n5rFcANlHgkfS1AoR8zg5JeBbbZUmActkB68N1A+BmVlnf0nZN
-	gFkYz7fZMODv5OnA0nH1eFWHT9xrUR5rJs0rmMrja4P0SZF8GSFES+g==
-X-Gm-Gg: ASbGnctGqub+S75K7X19TbIF+YRNxA7erezP/QwTCRwwhUz7YNNsphHdGFw4iXIHzdk
-	YJ0gAGdsTuTwSHTSpeYIzb1LtWTYWIeCghKx7xIh6d5j4F/zzbjGcDcQ9g+TeAhe6JaFfpzt4pd
-	Jav7BWDiOxstGc9VSSCMTp3S5S9MQxzSNH6b883p/PIJ71h7Mn744ndzjYE/F4Kze60M6BwpkNT
-	5LI9isvgiqpbMxwcTqR8i2zc5kEkjGrp9umVOoY3K5KfpoDTCyh+jDkR+AO6GE8wiwHoC3zodG6
-	TS6BuiFbpCUt/3wykLUkp9bjTZflYln81Tw=
-X-Received: by 2002:a05:6512:1288:b0:542:8cf5:a3a3 with SMTP id 2adb3069b0e04-545180ea9bdmr2313805e87.5.1739442743788;
-        Thu, 13 Feb 2025 02:32:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFOjVjfgWpSxlDgp1d5SSfQqcJAl+Kj/IMfKejulsNDq4Ht7M1ACB2G+v8WrXUKd+ndKzht2A==
-X-Received: by 2002:a05:6512:1288:b0:542:8cf5:a3a3 with SMTP id 2adb3069b0e04-545180ea9bdmr2313793e87.5.1739442743361;
-        Thu, 13 Feb 2025 02:32:23 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5451f083443sm131485e87.33.2025.02.13.02.32.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 02:32:22 -0800 (PST)
-Message-ID: <875da042-ef68-4036-beab-9beff1e21ab7@redhat.com>
-Date: Thu, 13 Feb 2025 11:32:19 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638A7201006;
+	Thu, 13 Feb 2025 10:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739442845; cv=fail; b=K1cRUJ4sE0hrr1fhxYznb4b09b4B9/U7hjWe3L3LnXE+ujlE2ulmQzbbR5oOy1G+QhMJ/HLCyzs3xf1lla2GBKy7t68Nv6fGKwMduiA1ViWELtbqfSn/NCLC9lRVwMAdTBK1/967raPZXvZBzBIPpMcpyfFBBENYgeWB5NbmFJQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739442845; c=relaxed/simple;
+	bh=wqmSsevL2WAtVmHgPy3Rdb+GMBPE/k1QEhOrkcjUDJU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hM49HHqI6pqPNNa9S87Cv62+NLo1YzFYiA07woL2ci90HmMkp1DUvhlMXoiXXd1qqHsjbRChUjgTSETNR/zlvuRIJ0V0Cqc2Pl40y2HF4zoZv7/4wp2SmHrAKalDgRKkXH4/oy9jGMDxqev0FFWcmmxRMc7JO41G4FBQfHBVpW0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OT8GtHAo; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739442843; x=1770978843;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wqmSsevL2WAtVmHgPy3Rdb+GMBPE/k1QEhOrkcjUDJU=;
+  b=OT8GtHAoeVAdyf223M1PmLctvPTYQGHhtnqnp0iHUcGlSdU8YsKVy5mH
+   rYEjOVl5Iv6JyruKJLn3w3rukDvACGR3ktAvshfbdNeaw7PgHhOFBS94q
+   R4gIZ92zEp2ZVYpvZu13DBVsemejW/sd7dOwhallHVP6JO59n8lbds1Q7
+   Hlb6OIb0VEO219z/42wkIO3qgqUpfppjAvUDbdN6OUNIMPZRifPylGVm4
+   JXTS/7PMvrmQ85gv9SVdn8PzB1eI1rtC6gM9ZrlJ17rcfqvuDltJeUFka
+   UuXG9OAl/ij7Bz6Qy3kUqF3nUydKu7K7gYi5p75hC7ZnoFKmIujrOjZPl
+   Q==;
+X-CSE-ConnectionGUID: SZPiOJ0eQpKsDj+6pWU78w==
+X-CSE-MsgGUID: lS8zbPu/TcyS0mSSK+GqsQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="40259524"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="40259524"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 02:34:03 -0800
+X-CSE-ConnectionGUID: jgTwdAmGQgKtLYexeiFD9Q==
+X-CSE-MsgGUID: OXe87Jw2Rv2d/DyclZVcjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="113635507"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2025 02:34:02 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 13 Feb 2025 02:34:01 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 13 Feb 2025 02:34:01 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Feb 2025 02:34:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RyMFjS5VGimppWizGL8zmKZmdhEjiZCETKYE7jirQjZZ+iumTRac1sn9BIgudZz0F5sdh25tAKr5YhsVJpQNSf3AkDeTmUT6hnVqn8fGD5wlTSXFCGb78wGnykR9IjIftASn+y7mnyiXAjxM7Klyq3w65InqpW4O9L8GqXGYheBnYFImAK0/V6JXbFyW3A7szYxxneOt1/9aCAJsXjN5oiYCrmjintkkoOd4ZbxgERcmfHEAbRyIX8oXyL/rc+TMAC4N2ZmTg8+ioQs4g/sfrrsq0v/rNMb7LsTp3pNPPtxoUn0ifVLXLkkr62fCL6sfn95p9FxpGqxJM/hAgpnSXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dBIdljD4dPuHFIXUgrONbH5ai3m3kPOHqaCfPdN0etg=;
+ b=LAehEudkyMTkGaUo0WdoBCO2ZXJCdCzDdL2TndjC8O9/Tv8J7BZ8/7g2mPXN4U1SS3Ix25KJJgfiofjhc8m4z3u/1knBlS4gQn+IHtvWMH9UqwXFsLQ0lPK+SraZQQuJ7c/JFCli/wlEFj8KS1ZSDoktbdYzFfeMoV8UV6htSrdj09s9a7E5/Z+P/qbaKWrsQ9YpprUBby5gtboySoMAyZZa4hvafSjZ9ayfyjB6cvgF8VwcCeWSoWwpvT+LKj1Vs5MAIHvz3rexB5CRIHmcWDepWLnwdaPO45tvWrI5hAaGBryUbnXDDAY7x4PRnH+jlAqQWIt6/pGvbOHkMP307Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com (2603:10b6:510:1c5::7)
+ by MN2PR11MB4536.namprd11.prod.outlook.com (2603:10b6:208:26a::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Thu, 13 Feb
+ 2025 10:33:32 +0000
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51]) by PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51%4]) with mapi id 15.20.8422.015; Thu, 13 Feb 2025
+ 10:33:32 +0000
+Message-ID: <2807e16d-5770-4aa5-98ff-2285a7ea11ec@intel.com>
+Date: Thu, 13 Feb 2025 11:33:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] net/mlx5: Prefix temperature event bitmap
+ with '0x' for clarity
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
+ Dumazet" <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Shahar Shitrit <shshitrit@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250213094641.226501-1-tariqt@nvidia.com>
+ <20250213094641.226501-3-tariqt@nvidia.com>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20250213094641.226501-3-tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI0P293CA0009.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::6) To PH8PR11MB6682.namprd11.prod.outlook.com
+ (2603:10b6:510:1c5::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] octeontx2-af: Fix uninitialized scalar variable
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Ethan Carter Edwards <ethan@ethancedwards.com>
-Cc: hariprasad <hkelam@marvell.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250210-otx2_common-v1-1-954570a3666d@ethancedwards.com>
- <Z6rk3Z6TuFSJgSaV@mev-dev.igk.intel.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <Z6rk3Z6TuFSJgSaV@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6682:EE_|MN2PR11MB4536:EE_
+X-MS-Office365-Filtering-Correlation-Id: fdebaa4c-7a18-4b3c-9acd-08dd4c19dd0b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?M2V1aFpkMFB0THl5cUZSZ3pLbTFSMlBFeUY1eHk5bXNORExQWkZFQWJwVll2?=
+ =?utf-8?B?QnFXaFNKWk9IUnRXa2NjZkI2NEwxMFNLd090d09ja09IRHNoWHlucWJnWVd4?=
+ =?utf-8?B?cStzUE1ZUTRncHVzd2NTU0lVR1lIa1NIQ0pGNExDVSs3WFhTVXJMNzQvd0pv?=
+ =?utf-8?B?WFFtRGNGQ3Y2dDZyanFEWk5IT1pIVnpuNHc5VlJScDhJbTZEaHIzVllMUkZo?=
+ =?utf-8?B?cVB3TmJoUEtuRm1Ham1yYWZYSVdlSXVQcmFQQ0lsRUFTMmwwM3F0bFROb3Bi?=
+ =?utf-8?B?WmFyQmNtS1NtL1RZWnVIVnBNODROSHRhSzl3MFZDb29KRGsyNlZUdDYyU01D?=
+ =?utf-8?B?aUN4VGFOOUxRU3lFdEtyclNkL1dHOXZCZU9TbXNlbE9FV0ZtRjhzUTdFV1Zw?=
+ =?utf-8?B?N2tHZXpNU0dhQUpoSm1qdC9ubDNhbXRmOHVNYjJHZ2J6QU0zTE9mdXNaeFNZ?=
+ =?utf-8?B?YUY0dFFyVnpmeHRtUTNSNlBvU3FQOEhHNnJ6SlFscUtoM1ZGVG9vTHBwbUhO?=
+ =?utf-8?B?Q2p3NnRkMzUyazNkdjIraWhxOWxyYWFLaU03ZTQxRUZxMnFtdmRqakducjhz?=
+ =?utf-8?B?TDV2MENYY2t1SVovM0F3aUx0YXpPU1BKN3d1S0t3czRWMXpPVXN5SGxRYjB4?=
+ =?utf-8?B?S0RIUlhXaFkvaWJhRDNGb2NXY3MvV2g5T2hBZlp2aXRsMFpURlZnM05YSDVP?=
+ =?utf-8?B?QmxnbTY5YjFpV1F1ZU5qVE05dXc3WTNsV1huOFZjNEw4bEJBZmpiY01WQWdu?=
+ =?utf-8?B?WjB0UE41aEdpdDRVNWh2T21kclRYNTZBQjZ0ZnNkY24yUHI5bmpIaEZGZEpI?=
+ =?utf-8?B?WFM3eHRITitEanVzaHNCaVQ0ZnF0NW9iYXVPdnpKblMzaEsyZFNwZlA1ckd3?=
+ =?utf-8?B?SU5uU0lUU1VaMEdhSXdsWmhIRVhkSWxrRVpTS3Z2cnU2Z1JiblJSV3FjSWND?=
+ =?utf-8?B?ejRQa2FlY0VTSG42U21ueUpIYTA4MkdoN0VTSi9XWTZlMXVXNnBGMzIwaUtM?=
+ =?utf-8?B?eWQxek4zRWZOc01qbWp6REtZYkVFZzVvOE10d285dUJTb3RRREVtZk9SdGZG?=
+ =?utf-8?B?UjRZVEJmUDdtMmNyUG44bjVoNERZUzVRcGNiWFU2eDFQWkNLUmtPQmh1emQz?=
+ =?utf-8?B?SUNjdSt6MmdRR21ocUpLS1ZSM2Z4WXNBVGJkaXNTTkVSOEwrS1VRaFhKUjBE?=
+ =?utf-8?B?cFUxaytiU1UxMU5LNURxM3hhV1JoZjJ6Q1NaSG5BelgreFdYeHZXYjVuS3A3?=
+ =?utf-8?B?NHVlTzdTUGtUUXRTcUZDR0Z5Nm84ZVIyaUFtMm9nUG1oL3JQcmNTcUhuNEpl?=
+ =?utf-8?B?NlNiYWk1VElrWTQzL0g0eEQvYXZBVHV1STVkaWlMNjdqUVg0eUtRSkNhRFFx?=
+ =?utf-8?B?enY5a2hoZ3oxUkk1ZmQxNjByRWZsZDFweU9aLy9kVXo2OGJpUlBiSWJPVko0?=
+ =?utf-8?B?OVp5bUFPQ1dIRXNPTUFXZGtaSTI3VjdTN3dmc01ZRkJUSVBwZmpyd2FMcUs2?=
+ =?utf-8?B?Um0xaFI1WlAwNnR1bXFEVVlXTWhFYXk4VC9XcjY3NGcrQXJIaWhvWDU3U2tJ?=
+ =?utf-8?B?UnVZNmhrbkhDM25DRHdUMW4ramdmM2Y0SVhhTUtOaW1XSlE4Z2tzcHZnbC9G?=
+ =?utf-8?B?VmF1NzZGbThxU05vd24zYXJVVkljNGpXL0F3UUdJY1YycnA3azVmZXJYMWNH?=
+ =?utf-8?B?bnRUQkpVTzk2TzczeU5PcGRVUjRWWFVhY0Q4RGo4bTBhMytaRlUrbFlpUXZX?=
+ =?utf-8?B?T1ZROVBwK0ZCTWFINm1yN1hlMzc2ZjA3b0ZYNXpYTWVDOGdPUFcxUFVyci9r?=
+ =?utf-8?B?eFI5R0RkSzBOTEw1OE5ncTdSR0FFVlNEZ3lqUkdUK1pNbWFoWnl0emRlT0d1?=
+ =?utf-8?Q?JwMs5z+XqatRk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6682.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cy9oY04vcWhQYlAwcFplcVNKVTBnZ3VNOFVxVnZzd2FqRVEzYjNoNWRlWUxE?=
+ =?utf-8?B?ZTIvSlVQanhSTE04UDV5Ty9xdWR0ejNndnZod2JlUVJSQjBTLzB4SlBSNVBh?=
+ =?utf-8?B?NXhBUklGOXAya0dpVVZPL01HdmVIWk5JQnZyV3VRQzUxU2dWVWlPN3hKNjFU?=
+ =?utf-8?B?REMwOFRBekFzeUx2TW9hcThGaVl5MHg2WlMvWG1vbk1qRnF1VGlrNEhKaW1j?=
+ =?utf-8?B?TnNMNVZKRGh1dzJ0ZzBxUjZYT2FYWFB3NThaczhqZHBmdW5pVzA1c2lpVkQ0?=
+ =?utf-8?B?bGFPaFJQaWhvWlRNUnR4NmppTDZ4T0IzZ0xpVzVBUTZXWDdwTGUzZHhqaU1K?=
+ =?utf-8?B?Zm9aRnJPRkNpbXFyQTZ1R2VwUXZDM0ZTcGtxTUhGSXRvWmVQdTR5MnNaNWxy?=
+ =?utf-8?B?aHA3bDJGN04zZEhMaHNVY2ZyUUZoYjduem93NlpUb0RRRm5CNVF6bjVEOEc1?=
+ =?utf-8?B?N2pwd1cxQlZ1MXdhejN2YWdNTjd4czhockRxMjB0eUtBTWtEMTJYYythRVpS?=
+ =?utf-8?B?WmMxQlVUWGFhWm5ucWtVUkd0VkFXMi9wYUZyY3dVVWFZelJJVmhOempDOUk0?=
+ =?utf-8?B?aUVXZFJxMTVlVk93dkF6dW1HazR6dFgvZXBOck53WUN3WGpMVXkwUU9mcFU3?=
+ =?utf-8?B?a3EvSG5rYTkvMWtJL1dDZU45WldwUmIwVkRsYnd6NUtvZFluUUZiR0RLMHhq?=
+ =?utf-8?B?d1NHZUZvYThnaTUvMnhLUTUwcFFEZEFUeVpLYjN5N1hIRFJ2WUVWZFAwaURR?=
+ =?utf-8?B?YzZTeHYwR3JyQ1ViOC9XWDd1WEZHclk0eFI5blRSamRQWFFCQjJlblJtZDYw?=
+ =?utf-8?B?Q0NsYUp6SVYvUUtzOVBYMnRYdVVxVEVyM3d5QkRoQm9KUVpZRW5RUWpBRVh0?=
+ =?utf-8?B?L1hZOCszN0syT2hYMXFLcGFwWWY5a3dWSVhrK2dZWTQxc0FXb2ExZzk2RmVX?=
+ =?utf-8?B?M3FlTVI5Nk14THJ1bTFPdld6VHIvWGFnN29jVHpDMlhFL1lkaGlNNzdTV3Y3?=
+ =?utf-8?B?di9IVlY0bWkzaHdEczlCTUU4UWdnT1BqblJzSG53bzhrQlI5WHVEbXl6OFZo?=
+ =?utf-8?B?TXVxZzBINmNYVGhHb3ZNalllRXdNY3hDQzNFSDJrZmtSN2tjSWVzU1BMSEdr?=
+ =?utf-8?B?eUtvN0EvZjREMm1iRTRKTEFUMTlib0RQLzd4bzl4cUxtZkcwVFFmQWFaQ1Ba?=
+ =?utf-8?B?TGJuNERmRkFTaHgzd2pmZVQ3NnRmemlscndtbTNCaHg0N2JhSXlQTWRma0ph?=
+ =?utf-8?B?M1krcTV3Z0hTNDlJNUpSb3dwNlVCZEpUNzIyNVdMQkphWHVYOGRDcWRXckNY?=
+ =?utf-8?B?ZHJORmtTVWloY1gzZC9MWFRwOVMvQ29Qd3E0bUdFYkttQUp2WDIrZ2Fkb1Jp?=
+ =?utf-8?B?S3ZveWx1Y2c0QUxHTUNoODlxNkJiWUN1SXpqQ09VQ3FiMFBVaGFmZThmM3J6?=
+ =?utf-8?B?ZXB5VE12bnR1d3g1YjZmQmQ0ZjV3RmVqdTliM1l2Umh4T0luamQ1eS8yMEp0?=
+ =?utf-8?B?anZiREtzeW5wWEp6a0Z1YnFsbjNwbUFRMzFONERlSHQxd3BnN28zb3NZZERJ?=
+ =?utf-8?B?Z1dsQkdmQURaQmorUU44ek5TSWIyNTM3VllQTWZ5WlV4eVg3ZnpHT1k3Y2t0?=
+ =?utf-8?B?UU5USS82SFI2Y3V6cjc0clZRQXlPamM1bnQvZkxWemVXY2RyU2t1ZnR4bHdJ?=
+ =?utf-8?B?Z2tQeU1UcFRjUXUyK2UvQkpoYkhwNzRQeHpxV2M5Z3ZlakhSWHJnQThKU2hq?=
+ =?utf-8?B?dURlUWgvejhvYkt0UU5KcmVWWjIrNUl5N3ZsbDgrU1pvSFhiYmNMSzlKOXZv?=
+ =?utf-8?B?eXVhaVR2b05MZXFlMnFydytBL3lnTjAwZTZNNG9wNnRadDlaV05PQ3dFWHgy?=
+ =?utf-8?B?dmJPeHlHUWppUW5KRE1kY3MxV2tjdVprVllnUWpTeUtXZlNvRnlCOHJ0Rmkx?=
+ =?utf-8?B?eUc2MzBGOHRTVFpnTldlQ1Qwb21MZzRlNkFpT1lGeTRpQmhodDQ4eVdGaDRn?=
+ =?utf-8?B?QkZVem9iUGRSZndNOTJZL2xWb2paYTZkUlVNZE00NkVKeGVSZkowWnpldS9Y?=
+ =?utf-8?B?RkZGUmFKaHBxekVocWdOYmdlNUVCZXY1UDBOV1UrOEFQaXhoR0xFYzlKNnlx?=
+ =?utf-8?B?cCtIdTlTYU1qV0pjMWdOcHRvM0RLZmlkZm1ZS3pmVFBzZkR5Q2l6bWR2ckZG?=
+ =?utf-8?B?V1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdebaa4c-7a18-4b3c-9acd-08dd4c19dd0b
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6682.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 10:33:32.5228
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5mkZzqxz5UiE7PIgTP6i36mz/ZsQKuO42s00+U726j9+coWnQ58Y5PUcg5CgUQrSo3bSm8KXCg/gAhbCNCJ4awKfscKTKPHdA8tx50lGpEI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4536
+X-OriginatorOrg: intel.com
 
-On 2/11/25 6:50 AM, Michal Swiatkowski wrote:
-> On Mon, Feb 10, 2025 at 09:01:52PM -0500, Ethan Carter Edwards wrote:
->> The variable *max_mtu* is uninitialized in the function
->> otx2_get_max_mtu. It is only assigned in the if-statement, leaving the
->> possibility of returning an uninitialized value.
+
+
+On 2/13/2025 10:46 AM, Tariq Toukan wrote:
+> From: Shahar Shitrit <shshitrit@nvidia.com>
 > 
-> In which case? If rc == 0 at the end of the function max_mtu is set to
-> custom value from HW. If rc != it will reach the if after goto label and
-> set max_mtu to default.
+> Prepend '0x' to the sensor bitmap in the warning message to clearly
+> indicate that the bitmap is in hexadecimal format.
 > 
-> In my opinion this change is good. It is easier to see that the variable
-> is alwyas correct initialized, but I don't think it is a fix for real
-> issue.
+> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/events.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/events.c b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+> index e8beb6289d01..a661aa522a9a 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/events.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+> @@ -167,7 +167,7 @@ static int temp_warn(struct notifier_block *nb, unsigned long type, void *data)
+>   
+>   	if (net_ratelimit())
+>   		mlx5_core_warn(events->dev,
+> -			       "High temperature on sensors with bit set %llx %llx",
+> +			       "High temperature on sensors with bit set %#llx %#llx",
+>   			       value_msb, value_lsb);
+>   
+>   	return NOTIFY_OK;
 
-Yep, this is not a fix, the 'Fixes' tag should be dropped. Also I think
-the external tool related tag should not be included.
-
-IMHO have the `max_mtu = 1500` initialization nearby the related warning
-is preferable.
-
-Since this is a refactor, I would instead rewrite the relevant function
-to be more readable and hopefully please the checker, something alike
-the following (completely untested):
-
----
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 2b49bfec7869..7f6c8945e1ef 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1915,42 +1915,37 @@ u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
- 	mutex_lock(&pfvf->mbox.lock);
-
- 	req = otx2_mbox_alloc_msg_nix_get_hw_info(&pfvf->mbox);
--	if (!req) {
--		rc =  -ENOMEM;
--		goto out;
--	}
-+	if (!req)
-+		goto fail;
-
- 	rc = otx2_sync_mbox_msg(&pfvf->mbox);
--	if (!rc) {
--		rsp = (struct nix_hw_info *)
--		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
--		if (IS_ERR(rsp)) {
--			rc = PTR_ERR(rsp);
--			goto out;
--		}
-+	if (rc)
-+		goto fail;
-+	rsp = (struct nix_hw_info *)
-+	       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
-+	if (IS_ERR(rsp))
-+		goto fail;
-
--		/* HW counts VLAN insertion bytes (8 for double tag)
--		 * irrespective of whether SQE is requesting to insert VLAN
--		 * in the packet or not. Hence these 8 bytes have to be
--		 * discounted from max packet size otherwise HW will throw
--		 * SMQ errors
--		 */
--		max_mtu = rsp->max_mtu - 8 - OTX2_ETH_HLEN;
-+	/* HW counts VLAN insertion bytes (8 for double tag)
-+	 * irrespective of whether SQE is requesting to insert VLAN
-+	 * in the packet or not. Hence these 8 bytes have to be
-+	 * discounted from max packet size otherwise HW will throw
-+	 * SMQ errors
-+	 */
-+	max_mtu = rsp->max_mtu - 8 - OTX2_ETH_HLEN;
-
--		/* Also save DWRR MTU, needed for DWRR weight calculation */
--		pfvf->hw.dwrr_mtu = get_dwrr_mtu(pfvf, rsp);
--		if (!pfvf->hw.dwrr_mtu)
--			pfvf->hw.dwrr_mtu = 1;
--	}
-+	/* Also save DWRR MTU, needed for DWRR weight calculation */
-+	pfvf->hw.dwrr_mtu = get_dwrr_mtu(pfvf, rsp);
-+	if (!pfvf->hw.dwrr_mtu)
-+		pfvf->hw.dwrr_mtu = 1;
-+	mutex_unlock(&pfvf->mbox.lock);
-+	return max_mtu;
-
--out:
-+fail:
- 	mutex_unlock(&pfvf->mbox.lock);
--	if (rc) {
--		dev_warn(pfvf->dev,
-+	dev_warn(pfvf->dev,
- 			 "Failed to get MTU from hardware setting default value(1500)\n");
--		max_mtu = 1500;
--	}
--	return max_mtu;
-+	return 1500;
- }
- EXPORT_SYMBOL(otx2_get_max_mtu);
-
-
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
