@@ -1,137 +1,129 @@
-Return-Path: <netdev+bounces-165777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D545BA33585
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:31:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E14AA33586
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 03:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99A6416678B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:30:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20FEA188AFD9
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D972520371B;
-	Thu, 13 Feb 2025 02:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682A220371B;
+	Thu, 13 Feb 2025 02:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nADKsnGV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LgtwfWTg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528AC1F8677
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 02:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9195F35949;
+	Thu, 13 Feb 2025 02:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739413855; cv=none; b=Wv+N4/+C96MCrqC0hFH/4PlnZW4Qb7e6KA1Eb1od0TMIgqJVbtFRBpStycUXVSoYW4tZeHyeYtoPC0knKd6BBSQ89P73MewP+VvN+54trXuj/CTVK4FP6KV3AMtVa9TZJnkkREKVEry5F3QhZ3JR8aFwCioVjQOcSVqWKyEM5oY=
+	t=1739413957; cv=none; b=BDMBn4Mqv6ZD+S69+cV4BBP5wRfCSEzZD+juSsUKF7Cqy9mnoXxnTRn3zKdJ2mq62C35bTxuulYW59mxgOcCWMBMRrzJAxXTQBtrPQDxCxASvHOv6bAqDg1SXUmLzyNKKzmWxQcoCxmY/MOrYQv4knTeWYgJInXcR3I24n8y9bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739413855; c=relaxed/simple;
-	bh=3KbG0rv0EXu0QxjGBFMU3UG02Wnv1Kkg6coC9fllf3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dq48fNnVJpCtPUZ4z3MvOf4VVFVpW5wYqr9HYScN2N8aWmwpgaaR1RaG70yD4L3C6R3L/bnuVHcTFJjFKvLR8mcvt0HG/ftsSMaPs4EA9pzANsSlyqElkxYGKuX6O7JBEWbfO1/g471xN3wXMm/sceHlVs3C5+RkEBAdHjyma5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nADKsnGV; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2fa5af6d743so661705a91.3
-        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 18:30:54 -0800 (PST)
+	s=arc-20240116; t=1739413957; c=relaxed/simple;
+	bh=mpXR5Z5b+24KS40Q+sflPsaqnxb3qXLvHDkx9+7Blc8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SGP17I9eMU6B5T/aEBQA6USu+aQqVTIDl3sQANSYJGBkATkPaOavUX1B9dcoo5WUrUV4qtyL68Hhk8IbDAt7wFJ5wKip3SlauK/pFgxiwtyRwQxrdhz2w1gl15COms/PqouMCpFyDri8NxAT8YqaQc2nafkhNvraz/vCON3LMjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LgtwfWTg; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739413853; x=1740018653; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XyFCzEj0jYxlqIuLfQmxuKNy4cLrP51qIiSmrXGX+ts=;
-        b=nADKsnGV+iRnDapfn0ernMBPtj2d5tHaaZGqQUH6bf/CCUO7a6iLL5CI0/8w9MadGZ
-         4MJgikt1GiNQz4a40fFhDL2xwsr6XWRJm4Qw4wRMNTjPnt7L3VoYNJLjXMXBvKIAYHAx
-         I8I2SNYO0zVNd0oUZfgLFndjlHg0jeb3654sXhAB89UY0rTHtv/51gwBgNSQRrM8wdou
-         Hbf2drAs3KZRLLnkrTbLue4IPVgFBSfgPpdrFf55iKZ79Vty+jtQ+XZxN9E2J4k41fNx
-         w0D+V0rOIh4NZdb0QTqr+Q10Zfbbz8J04fclUBRvm9cHKNJxjkzLScnF+dXMZ79xbT6W
-         zLDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739413853; x=1740018653;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XyFCzEj0jYxlqIuLfQmxuKNy4cLrP51qIiSmrXGX+ts=;
-        b=DKQKPjm8TaYfI9YZokrcX9UcY5uSyF+y4Jj0X4+cl4rMkn3C525onMhkGCLOioIec5
-         bE++zPClB7gpT4pgkU8R20XoJKqJBlTMG5sWKHflBy6Z4ybo3lJXGkALapCymyXi05HT
-         L0DzZ0hDRAePqye5UlbUbWLbW0PI0K3pF0PvyjHnlCrzRfMOuPfBQNvSsyhJZoGFWTPE
-         q14MPJ1Var6R+RlLBFBLr4BGR61oU+s/by3LOIqoIBc0hlOMPpvLS4vQRQSuj33+mFbT
-         KMK3f3mpywRvyrO7rEP+ML3jW9i9UujfnRwiCk1xWW50zHmipmt+jsoeV/GWUGMEPW4G
-         vUMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiUffCs7d22I7EwndcsmUEJYiIgjcPWN1kl98JIlrDHC8QFYRvdxtQ5k2GtxnLNRD7/Wk76gw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxvDbD3VKexeqeoaOrjxrStCD+mS2lpkdU9LvOyzD7a3ExmBBw
-	WGaZN7CzK+3oeS6O7pO92P7gzqxzhPDoDWsnPDXbeXXl4l4WVdU=
-X-Gm-Gg: ASbGncucruwTQIH+OtXwPFSs3JhOpRAc5eni0rE+alw39kyxsxHRDeQBkN31DSVWXiz
-	jtxkuf0bfxl03cAToezpOWKZj01gwKtmUM3WL0oOp22d/Wrnn1R2p7GcRQPLpIkFdgsDI643P3W
-	CIB/GJP957jVQHaTi3bpWxc8s+8FQqWlPcfWcvJKwPXAcVNdjbOiuqtgIFG4UTF5w5L6R3j6HqK
-	gn1e6w9zh3bVuDmmw5WXeode3AHZTwuQf4nrNVH9N+YBKfzPBLCxFp3/hqtMPJN19bDBWJnmEVC
-	UNRlibQoimz3vic=
-X-Google-Smtp-Source: AGHT+IHFr1Drq7zZG754H5mTzThYlrVA+uinsxnl6IHqy/NBIi2U47T0kUbCqagZzUIZkgkb2n/c1A==
-X-Received: by 2002:a05:6a00:2292:b0:732:2170:b68b with SMTP id d2e1a72fcca58-7323c001a1emr2626404b3a.0.1739413853405;
-        Wed, 12 Feb 2025 18:30:53 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7324276169fsm150224b3a.140.2025.02.12.18.30.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 18:30:53 -0800 (PST)
-Date: Wed, 12 Feb 2025 18:30:52 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Paul Ripke <stix@google.com>,
-	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 2/2] ipv6: fix blackhole routes
-Message-ID: <Z61ZXLdD4VQZFcBa@mini-arch>
-References: <20250212164323.2183023-1-edumazet@google.com>
- <20250212164323.2183023-3-edumazet@google.com>
- <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
- <CANn89iLiEcbnbMj7MdCTPsxoT3fHANALZ9LAAsG9T+sWcv-vew@mail.gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739413956; x=1770949956;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=uDx7Pec/32QhafzMHIA4UZXXRTf/UUrn5Ndsewj+63w=;
+  b=LgtwfWTgD5PC2Z52tmUGkJLtR0Dbwy7AD840nZ8KUMRvCaFh/bXl08bG
+   KMU+xuRMc3cZIr/rpJjLZbc2JwIZVpZ3fNYQlyBFhW3YcqS4mWuK6JmD4
+   nzNJB5LiFpLPDZr4qd8ct24QBDGaBPHxK+K6bLx+AgO4eFW8kZgY8tg/Q
+   o=;
+X-IronPort-AV: E=Sophos;i="6.13,281,1732579200"; 
+   d="scan'208";a="65550634"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 02:32:32 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:38744]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.31:2525] with esmtp (Farcaster)
+ id 50f51949-45c1-4e8f-b9b0-30bf21009bc1; Thu, 13 Feb 2025 02:32:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 50f51949-45c1-4e8f-b9b0-30bf21009bc1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 13 Feb 2025 02:32:30 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Feb 2025 02:32:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<eddyz87@gmail.com>, <edumazet@google.com>, <haoluo@google.com>,
+	<horms@kernel.org>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
+	<kerneljasonxing@gmail.com>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<martin.lau@linux.dev>, <ncardwell@google.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <sdf@fomichev.me>, <song@kernel.org>,
+	<yonghong.song@linux.dev>
+Subject: Re: [PATCH net-next 2/3] bpf: add TCP_BPF_RTO_MAX for bpf_setsockopt
+Date: Thu, 13 Feb 2025 11:32:14 +0900
+Message-ID: <20250213023214.76562-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250213022501.76123-1-kuniyu@amazon.com>
+References: <20250213022501.76123-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLiEcbnbMj7MdCTPsxoT3fHANALZ9LAAsG9T+sWcv-vew@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 02/12, Eric Dumazet wrote:
-> On Wed, Feb 12, 2025 at 7:00 PM David Ahern <dsahern@kernel.org> wrote:
-> >
-> > On 2/12/25 9:43 AM, Eric Dumazet wrote:
-> > > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> > > index 78362822b9070df138a0724dc76003b63026f9e2..335cdbfe621e2fc4a71badf4ff834870638d5e13 100644
-> > > --- a/net/ipv6/route.c
-> > > +++ b/net/ipv6/route.c
-> > > @@ -1048,7 +1048,7 @@ static const int fib6_prop[RTN_MAX + 1] = {
-> > >       [RTN_BROADCAST] = 0,
-> > >       [RTN_ANYCAST]   = 0,
-> > >       [RTN_MULTICAST] = 0,
-> > > -     [RTN_BLACKHOLE] = -EINVAL,
-> > > +     [RTN_BLACKHOLE] = 0,
-> > >       [RTN_UNREACHABLE] = -EHOSTUNREACH,
-> > >       [RTN_PROHIBIT]  = -EACCES,
-> > >       [RTN_THROW]     = -EAGAIN,
-> >
-> > EINVAL goes back to ef2c7d7b59708 in 2012, so this is a change in user
-> > visible behavior. Also this will make ipv6 deviate from ipv4:
-> >
-> >         [RTN_BLACKHOLE] = {
-> >                 .error  = -EINVAL,
-> >                 .scope  = RT_SCOPE_UNIVERSE,
-> >         },
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 13 Feb 2025 11:25:01 +0900
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 2ec162dd83c4..a21a147e0a86 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -5303,6 +5303,12 @@ static int bpf_sol_tcp_setsockopt(struct sock *sk, int optname,
+> >  			return -EINVAL;
+> >  		tp->bpf_sock_ops_cb_flags = val;
+> >  		break;
+> > +	case TCP_BPF_RTO_MAX:
+> > +		if (val > TCP_RTO_MAX_SEC * MSEC_PER_SEC ||
+> > +		    val < TCP_RTO_MAX_MIN_SEC * MSEC_PER_SEC)
+> > +			return -EINVAL;
+> > +		inet_csk(sk)->icsk_rto_max = msecs_to_jiffies(val);
+> > +		break;
+> >  	default:
+> >  		return -EINVAL;
+> >  	}
 > 
-> Should we create a new RTN_SINK (or different name), for both IPv4 and IPv6 ?
+> You need not define TCP_BPF_RTO_MAX because TCP_RTO_MAX is not a
+> BPF specific option, and you can just reuse do_tcp_setsockopt(),
+> then bpf_getsockopt() also works.
+> 
+> ---8<---
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 2ec162dd83c4..77732f10097c 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5382,6 +5382,7 @@ static int sol_tcp_sockopt(struct sock *sk, int optname,
+>  	case TCP_USER_TIMEOUT:
+>  	case TCP_NOTSENT_LOWAT:
+>  	case TCP_SAVE_SYN:
+> +	case TCP_RTO_MAX:
 
-Sorry for sidelining, but depending on how this discussion goes,
-tools/testing/selftests/net/fib_nexthops.sh test might need to be
-adjusted (currently fails presumably because of -EINVAL change):
+s/TCP_RTO_MAX/TCP_RTO_MAX_MS/ :)
 
-https://netdev-3.bots.linux.dev/vmksft-net/results/990081/2-fib-nexthops-sh/stdout
 
----
-pw-bot: cr
+>  		if (*optlen != sizeof(int))
+>  			return -EINVAL;
+>  		break;
+> ---8<---
 
