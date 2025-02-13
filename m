@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-166123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0175A34AC9
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:52:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F685A34AFA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:57:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A4497A19C1
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:51:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA80918933B0
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734B524290A;
-	Thu, 13 Feb 2025 16:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD52242926;
+	Thu, 13 Feb 2025 16:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Of7CjW3Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/mO1hzW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA8E241691
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 16:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C22328A2A8;
+	Thu, 13 Feb 2025 16:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739465403; cv=none; b=UCGNuTo4D4NEffmTzLeh5h21jIELGFmji++bKZ1iH1OwegJs8UzpWGsIGiozyY5j2biQBaRFkA/IwzkiwPzKjX4tR5DLBbvpIb9GYh915+E4eUliAUhhUvGcPfEKQaQIjiMEgr/TQK2bN2be3BY0UpVLU48qcGvgzFHEVzGNdW0=
+	t=1739465405; cv=none; b=juAM0nKQOUhEPTA8nyQWZKcNzQOTAEnPH/dRFGB3dbGZCUW0BtWRtxqh2biGnep/PuLqOtHTFB06Kp41GM/xKT5hob8UuouE9AMqLIw19+JLjlVOMRH3K0mPFfxw4rTfhSR85VIWaY0B2PBkfCbR/phgpk5quUosS/PiYNF2SsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739465403; c=relaxed/simple;
-	bh=Eu188JSDuYFG3Gb9frOY8rek+eWlDvpXrZYOPIteRwg=;
+	s=arc-20240116; t=1739465405; c=relaxed/simple;
+	bh=vWc8VKBxp9o18AQbWPY+q8CPpm+dcXnTK5NFlS4VvS8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oWKOuaVvxSHmD/9eHDRYgfb9xyg1YVv0LVNMyA0U0Y9n3tSPgxmzEQhh+kjxwhQKH6UtoSYlzh5CHHWlHOO6Gq2hcEr9d93qkXLIXwNSjrGTzqbIlqtgzz+bxBLChAHz28sc/JBr85gVUBlTav0VdtWfCNiSRgO38Xq3STbOdbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Of7CjW3Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB795C4CED1;
-	Thu, 13 Feb 2025 16:50:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LwcmF+dE0eZbPXVgGyoiQqkLhs+ttOxuz5WdV0fY4p3PHNL3M7Ac6Vl17ZF6EOSB4zf1XH3aSvxTvRN6eL6LHXrQ+ey31WZCpEGrgxOHbJlZz4KkDdgVoJsnGgqQ89smdoSYURsHFmDSLG5LRRdNtiXgHFuZgIMdf/STFB+UvDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/mO1hzW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8CE8C4CED1;
+	Thu, 13 Feb 2025 16:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739465402;
-	bh=Eu188JSDuYFG3Gb9frOY8rek+eWlDvpXrZYOPIteRwg=;
+	s=k20201202; t=1739465404;
+	bh=vWc8VKBxp9o18AQbWPY+q8CPpm+dcXnTK5NFlS4VvS8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Of7CjW3Qri9J9cRGuqaE/AyrV1SqXeaJBVSF035XatqdaQZ3HaE78UbByygB2+242
-	 +frm8+0PiCaVpAbebuyBPmVMvRJTKz/gK10n25W97w8hrwFR3XcKpd/A5Eh4HdBsGO
-	 saN9atRKmgjZIdFCBHpnelWpL3ZZrSZP6r1JqAGYwd2mBOYr2qYD9xHPNfqSa6Cokv
-	 wcGi4NkU9n8hAwEkqhd8auuLM1qpkqkh0DenxPUTagom6BcrgzrZedBUL01GoVQ6Aw
-	 SuCF9HoJsWqVmf+M6MmjppdMnucyvOfBqMO8LWL1ySBpsr4XvtcW2020Ug657dXiWI
-	 vZSsHAOoKwwpA==
+	b=i/mO1hzWbXLsKolCeYD/qTERCl+u/4XCY8eQkko6o8kLWPf+elrjpiH6B25qLcCsV
+	 cC3P9s/aDm/Ss9Hn+4Unuz3BXfp1HoHxVf1M1xLPbThdvW5YfuvQBIsh7xXRRxZ8Qj
+	 jfI95o1XzcNx4SsaDc47vqt1yg3YpByt400T2go07GA57SZRs9iQ1klAJqAiI8oTVO
+	 frkCgnDgohm/efty09pFsE6IBjTw82c5dXvwvWlwhR/OYoBFkfLVwMUa212JAXIIe6
+	 mk56LcEnOhBhlWFykWhiKUPmdXKj5fEE7zvKJUl48oVvCseNsLIshUoPrIaxXNAbDI
+	 wsPyNd4MYBGlA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342BE380CEEF;
-	Thu, 13 Feb 2025 16:50:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FB7380CEEF;
+	Thu, 13 Feb 2025 16:50:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: mcast: add RCU protection to mld_newpack()
+Subject: Re: [PATCH] mlxsw: Add return value check for
+ mlxsw_sp_port_get_stats_raw()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173946543174.1295234.14096603831223863900.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 16:50:31 +0000
-References: <20250212141021.1663666-1-edumazet@google.com>
-In-Reply-To: <20250212141021.1663666-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, dsahern@kernel.org, horms@kernel.org,
- eric.dumazet@gmail.com
+ <173946543381.1295234.12436241481892534091.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 16:50:33 +0000
+References: <20250212152311.1332-1-vulab@iscas.ac.cn>
+In-Reply-To: <20250212152311.1332-1-vulab@iscas.ac.cn>
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: idosch@nvidia.com, petrm@nvidia.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 12 Feb 2025 14:10:21 +0000 you wrote:
-> mld_newpack() can be called without RTNL or RCU being held.
+On Wed, 12 Feb 2025 23:23:11 +0800 you wrote:
+> Add a check for the return value of mlxsw_sp_port_get_stats_raw()
+> in __mlxsw_sp_port_get_stats(). If mlxsw_sp_port_get_stats_raw()
+> returns an error, exit the function to prevent further processing
+> with potentially invalid data.
 > 
-> Note that we no longer can use sock_alloc_send_skb() because
-> ipv6.igmp_sk uses GFP_KERNEL allocations which can sleep.
-> 
-> Instead use alloc_skb() and charge the net->ipv6.igmp_sk
-> socket under RCU protection.
+> Fixes: 614d509aa1e7 ("mlxsw: Move ethtool_ops to spectrum_ethtool.c")
+> Cc: stable@vger.kernel.org # 5.9+
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ipv6: mcast: add RCU protection to mld_newpack()
-    https://git.kernel.org/netdev/net/c/a527750d877f
+  - mlxsw: Add return value check for mlxsw_sp_port_get_stats_raw()
+    https://git.kernel.org/netdev/net/c/fee5d6889406
 
 You are awesome, thank you!
 -- 
