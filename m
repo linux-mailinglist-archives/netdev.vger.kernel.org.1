@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-166134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53DA3A34B97
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:20:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03372A34BB6
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E640165F4D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFCDF1621DA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E4F203710;
-	Thu, 13 Feb 2025 17:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301512040BA;
+	Thu, 13 Feb 2025 17:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QqkS/4J8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vk7L3TjG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E165203719;
-	Thu, 13 Feb 2025 17:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61551FFC41;
+	Thu, 13 Feb 2025 17:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739467161; cv=none; b=QRB8WnQ+ZmNQIdjsUjDllCWmuIThjPE1FF3Gkj35hZMHmi20/l2W/Pgn18R6g155Xva5coJDLxZXBzWBvRuqz1L8auvHLDl7ROfEBZUsAk0ToQFr9BQBdRTMAiYE5KkF4Tl5ZCzG+E68PwN0xGO4AiH7dgZkun4n/0aqPBIqolg=
+	t=1739467307; cv=none; b=lXirWpBeDS/5RAd/gcPH20naTvHb3NsSc5UeWAGJfY9pXMFZ5O6l95ohgsJndt0hyRkIaG/7aQF98fhe4rhTt947qYXB2vDlWznLXjf++n7WnD4+38FPUCQbaCIF24KBiRCwydHYttUYkXC1LiSQtmF+ObHBey6niEx6iaQzyB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739467161; c=relaxed/simple;
-	bh=9jSHN4ul3ZleLnTMDmLIZOfk8OvNXvpRioZv/TPSV6Y=;
+	s=arc-20240116; t=1739467307; c=relaxed/simple;
+	bh=7b3tiR515nbHuXH37JXwcZMGqsx2+CI2oXw9UOzBwG8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fg7PfsYJpjO8MRLruAD9416zzGCkCAaHEmRLTrIDIwO9Aqwjm79YnxWuRLwwrK7xPaYPwqbTxFAcp5ZifQ9L4qJHAvrxpJ40DiBqSbD7Bhhb6XZT7gipL19Qb4pTJHPC80qpREcbmAyVpCjzdhCZ8JVxlG2ky+2hIctmLTMJwYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QqkS/4J8; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739467159; x=1771003159;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9jSHN4ul3ZleLnTMDmLIZOfk8OvNXvpRioZv/TPSV6Y=;
-  b=QqkS/4J8n5ysXdbooCQUoibIRiv7+6znDjufuE+Y0poa/fxzOu0w7qja
-   RbRU5kkk0Esm46pQcSC37aPJ5W1xuUqbggec0fQF0R5GwM7hS6NKc0U8t
-   MZZptK/W5iXg8VIS2cs9mwWx2nYuACAWurlkaqXF4yX1biTG9A03SQwww
-   XcwTxQBLmhRYeOZsta/vYnRYpHmkRam3X7jhU4hBcQ6AdZEbWGAi+JhGp
-   aD7sFnAlUGK3nOLVJHZNJcD8/5aVixckyrai93AQTUIdEErFzPd9mHvCp
-   GgIKWrlllpLsov9SPX6chDwF7gYk2ar44jRUxl3zUeQi2khc5PCYg5Aj2
-   g==;
-X-CSE-ConnectionGUID: XEfdE3R/T/q3JamtQqfJpQ==
-X-CSE-MsgGUID: LtPNf76JT8KTcNLz31aPGQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="40219580"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="40219580"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:19:18 -0800
-X-CSE-ConnectionGUID: 9N4MUBhwQU2v0fAwWmpkiQ==
-X-CSE-MsgGUID: MYE75GfASb6bCUWppIhORQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="150382550"
-Received: from dprybysh-mobl.ger.corp.intel.com (HELO intel.com) ([10.245.246.5])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:19:16 -0800
-Date: Thu, 13 Feb 2025 18:19:12 +0100
-From: Andi Shyti <andi.shyti@linux.intel.com>
-To: Markus Theil <theil.markus@gmail.com>
-Cc: linux-kernel@vger.kernel.org, andi.shyti@linux.intel.com,
-	intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
-	Jason@zx2c4.com, tytso@mit.edu
-Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
-Message-ID: <Z64pkN7eU6yHPifn@ashyti-mobl2.lan>
-References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
- <20250211063332.16542-1-theil.markus@gmail.com>
- <20250211063332.16542-2-theil.markus@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OFEfBxKic0ua/J2AaE2Eg1Cqwck2h/YEr+Sqctkky6+t1bChJCoqUlVnrSSFiHV65fmf24zDe1G/0fnDtUfNsoOQECz+04tAJaLBgFmEGJnffRx0lYeRgoNdgv4pxQ3JGT5yr+tJ2GuHF0rQ9MTXpSrTOVompCsW0ql7s0+in+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vk7L3TjG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7115C4CEE4;
+	Thu, 13 Feb 2025 17:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739467306;
+	bh=7b3tiR515nbHuXH37JXwcZMGqsx2+CI2oXw9UOzBwG8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vk7L3TjGgvDZ88rkKo1f+7cCCKr0k6im7o74QLsJCXW6TM38Au1PTj9Waf+TipLFk
+	 ZCNxToozxFogVFdPl+7mmVT6aG4LuOJ9RDRSWSJzH2iICpi6INUZ2Brh9jiYnS4XOx
+	 /hfTZh/Xxqkvaq9PoAWGcb9igOvi490Usrq7/Q8Dv31LpYTwPe1d7AhEzcSvEPNOoV
+	 r5Izw7978sB/1+oF6EIw8696Q4PnqaCrfQZ/DdLupB3aaXOt8i2dgkGEowJakO7Uqx
+	 Tj8B/1Aqu0QGbzguohO1KXyovh9b+yIp82VyRV6HYX09ihDXHBP6Qi7YnGKaKgUFU8
+	 /EqeW0kKHZWUQ==
+Date: Thu, 13 Feb 2025 22:51:42 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: David Lechner <dlechner@baylibre.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Andy Shevchenko <andy@kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+	linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v3 14/15] phy: mapphone-mdm6600: use
+ gpiod_multi_set_value_cansleep
+Message-ID: <Z64qJjamqN+9GG+P@vaman>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+ <20250210-gpio-set-array-helper-v3-14-d6a673674da8@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,18 +79,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250211063332.16542-2-theil.markus@gmail.com>
+In-Reply-To: <20250210-gpio-set-array-helper-v3-14-d6a673674da8@baylibre.com>
 
-Hi Markus,
-
-On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
-> This is part of a prandom cleanup, which removes
-> next_pseudo_random32 and replaces it with the standard PRNG.
+On 10-02-25, 16:33, David Lechner wrote:
+> Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
+> gpiod_set_array_value_cansleep().
 > 
-> Signed-off-by: Markus Theil <theil.markus@gmail.com>
+> ddata->cmd_gpios->ndescs is validated to be equal to
+> PHY_MDM6600_NR_CMD_LINES during driver probe, so it will have the same
+> value as the previously hard-coded argument.
 
-I merged just this patch in drm-intel-gt-next.
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-Thanks,
-Andi
+-- 
+~Vinod
 
