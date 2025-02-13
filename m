@@ -1,229 +1,251 @@
-Return-Path: <netdev+bounces-165854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A94A338C1
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:25:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA80DA338CC
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:27:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E593A613D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 755BF168701
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56958208974;
-	Thu, 13 Feb 2025 07:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFAA209F25;
+	Thu, 13 Feb 2025 07:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xq9jRc8E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKIqPwZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEF01FAC42;
-	Thu, 13 Feb 2025 07:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739431514; cv=none; b=sMG4tSkFQdcRIny4Vi7BqC0phMRzImigVPqIsOZGZfgBaYLUCI8NIjsdVz+O1CqiOVTa9T6tZf5X2HMeH0Nv5WfSAL9p/pos9KRkVhBMPV97wpuB0UBesJZLq13mhmTv0PhlxyVFMa1jnYrSjGh11r8SdJeZDazufwU8FPxAXvU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739431514; c=relaxed/simple;
-	bh=DRPApdIO1hjqDSiJfQjNZ64VrXoBZxzHXsrThoOG6bk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WPhbX22YLwS0ksfKLPmoT6vWZhttwbn+6ntQoa/6tHrLiCL4svi5FzxHdl0CM5VJfrFTbyG5bwCNQVBlcaF8r7TnMFo3AgtLNYwt15s/tRs/PWkc48Sq3D196x6fKldHOYQNudXzd8SdhAQfua1hInNElogLwLZt+Lfussu0v7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xq9jRc8E; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cfce97a3d9so2061325ab.2;
-        Wed, 12 Feb 2025 23:25:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739431511; x=1740036311; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/lsDlskI1XlpKLkvs3f4ODJwIZbqrD0d2Rq9yStXHOs=;
-        b=Xq9jRc8EzY2PayPnmlpGnCeg/AayThb+2IoZbay71bowsWG15gLCm2GCDQHAlTdk9x
-         i8AfHcRN4JNC0y8Kn5jnh46PuFndukJZfcP+EsfV1WVUHeE/KScuCj2MznMVHCdbWpAW
-         OIw6uHOT+zdgnXi3U3X2iHbTI98MbFYRJ2/scajgqdjRivB52h9XWQ/mGZR909bWacer
-         z6MAf9UefBSBZiPKOItl1p1QnaFBEAli3F1jfV2K5MP2WIuT8K29RCot5l+/Omeq8C89
-         HWwnksl41tc2iM6LwC9+5jGh42X4bwt3g3IW9HK3KMajOQUjVWm5FNcY7brdLKZ7tmb9
-         AJ5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739431512; x=1740036312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/lsDlskI1XlpKLkvs3f4ODJwIZbqrD0d2Rq9yStXHOs=;
-        b=IHAFnLVDjlr+qph6mxlryAD80/FtuAN9AZvc45BGJ901RenfF28J3gYkYvRo7MrsLt
-         4u4T3GxLmvRauDujRw+Ax6X/s0R9S3mDmXHPV4i+jlJgbRnutiEiQCm+gd6IsgIHSssB
-         7HDLCjPfOcgb5VKxPOncQJOCFP98v2hK+xKxh/Zir2AJQRwzAynEpXE/dJ6DXf+YFerd
-         DPMMe2zuAxwTay/6UNIOmNjX1UbYax67W1G4vNK7hvmptCOyNfMKQQUqwKOjfwuchnrz
-         s0yotwZrCi+zBzElOVqizChtkWDMnjRcbHeWBGjR382EDjGeLG3JxCQ38o3cHFhk+wza
-         31Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCV/Q0bEJ/b9x/uMpGypO9TEjJB4cultZ1yi6VNMfol93UAmf24rDYcnvfee314fePhha/j9R8GK@vger.kernel.org, AJvYcCXTWJts9mcIvK3Virz1rrJqT/6nsKIF7GIXxjHKa091182pMNJXt7P3ChzQy6ZeTwLkU8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZNYIooppIqR993kqYTo0LMAnc8/zU9P2FH3JhZZDtx3pRjKm2
-	wZ2+hwTc6I98mtOj8RLmXmTsGE2Ep7u3ya9x1EZQA81jm74qyVkpo3o3n+gIHDGd8SqJzVlhQ3Z
-	Wqu4sMGHvElxzHxHVjvqc1tswVno=
-X-Gm-Gg: ASbGnctKwubP10QF1aVzDZ/7MBqeRuK39sSwNvmzOMDWJI9TeEOgF4Oep8OFKh8GJAW
-	YQTKpwyirhFeMxFoqKyYB3T7WCiR8q5kbzQKNdG8wXph/OIIWmB5A5fbbzC4WcFvFmcoJ8dCC
-X-Google-Smtp-Source: AGHT+IFEmICaGFHReqgHIAMYAGYsU8oxirjBBKTYWdusCyKTGkUtYNYrEslHZs7wey5xFEMdK8GQS1L63TfWyrLOZ2I=
-X-Received: by 2002:a92:c269:0:b0:3d0:d0d:db8e with SMTP id
- e9e14a558f8ab-3d18c21e8a1mr20566315ab.1.1739431511658; Wed, 12 Feb 2025
- 23:25:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12331209F48
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 07:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739431623; cv=fail; b=VmYAfifMoXuwpNknlx+46Juvrq6zIKpjxEEaBr71v3mbd+8YprCEBUDRcV2x5LYSG4vAZ9c4ctApktFdBM+VEEHvsw4MOdiCPijShEd1pzQ8BC7BULXG1gPveO/Zhjh7gjEd37daiTemn09WS+Vorg09bsPQsxIG9/8oto9ki0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739431623; c=relaxed/simple;
+	bh=onJnIK/eUYvUAvW7Y+pawptk8r/AsIvrMnaX376l1Ao=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=k4in+KWrY3oiFfLNmYAgi3rk75Ge9wb+p5Ok0f1KsPY9ock1LuyeSapYe5M8ZpatahgC0W7vS/F4/amqCrjbcad9WAb7EsrlvnTpmG7QOLP15OmaXzK3nD6KE7TEEJxFRKHRIViXbNH8LY9fafydPRfzDCOmYHELm9wc1GlvKKM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iKIqPwZA; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739431622; x=1770967622;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=onJnIK/eUYvUAvW7Y+pawptk8r/AsIvrMnaX376l1Ao=;
+  b=iKIqPwZAQoTK33GeRbD52qNmhMki7slN562YDNzKzUTcqXeH+wHS2Cz+
+   o8OB1SIWv7JdfhcujH8R5vohDuCffW2kWEnLc3SvDIYGYbh29fxFaASR+
+   282nu6JOM/nPwqpOMKF6ANeCjq03dezayPolqvvtOpP0rdQosekoJ//dR
+   PU6PeEVyuPIDtBilyBnpjB9V8MtkYaecgtSHPx2+jY92hH47QEIuPEUI3
+   ylIH6cH3S5Njj7dIOb7JfZXU+zna+x0s4piMYA2yA2yChn7MLAr3I8exl
+   jeNPWmd0gCA+rTjleVxQowcYhHvGASIPMR2DaKVcNxOzGjA07NLaUX55q
+   Q==;
+X-CSE-ConnectionGUID: N/arbl1LQSOs9Ddz3Yg3gA==
+X-CSE-MsgGUID: UwbWvrvqTUyHZGjUwxzqgg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="44050716"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="44050716"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 23:27:00 -0800
+X-CSE-ConnectionGUID: chTyu/+CRVO6qMtq3tWBYw==
+X-CSE-MsgGUID: tu6vWHG8Tde1ZjSl9xATwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="118152011"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Feb 2025 23:27:01 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 12 Feb 2025 23:27:00 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 12 Feb 2025 23:27:00 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 12 Feb 2025 23:26:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IQsuVv146Hrnu2WGRJPFSorTAO9YNd6ShEaYj7c2fY7B+FzHclIQWy+fyOOSnOYgsgNoLy5ju98Pkpo4vnwu9549GXhOItG6ZnUtwKiYbYaO1UmT7lvRKTuPmsZTSHN4jUOSnRYfRSCv8nn5OE6DPT+hHGd+whM/sKFI2ATvUPL++Vx/dbdiByZ5vEcEHp/mNS5cit2Fp2dN5D4DNbDBiH3XJgtS6BY3UNgRl3YcinV1Y5eCzW5pYw/69msBz6xVy8XgLWUcunJvmvAzDhlyYf8/crIfghAaotuUjAtzhoV1tAChcztFwEpvsyD8VE710CoTbvMbsUpEsxfJvI77mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9FXa6GfqXkPZRGzcj/jXU7wdQE9Y8RWDCnuImGiHgis=;
+ b=g4CuKCK7uAEiIh3Wci6+b6aEgW7+38Cj7ofJgmgxVkriMJantZgtC2KdRWIJFJRYJuYFPNL35ZI5P/vjaHnzhBF77ZpTGtQ2H89xFqWvuByZ9eKiDmN7aDV2QUB7eZ8Mk2XGK5floijGBSlRAnKOLaMkUo4v9Ea4D8GeDqU2h9tVKGLSTt5udW7caUgwOlRE6S8upsyfQXZFf6aQFlkklHPYRf6MUZvk5+RBH610clz70atlCle5heE97uI9VAcF2GW8J3tCD0/OkU1kCuQgzRN8zoTCP3HaDK1DhKsmXSrU3gWKRofyKG5pOsWyyi5N/wabS5uZJopdbbq1TiUavA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com (2603:10b6:510:1c5::7)
+ by PH8PR11MB8063.namprd11.prod.outlook.com (2603:10b6:510:252::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Thu, 13 Feb
+ 2025 07:26:29 +0000
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51]) by PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51%4]) with mapi id 15.20.8422.015; Thu, 13 Feb 2025
+ 07:26:29 +0000
+Message-ID: <8baf9307-daaa-4e0d-b89a-21403019ab2b@intel.com>
+Date: Thu, 13 Feb 2025 08:26:22 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 1/4] net: introduce EXPORT_IPV6_MOD() and
+ EXPORT_IPV6_MOD_GPL()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, Simon Horman <horms@kernel.org>, "Willem de
+ Bruijn" <willemb@google.com>, Sabrina Dubroca <sd@queasysnail.net>, "Neal
+ Cardwell" <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	<eric.dumazet@gmail.com>
+References: <20250212132418.1524422-1-edumazet@google.com>
+ <20250212132418.1524422-2-edumazet@google.com>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20250212132418.1524422-2-edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI2P293CA0005.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::12) To PH8PR11MB6682.namprd11.prod.outlook.com
+ (2603:10b6:510:1c5::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
- <20250212061855.71154-9-kerneljasonxing@gmail.com> <216c663c-1a7a-4db7-9973-afba485f797e@linux.dev>
-In-Reply-To: <216c663c-1a7a-4db7-9973-afba485f797e@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 13 Feb 2025 15:24:35 +0800
-X-Gm-Features: AWEUYZkppkMyfovKe9HvsFboC0NC24GTtV3gUGiFVDvnk6ACPGMA9_BnNNiVfd8
-Message-ID: <CAL+tcoC9Xc1-9ZJVQX+AcKaOQGPSaXhoLH7FOemsD1yNEP8ULw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v10 08/12] bpf: add BPF_SOCK_OPS_TS_HW_OPT_CB callback
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6682:EE_|PH8PR11MB8063:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbf121f1-ba65-4b1e-0248-08dd4bffbb76
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MHJRcVVHRmwyUllPbXFiUStTc1RaQXMzZ2w5WC9qanQ5V280dXhpdlJ4TlVk?=
+ =?utf-8?B?YTFDdXhpOHVYYTZpMXN4VEptNzV0elQ1ZGVtMnZiQ0N0Sy9SVE9BTVJjZmNI?=
+ =?utf-8?B?RDV4c3FKZmY0RWpTSWJuaEgvWlBlZzBOeHZDMk5FcjV3cEp4Ujh5bmsvdTdV?=
+ =?utf-8?B?RmNrdFRxU0paMkY0ZVpnVkFDWEpBN1dYeXJ2WHVTUDVyaTlJMzBlemxJVEly?=
+ =?utf-8?B?bHVuNGJKNHhxUGZXV2hkdS9BenBzMC90VEVmRnpEZHc1b0xhQTBBKzlmN3Mr?=
+ =?utf-8?B?cmZTV1N0Uzc3RUVLZDRuK1ZZYmNFZjZsS1FVSXp3UVRuQlhtUVVVaXNHQ1Z6?=
+ =?utf-8?B?M0JIZ0Q1WitZai91clZPeWw4OEoweGNPcEV2a1lKTmdtOGtvYmNMMWM5Sk1s?=
+ =?utf-8?B?a3c2eGNFOWdQUlJvd254OWZrNmJDUXNwcEMrSyt6TlZIRVRqd3VSYzh6RXVW?=
+ =?utf-8?B?NFJqbkpwZnNBVmxXOExyRmNCaFN0bFFjVS9kVVlqampqVUdtU2U3bmhjZVFU?=
+ =?utf-8?B?SEN6UXNBcitNSSt6YmpRWlduU0ZIRjZzc2xRR2tlK1hzKzV4a0tPREZ5SWNp?=
+ =?utf-8?B?eWdKUDNoTi9ycEdjU3RHVTlZWHJDQysvWGthN1JWTzhKcnloWjhTY3ozQi8y?=
+ =?utf-8?B?bkdrdVRsdzBxY1NrYmw2SkN4K1EveDNYV3pIekYxMWJpWG0rNzVQcnVlRXQ3?=
+ =?utf-8?B?eXNTdUVzTUlXYkJqZ2drQjlNQW1tYlJYSzlaSVJ2bThMNHp2ZnpMSDc5YjBI?=
+ =?utf-8?B?VldRQit1bkw2cHFmM1dmUCtnb0pTbDlyai9ma3dldFRCYXdtOFE4Y09TSk9G?=
+ =?utf-8?B?ZFZMTEdUOEFiV1Z4dFNNMnZBQ1U3VnJZVjk2UDBlWStJejdyNTVyaFlxc2hC?=
+ =?utf-8?B?M2NTamlxamJVakIrQXliN0tDbDYwVXR0bGZOZ3kwUlBYL1l6MXdFS0VQd2Vj?=
+ =?utf-8?B?N1U2d0JpREh0MkNtWkg1Q0RFd3dkVjJxMk9SNG05WXU3LzM5c0ZRUUh1YkVO?=
+ =?utf-8?B?R1JSdTN3d1ZiOG4vUW1TMzVXK3pBVUNoaEVseWhWN1B3WG91QUg0TmR3TDRH?=
+ =?utf-8?B?VjRhUTdMS1Q2dGNmUllPUndGRlE3WVZjNyt5SzltOUplc2lEZTh6dmw3Wlk3?=
+ =?utf-8?B?d1M0Y2x3VGNtTHdCdExGeDczT3hGb0JxVkcrbGp3RG1ZWkp5VE5UUFNlb1FS?=
+ =?utf-8?B?eUNtV09nelEyN25xUnplREVzY2lSU1lEMGZoMVZYNVVJV0RVQjNwRGhKVkxk?=
+ =?utf-8?B?aVJLVk5kZHNQQnk0YitORklSU2QwQ255Tlk2SHI2SjBlYVI0MXlTZnZ4dnFj?=
+ =?utf-8?B?YlZybFMwb09PWndvTzBDV0N2SytSejdSNjNkM2ZKSUZ5Mkt2dCsxQmJtMmhX?=
+ =?utf-8?B?dmdrVzYrVkpOZmZjd0pKRlZHZi8xMnJCK1JjaGlFZVE1ZS9kaC9ERTB5bi82?=
+ =?utf-8?B?NXU5dWwvQWU1bEE1ZVl4VEFjVjJNSExJTi9oOVZWaUtYN3JPV0FacHhESUhD?=
+ =?utf-8?B?aVBROTZaVTluUzBJZzR2M2lQdjF1OVlPa0drMi9tcjR0M2IrQWpRMjFQYUtu?=
+ =?utf-8?B?dncwcG9RdEhNWENtcmQ1aDdBQ0hXYWs4bmRybnQ0UVYxMnUvYzRoR0xlRzBw?=
+ =?utf-8?B?UVFxZHR2MHh3VkNvMnMwVDJhVHhnNjViOThYcHN1OURQN2ljcThWOVFRcTdl?=
+ =?utf-8?B?M0czRDgwWWoreHBvK1Y5VjBSMHMzR1ZSRkJWMjlad3puUVMyT0R3SzJIMUpV?=
+ =?utf-8?B?V2s1ei9UZlRmck40eWJNNWdLMTVsbVlvSXlydGgyamkvS2xPUGNVeWZnKzVL?=
+ =?utf-8?B?WkQ1WC9QcEJWUzVtWnI0Z0liSTV0MmZ5YVNUTmlPYkFPU2VtZ1pmZ3VDTlpD?=
+ =?utf-8?Q?pXKR+RzqDzsDq?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6682.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bVp3aTVYQm9ZMFZYcDQ0NjN1b2JpanoySWNjbWVRczZyNy9YMG5RWkt2N3l4?=
+ =?utf-8?B?VXB2YklDbmlkVnpSZVNuSWJtMUVnVThRWmVFSVhRMFNCWUptNEVWZVBLSGJ0?=
+ =?utf-8?B?ZG43ZFN2dkNhWVBsNFZjekhFM1U3WkE5UHFoOEVWTUUybGRKbjFPaDlqQXl1?=
+ =?utf-8?B?ZGtpUG9KOHYyOWR1S3RhVERvUDk0YVhaL2VFWmJrRDJlMWRINzBrTm8yM1Jm?=
+ =?utf-8?B?K25HOUpuN3owTjVpakZHY0llNDNQbWpPWThxWG9SNEwrWVBWZ01FVWt0em9x?=
+ =?utf-8?B?Z0hJaWdWb1ZoVnpWS3ByWUdmc0ZRQitnRDg3VXdxak5sYldVc2JXQ2RLOEcy?=
+ =?utf-8?B?V29BUEc2SW5mNFhqT1p1ZTBPOG55d0NhRDAzUEtVNWxBY00rZEl1TjFjUll1?=
+ =?utf-8?B?R0Fod2VYdlNXWUR6Y0YvRnkrSndWSU9vNCtFODJweHBuckFwaEdTNVdNem1L?=
+ =?utf-8?B?Z2oyMHc4azh6VmU2TittZEk3M0VuS1VDY3dGajFndlVnZzMvY21FSW4yQkVH?=
+ =?utf-8?B?Sk1LWkkzbWFoOUxyMkhhajVVZUMxNTJGVk5yT2ZBMFlpVzBiNW9rT3IwRy9J?=
+ =?utf-8?B?U0lYMXIrOGs4ZWhYRUt6U09BbEVKWjhYeFVEblY0bVFMQ3FWZTJwcG5QbFJX?=
+ =?utf-8?B?RTdNalVZT3FEWUR0N1N6SklrQis1OUlGS0RWZllpVW13VFFzSVo2S1hZeEFV?=
+ =?utf-8?B?VHg2REFBaWVMMmwxNHVzUXIyWmJpUXlWN2ZSUm0xc1ZkUCtDS1h6VmJER09Q?=
+ =?utf-8?B?dXVRbWs5TjNxUnFTblBHZUhINUFSdlBXc3VPVzlYcEhtYmNHcnVhODNKREgy?=
+ =?utf-8?B?NmkyT0ptcmo2QUJtOCtsemRiZGZLRXIyWi94SXBDZisrTHMxaVE0Uk0yRjky?=
+ =?utf-8?B?ZjZDU0p5amlrU3FzaGk3NVY5RDllQnc2cGpVMEVvMHB5VFpkaGdNc3J2MlNW?=
+ =?utf-8?B?TUxER3FoOFgzODJLdm53bTR2NEcwbE5MRnRvcFBzeXpTTnIxWFhMb2x4Y1JU?=
+ =?utf-8?B?ZlJwTGNlNTlHNTlrWnhqaGNqOVJyRTZHbzltM01zcG92UEtVdTNsVXJWM1Fm?=
+ =?utf-8?B?eUdTLzRSYVp0Vi9VamM2WEd0WkRNOGtVRWw4TjNRcXZmQ1BiZHh5bllMUmI0?=
+ =?utf-8?B?YUNENGxtWkNObmRCOEtQMUNmTlR2dDAzaXpGazBkcjJkVExTaldyVEtRTTRj?=
+ =?utf-8?B?SGdRUWdaTmlhUjM5cFM5Q01VSVFlc3pSUkpoSUNta21QYlUwbjMzYWJQVW5F?=
+ =?utf-8?B?azczdzRQVEZ5eXdjWFpjMURPemlyclhGQzZ5a0ZDdzNacHBMVWprcEY3UjJn?=
+ =?utf-8?B?TDhjMnMvQXlML2VRYTNpTjd6Z2kzWjRDZ0E4SGpXbWhYNC8vTXY4eHIyNkxF?=
+ =?utf-8?B?TVBtQTdabm9JTnprRit2eTc0bUVGUkVNWFlPbGd0enhTRHdkSUFMTGIzZkFw?=
+ =?utf-8?B?K0RDeDluOGd4QjZEZXlsbEV6V3QvNkZKbWMxRjRGSDRtT0xPTTlKYStqVm9q?=
+ =?utf-8?B?akU1U2NlWXZhSzFIcGFSYVdlOGVSU1M4SHF0UENLOFZmVGN5VXVSTFZVWnVi?=
+ =?utf-8?B?RWRobUs2SzZnM1pGNEg5RWV2RFU1em0wU1VwczM0ZHB1YzhSRHQ1RnByQksz?=
+ =?utf-8?B?djBqUE53UW90NnNvdklzL29HUklRUzJCZWVqTHFNOHJuREFpSFY4ZjFxNFh4?=
+ =?utf-8?B?a1BkVlJ1SDN4cERrN2pqN21CbDE2M3R4UG1XbWVxSXVncUlCcjE1TkZxc0lH?=
+ =?utf-8?B?WkdGQlNzMzl0YzVkb01SVlV4R0RzbnVNVnNtQmFoUEdXNnY5Q1g1blhiRndF?=
+ =?utf-8?B?UWZKbm1CRTZQOWZpQ1Y0cjJ1dXlqalRBdHM4OVVzcmJPMm9VTUxFN2lkK0NU?=
+ =?utf-8?B?TDFRWTBOdTc2YjRIRVo0YURrcUxkS2ZCL2FvaHQvWSt6M0daTktWZUhhYWEy?=
+ =?utf-8?B?clRuY0ZQL3FOVHg5T01aVjk4cm00dEFGdk1RbUdidHZpNitac25xOG9GQU9o?=
+ =?utf-8?B?MkFmN01PVGVqcE1lazhGdUNQQlhCa0tmSkM1T3lkbDhzK0VnckpMRXFFRkh2?=
+ =?utf-8?B?bDIxNVN0SmkrKzVmb0FGNVl2MzhRcFlpWHF1NjhJYTdwRTVQbEJ0RlhqUnMw?=
+ =?utf-8?B?ZzgrZUpjaytWT2xGWUhwcFB2YlVYMUJJYVdZcngyRjNHRk9BTmxzbGdZWWEz?=
+ =?utf-8?B?SGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbf121f1-ba65-4b1e-0248-08dd4bffbb76
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6682.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 07:26:29.2765
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n3L3KDzorZwhKhbBjJMUbrvlwGjCRYRg3TLAYgmMhwfBidKuIpdpRuUdTB8iuINpGfewBohQNX5k5q/hFTRwAYfxlo5FqHBEwbarUxPx7e0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8063
+X-OriginatorOrg: intel.com
 
-On Thu, Feb 13, 2025 at 7:20=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 2/11/25 10:18 PM, Jason Xing wrote:
-> > Support hw SCM_TSTAMP_SND case for bpf timestamping.
-> >
-> > Add a new sock_ops callback, BPF_SOCK_OPS_TS_HW_OPT_CB. This
-> > callback will occur at the same timestamping point as the user
-> > space's hardware SCM_TSTAMP_SND. The BPF program can use it to
-> > get the same SCM_TSTAMP_SND timestamp without modifying the
-> > user-space application.
-> >
-> > To avoid increase the code complexity, replace SKBTX_HW_TSTAMP
-> > with SKBTX_HW_TSTAMP_NOBPF instead of changing numerous callers
-> > from driver side using SKBTX_HW_TSTAMP. The new definition of
-> > SKBTX_HW_TSTAMP means the combination tests of socket timestamping
-> > and bpf timestamping. After this patch, drivers can work under the
-> > bpf timestamping.
-> >
-> > Considering some drivers doesn't assign the skb with hardware
-> > timestamp, this patch do the assignment and then BPF program
-> > can acquire the hwstamp from skb directly.
-> >
-> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > ---
-> >   include/linux/skbuff.h         | 4 +++-
-> >   include/uapi/linux/bpf.h       | 4 ++++
-> >   net/core/skbuff.c              | 6 +++---
-> >   tools/include/uapi/linux/bpf.h | 4 ++++
-> >   4 files changed, 14 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index 76582500c5ea..0b4f1889500d 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -470,7 +470,7 @@ struct skb_shared_hwtstamps {
-> >   /* Definitions for tx_flags in struct skb_shared_info */
-> >   enum {
-> >       /* generate hardware time stamp */
-> > -     SKBTX_HW_TSTAMP =3D 1 << 0,
-> > +     SKBTX_HW_TSTAMP_NOBPF =3D 1 << 0,
-> >
-> >       /* generate software time stamp when queueing packet to NIC */
-> >       SKBTX_SW_TSTAMP =3D 1 << 1,
-> > @@ -494,6 +494,8 @@ enum {
-> >       SKBTX_BPF =3D 1 << 7,
-> >   };
-> >
-> > +#define SKBTX_HW_TSTAMP              (SKBTX_HW_TSTAMP_NOBPF | SKBTX_BP=
-F)
-> > +
-> >   #define SKBTX_ANY_SW_TSTAMP (SKBTX_SW_TSTAMP    | \
-> >                                SKBTX_SCHED_TSTAMP | \
-> >                                SKBTX_BPF)
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index b3bd92281084..f70edd067edf 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -7043,6 +7043,10 @@ enum {
-> >                                        * to the nic when SK_BPF_CB_TX_T=
-IMESTAMPING
-> >                                        * feature is on.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_HW_OPT_CB,      /* Called in hardware phase when
-> > +                                      * SK_BPF_CB_TX_TIMESTAMPING feat=
-ure
-> > +                                      * is on.
-> > +                                      */
-> >   };
-> >
-> >   /* List of TCP states. There is a build check in net/ipv4/tcp.c to de=
-tect
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index d80d2137692f..4930c43ee77b 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5547,7 +5547,7 @@ static bool skb_tstamp_tx_report_so_timestamping(=
-struct sk_buff *skb,
-> >       case SCM_TSTAMP_SCHED:
-> >               return skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP;
-> >       case SCM_TSTAMP_SND:
-> > -             return skb_shinfo(skb)->tx_flags & (hwts ? SKBTX_HW_TSTAM=
-P :
-> > +             return skb_shinfo(skb)->tx_flags & (hwts ? SKBTX_HW_TSTAM=
-P_NOBPF :
-> >                                                   SKBTX_SW_TSTAMP);
-> >       case SCM_TSTAMP_ACK:
-> >               return TCP_SKB_CB(skb)->txstamp_ack;
-> > @@ -5568,9 +5568,9 @@ static void skb_tstamp_tx_report_bpf_timestamping=
-(struct sk_buff *skb,
-> >               op =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> >               break;
-> >       case SCM_TSTAMP_SND:
-> > +             op =3D hwts ? BPF_SOCK_OPS_TS_HW_OPT_CB : BPF_SOCK_OPS_TS=
-_SW_OPT_CB;
->
-> Remove this "hwts" test.
->
-> >               if (hwts)
->
-> Reuse this and do everything in this "if else" statement.
 
-Will do it.
 
-Thanks,
-Jason
+On 2/12/2025 2:24 PM, Eric Dumazet wrote:
+> We have many EXPORT_SYMBOL(x) in networking tree because IPv6
+> can be built as a module.
+> 
+> CONFIG_IPV6=y is becoming the norm.
+> 
+> Define a EXPORT_IPV6_MOD(x) which only exports x
+> for modular IPv6.
+> 
+> Same principle applies to EXPORT_IPV6_MOD_GPL()
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>   include/net/ip.h | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> 
+> diff --git a/include/net/ip.h b/include/net/ip.h
+> index 9f5e33e371fcdd8ea88c54584b8d4b6c50e7d0c9..1e40c5ac53a74e1c20157709e49edf2271e44fe3 100644
+> --- a/include/net/ip.h
+> +++ b/include/net/ip.h
+> @@ -666,6 +666,14 @@ static inline void ip_ipgre_mc_map(__be32 naddr, const unsigned char *broadcast,
+>   		memcpy(buf, &naddr, sizeof(naddr));
+>   }
+>   
+> +#if IS_MODULE(CONFIG_IPV6)
+> +#define EXPORT_IPV6_MOD(X) EXPORT_SYMBOL(X)
+> +#define EXPORT_IPV6_MOD_GPL(X) EXPORT_SYMBOL_GPL(X)
+> +#else
+> +#define EXPORT_IPV6_MOD(X)
+> +#define EXPORT_IPV6_MOD_GPL(X)
+> +#endif
+> +
+>   #if IS_ENABLED(CONFIG_IPV6)
+>   #include <linux/ipv6.h>
+>   #endif
 
->
-> > -                     return;
-> > -             op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
-> > +                     *skb_hwtstamps(skb) =3D *hwts;
-> >               break;
-> >       default:
-> >               return;
-> > diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/=
-bpf.h
-> > index 9bd1c7c77b17..7b9652ce7e3c 100644
-> > --- a/tools/include/uapi/linux/bpf.h
-> > +++ b/tools/include/uapi/linux/bpf.h
-> > @@ -7033,6 +7033,10 @@ enum {
-> >                                        * to the nic when SK_BPF_CB_TX_T=
-IMESTAMPING
-> >                                        * feature is on.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_HW_OPT_CB,      /* Called in hardware phase when
-> > +                                      * SK_BPF_CB_TX_TIMESTAMPING feat=
-ure
-> > +                                      * is on.
-> > +                                      */
-> >   };
-> >
-> >   /* List of TCP states. There is a build check in net/ipv4/tcp.c to de=
-tect
->
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
