@@ -1,409 +1,168 @@
-Return-Path: <netdev+bounces-165747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88AAEA33466
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:08:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7787FA3346C
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:13:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36DF2164A7F
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:08:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F092163376
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C105769D2B;
-	Thu, 13 Feb 2025 01:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77B16F2F2;
+	Thu, 13 Feb 2025 01:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="djyt42cF"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xo+GBfy4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769B027456
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB74786323
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739408921; cv=none; b=ru9sEX6v3zmQbbPKVQiZ/ilnEDIsvyAr0Y1Ra+ll8FjErNgipT6SUjAGOZrUSOar34W4QWka3TMw7tOIDP13syN9AzT2Ve1dwzDd38RaAgmz7EfgWZtumVgXO6jdYkacU1CrAIFeWegCTb7EVcbPE8p/T7wx92veBvfjMWe7jMM=
+	t=1739409206; cv=none; b=Vo+yEx3bgOXTjE9GtBmiRFkaI9ahv3Hu7dsE10Gi9m0A2bSyNbgJwmM+GxWAoH6JE2WDamKTMTIJJN884KhFk2xYeWMM0/WAvD7rHaKkc4gCBrjr67ZacKMoZuqyvX4piEkqHrRiGV8Ddh5FLc7iP1w9kmxEBVWC91ozypK7N5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739408921; c=relaxed/simple;
-	bh=PMmIPAgsqFOn0YIn7JOjg/LM/WhKKAyJD2E/XFiw+OE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iaoc5cmM4s7U2DWXwbLQAW/c6kmjVYqqLG9DbJaXonShBaUC4zh90zHHI+0g2r4TTJoGVj1NubUGd3B/+jtxRC5gCjtiHoqOiPW7MfVR5JctEkxOv/IgDPiWP3iJiVCSiIyPQ7ksCJk3UTpptGQLZxKRFv2/5H3fKKF3h4CRZ0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=djyt42cF; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4e51fae2-0b43-426f-8fae-ea267fe2839f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739408907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r0FiEdnI/5PV2tOdLNOpW9wnUSqBg5piDnE+78JJgz4=;
-	b=djyt42cFrjwns2v/ZfroXwFSvZOoFtz52uOYFIRpGOL9Xx+WR5loFFvfbcaDp+Te7ROWW6
-	ygfFoU8TmkafWFlnWCPYKl1CNfn1K7t15H4bdiUNv1OZNs888B1SEqna4iSyhUUvsFWGcG
-	3HrQOT0hIPGkVMWC3A+qJmf3vMqwBv8=
-Date: Wed, 12 Feb 2025 17:08:18 -0800
+	s=arc-20240116; t=1739409206; c=relaxed/simple;
+	bh=gZi25y/tMtvr3cHF33QDViNTKtenRh9WwOy/0Mqckh4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Db5+mkmceIWWEfg7uewVAqQmbWcvjJCKqiLENpJdwUjBvMssnZsjcqVpJfUTX+Y+8fS5usLgZfwo4PsyRJnKF6daRXbXRorozmsGI0+qdQEC3TTd6wa7IuChuF4OIWBc+wj30AixBRBJI5ku88+Yev8eNsx4IGHfG281rU2B/CE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Xo+GBfy4; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7270003d9c8so140750a34.2
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 17:13:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1739409204; x=1740014004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IkuehVl4EfVbUu5J0rlaP5uW/lcuFcGyq5FgIlIQIJc=;
+        b=Xo+GBfy4xaxGwdcLunbnPp67jJtuyCpE/aTjI0bbdip9/0mw0wEwamsEwV2gFks/9V
+         pvM+dr+tyltCgOmzX5LHIyT3GJQAiQXxGVkGRGYOKWuhdOpwWJ0y7Kdy9j5uG6luResG
+         aW6Cdzls2E2FYlTgS44SyA1LIfZf/s8rJFpaI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739409204; x=1740014004;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IkuehVl4EfVbUu5J0rlaP5uW/lcuFcGyq5FgIlIQIJc=;
+        b=sOJZW+Xe7yx0BGmcKR2/m2dpje6oohnCsbTFVZlXBH7/M0Yg0ZiW+U5NF0IbbqvVdG
+         MR1Ozd2cdJRjZ6rUXk9dGmc398G+OjP/U8EesVfxesKm0IZ1jJk8sFKDSCrqyCjerktu
+         21hihtRR/3L9XdFG6UWfUgUTYRqeOxyY9esFnrG6Okq8/kW2Kb6ziVmQoXax7KEDUhDF
+         LGeS0DTpRjc7P1bR88UzaUvOe3+FEpKQGbumE//ClRMw/KbU0HCryR9nthhRMBIx2H6Y
+         bLuOuKXe/TlGbXbbmeksJAExXm9T/EOgtTRYsCFe7x0FwDAm0DChp8g1KhvY2dZl7cLw
+         vVwQ==
+X-Gm-Message-State: AOJu0YzeNDn+1a3CDlehb18gRFCWgX+fINWzaKNO73MYsELHkDcyaGgt
+	MgUfr+gjj7iC8FDoGy16WLkCISNRX0Ww+aEkMYW47okAXPkTtz7vz4cAaQAzoQ==
+X-Gm-Gg: ASbGnctEwVybZoA0oFfD5aGn+dFw5HeQ0IOonz2x1qERNgkoIw7lb1TgJ1oifRlkoka
+	rVhYjKhA1yqXczy1zFz8lvpKj6e01BjDXCcs6m5Eo5CDd4JcuWb0VLN/JhT1Y9XALvLJL8lKuOw
+	y9KLetyG1dXEf85jPC2afHrMYAoqxqpiA7e5IUZwLL2jjEw2MVkw4QFq61k7T5Lq4P8s+lF14NK
+	G2lkBGHh53t8Aj736WOxgsTExzuRYl3ElsA+vg5zRxvHZuUK5zZQon5LsXUzPg96XGKdNbrtGTk
+	FaaO2YH1n1iZkNFBYpthw1Dq1XbWlE2Qvuu+b1cPpPvuJOF1BcyV1rx53XQQKJ3ZjNI=
+X-Google-Smtp-Source: AGHT+IGGMNP7IhLFwUuu++yEcDoLcvw+h3mFTleWI+Tr1EAParUJrPZwO8FTtvuZNWB+K4lTNOf/Zg==
+X-Received: by 2002:a05:6830:2585:b0:71d:f361:5cfb with SMTP id 46e09a7af769-726f1c36ee6mr3875702a34.5.1739409203803;
+        Wed, 12 Feb 2025 17:13:23 -0800 (PST)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-727001cdb70sm195967a34.13.2025.02.12.17.13.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 17:13:22 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	michal.swiatkowski@linux.intel.com,
+	helgaas@kernel.org,
+	horms@kernel.org
+Subject: [PATCH net-next v5 00/11] bnxt_en: Add NPAR 1.2 and TPH support
+Date: Wed, 12 Feb 2025 17:12:28 -0800
+Message-ID: <20250213011240.1640031-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v10 12/12] selftests/bpf: add simple bpf tests in
- the tx path for timestamping feature
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
- <20250212061855.71154-13-kerneljasonxing@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250212061855.71154-13-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 2/11/25 10:18 PM, Jason Xing wrote:
-> BPF program calculates a couple of latency deltas between each tx
-> timestamping callbacks. It can be used in the real world to diagnose
-> the kernel behaviour in the tx path.
-> 
-> Check the safety issues by accessing a few bpf calls in
-> bpf_test_access_bpf_calls() which are implemented in the patch 3 and 4.
-> 
-> Check if the bpf timestamping can co-exist with socket timestamping.
-> 
-> There remains a few realistic things[1][2] to highlight:
-> 1. in general a packet may pass through multiple qdiscs. For instance
-> with bonding or tunnel virtual devices in the egress path.
-> 2. packets may be resent, in which case an ACK might precede a repeat
-> SCHED and SND.
-> 3. erroneous or malicious peers may also just never send an ACK.
-> 
-> [1]: https://lore.kernel.org/all/67a389af981b0_14e0832949d@willemb.c.googlers.com.notmuch/
-> [2]: https://lore.kernel.org/all/c329a0c1-239b-4ca1-91f2-cb30b8dd2f6a@linux.dev/
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   .../bpf/prog_tests/net_timestamping.c         | 231 +++++++++++++++++
->   .../selftests/bpf/progs/net_timestamping.c    | 244 ++++++++++++++++++
->   2 files changed, 475 insertions(+)
->   create mode 100644 tools/testing/selftests/bpf/prog_tests/net_timestamping.c
->   create mode 100644 tools/testing/selftests/bpf/progs/net_timestamping.c
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/net_timestamping.c b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-> new file mode 100644
-> index 000000000000..dcdc40473a7d
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/net_timestamping.c
-> @@ -0,0 +1,231 @@
-> +#include <linux/net_tstamp.h>
-> +#include <sys/time.h>
-> +#include <linux/errqueue.h>
-> +#include "test_progs.h"
-> +#include "network_helpers.h"
-> +#include "net_timestamping.skel.h"
-> +
-> +#define CG_NAME "/net-timestamping-test"
-> +#define NSEC_PER_SEC    1000000000LL
-> +
-> +static const char addr4_str[] = "127.0.0.1";
-> +static const char addr6_str[] = "::1";
-> +static struct net_timestamping *skel;
-> +static int cfg_payload_len = 30;
+The first patch adds NPAR 1.2 support.  Patches 2 to 11 add TPH
+(TLP Processing Hints) support.  These TPH driver patches are new
+revisions originally posted as part of the TPH PCI patch series.
+Additional driver refactoring has been done so that we can free
+and allocate RX completion ring and the TX rings if the channel is
+a combined channel.  We also add napi_disable() and napi_enable()
+during queue_stop() and queue_start() respectively, and reset for
+error handling in queue_start().
 
-const ?
+v5:
+Split bnxt_hwrm_tx_ring_free() refactoring from patch #9 into a new patch
+Remove reset counters increment
+Add comments that ring alloc should not fail in this code path
+Add comments about napi_disable()
 
-> +static struct timespec usr_ts;
-> +static u64 delay_tolerance_nsec = 10000000000; /* 10 seconds */
-> +int SK_TS_SCHED;
-> +int SK_TS_TXSW;
-> +int SK_TS_ACK;
-> +
-> +static int64_t timespec_to_ns64(struct timespec *ts)
-> +{
-> +	return ts->tv_sec * NSEC_PER_SEC + ts->tv_nsec;
-> +}
-> +
-> +static void validate_key(int tskey, int tstype)
-> +{
-> +	static int expected_tskey = -1;
-> +
-> +	if (tstype == SCM_TSTAMP_SCHED)
-> +		expected_tskey = cfg_payload_len - 1;
-> +
-> +	ASSERT_EQ(expected_tskey, tskey, "tskey mismatch");
-> +
-> +	expected_tskey = tskey;
-> +}
-> +
-> +static void validate_timestamp(struct timespec *cur, struct timespec *prev)
-> +{
-> +	int64_t cur_ns, prev_ns;
-> +
-> +	cur_ns = timespec_to_ns64(cur);
-> +	prev_ns = timespec_to_ns64(prev);
-> +
-> +	ASSERT_TRUE((cur_ns - prev_ns) < delay_tolerance_nsec, "latency");
+v4:
+Fix NPAR typo in patch #1 and improve the description of NPAR
 
-ASSERT_LT()
+https://lore.kernel.org/netdev/20250208202916.1391614-1-michael.chan@broadcom.com/
 
-> +}
-> +
-> +static void test_socket_timestamp(struct scm_timestamping *tss, int tstype,
-> +				  int tskey)
-> +{
-> +	static struct timespec *prev_ts = &usr_ts;
-> +
-> +	validate_key(tskey, tstype);
-> +
-> +	switch (tstype) {
-> +	case SCM_TSTAMP_SCHED:
-> +		validate_timestamp(&tss->ts[0], prev_ts);
-> +		SK_TS_SCHED = 1;
-> +		SK_TS_TXSW = SK_TS_ACK = 0;
-> +		break;
-> +	case SCM_TSTAMP_SND:
-> +		validate_timestamp(&tss->ts[0], prev_ts);
-> +		SK_TS_TXSW = 1;
-> +		break;
-> +	case SCM_TSTAMP_ACK:
-> +		validate_timestamp(&tss->ts[0], prev_ts);
-> +		SK_TS_ACK = 1;
-> +		break;
-> +	}
-> +
-> +	prev_ts = &tss->ts[0];
-> +}
-> +
-> +static void test_recv_errmsg_cmsg(struct msghdr *msg)
-> +{
-> +	struct sock_extended_err *serr = NULL;
-> +	struct scm_timestamping *tss = NULL;
-> +	struct cmsghdr *cm;
-> +
-> +	for (cm = CMSG_FIRSTHDR(msg);
-> +	     cm && cm->cmsg_len;
-> +	     cm = CMSG_NXTHDR(msg, cm)) {
-> +		if (cm->cmsg_level == SOL_SOCKET &&
-> +		    cm->cmsg_type == SCM_TIMESTAMPING) {
-> +			tss = (void *) CMSG_DATA(cm);
-> +		} else if ((cm->cmsg_level == SOL_IP &&
-> +			    cm->cmsg_type == IP_RECVERR) ||
-> +			   (cm->cmsg_level == SOL_IPV6 &&
-> +			    cm->cmsg_type == IPV6_RECVERR) ||
-> +			   (cm->cmsg_level == SOL_PACKET &&
-> +			    cm->cmsg_type == PACKET_TX_TIMESTAMP)) {
-> +			serr = (void *) CMSG_DATA(cm);
-> +			ASSERT_EQ(serr->ee_origin, SO_EE_ORIGIN_TIMESTAMPING,
-> +				    "cmsg type");
-> +		}
-> +
-> +		if (serr && tss)
-> +			test_socket_timestamp(tss, serr->ee_info,
-> +					      serr->ee_data);
-> +	}
-> +}
-> +
-> +static bool socket_recv_errmsg(int fd)
-> +{
-> +	static char ctrl[1024 /* overprovision*/];
-> +	char data[cfg_payload_len];
-> +	static struct msghdr msg;
-> +	struct iovec entry;
-> +	int n = 0;
-> +
-> +	memset(&msg, 0, sizeof(msg));
-> +	memset(&entry, 0, sizeof(entry));
-> +	memset(ctrl, 0, sizeof(ctrl));
-> +
-> +	entry.iov_base = data;
-> +	entry.iov_len = cfg_payload_len;
-> +	msg.msg_iov = &entry;
-> +	msg.msg_iovlen = 1;
-> +	msg.msg_name = NULL;
-> +	msg.msg_namelen = 0;
-> +	msg.msg_control = ctrl;
-> +	msg.msg_controllen = sizeof(ctrl);
-> +
-> +	n = recvmsg(fd, &msg, MSG_ERRQUEUE);
-> +	if (n == -1)
-> +		ASSERT_EQ(errno, EAGAIN, "recvmsg MSG_ERRQUEUE");
-> +
-> +	if (n >= 0)
-> +		test_recv_errmsg_cmsg(&msg);
-> +
-> +	return n == -1;
-> +
-> +}
-> +
-> +static void test_socket_timestamping(int fd)
-> +{
-> +	while (!socket_recv_errmsg(fd));
-> +
-> +	ASSERT_EQ(SK_TS_SCHED, 1, "SCM_TSTAMP_SCHED");
-> +	ASSERT_EQ(SK_TS_TXSW, 1, "SCM_TSTAMP_SND");
-> +	ASSERT_EQ(SK_TS_ACK, 1, "SCM_TSTAMP_ACK");
-> +}
-> +
-> +static void test_tcp(int family)
-> +{
-> +	struct net_timestamping__bss *bss = skel->bss;
-> +	char buf[cfg_payload_len];
-> +	int sfd = -1, cfd = -1;
-> +	unsigned int sock_opt;
-> +	int ret;
-> +
-> +	memset(bss, 0, sizeof(*bss));
+v3:
+Fix build bot warning in patch #9
+Add MODULE_IMPORT_NS("NETDEV_INTERNAL") to patch #10
+Optimize ring operations when TPH is not enabled in patch #8 and #9
 
-No need to reset some of the new global variables, e.g. SK_TS_SCHED?
+https://lore.kernel.org/netdev/20250204004609.1107078-1-michael.chan@broadcom.com/
 
-> +
-> +	sfd = start_server(family, SOCK_STREAM,
-> +			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
-> +	if (!ASSERT_OK_FD(sfd, "start_server"))
-> +		goto out;
-> +
-> +	cfd = connect_to_fd(sfd, 0);
-> +	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
-> +		goto out;
-> +
-> +	sock_opt = SOF_TIMESTAMPING_SOFTWARE |
-> +		   SOF_TIMESTAMPING_OPT_ID |
-> +		   SOF_TIMESTAMPING_TX_SCHED |
-> +		   SOF_TIMESTAMPING_TX_SOFTWARE |
-> +		   SOF_TIMESTAMPING_TX_ACK;
-> +	ret = setsockopt(cfd, SOL_SOCKET, SO_TIMESTAMPING,
-> +			 (char *) &sock_opt, sizeof(sock_opt));
+v2:
+Major change is error handling in patch #9.
 
-It also needs the original test in v9 to check the bpf timestamping works 
-without the user space's SO_TIMESTAMPING, which is the major use case of this 
-series.
+https://lore.kernel.org/netdev/20250116192343.34535-1-michael.chan@broadcom.com/
 
-It should be easy to do by conditionally enabling the SO_TIMESTAMPING here.
+v1: 
+https://lore.kernel.org/netdev/20250113063927.4017173-1-michael.chan@broadcom.com/
 
-> +	if (!ASSERT_OK(ret, "setsockopt SO_TIMESTAMPING"))
-> +		goto out;
-> +
-> +	ret = clock_gettime(CLOCK_REALTIME, &usr_ts);
-> +	if (!ASSERT_OK(ret, "get user time"))
-> +		goto out;
-> +
-> +	ret = write(cfd, buf, sizeof(buf));
-> +	if (!ASSERT_EQ(ret, sizeof(buf), "send to server"))
-> +		goto out;
-> +
-> +	/* Test if socket timestamping works correctly even with bpf
-> +	 * extension enabled.
-> +	 */
-> +	test_socket_timestamping(cfd);
-> +
-> +	ASSERT_EQ(bss->nr_active, 1, "nr_active");
-> +	ASSERT_EQ(bss->nr_snd, 2, "nr_snd");
-> +	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
-> +	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
-> +	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-> +
-> +out:
-> +	if (sfd >= 0)
-> +		close(sfd);
-> +	if (cfd >= 0)
-> +		close(cfd);
-> +}
-> +
-> +void test_net_timestamping(void)
-> +{
-> +	struct netns_obj *ns;
-> +	int cg_fd;
-> +
-> +	cg_fd = test__join_cgroup(CG_NAME);
-> +	if (!ASSERT_OK_FD(cg_fd, "join cgroup"))
-> +		return;
-> +
-> +	ns = netns_new("net_timestamping_ns", true);
-> +	if (!ASSERT_OK_PTR(ns, "create ns"))
-> +		goto done;
-> +
-> +	skel = net_timestamping__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "open and load skel"))
-> +		goto done;
-> +
-> +	if (!ASSERT_OK(net_timestamping__attach(skel), "attach skel"))
-> +		goto done;
-> +
-> +	skel->links.skops_sockopt =
-> +		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
-> +	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
-> +		goto done;
-> +
-> +	test_tcp(AF_INET6);
-> +	test_tcp(AF_INET);
+Discussion about adding napi_disable()/napi_enable():
 
-Considering the w and w/o SO_TIMESTAMPING combinations (i.e. x2), it is worth to 
-have proper subtests. It is easy also. Take a look at the test__start_subtest() 
-usage `under the prog_tests/.
+https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwei.uk/#t
 
-> +
-> +done:
-> +	net_timestamping__destroy(skel);
-> +	netns_free(ns);
-> +	close(cg_fd);
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/net_timestamping.c b/tools/testing/selftests/bpf/progs/net_timestamping.c
-> new file mode 100644
-> index 000000000000..d3e1da599626
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/net_timestamping.c
-> @@ -0,0 +1,244 @@
-> +#include "vmlinux.h"
-> +#include "bpf_tracing_net.h"
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +#include "bpf_misc.h"
-> +#include "bpf_kfuncs.h"
-> +#include <errno.h>
-> +
-> +#define SK_BPF_CB_FLAGS 1009
-> +#define SK_BPF_CB_TX_TIMESTAMPING 1
+Previous driver series fixing rtnl_lock and empty release function:
 
-Remove these two defines. The vmlinux.h has it.
+https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
 
-[ ... ]
+v5 of the PCI series using netdev_rx_queue_restart():
 
-> +SEC("fentry/tcp_sendmsg_locked")
-> +int BPF_PROG(trace_tcp_sendmsg_locked, struct sock *sk, struct msghdr *msg, size_t size)
-> +{
-> +	u64 timestamp = bpf_ktime_get_ns();
-> +	u32 flag = sk->sk_bpf_cb_flags;
-> +	struct sk_stg *stg;
-> +
-> +	if (!flag)
+https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
 
-I just noticed this one.
+v1 of the PCI series using open/close:
 
-Lets replace the "flag" check with a better check (e.g. pid check used in other 
-tests). Then it won't affect sk of other tests running in parallel.
+https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
 
-It is pretty easy. Take a look at how bpf_get_current_pid_tgid() is used in 
-progs/local_storage.c.
+Manoj Panicker (1):
+  bnxt_en: Add TPH support in BNXT driver
 
+Michael Chan (6):
+  bnxt_en: Set NPAR 1.2 support when registering with firmware
+  bnxt_en: Refactor completion ring allocation logic for P5_PLUS chips
+  bnxt_en: Refactor TX ring allocation logic
+  bnxt_en: Refactor RX/RX AGG ring parameters setup for P5_PLUS
+  bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
+  bnxt_en: Refactor TX ring free logic
 
-> +		return 0;
-> +
-> +	stg = bpf_sk_storage_get(&sk_stg_map, sk, 0,
-> +				 BPF_SK_STORAGE_GET_F_CREATE);
-> +	if (!stg)
-> +		return 0;
-> +
-> +	stg->sendmsg_ns = timestamp;
-> +	nr_snd += 1;
-> +	return 0;
-> +}
-> +
+Somnath Kotur (4):
+  bnxt_en: Refactor completion ring free routine
+  bnxt_en: Refactor bnxt_free_tx_rings() to free per TX ring
+  bnxt_en: Reallocate RX completion ring for TPH support
+  bnxt_en: Extend queue stop/start for TX rings
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 554 ++++++++++++++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |   8 +
+ 2 files changed, 416 insertions(+), 146 deletions(-)
+
+-- 
+2.30.1
+
 
