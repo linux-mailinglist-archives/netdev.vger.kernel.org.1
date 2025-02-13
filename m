@@ -1,120 +1,132 @@
-Return-Path: <netdev+bounces-165848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC6AA33857
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:55:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC01A33860
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:59:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA34E3A6F5C
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:55:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44B927A1551
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9808207DF7;
-	Thu, 13 Feb 2025 06:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB056207DEF;
+	Thu, 13 Feb 2025 06:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BRoMzwdc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SHVBOqRa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3D9207A11;
-	Thu, 13 Feb 2025 06:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECACC207A11;
+	Thu, 13 Feb 2025 06:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739429733; cv=none; b=LwnnpIJUcJK25DC5UDs2v8hVgR9owPF8LEb1w7wL23/7OHNF1c32go+so4q31q7noTjh5t6q9/UWoQmzEwmcovYxlp4gFOYXXyRTDqD+ytIWO0DFi11FfqY2EusmLJM7XCsax7CUcth5ro4RL+Ajr4MgCwY7wvUO9hsBmN4LHus=
+	t=1739429933; cv=none; b=N5x9mI6gGGvk9QRDyltVB+hyNSGuXI64xTisTL+xbnOxqcJlFAUL6kuHOa0cl4fqMX8abdZJ39rbeI4nPrITMYOyU+3mZGNB7/pd0DGG13F2lID9uQ/jyJcp32l5N7doMkezRhxcZuI5YvqGf7NAI8iiao6jDgcQqu+aRBKiCr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739429733; c=relaxed/simple;
-	bh=pzVOa8TMmsifg2ueyS/bcaAb3MJ+O9q9vr126AjlrS0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HtkdqHUtrOdVBnLMI+VqTIyNdqCEuakBOp4PJ2Xe9xHNQOjCbxJv6nbWdCF5FPPSZoRfJtiVG4iAllEaTpWAR7V98bgsMX0bYId52jTjfcrgNiGHT1BNG3o4QMAwOX78uMqQeYn6QRR2kDpkGkXN80M4llw+cTwfRADyJT4b//c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BRoMzwdc; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739429732; x=1770965732;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y6vhqwcHgjQ9crHQuKcOHH1ChdkHGoRglO+wy/6/WSQ=;
-  b=BRoMzwdc+AnxqWgne0up9L8FJBjQaVL9uR+IbjaLD3JwayzTK+RILbcW
-   LXAnW8tEsY+3NLzvY5Gim7wBX/ALwZG4a6bCQa5YVaMXtw+QAfiaUayYU
-   B0lslLmJOpdfzpSPbCe3CmXg8JZjeoksQgR+5+SMwJ16I3xLRaJarQYwJ
-   s=;
-X-IronPort-AV: E=Sophos;i="6.13,282,1732579200"; 
-   d="scan'208";a="270777830"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 06:55:26 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:9280]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.246:2525] with esmtp (Farcaster)
- id 0c153c97-2bf1-4a6b-942d-4cbd218ce4f6; Thu, 13 Feb 2025 06:55:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 0c153c97-2bf1-4a6b-942d-4cbd218ce4f6
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 13 Feb 2025 06:55:24 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Feb 2025 06:55:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <alex.aring@gmail.com>, <andrew+netdev@lunn.ch>,
-	<b.a.t.m.a.n@lists.open-mesh.org>, <bpf@vger.kernel.org>,
-	<bridge@lists.linux.dev>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-ppp@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
-	<netdev@vger.kernel.org>, <osmocom-net-gprs@lists.osmocom.org>,
-	<pabeni@redhat.com>, <shuah@kernel.org>, <stefan@datenfreihafen.org>,
-	<steffen.klassert@secunet.com>, <wireguard@lists.zx2c4.com>
-Subject: Re: [PATCH net-next v9 03/11] net: Use link netns in newlink() of rtnl_link_ops
-Date: Thu, 13 Feb 2025 15:55:06 +0900
-Message-ID: <20250213065506.8720-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250210133002.883422-4-shaw.leon@gmail.com>
-References: <20250210133002.883422-4-shaw.leon@gmail.com>
+	s=arc-20240116; t=1739429933; c=relaxed/simple;
+	bh=IuDkSPusWTCLmutvKrUiCtONzQj5Xn2RbA/VhezuVxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DyieYX1Uzw2yd1VskxNA/B9eI3BxC6mciyZj1kUjkOdLGYvxlv1xCeXpHyAxlqnBvoZwY63YxS6fomYbZ4kZic5Y39n6QwONLZtpfKwYe4e9MDlajZE8pokYndQ9OD+lD+OzlQtQJbmxl1OsxTKeDfFPI4ru29nJz3dsptNZHsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SHVBOqRa; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739429932; x=1770965932;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IuDkSPusWTCLmutvKrUiCtONzQj5Xn2RbA/VhezuVxA=;
+  b=SHVBOqRaLQEjouentecf0eiV2j3zV+hTODC9h4VCh21No3/c+MScuUtK
+   /VKSw4cenwwFJh1bVE6r8r/hvC7d8TsMZQRYB7aadGOdy+z15SHi72d5y
+   o4g9XttTDBg6VGfjt6bJQ6Jezr4ul6rwS4SmguYbfscpqVlGV2cmZbJna
+   sYYFEEVjfjl2vJJRhTqxxRKdVCeOmdOEEtFijU430yDIvn0Bm6qtTu+LX
+   cFIw8jpFDNx2kK4szvjcfp7N1WES5UYdFT+XgJA1fI6QT5+x0yVom4Ks6
+   Lio7JHf5lHHI7QWXuMQWS7W6j/x9yvbSszlMG5tkTGNv2VMZCwqJ1Hyba
+   g==;
+X-CSE-ConnectionGUID: VznTinZERAuXRqGoZHMz9A==
+X-CSE-MsgGUID: 1EALNzy+RPmZQ5jEx0JKNw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="39818279"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="39818279"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:58:49 -0800
+X-CSE-ConnectionGUID: KUJW1hv9RVqsIDMDOXu40g==
+X-CSE-MsgGUID: Uu0E+VmgQ9e+/yLUUhvqhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="150223547"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:58:46 -0800
+Date: Thu, 13 Feb 2025 07:55:12 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] ice: Fix signedness bug in
+ ice_init_interrupt_scheme()
+Message-ID: <Z62XUG6JzoD0sGAb@mev-dev.igk.intel.com>
+References: <b16e4f01-4c85-46e2-b602-fce529293559@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b16e4f01-4c85-46e2-b602-fce529293559@stanley.mountain>
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Mon, 10 Feb 2025 21:29:54 +0800
-> These netdevice drivers already uses netns parameter in newlink()
-> callback. Convert them to use rtnl_newlink_link_net() or
-> rtnl_newlink_peer_net() for clarity and deprecate params->net.
+On Thu, Feb 13, 2025 at 09:31:41AM +0300, Dan Carpenter wrote:
+> If pci_alloc_irq_vectors() can't allocate the minimum number of vectors
+> then it returns -ENOSPC so there is no need to check for that in the
+> caller.  In fact, because pf->msix.min is an unsigned int, it means that
+> any negative error codes are type promoted to high positive values and
+> treated as success.  So here, the "return -ENOMEM;" is unreachable code.
+> Check for negatives instead.
 > 
-> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
+> Now that we're only dealing with error codes, it's easier to propagate
+> the error code from pci_alloc_irq_vectors() instead of hardcoding
+> -ENOMEM.
+> 
+> Fixes: 79d97b8cf9a8 ("ice: remove splitting MSI-X between features")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+> v2: Fix my scripts to say [PATCH net-next]
+>     Propagate the error code.
+> 
+>  drivers/net/ethernet/intel/ice/ice_irq.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> index cbae3d81f0f1..30801fd375f0 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> @@ -149,8 +149,8 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+>  
+>  	vectors = pci_alloc_irq_vectors(pf->pdev, pf->msix.min, vectors,
+>  					PCI_IRQ_MSIX);
+> -	if (vectors < pf->msix.min)
+> -		return -ENOMEM;
+> +	if (vectors < 0)
+> +		return vectors;
+>  
+>  	ice_init_irq_tracker(pf, pf->msix.max, vectors);
+>  
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Thanks,
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-
-> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> index 8151e91395e2..ab7e5b6649b2 100644
-> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
-> @@ -122,8 +122,8 @@ static int rmnet_newlink(struct net_device *dev,
->  			 struct netlink_ext_ack *extack)
->  {
->  	u32 data_format = RMNET_FLAGS_INGRESS_DEAGGREGATION;
-> +	struct net *link_net = rtnl_newlink_link_net(params);
-
-nit: reverse xmas tree
-
-
->  	struct nlattr **data = params->data;
-> -	struct net *src_net = params->net;
->  	struct nlattr **tb = params->tb;
->  	struct net_device *real_dev;
->  	int mode = RMNET_EPMODE_VND;
+> -- 
+> 2.47.2
+> 
 
