@@ -1,135 +1,119 @@
-Return-Path: <netdev+bounces-166138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 936FCA34BE8
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:29:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F63A34C10
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 18:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A5A97A1915
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:28:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97C681882F35
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 17:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5312036FD;
-	Thu, 13 Feb 2025 17:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sg8eA3Pe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D5D22156F;
+	Thu, 13 Feb 2025 17:37:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB5A1C863C
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 17:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7B828A2DB;
+	Thu, 13 Feb 2025 17:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739467776; cv=none; b=RJFXQtMG/nn/naSLBxFY+oN3yulzDJ/4l7/5QOf8ccdo8ccfY10TxszufV/waywnAPGFf2eV9oZSkIaphAs7gwUAxWreTfjRyYFr+gnpg3QRlzMgVsTJ5SXkf5FWoIZ43HXsnR4zUYDnt0R81ec1hyfcAHrAzYYeNxm3SZ6mfyw=
+	t=1739468235; cv=none; b=bZcSaQ4As3U6sdxBaLV3Tf54EMhFKizgIoQPL7e1vANShcbW4r5jDMfTLpiZP33YCMDsO6bw6HO4X00xRBg4wBt6iaCjwGIcMqzoq1rxGTwkeIbD+nyuwttQA2Puh+qCMxYVbO607R4Q8b6/1xg33nhqw5tsmUPPzCUJjC3uWR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739467776; c=relaxed/simple;
-	bh=beEHYWfLW8uB+WEzhiwbEsKkojCix3lQoBcLZIbMJmY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DYf5rTBhI5ZiUXZiQZKezHV3s7KtFQgEFyuttMetPHVRADwoSIpX5cJEmTYWK1zK0HZCZPTkcptmLaDWtzK9BnN0ANtZNwIG98jPHgLXNmbgiOIJSD5AZq5pVi0Qfk8l0enIRBaPY+0BaC0CJhTEPqmqYMuWP3tViPS7OWvxWwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sg8eA3Pe; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5de3c29e9b3so1842266a12.3
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:29:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739467773; x=1740072573; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rxxFFdHrx4/pEU8chDYsT/kU3Mey57G9R2YibujipWM=;
-        b=sg8eA3Pej11OUxc8yccdtcrbkpU0snbWxY6NpBVJ7qWu+Xcfk6s84XM8hA/0TMYqHy
-         icRJSz7MX1del+O8/3NLqpgl7xQUxU4xtg0zN/j5R+h/4XqOX/qAyLHgPxzKUvZMHrzB
-         VjZb8O6JaiU0EYeG+C9tyxavobPBiAg6ST/VQbqMlJewBqrayOEF8LeEgXkAWCqMm0Yl
-         YHQ5SALSkAT1PI15RopCbpdMk+pnAAFll88jfnOl3uRCcqVk0qf8NGaUXezqOCSH8VuX
-         lDSXUsGaL//05dGCd870RKC3YT50WqHR664HcfJ3pExAri0VFYqhsWdu8j9Bfph7518K
-         AAsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739467773; x=1740072573;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rxxFFdHrx4/pEU8chDYsT/kU3Mey57G9R2YibujipWM=;
-        b=b3fZvTVYZw2vDEmhUWpkRTK1EfKSdccrIUHlvalo1FRoOtAZVapx8xnvyEIuoEGtr9
-         so61CM6eIIdRqXRMDNzKff9+NIiru8JzUWssoihJJj/XFawcOkLCkhDJr6ke06tTXo7O
-         7d6/aZOIc0uZzzEcxYsz6N3j76vtRWrcDJQ1bIe0DNP10ckDFHg4ZDNxR/vOVmj6fr5I
-         s3HSs4LkgTy5bBrGkdy+LEt8LSlx1bHm6fxX5AuSxpwQvtEavMhEw0gEAKx31hI9OW3T
-         PFJPXHRSAFxFICgsXyEV6ZX+A38kyaz4uraCNzfv6owa8XkSoa38Wm+mXpWr2XJBywb2
-         ZIsw==
-X-Gm-Message-State: AOJu0YxbFBZ8U+SLiD9ymjjKSK1Bh8F0Eq94AI4SXEQemy54Jls7tzQp
-	b5EEVNw0I3WL24o1/Km2Fr3bZOCjYsR+eX3fM9Jf/OtUFxKKYdC7uum+6UEE2jP2oZ7iJkU7iQ5
-	5tutg+/ChPAcSR4NhlINrChthZJwSDO8xjQuo
-X-Gm-Gg: ASbGncsFcSKcHqeHgEm0+6gqsjTZx9L5WNC49riUPesdYvBo2Y5YMliVB2D0EL5RONJ
-	q0MPRJ/y9UT8UvNu88vizz3xkYa4Vx49sQJNtRbym3nTFFsBsyBuPQyxtQ412gfm8S7Ffo6+jew
-	==
-X-Google-Smtp-Source: AGHT+IEnc+n3yFYlhIOPv071hPzEGKuco0va2tIo22Ttk1SmKZo9OEqVXQeOv0crrmOfciMX/nJ7w3Ianh6R9lkkSeE=
-X-Received: by 2002:a05:6402:3593:b0:5de:5946:8a01 with SMTP id
- 4fb4d7f45d1cf-5dec9d6731fmr3506421a12.2.1739467772931; Thu, 13 Feb 2025
- 09:29:32 -0800 (PST)
+	s=arc-20240116; t=1739468235; c=relaxed/simple;
+	bh=5iQ5TvzoYRvqsRL1Tb0dA+axEBtrzj3x/DwmaMb9aGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bnP/nwfV7AZKoReo0BdId9Ikh7hs6uDno30gndnbepwfahta9uequo6BTQfaVlxe7lJpbweKmm1bY0/zo8l7/PwG5Dp8YKty0Lz8rQ7zZbKaeKucXQtf06Syf482wHEGnQ75J5xsn1p8UyMXzQLpcV1fGViyLs++cWfBcEZbSzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: 96v72kWXR2u1Wm5z0Dr5ug==
+X-CSE-MsgGUID: /y/UnMw5R8+8wWpc+X+92Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="43022532"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="43022532"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:37:13 -0800
+X-CSE-ConnectionGUID: rIPp2GcVQOaJ8l+k6WheOQ==
+X-CSE-MsgGUID: vglTymb0SMS7zPTNi4/S0g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="112955713"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 09:37:06 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1tid93-0000000BEkc-2k0W;
+	Thu, 13 Feb 2025 19:37:01 +0200
+Date: Thu, 13 Feb 2025 19:37:01 +0200
+From: Andy Shevchenko <andy@kernel.org>
+To: David Lechner <dlechner@baylibre.com>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-sound@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: (subset) [PATCH v3 00/15] gpiolib: add
+ gpiod_multi_set_value_cansleep
+Message-ID: <Z64tvc3npT6cQgMV@smile.fi.intel.com>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+ <173935301204.11039.10193374588878813157.b4-ty@linaro.org>
+ <801b5364-129f-42e9-bf9a-a90d9eeb4629@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
- <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
- <504a90ea-8234-4732-b4d0-ec498312dcd9@redhat.com> <CANn89i+us2jYB6ayce=8GuSKJjjyfH4xj=FvB9ykfMD3=Sp=tw@mail.gmail.com>
- <12199ed2-ca9e-4658-9fc0-44e5b05ca7c3@redhat.com>
-In-Reply-To: <12199ed2-ca9e-4658-9fc0-44e5b05ca7c3@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 13 Feb 2025 18:29:21 +0100
-X-Gm-Features: AWEUYZneaePz4OCi4M3MOUoH9UomRgkvYTbve7DqBu3dbVcbl6RPqkuTiH1pIxg
-Message-ID: <CANn89i+oxrDhKG+wM0TKkyyhXyYCMZBNYyY9aYAfFBDt3X35eg@mail.gmail.com>
-Subject: Re: [PATCH net] net: allow small head cache usage with large
- MAX_SKB_FRAGS values
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <801b5364-129f-42e9-bf9a-a90d9eeb4629@baylibre.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Thu, Feb 13, 2025 at 6:13=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 2/13/25 2:44 PM, Eric Dumazet wrote:
-> > On Wed, Feb 12, 2025 at 11:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> >>
-> >> On 2/12/25 9:47 PM, Eric Dumazet wrote:
-> >>> This patch still gives a warning if  MAX_TCP_HEADER < GRO_MAX_HEAD +
-> >>> 64 (in my local build)
-> >>
-> >> Oops, I did not consider MAX_TCP_HEADER and GRO_MAX_HEAD could diverge=
-.
-> >>
-> >>> Why not simply use SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) , and
-> >>> remove the 1024 value ?
-> >>
-> >> With CONFIG_MAX_SKB_FRAGS=3D17, SKB_SMALL_HEAD_CACHE_SIZE is considera=
-bly
-> >> smaller than 1024, I feared decreasing such limit could re-introduce a
-> >> variation of the issue addressed by commit 3226b158e67c ("net: avoid 3=
-2
-> >> x truesize under-estimation for tiny skbs").
-> >>
-> >> Do you feel it would be safe?
-> >
-> > As long as we are using kmalloc() for those, we are good I think.
->
-> Due to ENOCOFFEE it took me a while to understand you mean that we just
-> need to ensure GRO_MAX_HEAD and GOOD_COPY_LEN allocations are backed by
-> kmalloc to avoid the mentioned issue.
->
-> I guess eventual nic drivers shooting themselves in the foot
-> consistently doing napi_alloc_skb(<max small cache + 1>), if any should
-> be fixed in their own code.
->
-> I concur using SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) as the limit
-> would be safe.
->
-> Will you send formally the patch or do you prefer otherwise?
+On Thu, Feb 13, 2025 at 11:25:21AM -0600, David Lechner wrote:
+> On 2/12/25 3:36 AM, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Oh, please go ahead, I am busy with other bugs, thanks !
+[...]
+
+> > Applied, thanks!
+> > 
+> > [06/15] gpio: max3191x: use gpiod_multi_set_value_cansleep
+> >         commit: eb2e9c308d2882d9d364af048eb3d8336d41c4bb
+> 
+> Do you plan to pick up the other patches that have been acked
+> as well? It seems like most folks were OK with everything going
+> though the gpio tree since the changes are small.
+
+FWIW, I took auxdisplay one via the respective tree.
+But please tell me, if you are going to take them all,
+I will drop that in my tree.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
