@@ -1,108 +1,151 @@
-Return-Path: <netdev+bounces-165735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F06A33442
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:50:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1C6FA33446
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 290BA7A2342
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:49:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80CE31660A9
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 00:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279E378C9C;
-	Thu, 13 Feb 2025 00:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B225A69D2B;
+	Thu, 13 Feb 2025 00:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYyblUqz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="payEPhI7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0398970810
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CDA4D8A3
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739407806; cv=none; b=AEhQbWcBywlTinZKVK4pxKQRuV+km1z3lPXkbFB6zAAjFVDmUIB14OCMCZ2YiJFm4UmCKte2lYeQ8br0KbTcUHoxa3nlllJu9R+8+2vEbzHHfLpdumUsnxToyqwG9RzIA556QNbhSLq9wEiKsx8zHXBg7nCinek113kYattXbvo=
+	t=1739407903; cv=none; b=g0/PTCalHv7FNmHxav+0aw4s9Ll01pZiIEIYEPkZwpvN/TIhuzYeyBbvOWWHWe70pZ6eVo1C32uPXHInldqb7rzI7hxPfZtPTGXW5ksDajsFZWNbb2XMqoE98FJO2tIBzB6jnCg04Sfav60rncEaYPr7OD0R4lKjPR3VMidmiDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739407806; c=relaxed/simple;
-	bh=r7i1kG7ras9jFXp3FVZCfhBxw5wOC4TPO5jb00HQ63k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I/p0CRmXuSwDYojmBw+Ijk9IUoLl74jVYoZ+UanW+UX46hSaHIFNKGuBwTvpQcdBokLE3uJLjg/8wYoRiXB1duf7HaX4gYIYHv62yaxkLGz6sGWJr4SisQnsuYXmoPmlawsEZH7O2Pw6R2r3V9BYYG51MjtY1iqYOBTi1cP9s7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYyblUqz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C1FBC4CEDF;
-	Thu, 13 Feb 2025 00:50:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739407805;
-	bh=r7i1kG7ras9jFXp3FVZCfhBxw5wOC4TPO5jb00HQ63k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fYyblUqzMlTU2Zg6W+de0Ame/aLI4G4n6eP49Y6GSOCS975poTe79LuCtx2bz7Pvc
-	 kavABaEUJZRDJcRFvg1CDPZJGczTRipX0+XpN+brN9kxqTcyJYJHjD/d2mydYulkIH
-	 9ZDuctta9B7e8QJQU9+zO2BSvC40tnJk4RIz1QYDuEdZ+i/ku8T7G1v2p+S3OJZ5oc
-	 kQgQrfCa9BioHFWZyXGsB2+fYsbnp9OAsoxezX4yWmSbAzVC4e6ah0oy9fu20zkoXh
-	 G55GxUGX17F52n3XA4/IGS7Hl9Il60cv8yWdbxl0DIhClBITPv3K13r2EKYpsO0oc+
-	 rDD+F+7RDCbYA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFC8380CEDA;
-	Thu, 13 Feb 2025 00:50:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739407903; c=relaxed/simple;
+	bh=SNKZi7zcWDGtJqAEYcLwUaW+VLU7u6S0IU2LBcAycJY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ClC3DeKmENhI4P4a0CE3ikT2B3ak/A/9zNBLWu249XHGT0mByM+uzsVvyWx9Cv98DH75el+7gvmeKHraXWqeK+rBSughg8hfV/bEQaWhyO8toian3pOh8LW8mulcslxpYZ49xrej50RveK/e6bzV7rSEwAUVUzknGvrmUcOMyGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=payEPhI7; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21f72fac367so26815ad.0
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 16:51:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739407901; x=1740012701; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MJ7+h+nkWzgpHhekbG7PVAPWh0eFUQ+pI8xpVOtRUg0=;
+        b=payEPhI78l4icYn+na2DpyRqwdgNIgZvQm1vYt4hN5fGIv+ajTmbn5b6/EOLFN8ZT7
+         uHMYf1ggdgc/E0LvdrVmgcSPnTDrOSHFq56BVIgE8oy4o10BbPHDB1Vc/6I3HqUlFGS4
+         5VWdO4DqzJwZd+B7lZFBMV2m08lkbkw14rm2N9wpQ2QMb44W8BoL+QyB8jLzDJ8L8p2K
+         o04iN4bZO1uon/f5jSgGGPtAzp6dqn9DMX1j/eGWVHNZoM/AX0SNY6kHFtSzM5tQKL0f
+         38Tk/O9vpJpjzWryTDTLFpTOsxv06xI12zUdo0uPZr3u120XMJ9LW1i9SlIxNb5x+trb
+         yR3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739407901; x=1740012701;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MJ7+h+nkWzgpHhekbG7PVAPWh0eFUQ+pI8xpVOtRUg0=;
+        b=GZmCZrqvql71M+HGz9979JOvtagfRM8I0Eoyu/rJ+DB548BvufGStC8eHZzc5CuAv7
+         yDTpwz8YKb/CsQ9ROcJ3j66EsUJtw33OEwbY1AY9vS75DxCLPdWpOWza7MN/PdxIcEOj
+         7JqrMwAOZFfW0xkgIwPMRXfjmGeiHxYrACITfWXGuYVlcW8WEyx6OEfportxgsR5Rjcq
+         b4Kq/vcG6nPq9+6vUGEb2qy+7dP2If9bZGGFgrJxVfaTJeUpWTthaAKA0C4KbClxLe4n
+         K+DrThmVbeE+LAb8KAp/nZTSxXYP+1bd1X0+mAe/7QqbUNAcnGo9fcUQn2zDka+IHCv/
+         jzGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUojTJXP5XtHwXMY0Fusm2GNvzlRbhkr1AXoOHiLBEkJVE0rYiLD8GBNSMWK80kNd0fXgAf+o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyFKhIf01qAVH9790Ha04u+bKvoT9dG1i4uGSByqJpJZti/mjy
+	vAUw1fSlGGStjsnyCy3o+L7uoFvJdOiEb6Rw0XPr27uKZ1N9SGtmk1Wa3G8QxtgYwxdb7Ua+LOr
+	iRwyDH37ExqZESqo5v2uuKWUuShbLy69OfL2q
+X-Gm-Gg: ASbGncsqB0zDIuF/b0dveMN2sIezEiRj1umKje8vG3Fx3gPz9Tfw9P6GCLiej+KbzQK
+	5NU+qWz6rauNTYjduuGicZBH5edezv4dj+OGfWsIN4VbZ1rTMB+V+fQbit5to00J0UQPUsGiEf1
+	5POJ+JykILHmUjvcF4Lfb/8/u3GB0=
+X-Google-Smtp-Source: AGHT+IFaHXyEuFFQ1ojsAq4oBRSrhwThDfYQFWqdwWW3S9x7KqrpElgxCrRSTvk645cBul/2TG+RH4bj4E96CyUDlC8=
+X-Received: by 2002:a17:903:190:b0:215:9ab0:402 with SMTP id
+ d9443c01a7336-220d35811femr1119345ad.18.1739407901132; Wed, 12 Feb 2025
+ 16:51:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] eth: fbnic: report software queue stats
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173940783453.713677.12924447032289552556.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 00:50:34 +0000
-References: <20250211181356.580800-1-kuba@kernel.org>
-In-Reply-To: <20250211181356.580800-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, alexanderduyck@fb.com, netdev@vger.kernel.org,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- horms@kernel.org
+References: <20250210130953.26831-1-kerneljasonxing@gmail.com>
+ <CAHS8izMznEB7TWkc4zxBhFF+8JVmstFoRfqfsRLOOMbcuUoRRA@mail.gmail.com>
+ <CAL+tcoDrxSgGU3G0a=OqpYVD2WAayLKGy=po5p7Tm+eHiodtNw@mail.gmail.com>
+ <CAHS8izNSG_fC7t3cAaN0s3W2Mo-7J2UW8c-OxPSpdeuvK-mxxw@mail.gmail.com>
+ <CAL+tcoD0CT_JmDcLEY6VGq2_+oU=TgHRfY6LPG70By3gm5CP0A@mail.gmail.com>
+ <CAHS8izNyeOThGCt=tO-0xoAEOsoQJLF_DJxF1iV8zJnJoyW-=g@mail.gmail.com> <CAL+tcoBa9uz7i-9_-wtakpQkmeiX55RpQn2zkpDnXFBAXutkYw@mail.gmail.com>
+In-Reply-To: <CAL+tcoBa9uz7i-9_-wtakpQkmeiX55RpQn2zkpDnXFBAXutkYw@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 12 Feb 2025 16:51:28 -0800
+X-Gm-Features: AWEUYZkdktVXQOGNXCxSM72XKZkWZKdN25aZEUaFvhvJVTKu4m8V0_b2untSOVk
+Message-ID: <CAHS8izOk6o-CQwJf+3zGkd_2Bfi0du489JqngF8aJVOsfpihqg@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] page_pool: avoid infinite loop to schedule
+ delayed worker
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	horms@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, Feb 12, 2025 at 4:44=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+> >
+> > ```
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > index 2ea8041aba7e..6d62ea45571b 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -1113,13 +1113,12 @@ static void page_pool_release_retry(struct
+> > work_struct *wq)
+> >         int inflight;
+> >
+> >         inflight =3D page_pool_release(pool);
+> > -       if (!inflight)
+> > -               return;
+> >
+> >         /* Periodic warning for page pools the user can't see */
+> >         netdev =3D READ_ONCE(pool->slow.netdev);
+> >         if (time_after_eq(jiffies, pool->defer_warn) &&
+> > -           (!netdev || netdev =3D=3D NET_PTR_POISON)) {
+> > +           (!netdev || netdev =3D=3D NET_PTR_POISON) &&
+> > +           inflight !=3D 0) {
+> >                 int sec =3D (s32)((u32)jiffies - (u32)pool->defer_start=
+) / HZ;
+> >
+> >                 pr_warn("%s() stalled pool shutdown: id %u, %d
+> > inflight %d sec devmem=3D%d\n",
+> > @@ -1128,7 +1127,15 @@ static void page_pool_release_retry(struct
+> > work_struct *wq)
+> >                 pool->defer_warn =3D jiffies + DEFER_WARN_INTERVAL;
+> >         }
+> >
+> > -       /* Still not ready to be disconnected, retry later */
+> > +       /* In rare cases, a driver bug may cause inflight to go negativ=
+e. Don't
+> > +        * reschedule release if inflight is 0 or negative.
+> > +        *      - If 0, the page_pool has been destroyed
+> > +        *      - if negative, we will never recover
+> > +        * in both cases no reschedule necessary.
+> > +        */
+> > +       if (inflight < 1)
+>
+> Maybe I would change the above to 'inflight <=3D 0' which looks more
+> obvious at the first glance? :)
+>
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Good catch. Yes.
 
-On Tue, 11 Feb 2025 10:13:51 -0800 you wrote:
-> Fill in typical software queue stats.
-> 
->   # ./pyynl/cli.py --spec netlink/specs/netdev.yaml --dump qstats-get
->   [{'ifindex': 2,
->     'rx-alloc-fail': 0,
->     'rx-bytes': 398064076,
->     'rx-csum-complete': 271,
->     'rx-csum-none': 0,
->     'rx-packets': 276044,
->     'tx-bytes': 7223770,
->     'tx-needs-csum': 28148,
->     'tx-packets': 28449,
->     'tx-stop': 0,
->     'tx-wake': 0}]
-> 
-> [...]
+Also, write "no reschedule is necessary" on the last line in the
+comment (add "is")
 
-Here is the summary with links:
-  - [net-next,1/5] net: report csum_complete via qstats
-    https://git.kernel.org/netdev/net-next/c/34eea78a1112
-  - [net-next,2/5] eth: fbnic: wrap tx queue stats in a struct
-    (no matching commit)
-  - [net-next,3/5] eth: fbnic: report software Rx queue stats
-    (no matching commit)
-  - [net-next,4/5] eth: fbnic: report software Tx queue stats
-    (no matching commit)
-  - [net-next,5/5] eth: fbnic: re-sort the objects in the Makefile
-    https://git.kernel.org/netdev/net-next/c/0ec023282a9d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+Thanks,
+Mina
 
