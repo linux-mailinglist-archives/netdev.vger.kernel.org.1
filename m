@@ -1,81 +1,65 @@
-Return-Path: <netdev+bounces-166193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30D1A34E56
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:18:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DDEB0A34E5E
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 20:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35892188352B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:18:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 547621890036
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 19:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA8E206F2A;
-	Thu, 13 Feb 2025 19:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7276245AF9;
+	Thu, 13 Feb 2025 19:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8Gy5+H5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2kII6b6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41D0194AD5
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 19:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D125D241686
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 19:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739474325; cv=none; b=XHx/oViEf89WMWUTp3H3eMRq8RZfyESMsEsOwesvJNN8rsrH2WEvaTwKv7vnletfgjxXIyaAowDWQpkQTaOtw5JaEMKazN0HUUGYP00z1nz26R5B+e9Aa7r2UYLkClNg2dVo1uy6f3RYPtLUgjf9JiTOrtR13J9ynuNSBhRaWAY=
+	t=1739474441; cv=none; b=p+YxbpYUDIb8vJv4EC28RAU3KLKbBbmhyWdgNKO5GkxSLdy1+uxNWP6VmTBlLE8KXRpXtf2/+lK5rTTEvurp5f8mBL5bCjd6CcCfuWH5CYPiUThBI8BvlzB/CIXDQwSJnIMKaAO4I+orapP0XbVP4pNCK4LYQ/ZFD6W5/xVb7EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739474325; c=relaxed/simple;
-	bh=AhzIdeUNW+hCq2NsK0teMbmcDd0av7JWUfWU+f4ZMRk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=OpPC14Q/rDXuGaUIooGN07PKv89YNhR85hf0rApUBYklfWqWQftXTcsEkAMbf1hvJl6Jo0cvWmh+NL8+m4Y80AqRQMcz5gDAntBr6ygVgWCESFS4SN2OWqywydK/2FMX3FnVIRVrlaPXweCXkLz/5ceybid2jsEAhdawZ39Z/u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8Gy5+H5; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7cb1154abso171507766b.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 11:18:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739474322; x=1740079122; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aqwR/OohvPeKiJLulmHUEaUwhhaHWF7qcqQ9CtgceOQ=;
-        b=D8Gy5+H5BVnAF/soSmVixgIf2EoQl7vtifTnXBk6YsUqPyg9QFeL/9z2NRFNubyZsz
-         0R2DutA0xvTD6IeCfq7Au1zhfhsrcrHSNU7RKcOsDFsEHEiKWkM3qGTTOoNHLVPS6ggn
-         FBWmfLam57hRcsahujdRapvXjTzJg5hC3DQgFRXG+/BuWqhOB1KN7pXbBn1hyKPE0q3B
-         R7JPfDOfdhTgacYQ/h4dN1Olx2vsDcB4+iQVTZcKAbRHMR7sbcUHAtboEcTlthpcRWqI
-         dD4i4WM6eKfylHr1FhBm0shaoOMRSI2z5sOQ/7vJNkS7UGpfg0ABgayCAuAhihEvaaUi
-         fIug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739474322; x=1740079122;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aqwR/OohvPeKiJLulmHUEaUwhhaHWF7qcqQ9CtgceOQ=;
-        b=gnbS5c7942+5YhBqYE5xcuIuMw2EIeiRiT0nOl60pNTUiis2jUnj4iIeaHX16PBNP0
-         JSteKholWyDGL/C/bzBnLT1ksx7vKhcCW0GNyMoE7pLXvBJ5/Jfrs9mq3brv4zwCgjWC
-         h7W8ongB+nDrsDRb8gJdccvnP69dVNBsmZrOiqc4AZBjsQHmt+oh9MDf4tHstebmPibe
-         Zn+Ebs9pgPfWIw4pXT2OPhil3R+oK6FihkSvxUNWRQ1/0HaBxKpk0V8FE7y/FzWDD55l
-         cvCBjSya83SBqN934uHXbWERBS4CWqXWsvf/3eDtWX57NdCrVYg+tAwkIQNDy11lBXgC
-         2kHQ==
-X-Gm-Message-State: AOJu0YyFYIyC4aAvdnDsl3L9Fgumoix9Bm6wXhjtYcTgP2F9UHQBzjRa
-	JvUi5Lna7ha9mDx4t0Cdurqm+Yqzc5pnjyORklp/g8Q2E8UaNOQt
-X-Gm-Gg: ASbGncvamQ1iLKuN+wSeZyefb2yEMdo4clE+QwHT+YQtomMMNI+BDeKt5BgxCMwWeWU
-	7J90tJqf6gVtDpZhhbTl0Z8GoKq09BfYM0/tlkJDSGbyXhIixvGpJIeauRoAC04bjTMYhIaP1qV
-	udBpBAEFzXDBy5w+CB0zqIbZZBy2Gu0q3Ab0SYtUeOzPL6HXPs2VHreQcajG024+ikjGtSF3slO
-	G9IFR//t8+EKZ5M1VdJXYkvRkC+rbAfceJMY1LLqg0/OXzXyBHRBkMIu4X1NoMq7A75wPGCywc5
-	L+2pK4AFvjwcoY24m+89qInt+3A2gC8H2izXnZw/wCdGGM3bV+/zwk5AC02muO5jUJYTdb46eUr
-	cH7Ts5C8bfjstzJm8H/lHTfySdu5HPW2Wt52MFbCxX+DmYC3bfGoz97RW/TQ5n8OYg2X4axuPNf
-	sR7RmW
-X-Google-Smtp-Source: AGHT+IFX+gnlqMhT+5vTpsx9C2/2X2JyeJYFH55i/MH5TDxc/8cuoHn9ll+N+POfRn3SLRo7GG90pQ==
-X-Received: by 2002:a05:6402:2553:b0:5de:3d2d:46ce with SMTP id 4fb4d7f45d1cf-5dec9e9a0e9mr9440109a12.25.1739474322087;
-        Thu, 13 Feb 2025 11:18:42 -0800 (PST)
-Received: from ?IPV6:2a02:3100:9dea:b00:8140:d035:b1a4:911d? (dynamic-2a02-3100-9dea-0b00-8140-d035-b1a4-911d.310.pool.telefonica.de. [2a02:3100:9dea:b00:8140:d035:b1a4:911d])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aba533bf5casm183857866b.182.2025.02.13.11.18.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 11:18:41 -0800 (PST)
-Message-ID: <81416f95-0fac-4225-87b4-828e3738b8ed@gmail.com>
-Date: Thu, 13 Feb 2025 20:19:14 +0100
+	s=arc-20240116; t=1739474441; c=relaxed/simple;
+	bh=MJvGzEAVvXDo67jLs3QBQsFAm8wqFuqKtzvY+7kPN2o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZPDL2qnKiRcqtVbvYoGkmNPyDoiU/FnY3Y7QwjGf0BKbKh/le/pOJJuDsF3+MVOnxQsjEUOtVCZEPqI7crLB3NPFXwyb5Pdm1BVLeAsUZMmwZSD/GJxDnc4kDEdqucKZz19gKN8nNGBeuYidxhryKuDJ0uwV/J5F4F7JA5b5PU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2kII6b6; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739474440; x=1771010440;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MJvGzEAVvXDo67jLs3QBQsFAm8wqFuqKtzvY+7kPN2o=;
+  b=M2kII6b66cO7IhihQQNwg3VcdxwpEfbEkbUaXBLAzj+oIhSx4qdxv9nV
+   t1SDkT0WL7iXgwq24acAMMspMivd+1gIPst7IkT8C2kOVXzS4y1B2qXzz
+   fgHM8Lj1tvz3765D9yLNbudx0oxIsJEdN7Ug1NRt33a2NWYqKDHfZPqOf
+   Fl7fEQhFIn+JDFWHKUN4MO0apQiqPRxrkSlL/4+ewKvbh8znAmwfA5/0q
+   PFRFLmPyWJ2vvZknMLrxiqrQpMBC7L4TA/eV8fFiobj7B5z+AdVVUAZQr
+   4JIISr2ALib8K1KjABpAJbgST6+nz/nxYMswh0FYGfRtpIacnq/pQ5qn9
+   g==;
+X-CSE-ConnectionGUID: g3eXdtvDQSyBko+vqPm6eg==
+X-CSE-MsgGUID: EkOGq8CTQFSd3COK3lfAQw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="50845879"
+X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
+   d="scan'208";a="50845879"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 11:20:39 -0800
+X-CSE-ConnectionGUID: Iwa5s9FDQlqLXEXxew6+4A==
+X-CSE-MsgGUID: lc36L7AOSAatuC3jZicEXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="118158570"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.21.71]) ([10.246.21.71])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 11:20:35 -0800
+Message-ID: <8e533834-4564-472f-b29b-4f1cb7730053@linux.intel.com>
+Date: Thu, 13 Feb 2025 20:20:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,112 +67,350 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH v2 net-next 3/3] net: phy: realtek: switch from paged to MMD
- ops in rtl822x functions
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <c6a969ef-fd7f-48d6-8c48-4bc548831a8d@gmail.com>
+Subject: Re: [Intel-wired-lan] [iwl-next v9 5/9] ice, irdma: move interrupts
+ code to irdma
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: himasekharx.reddy.pucha@intel.com, pmenzel@molgen.mpg.de,
+ marcin.szycik@intel.com, netdev@vger.kernel.org, rafal.romanowski@intel.com,
+ konrad.knitter@intel.com, pawel.chmielewski@intel.com, horms@kernel.org,
+ David.Laight@ACULAB.COM, nex.sw.ncis.nat.hpm.dev@intel.com,
+ pio.raczynski@gmail.com, sridhar.samudrala@intel.com,
+ jacob.e.keller@intel.com, jiri@resnulli.us, przemyslaw.kitszel@intel.com,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <20241203065817.13475-1-michal.swiatkowski@linux.intel.com>
+ <20241203065817.13475-6-michal.swiatkowski@linux.intel.com>
 Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <c6a969ef-fd7f-48d6-8c48-4bc548831a8d@gmail.com>
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20241203065817.13475-6-michal.swiatkowski@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-The MDIO bus provided by r8169 for the internal PHY's now supports
-c45 ops for the MDIO_MMD_VEND2 device. So we can switch to standard
-MMD ops here.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/realtek/realtek_main.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 2e2c5353c..34be1d752 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -901,7 +901,7 @@ static int rtl822x_get_features(struct phy_device *phydev)
- {
- 	int val;
- 
--	val = phy_read_paged(phydev, 0xa61, 0x13);
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xa616);
- 	if (val < 0)
- 		return val;
- 
-@@ -922,10 +922,9 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
- 	if (phydev->autoneg == AUTONEG_ENABLE) {
- 		u16 adv = linkmode_adv_to_mii_10gbt_adv_t(phydev->advertising);
- 
--		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
--					       MDIO_AN_10GBT_CTRL_ADV2_5G |
--					       MDIO_AN_10GBT_CTRL_ADV5G,
--					       adv);
-+		ret = phy_modify_mmd_changed(phydev, MDIO_MMD_VEND2, 0xa5d4,
-+					     MDIO_AN_10GBT_CTRL_ADV2_5G |
-+					     MDIO_AN_10GBT_CTRL_ADV5G, adv);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -969,7 +968,7 @@ static int rtl822x_read_status(struct phy_device *phydev)
- 	    !phydev->autoneg_complete)
- 		return 0;
- 
--	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
-+	lpadv = phy_read_mmd(phydev, MDIO_MMD_VEND2, 0xa5d6);
- 	if (lpadv < 0)
- 		return lpadv;
- 
--- 
-2.48.1
+On 03.12.2024 07:58, Michal Swiatkowski wrote:
+> Move responsibility of MSI-X requesting for RDMA feature from ice driver
+> to irdma driver. It is done to allow simple fallback when there is not
+> enough MSI-X available.
+> 
+> Change amount of MSI-X used for control from 4 to 1, as it isn't needed
+> to have more than one MSI-X for this purpose.
 
+Hi, I'm observing KASAN reports or kernel panic when attempting to remove irdma
+with this patchset, most probably this patch being the culprit, since it touches
+functions from splat.
+
+Reproducer:
+  sudo rmmod irdma
+
+Minified splat(s):
+  BUG: KASAN: use-after-free in irdma_remove+0x257/0x2d0 [irdma]
+  Call Trace:
+   <TASK>
+   ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+   ? kfree+0x253/0x450
+   ? irdma_remove+0x257/0x2d0 [irdma]
+   kasan_report+0xed/0x120
+   ? irdma_remove+0x257/0x2d0 [irdma]
+   irdma_remove+0x257/0x2d0 [irdma]
+   auxiliary_bus_remove+0x56/0x80
+   device_release_driver_internal+0x371/0x530
+   ? kernfs_put.part.0+0x147/0x310
+   driver_detach+0xbf/0x180
+   bus_remove_driver+0x11b/0x2a0
+   auxiliary_driver_unregister+0x1a/0x50
+   irdma_exit_module+0x40/0x4c [irdma]
+  
+  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+  RIP: 0010:ice_free_rdma_qvector+0x2a/0xa0 [ice]
+  Call Trace:
+   ? ice_free_rdma_qvector+0x2a/0xa0 [ice]
+   irdma_remove+0x179/0x2d0 [irdma]
+   auxiliary_bus_remove+0x56/0x80
+   device_release_driver_internal+0x371/0x530
+   ? kobject_put+0x61/0x4b0
+   driver_detach+0xbf/0x180
+   bus_remove_driver+0x11b/0x2a0
+   auxiliary_driver_unregister+0x1a/0x50
+   irdma_exit_module+0x40/0x4c [irdma]
+
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>  drivers/infiniband/hw/irdma/main.h       |  3 ++
+>  drivers/net/ethernet/intel/ice/ice.h     |  1 -
+>  include/linux/net/intel/iidc.h           |  2 +
+>  drivers/infiniband/hw/irdma/hw.c         |  2 -
+>  drivers/infiniband/hw/irdma/main.c       | 46 ++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_idc.c | 64 ++++++------------------
+>  drivers/net/ethernet/intel/ice/ice_irq.c |  3 +-
+>  7 files changed, 65 insertions(+), 56 deletions(-)
+> 
+> diff --git a/drivers/infiniband/hw/irdma/main.h b/drivers/infiniband/hw/irdma/main.h
+> index 9f0ed6e84471..ef9a9b79d711 100644
+> --- a/drivers/infiniband/hw/irdma/main.h
+> +++ b/drivers/infiniband/hw/irdma/main.h
+> @@ -117,6 +117,9 @@ extern struct auxiliary_driver i40iw_auxiliary_drv;
+>  
+>  #define IRDMA_IRQ_NAME_STR_LEN (64)
+>  
+> +#define IRDMA_NUM_AEQ_MSIX	1
+> +#define IRDMA_MIN_MSIX		2
+> +
+>  enum init_completion_state {
+>  	INVALID_STATE = 0,
+>  	INITIAL_STATE,
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index f497f7d6eb71..14a90c916d43 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -97,7 +97,6 @@
+>  #define ICE_MIN_LAN_OICR_MSIX	1
+>  #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
+>  #define ICE_FDIR_MSIX		2
+> -#define ICE_RDMA_NUM_AEQ_MSIX	4
+>  #define ICE_NO_VSI		0xffff
+>  #define ICE_VSI_MAP_CONTIG	0
+>  #define ICE_VSI_MAP_SCATTER	1
+> diff --git a/include/linux/net/intel/iidc.h b/include/linux/net/intel/iidc.h
+> index 1c1332e4df26..13274c3def66 100644
+> --- a/include/linux/net/intel/iidc.h
+> +++ b/include/linux/net/intel/iidc.h
+> @@ -78,6 +78,8 @@ int ice_del_rdma_qset(struct ice_pf *pf, struct iidc_rdma_qset_params *qset);
+>  int ice_rdma_request_reset(struct ice_pf *pf, enum iidc_reset_type reset_type);
+>  int ice_rdma_update_vsi_filter(struct ice_pf *pf, u16 vsi_id, bool enable);
+>  void ice_get_qos_params(struct ice_pf *pf, struct iidc_qos_params *qos);
+> +int ice_alloc_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry);
+> +void ice_free_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry);
+>  
+>  /* Structure representing auxiliary driver tailored information about the core
+>   * PCI dev, each auxiliary driver using the IIDC interface will have an
+> diff --git a/drivers/infiniband/hw/irdma/hw.c b/drivers/infiniband/hw/irdma/hw.c
+> index ad50b77282f8..69ce1862eabe 100644
+> --- a/drivers/infiniband/hw/irdma/hw.c
+> +++ b/drivers/infiniband/hw/irdma/hw.c
+> @@ -498,8 +498,6 @@ static int irdma_save_msix_info(struct irdma_pci_f *rf)
+>  	iw_qvlist->num_vectors = rf->msix_count;
+>  	if (rf->msix_count <= num_online_cpus())
+>  		rf->msix_shared = true;
+> -	else if (rf->msix_count > num_online_cpus() + 1)
+> -		rf->msix_count = num_online_cpus() + 1;
+>  
+>  	pmsix = rf->msix_entries;
+>  	for (i = 0, ceq_idx = 0; i < rf->msix_count; i++, iw_qvinfo++) {
+> diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
+> index 3f13200ff71b..1ee8969595d3 100644
+> --- a/drivers/infiniband/hw/irdma/main.c
+> +++ b/drivers/infiniband/hw/irdma/main.c
+> @@ -206,6 +206,43 @@ static void irdma_lan_unregister_qset(struct irdma_sc_vsi *vsi,
+>  		ibdev_dbg(&iwdev->ibdev, "WS: LAN free_res for rdma qset failed.\n");
+>  }
+>  
+> +static int irdma_init_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
+> +{
+> +	int i;
+> +
+> +	rf->msix_count = num_online_cpus() + IRDMA_NUM_AEQ_MSIX;
+> +	rf->msix_entries = kcalloc(rf->msix_count, sizeof(*rf->msix_entries),
+> +				   GFP_KERNEL);
+> +	if (!rf->msix_entries)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < rf->msix_count; i++)
+> +		if (ice_alloc_rdma_qvector(pf, &rf->msix_entries[i]))
+> +			break;
+> +
+> +	if (i < IRDMA_MIN_MSIX) {
+> +		for (; i > 0; i--)
+> +			ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
+> +
+> +		kfree(rf->msix_entries);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	rf->msix_count = i;
+> +
+> +	return 0;
+> +}
+> +
+> +static void irdma_deinit_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < rf->msix_count; i++)
+> +		ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
+> +
+> +	kfree(rf->msix_entries);
+> +}
+> +
+>  static void irdma_remove(struct auxiliary_device *aux_dev)
+>  {
+>  	struct iidc_auxiliary_dev *iidc_adev = container_of(aux_dev,
+> @@ -216,6 +253,7 @@ static void irdma_remove(struct auxiliary_device *aux_dev)
+>  
+>  	irdma_ib_unregister_device(iwdev);
+>  	ice_rdma_update_vsi_filter(pf, iwdev->vsi_num, false);
+> +	irdma_deinit_interrupts(iwdev->rf, pf);
+>  
+>  	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev->devfn));
+>  }
+> @@ -230,9 +268,7 @@ static void irdma_fill_device_info(struct irdma_device *iwdev, struct ice_pf *pf
+>  	rf->gen_ops.unregister_qset = irdma_lan_unregister_qset;
+>  	rf->hw.hw_addr = pf->hw.hw_addr;
+>  	rf->pcidev = pf->pdev;
+> -	rf->msix_count =  pf->num_rdma_msix;
+>  	rf->pf_id = pf->hw.pf_id;
+> -	rf->msix_entries = &pf->msix_entries[pf->rdma_base_vector];
+>  	rf->default_vsi.vsi_idx = vsi->vsi_num;
+>  	rf->protocol_used = pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2 ?
+>  			    IRDMA_ROCE_PROTOCOL_ONLY : IRDMA_IWARP_PROTOCOL_ONLY;
+> @@ -281,6 +317,10 @@ static int irdma_probe(struct auxiliary_device *aux_dev, const struct auxiliary_
+>  	irdma_fill_device_info(iwdev, pf, vsi);
+>  	rf = iwdev->rf;
+>  
+> +	err = irdma_init_interrupts(rf, pf);
+> +	if (err)
+> +		goto err_init_interrupts;
+> +
+>  	err = irdma_ctrl_init_hw(rf);
+>  	if (err)
+>  		goto err_ctrl_init;
+> @@ -311,6 +351,8 @@ static int irdma_probe(struct auxiliary_device *aux_dev, const struct auxiliary_
+>  err_rt_init:
+>  	irdma_ctrl_deinit_hw(rf);
+>  err_ctrl_init:
+> +	irdma_deinit_interrupts(rf, pf);
+> +err_init_interrupts:
+>  	kfree(iwdev->rf);
+>  	ib_dealloc_device(&iwdev->ibdev);
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
+> index 145b27f2a4ce..bab3e81cad5d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_idc.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_idc.c
+> @@ -228,61 +228,34 @@ void ice_get_qos_params(struct ice_pf *pf, struct iidc_qos_params *qos)
+>  }
+>  EXPORT_SYMBOL_GPL(ice_get_qos_params);
+>  
+> -/**
+> - * ice_alloc_rdma_qvectors - Allocate vector resources for RDMA driver
+> - * @pf: board private structure to initialize
+> - */
+> -static int ice_alloc_rdma_qvectors(struct ice_pf *pf)
+> +int ice_alloc_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry)
+>  {
+> -	if (ice_is_rdma_ena(pf)) {
+> -		int i;
+> -
+> -		pf->msix_entries = kcalloc(pf->num_rdma_msix,
+> -					   sizeof(*pf->msix_entries),
+> -						  GFP_KERNEL);
+> -		if (!pf->msix_entries)
+> -			return -ENOMEM;
+> +	struct msi_map map = ice_alloc_irq(pf, true);
+>  
+> -		/* RDMA is the only user of pf->msix_entries array */
+> -		pf->rdma_base_vector = 0;
+> -
+> -		for (i = 0; i < pf->num_rdma_msix; i++) {
+> -			struct msix_entry *entry = &pf->msix_entries[i];
+> -			struct msi_map map;
+> +	if (map.index < 0)
+> +		return -ENOMEM;
+>  
+> -			map = ice_alloc_irq(pf, false);
+> -			if (map.index < 0)
+> -				break;
+> +	entry->entry = map.index;
+> +	entry->vector = map.virq;
+>  
+> -			entry->entry = map.index;
+> -			entry->vector = map.virq;
+> -		}
+> -	}
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL_GPL(ice_alloc_rdma_qvector);
+>  
+>  /**
+>   * ice_free_rdma_qvector - free vector resources reserved for RDMA driver
+>   * @pf: board private structure to initialize
+> + * @entry: MSI-X entry to be removed
+>   */
+> -static void ice_free_rdma_qvector(struct ice_pf *pf)
+> +void ice_free_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry)
+>  {
+> -	int i;
+> -
+> -	if (!pf->msix_entries)
+> -		return;
+> -
+> -	for (i = 0; i < pf->num_rdma_msix; i++) {
+> -		struct msi_map map;
+> +	struct msi_map map;
+>  
+> -		map.index = pf->msix_entries[i].entry;
+> -		map.virq = pf->msix_entries[i].vector;
+> -		ice_free_irq(pf, map);
+> -	}
+> -
+> -	kfree(pf->msix_entries);
+> -	pf->msix_entries = NULL;
+> +	map.index = entry->entry;
+> +	map.virq = entry->vector;
+> +	ice_free_irq(pf, map);
+>  }
+> +EXPORT_SYMBOL_GPL(ice_free_rdma_qvector);
+>  
+>  /**
+>   * ice_adev_release - function to be mapped to AUX dev's release op
+> @@ -382,12 +355,6 @@ int ice_init_rdma(struct ice_pf *pf)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	/* Reserve vector resources */
+> -	ret = ice_alloc_rdma_qvectors(pf);
+> -	if (ret < 0) {
+> -		dev_err(dev, "failed to reserve vectors for RDMA\n");
+> -		goto err_reserve_rdma_qvector;
+> -	}
+>  	pf->rdma_mode |= IIDC_RDMA_PROTOCOL_ROCEV2;
+>  	ret = ice_plug_aux_dev(pf);
+>  	if (ret)
+> @@ -395,8 +362,6 @@ int ice_init_rdma(struct ice_pf *pf)
+>  	return 0;
+>  
+>  err_plug_aux_dev:
+> -	ice_free_rdma_qvector(pf);
+> -err_reserve_rdma_qvector:
+>  	pf->adev = NULL;
+>  	xa_erase(&ice_aux_id, pf->aux_idx);
+>  	return ret;
+> @@ -412,6 +377,5 @@ void ice_deinit_rdma(struct ice_pf *pf)
+>  		return;
+>  
+>  	ice_unplug_aux_dev(pf);
+> -	ice_free_rdma_qvector(pf);
+>  	xa_erase(&ice_aux_id, pf->aux_idx);
+>  }
+> diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> index 1a7d446ab5f1..80c9ee2e64c1 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> @@ -84,11 +84,12 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf, bool dyn_only)
+>  	return entry;
+>  }
+>  
+> +#define ICE_RDMA_AEQ_MSIX 1
+>  static int ice_get_default_msix_amount(struct ice_pf *pf)
+>  {
+>  	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
+>  	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
+> -	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_NUM_AEQ_MSIX : 0);
+> +	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
+>  }
+>  
+>  /**
 
 
