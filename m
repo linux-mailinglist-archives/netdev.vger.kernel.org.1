@@ -1,93 +1,138 @@
-Return-Path: <netdev+bounces-165964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E91A33CF3
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:50:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A429A33CFA
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:51:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E468A1889455
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:50:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 282061889629
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99932212D7A;
-	Thu, 13 Feb 2025 10:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768CA212D8D;
+	Thu, 13 Feb 2025 10:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNU7TkkE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X/XnKPTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D8020E717
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 10:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE992054E4;
+	Thu, 13 Feb 2025 10:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739443802; cv=none; b=LPT0tcmV/z27EweUWVvm3bsSgrb3nLjI3KiLOxJE3DJlVJzIMR4j/LL+9NV2PmdJP3OcQhvAnVKH2g2Q9nPWb4L53XjtFKsj5nu0k0uef//rFsjTwNXq/qvoDoJnpS5t9AOkxbtXtxhRvLPGr7WQSp+50DrmWDM2KIxpObHU3eU=
+	t=1739443886; cv=none; b=UHSCkJogeNweSZk9KsLCK8QTqDsdfZiIzh4Qgr6ZqXhOcLQgfNPQrVo15z9sT388XoJIoJLxj1vd8x0EcQeBu5qxap+KC8Q3BmyaFC1j6WA/SyZ8COkQHpyqScNVkX5S65T5IknKb88BcxT8wbKBeyz1eETptVIFgztmslVhF2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739443802; c=relaxed/simple;
-	bh=EmgFZclLpQ6mkv0XEm01W/8nKRvFjm/b2ZRsTuA1oBc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tVupPRsm6uogVTfQhG0qJOvSFFEAEBhzoVBiWqyw+AGGcBP71217FDjOswdiqwsvX5ptSOFcFnEQEHUSYpsSC8biZ9Ih0SWnzAjnx9rTr97pb1rYq/AHVz9I2mDRyIbG1zNsqU7Q0xrqzdbzoXlmPFrHKFoHivehcuxzyi3JZrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNU7TkkE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E030CC4CED1;
-	Thu, 13 Feb 2025 10:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739443801;
-	bh=EmgFZclLpQ6mkv0XEm01W/8nKRvFjm/b2ZRsTuA1oBc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SNU7TkkE9+Pq83nxYt3ieBKPuPcfCcvDqf22n2dsiXU6/KQjYP2Vs3Y9FbMQjefac
-	 tBU4rSpbOi74RXCTPx6Wwnb++uJ+V8ld9gONM4mpjnOF2VkCtNmuwt3svVR7oaWVBt
-	 JIimvlYdA0fwr5FzQFasU7j6hsEEWoOSochaiffSKKcScYw5K+7IQDeE0F9onCQTsJ
-	 uxGcS9lK6UfL9tfYbWk4lSSVmWHPduMTUlmfkIXVqHjgBCLQCYqliyeq0GKVDtJW++
-	 bxP6F/Sd5RVkpw79Zwabhjp84fLVZ4vhBRqYfl1sFBsAxfjHgdLFKPkEC9OdLqJbhz
-	 AZhSrSBU+Dvgw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FD1380CEEF;
-	Thu, 13 Feb 2025 10:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739443886; c=relaxed/simple;
+	bh=IF3pV7l7zOjvvG/0UDfuSxAlR8BVTLZ4GNjgKKSCkmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LAe3ifnqdYgIZS1BKZPgN1EKQj8mq2AbzqBokUoyTvPQMdunBg9nWK5CZ11MhaXQWU7cBtqE0jDyNHLpShXnlzCTYw9WZjxfP11hNxCiximpY4+sh7C4pa0nVTueslx2uyOZPbnyEk1LybEmz0HukgIJVtvWzj7WQsBMLHGhbrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X/XnKPTb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t+Sa1rIopsE4vpBI1kqaD2rohwmI2qAey/4fz9993mc=; b=X/XnKPTb2dokpBdeEwNhew0L1F
+	B+I44FJ50CE/Xs7CxZGHDwJ3TH4O8+W6KA/hZvX1JiGnZrJ98HujZJ5ChNpcp5D8mGcow579YLpVz
+	YG+kAlsPjl6AJmGrAu3vcY5995Z1q7UPL3liVu8qGcYnFAADjtNKz9jqMpC5tmJa1uMwvDV1w8nDT
+	CH5VY8Wl05Nr88D/uNFQlJexL6u9uGZZsCMac8HELUEAAPkKifa8NhD3s2d4iVfZI4GlJQyWVI7W1
+	bMONE0q26ZCGVLQC9RHn3HwC7rZsrzvWGClclXPZfh9NfEwlZ+xAlqLotpNyctkV3/K26wKepODna
+	NV43mtww==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51268)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tiWoK-0000pL-2u;
+	Thu, 13 Feb 2025 10:51:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tiWoH-00024b-0u;
+	Thu, 13 Feb 2025 10:51:09 +0000
+Date: Thu, 13 Feb 2025 10:51:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chintan Vankar <c-vankar@ti.com>
+Cc: Rosen Penev <rosenp@gmail.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, s-vadapalli@ti.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: phy: mscc: Add auto-negotiation feature to VSC8514
+Message-ID: <Z63OnZTBMeAbzxrB@shell.armlinux.org.uk>
+References: <20250213102150.2400429-1-c-vankar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next] arp: Convert SIOCDARP and SIOCSARP to per-netns
- RTNL.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173944383101.1182479.12815558202490033852.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 10:50:31 +0000
-References: <20250211045057.10419-1-kuniyu@amazon.com>
-In-Reply-To: <20250211045057.10419-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213102150.2400429-1-c-vankar@ti.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 11 Feb 2025 13:50:57 +0900 you wrote:
-> ioctl(SIOCDARP/SIOCSARP) operates on a single netns fetched from
-> an AF_INET socket in inet_ioctl().
+On Thu, Feb 13, 2025 at 03:51:50PM +0530, Chintan Vankar wrote:
+> Add function vsc85xx_config_inband_aneg() in mscc_main.c to enable
+> auto-negotiation. The function enables auto-negotiation by configuring
+> the MAC SerDes PCS Control register of VSC8514.
 > 
-> Let's hold rtnl_net_lock() for SIOCDARP and SIOCSARP.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-> [...]
+> Invoke the vsc85xx_config_inband_aneg() function from the
+> vsc8514_config_init() function present in mscc_main.c to start the
+> auto-negotiation process. This is required to get Ethernet working with
+> the Quad port Ethernet Add-On card connected to J7 common processor board.
 
-Here is the summary with links:
-  - [v1,net-next] arp: Convert SIOCDARP and SIOCSARP to per-netns RTNL.
-    https://git.kernel.org/netdev/net-next/c/7aca0d8a727d
+A few points:
 
-You are awesome, thank you!
+1. please read the netdev FAQ:
+   https://www.kernel.org/doc/html/v5.6/networking/netdev-FAQ.html
+   specifically the first question. Please also note the delay
+   requirement for resending patches.
+
+2. Is this a fix? Does something not work at the moment?
+
+3. Will always forcing the inband signalling to be enabled result in
+   another existing user that doesn't provide the inband signalling
+   now failing? Do you know for sure that this won't disrupt any other
+   users of this PHY?
+
+4. Maybe consider using phylink in the ethernet driver and populating
+   the .inband_caps() and .config_inband() methods which will allow
+   the inband signalling properties to be negotiated between the MAC's
+   PCS and the PHY.
+
+Other points inline below:
+
+> +static int vsc85xx_config_inband_aneg(struct phy_device *phydev, bool enabled)
+> +{
+> +	u16 reg_val = 0;
+> +	int rc;
+> +
+> +	if (enabled)
+> +		reg_val = MSCC_PHY_SERDES_ANEG;
+> +
+> +	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_3,
+> +			      MSCC_PHY_SERDES_PCS_CTRL, MSCC_PHY_SERDES_ANEG,
+> +			      reg_val);
+> +
+> +	return rc;
+
+Why not simply:
+
+	return phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_3,
+				MSCC_PHY_SERDES_PCS_CTRL,
+				MSCC_PHY_SERDES_ANEG,
+				reg_val);
+
+?
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
