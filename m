@@ -1,67 +1,64 @@
-Return-Path: <netdev+bounces-165767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6919DA33505
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:55:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9CD4A3350C
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 02:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEAE4188AD9D
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:55:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96AF2167AA0
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 01:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42ED8132103;
-	Thu, 13 Feb 2025 01:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDFD13CA97;
+	Thu, 13 Feb 2025 01:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uOklJTdD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Un+iAw/y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F8718EB0;
-	Thu, 13 Feb 2025 01:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2B7132117;
+	Thu, 13 Feb 2025 01:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739411727; cv=none; b=YgZJZmRut8re6J2fi/E7jS9AR1ZmoaLch7sYGhJJHSc/GOx2/B4EfFzZp55KuPfoJveVV128xg8i2gNFUEB7vHAU3wP5E3aOy7sBCNd8msRnsiPs5pR9jOyqbkbLJEJ7Iac2uxTix+Qimth4wLslBrdu8l5p4ay5DA/m+kDqJTE=
+	t=1739411943; cv=none; b=LkD5RF9pkUtsUU7f4Kk0BJYBvD2ED/PlC3roOdjSu9Ychi7MAXwQ1zuU/P0ie8IGLBWh5vDpafVvhBuG6K2s3FjojAvns7BqTdRWZMQ0wFWaIdZQnReNcDhiWi9QVQISrnrWbSnBtOOEh9V6EiUu1bEwy9Odz8V2ipUqZs5EIio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739411727; c=relaxed/simple;
-	bh=iHz3/lz8by3vyfJfWdwvgvbN/HigLmoOkJ804e/e2OE=;
+	s=arc-20240116; t=1739411943; c=relaxed/simple;
+	bh=5e9tQdjyUtvFsdWFPY66rgy1K6uwxdwMbTMFDYcH4wI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ybh7r4J1PbZJ27PKFZv8Be0YPkfzu5nDeronvSli2exu2EPDbuDUWhAD114gyW/lC+RG+pFPJ0b/T/cncdGHKe6kjLbJuYxQP711djgSnYx9zelo5o8JhpnIyrtGPUFNi/w9SAIfPE7XzpfjXcsaCzP60BFxijYwbyprWV+cydE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uOklJTdD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E09C4CEDF;
-	Thu, 13 Feb 2025 01:55:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WX91gIAcWgcpSWRH7sJDD7gkZcgOpiIMmMnC9syKjG9/O+h0Tu9DRAJlB/FZ1Z/lBudurmhZM0QIjWfCdUqYcCY3WYYuD4pwdCfiJBgHvw/NHYj7rv6cGRWKQYqABbs2gcx9xz7zeoNQ2GCki79eH3x2BDgXMdb2+yCyQz2zXAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Un+iAw/y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE85C4CEDF;
+	Thu, 13 Feb 2025 01:59:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739411726;
-	bh=iHz3/lz8by3vyfJfWdwvgvbN/HigLmoOkJ804e/e2OE=;
+	s=k20201202; t=1739411942;
+	bh=5e9tQdjyUtvFsdWFPY66rgy1K6uwxdwMbTMFDYcH4wI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uOklJTdD9MPwJna+bt6mER7qr7rzwQqUrG/tLpLMhJWROffn2rfqcos/ZRxog2+cB
-	 rk9RsOprMWjZBQa5D9GsDwPGgIddTd2nmDebMAd3i6ChvOiaN3WtKyGttk+wNR4a8R
-	 qlE++skhleUYz1BzPX6SpCpvdhnkW/MRq4f6XJ/4Ck96JDWDyio/HHkdISfao8Q4vi
-	 DaL8/Sfxbsl9Zrmx+8DZDY0I0+Wh5u8xaPJ0Hqiyzi6UMF7gltkvZIPsxiiBoG6Fqo
-	 bYfEJ3VG+dtFBkLg4IA8xRAiAwRNdiVZthYp8ypHlAv0bny4/wTKgqa+0uuhR8tAVv
-	 qrJT9QcYsfF9A==
-Date: Wed, 12 Feb 2025 17:55:25 -0800
+	b=Un+iAw/y1U6YD1qlsbtOYvwBpsZG4kOuALtUoheHGABfL+Eu7bruJ5XaiPm094Zx/
+	 KEFiM6zyg3J1Ym9fVWNxRCeulk3FdwvAj8e0RC1bo5BI7jvFjeqEv1lJxOJheUfD63
+	 TWX0DtHHX/pS1Xa9zHcwItl+LxS9DhXV1gp0Xb7bFLr28g6ZZKaI8+P27Y+OsA9ReS
+	 r7SJ9VpXDOlBx3hVZFWXYLhvgzLI8EsGrugVjyTBxwojBPZe90RiGgxVWWueOJZU7z
+	 zFwmUUjmKY82LWkOYDt+WJl/2rQR0x3s2aSZdd+4hFIIesZF/Sil6TxjzcV47xafi6
+	 tLTCI+eMv3+TQ==
+Date: Wed, 12 Feb 2025 17:59:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>, Louis Peens
- <louis.peens@corigine.com>, Simon Horman <horms@kernel.org>, David Ahern
- <dsahern@kernel.org>, Pravin B Shelar <pshelar@ovn.org>, Yotam Gigi
- <yotam.gi@gmail.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Kees Cook
- <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- dev@openvswitch.org, linux-hardening@vger.kernel.org, Ilya Maximets
- <i.maximets@ovn.org>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next v2] net: Add options as a flexible array to
- struct ip_tunnel_info
-Message-ID: <20250212175525.4e658590@kernel.org>
-In-Reply-To: <d98d0c20-741d-4d87-b39e-5aa8eed4624c@nvidia.com>
-References: <20250212140953.107533-1-gal@nvidia.com>
-	<f9adb864-8ed5-4368-a880-b2aac8aac885@intel.com>
-	<d98d0c20-741d-4d87-b39e-5aa8eed4624c@nvidia.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "Paolo Abeni" <pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ "Wojciech Drewek" <wojciech.drewek@intel.com>,
+ <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+Subject: Re: [PATCH next] ice: Fix signedness bug in
+ ice_init_interrupt_scheme()
+Message-ID: <20250212175901.11199ce1@kernel.org>
+In-Reply-To: <f66b15a3-1d83-43f9-8af2-071b76b133c0@intel.com>
+References: <14ebc311-6fd6-4b0b-b314-8347c4efd9fc@stanley.mountain>
+	<f66b15a3-1d83-43f9-8af2-071b76b133c0@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,15 +68,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 12 Feb 2025 20:13:28 +0200 Gal Pressman wrote:
-> > You could leave this macro inplace and just change `(info) + 1` to
-> > `(info)->options` avoiding changes in lots of files and adding casts
-> > everywhere.  
+On Wed, 12 Feb 2025 17:46:54 +0100 Alexander Lobakin wrote:
+> > [PATCH next] ice: Fix signedness bug in ice_init_interrupt_scheme()  
+> 
+> I believe it should be "PATCH net" with
+> 
+> > If pci_alloc_irq_vectors() can't allocate the minimum number of vectors
+> > then it returns -ENOSPC so there is no need to check for that in the
+> > caller.  In fact, because pf->msix.min is an unsigned int, it means that
+> > any negative error codes are type promoted to high positive values and
+> > treated as success.  So here the "return -ENOMEM;" is unreachable code.
+> > Check for negatives instead.
+> > 
+> > Fixes: 79d97b8cf9a8 ("ice: remove splitting MSI-X between features")  
+> 
+> a 'Stable:' tag here.
 
-+1
-
-> I'd rather not, having a macro to do 'info->options' doesn't help code
-> readability IMHO.
-
-It'd avoid having to explicitly cast the types everywhere, too.
+Bug only exists in net-next if it comes from commit under Fixes.
+So I think the patch is good as is.
 
