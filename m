@@ -1,112 +1,129 @@
-Return-Path: <netdev+bounces-165927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C856BA33BCB
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:58:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C6A7A33BCE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B213A5306
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6F8E188C1C0
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20118210F45;
-	Thu, 13 Feb 2025 09:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="M2WPbCU3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0230B210F4D;
+	Thu, 13 Feb 2025 09:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27E20DD5C;
-	Thu, 13 Feb 2025 09:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DFA20DD5C;
+	Thu, 13 Feb 2025 09:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440663; cv=none; b=ooWWomGCJG88wv/X1JkIAGhZvJAGoxMrN+TSVaeA4p//PLPNPq5hm7+ZHaqwypxTUMwoOf/JHsHdK3XoFly8boL3o8QwaRlnsLKd9SDuD2wqV/yf013mWU9pDOcCgVgjK/HmFfE8tgbHpJkDhMethKWoTJIWUgPpCudYrsbR+9s=
+	t=1739440704; cv=none; b=VMX5ymtqBKkcGSoZ4Hc/R5tWU2bPR42qDcTky8Ha1stDiraTsHub8vpZQ9t/HYx98Wu/CU84Y8RHB3MjeIdJwkL/wnBDgr7mIYb+jXhg/nlPUFYZ2R4m5C8vWExKjAJH6SDLUJxTH9WYiXAL2Qt0xT1TcKLAclB3uC3ue/Fzzzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440663; c=relaxed/simple;
-	bh=1CWo1aSTUjGr3FP97hGZrr4McNp8udH6R08vZAVU5eM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvpLCNGZdIpayWRx04cE9OVu2X+u1Ms5A0jcqRQSQ8mW+QKLh7O0wjuDTahYrBBU3n5gqrl43J6ObU3BTvfF8aGr14Sco3bxb8OgR5OV3169n2w4EB4mSCCZzYEjFIp0uTm15W9MyLQ/Ni7IZMqPqcGNgrZc84lkwJKoyAjRqhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=M2WPbCU3; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 09F6244284;
-	Thu, 13 Feb 2025 09:57:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739440658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wCrNDPpSmr0ghjZQHln3wrW9wdkB0T1+1LgU4/+ksGM=;
-	b=M2WPbCU3Ms+NJaOcFhYVZLVfK0a36bi/qXyx2rTssWCj/fOmmXL4sbCZz+wjRTIGub5h2f
-	FyV4oEb73P7f6eiGZAllSvelM5XC20sDXUcK04NLaYvIgTFhajq87hSEPqKwFgk2QnfjXL
-	IG3ovhR8GO5T5SEBXrsGQDzvjtGJ/6xc247bBIky9fKPeZ5+PeCltHqdT/mIrSv9HmR9+A
-	51xpZ9tBkO+0jfc1hA6zgANbs8ZRpRfxIlRQVcmtzQapYd9GYZab5yKaqL2jQtApf5IzNy
-	Hn7nMYU0qr3olfg+nqaIbLFjPLS/7kZktfzC+6V6Be+J/aa3nPccWdi2cIp98w==
-Date: Thu, 13 Feb 2025 10:57:35 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 00/13] Introduce an ethernet port
- representation
-Message-ID: <20250213105735.748b5d1d@fedora.home>
-In-Reply-To: <20250212194808.GA130810-robh@kernel.org>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
-	<20250212194808.GA130810-robh@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1739440704; c=relaxed/simple;
+	bh=sIMf72bZ70VvfcEOfaZNDsy8vIAaeXVF9ry/WOwLlbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fvCaVq6MyfOQ5sqQt0zi8/ThVC8vv2VMtEV415cLN2cmZAIrNPytF9AyDMtg7PieihHkS9y2qI4vPRX7RSoMxhOzQhcSbIiRpIkXIAqVvq1lk3JpaOwU/KEtRq1PC01D4biJznlF/TMimD7nqMpEcfB2q5HXAhE7dHIQUA6dRaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5deb1266031so1105556a12.2;
+        Thu, 13 Feb 2025 01:58:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739440701; x=1740045501;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q5ZamwJ0Kx0KvBpg8RsfWbLjBh13gTrQJTmNCAequ2U=;
+        b=VeriCGpBCFxtt93aPBFZgSZOQb6UkBsOEYETPovaIJb9CRHE5E9X+IS4TIkMUbR8D0
+         VA1PcCvKaPMwpWqC60iuW1iyMbf13EEF9gno0af0/mb87/T+gpRX1xNEtTEfKjDdVZ9q
+         QtfuDxHHLewN0VSOD2GWJ93JSDu/UGYMO1PAfyMBXvSVYqXs/fNfGEg0d1mP14SCoeSe
+         0DI3dg5LEdxB1AnfUcRCpxFz9lo/b5JBN4UBvTi9d50Xd9YNIF3rSyPy18Yg9oGFOJc0
+         ///wv6Uopol1951Jbwe3EzQd9hb+66sBzUj3DIESsnZg+FysobStkwHE48h/NH8KBmMM
+         tAvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUupDawC/RWKAa/qphxN/STBOZLyvyHEpPmO6edqj6aG6qxPQfTXQHp2+QXcgU8lCzvdwpKrhWfIcRP@vger.kernel.org, AJvYcCVDNki0bQ1I79/KKwFujjmWaXDN8q6aUUU2nNsdDCQQg4cwAvhtylHZ0C14BeDDNxZYEy7OGiM7KjvawYc=@vger.kernel.org, AJvYcCVELeNE9yMpwamnczQ29uXwjp79yQGlDI50gHgFaayDlRaxeWtwcq76bt6tL8Ge+uWnoH9wmfDI@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCLLTbR7Pa5W16F0w1pLhQXq6WZssIMnOt25W7Y4WfyMVJy4lw
+	+PUKI/ClI5pb3tCREOyaUHGRTpRfiB4PY8/YilGMRstG/JcZYtPL
+X-Gm-Gg: ASbGncuCJasNSuszN+284LRxVFYJ5XV8ECLdTze0ZS7lIsV7JZn8VosmRGxXMCZ3r5b
+	A1ce1Tx+FED+7gl+peLdQY0maTfpuXcsuIhHSQV4bcrk8hhxgi93XhbDb9N7HVHpk1dPYiqTMId
+	8hkpC0/Y3pxHg3DU4QNIIihTBG9F5tRjQCT9YA1KNScxnxulCR36ct1huY9J7Y2vDm2wkzXvvYi
+	b1fH8/0yQ5PWbfUOcTIXJe8nQysfIVgbJ29oKtXzpLMafzfisTUpgpqgZAX0E1jQ93Km6VC1NWF
+	ga/oj8U=
+X-Google-Smtp-Source: AGHT+IHijeTw/BOivI6gfk1oV8DxhJZtMmLYZDv3eGifbdwjoZKdiicg99ky3m/GQj2Np2THLNDk/A==
+X-Received: by 2002:a17:906:478a:b0:ab7:e234:526b with SMTP id a640c23a62f3a-ab7f334ac6cmr723688766b.3.1739440700615;
+        Thu, 13 Feb 2025 01:58:20 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:72::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53231ddasm98891566b.36.2025.02.13.01.58.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 01:58:20 -0800 (PST)
+Date: Thu, 13 Feb 2025 01:58:17 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: Assert proper context while calling
+ napi_schedule()
+Message-ID: <20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
+References: <20250212174329.53793-1-frederic@kernel.org>
+ <20250212174329.53793-2-frederic@kernel.org>
+ <20250212194820.059dac6f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegieegjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpedugfelledvtdffvdekudeijeduueevvdevffehudehvdeuudetheekheeigfetheenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdekpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvs
- ehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212194820.059dac6f@kernel.org>
 
-Hello Rob,
-
-On Wed, 12 Feb 2025 13:48:08 -0600
-Rob Herring <robh@kernel.org> wrote:
-
-> On Fri, Feb 07, 2025 at 11:36:19PM +0100, Maxime Chevallier wrote:
-> > Hello everyone,
+On Wed, Feb 12, 2025 at 07:48:20PM -0800, Jakub Kicinski wrote:
+> On Wed, 12 Feb 2025 18:43:28 +0100 Frederic Weisbecker wrote:
+> > napi_schedule() is expected to be called either:
 > > 
-> > This series follows the 2 RFC that were sent a few weeks ago :
-> > RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
-> > RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/  
+> > * From an interrupt, where raised softirqs are handled on IRQ exit
+> > 
+> > * From a softirq disabled section, where raised softirqs are handled on
+> >   the next call to local_bh_enable().
+> > 
+> > * From a softirq handler, where raised softirqs are handled on the next
+> >   round in do_softirq(), or further deferred to a dedicated kthread.
+> > 
+> > Other bare tasks context may end up ignoring the raised NET_RX vector
+> > until the next random softirq handling opportunity, which may not
+> > happen before a while if the CPU goes idle afterwards with the tick
+> > stopped.
+> > 
+> > Report inappropriate calling contexts when neither of the three above
+> > conditions are met.
 > 
-> That makes this series v3. RFC is not a version, but a condition the 
-> patches are in (not ready to merge).
+> Looks like netcons is hitting this warning in netdevsim:
+> 
+> [   16.063196][  T219]  nsim_start_xmit+0x4e0/0x6f0 [netdevsim]
+> [   16.063219][  T219]  ? netif_skb_features+0x23e/0xa80
+> [   16.063237][  T219]  netpoll_start_xmit+0x3c3/0x670
+> [   16.063258][  T219]  __netpoll_send_skb+0x3e9/0x800
+> [   16.063287][  T219]  netpoll_send_skb+0x2a/0xa0
+> [   16.063298][  T219]  send_ext_msg_udp+0x286/0x350 [netconsole]
+> [   16.063325][  T219]  write_ext_msg+0x1c6/0x230 [netconsole]
+> [   16.063346][  T219]  console_emit_next_record+0x20d/0x430
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/990261/7-netcons-basic-sh/stderr
+> 
+> We gotta fix that first.
 
-Fair enough, next iteration will be V4 then :)
+Thanks Jakub,
 
-Thanks,
+I understand that it will be fixed by this patchset, right?
 
-Maxime
-
-> Rob
-
+https://lore.kernel.org/all/20250212-netdevsim-v1-1-20ece94daae8@debian.org/
 
