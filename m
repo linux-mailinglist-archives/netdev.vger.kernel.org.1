@@ -1,169 +1,127 @@
-Return-Path: <netdev+bounces-166052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D174DA341F9
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:29:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECCB9A341FC
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BDB1188ECDB
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:25:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 731771882710
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA21281360;
-	Thu, 13 Feb 2025 14:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4658D281362;
+	Thu, 13 Feb 2025 14:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFhExKZI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NWbFa13t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61256281345;
-	Thu, 13 Feb 2025 14:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD43D281343;
+	Thu, 13 Feb 2025 14:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739456721; cv=none; b=WNSO2/sa1vpP0BJnarIjuRURpqO4azENC4MtGAE7CWk9nGV0jgxJObuwuke6dEItBHRvAtvPMgVwM6Uu2VPy9ffsaFa9EQ3uYwcSccEMvzdJ+GjW8geuFLvPHFIrTAjn3O7G48V4cTnjLOR2skngjoAET/9IUKPHv2YS6Ny+R0s=
+	t=1739456780; cv=none; b=LkiBwk0kvQ/zCJqQKLUoF7rwFbwH/6eTialtmxvFNENpZajVr5uDimKVfpLKfe6k3DkZglHFqK25o2QupoWgNExU3cMUkKyv+LqZ7qda4iQ8ge7JKFWu1cN7DmafDelwodOrqM9dyeewIb2LDkqQmOH2h5ZYRYPDgv+ltaQJqpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739456721; c=relaxed/simple;
-	bh=6E5SX+fs6O60hhZe8Qygi+YphymUSg0AYRAGUisCLi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Krx7YxibmvMVJAyLvDIoBfKu/RK2Vgt8Vxg5+ejFU/hXtywg+EFE+cDEU96IB8ajhGV0wAlqiVkppEfJh2Lpo22T2w47/UMpi3Lozc/pXC94ILMQSYDSABrJ3X7f3sTyj/6POAzWJ61bimtiFonfw/RDnjD+tLAsrOFrh0VNk4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFhExKZI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF21AC4CED1;
-	Thu, 13 Feb 2025 14:25:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739456720;
-	bh=6E5SX+fs6O60hhZe8Qygi+YphymUSg0AYRAGUisCLi0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lFhExKZIhZbBJVwAlMefC/LreHiyt9BVV3SZnS/xtDnc3z2nJHlVRJoPxAUwwBhkG
-	 2S/p191EG+mv/BKb3a88miTfVwyr2WAo6nFICJekdDxwEvIIJauUu749YRNP88f1lH
-	 GVlOKy8eEy0PMLdk644kzFOdiIVDT1gf5thE1zih8G6LhaSpPDvvJoK1aIPoHGZZnB
-	 I3LeyMXF4EkoZj+E3TbhJPECkBlkF0CeRAiqeQRyvoF7oYNhUfWwgUkStK56/ufZGn
-	 jsxHGKTz2IxVhrFJpVf/5RzMcHT4xGYmWvbVYbf+4pievC4dqR8arJ28Af4HolIT7q
-	 dTtLq0c9D4rrQ==
-Date: Thu, 13 Feb 2025 16:25:16 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
-	Andy Gospodarek <gospo@broadcom.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leonid Bloch <lbloch@nvidia.com>,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v4 07/10] fwctl/mlx5: Support for communicating with mlx5
- fw
-Message-ID: <20250213142516.GM17863@unreal>
-References: <7-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
- <daca71bd-547d-406c-83d8-05f8508703b2@intel.com>
+	s=arc-20240116; t=1739456780; c=relaxed/simple;
+	bh=bsl36szvy9nKL3yIEKuviz5lJs1Th85tPgkSBBzwg4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pLVf6hMfW/hUns8/dHLXMxpfaD4wGQOxj1rtfQPdh7Hj0CsQkWoj5L659NaxmT2JghnofYbOF3O4fa7eJ93T2KS0sM4N+mWxsRDABLRDfVdDb4Brsojbeff+LVbfScIR3kNBF3KCTmlgNxrNW91KyHYQFED0xIvS6vw2IQDu3NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NWbFa13t; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c056512facso12372385a.2;
+        Thu, 13 Feb 2025 06:26:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739456776; x=1740061576; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5yV3OUmxBEMt+DI9TBgHjK6W2vVBWBY0CKoBLi+dPpw=;
+        b=NWbFa13tWPkZOdvDUUzSC5Zi7J4z9UEfBkaNU2OzTJmy3t+z0no91v6XG1pfkuJwy7
+         TzF5VXFwXH19JsLODvPIAeE8Bsop8/dwI4KMlk/9gcXaoog8hd1/zjC+eN542h+etijq
+         JtstOxlXthB73TYh58wqUPRUoDla0P3SsOPuvAhW4iS1lvCaw+RtPX3RAeYDrsFbCiEH
+         60M3vzq97cVW6H4enHbr6rV6pQjm8cl/LReg/aJ/uQNDieYxJJUkdU7tDfoHsjv6vvuu
+         Ft83/XN/QVArTZsyv45Ress5RH9b8cFrY9/Dlajv6yZ/l5ew6b2K4HERVPiYY252bXCs
+         3K1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739456776; x=1740061576;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5yV3OUmxBEMt+DI9TBgHjK6W2vVBWBY0CKoBLi+dPpw=;
+        b=gv4GGCX25wVT/0BFKi7b1z6szN1W5iR0rtuUCSTBMru5nB22RmErutk8J3Sn51J/Bk
+         nMFXtP2dxrrA7dZ8RfFotVEw6LZ5UEdPNut4qiipES2P/60ibzIf8OaZQhasCyt925QG
+         SPY3+liENpcfq6J7Re2SWG2gcYT7y/jwXzDpUCpNTEHOg9KGyKoRFbt8TsHKhchNhTsf
+         XmPn7KK/mB0IjX1Ir5hySGYRd/0IUQcCHP3xpWnU84fI1cj8X13obLX1zWRzvPsgp/R0
+         jRmcZeRogmbRkGVGY4dY5OPrLVUZNPM0S9iWMeIQlvcsGQZQTi9EadZBxu0eiynH+wu2
+         Aw5w==
+X-Forwarded-Encrypted: i=1; AJvYcCU7tWVbrvJYpI+v7rj5fqtq7BW9kT+MgdLll+g6i7B/XzrtEgxZKFlAx7O5xYnvkUwo9FNqXpQIExKffoE/NNBn@vger.kernel.org, AJvYcCUNg0rDY5VMvkYHNx/S/FworKHqzDcub7Irt6k4D7uY8QawWKXICY7a8IKRZMbFIndxrHf67SorIjkDW9s=@vger.kernel.org, AJvYcCXMh2FaaDKnuLkGlf0UsRKUJADmx7aW0yWPPjY5zjwgTYKvvNB86v6/Dy/TT/8Vt5NjSks5pEE4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzri1d6n0+hsRrVR2izv7nACxsCabxzgn6xhLg6fITQkItCVWYu
+	/8CDcdjvJyQRMm4nbJ6jhuwWYdHS6hmt2rgt0VPjDG6eXG0i5j1x
+X-Gm-Gg: ASbGncuf7lNtZBXXyDq7FV/khlIGh4+vcRA+WNg70x7XN8dWiR/yXjoyo6a/aipB6Mu
+	kFJicLM/cY3B3T556Zpq7MRELV1ZlIlX4q9x904Qa3FeSI2LZcxyzzpxSEOeaFf+0bQcln4x4N6
+	8I8pbX4SzVE8yaP3tMOfmshE4CzwaZwu/b+L5Op5U1E5PHUZerIngsOnu0LCT8IFonaJfuxXqgD
+	YVNyA++PFqvFXxX5gS1Dkulc6BSULzvsqQ1EI4plWDYe+vKAbVo3k/08WwkHSyFGJqGhLUSr6rQ
+	hVzsVG6/2ypa5DafWO/L85l9WJ5kkpS4JUqQGXWkX+muEZD2rsSN3mZO+XTEHMReKRs=
+X-Google-Smtp-Source: AGHT+IE6DYJdHVlRXn35uoxkVbWsFnt3UaddizuTuydiIll1KUpO1LGzexLI9ylAX1yTeI/rRXD55g==
+X-Received: by 2002:a05:620a:1a83:b0:7c0:7aff:f0b3 with SMTP id af79cd13be357-7c07afff237mr175231285a.14.1739456776423;
+        Thu, 13 Feb 2025 06:26:16 -0800 (PST)
+Received: from [192.168.1.201] (pool-108-28-192-105.washdc.fios.verizon.net. [108.28.192.105])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c5f3a4dsm94830685a.2.2025.02.13.06.26.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 06:26:16 -0800 (PST)
+Message-ID: <2dc054c7-c596-b283-b26a-86c52e48efe0@gmail.com>
+Date: Thu, 13 Feb 2025 09:26:14 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <daca71bd-547d-406c-83d8-05f8508703b2@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH net-next v19 00/26] Introducing OpenVPN Data Channel
+ Offload
+Content-Language: en-US
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ steffen.klassert@secunet.com, antony.antony@secunet.com,
+ willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+References: <20250211-b4-ovpn-v19-0-86d5daf2a47a@openvpn.net>
+From: Sean Anderson <seanga2@gmail.com>
+In-Reply-To: <20250211-b4-ovpn-v19-0-86d5daf2a47a@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 13, 2025 at 02:19:38PM +0100, Przemek Kitszel wrote:
-> On 2/7/25 01:13, Jason Gunthorpe wrote:
-> > From: Saeed Mahameed <saeedm@nvidia.com>
-> 
-> In part this is a general feedback for the subsystem too.
-> 
-> > +FWCTL MLX5 DRIVER
-> 
-> I don't like this design.
-> That way each and every real driver would need to make another one to
-> just use fwctl.
-> 
-> Why not just require the real driver to call fwctl_register(opsstruct),
-> with the required .validate, .do_cmd, etc commands backed there?
-> There will be much less scaffolding.
+Hi Antonio,
 
-We invented auxiliary_bus to actually reduce scaffolding. The auxiliary
-devices allow split of complex, multi-subsystem devices without need
-to create hard binding of their drivers.
-
-It allows for every subsystem to have its own independent driver, which
-can be loaded separately, something that is not possible with your idea.
-
+On 2/10/25 19:39, Antonio Quartulli wrote:
+> NOTE: TCP tests are still showing the following warning while running
+> iperf.
+> I have analysed the report several times, but it definitely looks like
+> a false positive to me, so nothing to worry about.
 > 
-> Or the intention is to have this little driver replaced by OOT one,
-> but keep the real (say networking) driver as-is from intree?
-
-No, please read the purpose here drivers/base/auxiliary.c:
-
-....
-   23  * In some subsystems, the functionality of the core device (PCI/ACPI/other) is
-   24  * too complex for a single device to be managed by a monolithic driver (e.g.
-   25  * Sound Open Firmware), multiple devices might implement a common intersection
-   26  * of functionality (e.g. NICs + RDMA), or a driver may want to export an
-   27  * interface for another subsystem to drive (e.g. SIOV Physical Function export
-   28  * Virtual Function management).  A split of the functionality into child-
-   29  * devices representing sub-domains of functionality makes it possible to
-   30  * compartmentalize, layer, and distribute domain-specific concerns via a Linux
-   31  * device-driver model.
-....
-
+> Basically the lockdep engine gets confused thinking that we are
+> acquiring the lock twice on the same sock, but actually:
+> 1) the kernel is first locking the 'iperf' (user) TCP socket;
+> 2) ovpn is later locking the underlying TCP trasport socket.
 > 
-> > +++ b/drivers/fwctl/mlx5/main.c
-> > @@ -0,0 +1,340 @@
-> > +// SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0
-> > +/*
-> > + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> 
-> -2025
-> 
-> > + */
-> > +#include <linux/fwctl.h>
-> > +#include <linux/auxiliary_bus.h>
-> > +#include <linux/mlx5/device.h>
-> > +#include <linux/mlx5/driver.h>
-> 
-> this breaks abstraction (at least your headers are in nice place, but
-> this is rather uncommon, typical solution is to have them backed inside
-> the driver directory) - the two drivers will be tightly coupled
+> So there is NO risk of deadlock (and indeed nothing hangs), but I
+> couldn't find a way to make the warning go away.
 
-FWCTL driver is connected to auxiliary device which is managed by some
-other driver core (in our case mlx5_core). It is coupled by design.
+I think you can use a "nested" lock to avoid this. See e.g. commit
+86a41ea9fd79 ("l2tp: fix lockdep splat") for an example.
 
-> 
-> > +module_auxiliary_driver(mlx5ctl_driver);
-> > +
-> > +MODULE_IMPORT_NS("FWCTL");
-> > +MODULE_DESCRIPTION("mlx5 ConnectX fwctl driver");
-> > +MODULE_AUTHOR("Saeed Mahameed <saeedm@nvidia.com>");
-> > +MODULE_LICENSE("Dual BSD/GPL");
-> > diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
-> > index 7a21f2f011917a..0790b8291ee1bd 100644
-> > --- a/include/uapi/fwctl/fwctl.h
-> > +++ b/include/uapi/fwctl/fwctl.h
-> > @@ -42,6 +42,7 @@ enum {
-> >   enum fwctl_device_type {
-> >   	FWCTL_DEVICE_TYPE_ERROR = 0,
-> > +	FWCTL_DEVICE_TYPE_MLX5 = 1,
-> 
-> is that for fwctl info to be able to properly report what device user
-> has asked ioctl on? Would be great to embed 32byte long cstring of
-> DRIVER_NAME, to don't need each and every device to come to you and
-> ask for inclusion, that would also resolve problem of conflicting IDs
-> (my-driver-id prior-to and after upstreaming)
+--Sean
 
-Yes, we do want to make sure that FWCTL is used for upstream code and
-don't want to open it for any out-of-tree drivers, which wants to use
-this interface but didn't send it to upstream.
-
-Thanks
-
-> 
-> 
+[1] https://www.kernel.org/doc/html/latest/locking/lockdep-design.html#exception-nested-data-dependencies-leading-to-nested-locking
 
