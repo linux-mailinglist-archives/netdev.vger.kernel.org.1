@@ -1,178 +1,169 @@
-Return-Path: <netdev+bounces-166066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4F7A34539
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:13:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D174DA341F9
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA2AA1730AE
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:05:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BDB1188ECDB
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 14:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B3718DF6D;
-	Thu, 13 Feb 2025 15:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA21281360;
+	Thu, 13 Feb 2025 14:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Ybw808XE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFhExKZI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C815B189BAF;
-	Thu, 13 Feb 2025 15:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61256281345;
+	Thu, 13 Feb 2025 14:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739458960; cv=none; b=Dx8eQ7ImfbrS2No1suJ/47JnhZxKJ0As+UqoalQ2qn4ms/81fidMkPik+4IR9YVcSLOeSYhQYceLoOrYJIOymP0YUEMl8BAa1uZ/w+UPbdGgxAcNF1joD1ysFpGZfBUqrRT79TvMTxUoxHX07LuX6nishhiQ+auVwQVdUQu8Krg=
+	t=1739456721; cv=none; b=WNSO2/sa1vpP0BJnarIjuRURpqO4azENC4MtGAE7CWk9nGV0jgxJObuwuke6dEItBHRvAtvPMgVwM6Uu2VPy9ffsaFa9EQ3uYwcSccEMvzdJ+GjW8geuFLvPHFIrTAjn3O7G48V4cTnjLOR2skngjoAET/9IUKPHv2YS6Ny+R0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739458960; c=relaxed/simple;
-	bh=EmxVxIPGz4HOpbWHwjiZIVlEniWaE2rYqEUYvmaCOgw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RMEP/Bc7j5Y4jmUKqSF3rdZ/aHz5hwPqgiM7RZxT4/lkt6w8wt9yLG2LW8MuHuD+MrnM85BjwreUAaM01fAVeKa/XntSgZeeObfHL+gNDVKc0V++DgPp3zxCRqGWycrEqeptu8zv0NzrRmd5BSigdZXZ1AhGNbJQbuZPhpn0WzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Ybw808XE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6D7C4CED1;
-	Thu, 13 Feb 2025 15:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739458960;
-	bh=EmxVxIPGz4HOpbWHwjiZIVlEniWaE2rYqEUYvmaCOgw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ybw808XEkyVkLkR6GqjkQ1YN8JI0oL+9XJz+SjESHXiIATMBwBosoH43bNRAQ2hPL
-	 AjyHa0SmK9n2LKdR2pvzZRSjxCT56Q56wWiyBaP6wNvlOeipY89dX8Xz3JHzlnY8ce
-	 Z3DjDdTDesyMoWDmytwmEEmQtmnRVuOrH1/E8mNo=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.13 127/443] rxrpc: Fix the rxrpc_connection attend queue handling
-Date: Thu, 13 Feb 2025 15:24:52 +0100
-Message-ID: <20250213142445.510181582@linuxfoundation.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250213142440.609878115@linuxfoundation.org>
-References: <20250213142440.609878115@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	s=arc-20240116; t=1739456721; c=relaxed/simple;
+	bh=6E5SX+fs6O60hhZe8Qygi+YphymUSg0AYRAGUisCLi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Krx7YxibmvMVJAyLvDIoBfKu/RK2Vgt8Vxg5+ejFU/hXtywg+EFE+cDEU96IB8ajhGV0wAlqiVkppEfJh2Lpo22T2w47/UMpi3Lozc/pXC94ILMQSYDSABrJ3X7f3sTyj/6POAzWJ61bimtiFonfw/RDnjD+tLAsrOFrh0VNk4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFhExKZI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF21AC4CED1;
+	Thu, 13 Feb 2025 14:25:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739456720;
+	bh=6E5SX+fs6O60hhZe8Qygi+YphymUSg0AYRAGUisCLi0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lFhExKZIhZbBJVwAlMefC/LreHiyt9BVV3SZnS/xtDnc3z2nJHlVRJoPxAUwwBhkG
+	 2S/p191EG+mv/BKb3a88miTfVwyr2WAo6nFICJekdDxwEvIIJauUu749YRNP88f1lH
+	 GVlOKy8eEy0PMLdk644kzFOdiIVDT1gf5thE1zih8G6LhaSpPDvvJoK1aIPoHGZZnB
+	 I3LeyMXF4EkoZj+E3TbhJPECkBlkF0CeRAiqeQRyvoF7oYNhUfWwgUkStK56/ufZGn
+	 jsxHGKTz2IxVhrFJpVf/5RzMcHT4xGYmWvbVYbf+4pievC4dqR8arJ28Af4HolIT7q
+	 dTtLq0c9D4rrQ==
+Date: Thu, 13 Feb 2025 16:25:16 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leonid Bloch <lbloch@nvidia.com>,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	"Nelson, Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v4 07/10] fwctl/mlx5: Support for communicating with mlx5
+ fw
+Message-ID: <20250213142516.GM17863@unreal>
+References: <7-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <daca71bd-547d-406c-83d8-05f8508703b2@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <daca71bd-547d-406c-83d8-05f8508703b2@intel.com>
 
-6.13-stable review patch.  If anyone has any objections, please let me know.
+On Thu, Feb 13, 2025 at 02:19:38PM +0100, Przemek Kitszel wrote:
+> On 2/7/25 01:13, Jason Gunthorpe wrote:
+> > From: Saeed Mahameed <saeedm@nvidia.com>
+> 
+> In part this is a general feedback for the subsystem too.
+> 
+> > +FWCTL MLX5 DRIVER
+> 
+> I don't like this design.
+> That way each and every real driver would need to make another one to
+> just use fwctl.
+> 
+> Why not just require the real driver to call fwctl_register(opsstruct),
+> with the required .validate, .do_cmd, etc commands backed there?
+> There will be much less scaffolding.
 
-------------------
+We invented auxiliary_bus to actually reduce scaffolding. The auxiliary
+devices allow split of complex, multi-subsystem devices without need
+to create hard binding of their drivers.
 
-From: David Howells <dhowells@redhat.com>
+It allows for every subsystem to have its own independent driver, which
+can be loaded separately, something that is not possible with your idea.
 
-[ Upstream commit 4241a702e0d0c2ca9364cfac08dbf134264962de ]
+> 
+> Or the intention is to have this little driver replaced by OOT one,
+> but keep the real (say networking) driver as-is from intree?
 
-The rxrpc_connection attend queue is never used because conn::attend_link
-is never initialised and so is always NULL'd out and thus always appears to
-be busy.  This requires the following fix:
+No, please read the purpose here drivers/base/auxiliary.c:
 
- (1) Fix this the attend queue problem by initialising conn::attend_link.
+....
+   23  * In some subsystems, the functionality of the core device (PCI/ACPI/other) is
+   24  * too complex for a single device to be managed by a monolithic driver (e.g.
+   25  * Sound Open Firmware), multiple devices might implement a common intersection
+   26  * of functionality (e.g. NICs + RDMA), or a driver may want to export an
+   27  * interface for another subsystem to drive (e.g. SIOV Physical Function export
+   28  * Virtual Function management).  A split of the functionality into child-
+   29  * devices representing sub-domains of functionality makes it possible to
+   30  * compartmentalize, layer, and distribute domain-specific concerns via a Linux
+   31  * device-driver model.
+....
 
-And, consequently, two further fixes for things masked by the above bug:
+> 
+> > +++ b/drivers/fwctl/mlx5/main.c
+> > @@ -0,0 +1,340 @@
+> > +// SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0
+> > +/*
+> > + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
+> 
+> -2025
+> 
+> > + */
+> > +#include <linux/fwctl.h>
+> > +#include <linux/auxiliary_bus.h>
+> > +#include <linux/mlx5/device.h>
+> > +#include <linux/mlx5/driver.h>
+> 
+> this breaks abstraction (at least your headers are in nice place, but
+> this is rather uncommon, typical solution is to have them backed inside
+> the driver directory) - the two drivers will be tightly coupled
 
- (2) Fix rxrpc_input_conn_event() to handle being invoked with a NULL
-     sk_buff pointer - something that can now happen with the above change.
+FWCTL driver is connected to auxiliary device which is managed by some
+other driver core (in our case mlx5_core). It is coupled by design.
 
- (3) Fix the RXRPC_SKB_MARK_SERVICE_CONN_SECURED message to carry a pointer
-     to the connection and a ref on it.
+> 
+> > +module_auxiliary_driver(mlx5ctl_driver);
+> > +
+> > +MODULE_IMPORT_NS("FWCTL");
+> > +MODULE_DESCRIPTION("mlx5 ConnectX fwctl driver");
+> > +MODULE_AUTHOR("Saeed Mahameed <saeedm@nvidia.com>");
+> > +MODULE_LICENSE("Dual BSD/GPL");
+> > diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> > index 7a21f2f011917a..0790b8291ee1bd 100644
+> > --- a/include/uapi/fwctl/fwctl.h
+> > +++ b/include/uapi/fwctl/fwctl.h
+> > @@ -42,6 +42,7 @@ enum {
+> >   enum fwctl_device_type {
+> >   	FWCTL_DEVICE_TYPE_ERROR = 0,
+> > +	FWCTL_DEVICE_TYPE_MLX5 = 1,
+> 
+> is that for fwctl info to be able to properly report what device user
+> has asked ioctl on? Would be great to embed 32byte long cstring of
+> DRIVER_NAME, to don't need each and every device to come to you and
+> ask for inclusion, that would also resolve problem of conflicting IDs
+> (my-driver-id prior-to and after upstreaming)
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-Fixes: f2cce89a074e ("rxrpc: Implement a mechanism to send an event notification to a connection")
-Link: https://patch.msgid.link/20250203110307.7265-3-dhowells@redhat.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- include/trace/events/rxrpc.h |  1 +
- net/rxrpc/conn_event.c       | 17 ++++++++++-------
- net/rxrpc/conn_object.c      |  1 +
- 3 files changed, 12 insertions(+), 7 deletions(-)
+Yes, we do want to make sure that FWCTL is used for upstream code and
+don't want to open it for any out-of-tree drivers, which wants to use
+this interface but didn't send it to upstream.
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 27c23873c8811..ee4030f2e99da 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -218,6 +218,7 @@
- 	EM(rxrpc_conn_get_conn_input,		"GET inp-conn") \
- 	EM(rxrpc_conn_get_idle,			"GET idle    ") \
- 	EM(rxrpc_conn_get_poke_abort,		"GET pk-abort") \
-+	EM(rxrpc_conn_get_poke_secured,		"GET secured ") \
- 	EM(rxrpc_conn_get_poke_timer,		"GET poke    ") \
- 	EM(rxrpc_conn_get_service_conn,		"GET svc-conn") \
- 	EM(rxrpc_conn_new_client,		"NEW client  ") \
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index 2a1396cd892f3..ca5e694ab858b 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -266,6 +266,7 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
- 			 * we've already received the packet, put it on the
- 			 * front of the queue.
- 			 */
-+			sp->conn = rxrpc_get_connection(conn, rxrpc_conn_get_poke_secured);
- 			skb->mark = RXRPC_SKB_MARK_SERVICE_CONN_SECURED;
- 			rxrpc_get_skb(skb, rxrpc_skb_get_conn_secured);
- 			skb_queue_head(&conn->local->rx_queue, skb);
-@@ -431,14 +432,16 @@ void rxrpc_input_conn_event(struct rxrpc_connection *conn, struct sk_buff *skb)
- 	if (test_and_clear_bit(RXRPC_CONN_EV_ABORT_CALLS, &conn->events))
- 		rxrpc_abort_calls(conn);
- 
--	switch (skb->mark) {
--	case RXRPC_SKB_MARK_SERVICE_CONN_SECURED:
--		if (conn->state != RXRPC_CONN_SERVICE)
--			break;
-+	if (skb) {
-+		switch (skb->mark) {
-+		case RXRPC_SKB_MARK_SERVICE_CONN_SECURED:
-+			if (conn->state != RXRPC_CONN_SERVICE)
-+				break;
- 
--		for (loop = 0; loop < RXRPC_MAXCALLS; loop++)
--			rxrpc_call_is_secure(conn->channels[loop].call);
--		break;
-+			for (loop = 0; loop < RXRPC_MAXCALLS; loop++)
-+				rxrpc_call_is_secure(conn->channels[loop].call);
-+			break;
-+		}
- 	}
- 
- 	/* Process delayed ACKs whose time has come. */
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 694c4df7a1a31..88b4aab5a0913 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -67,6 +67,7 @@ struct rxrpc_connection *rxrpc_alloc_connection(struct rxrpc_net *rxnet,
- 		INIT_WORK(&conn->destructor, rxrpc_clean_up_connection);
- 		INIT_LIST_HEAD(&conn->proc_link);
- 		INIT_LIST_HEAD(&conn->link);
-+		INIT_LIST_HEAD(&conn->attend_link);
- 		mutex_init(&conn->security_lock);
- 		mutex_init(&conn->tx_data_alloc_lock);
- 		skb_queue_head_init(&conn->rx_queue);
--- 
-2.39.5
+Thanks
 
-
-
+> 
+> 
 
