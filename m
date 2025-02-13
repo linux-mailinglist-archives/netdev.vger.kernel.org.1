@@ -1,131 +1,132 @@
-Return-Path: <netdev+bounces-165932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69FD6A33BF7
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:06:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C57A33C22
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 11:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E92F8188CD3B
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CBA018827EE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA812135B6;
-	Thu, 13 Feb 2025 10:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01896212B2D;
+	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="TEZxhGFy";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="XPYHNgOn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QduZ+V/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC72135A6;
-	Thu, 13 Feb 2025 10:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39B4211460;
+	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441125; cv=none; b=EwMPZyCkZI4VosWFng/nkZ4X7GefUjHUdNihp/xQoCeFzy7pIJBez1lmiCVaoF+1l0mQlcTWxDhYwLZFwzQKeaBpxv5K+BB8gaIbkIwX46uxeYELHrMOfR8jMhsqmQD5mJx1YilV46kTjwr3lJxSDiJ9dO4Yw3Jc11pb7Rf00jE=
+	t=1739441423; cv=none; b=O2cLktU/ypQMSZvBxBnQ+UznrWnMD7k6ib5cg8eI3QZpBzMxpJPY5vTryX1mwpJEqArDgodk2itubV5OdNfaKN1RBxQu7iKvu8ra27fhAJUZrqYpZ5Lcdf7ohe3dqFKmPvlHYlV4U4cpli78sRkH1VmgCKScLFCOUR20GplWTtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441125; c=relaxed/simple;
-	bh=WmsomkJ100p7pSf7xL38z54aaFNpB7l8QlDbE8kCpLQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uN+jVFIgK5DPCwQE70u/T/faJliwKKt2P+/J/w0bqhOkfAPt7atPyJc9bfzDkze9Ws+qUqw4Ezm12k/TFajuWI0r5xXjse/TVpfifUGjXUqNijUWwfRiguggPiVbI/UWOr9Nfj6UQgHDn01PzIUaDWN140RbhCUIck+MQISz5Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=TEZxhGFy; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=XPYHNgOn; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 442D66056C; Thu, 13 Feb 2025 11:05:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1739441116;
-	bh=0FjhRGzxaA/4a6gzXP9+0Iz4nUTyuEMmSJ2bbQBb32o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TEZxhGFye5Wp67UjZL4Ev8PWK9/jpSO7asoomZQdsGqScKi22OMwg5Kk4Ye1J4i+G
-	 MqqkIBkpv+BPSxfX14Sf34Dmp6ScfcjnFp+3hSYp7IIuaAreA32boInIV2OLf3mGFD
-	 bg5kh9MqLYfhfijdcfEokzVZd+hlpIxENxS6NEmPYgNiX+net/gZm+xrpGnlwsjmCx
-	 sIsB7UObYPeZDyUw3d6qKfVbEDmc3lTbsSozpmxjyerpVHtc55IQt8sz8R1oG6jqsx
-	 VqGiyXmlTPBh10UHf2wjflimfk0rXisfGACEfB2e94agdd/CusHJvTZqJJulXnn59i
-	 u2SHdP5DUuNPA==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id A399160568;
-	Thu, 13 Feb 2025 11:05:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1739441115;
-	bh=0FjhRGzxaA/4a6gzXP9+0Iz4nUTyuEMmSJ2bbQBb32o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XPYHNgOnpkLeUGd7aG78UzgcHGdUZrSdNrzLEOX8dyWn0KnjTJ4MDqrkP+2QUHx6n
-	 5tvU19tg8MAeVHYG35eFpzMrTdLSXkdnpqH+KHPvxJBifZ52fTSkyJnzdi6wGBReqR
-	 T5oPWacsEjIFn7IvYJsYXoiojv9n2m5SPAIk98FSg5OscxhkWNUZiHbjeVCafGhspM
-	 ZI2Wl37yudRcZ71Thj/ebXcBxu0TSZa8vQu4/VTD4fkTnEIP7dY9zgBpMUhiJSJWbY
-	 pnXBV1bn/bOmqL6jACq5OMPSQgJ3ffChnBjXgKxJbXtdv19iodabbrkKHtzJVsUN6C
-	 LpuVoxENZu5ug==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 1/1] Revert "netfilter: flowtable: teardown flow if cached mtu is stale"
-Date: Thu, 13 Feb 2025 11:05:02 +0100
-Message-Id: <20250213100502.3983-2-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250213100502.3983-1-pablo@netfilter.org>
-References: <20250213100502.3983-1-pablo@netfilter.org>
+	s=arc-20240116; t=1739441423; c=relaxed/simple;
+	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TFHKZJ5Fc/rWuU0ijpwao0zkxDmdFi33Rm42+nusNneoEeYuMLIM2nYFbtX6dfLTesl8iewXyRr39v8eX1Hajx/i6SsBhG/YWCt4/b1DIO9CNIdO0jUBLaYXjKedplpVwJWNMT9HI1lpZpjoErCs5ep4p09VZVZw8M/pHQvotNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QduZ+V/D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5470AC4CEE6;
+	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739441423;
+	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=QduZ+V/DRRjp2YWO++Ujfw3lygiGvik5JyzHxwkbzuCCpkjDQA2xTe9472qCN+Nmm
+	 g8UPJBRO1x11HRM2ivIE8CcqfDWwXrogX25VnK26nn9dKYYSxVlODPp0HlmILK/i/p
+	 ILEi1lvFLnbPFZ1RBFxCyUR9zSS2JVm7RVMD5EUeUO5vRTsL2pHLncYcwgGow9yA1I
+	 mYmv3jE4woQi5p93XX32ny0y8aYTG6xUG+cNojoNuN4gr//3nWs+4xcMdeJ3iK/26I
+	 8RMuhd8w68G4+i9xGt3TiXQciFWBB6LoanAcebArn+JtR6Jr1P+7tTOJogzdZMgjnR
+	 bu3Pc5MrK9oNg==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fa8so7688601fa.2;
+        Thu, 13 Feb 2025 02:10:23 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVb9ccK0jSaxkhh/Z/JG28X1YnieBlj7v1teeXPQSUDgVHWpdiMYy0TNXGEsZwbz6v4QTtUIBsQDgb7XQE=@vger.kernel.org, AJvYcCWwFS3C1M4aQO6e0+Lhko+k8b/2Ynh5vLNblv0uy1C9YACKr3uKEOd1JjoKYmenK63Cip6IjhpSbOVBedJg@vger.kernel.org, AJvYcCXkErUz+niTcjgSykqpjHaNOPza3lLBKX/cGQk69QtymOuEmGhR7/fDwAJ+tmS14z+4KEQusWXO@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeNyQIcl6lazNEFA7UknbxtWuvkGdUaZBK9suLluzkeub6fGxn
+	Q9hKQjvF0R0J1kNXaGnIIWPS0Nlx8GCzePS5WhxjBKEiAq7rDsjVzz1ZtOSt5NgebHgdhHTupR9
+	GJEyU4gmtZkeCAksstJRigUD4CmI=
+X-Google-Smtp-Source: AGHT+IHR+xr20cYmx6lgB9lVJM3c3+XAiEna+ZFlbjgJt6DHiy1GJEpnHOR+KpKMxfjEGw7dyQYgQ9iz1/SKleqfvSQ=
+X-Received: by 2002:a05:6512:159b:b0:545:4d1:64c0 with SMTP id
+ 2adb3069b0e04-5451dd9e2admr736305e87.27.1739441421532; Thu, 13 Feb 2025
+ 02:10:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+In-Reply-To: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 13 Feb 2025 11:10:10 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
+X-Gm-Features: AWEUYZkVud9S7L-5xo9HDDz6-H1l2qn4wDw7iDL4qi7FjFF8ciQmJoIc0opMONg
+Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-This reverts commit b8baac3b9c5cc4b261454ff87d75ae8306016ffd.
+On Thu, 13 Feb 2025 at 05:17, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
+> > [ This patchset keeps getting rejected by Herbert, who prefers a
+> >   complex, buggy, and slow alternative that shoehorns CPU-based hashing
+> >   into the asynchronous hash API which is designed for off-CPU offload:
+> >   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
+> >   This patchset is a much better way to do it though, and I've already
+> >   been maintaining it downstream as it would not be reasonable to go the
+> >   asynchronous hash route instead.  Let me know if there are any
+> >   objections to me taking this patchset through the fsverity tree, or at
+> >   least patches 1-5 as the dm-verity patches could go in separately. ]
+>
+> Yes I object.  While I very much like this idea of parallel hashing
+> that you're introducing, shoehorning it into shash is restricting
+> this to storage-based users.
+>
+> Networking is equally able to benefit from paralell hashing, and
+> parallel crypto (in particular, AEAD) in general.  In fact, both
+> TLS and IPsec can benefit directly from bulk submission instead
+> of the current scheme where a single packet is processed at a time.
+>
+> But thanks for the reminder and I will be posting my patches
+> soon.
+>
 
-IPv4 packets with no DF flag set on result in frequent flow entry
-teardown cycles, this is visible in the network topology that is used in
-the nft_flowtable.sh test.
+I have to second Eric here, simply because his work has been ready to
+go for a year now, while you keep rejecting it on the basis that
+you're creating something better, and the only thing you have managed
+to produce in the meantime didn't even work.
 
-nft_flowtable.sh test ocassionally fails reporting that the dscp_fwd
-test sees no packets going through the flowtable path.
+I strongly urge you to accept Eric's work, and if your approach is
+really superior, it should be fairly easy making that point with
+working code once you get around to producing it, and we can switch
+over the users then.
 
-Fixes: b8baac3b9c5c ("netfilter: flowtable: teardown flow if cached mtu is stale")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_flow_table_ip.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+The increased flexibility you claim your approach will have does not
+mesh with my understanding of where the opportunities for improvement
+are: CPU-based SHA can be tightly interleaved at the instruction level
+to have a performance gain of almost 2x. Designing a more flexible
+ahash based multibuffer API that can still take advantage of this to
+the same extent is not straight-forward, and you going off and cooking
+up something by yourself for months at a time does not inspire
+confidence that this will converge any time soon, if at all.
 
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index 97c6eb8847a0..8cd4cf7ae211 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -381,10 +381,8 @@ static int nf_flow_offload_forward(struct nf_flowtable_ctx *ctx,
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
- 	mtu = flow->tuplehash[dir].tuple.mtu + ctx->offset;
--	if (unlikely(nf_flow_exceeds_mtu(skb, mtu))) {
--		flow_offload_teardown(flow);
-+	if (unlikely(nf_flow_exceeds_mtu(skb, mtu)))
- 		return 0;
--	}
- 
- 	iph = (struct iphdr *)(skb_network_header(skb) + ctx->offset);
- 	thoff = (iph->ihl * 4) + ctx->offset;
-@@ -662,10 +660,8 @@ static int nf_flow_offload_ipv6_forward(struct nf_flowtable_ctx *ctx,
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
- 	mtu = flow->tuplehash[dir].tuple.mtu + ctx->offset;
--	if (unlikely(nf_flow_exceeds_mtu(skb, mtu))) {
--		flow_offload_teardown(flow);
-+	if (unlikely(nf_flow_exceeds_mtu(skb, mtu)))
- 		return 0;
--	}
- 
- 	ip6h = (struct ipv6hdr *)(skb_network_header(skb) + ctx->offset);
- 	thoff = sizeof(*ip6h) + ctx->offset;
--- 
-2.30.2
+Also, your network use case is fairly theoretical, whereas the
+fsverity and dm-verity code runs on 100s of millions of mobile phones
+in the field, so sacrificing any performance of the latter to serve
+the former seems misguided to me.
 
+So could you please remove yourself from the critical path here, and
+merge this while we wait for your better alternative to materialize?
+
+Thanks,
+Ard.
 
