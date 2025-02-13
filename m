@@ -1,201 +1,217 @@
-Return-Path: <netdev+bounces-165914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9573AA33B17
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:24:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8225A33B1D
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 10:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E08D3A126F
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:24:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D029918856DC
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E1D20C03E;
-	Thu, 13 Feb 2025 09:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357B4202C27;
+	Thu, 13 Feb 2025 09:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="KDjKOm6/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOWjFEzM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06EE1E376E
-	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 09:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF7E8494;
+	Thu, 13 Feb 2025 09:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739438644; cv=none; b=ZwvV0KeYem/kTs/jGw/mjZZJY09Zg+QBbI+XBoST6FbWOun4Y/31+hqH8dR+D1tL15yyraIFy+DrB1MqXtfyXuJ9zQzLo5+Wj29WKxeCL0AQyfCAVTzKTeFyAwqXrVOkR239qGnnz/Yg/lamvAyzQ3OWmyBR8uZ3luDBgm54hHc=
+	t=1739438657; cv=none; b=iH6RiQHVwMGXJambQpsJALJ6yPRH5jI8g/uf83opaAxRmqE16loOii4Mk/WGIeBemrN2HI+hj35H0wUksx1zcYMJRhMRiXUaWjHIbIeUm0dWqxxuFDSYj6S076dQVPR8FBW+yAgNiB+3Ij5hOhz9fARcwx+uynjEJEJCp0Yeyyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739438644; c=relaxed/simple;
-	bh=mfXNeTj+Q8ZX0NBisxbi4QQyQ/0LK4y+WrTTR40VPyo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZPvjlWcxIgfaqaed6hZbeZ3bxHaFlVGYBfcDZP7D1qnv4AiI5acYjmNlalqNNotAHDM9lT+GoLIzIJk5zZfXD8uM2XVBqhUFIAu2q1+pK6drp7sLgDRJb2s/4EMukSrNlIS8MErHHUh4Xncxhf6RtmMbJdBv/gvl7Xyna3KCbss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=KDjKOm6/; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21f40deb941so14334625ad.2
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 01:24:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1739438642; x=1740043442; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
-        b=KDjKOm6/0FJ3659nApC3mh5Qz2KfuRT+TelHF+ecr+t08t0h66scPICfpH8q36dDdg
-         QNpyYENQ5hApsce4xKZYWc/6l7lwDw2r288/mzMSZmM2UxvpTjK75ljeTzV7dVByqdPx
-         /867R5Ei2/PaBSNEp/Zm6k3AXDyisesc3wjyzdVOAYEUdQpIIs7TjXWlfFeDZMbsFLCJ
-         CVv8SbBjU49ezKqdbXe8QNlTxp1p3no2ssUvpPSNsstvHvLmw7r9lIrAaqXlBpobaS/R
-         NwxC17uCq2KpdNFKZkZubeft8KN3u3yeKSIGiwp0FVQZSh49q1RyQYbPtIiJL11XeB5H
-         jegA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739438642; x=1740043442;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
-        b=QEW85KdbqDm+IZn4Of7AT+HlAB+bDKO4+yKJ4fMcQOb9bt59ISZ6P0Y5PhhyiT4U00
-         Q0QRqamGSSGgPOQoAvBIFpmehyOVRmQ0oNxVD9u2zcBf5spzArVfuqJZDDqUp1v7CO41
-         JCr02c1A0HpzCEdeZmvSJWchnvCZJ55MmhLXjqDQJoef5lO5rgGbjDxrwamGMPAJm5rR
-         y3MUw4gWNjTEurCkgDXnsCHv76AQel5FIlaU6BZIqIzpz4/Xogz3luFdMoS7mP+Y0M6Z
-         2+wKXZ/9wRh0kYHWpYa4yCRPE6a4XgzRXDAJuIBi1pLX51BCHcVyr+75DGBqQm3CRMsQ
-         5gJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2JeY6GHa3m7soPDtemLBRq/ZxXlv/q1hrNH3+aeZ5o6/cIGkiQMebZMcKOQY5cYTaNeWwizI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG6Lg1b2mKUHr1YUYLk39ozGYwWQm3tmm4W7t2Y4sgCTLqKaM7
-	/N8UubJRAxEAhg8dxZDnxt5yUKkKVFBJwO6m5TiAZ8/Yz1eIBfhi3ewoifoDNP8=
-X-Gm-Gg: ASbGncviaDFl5C1v2O2VSKbCYRmyfga723HHqEzYA1CybSoELrFXNaGBuDB/4TnweXD
-	w5zwp7LejEtOftngsqWOl9DgrjCV5yJS4C7JUhkn/1MnWiluK6OUcuTwge+aGCr/j6cQxXCx0fH
-	JrTCPNPsCrotVvkl61YTSEMSr+DiV2vVppzEMfJhuoHOST7mGG2TsvlKv4sub4dLT3hzUn1GgFh
-	z6vSMk4bHOIv2UNQVN/zqbYQt6Ngpbv0Gu+ipnJ82i8waFkjKab8kOV9SxvYdqNb7GACt3PiFHQ
-	i+qmBAe5VlUVWm74RS7TRxqcANiJ
-X-Google-Smtp-Source: AGHT+IGF+4e3Af2SCI8Rg8n4coZI7ErejXVy5bxQnzx65sHDQNZjtZ7hhVxDzaYqpoDifzZ7gAKFSQ==
-X-Received: by 2002:a17:902:e950:b0:220:c813:dfb2 with SMTP id d9443c01a7336-220d2153077mr52167375ad.44.1739438642097;
-        Thu, 13 Feb 2025 01:24:02 -0800 (PST)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fc13ad3fb8sm805579a91.26.2025.02.13.01.23.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 01:24:01 -0800 (PST)
-Message-ID: <0fa16c0e-8002-4320-b7d3-d3d36f80008c@daynix.com>
-Date: Thu, 13 Feb 2025 18:23:55 +0900
+	s=arc-20240116; t=1739438657; c=relaxed/simple;
+	bh=SETByG1qewINiXUWVnpG1tbMW3sFfN+fC9WwoSZz3Cg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eT5GLPdaKdKEAsYqN2sCipGPzXB9p81hZ7BlsS/thbwGc1gvyJtxGk8unr2Lf/bUa0H8KPltHbzMUCm2cZQeJrEoAFC9nQzU0PuIthN7GLPpUHUMOaRvOeVbFZJuj47Asxbd1Tqea1m4rCdb+FjNSTwvPTciarzZszRwnlrAGC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOWjFEzM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE2CC4CED1;
+	Thu, 13 Feb 2025 09:24:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739438656;
+	bh=SETByG1qewINiXUWVnpG1tbMW3sFfN+fC9WwoSZz3Cg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oOWjFEzMW5Itbp966Mhhgvt+TSmcPLI232Gake1rJyNJewJB2DhfHk0U5YNO1lnI9
+	 xQ/+R0S1tgEtop555Oa0DEXmWmTzo+yE467JQme2B7qtBZahmDEqSJD00Iwd5qeN29
+	 YmNehKmWRS1AEc7jH5c0n4NV1bzFgDctDN5u7WbrzjTHoG6opz1dwamldQt6qv5iqd
+	 56+oBFZ7CKTXHKkYk6Sd2i/P9P9mIPfYTMbgTjyo9Hsw9y+WNGfQ/qU7nHx8bOWGQy
+	 x/zVofWifwca7Iiy9krdj6/EYQ+c72Cyj1uocQVgooNnXQGiTKq2x5mzluf8iCcm8B
+	 O577k+inauNZQ==
+Date: Thu, 13 Feb 2025 10:24:13 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Ajay Singh <ajay.kathat@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Marek Vasut <marex@denx.de>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 10/12] bluetooth: hci_wilc: add wilc hci driver
+Message-ID: <20250213-fine-thankful-lobster-eed3e8@krzk-bin>
+References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+ <20250212-wilc3000_bt-v1-10-9609b784874e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tun: Pad virtio headers
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250213-buffers-v1-1-ec4a0821957a@daynix.com>
- <20250213020702-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250213020702-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250212-wilc3000_bt-v1-10-9609b784874e@bootlin.com>
 
-On 2025/02/13 16:18, Michael S. Tsirkin wrote:
-> 
-> Commit log needs some work.
-> 
-> So my understanding is, this patch does not do much functionally,
-> but makes adding the hash feature easier. OK.
-> 
-> On Thu, Feb 13, 2025 at 03:54:06PM +0900, Akihiko Odaki wrote:
->> tun used to simply advance iov_iter when it needs to pad virtio header,
->> which leaves the garbage in the buffer as is. This is especially
->> problematic
-> 
-> I think you mean "this will become especially problematic"
-> 
->> when tun starts to allow enabling the hash reporting
->> feature; even if the feature is enabled, the packet may lack a hash
->> value and may contain a hole in the virtio header because the packet
->> arrived before the feature gets enabled or does not contain the
->> header fields to be hashed. If the hole is not filled with zero, it is
->> impossible to tell if the packet lacks a hash value.
->>
->> In theory, a user of tun can fill the buffer with zero before calling
->> read() to avoid such a problem, but leaving the garbage in the buffer is
->> awkward anyway so fill the buffer in tun.
-> 
-> 
-> What is missing here is description of what the patch does.
-> I think it is
-> "Replace advancing the iterator with writing zeros".
-> 
-> There could be performance cost to the dirtying extra cache lines, though.
-> Could you try checking that please?
+On Wed, Feb 12, 2025 at 04:46:29PM +0100, Alexis Lothor=C3=A9 wrote:
+> +#include "linux/bitops.h"
+> +#include "linux/byteorder/generic.h"
+> +#include "linux/err.h"
+> +#include "linux/gfp_types.h"
+> +#include "net/bluetooth/bluetooth.h"
+> +#include "net/bluetooth/hci.h"
 
-It will not dirty extra cache lines; an explanation follows later. 
-Because of that, any benchmark are likely to show only noises, but if 
-you have an idea of workloads that should be tested, please tell me.
+Keep some order here. Why some are <> some "", why net is mixed with
+linux...
 
-> 
-> I think we should mention the risks of the patch, too.
-> Maybe:
-> 
-> 	Also in theory, a user might have initialized the buffer
-> 	to some non-zero value, expecting tun to skip writing it.
-> 	As this was never a documented feature, this seems unlikely.
- > >
->>
->> The specification also says the device MUST set num_buffers to 1 when
->> the field is present so set it when the specified header size is big
->> enough to contain the field.
-> 
-> This part I dislike. tun has no idea what the number of buffers is.
-> Why 1 specifically?
+> +#include <linux/module.h>
+> +#include <linux/firmware.h>
+> +#include <linux/of.h>
+> +#include <linux/serdev.h>
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +#include <net/wilc.h>
+> +
+> +#include "hci_uart.h"
+> +
 
-That's a valid point. I rewrote the commit log to clarify, but perhaps 
-we can drop the code to set the num_buffers as "[PATCH] vhost/net: Set 
-num_buffers for virtio 1.0" already landed.
+=2E..
 
-Below is the rewritten commit log, which incorporates your suggestions 
-and is extended to cover the performance implication and reason the 
-num_buffers initialization:
+> +static const struct hci_uart_proto wilc_bt_proto =3D {
+> +	.id =3D HCI_UART_WILC,
+> +	.name =3D "Microchip",
+> +	.manufacturer =3D WILC_BT_UART_MANUFACTURER,
+> +	.init_speed =3D WILC_UART_DEFAULT_BAUDRATE,
+> +	.open =3D wilc_open,
+> +	.close =3D wilc_close,
+> +	.flush =3D wilc_flush,
+> +	.recv =3D wilc_recv,
+> +	.enqueue =3D wilc_enqueue,
+> +	.dequeue =3D wilc_dequeue,
+> +	.setup =3D wilc_setup,
+> +	.set_baudrate =3D wilc_set_baudrate,
+> +};
+> +
+> +static int wilc_bt_serdev_probe(struct serdev_device *serdev)
+> +{
+> +	struct wilc_adapter *wilc_adapter;
+> +	struct device_node *wlan_node;
+> +	void *wlan =3D NULL;
+> +	int ret;
+> +
+> +	wilc_adapter =3D kzalloc(sizeof(*wilc_adapter), GFP_KERNEL);
 
-tun simply advances iov_iter when it needs to pad virtio header,
-which leaves the garbage in the buffer as is. This will become
-especially problematic when tun starts to allow enabling the hash
-reporting feature; even if the feature is enabled, the packet may lack a
-hash value and may contain a hole in the virtio header because the
-packet arrived before the feature gets enabled or does not contain the
-header fields to be hashed. If the hole is not filled with zero, it is
-impossible to tell if the packet lacks a hash value.
+Why not devm?
 
-In theory, a user of tun can fill the buffer with zero before calling
-read() to avoid such a problem, but leaving the garbage in the buffer is
-awkward anyway so replace advancing the iterator with writing zeros.
+> +	if (!wilc_adapter)
+> +		return -ENOMEM;
+> +
+> +	wlan_node =3D of_parse_phandle(serdev->dev.of_node, "wlan", 0);
+> +	if (!wlan_node) {
+> +		BT_ERR("Can not run wilc bluetooth without wlan node");
+> +		ret =3D -EINVAL;
+> +		goto exit_free_adapter;
+> +	}
+> +
+> +#if IS_ENABLED(CONFIG_WILC1000_SDIO)
+> +	wlan =3D wilc_sdio_get_byphandle(wlan_node);
+> +#endif
+> +#if IS_ENABLED(CONFIG_WILC1000_SPI)
+> +	if (!wlan || wlan =3D=3D ERR_PTR(-EPROBE_DEFER))
+> +		wlan =3D wilc_spi_get_byphandle(wlan_node);
+> +#endif
+> +	if (IS_ERR(wlan)) {
+> +		pr_warn("Can not initialize bluetooth: %pe\n", wlan);
 
-A user might have initialized the buffer to some non-zero value,
-expecting tun to skip writing it. As this was never a documented
-feature, this seems unlikely. Neither is there a non-zero value that can
-be determined and set before receiving the packet; the only exception
-is the num_buffers field, which is expected to be 1 for version 1 when
-VIRTIO_NET_F_HASH_REPORT is not negotiated. This field is specifically
-set to 1 instead of 0.
+dev_warn or even dev_err_probe to handle deferral.
 
-The overhead of filling the hole in the header is negligible as the
-entire header is already placed on the cache when a header size defined
-in the current specification is used even if the cache line is small
-(16 bytes for example).
 
-Below are the header sizes possible with the current specification:
-a) 10 bytes if the legacy interface is used
-b) 12 bytes if the modern interface is used
-c) 20 bytes if VIRTIO_NET_F_HASH_REPORT is negotiated
+> +		ret =3D PTR_ERR(wlan);
+> +		goto exit_put_wlan_node;
+> +	}
+> +
+> +	of_node_put(wlan_node);
+> +	wilc_adapter->wlan_priv =3D wlan;
+> +	ret =3D wilc_bt_init(wlan);
+> +	if (ret) {
+> +		pr_err("Failed to initialize bluetooth firmware (%d)\n", ret);
 
-a) and b) obviously fit in a cache line. c) uses one extra cache line,
-but the cache line also contains the first 12 bytes of the packet so
-it is always placed on the cache.
+dev_err_probe
+
+> +		goto exit_put_wlan;
+> +	}
+> +
+> +	wilc_adapter->dev =3D &serdev->dev;
+> +	wilc_adapter->hu.serdev =3D serdev;
+> +	wilc_adapter->flow_control =3D false;
+> +	serdev_device_set_drvdata(serdev, wilc_adapter);
+> +	ret =3D hci_uart_register_device(&wilc_adapter->hu, &wilc_bt_proto);
+> +	if (ret) {
+> +		dev_err(&serdev->dev, "Failed to register hci device");
+> +		goto exit_deinit_bt;
+> +	}
+> +
+> +	dev_info(&serdev->dev, "WILC hci interface registered");
+
+Drop simple probe statuses. sysfs already provides this.
+
+
+> +	return 0;
+> +
+> +exit_deinit_bt:
+> +	wilc_bt_shutdown(wlan);
+> +exit_put_wlan:
+> +	wilc_put(wlan);
+> +exit_put_wlan_node:
+> +	of_node_put(wlan_node);
+> +exit_free_adapter:
+> +	kfree(wilc_adapter);
+> +	return ret;
+> +}
+> +
+> +static void wilc_bt_serdev_remove(struct serdev_device *serdev)
+> +{
+> +	struct wilc_adapter *wilc_adapter =3D serdev_device_get_drvdata(serdev);
+> +
+> +	hci_uart_unregister_device(&wilc_adapter->hu);
+> +	wilc_bt_shutdown(wilc_adapter->wlan_priv);
+> +	wilc_put(wilc_adapter->wlan_priv);
+> +	kfree(wilc_adapter);
+> +}
+> +
+> +static const struct of_device_id wilc_bt_of_match[] =3D {
+> +	{ .compatible =3D "microchip,wilc3000-bt" },
+> +	{},
+> +};
+> +MODULE_DEVICE_TABLE(of, wilc_bt_of_match);
+> +
+> +static struct serdev_device_driver wilc_bt_serdev_driver =3D {
+> +	.probe =3D wilc_bt_serdev_probe,
+> +	.remove =3D wilc_bt_serdev_remove,
+> +	.driver =3D {
+> +		.name =3D "hci_uart_wilc",
+> +		.of_match_table =3D of_match_ptr(wilc_bt_of_match),
+
+Drop of_match_tr, you have warnings here.
+
+Best regards,
+Krzysztof
+
 
