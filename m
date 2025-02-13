@@ -1,135 +1,165 @@
-Return-Path: <netdev+bounces-165882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F7FA339AC
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:09:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E2EA339C8
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 09:18:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673AD16048F
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:09:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E7F3188BE7B
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 08:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E08820B20B;
-	Thu, 13 Feb 2025 08:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF8E20011B;
+	Thu, 13 Feb 2025 08:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="HVOLk+Bq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b79G4DeW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0390F20B1EB;
-	Thu, 13 Feb 2025 08:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108B813B29B
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 08:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739434152; cv=none; b=N1SdBBZySN5XLXY3ZRCQLw/ICgC5iZchEuny+HQweCWVcWByppb5dD97Vo1VrK7PT+BdSjFq179wRbG1LeBoSvu5ZwijsM9lrxs9u458LB6qsuNiLKb7EO9aRT6XU+uDm62SambjTGrv9+akU1bjVXEbk0IX88ubqf4hQXep8ek=
+	t=1739434705; cv=none; b=RR+xgy7LUajErKimGV2Y8A7Xn0Ud8cFNP5jGbpTDn4U3Eu1x+N1n+Kq81q+CKu28ClDLgSI9EeH43ugZSJHW1FC4QsMmqsZbFjNK7embQys3wguGjbKb7h0y14R1ngbQEFMWfqG50t7+TjFWcUbGl7S/6SjyxHyYGevejufgEnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739434152; c=relaxed/simple;
-	bh=l+5HQx8cFcT2yRLskL7WUfWIjvy287sZBw2u4XjGjiw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CYHU4AYlpLoaYhOjR2hyKykAqoYFs+a2Ahadt+P+AcJWCO56N3oPq9to8eokNfndAxA4qpSFzzsqnLJ8Jhu5tQ93ubADlGjBQH4vMAViv4EbjPpITmQ3v1IxqlzktC9vWsL66FnRfFnhk5AAJO13icK9SJaZ/jduNpV+GslaCys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=HVOLk+Bq; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: cae47d66e9e111efb8f9918b5fc74e19-20250213
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=Z2GfcKvn7LI0JHLtBK2d2zXW0LLZLDrS62rSfHY8ssk=;
-	b=HVOLk+BqQTh7XEv95DxEs6v4zhCRUREI4Rwi26vUkNfcceX+9wcDtSqoB+J4f6Szgr+ONZDh8E6p5X/g5JVr7SIFHt7xA6Wg9uJGWxTm3x2BK9mqFZDpYt6engoAhhWRjoIKmwnp0x4thRbnXl+vzMtX6P5GvxkcH/S0oPCIYVw=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.46,REQID:b44ae555-bfec-4b62-a50b-ab0d88778ebe,IP:0,U
-	RL:0,TC:0,Content:0,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:60aa074,CLOUDID:1b2468a1-97df-4c26-9c83-d31de0c9db26,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:81|82|102,TC:nil,Content:0|50,EDM:1,
-	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
-	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: cae47d66e9e111efb8f9918b5fc74e19-20250213
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1467896638; Thu, 13 Feb 2025 16:09:05 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 13 Feb 2025 16:09:03 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.28 via Frontend Transport; Thu, 13 Feb 2025 16:09:03 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Simon
- Horman" <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, Sky Huang
-	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v2 5/5] net: phy: mediatek: Move some macros to phy-lib for later use
-Date: Thu, 13 Feb 2025 16:05:53 +0800
-Message-ID: <20250213080553.921434-6-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250213080553.921434-1-SkyLake.Huang@mediatek.com>
-References: <20250213080553.921434-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1739434705; c=relaxed/simple;
+	bh=1bs01Yo1O6I57sjNWPu/TWBCGpO/k38hu29YzagsXHE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Fiw511WDzr7PiFJLUbM/WtXB9VY0uUx89c2TMgt6U+JenYCG4lN6LMrB9VOwtSNLiNioke0k0o1cBh2m+wH6pVjvuEElzKlg2xpJ1QW0WLW6ixmPEGqsy/sv0iQe4l1IUw/Bcse3/Q22ZXJdHStHTcW4eFKo1T+lGMfWLS9cars=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b79G4DeW; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-439554db49dso6473125e9.1
+        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 00:18:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739434702; x=1740039502; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULSQ/d68Wo0CiJOY2GKamU5afNpelbsrPmXkcv3VlOQ=;
+        b=b79G4DeWen//alDNQwZfoXQLdDK1vxWk7tCAGCYsr9MQeUST5oLBLbHopSuOOGyHyJ
+         s1UpjSHCQ4+ZfwrL1MXy322CLpWglzId/y0IaHRgXuvf/Y9stmrfK1d9mWitoJ1pPCXL
+         J6jeRd7MSqLxCv4oqSOHESl19ltceudr73h5ZrVrtZqTzlFXBRtd9fAO5i4UcV9AOhMo
+         Rrphn57kq1jtcfwKnfn+xaiSCV7NDB1mHLQjdldu/OHRB+n4919m+GIlUXV7T2vFLFkM
+         Lr69Op6I5B7RxnPpU9xf8bFjo0GCHivVcu2LTZlkeoB3zXmNO+VFdqwl/leKTVgiBQs5
+         cSWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739434702; x=1740039502;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ULSQ/d68Wo0CiJOY2GKamU5afNpelbsrPmXkcv3VlOQ=;
+        b=AWdOOntsSCM7okCYc2GQI6NSHqYRUCJ7GOY/PaakC2uRlGy4EI4KdpFOpEHhhGO7kw
+         jJxnUW6FWNKHEyuX8E7ONRm7ByK4Yvppf3/DxQw7pxXPaTO7lfzzxc/XYcEcxL+K3ciH
+         jNiY3FFUW6oF8oWG6QL5+OUbzBtSg64uO1fJFl898IbdpGLjYOqD/pN5DMUgoob7EOGq
+         iuYCDAhu5rES0m4gJ7nezE7WI7tri718JpVRFjtN8z0DWMpIvpoWEUKNc5cYhM2fgLri
+         HRZSIA+Oz5e1WFCk3F84PT/ofqnk2BMLhda/LqjXu7R5X4ijkBx/kkES5I+0K8pNioWi
+         dWxw==
+X-Gm-Message-State: AOJu0YxlXNYR9HFADQlGRKHa7dDyhXK6P2o/4VE/dhNbtDhHZ761k0xK
+	ntxO20AjbVxVMOTCJaadWltzaFwWF97j3jOo4vRYKHeHnc4VZ5hN
+X-Gm-Gg: ASbGncsBYEumNwC/OnCJPLMw+/p69wDSMi20SNThn7RREW38/8znxbqcAAJpWGjCJ5G
+	tOQNwFWbv555+jMsHeI5Xyph4aCuWQMoluOrDLOJ0Cjye45gApNlW6WGkBMWkP8E5yUV+8Co6Dh
+	PRdTRsVj5Czvoz/TEqOOXjHFbl8qLIcopWUJIvlojac0Q4JzrQzgknhxDQ23gIXLDo/PJ/56o4i
+	JM5dtR/YdBTYQk9j0/siGktfEv8oeg4EuMiEi5lpYmYmTyvCVW4eQWWWD/PYQSFKTUF0Ol9yzx2
+	KxXMZoQNkrqwEL6HlWwHi1P+DkxrLzJEu+6ca3iIwucvWhwlYP3QrHGQBIp94HOQmq1ib3bidw5
+	6D6XNHKvi0ceUYE3Q3sLx56ggB5e40/2QW7JWPVhJOBhezdotLUrtwF5WpQhcqCFV1sPDvFQjbe
+	Lo+k6I
+X-Google-Smtp-Source: AGHT+IHbfdHWEyKxT6ICNPixafxAB8K8t5yQbPScvTvmQ0NNPMHa0mBATra3n4D5btm5nZbskq4+cA==
+X-Received: by 2002:a5d:5188:0:b0:385:fd07:85f4 with SMTP id ffacd0b85a97d-38dea290941mr4584108f8f.31.1739434702109;
+        Thu, 13 Feb 2025 00:18:22 -0800 (PST)
+Received: from ?IPV6:2a02:3100:9dea:b00:b07f:6560:295a:4c98? (dynamic-2a02-3100-9dea-0b00-b07f-6560-295a-4c98.310.pool.telefonica.de. [2a02:3100:9dea:b00:b07f:6560:295a:4c98])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38f258b4118sm1198921f8f.18.2025.02.13.00.18.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 00:18:21 -0800 (PST)
+Message-ID: <4d4ce24d-cd4d-45e4-ae70-212268ad392e@gmail.com>
+Date: Thu, 13 Feb 2025 09:18:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/3] net: phy: realtek: improve MMD register
+ access for internal PHY's
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <ca05b98a-5830-4637-be72-c11d7418647a@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ca05b98a-5830-4637-be72-c11d7418647a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Sky Huang <skylake.huang@mediatek.com>
+On 13.02.2025 07:47, Heiner Kallweit wrote:
+> The integrated PHYs on chip versions from RTL8168g allow to address
+> MDIO_MMD_VEND2 registers. All c22 standard registers are mapped to
+> MDIO_MMD_VEND2 registers. So far the paging mechanism is used to
+> address PHY registers. Add support for c45 ops to address MDIO_MMD_VEND2
+> registers directly, w/o the paging.
+> 
+> Heiner Kallweit (3):
+>   r8169: add PHY c45 ops for MII_MMD_VENDOR2 registers
+>   net: phy: realtek: improve MMD register access for internal PHY's
+>   net: phy: realtek: switch from paged to MMD ops in rtl822x functions
+> 
+>  drivers/net/ethernet/realtek/r8169_main.c | 33 +++++++++
+>  drivers/net/phy/realtek/realtek_main.c    | 90 ++++++++++-------------
+>  2 files changed, 71 insertions(+), 52 deletions(-)
+> 
+There's a superfluous space in patch 1.
 
-Move some macros to phy-lib because MediaTek's 2.5G built-in
-ethernet PHY will also use them.
-
-Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
----
- drivers/net/phy/mediatek/mtk-ge.c | 4 ----
- drivers/net/phy/mediatek/mtk.h    | 4 ++++
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
-index 79663da..937254a 100644
---- a/drivers/net/phy/mediatek/mtk-ge.c
-+++ b/drivers/net/phy/mediatek/mtk-ge.c
-@@ -8,10 +8,6 @@
- #define MTK_GPHY_ID_MT7530		0x03a29412
- #define MTK_GPHY_ID_MT7531		0x03a29441
- 
--#define MTK_PHY_PAGE_EXTENDED_1			0x0001
--#define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
--#define   MTK_PHY_ENABLE_DOWNSHIFT		BIT(4)
--
- #define MTK_PHY_PAGE_EXTENDED_2			0x0002
- #define MTK_PHY_PAGE_EXTENDED_3			0x0003
- #define MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG11	0x11
-diff --git a/drivers/net/phy/mediatek/mtk.h b/drivers/net/phy/mediatek/mtk.h
-index 4e4468d..320f76f 100644
---- a/drivers/net/phy/mediatek/mtk.h
-+++ b/drivers/net/phy/mediatek/mtk.h
-@@ -8,7 +8,11 @@
- #ifndef _MTK_EPHY_H_
- #define _MTK_EPHY_H_
- 
-+#define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
-+#define   MTK_PHY_ENABLE_DOWNSHIFT		BIT(4)
-+
- #define MTK_EXT_PAGE_ACCESS			0x1f
-+#define MTK_PHY_PAGE_EXTENDED_1			0x0001
- #define MTK_PHY_PAGE_STANDARD			0x0000
- #define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
- 
--- 
-2.18.0
-
+--
+pw-bot: cr
 
