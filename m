@@ -1,98 +1,112 @@
-Return-Path: <netdev+bounces-166067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85A7A34573
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:15:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93BFCA345FE
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 16:21:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49DAB16F7E2
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:08:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B1B9189C126
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 15:09:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7455146588;
-	Thu, 13 Feb 2025 15:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3876E26B0A4;
+	Thu, 13 Feb 2025 15:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnsAAn+N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTIKdcm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BA626B080;
-	Thu, 13 Feb 2025 15:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754AB5684;
+	Thu, 13 Feb 2025 15:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739459203; cv=none; b=cVCtZvSy/mx5KMMkfiW/HTUL70L1zykdzdxoVlU0L654WRb0JFkHfSksPhHl9yatUJbZ5zyH33KG7R53aL0zd4nLe+BOGFbp8XOTz9jiYISJvtXFQFMD4pcA+/jq2NQFNpoMrWKP+901ykD7e6NWZrATfYzT5w81q5+5dzRFuvQ=
+	t=1739459363; cv=none; b=qj9hXHqSq7kMtkhW0KPpSQPfOlB4tk03wSb05URdvLrHyYSGX9pFfg+1Y3BJ1zgjCzaLY5rfu7JButVOeMFRvPM2y5QmTYjOhjvCg8j0oOTup5J5uzTqAlYHvPJA1xnad0geVkM6E4nXKN+Od/Zw1+ENiqcEro4nug8UWcpNn50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739459203; c=relaxed/simple;
-	bh=QRu6YNCJ6CAdbfZVzys1lbmIOv16QxmAy6aoY/mj5ws=;
+	s=arc-20240116; t=1739459363; c=relaxed/simple;
+	bh=IdZEyjiKkZI/1pqJFXXoSC+azr1RfKtky1xv5mMmHg4=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=F0a1+YJR5mTSTE/ez+qTRo37dJpOL2+XtY1eHKcKZgKw2ynZt9tllMWowB9/DPwmSkipKcRkiPvB3kbtagu9rfY72GwfTo/MFCmxgqLoZomzsp5Ko02xW2bvJWQvi9bKPf6yuufIFqqBoV7KFgeHt7l8TrnvN8cmWJtsNEio2OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnsAAn+N; arc=none smtp.client-ip=209.85.160.174
+	 Mime-Version:Content-Type; b=QGVl4cgZ8bP4JzXWbcAKW2RLXyegiQ9X7jTDIPQcw1crbwsY65gzTm4mAFsB0+/Zw5s9MEhQgfoqWxDNIXjEqwq3TqAWHL9MSOw6jXsHb/f/x/6Yx44Mu9ysTEYYqMV5iFGqATfc+5DjyLnNiCCMzU3LNPtFcmtH2cH8z1Gxthw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTIKdcm4; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-471c8bdabcfso3939881cf.2;
-        Thu, 13 Feb 2025 07:06:41 -0800 (PST)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7be49f6b331so94450085a.1;
+        Thu, 13 Feb 2025 07:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739459201; x=1740064001; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739459360; x=1740064160; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QRu6YNCJ6CAdbfZVzys1lbmIOv16QxmAy6aoY/mj5ws=;
-        b=nnsAAn+NfSG5ljWRaPYbbYH6BZdtnyN7E7QXqZzAkBISyCsleLB/2j0uyBYegRtI9i
-         8huBYDNXTyOJsfCIJUBQIhz0vWxaeQsz5sbyadWe8kcPeYNDwAyHa0qVx4uGI6v+M455
-         ff8IKw9rfmQc0WegPMcmV+c+KYJpwSZiEIm0gTdL+TnUBAJvXvb4WQlh7qMQx6ywnhQh
-         0C0ppjnqMs88uX1K636b+VDasEt/6UekQwjjdcuFoy/3Anen04TeA7KSZ7ivWqvnP+6b
-         jWHISnNMeFLiwfIGytdCyDauzaVgP3ivc14A+izHTmns4908afOLoJymL8W2qZ0nbJfC
-         MOAA==
+        bh=B2dha7925JQRUD+dKqDxU48OayQdmawGC+OQkEXNRWU=;
+        b=gTIKdcm4ViPVXwx5o1gfuUfk+PGYBNN5MiN4t9TpGU+/Gi/js+0BQ/03O7l2MPdO7a
+         SUVGWNcfQrXkq5ZwPhLPiT743KRz2NQk5cdd8C/kOAswz721fihcUZJSmjTz//VKaG/b
+         kkTA/a6f1IuyWMD2BwtKYmFbYq0A464ccU1KFRBluZOSqB+cncVpBx0IQmV6YCnUaSOh
+         qGQQwTC2yB4OsPaYvFa11k/Jv70vMAz2cbsS0hrjZPGA/NYY820Myp8Oddt+Eon7Jiz4
+         npKPGDUwEpqfbktyHDrCTYA7pHNjvlgwjFSMCd8yQdisjwNiO4hd5A0UMAXR369ATkZ0
+         TmwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739459201; x=1740064001;
+        d=1e100.net; s=20230601; t=1739459360; x=1740064160;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=QRu6YNCJ6CAdbfZVzys1lbmIOv16QxmAy6aoY/mj5ws=;
-        b=b3Kt9a0rQZfQ2W1eDd6tWZBgci2nc2/G49hfZ2R0ciCSS3II5JAX/F84VHOJsWaB/M
-         SgL3scsUUQkNGEnyQ1h/rVOIVCCFlFexKc7nt46hvyGZgFMJ1yFLMbFnjmgDGldZ9QTK
-         tldJxDKhlKq7UzPGMjthawcz6RwipWk83NBwVU84lGF5cr8j6LbeZwMJPCCOOZXmFTEa
-         gin39x1DQTpDDkWzCSiel9E9pVikWADY1dvnLWapY3SjVNamBfnMF2S1GFOmGHDdXkYO
-         m63McVzNs3GSGqxXgMoixHg42/Cnao+A4QreSOTNgpAMwmgGPgs/amsA9tyjT05kvaUY
-         dEhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWD6ltDeFW47hERCSrzROl10gXUrZpN/7DJK6F/KggIsaooqpyyAOCte+A2RTbzjmVmdwuXLsARBn9kB8BkLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yydccs4JcAg8J9GiGDS2NYIb9+QZ1o74NUgRJkQ0dm1zISkFJTJ
-	tjgveM97mBnUF2gB/bNidBnmIRrvW741LlvoX6+JTXLJaznLYFwa
-X-Gm-Gg: ASbGncs7e5XUdPqt5Gx0SI5jgXjw1+GkVfCQY9p9gi+Tmb9MIVtOYVBY7sAGIsQs0m9
-	c9DVs4GaG5Hj4q4LEwI1vgAP/s1db8piz2pjJwTwN0hon26lhkeW5GRBNe0uAEX889RscLzdwMk
-	0+bxTuEX4qyQ9GSa8KtWbtEC02pu7ZGddROygrMEuqpWHrPPxGe5TxWJNku2d7hzujyrljw1gAX
-	cPA/Om9TeoDgy8JlM0le4rwMOZU6hXm+tFzDGj2tE4myoUSiuX90IlvFodCSjz8F8zbVIDISAHm
-	yuZy0nfUO1YbuJEuM2wZeAWPhHl6mRVZWP+5GtsFbuVBivdLEng+CP7s0hJBfds=
-X-Google-Smtp-Source: AGHT+IE6bwqcfU1yJ3EL4ucljVAN/H74late+gSRNOZLXFyhy2eyNgcBcdloyAJPE9jkyWHrOjvYPg==
-X-Received: by 2002:a05:622a:189a:b0:471:a693:591b with SMTP id d75a77b69052e-471bedbc6b9mr51581381cf.51.1739459200843;
-        Thu, 13 Feb 2025 07:06:40 -0800 (PST)
+        bh=B2dha7925JQRUD+dKqDxU48OayQdmawGC+OQkEXNRWU=;
+        b=P7hBIvfilKlchLP8SKoEnpR9+OTu8ByX2dO6MsJd9xhGG+VEzCxlVZBkcpbi5StIZS
+         s2u/E8iMx3wh3CsXIHU2HZEAlAFC5pm121IZdX6kc34Pr/qsMApQalfrpMgtFI5a0HK6
+         nqn9gGB5kkBeTM9tPtbCVOjWufqeIFTTAj68r3GTDh1A7Yh6cn4AeWdMLqKv6/6GoAoa
+         ZPSsI4vig5SpDnvtFoYP1CEp5YAS42E26KkGuEU2V0UD/tTU22RtvMpzmqQRayOw6Gh0
+         H64tFlswiIUG8ktdDppCKv0Cdz3Bu6jkDQ4gYWJbUPcxAhn6eE27/DtIIorav51nuVqC
+         NCxw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1BYli5jTsgIACTdN0oXd1L5pBtF4K7dT0dnOHj0dmz+GIWXuspB8dLa0X+Xl1W+SRByo=@vger.kernel.org, AJvYcCVIHtIy30coVPsPai28dfw88LxoTL7Z5FC5r5/YMV4H7qJ76ZBfw/sl8dZqnPhrVHvBLn46TCyY@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1q5lFzxyP6BR/DZTqGqOCXm3SffGaScuA8nXnCSMh8RFNGtfG
+	j+uXgjFyxI5pgCheCTiaI80BePxtjGhVCMTe2TcG3Y0KLb2iL2GL
+X-Gm-Gg: ASbGncvn5NU4oJlDOn8mP0TQ6SIAvlBmw5cT24Dn3zaDaU22zAjXwJV9ttvqqlPEOI/
+	dxcR+QGaOxbuqfGk7H/lAoeUXgjIdNaCo/RITDhX7+A3ec0Tt/JyNTPchT4a2xZjD3nW7rI5vEu
+	Xph5SOsgCUB9Ugu8Qf2xMhq7TdXejQWaaqwS5/kxR8D1yHvjLQZlScxQq0cyjCP9Tjvxw9/qDOt
+	YW4XeHsqfu+QEvxVDdRn4LqatSQmd3x26Lw3x7A153T8k3NmXUsvJpeIkzeXLLdvKAhremOUTeh
+	OrwccdZDS8i78v49z1xVhq1mCF46Fg0PXPFMISoDKMBPgns59eZyDSw/1uKKwSU=
+X-Google-Smtp-Source: AGHT+IHjOXMgBbY6J+GWiif+HmFmwCJy+rZEzcZlh7LI9fV/MGv+P68o9eEMOZgrM6bupXCReyhRFg==
+X-Received: by 2002:a05:620a:4089:b0:7b6:6642:b5f0 with SMTP id af79cd13be357-7c06fc57c9bmr1114129985a.11.1739459359842;
+        Thu, 13 Feb 2025 07:09:19 -0800 (PST)
 Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471c2af37d2sm8594831cf.63.2025.02.13.07.06.39
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c6081aasm99412385a.27.2025.02.13.07.09.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 07:06:39 -0800 (PST)
-Date: Thu, 13 Feb 2025 10:06:38 -0500
+        Thu, 13 Feb 2025 07:09:19 -0800 (PST)
+Date: Thu, 13 Feb 2025 10:09:18 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Nyiri <annaemesenyiri@gmail.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- fejes@inf.elte.hu, 
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
  edumazet@google.com, 
  kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
  willemb@google.com, 
- idosch@idosch.org, 
- horms@kernel.org, 
- davem@davemloft.net, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
  shuah@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <67ae0a7e9b5f6_24be4529453@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAKm6_Rv4LCpy6KaV84gOi7wW7OKdasbx2zqfFwFG26=L6rkhgA@mail.gmail.com>
-References: <20250210192216.37756-1-annaemesenyiri@gmail.com>
- <72634e76-7bb2-48d5-ab21-9d5e86adee9c@redhat.com>
- <CAKm6_Rv4LCpy6KaV84gOi7wW7OKdasbx2zqfFwFG26=L6rkhgA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] selftests: net: Add support for testing
- SO_RCVMARK and SO_RCVPRIORITY
+ ykolal@fb.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Message-ID: <67ae0b1ed4a6f_24be4529484@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoA9mi7yfHKf+PGhgjWE0NSrZp44ok+u5v4kOUycSnnbfw@mail.gmail.com>
+References: <20250212061855.71154-1-kerneljasonxing@gmail.com>
+ <20250212061855.71154-10-kerneljasonxing@gmail.com>
+ <67acbdb3be6b5_1bcd3029470@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA-5noB0rfHwU=FxANd9yifADFoq-vGkkzW=ZJ=BOnGUA@mail.gmail.com>
+ <CAL+tcoA9mi7yfHKf+PGhgjWE0NSrZp44ok+u5v4kOUycSnnbfw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v10 09/12] bpf: add BPF_SOCK_OPS_TS_ACK_OPT_CB
+ callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,61 +117,61 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Anna Nyiri wrote:
-> Paolo Abeni <pabeni@redhat.com> ezt =C3=ADrta (id=C5=91pont: 2025. febr=
-. 11., K, 12:19):
+Jason Xing wrote:
+> On Thu, Feb 13, 2025 at 8:07=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
 > >
-> > On 2/10/25 8:22 PM, Anna Emese Nyiri wrote:
-> > > Introduce tests to verify the correct functionality of the SO_RCVMA=
-RK and
-> > > SO_RCVPRIORITY socket options.
+> > On Wed, Feb 12, 2025 at 11:26=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
 > > >
-> > > Key changes include:
+> > > Jason Xing wrote:
+> > > > Support the ACK case for bpf timestamping.
+> > > >
+> > > > Add a new sock_ops callback, BPF_SOCK_OPS_TS_ACK_OPT_CB. This
+> > > > callback will occur at the same timestamping point as the user
+> > > > space's SCM_TSTAMP_ACK. The BPF program can use it to get the
+> > > > same SCM_TSTAMP_ACK timestamp without modifying the user-space
+> > > > application.
+> > > >
+> > > > This patch extends txstamp_ack to two bits: 1 stands for
+> > > > SO_TIMESTAMPING mode, 2 bpf extension.
+> > > >
+> > > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > > ---
+> > > >  include/net/tcp.h              | 6 ++++--
+> > > >  include/uapi/linux/bpf.h       | 5 +++++
+> > > >  net/core/skbuff.c              | 5 ++++-
+> > > >  net/dsa/user.c                 | 2 +-
+> > > >  net/ipv4/tcp.c                 | 2 +-
+> > > >  net/socket.c                   | 2 +-
+> > > >  tools/include/uapi/linux/bpf.h | 5 +++++
+> > > >  7 files changed, 21 insertions(+), 6 deletions(-)
 > > >
-> > > - so_rcv_listener.c: Implements a receiver application to test the =
-correct
-> > > behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
-> > > - test_so_rcv.sh: Provides a shell script to automate testing for t=
-hese options.
-> > > - Makefile: Integrates test_so_rcv.sh into the kernel selftests.
+> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > index 0d704bda6c41..aa080f7ccea4 100644
+> > > > --- a/net/ipv4/tcp.c
+> > > > +++ b/net/ipv4/tcp.c
+> > > > @@ -488,7 +488,7 @@ static void tcp_tx_timestamp(struct sock *sk,=
+ struct sockcm_cookie *sockc)
+> > > >
+> > > >               sock_tx_timestamp(sk, sockc, &shinfo->tx_flags);
+> > > >               if (tsflags & SOF_TIMESTAMPING_TX_ACK)
+> > > > -                     tcb->txstamp_ack =3D 1;
+> > > > +                     tcb->txstamp_ack =3D TSTAMP_ACK_SK;
 > > >
-> > > v2:
+> > > Similar to the BPF code, should this by |=3D TSTAMP_ACK_SK?
 > > >
-> > > - Add the C part to TEST_GEN_PROGS and .gitignore.
-> > > - Modify buffer space and add IPv6 testing option
-> > > in so_rcv_listener.c.
-> > > - Add IPv6 testing, remove unnecessary comment,
-> > > add kselftest exit codes, run both binaries in a namespace,
-> > > and add sleep in test_so_rcv.sh.
-> > > The sleep was added to ensure that the listener process has
-> > > enough time to start before the sender attempts to connect.
-> > > - Rebased on net-next.
-> > >
-> > > v1:
-> > >
-> > > https://lore.kernel.org/netdev/20250129143601.16035-2-annaemesenyir=
-i@gmail.com/
+> > > Does not matter in practice if the BPF setter can never precede thi=
+s.
 > >
-> > Unfortunately the added self-test does not run successfully in the CI=
-:
+> > I gave the same thought on this too. We've already fixed the position=
+
+> > and order (of using socket timestamping and bpf timestamping).
+> >
+> > I have no strong preference. If you insist, I can surely adjust it.
 > =
 
-> I think the test is not running because it is added to TEST_GEN_PROGS.
-> However, after reconsidering, I'm not sure it should be there, since
-> this test does not run on its own but is executed by the
-> test_so_rcv.sh shell script.
-> Wouldn't it be more appropriate to add so_rcv_listener to
-> TEST_GEN_FILES instead?
+> I updated it in the next version locally :)
 
-Yes,
-
-+TEST_PROGS +=3D test_so_rcv.sh
-
-is correct, as this needs to be called from kselftest.
-
-+TEST_GEN_PROGS +=3D so_rcv_listener
-
-needs to be TEST_GEN_FILES as it is not intended to be called directly.
-
-Documentation/dev-tools/kselftest.rst for details.=
+Great. I was going to say that I do prefer this.=
 
