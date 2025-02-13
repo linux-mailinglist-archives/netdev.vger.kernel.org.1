@@ -1,146 +1,158 @@
-Return-Path: <netdev+bounces-165841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF0CA337FD
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:33:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C23A33821
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 07:47:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4C3165948
-	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:33:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 994317A1282
+	for <lists+netdev@lfdr.de>; Thu, 13 Feb 2025 06:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F588206F2A;
-	Thu, 13 Feb 2025 06:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A063205E23;
+	Thu, 13 Feb 2025 06:47:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkS4A/KV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bm7bP1ay"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B01BA2D;
-	Thu, 13 Feb 2025 06:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43E6EADC
+	for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 06:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739428387; cv=none; b=hfWXhCnOpKhpnf8yxdsHK7o7ZfS7ZZ0nC2REU2N46DxXSGQ8XRiDzEmoQm5UVm09hMvqXvMgLG+bL4ODNYJGhga3aBjiF4FbUgyy+R8iKLPsqWy7gqJ6KO7jzZ2qOXl868wY5xLIBme5qr/4II6+RPSpt00BPo407beDxFMVFz4=
+	t=1739429250; cv=none; b=dfscdvHujekbZ7YNUz48VA6JAqez5mEU/cX+nFMxFl9+mkUbv6xsxKNe1Lpc7k2EhYm7t6EFWvVSYCBx8i6YSsf16AyE7uI9vh7gyt/gVGszIMGDz1RCHYvG6PjnqkPuaout9HPfGSzgRgmo8GzSM1qgpKnul8W7WMByR73KP0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739428387; c=relaxed/simple;
-	bh=EYlzHzMqG7RCe6q7JFcYu+FiAfG2RPpXS8EZEEWgLsw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GSEi15aSsSaEFJlhYeAyzY61crE3W4aYaclAdm82lotK1fwlmVV+YWEegp+OgKqhAX5tgC7eVn1Nf2scq07fO6VrtdxLWl8g8HYmPnGkQRQjyZkA92UN57kWMWJLtqKQieOOb5blaWvCqr71yQ5bUFAMa2aUhy+z9lkaNTkxjiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkS4A/KV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46F2DC4CED1;
-	Thu, 13 Feb 2025 06:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739428386;
-	bh=EYlzHzMqG7RCe6q7JFcYu+FiAfG2RPpXS8EZEEWgLsw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UkS4A/KV+3NNKiQjsxvFOCzRdT8eWvlDjxM2q4kcb2BJO337OWJX9LiciToHB4H5D
-	 betsxIK36VXW3NHNoB4lRt0NJXBcNvvIRD4TdwxZiVuUg3QYAeOYlV1HlcU0EOe6Iq
-	 PZLtnwxTCnRM2qsfunBg9CIOm9UrYC0WezluyZS+0WZx/wi4xyYmqrxjQWRSRydQv3
-	 JAKdnQbYR1WC1r7H2ZTQHeKSXHaJKzo/J/55xlp6TGxwvoKepy/NpWl6mEE7OkYIg4
-	 oMQ9JVu3HAPS0/XGVqxfYxi4AA4Ae/S7xImljyKO0EBVNzSAITvpy/EH7dB6z6x2NI
-	 wBiVk20+/3H9Q==
-Date: Wed, 12 Feb 2025 22:33:04 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
- hashing
-Message-ID: <20250213063304.GA11664@sol.localdomain>
-References: <20250212154718.44255-1-ebiggers@kernel.org>
- <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+	s=arc-20240116; t=1739429250; c=relaxed/simple;
+	bh=WDAGFYBJ4ZWGTYJcXuFI9hHtIY4Hzo5WeLoku06t21s=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=EeaBI61xejyzgai34eoeJeJDyxYisxEq8siWVwV15KAPeo66xwsf/YHsFn2V4oY/CGWnm0hNcSURAYAAoRJtxlx1drtvqT0aXXDuktHh76ElDVFv6pxg1zQM+pUQlTdhPgi38kd1nfYE5OaZJQ4k1naQjNsq1UG7Hq1Fvk/R42M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bm7bP1ay; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4394036c0efso2831165e9.2
+        for <netdev@vger.kernel.org>; Wed, 12 Feb 2025 22:47:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739429247; x=1740034047; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Fk1r1bTNGfst5ZFUkTrOxzDNlqTft5Wi5dKa+sgyUJc=;
+        b=bm7bP1ay8qYimi/+UkZCGMekTPzfkfo45SUTVPdyHuR8CQBPaTdpU5H8MMEjDoHfWX
+         Hh9udOQ8qwV7l+4FhrOLjHuW0IQHE5eZ5cQRx+swBHP29I1IvxlWx9TpyHvopKRb9OlP
+         9/JyvwhxLf+9Ao7PSvkx1tNYG+KMB3ctDWo/fkomZEK+llly2tSOUpkY+SaiWw37bOxx
+         vHKawUPg/1ClLKYmOUIlwGb0/nzH1VwtvSggKnZ+ptET7BDUNE+1AdWyYPrty9bJcnpg
+         SA6ljs7w1BV26FZPkLP0w0ojhJ4hY3/a4sbBTDYuxPm3AbMy8mhJMwqwybKFPC0nlRtT
+         CB0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739429247; x=1740034047;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fk1r1bTNGfst5ZFUkTrOxzDNlqTft5Wi5dKa+sgyUJc=;
+        b=dDnD9+YXkfVhcFDL4ftEuoS5nzUgZk3KaHhcKdRdpoqRS73bw5biHXkPorSNrZK/r5
+         /2Gb8nu7VTzGZohi5TB+lAorwO6Z3mOTfn+kpabaJqDwV7CWNvELNQ5N88uW4InOQpw9
+         Mb5qM0nVfOmL6wYp8BxzAVCkkgTkAgobGdLNkLwZr0A84uay3cZLsqUe0Jgsw6FopRNz
+         9F2qDPd7qFTayn6f0qFjh7dR5nA7WZ0d5HbAyk8ynf2WvfBGSRHa151H/EBu92tKT5er
+         i1wm3tzYQyswD+K2pzEJa8rrmqhihtsRG4qdhGUNPtT7XXawrZJJ8i/RDahKkcxniRh2
+         iQOw==
+X-Gm-Message-State: AOJu0YzliGIP5GGwVb9s6hcQWArPAxoCmMjMPIWglMan8RNN43dKNzOg
+	gyLtP16aCgez4AJTGGOt5dBNS1ugcZ4Ryo5sro4qAUsmC6klZB8t
+X-Gm-Gg: ASbGncv19j9AA5DfykvzrE88utZOfd6IqLhbomI08oGF8lYzo3BxugiGKoQb3FY0uUH
+	zoqoicQbaPCKedUjjZMDGqHTpbTRO77zRenH9+l3YulOVhkJTnsc44P9z8p7oRMVJsNn2G4vJI6
+	iX0cHNyfvger9i0bkqDQw/Ar5D62ATBhtpW79We9u2pySwDNNS39pIukcqwnAZiFNzBWdTYmbnu
+	oHXiMilrbIJDQywcOOUx6F2dLiX/nFukpeyXRQ0GvqgxOcv5XNw5RI2fuIQAQY+sNq4zAIlWTEP
+	kNrFDwFIPbkqfg5d04cdyoReQN6CVs4Q9wOShdBlBfbuToPoqRKHdTCLHx5yP4L8BBI9V6vTPVd
+	DPkiAWDQGfiGdn+hf0JWb7+wX21TOWOncx8OxT6PioUn8FCmsFEjrghVNBjvk+qriFa9SsXa7nF
+	bpgN9s
+X-Google-Smtp-Source: AGHT+IH0q/xqq97L+F6xM2Fd+VdVGhnHcvS+6pLS08jcKK5hbFmv5reiBQv/SpjNofT8lUr3adByJg==
+X-Received: by 2002:a05:600c:1c1c:b0:439:3ef1:fc36 with SMTP id 5b1f17b1804b1-4395818fdfemr57498335e9.18.1739429246786;
+        Wed, 12 Feb 2025 22:47:26 -0800 (PST)
+Received: from ?IPV6:2a02:3100:9dea:b00:8068:750d:197f:b741? (dynamic-2a02-3100-9dea-0b00-8068-750d-197f-b741.310.pool.telefonica.de. [2a02:3100:9dea:b00:8068:750d:197f:b741])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43961826cd4sm8372235e9.24.2025.02.12.22.47.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2025 22:47:25 -0800 (PST)
+Message-ID: <ca05b98a-5830-4637-be72-c11d7418647a@gmail.com>
+Date: Thu, 13 Feb 2025 07:47:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next 0/3] net: phy: realtek: improve MMD register access
+ for internal PHY's
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 13, 2025 at 12:17:42PM +0800, Herbert Xu wrote:
-> On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
-> > [ This patchset keeps getting rejected by Herbert, who prefers a
-> >   complex, buggy, and slow alternative that shoehorns CPU-based hashing
-> >   into the asynchronous hash API which is designed for off-CPU offload:
-> >   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
-> >   This patchset is a much better way to do it though, and I've already
-> >   been maintaining it downstream as it would not be reasonable to go the
-> >   asynchronous hash route instead.  Let me know if there are any
-> >   objections to me taking this patchset through the fsverity tree, or at
-> >   least patches 1-5 as the dm-verity patches could go in separately. ]
-> 
-> Yes I object.  While I very much like this idea of parallel hashing
-> that you're introducing, shoehorning it into shash is restricting
-> this to storage-based users.
-> 
-> Networking is equally able to benefit from paralell hashing, and
-> parallel crypto (in particular, AEAD) in general.  In fact, both
-> TLS and IPsec can benefit directly from bulk submission instead
-> of the current scheme where a single packet is processed at a time.
+The integrated PHYs on chip versions from RTL8168g allow to address
+MDIO_MMD_VEND2 registers. All c22 standard registers are mapped to
+MDIO_MMD_VEND2 registers. So far the paging mechanism is used to
+address PHY registers. Add support for c45 ops to address MDIO_MMD_VEND2
+registers directly, w/o the paging.
 
-I've already covered this extensively, but here we go again.  First there are
-more users of shash than ahash in the kernel, since shash is much easier to use
-and also a bit faster.  There is nothing storage specific about it.  You've
-claimed that shash is deprecated, but that reflects a misunderstanding of what
-users actually want and need.  Users want simple, fast, easy-to-use APIs.  Not
-APIs that are optimized for an obsolete form of hardware offload and have
-CPU-based crypto support bolted on as an afterthought.
+Heiner Kallweit (3):
+  r8169: add PHY c45 ops for MII_MMD_VENDOR2 registers
+  net: phy: realtek: improve MMD register access for internal PHY's
+  net: phy: realtek: switch from paged to MMD ops in rtl822x functions
 
-Second, these days TLS and IPsec usually use AES-GCM, which is inherently
-parallelizable so does not benefit from multibuffer crypto.  This is a major
-difference between the AEADs and message digest algorithms in common use.  And
-it happens that I recently did a lot of work to optimize AES-GCM on x86_64; see
-my commits in v6.11 that made AES-GCM 2-3x as fast on VAES-capable CPUs.
+ drivers/net/ethernet/realtek/r8169_main.c | 33 +++++++++
+ drivers/net/phy/realtek/realtek_main.c    | 90 ++++++++++-------------
+ 2 files changed, 71 insertions(+), 52 deletions(-)
 
-So anyone who cares about TLS or IPsec performance should of course be using
-AES-GCM, as it's the fastest by far, and it has no need for multibuffer.  But
-even for the rare case where someone is still using a legacy algorithm like
-"authenc(hmac(sha256),cbc(aes))" for some reason, as I've explained before there
-are much lower hanging fruit to optimizing it.  For example x86_64 still has no
-implementation of the authenc template, let alone one that interleaves the
-encryption with the MAC.  Both could be done today with the current crypto API.
-Meanwhile multibuffer crypto would be very hard to apply to that use case (much
-harder than the cases where I've applied it) and would not be very effective,
-for reasons such as the complexity of that combination of algorithms vs. just
-SHA-256.  Again, see
-https://lore.kernel.org/linux-crypto/20240605191410.GB1222@sol.localdomain/,
-https://lore.kernel.org/linux-crypto/20240606052801.GA324380@sol.localdomain/,
-https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomain/,
-https://lore.kernel.org/linux-crypto/20240611203209.GB128642@sol.localdomain/,
-https://lore.kernel.org/linux-crypto/20240611201858.GA128642@sol.localdomain/
-where I've already explained this in detail.
-
-You've drawn an analogy to TSO and claimed that submitting multiple requests to
-the crypto API at once would significantly improve performance even without
-support from the underlying algorithm.  But that is incorrect.  TSO saves a
-significant amount of time due to how the networking stack works.  In contrast,
-the equivalent in the crypto API would do very little.  It would at best save
-one indirect call per message, at the cost of adding the overhead of multi
-request support.  Even assuming it was beneficial at all, it would be a very
-minor optimization, and not worth it over other optimization opportunities that
-would not require making complex and error-prone extensions to the crypto API.
-
-I remain quite puzzled by your position here, as it makes no sense.  TBH, I
-think your opinions would be more informed if you had more experience with
-actually implementing and optimizing the various crypto algorithms.
-
-> But thanks for the reminder and I will be posting my patches soon.
-
-I am not really interested in using your patches, sorry.  They just seem like
-really poor engineering and a continuation of many of the worst practices of the
-kernel crypto API that we *know* are not working.  Especially for cryptography
-code, we need to do better.  (And I've even already done it!)
-
-- Eric
+-- 
+2.48.1
 
