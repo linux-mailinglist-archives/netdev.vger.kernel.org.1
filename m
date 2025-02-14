@@ -1,396 +1,209 @@
-Return-Path: <netdev+bounces-166383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D65DA35CAA
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:37:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D00DAA35CAE
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0ED701890806
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93F0F16946A
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485D8263C60;
-	Fri, 14 Feb 2025 11:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC86263C62;
+	Fri, 14 Feb 2025 11:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="a4/0cF2W"
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="sVOcLB7/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021080.outbound.protection.outlook.com [52.101.100.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC35B2627ED;
-	Fri, 14 Feb 2025 11:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739533037; cv=none; b=jJmAdgRbC2+sIP7dv60yqOPTAc8xn15aaEQAMbEHVCEI56nadnQgpwplKAc4qr6DU0kQrkiPTC1zc+h/2q7iZHq6iP5MQiILdAp35/tVJGZeUg8zhm2WfRlOFDRI6B4Jr+4GaAfu4NtAQsMx+3E2ei9Y9fhKHctxlsfk8WDfHYE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739533037; c=relaxed/simple;
-	bh=I74jwEEgdzAlIhSsbE1frYKB0EsoLIVW5+jBpBwQJUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+QmpyKRoO55EIposq6Xmb8qBW5MD2qUvzGOiL/POm7IfnUQEMa+XH9at7ayDIMigh98nG34CSMF5Z5JJziDSBzJuGQFnvH31TWDWemjyE7CV95fkfzKdNkXrkiWEBsulqICoJTuK4p7KY7ljA1SFa4LNHOyDNe0gzYzM+yIiLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=a4/0cF2W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F716C4CED1;
-	Fri, 14 Feb 2025 11:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739533036;
-	bh=I74jwEEgdzAlIhSsbE1frYKB0EsoLIVW5+jBpBwQJUs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a4/0cF2WRNCjsiaf6pKoUGpuI4u49rX9/YkGi91TzB2R3464I2CurlUIzxZF60Zd5
-	 +hHbnBr43gc5Sj95+g2iGDRUWmzYOwtYxbxNtOsyTSFIbJdA3OPSQnGShbzkyQ/Ywx
-	 4TlmJhAiiV+AV9dwhx9z59IW9RLlmigZgC428enc=
-Date: Fri, 14 Feb 2025 12:37:12 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs
- isoc_alt
-Message-ID: <2025021425-surgical-wackiness-0940@gregkh>
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2D025A657;
+	Fri, 14 Feb 2025 11:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739533068; cv=fail; b=PUJWIrdiK121EyJ4qw8pq1A++KURotkapmC0GWofQJzEpQNqQzUGDt+6RbkzehW2S2I4S842fD7UqmtfXgDfokPM3yx+bBbMyAmMkGpsyRzI1R91Bs4Te/UJHlCgkjU4p7jTfdTAdVWjUJSl8SERnEhKf+Loii/fAP8fCZJX0wM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739533068; c=relaxed/simple;
+	bh=IjFWn+gPCC6NL2fTwyTAuqDvzywntRNoFOUeA/PUjyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mriXi5xEeMcLa+yZxoZO5aWv22oqDcmOnewuRtkfHjiOQbUoxgXhy5zM3koo469YNabIWuH5Uj+4NtAh5iiQL9T9gHKDgW8z215VyUV5V3l/90Ia5asOVpeYu2RYdOGxaP0MEPrEBGawYki0kqwfekl+LLxEOAm7wXglTgxzHvc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=sVOcLB7/; arc=fail smtp.client-ip=52.101.100.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=R4KitlUQmuxIGyq74sFDe27Q4j1Li/V3rqQe07csi2BWtHnwgjbAUdOxYL3AIZA0MuoCmQzv6Th6qkpKUnZ5YDqy0dhZlGX/7KMChwnRwDuEFw5sLsa1EmCK5dkQFt+KOBk6XW4qNj9cu02+0TXJ5GLycW81GS8PobI5hWD8Hd6pvSUv70Cg9nLtXuQrnbJbEqD4UQKjjsmLk03uGnfsWlhbXcvHqNil2DZmwouWcIlYVlaxA1B5erNBaeFHUrtXhcwFOv/+1472z5//XABtR7e4gZJP4cA85lCFmc6h06M6hJUP6qqrHWzT82NJuU9pnM1ZuMtoFMarEn1paAQR0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7/aFwF0AgNhX46hjssnsbwLM2eVJ5LhAnzJUDQRWhBY=;
+ b=IjuWDNe8tDZTTo6iwwpMyo3R0HOwkKRKqaJLU52BYY8Tvod+m4fi8Kv9Vb2xvWxkLcvCgg1bz2jzOiFxTiI8PZbtKI7qizZ1ZhNscAKO6wN4ID887vKJm2/siFzlzIwLyjwMRlBxTXjd6dsIq992KsUhErKnZM0S0Wj7lBq6SJOiNaLKt045ND/C4mtRYE8Z9ddKXLzsxOPKhY7qQJwLJIeCXHN6t9ndO1JPUq0NkWq/5Ow6dxulbW7qErY8/j+dFZ4l7MRPdp0CfCPaf1QtGsKx5fGtgL2XDW4p3kTtYoK5/UhTYev6xrK/28r+quT8FrbFeA4trew8aDWPx7IHaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7/aFwF0AgNhX46hjssnsbwLM2eVJ5LhAnzJUDQRWhBY=;
+ b=sVOcLB7/HHv1p/dMa3XpbG/hBOT52qY+Yn4gBF2UySmhBdFUusmzvPG2u3O1xcD/+EKs1GPsZIkkOUIm3iRU/kIys3K2CRangF0FK5H7kCU2bSm6hmLv1ynPMOLBXQ3DWDpAyPjf4otDDm1tmDWRGpnczGMe9CTg5UkQjfQEEpU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
+ by CWXP265MB3061.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:c6::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.18; Fri, 14 Feb
+ 2025 11:37:44 +0000
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7%4]) with mapi id 15.20.8445.016; Fri, 14 Feb 2025
+ 11:37:44 +0000
+Date: Fri, 14 Feb 2025 11:37:40 +0000
+From: Gary Guo <gary@garyguo.net>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev
+Subject: Re: [PATCH v10 7/8] rust: Add read_poll_timeout functions
+Message-ID: <20250214113740.156faaf4@eugeo>
+In-Reply-To: <20250214.130530.335441284525755047.fujita.tomonori@gmail.com>
+References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
+	<20250207132623.168854-8-fujita.tomonori@gmail.com>
+	<20250209162048.3f18eebd.gary@garyguo.net>
+	<20250214.130530.335441284525755047.fujita.tomonori@gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-pc-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0504.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1ab::23) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:253::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|CWXP265MB3061:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe7d1c60-cf2f-413a-98f6-08dd4cebff5d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EIBhZaNmUsHSwGlQIh321FoyDGTohfQsljBA4H/83KJa4KphOvHZCN9a8nE9?=
+ =?us-ascii?Q?KXCjtWAPvTfNFDT0aZB9qcwLJTCdhSvwKWYuMnHY392zgX5XcSrBRdwhUKxM?=
+ =?us-ascii?Q?s9IG2gWhPydUBr6eefU/ZhzyzKA0N0/ZHHy0wj3caVOltG5mbdAfN4Pt6zlc?=
+ =?us-ascii?Q?DPiNc8wUGCn9cByvbMLQvejVXSj/GtZLi+qge1AWAZePRMI6xcpRpEj7uFF2?=
+ =?us-ascii?Q?VaRRoaatPUNfNR2sbY5OhscXHdrVJQr5NZGy/HvH9NSakqPHJKKGVlYBTgbL?=
+ =?us-ascii?Q?TxHihejnV/v4MqxXLsV+pqLTXfzbMGbrludF6aL6JrvaNpf24fqVrhoB3PGd?=
+ =?us-ascii?Q?iWPrwHyVUn6aaX571o96QLSdXrmixpq76gIftRa6LVNgZ3SeKOcGnGMulMz9?=
+ =?us-ascii?Q?vzwkl/1BSwGOpKjX0+ZRdryJLpjiSD/aVtPL7GdyN1ZMVS4Fub2zoj9sT4eN?=
+ =?us-ascii?Q?1GxlJGrMPp1nwnS5W+9ggIX6RrxA6JuQ4NxDleEdiRxjBKfxPstKP+kcwu2t?=
+ =?us-ascii?Q?s7on/KwHfjb//u+NVy0l7S4fYCWgvTFLGLlKCSol0H3wqLUbA3sVpQBvE9Z1?=
+ =?us-ascii?Q?Q1y/JOODxhi8uyENXefkkCiOyKKgJ28e9zuzPyOZMdlqMY6UbwxWvwPKbcgi?=
+ =?us-ascii?Q?6P/0DIFbQJUNxJkyUQXkllnuyvufmc3Ag1HiYdjNyIvgm0tTL7B9qe4Jvcmm?=
+ =?us-ascii?Q?4RmsGeHjjDZSD5vRtDBuBSweJ7MLCnyEYkKv9bE6Q8odJXomdIXY4WGaZXiW?=
+ =?us-ascii?Q?lf8xPoEIPLFWnONAhmAewT+oDRb3APnWDeAg0Q5bMAaQVUmAS6Jw1HiGPYlJ?=
+ =?us-ascii?Q?aiSTEx4jzrz2jY954BYTdh+wVvJjT1TKLFg0XWl73rXFwcqB5X9O81/c6c7U?=
+ =?us-ascii?Q?0TesplbJEvDUaFjoQtjuxhcQrsxYDW+NvGzHKUgqdpANtRauYwQ0SqT1m7oC?=
+ =?us-ascii?Q?JEVdtDGxqA3VfywzYRv9VTlbPYDfrrE5UIKCjpXEtqJQiGhkgLxQliNIqOWd?=
+ =?us-ascii?Q?sPhd9nWTR2a8rK2yWlf9VpyzK10BimQXhKyF733VVuxAyjD3AnSoqTIttSTN?=
+ =?us-ascii?Q?VA5txElF7YYEa3SaP8FWuFV/0c7K9RRnu1cl38V7xMjxSC/yN6iU40lIh7/T?=
+ =?us-ascii?Q?DGVeHqUqULt2bOBsz08JaUhuO+mVzjO1JObx5FLwabIdvn7AgMkSsF3AO9W0?=
+ =?us-ascii?Q?gL05b9uAjkQDZgjt2VREQfKdZJa19MjkXmWIydZhvptGMW3GWLG+okD2Gfik?=
+ =?us-ascii?Q?Bjp8V21lRohZy8S7DmYXKrMRYkQirrK5PzEt8DVYTsF0A4QLuZnhy2C1h9yF?=
+ =?us-ascii?Q?lRsj15OZAUwOsQ0dUlf/5nL8qkeIH5aGqufa9dZcUvCzJ+Z6xUyjDi8lH9Ov?=
+ =?us-ascii?Q?pZInZWnAm8U5e0aRBFtSqSzI/25t?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?z39n8HFClXb3rzinFe3Vgsb9u1aJXhlmYtldtJipY3IhtGefTohgE3H/lhrh?=
+ =?us-ascii?Q?xEK4i/0t3VqyulZwM8PdKvBQJUhyeoaW7q4nAtTg1Y9TqoTLuF4iD5f9+qwK?=
+ =?us-ascii?Q?S1mulEOEgiNIY1ocMRH9cGa7K9LnbigcxUgXWri9/dZi1hQ/t3ZIz8OyJAh2?=
+ =?us-ascii?Q?718wBm1KKHCRdmx3k4MrNbvUv8B3z8PbI8zeQbymW8DDwws3Yk8EShJwqw2b?=
+ =?us-ascii?Q?DHsfZ5deWjn1JXvzHHRf6M+Q2W6YnQ/VPqdv93BRF1tfukDNTcts1In+nFNB?=
+ =?us-ascii?Q?3Q0bSM9Dr39u2IyeZU2oEEO7zYucS52LtGi0VlTIJzoHj3CT5q7U4vK2JqsQ?=
+ =?us-ascii?Q?MEpZ76j9J1/R6F7emgLgNPW2tWvDfjy+9cqbbS1EKm/dsBe6bakGgS9Bf/7n?=
+ =?us-ascii?Q?bopCUbqUIxV5AHCfv3CYR+533jEta7eNV8irZ4MKrs4C+oItHdfC/HzTuLtR?=
+ =?us-ascii?Q?BkfFaqYrzt5lHeICjLryocwepwReVkd2hhYoDqGuqoPFUeXDFEPb60glPMei?=
+ =?us-ascii?Q?iIcirppf5xEkJ19hgDfXMreODkwgLsprcx/WBExb93V7ODD13WII2uSxPqwB?=
+ =?us-ascii?Q?spP5bjmzRs7iwlyFLl9ZYt/9SPlWZqdl84ahiB7joP2NC8oCiHKoQcSb4vH2?=
+ =?us-ascii?Q?+l1Ac9ytuSZwqw4pYOlgfCBymY1eLHz78GR0j2tNnY0WPfYJQsBpjkM5kq1P?=
+ =?us-ascii?Q?DrBy2qC4tULFxJ6vmxx2PPeKWegXfAjG1cWDC1oLdMwsEnk8sK25YNm45I8B?=
+ =?us-ascii?Q?GDyr9ODgFfFzWi+MIxOazcLxpEkAlq80W0zBie6ZVnjtCV4y6rdnURGRGs5T?=
+ =?us-ascii?Q?/MRnIQT5opYZgCTrp87OjiOMNztI8BtVXPBu62yjW3nEUmVkiYZhwelKoZhD?=
+ =?us-ascii?Q?4QhhP+QXibDdCjIZKmr5CUz0Z0ASxfN6xhT+0y3J6SUJLkqOlKm6JrvqY3ZZ?=
+ =?us-ascii?Q?NLcQzo+kguDVisFVtqptWYZjSBsHvjl/6RMyMAtvvfowu6dV3F9kZiHZ8QlR?=
+ =?us-ascii?Q?sBuRbT7u1pYBwbgfg0kfzUsW1IQKNk/Ul3zE6GXIQChBsg2XUCRXZBFMihxh?=
+ =?us-ascii?Q?ubJ4YfSv6jvZBkMo2ilkaEfNFrwAN1pEz96VN5UeuX8ZGKE+TPLIssxPNtxo?=
+ =?us-ascii?Q?Ha2s6J0TluyqyEyMdULs3zXCPWm6br1tgyrTvvMjig7WExXdVBZydfuyp4Sd?=
+ =?us-ascii?Q?30g5F/TO7LzH0vkPm5EOT5R17wDy2mVxmIFhy3EyP26qr3s/thXqx0kr1jQr?=
+ =?us-ascii?Q?WIwsiS1TFjZeloJW3pKfM4M2ZmlIL5jokW03f2870tM7wqfHo+ycK0qxSRro?=
+ =?us-ascii?Q?z/frctEMcnspLNnXl93SB8JQ4lMi0O7TFwOHCTjuvaz27d22P6GbPO5rkrqe?=
+ =?us-ascii?Q?uUqgXyV2t8jfKlWSDlYX9F78/kx8axatEl+3DvOr5ln9A4vI0DY8XLdFsJmg?=
+ =?us-ascii?Q?SZ1wdrwKl9SKEYTJjSNVbTh14THO/c49DstbCKGL1uQ6wW4p0PsdXMMcTvOU?=
+ =?us-ascii?Q?ITC2QN18bB+r5JOk8XZ3V3pfBTKisN1CyJGKOhHEUrSZ3+L8EedyBa1KD+3u?=
+ =?us-ascii?Q?Wq99FzQPcyNR+AkpDzK4yUDYceSb1LK1T9b9t+Ss?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe7d1c60-cf2f-413a-98f6-08dd4cebff5d
+X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 11:37:44.3569
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BYAoePQ8DezYgDkcAhH43MWB2EAmiNTOWDtyMMxGva5vbLBVrV/pMdq+xtKE+8F+qlxj5xVcGsSzT1gwKZA5vA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB3061
 
-On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> From: Hsin-chen Chuang <chharry@chromium.org>
+On Fri, 14 Feb 2025 13:05:30 +0900 (JST)
+FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+
+> On Sun, 9 Feb 2025 16:20:48 +0000
+> Gary Guo <gary@garyguo.net> wrote:
 > 
-> Expose the isoc_alt attr with device group to avoid the racing.
+> >> +fn might_sleep(loc: &Location<'_>) {
+> >> +    // SAFETY: FFI call.
+> >> +    unsafe {
+> >> +        crate::bindings::__might_sleep_precision(
+> >> +            loc.file().as_ptr().cast(),
+> >> +            loc.file().len() as i32,
+> >> +            loc.line() as i32,
+> >> +        )
+> >> +    }
+> >> +}  
+> > 
+> > One last Q: why isn't `might_sleep` marked as `track_caller` and then
+> > have `Location::caller` be called internally?
+> >
+> > It would make the API same as the C macro.  
 > 
-> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> it also becomes the parent device of hci dev.
+> Equivalent to the C side __might_sleep(), not might_sleep(). To avoid
+> confusion, it might be better to change the name of this function.
 > 
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-
-Wait, step back, why is this commit needed if you can change the alt
-setting already today through usbfs/libusb without needing to mess with
-the bluetooth stack at all?
-
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
+> The reason why __might_sleep() is used instead of might_sleep() is
+> might_sleep() can't always be called. It was discussed in v2:
 > 
-> Changes in v5:
-> - Merge the ABI doc into this patch
-> - Manage the driver data with device
+> https://lore.kernel.org/all/ZwPT7HZvG1aYONkQ@boqun-archlinux/
+
+I don't follow. `__might_sleep` or `might_sleep` wouldn't make a
+difference here, given that this function may actually sleep.
+
+- Gary
+
 > 
-> Changes in v4:
-> - Create a dev node for btusb. It's now hci dev's parent and the
->   isoc_alt now belongs to it.
-> - Since the changes is almost limitted in btusb, no need to add the
->   callbacks in hdev anymore.
+> > Also -- perhaps this function can be public (though I guess you'd need
+> > to put it in a new module).  
+
 > 
-> Changes in v3:
-> - Make the attribute exported only when the isoc_alt is available.
-> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
->   (which calls hci_init_sysfs).
-> - Since hci_init_sysfs is called before btusb could modify the hdev,
->   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
-> 
-> Changes in v2:
-> - The patch has been removed from series
-> 
->  .../ABI/stable/sysfs-class-bluetooth          |  13 ++
->  drivers/bluetooth/btusb.c                     | 111 ++++++++++++++----
->  include/net/bluetooth/hci_core.h              |   1 +
->  net/bluetooth/hci_sysfs.c                     |   3 +-
->  4 files changed, 102 insertions(+), 26 deletions(-)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documentation/ABI/stable/sysfs-class-bluetooth
-> index 36be02471174..c1024c7c4634 100644
-> --- a/Documentation/ABI/stable/sysfs-class-bluetooth
-> +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
-> @@ -7,3 +7,16 @@ Description: 	This write-only attribute allows users to trigger the vendor reset
->  		The reset may or may not be done through the device transport
->  		(e.g., UART/USB), and can also be done through an out-of-band
->  		approach such as GPIO.
-> +
-> +What:		/sys/class/bluetooth/btusb<usb-intf>/isoc_alt
-> +Date:		13-Feb-2025
-> +KernelVersion:	6.13
-> +Contact:	linux-bluetooth@vger.kernel.org
-> +Description:	This attribute allows users to configure the USB Alternate setting
-> +		for the specific HCI device. Reading this attribute returns the
-> +		current setting, and writing any supported numbers would change
-> +		the setting. See the USB Alternate setting definition in Bluetooth
-> +		core spec 5, vol 4, part B, table 2.1.
-> +		If the HCI device is not yet init-ed, the write fails with -ENODEV.
-> +		If the data is not a valid number, the write fails with -EINVAL.
-> +		The other failures are vendor specific.
+> Wouldn't it be better to keep it private until actual users appear?
 
-Again, what's wrong with libusb/usbfs to do this today?
-
-
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 1caf7a071a73..e2fb3d08a5ed 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -920,6 +920,8 @@ struct btusb_data {
->  	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->  
->  	struct qca_dump_info qca_dump;
-> +
-> +	struct device dev;
-
-Ah, so now this structure's lifecycle is determined by the device you
-just embedded in it?  Are you sure you got this right?
-
->  };
->  
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
->  	int alt;
->  	int ret;
->  
-> +	if (!data->hdev)
-> +		return -ENODEV;
-> +
->  	if (kstrtoint(buf, 10, &alt))
->  		return -EINVAL;
->  
-> @@ -3702,6 +3707,36 @@ static ssize_t isoc_alt_store(struct device *dev,
->  
->  static DEVICE_ATTR_RW(isoc_alt);
->  
-> +static struct attribute *btusb_sysfs_attrs[] = {
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs);
-> +
-> +static void btusb_sysfs_release(struct device *dev)
-> +{
-> +	struct btusb_data *data = dev_get_drvdata(dev);
-
-That feels wrong, it's embedded in the device, not pointed to by the
-device.  So this should be a container_of() call, right?
-
-> +
-> +	kfree(data);
-> +}
-> +
-> +static const struct device_type btusb_sysfs = {
-> +	.name    = "btusb",
-> +	.release = btusb_sysfs_release,
-> +	.groups  = btusb_sysfs_groups,
-> +};
-> +
-> +static struct attribute *btusb_sysfs_isoc_alt_attrs[] = {
-> +	&dev_attr_isoc_alt.attr,
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs_isoc_alt);
-> +
-> +static const struct device_type btusb_sysfs_isoc_alt = {
-> +	.name    = "btusb",
-> +	.release = btusb_sysfs_release,
-> +	.groups  = btusb_sysfs_isoc_alt_groups,
-> +};
-> +
->  static int btusb_probe(struct usb_interface *intf,
->  		       const struct usb_device_id *id)
->  {
-> @@ -3743,7 +3778,7 @@ static int btusb_probe(struct usb_interface *intf,
->  			return -ENODEV;
->  	}
->  
-> -	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
->  	if (!data)
->  		return -ENOMEM;
->  
-> @@ -3766,8 +3801,10 @@ static int btusb_probe(struct usb_interface *intf,
->  		}
->  	}
->  
-> -	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep)
-> -		return -ENODEV;
-> +	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep) {
-> +		err = -ENODEV;
-> +		goto out_free_data;
-> +	}
->  
->  	if (id->driver_info & BTUSB_AMP) {
->  		data->cmdreq_type = USB_TYPE_CLASS | 0x01;
-> @@ -3821,16 +3858,47 @@ static int btusb_probe(struct usb_interface *intf,
->  
->  	data->recv_acl = hci_recv_frame;
->  
-> +	if (id->driver_info & BTUSB_AMP) {
-> +		/* AMP controllers do not support SCO packets */
-> +		data->isoc = NULL;
-> +	} else {
-> +		/* Interface orders are hardcoded in the specification */
-> +		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> +		data->isoc_ifnum = ifnum_base + 1;
-> +	}
-> +
-> +	if (id->driver_info & BTUSB_BROKEN_ISOC)
-> +		data->isoc = NULL;
-> +
-> +	/* Init a dev for btusb. The attr depends on the support of isoc. */
-> +	if (data->isoc)
-> +		data->dev.type = &btusb_sysfs_isoc_alt;
-> +	else
-> +		data->dev.type = &btusb_sysfs;
-
-When walking the class, are you sure you check for the proper types now?
-Does anyone walk all of the class devices anywhere?
-
-> +	data->dev.class = &bt_class;
-> +	data->dev.parent = &intf->dev;
-> +
-> +	err = dev_set_name(&data->dev, "btusb%s", dev_name(&intf->dev));
-
-what does this name look like in a real system?  squashing them together
-feels wrong, why is 'btusb' needed here at all?
-
-> +	if (err)
-> +		goto out_free_data;
-> +
-> +	dev_set_drvdata(&data->dev, data);
-> +	err = device_register(&data->dev);
-> +	if (err < 0)
-> +		goto out_put_sysfs;
-> +
->  	hdev = hci_alloc_dev_priv(priv_size);
-> -	if (!hdev)
-> -		return -ENOMEM;
-> +	if (!hdev) {
-> +		err = -ENOMEM;
-> +		goto out_free_sysfs;
-> +	}
->  
->  	hdev->bus = HCI_USB;
->  	hci_set_drvdata(hdev, data);
->  
->  	data->hdev = hdev;
->  
-> -	SET_HCIDEV_DEV(hdev, &intf->dev);
-> +	SET_HCIDEV_DEV(hdev, &data->dev);
->  
->  	reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
->  					GPIOD_OUT_LOW);
-> @@ -3969,15 +4037,6 @@ static int btusb_probe(struct usb_interface *intf,
->  		hci_set_msft_opcode(hdev, 0xFD70);
->  	}
->  
-> -	if (id->driver_info & BTUSB_AMP) {
-> -		/* AMP controllers do not support SCO packets */
-> -		data->isoc = NULL;
-> -	} else {
-> -		/* Interface orders are hardcoded in the specification */
-> -		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> -		data->isoc_ifnum = ifnum_base + 1;
-> -	}
-> -
->  	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
->  	    (id->driver_info & BTUSB_REALTEK)) {
->  		btrtl_set_driver_name(hdev, btusb_driver.name);
-> @@ -4010,9 +4069,6 @@ static int btusb_probe(struct usb_interface *intf,
->  			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
->  	}
->  
-> -	if (id->driver_info & BTUSB_BROKEN_ISOC)
-> -		data->isoc = NULL;
-> -
->  	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
->  		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
->  
-> @@ -4065,10 +4121,6 @@ static int btusb_probe(struct usb_interface *intf,
->  						 data->isoc, data);
->  		if (err < 0)
->  			goto out_free_dev;
-> -
-> -		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
-
-You have now moved the file, are you sure you don't also need to update
-the documentation?
-
-
-> -		if (err)
-> -			goto out_free_dev;
->  	}
->  
->  	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> @@ -4099,6 +4151,16 @@ static int btusb_probe(struct usb_interface *intf,
->  	if (data->reset_gpio)
->  		gpiod_put(data->reset_gpio);
->  	hci_free_dev(hdev);
-> +
-> +out_free_sysfs:
-> +	device_del(&data->dev);
-> +
-> +out_put_sysfs:
-> +	put_device(&data->dev);
-> +	return err;
-> +
-> +out_free_data:
-> +	kfree(data);
->  	return err;
->  }
->  
-> @@ -4115,10 +4177,8 @@ static void btusb_disconnect(struct usb_interface *intf)
->  	hdev = data->hdev;
->  	usb_set_intfdata(data->intf, NULL);
->  
-> -	if (data->isoc) {
-> -		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> +	if (data->isoc)
->  		usb_set_intfdata(data->isoc, NULL);
-> -	}
->  
->  	if (data->diag)
->  		usb_set_intfdata(data->diag, NULL);
-> @@ -4150,6 +4210,7 @@ static void btusb_disconnect(struct usb_interface *intf)
->  		gpiod_put(data->reset_gpio);
->  
->  	hci_free_dev(hdev);
-> +	device_unregister(&data->dev);
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 05919848ea95..776dd6183509 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1843,6 +1843,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_dev *hdev);
->  
->  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
->  
-> +extern const struct class bt_class;
->  void hci_init_sysfs(struct hci_dev *hdev);
->  void hci_conn_init_sysfs(struct hci_conn *conn);
->  void hci_conn_add_sysfs(struct hci_conn *conn);
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 041ce9adc378..aab3ffaa264c 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -6,9 +6,10 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> -static const struct class bt_class = {
-> +const struct class bt_class = {
->  	.name = "bluetooth",
->  };
-> +EXPORT_SYMBOL(bt_class);
-
-EXPORT_SYMBOL_GPL(), right?
-
-thanks,
-
-greg k-h
 
