@@ -1,193 +1,99 @@
-Return-Path: <netdev+bounces-166438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEE1A35FF9
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:15:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8B9A35FEB
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:14:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 399B91891BD6
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1417F3A5B2E
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F766265CDB;
-	Fri, 14 Feb 2025 14:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4F5264FB9;
+	Fri, 14 Feb 2025 14:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8Rji59G"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hTLSSzS6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9173265CB8;
-	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6DD25A35E
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739542466; cv=none; b=aQZta+HEkcX9F5dC3NlCdpK9RxxOwB3jGRB6EJ8H0Yk6k02ZQEiPpiJdNGdNILfGUX9/mZUBWX2Kp2/38GOvj3mhFjUuJZr5sPKOzoHJAurT/IWH9TePfggIvOS67JjhoYvTLRFXUpVSj9kG+DXwcwkt+1JufBMJFLEvzbvHcM8=
+	t=1739542463; cv=none; b=Ilo8c/oLbzR7i4qCsIxgas5k+jOwZqgIe4UcA4TUelRCdpvDbmWbrzTftAI26Ka3r7KbREWg5l/6MRXyxKczQVjY8vh4uD2/IY75dna2Vf4MCefNjxpu9POQYzXhwFi7xf3TVWT3m/POqbpoCe5JzFgIrmOROZMITqBBIBGpqVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739542466; c=relaxed/simple;
-	bh=OoAMzDnzmRmO0ZesIeeusKyjpaxqRVifD0eRg6O/C+c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=edPFYNZU34Q8JICrlVapOm5oGNk1U1k7Nty6t0myCTacMCx6HcwFq8DI166ZwUYplrr5O4oJX75ijiCFU9/UTd8YYUD8KcaXoh0uAVsmJOMzORJnC+zQr1k8rzuw6MmnEyNK4X0vwbsbRRvPArrWZQfLtcb25OQ9nDJNfIrs+/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D8Rji59G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6DDCFC4AF0B;
-	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739542466;
-	bh=OoAMzDnzmRmO0ZesIeeusKyjpaxqRVifD0eRg6O/C+c=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=D8Rji59GwdedTpdUmGp6He/h286f64F3hQqtpN8Tr7rowSLJm9cFSzyQNjl+g1y8I
-	 2NH6wVSbnbi/66htdR5vROdEYB17JAapQ3RutH+c+hysbRNJtomnT74+W4YbKtziIZ
-	 wuDmFaYhf5z5yQ0y0Qpl+HDPp2oV9kxqe0ph9nexJv0DU69zufANnyQtJ/uyvnz0Cd
-	 F24lM7JEoxxoTV73yILd3+6emiz13umCF6yycSDcWOr4jZ1LMXAp3PHBeVSUwOv8Kf
-	 /vyZH/xZUz51T3I2JgT58bGT1sgwIdST4afzhKy0ruMQyUCogDxvsedH39DUpvOSSu
-	 w1lKJpdseG7XQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B97C021A9;
-	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
-From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Fri, 14 Feb 2025 15:14:11 +0100
-Subject: [PATCH net-next v5 3/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
+	s=arc-20240116; t=1739542463; c=relaxed/simple;
+	bh=XoOP2Rl4B9P2ec3pKEVrjBv0YWzev9pY5vEbs+9JzSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IV3KEmnxkjgcLqJsZFDMvs8UexrfFrYzEKFI6L+53ARNnC3UalUjvlDQkrCljbYoNpm3E34gIfEeyZl9w6kIF8WBIN1jE0qc6sa7LSUbVv3aqArJQYDbNVzTwl0DuVpoaGjokUGnVA2tgb6SEs1LT6zYSNtQA+9V9+VY26JbCGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hTLSSzS6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cwTNYMSB6L78IK+gymK2J/YOKlkj4xNihqKiXhxKYjM=; b=hTLSSzS61rz4N/pRvrURgPeRdf
+	ffYS3YHCRZQzdbpzaCLp1TKxCih4kQO55h4zDL059ojKY9ySI+Z3kCcsSVuBoE9toAyax9yBBCgUU
+	6oQ2r7e/Y2mundk0LnjdiqiMtysROLNPqMgVDtIFFjc8eUqlOT3Y/Yberb/atLadFEs4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tiwSP-00E5Wo-AA; Fri, 14 Feb 2025 15:14:17 +0100
+Date: Fri, 14 Feb 2025 15:14:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, pierre@stackhpc.com,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
+Message-ID: <10e27c4b-84d8-4c63-9aea-d6d6197510d9@lunn.ch>
+References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+ <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+ <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250214-dp83822-tx-swing-v5-3-02ca72620599@liebherr.com>
-References: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
-In-Reply-To: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Florian Fainelli <f.fainelli@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
- Dimitri Fedrau <dima.fedrau@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739542465; l=3488;
- i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=Or6PDXKPMq4kk1AHxpqPQpxSNSkTyzooFMkd9jkPUKk=;
- b=WVZP1AGB+0WKyM2keetZIyKR2MJ5QQffba06je+G7obuCNMafoggYpuEJfP6BkMf7viovLvSl
- Bz2qj6R74dWBe3FDQ3ZIy6c5+QDQRXv06FQkJPJYoGrIzEU7BT6jGGV
-X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
- pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
-X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
- with auth_id=290
-X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Reply-To: dimitri.fedrau@liebherr.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
 
-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+On Fri, Feb 14, 2025 at 02:58:41PM +0100, Michal Swiatkowski wrote:
+> On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
+> > On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
+> > > Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> > > from xa_alloc_cyclic() in scheduler code [1]. The same is done in
+> > > devlink_rel_alloc().
+> > 
+> > If the same bug exists twice it might exist more times. Did you find
+> > this instance by searching the whole tree? Or just networking?
+> > 
+> > This is also something which would be good to have the static
+> > analysers check for. I wounder if smatch can check this?
+> > 
+> > 	Andrew
+> > 
+> 
+> You are right, I checked only net folder and there are two usage like
+> that in drivers. I will send v2 with wider fixing, thanks.
+> 
+> It can be not so easy to check. What if someone want to treat wrapping
+> as an error (don't know if it is valid)? If one of the caller is
+> checking err < 0 it will be fine.
 
-Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-Modifying it can be necessary to compensate losses on the PCB and
-connector, so the voltages measured on the RJ45 pins are conforming.
+I put Dan in Cc:, lets see what he thinks.
 
-Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
----
- drivers/net/phy/dp83822.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+There is at least one other functions i can think of which has similar
+behaviour, < 0 on error, 0 or 1 are both different sorts of
+success. If there are two, there are probably more. Having tooling to
+find this sort of problem would be nice, even if it has a high false
+positive rate and needs combining with manual inspection.
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 6599feca1967d705331d6e354205a2485ea962f2..3662f3905d5ade8ad933608fcaeabb714a588418 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -31,6 +31,7 @@
- #define MII_DP83822_RCSR	0x17
- #define MII_DP83822_RESET_CTRL	0x1f
- #define MII_DP83822_MLEDCR	0x25
-+#define MII_DP83822_LDCTRL	0x403
- #define MII_DP83822_LEDCFG1	0x460
- #define MII_DP83822_IOCTRL1	0x462
- #define MII_DP83822_IOCTRL2	0x463
-@@ -123,6 +124,9 @@
- #define DP83822_IOCTRL1_GPIO1_CTRL		GENMASK(2, 0)
- #define DP83822_IOCTRL1_GPIO1_CTRL_LED_1	BIT(0)
- 
-+/* LDCTRL bits */
-+#define DP83822_100BASE_TX_LINE_DRIVER_SWING	GENMASK(7, 4)
-+
- /* IOCTRL2 bits */
- #define DP83822_IOCTRL2_GPIO2_CLK_SRC		GENMASK(6, 4)
- #define DP83822_IOCTRL2_GPIO2_CTRL		GENMASK(2, 0)
-@@ -197,6 +201,7 @@ struct dp83822_private {
- 	bool set_gpio2_clk_out;
- 	u32 gpio2_clk_out;
- 	bool led_pin_enable[DP83822_MAX_LED_PINS];
-+	int tx_amplitude_100base_tx_index;
- };
- 
- static int dp83822_config_wol(struct phy_device *phydev,
-@@ -522,6 +527,12 @@ static int dp83822_config_init(struct phy_device *phydev)
- 			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CLK_SRC,
- 					  dp83822->gpio2_clk_out));
- 
-+	if (dp83822->tx_amplitude_100base_tx_index >= 0)
-+		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_LDCTRL,
-+			       DP83822_100BASE_TX_LINE_DRIVER_SWING,
-+			       FIELD_PREP(DP83822_100BASE_TX_LINE_DRIVER_SWING,
-+					  dp83822->tx_amplitude_100base_tx_index));
-+
- 	err = dp83822_config_init_leds(phydev);
- 	if (err)
- 		return err;
-@@ -720,6 +731,11 @@ static int dp83822_phy_reset(struct phy_device *phydev)
- }
- 
- #ifdef CONFIG_OF_MDIO
-+static const u32 tx_amplitude_100base_tx_gain[] = {
-+	80, 82, 83, 85, 87, 88, 90, 92,
-+	93, 95, 97, 98, 100, 102, 103, 105,
-+};
-+
- static int dp83822_of_init_leds(struct phy_device *phydev)
- {
- 	struct device_node *node = phydev->mdio.dev.of_node;
-@@ -780,6 +796,8 @@ static int dp83822_of_init(struct phy_device *phydev)
- 	struct dp83822_private *dp83822 = phydev->priv;
- 	struct device *dev = &phydev->mdio.dev;
- 	const char *of_val;
-+	int i, ret;
-+	u32 val;
- 
- 	/* Signal detection for the PHY is only enabled if the FX_EN and the
- 	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
-@@ -815,6 +833,26 @@ static int dp83822_of_init(struct phy_device *phydev)
- 		dp83822->set_gpio2_clk_out = true;
- 	}
- 
-+	dp83822->tx_amplitude_100base_tx_index = -1;
-+	ret = phy_get_tx_amplitude_gain(phydev, dev,
-+					ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-+					&val);
-+	if (!ret) {
-+		for (i = 0; i < ARRAY_SIZE(tx_amplitude_100base_tx_gain); i++) {
-+			if (tx_amplitude_100base_tx_gain[i] == val) {
-+				dp83822->tx_amplitude_100base_tx_index = i;
-+				break;
-+			}
-+		}
-+
-+		if (dp83822->tx_amplitude_100base_tx_index < 0) {
-+			phydev_err(phydev,
-+				   "Invalid value for tx-amplitude-100base-tx-percent property (%u)\n",
-+				   val);
-+			return -EINVAL;
-+		}
-+	}
-+
- 	return dp83822_of_init_leds(phydev);
- }
- 
-
--- 
-2.39.5
-
-
+	Andrew
 
