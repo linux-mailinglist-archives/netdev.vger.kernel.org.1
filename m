@@ -1,98 +1,71 @@
-Return-Path: <netdev+bounces-166389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BBA35D5B
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:17:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77170A35DD6
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8C70188D5D9
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:17:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB9C168694
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A488263C9C;
-	Fri, 14 Feb 2025 12:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D28DF5C;
+	Fri, 14 Feb 2025 12:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7N/9TGo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CfXCOA8O"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C8A26137F
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF2E2753E7
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739535454; cv=none; b=RZqRsS/9MnMohYpy7sNVcO8C/LhoWPGxvX+Z3McMIWVCnd2D5yEwPWzAlGLUP+L5SJoDrYH/Chns9VMZgJ4QMSIzAvDZGLc7H9TN36fPOR8itv3MvD6jJnTat8cgZ1lKWKhv0hztyqT1b6qPYka7mFm0NhUOQQhsM+2nzicTGA8=
+	t=1739537202; cv=none; b=VthVkBrVcl2JyVt1zXlKKfr2+C8m1hmVdD+tnRTmu02xOPjDPAA7cvMtb6l/RkTMqjBoQXZaHSny1vrrcnzMlbrqaU07SrqQk3X6Jue9xK7IPsX64MbaZEhHCE9dKvYOFSH0IoEKNzaHdxxnXyU7Iay8OaJz2Vikzbl9xjMBZVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739535454; c=relaxed/simple;
-	bh=508bg14U3UMJ8jdr3pX2AL6akRM/QyTn1EwYOGL0phw=;
+	s=arc-20240116; t=1739537202; c=relaxed/simple;
+	bh=wxHauzlg+BXUiSKr0BD/Ua4+vBpvNMAqjIAiar5h21I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clpOlMvOjjMB+ddGNyTh87l8f/kn2RMvhhwzqoKIf4NJbo/ShDchTyUzqq28ZL+FzkAvibbCQlQN1dA0UfBOBT3yJvLiHOeiemH6FCE7HHGYoJoUopquG1kkOgzID+ta45WIFtrJlbRgfpzn6Aybn3YY2fwpzI9AkISWhImEgp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7N/9TGo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739535451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
-	b=J7N/9TGovXCge1ko/0xLQVccvL2XxhtJ1uUVxvQ7FI/oWVJLZfO4MnOjNNP119rIdfgkDD
-	TLI7Iw5ExEyybxgy8YFlNCSAILmlzeXbpXRSwVAfp62eNNFpLfOK1bti6p//jUC2jlj5Yq
-	SDxdcjnhaEDUyuK7YVdZKDLBM/wLhQw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-1jkhPBu5O4iIe3gSEmKdow-1; Fri, 14 Feb 2025 07:17:29 -0500
-X-MC-Unique: 1jkhPBu5O4iIe3gSEmKdow-1
-X-Mimecast-MFC-AGG-ID: 1jkhPBu5O4iIe3gSEmKdow_1739535449
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ab7ee92898fso227441266b.0
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 04:17:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739535448; x=1740140248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
-        b=rWFZoF6GLkK4y0OoUmKppMhgpcsO0TNytWtlteEE5B2vAm8dIj/5tufw05DMCC+7ts
-         DQopUNcw0skTFLdcxuBnhpKyiNJA5Bt3pk5PcMuoOiBJah+7ZBA5oXLQ1m+f0DjbxWMe
-         5rWit2TSkXYc6mXjT9Ys4SxdT3o6kMHMxN8i/8pCA5w0++GOBXrf1NrZa1jlrlCdRj/+
-         OCW+i0e9ko08tH9fvoSGlmt72iAy0xHhNRFTQdUhU5/RnBQfPLspXyuu3tjIAedB3UaF
-         aRaEHZPuGHcwemFIU+kJdzxvkLYRfl0rpnoa1/zQuDZLxIdws4KeUgSqkQShzT6yxSU+
-         p1Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVr6fGO5TGGAeOb+1X3zulBPSxXxB2cB2LfTAwHPIRZPZKjTvjJbaDYF5+s9y7rCqmPB/KHMEQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxM8w78LCRPn65WoJsZjrMX9LYZbnKPA8MtcgwDv9ll/egozE/
-	BEHmwOVT9tXbTksYgbcaAvVeMMp3cjQItia0K2sk2kEnNCemTIP1H9DdExAdEWkUWymkREIj420
-	66npO8YaGRRIv/2i/PDMiKs/2ln7Hy5UyfDvncdOd+noGkFM6b17MiA==
-X-Gm-Gg: ASbGncs8HlS0C/deA/A34ztuxjOY7Njvsp41obXthWzUW0l2XY9e+PumPXiWimgN2Vm
-	aUr3tlziLh066acYpVWdUGcqbn/ncXjtKRHbCsUw1GrHtlYjG7K8wonwTp6fRCibJyVDnjwuWAc
-	t/NXbtShxdoKA94n49jn58TDofE2A4hRewaesL2vog7UUpU5lWD5HBunW4eDAtcFMg9JE1d2jtv
-	weiJY1e/AJCXvq5nmNymVeWLohEmnqxCgG0i9bgP0oIUg5Lq3dsRb9jOkHD7D/+VsU/Rg==
-X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198347466b.40.1739535448550;
-        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGPf+AeSUeRn24l529Z9ZendqwqQDqP06Hke8qwzwFNKUt9IcGq+7DW+H44R0X87YfMunCk/g==
-X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198344266b.40.1739535448190;
-        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
-Received: from redhat.com ([2.55.187.107])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba5323226asm334107966b.8.2025.02.14.04.17.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 04:17:26 -0800 (PST)
-Date: Fri, 14 Feb 2025 07:17:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
-	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com,
-	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying01.gao@samsung.com, ying123.xu@samsung.com
-Subject: Re: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Message-ID: <20250214071714-mutt-send-email-mst@kernel.org>
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
- <CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
- <20250214012200.1883896-1-junnan01.wu@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJF4064wZLXy6GYOqYIMjv0j+Hesr+BvXnwEIxlmyE6qV2SPl48M9IgRsUmy0rd6ynVshBCGJO8OfB7pYXu7BoXCqAyGb7Na3CkFWlSZLslR0Z1nwVHjDuFI/JE7OyjDI7k8xkRtHLvSG7lDsx/R+GUe5z2gtuHI9lsrsdbaP0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CfXCOA8O; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739537201; x=1771073201;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wxHauzlg+BXUiSKr0BD/Ua4+vBpvNMAqjIAiar5h21I=;
+  b=CfXCOA8OKl7GrHj+f3C9pmgh1gtNFny/5hYzB2NbXr20JGJiuZdWL88K
+   rBGA7hPG+WLulZV0BiGN2+5GhS48W6z2hyiBc1FCd0OH5Z+JzPoV0P8Ik
+   txbMWpaVknB0/16IkHTrLB8w+h8cuHP5tbH1qaeD9iBLhxlx8KO1YS0Zt
+   LkwM/TI7tuPR+UiGt+tl4mNuR3D6TcyzLFCsHMvl0cqeXcVmMN1dhFo9B
+   rJRKvQjwLHvwOKpkw1K30ycIWVn6b7Eq2WaGz7TviZaA+Mhb46pdSlsN8
+   mdlXuPAVEKU0ldGaT160GBk0MAjgfsmHojbhu6lKPOZHp/ePTbu0vBUeh
+   A==;
+X-CSE-ConnectionGUID: ZIhGIH2TQTCn27GkblN/zg==
+X-CSE-MsgGUID: U1iX6HYZRF6JLTxBRZKAgA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="40319070"
+X-IronPort-AV: E=Sophos;i="6.13,285,1732608000"; 
+   d="scan'208";a="40319070"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 04:46:40 -0800
+X-CSE-ConnectionGUID: oR6x/a2hSHaRC8/PNz/xng==
+X-CSE-MsgGUID: +5RtNyuCQDOl76LRZ2Vd/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="113939301"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 04:46:39 -0800
+Date: Fri, 14 Feb 2025 13:43:03 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Pierre Riteau <pierre@stackhpc.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net/sched: cls_api: fix error handling causing NULL
+ dereference
+Message-ID: <Z685fovQy0yL6stZ@mev-dev.igk.intel.com>
+References: <20250213223610.320278-1-pierre@stackhpc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,75 +74,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250214012200.1883896-1-junnan01.wu@samsung.com>
+In-Reply-To: <20250213223610.320278-1-pierre@stackhpc.com>
 
-On Fri, Feb 14, 2025 at 09:22:00AM +0800, Junnan Wu wrote:
-> When executing suspend to ram twice in a row,
-> the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
-> Then after virtqueue_get_buf and `rx_buf_nr` decreased
-> in function virtio_transport_rx_work,
-> the condition to fill rx buffer
-> (rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+On Thu, Feb 13, 2025 at 11:36:10PM +0100, Pierre Riteau wrote:
+> tcf_exts_miss_cookie_base_alloc() calls xa_alloc_cyclic() which can
+> return 1 if the allocation succeeded after wrapping. This was treated as
+> an error, with value 1 returned to caller tcf_exts_init_ex() which sets
+> exts->actions to NULL and returns 1 to caller fl_change().
 > 
-> It is because that `rx_buf_nr` and `rx_buf_max_nr`
-> are initialized only in virtio_vsock_probe(),
-> but they should be reset whenever virtqueues are recreated,
-> like after a suspend/resume.
+> fl_change() treats err == 1 as success, calling tcf_exts_validate_ex()
+> which calls tcf_action_init() with exts->actions as argument, where it
+> is dereferenced.
 > 
-> Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
-> virtio_vsock_vqs_init(), so we are sure that they are properly
-> initialized, every time we initialize the virtqueues, either when we
-> load the driver or after a suspend/resume.
+> Example trace:
 > 
-> To prevent erroneous atomic load operations on the `queued_replies`
-> in the virtio_transport_send_pkt_work() function
-> which may disrupt the scheduling of vsock->rx_work
-> when transmitting reply-required socket packets,
-> this atomic variable must undergo synchronized initialization
-> alongside the preceding two variables after a suspend/resume.
+> BUG: kernel NULL pointer dereference, address: 0000000000000000
+> CPU: 114 PID: 16151 Comm: handler114 Kdump: loaded Not tainted 5.14.0-503.16.1.el9_5.x86_64 #1
+> RIP: 0010:tcf_action_init+0x1f8/0x2c0
+> Call Trace:
+>  tcf_action_init+0x1f8/0x2c0
+>  tcf_exts_validate_ex+0x175/0x190
+>  fl_change+0x537/0x1120 [cls_flower]
 > 
-> Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
-> Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
-> Co-developed-by: Ying Gao <ying01.gao@samsung.com>
-> Signed-off-by: Ying Gao <ying01.gao@samsung.com>
-> Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
-
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
+> Fixes: 80cd22c35c90 ("net/sched: cls_api: Support hardware miss to tc action")
+> Signed-off-by: Pierre Riteau <pierre@stackhpc.com>
 > ---
->  net/vmw_vsock/virtio_transport.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  net/sched/cls_api.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index b58c3818f284..f0e48e6911fc 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
->  	};
->  	int ret;
+> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> index 8e47e5355be6..4f648af8cfaa 100644
+> --- a/net/sched/cls_api.c
+> +++ b/net/sched/cls_api.c
+> @@ -97,7 +97,7 @@ tcf_exts_miss_cookie_base_alloc(struct tcf_exts *exts, struct tcf_proto *tp,
 >  
-> +	mutex_lock(&vsock->rx_lock);
-> +	vsock->rx_buf_nr = 0;
-> +	vsock->rx_buf_max_nr = 0;
-> +	mutex_unlock(&vsock->rx_lock);
-> +
-> +	atomic_set(&vsock->queued_replies, 0);
-> +
->  	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
->  	if (ret < 0)
->  		return ret;
-> @@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>  	err = xa_alloc_cyclic(&tcf_exts_miss_cookies_xa, &n->miss_cookie_base,
+>  			      n, xa_limit_32b, &next, GFP_KERNEL);
+> -	if (err)
+> +	if (err < 0)
+>  		goto err_xa_alloc;
 >  
->  	vsock->vdev = vdev;
->  
-> -	vsock->rx_buf_nr = 0;
-> -	vsock->rx_buf_max_nr = 0;
-> -	atomic_set(&vsock->queued_replies, 0);
->  
->  	mutex_init(&vsock->tx_lock);
->  	mutex_init(&vsock->rx_lock);
-> -- 
-> 2.34.1
+>  	exts->miss_cookie_node = n;
 
+Thanks for fixing.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+The same thing is done in devlink_rel_alloc() (net/devlink/core.c). I am
+not sure if it can lead to NULL pointer dereference as here.
+
+Thanks,
+Michal
+
+> -- 
+> 2.43.5
 
