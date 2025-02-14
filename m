@@ -1,143 +1,128 @@
-Return-Path: <netdev+bounces-166301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E6AA35680
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:45:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1F0A3567E
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 202913AC591
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:45:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B157163947
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0311891AA;
-	Fri, 14 Feb 2025 05:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AB918C924;
+	Fri, 14 Feb 2025 05:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OeVaPbT9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X01BBUpt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24D4155743
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 05:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A5318A6B8;
+	Fri, 14 Feb 2025 05:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739511919; cv=none; b=ciEuzf4EW1r5WY9ipK6p5rmE4VPmW122oP/KJJxD483SbvqIKGgpN+yxbXnwrireqz/iW1KjShpCf56w3LY5pksMX0KPSzI0DQWUoC36FZQhfAE38LQuo9LWkk3tFqGYJM/nRYiSZMLoQK1oK2tRtnv8gDnhiDUVRaGRtM2C/IM=
+	t=1739511906; cv=none; b=QaH9YSnDMV57vYga6byQVjW0om5LXXCPze0G/Dm+2Dd6U0Mg9d/PQIoPdnUHux6bxLQpsYXjP6dXk6+Vzoya6qTpObANu+VRbb0xNSfHJeBAzW1BCv9xiflymTKISlhtEjlfN4TNVfHDWgOB3TtcCGA6/dFxHinsNg6YRejGTZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739511919; c=relaxed/simple;
-	bh=WkDTYJr0mQ8LaGzM86s/k8BZhKOQcrJIJdVs6kspsYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QcDjvvqDqC3vzIxmAMH5gq/UxG65d5YS/BTU9v6gyX2TtsZ04knM2Qmd9RevfzELJ8diLwG8hxr3JmR5UVqo2SN01t0Nw4bcHbo2QEXcehpJ1bsBJct0+UzSnQvKibqQwNI+yah4QiDS3iPxcl/kFu7bM7Vy7K3x9+BP4fVsdc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OeVaPbT9; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739511918; x=1771047918;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WkDTYJr0mQ8LaGzM86s/k8BZhKOQcrJIJdVs6kspsYA=;
-  b=OeVaPbT9uak7J2+duIDsuY1easuelkOuwdcIu/VsyjkQejcjWovMrQbt
-   9n0bIaYV9o/1yfbTjEiBE3l4HUFGXXIemfAHW1vUpqzFBNPAYUwdv7OwX
-   KJmGVVIb+Ia0qCXkOjfw5SDBqh5VVx0s7lo++QgcGYMOgO/p9HDqOxB2l
-   wfojezoALAfhGwxapUY38UE9JUtOg13U76WHw+qgeXAgAPq88PZNjmJsE
-   RGgFJ7TVBDZQbgT/6gUHG/thtuNJiWemMlB0t/+h1okpg7OVInUtBdD0l
-   C03js4rUwUCxuVgZ4dVYNuXBT1FcaaNihdmiZp4FKD5z7F+Y5AYnrspob
-   w==;
-X-CSE-ConnectionGUID: e4GLbs9NTFugyoUxwa8lRw==
-X-CSE-MsgGUID: g2sZaYTkSDydMQBWqdScXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="39955443"
-X-IronPort-AV: E=Sophos;i="6.13,284,1732608000"; 
-   d="scan'208";a="39955443"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 21:45:16 -0800
-X-CSE-ConnectionGUID: X3ElYp6mRuamoI8ErGA/tQ==
-X-CSE-MsgGUID: WPA/9lNuTzGl0YLZ3L8yDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="113226630"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 21:45:12 -0800
-Date: Fri, 14 Feb 2025 06:41:35 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Marcin Szycik <marcin.szycik@linux.intel.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	intel-wired-lan@lists.osuosl.org, himasekharx.reddy.pucha@intel.com,
-	pmenzel@molgen.mpg.de, marcin.szycik@intel.com,
-	netdev@vger.kernel.org, rafal.romanowski@intel.com,
-	konrad.knitter@intel.com, pawel.chmielewski@intel.com,
-	horms@kernel.org, David.Laight@aculab.com,
-	nex.sw.ncis.nat.hpm.dev@intel.com, pio.raczynski@gmail.com,
-	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
-	jiri@resnulli.us, przemyslaw.kitszel@intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: Re: [Intel-wired-lan] [iwl-next v9 5/9] ice, irdma: move interrupts
- code to irdma
-Message-ID: <Z67XjwByeVSuLooq@mev-dev.igk.intel.com>
-References: <20241203065817.13475-1-michal.swiatkowski@linux.intel.com>
- <20241203065817.13475-6-michal.swiatkowski@linux.intel.com>
- <8e533834-4564-472f-b29b-4f1cb7730053@linux.intel.com>
+	s=arc-20240116; t=1739511906; c=relaxed/simple;
+	bh=SpV6gU4dH4/RbNa4LGUMXY4ykpvqmlx4QE93BGR8tbk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BYrQUOUQFtF4emrc3YoDrbEUT1OpSL83qkMF4XUcXTp/XUfZl2aw8GWRoCp6L0S1yT3XQodqopcfuey08Yj2d3NXuC9NSESP768/Mz+oalfYSU220gnVFi83O8Lduk8mVAvRbag3c58v7YdhwPqVnf91uWltGWuOLkb5mCQFEIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X01BBUpt; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e53c9035003so1331997276.2;
+        Thu, 13 Feb 2025 21:45:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739511903; x=1740116703; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3+g3t1xpmHHGvkCi1mzuO0iYCFXd/XL2tsFLnK4Gt4Q=;
+        b=X01BBUptvcElrfwwPdXHNwqEcSKTS7FDxpnrHd3d2ebYLTijF9/bE5P0hqtIEZAj7E
+         BBdQ20uyKv2dDnkEma3VUoGpQS4anrZo2UviIyAxE3RIWO3LYkhCk+AjLmhd/6LvxAek
+         voIFjLYcowl2nP30GzXxqgI+sGaNhLNcT+qEHLMyYEWh4n6KyRF4FoJr13xZVDrZ6cN6
+         KvTrVmz/mov15POeZGitj6L0IQtuaOP0Xv7pViWgRZB4BdJsiiYPTWvejJTqAMbtRzDw
+         aEWLn+sZoHWjh/YglwTw+FiJXYpfJ74ZJ2gFxlR5S55A9io8W7FRRu327hyyEQm1WAKX
+         O/gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739511903; x=1740116703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3+g3t1xpmHHGvkCi1mzuO0iYCFXd/XL2tsFLnK4Gt4Q=;
+        b=hodNpHfOeafa0oSdAc/NsoN0QpQCPtS2vDnzj4uTh1+Bs0EERNEWCkM1ExUqk01ugh
+         UjYuSad/HQxy2g7SfwAr6kZ8D2HWr1OF/mGneMpIvG0f9aHDD/YAGwCyvT7Cgf4alvW1
+         2HBGreqIZG0jpfQOMzQjCNnUr54uMpkEL3VGh4IP1DS2OIVvWFDeJIWXZQdJykHWk1K0
+         uKJYmPQMjqmZ/7MoMuZ4lz7vuHHq95GYZWYKyOnM5RIK2S1JII71uwTOePUJFn2Gy8fU
+         9H1HPhyTvHxXPs8rAxKyDev5w+xNccZVDSJn5AL0Ut2YPZg26509YvmOmGGDvYY7s5hG
+         lmlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKBAH8TA4WO1pbX4HSGFSv6mDy8bUMhfNMucDXeye8WZhpSz3g+t/PRcJsapUgDVBci9mV1uw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1NXu32LVF4rIMjZIfNdKLT83/FDOfkZ1KRz28nQjZJl9/rm+d
+	XK5IjOLO2+VIzpCuD2l6fxPQa3gxc8AnJS9KA8s3/w4GTIUqIZocBKHjQm5b7EJrvGQG8svZ9SQ
+	VK6280Lj/kL+Ame30sqPyTSShSso=
+X-Gm-Gg: ASbGncsg/vVL/C2cABEDhOAO00eAdLG05Nd8M6gPnmBOkSr21pDpw/iq2iZIshFGh7C
+	dW47IGZbhr6sXzVfFIcK46NCPnVG7vTxD3lkyGDfIsv0aETn7AX2j2KPnuac5l9UhAJ6n0SQ5
+X-Google-Smtp-Source: AGHT+IGIihUVoAVCUXpgds5ypH/iwoRtxdOC1bY/zttJTlf4zUBc0yN5Q4Nvp19kwSM1fvB641IXWq5Wtcp1Q/9Zjy0=
+X-Received: by 2002:a05:6902:10cb:b0:e5b:34b8:5d5e with SMTP id
+ 3f1490d57ef6-e5da815c681mr5775941276.26.1739511903488; Thu, 13 Feb 2025
+ 21:45:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8e533834-4564-472f-b29b-4f1cb7730053@linux.intel.com>
+References: <20250210174336.2024258-1-ameryhung@gmail.com> <20250210174336.2024258-2-ameryhung@gmail.com>
+ <0bee571a-927d-4042-9e89-53bf695ec054@linux.dev>
+In-Reply-To: <0bee571a-927d-4042-9e89-53bf695ec054@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 13 Feb 2025 21:44:52 -0800
+X-Gm-Features: AWEUYZnNCWkwe7XKJbQFRb5sVdvpcwySEEcq7pHg2MGl15FaYoqfGJB3kDU3LCE
+Message-ID: <CAMB2axN+HNH+XOrEDKRwg8rDywOxPBEjWNQCp0FaNxsFnbvArw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 01/19] bpf: Make every prog keep a copy of ctx_arg_info
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
+	kuba@kernel.org, edumazet@google.com, xiyou.wangcong@gmail.com, 
+	cong.wang@bytedance.com, jhs@mojatatu.com, sinquersw@gmail.com, 
+	toke@redhat.com, jiri@resnulli.us, stfomichev@gmail.com, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	yepeilin.cs@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 13, 2025 at 08:20:31PM +0100, Marcin Szycik wrote:
-> 
-> 
-> On 03.12.2024 07:58, Michal Swiatkowski wrote:
-> > Move responsibility of MSI-X requesting for RDMA feature from ice driver
-> > to irdma driver. It is done to allow simple fallback when there is not
-> > enough MSI-X available.
-> > 
-> > Change amount of MSI-X used for control from 4 to 1, as it isn't needed
-> > to have more than one MSI-X for this purpose.
-> 
-> Hi, I'm observing KASAN reports or kernel panic when attempting to remove irdma
-> with this patchset, most probably this patch being the culprit, since it touches
-> functions from splat.
-> 
-> Reproducer:
->   sudo rmmod irdma
-> 
-> Minified splat(s):
->   BUG: KASAN: use-after-free in irdma_remove+0x257/0x2d0 [irdma]
->   Call Trace:
->    <TASK>
->    ? __pfx__raw_spin_lock_irqsave+0x10/0x10
->    ? kfree+0x253/0x450
->    ? irdma_remove+0x257/0x2d0 [irdma]
->    kasan_report+0xed/0x120
->    ? irdma_remove+0x257/0x2d0 [irdma]
->    irdma_remove+0x257/0x2d0 [irdma]
->    auxiliary_bus_remove+0x56/0x80
->    device_release_driver_internal+0x371/0x530
->    ? kernfs_put.part.0+0x147/0x310
->    driver_detach+0xbf/0x180
->    bus_remove_driver+0x11b/0x2a0
->    auxiliary_driver_unregister+0x1a/0x50
->    irdma_exit_module+0x40/0x4c [irdma]
->   
->   Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
->   KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->   RIP: 0010:ice_free_rdma_qvector+0x2a/0xa0 [ice]
->   Call Trace:
->    ? ice_free_rdma_qvector+0x2a/0xa0 [ice]
->    irdma_remove+0x179/0x2d0 [irdma]
->    auxiliary_bus_remove+0x56/0x80
->    device_release_driver_internal+0x371/0x530
->    ? kobject_put+0x61/0x4b0
->    driver_detach+0xbf/0x180
->    bus_remove_driver+0x11b/0x2a0
->    auxiliary_driver_unregister+0x1a/0x50
->    irdma_exit_module+0x40/0x4c [irdma]
+On Thu, Feb 13, 2025 at 11:54=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
+.dev> wrote:
+>
+> On 2/10/25 9:43 AM, Amery Hung wrote:
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 9971c03adfd5..a41ba019780f 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -22377,6 +22377,18 @@ static void print_verification_stats(struct bp=
+f_verifier_env *env)
+> >               env->peak_states, env->longest_mark_read_walk);
+> >   }
+> >
+> > +int bpf_prog_ctx_arg_info_init(struct bpf_prog *prog,
+> > +                            const struct bpf_ctx_arg_aux *info, u32 cn=
+t)
+> > +{
+> > +     prog->aux->ctx_arg_info =3D kcalloc(cnt, sizeof(*info), GFP_KERNE=
+L);
+>
+> Missing a kfree.
 
-Thanks, I will work on it.
+Thanks for catching this. I will fix it.
 
-> 
+>
+> > +     if (!prog->aux->ctx_arg_info)
+> > +             return -ENOMEM;
+> > +
+> > +     memcpy(prog->aux->ctx_arg_info, info, sizeof(*info) * cnt);
+> > +     prog->aux->ctx_arg_info_size =3D cnt;
+> > +     return 0;
+> > +}
+> > +
 
