@@ -1,63 +1,56 @@
-Return-Path: <netdev+bounces-166565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053BAA36768
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:20:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BDE3A36773
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48100188F487
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 21:20:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127A1188DE54
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 21:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBDD1C8616;
-	Fri, 14 Feb 2025 21:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D241DEFE8;
+	Fri, 14 Feb 2025 21:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aU7Z9YgL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB5hwIYT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9225158870;
-	Fri, 14 Feb 2025 21:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44841C8616
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 21:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739568010; cv=none; b=BLGQ6RKlQyewtVN4BfRddDMT4birJzNCxxNLZdYhrMmfqTLz1bb+UxXnkGRymJOUxOLUSIJzn0/7ke+uE+TnPVok4OJ4f6dk40mrdUMsWRJOhH2tywvObvjiYe+C66xSNljMPXI/LwcXeBuNbBk75XatLVC5/RV/Z+JJ3WO35c4=
+	t=1739568199; cv=none; b=SVG6VDZqURldcGvbc7PK3SxRihA0DzZxEskQbqROA7RBaYcziurVgSav1U2daE6URwQHHHFCMoCnCaku2Xc+XxF70zslnX4kVssw9B+wFPA9OpaDh+3AWHAFf/tu6PM6Y4proWKxEA9wbG1orDE07e/SfqrWYVggl5i6o/Xp9WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739568010; c=relaxed/simple;
-	bh=7Bz6zsV8G0KelhMQC/n7HDA0e50TvIelUa+YzRPtv0I=;
+	s=arc-20240116; t=1739568199; c=relaxed/simple;
+	bh=RvBQ4cRHe+DOZ8uE5NlDppOvcHA/QgQgKrwuFY7b6gc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NZFhxVCVyAA3j5gVOOTw8Sd9ictRJUN8ibUC9/9f4gQeAHyVKj8zgDpoNJZo4eGHFzieTjCQv36XcVHVVxHqKubX6T6HT8h0J5RM7myuYUsqJrtJnlNJz6CzqFYNVfBm81iUxS4j4Nv1tg87+Msd1KWa5AxMz98yEXf35DL//gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aU7Z9YgL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F521C4CED1;
-	Fri, 14 Feb 2025 21:20:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=shMUYbmVzk/63NsdzG7HURjjYpJx0Zj8WUnJt5ypTP9ylMdYrJJFcFqA9yHimqToRrmZtkKrKkrRACHTzchbvkQui1U11ENJfEOkE3K2ELL9GvzK3IMywc+Kk3/b8dmEonicaiRWeeQNjP2fIFqlaZrNhiAKeX7cZI1X6kCf8iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB5hwIYT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881CEC4CED1;
+	Fri, 14 Feb 2025 21:23:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739568009;
-	bh=7Bz6zsV8G0KelhMQC/n7HDA0e50TvIelUa+YzRPtv0I=;
+	s=k20201202; t=1739568199;
+	bh=RvBQ4cRHe+DOZ8uE5NlDppOvcHA/QgQgKrwuFY7b6gc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aU7Z9YgL9uMd/MjkiSsN8zEGiS0VtEtagk1gc9XSw4PWDNWmBO6fxCcwKhFfzgPYe
-	 +GVfdbsFkPv8SKkarkA/jl8Ptpsbwx3ySIH6nBqGAYKFQM1riqNe+QClmM4sDtUqYh
-	 1jGGwYWusdwaykuFAnjP5jbG82ev90j5j9EsVv4aNtYu2h1nAYn51nWfSL/v71rAQ3
-	 Eefvo666R2zoWOFCEVwxnnQP4qrXOp1fzNuWvbO5RU6v1W2ZQTObz6DNjGtqRiYCWt
-	 X8Oqh4rFDOQyLOzW7hvS66sH4ekLua2Lla3+hohMJKVIoLjoEkZ1pnWvEW8Cs29CSw
-	 9bzyQ0a5gtS+A==
-Date: Fri, 14 Feb 2025 13:20:07 -0800
+	b=gB5hwIYT9YnbxEfcz6ZxGd7sLiaAkuW2b/gDIFVhGRlKn6BMyyNJHn8Dfinasxu1v
+	 mcfIj0AiyMgpNT/1hAYnUR8SFH5icPXt5141HwgLpCuOaqFuLjRjP9+WqoQs9P+vnP
+	 KSC25k4POmah9LK1U2YPaYkxvxZ52AJGzl164ff96g8suhobZjAHZ4h6+vqYuitrV1
+	 tvRAO05B4mxylKZTSs3MiixMAdrIvEgJDeIScu+ZwYBbB9wDWoINPAPpPc9Rd2ZQys
+	 suoYAXR+pno7DzxjfB33cNyAPOSBB/mh1bbGSU+IrtFhXQ4r1w4eV35IEy/71YjhkM
+	 DYK7tviQHRj5w==
+Date: Fri, 14 Feb 2025 13:23:18 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: zhangmingyi <zhangmingyi5@huawei.com>, kernel test robot
- <oliver.sang@intel.com>, oe-lkp@lists.linux.dev, lkp@intel.com, Xin Liu
- <liuxin350@huawei.com>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- mptcp@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- linux-kernel@vger.kernel.org, yanan@huawei.com, wuchangye@huawei.com,
- xiesongyang@huawei.com, liwei883@huawei.com, tianmuyang@huawei.com
-Subject: Re: [PATCH v2 1/2] bpf-next: Introduced to support the ULP to get
- or set sockets
-Message-ID: <20250214132007.54dd0693@kernel.org>
-In-Reply-To: <62294c30-ca75-4075-8d4b-3801194bd92c@linux.dev>
-References: <202502140959.f66e2ba6-lkp@intel.com>
-	<62294c30-ca75-4075-8d4b-3801194bd92c@linux.dev>
+To: Max Schulze <max.schulze@online.de>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, David Hollis
+ <dhollis@davehollis.com>, Sven Kreiensen <s.kreiensen@lyconsys.com>
+Subject: Re: [PATCH net v3] net: usb: asix_devices: add FiberGecko DeviceID
+Message-ID: <20250214132318.3426db12@kernel.org>
+In-Reply-To: <20250212150957.43900-2-max.schulze@online.de>
+References: <20250126114203.12940-1-max.schulze@online.de>
+	<20250212150957.43900-2-max.schulze@online.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,29 +60,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Feb 2025 22:23:39 -0800 Martin KaFai Lau wrote:
-> On 2/13/25 6:13 PM, kernel test robot wrote:
-> > [ 71.196846][ T3759] ? tls_init (net/tls/tls_main.c:934 net/tls/tls_main.c:993)
-> > [ 71.196856][ T3759] ? __schedule (kernel/sched/core.c:5380)
-> > [ 71.196866][ T3759] __mutex_lock (kernel/locking/mutex.c:587 kernel/locking/mutex.c:730)
-> > [ 71.196872][ T3759] ? tls_init (net/tls/tls_main.c:934 net/tls/tls_main.c:993)
-> > [ 71.196878][ T3759] ? rcu_read_unlock (include/linux/rcupdate.h:335)
-> > [ 71.196885][ T3759] ? mark_held_locks (kernel/locking/lockdep.c:4323)
-> > [ 71.196889][ T3759] ? lock_sock_nested (net/core/sock.c:3653)
-> > [ 71.196898][ T3759] mutex_lock_nested (kernel/locking/mutex.c:783)  
-> 
-> This is probably because __tcp_set_ulp is now under the rcu_read_lock() in patch 1.
-> 
-> Even fixing patch 1 will not be enough. The bpf cgrp prog (e.g. sockops) cannot 
-> sleep now, so it still cannot call bpf_setsockopt(TCP_ULP, "tls") which will 
-> take a mutex. This is a blocker :(
+On Wed, 12 Feb 2025 16:09:51 +0100 Max Schulze wrote:
+> The FiberGecko is a small USB module that connects a 100 Mbit/s SFP
 
-Oh, kbuild bot was nice enough to CC netdev, it wasn't CCed on 
-the submission.
-
-I'd really rather we didn't allow setting ULP from BPF unless there 
-is a strong and clear use case. The ULP configuration and stacking
-is a source of many bugs. And the use case here AFAIU is to allow
-attaching some ULP from an OOT module to a socket, which I think
-won't make core BPF folks happy either, right?
+Applied, thanks!
+-- 
+pw-bot: accept
 
