@@ -1,266 +1,139 @@
-Return-Path: <netdev+bounces-166422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E99CA35F57
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:38:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BEB2A35F5C
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC542162C96
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:33:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B966B1663DB
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D3B264A88;
-	Fri, 14 Feb 2025 13:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B6F264A9C;
+	Fri, 14 Feb 2025 13:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lxP6snUH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p5IeBaeg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6282139A8
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 13:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739539979; cv=fail; b=NNQEy6vKyGT4VZ3JeHmS/O9d6p2e+9RZvvenUT0jnMqApLVPf6ozwPrWW8vIiEiYajpmpKbYmzves1v9d1xdotiaD2/9wECfWyk+Oq7HkRO+bH+as4p2Hqz5KKZmeiroVHfglmomsXF2ShMrDzolZ8obu9EcGiAm9O13UdTgFh8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739539979; c=relaxed/simple;
-	bh=7rvPGw2RP61t64IJORy3ksJI0HSVIMJlFWbCZulsxcs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=KlkB+tQHclLaK3KZeNdeRKKbk8H/+iCP6vhzcUNTYsTGhssgTw8Hz1O5Mn64kXrCwv60ohX4Su3A1Mf2E0yKTqtBjd8KtVKEmAnCi0DaXVHJKAMbYHD+ix8M8usCLYGRnJvVd4FAIprusOYEfCbgkNX+WhGWUcf/EMKVy15X3gA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lxP6snUH; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739539978; x=1771075978;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7rvPGw2RP61t64IJORy3ksJI0HSVIMJlFWbCZulsxcs=;
-  b=lxP6snUHkLVYj9nnNvv2i9Xl2/3EL6TmQ00qkmsu9qhcnuxUBb3/NFvH
-   cu+it6ylNZiK6Gi4SkKgtO/cLYBl8HLeqGYLYKdPXo7G1KOylxuTsXeRy
-   IqbapsJtnhNf87yfTw4/u8FzUjPaVn216Kcu53xzWq2BNrq82z2Ospe8b
-   gBxjXaI1MmrNC6RlT4ZeUkkJmhFPgPTeIpFG3SU0b5ffKuGc59jTdX//9
-   ctL21oMb40w3EruwMDwH0xHGgDRYnaSdL5V4U7XioZILvagj5Qy2GChb/
-   ptJi3RcXqxCmBZuVoRjELb8jcgGVXLAM3io9p5Ioyy32AHSOaKvmifqQw
-   A==;
-X-CSE-ConnectionGUID: j4ogmGcCQhmfSxGXFVWYWg==
-X-CSE-MsgGUID: Uh82nXUMQR2pvodQyRv5vg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="39996125"
-X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="39996125"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 05:32:50 -0800
-X-CSE-ConnectionGUID: xSpBqFcJS0OLdpQ6XcjJKQ==
-X-CSE-MsgGUID: C/eut94iRbmwjJQIpP351w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="113977413"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2025 05:32:48 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 14 Feb 2025 05:32:47 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 14 Feb 2025 05:32:47 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 14 Feb 2025 05:32:47 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q/coHVPh7cPbc0V9u9m0eMCR1ejpyjwljM7TWi6R+6RtTCXlmkoCMHuv1SFq75FbnDxFBwXnMLXsBXV3N81+zPLcDd+uq9TC1LhPCUgas3ElxDR5ExOQKhNp6X00AhTHmfsYJrTnhjB2C+m4H3XLO0dSbcu279lmDOtqvAPSF/BpqPGjo9yqJVMeMPySrAWWJIghcrxX8nC7ReUjs+CVwUyCCgXjZi1Mgr7Ifax5ljYjoizmfUidAfZzIees+6Ee9klURioHme3FScLRt0RVYpWgDArHuVgKHh4GirOJrtcQLLq24NVbn89Nt1QPbx0sK9DDx8mDzxEqAHiYGT00PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M7k/hOxdNkducK2548rswFV8nfA8zCfEOrxtxU7RU/8=;
- b=HclmChW19MSFV8RjqmtFnDBVeGILx2yplyn2UbDTAQzP0U9z2RAVuUbxH1QwiA5Pmirl0Al/2A1WEGju7voPDtCh0aQlvSe6SK4uN2lrZBCM5GivRYM5rLHw23KHWmYxY0VpTY4XcXCf2GC9+U4NSsDkdBd9ALHZXq2DEr9W7AoZ+i9fCd2bToXYS4UN7W2UCDKGc9rRH3gWJGgY94Vfqvi2lNYiXJLkSDjhoeuLStfDWbvnIpCrD17796sgo7TodQgQDgwfazl5ws5yKCyiMo0Vdifa8QS0VqNAHWO/Zm7mSHPKA+Q1ItjQKN6nqavjqz/wXpCeMJ4MQHVhkD+67A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CYYPR11MB8305.namprd11.prod.outlook.com (2603:10b6:930:c1::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Fri, 14 Feb
- 2025 13:32:26 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8445.017; Fri, 14 Feb 2025
- 13:32:26 +0000
-Message-ID: <02b91659-83d2-482d-9b28-f814829b1005@intel.com>
-Date: Fri, 14 Feb 2025 14:32:20 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: check error for
- register_netdev() on init
-To: "Tantilov, Emil S" <emil.s.tantilov@intel.com>, Simon Horman
-	<horms@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<decot@google.com>, <willemb@google.com>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <madhu.chittim@intel.com>
-References: <20250211023851.21090-1-emil.s.tantilov@intel.com>
- <20250212182111.GH1615191@kernel.org>
- <00ecb5e5-00b9-4c30-a29a-37c9f268b389@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <00ecb5e5-00b9-4c30-a29a-37c9f268b389@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR0P278CA0031.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::18) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B072641FA;
+	Fri, 14 Feb 2025 13:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739540036; cv=none; b=BDaOWEbJQWuWDB/jlFWOHKfXNkObf9518LjHw0Swk+I4EJZRT5vaI4Is/t3jeH+LmAsMXkFWlUyTkVkp2Uw/iO9U6GdXL6e7VcsBXJhGu9pi6O/dr6sLIREZOwPhIQR+EUb+39m0tx5iljEM/vJ30RKly+mZrcUXeR+Ps1RsFqE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739540036; c=relaxed/simple;
+	bh=FJGk+9rhaetDdk8WaF1XmUYKc3SAtIIHdodQDcsgra8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDz+iDvTMWp1XtZIB1SnuXOFElVN4soDWPRS1UowEZkTwrRZ3SHMEpRjblYEpALWSFQAmJzmszMcuE25Zi5xdo92wBpy6ylS41PQhIuGNV4B2my/y6gxvKwiHXazUA6YldNn+J1ohGR1Z5W0bWoGaSGDZEYloQFWrgj05dYBxD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p5IeBaeg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Sjoc4mU2ZN2AZGuZYU9JfeoEcrjVetM2APyjqvflfVA=; b=p5IeBaeg+JnuCNdrC3CYppyFdc
+	LNOeTd6vHsn386e/hOcESo7+QHPrBWVeFo8vLWmWou6Ky1Wgr0ijbUi3Fp6IukiLiOLSPismY4wZP
+	5sCAwiQotFt9dauilYzYZoq0yASYk6DEMBWOGk6mMpwU6EhznVTmuRic+CAmoWTzkApY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tivpB-00E4sv-Qc; Fri, 14 Feb 2025 14:33:45 +0100
+Date: Fri, 14 Feb 2025 14:33:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Remove redundant variable declaration in
+ __dev_change_flags()
+Message-ID: <1d7e3018-9c82-4a00-8e10-3451b4a19a0d@lunn.ch>
+References: <20250214-old_flags-v1-1-29096b9399a9@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CYYPR11MB8305:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2c44a351-49c8-4b8a-b143-08dd4cfc056c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SXdOWlZnT05MQ0wzVllaMURKdjUybWtVSlRxZE9vekFoeDJCM2FQbSs5NU1H?=
- =?utf-8?B?QWN1MWpTZDcyK2ppS3JUNHhKOTZRZTRFb090TytmR2diL09Oa3c1NVIyWW1r?=
- =?utf-8?B?MGY3Y1B3ejZHQ0JIaTdubHdrUGNkZ1V1dStxamplZzFndnk0eFZMb1BwUEwz?=
- =?utf-8?B?ci9ZbktydUZhR2hzbitieFlXaWI4RzJpdEdaSUNLK09tcTE5Uk51am1rZ1dr?=
- =?utf-8?B?cDFHZEV1MWxqTjVWN0hrSXdGMXNMbS9SQVh1UnViYXlkQUJucWU1UU4zQzNo?=
- =?utf-8?B?SlpDYmJrYUxBcVZPaWE5T0hxQnZJbkRHc3UxZTRkN0VXWXJ1R1YxMmVFUXFp?=
- =?utf-8?B?eGRMTHovOTBXYWw1K3NQZ0lKNkUvN01KcjdZdk5ub3ZVQmQ5Q0FIOTNXUjIx?=
- =?utf-8?B?bEg0cXBKQ04wSzRveHFDRHU1OU9ZM0oyTDErZzhNaGVJc0Z1WGc5NWh5eEpC?=
- =?utf-8?B?d3pVcCtVQThIVjJST0dwRFJpTUgrNDh0Y3pYM3lJa1NjaUtYcWlDdmtkSUFx?=
- =?utf-8?B?bndoY3VVb042b1BJU2piY1FYNnNzWTNad2QwZkQ2R1pWb1NwTGtOc3owSmFW?=
- =?utf-8?B?cnpZZXJQQy9ZT3Y5VzhMeUY5UzkvRUEzNFpLRnVGZm1LY25lVlhLM21JaVgv?=
- =?utf-8?B?REx6WnFEYVArRUwrdHRIR1VLdW5UMFl3TldBN3U5MlVMVVkyNUpWNFJGVkw3?=
- =?utf-8?B?d2g0K2hCaFY0QUsyYUQwU1p4OWlzVUdueVZBcmxvaFZxZmN2VklTbnkyWFYy?=
- =?utf-8?B?dFQ4dUY0U3g4R253dnAzT1p1TVRtT3JPb0xPdDlJTVYxSzNsMm42TVlIZjZh?=
- =?utf-8?B?ejA2WU5RaDBtcHN6dHdpSkxWM09tdCt3VVhaS1J1cFp2K2RDZzhPM2dyNFJq?=
- =?utf-8?B?a3BoaUFwNkMwblhHcFM3QVcyZWV6OGlvWVNVV0lzRktSd1BhL3d1bWNLYnJm?=
- =?utf-8?B?TjJ3R2o2SlkxbzNPVHNtOFJGR0tSeVg1amE1YkJDOXNiT3VDdW85eDhobDdL?=
- =?utf-8?B?SWVuZ1VsTGhYME8ySU96WGROMHV4UlErbFZjcmVSZ2FGWXNCQUIvcUVPeExl?=
- =?utf-8?B?UlNLMzFuNVhjYzFlVTlnd3dDa2xIY29FNEF2SXBaNjVicVN3U0NxVTFVUmpa?=
- =?utf-8?B?RWNKNG16S1VlbjdZemRCWWFnbGZLM3Y5cytiRUttNFhaSnB2VnlwNTZZQmRM?=
- =?utf-8?B?eThuYVZRQXhtdjh4THQ4R3hPOUJNV0d1cHFmMUJndktkT3R2ZC9nSFlxMDY2?=
- =?utf-8?B?QldRaXd1aFdMMHNoVXlPVy9NZUt6RlVsL2duWjkyQ1BaQlA0MDYwY3ArbHl5?=
- =?utf-8?B?TE9ZbCtqUXZ1dWZMSHRONEtkWGR4VVBJWVdlckJ3UkVzQWVPRldBS2ZHd1BV?=
- =?utf-8?B?U3lYYkYzZUhRbHpBUXQwbzAwRmhoalE1MkFXVzM5Uk1uTGxMK2JmSEVCWkFx?=
- =?utf-8?B?SkxEeWM2S3ROTmtZMFNsTHFMZ3YxSmVzT2hxTnBFN3NHcWk0bWp4bHpiMGs1?=
- =?utf-8?B?RUFRWUJCbnZ1MXRKRXFyTElOVGgrNElmNEVmdU5oZDNYbXorV2lSZUplay8z?=
- =?utf-8?B?MU95UjQ3RitDaTRJM3VzdzZOTkhGRGIvUXNPV1VCSXlVTW9VNGR4czh6UkRH?=
- =?utf-8?B?N3VGOXg0K1dSUmNlWmZCbmtVQ2xab3ZIUC9iZkd1TkZhK0E1OVlEVTNGUDYz?=
- =?utf-8?B?OVRrbm9sa1NqTVBXMDRSdGRYZE5VcHoyYjQxN2ZIU3RIeWcyWFRIQ0Nya3hG?=
- =?utf-8?B?M1Fmd2NPZlBTUWN1cEQ2SmxUQ2xKSGd2VGkvQ1lOcWYrTVJCWkRBK1hDVFNt?=
- =?utf-8?B?Y1RoSWRVN2lNN01haTZ2OEpYU2hlSVFNQW9QTWQ0c0EyOHp3NDR3K3FGYUI5?=
- =?utf-8?Q?EUIZTeUsv9QNV?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NThVdnhYc2tmNDRSZDl2UUR1SmZidUpKYlFHbGZEM3JpWUlJQkEwUVV3WkRD?=
- =?utf-8?B?SDRzaHc3NUNwQWhWYWRHUytXa1FOT3JGZjNZMjJsNndXakNxcEZKdm5mZ1gx?=
- =?utf-8?B?SXZsUmNqamNoSnd1by95VGUzV3lGd1lmQkVLTHZzS0FDQVVkWVJoRWdEUG1M?=
- =?utf-8?B?cTZheGFSK3Z4cW83cWJFNlRRUkFuK3l1RHh3ZHJXaXVnSzVYUU1XdGV2aUlB?=
- =?utf-8?B?WFlQQXoyS3FOQkRHTzJMTmZCR2ppZnc4T09QMWIzcUVvNG5LRkVhL2tZdUwr?=
- =?utf-8?B?SGIzdkFDVjJrT2h0MjYyL2NXZ1BQUnpIRFBhcUFHaW9nczFJZUJ0QVdHRnhT?=
- =?utf-8?B?ZVhKOXJrVFduMWZJc3QyaTQyZWY0VThGWXhJeXdnQy94T1hMc0dXSGp0N2Jv?=
- =?utf-8?B?V2FYei91N3U4RHBwUlZOZXduc0ZLRm1USXAxQXh5SFlKWGEwem5TQjRSQUE0?=
- =?utf-8?B?aE4zRSs2QXhNMm1RYVZLV2paRlEzaXl5SnhUYkd0U0tIT3ZWU3BlZlVMNUxl?=
- =?utf-8?B?T2NwajQxVU1xQkRJby9HbWdqRE5CY3dMSStrM1NGYUFhSkFuNzNWeDg1ZWhT?=
- =?utf-8?B?UXpwbDJDb3pFVm5HK2pzczU2Y2QzckxDYTBJRXlMVFQvb1JNRCtDanBSSUJW?=
- =?utf-8?B?N1NqcXRvdmRNb3NHVGJtdkdOTlVTemZseVlJUVZMMGx2RTA5SkhvdGQ2MUE2?=
- =?utf-8?B?Zm9saHJ2cjEwTnV1emtVTEc0U01SMnM0SU5ZWkxUR2UxK1dFUDJCS1ZEM0lX?=
- =?utf-8?B?YnQ5T2hzQTVRRno0alJqM1cvYWMrZ3Zjc2xBSThTU3FMS3BQdDlYRk1HYWlt?=
- =?utf-8?B?a0RmNm9hdWY4U2hicGs3bGpBd0h2SE5IWGlyanFMSlJ2cU5jb3IxOE1taFJy?=
- =?utf-8?B?ckUxSU50TjdlcGpDZytVNnpzRWRkN3NuSVpXME5vRmJIWkwxL1NBZy8yc2cy?=
- =?utf-8?B?SFBla2ZPMllXRmdjUlJsQXp4OFBuQ016SCtLWnc3TFJqb2NuRklQSFFKYmVJ?=
- =?utf-8?B?K0RwQ1N5aEN6TTBPRUlPMk43QjM5YkNoTzBYSjFGREsrYndPdHhUMzNwV0Ft?=
- =?utf-8?B?Q1hmTVVzVFRiN0JLR1BRWWtOWmRZVG9zejROQ2xKL1NUSXAyN3ZqcUpac3F5?=
- =?utf-8?B?cy9MT04rQkZPVnYvdGRORFRxVElLZjlNRHJpMEpjOFNHUHZUdkNKSGRaZUpx?=
- =?utf-8?B?aHk1Y1hNSGlreHdDanZZQ0dhTU1ZdjZkRmo2eEkzRlFlVjZmYVlrOWhPTFA2?=
- =?utf-8?B?TDdPMEhhYmtjVzZyMGk2cEpLQWVKb2NUczNTQ2dyLzFraU5rM0QvaDVodExm?=
- =?utf-8?B?ZjFYN1NEa3BaZUYrTEx1cG9XaVA2U1VyT3plV3JReEp1aDJ5SjliQ1BJTy9Q?=
- =?utf-8?B?b01HSHJxenBsT2p1bVd1SThZODVUcGdyR0hIenVVUHBOakdPaUJJUXBUbHJG?=
- =?utf-8?B?bEFDSjNoSzE3UDFmNS9SSWtsNXU1YWxHYWNBMVlNKzd3eW8zZEFYbVBZMGdr?=
- =?utf-8?B?MWRiSnY5UUVSaUR4aitqeUtZVkdMaExDYUg2TkFGN0xZQXppNC9OY0pack5p?=
- =?utf-8?B?dzg4Z3B6S2ZmR0NrK2RlL3RYTHE4Szl5QU4wdFZqTXowcEZXcDJQbE03Sms0?=
- =?utf-8?B?Uk1LSGFYQ3ZNZlp0aHRHa1hEdEtIYUtFUGprVHZCZWNZN1djT3Z3S0Mwb0FG?=
- =?utf-8?B?eE1uTXZ4RmwvckMraG1ucnpLS2JIMTBlSU05K2J3eFpxZzI2UEd5WWp6VXd1?=
- =?utf-8?B?MnpHUTFRMG9kQlBHcTBReW1LbHByaEcxL3Jybjg2NnphQ3k5eHI0WXJXWTZz?=
- =?utf-8?B?Y2ZhSDNvRzZiQjNKR0ZyRjVEcGljY0IyTjJrTGhsazduYWp2VTBRZ3hpWlN3?=
- =?utf-8?B?cmg1bjJZbmgwZFJ4TEhFdHBBczFIeDBGamRING03TXdNL1c2T1E5eVZHSmxD?=
- =?utf-8?B?VFhvK2ZHNHcxUlZUTHFtbzBwU1ZUSzBRUVBvZ0QyRWVGelcxaVdSRlZ1MnJo?=
- =?utf-8?B?VVYwRkFrbnlibUVDbDIya3lxRnduN2VGenFpcEFPeDBvcjZFMmtxTHBPUnNZ?=
- =?utf-8?B?NERteGNua3UzQ3F3RHdvM3VkdU56Rzg0cWVyNHlYcHlTMldaS2RNY296OGY5?=
- =?utf-8?B?Zm0yVDB3MjlHdERqZzRnbGNOWXZVdXFZUzdZNTlCTXdLYUV2eU1TVGU0U2VG?=
- =?utf-8?Q?ivk4k2YpmK9zfuSjCh+tZU8=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c44a351-49c8-4b8a-b143-08dd4cfc056c
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 13:32:26.3830
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fUQqbRAPBAJVmhY4NbrQ+atgqOcWIHQcHGTf3R9Wg/aNmioJln/QMR767GYmICFbYdrhnAlaoN/7LwYAg5l6fVM0JwLJP1c7OXkezvOE5eU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8305
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250214-old_flags-v1-1-29096b9399a9@debian.org>
 
-On 2/13/25 21:39, Tantilov, Emil S wrote:
-> On 2/12/2025 10:21 AM, Simon Horman wrote:
->> On Mon, Feb 10, 2025 at 06:38:51PM -0800, Emil Tantilov wrote:
->>> Current init logic ignores the error code from register_netdev(),
->>> which will cause WARN_ON() on attempt to unregister it, if there was 
->>> one,
->>> and there is no info for the user that the creation of the netdev 
->>> failed.
-
-
->> Hi Emil,
->>
->> I'm wondering if we could reduce indentation and lines longer
->> than 80 characters in the above like this (completely untested!):
-> I was mostly trying to focus on the fix itself, since this patch is -net 
-> bound. The >80 line came about from the introduction of the local netdev 
-> and it seemed cleaner to keep it in one line. I can just split the check 
-> as in the original code.
+On Fri, Feb 14, 2025 at 04:47:49AM -0800, Breno Leitao wrote:
+> The old_flags variable is declared twice in __dev_change_flags(),
+> causing a shadow variable warning. This patch fixes the issue by
+> removing the redundant declaration, reusing the existing old_flags
+> variable instead.
 > 
->>
->>
->>     for (index = 0; index < adapter->max_vports; index++) {
->>         struct idpf_vport_config *vport_config = adapter- 
->> >vport_config[index];
->>         struct net_device *netdev = adapter->netdevs[index];
->>
->>         if (!netdev ||
->>             test_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags))
->>             continue;
-> Again, because its mainly to add the error checking I am not sure if its 
-> OK to re-shuffle the logic.
+> 	net/core/dev.c:9225:16: warning: declaration shadows a local variable [-Wshadow]
+> 	9225 |                 unsigned int old_flags = dev->flags;
+> 	|                              ^
+> 	net/core/dev.c:9185:15: note: previous declaration is here
+> 	9185 |         unsigned int old_flags = dev->flags;
+> 	|                      ^
+> 	1 warning generated.
 > 
->>
->>         err = register_netdev(netdev);
->>         if (err) {
->>             dev_err(&pdev->dev, "failed to register netdev for vport 
->> %d: %pe\n",
->>                 index, ERR_PTR(err));
->>             continue;
->>         }
->>         set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
->>     }
-> 
-> Don't mind re-spinning (and testing) v2 with the proposed change, if 
-> it's not infringing on the guidelines for submission to -net.
-> 
-> Thanks,
-> Emil
+> This change has no functional impact on the code, as the inner variable
+> does not affect the outer one. The fix simply eliminates the unnecessary
+> declaration and resolves the warning.
 
-Emil, you are right that we generally don't want to do refactors on -net
-submissions. In this particular case your code was just replacing the
-body of the loop. Simon's snippet did the same, just with less
-indentation.
+I'm not a compiler person... but there might be some subtlety here:
 
-The "early return" (or "continue") style is better, also in this case.
+
+int __dev_change_flags(struct net_device *dev, unsigned int flags,
+		       struct netlink_ext_ack *extack)
+{
+	unsigned int old_flags = dev->flags;
+	int ret;
+
+This old_flags gets the value of flags at the time of entry into the
+function.
+
+...
+
+	if ((old_flags ^ flags) & IFF_UP) {
+		if (old_flags & IFF_UP)
+			__dev_close(dev);
+		else
+			ret = __dev_open(dev, extack);
+	}
+
+If you dig down into __dev_close(dev) you find
+
+		dev->flags &= ~IFF_UP;
+
+then
+
+...
+
+	if ((flags ^ dev->gflags) & IFF_PROMISC) {
+		int inc = (flags & IFF_PROMISC) ? 1 : -1;
+		unsigned int old_flags = dev->flags;
+
+This inner old_flags now has the IFF_UP removed, and so is different
+to the outer old_flags.
+
+The outer old_flags is not used after this point, so in the end it
+might not matter, but that fact i felt i needed to look deeper at the
+code suggests the commit message needs expanding to include more
+analyses.
+
+> Fixes: 991fb3f74c142e ("dev: always advertise rx_flags changes via netlink")
+
+I suppose there is also a danger here this code has at some point in
+the past has been refactored, such that the outer old_flags was used
+at some point? Backporting this patch could then break something?  Did
+you check for this? Again, a comment in the commit message that you
+have checked this is safe to backport would be nice.
+
+    Andrew
+
+---
+pw-bot: cr
 
