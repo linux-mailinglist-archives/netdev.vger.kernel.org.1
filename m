@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-166543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B87BA36623
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 20:30:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1310DA36629
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 20:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44E9C172803
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 19:29:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44CC318972BC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 19:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FA91DE2A5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE591DC1A7;
 	Fri, 14 Feb 2025 19:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T9uDNL8N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q6DjBpRG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642571DB128
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 19:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2581DBB13
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 19:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739561284; cv=none; b=SRrOnvSLFDuBXeHvMGviFDINMQOabG8Zx/kp0alYEvExMwHfjh+3O6XoWEgfM1+V3ta4mZr8eW8AEkVLerSgkauElUBfehOHbAPmX8a1UcBhkjrLNRVELuBbE0OHTv8liRzLKz45aX6Vb8D5P/GWiXStWZkyx/pKFVUUTzyS7gs=
+	t=1739561284; cv=none; b=oaRmo4/VWPI5X8F9YSurIi1jprebz3iGn3/T9cbsbhPytwalN57nCIm9YJE8Knw3fa+QSwTDeJRZYXR7EhDyNdUrrXZhk7Kyyf+WRV8oEyjprEg3M2JYgJkzQrF/XcSAplnfu8coUjriks8479cKnaFAJcUYqsmaCopXsKswrOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739561284; c=relaxed/simple;
-	bh=U3aZeM5Cre/d9oIyAfspsVKeMu4NZhNzcqlrEhHkECo=;
+	bh=njdYT6LC4j4T8mMLBd5yVYisyLGXOyC4B69S9heE47E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iXCkfNttAuWTJXs4VnFP0RIpjOV81l28r88QxMeB2bDwLuPXLgXfNgpl+v5Eml4Yua3xm9d8u0TvLQzTN6pPavajj0Ghh3JxN8Bi5CZa55qRSi2FsCVql8B/6bJLB5qGETZSfAUsiWS64oWlSVV2mdMLTQllMPHjf1vjeLQzn5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T9uDNL8N; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=FhHi08zEgQ3lNukAUiAGXrdqFAudFrD4RP6tl3Egcerh/9nKfN+XMK0ZiYSCozdGqgl4Bfn4ye66QSmkECBHXKLUPVxBXujIHpzGUXPqQjzg90C2avnUvlJnTDBgI+go/oim6REMpXaayDk/9T06MLcW7Lvr9uhHJoDQH93UERE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q6DjBpRG; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739561281; x=1771097281;
+  t=1739561282; x=1771097282;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=U3aZeM5Cre/d9oIyAfspsVKeMu4NZhNzcqlrEhHkECo=;
-  b=T9uDNL8N3mli5rh63+mQ5jaZheA3HONM7Qia+UCicb7c3qmjcJ+cXsnm
-   0wHJUy+JfSBH3vrP3u+G7oaTNQs4YLgPewUP9l/RqaP89YBbeKgk8/qTR
-   HWMNq9B6IuaVEdtFCvD0JcD59rL2JDKJX6f37US4hHA8OUXOE0UiNcjEC
-   +34HX2/EDaklQhtzrrrvzrIoRlaPryV53prnJc3q0/Qkr1H8aH0RudFe5
-   n5+M7SA6i45IHjOtl8kzbGBu22WyVLfRHHZ7Ho2V78jNgu9JYu1sWj8zH
-   V4EZvqiXXEyRCr1n9zhTpxJCLrZ2IuZxMQP4QRbfVeHrd/sWskOcGfsYZ
-   w==;
-X-CSE-ConnectionGUID: lwUKAF1SROaFkqG0d+F77Q==
-X-CSE-MsgGUID: CIyQWKfnQICVFzVNknxPqg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="40244160"
+  bh=njdYT6LC4j4T8mMLBd5yVYisyLGXOyC4B69S9heE47E=;
+  b=Q6DjBpRGumE5pJtoGTHklhTJEbOXKwELEN9Grk1hBwtR9gH0b+zRX3rk
+   OFC4/LWV13So5W+1/WK05fasI9NB/kP3eYMkZriU3VJmUsoe/L5O6DzU2
+   oNVf1T0ikyJ1tb4t23NuBxkU3VIVGoSR1elj+7z0JxWTVMvl2Pjp0631Y
+   1RvuLhY/ZLUMa5od7IylZVoQ+q5j4+Toia+n1SXYg1QffxuEmB+89RDV3
+   avgdRqj7gLWdTFJQWG7Yv9NkhL0U36qIGqZiIJFrFCuTYkMjCgOnZUxkM
+   1pG9NUPcgEMT/MLKuNV/kQLG0vTy8jiEkSlWe+UKhjQ9H7tOYuBJzrgzx
+   A==;
+X-CSE-ConnectionGUID: Q+pBcGkrQ4uwNSlbZE3hCw==
+X-CSE-MsgGUID: fsMRXgnzQ2W1aqOMOUqWhw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="40244167"
 X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="40244160"
+   d="scan'208";a="40244167"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 11:27:54 -0800
-X-CSE-ConnectionGUID: qW/7w4xpQ7KMWFnCiZkQYQ==
-X-CSE-MsgGUID: I7Fw2G2TQGy5fn/oZw+qtQ==
+X-CSE-ConnectionGUID: cv3yqdIDRmOHeX8c/qkMrQ==
+X-CSE-MsgGUID: PATJ9cCXTzOK0OyyVFiKCQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="144394011"
+   d="scan'208";a="144394014"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa002.jf.intel.com with ESMTP; 14 Feb 2025 11:27:54 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,15 +65,16 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
+Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	anthony.l.nguyen@intel.com,
-	mateusz.polchlopek@intel.com,
+	jacob.e.keller@intel.com,
 	richardcochran@gmail.com,
 	horms@kernel.org,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 11/14] iavf: refactor iavf_clean_rx_irq to support legacy and flex descriptors
-Date: Fri, 14 Feb 2025 11:27:32 -0800
-Message-ID: <20250214192739.1175740-12-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 12/14] iavf: Implement checking DD desc field
+Date: Fri, 14 Feb 2025 11:27:33 -0800
+Message-ID: <20250214192739.1175740-13-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250214192739.1175740-1-anthony.l.nguyen@intel.com>
 References: <20250214192739.1175740-1-anthony.l.nguyen@intel.com>
@@ -85,712 +86,195 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-Using VIRTCHNL_VF_OFFLOAD_FLEX_DESC, the iAVF driver is capable of
-negotiating to enable the advanced flexible descriptor layout. Add the
-flexible NIC layout (RXDID=2) as a member of the Rx descriptor union.
+Rx timestamping introduced in PF driver caused the need of refactoring
+the VF driver mechanism to check packet fields.
 
-Also add bit position definitions for the status and error indications
-that are needed.
+The function to check errors in descriptor has been removed and from
+now only previously set struct fields are being checked. The field DD
+(descriptor done) needs to be checked at the very beginning, before
+extracting other fields.
 
-The iavf_clean_rx_irq function needs to extract a few fields from the Rx
-descriptor, including the size, rx_ptype, and vlan_tag.
-Move the extraction to a separate function that decodes the fields into
-a structure. This will reduce the burden for handling multiple
-descriptor types by keeping the relevant extraction logic in one place.
-
-To support handling an additional descriptor format with minimal code
-duplication, refactor Rx checksum handling so that the general logic
-is separated from the bit calculations. Introduce an iavf_rx_desc_decoded
-structure which holds the relevant bits decoded from the Rx descriptor.
-This will enable implementing flexible descriptor handling without
-duplicating the general logic twice.
-
-Introduce an iavf_extract_flex_rx_fields, iavf_flex_rx_hash, and
-iavf_flex_rx_csum functions which operate on the flexible NIC descriptor
-format instead of the legacy 32 byte format. Based on the negotiated
-RXDID, select the correct function for processing the Rx descriptors.
-
-With this change, the Rx hot path should be functional when using either
-the default legacy 32byte format or when we switch to the flexible NIC
-layout.
-
-Modify the Rx hot path to add support for the flexible descriptor
-format and add request enabling Rx timestamps for all queues.
-
-As in ice, make sure we bump the checksum level if the hardware detected
-a packet type which could have an outer checksum. This is important
-because hardware only verifies the inner checksum.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/iavf/iavf_txrx.c | 354 ++++++++++++++------
- drivers/net/ethernet/intel/iavf/iavf_type.h | 127 ++++---
- 2 files changed, 327 insertions(+), 154 deletions(-)
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c | 54 ++++++++++++++++-----
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h | 16 ------
+ drivers/net/ethernet/intel/iavf/iavf_type.h |  2 +
+ 3 files changed, 43 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-index 46745ebc9c1f..89b71509e521 100644
+index 89b71509e521..283997b8a777 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-@@ -896,59 +896,43 @@ bool iavf_alloc_rx_buffers(struct iavf_ring *rx_ring, u16 cleaned_count)
- }
+@@ -9,6 +9,25 @@
+ #include "iavf_trace.h"
+ #include "iavf_prototype.h"
  
- /**
-- * iavf_rx_checksum - Indicate in skb if hw indicated a good cksum
-+ * iavf_rx_csum - Indicate in skb if hw indicated a good checksum
-  * @vsi: the VSI we care about
-  * @skb: skb currently being received and modified
-- * @rx_desc: the receive descriptor
-+ * @decoded_pt: decoded ptype information
-+ * @csum_bits: decoded Rx descriptor information
-  **/
--static void iavf_rx_checksum(struct iavf_vsi *vsi, struct sk_buff *skb,
--			     struct iavf_rx_desc *rx_desc)
-+static void iavf_rx_csum(const struct iavf_vsi *vsi, struct sk_buff *skb,
-+			 struct libeth_rx_pt decoded_pt,
-+			 struct libeth_rx_csum csum_bits)
++/**
++ * iavf_is_descriptor_done - tests DD bit in Rx descriptor
++ * @qw1: quad word 1 from descriptor to get Descriptor Done field from
++ * @flex: is the descriptor flex or legacy
++ *
++ * This function tests the descriptor done bit in specified descriptor. Because
++ * there are two types of descriptors (legacy and flex) the parameter rx_ring
++ * is used to distinguish.
++ *
++ * Return: true or false based on the state of DD bit in Rx descriptor.
++ */
++static bool iavf_is_descriptor_done(u64 qw1, bool flex)
++{
++	if (flex)
++		return FIELD_GET(IAVF_RXD_FLEX_DD_M, qw1);
++	else
++		return FIELD_GET(IAVF_RXD_LEGACY_DD_M, qw1);
++}
++
+ static __le64 build_ctob(u32 td_cmd, u32 td_offset, unsigned int size,
+ 			 u32 td_tag)
  {
--	struct libeth_rx_pt decoded;
--	u32 rx_error, rx_status;
- 	bool ipv4, ipv6;
--	u64 qword;
--	u32 ptype;
- 
- 	skb->ip_summed = CHECKSUM_NONE;
- 
--	qword = le64_to_cpu(rx_desc->qw1);
--	ptype = FIELD_GET(IAVF_RXD_QW1_PTYPE_MASK, qword);
--
--	decoded = libie_rx_pt_parse(ptype);
--	if (!libeth_rx_pt_has_checksum(vsi->netdev, decoded))
--		return;
--
--	rx_error = FIELD_GET(IAVF_RXD_QW1_ERROR_MASK, qword);
--	rx_status = FIELD_GET(IAVF_RXD_QW1_STATUS_MASK, qword);
--
- 	/* did the hardware decode the packet and checksum? */
--	if (!(rx_status & BIT(IAVF_RX_DESC_STATUS_L3L4P_SHIFT)))
-+	if (unlikely(!csum_bits.l3l4p))
- 		return;
- 
--	ipv4 = libeth_rx_pt_get_ip_ver(decoded) == LIBETH_RX_PT_OUTER_IPV4;
--	ipv6 = libeth_rx_pt_get_ip_ver(decoded) == LIBETH_RX_PT_OUTER_IPV6;
-+	ipv4 = libeth_rx_pt_get_ip_ver(decoded_pt) == LIBETH_RX_PT_OUTER_IPV4;
-+	ipv6 = libeth_rx_pt_get_ip_ver(decoded_pt) == LIBETH_RX_PT_OUTER_IPV6;
- 
--	if (ipv4 &&
--	    (rx_error & (BIT(IAVF_RX_DESC_ERROR_IPE_SHIFT) |
--			 BIT(IAVF_RX_DESC_ERROR_EIPE_SHIFT))))
-+	if (unlikely(ipv4 && (csum_bits.ipe || csum_bits.eipe)))
- 		goto checksum_fail;
- 
- 	/* likely incorrect csum if alternate IP extension headers found */
--	if (ipv6 &&
--	    rx_status & BIT(IAVF_RX_DESC_STATUS_IPV6EXADD_SHIFT))
--		/* don't increment checksum err here, non-fatal err */
-+	if (unlikely(ipv6 && csum_bits.ipv6exadd))
- 		return;
- 
- 	/* there was some L4 error, count error and punt packet to the stack */
--	if (rx_error & BIT(IAVF_RX_DESC_ERROR_L4E_SHIFT))
-+	if (unlikely(csum_bits.l4e))
- 		goto checksum_fail;
- 
- 	/* handle packets that were not able to be checksummed due
- 	 * to arrival speed, in this case the stack can compute
- 	 * the csum.
- 	 */
--	if (rx_error & BIT(IAVF_RX_DESC_ERROR_PPRS_SHIFT))
-+	if (unlikely(csum_bits.pprs))
- 		return;
- 
- 	skb->ip_summed = CHECKSUM_UNNECESSARY;
-@@ -959,30 +943,117 @@ static void iavf_rx_checksum(struct iavf_vsi *vsi, struct sk_buff *skb,
- }
- 
- /**
-- * iavf_rx_hash - set the hash value in the skb
-+ * iavf_legacy_rx_csum - Indicate in skb if hw indicated a good checksum
-+ * @vsi: the VSI we care about
-+ * @qw1: quad word 1
-+ * @decoded_pt: decoded packet type
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_1_32B_BASE legacy 32byte
-+ * descriptor writeback format.
-+ *
-+ * Return: decoded checksum bits.
-+ **/
-+static struct libeth_rx_csum
-+iavf_legacy_rx_csum(const struct iavf_vsi *vsi, u64 qw1,
-+		    const struct libeth_rx_pt decoded_pt)
-+{
-+	struct libeth_rx_csum csum_bits = {};
-+
-+	if (!libeth_rx_pt_has_checksum(vsi->netdev, decoded_pt))
-+		return csum_bits;
-+
-+	csum_bits.ipe = FIELD_GET(IAVF_RXD_LEGACY_IPE_M, qw1);
-+	csum_bits.eipe = FIELD_GET(IAVF_RXD_LEGACY_EIPE_M, qw1);
-+	csum_bits.l4e = FIELD_GET(IAVF_RXD_LEGACY_L4E_M, qw1);
-+	csum_bits.pprs = FIELD_GET(IAVF_RXD_LEGACY_PPRS_M, qw1);
-+	csum_bits.l3l4p = FIELD_GET(IAVF_RXD_LEGACY_L3L4P_M, qw1);
-+	csum_bits.ipv6exadd = FIELD_GET(IAVF_RXD_LEGACY_IPV6EXADD_M, qw1);
-+
-+	return csum_bits;
-+}
-+
-+/**
-+ * iavf_flex_rx_csum - Indicate in skb if hw indicated a good checksum
-+ * @vsi: the VSI we care about
-+ * @qw1: quad word 1
-+ * @decoded_pt: decoded packet type
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-+ * descriptor writeback format.
-+ *
-+ * Return: decoded checksum bits.
-+ **/
-+static struct libeth_rx_csum
-+iavf_flex_rx_csum(const struct iavf_vsi *vsi, u64 qw1,
-+		  const struct libeth_rx_pt decoded_pt)
-+{
-+	struct libeth_rx_csum csum_bits = {};
-+
-+	if (!libeth_rx_pt_has_checksum(vsi->netdev, decoded_pt))
-+		return csum_bits;
-+
-+	csum_bits.ipe = FIELD_GET(IAVF_RXD_FLEX_XSUM_IPE_M, qw1);
-+	csum_bits.eipe = FIELD_GET(IAVF_RXD_FLEX_XSUM_EIPE_M, qw1);
-+	csum_bits.l4e = FIELD_GET(IAVF_RXD_FLEX_XSUM_L4E_M, qw1);
-+	csum_bits.eudpe = FIELD_GET(IAVF_RXD_FLEX_XSUM_EUDPE_M, qw1);
-+	csum_bits.l3l4p = FIELD_GET(IAVF_RXD_FLEX_L3L4P_M, qw1);
-+	csum_bits.ipv6exadd = FIELD_GET(IAVF_RXD_FLEX_IPV6EXADD_M, qw1);
-+	csum_bits.nat = FIELD_GET(IAVF_RXD_FLEX_NAT_M, qw1);
-+
-+	return csum_bits;
-+}
-+
-+/**
-+ * iavf_legacy_rx_hash - set the hash value in the skb
-+ * @ring: descriptor ring
-+ * @qw0: quad word 0
-+ * @qw1: quad word 1
-+ * @skb: skb currently being received and modified
-+ * @decoded_pt: decoded packet type
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_1_32B_BASE legacy 32byte
-+ * descriptor writeback format.
-+ **/
-+static void iavf_legacy_rx_hash(const struct iavf_ring *ring, __le64 qw0,
-+				__le64 qw1, struct sk_buff *skb,
-+				const struct libeth_rx_pt decoded_pt)
-+{
-+	const __le64 rss_mask = cpu_to_le64(IAVF_RXD_LEGACY_FLTSTAT_M);
-+	u32 hash;
-+
-+	if (!libeth_rx_pt_has_hash(ring->netdev, decoded_pt))
-+		return;
-+
-+	if ((qw1 & rss_mask) == rss_mask) {
-+		hash = le64_get_bits(qw0, IAVF_RXD_LEGACY_RSS_M);
-+		libeth_rx_pt_set_hash(skb, hash, decoded_pt);
-+	}
-+}
-+
-+/**
-+ * iavf_flex_rx_hash - set the hash value in the skb
-  * @ring: descriptor ring
-- * @rx_desc: specific descriptor
-+ * @qw1: quad word 1
-  * @skb: skb currently being received and modified
-- * @rx_ptype: Rx packet type
-+ * @decoded_pt: decoded packet type
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-+ * descriptor writeback format.
-  **/
--static void iavf_rx_hash(struct iavf_ring *ring,
--			 struct iavf_rx_desc *rx_desc,
--			 struct sk_buff *skb,
--			 u8 rx_ptype)
-+static void iavf_flex_rx_hash(const struct iavf_ring *ring, __le64 qw1,
-+			      struct sk_buff *skb,
-+			      const struct libeth_rx_pt decoded_pt)
- {
--	struct libeth_rx_pt decoded;
-+	bool rss_valid;
- 	u32 hash;
--	const __le64 rss_mask =
--		cpu_to_le64((u64)IAVF_RX_DESC_FLTSTAT_RSS_HASH <<
--			    IAVF_RX_DESC_STATUS_FLTSTAT_SHIFT);
- 
--	decoded = libie_rx_pt_parse(rx_ptype);
--	if (!libeth_rx_pt_has_hash(ring->netdev, decoded))
-+	if (!libeth_rx_pt_has_hash(ring->netdev, decoded_pt))
- 		return;
- 
--	if ((rx_desc->qw1 & rss_mask) == rss_mask) {
--		hash = le64_get_bits(rx_desc->qw0, IAVF_RXD_LEGACY_RSS_M);
--		libeth_rx_pt_set_hash(skb, hash, decoded);
-+	rss_valid = le64_get_bits(qw1, IAVF_RXD_FLEX_RSS_VALID_M);
-+	if (rss_valid) {
-+		hash = le64_get_bits(qw1, IAVF_RXD_FLEX_RSS_HASH_M);
-+		libeth_rx_pt_set_hash(skb, hash, decoded_pt);
- 	}
- }
- 
-@@ -991,20 +1062,33 @@ static void iavf_rx_hash(struct iavf_ring *ring,
-  * @rx_ring: rx descriptor ring packet is being transacted on
+@@ -1063,6 +1082,7 @@ static void iavf_flex_rx_hash(const struct iavf_ring *ring, __le64 qw1,
   * @rx_desc: pointer to the EOP Rx descriptor
   * @skb: pointer to current skb being populated
-- * @rx_ptype: the packet type decoded by hardware
-+ * @ptype: the packet type decoded by hardware
+  * @ptype: the packet type decoded by hardware
++ * @flex: is the descriptor flex or legacy
   *
   * This function checks the ring, descriptor, and packet information in
   * order to populate the hash, checksum, VLAN, protocol, and
-  * other fields within the skb.
+@@ -1070,7 +1090,8 @@ static void iavf_flex_rx_hash(const struct iavf_ring *ring, __le64 qw1,
   **/
--static void
--iavf_process_skb_fields(struct iavf_ring *rx_ring,
--			struct iavf_rx_desc *rx_desc, struct sk_buff *skb,
--			u8 rx_ptype)
-+static void iavf_process_skb_fields(const struct iavf_ring *rx_ring,
-+				    const struct iavf_rx_desc *rx_desc,
-+				    struct sk_buff *skb, u32 ptype)
+ static void iavf_process_skb_fields(const struct iavf_ring *rx_ring,
+ 				    const struct iavf_rx_desc *rx_desc,
+-				    struct sk_buff *skb, u32 ptype)
++				    struct sk_buff *skb, u32 ptype,
++				    bool flex)
  {
--	iavf_rx_hash(rx_ring, rx_desc, skb, rx_ptype);
-+	struct libeth_rx_csum csum_bits;
-+	struct libeth_rx_pt decoded_pt;
-+	__le64 qw0 = rx_desc->qw0;
-+	__le64 qw1 = rx_desc->qw1;
+ 	struct libeth_rx_csum csum_bits;
+ 	struct libeth_rx_pt decoded_pt;
+@@ -1079,14 +1100,14 @@ static void iavf_process_skb_fields(const struct iavf_ring *rx_ring,
  
--	iavf_rx_checksum(rx_ring->vsi, skb, rx_desc);
-+	decoded_pt = libie_rx_pt_parse(ptype);
-+
-+	if (rx_ring->rxdid == VIRTCHNL_RXDID_1_32B_BASE) {
+ 	decoded_pt = libie_rx_pt_parse(ptype);
+ 
+-	if (rx_ring->rxdid == VIRTCHNL_RXDID_1_32B_BASE) {
+-		iavf_legacy_rx_hash(rx_ring, qw0, qw1, skb, decoded_pt);
+-		csum_bits = iavf_legacy_rx_csum(rx_ring->vsi, le64_to_cpu(qw1),
+-						decoded_pt);
+-	} else {
++	if (flex) {
+ 		iavf_flex_rx_hash(rx_ring, qw1, skb, decoded_pt);
+ 		csum_bits = iavf_flex_rx_csum(rx_ring->vsi, le64_to_cpu(qw1),
+ 					      decoded_pt);
++	} else {
 +		iavf_legacy_rx_hash(rx_ring, qw0, qw1, skb, decoded_pt);
 +		csum_bits = iavf_legacy_rx_csum(rx_ring->vsi, le64_to_cpu(qw1),
 +						decoded_pt);
-+	} else {
-+		iavf_flex_rx_hash(rx_ring, qw1, skb, decoded_pt);
-+		csum_bits = iavf_flex_rx_csum(rx_ring->vsi, le64_to_cpu(qw1),
-+					      decoded_pt);
-+	}
-+	iavf_rx_csum(rx_ring->vsi, skb, decoded_pt, csum_bits);
+ 	}
+ 	iavf_rx_csum(rx_ring->vsi, skb, decoded_pt, csum_bits);
  
- 	skb_record_rx_queue(skb, rx_ring->queue_index);
+@@ -1296,12 +1317,13 @@ iavf_extract_flex_rx_fields(const struct iavf_ring *rx_ring,
  
-@@ -1091,8 +1175,7 @@ static struct sk_buff *iavf_build_skb(const struct libeth_fqe *rx_buffer,
- /**
-  * iavf_is_non_eop - process handling of non-EOP buffers
-  * @rx_ring: Rx ring being processed
-- * @rx_desc: Rx descriptor for current buffer
-- * @skb: Current socket buffer containing buffer in progress
-+ * @fields: Rx descriptor extracted fields
-  *
-  * This function updates next to clean.  If the buffer is an EOP buffer
-  * this function exits returning false, otherwise it will place the
-@@ -1100,8 +1183,7 @@ static struct sk_buff *iavf_build_skb(const struct libeth_fqe *rx_buffer,
-  * that this is in fact a non-EOP buffer.
-  **/
- static bool iavf_is_non_eop(struct iavf_ring *rx_ring,
--			    struct iavf_rx_desc *rx_desc,
--			    struct sk_buff *skb)
-+			    struct libeth_rqe_info fields)
+ static struct libeth_rqe_info
+ iavf_extract_rx_fields(const struct iavf_ring *rx_ring,
+-		       const struct iavf_rx_desc *rx_desc)
++		       const struct iavf_rx_desc *rx_desc,
++		       bool flex)
  {
- 	u32 ntc = rx_ring->next_to_clean + 1;
- 
-@@ -1112,8 +1194,7 @@ static bool iavf_is_non_eop(struct iavf_ring *rx_ring,
- 	prefetch(IAVF_RX_DESC(rx_ring, ntc));
- 
- 	/* if we are the last buffer then there is nothing else to do */
--#define IAVF_RXD_EOF BIT(IAVF_RX_DESC_STATUS_EOF_SHIFT)
--	if (likely(iavf_test_staterr(rx_desc, IAVF_RXD_EOF)))
-+	if (likely(fields.eop))
- 		return false;
- 
- 	rx_ring->rx_stats.non_eop_descs++;
-@@ -1121,6 +1202,108 @@ static bool iavf_is_non_eop(struct iavf_ring *rx_ring,
- 	return true;
+-	if (rx_ring->rxdid == VIRTCHNL_RXDID_1_32B_BASE)
+-		return iavf_extract_legacy_rx_fields(rx_ring, rx_desc);
+-	else
++	if (flex)
+ 		return iavf_extract_flex_rx_fields(rx_ring, rx_desc);
++	else
++		return iavf_extract_legacy_rx_fields(rx_ring, rx_desc);
  }
  
-+/**
-+ * iavf_extract_legacy_rx_fields - Extract fields from the Rx descriptor
-+ * @rx_ring: rx descriptor ring
-+ * @rx_desc: the descriptor to process
-+ *
-+ * Decode the Rx descriptor and extract relevant information including the
-+ * size, VLAN tag, Rx packet type, end of packet field and RXE field value.
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_1_32B_BASE legacy 32byte
-+ * descriptor writeback format.
-+ *
-+ * Return: fields extracted from the Rx descriptor.
-+ */
-+static struct libeth_rqe_info
-+iavf_extract_legacy_rx_fields(const struct iavf_ring *rx_ring,
-+			      const struct iavf_rx_desc *rx_desc)
-+{
-+	u64 qw0 = le64_to_cpu(rx_desc->qw0);
-+	u64 qw1 = le64_to_cpu(rx_desc->qw1);
-+	u64 qw2 = le64_to_cpu(rx_desc->qw2);
-+	struct libeth_rqe_info fields;
-+	bool l2tag1p, l2tag2p;
-+
-+	fields.eop = FIELD_GET(IAVF_RXD_LEGACY_EOP_M, qw1);
-+	fields.len = FIELD_GET(IAVF_RXD_LEGACY_LENGTH_M, qw1);
-+
-+	if (!fields.eop)
-+		return fields;
-+
-+	fields.rxe = FIELD_GET(IAVF_RXD_LEGACY_RXE_M, qw1);
-+	fields.ptype = FIELD_GET(IAVF_RXD_LEGACY_PTYPE_M, qw1);
-+	fields.vlan = 0;
-+
-+	if (rx_ring->flags & IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1) {
-+		l2tag1p = FIELD_GET(IAVF_RXD_LEGACY_L2TAG1P_M, qw1);
-+		if (l2tag1p)
-+			fields.vlan = FIELD_GET(IAVF_RXD_LEGACY_L2TAG1_M, qw0);
-+	} else if (rx_ring->flags & IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2) {
-+		l2tag2p = FIELD_GET(IAVF_RXD_LEGACY_L2TAG2P_M, qw2);
-+		if (l2tag2p)
-+			fields.vlan = FIELD_GET(IAVF_RXD_LEGACY_L2TAG2_M, qw2);
-+	}
-+
-+	return fields;
-+}
-+
-+/**
-+ * iavf_extract_flex_rx_fields - Extract fields from the Rx descriptor
-+ * @rx_ring: rx descriptor ring
-+ * @rx_desc: the descriptor to process
-+ *
-+ * Decode the Rx descriptor and extract relevant information including the
-+ * size, VLAN tag, Rx packet type, end of packet field and RXE field value.
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-+ * descriptor writeback format.
-+ *
-+ * Return: fields extracted from the Rx descriptor.
-+ */
-+static struct libeth_rqe_info
-+iavf_extract_flex_rx_fields(const struct iavf_ring *rx_ring,
-+			    const struct iavf_rx_desc *rx_desc)
-+{
-+	struct libeth_rqe_info fields = {};
-+	u64 qw0 = le64_to_cpu(rx_desc->qw0);
-+	u64 qw1 = le64_to_cpu(rx_desc->qw1);
-+	u64 qw2 = le64_to_cpu(rx_desc->qw2);
-+	bool l2tag1p, l2tag2p;
-+
-+	fields.eop = FIELD_GET(IAVF_RXD_FLEX_EOP_M, qw1);
-+	fields.len = FIELD_GET(IAVF_RXD_FLEX_PKT_LEN_M, qw0);
-+
-+	if (!fields.eop)
-+		return fields;
-+
-+	fields.rxe = FIELD_GET(IAVF_RXD_FLEX_RXE_M, qw1);
-+	fields.ptype = FIELD_GET(IAVF_RXD_FLEX_PTYPE_M, qw0);
-+	fields.vlan = 0;
-+
-+	if (rx_ring->flags & IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1) {
-+		l2tag1p = FIELD_GET(IAVF_RXD_FLEX_L2TAG1P_M, qw1);
-+		if (l2tag1p)
-+			fields.vlan = FIELD_GET(IAVF_RXD_FLEX_L2TAG1_M, qw1);
-+	} else if (rx_ring->flags & IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2) {
-+		l2tag2p = FIELD_GET(IAVF_RXD_FLEX_L2TAG2P_M, qw2);
-+		if (l2tag2p)
-+			fields.vlan = FIELD_GET(IAVF_RXD_FLEX_L2TAG2_2_M, qw2);
-+	}
-+
-+	return fields;
-+}
-+
-+static struct libeth_rqe_info
-+iavf_extract_rx_fields(const struct iavf_ring *rx_ring,
-+		       const struct iavf_rx_desc *rx_desc)
-+{
-+	if (rx_ring->rxdid == VIRTCHNL_RXDID_1_32B_BASE)
-+		return iavf_extract_legacy_rx_fields(rx_ring, rx_desc);
-+	else
-+		return iavf_extract_flex_rx_fields(rx_ring, rx_desc);
-+}
-+
  /**
-  * iavf_clean_rx_irq - Clean completed descriptors from Rx ring - bounce buf
-  * @rx_ring: rx descriptor ring to transact packets on
-@@ -1141,13 +1324,9 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
- 	bool failure = false;
- 
- 	while (likely(total_rx_packets < (unsigned int)budget)) {
-+		struct libeth_rqe_info fields;
+@@ -1318,6 +1340,7 @@ iavf_extract_rx_fields(const struct iavf_ring *rx_ring,
+  **/
+ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
+ {
++	bool flex = rx_ring->rxdid == VIRTCHNL_RXDID_2_FLEX_SQ_NIC;
+ 	unsigned int total_rx_bytes = 0, total_rx_packets = 0;
+ 	struct sk_buff *skb = rx_ring->skb;
+ 	u16 cleaned_count = IAVF_DESC_UNUSED(rx_ring);
+@@ -1327,6 +1350,7 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
+ 		struct libeth_rqe_info fields;
  		struct libeth_fqe *rx_buffer;
  		struct iavf_rx_desc *rx_desc;
--		u16 ext_status = 0;
--		unsigned int size;
--		u16 vlan_tag = 0;
--		u8 rx_ptype;
--		u64 qw1;
++		u64 qw1;
  
  		/* return some buffers to hardware, one at a time is too slow */
  		if (cleaned_count >= IAVF_RX_BUFFER_WRITE) {
-@@ -1158,35 +1337,28 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
- 
- 		rx_desc = IAVF_RX_DESC(rx_ring, rx_ring->next_to_clean);
- 
--		/* status_error_len will always be zero for unused descriptors
--		 * because it's cleared in cleanup, and overlaps with hdr_addr
--		 * which is always zero because packet split isn't used, if the
--		 * hardware wrote DD then the length will be non-zero
--		 */
--		qw1 = le64_to_cpu(rx_desc->qw1);
--
- 		/* This memory barrier is needed to keep us from reading
- 		 * any other fields out of the rx_desc until we have
- 		 * verified the descriptor has been written back.
+@@ -1343,10 +1367,14 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
  		 */
  		dma_rmb();
--#define IAVF_RXD_DD BIT(IAVF_RX_DESC_STATUS_DD_SHIFT)
--		if (!iavf_test_staterr(rx_desc, IAVF_RXD_DD))
-+
-+		if (!iavf_test_staterr(rx_desc, IAVF_RXD_FLEX_DD_M))
+ 
+-		if (!iavf_test_staterr(rx_desc, IAVF_RXD_FLEX_DD_M))
++		qw1 = le64_to_cpu(rx_desc->qw1);
++		/* If DD field (descriptor done) is unset then other fields are
++		 * not valid
++		 */
++		if (!iavf_is_descriptor_done(qw1, flex))
  			break;
  
--		size = FIELD_GET(IAVF_RXD_QW1_LENGTH_PBUF_MASK, qw1);
-+		fields = iavf_extract_rx_fields(rx_ring, rx_desc);
+-		fields = iavf_extract_rx_fields(rx_ring, rx_desc);
++		fields = iavf_extract_rx_fields(rx_ring, rx_desc, flex);
  
  		iavf_trace(clean_rx_irq, rx_ring, rx_desc, skb);
  
- 		rx_buffer = &rx_ring->rx_fqes[rx_ring->next_to_clean];
--		if (!libeth_rx_sync_for_cpu(rx_buffer, size))
-+		if (!libeth_rx_sync_for_cpu(rx_buffer, fields.len))
- 			goto skip_data;
- 
- 		/* retrieve a buffer from the ring */
- 		if (skb)
--			iavf_add_rx_frag(skb, rx_buffer, size);
-+			iavf_add_rx_frag(skb, rx_buffer, fields.len);
- 		else
--			skb = iavf_build_skb(rx_buffer, size);
-+			skb = iavf_build_skb(rx_buffer, fields.len);
- 
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb) {
-@@ -1197,15 +1369,14 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
- skip_data:
- 		cleaned_count++;
- 
--		if (iavf_is_non_eop(rx_ring, rx_desc, skb) || unlikely(!skb))
-+		if (iavf_is_non_eop(rx_ring, fields) || unlikely(!skb))
- 			continue;
- 
--		/* ERR_MASK will only have valid bits if EOP set, and
--		 * what we are doing here is actually checking
--		 * IAVF_RX_DESC_ERROR_RXE_SHIFT, since it is the zeroth bit in
--		 * the error field
-+		/* RXE field in descriptor is an indication of the MAC errors
-+		 * (like CRC, alignment, oversize etc). If it is set then iavf
-+		 * should finish.
- 		 */
--		if (unlikely(iavf_test_staterr(rx_desc, BIT(IAVF_RXD_QW1_ERROR_SHIFT)))) {
-+		if (unlikely(fields.rxe)) {
- 			dev_kfree_skb_any(skb);
- 			skb = NULL;
- 			continue;
-@@ -1219,26 +1390,11 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
- 		/* probably a little skewed due to removing CRC */
+@@ -1391,7 +1419,7 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx_ring, int budget)
  		total_rx_bytes += skb->len;
  
--		rx_ptype = FIELD_GET(IAVF_RXD_QW1_PTYPE_MASK, qw1);
--
  		/* populate checksum, VLAN, and protocol */
--		iavf_process_skb_fields(rx_ring, rx_desc, skb, rx_ptype);
--
--		if (qw1 & BIT(IAVF_RX_DESC_STATUS_L2TAG1P_SHIFT) &&
--		    rx_ring->flags & IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1)
--			vlan_tag = le64_get_bits(rx_desc->qw0,
--						 IAVF_RXD_LEGACY_L2TAG1_M);
--
--		ext_status = le64_get_bits(rx_desc->qw2,
--					   IAVF_RXD_LEGACY_EXT_STATUS_M);
--
--		if ((ext_status & IAVF_RX_DESC_EXT_STATUS_L2TAG2P_M) &&
--		    (rx_ring->flags & IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2))
--			vlan_tag = le64_get_bits(rx_desc->qw2,
--						 IAVF_RXD_LEGACY_L2TAG2_2_M);
-+		iavf_process_skb_fields(rx_ring, rx_desc, skb, fields.ptype);
+-		iavf_process_skb_fields(rx_ring, rx_desc, skb, fields.ptype);
++		iavf_process_skb_fields(rx_ring, rx_desc, skb, fields.ptype, flex);
  
  		iavf_trace(clean_rx_irq_rx, rx_ring, rx_desc, skb);
--		iavf_receive_skb(rx_ring, skb, vlan_tag);
-+		iavf_receive_skb(rx_ring, skb, fields.vlan);
- 		skb = NULL;
+ 		iavf_receive_skb(rx_ring, skb, fields.vlan);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
+index 3a1a39ee3615..dff5c8cd27ab 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
++++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
+@@ -80,22 +80,6 @@ enum iavf_dyn_idx_t {
+ 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
+ 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
  
- 		/* update budget accounting */
+-/**
+- * iavf_test_staterr - tests bits in Rx descriptor status and error fields
+- * @rx_desc: pointer to receive descriptor (in le64 format)
+- * @stat_err_bits: value to mask
+- *
+- * This function does some fast chicanery in order to return the
+- * value of the mask which is really only used for boolean tests.
+- * The status_error_len doesn't need to be shifted because it begins
+- * at offset zero.
+- */
+-static inline bool iavf_test_staterr(struct iavf_rx_desc *rx_desc,
+-				     const u64 stat_err_bits)
+-{
+-	return !!(rx_desc->qw1 & cpu_to_le64(stat_err_bits));
+-}
+-
+ /* How many Rx Buffers do we bundle into one write to the hardware ? */
+ #define IAVF_RX_INCREMENT(r, i) \
+ 	do {					\
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h b/drivers/net/ethernet/intel/iavf/iavf_type.h
-index e000971e3c01..3dc0907bf70d 100644
+index 3dc0907bf70d..e62a8a0067ea 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_type.h
 +++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
-@@ -206,46 +206,86 @@ struct iavf_rx_desc {
- #define IAVF_RXD_LEGACY_RSS_M			GENMASK_ULL(63, 32)
- /* Stripped C-TAG VLAN from the receive packet */
- #define IAVF_RXD_LEGACY_L2TAG1_M		GENMASK_ULL(33, 16)
-+/* Packet type */
-+#define IAVF_RXD_FLEX_PTYPE_M			GENMASK_ULL(25, 16)
-+/* Packet length */
-+#define IAVF_RXD_FLEX_PKT_LEN_M			GENMASK_ULL(45, 32)
+@@ -212,6 +212,8 @@ struct iavf_rx_desc {
+ #define IAVF_RXD_FLEX_PKT_LEN_M			GENMASK_ULL(45, 32)
  
  	aligned_le64 qw1;
-+/* End of packet. Set to 1 if this descriptor is the last one of the packet */
-+#define IAVF_RXD_LEGACY_EOP_M			BIT(1)
-+/* L2 TAG 1 presence indication */
-+#define IAVF_RXD_LEGACY_L2TAG1P_M		BIT(2)
-+/* Detectable L3 and L4 integrity check is processed by the HW */
-+#define IAVF_RXD_LEGACY_L3L4P_M			BIT(3)
-+/* Set when an IPv6 packet contains a Destination Options Header or a Routing
-+ * Header.
-+ */
-+#define IAVF_RXD_LEGACY_IPV6EXADD_M		BIT(15)
-+/* Receive MAC Errors: CRC; Alignment; Oversize; Undersizes; Length error */
-+#define IAVF_RXD_LEGACY_RXE_M			BIT(19)
-+/* Checksum reports:
-+ * - IPE: IP checksum error
-+ * - L4E: L4 integrity error
-+ * - EIPE: External IP header (tunneled packets)
-+ */
-+#define IAVF_RXD_LEGACY_IPE_M			BIT(22)
-+#define IAVF_RXD_LEGACY_L4E_M			BIT(23)
-+#define IAVF_RXD_LEGACY_EIPE_M			BIT(24)
-+/* Set for packets that skip checksum calculation in pre-parser */
-+#define IAVF_RXD_LEGACY_PPRS_M			BIT(26)
-+/* Indicates the content in the Filter Status field */
-+#define IAVF_RXD_LEGACY_FLTSTAT_M		GENMASK_ULL(13, 12)
-+/* Packet type */
-+#define IAVF_RXD_LEGACY_PTYPE_M			GENMASK_ULL(37, 30)
-+/* Packet length */
-+#define IAVF_RXD_LEGACY_LENGTH_M		GENMASK_ULL(51, 38)
-+/* Descriptor done indication flag */
-+#define IAVF_RXD_FLEX_DD_M			BIT(0)
-+/* End of packet. Set to 1 if this descriptor is the last one of the packet */
-+#define IAVF_RXD_FLEX_EOP_M			BIT(1)
-+/* Detectable L3 and L4 integrity check is processed by the HW */
-+#define IAVF_RXD_FLEX_L3L4P_M			BIT(3)
-+/* Checksum reports:
-+ * - IPE: IP checksum error
-+ * - L4E: L4 integrity error
-+ * - EIPE: External IP header (tunneled packets)
-+ * - EUDPE: External UDP checksum error (tunneled packets)
-+ */
-+#define IAVF_RXD_FLEX_XSUM_IPE_M		BIT(4)
-+#define IAVF_RXD_FLEX_XSUM_L4E_M		BIT(5)
-+#define IAVF_RXD_FLEX_XSUM_EIPE_M		BIT(6)
-+#define IAVF_RXD_FLEX_XSUM_EUDPE_M		BIT(7)
-+/* Set when an IPv6 packet contains a Destination Options Header or a Routing
-+ * Header.
-+ */
-+#define IAVF_RXD_FLEX_IPV6EXADD_M		BIT(9)
-+/* Receive MAC Errors: CRC; Alignment; Oversize; Undersizes; Length error */
-+#define IAVF_RXD_FLEX_RXE_M			BIT(10)
-+/* Indicates that the RSS/HASH result is valid */
-+#define IAVF_RXD_FLEX_RSS_VALID_M		BIT(12)
-+/* L2 TAG 1 presence indication */
-+#define IAVF_RXD_FLEX_L2TAG1P_M			BIT(13)
-+/* Stripped L2 Tag from the receive packet */
-+#define IAVF_RXD_FLEX_L2TAG1_M			GENMASK_ULL(31, 16)
-+/* The hash signature (RSS) */
-+#define IAVF_RXD_FLEX_RSS_HASH_M		GENMASK_ULL(63, 32)
-+
- 	aligned_le64 qw2;
-+/* L2 Tag 2 Presence */
-+#define IAVF_RXD_LEGACY_L2TAG2P_M		BIT(0)
- /* Stripped S-TAG VLAN from the receive packet */
--#define IAVF_RXD_LEGACY_L2TAG2_2_M		GENMASK_ULL(63, 48)
--/* Extended status bits */
--#define IAVF_RXD_LEGACY_EXT_STATUS_M		GENMASK_ULL(11, 0)
--
-+#define IAVF_RXD_LEGACY_L2TAG2_M		GENMASK_ULL(63, 32)
-+/* Stripped S-TAG VLAN from the receive packet */
-+#define IAVF_RXD_FLEX_L2TAG2_2_M		GENMASK_ULL(63, 48)
-+/* The packet is a UDP tunneled packet */
-+#define IAVF_RXD_FLEX_NAT_M			BIT(4)
-+/* L2 Tag 2 Presence */
-+#define IAVF_RXD_FLEX_L2TAG2P_M			BIT(11)
- 	aligned_le64 qw3;
- } __aligned(4 * sizeof(__le64));
- static_assert(sizeof(struct iavf_rx_desc) == 32);
- 
--enum iavf_rx_desc_status_bits {
--	/* Note: These are predefined bit offsets */
--	IAVF_RX_DESC_STATUS_DD_SHIFT		= 0,
--	IAVF_RX_DESC_STATUS_EOF_SHIFT		= 1,
--	IAVF_RX_DESC_STATUS_L2TAG1P_SHIFT	= 2,
--	IAVF_RX_DESC_STATUS_L3L4P_SHIFT		= 3,
--	IAVF_RX_DESC_STATUS_CRCP_SHIFT		= 4,
--	IAVF_RX_DESC_STATUS_TSYNINDX_SHIFT	= 5, /* 2 BITS */
--	IAVF_RX_DESC_STATUS_TSYNVALID_SHIFT	= 7,
--	/* Note: Bit 8 is reserved in X710 and XL710 */
--	IAVF_RX_DESC_STATUS_EXT_UDP_0_SHIFT	= 8,
--	IAVF_RX_DESC_STATUS_UMBCAST_SHIFT	= 9, /* 2 BITS */
--	IAVF_RX_DESC_STATUS_FLM_SHIFT		= 11,
--	IAVF_RX_DESC_STATUS_FLTSTAT_SHIFT	= 12, /* 2 BITS */
--	IAVF_RX_DESC_STATUS_LPBK_SHIFT		= 14,
--	IAVF_RX_DESC_STATUS_IPV6EXADD_SHIFT	= 15,
--	IAVF_RX_DESC_STATUS_RESERVED_SHIFT	= 16, /* 2 BITS */
--	/* Note: For non-tunnel packets INT_UDP_0 is the right status for
--	 * UDP header
--	 */
--	IAVF_RX_DESC_STATUS_INT_UDP_0_SHIFT	= 18,
--	IAVF_RX_DESC_STATUS_LAST /* this entry must be last!!! */
--};
--
--#define IAVF_RXD_QW1_STATUS_SHIFT	0
--#define IAVF_RXD_QW1_STATUS_MASK	((BIT(IAVF_RX_DESC_STATUS_LAST) - 1) \
--					 << IAVF_RXD_QW1_STATUS_SHIFT)
--
- #define IAVF_RXD_QW1_STATUS_TSYNINDX_SHIFT IAVF_RX_DESC_STATUS_TSYNINDX_SHIFT
- #define IAVF_RXD_QW1_STATUS_TSYNINDX_MASK  (0x3UL << \
- 					    IAVF_RXD_QW1_STATUS_TSYNINDX_SHIFT)
-@@ -261,22 +301,6 @@ enum iavf_rx_desc_fltstat_values {
- 	IAVF_RX_DESC_FLTSTAT_RSS_HASH	= 3,
- };
- 
--#define IAVF_RXD_QW1_ERROR_SHIFT	19
--#define IAVF_RXD_QW1_ERROR_MASK		(0xFFUL << IAVF_RXD_QW1_ERROR_SHIFT)
--
--enum iavf_rx_desc_error_bits {
--	/* Note: These are predefined bit offsets */
--	IAVF_RX_DESC_ERROR_RXE_SHIFT		= 0,
--	IAVF_RX_DESC_ERROR_RECIPE_SHIFT		= 1,
--	IAVF_RX_DESC_ERROR_HBO_SHIFT		= 2,
--	IAVF_RX_DESC_ERROR_L3L4E_SHIFT		= 3, /* 3 BITS */
--	IAVF_RX_DESC_ERROR_IPE_SHIFT		= 3,
--	IAVF_RX_DESC_ERROR_L4E_SHIFT		= 4,
--	IAVF_RX_DESC_ERROR_EIPE_SHIFT		= 5,
--	IAVF_RX_DESC_ERROR_OVERSIZE_SHIFT	= 6,
--	IAVF_RX_DESC_ERROR_PPRS_SHIFT		= 7
--};
--
- enum iavf_rx_desc_error_l3l4e_fcoe_masks {
- 	IAVF_RX_DESC_ERROR_L3L4E_NONE		= 0,
- 	IAVF_RX_DESC_ERROR_L3L4E_PROT		= 1,
-@@ -285,13 +309,6 @@ enum iavf_rx_desc_error_l3l4e_fcoe_masks {
- 	IAVF_RX_DESC_ERROR_L3L4E_DMAC_WARN	= 4
- };
- 
--#define IAVF_RXD_QW1_PTYPE_SHIFT	30
--#define IAVF_RXD_QW1_PTYPE_MASK		(0xFFULL << IAVF_RXD_QW1_PTYPE_SHIFT)
--
--#define IAVF_RXD_QW1_LENGTH_PBUF_SHIFT	38
--#define IAVF_RXD_QW1_LENGTH_PBUF_MASK	(0x3FFFULL << \
--					 IAVF_RXD_QW1_LENGTH_PBUF_SHIFT)
--
- #define IAVF_RXD_QW1_LENGTH_HBUF_SHIFT	52
- #define IAVF_RXD_QW1_LENGTH_HBUF_MASK	(0x7FFULL << \
- 					 IAVF_RXD_QW1_LENGTH_HBUF_SHIFT)
++/* Descriptor done indication flag. */
++#define IAVF_RXD_LEGACY_DD_M			BIT(0)
+ /* End of packet. Set to 1 if this descriptor is the last one of the packet */
+ #define IAVF_RXD_LEGACY_EOP_M			BIT(1)
+ /* L2 TAG 1 presence indication */
 -- 
 2.47.1
 
