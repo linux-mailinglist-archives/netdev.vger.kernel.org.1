@@ -1,99 +1,78 @@
-Return-Path: <netdev+bounces-166275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB812A354FF
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:46:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8085A35509
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:49:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59EBA18913E6
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:46:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54BC47A1BF7
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7597139D1B;
-	Fri, 14 Feb 2025 02:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D16D1474A9;
+	Fri, 14 Feb 2025 02:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNyeqlUO"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293CF77F11;
-	Fri, 14 Feb 2025 02:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12D013C67E;
+	Fri, 14 Feb 2025 02:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739501199; cv=none; b=fxxk8Sg+EcVZA6pCXTaUJBtv7vtk22sJ/zHNKBx+yGR0hwoy6xFYMv9L5GT+4ziUv37VoXm79rMpDcfnokcaImbVhU/fVARMMf7DiwkkRTfiWmh2XfFaMaHdJCL0QVDnhvYpWN1Am+hy3N7sv57aB1tpelyE8mqxPFpImqGA9gg=
+	t=1739501359; cv=none; b=QXWNGG+7wZzlU08g0y8WKXlKanXAhkz1rmhI/5LLORguahdUh4lVtjsaAwtsXffwTjT+pQ0/AcN/xjA/NvsB7uOhgsx2bX9kH1mKg+cQysvUnVnmB6ISTIkdR756UVSRA3ojnBIVBlC6SSLLV1/cLSw5I3cNUvI9llOdsxXv7II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739501199; c=relaxed/simple;
-	bh=r6tl0D5Ohz++OnApacxTTWWCjiyFXxwaFc8dAcN1aS0=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=l2To77wVKoj0S6iol7V5HW3Acjg18f6ALWTOEHE87KKaED09thgNjgMbBhNNXmynTLf0XALw0aVqiEXGR06BPpfOJE7MBLcXQBrhmiMSV4GVSHHDGcV15D0Jkc9WzwPMsYsr0mO9p23XlCYUdvd1SwXPTHV6Y7bUxwr9MPlznHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YvGZf4SvzzRmdp;
-	Fri, 14 Feb 2025 10:43:38 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 72ECE180087;
-	Fri, 14 Feb 2025 10:46:33 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 14 Feb 2025 10:46:32 +0800
-Message-ID: <842c3542-95a6-4112-9c50-70226b0caadc@huawei.com>
-Date: Fri, 14 Feb 2025 10:46:31 +0800
+	s=arc-20240116; t=1739501359; c=relaxed/simple;
+	bh=/aaQWg+YeEPuNctVbeajNUJMARTgmwKnAUAbqnJAsEI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q2/l++svvUW+x6LyCsbinY/zzZAlBpfWx5U+iJo8EomcFkGco+tKI9OsfS54JRSwEB+jxkP3uowMm5L/2FINRiBMVNbyxiBigInTfJI0SaqXdsc2EIX0piGMfFhfWIP7Jn6UVWKf8zRielYXUtCvW7JJhmukd/6+xHhUhnD3Ta0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNyeqlUO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DD5C4CED1;
+	Fri, 14 Feb 2025 02:49:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739501358;
+	bh=/aaQWg+YeEPuNctVbeajNUJMARTgmwKnAUAbqnJAsEI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HNyeqlUOQpAvzZO22GqE9nrezFZ0FKs6y8/7IdZNJbUKWj+DIYc2ixwIHRjzFHRdq
+	 3ok2huby0iOzi7Q96+TfOOm+HcXUlP5wji7YVgshCJdZBv1rs4Zyy1BXDuSv8ODQjB
+	 E6oNQD+EafE/53+g/OKl1fmdCb4atxDwVRaCKGo0/QcCXMxCkWaKVqyCU4de2EoshW
+	 34H522tz6S3HeDozH0ybzdU6phr/+BmaMh2Whqmg9lOXuCDeHHimpf0+ne1P4Z9xNy
+	 vA9u544B7Kr9Jd5eplHGXj4PkWGTYGjX7CWU+qxKI+qf2CJlOP2ZTQF5ooyZR+2trI
+	 0zz+PMfFqyEOg==
+Date: Thu, 13 Feb 2025 18:49:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, stfomichev@gmail.com, horms@kernel.org, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org (open
+ list), linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST
+ FRAMEWORK), bpf@vger.kernel.org (open list:XDP (eXpress Data
+ Path):Keyword:(?:\b|_)xdp(?:\b|_))
+Subject: Re: [PATCH net-next RESEND v7 3/3] selftests: drv-net: Test queue
+ xsk attribute
+Message-ID: <20250213184916.47735d95@kernel.org>
+In-Reply-To: <20250213192336.42156-4-jdamato@fastly.com>
+References: <20250213192336.42156-1-jdamato@fastly.com>
+	<20250213192336.42156-4-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/7] net: hibmcge: Add self test supported in
- this module
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-3-shaojijie@huawei.com>
- <6501012c-fecf-42b3-a70a-2c8a968b6fbd@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <6501012c-fecf-42b3-a70a-2c8a968b6fbd@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
+On Thu, 13 Feb 2025 19:23:13 +0000 Joe Damato wrote:
+> +TEST_GEN_PROGS := xdp_helper
 
-on 2025/2/14 3:59, Andrew Lunn wrote:
-> On Thu, Feb 13, 2025 at 11:55:24AM +0800, Jijie Shao wrote:
->> This patch supports many self test: Mac, SerDes and Phy.
->>
->> To implement self test, this patch implements a simple packet sending and
->> receiving function in the driver. By sending a packet in a specific format,
->> driver considers that the test is successful if the packet is received.
->> Otherwise, the test fails.
->>
->> The SerDes hardware is on the BMC side, Therefore, when the SerDes loopback
->> need enabled, driver notifies the BMC through an event message.
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Please take a look at the work Gerhard Engleder is doing, and try not
-> to reinvent net/core/selftest.c
->
->      Andrew
-
-I actually knew about this, but after browsing the source code, I gave up using it.
-
-I have an additional requirement: serdes loopback and mac loopback.
-However, they are not supported in net/core/selftest.c.
-
-Thanks,
-Jijie Shao
-
+TEST_GET_PROGS is for self-contained tests
+TEST_GEN_FILES is the right variable for building helpers
+-- 
+pw-bot: cr
 
