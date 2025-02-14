@@ -1,171 +1,90 @@
-Return-Path: <netdev+bounces-166509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EADB0A363DE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 18:04:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C35A363D8
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 18:03:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54D73B24CB
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:02:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74F487A28E8
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A06266EE4;
-	Fri, 14 Feb 2025 17:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6F3267B18;
+	Fri, 14 Feb 2025 17:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeLxhHaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6098267B0F;
-	Fri, 14 Feb 2025 17:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B395224291F
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 17:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739552551; cv=none; b=XM4Ugj9dAY7tsmjSZBL1PcMrCPJzQQnrObwZW3sERGnEJgjPYAgjXx0gRV04x26J91Yqj1AbbxBNbg8Ks4boK1WtJG65Wz1cfUtO7X3BCIzai313acUm1jNf81KKKvR1GHnL1CU0S3Pea80QT0kSnoKVugAq5CFhdqbrIcPAcms=
+	t=1739552613; cv=none; b=YUFSmGxSxYs1LR9nw9VRQ2rG/XVuJ4I+0W3r6C/xZA+5DwVTp6c5H0/Q8GUrUA/SCWkxEouf0bqP7fW1yiAHiuVs79DGfhalw4dHyv1rErS7wNkcK4RHCB6ltyG44L7ZvxZ4iZLvh33WtYJuRU1qsxsDHZ+WWrMBUmwFOLJ04DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739552551; c=relaxed/simple;
-	bh=Na8Voha/kXexWg6Tw3ntWSghbGxtOvW6Jvju9RKpfxU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k1FX6wRpyvqVRVak0Jn2j0rNFU01al+oIWqISiKxL47iHwcHCV0U+ZOcpcn2lqSCKHoUrbEDO6vWK7VT4AwkX7/D++ipqzDWIqUv5O21MrLEAVuIrZ27fPaUzAx200+PUsFslYMRW8Mp6QhTrCUb5TB4l4CTilvPHeH5qPERysI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Yvdbz5shxz6HJfJ;
-	Sat, 15 Feb 2025 01:01:03 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id A39CB140B55;
-	Sat, 15 Feb 2025 01:02:25 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 14 Feb
- 2025 18:02:25 +0100
-Date: Fri, 14 Feb 2025 17:02:23 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alucerop@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>
-Subject: Re: [PATCH v10 01/26] cxl: make memdev creation type agnostic
-Message-ID: <20250214170223.00003362@huawei.com>
-In-Reply-To: <20250205151950.25268-2-alucerop@amd.com>
-References: <20250205151950.25268-1-alucerop@amd.com>
-	<20250205151950.25268-2-alucerop@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1739552613; c=relaxed/simple;
+	bh=BlJTXi4YrMYiFwdW0nq8J2qfnIvEmq5Q7QNxw1zC3dM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=jlYsuAoD3BXDk8xMSM5GjyU5CIYWqN7TPSut4OBTxFSHZWAKG4k+5wtt6pB5P6N2tufanQCTc7dSRGT5WuXd16xeeM7u2jNLeGWZp9qy76UyEBmlMV5MSXykjcanPg0kzIaeezXb73lJAsYTPLEV5GmSDHtTZXUhmKLCtCr/MWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeLxhHaa; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-545097ff67cso2275077e87.2
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 09:03:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739552610; x=1740157410; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BlJTXi4YrMYiFwdW0nq8J2qfnIvEmq5Q7QNxw1zC3dM=;
+        b=FeLxhHaa36GCN8Ha9nfJ8eM61W+d8Bul0uFe/FqWoVECVAnL7VHQAmdNbOhhnsWiJh
+         S8ff4LnrBcvepYnzZuVWqIg+7wpKhcVM/mI1MdDJHPi11azP1ol+e1LGoNY70RgOopIR
+         SLWWiwYSLfl+7OrUKMbdEEEz2c2T8+4TL2skQMJWY4oIWV44uH0IttnY3beWMfbJ8Nd1
+         vluRrUjIyFs9xr93NAh3o2f7se2bdODcwTRUMEvJQuV/OKAxhPzDDqbJRABXkpymbSue
+         uE/Hx2wixdend42yHRMkGGowhEFrg/92Mlz6w4z2Wm/pn6vt0Pah4YpAucUwv2/iHhg4
+         Gl3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739552610; x=1740157410;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BlJTXi4YrMYiFwdW0nq8J2qfnIvEmq5Q7QNxw1zC3dM=;
+        b=em826zopUhtTex+y4OFBoKQsIyI6bjRoa+ApLjkMPCFX8BgfGDtDovErJSiC8SGNAv
+         Zr1ijVK1xA+7a5fbpq9bBSl1mqBEWzAeSUtyz/7CPkcAw+KuEthEG94f5BkWKiwUN275
+         qx3dD0kLSdkb4sA6bNUZPNzQpA+Z9CJtYfdZJSsuI7n+SaM0awg1oNa3V9+amW5O84F+
+         YAouCfEK4QTpUHZFD8l2DLN4SSV9YhxSjh1W0ENTEnUlXO41IxEDE2OiQZo7QryBTgj4
+         AiywT37sn9/eZRD9kB0YqgyOwq14R46AUcYRSYMFxM5nWaTx+zVMQw29uUlJRLE77Kqo
+         7NZA==
+X-Gm-Message-State: AOJu0YwZsvfcwNdei6waLvuTXQD+eBBPBGOAvXHhTBSlMCS68Z/JpeGi
+	oSJd9DiPdQKmxN2rYHW93ioWEGS3Si4aYnZNrOllEdt5e5ZvMXyJ2ugfacjCmTXHHNM2z4LqNrj
+	J1Z9K9pgoJGXNsIm/OyAqfG+0DqwwoRPS
+X-Gm-Gg: ASbGncsFCOyZehdxb9glSj8nR82NMqJzD/FSDknHGIJ4IFVWtieiERlBOyx/nYBUfrD
+	KJA2WAewvdrYT5jPocc4Lw7YKkkr2xL0gQUA8mQATZ468S0XQmT8hkCghAd9Pbc/ZkAuWC8FDKU
+	/NkuK97e0oKX/1dJZUatiPF9ccNDlJEbc=
+X-Google-Smtp-Source: AGHT+IHW8UFQ7l28FKJM0BlUoAwBJqhvAquivamjc7bnV1r7OJ58TPcDBeuphXT8uXGYUumK81xa+AQLKO7JHMWBMuQ=
+X-Received: by 2002:a05:6512:3051:b0:545:ae6:d740 with SMTP id
+ 2adb3069b0e04-5452fe8bf35mr20643e87.41.1739552609372; Fri, 14 Feb 2025
+ 09:03:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- frapeml500008.china.huawei.com (7.182.85.71)
+From: =?UTF-8?B?7KCc7J6E7Iqk?= <jaymaacton@gmail.com>
+Date: Fri, 14 Feb 2025 12:03:17 -0500
+X-Gm-Features: AWEUYZnfF_Tk7dG2cnSv-o3zuYAmdel0Fogpae7pu6Amq-U3IJNjVIal0poNKkI
+Message-ID: <CAPpvP8+0KftCR7WOFTf2DEOc1q_hszCHHb6pE2R-bhXMOub6Rw@mail.gmail.com>
+Subject: Question about TCP delayed-ack and PUSH flag behavior
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 5 Feb 2025 15:19:25 +0000
-alucerop@amd.com wrote:
+Hi netdev,
 
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> In preparation for Type2 support, change memdev creation making
-> type based on argument.
-> 
-> Integrate initialization of dvsec and serial fields in the related
-> cxl_dev_state within same function creating the memdev.
-> 
-> Move the code from mbox file to memdev file.
-> 
-> Add new header files with type2 required definitions for memdev
-> state creation.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-One passing comment.
+When tcp stack receives a segment with PUSH flag set, does the stack
+immediately send out for the corresponding ACK with ignoring delay-ack
+timer?
+Or regardless of the PUSH flag, delay-ack is always enforced?
 
-
-> diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
-> index 536cbe521d16..62a459078ec3 100644
-> --- a/drivers/cxl/cxlmem.h
-> +++ b/drivers/cxl/cxlmem.h
-
->  /* CXL 2.0 8.1.4: Non-CXL Function Map DVSEC */
-> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
-> index b2c943a4de0a..bd69dc07f387 100644
-> --- a/drivers/cxl/pci.c
-> +++ b/drivers/cxl/pci.c
-> @@ -911,6 +911,7 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	int rc, pmu_count;
->  	unsigned int i;
->  	bool irq_avail;
-> +	u16 dvsec;
->  
->  	/*
->  	 * Double check the anonymous union trickery in struct cxl_regs
-> @@ -924,19 +925,20 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  		return rc;
->  	pci_set_master(pdev);
->  
-> -	mds = cxl_memdev_state_create(&pdev->dev);
-> +	dvsec = pci_find_dvsec_capability(pdev, PCI_VENDOR_ID_CXL,
-> +					  CXL_DVSEC_PCIE_DEVICE);
-> +	if (!dvsec)
-> +		dev_warn(&pdev->dev,
-> +			 "Device DVSEC not present, skip CXL.mem init\n");
-> +
-> +	mds = cxl_memdev_state_create(&pdev->dev, pci_get_dsn(pdev), dvsec,
-> +				      CXL_DEVTYPE_CLASSMEM);
->  	if (IS_ERR(mds))
->  		return PTR_ERR(mds);
->  	cxlds = &mds->cxlds;
->  	pci_set_drvdata(pdev, cxlds);
->  
->  	cxlds->rcd = is_cxl_restricted(pdev);
-> -	cxlds->serial = pci_get_dsn(pdev);
-> -	cxlds->cxl_dvsec = pci_find_dvsec_capability(
-> -		pdev, PCI_VENDOR_ID_CXL, CXL_DVSEC_PCIE_DEVICE);
-> -	if (!cxlds->cxl_dvsec)
-> -		dev_warn(&pdev->dev,
-> -			 "Device DVSEC not present, skip CXL.mem init\n");
->  
->  	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
->  	if (rc)
-
-
-> diff --git a/include/cxl/pci.h b/include/cxl/pci.h
-> new file mode 100644
-> index 000000000000..ad63560caa2c
-> --- /dev/null
-> +++ b/include/cxl/pci.h
-Clashes with the cxl reset patch (or should anyway as current version
-of that just duplicates these defines) That will move
-these into uapi/linux/pci_regs.h.
-
-No idea on order things will land, but thought I'd mention it at least
-so no one gets a surprise!
-
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright(c) 2020 Intel Corporation. All rights reserved. */
-> +
-> +#ifndef __CXL_ACCEL_PCI_H
-> +#define __CXL_ACCEL_PCI_H
-> +
-> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
-> +#define CXL_DVSEC_PCIE_DEVICE					0
-> +#define   CXL_DVSEC_CAP_OFFSET		0xA
-> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
-> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
-> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
-> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
-> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
-> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
-> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
-> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
-> +
-> +#endif
-
+Thanks,
+JY
 
