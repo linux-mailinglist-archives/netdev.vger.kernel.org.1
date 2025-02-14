@@ -1,202 +1,253 @@
-Return-Path: <netdev+bounces-166249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366A1A35348
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 01:55:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E1AA35354
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A17E43AAC12
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 00:55:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA4893ABDB9
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 01:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABAC6FC5;
-	Fri, 14 Feb 2025 00:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BF15228;
+	Fri, 14 Feb 2025 01:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qNNmOA06"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxtrNQj7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9A62753FD;
-	Fri, 14 Feb 2025 00:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739494541; cv=fail; b=cL4jK+3C5o5SnFzKtVviKudscEgSD83wTv0Txp08UkbFpiPQXX65SuXlWP0/yzBPXqOd0zzVPWd8buaeGLiU3MBcNuxaCC5asjpiQV916Aplalnbsg791CYd0BJjg7X1gBF9hweHAP82B4oWDsWlIAAa1gtbjA/wt/GaMLw971o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739494541; c=relaxed/simple;
-	bh=y6L9hpx6YbsziAIkveM8ZuSJRAvGzJ79LySpcLRc2EQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=bPkwvcNy32nQ8mVy6+vev05vRgsfgLMy6VaMI3ZIj8XB1Vg3rnWBi3f3DZXCX3DfPhf5xfMoi1V91PUynNiGYJSLkcYuEYbe2HzpiujpoQ/2WHQFujZ6ieRAPT4QYLajVH78+vJ6Sqcorwf/x+lWFykjtpsnChNpyhfcQscnJ00=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qNNmOA06; arc=fail smtp.client-ip=40.107.220.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uFxblCMobnoeoQHC1n5wzuIYKRWvn81Ovk9pZAo/ku2bSXBxufcAQS+Rv2ltq9e0wRB9mWOBV9czmkPWKa4Cb5q6AqPhHivayTJwI0D8ygUs9cdiv6O5Z+N3sW93nrP968mjfz9Ym7AeQtoX0ngwZasKjhxJdK4r20ec16E0m2PPztBi6sUebAAQZX0wzv3JweBnYCqNksSZkho12MbBOAyJkKAB0knt+fP+w6B/AXsvocfoQqjOWNCpjyMP052NxBd7/eXnOO1yY5pUZOKxVhJXhZaEgk8bkarfbQd5PPldqKv132XoClksZpUrBJhNeW/OX/XoNoXD5IKuC+ovFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XmlTw9AFPGTGVFD7oDaQNoYVDDgATd9e31R7fnzXAX0=;
- b=rFr7z+9SUj26xiWc6bdXJ5SUhzVIOmg+lbMfj5wL0Zp9lhjDECCps1dOlKEHZlW4IutjjQKB4rerJunuMXs3dO2X6SygnaDiS1B5Z+sDALOvVC5JUkK0GLiEgssdz3i7O1SHcH88bk1kFkS1OcOzRTlevC61/NC6eDG2zufzRK1tRwQCYJgaKZ1AgRJBytFaWRnV7tlLQTyseqxeC2xgn3gaPC0GsAJPhGf2W0ErtQaRmQCTzw7mzTfswBwK3jDiYn9gFpx06LsimAjB1JHjA9d3yAo2RVWQc1ZHz8/JXDL/GKBml0rgibF84VHODcR5z2xCVFWM0D6dPDZvLhm7Dw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XmlTw9AFPGTGVFD7oDaQNoYVDDgATd9e31R7fnzXAX0=;
- b=qNNmOA06o2eXuL+ktwdJw6zjryBqlaSi9hh0BfwNhpR0fjYyp8WsMJIl+wJHvCA7EZOKSHRjueJOpO9DIbekr+oaPiAwHiEVFFNcMNspRMSdKPRFD2SM+Zkhe3aKgZxHdZVrM8bw7N8iykI5yM0wHj9eknMQFKyxr/z2/VEbgSIejK/MMFEAAlSpA+ZMgonYD9E8yjl61ULdPr+N8WImNQFSRD5GHWeqq6G6/YAxVu485l0o7qI6MusvXYREdRFgonRIMxX5kFgBZgtFxj3uXnSXTTlkMZcLI3kMFh3ld2CylbDNnqCvwfmMZ+gJHC7GXJdB7Z/yQedzyM83qjuKyQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DS0PR12MB8786.namprd12.prod.outlook.com (2603:10b6:8:149::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Fri, 14 Feb
- 2025 00:55:21 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%6]) with mapi id 15.20.8445.013; Fri, 14 Feb 2025
- 00:55:21 +0000
-Date: Thu, 13 Feb 2025 20:55:20 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
-	dan.j.williams@intel.com, daniel.vetter@ffwll.ch,
-	dave.jiang@intel.com, dsahern@kernel.org, gospo@broadcom.com,
-	hch@infradead.org, itayavr@nvidia.com, jiri@nvidia.com,
-	kuba@kernel.org, lbloch@nvidia.com, leonro@nvidia.com,
-	saeedm@nvidia.com, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	brett.creeley@amd.com
-Subject: Re: [RFC PATCH fwctl 3/5] pds_fwctl: initial driver framework
-Message-ID: <20250214005520.GE3886819@nvidia.com>
-References: <20250211234854.52277-1-shannon.nelson@amd.com>
- <20250211234854.52277-4-shannon.nelson@amd.com>
- <20250212122215.000001a0@huawei.com>
- <3d9b8966-8ad6-43ee-a745-073a5c82554b@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d9b8966-8ad6-43ee-a745-073a5c82554b@amd.com>
-X-ClientProxiedBy: MN2PR05CA0058.namprd05.prod.outlook.com
- (2603:10b6:208:236::27) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81DF2753EB;
+	Fri, 14 Feb 2025 01:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739494850; cv=none; b=oY8zcI6hTicNyzTScjXovAkJmrTP3zz7ijBnRnNudB2lC37yLkED/qAZKWJZVBR226ktA48GWkPyZMLxB2BBXdNAdmJQ1KvmEGn5vEcYzdibv1fA8PPvPub34In7QClneInJVeKGTDZjJgOLTMI374mchIAXPni7s1rAfNzwk4g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739494850; c=relaxed/simple;
+	bh=n0EtK+xYeRelzV925EbaxthfAar4iubZjLdX9Hs0BhI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YP2uzI8zf22kNxFAg0Xe3h45wGHArySeyQEzmwoSL7Pf5ALcaeq6hx07lLrGfVd3tYrsGAUZJ3YgqN/8Pw4Lzj1Xfz3kxej7uX+PVx+QY9OaMsD5o1pyJDm2s8krzg1sfk9EG9HjNFBVyR9AAJZVk+AHK+WTGosoRnGxmgNnU84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxtrNQj7; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21f818a980cso23292155ad.3;
+        Thu, 13 Feb 2025 17:00:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739494848; x=1740099648; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Cnj8arz+IuFd1isxZxDqgMZyR+BIMXopz33+4E2hnY=;
+        b=lxtrNQj7A8yzel4ueEZB4rL/eLC7nX9vxEvnjbUxbDGEzi/xZ7ggg9Y48jyn84mrfd
+         Aa3Gbd0MC1CwmPjRY434Y4fypZVKBFjofzbCjFsKQRqaAz3jGF03FAbGKmyz09jv0IT6
+         KK8X6GvZtQwqq5xpANo/reX549vsi70tW1OEnf1qxn8f6kzD3Ybm46CFv3J6fAov6AN3
+         H8MDRdlcE7WLxOPKlbjBOGN8d3LUFuZNRnfgodj/0Rkn7s+ISNzeK/numGS/xOYzQJ9e
+         xH2WkLVpxxcsD8347rWWwv0WDatxbaLu3+I6XtFdbHnfPeArV3uK0z0mmfZT576390Is
+         cV5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739494848; x=1740099648;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Cnj8arz+IuFd1isxZxDqgMZyR+BIMXopz33+4E2hnY=;
+        b=RLJBJa3DRx+PEPgSxM5gmh9v9HUUPBM9SaOkWlBcuyUNZRDy9zxm5yfm5ciTtfdryK
+         16cMV0RP62/Zf9MB3Y6y0+kE6wSJnSQ6j8fkOEwz89UOlkSAo9Snekqu8WcXo5Vsy0qu
+         ezQnd9MO408QFcAdNNea3OY4Sfw1kBKUmQ6DHDI1a15dvqCXtMEvb+Rq/HT1o8JlCddO
+         7U4QpdLb23/pqpV5MUsMM54gENG5+VoCmFN97CaEIKXym9ZJW69YH0PM4G9rkdJIEvuX
+         cygyw4tsS1turhZ1gVabNDPMwBZjJGgliu/skAahhlcGtFzmZR0k5jwm/9bovXWSa2up
+         U3Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4xA7heUbq1x3GLETqTrP0bPQQ+j08cRyPJkhUwSNlQyKKfE8JrqA/ShRAuWlVq7zavQm/T3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywscl129D+fUEBS48e4gLDkxvJLBrDc/apSBgZ2UB3kNJkgeU/L
+	geuIL8STLe05781OVdzisymTBAJh2iUmdhffJDiqYOj6J04IA8TB
+X-Gm-Gg: ASbGncuHJP94tGoWEDXvt2ipPvJLhbFLiojrFIMVQduwTbwI2Ge9G62Me6ao6mUhUWU
+	KgBnNa5e8xzBIRQO013ko/dPj0kOlQdOTQ/DPxurT+WM4E8JVy4t6T1paFHzuEjILcrW6ak7HWS
+	CJPMhmkzHDs5EhQmZ+mi/yxFkKmUZI8m8GwypXP5ZBk+0HU3TrZKAEQ5tlMNr62mRIFbk09nizm
+	9TmvqnZqoYTeIqF6vTxJD0TWqp+VeTnL2E3O0DdVyPaYNk1HusxI86abltWTcq21zjd7GkHNOGI
+	kgLSEsXTDKNg0endS7Sk4MUtPOwST1m0nUbKy2sw02R8zxjz/0sq2w==
+X-Google-Smtp-Source: AGHT+IHlR+F1sO8IBAe3Ng+r5Sdce+axHL1BEXzejjV1MqPX4//gqXEl6Ty9tOYpuxUtRnrOeoGAdg==
+X-Received: by 2002:a17:902:e750:b0:220:e392:c73 with SMTP id d9443c01a7336-220e3920eebmr56229225ad.22.1739494847685;
+        Thu, 13 Feb 2025 17:00:47 -0800 (PST)
+Received: from KERNELXING-MC1.tencent.com ([111.201.25.167])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d534db68sm18629565ad.39.2025.02.13.17.00.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 17:00:47 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	willemb@google.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	horms@kernel.org
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: [PATCH bpf-next v11 00/12] net-timestamp: bpf extension to equip applications transparently
+Date: Fri, 14 Feb 2025 09:00:26 +0800
+Message-Id: <20250214010038.54131-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS0PR12MB8786:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19b4e2fd-a66b-4b30-0a75-08dd4c924203
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?66p4w5s3/drz8pmRvhanYVkCDTRtOnkeWneDVRJrBtHbvbk9ZzYSeYtKaGyk?=
- =?us-ascii?Q?8eNLH06V5GJHXktokF6xS6fT2/NLsQIYZLjkxakmzz4PZUavGW9EY3OQS/4c?=
- =?us-ascii?Q?L7NlDExprpuXOLXJWzx6/78QPPKGZWAEyvbsvHmMSq1I3D4ENBaQCQRp2Duy?=
- =?us-ascii?Q?1qBaXHm5J7GUUl5IYuMqNl2VeeK34uCeXJ7rFS2NS62MGzO9BavODhwRZvCP?=
- =?us-ascii?Q?siS9jfrb3ZfTOAyfmk1zcwlJz5gDYJHSX0dwxcbHZyXBrKaEoMzlBhQM7zFS?=
- =?us-ascii?Q?DGxsAr0oF60rzOIG6lLCj6t+fkucpKsxf5x/c22aO/knhSQZvuJUQVxCNLuQ?=
- =?us-ascii?Q?gf1zQT8S5nuCSIxPNDdw5OTAniDbmfeeXDWK0Det0611YzQbWauCcniCh371?=
- =?us-ascii?Q?QP5XONcQP1T+MnNt8xQKS3K0xL4I+mu4xFNNQuGNuLsyrudPzuCW6qvpC3aF?=
- =?us-ascii?Q?whdEaxS3VbehH3CV5PMwnLe60etBH+p6F5ViwjCO8BimlEdLfTvLrDKj9EB6?=
- =?us-ascii?Q?Geu043RmwpVCh5wjd6qqkL1SQc8CqR16uQx2qO7BtPbySuTa0wKRdUttbl3x?=
- =?us-ascii?Q?i92+GwlaCC6B+9uSShdaRW9t2A74OsaSh/mL4JIFsWSWEClgSiW20ebpbU1L?=
- =?us-ascii?Q?6QD9VVwlsDw9M+cTGFmDsTAUp4mO95kEqB2WFxV9H038/oFjmO/2A9cM5Pik?=
- =?us-ascii?Q?m68vpNRnHKUHTIZ0kGzRpUoeoEbnEhUA6mlsjtFzP7W6WqP2Wa+qx3JY3vgt?=
- =?us-ascii?Q?kI8gSgzeeY3uiRCJyQ1S0lA/54WzCKkkL8CPTTI9dqWZMDbl43DKBsPAGZF9?=
- =?us-ascii?Q?dC11Hxqw8w82BzwbYWxYNSnkn6D8sLhtTvhR8DHiXtX2aS94+khd76lXbhVQ?=
- =?us-ascii?Q?/gOvYndVmc6YITaSJnxURyq+qPb+vfafx/QS9XSFDfADa2fj4Wl+8PLbz0hT?=
- =?us-ascii?Q?1rburf1cpo5VIMccEe4WhpHgwY+VyCjOG/ODoUUYALrRNg7ah3bB/tE2sGNn?=
- =?us-ascii?Q?4h7Ax/G9xxiS6CYih4BL+CKJB1zilbHl8VPuQ2SJ1CvRYmCAfuMWt7ZYzqUX?=
- =?us-ascii?Q?fOvXfoop9RnwVttxa64bTHs27PxrPvbtDfK4vd/q8uZRo5evpGvyjh+OkpOc?=
- =?us-ascii?Q?hq6+J8ndLm48y4KqH0gTwXPpXbcTm/xieD0pt4RjavO6K6+ZLE4eX4HuWTHO?=
- =?us-ascii?Q?jxiN0btUIr/REKR9q/vXHsIfL1PB3CpNNiZEP0EaQhXfPMpLRNwzXZZ2dgyX?=
- =?us-ascii?Q?NmYO7p6uwAekAQ3nYYcD8jXx7MKk+biKfVXz1kLN+hiFD/mV9fD9H/jXe449?=
- =?us-ascii?Q?0TRvkLFWLZmH6mcf95lEqRSO3b3ROQa/o/MFQ9zbS6hLGYOOaZopZTNnmLeJ?=
- =?us-ascii?Q?SsPy+57t4RUPrQIFA4vLYPfcd3B5?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LEMO9C2ERyZFfkHEGyANL7hRJ9P+ezccULf+fJAo73RfQfkZs2RLY//DzgoO?=
- =?us-ascii?Q?SZWeKweD3v1E8bYBklN8b4jZhwBRoGFBAHhtdlhwa5GJty0DUlGEB0YgZybS?=
- =?us-ascii?Q?apmjl26qzndqWAjbSh9NQMnxBHDMF1pw6PK1DQCxoCO6iIc8VtyvT20srjmq?=
- =?us-ascii?Q?6mS+OuHALly1Fgt+gtQmIK2zNf4TMSY/ZoifKEMAIKXcoMl0SJ3shodFC+7A?=
- =?us-ascii?Q?iUz4PVn8e9a7oYtIavKovgSulotYFgK/ns2J9ZkdYHTAhG5DDOdA+VOCNdaD?=
- =?us-ascii?Q?lHFdshlh9duR4mupGx+ncmX2dD+GI8ltjAFxAwEq8sHatX34nbusQYwyme9n?=
- =?us-ascii?Q?2Elgme8tyCQnlx4CsAx1Pl9St6csI+OtuJ/xhSWDUyhlSwy7uqbw8y/QIxlI?=
- =?us-ascii?Q?ssCLhLCdOvRKS4B9CNt3WRaGb33udHyHTxUiXmTrVO4Q0M880KJNfARP9MW6?=
- =?us-ascii?Q?py+6SPEYa8qv2NyuN4fOaOuGWuCEgVxWYFfmuByy0e/QJxls5Wn5a/zDTIsv?=
- =?us-ascii?Q?YfqIyEKRlrU/VU5XffzmbLbFcR9lpkd/j8fFWA0fnzugwvOHJZYhxTgJcLfs?=
- =?us-ascii?Q?Bsdtla6CWjCcM/ncnnoN6pO0zwQzQPr6XWwKCT0pFlUD8L9XMj4U30readk5?=
- =?us-ascii?Q?I2KZqCxXoPRVzqjeAW5NU7RVSokxZNzkRP9tPzJGZgoXp9GoNZ36xV+xuf6i?=
- =?us-ascii?Q?N3JszdxjUxFKNo0AMUB7T+XBDL4JKVQ6ndmU8erzKu4ZEnTtShyzhf2TC9kW?=
- =?us-ascii?Q?xW6dClX2V4duscCkae1W/9HqwCwZTQMk8HhCLthGJBoBv2eo0mOnQY6Du2f/?=
- =?us-ascii?Q?46CJ7Av7l6j4vcVg58Ltsp93hf2M+uPCs0fwWsRmgmCxI/ZIaE7lSGa0/1IT?=
- =?us-ascii?Q?xo4IuX00dCdbPgip1eQWmsNf+4r41QKu9iljVQbYfI1y+uFNJiGgkjuZuZOM?=
- =?us-ascii?Q?jCjdWTf/nNBTTGRViofgUncPyEz7RKfhnMAVb8C0uJ/658If4NAqTLuDdPu1?=
- =?us-ascii?Q?8VubyNHQRTwwJbyF9mGTADAWP9WLHN1yz/jsJgEAMUUL3zb9u11tSV8gKl/g?=
- =?us-ascii?Q?f5EYNuBENvWOqSFjsVq+OKRUTrZT6UnH12RlMBl6GH9u8pvHbgSlVKBoYFpL?=
- =?us-ascii?Q?6P59Cgq25G1zpXgbiIFf0ekMgqMomesBgaKdfB7XzZDa6s6ZBXgHmyooHLj3?=
- =?us-ascii?Q?VxAQSbgs7NMjG9eYw2V4QbyOj6RI2m7VwY+9XBKTJ5kgfpKAzDvFPfzCzvcX?=
- =?us-ascii?Q?dTmgLJCwLuK3Hk2BcN+CIzUke/a9mKJRCDalVCT3UsXooNobqS88AOc++uVi?=
- =?us-ascii?Q?LvqRH84sHphrWHpKigO6YLCCGsPbOuYSDWMFDVrgpC6MEqHAXrDOihE3we0/?=
- =?us-ascii?Q?5+oqr0/IZo9ISw/049UkGHIvbQKSAe6oyr4m6sbNH0jPwOtpgy66GLA8OYyY?=
- =?us-ascii?Q?9NYlt/8aiNEYoOl+ym9PAdfIgINLI4Iyjf/Sopiqgpxcob24zfAGy5P4IBWM?=
- =?us-ascii?Q?yNHk+yhPfFKdNFCGvQevTLgIC/qliBthDVPPp5WZUzP6WGeLmhJe24qya1RI?=
- =?us-ascii?Q?AvqMKJQm1NsC2RhHA9cvZARsmUJvJAMkVueoN9y7?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19b4e2fd-a66b-4b30-0a75-08dd4c924203
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 00:55:21.4683
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vuuBkLvFATD2g25thRfjwVHhK2+m7iaBF8vgxuqWZ2s8WyTa7W40vzPtpt1LiO5i
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8786
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 13, 2025 at 03:06:14PM -0800, Nelson, Shannon wrote:
+"Timestamping is key to debugging network stack latency. With
+SO_TIMESTAMPING, bugs that are otherwise incorrectly assumed to be
+network issues can be attributed to the kernel." This is extracted
+from the talk "SO_TIMESTAMPING: Powering Fleetwide RPC Monitoring"
+addressed by Willem de Bruijn at netdevconf 0x17).
 
-> > > +/**
-> > > + * struct pds_fwctl_cmd - Firmware control command structure
-> > > + * @opcode: Opcode
-> > > + * @rsvd:   Word boundary padding
-> > > + * @ep:     Endpoint identifier.
-> > > + * @op:     Operation identifier.
-> > > + */
-> > > +struct pds_fwctl_cmd {
-> > > +     u8     opcode;
-> > > +     u8     rsvd[3];
-> > > +     __le32 ep;
-> > > +     __le32 op;
-> > > +} __packed;
-> > None of these actually need to be packed given explicit padding to
-> > natural alignment of all fields.  Arguably it does no harm though
-> > so up to you.
-> 
-> Old belt-and-suspenders habits...
+There are a few areas that need optimization with the consideration of
+easier use and less performance impact, which I highlighted and mainly
+discussed at netconf 2024 with Willem de Bruijn and John Fastabend:
+uAPI compatibility, extra system call overhead, and the need for
+application modification. I initially managed to solve these issues
+by writing a kernel module that hooks various key functions. However,
+this approach is not suitable for the next kernel release. Therefore,
+a BPF extension was proposed. During recent period, Martin KaFai Lau
+provides invaluable suggestions about BPF along the way. Many thanks
+here!
 
-In that case it is worth knowing that __packed also changes the
-assumed alignment of the struct. You can access a __packed struct at
-any byte.
+This series adds the BPF networking timestamping infrastructure through
+reusing most of the tx timestamping callback that is currently enabled
+by the SO_TIMESTAMPING.. This series also adds TX timestamping support
+for TCP. The RX timestamping and UDP support will be added in the future.
 
-On x86 this is mostly meaningless, but on other arches it can effect
-code generation as the compiler will have to assume that, say, a 64
-bit load is not naturally aligned and emit a more expensive sequence
-to load it.
+---
+v10
+Link: https://lore.kernel.org/all/20250212061855.71154-1-kerneljasonxing@gmail.com/
+1. rename hwts with hwtimestamp
+2. use subtest and pid filter in selftest
+3. use 'tcb->txstamp_ack |= TSTAMP_ACK_SK'
 
-Which is why you occasionally see things like:
-  __attribute__ ((packed,aligned(8)));
+v9
+Link: https://lore.kernel.org/all/20250208103220.72294-1-kerneljasonxing@gmail.com/
+1. set the hwtstamp to skb when the skb enters into the hw SND case
+2. fix co-existence problem in patch 9 and add corresponding check in
+patch 12.
+3. refine some commit messages and titles
 
-Which says that there is no padding inside the struct, but also that
-the compiler can assume a guaranteed starting alignment for the
-memory.
+v8
+Link: https://lore.kernel.org/all/20250128084620.57547-1-kerneljasonxing@gmail.com/
+1. adjust some commit messages and titles
+2. add sk cookie in selftests
+3. handle the NULL pointer in hwstamp
+4. use kfunc to do selective sampling
 
-Jason
+v7
+Link: https://lore.kernel.org/all/20250121012901.87763-1-kerneljasonxing@gmail.com/
+1. target bpf-next tree
+2. simplely and directly stop timestamping callbacks calling a few BPF
+CALLS due to safety concern.
+3. add more new testcases and adjust the existing testcases
+4. revise some comments of new timestamping callbacks
+5. remove a few BPF CGROUP locks
+
+RFC v6
+In the meantime, any suggestions and reviews are welcome!
+Link: https://lore.kernel.org/all/20250112113748.73504-1-kerneljasonxing@gmail.com/
+1. handle those safety problem by using the correct method.
+2. support bpf_getsockopt.
+3. adjust the position of BPF_SOCK_OPS_TS_TCP_SND_CB
+4. fix mishandling the hardware timestamp error
+5. add more corresponding tests
+
+v5
+Link: https://lore.kernel.org/all/20241207173803.90744-1-kerneljasonxing@gmail.com/
+1. handle the safety issus when someone tries to call unrelated bpf
+helpers.
+2. avoid adding direct function call in the hot path like
+__dev_queue_xmit()
+3. remove reporting the hardware timestamp and tskey since they can be
+fetched through the existing helper with the help of
+bpf_skops_init_skb(), please see the selftest.
+4. add new sendmsg callback in tcp_sendmsg, and introduce tskey_bpf used
+by bpf program to correlate tcp_sendmsg with other hook points in patch [13/15].
+
+v4
+Link: https://lore.kernel.org/all/20241028110535.82999-1-kerneljasonxing@gmail.com/
+1. introduce sk->sk_bpf_cb_flags to let user use bpf_setsockopt() (Martin)
+2. introduce SKBTX_BPF to enable the bpf SO_TIMESTAMPING feature (Martin)
+3. introduce bpf map in tests (Martin)
+4. I choose to make this series as simple as possible, so I only support
+most cases in the tx path for TCP protocol.
+
+v3
+Link: https://lore.kernel.org/all/20241012040651.95616-1-kerneljasonxing@gmail.com/
+1. support UDP proto by introducing a new generation point.
+2. for OPT_ID, introducing sk_tskey_bpf_offset to compute the delta
+between the current socket key and bpf socket key. It is desiged for
+UDP, which also applies to TCP.
+3. support bpf_getsockopt()
+4. use cgroup static key instead.
+5. add one simple bpf selftest to show how it can be used.
+6. remove the rx support from v2 because the number of patches could
+exceed the limit of one series.
+
+V2
+Link: https://lore.kernel.org/all/20241008095109.99918-1-kerneljasonxing@gmail.com/
+1. Introduce tsflag requestors so that we are able to extend more in the
+future. Besides, it enables TX flags for bpf extension feature separately
+without breaking users. It is suggested by Vadim Fedorenko.
+2. introduce a static key to control the whole feature. (Willem)
+3. Open the gate of bpf_setsockopt for the SO_TIMESTAMPING feature in
+some TX/RX cases, not all the cases.
+
+
+Jason Xing (12):
+  bpf: add networking timestamping support to bpf_get/setsockopt()
+  bpf: prepare the sock_ops ctx and call bpf prog for TX timestamping
+  bpf: prevent unsafe access to the sock fields in the BPF timestamping
+    callback
+  bpf: disable unsafe helpers in TX timestamping callbacks
+  net-timestamp: prepare for isolating two modes of SO_TIMESTAMPING
+  bpf: add BPF_SOCK_OPS_TS_SCHED_OPT_CB callback
+  bpf: add BPF_SOCK_OPS_TS_SW_OPT_CB callback
+  bpf: add BPF_SOCK_OPS_TS_HW_OPT_CB callback
+  bpf: add BPF_SOCK_OPS_TS_ACK_OPT_CB callback
+  bpf: add BPF_SOCK_OPS_TS_SND_CB callback
+  bpf: support selective sampling for bpf timestamping
+  selftests/bpf: add simple bpf tests in the tx path for timestamping
+    feature
+
+ include/linux/filter.h                        |   1 +
+ include/linux/skbuff.h                        |  12 +-
+ include/net/sock.h                            |  10 +
+ include/net/tcp.h                             |   7 +-
+ include/uapi/linux/bpf.h                      |  30 +++
+ kernel/bpf/btf.c                              |   1 +
+ net/core/dev.c                                |   3 +-
+ net/core/filter.c                             |  81 +++++-
+ net/core/skbuff.c                             |  53 ++++
+ net/core/sock.c                               |  14 +
+ net/dsa/user.c                                |   2 +-
+ net/ipv4/tcp.c                                |   6 +-
+ net/ipv4/tcp_input.c                          |   2 +
+ net/ipv4/tcp_output.c                         |   2 +
+ net/socket.c                                  |   2 +-
+ tools/include/uapi/linux/bpf.h                |  23 ++
+ .../bpf/prog_tests/net_timestamping.c         | 239 +++++++++++++++++
+ .../selftests/bpf/progs/net_timestamping.c    | 248 ++++++++++++++++++
+ 18 files changed, 722 insertions(+), 14 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/net_timestamping.c
+ create mode 100644 tools/testing/selftests/bpf/progs/net_timestamping.c
+
+-- 
+2.43.5
+
 
