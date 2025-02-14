@@ -1,203 +1,129 @@
-Return-Path: <netdev+bounces-166265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68110A353A1
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:22:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29685A353A5
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57C81890821
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 01:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2EC2189082A
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 01:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6782442A9E;
-	Fri, 14 Feb 2025 01:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657CF86334;
+	Fri, 14 Feb 2025 01:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="cbcAWgTl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtMCl4ON"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B081E502
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 01:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E432A70831;
+	Fri, 14 Feb 2025 01:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739496161; cv=none; b=RveoY6Yn3RCMHW/OKetbTq1BsZMzDcPjEH3fYTqcQu+J/5b/DlwzMwAY3fevotJJ2myHpcMpvlmDesN8dc0huHTQWrV65G2/3pQ48Xr2qQqvA+iqqZ0FhmxJBgUmLPQl4kvoWMd2SkphBN1byEmQ2Ll8w1Mt/DMUPXdxTLTcSFk=
+	t=1739496163; cv=none; b=kvp1geDeHGT1/hmf69GILjTXdj+1m6Wlnc7vNX8oLZzrXFsPT5ArbSDT4VYAdWD3WcOklDeQ0Zuknpd6MA6ZfvOcjzg7NJjzfvcuyyXJrBkdMIVFSC4tDWftzUgOs/Mz4ZBc5O4RqqeUhnRuU15gvsSlRP+0E3LEBBUKT6jwhNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739496161; c=relaxed/simple;
-	bh=IFVi1KzRLJQIhOXSQygfQ9egjuXlYGDLjPg29AdBZZI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=CK6LyqA4WE5ecyEzLaFsycDCyISa12wxaptE+ghPHbEHTGqLDcVGSWNHoG5IdkArjj33dCPzS9INKz64eknxhxx0OJg2QkZQ6wRO7OFO8l5WflWxMni8pocn/MdWysRRzHcxwkcuh/eXSDvrdRuEo8AqAr2nt4vHBaqGu7kGCjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=cbcAWgTl; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250214012237epoutp0242844db8d8f249bfc2a53b279518914a~j7onll1md1645916459epoutp02B
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 01:22:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250214012237epoutp0242844db8d8f249bfc2a53b279518914a~j7onll1md1645916459epoutp02B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1739496157;
-	bh=vWW0cMrxiqFDMldSnf+yvYR4SjlKf7GeaVFbQk4Idww=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cbcAWgTlETlBzsl3TbMtQ2kLtbmoCFPXWZO8rRd3Mu74agy0cne2RUbE+VcCIro0F
-	 /F287O11PfM1qWb2IbzAqkOrhGol8egl7l9eAKVLAhCnrGhs1nvcGGWocqcfhuNHG/
-	 OIWSZk09vj0zu75ezNYfCZCgKY7vBtnZSHZPyQTg=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20250214012236epcas5p4fa21829d79194337f9979f2be5bdbf5e~j7om5ZjXq2587725877epcas5p4D;
-	Fri, 14 Feb 2025 01:22:36 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4YvDn60BTvz4x9Q7; Fri, 14 Feb
-	2025 01:22:34 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	2F.78.19956.9DA9EA76; Fri, 14 Feb 2025 10:22:33 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250214012219epcas5p2840feb4b4539929f37c171375e2f646b~j7oXE6qXm1410614106epcas5p2b;
-	Fri, 14 Feb 2025 01:22:19 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250214012219epsmtrp18a9d38e9ea58dc827f9e3417383d6e5c~j7oXDyhMG0520605206epsmtrp1G;
-	Fri, 14 Feb 2025 01:22:19 +0000 (GMT)
-X-AuditID: b6c32a4b-fe9f470000004df4-b3-67ae9ad9c3ff
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B9.FB.18729.BCA9EA76; Fri, 14 Feb 2025 10:22:19 +0900 (KST)
-Received: from asg29.. (unknown [109.105.129.29]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250214012217epsmtip1797d1fadbd3da2065d6d311b324c9e55~j7oU6oa-b1757717577epsmtip1k;
-	Fri, 14 Feb 2025 01:22:16 +0000 (GMT)
-From: Junnan Wu <junnan01.wu@samsung.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, junnan01.wu@samsung.com,
-	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
-	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying01.gao@samsung.com, ying123.xu@samsung.com
-Subject: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Date: Fri, 14 Feb 2025 09:22:00 +0800
-Message-Id: <20250214012200.1883896-1-junnan01.wu@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
+	s=arc-20240116; t=1739496163; c=relaxed/simple;
+	bh=HKtCsVI3P+B6Gx69zLkhJXX6YJUETgO4lClDEJQtLGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RA/9RJVJZ7Yw4w6sxEzlr6bm0dE7IXJOf3R7hXqUK/tPWxcp+gaEHPlmh3mmLETs59RNeq1MFLw71AwSuEahCkyAZKCZYSEOaVhtNE4XXkk4GE/9UwN8ixB4g9jxJtDZwWV57DZyWPQs1cSMP/UOnMDz6J+jKAofhKC7ygricOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtMCl4ON; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21f7f1e1194so37951785ad.2;
+        Thu, 13 Feb 2025 17:22:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739496161; x=1740100961; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MoGZ2nbNCqpuk1a2KOC1Wh+Mauc+R8mLO4uJ6ZuYEdI=;
+        b=HtMCl4ON7juiHZwOgJWY1LRy1tzymcOIGsrpEtZ2x9udwgjOC32Hv198BIaySGT0SM
+         QxdxJzb0CYtlSPHroijui3YAIDtN8W3Y6UTRWlSqpWttxjhME5zwZgofdSX/F37Up0cB
+         3Bzzd3nh1QAE3r/lRokDKVw/Ks9p2rM4gp/Di3sFZQGS0HBPkvmBuFDuuWX+G90M4afd
+         xYQHybRK6BlerLibMnZEppZFU7n0MBL9jzewWMzmBXMWYABNtXASDyTzdKL24YsMnXXG
+         ZfQAiv2awUR2PjPaXpHtAjCY3KOjkyT55rQv7krS+5UBaXne8LkJKtlVo36E8jUsJ44X
+         U6kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739496161; x=1740100961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MoGZ2nbNCqpuk1a2KOC1Wh+Mauc+R8mLO4uJ6ZuYEdI=;
+        b=Q7LEhHcNHTPPSGzT22wcnHSxa8CRY+OEWp/ZJxjAzC38wzKgHc8otCdSIG2Rr6qwIg
+         sGxh5AfgauJvyxktxASDKQvpGprsQt6i9aYFtNQyrlNijjt2h0alY31wR3iGQRGqlCJh
+         6q5Fam6ULP7iY9RrQ3wTweyD0gxvqFjfyHV+YOqrPLg5Ds6wqHmrPeIhiMA21tzYYhQM
+         xdM56JFOkm8blxyKhXBd2PR3/DalnpOsVlUKvH81ooo6uSfNxNjIlA7iQRoqiegQ3+nN
+         pLOhDUiaffY6c8ARBTW+5OW/KfUrD3DvfKek5ZKDcRI78k2qfaCwWhqmoi+dPWBCG3+I
+         MyNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXQH4k627skjOjWOeSqAzS5FBa9Yb49E2Sq6tScAL7aStAYoGHi77gO5x6+C8PfJyjMMnYcuIZwIYvWypJe9Kz@vger.kernel.org, AJvYcCXCE9B6eSi7A7WWGmolF8SiUwrR2W4b8Bsh6QKK9vtS9qj62ggP+wT/66n7PUjriQwXRram4nldgS9cDQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu333/5tXIYk/lJmJcx93ye/zgeIQHe4PtXBcDHeDW0LFLu9E9
+	mBpwGNXvIuHCq0Bjq+F2Wzka8mliQH9NXk8H76xvWS//H0ULUC6T
+X-Gm-Gg: ASbGnctB9fB0w+0gZfpSH6rV3d804jm289vtPtQmONle3FyWXYEHLXQQkePeHBFHtS2
+	tu9i3kYzRBGdjDFXzIbaC7KKThJKoziP7I3URJMhOFStr8a9mLuNA/6uGN3h/sBznK1F5ks0dXY
+	8IijLP2o+rZ/agmwA7x6zRdNwlCWsKFM4lAGZpSmcLpd1rCHaIqVd3+8tcjDowjn6Evs276cAO+
+	CPQucvd4gTyG6qYOVbvNnnJtB0mN6RLuXV+v2As5MNfXmczCn68mGuflw9RCeQggQF89bRidgiU
+	3X3dfvtGa2Ji/dcFaOHF
+X-Google-Smtp-Source: AGHT+IG4mCcZ2fxv9ulKkHnSy7iZvJ7eKTAqqtS2jCvEPVFhgCETVfE2TL8lwGbtUfThOvRKIYDTjQ==
+X-Received: by 2002:a17:903:230b:b0:21f:49f2:e33f with SMTP id d9443c01a7336-220bbb243c2mr157553825ad.21.1739496161133;
+        Thu, 13 Feb 2025 17:22:41 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d53668d1sm18831085ad.75.2025.02.13.17.22.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 17:22:40 -0800 (PST)
+Date: Fri, 14 Feb 2025 01:22:32 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
+Message-ID: <Z66a2Mgi6jkHvoVV@fedora>
+References: <20250207092920.543458-1-liuhangbin@gmail.com>
+ <Z6b67YBbERi5v9gt@fedora>
+ <Z6r8y1U4C_s1-3jV@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEJsWRmVeSWpSXmKPExsWy7bCmlu7NWevSDdpuWFrMOd/CYvH02CN2
-	i8dzV7JbPOo/wWax7NJnJou719wtLmzrY7WYM7XQom3HZVaLy7vmsFlcWdLDbvH/1ytWi2ML
-	xCy+nX7DaLH07Vlmi7MTPrBanJ/zn9ni9aT/rBZHt69ktbjWZGFx4QjQ1P2PZrI6iHlsWXmT
-	yWPBplKPTas62Tx2PrT0eLF5JqPH+31X2Tz6tqxi9Pi8SS6AIyrbJiM1MSW1SCE1Lzk/JTMv
-	3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwfoNSWFssScUqBQQGJxsZK+nU1RfmlJ
-	qkJGfnGJrVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsasM1IFl4Uqzs6aztTA+Jm/
-	i5GTQ0LAROLP//dMXYxcHEICuxklXu1pZ4RwPjFKnOi8xQ5SJSTwjVHiw+VimI7V35dDFe1l
-	lHi8+hUbhPOMUWLZwZMsIFVsApoSJ/asYAOxRQTEJS7MWwJWxCywm1niwcZOsISwQIjE4kdn
-	mUBsFgFViTs7VgKN5eDgFbCTmPg3D2KbvMT+g2eZQWxOgUCJC+t/gV3EKyAocXLmE7BdzEA1
-	zVtnM4PMlxB4wiFx6e0GNohmF4k3+++wQtjCEq+Ob2GHsKUkXva3QdnZEr1Hf0HVl0h0v7sE
-	VW8tcX5dOzPIPcxAz6zfpQ8RlpWYemodE8RePone30+YIOK8EjvmgdgcQLaqxPsJNRBhaYmV
-	mzZBbfKQeHDyCyskrJYwSkyb85ZtAqPCLCTvzELyziyEzQsYmVcxSqYWFOempxabFhjnpZbD
-	4zg5P3cTIzixa3nvYHz04IPeIUYmDsZDjBIczEoivBLT1qQL8aYkVlalFuXHF5XmpBYfYjQF
-	BvdEZinR5HxgbskriTc0sTQwMTMzM7E0NjNUEudt3tmSLiSQnliSmp2aWpBaBNPHxMEp1cBU
-	xNpYPEEriO11N/+mDUnhR6+f0ah8fqLL3Lzl6/qZv5VMoo7vfeUZL2staPlvl/Fy51kmmjc/
-	ZNxOOCCoUdZ19rtgU3waU4t1ZtY8xd0Lq+5G77Gd/K9gukKTa9RlpXArTf7MD0a5DSnR2zy8
-	Ivp1yyfelfuX1aDq9LVI92bpPSbbR6lfirfxdDxb/HvT233XmubkcBumx6hdWnpcyY2/vllb
-	0OFs++8GjuXMvIu3Cd/YtkP4w71vJ7l7r4ntVE58z2x8gXty/Iqikrnayw2bptqU/FPkLsj5
-	Lazus/2hrn6hYnp1IEde1MYOfemJDO8fvPq96uDd49OC9L46urQ+k5M3qtL4oiB04eN8fiWW
-	4oxEQy3mouJEAADRax11BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJIsWRmVeSWpSXmKPExsWy7bCSnO7pWevSDZ5t5beYc76FxeLpsUfs
-	Fo/nrmS3eNR/gs1i2aXPTBZ3r7lbXNjWx2oxZ2qhRduOy6wWl3fNYbO4sqSH3eL/r1esFscW
-	iFl8O/2G0WLp27PMFmcnfGC1OD/nP7PF60n/WS2Obl/JanGtycLiwhGgqfsfzWR1EPPYsvIm
-	k8eCTaUem1Z1snnsfGjp8WLzTEaP9/uusnn0bVnF6PF5k1wARxSXTUpqTmZZapG+XQJXxqwz
-	UgWXhSrOzprO1MD4mb+LkZNDQsBEYvX35YwgtpDAbkaJh0etIeLSEl2/25ghbGGJlf+es3cx
-	cgHVPGGUmDlxBjtIgk1AU+LEnhVsILaIgLjEhXlL2ECKmAUuM0uc+3kHrEhYIEii9cISsA0s
-	AqoSd3asBLI5OHgF7CQm/s2DWCAvsf/gWbBlnAKBEhfW/2KHOChA4sDkZrD5vAKCEidnPmEB
-	sZmB6pu3zmaewCgwC0lqFpLUAkamVYySqQXFuem5xYYFhnmp5XrFibnFpXnpesn5uZsYwbGn
-	pbmDcfuqD3qHGJk4GA8xSnAwK4nwSkxbky7Em5JYWZValB9fVJqTWnyIUZqDRUmcV/xFb4qQ
-	QHpiSWp2ampBahFMlomDU6qBKez5xE8SLhdCN7IuatA4Oukhv+rupNOLd3zmaGieJ33BlSdn
-	psWEFy+D9SX4t+v9ioq5tP3f45bA1xzpn2PigrN09u2NqA6bXLgtzVl28cF5u2a9L/Y9/e2w
-	+ZSsq59Lq/Yb5L7caXtI6d4n7u1sj34XW00zv7s/avGDjNqvSUlO6icMulVswzP9Szsn2/I4
-	LlbUn27t08t1v+HGji0qtorMpyf3S1dlfeDmn3n3y+/9LhVB1tLrus9eORWt+tnnRrS1sy3j
-	Fb0LQR8lD69bIXru7IydnD09a3w5jH/cPHdInrH0y8lFK+x4irn2bLkm9vj13gbeC5n3k/Y5
-	LZXw2Bg0tb6zYI5Uptj3ae1u+UosxRmJhlrMRcWJAAat4qYsAwAA
-X-CMS-MailID: 20250214012219epcas5p2840feb4b4539929f37c171375e2f646b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250214012219epcas5p2840feb4b4539929f37c171375e2f646b
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
-	<CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6r8y1U4C_s1-3jV@fedora>
 
-When executing suspend to ram twice in a row,
-the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
-Then after virtqueue_get_buf and `rx_buf_nr` decreased
-in function virtio_transport_rx_work,
-the condition to fill rx buffer
-(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+Hi Jay,
 
-It is because that `rx_buf_nr` and `rx_buf_max_nr`
-are initialized only in virtio_vsock_probe(),
-but they should be reset whenever virtqueues are recreated,
-like after a suspend/resume.
+Any comments?
 
-Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
-virtio_vsock_vqs_init(), so we are sure that they are properly
-initialized, every time we initialize the virtqueues, either when we
-load the driver or after a suspend/resume.
-
-To prevent erroneous atomic load operations on the `queued_replies`
-in the virtio_transport_send_pkt_work() function
-which may disrupt the scheduling of vsock->rx_work
-when transmitting reply-required socket packets,
-this atomic variable must undergo synchronized initialization
-alongside the preceding two variables after a suspend/resume.
-
-Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
-Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
-Co-developed-by: Ying Gao <ying01.gao@samsung.com>
-Signed-off-by: Ying Gao <ying01.gao@samsung.com>
-Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
----
- net/vmw_vsock/virtio_transport.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index b58c3818f284..f0e48e6911fc 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
- 	};
- 	int ret;
- 
-+	mutex_lock(&vsock->rx_lock);
-+	vsock->rx_buf_nr = 0;
-+	vsock->rx_buf_max_nr = 0;
-+	mutex_unlock(&vsock->rx_lock);
-+
-+	atomic_set(&vsock->queued_replies, 0);
-+
- 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
- 	if (ret < 0)
- 		return ret;
-@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 
- 	vsock->vdev = vdev;
- 
--	vsock->rx_buf_nr = 0;
--	vsock->rx_buf_max_nr = 0;
--	atomic_set(&vsock->queued_replies, 0);
- 
- 	mutex_init(&vsock->tx_lock);
- 	mutex_init(&vsock->rx_lock);
--- 
-2.34.1
-
+Thanks
+Hangbin
+On Tue, Feb 11, 2025 at 07:31:32AM +0000, Hangbin Liu wrote:
+> Hi Jay,
+> On Sat, Feb 08, 2025 at 06:34:21AM +0000, Hangbin Liu wrote:
+> > Please hold on this patch. Our QE reported that with bare NIC, the
+> > backup NIC can't receive the NS messages even after joining the multicast
+> > MAC group. But after remove the backup NIC from bond, the NIC interface
+> > could receive the NS message.
+> > 
+> > This is weird, it looks the backup NIC dropped the NS message somewhere,
+> > even using tcpdump (the NIC will be in promisc mode) I can't capture the
+> > NS message on backup slave.
+> > 
+> > I need to debug more.
+> 
+> After debug, I find it's a driver issue. The issue exists with ice dirver NIC.
+> I tried with a mlx5 NIC and the patch works good for me.
+> 
+> So I think you can start review this patch when you have time. I will debug
+> the ice driver later.
+> 
+> Thanks
+> Hangbin
 
