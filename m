@@ -1,148 +1,114 @@
-Return-Path: <netdev+bounces-166308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01ABA356C5
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:10:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E8DA356EE
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:17:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B5E16DCDC
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:10:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 155711892539
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE5A1DD9AC;
-	Fri, 14 Feb 2025 06:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625E71FFC4E;
+	Fri, 14 Feb 2025 06:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hG037B7W"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="w/KpCZy0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979C71DC9BB;
-	Fri, 14 Feb 2025 06:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4941149C64;
+	Fri, 14 Feb 2025 06:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739513400; cv=none; b=ZHjFAMoR+gvDfttFhTwOr7owBtjlWeqyC07Pq9YcXeMUcAbprgSWpjKrT2f9p3qlLEipoXo3lXRAU1+gI4rQ+0iRGnizJj6GW0GZ1Tl3wXbYvj1e1m0EBoBI30v/UTUQjKHpmfOe+WcmxIFHger5fGqHf3697ttU0qnsun7qLG0=
+	t=1739513779; cv=none; b=WEhcmGfhUfCFOk6Q3pJXngKHpa02Ix48TyHTIyKeS5GR2jaPKJGWcq61vH8Q2Zdiu3luWeopPDINhQPhUOjvuxBqpsQqJBWpTXpKMjlMOayjHdTk5KQIK8ecAbGP7YV8x8/p32aKnbhe/6KRH8HlOUtd18xvDCfWKWRL2RpLpxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739513400; c=relaxed/simple;
-	bh=vzOLtDLNbwZ6k28Raz3YXTxcfhefEHbtVJ9RqBaS+fM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=F6uigqT9bmMMmelvv/EwNrrDP3QBgsrW9HyKOwh0TWeMj2mcfl9PQFsYk1B0UVpG/q+MtdfY27DAb0YMfPjr7skJTUGlKjHLH1Ete/9L2VbBuIXTsbt+KS+kDWsxBnOUbndYASgjpfJXV7bJses9po2DL0CrmRLa5UW2Ayc0uKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hG037B7W; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51DJrthP015820;
-	Fri, 14 Feb 2025 06:09:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	oxtC73W7s7XwzhQwTpzZ2WHOKktLjMRi2XHEFB1dH3A=; b=hG037B7WsNiC68TZ
-	xsnN7ghjNiyRmbcdLxO105dcwChM7QDADbSA9aprEUdkioxZxcKvcPBrs2dYZ6qQ
-	BUUANhS67OkcJf5g9cZrgqjh/ckIKv0dOL+PDEqJr/qB9koQ0zwEcdO2gn7lS4Ce
-	V79+8wio8KUDmDA+YjLrqcjZ2scNad9stJ4J1AxfkYxcM47eZSwWXBDbtxJiDpme
-	OilREDmfgZyA35POQVRRzrAD5u70ZYMosql6C8U37FIWXDFOp7EPnq6+V77S/wOK
-	Efxw/OA5tw5l7JRIOGa+TlhxAiVzat66QdlelF3Yj0GpKH/rIRF6LSXscNaKDKXW
-	ETLQKg==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44rgpgqa5b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 06:09:33 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51E69XeU003774
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 06:09:33 GMT
-Received: from [10.253.8.223] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 13 Feb
- 2025 22:09:27 -0800
-Message-ID: <b980cc2b-5c4f-4293-ba1a-496253ae8049@quicinc.com>
-Date: Fri, 14 Feb 2025 14:09:25 +0800
+	s=arc-20240116; t=1739513779; c=relaxed/simple;
+	bh=x2Z55WN/bolhypsMCgfZrcr9/UcmIPhudFFRNZuvWEg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=nkgBYhkDNRgOmMw/EoXqtZ82UEkuLER7obcBG11htgiaznNEyXI/7ctqIBHdkgdhskLrI7qIqKDm19ykrzFsKbQ/s4Kkfjw4qC3gh7IpfHgYXI9f2knnFzEfv63epcr6MDc22F3fIn1pHuxMRBC2S9O1MhrCB5ZlPL69g+vpIqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=w/KpCZy0; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1739513470;
+	bh=I9tMxA0b35Ehfj2sW9QpEMSfeMBVVc4pqXPgNUSyFJI=;
+	h=From:To:Cc:Subject:Date;
+	b=w/KpCZy0aWUOFHdBAkYlMqQCljvDhY7b92Qz+comKXMpNf/G89XWHheUEXMH5t+0X
+	 x06sv6SAJ4dadI56gqfYVW6x9+fEq6sZRfQQlhh/ACOEwJIFVz8urL5sXRx/KxgLBw
+	 RI/5uQRBS7+NhkvcaeRIJjB3bn5/Khn/nL7cS/38=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id 2C88A6BB; Fri, 14 Feb 2025 14:11:08 +0800
+X-QQ-mid: xmsmtpt1739513468tg3oqmv9r
+Message-ID: <tencent_832FF5138D392257AC081FEE322A03C84907@qq.com>
+X-QQ-XMAILINFO: MR/iVh5QLeiehVxo+faJzMBrZMJ7TGsCOUlN4TBw/pxiWd3JxEndMuo3xdDyMB
+	 hw5nZTeA8kHAXi7hoIcWIWLCkCMSXVA1V0O/T5Y3RuToIEUY0hTdcgQb08vo3LhJXKsfC/JAvHfI
+	 dFlAWCttNdr0V4trtFUMRcXnyH964UhkOzb51/bZfoor6r0FE2f9UE5YpxX23Di25YQaAxO92CP8
+	 Iooke+oYAazomDNH/ofk9CYXzM7PWpS3LueiFgK2e4sYNBJwAD1p0ggeJ0w7cBQI5nTRJ3/FDl+p
+	 qXpgEjcHKK2keiab4mSAS8b42zMoQoPLh5J7lpAOR19p0C6Y571Ut1RFfO8Omf9nvA+1xTe6f50z
+	 aPB1LPh2k8dFdMKfrKyseGDSs9y8rruJGtcYvHKLtjdmFtirUK5ERtB3UlnFYv2JnXesFYeBqcg6
+	 BxOtiLc1Dx5wUCEWorxZxyLEzC/LBHrjr8RzA7jcElNt1TwfAcb6Ot7QEVnb38LH6O/xuJT2fNG9
+	 629mM3h7fo7+BL5hS164+RWu94Qk3xXaNtzcRQAuc9f0BCg6HlS8QrIjTUDG234gtklE/UKr/WhP
+	 te6CenuNctvR3b+WXNAmV3Tj6s1Xd63QDpNhtNd0uFf0we42I9EabA9cvuHqWxGLjmUiDinwhStd
+	 QCLf5Kk/h+n+p5AhXFoQ0xui7AhcQwkap7EAJIR6ml9cu/gelcHTcS9st2JiNamIIwMhx7GOm7Nd
+	 vPv/Gd5+/xMlLsx+zX75NAXtr/M9vb6eulH7KVYwuscVqFFqpnATGfv0X6ewFENr35Sk4CmAalXH
+	 tdvlO66UxWeQbpTOqoG5v5la1zDSixvPfW101WnC8fQgKxSgha6LOEj6Eda7axYH+zT9+V+hmbvm
+	 zDVyI7Q5g6Cd0LKk3uL36EOhC+x59LzSAecuUmSLPTAFF0p1ZEwsFo7ZHJSFBDjBMKLF2Ef1NaE3
+	 AfAvZ+qmc=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: xiaopeitux@foxmail.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Cc: Pei Xiao <xiaopei01@kylinos.cn>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] net: freescale: ucc_geth: make ugeth_mac_ops be static
+Date: Fri, 14 Feb 2025 14:11:07 +0800
+X-OQ-MSGID: <e940237592fae0d6e8e32d6b61b4ff18724dc918.1739513279.git.xiaopei01@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 03/14] net: ethernet: qualcomm: Add PPE driver
- for IPQ9574 SoC
-To: Jie Gan <jie.gan@oss.qualcomm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Lei Wei <quic_leiwei@quicinc.com>,
-        "Suruchi
- Agarwal" <quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-3-453ea18d3271@quicinc.com>
- <58e05149-abc2-4cf4-a6e8-35380823d94a@oss.qualcomm.com>
- <63f1d25c-087a-46dd-9053-60334a0095d5@quicinc.com>
- <1882f5dd-4e46-40b9-977d-dc3570975738@oss.qualcomm.com>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <1882f5dd-4e46-40b9-977d-dc3570975738@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ejRAXFTrCBblpUpjQfi9kwfmZIxa6bhv
-X-Proofpoint-GUID: ejRAXFTrCBblpUpjQfi9kwfmZIxa6bhv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_02,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=612
- priorityscore=1501 mlxscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 phishscore=0 malwarescore=0 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502140043
 
+From: Pei Xiao <xiaopei01@kylinos.cn>
 
+sparse warning:
+    sparse: symbol 'ugeth_mac_ops' was not declared. Should it be
+static.
 
-On 2/12/2025 9:58 AM, Jie Gan wrote:
->>>> +static int qcom_ppe_probe(struct platform_device *pdev)
->>>> +{
->>>> +    struct device *dev = &pdev->dev;
->>>> +    struct ppe_device *ppe_dev;
->>>> +    void __iomem *base;
->>>> +    int ret, num_icc;
->>> I think it's better with:
->>>      int num_icc = ARRAY_SIZE(ppe_icc_data);
->>
->> This will impact the “reverse xmas tree” rule for local variable
->> definitions. Also, the num_icc will vary as per the different SoC,
->> so we will need to initialize the num_icc in a separate statement.
->>
->> (Note: This driver will be extended to support different SoC in
->> the future.)
->>
-> Got your point here. So there may have multiple definitions like 
-> ppe_icc_data here, right? But the num_icc here is hardcoded.
-> Maybe it would be better defined within the ppe_icc_data, if possible?
-> Then just directly use ppe_icc_data->num_icc?
-> 
-> Never mind, that's just my thought on the flexibility.
-> 
-> Jie
+Add static to fix sparse warnings.
 
-Yes, the num_icc will be moved the SoC specific .data area of struct
-of_device_id, when this driver is extended to support multiple SoCs.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202502141128.9HfxcdIE-lkp@intel.com/
+Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
+Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
+---
+ drivers/net/ethernet/freescale/ucc_geth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index f47f8177a93b..c24b2f75435f 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -3408,7 +3408,7 @@ static int ucc_geth_parse_clock(struct device_node *np, const char *which,
+ 	return 0;
+ }
+ 
+-struct phylink_mac_ops ugeth_mac_ops = {
++static struct phylink_mac_ops ugeth_mac_ops = {
+ 	.mac_link_up = ugeth_mac_link_up,
+ 	.mac_link_down = ugeth_mac_link_down,
+ 	.mac_config = ugeth_mac_config,
+-- 
+2.25.1
+
 
