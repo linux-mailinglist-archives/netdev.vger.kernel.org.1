@@ -1,139 +1,122 @@
-Return-Path: <netdev+bounces-166291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05873A355F8
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:57:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF74A355F2
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2810718923CD
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:56:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2633A1DF5
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC39A189F5C;
-	Fri, 14 Feb 2025 04:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8758D186E26;
+	Fri, 14 Feb 2025 04:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kFj9OtWt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="c1/zVKRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB9C172BB9
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 04:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B441B16DC12;
+	Fri, 14 Feb 2025 04:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739508881; cv=none; b=TekdOTMyxMg5cUVCwCfQo5rk7Aikfyrtb/Z0CxPHJgiREExHVBUHP89/7YeFPAE2LK1cqVBR91yJSUcqOrINIQ1RYDmbt7zD8bmEudJUBnqLzzZVqEfV/0kpxcwKs9Nkawu0yOddfeRiqGjSc5lYn7gS5shvEdQXr+VNYmRNQHo=
+	t=1739508986; cv=none; b=tDhSbt5PhjMlh9cqxUxaLQAU2RLCu4gyWKXEjah5HakChjNQLoIFhWRfwp2OuTfYJRN+apSAmw11xMtSZ6t8XGMkM4UhQPxGZjcUw9Sh3Arxtb2xNwThLXYJHgq8rVkhb/tWDd7WlxVd5wUpanfbrVgrsfjWR07qekq3tlTZnVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739508881; c=relaxed/simple;
-	bh=SivAQXvyEJDUy05F1KlehL5YLn8i/AmSKgo3e3WwYqc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tKSVcXN1dS2d/BfE/zbn3ZICgpqNalkzMUDaCGgJZZTY9rxmTnV6MCHeSd2CZEJWZ2kPmGsaqVh5yTJk/ZRCqdqMDRo/hBd43ynFpqGVTYVcwvkThpDBGcBmSbe2NwKh54XxdZQSkZt7kBNv5aZpUHjn86B7DG8di4zq9LK8S4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kFj9OtWt; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739508880; x=1771044880;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1j43PY77UHCzr3MgVU0slx/WqTV1fKlIBSRbwR+gH84=;
-  b=kFj9OtWt+gQC/ykOCbVWDejoG/jCq65yg2xYYr37IQ3CuotgOGdWRK5v
-   cIgXwJXOJ6bH/McMgkgVX/XASQcUtI4VupBdxXPoAR4JRaauHha/xzdaW
-   KN8A/MjVaaPIKzevSiFVYrPuFOYVcv89x5BYHPIduCe4CBwdoV750ecFo
-   w=;
-X-IronPort-AV: E=Sophos;i="6.13,284,1732579200"; 
-   d="scan'208";a="466762139"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 04:54:36 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:31682]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.73:2525] with esmtp (Farcaster)
- id 572d323f-54f5-44a2-a735-47f59be413e8; Fri, 14 Feb 2025 04:54:36 +0000 (UTC)
-X-Farcaster-Flow-ID: 572d323f-54f5-44a2-a735-47f59be413e8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 14 Feb 2025 04:54:35 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.118.254.117) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Feb 2025 04:54:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn
-	<lukas.bulwahn@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Kuniyuki
- Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next] checkpatch: Discourage a new use of rtnl_lock() variants.
-Date: Fri, 14 Feb 2025 13:54:14 +0900
-Message-ID: <20250214045414.56291-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1739508986; c=relaxed/simple;
+	bh=QBmPfSziU7mcj2ePBONzWfy0ZaFhuiN/7Gh7sGOqkLA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EKxbCvp7M54tL87sRmRZMZDcgnlhoOt5r6GAgHtjch2NOpsZOtc2G/0BpglyU5MqSKUVmVApZZpO12PwFu2Of0SVcMMJH/LIf/64aAcnmrBSe5HEjFbsTcRtXvIjP1WMdgfYUDY0jbSbVA6BRd4JVk31xFtYXj0DsghPC7pHcyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=c1/zVKRk; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=krJe8yV8IQ5q17uTwD2a+k61avLmokiZ6lpNbWzhrlc=; b=c1/zVKRkjdwM1WpA0c5enod/bf
+	+yxkYSufqwlKCAjaDrBf0ozX89Gb0qwUbIhRMpyaTch+lg/+KPTbNVtpf6kDGqT3xsGffRue7wEdo
+	CAaz8vRA84F04vnFZnZnPQ7IQxIXLl6q7YWpMaLFOMJ4dbGPhfabx1V+D5A/mjD7itFRk7kMCpCGV
+	KgwDk+WjgYS8BPgxrRHEoUAl5uvbI2LN7m62lWq8uN3RxdqTzR1mPo9RM8wW/U1yjyHQvt39Qz28z
+	9LVCuz3yoqwsiRs1EDZy8O5gsTZAFpDb3lQZd8Cv0NpfWbw2yAWlNm5NNHfW6l0kHXBkIyiJ/mKwn
+	ziT7ok3Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tinXO-000EO9-0Y;
+	Fri, 14 Feb 2025 12:56:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Feb 2025 12:56:10 +0800
+Date: Fri, 14 Feb 2025 12:56:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <Z67M6iSoMyvGwkAF@gondor.apana.org.au>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
+ <Z66uH_aeKc7ubONg@gondor.apana.org.au>
+ <20250214033518.GA2771@sol.localdomain>
+ <Z669mxPsSpej6K6K@gondor.apana.org.au>
+ <20250214042951.GB2771@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250214042951.GB2771@sol.localdomain>
 
-rtnl_lock() is a "Big Kernel Lock" in the networking slow path
-and still serialises most of RTM_(NEW|DEL|SET)* rtnetlink requests.
+On Thu, Feb 13, 2025 at 08:29:51PM -0800, Eric Biggers wrote:
+>
+> That doesn't actually exist, and your code snippet is also buggy (undefined
+> behavior) because it never sets the tfm pointer in the ahash_request.  So this
 
-Commit 76aed95319da ("rtnetlink: Add per-netns RTNL.") started a
-very large, in-progress, effort to make the RTNL lock scope per
-network namespace.
+Well thanks for pointing out that deficiency.  It would be good
+to be able to set the tfm in the macro, something like:
 
-However, there are still some patches that newly use rtnl_lock(),
-which is now discouraged, and we need to revisit it later.
+#define SYNC_AHASH_REQUEST_ON_STACK(name, _tfm) \
+	char __##name##_desc[sizeof(struct ahash_request) + \
+			     MAX_SYNC_AHASH_REQSIZE \
+			    ] CRYPTO_MINALIGN_ATTR; \
+	struct ahash_request *name = (((struct ahash_request *)__##name##_desc)->base.tfm = crypto_sync_ahash_tfm((_tfm)), (void *)__##name##_desc)
 
-Let's warn about the case by checkpatch.
+> just shows that you still can't use your own proposed APIs correctly because
+> they're still too complex.  Yes the virt address support would be an improvement
+> on current ahash, but it would still be bolted onto an interface that wasn't
+> designed for it.  There would still be the weirdness of having to initialize so
+> many unnecessary fields in the request, and having "synchronous asynchronous
+> hashes" which is always a fun one to try to explain to people.  The shash and
+> lib/crypto/ interfaces are much better as they do not have these problems.
 
-The target functions are as follows:
+I'm more than happy to rename ahash to hash.  The only reason
+it was called ahash is to distinguish it from shash, which will
+no longer be necessary.
 
-  * rtnl_lock()
-  * rtnl_trylock()
-  * rtnl_lock_interruptible()
-  * rtnl_lock_killable()
+> never use exactly the same API anyway, just similar ones.  And FWIW, zswap is
+> synchronous, so yet again all the weird async stuff just gets in the way.
 
-and the warning will be like:
+I think you're again conflating two different concepts.  Yes
+zswap/iaa are sleepable, but they're not synchronous.  This comes
+into play because iaa is also useable by IPsec, which is most
+certainly not sleepable.
 
-  WARNING: A new use of rtnl_lock() variants is discouraged, try to use rtnl_net_lock(net) variants
-  #18: FILE: net/core/rtnetlink.c:79:
-  +	rtnl_lock();
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-v2:
-  * Remove unnecessary "^\+.*"
-  * Match "rtnl_lock	 ()"
-
-v1: https://lore.kernel.org/netdev/20250211070447.25001-1-kuniyu@amazon.com/
----
- scripts/checkpatch.pl | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 7b28ad331742..eca4f082ac3f 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -6995,6 +6995,12 @@ sub process {
- #			}
- #		}
- 
-+# A new use of rtnl_lock() is discouraged as it's being converted to rtnl_net_lock(net).
-+		if ($line =~ /\brtnl_(try)?lock(_interruptible|_killable)?\s*\(\)/) {
-+			WARN("rtnl_lock()",
-+			     "A new use of rtnl_lock() variants is discouraged, try to use rtnl_net_lock(net) variants\n" . $herecurr);
-+		}
-+
- # strcpy uses that should likely be strscpy
- 		if ($line =~ /\bstrcpy\s*\(/) {
- 			WARN("STRCPY",
+Cheers,
 -- 
-2.39.5 (Apple Git-154)
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
