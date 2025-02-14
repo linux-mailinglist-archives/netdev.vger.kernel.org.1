@@ -1,88 +1,102 @@
-Return-Path: <netdev+bounces-166327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5E9A3585F
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:04:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA94A358B4
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11A647A14C9
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:03:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D79D16F4AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35308221550;
-	Fri, 14 Feb 2025 08:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C10222564;
+	Fri, 14 Feb 2025 08:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNQyXiew"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="K2ZF/PFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D96E21D596;
-	Fri, 14 Feb 2025 08:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDDF6221D9B
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 08:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739520237; cv=none; b=YmJh8a2dSXfcnoZuhAEvfzXgxq6Am4btKKbJxQpnYllJrmHdqvgxLxrAKQXq1hF49z/2DQbV2Iez7rxsOCBm4SA6swAfQMAYZZxL29LnBHsU6e30x59qO6Lz0+dwuL1fnFZMc1xcYWNg0V46AyV5/uVy9HMEPqLmKT6p9Lbdh4I=
+	t=1739521145; cv=none; b=ZKWQU3msum/xZIIy0NhmVkPvsBOHLP2gt1DC06Oc8gVJzW/mfyp7GOj48sdPq+JVAFAL6do3YcR+S1OgpRJ7/+JfwJ6yKulccRcOxo/r2Z3EZAYT/WQL4I78Zaqnev2CEncgwLJKFLwkLdh/WXlY3uEyUHaaYqayxP3lr8/EJ8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739520237; c=relaxed/simple;
-	bh=ZJTleOr+aCVydGuBXvDe9vmxgmg7Hou12+O0aC141WM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQ9J6QWdoecvuuvyJUnccTt6oF1H9G9i5HNZIe6jOhD4QB6L2oT1I8kL9btSo7hm+HQnfTBLLdyMDaC8pKNdIkzj3vtBhY+6FPojDROuOrgSDA7ivYcFwvjISSdC3DYF9LYtPhoICiR2ZB0ZI//dEzIHyS2EKs1vCwvXVUQwoQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNQyXiew; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA967C4CED1;
-	Fri, 14 Feb 2025 08:03:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739520236;
-	bh=ZJTleOr+aCVydGuBXvDe9vmxgmg7Hou12+O0aC141WM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rNQyXiewYUFgMh/V+W+aYjDpnFSpGmByYccCQTdDs+utzhny0WTB/CV7Pzdtk6unF
-	 nIZ0LXNKlBANxtHtRqoN/q8ugYylWxYSafBFsUVmBpkTH94wGaT1JQqaZgbT+l9KDo
-	 z0kzoy37mljipUA+YCzLw1g7xedqbQIcv4I7rQqsIeztYoss6AhLGzabOMvyYAeNdX
-	 n5Vv4k4vXto83RiJc6QeEI8esqSmTLfSN7ncfglGEkHynuy6Xi5aZHy7icTc0oCJHf
-	 +ZCpiRW6GuWfeSokxvBGKZbOttm7c0ISkKTwJcaObnz2KeSVknBe3wxh7sz+8td7SS
-	 bO7KKW97He9/g==
-Date: Fri, 14 Feb 2025 09:03:52 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>, 
-	Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, upstream@airoha.com
-Subject: Re: [PATCH net-next v4 11/16] dt-bindings: net: airoha: Add the NPU
- node for EN7581 SoC
-Message-ID: <20250214-futuristic-goat-of-enthusiasm-bba020@krzk-bin>
-References: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
- <20250213-airoha-en7581-flowtable-offload-v4-11-b69ca16d74db@kernel.org>
+	s=arc-20240116; t=1739521145; c=relaxed/simple;
+	bh=45vpw4lyGNwmwznESJ+p7R/+2oDgiTTGI59ihglnVRw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C/SrucM1OribypSNXIlPFPxXXCa1VXvNo/xnwctypYHSkm7xAJYKNA2BWDfQAsJViBWU8FN60qyxu0LDYUYK5DI0dqNqjXWFJ88bT0bsYenKIx/QE/GDLC3p6uTqXi5RfzXtL0BNG7MRqXaCEjL9VJijYlQDuul9+5N60PF9sfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=K2ZF/PFD; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739521145; x=1771057145;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kmSxIaSQNuE4bDEhjr0tEWX0p2iXtDaNwX+VNTT6bJs=;
+  b=K2ZF/PFDJuXvI4lFs/YkbpOfwA6BUduX9+RKNHkewQpUE2sQki2uF/VJ
+   vQFW2nBiFe67XYfbYYQToTGz/ItZpk2p6Drkd/LPWKleZc3jEW4i4jhod
+   5XZ1saLUlzdJ7wPuQE6oq1sPf4C6u1dc2zz/vBrcJMildPWaCdEIniHry
+   A=;
+X-IronPort-AV: E=Sophos;i="6.13,285,1732579200"; 
+   d="scan'208";a="718726375"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 08:18:35 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:46023]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.150:2525] with esmtp (Farcaster)
+ id 37a3b9db-95b2-4549-bd08-a7d20a21595b; Fri, 14 Feb 2025 08:18:34 +0000 (UTC)
+X-Farcaster-Flow-ID: 37a3b9db-95b2-4549-bd08-a7d20a21595b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 14 Feb 2025 08:18:33 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.118.254.117) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 14 Feb 2025 08:18:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/3] bareudp/pfcp/ppp: Improve netns dismantle.
+Date: Fri, 14 Feb 2025 17:18:15 +0900
+Message-ID: <20250214081818.81658-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250213-airoha-en7581-flowtable-offload-v4-11-b69ca16d74db@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 13, 2025 at 04:34:30PM +0100, Lorenzo Bianconi wrote:
-> This patch adds the NPU document binding for EN7581 SoC.
-> The Airoha Network Processor Unit (NPU) provides a configuration interface
-> to implement wired and wireless hardware flow offloading programming Packet
-> Processor Engine (PPE) flow table.
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../devicetree/bindings/net/airoha,en7581-npu.yaml | 72 ++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
+pfcp and ppp holds RTNL in pernet_operations.exit(), which can be
+converted to ->exit_batch_rtnl().  Patch 1 and 2 do the conversion.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+bareudp leaves some unregistered devices in a list in dying netns
+depending on where the device is cleaned up.  Patch 3 fixes that
+inconsistency.
 
-Best regards,
-Krzysztof
+
+Kuniyuki Iwashima (3):
+  pfcp: Convert pfcp_net_exit() to ->exit_batch_rtnl().
+  ppp: Split ppp_exit_net() to ->exit_batch_rtnl().
+  bareudp: Call bareudp_dellink() in bareudp_destroy_tunnels().
+
+ drivers/net/bareudp.c         |  2 +-
+ drivers/net/pfcp.c            | 27 ++++++++++++++++-----------
+ drivers/net/ppp/ppp_generic.c | 33 ++++++++++++++++++++++-----------
+ 3 files changed, 39 insertions(+), 23 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
 
 
