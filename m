@@ -1,167 +1,111 @@
-Return-Path: <netdev+bounces-166598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 178FAA368AC
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:46:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2080A368AD
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6841A3A9E53
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:44:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0E0B170F26
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE7A1FC7EE;
-	Fri, 14 Feb 2025 22:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CAF1FCD1F;
+	Fri, 14 Feb 2025 22:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sj/IziDH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xr5zhzIE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843C81FC7FC
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 22:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B0B1FCD0C
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 22:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739573090; cv=none; b=USzKZNULH1FTEf3Ad38n2bf9TTLhpeuGTgPFE13Vqo5weH7Rae4CO/YtmeYSsleUeMT78LQcNNbcLLbs9PQoItkhfk0c/PbnV5w/7/rTDyCbCzgHWbqfjJDGd60xyL0tnSpGzntJoaRsG3jldZES4EM817Mg/qJgW2HqcZYfEtg=
+	t=1739573165; cv=none; b=MyXDiU6r80HvGYz1MZhRPeC5nd5eFU7hVTmvT+r0S3Nrhwp/MN7UBiSNlQ+buwrYuLW3EDcplcMVbQfCbMce851rnBnwNMm54z1viW1GLJDTPSXPMECEB8Tz8QK+cVqR1OY6tcSAz3cBhyFoL94ckpfVe7upTHajYNwq9ObN0II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739573090; c=relaxed/simple;
-	bh=C9A3LWRVVEvM4OBlqT9wYA0yWCdJj2Hpz7Z1pzmG8wU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MuLbcx6xcEkmCd+Gz8HMZ+IxQ2BULVtdgMDMJe7zc1ibZHzMUpc0rlLMlv8UczFleghxlRQIO6TIv9ADtbG29BJp9w8mADI6VRbVtuC4T1UynvlJDnTBFSgLKWBoYIjFaQ8uQkQssBGgU1SerHQ7mv++Zt7Pdr8nhrnes5SPxtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sj/IziDH; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21a7cbe3b56so42533535ad.0
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:44:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739573088; x=1740177888; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tUNETmfCcN16mATl/cudDdX8wxXBFFNsGuPJIeAzz7o=;
-        b=sj/IziDHroH5kXw5DjtQJdNC0AeZGArJJh2x98x4jO7HBS6Lp7Tzk+QZzpa8dqlUYP
-         jfqLmNconmo8MCmiAOPWrPLU/TCV3nuJNTehQ/OVNXbbLClxjaiAiLNxLKA5WIblBQb6
-         7NoOkVtNjckuuQY10tkKmL4ZsEAR3d5lWYDpM75KGEDAxgp+m2fYP1Z6XITeuCKYkuE6
-         EZvFJYqiDjBQytspQ5rYqzYceWstJ4fS8EdgThrk+ZAyL1e4Qh6ok/h5O40PPUJ0zsCk
-         QI4C36QMidbIjO60BKbHmGiHDc68GtFC1NeQFj5F+cM5sPeA2uzs/3ZHZvbPbRvlR/LM
-         DFmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739573088; x=1740177888;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tUNETmfCcN16mATl/cudDdX8wxXBFFNsGuPJIeAzz7o=;
-        b=pazihgMM+98Xp9byplq9yENjgTjszpbRLzByGyngGPAIprDiEjJaLCI0EgmbcNqeSv
-         mrjWCfC8EiZ+xPwqdJ/oHEb/EAFLRppPILQzwPa3VXNkH+bXtFnvP/z6//WapfnuaPDb
-         fIvlfXY1v2qFs//33lcbxIxYCyHKtjTPgR4/lBZZwfK5B2zjUztV5Swk2H7v6DqklVVg
-         ICBtWo4D1guLvcDXy7agfwPCUnaGzOpLhkAsm3pHbh9AjfsthBVTDgB6NqXfiVSpg8Nx
-         Rwm/p2EyK5aD0/TI2ddegl3za8vchfdVG5w6smoDJdYllFqGbt5+CPcwX5hkg3hJ9wZx
-         epRg==
-X-Gm-Message-State: AOJu0YzJ2kvGLoip0ZTFDVlVP1Oe+j9+1BlUP3NGojcUbjUbf/XoN1F5
-	i87VL0POPFbxauXosCARMpdKFpKy89swpLtMUQncm8ZxOQRuCiJOuv0Wz2o+B/PWMKel60CN6Lp
-	7jjSfXx9FqIaY3vDkQwfzkea9vzchBTcHowtWL0w1dhCvn4pTTnwczhZ8Nrn3sljV5ydoMimd0u
-	ytnWWEVd/BSonjwOvq73/kMdWzVJaIbqaXXTDW/VC0CeY=
-X-Google-Smtp-Source: AGHT+IFipCMt7qHod8wE+QJEnJFVy+GDVWXm+FNM4uL263Au9RAnEUGi4OFC3Gq37Yk5dRgHAwAYikh+aCfyzw==
-X-Received: from pjbtb14.prod.google.com ([2002:a17:90b:53ce:b0:2ea:756d:c396])
- (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:986:b0:215:5ea2:6544 with SMTP id d9443c01a7336-22103efa6e3mr14484155ad.7.1739573087787;
- Fri, 14 Feb 2025 14:44:47 -0800 (PST)
-Date: Fri, 14 Feb 2025 14:43:59 -0800
+	s=arc-20240116; t=1739573165; c=relaxed/simple;
+	bh=Tf36ND/7Va/aOXlN5jjfJ8JzWElmGjCudShLKwWLncI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NDTrgfm4/5vujgi3JskvqsKjXWT12jSJlsXThA/rH9sdhxKEXFOHtQk+w10JBSYF431NdUt1tOBsQZB834GAmdL/tq4MKOvyFn25vEDooGwPZiwyXTAmXaz6jXwFX8CfM61/fnT+GOFOGkxAgqYIqdaz9x0d5e+bNc+qcDY1Wu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xr5zhzIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 165DBC4CED1;
+	Fri, 14 Feb 2025 22:46:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739573164;
+	bh=Tf36ND/7Va/aOXlN5jjfJ8JzWElmGjCudShLKwWLncI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Xr5zhzIEajkA68SFxrYun20gTp+lVe9NdVjBhfobHZ+eEEp9utZh9pYXDFEUAYP4q
+	 oVfFYISOZcgyCcgTaSwme7Zlx991J+msuz0IFv439Q0UfhkFyPNqjyPRre2kLM/R2X
+	 r0DoAj1fKKl6qX1MdHcevrXsfwPtW2pptFKEOIA9kJvOBzQAtICvwL+XltcNHIhBZj
+	 MN5T4kbZHQzOKUpfFSQ4zfR9wRj6YE/+CFFfVNzT/A0cxsCRavrywlMCh4kSaJBdlN
+	 wXJLEFCfrdC8OvpNLSKzbvop0L3rP8DFhBfRnheyWraQYSVaR3wpLxwwAm6ufyJrKT
+	 nuwDoczin/nVg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	willemb@google.com,
+	ecree.xilinx@gmail.com,
+	neescoba@cisco.com
+Subject: [PATCH net-next v2] netdev: clarify GSO vs csum in qstats
+Date: Fri, 14 Feb 2025 14:46:01 -0800
+Message-ID: <20250214224601.2271201-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250214224417.1237818-1-joshwash@google.com>
-Subject: [PATCH net] gve: set xdp redirect target only when it is available
-From: joshwash@google.com
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, stable@kernel.org, 
-	Joshua Washington <joshwash@google.com>, stable@vger.kernel.org, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
-	Shailend Chand <shailend@google.com>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Joshua Washington <joshwash@google.com>
+Could be just me, but I had to pause and double check that the Tx csum
+counter in qstat should include GSO'd packets. GSO pretty much implies
+csum so one could possibly interpret the csum counter as pure csum offload.
 
-Before this patch the NETDEV_XDP_ACT_NDO_XMIT XDP feature flag is set by
-default as part of driver initialization, and is never cleared. However,
-this flag differs from others in that it is used as an indicator for
-whether the driver is ready to perform the ndo_xdp_xmit operation as
-part of an XDP_REDIRECT. Kernel helpers
-xdp_features_(set|clear)_redirect_target exist to convey this meaning.
+But the counters are based on virtio:
 
-This patch ensures that the netdev is only reported as a redirect target
-when XDP queues exist to forward traffic.
+  [tx_needs_csum]
+      The number of packets which require checksum calculation by the device.
 
-Fixes: 39a7f4aa3e4a ("gve: Add XDP REDIRECT support for GQI-QPL format")
-Cc: stable@vger.kernel.org
-Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Reviewed-by: Jeroen de Borst <jeroendb@google.com>
-Signed-off-by: Joshua Washington <joshwash@google.com>
+  [rx_needs_csum]
+      The number of packets with VIRTIO_NET_HDR_F_NEEDS_CSUM.
+
+and VIRTIO_NET_HDR_F_NEEDS_CSUM gets set on GSO packets virtio sends.
+
+Clarify this in the spec to avoid any confusion.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/google/gve/gve.h      | 10 ++++++++++
- drivers/net/ethernet/google/gve/gve_main.c |  6 +++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+v2:
+ - remove the note that almost all GSO types need L4 csum
+v1: https://lore.kernel.org/20250213010457.1351376-1-kuba@kernel.org
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 8167cc5fb0df..78d2a19593d1 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -1116,6 +1116,16 @@ static inline u32 gve_xdp_tx_start_queue_id(struct gve_priv *priv)
- 	return gve_xdp_tx_queue_id(priv, 0);
- }
- 
-+static inline bool gve_supports_xdp_xmit(struct gve_priv *priv)
-+{
-+	switch (priv->queue_format) {
-+	case GVE_GQI_QPL_FORMAT:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- /* gqi napi handler defined in gve_main.c */
- int gve_napi_poll(struct napi_struct *napi, int budget);
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 533e659b15b3..92237fb0b60c 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1903,6 +1903,8 @@ static void gve_turndown(struct gve_priv *priv)
- 	/* Stop tx queues */
- 	netif_tx_disable(priv->dev);
- 
-+	xdp_features_clear_redirect_target(priv->dev);
-+
- 	gve_clear_napi_enabled(priv);
- 	gve_clear_report_stats(priv);
- 
-@@ -1972,6 +1974,9 @@ static void gve_turnup(struct gve_priv *priv)
- 		napi_schedule(&block->napi);
- 	}
- 
-+	if (priv->num_xdp_queues && gve_supports_xdp_xmit(priv))
-+		xdp_features_set_redirect_target(priv->dev, false);
-+
- 	gve_set_napi_enabled(priv);
- }
- 
-@@ -2246,7 +2251,6 @@ static void gve_set_netdev_xdp_features(struct gve_priv *priv)
- 	if (priv->queue_format == GVE_GQI_QPL_FORMAT) {
- 		xdp_features = NETDEV_XDP_ACT_BASIC;
- 		xdp_features |= NETDEV_XDP_ACT_REDIRECT;
--		xdp_features |= NETDEV_XDP_ACT_NDO_XMIT;
- 		xdp_features |= NETDEV_XDP_ACT_XSK_ZEROCOPY;
- 	} else {
- 		xdp_features = 0;
+CC: willemb@google.com
+CC: ecree.xilinx@gmail.com
+CC: neescoba@cisco.com
+---
+ Documentation/netlink/specs/netdev.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 288923e965ae..48159eb116a4 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -457,6 +457,8 @@ name: netdev
+         name: tx-needs-csum
+         doc: |
+           Number of packets that required the device to calculate the checksum.
++          This counter includes the number of GSO wire packets for which device
++          calculated the L4 checksum.
+         type: uint
+       -
+         name: tx-hw-gso-packets
 -- 
-2.48.1.601.g30ceb7b040-goog
+2.48.1
 
 
