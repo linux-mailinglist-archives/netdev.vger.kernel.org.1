@@ -1,139 +1,138 @@
-Return-Path: <netdev+bounces-166430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16CE0A35FB8
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:02:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 535CAA35FE6
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:09:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B5D3AB599
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E77016C40C
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB657081C;
-	Fri, 14 Feb 2025 14:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JZaRIbiO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98E7264A82;
+	Fri, 14 Feb 2025 14:09:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9C720FA9E
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E33261376
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739541744; cv=none; b=WT0lfvDdDOdPwRQ6KriRhetvyc0SjrKcGOFnhMqlOIfq9bJKuWyiR9Xm5FdP6gXHqxKBEXonPpgF4a0kJaWGg9YoZydtWAk6gGRA1K11e6w/lrjZm/EtgQYPmLbiD0b17O9t7dvJcwmW26oy9+wq6/PBupxMrf2a5pDdqRSHeNA=
+	t=1739542184; cv=none; b=o4FaVQW/2kMXToARvitiwpgNDhAjDUTOFLzBLSBZDcBQtQx/EbxpJS9n8ggE6CdxxWjpxzevq+Kgbp9M/4bOoTKZiBsn2mB0tefYVQUrruc74xWXLiItAz+1WMTILQCe4kTLH9OGXRK/dyeT08ZDwokhh6uJln6TtvRB5G16ekM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739541744; c=relaxed/simple;
-	bh=+XOvsBPEExIFFP1osKY+2SXJ8otMNgD4O/BXm2G1Ohk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ww2UDa9nekOOdFjERtH8MEK9CftnTq9aEZ+OjcvJkk7KQWrZG4ERUCjov0okXjyFITO7kCL7u1GRv4d690P8IkZCAhvFc+7vr151qMYPmfBJ7ieo2+xOnmdj9Aji6pmoIch1Dan+BNLvN3I3rKfrpMTZeIe6WiDFoC/gFM+sfkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JZaRIbiO; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739541743; x=1771077743;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+XOvsBPEExIFFP1osKY+2SXJ8otMNgD4O/BXm2G1Ohk=;
-  b=JZaRIbiOSF8lg1mVk9VhLIhCfebAze7u0HgWWuM2TM4gErC+kX5OA1Ho
-   3Ro/2ze6sjugWyj4kT24Z17QFRP+HJFV/76yE5xqMDMol8vSpCkq1RvQv
-   rQHhdanbv1+oII5G2SLBqKLzawOlZB6bQ4q2ubm94A4LHcU3+TvKLETmM
-   s1qGh/skRdsluSM1BsDJ/jFsJLnHOuthe/vPDdOaSeZ/WPDkHShIPXPmX
-   k+w3aWRPbY3fbjGaw4ZLHxtvk+Pa3Fvdjvu9rQU8VRDPqHTV5A8Lr5W/t
-   4YbIzbcOkLlgAAqLT5IuWQgPLT/CZyGEN3R25521OS0yJuvGkNET+Lp8Z
-   Q==;
-X-CSE-ConnectionGUID: HtbvPTYqRiOG8k4zOT0PhA==
-X-CSE-MsgGUID: THfX2S9WR0Ov5fcId7Bfuw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="39520925"
-X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="39520925"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 06:02:22 -0800
-X-CSE-ConnectionGUID: q3y0rG5JTLKUsHcOl514NQ==
-X-CSE-MsgGUID: 9TnUw5xUQ7+mE43XiUoD+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
-   d="scan'208";a="144321800"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 06:02:19 -0800
-Date: Fri, 14 Feb 2025 14:58:41 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, pierre@stackhpc.com,
-	Dan Carpenter <error27@gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-Message-ID: <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
- <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+	s=arc-20240116; t=1739542184; c=relaxed/simple;
+	bh=c8aTG/Ae42z7StuITPOfTKTRfJ7z/SJOWehc1SBqnag=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=r9yUpYcv+eecpDhvgouB9yRynCO4SqIdkMmDt6Qn1sJFB0IY/7lc1/NhJFrQrWhTOxA5bYMfCP5hbh85Xnug7RycyfSsqbb9bi6ZDIATiicg5A0BlqdaX5tbF0Wk04hGzlWbw7M/KehrX6ad4G63i5pmHfZVLaHAu50M+NNvzNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com; spf=pass smtp.mailfrom=perches.com; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=perches.com
+Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay06.hostedemail.com (Postfix) with ESMTP id 8CB6EB033C;
+	Fri, 14 Feb 2025 14:00:21 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf20.hostedemail.com (Postfix) with ESMTPA id 6C72F2002E;
+	Fri, 14 Feb 2025 14:00:18 +0000 (UTC)
+Message-ID: <06ba971191eeb80cea711653b737b16221899cf9.camel@perches.com>
+Subject: Re: [PATCH v2 net-next] checkpatch: Discourage a new use of
+ rtnl_lock() variants.
+From: Joe Perches <joe@perches.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, Kuniyuki Iwashima
+	 <kuniyu@amazon.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	 <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray
+ <dwaipayanray1@gmail.com>,  Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Date: Fri, 14 Feb 2025 06:00:17 -0800
+In-Reply-To: <c25c5efe-6835-44fb-9937-87bf25368a97@intel.com>
+References: <20250214045414.56291-1-kuniyu@amazon.com>
+	 <c25c5efe-6835-44fb-9937-87bf25368a97@intel.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+X-Rspamd-Queue-Id: 6C72F2002E
+X-Rspamd-Server: rspamout04
+X-Stat-Signature: a9z6mkdskhga6kxp1objeaik63w6rq81
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18JOd/SfB9yPb5AiLmlIXaTGe4d9bd0GSs=
+X-HE-Tag: 1739541618-817973
+X-HE-Meta: U2FsdGVkX1/Im1Tt+AxiLjpqgOL3UcQ2w6LBwe1wmD2d/e8IuZiZK9m83shiC6nm02+7PlevFhs+8RyHC2jah87FOTqnXT2LbKkX+QQcVoU3CNW5I09eOQGbcItzbcEFZj5pZbEoO0C5N7eim5f5nwPbWvUnXgbTkhZ5NYxCCkKGzMKmSEORFwpAbmWfCPgEmKuDAGUDOZ0UP3qcAXdNvNhK1IL5GE633mDg/kjYSeK71ilBcORZyTDRU9ngTjNe31/5QUBhjHT8pRNy05NmyHjV/a1kqBC+plP0VI/O4XSSIe2R0CfH7llm2LNQEnaQFtODHF47PQTgIAVIlm3isQ/9l+iBMrgl9zgVSTXD7c1pfFK7XUW2XA==
 
-On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
-> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> > Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> > from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> > devlink_rel_alloc().
-> 
-> If the same bug exists twice it might exist more times. Did you find
-> this instance by searching the whole tree? Or just networking?
-> 
-> This is also something which would be good to have the static
-> analysers check for. I wounder if smatch can check this?
-> 
-> 	Andrew
-> 
-
-You are right, I checked only net folder and there are two usage like
-that in drivers. I will send v2 with wider fixing, thanks.
-
-It can be not so easy to check. What if someone want to treat wrapping
-as an error (don't know if it is valid)? If one of the caller is
-checking err < 0 it will be fine.
-
-Thanks,
-Michal
-
-> > 
-> > In case of returning 1 from xa_alloc_cyclic() (wrapping) ERR_PTR(1) will
-> > be returned, which will cause IS_ERR() to be false. Which can lead to
-> > dereference not allocated pointer (rel).
-> > 
-> > Fix it by checking if err is lower than zero.
-> > 
-> > This wasn't found in real usecase, only noticed. Credit to Pierre.
-> > 
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Fri, 2025-02-14 at 10:24 +0100, Mateusz Polchlopek wrote:
+>=20
+> On 2/14/2025 5:54 AM, Kuniyuki Iwashima wrote:
+> > rtnl_lock() is a "Big Kernel Lock" in the networking slow path
+> > and still serialises most of RTM_(NEW|DEL|SET)* rtnetlink requests.
+> >=20
+> > Commit 76aed95319da ("rtnetlink: Add per-netns RTNL.") started a
+> > very large, in-progress, effort to make the RTNL lock scope per
+> > network namespace.
+> >=20
+> > However, there are still some patches that newly use rtnl_lock(),
+> > which is now discouraged, and we need to revisit it later.
+> >=20
+> > Let's warn about the case by checkpatch.
+> >=20
+> > The target functions are as follows:
+> >=20
+> >    * rtnl_lock()
+> >    * rtnl_trylock()
+> >    * rtnl_lock_interruptible()
+> >    * rtnl_lock_killable()
+> >=20
+> > and the warning will be like:
+> >=20
+> >    WARNING: A new use of rtnl_lock() variants is discouraged, try to us=
+e rtnl_net_lock(net) variants
+> >    #18: FILE: net/core/rtnetlink.c:79:
+> >    +	rtnl_lock();
+> >=20
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > Reviewed-by: Simon Horman <horms@kernel.org>
 > > ---
-> >  net/devlink/core.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/devlink/core.c b/net/devlink/core.c
-> > index f49cd83f1955..7203c39532fc 100644
-> > --- a/net/devlink/core.c
-> > +++ b/net/devlink/core.c
-> > @@ -117,7 +117,7 @@ static struct devlink_rel *devlink_rel_alloc(void)
-> >  
-> >  	err = xa_alloc_cyclic(&devlink_rels, &rel->index, rel,
-> >  			      xa_limit_32b, &next, GFP_KERNEL);
-> > -	if (err) {
-> > +	if (err < 0) {
-> >  		kfree(rel);
-> >  		return ERR_PTR(err);
-> >  	}
-> > -- 
-> > 2.42.0
-> > 
-> > 
+> > v2:
+> >    * Remove unnecessary "^\+.*"
+> >    * Match "rtnl_lock	 ()"
+> >=20
+> > v1: https://lore.kernel.org/netdev/20250211070447.25001-1-kuniyu@amazon=
+.com/
+> > ---
+> >   scripts/checkpatch.pl | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> >=20
+> > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+[]
+> > @@ -6995,6 +6995,12 @@ sub process {
+> >   #			}
+> >   #		}
+> >  =20
+> > +# A new use of rtnl_lock() is discouraged as it's being converted to r=
+tnl_net_lock(net).
+> > +		if ($line =3D~ /\brtnl_(try)?lock(_interruptible|_killable)?\s*\(\)/=
+) {
+> > +			WARN("rtnl_lock()",
+> > +			     "A new use of rtnl_lock() variants is discouraged, try to use =
+rtnl_net_lock(net) variants\n" . $herecurr);
+
+UPPER_CASE ALPHANUMERIC only for the key value please
+and there could be whitespace between the parentheses
+
+Perhaps:
+		if ($line =3D~ /\brtnl_((?:try)?lock(?:_interruptible|_killable)?)\s*\(\s=
+*\)/) {
+			WARN("RTNL_LOCK",
+			     "New use of rtnl_$1, prefer rtnl_net_$1(net)\n" . $herecurr);
+		}
+
+though there doesn't seem to be any uses of interruptible variants
+in the tree I looked at.
+
 
