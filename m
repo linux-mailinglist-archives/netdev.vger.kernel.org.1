@@ -1,118 +1,164 @@
-Return-Path: <netdev+bounces-166368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161CDA35BD3
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:51:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5613BA35BEE
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A80E3A9C49
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:50:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 609083B04DA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF9B2566C9;
-	Fri, 14 Feb 2025 10:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB54025A65E;
+	Fri, 14 Feb 2025 10:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRsIYOrX"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MNfAtpwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FBB245B0B;
-	Fri, 14 Feb 2025 10:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13998245B1F;
+	Fri, 14 Feb 2025 10:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739530263; cv=none; b=ukrsRa3rtFdSmfweaNN06X8pXA7NJ20tnJKXiQZkEozLO2nN4MF1pnYGAvHtxOHEsciz0hyeQR1r9KG878vxOpLMTCw+PtRhYIAcDSAPEXKcFk5e4+cPtHAaaSG1Z2WWK4HyuySkTilRvqP9zaGPKMo6oIvWJYTlyxUBrRPveiA=
+	t=1739530341; cv=none; b=H/4jaBehW6HTbglIcIg9lRVypUQkniqcqwJgIcKw+IYCPEAF4kMocIbyXeFF4ydeaLevJfuwE/xli4T9dV8sFp1mR525xL2gRLl1vRmSC+NBAoOIC6P4Vkv9Q+6vEHd3ZluPu8EOsucYU7NbvS0mGpMB0cMv7cKlfk+j9lLkLVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739530263; c=relaxed/simple;
-	bh=6Jn8hY/sj0Vyp9Oc8m9BXlUSR+CXepQ6Dz6GoxyvGmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YMJlFOA8HZ/KJ4J/qgaj4BaCP7e7nIU56JM9GM7HfAgPOC24kwsIPrfFa0xYCbsWDDwVvSSVNnt1fT0PzEHxKE0ECnC0FIPSco449J0OrJANXgB3A60HdjtlLvpERDxrKPLVyeQ0/zcqHWaH/HZd73f5esI4e5tAuFUeiWDiQ5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRsIYOrX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C27EC4CEDF;
-	Fri, 14 Feb 2025 10:51:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739530262;
-	bh=6Jn8hY/sj0Vyp9Oc8m9BXlUSR+CXepQ6Dz6GoxyvGmM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VRsIYOrXB4NBmaHnCnh1uRaIbgK1hXsNVaNz80MfbnD6MVpllwkX+Ak12MXoDJHcV
-	 ys6MmQ9o2cpS8i3Vi7Bu3Lc0qaPCyUl/+Wehmwb+DWyODTsnbbG70xkXTu09G85ek6
-	 oKOzzzEfsyiggpI64zaVrWPSzL7j2WgI8P+RDQH0vdoZuqQ/SL8X7IFVD98QPIX2up
-	 Yymer9b//q1dKe/m4zomdwTDoM8rJOr3/EgutNtanp1n1AQiwty6iUdSBdjPo2XY+M
-	 CQ0VKj0yNlCs2PAom9g9m52G7jyDnzJIpE1f6SMrCUf09pyfQt2/ehewrWeFXSS//H
-	 GhfM6r7edJq/w==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-543e49a10f5so2015147e87.1;
-        Fri, 14 Feb 2025 02:51:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUjSLQE5g84o/XvpuGjKIMXRjs3AGrG72dSftBGtZjHKVWkZTEDYX0/IbuJbichzRuAcqMFU7634QQBeARv@vger.kernel.org, AJvYcCUsdSNcKZq+PVIX+9FsZqtU1ovxdK7JxjvT2xyV5yHmTP6PiQjnADJeIssu72modoze9RXEYOwC@vger.kernel.org, AJvYcCWTfDP18vF+23BTbuCFp4V/84x1fE26w5LwEtnxROSQA6AjPdd8t9KDRI42XPqMZKbF9trBMboideJtK/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrfytJiiN+4YBKs4ilfa7nt5U+/lPAhZRaKAy/f+VUimZ0NpgZ
-	3OrY3e3qydDt6945VXOsGS+huAHI/BtK3SWvROdCtXlmYATCDyf60zjt147jmMERtMqJhRvsqpa
-	Df9vYGiX7vT7GEq2HaUwQBzgCXkc=
-X-Google-Smtp-Source: AGHT+IE51G43p8pR1toPTVSYBg68ovY9ZnGfaoNwwqJs6GgOaOCJnB/+CJEzpaQ+RZJoWPf4T1kKfJId9pTwob2I0YE=
-X-Received: by 2002:a05:6512:1155:b0:545:296e:ac28 with SMTP id
- 2adb3069b0e04-545296eaef4mr578053e87.24.1739530260860; Fri, 14 Feb 2025
- 02:51:00 -0800 (PST)
+	s=arc-20240116; t=1739530341; c=relaxed/simple;
+	bh=mDVjtyGUVb1KOH6XFAgZg0raVWfx3ObaCsvs+QX6YF0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ispBiUXHtJEb6yXGvv7f9uX3TZaP/kjEmbIo/wflkeIIMVVUgwZqw2cOIfFfFM0JFtDtdduLB8IgwhMcqRUbHqN+rW+9chDb6ohwk94oAzkmgShxgPUML6KlySzsOyfVPPRYnTPSu5u4ayp4tGoFxHNoQzS643rFQpxtZJNQdac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MNfAtpwx; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739530340; x=1771066340;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=X45XUOzd/bOUyeGuamt7kL+bHzoQ+bKhEEl7QpzEQY8=;
+  b=MNfAtpwxQumG2P41iJonYF5wLi1RA8BwpfWObzF3yqoNvstn79cywCCB
+   jYnOGgzNl4OHygjKREetMT+AjGRXH1GGjc9XIgI1e598HF6INwm+TgF95
+   dpyCyeP3JtvkF13POp3Hou/eRO5WTV4Z7EXfdeuNxQ8GGJrFPQ6RWTcW+
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,285,1732579200"; 
+   d="scan'208";a="493875980"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 10:52:13 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:41133]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.181:2525] with esmtp (Farcaster)
+ id 014291f4-deb9-4469-b9db-a2315c599e77; Fri, 14 Feb 2025 10:52:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 014291f4-deb9-4469-b9db-a2315c599e77
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 14 Feb 2025 10:52:08 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.118.254.117) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 14 Feb 2025 10:51:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <shaw.leon@gmail.com>
+CC: <alex.aring@gmail.com>, <andrew+netdev@lunn.ch>,
+	<b.a.t.m.a.n@lists.open-mesh.org>, <bpf@vger.kernel.org>,
+	<bridge@lists.linux.dev>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-ppp@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
+	<netdev@vger.kernel.org>, <osmocom-net-gprs@lists.osmocom.org>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <stefan@datenfreihafen.org>,
+	<steffen.klassert@secunet.com>, <wireguard@lists.zx2c4.com>
+Subject: Re: [PATCH net-next v9 06/11] net: ipv6: Use link netns in newlink() of rtnl_link_ops
+Date: Fri, 14 Feb 2025 19:51:48 +0900
+Message-ID: <20250214105148.1920-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <CABAhCOSsZqzrsqct+c613TVhGJdubv+_wTDxmjH8z6-PL1Mu2A@mail.gmail.com>
+References: <CABAhCOSsZqzrsqct+c613TVhGJdubv+_wTDxmjH8z6-PL1Mu2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain> <Z66uH_aeKc7ubONg@gondor.apana.org.au>
- <20250214033518.GA2771@sol.localdomain> <Z669mxPsSpej6K6K@gondor.apana.org.au>
-In-Reply-To: <Z669mxPsSpej6K6K@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 14 Feb 2025 11:50:49 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHS+BaLnUSQf9uiTvXhSee=+8W1B-DY5MFHTxgpe1iMyg@mail.gmail.com>
-X-Gm-Features: AWEUYZk9BVG_mnviM5EBJUUBfeH7CmJgTUXwh6dulpUSYK22Lsgwd5629FUH9e4
-Message-ID: <CAMj1kXHS+BaLnUSQf9uiTvXhSee=+8W1B-DY5MFHTxgpe1iMyg@mail.gmail.com>
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, 14 Feb 2025 at 04:51, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Feb 13, 2025 at 07:35:18PM -0800, Eric Biggers wrote:
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Fri, 14 Feb 2025 17:22:28 +0800
+> On Thu, Feb 13, 2025 at 7:00 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
 > >
-> > It absolutely is designed for an obsolete form of hardware offload.  Have you
-> > ever tried actually using it?  Here's how to hash a buffer of data with shash:
+> > From: Xiao Liang <shaw.leon@gmail.com>
+> > Date: Thu, 13 Feb 2025 17:55:32 +0800
+> > > On Thu, Feb 13, 2025 at 4:37 PM Xiao Liang <shaw.leon@gmail.com> wrote:
+> > > >
+> > > > On Thu, Feb 13, 2025 at 3:05 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > > > >
+> > > > [...]
+> > > > > > diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+> > > > > > index 863852abe8ea..108600dc716f 100644
+> > > > > > --- a/net/ipv6/ip6_gre.c
+> > > > > > +++ b/net/ipv6/ip6_gre.c
+> > > > > > @@ -1498,7 +1498,8 @@ static int ip6gre_tunnel_init_common(struct net_device *dev)
+> > > > > >       tunnel = netdev_priv(dev);
+> > > > > >
+> > > > > >       tunnel->dev = dev;
+> > > > > > -     tunnel->net = dev_net(dev);
+> > > > > > +     if (!tunnel->net)
+> > > > > > +             tunnel->net = dev_net(dev);
+> > > > >
+> > > > > Same question as patch 5 for here and other parts.
+> > > > > Do we need this check and assignment ?
+> > > > >
+> > > > > ip6gre_newlink_common
+> > > > > -> nt->net = dev_net(dev)
+> > > > > -> register_netdevice
+> > > > >   -> ndo_init / ip6gre_tunnel_init()
+> > > > >     -> ip6gre_tunnel_init_common
+> > > > >       -> tunnel->net = dev_net(dev)
+> > > >
+> > > > Will remove this line.
+> > >
+> > > However, fb tunnel of ip6_tunnel, ip6_vti and sit can have
+> > > tunnel->net == NULL here. Take ip6_tunnel for example:
+> > >
+> > > ip6_tnl_init_net()
+> > >     -> ip6_fb_tnl_dev_init()
+> > >     -> register_netdev()
+> > >         -> register_netdevice()
+> > >             -> ip6_tnl_dev_init()
+> > >
+> > > This code path (including ip6_fb_tnl_dev_init()) doesn't set
+> > > tunnel->net. But for ip6_gre, ip6gre_fb_tunnel_init() does.
 > >
-> >       return crypto_shash_tfm_digest(tfm, data, size, out)
-> >
-> > ... and here's how to do it with the SHA-256 library, for what it's worth:
-> >
-> >       sha256(data, size, out)
-> >
-> > and here's how to do it with ahash:
->
-> Try the new virt ahash interface, and we could easily put the
-> request object on the stack for sync algorithms:
->
->         SYNC_AHASH_REQUEST_ON_STACK(req, alg);
->
->         ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
->         ahash_request_set_virt(req, data, out, size);
->
->         return crypto_ahash_digest(req);
->
+> > Ah, okay.  Then, let's set net in a single place, which would
+> > be better than spreading net assignment and adding null check
+> > in ->ndo_init(), and maybe apply the same to IPv4 tunnels ?
+> 
+> Tunnels are created in three ways: a) rtnetlink newlink,
+> b) ioctl SIOCADDTUNNEL and c) during per netns init (fb).
+> The code paths don't have much in common, and refactoring
+> to set net in a single place is somewhat beyond the scope
+> of this series. But for now I think we could put a general rule:
+> net should be set prior to register_netdevice().
+> 
+> For IPv4 tunnels, tunnel->net of a) is set in ip_tunnel_newlink().
+> b) and c) are set in __ip_tunnel_create():
+> ip_tunnel_init_net() -> __ip_tunnel_create()
+> ip_tunnel_ctl() -> ip_tunnel_create() -> __ip_tunnel_create()
+> So net has already been initialized when register_netdevice()
+> is called.
+> 
+> But it varies for IPv6 tunnels. Some set net for a) or c) while
+> some don't. This patch has "fixed" for a). As for c) we can
+> adopt the way of ip6_gre - setting net in *_fb_tunnel_init(),
+> then remove the check in ndo_init().
+> 
+> Is it reasonable?
 
-Whatever happened to not adding infrastructure to the kernel without a user?
-
-You keep saying how great this will all work for hypothetical cases,
-and from any other contributor, we would expect to see working code
-that demonstrates the advantages of the approach.
-
-But it seems you have no interest in actually writing this networking
-code, and nor has anybody else, as far as I can tell, which makes your
-claims rather dubious.
-
-IOW, even if all your claims are correct, it really makes no
-difference when nobody can be bothered to take advantage of it, and we
-should just go with Eric's working code.
+Yes, fair enough.
 
