@@ -1,114 +1,147 @@
-Return-Path: <netdev+bounces-166312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E8DA356EE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:17:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D450A356D5
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 155711892539
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:16:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C53D7A5AC6
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625E71FFC4E;
-	Fri, 14 Feb 2025 06:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C821FC0F3;
+	Fri, 14 Feb 2025 06:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="w/KpCZy0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNYIiPYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4941149C64;
-	Fri, 14 Feb 2025 06:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E80A1DDC00;
+	Fri, 14 Feb 2025 06:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739513779; cv=none; b=WEhcmGfhUfCFOk6Q3pJXngKHpa02Ix48TyHTIyKeS5GR2jaPKJGWcq61vH8Q2Zdiu3luWeopPDINhQPhUOjvuxBqpsQqJBWpTXpKMjlMOayjHdTk5KQIK8ecAbGP7YV8x8/p32aKnbhe/6KRH8HlOUtd18xvDCfWKWRL2RpLpxU=
+	t=1739513522; cv=none; b=kLsS3mmD/HwI6Y969TjC/8WrW60E5cup/+vZJ9QqDvuzSY0RguCyGWnuuDSb44s4MBuOcKL61I1aKa7MniF11cbLjZhQPeP/kdn/FoDdyUmNFduVjGX4hVwOYQRPS6TcMJqN9UgS6tMqhsDxSuLvq9mHMwmf/LfgpbKPV0x1XIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739513779; c=relaxed/simple;
-	bh=x2Z55WN/bolhypsMCgfZrcr9/UcmIPhudFFRNZuvWEg=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=nkgBYhkDNRgOmMw/EoXqtZ82UEkuLER7obcBG11htgiaznNEyXI/7ctqIBHdkgdhskLrI7qIqKDm19ykrzFsKbQ/s4Kkfjw4qC3gh7IpfHgYXI9f2knnFzEfv63epcr6MDc22F3fIn1pHuxMRBC2S9O1MhrCB5ZlPL69g+vpIqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=w/KpCZy0; arc=none smtp.client-ip=162.62.57.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1739513470;
-	bh=I9tMxA0b35Ehfj2sW9QpEMSfeMBVVc4pqXPgNUSyFJI=;
-	h=From:To:Cc:Subject:Date;
-	b=w/KpCZy0aWUOFHdBAkYlMqQCljvDhY7b92Qz+comKXMpNf/G89XWHheUEXMH5t+0X
-	 x06sv6SAJ4dadI56gqfYVW6x9+fEq6sZRfQQlhh/ACOEwJIFVz8urL5sXRx/KxgLBw
-	 RI/5uQRBS7+NhkvcaeRIJjB3bn5/Khn/nL7cS/38=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 2C88A6BB; Fri, 14 Feb 2025 14:11:08 +0800
-X-QQ-mid: xmsmtpt1739513468tg3oqmv9r
-Message-ID: <tencent_832FF5138D392257AC081FEE322A03C84907@qq.com>
-X-QQ-XMAILINFO: MR/iVh5QLeiehVxo+faJzMBrZMJ7TGsCOUlN4TBw/pxiWd3JxEndMuo3xdDyMB
-	 hw5nZTeA8kHAXi7hoIcWIWLCkCMSXVA1V0O/T5Y3RuToIEUY0hTdcgQb08vo3LhJXKsfC/JAvHfI
-	 dFlAWCttNdr0V4trtFUMRcXnyH964UhkOzb51/bZfoor6r0FE2f9UE5YpxX23Di25YQaAxO92CP8
-	 Iooke+oYAazomDNH/ofk9CYXzM7PWpS3LueiFgK2e4sYNBJwAD1p0ggeJ0w7cBQI5nTRJ3/FDl+p
-	 qXpgEjcHKK2keiab4mSAS8b42zMoQoPLh5J7lpAOR19p0C6Y571Ut1RFfO8Omf9nvA+1xTe6f50z
-	 aPB1LPh2k8dFdMKfrKyseGDSs9y8rruJGtcYvHKLtjdmFtirUK5ERtB3UlnFYv2JnXesFYeBqcg6
-	 BxOtiLc1Dx5wUCEWorxZxyLEzC/LBHrjr8RzA7jcElNt1TwfAcb6Ot7QEVnb38LH6O/xuJT2fNG9
-	 629mM3h7fo7+BL5hS164+RWu94Qk3xXaNtzcRQAuc9f0BCg6HlS8QrIjTUDG234gtklE/UKr/WhP
-	 te6CenuNctvR3b+WXNAmV3Tj6s1Xd63QDpNhtNd0uFf0we42I9EabA9cvuHqWxGLjmUiDinwhStd
-	 QCLf5Kk/h+n+p5AhXFoQ0xui7AhcQwkap7EAJIR6ml9cu/gelcHTcS9st2JiNamIIwMhx7GOm7Nd
-	 vPv/Gd5+/xMlLsx+zX75NAXtr/M9vb6eulH7KVYwuscVqFFqpnATGfv0X6ewFENr35Sk4CmAalXH
-	 tdvlO66UxWeQbpTOqoG5v5la1zDSixvPfW101WnC8fQgKxSgha6LOEj6Eda7axYH+zT9+V+hmbvm
-	 zDVyI7Q5g6Cd0LKk3uL36EOhC+x59LzSAecuUmSLPTAFF0p1ZEwsFo7ZHJSFBDjBMKLF2Ef1NaE3
-	 AfAvZ+qmc=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: xiaopeitux@foxmail.com
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Cc: Pei Xiao <xiaopei01@kylinos.cn>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH] net: freescale: ucc_geth: make ugeth_mac_ops be static
-Date: Fri, 14 Feb 2025 14:11:07 +0800
-X-OQ-MSGID: <e940237592fae0d6e8e32d6b61b4ff18724dc918.1739513279.git.xiaopei01@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1739513522; c=relaxed/simple;
+	bh=kjKHneaaDBuIXsWcKyGK0NM3OpIrEwVZV5f1ZO7dz88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S5mSfLaPitiAQlr7IcgIErbby68xo/bhUkVIo7aizRIepgMxpwsrzESw2/DzueWrlnIIwCYKld1TjNfMX5oO9ZBzY73gqvUu1ziWqETY38lL10YJmN+TjJ/NyGScUNJ0vat8ytk7FHV+3UcWnkjEFsfRYiniVw3eYDovjH+GKpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNYIiPYq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A4BC4CED1;
+	Fri, 14 Feb 2025 06:12:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739513521;
+	bh=kjKHneaaDBuIXsWcKyGK0NM3OpIrEwVZV5f1ZO7dz88=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jNYIiPYqj9k89L1AKdVGtNfga4LBPcic0J5cebK2pXX6HgY567bCvRpJVgbuS9m3L
+	 WVF/bU4zCZhy8J9rWmbVca5XFTefAOvM1HsSZ9lI6L8eN4cBOQ6JlNTxhsvf4tI9wO
+	 Pn3AezEVm4n1xUe/vQOPiVD55BvBVEf4l93S+4V1PD//j6Twur6PjqopS8ehqzdQYQ
+	 4tQvvuiao6KylzQ6cKbYYrZ/U1K2mKihuddgDMcbEyfQCOB9j+JLI27W4jZOLqRmEf
+	 iT3kd0zNFnUfuG3R99ecdcN7VDDqzkQ7Se2W1QVmsv3//FM+OIV8k36mNLqOC0aune
+	 v2GD8WXX8XNIw==
+Date: Thu, 13 Feb 2025 22:11:59 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <20250214061159.GC2771@sol.localdomain>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
+ <Z66uH_aeKc7ubONg@gondor.apana.org.au>
+ <20250214033518.GA2771@sol.localdomain>
+ <Z669mxPsSpej6K6K@gondor.apana.org.au>
+ <20250214042951.GB2771@sol.localdomain>
+ <Z67M6iSoMyvGwkAF@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z67M6iSoMyvGwkAF@gondor.apana.org.au>
 
-From: Pei Xiao <xiaopei01@kylinos.cn>
+On Fri, Feb 14, 2025 at 12:56:10PM +0800, Herbert Xu wrote:
+> On Thu, Feb 13, 2025 at 08:29:51PM -0800, Eric Biggers wrote:
+> >
+> > That doesn't actually exist, and your code snippet is also buggy (undefined
+> > behavior) because it never sets the tfm pointer in the ahash_request.  So this
+> 
+> Well thanks for pointing out that deficiency.  It would be good
+> to be able to set the tfm in the macro, something like:
+> 
+> #define SYNC_AHASH_REQUEST_ON_STACK(name, _tfm) \
+> 	char __##name##_desc[sizeof(struct ahash_request) + \
+> 			     MAX_SYNC_AHASH_REQSIZE \
+> 			    ] CRYPTO_MINALIGN_ATTR; \
+> 	struct ahash_request *name = (((struct ahash_request *)__##name##_desc)->base.tfm = crypto_sync_ahash_tfm((_tfm)), (void *)__##name##_desc)
 
-sparse warning:
-    sparse: symbol 'ugeth_mac_ops' was not declared. Should it be
-static.
+I'm not sure what you intended with the second line, which looks like it won't
+compile.  The first line also shows that ahash_request has a large alignment for
+DMA, which is irrelevant for CPU based crypto.  And I'm not sure
+__attribute__((aligned)) with that alignment on the stack even works reliably
+all architectures; we've had issues with that in the past.  So again you're
+still proposing APIs with weird quirks caused by bolting CPU-based crypto
+support onto an API designed for an obsolete style of hardware offload.
 
-Add static to fix sparse warnings.
+> > just shows that you still can't use your own proposed APIs correctly because
+> > they're still too complex.  Yes the virt address support would be an improvement
+> > on current ahash, but it would still be bolted onto an interface that wasn't
+> > designed for it.  There would still be the weirdness of having to initialize so
+> > many unnecessary fields in the request, and having "synchronous asynchronous
+> > hashes" which is always a fun one to try to explain to people.  The shash and
+> > lib/crypto/ interfaces are much better as they do not have these problems.
+> 
+> I'm more than happy to rename ahash to hash.  The only reason
+> it was called ahash is to distinguish it from shash, which will
+> no longer be necessary.
+> 
+> > never use exactly the same API anyway, just similar ones.  And FWIW, zswap is
+> > synchronous, so yet again all the weird async stuff just gets in the way.
+> 
+> I think you're again conflating two different concepts.  Yes
+> zswap/iaa are sleepable, but they're not synchronous.  
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202502141128.9HfxcdIE-lkp@intel.com/
-Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
-Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
----
- drivers/net/ethernet/freescale/ucc_geth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here's the compression in zswap:
 
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
-index f47f8177a93b..c24b2f75435f 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -3408,7 +3408,7 @@ static int ucc_geth_parse_clock(struct device_node *np, const char *which,
- 	return 0;
- }
- 
--struct phylink_mac_ops ugeth_mac_ops = {
-+static struct phylink_mac_ops ugeth_mac_ops = {
- 	.mac_link_up = ugeth_mac_link_up,
- 	.mac_link_down = ugeth_mac_link_down,
- 	.mac_config = ugeth_mac_config,
--- 
-2.25.1
+    comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
 
+And here's the decompression:
+
+    BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait));
+
+It waits synchronously for each request to complete.
+
+It doesn't want an asynchronous API.
+
+> iaa is also useable by IPsec, which is most certainly not sleepable.
+
+The IAA driver doesn't actually support encryption, so that's a very bad start.
+But even assuming it was added, the premise of IAA being helpful for IPsec seems
+questionable.  AES-GCM is already accelerated via the VAES and VPCLMULQDQ
+instructions, performing at 10-30 GB/s per thread on recent processors.  It's
+hard to see how legacy-style offload can beat that in practice, when accounting
+for all the driver overhead and the fact that memory often ends up as the
+bottleneck these days.  But of course for optimal IPsec performance you actually
+need adapter-level offload (inline crypto) which does not use the crypto API at
+all, so again the legacy-style offload support in the crypto API is irrelevant.
+
+But, this is tangential to this discussion, since we can still keep the legacy
+style hardware offload APIs around for the few users that think they want them.
+The point is that we shouldn't let them drag down everyone else.
+
+- Eric
 
