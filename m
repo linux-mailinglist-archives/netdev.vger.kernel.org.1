@@ -1,84 +1,104 @@
-Return-Path: <netdev+bounces-166400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8038A35E87
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA44A35EC4
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 688157A06A8
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:13:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B14F165F84
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B271263F2E;
-	Fri, 14 Feb 2025 13:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E6C263F20;
+	Fri, 14 Feb 2025 13:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5y3pZT9x"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Oq/dgSqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7CF2753FC;
-	Fri, 14 Feb 2025 13:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419AB2641C0
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 13:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739538888; cv=none; b=OPvBJnKEuP87yGoZ0E3DFUENFhf7aGsIyQdWn2wl/hPXuAsHiiYNorOQNkWJaJeCcYMPZxJK/Oa3qDecD4dRzjVqrL4mAGQe4xriXwEhwSrfIh+b1ktAq2aryxN/Yovn/r6B0lyA/R86D+DdiRNDE3s7dJGxGjAYibDTc/Aggqs=
+	t=1739538922; cv=none; b=aGoawlPQjdNT72i8Uw3w0JaWxJKCKUh5+Oq0aiHe+t0rrudC9PtcHKmpgtt3Kj4y3Sh1sIdsSxUEamSaeWR6KLpZjegz5ZwWqosfAuk744gYtyDMk7q/v15UoNtvKOfAw6MOaZ6GvQsCJPLdLFCXC15KjSxe96Cfl3Fe0RzKB0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739538888; c=relaxed/simple;
-	bh=6oDcW75qUCH8EauoDZEesOlHRIrOTMEnECDTMiOK6J8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XZwLwALj/UwYKw3VxjhmEND/xFGkq8liHQiCKD1IUv8tCXfhGA0I5M5O32kE07aLxod6R5tOl2ggso4JwIprgnoB/870Nr50NqeIb8yioi4lpTEnGyyu4W9W/avJMCCLl8ktIQl+gKmWsu2IRtilmydLuGpu6QeLQfxXRdQgsY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5y3pZT9x; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YjsHEfo/qiRRRbNh0TXBs04HjQPppZ55+bcTb3JVFDE=; b=5y3pZT9xEJp+yHFLR6BVPnkZkj
-	5VG5PWgvE0P+qCuoCReQzsiWT7pBT/zLHKnlAczalSXPzOQ4Scj2EXB6SeuV9kMWwxw3J+/6b+E1L
-	ssDIxqUIUdheODYcVVb+sHG3EdwwH41GWndexQ8JLLW3vegHhXgWW+UMsf0LbwDBdl5k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tivWX-00E4X7-T8; Fri, 14 Feb 2025 14:14:29 +0100
-Date: Fri, 14 Feb 2025 14:14:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: xiaopeitux@foxmail.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	Pei Xiao <xiaopei01@kylinos.cn>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] net: freescale: ucc_geth: make ugeth_mac_ops be static
-Message-ID: <8b45aa58-3128-44b0-9408-3d7794436cd4@lunn.ch>
-References: <tencent_832FF5138D392257AC081FEE322A03C84907@qq.com>
+	s=arc-20240116; t=1739538922; c=relaxed/simple;
+	bh=1ijryi+AYGJIbnyQDC8LItR2Zntdse4NN1r4Ev6UL18=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=eM8F7ULmqkHNqGU2od5Muy47YX/h1NArgHb6L1ZGcqmImScmT4aBg5wkzUkLAlLlw6JG7kcyRyMMIG1LkQj1Px5o4YAJiEQAVc/uwwNohYImX7ON1f8i1XeqNPJTaGqp1JWbCDGR/+J/4NOQwOV1O/yQ+DJnN62oEaSVhCoH3Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Oq/dgSqc; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tivXI-005YwM-11; Fri, 14 Feb 2025 14:15:16 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=FyOa+DQ3Ccjw6qmkwa7QCGbg3gYexAbxrDcQa74dC8Q=; b=Oq/dgSqcFo8tvhiGclYm70/gAq
+	q9H95pjTopxZcJuDs09x3160hlyWf9Q/Icc5FP1zrDJZrFS3tgfeB38D5QyhBztbojWiBd5usJfQH
+	rVsWQ13yb6USIHj41LCTzGCVVfP+/Q0QWnCuuxDFBYWmu/jWUVXXL/HiwwWvWPDskBE8tGSKOknjk
+	NANyykppxr8DtHelKVNzpLZrfBuDRd3yl4U8uHHf3wwE1gR2/IH67N7FPxcc8Uw8v7Xifc0N72xDQ
+	3Ezsohqk20VNDU5+WRHTYHkzmcteC+sMY7fAaoifCoP3gRzEDNnCEARAaKjull8nV03s6hrWCBcZv
+	Tk2xRcbw==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tivXH-0002nV-2F; Fri, 14 Feb 2025 14:15:15 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tivXG-00FcKa-AX; Fri, 14 Feb 2025 14:15:14 +0100
+Message-ID: <950e90d8-4e7a-4e3e-9a9d-2a5bfde8e541@rbox.co>
+Date: Fri, 14 Feb 2025 14:15:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_832FF5138D392257AC081FEE322A03C84907@qq.com>
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net v3 0/2] vsock: null-ptr-deref when SO_LINGER enabled
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org,
+ syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com,
+ Luigi Leonardi <leonardi@redhat.com>
+References: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
+ <20250212200253.4a34cdab@kernel.org>
+ <04190424-8d8f-48c4-9d07-ce5c2f09d5a1@rbox.co>
+ <20250213072437.111da6fc@kernel.org>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <20250213072437.111da6fc@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 14, 2025 at 02:11:07PM +0800, xiaopeitux@foxmail.com wrote:
-> From: Pei Xiao <xiaopei01@kylinos.cn>
+On 2/13/25 16:24, Jakub Kicinski wrote:
+> On Thu, 13 Feb 2025 11:15:43 +0100 Michal Luczaj wrote:
+>> On 2/13/25 05:02, Jakub Kicinski wrote:
+>>> On Mon, 10 Feb 2025 13:14:59 +0100 Michal Luczaj wrote:  
+>>>> Fixes fcdd2242c023 ("vsock: Keep the binding until socket destruction").  
+>>>
+>>> I don't think it's a good idea to put Fixes tags into the cover letters.
+>>> Not sure what purpose it'd serve.  
+>>
+>> I was trying to say it's a "follow up" to a very recent (at least in the
+>> vsock context) patch-gone-wrong. But I did not intend to make this a tag;
+>> it's not a "Fixes:" with a colon :)
+>>
+>> Anyway, if that puts too much detail into the cover letter, I'll refrain
+>> from doing so.
 > 
-> sparse warning:
->     sparse: symbol 'ugeth_mac_ops' was not declared. Should it be
-> static.
-> 
-> Add static to fix sparse warnings.
+> Never too much detail :) But if it's informative and for humans I'd
+> recommend weaving it into the explanation or adding some words around.
+> Sorry for the nit picking.
 
-While you are touching it, can it also be made const?
-
-struct phylink *phylink_create(struct phylink_config *,
-			       const struct fwnode_handle *,
-			       phy_interface_t,
-			       const struct phylink_mac_ops *);
-
-phylink_create() will accept a const struct *.
-
-	Andrew
+It's ok, I think I get your point. Even simply using a reference[1] would
+probably be less confusing for eyes and brains.
 
