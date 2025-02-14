@@ -1,188 +1,171 @@
-Return-Path: <netdev+bounces-166508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8035CA3635A
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:44:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EADB0A363DE
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 18:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57687188C69B
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54D73B24CB
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF22267732;
-	Fri, 14 Feb 2025 16:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A06266EE4;
+	Fri, 14 Feb 2025 17:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6118635A;
-	Fri, 14 Feb 2025 16:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6098267B0F;
+	Fri, 14 Feb 2025 17:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739551415; cv=none; b=NdHu8gW54+Wiqxufuc65RCc8BCwG/few0ZRBAx5Ty2wznQ3rHyWBM9iVmKTCLckUDGFo0jmFLAX7OUdMTtHpwL3nIePAxJEALFyDwfaoatelkGwymiPyvt8ObCk7E7868ToJ01daYjH5dNLlLOtbSBS8jNKjP+5sVVNGTzHpJAE=
+	t=1739552551; cv=none; b=XM4Ugj9dAY7tsmjSZBL1PcMrCPJzQQnrObwZW3sERGnEJgjPYAgjXx0gRV04x26J91Yqj1AbbxBNbg8Ks4boK1WtJG65Wz1cfUtO7X3BCIzai313acUm1jNf81KKKvR1GHnL1CU0S3Pea80QT0kSnoKVugAq5CFhdqbrIcPAcms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739551415; c=relaxed/simple;
-	bh=675U55SFM8sU4+EhaPernPFOC39d5e7xO/3frydYZ2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CjlsU767CPn7Pn3hOO/PJ2lrz49uZxVuKd29V1yytQioAlf7iV1W9JcpqAa6b6bdEVI0XI9y5LW6m7LJeyNbEQ+2VNHKkrDCQpmgV6mSREibNmswV8+bjnCcLgECUzQfeXoYFrHQPoT/LVObpbykBvDGa/xxnsQMy5oUogSFOPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5de3c29ebaeso2874477a12.3;
-        Fri, 14 Feb 2025 08:43:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739551412; x=1740156212;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/t1Ns3NcaYBFWtkLRF5Ic7g1dCvI6biRGojqgTrE5Gw=;
-        b=BH+1quUYchT/1DAs4iY8/YICD/xAnDTWRDxtFDHUcRLfQMegOQyc0uzt+9goEySGkZ
-         L/QVGAJba5vbdhaDSRBctQHTfT3NqFtW6/r3yUNwDGwjS+WXi4F4xp9Rj2BC1cwyghri
-         n+pG8PwXst2iig3AN48Nl0uCWXUV4NKgXJCJUd6O7ygAWOmL84urPGOacYlpDuekmcEF
-         M964PmO1dbC6ihFpujB3q/900Hx5clbVkWNczG/Kh5Ki+4HpkbznVEoHENNWX/0MMGrg
-         jx/vYiR6k3HTUbRJ+HF5rmaGYEfuVRqK1wsFyZ8rvE2W39gHvwDwJRO1jBZPnmc8tZCq
-         2Y4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUkWokDy5yD/qhPbpcLhrOZK2NFPlSYfQ+tTaHT7lujdh/M7aG3dbjAZWMWFsJPqkmB9aOSXX8N@vger.kernel.org, AJvYcCW37Hzhg2WxFeUSuY/p05RBr3O6dkA/nF6/chPr5WCRHUgOJIj9OgDd6OPnU/nsJLrYA26Dep1ysweL@vger.kernel.org, AJvYcCXRn5Ut1vyFxcVUNCav8wx1cR3LKqtuddd74t32MZm5D+7Hm9qDZLUa0dWgg7KaTdORNi6qtF63xYhQflE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi/ZWV4fMDCtphBn5BmAjGjEMc2eg6gloJYg9x4BY7I99odu9z
-	aMbcSLU/CwYkvPVjSqe3cNY3Q4eXnMsE0EoO3AQR4b/WJnvHmY+u
-X-Gm-Gg: ASbGncuiQid9+rgC6pZrXD/WSV1gmjVFT633Bi4RCQ62dLiDvqZ9yqbaRmJH/y+4FmZ
-	tuG/AzrXH0FVS6fCdJqbaA+674D3NIwKS2eshOz56Mi6gj3Ehx5NytZX6jglcHx7V0x7hTVWIQZ
-	IZ/reLcvSgO04HDTIZ/F7R0hmthL77uL3DmHY97pVyA+UMIohbRCuGzw+c0fZPyH4MUHu7hZYkZ
-	ZD0Yg1EOYO1zk2Z5gCQJM46x84jtv6AelbEqUY+rmMUSxGRLAk9qBT4WZf744sVRwfiUH280TuK
-	IRol0Q==
-X-Google-Smtp-Source: AGHT+IFBPPEELc2QJatVUYw0kOEPlaAq+EmZ03OI1xZEzH4jy5P0OOSZPQ0pK4HjxYlqMW0G7zWgkw==
-X-Received: by 2002:a17:907:948f:b0:ab6:e10e:2f5 with SMTP id a640c23a62f3a-ab7f347e62amr1376490366b.37.1739551411728;
-        Fri, 14 Feb 2025 08:43:31 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:7::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53398364sm373948266b.128.2025.02.14.08.43.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 08:43:31 -0800 (PST)
-Date: Fri, 14 Feb 2025 08:43:28 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: Assert proper context while calling
- napi_schedule()
-Message-ID: <20250214-grinning-upbeat-chowchow-5c0e2f@leitao>
-References: <20250212174329.53793-1-frederic@kernel.org>
- <20250212174329.53793-2-frederic@kernel.org>
- <20250212194820.059dac6f@kernel.org>
- <20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
- <20250213071426.01490615@kernel.org>
+	s=arc-20240116; t=1739552551; c=relaxed/simple;
+	bh=Na8Voha/kXexWg6Tw3ntWSghbGxtOvW6Jvju9RKpfxU=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k1FX6wRpyvqVRVak0Jn2j0rNFU01al+oIWqISiKxL47iHwcHCV0U+ZOcpcn2lqSCKHoUrbEDO6vWK7VT4AwkX7/D++ipqzDWIqUv5O21MrLEAVuIrZ27fPaUzAx200+PUsFslYMRW8Mp6QhTrCUb5TB4l4CTilvPHeH5qPERysI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Yvdbz5shxz6HJfJ;
+	Sat, 15 Feb 2025 01:01:03 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id A39CB140B55;
+	Sat, 15 Feb 2025 01:02:25 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 14 Feb
+ 2025 18:02:25 +0100
+Date: Fri, 14 Feb 2025 17:02:23 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alucerop@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+Subject: Re: [PATCH v10 01/26] cxl: make memdev creation type agnostic
+Message-ID: <20250214170223.00003362@huawei.com>
+In-Reply-To: <20250205151950.25268-2-alucerop@amd.com>
+References: <20250205151950.25268-1-alucerop@amd.com>
+	<20250205151950.25268-2-alucerop@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213071426.01490615@kernel.org>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-Hello Jakub,
+On Wed, 5 Feb 2025 15:19:25 +0000
+alucerop@amd.com wrote:
 
-On Thu, Feb 13, 2025 at 07:14:26AM -0800, Jakub Kicinski wrote:
-> ... How about we add an hrtimer to netdevsim,
-> schedule it to fire 5usec in the future instead of scheduling NAPI
-> immediately? We can call napi_schedule() from a timer safely.
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> In preparation for Type2 support, change memdev creation making
+> type based on argument.
+> 
+> Integrate initialization of dvsec and serial fields in the related
+> cxl_dev_state within same function creating the memdev.
+> 
+> Move the code from mbox file to memdev file.
+> 
+> Add new header files with type2 required definitions for memdev
+> state creation.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+One passing comment.
 
-I hacked a way to do so. Is this what you had in mind?
 
-Author: Breno Leitao <leitao@debian.org>
-Date:   Wed Feb 12 09:50:51 2025 -0800
+> diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
+> index 536cbe521d16..62a459078ec3 100644
+> --- a/drivers/cxl/cxlmem.h
+> +++ b/drivers/cxl/cxlmem.h
 
-    netdevsim: call napi_schedule from a timer context
-    
-    The netdevsim driver was experiencing NOHZ tick-stop errors during packet
-    transmission due to pending softirq work when calling napi_schedule().
-    This issue was observed when running the netconsole selftest, which
-    triggered the following error message:
-    
-      NOHZ tick-stop error: local softirq work is pending, handler #08!!!
-    
-    To fix this issue, introduce a timer that schedules napi_schedule()
-    from a timer context instead of calling it directly from the TX path.
-    
-    Create an hrtimer for each queue and kick it from the TX path,
-    which then schedules napi_schedule() from the timer context.
-    
-    Suggested-by: Jakub Kicinski <kuba@kernel.org>
-    Signed-off-by: Breno Leitao <leitao@debian.org>
+>  /* CXL 2.0 8.1.4: Non-CXL Function Map DVSEC */
+> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+> index b2c943a4de0a..bd69dc07f387 100644
+> --- a/drivers/cxl/pci.c
+> +++ b/drivers/cxl/pci.c
+> @@ -911,6 +911,7 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	int rc, pmu_count;
+>  	unsigned int i;
+>  	bool irq_avail;
+> +	u16 dvsec;
+>  
+>  	/*
+>  	 * Double check the anonymous union trickery in struct cxl_regs
+> @@ -924,19 +925,20 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  		return rc;
+>  	pci_set_master(pdev);
+>  
+> -	mds = cxl_memdev_state_create(&pdev->dev);
+> +	dvsec = pci_find_dvsec_capability(pdev, PCI_VENDOR_ID_CXL,
+> +					  CXL_DVSEC_PCIE_DEVICE);
+> +	if (!dvsec)
+> +		dev_warn(&pdev->dev,
+> +			 "Device DVSEC not present, skip CXL.mem init\n");
+> +
+> +	mds = cxl_memdev_state_create(&pdev->dev, pci_get_dsn(pdev), dvsec,
+> +				      CXL_DEVTYPE_CLASSMEM);
+>  	if (IS_ERR(mds))
+>  		return PTR_ERR(mds);
+>  	cxlds = &mds->cxlds;
+>  	pci_set_drvdata(pdev, cxlds);
+>  
+>  	cxlds->rcd = is_cxl_restricted(pdev);
+> -	cxlds->serial = pci_get_dsn(pdev);
+> -	cxlds->cxl_dvsec = pci_find_dvsec_capability(
+> -		pdev, PCI_VENDOR_ID_CXL, CXL_DVSEC_PCIE_DEVICE);
+> -	if (!cxlds->cxl_dvsec)
+> -		dev_warn(&pdev->dev,
+> -			 "Device DVSEC not present, skip CXL.mem init\n");
+>  
+>  	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
+>  	if (rc)
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 42f247cbdceec..cd56904a39049 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -87,7 +87,7 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
- 		goto out_drop_cnt;
- 
--	napi_schedule(&rq->napi);
-+	hrtimer_start(&rq->napi_timer, ns_to_ktime(5), HRTIMER_MODE_REL);
- 
- 	rcu_read_unlock();
- 	u64_stats_update_begin(&ns->syncp);
-@@ -426,6 +426,25 @@ static int nsim_init_napi(struct netdevsim *ns)
- 	return err;
- }
- 
-+static enum hrtimer_restart nsim_napi_schedule(struct hrtimer *timer)
-+{
-+	struct nsim_rq *rq;
-+
-+	rq = container_of(timer, struct nsim_rq, napi_timer);
-+	napi_schedule(&rq->napi);
-+	/* TODO: Should HRTIMER_RESTART be returned if napi_schedule returns
-+	 * false?
-+	 */
-+
-+	return HRTIMER_NORESTART;
-+}
-+
-+static void nsim_rq_timer_init(struct nsim_rq *rq)
-+{
-+	hrtimer_init(&rq->napi_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
-+	rq->napi_timer.function = nsim_napi_schedule;
-+}
-+
- static void nsim_enable_napi(struct netdevsim *ns)
- {
- 	struct net_device *dev = ns->netdev;
-@@ -436,6 +455,7 @@ static void nsim_enable_napi(struct netdevsim *ns)
- 
- 		netif_queue_set_napi(dev, i, NETDEV_QUEUE_TYPE_RX, &rq->napi);
- 		napi_enable(&rq->napi);
-+		nsim_rq_timer_init(rq);
- 	}
- }
- 
-@@ -461,6 +481,7 @@ static void nsim_del_napi(struct netdevsim *ns)
- 	for (i = 0; i < dev->num_rx_queues; i++) {
- 		struct nsim_rq *rq = ns->rq[i];
- 
-+		hrtimer_cancel(&rq->napi_timer);
- 		napi_disable(&rq->napi);
- 		__netif_napi_del(&rq->napi);
- 	}
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index dcf073bc4802e..2b396c517ac1d 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -97,6 +97,7 @@ struct nsim_rq {
- 	struct napi_struct napi;
- 	struct sk_buff_head skb_queue;
- 	struct page_pool *page_pool;
-+	struct hrtimer napi_timer;
- };
- 
- struct netdevsim {
+
+> diff --git a/include/cxl/pci.h b/include/cxl/pci.h
+> new file mode 100644
+> index 000000000000..ad63560caa2c
+> --- /dev/null
+> +++ b/include/cxl/pci.h
+Clashes with the cxl reset patch (or should anyway as current version
+of that just duplicates these defines) That will move
+these into uapi/linux/pci_regs.h.
+
+No idea on order things will land, but thought I'd mention it at least
+so no one gets a surprise!
+
+> @@ -0,0 +1,23 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Copyright(c) 2020 Intel Corporation. All rights reserved. */
+> +
+> +#ifndef __CXL_ACCEL_PCI_H
+> +#define __CXL_ACCEL_PCI_H
+> +
+> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
+> +#define CXL_DVSEC_PCIE_DEVICE					0
+> +#define   CXL_DVSEC_CAP_OFFSET		0xA
+> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
+> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
+> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
+> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
+> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + ((i) * 0x10))
+> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + ((i) * 0x10))
+> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
+> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
+> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
+> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + ((i) * 0x10))
+> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + ((i) * 0x10))
+> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
+> +
+> +#endif
+
 
