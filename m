@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-166494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5605A362DE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:19:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83310A362DD
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C5D1890373
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:19:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DF57A4E57
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947122676CE;
-	Fri, 14 Feb 2025 16:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914032676DA;
+	Fri, 14 Feb 2025 16:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aWB4bzcS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gAjnjb9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2052.outbound.protection.outlook.com [40.107.212.52])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3D62753FD
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74922753FD
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739549960; cv=fail; b=AtUoBzpFIA19/AQ6TK5no/aDZGhZGNcWgvgLgMGC+uyKMDiC6W9/5Tz6pX2t0mBg+uPM+Gk9HpZzdRAG8G4wnuvmyPcTYS/dM2+fU55HGuzrlGiOUqGOlBU0tsqGTq37fR78CnNwX9DbpBcpRjBt9G1CxsCLu/pci/7+j7T6EGQ=
+	t=1739549972; cv=fail; b=lTqgXGKwVr0GER1fdYmY2cpz22bhygZf/XYjubY2DqH7AtoZx55pQhkS3IWDwppTu71Ka8ayjXGlxTFoY5Fl4pzplpbPJjXBTXHYvz91Yz6mywiYq5n/LR/y0TyY5yTvBxCCUWkIRqAASBdxe9hyuH+EXyXipAUBYroMQQRtV5U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739549960; c=relaxed/simple;
-	bh=wSymqzz7rxwOlVJ/pbjKx++OCr227vtTEVuyoxDP2Ek=;
+	s=arc-20240116; t=1739549972; c=relaxed/simple;
+	bh=7JZunx0YZ6PMcmEnBJSirKzbxLCDajsM6gsBfC2svr4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qnpqx9/hZpdhYsmUL5qqsRMqZiw6gd7XTlaIgGMXPIJPAZP0+C+CRjlu0YtFZfGIVyWmkqId3xAGcurITOXpMA6AgGv6HdORVlyEevAYVZRkXUDaaHPOww0BUeH89z2NVUWa2CtGXWoRj3tSSQ/3tx2FrkiyS2CzsIfMZXoZHNQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aWB4bzcS; arc=fail smtp.client-ip=40.107.212.52
+	 MIME-Version:Content-Type; b=VUJt3m9k0lnrQ12ggby8uGz3arEmgst87RQdR2RbzIN2jNK+6ZSPh7SYXAepXpUah4fxullf0r//UPfMFkgSHw7Npr1DQSK3k9pzDRVilIq8Gt0apZo1dZ6h5JXpCV3IZ5agXBTodw/+HEFTaBJZYth/XgbwM4d1HMK+dlp4IB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gAjnjb9e; arc=fail smtp.client-ip=40.107.94.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fiq26Zse6T6HLc5DW+uhhTqrDy51MLYnSC8OI4CCINjtofvMni69uKvUSZAbTSCeUnkTAPim3AjoDn4U8+0mx3o6kl6yZo2VGtumuc0WOVVYyXv29ph5c3cLzYA0S8yoAwXM85wkQCqIZsPxvkkkuykyoB37xb7cGith3983LcFOsInXh6eGCce+qd9HvvGD5a2/dDvHNauPi90FJJBof5pJIjIFs5N1eUaMvYxnYRRaDCAqFv1UjzQzzCyVCJDcPGNDnjyM0YbEibZWNnXHyF2eA3gvFeKDK6SrYwIrpPiaX6tpYi2iFcrdfKIDRIHPK3LOlMReuJA9XeUU4nA+Pg==
+ b=fITXkYfAKFz0J5XXUSrFnUh48ieEWTI/0cTu2/sI7jHlRoDHlws5lok8zbQsroP9iLHbRXXFcdDf7xuMj2kgUk3W9AQRRXQS8LRv2bnpJx+ZGzzoApz7TkAawRoOB/dKNrcb6brfZf+tAHOG0L3uNhpgJIbkZGtHyaapvhhOoRbIF08OC0hSYDR/3QwMtiog3KWN07/+twNwNgY7QrPZNFCIMXNDjEMykjjKJI59ElvSdvSw1xmclJgG0DjqQem1hU1CNrQITQsNm/kGqpnbZYZzhBoK4vrFgYVKSXAX707pdam2jr59rU79IyyTgxoVKF26UUEuYHo5pJkuPxisaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dx31xe6hJ7OkeovnABQgl2ODAJmzdf3zz+eTNYke4k4=;
- b=dMgwtEFj9EthAoJG3XYRCbV1lxMEvXc6DcHXnbBubzEQ+hvJv6YJmkTg5LpeHDJW1VG+7sS6Jl+on6mLSg7/jSDA5WUOjRRZe2jYpzvycbBcTpVuXr4f3LoBp8Xg4w2xryaqMIvD54gaa7Txjkpl9pt49yFHMocGpJEqFO83i2Sp4HWOctpoFB7E3vGN5ycCEtCAKK39s2gY2is241Fa+6Q0Ry9uX5QJC/Pboyl/VWGKJkiOXd1hXRwrmZV0suiMy93qvrVAi1DOS/1Lhd9AtL8SwwrvjAVuAzSSpawIivi9RYXcGv4tBRmC8oNGcKcs/x3j2dXPq5p7bh08ruqm7g==
+ bh=Oy9AzTMbLO0uz0V4Wq59iTR8Arn+DiswL+6tRw3H42g=;
+ b=d9/SebWSAp2CXTxrzCwEPzNXuSd1ubjawToJcvSxTfzU+H5f9QLtddsr4ehCCCcLZ8417K2rdJpKRih4QrRKK3XXKnbrayOJWxcaaGgN1D4ZImu0ZVUB7qZ0nL9uk3lYOAMDqNAnU6++S5dfJ78Sb6jz0JiyZJCmOiU+nqijIPKmbyHV1AOUvXOQlw63d5FZLSUBQv74lsZSoxw/DrLqTtnfiwVJYodXtMGYfp8qNUXQJfWbX4ovFao5tbdLDS4o/jOPIgIFtcfpg91Tce/4ws23S5bMt6hHs9mfQGvrCSjngDqguWeBe2jdwma5rd/V8nJkx8ySIUZgLuhikWnDDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dx31xe6hJ7OkeovnABQgl2ODAJmzdf3zz+eTNYke4k4=;
- b=aWB4bzcSxI9PfsHLF0u3njZAvoIFtcGM0bt4A3/EORdP9RTadjEpkyDuF8D1MnTPbVl41VjCidxlls3frXXSi54swgHmLHaWbVk8orTLktKlny9hNWQgnmzo5+y15JmCBQmcRnQa3+LeruzfqFWbiDpJEPkIPdXxv9uOHhjGbo51Vqhi2y+RQH99l3m6YopRj3+F2QoZs2uS7nXu0CMrRXZAW5AKAdrzQIJ/E69EMvAm0lTTeKZvdIw9vYGhwkgqpOvlOEe3qpYHH63Jkx4Xt6/PZWs9MC8VH9b4aBAPBY4YPW5ylXJX9YG1jJebdB3BwU+rlYdIddTGuUCVjG2k9w==
-Received: from CH0PR04CA0033.namprd04.prod.outlook.com (2603:10b6:610:77::8)
- by MN0PR12MB5713.namprd12.prod.outlook.com (2603:10b6:208:370::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.16; Fri, 14 Feb
- 2025 16:19:14 +0000
-Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
- (2603:10b6:610:77:cafe::dc) by CH0PR04CA0033.outlook.office365.com
- (2603:10b6:610:77::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.17 via Frontend Transport; Fri,
- 14 Feb 2025 16:19:14 +0000
+ bh=Oy9AzTMbLO0uz0V4Wq59iTR8Arn+DiswL+6tRw3H42g=;
+ b=gAjnjb9eKcrRIwfkZcNb8NtafwpbeR2x9aMTOJxNPbi7rbRLlguoPOi62B8HSyBNVMgoJAn9vJbnGMYK9hWSKJclktkUvODyfHPlOkpULaKJjrkMXGVa59ibBeSWtioKRbi3sf2N1OvxoXab68MbBhcALP5kOJsRfYAkHeUaHSr4ehhQdFZ0JMqCByA9LO4dFRwYXKaMQO0ZRw/YM0soubWJfCvM45DeiwUDYu5jozpYHnnA1eKN/c28yUB1YP9cmn5NNjN9DXilBSpIeduFjFzXMp8ULYK0dW4oSW5nJuqoVbzXIzumI3l48VIP+pnqCrsa550nEECLuxqKZ6K4XA==
+Received: from DS7P222CA0029.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::28) by
+ IA0PR12MB8225.namprd12.prod.outlook.com (2603:10b6:208:408::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8445.13; Fri, 14 Feb 2025 16:19:18 +0000
+Received: from DS3PEPF000099DF.namprd04.prod.outlook.com
+ (2603:10b6:8:2e:cafe::b2) by DS7P222CA0029.outlook.office365.com
+ (2603:10b6:8:2e::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.16 via Frontend Transport; Fri,
+ 14 Feb 2025 16:19:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +63,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
+ DS3PEPF000099DF.mail.protection.outlook.com (10.167.17.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Fri, 14 Feb 2025 16:19:13 +0000
+ 15.20.8445.10 via Frontend Transport; Fri, 14 Feb 2025 16:19:17 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 14 Feb
- 2025 08:18:59 -0800
+ 2025 08:19:04 -0800
 Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Fri, 14 Feb
- 2025 08:18:53 -0800
+ 2025 08:18:59 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -84,9 +83,9 @@ CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Nikolay Aleksandrov
 	<razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>, Menglong Dong
 	<menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>
-Subject: [PATCH net-next v2 1/5] vxlan: Drop 'changelink' parameter from vxlan_dev_configure()
-Date: Fri, 14 Feb 2025 17:18:20 +0100
-Message-ID: <a3a3ceb6e4ef0952a3339a5a613f333f92958292.1739548836.git.petrm@nvidia.com>
+Subject: [PATCH net-next v2 2/5] vxlan: Join / leave MC group after remote changes
+Date: Fri, 14 Feb 2025 17:18:21 +0100
+Message-ID: <056c8f4765a52179630b904e95fc4e3f26c02f2a.1739548836.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <cover.1739548836.git.petrm@nvidia.com>
 References: <cover.1739548836.git.petrm@nvidia.com>
@@ -102,56 +101,93 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|MN0PR12MB5713:EE_
-X-MS-Office365-Filtering-Correlation-Id: f43a08de-33b3-4b4e-f077-08dd4d13523e
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DF:EE_|IA0PR12MB8225:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8bf9e8de-dad7-4694-b43b-08dd4d1354a9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RzBJJK4u6D79huWBeCC8M9FQq96FzPbzJniwCOH2LGy0YlQc1R4qftJrbpks?=
- =?us-ascii?Q?rUw8vsgDtAkxrMdlDV6RBjJojhMO5dxtNtslq+ZXICRIDNirruAmWGXVjPRE?=
- =?us-ascii?Q?ZtEBMid0XRmDmpO8LwrGnd7h6kspcMSfiwEn06s2TVTwZLqGE9CSKHtufVs5?=
- =?us-ascii?Q?nDfZeAHlB2aUYO9KIRMK+XDI6tS8OjyT190M9Ol5mCRLC74mm2uZ06ZOkoPD?=
- =?us-ascii?Q?/0kX4NhGpiUoCn/V5nWlb6kezXmrah2ReniHpA6B9GmxR4dcD8irMQodzqDV?=
- =?us-ascii?Q?4Sum59rVw6n9kNwwrVavThSrJ23lnTcgNNj9B7Gqne/hViNGzj1nwvEmyZm6?=
- =?us-ascii?Q?ffscKOtiA1no7das2OaoKT8aIyohlSfB/ioaPXSJyY5tKfAH03YkFoD0ce3T?=
- =?us-ascii?Q?pZrXmEOtHm65yrLl3MBk7cUIScEM6YAZu8RsRWi2yXpBmDiLwTmXwRu/cj2x?=
- =?us-ascii?Q?6ftEDLDnqpUajFMF2pVnWRq1BwbF5JikIONedQTX4qxc1aHc9Y8j7Fz0o6eI?=
- =?us-ascii?Q?6GqiKMPHzpBWBwogumThuhyErS0nfgiW/LKFDXtOle+FVxQLzSVebfcWwtS9?=
- =?us-ascii?Q?ZhlAxM9JIhvzwBhKquJaH3eZzEglqcZV0qUafcD+sLloE1TM9rG2t0Yhwi6i?=
- =?us-ascii?Q?7Ewn44+Vp0rfN2SU52zFEjxrT/XQ7VJe8H1z4HOuOr2pLmHatOAFMzEsj/4/?=
- =?us-ascii?Q?6MEapy94FkpWlehbZyXo4rOjiFa8JKyPpkUiMbNWtmA6ixYMymyBl2yQZbOU?=
- =?us-ascii?Q?1t0sBa7+sTjeloZNfxSClUGmQZqb+0qspEFgzVxyk8G6Sv9LfpaVI3etwl69?=
- =?us-ascii?Q?/IL1mcEUQ0KDan4no37sCNzIQoUkeYHCGusW9NBE+C7YzlZz7BQiPvddAqPu?=
- =?us-ascii?Q?l79BXlxsnGFAmEIx4oai1JbU+qBM1qmGfU0lTIRVPlDA6oBZLker9H2/hemp?=
- =?us-ascii?Q?sQ3giJ9HHdg5r8WxX42jbRWWjsRAGnVr5p/pCRC8tw/UV30MbNYQz+TGDpSb?=
- =?us-ascii?Q?4p7OkO5KbIH+GguqUWTaRDsYIp3U8W4o27lKzMFc2kL+lJzOlDS7pE3pb93V?=
- =?us-ascii?Q?ynSA2cyKBNdpoohWKUmr/dWZ4YcV1VT0U0eLKfRz5I6t5O2Qlh5Q4xQvNM5L?=
- =?us-ascii?Q?ASBTu2CwDlmfzLvrrDbAJVzAaCI/sGpyQBFExjK/0w/TE5uzjQzzBtZzSCTn?=
- =?us-ascii?Q?bBlme/kssnekFhtQLov+Weqnx88RceGZa54Wt+4c/u29QpdsHIFFfAVaj9yt?=
- =?us-ascii?Q?Eb4nXulsDbaIEQoewXm3Jac7JxhIUECv/RVU7SV+K+rQEhr7D8Vyx7MFaZnQ?=
- =?us-ascii?Q?Sh/KAB4FyOMd9imaTwn70DzxqoGtr/780nicjEIVxpVJI2HWjsoMhhzu9X6g?=
- =?us-ascii?Q?ZARttFEwiPMflz870csSRjfI4zlkq8hr+xqqhypfZh1fcd+MnCFMIgzXYOWV?=
- =?us-ascii?Q?VZ+OjYcoKUcGfrPGcpwquIUwWgwIirWrD1Z6Y3wZlhHW2WB6SdjR0v6Tmvuq?=
- =?us-ascii?Q?7RHTHywrAUjT6YI=3D?=
+	=?us-ascii?Q?Iw9uele4Hi5+Bxyd7IHXI5KjAtUi0B++oWdW1ulBEauGKKCtP3XBDhM5w7xW?=
+ =?us-ascii?Q?fyWtOgqHb1RbXgFsPsaP3BsLDGj3IDmDYTza1qZMUhUDTBlpuAK4XvA+DLyF?=
+ =?us-ascii?Q?2Cv1647xFj/yHbR3dpd4u55LQemmU4NB3HrUKW4B5TfxY70bXOBOCN90uf6b?=
+ =?us-ascii?Q?8yGRu/K3cMgHLcr1OruThre4OmWcsJpcrl4h3SlExpR67HFtMnJbG7DgYROb?=
+ =?us-ascii?Q?O/4ujrGMjx+tSGFI16hMvHI2+M0TTCzBFqBF1lwTpsiCUPRLi48b6Uo1GUVB?=
+ =?us-ascii?Q?77cj13KCoahCBUvRNMPmP7e5LURlqdJkbdGaQ2o0sL8hsaPMbmgos2mlJQcC?=
+ =?us-ascii?Q?ZMHMbTjuwRcA63SKIE4H4YHbHy9uLKP8b98wAr4xzB7QUqe7UkJl0EEP/k31?=
+ =?us-ascii?Q?b1zLlAu8hoRgU2m8F4hbP3VSnhBMpZAxguueAv/++ws2OwzZZvT05xsVnzza?=
+ =?us-ascii?Q?ppXYYg8xekODcquOTxlfvb/mpUSsQOG5xsCgBs37lDwvxo0sMYCGrEs4KFbq?=
+ =?us-ascii?Q?KrzVelS6Gtt7BaqW/nyvdgTljqX6m1mmDipZCZSgq7Q5huoeyfR66f3+JOWY?=
+ =?us-ascii?Q?bOoyf4+CCCKbUdfK1XBaK2cf0IdMlA0CAFvpLippWHCRnNf4JBKH3s3HYfZo?=
+ =?us-ascii?Q?jxzcLwlIYYaAe83DQdGFIjkciWH801RDpAhTp2N2rJb1haZvFm4GmJPPo911?=
+ =?us-ascii?Q?l8Ijuy2b1M0a3SDQ0394LFY+4E3gijFTrDRM6IgfT5bmmPcdRLK84Zu68OZ/?=
+ =?us-ascii?Q?RLnOvVZj2VIKrPa4lmkgs/B7WOtOZ2jBBmSx+J9+m+LSDAtIWtO397hVNcP4?=
+ =?us-ascii?Q?0RAEywCuohFmFQwrOvpF9mtEf22nlR4/4TX4mN4sHljTZ45mEx6IN6OtoFsr?=
+ =?us-ascii?Q?0EV7fIFs+SNRxOr+j3QwDEu/CUfdc5OB7bGdxmjTS3qF4WCYuU2WlkxFBMcV?=
+ =?us-ascii?Q?OsZWqzH/IqTpdqQ6t+7dCgBNqTSuRpLwT7ht8FokQco66j9+hQ3oyL/chI3d?=
+ =?us-ascii?Q?unGbm5B7QHjIuanzqErdc/h8DrcRI7UGMHYpc0UwjYZmhxwSLjLSKty42lCz?=
+ =?us-ascii?Q?yYmQkKy4e/o+FxaV0TMpuXR3sV9Euf2Dza9I86OTra6s+7h03j8yhiZXuvX6?=
+ =?us-ascii?Q?1oMLWdbQVPcQ0Jh5KJ896MuLlsbuJDZHY1H+ngjvV4um/gPBPQgOKHyIc9WP?=
+ =?us-ascii?Q?YpFlsqt7LdNFHMRAxRNB1oNbopULdywQKC6DSBppLRVQxf1RQvdpDE9UOKU+?=
+ =?us-ascii?Q?do2mm+bnvkUnXan0nJKedPe6pg/MxEcV1oi19863fQyR1uP3tq4faf17n3t2?=
+ =?us-ascii?Q?GDHbznmB1XpEjKucIi8eduQFmyZaPake9DBCZwTeQYULSN1kFRUrTwpBqKug?=
+ =?us-ascii?Q?2d2l3DyrYPTiDk7wpvp1McBmTpizn2JT7wyfQmPFcikafJ3lt/hpV8H6VTNS?=
+ =?us-ascii?Q?I60ewfHem6WKSvJMdHdxOt+I++OAza2n/tdJoslEHkb5IJg4D/rNXE9VcRDC?=
+ =?us-ascii?Q?Dlq+hUI5arOT5/c=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 16:19:13.4333
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 16:19:17.5041
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f43a08de-33b3-4b4e-f077-08dd4d13523e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bf9e8de-dad7-4694-b43b-08dd4d1354a9
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099E2.namprd04.prod.outlook.com
+	DS3PEPF000099DF.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5713
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8225
 
-vxlan_dev_configure() only has a single caller that passes false
-for the changelink parameter. Drop the parameter and inline the
-sole value.
+When a vxlan netdevice is brought up, if its default remote is a multicast
+address, the device joins the indicated group.
+
+Therefore when the multicast remote address changes, the device should
+leave the current group and subscribe to the new one. Similarly when the
+interface used for endpoint communication is changed in a situation when
+multicast remote is configured. This is currently not done.
+
+Both vxlan_igmp_join() and vxlan_igmp_leave() can however fail. So it is
+possible that with such fix, the netdevice will end up in an inconsistent
+situation where the old group is not joined anymore, but joining the new
+group fails. Should we join the new group first, and leave the old one
+second, we might end up in the opposite situation, where both groups are
+joined. Undoing any of this during rollback is going to be similarly
+problematic.
+
+One solution would be to just forbid the change when the netdevice is up.
+However in vnifilter mode, changing the group address is allowed, and these
+problems are simply ignored (see vxlan_vni_update_group()):
+
+ # ip link add name br up type bridge vlan_filtering 1
+ # ip link add vx1 up master br type vxlan external vnifilter local 192.0.2.1 dev lo dstport 4789
+ # bridge vni add dev vx1 vni 200 group 224.0.0.1
+ # tcpdump -i lo &
+ # bridge vni add dev vx1 vni 200 group 224.0.0.2
+ 18:55:46.523438 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+ 18:55:46.943447 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+ # bridge vni
+ dev               vni                group/remote
+ vx1               200                224.0.0.2
+
+Having two different modes of operation for conceptually the same interface
+is silly, so in this patch, just do what the vnifilter code does and deal
+with the errors by crossing fingers real hard.
+
+The vnifilter code leaves old before joining new, and in case of join /
+leave failures does not roll back the configuration changes that have
+already been applied, but bails out of joining if it could not leave. Do
+the same here: leave before join, apply changes unconditionally and do not
+attempt to join if we couldn't leave.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
@@ -159,7 +195,9 @@ Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
 Notes:
     v2:
-    - New patch.
+    - Adjust the code so that it is closer to vnifilter.
+      Expand the commit message the explain in detail
+      which aspects of vnifilter code were emulated.
     
 ---
 CC: Andrew Lunn <andrew+netdev@lunn.ch>
@@ -168,40 +206,60 @@ CC: Roopa Prabhu <roopa@nvidia.com>
 CC: Menglong Dong <menglong8.dong@gmail.com>
 CC: Guillaume Nault <gnault@redhat.com>
 
- drivers/net/vxlan/vxlan_core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/vxlan/vxlan_core.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index b1158a1bb855..ec0aee1d5b91 100644
+index ec0aee1d5b91..588ab2c16c67 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3936,7 +3936,7 @@ static void vxlan_config_apply(struct net_device *dev,
- }
- 
- static int vxlan_dev_configure(struct net *src_net, struct net_device *dev,
--			       struct vxlan_config *conf, bool changelink,
-+			       struct vxlan_config *conf,
- 			       struct netlink_ext_ack *extack)
+@@ -4419,6 +4419,7 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 			    struct netlink_ext_ack *extack)
  {
  	struct vxlan_dev *vxlan = netdev_priv(dev);
-@@ -3947,7 +3947,7 @@ static int vxlan_dev_configure(struct net *src_net, struct net_device *dev,
- 	if (ret)
- 		return ret;
- 
--	vxlan_config_apply(dev, conf, lowerdev, src_net, changelink);
-+	vxlan_config_apply(dev, conf, lowerdev, src_net, false);
- 
- 	return 0;
- }
-@@ -3965,7 +3965,7 @@ static int __vxlan_dev_create(struct net *net, struct net_device *dev,
- 	int err;
- 
- 	dst = &vxlan->default_dst;
--	err = vxlan_dev_configure(net, dev, conf, false, extack);
-+	err = vxlan_dev_configure(net, dev, conf, extack);
++	bool rem_ip_changed, change_igmp;
+ 	struct net_device *lowerdev;
+ 	struct vxlan_config conf;
+ 	struct vxlan_rdst *dst;
+@@ -4442,8 +4443,13 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
  	if (err)
  		return err;
  
++	rem_ip_changed = !vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip);
++	change_igmp = vxlan->dev->flags & IFF_UP &&
++		      (rem_ip_changed ||
++		       dst->remote_ifindex != conf.remote_ifindex);
++
+ 	/* handle default dst entry */
+-	if (!vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip)) {
++	if (rem_ip_changed) {
+ 		u32 hash_index = fdb_head_index(vxlan, all_zeros_mac, conf.vni);
+ 
+ 		spin_lock_bh(&vxlan->hash_lock[hash_index]);
+@@ -4487,6 +4493,9 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 		}
+ 	}
+ 
++	if (change_igmp && vxlan_addr_multicast(&dst->remote_ip))
++		err = vxlan_multicast_leave(vxlan);
++
+ 	if (conf.age_interval != vxlan->cfg.age_interval)
+ 		mod_timer(&vxlan->age_timer, jiffies);
+ 
+@@ -4494,7 +4503,12 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	if (lowerdev && lowerdev != dst->remote_dev)
+ 		dst->remote_dev = lowerdev;
+ 	vxlan_config_apply(dev, &conf, lowerdev, vxlan->net, true);
+-	return 0;
++
++	if (!err && change_igmp &&
++	    vxlan_addr_multicast(&dst->remote_ip))
++		err = vxlan_multicast_join(vxlan);
++
++	return err;
+ }
+ 
+ static void vxlan_dellink(struct net_device *dev, struct list_head *head)
 -- 
 2.47.0
 
