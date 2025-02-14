@@ -1,133 +1,184 @@
-Return-Path: <netdev+bounces-166289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA75A355C1
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:29:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB040A355DC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4F4168503
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:29:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8061890C39
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C0215C13A;
-	Fri, 14 Feb 2025 04:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C0715442D;
+	Fri, 14 Feb 2025 04:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdP10B/d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JorwI9bI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD931519AB;
-	Fri, 14 Feb 2025 04:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6972142AAF;
+	Fri, 14 Feb 2025 04:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739507393; cv=none; b=g+ZJiBTpzmN/0148aR2srm6PAX7I/BuMLKRVvJiEHD/dBDlfDiPJgRBDHK4rEHce9Wwp9kGNjOiMbPDETLMAbw+luwAd/FWBzIzqXolExF3USmAmSbcP+RpCC5xoUHhNxVIebljj2+5ed9mZ+p7oe2Zn3yB/bp4B25iHR+LWLpE=
+	t=1739508619; cv=none; b=gMmbRtVXkfuS41WCQpjm8ZXUBaLMZxiOaUICtHW5+IlHiubpOORZaW3z+i5nxlcv+7u1S/skgp1yat91Ge17tx/FuJ7QqvkOMC/dSztTaxRA7h3WqyjDMT0vV+gnCL7ytfC7gK9wMoIgA2zrGOMqOHVwNCSWKitC4w3dyix1GC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739507393; c=relaxed/simple;
-	bh=kJfkFaSW6aJQb8uFoWo8v4ScxVtaWTGd54TPudR6gnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vp7rMczNqn+27sBWsE8beZLn+1LF7+VXGdVeojLL06g3Mue2gm/Lo2EE93rHbTnB51pPO06th+2sq1kD4BG8enV964Cr4B9QBcrYU7iQiZaPVzRwQ+A8EMR9G+F+cs5nbZwdXrO0Hgbq67uL7c7MtRNl0u9MS/6fmiyIOHpP/4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdP10B/d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADC6EC4CEDD;
-	Fri, 14 Feb 2025 04:29:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739507393;
-	bh=kJfkFaSW6aJQb8uFoWo8v4ScxVtaWTGd54TPudR6gnY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BdP10B/d07a8NOBmx+NMyNq7E4ryvlAzNRtxyr9IhOOrkL3F76sOwT0kQsy75C15J
-	 NdH8ijzNrzam/YU/kpqouZ2Gpdz6bE0ex62pPOyTv4Q40hIuslm3iDr89O6+KMocJp
-	 /XCJwCOz7jf1mdTwPujOnuz2dpvZaXAaKr7bHmeFIQ5uO3Zzw31UEGy9AKmeNFXZxT
-	 mQV5OPxyxp1QZxbBx1DLhUuYCGjTp7ahg0RfGQ5/mUco3sFrqZI5vbzuasB5k5Olj5
-	 vgtCg+agVsu/TeRxXSUzqhllmhb1w+7l4FaVFdkqtD5p2GTgzVT5T8TLnCGwvHDFPH
-	 EOZ/pqHoqYmjQ==
-Date: Thu, 13 Feb 2025 20:29:51 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
- hashing
-Message-ID: <20250214042951.GB2771@sol.localdomain>
-References: <20250212154718.44255-1-ebiggers@kernel.org>
- <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain>
- <Z66uH_aeKc7ubONg@gondor.apana.org.au>
- <20250214033518.GA2771@sol.localdomain>
- <Z669mxPsSpej6K6K@gondor.apana.org.au>
+	s=arc-20240116; t=1739508619; c=relaxed/simple;
+	bh=gPVj4mO6xQJrCt3sZYWJNbH9C8SimtbKXR7wY1fjf90=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=SfltRmKOiw5sz1HQg9km8aSfBgAe1dSK7bCqmvFVg+2PxTYBA+eJNZF0pUSrQmArkxneJ7jZpcSdZhU3z18eEevM2GUWkgujQcs2Yx5fCqpsx7j1lTyS1KxtoI1+j3KXEZa4H4inpHSpDWCGwdKWvbZ2TltB+b+OboBZt5KuLyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JorwI9bI; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739508618; x=1771044618;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=gPVj4mO6xQJrCt3sZYWJNbH9C8SimtbKXR7wY1fjf90=;
+  b=JorwI9bIUscB+rO2CNT6mhd6Aej2x39pdqMJ4kV/Svc0iULJQFsnsrRa
+   Mj51M5DpENNxBU3lHUXBBEOTQDiaBBY0GnS1wl2kvrx9akq1jeyV0UlM8
+   o+VRAtN/moCQTNt+Bi/pvCoN3JTKnPyYrBqiSQrkJgpfmbPb6OEPk6PB4
+   kF7g8s057LUA3Kw+vXNJP1mys2Y+DJXn4FjVndzs5wMKYerNqTKN6IMkI
+   5QbzxYSHBbpQMIntK2H3rL+SKs91L7JQ1xLbanLAgeXDCGvqchEKPGQ6x
+   B2ED/Ii7sTOcmx6yRdck7j6ukRXknGaXIVtDTEoQT4bMMwwPc+FUZK+Yo
+   w==;
+X-CSE-ConnectionGUID: u7AS2e6uShGQvvfrlgPHgA==
+X-CSE-MsgGUID: 65PyX/SOR6CSShPK05QAYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40361826"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="40361826"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 20:50:15 -0800
+X-CSE-ConnectionGUID: 2b+fgtn9Q7+FDC4KwavSPQ==
+X-CSE-MsgGUID: wezvzmt3Tm6HcUS0QIfqlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,284,1732608000"; 
+   d="scan'208";a="113096903"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.123.6]) ([10.247.123.6])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 20:50:07 -0800
+Message-ID: <e5c5d7ed-9f47-4af1-aee4-4632099bd546@linux.intel.com>
+Date: Fri, 14 Feb 2025 12:50:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z669mxPsSpej6K6K@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
+ feature in IGC
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250212220121.ici3qll66pfoov62@skbuf>
+ <b19357dc-590d-458c-9646-ee5993916044@linux.intel.com>
+ <87cyfmnjdh.fsf@kurt.kurt.home>
+ <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
+ <20250213130003.nxt2ev47a6ppqzrq@skbuf>
+ <1c981aa1-e796-4c53-9853-3eae517f2f6d@linux.intel.com>
+ <877c5undbg.fsf@kurt.kurt.home> <20250213184613.cqc2zhj2wkaf5hn7@skbuf>
+ <87v7td3bi1.fsf@kurt.kurt.home>
+ <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 11:50:51AM +0800, Herbert Xu wrote:
-> On Thu, Feb 13, 2025 at 07:35:18PM -0800, Eric Biggers wrote:
-> >
-> > It absolutely is designed for an obsolete form of hardware offload.  Have you
-> > ever tried actually using it?  Here's how to hash a buffer of data with shash:
-> > 
-> > 	return crypto_shash_tfm_digest(tfm, data, size, out)
-> > 
-> > ... and here's how to do it with the SHA-256 library, for what it's worth:
-> > 
-> > 	sha256(data, size, out)
-> > 
-> > and here's how to do it with ahash:
-> 
-> Try the new virt ahash interface, and we could easily put the
-> request object on the stack for sync algorithms:
-> 
-> 	SYNC_AHASH_REQUEST_ON_STACK(req, alg);
-> 
-> 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-> 	ahash_request_set_virt(req, data, out, size);
-> 
-> 	return crypto_ahash_digest(req);
 
-That doesn't actually exist, and your code snippet is also buggy (undefined
-behavior) because it never sets the tfm pointer in the ahash_request.  So this
-just shows that you still can't use your own proposed APIs correctly because
-they're still too complex.  Yes the virt address support would be an improvement
-on current ahash, but it would still be bolted onto an interface that wasn't
-designed for it.  There would still be the weirdness of having to initialize so
-many unnecessary fields in the request, and having "synchronous asynchronous
-hashes" which is always a fun one to try to explain to people.  The shash and
-lib/crypto/ interfaces are much better as they do not have these problems.
 
-> > What?  GHASH is a polynomial hash function, so it is easily parallelizable.  If
-> > you precompute N powers of the hash key then you can process N blocks in
-> > parallel.  Check how the AES-GCM assembly code works; that's exactly what it
-> > does.  This is fundamentally different from message digests like SHA-* where the
-> > blocks have to be processed serially.
+On 14/2/2025 12:20 pm, Abdul Rahim, Faizal wrote:
 > 
-> Fair enough.
 > 
-> But there are plenty of other users who want batching, such as the
-> zcomp with iaa, and I don't want everybody to invent their own API
-> for the same thing.
+> On 14/2/2025 3:12 am, Kurt Kanzenbach wrote:
+>> On Thu Feb 13 2025, Vladimir Oltean wrote:
+>>> So, confusingly to me, it seems like one operating mode is fundamentally
+>>> different from the other, and something will have to change if both will
+>>> be made to behave the same. What will change? You say mqprio will behave
+>>> like taprio, but I think if anything, mqprio is the one which does the
+>>> right thing, in igc_tsn_tx_arb(), and taprio seems to use the default Tx
+>>> arbitration scheme?
+>>
+>> Correct. taprio is using the default scheme. mqprio configures it to
+>> what ever the user provided (in igc_tsn_tx_arb()).
+>>
+>>> I don't think I'm on the same page as you guys, because to me, it is
+>>> just odd that the P traffic classes would be the first ones with
+>>> mqprio, but the last ones with taprio.
+>>
+>> I think we are on the same page here. At the end both have to behave the
+>> same. Either by using igc_tsn_tx_arb() for taprio too or only using the
+>> default scheme for both (and thereby keeping broken_mqprio). Whatever
+>> Faizal implements I'll match the behavior with mqprio.
+>>
+> 
+> Hi Kurt & Vladimir,
+> 
+> After reading Vladimir's reply on tc, hw queue, and socket priority mapping 
+> for both taprio and mqprio, I agree they should follow the same priority 
+> scheme for consistency—both in code and command usage (i.e., taprio, 
+> mqprio, and fpe in both configurations). Since igc_tsn_tx_arb() ensures a 
+> standard mapping of tc, socket priority, and hardware queue priority, I'll 
+> enable taprio to use igc_tsn_tx_arb() in a separate patch submission.
+> 
+> I'll split the changes based on Vladimir's suggestion.
+> 
+> First part - ethtool-mm related:
+> igc: Add support to get frame preemption statistics via ethtool
+> igc: Add support to get MAC Merge data via ethtool
+> igc: Add support to set tx-min-frag-size
+> igc: Add support for frame preemption verification
+> igc: Set the RX packet buffer size for TSN mode
+> igc: Optimize TX packet buffer utilization
+> igc: Rename xdp_get_tx_ring() for non-XDP usage
+> net: ethtool: mm: Extract stmmac verification logic into a common library
+> 
+> Second part:
+> igc: Add support for preemptible traffic class in taprio and mqprio
+> igc: Use igc_tsn_tx_arb() for taprio queue priority scheme
+> igc: Kurt's patch on mqprio to use normal TSN Tx mode
+> 
+> Kurt can keep igc_tsn_tx_arb() for his mqprio patch, so preemptible tc 
+> should work the same for both taprio and mqprio.
+> 
+> I'm suggesting to include Kurt's patch in the second part since there's 
+> some dependency and potential code conflict, even though it mixes different 
+> functional changes in the same series.
 
-Well, the IAA and zswap people want a batch_compress method that takes an array
-of pages
-(https://lore.kernel.org/linux-crypto/20250206072102.29045-3-kanchana.p.sridhar@intel.com/).
-They do not seem to want the weird request chaining thing that you are trying to
-make them use.  batch_compress is actually quite similar to what I'm proposing,
-just for compression instead of hashing.   So there is no conflict with my
-proposal, and in fact they complement each other as they arrived at a similar
-conclusion.  Hash and compression are different algorithm types, so they can
-never use exactly the same API anyway, just similar ones.  And FWIW, zswap is
-synchronous, so yet again all the weird async stuff just gets in the way.
+I forgot that the second part patch:
+igc: Add support for preemptible traffic class in taprio and mqprio
 
-- Eric
+depends on the first part ethtool-mm, which would delay Kurt's patch.
+
+So Kurt, if you'd prefer to submit yours first, that's okay too.
+
+
+
 
