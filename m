@@ -1,162 +1,228 @@
-Return-Path: <netdev+bounces-166316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92376A35755
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:43:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04700A35776
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BB857A3067
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:42:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 669873ABFB3
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2AD202C4C;
-	Fri, 14 Feb 2025 06:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419A0202F97;
+	Fri, 14 Feb 2025 06:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JiBROJAd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNC6mnMs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9B11FFC63
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 06:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B241519A9;
+	Fri, 14 Feb 2025 06:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739515382; cv=none; b=XvMUUpVK5s8aMGdhLCQWbTy3ebiQ0DWzHQZUf6541Z/vBQMIqguKe99C6KvIKHIAnxmTInA7Vdse6y2WNly7ZHf71yPCfiULVjETtMW45JEBgMR+2FLlYnPaJiKUVuchT7ezbRIXcQkfHB4xcVRQ68Jfphz7cshdBrGkLVL5qF8=
+	t=1739516221; cv=none; b=Z1i3D61hyZFMr9N2OwfOqhrU7yM2F8u357NaHzSx/xzeX3dk8yKcVy6WknI35xW5L7H1rAD7uviKS9LDKqVjJdpjF/M+ec8w7LFHWJOdTJVnykpp94o538Fl9764nQBnA0z/IGgyWnPA7ooFw9P5bInj6/hRUn7gBXDslsM2XBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739515382; c=relaxed/simple;
-	bh=PtyoGLGw8IVrBKEWpULXxxcFvaXaePzgliOlCu2oe2M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jLmICAQ3G7sfXXEqSTmqaX4deIGajmAJch8pw/OjwPAt4QNLiHByg7MpsIVZZBKN8oEAbBPTY0a0czmab19ZEjfg7aCmxHG7vSQa3sGCHXfQcP/72oCbfsuoFYjExvsz9ExXxa8sJshw78xquVTB+RJxc8PSArbQ1v6bFzzq740=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JiBROJAd; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1739516221; c=relaxed/simple;
+	bh=Fec+rZk/W9gK1K5DEsZiJ8DtC/dCtMvlJ3l5jhOQiwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cXdsEA543VFSFLe2N26XGBCONyAleL5o72SOW4MBojtID7JmKuEp+7FVwMuZko0ZxtFx62FCmIRVgTaFnMmgBYJSBbtiB1JOq9eiAN6yYlcCOJ6cTfj9FRg0PYXqbfxvxWWNseQs/rmJxhqJGsEVB/CLirdWI30tmCkuJ99hmWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNC6mnMs; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-220ec47991aso6959805ad.1
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 22:43:00 -0800 (PST)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so5476345ab.2;
+        Thu, 13 Feb 2025 22:56:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739515380; x=1740120180; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=41iHSWGkTEHehrErTs64VtqmmrQo94r4ocjInjarKdQ=;
-        b=JiBROJAd+K3GlyTywlCYh3KpsmmEjSku0jh40O3KFMR3IJvgYtmzyqpAd4VW1/OzjV
-         cMjkpIYbe74P7PCoGZ8yq+SHNBznMGljs2IOShy2sAGN/FJnoZHy2eYFQz2njDcty48y
-         CS2F6OoVqFL/8DnA9+yjrv34FpYxSQjbuVqcHLZ756SdsrFrEeiJpntLppAMZM1LBI3R
-         NJDts1BS7m8viiwVyj1o570VMJtqUXDNk5fNaOUPCj7u31ruGDwyYQWb7rNao4rxEFJD
-         GJ4ykNKjXXXI5QMr53Auy5lTrsMntNyV/26C2zBbkoB4z4te7faf1af/0X97fcSv7sBV
-         hCaw==
+        d=gmail.com; s=20230601; t=1739516218; x=1740121018; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y3UYfrgfI+u6YUZkrJkTzUEiGH4tn/5JLev8v5kxCTI=;
+        b=TNC6mnMsscQZOWy1eoqNCIqJzc0zD82Jpk7/jRfnu5GvkJ6YC0hzvJuqUSlOrmPzh4
+         5pe/nci9iN8MKWdOgzYD2gV1XhkaFan1ZEw682pieFlXTtbYI719ynrj1k/HG9pbg9n6
+         vsU444hw+EAJ9QWMdpujlm0He9z4EsVsxzsQ3DndV72JpnoEEkgG4eFbrnozKQ5X56WS
+         zjjLge+mNFlPeXM9M015sR2JvOv1XpOiHNKBnxZ1ncqI3v8LNJiOdDniGOu9mEBNDAC+
+         OOVLK8eCeoMIR2xLzuXUD+RxjvfW3LAemPg01y2sYolCZPtY+fLM6rtqkQwJ1uaub7vw
+         BdtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739515380; x=1740120180;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=41iHSWGkTEHehrErTs64VtqmmrQo94r4ocjInjarKdQ=;
-        b=S68L1A6Wepme4KCimCblrf15ioWQi26Um+sz/yl0j6XpeHcGc3syXqYdl3vPcXHHyN
-         DVv6q+UFobZD+eUwBbcp84J1HnBWxr/KB9R4J08x94AYkxmyPYWjE6AdPe//IdIPb4WV
-         LNOKKR2vp6Lv9xujmHEGa+jpGJ/QB9jW//sFHtUm/CkzxjNGrfppogNf7St/t8/rutqN
-         1CUA5U8/mtOvXNIzbaJrNjWPkx72fFBOyUv2JUNEzCFCNMoApDsYfYYO27GhYMGdCHcG
-         7/tjINkb8LD+9sc8gRdTaGqIJea7+W+VfUonYR/6Sy+Yb4GgKkrK6ggjELFdTHrCkb8p
-         Gtog==
-X-Gm-Message-State: AOJu0YzRjxLMfnPCsztJeRQqaPQiTa7RCKLpvSRpEOGcVNuU04Tlbzso
-	1pextLl3gMSD3GVJibtlY/0CerCFsOIR6d94r5wXRR5aOx2AjSeH
-X-Gm-Gg: ASbGncv7jXgOV+8fDLv++7AHaKy9oNjVpfSGbyFJ9Zkma+ffEQXJqGesFxh23rHt7pl
-	dCmu4XF3a0zvfdJ/j1LvOSRwFQ4283fDdEDUG5JW4KahzzRtubSR01Gc8L6J2Jp9fAOzV7bC3KH
-	hsOXIROrkTPrqh4MBRCZ3cg7tlGP6gzZMadS7oVDqWqRw+QL9Tz9lIWx732vO1cWZE3hsJZS6Jd
-	HpLLpRBjoJRgSotmkWC4gWvs1H5TXs+9Hky5MFidgBESMnoRtRIowunZh8FJbXyW5CWiUjZ5g7d
-	si0OGmYYAvQIXbUT3/EjLB2gKLJqqrWbdqoqWVUlHEgJuAaUty2/JEHatKqe7lM=
-X-Google-Smtp-Source: AGHT+IEY+kkIUBHUWrkm+YxVmVVosNPoYo9fR6Fh1CS1VlYmEQyYpRrfSJuDXlpQq7iCFVDGyliTog==
-X-Received: by 2002:a05:6a21:9d48:b0:1ee:69c8:8d04 with SMTP id adf61e73a8af0-1ee69c88da3mr14480184637.40.1739515379748;
-        Thu, 13 Feb 2025 22:42:59 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7324273eac4sm2380444b3a.113.2025.02.13.22.42.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 22:42:59 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	almasrymina@google.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH net-next v3] page_pool: avoid infinite loop to schedule delayed worker
-Date: Fri, 14 Feb 2025 14:42:50 +0800
-Message-Id: <20250214064250.85987-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1739516218; x=1740121018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y3UYfrgfI+u6YUZkrJkTzUEiGH4tn/5JLev8v5kxCTI=;
+        b=I8UKcVpb/2nbAc9BAU7LrjLeEUvmoP4vLSpTMRqZQNzb4Ar8Duxss+f0naZmBL6PlF
+         y85R73yeN7oqXeCIZoVbVi+U47oEJGCjj/1/GGuhbZnLZEgLTA1u5/G9YIT5kNqLPc5k
+         DjQiKj8Oe9H+BO3emEu1/Rs5Juhol8Bi2tuSClb77DUXNp7Tx+pc86mWoDVUaaqzf7JT
+         yeHJAf9LGQr+cB8lFa/omuh/pNBH/Hv4lfWdK3yf7ynHOB55Hx9J2UuDdje6ozbRetjc
+         WNZSwE2T7q8Qw/0FpdArt8fbZbz3wQnH1yFpch3IBTms/8GF6Drf0gbKUH7hN43w6EFB
+         w/tA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYuKfDG33uCe2Qi1PZHNVi7xruomA0hG2+/Tw/G8mKy7eH9VcRvcjWypQfN1hXXAQ/hMk=@vger.kernel.org, AJvYcCXRrcvvuhYB3vENzcKqY435bmkTVn6/I8WxegNrATJiVV1uVnM5JwalLV+DLKPRL1w70C564oGy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6WlDAiwVbZc1aEdZvHTPZ+WAkn2EmthyNYhb6xJtm/VnHzIaH
+	gRAhv0c5ZsjAv5hb74zsaQ8EBrKYNMHgrHnUiEDJl9EIWQRFJO6/Pgc6gtqJaOqCN5FzR+XcCTg
+	pT5fEHgRI001NYWjznm3swcZf5sk=
+X-Gm-Gg: ASbGnctAt9gthsrHpGm7H86Vi/+UBI9+skOfxHjvLcz36xXcDTD9psW2+kV39aGIrsU
+	9I0hIXtPTb4BKAZJuzjm3nOTKgsAJfICIZyZ67qWUMUDjU3KYSUjLhGvKH6R1Lu0gJlzs6KU=
+X-Google-Smtp-Source: AGHT+IEQfgHbwxRW6daC4an8k8SMcE/hiFMd/JCnTmBjOqlVHMmb0vJILox+ZEp8Yp2Nme7V0qRYGXPGNu+FX464/jA=
+X-Received: by 2002:a05:6e02:368a:b0:3d1:a26f:e241 with SMTP id
+ e9e14a558f8ab-3d1a26fe440mr3263835ab.7.1739516218456; Thu, 13 Feb 2025
+ 22:56:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250213004355.38918-1-kerneljasonxing@gmail.com>
+ <20250213004355.38918-3-kerneljasonxing@gmail.com> <Z66DL7uda3fwNQfH@mini-arch>
+ <CAL+tcoATv6HX5G6wOrquGyyj8C7bFgRZNnWBwnPTKD1gb4ZD=g@mail.gmail.com>
+ <039bfa0d-3d61-488e-9205-bef39499db6e@linux.dev> <CAL+tcoBAv5QuGeiGYUakhxBwVEsut7Gaa-96YOH03h57jtTVaQ@mail.gmail.com>
+ <86453e67-d5dc-4565-bdd6-6383273ed819@linux.dev> <CAL+tcoApvV0vyiTKdaMWMp8F=ZWSodUg0zD+eq_F6kp=oh=hmA@mail.gmail.com>
+ <b3f30f7d-e0c3-4064-b27e-6e9a18b90076@linux.dev>
+In-Reply-To: <b3f30f7d-e0c3-4064-b27e-6e9a18b90076@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 14 Feb 2025 14:56:21 +0800
+X-Gm-Features: AWEUYZmGuuAbDAB7AOdm5fCDp5ql6QQtZvUW4793IHuvA53AYBy76HVgsR7U4cg
+Message-ID: <CAL+tcoB2EO_FJis4wp7WkMdEZQyftwuG2X6z0UrJEFaYnSocNg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] bpf: add TCP_BPF_RTO_MAX for bpf_setsockopt
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	ncardwell@google.com, kuniyu@amazon.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We noticed the kworker in page_pool_release_retry() was waken
-up repeatedly and infinitely in production because of the
-buggy driver causing the inflight less than 0 and warning
-us in page_pool_inflight()[1].
+On Fri, Feb 14, 2025 at 2:40=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/13/25 10:12 PM, Jason Xing wrote:
+> > On Fri, Feb 14, 2025 at 1:41=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
+nux.dev> wrote:
+> >>
+> >> On 2/13/25 7:09 PM, Jason Xing wrote:
+> >>> On Fri, Feb 14, 2025 at 10:14=E2=80=AFAM Martin KaFai Lau <martin.lau=
+@linux.dev> wrote:
+> >>>>
+> >>>> On 2/13/25 3:57 PM, Jason Xing wrote:
+> >>>>> On Fri, Feb 14, 2025 at 7:41=E2=80=AFAM Stanislav Fomichev<stfomich=
+ev@gmail.com> wrote:
+> >>>>>> On 02/13, Jason Xing wrote:
+> >>>>>>> Support bpf_setsockopt() to set the maximum value of RTO for
+> >>>>>>> BPF program.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Jason Xing<kerneljasonxing@gmail.com>
+> >>>>>>> ---
+> >>>>>>>     Documentation/networking/ip-sysctl.rst | 3 ++-
+> >>>>>>>     include/uapi/linux/bpf.h               | 2 ++
+> >>>>>>>     net/core/filter.c                      | 6 ++++++
+> >>>>>>>     tools/include/uapi/linux/bpf.h         | 2 ++
+> >>>>>>>     4 files changed, 12 insertions(+), 1 deletion(-)
+> >>>>>>>
+> >>>>>>> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentati=
+on/networking/ip-sysctl.rst
+> >>>>>>> index 054561f8dcae..78eb0959438a 100644
+> >>>>>>> --- a/Documentation/networking/ip-sysctl.rst
+> >>>>>>> +++ b/Documentation/networking/ip-sysctl.rst
+> >>>>>>> @@ -1241,7 +1241,8 @@ tcp_rto_min_us - INTEGER
+> >>>>>>>
+> >>>>>>>     tcp_rto_max_ms - INTEGER
+> >>>>>>>          Maximal TCP retransmission timeout (in ms).
+> >>>>>>> -     Note that TCP_RTO_MAX_MS socket option has higher precedenc=
+e.
+> >>>>>>> +     Note that TCP_BPF_RTO_MAX and TCP_RTO_MAX_MS socket option =
+have the
+> >>>>>>> +     higher precedence for configuring this setting.
+> >>>>>> The cover letter needs more explanation about the motivation.
+> >>>>
+> >>>> +1
+> >>>>
+> >>>> I haven't looked at the patches. The cover letter has no word on the=
+ use case.
+> >>
+> >> The question was your _use case_ in bpf. Not what the TCP_RTO_MAX_MS d=
+oes. Your
+> >> current use case is to have bpf setting it after reading the tcp heade=
+r option,
+> >> like the selftest in patch 3?
+> >
+> > Oops, I misunderstood the real situation of the tcp header option
+> > test. My intention is to bpf_setsockopt() just like setget_sockopt
+> > does.
+> >
+> > Thanks for reminding me. I will totally remove the header test in the
+> > next version.
+>
+> If your use case was in the header, it is ok although it won't be the fir=
+st
 
-Since the inflight value goes negative, it means we should
-not expect the whole page_pool to get back to work normally.
+I was planning to add a simple test to only see if the rto max for bpf
+feature works, so I found the rto min selftests and then did a similar
+one.
 
-This patch mitigates the adverse effect by not rescheduling
-the kworker when detecting the inflight negative in
-page_pool_release_retry().
+> useful place I have in my mind. Regardless, it is useful to say a few wor=
+ds
+> where you are planning to set it in the bpf. During a cb in sockops or du=
+ring
+> socket create ...etc. Without it, we can only guess from the selftest :(
 
-[1]
-[Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
-[Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
-...
-[Mon Feb 10 20:36:11 2025] Call Trace:
-[Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
-[Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
-[Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
-[Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
-[Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
-[Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
-[Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
-[Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
-Note: before this patch, the above calltrace would flood the
-dmesg due to repeated reschedule of release_dw kworker.
+I see your point. After evaluating and comparing those two tests, I
+think the setsock_opt is a better place to go. Do we even apply the
+use of rto min to setsock_opt as well?
 
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
----
-v3
-Link: https://lore.kernel.org/all/20250213052150.18392-1-kerneljasonxing@gmail.com/
-1. remove printing warning even when inflight is negative, or else
-it will cause panic.
+What do you think?
 
-v2
-Link: https://lore.kernel.org/all/20250210130953.26831-1-kerneljasonxing@gmail.com/
-1. add more details in commit message.
-2. allow printing once when the inflight is negative.
-3. correct the position where to stop the reschedule.
-Suggested by Mina and Jakub.
----
- net/core/page_pool.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> >
+> >>
+> >>>
+> >>> I will add and copy some words from Eric's patch series :)
+> >>
+> >>
+> >>>>> I am targeting the net-next tree because of recent changes[1] made =
+by
+> >>>>> Eric. It probably hasn't merged into the bpf-next tree.
+> >>>>
+> >>>> There is the bpf-next/net tree. It should have the needed changes.
+> >>>
+> >>> [1] was recently merged in the net-next tree, so the only one branch =
+I
+> >>> can target is net-next.
+> >>>
+> >>> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.=
+git/commit/?id=3Dae9b3c0e79bc
+> >>>
+> >>> Am I missing something?
+> >>
+> >> There is a net branch:
+>                ^^^
+>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
+> >
+> > But this branch hasn't included the rto max feature. I was trying to
+>
+> Which branch? I was talking about the **net** branch. Not the master bran=
+ch. Try
+> to pull again if your local copy does not have it. The net branch should =
+have
+> the TCP_RTO_MAX_MS patches.
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 1c6fec08bc43..acef1fcd8ddc 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1112,7 +1112,13 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	int inflight;
- 
- 	inflight = page_pool_release(pool);
--	if (!inflight)
-+	/* In rare cases, a driver bug may cause inflight to go negative.
-+	 * Don't reschedule release if inflight is 0 or negative.
-+	 * - If 0, the page_pool has been destroyed
-+	 * - if negative, we will never recover
-+	 * in both cases no reschedule is necessary.
-+	 */
-+	if (inflight <= 0)
- 		return;
- 
- 	/* Periodic warning for page pools the user can't see */
--- 
-2.43.5
+Oh, I always use the master branch, never heard of net branch. You're
+right, I checked out the net branch and then found it. Thanks.
 
+One more thing I have to ask in advance is that in this case what the
+title looks like? [patch bpf] or [patch bpf net]?
+
+Thanks,
+Jason
+
+>
+> > say that what I wrote is based on the rto max feature which only
+> > exists in the net-next tree for now.
+> >
+>
+>
 
