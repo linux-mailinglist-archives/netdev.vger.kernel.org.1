@@ -1,186 +1,175 @@
-Return-Path: <netdev+bounces-166388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6A9A35D3E
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:02:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BBA35D5B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:17:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F9A16463E
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:01:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8C70188D5D9
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF96221DA0;
-	Fri, 14 Feb 2025 12:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A488263C9C;
+	Fri, 14 Feb 2025 12:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dQMYfg+a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7N/9TGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8C61DD9AC;
-	Fri, 14 Feb 2025 12:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C8A26137F
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739534512; cv=none; b=JhXx9u2CNB8NkQ2Js9hpg3nTOArd1ALCK9+RRH64XA6XZek25/CXJvUP+nWxOJmBLOxRKgx6kG0s7m87iSBAZl/tQ6kOJ55teNZ3HP779dNstM2DCZ8aR6khBS1RQBNKS8VGNSIlhPcZhBAGVJJ86WLq3kXqbAI8xIK6OSudUYI=
+	t=1739535454; cv=none; b=RZqRsS/9MnMohYpy7sNVcO8C/LhoWPGxvX+Z3McMIWVCnd2D5yEwPWzAlGLUP+L5SJoDrYH/Chns9VMZgJ4QMSIzAvDZGLc7H9TN36fPOR8itv3MvD6jJnTat8cgZ1lKWKhv0hztyqT1b6qPYka7mFm0NhUOQQhsM+2nzicTGA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739534512; c=relaxed/simple;
-	bh=DR3a5kaxmwquSiJaBB+sD41Zavc+e5mAl/XGzBrb9n0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoBnIeVaejnST8HaXZ/v7qNSQYsnuBD+iNBaoFHu3/YH9PCuaiecx9xl4kk+gvfcfr2MERsSSaS5JJvytZv7papY/R7WxeuZIOHH5b8B33Wd2nTTCTGXaUHpIYyCcgIbCLucG+7gNdwREfDO8/fGICoZX/sz6oMoZIFL5nxudd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dQMYfg+a; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51E7X8Kf026777;
-	Fri, 14 Feb 2025 12:01:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=0wYMri5wD3qO+8RYb9X5OlgQi1LR+c2TdfqU6pruF
-	Ow=; b=dQMYfg+auBWgLje8tdQMIvlMkzosgNnV1vB1QrQwGYfCA5hNa5Fy2zAAL
-	9IbbkH6Iot5ZWrdRzcVEnpKWvfc3XA+KE9OGXNWzGWyOKBIe5eJkNcQM+viALaDN
-	DiJFevlUr0i0oZGXGBHyW3h2kKzyPC3aHFMVWZiDBT4nrf72fe+ugozxffhkYObz
-	0ZZi9ibjzM0RZWnOMk9FA4L4OlDQyS6/kus6vEalfVinC150tYb6FrcK+eWnGSRR
-	CG+pCG0evsCPN0/euPqkhb05iP/MSGqGMMPbWuXr8R9OHMPlplhkkgbAL8RRtcpE
-	fLmfSXkhs2PwDdIPX0j4SLCgl9E7A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44t1hps5mf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 12:01:43 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51EC1gHA028570;
-	Fri, 14 Feb 2025 12:01:42 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44t1hps5mb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 12:01:42 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51EBeZ6n001355;
-	Fri, 14 Feb 2025 12:01:42 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjknkdsf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 12:01:42 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51EC1crE55443818
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Feb 2025 12:01:38 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A11520043;
-	Fri, 14 Feb 2025 12:01:38 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1723120040;
-	Fri, 14 Feb 2025 12:01:38 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 14 Feb 2025 12:01:38 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id C1781E0E8A; Fri, 14 Feb 2025 13:01:37 +0100 (CET)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Julian Ruess <julianr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>
-Subject: [PATCH net] s390/ism: add release function for struct device
-Date: Fri, 14 Feb 2025 13:01:37 +0100
-Message-ID: <20250214120137.563409-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1739535454; c=relaxed/simple;
+	bh=508bg14U3UMJ8jdr3pX2AL6akRM/QyTn1EwYOGL0phw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=clpOlMvOjjMB+ddGNyTh87l8f/kn2RMvhhwzqoKIf4NJbo/ShDchTyUzqq28ZL+FzkAvibbCQlQN1dA0UfBOBT3yJvLiHOeiemH6FCE7HHGYoJoUopquG1kkOgzID+ta45WIFtrJlbRgfpzn6Aybn3YY2fwpzI9AkISWhImEgp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7N/9TGo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739535451;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
+	b=J7N/9TGovXCge1ko/0xLQVccvL2XxhtJ1uUVxvQ7FI/oWVJLZfO4MnOjNNP119rIdfgkDD
+	TLI7Iw5ExEyybxgy8YFlNCSAILmlzeXbpXRSwVAfp62eNNFpLfOK1bti6p//jUC2jlj5Yq
+	SDxdcjnhaEDUyuK7YVdZKDLBM/wLhQw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-1jkhPBu5O4iIe3gSEmKdow-1; Fri, 14 Feb 2025 07:17:29 -0500
+X-MC-Unique: 1jkhPBu5O4iIe3gSEmKdow-1
+X-Mimecast-MFC-AGG-ID: 1jkhPBu5O4iIe3gSEmKdow_1739535449
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ab7ee92898fso227441266b.0
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 04:17:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739535448; x=1740140248;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
+        b=rWFZoF6GLkK4y0OoUmKppMhgpcsO0TNytWtlteEE5B2vAm8dIj/5tufw05DMCC+7ts
+         DQopUNcw0skTFLdcxuBnhpKyiNJA5Bt3pk5PcMuoOiBJah+7ZBA5oXLQ1m+f0DjbxWMe
+         5rWit2TSkXYc6mXjT9Ys4SxdT3o6kMHMxN8i/8pCA5w0++GOBXrf1NrZa1jlrlCdRj/+
+         OCW+i0e9ko08tH9fvoSGlmt72iAy0xHhNRFTQdUhU5/RnBQfPLspXyuu3tjIAedB3UaF
+         aRaEHZPuGHcwemFIU+kJdzxvkLYRfl0rpnoa1/zQuDZLxIdws4KeUgSqkQShzT6yxSU+
+         p1Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVr6fGO5TGGAeOb+1X3zulBPSxXxB2cB2LfTAwHPIRZPZKjTvjJbaDYF5+s9y7rCqmPB/KHMEQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxM8w78LCRPn65WoJsZjrMX9LYZbnKPA8MtcgwDv9ll/egozE/
+	BEHmwOVT9tXbTksYgbcaAvVeMMp3cjQItia0K2sk2kEnNCemTIP1H9DdExAdEWkUWymkREIj420
+	66npO8YaGRRIv/2i/PDMiKs/2ln7Hy5UyfDvncdOd+noGkFM6b17MiA==
+X-Gm-Gg: ASbGncs8HlS0C/deA/A34ztuxjOY7Njvsp41obXthWzUW0l2XY9e+PumPXiWimgN2Vm
+	aUr3tlziLh066acYpVWdUGcqbn/ncXjtKRHbCsUw1GrHtlYjG7K8wonwTp6fRCibJyVDnjwuWAc
+	t/NXbtShxdoKA94n49jn58TDofE2A4hRewaesL2vog7UUpU5lWD5HBunW4eDAtcFMg9JE1d2jtv
+	weiJY1e/AJCXvq5nmNymVeWLohEmnqxCgG0i9bgP0oIUg5Lq3dsRb9jOkHD7D/+VsU/Rg==
+X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198347466b.40.1739535448550;
+        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGPf+AeSUeRn24l529Z9ZendqwqQDqP06Hke8qwzwFNKUt9IcGq+7DW+H44R0X87YfMunCk/g==
+X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198344266b.40.1739535448190;
+        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
+Received: from redhat.com ([2.55.187.107])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba5323226asm334107966b.8.2025.02.14.04.17.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 04:17:26 -0800 (PST)
+Date: Fri, 14 Feb 2025 07:17:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Junnan Wu <junnan01.wu@samsung.com>
+Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
+	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com,
+	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+	ying01.gao@samsung.com, ying123.xu@samsung.com
+Subject: Re: [Patch net v3] vsock/virtio: fix variables initialization during
+ resuming
+Message-ID: <20250214071714-mutt-send-email-mst@kernel.org>
+References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
+ <CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
+ <20250214012200.1883896-1-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: wxKR11nYCWu0DR48hHku32rcGeGCob16
-X-Proofpoint-GUID: DvEupEL37fO0OD6qxSZPPOzVq6CfMLmB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_04,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 phishscore=0 spamscore=0
- mlxlogscore=967 mlxscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502140084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250214012200.1883896-1-junnan01.wu@samsung.com>
 
-From: Julian Ruess <julianr@linux.ibm.com>
+On Fri, Feb 14, 2025 at 09:22:00AM +0800, Junnan Wu wrote:
+> When executing suspend to ram twice in a row,
+> the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
+> Then after virtqueue_get_buf and `rx_buf_nr` decreased
+> in function virtio_transport_rx_work,
+> the condition to fill rx buffer
+> (rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+> 
+> It is because that `rx_buf_nr` and `rx_buf_max_nr`
+> are initialized only in virtio_vsock_probe(),
+> but they should be reset whenever virtqueues are recreated,
+> like after a suspend/resume.
+> 
+> Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+> virtio_vsock_vqs_init(), so we are sure that they are properly
+> initialized, every time we initialize the virtqueues, either when we
+> load the driver or after a suspend/resume.
+> 
+> To prevent erroneous atomic load operations on the `queued_replies`
+> in the virtio_transport_send_pkt_work() function
+> which may disrupt the scheduling of vsock->rx_work
+> when transmitting reply-required socket packets,
+> this atomic variable must undergo synchronized initialization
+> alongside the preceding two variables after a suspend/resume.
+> 
+> Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+> Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
+> Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+> Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+> Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
 
-According to device_release() in /drivers/base/core.c,
-a device without a release function is a broken device
-and must be fixed.
 
-The current code directly frees the device after calling device_add()
-without waiting for other kernel parts to release their references.
-Thus, a reference could still be held to a struct device,
-e.g., by sysfs, leading to potential use-after-free
-issues if a proper release function is not set.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Fixes: 8c81ba20349d ("net/smc: De-tangle ism and smc device initialization")
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Signed-off-by: Julian Ruess <julianr@linux.ibm.com>
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
----
- drivers/s390/net/ism_drv.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index e36e3ea165d3..2f34761e6413 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -588,6 +588,15 @@ static int ism_dev_init(struct ism_dev *ism)
- 	return ret;
- }
- 
-+static void ism_dev_release(struct device *dev)
-+{
-+	struct ism_dev *ism;
-+
-+	ism = container_of(dev, struct ism_dev, dev);
-+
-+	kfree(ism);
-+}
-+
- static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct ism_dev *ism;
-@@ -601,6 +610,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	dev_set_drvdata(&pdev->dev, ism);
- 	ism->pdev = pdev;
- 	ism->dev.parent = &pdev->dev;
-+	ism->dev.release = ism_dev_release;
- 	device_initialize(&ism->dev);
- 	dev_set_name(&ism->dev, dev_name(&pdev->dev));
- 	ret = device_add(&ism->dev);
-@@ -637,7 +647,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	device_del(&ism->dev);
- err_dev:
- 	dev_set_drvdata(&pdev->dev, NULL);
--	kfree(ism);
-+	put_device(&ism->dev);
- 
- 	return ret;
- }
-@@ -682,7 +692,7 @@ static void ism_remove(struct pci_dev *pdev)
- 	pci_disable_device(pdev);
- 	device_del(&ism->dev);
- 	dev_set_drvdata(&pdev->dev, NULL);
--	kfree(ism);
-+	put_device(&ism->dev);
- }
- 
- static struct pci_driver ism_driver = {
--- 
-2.45.2
+> ---
+>  net/vmw_vsock/virtio_transport.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index b58c3818f284..f0e48e6911fc 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>  	};
+>  	int ret;
+>  
+> +	mutex_lock(&vsock->rx_lock);
+> +	vsock->rx_buf_nr = 0;
+> +	vsock->rx_buf_max_nr = 0;
+> +	mutex_unlock(&vsock->rx_lock);
+> +
+> +	atomic_set(&vsock->queued_replies, 0);
+> +
+>  	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+>  	if (ret < 0)
+>  		return ret;
+> @@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>  
+>  	vsock->vdev = vdev;
+>  
+> -	vsock->rx_buf_nr = 0;
+> -	vsock->rx_buf_max_nr = 0;
+> -	atomic_set(&vsock->queued_replies, 0);
+>  
+>  	mutex_init(&vsock->tx_lock);
+>  	mutex_init(&vsock->rx_lock);
+> -- 
+> 2.34.1
 
 
