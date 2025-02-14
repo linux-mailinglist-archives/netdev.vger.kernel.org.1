@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-166437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C96A35FF2
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:14:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBEE1A35FF9
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:15:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76CF216B938
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 399B91891BD6
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02389265CCE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F766265CDB;
 	Fri, 14 Feb 2025 14:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="adb5Ho2Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8Rji59G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AD125A35E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9173265CB8;
 	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739542466; cv=none; b=u2RKX2RYgF52MaGuaTyb3Ez3qIXS8f4h/ss9PeDPTi31ErqyBZlRRMx1MMu0AomqUzEz1tyVIDm8O47JbskjaNb2QLLzkEOhZyZ57jJLiknmLk37Zw/4QM2PA7es3xb44zkQ28C0TOhMHELaTDzzeWRqE1v8HSdgjmExaRWZ3IY=
+	t=1739542466; cv=none; b=aQZta+HEkcX9F5dC3NlCdpK9RxxOwB3jGRB6EJ8H0Yk6k02ZQEiPpiJdNGdNILfGUX9/mZUBWX2Kp2/38GOvj3mhFjUuJZr5sPKOzoHJAurT/IWH9TePfggIvOS67JjhoYvTLRFXUpVSj9kG+DXwcwkt+1JufBMJFLEvzbvHcM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739542466; c=relaxed/simple;
-	bh=4hda1p+a5q+D3wxkdOPEhpRLy2WV8wre68Pgg03Lmzk=;
+	bh=OoAMzDnzmRmO0ZesIeeusKyjpaxqRVifD0eRg6O/C+c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DARxSS27gqxi4wReIUi4d5iy/k0HJSDNayUj47uq3aTXjdAUdWfNagnyaWGpW4MBbQaX829hQQVVlHVvmjhC+O2CbxBhE54df9wdhQ2MdsBxWDhM0gCd+fXZiUapzUgmmdRq2tkviu7AfG6KdTnkbcF4fKd+31TSEzgBXvejKLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=adb5Ho2Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 66DBEC4CEDF;
+	 In-Reply-To:To:Cc; b=edPFYNZU34Q8JICrlVapOm5oGNk1U1k7Nty6t0myCTacMCx6HcwFq8DI166ZwUYplrr5O4oJX75ijiCFU9/UTd8YYUD8KcaXoh0uAVsmJOMzORJnC+zQr1k8rzuw6MmnEyNK4X0vwbsbRRvPArrWZQfLtcb25OQ9nDJNfIrs+/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D8Rji59G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6DDCFC4AF0B;
 	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739542466;
-	bh=4hda1p+a5q+D3wxkdOPEhpRLy2WV8wre68Pgg03Lmzk=;
+	bh=OoAMzDnzmRmO0ZesIeeusKyjpaxqRVifD0eRg6O/C+c=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=adb5Ho2YMrFyefbykaKTUNuDL4tohprIlgC5svMStCZSPIdEC8YN0BpshqRGjohlA
-	 LWcDafU6GvWJNl1S2CBas6uoURB2N+vTWWDJr+LPviiMtF2KMm2Vw3wvvfqs5cUWZH
-	 p8oJNF07/ev2WMdmMci/5yecQMg9UL9pM3gngTzgHeF7QYvnrPHIW7NcLxHaWa83IW
-	 WoCfsdO7ed2JFJiniyhOhgd99za6kh6PL2NLILjXbh0ysoZq7Ac/DAccOK9enSC7dZ
-	 +6OrjzTS+glP2TuKH6mCdzcNgWPq0sADf5lVN5zj3rybgz5P+uDoo2oKfcYUmX87Xd
-	 eaoN9Po1YtXDw==
+	b=D8Rji59GwdedTpdUmGp6He/h286f64F3hQqtpN8Tr7rowSLJm9cFSzyQNjl+g1y8I
+	 2NH6wVSbnbi/66htdR5vROdEYB17JAapQ3RutH+c+hysbRNJtomnT74+W4YbKtziIZ
+	 wuDmFaYhf5z5yQ0y0Qpl+HDPp2oV9kxqe0ph9nexJv0DU69zufANnyQtJ/uyvnz0Cd
+	 F24lM7JEoxxoTV73yILd3+6emiz13umCF6yycSDcWOr4jZ1LMXAp3PHBeVSUwOv8Kf
+	 /vyZH/xZUz51T3I2JgT58bGT1sgwIdST4afzhKy0ruMQyUCogDxvsedH39DUpvOSSu
+	 w1lKJpdseG7XQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D84C021A7;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B97C021A9;
 	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
 From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Fri, 14 Feb 2025 15:14:10 +0100
-Subject: [PATCH net-next v5 2/3] net: phy: Add helper for getting tx
- amplitude gain
+Date: Fri, 14 Feb 2025 15:14:11 +0100
+Subject: [PATCH net-next v5 3/3] net: phy: dp83822: Add support for
+ changing the transmit amplitude voltage
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250214-dp83822-tx-swing-v5-2-02ca72620599@liebherr.com>
+Message-Id: <20250214-dp83822-tx-swing-v5-3-02ca72620599@liebherr.com>
 References: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
 In-Reply-To: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -71,11 +71,11 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
  Dimitri Fedrau <dima.fedrau@gmail.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739542465; l=4484;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1739542465; l=3488;
  i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=dj7XjLsD1vcv58mbznpKHLLZxlHxYB7Mj8UF6IH59YQ=;
- b=Aejaq9OY2Odwpc2y8jo8Bh7r8uRC4Z4WNGMWvnnFLn2N7YGbSvNaZMntwtqhsN3Gwa52ckmIq
- wjNFtQaTu9uDJUQL4DQ+87NYB1DPVM7rf1x6TKgp9mCEzSPHyZ1/ZrF
+ bh=Or6PDXKPMq4kk1AHxpqPQpxSNSkTyzooFMkd9jkPUKk=;
+ b=WVZP1AGB+0WKyM2keetZIyKR2MJ5QQffba06je+G7obuCNMafoggYpuEJfP6BkMf7viovLvSl
+ Bz2qj6R74dWBe3FDQ3ZIy6c5+QDQRXv06FQkJPJYoGrIzEU7BT6jGGV
 X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
  pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
 X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
@@ -85,127 +85,105 @@ Reply-To: dimitri.fedrau@liebherr.com
 
 From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 
-Add helper which returns the tx amplitude gain defined in device tree.
+Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
 Modifying it can be necessary to compensate losses on the PCB and
 connector, so the voltages measured on the RJ45 pins are conforming.
 
 Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 ---
- drivers/net/phy/phy_device.c | 53 +++++++++++++++++++++++++++++---------------
- include/linux/phy.h          |  4 ++++
- 2 files changed, 39 insertions(+), 18 deletions(-)
+ drivers/net/phy/dp83822.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 9b06ba92f2ed207ec1e254ad3d1c8111933f4181..4223742e3b0c16d782f790c2fcf9e7dbdd32ba2d 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3096,19 +3096,12 @@ void phy_get_pause(struct phy_device *phydev, bool *tx_pause, bool *rx_pause)
- EXPORT_SYMBOL(phy_get_pause);
+diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+index 6599feca1967d705331d6e354205a2485ea962f2..3662f3905d5ade8ad933608fcaeabb714a588418 100644
+--- a/drivers/net/phy/dp83822.c
++++ b/drivers/net/phy/dp83822.c
+@@ -31,6 +31,7 @@
+ #define MII_DP83822_RCSR	0x17
+ #define MII_DP83822_RESET_CTRL	0x1f
+ #define MII_DP83822_MLEDCR	0x25
++#define MII_DP83822_LDCTRL	0x403
+ #define MII_DP83822_LEDCFG1	0x460
+ #define MII_DP83822_IOCTRL1	0x462
+ #define MII_DP83822_IOCTRL2	0x463
+@@ -123,6 +124,9 @@
+ #define DP83822_IOCTRL1_GPIO1_CTRL		GENMASK(2, 0)
+ #define DP83822_IOCTRL1_GPIO1_CTRL_LED_1	BIT(0)
  
- #if IS_ENABLED(CONFIG_OF_MDIO)
--static int phy_get_int_delay_property(struct device *dev, const char *name)
-+static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
- {
--	s32 int_delay;
--	int ret;
--
--	ret = device_property_read_u32(dev, name, &int_delay);
--	if (ret)
--		return ret;
--
--	return int_delay;
-+	return device_property_read_u32(dev, name, val);
++/* LDCTRL bits */
++#define DP83822_100BASE_TX_LINE_DRIVER_SWING	GENMASK(7, 4)
++
+ /* IOCTRL2 bits */
+ #define DP83822_IOCTRL2_GPIO2_CLK_SRC		GENMASK(6, 4)
+ #define DP83822_IOCTRL2_GPIO2_CTRL		GENMASK(2, 0)
+@@ -197,6 +201,7 @@ struct dp83822_private {
+ 	bool set_gpio2_clk_out;
+ 	u32 gpio2_clk_out;
+ 	bool led_pin_enable[DP83822_MAX_LED_PINS];
++	int tx_amplitude_100base_tx_index;
+ };
+ 
+ static int dp83822_config_wol(struct phy_device *phydev,
+@@ -522,6 +527,12 @@ static int dp83822_config_init(struct phy_device *phydev)
+ 			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CLK_SRC,
+ 					  dp83822->gpio2_clk_out));
+ 
++	if (dp83822->tx_amplitude_100base_tx_index >= 0)
++		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_LDCTRL,
++			       DP83822_100BASE_TX_LINE_DRIVER_SWING,
++			       FIELD_PREP(DP83822_100BASE_TX_LINE_DRIVER_SWING,
++					  dp83822->tx_amplitude_100base_tx_index));
++
+ 	err = dp83822_config_init_leds(phydev);
+ 	if (err)
+ 		return err;
+@@ -720,6 +731,11 @@ static int dp83822_phy_reset(struct phy_device *phydev)
  }
- #else
--static int phy_get_int_delay_property(struct device *dev, const char *name)
-+static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
+ 
+ #ifdef CONFIG_OF_MDIO
++static const u32 tx_amplitude_100base_tx_gain[] = {
++	80, 82, 83, 85, 87, 88, 90, 92,
++	93, 95, 97, 98, 100, 102, 103, 105,
++};
++
+ static int dp83822_of_init_leds(struct phy_device *phydev)
  {
- 	return -EINVAL;
- }
-@@ -3133,12 +3126,12 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
- s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
- 			   const int *delay_values, int size, bool is_rx)
- {
--	s32 delay;
--	int i;
+ 	struct device_node *node = phydev->mdio.dev.of_node;
+@@ -780,6 +796,8 @@ static int dp83822_of_init(struct phy_device *phydev)
+ 	struct dp83822_private *dp83822 = phydev->priv;
+ 	struct device *dev = &phydev->mdio.dev;
+ 	const char *of_val;
 +	int i, ret;
-+	u32 delay;
++	u32 val;
  
- 	if (is_rx) {
--		delay = phy_get_int_delay_property(dev, "rx-internal-delay-ps");
--		if (delay < 0 && size == 0) {
-+		ret = phy_get_u32_property(dev, "rx-internal-delay-ps", &delay);
-+		if (ret < 0 && size == 0) {
- 			if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
- 			    phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID)
- 				return 1;
-@@ -3147,8 +3140,8 @@ s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
- 		}
- 
- 	} else {
--		delay = phy_get_int_delay_property(dev, "tx-internal-delay-ps");
--		if (delay < 0 && size == 0) {
-+		ret = phy_get_u32_property(dev, "tx-internal-delay-ps", &delay);
-+		if (ret < 0 && size == 0) {
- 			if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
- 			    phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID)
- 				return 1;
-@@ -3157,8 +3150,8 @@ s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
- 		}
+ 	/* Signal detection for the PHY is only enabled if the FX_EN and the
+ 	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
+@@ -815,6 +833,26 @@ static int dp83822_of_init(struct phy_device *phydev)
+ 		dp83822->set_gpio2_clk_out = true;
  	}
  
--	if (delay < 0)
--		return delay;
-+	if (ret < 0)
-+		return ret;
- 
- 	if (size == 0)
- 		return delay;
-@@ -3193,6 +3186,30 @@ s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
- }
- EXPORT_SYMBOL(phy_get_internal_delay);
- 
-+/**
-+ * phy_get_tx_amplitude_gain - stores tx amplitude gain in @val
-+ * @phydev: phy_device struct
-+ * @dev: pointer to the devices device struct
-+ * @linkmode: linkmode for which the tx amplitude gain should be retrieved
-+ * @val: tx amplitude gain
-+ *
-+ * Returns: 0 on success, < 0 on failure
-+ */
-+int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
-+			      enum ethtool_link_mode_bit_indices linkmode,
-+			      u32 *val)
-+{
-+	switch (linkmode) {
-+	case ETHTOOL_LINK_MODE_100baseT_Full_BIT:
-+		return phy_get_u32_property(dev,
-+					    "tx-amplitude-100base-tx-percent",
-+					    val);
-+	default:
-+		return -EINVAL;
++	dp83822->tx_amplitude_100base_tx_index = -1;
++	ret = phy_get_tx_amplitude_gain(phydev, dev,
++					ETHTOOL_LINK_MODE_100baseT_Full_BIT,
++					&val);
++	if (!ret) {
++		for (i = 0; i < ARRAY_SIZE(tx_amplitude_100base_tx_gain); i++) {
++			if (tx_amplitude_100base_tx_gain[i] == val) {
++				dp83822->tx_amplitude_100base_tx_index = i;
++				break;
++			}
++		}
++
++		if (dp83822->tx_amplitude_100base_tx_index < 0) {
++			phydev_err(phydev,
++				   "Invalid value for tx-amplitude-100base-tx-percent property (%u)\n",
++				   val);
++			return -EINVAL;
++		}
 +	}
-+}
-+EXPORT_SYMBOL_GPL(phy_get_tx_amplitude_gain);
 +
- static int phy_led_set_brightness(struct led_classdev *led_cdev,
- 				  enum led_brightness value)
- {
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 64982eba71d1eab504307cc83b9c5bbe6886ed29..ffd0eb7f7425ba3dfebbeb966c1fd83783586e08 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2124,6 +2124,10 @@ void phy_get_pause(struct phy_device *phydev, bool *tx_pause, bool *rx_pause);
- s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
- 			   const int *delay_values, int size, bool is_rx);
- 
-+int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
-+			      enum ethtool_link_mode_bit_indices linkmode,
-+			      u32 *val);
-+
- void phy_resolve_pause(unsigned long *local_adv, unsigned long *partner_adv,
- 		       bool *tx_pause, bool *rx_pause);
+ 	return dp83822_of_init_leds(phydev);
+ }
  
 
 -- 
