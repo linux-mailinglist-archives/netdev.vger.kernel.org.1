@@ -1,184 +1,235 @@
-Return-Path: <netdev+bounces-166290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB040A355DC
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:50:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78748A355F9
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:58:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8061890C39
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:50:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65A1E18927F3
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C0715442D;
-	Fri, 14 Feb 2025 04:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90FCD18B48B;
+	Fri, 14 Feb 2025 04:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JorwI9bI"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="OCSJZ3NG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6972142AAF;
-	Fri, 14 Feb 2025 04:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537B4178CC8
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 04:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739508619; cv=none; b=gMmbRtVXkfuS41WCQpjm8ZXUBaLMZxiOaUICtHW5+IlHiubpOORZaW3z+i5nxlcv+7u1S/skgp1yat91Ge17tx/FuJ7QqvkOMC/dSztTaxRA7h3WqyjDMT0vV+gnCL7ytfC7gK9wMoIgA2zrGOMqOHVwNCSWKitC4w3dyix1GC0=
+	t=1739508883; cv=none; b=Ma1NivULX5FE3EEUDy2SeRax1mUuHUAeAKynCFn2XEe2QnOAQx8uqc35HfXVhRQa3rfii9vBOdKOeGQaMqU4RNlYvNLg+k9Ae9NDZ0roVWflt0QeeFifH36hp8dsmNjJcfJKcy8BsmmnIk847WrpkTybUelbh5Rl5unccxox3aI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739508619; c=relaxed/simple;
-	bh=gPVj4mO6xQJrCt3sZYWJNbH9C8SimtbKXR7wY1fjf90=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SfltRmKOiw5sz1HQg9km8aSfBgAe1dSK7bCqmvFVg+2PxTYBA+eJNZF0pUSrQmArkxneJ7jZpcSdZhU3z18eEevM2GUWkgujQcs2Yx5fCqpsx7j1lTyS1KxtoI1+j3KXEZa4H4inpHSpDWCGwdKWvbZ2TltB+b+OboBZt5KuLyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JorwI9bI; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739508618; x=1771044618;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=gPVj4mO6xQJrCt3sZYWJNbH9C8SimtbKXR7wY1fjf90=;
-  b=JorwI9bIUscB+rO2CNT6mhd6Aej2x39pdqMJ4kV/Svc0iULJQFsnsrRa
-   Mj51M5DpENNxBU3lHUXBBEOTQDiaBBY0GnS1wl2kvrx9akq1jeyV0UlM8
-   o+VRAtN/moCQTNt+Bi/pvCoN3JTKnPyYrBqiSQrkJgpfmbPb6OEPk6PB4
-   kF7g8s057LUA3Kw+vXNJP1mys2Y+DJXn4FjVndzs5wMKYerNqTKN6IMkI
-   5QbzxYSHBbpQMIntK2H3rL+SKs91L7JQ1xLbanLAgeXDCGvqchEKPGQ6x
-   B2ED/Ii7sTOcmx6yRdck7j6ukRXknGaXIVtDTEoQT4bMMwwPc+FUZK+Yo
-   w==;
-X-CSE-ConnectionGUID: u7AS2e6uShGQvvfrlgPHgA==
-X-CSE-MsgGUID: 65PyX/SOR6CSShPK05QAYQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40361826"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="40361826"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 20:50:15 -0800
-X-CSE-ConnectionGUID: 2b+fgtn9Q7+FDC4KwavSPQ==
-X-CSE-MsgGUID: wezvzmt3Tm6HcUS0QIfqlQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,284,1732608000"; 
-   d="scan'208";a="113096903"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.123.6]) ([10.247.123.6])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 20:50:07 -0800
-Message-ID: <e5c5d7ed-9f47-4af1-aee4-4632099bd546@linux.intel.com>
-Date: Fri, 14 Feb 2025 12:50:04 +0800
+	s=arc-20240116; t=1739508883; c=relaxed/simple;
+	bh=uPPLgQvQK/TdggX1MdEKB3Bu/5qR/0/dajFZVSJMm8U=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:Message-ID:MIME-Version:
+	 Content-Type:References; b=CsTOib4pZXGLA4hGh1imM/GJ75Jy11yH57G75dKY+bQzdcpHLb0UYru7KNe+KoE/Cg4kk43twck9Q7Ng2cv68a7K9tgkN5MHUVtoNJdjkO1zk5wTgU0K/WxoKzYnf+XaXTRnoQ0Jk7JDXfMf7GMq7VFloFBB6wRB92rLzDrQXbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=OCSJZ3NG; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250214045438epoutp04280c5d7ac9ac42beba13b1f26b38c5c1~j_hvjb5V-0111801118epoutp04-
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 04:54:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250214045438epoutp04280c5d7ac9ac42beba13b1f26b38c5c1~j_hvjb5V-0111801118epoutp04-
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1739508878;
+	bh=GFJe4qALkeQEhys3xW/L0dietQst9PmodQmHtovFhEA=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=OCSJZ3NGxdDlcKb32darMlmiZ9woTMMT0+iKvYj9+6VOgcr23M/cPHMpDXwV7R90r
+	 Hj0yIWN7mJrwtZb2aCdAFsucsVLf0WfdJUylOlj7nLVHW6RE8pIIglbtzrZM9f9VOn
+	 yYh275MWgLFb8JTa9dkuTKY34fit/TYk7wIISdww=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250214045438epcas5p40ed000ae5a1d8c794f122852605f60e7~j_hu587St1722717227epcas5p4t;
+	Fri, 14 Feb 2025 04:54:38 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.182]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4YvKTm1MtZz4x9Px; Fri, 14 Feb
+	2025 04:54:36 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	43.3F.19710.C8CCEA76; Fri, 14 Feb 2025 13:54:36 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250214045402epcas5p3396c5963c8764122bd0ea8e6def478bd~j_hNb8N6R1547315473epcas5p3p;
+	Fri, 14 Feb 2025 04:54:02 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250214045402epsmtrp17cf0464ecfc999f324a0bf7b16616463~j_hNaQEVX3205132051epsmtrp1b;
+	Fri, 14 Feb 2025 04:54:02 +0000 (GMT)
+X-AuditID: b6c32a44-36bdd70000004cfe-19-67aecc8cc583
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	2F.57.18949.96CCEA76; Fri, 14 Feb 2025 13:54:02 +0900 (KST)
+Received: from FDSFTE596 (unknown [107.122.82.131]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250214045359epsmtip1b27101d3b6fca803c4f2c4f69c76a4e4~j_hK_pWn-1563615636epsmtip1K;
+	Fri, 14 Feb 2025 04:53:59 +0000 (GMT)
+From: "Swathi K S" <swathi.ks@samsung.com>
+To: "'Krzysztof Kozlowski'" <krzk@kernel.org>
+Cc: <krzk+dt@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<robh@kernel.org>, <conor+dt@kernel.org>, <richardcochran@gmail.com>,
+	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<rmk+kernel@armlinux.org.uk>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+In-Reply-To: <27b0f5c5-ae51-4192-8847-20e471c55be7@kernel.org>
+Subject: RE: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Date: Fri, 14 Feb 2025 10:23:49 +0530
+Message-ID: <00ad01db7e9c$76c288a0$644799e0$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
- feature in IGC
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Serge Semin <fancer.lancer@gmail.com>,
- Xiaolei Wang <xiaolei.wang@windriver.com>,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
- Jesper Nilsson <jesper.nilsson@axis.com>,
- Andrew Halaney <ahalaney@redhat.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
-References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
- <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
- <20250212220121.ici3qll66pfoov62@skbuf>
- <b19357dc-590d-458c-9646-ee5993916044@linux.intel.com>
- <87cyfmnjdh.fsf@kurt.kurt.home>
- <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
- <20250213130003.nxt2ev47a6ppqzrq@skbuf>
- <1c981aa1-e796-4c53-9853-3eae517f2f6d@linux.intel.com>
- <877c5undbg.fsf@kurt.kurt.home> <20250213184613.cqc2zhj2wkaf5hn7@skbuf>
- <87v7td3bi1.fsf@kurt.kurt.home>
- <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQFMfZy5LnHh86L+CikZ+hKlrx3PbgHP/Q5uAh59lGQBgzSo3AGBIR3uAawmoOC0H0U3EA==
+Content-Language: en-in
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNJsWRmVeSWpSXmKPExsWy7bCmlm7PmXXpBjtOslv8fDmN0WL5gx2s
+	Fmv2nmOymHO+hcVi/pFzrBZPjz1it3g56x6bxfnzG9gtLmzrY7XY9Pgaq8XlXXPYLLquPWG1
+	mPd3LavFsQViFt9Ov2G0OHLmBbPFpf6JTBb/9+xgdxDyuHztIrPHlpU3mTye9m9l99g56y67
+	x4JNpR6bVnWyeWxeUu+xc8dnJo/3+66yeRzcZ+jxeZNcAHdUtk1GamJKapFCal5yfkpmXrqt
+	kndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0F9KCmWJOaVAoYDE4mIlfTubovzSklSF
+	jPziElul1IKUnAKTAr3ixNzi0rx0vbzUEitDAwMjU6DChOyMN18+MhaclKzY0v+brYHxmkgX
+	IyeHhICJxJ6Dt9lAbCGB3YwS/58ldTFyAdmfGCVmHzjLBuF8Y5RY/vgjO0xH44puZojEXkaJ
+	e73voKpeMEqsOLoPbBabgJbEor59YB0iAroSm28sZwcpYhZ4wCzRM2MOC0iCU8BOYseW10Cj
+	ODiEBQIl2o7ygYRZBFQlJiw+CFbCK2Apcf3JVShbUOLkzCdgNrOAtsSyhSCtIBcpSPx8uowV
+	ZIyIQJjE9n86ECXiEkd/9oAdKiHQzSlxb+EjqA9cJNbMn8gGYQtLvDq+BSouJfGyvw3KjpdY
+	3QexV0IgQ+LuL5h6e4kDV0DO5wBaoCmxfpc+RFhWYuqpdUwQe/kken8/YYKI80rsmAdjK0v8
+	fX0NaqSkxLal79knMCrNQvLZLCSfzULywiyEbQsYWVYxSqYWFOempyabFhjmpZbD4zs5P3cT
+	IzjVa7nsYLwx/5/eIUYmDsZDjBIczEoivBLT1qQL8aYkVlalFuXHF5XmpBYfYjQFBvdEZinR
+	5HxgtskriTc0sTQwMTMzM7E0NjNUEudt3tmSLiSQnliSmp2aWpBaBNPHxMEp1cAU/uZfacRa
+	9WT51PXLp52tv2pn5cncUau27/4kOamlve8KNfNvyl9o8dzeGNs+2+vUlHPaDtcFszuj1nwN
+	YvNPPpp3P4PN4L7L6tWa753uCpQIuhUneJ+/FXno7Yzqn5P9bJa0qDYZBy14I1nkrS7XxbVa
+	Y7Olwa13a99yXKw/v9y2X5A9dM+S1swqMe22yNm+P5x/tLXqtovNqA3bLVF1tyUwKFtNclnz
+	ze9xrKK63hO+LJuyrdUi6si7I3ucb58LvnEtiy3xndht7YyD0tcVJa99dF8d2ad3xNBYj+Pf
+	jYvNvWfnreW+rzRBper/qph3kdMT3l+ZsmJR5ovzB8JfX1c7evRLnd+FIw/4+ISVWIozEg21
+	mIuKEwGklvbGfgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrCIsWRmVeSWpSXmKPExsWy7bCSnG7WmXXpBl1nGS1+vpzGaLH8wQ5W
+	izV7zzFZzDnfwmIx/8g5Vounxx6xW7ycdY/N4vz5DewWF7b1sVpsenyN1eLyrjlsFl3XnrBa
+	zPu7ltXi2AIxi2+n3zBaHDnzgtniUv9EJov/e3awOwh5XL52kdljy8qbTB5P+7eye+ycdZfd
+	Y8GmUo9NqzrZPDYvqffYueMzk8f7fVfZPA7uM/T4vEkugDuKyyYlNSezLLVI3y6BK+PplVbm
+	gq8SFSe2b2ZrYGwS6WLk5JAQMJFoXNHNDGILCexmlJj4SxciLinxqXkqK4QtLLHy33P2LkYu
+	oJpnjBIr359iAUmwCWhJLOrbxw5iiwjoSmy+sRysiFngC7PE7PuTmSA6zjJJLG1bxQRSxSlg
+	J7Fjy2uwdcIC/hLve0+CdbMIqEpMWHwQbCqvgKXE9SdXoWxBiZMzn4DZzALaEk9vPoWzly2E
+	mCMhoCDx8+kyoFM5gK4Ik9j+TweiRFzi6M8e5gmMwrOQTJqFZNIsJJNmIWlZwMiyilEytaA4
+	Nz232LDAKC+1XK84Mbe4NC9dLzk/dxMjOOK1tHYw7ln1Qe8QIxMH4yFGCQ5mJRFeiWlr0oV4
+	UxIrq1KL8uOLSnNSiw8xSnOwKInzfnvdmyIkkJ5YkpqdmlqQWgSTZeLglGpg0jHubrzP6WGy
+	ntHTZ8qKp/c2TjFfxTVtSqJcbfiJhWqrvxzpel/Q4NJwcU149AT188EGjxbGvPqQGfcrYfrS
+	wsXef5vTGhamsgiZnmKos/7kw9qTWGdZcEbq8t4lWms/zbzVrXB9YvNFw2nJUy8lVlaycO99
+	f0T94intueIXNrjOlfFkO1Ll8kB16o21i96eZz3dXXYg9taMsnQ1kz4NmTjjlD8cPA/sw/i1
+	uq8GGAqEH3x468JCn6vG7EYxXe3nvkuuXvTvknyZ/rSu53cmMMg7Bp+VlIpNaou97l3A1td2
+	/e7OItfYrPYrfjYvbObH8a7N/up4yWy5/uTD/ku/T3x9qEmh8s7x7++TzOetUWIpzkg01GIu
+	Kk4EABZLXqpnAwAA
+X-CMS-MailID: 20250214045402epcas5p3396c5963c8764122bd0ea8e6def478bd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff
+References: <20250213044624.37334-1-swathi.ks@samsung.com>
+	<CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
+	<20250213044624.37334-2-swathi.ks@samsung.com>
+	<20250213-adorable-arboreal-degu-6bdcb8@krzk-bin>
+	<009a01db7e07$132feb60$398fc220$@samsung.com>
+	<27b0f5c5-ae51-4192-8847-20e471c55be7@kernel.org>
 
 
 
-On 14/2/2025 12:20 pm, Abdul Rahim, Faizal wrote:
-> 
-> 
-> On 14/2/2025 3:12 am, Kurt Kanzenbach wrote:
->> On Thu Feb 13 2025, Vladimir Oltean wrote:
->>> So, confusingly to me, it seems like one operating mode is fundamentally
->>> different from the other, and something will have to change if both will
->>> be made to behave the same. What will change? You say mqprio will behave
->>> like taprio, but I think if anything, mqprio is the one which does the
->>> right thing, in igc_tsn_tx_arb(), and taprio seems to use the default Tx
->>> arbitration scheme?
->>
->> Correct. taprio is using the default scheme. mqprio configures it to
->> what ever the user provided (in igc_tsn_tx_arb()).
->>
->>> I don't think I'm on the same page as you guys, because to me, it is
->>> just odd that the P traffic classes would be the first ones with
->>> mqprio, but the last ones with taprio.
->>
->> I think we are on the same page here. At the end both have to behave the
->> same. Either by using igc_tsn_tx_arb() for taprio too or only using the
->> default scheme for both (and thereby keeping broken_mqprio). Whatever
->> Faizal implements I'll match the behavior with mqprio.
->>
-> 
-> Hi Kurt & Vladimir,
-> 
-> After reading Vladimir's reply on tc, hw queue, and socket priority mapping 
-> for both taprio and mqprio, I agree they should follow the same priority 
-> scheme for consistency—both in code and command usage (i.e., taprio, 
-> mqprio, and fpe in both configurations). Since igc_tsn_tx_arb() ensures a 
-> standard mapping of tc, socket priority, and hardware queue priority, I'll 
-> enable taprio to use igc_tsn_tx_arb() in a separate patch submission.
-> 
-> I'll split the changes based on Vladimir's suggestion.
-> 
-> First part - ethtool-mm related:
-> igc: Add support to get frame preemption statistics via ethtool
-> igc: Add support to get MAC Merge data via ethtool
-> igc: Add support to set tx-min-frag-size
-> igc: Add support for frame preemption verification
-> igc: Set the RX packet buffer size for TSN mode
-> igc: Optimize TX packet buffer utilization
-> igc: Rename xdp_get_tx_ring() for non-XDP usage
-> net: ethtool: mm: Extract stmmac verification logic into a common library
-> 
-> Second part:
-> igc: Add support for preemptible traffic class in taprio and mqprio
-> igc: Use igc_tsn_tx_arb() for taprio queue priority scheme
-> igc: Kurt's patch on mqprio to use normal TSN Tx mode
-> 
-> Kurt can keep igc_tsn_tx_arb() for his mqprio patch, so preemptible tc 
-> should work the same for both taprio and mqprio.
-> 
-> I'm suggesting to include Kurt's patch in the second part since there's 
-> some dependency and potential code conflict, even though it mixes different 
-> functional changes in the same series.
+> -----Original Message-----
+> From: Krzysztof Kozlowski <krzk=40kernel.org>
+> Sent: 13 February 2025 17:31
+> To: Swathi K S <swathi.ks=40samsung.com>
+> Cc: krzk+dt=40kernel.org; andrew+netdev=40lunn.ch; davem=40davemloft.net;
+> edumazet=40google.com; kuba=40kernel.org; pabeni=40redhat.com;
+> robh=40kernel.org; conor+dt=40kernel.org; richardcochran=40gmail.com;
+> mcoquelin.stm32=40gmail.com; alexandre.torgue=40foss.st.com;
+> rmk+kernel=40armlinux.org.uk; netdev=40vger.kernel.org;
+> devicetree=40vger.kernel.org; linux-stm32=40st-md-mailman.stormreply.com;
+> linux-arm-kernel=40lists.infradead.org; linux-kernel=40vger.kernel.org
+> Subject: Re: =5BPATCH v6 1/2=5D dt-bindings: net: Add FSD EQoS device tre=
+e
+> bindings
+>=20
+> On 13/02/2025 12:04, Swathi K S wrote:
+> >
+> >
+> >> -----Original Message-----
+> >> From: Krzysztof Kozlowski <krzk=40kernel.org>
+> >> Sent: 13 February 2025 13:24
+> >> To: Swathi K S <swathi.ks=40samsung.com>
+> >> Cc: krzk+dt=40kernel.org; andrew+netdev=40lunn.ch;
+> davem=40davemloft.net;
+> >> edumazet=40google.com; kuba=40kernel.org; pabeni=40redhat.com;
+> >> robh=40kernel.org; conor+dt=40kernel.org; richardcochran=40gmail.com;
+> >> mcoquelin.stm32=40gmail.com; alexandre.torgue=40foss.st.com;
+> >> rmk+kernel=40armlinux.org.uk; netdev=40vger.kernel.org;
+> >> devicetree=40vger.kernel.org; linux-stm32=40st-md-
+> mailman.stormreply.com;
+> >> linux-arm-kernel=40lists.infradead.org; linux-kernel=40vger.kernel.org
+> >> Subject: Re: =5BPATCH v6 1/2=5D dt-bindings: net: Add FSD EQoS device
+> >> tree bindings
+> >>
+> >> On Thu, Feb 13, 2025 at 10:16:23AM +0530, Swathi K S wrote:
+> >>> +  clock-names:
+> >>> +    minItems: 5
+> >>> +    maxItems: 10
+> >>> +    contains:
+> >>> +      enum:
+> >>> +        - ptp_ref
+> >>> +        - master_bus
+> >>> +        - slave_bus
+> >>> +        - tx
+> >>> +        - rx
+> >>> +        - master2_bus
+> >>> +        - slave2_bus
+> >>> +        - eqos_rxclk_mux
+> >>> +        - eqos_phyrxclk
+> >>> +        - dout_peric_rgmii_clk
+> >>
+> >> This does not match the previous entry. It should be strictly ordered
+> >> with
+> >> minItems: 5.
+> >
+> > Hi Krzysztof,
+> > Thanks for reviewing.
+> > In FSD SoC, we have 2 instances of ethernet in two blocks.
+> > One instance needs 5 clocks and the other needs 10 clocks.
+>=20
+> I understand and I do not think this is contradictory to what I asked.
+> If it is, then why/how?
+>=20
+> >
+> > I tried to understand this by looking at some other dt-binding files
+> > as given below, but looks like they follow similar approach
+> > Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+> >
+> > Could you please guide me on how to implement this?
+> > Also, please help me understand what is meant by 'strictly ordered'
+>=20
+> Every other 99% of bindings. Just like your clocks property.
 
-I forgot that the second part patch:
-igc: Add support for preemptible traffic class in taprio and mqprio
+Hi Krzysztof,
+Thanks for your feedback.
+I want to make sure I fully understand your comment.=20
+I can see we have added clocks and clock names in the same order.
+Could you please help in detail what specifically needs to be modified rega=
+rding the ordering and minItems/maxItems usage?
 
-depends on the first part ethtool-mm, which would delay Kurt's patch.
+-Swathi
 
-So Kurt, if you'd prefer to submit yours first, that's okay too.
-
-
+>=20
+> Best regards,
+> Krzysztof
 
 
