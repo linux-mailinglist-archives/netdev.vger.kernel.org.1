@@ -1,109 +1,169 @@
-Return-Path: <netdev+bounces-166425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9213A35F6E
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:44:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4961A35F78
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:53:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D3921676C6
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:44:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70956188B9B0
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397DD2641FA;
-	Fri, 14 Feb 2025 13:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98093263C82;
+	Fri, 14 Feb 2025 13:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IYMbXnGq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZUEf40c/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746022641CE
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 13:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C0015199D;
+	Fri, 14 Feb 2025 13:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739540695; cv=none; b=lsGCeKDG5/35n9hxQOwFoSvX6HWRqymgQxOOf7pIqKCnC8egWO1bPNm3RCV6mYjtlc+Vmn2f53rrcIfouUfhATV3OJPSuc5Sd/U77NaEfslzua/5iHFlyDWkeHBXsu0NFX0HFpxRtGV9k3oONfFU1DAQdbpvCra3ByCu0gGV1nA=
+	t=1739541215; cv=none; b=jrwB9FhIdf8JTXxoumiYUTa0r9WeXi+vLpYEbe4E0h0R1pnkz76xFfosa20AfnGZAAvn59QzNoK3dAuhB4w6IJGWZVf84Pzq5wm5z3JRijk5ZlJpkpMGrvsCciTXwjHF0DAdhU63wzmFMSi+xVpaBikTMMNE+YNb71OZdMyz09M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739540695; c=relaxed/simple;
-	bh=BRnHtysPLccMsZmphY8kyqv52wVryKp9chQU7QlYYLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Et/AFOPLCbYkzsc/x67pyufABJ8tam6bZoc79/RLmBcmoJ/PgbYrpGujcTQURGNYyixY5ZxsW4U7+tf2QMktpMf5jpvkmno2JrVgKABxHV0uszY5rYwzSsRDRA+fl8tMeA+99rFUqfB9Vn3eX1i3piwVltQul4+H+eYvEO/b750=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IYMbXnGq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sQeMWAmqvHsGAQGs7OFlW86G1XWayOkPA/i8UTyB8oc=; b=IYMbXnGq4EzIe+3eMQ90tC3i81
-	DlmhnJZnigO9UnQ/USUJWScsgwq/Jk7TDBAIflv8zHSj9PlCn04HbTWwLOxAbrMpBxvGXUqB7V9Gp
-	UwQSyv7z6TsowMQOS83Qwyp1QAhFx/TWB670Kbzv2FRYgrxl8F/vmdFF5eVG88w4I7pE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tivzt-00E54L-8R; Fri, 14 Feb 2025 14:44:49 +0100
-Date: Fri, 14 Feb 2025 14:44:49 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, pierre@stackhpc.com,
-	Dan Carpenter <error27@gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-Message-ID: <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1739541215; c=relaxed/simple;
+	bh=t4t0GFjhp7gnA5t6SYamQkof+QYpu37Cw8BGFrVG6BI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t/6bM9zhUlHjGe7ahTEEOvk54y9nrkkqREPzX7dLb9fT1dqhIDdMH7x/WoFL/YkLNZvh/TJdQyhalShtsiTpB0cF/4uTqLn5CKL92PtWo+eSP+zQyC9rhhB4XRRIokzVqOqMlITq4gtCF6EbvlfhIk5hizgopJR2dggS7Jv4/cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZUEf40c/; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739541213; x=1771077213;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=t4t0GFjhp7gnA5t6SYamQkof+QYpu37Cw8BGFrVG6BI=;
+  b=ZUEf40c/ZHcMH3vBEz+5mVdQiVYJXmdakjNjsRzKvuqdRHQLs2cNblF5
+   Lk/EsCNXCY2i8nMkvmPicCOY7sal2cgfNl0wAFlZPx+zHvOfsRNAz8/ur
+   tYBz4kULFwK5TrINynhYp0CDqop1Nq7lITFN8p6+g2C12xpg9ZhHHv7gT
+   4qBI+FBfjAGu+wMOqxvXvRL5EFNntdSFUozsRtsYw3ZroIx3dinxi99Vf
+   85Z3N7oj0B4vg7QOaVH4f9IL3dq/OmNEivYrpVsx7d7lXlcs3ZSuwRT50
+   eH5jHZVCfi+cTCflyM3nvTE8TlrGcxs9kFmsePCw9zyUpg5YZ+hY9KvsS
+   A==;
+X-CSE-ConnectionGUID: hlpjKpenTZ+WefVbe4oXng==
+X-CSE-MsgGUID: HSyHk+anScqf5s/DgVJdEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="57822084"
+X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
+   d="scan'208";a="57822084"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 05:53:33 -0800
+X-CSE-ConnectionGUID: HhRJGfvKRgeb1WH95/VRzQ==
+X-CSE-MsgGUID: Z9fVTABAQZiaGkR39xK5iA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="150636991"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by orviesa001.jf.intel.com with ESMTP; 14 Feb 2025 05:53:31 -0800
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	marcin.szycik@linux.intel.com,
+	mustafa.ismail@intel.com,
+	tatyana.e.nikolova@intel.com,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	jacob.e.keller@intel.com,
+	anthony.l.nguyen@intel.com,
+	linux-rdma@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-next v1] irdma: free iwdev->rf after removing MSI-X
+Date: Fri, 14 Feb 2025 14:53:22 +0100
+Message-ID: <20250214135322.4999-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> devlink_rel_alloc().
+Currently iwdev->rf is allocated in irdma_probe(), but free in
+irdma_ib_dealloc_device(). It can be misleading. Move the free to
+irdma_remove() to be more obvious.
 
-If the same bug exists twice it might exist more times. Did you find
-this instance by searching the whole tree? Or just networking?
+Freeing in irdma_ib_dealloc_device() leads to KASAN use-after-free
+issue. Which can also lead to NULL pointer dereference. Fix this.
 
-This is also something which would be good to have the static
-analysers check for. I wounder if smatch can check this?
+irdma_deinit_interrupts() can't be moved before freeing iwdef->rf,
+because in this case deinit interrupts will be done before freeing irqs.
+The simplest solution is to move kfree(iwdev->rf) to irdma_remove().
 
-	Andrew
+Reproducer:
+  sudo rmmod irdma
 
-> 
-> In case of returning 1 from xa_alloc_cyclic() (wrapping) ERR_PTR(1) will
-> be returned, which will cause IS_ERR() to be false. Which can lead to
-> dereference not allocated pointer (rel).
-> 
-> Fix it by checking if err is lower than zero.
-> 
-> This wasn't found in real usecase, only noticed. Credit to Pierre.
-> 
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  net/devlink/core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/devlink/core.c b/net/devlink/core.c
-> index f49cd83f1955..7203c39532fc 100644
-> --- a/net/devlink/core.c
-> +++ b/net/devlink/core.c
-> @@ -117,7 +117,7 @@ static struct devlink_rel *devlink_rel_alloc(void)
->  
->  	err = xa_alloc_cyclic(&devlink_rels, &rel->index, rel,
->  			      xa_limit_32b, &next, GFP_KERNEL);
-> -	if (err) {
-> +	if (err < 0) {
->  		kfree(rel);
->  		return ERR_PTR(err);
->  	}
-> -- 
-> 2.42.0
-> 
-> 
+Minified splat(s):
+  BUG: KASAN: use-after-free in irdma_remove+0x257/0x2d0 [irdma]
+  Call Trace:
+   <TASK>
+   ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+   ? kfree+0x253/0x450
+   ? irdma_remove+0x257/0x2d0 [irdma]
+   kasan_report+0xed/0x120
+   ? irdma_remove+0x257/0x2d0 [irdma]
+   irdma_remove+0x257/0x2d0 [irdma]
+   auxiliary_bus_remove+0x56/0x80
+   device_release_driver_internal+0x371/0x530
+   ? kernfs_put.part.0+0x147/0x310
+   driver_detach+0xbf/0x180
+   bus_remove_driver+0x11b/0x2a0
+   auxiliary_driver_unregister+0x1a/0x50
+   irdma_exit_module+0x40/0x4c [irdma]
+
+  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+  RIP: 0010:ice_free_rdma_qvector+0x2a/0xa0 [ice]
+  Call Trace:
+   ? ice_free_rdma_qvector+0x2a/0xa0 [ice]
+   irdma_remove+0x179/0x2d0 [irdma]
+   auxiliary_bus_remove+0x56/0x80
+   device_release_driver_internal+0x371/0x530
+   ? kobject_put+0x61/0x4b0
+   driver_detach+0xbf/0x180
+   bus_remove_driver+0x11b/0x2a0
+   auxiliary_driver_unregister+0x1a/0x50
+   irdma_exit_module+0x40/0x4c [irdma]
+
+Reported-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Closes: https://lore.kernel.org/netdev/8e533834-4564-472f-b29b-4f1cb7730053@linux.intel.com/
+Fixes: 3e0d3cb3fbe0 ("ice, irdma: move interrupts code to irdma")
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+Fix to net-next instead of net, because the commit isn't yet in net
+tree.
+---
+ drivers/infiniband/hw/irdma/main.c  | 2 ++
+ drivers/infiniband/hw/irdma/verbs.c | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
+index 1ee8969595d3..d10fd16dcec3 100644
+--- a/drivers/infiniband/hw/irdma/main.c
++++ b/drivers/infiniband/hw/irdma/main.c
+@@ -255,6 +255,8 @@ static void irdma_remove(struct auxiliary_device *aux_dev)
+ 	ice_rdma_update_vsi_filter(pf, iwdev->vsi_num, false);
+ 	irdma_deinit_interrupts(iwdev->rf, pf);
+ 
++	kfree(iwdev->rf);
++
+ 	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev->devfn));
+ }
+ 
+diff --git a/drivers/infiniband/hw/irdma/verbs.c b/drivers/infiniband/hw/irdma/verbs.c
+index eeb932e58730..1e8c92826de2 100644
+--- a/drivers/infiniband/hw/irdma/verbs.c
++++ b/drivers/infiniband/hw/irdma/verbs.c
+@@ -4871,5 +4871,4 @@ void irdma_ib_dealloc_device(struct ib_device *ibdev)
+ 
+ 	irdma_rt_deinit_hw(iwdev);
+ 	irdma_ctrl_deinit_hw(iwdev->rf);
+-	kfree(iwdev->rf);
+ }
+-- 
+2.42.0
+
 
