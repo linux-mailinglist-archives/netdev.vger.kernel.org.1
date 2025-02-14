@@ -1,99 +1,111 @@
-Return-Path: <netdev+bounces-166273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3018A354D4
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:40:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2879BA354F9
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:45:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A93AA169CA3
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:39:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CB4D18910EA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2DC13C9C4;
-	Fri, 14 Feb 2025 02:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C41313C67E;
+	Fri, 14 Feb 2025 02:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="crG3z6Nx"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D281519AB;
-	Fri, 14 Feb 2025 02:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E248635A;
+	Fri, 14 Feb 2025 02:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739500756; cv=none; b=oINcZkNy9rQeReUZo8av2L4qPmppx4ejtPv8MpwS8ebMJnnKzIry5obTduVrtTfy+439eYyRyrfE4aeDasokzPvfPmU23mmGNkP/jMp3aAEBpjIzbUA8JltrkARI9qZeosNVFDh2K28/4/u3lm/S4NIycOj9Wtfu3OUeECVYOxM=
+	t=1739501099; cv=none; b=AUHZ2c/W66T9EsS1VhqvBmU+sdAURpMeD8U4rWteYYNwN0a5eVzvIZXteKc8Yx8YvgbXFe9i0xk9wuymyv2KBBGy78xOndIfiZFETUFinUQWK8Tsw7Hu6/kOXoNg/4qReylSMokAws2VbGGbMRtTXhAazVqgMlwnm20VaTutnAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739500756; c=relaxed/simple;
-	bh=ggqllBKY0hZPDPykZ9eDSe4dSq6P5GCFoSX8bpONkyQ=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HD1lqdSJCD/eqUleBtsxWGY5cA9fo6oKstlWy3hT/zHlnB1NErZIWVTCGxz9uH8C+hML1cJ73cqosp7GKzMVTBcEoZLKhFE5ov9jSegz7+jQNKqEy2nyw3xGkdzcvdp4qgxBDXKszl/9X4GxPGvqZIHCb5wa6pV4bfjGytxhL54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4YvGNK5P6Mz1W5kg;
-	Fri, 14 Feb 2025 10:34:41 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E02B3140121;
-	Fri, 14 Feb 2025 10:39:10 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 14 Feb 2025 10:39:09 +0800
-Message-ID: <1d82f748-2173-4e24-9f4c-e2dd71c02c44@huawei.com>
-Date: Fri, 14 Feb 2025 10:39:09 +0800
+	s=arc-20240116; t=1739501099; c=relaxed/simple;
+	bh=WGPoqVRqUNUupOPvcUF75S6imIM0F94i8SNoD5PoDN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XLOicXx/kXG+VH6kdbetg/gv9f6iMsXC+9TRky2w9v1dHd1NfOg6xVtlJPE/NNwSD7tBEhgqNavW7BWoghdLRsJfMFwxX3FT0Vz6mTGd6tgU5vqJWaLYvR7eGFeZBfo69F1iZhnrG37DBBNOiT+999v+jZJrfC4t6FNKiUGk3BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=crG3z6Nx; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=65T4rBQvy6mFilnie1q3glh+nsrM26bK761iT5MKkEQ=; b=crG3z6NxOhqIo4edos2ddK19x9
+	hWQSi3nAdhK010ZkcRwyeT/b7++m63S5YNZcODozEpBJOgP/hasAC3UwlWnFjWlOcuxZl6tHYs4l6
+	6CdnKwqrBKWVhX/71+itsWvFCZPIi5xG1gs60s6n4iM2+RSM+EG2zasTj5Py8FPoAqUifwAFUeSF7
+	jz3SIn2+ft0+9dsPngX+XYAY40kD7KeiEKr2GMLKn4zN7UML+XlDViVY9nEWPOxDqUIKfr4y2IiG8
+	uHyVA8/XvOed0PTCNxcEp+sHeenwZAK2TFyGrWhXuNWJe+/SMmo5c/8xDxp+RWJ+TWkWRU6yqFsJt
+	i0IQW4xQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tilUE-000DGZ-2e;
+	Fri, 14 Feb 2025 10:44:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Feb 2025 10:44:47 +0800
+Date: Fri, 14 Feb 2025 10:44:47 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <Z66uH_aeKc7ubONg@gondor.apana.org.au>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/7] net: hibmcge: Add mac link exception
- handling feature in this module
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-6-shaojijie@huawei.com>
- <dc22a252-2889-4b20-b72c-5e4d44d24f88@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <dc22a252-2889-4b20-b72c-5e4d44d24f88@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213063304.GA11664@sol.localdomain>
+
+On Wed, Feb 12, 2025 at 10:33:04PM -0800, Eric Biggers wrote:
+> 
+> I've already covered this extensively, but here we go again.  First there are
+> more users of shash than ahash in the kernel, since shash is much easier to use
+> and also a bit faster.  There is nothing storage specific about it.  You've
+> claimed that shash is deprecated, but that reflects a misunderstanding of what
+> users actually want and need.  Users want simple, fast, easy-to-use APIs.  Not
+> APIs that are optimized for an obsolete form of hardware offload and have
+> CPU-based crypto support bolted on as an afterthought.
+
+The ahash interface was not designed for hardware offload, it's
+exactly the same as the skcipher interface which caters for all
+users.  The shash interface was a mistake, one which I've only
+come to realise after adding the corresponding lskcipher interface.
 
 
-on 2025/2/14 4:05, Andrew Lunn wrote:
->> +int hbg_reset_phy(struct hbg_priv *priv)
->> +{
->> +	struct phy_device *phydev = priv->mac.phydev;
->> +
->> +	if (phydev->drv->soft_reset)
->> +		return phydev->drv->soft_reset(phydev);
->> +
->> +	return genphy_soft_reset(phydev);
->> +}
-> A MAC driver should not be doing a soft reset on a PHY. For some
-> devices, this clears out all the settings. I would suggest you use
-> phy_stop(), phy_start() which are functions a MAC driver is allowed to
-> use.
->
-> 	Andrew
+> Second, these days TLS and IPsec usually use AES-GCM, which is inherently
+> parallelizable so does not benefit from multibuffer crypto.  This is a major
+> difference between the AEADs and message digest algorithms in common use.  And
+> it happens that I recently did a lot of work to optimize AES-GCM on x86_64; see
+> my commits in v6.11 that made AES-GCM 2-3x as fast on VAES-capable CPUs.
 
-Well, I think your advice is helpful.
+Bravo to your efforts on improving GCM.  But that does not mean that
+GCM is not amenable to parallel processing.  While CTR itself is
+obviously already parallel, the GHASH algorithm can indeed benefit
+from parallel processing like any other hashing algorithm.
 
-It is also a good practice to restart the PHY, which also triggers link relinking.
-
-Thank you. I'll test this method.
-
-Thanks,
-Jijie Shao
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
