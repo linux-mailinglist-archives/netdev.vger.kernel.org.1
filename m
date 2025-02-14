@@ -1,163 +1,167 @@
-Return-Path: <netdev+bounces-166279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF11AA35537
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:10:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D577A35540
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48A5C3AB4EC
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:10:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED6C118918DF
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE4215198E;
-	Fri, 14 Feb 2025 03:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861562CCC5;
+	Fri, 14 Feb 2025 03:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUGQAzpE"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="io0RN+xs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from lf-1-19.ptr.blmpb.com (lf-1-19.ptr.blmpb.com [103.149.242.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E121E2753FD;
-	Fri, 14 Feb 2025 03:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BF92F24
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 03:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.149.242.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739502621; cv=none; b=hrEmnpDjUVFdk4dRoCAecm2Y4WTy3AebiAHBfFCEd80Hf0q4PeWds07nw1iycd6/YryWfJfAJsMcqUzJaqcBusuwCE9O7LjI+c5vsG71miikQlfZLDb0KKxtKUAtXPCEpB7MsF1uQJztAL1EZU6jpvcwPl5Um97LKIzmFADA4+g=
+	t=1739503110; cv=none; b=jaEpRUv9hxGp0raCdQWbydkk39+zdAMj2nME5S1s7ypxWMTwtuP/O0W4SpElH+uF8kbYqzcmfluae8Na/KiITdWX+guwK2YAG4krvOr1KyeqXdltuPhnlZojU0AZ6ZYLH5rZMYrQWQ9CDyKftYVk2MsASXowpeuOeDP/yku8ihc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739502621; c=relaxed/simple;
-	bh=A65U+faa4oNOa5ylsWolb+GmQIu3g+Rry+N6W9V4a3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ovez29y5gTTTC/yejW1KsAbicK7peWUzXYnKdtvpNeeVBtkBAdI59Oj/sImP3l95FvGVrSXja4Ouv7jzz8HvjMWfvT69Ix2XkqguTn8Rh4+HeE1adjUfmBsAAuHdx1lkQcZhtVUdjsU+v2VNysNTlwxVntC8XusVbnJiJgoeGjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUGQAzpE; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d19e40a891so523535ab.3;
-        Thu, 13 Feb 2025 19:10:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739502619; x=1740107419; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sr7VtscEnLfkXHzMmEefMyB7dFFB5djMVQi/VXYO6Q8=;
-        b=JUGQAzpEPclcgotvDwc4sbxgf/HlEDlcBeIICOEgo0T3cTIpxK8zRaYHZt8nh5XGSp
-         ZxdY+TLhU+yvlkXqVb6xDzJoSHIEyOuKUUk/ih983wpGRbM8HioYj6QLp0CDubJnPxIU
-         ijalJqWbzQZGn/Q6IqMGJfnuKk8D3fqQmKLlhqq0mV1MFA+d1W4C2VQu9+KIK0B6LYm7
-         b6W9KKRQhmG1ha9tSd18pHIt+f00ZtxSBULfS9Pq9aze2oAgtcXiOmZZLWBM76Yu9JMt
-         Xsl/AWKYFMXBuMiy5aJYx4Vh/HWZkoxZ/ZBSxgCXYLeQkqMRUpUhTH42O/AsUGFlD43s
-         w9tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739502619; x=1740107419;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sr7VtscEnLfkXHzMmEefMyB7dFFB5djMVQi/VXYO6Q8=;
-        b=hZ22oyYK19AOmYwNnpuwkGis3Pr6/JPBAUDRrGXejW6UE+Tp8cz1Cj4CC8edJ7mlOB
-         Hoz+L5vRJPSnrCKSk5lROhf3AKCrPWnZqSpUxWjEJCluxsGqP+RSfhkvmrKqhRirUTa9
-         cuBsiyOmehBkUmJlrm4DR3lYmm9zHmP7+xKvOqkmyTTUE47cLV9PYiUF6lrLEqx+qBRH
-         SwQT8QNvNnwXtHftX4f+th/kvZoJWkKh63LFuvHrG8Mk4XjR3wgsHMOMDN8dZvA9PyI+
-         lkQW8XnbfMRRnjLNNfGlPS6e12kWZGWgz5x21wCgfN66tzSoq55fTM4xK4Jgq8ok+dCN
-         os5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWWvMSxJo+l8pIZy3Wj9H5yIYVZCxOzLFESkMvMknIugD3zscGIyzgM5LuObithU6rJJGc=@vger.kernel.org, AJvYcCXfB/IeS8OhGhmj1dMsozMvKHs77blVO/fj92MHLsyGJUV9M4fLxC3k5OBCtGTsR8Kv8VocG5pm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8kaa3j+oLaNr5+nF0+G2khalX8ns9S2SKFm9jIyWA4S/ZXujd
-	JYMyWSS9l+ZwTzbOFtTKK2WyqqactszErKY4WYrTbt5u7xmfyCJ2ynqDakO1pDFwgIX6EWdlYw1
-	WJpgkcDf3F2K687IsZQK0yKMK+Yg=
-X-Gm-Gg: ASbGncuFNwm42bc3oKgChUue/N0vVVpy3BJLb6YlThXFeCmk+E7yZaudXHxOFkf1ZLg
-	M7+1fvWzzLM6MUV6xxPyQKlflchoWDhtxJJ/xs6RZjcAcdQCTlGxDuGIc8KJN+Aju4xWEL9aj
-X-Google-Smtp-Source: AGHT+IEfGVOyU//v0eco6EEni1bDVW5yC4amkhgfCf1HJIMYXicK+XJ5DgN+Qx3tjnUJVf6rESUufXJIkLz83N31V4E=
-X-Received: by 2002:a92:c569:0:b0:3cf:b9b8:5052 with SMTP id
- e9e14a558f8ab-3d18c21e82cmr53181895ab.3.1739502618941; Thu, 13 Feb 2025
- 19:10:18 -0800 (PST)
+	s=arc-20240116; t=1739503110; c=relaxed/simple;
+	bh=qGODg8jGyA23k+4nMcy9P9ClWkhf9vxdjPv8R0mieuE=;
+	h=Cc:Message-Id:Mime-Version:References:To:From:Date:Content-Type:
+	 Subject:In-Reply-To; b=uqwu9GVnJrc256NAHyoeR+lsBo7+2KvHs4WYS2Y8NSg1JhPdWBp9bMWXThBN1Huds0CRM1MGRyq3VLr/6z/tkJe1DIrn0+2UbVvx3N0Bu3SsQZnAII1jUhpW2n6tDY/RMqKXbLm97A27Zz496DmB4CvSoUFIGpr4XGxy075bb30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=io0RN+xs; arc=none smtp.client-ip=103.149.242.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1739502890; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=M72yQnSpGEJg1NFY+l1/WlfXPlkL683KCsCQh285I70=;
+ b=io0RN+xs9OkrMvmMcr3XVFC4hXyH7OUeyesXJ94YMGi+/HLQq+j6uf5La1NRX/WdrVhod2
+ R3BU5M86Q0HpSfKbupXe+cXd+hxXxslzkkrxNW0p/pOB8MZbyWiF2+WTfwG+ITNNy+CGEV
+ rxcKlS3IcbliIA6e3UMQofNTl7Cy3u+ksHR3+N1h11ZDuf2wnB/cTlX92CyXBWXGsdE6ru
+ fQQKfTLa/A3M2oJKHu5NyBpt9NX5rpPMwk/Pd1xKEkFEpKdu+N34P0jrw7aCXukIHdXqef
+ PH9clPtlkb1mbz1LIeFkMej0L27tnFHTQ7Uk5rdVZq+ClLvY/7mf1BglWxV4dw==
+Cc: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <horms@kernel.org>, 
+	<parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>
+X-Original-From: tianx <tianx@yunsilicon.com>
+Message-Id: <0e83c125-b69e-46a0-a760-fe090b53bc70@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250213004355.38918-1-kerneljasonxing@gmail.com>
- <20250213004355.38918-3-kerneljasonxing@gmail.com> <Z66DL7uda3fwNQfH@mini-arch>
- <CAL+tcoATv6HX5G6wOrquGyyj8C7bFgRZNnWBwnPTKD1gb4ZD=g@mail.gmail.com> <039bfa0d-3d61-488e-9205-bef39499db6e@linux.dev>
-In-Reply-To: <039bfa0d-3d61-488e-9205-bef39499db6e@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 14 Feb 2025 11:09:41 +0800
-X-Gm-Features: AWEUYZlRUwUUBMhsCxGmt2NwtwzeGsWopF-CpgoUIlSrK9GVl3AZE_DOTnxYLIA
-Message-ID: <CAL+tcoBAv5QuGeiGYUakhxBwVEsut7Gaa-96YOH03h57jtTVaQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] bpf: add TCP_BPF_RTO_MAX for bpf_setsockopt
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
-	ncardwell@google.com, kuniyu@amazon.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250213091402.2067626-1-tianx@yunsilicon.com> <20250213091418.2067626-8-tianx@yunsilicon.com> <20250213143702.GN17863@unreal>
+To: "Leon Romanovsky" <leon@kernel.org>
+From: "tianx" <tianx@yunsilicon.com>
+Date: Fri, 14 Feb 2025 11:14:45 +0800
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Fri, 14 Feb 2025 11:14:47 +0800
+Subject: Re: [PATCH v4 07/14] net-next/yunsilicon: Init auxiliary device
+User-Agent: Mozilla Thunderbird
+X-Lms-Return-Path: <lba+267aeb528+5039d0+vger.kernel.org+tianx@yunsilicon.com>
+In-Reply-To: <20250213143702.GN17863@unreal>
 
-On Fri, Feb 14, 2025 at 10:14=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
+On 2025/2/13 22:37, Leon Romanovsky wrote:
+> On Thu, Feb 13, 2025 at 05:14:19PM +0800, Xin Tian wrote:
+>> Initialize eth auxiliary device when pci probing
+>>
+>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+>> ---
+>>   .../ethernet/yunsilicon/xsc/common/xsc_core.h |  12 ++
+>>   .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   3 +-
+>>   .../net/ethernet/yunsilicon/xsc/pci/adev.c    | 110 ++++++++++++++++++
+>>   .../net/ethernet/yunsilicon/xsc/pci/adev.h    |  14 +++
+>>   .../net/ethernet/yunsilicon/xsc/pci/main.c    |  10 ++
+>>   5 files changed, 148 insertions(+), 1 deletion(-)
+>>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+>>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
+> <...>
 >
-> On 2/13/25 3:57 PM, Jason Xing wrote:
-> > On Fri, Feb 14, 2025 at 7:41=E2=80=AFAM Stanislav Fomichev<stfomichev@g=
-mail.com> wrote:
-> >> On 02/13, Jason Xing wrote:
-> >>> Support bpf_setsockopt() to set the maximum value of RTO for
-> >>> BPF program.
-> >>>
-> >>> Signed-off-by: Jason Xing<kerneljasonxing@gmail.com>
-> >>> ---
-> >>>   Documentation/networking/ip-sysctl.rst | 3 ++-
-> >>>   include/uapi/linux/bpf.h               | 2 ++
-> >>>   net/core/filter.c                      | 6 ++++++
-> >>>   tools/include/uapi/linux/bpf.h         | 2 ++
-> >>>   4 files changed, 12 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/n=
-etworking/ip-sysctl.rst
-> >>> index 054561f8dcae..78eb0959438a 100644
-> >>> --- a/Documentation/networking/ip-sysctl.rst
-> >>> +++ b/Documentation/networking/ip-sysctl.rst
-> >>> @@ -1241,7 +1241,8 @@ tcp_rto_min_us - INTEGER
-> >>>
-> >>>   tcp_rto_max_ms - INTEGER
-> >>>        Maximal TCP retransmission timeout (in ms).
-> >>> -     Note that TCP_RTO_MAX_MS socket option has higher precedence.
-> >>> +     Note that TCP_BPF_RTO_MAX and TCP_RTO_MAX_MS socket option have=
- the
-> >>> +     higher precedence for configuring this setting.
-> >> The cover letter needs more explanation about the motivation.
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c b/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+>> new file mode 100644
+>> index 000000000..1f8f27d72
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
+>> @@ -0,0 +1,110 @@
+>> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+>> +/*
+>> + * Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> + * All rights reserved.
+>> + */
+>> +
+>> +#include <linux/auxiliary_bus.h>
+>> +#include <linux/idr.h>
+>> +
+>> +#include "adev.h"
+>> +
+>> +static DEFINE_IDA(xsc_adev_ida);
+>> +
+>> +enum xsc_adev_idx {
+>> +	XSC_ADEV_IDX_ETH,
+>> +	XSC_ADEV_IDX_MAX
+>> +};
+>> +
+>> +static const char * const xsc_adev_name[] = {
+>> +	[XSC_ADEV_IDX_ETH] = XSC_ETH_ADEV_NAME,
+>> +};
+>> +
+>> +static void xsc_release_adev(struct device *dev)
+>> +{
+>> +	/* Doing nothing, but auxiliary bus requires a release function */
+>> +}
+> It is unlikely to be true in driver lifetime model. At least you should
+> free xsc_adev here.
 >
-> +1
->
-> I haven't looked at the patches. The cover letter has no word on the use =
-case.
+> Thanks
 
-I will add and copy some words from Eric's patch series :)
+Hi Leon, xsc_adev has already been freed after calling 
+auxiliary_device_uninit. If I free it again in the release callback, it 
+will cause a double free.
 
-> Using test_tcp_hdr_options.c as the test is unnecessarily complicated jus=
-t for
-> adding a new optname support. setget_sockopt.c is the right test to reuse=
-.
+>> +
+>> +static int xsc_reg_adev(struct xsc_core_device *xdev, int idx)
+>> +{
+>> +	struct auxiliary_device	*adev;
+>> +	struct xsc_adev *xsc_adev;
+>> +	int ret;
+>> +
+>> +	xsc_adev = kzalloc(sizeof(*xsc_adev), GFP_KERNEL);
+>> +	if (!xsc_adev)
+>> +		return -ENOMEM;
+>> +
+>> +	adev = &xsc_adev->adev;
+>> +	adev->name = xsc_adev_name[idx];
+>> +	adev->id = xdev->adev_id;
+>> +	adev->dev.parent = &xdev->pdev->dev;
+>> +	adev->dev.release = xsc_release_adev;
+>> +	xsc_adev->xdev = xdev;
+>> +
+>> +	ret = auxiliary_device_init(adev);
+>> +	if (ret)
+>> +		goto err_free_adev;
+>> +
+>> +	ret = auxiliary_device_add(adev);
+>> +	if (ret)
+>> +		goto err_uninit_adev;
+>> +
+>> +	xdev->xsc_adev_list[idx] = xsc_adev;
+>> +
+>> +	return 0;
+>> +err_uninit_adev:
+>> +	auxiliary_device_uninit(adev);
+>> +err_free_adev:
+>> +	kfree(xsc_adev);
+>> +
 
-Will use setget_sockopt.c only.
-
->
->
-> > I am targeting the net-next tree because of recent changes[1] made by
-> > Eric. It probably hasn't merged into the bpf-next tree.
->
-> There is the bpf-next/net tree. It should have the needed changes.
-
-[1] was recently merged in the net-next tree, so the only one branch I
-can target is net-next.
-
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/co=
-mmit/?id=3Dae9b3c0e79bc
-
-Am I missing something?
-
-Thanks,
-Jason
-
->
-> pw-bot: cr
+>> +	return ret;
+>> +}
 
