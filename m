@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-166390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77170A35DD6
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:46:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB43A35DDC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB9C168694
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 594C63AA8AA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D28DF5C;
-	Fri, 14 Feb 2025 12:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CfXCOA8O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B7117BA1;
+	Fri, 14 Feb 2025 12:48:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF2E2753E7
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A92DF5C;
+	Fri, 14 Feb 2025 12:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739537202; cv=none; b=VthVkBrVcl2JyVt1zXlKKfr2+C8m1hmVdD+tnRTmu02xOPjDPAA7cvMtb6l/RkTMqjBoQXZaHSny1vrrcnzMlbrqaU07SrqQk3X6Jue9xK7IPsX64MbaZEhHCE9dKvYOFSH0IoEKNzaHdxxnXyU7Iay8OaJz2Vikzbl9xjMBZVE=
+	t=1739537287; cv=none; b=E/TNSBPxCtTlRVPT+H68cFVYVRWvaKSW+XiBrANWIMHQnpdLMGkmAViptr4KzCmurNizzjnaf8N/1ZJOGEPm3AxpRcOZvQ1o43Hfj85vscZ3QGpkTpTozmLIO9+5yZLnfStMOWRtAcPBqOdU/X2AzTuwmiLyKC0DTQE+1s5Icqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739537202; c=relaxed/simple;
-	bh=wxHauzlg+BXUiSKr0BD/Ua4+vBpvNMAqjIAiar5h21I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZJF4064wZLXy6GYOqYIMjv0j+Hesr+BvXnwEIxlmyE6qV2SPl48M9IgRsUmy0rd6ynVshBCGJO8OfB7pYXu7BoXCqAyGb7Na3CkFWlSZLslR0Z1nwVHjDuFI/JE7OyjDI7k8xkRtHLvSG7lDsx/R+GUe5z2gtuHI9lsrsdbaP0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CfXCOA8O; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739537201; x=1771073201;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wxHauzlg+BXUiSKr0BD/Ua4+vBpvNMAqjIAiar5h21I=;
-  b=CfXCOA8OKl7GrHj+f3C9pmgh1gtNFny/5hYzB2NbXr20JGJiuZdWL88K
-   rBGA7hPG+WLulZV0BiGN2+5GhS48W6z2hyiBc1FCd0OH5Z+JzPoV0P8Ik
-   txbMWpaVknB0/16IkHTrLB8w+h8cuHP5tbH1qaeD9iBLhxlx8KO1YS0Zt
-   LkwM/TI7tuPR+UiGt+tl4mNuR3D6TcyzLFCsHMvl0cqeXcVmMN1dhFo9B
-   rJRKvQjwLHvwOKpkw1K30ycIWVn6b7Eq2WaGz7TviZaA+Mhb46pdSlsN8
-   mdlXuPAVEKU0ldGaT160GBk0MAjgfsmHojbhu6lKPOZHp/ePTbu0vBUeh
-   A==;
-X-CSE-ConnectionGUID: ZIhGIH2TQTCn27GkblN/zg==
-X-CSE-MsgGUID: U1iX6HYZRF6JLTxBRZKAgA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="40319070"
-X-IronPort-AV: E=Sophos;i="6.13,285,1732608000"; 
-   d="scan'208";a="40319070"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 04:46:40 -0800
-X-CSE-ConnectionGUID: oR6x/a2hSHaRC8/PNz/xng==
-X-CSE-MsgGUID: +5RtNyuCQDOl76LRZ2Vd/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="113939301"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 04:46:39 -0800
-Date: Fri, 14 Feb 2025 13:43:03 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Pierre Riteau <pierre@stackhpc.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net] net/sched: cls_api: fix error handling causing NULL
- dereference
-Message-ID: <Z685fovQy0yL6stZ@mev-dev.igk.intel.com>
-References: <20250213223610.320278-1-pierre@stackhpc.com>
+	s=arc-20240116; t=1739537287; c=relaxed/simple;
+	bh=BzDfEKhUE15vpc1INVw+F1pbXo84Ls4FTMQ+1iKgxtU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VSrjb6PjL4xOMJ+WBByp6JYLs5zHM/nEyW6xZP53svWRrZeardi4FaHyAdYoH4JIXQZkHtpVmOASx8CO8wvVRw2P2xgguGjuf+olAtsReVoQQ6cIpN2RT3PhA/rWQ7SqaOwePPbslvuNjLOTJbNUm3t6Tc7R1x9xL4jzraPe+v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso343332766b.1;
+        Fri, 14 Feb 2025 04:48:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739537283; x=1740142083;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zWHiaeevD/r5R0u2eJ0CdX39n4tOeuiDl0zFf8oq09I=;
+        b=YZL67qeow7L6/8NYR9xOS0n4cqERS5+HW3eN5Pzk9oTlQQfE6G/KkgahVQxTMisMUl
+         A3PsRnkXMAJ4+aXiKKyDcy6Ji25Hy4iB7xVLO/rhbpRzr8gw2SFZokOVdbcEGzeFiMIA
+         Bb9cmGXQCeaM9uqhTYFjKVfRUZMWdoUB4pXAj3bL5OkYLMo761gX/P+iGYEPi0fih8CW
+         MicGD49iasbEyN5ZTj1fXQUkxWW3FRTW+mXVjIzcW7YEyd+jkMJ+YN50yK2w9WXUL/2V
+         Nexe9mvnwuf4NLARqJ22NYtkqmRDR2MOJRC26mK3oTcTiTtya4vI6I80ECFxz/GAxI7q
+         v1UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWn1XYLZRuPEVCpXXs1JpQ/mKg/Revol4StF6cuJ48sFJX1ewsf5sYIJRlrtk196tJ7C0bXtYOz0MTUFd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEsZYVy1z2cEqN8BfsVBvnu7JWVLJ45oQ65/dNdswqLl8o+HcA
+	Vjk2ZY6ej9B8ePydeyz/kQ4Rtt9YZxi6RJy9RbdiRa0qeAKQxYBIkz/pig==
+X-Gm-Gg: ASbGncvgvZOYFVk8N3uxKh5ejamQtf/EYztpyfB/Kf+hvL+bSyIx69qGFRS5gbqU2pX
+	/5cYHhduXVWmwUwyeIc9nOgm7u0f7F6o3nbUKoRdRpUXv1xAJ+IaQGhlJbQNz9mtke8hptgG3EF
+	8Vl5Dnjrpn9Mvb+rke6vKLqtwS6zgxsrkuNvotlOf25hW9pVyYI98du4lhmPwr8zvX8/ysYurjR
+	b7EFgbGI4k/H5m7RGBC3D5LC36tipSNL6QfQEg0xCC4jD5ubnI2fWo8bAr7uQsQA5lkQVFGypbp
+	M/Jg9w==
+X-Google-Smtp-Source: AGHT+IF7ZajZlCF/chEKeP4PxK9xCSMbKF6UAl/NmWZoUrwYh3B2bv5d+6BhpcUTLjIYb2WEMGKRfg==
+X-Received: by 2002:a17:907:2cc5:b0:ab6:f4e7:52f9 with SMTP id a640c23a62f3a-ab7f33d1874mr1216812866b.25.1739537283013;
+        Fri, 14 Feb 2025 04:48:03 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:3::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53280ee4sm335240066b.78.2025.02.14.04.48.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 04:48:02 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 14 Feb 2025 04:47:49 -0800
+Subject: [PATCH net-next] net: Remove redundant variable declaration in
+ __dev_change_flags()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213223610.320278-1-pierre@stackhpc.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250214-old_flags-v1-1-29096b9399a9@debian.org>
+X-B4-Tracking: v=1; b=H4sIAHU7r2cC/x3M4QpAMBQG0Fe5fb+ttptFexVJ4o5bGm2SkndXz
+ gOcB0WySkGgB1kuLbonBHIVYVrHtIjRGYHAlr1lV5t9m4e4jUsxntso1nPduAkV4cgS9f6vDkl
+ Ok+Q+0b/vB8be6gZlAAAA
+X-Change-ID: 20250214-old_flags-528fe052471c
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1604; i=leitao@debian.org;
+ h=from:subject:message-id; bh=BzDfEKhUE15vpc1INVw+F1pbXo84Ls4FTMQ+1iKgxtU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnrzuBGr06RVPZHbr3vzDgq0KoAoIzIV5+aOhvr
+ STWQhRjDAaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ687gQAKCRA1o5Of/Hh3
+ bauND/oDDyzI76zBxHqHhMyT2m/sm8HmPORt6uKeYx9YhkNvMpZkSQyLrUKSZQXZ9cHTdowd6U+
+ ln3EGuS8j9H3Q6L0Ilh0w6PPfuWvuUCu1zQrfjLyENUId/DX7328NMhP00SYFrVZ7rIZKjNxdQ3
+ O2CQ9T4b5pyhv9PRJycr3MoEcBZs6EmIkdMFc7YZqJ6VFYvwCaZrLX5nnG2SvE34hkhYegMRJ07
+ tawIFc5rVaMSBg96w/7MY4sXoZsIUzQ1ru+9/z0/JuPK+pz7GPMcyNwCaYAdEtKTSKudbbyaPsO
+ WU4eentTLOr/piMIeHhjs6umEnSJcRY+aarealuWz3P0KVFqWlP1phgHBiUaxjZFcNTgtZEl+t6
+ FKHQN4GISNESz/BXfCK5G15Vg29hf3ivC7HDIx6nXWwmh4KZPAI1DehDBmMi5pmigHzU5OIVGjo
+ x8vEfSRi3ssf2Mw4NPnj9j23AiOw9fSurshjtgZxMUqIO7Eqo7P/wvPPn9+0qQdO4zncnhRWtRK
+ RSfiLs/coLE51Re0TGM0QbJk9su0FKAeuvAsVYGrbjKwSKG8fIMl7Q8IWtozCZjrVw7AwI74On4
+ N47IABt7VXvZ73fUAtzd3Ndfr+SqU/pxcLvwIhnFGaCmuLFSeNMcgA9N9st3rl4WyvzcBzdlJcP
+ np7nodxTc9GZpSQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Thu, Feb 13, 2025 at 11:36:10PM +0100, Pierre Riteau wrote:
-> tcf_exts_miss_cookie_base_alloc() calls xa_alloc_cyclic() which can
-> return 1 if the allocation succeeded after wrapping. This was treated as
-> an error, with value 1 returned to caller tcf_exts_init_ex() which sets
-> exts->actions to NULL and returns 1 to caller fl_change().
-> 
-> fl_change() treats err == 1 as success, calling tcf_exts_validate_ex()
-> which calls tcf_action_init() with exts->actions as argument, where it
-> is dereferenced.
-> 
-> Example trace:
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> CPU: 114 PID: 16151 Comm: handler114 Kdump: loaded Not tainted 5.14.0-503.16.1.el9_5.x86_64 #1
-> RIP: 0010:tcf_action_init+0x1f8/0x2c0
-> Call Trace:
->  tcf_action_init+0x1f8/0x2c0
->  tcf_exts_validate_ex+0x175/0x190
->  fl_change+0x537/0x1120 [cls_flower]
-> 
-> Fixes: 80cd22c35c90 ("net/sched: cls_api: Support hardware miss to tc action")
-> Signed-off-by: Pierre Riteau <pierre@stackhpc.com>
-> ---
->  net/sched/cls_api.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 8e47e5355be6..4f648af8cfaa 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -97,7 +97,7 @@ tcf_exts_miss_cookie_base_alloc(struct tcf_exts *exts, struct tcf_proto *tp,
->  
->  	err = xa_alloc_cyclic(&tcf_exts_miss_cookies_xa, &n->miss_cookie_base,
->  			      n, xa_limit_32b, &next, GFP_KERNEL);
-> -	if (err)
-> +	if (err < 0)
->  		goto err_xa_alloc;
->  
->  	exts->miss_cookie_node = n;
+The old_flags variable is declared twice in __dev_change_flags(),
+causing a shadow variable warning. This patch fixes the issue by
+removing the redundant declaration, reusing the existing old_flags
+variable instead.
 
-Thanks for fixing.
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+	net/core/dev.c:9225:16: warning: declaration shadows a local variable [-Wshadow]
+	9225 |                 unsigned int old_flags = dev->flags;
+	|                              ^
+	net/core/dev.c:9185:15: note: previous declaration is here
+	9185 |         unsigned int old_flags = dev->flags;
+	|                      ^
+	1 warning generated.
 
-The same thing is done in devlink_rel_alloc() (net/devlink/core.c). I am
-not sure if it can lead to NULL pointer dereference as here.
+This change has no functional impact on the code, as the inner variable
+does not affect the outer one. The fix simply eliminates the unnecessary
+declaration and resolves the warning.
 
-Thanks,
-Michal
+Fixes: 991fb3f74c142e ("dev: always advertise rx_flags changes via netlink")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> -- 
-> 2.43.5
+diff --git a/net/core/dev.c b/net/core/dev.c
+index d5ab9a4b318ea4926c200ef20dae01eaafa18c6b..cd2474a138201e6ee86acf39ca425d57d8d2e9b4 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9182,7 +9182,7 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 
+ 	if ((flags ^ dev->gflags) & IFF_PROMISC) {
+ 		int inc = (flags & IFF_PROMISC) ? 1 : -1;
+-		unsigned int old_flags = dev->flags;
++		old_flags = dev->flags;
+ 
+ 		dev->gflags ^= IFF_PROMISC;
+ 
+
+---
+base-commit: 7a7e0197133d18cfd9931e7d3a842d0f5730223f
+change-id: 20250214-old_flags-528fe052471c
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
