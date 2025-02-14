@@ -1,111 +1,139 @@
-Return-Path: <netdev+bounces-166393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31367A35DFC
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:57:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F1EDA35E4F
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23E8C1890C9A
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 12:56:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D043B3830
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3242264613;
-	Fri, 14 Feb 2025 12:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oh+rWHFF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DE5264A97;
+	Fri, 14 Feb 2025 13:01:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DAD24291F
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958BF264A9A;
+	Fri, 14 Feb 2025 13:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739537767; cv=none; b=hM/0morg1/ogIppkXwmi50QZ1VGMtVq8/rBmJ6EWCpBuX2SsKIGRmFPSfnSez9D2bfca70xLzAUNJ2RoWqG1m/xbAWQEXdTrPFcuOb2Svg9Qi04C0vaBElAEiDnefcoesrYTB0ROzbWc/MzrdVayVNclhxDSCDcNnvXGFh69u0w=
+	t=1739538092; cv=none; b=nRsduaedp4bNcOXTwCerUm5ejh9yheq2jWXxOKTE6RLyV6fcnPU9RwADrcLbw/6UB9MW+KQyhjiclv7ig1gcfUZbm7NSk5bEf3U6X3CUj9osKhd7nfckSGuu4YUloixoeBPaQyargpkUZ/HgMNruJr4Wy39cnO0MpX57pQDtnvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739537767; c=relaxed/simple;
-	bh=ojwpUwUMjiHFVlNSSpVEmHK5c+oUMwCP47ryH5F0B2M=;
+	s=arc-20240116; t=1739538092; c=relaxed/simple;
+	bh=FIBo4Pn5/bM8NNMW2uzH89Pu3UzY3UHIvwIrPFjcIYk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PW0YCE7ngUpCR99r895eg39ygoNWOWdBMUD8d+oM4KmZJpulT4xqFDoNp2o3BdD++tJD6VoRBXiJC+GD9Bs3LUBk3Le6xBFUAlOK+adKXF1lLuXFrd/VY+kmypGPQ295MByHWhrWdrL2ZdgjSYRvqZ/BXoQG8AzNoebf4nGtIUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oh+rWHFF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n9k4uW8l5W7e8oOK/XQ0vmxtMr81+tb0T7YV8IoBSmk=; b=oh+rWHFFiGIiBdHKcyEym+pEMO
-	lCsiWbjJS5VFO1Paq4IEfG+AxCWXq9c60Mtkha8utCSQHYiGfWHNPLIXkXxB1gU8NXM8Ec6WFda6z
-	nyU/EuzO/Vux3aBSkp+bkmlBQtXfiOn6JILrlouzb7R0Ua9pFful2cmx8DHIiV0LZ8lk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tivEa-00E4Ej-VU; Fri, 14 Feb 2025 13:55:56 +0100
-Date: Fri, 14 Feb 2025 13:55:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux@armlinux.org.uk, sanman.p211993@gmail.com,
-	vadim.fedorenko@linux.dev, suhui@nfschina.com, horms@kernel.org,
-	sdf@fomichev.me, jdamato@fastly.com, brett.creeley@amd.com,
-	przemyslaw.kitszel@intel.com, colin.i.king@gmail.com,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next V2] eth: fbnic: Add ethtool support for IRQ
- coalescing
-Message-ID: <bd76941d-a6fa-483d-8f91-a5d699b6b945@lunn.ch>
-References: <20250214035037.650291-1-mohsin.bashr@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VKDKSlGY/irHND4uCJofoEF+g6InVFdGPC/6LxfsZdL47MFD1bZESUoA14MLR6yOXhfwl33AZXAyy2Ze5DI6TRA843BidtVJ+LLbLwVREUc3+Xf9wP9ifOp/lHsvz+nn6cnw7KIoEjSjS/1o7WJvWLM41NARuzOzxRQSUlXZvPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so1106614a12.1;
+        Fri, 14 Feb 2025 05:01:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739538089; x=1740142889;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SmJSbPjau7GZkUvt4YAQLEQLZ+4k7GSl+yHabGYZeqg=;
+        b=r5b4CCrBRukca8dW6trOReaOCLrjy95fAenMeFpNH/cuEF05cgTBy9FrOVFnJm7xyL
+         sa/qBqRuzu8MD9P+zxdCvsx/RKSggt/hEQS0IrS+D9e7ffLQGciKqhKtsWZLIzaLNf2Z
+         EDHI9M7IysptptsPz2Jtz3geLX/L3s4pZW2KoCFn03e/rydGoPBUF/9Cbaimx0AgPQcg
+         zpghuKwqrYo0HL7p5/mWA43JCaB7Aetehl3XQINF+TLTqN3AuR0klT/uTWS8ly1JxHFe
+         FZm5wVB2VlQ6aCL5aWtAG+a7Ieu17DVdPisb4cwzwV9ieO2vmDxL/VTJ7nZ62oDI7fi7
+         H8tA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgS60VUGlJvtIHcTqU+WP7o4wu/V3jBIoA4agB+lc/o4r74v7djxQwyyphJt2EhT4aQ31ImxEq@vger.kernel.org, AJvYcCWI2b66Rmp1kUmA1j0iCg6HP6hESocDP0jsUsJbj/4Z0vrPzzX1HhZsxxeRpvN6zZo5LdcBG0rJ@vger.kernel.org, AJvYcCWsAj8WAolw6F1YTrxGCpMMM9koqtoIkHhDdkgVWVNUuVtNaIReYtgCHtRHI88DfIGZpoGBwsPu7+BQADo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/bugQ4iL1NM7wCDcP54tAB4oZI/SIpxJ4nPe0SZAfnjs56sG4
+	dZ8C60JB9XFo1kIJjdz+WXZpY4FIjuidsFvIS8y493p0HWl6tbga
+X-Gm-Gg: ASbGnctXpAhgHH8AGQh3GsALmw0qS4hRilyu2VHv4lVND/gZ3RKmkZXrVxfcF5zHzv8
+	eZ9qhPm3I0AlwKs/veW2PgyW7oVlJtZheOQy9KlS5Ug0FYN+mOGQ71FB5fFHR0ouVQlGWLyzg9t
+	0Tz01+hf3hmDC6EvvQA54b8oQ6maUT3rpGz6m5Ujd1kywd/MIAtwlnIo9nBMdCHn+/ZTFu4xzfo
+	+B+4n3/b6pvx4GkCUU4vNQeXyD3UOympEcPO7JgEi6VqLsVO7yJxA2mN5ZOAdlQTgb9ESRSp/84
+	B6sflQ==
+X-Google-Smtp-Source: AGHT+IEirsmfMl6q8OzxN8fXiy6/+vOALKyTI2Z/D3DognQreEPKQsCrns0gsFkYbx+oq0ZFm8aeEA==
+X-Received: by 2002:a17:907:1c1e:b0:ab7:ef47:ed27 with SMTP id a640c23a62f3a-aba50febe2cmr709899666b.13.1739538088320;
+        Fri, 14 Feb 2025 05:01:28 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba532581cesm334181466b.45.2025.02.14.05.01.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 05:01:27 -0800 (PST)
+Date: Fri, 14 Feb 2025 05:01:25 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	paulmck@kernel.org, kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH net] netdevsim: disable local BH when scheduling NAPI
+Message-ID: <20250214-daffy-athletic-kakapo-ba9b1b@leitao>
+References: <20250212-netdevsim-v1-1-20ece94daae8@debian.org>
+ <CANn89iKnqeDCrEsa4=vf1XV4N6+FUbfB8S6tXG6n8V+LKGfBEg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250214035037.650291-1-mohsin.bashr@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKnqeDCrEsa4=vf1XV4N6+FUbfB8S6tXG6n8V+LKGfBEg@mail.gmail.com>
 
-On Thu, Feb 13, 2025 at 07:50:37PM -0800, Mohsin Bashir wrote:
-> Add ethtool support to configure the IRQ coalescing behavior. Support
-> separate timers for Rx and Tx for time based coalescing. For frame based
-> configuration, currently we only support the Rx side.
-> 
-> The hardware allows configuration of descriptor count instead of frame
-> count requiring conversion between the two. We assume 2 descriptors
-> per frame, one for the metadata and one for the data segment.
-> 
-> When rx-frames are not configured, we set the RX descriptor count to
-> half the ring size as a fail safe.
-> 
-> Default configuration:
-> ethtool -c eth0 | grep -E "rx-usecs:|tx-usecs:|rx-frames:"
-> rx-usecs:       30
-> rx-frames:      0
-> tx-usecs:       35
-> 
-> IRQ rate test:
-> With single iperf flow we monitor IRQ rate while changing the tx-usesc and
-> rx-usecs to high and low values.
-> 
-> ethtool -C eth0 rx-frames 8192 rx-usecs 150 tx-usecs 150
-> irq/sec   13k
-> irq/sec   14k
-> irq/sec   14k
-> 
-> ethtool -C eth0 rx-frames 8192 rx-usecs 10 tx-usecs 10
-> irq/sec  27k
-> irq/sec  28k
-> irq/sec  28k
-> 
-> Validating the use of extack:
-> ethtool -C eth0 rx-frames 16384
-> netlink error: fbnic: rx_frames is above device max
-> netlink error: Invalid argument
+Hello Eric,
 
-Nice, thanks.
+On Wed, Feb 12, 2025 at 07:55:32PM +0100, Eric Dumazet wrote:
+> On Wed, Feb 12, 2025 at 7:34 PM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > --- a/drivers/net/netdevsim/netdev.c
+> > +++ b/drivers/net/netdevsim/netdev.c
+> > @@ -87,7 +87,9 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+> >         if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
+> >                 goto out_drop_cnt;
+> >
+> > +       local_bh_disable();
+> >         napi_schedule(&rq->napi);
+> > +       local_bh_enable();
+> >
+> 
+> I thought all ndo_start_xmit() were done under local_bh_disable()
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I think it depends on the path?
 
-    Andrew
+> Could you give more details ?
+
+There are several paths to ndo_start_xmit(), and please correct me if
+I am reading the code wrongly here.
+
+Common path:
+
+	__dev_direct_xmit()
+		local_bh_disable();
+			netdev_start_xmit()
+				__netdev_start_xmit()
+					ops->ndo_start_xmit(skb, dev);
+
+
+But, in some other cases, I see:
+
+	netpoll_start_xmit()
+		netdev_start_xmit()
+			....
+
+My reading is that not all cases have local_bh_disable() disabled before
+calling ndo_start_xmit().
+
+Question: Must BH be disabled before calling ndo_start_xmit()? If so,
+the problem might be in the netpoll code!? Also, is it worth adding
+a DEBUG_NET_WARN_ON_ONCE()?
+
+Note: Jakub gave another suggestion on how to fix this, so, I send a v2
+with a different approach:
+
+	https://lore.kernel.org/all/20250213071426.01490615@kernel.org/
+
+Thanks for the review!
+--breno
+
 
