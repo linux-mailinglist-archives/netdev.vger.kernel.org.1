@@ -1,204 +1,433 @@
-Return-Path: <netdev+bounces-166555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D29A36726
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 21:58:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE22A3672B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 21:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FD091678DE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 20:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD0A1893C9A
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 20:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDBD1C8633;
-	Fri, 14 Feb 2025 20:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFA81D9A79;
+	Fri, 14 Feb 2025 20:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="INKco4EG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXpbrZh8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5166A1C8619
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 20:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0096E1AA1E0;
+	Fri, 14 Feb 2025 20:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739566701; cv=none; b=h0SpSkZHKrGe9RJvdwvOqER8CltUwCS3E0hjEgZRaQ5fMnD41te/KQ//oOJBpV24NXLP6PGI8KELRhyOokswyuMT6gL8AyWmB/LaCTHaEOQOAvCW2YMoAUNc0hXI0m4GioARKZmBhLWLrBo2/+xmr+f2g0qIBLW82GcsC0dY54U=
+	t=1739566747; cv=none; b=JC+qVKhTyKp8B0A1BZ7OSwwHJ0XXeYDISBv0nvqPdh3XZrT7g9ct34E81NhJY3OpIt68uki6ABU2lG4FSItANcz5fqA7EsXkYEbmrpYhILdQsY7W8LOKlwkqOyOTpwi9zpc8XgIVXB9oKfa7h07mEotlKmpZgPhqxH++brNf0Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739566701; c=relaxed/simple;
-	bh=vaKwmHnAyriqw0O10M/Qwf2Y5vvws0cQSQXtACGqsfk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hC6Nbq3fkJ1tekzv370pujrzPxvQcDwvDcbUhZ5zmLe5kG5XC2H2SVrIX41tkNLfPlcmnwwxpNNvMCi0xkevmmFu8SbLnm5wH8OoxVHX2XdfVgDkHqTdvSSCgRho7XkyrMj+EltO/G01dvHIT5smMVp99SeGQt9mCl432FJe+3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=INKco4EG; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21f8c280472so7425ad.1
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 12:58:20 -0800 (PST)
+	s=arc-20240116; t=1739566747; c=relaxed/simple;
+	bh=mFlGyEVpPTlXv6cGryde7xEh5ORjIleuWyrYtfDjFlo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KsHsN14mV3Sd0Vif6pcxwzdmtQ0lIJN18LyPj8MTzbfjMvySU+auHurodn4PjCq16GFterhmBoHYwbkyZLIRYGZl8wgm2JVwRvwUMwKVyvPHBLIBKxRSrebllSBqdwVqXkQNC0BHdAMAalBmR6KWeRJxsl7tRdgb5TpID9YdYwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXpbrZh8; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-38f2f748128so466107f8f.1;
+        Fri, 14 Feb 2025 12:59:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739566699; x=1740171499; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2YgySpnqFZLhvEyVlrQicLthetC3cVznXnvyAWuRKPc=;
-        b=INKco4EGdnDB/fWUSfqA+LvgLTV4CSurw2RLCOUsI079ybiABggsMV8XKJdbeLtPM/
-         ltbgjWU9Lf6Y+qGpq0tNjvpZSrBe0cY+jyBAs3CvWsLKs5ZILfnWw4yAWKRM4tSEQWmp
-         2Qg23Wi+ZclT5NNc4Umd3oBKk2PJfVrgowt29059iQs+vcNL/XxHQEdpuZFBnBQhMyC4
-         vNYDRmDGDc3/YhsSXZCY+aHw53mxssNWApbWySGnAEq4H4lneuq5dOj4MTTJQPXNzVL9
-         QR5uHKF6zdNs6JwvC9B9gpc0ED6lemp9Zv4amatqgNX+gLjYvX90f9qgpiJ8MnHh3mPW
-         B7VQ==
+        d=gmail.com; s=20230601; t=1739566743; x=1740171543; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eXeQ5MGj+nMjyi2bW+O+ck5e5Rx8K8X7YXDWKqRftac=;
+        b=GXpbrZh82xHRdHqRLU3HBVRyZP3BHcWg6fBKoGTVD8LmquqZbiBJiLyQiMnp1UMG/4
+         eJSaoCCsd74FI3gZgSvYU4468MItGc2AkteBAr1cwybYeR8cqqv7/i55cTa+TKEshqRI
+         a3juYc4JLLfQ94m3wH9S2UwYapycdDrJkGJMueio2086L8YtfVOMrbATn4LhLSeArVuc
+         HJLiZyICILpCQ8KWw84HJf73bIWR5NW70SDi0Umpcp0mUwMlAdbbAWjwOUrL6LF+XHHw
+         Ce/kri1/Asbrdm0C9GhBpi7HOqfd9KDvAnZIj9/eM03LysH33saSp7VW1/ZoDkB0cuUg
+         DPvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739566699; x=1740171499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2YgySpnqFZLhvEyVlrQicLthetC3cVznXnvyAWuRKPc=;
-        b=TuZ82YbHaVyF9O/l0VsOgTnpr5tHgZREH7FqWtTkpXWmVsisYa2ee5wuV4o+1FMC8A
-         J1Te38H7n/T8O1osL3rTEKrFmZfsu34/BQAhqR0zYZ3ei889KockcTN9m+2ra+1h1YU4
-         /RwFjTwXiVypKPm1j5YzO4BgarjXE6C4HaIhfUGmgXE0D7ZA6ctl+x8M3Q4OUdjnWrI2
-         xoeNuyvM/DDphfjrjCZ6HvDi1sBWlDTPP5B4ckamZsjjkjFvEODRNyTZMmIVk5EUSuLO
-         MmQzqgDJwTFjZJAJEjAFlucj33Qk2WRiyNkqtSQ/LQj2Ms1dLHj0EHmRQ0fRcCNE8IiU
-         IIiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXvVI1KktYI2J2abMf9IKtJeJDXdeT9v1to/8FvnXQObDxcO5U+SBfND8aKGL3hYmvyQF8U6A8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLSWnOcN7P2LGayelk5OG6yN1b2Udzgq0/1nmdIjU3teD8qk/U
-	7ImHc+2c5hgxl2lfA3FSDWM8U/q1a+WsDrI5JqNpiu1Y49x7BxldKhZeFmn1+qn7ieHNJAuHL1o
-	adD200PeI+H2BRO4WBNV/6LTFUbxAhK99QaVm
-X-Gm-Gg: ASbGnct4TvI4m3wzfhM96ro0PYwB28cZZKdWl80NBlx2izhKnCValVSquTIsZqG/yRg
-	JeY31vHqlg7ZRTKn7UJo+s8O8rfuJZaCNbOLN3JuZAUvrfB1pPSK/b/VrxHWHzUJN9KumBE4hQn
-	BNbyRAEHOUtjKpcS6Yr2nRh4pqnd8=
-X-Google-Smtp-Source: AGHT+IHMo7WsTDcyDI2IJxk30OmWpNkq4lqd/LDPkpSnJQoBmryh3jggnLVgBNK9KRLZbjUR8YF1jff3s8KWZZmox3M=
-X-Received: by 2002:a17:902:d50d:b0:220:c905:689f with SMTP id
- d9443c01a7336-22104ec0a38mr369985ad.25.1739566699325; Fri, 14 Feb 2025
- 12:58:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739566743; x=1740171543;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eXeQ5MGj+nMjyi2bW+O+ck5e5Rx8K8X7YXDWKqRftac=;
+        b=mOSUCQpopnPp+QYhZPEOj2onH39F9KKUOvJSQHH0rxuPTVq3tn5LS7C63jwPKxj6SO
+         UQUwB01r881ZaGbLBCWbE1ogK4hA9M6X/Rsn5Si/87QcQlfw1IsGE6p4FbfgLhOb/It5
+         jpA8AzZKD6j0QXliqoc3tlNGhGnO7Mu+irCNNo9OQIX1Aq/LY3QVPD47jUYdISA9kGk8
+         Ha1MPHBJK5OHfz65CnlCZow3aB1wHLBSdRsxZH4jVgGGJ2UJOP3Yyhhx6Z5U2ahWxQHU
+         iFEM/mEhEWdNlBtVzLlOOWN4glODixVw6pYQeC2T+4l5W05Hj8Z0RG7LjDUAbBT+1OPx
+         G/PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVvdfKMx3tmHnLD1746/CJtHzI42dgpE3iTUYz3PlOg0vgHA/sFaplQlC+QP5IgSWtPucHYtf7qXYbRZkmHCxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXh0bd4cDwew+1TznJr9nG15wwrvq+F5bKFBKOK/ojwrlzzND+
+	MpMORhPvWmrmy0TFyTnSPbEUpJPK5cQTCJusjoUAbynjabO4XXskfV3vfjVg
+X-Gm-Gg: ASbGncvWyEOS0xeqNSP6YfWhRqG6QHHXb8RWKizmz0tsIVPurTVRDFrgoQ7NJ7EkBik
+	RrQbOQwWDk/aKArtI8v7nS1RrbZ49x1orRo5FZuioDktnpBTMy9EM4jA6zll9cF6grGwojhRty0
+	nqhdQ4NscPoqmng87UwgynsbaPkuaJlgUoFRJMkaajQSOZzkCVO3aeBE4Y+LrIT8KBck2TXIOS5
+	DLcBkwwqRx/z7SvY+u94MrgnWBIpXHPXW2GG4KM4Qj10X83cixJOwJfGn+7fT6jdgsjQViZojnD
+	mEmKNHKRRX972W09rof96uG/vRw3EshAHkm+
+X-Google-Smtp-Source: AGHT+IESo6J0+zRAVASF/ZMT8KvFhGEgOMm1RoknaLLWwYFt+QhYcQNG5WSTLatUFTsl6tUGc4pYxw==
+X-Received: by 2002:a5d:47c3:0:b0:38e:53e7:da50 with SMTP id ffacd0b85a97d-38f33f52fc0mr638664f8f.30.1739566742447;
+        Fri, 14 Feb 2025 12:59:02 -0800 (PST)
+Received: from localhost.localdomain ([2001:4c4e:1e9e:5700:2a28:d53d:268f:6f1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a06d237sm84360125e9.21.2025.02.14.12.59.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 12:59:02 -0800 (PST)
+From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+To: netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	idosch@idosch.org,
+	horms@kernel.org,
+	davem@davemloft.net,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Subject: [PATCH net-next v3] selftests: net: add support for testing SO_RCVMARK and SO_RCVPRIORITY
+Date: Fri, 14 Feb 2025 21:58:28 +0100
+Message-ID: <20250214205828.48503-1-annaemesenyiri@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212092552.1779679-1-linyunsheng@huawei.com> <20250212092552.1779679-3-linyunsheng@huawei.com>
-In-Reply-To: <20250212092552.1779679-3-linyunsheng@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 14 Feb 2025 12:58:05 -0800
-X-Gm-Features: AWEUYZkrCnzHRX-UM7YzAnXpZTXuHcolUoh7nm-MSMVw8gpzJwYFTphmx0X5nYE
-Message-ID: <CAHS8izPZe0UHn8P38EvzX0ei_jGJnsXg99B5ra9Ldu09aWBU-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 2/4] page_pool: fix IOMMU crash when driver
- has already unbound
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com, 
-	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	IOMMU <iommu@lists.linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 12, 2025 at 1:34=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> Networking driver with page_pool support may hand over page
-> still with dma mapping to network stack and try to reuse that
-> page after network stack is done with it and passes it back
-> to page_pool to avoid the penalty of dma mapping/unmapping.
-> With all the caching in the network stack, some pages may be
-> held in the network stack without returning to the page_pool
-> soon enough, and with VF disable causing the driver unbound,
-> the page_pool does not stop the driver from doing it's
-> unbounding work, instead page_pool uses workqueue to check
-> if there is some pages coming back from the network stack
-> periodically, if there is any, it will do the dma unmmapping
-> related cleanup work.
->
-> As mentioned in [1], attempting DMA unmaps after the driver
-> has already unbound may leak resources or at worst corrupt
-> memory. Fundamentally, the page pool code cannot allow DMA
-> mappings to outlive the driver they belong to.
->
-> Currently it seems there are at least two cases that the page
-> is not released fast enough causing dma unmmapping done after
-> driver has already unbound:
-> 1. ipv4 packet defragmentation timeout: this seems to cause
->    delay up to 30 secs.
-> 2. skb_defer_free_flush(): this may cause infinite delay if
->    there is no triggering for net_rx_action().
->
-> In order not to call DMA APIs to do DMA unmmapping after driver
-> has already unbound and stall the unloading of the networking
-> driver, use some pre-allocated item blocks to record inflight
-> pages including the ones which are handed over to network stack,
-> so the page_pool can do the DMA unmmapping for those pages when
-> page_pool_destroy() is called. As the pre-allocated item blocks
-> need to be large enough to avoid performance degradation, add a
-> 'item_fast_empty' stat to indicate the unavailability of the
-> pre-allocated item blocks.
->
-> By using the 'struct page_pool_item' referenced by page->pp_item,
-> page_pool is not only able to keep track of the inflight page to
-> do dma unmmaping if some pages are still handled in networking
-> stack when page_pool_destroy() is called, and networking stack is
-> also able to find the page_pool owning the page when returning
-> pages back into page_pool:
-> 1. When a page is added to the page_pool, an item is deleted from
->    pool->hold_items and set the 'pp_netmem' pointing to that page
->    and set item->state and item->pp_netmem accordingly in order to
->    keep track of that page, refill from pool->release_items when
->    pool->hold_items is empty or use the item from pool->slow_items
->    when fast items run out.
-> 2. When a page is released from the page_pool, it is able to tell
->    which page_pool this page belongs to by masking off the lower
->    bits of the pointer to page_pool_item *item, as the 'struct
->    page_pool_item_block' is stored in the top of a struct page. And
->    after clearing the pp_item->state', the item for the released page
->    is added back to pool->release_items so that it can be reused for
->    new pages or just free it when it is from the pool->slow_items.
-> 3. When page_pool_destroy() is called, item->state is used to tell if
->    a specific item is being used/dma mapped or not by scanning all the
->    item blocks in pool->item_blocks, then item->netmem can be used to
->    do the dma unmmaping if the corresponding inflight page is dma
->    mapped.
->
-> The overhead of tracking of inflight pages is about 10ns~20ns,
-> which causes about 10% performance degradation for the test case
-> of time_bench_page_pool03_slow() in [2].
->
-> Note, the devmem patchset seems to make the bug harder to fix,
-> and may make backporting harder too. As there is no actual user
-> for the devmem and the fixing for devmem is unclear for now,
-> this patch does not consider fixing the case for devmem yet.
->
-> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kern=
-el.org/T/
-> 2. https://github.com/netoptimizer/prototype-kernel
-> CC: Robin Murphy <robin.murphy@arm.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: IOMMU <iommu@lists.linux.dev>
-> Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Tested-by: Yonglong Liu <liuyonglong@huawei.com>
-[...]
-> +
-> +/* The size of item_block is always PAGE_SIZE, so that the address of it=
-em_block
-> + * for a specific item can be calculated using 'item & PAGE_MASK'
-> + */
-> +struct page_pool_item_block {
-> +       struct page_pool *pp;
-> +       struct list_head list;
-> +       struct page_pool_item items[];
-> +};
-> +
+Introduce tests to verify the correct functionality of the SO_RCVMARK and 
+SO_RCVPRIORITY socket options.
 
-I think this feedback was mentioned in earlier iterations of the series:
+Key changes include:
 
-Can we not hold a struct list_head in the page_pool that keeps track
-of inflight netmems that we need to dma-unmap on page_pool_destroy?
-Why do we have to modify the pp entry in the struct page and struct
-net_iov?
+- so_rcv_listener.c: Implements a receiver application to test the correct 
+behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
+- test_so_rcv.sh: Provides a shell script to automate testing for these options.
+- Makefile: Integrates test_so_rcv.sh into the kernel selftests.
 
-The decision to modify pp entry in struct page and struct net_iov is
-making this patchset bigger and harder to review IMO.
+v3:
 
---=20
-Thanks,
-Mina
+- Add the C part to TEST_GEN_FILES.
+- Ensure the test fails if no cmsg of type opt.name is received
+in so_rcv_listener.c
+- Rebased on net-next.
+
+v2:
+
+https://lore.kernel.org/netdev/20250210192216.37756-1-annaemesenyiri@gmail.com/
+- Add the C part to TEST_GEN_PROGS and .gitignore.
+- Modify buffer space and add IPv6 testing option
+in so_rcv_listener.c.
+- Add IPv6 testing, remove unnecessary comment,
+add kselftest exit codes, run both binaries in a namespace,
+and add sleep in test_so_rcv.sh.
+The sleep was added to ensure that the listener process has
+enough time to start before the sender attempts to connect.
+- Rebased on net-next.
+
+v1:
+
+https://lore.kernel.org/netdev/20250129143601.16035-2-annaemesenyiri@gmail.com/
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
+Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+
+---
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/Makefile          |   2 +
+ tools/testing/selftests/net/so_rcv_listener.c | 168 ++++++++++++++++++
+ tools/testing/selftests/net/test_so_rcv.sh    |  73 ++++++++
+ 4 files changed, 244 insertions(+)
+ create mode 100644 tools/testing/selftests/net/so_rcv_listener.c
+ create mode 100755 tools/testing/selftests/net/test_so_rcv.sh
+
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 28a715a8ef2b..80dcae53ef55 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -42,6 +42,7 @@ socket
+ so_incoming_cpu
+ so_netns_cookie
+ so_txtime
++so_rcv_listener
+ stress_reuseport_listen
+ tap
+ tcp_fastopen_backup_key
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b6271714504d..8d6116b80cf1 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
+ TEST_PROGS += gre_gso.sh
+ TEST_PROGS += cmsg_so_mark.sh
+ TEST_PROGS += cmsg_so_priority.sh
++TEST_PROGS += test_so_rcv.sh
+ TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
+ TEST_PROGS += netns-name.sh
+ TEST_PROGS += nl_netdev.py
+@@ -76,6 +77,7 @@ TEST_GEN_PROGS += reuseport_dualstack reuseaddr_conflict tls tun tap epoll_busy_
+ TEST_GEN_FILES += toeplitz
+ TEST_GEN_FILES += cmsg_sender
+ TEST_GEN_FILES += stress_reuseport_listen
++TEST_GEN_FILES += so_rcv_listener
+ TEST_PROGS += test_vxlan_vnifiltering.sh
+ TEST_GEN_FILES += io_uring_zerocopy_tx
+ TEST_PROGS += io_uring_zerocopy_tx.sh
+diff --git a/tools/testing/selftests/net/so_rcv_listener.c b/tools/testing/selftests/net/so_rcv_listener.c
+new file mode 100644
+index 000000000000..4b0b14edce61
+--- /dev/null
++++ b/tools/testing/selftests/net/so_rcv_listener.c
+@@ -0,0 +1,168 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <errno.h>
++#include <netdb.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <linux/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++
++#ifndef SO_RCVPRIORITY
++#define SO_RCVPRIORITY 82
++#endif
++
++struct options {
++	__u32 val;
++	int name;
++	int rcvname;
++	const char *host;
++	const char *service;
++} opt;
++
++static void __attribute__((noreturn)) usage(const char *bin)
++{
++	printf("Usage: %s [opts] <dst host> <dst port / service>\n", bin);
++	printf("Options:\n"
++		"\t\t-M val  Test SO_RCVMARK\n"
++		"\t\t-P val  Test SO_RCVPRIORITY\n"
++		"");
++	exit(EXIT_FAILURE);
++}
++
++static void parse_args(int argc, char *argv[])
++{
++	int o;
++
++	while ((o = getopt(argc, argv, "M:P:")) != -1) {
++		switch (o) {
++		case 'M':
++			opt.val = atoi(optarg);
++			opt.name = SO_MARK;
++			opt.rcvname = SO_RCVMARK;
++			break;
++		case 'P':
++			opt.val = atoi(optarg);
++			opt.name = SO_PRIORITY;
++			opt.rcvname = SO_RCVPRIORITY;
++			break;
++		default:
++			usage(argv[0]);
++			break;
++		}
++	}
++
++	if (optind != argc - 2)
++		usage(argv[0]);
++
++	opt.host = argv[optind];
++	opt.service = argv[optind + 1];
++}
++
++int main(int argc, char *argv[])
++{
++	int err = 0;
++	int recv_fd = -1;
++	int ret_value = 0;
++	__u32 recv_val;
++	struct cmsghdr *cmsg;
++	char cbuf[CMSG_SPACE(sizeof(__u32))];
++	char recv_buf[CMSG_SPACE(sizeof(__u32))];
++	struct iovec iov[1];
++	struct msghdr msg;
++	struct sockaddr_in recv_addr4;
++	struct sockaddr_in6 recv_addr6;
++
++	parse_args(argc, argv);
++
++	int family = strchr(opt.host, ':') ? AF_INET6 : AF_INET;
++
++	recv_fd = socket(family, SOCK_DGRAM, IPPROTO_UDP);
++	if (recv_fd < 0) {
++		perror("Can't open recv socket");
++		ret_value = -errno;
++		goto cleanup;
++	}
++
++	err = setsockopt(recv_fd, SOL_SOCKET, opt.rcvname, &opt.val, sizeof(opt.val));
++	if (err < 0) {
++		perror("Recv setsockopt error");
++		ret_value = -errno;
++		goto cleanup;
++	}
++
++	if (family == AF_INET) {
++		memset(&recv_addr4, 0, sizeof(recv_addr4));
++		recv_addr4.sin_family = family;
++		recv_addr4.sin_port = htons(atoi(opt.service));
++
++		if (inet_pton(family, opt.host, &recv_addr4.sin_addr) <= 0) {
++			perror("Invalid IPV4 address");
++			ret_value = -errno;
++			goto cleanup;
++		}
++
++		err = bind(recv_fd, (struct sockaddr *)&recv_addr4, sizeof(recv_addr4));
++	} else {
++		memset(&recv_addr6, 0, sizeof(recv_addr6));
++		recv_addr6.sin6_family = family;
++		recv_addr6.sin6_port = htons(atoi(opt.service));
++
++		if (inet_pton(family, opt.host, &recv_addr6.sin6_addr) <= 0) {
++			perror("Invalid IPV6 address");
++			ret_value = -errno;
++			goto cleanup;
++		}
++
++		err = bind(recv_fd, (struct sockaddr *)&recv_addr6, sizeof(recv_addr6));
++	}
++
++	if (err < 0) {
++		perror("Recv bind error");
++		ret_value = -errno;
++		goto cleanup;
++	}
++
++	iov[0].iov_base = recv_buf;
++	iov[0].iov_len = sizeof(recv_buf);
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = cbuf;
++	msg.msg_controllen = sizeof(cbuf);
++
++	err = recvmsg(recv_fd, &msg, 0);
++	if (err < 0) {
++		perror("Message receive error");
++		ret_value = -errno;
++		goto cleanup;
++	}
++
++	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++		if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == opt.name) {
++			recv_val = *(__u32 *)CMSG_DATA(cmsg);
++			printf("Received value: %u\n", recv_val);
++
++			if (recv_val != opt.val) {
++				fprintf(stderr, "Error: expected value: %u, got: %u\n",
++					opt.val, recv_val);
++				ret_value = -EINVAL;
++			}
++			goto cleanup;
++		}
++	}
++
++	fprintf(stderr, "Error: No matching cmsg received\n");
++	ret_value = -ENOMSG;
++
++cleanup:
++	if (recv_fd >= 0)
++		close(recv_fd);
++
++	return ret_value;
++}
+diff --git a/tools/testing/selftests/net/test_so_rcv.sh b/tools/testing/selftests/net/test_so_rcv.sh
+new file mode 100755
+index 000000000000..d8aa4362879d
+--- /dev/null
++++ b/tools/testing/selftests/net/test_so_rcv.sh
+@@ -0,0 +1,73 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++source lib.sh
++
++HOSTS=("127.0.0.1" "::1")
++PORT=1234
++TOTAL_TESTS=0
++FAILED_TESTS=0
++
++declare -A TESTS=(
++	["SO_RCVPRIORITY"]="-P 2"
++	["SO_RCVMARK"]="-M 3"
++)
++
++check_result() {
++	((TOTAL_TESTS++))
++	if [ "$1" -ne 0 ]; then
++		((FAILED_TESTS++))
++	fi
++}
++
++cleanup()
++{
++	cleanup_ns $NS
++}
++
++trap cleanup EXIT
++
++setup_ns NS
++
++for HOST in "${HOSTS[@]}"; do
++	PROTOCOL="IPv4"
++	if [[ "$HOST" == "::1" ]]; then
++		PROTOCOL="IPv6"
++	fi
++	for test_name in "${!TESTS[@]}"; do
++		echo "Running $test_name test, $PROTOCOL"
++		arg=${TESTS[$test_name]}
++
++		ip netns exec $NS ./so_rcv_listener $arg $HOST $PORT &
++		LISTENER_PID=$!
++
++		sleep 0.5
++
++		if ! ip netns exec $NS ./cmsg_sender $arg $HOST $PORT; then
++			echo "Sender failed for $test_name, $PROTOCOL"
++			kill "$LISTENER_PID" 2>/dev/null
++			wait "$LISTENER_PID"
++			check_result 1
++			continue
++		fi
++
++		wait "$LISTENER_PID"
++		LISTENER_EXIT_CODE=$?
++
++		if [ "$LISTENER_EXIT_CODE" -eq 0 ]; then
++			echo "Rcv test OK for $test_name, $PROTOCOL"
++			check_result 0
++		else
++			echo "Rcv test FAILED for $test_name, $PROTOCOL"
++			check_result 1
++		fi
++	done
++done
++
++if [ "$FAILED_TESTS" -ne 0 ]; then
++	echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
++	exit ${KSFT_FAIL}
++else
++	echo "OK - All $TOTAL_TESTS tests passed"
++	exit ${KSFT_PASS}
++fi
+-- 
+2.43.0
+
 
