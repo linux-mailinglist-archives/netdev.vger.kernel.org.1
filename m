@@ -1,77 +1,93 @@
-Return-Path: <netdev+bounces-166431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE898A35FBD
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:04:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7D1A35FD3
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2647916937C
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:03:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CF0F7A49DC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB08264A71;
-	Fri, 14 Feb 2025 14:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E76A265625;
+	Fri, 14 Feb 2025 14:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ffutnsRo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CCrWJsCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFCB7081C;
-	Fri, 14 Feb 2025 14:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E5A264A71;
+	Fri, 14 Feb 2025 14:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739541788; cv=none; b=KgGtfIvjxbMY+wDKDRIGL5i+rTEJlBCOJKViCGu9J+UENMFdw6FkZhDXMol9Ayr6kDkZbojZvfAnG6y2TU1A3de8iErP+B1ndw7igps6vo7rxgIn3EHiqtjFaIKtIw7zQwqqlU5WlfkebRrWoNwaX7vJF+Nt6TX/pkBzEkvXyK8=
+	t=1739541990; cv=none; b=COawP0m58HjXY7Xk6yXyBQdmWWsNWx/lINbnBahHMOHMIszD6M3wGIzrnNBWZL597hQZppiNxaO0flQx53XnhvtTxLnyP/FcbfSnP014fLtRAqYwzSjqwOfYdFXq/TnOKbStjl74da/nGL0hr3E+gixL79+N5lLuqyqGie8aLcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739541788; c=relaxed/simple;
-	bh=HPjrAGuqBs30Xqla0S08E7D+Vsk8nak+FoJqatHVKqs=;
+	s=arc-20240116; t=1739541990; c=relaxed/simple;
+	bh=9cBFlk2elfhIUBovJUgc2pj982hQ8Go+77xQ1AoDVOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GEbxC9LFJZAeVC2jywQgScFjENM+hOLdOT7QtFvgA6UapXlLwv8TvxYwVew1rSx1P9AF9MwxveQDWAVP0RCO3ym4PzT0J7s0iK8tb4z3F+ycq0p+IYI6Ckizug9Nlrz+87v1I5GHa1vwq5Fez6GISeCQ/O2ALfiPmMQzUS7VcXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ffutnsRo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YPfqLp9fbZ/8JOO2RhhN9couacnmyf0ld4MXnUIvALM=; b=ffutnsRoSZY8FyHYndFd/8kLiJ
-	I4KHxo35/Ek9TxhoUWtM8unvMnPGhWSEmkPTEcDT3jYClEQEnUPZhUgdZ2ziMHH55Gx8f8Cqx5dY+
-	TMUNkVQeXvIecwSFy4vJcLw7LskEMPFSJgDfs890xo04TQ/QG3ANEnPgdKm5ofEn2wRI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tiwHO-00E5L7-4X; Fri, 14 Feb 2025 15:02:54 +0100
-Date: Fri, 14 Feb 2025 15:02:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pmoxsa0OA03OlB89yL0QpWI5fZaiE69NO9ZlY7PLq+AzklWibh31j7+Nfu9yMbn1F//PH8DB36xXjFZtlf/U+43Pgf6WVOp/7EdteKBTmujabM0UggXzKpqqlTTVBC24kmKHyHSOzp5Iq4/OmpkmAvRxNNq685Lexy1UlC3/N7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CCrWJsCr; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739541987; x=1771077987;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9cBFlk2elfhIUBovJUgc2pj982hQ8Go+77xQ1AoDVOk=;
+  b=CCrWJsCruHl4hK68obUB2qrJNgX96WuWIl0gz62cmUKUCge3e7tUjKEP
+   D7e7kDRKJbEZ6NvwA9DcZ9WGioeXz13GJfTqO0gVXCfCIuv82dnFtIJBO
+   c7PcL4hlsj514wbfmzIyFbD+GhxEDyt/+jXw4N0Hor4u247XEYwFeQLKz
+   k6hkxf3OFbNAg9dI3HSuK8JZgUbRtSfPyvgPtGj6zRwoB1XvqWfP6EWKt
+   rxOotn4sVQhImIcGjWmAAlSXNjR6Sn22ncuMpi1hQBSpd3HJPzAkFeJt5
+   BzsJF4is7FXDq6jneZbOFWybr3FQ0OJG4VcYRU57Udfu47V4Gqe0urQuW
+   g==;
+X-CSE-ConnectionGUID: DfCo0bqJT/Wb6v0vNvQH9g==
+X-CSE-MsgGUID: IE228LZhQJ+8w0UpPc5AZQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="51690475"
+X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
+   d="scan'208";a="51690475"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 06:06:26 -0800
+X-CSE-ConnectionGUID: GAM0Tt/hQbO7u9VXlp1RNg==
+X-CSE-MsgGUID: OeYg75QKQSWqKE5danBI+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="118399870"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 14 Feb 2025 06:06:22 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tiwKg-0019df-34;
+	Fri, 14 Feb 2025 14:06:18 +0000
+Date: Fri, 14 Feb 2025 22:06:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	john@phrozen.org
-Subject: Re: [PATCH net-next v3 13/14] net: ethernet: qualcomm: Add PPE
- debugfs support for PPE counters
-Message-ID: <72171304-9a98-4734-85a3-d1302d053602@lunn.ch>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-13-453ea18d3271@quicinc.com>
- <5a53333b-e94c-4fb7-b23d-e1d38d2dad8e@lunn.ch>
- <a455a2f6-ca0b-43e0-b18c-53f73344981f@quicinc.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [PATCH net-next v4 14/16] net: airoha: Introduce flowtable
+ offload support
+Message-ID: <202502142131.na71FjkW-lkp@intel.com>
+References: <20250213-airoha-en7581-flowtable-offload-v4-14-b69ca16d74db@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,41 +96,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a455a2f6-ca0b-43e0-b18c-53f73344981f@quicinc.com>
+In-Reply-To: <20250213-airoha-en7581-flowtable-offload-v4-14-b69ca16d74db@kernel.org>
 
-> > > +/* The number of packets dropped because of no buffer available, no PPE
-> > > + * buffer assigned to these packets.
-> > > + */
-> > > +static void ppe_port_rx_drop_counter_get(struct ppe_device *ppe_dev,
-> > > +					 struct seq_file *seq)
-> > > +{
-> > > +	u32 reg, drop_cnt = 0;
-> > > +	int ret, i, tag = 0;
-> > > +
-> > > +	PRINT_COUNTER_PREFIX("PRX_DROP_CNT", "SILENT_DROP:");
-> > > +	for (i = 0; i < PPE_DROP_CNT_TBL_ENTRIES; i++) {
-> > > +		reg = PPE_DROP_CNT_TBL_ADDR + i * PPE_DROP_CNT_TBL_INC;
-> > > +		ret = ppe_pkt_cnt_get(ppe_dev, reg, PPE_PKT_CNT_SIZE_1WORD,
-> > > +				      &drop_cnt, NULL);
-> > > +		if (ret) {
-> > > +			seq_printf(seq, "ERROR %d\n", ret);
-> > > +			return;
-> > > +		}
-> > 
-> > This is an error getting the value from the hardware? You should not
-> > put that into the debugfs itself, you want the read() call to return
-> > it.
-> > 
-> 
-> Yes, this error code is returned by regmap read functions in
-> ppe_pkt_cnt_get() when the hardware counter read fails. I will
-> remove it from debugfs file and instead log the error to the
-> console (dev_info).
+Hi Lorenzo,
 
-and return it to user space via the read() call. These functions
-normally return the number of bytes put into the buffer. But you can
-also return a negative error code which gets passed back to user space
-instead.
+kernel test robot noticed the following build warnings:
 
-	Andrew
+[auto build test WARNING on c3a97ccaed80986fc3c0581661bf9170847d23ba]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/net-airoha-Fix-TSO-support-for-header-cloned-skbs/20250213-234737
+base:   c3a97ccaed80986fc3c0581661bf9170847d23ba
+patch link:    https://lore.kernel.org/r/20250213-airoha-en7581-flowtable-offload-v4-14-b69ca16d74db%40kernel.org
+patch subject: [PATCH net-next v4 14/16] net: airoha: Introduce flowtable offload support
+config: hexagon-allyesconfig (https://download.01.org/0day-ci/archive/20250214/202502142131.na71FjkW-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250214/202502142131.na71FjkW-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502142131.na71FjkW-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/airoha/airoha_ppe.c:818:6: warning: variable 'err' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+     818 |         if (!eth->npu)
+         |             ^~~~~~~~~
+   drivers/net/ethernet/airoha/airoha_ppe.c:820:7: note: uninitialized use occurs here
+     820 |         if (!err)
+         |              ^~~
+   drivers/net/ethernet/airoha/airoha_ppe.c:818:2: note: remove the 'if' if its condition is always true
+     818 |         if (!eth->npu)
+         |         ^~~~~~~~~~~~~~
+     819 |                 err = airoha_ppe_offload_setup(eth);
+   drivers/net/ethernet/airoha/airoha_ppe.c:811:9: note: initialize the variable 'err' to silence this warning
+     811 |         int err;
+         |                ^
+         |                 = 0
+   1 warning generated.
+
+
+vim +818 drivers/net/ethernet/airoha/airoha_ppe.c
+
+   803	
+   804	int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
+   805					 void *cb_priv)
+   806	{
+   807		struct flow_cls_offload *cls = type_data;
+   808		struct net_device *dev = cb_priv;
+   809		struct airoha_gdm_port *port = netdev_priv(dev);
+   810		struct airoha_eth *eth = port->qdma->eth;
+   811		int err;
+   812	
+   813		if (!tc_can_offload(dev) || type != TC_SETUP_CLSFLOWER)
+   814			return -EOPNOTSUPP;
+   815	
+   816		mutex_lock(&flow_offload_mutex);
+   817	
+ > 818		if (!eth->npu)
+   819			err = airoha_ppe_offload_setup(eth);
+   820		if (!err)
+   821			err = airoha_ppe_flow_offload_cmd(port, cls);
+   822	
+   823		mutex_unlock(&flow_offload_mutex);
+   824	
+   825		return err;
+   826	}
+   827	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
