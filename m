@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-166272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1694FA354B9
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:30:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3018A354D4
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68C007A12FD
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:29:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A93AA169CA3
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 02:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CA9136326;
-	Fri, 14 Feb 2025 02:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2DC13C9C4;
+	Fri, 14 Feb 2025 02:39:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068F5171C9;
-	Fri, 14 Feb 2025 02:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D281519AB;
+	Fri, 14 Feb 2025 02:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739500218; cv=none; b=QOxWEFqwckSgFuKlHR1fMC3x55u2+AM4kT0M3Gy+xYYcPhGth9JDD4mU24TLEMBD041/CadVDPHY0Yv/ct7dG5Vyj2FEC7FN7oM8Vf8LhaO7PK4CzkXrZO3BkQWV1pMBjQ9PqY1BvDvjGrYknU0ZkpV7TPEWIfoNgg86W4tdK5A=
+	t=1739500756; cv=none; b=oINcZkNy9rQeReUZo8av2L4qPmppx4ejtPv8MpwS8ebMJnnKzIry5obTduVrtTfy+439eYyRyrfE4aeDasokzPvfPmU23mmGNkP/jMp3aAEBpjIzbUA8JltrkARI9qZeosNVFDh2K28/4/u3lm/S4NIycOj9Wtfu3OUeECVYOxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739500218; c=relaxed/simple;
-	bh=sFpDGUnerwF3suoWQ9Vhbi6FtbcRuLTbWnx0G65op8Y=;
+	s=arc-20240116; t=1739500756; c=relaxed/simple;
+	bh=ggqllBKY0hZPDPykZ9eDSe4dSq6P5GCFoSX8bpONkyQ=;
 	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=u02X0OwUJrxhF8ARwBsk7di7z5fUbnH77O+yS0pMcZRPRJvZIB6ctlol7xKyZyHSpyY/hyHhPhdOJJ/jdoC3N0wuIRrDp6O4FNQVYXct3TsmgE2ipFFU+gdNfEjlz92uUw4GTyYtjnKnoOAQu6Itj70vVBfO3jEQUn/xlq/yGZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 In-Reply-To:Content-Type; b=HD1lqdSJCD/eqUleBtsxWGY5cA9fo6oKstlWy3hT/zHlnB1NErZIWVTCGxz9uH8C+hML1cJ73cqosp7GKzMVTBcEoZLKhFE5ov9jSegz7+jQNKqEy2nyw3xGkdzcvdp4qgxBDXKszl/9X4GxPGvqZIHCb5wa6pV4bfjGytxhL54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YvGCn34V0z22mtc;
-	Fri, 14 Feb 2025 10:27:17 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4YvGNK5P6Mz1W5kg;
+	Fri, 14 Feb 2025 10:34:41 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0B3DB1A0188;
-	Fri, 14 Feb 2025 10:30:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id E02B3140121;
+	Fri, 14 Feb 2025 10:39:10 +0800 (CST)
 Received: from [10.67.120.192] (10.67.120.192) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 14 Feb 2025 10:30:11 +0800
-Message-ID: <26c18304-5f91-4a15-b8f2-49b7ba36bc57@huawei.com>
-Date: Fri, 14 Feb 2025 10:30:10 +0800
+ 15.2.1544.11; Fri, 14 Feb 2025 10:39:09 +0800
+Message-ID: <1d82f748-2173-4e24-9f4c-e2dd71c02c44@huawei.com>
+Date: Fri, 14 Feb 2025 10:39:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,81 +56,42 @@ CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 7/7] net: hibmcge: Add ioctl supported in this
- module
+Subject: Re: [PATCH net-next 5/7] net: hibmcge: Add mac link exception
+ handling feature in this module
 To: Andrew Lunn <andrew@lunn.ch>
 References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-8-shaojijie@huawei.com>
- <c1d557b6-7f11-449e-aff7-dad974e1c7c9@lunn.ch>
+ <20250213035529.2402283-6-shaojijie@huawei.com>
+ <dc22a252-2889-4b20-b72c-5e4d44d24f88@lunn.ch>
 From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <c1d557b6-7f11-449e-aff7-dad974e1c7c9@lunn.ch>
+In-Reply-To: <dc22a252-2889-4b20-b72c-5e4d44d24f88@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
 
-on 2025/2/14 4:13, Andrew Lunn wrote:
-> On Thu, Feb 13, 2025 at 11:55:29AM +0800, Jijie Shao wrote:
->> This patch implements the ioctl interface to
->> read and write the PHY register.
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   .../net/ethernet/hisilicon/hibmcge/hbg_main.c  | 18 ++++++++++++++++++
->>   .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c  | 10 ++++++++++
->>   .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h  |  2 ++
->>   3 files changed, 30 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> index 78999d41f41d..afd04ed65eee 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> @@ -273,6 +273,23 @@ static netdev_features_t hbg_net_fix_features(struct net_device *netdev,
->>   	return features & HBG_SUPPORT_FEATURES;
->>   }
->>   
->> +static int hbg_net_eth_ioctl(struct net_device *dev, struct ifreq *ifr, s32 cmd)
+on 2025/2/14 4:05, Andrew Lunn wrote:
+>> +int hbg_reset_phy(struct hbg_priv *priv)
 >> +{
->> +	struct hbg_priv *priv = netdev_priv(dev);
+>> +	struct phy_device *phydev = priv->mac.phydev;
 >> +
->> +	if (test_bit(HBG_NIC_STATE_RESETTING, &priv->state))
->> +		return -EBUSY;
+>> +	if (phydev->drv->soft_reset)
+>> +		return phydev->drv->soft_reset(phydev);
 >> +
->> +	switch (cmd) {
->> +	case SIOCGMIIPHY:
->> +	case SIOCGMIIREG:
->> +	case SIOCSMIIREG:
->> +		return hbg_mdio_ioctl(priv, ifr, cmd);
->> +	default:
->> +		return -EOPNOTSUPP;
->> +	}
-> No need for this switch statement. phy_mii_ioctl() will return
-> EOPNOTSUPP for any it does not support.
->
-> The general structure of an IOCTL handler is to have a switch
-> statements for any IOCTL which are handled at this level and the
-> default: case then calls into the next layer down.
->
->> +int hbg_mdio_ioctl(struct hbg_priv *priv, struct ifreq *ifr, int cmd)
->> +{
->> +	struct hbg_mac *mac = &priv->mac;
->> +
->> +	if (!mac->phydev)
->> +		return -ENODEV;
->> +
->> +	return phy_mii_ioctl(mac->phydev, ifr, cmd);
-> phy_do_ioctl(). This is assuming you follow the normal pattern of
-> keeping the phydev pointer in the net_device structure.
+>> +	return genphy_soft_reset(phydev);
+>> +}
+> A MAC driver should not be doing a soft reset on a PHY. For some
+> devices, this clears out all the settings. I would suggest you use
+> phy_stop(), phy_start() which are functions a MAC driver is allowed to
+> use.
 >
 > 	Andrew
 
-Yes, of course
+Well, I think your advice is helpful.
 
-So I think I can just use:
-  .ndo_eth_ioctl = phy_do_ioctl,
+It is also a good practice to restart the PHY, which also triggers link relinking.
 
-No other code is required.
+Thank you. I'll test this method.
 
 Thanks,
 Jijie Shao
