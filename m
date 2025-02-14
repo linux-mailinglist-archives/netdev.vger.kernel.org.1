@@ -1,166 +1,137 @@
-Return-Path: <netdev+bounces-166603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E302A368F1
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:15:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F41A368F3
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C4F1725F7
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:15:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AACA1725EA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D601922DE;
-	Fri, 14 Feb 2025 23:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BC41DC19F;
+	Fri, 14 Feb 2025 23:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cKqYFPrD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GCgW8M/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ACB191493
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 23:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A41F191493;
+	Fri, 14 Feb 2025 23:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739574938; cv=none; b=bhShQUSpYXZU280PQvYBtpnxEvZJHcZ98uIGRZqpzyr68yVXKn6iWogzfwebGNC0w+WR0ViP9FewY1vBjOB+Z0fvXGKDOB11bhduCrOiEZxrizdKSddokITJNrSRj9MITVSIgbIiW0wfpm0zV388Yf0Pnt5iFvGbWHA+v1KC7mU=
+	t=1739575045; cv=none; b=fe+79aDGoC86BQt9ei2zbw9yYvAob5jPuWHyqMaRCeh6/kQVgJDwwKUnFqEIAT7Zk962HqcCq9qIZPmidKMsq3jCIdEz/nrCJUSy1kkZcFAvFabDZGI9tze13BiZlOjwzoM4sBtFFhOjm+7M6+LLhMuoMUTBTIdnDAwg3BcsO/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739574938; c=relaxed/simple;
-	bh=dCQEUPW3bF6z/PIA0W72z1Sx/yTML9yZcgJSLS94BvM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ChzKMkD5ePYfTVK3GZTFTNhuchBf3P2GDyuNKJObXZIwzzuRH5R8VJQqW+0kLjxIegRmfYZVOK4p48dpZtcgtwHo/t9kFbxoDqA0ejAXW3lsoEZFdtMsird2ECVjRPv+ItAq91es17JUMbrWJZZnOuI+aci0wLIwzv1DlFsd58M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cKqYFPrD; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1739575045; c=relaxed/simple;
+	bh=pOZ45U9cUXe4v4A3BNp1OQoM8u/UXcFSFR4d7ZCcb2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TdY3Jfejisuw+URJrCgdRRwznzeoNpZ8ytKv5hL2ra4uAYFb4bqSnTFvjPyn55/9zGVzeXQ4UFbXqXgT5l78B1NnJwehXeJoO14htH8emjYvjQA+Genq5TD8kJoKtM9LqtKZK/KsthZkrLYVPVVX1bOgZRf7gt52piuuLnszKHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GCgW8M/v; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c079026860so295699785a.3
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 15:15:36 -0800 (PST)
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d284b9734fso264695ab.2;
+        Fri, 14 Feb 2025 15:17:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739574936; x=1740179736; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1739575043; x=1740179843; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EDZBVvqGC948KUxzy/pTYFzuUP94o3HP5o4MoUQdhUc=;
-        b=cKqYFPrDz359c7Tx2yqFENX0GcBmrt/ct8IHGOpmGRsN/HbPV9tHYfZWdySf1vS9Fp
-         WvVq7R9DuFjW2mELD7wwcEQ4GZUtTdB0gSuS/hsAGw12cSWq+h7Qj6NzZHZDBAenlpY7
-         p4/enM/pRhrD8AEfLRRyiL9A+EG7wApsPYO1G/tg5gxy16vbXLSB890MdOt0qhEbdjIV
-         Yw+gxNE6AdtRe+KhK/XmF1ymgBqHD1JWMCTe+QTAD00JRMxNYIBAodx9bfhiuu/E/q2A
-         nw+9AlclmJs/qRKuHB8DbEhWdLW0VldC63lnllIdxD35wB4hvexLol+zHWpZ+/JgjRkj
-         xzuA==
+        bh=/TVa+GEHdIMw5XDJfrQRHrfiQ0akjWQPZFCDra18l/8=;
+        b=GCgW8M/vM4jU42v3WydsqKSuhyn10i67RAbqrvKDAXgUe+Fzou2ff9w3oW/iwC60lA
+         1KI/alQ/hcVSQsx/Q9XfHIe8Q1qE4SILknmpwhtsMFEH9xrlJ80Wr/kRG/9s9RqEhAIN
+         8nVh4rKZasEJIodqSr6cH3KA1W+mxHuEhMuosbV+B2Fxmpt+Hv6xChywmzPtHAI8guAI
+         A2bjMAh5fr/VxzF60eHEQE0Lpo37wDGsVFoQNxiOdkr1ActRWqq7/FBpqN43tTV3ylQ0
+         QgH+6epsARgb+f1Hd4HAT4FEoz6kM4lZzWwwNDt91SzNRGjEoS30VRiEEhrkBTIYB8/T
+         Z6ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739574936; x=1740179736;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EDZBVvqGC948KUxzy/pTYFzuUP94o3HP5o4MoUQdhUc=;
-        b=ZtgxWvIA86t1+kzysQMhGohCi17U1bOhN252aCxMm25R1MTLqoubvR7i+fIWKpDzgz
-         yf2KH/lXyiX4TPGbVxdmYPADf7Zl0aqpLlGDPVALnQbGze/eNVrQCmqE0GfI3MqsE8og
-         TPyakbAgPxiIQrRyPaD5aIXp2MA6oh9QZWLuYgHNQIw/kYUuIrhAqqaSsLeXabf8iPNj
-         hM99GAqXXg1aQrMSiZx6fGeyfJRXI9bNruzYXTfs3JFC3iGAR0X4dLiUZxC3l40Nf4DV
-         dQqbdtAZzU3CMBpnYrwqCb8FKPFyVi0O1/RpXOuNN39NXLWAm9veD9oSl2jbefkh5zzn
-         JPLg==
-X-Gm-Message-State: AOJu0YyhRiBuZOnl29rWF7skabRWr4Io+GETXtYQaCZFOvpDIJksqadD
-	axZJJW8aBp8XvAN1xlgp5bNMePsfE9kEqRmZcaeD98p8qQeFCbWeGwLl8w==
-X-Gm-Gg: ASbGnctG6wrJ/E5Dolz9s2Xfd4zdFDVYnjVYx1x2ATvDCP6Z8R3Pspx1MrZGCcWze0Y
-	OBvoepNs1Y0jmE2sORJmoSMIH+/F/Xqs6qIktTRKvf7aFrWUl7S6Kov2ZAWlABizoZR/0Wsa2Uk
-	WpzRqKAGw8LaNaMXNawABCcN9a5qbT22cYBIKH5IX6F6NvckCvWTow9fxLBFOxr237/rGgFtUEc
-	UWJ8UKB+tCnzt6+iThULeqoVYkTOcZwktP2gtw6ShNx+24fUuD1bEXhT7NtoHh8m7tfv6qgcxKq
-	o2+uZoyqX78g7lb3ni1TG18vBi1W37Ppl4jI5UuZ+7aP2sE8HwtvfanAI7v4nKg=
-X-Google-Smtp-Source: AGHT+IEI8zCXo9RMN0pP596HD3wOGUnpo8abQD2TQ/c/zbmWiatis4SkmdgllciB+TcbpDEweezKsg==
-X-Received: by 2002:a05:620a:1a8c:b0:7a9:c129:5da7 with SMTP id af79cd13be357-7c08a9db45amr187534985a.29.1739574935793;
-        Fri, 14 Feb 2025 15:15:35 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c861221sm257569985a.85.2025.02.14.15.15.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 15:15:35 -0800 (PST)
-Date: Fri, 14 Feb 2025 18:15:34 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- willemb@google.com, 
- ecree.xilinx@gmail.com, 
- neescoba@cisco.com
-Message-ID: <67afce96ccece_312c64294fa@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250214224601.2271201-1-kuba@kernel.org>
-References: <20250214224601.2271201-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next v2] netdev: clarify GSO vs csum in qstats
+        d=1e100.net; s=20230601; t=1739575043; x=1740179843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/TVa+GEHdIMw5XDJfrQRHrfiQ0akjWQPZFCDra18l/8=;
+        b=YuINXJLomrkW/yjj8q1GsYh6WTMeD8hBnGWLk61joW0OakNi6Ia+XMFiWtbqJ0U9MZ
+         mwA3H4dbyTCQvZWgAx21bQU1hnbv8QCGq7qTIp8GiWVq039kBKqU7mYXIGGAcfmbVdLA
+         S/KPKJb639zGNYhLo/8CsSeEWnANLSv5pTURVyqXnw1flFi6OHsaxOJp22ub33bzQtdS
+         lCswPqWBwFPTcHfNaqMd1rYzD/IHK7EjnQ+mRsP8jbHan7hQOJzRNSMYLx9JK2+4xxyR
+         7y8+DMlx2mWEmYJevMrhb1157OqA+ULnRlYU3+DRGONhmLNFlgGAszDdRhwxsAlLBmg7
+         7YZw==
+X-Forwarded-Encrypted: i=1; AJvYcCW84oXSC0tq4Dvp1vaHiuM+Hzzg29kwmAV/KQ5wsOCFYw0M7eQCrDwai8SOB83jrQiLIzQ=@vger.kernel.org, AJvYcCXQbrry6Bl1IIv7cFu60/8QeshSXGMjpZigy95x+kPQ+wn41h2z33ofiH/81gj/4UFaRUsVUKy0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxs4CMS/mUgFtMQBcnjrLhgLzQKbhWTOkRUI7UwfPFOPOHxCAjs
+	XG5VbiwFclMm9SbvzQR67lqAA5DPG8ijsbED2RpacdMPD3Ax5yYYTlgCfJEd0AvS9F+6S96g+zj
+	NEFnXIp+B6JUz6PIslXyZwGmkW1s=
+X-Gm-Gg: ASbGnctljeMUIjXiOa04joY+i1wl8ZHhM4ByLxX+hnu88Efvs5+SH1MAz9o7sB2w74b
+	W8EwshUsd/D3ZmGtmTH1jS8mmMY5RJW8Pa3uLo2gYkL0AO99K2RCkWlNlq65ONl7xAYZHCY+B
+X-Google-Smtp-Source: AGHT+IF31TURnSGBBAMrHRyQCDh83TGwh6u5o99fMU5DEEmYgug04rfo/3z2qmkIv4iGW5vnQbBkNpf13o21cX28KpE=
+X-Received: by 2002:a05:6e02:3089:b0:3d1:a380:bcd with SMTP id
+ e9e14a558f8ab-3d2808b09f6mr10635885ab.10.1739575043555; Fri, 14 Feb 2025
+ 15:17:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250214010038.54131-1-kerneljasonxing@gmail.com>
+ <20250214010038.54131-10-kerneljasonxing@gmail.com> <5f6e9e0b-1a5f-4129-9a88-ad612b6c6e3b@linux.dev>
+In-Reply-To: <5f6e9e0b-1a5f-4129-9a88-ad612b6c6e3b@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 15 Feb 2025 07:16:46 +0800
+X-Gm-Features: AWEUYZlziJb3X02rhkMtdcIIHocnZ5e9BIkHHoufyjlQW2Q6QZLubzoBssrIHwM
+Message-ID: <CAL+tcoCYcpaBDG8GRyP1Fk8WYHAo4ic1YNhmazXEysYUWSTqxg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v11 09/12] bpf: add BPF_SOCK_OPS_TS_ACK_OPT_CB callback
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski wrote:
-> Could be just me, but I had to pause and double check that the Tx csum
-> counter in qstat should include GSO'd packets. GSO pretty much implies
-> csum
+On Sat, Feb 15, 2025 at 4:34=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/13/25 5:00 PM, Jason Xing wrote:
+> > diff --git a/net/dsa/user.c b/net/dsa/user.c
+> > index 291ab1b4acc4..794fe553dd77 100644
+> > --- a/net/dsa/user.c
+> > +++ b/net/dsa/user.c
+> > @@ -897,7 +897,7 @@ static void dsa_skb_tx_timestamp(struct dsa_user_pr=
+iv *p,
+> >   {
+> >       struct dsa_switch *ds =3D p->dp->ds;
+> >
+> > -     if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
+> > +     if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NOBPF))
+>
+> This change should be in patch 8.
+>
+> [ ... ]
+>
+> > diff --git a/net/socket.c b/net/socket.c
+> > index 262a28b59c7f..517de433d4bb 100644
+> > --- a/net/socket.c
+> > +++ b/net/socket.c
+> > @@ -676,7 +676,7 @@ void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_fl=
+ags)
+> >       u8 flags =3D *tx_flags;
+> >
+> >       if (tsflags & SOF_TIMESTAMPING_TX_HARDWARE) {
+> > -             flags |=3D SKBTX_HW_TSTAMP;
+> > +             flags |=3D SKBTX_HW_TSTAMP_NOBPF;
+>
+> Same here.
 
-Unfortunately specifically to virtio_net, this sensible limitation was
-not enforced from the start. Which is why virtio_net_hdr_to_skb has a
-branch for !VIRTIO_NET_HDR_F_NEEDS_CSUM && gso_type. Mainly "used" by
-syzkaller afaik.
+Sure, you're right. If you feel it's necessary to re-spin, I will
+adjust these two points :)
 
-With the addition of USO besides TSO that could also eschew L4 checksum
-offload. But the local stack does not generate those (udp_send_skb),
-nor does UDP GRO (first branch in udp_gro_receive_segment).
+Thanks,
+Jason
 
-In any case, the new comment clearly mentions this limitation on L4
-checksum.
-
-> so one could possibly interpret the csum counter as pure csum offload.
-> 
-> But the counters are based on virtio:
-> 
->   [tx_needs_csum]
->       The number of packets which require checksum calculation by the device.
-> 
->   [rx_needs_csum]
->       The number of packets with VIRTIO_NET_HDR_F_NEEDS_CSUM.
-> 
-> and VIRTIO_NET_HDR_F_NEEDS_CSUM gets set on GSO packets virtio sends.
-> 
-> Clarify this in the spec to avoid any confusion.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-> ---
-> v2:
->  - remove the note that almost all GSO types need L4 csum
-> v1: https://lore.kernel.org/20250213010457.1351376-1-kuba@kernel.org
-> 
-> CC: willemb@google.com
-> CC: ecree.xilinx@gmail.com
-> CC: neescoba@cisco.com
-> ---
->  Documentation/netlink/specs/netdev.yaml | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index 288923e965ae..48159eb116a4 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -457,6 +457,8 @@ name: netdev
->          name: tx-needs-csum
->          doc: |
->            Number of packets that required the device to calculate the checksum.
-> +          This counter includes the number of GSO wire packets for which device
-> +          calculated the L4 checksum.
->          type: uint
->        -
->          name: tx-hw-gso-packets
-> -- 
-> 2.48.1
-> 
-
-
+>
+>
 
