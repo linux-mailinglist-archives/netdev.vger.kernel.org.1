@@ -1,186 +1,143 @@
-Return-Path: <netdev+bounces-166442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD7F9A36011
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:17:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 118FAA35FED
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE15816D6E5
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:16:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731973AAC68
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DAA264FB9;
-	Fri, 14 Feb 2025 14:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1DD26618A;
+	Fri, 14 Feb 2025 14:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="mDeX57ug"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WilpZguW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F9024166E;
-	Fri, 14 Feb 2025 14:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFC4265CBA;
+	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739542589; cv=none; b=lRrm3T+q8rEpw+6CI9ouJWZhUl1eTR12ozcw7FSQx6P3daWXOfrGrYiXiiR7bKtcK+vF03Ax8UbWC6L6LuEh976mOyDiSv4IQKMTMoOwnn4XWRB9JtFiUbY2XETtszFYeeYlFSL2Y7OhEL1VYYjBF5wiyA6mAGkIxrGzKgZO9c0=
+	t=1739542466; cv=none; b=M2NO73RCel0AvVb39AsVTDR3rAK2pLzSvonHn0Coq98JSyTyfyx7UDG7fiDf9WHGUreIsUVRU8In7t87jp94+46kVMxi8vliRGr23qr5qKB4BfMdBQeH0EPn1yHdvAwggDhc5WMPVTUHeMUWtIXmEbE3zuXUEkqo5spWk2ldzqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739542589; c=relaxed/simple;
-	bh=QIMA8HSuryzyn1y+ASb9er9Vg5M2gtiAh7i6VC48zzk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MtX+Wg8unGrOKNemqSQu03YNT6K06k1witrBdTO2HhOgdlClVrF11cGrn63kCQQXKEW69QBU6Fn0D4AQYkMc4rVFZJ/19tJyUIXnVM7SM0ITU2p83SHpGZL8wCuiCjATIZpUpqnRd54yq2oTwUZurhTHFBbPz+VxXNIFO/ELqGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=mDeX57ug; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51ECk2If002159;
-	Fri, 14 Feb 2025 15:15:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	wwHVwCdc4/Na+JqMuJs/rM97AN1e37TSauY+tsEiMZg=; b=mDeX57ugP7b3YAfT
-	oj7mOSZi/VqovNPGLChvfywQBemHEZ6ypH3glLTI6nkIraIIsWq/uFV7/7LJuUgu
-	EVsNUaC4hepUTX/Qbu6vSkG0jyRHq0Ul50PNWwY0mfYVWi+9gJeZsa/Zt3TovvMl
-	zPKAc953mE9PMnJ0DsUnyd5s2HpOa0mi7zC/NP3EZ4ui1NxvchupqLHLC/xEgQUu
-	GLZ5T2yTLUEhJZ5c5dRrGIuOdB6DmPBMkzFivir5NE0wX8Ca6nG+TIk9/xvMZzNU
-	pjSoPabQI/YjtEFNvna3fKMutO8Vazcr8z43C5SwLxoCxojzt50cL3BTckybHA5e
-	Yv0W5A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 44p0q0bgt7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 15:15:54 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 1E12740048;
-	Fri, 14 Feb 2025 15:14:58 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 956D02CF588;
-	Fri, 14 Feb 2025 15:13:58 +0100 (CET)
-Received: from [10.48.87.120] (10.48.87.120) by SHFDAG1NODE3.st.com
- (10.75.129.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 14 Feb
- 2025 15:13:57 +0100
-Message-ID: <e3d320a4-9e8e-438f-b85f-47cfa1219684@foss.st.com>
-Date: Fri, 14 Feb 2025 15:13:57 +0100
+	s=arc-20240116; t=1739542466; c=relaxed/simple;
+	bh=mKExfhVU1mGueFObQGf6TrT/sXrlbwhC802VWY3/t6I=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qEh6gFM7uiyAi81XSwrZ2qaCHXmQeP25LctzQhNQF4W+E/voR1vbxA8JMKhlHV+qfg+Aq8O4PqlPt3RIEh/9eeiIN+225HJClblj24mwfHcR+qNBUei+sADH56mGEkhGDtWkFH+SKVP3jckO9bclVNTDuf8HTcN/UcTlQGifjrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WilpZguW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46D5AC4CED1;
+	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739542466;
+	bh=mKExfhVU1mGueFObQGf6TrT/sXrlbwhC802VWY3/t6I=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=WilpZguWESeKYgo1V11N4k8Pbk024J4qZlV43SMzRtHKCPRpVeDH94w7GP3N9dAib
+	 ItIQHDE+akKhxcGB2V2h4vrmKUBAH051BgiqLxPpCjaD2feSrBvaz4BcevU7OKBh/X
+	 I+ljZyKk8WVMda0HtjYp5cQfzgxqcxJn6rnMFYtdeBvKeHU/p1jI0kgXOvkqnZdjdp
+	 cVYUcN7vHsdbxsilgU+aQIOz5kCvHrs1IKybYsso3qPtLYMyW/UyxXdz2/6PigPAdQ
+	 zv9pQOfqnldyd2QS99YFqmrAcwVSIlZelEBjRPu/nEfOCmR34lCr3LvnYF+occs2bS
+	 S29HCRsQsD/pA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 316E2C02198;
+	Fri, 14 Feb 2025 14:14:26 +0000 (UTC)
+From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
+Subject: [PATCH net-next v5 0/3] net: phy: dp83822: Add support for
+ changing the transmit amplitude voltage
+Date: Fri, 14 Feb 2025 15:14:08 +0100
+Message-Id: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/10] arm64: dts: st: add stm32mp235f-dk board support
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-References: <20250210-b4-stm32mp2_new_dts-v1-0-e8ef1e666c5e@foss.st.com>
- <20250210-b4-stm32mp2_new_dts-v1-6-e8ef1e666c5e@foss.st.com>
- <20250213-truthful-accurate-gaur-bd118f@krzk-bin>
-Content-Language: en-US
-From: Amelie Delaunay <amelie.delaunay@foss.st.com>
-In-Reply-To: <20250213-truthful-accurate-gaur-bd118f@krzk-bin>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE3.st.com
- (10.75.129.71)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_06,2025-02-13_01,2024-11-22_01
+X-B4-Tracking: v=1; b=H4sIALBPr2cC/23NwW7DIBAE0F+JOIdqdw0Gcsp/VD3YsI2RGhyB5
+ bqK/O9FvjSqOI5G8+YpCufIRVxOT5F5jSXOqQZ9Pgk/DenGMoaaBQEpJOxkeNjOEsllk+U7ppv
+ U49B7ZDdCr0WdPTJ/xu0g30XiRSbeFvFRmymWZc4/x9eKR19ZDdhiV5QgDQc9uGABEK5fkceJc
+ 37z8/3wVnoxCBoGVQOMdy54RT2ZhtH9GQSqYXTVcMZZdr0GCK5hqBcDsWGoaiBbHoPBIWj1z9j
+ 3/RdtI8CKiQEAAA==
+X-Change-ID: 20241213-dp83822-tx-swing-5ba6c1e9b065
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
+ Dimitri Fedrau <dima.fedrau@gmail.com>, 
+ Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1739542465; l=2248;
+ i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
+ bh=mKExfhVU1mGueFObQGf6TrT/sXrlbwhC802VWY3/t6I=;
+ b=RNdzwZ9/nf1p22uBC/NIXeObi2rcn6NMKekvnCJosWzod7J2BRJGVHOmrPnX4CgqVnI1J7SiD
+ qFLVEzBtyNtAGRDWAcX0lxlW2p0sK9iiMqUYP+1aOOve2i4nOVhciIX
+X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
+ pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
+X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
+ with auth_id=290
+X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Reply-To: dimitri.fedrau@liebherr.com
 
-On 2/13/25 10:03, Krzysztof Kozlowski wrote:
-> On Mon, Feb 10, 2025 at 04:21:00PM +0100, Amelie Delaunay wrote:
->> Add STM32MP235F Discovery Kit board support. It embeds a STM32MP235FAK
->> SoC, with 4GB of LPDDR4, 2*USB typeA, 1*USB3 typeC, 1*ETH, wifi/BT
->> combo, DSI HDMI, LVDS connector ...
->>
->> Signed-off-by: Amelie Delaunay <amelie.delaunay@foss.st.com>
->> ---
->>   arch/arm64/boot/dts/st/Makefile           |   1 +
->>   arch/arm64/boot/dts/st/stm32mp235f-dk.dts | 115 ++++++++++++++++++++++++++++++
->>   2 files changed, 116 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/st/Makefile b/arch/arm64/boot/dts/st/Makefile
->> index 0cc12f2b1dfeea6510793ea26f599f767df77749..06364152206997863d0991c25589de73c63494fb 100644
->> --- a/arch/arm64/boot/dts/st/Makefile
->> +++ b/arch/arm64/boot/dts/st/Makefile
->> @@ -1,4 +1,5 @@
->>   # SPDX-License-Identifier: GPL-2.0-only
->>   dtb-$(CONFIG_ARCH_STM32) += \
->> +	stm32mp235f-dk.dtb \
->>   	stm32mp257f-dk.dtb \
->>   	stm32mp257f-ev1.dtb
->> diff --git a/arch/arm64/boot/dts/st/stm32mp235f-dk.dts b/arch/arm64/boot/dts/st/stm32mp235f-dk.dts
->> new file mode 100644
->> index 0000000000000000000000000000000000000000..08e330d310749506c5b0e7a1fb2f80dfa134400a
->> --- /dev/null
->> +++ b/arch/arm64/boot/dts/st/stm32mp235f-dk.dts
->> @@ -0,0 +1,115 @@
->> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
->> +/*
->> + * Copyright (C) STMicroelectronics 2025 - All Rights Reserved
->> + * Author: Amelie Delaunay <amelie.delaunay@foss.st.com> for STMicroelectronics.
->> + */
->> +
->> +/dts-v1/;
->> +
->> +#include <dt-bindings/gpio/gpio.h>
->> +#include <dt-bindings/input/input.h>
->> +#include <dt-bindings/leds/common.h>
->> +#include "stm32mp235.dtsi"
->> +#include "stm32mp23xf.dtsi"
->> +#include "stm32mp25-pinctrl.dtsi"
->> +#include "stm32mp25xxak-pinctrl.dtsi"
->> +
->> +/ {
->> +	model = "STMicroelectronics STM32MP235F-DK Discovery Board";
->> +	compatible = "st,stm32mp235f-dk", "st,stm32mp235";
->> +
->> +	aliases {
->> +		serial0 = &usart2;
->> +	};
->> +
->> +	chosen {
->> +		stdout-path = "serial0:115200n8";
->> +	};
->> +
->> +	gpio-keys {
->> +		compatible = "gpio-keys";
->> +
->> +		button-user-1 {
->> +			label = "User-1";
->> +			linux,code = <BTN_1>;
->> +			gpios = <&gpioc 5 GPIO_ACTIVE_HIGH>;
->> +			status = "okay";
-> 
-> Where is it disabled?
-> 
->> +		};
->> +
->> +		button-user-2 {
->> +			label = "User-2";
->> +			linux,code = <BTN_2>;
->> +			gpios = <&gpioc 11 GPIO_ACTIVE_HIGH>;
->> +			status = "okay";
-> 
-> Same question
-> 
->> +		};
->> +	};
-> 
-> Best regards,
-> Krzysztof
-> 
+Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
+Add support for configuration via DT.
 
-Will drop status property.
+Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+---
+Changes in v5:
+- Remove default from binding
+- Fix description in binding by defining what 100% gain means
+- Switch to reverse christmas tree in phy_get_internal_delay
+- Add kernel doc for phy_get_tx_amplitude_gain
+- EXPORT_SYMBOL_GPL for phy_get_tx_amplitude_gain
+- Link to v4: https://lore.kernel.org/r/20250211-dp83822-tx-swing-v4-0-1e8ebd71ad54@liebherr.com
 
-Regards,
-Amelie
+Changes in v4:
+- Remove type $ref from binding
+- Remove '|' from description in binding
+- Change helper function from:
+    static int phy_get_int_delay_property(struct device *dev, const char *name)
+  to:
+    static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
+- Apply helper function to phy_get_internal_delay
+- Link to v3: https://lore.kernel.org/r/20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com
+
+Changes in v3:
+- Switch to tx-amplitude-100base-tx-percent in bindings
+- Link to v2: https://lore.kernel.org/r/20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com
+
+Changes in v2:
+- Remove binding ti,tx-amplitude-100base-tx-millivolt from ti,dp83822.yaml
+- Add binding tx-amplitude-100base-tx-gain-milli to ethernet-phy.yaml
+- Add helper to get tx amplitude gain from DT
+- Link to v1: https://lore.kernel.org/r/20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com
+
+---
+Dimitri Fedrau (3):
+      dt-bindings: net: ethernet-phy: add property tx-amplitude-100base-tx-percent
+      net: phy: Add helper for getting tx amplitude gain
+      net: phy: dp83822: Add support for changing the transmit amplitude voltage
+
+ .../devicetree/bindings/net/ethernet-phy.yaml      |  6 +++
+ drivers/net/phy/dp83822.c                          | 38 ++++++++++++++++
+ drivers/net/phy/phy_device.c                       | 53 ++++++++++++++--------
+ include/linux/phy.h                                |  4 ++
+ 4 files changed, 83 insertions(+), 18 deletions(-)
+---
+base-commit: 7a7e0197133d18cfd9931e7d3a842d0f5730223f
+change-id: 20241213-dp83822-tx-swing-5ba6c1e9b065
+
+Best regards,
+-- 
+Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+
+
 
