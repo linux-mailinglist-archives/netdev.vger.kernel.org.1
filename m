@@ -1,89 +1,114 @@
-Return-Path: <netdev+bounces-166582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC5FA367F7
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:03:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F823A3680D
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 23:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 636F73B1140
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:03:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25EF21892E32
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 22:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE9D1DC9B1;
-	Fri, 14 Feb 2025 22:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783641FBEB4;
+	Fri, 14 Feb 2025 22:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZJpRkR1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8zDjj9H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FF74A08;
-	Fri, 14 Feb 2025 22:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496221DC198;
+	Fri, 14 Feb 2025 22:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739570593; cv=none; b=agBX787jpqVJ9rPFKCEo77xOOgEXDh5I94GxKZVcUQhHYSSb6ivM+xVI8ezPXGaTaa8aIbCwSWUJ38YZVZNqovRiuGUhLYnuynwxrOFlXtsTM5cjlulnisWMh67EcTNrsdHLVrfCOx5KxEj5vyk9LqWBh5CY1VPKB/e0I/Nmp2Q=
+	t=1739571013; cv=none; b=T6HL97DEZFLJs5Vr17T9BwAHZGVwq8TnkbUqOum+lmQl1dZbdAs3zkcAFoYQrG9mJ28512THUrZI18Jp4GNG7HoPorJFlAP1+PXPJi6fnwBNFTdbQi21JVS8yQKtcEfFxg0H40cnjewtEbbDxfQbjDScjhx/GVTfK6jItCl5ly8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739570593; c=relaxed/simple;
-	bh=W0N0vZnTxZ9LxqS354lEdjFrRGF755H50o4JHtYZhAA=;
+	s=arc-20240116; t=1739571013; c=relaxed/simple;
+	bh=2lmBOZ1d2qXbAloPFesGofjAzJUey6sxCfusp2YdXcE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QNXSY/6AexbXLqq9fdIScaLLDBydE5XktAU0JlVUBfNNv8qh287ppRoX+vdQpRCZj7dr1dXfifqilWkKeVxsxGokTcrfHKtLu9bFoPPJaZsMz5SxMC0pYsKVO50HC0wG9za9BUL6eO4V5IiIfugIVmIr7ivKU31dT6i5jPQTG+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZJpRkR1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA16CC4CED1;
-	Fri, 14 Feb 2025 22:03:11 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sP8gc/3s6qiNga4ziANtBd7bO1cqH4MP1Wgn3JH2e5rmDQpKfZcrE7DcNELLo4dlgS45JU4VZVJuiFNnF3DicAfwA6sQAmV78Y/IDL0N2rYX7usHnxm+xrsKWvyxjwgddySXAxxcrlnwloxZOqo3kU8kvx/5dw99aOuFAKQ4n3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8zDjj9H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 493B1C4CED1;
+	Fri, 14 Feb 2025 22:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739570592;
-	bh=W0N0vZnTxZ9LxqS354lEdjFrRGF755H50o4JHtYZhAA=;
+	s=k20201202; t=1739571012;
+	bh=2lmBOZ1d2qXbAloPFesGofjAzJUey6sxCfusp2YdXcE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hZJpRkR1VtZgwi2CSVO2dxlZxalWyrVVY1qyJfBfVAnmO/i3oqg5tHjZUR9f3XOEi
-	 DzMg9NWdQkvg0nr1EE9p65CbdRAlQhhTL6PY+542uzKAp6LInkkQ/IPqIUx5ZfWo6t
-	 zn2mMRI1O7rFqW/b8FHj4cUZ9ZqxcDZuqC60cnGbQC89E/YnJ7Ne8DQ2aPxwDZ5Ymg
-	 IQpbyoIYbKO2XPbrDuStl4QQ3GQng5LtIIwd//b8KFDV+40xkR1OuTh8Ki1Gf6ME8U
-	 xH1BL/TqgLKCuWH2k5sQgsHrOZNIddUWwVl7zHc62TP7V3FcGecNYN3Bmh1YCMFvKg
-	 DhIZtM5NRdUaw==
-Date: Fri, 14 Feb 2025 14:03:11 -0800
+	b=I8zDjj9HEl+11XI7gXGB+sy5GOfjPqXp07BJcks1KDgiZCZJb7MJom6/X62XW/+ds
+	 9iEl6LBaklQ0o2lj9xun0kwZt8EvTKkm9UUa7iqQvIUMEiP2bnRlfzwCPJqJzlqtNB
+	 QtV4AU124DyhwWWnjoHhfvIezYjfzXb5cWftQbaoTOim1MpYvDDqODsDzsgNjwm69T
+	 xlW58zmLkZAmNPqwS+i+1a/umI9CFolg1z68vX8Izv0NZS1RvF09HP1S/7qezwLh6q
+	 Y5TUNutR7QS4bqJjouzje8IDIoQzXkV1NcYCLjIz5SdNKHGPkEYXI6kLhpuB8bbBnx
+	 8UKg2BAPTPHlg==
+Date: Fri, 14 Feb 2025 14:10:11 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Will Deacon
- <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Waiman Long
- <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org, Breno Leitao
- <leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>, LKML
+ <linux-kernel@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo
+ Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Boqun Feng
+ <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Hayes Wang
+ <hayeswang@realtek.com>, linux-usb@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: [PATCH 1/2] net: Assert proper context while calling
  napi_schedule()
-Message-ID: <20250214140311.43f58050@kernel.org>
-In-Reply-To: <Z65Yl2eeui05Cluy@pavilion.home>
+Message-ID: <20250214141011.501910f3@kernel.org>
+In-Reply-To: <20250214-grinning-upbeat-chowchow-5c0e2f@leitao>
 References: <20250212174329.53793-1-frederic@kernel.org>
 	<20250212174329.53793-2-frederic@kernel.org>
 	<20250212194820.059dac6f@kernel.org>
-	<Z65Yl2eeui05Cluy@pavilion.home>
+	<20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
+	<20250213071426.01490615@kernel.org>
+	<20250214-grinning-upbeat-chowchow-5c0e2f@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Feb 2025 21:39:51 +0100 Frederic Weisbecker wrote:
-> Le Wed, Feb 12, 2025 at 07:48:20PM -0800, Jakub Kicinski a =C3=A9crit :
-> > On Wed, 12 Feb 2025 18:43:28 +0100 Frederic Weisbecker wrote:
-> > Please post the fixes for net, and then the warning in net-next.
-> > So that we have some time to fix the uncovered warnings before
-> > users are broadly exposed to them. =20
->=20
-> How do I define the patch target? Is it just about patch prefix?
+On Fri, 14 Feb 2025 08:43:28 -0800 Breno Leitao wrote:
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index 42f247cbdceec..cd56904a39049 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -87,7 +87,7 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
+>  		goto out_drop_cnt;
+>  
+> -	napi_schedule(&rq->napi);
+> +	hrtimer_start(&rq->napi_timer, ns_to_ktime(5), HRTIMER_MODE_REL);
 
-Yes, --subject-prefix=3D"PATCH net" for fixes
-     --subject-prefix=3D"PATCH net-next" for -next stuff
+ns -> us
 
-But even that isn't really a super hard requirement. My main ask
-was to post patch 2, then wait for it to propagate (we merge the=20
-trees every Thu afternoon) then post patch 1.
+We want to leave the timer be in case it's already scheduled.
+Otherwise we'll keep postponing forever under load.
+Double check that hrtime_start() does not reset the time if already
+pending. Maybe hrtimer_start_range_ns(..., 0, us_to_ktime(5), ...)
+would work?
 
-Sorry for the delay.
+>  	rcu_read_unlock();
+>  	u64_stats_update_begin(&ns->syncp);
+> @@ -426,6 +426,25 @@ static int nsim_init_napi(struct netdevsim *ns)
+>  	return err;
+>  }
+>  
+> +static enum hrtimer_restart nsim_napi_schedule(struct hrtimer *timer)
+> +{
+> +	struct nsim_rq *rq;
+> +
+> +	rq = container_of(timer, struct nsim_rq, napi_timer);
+> +	napi_schedule(&rq->napi);
+> +	/* TODO: Should HRTIMER_RESTART be returned if napi_schedule returns
+> +	 * false?
+> +	 */
+
+I think not, ignore the return value
+
+> +	return HRTIMER_NORESTART;
+> +}
+
 
