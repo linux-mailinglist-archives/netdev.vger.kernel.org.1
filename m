@@ -1,229 +1,172 @@
-Return-Path: <netdev+bounces-166359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C790A35A7D
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:38:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55E6A35A8B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FF501891BAF
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:38:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BEE93AD477
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A8622D799;
-	Fri, 14 Feb 2025 09:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A56242923;
+	Fri, 14 Feb 2025 09:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YMKbeLq1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ViFKXovg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA71F20B20B
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 09:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0868149C7D;
+	Fri, 14 Feb 2025 09:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739525879; cv=none; b=rS72HmS/9LVosvvrI+xEwxz52cP01pfYeNjaOX/1WMIJrD0IoupQDFYGTtip8B+am5gLvz0X2ofNv5uhFtBjhJiiUmfFPrW6hbUJ4vTFahExHYietlIF8c+ZrS19WlaLL/8T4sPcFuNSDdyfHwjqBkRex2bpsST/c8Nkr1IxQys=
+	t=1739526214; cv=none; b=X3eZruUpOMiAiaU2lLbdS9XvSVwpfBK6m7udDQBETqFjSlCjaFQIyXnIiS3fSRkXAYvL9ZwZ3TtBmIF+pYUJQhimVRCk6AmwSiz9eKmyEFdM6zIcZIOaf3ZJcIn7ao+Zmo+QiwYwW6DR3TIVIh3x6xoJnFIS2PVAJg8c4x6VQU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739525879; c=relaxed/simple;
-	bh=AQTS7z4EF6Kj4x9dUNFEDjbX5gbKif/DgWy1UeycRTc=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FVHrQaZioIadL3K6W+NiyAz8dTHUVgIqUtTcll7KvQR0B+vlHGRwyYjBGZ5LA3x0BI+hlpS+/5djkzTTSWWTopnDazpBrKQYSUxbgNXjD9wr9aQSRunPKNTH/2QSDg/HeMTNnmu39boLPTj/Hj1WgBsKITKMa5iY/SQvq2EjJ8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YMKbeLq1; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51E5nqrO012347;
-	Fri, 14 Feb 2025 01:37:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=s+sj44ScQJ1xb0+gk2XwZxhVIlCMD0GRpZaxPw3WjFo=; b=YMK
-	beLq1HRWBH3DSPOb3dq5yxSA5+QJxpSE4e717HDM3m5/P2PGNs89NmL/wQPrFfd2
-	uwe5/aQ8nPx3sqljaLMyLPcziym4eJPpMrs4gZ0tQTJ3IhO6PUnwxLhPT5jIswOs
-	sr8lMLLT2QayBDYIAQYzA3JbDpzasUXcOrodTpxQrO3lTDq+NPpYLiFpB2oUSIQM
-	SLLhgPW2vjAvYEHZaJWgYoFOBk4DU+7PAS1CsaNosUSmKyTVPYqbGDKXOodhHyjc
-	9MASAUzuxfb2xn2jF/xZ3sTG4ya7bFGQg0gjptacXEZrd0hJcmrf+VMhwvxPskpC
-	V6ZlUVFIMvpE2rmrKAg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 44t01f0b6c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 01:37:41 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 14 Feb 2025 01:37:40 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 14 Feb 2025 01:37:40 -0800
-Received: from 285c454e7213 (HY-LT91368.marvell.com [10.29.8.52])
-	by maili.marvell.com (Postfix) with SMTP id DD8595B6927;
-	Fri, 14 Feb 2025 01:37:36 -0800 (PST)
-Date: Fri, 14 Feb 2025 09:37:35 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-CC: Alvin ipraga <alsi@bang-olufsen.dk>, Andrew Lunn <andrew@lunn.ch>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>,
-        Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-        <netdev@vger.kernel.org>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] net: dsa: rtl8366rb: Fix compilation problem
-Message-ID: <Z68O34EauNyyxak7@285c454e7213>
+	s=arc-20240116; t=1739526214; c=relaxed/simple;
+	bh=zLq34zyZ+vn2x8EHLG71uh1H2EfQ4PWpqK69Hy66e7w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IKFGWwGtU1z85/o7wpfkp/hn/QqPFHsO8bAv1RYWBtvnJfKSqtfBjeQYQHefToCxdB+Db31x9QeSmkKmMyQdLbWrSO0JSi8rhV9gWQVz/X4RwgQmo94dORIS6SgzBKdl8jIgRT1R+cBDviUeBHlxWzr14wFxzSnQnoYgqEj/42A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ViFKXovg; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739526212; x=1771062212;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zLq34zyZ+vn2x8EHLG71uh1H2EfQ4PWpqK69Hy66e7w=;
+  b=ViFKXovgOXOFScFg8+GYrAxPhRy9KrENocku7RpenrL9BzfXvYfaAZRg
+   jQBm7hnEPZCmZFwxjmlZhA1z7C884dKiyWJRzLl8bO3TkrMIBK4CjR3kQ
+   iqurHJTYsCdnfougLXc2YPBCsTovqq8GIgRYMPsOzAkv0cquC2S4DIMU+
+   oOMT3Z1Oe+9e+snzMOfYflKKKQ5C+P8mZeM5socKzbvrqA9r2vppzVmzq
+   WVFF52dfBY+NX/AymnmuoDXRS5tYSoHjzijwYsnEPB/LzYD6/3AYtu8Ig
+   DU1IYpzd/u+Tz0eUOkYtwsCAcpc0pPEI4dRofM6FLOeWYPi9UrF1cONln
+   g==;
+X-CSE-ConnectionGUID: Kq6TxkY1RuiUtW2hdM1HLw==
+X-CSE-MsgGUID: 37DqnfFoQ02HpGKQAJ6h4A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11344"; a="44197299"
+X-IronPort-AV: E=Sophos;i="6.13,285,1732608000"; 
+   d="scan'208";a="44197299"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 01:43:30 -0800
+X-CSE-ConnectionGUID: ZO0UWXkJQOin2e28wbPaEw==
+X-CSE-MsgGUID: Hg2vL6gvSzaFtD29bl+/3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118036852"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.89.75]) ([10.247.89.75])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 01:43:22 -0800
+Message-ID: <641ab972-e110-4af2-ad9b-6688cee56562@linux.intel.com>
+Date: Fri, 14 Feb 2025 17:43:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-Proofpoint-ORIG-GUID: enHcGK9O42FWM0d_a-3GWhZiA_18rI39
-X-Proofpoint-GUID: enHcGK9O42FWM0d_a-3GWhZiA_18rI39
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_04,2025-02-13_01,2024-11-22_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
+ feature in IGC
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250212220121.ici3qll66pfoov62@skbuf>
+ <b19357dc-590d-458c-9646-ee5993916044@linux.intel.com>
+ <87cyfmnjdh.fsf@kurt.kurt.home>
+ <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
+ <20250213130003.nxt2ev47a6ppqzrq@skbuf>
+ <1c981aa1-e796-4c53-9853-3eae517f2f6d@linux.intel.com>
+ <877c5undbg.fsf@kurt.kurt.home> <20250213184613.cqc2zhj2wkaf5hn7@skbuf>
+ <87v7td3bi1.fsf@kurt.kurt.home>
+ <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+ <874j0wrjk2.fsf@kurt.kurt.home>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <874j0wrjk2.fsf@kurt.kurt.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2025-02-14 at 08:59:57, Linus Walleij (linus.walleij@linaro.org) wrote:
-> When the kernel is compiled without LED framework support the
-> rtl8366rb fails to build like this:
-> 
-> rtl8366rb.o: in function `rtl8366rb_setup_led':
-> rtl8366rb.c:953:(.text.unlikely.rtl8366rb_setup_led+0xe8):
->   undefined reference to `led_init_default_state_get'
-> rtl8366rb.c:980:(.text.unlikely.rtl8366rb_setup_led+0x240):
->   undefined reference to `devm_led_classdev_register_ext'
-> 
-> As this is constantly coming up in different randconfig builds,
-> bite the bullet and add some nasty ifdefs to rid this issue.
->
-to get rid of this issue
 
-Rest looks good to me.
 
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+On 14/2/2025 4:56 pm, Kurt Kanzenbach wrote:
+> On Fri Feb 14 2025, Abdul Rahim, Faizal wrote:
+>> On 14/2/2025 3:12 am, Kurt Kanzenbach wrote:
+>>> On Thu Feb 13 2025, Vladimir Oltean wrote:
+>>>> So, confusingly to me, it seems like one operating mode is fundamentally
+>>>> different from the other, and something will have to change if both will
+>>>> be made to behave the same. What will change? You say mqprio will behave
+>>>> like taprio, but I think if anything, mqprio is the one which does the
+>>>> right thing, in igc_tsn_tx_arb(), and taprio seems to use the default Tx
+>>>> arbitration scheme?
+>>>
+>>> Correct. taprio is using the default scheme. mqprio configures it to
+>>> what ever the user provided (in igc_tsn_tx_arb()).
+>>>
+>>>> I don't think I'm on the same page as you guys, because to me, it is
+>>>> just odd that the P traffic classes would be the first ones with
+>>>> mqprio, but the last ones with taprio.
+>>>
+>>> I think we are on the same page here. At the end both have to behave the
+>>> same. Either by using igc_tsn_tx_arb() for taprio too or only using the
+>>> default scheme for both (and thereby keeping broken_mqprio). Whatever
+>>> Faizal implements I'll match the behavior with mqprio.
+>>>
+>>
+>> Hi Kurt & Vladimir,
+>>
+>> After reading Vladimir's reply on tc, hw queue, and socket priority mapping
+>> for both taprio and mqprio, I agree they should follow the same priority
+>> scheme for consistency—both in code and command usage (i.e., taprio,
+>> mqprio, and fpe in both configurations). Since igc_tsn_tx_arb() ensures a
+>> standard mapping of tc, socket priority, and hardware queue priority, I'll
+>> enable taprio to use igc_tsn_tx_arb() in a separate patch submission.
+> 
+> There's one point to consider here: igc_tsn_tx_arb() changes the mapping
+> between priorities and Tx queues. I have no idea how many people rely on
+> the fact that queue 0 has always the highest priority. For example, it
+> will change the Tx behavior for schedules which open multiple traffic
+> classes at the same time. Users may notice.
 
-> Fixes: 32d617005475 ("net: dsa: realtek: add LED drivers for rtl8366rb")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202502070525.xMUImayb-lkp@intel.com/
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  drivers/net/dsa/realtek/rtl8366rb.c | 53 +++++++++++++++++++++++--------------
->  1 file changed, 33 insertions(+), 20 deletions(-)
+Yeah, I was considering the impact on existing users too. I hadn’t given it 
+much thought initially and figured they’d just need to adapt to the 
+changes, but now that I think about it, properly communicating this would 
+be tough. taprio on igc (i225, i226) has been around for a while, so a lot 
+of users would be affected.
+
+> OTOH changing mqprio to the broken_mqprio model is easy, because AFAIK
+> there's only one customer using this.
 > 
-> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-> index 4c4a95d4380ce2a8a88a6d564cc16eab5a82dbc8..b914bb288f864ed211ff0b799d4f1938474199a7 100644
-> --- a/drivers/net/dsa/realtek/rtl8366rb.c
-> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-> @@ -372,12 +372,14 @@ enum rtl8366_ledgroup_mode {
->  	__RTL8366RB_LEDGROUP_MODE_MAX
->  };
->  
-> +#if IS_ENABLED(CONFIG_LEDS_CLASS)
->  struct rtl8366rb_led {
->  	u8 port_num;
->  	u8 led_group;
->  	struct realtek_priv *priv;
->  	struct led_classdev cdev;
->  };
-> +#endif
->  
->  /**
->   * struct rtl8366rb - RTL8366RB-specific data
-> @@ -388,7 +390,9 @@ struct rtl8366rb_led {
->  struct rtl8366rb {
->  	unsigned int max_mtu[RTL8366RB_NUM_PORTS];
->  	bool pvid_enabled[RTL8366RB_NUM_PORTS];
-> +#if IS_ENABLED(CONFIG_LEDS_CLASS)
->  	struct rtl8366rb_led leds[RTL8366RB_NUM_PORTS][RTL8366RB_NUM_LEDGROUPS];
-> +#endif
->  };
->  
->  static struct rtl8366_mib_counter rtl8366rb_mib_counters[] = {
-> @@ -831,6 +835,7 @@ static int rtl8366rb_jam_table(const struct rtl8366rb_jam_tbl_entry *jam_table,
->  	return 0;
->  }
->  
-> +/* This code is used also with LEDs disabled */
->  static int rb8366rb_set_ledgroup_mode(struct realtek_priv *priv,
->  				      u8 led_group,
->  				      enum rtl8366_ledgroup_mode mode)
-> @@ -850,6 +855,7 @@ static int rb8366rb_set_ledgroup_mode(struct realtek_priv *priv,
->  	return 0;
->  }
->  
-> +#if IS_ENABLED(CONFIG_LEDS_CLASS)
->  static inline u32 rtl8366rb_led_group_port_mask(u8 led_group, u8 port)
->  {
->  	switch (led_group) {
-> @@ -988,26 +994,6 @@ static int rtl8366rb_setup_led(struct realtek_priv *priv, struct dsa_port *dp,
->  	return 0;
->  }
->  
-> -static int rtl8366rb_setup_all_leds_off(struct realtek_priv *priv)
-> -{
-> -	int ret = 0;
-> -	int i;
-> -
-> -	regmap_update_bits(priv->map,
-> -			   RTL8366RB_INTERRUPT_CONTROL_REG,
-> -			   RTL8366RB_P4_RGMII_LED,
-> -			   0);
-> -
-> -	for (i = 0; i < RTL8366RB_NUM_LEDGROUPS; i++) {
-> -		ret = rb8366rb_set_ledgroup_mode(priv, i,
-> -						 RTL8366RB_LEDGROUP_OFF);
-> -		if (ret)
-> -			return ret;
-> -	}
-> -
-> -	return ret;
-> -}
-> -
->  static int rtl8366rb_setup_leds(struct realtek_priv *priv)
->  {
->  	struct dsa_switch *ds = &priv->ds;
-> @@ -1039,6 +1025,33 @@ static int rtl8366rb_setup_leds(struct realtek_priv *priv)
->  	}
->  	return 0;
->  }
-> +#else
-> +static int rtl8366rb_setup_leds(struct realtek_priv *priv)
-> +{
-> +	return 0;
-> +}
-> +#endif
-> +
-> +/* This code is used also with LEDs disabled */
-> +static int rtl8366rb_setup_all_leds_off(struct realtek_priv *priv)
-> +{
-> +	int ret = 0;
-> +	int i;
-> +
-> +	regmap_update_bits(priv->map,
-> +			   RTL8366RB_INTERRUPT_CONTROL_REG,
-> +			   RTL8366RB_P4_RGMII_LED,
-> +			   0);
-> +
-> +	for (i = 0; i < RTL8366RB_NUM_LEDGROUPS; i++) {
-> +		ret = rb8366rb_set_ledgroup_mode(priv, i,
-> +						 RTL8366RB_LEDGROUP_OFF);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return ret;
-> +}
->  
->  static int rtl8366rb_setup(struct dsa_switch *ds)
->  {
-> 
-> ---
-> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-> change-id: 20250213-rtl8366rb-leds-compile-issue-dcd2c3c50fef
-> 
-> Best regards,
-> -- 
-> Linus Walleij <linus.walleij@linaro.org>
-> 
+
+Hmmmm, now I’m leaning toward keeping taprio as is (hw queue 0 highest 
+priority) and having mqprio follow the default priority scheme (aka 
+broken_mqprio). Even though it’s not the norm, the impact doesn’t seem 
+worth the gain. Open to hearing others' thoughts.
+
 
