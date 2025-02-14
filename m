@@ -1,139 +1,117 @@
-Return-Path: <netdev+bounces-166394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F1EDA35E4F
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:05:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85BF5A35E6E
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D043B3830
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:02:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1B3016F04B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 13:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DE5264A97;
-	Fri, 14 Feb 2025 13:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039CD2641CB;
+	Fri, 14 Feb 2025 13:05:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958BF264A9A;
-	Fri, 14 Feb 2025 13:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D99F507;
+	Fri, 14 Feb 2025 13:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739538092; cv=none; b=nRsduaedp4bNcOXTwCerUm5ejh9yheq2jWXxOKTE6RLyV6fcnPU9RwADrcLbw/6UB9MW+KQyhjiclv7ig1gcfUZbm7NSk5bEf3U6X3CUj9osKhd7nfckSGuu4YUloixoeBPaQyargpkUZ/HgMNruJr4Wy39cnO0MpX57pQDtnvU=
+	t=1739538324; cv=none; b=fIH2SdtnjadkeaItSBtk2yDbcle7NIAyLuioi9slrKsZGSN1vPwpHFDD4mNOxlkP4zaDnTJ2mE7S+CxMAM5yioI6GJlLxh+C4Y+fkX0x+RKh88eSMbNLwF0PViEbOJ9I+yNvGcglsYbYWXK7YiY3ZiJzPiFKkPN8DrkTOKyhdbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739538092; c=relaxed/simple;
-	bh=FIBo4Pn5/bM8NNMW2uzH89Pu3UzY3UHIvwIrPFjcIYk=;
+	s=arc-20240116; t=1739538324; c=relaxed/simple;
+	bh=TExxYGL2g1GIs+G42A58gEs8Fv/48l/Y6gh+XSSRzPc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VKDKSlGY/irHND4uCJofoEF+g6InVFdGPC/6LxfsZdL47MFD1bZESUoA14MLR6yOXhfwl33AZXAyy2Ze5DI6TRA843BidtVJ+LLbLwVREUc3+Xf9wP9ifOp/lHsvz+nn6cnw7KIoEjSjS/1o7WJvWLM41NARuzOzxRQSUlXZvPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNde7hBeC86W3p4p+fdbQO8bAv3rMcnFR3JzfNVLinH/vGGLEwgtQQT4kdeDXysNkPG9NRvU9xfDvRtXKFyY/GCl+POkTBk4uDDZM4hucgNMwmKMMjCBqrE7jxDGGFkZ+LCnyxqJwiZB8Dlft8FB+Mhtm6ri5qloDWb5eSOakIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so1106614a12.1;
-        Fri, 14 Feb 2025 05:01:30 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ab7c81b8681so351752866b.0;
+        Fri, 14 Feb 2025 05:05:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739538089; x=1740142889;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SmJSbPjau7GZkUvt4YAQLEQLZ+4k7GSl+yHabGYZeqg=;
-        b=r5b4CCrBRukca8dW6trOReaOCLrjy95fAenMeFpNH/cuEF05cgTBy9FrOVFnJm7xyL
-         sa/qBqRuzu8MD9P+zxdCvsx/RKSggt/hEQS0IrS+D9e7ffLQGciKqhKtsWZLIzaLNf2Z
-         EDHI9M7IysptptsPz2Jtz3geLX/L3s4pZW2KoCFn03e/rydGoPBUF/9Cbaimx0AgPQcg
-         zpghuKwqrYo0HL7p5/mWA43JCaB7Aetehl3XQINF+TLTqN3AuR0klT/uTWS8ly1JxHFe
-         FZm5wVB2VlQ6aCL5aWtAG+a7Ieu17DVdPisb4cwzwV9ieO2vmDxL/VTJ7nZ62oDI7fi7
-         H8tA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgS60VUGlJvtIHcTqU+WP7o4wu/V3jBIoA4agB+lc/o4r74v7djxQwyyphJt2EhT4aQ31ImxEq@vger.kernel.org, AJvYcCWI2b66Rmp1kUmA1j0iCg6HP6hESocDP0jsUsJbj/4Z0vrPzzX1HhZsxxeRpvN6zZo5LdcBG0rJ@vger.kernel.org, AJvYcCWsAj8WAolw6F1YTrxGCpMMM9koqtoIkHhDdkgVWVNUuVtNaIReYtgCHtRHI88DfIGZpoGBwsPu7+BQADo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/bugQ4iL1NM7wCDcP54tAB4oZI/SIpxJ4nPe0SZAfnjs56sG4
-	dZ8C60JB9XFo1kIJjdz+WXZpY4FIjuidsFvIS8y493p0HWl6tbga
-X-Gm-Gg: ASbGnctXpAhgHH8AGQh3GsALmw0qS4hRilyu2VHv4lVND/gZ3RKmkZXrVxfcF5zHzv8
-	eZ9qhPm3I0AlwKs/veW2PgyW7oVlJtZheOQy9KlS5Ug0FYN+mOGQ71FB5fFHR0ouVQlGWLyzg9t
-	0Tz01+hf3hmDC6EvvQA54b8oQ6maUT3rpGz6m5Ujd1kywd/MIAtwlnIo9nBMdCHn+/ZTFu4xzfo
-	+B+4n3/b6pvx4GkCUU4vNQeXyD3UOympEcPO7JgEi6VqLsVO7yJxA2mN5ZOAdlQTgb9ESRSp/84
-	B6sflQ==
-X-Google-Smtp-Source: AGHT+IEirsmfMl6q8OzxN8fXiy6/+vOALKyTI2Z/D3DognQreEPKQsCrns0gsFkYbx+oq0ZFm8aeEA==
-X-Received: by 2002:a17:907:1c1e:b0:ab7:ef47:ed27 with SMTP id a640c23a62f3a-aba50febe2cmr709899666b.13.1739538088320;
-        Fri, 14 Feb 2025 05:01:28 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:5::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba532581cesm334181466b.45.2025.02.14.05.01.27
+        d=1e100.net; s=20230601; t=1739538321; x=1740143121;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=00ZjsPVy/ck54B3KQOxyx18bQduThNAmRPFGnxfYcmw=;
+        b=TyqRukQriF47yBO/QeZSRm+fICR613qn9Ic5asOGnJ0142kWEylcb121OUIiBrWdsO
+         E1Gy0Klt/3SQQTfHdDZ4Lsp7DjSI/2CoQtfnRBr8mM6VFqnDqZtW05k/ReL9CFae3d9x
+         rCif7mDzrUiz4WIg04wnPy0xAOfAs4ljxRxx9UWq7VOFq3FINHsq+QJEq9q0fQht0o3J
+         Y+RdUKM9JiBa8YysC9tIUjRhbXXOqNxSeKz0Ykepnkkn4fwrIYty+uzZJMg2DFkYSiOY
+         ICamVPD/eCJ18UOHk1940nIiu6qNP8dSqVHki4lyBLnW0a4n31vRAQS1qyy04hAGO42J
+         je0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWNs4hfPYvHqjcs/aB9hop1j3NtMBXO3oJFDY5BQmPOiK/lkTb2zimntcwsO2jrTVNFAy3ZHjEx@vger.kernel.org, AJvYcCWkKZNb8bt3IuQsSPBSEzGZnf8l4TWSM0uY9QXwHhnQGiAdpj8B4q/KK4iVPTPjBTbq3Yq0RnKP9B6oWFc=@vger.kernel.org, AJvYcCXaGO0rqeR6MTWClseOFpGRgZOZvr2ASWyDdLNBkDy1X7KrhiPGgalcO0ER9P9siOT2Eg0vzXfPb7Hn@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF8bY1Qn58blH37BE6ClCVmigvbBHjcyCfveJXiuKdtm/aCxe2
+	AnWid66DWSuTC7b0KwrQFXk/sp90bneI73QngHaJ0Vmd1QK70kQZ
+X-Gm-Gg: ASbGnctoTCsF1g+/dPTrS90r5/z3WKx6sQbvKHzuSLsX1UsYMV59JJs+b6wu6vDRQXU
+	0tBhEQsy7e/MfY9h24MBjqflLfWXC3L5jJXGuZlPrWeXLEc4MRbF0Tatdjr/hKgnBbEhd1dsp03
+	NwasiXbgIHTzZWk/u8OKR8TlY9BAhEz5cGGwoni7IhO7NZZ+QLktT7cOsRFomw+Ii0V7FtylEJZ
+	gtGBQ3KPfq44NmzJhlMzuMBI/wo83rEvWBjgvVbn7wVbNRvuuL60oZDmqHoYz+SzDdEPkBI1WIV
+	nwzO5Ac=
+X-Google-Smtp-Source: AGHT+IHQk+IPmCfAJHCjcco7sECqNGd7fWJltlvwAvnfYmj/VMo7R3fuWFr2fvA/4EBMwe1nk5M9vw==
+X-Received: by 2002:a17:906:dc91:b0:ab7:c4db:a044 with SMTP id a640c23a62f3a-ab7f3714983mr1158317666b.8.1739538311827;
+        Fri, 14 Feb 2025 05:05:11 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:70::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dece270967sm2885102a12.55.2025.02.14.05.05.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 05:01:27 -0800 (PST)
-Date: Fri, 14 Feb 2025 05:01:25 -0800
+        Fri, 14 Feb 2025 05:05:11 -0800 (PST)
+Date: Fri, 14 Feb 2025 05:05:08 -0800
 From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	paulmck@kernel.org, kernel-team@meta.com, stable@vger.kernel.org
-Subject: Re: [PATCH net] netdevsim: disable local BH when scheduling NAPI
-Message-ID: <20250214-daffy-athletic-kakapo-ba9b1b@leitao>
-References: <20250212-netdevsim-v1-1-20ece94daae8@debian.org>
- <CANn89iKnqeDCrEsa4=vf1XV4N6+FUbfB8S6tXG6n8V+LKGfBEg@mail.gmail.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: Assert proper context while calling
+ napi_schedule()
+Message-ID: <20250214-belligerent-invaluable-nightingale-cd8d95@leitao>
+References: <20250212174329.53793-1-frederic@kernel.org>
+ <20250212174329.53793-2-frederic@kernel.org>
+ <20250212194820.059dac6f@kernel.org>
+ <20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
+ <20250213071426.01490615@kernel.org>
+ <20250213-camouflaged-shellfish-of-refinement-79e3df@leitao>
+ <20250213110452.5684bc39@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKnqeDCrEsa4=vf1XV4N6+FUbfB8S6tXG6n8V+LKGfBEg@mail.gmail.com>
+In-Reply-To: <20250213110452.5684bc39@kernel.org>
 
-Hello Eric,
-
-On Wed, Feb 12, 2025 at 07:55:32PM +0100, Eric Dumazet wrote:
-> On Wed, Feb 12, 2025 at 7:34 PM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > --- a/drivers/net/netdevsim/netdev.c
-> > +++ b/drivers/net/netdevsim/netdev.c
-> > @@ -87,7 +87,9 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
-> >         if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
-> >                 goto out_drop_cnt;
-> >
-> > +       local_bh_disable();
-> >         napi_schedule(&rq->napi);
-> > +       local_bh_enable();
-> >
+On Thu, Feb 13, 2025 at 11:04:52AM -0800, Jakub Kicinski wrote:
+> On Thu, 13 Feb 2025 10:14:02 -0800 Breno Leitao wrote:
+> > > The problem is a bit nasty, on a closer look. We don't know if netcons
+> > > is called in IRQ context or not. How about we add an hrtimer to netdevsim,
+> > > schedule it to fire 5usec in the future instead of scheduling NAPI
+> > > immediately? We can call napi_schedule() from a timer safely.
+> > > 
+> > > Unless there's another driver which schedules NAPI from xmit.
+> > > Then we'd need to try harder to fix this in netpoll.
+> > > veth does use NAPI on xmit but it sets IFF_DISABLE_NETPOLL already.  
+> > 
+> > Just to make sure I follow the netpoll issue. What would you like to fix
+> > in netpoll exactly?
 > 
-> I thought all ndo_start_xmit() were done under local_bh_disable()
+> Nothing in netpoll, the problem is that netdevsim calls napi_schedule
 
-I think it depends on the path?
+Hm, you said the following above: 
 
-> Could you give more details ?
+	Then we'd need to try harder to fix this in netpoll.
 
-There are several paths to ndo_start_xmit(), and please correct me if
-I am reading the code wrongly here.
+I was curious about the meaning of that statement?
 
-Common path:
-
-	__dev_direct_xmit()
-		local_bh_disable();
-			netdev_start_xmit()
-				__netdev_start_xmit()
-					ops->ndo_start_xmit(skb, dev);
-
-
-But, in some other cases, I see:
-
-	netpoll_start_xmit()
-		netdev_start_xmit()
-			....
-
-My reading is that not all cases have local_bh_disable() disabled before
-calling ndo_start_xmit().
-
-Question: Must BH be disabled before calling ndo_start_xmit()? If so,
-the problem might be in the netpoll code!? Also, is it worth adding
-a DEBUG_NET_WARN_ON_ONCE()?
-
-Note: Jakub gave another suggestion on how to fix this, so, I send a v2
-with a different approach:
-
-	https://lore.kernel.org/all/20250213071426.01490615@kernel.org/
-
-Thanks for the review!
+Thanks
 --breno
-
 
