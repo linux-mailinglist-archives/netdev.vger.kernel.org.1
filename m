@@ -1,134 +1,161 @@
-Return-Path: <netdev+bounces-166499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9A7A362F9
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:23:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9DD1A36300
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 17:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26C3B3A5A9C
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:23:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F16216B50E
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0B82676CE;
-	Fri, 14 Feb 2025 16:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2BE2676FD;
+	Fri, 14 Feb 2025 16:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHcTh8yM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E0q3Q8fe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033452753FD
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF292676CE;
+	Fri, 14 Feb 2025 16:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739550235; cv=none; b=C7OcHL1+8fOKXRY+a6gIRlNupDY2o7J5xzmy0qec2KvbQPXJXFfo/Du2xgfdIxRAsUFWeb+CVSohAzbvjV7KcBzSaeS8ufE9+xBkuR0K2d4hkigLf5ARxuHaHB71tLCvbztaHjZIPhBxMaJegRzzHz+KCBcN8GqEpeuT+mqxJnE=
+	t=1739550300; cv=none; b=mXGGbBPsee1DqUmlCpsepLvT1YWj8+Q6aU5OEY4kDUC4EI14RSVoBFAV92GfvvN6oJ8qpvs0QrmquZQQ+jBBp4mCMw4/zSYFLGu5xMxfuP73SC43goKHUiep/G3yKgGDldJ5K+UfHdT+5JGtvQoZluoyHKd0lnKI8skRqcCoR9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739550235; c=relaxed/simple;
-	bh=8Mb1gopNuJ3swCluVTerdaKmSaePf6NdOwg7SyWm6eU=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=I3dow7NscLEK1pcxyuhYcR1pn8VEOHHjgx/STfh34CuliW7k0gcPSBcP2e39vRPt6O+1dwqN6Nf9dUJ86br6nX1+9F9XZlBEt3z0h79aEqZmRrwg7H53AR1cvsxGrlRjAj3a1k+ql1TFxUhwGh2PN2TENX+iFzG9qHrt+xtXhS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHcTh8yM; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38dc6d55ebaso2202211f8f.1
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 08:23:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739550232; x=1740155032; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R8b846e0yOvqew9DqyRWHkZ4zUUK8Zjpqn2sr19+fzA=;
-        b=EHcTh8yM1dw18YKV13yqtpOu6TdpiJRY9a8jQ8eFjhpMIEX6b9UTp3Av0fv7UE6664
-         KJtZ0n9MooYIfdTcNFZpGYz8YutfV3TkW3RUrnhDYokQX3nmodEdrJ81YWYw8j3mnn4O
-         4V2oiWI6tpq/GzeLkmdkpCzEdf0+Kjn1ILpEiLWEvcpWSKjrHXcGXEDE37PnAvfzzXG/
-         MtndGhUeTuM0S5IdtRgJ9lJAfrs/1ozFLjM+zLWiFXWrgaumzQKZQ1Jlg/6WKN91bZb4
-         WfbG9KNzxeSaO3yLEoF7z4ZJe3gczGaM4qKpMuQb55efc1vVplz2Xp22diFAZFD9tdnH
-         pDTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739550232; x=1740155032;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R8b846e0yOvqew9DqyRWHkZ4zUUK8Zjpqn2sr19+fzA=;
-        b=REUMCvVR/YrkjZNF81Qfno+TJPqzqpyTa4xUmazx0a5xkXvRZvsBrMFgRtZ9Xmshjk
-         rOeSeK3p1oEEIQMVsns+Uj2t7hm2BJd+tzqA634MgLiynQvOivGwI3E6Vi8oyCn5A9OB
-         dCM1XGlB36IiVqhjcfNfblr8gt3vU9zWm+gHRJLaoVjjPpGuLNICuN8IymZFX+1zpyZc
-         3bcaNR/EUGGM2Nxv3TaCXXYDiMO07RDbZVouEnj3pCrEldfR8TGfOnKwEuMCIKmv67Pz
-         zJIGz+ZMtvQ/XMLfyHp6L45EtXQ/n7oM5gl7+OBvHN4yQkghTZMjbkhtxz+HDvH2MENT
-         A4Kg==
-X-Gm-Message-State: AOJu0YyaZOowB9tuQwPhR1G5TTj/dzXjJoJJHluSCzhq1wZZRAZebK4s
-	98+sKI7tP5fdnlZ9JfjlESz3Mp/euXpkq9uOfRgy82yQSTXAdcRh
-X-Gm-Gg: ASbGncvbgvR5t2euv8VWJzcIE77/qzXPn0ytorPcs4s4YXmQTOzYslSYr2HJevAqsFD
-	SckjntfgOlKpJkDxWGzWjU/tkFXmegeDTqd3f5FKmwi+ivnLKueyiWLKxF8W0LQ7T41WlxXaDty
-	ARoiLKpowIi+rrW7wCNP2y863LDzCrtuXQKWwq2ciMG29bKFKokfd3Ru1/G6WtGrOMTLjWrIAiz
-	Og3i9Jl6YeRqQLhKrqYKrGG9X8quBRVfvDOGocKu699jGUhQWwSz8ccZVH7/FDnS2uI/8NmdpHD
-	fMvfKU1pP/kZEoucRdu8t6Np4lE2RXOgRJk52ZdiNJ0uRVHTJXWaANTid1j7xKi5tTG9BkATzrg
-	LkAs=
-X-Google-Smtp-Source: AGHT+IGdLO1vOkrWwTLzshn6PmD83mUYlM/8U3lvhCad+Lbpanql70lebcpQJrO+PzQvU7wBZaIrGA==
-X-Received: by 2002:a5d:6603:0:b0:38a:4184:14ec with SMTP id ffacd0b85a97d-38f24f06c50mr8580775f8f.1.1739550232100;
-        Fri, 14 Feb 2025 08:23:52 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258b434fsm5109055f8f.16.2025.02.14.08.23.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 08:23:51 -0800 (PST)
-Subject: Re: [PATCH net-next 6/7] sfc: add debugfs entries for filter table
- status
-To: "Nelson, Shannon" <shannon.nelson@amd.com>, edward.cree@amd.com,
- linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
- Jonathan Cooper <jonathan.s.cooper@amd.com>
-References: <cover.1702314694.git.ecree.xilinx@gmail.com>
- <fc28d967fbffd53f61a1d42332ee7bc64435df7c.1702314695.git.ecree.xilinx@gmail.com>
- <ed7a2ffa-bfc9-4276-8776-89cafa546ef8@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <235217f3-97fc-9925-cf9d-7ebbb77f0487@gmail.com>
-Date: Fri, 14 Feb 2025 16:23:50 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1739550300; c=relaxed/simple;
+	bh=LsWihSEDqmW2ynjjlF9YkNchxOjrOyCby77qfHSZnAY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FcXYlBe3TIep3SEwB0bHY+yiXz6KvbVDBMWEvx9kMlSLa6aQE4gnLVEBAu1wwafv/CLtuDwJB8VSOwFncdAa3obXiuVh2SlqAuDIdhHf6NEkVVNGHtGIiFyHPAUeFcQ6ieammrDEY/I5gmGn5WL7ec+dXi7/zr8Vkc5utiT8HaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=E0q3Q8fe; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51EBAgNh000518;
+	Fri, 14 Feb 2025 16:24:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=pjx1l8vRjPsMgVy1+/X/PVrWefQm6fL9MGARtv2sl
+	sE=; b=E0q3Q8feKaa3pljJhfPXsUbOo13cXTtao9KoK0GTGC8j2igNhANF1ZzWY
+	fIvhpV3kFCMzoby9A7MS/wzPUQItHsikqq+QdyLq0+1txJfivg8NFP/b5OuEyCpb
+	rJWfjIuxf5++BrTVNDLsQ8MLrKIzi7j8MxSjOkpuwv208yhf3f+pVxRYhIU9nrR5
+	TGrk0NQ4ytqH0UziW1Ul3iBTjZIGbG55gBkpao0gVeppYt8NnuDbFoTK7DHZbQJG
+	L/z9bR3DY2boab7c8Egg5zhBjXWtQxSDASd3kg8TwWROJFJs9AyQDKcETZ9okuWt
+	vIxtcovDmXMadYjKFCOLCsd8sptnA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44ssvacbbh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Feb 2025 16:24:55 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51EFWsLH016752;
+	Fri, 14 Feb 2025 16:24:54 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pk3kmd4m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Feb 2025 16:24:54 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51EGOpZY27329042
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Feb 2025 16:24:51 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6485F58056;
+	Fri, 14 Feb 2025 16:24:51 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 352C05803F;
+	Fri, 14 Feb 2025 16:24:51 +0000 (GMT)
+Received: from li-4c4c4544-0047-5210-804b-b8c04f323634.lan (unknown [9.61.91.157])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 14 Feb 2025 16:24:51 +0000 (GMT)
+From: Nick Child <nnac123@linux.ibm.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: haren@linux.ibm.com, ricklind@us.ibm.com, nick.child@ibm.com,
+        jacob.e.keller@intel.com, horms@kernel.org,
+        Nick Child <nnac123@linux.ibm.com>
+Subject: [PATCH v2 0/3] Use new for_each macro to create hexdumps
+Date: Fri, 14 Feb 2025 10:24:33 -0600
+Message-ID: <20250214162436.241359-1-nnac123@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ed7a2ffa-bfc9-4276-8776-89cafa546ef8@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mIdPVQ06Q4rkXpArDOB5AZYYNaCAvUFl
+X-Proofpoint-ORIG-GUID: mIdPVQ06Q4rkXpArDOB5AZYYNaCAvUFl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-14_07,2025-02-13_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 mlxscore=0 spamscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2501170000 definitions=main-2502140114
 
-On 15/12/2023 00:05, Nelson, Shannon wrote:
-> On 12/11/2023 9:18 AM, edward.cree@amd.com wrote:
->> +#ifdef CONFIG_DEBUG_FS
->> +       table->debug_dir = debugfs_create_dir("filters", efx->debug_dir);
->> +       debugfs_create_bool("uc_promisc", 0444, table->debug_dir,
->> +                           &table->uc_promisc);
->> +       debugfs_create_bool("mc_promisc", 0444, table->debug_dir,
->> +                           &table->mc_promisc);
->> +       debugfs_create_bool("mc_promisc_last", 0444, table->debug_dir,
->> +                           &table->mc_promisc_last);
->> +       debugfs_create_bool("mc_overflow", 0444, table->debug_dir,
->> +                           &table->mc_overflow);
->> +       debugfs_create_bool("mc_chaining", 0444, table->debug_dir,
->> +                           &table->mc_chaining);
->> +#endif
-> 
-> It would be good to continue the practice of using the debugfs_* primitives in your debugfs.c and just make a single call here that doesn't need the ifdef
+Apologies, not sure what mailing list/tree to target. First 2 patches look
+like *-next and last patch should go to net-next.
 
-I'm still in two minds about this.  While it makes sense in isolation
- to do it that way here, in the following patch we add a more complex
- dumper, and I think it makes more sense to put that in mcdi_filters.c
- and have filters code know a bit about debugfs, than put it in
- debugfs.c and have debug code know *everything* about filters — and
- every other part of the driver that subsequently gets its own debug
- nodes.
-I already have some follow-up patches that add EF100 MAE debugfs nodes
- which also have custom dumpers, but those are in a separate file
- (tc_debugfs.c) because there are a lot of them and tc/mae code is
- already split into several pieces, whereas I'm not sure whether
- adding a separate file for filter-table debugfs code really makes
- sense, or whether it's sufficient just to refactor this code into
- a(n unconditionally-called) function that continues to live in
- mcdi_filters.c and has the ifdef within it.
+Currently, obtaining a hexdump can be done through one of the following:
+ 1. hex_dump_to_buffer - takes at most 32 bytes of a buffer and returns a 
+     hexdump string representation
+ 2. print_hex_dump - prints output of hex_dump_to_buffer iteratively over
+    a large buffer
+
+There is no functionality for iterating over a large buffer and receiving
+the string representation. It seems most users of hex_dump_to_buffer are
+calling hex_dump_to_buffer within the body of a loop which iterates
+through a buffer.
+
+This patchset creates a for_each macro that accepts a buffer and fills
+out an output string with the converted hexdump. This loops over the
+buffer and takes care of incrementing pointers. Hopefully this makes
+writing sequential calls to hex_dump_to_buffer more straightforward.
+
+From a users perspective there should be no difference in output.
+
+The inspiration here was I wanted to use print_hex_dump in ibmvnic code
+but I wanted to print through netdevice printing functions to maintain
+formatting. Looking at other users of hex_dump_to_buffer it seems they had
+similar intentions.
+
+Side question:
+  hex_dump_to_buffer automatically sets groupsize to 1 if user given
+  groupsize is not a multiple of len. When printing large buffers this
+  makes non-uniform output. For example, this is a 31 byte 8 groupsize
+  buffer:
+   ibmvnic 30000003 env3: 6c6774732e737561 2e6d62692e736261
+   ibmvnic 30000003 env3: 63 6f 6d 00 03 00 05 65 6e 76 33 00 00 00 00
+  Since the second line is only 15 bytes, the group size is set to 1. I
+  have written a patch which keeps groupsize so output would be:
+   ibmvnic 30000003 env3: 6c6774732e737561 2e6d62692e736261
+   ibmvnic 30000003 env3: 636f6d0003000565 6e763300000000
+  But since I am not sure if this would break some dependency for someone,
+  and my justification for change is purely pedantic, I chose to omit
+  that patch in this patchset. Let me know if there is any interest and
+  I will send a different patchset for that. 
+
+Thanks for your consideration/review. And thanks to Simon and Jacob for v1
+review!
+
+Changes since v1:
+ - add Jacob's Reviewed-by
+ - fix kernel doc typo in patch 1 noted by Simon
+
+v1: https://lore.kernel.org/lkml/20250113221721.362093-1-nnac123@linux.ibm.com/
+
+Nick Child (3):
+  hexdump: Implement macro for converting large buffers
+  hexdump: Use for_each macro in print_hex_dump
+  ibmvnic: Print data buffers with kernel API's
+
+ drivers/net/ethernet/ibm/ibmvnic.c | 23 ++++++++++++++---------
+ include/linux/printk.h             | 21 +++++++++++++++++++++
+ lib/hexdump.c                      | 11 +++--------
+ 3 files changed, 38 insertions(+), 17 deletions(-)
+
+-- 
+2.48.0
+
 
