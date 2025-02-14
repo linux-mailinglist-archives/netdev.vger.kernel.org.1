@@ -1,386 +1,126 @@
-Return-Path: <netdev+bounces-166283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96325A3556A
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:51:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEC9A3556B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AF6616DD67
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:51:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7600316DD79
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 03:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A7E14EC77;
-	Fri, 14 Feb 2025 03:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FC2155756;
+	Fri, 14 Feb 2025 03:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiIFi22B"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dW5AinHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF0914B088
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 03:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D9B41C85;
+	Fri, 14 Feb 2025 03:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739505058; cv=none; b=oou9ehDi2IzIOpVf4V3T7F0TAHzl/nG3XyWsez2/ms9cBYvWXAUOl/nHwZXP7o/1yjbv0wgDJo6fYoB/DJPv+9V1cLmwZVNGY6Xz95+tcbGLW3ygckKeIj/CzYjKBCTFAjYhgP5A+I8EOP4qQR34aX2dgMatvjh85MeYDGoR54o=
+	t=1739505060; cv=none; b=JMJTtZ1pQ275eKv0ag9glybn2E6jbHw1e+VJfVRTkq+SA+KIYCAn0wq+8kSiJHb5JVWmH3AKBV5Ju7os40iLe3UYsWlDQBFXj+owYW9TXz+58C9BQiQGG3UDc7dRWZ1wg9EoHvXgWmyacVAfU8mrogWmHj+E8Y2ATByxegT3fYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739505058; c=relaxed/simple;
-	bh=ETI5iVzJdZ+sW92+V7IDBAKcozuSKrnx0jgbGX/wpxs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vd89CK4PY0CdTtVtjEeU6fektzWua0aUYw1bFBIUHV1NoB6a+EeWi4sEWQ84puEqS3fEGqKXAnwEcqYMf+NmluhRY37RBotciQfZrOv4o7pzrhJEXAOzsFuNzoRQOWy+XnIpnXrFEfap/LEYtAQzzVMJvMxCsoHnhjW96wpOraY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eiIFi22B; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5deb1b8e1bcso2997518a12.0
-        for <netdev@vger.kernel.org>; Thu, 13 Feb 2025 19:50:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739505055; x=1740109855; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ON0AI5LIKRY01veX2Y8fur1qAsOo/9rhbvdVRBGvOTA=;
-        b=eiIFi22BxuzcdW5PjWsag+Wl6FoTlhUp0RYB4D+sCTbm1liKhJXekPAVVSygFBxrMI
-         sM6YQ7ldRULunLkbFRAIvWOPRYVdW4k5GFWXZshoyFXolmggM4NpF97vcbRzxYpF2PoJ
-         KkOJ7UhaaYJgTNSr1KgOYypYQ4scmHNOpRNQKuwir23Dlf38Ifuy/VvGz0UYLdzTSYMe
-         txi9V2Uwu4ORiflZXrbdvDcRAMGT0tERoWMBoeBNI/krw0BDGFrvugABsw6wuJn5zWxu
-         pPmPHTAXx3JtDAFlNFfMX3mGTm84IyopR50fo7jvZttxpOUhmm4yrjZdMNAfQUQq1asd
-         scog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739505055; x=1740109855;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ON0AI5LIKRY01veX2Y8fur1qAsOo/9rhbvdVRBGvOTA=;
-        b=Ez8yrsaJ9ZJ44GBL3zuqlgo7oPLpdkqYzRg7Y3e6OMlDuLLlZ6iKd1fztKdoaF3t37
-         SEjMdcKeC44UU7p9UFDABxSrQEy5ZYf8O4Tf7tzD+ueVdwxIWmBZyhciiz0uQZzZDngb
-         mSj8vzsK0eeXFCXdm08MaQPi0IvVmpH+AjK+p2gdScNkmgYOKMTgsjyfOnpQLG+pk7o9
-         MM8mo76hcp2sxHPMpohdoSL5kFdExzBcrO/wnXhcfLnbNY97yvXnMTz7nNQfYTKse2ty
-         YS+QyEPNz7UjMI34+kGAlnpV6IVLxIBbmSsGxSdkeKBdeVcdEQQS8kWA1elStVnFO+ws
-         IqVQ==
-X-Gm-Message-State: AOJu0Yye1ID3L1F5fIv3qMVyeUuG6hf68ysD0OiT1Kb2uu5QBhr1SiCn
-	lSg2BMbiWV0BgmFqKp7QmXNMxB2HN5bbwK9obtn5arVSRyhp3c1/7QtYT7py
-X-Gm-Gg: ASbGncsazBre17sVyWif+4ixxN5/+UHpM8ESHk8GRB+5tDeCSdb36NQKLjCWMaoziC/
-	KvRh9TWSifIRcWEseksiwPoY/z/pRHo88nfR6vgkVIFh+ZjuQHEL9MQwG/i19JGteV5J4B37zJI
-	7/Sohvse1iMff9SAk7cD++AOOnzS2JVWfsJbQ8kmF4i776joF22XzQMxz8BtXu4GsYaXx8t0tM5
-	TgLlsx2p5QXCHUa43iujJP11U3y7qkzcdjtqe9a0uqYNQ8nBvXcUVG0JUeDYmxpTFm2t/9vX8T6
-	bH9tdzwS9wMo
-X-Google-Smtp-Source: AGHT+IGowXKNjHXox/mqh6oenJ5mH7U1pf9gjzmF1TmQ0yGuhICYYf1taDYHGHc9mRqZGqYcElZOLQ==
-X-Received: by 2002:a17:906:730f:b0:aae:fd36:f511 with SMTP id a640c23a62f3a-aba501a9d85mr569938066b.47.1739505054459;
-        Thu, 13 Feb 2025 19:50:54 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:1::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba533bdcf9sm249923166b.163.2025.02.13.19.50.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 19:50:52 -0800 (PST)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com,
-	kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	sanman.p211993@gmail.com,
-	vadim.fedorenko@linux.dev,
-	suhui@nfschina.com,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	jdamato@fastly.com,
-	brett.creeley@amd.com,
-	przemyslaw.kitszel@intel.com,
-	colin.i.king@gmail.com,
-	kernel-team@meta.com,
-	mohsin.bashr@gmail.com
-Subject: [PATCH net-next V2] eth: fbnic: Add ethtool support for IRQ coalescing
-Date: Thu, 13 Feb 2025 19:50:37 -0800
-Message-ID: <20250214035037.650291-1-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1739505060; c=relaxed/simple;
+	bh=MASPfQyzOv9tcobGZFbxLBmds7u/iccI0/qeVNXfHZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=izQwitVCFm/EwwvGyF9HBaoR600TKwodaT2WDYqImKLv4bpibKvmoCkE+clqsS+UHif63Eq4Ii+6S2WuR1937U+Ra+piQQXa6Tvavb0YFTqFXVxUkWfsf21Sthzx+Z238vniIgTY8YjEAjF+4g8Wtf+vxHldpC5rs+2adGbHV+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dW5AinHJ; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=dSVMhfzPHKYPcVMTMnZqyr4OBSa7KstYIVuVF6WaaZE=; b=dW5AinHJmfj9B8vPIT+PpH8p4X
+	E9tbjwbP/7wkcyLd+7sXxX58tjMwHxgdYqCUnjCq2y3EV6DvI5dHMmIqBJx5RcbPC41sPPB/qHzqD
+	DnXPfplfBE8Lzcj92BjefT+OSoF1ac4O+emS3L0bh1SW6GZIkLEK2h7cxO62cRc+WruGGmtlpsp2z
+	cd/cOJUlID0579rcCEtdaJxHwHa3T86WicSQUzIUC5qqpLFqyk8mHG6kJFzVVjfYyNSYkZeWHQlf+
+	nw9tUS5yUsXxq/inwkcvsEtiiYaSg5osggt/GuCvCF1XgUlTTuhqu80zPRD+6i0bhuByHydOalCwH
+	YAbom6bQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1timWA-000DqF-1W;
+	Fri, 14 Feb 2025 11:50:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Feb 2025 11:50:51 +0800
+Date: Fri, 14 Feb 2025 11:50:51 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <Z669mxPsSpej6K6K@gondor.apana.org.au>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
+ <Z66uH_aeKc7ubONg@gondor.apana.org.au>
+ <20250214033518.GA2771@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250214033518.GA2771@sol.localdomain>
 
-Add ethtool support to configure the IRQ coalescing behavior. Support
-separate timers for Rx and Tx for time based coalescing. For frame based
-configuration, currently we only support the Rx side.
+On Thu, Feb 13, 2025 at 07:35:18PM -0800, Eric Biggers wrote:
+>
+> It absolutely is designed for an obsolete form of hardware offload.  Have you
+> ever tried actually using it?  Here's how to hash a buffer of data with shash:
+> 
+> 	return crypto_shash_tfm_digest(tfm, data, size, out)
+> 
+> ... and here's how to do it with the SHA-256 library, for what it's worth:
+> 
+> 	sha256(data, size, out)
+> 
+> and here's how to do it with ahash:
 
-The hardware allows configuration of descriptor count instead of frame
-count requiring conversion between the two. We assume 2 descriptors
-per frame, one for the metadata and one for the data segment.
+Try the new virt ahash interface, and we could easily put the
+request object on the stack for sync algorithms:
 
-When rx-frames are not configured, we set the RX descriptor count to
-half the ring size as a fail safe.
+	SYNC_AHASH_REQUEST_ON_STACK(req, alg);
 
-Default configuration:
-ethtool -c eth0 | grep -E "rx-usecs:|tx-usecs:|rx-frames:"
-rx-usecs:       30
-rx-frames:      0
-tx-usecs:       35
+	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+	ahash_request_set_virt(req, data, out, size);
 
-IRQ rate test:
-With single iperf flow we monitor IRQ rate while changing the tx-usesc and
-rx-usecs to high and low values.
+	return crypto_ahash_digest(req);
+ 
+> Hmm, I wonder which API users would rather use?
 
-ethtool -C eth0 rx-frames 8192 rx-usecs 150 tx-usecs 150
-irq/sec   13k
-irq/sec   14k
-irq/sec   14k
+You're conflating the SG API problem with the interface itself.
+It's a separate issue, and quite easily solved.
 
-ethtool -C eth0 rx-frames 8192 rx-usecs 10 tx-usecs 10
-irq/sec  27k
-irq/sec  28k
-irq/sec  28k
+> What?  GHASH is a polynomial hash function, so it is easily parallelizable.  If
+> you precompute N powers of the hash key then you can process N blocks in
+> parallel.  Check how the AES-GCM assembly code works; that's exactly what it
+> does.  This is fundamentally different from message digests like SHA-* where the
+> blocks have to be processed serially.
 
-Validating the use of extack:
-ethtool -C eth0 rx-frames 16384
-netlink error: fbnic: rx_frames is above device max
-netlink error: Invalid argument
+Fair enough.
 
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
-V2:
-- Update fbnic_set_coalesce() to use extack to highlight incorrect config
-- Simplify fbnic_config_rx_frames()
-V1: https://lore.kernel.org/netdev/20250212234946.2536116-1-mohsin.bashr@gmail.com
----
- drivers/net/ethernet/meta/fbnic/fbnic.h       |  3 +
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 59 +++++++++++++++++++
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  4 ++
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  6 ++
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 53 ++++++++++++++---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  3 +
- 6 files changed, 120 insertions(+), 8 deletions(-)
+But there are plenty of other users who want batching, such as the
+zcomp with iaa, and I don't want everybody to invent their own API
+for the same thing.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index 14751f16e125..548e882381ce 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -180,6 +180,9 @@ void fbnic_dbg_exit(void);
- void fbnic_csr_get_regs(struct fbnic_dev *fbd, u32 *data, u32 *regs_version);
- int fbnic_csr_regs_len(struct fbnic_dev *fbd);
- 
-+void fbnic_config_txrx_usecs(struct fbnic_napi_vector *nv, u32 arm);
-+void fbnic_config_rx_frames(struct fbnic_napi_vector *nv);
-+
- enum fbnic_boards {
- 	fbnic_board_asic
- };
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 20cd9f5f89e2..54c216148d12 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -135,6 +135,61 @@ static void fbnic_clone_free(struct fbnic_net *clone)
- 	kfree(clone);
- }
- 
-+static int fbnic_get_coalesce(struct net_device *netdev,
-+			      struct ethtool_coalesce *ec,
-+			      struct kernel_ethtool_coalesce *kernel_coal,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	ec->tx_coalesce_usecs = fbn->tx_usecs;
-+	ec->rx_coalesce_usecs = fbn->rx_usecs;
-+	ec->rx_max_coalesced_frames = fbn->rx_max_frames;
-+
-+	return 0;
-+}
-+
-+static int fbnic_set_coalesce(struct net_device *netdev,
-+			      struct ethtool_coalesce *ec,
-+			      struct kernel_ethtool_coalesce *kernel_coal,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	/* Verify against hardware limits */
-+	if (ec->rx_coalesce_usecs > FIELD_MAX(FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT)) {
-+		NL_SET_ERR_MSG_MOD(extack, "rx_usecs is above device max");
-+		return -EINVAL;
-+	}
-+	if (ec->tx_coalesce_usecs > FIELD_MAX(FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT)) {
-+		NL_SET_ERR_MSG_MOD(extack, "tx_usecs is above device max");
-+		return -EINVAL;
-+	}
-+	if (ec->rx_max_coalesced_frames >
-+	    FIELD_MAX(FBNIC_QUEUE_RIM_THRESHOLD_RCD_MASK) /
-+	    FBNIC_MIN_RXD_PER_FRAME) {
-+		NL_SET_ERR_MSG_MOD(extack, "rx_frames is above device max");
-+		return -EINVAL;
-+	}
-+
-+	fbn->tx_usecs = ec->tx_coalesce_usecs;
-+	fbn->rx_usecs = ec->rx_coalesce_usecs;
-+	fbn->rx_max_frames = ec->rx_max_coalesced_frames;
-+
-+	if (netif_running(netdev)) {
-+		int i;
-+
-+		for (i = 0; i < fbn->num_napi; i++) {
-+			struct fbnic_napi_vector *nv = fbn->napi[i];
-+
-+			fbnic_config_txrx_usecs(nv, 0);
-+			fbnic_config_rx_frames(nv);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- {
- 	int i;
-@@ -586,9 +641,13 @@ fbnic_get_eth_mac_stats(struct net_device *netdev,
- }
- 
- static const struct ethtool_ops fbnic_ethtool_ops = {
-+	.supported_coalesce_params	= ETHTOOL_COALESCE_USECS |
-+					  ETHTOOL_COALESCE_RX_MAX_FRAMES,
- 	.get_drvinfo		= fbnic_get_drvinfo,
- 	.get_regs_len		= fbnic_get_regs_len,
- 	.get_regs		= fbnic_get_regs,
-+	.get_coalesce		= fbnic_get_coalesce,
-+	.set_coalesce		= fbnic_set_coalesce,
- 	.get_strings		= fbnic_get_strings,
- 	.get_ethtool_stats	= fbnic_get_ethtool_stats,
- 	.get_sset_count		= fbnic_get_sset_count,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 1db57c42333e..8b6be6b60945 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -618,6 +618,10 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	fbn->ppq_size = FBNIC_PPQ_SIZE_DEFAULT;
- 	fbn->rcq_size = FBNIC_RCQ_SIZE_DEFAULT;
- 
-+	fbn->tx_usecs = FBNIC_TX_USECS_DEFAULT;
-+	fbn->rx_usecs = FBNIC_RX_USECS_DEFAULT;
-+	fbn->rx_max_frames = FBNIC_RX_FRAMES_DEFAULT;
-+
- 	default_queues = netif_get_num_default_rss_queues();
- 	if (default_queues > fbd->max_num_queues)
- 		default_queues = fbd->max_num_queues;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index a392ac1cc4f2..46af92a8f781 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -12,6 +12,7 @@
- #include "fbnic_txrx.h"
- 
- #define FBNIC_MAX_NAPI_VECTORS		128u
-+#define FBNIC_MIN_RXD_PER_FRAME		2
- 
- struct fbnic_net {
- 	struct fbnic_ring *tx[FBNIC_MAX_TXQS];
-@@ -27,6 +28,11 @@ struct fbnic_net {
- 	u32 ppq_size;
- 	u32 rcq_size;
- 
-+	u16 rx_usecs;
-+	u16 tx_usecs;
-+
-+	u32 rx_max_frames;
-+
- 	u16 num_napi;
- 
- 	struct phylink *phylink;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index d4d7027df9a0..7e0bd11f05d2 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2010,9 +2010,51 @@ static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
- 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RDE_CTL0, rcq_ctl);
- }
- 
-+static void fbnic_config_rim_threshold(struct fbnic_ring *rcq, u16 nv_idx, u32 rx_desc)
-+{
-+	u32 threshold;
-+
-+	/* Set the threhsold to half the ring size if rx_frames
-+	 * is not configured
-+	 */
-+	threshold = rx_desc ? : rcq->size_mask / 2;
-+
-+	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_CTL, nv_idx);
-+	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_THRESHOLD, threshold);
-+}
-+
-+void fbnic_config_txrx_usecs(struct fbnic_napi_vector *nv, u32 arm)
-+{
-+	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
-+	struct fbnic_dev *fbd = nv->fbd;
-+	u32 val = arm;
-+
-+	val |= FIELD_PREP(FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT, fbn->rx_usecs) |
-+	       FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT_UPD_EN;
-+	val |= FIELD_PREP(FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT, fbn->tx_usecs) |
-+	       FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT_UPD_EN;
-+
-+	fbnic_wr32(fbd, FBNIC_INTR_CQ_REARM(nv->v_idx), val);
-+}
-+
-+void fbnic_config_rx_frames(struct fbnic_napi_vector *nv)
-+{
-+	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
-+	int i;
-+
-+	for (i = nv->txt_count; i < nv->rxt_count + nv->txt_count; i++) {
-+		struct fbnic_q_triad *qt = &nv->qt[i];
-+
-+		fbnic_config_rim_threshold(&qt->cmpl, nv->v_idx,
-+					   fbn->rx_max_frames *
-+					   FBNIC_MIN_RXD_PER_FRAME);
-+	}
-+}
-+
- static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
- 			     struct fbnic_ring *rcq)
- {
-+	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
- 	u32 log_size = fls(rcq->size_mask);
- 	u32 rcq_ctl;
- 
-@@ -2040,8 +2082,8 @@ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
- 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RCQ_SIZE, log_size & 0xf);
- 
- 	/* Store interrupt information for the completion queue */
--	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_CTL, nv->v_idx);
--	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_THRESHOLD, rcq->size_mask / 2);
-+	fbnic_config_rim_threshold(rcq, nv->v_idx, fbn->rx_max_frames *
-+						   FBNIC_MIN_RXD_PER_FRAME);
- 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_MASK, 0);
- 
- 	/* Enable queue */
-@@ -2080,12 +2122,7 @@ void fbnic_enable(struct fbnic_net *fbn)
- 
- static void fbnic_nv_irq_enable(struct fbnic_napi_vector *nv)
- {
--	struct fbnic_dev *fbd = nv->fbd;
--	u32 val;
--
--	val = FBNIC_INTR_CQ_REARM_INTR_UNMASK;
--
--	fbnic_wr32(fbd, FBNIC_INTR_CQ_REARM(nv->v_idx), val);
-+	fbnic_config_txrx_usecs(nv, FBNIC_INTR_CQ_REARM_INTR_UNMASK);
- }
- 
- void fbnic_napi_enable(struct fbnic_net *fbn)
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index c2a94f31f71b..483e11e8bf39 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -31,6 +31,9 @@ struct fbnic_net;
- #define FBNIC_HPQ_SIZE_DEFAULT		256
- #define FBNIC_PPQ_SIZE_DEFAULT		256
- #define FBNIC_RCQ_SIZE_DEFAULT		1024
-+#define FBNIC_TX_USECS_DEFAULT		35
-+#define FBNIC_RX_USECS_DEFAULT		30
-+#define FBNIC_RX_FRAMES_DEFAULT		0
- 
- #define FBNIC_RX_TROOM \
- 	SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+Cheers,
 -- 
-2.43.5
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
