@@ -1,221 +1,175 @@
-Return-Path: <netdev+bounces-166363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BC7A35AFF
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:58:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D576A35B36
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DEDA16FBDB
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFECC16CC75
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E1325A635;
-	Fri, 14 Feb 2025 09:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66FC2566C9;
+	Fri, 14 Feb 2025 10:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QB2YmXfk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="posUjUHd"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C2925A625
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 09:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECCA2505C2;
+	Fri, 14 Feb 2025 10:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739527088; cv=none; b=oELdekK8dTH+p6SiBPsmWB0Wlr9sT/rAfn8qObFSmiVR8hYWQGo7UZzaDmDtUyMZZsda6qMbFUleFJc5C7/rvpbkdcRvrspJXkiFIPxx5kJz/XQ1NWwQvASJtDkQ3t6cVcYxbcPbGxL4cNJ5simAXhYjKA1Eylg18MgV5IGG/3s=
+	t=1739527708; cv=none; b=MCOzmwy7MhZhivyuDFaNE+/CFiYuhl5KZv2mVAWXSS8Vc0F72cRl+z4Gm630AYhT4p+dKA5HUi7mI/1WBUbv2bUDrmVRlicSib52soQf1cIXeTNc2FlTZBPWSkM6wO1b93A4qALUGkj+nRwOOFJk23LGeJ2XKReUQoj/+RyrQFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739527088; c=relaxed/simple;
-	bh=+bHauV9g2ZBKiR2AdzfJdEwUd1TVkc7Bvb+R7wAAs7Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JYbdaSFPOMvIwHgSFxRXbVixqQXXRxjgZiWNU69qE+Ovbdb1rUe5VsaoTY+lzsC+QQEVLkU/0QTNs8BE5AEyVz5Jv64K8IKuMXHEpcGqKPIxBsTzvIAAKBl9lt05ajITSQ4nURU44mpbcdmklwJGpxQ5z2G0WXex1gR+6nGvDqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QB2YmXfk; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1739527708; c=relaxed/simple;
+	bh=53LNLk41GeT251Ki6wN1YyHGewResJx5xfKx2eJrWbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TezsL4mOodfNZcp0SS20FpBnXt53LqAPNdva60O91/8UAr61BxSf8TBRYg/xVm0u93hDsmmGQcdAx3Son9hW6wTA1tBPeeW6XOnLCb4dYAWg99Rp5zsaCeKONP/6ny1dPvRDegTqIZGNFWonS2JwrCz0orbULVljrRbvTjj1eJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=posUjUHd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+bHauV9g2ZBKiR2AdzfJdEwUd1TVkc7Bvb+R7wAAs7Q=; b=QB2YmXfkZnPb6FbXT8Hcy3nDTO
-	IZhQpKkdjHei3kHDZPIxI+h37B77OMcT/RtUKhpzYi1P7To04X1T6mKnkiNi0i3Lz17cupjD6iIx9
-	MwsQpWEOCHR/XB5TFEkSCpVMTOwiDdNlIzWvC6WzJMUg7z399HjR0oZ7xeK3+yrugSij5eUbguMn4
-	Vix6xwjnId1MpWFk0Ac7Tit7VvTkO4t5BrGFErgnI5cOD7Hmsdg48ALcLEET5cVxQUCaTBRDnL4vi
-	hMHl70V6UaECmvVI4mAOYNcZA4i71Liw6qLsvMYkFQi0w1Mgsm5kwekKjwNNs8CaBhmfp7dH3O1h2
-	JtKpbTdw==;
-Received: from 54-240-197-232.amazon.com ([54.240.197.232] helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tisSL-0000000AvkB-0Gvq;
-	Fri, 14 Feb 2025 09:57:57 +0000
-Message-ID: <61bfea4254bfa9a3a64e71ec39c3a1084195856c.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH v6 net-next 0/4] PHC support in ENA driver
-From: David Woodhouse <dwmw2@infradead.org>
-To: Maciek Machnikowski <maciek@machnikowski.net>, Jakub Kicinski
-	 <kuba@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
-  netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>, Rahul
- Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Date: Fri, 14 Feb 2025 09:57:56 +0000
-In-Reply-To: <72458ccc-9c18-4c95-8506-de4951851af7@machnikowski.net>
-References: <20250206141538.549-1-darinzon@amazon.com>
-	 <20250207165846.53e52bf7@kernel.org>
-	 <7bc5e34e-8be6-46a2-8262-7129fff5e2f3@linux.dev>
-	 <20250210164626.178efa58@kernel.org>
-	 <72458ccc-9c18-4c95-8506-de4951851af7@machnikowski.net>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Z8NKNnD/Zo6zMn3GObUV"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tdPlHVt3ni4s0SZff+yz9+0nplN2iDRWLKiUyFb0Hp4=; b=posUjUHddym7uqvMHwCOokPRUL
+	hIhvizeJkvzKLNBVD20Ub1HVM+rJbzaQh/LiBHzcI3efIe8gbOqdy6KWANyxjPYtiMqtcDZoHZuhs
+	7u/MJabTtIXJzKanWX9orGcAeKMq/zyqH/C3x6cNoOqcdNnFfKSSFiiiUY2O5NRMC6NURE3G9o2rA
+	0Uc0WEcD6FNPLNjU8qs/hwVWo6VKTjYfRM6d+B5WT+JoU8xOWoB9Nf29MZ13ipmu/Di8t/D9SjGMw
+	LNfcmO9l4h/KZvm61YLqV5t5ECDoDoxlX1gw2WCKPpcbynrtZy2+31vzwjuLMlTSu95qzV561/k+M
+	Q2w17mCg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43330)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tiscM-0004cw-1V;
+	Fri, 14 Feb 2025 10:08:18 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tiscG-00033r-1e;
+	Fri, 14 Feb 2025 10:08:12 +0000
+Date: Fri, 14 Feb 2025 10:08:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next] Documentation: net: phy: Elaborate on RGMII
+ delay handling
+Message-ID: <Z68WDG_OzTDOBGY-@shell.armlinux.org.uk>
+References: <20250214094414.1418174-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250214094414.1418174-1-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Fri, Feb 14, 2025 at 10:44:13AM +0100, Maxime Chevallier wrote:
+> @@ -73,8 +73,16 @@ The Reduced Gigabit Medium Independent Interface (RGMII) is a 12-pin
+>  electrical signal interface using a synchronous 125Mhz clock signal and several
+>  data lines. Due to this design decision, a 1.5ns to 2ns delay must be added
+>  between the clock line (RXC or TXC) and the data lines to let the PHY (clock
+> -sink) have a large enough setup and hold time to sample the data lines correctly. The
+> -PHY library offers different types of PHY_INTERFACE_MODE_RGMII* values to let
+> +sink) have a large enough setup and hold time to sample the data lines correctly.
+> +
+> +The device tree property phy-mode describes the hardware. When used
 
---=-Z8NKNnD/Zo6zMn3GObUV
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Please don't make this document device-tree centric - it isn't
+currently, and in fact phylink can be used with other implementations
+even statically defined. Nothing about the phy mode is device-tree
+centric.
 
-On Tue, 2025-02-11 at 08:58 +0100, Maciek Machnikowski wrote:
-> On 2/11/2025 1:46 AM, Jakub Kicinski wrote:
-> > On Sun, 9 Feb 2025 12:33:24 +0000 Vadim Fedorenko wrote:
-> > > Yes, we have seen this patchset, and we were thinking of how to
-> > > generalize error_bound property, which was removed from the latest
-> > > version unfortunately. But it's a good point to look at it once
-> > > again in terms of our prototype, thanks!
-> >=20
-> > I was wondering whether they have a user space "time extrapolation
-> > component" which we should try to be compatible with. Perhaps they
-> > just expect that the user will sync system time.
->=20
-> error_bound has a different purpose - it tries to get the "baseline"
-> clock accuracy from the HW. The number returned here is needed to
-> calculate the uncertainty, not to extrapolate.
->=20
-> And yes - AFIK AWS suggests system time sync for EC2 instances [1]
->=20
-> [1]
-> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configure-ec2-ntp.htm=
-l
+> +with RGMII, its value indicates if the hardware, i.e. the PCB,
+> +provides the 2ns delay required for RGMII. A phy-mode of 'rgmii'
+> +indicates the PCB is adding the 2ns delay. For other values, the
+> +MAC/PHY pair must insert the needed 2ns delay, with the strong
+> +preference the PHY adds the delay.
 
+This gets confusing. The documentation already lists each RGMII mode
+describing each in detail in terms of the PHY. I'm not sure we need to
+turn it on its head and start talking about "it's the PCB property".
 
-Right, error bound gives you a min/max for what the time can possibly
-be, and that allows you to know whether certain transactions/timestamps
-could *possibly* overlap, or if there is a known ordering between them.
+> +
+> +The PHY library offers different types of PHY_INTERFACE_MODE_RGMII* values to let
+>  the PHY driver and optionally the MAC driver, implement the required delay. The
+>  values of phy_interface_t must be understood from the perspective of the PHY
+>  device itself, leading to the following:
+> @@ -106,14 +114,22 @@ Whenever possible, use the PHY side RGMII delay for these reasons:
+>    configure correctly a specified delay enables more designs with similar delay
+>    requirements to be operated correctly
+>  
+> -For cases where the PHY is not capable of providing this delay, but the
+> -Ethernet MAC driver is capable of doing so, the correct phy_interface_t value
+> -should be PHY_INTERFACE_MODE_RGMII, and the Ethernet MAC driver should be
+> -configured correctly in order to provide the required transmit and/or receive
+> -side delay from the perspective of the PHY device. Conversely, if the Ethernet
+> -MAC driver looks at the phy_interface_t value, for any other mode but
+> -PHY_INTERFACE_MODE_RGMII, it should make sure that the MAC-level delays are
+> -disabled.
+> +The MAC driver may fine tune the delays. This can be configured
+> +based on firmware "rx-internal-delay-ps" and "tx-internal-delay-ps"
+> +properties. These values are expected to be small, not the full 2ns
+> +delay.
+> +
+> +A MAC driver inserting these fine tuning delays should always do so
+> +when these properties are present and non-zero, regardless of the
+> +RGMII mode specified.
+> +
+> +For cases where the PHY is not capable of providing the 2ns delay,
+> +the MAC must provide it,
 
-There are libraries in userspace which handle this, to be used by
-things like distributed databases. https://github.com/aws/clock-bound
+No, this is inaccurate. One may have a PHY that is not capable of
+providing the delay, but the PCB does. 
 
-The error bound is also exposed by the vmclock device which is now
-supported in Linux (https://git.kernel.org/torvalds/c/205032724226) and
-QEMU (https://gitlab.com/qemu-project/qemu/-/commit/3634039b93cc5),
-although QEMU doesn't actually expose time through it yet, only the
-fact that time has been *disrupted* e.g. through live migration).
+It also brings up the question "how does the MAC know that the PHY
+isn't capable of providing the delay" and "how does the MAC know that
+the PCB is not providing the delay". This is a can of worms...
 
-(The PHC discussed here allows each guest on the system to do the same
-work of carefully calibrating the *same* underlying hardware
-oscillator; with vmclock the host does it once and then just tells the
-guests the result through a shared memory structure. With the added
-bonus of still being accurate immediately after live migration to a new
-host.)
+> if the phy-mode indicates the PCB is not
+> +providing the delays. The MAC driver must adjust the
+> +PHY_INTERFACE_MODE_RGMII_* mode it passes to the connected PHY
+> +device (through :c:func:`phy_connect <phy_connect>` for example) to
+> +account for MAC-side delay insertion, so that the PHY device
+> +does not add additional delays.
 
---=-Z8NKNnD/Zo6zMn3GObUV
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+The intention of the paragraph you're trying to clarify (but I'm not
+sure it is any clearer) is:
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIxNDA5NTc1
-NlowLwYJKoZIhvcNAQkEMSIEIPN7+c2PkqsGT279Nrp7sqKgIWcQO3yGXbGKGMM+A2wYMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAzFNG0VELahxc
-8jzxVLQUlznt6l99QaWd5LGqCSlzspn+eSYzv1DUB9A+SgKVJnx4GVqW4s2cFtoaQLQn5pmcH+xH
-yUA4d7Uju94cRWMpRhQPZ+VM0C0ffEwtTccQDS+HeEv09Dq2H6tenQJ2xasfKSNuFOSiBdUEekYT
-jC4p13pow/4gGzvnFjs4ykRf3dvW0nYg7ufdzKMO+TzZvmlWQXzG3WPpskPRX8zvwNaH0V/XGhG5
-L2ANoZhcz5ScBNgk2Q4aHXea8hUpRPhWJ7rNhiz7hn0pJhbXi9BrkaYCaDO8XfriGcjI0ry7rTsi
-RMjF7lLj9s0DGTa4P3LoC9RtokVuNZbQZHdpZDXfS1dxrMRBcF0ZUp7b0FY2hEryddYG0Fq9hWmT
-/sEujLsnQWAIIH9WRmi1euP4aUbhcIG46kpR7gt9oTYVbWuz9J41l+uj2/iXKMbnQhw+iwQ7Dnk6
-VxftZ1tE+MFSvqyPaKHScy04RsZcoI6XM1MzBoIqLl2ioze/1zsON20BWP6oYDNbYG6ozsWjEMZT
-dOlNCK6mv0Q/s7/NcoPwwVCTgCUW1vLyHD640AJRD/cfIn3m3s7um5lNiGH51wl1D8jrA/G4hcAs
-uNTlnHEjgj5y0ABdXwzYI6OJ8ZzMC1dvkMxwaInMfG0VUQCFlCgX8MCsqracBi0AAAAAAAA=
+- If the MAC driver is providing the delays, it should pass
+  PHY_INTERFACE_MODE_RGMII to phylib. It should interpret the
+  individual RGMII modes for its own delay setting.
 
+- If the MAC driver is not providing the delays, it should pass
+  the appropriate PHY_INTERFACE_MODE_RGMII* to phylib so the PHY
+  can add the appropriate delays (which will depend on the PCB and
+  other design parameters.) The MAC driver must *not* interpret the
+  individual RGMII modes for its own delay setting.
 
---=-Z8NKNnD/Zo6zMn3GObUV--
+In both cases, the MAC can fine-tune the delays using whatever mechanism
+it sees fit.
+
+Whether the PHY is capable of providing the delay or not is up to the
+board designer and up to the author providing the RGMII configuration
+(e.g. board firmware (DT / ACPI) to sort out.) There is no mechanism
+in the kernel that the MAC can discover whether the PHY its going to
+connect to supports any particular RGMII delay setting.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
