@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-166307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F530A356B7
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:05:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01ABA356C5
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 07:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82DA3AD24F
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:05:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B5E16DCDC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4541DB92A;
-	Fri, 14 Feb 2025 06:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE5A1DD9AC;
+	Fri, 14 Feb 2025 06:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Ho/Sxa1b"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hG037B7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1A21DA2E5;
-	Fri, 14 Feb 2025 06:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979C71DC9BB;
+	Fri, 14 Feb 2025 06:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739513144; cv=none; b=Gqv6CTVTu8FJOAIamak6jNREvJ5FKRolsqVX4INxUH2PJuoAMOhzAW5K4X5Kx2B6J9aLyA7RABGP4UCiP4Er2Rng6IC5ScY1kfSt738QWTnhGo7dqR6tIEmBgFl7qduWYKbRskshD9khzWFEKlejlgERvPEAbZwLsjpznktZRvA=
+	t=1739513400; cv=none; b=ZHjFAMoR+gvDfttFhTwOr7owBtjlWeqyC07Pq9YcXeMUcAbprgSWpjKrT2f9p3qlLEipoXo3lXRAU1+gI4rQ+0iRGnizJj6GW0GZ1Tl3wXbYvj1e1m0EBoBI30v/UTUQjKHpmfOe+WcmxIFHger5fGqHf3697ttU0qnsun7qLG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739513144; c=relaxed/simple;
-	bh=VgutWXKUxrpUBj1Z0jT3oDJdo2f6anV/Udr1h+4FdEI=;
+	s=arc-20240116; t=1739513400; c=relaxed/simple;
+	bh=vzOLtDLNbwZ6k28Raz3YXTxcfhefEHbtVJ9RqBaS+fM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YnViGrF4T+xjI5zxWXeKjJGQ5tTfMgXb9YaoB1FNsa4yAfydfm/Cf+wEyB/zHBXRmDwG20aL54i7Hr7jAYcXSSR0mKU4VR0VtY8ib7C5YQCYPvHNPbaFwwUHcxCm2RuQggZJAxcpcHrAE3BQZr2onaeqtP7bl/UeI9ddpyrr3+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Ho/Sxa1b; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51E65E9V4158044
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Feb 2025 00:05:14 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1739513114;
-	bh=Qw7XIK846oCUWiLOfnk5Jrq4uCGhW+CbWo1jUtxsbSc=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Ho/Sxa1bQv3IKJlC684wTKz5EGQBl7q/G4t7WCcZ2uoZ2OesrcT78b/ESjjagB28v
-	 r33YtHlV7Yp6EVrK9QTfMndgoyTHkrh38aJAY4zRDwTzLgmOviK11/T8qgY7g8kt0H
-	 +JQOCqwyESXT09/V14jVNF7f5cgGZ/mYS6ZwegJE=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51E65EVo053089
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 14 Feb 2025 00:05:14 -0600
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 14
- Feb 2025 00:05:13 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 14 Feb 2025 00:05:13 -0600
-Received: from [10.249.140.156] ([10.249.140.156])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51E658er104524;
-	Fri, 14 Feb 2025 00:05:09 -0600
-Message-ID: <66f30c0f-dec8-4ad5-9578-a9dcc422355a@ti.com>
-Date: Fri, 14 Feb 2025 11:35:07 +0530
+	 In-Reply-To:Content-Type; b=F6uigqT9bmMMmelvv/EwNrrDP3QBgsrW9HyKOwh0TWeMj2mcfl9PQFsYk1B0UVpG/q+MtdfY27DAb0YMfPjr7skJTUGlKjHLH1Ete/9L2VbBuIXTsbt+KS+kDWsxBnOUbndYASgjpfJXV7bJses9po2DL0CrmRLa5UW2Ayc0uKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hG037B7W; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51DJrthP015820;
+	Fri, 14 Feb 2025 06:09:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	oxtC73W7s7XwzhQwTpzZ2WHOKktLjMRi2XHEFB1dH3A=; b=hG037B7WsNiC68TZ
+	xsnN7ghjNiyRmbcdLxO105dcwChM7QDADbSA9aprEUdkioxZxcKvcPBrs2dYZ6qQ
+	BUUANhS67OkcJf5g9cZrgqjh/ckIKv0dOL+PDEqJr/qB9koQ0zwEcdO2gn7lS4Ce
+	V79+8wio8KUDmDA+YjLrqcjZ2scNad9stJ4J1AxfkYxcM47eZSwWXBDbtxJiDpme
+	OilREDmfgZyA35POQVRRzrAD5u70ZYMosql6C8U37FIWXDFOp7EPnq6+V77S/wOK
+	Efxw/OA5tw5l7JRIOGa+TlhxAiVzat66QdlelF3Yj0GpKH/rIRF6LSXscNaKDKXW
+	ETLQKg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44rgpgqa5b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Feb 2025 06:09:33 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51E69XeU003774
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Feb 2025 06:09:33 GMT
+Received: from [10.253.8.223] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 13 Feb
+ 2025 22:09:27 -0800
+Message-ID: <b980cc2b-5c4f-4293-ba1a-496253ae8049@quicinc.com>
+Date: Fri, 14 Feb 2025 14:09:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,71 +65,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net 1/2] net: ti: icss-iep: Fix pwidth
- configuration for perout signal
-To: Paolo Abeni <pabeni@redhat.com>, <javier.carrasco.cruz@gmail.com>,
-        <diogo.ivo@siemens.com>, <horms@kernel.org>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20250211103527.923849-1-m-malladi@ti.com>
- <20250211103527.923849-2-m-malladi@ti.com>
- <3a979b56-e9d6-41c9-910b-63b5371b9631@redhat.com>
+Subject: Re: [PATCH net-next v3 03/14] net: ethernet: qualcomm: Add PPE driver
+ for IPQ9574 SoC
+To: Jie Gan <jie.gan@oss.qualcomm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Lei Wei <quic_leiwei@quicinc.com>,
+        "Suruchi
+ Agarwal" <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook
+	<kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "Philipp
+ Zabel" <p.zabel@pengutronix.de>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <john@phrozen.org>
+References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
+ <20250209-qcom_ipq_ppe-v3-3-453ea18d3271@quicinc.com>
+ <58e05149-abc2-4cf4-a6e8-35380823d94a@oss.qualcomm.com>
+ <63f1d25c-087a-46dd-9053-60334a0095d5@quicinc.com>
+ <1882f5dd-4e46-40b9-977d-dc3570975738@oss.qualcomm.com>
 Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <3a979b56-e9d6-41c9-910b-63b5371b9631@redhat.com>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <1882f5dd-4e46-40b9-977d-dc3570975738@oss.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: ejRAXFTrCBblpUpjQfi9kwfmZIxa6bhv
+X-Proofpoint-GUID: ejRAXFTrCBblpUpjQfi9kwfmZIxa6bhv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-14_02,2025-02-13_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=612
+ priorityscore=1501 mlxscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ impostorscore=0 phishscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
+ definitions=main-2502140043
 
 
 
-On 2/13/2025 4:53 PM, Paolo Abeni wrote:
-> On 2/11/25 11: 35 AM, Meghana Malladi wrote: > @@ -419,8 +426,9 @@ 
-> static int icss_iep_perout_enable_hw(struct icss_iep *iep, > 
-> regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp)); > if 
-> (iep->plat_data->flags &
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
-> updqdzavl0dbisXOnfkDHxHqGlQUHEro3tgnljLa7x4DRPBIRKu8Nqm3bW1LeMtXFyqz6yM7_tLlrvUmslKj9m_IL0hUlNU$>
-> ZjQcmQRYFpfptBannerEnd
+On 2/12/2025 9:58 AM, Jie Gan wrote:
+>>>> +static int qcom_ppe_probe(struct platform_device *pdev)
+>>>> +{
+>>>> +    struct device *dev = &pdev->dev;
+>>>> +    struct ppe_device *ppe_dev;
+>>>> +    void __iomem *base;
+>>>> +    int ret, num_icc;
+>>> I think it's better with:
+>>>      int num_icc = ARRAY_SIZE(ppe_icc_data);
+>>
+>> This will impact the “reverse xmas tree” rule for local variable
+>> definitions. Also, the num_icc will vary as per the different SoC,
+>> so we will need to initialize the num_icc in a separate statement.
+>>
+>> (Note: This driver will be extended to support different SoC in
+>> the future.)
+>>
+> Got your point here. So there may have multiple definitions like 
+> ppe_icc_data here, right? But the num_icc here is hardcoded.
+> Maybe it would be better defined within the ppe_icc_data, if possible?
+> Then just directly use ppe_icc_data->num_icc?
 > 
-> On 2/11/25 11:35 AM, Meghana Malladi wrote:
->> @@ -419,8 +426,9 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
->>  			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp));
->>  			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
->>  				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, upper_32_bits(cmp));
->> -			/* Configure SYNC, 1ms pulse width */
->> -			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, 1000000);
->> +			/* Configure SYNC, based on req on width */
->> +			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
->> +				     (u32)(ns_width / iep->def_inc));
+> Never mind, that's just my thought on the flexibility.
 > 
-> This causes build errors on 32bits:
-> 
-> ERROR: modpost: "__udivdi3" [drivers/net/ethernet/ti/icssg/icss_iep.ko]
-> undefined!
-> make[3]: *** [../scripts/Makefile.modpost:147: Module.symvers] Error 1
-> make[2]: *** [/home/nipa/net/wt-0/Makefile:1944: modpost] Error 2
-> make[1]: *** [/home/nipa/net/wt-0/Makefile:251: __sub-make] Error 2
-> make: *** [Makefile:251: __sub-make] Error 2
-> ERROR: modpost: "__udivdi3" [drivers/net/ethernet/ti/icssg/icss_iep.ko]
-> 
-> You should use div_u64()
-> 
+> Jie
 
-I see, thanks.
-Can you tell me how can I reproduce this on my end for 32 bits.
-Will fix this in v2.
-
-> /P
-> 
-
+Yes, the num_icc will be moved the SoC specific .data area of struct
+of_device_id, when this driver is extended to support multiple SoCs.
 
