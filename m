@@ -1,70 +1,62 @@
-Return-Path: <netdev+bounces-166462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45710A360CF
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:54:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4D0A360F1
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 16:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09FBD170715
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0C2A189500B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAD6265CA9;
-	Fri, 14 Feb 2025 14:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4BE2641FA;
+	Fri, 14 Feb 2025 15:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LTdduK5v"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o8ZCLj+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8352641F7
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ABC1862A;
+	Fri, 14 Feb 2025 15:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739544859; cv=none; b=Th2vtYWEmgRsh+C7n+Xyb6WsNErCS/3Dqt2Koetptv0ZpcbS5ApXKbDTq3gbvrSgNRFIsoNkJcwqPjFKn/Drf/nWiCgVfLDfVVvZDOOaO0ffBOqKV6jEBSwuIXbGcOiIMGWEEvjxGPWivZzzamn7YLCVs4dptS2k722yO5iOMl8=
+	t=1739545344; cv=none; b=ILgcsxFWijL6ORgs9Y/hiFo2s8qOGMvooemqRHaZAM+oJY9Bcpk1fTXrR7kY1RhigSK7VEB+ALHQExvC8Kr9LxOoY/SJCMo2Gy7ZE4E5C5f1N+dLGzOY2TYgi9pIFcawbdurhxZaNNTg+4xy5sw9925MmG3mJNXvOyINfprPNkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739544859; c=relaxed/simple;
-	bh=eK4Ufny9o5ZnhwGSdbWej7QKOWpWgDuzFDc0c4Qd2f4=;
+	s=arc-20240116; t=1739545344; c=relaxed/simple;
+	bh=c+hKjlXUh3vmeoBXIH+WnhBb2eaR+k7dUrLHl5n3JdU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ish7FzQUfcKtg9JdzND3o+UMRYqvGY/a3fLVrgohybjUGKARIOOzo/QZQ5l5aY4kpZR2zVQncUqvpzPnSWrDG2hJ76BtpnFTyU4+VBJl9JXjZl55Z9VUmwV7qa+iNk5OMjOocf66MBCoFrt8RcnHkiVPoKW1EiEG5Sls2QzYdkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LTdduK5v; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JE1kHbtfqQF9VMh3qY/5PDRL3y+rkuMo/3ZK86g64ps=; b=LTdduK5vAiyiI0G2HBsi5eiHeh
-	r0WeXf8ptVoxKj8bpno3MkCbmqmSpkRQqS1Sz0x/XbR0Tzf+ItVrL+VBSj0EvrWEm2zNWCl8cxny6
-	ON8MdO70zGmi/LFGkhwqY7Ich9P6X4n9QiX46k2j4eig7nlhH1sxIZa25rpBB4a8hI4V2nuuyxWeJ
-	uwkore1qjPczi0UQNjTBW6cL+5K7u1uXKgSvbsZapY1OkIzUuDdI8VSAOADjms4ATKDFtey3bF1SM
-	KIa6KbEddz93wQGgv/uVYe3mjorhuXr1a+Iv6kIckGjbxsyhUxljuDaC3xx0LvCsclqpSijx6lkWx
-	571V2OGw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50452)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tix51-0005U6-39;
-	Fri, 14 Feb 2025 14:54:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tix50-0003Fx-2c;
-	Fri, 14 Feb 2025 14:54:10 +0000
-Date: Fri, 14 Feb 2025 14:54:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=oxDADtzjx1cr434uc8US51fTh0XRMyS+LU99wr9H5Vud0HfR3UhxfKO9DRSgeO7jXjdfnCw9zdVR6TkhRF7j1SqpbruDkbe+J718U08TbEi5lt9Cp3vg/2GggWrGcSDdCa6q0OMcB4Ntsa5wZq/XP9bn3PK8k91wASwT3F3Wrww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o8ZCLj+O; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=toTGovKSUsy54iHA+P8q9j1fvWiVfvEo6sn+LhC8T38=; b=o8ZCLj+OzfRXjX90B2XHWoFtuf
+	hbb75XpLtIelDiGN/4aerCSC9gmU16Qg1DglvOp+DBgoUYEenVeZfu0mrk3qXFcmxLmRpll0K70gC
+	/enhxbhKvRi7e0vkwfxfiaxbkkdCmGAzjW2E6zxQaVDNwV/IV3C1DW+v8YYD1qiLfVVo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tixCk-00E6JC-RS; Fri, 14 Feb 2025 16:02:10 +0100
+Date: Fri, 14 Feb 2025 16:02:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 4/4] net: phy: remove helper phy_is_internal
-Message-ID: <Z69ZEiaRodNnb92p@shell.armlinux.org.uk>
-References: <d14f8a69-dc21-4ff7-8401-574ffe2f4bc5@gmail.com>
- <f3f35265-80a9-4ed7-ad78-ae22c21e288b@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: Remove redundant variable declaration in
+ __dev_change_flags()
+Message-ID: <943abc29-d5af-4064-8853-5f3c365bf6d6@lunn.ch>
+References: <20250214-old_flags-v1-1-29096b9399a9@debian.org>
+ <1d7e3018-9c82-4a00-8e10-3451b4a19a0d@lunn.ch>
+ <20250214-civet-of-regular-refinement-23b247@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,22 +65,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f3f35265-80a9-4ed7-ad78-ae22c21e288b@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250214-civet-of-regular-refinement-23b247@leitao>
 
-On Thu, Feb 13, 2025 at 10:51:53PM +0100, Heiner Kallweit wrote:
-> Helper phy_is_internal() is just used in two places phylib-internally.
-> So let's remove it from the API.
+> But I agree with you, if you needed to look at it, it means the message
+> is NOT good enough. I will update it.
+
+Thanks.
+
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> > > Fixes: 991fb3f74c142e ("dev: always advertise rx_flags changes via netlink")
+> > 
+> > I suppose there is also a danger here this code has at some point in
+> > the past has been refactored, such that the outer old_flags was used
+> > at some point? Backporting this patch could then break something?  Did
+> > you check for this? Again, a comment in the commit message that you
+> > have checked this is safe to backport would be nice.
+> 
+> I haven't look at this, and I don't think this should be backported,
+> thus, that is why I sent to net-next and didn't cc: stable.
+> 
+> That said, I don't think this should be backported, since it is not
+> a big deal. Shouldn't I add the Fixes: in such case?
 
-My grep confirms.
+The danger of adding a Fixes: is that the ML bot will see the Fixes:
+tag and might select it for backporting, even if we did not explicitly
+queue it up for back porting. So i suggest dropping the tag.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
