@@ -1,125 +1,144 @@
-Return-Path: <netdev+bounces-166441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7F8A3600D
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:16:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43378A36049
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C108B16F500
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:16:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 083A21705BE
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD17265637;
-	Fri, 14 Feb 2025 14:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62ACE265CA1;
+	Fri, 14 Feb 2025 14:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RfldtZ9Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CS91pPFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDEA25A645
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A621C5BAF0
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739542563; cv=none; b=ogwi8k6IzHdL4KCPbhD9tqghxkUKVZhk25UZX6tv/+13wnqE0DiR97XPUbspxJqXcv03rQ6qrhgcb7K+RZ9+qjuRVWl2aQl/jeHj8BYVO/HPVwrZiaK0ehGk9P47c9Uk2LciUlgH//jw9vOrUo7nQ84Ar+lJ7aJBvaygETpSQyE=
+	t=1739543059; cv=none; b=tVt4vo7G2Qe7lgc4eNyQXXA8WjERvKdO/UpsvftZUbrugAor2PR7Y13tizjM4sNwV64IbOMFr/nly5gns/IQghnmZGL922d+ESvbic4ALY3fQTzEaoyXN3PiYM2VxLolq8R6IuYuWU9nEw7ZvTjDh/gjN5z3qoQ8DQQEunKbimU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739542563; c=relaxed/simple;
-	bh=bdWpZ7zeICeJwSZs7Sq+iETodmYOR/0+PZr+SrMWFCY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dRY6w0w+9j5S6OIF7rCES8lECo0wPyyDJEjFew/rXPzN2dTX/iQ5djm+U/daxkN5NyvIFgbmDl0G9FiZMs/nZu7j2UBBhPvAWH2mbfOUw9mLYie3iM0Lh+zFJqeZ5pLKNE35FJAqvOYyDj7iAA1bQBMu/+ewD/jeuB5bqB1F7is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RfldtZ9Q; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so1238303a12.1
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 06:16:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739542560; x=1740147360; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DLRVCWrxOw3czTbnoXrUYVv+b49FI3ouuyEQgHZTyVw=;
-        b=RfldtZ9QBUOdtPVDsMGrIzj+bcIl5/4lVsBQ6gmSiMp11vG/YtoCvOkClic6fJYRNh
-         gmy19gzvjAoDx2NDj+rvZ2Gpljm/VcrjNqVYutZGffojo9V/mmTbD+QPnXwOziEOddm4
-         g1/UE2Q9xKZv8GGcZiFqVvdB7acswXQjc2kvNsLy4S/8BjiUa2s6TfV9COzdP93Vptwv
-         BlheHihU/QlrwCO92/YCqFOIuyTPYtPwecqDDFseR2Hr6y36xTUtx8smpLvnGtv7LKgV
-         hG//Ec3G4pN1d7VvHe1GN5fBYucV1XYRr+92TgfY8aepUmMQfLdwJpjKwhtUQtRSvs43
-         94oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739542560; x=1740147360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DLRVCWrxOw3czTbnoXrUYVv+b49FI3ouuyEQgHZTyVw=;
-        b=PiVj9gjh18nugTYvc36sgMpJ/pbnX4E/QJ5pIRuQZ1LWuLsN5q42uwGEdEHpmweKcz
-         98YN+wdT9wcq5/JGXz+qf0WlxzLy/DoeYqvHLAsNRRQJtk8ymHclwnCERJWHjgkGa2SY
-         Q2zBFSNys1kVqh+tczF4QnuwRL8UQIjSrHSIeYBGXTNFp5XawOeF6l6qlyB0sIee/mAQ
-         sS76EDt+EGrPU1xAbNi/eGLMY2dXrt8H3P4ZvmCw6nNkv1ejeAl3pQzduCdEq511QRao
-         3vZGDtm2ZgDCv3eI949ND9MaHaUOfxngsKqlrp/jhZLxg/+STwONLfcxqddWEJpp0NaF
-         ii1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXbU3vWKgD81DfRQE8OX5wkjLf+h3LKK25qCrUromyS7DFRq4B40AIdCX/nNu8RPk0SzhTUsLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFhN9T++iIWtnf3UT/sEtK7YJ102bryu4EYJBMDYKd7nTjNRnV
-	Y8UD8jio31yArrP0TmZEXATXk/c/gYNuDTbFltoM9KxKzjlsTL0zxDTURrLDdTuHvnkM9etxG/W
-	/+n2o7jkbMdio1DHtsRUiaXY8WLOi0Wef6YPb
-X-Gm-Gg: ASbGnctahplJ3bTG7BJDx12vNLk5+wLltHYQE0CaSGeufToQ3th3+cgm2qduwf8dEGA
-	CUXR/wsQcM05/rViAQxYgq9qdvl8Z/sS6pN9crLwny5yHCUE5Bt8sIsIOzOH/Gxqz4DDMl1Vcog
-	==
-X-Google-Smtp-Source: AGHT+IH2av6U3WuBZtAedsZeDY7Dw2iatqoTQl9zAS50lisPIi8WTBSTTmIGKVaS52CXHmgvS0YLQK5hZR0e/SNe+NA=
-X-Received: by 2002:a05:6402:3589:b0:5de:5cb3:e82a with SMTP id
- 4fb4d7f45d1cf-5deca86c698mr8067441a12.0.1739542560068; Fri, 14 Feb 2025
- 06:16:00 -0800 (PST)
+	s=arc-20240116; t=1739543059; c=relaxed/simple;
+	bh=8ebCSotvFXFk2/Y8xiThO7AqnC7ddIlvXSZi4B79NY4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nJSi1Zl54jq2H6S+BQk6D2FjQQlAvX4ttnfBU188JJ89zA4ImAbAR7CQQMIh3FwqZ8WC89wMHRu+dljzUOsvPcFFIcea1X4NsFRdUsUCANMJfjt27f+0c2Jb3W7e83g+j+XDaIeljJZWxufzEm65g4I69OVJ+8sZXhsjIKnRV24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CS91pPFl; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739543056; x=1771079056;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8ebCSotvFXFk2/Y8xiThO7AqnC7ddIlvXSZi4B79NY4=;
+  b=CS91pPFln15Av2g1f9zWYUWrWG488pdImvHd1miyVNt/Do+3wzStazN0
+   bpjKyDSh5bW+LW5325RP9qMPWiKKYLgB344mLp5tT3mds5/pUogjdRU/S
+   vbwcJW9idQFqjnFKQ1fb6u89ZYW1K993/l1MkSc7V2LnlJ51hMe05rPbe
+   L+QHaD8iQ1nFQkUld3gZ5XFRoaWJbmPYPK5bsnCPRt9ZWJEwy/qLFKMtD
+   7mX7Fgr08CTKa/xlq7sIC++8c0WvKt5HHoeUAx4CX7bb1KkyCbZo5y4B0
+   VYKBvebu1B5qC65sZ7+lMZDrj2+Q7HIj7QHnp1VDLgLr0st3c/oHqfsjj
+   Q==;
+X-CSE-ConnectionGUID: qqW++y/eQk+ROcDRPLaarA==
+X-CSE-MsgGUID: i8UKOMT/TZOrRtXogtpWqw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="40154916"
+X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
+   d="scan'208";a="40154916"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 06:24:15 -0800
+X-CSE-ConnectionGUID: UmCr9fIFR4K1XpUb9z9jiw==
+X-CSE-MsgGUID: V9tio63fR3uXEbRuZd3TBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118093336"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by fmviesa005.fm.intel.com with ESMTP; 14 Feb 2025 06:24:14 -0800
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH iwl-next v2 0/3] ice: decouple control of SMA/U.FL/SDP pins
+Date: Fri, 14 Feb 2025 15:18:33 +0100
+Message-Id: <20250214141836.597747-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214045414.56291-1-kuniyu@amazon.com>
-In-Reply-To: <20250214045414.56291-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 14 Feb 2025 15:15:48 +0100
-X-Gm-Features: AWEUYZkfFVgdNONaP42Z8vshZmXhHhP55I8n3Uovu07QQrg80_--5duvdd0-hvE
-Message-ID: <CANn89iKY8V7jj=JkZpC2YuKtiUMr9-mDoJ7g7+0G9ppdOXo8ZQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] checkpatch: Discourage a new use of
- rtnl_lock() variants.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andy Whitcroft <apw@canonical.com>, 
-	Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 5:54=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> rtnl_lock() is a "Big Kernel Lock" in the networking slow path
-> and still serialises most of RTM_(NEW|DEL|SET)* rtnetlink requests.
->
-> Commit 76aed95319da ("rtnetlink: Add per-netns RTNL.") started a
-> very large, in-progress, effort to make the RTNL lock scope per
-> network namespace.
->
-> However, there are still some patches that newly use rtnl_lock(),
-> which is now discouraged, and we need to revisit it later.
->
-> Let's warn about the case by checkpatch.
->
-> The target functions are as follows:
->
->   * rtnl_lock()
->   * rtnl_trylock()
->   * rtnl_lock_interruptible()
->   * rtnl_lock_killable()
->
-> and the warning will be like:
->
->   WARNING: A new use of rtnl_lock() variants is discouraged, try to use r=
-tnl_net_lock(net) variants
->   #18: FILE: net/core/rtnetlink.c:79:
->   +     rtnl_lock();
+Previously control of the dpll SMA/U.FL pins was partially done through
+ptp API, decouple pins control from both interfaces (dpll and ptp).
+Allow the SMA/U.FL pins control over a dpll subsystem, and leave ptp
+related SDP pins control over a ptp subsystem.
 
-I do wonder if this is not premature.
+Arkadiusz Kubalewski (1):
+  ice: redesign dpll sma/u.fl pins control
 
-After all, we have nothing in Documentation/ yet about this.
+Karol Kolacinski (2):
+  ice: change SMA pins to SDP in PTP API
+  ice: add ice driver PTP pin documentation
+
+ .../device_drivers/ethernet/intel/ice.rst     |  13 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 950 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  23 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 254 +----
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   3 -
+ 5 files changed, 1009 insertions(+), 234 deletions(-)
+
+
+base-commit: 233a2b1480a0bdf6b40d4debf58a07084e9921ff
+prerequisite-patch-id: 2cda134043ccfc781dd595052cfc60a3e2ea48ea
+prerequisite-patch-id: 62ac41823e7278621af3745a171aae07508711c8
+prerequisite-patch-id: 1330728a760d99174344cb421336ae9b01e17f38
+prerequisite-patch-id: ff2afa3e3a2c60a590d17a880b610e2a37e7af0c
+prerequisite-patch-id: cbff95efd09cb57e17c68c464ee1e317d01cf822
+prerequisite-patch-id: e5be07f7b169f2443c034f04e3d0a00a8d0a8894
+prerequisite-patch-id: a5f362eec88b62ff098203469cef8534f176d2a8
+prerequisite-patch-id: 545b9e38f61ccfd5b33ab9c3e3a6e7a9f899e306
+prerequisite-patch-id: a74b6b981ecd8a320284454d75b1dfc9e555b5f0
+prerequisite-patch-id: df0a5f503065fa5869b1c915721a54eb3c7394cb
+prerequisite-patch-id: faebd604b0a6eb2a888e99b8977f803abe035abf
+prerequisite-patch-id: b7543662f5225ce13a1c95749504c68ef4733aea
+prerequisite-patch-id: a7297c1e743f01d118c7f77b39e5755f7a704e17
+prerequisite-patch-id: 6f036cdf7bca2a272b153ecc5b3a767f41517c38
+prerequisite-patch-id: bb790f877236aad43dae0bdbdceb0a3553260d10
+prerequisite-patch-id: 2f53433b0d2a98cd42b18429bdbec1542b175b1f
+prerequisite-patch-id: cc9bf85bb9d988d92ab6cb1524bf213ec1351032
+prerequisite-patch-id: 112c048b7ae143edda05244b0d8b5ab928d3eff4
+prerequisite-patch-id: 124be0607c41aebe292c7b81910857489027baf1
+prerequisite-patch-id: b6b5f0e405d566879133d53c26fd998e9f330ff2
+prerequisite-patch-id: 777e25e09efe2ec4863e3bebdb247bac3e037c85
+prerequisite-patch-id: bf13dbef14d654b243150d4f2603eb90ae497058
+prerequisite-patch-id: 76f1c5ef5dacad0600339d5cf843ca14fcfa9dde
+prerequisite-patch-id: 586431a13be4f1ecf0adf450242aa7e90975d38f
+prerequisite-patch-id: e5c687a47edf3659dca8519e4c5250bbea89171b
+prerequisite-patch-id: 9f8081c59e275240cd76911fbede7d2737473357
+prerequisite-patch-id: f4d6edba52edea1276e0095e132733f4438de720
+prerequisite-patch-id: 5e7afab1204a42d90b8b6a14e3881cf1d4987954
+prerequisite-patch-id: 708e14a83a03377f2909b3ce0d72d21a4619a03d
+prerequisite-patch-id: ae9720262fb8d1f92b157865f02a9fc7d9aa1582
+prerequisite-patch-id: 11c806ab6cc8d29c86218d5760ca22cf3ef2ae05
+prerequisite-patch-id: 1aae146d6c20d41b4785d37962052a52c320ac3b
+prerequisite-patch-id: 59b00a073b5055091ccf55905e746a372dfc5e8e
+prerequisite-patch-id: 5b640578751b48ab50748dbe6f864ce14f1978c9
+prerequisite-patch-id: 725ea892cdefd598a1841323c6e74efe160dd3fe
+prerequisite-patch-id: 03bb4b3b1f37211fbcd379a19ebff5621c9d901f
+prerequisite-patch-id: 877ab147dd7c2e56beeb97bc4651fef89590cc23
+prerequisite-patch-id: 798f81cfb09f75af615986689658787d29427e85
+prerequisite-patch-id: 4e64a22702fa030f57436da273da1093153cfa7a
+prerequisite-patch-id: c8b8f75ae6c949e68a8ee0b6e7b09344a700663f
+prerequisite-patch-id: 19fed1ea4aaa320e4a4e46f9c39c7e994f09c7d9
+prerequisite-patch-id: 546c7611f620c90a054da039dd19cbc7339edb39
+prerequisite-patch-id: 272344e3e7ca650f3833ad62ffa75aa3b080fd72
+prerequisite-patch-id: b1d967b8973ec9320e239653773c7caa9d54de70
+-- 
+2.38.1
+
 
