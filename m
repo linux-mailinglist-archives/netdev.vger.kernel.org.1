@@ -1,275 +1,177 @@
-Return-Path: <netdev+bounces-166338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DADEA3596B
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:54:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB1DA3597B
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:57:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F6D33AE1CE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54AC8188C3DA
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554EC227EB8;
-	Fri, 14 Feb 2025 08:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9613E22A4CA;
+	Fri, 14 Feb 2025 08:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="IAgOutDX"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="y10N4J9i";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LDC6z2ym"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA593227BAA;
-	Fri, 14 Feb 2025 08:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC8C22A1D5;
+	Fri, 14 Feb 2025 08:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739523275; cv=none; b=erH7kI1mjzvR7NCaDcHjDaN/nVRfpy6S2FvcbOprPddG2eBebbUYdc7qYGtntVotMzOH73nUZJJ+8lOWyTPtPAQ1crCIgcjfjxCOotUy9XJyV5stU/dFPomZ0K8Sc26BshsXr4Ym5b2oO1dzGRiDFDbbo1EZktsexYXJstmf/7c=
+	t=1739523396; cv=none; b=dTg5jlojOT7dYSOh6RKMudvvTuhbaZPy7a7uxcQSASobnjZWF6hKVNYZKdKl5n3J2qi9KiZLrDGHwyAo3NPM9kvZUGCrSN20kUusXiFxDe7OA4ezJiL1YJzBeLYwDlxcRXvXB5qlQQLxPjrPKxesKCYAygneuY5/EJw2hkSfSXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739523275; c=relaxed/simple;
-	bh=IQ0gfvJlGq/EWoCU475l10nubAs9wvs3rFP/Bmcwx+k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jWq+F/GH42IOVQgZts0XShh/zeQiFkaM/F7lD9jSC4mxPIkRvqeVHL40A/fUj1J2EwCkmlJlc0QxN0WAQ+lJP7DTB/8w0mT6Wkpo4nxPAZpD/B4sWGFiRluqxsy7AH1NhBaXzrZzD1+n5YA+IYd1es01R45Hv1EGnRKOIO+F68Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=IAgOutDX; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=TxlRvYVV9khSZoxHTmi6Xm+xr2AQ+F0Z9nuDl3ZM9+Y=; b=IAgOutDXlTV7f8paqVi7ze48Uf
-	QaqjVPTOg+IsBteCrfmS7OXmowYm8gbJEndF8REIZ1kMQ8JWhaxJ5j6YvlYRHQUC8sC6qsL/GTRDN
-	VzDswVN+GAHvJC10L37032/IGF14NXlf10HCqBU44WPZC6vRmTL30205soeSfRZ+l00muCx3PoXbc
-	xysV/NXfghDWiYDjsLU2Iv3cu5/p1UDVzkD2HUkTATgX4184L8ouJ+H5VogMg0PKg2XSenZ4taXfk
-	z6NEG1CfwTTibQ3ptd6LqJ43zI+E0mTwkstVhTJM3XaTXW3DqXWVfHgltwFmHwJBSvD8sARewkcVR
-	rBnMuqjw==;
-Received: from [122.175.9.182] (port=45524 helo=cypher.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.96.2)
-	(envelope-from <parvathi@couthit.com>)
-	id 1tirSv-00050J-0x;
-	Fri, 14 Feb 2025 14:24:29 +0530
-From: parvathi <parvathi@couthit.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	nm@ti.com,
-	ssantosh@kernel.org,
-	richardcochran@gmail.com,
-	parvathi@couthit.com,
-	basharath@couthit.com,
-	schnelle@linux.ibm.com,
-	diogo.ivo@siemens.com,
-	m-karicheri2@ti.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com,
-	afd@ti.com,
-	s-anna@ti.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pratheesh@ti.com,
-	prajith@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	pmohan@couthit.com,
-	mohan@couthit.com
-Subject: [PATCH net-next v3 10/10] soc: ti: PRUSS OCP configuration
-Date: Fri, 14 Feb 2025 14:23:15 +0530
-Message-Id: <20250214085315.1077108-11-parvathi@couthit.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250214054702.1073139-1-parvathi@couthit.com>
-References: <20250214054702.1073139-1-parvathi@couthit.com>
+	s=arc-20240116; t=1739523396; c=relaxed/simple;
+	bh=k0/rnce+Rd2CzFJn7uWLGWjtLuFwcjvq8VkWuHMSEk0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KUCrDXs5OjVMNozq+nDKsLVtJ1WvISky34l64t08EmuZRMaUdQ8qV7BG2J+toDDEKlCKQqaPYR3y0HpgcB2fw0bYo+Pl8QVEY9Z7yCqpgqLAnSHpsMvVoy81OWTkLcT3bOPJUKmCOutnxVbG9SbzvC31HMOL9evsH+KMp1bRQ/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=y10N4J9i; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LDC6z2ym; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1739523392;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k0/rnce+Rd2CzFJn7uWLGWjtLuFwcjvq8VkWuHMSEk0=;
+	b=y10N4J9imkiBtiYErNuQfAugaMY9dHIlTa6jk8nKosC2v3SJXWJPHGe0xyePWHxt5jNQ6T
+	L/ztRknGyeA7Ns0IJ6FPBweOlUPBYXdwQ22t13502qrl/DYm+97dI93sRuilT2WFHVC/EX
+	er0YaIC3PVdb575p/Y3t+1pBXzT9ZJIp5kXqP5muSZ5gkhkgdbv92HWqI5qkQ4gl1QdOsu
+	VAZKX5eFMzikPH2LlvgnyCY4Ir85tRH4gO7C7O9Q0qVCZxV/BChg8B08D0Xc0TyLLwbXF3
+	UXNEo+jwiwNye1bUL3UQYINieP08qiLR9RH4GvRI8adb8RWPMDzevf+2L7L4AA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1739523392;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k0/rnce+Rd2CzFJn7uWLGWjtLuFwcjvq8VkWuHMSEk0=;
+	b=LDC6z2ymJ85I5KfU1stXIGjBN0B1fRLsUag1totGNYe1kesSKGeCfmxgBkcQVb3dce2pYR
+	Xvz4tS+FkQBIsZDQ==
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Simon Horman
+ <horms@kernel.org>, Russell King <linux@armlinux.org.uk>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>, Russell King
+ <rmk+kernel@armlinux.org.uk>, Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>, Suraj Jaiswal
+ <quic_jsuraj@quicinc.com>, Kory Maincent <kory.maincent@bootlin.com>, Gal
+ Pressman <gal@nvidia.com>, Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>, Choong Yong Liang
+ <yong.liang.choong@linux.intel.com>, Kunihiko Hayashi
+ <hayashi.kunihiko@socionext.com>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
+ feature in IGC
+In-Reply-To: <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250212220121.ici3qll66pfoov62@skbuf>
+ <b19357dc-590d-458c-9646-ee5993916044@linux.intel.com>
+ <87cyfmnjdh.fsf@kurt.kurt.home>
+ <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
+ <20250213130003.nxt2ev47a6ppqzrq@skbuf>
+ <1c981aa1-e796-4c53-9853-3eae517f2f6d@linux.intel.com>
+ <877c5undbg.fsf@kurt.kurt.home> <20250213184613.cqc2zhj2wkaf5hn7@skbuf>
+ <87v7td3bi1.fsf@kurt.kurt.home>
+ <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+Date: Fri, 14 Feb 2025 09:56:29 +0100
+Message-ID: <874j0wrjk2.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-From: Roger Quadros <rogerq@ti.com>
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Updates OCP master port configuration to enable memory access outside
-of the PRU-ICSS subsystem.
+On Fri Feb 14 2025, Abdul Rahim, Faizal wrote:
+> On 14/2/2025 3:12 am, Kurt Kanzenbach wrote:
+>> On Thu Feb 13 2025, Vladimir Oltean wrote:
+>>> So, confusingly to me, it seems like one operating mode is fundamentally
+>>> different from the other, and something will have to change if both will
+>>> be made to behave the same. What will change? You say mqprio will behave
+>>> like taprio, but I think if anything, mqprio is the one which does the
+>>> right thing, in igc_tsn_tx_arb(), and taprio seems to use the default Tx
+>>> arbitration scheme?
+>>=20
+>> Correct. taprio is using the default scheme. mqprio configures it to
+>> what ever the user provided (in igc_tsn_tx_arb()).
+>>=20
+>>> I don't think I'm on the same page as you guys, because to me, it is
+>>> just odd that the P traffic classes would be the first ones with
+>>> mqprio, but the last ones with taprio.
+>>=20
+>> I think we are on the same page here. At the end both have to behave the
+>> same. Either by using igc_tsn_tx_arb() for taprio too or only using the
+>> default scheme for both (and thereby keeping broken_mqprio). Whatever
+>> Faizal implements I'll match the behavior with mqprio.
+>>=20
+>
+> Hi Kurt & Vladimir,
+>
+> After reading Vladimir's reply on tc, hw queue, and socket priority mappi=
+ng=20
+> for both taprio and mqprio, I agree they should follow the same priority=
+=20
+> scheme for consistency=E2=80=94both in code and command usage (i.e., tapr=
+io,=20
+> mqprio, and fpe in both configurations). Since igc_tsn_tx_arb() ensures a=
+=20
+> standard mapping of tc, socket priority, and hardware queue priority, I'l=
+l=20
+> enable taprio to use igc_tsn_tx_arb() in a separate patch submission.
 
-This set of changes configures PRUSS_SYSCFG.STANDBY_INIT bit either
-to enable or disable the OCP master ports (applicable only on SoCs
-using OCP interconnect like the OMAP family).
+There's one point to consider here: igc_tsn_tx_arb() changes the mapping
+between priorities and Tx queues. I have no idea how many people rely on
+the fact that queue 0 has always the highest priority. For example, it
+will change the Tx behavior for schedules which open multiple traffic
+classes at the same time. Users may notice.
 
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
----
- drivers/soc/ti/pruss.c       | 77 +++++++++++++++++++++++++++++++++++-
- include/linux/pruss_driver.h |  6 +++
- 2 files changed, 82 insertions(+), 1 deletion(-)
+OTOH changing mqprio to the broken_mqprio model is easy, because AFAIK
+there's only one customer using this.
 
-diff --git a/drivers/soc/ti/pruss.c b/drivers/soc/ti/pruss.c
-index d7634bf5413a..a0e233da052c 100644
---- a/drivers/soc/ti/pruss.c
-+++ b/drivers/soc/ti/pruss.c
-@@ -25,14 +25,19 @@
- #include <linux/slab.h>
- #include "pruss.h"
- 
-+#define SYSCFG_STANDBY_INIT	BIT(4)
-+#define SYSCFG_SUB_MWAIT_READY	BIT(5)
-+
- /**
-  * struct pruss_private_data - PRUSS driver private data
-  * @has_no_sharedram: flag to indicate the absence of PRUSS Shared Data RAM
-  * @has_core_mux_clock: flag to indicate the presence of PRUSS core clock
-+ * @has_ocp_syscfg: flag to indicate if OCP SYSCFG is present
-  */
- struct pruss_private_data {
- 	bool has_no_sharedram;
- 	bool has_core_mux_clock;
-+	bool has_ocp_syscfg;
- };
- 
- /**
-@@ -286,6 +291,72 @@ int pruss_cfg_xfr_enable(struct pruss *pruss, enum pru_type pru_type,
- }
- EXPORT_SYMBOL_GPL(pruss_cfg_xfr_enable);
- 
-+/**
-+ * pruss_cfg_ocp_master_ports() - configure PRUSS OCP master ports
-+ * @pruss: the pruss instance handle
-+ * @enable: set to true for enabling or false for disabling the OCP master ports
-+ *
-+ * This function programs the PRUSS_SYSCFG.STANDBY_INIT bit either to enable or
-+ * disable the OCP master ports (applicable only on SoCs using OCP interconnect
-+ * like the OMAP family). Clearing the bit achieves dual functionalities - one
-+ * is to deassert the MStandby signal to the device PRCM, and the other is to
-+ * enable OCP master ports to allow accesses outside of the PRU-ICSS. The
-+ * function has to wait for the PRCM to acknowledge through the monitoring of
-+ * the PRUSS_SYSCFG.SUB_MWAIT bit when enabling master ports. Setting the bit
-+ * disables the master access, and also signals the PRCM that the PRUSS is ready
-+ * for Standby.
-+ *
-+ * Return: 0 on success, or an error code otherwise. ETIMEDOUT is returned
-+ * when the ready-state fails.
-+ */
-+int pruss_cfg_ocp_master_ports(struct pruss *pruss, bool enable)
-+{
-+	const struct pruss_private_data *data;
-+	u32 syscfg_val, i;
-+	int ret;
-+
-+	if (IS_ERR_OR_NULL(pruss))
-+		return -EINVAL;
-+
-+	data = of_device_get_match_data(pruss->dev);
-+
-+	/* nothing to do on non OMAP-SoCs */
-+	if (!data || !data->has_ocp_syscfg)
-+		return 0;
-+
-+       /* assert the MStandby signal during disable path */
-+	if (!enable)
-+		return pruss_cfg_update(pruss, PRUSS_CFG_SYSCFG,
-+					SYSCFG_STANDBY_INIT,
-+					SYSCFG_STANDBY_INIT);
-+
-+	/* enable the OCP master ports and disable MStandby */
-+	ret = pruss_cfg_update(pruss, PRUSS_CFG_SYSCFG, SYSCFG_STANDBY_INIT, 0);
-+	if (ret)
-+		return ret;
-+
-+	/* wait till we are ready for transactions - delay is arbitrary */
-+	for (i = 0; i < 10; i++) {
-+		ret = pruss_cfg_read(pruss, PRUSS_CFG_SYSCFG, &syscfg_val);
-+		if (ret)
-+			goto disable;
-+
-+		if (!(syscfg_val & SYSCFG_SUB_MWAIT_READY))
-+			return 0;
-+
-+		udelay(5);
-+	}
-+
-+	dev_err(pruss->dev, "timeout waiting for SUB_MWAIT_READY\n");
-+	ret = -ETIMEDOUT;
-+
-+disable:
-+	pruss_cfg_update(pruss, PRUSS_CFG_SYSCFG, SYSCFG_STANDBY_INIT,
-+			 SYSCFG_STANDBY_INIT);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(pruss_cfg_ocp_master_ports);
-+
- static void pruss_of_free_clk_provider(void *data)
- {
- 	struct device_node *clk_mux_np = data;
-@@ -570,6 +641,10 @@ static const struct pruss_private_data am437x_pruss0_data = {
- 	.has_no_sharedram = true,
- };
- 
-+static const struct pruss_private_data am57xx_data = {
-+	.has_ocp_syscfg = true,
-+};
-+
- static const struct pruss_private_data am65x_j721e_pruss_data = {
- 	.has_core_mux_clock = true,
- };
-@@ -578,7 +653,7 @@ static const struct of_device_id pruss_of_match[] = {
- 	{ .compatible = "ti,am3356-pruss" },
- 	{ .compatible = "ti,am4376-pruss0", .data = &am437x_pruss0_data, },
- 	{ .compatible = "ti,am4376-pruss1", .data = &am437x_pruss1_data, },
--	{ .compatible = "ti,am5728-pruss" },
-+	{ .compatible = "ti,am5728-pruss", .data = &am57xx_data, },
- 	{ .compatible = "ti,k2g-pruss" },
- 	{ .compatible = "ti,am654-icssg", .data = &am65x_j721e_pruss_data, },
- 	{ .compatible = "ti,j721e-icssg", .data = &am65x_j721e_pruss_data, },
-diff --git a/include/linux/pruss_driver.h b/include/linux/pruss_driver.h
-index 2e18fef1a2e1..15b3c9c58539 100644
---- a/include/linux/pruss_driver.h
-+++ b/include/linux/pruss_driver.h
-@@ -118,6 +118,7 @@ int pruss_cfg_gpimode(struct pruss *pruss, enum pruss_pru_id pru_id,
- int pruss_cfg_miirt_enable(struct pruss *pruss, bool enable);
- int pruss_cfg_xfr_enable(struct pruss *pruss, enum pru_type pru_type,
- 			 bool enable);
-+int pruss_cfg_ocp_master_ports(struct pruss *pruss, bool enable);
- 
- #else
- 
-@@ -172,6 +173,11 @@ static inline int pruss_cfg_xfr_enable(struct pruss *pruss,
- 	return -EOPNOTSUPP;
- }
- 
-+static int pruss_cfg_ocp_master_ports(struct pruss *pruss, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- #endif /* CONFIG_TI_PRUSS */
- 
- #endif	/* _PRUSS_DRIVER_H_ */
--- 
-2.34.1
+Thanks,
+Kurt
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmevBT0THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgsbpD/9AxFeEEq8XNrGj2pz6LdoAUuyEQfHj
+t+9vHsspGPBsJxkOhM3JG10feAFjH823FcdQIruXggTynYrEO8GZH+G5a1qa24dh
+6QAhDEi5ALUqVUD65fdIddO/wfEdDzSQj81bkkehRPqJ5V5bkaGGV9EJ6OYCEREE
+L0PJ7rmipFvhZkbZ/1AKmO6U2yB8qDh2lwfAAKCYStjQDn7XdKrDhZVHAgxVn7UJ
+rlxoaRVV9a419VYNs8lyeOkBrANThzcX4UPv8gs0ar6PtgDriPrVpeHa6wvFa+xl
+/s1b9FtCHwZGjhaQVlRSMYuSF4N4TqBW9aXsCW81hJb2wka+MV8PTtGntss/yv6k
+WU5dso/sCDXTD/4r4AQiS2p9w5exEIgNkcT55/0mnjiJNJ2Lzk+0ikrEC6LLnfZj
+0UME5TLxP09SOIa68d5wHzi4JRKr+NTwcEevieGsxS78sC1UYvMi2jWiUa6C9fdz
+TPU8/YpJ4Mw/8orXm/1Dkb5XKd3ef5/RF5uFG5Cu3vem7SJJJya8BrTqiUDesuy0
+n3Wgx2CUBZ/sl1qssCGu2HwOfU/EeWtc4Pxr7UE9WKPc+aeMmJMt0qONmPYln/iJ
+dPr18MvJNHlWM1NFmuAEV6ZJoo/LzvWEbvwNlJmKb8GodD4To4YEk5/iGWncaXkP
+noqBzMdqbY5wEw==
+=EOqX
+-----END PGP SIGNATURE-----
+--=-=-=--
 
