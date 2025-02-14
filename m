@@ -1,132 +1,154 @@
-Return-Path: <netdev+bounces-166455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6F23A360A0
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:39:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259B5A3609F
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 15:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26C813A9ADE
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:37:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E628818907AD
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 14:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5A426656F;
-	Fri, 14 Feb 2025 14:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8B62661B9;
+	Fri, 14 Feb 2025 14:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Qnv1zqqw"
+	dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b="K3tUZZst"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828292661AA
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1C6264A9F
+	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 14:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739543884; cv=none; b=OysG//fBA+yu2xdG4CgIAowOkyZoru/qNop3gU4Y211puEyTKo+cL3Y41bacLr2XFwf8FSiRv0TsJEnqmWlEH4iHMLSSaQJRs5o1Ce1RxZCuA+yWEWJezqmVrP0/q7vfRCAZj0rL7B9hmF7lAvBD68h+l4YicdF6Qbq5vaxHI1c=
+	t=1739543943; cv=none; b=WFoqLsQ++155zl23M1JUbdxqprc7SR8NeoyxKJRs+SjfAsGX56f0jzg3nosgSH8cNLIyWIWr6pBfaVuhDJkziZx1ihf4vWw/ay1a/dKzm7KRL2gM8VZ2EsSLq0YUfftO8A0TxXnJ4ipeS4JHQYQibyB31ztu+TRn8Rr6ug3qCzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739543884; c=relaxed/simple;
-	bh=VWb5MkKgJlcOONgIwkXIHXhOHFOwyrjuHcEUQBNf7xw=;
+	s=arc-20240116; t=1739543943; c=relaxed/simple;
+	bh=wFkxdvIwnJWPtmy3IVwliR+EGyMjmgmxBGvOd/UtBZQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XuQdpTis2Lq92bTMmYFlcQWN7meyuHFBYUTyPw45R2TRCpO/VWF8JvUxDiAUZa5OVfaipYsl9nigl6qEC9IQ8wZijvho9AgUg5qMfXw2Mf2vhZerPIYmiytMr2dcoEv+U+HAQRjvCl6kzYn4mD8s2HFlshuXSgdTTw9Iy/kih8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Qnv1zqqw; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5450abbdce0so2214456e87.3
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 06:38:02 -0800 (PST)
+	 To:Cc:Content-Type; b=tuckEsva2gis0PU7tDN0T2G2FuVTekPu9DooJXYjN+LX0GfMG3c5N6PP0RdbWagJSNGcp/i6GFPeTyy1Yd9kl32FAY9HKBhej6zVebVJqJRHEZHKke9i4dyX8eG6s20pO3HXVXVl00N3FYbZF6tpPplUoaUzMt0moH4Ch453LF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com; spf=pass smtp.mailfrom=stackhpc.com; dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b=K3tUZZst; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stackhpc.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220f048c038so11999015ad.2
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 06:39:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1739543880; x=1740148680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s/nWo8rBImm3/oJoY9sZaYO485tQZOmVynsCXssfwwk=;
-        b=Qnv1zqqwxfpLkHSKnNaLKIKFbyg75JB75IxlrE/h7+F420HlaTZ+0ioMQqu2R3G8A9
-         5BJeHLjkdJ4Scs8zR7CGNgrn1Hq2yd/8rzx8/FHm8o2m0+iSIHobu5RXwXHJOEN9Vyp0
-         SG9Xb44XbjaJ+UPIykTyGaUtMahI5L88E5Klr1vxbfJsvmfp2jLQMzD5iRWAMaCyiKXE
-         6FSSEAfZew371SuTnJ+cCy75G2ljIMVUnu4y/5SjXLvz07kBlQFjaxGmZSDawf+GVHDY
-         R0MKJDjjVisJNvlmVmHX4BYB3sTGMCbeqY5bS6GMgHTk46GF1+7BSId+Gd+MVbhRZ3yZ
-         KeUQ==
+        d=stackhpc-com.20230601.gappssmtp.com; s=20230601; t=1739543941; x=1740148741; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vhilAW4gniv1DVgcjzIBhwxNOhpawvc9uI+g4OceS6U=;
+        b=K3tUZZstKqEvsrmXGbWEtzO6y4gz435WZI9bxgzC1h1ClPXNFk3W4AnvAU5p9Opg70
+         3DymKHrFv/fjU6n15LtCz7W8vkcFQ3jh1bQY5w14mNNnu3fC7moY26d+/mTZAXUIZAzK
+         GJZu096k+3raD5CcHZ8jEY7s7B1IeclPE2YxqJ+DIAIiEZvMqI7joXzExmZ0j29YeIqS
+         CDY0jBvisHc5B29suuoxMR4O1NliwpzkEodbZ/TyiMLN6WlfqyuM/hvKhfBOFa9/g+IH
+         Iq6qasH+J2J6NvvTXZKh5KN4ZvFIBVtfgnxMf4Xctl9rlEblZXilRHZywEvV93slQ6xW
+         uJBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739543880; x=1740148680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s/nWo8rBImm3/oJoY9sZaYO485tQZOmVynsCXssfwwk=;
-        b=M0TSFfZWhTuCbyJwVbgD64jwYskEKgWz+5tTn5YOShg5BMlG+YePMPpNsYDED3OBtD
-         ddQh9reNBN9nu5WB9yC09JvnBPIetFJplkt0kiDkzwmXEd6JNKQb3KDyESOq+YH1yLUL
-         VUIHTT5jH2ZGlhjqz3cAIrDA2wtFaezZ7hi21GeVaalmnLgEqa83DP/T3ZC7OH9nZL64
-         TzoBSi8g0O15qvEKBRC5zQSbbvzpbubMkeYI2/4e6FV9yboFp7dlibnUnd8qwlUYuxkk
-         eRUPnmkVWJL0stG8YsWQ+qo7pouG8wqLBZUMdm0ttOCPdiepDY6481HAeu3eD3q4BEc+
-         CEgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXRqR72aPMzA+8Dv7Wdv5If9fcEGiviHEU3OzGDwxV15DBS1GbC2DYga4cT2LH/v/qynshr2bo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBH4YLDMnX5q6EYk7TyIgLRY55+CVafM0kY1C/x44o78grY0RG
-	xw4uUFPrgUSJUshhfLK+S6z5Kg7PhSNRLIdhQt4MsxovtxtZcJhAL51vnWB1+jkbDI4dTIlE2t0
-	bKwEEbKByL3xrY4aRMqW2mLcyAkJzDgg46UMMKQ==
-X-Gm-Gg: ASbGncu3yL0nU7poDVlSIc2OxkIuNZseaTBDjXWCsNU7eHR6gQN7Fh3PLlKftjUHquJ
-	P3ihC+n6xfZy5oCM/5leMOQxTBgNvlKPo0BYNMvAEWXOmTNqDvSzu80sYZy6pXfAND5vudbGmnu
-	I0Ti7X3gS12u2XOyhXVugvGs1p0ZA=
-X-Google-Smtp-Source: AGHT+IFI84zGNU/5Prn01Vy8fWHPKleDbw82zc5GSdSgL+oYsNCtPFeqOqBeE0yzBu7Mgzm4cA6Jih86DZ3F3f8DtA8=
-X-Received: by 2002:a05:6512:ac7:b0:545:1049:eb44 with SMTP id
- 2adb3069b0e04-545184a2edcmr3543131e87.36.1739543880482; Fri, 14 Feb 2025
- 06:38:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739543941; x=1740148741;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vhilAW4gniv1DVgcjzIBhwxNOhpawvc9uI+g4OceS6U=;
+        b=ZPjLNOsnVCVKBnDwkvcCGdRjRglPCjrtggfqrSLl+J1IAiR4MorCoSGiF4H61YfFcW
+         Xz5zywNwvrxdSorCMQxtCmfZ0GZ3a/1S2zFq4hYlyzpvDEMBUmNIlV2LLwgSXzpr0wVc
+         ms8cFawoUJOd9J5HeUb+iAS7F8N4ZO06VrhhFoJ7D6yJPo1b87W/hyPvTNJBI4PBoSyR
+         5pjfjBm9Ie4CVLK2QIEh4AjgAA4iN1l/IQTFE8iuOS9aQ2kE+NDdWfcNYnX1HdlY8UKI
+         oE9dVQCsi7lnPO8BU/j2pjnPAWpxIjFXlChs674lY9AemI9gvucMdfnfGA6uLPPGlOop
+         MC6A==
+X-Gm-Message-State: AOJu0Yxb5jieQOwL4YMKu+a4xzkDG0dcTSangESvE5VzLKW3yDL4ELi1
+	OtiGnGpbJH9UWwitf8DSj+lduBn+2rHfnphGy0RfHmYx+9wP/rJDZ7siL/wuLWhXVayUFi+ZD/3
+	LSe9Thq+TVZITYVklRMHasocqr6niDG/43V1oww==
+X-Gm-Gg: ASbGncu2lRQWtBfrY6Emc1A8royaXohsW9qfRGSNJ0Pe6um9qEX+GnbWMvxI+M1ZJ8D
+	/5YGfqB1dQtBS5repsQCm+GGzCrd2h7g75Bw1VY+2e5lLb37mRLKfow87ord/1vazbv/94dS+ok
+	F1oKsYpix1tnhXwzraHoY8KTivZaYw9qg=
+X-Google-Smtp-Source: AGHT+IFNZXpOncTCw8++MCjUYwQdWRNY703IWLqlt85EiLHOTjZiy50WPWA+xtX3i7nH0o3KCEB4MFbs61B4W49dR18=
+X-Received: by 2002:a17:902:db10:b0:221:133:fcfb with SMTP id
+ d9443c01a7336-2210133fe61mr6939335ad.20.1739543941046; Fri, 14 Feb 2025
+ 06:39:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
- <173952845012.57797.11986673064009251713.b4-ty@linaro.org> <CAHp75VcjAFEdaDQAMXVMO96uxwz5byWZvybhq2fdL9ur4WP3rg@mail.gmail.com>
-In-Reply-To: <CAHp75VcjAFEdaDQAMXVMO96uxwz5byWZvybhq2fdL9ur4WP3rg@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 14 Feb 2025 15:37:48 +0100
-X-Gm-Features: AWEUYZmZOOzJ-2PYVb-j2HjRho5iTG1Da6ZcvH4AymKKHcJZkPFSmjChMriWUzs
-Message-ID: <CAMRc=MefPRs-REL=OpuUFJe=MVbmeqqodp+wCxLCE8CQqdL4gQ@mail.gmail.com>
-Subject: Re: (subset) [PATCH v3 00/15] gpiolib: add gpiod_multi_set_value_cansleep
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Andy Shevchenko <andy@kernel.org>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, David Lechner <dlechner@baylibre.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, linux-gpio@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20250213223610.320278-1-pierre@stackhpc.com> <Z685fovQy0yL6stZ@mev-dev.igk.intel.com>
+ <CA+ny2swxXoMheYQV=gf=P2bYhTzt0J3RhtOZz0++rem=jcq7dA@mail.gmail.com>
+In-Reply-To: <CA+ny2swxXoMheYQV=gf=P2bYhTzt0J3RhtOZz0++rem=jcq7dA@mail.gmail.com>
+From: Pierre Riteau <pierre@stackhpc.com>
+Date: Fri, 14 Feb 2025 15:38:24 +0100
+X-Gm-Features: AWEUYZlrBhjJZbZcCJvSyGbGYlwPRh4x-urU_whcBwjbM6Dni_s47pUK8ohZYJo
+Message-ID: <CA+ny2sz8+UFZtYFLEDo+VQrN3iEwSu_gG1+mKTWm4wL7PK+uTw@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: cls_api: fix error handling causing NULL dereference
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 14, 2025 at 3:35=E2=80=AFPM Andy Shevchenko
-<andy.shevchenko@gmail.com> wrote:
+On Fri, 14 Feb 2025 at 15:21, Pierre Riteau <pierre@stackhpc.com> wrote:
 >
-> On Fri, Feb 14, 2025 at 12:21=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.=
-pl> wrote:
-> > On Mon, 10 Feb 2025 16:33:26 -0600, David Lechner wrote:
-> > > This series was inspired by some minor annoyance I have experienced a
-> > > few times in recent reviews.
+> On Fri, 14 Feb 2025 at 13:46, Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com> wrote:
+> >
+> > On Thu, Feb 13, 2025 at 11:36:10PM +0100, Pierre Riteau wrote:
+> > > tcf_exts_miss_cookie_base_alloc() calls xa_alloc_cyclic() which can
+> > > return 1 if the allocation succeeded after wrapping. This was treated as
+> > > an error, with value 1 returned to caller tcf_exts_init_ex() which sets
+> > > exts->actions to NULL and returns 1 to caller fl_change().
+> > >
+> > > fl_change() treats err == 1 as success, calling tcf_exts_validate_ex()
+> > > which calls tcf_action_init() with exts->actions as argument, where it
+> > > is dereferenced.
+> > >
+> > > Example trace:
+> > >
+> > > BUG: kernel NULL pointer dereference, address: 0000000000000000
+> > > CPU: 114 PID: 16151 Comm: handler114 Kdump: loaded Not tainted 5.14.0-503.16.1.el9_5.x86_64 #1
+> > > RIP: 0010:tcf_action_init+0x1f8/0x2c0
+> > > Call Trace:
+> > >  tcf_action_init+0x1f8/0x2c0
+> > >  tcf_exts_validate_ex+0x175/0x190
+> > >  fl_change+0x537/0x1120 [cls_flower]
+> > >
+> > > Fixes: 80cd22c35c90 ("net/sched: cls_api: Support hardware miss to tc action")
+> > > Signed-off-by: Pierre Riteau <pierre@stackhpc.com>
+> > > ---
+> > >  net/sched/cls_api.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> > > index 8e47e5355be6..4f648af8cfaa 100644
+> > > --- a/net/sched/cls_api.c
+> > > +++ b/net/sched/cls_api.c
+> > > @@ -97,7 +97,7 @@ tcf_exts_miss_cookie_base_alloc(struct tcf_exts *exts, struct tcf_proto *tp,
+> > >
+> > >       err = xa_alloc_cyclic(&tcf_exts_miss_cookies_xa, &n->miss_cookie_base,
+> > >                             n, xa_limit_32b, &next, GFP_KERNEL);
+> > > -     if (err)
+> > > +     if (err < 0)
+> > >               goto err_xa_alloc;
+> > >
+> > >       exts->miss_cookie_node = n;
+> >
+> > Thanks for fixing.
+> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> >
+> > The same thing is done in devlink_rel_alloc() (net/devlink/core.c). I am
+> > not sure if it can lead to NULL pointer dereference as here.
+> >
+> > Thanks,
+> > Michal
 >
-> ...
+> Thanks for the review. I also checked other occurrences under net/ and
+> wanted to investigate this one. It looks like it could produce a
+> similar result.
 >
-> > [07/15] iio: adc: ad7606: use gpiod_multi_set_value_cansleep
-> >         commit: 8203bc81f025a3fb084357a3d8a6eb3053bc613a
-> > [08/15] iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
-> >         commit: e18d359b0a132eb6619836d1bf701f5b3b53299b
-> > [09/15] iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
-> >         commit: 7920df29f0dd3aae3acd8a7115d5a25414eed68f
-> > [10/15] iio: resolver: ad2s1210: use bitmap_write
-> >         commit: a67e45055ea90048372066811da7c7fe2d91f9aa
+> In devlink_rel_alloc(), if xa_alloc_cyclic() returns 1, we execute
+> kfree(rel); return ERR_PTR(err);
+> In caller devlink_rel_nested_in_add(), we would assign the value 1 to
+> rel, check IS_ERR(rel) - which should be false? - and dereference rel
+> at: rel->devlink_index = devlink->index;
 >
-> FWIW, Jonathan usually takes care of patch queue on weekends.
-> But whatever, it's not my business after all :-)
->
+> Should I update the patch to cover both issues?
 
-Too many conflicting suggestions. I just picked up all Acked patches. =C2=
-=AF\_(=E3=83=84)_/=C2=AF
-
-Bart
+Nevermind, I see you already posted a patch in the meantime. Thanks.
 
