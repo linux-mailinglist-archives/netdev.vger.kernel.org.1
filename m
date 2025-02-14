@@ -1,121 +1,130 @@
-Return-Path: <netdev+bounces-166334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC404A358B3
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:20:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B808DA358BC
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 09:20:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3B53AAB39
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:20:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4C01892554
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 08:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C8F221D90;
-	Fri, 14 Feb 2025 08:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9730222259B;
+	Fri, 14 Feb 2025 08:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="v9XIPkLY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVF7Gtte"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4A321D596
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 08:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC18D221D9F;
+	Fri, 14 Feb 2025 08:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739521209; cv=none; b=PheDzjp3ese1CN01NUhBs/o0SlBU47gDMNjvfFtoziIBvD3Z56IbJFFK1PsHerNenarEW4J1werABtM+wlePjXIG+KvJGQRPCh4wSSa/phHqeFyp25QbhXFCk26tS6JDVaJV9+tLG3BSHamdJVsjGTvrLhMQfP4ZnHWeUQjDrL8=
+	t=1739521146; cv=none; b=A+w9HAigZV9Gjs2wjgzMw3fbGY5wfN9Q/Tp3Cn+Ynig8XvVGRdqKh/pac9+nl/GlbrE1KuhyuasibVMWMjBWZizenK2y1AObIWFuC3Gd6hjJZqrG0PZ3Divbuj6Z45Q84hoPl/UIjI+jPKyGBlS/LUAgNnqwFcCo5gtdhI0xOfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739521209; c=relaxed/simple;
-	bh=9bFCaE8eScKI2/xsZ5wdjcHaDxdtJl8IXFst8prmZqw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZUktGiNznPzhMr7V2ZgBYl711BjeoB4ObEaQb8U+vm0GoJKlGzfpJYJfdRe4dnZ3umjJsHucEQQlsS5dSskDa7gwpi1qgvyD10pytvdLJVwTXU8xTOnOhueKSspZZjKPR8NTmgyJnezaQW0ezhvZGJ7p0+mX5g9j4NbF/CthEoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=v9XIPkLY; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1739521146; c=relaxed/simple;
+	bh=+YRZa9GQMBvxCO42bZd2rPCKBHevSnFiZVRhYz/Twu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qe7yiywb3HIu+r/WQ4Bzs3eCipMfT/o1WmtF2Frtk2anWAujsaUriQtFCOTmsorcpUA+zUZ467EagwiKiTwoUJYCBXB79xuNT5ka2SbbsdJIecggD0l0TPrTd95fHWaoXjY6q/UH9V9F6wUW2uICE15CNFgnMoeOSkaB+2D9JnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lVF7Gtte; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4396794bfdeso5241205e9.3;
+        Fri, 14 Feb 2025 00:19:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739521207; x=1771057207;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YyCfsp8prorlfSI+QgOrST+6tDqiuOlyGQla/LQw/RI=;
-  b=v9XIPkLYMcZGwJSkBnExFkS3eNMSkn9PiWTWRmjFEL4tfGZzRaABGC7t
-   NRh06a5VwiylSJVS7pcJApRVs0K5laZ/E/YO1zyRc1miVnqL7ZdcoZnzb
-   ELSOv1NOaJ4T/C6UD9eWC6VX8UMA/DCumtyodxU7toRvbNnwHG4aOq8fS
-   o=;
-X-IronPort-AV: E=Sophos;i="6.13,285,1732579200"; 
-   d="scan'208";a="697061564"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 08:19:57 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:63692]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.73:2525] with esmtp (Farcaster)
- id 6cfd46ff-bf64-42d4-bd4b-5eae50c7395d; Fri, 14 Feb 2025 08:19:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 6cfd46ff-bf64-42d4-bd4b-5eae50c7395d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 14 Feb 2025 08:19:54 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.118.254.117) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Feb 2025 08:19:50 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 3/3] bareudp: Call bareudp_dellink() in bareudp_destroy_tunnels().
-Date: Fri, 14 Feb 2025 17:18:18 +0900
-Message-ID: <20250214081818.81658-4-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250214081818.81658-1-kuniyu@amazon.com>
-References: <20250214081818.81658-1-kuniyu@amazon.com>
+        d=gmail.com; s=20230601; t=1739521140; x=1740125940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LbVa8HDmySOLzTxdp1rm7fHbF9zRW7+16BI5omjFQBQ=;
+        b=lVF7GttePDH4zpQG2F6wt4G/fcAfDK7keoGZ8sJbC4ZdQA27LLTT7gzXsHdVQ2cOKA
+         E3xTwBsvkss4GZLsrYEyIrwgEptAmiquMUgM5k/w+r29BJ8JTNPWvBPmSunhtiXRRKD5
+         /ElUE5e4L343sdLbPCXF3iW/rCj0Aa6WpTPQ7X+lfIpuOZ0dPvGdn7VZkMvo/PXU6FI2
+         k+zto5fp4s3rOftJwbryr1XmNv/IF4STtchZwQpohMjjDb9cQYIBEB1XYZ8swQ2hLgmv
+         8Zh8AHhvKoS1/0/PRJCLcWbxqLNXICmlaUtxFUCzCGoILpDnN3evYc+/Wg/W/lKLINrm
+         0z1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739521140; x=1740125940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LbVa8HDmySOLzTxdp1rm7fHbF9zRW7+16BI5omjFQBQ=;
+        b=a9qQpTbkYrxk2QywB5AdKbRcTiA64Y3w1Qy4NIVPLqaKJ1zLcz4CcrHKBDjOZ32yLp
+         rmNXCJgabvgWiR5n42/97LTDcYzMZIBmRemJuvj7S2NSR/wfBwbSdpT+Tt9ulVbybF8f
+         idjdlArsX9oyv3P2FVTEjGDXAbgHAXlOqOfKAaRG4EjocU08nRS+rDDqox97OTvPEQBo
+         USC9MvsJDE2OutnGur5Hl+C6Kl1Da7JEXIYFH32u9TfvorvcDgHQy7fMjWUCH5QnGzHu
+         tLBrb3SDqChn7bZ785MXrFHu/Rh6SkOIzz6d9B2uAmU4hjsZkVqg/Qcl462ZxyN8tXTR
+         fhgg==
+X-Forwarded-Encrypted: i=1; AJvYcCUL54b0pDN9kfRugIzLG1Vc6WayomaJJVB1bDQXCiwKpGpK97HylJns/Ia6hka5B7oxwbt3sW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlwFIfwsTSFwFEPlUDAxVjBSkGkeBj/P292kmhlWdGIEK61YE0
+	NzDYtMD5rxZIuC2Mby+XHdBmMIdp9IF5Id4aFUAh4PdHsz10cpBu7bStW92amsqNAg==
+X-Gm-Gg: ASbGncu3AG5G1d3GNJm2FMQJB/6z/B+LLcrwHuNOAZjjKdIlAzDK0G7vzLhp7fhf6bd
+	CTjW8HSJ43aI5zQ7L+4Yg9nU/TOhHMJz77uZn+vL6LtFmLIesuZP7mO0yeC1MmXz1viBLnRJpxf
+	9554dnEfAUw9h9zWuka/UNvLTVpeeff2nURX1hNT7nl1MO1KIK90ngYSanI/OYjxf8c6RYS82fg
+	gtpS0p4MEChwa6GEYGPpQTSZaUOvNvUboqSHQ7oHt0ORCSG+EAritZ/2jQJBqdzL3xPGi/HYOD8
+	/0AdqJ7EwOcYBkzA+y6m/JIjiYWw/4wMpCmaN3LsRm8Y2SgKwrtvqO9j+9cLjTFmWSHHeZ5210Q
+	IVVSxrNAl5Bzs+bo=
+X-Google-Smtp-Source: AGHT+IGyXZdWdSWqRimzmSMnbhS5myJ9fXPKRG3aOdX5uBZS03JahStAbbfxW7j2lDOXI7yxVWNY9w==
+X-Received: by 2002:a05:600c:687:b0:439:5aa1:1ef2 with SMTP id 5b1f17b1804b1-4395aa12228mr98087905e9.27.1739521139878;
+        Fri, 14 Feb 2025 00:18:59 -0800 (PST)
+Received: from legolas.fritz.box (p200300d0af0cd200c9869c6f52eff023.dip0.t-ipconnect.de. [2003:d0:af0c:d200:c986:9c6f:52ef:f023])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a04ee48sm69409735e9.3.2025.02.14.00.18.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 00:18:58 -0800 (PST)
+From: Markus Theil <theil.markus@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	akpm@linux-foundation.org,
+	Jason@zx2c4.com,
+	Markus Theil <theil.markus@gmail.com>
+Subject: [PATCH 0/2] prandom: add crypto warnings and switch to new PRNG
+Date: Fri, 14 Feb 2025 09:18:38 +0100
+Message-ID: <20250214081840.47229-1-theil.markus@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA003.ant.amazon.com (10.13.139.105) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-bareudp devices are destroyed in two places during netns dismantle:
-bareudp_exit_batch_rtnl() and default_device_exit_batch().
+This series builds on top of the series:
+	"prandom: remove next_pseudo_random32."
 
-bareudp_exit_batch_rtnl() unregisters devices whose backend UDP
-socket is in the dying netns.
+With the current cryptographically safe PRNG in drivers/char/random.c
+fast enough for most purposes, make annoyingly clear, that no one should
+use the prandom PRNG for cryptographic purposes without known about
+this.
 
-default_device_exit_batch() unregisters devices in the dying netns.
+While looking at the prandom/random32 code, I informed myself about
+PRNGs and saw that currently fast PRNGs with better statistical
+properties than LFSR113, which is currently used, are available.
 
-The latter calls ->dellink(), but the former calls
-unregister_netdevice_queue() only.  In the former case, the device
-remains in net_generic(net, bareudp_net_id)->bareudp_list.
+Recent alternatives to consider are in my opinion:
+* PCG: https://www.pcg-random.org
+* Xoshiro: https://prng.di.unimi.it
 
-There is no real bug, but let's call ->dellink() to avoid a potential
-issue like the one recently found in geneve. [0]
+While both seem to have good statistical properties, I recommend
+to chose Xoshiro256++ here, because it seems to be even faster than
+RNGs from the PCG series.
 
-Link: https://lore.kernel.org/netdev/20250213043354.91368-1-kuniyu@amazon.com/ [0]
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- drivers/net/bareudp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Furthermore, the authors of Xoshiro provide a small RNG named SplitMix64
+for generating high quality seeds for the Xoshiro RNG. By using this in
+the default way, no further seed checks or state warmup are necessary.
+This simplifies the PRNG code IMHO.
 
-diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index 70814303aab8..396a8b28cf0c 100644
---- a/drivers/net/bareudp.c
-+++ b/drivers/net/bareudp.c
-@@ -780,7 +780,7 @@ static void bareudp_destroy_tunnels(struct net *net, struct list_head *head)
- 	struct bareudp_dev *bareudp, *next;
- 
- 	list_for_each_entry_safe(bareudp, next, &bn->bareudp_list, next)
--		unregister_netdevice_queue(bareudp->dev, head);
-+		bareudp_dellink(bareudp->dev, head);
- }
- 
- static void __net_exit bareudp_exit_batch_rtnl(struct list_head *net_list,
+Markus Theil (2):
+  prandom: add usage comments for cryptography
+  prandom/random32: switch to Xoshiro256++
+
+ include/linux/prandom.h |  30 +---
+ lib/random32.c          | 351 ++++++++++++++++++++--------------------
+ 2 files changed, 180 insertions(+), 201 deletions(-)
+
 -- 
-2.39.5 (Apple Git-154)
+2.47.2
 
 
