@@ -1,162 +1,268 @@
-Return-Path: <netdev+bounces-166365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD61BA35B6A
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:21:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09976A35B79
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 11:22:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E0AB3AE316
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:21:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61F713A6D01
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 10:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BD8257AE1;
-	Fri, 14 Feb 2025 10:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBE6256C62;
+	Fri, 14 Feb 2025 10:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="VGYh8Spi"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Gkz5E9wx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2057.outbound.protection.outlook.com [40.107.22.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C13245AFB
-	for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 10:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739528465; cv=none; b=Pd+9fQmxDm/q4RVphxB+R9+PvFcXnRngmkutex6MmZSjnfTV7ZS+59OV9JVKzx9pljpcyLHsx/EbyN3A4xZDvgJilHB4F5hqitkDxqSiqVXlzEKEE/st2GUioHDQ3/9coVI2A69R2JxZ/W/txQ9IRBXirnvfM5QKsUbMajXXLk8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739528465; c=relaxed/simple;
-	bh=1lGizCsR7R+FyokmykNTUGHY1lzSxjHAe9z+jj/6a1E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W1BImtrACQHS2QwUqkd7/b3TDDeaq1xFtLtd1OfEo8Au6x24etbmkc8ka1Kxh+LjSkHnmE3QVd5dkuI4OBdo9P1Aavtb5IqMwqW6smXmiyNcMfF7kZA/btec8igqQ7x5RjVVCLSs5/WojN5Lz2aDt54F6yTGfpcxgOfh18xLHw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=VGYh8Spi; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4394345e4d5so13440595e9.0
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 02:21:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1739528462; x=1740133262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NLnRVw8CXaL8aivm+oTTQCZPxIVCt8DWL00ds7O1e6U=;
-        b=VGYh8SpiUpS/S1XOqhPcF+0eTnGV9rIy6ItXmOglkxFdbEzXe5CiPX6VCBQhsWVFIm
-         MxhWRAGP7beu+fAEe7tq75ziIXAqo9B5NrK/xsMNTTFjCWSwe3R38CD58IfVpxVvRWsq
-         S/UqOzaAeefpmnUCSaH5yIeqeWeDzHZ6ttI6a5TN8+86DpF7cgzEjMXXVnyGmE8OoQPA
-         +uInOqbOs6NDQWi4RXlB2+kW4z5BGBux307L3RpXUDhqydHAKsheawYAPO+doAqgvutK
-         UdcWSOMD9xVSbivv67M5YNLZ5Cf4XpgSeloT6ndMjMk3UnFEyy5s9uUPdTbiMFOtYaWg
-         8V+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739528462; x=1740133262;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NLnRVw8CXaL8aivm+oTTQCZPxIVCt8DWL00ds7O1e6U=;
-        b=hkJK8IfHCf2DuVETTsvBehyve05Qn9KZoZVorAFhWq/5B79otwJsH304ZwABwqQnNr
-         SO1f3Tvhri1573k0Wy8f/F6NtI7gKFEqlTBFyQnCY842GOS4hBxPgj6g9/j7mISjY0X6
-         Mhb+ZqVXKEAFlU7AD0lNgUhSHxquBEBHz2gsr4lFStN5MKmg0Ss9ZguxWXcV9fbBLY8f
-         eRCiiUGB3yXJe1FL5KQ3wzPrnCusL9eMkXDVRYcha3L5kO9FTyYZhGGTN9sWuMBzx0cz
-         wPL7F9UIzn/6udQHXfHZIuGw5UbtTs5K1IWQciqMZHFlsjL8KNe2ekVaanJA4QRGYvq9
-         6LSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgiuV2nnuUwb7zfWqahx2e8bSCR/PwgPYE91moO3pITSH6kKyL0qfL3o7BHxFKPZ63u1dgcmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3NXjruM53BmvvipsOLFHH4cHbQkuRbdJa9IbYtt9F9EEi7+lL
-	Q9fVxbiNx+aYKr3CTCUbOEyiMs7gh9DRIZGiGQ8RnQxEstMExpmuQyso7gxNUNI=
-X-Gm-Gg: ASbGncug2f3Hmlc6QWKOBQWSjDHNvk4Z5n8i8LsL9xiZqGDzKPHwGUITRe4YiaaSZgZ
-	FjibtNFqLd8ZVMPg1CNe8HvwQyAKdG+PWtn4Q2GseJmom1jZILHj5z9X8i4NtXVcDP3CgkxiGm2
-	E39sh3SYjCijC9geAuhjWo1Sqn51opgDZ/FW0vkDOESJo3Ib/op5zMUwUjqPnm0DgA5CDOmpO9x
-	2okQsWFU3ihlRSzDq2EBT+pArPpdWulS23z4gM4r6Ph7csn8qwexfX4ZlsIGEYDuhSg/LkZZJj3
-	EnJtS4rsQdqC/Q==
-X-Google-Smtp-Source: AGHT+IH0JLaEmWyKXH91k0R2F707+ITR4fD263SwynHCn2SZFyP0K4/kI1oydg9oxe4La6Y3ETiVQQ==
-X-Received: by 2002:a05:600c:35c1:b0:439:69fd:34b7 with SMTP id 5b1f17b1804b1-43969fd35f7mr14374675e9.3.1739528461685;
-        Fri, 14 Feb 2025 02:21:01 -0800 (PST)
-Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:62cc:da7:7c42:97ac])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a06d237sm71463255e9.21.2025.02.14.02.20.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 02:21:00 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Andy Shevchenko <andy@kernel.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Peter Rosin <peda@axentia.se>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58718245B05;
+	Fri, 14 Feb 2025 10:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739528535; cv=fail; b=c7rxqu/Xs0IaEXtZ5mUjAbK3xPmg7VycobcSrxsV35h8/0Kv1aOLsImuj9Wftth7NwuMTRi5MpNb4gtdOKIsNxbf/lGetoteIZ8IL6Ei76cFJLcr3sTt9qD1bWWc+treKkRARvFXwYdyosSEKmD2fkdIIPtXlucXn1mxsIi1Jng=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739528535; c=relaxed/simple;
+	bh=ywfa9V7NA81U/YLSB3HPgNS0ip7qXDUdH7k2kGfF0QI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GBPE8dFyV+/GGMkWw9CDhiPvze+pksZPtjcatlj+si2UoPskeoJ1F6N+SbIXgtkjNT4pCZAeELI72JvtT8V3vK3s30XyH0UKWEKJvksug7A4wZgXTrmgcusydGPVsHFyVdVQTWCVcVmV3RucaspV4XWXLkNoZs/WZuUec+ESdqM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Gkz5E9wx; arc=fail smtp.client-ip=40.107.22.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bUDodQuS+iAEk7CGIBV75WElL80X5IurAG4MdGSAogHkYJ9UPXG+DmoQOZfVUkfNrBYL1nnje5m00gR3Zev4ggs09XTCXO805LKNQc7fd1KGlgAiy5t9fFJX/AFlbhh60rxg/+rjv/286mEC9KV84WtkfRaKM5X/yqQ7m4AcS36HT2qO9M3GaOcmvTjtgDWjEP4jODObOmvXIKhAUQyusgbj6x8BScXV//hE0aFQCzMtSa5vGhwF3u4ZncSgIzh6aMosutEc1ypHn7lm3/OXuKiyoqwmktzFWl0CSnDWuR34kEFC3O+MdznGkGCNfdXizvvDBbdR1jbhkQn8G1/B4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EQ2qge8tIHMz9ALRLNQ4aojG1aGgoFU28SRdXRYfg6s=;
+ b=ROBWI/XqfCCibIQgBLca3YTq4X5vkhRTWZvY34wor3Fu6cSKbqHlHss3QOapi7f2cSOjEMFf58kPIA8y8DrSg1osqt9ffM7ILNEYiDRM6A9nhJSxPIT6jQ+FzOrK/JCCH4+vk6NF+A72zSoI+TJmslCDsXrVSM4Y16S5sekkO2Z51T4vVx29wxwvpLcoy610UOY1ECf8VnLvDSgEPjwMITmGw+DiUYei071T8zCv0bXgDi6mAvto5/NcEPOW5GdHw0h0zkiAzY6STOEtygCT7X2/5DsEU4LtPLApYhh7tcWSmS/ihQUoRgNNrmBryyQ6ZwMZ1bucgp3f/w8lBNDv4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EQ2qge8tIHMz9ALRLNQ4aojG1aGgoFU28SRdXRYfg6s=;
+ b=Gkz5E9wxootroJJ8eGxdNCjK9CG3Hmbzd4zJsZTa5+PvGWRNpluJkM8BI+r+Ccb1wgywZAEE5+A6DeSL1czQue0THt6RxBJTmIYH+ugubxCYU0O4xfpZaHnhUcvzGGk8G+zu5HB79AOTLlQO/Tw250VsKRkLToJTLJo97805Jc7SCjjvYdf4YcyVTMYNLb76z191kP20+8MFJW9jnoLKnnkeg6CEACH1hg0/Rft5ZLaI6O/c1rbhPdhvQ1nnDhsf6sC+Ab6pHeZgL+5UphXUb0pJIFUDpHQnSd3bHyKRtRQzQ5OaUztmNITe9eVHUeHIjckvLmzg1XZ0hBq/nDVCfQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by PA2PR04MB10507.eurprd04.prod.outlook.com (2603:10a6:102:41a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.17; Fri, 14 Feb
+ 2025 10:22:10 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8445.013; Fri, 14 Feb 2025
+ 10:22:10 +0000
+Date: Fri, 14 Feb 2025 12:22:06 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	=?UTF-8?q?Nuno=20S=C3=A1?= <nuno.sa@analog.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	David Lechner <dlechner@baylibre.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	linux-gpio@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-iio@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-sound@vger.kernel.org,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: (subset) [PATCH v3 00/15] gpiolib: add gpiod_multi_set_value_cansleep
-Date: Fri, 14 Feb 2025 11:20:58 +0100
-Message-ID: <173952845012.57797.11986673064009251713.b4-ty@linaro.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v4 0/9] igc: Add support for Frame Preemption
+ feature in IGC
+Message-ID: <20250214102206.25dqgut5tbak2rkz@skbuf>
+References: <87cyfmnjdh.fsf@kurt.kurt.home>
+ <5902cc28-a649-4ae9-a5ba-83aa265abaf8@linux.intel.com>
+ <20250213130003.nxt2ev47a6ppqzrq@skbuf>
+ <1c981aa1-e796-4c53-9853-3eae517f2f6d@linux.intel.com>
+ <877c5undbg.fsf@kurt.kurt.home>
+ <20250213184613.cqc2zhj2wkaf5hn7@skbuf>
+ <87v7td3bi1.fsf@kurt.kurt.home>
+ <b7740709-6b4a-4f44-b4d7-e265bb823aca@linux.intel.com>
+ <874j0wrjk2.fsf@kurt.kurt.home>
+ <641ab972-e110-4af2-ad9b-6688cee56562@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <641ab972-e110-4af2-ad9b-6688cee56562@linux.intel.com>
+X-ClientProxiedBy: VI1P194CA0056.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:803:3c::45) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PA2PR04MB10507:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c2d547d-aedb-4edd-135f-08dd4ce17124
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NEJ2YmZBTUxyeHpZL2JGcVlOUndjakQxK1psMzhXWGlUVHJxUFVPMk5LOElI?=
+ =?utf-8?B?STkzRXZPMFdDVkR1aWhvRHRVaUhIMDVvcldYSU1WSitTeVV6dUMyS3FldWNq?=
+ =?utf-8?B?aGpUZWtDZjVpVlF5Mys4eHVoa3hSMXhFQ0ZTSnhXb05HeXdPUlRldVgvSlNy?=
+ =?utf-8?B?OEthUHZYNVlPd2JqSzlUdTZFNWI3WHBXSzNuNmhaSmozV2g0UFg4WVdoR3Vu?=
+ =?utf-8?B?L0tmVkF2aWZjUUhBZlZwbnYwMlk1US9pd2N2Sk9MZTBPS1pYWHFEZW1ySzQz?=
+ =?utf-8?B?RkJaU2hGem16ajJvK1FWMEdNbXhaNEpPZGNqMi96bDlaZFg2aDVUQTViRGM5?=
+ =?utf-8?B?OExVRXl4YzZ6QWtSNzR4OGJBNGdlTEQvOU1naERuREFJcE1MUG9HZ1drWmZS?=
+ =?utf-8?B?Y3hXd1NvNTVWMEt0elhhYmU2dGc1T1pGdGtBY2hnK1VYbnliZjRYRTZlazI5?=
+ =?utf-8?B?UVBib2VqSmg4R0J0M0VXbzMxWjlld0NrMzdNK1RQRU5QSER6SHpIZDRYSDZZ?=
+ =?utf-8?B?Z3BZNE9vWUR3ZkQ4eDMxV3lDVnh6ZGhKNUtmU09xbnZTcVBYYWM5bGRpSWtY?=
+ =?utf-8?B?eHFmSHdTdFZwZHZTY3FHZzhjYUc2elpWbnFvTjVYVS9nWFAvbW4xOWZveXIw?=
+ =?utf-8?B?dlFYNlY5bzVQT3BZSXE5b3BGeWRWSzkrS3MySGt6dnpzVGNIeUpZd2xnQVNS?=
+ =?utf-8?B?TlZOcGFSK3J5VUdBQm04clltdTVUcEIrY2NoUkFoaHBxazYyWUFjdjl4YzFi?=
+ =?utf-8?B?MEtmZkdJNkdDQXpob0VZMDNuZWVIT0UyWkFEZXZ2S1JnZWtVOE1tVEdRV21V?=
+ =?utf-8?B?TUNzZmYwNVJPc2dFMzI4V0lwT3ErZTd2c1J5N2kzVzQ3ZzZ3QXdQeG5OazYx?=
+ =?utf-8?B?MlNOeVNwcXVMZXorWndGdEluQU00U2VGcGl6SUs1UUFzcFpYbEpNTkp4YXJa?=
+ =?utf-8?B?YzRBdjVTakJGMmo0MWNyUnhTS1RuaUlKMUJ0eWpud2tYRTYzdnljLzFUSStP?=
+ =?utf-8?B?Q25CaVd1MkJ1UG5xM01uMzFQVGdqTlVWMXc0NVJacDdyMDAvd2FtU3Z1V1Z5?=
+ =?utf-8?B?YnJUbE1MUzk3UmMzNVhPMnY0MitJaUI3Tlh5MVZ6STdIWlordkdYb2V4RVk1?=
+ =?utf-8?B?MmVadGxJUG1VclpFb2puR1JBUEM5aTdSclhNQkN1a2VFRURaUFBWNlRWYUJP?=
+ =?utf-8?B?eE9ueDFpallyNEQ1WXZlbWZ5T1lSL3pWRVdPZ1ZUSW9QWG5xM2J5UlYxRHRE?=
+ =?utf-8?B?MkJ1Tmw4aGFKMGlHaU5ERU5hRFZ3TTZ4YkRqVlZNOVZjRzZZSjQ1RTRsN1Qy?=
+ =?utf-8?B?TnFkR3duSk90Tk5yZVlzRHZoS2RkMmU2TUJtSnAzNXZsS2o0Wk5zbEw3UFY2?=
+ =?utf-8?B?TTRTemZyODhoRWJvY3VFSllwcFZHRmtCbW9rc2tZcnlqTWVUa2JvNjVjeHFp?=
+ =?utf-8?B?MGptWTg1b1JkVFJISi9KdGd5dEJoVUVGZDRYSlFqWlk2bm1PemptUHl0UitN?=
+ =?utf-8?B?aW5XTGloVWZuYTlmbm1YTXh2VHQrOUphdW1sQjB3bHFUbmlVOTR4MDhaZzZQ?=
+ =?utf-8?B?WVd5dDIxR0MyVGJaN1RMZ3lTTUpybjdzSFRjVDZzVnp1dmRkejlWODdXbWpS?=
+ =?utf-8?B?U3RJazg4QjVGdkpRaXNhZ3Z6cnJpNWVmc3pJUXBIeW1CQW5qWVVidWYwRW5m?=
+ =?utf-8?B?NE4rTHJlT3h1U1lEVm5ONWdrNGVPQk1YV0VBWkw1OFBJVDk3VE5KaG04WDd3?=
+ =?utf-8?B?N3UvY2E4MWl5WmZtRHNFNzBDTzlJazhqajhPSE1BeWNUUFMrbXBVUDQvejZi?=
+ =?utf-8?B?MFdKOWNOSXhKazQ4WEhTbVNlVUJRRG9sZGJYc2ZleFp2eW5ibGdnclFWcU9U?=
+ =?utf-8?Q?qnxy+Qpn0uBiQ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Ym1FemVhM0VlaThnNGVNK2dWd3ZBZnFtOG1mWjFnOG4yaERsVVV4NEV4Qnhh?=
+ =?utf-8?B?UklMMkRaa3JwWHFiTEZOdllaa3JJdStsWmdlQzV6NmpWa3hnQXJwVTlSUVM4?=
+ =?utf-8?B?RGE0bzdON0dqQmtvV3JOTGc2TGUrbkVTT01yVlZKVUZaUXBtbWpxS2lvMkJD?=
+ =?utf-8?B?d3krc01QK2V2aDNjd1NydldWMGxlRWpIU0w0YVE2djYwNEoraldtdExnOFhj?=
+ =?utf-8?B?NGVSdkZrNVVrelMxU0I0Z3NXMWVKNUF5S1hxbzNaSElqZWs1RmMzNDZZZEZI?=
+ =?utf-8?B?K05aWmFoK1JiME40aDRYc2FnMXZaUFBhN0N2QUJiQUFxdXZLVWthWFdBUmRN?=
+ =?utf-8?B?Mm1OclhnVkpaUklTT0tPczBUbE5ZRlQxYnNPZ0xZZFZUbXRMUWtET1Fud0Qw?=
+ =?utf-8?B?STdiM3dYL1pkMWd2TWFBajB2ZTZ3KzVhbGRBUm9JdXpsNjkzNjN0a0xXRmds?=
+ =?utf-8?B?aUp2dVZqZG1LbGZPOHBxbGF1QVdVaFJpczdJbkNkN0pVZmRKKytyOTQwUmZ5?=
+ =?utf-8?B?OTVpbWpaUlNybDZPRk9Pei9VZHZFTFB6UStqN1JTcllsUE1RTjNzL3NUWmJp?=
+ =?utf-8?B?L0RVOFcyUVZyeit6aFlMQUdXc1JJcE54c3p2anI3emUrTk5WbmRNZWdyOG9t?=
+ =?utf-8?B?dzUrOCtRVjhtZk9BN3hBS2NqNFNxQ1RQelR4dUhSekFUR3p3N1FIdkIyeUpt?=
+ =?utf-8?B?YmxaNjEwQWhQbFBnSEhKdXJHZW85OXhEUXg5WWNGdmtnOXBkZFprS0dRSTZT?=
+ =?utf-8?B?aEZIMTJEK2pHejRncnU1ZkNGY0VrT3lRcyswYVhUdjRsNnZJU09idVlHVEtT?=
+ =?utf-8?B?bmp6MkpBb0JiaElJOGJQSytBZXBkZEMzNnpLNG05SGNPZXJjdXUvQmwwMkFs?=
+ =?utf-8?B?UzFTNlJ3Q3dNMld1eldiWVhSNXh4blpJUFZyS3JDQWI3b2xxWFh1bEJxTStM?=
+ =?utf-8?B?VHlvSVYzZ2EwbWRKV1Fjd0JqZWR4QjU2RmY0bUQvNTVja3BxS05PMUZZVW05?=
+ =?utf-8?B?ZWJFcU13L0pLZ01ZMlV4V20rT0JyS3Y5NzFsUTNHVXRKeFVYOGtIVTZRT0Ji?=
+ =?utf-8?B?bHgrdlQ1TVlocjRrOC9LNXN3UkpxR1BSTldBWHJtcmk2Q3JHSTNJNVZpMitP?=
+ =?utf-8?B?SEdSRmJwdFlSQWJxNTQwNjZlZVdaZm9RTW5ZbWMwc0NEb3VlbFJKVDJpWDgz?=
+ =?utf-8?B?RjBsWnBpQ2dxNXRqQXBzam5Ga2tKUERSWHpiWnBqZ0xWcUcvU2hiaWFVU1Ay?=
+ =?utf-8?B?SXg1dnYyMW1RSDYyNFR3S0ZiRGNpWHJtUWNkVW52TzRlTTMyaTVyd083aDd5?=
+ =?utf-8?B?R0V0TkxhM0VhY0cxSUcrUnlFdjM1QnYrZzREUzFDRXBDM280anZ5UFhGUnFX?=
+ =?utf-8?B?MWN3SUxwUEVzZXArSDAxd1R2WHExS0UycWhzTWhESkNDRmZVdWpOS0pEL2lW?=
+ =?utf-8?B?WTY2bnZ3ZjZlT2lVUExKZzhWQXh3RnM3M1E3Y1hvUWVwaEtSWnFmV050bC9p?=
+ =?utf-8?B?VTFxb2JIZEJsQ24wN1N6aDhSalNIZFhuMFpSZTJzaE1FMmhMVnJSVVpmWjBu?=
+ =?utf-8?B?SlpMaU1GL1ZWY0swR0hlVE1TcXVlZmpYcG03MzJhYnlqTm8wWmVjRGt5Yitq?=
+ =?utf-8?B?dFd6azllOGhaTlJMenNMdlhHdmNnK2VxUTlNcWszWnJiVk9wYVI2bkFQTHlY?=
+ =?utf-8?B?ODNNL1Q0emhPa3F5ZUYvdjc5eFlVODdLbDJDWnhzZXQvejQ3SXJ5YjRGNWxD?=
+ =?utf-8?B?eERZMFpSYzZCQkY1UEJkbFY5cWRRclI1cEZaZnQwN3R5WlNIZnZTRWpFbmUr?=
+ =?utf-8?B?NmVTSlRvWWExZndpZHd2STF2cmJNVXNCcDIvR0Y2VTd2N0F6MzY1OE5KMlhW?=
+ =?utf-8?B?OWtiN1A3dE1GZWNUSXFwNmNYZWRjcW1adWcwUGt0Wm9TSUlhWjdLb2x3Nnk4?=
+ =?utf-8?B?NmFNYmpDbnJVQnZOeDZoS1FxbmFiZExJQ3J4TmZKajljYjA3QlRVZU5qMmJQ?=
+ =?utf-8?B?ZXlWdEkxRFJKdE5QNS9nVmpYL1NFMUt3ajlOUEJqNWJ6NGtCSEJ5OWxjcVRE?=
+ =?utf-8?B?TVNDVS9HcjdjSnBRelB0OVhUU2NlNkNia2hkN3JzZmhQK3hmKzcrbEVMQ3VQ?=
+ =?utf-8?B?V1NsUTFFMkdackFXK0tScndOSXBaY1BjV2hWdkVuOWZZTVpwNUZIVGtTTlVH?=
+ =?utf-8?B?ZWc9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c2d547d-aedb-4edd-135f-08dd4ce17124
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2025 10:22:10.7618
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Or3r8+niS6Z3kBod8DNdddfMwajuwv2mW7+xkGlEZA4pV6wuMDl9QjD6ixwyvsEr7+3GSD3c+5MRtJe3NBFgug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR04MB10507
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Faizal,
 
-
-On Mon, 10 Feb 2025 16:33:26 -0600, David Lechner wrote:
-> This series was inspired by some minor annoyance I have experienced a
-> few times in recent reviews.
+On Fri, Feb 14, 2025 at 05:43:19PM +0800, Abdul Rahim, Faizal wrote:
+> > > Hi Kurt & Vladimir,
+> > > 
+> > > After reading Vladimir's reply on tc, hw queue, and socket priority mapping
+> > > for both taprio and mqprio, I agree they should follow the same priority
+> > > scheme for consistency—both in code and command usage (i.e., taprio,
+> > > mqprio, and fpe in both configurations). Since igc_tsn_tx_arb() ensures a
+> > > standard mapping of tc, socket priority, and hardware queue priority, I'll
+> > > enable taprio to use igc_tsn_tx_arb() in a separate patch submission.
+> > 
+> > There's one point to consider here: igc_tsn_tx_arb() changes the mapping
+> > between priorities and Tx queues. I have no idea how many people rely on
+> > the fact that queue 0 has always the highest priority. For example, it
+> > will change the Tx behavior for schedules which open multiple traffic
+> > classes at the same time. Users may notice.
 > 
-> Calling gpiod_set_array_value_cansleep() can be quite verbose due to
-> having so many parameters. In most cases, we already have a struct
-> gpio_descs that contains the first 3 parameters so we end up with 3 (or
-> often even 6) pointer indirections at each call site. Also, people have
-> a tendency to want to hard-code the first argument instead of using
-> struct gpio_descs.ndescs, often without checking that ndescs >= the
-> hard-coded value.
+> Yeah, I was considering the impact on existing users too. I hadn’t given it
+> much thought initially and figured they’d just need to adapt to the changes,
+> but now that I think about it, properly communicating this would be tough.
+> taprio on igc (i225, i226) has been around for a while, so a lot of users
+> would be affected.
 > 
-> [...]
+> > OTOH changing mqprio to the broken_mqprio model is easy, because AFAIK
+> > there's only one customer using this.
+> > 
+> 
+> Hmmmm, now I’m leaning toward keeping taprio as is (hw queue 0 highest
+> priority) and having mqprio follow the default priority scheme (aka
+> broken_mqprio). Even though it’s not the norm, the impact doesn’t seem worth
+> the gain. Open to hearing others' thoughts.
 
-Applied, thanks!
+Kurt is right, you need to think about your users, but it isn't only that.
+Intel puts out a lot of user-facing TSN technical documentation for Linux,
+and currently, they have a hard time adapting it to other vendors, because
+of Intel specific peculiarities such as this one. I would argue that for
+being one of the most visible vendors from the Linux TSN space, you also
+have a duty to the rest of the community of not pushing users away from
+established conventions.
 
-[07/15] iio: adc: ad7606: use gpiod_multi_set_value_cansleep
-        commit: 8203bc81f025a3fb084357a3d8a6eb3053bc613a
-[08/15] iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
-        commit: e18d359b0a132eb6619836d1bf701f5b3b53299b
-[09/15] iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
-        commit: 7920df29f0dd3aae3acd8a7115d5a25414eed68f
-[10/15] iio: resolver: ad2s1210: use bitmap_write
-        commit: a67e45055ea90048372066811da7c7fe2d91f9aa
-[11/15] mmc: pwrseq_simple: use gpiod_multi_set_value_cansleep
-        commit: 2a5920429897201f75ba026c8aa3488c792b3bd7
-[12/15] mux: gpio: use gpiod_multi_set_value_cansleep
-        commit: 47a7c4f58e1f9967eb0ea6c1cb2c29e0ad2edb1a
-[14/15] phy: mapphone-mdm6600: use gpiod_multi_set_value_cansleep
-        commit: c88aa68297390695b16fd9b7a33612257d8ef548
+It's unfair that a past design mistake would stifle further evolution of
+the driver in the correct direction, so I don't think we should let that
+happen. I was thinking the igc driver should have a driver-specific
+opt-in flag which users explicitly have to set in order to get the
+conventional TX scheduling behavior in taprio (the one from mqprio).
+Public Intel documentation would be updated to present the differences
+between the old and the new mode, and to recommend opting into the new
+mode. By default, the current behavior is maintained, thus not breaking
+any user.  Something like an ethtool priv flag seems adequate for this.
 
-Best regards,
--- 
-Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Understandably, many network maintainers will initially dislike this,
+but you will have to be persistent and explain the ways in which having
+this priv flag is better than not having it. Normally they will respect
+those reasons more than they dislike driver-specific priv flags, which,
+let's be honest, are way too often abused for adding custom behavior.
+Here the situation is different, the custom behavior already exists, it
+just doesn't have a name and there's no way of turning it off.
 
