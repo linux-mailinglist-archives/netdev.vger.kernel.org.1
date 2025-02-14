@@ -1,132 +1,154 @@
-Return-Path: <netdev+bounces-166294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524D2A35602
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:07:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900D1A3560C
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA12816C656
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:07:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073F83ACCA6
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8F316CD33;
-	Fri, 14 Feb 2025 05:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ED11779AE;
+	Fri, 14 Feb 2025 05:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qVMgUW2n"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="nII9W+eC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="baep5RrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE4B126F0A;
-	Fri, 14 Feb 2025 05:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E2E16CD33;
+	Fri, 14 Feb 2025 05:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739509642; cv=none; b=FAZVALH6ht1Cq0b3/7QPb/Ab8XGAB2KesAtDyVus0SAoXWPv51/i7CESZiaoScJ+6ZE03Kq/Hv3yBlL6C+WgMQR5iH+te679MBSnHF4zNhC2B3hID4MzGEayPJIJrqT7gq3PZc5WpCDBBfm+/6Xe2mWxJHSF9KsHUxcUZtcxdRg=
+	t=1739509886; cv=none; b=K+LVUWAXJDx/kVS2SS+BTxuMtC/NAWsNGtaQPwlMvW3EAH84KBAqd1c05sEi3EO6t6Pz+Pw8RpGcj3FG69QKjpXxWd5xqxyAgScn9klWJRkh3Zv9XTgRYnkI/1TlVS4QkuQXzmCVNccTBzoLE0+AzVFFZBKp+5mQq81gG5vOk50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739509642; c=relaxed/simple;
-	bh=KfFGOuc5JjjRIz0Ea0BajMpJsbMdkcnLcBnBwON+Liw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=AdHjbBNVXh0gF2VpFqt2VWygmKFdJ0cglymaabm86v8UFMYiWFM/K64t/Yb0JtrsAKAU+/OyANb98Aex527+trFGEa1nI1Y4IVzTGY2ZH1vxOMCUX7Jj4FtQ75Y8+6qiuIO2Lrw30WKCu720IQKyCA2KJGxrw48yJbcVmH8VER8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=qVMgUW2n; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1739509636;
-	bh=Ybl5pjKtAGkp6U3PePyb/EpekVJzwa92J/91S0y7yqo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=qVMgUW2nq8Qqpti1zAihhZdxcFxWon4c8e/zpmKesw/xFjEkYSnzNttrfy87405JF
-	 dly3y4DWtqQhQst1KpzHA5UZ3fWJAJlT0CdJZlhTCMJ18B5y/FmFmX6N0/Uw0M7xaw
-	 Y6EpIWKLeD36Y/i/6rT3jHZAMaMMcub1vy7flxoR+5084XXz/Lxf4RlpZMTwtskKM8
-	 4skbVy/OXF2uyimqqI99xYwmVeX4dvECDpbTs8CnAXWgKPKwA6bjyWLKjv6/tPMjD/
-	 hEn2SX7CZK+b0DzsCGDQ3RYCfFozydynbQUDudSRVEW/tA8NRU0+NRBK6HiPxGf01v
-	 1wOI73yhBnoaQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YvKmN0Qtxz4x4t;
-	Fri, 14 Feb 2025 16:07:15 +1100 (AEDT)
-Date: Fri, 14 Feb 2025 16:07:14 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
-Cc: Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the bpf-next tree with the bpf tree
-Message-ID: <20250214160714.4cd44261@canb.auug.org.au>
+	s=arc-20240116; t=1739509886; c=relaxed/simple;
+	bh=izTXpmjkLskuTaKgQ53chP8qGfsAs27u/crrMU1WP+0=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=RaYE+F6M05c3Tkcoy8KpvOZncEldJ0K6sLhV9cpn+uPiTzu+6LA65/qEdtp4mDOqayNkUkM12aSEDQjKg+H95iTB6U0k0PMAroD9PLTW2Z9I3L/WbNmYohR7nZzTtsKiKbQLYAvq+lpU+bAHYOcVFmQOpIaxCT4ztorDuJTwxfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=nII9W+eC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=baep5RrY; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 6F91911400EC;
+	Fri, 14 Feb 2025 00:11:22 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Fri, 14 Feb 2025 00:11:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-type:content-type:date:date:from
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1739509882; x=
+	1739596282; bh=heMlusK5FGA6JqL97UB/JZCAI0C9yt2iHuQEDmaniks=; b=n
+	II9W+eCiL7CV2whRTV1Xb/uBvTekDrriJJa5+7d+MVlHYHVK2urzM2PY78tKVLp/
+	4cSjy9jLAxuPb9DSx/jfYzRb5dR4Af6EY7NCe7HAWvNerCoarJP0LBH4DFeZtz1p
+	JlY/uXO2ahq+y+FfOKrYzvhz9ntGMkz9Fkr95tK+mI8uD3/j4aTTMannZuKQTuPW
+	yDRd/IIeizV0nMiuJZ1C32mCct0Fux4x7ewP01DnO7QKvSdtuxH7I8Yax4upRhzN
+	JNzUtZVm/RxJNNkkwL/64juXMEmRdpQh7EncNTMLi/puS+oREFevqfxpNaOa3SuF
+	5XUkbd+qttR3IdMwBYlGQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1739509882; x=1739596282; bh=h
+	eMlusK5FGA6JqL97UB/JZCAI0C9yt2iHuQEDmaniks=; b=baep5RrYQPiyfvkCh
+	06Gdqq7dU36kSjLHnOUNXn39ilKCG8EgKVk7sgNEJ+FJgmjTcDV+eMpAyyw/yHGi
+	J2vjUDzoC74zd7FXQa55yCqZVI2JTVE3T98KHxZRXqNVWWjEjwEk51aDAwmYvo+D
+	Lysgff/P3j9xRQjCf+s5pp0me7PS1TAn8O+fovcz8H0vvpcJRqL1EQSZau5RpyGa
+	85TpIx7l7SwIk/KUQhl+F9bwuchQd/gVoKfSgH1TlZkVYOFVUzpW+oalPl8VANCt
+	E8dndfQfuR2qUnT3p4dgxSblVEglTimbbqHk0Q1i4m+pv1QXk5dFBBphFVvr0S2N
+	IEM5w==
+X-ME-Sender: <xms:edCuZzzKnRIDlAuq4um28_84z9ghYnx_yWxoolndABPFgBEzpiVaCA>
+    <xme:edCuZ7QfJ3D7MESVkjfPhmdgAbhSxUsmx_F_Sm-Dbv-ZvghVr_4s-PWsJNHLMMyDc
+    YVg9yDeBVttk0YI5m0>
+X-ME-Received: <xmr:edCuZ9WPdDAQjpP2S17k5M9SkBMf6cGOqKyaeebzM9D-j5cJ6-eyKagln_51p1L2i4YUOA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegkeejjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtfffksehttdertdertddv
+    necuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnh
+    gvtheqnecuggftrfgrthhtvghrnhepjedvgffhteevvddufedvjeegleetveekveegtdfh
+    udekveeijeeuheekgeffjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthho
+    peduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkh
+    ifrghllhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+    pdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhssehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgif
+    odhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegsohhrihhsphesnhhvihguih
+    grrdgtohhm
+X-ME-Proxy: <xmx:edCuZ9gHGu7_p1PU8Gg6KqhcN8jIPFFCGgPzcAG5dSRp7CrHLKGGcg>
+    <xmx:edCuZ1ArhYtB1PW9FRZYUvxT_ztQOcpg1chBf0FmixcN3BxiGLSyjQ>
+    <xmx:edCuZ2LtQ9vtQsKJ9lDR3h8DhUJkwicN-U_1eXqejy5jj0DFo4Zw3g>
+    <xmx:edCuZ0CwJ6gvLFXIG_aXn8tM1ybbJooWBGa4qYKzEkmTI1rpHr9qHg>
+    <xmx:etCuZ_T4DGXuhh6UQSGobHRkaXcDoQlvwNv6i1-wfcfYvw7dHoH0qz9h>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 14 Feb 2025 00:11:21 -0500 (EST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 6975F9FD37; Thu, 13 Feb 2025 21:11:19 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 689099FD36;
+	Thu, 13 Feb 2025 21:11:19 -0800 (PST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
+    Boris Pismenny <borisp@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+    Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
+In-reply-to: <20250207092920.543458-1-liuhangbin@gmail.com>
+References: <20250207092920.543458-1-liuhangbin@gmail.com>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Fri, 07 Feb 2025 09:29:18 +0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/WSU/=WLeJHVwI+vzmrU09TM";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <985474.1739509879.1@famine>
+Date: Thu, 13 Feb 2025 21:11:19 -0800
+Message-ID: <985475.1739509879@famine>
 
---Sig_/WSU/=WLeJHVwI+vzmrU09TM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Hi all,
+>The mac address on backup slave should be convert from Solicited-Node
+>Multicast address, not from bonding unicast target address.
+>
+>v3: also fix the mac setting for slave_set_ns_maddr. (Jay)
+>    Add function description for slave_set_ns_maddr/slave_set_ns_maddrs (Jay)
+>v2: fix patch 01's subject
+>
+>Hangbin Liu (2):
+>  bonding: fix incorrect MAC address setting to receive NS messages
+>  selftests: bonding: fix incorrect mac address
 
-Today's linux-next merge of the bpf-next tree got a conflict in:
+	For the series:
 
-  kernel/bpf/btf.c
+Acked-by: Jay Vosburgh <jv@jvosburgh.net>
 
-between commit:
+	-J
 
-  5da7e15fb5a1 ("net: Add rx_skb of kfree_skb to raw_tp_null_args[].")
+> drivers/net/bonding/bond_options.c            | 55 ++++++++++++++++---
+> .../drivers/net/bonding/bond_options.sh       |  4 +-
+> 2 files changed, 49 insertions(+), 10 deletions(-)
+>
+>-- 
+>2.46.0
+>
 
-from the bpf tree and commit:
-
-  c83e2d970bae ("bpf: Add tracepoints with null-able arguments")
-
-from the bpf-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc kernel/bpf/btf.c
-index c3223e0db2f5,f8335bdc8bf8..000000000000
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@@ -6507,8 -6505,8 +6505,10 @@@ static const struct bpf_raw_tp_null_arg
-  	/* rxrpc */
-  	{ "rxrpc_recvdata", 0x1 },
-  	{ "rxrpc_resend", 0x10 },
-+ 	{ "rxrpc_tq", 0x10 },
-+ 	{ "rxrpc_client", 0x1 },
- +	/* skb */
- +	{"kfree_skb", 0x1000},
-  	/* sunrpc */
-  	{ "xs_stream_read_data", 0x1 },
-  	/* ... from xprt_cong_event event class */
-
---Sig_/WSU/=WLeJHVwI+vzmrU09TM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmeuz4IACgkQAVBC80lX
-0GzFwQf+KccFBNU+HUJlqoL4MQCl1bRZ4k5FqGnL6ELDAMxV6Uc+neJveJfv3LD/
-6jK8CsuRgAsmCBR+c3iYeaB0pJV3jMvsa5TdM93p8lbxzijZzurlLMzFxXaIAT6T
-Ua9NqwACzjVLyShGZ4+b221gpbgDd1EuEtz+PEEyrG/KsCjZDWUZtbusbtQBbXOd
-/lwwqe62LhOSvHUmI8xta56ZjkOODQS4M17Nwtt10x4yR/QI1h2XUg3P1600sKHL
-b4t7tWigH1tgM56a4Rvk3255r5yWrhh1/LY961MndGiWQaJfWTQxXHhwX9cJ19Oe
-adrWLbxTeEQBqmo99uWmX7EdadIPXQ==
-=CPEF
------END PGP SIGNATURE-----
-
---Sig_/WSU/=WLeJHVwI+vzmrU09TM--
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
