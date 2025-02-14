@@ -1,122 +1,132 @@
-Return-Path: <netdev+bounces-166293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF74A355F2
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:57:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524D2A35602
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 06:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2633A1DF5
-	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 04:56:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA12816C656
+	for <lists+netdev@lfdr.de>; Fri, 14 Feb 2025 05:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8758D186E26;
-	Fri, 14 Feb 2025 04:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8F316CD33;
+	Fri, 14 Feb 2025 05:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="c1/zVKRk"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qVMgUW2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B441B16DC12;
-	Fri, 14 Feb 2025 04:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE4B126F0A;
+	Fri, 14 Feb 2025 05:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739508986; cv=none; b=tDhSbt5PhjMlh9cqxUxaLQAU2RLCu4gyWKXEjah5HakChjNQLoIFhWRfwp2OuTfYJRN+apSAmw11xMtSZ6t8XGMkM4UhQPxGZjcUw9Sh3Arxtb2xNwThLXYJHgq8rVkhb/tWDd7WlxVd5wUpanfbrVgrsfjWR07qekq3tlTZnVE=
+	t=1739509642; cv=none; b=FAZVALH6ht1Cq0b3/7QPb/Ab8XGAB2KesAtDyVus0SAoXWPv51/i7CESZiaoScJ+6ZE03Kq/Hv3yBlL6C+WgMQR5iH+te679MBSnHF4zNhC2B3hID4MzGEayPJIJrqT7gq3PZc5WpCDBBfm+/6Xe2mWxJHSF9KsHUxcUZtcxdRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739508986; c=relaxed/simple;
-	bh=QBmPfSziU7mcj2ePBONzWfy0ZaFhuiN/7Gh7sGOqkLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EKxbCvp7M54tL87sRmRZMZDcgnlhoOt5r6GAgHtjch2NOpsZOtc2G/0BpglyU5MqSKUVmVApZZpO12PwFu2Of0SVcMMJH/LIf/64aAcnmrBSe5HEjFbsTcRtXvIjP1WMdgfYUDY0jbSbVA6BRd4JVk31xFtYXj0DsghPC7pHcyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=c1/zVKRk; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=krJe8yV8IQ5q17uTwD2a+k61avLmokiZ6lpNbWzhrlc=; b=c1/zVKRkjdwM1WpA0c5enod/bf
-	+yxkYSufqwlKCAjaDrBf0ozX89Gb0qwUbIhRMpyaTch+lg/+KPTbNVtpf6kDGqT3xsGffRue7wEdo
-	CAaz8vRA84F04vnFZnZnPQ7IQxIXLl6q7YWpMaLFOMJ4dbGPhfabx1V+D5A/mjD7itFRk7kMCpCGV
-	KgwDk+WjgYS8BPgxrRHEoUAl5uvbI2LN7m62lWq8uN3RxdqTzR1mPo9RM8wW/U1yjyHQvt39Qz28z
-	9LVCuz3yoqwsiRs1EDZy8O5gsTZAFpDb3lQZd8Cv0NpfWbw2yAWlNm5NNHfW6l0kHXBkIyiJ/mKwn
-	ziT7ok3Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tinXO-000EO9-0Y;
-	Fri, 14 Feb 2025 12:56:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Feb 2025 12:56:10 +0800
-Date: Fri, 14 Feb 2025 12:56:10 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
- hashing
-Message-ID: <Z67M6iSoMyvGwkAF@gondor.apana.org.au>
-References: <20250212154718.44255-1-ebiggers@kernel.org>
- <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain>
- <Z66uH_aeKc7ubONg@gondor.apana.org.au>
- <20250214033518.GA2771@sol.localdomain>
- <Z669mxPsSpej6K6K@gondor.apana.org.au>
- <20250214042951.GB2771@sol.localdomain>
+	s=arc-20240116; t=1739509642; c=relaxed/simple;
+	bh=KfFGOuc5JjjRIz0Ea0BajMpJsbMdkcnLcBnBwON+Liw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=AdHjbBNVXh0gF2VpFqt2VWygmKFdJ0cglymaabm86v8UFMYiWFM/K64t/Yb0JtrsAKAU+/OyANb98Aex527+trFGEa1nI1Y4IVzTGY2ZH1vxOMCUX7Jj4FtQ75Y8+6qiuIO2Lrw30WKCu720IQKyCA2KJGxrw48yJbcVmH8VER8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=qVMgUW2n; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1739509636;
+	bh=Ybl5pjKtAGkp6U3PePyb/EpekVJzwa92J/91S0y7yqo=;
+	h=Date:From:To:Cc:Subject:From;
+	b=qVMgUW2nq8Qqpti1zAihhZdxcFxWon4c8e/zpmKesw/xFjEkYSnzNttrfy87405JF
+	 dly3y4DWtqQhQst1KpzHA5UZ3fWJAJlT0CdJZlhTCMJ18B5y/FmFmX6N0/Uw0M7xaw
+	 Y6EpIWKLeD36Y/i/6rT3jHZAMaMMcub1vy7flxoR+5084XXz/Lxf4RlpZMTwtskKM8
+	 4skbVy/OXF2uyimqqI99xYwmVeX4dvECDpbTs8CnAXWgKPKwA6bjyWLKjv6/tPMjD/
+	 hEn2SX7CZK+b0DzsCGDQ3RYCfFozydynbQUDudSRVEW/tA8NRU0+NRBK6HiPxGf01v
+	 1wOI73yhBnoaQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YvKmN0Qtxz4x4t;
+	Fri, 14 Feb 2025 16:07:15 +1100 (AEDT)
+Date: Fri, 14 Feb 2025 16:07:14 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, bpf
+ <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the bpf tree
+Message-ID: <20250214160714.4cd44261@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214042951.GB2771@sol.localdomain>
+Content-Type: multipart/signed; boundary="Sig_/WSU/=WLeJHVwI+vzmrU09TM";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, Feb 13, 2025 at 08:29:51PM -0800, Eric Biggers wrote:
->
-> That doesn't actually exist, and your code snippet is also buggy (undefined
-> behavior) because it never sets the tfm pointer in the ahash_request.  So this
+--Sig_/WSU/=WLeJHVwI+vzmrU09TM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Well thanks for pointing out that deficiency.  It would be good
-to be able to set the tfm in the macro, something like:
+Hi all,
 
-#define SYNC_AHASH_REQUEST_ON_STACK(name, _tfm) \
-	char __##name##_desc[sizeof(struct ahash_request) + \
-			     MAX_SYNC_AHASH_REQSIZE \
-			    ] CRYPTO_MINALIGN_ATTR; \
-	struct ahash_request *name = (((struct ahash_request *)__##name##_desc)->base.tfm = crypto_sync_ahash_tfm((_tfm)), (void *)__##name##_desc)
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-> just shows that you still can't use your own proposed APIs correctly because
-> they're still too complex.  Yes the virt address support would be an improvement
-> on current ahash, but it would still be bolted onto an interface that wasn't
-> designed for it.  There would still be the weirdness of having to initialize so
-> many unnecessary fields in the request, and having "synchronous asynchronous
-> hashes" which is always a fun one to try to explain to people.  The shash and
-> lib/crypto/ interfaces are much better as they do not have these problems.
+  kernel/bpf/btf.c
 
-I'm more than happy to rename ahash to hash.  The only reason
-it was called ahash is to distinguish it from shash, which will
-no longer be necessary.
+between commit:
 
-> never use exactly the same API anyway, just similar ones.  And FWIW, zswap is
-> synchronous, so yet again all the weird async stuff just gets in the way.
+  5da7e15fb5a1 ("net: Add rx_skb of kfree_skb to raw_tp_null_args[].")
 
-I think you're again conflating two different concepts.  Yes
-zswap/iaa are sleepable, but they're not synchronous.  This comes
-into play because iaa is also useable by IPsec, which is most
-certainly not sleepable.
+from the bpf tree and commit:
 
+  c83e2d970bae ("bpf: Add tracepoints with null-able arguments")
+
+from the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Stephen Rothwell
+
+diff --cc kernel/bpf/btf.c
+index c3223e0db2f5,f8335bdc8bf8..000000000000
+--- a/kernel/bpf/btf.c
++++ b/kernel/bpf/btf.c
+@@@ -6507,8 -6505,8 +6505,10 @@@ static const struct bpf_raw_tp_null_arg
+  	/* rxrpc */
+  	{ "rxrpc_recvdata", 0x1 },
+  	{ "rxrpc_resend", 0x10 },
++ 	{ "rxrpc_tq", 0x10 },
++ 	{ "rxrpc_client", 0x1 },
+ +	/* skb */
+ +	{"kfree_skb", 0x1000},
+  	/* sunrpc */
+  	{ "xs_stream_read_data", 0x1 },
+  	/* ... from xprt_cong_event event class */
+
+--Sig_/WSU/=WLeJHVwI+vzmrU09TM
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmeuz4IACgkQAVBC80lX
+0GzFwQf+KccFBNU+HUJlqoL4MQCl1bRZ4k5FqGnL6ELDAMxV6Uc+neJveJfv3LD/
+6jK8CsuRgAsmCBR+c3iYeaB0pJV3jMvsa5TdM93p8lbxzijZzurlLMzFxXaIAT6T
+Ua9NqwACzjVLyShGZ4+b221gpbgDd1EuEtz+PEEyrG/KsCjZDWUZtbusbtQBbXOd
+/lwwqe62LhOSvHUmI8xta56ZjkOODQS4M17Nwtt10x4yR/QI1h2XUg3P1600sKHL
+b4t7tWigH1tgM56a4Rvk3255r5yWrhh1/LY961MndGiWQaJfWTQxXHhwX9cJ19Oe
+adrWLbxTeEQBqmo99uWmX7EdadIPXQ==
+=CPEF
+-----END PGP SIGNATURE-----
+
+--Sig_/WSU/=WLeJHVwI+vzmrU09TM--
 
