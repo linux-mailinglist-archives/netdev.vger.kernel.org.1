@@ -1,104 +1,116 @@
-Return-Path: <netdev+bounces-166670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C62A36EAB
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:03:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF33A36ECD
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15193AA9E3
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 852F37A2FB0
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7301213A88A;
-	Sat, 15 Feb 2025 14:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81341A01B0;
+	Sat, 15 Feb 2025 14:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJDDED3L"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="DUWKGwzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6EB5103F;
-	Sat, 15 Feb 2025 14:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8808F14F98;
+	Sat, 15 Feb 2025 14:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739628178; cv=none; b=X1ZdtYQec2YNnx7zGOu8disWLfnrU5JeYoSXGcmOBXap9a8U25qH9URLbl/WLPrSwhBUIX2KSa+ARvf/0HDOJnRrmREcAXeoZMFnV7DQuXg61XfSTYPZ8l/FcWb7yXXxXsk8/Peag4SKI60c0ZcB7J7n1FXElBD3h/HEL6Mtc2k=
+	t=1739629602; cv=none; b=WpliESXEgSojY6zvQXLS+sTFvT0YX75GtBkTBEO1jeejgRfzbvFT1IdI0CS4Ii8LCPU2YcREnzlZLHJs4k7P9wutcRPXWgNlIOxNYhE86Y9mPIJnsWmmdggXGik1xejx8l5TMDqEFl3hNQThCfCxkMe/ZmCKhFXtcEoguL361wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739628178; c=relaxed/simple;
-	bh=vNLrGNHqeVoQIeEwsVb8aUGliW0G4Qp5gERyB4+77Es=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oP7Z22QUku0erdxqWy0UfhkjmCP9bz46boB0zJkALbeEzHn2xjTh2yi2gD76+ShYqeWNn0i8DLEN8EqZJEteNd96Ibq0Br1KiohpVCotkOJi562KRN4g6NNUZyxEfrBca86EYcvknudjUBdC+CLh4s8/dwa3aQPH8ci/3kG1RBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJDDED3L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6553C4CEE7;
-	Sat, 15 Feb 2025 14:02:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739628177;
-	bh=vNLrGNHqeVoQIeEwsVb8aUGliW0G4Qp5gERyB4+77Es=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bJDDED3L0pMJkGG1sSsVGiyfkflCEIjsN/+OQENknmdKORiZTKf/MP/xBvqgqQxNa
-	 iE5zsm41BbaIwh5p21ZCVUbCnER82jL+z9/nC9NzPinDw2m6DURTEep2p3dUG9zva7
-	 Hri/qah13kLoubon11ie7miHcTmeOAk9BAnz3xEBZ3gexsU3YIhUHOGEWNu1EfeTqQ
-	 Cd5BbYlqYxsJah3O18Hiby1DNs9cVy2zz6vO1u0wnIsmd9akEPjBCrccmT+gZ1ITFz
-	 0UCFFSd5FidELQH+0AzwItctqoB24wUnZXRoyUUzioPw5klMrqucOtLeQWJqHOiwi/
-	 GzdtSiVZdYNbQ==
-Date: Sat, 15 Feb 2025 14:02:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Amit Cohen <amcohen@nvidia.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Petr Machata <petrm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Network Development <netdev@vger.kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	bpf <bpf@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
-Message-ID: <20250215140252.GP1615191@kernel.org>
-References: <cover.1738665783.git.petrm@nvidia.com>
- <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
- <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
- <CAADnVQLJfd201t_-bgWHRJRDHm4FQDNapbmAQhPd18OEFq_QdA@mail.gmail.com>
- <BL1PR12MB5922564282DA2C2C5CA671C1CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
- <20250205090958.278ffaff@kernel.org>
+	s=arc-20240116; t=1739629602; c=relaxed/simple;
+	bh=DFut+FK2UpCi7ga43XWIytp2SuGLPekeCyiXPcSaPI8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=pP6/tUMpbu64qD2lH2gV8g5/qDyeymxfVQhuGZ1x1tzfWRqKX6EkVrh37SpJmkXvbFsRRO/4v6S6xSyGEhBoymaypnuTEmGTA0mSv7M5hV1+btrpmi37UtugKPNO4aaOSIIecDmEA7pDLTeJ2YM96FZVYuh1Rw8AxjP9obzxoAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=DUWKGwzu; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1739629580; x=1740234380; i=markus.elfring@web.de;
+	bh=DFut+FK2UpCi7ga43XWIytp2SuGLPekeCyiXPcSaPI8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=DUWKGwzuoNfJ2aWRuBbNtVEwR3nSB6d82Gzvinm38NZYVvRX2Nz8fCmRqkIJVnbk
+	 nXzi34KPtW4QJsz3h0UgDnPx0r/Wo4yRti9tclyl82+lzxnKSDNNALQsKIeEKCd/b
+	 D7lYuqkPThLIa0xVEummehKJtISNKmdlDaV6GrmgXeMlfUC0TzAPyDk8Yr9uAFOnn
+	 HRHIm63E+jZijEjgfhXfj/oeBf4rtR9A0jLR5D1q12ObBOMejbcLDIwPs+NZZRQ2H
+	 aSgUeiDHsEl3PQiloeb8Y19eaVUvsOFw9jRVs7B2ir2IyzrFzm6Pa2T9I6wsrSbB9
+	 1DVktkLaRc64Z+nEHg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.21]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MyO0u-1tQYuu3Pu0-014p8Z; Sat, 15
+ Feb 2025 15:26:20 +0100
+Message-ID: <5a401aaa-b6cd-46d4-9fd8-96753599b440@web.de>
+Date: Sat, 15 Feb 2025 15:26:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205090958.278ffaff@kernel.org>
+User-Agent: Mozilla Thunderbird
+To: Junnan Wu <junnan01.wu@samsung.com>, Ying Gao <ying01.gao@samsung.com>,
+ kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Simon Horman <horms@kernel.org>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, lei19.wang@samsung.com,
+ q1.huang@samsung.com, ying123.xu@samsung.com
+References: <20250211071922.2311873-3-junnan01.wu@samsung.com>
+Subject: Re: [Patch net 2/2] vsock/virtio: Don't reset the created SOCKET
+ during suspend to ram
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250211071922.2311873-3-junnan01.wu@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:eobdNOT+A98DE5H8v3OTataNkfwqaINt6wCZsbStgpwjzWbUtAM
+ 7F3WLjApUwK1qGc4fL+2vZDMIHVxqXXpNSmH7tX6KKyRSAPTN3QZ9BGKpB5tlrygOaBEz0g
+ camgspudC9sKlgF4oSNxT0K4DwsQi07hzKOoXSGbiJlO7cd+kMvsghpsaWqkB0eBPm5VAM+
+ ZJaTlYE4CbhE0wr/zsRRw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:3u/eZlVbUL0=;uCP56s0QJjJfwtaaUKLZEhfJqY9
+ 2IuXXdu0f4AtavQAK6YUDDgMGHMyrDkkz7bjH9UXBRyqtbD8sWd7OZrCviCw7H3+jO4UROxe4
+ fvJxXro3TyYXpyncpCAOmGFfpjekb6C9LEC7u5pbD+muRBHLbiAWDaD5caHgNFu2J8C5YWMzH
+ /vnI8pwRRC3Qx3WtUbnGxaxCIS0r5jx1r41ZFqVHybYlAqjPca54Uis9PpmBywBl2gogn0uEM
+ 6rWRn741IwrvIlPCQ6/cNj74KPYPEuR4u1xg2Mj6jH1h+OwQuCAJQhC2Ix9qkBKNiSWLsfGUq
+ cadQvcVdJDrclvvDsCVUGogWtuA9G1TeVSRlmnFMx6lcbJ1z+hm9GUgrQsmtd7uZzZkN581j8
+ JHWgLl9U6nf1qZCfqwx0iYNbtbhgrTKkz6+aR/gjrw5BCB3aowGMvu7mjhxnFoXWe+Pk2meJ4
+ 7fXE9hBQoYT9fKKiMrRZGQebk4xBK2arI7/zUQ1ogK+Kak7NKjJyy38ieA1BSqDlIn/97Tnt9
+ ZU2yxiFvmw2ffAhWaE+0iKWdXBFM+P/GTfcDZ5Qa2diAPEcgz/Tf/O/hUWfYuYEUVNaOlGETd
+ 2WllLp1szJcvLHDFvKaFtzlZJ4A1Ax1IptskxQUEg1GDbEVA/jiq7wmw/uL07bU+Wnf1J1TnZ
+ v14UaiLUjYT/jeFa1Byxyz3MTdSqn0XU+4RyALSBNZT4Uw1vvvO8bA0+EYKqyvCC+8fzPYuYr
+ vxbVFAAKunx0WGyGCDZbZQyZgzj3osNatk5QE+Cqj3CSC+trquQgepmPlhuENsNkv206UIuO0
+ IR6kRVVKXomnzXqF9RCebXqY/NzR7eQFAsLFJUt771mHACA7Ll8tUa+4fbsS4yejbxtSTa0r2
+ GlhHS6RGeLaDX78y7BuvM2n2o4gYEePTIUSsxSd/nhSZpISqS9z8bojO5CGufvJPHQD2B/AcV
+ +g9R9f7r9q5+GQsH6OZQmtDeC5lHvTw9r48VB0f/RTOFRv0EEuQgRRRbT8RuGIrLeNmP8LSlB
+ ThxXdukrdVAAv5a/3OQ1Vgf+FCkUYVNgSDmQaoxjrAgPvN8cu0pTzyMIeZnCxBqZE8+219Iu1
+ 2dE7WNvjLerFPRhfs7b2kQBbuzuFuqmwm8bdh7jFh/spby3LNdYEJBYkTAMdNIpa580UXKx3f
+ ksvNCA0KnOZdAgjeoYxiZcz0NmhN1htkpe5MhbG9dxG9IJNCPE6itMwl32hcG46S4jGIAnLzD
+ ncUdPaJnjpBIRYyGzHrYjsJ5KM0F3TqJXLGQxBxk3eYtw/jODoi4QwUKFmvyWbvGEabJl3rTe
+ cSKEkJNvJvyFx0qQks19lqtvBNl5WW3a5kBR6JEdWoFiaUJzg1okOGFfuiWleez9AEcgerfA2
+ U4nQAj582UGSVCoh5uQdrdDTE7GhtjCVgP5uDIjyued4xo1r30RBCEOwHoJEk51zACLM2vpnT
+ Iodat3j1IuCbsqe3w61/JDYmVkkM=
 
-On Wed, Feb 05, 2025 at 09:09:58AM -0800, Jakub Kicinski wrote:
-> On Tue, 4 Feb 2025 17:26:43 +0000 Amit Cohen wrote:
-> > > > You're right, most of packets should be handled by HW, XDP is
-> > > > mainly useful for telemetry.  
-> > > 
-> > > Why skb path is not enough?  
-> > 
-> > We get better packet rates using XDP, this can be useful to redirect
-> > packets to a server for analysis for example.
-> 
-> TBH I also feel a little ambivalent about adding advanced software
-> features to mlxsw. You have a dummy device off which you hang the NAPIs,
-> the page pools, and now the RXQ objects. That already works poorly with
-> our APIs. How are you going to handle the XDP side? Program per port, 
-> I hope? But the basic fact remains that only fallback traffic goes thru
-> the XDP program which is not the normal Linux model, routing is after
-> XDP.
-> 
-> On one hand it'd be great if upstream switch drivers could benefit from
-> the advanced features. On the other the HW is clearly not capable of
-> delivering in line with how NICs work, so we're signing up for a stream
-> of corner cases, bugs and incompatibility. Dunno.
+=E2=80=A6
+> and it will cause that socket can not be unusable after resume.
+=E2=80=A6
 
-FWIIW, I do think that as this driver is actively maintained by the vendor,
-and this is a grey zone, it is reasonable to allow the vendor to decide if
-they want the burden of this complexity to gain some performance.
+I find such a wording confusing.
+Can the change description become clearer?
+
+Regards,
+Markus
 
