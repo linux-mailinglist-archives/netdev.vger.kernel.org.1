@@ -1,200 +1,122 @@
-Return-Path: <netdev+bounces-166720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23D4CA370D2
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 22:11:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E379FA370D9
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 22:16:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32B277A084B
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 21:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93E2D16FF69
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 21:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD741F9A85;
-	Sat, 15 Feb 2025 21:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1995C1EEA5A;
+	Sat, 15 Feb 2025 21:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1DMSe4k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/WVQI4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24CC1EA7C0;
-	Sat, 15 Feb 2025 21:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC55158851;
+	Sat, 15 Feb 2025 21:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739653910; cv=none; b=hnHKj5hi2wP55C/mDwdvZB8BBm1m4mxJF6V+Gy0aIZipmOOxPV1XbLQFa5D/qaFcjoL0Vq7esIMvw+hdBz1+FbVqOwew3/q/yFhu/LIMX+XM/NZ7HOvyJCpBmzved2JTQWTxYwSy6vNhaLaqUsTr6RUdwM7xIRu7Fw81r1H+dDY=
+	t=1739654214; cv=none; b=Tlvzoc8ijYD1EzqDd+dmxFvOHgIBkfHcWi2zhGpa58/8T4GwTmkd1zUinaTyeIerEmbtYt5OLFWUksa3/8SE43NEfMBo4g7tw0Uq2axdq9WOaRh+h7nLw97Z01sGwo0De9DP0ibDGwFU/cw5ECbE2dFsPPSFmwOd0IQx1xrRMQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739653910; c=relaxed/simple;
-	bh=nw81fQRTWtFHoZwaNiOMqnklz1cWx/vn28Qh6LB7fts=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QKoALG7I0keipnrUrUf3RVPhBW0Cd+A5WkbmXozHdUvqrBzhLsnKd+2Lp3UBkDoSRa5O775+su3O9YAx1uWdesATpIvqRmFKlYHJ3Fp7OcJnyxezp57wZMRo70oWo9HuJwGwIFM1843h8cY05hWFN96mavfCJNlo9KHyGRNHzxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1DMSe4k; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d193fc345aso6945505ab.2;
-        Sat, 15 Feb 2025 13:11:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739653907; x=1740258707; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v78TMsOUIcQOvQE5LpJzgcK6y9xjwiFAdxmxf+5gej0=;
-        b=I1DMSe4kJtcwlj+OOcYXwVlmybnvMY0MH1p5S79jwAEvaivtAAz8ka4J11BTijJl7/
-         npA42T3tHpKQYwJ44wPYFYl+1esL6J1FsGDe7sL+EB1nYTs/Z5KtBm782dVjpSsmu3a1
-         KebczvIVuVx7LQob4AlV8WFfArIpQCR7f92h1DOwgUUVWAORii1K34Jr9LzuMUx7NaiF
-         4RAbwgcGpI+yQE+rzmcuihs8AuGD1Q5nJKkPvc+Y2NrPUGUdC/dxt//nyvcU9X4OTmtP
-         XH0T2KUtSHlkG8qfaz3sppnHfQdXJ3QAWLsPi5ivVa26QhT+KokznxmI8RgIJm7Me4I7
-         /aGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739653907; x=1740258707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v78TMsOUIcQOvQE5LpJzgcK6y9xjwiFAdxmxf+5gej0=;
-        b=FRixYE1RQjGOURbD9TGWeHIptTXfNXx5RWQwi7PErb7Pa1bDR/ZscF4ZnGvZmq0UDA
-         pZsebwRY7xDkB1bmjwZ6Sw4YM5it/jb/iAbqEfPwdnYSZTJjgVwE0ETDhOjxJ/fuzJji
-         ZKB/9TBcc7D3CQzc/eZogCNuHhc7BdJONJY8zE9PPMxR+MsGX3Z87QBhb/zi6E2X9Lve
-         /xXNgcHwjk0yX6RQz1AIKHymRwrszi4BTfXx/a7ThdIHcUiAnSZN0pwD3B9912J7Ae/Q
-         QGtlYRvud7MhGmxn4oldApAEUCBQnEoCxCULmJTS3ejEvTQ0IBAZdNp/kGYJ9MG5Lvc7
-         +Yog==
-X-Forwarded-Encrypted: i=1; AJvYcCVRh8E4K/Lb+1SWGDWd614/NvXgS/gPlY5IR3dmBZETPRyxXNawWf9DpkQCqCYPWd3eXbY=@vger.kernel.org, AJvYcCVh2CdhpvjP4/a4rCgdqYG04Y/36qmwhjKu1q0YgIFCDCTSS7HaQE1lj3y0AgMd188F6J2NHANP@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpWQVRXNyid8+5fmGP1VN2s0AXyS2ADJJWSQ7n9Qk9LYQVqp4q
-	KO1//cnpfhHkxowvINPIq9WkF0Zi4M3MYvYykztqClCilsyiC+wCg9CMqZsdSBMiRm2KSKAVBFW
-	EyOlpaXpnPE0ZoTlY3mvIjsU+xkk=
-X-Gm-Gg: ASbGnctPxHR0h2KpE7XA0zdWTlHSlcEpqsdQ2zhHUJNkgep3Z7skKEO/1gx9qrSIiVq
-	0pKAAI3YoffsW2qa5rfX7k9mJ1mfs/Fyq9LSvnN/xKcmqdc60vbUOFpZHhq6Gexe/oRySo9A=
-X-Google-Smtp-Source: AGHT+IFuAwtN03VwLYf2QZqC4VE+Vmytw4fR3hV7wW0zLScVogoM/Kk/aZUSN7nTJL69c5hoSKfkINlnhRVIO3efuIU=
-X-Received: by 2002:a05:6e02:3103:b0:3d1:9cee:3d11 with SMTP id
- e9e14a558f8ab-3d28076e0d3mr36244305ab.3.1739653907588; Sat, 15 Feb 2025
- 13:11:47 -0800 (PST)
+	s=arc-20240116; t=1739654214; c=relaxed/simple;
+	bh=ner3TNyOFY2Dhnybh/9oA+yR/WkVoDzvAfBFKBlqDck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cnYiI9jRqh68TfRZDgxssG2KGEpuyImMvpVz/8srz2VaWtyyTz+GQldUKdvI/0tpGI23V1r6R/cC81a9NB1o/WSFTij4f/yyiNxqGrRT1ztVX4z7rrX6LJWpXAfJ/I54a/oRd8ZB/QatGPKHan8Hafy8RzEBtS+viPmsfxPjMI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/WVQI4/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF13DC4CEDF;
+	Sat, 15 Feb 2025 21:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739654212;
+	bh=ner3TNyOFY2Dhnybh/9oA+yR/WkVoDzvAfBFKBlqDck=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y/WVQI4/8AaDcJlQY+cNBnnq+j7Q3ICBzWFbsyRehFIdnHncDrFWHmbJH5IE37Li3
+	 MhD8I0ktOu4fYmNr7wiHQP+ZDgt4PbnQMBv57i0ylJQHlYojqDIyr6GIWOReZcyHos
+	 Ut93ikC6aJEMUxHmLxmgY+Zi8VvWsklDmu0Rz+459OlfR4JO9lpHZRM5s/vldp7TD1
+	 JCofrR1ECyKFEfj8tsAVFdX6RRFcRhrWYsF4r6sbDRa7QUvNrHk7VdunjGh2mlim6k
+	 bkEq5j7EgBuJ64GS7x4Dsymn+Fn1GALNi3M419xTlTF/trjC0immZVi5y0wFIkVn1a
+	 X5rykiKSqFjgw==
+Date: Sat, 15 Feb 2025 22:16:49 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, LKML <linux-kernel@vger.kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: Assert proper context while calling
+ napi_schedule()
+Message-ID: <Z7EEQalDIm1n_XRc@pavilion.home>
+References: <20250212174329.53793-1-frederic@kernel.org>
+ <20250212174329.53793-2-frederic@kernel.org>
+ <20250212194820.059dac6f@kernel.org>
+ <20250213-translucent-nightingale-of-upgrade-b41f2e@leitao>
+ <20250213071426.01490615@kernel.org>
+ <20250213-camouflaged-shellfish-of-refinement-79e3df@leitao>
+ <20250213110452.5684bc39@kernel.org>
+ <Z65YNFGxh-ORF7hm@pavilion.home>
+ <20250214140045.547f1396@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214010038.54131-1-kerneljasonxing@gmail.com>
- <20250214010038.54131-12-kerneljasonxing@gmail.com> <67b0ae562fc79_36e344294ab@willemb.c.googlers.com.notmuch>
- <CAL+tcoC=PROxQfPoa_LGJZ0JAPW1XuqSnTTHwJssjsC7-MPV_A@mail.gmail.com> <67b0d6906ee9c_381893294da@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67b0d6906ee9c_381893294da@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 16 Feb 2025 05:11:11 +0800
-X-Gm-Features: AWEUYZlUHkGz809iBMD1SA0e3lN1r-I-NHn6e1zkc6SEXypXN_p_FMfQvuvz2II
-Message-ID: <CAL+tcoCoyFC=gCag+pLVeQ9tyiwzsjG-qedpUBNop4wxCQEw=Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v11 11/12] bpf: support selective sampling for
- bpf timestamping
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250214140045.547f1396@kernel.org>
 
-On Sun, Feb 16, 2025 at 2:01=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Sat, Feb 15, 2025 at 11:10=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > Add the bpf_sock_ops_enable_tx_tstamp kfunc to allow BPF programs t=
-o
-> > > > selectively enable TX timestamping on a skb during tcp_sendmsg().
-> > > >
-> > > > For example, BPF program will limit tracking X numbers of packets
-> > > > and then will stop there instead of tracing all the sendmsgs of
-> > > > matched flow all along. It would be helpful for users who cannot
-> > > > afford to calculate latencies from every sendmsg call probably
-> > > > due to the performance or storage space consideration.
-> > > >
-> > > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > > ---
-> > > >  kernel/bpf/btf.c  |  1 +
-> > > >  net/core/filter.c | 33 ++++++++++++++++++++++++++++++++-
-> > > >  2 files changed, 33 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > > > index 9433b6467bbe..740210f883dc 100644
-> > > > --- a/kernel/bpf/btf.c
-> > > > +++ b/kernel/bpf/btf.c
-> > > > @@ -8522,6 +8522,7 @@ static int bpf_prog_type_to_kfunc_hook(enum b=
-pf_prog_type prog_type)
-> > > >       case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
-> > > >       case BPF_PROG_TYPE_CGROUP_SOCKOPT:
-> > > >       case BPF_PROG_TYPE_CGROUP_SYSCTL:
-> > > > +     case BPF_PROG_TYPE_SOCK_OPS:
-> > > >               return BTF_KFUNC_HOOK_CGROUP;
-> > > >       case BPF_PROG_TYPE_SCHED_ACT:
-> > > >               return BTF_KFUNC_HOOK_SCHED_ACT;
-> > > > diff --git a/net/core/filter.c b/net/core/filter.c
-> > > > index 7f56d0bbeb00..3b4c1e7b1470 100644
-> > > > --- a/net/core/filter.c
-> > > > +++ b/net/core/filter.c
-> > > > @@ -12102,6 +12102,27 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(st=
-ruct __sk_buff *s, struct sock *sk,
-> > > >  #endif
-> > > >  }
-> > > >
-> > > > +__bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_=
-kern *skops,
-> > > > +                                           u64 flags)
-> > > > +{
-> > > > +     struct sk_buff *skb;
-> > > > +     struct sock *sk;
-> > > > +
-> > > > +     if (skops->op !=3D BPF_SOCK_OPS_TS_SND_CB)
-> > > > +             return -EOPNOTSUPP;
-> > > > +
-> > > > +     if (flags)
-> > > > +             return -EINVAL;
-> > > > +
-> > > > +     skb =3D skops->skb;
-> > > > +     sk =3D skops->sk;
-> > >
-> > > nit: not used
-> >
-> > BPF programs can use this in the future if necessary whereas the
-> > selftests don't reflect it.
->
-> How does defining a local variable help there?
+Le Fri, Feb 14, 2025 at 02:00:45PM -0800, Jakub Kicinski a écrit :
+> On Thu, 13 Feb 2025 21:38:12 +0100 Frederic Weisbecker wrote:
+> > > > Just to make sure I follow the netpoll issue. What would you like to fix
+> > > > in netpoll exactly?  
+> > > 
+> > > Nothing in netpoll, the problem is that netdevsim calls napi_schedule
+> > > from the xmit path. That's incompatible with netpoll. We should fix
+> > > netdevsim instead (unless more real drivers need napi-from-xmit to
+> > > work).  
+> > 
+> > Let me clarify, because I don't know much this area. If the problem is that xmit
+> > can't call napi_schedule() by design, then I defer to you. But if the problem is that
+> > napi_schedule() may or may not be called from an interrupt, please note that
+> > local_bh_enable() won't run softirqs from a hardirq and will instead defer to
+> > IRQ tail. So it's fine to do an unconditional pair of local_bh_disable() / local_bh_enable().
+> 
+> I don't know where this is in the code TBH, but my understanding is
+> that HW IRQs - yes, as you say it'd be safe; the problem is that 
+> we have local_irq_save() all over the place. And that is neither
+> protected from local_bh_enable(), not does irq_restore execute softirqs.
 
-Sorry, I didn't state it clearly. I meant you're right, for now it is
-useless, but for the future... Right, I will remove it.
+Yeah actually checking local_bh_enable() again, it's not safe to call within
+a hardirq. Ok I've been thinking some more and how about this instead?
 
->
-> > >
-> > > > +     skb_shinfo(skb)->tx_flags |=3D SKBTX_BPF;
-> > > > +     TCP_SKB_CB(skb)->txstamp_ack |=3D TSTAMP_ACK_BPF;
-> > > > +     skb_shinfo(skb)->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - =
-1;
-> > >
-> > > Can this overwrite the seqno previously calculated by tcp_tx_timestam=
-p?
-> >
-> > seqno? If you are referring to seqno, I don't think the BPF program is
-> > allowed to modify it because SOCK_OPS_GET_OR_SET_FIELD() only supports
-> > overwriting sk_txhash only. Please see sock_ops_convert_ctx_access().
->
-> I meant tskey
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c0021cbd28fc..2419cc558a64 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4692,7 +4692,7 @@ static inline void ____napi_schedule(struct softnet_data *sd,
+ 	 * we have to raise NET_RX_SOFTIRQ.
+ 	 */
+ 	if (!sd->in_net_rx_action)
+-		__raise_softirq_irqoff(NET_RX_SOFTIRQ);
++		raise_softirq_irqoff(NET_RX_SOFTIRQ);
+ }
+ 
+ #ifdef CONFIG_RPS
 
-It 'overwrites' the tskey here if the socket timestamping feature is
-also on. But the seqno and len would not change during the gap between
-tcp_tx_timestamp() and bpf_sock_ops_enable_tx_tstamp(), I think? If
-the seq and len doesn't change, then the tskey will not be truly
-overwritten with a different value. Unless you probably expect to see
-this:
 
-if (!skb_shinfo(skb)->tskey)
-        skb_shinfo(skb)->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
-?
+This will simply wake up ksoftirqd if called from a non-IRQ. I expect such
+callers to be rare enough to not impact performances and it has the advantage
+to work for everyone.
 
-From my perspective, the final result is the same :)
-
-Thanks,
-Jason
+Thanks.
 
