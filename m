@@ -1,78 +1,53 @@
-Return-Path: <netdev+bounces-166651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFCFA36C4A
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 07:05:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E38EEA36C50
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 07:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06D131714DC
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 06:05:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21DD63B2222
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 06:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A8F197A7A;
-	Sat, 15 Feb 2025 06:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC13B1624FE;
+	Sat, 15 Feb 2025 06:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="x7OeW8F8"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="hmpAlHPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp175.webpack.hosteurope.de (wp175.webpack.hosteurope.de [80.237.132.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C08158851
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 06:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB6B623
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 06:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.132.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739599507; cv=none; b=AL3Lt65/R/i3Sj+HdOe0VvDmEl5AUhm8v/R/mZub22l4JvvYn+IYP5WgYNrOo2kodtQrnVF3d/Stnzwg7nIImbu3H4wcB/WdlMjm6FAIGErxuR3O+K3v691N83Vl4bD+iy2Py8SFiha9EBx8nXEAatra0Mo88OWj82dJVB87VY8=
+	t=1739600995; cv=none; b=hlQEXKV2ENadCpoVgx4KPoknw+uUzRC47K3KP4HUvWKnpT4rHua129btOLLj8+wPX6EDA0NVeXTBkHl3ACdb6/BmrOuOBOvY6OM2IBmLzxQp05w28XJhk7F5TWHwOHMeuQ39v++v5x+p2tsTVmd7fgMzIa8cchwz7q44sBVky4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739599507; c=relaxed/simple;
-	bh=p2c/thFQqA2f6zTlTTsMJKHXAHt05q1wXjQfa65msec=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Yjd3WPa1hXu0ykUs4gOQZ3/JGIUIT6yZNf5HOcBLLn5eArrjpwhRe0sd6W4Vf0RWUwBR0rzcoR3ZsCav8bYCRqcpJGfSzbgBAFmgBL9aa8wUY1leAfnl98Cj0bnh7fWT5jIz+GWCRMFe9Ks/KTA1pV90Ui4c2Q4rJmkCZG0mGjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=x7OeW8F8; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fa48404207so5627863a91.1
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 22:05:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1739599504; x=1740204304; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0i3rAU9TgZ1Zz0MhhHSh60Ea+b9QKMgq4pEb6ogGOM=;
-        b=x7OeW8F8cHXPOmNKa5BDOs9TMpvoH82pn80WeUfnVZFVeZtGU4BgrQPHWWPTvJC20q
-         fv+MQsmOJ4RBGGVEjGxl9rwZQWyaxxv1ZnsgvfgtOrvJOGNbAuPdxmyfUGZFrWuEsHRu
-         Oyom0RKU4G3Y27+PQBJCvoajytSynTfHtsDEvsG6/nuuk5I0RRUPc9DLfa6S86kMugAE
-         bqaymOjMH2Er+YQb2A19Rgmux1Y9Ks3YkY2J1VVLw1GM9A84Y2ghxilqENljEvy4/h84
-         DXF0fv4xiOOIqkikEyMWeBv+uA3Lzc/GYi4i07JEH3KnpFKrBxwZ6Z4tDAdq4LjwFTks
-         fS+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739599504; x=1740204304;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M0i3rAU9TgZ1Zz0MhhHSh60Ea+b9QKMgq4pEb6ogGOM=;
-        b=I5cWJ7qLOTsy6KiECxzry5K3KF5INBQPa/1Vya5jWZ8F0EATGN2H2oq2dWN6ivJ/Dq
-         WangH/sHJV+Z8+a8SBhwHcePwokTvTb+G9dEdq098VBUGgGzDc75nbACIHWhQvI/3mMB
-         eWY29ipBflKhBt+pHgnzZFY2VVOL48+jcc3OU/MP/cnztMV8AbKiTt0tkWBcN4efUZAl
-         TihUia+7wO36TVTv0j3yduZJBWHTxdnAiEbPP1gARaL7zefQ1SUASNitieLfi0Fbru5p
-         2vY/nHnNUrE0iI2t8wUu99gvEmUtzcAUodxJlU2VSIEfhxcLghKJ5w5JC077Hs95xKiP
-         c67A==
-X-Forwarded-Encrypted: i=1; AJvYcCU1B0MKRnrUuvkxsPdbvSUaLO5jlipTfMlSOemeJ4JUji0tYssmBUX0a/EooRWhPftZFsCPiFA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxapJ/S+qH+2edZ4YG8/fXjJeBUjxOQXx2f7Ucm7PnxD9ZQQy3
-	8hyg2A9+2iSe05DVcBHboVMnhkBFrIJVdcoD5vYEscphx9LAg317ZjzHATVENRc=
-X-Gm-Gg: ASbGncvkMroIW5TXqisSo5IfICzQQsjmttpJRZ2rwwNbBP+8CRRQ29j9LPWgvYn0v26
-	HQgir9JdNQdRJQJDzhn7vkSjPldk56DmciWbx4T62VIZ4H/EvUHP3vAieLBADR/qGNQ2NxbXDpL
-	p8xbsMlrk00qpwWrs6nQG6LQCamUjnCk11EO+VhXVMM2vc3hQWv2l5DifvmO8A/fWAJbOCDMrGK
-	y1NUM8SvhitkQx9aJI0ZychM4vzi4QTAbztQ2ESVgX7eJEop5ukiuFeZZnjXdq/inO1VFu2zXNf
-	t78I32dvXQfosiZlTp4=
-X-Google-Smtp-Source: AGHT+IFsNJehBsouPtXrJ7NS9YGEa4MnrstGirWvcWdd4oXF0UxNUAuboQan1xDS6hUFV2zvLI2IVw==
-X-Received: by 2002:a05:6a00:21d5:b0:730:74f8:25c8 with SMTP id d2e1a72fcca58-732617bfb2cmr3520739b3a.11.1739599504057;
-        Fri, 14 Feb 2025 22:05:04 -0800 (PST)
-Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7324276169fsm4215019b3a.140.2025.02.14.22.04.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 22:05:03 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Sat, 15 Feb 2025 15:04:50 +0900
-Subject: [PATCH net-next v2] tun: Pad virtio headers
+	s=arc-20240116; t=1739600995; c=relaxed/simple;
+	bh=sJBNkEjzKUaWqxdX+4sZCeuQ/JUD3ox6Y18TbzEEt9M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mLIYid0njLSDkUCGDKUvT9J8ZR3GeRiiDsKPOzPzBPlS9Zc56wVWZDJB/2N1VzdB7PUJ4+smpr2iE9SRFl39npyDb88SPLtydRHwMlw2eSQwAsqyyGicPDmtneZkBk8qo5TiBt/jKI/vobGE81k6MMUSZndWoMPruyXUzNtZiNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=hmpAlHPh; arc=none smtp.client-ip=80.237.132.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=birger-koblitz.de; s=he134867; h=Cc:To:Message-Id:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:Subject:Date:From:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=76YxnghdWiJ3guDKU0QmXTCQgZm0lERENJX6P9Q7Cag=; t=1739600993; x=1740032993; 
+	b=hmpAlHPhxTQDMDQEkZ6h4aMjbSdvYV0DcCNmUl+lNvTbcz68CFkk/TElAU/0Z8GzRJfIlIkASW5
+	KXdbp+BQB5VSug8IA/Su0KWwYxBDDrIi2mAh3s9U46dk5nHV/YUIp/R0QxL9xiMNVJblaqqgM+yc/
+	qrmM4PdakYqP5hnrpjKlBT1MUY/CP5YfeYFcPcLEoDx3dIV+pZigjRP05nTYL2Ri0xt7qmPCqUSni
+	UJ3U3Pi0CG5SI/Mhu/cwXSr+GS3oHbqD87BB0t/GWk3lWdXtBKulrIxcFPNHax+EdLAZXBm6gBA5J
+	0J5TWAS9t55bZEw/j5hyuePEnjI1eD8NTK/A==;
+Received: from [2a00:6020:47a3:e800:b302:277d:cae8:fbde] (helo=AMDDesktop.lan); authenticated
+	by wp175.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1tjBgO-00EL1P-2H;
+	Sat, 15 Feb 2025 07:29:44 +0100
+From: Birger Koblitz <mail@birger-koblitz.de>
+Date: Sat, 15 Feb 2025 07:29:44 +0100
+Subject: [PATCH net-next] net: sfp: add quirk for 2.5G OEM BX SFP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,108 +56,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250215-buffers-v2-1-1fbc6aaf8ad6@daynix.com>
-X-B4-Tracking: v=1; b=H4sIAIEusGcC/z2Oyw6DIBBFf8XMujQMvqqr/kfjAnGoLIotoNEY/
- 72ENi5v7twzZwdPzpCHNtvB0WK8mWwM4pKBGqV9EjNDzCC4KDlixfpZa3KeNRVh0Wsucq0gXr8
- dabMm0gMsBWZpDdD9GkefOaLDvz7J8REXBYqcszBbVkUml0XTc1W3S5XWo/FhclsSXDDNk4vA/
- HRZkCEjVUh+E9iUtbwPcrNmvarpBd1xHF+oDfLB5wAAAA==
-X-Change-ID: 20250116-buffers-96e14bf023fc
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- devel@daynix.com
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-Id: <20250215-lkmsub-v1-1-1ffd6ae97229@birger-koblitz.de>
+X-B4-Tracking: v=1; b=H4sIAFc0sGcC/x3MQQqAIBBA0avErBNMErKrRIvMqYbKwrEQorsnL
+ R98/gOMgZChLR4IeBPT4TOqsoBxGfyMglw2KKm0VJUW27rzZYUzRrvG4lRLCTk+A06U/lEHHqP
+ wmCL07/sBwimyK2IAAAA=
+X-Change-ID: 20250215-lkmsub-d995d8bef400
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>, 
+ Daniel Golle <daniel@makrotopia.org>
 X-Mailer: b4 0.14.2
+X-bounce-key: webpack.hosteurope.de;mail@birger-koblitz.de;1739600993;cbca1cc7;
+X-HE-SMSGID: 1tjBgO-00EL1P-2H
 
-tun simply advances iov_iter when it needs to pad virtio header,
-which leaves the garbage in the buffer as is. This will become
-especially problematic when tun starts to allow enabling the hash
-reporting feature; even if the feature is enabled, the packet may lack a
-hash value and may contain a hole in the virtio header because the
-packet arrived before the feature gets enabled or does not contain the
-header fields to be hashed. If the hole is not filled with zero, it is
-impossible to tell if the packet lacks a hash value.
+The OEM SFP-2.5G-BX10-D/U SFP module pair is meant to operate with
+2500Base-X. However, in their EEPROM they incorrectly specify:
+Transceiver codes   : 0x00 0x12 0x00 0x00 0x12 0x00 0x01 0x05 0x00
+BR, Nominal         : 2500MBd
 
-In theory, a user of tun can fill the buffer with zero before calling
-read() to avoid such a problem, but leaving the garbage in the buffer is
-awkward anyway so replace advancing the iterator with writing zeros.
+Use sfp_quirk_2500basex for this module to allow 2500Base-X mode anyway.
+Tested on BananaPi R3.
 
-A user might have initialized the buffer to some non-zero value,
-expecting tun to skip writing it. As this was never a documented
-feature, this seems unlikely.
-
-The overhead of filling the hole in the header is negligible when the
-header size is specified according to the specification as doing so will
-not make another cache line dirty under a reasonable assumption. Below
-is a proof of this statement:
-
-The first 10 bytes of the header is always written and tun also writes
-the packet itself immediately after the packet unless the packet is
-empty. This makes a hole between these writes whose size is: sz - 10
-where sz is the specified header size.
-
-Therefore, we will never make another cache line dirty when:
-sz < L1_CACHE_BYTES + 10
-where L1_CACHE_BYTES is the cache line size. Assuming
-L1_CACHE_BYTES >= 16, this inequation holds when: sz < 26.
-
-sz <= 20 according to the current specification so we even have a
-margin of 5 bytes in case that the header size grows in a future version
-of the specification.
-
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 ---
-Changes in v2:
-- Dropped the code to set num_buffers to 1.
-- Incorporated a grammatical improvement suggested by Michael S.
-  Tsirkin.
-- Added an explanation of this patch's risk suggested by Michael S.
-  Tsirkin.
-- Noted that it will not make another cache line dirty.
-- Added an error check.
-- Link to v1: https://lore.kernel.org/r/20250213-buffers-v1-1-ec4a0821957a@daynix.com
----
- drivers/net/tun_vnet.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/phy/sfp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-index fd7411c4447ffb180e032fe3e22f6709c30da8e9..58b9ac7a5fc4084c789fe94fe36b5f8631bf1fa4 100644
---- a/drivers/net/tun_vnet.h
-+++ b/drivers/net/tun_vnet.h
-@@ -143,7 +143,8 @@ static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
- 	if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr)))
- 		return -EFAULT;
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 7dbcbf0a4ee26a221e9c47a6f030c8a18317bdbb..9369f5297769493efcab0ed4c356245baa1aa248 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -515,6 +515,8 @@ static const struct sfp_quirk sfp_quirks[] = {
  
--	iov_iter_advance(iter, sz - sizeof(*hdr));
-+	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-+		return -EFAULT;
- 
- 	return 0;
- }
+ 	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
++	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
++	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
 
 ---
-base-commit: f54eab84fc17ef79b701e29364b7d08ca3a1d2f6
-change-id: 20250116-buffers-96e14bf023fc
-prerequisite-change-id: 20241230-tun-66e10a49b0c7:v6
-prerequisite-patch-id: 871dc5f146fb6b0e3ec8612971a8e8190472c0fb
-prerequisite-patch-id: 2797ed249d32590321f088373d4055ff3f430a0e
-prerequisite-patch-id: ea3370c72d4904e2f0536ec76ba5d26784c0cede
-prerequisite-patch-id: 837e4cf5d6b451424f9b1639455e83a260c4440d
-prerequisite-patch-id: ea701076f57819e844f5a35efe5cbc5712d3080d
-prerequisite-patch-id: 701646fb43ad04cc64dd2bf13c150ccbe6f828ce
-prerequisite-patch-id: 53176dae0c003f5b6c114d43f936cf7140d31bb5
+base-commit: 9946eaf552b194bb352c2945b54ff98c8193b3f1
+change-id: 20250215-lkmsub-d995d8bef400
 
 Best regards,
 -- 
-Akihiko Odaki <akihiko.odaki@daynix.com>
+Birger Koblitz <mail@birger-koblitz.de>
 
 
