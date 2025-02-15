@@ -1,147 +1,131 @@
-Return-Path: <netdev+bounces-166714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009CFA37050
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 20:04:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C83A37064
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 20:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B48B8188B6F0
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 19:04:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E431891475
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 19:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ADC1F37BA;
-	Sat, 15 Feb 2025 19:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995B21F4163;
+	Sat, 15 Feb 2025 19:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOSb0Y5r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOqyZZj/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF451624D3;
-	Sat, 15 Feb 2025 19:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A861A9B58;
+	Sat, 15 Feb 2025 19:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739646272; cv=none; b=cbxYigX5iULanDMi+VNTLAJg4CJh9lP/xZHkRL0Gt/VJP/EWjvb9neHBvL8N+pjgjjYlSVv8Y3Z1J7X5nBry6i7PEkRvq2PQqCScvPNWKo578SJWuU53HcaDAp9U1HFqzQSl0P8nG+4F60joaB3k4rxoDUwcvUkq0RWl+MiU1Uk=
+	t=1739647780; cv=none; b=Q8gX2zyuYP//F017zYnC2Z9sBK2zPL47/IUgJQHgenr/hRL7ZM2zEX7gBqPjORHSzjusTRpEWbNIgswkdeyEq2OKNgiw+hxpy31ADsFFwAvPVloFBzkAW4+7mKdeiZqksEwBdj0xRzPLMITrV6coowUSvrtnLfoCxtbji8fmHrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739646272; c=relaxed/simple;
-	bh=Df2b8aVgJjFNJGQ3bD+jOZ3m5M4kbFV5KsneEFnbz1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G+gBBUtfdQ8MrKOfJZ+eIzWUhUgdlEc1M8VZevXxJytlxkUYDM16zknFq0FoD0S1ZTH9BqXitA3haaL8D+0/V3GtvQzgY2Bzkybwa7mr6dTuxjiaPKyyrVfF5+fHANtXmKk8vBo4ZbNIFF7IRhYe5tr0G5vF3Ul3sq5RPcQdONI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOSb0Y5r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D038CC4CEDF;
-	Sat, 15 Feb 2025 19:04:29 +0000 (UTC)
+	s=arc-20240116; t=1739647780; c=relaxed/simple;
+	bh=ehjLwgwM1t69iI6E6+1h4fWJ2pSx2/m/NQW5hQlky4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sZTzXEOuhie0ynRr2zkPIWAZmstlOad3oyLOJg7brU4cTAmIEUthWrN7it5eqnA4vfeD5+i+vLzZg+niNew3oAn7I/ehkW6uBEqwfNTnz9j0yfKbBClezQUlWmKpcFyLqnB5Xa37jyVlossJ04UcPQ+hkks2EY+7brLdipjsCXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOqyZZj/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0CFC4CEDF;
+	Sat, 15 Feb 2025 19:29:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739646271;
-	bh=Df2b8aVgJjFNJGQ3bD+jOZ3m5M4kbFV5KsneEFnbz1Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HOSb0Y5rS2c+iF55klymj6B0z0P3nkofcNiCgsMP5plndlLE+6Ux2rzZK9kiCXW0A
-	 8Xv9r5UvZhELq5KpOx3B3v+yWB5mCSwHcqK5aJtn5i9hYLs9s/hOsJ+NSMtxlU6Qzl
-	 SAmAb3QN87QQ4fNEWxSaL0jt3Bc2P5Unl9V11YdJZrVbuWkOxjDpNQv8aOVjjCDGEk
-	 BRrau+nibXXPqTvtcM4xYrX6rwfHPAQUZu1Sr7G6uCXWbwx3ZmngcvJqZYiyb0h0rq
-	 WO1T/S5i1kzxfiA2YYuU0zPyax6bsKZ3H6dUECjmFG8VpVNYCdjH2uRurDUOBQw58t
-	 V3Llh8KYjzaug==
-Date: Sat, 15 Feb 2025 11:04:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, Florian Bezdeka
- <florian.bezdeka@siemens.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>, Magnus
- Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Joe Damato
- <jdamato@fastly.com>, Stanislav Fomichev <sdf@fomichev.me>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mina Almasry <almasrymina@google.com>, Daniel
- Jurgens <danielj@nvidia.com>, Andrii Nakryiko <andrii@kernel.org>, Eduard
- Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Martin
- KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose
- Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Faizal Rahim
- <faizal.abdul.rahim@linux.intel.com>, Choong Yong Liang
- <yong.liang.choong@linux.intel.com>, Bouska Zdenek
- <zdenek.bouska@siemens.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
- xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v10 1/5] xsk: Add launch time hardware offload
- support to XDP Tx metadata
-Message-ID: <20250215110428.68f25c5e@kernel.org>
-In-Reply-To: <20250215110159.0c1888ae@kernel.org>
-References: <20250207021943.814768-1-yoong.siang.song@intel.com>
-	<20250207021943.814768-2-yoong.siang.song@intel.com>
-	<20250215110159.0c1888ae@kernel.org>
+	s=k20201202; t=1739647780;
+	bh=ehjLwgwM1t69iI6E6+1h4fWJ2pSx2/m/NQW5hQlky4Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SOqyZZj/6kaTgkoyRaSBLMkEf8t/HOsFy5n/BwQu/S8iSLlwwxv6GIW6enPOFSspd
+	 tjulUo7ckzOFqTrhC2L6V8oTuOPa7/d2QraO3FXiIuUcXroVIO7m19mY3QTti2d1r1
+	 Per0q5mHQyJ+o8VM+kuHJcgxZTnbjRrBDSii4fyxBR6QY963nCQN33VpGaXWaX4unX
+	 5wZXByBs1xS6PpXwMg740spgBWodKwE2fZ6/jWFxDFw+t4SCx5UCYpqfLwDGt6vLQl
+	 AXR5lN1Ry5NAW2bRNiBUmMfTRYa50AOOsw8xWD2SaxTCF7MpbVVwTx6h+CILnXSO7e
+	 lAIvsFK8A3taA==
+Date: Sat, 15 Feb 2025 19:29:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shahar Shitrit <shshitrit@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
+ event message
+Message-ID: <20250215192935.GU1615191@kernel.org>
+References: <20250213094641.226501-1-tariqt@nvidia.com>
+ <20250213094641.226501-5-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213094641.226501-5-tariqt@nvidia.com>
 
-On Sat, 15 Feb 2025 11:01:59 -0800 Jakub Kicinski wrote:
-> On Fri,  7 Feb 2025 10:19:39 +0800 Song Yoong Siang wrote:
-> > Extend the XDP Tx metadata framework so that user can requests launch time
-> > hardware offload, where the Ethernet device will schedule the packet for
-> > transmission at a pre-determined time called launch time. The value of
-> > launch time is communicated from user space to Ethernet driver via
-> > launch_time field of struct xsk_tx_metadata.  
+On Thu, Feb 13, 2025 at 11:46:41AM +0200, Tariq Toukan wrote:
+> From: Shahar Shitrit <shshitrit@nvidia.com>
 > 
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Previously, a temperature event message included a bitmap indicating
+> which sensors detect high temperatures.
+> 
+> To enhance clarity, we modify the message format to explicitly list
+> the names of the overheating sensors, alongside the sensors bitmap.
+> If HWMON is not configured, the event message remains unchanged.
+> 
+> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Sorry, I take that back, you haven't regenerated the code after
-renaming the flag:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index fc0aa971d276..b97ff8bbb0c6 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -59,13 +59,13 @@ enum netdev_xdp_rx_metadata {
-  *   by the driver.
-  * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-  *   driver.
-- * @NETDEV_XSK_FLAGS_LAUNCH_TIME: Launch Time HW offload is supported by the
-- *   driver.
-+ * @NETDEV_XSK_FLAGS_TX_LAUNCH_TIME_FIFO: Launch time HW offload is supported
-+ *   by the driver.
-  */
- enum netdev_xsk_flags {
-        NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
-        NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
--       NETDEV_XSK_FLAGS_LAUNCH_TIME = 4,
-+       NETDEV_XSK_FLAGS_TX_LAUNCH_TIME_FIFO = 4,
- };
- 
- enum netdev_queue_type {
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index fc0aa971d276..b97ff8bbb0c6 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -59,13 +59,13 @@ enum netdev_xdp_rx_metadata {
-  *   by the driver.
-  * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-  *   driver.
-- * @NETDEV_XSK_FLAGS_LAUNCH_TIME: Launch Time HW offload is supported by the
-- *   driver.
-+ * @NETDEV_XSK_FLAGS_TX_LAUNCH_TIME_FIFO: Launch time HW offload is supported
-+ *   by the driver.
-  */
- enum netdev_xsk_flags {
-        NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
-        NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
--       NETDEV_XSK_FLAGS_LAUNCH_TIME = 4,
-+       NETDEV_XSK_FLAGS_TX_LAUNCH_TIME_FIFO = 4,
- };
- 
- enum netdev_queue_type {
+...
+
+> +#if IS_ENABLED(CONFIG_HWMON)
+> +static void print_sensor_names_in_bit_set(struct mlx5_core_dev *dev, struct mlx5_hwmon *hwmon,
+> +					  u64 bit_set, int bit_set_offset)
+> +{
+> +	unsigned long *bit_set_ptr = (unsigned long *)&bit_set;
+> +	int num_bits = sizeof(bit_set) * BITS_PER_BYTE;
+> +	int i;
+> +
+> +	for_each_set_bit(i, bit_set_ptr, num_bits) {
+> +		const char *sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
+> +
+> +		mlx5_core_warn(dev, "Sensor name[%d]: %s\n", i + bit_set_offset, sensor_name);
+> +	}
+> +}
+
+nit:
+
+If you have to respin for some other reason, please consider limiting lines
+to 80 columns wide or less here and elsewhere in this patch where it
+doesn't reduce readability (subjective I know).
+
+e.g.:
+
+static void print_sensor_names_in_bit_set(struct mlx5_core_dev *dev,
+                                          struct mlx5_hwmon *hwmon,
+                                          u64 bit_set, int bit_set_offset)
+{
+        unsigned long *bit_set_ptr = (unsigned long *)&bit_set;
+        int num_bits = sizeof(bit_set) * BITS_PER_BYTE;
+        int i;
+
+        for_each_set_bit(i, bit_set_ptr, num_bits) {
+                const char *sensor_name;
+
+                sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
+
+                mlx5_core_warn(dev, "Sensor name[%d]: %s\n",
+                               i + bit_set_offset, sensor_name);
+        }
+}
+
+...
 
