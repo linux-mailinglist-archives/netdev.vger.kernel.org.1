@@ -1,144 +1,94 @@
-Return-Path: <netdev+bounces-166688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E45CDA36F65
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:21:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCDAA36F6E
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 341333A5432
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 636DC170F83
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECDB1DFD89;
-	Sat, 15 Feb 2025 16:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAxUNaQL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECBD1E5B77;
+	Sat, 15 Feb 2025 16:22:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FD41624E8;
-	Sat, 15 Feb 2025 16:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5961DE2C7
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 16:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739636467; cv=none; b=jYBmbyvD/oV4QloTjlmHplnrjPd/J7QP7QkBCFdTguSiG7HGKKIH58Sh/EKn2K7K5B7kS17fN1zA7KUV9CW69F/VzqlMQ2l1xNqq2aii3fNHbsJgmj21C/WzpnEXH92P1OnFdoM8Qwz6RYSxe8cGjtr6x75ev+WkUDznVHTZok8=
+	t=1739636523; cv=none; b=bQgvHx+C/RvchC0ycb0Fnl5PixAxz2E4/v6SGqVYhiRv9WtbKbr5ByNnqF5lPzgiQLlDf8lVAJeajQk9QlrcZeGZHAZ9xkAz4/sVy3SvvbWyfrXWiFnqWk0XDAQoCP/EUwwM4I5YbjxQCH8//tX/GuLT3NwyYaL+R04Qom3fR8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739636467; c=relaxed/simple;
-	bh=oMr9kLTfKManm/UUrjsm3ZodbEL/TxRtX0uLcVKFAno=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FQjXnUPbi13XZV5jmUw8vNeNqLTqePsnvSw12HcTTl5YEhuNqDsx6p8wgD4JrP+TvIHjrMdD47IzMCzsLLpSt56NTcRCLDhy+26C5Q5+4HrzWfMYDtEuUYo0XZKOOOKlSIG3o1kpt3MfB46cqhTWuL6AmFUqysB/Mf2GBipCuJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAxUNaQL; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d19d214f0aso14045635ab.1;
-        Sat, 15 Feb 2025 08:21:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739636465; x=1740241265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oMr9kLTfKManm/UUrjsm3ZodbEL/TxRtX0uLcVKFAno=;
-        b=QAxUNaQL4RCc1kQnYaQDr+YgB82wpytu0gcVomDDQN/SGfVsDjaYhD7tU1d3af5Er2
-         lQVyokFic3KDJ5A2gVdGWpv9bUMYz63Jat2yjccSTsGLMDWcvhixogHOWni9KACvS0fs
-         eJc/71Ya1VwBcP4gnq1lDGn9VEdxR1F050oWz9JeSQBGcOENXk3kL3usEAgEcxaGkHHu
-         besvmAL+yZWxyjGRXev0Yt7+lNpfb5j8kRzaJOiHVqR9aLPvZ55pYaTrIXFB17AGLpXw
-         P1a8cqk/FB+64P0KwZD6rStNEdMw/HiTuP6NqU3M34XiWQyqALGjqhj8H+RUqGAl2g3d
-         PUZw==
+	s=arc-20240116; t=1739636523; c=relaxed/simple;
+	bh=IG/5jApV2sOSl8a3GEyu/nbUQiVzZuOltqY088VSr6s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=kd8FssznRUnBTc51IeeOz6cjoz813QUU9+1vtNOeyXlnnbnAoRT/dlLlEa+j/BzTYnCM1nzXTm9wcjYL9D6j3EP7dYrw9we9rnCilLkHz/+hq1PACN+2R4uoCUpvhCmcXS1FPr7PRWMvc+XZl2OY40NOoCLB1SXJ69AOHu+AtXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8556ffa0a99so133528539f.0
+        for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 08:22:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739636465; x=1740241265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oMr9kLTfKManm/UUrjsm3ZodbEL/TxRtX0uLcVKFAno=;
-        b=vVhx4nxFsTJZB+PYZDcz7YJS3RCFcpqeGGeclEJmprSrX+7ZKsMjETJ+fBFi2Z2f47
-         sLJfdshRlL3xc6hO0yCFGBYzkQKtE/Sjs4CHWdgEKAX0KrK6o9Mc8ZcBOKvBCUjnp4Xv
-         pJ2b4HMDnnfUKN+ry95gl7T+NDRyaXmeEjE3vQJ9Tzg9LihZi15hWirayo7OzQrT5eHw
-         eqGDsHmnlqlSGK9nhcIt8425eNPbWWGdGD883gvHTU28yQdaLFDNIbg7Eof5aF+b+K5h
-         4d8Blp8NSHvgXaRZLet01nRalDKHQn1RPSNsBs7NPCKodSICduSFv3J6PgJ+9hHhnYFO
-         qAQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6iyyBbFmolpgwUUVh+oaNPHcF0KJmBDMGjnXbTq9drkxvoTa9tcwC6G3o+oIdgGch3aM/tH92@vger.kernel.org, AJvYcCVXDpdGGrYlqawtBpX7CYhpJ/+ppu024fY6Bm1ye/x7mpv/bmv53bS3vQIXPUY6Zo05hkk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIi+4F+IRDM/kLI92nrswyn/gPIzI8W96qN7fPsWY1JyT84c0u
-	g+0epvaytnr6j0mZNA9yXcgVT+2IJS40e5fubJK1PDUfsqiEnyLD0tcfo1rlOfJnD/9g+JYgirW
-	G0OzgtY3vf/d29eSP0INrRvwujaQ=
-X-Gm-Gg: ASbGncufk2QbRA5GEQu6QK33SDrVj4+CTx9jaJsJb1EsfiKqdMOInyiCBue0iG54QGv
-	7isVpdxCnTQ2LwrXnzdxrP++VQPwiULw4jPRzU8as+X8lv6wJv4OHYksWzgn0nSbTUjzKlD8=
-X-Google-Smtp-Source: AGHT+IEwxonViDBiv+JKCboR3HbTQrNJhUhbqCDu+zTz3kVlvjWyn66IxEBTvkdyBc0w8yNdJncMfbdN/FBhEh1Ai8c=
-X-Received: by 2002:a05:6e02:20cd:b0:3d1:980a:6a7c with SMTP id
- e9e14a558f8ab-3d2807bc6f0mr27639655ab.8.1739636465303; Sat, 15 Feb 2025
- 08:21:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739636521; x=1740241321;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s0qTm4qCvLRYalG9z/HrHmtBGe5kHsJD0r/taF4MuuQ=;
+        b=anleQd6sha/bCN8ptzGC3idz9Btqg/anGi3gecMgPnoSEsDpk/KDG4kY0/wMnG4Q+Q
+         e2GEY03PUeFexXSX+0vWMblVCQZVUH8nO8BhpRFId/+dLhowUgnkgYPWZ+jCvH+SSwKj
+         yyUHq6gwj56JK1Pw94P2zL5eMvpj5xCInfDWn7kFETKz+XCp4H2b3KjcCsSdyf5dBOWY
+         D25tj8+NSFSQR4SxX381rvxb3xBAVPyJ6HdvHokTWwjCy51TsvqWSgs7nKrPqV68AvOv
+         qTAEu2H4XLfhP3TTNY/17PT0a4encEIa22CNsaxW5j3xRIfVo/NRbpKqDHE83NgvWvpr
+         VwLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/CblQrhrrwy/8OwSXdqo43gZ9QagM0gWQhBaeD4KhvCBUcm/foI7TsIZh838vlSiEqmpbfEw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIg00ELBon7rn2dLjEUccvzWsD62PSKFEu7ET/5FnFm+yr1+QU
+	btWyRLpYi8OTiwzfWSzrvKbbnobUeRsIyC1hTA/is0MAwjutDY/LnLAYDE50ITFd4UYW9cYuNC5
+	ToA+tYQvwn+wBKXgUiB2ic8sXbyuTg4kY65LhaIO25Ot5/doja3Hxq3Y=
+X-Google-Smtp-Source: AGHT+IHRq8GM6tfXpOlFN58zTXBcLQBL4mQaH5rBniMTJZY2Z7rN/MmFFcpQeaxnOqe9pRomS/ZoliUh7/cmnvphsSIgdzUvAVrp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214010038.54131-1-kerneljasonxing@gmail.com>
- <20250214010038.54131-9-kerneljasonxing@gmail.com> <67b0ad8819948_36e344294a7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67b0ad8819948_36e344294a7@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 16 Feb 2025 00:20:29 +0800
-X-Gm-Features: AWEUYZkdJ3ieNrvQt5iWntR9Wf2OZXPKTe-qJr__MQQy5tegpJ61qdsaB1qVW_4
-Message-ID: <CAL+tcoAJHSfBrfdn-Cmk=9ZkMNSdkGYKJbZ0mynn_=qU9Mp1Ag@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v11 08/12] bpf: add BPF_SOCK_OPS_TS_HW_OPT_CB callback
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:12c3:b0:3d1:946c:e69b with SMTP id
+ e9e14a558f8ab-3d28078ed3fmr19259425ab.8.1739636521714; Sat, 15 Feb 2025
+ 08:22:01 -0800 (PST)
+Date: Sat, 15 Feb 2025 08:22:01 -0800
+In-Reply-To: <67afa09f.050a0220.21dd3.0054.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b0bf29.050a0220.6f0b7.0010.GAE@google.com>
+Subject: Re: [syzbot] [kernfs?] [bcachefs?] UBSAN: shift-out-of-bounds in radix_tree_delete_item
+From: syzbot <syzbot+b581c7106aa616bb522c@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	gregkh@linuxfoundation.org, horms@kernel.org, kent.overstreet@linux.dev, 
+	kuba@kernel.org, linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tj@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 15, 2025 at 11:06=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > Support hw SCM_TSTAMP_SND case for bpf timestamping.
-> >
-> > Add a new sock_ops callback, BPF_SOCK_OPS_TS_HW_OPT_CB. This
-> > callback will occur at the same timestamping point as the user
-> > space's hardware SCM_TSTAMP_SND. The BPF program can use it to
-> > get the same SCM_TSTAMP_SND timestamp without modifying the
-> > user-space application.
-> >
-> > To avoid increasing the code complexity, replace SKBTX_HW_TSTAMP
-> > with SKBTX_HW_TSTAMP_NOBPF instead of changing numerous callers
-> > from driver side using SKBTX_HW_TSTAMP. The new definition of
-> > SKBTX_HW_TSTAMP means the combination tests of socket timestamping
-> > and bpf timestamping. After this patch, drivers can work under the
-> > bpf timestamping.
-> >
-> > Considering some drivers doesn't assign the skb with hardware
-> > timestamp,
->
-> This is not for a real technical limitation, like the skb perhaps
-> being cloned or shared?
+syzbot has bisected this issue to:
 
-Agreed on this point. I'm kind of familiar with I40E, so I dare to say
-the reason why it doesn't assign the hwtstamp is because the skb will
-soon be destroyed, that is to say, it's pointless to assign the
-timestamp.
+commit 14152654805256d760315ec24e414363bfa19a06
+Author: Kent Overstreet <kent.overstreet@linux.dev>
+Date:   Mon Nov 25 05:21:27 2024 +0000
 
->
-> > this patch do the assignment and then BPF program
-> > can acquire the hwstamp from skb directly.
->
-> If the above is not the case and it is safe to write to the skb_shinfo,
-> and only if respinning anyway, grammar:
+    bcachefs: Bad btree roots are now autofix
 
-From what I've known about various drivers (although very limited),
-it's safe to do the assignment.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=152659a4580000
+start commit:   09fbf3d50205 Merge tag 'tomoyo-pr-20250211' of git://git.c..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=172659a4580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=132659a4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c516b1c112a81e77
+dashboard link: https://syzkaller.appspot.com/bug?extid=b581c7106aa616bb522c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11e449b0580000
 
->
-> s/doesn't/don't/
-> s/do/does/
+Reported-by: syzbot+b581c7106aa616bb522c@syzkaller.appspotmail.com
+Fixes: 141526548052 ("bcachefs: Bad btree roots are now autofix")
 
-Thanks for catching these things. If the re-spin is necessary, I will
-fix them all for sure.
-
-Thanks,
-Jason
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
