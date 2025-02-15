@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-166625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2BA5A3699A
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:14:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B727FA369A3
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524BE17307C
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:12:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41486189842F
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B981624DF;
-	Sat, 15 Feb 2025 00:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC7A1624FD;
+	Sat, 15 Feb 2025 00:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="XV08BNqg"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="sCXWpXYC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8601624CB
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E3F2943F
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739578212; cv=none; b=MzlvMvHyxVCNV/sf4PbsJTS2WCrmA0Kk9ce7wOCoSuTZHcDcpP1xQsDJccS/EJZMZJbrbpbciA7R3ySM6yTHdtJc4niu5tMvntyMgFxfZuTe24pJja2k3G8hVQaDUxkRw85C/uyIndyudNUySru336Vsiiz9Kr5wrbL6RpOi6jg=
+	t=1739578213; cv=none; b=h9o2Kz4pXFsVRKAI2KNdP8fxwyVoDC9TZDvOrnNBM/qp92GViZzE7qFGxBNpwUJwadyVmIZ/PFBjh0HV8W4EqSbyZtwwNgjMurmto1S4UytaqvdP6BPYOs5VKMb8wZkvnOuS+SsfFuOUTQTVeTmtbPzBjzLZHpuqTcbvDvOp9ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739578212; c=relaxed/simple;
-	bh=waZElP+hnGci0XgG5ol4AhH/YpGYtuPpjvD6W8bnmQ0=;
+	s=arc-20240116; t=1739578213; c=relaxed/simple;
+	bh=9pTdmByBVpWL3oRo72V1P/Qnfm3p1w1EAQ8TvZwzW4E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p7Jq03a4uC9hCmCZETuRauHxHb2uFEULuOsKaXkIYi/yecT5/xXRM1mxWC1WagB3GbJKDbnv8CDtBvKEZ9UbfXXtzROttFKjyg8zECYlpbtm+wVOTyaM2d6BKa94ccHcm/vYo1j7anuoOP0SPODqvAgd+kxIqiXJ6KaaHs5KSNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=XV08BNqg; arc=none smtp.client-ip=209.85.216.49
+	 MIME-Version; b=CsPyNLXBBWAsiBwSG0vFjvMpj+4CRbkKFV7PQSmS5YBY25XRy/prY01Yx4n7CiNfHhW+Wo5aNZwreloWosdtJuQuJeI353PP7jYyF0wpg0EJqu/ch0Bum6bqxt5KqKmSVKQ/OaRg5HkHq7DVJqQRj5GJlFatIgkpJYNwDwioTC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=sCXWpXYC; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fbfe16cc39so4882097a91.3
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:10:10 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220c92c857aso42490435ad.0
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:10:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739578210; x=1740183010; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739578211; x=1740183011; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FmNIyCXXoWBh40mpSPtcuAkEk/iQTmfVKkUBNv+QvTM=;
-        b=XV08BNqgAmqqQQTAO2EC9tMpEjcuQVi1emyTROZeUuxdKtdJ+n+tPM+MRI8KvkYjER
-         IHMj33JNAItNHoIRPw7ZCyVDyr+lXEzAV2L8NV/p08JR0LjmI2UwkRWHUiB5OeOmcEkL
-         TAjLeoYwsQNRO87obRphraHw9XKxMOzGwIEhmK67S2EcvYymoOpHs9qad49qcFZKEbFt
-         c1ryKhSeFsb9IPWzeO3CbaFOGk/ple5CsZuEcsCQDfjBK3eLOQ5B0cLbz+Xwhbnd/6eZ
-         VEZoK5NxlhTSSPtFHsGEB+ThptdSSe32kz3m3tXzQMyJ4qc2DpzGDy9IAvOrUFEfYnQ0
-         L8gg==
+        bh=NHWoGsRhiFc/ooKo3TvF3R3d8ADOTW+DffRpnDLhJ48=;
+        b=sCXWpXYCkPr4AIgT85SWKKDZgQpmOYI1AlUlPutZhDv9ApQnXaa2Z2BwJBMPMv19KC
+         EaLI1lDprh7TUTYfByVEtSgDwxKWvyfywAibiWDyBwplB3CUpsHTPZT78ncgxkZ8nXHv
+         Q7zpkAZ3gKvGFBj5EMHX8Ft+n8sHvCDMuUMe8/2hHRlSRExtqqepa1ZAjpIQCekbrE5L
+         n/N2g3NctFgTy59DeQhWGiEQ8PHN5DKkgT54mEjSHuy1KkLLOwnsRQlvYP30gi6/cpWb
+         K17YE/wTgwJGV9xtXcmj5jtM1tSABWZ46wRWaf+ikX4Ym5VOFUDSwJDLA1KliDwqW+Ek
+         tBRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739578210; x=1740183010;
+        d=1e100.net; s=20230601; t=1739578211; x=1740183011;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FmNIyCXXoWBh40mpSPtcuAkEk/iQTmfVKkUBNv+QvTM=;
-        b=nAINh4vooXGXN4pyweQ6Q+4+V1NUWWBM7/WVeW9DiSLsupp/OYowxvNTsnqh5laOC4
-         Wzjp+a33ia/CtstuajxhGnQqjyYXrqpY8EBg0pKuur9c7cJcDUMAGMR2QpTUzPONx0o6
-         CqxysnsXaH1ALNQmY2h1Yl42oAxyAKkWA1Ob585+G4tRrszOCg0DwrV9+sW02NfRg798
-         R6chaXZ0aGa82Z0dY1CK0RO9cEhL0UgQgiso++vzgKq+t3dSm7qYzTvTfNSLBnSV3iWI
-         JUQgCdeAHXS53zPpcf8ShsGAnSZ4swtlsHHg+1Ull66PrroAqkmUI8kBs9b+CJvoUMyj
-         lK8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXiBp65RHQBfVO6L1WwtVDCvY7B80+1m8jnhDxrPaVnzV1UZO6n1V8u9Nm0uhGGGVFh+w4gWH4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuNyMIpCsN0gFP7F0HI+5FJKwsahz3GzAplBGzucNi5KmlVK4I
-	HNuEL+PC10pXQpc83cJmyVDY7QGcRkMsgVpjuDumyGIAsFGMKzxsBsLNeDGS3RZopFFLpmINClG
-	Z
-X-Gm-Gg: ASbGncsprDQkfNoywrI1/nJEgkqFlcetyeH5G7Oki19T3pQZ9oI212y7dJvkDKEvq21
-	rDgShE5rt9gyl0E1D1LEN+vORSlPM3ur7vlW+QP3/bPjHechWtZtWUUhDI4JHihSDIk17kiVSED
-	ISQhq4mpLjwQ3YAT/D9O10fMdY05vK+JAF+O3BEyvqqAcx1bX48B1u/tVx/f3T1e5SZGhVLQL2j
-	LRrPtzOMNUa9ejDNR7NcIpO5v7JjeqA4bwYMGUf75zDKl/uB0XjjXXx+QOefNkKWS8uQqetwYA=
-X-Google-Smtp-Source: AGHT+IEinmI6YzYKXk3Kc5KlfdAL6uHZcNBPKDAy0rcbD2dGEYI7Nt2Eoa6T6eOa2HTjIdHra2zZ2Q==
-X-Received: by 2002:a05:6a00:1391:b0:72d:9cbc:730d with SMTP id d2e1a72fcca58-732617c4b97mr2151318b3a.11.1739578210384;
-        Fri, 14 Feb 2025 16:10:10 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:d::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-732621c4762sm342097b3a.172.2025.02.14.16.10.09
+        bh=NHWoGsRhiFc/ooKo3TvF3R3d8ADOTW+DffRpnDLhJ48=;
+        b=PqezGmv3K4GYVzzN9jnI2ShKiYp3XA5GSZ6tEorKpugyHjpbrZNduGm4sZ+ex493bR
+         Rgl/Voc3JDxBkTmUTnmnkoP02yym1ueNyZ6EqY9WAmThrDQ501Vk8WRvoQHjhk+OMaB5
+         cme2gcGOnIw6t4101GGeRgVsGoXCkuIzpM6XsKLYASh3uWuh3Q+082fq7XDQ8PO3iM8T
+         di2pBCYBny3MKJ0sHmeG5A8IYkl8j30Gf1HW5j/ROUqfjrbpsiZ7Poul2uCa4Jw97CVv
+         p45mbOuY/klyNNqQut4PgcJE+0AWHFACRLeGvxqgaEFyI0KLSKJ5A4SfuMzJ87J666Fz
+         fTeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmbPvEeXnQWwE/dMxOkDNx57jQK/Da3cNYfaDAa8NVXzv2oonlPTHTeFNJBJsOqpptaTsU45Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6SNXCtHlWNxooLLubJtwxCmL2tTg42Q7BSGFuRLg8aP/S5vNb
+	JOQyAixQykuEY9lT0Re2ZVuz1L0h7AdL/eBofzJFhuCpU8rFTs+rDcTo++Qd/iA=
+X-Gm-Gg: ASbGnctZMQtKSW8hOshkmkY22l1Xwr4nXmkp/NDQp24QfIkkrf1ZXZfM79HJbh2gRpi
+	isITZa1vUFv1ts6q8jTzpc9Y35bdVLHh0k6FtK1QshxD8MgBzPDVHr8nA3ry9hOjM62DyIbSPwq
+	otbY7A4SPDszzyUoaH+zbyY0ImGp672nlbbR28epEZcD2OI0RCrhOmzXLAMGzfoSv/NfmwZyOJs
+	LglpcmYOzXv+0iZa2b7+9jqmJumq2AtDMOoJQ/uqzhKgXYDq6rBD752knTa6fljzjQrdziWH9FI
+X-Google-Smtp-Source: AGHT+IGB+0BtJEKjVmh9epCDeysVRSF5mdDq27M8L2mrfMjVlA01YXkfPFySEiuWNB9RVj09mjVQCA==
+X-Received: by 2002:a17:903:94d:b0:21f:ba77:c49a with SMTP id d9443c01a7336-220d33a50a3mr143708735ad.4.1739578211445;
+        Fri, 14 Feb 2025 16:10:11 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:71::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d473sm34116265ad.166.2025.02.14.16.10.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 16:10:09 -0800 (PST)
+        Fri, 14 Feb 2025 16:10:11 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -88,9 +87,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Joe Damato <jdamato@fastly.com>,
 	Pedro Tammela <pctammela@mojatatu.com>,
 	lizetao <lizetao1@huawei.com>
-Subject: [PATCH v14 09/11] io_uring/zcrx: add copy fallback
-Date: Fri, 14 Feb 2025 16:09:44 -0800
-Message-ID: <20250215000947.789731-10-dw@davidwei.uk>
+Subject: [PATCH v14 10/11] net: add documentation for io_uring zcrx
+Date: Fri, 14 Feb 2025 16:09:45 -0800
+Message-ID: <20250215000947.789731-11-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250215000947.789731-1-dw@davidwei.uk>
 References: <20250215000947.789731-1-dw@davidwei.uk>
@@ -102,196 +101,236 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+Add documentation for io_uring zero copy Rx that explains requirements
+and the user API.
 
-There are scenarios in which the zerocopy path can get a kernel buffer
-instead of a net_iov and needs to copy it to the user, whether it is
-because of mis-steering or simply getting an skb with the linear part.
-In this case, grab a net_iov, copy into it and return it to the user as
-normally.
-
-At the moment the user doesn't get any indication whether there was a
-copy or not, which is left for follow up work.
-
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- io_uring/zcrx.c | 120 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 114 insertions(+), 6 deletions(-)
+ Documentation/networking/index.rst    |   1 +
+ Documentation/networking/iou-zcrx.rst | 202 ++++++++++++++++++++++++++
+ 2 files changed, 203 insertions(+)
+ create mode 100644 Documentation/networking/iou-zcrx.rst
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 7e0cba1e0f39..026efb8dd381 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -7,6 +7,7 @@
- #include <linux/io_uring.h>
- #include <linux/netdevice.h>
- #include <linux/rtnetlink.h>
-+#include <linux/skbuff_ref.h>
- 
- #include <net/page_pool/helpers.h>
- #include <net/page_pool/memory_provider.h>
-@@ -134,6 +135,13 @@ static void io_zcrx_get_niov_uref(struct net_iov *niov)
- 	atomic_inc(io_get_user_counter(niov));
- }
- 
-+static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
-+{
-+	struct io_zcrx_area *area = io_zcrx_iov_to_area(niov);
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index 058193ed2eeb..c64133d309bf 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -63,6 +63,7 @@ Contents:
+    gtp
+    ila
+    ioam6-sysctl
++   iou-zcrx
+    ip_dynaddr
+    ipsec
+    ip-sysctl
+diff --git a/Documentation/networking/iou-zcrx.rst b/Documentation/networking/iou-zcrx.rst
+new file mode 100644
+index 000000000000..0127319b30bb
+--- /dev/null
++++ b/Documentation/networking/iou-zcrx.rst
+@@ -0,0 +1,202 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+	return area->pages[net_iov_idx(niov)];
-+}
++=====================
++io_uring zero copy Rx
++=====================
 +
- static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
- 				 struct io_uring_zcrx_ifq_reg *reg,
- 				 struct io_uring_region_desc *rd)
-@@ -448,6 +456,11 @@ static void io_zcrx_return_niov(struct net_iov *niov)
- {
- 	netmem_ref netmem = net_iov_to_netmem(niov);
- 
-+	if (!niov->pp) {
-+		/* copy fallback allocated niovs */
-+		io_zcrx_return_niov_freelist(niov);
-+		return;
-+	}
- 	page_pool_put_unrefed_netmem(niov->pp, netmem, -1, false);
- }
- 
-@@ -686,13 +699,93 @@ static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
- 	return true;
- }
- 
-+static struct net_iov *io_zcrx_alloc_fallback(struct io_zcrx_area *area)
-+{
-+	struct net_iov *niov = NULL;
++Introduction
++============
 +
-+	spin_lock_bh(&area->freelist_lock);
-+	if (area->free_count)
-+		niov = __io_zcrx_get_free_niov(area);
-+	spin_unlock_bh(&area->freelist_lock);
++io_uring zero copy Rx (ZC Rx) is a feature that removes kernel-to-user copy on
++the network receive path, allowing packet data to be received directly into
++userspace memory. This feature is different to TCP_ZEROCOPY_RECEIVE in that
++there are no strict alignment requirements and no need to mmap()/munmap().
++Compared to kernel bypass solutions such as e.g. DPDK, the packet headers are
++processed by the kernel TCP stack as normal.
 +
-+	if (niov)
-+		page_pool_fragment_netmem(net_iov_to_netmem(niov), 1);
-+	return niov;
-+}
++NIC HW Requirements
++===================
 +
-+static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+				  void *src_base, struct page *src_page,
-+				  unsigned int src_offset, size_t len)
-+{
-+	struct io_zcrx_area *area = ifq->area;
-+	size_t copied = 0;
-+	int ret = 0;
++Several NIC HW features are required for io_uring ZC Rx to work. For now the
++kernel API does not configure the NIC and it must be done by the user.
 +
-+	while (len) {
-+		size_t copy_size = min_t(size_t, PAGE_SIZE, len);
-+		const int dst_off = 0;
-+		struct net_iov *niov;
-+		struct page *dst_page;
-+		void *dst_addr;
++Header/data split
++-----------------
 +
-+		niov = io_zcrx_alloc_fallback(area);
-+		if (!niov) {
-+			ret = -ENOMEM;
-+			break;
-+		}
++Required to split packets at the L4 boundary into a header and a payload.
++Headers are received into kernel memory as normal and processed by the TCP
++stack as normal. Payloads are received into userspace memory directly.
 +
-+		dst_page = io_zcrx_iov_page(niov);
-+		dst_addr = kmap_local_page(dst_page);
-+		if (src_page)
-+			src_base = kmap_local_page(src_page);
++Flow steering
++-------------
 +
-+		memcpy(dst_addr, src_base + src_offset, copy_size);
++Specific HW Rx queues are configured for this feature, but modern NICs
++typically distribute flows across all HW Rx queues. Flow steering is required
++to ensure that only desired flows are directed towards HW queues that are
++configured for io_uring ZC Rx.
 +
-+		if (src_page)
-+			kunmap_local(src_base);
-+		kunmap_local(dst_addr);
++RSS
++---
 +
-+		if (!io_zcrx_queue_cqe(req, niov, ifq, dst_off, copy_size)) {
-+			io_zcrx_return_niov(niov);
-+			ret = -ENOSPC;
-+			break;
-+		}
++In addition to flow steering above, RSS is required to steer all other non-zero
++copy flows away from queues that are configured for io_uring ZC Rx.
 +
-+		io_zcrx_get_niov_uref(niov);
-+		src_offset += copy_size;
-+		len -= copy_size;
-+		copied += copy_size;
-+	}
++Usage
++=====
 +
-+	return copied ? copied : ret;
-+}
++Setup NIC
++---------
 +
-+static int io_zcrx_copy_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+			     const skb_frag_t *frag, int off, int len)
-+{
-+	struct page *page = skb_frag_page(frag);
-+	u32 p_off, p_len, t, copied = 0;
-+	int ret = 0;
++Must be done out of band for now.
 +
-+	off += skb_frag_off(frag);
++Ensure there are at least two queues::
 +
-+	skb_frag_foreach_page(frag, off, len,
-+			      page, p_off, p_len, t) {
-+		ret = io_zcrx_copy_chunk(req, ifq, NULL, page, p_off, p_len);
-+		if (ret < 0)
-+			return copied ? copied : ret;
-+		copied += ret;
-+	}
-+	return copied;
-+}
++  ethtool -L eth0 combined 2
 +
- static int io_zcrx_recv_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 			     const skb_frag_t *frag, int off, int len)
- {
- 	struct net_iov *niov;
- 
- 	if (unlikely(!skb_frag_is_net_iov(frag)))
--		return -EOPNOTSUPP;
-+		return io_zcrx_copy_frag(req, ifq, frag, off, len);
- 
- 	niov = netmem_to_net_iov(frag->netmem);
- 	if (niov->pp->mp_ops != &io_uring_pp_zc_ops ||
-@@ -719,18 +812,33 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- 	struct io_zcrx_ifq *ifq = args->ifq;
- 	struct io_kiocb *req = args->req;
- 	struct sk_buff *frag_iter;
--	unsigned start, start_off;
-+	unsigned start, start_off = offset;
- 	int i, copy, end, off;
- 	int ret = 0;
- 
- 	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
- 		return -EAGAIN;
- 
--	start = skb_headlen(skb);
--	start_off = offset;
-+	if (unlikely(offset < skb_headlen(skb))) {
-+		ssize_t copied;
-+		size_t to_copy;
- 
--	if (offset < start)
--		return -EOPNOTSUPP;
-+		to_copy = min_t(size_t, skb_headlen(skb) - offset, len);
-+		copied = io_zcrx_copy_chunk(req, ifq, skb->data, NULL,
-+					    offset, to_copy);
-+		if (copied < 0) {
-+			ret = copied;
-+			goto out;
-+		}
-+		offset += copied;
-+		len -= copied;
-+		if (!len)
-+			goto out;
-+		if (offset != skb_headlen(skb))
-+			goto out;
-+	}
++Enable header/data split::
 +
-+	start = skb_headlen(skb);
- 
- 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
- 		const skb_frag_t *frag;
++  ethtool -G eth0 tcp-data-split on
++
++Carve out half of the HW Rx queues for zero copy using RSS::
++
++  ethtool -X eth0 equal 1
++
++Set up flow steering, bearing in mind that queues are 0-indexed::
++
++  ethtool -N eth0 flow-type tcp6 ... action 1
++
++Setup io_uring
++--------------
++
++This section describes the low level io_uring kernel API. Please refer to
++liburing documentation for how to use the higher level API.
++
++Create an io_uring instance with the following required setup flags::
++
++  IORING_SETUP_SINGLE_ISSUER
++  IORING_SETUP_DEFER_TASKRUN
++  IORING_SETUP_CQE32
++
++Create memory area
++------------------
++
++Allocate userspace memory area for receiving zero copy data::
++
++  void *area_ptr = mmap(NULL, area_size,
++                        PROT_READ | PROT_WRITE,
++                        MAP_ANONYMOUS | MAP_PRIVATE,
++                        0, 0);
++
++Create refill ring
++------------------
++
++Allocate memory for a shared ringbuf used for returning consumed buffers::
++
++  void *ring_ptr = mmap(NULL, ring_size,
++                        PROT_READ | PROT_WRITE,
++                        MAP_ANONYMOUS | MAP_PRIVATE,
++                        0, 0);
++
++This refill ring consists of some space for the header, followed by an array of
++``struct io_uring_zcrx_rqe``::
++
++  size_t rq_entries = 4096;
++  size_t ring_size = rq_entries * sizeof(struct io_uring_zcrx_rqe) + PAGE_SIZE;
++  /* align to page size */
++  ring_size = (ring_size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
++
++Register ZC Rx
++--------------
++
++Fill in registration structs::
++
++  struct io_uring_zcrx_area_reg area_reg = {
++    .addr = (__u64)(unsigned long)area_ptr,
++    .len = area_size,
++    .flags = 0,
++  };
++
++  struct io_uring_region_desc region_reg = {
++    .user_addr = (__u64)(unsigned long)ring_ptr,
++    .size = ring_size,
++    .flags = IORING_MEM_REGION_TYPE_USER,
++  };
++
++  struct io_uring_zcrx_ifq_reg reg = {
++    .if_idx = if_nametoindex("eth0"),
++    /* this is the HW queue with desired flow steered into it */
++    .if_rxq = 1,
++    .rq_entries = rq_entries,
++    .area_ptr = (__u64)(unsigned long)&area_reg,
++    .region_ptr = (__u64)(unsigned long)&region_reg,
++  };
++
++Register with kernel::
++
++  io_uring_register_ifq(ring, &reg);
++
++Map refill ring
++---------------
++
++The kernel fills in fields for the refill ring in the registration ``struct
++io_uring_zcrx_ifq_reg``. Map it into userspace::
++
++  struct io_uring_zcrx_rq refill_ring;
++
++  refill_ring.khead = (unsigned *)((char *)ring_ptr + reg.offsets.head);
++  refill_ring.khead = (unsigned *)((char *)ring_ptr + reg.offsets.tail);
++  refill_ring.rqes =
++    (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
++  refill_ring.rq_tail = 0;
++  refill_ring.ring_ptr = ring_ptr;
++
++Receiving data
++--------------
++
++Prepare a zero copy recv request::
++
++  struct io_uring_sqe *sqe;
++
++  sqe = io_uring_get_sqe(ring);
++  io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, fd, NULL, 0, 0);
++  sqe->ioprio |= IORING_RECV_MULTISHOT;
++
++Now, submit and wait::
++
++  io_uring_submit_and_wait(ring, 1);
++
++Finally, process completions::
++
++  struct io_uring_cqe *cqe;
++  unsigned int count = 0;
++  unsigned int head;
++
++  io_uring_for_each_cqe(ring, head, cqe) {
++    struct io_uring_zcrx_cqe *rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
++
++    unsigned long mask = (1ULL << IORING_ZCRX_AREA_SHIFT) - 1;
++    unsigned char *data = area_ptr + (rcqe->off & mask);
++    /* do something with the data */
++
++    count++;
++  }
++  io_uring_cq_advance(ring, count);
++
++Recycling buffers
++-----------------
++
++Return buffers back to the kernel to be used again::
++
++  struct io_uring_zcrx_rqe *rqe;
++  unsigned mask = refill_ring.ring_entries - 1;
++  rqe = &refill_ring.rqes[refill_ring.rq_tail & mask];
++
++  unsigned long area_offset = rcqe->off & ~IORING_ZCRX_AREA_MASK;
++  rqe->off = area_offset | area_reg.rq_area_token;
++  rqe->len = cqe->res;
++  IO_URING_WRITE_ONCE(*refill_ring.ktail, ++refill_ring.rq_tail);
++
++Testing
++=======
++
++See ``tools/testing/selftests/drivers/net/hw/iou-zcrx.c``
 -- 
 2.43.5
 
