@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-166626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B727FA369A3
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:15:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A496A36989
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:12:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41486189842F
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:12:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7623F7A4AF0
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC7A1624FD;
-	Sat, 15 Feb 2025 00:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBC92943F;
+	Sat, 15 Feb 2025 00:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="sCXWpXYC"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="bPZy76ll"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E3F2943F
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBD61624F4
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739578213; cv=none; b=h9o2Kz4pXFsVRKAI2KNdP8fxwyVoDC9TZDvOrnNBM/qp92GViZzE7qFGxBNpwUJwadyVmIZ/PFBjh0HV8W4EqSbyZtwwNgjMurmto1S4UytaqvdP6BPYOs5VKMb8wZkvnOuS+SsfFuOUTQTVeTmtbPzBjzLZHpuqTcbvDvOp9ds=
+	t=1739578216; cv=none; b=jzQ0d4KNcPL4932p299cLaZzPwC86Bq/9zOVhiEtS3cRK6TMEHamHC7uyj+UUshR5sM839pgDh8N8UjUtIsN6osxq7uBdK5dCRddN4VXN2c3OUjQWoX+9bCyT0Zpa/7TUoBSEXH2QLstIClzKagvIdrC+HLV3HKuHj98SND6vNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739578213; c=relaxed/simple;
-	bh=9pTdmByBVpWL3oRo72V1P/Qnfm3p1w1EAQ8TvZwzW4E=;
+	s=arc-20240116; t=1739578216; c=relaxed/simple;
+	bh=cug8gWZNB+fVPqIM3eSb0lRttWPY03cy3UltoOm88oM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CsPyNLXBBWAsiBwSG0vFjvMpj+4CRbkKFV7PQSmS5YBY25XRy/prY01Yx4n7CiNfHhW+Wo5aNZwreloWosdtJuQuJeI353PP7jYyF0wpg0EJqu/ch0Bum6bqxt5KqKmSVKQ/OaRg5HkHq7DVJqQRj5GJlFatIgkpJYNwDwioTC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=sCXWpXYC; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=C0GGvAEo+6t6lUN4ny/pabdNG+0a0QLO9nncq3C2pWcWU7GUtD4Cl/UNe3aBPvVkcJg+rt9R2Sfhj9ONiyCVj7r5IwfuyM4eh2M6rSyGkHAlNgrCDhN/XSsH2CR7n9KTz9gTCLvqaH8eC0ntT8mVG0bZaDFofG/ymSo2Oo7qWRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=bPZy76ll; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220c92c857aso42490435ad.0
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:10:11 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21f78b1fb7dso45802195ad.3
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:10:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739578211; x=1740183011; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739578213; x=1740183013; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NHWoGsRhiFc/ooKo3TvF3R3d8ADOTW+DffRpnDLhJ48=;
-        b=sCXWpXYCkPr4AIgT85SWKKDZgQpmOYI1AlUlPutZhDv9ApQnXaa2Z2BwJBMPMv19KC
-         EaLI1lDprh7TUTYfByVEtSgDwxKWvyfywAibiWDyBwplB3CUpsHTPZT78ncgxkZ8nXHv
-         Q7zpkAZ3gKvGFBj5EMHX8Ft+n8sHvCDMuUMe8/2hHRlSRExtqqepa1ZAjpIQCekbrE5L
-         n/N2g3NctFgTy59DeQhWGiEQ8PHN5DKkgT54mEjSHuy1KkLLOwnsRQlvYP30gi6/cpWb
-         K17YE/wTgwJGV9xtXcmj5jtM1tSABWZ46wRWaf+ikX4Ym5VOFUDSwJDLA1KliDwqW+Ek
-         tBRg==
+        bh=ZV9MbmHy+OETbAKxN4PX54lk+MlnQr4pOuqlO0aDqtA=;
+        b=bPZy76lludetFjSw3IOfbKs4XZAj36jr8bVKYbvIr6Kf9zCd8vKwsi+BhN5QCq2xKs
+         RoOtVlkBEi6m7FhonZZminht8p5xn2Qf3qnwc+zP55NAx8lkUSOLkWXDfn14v6chcZzi
+         xm811ZcFbNuK3Jmar7R6fVZBQX+dEW5qiYxJE5Veg5XdyFccW1yzFVVpbbZkboJhk0X9
+         Cz9JTwzsgvreZPqktH0fFYUXHffHiPNcsYG4uL+ThpdOYC+k+U/MJGVpWMjJKLMFEEhZ
+         uuP/5e/Zx+1hlCTnHe8kE4NafiS+roylkvIvSeCFpR6Sbq7zJwSGKfOdWJrHeXUvOqD7
+         h8Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739578211; x=1740183011;
+        d=1e100.net; s=20230601; t=1739578213; x=1740183013;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NHWoGsRhiFc/ooKo3TvF3R3d8ADOTW+DffRpnDLhJ48=;
-        b=PqezGmv3K4GYVzzN9jnI2ShKiYp3XA5GSZ6tEorKpugyHjpbrZNduGm4sZ+ex493bR
-         Rgl/Voc3JDxBkTmUTnmnkoP02yym1ueNyZ6EqY9WAmThrDQ501Vk8WRvoQHjhk+OMaB5
-         cme2gcGOnIw6t4101GGeRgVsGoXCkuIzpM6XsKLYASh3uWuh3Q+082fq7XDQ8PO3iM8T
-         di2pBCYBny3MKJ0sHmeG5A8IYkl8j30Gf1HW5j/ROUqfjrbpsiZ7Poul2uCa4Jw97CVv
-         p45mbOuY/klyNNqQut4PgcJE+0AWHFACRLeGvxqgaEFyI0KLSKJ5A4SfuMzJ87J666Fz
-         fTeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVmbPvEeXnQWwE/dMxOkDNx57jQK/Da3cNYfaDAa8NVXzv2oonlPTHTeFNJBJsOqpptaTsU45Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6SNXCtHlWNxooLLubJtwxCmL2tTg42Q7BSGFuRLg8aP/S5vNb
-	JOQyAixQykuEY9lT0Re2ZVuz1L0h7AdL/eBofzJFhuCpU8rFTs+rDcTo++Qd/iA=
-X-Gm-Gg: ASbGnctZMQtKSW8hOshkmkY22l1Xwr4nXmkp/NDQp24QfIkkrf1ZXZfM79HJbh2gRpi
-	isITZa1vUFv1ts6q8jTzpc9Y35bdVLHh0k6FtK1QshxD8MgBzPDVHr8nA3ry9hOjM62DyIbSPwq
-	otbY7A4SPDszzyUoaH+zbyY0ImGp672nlbbR28epEZcD2OI0RCrhOmzXLAMGzfoSv/NfmwZyOJs
-	LglpcmYOzXv+0iZa2b7+9jqmJumq2AtDMOoJQ/uqzhKgXYDq6rBD752knTa6fljzjQrdziWH9FI
-X-Google-Smtp-Source: AGHT+IGB+0BtJEKjVmh9epCDeysVRSF5mdDq27M8L2mrfMjVlA01YXkfPFySEiuWNB9RVj09mjVQCA==
-X-Received: by 2002:a17:903:94d:b0:21f:ba77:c49a with SMTP id d9443c01a7336-220d33a50a3mr143708735ad.4.1739578211445;
-        Fri, 14 Feb 2025 16:10:11 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:71::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d473sm34116265ad.166.2025.02.14.16.10.10
+        bh=ZV9MbmHy+OETbAKxN4PX54lk+MlnQr4pOuqlO0aDqtA=;
+        b=VK+oAGY6OFJAawN7Gdb8uFTOcQOOuRrIO+W37lpkykaiUS5BT/82h2ZiFveVdCtr+Z
+         BsNzRmMyQEc6LBIO4v/9vF662Wy54sSseV4fVL7MIK21v/FgG+XjMSlfcn6IDSlQX4aA
+         6xKwGGq7yFstxiEEAmdzYC5ILZ9V2X0U/p1QVRg4fkjfDJsqhsu4QcTyTEcFbA3/J/5g
+         DcbI8gd/qwMliCKK5s8bTHB0UlnKt5qRyVuOmpFnb0lBSYa+L6oVMcIWz2XRaxr9fv2J
+         oq6y3V41hGw1L0evwHYZwOVLctuf1vc+nI4EpNLAfVHuu4naUtOwQOH4H0O/5uDpkD2h
+         IBRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURyLRL43WlHAtsBI0q8LoCB5IyJE85jqJOKtJMIiOIGlqb423FxO793CF5VaK8356UtWqm6ng=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7IXMYtBv4+8gzNw+B2K7Neyr//Q5flt1iIrr145MibVVuugpf
+	kxK0TbJzNnNGCIqIJv9eFyUnekgai5z3olEMFchnaWbKecQe7TkVlXuN54OEqxw=
+X-Gm-Gg: ASbGncuVRVHJRGvXOjtTn5MPeLTK4t62SzDwjkk29ecfoPV6dSyh/n1rBoTGSdZK+oG
+	DozZkhfhvZQMmBWUvdBPX/PB0OcS+568Z9aqjWxB1Wm2MfA9RjqGzshXm3OhUCepL9Qvvk59+py
+	wTFEznzcJYzbLlwonLDhzbPYpqCuRTywLQmiUq8fNk9fRfo8nQV8r0gSMiM8GFi5Pi7dUoMcb7J
+	++kyeBVx0rl3YvnSrJh6OOj6UIxXyoCa0NrFU5znJlMf7ZnK3J5XFbLNT129u73quLppnDNOg+W
+X-Google-Smtp-Source: AGHT+IEGnaOoh/T9o1CgyylYlUdBn5i9SkiVlipSNdsE5ifqIaO2FURIjeIDWlqXEioTBikpLUUwwA==
+X-Received: by 2002:a17:903:2b07:b0:215:b8c6:338a with SMTP id d9443c01a7336-22103f038e6mr20410055ad.4.1739578212650;
+        Fri, 14 Feb 2025 16:10:12 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:40::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d545d051sm34057945ad.108.2025.02.14.16.10.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 16:10:11 -0800 (PST)
+        Fri, 14 Feb 2025 16:10:12 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -87,9 +87,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Joe Damato <jdamato@fastly.com>,
 	Pedro Tammela <pctammela@mojatatu.com>,
 	lizetao <lizetao1@huawei.com>
-Subject: [PATCH v14 10/11] net: add documentation for io_uring zcrx
-Date: Fri, 14 Feb 2025 16:09:45 -0800
-Message-ID: <20250215000947.789731-11-dw@davidwei.uk>
+Subject: [PATCH v14 11/11] io_uring/zcrx: add selftest
+Date: Fri, 14 Feb 2025 16:09:46 -0800
+Message-ID: <20250215000947.789731-12-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250215000947.789731-1-dw@davidwei.uk>
 References: <20250215000947.789731-1-dw@davidwei.uk>
@@ -101,236 +101,561 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add documentation for io_uring zero copy Rx that explains requirements
-and the user API.
+Add a selftest for io_uring zero copy Rx. This test cannot run locally
+and requires a remote host to be configured in net.config. The remote
+host must have hardware support for zero copy Rx as listed in the
+documentation page. The test will restore the NIC config back to before
+the test and is idempotent.
+
+liburing is required to compile the test and be installed on the remote
+host running the test.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- Documentation/networking/index.rst    |   1 +
- Documentation/networking/iou-zcrx.rst | 202 ++++++++++++++++++++++++++
- 2 files changed, 203 insertions(+)
- create mode 100644 Documentation/networking/iou-zcrx.rst
+ .../selftests/drivers/net/hw/.gitignore       |   2 +
+ .../testing/selftests/drivers/net/hw/Makefile |   5 +
+ .../selftests/drivers/net/hw/iou-zcrx.c       | 426 ++++++++++++++++++
+ .../selftests/drivers/net/hw/iou-zcrx.py      |  64 +++
+ 4 files changed, 497 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/iou-zcrx.py
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 058193ed2eeb..c64133d309bf 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -63,6 +63,7 @@ Contents:
-    gtp
-    ila
-    ioam6-sysctl
-+   iou-zcrx
-    ip_dynaddr
-    ipsec
-    ip-sysctl
-diff --git a/Documentation/networking/iou-zcrx.rst b/Documentation/networking/iou-zcrx.rst
+diff --git a/tools/testing/selftests/drivers/net/hw/.gitignore b/tools/testing/selftests/drivers/net/hw/.gitignore
+index e9fe6ede681a..6942bf575497 100644
+--- a/tools/testing/selftests/drivers/net/hw/.gitignore
++++ b/tools/testing/selftests/drivers/net/hw/.gitignore
+@@ -1 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0-only
++iou-zcrx
+ ncdevmem
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index 21ba64ce1e34..7efc47c89463 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0+ OR MIT
+ 
++TEST_GEN_FILES = iou-zcrx
++
+ TEST_PROGS = \
+ 	csum.py \
+ 	devlink_port_split.py \
+@@ -10,6 +12,7 @@ TEST_PROGS = \
+ 	ethtool_rmon.sh \
+ 	hw_stats_l3.sh \
+ 	hw_stats_l3_gre.sh \
++	iou-zcrx.py \
+ 	loopback.sh \
+ 	nic_link_layer.py \
+ 	nic_performance.py \
+@@ -38,3 +41,5 @@ include ../../../lib.mk
+ # YNL build
+ YNL_GENS := ethtool netdev
+ include ../../../net/ynl.mk
++
++$(OUTPUT)/iou-zcrx: LDLIBS += -luring
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
 new file mode 100644
-index 000000000000..0127319b30bb
+index 000000000000..5d04dd55ae55
 --- /dev/null
-+++ b/Documentation/networking/iou-zcrx.rst
-@@ -0,0 +1,202 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+@@ -0,0 +1,426 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <assert.h>
++#include <errno.h>
++#include <error.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
 +
-+=====================
-+io_uring zero copy Rx
-+=====================
++#include <arpa/inet.h>
++#include <linux/errqueue.h>
++#include <linux/if_packet.h>
++#include <linux/ipv6.h>
++#include <linux/socket.h>
++#include <linux/sockios.h>
++#include <net/ethernet.h>
++#include <net/if.h>
++#include <netinet/in.h>
++#include <netinet/ip.h>
++#include <netinet/ip6.h>
++#include <netinet/tcp.h>
++#include <netinet/udp.h>
++#include <sys/epoll.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <sys/resource.h>
++#include <sys/socket.h>
++#include <sys/stat.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <sys/un.h>
++#include <sys/wait.h>
 +
-+Introduction
-+============
++#include <liburing.h>
 +
-+io_uring zero copy Rx (ZC Rx) is a feature that removes kernel-to-user copy on
-+the network receive path, allowing packet data to be received directly into
-+userspace memory. This feature is different to TCP_ZEROCOPY_RECEIVE in that
-+there are no strict alignment requirements and no need to mmap()/munmap().
-+Compared to kernel bypass solutions such as e.g. DPDK, the packet headers are
-+processed by the kernel TCP stack as normal.
++#define PAGE_SIZE (4096)
++#define AREA_SIZE (8192 * PAGE_SIZE)
++#define SEND_SIZE (512 * 4096)
++#define min(a, b) \
++	({ \
++		typeof(a) _a = (a); \
++		typeof(b) _b = (b); \
++		_a < _b ? _a : _b; \
++	})
++#define min_t(t, a, b) \
++	({ \
++		t _ta = (a); \
++		t _tb = (b); \
++		min(_ta, _tb); \
++	})
 +
-+NIC HW Requirements
-+===================
++#define ALIGN_UP(v, align) (((v) + (align) - 1) & ~((align) - 1))
 +
-+Several NIC HW features are required for io_uring ZC Rx to work. For now the
-+kernel API does not configure the NIC and it must be done by the user.
++static int cfg_server;
++static int cfg_client;
++static int cfg_port = 8000;
++static int cfg_payload_len;
++static const char *cfg_ifname;
++static int cfg_queue_id = -1;
++static struct sockaddr_in6 cfg_addr;
 +
-+Header/data split
-+-----------------
++static char payload[SEND_SIZE] __attribute__((aligned(PAGE_SIZE)));
++static void *area_ptr;
++static void *ring_ptr;
++static size_t ring_size;
++static struct io_uring_zcrx_rq rq_ring;
++static unsigned long area_token;
++static int connfd;
++static bool stop;
++static size_t received;
 +
-+Required to split packets at the L4 boundary into a header and a payload.
-+Headers are received into kernel memory as normal and processed by the TCP
-+stack as normal. Payloads are received into userspace memory directly.
++static unsigned long gettimeofday_ms(void)
++{
++	struct timeval tv;
 +
-+Flow steering
-+-------------
++	gettimeofday(&tv, NULL);
++	return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
++}
 +
-+Specific HW Rx queues are configured for this feature, but modern NICs
-+typically distribute flows across all HW Rx queues. Flow steering is required
-+to ensure that only desired flows are directed towards HW queues that are
-+configured for io_uring ZC Rx.
++static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
++{
++	int ret;
 +
-+RSS
-+---
++	sin6->sin6_family = AF_INET6;
++	sin6->sin6_port = htons(port);
 +
-+In addition to flow steering above, RSS is required to steer all other non-zero
-+copy flows away from queues that are configured for io_uring ZC Rx.
++	ret = inet_pton(sin6->sin6_family, str, &sin6->sin6_addr);
++	if (ret != 1) {
++		/* fallback to plain IPv4 */
++		ret = inet_pton(AF_INET, str, &sin6->sin6_addr.s6_addr32[3]);
++		if (ret != 1)
++			return -1;
 +
-+Usage
-+=====
++		/* add ::ffff prefix */
++		sin6->sin6_addr.s6_addr32[0] = 0;
++		sin6->sin6_addr.s6_addr32[1] = 0;
++		sin6->sin6_addr.s6_addr16[4] = 0;
++		sin6->sin6_addr.s6_addr16[5] = 0xffff;
++	}
 +
-+Setup NIC
-+---------
++	return 0;
++}
 +
-+Must be done out of band for now.
++static inline size_t get_refill_ring_size(unsigned int rq_entries)
++{
++	size_t size;
 +
-+Ensure there are at least two queues::
++	ring_size = rq_entries * sizeof(struct io_uring_zcrx_rqe);
++	/* add space for the header (head/tail/etc.) */
++	ring_size += PAGE_SIZE;
++	return ALIGN_UP(ring_size, 4096);
++}
 +
-+  ethtool -L eth0 combined 2
++static void setup_zcrx(struct io_uring *ring)
++{
++	unsigned int ifindex;
++	unsigned int rq_entries = 4096;
++	int ret;
 +
-+Enable header/data split::
++	ifindex = if_nametoindex(cfg_ifname);
++	if (!ifindex)
++		error(1, 0, "bad interface name: %s", cfg_ifname);
 +
-+  ethtool -G eth0 tcp-data-split on
++	area_ptr = mmap(NULL,
++			AREA_SIZE,
++			PROT_READ | PROT_WRITE,
++			MAP_ANONYMOUS | MAP_PRIVATE,
++			0,
++			0);
++	if (area_ptr == MAP_FAILED)
++		error(1, 0, "mmap(): zero copy area");
 +
-+Carve out half of the HW Rx queues for zero copy using RSS::
++	ring_size = get_refill_ring_size(rq_entries);
++	ring_ptr = mmap(NULL,
++			ring_size,
++			PROT_READ | PROT_WRITE,
++			MAP_ANONYMOUS | MAP_PRIVATE,
++			0,
++			0);
 +
-+  ethtool -X eth0 equal 1
++	struct io_uring_region_desc region_reg = {
++		.size = ring_size,
++		.user_addr = (__u64)(unsigned long)ring_ptr,
++		.flags = IORING_MEM_REGION_TYPE_USER,
++	};
 +
-+Set up flow steering, bearing in mind that queues are 0-indexed::
++	struct io_uring_zcrx_area_reg area_reg = {
++		.addr = (__u64)(unsigned long)area_ptr,
++		.len = AREA_SIZE,
++		.flags = 0,
++	};
 +
-+  ethtool -N eth0 flow-type tcp6 ... action 1
++	struct io_uring_zcrx_ifq_reg reg = {
++		.if_idx = ifindex,
++		.if_rxq = cfg_queue_id,
++		.rq_entries = rq_entries,
++		.area_ptr = (__u64)(unsigned long)&area_reg,
++		.region_ptr = (__u64)(unsigned long)&region_reg,
++	};
 +
-+Setup io_uring
-+--------------
++	ret = io_uring_register_ifq(ring, &reg);
++	if (ret)
++		error(1, 0, "io_uring_register_ifq(): %d", ret);
 +
-+This section describes the low level io_uring kernel API. Please refer to
-+liburing documentation for how to use the higher level API.
++	rq_ring.khead = (unsigned int *)((char *)ring_ptr + reg.offsets.head);
++	rq_ring.ktail = (unsigned int *)((char *)ring_ptr + reg.offsets.tail);
++	rq_ring.rqes = (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
++	rq_ring.rq_tail = 0;
++	rq_ring.ring_entries = reg.rq_entries;
 +
-+Create an io_uring instance with the following required setup flags::
++	area_token = area_reg.rq_area_token;
++}
 +
-+  IORING_SETUP_SINGLE_ISSUER
-+  IORING_SETUP_DEFER_TASKRUN
-+  IORING_SETUP_CQE32
++static void add_accept(struct io_uring *ring, int sockfd)
++{
++	struct io_uring_sqe *sqe;
 +
-+Create memory area
-+------------------
++	sqe = io_uring_get_sqe(ring);
 +
-+Allocate userspace memory area for receiving zero copy data::
++	io_uring_prep_accept(sqe, sockfd, NULL, NULL, 0);
++	sqe->user_data = 1;
++}
 +
-+  void *area_ptr = mmap(NULL, area_size,
-+                        PROT_READ | PROT_WRITE,
-+                        MAP_ANONYMOUS | MAP_PRIVATE,
-+                        0, 0);
++static void add_recvzc(struct io_uring *ring, int sockfd)
++{
++	struct io_uring_sqe *sqe;
 +
-+Create refill ring
-+------------------
++	sqe = io_uring_get_sqe(ring);
 +
-+Allocate memory for a shared ringbuf used for returning consumed buffers::
++	io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, sockfd, NULL, 0, 0);
++	sqe->ioprio |= IORING_RECV_MULTISHOT;
++	sqe->user_data = 2;
++}
 +
-+  void *ring_ptr = mmap(NULL, ring_size,
-+                        PROT_READ | PROT_WRITE,
-+                        MAP_ANONYMOUS | MAP_PRIVATE,
-+                        0, 0);
++static void process_accept(struct io_uring *ring, struct io_uring_cqe *cqe)
++{
++	if (cqe->res < 0)
++		error(1, 0, "accept()");
++	if (connfd)
++		error(1, 0, "Unexpected second connection");
 +
-+This refill ring consists of some space for the header, followed by an array of
-+``struct io_uring_zcrx_rqe``::
++	connfd = cqe->res;
++	add_recvzc(ring, connfd);
++}
 +
-+  size_t rq_entries = 4096;
-+  size_t ring_size = rq_entries * sizeof(struct io_uring_zcrx_rqe) + PAGE_SIZE;
-+  /* align to page size */
-+  ring_size = (ring_size + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
++static void process_recvzc(struct io_uring *ring, struct io_uring_cqe *cqe)
++{
++	unsigned rq_mask = rq_ring.ring_entries - 1;
++	struct io_uring_zcrx_cqe *rcqe;
++	struct io_uring_zcrx_rqe *rqe;
++	struct io_uring_sqe *sqe;
++	uint64_t mask;
++	char *data;
++	ssize_t n;
++	int i;
 +
-+Register ZC Rx
-+--------------
++	if (cqe->res == 0 && cqe->flags == 0) {
++		stop = true;
++		return;
++	}
 +
-+Fill in registration structs::
++	if (cqe->res < 0)
++		error(1, 0, "recvzc(): %d", cqe->res);
 +
-+  struct io_uring_zcrx_area_reg area_reg = {
-+    .addr = (__u64)(unsigned long)area_ptr,
-+    .len = area_size,
-+    .flags = 0,
-+  };
++	if (!(cqe->flags & IORING_CQE_F_MORE))
++		add_recvzc(ring, connfd);
 +
-+  struct io_uring_region_desc region_reg = {
-+    .user_addr = (__u64)(unsigned long)ring_ptr,
-+    .size = ring_size,
-+    .flags = IORING_MEM_REGION_TYPE_USER,
-+  };
++	rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
 +
-+  struct io_uring_zcrx_ifq_reg reg = {
-+    .if_idx = if_nametoindex("eth0"),
-+    /* this is the HW queue with desired flow steered into it */
-+    .if_rxq = 1,
-+    .rq_entries = rq_entries,
-+    .area_ptr = (__u64)(unsigned long)&area_reg,
-+    .region_ptr = (__u64)(unsigned long)&region_reg,
-+  };
++	n = cqe->res;
++	mask = (1ULL << IORING_ZCRX_AREA_SHIFT) - 1;
++	data = (char *)area_ptr + (rcqe->off & mask);
 +
-+Register with kernel::
++	for (i = 0; i < n; i++) {
++		if (*(data + i) != payload[(received + i)])
++			error(1, 0, "payload mismatch");
++	}
++	received += n;
 +
-+  io_uring_register_ifq(ring, &reg);
++	rqe = &rq_ring.rqes[(rq_ring.rq_tail & rq_mask)];
++	rqe->off = (rcqe->off & ~IORING_ZCRX_AREA_MASK) | area_token;
++	rqe->len = cqe->res;
++	io_uring_smp_store_release(rq_ring.ktail, ++rq_ring.rq_tail);
++}
 +
-+Map refill ring
-+---------------
++static void server_loop(struct io_uring *ring)
++{
++	struct io_uring_cqe *cqe;
++	unsigned int count = 0;
++	unsigned int head;
++	int i, ret;
 +
-+The kernel fills in fields for the refill ring in the registration ``struct
-+io_uring_zcrx_ifq_reg``. Map it into userspace::
++	io_uring_submit_and_wait(ring, 1);
 +
-+  struct io_uring_zcrx_rq refill_ring;
++	io_uring_for_each_cqe(ring, head, cqe) {
++		if (cqe->user_data == 1)
++			process_accept(ring, cqe);
++		else if (cqe->user_data == 2)
++			process_recvzc(ring, cqe);
++		else
++			error(1, 0, "unknown cqe");
++		count++;
++	}
++	io_uring_cq_advance(ring, count);
++}
 +
-+  refill_ring.khead = (unsigned *)((char *)ring_ptr + reg.offsets.head);
-+  refill_ring.khead = (unsigned *)((char *)ring_ptr + reg.offsets.tail);
-+  refill_ring.rqes =
-+    (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
-+  refill_ring.rq_tail = 0;
-+  refill_ring.ring_ptr = ring_ptr;
++static void run_server(void)
++{
++	unsigned int flags = 0;
++	struct io_uring ring;
++	int fd, enable, ret;
++	uint64_t tstop;
 +
-+Receiving data
-+--------------
++	fd = socket(AF_INET6, SOCK_STREAM, 0);
++	if (fd == -1)
++		error(1, 0, "socket()");
 +
-+Prepare a zero copy recv request::
++	enable = 1;
++	ret = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
++	if (ret < 0)
++		error(1, 0, "setsockopt(SO_REUSEADDR)");
 +
-+  struct io_uring_sqe *sqe;
++	ret = bind(fd, (struct sockaddr *)&cfg_addr, sizeof(cfg_addr));
++	if (ret < 0)
++		error(1, 0, "bind()");
 +
-+  sqe = io_uring_get_sqe(ring);
-+  io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, fd, NULL, 0, 0);
-+  sqe->ioprio |= IORING_RECV_MULTISHOT;
++	if (listen(fd, 1024) < 0)
++		error(1, 0, "listen()");
 +
-+Now, submit and wait::
++	flags |= IORING_SETUP_COOP_TASKRUN;
++	flags |= IORING_SETUP_SINGLE_ISSUER;
++	flags |= IORING_SETUP_DEFER_TASKRUN;
++	flags |= IORING_SETUP_SUBMIT_ALL;
++	flags |= IORING_SETUP_CQE32;
 +
-+  io_uring_submit_and_wait(ring, 1);
++	io_uring_queue_init(512, &ring, flags);
 +
-+Finally, process completions::
++	setup_zcrx(&ring);
 +
-+  struct io_uring_cqe *cqe;
-+  unsigned int count = 0;
-+  unsigned int head;
++	add_accept(&ring, fd);
 +
-+  io_uring_for_each_cqe(ring, head, cqe) {
-+    struct io_uring_zcrx_cqe *rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
++	tstop = gettimeofday_ms() + 5000;
++	while (!stop && gettimeofday_ms() < tstop)
++		server_loop(&ring);
 +
-+    unsigned long mask = (1ULL << IORING_ZCRX_AREA_SHIFT) - 1;
-+    unsigned char *data = area_ptr + (rcqe->off & mask);
-+    /* do something with the data */
++	if (!stop)
++		error(1, 0, "test failed\n");
++}
 +
-+    count++;
-+  }
-+  io_uring_cq_advance(ring, count);
++static void run_client(void)
++{
++	ssize_t to_send = SEND_SIZE;
++	ssize_t sent = 0;
++	ssize_t chunk, res;
++	int fd;
 +
-+Recycling buffers
-+-----------------
++	fd = socket(AF_INET6, SOCK_STREAM, 0);
++	if (fd == -1)
++		error(1, 0, "socket()");
 +
-+Return buffers back to the kernel to be used again::
++	if (connect(fd, (struct sockaddr *)&cfg_addr, sizeof(cfg_addr)))
++		error(1, 0, "connect()");
 +
-+  struct io_uring_zcrx_rqe *rqe;
-+  unsigned mask = refill_ring.ring_entries - 1;
-+  rqe = &refill_ring.rqes[refill_ring.rq_tail & mask];
++	while (to_send) {
++		void *src = &payload[sent];
 +
-+  unsigned long area_offset = rcqe->off & ~IORING_ZCRX_AREA_MASK;
-+  rqe->off = area_offset | area_reg.rq_area_token;
-+  rqe->len = cqe->res;
-+  IO_URING_WRITE_ONCE(*refill_ring.ktail, ++refill_ring.rq_tail);
++		chunk = min_t(ssize_t, cfg_payload_len, to_send);
++		res = send(fd, src, chunk, 0);
++		if (res < 0)
++			error(1, 0, "send(): %d", sent);
++		sent += res;
++		to_send -= res;
++	}
 +
-+Testing
-+=======
++	close(fd);
++}
 +
-+See ``tools/testing/selftests/drivers/net/hw/iou-zcrx.c``
++static void usage(const char *filepath)
++{
++	error(1, 0, "Usage: %s (-4|-6) (-s|-c) -h<server_ip> -p<port> "
++		    "-l<payload_size> -i<ifname> -q<rxq_id>", filepath);
++}
++
++static void parse_opts(int argc, char **argv)
++{
++	const int max_payload_len = sizeof(payload) -
++				    sizeof(struct ipv6hdr) -
++				    sizeof(struct tcphdr) -
++				    40 /* max tcp options */;
++	struct sockaddr_in6 *addr6 = (void *) &cfg_addr;
++	char *addr = NULL;
++	int ret;
++	int c;
++
++	if (argc <= 1)
++		usage(argv[0]);
++	cfg_payload_len = max_payload_len;
++
++	while ((c = getopt(argc, argv, "46sch:p:l:i:q:")) != -1) {
++		switch (c) {
++		case 's':
++			if (cfg_client)
++				error(1, 0, "Pass one of -s or -c");
++			cfg_server = 1;
++			break;
++		case 'c':
++			if (cfg_server)
++				error(1, 0, "Pass one of -s or -c");
++			cfg_client = 1;
++			break;
++		case 'h':
++			addr = optarg;
++			break;
++		case 'p':
++			cfg_port = strtoul(optarg, NULL, 0);
++			break;
++		case 'l':
++			cfg_payload_len = strtoul(optarg, NULL, 0);
++			break;
++		case 'i':
++			cfg_ifname = optarg;
++			break;
++		case 'q':
++			cfg_queue_id = strtoul(optarg, NULL, 0);
++			break;
++		}
++	}
++
++	if (cfg_server && addr)
++		error(1, 0, "Receiver cannot have -h specified");
++
++	memset(addr6, 0, sizeof(*addr6));
++	addr6->sin6_family = AF_INET6;
++	addr6->sin6_port = htons(cfg_port);
++	addr6->sin6_addr = in6addr_any;
++	if (addr) {
++		ret = parse_address(addr, cfg_port, addr6);
++		if (ret)
++			error(1, 0, "receiver address parse error: %s", addr);
++	}
++
++	if (cfg_payload_len > max_payload_len)
++		error(1, 0, "-l: payload exceeds max (%d)", max_payload_len);
++}
++
++int main(int argc, char **argv)
++{
++	const char *cfg_test = argv[argc - 1];
++	int i;
++
++	parse_opts(argc, argv);
++
++	for (i = 0; i < SEND_SIZE; i++)
++		payload[i] = 'a' + (i % 26);
++
++	if (cfg_server)
++		run_server();
++	else if (cfg_client)
++		run_client();
++
++	return 0;
++}
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+new file mode 100755
+index 000000000000..ea0a346c3eff
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+@@ -0,0 +1,64 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++import re
++from os import path
++from lib.py import ksft_run, ksft_exit
++from lib.py import NetDrvEpEnv
++from lib.py import bkg, cmd, ethtool, wait_port_listen
++
++
++def _get_rx_ring_entries(cfg):
++    output = ethtool(f"-g {cfg.ifname}", host=cfg.remote).stdout
++    values = re.findall(r'RX:\s+(\d+)', output)
++    return int(values[1])
++
++
++def _get_combined_channels(cfg):
++    output = ethtool(f"-l {cfg.ifname}", host=cfg.remote).stdout
++    values = re.findall(r'Combined:\s+(\d+)', output)
++    return int(values[1])
++
++
++def _set_flow_rule(cfg, chan):
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port 9999 action {chan}", host=cfg.remote).stdout
++    values = re.search(r'ID (\d+)', output).group(1)
++    return int(values)
++
++
++def test_zcrx(cfg) -> None:
++    cfg.require_v6()
++
++    combined_chans = _get_combined_channels(cfg)
++    if combined_chans < 2:
++        raise KsftSkipEx('at least 2 combined channels required')
++    rx_ring = _get_rx_ring_entries(cfg)
++
++    rx_cmd = f"{cfg.bin_remote} -s -p 9999 -i {cfg.ifname} -q {combined_chans - 1}"
++    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_v6} -p 9999 -l 12840"
++
++    try:
++        ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
++        ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
++        flow_rule_id = _set_flow_rule(cfg, combined_chans - 1)
++
++        with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
++            wait_port_listen(9999, proto="tcp", host=cfg.remote)
++            cmd(tx_cmd)
++    finally:
++        ethtool(f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
++        ethtool(f"-X {cfg.ifname} default", host=cfg.remote)
++        ethtool(f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
++
++
++def main() -> None:
++    with NetDrvEpEnv(__file__) as cfg:
++        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
++        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
++
++        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.43.5
 
