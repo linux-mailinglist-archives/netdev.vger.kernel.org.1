@@ -1,63 +1,58 @@
-Return-Path: <netdev+bounces-166716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C83A37064
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 20:30:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD262A37067
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 20:31:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E431891475
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 19:29:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFB097A3A4F
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 19:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995B21F4163;
-	Sat, 15 Feb 2025 19:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AC21EA7F5;
+	Sat, 15 Feb 2025 19:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOqyZZj/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIiparAn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A861A9B58;
-	Sat, 15 Feb 2025 19:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8297E1624D3
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 19:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739647780; cv=none; b=Q8gX2zyuYP//F017zYnC2Z9sBK2zPL47/IUgJQHgenr/hRL7ZM2zEX7gBqPjORHSzjusTRpEWbNIgswkdeyEq2OKNgiw+hxpy31ADsFFwAvPVloFBzkAW4+7mKdeiZqksEwBdj0xRzPLMITrV6coowUSvrtnLfoCxtbji8fmHrk=
+	t=1739647867; cv=none; b=c1c90RTHPEr9l3QT8GTnj3sjIq63I1p31+jTCmeVGhyTUByMaAuS12V6u6qvUXIERT56dAT7bW5DqXURQfNa0lle0pOq09MlfBrwaNRBF2l6gY1zwWT/E/TSlEFU+48Xan8T9D6VW7rEo9HL6mcVsOuboupwYeBWCAMYFz3kzMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739647780; c=relaxed/simple;
-	bh=ehjLwgwM1t69iI6E6+1h4fWJ2pSx2/m/NQW5hQlky4Y=;
+	s=arc-20240116; t=1739647867; c=relaxed/simple;
+	bh=TXTdzNW0VGtfO466EM72fkTi81UqXLfTYU598Ty8rzk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZTzXEOuhie0ynRr2zkPIWAZmstlOad3oyLOJg7brU4cTAmIEUthWrN7it5eqnA4vfeD5+i+vLzZg+niNew3oAn7I/ehkW6uBEqwfNTnz9j0yfKbBClezQUlWmKpcFyLqnB5Xa37jyVlossJ04UcPQ+hkks2EY+7brLdipjsCXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOqyZZj/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0CFC4CEDF;
-	Sat, 15 Feb 2025 19:29:37 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewp3RqD+H57udAZBG3+PDfP1+LnCqFubLHfhn/gNTGb4vStxG8a+IIAD4d3ZThoSepW2TVXGFDi5LshwHYa6Fyqy1ow29qRkCZUGVy1I0dwS/eAKwwrdGcAfgVaon7lWg26u3UKcbNS9d49Akg12wEckM7fyeHZBnAQmBg5BzyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIiparAn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA66DC4CEDF;
+	Sat, 15 Feb 2025 19:31:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739647780;
-	bh=ehjLwgwM1t69iI6E6+1h4fWJ2pSx2/m/NQW5hQlky4Y=;
+	s=k20201202; t=1739647866;
+	bh=TXTdzNW0VGtfO466EM72fkTi81UqXLfTYU598Ty8rzk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SOqyZZj/6kaTgkoyRaSBLMkEf8t/HOsFy5n/BwQu/S8iSLlwwxv6GIW6enPOFSspd
-	 tjulUo7ckzOFqTrhC2L6V8oTuOPa7/d2QraO3FXiIuUcXroVIO7m19mY3QTti2d1r1
-	 Per0q5mHQyJ+o8VM+kuHJcgxZTnbjRrBDSii4fyxBR6QY963nCQN33VpGaXWaX4unX
-	 5wZXByBs1xS6PpXwMg740spgBWodKwE2fZ6/jWFxDFw+t4SCx5UCYpqfLwDGt6vLQl
-	 AXR5lN1Ry5NAW2bRNiBUmMfTRYa50AOOsw8xWD2SaxTCF7MpbVVwTx6h+CILnXSO7e
-	 lAIvsFK8A3taA==
-Date: Sat, 15 Feb 2025 19:29:35 +0000
+	b=aIiparAn1uj6lU3nl882HdQsutxt0iki79X9Di4Y1si8bLhe+TD/IeJmoYCcOgetq
+	 SfYxawOI5bO3D8HiSVvjQPeqUws6ROyoGpvyG2/6gevKckDkBpUDVdgUuWC9cQ8DYq
+	 aaf2Fsa5JnteSx+OwK51t6BO+0xM2QkZdwNfgvTZdDjJxb2q1bxuDwugtsfNx5Vvoz
+	 DgKhPyMMujsoSiJz2GCIuM5FW7IzVsH3vCBbzIxbw7QeTvosR9mjkM2KuYI7tp15hk
+	 rjZZIekc4SYnQhh/EUlvX2Iq5wAY1CoohabZg7O0C+UjxfIpnSc0yWXb0VAYvogCYd
+	 qUR+qQ/k0AxTw==
+Date: Sat, 15 Feb 2025 19:31:02 +0000
 From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shahar Shitrit <shshitrit@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
- event message
-Message-ID: <20250215192935.GU1615191@kernel.org>
-References: <20250213094641.226501-1-tariqt@nvidia.com>
- <20250213094641.226501-5-tariqt@nvidia.com>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	michal.swiatkowski@linux.intel.com,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Subject: Re: [PATCH iwl-net 1/2] ice: Fix deinitializing VF in error path
+Message-ID: <20250215193102.GV1615191@kernel.org>
+References: <20250211174322.603652-1-marcin.szycik@linux.intel.com>
+ <20250213105525.GJ1615191@kernel.org>
+ <72975a9c-0daf-4100-b31a-cee0f52e2514@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,66 +61,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250213094641.226501-5-tariqt@nvidia.com>
+In-Reply-To: <72975a9c-0daf-4100-b31a-cee0f52e2514@linux.intel.com>
 
-On Thu, Feb 13, 2025 at 11:46:41AM +0200, Tariq Toukan wrote:
-> From: Shahar Shitrit <shshitrit@nvidia.com>
+On Thu, Feb 13, 2025 at 01:32:38PM +0100, Marcin Szycik wrote:
 > 
-> Previously, a temperature event message included a bitmap indicating
-> which sensors detect high temperatures.
 > 
-> To enhance clarity, we modify the message format to explicitly list
-> the names of the overheating sensors, alongside the sensors bitmap.
-> If HWMON is not configured, the event message remains unchanged.
+> On 13.02.2025 11:55, Simon Horman wrote:
+> > On Tue, Feb 11, 2025 at 06:43:21PM +0100, Marcin Szycik wrote:
+> >> If ice_ena_vfs() fails after calling ice_create_vf_entries(), it frees
+> >> all VFs without removing them from snapshot PF-VF mailbox list, leading
+> >> to list corruption.
+> >>
+> >> Reproducer:
+> >>   devlink dev eswitch set $PF1_PCI mode switchdev
+> >>   ip l s $PF1 up
+> >>   ip l s $PF1 promisc on
+> >>   sleep 1
+> >>   echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
+> > 
+> > Should the line above be "echo 0" to remove the VFs before creating VFs
+> > below (I'm looking at sriov_numvfs_store())?
 > 
-> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Both "echo 1" commands fail (I'm fixing it in patch 2/2), that's why there's
+> no "echo 0" in between. Also, in this minimal example I'm assuming no VFs
+> were initially present.
+> 
+> Thanks for reviewing!
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
-
-> +#if IS_ENABLED(CONFIG_HWMON)
-> +static void print_sensor_names_in_bit_set(struct mlx5_core_dev *dev, struct mlx5_hwmon *hwmon,
-> +					  u64 bit_set, int bit_set_offset)
-> +{
-> +	unsigned long *bit_set_ptr = (unsigned long *)&bit_set;
-> +	int num_bits = sizeof(bit_set) * BITS_PER_BYTE;
-> +	int i;
-> +
-> +	for_each_set_bit(i, bit_set_ptr, num_bits) {
-> +		const char *sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
-> +
-> +		mlx5_core_warn(dev, "Sensor name[%d]: %s\n", i + bit_set_offset, sensor_name);
-> +	}
-> +}
-
-nit:
-
-If you have to respin for some other reason, please consider limiting lines
-to 80 columns wide or less here and elsewhere in this patch where it
-doesn't reduce readability (subjective I know).
-
-e.g.:
-
-static void print_sensor_names_in_bit_set(struct mlx5_core_dev *dev,
-                                          struct mlx5_hwmon *hwmon,
-                                          u64 bit_set, int bit_set_offset)
-{
-        unsigned long *bit_set_ptr = (unsigned long *)&bit_set;
-        int num_bits = sizeof(bit_set) * BITS_PER_BYTE;
-        int i;
-
-        for_each_set_bit(i, bit_set_ptr, num_bits) {
-                const char *sensor_name;
-
-                sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
-
-                mlx5_core_warn(dev, "Sensor name[%d]: %s\n",
-                               i + bit_set_offset, sensor_name);
-        }
-}
+Likewise, thanks for the clarification.
 
 ...
 
