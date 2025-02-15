@@ -1,55 +1,67 @@
-Return-Path: <netdev+bounces-166668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1FFDA36E9E
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:45:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69897A36EA9
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:01:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23E213A8BF6
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 13:45:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CFC9189550B
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244D71A9B34;
-	Sat, 15 Feb 2025 13:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7564156C79;
+	Sat, 15 Feb 2025 14:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVm5+qQp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdkeIjoa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DDA2AD2D;
-	Sat, 15 Feb 2025 13:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D62F8634E;
+	Sat, 15 Feb 2025 14:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739627152; cv=none; b=YbuXvY1BgSl+P281PZd4GZgi64lUg9Z1bHt09H30QvXn4JSkIP1SmAbmelwq4skX/HJ1RbvDuc62W5ZbuZlcqZVFXL8/u5jbn6HpgTRq9XGxElrJQyP07tCd1q6a+/NpercHUBz2qHCCVSvaaWehVydmFGktFfiZ6jN5wUG71+8=
+	t=1739628070; cv=none; b=UPKUMdMCzR4EseavdWi7cRU3zEdbo/Go4pdZQMteyh37Mwy8IORtD+GPcpBxVQhR75JYz3zTf/4C05rbgeejeqvvRxRDUcRMGHchVYL6lHkbEi4cCR/s6W35af7AMyzYCjWoRXHw7iKuGnehqAJN06fhgCLI+QzympdtJ8TbZvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739627152; c=relaxed/simple;
-	bh=0Cp85opGUTYUQPYzVDYxs88/wuDX9jLBEm7IyEJZHzU=;
+	s=arc-20240116; t=1739628070; c=relaxed/simple;
+	bh=3KZjQFG9kWj7eD82rZJTbZ9FPBolNJSFaZ87/g22y1A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c61aLMK0SD6VBcxGFNCcUW+aDaZpb6ysvmGoAztTZJkYgoQeNWXul8RJsu/rsibTQxf1mC6X7tI938O2RzQRRWJH4p7dvKykt//GiGebeBffmx5gV1rRtwPBuesmMY1RM4iCVW4forWhU4p8Z2r+1JX9lhWS9HbUK+0s0NDljC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fVm5+qQp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C04BC4CEDF;
-	Sat, 15 Feb 2025 13:45:50 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=X0AE3Vw5Pgc+XA1tSwRLZfDwZbt9F2J8ezrU00JY6R0NzwhZNWcCQ7xV+4ka9RYjIEvnELHKzraMSa4tocO5y4v3ODC1uguxSnI1+No5uBv4sGXKJ/zGBr1ztgwBcG7bwnD7jgUbqPTPcKBNnFsuQo8jHUVZRJpvzzfzx9IG3Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdkeIjoa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 822DEC4CEDF;
+	Sat, 15 Feb 2025 14:01:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739627151;
-	bh=0Cp85opGUTYUQPYzVDYxs88/wuDX9jLBEm7IyEJZHzU=;
+	s=k20201202; t=1739628069;
+	bh=3KZjQFG9kWj7eD82rZJTbZ9FPBolNJSFaZ87/g22y1A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fVm5+qQpnyY9gu3Za6y8iYpfV2/4Wl7AOthCA2kdoFr6kpo+NdsbfRO4us4ZvyBLj
-	 lKlN57+Ie4VdtdbVzDAQ8cGkLrxCKegw+go1XvL6pc4NSL0oFAwtdFmVsZ3+h1Saql
-	 P0RALecyk7Cc1kVHrYOSuRyXVsdjzCO6WJpTDptfm10mTFlMVHkC9+/A218wLQ0Nzb
-	 ijRLJeBLVK19UvayzX0kJ3XdbZhcIdJ0tPpa3tdFzbMwt/vAzhgh6cxiKLGJ9vaM+2
-	 /NPQvuIVtsa+la76yEZRwwJ7NMELAzVRczRwD148uyCwqa8XTYxnmR/u3Iii9IEKr3
-	 Lf51k3MpYgyDw==
-Date: Sat, 15 Feb 2025 13:45:48 +0000
+	b=mdkeIjoaX5Cb1zuFkBFKRC5hh5M29XZV6OoodO/ZlM3RWcOllZD4faWThxIxKAilu
+	 /iuMlnTsVOmvaUlKMWzMz5ioNFJOXsiMMall0OHQ5poQv5AalO30eE62ksKJNLys9m
+	 avuff3LzCUsjxCRVh/t92j1yyH3H7FvPdXrKUOKmWJxLUey6VcZNnyDE1WeRjBfOt1
+	 AAyWl08v6RedA0ScYvadnEDN2CwZ1fjFeeB+ivrxUOi3LQvWGLreBwFsweGGPCKke1
+	 LDUWOLGA7xmCvobdxxd+EikL5WJC7hNXcHgTv8xCmhg8BHfFCEsi2cvputIOqUNCB7
+	 SwzWhYoCaaffA==
+Date: Sat, 15 Feb 2025 14:01:04 +0000
 From: Simon Horman <horms@kernel.org>
-To: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel-mentees@lists.linux.dev,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH net-next] selftests: net: fix grammar in
- reuseaddr_ports_exhausted.c log message
-Message-ID: <20250215134548.GN1615191@kernel.org>
-References: <20250213152612.4434-1-pranav.tyagi03@gmail.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v3 net-next] net: ethernet: mtk_ppe_offload: Allow QinQ
+Message-ID: <20250215140104.GO1615191@kernel.org>
+References: <20250209110936.241487-1-ericwouds@gmail.com>
+ <20250211165127.3282acb0@kernel.org>
+ <fe6509ab-c186-47c1-b004-4e17a875c5c7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,33 +70,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250213152612.4434-1-pranav.tyagi03@gmail.com>
+In-Reply-To: <fe6509ab-c186-47c1-b004-4e17a875c5c7@gmail.com>
 
-On Thu, Feb 13, 2025 at 08:56:11PM +0530, Pranav Tyagi wrote:
-> This patch fixes a grammatical error in a test log message in
-> reuseaddr_ports_exhausted.c for better clarity as a part of lfx
-> application tasks
+On Wed, Feb 12, 2025 at 08:33:52PM +0100, Eric Woudstra wrote:
 > 
-> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+> 
+> On 2/12/25 1:51 AM, Jakub Kicinski wrote:
+> > On Sun,  9 Feb 2025 12:09:36 +0100 Eric Woudstra wrote:
+> >> This patch adds QinQ support to mtk_flow_offload_replace().
+> >>
+> >> Only PPPoE-in-Q (as before) and Q-in-Q are allowed. A combination
+> >> of PPPoE and Q-in-Q is not allowed.
+> > 
+> > AFAIU the standard asks for outer tag in Q-in-Q to be ETH_P_8021AD,
+> > but you still check:
+> > 
+> >> 			    act->vlan.proto != htons(ETH_P_8021Q))
+> >> 				return -EOPNOTSUPP;
+> > 
+> > If this is a HW limitation I think you should document that more
+> > clearly in the commit message. If you can fix it, I think you should..
+> 
+> It will be the first case. mtk_foe_entry_set_vlan() is limited to using
+> only 1 fixed protocol. I'll drop the reviewed-by, amend the commit
+> message and send v4.
 
-Thanks Pranav,
+I agree with Jakub's comment regarding the spec, and his suggested actions.
+But, FWIIW, I also think that situations such as this are not uncommon in
+the wild.
 
-This change looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-
-A note on process to keep in mind for next time:
-
-This patch seems to have been posted to netdev twice, about 20 hours apart.
-Please don't do that as it can be quite confusing to reviewers.
-
-If you need to update a patch, please version it (e.g. [PATCH v2 net-next).
-If you need to repost a patch, say because there has been no response for a
-long time, please label it accordingly (e.g. [PATCH REPOST net-next]) and
-include some explanation of why it is being reposted, e.g. below the
-scissors ("---").
-
-And regardless, when posting a patch to netdev, please don't post it more
-than once every 24h.
 
