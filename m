@@ -1,185 +1,254 @@
-Return-Path: <netdev+bounces-166658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A714EA36D1C
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 10:48:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50DBAA36D9D
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 12:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD71677BC
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 09:48:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95CC13B1EB0
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 11:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680561953AD;
-	Sat, 15 Feb 2025 09:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZdIEsFke"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E8D1A316A;
+	Sat, 15 Feb 2025 11:11:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D119B19049B;
-	Sat, 15 Feb 2025 09:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E334418F2DF;
+	Sat, 15 Feb 2025 11:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739612894; cv=none; b=rq2sJZOtjRPhCYmiYhm3kyKDVI2vjSpbdQ5O25mJvpu1WvFuX86rWFUYpmPQYH4SRWP1isLOEhvkQJXP83956LL6JzOqyBbfRNXvBpVuGW7G+ZWBLQiEsrMpU8pw7A52/RhdUid99Nun2AtUeB4JIsOZv5EsuIRFHltXbwRFfYo=
+	t=1739617863; cv=none; b=IwIiH4TqNlczlSJed7nfxSY4A4GtPPN5SMmRQWRa3ZEifcBt+x537Yle/PkA/Acc4BPUtrnvQG/rOhvr0OdTTwWMvZ2iqvX4N4/CNYDST+0iKuEmrEWnz05iRz53CWsSz0BnLjnQ7RQ0oKinpkFYcZfwnTXOAbsdgy5PcbW38tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739612894; c=relaxed/simple;
-	bh=5p1qxbmmokb/RCjmP0J0KXsqx7Q/xH8ph31KI4qY+is=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=XpdOcvHUichgGiI661RxjQZx9k1a05VIOBDukhOozhhyiigxxHR1u9Hc4q00rcf8dymtHsdx6jxb++oOPOjfN40Xj8DueDWsYpQcC9HWguLNvBrLlE/fjuC2BBgvLUR89PK8lQwVqAiOpND/ioe2M3XvI24mIXW9NfApTWZn03o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZdIEsFke; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-220d39a5627so42415695ad.1;
-        Sat, 15 Feb 2025 01:48:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739612891; x=1740217691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lVUIuv5v60t9dUYELYCuiXZ/SdEpKJMXESO8sDLvOaw=;
-        b=ZdIEsFkehPXmP/+UtvaUfX/y6oywKDbJURPxEDkalpCYNBpIJ16gJaNtu9grQITemU
-         GwElHt6iWA5kWqrlX+Zk5bHIApw+Niyb1pzlLCI/sVYLUvOzEZQUhmtfFpimfsqDx8lS
-         /qoyCrqTKCqhfDWao6vcZdeiX1hItHJMa38TCs9JOZPuxeFuutDLzXdE8A0bIWXdU9Mm
-         b8+l3rsK3y/MyabU0d50tPUNepXjuldLdCnjNnhXUW8DI2gZOjyY17of5Eh0PtSLCIk3
-         R1Ynkjffd1ajnASj3rOOt2zNHNzT5Ph85vX5RYLZn97ViRpp0ESQNSvB0SnoXB1h+6/F
-         gf8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739612891; x=1740217691;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lVUIuv5v60t9dUYELYCuiXZ/SdEpKJMXESO8sDLvOaw=;
-        b=NFdpRTYokZh3gFJdLVUhYQPZnBwiE4LGBw4sYL7m+SCAAJ4AAf57UbqV6dVh1JnD2D
-         6+m0cNVHlREkIlnyQtGsNqHX7qg9POFXjhwLsTAwFI1cWnLt1jKmJxhFvmaQvhr2GdtA
-         wf5cK2xl9jhbUCw5XMx2gOgvQiRdfLU675YbkMU7zZgEYXDU2vpdXjKxveYVZzRxEbTJ
-         vyCGjAauzIOYL7Y/UbNMx9knpOn2G9/sbZvkuUgMV37WMI2hiBd3SIbGOEO91GfAuR8p
-         2caLqyW3i04kcdqCSdyYYqrSNTrzGh1cFmW8tVMiHbhZpUjrH494KN+GMOqoq+0WUR10
-         CjGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwb4CdN3EsfI0iHTENuOXje1JR2S24UJOjL3K6RRWqjB//uKBTCilkm5PdGWS2YCR8TGuYEUSeoPreW/hVaO4=@vger.kernel.org, AJvYcCV54OJruluIKfMFmhdqznZDmWDzG1kTixEKV4wV4ce8iDYnV+UM5z7MM4gYSXmBtoWxMUTYh2Rp@vger.kernel.org, AJvYcCW3uW+QaGCdUprrYh0OeIro+MDHp/kZUaZn6r9NXEZctivFr0KjxrIKdAg2CsZFdq0y+iMN3B1D3adtd/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM843kLskXN29EtJz1lziQOgL1mhheBmG4nS0NIP4eavr08JXd
-	mswF9dLTiOf7jraTOGkYNInfJg5LHdC3t+67Jtyd7rpDutOmAdt6
-X-Gm-Gg: ASbGncu/AwSw4LOYlCP/V2Ykp6S9VjmM+d2UaAc22I5NaJRcpq5JbGsTvsvyfJvjCGN
-	wKBC/nk0MBIXkyCoUIlF9GkXLLw6OlYZCvLhuOFoAIn2L9SOrN0+4FQxCvOeSwH4LMeHVEOUMSN
-	WBJn15klIK4LeRoJn5jPLa4ilGVELUyggNxY4o2r8/aslgWcl+iCgx6fsVw8KqpkmuunHFe5o+A
-	xIS7ywm9PSunREMlhcTIIVYHyBtb/lGhjlkRHoN47QnZ0edJmSCIp3SbvRdFVjPP/TcbPvx9lAP
-	W6yEr6n0rNJX9OdihUR0SdlzTgIFDJtO9V0ObVYeSZnOh9nP7vtpMBxrTmCT1VcS69tmgU43
-X-Google-Smtp-Source: AGHT+IFSkyYAhujjKt35ajNYuLEfuQtd1ZG9+o4N2CkiF9wb8sdnKHspORe3GA6ysX8Thph6oTObVw==
-X-Received: by 2002:a17:902:ce89:b0:220:e9ac:e746 with SMTP id d9443c01a7336-221040d81f2mr42004535ad.53.1739612890987;
-        Sat, 15 Feb 2025 01:48:10 -0800 (PST)
-Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5364351sm40951775ad.76.2025.02.15.01.48.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 01:48:10 -0800 (PST)
-Date: Sat, 15 Feb 2025 18:48:01 +0900 (JST)
-Message-Id: <20250215.184801.161111735013966961.fujita.tomonori@gmail.com>
-To: gary@garyguo.net
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
-Subject: Re: [PATCH v10 7/8] rust: Add read_poll_timeout functions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20250214113740.156faaf4@eugeo>
-References: <20250209162048.3f18eebd.gary@garyguo.net>
-	<20250214.130530.335441284525755047.fujita.tomonori@gmail.com>
-	<20250214113740.156faaf4@eugeo>
+	s=arc-20240116; t=1739617863; c=relaxed/simple;
+	bh=sPpAxcr8OEPeF6nDrBH1XyqrEsoo2vFroxJiGi2FJUc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ScDvp8Ceu4LVSZLtAoLi5pWTqeFBdvW8RbtfmP3IWat0Rb1G4N8NqSgDbuRnn/Ip0iyVdzTlNnbnttsVcd++HuF3i5moE14NIYwEdQv06qe8QBw08QnhOonqfsi+/LItycxkET5j9kt4tpw83UOh5a/P3Ml2QYBa6ZJE5KvHjus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Yw5hC54Fnz11Q89;
+	Sat, 15 Feb 2025 19:06:19 +0800 (CST)
+Received: from kwepemo500008.china.huawei.com (unknown [7.202.195.163])
+	by mail.maildlp.com (Postfix) with ESMTPS id D92901800D9;
+	Sat, 15 Feb 2025 19:10:50 +0800 (CST)
+Received: from localhost.localdomain (10.175.124.27) by
+ kwepemo500008.china.huawei.com (7.202.195.163) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 15 Feb 2025 19:10:49 +0800
+From: m30030393 <mengkanglai2@huawei.com>
+To: <ja@ssi.bg>
+CC: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<coreteam@netfilter.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yanan@huawei.com>, <fengtao40@huawei.com>,
+	<gaoxingwang1@huawei.com>, <lvs-devel@vger.kernel.org>
+Subject: Re: ftp ipvs connect failed in ipv6
+Date: Sat, 15 Feb 2025 19:09:59 +0800
+Message-ID: <20250215110959.2557589-1-mengkanglai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg>
+References: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemo500008.china.huawei.com (7.202.195.163)
 
-On Fri, 14 Feb 2025 11:37:40 +0000
-Gary Guo <gary@garyguo.net> wrote:
+Tue, 11 Feb 2025, Julian Anastasov wrote:
+>>
+>>
+>>	Hello,
+>>
+>>On Mon, 10 Feb 2025, mengkanglai wrote:
+>>
+>>> Hello:
+>>> I found a problem with ftp ipvs.
+>>> I create 3 virtual machine in one host. One is the FTP client, the other is the ipvs transition host, and the other is the FTP server.
+>>> The ftp connection is successful in ipv4 address,but failed in ipv6 address.
+>>> The failure is tcp6 checksum error in 
+>>> tcp_dnat_handler(tcp_dnat_handler-> tcp_csum_check->csum_ipv6_magic), I trace back where skb->csum is assigned and found skb->csum is assigned in nf_ip6_checksum in case CHECKSUM_NONE(ipv6_conntrack_in=> nf_conntrack_in => nf_conntrack_tcp_packet => nf_ip6_checksum).
+>>> I don't know much about ipv6 checksums,why ipv6 nf_conntrack assign skb->csum but check error in ipvs tcp_dnat_handler?
+>>
+>>	Looks like the checksum validation does not use correct offset for the protocol header in the case with IPv6. Do you see extension headers before the final IPv6 header that points to TCP header? If that is the case, the following patch can help. If you prefer, you can apply just the TCP part for the FTP test. Let me know if this solves the problem, thanks!
 
-> On Fri, 14 Feb 2025 13:05:30 +0900 (JST)
-> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
-> 
->> On Sun, 9 Feb 2025 16:20:48 +0000
->> Gary Guo <gary@garyguo.net> wrote:
+    Thanks for your help, but the following patch can't help. see extension headers before the IPv6 header, it’s just the common first SYN packet of the IPv6 three-way handshake but csum check failed in tcp_csum_check. 
+	I tried different offsets for the protocol header but doesn't work.
+
+>>[PATCH] ipvs: provide correct ipv6 proto offset for csum checks
+>>
+>>Protocol checksum validation fails if there are multiple IPv6 headers before the protocol header. iph->len already contains its offset, so use it to fix the problem.
+>>
+>>Signed-off-by: Julian Anastasov <ja@ssi.bg>
+>>---
+>> net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 ++++++------------  net/netfilter/ipvs/ip_vs_proto_tcp.c  | 19 ++++++-------------  net/netfilter/ipvs/ip_vs_proto_udp.c  | 18 ++++++------------
+>> 3 files changed, 18 insertions(+), 37 deletions(-)
+>>
+>>diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+>>index 83e452916403..63c78a1f3918 100644
+>>--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
+>>+++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+>>@@ -10,7 +10,8 @@
+>> #include <net/ip_vs.h>
 >> 
->> >> +fn might_sleep(loc: &Location<'_>) {
->> >> +    // SAFETY: FFI call.
->> >> +    unsafe {
->> >> +        crate::bindings::__might_sleep_precision(
->> >> +            loc.file().as_ptr().cast(),
->> >> +            loc.file().len() as i32,
->> >> +            loc.line() as i32,
->> >> +        )
->> >> +    }
->> >> +}  
->> > 
->> > One last Q: why isn't `might_sleep` marked as `track_caller` and then
->> > have `Location::caller` be called internally?
->> >
->> > It would make the API same as the C macro.  
+>> static int
+>>-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
+>>+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+		unsigned int sctphoff);
 >> 
->> Equivalent to the C side __might_sleep(), not might_sleep(). To avoid
->> confusion, it might be better to change the name of this function.
+>> static int
+>> sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -108,7 +109,7 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
 >> 
->> The reason why __might_sleep() is used instead of might_sleep() is
->> might_sleep() can't always be called. It was discussed in v2:
+>> 		/* Some checks before mangling */
+>>-		if (!sctp_csum_check(cp->af, skb, pp))
+>>+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+>> 			return 0;
 >> 
->> https://lore.kernel.org/all/ZwPT7HZvG1aYONkQ@boqun-archlinux/
-> 
-> I don't follow. `__might_sleep` or `might_sleep` wouldn't make a
-> difference here, given that this function may actually sleep.
-
-Yeah, it doesn't matter here. If I understand correctly, the
-discussion is about whether might_sleep() itself should be unsafe
-considering the case where it is called from other functions. I simply
-chose uncontroversial __might_sleep().
-
-After reviewing the code again, I realized that I made a mistake;
-__might_sleep() should only be executed when CONFIG_DEBUG_ATOMIC_SLEEP
-is enabled. I also think that it is confusing that might_sleep() calls
-C's __might_sleep().
-
-How about implementing the equivalent to might_sleep()?
-
-/// Annotation for functions that can sleep.
-///
-/// Equivalent to the C side [`might_sleep()`], this function serves as
-/// a debugging aid and a potential scheduling point.
-///
-/// This function can only be used in a nonatomic context.
-#[track_caller]
-fn might_sleep() {
-    #[cfg(CONFIG_DEBUG_ATOMIC_SLEEP)]
-    {
-        let loc = core::panic::Location::caller();
-	// SAFETY: FFI call.
-	unsafe {
-	    crate::bindings::__might_sleep_precision(
-	        loc.file().as_ptr().cast(),
-	        loc.file().len() as i32,
-                loc.line() as i32,
-	    )
-	}
-    }
-    // SAFETY: FFI call.
-    unsafe { crate::bindings::might_resched() }
-}
-
-
->> > Also -- perhaps this function can be public (though I guess you'd need
->> > to put it in a new module).  
+>> 		/* Call application helper if needed */ @@ -156,7 +157,7 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
 >> 
->> Wouldn't it be better to keep it private until actual users appear?
+>> 		/* Some checks before mangling */
+>>-		if (!sctp_csum_check(cp->af, skb, pp))
+>>+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+>> 			return 0;
+>> 
+>> 		/* Call application helper if needed */ @@ -185,19 +186,12 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,  }
+>> 
+>> static int
+>>-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
+>>+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+		unsigned int sctphoff)
+>> {
+>>-	unsigned int sctphoff;
+>> 	struct sctphdr *sh;
+>> 	__le32 cmp, val;
+>> 
+>>-#ifdef CONFIG_IP_VS_IPV6
+>>-	if (af == AF_INET6)
+>>-		sctphoff = sizeof(struct ipv6hdr);
+>>-	else
+>>-#endif
+>>-		sctphoff = ip_hdrlen(skb);
+>>-
+>> 	sh = (struct sctphdr *)(skb->data + sctphoff);
+>> 	cmp = sh->checksum;
+>> 	val = sctp_compute_cksum(skb, sctphoff); diff --git a/net/netfilter/ipvs/ip_vs_proto_tcp.c b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+>>index 7da51390cea6..dabdb9d3b479 100644
+>>--- a/net/netfilter/ipvs/ip_vs_proto_tcp.c
+>>+++ b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+>>@@ -29,7 +29,8 @@
+>> #include <net/ip_vs.h>
+>> 
+>> static int
+>>-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
+>>+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+	       unsigned int tcphoff);
+>> 
+>> static int
+>> tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -166,7 +167,7 @@ tcp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
+>> 
+>> 		/* Some checks before mangling */
+>>-		if (!tcp_csum_check(cp->af, skb, pp))
+>>+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+>> 			return 0;
+>> 
+>> 		/* Call application helper if needed */ @@ -244,7 +245,7 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
+>> 
+>> 		/* Some checks before mangling */
+>>-		if (!tcp_csum_check(cp->af, skb, pp))
+>>+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+>> 			return 0;
+>> 
+>> 		/*
+>>@@ -301,17 +302,9 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 
+>> 
+>> static int
+>>-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
+>>+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+	       unsigned int tcphoff)
+>> {
+>>-	unsigned int tcphoff;
+>>-
+>>-#ifdef CONFIG_IP_VS_IPV6
+>>-	if (af == AF_INET6)
+>>-		tcphoff = sizeof(struct ipv6hdr);
+>>-	else
+>>-#endif
+>>-		tcphoff = ip_hdrlen(skb);
+>>-
+>> 	switch (skb->ip_summed) {
+>> 	case CHECKSUM_NONE:
+>> 		skb->csum = skb_checksum(skb, tcphoff, skb->len - tcphoff, 0); diff --git a/net/netfilter/ipvs/ip_vs_proto_udp.c b/net/netfilter/ipvs/ip_vs_proto_udp.c
+>>index 68260d91c988..e99e7c5df869 100644
+>>--- a/net/netfilter/ipvs/ip_vs_proto_udp.c
+>>+++ b/net/netfilter/ipvs/ip_vs_proto_udp.c
+>>@@ -25,7 +25,8 @@
+>> #include <net/ip6_checksum.h>
+>> 
+>> static int
+>>-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
+>>+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+	       unsigned int udphoff);
+>> 
+>> static int
+>> udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -155,7 +156,7 @@ udp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
+>> 
+>> 		/* Some checks before mangling */
+>>-		if (!udp_csum_check(cp->af, skb, pp))
+>>+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+>> 			return 0;
+>> 
+>> 		/*
+>>@@ -238,7 +239,7 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 		int ret;
+>> 
+>> 		/* Some checks before mangling */
+>>-		if (!udp_csum_check(cp->af, skb, pp))
+>>+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+>> 			return 0;
+>> 
+>> 		/*
+>>@@ -297,17 +298,10 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+>> 
+>> 
+>> static int
+>>-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
+>>+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
+>>+	       unsigned int udphoff)
+>> {
+>> 	struct udphdr _udph, *uh;
+>>-	unsigned int udphoff;
+>>-
+>>-#ifdef CONFIG_IP_VS_IPV6
+>>-	if (af == AF_INET6)
+>>-		udphoff = sizeof(struct ipv6hdr);
+>>-	else
+>>-#endif
+>>-		udphoff = ip_hdrlen(skb);
+>> 
+>> 	uh = skb_header_pointer(skb, udphoff, sizeof(_udph), &_udph);
+>> 	if (uh == NULL)
+>>--
+>>2.48.1
+>>
+>>
+>>Regards
+>>
+>>--
+>>Julian Anastasov <ja@ssi.bg>
 
-I'll make the above public if you think that is the better approach.
-
-C's might_sleep() is defined in linux/kernel.h but kernel/kernel.rs
-isn't a good choice, I guess. kernel/sched.rs or other options?
 
