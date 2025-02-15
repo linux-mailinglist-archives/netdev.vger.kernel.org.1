@@ -1,122 +1,185 @@
-Return-Path: <netdev+bounces-166657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F8AA36D12
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 10:43:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A714EA36D1C
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 10:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA6AB1894737
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 09:43:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD71677BC
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 09:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1D519D09C;
-	Sat, 15 Feb 2025 09:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680561953AD;
+	Sat, 15 Feb 2025 09:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BD/vFss+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZdIEsFke"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897B61922ED
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 09:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D119B19049B;
+	Sat, 15 Feb 2025 09:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739612599; cv=none; b=JcUDksgZyz1/Fe11Uwc0hVS63gI+dn8y11n1h4tWQd074Z2NLnvprsulRtEmo6U2VFr820GlMqkq5E7XaKp3FxdtoBgk3E/D8TXLsCZkaqQHWIsYWe8v2e3AwI7SPBd2Pw4HF4SoNdqQfSbTiF01d4Jz0xcLf8V25GPL175SqsE=
+	t=1739612894; cv=none; b=rq2sJZOtjRPhCYmiYhm3kyKDVI2vjSpbdQ5O25mJvpu1WvFuX86rWFUYpmPQYH4SRWP1isLOEhvkQJXP83956LL6JzOqyBbfRNXvBpVuGW7G+ZWBLQiEsrMpU8pw7A52/RhdUid99Nun2AtUeB4JIsOZv5EsuIRFHltXbwRFfYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739612599; c=relaxed/simple;
-	bh=Swksr/PmYOf+GBVpFOrfwGWLcs0dWlCbQjBcuYE4s0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d38jmX58wxvtv3g4fFejOj5SvJ98kZNXp9CTfIoF5cZFn8aLbAGr8exXp/Dx4bIijEwrMwOU7sYimGp6fbgC4x2N5p/NJxzEDY4LgInzalI84/TC+O0CxYNm7A3cqvaCnsXMorzvc8ug1ABiFHlKy98pjz6R3FKbDpcTE9EAomY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BD/vFss+; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1739612894; c=relaxed/simple;
+	bh=5p1qxbmmokb/RCjmP0J0KXsqx7Q/xH8ph31KI4qY+is=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=XpdOcvHUichgGiI661RxjQZx9k1a05VIOBDukhOozhhyiigxxHR1u9Hc4q00rcf8dymtHsdx6jxb++oOPOjfN40Xj8DueDWsYpQcC9HWguLNvBrLlE/fjuC2BBgvLUR89PK8lQwVqAiOpND/ioe2M3XvI24mIXW9NfApTWZn03o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZdIEsFke; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-220d39a5627so42415695ad.1;
+        Sat, 15 Feb 2025 01:48:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739612597; x=1771148597;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AiujpX/yENDdxtCykiLZ/te6vWbTQRbEEnMMTYm3tdc=;
-  b=BD/vFss+4B2nJu14cGqET6XWUVu3yR4RBVPLHEMTgTqLVTWIUoZaQZ2p
-   tqMJVYtGiHz9i8khpeXfW0qr7j4bvLtRJEuDDdekg9E9zpjCrmDdJBU7d
-   9Gk/quMM2ifAbEpFzV8umPMXqGOQL8ZiufjC8gx3F980zo40idtoE3JuJ
-   g=;
-X-IronPort-AV: E=Sophos;i="6.13,288,1732579200"; 
-   d="scan'208";a="719039423"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2025 09:43:14 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:36209]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.245:2525] with esmtp (Farcaster)
- id 0a5dc21f-c683-4bc3-9814-2e3c6be72420; Sat, 15 Feb 2025 09:43:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 0a5dc21f-c683-4bc3-9814-2e3c6be72420
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sat, 15 Feb 2025 09:43:13 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 15 Feb 2025 09:43:09 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 1/3] pfcp: Convert pfcp_net_exit() to ->exit_batch_rtnl().
-Date: Sat, 15 Feb 2025 18:42:59 +0900
-Message-ID: <20250215094259.12720-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250214081818.81658-2-kuniyu@amazon.com>
-References: <20250214081818.81658-2-kuniyu@amazon.com>
+        d=gmail.com; s=20230601; t=1739612891; x=1740217691; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lVUIuv5v60t9dUYELYCuiXZ/SdEpKJMXESO8sDLvOaw=;
+        b=ZdIEsFkehPXmP/+UtvaUfX/y6oywKDbJURPxEDkalpCYNBpIJ16gJaNtu9grQITemU
+         GwElHt6iWA5kWqrlX+Zk5bHIApw+Niyb1pzlLCI/sVYLUvOzEZQUhmtfFpimfsqDx8lS
+         /qoyCrqTKCqhfDWao6vcZdeiX1hItHJMa38TCs9JOZPuxeFuutDLzXdE8A0bIWXdU9Mm
+         b8+l3rsK3y/MyabU0d50tPUNepXjuldLdCnjNnhXUW8DI2gZOjyY17of5Eh0PtSLCIk3
+         R1Ynkjffd1ajnASj3rOOt2zNHNzT5Ph85vX5RYLZn97ViRpp0ESQNSvB0SnoXB1h+6/F
+         gf8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739612891; x=1740217691;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lVUIuv5v60t9dUYELYCuiXZ/SdEpKJMXESO8sDLvOaw=;
+        b=NFdpRTYokZh3gFJdLVUhYQPZnBwiE4LGBw4sYL7m+SCAAJ4AAf57UbqV6dVh1JnD2D
+         6+m0cNVHlREkIlnyQtGsNqHX7qg9POFXjhwLsTAwFI1cWnLt1jKmJxhFvmaQvhr2GdtA
+         wf5cK2xl9jhbUCw5XMx2gOgvQiRdfLU675YbkMU7zZgEYXDU2vpdXjKxveYVZzRxEbTJ
+         vyCGjAauzIOYL7Y/UbNMx9knpOn2G9/sbZvkuUgMV37WMI2hiBd3SIbGOEO91GfAuR8p
+         2caLqyW3i04kcdqCSdyYYqrSNTrzGh1cFmW8tVMiHbhZpUjrH494KN+GMOqoq+0WUR10
+         CjGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUwb4CdN3EsfI0iHTENuOXje1JR2S24UJOjL3K6RRWqjB//uKBTCilkm5PdGWS2YCR8TGuYEUSeoPreW/hVaO4=@vger.kernel.org, AJvYcCV54OJruluIKfMFmhdqznZDmWDzG1kTixEKV4wV4ce8iDYnV+UM5z7MM4gYSXmBtoWxMUTYh2Rp@vger.kernel.org, AJvYcCW3uW+QaGCdUprrYh0OeIro+MDHp/kZUaZn6r9NXEZctivFr0KjxrIKdAg2CsZFdq0y+iMN3B1D3adtd/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM843kLskXN29EtJz1lziQOgL1mhheBmG4nS0NIP4eavr08JXd
+	mswF9dLTiOf7jraTOGkYNInfJg5LHdC3t+67Jtyd7rpDutOmAdt6
+X-Gm-Gg: ASbGncu/AwSw4LOYlCP/V2Ykp6S9VjmM+d2UaAc22I5NaJRcpq5JbGsTvsvyfJvjCGN
+	wKBC/nk0MBIXkyCoUIlF9GkXLLw6OlYZCvLhuOFoAIn2L9SOrN0+4FQxCvOeSwH4LMeHVEOUMSN
+	WBJn15klIK4LeRoJn5jPLa4ilGVELUyggNxY4o2r8/aslgWcl+iCgx6fsVw8KqpkmuunHFe5o+A
+	xIS7ywm9PSunREMlhcTIIVYHyBtb/lGhjlkRHoN47QnZ0edJmSCIp3SbvRdFVjPP/TcbPvx9lAP
+	W6yEr6n0rNJX9OdihUR0SdlzTgIFDJtO9V0ObVYeSZnOh9nP7vtpMBxrTmCT1VcS69tmgU43
+X-Google-Smtp-Source: AGHT+IFSkyYAhujjKt35ajNYuLEfuQtd1ZG9+o4N2CkiF9wb8sdnKHspORe3GA6ysX8Thph6oTObVw==
+X-Received: by 2002:a17:902:ce89:b0:220:e9ac:e746 with SMTP id d9443c01a7336-221040d81f2mr42004535ad.53.1739612890987;
+        Sat, 15 Feb 2025 01:48:10 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5364351sm40951775ad.76.2025.02.15.01.48.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2025 01:48:10 -0800 (PST)
+Date: Sat, 15 Feb 2025 18:48:01 +0900 (JST)
+Message-Id: <20250215.184801.161111735013966961.fujita.tomonori@gmail.com>
+To: gary@garyguo.net
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
+Subject: Re: [PATCH v10 7/8] rust: Add read_poll_timeout functions
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20250214113740.156faaf4@eugeo>
+References: <20250209162048.3f18eebd.gary@garyguo.net>
+	<20250214.130530.335441284525755047.fujita.tomonori@gmail.com>
+	<20250214113740.156faaf4@eugeo>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Fri, 14 Feb 2025 17:18:16 +0900
-> pfcp_net_exit() holds RTNL and calls unregister_netdevice_queue() for
-> dev in the netns.
-> 
-> Let's convert pfcp_net_exit() to ->exit_batch_rtnl to save RTNL dances
-> for each netns.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  drivers/net/pfcp.c | 27 ++++++++++++++++-----------
->  1 file changed, 16 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
-> index 68d0d9e92a22..5cb8635ada20 100644
-> --- a/drivers/net/pfcp.c
-> +++ b/drivers/net/pfcp.c
-> @@ -244,30 +244,35 @@ static int __net_init pfcp_net_init(struct net *net)
->  	return 0;
->  }
->  
-> -static void __net_exit pfcp_net_exit(struct net *net)
-> +static void __net_exit pfcp_destroy_links(struct net *net,
-> +					  struct list_head *dev_kill_list)
->  {
->  	struct pfcp_net *pn = net_generic(net, pfcp_net_id);
->  	struct pfcp_dev *pfcp, *pfcp_next;
->  	struct net_device *dev;
-> -	LIST_HEAD(list);
->  
-> -	rtnl_lock();
->  	for_each_netdev(net, dev)
->  		if (dev->rtnl_link_ops == &pfcp_link_ops)
-> -			pfcp_dellink(dev, &list);
-> +			pfcp_dellink(dev, dev_kill_list);
+On Fri, 14 Feb 2025 11:37:40 +0000
+Gary Guo <gary@garyguo.net> wrote:
 
-I got a report regarding this part and will post a fix conflicting
-with this hunk, so please ignore this series
+> On Fri, 14 Feb 2025 13:05:30 +0900 (JST)
+> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+> 
+>> On Sun, 9 Feb 2025 16:20:48 +0000
+>> Gary Guo <gary@garyguo.net> wrote:
+>> 
+>> >> +fn might_sleep(loc: &Location<'_>) {
+>> >> +    // SAFETY: FFI call.
+>> >> +    unsafe {
+>> >> +        crate::bindings::__might_sleep_precision(
+>> >> +            loc.file().as_ptr().cast(),
+>> >> +            loc.file().len() as i32,
+>> >> +            loc.line() as i32,
+>> >> +        )
+>> >> +    }
+>> >> +}  
+>> > 
+>> > One last Q: why isn't `might_sleep` marked as `track_caller` and then
+>> > have `Location::caller` be called internally?
+>> >
+>> > It would make the API same as the C macro.  
+>> 
+>> Equivalent to the C side __might_sleep(), not might_sleep(). To avoid
+>> confusion, it might be better to change the name of this function.
+>> 
+>> The reason why __might_sleep() is used instead of might_sleep() is
+>> might_sleep() can't always be called. It was discussed in v2:
+>> 
+>> https://lore.kernel.org/all/ZwPT7HZvG1aYONkQ@boqun-archlinux/
+> 
+> I don't follow. `__might_sleep` or `might_sleep` wouldn't make a
+> difference here, given that this function may actually sleep.
 
-pw-bot: cr
+Yeah, it doesn't matter here. If I understand correctly, the
+discussion is about whether might_sleep() itself should be unsafe
+considering the case where it is called from other functions. I simply
+chose uncontroversial __might_sleep().
+
+After reviewing the code again, I realized that I made a mistake;
+__might_sleep() should only be executed when CONFIG_DEBUG_ATOMIC_SLEEP
+is enabled. I also think that it is confusing that might_sleep() calls
+C's __might_sleep().
+
+How about implementing the equivalent to might_sleep()?
+
+/// Annotation for functions that can sleep.
+///
+/// Equivalent to the C side [`might_sleep()`], this function serves as
+/// a debugging aid and a potential scheduling point.
+///
+/// This function can only be used in a nonatomic context.
+#[track_caller]
+fn might_sleep() {
+    #[cfg(CONFIG_DEBUG_ATOMIC_SLEEP)]
+    {
+        let loc = core::panic::Location::caller();
+	// SAFETY: FFI call.
+	unsafe {
+	    crate::bindings::__might_sleep_precision(
+	        loc.file().as_ptr().cast(),
+	        loc.file().len() as i32,
+                loc.line() as i32,
+	    )
+	}
+    }
+    // SAFETY: FFI call.
+    unsafe { crate::bindings::might_resched() }
+}
+
+
+>> > Also -- perhaps this function can be public (though I guess you'd need
+>> > to put it in a new module).  
+>> 
+>> Wouldn't it be better to keep it private until actual users appear?
+
+I'll make the above public if you think that is the better approach.
+
+C's might_sleep() is defined in linux/kernel.h but kernel/kernel.rs
+isn't a good choice, I guess. kernel/sched.rs or other options?
 
