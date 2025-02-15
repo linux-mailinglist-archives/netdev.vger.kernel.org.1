@@ -1,58 +1,56 @@
-Return-Path: <netdev+bounces-166696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E54A36FBD
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 18:24:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4E9A36FC6
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 18:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C1937A4425
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:23:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36E307A217F
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAFD1E5B94;
-	Sat, 15 Feb 2025 17:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593E11E5B7C;
+	Sat, 15 Feb 2025 17:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxV2AH4u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWZ6cxqT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FED1C7011;
-	Sat, 15 Feb 2025 17:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B1817B50B
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 17:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739640284; cv=none; b=dLgFcwizYLWq/1V9dY40lDqesnkIvs8Ffm5bQFkXmXLnppBSe4bL9QXJW8eF08TB7PefE+HeAeUPAwWDLYx1kO4+nBeLK8yfP9kb105kKZ+VuL+Wr9e5HDT6eNBFw+xeqYlPd4acg8uoZwa880fFZC5wdA21eQDQLCjcV0skOTA=
+	t=1739640569; cv=none; b=NUfXc6UbwM/76hwkBTUONfcuSJNn4wk2j8+d3j4mAinSvmhSd/R8ASawSalul6tsb7Fqiev6hlDl5N9ytQaVYifjpOYq4K+PgaAHVQLN7QZfbhvKEoP1QFHbynYZdh73/KdLp9LYYludPPx9PVHc8jqC6FfWzF4HQlenF2b+LY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739640284; c=relaxed/simple;
-	bh=9xux18qx9ubVkdev0TOvJT7zo+/EGQTZgqk+KXMRMYA=;
+	s=arc-20240116; t=1739640569; c=relaxed/simple;
+	bh=IK6h/4TA/Iti4V46nu69BclTQgANpyGTmyc/wI2SVZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PkOODaSRpChbphJ+ya2+c4Qb6rjMNOrHrzP89P2BgsJQLUIMnpPOK/KbdSPazSZoOX/sk4eYzpp0uH1213qfUOgDWybbH/wj7k195GwQ1PoexkzTkIwQslxHVmPuXelGrM/rYZljcvz9yHR12fAUv/8UjbRbQn4AUT4QSW9F+yA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxV2AH4u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58453C4CEDF;
-	Sat, 15 Feb 2025 17:24:42 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tLaRNCQ0kHhkfLoHJHFWwrDjzJ7vpYpldUpPi96Q2FQlHBWA5mb0aYY+rIKQ959CunJByq+GGfrNgOnS8YLUnuhEIbAJ+c0muy/Ug297RF9VHHq+6jJ3ifjFK50n8oN30ZAiFhDCAytfdftE9GsZkgwF7S0aa+HaxXM+sM8fyi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWZ6cxqT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D475C4CEDF;
+	Sat, 15 Feb 2025 17:29:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739640284;
-	bh=9xux18qx9ubVkdev0TOvJT7zo+/EGQTZgqk+KXMRMYA=;
+	s=k20201202; t=1739640568;
+	bh=IK6h/4TA/Iti4V46nu69BclTQgANpyGTmyc/wI2SVZc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oxV2AH4uovLSS1POfDAWHYffP3cNZ4M+Gn0RWnrVzIWIMzwtOPcUVqqutZwCzYJwE
-	 B8pNNyQZhVpnzhyq8C9s+IXkxiNJMbl7iG22pBop0ScpmFB+JDMU1THxBeP1T6PK0e
-	 sBrs4uR2cQNc/yxB8i0IB/om8gSM8BH5LtixtwDh1lwyYHVXH8PI9iYR9fUbv6gX5w
-	 q/JtDs5UQeskIsRXFN2bEv5bMP85abNbsbFfkOK8c+iRyG0RQqzeVjpwT7mSAKausk
-	 9tvpYVAg8EBgFPHJVWeuCR1SaP/qM7R7WSCuKx7wTFVXkfQx/YYiVeKj4BaI2fD+b/
-	 8gzKavLMUjFcw==
-Date: Sat, 15 Feb 2025 17:24:40 +0000
+	b=jWZ6cxqT9XxRP9y3hkypd8VcpSr9sMxROT2H4C0mYerIefJIO6usUbdO2NwbEBkLJ
+	 uUTN+S6x0OjiDIAr6yIQ6NRWKGGu3uy1RshcV/kHxt2THB0hB32AFaUwxFyNkpeRoI
+	 rVOnpDHTj1gCiDYoi75maa2RSp6qlaaxjWHHhUYnzsSv1Go5WjIycYcjiC69LsAegA
+	 BXNsiE5xTvTLohRbbGONCh1r+c2Dbcd5ryQdM0mYJV7b+l2xXbuLzhrqPR3oSOJ3su
+	 xPPi98y9hS8aK04vtDJIAcDDTVPIw7uKDuUVoFbpMiB31d11xvps1AJipMce5Wlgfz
+	 AfHDGGok6BHRA==
+Date: Sat, 15 Feb 2025 17:29:25 +0000
 From: Simon Horman <horms@kernel.org>
-To: Purva Yeshi <purvayeshi550@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	skhan@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
-Message-ID: <20250215172440.GS1615191@kernel.org>
-References: <20250210075006.9126-1-purvayeshi550@gmail.com>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	andrew@lunn.ch, pmenzel@molgen.mpg.de, netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next v4] ixgbe: add support for thermal sensor event
+ reception
+Message-ID: <20250215172925.GT1615191@kernel.org>
+References: <20250213074452.95862-1-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,66 +59,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250210075006.9126-1-purvayeshi550@gmail.com>
+In-Reply-To: <20250213074452.95862-1-jedrzej.jagielski@intel.com>
 
-+ Iwashima-san, Dan
-
-On Mon, Feb 10, 2025 at 01:20:06PM +0530, Purva Yeshi wrote:
-> Fix issue detected by smatch tool:
-> An "undefined 'other'" error occur in __releases() annotation.
+On Thu, Feb 13, 2025 at 08:44:52AM +0100, Jedrzej Jagielski wrote:
+> E610 NICs unlike the previous devices utilizing ixgbe driver
+> are notified in the case of overheating by the FW ACI event.
 > 
-> Fix an undefined 'other' error in unix_wait_for_peer() caused by  
-> __releases(&unix_sk(other)->lock) being placed before 'other' is in  
-> scope. Since AF_UNIX does not use Sparse annotations, remove it to fix  
-> the issue.  
+> In event of overheat when threshold is exceeded, FW suspends all
+> traffic and sends overtemp event to the driver. Then driver
+> logs appropriate message and closes the adapter instance.
+> The card remains in that state until the platform is rebooted.
 > 
-> Eliminate the error without affecting functionality.  
+> This approach is a solution to the fact current version of the
+> E610 FW doesn't support reading thermal sensor data by the
+> SW. So give to user at least any info that overtemp event
+> has occurred, without interface disappearing from the OS
+> without any note.
 > 
-> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 > ---
-> V1 - https://lore.kernel.org/lkml/20250209184355.16257-1-purvayeshi550@gmail.com/
-> V2 - Remove __releases() annotation as AF_UNIX does not use Sparse annotations.
+> v2,3,4 : commit msg tweaks
 
-Hi Iwashima-san, all,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-in v1 of this change you commented that:
-
-  Tweaking an annotation with a comment for a static analyzer to fix
-  a warning for yet another static analyzer is too much.
-
-  Please remove sparse annotation instead.
-
-  Here's the only place where sparse is used in AF_UNIX code, and we
-  don't use sparse even for /proc/net/unix.
-
-And I do understand entirely that we don't want to overly tweak
-things to keep static analysis tools happy. But I don't think the
-patch description describes the situation completely. So I'd like
-to provide a bit more information.
-
-My understanding is that the two static analysis tools under discussion
-are Smatch and Sparse, where AFAIK Smatch is a fork of Sparse.
-
-Without this patch, when checking af_unix.c, both Smatch and Sparse report
-(only):
-
- .../af_unix.c:1511:9: error: undefined identifier 'other'
- .../af_unix.c:1511:9: error: undefined identifier 'other'
- .../af_unix.c:1511:9: error: undefined identifier 'other'
- .../af_unix.c:1511:9: error: undefined identifier 'other'
-
-And with either v1 or v2 of this patch applied Smatch reports nothing.
-While Sparse reports:
-
- .../af_unix.c:234:13: warning: context imbalance in 'unix_table_double_lock' - wrong count at exit
- .../af_unix.c:253:28: warning: context imbalance in 'unix_table_double_unlock' - unexpected unlock
- .../af_unix.c:1386:13: warning: context imbalance in 'unix_state_double_lock' - wrong count at exit
- .../af_unix.c:1403:17: warning: context imbalance in 'unix_state_double_unlock' - unexpected unlock
- .../af_unix.c:2089:25: warning: context imbalance in 'unix_dgram_sendmsg' - unexpected unlock
- .../af_unix.c:3335:20: warning: context imbalance in 'unix_get_first' - wrong count at exit
- .../af_unix.c:3366:34: warning: context imbalance in 'unix_get_next' - unexpected unlock
- .../af_unix.c:3396:42: warning: context imbalance in 'unix_seq_stop' - unexpected unlock
- .../af_unix.c:3499:34: warning: context imbalance in 'bpf_iter_unix_hold_batch' - unexpected unlock
-
-TBH, I'm unsure which is worse. Nor how to improve things.
 
