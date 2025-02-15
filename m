@@ -1,87 +1,142 @@
-Return-Path: <netdev+bounces-166693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A72A36F80
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:41:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D3FA36F85
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C6B188F42E
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:41:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72AA27A24D1
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2FE1A5B95;
-	Sat, 15 Feb 2025 16:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432CC1DA31F;
+	Sat, 15 Feb 2025 16:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxVe/hJI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eV1jBYvY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56948D529;
-	Sat, 15 Feb 2025 16:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54AC1A5B95;
+	Sat, 15 Feb 2025 16:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739637656; cv=none; b=nCQYuaCNinGo+onqysu+NbC5nZujminKyvQRGy6RjA1PpY7AdD0Bb8OevtHyyocYFWntwwuaYNqLdjuPRtqL9KM4BrOKKjoNGiHSmQ+gp+rICeCWHHAZRNmW1vVjg2tH+a4yjnkkkti9NapjVj+fA5nUF2oBzL9+myJ1gbMBkeg=
+	t=1739637861; cv=none; b=Stlg0Vr6oaz3j2mQGfVikhARpoG+IdrxaY8Rt0OoxCgdoS3kA3kxx6gmyqsBNU4O89k+cFjWeNS5KIxyOow2A8ukQZhSzIiK6Y2RJls8MJcKO0/X/nMUmwp5EbS7lN0suK+O1n6GYlOm5N7ncZsYxznvON37bx0XXE/3UWfvQl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739637656; c=relaxed/simple;
-	bh=BVypI3IHDMnMPfXwsi4Pcfk/2mG1xpprtvPcUh7Oq/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p2dF83/yyMoTg7ciFoPk0dZzZxRkhdRkX+6MD78EAxfjeQEIda950vyNfC0BeN7vQmSs3FcSjEt3IOXpYCCDgSuS3lQdbeUA4dUYTQEFlirbcj1fFLPeJ3DqvrMPkhUZyXVVnhPqyuWL4jcV13o9CnX//O5p0dQDXaP6c8KaPwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxVe/hJI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E07C4CEDF;
-	Sat, 15 Feb 2025 16:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739637655;
-	bh=BVypI3IHDMnMPfXwsi4Pcfk/2mG1xpprtvPcUh7Oq/U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LxVe/hJI43RZTfJeGj+7sR1ZghHCg1isg3hh7FiXjK5tKo+1CU8NrvbPZr5Ctl3u3
-	 lfb3vOgGFcre5sQwCpDTXlJxMvL1zxaTHQoNGq1QUfaFmV1iYAWuFh0DVdyeDRR+PA
-	 OYVCxwtYlpp4l7Kih7FF58FGXAvRQrYvO3/zNKDeiWohpf6FlUpFAiQNE5j2eVqMmo
-	 P6Ga1r0TqERaS4PQcqC/pL4rKNQ2tneou/k+NaXwoK8BJKNnh41wZCLd27SVIttcHt
-	 fYaxadY5GRFsArt4SgvB8M19ezhoZTFqTnwSLW+H3jmxWAVlc2RWBRq+RI8ZbM216F
-	 0eQSw+bgbeQ2w==
-Date: Sat, 15 Feb 2025 08:40:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sean Anderson <sean.anderson@linux.dev>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Paolo
- Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: cadence: macb: Report standard stats
-Message-ID: <20250215084054.09f12b7a@kernel.org>
-In-Reply-To: <19e578ec-b71d-4b22-b1db-016f19c5801d@lunn.ch>
-References: <20250214212703.2618652-1-sean.anderson@linux.dev>
-	<20250214212703.2618652-3-sean.anderson@linux.dev>
-	<19e578ec-b71d-4b22-b1db-016f19c5801d@lunn.ch>
+	s=arc-20240116; t=1739637861; c=relaxed/simple;
+	bh=ViqK2ervE/POO/iJFwLWQY5ukOPXss6ZmDi/xAULonU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eOwYDNJilCOAuE6RmJjoRnr2wwjZpgN1JHsiFGGvuWZKoNdtfDWCkEaOL0NBgiwCrNHJtOiM3AIMdzC/H4yBLIOJJ09PExm2JHzloTUkgR+UsnFh9MADN0fbguZaMrpRArqsVxw4BlmaVEm7PyA2EDKmMMhMp0AUF32YYuzSa4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eV1jBYvY; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22113560c57so5152385ad.2;
+        Sat, 15 Feb 2025 08:44:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739637859; x=1740242659; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zen24IcM3djM9YgCwghgtHtMwzQ4LV/2qqQkL+b6/N0=;
+        b=eV1jBYvYPeTeefHo6rmjGrL+c0MFbRY7DS3NdGJovmczK3ak9qCC0x3d+ANpE7uk8K
+         PhtHL96imlta8UFix/3VD5KIvOFyAp1llPR0RMYZGux8mVQpjbuPnE2Md8UjX1KuX0LR
+         pgAN27F5O42OFN4fVz6DEsMcillgYUIvtTrkJxQrr/6jFU3dci05+xEwrgyhlpGcGFaE
+         hcb0VUGzgn1WIhnv7LyWaVO6Ah5SSO88KRPsJbCUbgNamVMKwrbxYGV+oYv2HH/EZHdQ
+         d0o7+w8XqbxKCL6DqhGfh2C0UuTcca54WnALlpOBtm8+1Niv0VRMVqB4tawmUVVwx4F0
+         1kdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739637859; x=1740242659;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Zen24IcM3djM9YgCwghgtHtMwzQ4LV/2qqQkL+b6/N0=;
+        b=RVZBqZ8NrQ0kiM0EOcGwJ1WYQRvZESn7AbmTSshg/lRiFuC8mlwoLLKuHH6kzqohDv
+         lqfrKSP/X9t+0QUo3LdgGS8clYtEKNDsjsYKtCLVqQ/VYSqyU33DASw6EuvNCocv8F8P
+         5X7RnxDEEOlL07o6D0F/1Tje3vPp4NKynVn04ABhQG1XUtF7wgNYTh3P6LUlNefV1fAf
+         JiCvba/VCkFQGNAsCuQabFmkSaBD8mxUa9ouNeaz9qRyX1P9UtKR/+xG0zyVfuYpE03j
+         qMilS0GG6KSBn2HjrBf56WKOz0wwE2BFPJWp3JNywm2WO/U0WIs3DqZnbIqTG4l8Cldu
+         gqWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVis64liKrYCJ5x8IF1o+tL2FvsPmC3hgXtXQt7AVqTocX7TUJhRAn1EbXShTAYzawIwgrkoP5wli81sPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIGFw0TAZP1mvZN2v//VEIJY9qBmBxqzaCdcmfZMLgcpffov8c
+	qbENRDW7HdZ836tFBvwZiIKwgsc8SKNJOyQf4h5kAjBJBLjC69te
+X-Gm-Gg: ASbGnctTqCnMrtVdIvk2UqNf3jjeJG9lP3+cnjdKe7cDU7wc8FJoGc8TpH03SN6GIqA
+	4Vm/f4o4Kc416x11yPFW2wdshqfK5tUsxQZXdod4SUANi7KJxadYoXITYHdZm/ioE/wFrgdxGtn
+	lDrLKKSssPm/pDji+e3N883MCtFCgSg/W1vMWBQ9SgG93GyN6EttBVn6pPd/QpWbqtHOaOv3hRA
+	8uBJDmmqfAGRBXmPNcccKkolvbn2+dA4fSaC84KOz5Znshgq2iyKTL3RM5TD98YObaq+o+nGfsQ
+	7B3QG4Lk51ecoRfDiNEY
+X-Google-Smtp-Source: AGHT+IEB5/OkP6MlT6rURyfDn95k/vC4OmFIg6jcwrba1EZXG0N0SK2ZbXoBU4WJ2hpKhgmrU7THSQ==
+X-Received: by 2002:a05:6a00:c9:b0:732:6221:7180 with SMTP id d2e1a72fcca58-732622171dfmr3553434b3a.5.1739637858885;
+        Sat, 15 Feb 2025 08:44:18 -0800 (PST)
+Received: from eleanor-wkdl.. ([140.116.96.203])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326dba6585sm483348b3a.14.2025.02.15.08.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2025 08:44:18 -0800 (PST)
+From: Yu-Chun Lin <eleanor15x@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	jserv@ccns.ncku.edu.tw,
+	visitorckw@gmail.com,
+	Yu-Chun Lin <eleanor15x@gmail.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] net: stmmac: Use str_enabled_disabled() helper
+Date: Sun, 16 Feb 2025 00:44:12 +0800
+Message-ID: <20250215164412.2040338-1-eleanor15x@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sat, 15 Feb 2025 00:14:35 +0100 Andrew Lunn wrote:
-> Could we maybe have one central table which drivers share? I assume
-> IETF defined these bands as part or RMON?
+As kernel test robot reported, the following warning occurs:
 
-IIRC RMON standardizes these three:
+cocci warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:582:6-8: opportunity for str_enabled_disabled(on)
 
-        {    0,    64 },
-        {   65,   127 },
-        {  128,   255 },
-        {  256,   511 },
-        {  512,  1023 },
-        { 1024,  1518 },
+Replace ternary (condition ? "enabled" : "disabled") with
+str_enabled_disabled() from string_choices.h to improve readability,
+maintain uniform string usage, and reduce binary size through linker
+deduplication.
 
-Once we get into jumbo (as you probably noticed) the tables start 
-to diverge, mostly because max MTU is different.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202502111616.xnebdSv1-lkp@intel.com/
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On one hand common code is nice, on the other I don't think defining
-this table has ever been a source of confusion, and common table won't
-buy users anything. But, would be yet another thing we have to check
-in review, no?
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+index 96bcda0856ec..3efee70f46b3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+@@ -16,6 +16,7 @@
+ #include <linux/slab.h>
+ #include <linux/ethtool.h>
+ #include <linux/io.h>
++#include <linux/string_choices.h>
+ #include "stmmac.h"
+ #include "stmmac_pcs.h"
+ #include "stmmac_ptp.h"
+@@ -633,7 +634,7 @@ int dwmac1000_ptp_enable(struct ptp_clock_info *ptp,
+ 		}
+ 
+ 		netdev_dbg(priv->dev, "Auxiliary Snapshot %s.\n",
+-			   on ? "enabled" : "disabled");
++			   str_enabled_disabled(on));
+ 		writel(tcr_val, ptpaddr + PTP_TCR);
+ 
+ 		/* wait for auxts fifo clear to finish */
+-- 
+2.43.0
+
 
