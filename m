@@ -1,129 +1,102 @@
-Return-Path: <netdev+bounces-166653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3001FA36C67
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 08:14:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4087EA36CF1
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 10:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDC7818955AC
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 07:14:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E4B172A5E
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 09:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1E618A6C5;
-	Sat, 15 Feb 2025 07:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B29218A95E;
+	Sat, 15 Feb 2025 09:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6rh+JUf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="t30z1Qji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6FD2FF;
-	Sat, 15 Feb 2025 07:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2BE1373
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 09:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739603642; cv=none; b=gbo89OXfcoE5zMnkVWTwON4uVC8doMhV2RYxJzvj3d98dNU+gY+4jn3stFKhK/0LHIJb0EE51ZPlg/WGvrb8VSNTr+v0K3wE+/aW0hwsziGtssH81Aqk99OBXz87zL7ocbrfI4/jW0/3VZWKPo0r3oHXRqgiYTuNvEcYBJ7jihw=
+	t=1739611841; cv=none; b=najGpkUX7yIhgWMJJHhv8gfIVu+4nwijvWpEinXEtvZ1+/7xfCJOwN/bgqNBwnXl0Y0/uX3MCOnbOY7RQPw1wBURcbwZu4yFtNlyFwNL9QQFLGrJmjpigkiAzszBitfa1YqhouXL431HDYede4P0gWe+iSPtTK7pSBXvKGrncvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739603642; c=relaxed/simple;
-	bh=hZGOYluwocYD344Hp0YtYOSiK125EZ0Y1lL4SI0ewxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eIgrkCSXmIm7+AL509BLF5tNcEU6nZDLMy1gxo3s60vpzMn3JYUnHsQznMc5H45Q2COmUwKpulFCbrR5HfkTXeG/J9fn1b+DmaKcHOaGEMvMwB2bFYYR2MHCtT9EJXN9LhqCGsCnd8ablho1vb6YdXEM/axotvnh1fHBrFGXKJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6rh+JUf; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ab7e9254bb6so409494266b.1;
-        Fri, 14 Feb 2025 23:14:00 -0800 (PST)
+	s=arc-20240116; t=1739611841; c=relaxed/simple;
+	bh=OVANeRrv5qqPEz30Uq2Z2qHdzlU6zKKxvs9Rrqe3dBA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RlF9BWNENRlhazaWs7ACyX+DYawLOIdCVIUs2N8P/1FhSBFUIaP4KfLCr/rXjvWT7joILLqe756kXDrFI/rn5gGVNpBwe6JwFcKLZIBn8Sx//cGe1V9DqbOQKfZ1fv7hxO0/QCXKy8X1ei1rZOidDi5pHcXD3GKgA6SiY5OWNW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=t30z1Qji; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739603639; x=1740208439; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLCsXJvI2pTlMZ5YkAh+Q9HM6I6MXWV7qOEpj3EsXpc=;
-        b=O6rh+JUfsByg0G/HSit9w/p0yqaUKp1ccMDuDX9v/GsQdzFRPHBNWxSOi+5pPlWErR
-         qs8YV3So04uGVTD1rWPE6n5yL5mWa7TVtI5gEQJyLuAqqIOC/9jjPhzThdUc3MWhfmf2
-         1h7fE4agQdZ/SM9fNPHQWSKH5e9Xlnh+RfjGQvdYFQ2ViHiD9WKISrLFDxv4QOiFz2/Z
-         MMYP87yQzDZVw0f4xH5u1QpkmHOJ6O46VtyuFK8ZfaVwo0MMPlHfeZFEZqDTghCfBDd+
-         37+ZTnt1BMI6kqYMPvGcjhXZqysZZ8U+cRYN7cMxV69E5xZw1FYpxLdFnGm19g2tpKzH
-         B7lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739603639; x=1740208439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PLCsXJvI2pTlMZ5YkAh+Q9HM6I6MXWV7qOEpj3EsXpc=;
-        b=Xazw9gFu1aOo45mIA3QVk8bHx6OGEdP7V0oSK6zmTvOkrSE7w7vkUt7GPnvesd1RFq
-         dbiD4j0wHeFJfcKpGF2Bc571gSPx7yWR41cB0STiM/N7qWrnRtQ4ICk3wo94SNewBGq9
-         OYtnoqO8IVwmMOZZ1z3nv5TZaSALYWwgbh3h5gOOAUrhmPfeNbFXd11VKN/lIj2iFYXh
-         f9Ua/o0JTovyjOFMLZo+ixx8rDtC2Qx5Zvr8RlxsnPdXvY39Yui5Iev5qH6/NzbMQ8eT
-         L7uNP+i61Sb7vG9RpIutCeEXg/ItrefShfx5gPz5aHZq6RgMSDkz4vzrwyBJb7eYkVZw
-         QAuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlnAc070Zwy4ZUypRs7XXcwL4iYyCrUcrVeORX+5rnKbE4tI/i/Y0MVlrWdMRE6p+6KkkWdTIr@vger.kernel.org, AJvYcCX4YbQpD1Btd+w8n3rajtxJFp8FbOmWWXGm4qSba64U5C4qNGXKUEWnOHzW/PQ+G687WwO7m6tD/fRXMYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI/ZBlzKDUpKC7AiY9TFeFTU7/4+f3YbNukWLalX+IEY/PA47x
-	GqFxgN/on+XsB+yoxoUMmmKd9ASLlZSFEkgm38F0yNrYS4OTUpX9
-X-Gm-Gg: ASbGncu3X/9YiCUyWPJzw0TzKNT+oQrsDgYqJJ4xr4KwR7By/7zNrFbblLAXjeL9pXJ
-	mD9+56+RJ+3MZYFK34hFL6B7ROf5mZwN5mbb56Bs0OGWf592Jw2L2zKwmB4XOXPw8MYeEOrhEbe
-	m6O5tjumk7Qg7UKdGXkWx7cjlzjuO16D6vAhQENHGVQ0zI1gL+0vGaapz7omqUnqd5rOTeArO6a
-	tDO7GHDSomAiBIhRzgUAANdec2F60chFVUK448oFl3kCyHCJDgPKs7VXtfFoR+kIsQH3igdvSv2
-	tpGFGAFEMVib
-X-Google-Smtp-Source: AGHT+IF2uRFcFBDrStq+y/ucMkc+CpORFtGKrLDH1I6w9WA5PS7WZV5TjfRaAZ9vCKnj/U+tMdOdzQ==
-X-Received: by 2002:a17:907:2d28:b0:ab7:dec1:b34d with SMTP id a640c23a62f3a-abb70de3fb2mr168850366b.47.1739603638775;
-        Fri, 14 Feb 2025 23:13:58 -0800 (PST)
-Received: from debian ([2a00:79c0:62b:1200:45fb:7d1a:5e4d:9727])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba533bdcf9sm475099566b.163.2025.02.14.23.13.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 23:13:57 -0800 (PST)
-Date: Sat, 15 Feb 2025 08:13:53 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: phy: marvell-88q2xxx: enable
- temperature sensor in mv88q2xxx_config_init
-Message-ID: <20250215071353.GA5691@debian>
-References: <20250214-marvell-88q2xxx-cleanup-v1-0-71d67c20f308@gmail.com>
- <20250214-marvell-88q2xxx-cleanup-v1-3-71d67c20f308@gmail.com>
- <a3a5bd94-5bb7-4c65-85b6-d7876dca74b8@lunn.ch>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739611839; x=1771147839;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=z2oD3dqrdZ2jpcFMoT6Lk0evTIM8Qq4DJGMsDhcsY84=;
+  b=t30z1QjiNdOlxt4EKZPP89ZaIv8mQCGit+5sVP+L6L4mPhUkXEa21ZPz
+   5XOU1I/FAruaBSTQnN+m4++j09f3aoRTgtMc9GfAGtMRxEMCKhsTHjZZl
+   obaLLV2z6W6mBE2krOA1f6htvfDoJ5s2zM6aVF1NStfpI+Hq3X2Kqbtn0
+   M=;
+X-IronPort-AV: E=Sophos;i="6.13,288,1732579200"; 
+   d="scan'208";a="169953944"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2025 09:30:37 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:45601]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.245:2525] with esmtp (Farcaster)
+ id 4ece41e5-6b02-4040-a2d0-3998ef3f946a; Sat, 15 Feb 2025 09:30:37 +0000 (UTC)
+X-Farcaster-Flow-ID: 4ece41e5-6b02-4040-a2d0-3998ef3f946a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 15 Feb 2025 09:30:37 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 15 Feb 2025 09:30:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <ychemla@nvidia.com>
+Subject: Re: [PATCH v4 net 2/3] net: Fix dev_net(dev) race in unregister_netdevice_notifier_dev_net().
+Date: Sat, 15 Feb 2025 18:30:24 +0900
+Message-ID: <20250215093024.11328-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250214130827.35d59981@kernel.org>
+References: <20250214130827.35d59981@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a3a5bd94-5bb7-4c65-85b6-d7876dca74b8@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Am Fri, Feb 14, 2025 at 07:06:22PM +0100 schrieb Andrew Lunn:
-> On Fri, Feb 14, 2025 at 05:32:05PM +0100, Dimitri Fedrau wrote:
-> > Temperature sensor gets enabled for 88Q222X devices in
-> > mv88q222x_config_init. Move enabling to mv88q2xxx_config_init because
-> > all 88Q2XXX devices support the temperature sensor.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Fri, 14 Feb 2025 13:08:27 -0800
+> On Fri, 14 Feb 2025 09:25:57 +0900 Kuniyuki Iwashima wrote:
+> > > Is there a plan to clean this up in net-next? Or perhaps after Eric's
+> > > dev_net() work? Otherwise I'm tempted to suggest to use a loop, maybe:  
 > > 
-> > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> > For sure, I will post a followup patch to net-next.
 > 
-> The change itself looks fine:
+> Sorry, I meant that as distinct alternatives :)
+> The loop we can do already in net.
+> The question about net-next was more in case you're planning to rewrite
+> this entire function anyway, in which case the contents which land in
+> net are not as important.
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> but is the sensor actually usable if the PHY has not yet been
-> configured?
->
-No.
+> Does that make sense?
 
-> Architecturally, it seems odd to register the HWMON in probe, and then
-> enable it in config_init.
+Ah I see.
+I didn't have the plan so will post v5 with the simple loop.
 
-I think it makes sense to enable it in probe as well. I just moved it to
-config_init because of the PHYs hard reset. Before
-https://lore.kernel.org/netdev/20250118-marvell-88q2xxx-fix-hwmon-v2-1-402e62ba2dcb@gmail.com/
-it was already done in mv88q2xxx_hwmon_probe. I will come up with a patch.
-
-Best regards,
-Dimitri Fedrau
+Thanks!
 
