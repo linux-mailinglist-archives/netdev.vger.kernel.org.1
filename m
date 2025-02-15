@@ -1,137 +1,130 @@
-Return-Path: <netdev+bounces-166676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBF8A36EE6
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:50:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B459A36EEA
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:59:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BFE43B13B1
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:50:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEEC9188129F
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 14:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1374E1C6FE4;
-	Sat, 15 Feb 2025 14:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716E81D86FB;
+	Sat, 15 Feb 2025 14:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ftztP7CZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwUQSjPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDD14400
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 14:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF884400
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 14:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739631050; cv=none; b=AjGKy0BUUm54TcnkflDjH0kHE05XXAKbIrz8uUE5hCF/DH8+kOHxVKXYsJVgrf9HnYpj5kN4Bpa2rNJNcIVhI4l34C7wCgb9ZX8ldRGcq/3bKoLhhZYvfEDyQNfNWyasVT+jDqFKpUkoL0BtInnFjHDSOOvya/PoimjQ1/bAHqE=
+	t=1739631585; cv=none; b=IlE1WFLb83PyPTZjYhlPfEuen29jzaxiR2QqD7EVj4ys7ZEHyUSpfVzasBXQfVf1juzCFtZeIryhyCmBho2JZnVg8mTOVYkJE+UChCWrzFJgAqM77eFX0cUAUnWyL8fSeY4roi1pY2LC9pOfMvktkdo5fO6hzbtUmDhIUNrOvic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739631050; c=relaxed/simple;
-	bh=SWRrrQkaTxYEv0q5FmwJ8obiaDrM9IhdXeG/cNP74m0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=JYbTeI2IWX5mvaStM4IeNURLzlUQ2XymAphp3lXSFhEIj8qmTDIsz0NTovJ5fX6N/skRedttf9Sb5hKK+JQecqVYeiiXnM+l16HJXNjG5F9o+m0fb3dlZB8WUsiGWvnCw8b68BW29zTPyl/2bRwOcCvDr8WGPg1gqg2tIvF8m4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ftztP7CZ; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e4565be0e0so33909236d6.3
-        for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 06:50:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739631047; x=1740235847; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pQZWvFQUfpkKGQgAUvD4LRdp7wwl9gyYyXQmJ+Bb4/M=;
-        b=ftztP7CZ0Yi2kYJLsLocv30LKb6EKY7bS8jTAw5s8tKacTYH9I6geT1TsqMvAWIVsg
-         usTF58711VeUzVfT64Gcq1xi7c/0rUW68wS31K8qs4GNqFRNkjAbDtx4Iy52Kj0GC6PN
-         S5amGlirwlXLwmmyyF39Rk4xwr6ySMLZFGa6XriDLwAcTdAVVQCqgk+nixKsdt36Kne7
-         wi3dSI3ZhTET2Yy+lEG8fOMgK/wk/nSID5yyOxmKUO/3KRHVpH6lIfCGYhnkMgdDq5me
-         Qu1VthC4fFu1ZAmnUXcAIUQbzAhvzwTiPePW1YP3TgUlPYeiQXYhqcnn1cRdGcWoCLPS
-         Q+Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739631047; x=1740235847;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pQZWvFQUfpkKGQgAUvD4LRdp7wwl9gyYyXQmJ+Bb4/M=;
-        b=t7PqbgNfYGyRDZbmBM2vZOgnGXN//RIqWZlhgu98yIERba8O5GyYoJi+zLabx0SWfQ
-         cZKw+ovtSPG9tUO24FzOtYi6n+gCE8YxPbM3/L00cNnq8e87e0SKdPhdGtVgcD7cCPh8
-         x4mFLdE121nPQoR7BvhdjEZADlytE1YlD4fS0pFqEbrlYEbg9VP4UTLQwoV9RWx35QdV
-         0G+lbgiA4t5zUu7VjwBi8uvgXUZxt6sIRtSlr6JaDCZVC9RzwpdNhoUDF4otKGb4byLt
-         CM9UECK9JaElT4sq6R+QN3gUC5EeSyFh1yVMyOdVmRxwFP4C+PETjYtcwEosWtyBatlb
-         C1Kg==
-X-Gm-Message-State: AOJu0YzZFbicVTCZPPFHlrFSyEEzWRdJ83WVpIehFXeNrp7saKc2WFDd
-	HAls4QFrQUrC/XyIyLk0OzBw7SYo3x2CfruCoZIUxSfpqMuF6bDz
-X-Gm-Gg: ASbGnctDV6xlOYqkBsSpk3rT+BI8Xf07GXBKr6qq573LsLvVrHkf0jLkueqNfa3CVXK
-	JP2J4sadWT7xV5UXeLqVNyeNE6O82VlIT3+r8OE0T+zdotZ9A04CEiRlesZdN+YA4HBWfxxAUIo
-	0y2yy82YDz9aXJbHB7BSubSCsCe2vGoebjiXPkboxRlkNXRpaEG94qLCWtQ4WwkccKIsXoqw8Hf
-	zW0uyTU2ymdqRy2nCaStKbMXEflfP1l1LKF3fs3QqX0cmtuZSF1Akk3aImMtOuMi8A8BSLlsHeO
-	3qp5lLSYhZZl42GI8kpBs9fbAetf/x3/ktQJNWVqgGW5c6GkjcMG88WCsZsHARc=
-X-Google-Smtp-Source: AGHT+IFMZ1vYEuse7kR1G8hpzND7ioOcIr1FAYyB32zToYwvtqEJ4Ueu0UHDUYrpLlmV8zsXnBJL/g==
-X-Received: by 2002:a05:6214:cad:b0:6e6:6b55:aa79 with SMTP id 6a1803df08f44-6e66ccc46b6mr53845556d6.19.1739631047334;
-        Sat, 15 Feb 2025 06:50:47 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65db006e4sm32440766d6.103.2025.02.15.06.50.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 06:50:46 -0800 (PST)
-Date: Sat, 15 Feb 2025 09:50:46 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- petrm@nvidia.com, 
- stfomichev@gmail.com, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <67b0a9c6ae5bf_36e3442944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250214234631.2308900-4-kuba@kernel.org>
-References: <20250214234631.2308900-1-kuba@kernel.org>
- <20250214234631.2308900-4-kuba@kernel.org>
-Subject: Re: [PATCH net-next v2 3/3] selftests: drv-net: add a simple TSO test
+	s=arc-20240116; t=1739631585; c=relaxed/simple;
+	bh=KZIZ2YjjJfOnL3t0lW4BtdAn69ETS3FBkScbdmN5n2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qsmcqmz06xmFwI7dXopKIAsHHrmpzpVC41enk33Djxd2eWH3BVENGFIAqDDJkaiNSvLw4Baq4sIvDxeDL7PUX248scIcuEUuz17xnsaQIyifLQ2ldHL9xKsYNbkx4QyzDgySGUhC0gy9eB/HZdy0NXBaMPJpKbqkT+B2aTz/Wio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwUQSjPe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21B6DC4CEDF;
+	Sat, 15 Feb 2025 14:59:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739631585;
+	bh=KZIZ2YjjJfOnL3t0lW4BtdAn69ETS3FBkScbdmN5n2I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iwUQSjPeFfFkTjMYnVmHe7tOnnn5OFOHfLGa3Nr+PI5yRJy86Q0h+fk620+Pk51PM
+	 aMWnAKsbd0Gfvrv9N1eIcteupoF+EcthBhheAptnWL75DFJCyKC2lpjKy4upE/RsGN
+	 HrxihxYrNXbiVfLJpGT//M/CtKDsbmwkW+QKq7ufQvUsMkb6hPmG1zM21OVT3TlYZ2
+	 nufbEbHyZqWEf4aAZkId7Ao+L4so3+WxZLsAtBJGIgGFyckWqcoPGHWkCHR8lS9c3N
+	 CkoDjjuGDRZ0PcxopK/7KHpoZNIOjOjWQ014n07/lCi3KwbvFuEQfST+FYlB5Wcfmp
+	 G2yQ/ecN/LC3g==
+Date: Sat, 15 Feb 2025 14:59:41 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev <netdev@vger.kernel.org>,
+	Anthony Nguyen <anthony.l.nguyen@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: Re: [PATCH iwl-net] ice: ensure periodic output start time is in the
+ future
+Message-ID: <20250215145941.GQ1615191@kernel.org>
+References: <20250212-jk-gnrd-ptp-pin-patches-v1-1-7cbae692ac97@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250212-jk-gnrd-ptp-pin-patches-v1-1-7cbae692ac97@intel.com>
 
-Jakub Kicinski wrote:
-> Add a simple test for TSO. Send a few MB of data and check device
-> stats to verify that the device was performing segmentation.
-> Do the same thing over a few tunnel types.
+On Wed, Feb 12, 2025 at 03:54:39PM -0800, Jacob Keller wrote:
+> From: Karol Kolacinski <karol.kolacinski@intel.com>
 > 
-> Injecting GSO packets directly would give us more ability to test
-> corner cases, but perhaps starting simple is good enough?
+> On E800 series hardware, if the start time for a periodic output signal is
+> programmed into GLTSYN_TGT_H and GLTSYN_TGT_L registers, the hardware logic
+> locks up and the periodic output signal never starts. Any future attempt to
+> reprogram the clock function is futile as the hardware will not reset until
+> a power on.
 > 
->   # ./ksft-net-drv/drivers/net/hw/tso.py
->   # Detected qstat for LSO wire-packets
->   KTAP version 1
->   1..14
->   ok 1 tso.ipv4 # SKIP Test requires IPv4 connectivity
->   ok 2 tso.vxlan4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 3 tso.vxlan6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 4 tso.vxlan_csum4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 5 tso.vxlan_csum6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 6 tso.gre4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 7 tso.gre6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 8 tso.ipv6
->   ok 9 tso.vxlan4_ipv6
->   ok 10 tso.vxlan6_ipv6
->   ok 11 tso.vxlan_csum4_ipv6
->   ok 12 tso.vxlan_csum6_ipv6
->   ok 13 tso.gre4_ipv6
->   ok 14 tso.gre6_ipv6
->   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:7 error:0
+> The ice_ptp_cfg_perout function has logic to prevent this, as it checks if
+> the requested start time is in the past. If so, a new start time is
+> calculated by rounding up.
 > 
-> Note that the test currently depends on the driver reporting
-> the LSO count via qstat, which appears to be relatively rare
-> (virtio, cisco/enic, sfc/efc; but virtio needs host support).
+> Since commit d755a7e129a5 ("ice: Cache perout/extts requests and check
+> flags"), the rounding is done to the nearest multiple of the clock period,
+> rather than to a full second. This is more accurate, since it ensures the
+> signal matches the user request precisely.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Unfortunately, there is a race condition with this rounding logic. If the
+> current time is close to the multiple of the period, we could calculate a
+> target time that is extremely soon. It takes time for the software to
+> program the registers, during which time this requested start time could
+> become a start time in the past. If that happens, the periodic output
+> signal will lock up.
+> 
+> For large enough periods, or for the logic prior to the mentioned commit,
+> this is unlikely. However, with the new logic rounding to the period and
+> with a small enough period, this becomes inevitable.
+> 
+> For example, attempting to enable a 10MHz signal requires a period of 100
+> nanoseconds. This means in the *best* case, we have 99 nanoseconds to
+> program the clock output. This is essentially impossible, and thus such a
+> small period practically guarantees that the clock output function will
+> lock up.
+> 
+> To fix this, add some slop to the clock time used to check if the start
+> time is in the past. Because it is not critical that output signals start
+> immediately, but it *is* critical that we do not brick the function, 0.5
+> seconds is selected. This does mean that any requested output will be
+> delayed by at least 0.5 seconds.
+> 
+> This slop is applied before rounding, so that we always round up to the
+> nearest multiple of the period that is at least 0.5 seconds in the future,
+> ensuring a minimum of 0.5 seconds to program the clock output registers.
+> 
+> Finally, to ensure that the hardware registers programming the clock output
+> complete in a timely manner, add a write flush to the end of
+> ice_ptp_write_perout. This ensures we don't risk any issue with PCIe
+> transaction batching.
+> 
+> Strictly speaking, this fixes a race condition all the way back at the
+> initial implementation of periodic output programming, as it is
+> theoretically possible to trigger this bug even on the old logic when
+> always rounding to a full second. However, the window is narrow, and the
+> code has been refactored heavily since then, making a direct backport not
+> apply cleanly.
+> 
+> Fixes: d755a7e129a5 ("ice: Cache perout/extts requests and check flags")
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Thanks for the excellent patch description.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
