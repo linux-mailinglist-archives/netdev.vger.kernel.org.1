@@ -1,254 +1,159 @@
-Return-Path: <netdev+bounces-166659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DBAA36D9D
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 12:11:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29A7A36DA1
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 12:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95CC13B1EB0
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 11:10:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BF34188F3C5
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 11:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E8D1A316A;
-	Sat, 15 Feb 2025 11:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09BD1A83F2;
+	Sat, 15 Feb 2025 11:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isXhq3kt"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E334418F2DF;
-	Sat, 15 Feb 2025 11:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8EA18F2DF;
+	Sat, 15 Feb 2025 11:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739617863; cv=none; b=IwIiH4TqNlczlSJed7nfxSY4A4GtPPN5SMmRQWRa3ZEifcBt+x537Yle/PkA/Acc4BPUtrnvQG/rOhvr0OdTTwWMvZ2iqvX4N4/CNYDST+0iKuEmrEWnz05iRz53CWsSz0BnLjnQ7RQ0oKinpkFYcZfwnTXOAbsdgy5PcbW38tk=
+	t=1739618056; cv=none; b=hj09tei7YJ35Lk1vG8+gbaqYgl7YelszFdjZmQNH5OW/2tTumGADbFHnOHvrfhLz3xQGDEIORXEtairuyKA+tH0DvD8wyzZSf7SQg3yCKgy/M5zq66XvPZFJW3bF0V5D3kPmxZD2m7AGYIqeboQ3j6/fpIk7Hvm2gI+ks673gds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739617863; c=relaxed/simple;
-	bh=sPpAxcr8OEPeF6nDrBH1XyqrEsoo2vFroxJiGi2FJUc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ScDvp8Ceu4LVSZLtAoLi5pWTqeFBdvW8RbtfmP3IWat0Rb1G4N8NqSgDbuRnn/Ip0iyVdzTlNnbnttsVcd++HuF3i5moE14NIYwEdQv06qe8QBw08QnhOonqfsi+/LItycxkET5j9kt4tpw83UOh5a/P3Ml2QYBa6ZJE5KvHjus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Yw5hC54Fnz11Q89;
-	Sat, 15 Feb 2025 19:06:19 +0800 (CST)
-Received: from kwepemo500008.china.huawei.com (unknown [7.202.195.163])
-	by mail.maildlp.com (Postfix) with ESMTPS id D92901800D9;
-	Sat, 15 Feb 2025 19:10:50 +0800 (CST)
-Received: from localhost.localdomain (10.175.124.27) by
- kwepemo500008.china.huawei.com (7.202.195.163) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 15 Feb 2025 19:10:49 +0800
-From: m30030393 <mengkanglai2@huawei.com>
-To: <ja@ssi.bg>
-CC: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <yanan@huawei.com>, <fengtao40@huawei.com>,
-	<gaoxingwang1@huawei.com>, <lvs-devel@vger.kernel.org>
-Subject: Re: ftp ipvs connect failed in ipv6
-Date: Sat, 15 Feb 2025 19:09:59 +0800
-Message-ID: <20250215110959.2557589-1-mengkanglai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg>
-References: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg>
+	s=arc-20240116; t=1739618056; c=relaxed/simple;
+	bh=2MG5CjrZ+8pQDI+3FotFCAtkUVEZsU+0uSwPnGrtv1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c17hXMxINbdsGAkoQ/yQk5JtkbyE6FhVxa/Yj/Bs30oK/VYlH6uMElWbvjxGXe2lh+b65U5b+jXKd6dFo+r6LMHvECzmeS4KW2Wdw02LS+PJ6AVM8wPd0JweckIkBi2Aw2ANNBdEUzrkp7oh8SAbwsP2Udr9ikGVY84MuvtCoZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isXhq3kt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E927C4CEDF;
+	Sat, 15 Feb 2025 11:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739618056;
+	bh=2MG5CjrZ+8pQDI+3FotFCAtkUVEZsU+0uSwPnGrtv1U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=isXhq3ktq4XF7Ur7evEAeexK9bmTJ9BXtTQteA6D7utao/Uqi+shVcotQWzmu0PBQ
+	 3miM4u5GxdFgLlj2NIHnWRB4QY2N9pg2P5AOOt3AsVXsEHxq+d/m769aqlcCJse2/V
+	 IMCK1MD2TYsdAFeJHCEp/uHcon78tQwwBBIXS+vbGuQ+Ko4QUVuBRMc2foaxtK4yzG
+	 jFMaYVIYfav246rsYl64PCj/mWvPkDYqXXHIuvH+zXGbpzeXBvlxU6uVjVltLjPgT2
+	 l8J7oMaZ+qN7bDqIESZKcIIBvDcIRh358UuDEdhqdYAEHxxSUmRkZC2BGKMr07xsGr
+	 ADc1u82knp58Q==
+Message-ID: <8eab6c81-2015-4d5e-a1af-7ebe0208996a@kernel.org>
+Date: Sat, 15 Feb 2025 12:14:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemo500008.china.huawei.com (7.202.195.163)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] arm64: Kconfig: expand STM32 Armv8 SoC with
+ STM32MP21 SoCs family
+To: Amelie Delaunay <amelie.delaunay@foss.st.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250210-b4-stm32mp2_new_dts-v1-0-e8ef1e666c5e@foss.st.com>
+ <20250210-b4-stm32mp2_new_dts-v1-7-e8ef1e666c5e@foss.st.com>
+ <20250213-polite-spiked-dingo-ce0f3a@krzk-bin>
+ <450d2efa-f38b-4f3a-b308-f2fb01fdb8f7@foss.st.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <450d2efa-f38b-4f3a-b308-f2fb01fdb8f7@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Tue, 11 Feb 2025, Julian Anastasov wrote:
+On 14/02/2025 16:06, Amelie Delaunay wrote:
+> On 2/13/25 10:02, Krzysztof Kozlowski wrote:
+>> On Mon, Feb 10, 2025 at 04:21:01PM +0100, Amelie Delaunay wrote:
+>>> Expand config ARCH_STM32 with the new STM32MP21 SoCs family which is
+>>> composed of STM32MP211, STM32MP213 and STM32MP215 SoCs.
+>>>
+>>> Signed-off-by: Amelie Delaunay <amelie.delaunay@foss.st.com>
+>>> ---
+>>>   arch/arm64/Kconfig.platforms | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+>>> index 844a39620cfea8bfc031a545d85e33894ef20994..f788dbc09c9eb6f5801758ccf6b0ffe50a96090e 100644
+>>> --- a/arch/arm64/Kconfig.platforms
+>>> +++ b/arch/arm64/Kconfig.platforms
+>>> @@ -325,6 +325,8 @@ config ARCH_STM32
+>>>   			- STM32MP251, STM32MP253, STM32MP255 and STM32MP257.
+>>>   		- STM32MP23:
+>>>   			- STM32MP231, STM32MP233, STM32MP235.
+>>> +		- STM32MP21:
 >>
+>> Squash it with previous patch and keep some sort of order.
 >>
->>	Hello,
->>
->>On Mon, 10 Feb 2025, mengkanglai wrote:
->>
->>> Hello:
->>> I found a problem with ftp ipvs.
->>> I create 3 virtual machine in one host. One is the FTP client, the other is the ipvs transition host, and the other is the FTP server.
->>> The ftp connection is successful in ipv4 address,but failed in ipv6 address.
->>> The failure is tcp6 checksum error in 
->>> tcp_dnat_handler(tcp_dnat_handler-> tcp_csum_check->csum_ipv6_magic), I trace back where skb->csum is assigned and found skb->csum is assigned in nf_ip6_checksum in case CHECKSUM_NONE(ipv6_conntrack_in=> nf_conntrack_in => nf_conntrack_tcp_packet => nf_ip6_checksum).
->>> I don't know much about ipv6 checksums,why ipv6 nf_conntrack assign skb->csum but check error in ipvs tcp_dnat_handler?
->>
->>	Looks like the checksum validation does not use correct offset for the protocol header in the case with IPv6. Do you see extension headers before the final IPv6 header that points to TCP header? If that is the case, the following patch can help. If you prefer, you can apply just the TCP part for the FTP test. Let me know if this solves the problem, thanks!
+> 
+> Ok for squashing with patch 3.
+> Do you mean to keep the current chronological order used here or to 
 
-    Thanks for your help, but the following patch can't help. see extension headers before the IPv6 header, it’s just the common first SYN packet of the IPv6 three-way handshake but csum check failed in tcp_csum_check. 
-	I tried different offsets for the protocol header but doesn't work.
+chronological of what? Adding it? That's the worse of possible orders,
+because it is basically random invitation to conflicts.
 
->>[PATCH] ipvs: provide correct ipv6 proto offset for csum checks
->>
->>Protocol checksum validation fails if there are multiple IPv6 headers before the protocol header. iph->len already contains its offset, so use it to fix the problem.
->>
->>Signed-off-by: Julian Anastasov <ja@ssi.bg>
->>---
->> net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 ++++++------------  net/netfilter/ipvs/ip_vs_proto_tcp.c  | 19 ++++++-------------  net/netfilter/ipvs/ip_vs_proto_udp.c  | 18 ++++++------------
->> 3 files changed, 18 insertions(+), 37 deletions(-)
->>
->>diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
->>index 83e452916403..63c78a1f3918 100644
->>--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
->>+++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
->>@@ -10,7 +10,8 @@
->> #include <net/ip_vs.h>
->> 
->> static int
->>-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
->>+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+		unsigned int sctphoff);
->> 
->> static int
->> sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -108,7 +109,7 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!sctp_csum_check(cp->af, skb, pp))
->>+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
->> 			return 0;
->> 
->> 		/* Call application helper if needed */ @@ -156,7 +157,7 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!sctp_csum_check(cp->af, skb, pp))
->>+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
->> 			return 0;
->> 
->> 		/* Call application helper if needed */ @@ -185,19 +186,12 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,  }
->> 
->> static int
->>-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
->>+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+		unsigned int sctphoff)
->> {
->>-	unsigned int sctphoff;
->> 	struct sctphdr *sh;
->> 	__le32 cmp, val;
->> 
->>-#ifdef CONFIG_IP_VS_IPV6
->>-	if (af == AF_INET6)
->>-		sctphoff = sizeof(struct ipv6hdr);
->>-	else
->>-#endif
->>-		sctphoff = ip_hdrlen(skb);
->>-
->> 	sh = (struct sctphdr *)(skb->data + sctphoff);
->> 	cmp = sh->checksum;
->> 	val = sctp_compute_cksum(skb, sctphoff); diff --git a/net/netfilter/ipvs/ip_vs_proto_tcp.c b/net/netfilter/ipvs/ip_vs_proto_tcp.c
->>index 7da51390cea6..dabdb9d3b479 100644
->>--- a/net/netfilter/ipvs/ip_vs_proto_tcp.c
->>+++ b/net/netfilter/ipvs/ip_vs_proto_tcp.c
->>@@ -29,7 +29,8 @@
->> #include <net/ip_vs.h>
->> 
->> static int
->>-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
->>+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+	       unsigned int tcphoff);
->> 
->> static int
->> tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -166,7 +167,7 @@ tcp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!tcp_csum_check(cp->af, skb, pp))
->>+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
->> 			return 0;
->> 
->> 		/* Call application helper if needed */ @@ -244,7 +245,7 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!tcp_csum_check(cp->af, skb, pp))
->>+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
->> 			return 0;
->> 
->> 		/*
->>@@ -301,17 +302,9 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 
->> 
->> static int
->>-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
->>+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+	       unsigned int tcphoff)
->> {
->>-	unsigned int tcphoff;
->>-
->>-#ifdef CONFIG_IP_VS_IPV6
->>-	if (af == AF_INET6)
->>-		tcphoff = sizeof(struct ipv6hdr);
->>-	else
->>-#endif
->>-		tcphoff = ip_hdrlen(skb);
->>-
->> 	switch (skb->ip_summed) {
->> 	case CHECKSUM_NONE:
->> 		skb->csum = skb_checksum(skb, tcphoff, skb->len - tcphoff, 0); diff --git a/net/netfilter/ipvs/ip_vs_proto_udp.c b/net/netfilter/ipvs/ip_vs_proto_udp.c
->>index 68260d91c988..e99e7c5df869 100644
->>--- a/net/netfilter/ipvs/ip_vs_proto_udp.c
->>+++ b/net/netfilter/ipvs/ip_vs_proto_udp.c
->>@@ -25,7 +25,8 @@
->> #include <net/ip6_checksum.h>
->> 
->> static int
->>-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
->>+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+	       unsigned int udphoff);
->> 
->> static int
->> udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb, @@ -155,7 +156,7 @@ udp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!udp_csum_check(cp->af, skb, pp))
->>+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
->> 			return 0;
->> 
->> 		/*
->>@@ -238,7 +239,7 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 		int ret;
->> 
->> 		/* Some checks before mangling */
->>-		if (!udp_csum_check(cp->af, skb, pp))
->>+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
->> 			return 0;
->> 
->> 		/*
->>@@ -297,17 +298,10 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
->> 
->> 
->> static int
->>-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
->>+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
->>+	       unsigned int udphoff)
->> {
->> 	struct udphdr _udph, *uh;
->>-	unsigned int udphoff;
->>-
->>-#ifdef CONFIG_IP_VS_IPV6
->>-	if (af == AF_INET6)
->>-		udphoff = sizeof(struct ipv6hdr);
->>-	else
->>-#endif
->>-		udphoff = ip_hdrlen(skb);
->> 
->> 	uh = skb_header_pointer(skb, udphoff, sizeof(_udph), &_udph);
->> 	if (uh == NULL)
->>--
->>2.48.1
->>
->>
->>Regards
->>
->>--
->>Julian Anastasov <ja@ssi.bg>
+If chronological of market release, that's tricky to any contributor to
+figure out.
 
+> change the order because "chronological" is not an appropriate order? In 
+> this case, would the alphanumeric order be fine?
+
+Many lists go alphanumerical because it is most obvious and avoids
+conflicts.
+
+Best regards,
+Krzysztof
 
