@@ -1,145 +1,119 @@
-Return-Path: <netdev+bounces-166682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A08FA36F0D
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D0FAA36F1F
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 16:29:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD6711894BDA
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:22:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 247A81891DB5
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 15:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A59C1DDC37;
-	Sat, 15 Feb 2025 15:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B331DE2C7;
+	Sat, 15 Feb 2025 15:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ECzYN6xI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EBunxhHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803A11B532F;
-	Sat, 15 Feb 2025 15:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4774F42AA5
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 15:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739632913; cv=none; b=oeakw6D7rTNXz0/uadIYlxD3Tmm8PKRi3kWStoVtzjDCA7CSfJ/TiHIpEznxEX3HPvoCnh5aZpLxmGZXkO6fot7UvSEWfWo1Rxec0t8dBYm4pmIUSpfVYNqAlmSiN/fwwMUG7bsxsM6+VfeI8k6VnvRGabpuWaVbLfY74r0YfMQ=
+	t=1739633388; cv=none; b=qooZ5biY6Wj52t1ZAGPoHz8ZK8f3PTB7zLCJQls/WVMOGudrmJb4FrJbDJA9yU85UiK2uZ0xB3Om0OEHBWUmEl5t2Ib8JyxiUEVkse0LkcGNxaFzEF0lgt4xs37wd4YZP4SzYG+SUPk3v8k5/ByMZSIXeIbSyhg4nX7fIgJes6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739632913; c=relaxed/simple;
-	bh=qhDazyfT4fXyQ55ZFc7/xhm33sFszSOfjFQXOuGirLY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=VSfSuIadiLkyBPNPi1T2DiiSAI5atf3IGP35y2PzErHgkAjnVIyu/xLEwP3CnS/jHY7A7lBGiMz8ZDKllueXU/w7vp5HIqJlRljzcAwsgaUoIi2RJQhLOGlaFhr8xR3yWc/5tKKGGaGojKoBMeqZmyROnpK+G6EIAHw4OsmjmZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ECzYN6xI; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c077c9cbb9so249482585a.1;
-        Sat, 15 Feb 2025 07:21:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739632910; x=1740237710; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lMmFW9JrhGDdKsX2kiJjysOLPKZHgx5YbIzP9n3YrVc=;
-        b=ECzYN6xIX7c09baMp1hCDYfACmNyT+riShIJBNgCTIrTdYdXgPIdppEt7YYKvSVkOl
-         qjcBUi4Yb9fFOzBk39R7QzUHxsZTGfZibcKN5KqpZytAuFS0t9grsdy2xS9lzWRG3TwW
-         Z0Njlxhs5U10WSJ2kQa1fNT+/Tmop8lyp5XpNAfg9FLmDHhehQdmF4N0GNRT//MwNbhZ
-         +CxC4AxksU3Idcror5ZsgSMAyc3O2m7fMJH4rRrDrdRmyrC/lKHShNlzTQsIXLTIJDJ3
-         wRpP5NvJRyMSBcN8PJKNXg9UGijAqNnzm8GIe43rBYYtrAsxKuHsopDgD0oUgueu3P4X
-         sCwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739632910; x=1740237710;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lMmFW9JrhGDdKsX2kiJjysOLPKZHgx5YbIzP9n3YrVc=;
-        b=EisqNisXeTQtJJ1jsp+EqyAEA7kcyfi44yoZlvKo4zzm45Lq6AIBDvRgtdLFjCbseF
-         32EaoAkqA3zPEfATUFGzuM3joBm2V5BbmHhLn6rkiOAa9wt7Pe4HkhzgVyTxvmvK0zpp
-         b/HxjudtKFcc8U1tSWLXXjw8q7TmyUI7oz5OdI8wTpM1+MH1mlDnMTkFJs1uQZuHz3ft
-         ACTXOQ9bEjDO5pFH4ed6tVDIr0zZqGjg9HBo7K4dHdLWAX+qzb2I9c5mBtPp7lEk/XDT
-         qEVKRNyd2uVOw5nY/d7dsa+jclQYjuSZ9GxxqHLxu6tDnf0vsB2aNfyx8ksIiGPTPECb
-         wxNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiO5nbAKOATO9dvyOphuLQDoeG9KoAQDNBOvucPoQm02NcQqGjIMdqlJnlZhpf49yOmiK+bkm0e5MAiI7GETw=@vger.kernel.org, AJvYcCWpG0ObZuv3nC/N59yVziLOkST4Az7Jz9L/A0Vwh4KDj29IOBumRB5AouijAUy/LiLntLDnPkz0@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZo+dPqDkedda4qmbQrcYetcszM6vAmiGYz2nsPLRJUvoBi5Xl
-	g792VdyegFj77Krt0ZWpJ8JbI5rJYFAGDkXSeOoSuLkAjRg/zJ3/
-X-Gm-Gg: ASbGncs+VTKRen+EF6ve5jegxBL12ESGkliIPLTXTdHTQ3i+DgnnsNU+YXe6tn3z51Q
-	LhHQf9vXzJ0feHJExQhdYQDAWyAmKTQTyl8fWj8KqddrezNBD9PFHY/ukiAOvJXog4iezqlKLe9
-	DopcifoSbYVTRTDU3oy9bZZMW8ra7apN5bbpkqZgsl5FbNpbMK6tpCjVOs8YD9c6e6FmTrZ6TZw
-	XVBsiOi9zf7gvMjWVZHY0zQmM1i4MwFw5K73gbRhNiSxFJMgd2nhVQG2oTRsKsdheyS3hFn+BWE
-	JQJWuyMtObw1a4VQDjhBNOwG4UxKNI22XFPJgVJH4MjJV5/0X5hUbFNgfcSaZYQ=
-X-Google-Smtp-Source: AGHT+IG5scF0mmUQW2RyZ3GmEoLcesENu3i2UpsNOTAMjxcvKEICQAtJy5/BHE9hAqFDiYO78xC4dQ==
-X-Received: by 2002:a05:620a:2496:b0:7b6:d5b2:e58 with SMTP id af79cd13be357-7c08b1568d2mr455733885a.18.1739632909676;
-        Sat, 15 Feb 2025 07:21:49 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c6173f7sm324813585a.57.2025.02.15.07.21.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 07:21:49 -0800 (PST)
-Date: Sat, 15 Feb 2025 10:21:48 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
- netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com, 
- idosch@idosch.org, 
- horms@kernel.org, 
- davem@davemloft.net, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Message-ID: <67b0b10cd4381_36e34429435@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250214205828.48503-1-annaemesenyiri@gmail.com>
-References: <20250214205828.48503-1-annaemesenyiri@gmail.com>
-Subject: Re: [PATCH net-next v3] selftests: net: add support for testing
- SO_RCVMARK and SO_RCVPRIORITY
+	s=arc-20240116; t=1739633388; c=relaxed/simple;
+	bh=hz3ZOumg/E0odtwlLSJj3r8sYIUlcX4bjxd2o/f7S3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ocTitHcu42sNcz45oMnj1goMlS9FNHRUzCfzz7o6PenolEQN/oclnQYpfVTYj+qmGvkdAheUNVl9gdnGlfA4vO2g4ccj9dbMXTi5XNFunBcn6LXCrTl3XIChTYguSU4Jzeygjg+8LEh/0uTVx3HpUX5yMXQ55MV7HD4ZEZ/sXJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EBunxhHB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=rBdco+tY5/Z57bPCdHN8e7c3WhYvfabcGsCRPO6LyuU=; b=EB
+	unxhHB2AYmXqfZRsCI7RKPfkCHoqJunyQGYpX1Vhal7q0Z88UkiLT0PPA06b3XJrbfh8n5TsRhzRX
+	rp8GtSF5wvi1uMnJCiJjSMhvUmO2Fme5/8K2Jamqo4r0Fu3m9EAhEL5wBidvO4vb/pPV09XhNQJ9G
+	yamt3gkeb72adbQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tjK6g-00EPw9-Nj; Sat, 15 Feb 2025 16:29:26 +0100
+Date: Sat, 15 Feb 2025 16:29:26 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH] net: dsa: rtl8366rb: Fix compilation problem
+Message-ID: <dce33cab-5d8d-48a2-9554-1ef8c23d35b7@lunn.ch>
+References: <20250214-rtl8366rb-leds-compile-issue-v1-1-c4a82ee68588@linaro.org>
+ <ca426cd1-124a-483e-9426-4a59ed7d7ba4@lunn.ch>
+ <CACRpkdYWXyw6qZBmkf_uN0WcXL3v2iRWbsHjqvmkZ1bWC8Bbmw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACRpkdYWXyw6qZBmkf_uN0WcXL3v2iRWbsHjqvmkZ1bWC8Bbmw@mail.gmail.com>
 
-Anna Emese Nyiri wrote:
-> Introduce tests to verify the correct functionality of the SO_RCVMARK and 
-> SO_RCVPRIORITY socket options.
+On Sat, Feb 15, 2025 at 01:07:32AM +0100, Linus Walleij wrote:
+> On Fri, Feb 14, 2025 at 3:06 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > On Fri, Feb 14, 2025 at 09:59:57AM +0100, Linus Walleij wrote:
+> > > When the kernel is compiled without LED framework support the
+> > > rtl8366rb fails to build like this:
+> > >
+> > > rtl8366rb.o: in function `rtl8366rb_setup_led':
+> > > rtl8366rb.c:953:(.text.unlikely.rtl8366rb_setup_led+0xe8):
+> > >   undefined reference to `led_init_default_state_get'
+> > > rtl8366rb.c:980:(.text.unlikely.rtl8366rb_setup_led+0x240):
+> > >   undefined reference to `devm_led_classdev_register_ext'
+> > >
+> > > As this is constantly coming up in different randconfig builds,
+> > > bite the bullet and add some nasty ifdefs to rid this issue.
+> >
+> > At least for DSA drivers, it is more normal to put the LED code into a
+> > separate compilation unit and provide stubs for when it is not
+> > used. That avoids a lot of nasty #ifdefs. Could you do the same here?
 > 
-> Key changes include:
-> 
-> - so_rcv_listener.c: Implements a receiver application to test the correct 
-> behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
-> - test_so_rcv.sh: Provides a shell script to automate testing for these options.
-> - Makefile: Integrates test_so_rcv.sh into the kernel selftests.
-> 
-> v3:
-> 
-> - Add the C part to TEST_GEN_FILES.
-> - Ensure the test fails if no cmsg of type opt.name is received
-> in so_rcv_listener.c
-> - Rebased on net-next.
-> 
-> v2:
-> 
-> https://lore.kernel.org/netdev/20250210192216.37756-1-annaemesenyiri@gmail.com/
-> - Add the C part to TEST_GEN_PROGS and .gitignore.
-> - Modify buffer space and add IPv6 testing option
-> in so_rcv_listener.c.
-> - Add IPv6 testing, remove unnecessary comment,
-> add kselftest exit codes, run both binaries in a namespace,
-> and add sleep in test_so_rcv.sh.
-> The sleep was added to ensure that the listener process has
-> enough time to start before the sender attempts to connect.
-> - Rebased on net-next.
-> 
-> v1:
-> 
-> https://lore.kernel.org/netdev/20250129143601.16035-2-annaemesenyiri@gmail.com/
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> I can pull out *some* code to a separate file like that, but
+> some LED-related registers are also accessed when the LED
+> framework is disabled, so it would lead to a bit of unnatural
+> split between the two files with some always-available
+> LED code staying in the main file.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+So there is some low level code for basic LED register access which
+you need to keep in rtl8366rb.c, and then a layer on top of that for
+led_classdev which goes into a file of its own. At first glance, it
+does not look too bad, but the devil is in the details.
+
+In the end, you need to make a style call. Is #ifdef better than an
+unnatural splitting.
+
+Hummm..
+
+In the example above, you are getting linker errors. So the code at
+least compiles, in this example. Rather than #ifdef, can you use
+
+	if (IS_ENABLED(CONFIG_LEDS_CLASS)) {
+	....
+	}
+	
+That looks less ugly, and allows compile testing, which is what we
+don't like about #ifdef.
+
+	Andrew
+
 
