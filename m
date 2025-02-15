@@ -1,72 +1,57 @@
-Return-Path: <netdev+bounces-166630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D6EA36A53
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:58:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D384DA36A8A
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 02:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA463B1A89
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:57:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 134951897279
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEB9156F39;
-	Sat, 15 Feb 2025 00:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66033151985;
+	Sat, 15 Feb 2025 00:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sE5KJbIE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRAff6Hu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C2B154C0B;
-	Sat, 15 Feb 2025 00:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B5174BE1
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739580827; cv=none; b=TxQHavdnyIwIBlqoaxgf/BmtFYotWNF1vI19kHBQo4JbDTt2p4dnWUgtwXC8/BWsyCfNiK+Q/qFGuf1GvrWdDCTWOFE3mCnLGa9MojBEaQ6tntmj9yxNlCxKPu4Uj1ozqwD20K6IOnf/1Nqa01bDspjzMSIfGT2hTNwjTMWt1jQ=
+	t=1739581077; cv=none; b=E1bagaqgHmO+FP3GUt7Nb/e4BI0wl5X3Cd4J33CB6QndgF9CsQ7NAQkEbaw3l+jxCQJRtyreGz/S+gPSTjTN4U+GwBQyCR68XOdg46tmagkn2HR6UxlD3xF3QA4mZwUfg7mdiPS9bWkP8677vawKSd3Ko7//wqZNjop3Eh8kd7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739580827; c=relaxed/simple;
-	bh=U2QJb6XIJC6fNter4lBmA14G9QFD+52FUM0I1jZgCx4=;
+	s=arc-20240116; t=1739581077; c=relaxed/simple;
+	bh=sfhQiMAeKtuufJrG3n8kCaXeWpnueswcdP/MMKSaXM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MsF1njaWdf61H25YdARdrrsJ8pJIcyT8wNOvHJN+sKMFKXrvl6PRytk0eqM1JAyHsM24ycVk6K8st77yOCqkiUjJeNYoJ/5j4C4tFEj4IU5bzkczYJv8fe9yIrh4E+dJCVkL7axGlckp71bwxXCJ5G7akUthxbg1KMw7p7dzEK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sE5KJbIE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9E90C4CEE2;
-	Sat, 15 Feb 2025 00:53:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cS8fmvIPdAJnzT5PGL7HQU8RV34Ivzq+bROjnfjZupdS/ZW82xJXTDuum9gMfQfVCUoHp8gRQJ8d7V+yIxiZvc+3VSRL32W7MuVEPVqSYFpmjm2yU58kSzkHyPCrtz0duGHUOgwDjy8cOOBlf65IYBkr1WzzmI6bKAX1Or3LBmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRAff6Hu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B49C4CED1;
+	Sat, 15 Feb 2025 00:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739580826;
-	bh=U2QJb6XIJC6fNter4lBmA14G9QFD+52FUM0I1jZgCx4=;
+	s=k20201202; t=1739581076;
+	bh=sfhQiMAeKtuufJrG3n8kCaXeWpnueswcdP/MMKSaXM4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sE5KJbIErIEnMN8ssaRMOU7wYVNoq49KmLNBuOhpYT2dC9Qp58XGtuzTjVjfE8v4g
-	 MIeHJ9R3ASbAwY59YMeQB58dQgb/7ehBG+RdOt9nLndobnNZcRKdqvLLcDAgF7rEow
-	 56ij5RYIxWo5PS9bO1Rj0bRnVRry6lwsPhdxyycJsZfZl19PE5irc2c9d82I9SXjFf
-	 vY15DyE4TWVyYOcfOhXXaZ0LeVcSj/HKxM0ep2rfawnO/omKg1ZBAzk7AnVH3S6yk9
-	 9hxrMz8+dFD0NjTsNnLK7ta8GhuD7l0xgA7aD+jVdldnpo8siG5+cXOmM6ai9hqF11
-	 FI+arOB4Cx7cQ==
-Date: Fri, 14 Feb 2025 16:53:45 -0800
+	b=rRAff6HuWbiH6XdRW0paRH6V1JsM9JCauBTis8e4HRtpwYamLeN9Gv7YqjgorDgsq
+	 WOWjr0kHrr6ieljmHiDJbHjeeEI380ijy0HX5gtOQ+cF2C+WYZPK7/niV6ooFcdoNc
+	 uL1a5G0gub/L2Z+qOiGvgT6bmZciLfHlWbYGuX6A3wctyS689BgWLDaPP7bcDzLzzU
+	 F2SocViNIEQBgBGR1QXUt1pmOb8E048Xc+E/nqo1TLvV4wMPoC7OvGE3pEi918WYob
+	 8EMkHJomZsRwhI2CoNCAKjDU2WkNymaUXyl+pt/6RhkjNLIhznyG4QYxXFMr4ebo0h
+	 tCUjdUHN6xXXw==
+Date: Fri, 14 Feb 2025 16:57:55 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>, Sean Anderson
- <seanga2@gmail.com>
-Subject: Re: [PATCH net-next v4 00/15] Introduce an ethernet port
- representation
-Message-ID: <20250214165345.6cab996f@kernel.org>
-In-Reply-To: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
-References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: skb: do not assume that ktime_t is equal
+ to s64
+Message-ID: <20250214165755.1f1ecc36@kernel.org>
+In-Reply-To: <20250213101658.1349753-1-dmantipov@yandex.ru>
+References: <20250213101658.1349753-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,22 +61,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 13 Feb 2025 11:15:48 +0100 Maxime Chevallier wrote:
-> This is V4 of the series introducing the phy_port infrastructure.
+On Thu, 13 Feb 2025 13:16:58 +0300 Dmitry Antipov wrote:
+> In 'skb_get_timestamp()', do not assume that 'tstamp' of 'struct
+> sk_buff' (which is 'ktime_t') may be implicitly converted to 's64'
+> (which is expected by 'ns_to_kernel_old_timeval()') but use
+> the convenient 'ktime_to_ns()' instead. Compile tested only.
 
-FWIW it doesn't seem to apply:
+Is there a real bug here or you just run a scanner which checks 
+if types match? As is the commit message doesn't really explain
+what the potential problem is.
 
-Applying: net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
-Applying: net: ethtool: Export the link_mode_params definitions
-error: sha1 information is lacking or useless (net/ethtool/common.c).
-error: could not build fake ancestor
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Patch failed at 0002 net: ethtool: Export the link_mode_params definitions
-
+Also please run get_maintainer.pl on the patch, you missed two people.
 -- 
 pw-bot: cr
 
