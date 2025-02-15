@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-166698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD21FA36FC8
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 18:30:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91869A36FC9
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 18:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C26C3AFE0C
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:29:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36C7B7A30F8
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 17:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8CD1EA7C3;
-	Sat, 15 Feb 2025 17:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2371A1EA7FA;
+	Sat, 15 Feb 2025 17:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+nZ3Gvb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyF/3PmH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B39117B50B
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 17:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BFB194C61
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 17:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739640600; cv=none; b=f5NqFv8B+mCD9X87a+el2X+LYMbVrPa9lUgCB3uPqASvM957FrUj7r7M+MPHyeL59J16QZg2IOxxYnTobUc9GAMVgJV04vf2RBE4wB55dnbZEfuQh6yYDGarjmQGuquSwiLfwEvEiyy/eFCOYQ/wEaTGAi+uBP4wceLh5c+FmkE=
+	t=1739640603; cv=none; b=OnHMkeqMuu/6hT+65N4f5pD0UOeVcQ3fWDmg4q88//WWdaz+5eyz4ikj+dp4I0TqQKa4Gr2xxBslx2l15UMzOhQ83JVybm8ynlWzMN0LLeBB0ASYY+bvHIW5cfn6/U3t68o1CuY9UWHvsfBRkOiOYtej3OT3UJoiujF36ZU1D2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739640600; c=relaxed/simple;
-	bh=tKOBzBxlRpCPco1eskLBhqzcqZL/mxMqxCxcklwD8VM=;
+	s=arc-20240116; t=1739640603; c=relaxed/simple;
+	bh=2REkKld9n0ggNrMEylXWf43g5lPGYCB/MOY3Qf5vt4M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hfee5heEFS4V6vcdYr19rZLFanvIvV5hMwXP2JDN3wSgb3QMmH+W2JaZ7qQhcUvdOv/izRSUttPLbLGyXdJMlAOErmmL7bN+/2SDehWDmolRFc+e9ZtJAYMmCQ4gm1rp6cSRGd1teGp4IKlGkpYWtZe5Bfe0tjgGh19ZpSlKzH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+nZ3Gvb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89BE3C4CEDF;
-	Sat, 15 Feb 2025 17:29:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hWpOSb4J+vLGokqa93HkQlJlOy0kHlapMwlKgsFJYtKGQ8a0hmodPrcvaLQTU/M4RvLx+M7wGs500wNLNuPD8QyGCJ/pIDJlqNxFwZkSSJDj0x6C7vydxbK6DE7/U1Pui/kP4kHqIKOwBE9T1rByTls84rKDNVlyAJBUavBQ9o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyF/3PmH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF5E0C4CEDF;
+	Sat, 15 Feb 2025 17:30:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739640599;
-	bh=tKOBzBxlRpCPco1eskLBhqzcqZL/mxMqxCxcklwD8VM=;
+	s=k20201202; t=1739640602;
+	bh=2REkKld9n0ggNrMEylXWf43g5lPGYCB/MOY3Qf5vt4M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q+nZ3GvbxnJCPCe8Va+3CUk4dU+Ol9ng7k1gM4DbCtVcFRpU3s6i1EuC6JD7Ythnb
-	 sgK+C8FTMnT+JeeutRbm07qzoeHTsl717wxhTigIjM6I7rwRYiP2FEhqgL5oKagbze
-	 113oQKWeT1G3WIW2qgmLHH+7yhaWNNRVQ+2fsRyGnMBeL+jwPQeCL0lvOtocKzVA9Y
-	 ItZtdehhVJrQTU8X5B17yb0vT2+dS8Wa48/PIzzMMfOOY2Uj8AMMhFHs1bpQ43jPsb
-	 rk00E2l3AvS8jiJskH9f3QJZhIuX3EToz9R/8dml/8ab/TxaKssRIvXRXgp4yh1Hv+
-	 wysYiUm0/tn4w==
+	b=HyF/3PmHYeoQYBnD4HM4jdhBFHm+adNx70SWVM7vrrnW5sHeMeUSSuZMUloCZqpIG
+	 /+vzXlfSVgdL7l0aOhxAClYXOAOkgRktJ7uTrOdFxQd3iiZH7Z0GkTDiQYJ3XT22qk
+	 Z41HbJE6oD4qIHy1BYZR4ogAb5bJVE1pgajtSdkysqZOQIF/0MMbIMgv4/c4TvgWwU
+	 dsSWwnD2r/UXmCKHcy3ixn4OlYV6G/erumuURrU4gE5CkwRc+jQs1Qzj2sqrza/5Qf
+	 uj/t3YTkifrxrIGVe+YpP8KiGoKVvYCGE64Oi8AyFZZgE8yCYzSBMdr0zz0c4scyRo
+	 tOsUauKg9WOgA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7419E380AA7E;
-	Sat, 15 Feb 2025 17:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE3DF380AA7E;
+	Sat, 15 Feb 2025 17:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/sched: cls_api: fix error handling causing NULL
- dereference
+Subject: Re: [PATCH net-next] ndisc: ndisc_send_redirect() cleanup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173964062887.2306719.12280700542530896756.git-patchwork-notify@kernel.org>
-Date: Sat, 15 Feb 2025 17:30:28 +0000
-References: <20250213223610.320278-1-pierre@stackhpc.com>
-In-Reply-To: <20250213223610.320278-1-pierre@stackhpc.com>
-To: Pierre Riteau <pierre@stackhpc.com>
-Cc: netdev@vger.kernel.org
+ <173964063224.2306719.467147886967865202.git-patchwork-notify@kernel.org>
+Date: Sat, 15 Feb 2025 17:30:32 +0000
+References: <20250214140705.2105890-1-edumazet@google.com>
+In-Reply-To: <20250214140705.2105890-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, dsahern@kernel.org, horms@kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 13 Feb 2025 23:36:10 +0100 you wrote:
-> tcf_exts_miss_cookie_base_alloc() calls xa_alloc_cyclic() which can
-> return 1 if the allocation succeeded after wrapping. This was treated as
-> an error, with value 1 returned to caller tcf_exts_init_ex() which sets
-> exts->actions to NULL and returns 1 to caller fl_change().
+On Fri, 14 Feb 2025 14:07:05 +0000 you wrote:
+> ndisc_send_redirect() is always called under rcu_read_lock().
 > 
-> fl_change() treats err == 1 as success, calling tcf_exts_validate_ex()
-> which calls tcf_action_init() with exts->actions as argument, where it
-> is dereferenced.
+> It can use dev_net_rcu() and avoid one redundant
+> rcu_read_lock()/rcu_read_unlock() pair.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/sched: cls_api: fix error handling causing NULL dereference
-    https://git.kernel.org/netdev/net/c/071ed42cff4f
+  - [net-next] ndisc: ndisc_send_redirect() cleanup
+    https://git.kernel.org/netdev/net-next/c/0784d83df3bf
 
 You are awesome, thank you!
 -- 
