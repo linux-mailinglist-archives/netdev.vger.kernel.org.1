@@ -1,121 +1,372 @@
-Return-Path: <netdev+bounces-166615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404ADA3698C
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:12:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1B4A36991
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 01:13:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F4553A799C
-	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:10:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1F5F3B47B4
+	for <lists+netdev@lfdr.de>; Sat, 15 Feb 2025 00:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6D118B03;
-	Sat, 15 Feb 2025 00:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3624C92;
+	Sat, 15 Feb 2025 00:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wNkWPXYL"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Ho69KqqX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9463E4430
-	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249EAEACE
+	for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 00:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739578067; cv=none; b=Wn7S4dMGUqPe0jElC2O4qQpysjY6K5M/R5MnAfg9ZGFdPtn3cn3lyHlhFaV8f88xro5KmwhvNGjwi5pLYJvfxaNxokyVA3kJF9UVwYfGVT1va7GNQsMQAkxPeBaP3oZioiTXkMP7+sDVKpA/NWRvKQlHMzHaGAgSFfE7rvWLRXs=
+	t=1739578202; cv=none; b=UOqR57Z3FZ6UyOr/GIimeduGoNby3C7wL/AwfqziO/Rd1Dj5yxm6uUGYpl0j7tTOAYM2zayshA55ZsoQ2hBlKymajdBSbqeRAyvzJ4oKCK/FVMWvYCwm4xslQbPt0ZTNIFY+eSymhKGGSg+hf9p6+SIoKbH7gylEOiyg2FC2VOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739578067; c=relaxed/simple;
-	bh=UhL6i+N7peb9ywNx3OnTkHbbjamWQQ3AHfW8EL/M6dc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o67wD/LLNe3PkXXlhqNj6fI8VbBinLlD0RVs8DhkHoslR1A1VRSne5FlHZy56XmXUkqK9KRYKuYf1CYOUqFdo3mG+aM5y2L9a0Oyf0y6z59A9bJmMiTPWIGbmzxilkuxad2HZwLzU6/vNDn2KjOzZVW3ZXvDDBlRtS/Vq3hl6Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wNkWPXYL; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-308f141518cso28044391fa.2
-        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:07:45 -0800 (PST)
+	s=arc-20240116; t=1739578202; c=relaxed/simple;
+	bh=L4nGRhBPmFgPHVVSEX9BjtFkYHr7IBZgu9THPPcYsMg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HILBo6hAL+4VDKVzXMfsItkgRNcz2OxS/dUozZeFREAYfDQ5Pfj6Pw8m833PkWvFlgsVbxk30VKaP36mp/BK0jqzFeCfjAuTn194a7c9bFmUU/1FAr+L0eb4KKlz1gLjIVsNHvf0LZyw5sOc/dstswWVsmIgMlya5s0bA9YNNOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Ho69KqqX; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f6a47d617so46174775ad.2
+        for <netdev@vger.kernel.org>; Fri, 14 Feb 2025 16:09:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739578064; x=1740182864; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MgHLYwinBR34eauCt8OOE9hxiSu48heRbyG92F9P4aI=;
-        b=wNkWPXYL6UTfu1s7qIlgtTK5aTFIdk04CGrsMePQ7uh02O2azn56k0TTnSDmX8brQ8
-         jX5Zs++/YUvIo4JyXba1XyfyX74rG5yzuz8gu5sV4SyvF284RG4bvAriDoqEoNAu4XpE
-         BHnitC5oXXqKMnWKFmx99qMKl2fkvmAtWtgSJsRhiTfqxZzUpHl9sy8Z9K1qUyLFDSJx
-         1JW7NKDwo4rAAsy8LlhmkgPEzAn18wgPdsctpt2TFd65ka65B5hezg3GB9wGBGsZHEeI
-         Lm+bZpauJfvcBtXneLc9bkX7qLQtrK2Ys9v67q7Piv8Yc3/MosZNFvO9VIoN1dQJPNPc
-         2Mmw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739578199; x=1740182999; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TU2lLPsuD+1Wjb3qbpreSH3syxEnbs/l9acOJdZRAOQ=;
+        b=Ho69KqqXSO+oI21I93w9y9tgIxU0UP9c6m7Cz3pZ0UkBUddK5Q3vjwpM4EOrqJRY8G
+         mdEslm7qbM4LB9EJXs3tTS6BD4dGoYI4w7I57mm+bcoXBZIF7IqL5CIFBUpoi0Ykn6hL
+         V4n5KLsPiTLmIbjM2qPiakfXq8CJ6bKfSb/Bd70Q62trRMhee+YsfeWYBHBWi8D7OA4b
+         fl+t4LSRAYD9mvtY+VPDhe6ZVHR5rupSVElFvrt8ZWTEYxQjYQSaJY09FVgCQ0FdTrrb
+         iT+daBm7w9sYf5xzjBolOVJ0nkRLvxSb2tD3HRQ/BdMRNVtfZFugAohoGhQ61LoeoZCT
+         oBUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739578064; x=1740182864;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MgHLYwinBR34eauCt8OOE9hxiSu48heRbyG92F9P4aI=;
-        b=oPG+qZW5kZFjNzI0j3+cHb3oxVqYpAWxlQ1RPav5dSvSqY788+eR1ObxGsv12lUV6k
-         JRuf6V2sey0aFGr+Azc9n4er3PR3D5wzhD8DfNYuEs5XifJ2RwswdsJ1AJhTVBMkUoIU
-         E7maVmv4a5Rde9ITN4wqCnWXQywVQIBnmnpQhnVS4xijzLPj4Q0wcaO8wjLV5UNPReqm
-         msh8FBiIruuG/soOQoGddLF2n3mwGAXhtVopMRderQnX+Vo67duiRU8y0KF3dWuc6RhP
-         NtcMyQ6u8/kg9xWUeWdRwRahF78AadLmlMUhk7CNku1gYUmMziltLIN9K6v5xzsngxIx
-         g7FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUY7sjrR55j8lhnBT5TXsWXPshBrqItFtpC8o9ulvwNojzvMPCC9Kn/ntyWoQPbH53DzVZOMGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyIy9hDRgIJPPqBAv6DsRoozOK2NWTV7I/7+CWHjSXIY+dfBnX
-	+di3SRn8oS8YEpVGs9U4EqJXeRqcsBIfqy+Na3ngjU/j5U02TeGYYS1BJjrv7WB++vKDPHIF51+
-	OLNtd0TPChIHF0nI5pskY4BFPG0gDCe/x5oO1TQ==
-X-Gm-Gg: ASbGncut+z62DO/Qp38LRbi98L6AyXvbpIImj4wC4Ru9Ei4iP2GpFhJZEdguSktI1sT
-	A0JXaLLaUBxlCvQxKwZ9HD3w52LRDscb5jmMcyMsJGH3F4vsSua0ufX6GCWJSdhNemAIMtIl+
-X-Google-Smtp-Source: AGHT+IEg8iNlbN2R/OltdltShZHLG6aQ7xgqNftIkyxGGnGBA1Nylq82wQSYGj8bL3v6mnHUkRfcjf+cZSSya8sPaR0=
-X-Received: by 2002:a2e:9cd1:0:b0:308:eabd:2991 with SMTP id
- 38308e7fff4ca-30927a3a12fmr4840731fa.1.1739578063687; Fri, 14 Feb 2025
- 16:07:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739578199; x=1740182999;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TU2lLPsuD+1Wjb3qbpreSH3syxEnbs/l9acOJdZRAOQ=;
+        b=LJzdlYCXnhDj/HXF7ecZv2qVu7jmRgqdHvR2shEsESXaEXGuTluy1JoPrVOCqCklId
+         EgIIh6dyBpYr4DT2uGhv6sASk6IHN9RvSYTyUnBUrsI2qlrRpnieT1lisfMD39x5JI0E
+         hUDfrL3DWmuUMUfirNwUIVDsnfOVKPYLH18e2agm98Dc5179dOswvgX/Ris00/VvJDQK
+         TGTcloykrx8E0SqtwQmUfwWqyu9dgdclYZzBQ1ET08u+YHZrwaPaWbAY39xAmOjGJqla
+         5cuSNVDVngXnPXsk6pXX4a26bm+Ss7Y3xYS04/ulfZdhpljB3xlHE5b/cX5pOTYyge05
+         veaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrGx0XQtRlfrtmh4rAqOkncd3wXxbHcxG11t0dN1mkKSKi4qg7s7DfD1HeQCpEpegVa27dOE4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4mUw57KJbDeX7BmX0Dc2UcgzwHmdrQxDUYhwXdo1IA9gOXRTT
+	ldIf0GcUrx+KR+E26s+txlrL7UiTfaBvTXpGWQDl4JxwHOsb3XjPrJYFtdkHNgM=
+X-Gm-Gg: ASbGnctAq+qvAL4B8cdrCz7xi4SdvIWHkCyuf2lYZ3rO77sbizEnKcEM/okU4clcuXc
+	Jjj/PTU+QQPMoBsUWcUY5Lbi77Pgb7OImePvpG3msx0U99PSxB53TxAL47rx53HKiODq/80FirI
+	Rg2+Ymhz4vuj03iWr3vflDu0084wtum2KhD/nxkpDXtR4VonQ5n9OuCLOMD8qL8hkMZ079Xbl6z
+	z9KVxcAU2kU2BNqYL1L7VQkL8WFRVAsNYJe1Q7frJClzyo+HZdJ6nPs5PhVrwsr3wNDpZFkTvs=
+X-Google-Smtp-Source: AGHT+IFtxUdAGsWw/0C9+tu/5Zdu9VucwTHcdgSl4Cw98cDK35mU5kWXBYj/c6cc8QB0vdasn+u3TQ==
+X-Received: by 2002:a05:6a20:394b:b0:1ee:1af5:86a9 with SMTP id adf61e73a8af0-1ee8cb17bbcmr3032976637.22.1739578199303;
+        Fri, 14 Feb 2025 16:09:59 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:3::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73257bdca3fsm1507123b3a.161.2025.02.14.16.09.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 16:09:58 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	lizetao <lizetao1@huawei.com>
+Subject: [PATCH v14 00/11] io_uring zero copy rx
+Date: Fri, 14 Feb 2025 16:09:35 -0800
+Message-ID: <20250215000947.789731-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214-rtl8366rb-leds-compile-issue-v1-1-c4a82ee68588@linaro.org>
- <ca426cd1-124a-483e-9426-4a59ed7d7ba4@lunn.ch>
-In-Reply-To: <ca426cd1-124a-483e-9426-4a59ed7d7ba4@lunn.ch>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 15 Feb 2025 01:07:32 +0100
-X-Gm-Features: AWEUYZl-K_KCqbPePoOBg1A-DQnYACcQ70qIXtMW6i-WboXFkW2ISJhEd_WN8bo
-Message-ID: <CACRpkdYWXyw6qZBmkf_uN0WcXL3v2iRWbsHjqvmkZ1bWC8Bbmw@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: rtl8366rb: Fix compilation problem
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 3:06=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
-> On Fri, Feb 14, 2025 at 09:59:57AM +0100, Linus Walleij wrote:
-> > When the kernel is compiled without LED framework support the
-> > rtl8366rb fails to build like this:
-> >
-> > rtl8366rb.o: in function `rtl8366rb_setup_led':
-> > rtl8366rb.c:953:(.text.unlikely.rtl8366rb_setup_led+0xe8):
-> >   undefined reference to `led_init_default_state_get'
-> > rtl8366rb.c:980:(.text.unlikely.rtl8366rb_setup_led+0x240):
-> >   undefined reference to `devm_led_classdev_register_ext'
-> >
-> > As this is constantly coming up in different randconfig builds,
-> > bite the bullet and add some nasty ifdefs to rid this issue.
->
-> At least for DSA drivers, it is more normal to put the LED code into a
-> separate compilation unit and provide stubs for when it is not
-> used. That avoids a lot of nasty #ifdefs. Could you do the same here?
+This patchset contains io_uring patches needed by a new io_uring request
+implementing zero copy rx into userspace pages, eliminating a kernel to
+user copy.
 
-I can pull out *some* code to a separate file like that, but
-some LED-related registers are also accessed when the LED
-framework is disabled, so it would lead to a bit of unnatural
-split between the two files with some always-available
-LED code staying in the main file.
+We configure a page pool that a driver uses to fill a hw rx queue to
+hand out user pages instead of kernel pages. Any data that ends up
+hitting this hw rx queue will thus be dma'd into userspace memory
+directly, without needing to be bounced through kernel memory. 'Reading'
+data out of a socket instead becomes a _notification_ mechanism, where
+the kernel tells userspace where the data is. The overall approach is
+similar to the devmem TCP proposal.
 
-But if that's cool, I can do it.
+This relies on hw header/data split, flow steering and RSS to ensure
+packet headers remain in kernel memory and only desired flows hit a hw
+rx queue configured for zero copy. Configuring this is outside of the
+scope of this patchset.
 
-Yours,
-Linus Walleij
+We share netdev core infra with devmem TCP. The main difference is that
+io_uring is used for the uAPI and the lifetime of all objects are bound
+to an io_uring instance. Data is 'read' using a new io_uring request
+type. When done, data is returned via a new shared refill queue. A zero
+copy page pool refills a hw rx queue from this refill queue directly. Of
+course, the lifetime of these data buffers are managed by io_uring
+rather than the networking stack, with different refcounting rules.
+
+This patchset is the first step adding basic zero copy support. We will
+extend this iteratively with new features e.g. dynamically allocated
+zero copy areas, THP support, dmabuf support, improved copy fallback,
+general optimisations and more.
+
+In terms of netdev support, we're first targeting Broadcom bnxt. Patches
+aren't included since Taehee Yoo has already sent a more comprehensive
+patchset adding support in [1]. Google gve should already support this,
+and Mellanox mlx5 support is WIP pending driver changes.
+
+===========
+Performance
+===========
+
+Note: Comparison with epoll + TCP_ZEROCOPY_RECEIVE isn't done yet.
+
+Test setup:
+* AMD EPYC 9454
+* Broadcom BCM957508 200G
+* Kernel v6.11 base [2]
+* liburing fork [3]
+* kperf fork [4]
+* 4K MTU
+* Single TCP flow
+
+With application thread + net rx softirq pinned to _different_ cores:
+
++-------------------------------+
+| epoll     | io_uring          |
+|-----------|-------------------|
+| 82.2 Gbps | 116.2 Gbps (+41%) |
++-------------------------------+
+
+Pinned to _same_ core:
+
++-------------------------------+
+| epoll     | io_uring          |
+|-----------|-------------------|
+| 62.6 Gbps | 80.9 Gbps (+29%)  |
++-------------------------------+
+
+=====
+Links
+=====
+
+Broadcom bnxt support:
+[1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
+
+Linux kernel branch including io_uring bits:
+[2]: https://github.com/isilence/linux.git zcrx/v13
+
+liburing for testing:
+[3]: https://github.com/isilence/liburing.git zcrx/next
+
+kperf for testing:
+[4]: https://git.kernel.dk/kperf.git
+
+Changes in v14:
+---------------
+* Remove net-next in patch subjects
+* Cast to struct sockaddr in selftest for bind() and connect()
+
+Changes in v13:
+---------------
+io_uring
+* Add missing ~IORING_ZCRX_AREA_MASK
+* Update documentation
+* Selftest changes
+  * Remove ipv4 support
+  * Use ethtool() instea dof cmd()
+
+net
+* Fix race between io_uring closing and netdev unregister
+* Regenerate Netlink YAML
+
+Changes in v12:
+---------------
+* Check nla_nest_start() errors
+* Don't leak a netdev, add missing netdev_put()
+* Warn on failed queue restart during close
+
+Changes in v11:
+---------------
+* Add a shim provider helper for page_pool_set_dma_addr_netmem()
+* Drop netdev in ->uninstall, pin struct device instead
+* Add net_mp_open_rxq() and net_mp_close_rxq()
+* Remove unneeded CFLAGS += -I/usr/include/ in selftest Makefile
+
+Changes in v10:
+---------------
+* Fix !CONFIG_PAGE_POOL build
+* Use acquire/release for RQ in examples
+* Fix page_pool_ref_netmem for net_iov
+* Move provider helpers / definitions into a new file
+* Don’t export page_pool_{set,clear}_pp_info, introduce
+  net_mp_niov_{set,clear}_page_pool() instead
+* Remove devmem.h from net/core/page_pool_user.c
+* Add Netdev yaml for io-uring attribute
+* Add memory provider ops for filling in Netlink info
+
+Changes in v9:
+--------------
+* Fail proof against multiple page pools running the same memory
+  provider
+  * Lock the consumer side of the refill queue.
+  * Move scrub into io_uring exit.
+  * Kill napi_execute.
+  * Kill area init api and export finer grained net helpers as partial
+    init now need to happen in ->alloc_netmems()
+* Separate user refcounting.
+  * Fix copy fallback path math.
+* Add rodata check to page_pool_init()
+* Fix incorrect path in documentation
+
+Changes in v8:
+--------------
+* add documentation and selftest
+* use io_uring regions for the refill ring
+
+Changes in v7:
+--------------
+net:
+* Use NAPI_F_PREFER_BUSY_POLL for napi_execute + stylistics changes.
+
+Changes in v6:
+--------------
+Please note: Comparison with TCP_ZEROCOPY_RECEIVE isn't done yet.
+
+net:
+* Drop a devmem.h clean up patch.
+* Migrate to netdev_get_by_index from deprecated API.
+* Fix !CONFIG_NET_DEVMEM build.
+* Don’t return into the page pool cache directly, use a new helper
+* Refactor napi_execute
+
+io_uring:
+* Require IORING_RECV_MULTISHOT flag set.
+* Add unselectable CONFIG_IO_URING_ZCRX.
+* Pulled latest io_uring changes.
+* Unexport io_uring_pp_zc_ops.
+
+Changes in v5:
+--------------
+* Rebase on top of merged net_iov + netmem infra.
+* Decouple net_iov from devmem TCP.
+* Use netdev queue API to allocate an rx queue.
+* Minor uAPI enhancements for future extensibility.
+* QoS improvements with request throttling.
+
+Changes in RFC v4:
+------------------
+* Rebased on top of Mina Almasry's TCP devmem patchset and latest
+  net-next, now sharing common infra e.g.:
+    * netmem_t and net_iovs
+    * Page pool memory provider
+* The registered buffer (rbuf) completion queue where completions from
+  io_recvzc requests are posted is removed. Now these post into the main
+  completion queue, using big (32-byte) CQEs. The first 16 bytes is an
+  ordinary CQE, while the latter 16 bytes contain the io_uring_rbuf_cqe
+  as before. This vastly simplifies the uAPI and removes a level of
+  indirection in userspace when looking for payloads.
+  * The rbuf refill queue is still needed for userspace to return
+    buffers to kernel.
+* Simplified code and uAPI on the io_uring side, particularly
+  io_recvzc() and io_zc_rx_recv(). Many unnecessary lines were removed
+  e.g. extra msg flags, readlen, etc.
+
+Changes in RFC v3:
+------------------
+* Rebased on top of Jakub Kicinski's memory provider API RFC. The ZC
+  pool added is now a backend for memory provider.
+* We're also reusing ppiov infrastructure. The refcounting rules stay
+  the same but it's shifted into ppiov->refcount. That lets us to
+  flexibly manage buffer lifetimes without adding any extra code to the
+  common networking paths. It'd also make it easier to support dmabufs
+  and device memory in the future.
+  * io_uring also knows about pages, and so ppiovs might unnecessarily
+    break tools inspecting data, that can easily be solved later.
+
+Many patches are not for upstream as they depend on work in progress,
+namely from Mina:
+
+* struct netmem_t
+* Driver ndo commands for Rx queue configs
+* struct page_pool_iov and shared pp infra
+
+Changes in RFC v2:
+------------------
+* Added copy fallback support if userspace memory allocated for ZC Rx
+  runs out, or if header splitting or flow steering fails.
+* Added veth support for ZC Rx, for testing and demonstration. We will
+  need to figure out what driver would be best for such testing
+  functionality in the future. Perhaps netdevsim?
+* Added socket registration API to io_uring to associate specific
+  sockets with ifqs/Rx queues for ZC.
+* Added multi-socket support, such that multiple connections can be
+  steered into the same hardware Rx queue.
+* Added Netbench server/client support.
+
+David Wei (6):
+  io_uring/zcrx: add interface queue and refill queue
+  io_uring/zcrx: add io_zcrx_area
+  io_uring/zcrx: add io_recvzc request
+  io_uring/zcrx: set pp memory provider for an rx queue
+  net: add documentation for io_uring zcrx
+  io_uring/zcrx: add selftest
+
+Pavel Begunkov (5):
+  io_uring/zcrx: grab a net device
+  io_uring/zcrx: implement zerocopy receive pp memory provider
+  io_uring/zcrx: dma-map area for the device
+  io_uring/zcrx: throttle receive requests
+  io_uring/zcrx: add copy fallback
+
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/iou-zcrx.rst         | 202 ++++
+ Kconfig                                       |   2 +
+ include/linux/io_uring_types.h                |   6 +
+ include/uapi/linux/io_uring.h                 |  54 +-
+ io_uring/KConfig                              |  10 +
+ io_uring/Makefile                             |   1 +
+ io_uring/io_uring.c                           |   7 +
+ io_uring/io_uring.h                           |  10 +
+ io_uring/memmap.h                             |   1 +
+ io_uring/net.c                                |  74 ++
+ io_uring/opdef.c                              |  16 +
+ io_uring/register.c                           |   7 +
+ io_uring/rsrc.c                               |   2 +-
+ io_uring/rsrc.h                               |   1 +
+ io_uring/zcrx.c                               | 954 ++++++++++++++++++
+ io_uring/zcrx.h                               |  73 ++
+ .../selftests/drivers/net/hw/.gitignore       |   2 +
+ .../testing/selftests/drivers/net/hw/Makefile |   5 +
+ .../selftests/drivers/net/hw/iou-zcrx.c       | 426 ++++++++
+ .../selftests/drivers/net/hw/iou-zcrx.py      |  64 ++
+ 21 files changed, 1916 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/networking/iou-zcrx.rst
+ create mode 100644 io_uring/KConfig
+ create mode 100644 io_uring/zcrx.c
+ create mode 100644 io_uring/zcrx.h
+ create mode 100644 tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+
+-- 
+2.43.5
+
 
