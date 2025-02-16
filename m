@@ -1,79 +1,46 @@
-Return-Path: <netdev+bounces-166787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90986A374ED
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:11:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA92A37521
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F2216C664
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:11:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D94B5188F0F3
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D608D199252;
-	Sun, 16 Feb 2025 15:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E301F94C;
+	Sun, 16 Feb 2025 15:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="ThQddU+R"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GvMLObNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116711991AE
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 15:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F34BE567;
+	Sun, 16 Feb 2025 15:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739718680; cv=none; b=oB2jUlHbwqV0MjylYzSnvuYZCfQBrwKNXJx5kdXNOa6elqoDbCKLNg2qY7tCOrSkwKXyt67MxiJqbNE7I8brFpupu2p2H69ndhtvFDRoGswJI3cw/gDVT6ZPxOfYryj2krZy2a79nhJhfhd6KSvrjSRe3hBdx+E+YEPlVOpQVW8=
+	t=1739720356; cv=none; b=G4GyiWpjgDRCSq+kYg+H4Syr369k69R0Bw84i5fbcmDO0Y0pFtGtUfzB1m4Mn/sDmbJ/FgZprfP8zXVFAP+WqyG/WAPK3qvvULTZg/ArKzcYMEi2mnjAcYNrR+pzLuOfkEqBduJxw2z/a/miY7PlFWlTJGXB5FzZ2NL4R8tEqRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739718680; c=relaxed/simple;
-	bh=4IQ0g5KvyuNbmI4QCx+VPX0qeUVxl+rCSR4p41A6Qs0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N7J+PIeYZTi7JmOcq/36/AIsm92Jynxon4jF78sQuYIetEpRZQ7XxBI7sGvqrY4Dr9IRRmazOGU0UxHbj+SzV19CVDhazrBrmq5EJ+t469ovgrim63RHwUd5h34ETCgMYQsPmBxHb3aTBBh6I2V0TJPzPdE6rI+1mzvOOLiHq60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=ThQddU+R; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaec111762bso814908566b.2
-        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 07:11:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1739718677; x=1740323477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XxEs174tgEejEhOGBs+mL3V6fq9DUU/u2mDzbjv/spw=;
-        b=ThQddU+RMy7z0OSUJzzrS1h5g8C+aFHJEUpCeFTZIJjxuUuZtdmKhMSIQC4n94wsMA
-         pDafPzHJ9SHhih0K2pNSaOECzLZF2sw4Sflu7Qp9Vp/gSgbYl4P5wPj+NSMhOmlVag/O
-         q5meUpCfPzJgianjuaexCNE60Mhx7lfj6eiEJssnoi6ar4ubQDGV7uOkoD2r/g+JPqtM
-         IEGNyUMPGTvd3GsvqA2z/npDltepLpNt/hTdYtVUtJ8bezynKDFcwYf7dPxWYQcun3N5
-         uyEk8WG+9L3ZE3iHT6G7jtFsOEKGOGhAwvBnTkk4SdNdvPB779Th13jhGSsyKHpPBeBN
-         xLLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739718677; x=1740323477;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XxEs174tgEejEhOGBs+mL3V6fq9DUU/u2mDzbjv/spw=;
-        b=kxU1M7fg2Y9mQcUv7Vcz2/c+3gsAUS93d1E0At9PAIrV+yHGWmQZA46q8JkaNtkpe3
-         h9vfr9NbVyHqHk/m8cUVLpZkHvDoibAlR+fYnQbEeGBlBLCZdgRLaMQ/RKEKQjZpJgjC
-         g/5y732cPmAZsn7gt3i6E6rvL+Txqae6ZmZWz+5JRQ2pbX6alXfr10E9rG1va14DzWva
-         cI6BUiC0PW9Tffrg+qkO/2Mlk9v20R189yHG63cDfnKha4H7dqrYXMplA7t7uBmBa40a
-         bzagDaDWw6XGzud2/8o7aPBIS3vOq3NThMt0ZenKdGmQ7KO2vppSpo4XBKl3sNek7b8F
-         BXIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUklsrjMTZ31JQU9gFOkKEzzg5j1klZAh7gdbYbsYP9l1YFTr8L+6PHYpbiVVu4ybQFuvjvNrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPE+CX6nFaxEn89JxNoRTatps7M3c+Rrv2e8Z8wVwc/xOV8yMD
-	ljECdwwSeSJ6OL017L6ryMtUbZnKw33pRPOa/itsIYCiMt0yKHqF+ySavVNfFdM=
-X-Gm-Gg: ASbGnctjSN8yGvCn1yOpy+oA7xVPDjPggNKOz+MnIPnE6eUfiprdSrnyu0XpErcAG14
-	CpmAazBfcZN3/eRGrItQxsKVhAoMjC0n0oCB+2mA0i5TkWmgvvwSkQ4z78CIVKhn6uxl0U7pvbo
-	EWaUwX3rslyl9N83rtmgM8IbHFRCfS70aVTFhDnG+oR7wfyvcrKBBJm8OItJ/kgp4HQdFyTJLHQ
-	9KCBqexY1Y09lglp3XxdaB1vovmVGChuRDnSvcLrv0Ek4Lj8Lsapo6DEcvLXbbpUeh3Ud5Gx1ow
-	nHBHJA9ny2GqYNhzb/9KWMVhfxqnPkCFq2BNCB0NLiAbf/M=
-X-Google-Smtp-Source: AGHT+IFJErHfiwjq8OuATuDMBXLWRjnh3cAPDyG+uN8XMo+VzOnpfp01aY9p8urTKh5hiaXOlWw+3w==
-X-Received: by 2002:a17:907:7f27:b0:ab2:da92:d0bc with SMTP id a640c23a62f3a-abb70c01ecemr672451566b.3.1739718677216;
-        Sun, 16 Feb 2025 07:11:17 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dece270967sm5963200a12.55.2025.02.16.07.11.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Feb 2025 07:11:16 -0800 (PST)
-Message-ID: <684bc34c-ae15-4cff-9e44-945294ee233b@blackwall.org>
-Date: Sun, 16 Feb 2025 17:11:15 +0200
+	s=arc-20240116; t=1739720356; c=relaxed/simple;
+	bh=R/rjesY1vUA6QWSva5TdUE0A3eW1/D0JRd6BbtBqM4U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Dh1bU/H8MfvRzTWetX1upF9tXicRCDnHmI3HSBeVzMx+z7gpJmL+2SVcqtdaAtU21xi6OnaVgDW2B6hiumHZPkvRRijcSRqyfSYyinUqCpzUQVK6v5R45ayBe5EqCisFKmbRL1kHn7HSEMX3RhbOaeCuG3SeuLK95rDzGqKiFcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GvMLObNK; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1739720344; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=+1uFYePbL4gJcuBtQwdJFiHz1tFGGrZucYBZ/AAb9e0=;
+	b=GvMLObNKW2ZU41T5n2O3/qibtej2aoeDdV2scLza9LJQrBK1VlEpUmo7LoChCGTOqhCf+zUODA6BK8mylsmMtYXIh1Wd7rFao/2kCqhBX1oa+q3P21lwDxSn3CJJd0FeC4yTbEqhRQwNzwb57X2LFBE7D12cyprigSg6fIdaWPY=
+Received: from 30.212.179.125(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WPWxkrU_1739720330 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 16 Feb 2025 23:39:03 +0800
+Message-ID: <ac35c3ce-f568-4d1d-b9a5-2e5c51bd4494@linux.alibaba.com>
+Date: Sun, 16 Feb 2025 23:38:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,40 +48,168 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
- Boris Pismenny <borisp@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250207092920.543458-1-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250207092920.543458-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Julian Ruess <julianr@linux.ibm.com>, dust.li@linux.alibaba.com,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Peter Oberparleiter <oberpar@linux.ibm.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+In-Reply-To: <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/7/25 11:29, Hangbin Liu wrote:
-> The mac address on backup slave should be convert from Solicited-Node
-> Multicast address, not from bonding unicast target address.
+
+
+On 2025/1/17 00:17, Alexandra Winter wrote:
 > 
-> v3: also fix the mac setting for slave_set_ns_maddr. (Jay)
->     Add function description for slave_set_ns_maddr/slave_set_ns_maddrs (Jay)
-> v2: fix patch 01's subject
 > 
-> Hangbin Liu (2):
->   bonding: fix incorrect MAC address setting to receive NS messages
->   selftests: bonding: fix incorrect mac address
+> On 16.01.25 12:55, Julian Ruess wrote:
+>> On Thu Jan 16, 2025 at 10:32 AM CET, Dust Li wrote:
+>>> On 2025-01-15 20:55:20, Alexandra Winter wrote:
+>>>
+>>> Hi Winter,
+>>>
+>>> I'm fully supportive of the refactor!
 > 
->  drivers/net/bonding/bond_options.c            | 55 ++++++++++++++++---
->  .../drivers/net/bonding/bond_options.sh       |  4 +-
->  2 files changed, 49 insertions(+), 10 deletions(-)
+> 
+> Thank you very much Dust Li for joining the discussion.
+> 
+> 
+>>> Interestingly, I developed a similar RFC code about a month ago while
+>>> working on enhancing internal communication between guest and host
+>>> systems.
+> 
+> 
+> But you did not send that out, did you?
+> I hope I did not overlook an earlier proposal by you.
+> 
+> 
+> Here are some of my thoughts on the matter:
+>>>
+>>> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
+>>> Device) instead of ISM (Internal Shared Memory).
+> 
+> 
+> So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
+> 
+> 
+> To my knowledge, a
+>>> "Shared Memory Device" better encapsulates the functionality we're
+>>> aiming to implement.
+> 
+> 
+> Could you explain why that would be better?
+> 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
+> Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
+> devices and by ism_loopback. So what is the benefit in changing it?
+> 
+> 
+> It might be beneficial to place it under
+>>> drivers/shd/ and register it as a new class under /sys/class/shd/. That
+>>> said, my initial draft also adopted the ISM terminology for simplicity.
+>>
+>> I'm not sure if we really want to introduce a new name for
+>> the already existing ISM device. For me, having two names
+>> for the same thing just adds additional complexity.
+>>
+>> I would go for /sys/class/ism
+>>
+>>>
+>>> Modular Approach: I've made the ism_loopback an independent kernel
+>>> module since dynamic enable/disable functionality is not yet supported
+>>> in SMC. Using insmod and rmmod for module management could provide the
+>>> flexibility needed in practical scenarios.
+> 
+> 
+> With this proposal ism_loopback is just another ism device and SMC-D will
+> handle removal just like ism_client.remove(ism_dev) of other ism devices.
+> 
+> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
+> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
+> removal by ism_dev_unregister(). In case of this RFC that would only happen
+> in case of rmmod ism. Which should be improved.
+> One way to do that would be a separate ism_loopback kernel module, like you say.
+> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
+> I also think it is a great way for testing any ISM client, so it has benefit for
+> anybody using the ism module.
+> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
+> (Once we agree if and how to represent ism devices in genera in sysfs).
+> 
+>>>
+>>> Abstraction of ISM Device Details: I propose we abstract the ISM device
+>>> details by providing SMC with helper functions. These functions could
+>>> encapsulate ism->ops, making the implementation cleaner and more
+>>> intuitive. This way, the struct ism_device would mainly serve its
+>>> implementers, while the upper helper functions offer a streamlined
+>>> interface for SMC.
+>>>
+>>> Structuring and Naming: I recommend embedding the structure of ism_ops
+>>> directly within ism_dev rather than using a pointer. Additionally,
+>>> renaming it to ism_device_ops could enhance clarity and consistency.
+>>>
+>>>
+>>>> This RFC is about providing a generic shim layer between all kinds of
+>>>> ism devices and all kinds of ism users.
+>>>>
+>>>> Benefits:
+>>>> - Cleaner separation of ISM and SMC-D functionality
+>>>> - simpler and less module dependencies
+>>>> - Clear interface definition.
+>>>> - Extendable for future devices and clients.
+>>>
+>>> Fully agree.
+>>>
+>>>>
+> [...]
+>>>>
+>>>> Ideas for next steps:
+>>>> ---------------------
+>>>> - sysfs representation? e.g. as /sys/class/ism ?
+>>>> - provide a full-fledged ism loopback interface
+>>>>     (runtime enable/disable, sysfs device, ..)
+>>>
+>>> I think it's better if we can make this common for all ISM devices.
+>>> but yeah, that shoud be the next step.
+> 
+> 
+> The s390 ism_vpci devices are already backed by struct pci_dev.
+> And I assume that would be represented in sysfs somehow like:
+> /sys/class/ism/ism_vp0/device -> /sys/devices/<pci bus no>/<pci dev no>
+> so there is an
+> /sys/class/ism/<ism dev name>/device/enable entry already,
+> because there is /sys/devices/<pci bus no>/<pci dev no>/enable today.
+> 
+> I remember Wen Gu's first proposal for ism_loopback had a device
+> in /sys/devices/virtual/ and had an 'active' entry to enable/disable.
+> Something like that could be linked to /sys/class/ism/ism_lo/device.
 > 
 
-For the set:
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Yes, the previous proposal can be refered to [1]. And the hierarchy
+you mentioned makes sense to me.
 
+[1] https://lore.kernel.org/netdev/20240111120036.109903-1-guwen@linux.alibaba.com/
+
+> 
+>>
+>> I already have patches based on this series that introduce
+>> /sys/class/ism and show ism-loopback as well as
+>> s390/ism devices. I can send this soon.
+>>
+>>
+>> Julian
 
