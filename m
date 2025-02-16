@@ -1,128 +1,262 @@
-Return-Path: <netdev+bounces-166768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961C3A373F0
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 12:24:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6366A37412
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 13:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FFC218894DF
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 11:24:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6AE67A269E
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 12:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6714018DB17;
-	Sun, 16 Feb 2025 11:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19E518DB1E;
+	Sun, 16 Feb 2025 12:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAfGUCki"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXoQOopC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA60015F3FF;
-	Sun, 16 Feb 2025 11:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B40114D43D;
+	Sun, 16 Feb 2025 12:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739705075; cv=none; b=AEKWMp8MUggLtHv4ha+aem7Kcrh32ggcufSdMLKdhWDOUxI6A+F6brEksfmaU/8jKoF/x5d+zZXVLd47w9yIBXjrK8yibHQyaGkj1ki0fc1g8MY1VmVbSqfZhh+NQo0EAdVIFWoU7zuaxP3gAyXh0bE/EsM7RAVkcstGUTFTLLo=
+	t=1739707357; cv=none; b=iGCnLYbNe1KpcpIqkJAg1HwdaYZQpmeeHSQrUZRlX4Ni2O2kLuU/AZSCaHNJwzYaDYDspeThGOA+2tI91Ib9r3r3ww8tBrCZ3H63ocTw+4vQu0o3XTIgzAR5qatnpS/fUW5XwzzYL8cGWiYTzkIBEuuviy7RNcmRoO7zwj6wObE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739705075; c=relaxed/simple;
-	bh=enwafucR5NlWPBdACF9TuMGdAR8VNwvlFw1zTCogdRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c+CTHdK5p/qAe0k0a7sSppuS8vnSNWyenRhVlENOI2TU4Jah59FXVbTyBjou1cuSn6oVpMRiCyNwpZ4zheZD0JPxIX3eTTH1W/e8Z5VS5yLGJ0wGFf7X3voSmXD0ESeSP4XWdmO7cxsTcOUywHnyZAE7PLVO5s7uu1byCDpE4FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAfGUCki; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1739707357; c=relaxed/simple;
+	bh=hZ8/iVQ5s08p2V4vsm0sdgPhGPjrrIjdgmny8XSe5Qs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WrQVYDsJucXu1i9TgKNQQCU9rhxlPDVtxYA8CcEYHLoaILWPsyIvJDTg9wkiPZsjuB7quw5oQfQvgs6ku64Qz9pg8lh+j1qrYqNlU0MlPABsGtOIWLTCEK1zvQ1nnJ/M0utIPsm72TWy77kVKW+lUhSjlFpWA6BGaZoU2JtYFvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hXoQOopC; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38f31f7732dso921363f8f.1;
-        Sun, 16 Feb 2025 03:24:33 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-220d39a5627so50558765ad.1;
+        Sun, 16 Feb 2025 04:02:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739705072; x=1740309872; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N6CW6cwzy3RXFFAj6UJ9mWJ4TcwTIqGU+hJNWCt4bOU=;
-        b=VAfGUCkiNaz1wAtfPWmAAVbQAHnIFLypid2M1mFLYLesG6jP7kgt5zBaeJvp4+7Lf/
-         nTHAouJRY/3fLWslTCi7zGT8cfBIW8jaDqztgVaSY5vlXBL34cTacoFqfYhms/owz07k
-         zPit1IOAAQyMnDPLglNMhL0c/lmLzk4+XyzfFFutZELp890Q21jLnWocDhJ59T/CFwet
-         Gy32Kjt0tFpzFBCz7f35JOS7mJMenRLBjt7AEIg+I0HxGX+oGu/42ItpFPEBmgKsDRgv
-         2MJjcDaKsvl0as0uGMg9lbdHGT/nQ005V97UGoZBiBx6sjVfj23cbynsKML36W/FEoxG
-         kIwg==
+        d=gmail.com; s=20230601; t=1739707355; x=1740312155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=82WigbKU8K6bF5i7jEXR0EoBUFDRYWWxYd/tjoD8mAs=;
+        b=hXoQOopCFD2V5np1oXPJhx6n8i2I+WVOSniBe+FiqAHd0qyvqS+5859cIf3bgRO8xl
+         K0dF7bGz4NxEKgcvQkGrEpsv4ggkr8aauEsOctTwQsaoBgZnoUKzDNd4gEecoKxr2k37
+         PQvv/WGeDejgfKcPTkNnRJJwy6/9N0oq4/M4xsJhDdlmAmiyuZsP6oOw1dOnpEE2S/iP
+         typbS1UJuMkVWh3KCKR87w42xm90QjmWjIxl9AkGJsvzKGOm2EyM/OFMsmtexcSFN9Zo
+         qOeHfVyRKKSPDWXz7N0IInmadMg3I/Cxmee3zSbW1uSfHKT3aRGyTe3sRfQIqDcY0VCm
+         +PVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739705072; x=1740309872;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N6CW6cwzy3RXFFAj6UJ9mWJ4TcwTIqGU+hJNWCt4bOU=;
-        b=nl0FpfMD0otDqMSQVgfPqDMIb1iw5r14E23o7EuQUiH0K591Y8TxljCtU9BEBGA8Rb
-         yaADwDpaM/HVsIkjkHpmTYfZY4tSzh2KX/lYbmquqVoYC5/jftuVzRaz5htHYa5FJjup
-         bmUscqYhqHC14v4o9buYWig8n6dHnyNIF4VAdVs217wY1jPT/2x5z8NhIVWRpV0WX19V
-         6vT47otCF4MeEDGTBC56QPOrsh/xL/LNLef1fK+LxfvG8DsiiRMRkUNXn1X1Gpv/gzpJ
-         iBYhapWgevk8jxi2r3O2yfM0iNxiseNuUPWeTKeUyUMsm6rXv5Q2BO1M6O9j0r/Ne4ep
-         t74g==
-X-Forwarded-Encrypted: i=1; AJvYcCWfb7T7yX+vmk5GUp630tVgYbg9CZzziMKVf0LfC30KhEO4XjtEa7SJ/EEYJxit3/VuIjNi+/e1eCek8PE=@vger.kernel.org, AJvYcCWi1SCJIP/9MFMu+garr8BozaCWrZJWsIH8J2invpm0h9yU5qGpRPV5ZDr2brB3WbSHEVPrWbK8@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiYdvmjy3JouOJJ1KoE3W0YoDrYH3XlDRkv4pps+IRhnIPX5aS
-	kyZ75lUq2nnC88CTZxSt8Z4g7Cg28KgcdgSoaVKBapd1m/MvIEFo
-X-Gm-Gg: ASbGncu7ZEaOPcENN0xyKyC+QD6+2bA4ZjNLqDxL2IQnmoQeXaMITZAKDXXr19tW1M8
-	8AnODIm7S+0VhfPIJloxJJxnJILLO9jKTC+2WNWuzDsm7rQD09syys+pUbgmSp+OSQZkDAU+SSI
-	SaFqezKgCxSZO5D9EPH9bZ6OKbT2QzYLE+gs+UY7swhSgnD57BC9cGx2wew2C/RXvt2YvI3FX8I
-	TUkEo5NbrScM0Tt/lWJKUOB2taM8Z5pO81Ro1yxhuroREY3GY5aAFrBGON+ifURDLmdOJU9zVht
-	bT+z9hyOtbaDIZmZtTqe7HGnDI5FcGcIM0XkpCcxckutm4U8HpjvDg==
-X-Google-Smtp-Source: AGHT+IGVwtYfKNvFbUEXI11NHDgMu2PvMKflTrnjpL6Qjbpq/I/5bYeadzXPYdLkMR7a3RogSPSc2g==
-X-Received: by 2002:a05:6000:1fae:b0:38f:3aae:830b with SMTP id ffacd0b85a97d-38f3aafb43bmr3288926f8f.26.1739705071708;
-        Sun, 16 Feb 2025 03:24:31 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a1aa7e8sm124397715e9.26.2025.02.16.03.24.31
+        d=1e100.net; s=20230601; t=1739707355; x=1740312155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=82WigbKU8K6bF5i7jEXR0EoBUFDRYWWxYd/tjoD8mAs=;
+        b=dlmEirXTkRSs+UDD9ce3bbxNY4JemikDAgLrXBKLDuwhUV/D6eT56bh0vm2l1v+LyM
+         T9DDrMJ76GSuTd0Xf8G9LRbLbmdwbS6jmaZ38E7NONEloSItvyTEof6ob29lKWMfSKKY
+         nQGGT4eQ4Mw0UrVyis1Z9lnM5k02xb7IGYR2tzDXQleaxMwswqMoXDLeZHbOi3S6bPzF
+         a1s2/hMqwrkcPT7iq2btkayN1jRaTWHjkVdO6nwZSlzjgWGNQdoWS5GCHJGuydDv0eYv
+         nshbjvmsRyyl4J+m6TrTeONzQXosi4MLPpguMKQH6CCgcZ3rFIInuvG95QCWAM3HLKY7
+         N8PA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZDBQCd+POmvUer7znF/WG2V2e6HFKdHualRMWO34uZVLPvP0zedUTcZNK8MqtyeTEJHvu2ZaV@vger.kernel.org, AJvYcCVdNcnBbTvqK4DDwiZe6Rqhh6MU+QQTd+DCpuNa4lMseapYGN7z9odKUlNy/qGcM8g7i2QmoO7E@vger.kernel.org, AJvYcCWOF/+S0LUXpTMD+1Jy97R+bEZj3CrochGevrOiOVUAuxINfSYwSLSpUEq22SstrUnrz5mvNrpeIJoyAmmx@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWfe0/fLz67T5kQP+3j8y4jsj89ZAfgv91M2JfVinmHvdkenKE
+	qB+WxRzGtp1X8mBth/FCjHPhv5QrqBAySCQWvPoVPKPtlO9FlECC
+X-Gm-Gg: ASbGncsZ2e1djrXPzvjBtQYaO5qmRbnY+XKhDcsqmZdBZfvL17S1t2PzlZJhFg4M6rQ
+	JHSpSlxRrVlYw6pFaKyVuaHo/n7WPkFQkJW9kj2KjbTI8o8l7UsbCHrGALEs1bWH94TV+svhLfg
+	jVK9raknhWdB7CXgXECKD6uWJamCkHdlEVQcYtkba7b1afCrIzMMaW/3qL3vN0chhKPUtXSu29P
+	ETWCk5gNPd5hDN//p4Zdd02r8OmaspsMDHIuU/wB3duCVB7ZN65cdZqnM0qIWhfFPKtX8YBZ27X
+	IcB6dNBADTtb5JnhvrY=
+X-Google-Smtp-Source: AGHT+IErcCjOiHya8dVFasaPJCiSrh08Dpt+kq1hL0br1lZQvSwuAwOU/Wv3CBTQ2n9JWQBjRD9s0w==
+X-Received: by 2002:a05:6a21:6b05:b0:1ed:e7cc:ee89 with SMTP id adf61e73a8af0-1ee8cc0335fmr10408406637.26.1739707355394;
+        Sun, 16 Feb 2025 04:02:35 -0800 (PST)
+Received: from pop-os.. ([2401:4900:65bb:caef:d8d2:fa8c:9c6d:c932])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7324256896csm6181753b3a.40.2025.02.16.04.02.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Feb 2025 03:24:31 -0800 (PST)
-Date: Sun, 16 Feb 2025 11:24:30 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Nick Child <nnac123@linux.ibm.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
- nick.child@ibm.com, jacob.e.keller@intel.com
-Subject: Re: [PATCH 1/3] hexdump: Implement macro for converting large
- buffers
-Message-ID: <20250216112430.29c725c5@pumpkin>
-In-Reply-To: <20250216093204.GZ1615191@kernel.org>
-References: <20250214162436.241359-1-nnac123@linux.ibm.com>
-	<20250214162436.241359-2-nnac123@linux.ibm.com>
-	<20250215163612.GR1615191@kernel.org>
-	<20250215174039.20fbbc42@pumpkin>
-	<20250215174635.3640fb28@pumpkin>
-	<20250216093204.GZ1615191@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Sun, 16 Feb 2025 04:02:34 -0800 (PST)
+From: Aditya Dutt <duttaditya18@gmail.com>
+To: Shuah Khan <shuah@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Shuah Khan <skhan@linuxfoundation.org>,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	cgroups@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Aditya Dutt <duttaditya18@gmail.com>
+Subject: [PATCH] selftests: make shell scripts POSIX-compliant
+Date: Sun, 16 Feb 2025 17:32:25 +0530
+Message-Id: <20250216120225.324468-1-duttaditya18@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sun, 16 Feb 2025 09:32:04 +0000
-Simon Horman <horms@kernel.org> wrote:
+Changes include:
+- Replaced [[ ... ]] with [ ... ]
+- Replaced == with =
+- Replaced printf -v with cur=$(printf ...).
+- Replaced echo -e with printf "%b\n" ...
 
->...
-> > > Yep, that should fail for all versions of gcc.
-> > > Both 'i' and 'rowsize' should be unsigned types.
-> > > In fact all three can be 'unsigned int'.  
-> 
-> To give a bit more context, a complication changing the types is that the
-> type of len and rowsise (but not i) is in the signature of the calling
-> function, print_hex_dump(). And I believe that function is widely used
-> throughout the tree.
+The above mentioned are Bash/GNU extensions and are not part of POSIX.
+Using shells like dash or non-GNU coreutils may produce errors.
+They have been replaced with POSIX-compatible alternatives.
 
-Doesn't matter, nothing with assign the address of the function to a
-variable so changing the types (to unsigned) doesn't affect any callers.
-The values better be positive!
+Signed-off-by: Aditya Dutt <duttaditya18@gmail.com>
+---
 
-I just changed the prototypes (include/linux/printk.h) to make both
-rowsize and groupsize 'unsigned int'.
-The same change in lib/hexdump.c + changing the local 'i, linelen, remaining'
-to unsigned int and it all compiled.
+I have made sure to only change the files that specifically have the
+/bin/sh shebang.
+I have referred to https://mywiki.wooledge.org/Bashism for information
+on what is and what isn't POSIX-compliant.
 
-FWIW that hexdump code is pretty horrid (especially if groupsize != 1).
+ tools/testing/selftests/cgroup/test_cpuset_v1_hp.sh   | 10 +++++-----
+ tools/testing/selftests/kexec/kexec_common_lib.sh     |  2 +-
+ tools/testing/selftests/kexec/test_kexec_file_load.sh |  2 +-
+ tools/testing/selftests/net/veth.sh                   | 10 +++++-----
+ tools/testing/selftests/powerpc/eeh/eeh-vf-aware.sh   |  2 +-
+ tools/testing/selftests/zram/zram_lib.sh              |  2 +-
+ 6 files changed, 14 insertions(+), 14 deletions(-)
 
-	David
-
+diff --git a/tools/testing/selftests/cgroup/test_cpuset_v1_hp.sh b/tools/testing/selftests/cgroup/test_cpuset_v1_hp.sh
+index 3f45512fb512..00416248670f 100755
+--- a/tools/testing/selftests/cgroup/test_cpuset_v1_hp.sh
++++ b/tools/testing/selftests/cgroup/test_cpuset_v1_hp.sh
+@@ -11,24 +11,24 @@ skip_test() {
+ 	exit 4 # ksft_skip
+ }
+ 
+-[[ $(id -u) -eq 0 ]] || skip_test "Test must be run as root!"
++[ $(id -u) -eq 0 ] || skip_test "Test must be run as root!"
+ 
+ # Find cpuset v1 mount point
+ CPUSET=$(mount -t cgroup | grep cpuset | head -1 | awk -e '{print $3}')
+-[[ -n "$CPUSET" ]] || skip_test "cpuset v1 mount point not found!"
++[ -n "$CPUSET" ] || skip_test "cpuset v1 mount point not found!"
+ 
+ #
+ # Create a test cpuset, put a CPU and a task there and offline that CPU
+ #
+ TDIR=test$$
+-[[ -d $CPUSET/$TDIR ]] || mkdir $CPUSET/$TDIR
++[ -d $CPUSET/$TDIR ] || mkdir $CPUSET/$TDIR
+ echo 1 > $CPUSET/$TDIR/cpuset.cpus
+ echo 0 > $CPUSET/$TDIR/cpuset.mems
+ sleep 10&
+ TASK=$!
+ echo $TASK > $CPUSET/$TDIR/tasks
+ NEWCS=$(cat /proc/$TASK/cpuset)
+-[[ $NEWCS != "/$TDIR" ]] && {
++[ $NEWCS != "/$TDIR" ] && {
+ 	echo "Unexpected cpuset $NEWCS, test FAILED!"
+ 	exit 1
+ }
+@@ -38,7 +38,7 @@ sleep 0.5
+ echo 1 > /sys/devices/system/cpu/cpu1/online
+ NEWCS=$(cat /proc/$TASK/cpuset)
+ rmdir $CPUSET/$TDIR
+-[[ $NEWCS != "/" ]] && {
++[ $NEWCS != "/" ] && {
+ 	echo "cpuset $NEWCS, test FAILED!"
+ 	exit 1
+ }
+diff --git a/tools/testing/selftests/kexec/kexec_common_lib.sh b/tools/testing/selftests/kexec/kexec_common_lib.sh
+index 641ef05863b2..b65616ea67f8 100755
+--- a/tools/testing/selftests/kexec/kexec_common_lib.sh
++++ b/tools/testing/selftests/kexec/kexec_common_lib.sh
+@@ -96,7 +96,7 @@ get_secureboot_mode()
+ 	local secureboot_mode=0
+ 	local system_arch=$(get_arch)
+ 
+-	if [ "$system_arch" == "ppc64le" ]; then
++	if [ "$system_arch" = "ppc64le" ]; then
+ 		get_ppc64_secureboot_mode
+ 		secureboot_mode=$?
+ 	else
+diff --git a/tools/testing/selftests/kexec/test_kexec_file_load.sh b/tools/testing/selftests/kexec/test_kexec_file_load.sh
+index c9ccb3c93d72..072e03c8b1c3 100755
+--- a/tools/testing/selftests/kexec/test_kexec_file_load.sh
++++ b/tools/testing/selftests/kexec/test_kexec_file_load.sh
+@@ -226,7 +226,7 @@ get_secureboot_mode
+ secureboot=$?
+ 
+ # Are there pe and ima signatures
+-if [ "$(get_arch)" == 'ppc64le' ]; then
++if [ "$(get_arch)" = 'ppc64le' ]; then
+ 	pe_signed=0
+ else
+ 	check_for_pesig
+diff --git a/tools/testing/selftests/net/veth.sh b/tools/testing/selftests/net/veth.sh
+index 6bb7dfaa30b6..e86f102f9028 100755
+--- a/tools/testing/selftests/net/veth.sh
++++ b/tools/testing/selftests/net/veth.sh
+@@ -137,7 +137,7 @@ __change_channels()
+ 	local i
+ 
+ 	while true; do
+-		printf -v cur '%(%s)T'
++		cur=$(printf '%(%s)T')
+ 		[ $cur -le $end ] || break
+ 
+ 		for i in `seq 1 $CPUS`; do
+@@ -157,7 +157,7 @@ __send_data() {
+ 	local end=$1
+ 
+ 	while true; do
+-		printf -v cur '%(%s)T'
++		cur=$(printf '%(%s)T')
+ 		[ $cur -le $end ] || break
+ 
+ 		ip netns exec $NS_SRC ./udpgso_bench_tx -4 -s 1000 -M 300 -D $BM_NET_V4$DST
+@@ -166,7 +166,7 @@ __send_data() {
+ 
+ do_stress() {
+ 	local end
+-	printf -v end '%(%s)T'
++	cur=$(printf '%(%s)T')
+ 	end=$((end + $STRESS))
+ 
+ 	ip netns exec $NS_SRC ethtool -L veth$SRC rx 3 tx 3
+@@ -198,8 +198,8 @@ do_stress() {
+ 
+ usage() {
+ 	echo "Usage: $0 [-h] [-s <seconds>]"
+-	echo -e "\t-h: show this help"
+-	echo -e "\t-s: run optional stress tests for the given amount of seconds"
++	printf "%b\n" "\t-h: show this help"
++	printf "%b\n" "\t-s: run optional stress tests for the given amount of seconds"
+ }
+ 
+ STRESS=0
+diff --git a/tools/testing/selftests/powerpc/eeh/eeh-vf-aware.sh b/tools/testing/selftests/powerpc/eeh/eeh-vf-aware.sh
+index 874c11953bb6..18fdf88936f0 100755
+--- a/tools/testing/selftests/powerpc/eeh/eeh-vf-aware.sh
++++ b/tools/testing/selftests/powerpc/eeh/eeh-vf-aware.sh
+@@ -36,7 +36,7 @@ done
+ 
+ eeh_disable_vfs
+ 
+-if [ "$tested" == 0 ] ; then
++if [ "$tested" = 0 ] ; then
+ 	echo "No VFs with EEH aware drivers found, skipping"
+ 	exit $KSELFTESTS_SKIP
+ fi
+diff --git a/tools/testing/selftests/zram/zram_lib.sh b/tools/testing/selftests/zram/zram_lib.sh
+index 21ec1966de76..923dbeb64eaf 100755
+--- a/tools/testing/selftests/zram/zram_lib.sh
++++ b/tools/testing/selftests/zram/zram_lib.sh
+@@ -37,7 +37,7 @@ kernel_gte()
+ 
+ 	if [ $kernel_major -gt $major ]; then
+ 		return 0
+-	elif [[ $kernel_major -eq $major && $kernel_minor -ge $minor ]]; then
++	elif [ $kernel_major -eq $major && $kernel_minor -ge $minor ]; then
+ 		return 0
+ 	fi
+ 
+-- 
+2.34.1
 
 
