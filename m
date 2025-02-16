@@ -1,179 +1,115 @@
-Return-Path: <netdev+bounces-166793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E641BA37569
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:07:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7AFA3756D
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C34AD1891700
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:07:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24B1518830A6
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00FD1990A2;
-	Sun, 16 Feb 2025 16:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178431991DD;
+	Sun, 16 Feb 2025 16:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlM6MgGh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H4q8uVsk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DD7DF78;
-	Sun, 16 Feb 2025 16:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22841DF78
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 16:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739722056; cv=none; b=djw/o42l3eiyhIaZlUyOwGdIyRw+dCcDzm46STbb5i7L+yV9E0NHxIp7ZajI9X2hpGFIoKJtBvE7qBfKCL0hOa2ieIJuEScNsjIhARSwOZoXLs99Q9+temDOTGczJLKlklax8TPChdebhbvPT7nR4iQ4DlCN45EkrT0kuhuvR+Y=
+	t=1739722121; cv=none; b=QBkpG35wrdP8NFQJWysYHzOOEo4GgBZKGg6+AWxBpoQ9IxsKB3EM3GSfb7zSHtLzdG/8rfe4mOFtnmarJHN8qbm1ki+vRaM0Q/6G1d5l5lJB54D3fhPimu1q+29Uv7Ek0ZcxKhztHXA1n/td4aEc4fadz1ENWQiERrJtrCxG8nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739722056; c=relaxed/simple;
-	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
+	s=arc-20240116; t=1739722121; c=relaxed/simple;
+	bh=FHGvcORbXYPHiW3ah+wlOwSeMTvHUb5U5zZ7W1582R4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDr6774fUlMOKALnvM8CYPrQwk7DviZ1kWpwUg3aNDUPu0iEVz5luI41Kjfkjpmn+VliPJAZLklghx1/+UyVY1BvhdvcoS4Su4lIBItxMKPNvfYXdlvBxeUJhkuTldv0LgMe+6tok/2spirTYLNatOpaR3Xo+mxa5eD09jrTX6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlM6MgGh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BB6C4CEDD;
-	Sun, 16 Feb 2025 16:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739722056;
-	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LlM6MgGh//jb+HqFo2mNjO2abwlassCQW6QN1S0IhXrx9UWPKTL5lXIMRVICZOzHG
-	 +aYnJH6ZYStPAMiRJq9BoaA6fzzHLdcCGBjnpM5huUWXgAncyX5dPH9jTWi91Cv77M
-	 +3WB5YZYxAlEHNJp704sGJRxxnh02eUtAbNDOw2MfHkvNQ059CHOsRU99vDxYhKXt7
-	 vit/P0fUJ3Q1Fdij3Rpolx/Bjd5n5gQEy+dOsP9hDJgFvZpHViTnJNBLuCntrxlzRm
-	 45+oqW8LoqDcKA8k4nG/gqp6QP/yPQubFrpCeejequuS5/T2OBUF34Br4sw9waNrgt
-	 jsqu0/NtZNKhw==
-Date: Sun, 16 Feb 2025 16:07:29 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Kalle Valo <kvalo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Marek Vasut <marex@denx.de>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 09/12] wifi: wilc1000: disable firmware power save if
- bluetooth is in use
-Message-ID: <20250216160729.GG1615191@kernel.org>
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
- <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=McX+74dLIc7V/j25fZwev1V57mpD1WKtJoAwxb3GqCzzqhk8ChIbv64LahreqGdTM6+Ojw8rtn6+8ABeJpsRoiRZaYQYvbpMyf0Bx8Vx7Ve+tPTbpiMuM2neziDXPDTwvm8aaZ5zEPpTcj7g66HLBOVi/z1katMta3viUkuY0+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H4q8uVsk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TtoPxWzHabnLVTzuaN4IaK0Lt+B0O9KqxYH9fRYweDA=; b=H4q8uVskNrNM4D2OgBuuwy6N3n
+	hb+AJJ2jzPvweU+PGAq27kXNE0aT08NSzArH5sIX9Uw1HwajavZhiSvG3rcgfSo7zX/oluLyS23yQ
+	y+StzTk/ClbCqILT1W92UiJa4iMSNBnJ6+lwA2QdIUYfUuE5z8wL0B+lBfEFkcr+Ffsg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tjhBv-00EhAh-F5; Sun, 16 Feb 2025 17:08:23 +0100
+Date: Sun, 16 Feb 2025 17:08:23 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, pierre@stackhpc.com,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
+Message-ID: <263574a4-4411-487b-bbb2-f3ff11daa19f@lunn.ch>
+References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+ <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+ <64053332-cee0-49d8-a3ae-9ec0809882c0@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
+In-Reply-To: <64053332-cee0-49d8-a3ae-9ec0809882c0@stanley.mountain>
 
-On Wed, Feb 12, 2025 at 04:46:28PM +0100, Alexis Lothoré wrote:
-> If the wlan interface exposed by wilc driver has power save enabled
-> (either explicitly with iw dev wlan set power_save on, or because
-> kernel is built with CONFIG_CFG80211_DEFAULT_PS), it will send a power
-> management command to the wlan firmware when corresponding interface is
-> brought up. The bluetooth part, if used, is supposed to work
-> independently from the WLAN CPU. Unfortunately, this power save
-> management, if applied by the WLAN side, disrupts bluetooth operations
-> (the bluetooth CPU does not answer any command anymore on the UART
-> interface)
+On Sun, Feb 16, 2025 at 06:06:48PM +0300, Dan Carpenter wrote:
+> On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
+> > On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
+> > > Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> > > from xa_alloc_cyclic() in scheduler code [1]. The same is done in
+> > > devlink_rel_alloc().
+> > 
+> > If the same bug exists twice it might exist more times. Did you find
+> > this instance by searching the whole tree? Or just networking?
+> > 
+> > This is also something which would be good to have the static
+> > analysers check for. I wounder if smatch can check this?
 > 
-> Make sure that the bluetooth part can work independently by disabling
-> power save in wlan firmware when bluetooth is in use.
+> That's a great idea, thanks!  I'll try a couple experiments and see what
+> works tomorrow.  I've add these lines to check_zero_to_err_ptr.c
 > 
-> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
-> ---
->  drivers/net/wireless/microchip/wilc1000/bt.c       | 29 +++++++++++++++++++---
->  drivers/net/wireless/microchip/wilc1000/cfg80211.c |  5 +++-
->  drivers/net/wireless/microchip/wilc1000/netdev.h   |  3 +++
->  3 files changed, 33 insertions(+), 4 deletions(-)
+>    183          max = rl_max(estate_rl(sm->state));
+>    184          if (max.value > 0 && !sval_is_a_max(max))
+>    185                  sm_warning("passing non-max range '%s' to '%s'", sm->state->name, fn);
+>    186  
 > 
-> diff --git a/drivers/net/wireless/microchip/wilc1000/bt.c b/drivers/net/wireless/microchip/wilc1000/bt.c
-> index b0f68a5479a5bd6f70e2390a35512037dc6c332b..f0eb5fb506eddf0f6f4f3f0b182eaa650c1c7a87 100644
-> --- a/drivers/net/wireless/microchip/wilc1000/bt.c
-> +++ b/drivers/net/wireless/microchip/wilc1000/bt.c
-> @@ -7,6 +7,7 @@
->  #include <linux/of_platform.h>
->  #include <linux/platform_device.h>
->  #include <net/wilc.h>
-> +#include "cfg80211.h"
->  #include "netdev.h"
->  #include "wlan_if.h"
->  #include "wlan.h"
-> @@ -261,22 +262,36 @@ static int wilc_bt_start(struct wilc *wilc)
->  int wilc_bt_init(void *wilc_wl_priv)
->  {
->  	struct wilc *wilc = (struct wilc *)wilc_wl_priv;
-> +	struct wilc_vif *vif;
->  	int ret;
->  
-> +	wilc->bt_enabled = true;
-> +
->  	if (!wilc->hif_func->hif_is_init(wilc)) {
->  		dev_info(wilc->dev, "Initializing bus before starting BT");
->  		acquire_bus(wilc, WILC_BUS_ACQUIRE_ONLY);
->  		ret = wilc->hif_func->hif_init(wilc, false);
->  		release_bus(wilc, WILC_BUS_RELEASE_ONLY);
-> -		if (ret)
-> +		if (ret) {
-> +			wilc->bt_enabled = false;
->  			return ret;
-> +		}
->  	}
->  
-> +	/* Power save feature managed by WLAN firmware may disrupt
-> +	 * operations from the bluetooth CPU, so disable it while bluetooth
-> +	 * is in use (if enabled, it will be enabled back when bluetooth is
-> +	 * not used anymore)
-> +	 */
-> +	vif = wilc_get_wl_to_vif(wilc);
-> +	if (wilc->power_save_mode && wilc_set_power_mgmt(vif, false))
-> +		goto hif_deinit;
+> I'm hoping this one works.  It complains about any positive returns
+> except for when the return is "some non-zero value".
+> 
+>    194                  if (estate_get_single_value(tmp->state, &sval) &&
+>    195                      (sval.value < -4096 || sval.value > 0)) {
+>    196                          sm_warning("passing invalid error code %lld to '%s'", sval.value, fn);
+>    197                          return;
+>    198                  }
+> 
+> This one might miss some bugs but it should catch most stuff and have few
+> false positives.  Both of them work on this example.
+> 
+> net/devlink/core.c:122 devlink_rel_alloc() warn: passing non-max range '(-4095)-(-1),1' to 'ERR_PTR'
+> net/devlink/core.c:122 devlink_rel_alloc() warn: passing invalid error code 1 to 'ERR_PTR'
 
-Hi Alexis,
+Nice. In networking, ethernet PHYs, there are a few functions ending
+in _changed() have the same behaviour:
 
-Jumping to hif_deinit will result in the function returning ret.
-But ret may not not be initialised until a few lines below.
+ * Returns negative errno, 0 if there was no change, and 1 in case of change
 
-Flagged by Smatch.
+So there is the potential for the same issue with
+mdiobus_modify_changed(), phy_modify_changed(),
+phy_modify_mmd_changed(), phy_modify_paged_changed(). Hope this helps
+with testing.
 
-> +
->  	mutex_lock(&wilc->radio_fw_start);
->  	ret = wilc_bt_power_up(wilc);
->  	if (ret) {
->  		dev_err(wilc->dev, "Error powering up bluetooth chip\n");
-> -		goto hif_deinit;
-> +		goto reenable_power_save;
->  	}
->  	ret = wilc_bt_firmware_download(wilc);
->  	if (ret) {
-> @@ -293,10 +308,14 @@ int wilc_bt_init(void *wilc_wl_priv)
->  
->  power_down:
->  	wilc_bt_power_down(wilc);
-> -hif_deinit:
-> +reenable_power_save:
-> +	if (wilc->power_save_mode_request)
-> +		wilc_set_power_mgmt(vif, true);
->  	mutex_unlock(&wilc->radio_fw_start);
-> +hif_deinit:
->  	if (!wilc->initialized)
->  		wilc->hif_func->hif_deinit(wilc);
-> +	wilc->bt_enabled = false;
->  	return ret;
->  }
->  EXPORT_SYMBOL(wilc_bt_init);
-
-...
+	Andrew
 
