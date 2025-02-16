@@ -1,87 +1,121 @@
-Return-Path: <netdev+bounces-166803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792ECA375A6
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:19:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EFBAA375CA
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 107B716553E
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:19:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F88C1889949
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A718199EAF;
-	Sun, 16 Feb 2025 16:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB5645023;
+	Sun, 16 Feb 2025 16:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L3bYw1IT"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eB90miJq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AC918024;
-	Sun, 16 Feb 2025 16:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E246B1EB2A;
+	Sun, 16 Feb 2025 16:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739722775; cv=none; b=aXQGMRlvH9DWBA8P1D9LHa3xrVgugglvMCdU7K2cVnEsQ+LPoZ1n6UUTfPSkwOWdUqiW69xmOGnNKOhP3LOvy/4L4AiLRyS0Jn0gkk3Uodbfb2ECBrdw59WxWkzUvhgv4cULfGqqikQDgxkh26GlM6TOD9XyTX+Hbi9ZMk1WiAc=
+	t=1739723443; cv=none; b=YMo7IV65o1d064bYVQm0BRW6Z02DhQ/QRpnQ9ofeD+QzyBZ8fe/F4p6GMrAvnjMEj0cuAnvXngOGZrlng1wl266uBezUFss3blNuMuYgSzp1/Iz7vKl3s5O1Y+AQgZ2LubYJAO+AGNCirRHczMUKqL8B3MvJSufl6tF2ACUOorw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739722775; c=relaxed/simple;
-	bh=i69Rxv/M0TlJhdvqOqvlHHUGj58LbWRvt4U1OKsIxtg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjdDC7HOpdQmZ4f3DsAd+2Pw9WiOuD+FHZceNNnjehGyO/wQ/Nx+Lun8/EBdC4dIy4BO+vYuothN9qWPA+JaNmyU7sAGT5OJX4rbAQ8mYbXVG6FG3Cg2kI0hl6xk+04EWM13VuDsqP0n3bCEKnnGbiooZNnI3u6QGFRAFV4xosM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L3bYw1IT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Kd7X3GlD7l2NnFs2sFyauaR3N10qrRNEi52KigS/1Wc=; b=L3bYw1IT6EpF2nt+PswxXgve3j
-	ZKckm8iHa6R27ERI/sgUqkpALquQmvpERDwP409NpuSrXCgM45qtaFbKefAQKwzBX/pWOkSYMl4s1
-	GrLo1N/ST6Dlk9LB6t6KioZPoGGTHBQ8fgvguqcqt5cTmOaJssPl44NhyQ5xkSEOw8zw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tjhMb-00EhOG-5M; Sun, 16 Feb 2025 17:19:25 +0100
-Date: Sun, 16 Feb 2025 17:19:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: dimitri.fedrau@liebherr.com
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dimitri Fedrau <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v5 3/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
-Message-ID: <62495f94-c3e0-4483-a4cb-d01c261903c6@lunn.ch>
-References: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
- <20250214-dp83822-tx-swing-v5-3-02ca72620599@liebherr.com>
+	s=arc-20240116; t=1739723443; c=relaxed/simple;
+	bh=XUueMceg9DxHK3H1zwriL3J9Xlwq7Hdyuvt6k5oIh3M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jKlUOuMkYt1PSuKC3hw8NcoqVLOf6DpyRvlh5uwPKIl3fGytKgbH4jLnC1nYkPGbv5GGEw/t9t6cDaomMLsZgl91W7yxbZ5IbqQM67t3c3WakvhpWwBcEKgrCmc1qbbwoPlTFCqCsd4CfX0ZkHe+gR/YOufcldIe2d6VdJRwx+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eB90miJq; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739723441; x=1771259441;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NaJZIyPZAIfV6LNidT78LeIrY2+uo/+ruqMk5M8d7O0=;
+  b=eB90miJqB6Pl0O+6k+Kkhw3+IaHi4PrRs3lHoUijc+POYq70jc12fDjB
+   84icdkFwg7VBQm5GBZWysVUBrgP6CHUFQVctved0psTy32xLPHrSLS6iY
+   ZB7wAwuTPDOKaG8PPc4rgkZ+BqhVOk3YlcxnGi+LxCeFfMDvz0URuAgrR
+   U=;
+X-IronPort-AV: E=Sophos;i="6.13,291,1732579200"; 
+   d="scan'208";a="172956246"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2025 16:30:40 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:38396]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.73:2525] with esmtp (Farcaster)
+ id 92bb0ce0-6e42-4b4f-82f1-1290ee735eb2; Sun, 16 Feb 2025 16:30:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 92bb0ce0-6e42-4b4f-82f1-1290ee735eb2
+Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sun, 16 Feb 2025 16:30:39 +0000
+Received: from b0be8375a521.amazon.com (10.118.254.38) by
+ EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sun, 16 Feb 2025 16:30:34 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Gilad Naaman <gnaaman@drivenets.com>, Joel Granados
+	<joel.granados@kernel.org>, Li Zetao <lizetao1@huawei.com>, Kohei Enju
+	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
+Subject: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc() when GFP_ATOMIC is specified
+Date: Mon, 17 Feb 2025 01:30:16 +0900
+Message-ID: <20250216163016.57444-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214-dp83822-tx-swing-v5-3-02ca72620599@liebherr.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+ EX19D003ANC003.ant.amazon.com (10.37.240.197)
 
-On Fri, Feb 14, 2025 at 03:14:11PM +0100, Dimitri Fedrau via B4 Relay wrote:
-> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> 
-> Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-> Modifying it can be necessary to compensate losses on the PCB and
-> connector, so the voltages measured on the RJ45 pins are conforming.
-> 
-> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
+specified, since kvzalloc() doesn't support non-sleeping allocations such
+as GFP_ATOMIC.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
+path and returns immediately after the kmalloc path fails.
+Therefore, using kzalloc() is sufficient in this case.
 
-    Andrew
+Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+ net/core/neighbour.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index d8dd686b5287..344c9cd168ec 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -518,7 +518,7 @@ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
+ 	if (!ret)
+ 		return NULL;
+ 
+-	hash_heads = kvzalloc(size, GFP_ATOMIC);
++	hash_heads = kzalloc(size, GFP_ATOMIC);
+ 	if (!hash_heads) {
+ 		kfree(ret);
+ 		return NULL;
+@@ -536,7 +536,7 @@ static void neigh_hash_free_rcu(struct rcu_head *head)
+ 						    struct neigh_hash_table,
+ 						    rcu);
+ 
+-	kvfree(nht->hash_heads);
++	kfree(nht->hash_heads);
+ 	kfree(nht);
+ }
+ 
+-- 
+2.39.5 (Apple Git-154)
+
 
