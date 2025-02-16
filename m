@@ -1,121 +1,179 @@
-Return-Path: <netdev+bounces-166804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFBAA375CA
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:31:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F88A375C8
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F88C1889949
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:30:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509413A21AD
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB5645023;
-	Sun, 16 Feb 2025 16:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B5D182D9;
+	Sun, 16 Feb 2025 16:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eB90miJq"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OWpKSwgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E246B1EB2A;
-	Sun, 16 Feb 2025 16:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27761EB2A
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 16:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739723443; cv=none; b=YMo7IV65o1d064bYVQm0BRW6Z02DhQ/QRpnQ9ofeD+QzyBZ8fe/F4p6GMrAvnjMEj0cuAnvXngOGZrlng1wl266uBezUFss3blNuMuYgSzp1/Iz7vKl3s5O1Y+AQgZ2LubYJAO+AGNCirRHczMUKqL8B3MvJSufl6tF2ACUOorw=
+	t=1739723469; cv=none; b=RkYRU9nneX6X1vARHrzJg7LXMKd/sdPIEJDUVlSN45LXvhKHpLNwAWhP9y4IhNR0WhhdszJFkuPoeoiDvA5PYooKBrUQmzuQzqGOei6Rc4tOK5gagGdDd1rF18V0OUa8iXVdr9pvsDXxap0Ty+HDcRI9XNAZxpdhZFMm5JYLU5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739723443; c=relaxed/simple;
-	bh=XUueMceg9DxHK3H1zwriL3J9Xlwq7Hdyuvt6k5oIh3M=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jKlUOuMkYt1PSuKC3hw8NcoqVLOf6DpyRvlh5uwPKIl3fGytKgbH4jLnC1nYkPGbv5GGEw/t9t6cDaomMLsZgl91W7yxbZ5IbqQM67t3c3WakvhpWwBcEKgrCmc1qbbwoPlTFCqCsd4CfX0ZkHe+gR/YOufcldIe2d6VdJRwx+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eB90miJq; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739723441; x=1771259441;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NaJZIyPZAIfV6LNidT78LeIrY2+uo/+ruqMk5M8d7O0=;
-  b=eB90miJqB6Pl0O+6k+Kkhw3+IaHi4PrRs3lHoUijc+POYq70jc12fDjB
-   84icdkFwg7VBQm5GBZWysVUBrgP6CHUFQVctved0psTy32xLPHrSLS6iY
-   ZB7wAwuTPDOKaG8PPc4rgkZ+BqhVOk3YlcxnGi+LxCeFfMDvz0URuAgrR
-   U=;
-X-IronPort-AV: E=Sophos;i="6.13,291,1732579200"; 
-   d="scan'208";a="172956246"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2025 16:30:40 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:38396]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.73:2525] with esmtp (Farcaster)
- id 92bb0ce0-6e42-4b4f-82f1-1290ee735eb2; Sun, 16 Feb 2025 16:30:39 +0000 (UTC)
-X-Farcaster-Flow-ID: 92bb0ce0-6e42-4b4f-82f1-1290ee735eb2
-Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sun, 16 Feb 2025 16:30:39 +0000
-Received: from b0be8375a521.amazon.com (10.118.254.38) by
- EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 16 Feb 2025 16:30:34 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Gilad Naaman <gnaaman@drivenets.com>, Joel Granados
-	<joel.granados@kernel.org>, Li Zetao <lizetao1@huawei.com>, Kohei Enju
-	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc() when GFP_ATOMIC is specified
-Date: Mon, 17 Feb 2025 01:30:16 +0900
-Message-ID: <20250216163016.57444-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1739723469; c=relaxed/simple;
+	bh=JBxW88opkFEQVbx2tg3G9I/mRJKKNOE6b3B8y35QQSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rvFCgBf7WVwzeXSwCKl5aCcNoqtHbYQKuLG+Qa8iX9i+HasrNrD3WEqfhzIVPfT85g9tzUVL6WNLmVIWWEiZEFszVBZl8lfK9smvlI6f376Q4u2WZY9fewVhR/fRPdb/KuPcp/sY4rgLcv8uq/cWBXfcLBSra7J5xWrtXrGlx0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OWpKSwgp; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 69E4425400CC;
+	Sun, 16 Feb 2025 11:31:06 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Sun, 16 Feb 2025 11:31:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1739723466; x=1739809866; bh=mCDrHix1+OtxAOeDd4aFl5V38H50hNnqGCq
+	4ygl6dAA=; b=OWpKSwgpsehkfToaDSOk4hnY5uin0/6nQzcMvZD5e4zhkcstQ6G
+	jbq2Qb0kyJCXWcYp0YeGagJDjO4pIaB6kEmNYqh5Fg9TJV3f0N2kGDfn3lqBFxok
+	hdbqeA8qMsbHF+94MX9CUuwalewvxJ943Qan0+e3zyg7NxBBN6jkgEA5d4GLqvK0
+	bf8Ad1rlxMmmjZY2ncCDBiqZTW1pHhIkx/LEfhEk/dG2KfeLpMuIYAh/ps0gJrQ0
+	nF36mWwwx3ong8b2pLr4J/iJl8LOBaHxG7Vr20G/bdPUE29gzfBspsbSCOGyKlHG
+	EWYPaZMqYWg+ni1hvQ5yBNWpbPrmKSSDWmg==
+X-ME-Sender: <xms:yRKyZxvK7TQRYMPDwnFUMaS7wcm9Po6ia9s1b8xS6annS96U_bZAUg>
+    <xme:yRKyZ6drrS8_O0Bex-Irqe9Q7OWQlqimMvedHny38Qaij_YCQzlgKMpUYYuaysdi3
+    7E_FK0l-Jk85IQ>
+X-ME-Received: <xmr:yRKyZ0w44yKEqdvwoslRMX6yha6cL6hUL5sEBpu1DDgjbD59xcW97jke53RU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehheelgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefg
+    udffvdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
+    sehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpoh
+    huthdprhgtphhtthhopehjuhhsthhinhdrihhurhhmrghnsehulhhivghgvgdrsggvpdhr
+    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrhhn
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:yRKyZ4OsRhLLQxmOM3fuZVV45c2UjfCxCDDfCY3dfhaTLBY0ujvJYA>
+    <xmx:yRKyZx_qHCZi3mDD1NyL0S4JADq3wFN1ac0IVQ_i6lK0iXifuFtdVg>
+    <xmx:yRKyZ4UlImzRlKTp06LcnBs_l9ho08DADLjQpJou00wyW14gIRzf6A>
+    <xmx:yRKyZycJeReCY-Htb4VKoJe_MIxwZlqv9wpwM8f1KtBEK_Li6Moxdg>
+    <xmx:yhKyZwb0u5m5I02k-q4klYEzjblFAyrsLSRsqFHUNCRSa-9snGnSWfzv>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 16 Feb 2025 11:31:04 -0500 (EST)
+Date: Sun, 16 Feb 2025 18:31:02 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Justin Iurman <justin.iurman@uliege.be>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, Alexander Aring <alex.aring@gmail.com>,
+	David Lebrun <dlebrun@google.com>
+Subject: Re: [PATCH net v2 2/3] net: ipv6: fix lwtunnel loops in ioam6, rpl
+ and seg6
+Message-ID: <Z7ISxnU0QhtRGTnb@shredder>
+References: <20250211221624.18435-1-justin.iurman@uliege.be>
+ <20250211221624.18435-3-justin.iurman@uliege.be>
+ <Z63zgLQ_ZFmkO9ys@shredder>
+ <a375f869-9fc3-4a58-a81a-c9c8175463dd@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
- EX19D003ANC003.ant.amazon.com (10.37.240.197)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a375f869-9fc3-4a58-a81a-c9c8175463dd@uliege.be>
 
-Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
-specified, since kvzalloc() doesn't support non-sleeping allocations such
-as GFP_ATOMIC.
+On Thu, Feb 13, 2025 at 11:51:49PM +0100, Justin Iurman wrote:
+> On 2/13/25 14:28, Ido Schimmel wrote:
+> > On Tue, Feb 11, 2025 at 11:16:23PM +0100, Justin Iurman wrote:
+> > > When the destination is the same post-transformation, we enter a
+> > > lwtunnel loop. This is true for ioam6_iptunnel, rpl_iptunnel, and
+> > > seg6_iptunnel, in both input() and output() handlers respectively, where
+> > > either dst_input() or dst_output() is called at the end. It happens for
+> > > instance with the ioam6 inline mode, but can also happen for any of them
+> > > as long as the post-transformation destination still matches the fib
+> > > entry. Note that ioam6_iptunnel was already comparing the old and new
+> > > destination address to prevent the loop, but it is not enough (e.g.,
+> > > other addresses can still match the same subnet).
+> > > 
+> > > Here is an example for rpl_input():
+> > > 
+> > > dump_stack_lvl+0x60/0x80
+> > > rpl_input+0x9d/0x320
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > [...]
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > lwtunnel_input+0x64/0xa0
+> > > ip6_sublist_rcv_finish+0x85/0x90
+> > > ip6_sublist_rcv+0x236/0x2f0
+> > > 
+> > > ... until rpl_do_srh() fails, which means skb_cow_head() failed.
+> > > 
+> > > This patch prevents that kind of loop by redirecting to the origin
+> > > input() or output() when the destination is the same
+> > > post-transformation.
+> > 
+> > A loop was reported a few months ago with a similar stack trace:
+> > https://lore.kernel.org/netdev/2bc9e2079e864a9290561894d2a602d6@akamai.com/
+> > 
+> > But even with this series applied my VM gets stuck. Can you please check
+> > if the fix is incomplete?
+> 
+> Good catch! Indeed, seg6_local also needs to be fixed the same way.
+> 
+> Back to my first idea: maybe we could directly fix it in lwtunnel_input()
+> and lwtunnel_output() to make our lives easier, but we'd have to be careful
+> to modify all users accordingly. The users I'm 100% sure that are concerned:
+> ioam6 (output), rpl (input/output), seg6 (input/output), seg6_local (input).
+> Other users I'm not totally sure (to be checked): ila (output), bpf (input).
+> 
+> Otherwise, we'll need to apply the fix to each user concerned (probably the
+> safest (best?) option right now). Any opinions?
 
-With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
-path and returns immediately after the kmalloc path fails.
-Therefore, using kzalloc() is sufficient in this case.
+I audited the various lwt users and I agree with your analysis about
+which users seem to be effected by this issue.
 
-Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
----
- net/core/neighbour.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'm not entirely sure how you want to fix this in
+lwtunnel_{input,output}() given that only the input()/output() handlers
+of the individual lwt users are aware of both the old and new dst
+entries.
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index d8dd686b5287..344c9cd168ec 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -518,7 +518,7 @@ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
- 	if (!ret)
- 		return NULL;
- 
--	hash_heads = kvzalloc(size, GFP_ATOMIC);
-+	hash_heads = kzalloc(size, GFP_ATOMIC);
- 	if (!hash_heads) {
- 		kfree(ret);
- 		return NULL;
-@@ -536,7 +536,7 @@ static void neigh_hash_free_rcu(struct rcu_head *head)
- 						    struct neigh_hash_table,
- 						    rcu);
- 
--	kvfree(nht->hash_heads);
-+	kfree(nht->hash_heads);
- 	kfree(nht);
- }
- 
--- 
-2.39.5 (Apple Git-154)
+BTW, I noticed that bpf implements the xmit() hook in addition to
+input()/output(). I wonder if a loop is possible in the following case:
 
+ip_finish_output2()                                         <----+
+	lwtunnel_xmit()                                          |
+		bpf_xmit()                                       |
+			// bpf program does not change           |
+			// the packet and returns                |
+			// BPF_LWT_REROUTE                       |
+			bpf_lwt_xmit_reroute()                   |
+				// unmodified packet resolves    |
+				// the same dst entry            |
+				dst_output()                     |
+					ip_output() -------------+
 
