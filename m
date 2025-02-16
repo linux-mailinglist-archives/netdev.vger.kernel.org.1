@@ -1,164 +1,195 @@
-Return-Path: <netdev+bounces-166840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696CAA37817
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 23:50:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8545BA378D0
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 00:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 537E33AF776
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 22:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D77118915DD
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 23:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715A919CC0C;
-	Sun, 16 Feb 2025 22:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BfZgYw00"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59A1189B94;
+	Sun, 16 Feb 2025 23:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE035748F;
-	Sun, 16 Feb 2025 22:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB67DDD2
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 23:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739746242; cv=none; b=iYFrPXBLEiFtX8h+LM85xjunJC4sj85gKSgmHg8ncZODIApAc4aUzaFKarcer/i+fzgCBVPU/pHjsr6Eq3XprZc01JoqvXuBInx9iFrmzcR89XczqDDjJg0/te19dlXK2FHHDPTHZmF+UDHF1Yw1kiuXIoM3PCo40V5aUx9MP5I=
+	t=1739748769; cv=none; b=G3KwnI1tRU0VkUUSmEQiPmfgXrSj1X5xHm6LqikreRu98kJ0sK7tzAN54MugxRLMVL4fdUPtMavDXtz7dTgXXuU4F5voBvvx1xUTGDbK0jRjpUyLRaHNH+jSUwOL3ejMmIGgVG5EYxSk42YwZYb9GllfllEq32JJl2ibTj7ge1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739746242; c=relaxed/simple;
-	bh=MVPYUEfqQP7SYtryyiFnYb+MCB/nRuUktfoW6AhsSsE=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=CB1wJ8S3qP9XVNAfCrWmpmMmug4nCPxcxLmle82AHef4xbGC8Qw+7O71hQLbloGhXugL08LyC7sBRgws+qvFMQkhET6HX8Ey0g6V8b6CzPyzR1VgsnztMJeq7fseY/8PBSRyVagHO28is7iOOtIBITmPsj4yLSwuvie66wX/sMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BfZgYw00; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1739748769; c=relaxed/simple;
+	bh=N9JBD98H2SnmKbgCbD2jfrAvpK2UZ6M3Q1/9Z+lHrIE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KovYF3VQGI+YlJcrJ/OprzU8jgehiIr6lp+J4WtmFJLseaGXOq2lSEApEZN/nCkBpeZmq9qt+H25br4/A39uHFFBkSuTXTMkBN7VERSnzujghmZ1poFzhSY6aL2aCW+3WllPLDuK/KdCMRBFitZSosLPnSQryds9xQRvho2vtmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-220d601886fso48224415ad.1;
-        Sun, 16 Feb 2025 14:50:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739746240; x=1740351040; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rwRpTiFhkazH7eZCnzFo4dfJTeXkjVTocPymKPEhdxo=;
-        b=BfZgYw00LiTNTk+K0EWlPpbX4GkcUorSqwXbpFtvWHVoqwJd2R04XvLO7pKjDyg8BI
-         +P8M3xK56K6zjzVq9Bzvp0LeHyuuA7NUX+G+xDrqyrjJ3yzg/oGJy5Phdi1r72IxYUFT
-         snJqqwSbx3GVh55xgKYtOl2/CJy12U9eI8q0wVIop6HV30ccqrwuGW+eSe+bpMmZ9f9Y
-         5PIhVisYOY7d7QPLjdDo5t1C0eO7RsDff4KFdic3Yx6b6eAdCrjnAeHwPd4YtTJyA1gq
-         CmZ7eVscVy0SJiwk5F1mx0SOLYEb+lM9TDIVS0QFC/oOtw3Wh7zTMyMY8Sp9TPfDhTiQ
-         hGow==
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-220c8f38febso67566165ad.2
+        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 15:32:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739746240; x=1740351040;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rwRpTiFhkazH7eZCnzFo4dfJTeXkjVTocPymKPEhdxo=;
-        b=v+cjbNQpIAG0t7d7KhavjRSvFZp3yjbULsfudE7YpkxkI4MTPv+3mF51wJjkOlcE7n
-         77OauOrG8KO04DlN23l7K5v3k5wRXeQE1/fyCTcFncC5YDa0Ylup9oDMC96GZ/KtlRUP
-         BcruDKXHjLNnS1nT1JZJnWmEqn1W5MbA3jaPbyVpUrMyRBDl/96n0FjHLowW5KYcPjoJ
-         J3EkMvnUOLmUEiMUyaY6Et10BteMM/MUTDqf+ocvB4242jGtz64hsqnjvDExYO7H/5cJ
-         jWpJGgQinEAH+mMMOj1EvlfmglOuKbKLwtZS3gmoXojTScLyIWPuZQ6RqLmQ037n4eNm
-         GbUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUph41B+DMA9yuboNms8DGnV6S2mu/wfV1lApzLtd4QwrK/MRIi95onvV3YTBVQFT/u/LP4hwel@vger.kernel.org, AJvYcCW1lMXeM8lCs37Rb+NpgnZQjcOp0pZtU6T9+Bo9f0HP/pt5ZDur1NGXeTxdmdvq7//FiE6VYquOANkHKPM=@vger.kernel.org, AJvYcCWwnuWSGhYx9AUXl4MOQedOKOgNSeKDz3twzMBQnxmvNLCnbVh4j850+pdy4HtA33c3T9/V9/kwX+oWdyfm5Jc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8ByqjWu2yAMm06jFiIRaSg+IRkfmsEml1tIOf9esvbcH7OUAI
-	ZoQS8d1nC8bweaH8+xoXhDRpYMMlVwE/+9ziTuW7hbTh6cjmRcLV
-X-Gm-Gg: ASbGncv1iNFZpmI5vzYi/3Plgzbi61TvpoWAYNYqOQFGYEfhLpwWW47h6/es3WQG6ze
-	wqY6FEJcLnasD0Wyqbla6klKsIrpIUsUr/wsZOsMpgLAavbu9K9wPCvgKTeYcnInHDmNNBPnUk+
-	kR35FCJHgOSPNkJp4QddFRgQrsvYCAqHRytdgkhGhqIOc0+npoqovthtvsqhjUnJ4pzGwUKYbKj
-	BUOEaxKtNLrjOXWRWGz8mT/HO2U/HK9m7/Pjl/GxXLf3+EgeB7QaRbjdif3AbtzRV+j+dVa+BL6
-	FMgRrgakbP/+YeA6nEP3NtOzWmEJ/JCHfRWJCy7VltkDMwuZfkiokSfx4HYi9d4KcerFSx/H
-X-Google-Smtp-Source: AGHT+IE6flqDwVsTpGpc3YTvZ/iHfBKBaGrBtHop4poOhkkBMwzDiFwM8gvHelDmDsGXIxZ3B+QX9g==
-X-Received: by 2002:a17:903:32c3:b0:220:e7ae:dbcf with SMTP id d9443c01a7336-22104039c9cmr81807265ad.23.1739746240046;
-        Sun, 16 Feb 2025 14:50:40 -0800 (PST)
-Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d536733fsm60448195ad.77.2025.02.16.14.50.32
+        d=1e100.net; s=20230601; t=1739748767; x=1740353567;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k8latQQbhO8M0nbHt2+3WKQdcXD6SKpaQurTPLqN3YE=;
+        b=mkB2czFMynVkCu03Ylsgp8E4cqFJZGzffiUGXeb01yK/Y9Nb3X+RWArrD3Hr/lBSJo
+         9dZHtk45XYwYFcX0n+XVIgoQVhcsjXaKGwfZ9wEcO4a5nec0xBORVx0PMzYcbS2CPsa1
+         oV132PRG4ePPHc8MmQFo8gNzuzBcr7Vb7aNF0MCFJFCNqcFtyZkkKiBeqh7tUeCKfI7s
+         gyDcP9f7lnxaYyQHJ3CfX6EoRAoPtAgp4dsHIkxQ+W/pJlrmqpmVBu8CUtKKJlOVr+KO
+         jO8iWvxzjaUNo7944//dB/m47nvsPmh2EkbliTyknD8J/N4jU0lzh6QN0oIMMGMm9hTn
+         Jdvw==
+X-Gm-Message-State: AOJu0YwbSOrW5GuePM1NHtlVAS6ODi2YsAPYXyDCmYDxfwkdFSG1gHgN
+	yuTRvClKloaIbzcHJUKB8OV5ZC1b0jg9gZYdX5J5g/WRFVmjbadnYqKX
+X-Gm-Gg: ASbGnct1y8yMCHw8YvkhTwKEswBYd30JC/WaKvAjLYOl17jiBeOH5i9NvMzNW6EQwF0
+	ZgufXIudHYX/BEFfba6G8vk8ySnoypowA3q0Dxoc7yvaSD0n2dw8/rkOwb0lvs866uFHC5GktE0
+	HXUDMo8GalKbZTSt+KnSE6rKCnY9/KooihLqeOUCxg7MoGpIsn/znHFjmrwTbNx7pUIv8s2UmZV
+	Q30gEB6SuJXbHj5mbsS3m2/Tmbd3vBv6fTvpQn7sj4/Lu27YW8JGOWWBtKULEcCtPqyLSMxGdF1
+	jv5X2x85lQ/OVW4=
+X-Google-Smtp-Source: AGHT+IFqV+3lfApKaYH4hmwgoM5vfdLBu+Fooo2ZhSRS0svRsAAsNSpm17T0uttke7KfPlTvODbnJg==
+X-Received: by 2002:a17:902:ec85:b0:220:c911:3f60 with SMTP id d9443c01a7336-221040bd357mr117432815ad.47.1739748766538;
+        Sun, 16 Feb 2025 15:32:46 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d537ca99sm59680705ad.106.2025.02.16.15.32.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Feb 2025 14:50:39 -0800 (PST)
-Date: Mon, 17 Feb 2025 07:50:29 +0900 (JST)
-Message-Id: <20250217.075029.1780115689208398996.fujita.tomonori@gmail.com>
-To: daniel.almeida@collabora.com
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com,
- anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
- arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
-Subject: Re: [PATCH v10 7/8] rust: Add read_poll_timeout functions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CEF87294-8580-4C84-BEA3-EB72E63ED7DF@collabora.com>
-References: <3F610447-C8B9-4F9D-ABDA-31989024D109@collabora.com>
-	<20250214.131330.2062210935756508516.fujita.tomonori@gmail.com>
-	<CEF87294-8580-4C84-BEA3-EB72E63ED7DF@collabora.com>
+        Sun, 16 Feb 2025 15:32:46 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Saeed Mahameed <saeed@kernel.org>
+Subject: [PATCH net-next v3 00/12] net: Hold netdev instance lock during ndo operations
+Date: Sun, 16 Feb 2025 15:32:33 -0800
+Message-ID: <20250216233245.3122700-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-2022-jp
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sun, 16 Feb 2025 09:19:02 -0300
-Daniel Almeida <daniel.almeida@collabora.com> wrote:
+As the gradual purging of rtnl continues, start grabbing netdev
+instance lock in more places so we can get to the state where
+most paths are working without rtnl. Start with requiring the
+drivers that use shaper api (and later queue mgmt api) to work
+with both rtnl and netdev instance lock. Eventually we might
+attempt to drop rtnl. This mostly affects iavf, gve, bnxt and
+netdev sim (as the drivers that implement shaper/queue mgmt)
+so those drivers are converted in the process.
 
->>>> +/// Polls periodically until a condition is met or a timeout is reached.
->>>> +///
->>>> +/// ```rust
->>>> +/// use kernel::io::poll::read_poll_timeout;
->>>> +/// use kernel::time::Delta;
->>>> +/// use kernel::sync::{SpinLock, new_spinlock};
->>>> +///
->>>> +/// let lock = KBox::pin_init(new_spinlock!(()), kernel::alloc::flags::GFP_KERNEL)?;
->>>> +/// let g = lock.lock();
->>>> +/// read_poll_timeout(|| Ok(()), |()| true, Delta::from_micros(42), Some(Delta::from_micros(42)));
->>>> +/// drop(g);
->>>> +///
->>>> +/// # Ok::<(), Error>(())
->>> 
->>> IMHO, the example section here needs to be improved.
->> 
->> Do you have any specific ideas?
->> 
->> Generally, this function is used to wait for the hardware to be
->> ready. So I can't think of a nice example.
-> 
-> Just pretend that you’re polling some mmio address that indicates whether some hardware
-> block is ready, for example.
-> 
-> You can use “ignore” if you want, the example just has to illustrate how this function works, really.
+call_netdevice_notifiers locking is very inconsistent and might need
+a separate follow up. Some notified events are covered by the
+instance lock, some are not, which might complicate the driver
+expectations.
 
-Ah, you use `ignore` comment. I was only considering examples that
-would actually be tested.
+Changes since v2:
+- new patch to replace dev_addr_sem with instance lock (forwarding tests)
+- CONFIG_LOCKDEP around netdev_lock_cmp_fn (Jakub)
+- remove netif_device_present check from dev_setup_tc (bpf_offload.py)
+- reorder bpf_devs_locks and instance lock ordering in bpf map
+  offload (bpf_offload.py)
 
+Changes since v1:
+- fix netdev_set_mtu_ext_locked in the wrong place (lkp@intel.com)
+- add missing depend on CONFIG_NET_SHAPER for dummy device
+  (lkp@intel.com)
+  - not sure we need to apply dummy device patch..
+- need_netdev_ops_lock -> netdev_need_ops_lock (Jakub)
+- remove netdev_assert_locked near napi_xxx_locked calls (Jakub)
+- fix netdev_lock_cmp_fn comment and line length (Jakub)
+- fix kdoc style of dev_api.c routines (Jakub)
+- reflow dev_setup_tc to avoid indent (Jakub)
+- keep tc_can_offload checks outside of dev_setup_tc (Jakub)
 
-> Something like
-> 
-> ```ignore
->  /* R is a fictional type that abstracts a memory-mapped register where `read()` returns Result<u32> */
->  fn wait_for_hardware(ready_register: R) {
->      let op = || ready_register.read()?
-> 
->      // `READY` is some device-specific constant that we are waiting for.
->      let cond =  |value: &u32| { *value == READY }
-> 
->      let res = io::poll::read_poll_timeout (/* fill this with the right arguments */);
-> 
->      /* show how `res` works, is -ETIMEDOUT returned on Err? */
-> 
->      match res {
->        Ok(<what is here?>) => { /* hardware is ready */}
->        Err(e) => { /* explain that *value != READY here? */ }
-> 
->      /* sleep is Option<Delta>, how does this work? i.e.: show both None, and Some(…) with some comments. */
->  } 
-> ```
-> 
-> That’s just a rough draft, but I think it's going to be helpful for users.
+Changes since RFC:
+- other control paths are protected
+- bntx has been converted to mostly depend on netdev instance lock
 
-I'll add an example based on the code QT2025 PHY (8th patch). It's
-similar to the above.
+Cc: Saeed Mahameed <saeed@kernel.org>
 
-Thanks,
+Jakub Kicinski (1):
+  net: ethtool: try to protect all callback with netdev instance lock
+
+Stanislav Fomichev (11):
+  net: hold netdev instance lock during ndo_open/ndo_stop
+  net: hold netdev instance lock during ndo_setup_tc
+  net: hold netdev instance lock during queue operations
+  net: hold netdev instance lock during rtnetlink operations
+  net: hold netdev instance lock during ioctl operations
+  net: hold netdev instance lock during sysfs operations
+  net: hold netdev instance lock during ndo_bpf
+  net: replace dev_addr_sem with netdev instance lock
+  net: dummy: add dummy shaper API
+  docs: net: document new locking reality
+  eth: bnxt: remove most dependencies on RTNL
+
+ Documentation/networking/netdevices.rst       |  57 +++-
+ drivers/net/Kconfig                           |   1 +
+ drivers/net/bonding/bond_main.c               |  16 +-
+ drivers/net/dummy.c                           |  37 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 132 ++++----
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   9 +
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  16 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c |  18 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   3 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   8 +-
+ drivers/net/ethernet/google/gve/gve_utils.c   |   6 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  16 +-
+ drivers/net/netdevsim/ethtool.c               |   2 -
+ drivers/net/netdevsim/netdev.c                |  36 +-
+ drivers/net/tap.c                             |   2 +-
+ drivers/net/tun.c                             |   2 +-
+ include/linux/netdevice.h                     |  65 +++-
+ kernel/bpf/offload.c                          |   6 +-
+ net/8021q/vlan_dev.c                          |   4 +-
+ net/core/Makefile                             |   2 +-
+ net/core/dev.c                                | 300 +++++++----------
+ net/core/dev.h                                |  22 +-
+ net/core/dev_api.c                            | 318 ++++++++++++++++++
+ net/core/dev_ioctl.c                          |  69 ++--
+ net/core/net-sysfs.c                          |   9 +-
+ net/core/netdev_rx_queue.c                    |   5 +
+ net/core/rtnetlink.c                          |  51 ++-
+ net/dsa/conduit.c                             |  16 +-
+ net/dsa/user.c                                |   5 +-
+ net/ethtool/cabletest.c                       |  20 +-
+ net/ethtool/features.c                        |   6 +-
+ net/ethtool/ioctl.c                           |   6 +
+ net/ethtool/module.c                          |   8 +-
+ net/ethtool/netlink.c                         |  12 +
+ net/ethtool/phy.c                             |  20 +-
+ net/ethtool/rss.c                             |   2 +
+ net/ethtool/tsinfo.c                          |   9 +-
+ net/netfilter/nf_flow_table_offload.c         |   2 +-
+ net/netfilter/nf_tables_offload.c             |   2 +-
+ net/sched/cls_api.c                           |   2 +-
+ net/sched/sch_api.c                           |   8 +-
+ net/sched/sch_cbs.c                           |   8 +-
+ net/sched/sch_etf.c                           |   8 +-
+ net/sched/sch_ets.c                           |   4 +-
+ net/sched/sch_fifo.c                          |   4 +-
+ net/sched/sch_gred.c                          |   2 +-
+ net/sched/sch_htb.c                           |   2 +-
+ net/sched/sch_mq.c                            |   2 +-
+ net/sched/sch_mqprio.c                        |   6 +-
+ net/sched/sch_prio.c                          |   2 +-
+ net/sched/sch_red.c                           |   5 +-
+ net/sched/sch_taprio.c                        |  17 +-
+ net/sched/sch_tbf.c                           |   4 +-
+ net/xdp/xsk.c                                 |   3 +
+ net/xdp/xsk_buff_pool.c                       |   2 +
+ 56 files changed, 941 insertions(+), 464 deletions(-)
+ create mode 100644 net/core/dev_api.c
+
+-- 
+2.48.1
+
 
