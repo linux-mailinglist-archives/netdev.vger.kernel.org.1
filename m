@@ -1,137 +1,160 @@
-Return-Path: <netdev+bounces-166823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00724A37712
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 20:07:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 690CEA37735
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 20:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55CBB3A27C5
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 19:07:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591387A30F6
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 19:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEA719D881;
-	Sun, 16 Feb 2025 19:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E481A3156;
+	Sun, 16 Feb 2025 19:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="v1SRTl9Q"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V1zBXtc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45A419ABC2;
-	Sun, 16 Feb 2025 19:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCAE1A3146
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 19:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739732835; cv=none; b=dL0FKMnELNPBepIV9mRKVHwQBi3s1l3DxzhXFMGNWwZOHY2LOZWV8oMAHoYQIxnzAzgEhy0rZw1Xffzu8lhnHXinyjXhTNa2bQPyWyll359eK6ECZBFZvIfdEhm7AqKE+OeFBTizMBFwjdgjhMwHl1spyj8sSZWH+wZsHVLjlHM=
+	t=1739734426; cv=none; b=P/cUs+YedfVXLs0Vue0gUC1tAjK8BZp55mTErqTvbAfTYF3yWUbLCHIwEe0BI/Cawxn5Wp4tDyzDDxRXfXDE1fPo+ZGpRowuHcuxokMD45uXa+e8MoLGMBAflK1SKfZqBtXqkHsPvJvC9STLHJWick52sZVtGOLfcDc3fs0Xwwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739732835; c=relaxed/simple;
-	bh=WdUtfn83UKbZ9F3tMqRb3yyPvHLmUxE1jmeVFo4QYvs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KU0xlJOzZHXZ7NNFFOtWpxJP6Ade1M0D0UdA4ffuCBlg5tvpqf9S8pRcA5GZDgJFJ6lu30f5gWYvLpHVoBhA33Ja2tQtKAylQzHdHO2lIAGJrf7T/1n/UI5xnL/zuBddApcBLItf8gEnCVQZzlja594P7QDYrg+OURknDEfGzqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=v1SRTl9Q; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1739734426; c=relaxed/simple;
+	bh=bxFZkh3GxelTk2s9pdgdEfZyDa8KLecC+NZADbOkTxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lSLTnoZBaM0s9wK6Gv3QytuAK+vHPEKTvozLyIjsrXaYXkptJ4nQ8QfBgDYfGjFUFkEs0EoqE6eqEL69WEKRbm3nAWdNBs4vw5NGSNP0HET01/EzAWeKc2CtoLvcpeG/Sw4cJNSxPrFB7L1iiXJts2/a7a5NK7c7+fDO86DVH/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V1zBXtc6; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5de3c29ebaeso4798931a12.3
+        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 11:33:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739732834; x=1771268834;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ot3sZW9m1KrcwT8em5+cF0/58aAY/1r9ugZxy8yla4I=;
-  b=v1SRTl9QMiJx/2xYox3TG1048MIPxt3ZUiqL2yB89H3o8MxaU7lDQIqj
-   QY04l5OrIwDTlKa4YBPOxNp/b2N/hWj80RES2FcamR4WeExIGG1LvxFKj
-   cbhzJvaXuwaknGktGMcLE23r8c1/Ln0JiDZ3A+a6hYAP1nLKSac7XbTrn
-   w=;
-X-IronPort-AV: E=Sophos;i="6.13,291,1732579200"; 
-   d="scan'208";a="463041476"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2025 19:07:09 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:60624]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.73:2525] with esmtp (Farcaster)
- id 57c8e7c4-aa7c-48b3-b74c-a9a298df9c11; Sun, 16 Feb 2025 19:07:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 57c8e7c4-aa7c-48b3-b74c-a9a298df9c11
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sun, 16 Feb 2025 19:07:01 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.10.131) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 16 Feb 2025 19:06:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <enjuk@amazon.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <gnaaman@drivenets.com>,
-	<horms@kernel.org>, <joel.granados@kernel.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<lizetao1@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc() when GFP_ATOMIC is specified
-Date: Sun, 16 Feb 2025 11:06:42 -0800
-Message-ID: <20250216190642.31169-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250216163016.57444-1-enjuk@amazon.com>
-References: <20250216163016.57444-1-enjuk@amazon.com>
+        d=linaro.org; s=google; t=1739734422; x=1740339222; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+rdajbzChx3zXu80o9uC5gbyEQ6hbhHwr37XpGawygg=;
+        b=V1zBXtc6k6e9kKaz2yQcgujZqI2RHU3LOpMAPsQFwRj6EmLdA1bf5HilLrqqlCuzB3
+         NQ5YUpHzHQziPEdY46nV8GyjDNj5aMRbvyT+SPIZRnq/+ALd9oTEe8WI2JTeosLx0vl6
+         ln3gM96FCRNKxe9SZ5wBFX0mNJI+tD/0EwaxGAIlFraY51Ta2ULq3+VRMWMZq4+tcub+
+         kj0Lt9f6RvGVDKfwaEp/1OLvBf+RZW6bhcAVgaejM8laRfUqC8DFvsrfxVRrmdYTMjwZ
+         DSy4dosb9fIiJA3Ngtpj37QnxyMpKA3nJKzjHEkqXGnzXuEIIp/Vm+WWqhPkQfwyxz45
+         xREA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739734422; x=1740339222;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+rdajbzChx3zXu80o9uC5gbyEQ6hbhHwr37XpGawygg=;
+        b=Bq0dHk9vUyBcxU3d1FHWXf8zQsVBbMFHy9kN5YOdgmeyWxj9+4xV44b86/8z5rrjUd
+         OOpwfRUCXyux+h8prmW5jnrZmrMmbsyCakpJi5tpMJISDvuxZU67mFYBzWBCqmqSO5aa
+         70tlLtb3TNY7vqT/nSFEzQLhHQH9yzMFLkp1E9ZfRYoX0quV7XM88jPn8YVtquoBHqwH
+         ge9QS/7C+xJnJPInwn/IrfKrcO0ZquWT21SAAZz/kpoOZqq9xIxO473tKXlrbF9PhzlA
+         Utnokc+QG55O4uzquNuhHRo+MHoWn6ALSsdiJvh8XWpHfPzSyWphlDjR+OyUxtLw8cxF
+         NOSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWj8/o38F8OEUG+ixOng/ndNV/HifYCHUIjKtvDMvhSXx7MUp7H1zSbiaeKXyyJb7GoFqOLt1M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy945nCdw8ozI+vkfqLYK7NMss4kKuauU57UZOId1im9XM38axu
+	HZAO+P2WBCwttjE8wx+kLHFACs8pIFLcOSevI4g3hwtP5sdu0SMOyGEaMZQL3AQ=
+X-Gm-Gg: ASbGncvQlngIT+tcJHqFDNhtkIIQTagyycngKORCxv+7jSy8xyeRlq1lZTCZSXoC0hJ
+	yvx3xUTJj1korBy/7c04aM0LIAmyP6WNpBNl/EUucg5vRPS2L8i/eBifZ+XedpDpGgS8LvmEmmv
+	BSjjqFDXOisfGQHoam8pyc5IQKeCAL4EowtL6u3fUkHTg2bOAQIbjSSBS4cWjn9KtFSp3x3h2Qj
+	HdhEYoSTBklDu7+WElmr8xClIxxH6CRHZG2CXndEE4h7ASi/OHr6ri+oRGGR0XUm83bmaXfXt9i
+	6W1ckdbtfeKa5UyOLL4c
+X-Google-Smtp-Source: AGHT+IH1F3igbJlqramKS8IIZVfgTeP1tXThk89INYy49QTfryu4Jt4JBGKucuQ3oNfDdmwaojg53A==
+X-Received: by 2002:a17:907:7752:b0:aa6:79fa:b47d with SMTP id a640c23a62f3a-abb7091cedcmr597981666b.1.1739734422335;
+        Sun, 16 Feb 2025 11:33:42 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-aba533bdd39sm747734166b.167.2025.02.16.11.33.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 11:33:42 -0800 (PST)
+Date: Sun, 16 Feb 2025 22:33:38 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Purva Yeshi <purvayeshi550@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	skhan@linuxfoundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	linux-sparse@vger.kernel.org
+Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
+Message-ID: <4fbba9c0-1802-43ec-99c4-e456b38b6ffd@stanley.mountain>
+References: <20250210075006.9126-1-purvayeshi550@gmail.com>
+ <20250215172440.GS1615191@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250215172440.GS1615191@kernel.org>
 
-From: Kohei Enju <enjuk@amazon.com>
-Date: Mon, 17 Feb 2025 01:30:16 +0900
-> Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
-> specified, since kvzalloc() doesn't support non-sleeping allocations such
-> as GFP_ATOMIC.
+I've added the linux-sparse@vger.kernel.org mailing list to the CC.
+
+On Sat, Feb 15, 2025 at 05:24:40PM +0000, Simon Horman wrote:
+> My understanding is that the two static analysis tools under discussion
+> are Smatch and Sparse, where AFAIK Smatch is a fork of Sparse.
 > 
-> With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
-> path and returns immediately after the kmalloc path fails.
-> Therefore, using kzalloc() is sufficient in this case.
+> Without this patch, when checking af_unix.c, both Smatch and Sparse report
+> (only):
 > 
-> Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
-
-This commit followed the old hash_buckets allocation, so I'd add
-
-  Fixes: ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()")
-
-too.
-
-Both commits were introduced in v6.13, so there's no difference in terms
-of backporting though.
-
-Also, it would be nice to CC mm maintainers in case they have some
-comments.
-
-
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
->  net/core/neighbour.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
 > 
-> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> index d8dd686b5287..344c9cd168ec 100644
-> --- a/net/core/neighbour.c
-> +++ b/net/core/neighbour.c
-> @@ -518,7 +518,7 @@ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
->  	if (!ret)
->  		return NULL;
->  
-> -	hash_heads = kvzalloc(size, GFP_ATOMIC);
-> +	hash_heads = kzalloc(size, GFP_ATOMIC);
->  	if (!hash_heads) {
->  		kfree(ret);
->  		return NULL;
-> @@ -536,7 +536,7 @@ static void neigh_hash_free_rcu(struct rcu_head *head)
->  						    struct neigh_hash_table,
->  						    rcu);
->  
-> -	kvfree(nht->hash_heads);
-> +	kfree(nht->hash_heads);
->  	kfree(nht);
->  }
->  
-> -- 
-> 2.39.5 (Apple Git-154)
+
+Smatch isn't a fork of Sparse, it uses Sparse as a C front-end.
+This warning is really from Sparse, not Smatch.  The warning started
+when we changed the definition of unix_sk() in commit b064ba9c3cfa
+("af_unix: preserve const qualifier in unix_sk()").
+
+Smatch doesn't actually use these locking annotations at all.  Instead,
+Smatch has a giant table with all the locks listed.
+https://github.com/error27/smatch/blob/master/smatch_locking.c
+Smatch uses the cross function database for this as well if it's
+available.
+
+Unfortunately, Smatch does not parse the unix_wait_for_peer() function
+correctly.  It sees that something is unlocked but it can't figure out
+what.  I believe the problem is that Smatch doesn't parse
+container_of_const().  Fixing that has been on my TODO list for a while.
+The caller used unix_state_lock() to take the lock and that has a
+unix_sk() in it as well.  So smatch doesn't see this lock at all that's
+why it doesn't print a warning.
+
+regards,
+dan carpenter
+
+> Without this patch, when checking af_unix.c, both Smatch and Sparse report
+> (only):
+> 
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+>  .../af_unix.c:1511:9: error: undefined identifier 'other'
+> 
+> And with either v1 or v2 of this patch applied Smatch reports nothing.
+> While Sparse reports:
+> 
+>  .../af_unix.c:234:13: warning: context imbalance in 'unix_table_double_lock' - wrong count at exit
+>  .../af_unix.c:253:28: warning: context imbalance in 'unix_table_double_unlock' - unexpected unlock
+>  .../af_unix.c:1386:13: warning: context imbalance in 'unix_state_double_lock' - wrong count at exit
+>  .../af_unix.c:1403:17: warning: context imbalance in 'unix_state_double_unlock' - unexpected unlock
+>  .../af_unix.c:2089:25: warning: context imbalance in 'unix_dgram_sendmsg' - unexpected unlock
+>  .../af_unix.c:3335:20: warning: context imbalance in 'unix_get_first' - wrong count at exit
+>  .../af_unix.c:3366:34: warning: context imbalance in 'unix_get_next' - unexpected unlock
+>  .../af_unix.c:3396:42: warning: context imbalance in 'unix_seq_stop' - unexpected unlock
+>  .../af_unix.c:3499:34: warning: context imbalance in 'bpf_iter_unix_hold_batch' - unexpected unlock
+> 
+> TBH, I'm unsure which is worse. Nor how to improve things.
+
+
+
 
