@@ -1,139 +1,129 @@
-Return-Path: <netdev+bounces-166730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50F3BA371CD
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 03:14:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4BEA371CF
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 03:21:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B6B3B0340
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 02:14:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20CB0188A280
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 02:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8574253A7;
-	Sun, 16 Feb 2025 02:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFD9BE46;
+	Sun, 16 Feb 2025 02:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GxLfXYB5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3fylSSv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B096E2904
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 02:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B543322A;
+	Sun, 16 Feb 2025 02:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739672062; cv=none; b=Z4+xVeOjC2sD2vHa6m4cPkQCFbtXsFqz2A9R9X1cYhHhlX43Isw/USe4S+LR6/TS08Zkc+aQNgbMXtBBHC7sLMV+Q0UXOa7qWTjFZtTUUERd4BQCKmoOHXu4iYAAVRxV3DhvPvKzE88S2K+aI3jJSPdcqdPrg/lfbvURJHEbun0=
+	t=1739672512; cv=none; b=EYVzQxgnCzajtbTW5P/2aK9mJVMTKLfIKvgUUjasuaigUpdjM3HPhqy04W8s1tJ0+qPFSdWEQ9Xtok+5GLgRhs6TSyUtU5iGqaKaA26J8FEjII5IPG5jzG6wRhOujxfLKxY+qzGB5rEQ3Yk6qe0FCl58xEK9NWHSdS2awFoaAL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739672062; c=relaxed/simple;
-	bh=q69M93P0z0sJ1WTGkQ2VySwh/XbYssMPdprCj0FW7pg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UZ/ct9kRpcLKVtAQsMtRvKA2JYeMxiaoffLUvu+tpJalzspBxQxfyClZrljvsnhA0eBSu9SJE5SSdraaUxj5LeHWeGOMxZ/1dZQsWS/IM9wmZlT4/3plPhZEC8b6ouXNvzDVCOypBk9/Z5+3tz4ErU0Jn6jvt4PfddNPOhJ6NsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GxLfXYB5; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54504bf07cdso3369967e87.2
-        for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 18:14:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739672058; x=1740276858; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ssOFppK4+waIG2a/M0DalpoUbTkwdwGEaGVEU9XRLvE=;
-        b=GxLfXYB5jUF50aMTMGyzWk6/0XTmDHWkhnGMdCpxH3jtiqJ31U4pQwyPFbp3/6NJ4S
-         YYko6oV8/Xx9JGyc4PhOTlimcba/I0qsYMlemjqUxfrZy0UQGY7ItO42/LnbZxjzWMIF
-         oTwfRolosLw7tFYmBbQ28uey2WH2Kil/KqsPJZI1cwzb6W5xFP9JOuLxAKPmSl8w64xx
-         tSxGRl25Dw/088trFOQuqCFFIwEnwGNRu7j/Z94UDkgIzdvTHigxsL6YbaxBz/VbZJn2
-         qFxxs9VTjgl7ggR5+7sSipehpwI6GQE7AtJ3T0HVvsF60LW0K5iY9QCWhxvH15jlTgvF
-         JXRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739672058; x=1740276858;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ssOFppK4+waIG2a/M0DalpoUbTkwdwGEaGVEU9XRLvE=;
-        b=Z8rWCYUKIjdiNDaAMtZDLpoWJOemtwFFMCJuCcS6Dcf6HZPjUZugkUg4faFheZT/dg
-         r8gBN4736D1NL5RCNaZZwZq3Mmt0i83GzQ3bGSP/e3GbgikiisoJZuq9n3o0lGapv2dE
-         h3At3ys4S4lFoYqa6Oumx1GVcRs7XqgMHHs2LNL/k2PxP9kfcIQb248+wZoXfMZbZKN3
-         8gJttfL0fNZ5CbNXBoWq6mIrvp2absMPu7HsAEOvL1+MsCAhAKohR/BQv6Bxm+4er+Qe
-         omCFGzZS61JLprXt4KbBJzdUCYadMJ2AK7Otz92OyKt2Shv/V0DDzZt2jKSRMDtoLYV4
-         wvHQ==
-X-Gm-Message-State: AOJu0YwRLqG+cZMM76BQ3d5NKDvH50LxCA0zB1KS9wUmAb3ssGM7ezAl
-	zrfAjbYgl7oF8Crp1sxLJa4CpN6LT2oe+RzAvAlsRkP7e6QiJXcSpTwzDzE/zd+1Wg==
-X-Gm-Gg: ASbGncvvXzaEGN2R+iIMM5HrZnnjQyqyV0rbr5ihCPR4goHQabMl1sCsNQNmTkdONOU
-	ze4lxPB+JgvvwJmkcIidaTK88YRaSaRFQTHOIjM9/eNeyv9mHNKS0kgVjcELWE2LJAC6hg9KmNh
-	vWuPPBdAv6REJ3u4Q+mMJ1JisFHjKkuhoKZzMTG++UUjpm7vzXA6Y/yvehgEgfcO7QH50JEUYJY
-	20fYlhCww3JoQO98cFYp/PN2vX/a7OhkcdZGxMYkntuxaIE9R4764qYIsNtn9FHCosC5YYRF9fx
-	8kMfjEQWT1Ls9S7YGV0YgNkb1/NqJ2x7vfnozkiEbMiWFBTBd6KcDEiolkOzZtEMalQfRhZD
-X-Google-Smtp-Source: AGHT+IFgPeF4zrhboRFEMWlFBKePfRo4pbENPBhSGjWTA4g5wIqoQfnCGSIlac/ctqCtIMoMvZrkLw==
-X-Received: by 2002:a05:6512:318c:b0:545:2f9f:5f6a with SMTP id 2adb3069b0e04-5452fe3a89cmr1271204e87.14.1739672057181;
-        Sat, 15 Feb 2025 18:14:17 -0800 (PST)
-Received: from astra-student.rasu.local (109-252-121-101.nat.spd-mgts.ru. [109.252.121.101])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5452db28594sm622910e87.40.2025.02.15.18.14.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 18:14:15 -0800 (PST)
-From: Anton Moryakov <ant.v.moryakov@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH] lib: remove redundant checks in get_u64 and get_s64
-Date: Sun, 16 Feb 2025 05:14:11 +0300
-Message-Id: <20250216021411.645708-1-ant.v.moryakov@gmail.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1739672512; c=relaxed/simple;
+	bh=89f6kjxXBtZAaNt6NCCVp/SV2zvdrtocy+P983Rdy88=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JwQU9BDEGVUVxK41J/sKV+IHNEtqZHS5ku+LOr34+V4Rl27OaootYW8MWbaJ1fAGUak4/vPl/Hp0XZygr2NTy9O0uI8t0jx0nIffUtniJAAYMTRnxY06LscCKpChxR5yrLOA+iiW5/UQkiljtWhbumJpHCrXJefjX9iwOaTy/qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3fylSSv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B80C4CEED;
+	Sun, 16 Feb 2025 02:21:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739672511;
+	bh=89f6kjxXBtZAaNt6NCCVp/SV2zvdrtocy+P983Rdy88=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=A3fylSSvAsnYH15ydUFS+r59N8y3bLbLFqbqACryAQfsbPwavz5g7jM0RcLMdcDtF
+	 karFTM3aFOEIOi+smeCgIPWJx5TuDvcDft0+zLgshVCZeMvGd3cBnVar18mNGYIewZ
+	 5giB+H993hrvDHnsuZyZw8GnSLVg6ZsFTAKEMiBZJTpCVLu8gyj0Q2qSfpiDRnJBpu
+	 tfG+phyvg1zKmmtdze0tdfo5PK+eUswmvvgpuJLrtdv1LLUuDZRpr1VlK6GCKLnXia
+	 BoQ4PpzouLkGmYqMKQUzrsUg0ZtZ6FAu1ZpKSBhE7o7lDhQ9oBu+pHMTqthW0lOYLu
+	 vz4QuUvrxcFXA==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5e02eba02e8so1718132a12.0;
+        Sat, 15 Feb 2025 18:21:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUbNGZb5S1JyHny9DU2Cg1MLFMWcIWlQlW21gJthmRhHhyH8IUB/fd3zJAvXHxNr7NvqA8M9oU5@vger.kernel.org, AJvYcCXHi0ix+UyMTUEqvbKzGswtiSMIALtIRDIol+xC4v7epc5YlobduebAUNqewjbQymGGX9o7swTXnm/WyA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOA7HoAuTLzcvP5oaLNvNuyW8Sc6gKxQFqa8wjyD1XWuM9qCJk
+	BE2gnf52rOy7yuQuMNiCx1a4PQa1iNt1mKrKXufKj6ViLNloyCNqidHffA4MTmQnrzrkV6KMOc1
+	xzqRPL/A3IP0HWgo6a7UebxwUGq8=
+X-Google-Smtp-Source: AGHT+IHv+Clf+CXzjqX5DyVc7sIti2vAtNeryj4NmNK9lHofxSOPkE/OLkVPxMWDbiNC8PccJdCN2jloNFjeFePjtcU=
+X-Received: by 2002:a05:6402:27d3:b0:5de:c9d0:673b with SMTP id
+ 4fb4d7f45d1cf-5e03600514bmr5012067a12.1.1739672510048; Sat, 15 Feb 2025
+ 18:21:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250215164412.2040338-1-eleanor15x@gmail.com>
+In-Reply-To: <20250215164412.2040338-1-eleanor15x@gmail.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 16 Feb 2025 10:21:38 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6G47+vitTq1ua1Mse3kyABAoX0FWQRNYkpt2HzGb4E-g@mail.gmail.com>
+X-Gm-Features: AWEUYZlrH4zag26LnBQs_GejJWjGU1nYIl_mCem3RB06CTfTw7Cw4lFJKwa6J0E
+Message-ID: <CAAhV-H6G47+vitTq1ua1Mse3kyABAoX0FWQRNYkpt2HzGb4E-g@mail.gmail.com>
+Subject: Re: [PATCH] net: stmmac: Use str_enabled_disabled() helper
+To: Yu-Chun Lin <eleanor15x@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, 
+	alexandre.torgue@foss.st.com, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	jserv@ccns.ncku.edu.tw, visitorckw@gmail.com, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Static analyzer reported:
-1. if (res > 0xFFFFFFFFFFFFFFFFULL)
-Expression 'res > 0xFFFFFFFFFFFFFFFFULL' is always false , which may be caused by a logical error: 
-'res' has a type 'unsigned long long' with minimum value '0' and a maximum value '18446744073709551615'
+On Sun, Feb 16, 2025 at 12:44=E2=80=AFAM Yu-Chun Lin <eleanor15x@gmail.com>=
+ wrote:
+>
+> As kernel test robot reported, the following warning occurs:
+>
+> cocci warnings: (new ones prefixed by >>)
+> >> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:582:6-8: opportun=
+ity for str_enabled_disabled(on)
+>
+> Replace ternary (condition ? "enabled" : "disabled") with
+> str_enabled_disabled() from string_choices.h to improve readability,
+> maintain uniform string usage, and reduce binary size through linker
+> deduplication.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202502111616.xnebdSv1-lkp@i=
+ntel.com/
+> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
 
-2. if (res > INT64_MAX || res < INT64_MIN)
-Expression 'res > INT64_MAX' is always false , which may be caused by a logical error: 'res' has a type 'long long' 
-with minimum value '-9223372036854775808' and a maximum value '9223372036854775807'
-Expression 'res < INT64_MIN' is always false , which may be caused by a logical error: 'res' has a type 'long long' 
-with minimum value '-9223372036854775808' and a maximum value '9223372036854775807'
-
-Corrections explained:
-- Removed redundant check `res > 0xFFFFFFFFFFFFFFFFULL` in `get_u64`,
-  as `res` cannot exceed this value due to its type.
-- Removed redundant checks `res > INT64_MAX` and `res < INT64_MIN` in `get_s64`,
-  as `res` cannot exceed the range of `long long`.
-
-Triggers found by static analyzer Svace.
-
-Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
-
----
- lib/utils.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/lib/utils.c b/lib/utils.c
-index be2ce0fe..706e93c3 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -304,10 +304,6 @@ int get_u64(__u64 *val, const char *arg, int base)
- 	if (res == ULLONG_MAX && errno == ERANGE)
- 		return -1;
- 
--	/* in case ULL is 128 bits */
--	if (res > 0xFFFFFFFFFFFFFFFFULL)
--		return -1;
--
- 	*val = res;
- 	return 0;
- }
-@@ -399,8 +395,6 @@ int get_s64(__s64 *val, const char *arg, int base)
- 		return -1;
- 	if ((res == LLONG_MIN || res == LLONG_MAX) && errno == ERANGE)
- 		return -1;
--	if (res > INT64_MAX || res < INT64_MIN)
--		return -1;
- 
- 	*val = res;
- 	return 0;
--- 
-2.30.2
-
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drive=
+rs/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> index 96bcda0856ec..3efee70f46b3 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/ethtool.h>
+>  #include <linux/io.h>
+> +#include <linux/string_choices.h>
+>  #include "stmmac.h"
+>  #include "stmmac_pcs.h"
+>  #include "stmmac_ptp.h"
+> @@ -633,7 +634,7 @@ int dwmac1000_ptp_enable(struct ptp_clock_info *ptp,
+>                 }
+>
+>                 netdev_dbg(priv->dev, "Auxiliary Snapshot %s.\n",
+> -                          on ? "enabled" : "disabled");
+> +                          str_enabled_disabled(on));
+>                 writel(tcr_val, ptpaddr + PTP_TCR);
+>
+>                 /* wait for auxts fifo clear to finish */
+> --
+> 2.43.0
+>
+>
 
