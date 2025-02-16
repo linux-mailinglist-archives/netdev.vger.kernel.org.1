@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-166736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04013A371F8
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 04:29:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBABCA37205
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 05:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91A81888AD2
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 03:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC2F23A9DD4
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 04:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6685789D;
-	Sun, 16 Feb 2025 03:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC5B42A92;
+	Sun, 16 Feb 2025 04:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="jYOUT/DN"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="bcCcO38R"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0460FC8CE;
-	Sun, 16 Feb 2025 03:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD9B17BBF
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 04:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739676575; cv=none; b=EwoPRlOz7I8RX9KASMK+3wQAWGHbZgKKRUbtREnUPt6jlHoJcMQ/oPwuQsJ1Y291dRpXWJi5Zhy4gmH3MzkJuJSxoxOmO6AO4nzyRkMq6oUaMFeQz+KAX23CQgesEJYEf0Dn+YlrDcEnwbZMcLrA9J0i4Kxf6bp8RbGx2yA12Wo=
+	t=1739680908; cv=none; b=Gug+CORunm0+wiJASI8FooiPOpDI0exbO+gjlx+9jedbdKLA7XKnoq5RCmKpxLelxlmNMfrPZ1/IxvzOd9q/wPONdYqBuGPHHUQmoifNOreBu2355ebH5gROhpl5jXO0urG6noT4XPZeGUFl8yzlB6OtWS9EBIuD9weywXAGgsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739676575; c=relaxed/simple;
-	bh=iUhWftYdo9T8UrzE6GeB1DWNOpDcX5qptKrCMHfnN7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWLtFhibBiDTGEGK7c3PjVOTdUPTxAUFq8UEdoJRoism6rZtXezSceqQhqnnqV2R5KSZMzOUStEDa4/Z8JLiw7X6CxS1mWXh+qJCjQ2ALHP8rGDJJKL39FwzmrdkoC+Wg+Qm6ulDR43Z++QsRHXvZ1f/zM8rq+vzHQ3tard/N0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=jYOUT/DN; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=rc0BQgcYMwktFIfCc+amXmngzIQoye0cjtheqjw53zQ=; b=jYOUT/DNQz6ndVzPKDPcgy6BGS
-	Sbrt/uk1tV1ZGFwl6P5x2Q0ZbtQ8hF6wdBbCCJVtZytfAdZhcm66YhQttvb2L0D6RFTl2ABbNRTKr
-	PyewzxHJ2VUArIHg2dlw8DGS3maCYle5MQ5xZjzTLmB0eVGLkUE6WIAYlt2sCgAnS7zExJ7rxRQyz
-	U8F6Ug5NkRI6vnr2vuCgI9vZERbyczYpL5ho2vbI74+Zg0pD3ctbwn7lnZwjZfrdnEZSG0e+RmSKe
-	rSkCpeXURirWd+jIhugHpG0ydOLYDBkIsu9aTMFz5H3a9BHzmDR+NJMdg66akqLtLTXry4svUdCZx
-	tgk088Yw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tjV8X-000gj6-2y;
-	Sun, 16 Feb 2025 11:29:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Feb 2025 11:29:26 +0800
-Date: Sun, 16 Feb 2025 11:29:26 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, fsverity@lists.linux.dev,
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev,
-	x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
- hashing
-Message-ID: <Z7FblsbOQnJ7sYOA@gondor.apana.org.au>
-References: <20250212154718.44255-1-ebiggers@kernel.org>
- <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain>
- <20250215090412.46937c11@kernel.org>
- <Z7FM9rhEA7n476EJ@gondor.apana.org.au>
- <20250216032616.GA90952@quark.localdomain>
+	s=arc-20240116; t=1739680908; c=relaxed/simple;
+	bh=ka7DjWi5u8d7UKlea9WeJ5ehFm5Vqv68iCj2896Zig8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cuGRvAH7HLHuPD0zC47J8P0JNqQmB3iUs7aEd4qgb0ZsAWk/VaFrjNkqxhg+1uQjnmKTDd4d1wmngZF8b5z1DHSFOESC+DNYfBAuN1hLYhyQzFkLi0KghXr00c8L7QFZgG8BI58uAZM0WKVzrrwxm8erQeB8D/x7qoNEDTuw3Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=bcCcO38R; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-221206dbd7eso2625255ad.2
+        for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 20:41:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1739680906; x=1740285706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kE87YW205zQNnYEC1i62hj2LenRd+r/VDrmVONH7nZs=;
+        b=bcCcO38R180YU0P6VA8zTnK9g/MNSh8bKLG8wOsSUnCKeEKNLO7wYtajT0w5YKwvEm
+         u0zDyCR4tGQiy6kbnIQMnAulxTTp25DnqQLdV3vL15dF3Om6p5RJog8tud+SNEnYFOMo
+         Z64J1QNGIDM4ybIY8xm4RmLczBk/tBo9yIaHq4tJsZffM8VLtqRyPCy2/En1NG/TGywx
+         FY1MciphNwqlmcVlNLv589+IwywpZrf+iadCdON0ZYa5U5VWQk9b0LrV66mHMjnqCHss
+         Tj/kb1Kjf1dUQqBY822FS5w015E2uwb+8oE2PzExL5B33D9lIbvIqsOA5sCwk4svJhqM
+         KNRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739680906; x=1740285706;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kE87YW205zQNnYEC1i62hj2LenRd+r/VDrmVONH7nZs=;
+        b=u5JqatNiJAZkQeZsVx//p40jiP4Gd2necLOXsIWwO3VgtpzPkiLaXc5wWvXGC8Q6xN
+         5xm97v0cuKkokQ3F3fr1Af6pttgCFpM8HLuCWC2NmNSf2oCi9uwOSzLf6kVSSvH1XBBT
+         gYF7yX5NqhQQJCPPQlAExwbvnK4FEuqKSirwahLoCW6MX0BBwY2oW/7e6Go08NHeWi+e
+         g00XX01gUInsoI6v8+N8JF/oROd+4sC43tfGMRiorBujv9DemO0CFsJogdoPGUeDR2V0
+         7YUZZNlPjpHD/Gfi/EB30Chq8Ufh0t5lPlnrg0fdymJArU05+ihMEXPtvIqHwpjfc/Ri
+         ndRQ==
+X-Gm-Message-State: AOJu0YxOvHsLtnAotAr3Qs1KP3P64gJNADN9rYKhxKOgjYiYdEQTmqwf
+	w5oHf+l5RmXKcAX2T7ihKeAryCMV14uuc05rF7gtA6vWHxSXeiVxVfUV+P3DlSg=
+X-Gm-Gg: ASbGnctljzHiIL/2k5XiKXGmaJfa8Lc+j7nO/OqYy6Ut5OYewViBHMelJDuaVE+rUF0
+	7RgRQJn9AnGj4I6nL2M7mo1w9r4cY9YaahVZnp9W5rHbwr4M9whcbUggHvWqTxL1a/w71PbTIVX
+	YxUPKbJbK+ngkhttxB2Gk+RKObCVUjC/fFFylt3En2/j+VZDBGjD7WrlOnIykx95NEYVfp5Vaso
+	PIYPKxMoa0XxXanfBX574bIs/UVxFBShie27E6aw0SpLVnq9Qaqn7Ye2r/mYWlb5VidEdsQ8D0c
+	8P7SZpd73WEOKXWpmy3mJacyUKqYkWg99oTsxfw3jFfJuEOmg3GYt8zVPIICZ4QQCLIg
+X-Google-Smtp-Source: AGHT+IHDHNd2l1JieD+pine3di4BtFE5HtckNHl/+WjiHYcphTztmnQ4+y7wuIua1CULLTRWC+2bZQ==
+X-Received: by 2002:a17:903:986:b0:216:6fb5:fd83 with SMTP id d9443c01a7336-22104030d06mr77035345ad.29.1739680905902;
+        Sat, 15 Feb 2025 20:41:45 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fbf98cff80sm7657993a91.16.2025.02.15.20.41.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2025 20:41:45 -0800 (PST)
+Date: Sat, 15 Feb 2025 20:41:43 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Anton Moryakov <ant.v.moryakov@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] ip: handle NULL return from localtime in strxf_time in
+Message-ID: <20250215204143.0ae30525@hermes.local>
+In-Reply-To: <20250216022523.647342-1-ant.v.moryakov@gmail.com>
+References: <20250216022523.647342-1-ant.v.moryakov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250216032616.GA90952@quark.localdomain>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Feb 15, 2025 at 07:26:16PM -0800, Eric Biggers wrote:
->
-> Well, the async fallback (using cryptd) occurs only when a kernel-mode FPU
-> section in process context is interrupted by a hardirq and at the end of it a
-> softirq also tries to use kernel-mode FPU.  It's generally a rare case but also
-> a terrible implementation that is really bad for performance; this should never
+On Sun, 16 Feb 2025 05:25:23 +0300
+Anton Moryakov <ant.v.moryakov@gmail.com> wrote:
 
-It may not be rare if the kernel is busy doing bidirectional
-TX/RX with crypto.  The process context will be the TX-side
-encrypting while the softirq context will do RX-side decryption.
+> Static analyzer reported:
+> Pointer 'tp', returned from function 'localtime' at ipxfrm.c:352, may be NULL 
+> and is dereferenced at ipxfrm.c:354 by calling function 'strftime'.
+> 
+> Corrections explained:
+> The function localtime() may return NULL if the provided time value is
+> invalid. This commit adds a check for NULL and handles the error case
+> by copying "invalid-time" into the output buffer.
+> Unlikely, but may return an error
+> 
+> Triggers found by static analyzer Svace.
+> 
+> Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
 
-> have been implemented this way.  I am planning to fix it so that softirqs on x86
-
-Sure but it's way better than falling back to the C implementation
-on the RX-side.
-
-> will always be able to use the FPU, like they can on some of the other arches
-> like arm64 and riscv.
-
-That's great news.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Seems like you are creating dead code. Unless glibc is broken
+this can never happen.
 
