@@ -1,317 +1,164 @@
-Return-Path: <netdev+bounces-166750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EA8A3731C
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:28:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 623B3A3732A
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91583188CDB0
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 09:28:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09AB118895E4
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 09:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8AE185B5F;
-	Sun, 16 Feb 2025 09:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B541624DC;
+	Sun, 16 Feb 2025 09:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="64OM+z5G"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zzZEo4yj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A91748F;
-	Sun, 16 Feb 2025 09:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ABE433A0;
+	Sun, 16 Feb 2025 09:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739698084; cv=none; b=okva5vJ+UcBsHDl2LFaTF+AUAVVAznBP5c22UvroUdXIryKIvoj2Yl1qDhRD5SOC3Ou+++iuvTpIyUyKLLDEgsaW8xkuPJFR+49eiXOIrj7jWRcfG4Vl5Z0bKy8ZNlvw1HP6gOfucoxTNrW6KDuecXHV5FU2bGMPZuvnA4y3clg=
+	t=1739698263; cv=none; b=fGNE9LcQ2L1JRyJVjqZbRibYeIS9Kg9HGoygFmD8l1N+2P/35Gncm06FShooi1/F5wUYG8P27Fvv1YdOxftacSPEyKZIx+dSLqrYqXMxLamCm57UIbrVYa1MQtACaBpELfPEFTwKDzkOeVtbFiRBQNvTeJDGy7oSJp6kE+o6sXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739698084; c=relaxed/simple;
-	bh=PabaHSObL1FHhwTpo7FlmVS6XbdvGYluRSmJbaHlc+Q=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=pF+Y5B31tUyVvfhbGVHAQg90+sJ0qLeVXF56tjg4CPQ+4eFEUfdp5KVXzQZWV0DksjARiBXNHbAE0+kpTQkWY9fO91XIb5bNucN2fNaEPis2UlSkZ6bE430EyNDgV1YPjevzVyc88814cIPcHSL4Dtjtyvlw2xWZ3e0IKxE76dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=64OM+z5G; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 15BD223505;
-	Sun, 16 Feb 2025 11:27:51 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=tkY2r1upoRmrq85sW3Yt/r7d38HQ8mRdKHIEVeDaaWY=; b=64OM+z5Gfdie
-	kpW/jfIev5f349JJm/1tMt/oGDIsepAEW1ycZltuRLwSawAHzG8U31m8cPjZ7LYg
-	Uuzm1iovMkPHXpJnu7na5oe5A3oS6d0MyMcxKiDDgJH3/TYHYTN1kHZiMiDRgxRe
-	TRs7u/dT2rDr6HVEXiqc7CCWW9ORcCHy/IblPCpOnOP/EJiLVSOuq4U7bs/JGhMz
-	A8ypy1L+m5HcVDkkPY26KKEFHFN0dMJHKL6Ld6u5pE/ZMKI4FWWmH/W9szlnLq5P
-	jX58LZpKRXv1+f3+Ledq6RG9iE19N1YfWInuo/nCdACdaExMsCTdzU4VFdV/RD1D
-	s7qRberqtScQBPexHOPbYvNtFfVSpYp2+Njfc7jBuhsv8IC9CxUXnZ6wI0Zv6Q9k
-	iEAuI8MiaiBrOm+wZNErwbCjSPIPNQxcvJClp8box4ZyL7Dy4ygew3Cm8xuMEjru
-	Yi4snyY35nuFdDrTUt5MZ2s2wxZkLyCStnpjm0CFBEdGf5MefRu2C/bgMU94+9vq
-	CU8yMnl+bQXHL0tYZjTWVk0pglgVFvSxOar8+0xbMpjfnSj3UUc93S7W+fCal+ES
-	FhDMa5WRU6lom29jinwys+8SfSxozmbVWCSgmV5sGZbjhyXN9oF4hbP5iwsbmb94
-	C7bA7YuEaZn3OU53PzeDkKKvIpmrztU=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Sun, 16 Feb 2025 11:27:49 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 07C7615EA8;
-	Sun, 16 Feb 2025 11:27:41 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 51G9RdLN011172;
-	Sun, 16 Feb 2025 11:27:41 +0200
-Date: Sun, 16 Feb 2025 11:27:39 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: m30030393 <mengkanglai2@huawei.com>
-cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yanan@huawei.com, fengtao40@huawei.com,
-        gaoxingwang1@huawei.com, lvs-devel@vger.kernel.org
-Subject: Re: ftp ipvs connect failed in ipv6
-In-Reply-To: <20250215110959.2557589-1-mengkanglai2@huawei.com>
-Message-ID: <30ba0c1c-593c-f10b-4caf-a262d8ba1247@ssi.bg>
-References: <7a1903c5-f7e3-4480-2a07-ae94e4d6a895@ssi.bg> <20250215110959.2557589-1-mengkanglai2@huawei.com>
+	s=arc-20240116; t=1739698263; c=relaxed/simple;
+	bh=YycW8ro2VftsQjHvrgvBkrK3WDsRY9Wr78hI4vwmwoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O5we3F1nJU0or+6zr1jA5ZMmUf5VxRUxhXT5Y0FLikpCW+VWOzRBDg2GmIo3MbAcOuoyEfohitLn+XCiClXDg8Xe4qJjVwI5xgZzHyALsdJzc0uxToyAtpvqBalIVl/oxFNSGMec9eLWfDzScqcJ06bnictBm9odnceL41aYMCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zzZEo4yj; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 1D7A92540123;
+	Sun, 16 Feb 2025 04:31:00 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Sun, 16 Feb 2025 04:31:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1739698259; x=1739784659; bh=qx/SJG5ijmT0Xa4nxgZmBXmRB69O0r8beqb
+	QPBqwIS8=; b=zzZEo4yjwGDmU5if/IV5GZpfCiWFDYeBmDGERWTHbqk8NdxZVmP
+	ehrM/xkVhNCKFziS8b6FgApqabx/IxYUpBocuOPmqBif4GDbfPhIUfxPTbTEbn3I
+	sSvLibtESN8t7akiB3v3kkGvSAB9BPpbwGaAkEEyo4mZBXTYDKHlRskxLDgYYGgq
+	vhyX5ZlOyx4sIHQR17xTm4LG2rD/JopB9bZL2HjUoryvSNLU/yRolnHBQ4Me09o4
+	xplAEGU28UegynV+xacvrQqS9uXij8mXBMQwSnK5dhTEA/6uKy7/aWyL64b1C+K9
+	muYzA4J/y66FlAcnC0Civl54CqnJa1xJiSQ==
+X-ME-Sender: <xms:UrCxZ_eDSVpsraW3p6A8cDqbURZ6u-eWvN7-ywNkNpaRW_RJ3sxvCA>
+    <xme:UrCxZ1M2h5-MQEs99ZywZIRRsJ2nwmHHQE5vIKYzkN7frWK-nyyyG7douKwNRlo-t
+    Bo7alYHPY9shZw>
+X-ME-Received: <xmr:UrCxZ4gLRW0hNuIV14P371PwXIwOBRH-O1txIPKqIamITUF5rdmWf1dmp_ey>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehheduudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepihhlihgrrdhgrghvrh
+    hilhhovhesihhnfhhothgvtghsrdhruhdprhgtphhtthhopehnhhhorhhmrghnsehtuhig
+    ughrihhvvghrrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
+    gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthht
+    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvug
+    hhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
+    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:UrCxZw-FBWVbSp35ufaCHUq_EIbohO5GaH9KiyqCem4euKfkLJZUPg>
+    <xmx:UrCxZ7vl_OCnxlWWNL0e5aTVYi5MBJ-sXYKNu8KMzsN8N_10iAOSOg>
+    <xmx:UrCxZ_FuXnX2IkqpNKOpPBwITdj6w7KMyCYhxNY7WIyBDhHV7TjPvw>
+    <xmx:UrCxZyNUq4eyJRuXICbTzCfgqg6hkFY6-eKXS2ddB1rkSoDG0roVUA>
+    <xmx:U7CxZ8lcJOOfNRpPhu8MFK32DNezGT_bkeXpkA6zKpWt0mXz0HUMc7Px>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 16 Feb 2025 04:30:57 -0500 (EST)
+Date: Sun, 16 Feb 2025 11:30:55 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: Neil Horman <nhorman@tuxdriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH net v2] drop_monitor: fix incorrect initialization order
+Message-ID: <Z7GwT6d-9ZFuzUcL@shredder>
+References: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463811672-331892563-1739698061=:3370"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
----1463811672-331892563-1739698061=:3370
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-
-	Hello,
-
-On Sat, 15 Feb 2025, m30030393 wrote:
-
-> Tue, 11 Feb 2025, Julian Anastasov wrote:
-> >>
-> >>On Mon, 10 Feb 2025, mengkanglai wrote:
-> >>
-> >>> Hello:
-> >>> I found a problem with ftp ipvs.
-> >>> I create 3 virtual machine in one host. One is the FTP client, the other is the ipvs transition host, and the other is the FTP server.
-> >>> The ftp connection is successful in ipv4 address,but failed in ipv6 address.
-> >>> The failure is tcp6 checksum error in 
-> >>> tcp_dnat_handler(tcp_dnat_handler-> tcp_csum_check->csum_ipv6_magic), I trace back where skb->csum is assigned and found skb->csum is assigned in nf_ip6_checksum in case CHECKSUM_NONE(ipv6_conntrack_in=> nf_conntrack_in => nf_conntrack_tcp_packet => nf_ip6_checksum).
-> >>> I don't know much about ipv6 checksums,why ipv6 nf_conntrack assign skb->csum but check error in ipvs tcp_dnat_handler?
-> >>
-> >>	Looks like the checksum validation does not use correct offset for the protocol header in the case with IPv6. Do you see extension headers before the final IPv6 header that points to TCP header? If that is the case, the following patch can help. If you prefer, you can apply just the TCP part for the FTP test. Let me know if this solves the problem, thanks!
+On Thu, Feb 13, 2025 at 03:20:55PM +0000, Gavrilov Ilia wrote:
+> Syzkaller reports the following bug:
 > 
->     Thanks for your help, but the following patch can't help. see extension headers before the IPv6 header, it’s just the common first SYN packet of the IPv6 three-way handshake but csum check failed in tcp_csum_check. 
-> 	I tried different offsets for the protocol header but doesn't work.
+> BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
+>  lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+> CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+ #1
+> Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x119/0x179 lib/dump_stack.c:118
+>  debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
+>  do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
+>  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
+>  _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
+>  reset_per_cpu_data+0xe6/0x240 [drop_monitor]
+>  net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
+>  genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
+>  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+>  genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
+>  netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
+>  genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+>  netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
+>  netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
+>  sock_sendmsg_nosec net/socket.c:651 [inline]
+>  __sock_sendmsg+0x157/0x190 net/socket.c:663
+>  ____sys_sendmsg+0x712/0x870 net/socket.c:2378
+>  ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
+>  __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
+>  do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
+>  entry_SYSCALL_64_after_hwframe+0x62/0xc7
+> RIP: 0033:0x7f3f9815aee9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
+> RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
+> RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
+> 
+> If drop_monitor is built as a kernel module, syzkaller may have time
+> to send a netlink NET_DM_CMD_START message during the module loading.
+> This will call the net_dm_monitor_start() function that uses
+> a spinlock that has not yet been initialized.
+> 
+> To fix this, let's place resource initialization above the registration
+> of a generic netlink family.
+> 
+> Found by InfoTeCS on behalf of Linux Verification Center
+> (linuxtesting.org) with Syzkaller.
+> 
+> Fixes: 9a8afc8d3962 ("Network Drop Monitor: Adding drop monitor implementation & Netlink protocol")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
 
-	The previous patch needs more changes, see below
-v2 where we also provide correct protocol value. If this patch
-does not help, send me more info, if you prefer privately:
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-- packet capture file containing such packet
-- does it happen for other service (port), eg. 80/443 or just on 21
-- the skb->ip_summed, tcphoff and skb->csum values in tcp_csum_check
-
-[PATCHv2] ipvs: skip ipv6 extension headers for csum checks
-
-Protocol checksum validation fails for IPv6 if there are extension
-headers before the protocol header. iph->len already contains its
-offset, so use it to fix the problem.
-
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
----
- net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 ++++++------------
- net/netfilter/ipvs/ip_vs_proto_tcp.c  | 21 +++++++--------------
- net/netfilter/ipvs/ip_vs_proto_udp.c  | 20 +++++++-------------
- 3 files changed, 20 insertions(+), 39 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-index 83e452916403..63c78a1f3918 100644
---- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
-+++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
-@@ -10,7 +10,8 @@
- #include <net/ip_vs.h>
- 
- static int
--sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
-+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+		unsigned int sctphoff);
- 
- static int
- sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
-@@ -108,7 +109,7 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!sctp_csum_check(cp->af, skb, pp))
-+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
- 			return 0;
- 
- 		/* Call application helper if needed */
-@@ -156,7 +157,7 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!sctp_csum_check(cp->af, skb, pp))
-+		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
- 			return 0;
- 
- 		/* Call application helper if needed */
-@@ -185,19 +186,12 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- }
- 
- static int
--sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
-+sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+		unsigned int sctphoff)
- {
--	unsigned int sctphoff;
- 	struct sctphdr *sh;
- 	__le32 cmp, val;
- 
--#ifdef CONFIG_IP_VS_IPV6
--	if (af == AF_INET6)
--		sctphoff = sizeof(struct ipv6hdr);
--	else
--#endif
--		sctphoff = ip_hdrlen(skb);
--
- 	sh = (struct sctphdr *)(skb->data + sctphoff);
- 	cmp = sh->checksum;
- 	val = sctp_compute_cksum(skb, sctphoff);
-diff --git a/net/netfilter/ipvs/ip_vs_proto_tcp.c b/net/netfilter/ipvs/ip_vs_proto_tcp.c
-index 7da51390cea6..ede4fa3b63f5 100644
---- a/net/netfilter/ipvs/ip_vs_proto_tcp.c
-+++ b/net/netfilter/ipvs/ip_vs_proto_tcp.c
-@@ -29,7 +29,8 @@
- #include <net/ip_vs.h>
- 
- static int
--tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
-+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+	       unsigned int tcphoff);
- 
- static int
- tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
-@@ -166,7 +167,7 @@ tcp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!tcp_csum_check(cp->af, skb, pp))
-+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
- 			return 0;
- 
- 		/* Call application helper if needed */
-@@ -244,7 +245,7 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!tcp_csum_check(cp->af, skb, pp))
-+		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
- 			return 0;
- 
- 		/*
-@@ -301,17 +302,9 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 
- 
- static int
--tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
-+tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+	       unsigned int tcphoff)
- {
--	unsigned int tcphoff;
--
--#ifdef CONFIG_IP_VS_IPV6
--	if (af == AF_INET6)
--		tcphoff = sizeof(struct ipv6hdr);
--	else
--#endif
--		tcphoff = ip_hdrlen(skb);
--
- 	switch (skb->ip_summed) {
- 	case CHECKSUM_NONE:
- 		skb->csum = skb_checksum(skb, tcphoff, skb->len - tcphoff, 0);
-@@ -322,7 +315,7 @@ tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
- 			if (csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
- 					    &ipv6_hdr(skb)->daddr,
- 					    skb->len - tcphoff,
--					    ipv6_hdr(skb)->nexthdr,
-+					    IPPROTO_TCP,
- 					    skb->csum)) {
- 				IP_VS_DBG_RL_PKT(0, af, pp, skb, 0,
- 						 "Failed checksum for");
-diff --git a/net/netfilter/ipvs/ip_vs_proto_udp.c b/net/netfilter/ipvs/ip_vs_proto_udp.c
-index 68260d91c988..ffbebda547fc 100644
---- a/net/netfilter/ipvs/ip_vs_proto_udp.c
-+++ b/net/netfilter/ipvs/ip_vs_proto_udp.c
-@@ -25,7 +25,8 @@
- #include <net/ip6_checksum.h>
- 
- static int
--udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
-+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+	       unsigned int udphoff);
- 
- static int
- udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
-@@ -155,7 +156,7 @@ udp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!udp_csum_check(cp->af, skb, pp))
-+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
- 			return 0;
- 
- 		/*
-@@ -238,7 +239,7 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 		int ret;
- 
- 		/* Some checks before mangling */
--		if (!udp_csum_check(cp->af, skb, pp))
-+		if (!udp_csum_check(cp->af, skb, pp, udphoff))
- 			return 0;
- 
- 		/*
-@@ -297,17 +298,10 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
- 
- 
- static int
--udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
-+udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
-+	       unsigned int udphoff)
- {
- 	struct udphdr _udph, *uh;
--	unsigned int udphoff;
--
--#ifdef CONFIG_IP_VS_IPV6
--	if (af == AF_INET6)
--		udphoff = sizeof(struct ipv6hdr);
--	else
--#endif
--		udphoff = ip_hdrlen(skb);
- 
- 	uh = skb_header_pointer(skb, udphoff, sizeof(_udph), &_udph);
- 	if (uh == NULL)
-@@ -325,7 +319,7 @@ udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
- 				if (csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
- 						    &ipv6_hdr(skb)->daddr,
- 						    skb->len - udphoff,
--						    ipv6_hdr(skb)->nexthdr,
-+						    IPPROTO_UDP,
- 						    skb->csum)) {
- 					IP_VS_DBG_RL_PKT(0, af, pp, skb, 0,
- 							 "Failed checksum for");
--- 
-2.48.1
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
----1463811672-331892563-1739698061=:3370--
-
+I wouldn't object if someone requested to remove these archaic
+{BUG,WARN}_ON()s, but figured this cleanup is more of a net-next
+material.
 
