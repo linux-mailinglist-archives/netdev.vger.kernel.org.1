@@ -1,96 +1,59 @@
-Return-Path: <netdev+bounces-166751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 623B3A3732A
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:31:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE0CA3732D
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09AB118895E4
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 09:31:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6413E3A6A35
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 09:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B541624DC;
-	Sun, 16 Feb 2025 09:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D0C1865E3;
+	Sun, 16 Feb 2025 09:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zzZEo4yj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSqbu4+t"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ABE433A0;
-	Sun, 16 Feb 2025 09:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED9D433A0;
+	Sun, 16 Feb 2025 09:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739698263; cv=none; b=fGNE9LcQ2L1JRyJVjqZbRibYeIS9Kg9HGoygFmD8l1N+2P/35Gncm06FShooi1/F5wUYG8P27Fvv1YdOxftacSPEyKZIx+dSLqrYqXMxLamCm57UIbrVYa1MQtACaBpELfPEFTwKDzkOeVtbFiRBQNvTeJDGy7oSJp6kE+o6sXQ=
+	t=1739698329; cv=none; b=dJkNsJdbH+qOeyY9EiSlIcibK1Hx7Menguph740pNE7gdHGBE+ziGVmr401GjZrSIIywljZb5Nq1TAHSfR8b30mur++CUERaCoQjCkd8pd8aa886jBRf6ADSV0O+WaSqtKkZnHZybGnRiSEVSogpWEAtaFxETMv9hD9i4+C9nhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739698263; c=relaxed/simple;
-	bh=YycW8ro2VftsQjHvrgvBkrK3WDsRY9Wr78hI4vwmwoE=;
+	s=arc-20240116; t=1739698329; c=relaxed/simple;
+	bh=sM2HFCLqAxsh4GngDOhlxRVRtA3N/hd95Tg81RfRQFQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5we3F1nJU0or+6zr1jA5ZMmUf5VxRUxhXT5Y0FLikpCW+VWOzRBDg2GmIo3MbAcOuoyEfohitLn+XCiClXDg8Xe4qJjVwI5xgZzHyALsdJzc0uxToyAtpvqBalIVl/oxFNSGMec9eLWfDzScqcJ06bnictBm9odnceL41aYMCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zzZEo4yj; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 1D7A92540123;
-	Sun, 16 Feb 2025 04:31:00 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Sun, 16 Feb 2025 04:31:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1739698259; x=1739784659; bh=qx/SJG5ijmT0Xa4nxgZmBXmRB69O0r8beqb
-	QPBqwIS8=; b=zzZEo4yjwGDmU5if/IV5GZpfCiWFDYeBmDGERWTHbqk8NdxZVmP
-	ehrM/xkVhNCKFziS8b6FgApqabx/IxYUpBocuOPmqBif4GDbfPhIUfxPTbTEbn3I
-	sSvLibtESN8t7akiB3v3kkGvSAB9BPpbwGaAkEEyo4mZBXTYDKHlRskxLDgYYGgq
-	vhyX5ZlOyx4sIHQR17xTm4LG2rD/JopB9bZL2HjUoryvSNLU/yRolnHBQ4Me09o4
-	xplAEGU28UegynV+xacvrQqS9uXij8mXBMQwSnK5dhTEA/6uKy7/aWyL64b1C+K9
-	muYzA4J/y66FlAcnC0Civl54CqnJa1xJiSQ==
-X-ME-Sender: <xms:UrCxZ_eDSVpsraW3p6A8cDqbURZ6u-eWvN7-ywNkNpaRW_RJ3sxvCA>
-    <xme:UrCxZ1M2h5-MQEs99ZywZIRRsJ2nwmHHQE5vIKYzkN7frWK-nyyyG7douKwNRlo-t
-    Bo7alYHPY9shZw>
-X-ME-Received: <xmr:UrCxZ4gLRW0hNuIV14P371PwXIwOBRH-O1txIPKqIamITUF5rdmWf1dmp_ey>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehheduudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
-    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
-    thhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepihhlihgrrdhgrghvrh
-    hilhhovhesihhnfhhothgvtghsrdhruhdprhgtphhtthhopehnhhhorhhmrghnsehtuhig
-    ughrihhvvghrrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
-    gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthht
-    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvug
-    hhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:UrCxZw-FBWVbSp35ufaCHUq_EIbohO5GaH9KiyqCem4euKfkLJZUPg>
-    <xmx:UrCxZ7vl_OCnxlWWNL0e5aTVYi5MBJ-sXYKNu8KMzsN8N_10iAOSOg>
-    <xmx:UrCxZ_FuXnX2IkqpNKOpPBwITdj6w7KMyCYhxNY7WIyBDhHV7TjPvw>
-    <xmx:UrCxZyNUq4eyJRuXICbTzCfgqg6hkFY6-eKXS2ddB1rkSoDG0roVUA>
-    <xmx:U7CxZ8lcJOOfNRpPhu8MFK32DNezGT_bkeXpkA6zKpWt0mXz0HUMc7Px>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Feb 2025 04:30:57 -0500 (EST)
-Date: Sun, 16 Feb 2025 11:30:55 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: Neil Horman <nhorman@tuxdriver.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH net v2] drop_monitor: fix incorrect initialization order
-Message-ID: <Z7GwT6d-9ZFuzUcL@shredder>
-References: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jhvKmTM8h2OpeMv9ebvN+I6EVaHnVreAZL1mpSACZnHwPW8T5A2nbSUPUbG3yORCLjIiLkWAJrAUp23VI+VRCZxicVZ5cenza1iFmpP97prz1OirZ7HVuaJYL12KMDhqKfH1QCLfrElpRzXZ1NXRHuMPsdFKqYKeklP6du/r2hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSqbu4+t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED22AC4CEDD;
+	Sun, 16 Feb 2025 09:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739698328;
+	bh=sM2HFCLqAxsh4GngDOhlxRVRtA3N/hd95Tg81RfRQFQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VSqbu4+tEX+C/2s1TbcFTrMIK+qL/1F+WKH2CoR28EH30Sn6dCaPq9OqX8EiHCd+Z
+	 MWLufQMzvM6Oss4aHU71MfXyhG1tG5OhtObH60+5GI9YZSXmwZUWWe4AmqL4rkBqvx
+	 qb85QA1WEXIXEBn87bKvIGV5WkoO+UF8Q2oUuTmM7s2erZND4ZYcvOz2mOlh6xc8B+
+	 GQKD3Iq/hzrC2zV5J+3oFkYadfh7KcgciSXyAyPdg+RZQv9pKHsG8SCfwpuYiuTRVL
+	 6PS6Yioe20W3ilHsyrawLKJ0AlYSmjXkX/9C6f6EdrlPAAOdBTYRNN9ZcYWv5WFX2A
+	 +Kw3NrbONlrRg==
+Date: Sun, 16 Feb 2025 09:32:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Nick Child <nnac123@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, haren@linux.ibm.com,
+	ricklind@us.ibm.com, nick.child@ibm.com, jacob.e.keller@intel.com
+Subject: Re: [PATCH 1/3] hexdump: Implement macro for converting large buffers
+Message-ID: <20250216093204.GZ1615191@kernel.org>
+References: <20250214162436.241359-1-nnac123@linux.ibm.com>
+ <20250214162436.241359-2-nnac123@linux.ibm.com>
+ <20250215163612.GR1615191@kernel.org>
+ <20250215174039.20fbbc42@pumpkin>
+ <20250215174635.3640fb28@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,66 +62,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20250215174635.3640fb28@pumpkin>
 
-On Thu, Feb 13, 2025 at 03:20:55PM +0000, Gavrilov Ilia wrote:
-> Syzkaller reports the following bug:
+On Sat, Feb 15, 2025 at 05:46:35PM +0000, David Laight wrote:
+> On Sat, 15 Feb 2025 17:40:39 +0000
+> David Laight <david.laight.linux@gmail.com> wrote:
 > 
-> BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
->  lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
-> CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+ #1
-> Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
-> Call Trace:
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x119/0x179 lib/dump_stack.c:118
->  debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
->  do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
->  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
->  _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
->  reset_per_cpu_data+0xe6/0x240 [drop_monitor]
->  net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
->  genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
->  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
->  genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
->  netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
->  genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
->  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->  netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
->  netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
->  sock_sendmsg_nosec net/socket.c:651 [inline]
->  __sock_sendmsg+0x157/0x190 net/socket.c:663
->  ____sys_sendmsg+0x712/0x870 net/socket.c:2378
->  ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
->  __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
->  do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
->  entry_SYSCALL_64_after_hwframe+0x62/0xc7
-> RIP: 0033:0x7f3f9815aee9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
-> RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
-> RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
-> 
-> If drop_monitor is built as a kernel module, syzkaller may have time
-> to send a netlink NET_DM_CMD_START message during the module loading.
-> This will call the net_dm_monitor_start() function that uses
-> a spinlock that has not yet been initialized.
-> 
-> To fix this, let's place resource initialization above the registration
-> of a generic netlink family.
-> 
-> Found by InfoTeCS on behalf of Linux Verification Center
-> (linuxtesting.org) with Syzkaller.
-> 
-> Fixes: 9a8afc8d3962 ("Network Drop Monitor: Adding drop monitor implementation & Netlink protocol")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+> > On Sat, 15 Feb 2025 16:36:12 +0000
+> > Simon Horman <horms@kernel.org> wrote:
+> > 
+> > > + David Laight
+> > > 
+> > > On Fri, Feb 14, 2025 at 10:24:34AM -0600, Nick Child wrote:  
+> > > > Define for_each_line_in_hex_dump which loops over a buffer and calls
+> > > > hex_dump_to_buffer for each segment in the buffer. This allows the
+> > > > caller to decide what to do with the resulting string and is not
+> > > > limited by a specific printing format like print_hex_dump.
+> > > > 
+> > > > Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+> > > > ---
+> > > >  include/linux/printk.h | 21 +++++++++++++++++++++
+> > > >  1 file changed, 21 insertions(+)
+> > > > 
+> > > > diff --git a/include/linux/printk.h b/include/linux/printk.h
+> > > > index 4217a9f412b2..559d4bfe0645 100644
+> > > > --- a/include/linux/printk.h
+> > > > +++ b/include/linux/printk.h
+> > > > @@ -755,6 +755,27 @@ enum {
+> > > >  extern int hex_dump_to_buffer(const void *buf, size_t len, int rowsize,
+> > > >  			      int groupsize, char *linebuf, size_t linebuflen,
+> > > >  			      bool ascii);
+> > > > +/**
+> > > > + * for_each_line_in_hex_dump - iterate over buffer, converting into hex ASCII
+> > > > + * @i: offset in @buff
+> > > > + * @rowsize: number of bytes to print per line; must be 16 or 32
+> > > > + * @linebuf: where to put the converted data
+> > > > + * @linebuflen: total size of @linebuf, including space for terminating NUL
+> > > > + *		IOW >= (@rowsize * 2) + ((@rowsize - 1 / @groupsize)) + 1
+> > > > + * @groupsize: number of bytes to print at a time (1, 2, 4, 8; default = 1)
+> > > > + * @buf: data blob to dump
+> > > > + * @len: number of bytes in the @buf
+> > > > + */
+> > > > + #define for_each_line_in_hex_dump(i, rowsize, linebuf, linebuflen, groupsize, \
+> > > > +				   buf, len) \
+> > > > +	for ((i) = 0;							\
+> > > > +	     (i) < (len) &&						\
+> > > > +	     hex_dump_to_buffer((unsigned char *)(buf) + (i),		\
+> > > > +				min((len) - (i), rowsize),		\
+> > > > +				(rowsize), (groupsize), (linebuf),	\
+> > > > +				(linebuflen), false);			\
+> > > > +	     (i) += (rowsize) == 16 || (rowsize) == 32 ? (rowsize) : 16	\  
+> > > > +	    )
+> > > >  #ifdef CONFIG_PRINTK
+> > > >  extern void print_hex_dump(const char *level, const char *prefix_str,
+> > > >  			   int prefix_type, int rowsize, int groupsize,    
+> > > 
+> > > Hi Nick,
+> > > 
+> > > When compiling with gcc 7.5.0 (old, but still supported AFAIK) on x86_64
+> > > with patch 2/3 (and 1/3) applied I see this:
+> > > 
+> > >   CC      lib/hexdump.o
+> > > In file included from <command-line>:0:0:
+> > > lib/hexdump.c: In function 'print_hex_dump':
+> > > ././include/linux/compiler_types.h:542:38: error: call to '__compiletime_assert_11' declared with attribute error: min((len) - (i), rowsize) signedness error  
+> > ...
+> > > Highlighting the min line in the macro for context, it looks like this:
+> > > 
+> > > 	min((len) - (i), rowsize)
+> > > 
+> > > And in this case the types involved are:
+> > > 
+> > > 	size_t len
+> > > 	int i
+> > > 	int rowsize  
+> > 
+> > Yep, that should fail for all versions of gcc.
+> > Both 'i' and 'rowsize' should be unsigned types.
+> > In fact all three can be 'unsigned int'.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+To give a bit more context, a complication changing the types is that the
+type of len and rowsise (but not i) is in the signature of the calling
+function, print_hex_dump(). And I believe that function is widely used
+throughout the tree.
 
-I wouldn't object if someone requested to remove these archaic
-{BUG,WARN}_ON()s, but figured this cleanup is more of a net-next
-material.
+> 
+> Thinking a bit more.
+> If the compiler can determine that 'rowsize >= 0' then the test will pass.
+> More modern compilers do better value tracking so that might be enough
+> to stop the compiler 'bleating'.
+
+FTR, I did not see this with GCC 14.2.0 (or clang 19.1.7).
 
