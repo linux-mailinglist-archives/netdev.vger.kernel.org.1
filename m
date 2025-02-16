@@ -1,214 +1,147 @@
-Return-Path: <netdev+bounces-166789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F2CA37527
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:41:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF40CA37536
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:48:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A8CB16E7E7
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:41:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14ACE3AB39A
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A8F208A0;
-	Sun, 16 Feb 2025 15:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD8042A99;
+	Sun, 16 Feb 2025 15:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JGgIVzhx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TH/sXzoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD621F94C;
-	Sun, 16 Feb 2025 15:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5E7C8E0;
+	Sun, 16 Feb 2025 15:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739720470; cv=none; b=uFr30VAbiaQCBFfnMQ+/t1N8xj+6wdY/Vh+NjNvbSUP+KgrPGB0j+Xd0phFYNR8VPjjQxqmLYuGiegdNNvKFJC8m9ppj6VRqwxxbofTXWs1/sx9IAsPWqHPeYelJcOvkISJNXZ5gR+4Ray5yJBRUuWPNqWoHcxtLTgzGppJZOyQ=
+	t=1739720883; cv=none; b=sQn5Bj/zKblUDitbbKPxDmmHZEgerYls3jI4FYzTZA4y39c2gshG/bz0ObxfUYdhubNxXxTN9/P13iEAHwF1cmmBsg9G829IcH5Xi/l12OI2iTnWqC4ysoPxhAX2EYnBYEWzVzryju7x9CSQ5uCQy3khzT3+xKH1MnzQot1y4Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739720470; c=relaxed/simple;
-	bh=xG68caSkAsZvGAHs2S6lM0GkJkEvO8/I7pYrnkzMPZE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=TEgCtfgzeNgCSoqstc5oz5bKxZx0xhMKZgoHvsJHfU9rM79X+SOOQyt6hk6sQpDqXxtjqnBOQzYXeF0r5lijiF3vPwnuVQfJO6WbEW7cS+aI7oxAlzPzDRUEes8YVpAGW4kQatJvPuSqDF3+v6oV7OxYNP5CFTKLSS2BNQ5GYic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JGgIVzhx; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1739720453; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
-	bh=PS+GWVq2CPifdbQ54kKu6lK5pfUFqFXGFeV1WrkaFkE=;
-	b=JGgIVzhxcmbu8/03WhdIQXVz+Uw95Al0nBtchkGueMlGR6ZMie714CgoGDBJf9P77ImtgFTtZWDZ0Q7b6QZKwWOjZxjTlcQ178nZsNq9wSt+I5lcMCwux0j8485z6HccuP1df1WOuxcdEubQM3lLD8zbzTbnoW+v1JkL6eacb8w=
-Received: from 30.212.179.125(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WPWxmN2_1739720450 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 16 Feb 2025 23:40:52 +0800
-Message-ID: <59d386fb-0612-4c2e-a4e7-ca26b474917f@linux.alibaba.com>
-Date: Sun, 16 Feb 2025 23:40:47 +0800
+	s=arc-20240116; t=1739720883; c=relaxed/simple;
+	bh=JqQMD0hqYOzs5dOw+guRhjn4l01nDPpTFW7xyP6E+tA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sHYws73Q0q0sDp6ClAzsAF1Arsqmj2lsrZEkAHhRaERNZTmxKctQF0M2C3nGGq3/5F7X9hFgums6qOelmEjUcDoEvB4ZerabxY8USLYu+3Watjg6Wzh5v9CjezYKn8rX/BSk/wclvd2UNd2a82kb3xLrLRhkRdLsAlexE9r3+Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TH/sXzoG; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/FrEnAM0Ty8b3TT2wk1qUCREpGSXW5825yX1yLHlP7U=; b=TH/sXzoGZDKFZxyyyYNMJfCCcJ
+	haaiHeMXtkJd0EXixYhy5qRVdKxKvo6QU4s+3xu/7RPBJy8inXCaysxqUhpogLaQcnHn5agZHY7vC
+	ISA3JdH8ZIaySnObQY2s/fgesQH838h2X0hJ3Ddzde/x05GIMag/3XwrgarNWLs68l5ow65dSA6Ez
+	GZTTUyKV3vIU8VQAcZF8t39IRm/HYkxgn7wil+eIRf85b52fO03F2CLRoj36JaFDK0f/aQ/io0ge3
+	q8X+LcpW8NGBveQyqdM7nD9heEDOB1Jz6Zd2z8FuDZLqL3ahCTvqdWKkxt/Upnvkzk8EOTmfUfgiT
+	8owusuhQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39494)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tjgrh-0003Z0-1w;
+	Sun, 16 Feb 2025 15:47:29 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tjgrW-0005Ji-15;
+	Sun, 16 Feb 2025 15:47:18 +0000
+Date: Sun, 16 Feb 2025 15:47:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Lothar Rubusch <l.rubusch@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for Sophgo
+ SG2044 SoC
+Message-ID: <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
+References: <20250216123953.1252523-1-inochiama@gmail.com>
+ <20250216123953.1252523-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Wen Gu <guwen@linux.alibaba.com>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-To: Alexandra Winter <wintera@linux.ibm.com>, dust.li@linux.alibaba.com,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Julian Ruess <julianr@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>,
- Peter Oberparleiter <oberpar@linux.ibm.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
- <20250117021353.GF89233@linux.alibaba.com>
- <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
- <20250118153154.GI89233@linux.alibaba.com>
- <d1927140-443b-401c-92ff-f467c12d3e75@linux.ibm.com>
- <20250210050851.GS89233@linux.alibaba.com>
- <1e96806f-0a4e-4292-9483-928b1913d311@linux.ibm.com>
-In-Reply-To: <1e96806f-0a4e-4292-9483-928b1913d311@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250216123953.1252523-4-inochiama@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Sun, Feb 16, 2025 at 08:39:51PM +0800, Inochi Amaoto wrote:
+> +static void sophgo_dwmac_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+> +{
+> +	struct sophgo_dwmac *dwmac = priv;
+> +	long rate;
+> +	int ret;
+> +
+> +	rate = rgmii_clock(speed);
+> +	if (rate < 0) {
+> +		dev_err(dwmac->dev, "invalid speed %u\n", speed);
+> +		return;
+> +	}
+> +
+> +	ret = clk_set_rate(dwmac->clk_tx, rate);
+> +	if (ret)
+> +		dev_err(dwmac->dev, "failed to set tx rate %ld: %pe\n",
+> +			rate, ERR_PTR(ret));
+> +}
 
+There are a bunch of other platform support in stmmac that are doing
+the same:
 
-On 2025/2/10 17:38, Alexandra Winter wrote:
-> 
-> 
-> On 10.02.25 06:08, Dust Li wrote:
->> On 2025-01-28 17:04:53, Alexandra Winter wrote:
->>>
->>>
->>> On 18.01.25 16:31, Dust Li wrote:
->>>> On 2025-01-17 11:38:39, Niklas Schnelle wrote:
->>>>> On Fri, 2025-01-17 at 10:13 +0800, Dust Li wrote:
->>>>>>>
->>>>> ---8<---
->>>>>>> Here are some of my thoughts on the matter:
->>>>>>>>>
->>>>>>>>> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
->>>>>>>>> Device) instead of ISM (Internal Shared Memory).
->>>>>>>
->>>>>>>
->>>>>>> So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
->>>>>>
->>>>>> Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
->>>>>> shm_open(3)). SMD is also OK.
->>>>>>
->>>>>>>
->>>>>>>
->>>>>>> To my knowledge, a
->>>>>>>>> "Shared Memory Device" better encapsulates the functionality we're
->>>>>>>>> aiming to implement.
->>>>>>>
->>>>>>>
->>>>>>> Could you explain why that would be better?
->>>>>>> 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
->>>>>>> Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
->>>>>>> devices and by ism_loopback. So what is the benefit in changing it?
->>>>>>
->>>>>> I believe that if we are going to separate and refine the code, and add
->>>>>> a common subsystem, we should choose the most appropriate name.
->>>>>>
->>>>>> In my opinion, "ISM" doesn’t quite capture what the device provides.
->>>>>> Since we’re adding a "Device" that enables different entities (such as
->>>>>> processes or VMs) to perform shared memory communication, I think a more
->>>>>> fitting name would be better. If you have any alternative suggestions,
->>>>>> I’m open to them.
->>>>>
->>>>> I kept thinking about this a bit and I'd like to propose yet another
->>>>> name for this group of devices: Memory Communication Devices (MCD)
->>>>>
->>>>> One important point I see is that there is a bit of a misnomer in the
->>>>> existing ISM name in that our ISM device does in fact *not* share
->>>>> memory in the common sense of the "shared memory" wording. Instead it
->>>>> copies data between partitions of memory that share a common
->>>>> cache/memory hierarchy while not sharing the memory itself. loopback-
->>>>> ism and a possibly future virtio-ism on the other hand would share
->>>>> memory in the "shared memory" sense. Though I'd very much hope they
->>>>> will retain a copy mode to allow use in partition scenarios.
->>>>>
->>>>> With that background I think the common denominator between them and
->>>>> the main idea behind ISM is that they facilitate communication via
->>>>> memory buffers and very simple and reliable copy/share operations. I
->>>>> think this would also capture our planned use-case of devices (TTYs,
->>>>> block devices, framebuffers + HID etc) provided by a peer on top of
->>>>> such a memory communication device.
->>>>
->>>> Make sense, I agree with MCD.
->>>>
->>>> Best regard,
->>>> Dust
->>>>
->>>
->>>
->>
->> Hi Winter,
->>
->> Sorry for the late reply; we were on break for the Chinese Spring
->> Festival.
->>
->>>
->>> In the discussion with Andrew Lunn, it showed that
->>> a) we need an abstract description of 'ISM' devices (noted)
->>> b) DMBs (Direct Memory Buffers) are a critical differentiator.
->>>
->>> So what do your think of Direct Memory Communication (DMC) as class name for these devices?
->>>
->>> I don't have a strong preference (we could also stay with ISM). But DMC may be a bit more
->>> concrete than MCD or ISM.
->>
->> I personally prefer MCD over Direct Memory Communication (DMC).
->>
->> For loopback or Virtio-ISM, DMC seems like a good choice. However, for
->> IBM ISM, since there's a DMA copy involved, it doesn’t seem truly "Direct,"
->> does it?
->>
->> Additionally, since we are providing a device, MCD feels like a more
->> fitting choice, as it aligns better with the concept of a "device."
->>
->> Best regards,
->> Dust
-> 
-> Thank you for your thoughts, Dust.
-> For me the 'D as 'direct' is not so much about the number of copies, but more about the
-> aspect, that you can directly write at any offset into the buffer. I.e. no queues.
-> More like the D in DMA or RDMA.
-> 
+dwmac-s32.c is virtually identical
+dwmac-imx.c does the same, although has some pre-conditions
+dwmac-dwc-qos-eth.c is virually identical but the two steps are split
+  across a bunch of register writes
+dwmac-starfive.c looks the same
+dwmac-rk.c also
+dwmac-intel-plat.c also
 
-IMHO the 'D' means that the CPU copy does not need to be involved, and memory access
-only involves between memory and IO devices. So under this semantics, I think 'DMC'
-also applies to s390 ism device, since IIUC the s390 ism directly access to the memory
-which is passed down by move_data(). The exception is lo-ism, where the device
-actually doesn't need to access the memory(DMB), since the data has been put into the
-shared memory once the sendmsg() is called and no copy or move is needed. But this
-is not a violation of name, just a special kind of short-cut. So DMC makes sense
-to me.
+So, I wonder whether either this should be a helper, or whether core
+code should be doing this. Maybe something to look at as a part of
+this patch submission?
 
-> I am preparing a talk for netdev in March about this subject, and the more I work on it,
-> it seems to me that the buffers ('B'), that are
-> a) only authorized for a single remote device and
-> b) can be accessed at any offset
-> are the important differentiator compared other virtual devices.
-> So maybe 'D' for Dedicated?
-> 
-> I even came up with
-> dibs - Dedicated Internal Buffer Sharing or
-> dibc - Dedicated Internal Buffer Communication
-> (ok, I like the sound and look of the 'I'. But being on the same hardware as opposed
-> to RDMA is also an important aspect.)
-> 
-> 
-> MCD - 'memory communication device' sounds rather vague to me. But if it is the
-> smallest common denominator, i.e. the only thing we can all agree on, I could live with it.
-> 
+We really need to stop writing the same code in different ways and
+think more about how to reuse the code that's already present!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
