@@ -1,126 +1,95 @@
-Return-Path: <netdev+bounces-166733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0DEA371D8
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 03:25:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76996A371D9
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 03:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76DF16C1E7
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 02:25:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31E8416C279
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 02:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293BCD26D;
-	Sun, 16 Feb 2025 02:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA874D517;
+	Sun, 16 Feb 2025 02:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhAdDnbC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GakgaZxU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F73BA4A
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 02:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965DCBA4A;
+	Sun, 16 Feb 2025 02:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739672733; cv=none; b=EgjlMK+Ipkms4Hk4XMZ7LLMR7FlcrGtsNST8BzZZ+4X+MsAv7/6TSTl5pbf27K77JUBwm5NTpsSvRAfuv1I+aEcTD0SE/ywffceTc4BM3Ak9pxKZcLuShg/dko/09Vweq8lB9MIn27j0oak44rDJqWOHtvgNsBoUFUjuLOB7pXI=
+	t=1739672839; cv=none; b=ArGFudeb28s90KSa2ao3MfF3ySlR13TZhGSgr9MvPdzjq1QvquZx1FzIu/13OfXqOBnaLtMBcaeY/6Nv1GdxONheUZU7V8dODqBg8qKcHyxj8j1+SMyoU8UytOPuPGvOwzBs2u29USd6jy4GiECdxe4BC09KRH+8CU3ZT1RFdQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739672733; c=relaxed/simple;
-	bh=KIoynSTrGPbwBhubec3dWE+Kk/BFWUsb1nYs7nKdIV8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Eo8ceSbGFfU2Kj7DUw4LIs+k0tdmh/X4qCSlWh3bMaemHakckqtiz4BKyXqSkSloJpAEWOxxP2kADQ+T2t1ahamhZ98JYgMkB8DY42rThRFeilFlYLIgcDBj6webcq9GKmygag5td+veWxGo6KK1kEPuvhgT77b6BQi+hdkwE6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FhAdDnbC; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-545054d78edso3496820e87.1
-        for <netdev@vger.kernel.org>; Sat, 15 Feb 2025 18:25:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739672729; x=1740277529; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ASrEOVQkEZPh+kN+v1J+KP132rtpIrDrnqwoPnNxMqo=;
-        b=FhAdDnbCTfLGsKyB2Zg1P/70T69xxVFIWe3S/8MGL6y0ibg9nsWsiiBlYU75JhDv4K
-         u9Avp3HwdAdosDMh6BevGek9tFs6yzfQGTNVebYT//Wohu5FgtMH1gf6YJQg0Z/bVNMV
-         RtNLMVABD+vprhwZRK0+buh5C5M8LQB1/SqBP3zSHlWwo4AQL6Nat1w4vgfn6Odmj3M5
-         5F3DnpVqt0r8gfaTdmO30w1AMGkQHTUUcGUyNJaaMIKQ28gCxl2Nav9cAdDz/MK6hFcF
-         799fDiBEDBp6pXNc5E4tkH8rlgEnOl/HtA3HUGYdh2qwYmV52XRrWavWtOjZ/cTBnVQf
-         ZMDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739672729; x=1740277529;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ASrEOVQkEZPh+kN+v1J+KP132rtpIrDrnqwoPnNxMqo=;
-        b=VMc2nzV4x3XLiFBARfJXbDGJYOOorFZwh2PgSM7G8ORochwhLbR08XyqJEYl/WI6DW
-         spPo02yOvILrKW9El61qSvyYS1SlmYORHRFuJk37umLMRNezD6Rcf/mDLTLnQOIiuEHu
-         1cpXUuoTOpZYJajv8LmYMTGI22aV7BlROkISV66/lujEzgCb0ydRO07F3ip1ZmiEG/k/
-         773oy0mfPHEKIZVQCC124ERTAyXmBtiAkfl7msnj4yq8TMTPjvkN8FAuSlrt4plndPrC
-         zgbyWzcj8KDaybebMAK5G/6BbfvWZVEBgKVm+wG7FGNxkSP+PfxXPSAtAN25qt8P2oY4
-         oacA==
-X-Gm-Message-State: AOJu0YwCNvkzHVU6A4us17iuk6ONqhINv0fyxDuKubycOvJMtUUs6gn7
-	vnpu3W7DjSJAi+RNt45z7t5OiWYzjEQnMDTM8LKgfZ9ANiqRnlbBdHFkR7ahaxR54g==
-X-Gm-Gg: ASbGncs7za7z7hLN0JgH4MWLkS4YE2UtmQqP+7H/gYJf/i6bdtLXcu/9BVCzfK6q+dF
-	tLMT9/ua1ZM1cbTwSH6IlCGPPYeV8rlmBuw2FQ8KJZO6aWgyHko4gkSinLrkSxrZIij+PpsoU/k
-	PjmC1GxkzGApUBLL/WPb5gBjPz+ZQHpRjSc6svl991iJiIFJ2pYPZTSEjeaaIqgNO1npPuMPI2V
-	eCbaPMuTxtIaOJBS9liblAYw9mp+5CXEQ7FIVKZY+rSqz8rbkjbZOTtHQ8upX6Rydz6l3KLDHuQ
-	i8sC/3Qua/gB/XpmwtBKa2PM6FKuwoJxz/1hsMMWh59Km7dP/NKkx28B6DBGj6Imc+L6YpKV
-X-Google-Smtp-Source: AGHT+IGsWwR48jmDHceBazEENbz4yzovPow4fCDUuhPmx/sHdy1RrAkcl69CJqNIdOaBjyhGYnaXxQ==
-X-Received: by 2002:a05:6512:ba6:b0:545:271d:f8e with SMTP id 2adb3069b0e04-5452fe6533fmr1220767e87.29.1739672728895;
-        Sat, 15 Feb 2025 18:25:28 -0800 (PST)
-Received: from astra-student.rasu.local (109-252-121-101.nat.spd-mgts.ru. [109.252.121.101])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5453197f3f9sm303641e87.53.2025.02.15.18.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 18:25:27 -0800 (PST)
-From: Anton Moryakov <ant.v.moryakov@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH] ip: handle NULL return from localtime in strxf_time in
-Date: Sun, 16 Feb 2025 05:25:23 +0300
-Message-Id: <20250216022523.647342-1-ant.v.moryakov@gmail.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1739672839; c=relaxed/simple;
+	bh=y594kqnFYnmSKQC1AE3fsEF7zTOcAohwMW7qDULL64o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l3ra9z/28mcvdFlkhgm+qTaAgqvZD9itN7D1um2F+bfduzDK35wzokF/doAK40My+ZcHTFFbWF1eJS+gDQJ20vxzKw8HLDCAfnaiygY9Sg0dF/MbL3Ot5Gua4o7bfSkunTpPe2Gi4gXaPpfTsOyhmRBNSZ+BtlH/14mPc56WgS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GakgaZxU; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=g2yG0zZeHrh41/HUvAcj64EieaWG1lDiLMI8ggvgcIQ=; b=GakgaZxUxo5UvoGCj6Z78b2nFR
+	1ABLhDgqZLFZgRqbS0rm4ZExs1mSizKDwWXCTA3fzCQcZk3YZfu/U/T/YSE3lpWk23UTZquJie9Rr
+	y9GW7PI+UrBYGz2ALDO+oDT5U9S53yGWlwaqk1AuOUKPSX8x1Ce1DIGpJdYhzkmYVsVYLZxZ4JgeH
+	w7ryL7q86eqjgRawoHEnXijCTJjUIgFfefHus8xH0iEn8/lT28iuEzpdze0ET13c52a1OpSV5C+i+
+	ntv7NPzqZvCzSaANwx9c1rHGc+4JDUdhrwn/YWzPb1d5E9bLgjPKVnqTszqbq7oU8enRZ9zhAgek6
+	N+3nXd5g==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tjUA9-000gJl-1j;
+	Sun, 16 Feb 2025 10:27:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Feb 2025 10:27:02 +0800
+Date: Sun, 16 Feb 2025 10:27:02 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev,
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev,
+	x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <Z7FM9rhEA7n476EJ@gondor.apana.org.au>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
+ <20250215090412.46937c11@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250215090412.46937c11@kernel.org>
 
-Static analyzer reported:
-Pointer 'tp', returned from function 'localtime' at ipxfrm.c:352, may be NULL 
-and is dereferenced at ipxfrm.c:354 by calling function 'strftime'.
+On Sat, Feb 15, 2025 at 09:04:12AM -0800, Jakub Kicinski wrote:
+>
+> Can confirm, FWIW. I don't know as much about IPsec, but for TLS
+> lightweight SW-only crypto would be ideal.
 
-Corrections explained:
-The function localtime() may return NULL if the provided time value is
-invalid. This commit adds a check for NULL and handles the error case
-by copying "invalid-time" into the output buffer.
-Unlikely, but may return an error
+Please note that while CPU-only crypto is the best for networking,
+it actually operates in asynchronous mode on x86.  This is because
+RX occurs in softirq context, which may not be able to use SIMD on
+x86.
 
-Triggers found by static analyzer Svace.
-
-Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
-
----
- ip/ipxfrm.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/ip/ipxfrm.c b/ip/ipxfrm.c
-index 90d25aac..9bfd96ab 100644
---- a/ip/ipxfrm.c
-+++ b/ip/ipxfrm.c
-@@ -351,7 +351,12 @@ static const char *strxf_time(__u64 time)
- 		t = (long)time;
- 		tp = localtime(&t);
- 
--		strftime(str, sizeof(str), "%Y-%m-%d %T", tp);
-+		if (!tp) {
-+			/* Handle error case */
-+			strcpy(str, "invalid-time");
-+		} else {
-+			strftime(str, sizeof(str), "%Y-%m-%d %T", tp);
-+		}
- 	}
- 
- 	return str;
+Cheers,
 -- 
-2.30.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
