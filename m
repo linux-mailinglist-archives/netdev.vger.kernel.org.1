@@ -1,112 +1,152 @@
-Return-Path: <netdev+bounces-166763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2E7A373B4
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:59:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8699CA373C4
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 11:21:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8683ADF60
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 09:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3C116B7F6
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 10:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBB018DB03;
-	Sun, 16 Feb 2025 09:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F36818DB1A;
+	Sun, 16 Feb 2025 10:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t1jIDVnw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z3+Fvj93"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBC918C33B
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 09:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF77954F8C
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 10:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739699961; cv=none; b=nQ/kabQ4uVRg+pZLkwRiCQu4pj6RJX73oUQOMPUhzUMSPhsGLMckupuO40AwpSLz793/D7rK0ryvQnq1rwBRPlbKcBjuAnqU5VQbR7QDuj5BAJF1+nnaf3AAB7HZwSlG6nBE+RYJ+uwZbyOumgEip63MJXL745BvqQOYTZRAIms=
+	t=1739701272; cv=none; b=JyY07mhp6joTChDLckWE0HK+gnBfLK7ytGQHq6nbd8y6Y9eNeEUq79fMts6E/w+LFQEbAemKsKXSBQ3ouYpOv/JplL3xeYH6f8sUzaVnqSBM7+d9H4koNSMtndBegqd/5Aq6L3nG/5Dqy7Jmri975OO8gmsGxaWBc4oqrJz0Tjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739699961; c=relaxed/simple;
-	bh=JhbqIgw6KVqmKp440CFX6SqHipQonaNeojdpUoI/w+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TOYHKpKQXUyoC/YF3B3Jbu96062of301NpBJkKv1/qlbjrSORPYIbmkbAjqlyuO0ruhnaS/RHEjalQIyaCNyxsK5f60vF+JaygPi8gS1ddK0RT/1PM1CMXYuOHuOgUw9OQdR51J9nRhkTQPAl0OvH24n9FaNlQ+TSFu7ifGIhE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t1jIDVnw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3CC7C4CEDD;
-	Sun, 16 Feb 2025 09:59:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739699960;
-	bh=JhbqIgw6KVqmKp440CFX6SqHipQonaNeojdpUoI/w+A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t1jIDVnwARF2cUh1LGUxBd0Y0qlFvRzfZDyk6YSvuJHlsMtL/ts1+qBpfPSXXLMHa
-	 hJqA0+1DMlA+/6ebmSB2GgRA4Tid2BnmsVThLNdojtnA+RByYhTUe7fN7PcCdXVsYW
-	 Qke+sQpWjXob17XNii228uv02Aha+7lc4FALfwbWSHYpUUJ2J4HOb93ybPBNZBdnT+
-	 p3j4igNk4i2KoIV21uswwQBlTYCsp+1P69ifqK7NiFQir3XxcYOGS1hrxgJglR+z+f
-	 cWxksTqbvjtjqawcG10Yfxc+Vlo+LNtQYsiKgBtXZifLr4v0Cfif4osmjsRzBOBV3P
-	 BhWAC+8AlLrxQ==
-Date: Sun, 16 Feb 2025 11:59:15 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: tianx <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
-	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
-	weihg@yunsilicon.com, wanry@yunsilicon.com, horms@kernel.org,
-	parthiban.veerasooran@microchip.com, masahiroy@kernel.org
-Subject: Re: [PATCH v4 07/14] net-next/yunsilicon: Init auxiliary device
-Message-ID: <20250216095915.GT17863@unreal>
-References: <20250213091402.2067626-1-tianx@yunsilicon.com>
- <20250213091418.2067626-8-tianx@yunsilicon.com>
- <20250213143702.GN17863@unreal>
- <0e83c125-b69e-46a0-a760-fe090b53bc70@yunsilicon.com>
+	s=arc-20240116; t=1739701272; c=relaxed/simple;
+	bh=dWscY8tUOJUNlB4lFVJNy4OycVUtNdPgnUJuw5hmWug=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=EhId0AnwCQUsyY7ZkRjkVF6GDsmMtqEremlIHZQbJav8uAl025BEXorpxINVrOTQldEjBpizFi0HrgRxT86cH8b5kxSPyDIAsPcntzcmVzDOJaw1NgF9YFRKaGgjJp91BUQ/lAYWFlKzgV+wmLdNXvUQBHCFcKbTJypRHjm/lBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z3+Fvj93; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t0EvxuftoNBlZuzZvC5/AGF04/SaKmF4F/991w3Itbk=; b=Z3+Fvj93t1c4P4+kb+DDXo4z8v
+	WycKffYUp71lVm0p4Kwn52VxEDL6t/0j8IBnJRXkS22oT4B+HDdxTbMadodvvXxZ04sgHC+19fBkP
+	uBOOxlXC6FLwgoBpqCPN2g/hM/naBzPyfTJ7K41qEluGFpZFMmWr38vBGNcwXVhisVY0hOyeTmUDR
+	pYLTJXpz+RvSNjVTc9+9ry9ncFhNvB/i7Gby2QSHLRBo/GM5WzuoUWZunYlsP7Yz5Gj1TZWZoNdgU
+	XLSyL8XhYxyQ/yk6EeYjHCrj+HNqe/Y093BtuH1Oqu/O4zkcjX6SC0y5+em5/43dUBrRYz7o3o2TW
+	c69sieCA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38548 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tjbll-0002uh-37;
+	Sun, 16 Feb 2025 10:21:02 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tjblS-00448F-8v; Sun, 16 Feb 2025 10:20:42 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: xpcs: rearrange register definitions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0e83c125-b69e-46a0-a760-fe090b53bc70@yunsilicon.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tjblS-00448F-8v@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Sun, 16 Feb 2025 10:20:42 +0000
 
-On Fri, Feb 14, 2025 at 11:14:45AM +0800, tianx wrote:
-> On 2025/2/13 22:37, Leon Romanovsky wrote:
-> > On Thu, Feb 13, 2025 at 05:14:19PM +0800, Xin Tian wrote:
-> >> Initialize eth auxiliary device when pci probing
-> >>
-> >> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
-> >> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
-> >> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
-> >> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
-> >> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
-> >> ---
-> >>   .../ethernet/yunsilicon/xsc/common/xsc_core.h |  12 ++
-> >>   .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   3 +-
-> >>   .../net/ethernet/yunsilicon/xsc/pci/adev.c    | 110 ++++++++++++++++++
-> >>   .../net/ethernet/yunsilicon/xsc/pci/adev.h    |  14 +++
-> >>   .../net/ethernet/yunsilicon/xsc/pci/main.c    |  10 ++
-> >>   5 files changed, 148 insertions(+), 1 deletion(-)
-> >>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
-> >>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
-> > <...>
+Place register number definitions immediately above their field
+definitions and order by register number.
 
-<...>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/pcs/pcs-xpcs.h | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
 
-> >> +	[XSC_ADEV_IDX_ETH] = XSC_ETH_ADEV_NAME,
-> >> +};
-> >> +
-> >> +static void xsc_release_adev(struct device *dev)
-> >> +{
-> >> +	/* Doing nothing, but auxiliary bus requires a release function */
-> >> +}
-> > It is unlikely to be true in driver lifetime model. At least you should
-> > free xsc_adev here.
-> >
-> > Thanks
-> 
-> Hi Leon, xsc_adev has already been freed after calling 
-> auxiliary_device_uninit. If I free it again in the release callback, it 
-> will cause a double free.
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index 39d3f517b557..929fa238445e 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -55,23 +55,11 @@
+ /* Clause 37 Defines */
+ /* VR MII MMD registers offsets */
+ #define DW_VR_MII_DIG_CTRL1		0x8000
+-#define DW_VR_MII_AN_CTRL		0x8001
+-#define DW_VR_MII_AN_INTR_STS		0x8002
+-/* EEE Mode Control Register */
+-#define DW_VR_MII_EEE_MCTRL0		0x8006
+-#define DW_VR_MII_EEE_MCTRL1		0x800b
+-#define DW_VR_MII_DIG_CTRL2		0x80e1
+-
+-/* VR_MII_DIG_CTRL1 */
+ #define DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW		BIT(9)
+ #define DW_VR_MII_DIG_CTRL1_2G5_EN		BIT(2)
+ #define DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL	BIT(0)
+ 
+-/* VR_MII_DIG_CTRL2 */
+-#define DW_VR_MII_DIG_CTRL2_TX_POL_INV		BIT(4)
+-#define DW_VR_MII_DIG_CTRL2_RX_POL_INV		BIT(0)
+-
+-/* VR_MII_AN_CTRL */
++#define DW_VR_MII_AN_CTRL		0x8001
+ #define DW_VR_MII_AN_CTRL_8BIT			BIT(8)
+ #define DW_VR_MII_TX_CONFIG_MASK		BIT(3)
+ #define DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII	0x1
+@@ -81,7 +69,7 @@
+ #define DW_VR_MII_PCS_MODE_C37_SGMII		0x2
+ #define DW_VR_MII_AN_INTR_EN			BIT(0)
+ 
+-/* VR_MII_AN_INTR_STS */
++#define DW_VR_MII_AN_INTR_STS		0x8002
+ #define DW_VR_MII_AN_STS_C37_ANCMPLT_INTR	BIT(0)
+ #define DW_VR_MII_AN_STS_C37_ANSGM_FD		BIT(1)
+ #define DW_VR_MII_AN_STS_C37_ANSGM_SP		GENMASK(3, 2)
+@@ -90,19 +78,22 @@
+ #define DW_VR_MII_C37_ANSGM_SP_1000		0x2
+ #define DW_VR_MII_C37_ANSGM_SP_LNKSTS		BIT(4)
+ 
+-/* VR MII EEE Control 0 defines */
++#define DW_VR_MII_EEE_MCTRL0		0x8006
+ #define DW_VR_MII_EEE_LTX_EN			BIT(0)  /* LPI Tx Enable */
+ #define DW_VR_MII_EEE_LRX_EN			BIT(1)  /* LPI Rx Enable */
+ #define DW_VR_MII_EEE_TX_QUIET_EN		BIT(2)  /* Tx Quiet Enable */
+ #define DW_VR_MII_EEE_RX_QUIET_EN		BIT(3)  /* Rx Quiet Enable */
+ #define DW_VR_MII_EEE_TX_EN_CTRL		BIT(4)  /* Tx Control Enable */
+ #define DW_VR_MII_EEE_RX_EN_CTRL		BIT(7)  /* Rx Control Enable */
+-
+ #define DW_VR_MII_EEE_MULT_FACT_100NS		GENMASK(11, 8)
+ 
+-/* VR MII EEE Control 1 defines */
++#define DW_VR_MII_EEE_MCTRL1		0x800b
+ #define DW_VR_MII_EEE_TRN_LPI		BIT(0)	/* Transparent Mode Enable */
+ 
++#define DW_VR_MII_DIG_CTRL2		0x80e1
++#define DW_VR_MII_DIG_CTRL2_TX_POL_INV		BIT(4)
++#define DW_VR_MII_DIG_CTRL2_RX_POL_INV		BIT(0)
++
+ #define DW_XPCS_INFO_DECLARE(_name, _pcs, _pma)				\
+ 	static const struct dw_xpcs_info _name = { .pcs = _pcs, .pma = _pma }
+ 
+-- 
+2.30.2
 
-You should follow standard driver lifetime model. Your
-auxiliary_device_uninit() is wrong and shouldn't exist from the
-beginning.
-
-Thanks
 
