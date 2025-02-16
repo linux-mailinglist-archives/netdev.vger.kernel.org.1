@@ -1,59 +1,95 @@
-Return-Path: <netdev+bounces-166816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633C9A3765C
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 18:41:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999ECA37687
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 19:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85DA63B0EA2
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:41:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 884533AFBF1
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 18:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA9119E967;
-	Sun, 16 Feb 2025 17:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B7419DFA2;
+	Sun, 16 Feb 2025 18:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFXJwxrc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ix26ZGZp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2041.outbound.protection.outlook.com [40.107.223.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792BB42070
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 17:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739727672; cv=none; b=lvmOtj/Vx0P1xsyv0huROPrZxep0BPLpAzqM/yQRQDYh0faAa7L3f6TC8gDO5JJgK1qBuTP1mbq25gad1f/dWQXDlv7EYR5o+A/sCHdz4lhzEcTCtnzzukzQXUJCOjA51UGeqcmZQMel6uh9u/H5SM+mrYsl5cAUeOSbQaZ0v1k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739727672; c=relaxed/simple;
-	bh=YLYoQc7K5+dO3sEoXx4sFDC347pk3Vg0VVK7XKeAveE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z2j8h/1P2xh+yFT4mbxGFtLTD7YV6qC3FEyJNUG63A86VGadvycDuJtdjS3REZSjK7pkog/UrkT/6czw0uSGmHKVsTsBiZwhZAAYfSg315KpdGgFwHg5CXTz/YcKjdS6fHpGxujzQg1OkPBPLuapgWu+Y3ssErKUpEUTTbO7JnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AFXJwxrc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998C7C4CEE8;
-	Sun, 16 Feb 2025 17:41:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739727672;
-	bh=YLYoQc7K5+dO3sEoXx4sFDC347pk3Vg0VVK7XKeAveE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AFXJwxrcGK6DmlVhCsxiPnPUZxVU6jCPJ9i9GWCCLWKYknnbxUYi4QcScWAA9wbPl
-	 WwuHyDKxwwm3zcMneMiOn4/UkhEz4HYqarA3ZeHzVsCerA5PqXUSJu9iGS0Fe+UGps
-	 amFQayvzrR7uMYM2EyFIWj2Oe+VHBodrWHcLjhBGBbJUB8xy3kpqStPQWwBBiB6qdl
-	 jVcEBMIb+6T2o1K3wUN1Ohn7Jbd54VkZlMKHX2/vyTKGXocXf7jtXim+xbbBmTcrxL
-	 T0B1sKT+p7Muzym/JiZFWxqna8Pr9mXTLBDpFkohy55juT6+VPMZ4uyAVVTpnwFluM
-	 jHz9yDihVAq4A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	alexanderduyck@fb.com,
-	jdamato@fastly.com
-Subject: [PATCH net-next v3] eth: fbnic: support TCP segmentation offload
-Date: Sun, 16 Feb 2025 09:41:09 -0800
-Message-ID: <20250216174109.2808351-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97931154C05;
+	Sun, 16 Feb 2025 18:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739730327; cv=fail; b=hmUCB8GTzcUrdR4uZWLIytaseVV70HH/tp/Rn3KPLepNFGIdH21S0Z0TQ7d5iYpNBrVnT+EdKAzmD8r+nl2gAFvzhaOoo3+Ou351XOjAdbQ/gXEbcv/ma2etBVj5f4hhXzrfmOdRRnJe+JxMFAAsbNsGbPNcNOitkLPda5DjZAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739730327; c=relaxed/simple;
+	bh=1AwDE9keZRzcDbLzmvNLc0k9aPS+U76DQGlx5dIFxfI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qg+DH4h8g0rvePwdZ11EJ24S94OKf1QDf3NPOavCYa82lvgn04wKpxCNz0aS8os7o1elHligserPsQonh4dH/QNC9jas7UZR0+qeU1p3F7e0ktFe9xXM6xr9V4B/wO/Sbhs2GUHLRgAZ3TrXgfuaK/yxors3vcY+7LucBLXu/PI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ix26ZGZp; arc=fail smtp.client-ip=40.107.223.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ST9010/ruwT5onZPSRVA32uj6tEtCreJ4v6QwJ+wWRjF1lX8AiHe4fXWgy4wyrDttt7t84BW346aEooNtHE3uobv/hcmqLK/sqbafFRIaB6YhStxbtzdzcPjzdN57d+oekXi1f+/IrVzl9QnOn8pAQCICW5E2V+GXAbA+idyKzsniqxnwf5hGqQCWlEA3zQ45yRSNpVot7OqsDyRhvXcKVHqs4qW5GDWnW3GaHwKzeKaKVsCwSVUhSefcL5pJHeJS7ivZG1KinjnDpBEYvQGTo0nW22fUekG9MfsVTj8RtP4xH25s8y3rzRzrLpSqnHtiD5yHblIVKzh/IPN2wthEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/bjvLjtpubhcxkFawv5eUv9mFul1EUxUT1+jZ0iZv9E=;
+ b=yBGNJn/001qNm+W+YuVuKUjH9/KNl5/F79Rkjtm671Wf/WmJyBN5CBahtD+FrSBtRFhicH08gTJURkXJCUD9eM25mJVhcvCbKBjTgWkG2ddRLmmauXHEYro3vzkg8CBtuGGFAKDKxOqDSfVUEMdNWriTvRLSsmbOINQE4VnwIVC+yf65xQB2yUisqRTVKyIPkFRVse2hxD7VWJGXhakm62UzISsTTHbJaXG6pa07wT1m4Ze6ELnD9btyiowT3PbfDAcUWA/36EWnhsyhv2AB0z6vFswTyWMxZrsF45bkRZ9D6BuxB1cr7FvMxE3hEdfvdtN4ZZJwj+ivfzS0UMY5Ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/bjvLjtpubhcxkFawv5eUv9mFul1EUxUT1+jZ0iZv9E=;
+ b=Ix26ZGZpKwJ/gu9otoYlyd5EJW0M2FrToPaVlcIiR41vMnLad4f7pk1WlPKMsxfjs8eIPSAB3vM6/qA0DIe9GJAoBpq6L1U1wqVfHupi1VblJX59K018RtEVHbKB6FGNzCcHjC83TJUao8VNSGFw6q/LB3Qd35ul/AifU6A+WB/E07dhz9K7YS3BOcjbY8DPWCPJP4CL08fonxk7RPxn5ydgyniG09CQYag/FWFRjrqCQbbq2PnVEYbyL6R8bEWVzn/ZDD9fIyqBZUv6WXY753FF5pyI9rCbuw4wriZRAEJzgQH2XzMHw9dBrZuo2LzqAjX+pE/Tu2yat0Xhyezz2Q==
+Received: from BN9PR03CA0977.namprd03.prod.outlook.com (2603:10b6:408:109::22)
+ by MW4PR12MB7335.namprd12.prod.outlook.com (2603:10b6:303:22b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Sun, 16 Feb
+ 2025 18:25:17 +0000
+Received: from BL02EPF00021F68.namprd02.prod.outlook.com
+ (2603:10b6:408:109:cafe::a7) by BN9PR03CA0977.outlook.office365.com
+ (2603:10b6:408:109::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.19 via Frontend Transport; Sun,
+ 16 Feb 2025 18:25:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF00021F68.mail.protection.outlook.com (10.167.249.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.11 via Frontend Transport; Sun, 16 Feb 2025 18:25:13 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 16 Feb
+ 2025 10:25:03 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 16 Feb
+ 2025 10:25:02 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Sun, 16
+ Feb 2025 10:24:59 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Edward Cree <ecree.xilinx@gmail.com>, Ahmed Zaki
+	<ahmed.zaki@intel.com>, <linux-doc@vger.kernel.org>, Gal Pressman
+	<gal@nvidia.com>
+Subject: [PATCH net-next v3 0/5] Symmetric OR-XOR RSS hash
+Date: Sun, 16 Feb 2025 20:24:48 +0200
+Message-ID: <20250216182453.226325-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,351 +97,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F68:EE_|MW4PR12MB7335:EE_
+X-MS-Office365-Filtering-Correlation-Id: c59a4400-2e88-4a9c-1f15-08dd4eb7413c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|82310400026|36860700013|376014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?i4LTo0Mv9tZ+f+9DXdvcFvfZ2cRBv0q0V0vdseoshVLH9yvT4zwHHjgjoATr?=
+ =?us-ascii?Q?zHn0q1wKVJ3maQBwHpF1+ToCFsK4EQ9vgiMD1gyxIL85iw7pg4S+hzDOhNlA?=
+ =?us-ascii?Q?7IsX9xaFpCr6EifbI3QSPZ4I6mYkFGWpjQMM4+2RgrFOL3o4HXe9FhffgY54?=
+ =?us-ascii?Q?ojq4gQx3A63C2dYsvYLJ9VoqIjte86ctRD7ib60tvngwpBjta84LEIqGR2Nr?=
+ =?us-ascii?Q?xzwaA0aIuDXhUUOqxtl7OorjZEYMbu2M5UjRb5S8Nz9U5yeNtHscXGAw3fVq?=
+ =?us-ascii?Q?E8hbONbtWanbW+LjSoR17wQt5fEDULRvrL6VFADlLtReojjnbKJGlU3ra4Sr?=
+ =?us-ascii?Q?MM3mQAB+GICPTgicTbA1bYpQ2sfdBBcunJQIH65tGbtev/mE1zlieDVs6/Lq?=
+ =?us-ascii?Q?aEOFSNy9aMZeA2FAEp1wk898G/MiaBXMyP85+XzxSdmHHO0UijrYz2SgWMxg?=
+ =?us-ascii?Q?BUGiRZNbqRCd8zgzoeIpEbY9kyEFDBPdJ5Eq+S8zby1McuaCiRKIbg6IlNOn?=
+ =?us-ascii?Q?IBWH7tO4y/PcAP7VcnQ/kcbK07nGSLkoEq0zVNss1BPHMri9RSSf7LC8fFVv?=
+ =?us-ascii?Q?a0nem5lwYpk2DhBB1Xg6CQys6S7IoQ6S769o6nsZybSr3HYkSZzb/VMLEkfT?=
+ =?us-ascii?Q?+qU321eY7z1cr9x1mjpftFxQsGveTtuJXpLtTr/SbQ7gzAV3IpKt159c+G/Y?=
+ =?us-ascii?Q?IM2tDHHy9LuoxHCfywYA1bMSvO5pxffxUv80F5bTR8UH17pWoBvS2zqD0L2P?=
+ =?us-ascii?Q?GfgExqHpwAWt+Gu6Vif91F4gdit7gEN0K4mxnAWscHc6hpw74GwvVPzQiI+t?=
+ =?us-ascii?Q?4es9I2KfVIf1b45m97GRhNRGBXWAL2hie/EmmgwsXwrxg/G8rp8TfgMXTp8V?=
+ =?us-ascii?Q?B3T5ydvitSANx32mEqoXzD8nknl/kmn9oxRPDqGqJtz7AYjDKlCos22XmjLL?=
+ =?us-ascii?Q?byn2J7DYQIu/maPncmMhObXOc/dTLjgymwdS52D3k2ycC5yJ/DE6fFzuzp2T?=
+ =?us-ascii?Q?2CGJ5ZU9oxroISsuwrvhNUSpYT2YJlha6pfG4OBfVFcfqD73zfBdXYO+U9aP?=
+ =?us-ascii?Q?u7GENNVLWjE2u/DzD8/xwr+a19N/DRMtYPPlB88m/y20xO4kt4BSHnAxrfjy?=
+ =?us-ascii?Q?gdXKi3JuP5DXjfMy2VbA2fbEZwkm9a+WCmPIZy+OjdAjO1qz12gRK58pg4vW?=
+ =?us-ascii?Q?Kb8gxR7n9eQ/hdtJctc52qvUzKeBMp8DgEEkPr03E54kJ9VE1pVsU8Ne0G9B?=
+ =?us-ascii?Q?GkFAAJPryx5pTGyUrLYOCeoGMwH7NpmYtSi3ZFxzckRS2m7k6ETrg57Jxulz?=
+ =?us-ascii?Q?+BZZmXPYjP7mmDZTzm9R7CJpSf2VNMbIaYF4z0vx6daTQAE80vV6FW1v+OfY?=
+ =?us-ascii?Q?RTgWmPNmTGtlPwKEe/CIRKVq27EYyml/JErOOLzdRa1OvaIY7biaDI+g4TQ1?=
+ =?us-ascii?Q?u7nJZDMYetjslQ0zXlXrXTiofSn8DCFXhxijNVvMkkoTj8D19PpInlqGexh7?=
+ =?us-ascii?Q?qoczYnBfVeYpBFc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(82310400026)(36860700013)(376014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2025 18:25:13.4888
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c59a4400-2e88-4a9c-1f15-08dd4eb7413c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F68.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7335
 
-Add TSO support to the driver. Device can handle unencapsulated or
-IPv6-in-IPv6 packets. Any other tunnel stacks are handled with
-GSO partial.
+Add support for a new type of input_xfrm: Symmetric OR-XOR.
+Symmetric OR-XOR performs hash as follows:
+(SRC_IP | DST_IP, SRC_IP ^ DST_IP, SRC_PORT | DST_PORT, SRC_PORT ^ DST_PORT)
 
-Validate that the packet can be offloaded in ndo_features_check.
-Main thing we need to check for is that the header geometry can
-be expressed in the decriptor fields (offsets aren't too large).
+Configuration is done through ethtool -x/X command.
+For mlx5, the default is already symmetric hash, this patch now exposes
+this to userspace and allows enabling/disabling of the feature.
 
-Report number of TSO super-packets via the qstat API.
+Changelog -
+v2->v3: https://lore.kernel.org/netdev/20250205135341.542720-1-gal@nvidia.com/
+* Reorder fields in ethtool_ops (Jakub)
+* Add a selftest (Jakub)
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v3:
- - add missing feature clearing in ndo_features_check
-v2: https://lore.kernel.org/20250214235207.2312352-1-kuba@kernel.org
- - checkpatch -> whitespace
-v1: https://lore.kernel.org/20250213005540.1345735-1-kuba@kernel.org
+v1->v2: https://lore.kernel.org/all/20250203150039.519301-1-gal@nvidia.com/
+* Fix wording in comments (Edward)
 
-CC: alexanderduyck@fb.com
-CC: jdamato@fastly.com
----
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   3 +
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |   1 +
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  25 ++-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 146 +++++++++++++++++-
- 4 files changed, 163 insertions(+), 12 deletions(-)
+Thanks,
+Gal
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index a392ac1cc4f2..b84b447a8d8a 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -13,6 +13,9 @@
- 
- #define FBNIC_MAX_NAPI_VECTORS		128u
- 
-+/* Natively supported tunnel GSO features (not thru GSO_PARTIAL) */
-+#define FBNIC_TUN_GSO_FEATURES		NETIF_F_GSO_IPXIP6
-+
- struct fbnic_net {
- 	struct fbnic_ring *tx[FBNIC_MAX_TXQS];
- 	struct fbnic_ring *rx[FBNIC_MAX_RXQS];
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index b53a7d28ecd3..89a5c394f846 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -59,6 +59,7 @@ struct fbnic_queue_stats {
- 	union {
- 		struct {
- 			u64 csum_partial;
-+			u64 lso;
- 			u64 ts_packets;
- 			u64 ts_lost;
- 			u64 stop;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index b12672d1607e..c59f1ce8de32 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -517,7 +517,7 @@ static void fbnic_get_queue_stats_tx(struct net_device *dev, int idx,
- 	struct fbnic_net *fbn = netdev_priv(dev);
- 	struct fbnic_ring *txr = fbn->tx[idx];
- 	struct fbnic_queue_stats *stats;
--	u64 stop, wake, csum;
-+	u64 stop, wake, csum, lso;
- 	unsigned int start;
- 	u64 bytes, packets;
- 
-@@ -530,13 +530,15 @@ static void fbnic_get_queue_stats_tx(struct net_device *dev, int idx,
- 		bytes = stats->bytes;
- 		packets = stats->packets;
- 		csum = stats->twq.csum_partial;
-+		lso = stats->twq.lso;
- 		stop = stats->twq.stop;
- 		wake = stats->twq.wake;
- 	} while (u64_stats_fetch_retry(&stats->syncp, start));
- 
- 	tx->bytes = bytes;
- 	tx->packets = packets;
--	tx->needs_csum = csum;
-+	tx->needs_csum = csum + lso;
-+	tx->hw_gso_wire_packets = lso;
- 	tx->stop = stop;
- 	tx->wake = wake;
- }
-@@ -549,7 +551,8 @@ static void fbnic_get_base_stats(struct net_device *dev,
- 
- 	tx->bytes = fbn->tx_stats.bytes;
- 	tx->packets = fbn->tx_stats.packets;
--	tx->needs_csum = fbn->tx_stats.twq.csum_partial;
-+	tx->needs_csum = fbn->tx_stats.twq.csum_partial + fbn->tx_stats.twq.lso;
-+	tx->hw_gso_wire_packets = fbn->tx_stats.twq.lso;
- 	tx->stop = fbn->tx_stats.twq.stop;
- 	tx->wake = fbn->tx_stats.twq.wake;
- 
-@@ -650,11 +653,25 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 
- 	netdev->priv_flags |= IFF_UNICAST_FLT;
- 
-+	netdev->gso_partial_features =
-+		NETIF_F_GSO_GRE |
-+		NETIF_F_GSO_GRE_CSUM |
-+		NETIF_F_GSO_IPXIP4 |
-+		NETIF_F_GSO_UDP_TUNNEL |
-+		NETIF_F_GSO_UDP_TUNNEL_CSUM;
-+
- 	netdev->features |=
-+		netdev->gso_partial_features |
-+		FBNIC_TUN_GSO_FEATURES |
- 		NETIF_F_RXHASH |
- 		NETIF_F_SG |
- 		NETIF_F_HW_CSUM |
--		NETIF_F_RXCSUM;
-+		NETIF_F_RXCSUM |
-+		NETIF_F_TSO |
-+		NETIF_F_TSO_ECN |
-+		NETIF_F_TSO6 |
-+		NETIF_F_GSO_PARTIAL |
-+		NETIF_F_GSO_UDP_L4;
- 
- 	netdev->hw_features |= netdev->features;
- 	netdev->vlan_features |= netdev->features;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 24d2b528b66c..b2e544a66de3 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -6,6 +6,7 @@
- #include <linux/pci.h>
- #include <net/netdev_queues.h>
- #include <net/page_pool/helpers.h>
-+#include <net/tcp.h>
- 
- #include "fbnic.h"
- #include "fbnic_csr.h"
-@@ -18,6 +19,7 @@ enum {
- 
- struct fbnic_xmit_cb {
- 	u32 bytecount;
-+	u16 gso_segs;
- 	u8 desc_count;
- 	u8 flags;
- 	int hw_head;
-@@ -178,9 +180,73 @@ static bool fbnic_tx_tstamp(struct sk_buff *skb)
- 	return true;
- }
- 
-+static bool
-+fbnic_tx_lso(struct fbnic_ring *ring, struct sk_buff *skb,
-+	     struct skb_shared_info *shinfo, __le64 *meta,
-+	     unsigned int *l2len, unsigned int *i3len)
-+{
-+	unsigned int l3_type, l4_type, l4len, hdrlen;
-+	unsigned char *l4hdr;
-+	__be16 payload_len;
-+
-+	if (unlikely(skb_cow_head(skb, 0)))
-+		return true;
-+
-+	if (shinfo->gso_type & SKB_GSO_PARTIAL) {
-+		l3_type = FBNIC_TWD_L3_TYPE_OTHER;
-+	} else if (!skb->encapsulation) {
-+		if (ip_hdr(skb)->version == 4)
-+			l3_type = FBNIC_TWD_L3_TYPE_IPV4;
-+		else
-+			l3_type = FBNIC_TWD_L3_TYPE_IPV6;
-+	} else {
-+		unsigned int o3len;
-+
-+		o3len = skb_inner_network_header(skb) - skb_network_header(skb);
-+		*i3len -= o3len;
-+		*meta |= cpu_to_le64(FIELD_PREP(FBNIC_TWD_L3_OHLEN_MASK,
-+						o3len / 2));
-+		l3_type = FBNIC_TWD_L3_TYPE_V6V6;
-+	}
-+
-+	l4hdr = skb_checksum_start(skb);
-+	payload_len = cpu_to_be16(skb->len - (l4hdr - skb->data));
-+
-+	if (shinfo->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) {
-+		struct tcphdr *tcph = (struct tcphdr *)l4hdr;
-+
-+		l4_type = FBNIC_TWD_L4_TYPE_TCP;
-+		l4len = __tcp_hdrlen((struct tcphdr *)l4hdr);
-+		csum_replace_by_diff(&tcph->check, (__force __wsum)payload_len);
-+	} else {
-+		struct udphdr *udph = (struct udphdr *)l4hdr;
-+
-+		l4_type = FBNIC_TWD_L4_TYPE_UDP;
-+		l4len = sizeof(struct udphdr);
-+		csum_replace_by_diff(&udph->check, (__force __wsum)payload_len);
-+	}
-+
-+	hdrlen = (l4hdr - skb->data) + l4len;
-+	*meta |= cpu_to_le64(FIELD_PREP(FBNIC_TWD_L3_TYPE_MASK, l3_type) |
-+			     FIELD_PREP(FBNIC_TWD_L4_TYPE_MASK, l4_type) |
-+			     FIELD_PREP(FBNIC_TWD_L4_HLEN_MASK, l4len / 4) |
-+			     FIELD_PREP(FBNIC_TWD_MSS_MASK, shinfo->gso_size) |
-+			     FBNIC_TWD_FLAG_REQ_LSO);
-+
-+	FBNIC_XMIT_CB(skb)->bytecount += (shinfo->gso_segs - 1) * hdrlen;
-+	FBNIC_XMIT_CB(skb)->gso_segs = shinfo->gso_segs;
-+
-+	u64_stats_update_begin(&ring->stats.syncp);
-+	ring->stats.twq.lso += shinfo->gso_segs;
-+	u64_stats_update_end(&ring->stats.syncp);
-+
-+	return false;
-+}
-+
- static bool
- fbnic_tx_offloads(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- {
-+	struct skb_shared_info *shinfo = skb_shinfo(skb);
- 	unsigned int l2len, i3len;
- 
- 	if (fbnic_tx_tstamp(skb))
-@@ -195,10 +261,15 @@ fbnic_tx_offloads(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
- 	*meta |= cpu_to_le64(FIELD_PREP(FBNIC_TWD_CSUM_OFFSET_MASK,
- 					skb->csum_offset / 2));
- 
--	*meta |= cpu_to_le64(FBNIC_TWD_FLAG_REQ_CSO);
--	u64_stats_update_begin(&ring->stats.syncp);
--	ring->stats.twq.csum_partial++;
--	u64_stats_update_end(&ring->stats.syncp);
-+	if (shinfo->gso_size) {
-+		if (fbnic_tx_lso(ring, skb, shinfo, meta, &l2len, &i3len))
-+			return true;
-+	} else {
-+		*meta |= cpu_to_le64(FBNIC_TWD_FLAG_REQ_CSO);
-+		u64_stats_update_begin(&ring->stats.syncp);
-+		ring->stats.twq.csum_partial++;
-+		u64_stats_update_end(&ring->stats.syncp);
-+	}
- 
- 	*meta |= cpu_to_le64(FIELD_PREP(FBNIC_TWD_L2_HLEN_MASK, l2len / 2) |
- 			     FIELD_PREP(FBNIC_TWD_L3_IHLEN_MASK, i3len / 2));
-@@ -341,7 +412,9 @@ fbnic_xmit_frame_ring(struct sk_buff *skb, struct fbnic_ring *ring)
- 
- 	/* Write all members within DWORD to condense this into 2 4B writes */
- 	FBNIC_XMIT_CB(skb)->bytecount = skb->len;
-+	FBNIC_XMIT_CB(skb)->gso_segs = 1;
- 	FBNIC_XMIT_CB(skb)->desc_count = 0;
-+	FBNIC_XMIT_CB(skb)->flags = 0;
- 
- 	if (fbnic_tx_offloads(ring, skb, meta))
- 		goto err_free;
-@@ -368,6 +441,59 @@ netdev_tx_t fbnic_xmit_frame(struct sk_buff *skb, struct net_device *dev)
- 	return fbnic_xmit_frame_ring(skb, fbn->tx[q_map]);
- }
- 
-+static netdev_features_t
-+fbnic_features_check_encap_gso(struct sk_buff *skb, struct net_device *dev,
-+			       netdev_features_t features, unsigned int l3len)
-+{
-+	netdev_features_t skb_gso_features;
-+	struct ipv6hdr *ip6_hdr;
-+	unsigned char l4_hdr;
-+	unsigned int start;
-+	__be16 frag_off;
-+
-+	/* Require MANGLEID for GSO_PARTIAL of IPv4.
-+	 * In theory we could support TSO with single, innermost v4 header
-+	 * by pretending everything before it is L2, but that needs to be
-+	 * parsed case by case.. so leaving it for when the need arises.
-+	 */
-+	if (!(features & NETIF_F_TSO_MANGLEID))
-+		features &= ~NETIF_F_TSO;
-+
-+	skb_gso_features = skb_shinfo(skb)->gso_type;
-+	skb_gso_features <<= NETIF_F_GSO_SHIFT;
-+
-+	/* We'd only clear the native GSO features, so don't bother validating
-+	 * if the match can only be on those supported thru GSO_PARTIAL.
-+	 */
-+	if (!(skb_gso_features & FBNIC_TUN_GSO_FEATURES))
-+		return features;
-+
-+	/* We can only do IPv6-in-IPv6, not v4-in-v6. It'd be nice
-+	 * to fall back to partial for this, or any failure below.
-+	 * This is just an optimization, UDPv4 will be caught later on.
-+	 */
-+	if (skb_gso_features & NETIF_F_TSO)
-+		return features & ~FBNIC_TUN_GSO_FEATURES;
-+
-+	/* Inner headers multiple of 2 */
-+	if ((skb_inner_network_header(skb) - skb_network_header(skb)) % 2)
-+		return features & ~FBNIC_TUN_GSO_FEATURES;
-+
-+	/* Encapsulated GSO packet, make 100% sure it's IPv6-in-IPv6. */
-+	ip6_hdr = ipv6_hdr(skb);
-+	if (ip6_hdr->version != 6)
-+		return features & ~FBNIC_TUN_GSO_FEATURES;
-+
-+	l4_hdr = ip6_hdr->nexthdr;
-+	start = (unsigned char *)ip6_hdr - skb->data + sizeof(struct ipv6hdr);
-+	start = ipv6_skip_exthdr(skb, start, &l4_hdr, &frag_off);
-+	if (frag_off || l4_hdr != IPPROTO_IPV6 ||
-+	    skb->data + start != skb_inner_network_header(skb))
-+		return features & ~FBNIC_TUN_GSO_FEATURES;
-+
-+	return features;
-+}
-+
- netdev_features_t
- fbnic_features_check(struct sk_buff *skb, struct net_device *dev,
- 		     netdev_features_t features)
-@@ -388,9 +514,12 @@ fbnic_features_check(struct sk_buff *skb, struct net_device *dev,
- 	    !FIELD_FIT(FBNIC_TWD_L2_HLEN_MASK, l2len / 2) ||
- 	    !FIELD_FIT(FBNIC_TWD_L3_IHLEN_MASK, l3len / 2) ||
- 	    !FIELD_FIT(FBNIC_TWD_CSUM_OFFSET_MASK, skb->csum_offset / 2))
--		return features & ~NETIF_F_CSUM_MASK;
-+		return features & ~(NETIF_F_CSUM_MASK | NETIF_F_GSO_MASK);
- 
--	return features;
-+	if (likely(!skb->encapsulation) || !skb_is_gso(skb))
-+		return features;
-+
-+	return fbnic_features_check_encap_gso(skb, dev, features, l3len);
- }
- 
- static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
-@@ -441,7 +570,7 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
- 		}
- 
- 		total_bytes += FBNIC_XMIT_CB(skb)->bytecount;
--		total_packets += 1;
-+		total_packets += FBNIC_XMIT_CB(skb)->gso_segs;
- 
- 		napi_consume_skb(skb, napi_budget);
- 	}
-@@ -1105,12 +1234,13 @@ void fbnic_aggregate_ring_tx_counters(struct fbnic_net *fbn,
- 	fbn->tx_stats.packets += stats->packets;
- 	fbn->tx_stats.dropped += stats->dropped;
- 	fbn->tx_stats.twq.csum_partial += stats->twq.csum_partial;
-+	fbn->tx_stats.twq.lso += stats->twq.lso;
- 	fbn->tx_stats.twq.ts_lost += stats->twq.ts_lost;
- 	fbn->tx_stats.twq.ts_packets += stats->twq.ts_packets;
- 	fbn->tx_stats.twq.stop += stats->twq.stop;
- 	fbn->tx_stats.twq.wake += stats->twq.wake;
- 	/* Remember to add new stats here */
--	BUILD_BUG_ON(sizeof(fbn->tx_stats.twq) / 8 != 5);
-+	BUILD_BUG_ON(sizeof(fbn->tx_stats.twq) / 8 != 6);
- }
- 
- static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
+Gal Pressman (5):
+  ethtool: Symmetric OR-XOR RSS hash
+  net/mlx5e: Symmetric OR-XOR RSS hash control
+  selftests: drv-net: Make rand_port() get a port more reliably
+  selftests: drv-net: Introduce a function that checks whether a port is
+    available on remote host
+  selftests: drv-net-hw: Add a test for symmetric RSS hash
+
+ Documentation/networking/ethtool-netlink.rst  |  2 +-
+ Documentation/networking/scaling.rst          | 14 +++-
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |  2 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/rss.c  | 13 +++-
+ .../net/ethernet/mellanox/mlx5/core/en/rss.h  |  4 +-
+ .../ethernet/mellanox/mlx5/core/en/rx_res.c   | 11 +--
+ .../ethernet/mellanox/mlx5/core/en/rx_res.h   |  5 +-
+ .../net/ethernet/mellanox/mlx5/core/en/tir.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/tir.h  |  1 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 17 +++-
+ include/linux/ethtool.h                       |  5 +-
+ include/uapi/linux/ethtool.h                  |  4 +
+ net/ethtool/ioctl.c                           |  8 +-
+ .../testing/selftests/drivers/net/hw/Makefile |  1 +
+ .../drivers/net/hw/rss_input_xfrm.py          | 77 +++++++++++++++++++
+ .../selftests/drivers/net/lib/py/load.py      |  7 +-
+ tools/testing/selftests/net/lib/py/utils.py   | 22 +++---
+ 18 files changed, 155 insertions(+), 42 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
+
 -- 
-2.48.1
+2.40.1
 
 
