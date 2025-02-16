@@ -1,214 +1,134 @@
-Return-Path: <netdev+bounces-166784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640C8A374D9
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:49:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43883A374E9
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:07:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A99D7A2F43
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 14:48:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7978168F23
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E417193402;
-	Sun, 16 Feb 2025 14:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9C7156F57;
+	Sun, 16 Feb 2025 15:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6I4ikH0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iwREtN0j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE1653A7;
-	Sun, 16 Feb 2025 14:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B512904
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 15:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739717345; cv=none; b=tCicYJdkMeyjPHMHGxLI+hCm45bcCzsYoORoJTDrRrFQF2pFWjmveV2b66DCr6LiJ2bRz7JUoszulCj8ty1IojWgNyvU0ZKYaAIQ1UzuzaAEf+1w1OZ3vFbe/ysWf3sVsjr8aFZQQECbY96DozAilQeG3JgoEz6vWljGt4HgCwE=
+	t=1739718418; cv=none; b=k5s4m7RERKt/Ba2RSFBPK6zNsRlkotxJUhpBJEfzxGG2VD2kFVAbPn5o7Pu97U3IinpIZAGHUveqIRNX86T9xhOcYjV4HXsHZVKgJUWtSej7x0Z3AiQeKRrc9GeTfrfNTPU41180NSMaHgcVtMiTKXxRKpHJXPd9Kc3lo5b+rQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739717345; c=relaxed/simple;
-	bh=v541oYN4LKXknEHBVuJVfB05L2eJ4A19Ug3V3oUP4dA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cc7ZufJOr7U8a4qXr9qHKgdo1wjTOoTh14jXfAsbkPtw+7CMXlxrn2wuxIsavK0rUEv7y9Gs7862JA72yvjC5I2WE0FFQJLfaTKIEgZcLCKloShd4rSEcq9POS0lrbjETrTiayOEzz5GylAhxrfouuJ7Oo58ex7aAsHuBOMXGZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R6I4ikH0; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-8558229e184so13307539f.3;
-        Sun, 16 Feb 2025 06:49:03 -0800 (PST)
+	s=arc-20240116; t=1739718418; c=relaxed/simple;
+	bh=nxw8Nev6SqEYpTxQ8uBuOeCoWM3WvUQB7H/MC5U99kU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZsHl1cHqs38nlLN+E4g25UDfR1aHUUoiLY6HkaVLLPkT8X+9vOsr6C4MQv82/CtfIjTtZDF/DNF/C58gZNF3fnqyVVIGzj64R2F1dj/URhSugjEr+hyejJnRNH+HWdfogjW1sttuX+jyycl7WF3zyKTfHvvLYNUYQCDKLyAZh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iwREtN0j; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-abb7f539c35so194737066b.1
+        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 07:06:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739717343; x=1740322143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v541oYN4LKXknEHBVuJVfB05L2eJ4A19Ug3V3oUP4dA=;
-        b=R6I4ikH0i7QK0/gmKmNwTK0hvs1MjklRHY3tUtalIWNiecVMAgIfTk7jwKWsVmblln
-         9i9BvsfCeh+5gdGCsJnUrFEbGzmtzG3eF4V1jP8J9sFvmSzXZUYFcmPEH9vMPn6eMDZe
-         cIieIzwgP6cD20MXdKoDgILz5q9RF53wjc0KDoA8tdNJoYRwi46Mf+6XjR/PjTr3dgTc
-         ZgmM7fp00degHX/kDAdl3DCFJCxeWvMJqgyT1DhQohkDIFRnWZY0zaggNhNVm5yV/T3k
-         vRVizS8qoAXxjzCAGzczfDQv2Ro+a18Lg2WpBJQh2bAew1T7VJyHUg8/gN42rRz/eAxc
-         1vZg==
+        d=linaro.org; s=google; t=1739718413; x=1740323213; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=d2BVLff+bH8ac9wbzIHLSzMyCaDJG+zXJr3g0suTDBA=;
+        b=iwREtN0jBddmSwT4SoAFokSsVUDczSQoi6faA/dM10kLt0CzFIRD+l1dWB7KU0XxzM
+         syiiFBC4MiO9m9sFIbmE+foK3N78b+EjOCzxM+p1A6rkKtCiNaqlCaAPRiZGkk0+g0Ur
+         eRG/RCb/1hLGsxhuqiwL3eiFoKXYOOu70rnoDgbbSMN6tHlT4E/4LPsaV7pgMgdAAIQY
+         tH/DEyQ96WXU2zHxy8nIaCWhswdScIyYi1+D7BlCYQ2uiep4/Uh+v3LR6vptAkFFvtnP
+         b/mk3qSU7f9f9S4BqzwXcm1dNGTyrz3bgOYRc3fEh1TzDG/gkNOXFyDsbEgr8JdZDBAq
+         bK0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739717343; x=1740322143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v541oYN4LKXknEHBVuJVfB05L2eJ4A19Ug3V3oUP4dA=;
-        b=MyI83i7kB6YAJxvjvL4rAw7h3a38Id0umRnqC9jaDctudk/ZNc7sPOQWRX52GwFlK4
-         T0c6F/xuVHsBjG7qteypxHCNvdVgDKsteGj4eHlpu8eTOrUrqUCqGQU0VMc9AxmchJ3F
-         MGc7OdGfVYI0qAzAif7f8uSF34nXgbr1I+Xrtb4hT+ZvMV9bGCXKVMyR0h7fLM3NYKGN
-         NuLKkQnE8HAN+EWLGgzHHmxnBI9wsyemzL7fH1dlmqMLNu5IDD6EA/lT65jNBtQ/yfb1
-         rFoBuz3K+BDTfIfC1Ipa62U/T3o3DwBNpUzmqLGoRYV6xbS2UKByKCnoIMg+MI6XulFf
-         g8Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCVj3AkSyljNtkomYzTAhXjosJSdm+lQHHj/QbFWenFLj4EIDdNMntxgLpgFLpEXAkQ1QnU=@vger.kernel.org, AJvYcCW9a0/tI7kbKKoekjsW7xo/B1QpK0VmhyGQkubkHMtuBiqa/vMMC/6eA05mYw18KtOV8/2/9LE5@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjW35DNsx9rC8EgWvstTuA5sQabALv+xPz0lk1tkW8uK+O8/pz
-	NxacqkFDqMCEDbe8rjO09rd+LbJC300rQs+J/LVGJrckROxVY0jBZxM0qvp6qPps+n+EM8Sb90u
-	TLqDjYMKGun0/Eq/g0cX0PCWatt4=
-X-Gm-Gg: ASbGncvVYvtFhyu/BLsGge7UaZ9mNdj5VDflIRTRuMe/+YgyhjKrtI0wvo+0CPziZfI
-	uvE4vSr6vvj+kUHRLDhnwhdGkgg/NPlBJ1TogM3EoqUQORsoKp6UCBXoHDIWBf4HwKOavO7On
-X-Google-Smtp-Source: AGHT+IG3/aB3bhu4torf1LTXIS3c28cHadzav4Wvs1rEYQ66BEtV8AkdQBjP0KC1lzbBaxBGAXfMhYQixQpQF4zJbyU=
-X-Received: by 2002:a05:6e02:198d:b0:3d0:4a82:3f42 with SMTP id
- e9e14a558f8ab-3d280946f56mr41335535ab.16.1739717342692; Sun, 16 Feb 2025
- 06:49:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739718413; x=1740323213;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d2BVLff+bH8ac9wbzIHLSzMyCaDJG+zXJr3g0suTDBA=;
+        b=lEsZc5VK5Af6RNFjgZfWD1Ndtyf5i+ezbnpX4g53oEIk4unQGtUU5S9UhP49bZtRVD
+         Coa4/2uC9A9zK8x9G9xB+XWc5eQJ18D1I2dzXgeNGMF9ksnDLMPZm4mwylLjxMa0uR1p
+         fMLk3X7bjx0AB13/4F0g0xEIjrWNxoW/DmVYplZWgoOx60Hd+VIXLjermcQnTR6ocSl2
+         gvEMnQ+QveyI2ynt8L3zuDPbmQ70oaSecfFoLvj/azFTQyanHBWkyTMxkmQi20YBj8u7
+         5ZXzPI0XudyDuC6VNLGitb/dEsuu0Eks6C0bS+SSmxsPscJA01r9HeOEIF8dqjbRcUm2
+         l2Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8SZKVb22p8LShTYTWNJAucrgXd91+GUx9Y4czI0egKZlh5MrBrCi+/IQOeebHYtI2GweJ/Nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOpzktpQiGUDJWnegB5WHdItaFQsDykIRmAWnSuICBc/FUaD59
+	LbjFNEJDGkfILEeujgHIW/VzpWCS8RFg9we9fhXf5Yax5+3ueA0P8gHmyyCs2Cs=
+X-Gm-Gg: ASbGncsw4dac0UQtGwx4HPFsbrRCicPRbh/K609bMzse2K+9UfIH9x812vr0lkCDyA1
+	DaRODwLpowy6DPFSG+QLRxGc99uEwmI91XLQWHmTNeb/mwEIDBJjHgq140o1E9tPg9XUgZndUB9
+	bIamyNF6umZTt+orF0YWqrZhgOlzyvKkv8fWApxhxQLwqomoumPi9z+Alsdo07qK0+IUoZgiRKb
+	SSSqsd59UIbxXWHU78FQB9ErhAUkzdBX6NgKCWuvVLgOgCnQO7IKRtxuUCBx5onlfiXkgI1irBW
+	d719pYKbNRT528I0iqsr
+X-Google-Smtp-Source: AGHT+IEjA8dBmVjqLtOxUvCyJ5+C3X850rmK5fS/NUpiGnloFuDE97wDeIc/uZbNo2FaFL28KFTb3Q==
+X-Received: by 2002:a17:906:7312:b0:ab7:bcf1:264 with SMTP id a640c23a62f3a-abb70a7a559mr730846866b.5.1739718412531;
+        Sun, 16 Feb 2025 07:06:52 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-abb961594absm86470166b.111.2025.02.16.07.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 07:06:52 -0800 (PST)
+Date: Sun, 16 Feb 2025 18:06:48 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, pierre@stackhpc.com,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
+Message-ID: <64053332-cee0-49d8-a3ae-9ec0809882c0@stanley.mountain>
+References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+ <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214010038.54131-1-kerneljasonxing@gmail.com>
- <20250214010038.54131-9-kerneljasonxing@gmail.com> <67b0ad8819948_36e344294a7@willemb.c.googlers.com.notmuch>
- <CAL+tcoAJHSfBrfdn-Cmk=9ZkMNSdkGYKJbZ0mynn_=qU9Mp1Ag@mail.gmail.com>
- <67b0d831bf13f_381893294f4@willemb.c.googlers.com.notmuch>
- <CAL+tcoDhtBFjVBMWObHq3LaSNXgJN_UWBVONAqD=t7CRYN_PAg@mail.gmail.com>
- <89989129-9336-4863-a66e-e9c8adc60072@linux.dev> <CAL+tcoDB=Vv=smpP9rUaj3tug2Vt6dQz9Ay8DRxMwAs-Q9iexg@mail.gmail.com>
- <67b1f7f02320f_3f936429436@willemb.c.googlers.com.notmuch> <CAL+tcoCWmzFvz=GtbmfVoDwacTDXi2XeHt-Fc10rxc5S2WMN_Q@mail.gmail.com>
-In-Reply-To: <CAL+tcoCWmzFvz=GtbmfVoDwacTDXi2XeHt-Fc10rxc5S2WMN_Q@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 16 Feb 2025 22:48:26 +0800
-X-Gm-Features: AWEUYZkiW0AhQrlKaFnBShibTFBGkti51Rwws2qTO_nw13Fy9d17HAjL48LcVjc
-Message-ID: <CAL+tcoAjdaBPZE96T=YrgtZVUZNTmFpXr8C2+iVXLSZKB+01cA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v11 08/12] bpf: add BPF_SOCK_OPS_TS_HW_OPT_CB callback
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
 
-On Sun, Feb 16, 2025 at 10:45=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> On Sun, Feb 16, 2025 at 10:36=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > On Sun, Feb 16, 2025 at 6:58=E2=80=AFAM Martin KaFai Lau <martin.lau@=
-linux.dev> wrote:
-> > > >
-> > > > On 2/15/25 2:23 PM, Jason Xing wrote:
-> > > > > On Sun, Feb 16, 2025 at 2:08=E2=80=AFAM Willem de Bruijn
-> > > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >>
-> > > > >> Jason Xing wrote:
-> > > > >>> On Sat, Feb 15, 2025 at 11:06=E2=80=AFPM Willem de Bruijn
-> > > > >>> <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >>>>
-> > > > >>>> Jason Xing wrote:
-> > > > >>>>> Support hw SCM_TSTAMP_SND case for bpf timestamping.
-> > > > >>>>>
-> > > > >>>>> Add a new sock_ops callback, BPF_SOCK_OPS_TS_HW_OPT_CB. This
-> > > > >>>>> callback will occur at the same timestamping point as the use=
-r
-> > > > >>>>> space's hardware SCM_TSTAMP_SND. The BPF program can use it t=
-o
-> > > > >>>>> get the same SCM_TSTAMP_SND timestamp without modifying the
-> > > > >>>>> user-space application.
-> > > > >>>>>
-> > > > >>>>> To avoid increasing the code complexity, replace SKBTX_HW_TST=
-AMP
-> > > > >>>>> with SKBTX_HW_TSTAMP_NOBPF instead of changing numerous calle=
-rs
-> > > > >>>>> from driver side using SKBTX_HW_TSTAMP. The new definition of
-> > > > >>>>> SKBTX_HW_TSTAMP means the combination tests of socket timesta=
-mping
-> > > > >>>>> and bpf timestamping. After this patch, drivers can work unde=
-r the
-> > > > >>>>> bpf timestamping.
-> > > > >>>>>
-> > > > >>>>> Considering some drivers doesn't assign the skb with hardware
-> > > > >>>>> timestamp,
-> > > > >>>>
-> > > > >>>> This is not for a real technical limitation, like the skb perh=
-aps
-> > > > >>>> being cloned or shared?
-> > > > >>>
-> > > > >>> Agreed on this point. I'm kind of familiar with I40E, so I dare=
- to say
-> > > > >>> the reason why it doesn't assign the hwtstamp is because the sk=
-b will
-> > > > >>> soon be destroyed, that is to say, it's pointless to assign the
-> > > > >>> timestamp.
-> > > > >>
-> > > > >> Makes sense.
-> > > > >>
-> > > > >> But that does not ensure that the skb is exclusively owned. Nor =
-that
-> > > > >> the same is true for all drivers using this API (which is not sm=
-all,
-> > > > >> but small enough to manually review if need be).
-> > > > >>
-> > > > >> The first two examples I happened to look at, i40e and bnx2x, bo=
-th use
-> > > > >> skb_get() to get a non-exclusive skb reference for their ptp_tx_=
-skb.
-> > > >
-> > > > I think the existing __skb_tstamp_tx() function is also assigning t=
-o
-> > > > skb_hwtstamps(skb). The skb may be cloned from the orig_skb first, =
-but they
-> > > > still share the same shinfo. My understanding is that this patch is=
- assigning to
-> > > > the shinfo earlier, so it should not have changed the driver's expe=
-ctation on
-> > > > the skb_hwtstamps(skb) after calling __skb_tstamp_tx(). If there ar=
-e drivers
-> > > > assuming exclusive access to the skb_hwtstamps(skb), probably it is=
- something
-> > > > that needs to be addressed regardless and should not be the common =
-case?
-> > >
-> > > Right, it's also what I was trying to say but missed. Thanks for the
-> > > supplementary info:)
-> >
-> > That existing behavior looks dodgy then, too.
-> >
-> > I don't have time to look into it deeply right now. But it seems to go
-> > back all the way to the introduction of hw timestamping in commit
-> > ac45f602ee3d in 2009.
->
-> Right. And hardware timestamping has been used for many years, I presume.
->
-> >
-> > I can see how it works in that nothing else holding a clone will
-> > likely have a reason to touch those fields. But that does not make it
-> > correct.
-> >
-> > Your point that the new code is no worse than today probably is true.
->
-> Right.
->
-> > But when we spot something we prefer to fix it probably. Will need a
-> > deeper look..
->
-> Got it. I added it to my to-do list. If you don't mind, I plan to take
-> a deep look in March and then get back to you because recently I'm
-> occupied by many things. I need to study some of the drivers that
-> don't use skb_get() there.
->
+On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
+> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
+> > Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> > from xa_alloc_cyclic() in scheduler code [1]. The same is done in
+> > devlink_rel_alloc().
+> 
+> If the same bug exists twice it might exist more times. Did you find
+> this instance by searching the whole tree? Or just networking?
+> 
+> This is also something which would be good to have the static
+> analysers check for. I wounder if smatch can check this?
 
-Oh, sorry, I forgot to ask: what should we do next regarding this series ?
+That's a great idea, thanks!  I'll try a couple experiments and see what
+works tomorrow.  I've add these lines to check_zero_to_err_ptr.c
 
-Thanks,
-Jason
+   183          max = rl_max(estate_rl(sm->state));
+   184          if (max.value > 0 && !sval_is_a_max(max))
+   185                  sm_warning("passing non-max range '%s' to '%s'", sm->state->name, fn);
+   186  
+
+I'm hoping this one works.  It complains about any positive returns
+except for when the return is "some non-zero value".
+
+   194                  if (estate_get_single_value(tmp->state, &sval) &&
+   195                      (sval.value < -4096 || sval.value > 0)) {
+   196                          sm_warning("passing invalid error code %lld to '%s'", sval.value, fn);
+   197                          return;
+   198                  }
+
+This one might miss some bugs but it should catch most stuff and have few
+false positives.  Both of them work on this example.
+
+net/devlink/core.c:122 devlink_rel_alloc() warn: passing non-max range '(-4095)-(-1),1' to 'ERR_PTR'
+net/devlink/core.c:122 devlink_rel_alloc() warn: passing invalid error code 1 to 'ERR_PTR'
+
+regards,
+dan carpenter
+
 
