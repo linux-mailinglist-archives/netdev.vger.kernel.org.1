@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-166813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 369C7A37622
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 18:00:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30931A37628
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 18:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0098216D085
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:00:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4754B7A270C
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 17:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039E819D081;
-	Sun, 16 Feb 2025 16:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3F51922DD;
+	Sun, 16 Feb 2025 17:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xkCExdn1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B8uFo8Lw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667C119CC28;
-	Sun, 16 Feb 2025 16:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6C93A1DB;
+	Sun, 16 Feb 2025 17:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739725196; cv=none; b=m/4gUoCt7wX0aK6G3V1EbBPgZIEIw6kDMuqO+e5BmcFF5DI/vY0BLjVeXZo0CKupLl6oVd9BVx6b+9DshuflS6S8lNy23U199RMk6bMegrdsskFjNoj6boJHqbVM41qRIm/JVhcP3Bu/fMpsWKP7odv8UTYyxEtFtKTkGJmQB6A=
+	t=1739725647; cv=none; b=HAO9nqal0ZmiyghHCVUMm0ypLHHfX6uRWUdpIX8G69jrI/KT7rcZzud7ss2IZsoLxauc9Z+hWgKCPDfxpDNPNSwsr8PoqKvC+baXa8YCPMV+1EzcYeiHuc6nVqz6MVUT00/sD/3VeF8kTGzqBvEfyPzVN9S+bWgywJrZaFA3IDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739725196; c=relaxed/simple;
-	bh=DhySorGZIc9kQXBR4kFIxyKQSoB8SqkmLxPlhPKbfkU=;
+	s=arc-20240116; t=1739725647; c=relaxed/simple;
+	bh=VTFXIGwapkjlOdIp4WRhTQfD70mAJDYBz/TQyMO7S6w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F2c5RWR2FJNCCWfMm+lMZce1Y5tMyVcDozaEMjf3PMJikOB0HO0snuLyXddsj0ZGAZi7VhoC6MzjEp+/f6bXhKcodHSwRqjc4VnsK4l2YcEViuXWjlQ+W9c5vkdGFO0QsSz9xEiAyiyXBZQHDNnta8tvZPCgpnICd54arLts8u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xkCExdn1; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KzXvuJXnZLqOSUC0aE9hhtzX46rdADIWuJ65GwrX6eoHsOuuKOnB1cfYVTPFZBqF6a4ucReWSfIeo7qYl0z1pcjgTlfkct/ao3kJ6pq6+YtwxKVzwe4dVl3DeU2JyGJ0v6hxQO1RFLEIaPvmzyvAaDCdsyVWa8MSsWUFx8E1+HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B8uFo8Lw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,16 +36,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SGjXFxJmVk/FKeJ46IrEjqRmgY6gQvmYuvqL1kDeGQ4=; b=xkCExdn11EsAZtDgmuPdYucM2j
-	bK3pZs2vK93GF1VCsaJw9PI1Rx6zDnUDYt3fCnsSGGmkrntc4cSBM6QhC8CwBAKoDhfZkXjhqumGV
-	mE26uEYC00UAVkIj4JZSjPkjpP2ho+epU+iwoSH56gh2332eCOTh7rsxa6Xvd0ngofbo=;
+	bh=7hZ1fSExpzVyKpRFgU6VF7mxJS6w1IMWmpYoUWdP8zU=; b=B8uFo8Lw1gxr7PSjRioQ8WDC7M
+	RB4rvTQkIiL+FxUZ/tl2g/b8/c8gA69f6BVQgjHWJDfZt1svMu4dwCcCywlxvzTi4QV7K91m9XQvu
+	7Mx6JqYWdHVCF8qDfYC5MdDw7siI5bws4rdjL42azaIOwmkrGk0oZ7JGDtqruXvdmrBk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tjhzP-00Ehw8-Nx; Sun, 16 Feb 2025 17:59:31 +0100
-Date: Sun, 16 Feb 2025 17:59:31 +0100
+	id 1tji6j-00Ei2d-C0; Sun, 16 Feb 2025 18:07:05 +0100
+Date: Sun, 16 Feb 2025 18:07:05 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Inochi Amaoto <inochiama@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -76,13 +77,13 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	sophgo@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v5 2/3] net: stmmac: platform: Add
- snps,dwmac-5.30a IP compatible string
-Message-ID: <9dcab9aa-6d1e-4804-82ff-fb8dfa434df7@lunn.ch>
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for Sophgo
+ SG2044 SoC
+Message-ID: <5e481b95-3cf8-4f71-a76b-939d96e1c4f3@lunn.ch>
 References: <20250216123953.1252523-1-inochiama@gmail.com>
- <20250216123953.1252523-3-inochiama@gmail.com>
+ <20250216123953.1252523-4-inochiama@gmail.com>
+ <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,25 +92,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250216123953.1252523-3-inochiama@gmail.com>
+In-Reply-To: <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
 
-On Sun, Feb 16, 2025 at 08:39:50PM +0800, Inochi Amaoto wrote:
-> Add "snps,dwmac-5.30a" compatible string for 5.30a version that can avoid
-> to define some platform data in the glue layer.
+On Sun, Feb 16, 2025 at 03:47:18PM +0000, Russell King (Oracle) wrote:
+> On Sun, Feb 16, 2025 at 08:39:51PM +0800, Inochi Amaoto wrote:
+> > +static void sophgo_dwmac_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+> > +{
+> > +	struct sophgo_dwmac *dwmac = priv;
+> > +	long rate;
+> > +	int ret;
+> > +
+> > +	rate = rgmii_clock(speed);
+> > +	if (rate < 0) {
+> > +		dev_err(dwmac->dev, "invalid speed %u\n", speed);
+> > +		return;
+> > +	}
+> > +
+> > +	ret = clk_set_rate(dwmac->clk_tx, rate);
+> > +	if (ret)
+> > +		dev_err(dwmac->dev, "failed to set tx rate %ld: %pe\n",
+> > +			rate, ERR_PTR(ret));
+> > +}
 > 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> Reviewed-by: Romain Gantois <romain.gantois@bootlin.com>
+> There are a bunch of other platform support in stmmac that are doing
+> the same:
+> 
+> dwmac-s32.c is virtually identical
+> dwmac-imx.c does the same, although has some pre-conditions
+> dwmac-dwc-qos-eth.c is virually identical but the two steps are split
+>   across a bunch of register writes
+> dwmac-starfive.c looks the same
+> dwmac-rk.c also
+> dwmac-intel-plat.c also
+> 
+> So, I wonder whether either this should be a helper, or whether core
+> code should be doing this. Maybe something to look at as a part of
+> this patch submission?
 
-Ideally, this would be two patches, one adding the
-stmmac_gmac4_compats[] with the existing compatibles, and then a patch
-adding snps,dwmac-5.30a. Logically, these are different, so two
-patches.
+Inochi, please could you look at the datasheet for this IP. Is the
+transmit clock a part of the IP? Can we expect all devices integrating
+this IP to have such a clock? That would be a good indicator the clock
+handling should be moved into the core.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+	Andrew
 
