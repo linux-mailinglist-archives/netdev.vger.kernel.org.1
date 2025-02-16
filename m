@@ -1,134 +1,160 @@
-Return-Path: <netdev+bounces-166785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43883A374E9
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:07:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A98A374EB
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 16:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7978168F23
-	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:06:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC3BC188446E
+	for <lists+netdev@lfdr.de>; Sun, 16 Feb 2025 15:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9C7156F57;
-	Sun, 16 Feb 2025 15:06:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8315C1990A2;
+	Sun, 16 Feb 2025 15:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iwREtN0j"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="oQdo1u38"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B512904
-	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 15:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E04678F45
+	for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 15:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739718418; cv=none; b=k5s4m7RERKt/Ba2RSFBPK6zNsRlkotxJUhpBJEfzxGG2VD2kFVAbPn5o7Pu97U3IinpIZAGHUveqIRNX86T9xhOcYjV4HXsHZVKgJUWtSej7x0Z3AiQeKRrc9GeTfrfNTPU41180NSMaHgcVtMiTKXxRKpHJXPd9Kc3lo5b+rQo=
+	t=1739718615; cv=none; b=KWC8zbH517f91+mj0qqxca6J+eCqo16pfVD8AmtbdYFlVxK8Q9pbPCrx1/xF/65G+0boB9IxFeQlDrGmipGGYdziNBKu6LdYLHdX5NlLsqONlA0BJp49HvrIAahZhLs59GPpgAtvs++cQAMUNfKjwgSAumSJeuaJW6An6WOCqqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739718418; c=relaxed/simple;
-	bh=nxw8Nev6SqEYpTxQ8uBuOeCoWM3WvUQB7H/MC5U99kU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZsHl1cHqs38nlLN+E4g25UDfR1aHUUoiLY6HkaVLLPkT8X+9vOsr6C4MQv82/CtfIjTtZDF/DNF/C58gZNF3fnqyVVIGzj64R2F1dj/URhSugjEr+hyejJnRNH+HWdfogjW1sttuX+jyycl7WF3zyKTfHvvLYNUYQCDKLyAZh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iwREtN0j; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-abb7f539c35so194737066b.1
-        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 07:06:54 -0800 (PST)
+	s=arc-20240116; t=1739718615; c=relaxed/simple;
+	bh=7ExF0LBX/qghoeSiQHKm/aN/R2QQJsGgdHWO2KKmWCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=apRG/sJ11N+7VPf+68hbj6CxcgtiexwEiTYEimTDWZ/EEJOl2qpnh1HNvQCB/rCQ/6T8DumEmCPPjCrvMBr84jhSxumnG0p4H10GqVai5OKsttL35X0ZsiRAMXmI1fY9NjLd4C/zlIuWg3XyAQCLyGP1TuuA96Uo+KCkiJSR5zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=oQdo1u38; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-abb8f586d68so64502666b.0
+        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 07:10:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739718413; x=1740323213; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d2BVLff+bH8ac9wbzIHLSzMyCaDJG+zXJr3g0suTDBA=;
-        b=iwREtN0jBddmSwT4SoAFokSsVUDczSQoi6faA/dM10kLt0CzFIRD+l1dWB7KU0XxzM
-         syiiFBC4MiO9m9sFIbmE+foK3N78b+EjOCzxM+p1A6rkKtCiNaqlCaAPRiZGkk0+g0Ur
-         eRG/RCb/1hLGsxhuqiwL3eiFoKXYOOu70rnoDgbbSMN6tHlT4E/4LPsaV7pgMgdAAIQY
-         tH/DEyQ96WXU2zHxy8nIaCWhswdScIyYi1+D7BlCYQ2uiep4/Uh+v3LR6vptAkFFvtnP
-         b/mk3qSU7f9f9S4BqzwXcm1dNGTyrz3bgOYRc3fEh1TzDG/gkNOXFyDsbEgr8JdZDBAq
-         bK0A==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1739718612; x=1740323412; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ij4A6kvxWu+Hg4KiMOQry5de3PPhSfmpkY0YNQ7zBMM=;
+        b=oQdo1u387NymAJYEPFTFYgxQwsLCeJLz/b7nUvwmCAQv65IAFELr9LLRIy2luVG2I9
+         QucXr6yPHgNRD0ukK/bmtGLNSsMLBxNXJhduD8YZTGXghUSqmSRzVuHwVf1YAR6X36sy
+         pUX/qwjTEllTzPaJsZ+WTjA5f5/GhoM0nq2KcaPd/BVLJa6vDzdE/fwsyA/WLVB24Vy4
+         0U3w6S6BWlTiPvo8BsO2ZqysR1ViS8PRVAPxpR5UqxZjoc+JWT8ZVkkS/3pS4x/AJduT
+         58twXIXsO78FBTGuzqMRYHUnPqhUG8h8NiqWyVqZlR6iSEjtsHJBAfU0qeDs5vgExOoq
+         zZgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739718413; x=1740323213;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d2BVLff+bH8ac9wbzIHLSzMyCaDJG+zXJr3g0suTDBA=;
-        b=lEsZc5VK5Af6RNFjgZfWD1Ndtyf5i+ezbnpX4g53oEIk4unQGtUU5S9UhP49bZtRVD
-         Coa4/2uC9A9zK8x9G9xB+XWc5eQJ18D1I2dzXgeNGMF9ksnDLMPZm4mwylLjxMa0uR1p
-         fMLk3X7bjx0AB13/4F0g0xEIjrWNxoW/DmVYplZWgoOx60Hd+VIXLjermcQnTR6ocSl2
-         gvEMnQ+QveyI2ynt8L3zuDPbmQ70oaSecfFoLvj/azFTQyanHBWkyTMxkmQi20YBj8u7
-         5ZXzPI0XudyDuC6VNLGitb/dEsuu0Eks6C0bS+SSmxsPscJA01r9HeOEIF8dqjbRcUm2
-         l2Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCX8SZKVb22p8LShTYTWNJAucrgXd91+GUx9Y4czI0egKZlh5MrBrCi+/IQOeebHYtI2GweJ/Nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOpzktpQiGUDJWnegB5WHdItaFQsDykIRmAWnSuICBc/FUaD59
-	LbjFNEJDGkfILEeujgHIW/VzpWCS8RFg9we9fhXf5Yax5+3ueA0P8gHmyyCs2Cs=
-X-Gm-Gg: ASbGncsw4dac0UQtGwx4HPFsbrRCicPRbh/K609bMzse2K+9UfIH9x812vr0lkCDyA1
-	DaRODwLpowy6DPFSG+QLRxGc99uEwmI91XLQWHmTNeb/mwEIDBJjHgq140o1E9tPg9XUgZndUB9
-	bIamyNF6umZTt+orF0YWqrZhgOlzyvKkv8fWApxhxQLwqomoumPi9z+Alsdo07qK0+IUoZgiRKb
-	SSSqsd59UIbxXWHU78FQB9ErhAUkzdBX6NgKCWuvVLgOgCnQO7IKRtxuUCBx5onlfiXkgI1irBW
-	d719pYKbNRT528I0iqsr
-X-Google-Smtp-Source: AGHT+IEjA8dBmVjqLtOxUvCyJ5+C3X850rmK5fS/NUpiGnloFuDE97wDeIc/uZbNo2FaFL28KFTb3Q==
-X-Received: by 2002:a17:906:7312:b0:ab7:bcf1:264 with SMTP id a640c23a62f3a-abb70a7a559mr730846866b.5.1739718412531;
-        Sun, 16 Feb 2025 07:06:52 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-abb961594absm86470166b.111.2025.02.16.07.06.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Feb 2025 07:06:52 -0800 (PST)
-Date: Sun, 16 Feb 2025 18:06:48 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, pierre@stackhpc.com,
-	Dan Carpenter <error27@gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-Message-ID: <64053332-cee0-49d8-a3ae-9ec0809882c0@stanley.mountain>
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
- <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+        d=1e100.net; s=20230601; t=1739718612; x=1740323412;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ij4A6kvxWu+Hg4KiMOQry5de3PPhSfmpkY0YNQ7zBMM=;
+        b=cQtU8Lra5nyjygwK5WWJ0aYTnQJBx26otMODzLPgyKFVx5e7Q5XX5MFqoDj4kKxYjU
+         qjNq6s0oVX6T78OCguzzYDRazZOe0EDWUkRQzsKar1CYIYvRfF8b5jiSB5LUjpM4/xY7
+         NYgat6Zl4UerBdNg70kpt9Vty1kssjhwnIrNM0NywLbSCyzLkackONxb4pl5EwPCb2Ql
+         euyjiII02q6f4taVqi+WgfT7fuOr+SVyhTOeclfwKKi4d2rOpjOSggptJMQWIufGXhc+
+         MT0ghB+NmoYmNmddy/185CZ5ICsOu1yLQHKM6mNZ3BkDnwUV2FFnH6Rs5WF2zESvdv3x
+         Cktg==
+X-Forwarded-Encrypted: i=1; AJvYcCWgtVN/Mo5iut40OQ3YJz0p5RYl55hXIUXM9egtlPkdLo04SdbFsvu4KIyWwLfrEEGjhiFgctU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+ginDXhiXMa+7g7HWWhX8i/TW2qT0SYJyxYbI4WlA7iHEeWeT
+	MPBWBIDvqqvMkSkiLz39rSF4IPyLfBZ4i6Q9Dox+B8h1GXBHcJ6k0QQdS3yidC8=
+X-Gm-Gg: ASbGncvGglJPoC2js8LWsLg/2A3EhJ8ZQYAh0ae1PLuZNBGJwlaRCay7vNokd3VhCJX
+	56uhZ6ploly7wCMdiH39HQW0B7MuEbSP93YBuMs9U00ze6WIK+UjUvg/Ji/Plz7ku32Cupgzw9C
+	Fa4MmbN8xrxrFbNYEXd4oOz3aDO5CNzmkxOLIvSEZiSmScbPXTNuhAGpsF8P3fYoqwLkKLEpkog
+	IfkaKmwufYlj9Es27sqZijg4oc7SuQQnoYuPSaVoDPhN/Tb3BhEyaivTzj7m/Blzdfu25IjuMuv
+	jMVZKAev2bAqIudvvb4nrN6ryNjnZUpS7vQn4sc4rJl/Vro=
+X-Google-Smtp-Source: AGHT+IFQh0rL/Bg1EuwMpta4dBVvkkJWxoGM82Qgv8oKgCY6nes2v7mgUC/hhvgX4IM8hChl5iYP3Q==
+X-Received: by 2002:a17:906:6a03:b0:ab7:1816:e8a with SMTP id a640c23a62f3a-abb70d9e25cmr724855366b.36.1739718611596;
+        Sun, 16 Feb 2025 07:10:11 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb94e4d0adsm97434866b.56.2025.02.16.07.10.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Feb 2025 07:10:11 -0800 (PST)
+Message-ID: <507f8250-c240-43a2-beee-a46c9d626916@blackwall.org>
+Date: Sun, 16 Feb 2025 17:10:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/5] vxlan: Join / leave MC group when
+ reconfigured
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Roopa Prabhu <roopa@nvidia.com>,
+ Menglong Dong <menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>
+References: <cover.1739548836.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <cover.1739548836.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
-> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> > Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> > from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> > devlink_rel_alloc().
+On 2/14/25 18:18, Petr Machata wrote:
+> When a vxlan netdevice is brought up, if its default remote is a multicast
+> address, the device joins the indicated group.
 > 
-> If the same bug exists twice it might exist more times. Did you find
-> this instance by searching the whole tree? Or just networking?
+> Therefore when the multicast remote address changes, the device should
+> leave the current group and subscribe to the new one. Similarly when the
+> interface used for endpoint communication is changed in a situation when
+> multicast remote is configured. This is currently not done.
 > 
-> This is also something which would be good to have the static
-> analysers check for. I wounder if smatch can check this?
+> Both vxlan_igmp_join() and vxlan_igmp_leave() can however fail. So it is
+> possible that with such fix, the netdevice will end up in an inconsistent
+> situation where the old group is not joined anymore, but joining the
+> new group fails. Should we join the new group first, and leave the old one
+> second, we might end up in the opposite situation, where both groups are
+> joined. Undoing any of this during rollback is going to be similarly
+> problematic.
+> 
+> One solution would be to just forbid the change when the netdevice is up.
+> However in vnifilter mode, changing the group address is allowed, and these
+> problems are simply ignored (see vxlan_vni_update_group()):
+> 
+>  # ip link add name br up type bridge vlan_filtering 1
+>  # ip link add vx1 up master br type vxlan external vnifilter local 192.0.2.1 dev lo dstport 4789
+>  # bridge vni add dev vx1 vni 200 group 224.0.0.1
+>  # tcpdump -i lo &
+>  # bridge vni add dev vx1 vni 200 group 224.0.0.2
+>  18:55:46.523438 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+>  18:55:46.943447 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+>  # bridge vni
+>  dev               vni                group/remote
+>  vx1               200                224.0.0.2
+> 
+> Having two different modes of operation for conceptually the same interface
+> is silly, so in this patchset, just do what the vnifilter code does and
+> deal with the errors by crossing fingers real hard.
+> 
+> v2:
+> - Patch #1:
+>     - New patch.
+> - Patch #2:
+>     - Adjust the code so that it is closer to vnifilter.
+>       Expand the commit message the explain in detail
+>       which aspects of vnifilter code were emulated.
+> 
+> Petr Machata (5):
+>   vxlan: Drop 'changelink' parameter from vxlan_dev_configure()
+>   vxlan: Join / leave MC group after remote changes
+>   selftests: forwarding: lib: Move require_command to net, generalize
+>   selftests: test_vxlan_fdb_changelink: Convert to lib.sh
+>   selftests: test_vxlan_fdb_changelink: Add a test for MC remote change
+> 
+>  drivers/net/vxlan/vxlan_core.c                |  24 +++-
+>  tools/testing/selftests/net/forwarding/lib.sh |  10 --
+>  tools/testing/selftests/net/lib.sh            |  19 +++
+>  .../net/test_vxlan_fdb_changelink.sh          | 111 ++++++++++++++++--
+>  4 files changed, 136 insertions(+), 28 deletions(-)
+> 
 
-That's a great idea, thanks!  I'll try a couple experiments and see what
-works tomorrow.  I've add these lines to check_zero_to_err_ptr.c
-
-   183          max = rl_max(estate_rl(sm->state));
-   184          if (max.value > 0 && !sval_is_a_max(max))
-   185                  sm_warning("passing non-max range '%s' to '%s'", sm->state->name, fn);
-   186  
-
-I'm hoping this one works.  It complains about any positive returns
-except for when the return is "some non-zero value".
-
-   194                  if (estate_get_single_value(tmp->state, &sval) &&
-   195                      (sval.value < -4096 || sval.value > 0)) {
-   196                          sm_warning("passing invalid error code %lld to '%s'", sval.value, fn);
-   197                          return;
-   198                  }
-
-This one might miss some bugs but it should catch most stuff and have few
-false positives.  Both of them work on this example.
-
-net/devlink/core.c:122 devlink_rel_alloc() warn: passing non-max range '(-4095)-(-1),1' to 'ERR_PTR'
-net/devlink/core.c:122 devlink_rel_alloc() warn: passing invalid error code 1 to 'ERR_PTR'
-
-regards,
-dan carpenter
-
+For the set:
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
