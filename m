@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-167121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB483A38FB7
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:47:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4618AA38FBC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC7A9188FEBC
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 23:47:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A90A3AB215
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 23:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17591A4F12;
-	Mon, 17 Feb 2025 23:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246A61A8F89;
+	Mon, 17 Feb 2025 23:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qbBJnJ85"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyeONvhg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE39E7404E;
-	Mon, 17 Feb 2025 23:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E0B7404E;
+	Mon, 17 Feb 2025 23:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739836022; cv=none; b=Uh1AYyy+S7STORUzlwUyKYttytLCFe/81d2N06UaQDQZKTRDWIgxXMBWpqr73HFjCAsJcgQqZiPvTDzdxI0kXA6ulcnWTrZJUc2UR/ElKQ+52NIR23quEespbkmJOVj7RiL7oB6CBR3hl89XILqcAsLBQ+AxOq9pUKYhoi4D9G8=
+	t=1739836084; cv=none; b=u9sIzqnszzShqzJEZydmhEhgkgcfVkrFPI+KCV9C1u/6DJdhFaf/HIlkkY7L3Wiota/YxYs7GMNOLoPOZ2dKGB+5Cfw4CVbhw1laXwjrr96g7mMQRtk4OvO/CftZYVMzHBmV9wF3em/LWGPR0jlVba5J7WyTF2jTDZHG/rmojjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739836022; c=relaxed/simple;
-	bh=KtTFA6BxoMx2wTauDjB3MIJGMaVanSteNnBqy7zSKnI=;
+	s=arc-20240116; t=1739836084; c=relaxed/simple;
+	bh=Ec/oz3AfnETndpRHCs7Z69waq5sKF9/Av7l587y2Qp0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pTOaM2ViBP07W5NNFdZjXrXcqeQZh4Fm/p/8gbmyAadkvVKFsC7Xm/0BnOnbvnVZNFIR5/SMA0GT+5faqmR6fXe3pYK31UBe4IjmXif8Mn6zWb/gmJl0K2lpHIJ+0OFijaLuzCj0tmZvZFtL0bpNO8zMmKBMvdcGhic3mQnF5+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qbBJnJ85; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6985CC4CED1;
-	Mon, 17 Feb 2025 23:47:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nmQ5eQFVxIo3KSqJCPVTWCyycgsa40E5GWZLmcQQ5/MuZha5X5EGGCsGhi50XCu/NfjlHH/NzkZHGun0h9Sw9qgi5Y15AKCiYYIdpNIus2OWE5E9ZhQm4TrCWATgCORq/hf8tCl7J4uPbUZM0TnUtMs+msujMpQouvCVVSC8Wgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyeONvhg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6DDEC4CED1;
+	Mon, 17 Feb 2025 23:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739836022;
-	bh=KtTFA6BxoMx2wTauDjB3MIJGMaVanSteNnBqy7zSKnI=;
+	s=k20201202; t=1739836083;
+	bh=Ec/oz3AfnETndpRHCs7Z69waq5sKF9/Av7l587y2Qp0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qbBJnJ85+I82OYuJeWf6Ydzop158a+pw12JLnJ9gxr4USVUlpj8mQsTzfa8yZdzpe
-	 Qa6E3w0Zlg5qQVfY5fn/c7iUCuc9yaoKcP3pfgbFvgtkGhg+rK7SQdn+G/5h0jwdxP
-	 SUqtf899+tILoA8UvS/XgvmEWw4ml0W6y0rdHr4WiC+Xtfo5xzCikA7pSV6n+VvY7X
-	 vHOsHZjCphmvc92crZZIpqo+sdHeVAOhgDp16tGLYO4sAaLt50k7xLmZFCQYiVmONi
-	 I/2okhAlZDqyxOmW1AE7PRH9foK0LNfKRApayfG2dM6oNz8FrjmGyLonaAeh99O7ZW
-	 wsk3TSufu9zQA==
-Date: Mon, 17 Feb 2025 15:47:00 -0800
+	b=IyeONvhg7qcvLkCd8JGbNQyO1gcfkNb0fKmCust+WEBSfG+UhbjMyKXwQpCXgheMM
+	 NNkwkm4BIy+V5Y0R8GEW9iugbbDJpsMJRIeF0CtLyr777bTTj8RFDvLy2GHErKvWUn
+	 YURvKZV+QxGLQdntsJ4HjyjBM6sXVTpvTMjP3LW3vbFKBGz/nua8ybRm2v7uLVUKwl
+	 8yWL77sGbH+f+rerYCR7r1eVgv8li0gr+eY4nukCUf5x6yTGOtnBChj+tBfGi5XghB
+	 UWT8Ca92Iqegc0h2uv4F1s9+tVsjRaMBzZxLnN/8bIol6TXALZxvLC7w2e/8TukhOO
+	 e0ALtJOHZZM7g==
+Date: Mon, 17 Feb 2025 15:48:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Srinivas Kandagatla
- <srinivas.kandagatla@linaro.org>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>, Simon Horman <horms@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Johannes Berg <johannes@sipsolutions.net>,
- Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-doc@vger.kernel.org, kuniyu@amazon.com, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH net-next v4 0/3] netconsole: allow selection of egress
- interface via MAC address
-Message-ID: <20250217154700.34616bd7@kernel.org>
-In-Reply-To: <20250217-netconsole-v4-0-0c681cef71f1@purestorage.com>
-References: <20250217-netconsole-v4-0-0c681cef71f1@purestorage.com>
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Russell King
+ <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3] net: ethernet: mediatek: add EEE support
+Message-ID: <20250217154801.338f2de4@kernel.org>
+In-Reply-To: <20250217033954.3698772-1-dqfext@gmail.com>
+References: <20250217033954.3698772-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,14 +66,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 17 Feb 2025 00:18:43 -0700 Uday Shankar wrote:
-> This series adds support for selecting a netconsole egress interface by
-> specifying the MAC address (in place of the interface name) in the
-> boot/module parameter.
+On Mon, 17 Feb 2025 11:39:53 +0800 Qingfang Deng wrote:
+> Add EEE support to MediaTek SoC Ethernet. The register fields are
+> similar to the ones in MT7531, except that the LPI threshold is in
+> milliseconds.
 
-Breno is submitting the first patch with a fix, please wait for it 
-to appear in net-next then rebase and repost. It's probably going
-to happen on Friday.
+Please wait 24h before reposting next time.
 -- 
-pw-bot: defer
+pv-bot: 24h
 
