@@ -1,87 +1,107 @@
-Return-Path: <netdev+bounces-167073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95940A38AEB
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:51:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 177D8A38B21
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 19:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53E61169628
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 17:51:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E16171687
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF57231C8D;
-	Mon, 17 Feb 2025 17:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C28522F383;
+	Mon, 17 Feb 2025 18:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kU7ZGyOz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+c6CfRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96E8229B21
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 17:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2570622B5A3
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 18:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739814711; cv=none; b=Z18GICDRNwuVUtWd1wLBUrYpyozL6eE9GSBTW177OFdnCluWU7WNW8aVLrdK0dZ6yNGpBppqbXZHeJprXU+zk8gKlWH2WT5wTwUDIcJ7k+CfPFntZPCX0s9aoKG/1X7fvhDd6IdO4vrUjPmBAQTr4PgdoCQJi02rt77P4R2Bob4=
+	t=1739816005; cv=none; b=X6nZD5bCJRyWH9RoeIrL3hH64GZVW30QkeMC53Jm8p6b0JdGW926/PqKvoCTBY0zX3mXwt4H04LRoVg4cx2xFd4PSjhnTvxlBNTu0wWINE0o2/1YNGFDWUwdfGSCdhMoqbHco+K2taEG7ahuy66tQgGd//QztvO69dbBwVhrHOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739814711; c=relaxed/simple;
-	bh=TiONVQy+iWU84BUNbIfwwzD57Q6xMuP4EJbaQz8Av24=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W1mLQfpqTtAWhOdagelaZX4w2ToC/3NhzhggCi8TJUjBmPzD0TqEpOWOxIb0vaEZ+JcBeIrzWusLjdOLc0N3eTQzWz8JmcR59oP3VLcvmZ0+IpXxWyB6tRrHS2FRsJcAajNxUG2qntnhewkqdkMEVT9rC4+pReIzvVMpS37bSs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kU7ZGyOz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1709C4CED1;
-	Mon, 17 Feb 2025 17:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739814711;
-	bh=TiONVQy+iWU84BUNbIfwwzD57Q6xMuP4EJbaQz8Av24=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kU7ZGyOzrP30Lm6AWX8d5geF4TwktLcsIcbD4T3SryWwiRaSsVpD5uVUVoHYqI/hu
-	 hqBmSMb4F31ogW19XDQja+bc28JXjmBA9J8y0AFe5dfT/zqpSWlnAFX9mJsoQd3B5n
-	 oBWUjLaTlAVRf8J6lzoP9gmt/PL25krTqE8UDNQFOx9LfEVfXWAvqCku/IMl/IRMBZ
-	 pSwZLy7q/O/mnr4YHJMZJPiO2DXyJYg575Cq2yIINgm7Kqd6B7oZqdOZzug5K7GF+y
-	 fkPEFMc9LdDA0m9fBhq0s/Ly+SxptPhlHVi9eZesELBPLKqasiaurSJcXsJOTGVUyX
-	 OUgaTAeIMaAsA==
-Date: Mon, 17 Feb 2025 09:51:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] rtnetlink: Allow setting IFLA_PERM_ADDRESS at
- device creation time
-Message-ID: <20250217095150.12cdec05@kernel.org>
-In-Reply-To: <87zfipom9q.fsf@toke.dk>
-References: <20250213-virt-dev-permaddr-v1-1-9a616b3de44b@redhat.com>
-	<20250213074039.23200080@kernel.org>
-	<87zfipom9q.fsf@toke.dk>
+	s=arc-20240116; t=1739816005; c=relaxed/simple;
+	bh=S7uojleg166F6GoEE7dSYAVn2hzMD2W+CpfaL1868Dg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RjSli3SJLSdOP16cPMzQHfHcitVUJD4RxOGA+ygWNJQI+8yB9KOf8+53B+iexFjpzA7KMMQJFdjvGYn3NP8YmXVc8+WaJZAVqNhrhCKUCazFBzVGeMdGdt4fQwqF1bvctv7nFScaIGHb3lhdENBqDp9SriCa5ANEFzH7DfkvOZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+c6CfRz; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2f42992f608so7024408a91.0
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 10:13:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739816003; x=1740420803; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7lhCKTKEribQTfMxRx9Vwe/XqqvQlaJm44Ont/yeuyc=;
+        b=Q+c6CfRzltYdjB14YRlBfdCM0UJfGC1weeMp94EDV5Iwuq0Ko6BHpgVnVvCexll3C8
+         FgPfHk8zwISaqQB1MvfoTtlbcMUkA/JTkB+7R9ljm++WDgOF61LCQQGOx3/fF2XYnQu0
+         T8woUqfN2sr/OWvSEyVKX+RdxEXTkFakxe18sDXhPxw99CJ854X6QBRgAu21arrjE50d
+         w5Widm7k1sIGbQ8WMT0etTlWXmZW8zg+XKwyik+oCD+MuaYX2AetbTwZlNwmYadWGjcI
+         sno4BmUUL8pEeBSj/m/v2MwBhfif17nYVCZPuqQlumZ8mzFfy99nOM3YHwIj1aY0NLOX
+         GZ9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739816003; x=1740420803;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7lhCKTKEribQTfMxRx9Vwe/XqqvQlaJm44Ont/yeuyc=;
+        b=cDhVthFTbSDmuy0jEKVgViQ2PNbPnOcL1+j7b5LrGRS5+nF8a8KOUkzU8rcW9P2O9h
+         Cx13G2SddNdcprW4FDbpsHUFkTMA6TvJX4LkID/x1c5fUFwqULGtxIFNDc4xrEtxUuzY
+         XId+TNHLOKaSrSCZ5cF1cOEdv4EW0gw9mNfFxYFVMDcT7bwuGL4SPeHXlw0lOyZHEV7J
+         Acq1eT4wH5TffHFrX31gEx7F91hsBEifW1DAFf5y3ydLbOei8CvQr8v3X2EkC5U2HtGd
+         C9umpmlt5qMmaPlGwEKGPlPHHMEs1OitF5rsYpr62vF1U2upUQKFo7J+YY6nBELPPs6j
+         KsTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQCc60IiQ8JzSVuqRkxQaFLYCrMLf/eGKBay58ai3nb5Sm8YddT4Pl81c3Vb6HC16Pi4IyU1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPaf+0SNgNX0Ib57kvg/VeTsClLG3aR+f491PW+xj3AkAqfVol
+	nIVbWQCSfs9GgpCzCa1vs3jaDjtK6MpRAbhukQiKwznPSr0wN98=
+X-Gm-Gg: ASbGnctZ9R+gDSdUF9xyRCQ6Wp44KFqO44i8cJHghP5UfVw+CYoBd+5EvMBwof1hBbu
+	ngSRMbbuddD5YBCBjUIlGW1YdC0kxlxCCNeM4pIdi1wspevg0fH7IB/KE4ibif7O0bnbQbtud5B
+	djzg9nzFr+Ykz02J6I/yiXkWE3YTISEe1RNlrnoOU/IFaxYfl6O7zpVxWXtmiN5rhFrb6O2ZYD1
+	Bi8zyKaH3uQZYLFb4JQAjikn2SLa352Gx66AIUXwKriFWU9hdet3cAEQyHim4sd16KxzYwPvAl5
+	nv/vzvCixWte9Qc=
+X-Google-Smtp-Source: AGHT+IEN+TcJ4qi0hFVi5kj2RvtW7hOhmgRAv0GwIRdRypWYNoO9IwUOtbjYJHdbgiHsAa4hbdLDdw==
+X-Received: by 2002:a17:90b:1b46:b0:2f8:4a3f:dd2d with SMTP id 98e67ed59e1d1-2fc40f22bf0mr16684252a91.15.1739816003279;
+        Mon, 17 Feb 2025 10:13:23 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fc13ac0a5bsm8264155a91.18.2025.02.17.10.13.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 10:13:22 -0800 (PST)
+Date: Mon, 17 Feb 2025 10:13:22 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	Saeed Mahameed <saeed@kernel.org>
+Subject: Re: [PATCH net-next v3 00/12] net: Hold netdev instance lock during
+ ndo operations
+Message-ID: <Z7N8QgXWP-DJU5Yg@mini-arch>
+References: <20250216233245.3122700-1-sdf@fomichev.me>
+ <Z7NTE1DlI0nQjjwy@mini-arch>
+ <20250217090818.390e4efa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250217090818.390e4efa@kernel.org>
 
-On Thu, 13 Feb 2025 17:13:53 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Jakub Kicinski <kuba@kernel.org> writes:
->=20
-> > On Thu, 13 Feb 2025 14:45:22 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wro=
-te: =20
-> >> Eric suggested[0] allowing user-settable values for dev->perm_addr at
-> >> device creation time, instead of mucking about with netdevsim to get a
-> >> virtual device with a permanent address set. =20
-> >
-> > I vote no. Complicating the core so that its easier for someone=20
-> > to write a unit test is the wrong engineering trade off.
-> > Use a VM or netdevsim, that's what they are for. =20
->=20
-> Hmm, and you don't see any value in being able to specify a permanent
-> identifier for virtual devices? That bit was not just motivated
-> reasoning on my part... :)
+On 02/17, Jakub Kicinski wrote:
+> On Mon, 17 Feb 2025 07:17:39 -0800 Stanislav Fomichev wrote:
+> > Teaming lock ordering is still not correct :-(
+> 
+> Mm, yeah, looks like patch 9. We need to tell lockdep team's netdev
+> lock is not the same one as the lower netdev lock. Probably gotta
+> add the instance lock to netdev_lockdep_set_classes() after all?
 
-I can't think of any :( Specifying an address is already possible.
-Permanent address is a property of the hardware platform.
-Virtual devices OTOH are primarily used by containers,=20
-which are ephemeral by design. At least that's my mental model.
+Adding it to netdev_lockdep_set_classes triggers cleanup_net lockdep
+warning. Not sure why my lock_set_cmp_fn doesn't help with that, will
+try to debug.
 
