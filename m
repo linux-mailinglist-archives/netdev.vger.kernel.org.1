@@ -1,341 +1,193 @@
-Return-Path: <netdev+bounces-167008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74FA3A384EC
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:42:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715EAA384F0
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22E00188516C
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E522C7A427D
 	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6C12185A3;
-	Mon, 17 Feb 2025 13:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F388C21CA0E;
+	Mon, 17 Feb 2025 13:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="l74mHm25"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G/a4jbcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2049.outbound.protection.outlook.com [40.107.236.49])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE9D1E51D;
-	Mon, 17 Feb 2025 13:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1D321CFE8
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 13:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739799680; cv=fail; b=U12gM4ZyIekfJu7Uy3EKfY+969mpF7Crq/ZrKEdMOrYvAcC+3Ol5SRLypwWxZ0tt4/e5kVxaWlBaU2zxARVKVWIlCCUX5jbhXUoewygR+aLkYLIYvumgECkUvNPY7MHwRFRStSEGfoS+LcJDr/vs0RgOK2F4oPrKT6Qz1qpA9E0=
+	t=1739799727; cv=fail; b=GMA0OlNw6gw5ZFnMHG7YUnwegXFtOApdfYl+dcAs7fLlupaZF/bZdRbHmEo+yPdMbL9zSV8D6riADMcKsyuSTTHUH+jAfH+tq75guplmYsVGFzLgw0BPaXrXBZ9Btgbt1HuDuVWk+xouz2WHbLA2gGaV7I/zxFI6HtXatUXHZ5g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739799680; c=relaxed/simple;
-	bh=tYY+9s54+UWibuC1blWlvBQXjEew36u603pV0kVX4vs=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FP9hIYixd89+S1f4zOC5I4JVH4NuYips6N9GCPyXZHDVAnand0rny2Kvai3ytB9RZwTKfmxLhpu4x9BojR7646KVUzwCIrwhk9Xw8wnKXQ9wMMpG2ZSeCa1bQOwo1uhYZGc98vRxB+hhdAW8c8/Q2DHpF+6eZVktcpUqCL/yiyc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=l74mHm25; arc=fail smtp.client-ip=40.107.236.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1739799727; c=relaxed/simple;
+	bh=gORVHcfpJkQOcL6xhwCHRywBsNvCdJhvATlmFuXhS2k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V7m6JH15Sd1dni1gXV+mRGCAzRwgFLLSaTAp/v2PH/B0tJofym/ucFSQkceZ+HcrTgLno+Q0DjPpkV5gJRB9XmWDp9ThARVqY5ui/4xm3JeDwlYafhRTKdiFWjj0/2XlxDIUz9zOzmP0F0Wbd6OcRSzZ5jiK0dQRXjY27M9Tngk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G/a4jbcZ; arc=fail smtp.client-ip=40.107.243.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kCekHedfG3C82CNyED6uXfvyHFv7GJFPkVDJLK9UNSj747Ue8trmDT+/4VhFLH7T4XFvRm4bR71YSBdreZba0XZ5d2suvL9Yz1fJcSSJEnq+77mS5mFehjq2P/o/I2dAQ4A2jLW84wiwWWSVJKh+tXSeGtruhwgbUobQGJcTz0DzT3IqdvGLD+4rqe2OzjIyvlVttOCrFv5AkDrXrHM+XTtUcOaSMabp9TERjGAf3ENapDOQVbl3A9kBjaz6JLWT9GgKY7RJ4vN41lIXGnoJictl4ktLjUWDWLuq1vOcRq8gySRaXdNcrMuziP1xdH++vX2HkokKMVMYBrYzUVaaEA==
+ b=H+PU/nN2x1yKPQW50osLOr95ftqOnec7vIBjwat0ZhKmq26HVH0M5fqBT8paRhSoc9VVj/I0dkgzg2qm0VsXwpQALFMouiLEkXRbAvTDadHmEc3z3YcWnJ03pedgM70NBJ+4v5e2CwkrAcSEdDg2E6k46kSr8XO+Mk0zS1KTs2w1OuaHl44FHrtSSfEv9TW4Ltdy+TtQriTbg1x+iW/DnxxVnq321aKX525XNpqZymKfFXGoUWPKU3x56SGqzA07ivSmnXlkABFb7zOPHaEC1CEt6g3kBhnDS8yqNCXWdeDyw31HTi3IjoNfhPvMO88QSNlLcWiAHmmWbKU6ruDlSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QcW19wnBImIvu4emPvLKmq7EI6MKlQsfLJ1M3EaoEQw=;
- b=B7NVrXiROnI+Fe+o8VJiX5xtAwvmyZvTKuWdg5i+qo39HomFy3Ao+QhFq22go77oKG8cpd7kbHqrn2fT9QQ6st73PGL9V2ONnNKi1tV/Z2/aPwFZQPxM+J+nZLvLIMUG1KC4xDhUfm1HdjQxs3hIilMZxsuVGJNaoUtobwGP5giWSbDgSdnGKTv9swl31BsTnS++Dsj2yg4P+srjx+OfCWTTJH6hIkJnTWo5GjYT/581PISa1dv0QYwuNPclFxHCFbCs7o5ecgwSdjM64Jav/6pvTR530KHNCxuEvC1BHgw3VQietQufDzuyh4Arg6t7Bs5ZMRhZ5BQM0Pk33pVLZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=/aNCv97DWhKUeBl4WjJ9ek8l1mfHi4NLhN9Pi7jy6I4=;
+ b=opBGzyRStdgHxDNvv0saX9kOJLc8/W1iOwgGyJhMa4TrRIK4IHemq/0Hd70my9hT4MuOcgRFevuHxA6DbCmMLW6NxpqZ28TCoM2gpEhrtRB2ixqXfWCWIsfD5bM3QXquEAFwvhKddQrF7fD005u/hzRgz6J9x7DovJBBZ+CY4NixeYM2FVC1jOcx2mB/Hd+tRROkNNYtJF2jqzzqmAHN+pGBleGzk6q9zDGShr6a4KcmSg6e6zV2u7fIn8Uhy5Gifd1rgSTJdrMQ54Aw39Ky9SLaUh7bdgb+tK5Xeu7F/Df9xnAB5xlKUQy/7nkQkKBxTis4j/f4JihWgPCog+f2rA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QcW19wnBImIvu4emPvLKmq7EI6MKlQsfLJ1M3EaoEQw=;
- b=l74mHm25byiqqvQQWlnHIvYzWDgfcrcr+kc9Az9hA8YRjT8RW7Kk46dD6iHTaa+Xu0RElt+bd4u32e+KZHKwcxDR6QHc6Uyi5HoW8u7IMmq2Cdv6jiOM8ioUKwEyG8Fi8aI22Bscyo8jHiN07C+gypKPXyhCxQ8yutg3sqqyse4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by LV3PR12MB9120.namprd12.prod.outlook.com (2603:10b6:408:1a3::5) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=/aNCv97DWhKUeBl4WjJ9ek8l1mfHi4NLhN9Pi7jy6I4=;
+ b=G/a4jbcZigHbBPNXEdGvDY8QQ2IgjnuHWI6VuMfFnjtxv+1xaeujOi34YU1B3zosabb0jqautiAmQC791O3ofFCHcADHnNJ4ANjSPIpWVT1uAhB7n3XuULN9UEa/IUy1MInC1RYoZ6hdSKiTx1nmQV6/ApxxuxKu1or2BNgsS9Qce21AUzc050qnslxPGfSB9T6KqsiX83cC8rZNt7x1Er2PddZy5ugwwWkP2smPmAgKCDueJ//B/vsyXyiJdgaewtQNvitBJzgGTZS22z94DNBY5fl8lC5h1a8rCTbMhIMGAMg45zHFWAj9SOPKSoQZYzHk/UA2/VjoL3Hw8qI6xg==
+Received: from DS2PEPF00004560.namprd21.prod.outlook.com
+ (2603:10b6:f:fc00::50e) by CY8PR12MB7268.namprd12.prod.outlook.com
+ (2603:10b6:930:54::20) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Mon, 17 Feb
- 2025 13:41:15 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8445.017; Mon, 17 Feb 2025
- 13:41:15 +0000
-Message-ID: <eccb157e-10c3-4009-9036-dabccf4ba918@amd.com>
-Date: Mon, 17 Feb 2025 13:41:02 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 09/26] cxl: support device identification without
- mailbox
-Content-Language: en-US
-To: Ira Weiny <ira.weiny@intel.com>, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-References: <20250205151950.25268-1-alucerop@amd.com>
- <20250205151950.25268-10-alucerop@amd.com>
- <67a3dc0071693_2ee275294fc@iweiny-mobl.notmuch>
- <9ce2dc57-ad51-4587-8099-60f568984b84@amd.com>
- <67a50c15de8e1_305d76294d2@iweiny-mobl.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <67a50c15de8e1_305d76294d2@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CT2P275CA0061.ZAFP275.PROD.OUTLOOK.COM
- (2603:1086:100:24::17) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+ 2025 13:42:03 +0000
+Received: from DS1PEPF00017099.namprd05.prod.outlook.com
+ (2603:10b6:2c:400:0:1007:0:7) by DS2PEPF00004560.outlook.office365.com
+ (2603:10b6:f:fc00::50e) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.12 via Frontend Transport; Mon,
+ 17 Feb 2025 13:42:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF00017099.mail.protection.outlook.com (10.167.18.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.11 via Frontend Transport; Mon, 17 Feb 2025 13:42:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 17 Feb
+ 2025 05:41:51 -0800
+Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 17 Feb
+ 2025 05:41:48 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <horms@kernel.org>, <donald.hunter@gmail.com>,
+	<dsahern@kernel.org>, <petrm@nvidia.com>, <gnault@redhat.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH net-next 1/8] net: fib_rules: Add port mask attributes
+Date: Mon, 17 Feb 2025 15:41:02 +0200
+Message-ID: <20250217134109.311176-2-idosch@nvidia.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250217134109.311176-1-idosch@nvidia.com>
+References: <20250217134109.311176-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|LV3PR12MB9120:EE_
-X-MS-Office365-Filtering-Correlation-Id: abf64d9b-adea-4d1e-df7c-08dd4f58bf9f
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|CY8PR12MB7268:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ba81c12-b05d-46c2-78eb-08dd4f58dc91
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|921020;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cjF6RFRwSS9zWGszdmt6aVJXbTZBZ2FlbmdLUGliOFM2dHRqMmIxZkRGZXFN?=
- =?utf-8?B?b3JOMlI0R1ZHd21MdEszR2VyK0lCalU0dTNOS1ptSnQyZFRiM0srZ2dNalFC?=
- =?utf-8?B?K1VrdUZpUXMvbXhVcXBLcGJFT3UwWGtxNi8vbVFIajZ3OFVwRVBhOFNVSWh1?=
- =?utf-8?B?N2o1SDhMMUU5TCtqbVVRUlBCQk9JQnhsdW1GVFA4cklFeHpRbkR4V1hoRmdt?=
- =?utf-8?B?Wk5iRGpKV3JicTByenROTDdnN1QzNjJZWXpnTjVlT2cyT2dCQmlLNGROQVpl?=
- =?utf-8?B?U1pFVDJTZ1VPWVdtUmo1YmliT0x4RWJDVVNrVlBGZTFCeVowam5CRjVPZUdI?=
- =?utf-8?B?Tjl0Rm40aGtJTm05VmxkOTk1Rm4rWGJBZ1N6N05EY0htZFNTdU1OZ3VFNEhR?=
- =?utf-8?B?WnZOL2FhbVMyMXNrYXhFcVk4dzhhbkxIQkJFSVdhZ2JBZWtvOWpCUlRiVGYv?=
- =?utf-8?B?MzVmeFNqTWRwY3JuN2xXVk9abVdCOTM0SFVVQm9jZHJpSmltZ1loeXpaTXh0?=
- =?utf-8?B?ZnR6ZzRFc1hnTFRPQ3BLTmV2SlZOalpFTWR6TlpmZ0FkTHY1MDcyTnR2dS96?=
- =?utf-8?B?TWVXallaclcrbXVTSmgxbkdiallCYTBVQWFDVDBlalVqdTAzZVVQNitTbmQx?=
- =?utf-8?B?NnlFN0x4d2ZORDFRR0c5blAyYytqMDlPc0htMG5yWmFqczMvK3R1UnNoa3Vm?=
- =?utf-8?B?L0JUbmUwSldsY0F0MHpBRndjWkxhMnlzd1orMWJnVVJvbVBjRlFEcFFUb3pG?=
- =?utf-8?B?YWI4L2VEcUxtZ015V1VJNm1lZFdTSm5aaTlBcTdqUGpnUlhLQ3pNUTg0bGpO?=
- =?utf-8?B?bU1iTWhDdUdSVWl4MWhObkFRdWVtMlZuVzJxN0tTWGJtWXZES1ZrMEIrZ283?=
- =?utf-8?B?NytvZ2NGWGx4bkhCaGNJQTRlSngvcE5DckZiT3pURTF3SmowejZpUThGZUxL?=
- =?utf-8?B?VTNOSEZVR0IvV0FZRFZPUmdNanJSNmhra2EySDdKQnBMa0xvVk9ydDFjTVFV?=
- =?utf-8?B?S1dOWVlyYm5wUlFCaW1UdUdaNmZlRUdmR0lUOVU0SjhPS2lyekE0dXhabnpw?=
- =?utf-8?B?SkFaVTZnd0ZIbmFZdkF3Z3laTWxpVWphR0xwTnQ3K0FpSnJpKzVtQjdxNFlx?=
- =?utf-8?B?NEo5Q3UzeTd5WUQ2U0xHYjBNdC9QUmU1dVdybEZTN3RTbCs5ZDVtVXkya1JT?=
- =?utf-8?B?OTZKUmJTWmQvMEFBamt3RGh5UEtEMFZHTkZiVjl2RU9weGF0OWlFZlhJR0RI?=
- =?utf-8?B?a2JCU25aVEVyUnJUNVdVWWlFNHRZNFFCWmMxdHAyMlpEL3JEVmVkSFV3NEtM?=
- =?utf-8?B?dTNSOUtaUkFUbE9BcExUdnlHVC80STFwanF0a0gyZVFrZ2E4UXg2RFlueHlG?=
- =?utf-8?B?Y0d6MGZzdjByazdGV2VDVEJTOEJGOWF5S3RHKzNtVzBMTGxkZ3JrY0hZUlVy?=
- =?utf-8?B?TVZNMitIUms5ckM1dlF4WVh2a2JseTdFSWIvTXZ6WXFkWkc3SjBVVkVwaEpY?=
- =?utf-8?B?NzM5eGJlaHc0WkJITVRyWUJSTXJQdUgrTkZZa3dhMC8rYk1ZYU9vcm1GYkJK?=
- =?utf-8?B?bk9CcS8yU2gzVmMwelNuVHVWQTR3bUtGQXNTSnorU3B4aTZkZGlMSXRwL0pP?=
- =?utf-8?B?YmxpN3ZQUFJSZ1o5VEFaZXhDWmVKS1JUOTFTT3gwZERyZXlhYVE2Z21UWjk2?=
- =?utf-8?B?UEhjaXRIVHUxVTZmUTFTcEFrYTNmQVdWVWNON250N1dIN3QwNXovSEdsczZk?=
- =?utf-8?B?SHZFalJsenNQbVhCS3lpY3dYNjhpSGUwOU80L055Tm1VYk84WmV1ME54RVg4?=
- =?utf-8?B?NWI5U3NTektuY0lONjRCdGErMWFiSWxoTE91RjNqdFV2Qk5vU1NLYVJFNUhs?=
- =?utf-8?B?THlxRTVrbk1mYzRNbUdMT0pPQnFodVJNQTF3aHlITytCNEFIdlAwNGdIZ3Bo?=
- =?utf-8?Q?oEomCikulJE+o5P3F7FNYNWoCBEvH3m0?=
+	=?us-ascii?Q?joKCy5f9ZiG9XNuLojzTlOiqrTkRJ+Vl1ZKLxltF5X5ogeGLoFU051TBwdxM?=
+ =?us-ascii?Q?3geyb6yYwiIO3ZB+R8pIbIgxQ6xjCm/0W34pjIBbILo/9XMwJp9pvZ/vgA8b?=
+ =?us-ascii?Q?qAVw/ZsEnDMYXILXdYU8Eu4EfZO4qKhHY/j2iESgXECQWsEJ2U4V3zReIEGH?=
+ =?us-ascii?Q?CNbkTGT8/JF0v447lk+fBGhvzRNYlAxLksi3WtBeGW0hO2A4yKBaFf8x1YJd?=
+ =?us-ascii?Q?OJtwHtJ3ACxQFSmojhcGjSMWmCCZwzo1IuU44d2luZW4IWq2MNfbdy/uOGxM?=
+ =?us-ascii?Q?2zpca5wC01Q/hcZrSKuXgSsgl2gdEwWbOdbP1Ydsz3kmuTMFGoBnGXs+TlbJ?=
+ =?us-ascii?Q?0cwDuSAOxaa1GEyIEEYF0j3Di+SEfmS2we0TTakIZaBRRZEZ1xquMiIYDnXu?=
+ =?us-ascii?Q?ZPhI2nH+Jq0taCn5lbPtSpnMbfG3jCiF/gST/4GDslAEr6x2SumS5Ft6Ip5M?=
+ =?us-ascii?Q?btqp6BHTaUm/oAopJ1XS/HT2EfaqOa0GhH1URLJlaw6yi1dPZQnxvWZYiobY?=
+ =?us-ascii?Q?35IJCWPeM7N1XO56xmQL95JerQkecBdPB/4YB1odn4TGkf9VHg6Qc4w69OPa?=
+ =?us-ascii?Q?Ik1uj0NxsW+R68AnDUaAw6OeBNnZSFR3oqtmoFuuW7fTsAkgZZqmuLiHfSC9?=
+ =?us-ascii?Q?IXuNd2F2vyVTWVp6EItCDTiyecO6BVPvLgKOvyK+iJtPfxHMMk1uRUCnpi2R?=
+ =?us-ascii?Q?rNjaDGS8JnpFlhVWHlQCabW7nIlLTpDIxeGkbP8IDQgtYqMCL2RMVl9emxPn?=
+ =?us-ascii?Q?qhjUnOuH1M908wD1QvhOp8ypDG3iosISSY2zGW3G7i7N2OjnmMNzCVbUOb9Y?=
+ =?us-ascii?Q?E56SUcf034CejoijdlPgoMb7PayF1N0jzCLwrdXrpQHxJOfLgXv8jrhJ++qh?=
+ =?us-ascii?Q?g6felRcyZfcJLntxeccOBxT/rKSrW3hLT4q0U5zE5QmgcGNoPqlStjQOpims?=
+ =?us-ascii?Q?2HFDloNNsDE5smyE9vd4cktB8S2O5DY81Fj9SSX+yRZRqoDfW/lTuS/4GE1F?=
+ =?us-ascii?Q?sfoGGjIxfNKh3bjUE9q7JYy7rElyzNmg+1SwgBfASU54P6IsYngaSf+TASsK?=
+ =?us-ascii?Q?qTNKWAG5/bDPKdRb1gTCD5fRIOH81G8lszwAGkfS4fcjwdMMseQCZC5SA0kG?=
+ =?us-ascii?Q?eaK69XbAKb+7HZPezVsg12zKs7lSwuumyB20Em/oxiFURv3QAOFalAQhyFff?=
+ =?us-ascii?Q?PV+RuA1fC2l5+V3X4/DoklMD9NwgQkXzHkJsR9O9akgvIFowpCCJJvsKs4OK?=
+ =?us-ascii?Q?OimMaOQp6EbqN/9yjnOphgFQSa7TbG5qNKTSV5G3EryLdBkYRdklqzFR7jup?=
+ =?us-ascii?Q?bsGKG2IMgH62u90m6CM7evPUsw9jJWc/dg7U3YL5tCCxPVHwSn366C96mSyJ?=
+ =?us-ascii?Q?CG9FnCUmkl46hh/Omq49SfFxDp7BczZmGydu8WAeSah7oZGieWO4pbx9u09I?=
+ =?us-ascii?Q?quQ9NUAJ0BjorMuSsHorRwAbaLl5mSXWRk+l7ypQqEkK+qdhDAcSiKE8mn3g?=
+ =?us-ascii?Q?cxp4/vn73El3dTM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V3p6ZXhndWNmZkNnTHB3NFEyeDg5THAybjVHem00bXJtNFNMRnRPMWZ5b2FX?=
- =?utf-8?B?dUtHZGhmNVpNOTRSdkdqai9adWVzalFUc2FFcmZwWHd4UjV4dGR4L3YzRXhy?=
- =?utf-8?B?MXNaem5pOU12THF2eE9HSm1DRVg1RVVXclRRWm5ra2gxbXlvU1A4cDlSclBy?=
- =?utf-8?B?VXIwM3dLME03QURBTXNBYWZpcTJTekdyeldZTU9RRXN2R1J1Q2JRczFWd01J?=
- =?utf-8?B?czNPWm5sLzBTbE5KUFNyOXlMSjNVY0JZSmVqOTZlZmQ1TWFRWTR6cWhxR2JG?=
- =?utf-8?B?d2MveGkwUGRiMFBUaXAyS1RQMFp3TnV3ZlZPL2NrQjNSWDkrOENsdmFsMnI4?=
- =?utf-8?B?b24yUlNoQ09wWTBXWjB6ajFWT0FrRC90SHhuUFJPNURjVzBvL1dvUEdFelBk?=
- =?utf-8?B?aW9JRnVQU24rUVV6YnlzMXdUVk1zWlVXQmtrLys0dGU0YTEwU2QyWUswb0dl?=
- =?utf-8?B?U01TWlZrYWJNYnIxT1ZZNnQwbld6VnNab3k5dEtUaDZVOHUxSUdZV243S3Iw?=
- =?utf-8?B?ai95MDQzN3dUNU9Eb2JKek54V0FJa2J0MEd6bFNuVVJxK2hiR0xJUEIzaFNs?=
- =?utf-8?B?UEdoaE9YM2VIcU1IdGowZWVrOUhoMnQ4RFVtVzNLRFJLR2dqUFc3YXJzc3E4?=
- =?utf-8?B?R3ovMVc3M25yOUN3bTd6MEJOeUJ0RTMwcTFXYW9ra0RIcllXNVhaWHV0SUt3?=
- =?utf-8?B?V3ZzZGJUcmtiMklobnRQc0NXeUhTQndSczl4TnVmQUQvVnoxRGZuVWVxa2VB?=
- =?utf-8?B?aSt4Mjhxc2dOTWlqSzgzVU0xNnFZcWp5RldwMlNzd3orNkZ2N2xndWM5cUhQ?=
- =?utf-8?B?K1N5ald0dU5Ud3Rka2kwT0d0R1FYclB5QlJLbDNIczh0LzJSdFVkMDN4eU1t?=
- =?utf-8?B?bSsxTFM5TFhwT1VqVnFyVFN4ZWNndWVEdTFLSFBmMHFjYnRPczJXL3dTNzdK?=
- =?utf-8?B?VnA4OWJzTm5tSTFEMmNIY0Y2KzcwSHF4SDJQbnI4cjZBUjNYWXFNeEd5Qnk0?=
- =?utf-8?B?a25SS3dyYURjODlnZTNOUWhMVmphNE9OMW5lbHJSV0NKRzVFL0xWYTA2ck8y?=
- =?utf-8?B?bCtuZ0hNRFRpRjJHYVhWaGdWeFVJRkptOWc3TmV4dlgyaktZQ210OEI5ZnVp?=
- =?utf-8?B?a2xrNUJoQnY2QnVZSmhONHB6R2x3aGlEVE9DeHJtWkFmZHViWStiYWorUmdl?=
- =?utf-8?B?R1l5UldpU1lkMnBaK2JGcW00cUdJeGwvWXFqd3luZm1PMnFoeEJ2WmVJbTUw?=
- =?utf-8?B?V2Ixd2YxdVhpMjlSR3Z1N0NHQm9RQ3NFTTFkRFBpRTJzOTZ2eHNpdkkvYytv?=
- =?utf-8?B?UHRnN09Odm0wRzBsV1VFZ29hQzhOb0VVdUlUUE1ONmJHVjh3ZVJWWDdMQXdm?=
- =?utf-8?B?T01wSjNWNnl1bWZWdmRUUkdjU0lHZFY4L1NRaXBSU1VndUFKa2pqNjBCMnlE?=
- =?utf-8?B?NHhnYkJxeW5mSzhmL2t5R3g3Nm0yc0h1REgwK3doREo2VVhGZXg5RkxEYW94?=
- =?utf-8?B?akVudkdjWWx0UUFBbnZObTBhTEJqcHc5VXhDNGdxbisvd05mdWNFall5bmZa?=
- =?utf-8?B?UzdNbWZQM2IzWnU5emN2RjIxY0lFOTlsdTloYTdOWXZFWWp5Z3FrTmhXWkEz?=
- =?utf-8?B?eW9YSEp4MVAyTnZtcFJZNCs0bFMySHpJdGJ5TXN1bmtRcnFiWFNid0VSZng3?=
- =?utf-8?B?RFlCRTFONWd5R3d5akprcWN0eXNXRWpORWNqZ0xod3JabVMxSkgvcWhJQVFm?=
- =?utf-8?B?YTVTSWNZNzdhTzZaaWluTzEycXVoaExkQkp6WjZSSCt3TEhBYjdRbXYzaFpH?=
- =?utf-8?B?SlFYVUEyeWtPNkQxMWorMnB4NktQbnhJQTBiUy9makhKU2M0enJGaGJUN1Vx?=
- =?utf-8?B?Y2hHQmdxN2tCN2doWXZPa2NxWDBOSzluWThBQjQrbFdpTE5VaHB6VDhPUks5?=
- =?utf-8?B?b29CRlNpU041eDRVQWZDYTJGT09QMTE3N1lVSXpoaS9ReThWSFR3U3BkaXpC?=
- =?utf-8?B?dlB5RFNPVkRvTlB1dEU0QUZjcnc5ZTRIa0Y0eHJvcnVqeWJic3Nsd01seDRB?=
- =?utf-8?B?WDdWOXdpaDdCTWVDdWlRQ2RjUUtpZFpKVCtyOW53RkFnSGN3ZVdRNGlFM2RK?=
- =?utf-8?Q?YzPEWwKlVWMr2LYNVtjhA7IKN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: abf64d9b-adea-4d1e-df7c-08dd4f58bf9f
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2025 13:41:15.0492
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2025 13:42:03.1153
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Qp70IFxpmZaXQMFW6MeCQJJaOn4oeMjARyLBAU+djFRXL+cuonuaQfaZVIrDdVjW6NZMKBgQQib9JBEYIFYo0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9120
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ba81c12-b05d-46c2-78eb-08dd4f58dc91
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017099.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7268
 
+Add attributes that allow matching on source and destination ports with
+a mask. Matching on the source port with a mask is needed in deployments
+where users encode path information into certain bits of the UDP source
+port.
 
-On 2/6/25 19:23, Ira Weiny wrote:
-> Alejandro Lucero Palau wrote:
->> On 2/5/25 21:45, Ira Weiny wrote:
->>> alucerop@ wrote:
->>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>
->>>> Type3 relies on mailbox CXL_MBOX_OP_IDENTIFY command for initializing
->>>> memdev state params.
->>>>
->>>> Allow a Type2 driver to initialize same params using an info struct and
->>>> assume partition alignment not required by now.
->>>>
->>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->>> This is exactly the type of thing I was hoping to avoid by removing these
->>> members from the mds.  There is no reason you should have to fake these
->>> values within an mds just to create partitions in the device state.
->>
->> Let's be practical here.
->>
->>
->> A type2 without a mailbox needs to give that information for building up
->> the DPA partitions. Before it was about dealing with DPA resources from
->> the accel driver, but I do not think an accel driver should handle any
->> partition setup at all.
-> I 100% totally agree!  However, the dev state is where those partitions are
-> managed.  Not the memdev state.
+Temporarily set the type of the attributes to 'NLA_REJECT' while support
+is being added.
 
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ include/uapi/linux/fib_rules.h | 2 ++
+ net/core/fib_rules.c           | 2 ++
+ 2 files changed, 4 insertions(+)
 
-But as I said in other previous patches, this patchset version does use 
-cxl_memdev_state as the opaque struct to be used by the accel driver.
+diff --git a/include/uapi/linux/fib_rules.h b/include/uapi/linux/fib_rules.h
+index 00e9890ca3c0..95ec01b15c65 100644
+--- a/include/uapi/linux/fib_rules.h
++++ b/include/uapi/linux/fib_rules.h
+@@ -70,6 +70,8 @@ enum {
+ 	FRA_DSCP,	/* dscp */
+ 	FRA_FLOWLABEL,	/* flowlabel */
+ 	FRA_FLOWLABEL_MASK,	/* flowlabel mask */
++	FRA_SPORT_MASK,	/* sport mask */
++	FRA_DPORT_MASK,	/* dport mask */
+ 	__FRA_MAX
+ };
+ 
+diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
+index 424b4cd4e9e5..f5b1900770ec 100644
+--- a/net/core/fib_rules.c
++++ b/net/core/fib_rules.c
+@@ -784,6 +784,8 @@ static const struct nla_policy fib_rule_policy[FRA_MAX + 1] = {
+ 	[FRA_DSCP]	= NLA_POLICY_MAX(NLA_U8, INET_DSCP_MASK >> 2),
+ 	[FRA_FLOWLABEL] = { .type = NLA_BE32 },
+ 	[FRA_FLOWLABEL_MASK] = { .type = NLA_BE32 },
++	[FRA_SPORT_MASK] = { .type = NLA_REJECT },
++	[FRA_DPORT_MASK] = { .type = NLA_REJECT },
+ };
+ 
+ int fib_newrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
+-- 
+2.48.1
 
-
->> Mainly because there is code now doing that in
->> the cxl core which can be used for accel drivers without requiring too
->> much effort. You can see what the sfc driver does now, and it is
->> equivalent to the current pci driver. An accel driver with a device
->> supporting a mailbox will do exactly the same than the pci driver.
->>
-> I agree that the effort you made in these patches was not huge.  Changing the
-> types around and defining mds_info is not hard.  But the final result is odd
-> and does not fix a couple of the issues Dan had with the core architecture.
-> First of which is the carrying of initialization values in the memdev
-> state:[1]
->
-> [1]
->
-> 	> @@ -473,7 +488,9 @@ static inline struct cxl_dev_state *mbox_to_cxlds(struct cxl_mailbox *cxl_mbox)
-> 	>   * @dcd_cmds: List of DCD commands implemented by memory device
-> 	>   * @enabled_cmds: Hardware commands found enabled in CEL.
-> 	>   * @exclusive_cmds: Commands that are kernel-internal only
-> 	> - * @total_bytes: sum of all possible capacities
-> 	> + * @total_bytes: length of all possible capacities
-> 	> + * @static_bytes: length of possible static RAM and PMEM partitions
-> 	> + * @dynamic_bytes: length of possible DC partitions (DC Regions)
-> 	>   * @volatile_only_bytes: hard volatile capacity
-> 	>   * @persistent_only_bytes: hard persistent capacity
-> 	
-> 	I have regrets that cxl_memdev_state permanently carries runtime
-> 	storage for init time variables, lets not continue down that path
-> 	with DCD enabling.
->
-> 	-- https://lore.kernel.org/all/67871f05cd767_20f32947f@dwillia2-xfh.jf.intel.com.notmuch/
->
->> For avoiding the mds fields the weight should not be on the accel
->> driver.
-> I agree.  So why would you want to use the mds fields at all?
-
-
-I just wanted to have Type2 support patchset working with the new DPA 
-work. I was hoping those concerns not addressed with another patch or 
-patches Type2 work should be adapted to.
-
-
->
-> I proposed a helper function to create cxl_dpa_info [cxl_add_partition] and Dan
-> proposed a function to create the partitions from cxl_dpa_info
-> [cxl_dpa_setup].[2]
->
-> [2]
->
->     void cxl_add_partition(struct cxl_dpa_info *info, u64 start, u64 size, enum cxl_partition_mode mode)
->     int cxl_dpa_setup(struct cxl_dev_state *cxlds, const struct cxl_dpa_info *info)
->
-> 	-- https://lore.kernel.org/all/20250128-rfc-rearch-mem-res-v1-2-26d1ca151376@intel.com/
->
-> What more do you need?
-
-
-I need a stable API to work with which is not going to change so quick 
-after a work like the DPA changes.
-
-
->> This patch adds a way for giving the required (and little) info
->> to the core for building the partitions.
-> The second issue with your patch set is in the addition of struct mds_info.
-> This has the same issue which Dan objected to about creating a temporary
-> variable[3] but this is worse than my proposal in that your set continues to
-> carry the initialization state around in the memdev forever.
->
-> [3]
->
-> 	The crux of the concern for me is less about the role of
-> 	cxl_mem_get_partition_info() and more about the introduction of a new
-> 	'struct cxl_mem_dev_info' in/out parameter which is similar in function
-> 	to 'struct cxl_dpa_info'. If you can find a way to avoid another level
-> 	of indirection or otherwise consolidate all these steps into a straight
-> 	line routine that does "all the DPA enumeration" things.
->
-> 	-- https://lore.kernel.org/all/67a28921ca0b5_2d2c29434@dwillia2-xfh.jf.intel.com.notmuch/
->
->
-> Note to Dan.  I think doing 'all the DPA enumeration' things is the issue
-> here.  DCD further complicates this because it adds an additional DPA
-> discovery mechanism.  In summary we have:
->
-> 	1) Identify Memory Device (existing)
-> 	2) Hard coded values (Alejandro's type 2 set)
-> 	3) Get dynamic capacity configuration (DCD set)
->
-> It is conceivable that a device might want to do some random combination of
-> those.  But the combinations we have in front of us are:
->
-> 	A) 1 only
-> 	B) 2 only
-> 	C) 1 & 3
->
-> I'm not sure it is worth having a single call which attempts to enumerate the
-> dpa info.  I'll explore having a call which does A & C for mailbox supported
-> devices.  But B was specifically in my mind when I came up with the
-> cxl_add_partition() call.  And I felt using it in A and C would work just
-> fine.
->
->> So if you or Dan suggest this
->> is wrong and the accel driver should deal with the intrinsics of DPA
->> partitions, I will fight against it :-)
-> I don't want an accel driver to deal with the intrinsics of the DPA
-> partitions at all!  But it should be able to specify the size parameters
-> separate from creating dummy memdev state objects with values it does not
-> care about.
-
-
-Yes, but those objects have been there for a long time ...
-
-I bet we can optimize other aspects of those structs as well, but this 
-is being done in the middle of patches like Type2 and DCD relying on them.
-
-
->> I'm quite happy with the DPA partition work,
-> As am I.  I'm just trying to go a step further so it fits a bit cleaner
-> when DCD comes along.  I do apologize for the delay and churn in your set.
-> That was not my intention.  But I thought the alterations of the memdev
-> state were a good clean up.
->
->> with the result of current
->> v10 being simpler and cleaner. But it is time to get the patchsets
->> depending on that cleaning work going forward.
-> Agreed.
->
-> If Dan likes what you have here I will adjust the DCD work.
->
-> Ira
 
