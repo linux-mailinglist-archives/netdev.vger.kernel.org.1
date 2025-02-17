@@ -1,82 +1,135 @@
-Return-Path: <netdev+bounces-167059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18082A38A5B
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:10:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D147A38AC7
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 079F81721E4
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 17:10:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895BC3B43E9
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 17:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345F32288D3;
-	Mon, 17 Feb 2025 17:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kw4oWzjP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC6122AE5D;
+	Mon, 17 Feb 2025 17:39:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CA922838F;
-	Mon, 17 Feb 2025 17:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3DC22A4E8;
+	Mon, 17 Feb 2025 17:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739812219; cv=none; b=lV27HHxapPfkCcVsTk/fM+iuL9AFg+lyKPzinr45dtNfxr+5LKfnn557kwHRQ+/SjfCpk/9DCZYZZgz3Xvn+2CBLecwczlo0oSBu6k0LqLKoz0oohtK65fOrWtVxxGBjGC5YhoxxlY7+/GxhPDbYifLqnjuuqx8sjJqaYudrc9o=
+	t=1739813989; cv=none; b=QoYbCsgjTriOiOs7BvnMlFV1xTEcUIpPBHONaN0MkCj8vHm1308o60akzBxBWkK8b7LeJyTYHFfQArfQig2waTLFVyf15DLFIjZ6pwak2PMTnEsGhs+K26cAPWxv/MTgB6cHIfMxVvnoOM9b21+npzHfRRc0HyR97QRdaqr67uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739812219; c=relaxed/simple;
-	bh=S3qwZURE807WhbedRsfGnHG1TDtv+0elSP//hvhcmqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SvBucihjx58tAgVLZUeRQrPWSdgTFcNw7nEUwcj34N+YrSqAJBPdwhMYiqpmzMrJ8WjM06FHY5ZwgadepxfR0H1u2Z941aHDJK1ieNdSLYMngO70FkOGaApWH55E7XodNSEo1mvRFtGwIk3/6RIKCT1igk3/0pL2oZq6J6VT+MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kw4oWzjP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B1AC4CEE4;
-	Mon, 17 Feb 2025 17:10:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739812218;
-	bh=S3qwZURE807WhbedRsfGnHG1TDtv+0elSP//hvhcmqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kw4oWzjPYMIxoMeq2VF5x3eyJA5Tx1tDLDBCO18Q6WvyTLaMrhhs7BESiqk+4wGTW
-	 wGl4oaKiV9mBMRary8cuaF3RfSpscrTkKJEZM0ypwPHQNTsYUS181g8o2ZUpdcK1Y1
-	 UDDKhklp/FTUlczekGqoV3lfBzGg3oFUKp1eEGwJoe7/45Drv8SrYUaj87WcGDwa7w
-	 mZELfSI0bL7hHc5W9vzCFUrFpFA/YZGUsfBIQ+vPKqlw7uox44RJ/ko3Rvc7FIaS4b
-	 ixMv+iUX4toURTJClKDLMBiMToSjQJ5sNF01bD5bY5S9zIz1RBkJd1VLxqOAtJkhh0
-	 PIyKY70qdgc+Q==
-Date: Mon, 17 Feb 2025 09:10:17 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, ioana.ciornei@nxp.com, yangbo.lu@nxp.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev,
- stable@vger.kernel.org
-Subject: Re: [PATCH net 1/8] net: enetc: fix the off-by-one issue in
- enetc_map_tx_buffs()
-Message-ID: <20250217091017.3779eaf5@kernel.org>
-In-Reply-To: <20250217093906.506214-2-wei.fang@nxp.com>
-References: <20250217093906.506214-1-wei.fang@nxp.com>
-	<20250217093906.506214-2-wei.fang@nxp.com>
+	s=arc-20240116; t=1739813989; c=relaxed/simple;
+	bh=PRTZbIsGA8Nc0ATeWU+MuKCsNsmGvZmADdAnNmIhl7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lpti0uX467h21SK2NlrlI+qmCWG7LYlCrS4ELrU0DjfJWMByYsZjNMDR5TT84YSIPM5OGFxJqlo7/MTb6CnjIISVqHytqvDzk4neb7JdYe2s70UQlzdhTg/cE54WTVZGhxjiJeLS6MrfsWi2NwKr4rbttwsMr8PhbO4tSyY5S5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tk4pt-0001we-HZ; Mon, 17 Feb 2025 18:23:13 +0100
+Received: from [78.47.5.107] (helo=sdn-nic-test01..)
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tk4pt-000Opa-0r;
+	Mon, 17 Feb 2025 18:23:13 +0100
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	mykolal@fb.com,
+	shuah@kernel.org,
+	hawk@kernel.org,
+	marcus.wichelmann@hetzner-cloud.de
+Subject: [PATCH bpf-next v2 0/6] XDP metadata support for tun driver
+Date: Mon, 17 Feb 2025 17:23:02 +0000
+Message-ID: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27552/Mon Feb 17 10:47:21 2025)
 
-On Mon, 17 Feb 2025 17:38:59 +0800 Wei Fang wrote:
-> +	while (count--) {
->  		tx_swbd = &tx_ring->tx_swbd[i];
->  		enetc_free_tx_frame(tx_ring, tx_swbd);
->  		if (i == 0)
->  			i = tx_ring->bd_count;
->  		i--;
-> -	} while (count--);
-> +	};
+Hi all,
 
-I think this gives us:
+Thank you for your review comments. Here is an updated patch series with
+the requested changes.
 
-drivers/net/ethernet/freescale/enetc/enetc.c:408:2-3: Unneeded semicolon
+To add a selftest for the metadata support of the tun driver, I refactored
+an existing "xdp_context_functional" test which already tested something
+similar but for the veth driver. I made the testing logic behind it more
+reusable so that it also works for the tun driver and possibly other
+drivers in the future.
+
+The last patch ("fix file descriptor assertion in open_tuntap helper")
+fixes an assertion in an existing helper function that I just moved and
+reused. Somehow the file descriptor for /dev/net/tun turned out to be 0
+when running in the BPF kernel-patches GitHub CI, so the assert condition
+needed adjustment:
+https://github.com/kernel-patches/bpf/actions/runs/13339140896
+
+Successful pipeline:
+https://github.com/kernel-patches/bpf/actions/runs/13372306548
+
+---
+
+v2:
+- submit against bpf-next subtree
+- split commits and improved commit messages
+- remove redundant metasize check and add clarifying comment instead
+- use max() instead of ternary operator
+- add selftest for metadata support in the tun driver
+
+v1: https://lore.kernel.org/all/20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de/
+
+Marcus Wichelmann (6):
+  net: tun: enable XDP metadata support
+  net: tun: enable transfer of XDP metadata to skb
+  selftests/bpf: move open_tuntap to network helpers
+  selftests/bpf: refactor xdp_context_functional test and bpf program
+  selftests/bpf: add test for XDP metadata support in tun driver
+  selftests/bpf: fix file descriptor assertion in open_tuntap helper
+
+ drivers/net/tun.c                             |  24 ++-
+ tools/testing/selftests/bpf/network_helpers.c |  28 ++++
+ tools/testing/selftests/bpf/network_helpers.h |   3 +
+ .../selftests/bpf/prog_tests/lwt_helpers.h    |  29 ----
+ .../bpf/prog_tests/xdp_context_test_run.c     | 152 +++++++++++++++---
+ .../selftests/bpf/progs/test_xdp_meta.c       |  56 ++++---
+ 6 files changed, 215 insertions(+), 77 deletions(-)
+
 -- 
-pw-bot: cr
+2.43.0
+
 
