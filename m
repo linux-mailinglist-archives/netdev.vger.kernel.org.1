@@ -1,199 +1,134 @@
-Return-Path: <netdev+bounces-167034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA044A386CF
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:43:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651C3A386EA
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:50:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 562A71686C5
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:40:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B86B1887EF0
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A11D21D58C;
-	Mon, 17 Feb 2025 14:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19FC221560;
+	Mon, 17 Feb 2025 14:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UOxFwSaT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mx4kRtrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52EE1448D5
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 14:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2899F21CA0E
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 14:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739803238; cv=none; b=HDBb2QtzrnUWeeadnPNb20Nz+6yGX0Et0xUx0qEmGBpq9YuaSl9kAaCUXLuSmdJqrZd5nIfcJykvRy0F1uFYa7dWs8h7IxKX0ixdyHjM9oP1W3MwKPu0K+tO+qJ6+8US90pfYtDD/0McxVlYGxUBQoqiiaz9deIqTYZdHv0cExg=
+	t=1739803717; cv=none; b=u2+0QLunlbWOruOfolgpxv5vRMOV5BQcU1fy5Nf1eebd3v7wC+Z2fC9oEdeeETqSQAL6XzPHMHM+wdxFPA421jukdQFIN5WEmYyVAOCO7ngiDy9pw5npD08UxraQSfTVRKyYAvp5pPMRQDDFIJXxY9tQOqWCSGfaUVFF7WFTj/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739803238; c=relaxed/simple;
-	bh=zcIhLnYkLQJuAbMAhY1+QOldMZBVStDYwazT3yHekcA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNnP8oVt5Jw/tNPm2CFLx5DaB2SpzuOGYG3yi+UosAR5qnWU+gQta2FlcZRe123hx40DY8IUyghrQTvAlGek04u4RD1wr1ckieQjl+xDbThiAcPoRnXV4GQrItZSu+CzAtO6WCFmGPo6BSYnDnVXEeQE+uaxU3qvkjpw0fTLzCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UOxFwSaT; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id BEC3F11400AA;
-	Mon, 17 Feb 2025 09:40:35 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Mon, 17 Feb 2025 09:40:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1739803235; x=1739889635; bh=xWT3EKZqoTOo9805ijPC48DJU8XcWr/zaJw
-	fAvmUlos=; b=UOxFwSaTKBZ3BBDcUKBsiGDiUitshBPfFuTW3w8MGfHpDT8hnd2
-	/R4NAREfqS2kAOKDLkQt65tcDaVJWz6fAcNGS8dgq49WG59jFr/84V3VPACCEpzj
-	fwtQIDRP/kl7yPo4gLV3Srw1mGdct0b3UcPK/sk/48aKSA7tTpv74j5X/0e1RqcT
-	iSQqsRSJPY5tQcjzg+v3i1zb7tm+pHef/P8zRRZU0Fmq//+k5B03Fk7REkDPAHXI
-	mIWd4CazjFImInopL9bscAYd+atvxttt4cIAVhdN9u8orntGAvxaFQjXlDa4KpfE
-	n5ok+1UmLVCiNXyA/0XUnQkOR36qavvgGQQ==
-X-ME-Sender: <xms:Y0qzZ7yG5NMMTYjyBHTRjitCvUYlp2Fu4phYsJBrDHxHujBMb78yAw>
-    <xme:Y0qzZzRioA4U7T-0VOB5dXYivYetqlqydSsLK-NOoM4ra4qckazhLB-LbbW4HbY1A
-    BxxKAkUkTUJZbs>
-X-ME-Received: <xmr:Y0qzZ1Xg1OlawuFcfhOHJR56PQl35HYcCdQ8g4s6arfv6a9rJYF4YGvAmQaU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkeeiiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpeejvdetieeujeeuheejhfeuheehudduteetueel
-    lefhuedugeelheeuffdtieekueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdgsph
-    hfrdgtqdhonecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
-    mhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddtpdhmoh
-    guvgepshhmthhpohhuthdprhgtphhtthhopehjuhhsthhinhdrihhurhhmrghnsehulhhi
-    vghgvgdrsggvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
-    pegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvth
-    esghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdp
-    rhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorh
-    hmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgr
-    ihhlrdgtohhm
-X-ME-Proxy: <xmx:Y0qzZ1hOb5oLLWjgC84jmatsLGIIqKH9BdMUmquwhyxz0cPA8K9wwQ>
-    <xmx:Y0qzZ9AvK4eQJmdQBZWHFodPvkFM_lxIPcaA_dpZA-P-W5JWu3yk9Q>
-    <xmx:Y0qzZ-LX_k4iVBYaE_RIRTG-b3EGKd6jqQOonWZfHxm2Q13x0ckyGw>
-    <xmx:Y0qzZ8CIbAuk0y9rdNR5EcIb_IDgGb3fqN0BOk1SFf8mr-OSqJE4iA>
-    <xmx:Y0qzZxu11LE0qHJWCKr5vcdJwU9mSCQOD2zyrfvA3aKYtZ7p4a22ZsqA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Feb 2025 09:40:34 -0500 (EST)
-Date: Mon, 17 Feb 2025 16:40:32 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, Alexander Aring <alex.aring@gmail.com>,
-	David Lebrun <dlebrun@google.com>
-Subject: Re: [PATCH net v2 2/3] net: ipv6: fix lwtunnel loops in ioam6, rpl
- and seg6
-Message-ID: <Z7NKYMY7fJT5cYWu@shredder>
-References: <20250211221624.18435-1-justin.iurman@uliege.be>
- <20250211221624.18435-3-justin.iurman@uliege.be>
- <Z63zgLQ_ZFmkO9ys@shredder>
- <a375f869-9fc3-4a58-a81a-c9c8175463dd@uliege.be>
- <Z7ISxnU0QhtRGTnb@shredder>
+	s=arc-20240116; t=1739803717; c=relaxed/simple;
+	bh=8dhjqi6RQt0qUvh026uE2aPh7osHZWJ3X8d5NYVkLm8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VBQAotwWTfACMg4ocxsiBMThU5b135jXH1m3KBECgX8WKv3qj4RDrw9lgE2qCt/4CxVd+91av+taJjK+joMM2n993fKVe2Sm7+OFl/DTBYyumbMJYRPVZEwAEbsiQ0vofN0CIqdH+5px5CZMgrufOkJpB3ti1/SO/vnILN5WF/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mx4kRtrY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739803714;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rc6qCN4ETICC8azLtjrKdOIt2/nf2AWh/k3ErXHTy00=;
+	b=Mx4kRtrYwSqJrvpRZyFiPMQ9XQpXthslg+UYXDRvXKfPfmu7D5p3dUH8q7kkaePfFixSbx
+	Hf7CN0zMOhS8AqTiiQkohFaAxpx4XJup4ciPULKovkek3mjsN9iVlH6kGepcOgvB3n8pzT
+	6jp7RVGEOMSEbN/bnfb+j0wIDELnFmI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-147-mrWbPi0hNja-OIALSx04Uw-1; Mon, 17 Feb 2025 09:48:32 -0500
+X-MC-Unique: mrWbPi0hNja-OIALSx04Uw-1
+X-Mimecast-MFC-AGG-ID: mrWbPi0hNja-OIALSx04Uw_1739803711
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-439385b08d1so40485655e9.1
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 06:48:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739803711; x=1740408511;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rc6qCN4ETICC8azLtjrKdOIt2/nf2AWh/k3ErXHTy00=;
+        b=U3+2Rty4mD/lHOb+/VkHwj09bFkHmVDphwx9BZcaGuIZuvOXi4eXtPEIX0VNVrJamu
+         MaOPek+82EhKqR2VymUTsRU1YRYf91/cidPQ4yBjk7QWNUm05xmYtuYBM2cWq44Lwu6G
+         r9QADhTkQYHYPa8RBIpOUmL1oUHZeaJCqh+/NmTZGhpIzbK7OPP9vpTUpbZVHqe17Xg9
+         iL2AhsQemrrkbj11BtuR/19qmB/pBcRWncJi5iZXAEfvCXFYoJ4jYmhly10DQOYhSI/p
+         AyKoW0sJresKOuCZWWRnxCX87/Npk/K0B1uwt3Wgur+IDuJp8cdbc7+GaNNP4qOZEggA
+         n5kg==
+X-Gm-Message-State: AOJu0YwH5z1vRWWUkxiUZ6AU6XWsKwPZrMKd7UNpgG7azxQbloR+vAAM
+	z7NUGzU5xPnWXBsEy4w/zLCjoQ0jTqdK5B58bI6cephAxDETRSG5h2UBWx8B/FAbNr7FdLN9hWp
+	Ecv1Nz5SPuoHBfVITYp7UpoR99xSio/04wSFcJn8obBicqwk7sXRSUw==
+X-Gm-Gg: ASbGnctfzViNm2gg0Lsx9YbXQ91w6EAAddwdYS1fSTqyHtejCOUj0CCPI5AhmyM3vuI
+	8diMc8M/JMFx6uHKV5g+CU4Uo9QqCCrQBFYWhQ/FnK3HMjSk2DBhuT+Au5rI5NKQ7Fd5k4qNhaB
+	sufimP97n8GHDH04tQDO8fP7mgdXw0cpr6+78//NFznHkMYX67GURs4etnkuM+1U3kiLvgTbq0c
+	LMSGYV+fjmmlMtCMFWWdMwAPddIpkjV+7aqaCzKyeIC0fTK3r1lgyscMBEaGJL+HvmkQY2bCCgo
+	odZJBUwgKBtYlsn6mIoUwUlMRcTZvafQYto=
+X-Received: by 2002:a05:600c:1c24:b0:439:6304:e28a with SMTP id 5b1f17b1804b1-4396e5b56e7mr110357185e9.0.1739803711291;
+        Mon, 17 Feb 2025 06:48:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE4dxgzvDp9rr1MXvaB9poBGfjXuDnm6JJThZOwkW5h8/2vTvlD/gGcLEba0dFztjL+/zHSAQ==
+X-Received: by 2002:a05:600c:1c24:b0:439:6304:e28a with SMTP id 5b1f17b1804b1-4396e5b56e7mr110356975e9.0.1739803710901;
+        Mon, 17 Feb 2025 06:48:30 -0800 (PST)
+Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439617da91asm126105915e9.2.2025.02.17.06.48.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Feb 2025 06:48:30 -0800 (PST)
+Message-ID: <41482213-e600-4024-9ca7-a085ac50f2db@redhat.com>
+Date: Mon, 17 Feb 2025 15:48:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7ISxnU0QhtRGTnb@shredder>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: allow small head cache usage with large
+ MAX_SKB_FRAGS values
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
+ <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Feb 16, 2025 at 06:31:06PM +0200, Ido Schimmel wrote:
-> On Thu, Feb 13, 2025 at 11:51:49PM +0100, Justin Iurman wrote:
-> > On 2/13/25 14:28, Ido Schimmel wrote:
-> > > On Tue, Feb 11, 2025 at 11:16:23PM +0100, Justin Iurman wrote:
-> > > > When the destination is the same post-transformation, we enter a
-> > > > lwtunnel loop. This is true for ioam6_iptunnel, rpl_iptunnel, and
-> > > > seg6_iptunnel, in both input() and output() handlers respectively, where
-> > > > either dst_input() or dst_output() is called at the end. It happens for
-> > > > instance with the ioam6 inline mode, but can also happen for any of them
-> > > > as long as the post-transformation destination still matches the fib
-> > > > entry. Note that ioam6_iptunnel was already comparing the old and new
-> > > > destination address to prevent the loop, but it is not enough (e.g.,
-> > > > other addresses can still match the same subnet).
-> > > > 
-> > > > Here is an example for rpl_input():
-> > > > 
-> > > > dump_stack_lvl+0x60/0x80
-> > > > rpl_input+0x9d/0x320
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > [...]
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > lwtunnel_input+0x64/0xa0
-> > > > ip6_sublist_rcv_finish+0x85/0x90
-> > > > ip6_sublist_rcv+0x236/0x2f0
-> > > > 
-> > > > ... until rpl_do_srh() fails, which means skb_cow_head() failed.
-> > > > 
-> > > > This patch prevents that kind of loop by redirecting to the origin
-> > > > input() or output() when the destination is the same
-> > > > post-transformation.
-> > > 
-> > > A loop was reported a few months ago with a similar stack trace:
-> > > https://lore.kernel.org/netdev/2bc9e2079e864a9290561894d2a602d6@akamai.com/
-> > > 
-> > > But even with this series applied my VM gets stuck. Can you please check
-> > > if the fix is incomplete?
-> > 
-> > Good catch! Indeed, seg6_local also needs to be fixed the same way.
-> > 
-> > Back to my first idea: maybe we could directly fix it in lwtunnel_input()
-> > and lwtunnel_output() to make our lives easier, but we'd have to be careful
-> > to modify all users accordingly. The users I'm 100% sure that are concerned:
-> > ioam6 (output), rpl (input/output), seg6 (input/output), seg6_local (input).
-> > Other users I'm not totally sure (to be checked): ila (output), bpf (input).
-> > 
-> > Otherwise, we'll need to apply the fix to each user concerned (probably the
-> > safest (best?) option right now). Any opinions?
+On 2/12/25 9:47 PM, Eric Dumazet wrote:
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 5b2b04835688f65daa25ca208e29775326520e1e..a14ab14c14f1bd6275ab2d1d93bf230b6be14f49
+> 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -56,7 +56,11 @@ DECLARE_PER_CPU(u32, tcp_tw_isn);
 > 
-> I audited the various lwt users and I agree with your analysis about
-> which users seem to be effected by this issue.
+>  void tcp_time_wait(struct sock *sk, int state, int timeo);
 > 
-> I'm not entirely sure how you want to fix this in
-> lwtunnel_{input,output}() given that only the input()/output() handlers
-> of the individual lwt users are aware of both the old and new dst
-> entries.
-> 
-> BTW, I noticed that bpf implements the xmit() hook in addition to
-> input()/output(). I wonder if a loop is possible in the following case:
-> 
-> ip_finish_output2()                                         <----+
-> 	lwtunnel_xmit()                                          |
-> 		bpf_xmit()                                       |
-> 			// bpf program does not change           |
-> 			// the packet and returns                |
-> 			// BPF_LWT_REROUTE                       |
-> 			bpf_lwt_xmit_reroute()                   |
-> 				// unmodified packet resolves    |
-> 				// the same dst entry            |
-> 				dst_output()                     |
-> 					ip_output() -------------+
+> -#define MAX_TCP_HEADER L1_CACHE_ALIGN(128 + MAX_HEADER)
+> +#define MAX_TCP_HEADER L1_CACHE_ALIGN(64 + MAX_HEADER)
 
-FWIW, verified that this is indeed the case. Reproducer:
+I'm sorry for the latency following-up here, I really want to avoid
+another fiasco.
 
-$ cat lwt_xmit_repo.bpf.c
-// SPDX-License-Identifier: GPL-2.0
-#include <linux/bpf.h>
-#include <bpf/bpf_helpers.h>
+If I read correctly, you see the warning on top of my patch because you
+have the above chunk in your local tree, am I correct?
 
-SEC("lwt_xmit")
-int repo(struct __sk_buff *skb)
-{
-        return BPF_LWT_REROUTE;
-}
-$ clang -O2 -target bpf -c lwt_xmit_repo.bpf.c -o lwt_xmit_repo.o
-# ip link add name dummy1 up type dummy
-# ip route add 192.0.2.0/24 nexthop encap bpf xmit obj ./lwt_xmit_repo.o sec lwt_xmit dev dummy1
-# ping 192.0.2.1
+If so, would you be ok to split the change in a 'net' patch doing the
+minimal fix (basically the initially posted patch) and following-up on
+net-next to adjust MAX_TCP_HEADER and SKB_SMALL_HEAD_SIZE as you suggest?
+
+I have a vague fear some encap scenario may suffer from the reduced TCP
+headroom, I would refrain from pushing such change on stable, if possible.
+
+Thanks,
+
+Paolo
+
 
