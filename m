@@ -1,105 +1,92 @@
-Return-Path: <netdev+bounces-166902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98BCAA37D8B
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:55:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0081A37D99
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E401B1890E49
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC036189592C
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850001A76BB;
-	Mon, 17 Feb 2025 08:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187561A8407;
+	Mon, 17 Feb 2025 08:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="o1ihM3c0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xoZE3DCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395491A3148;
-	Mon, 17 Feb 2025 08:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01381A3147
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 08:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739782418; cv=none; b=EAep0mrL5a7LtqF4pRQRwOkSoVszNk5HXcTkG4jSHC/7RWyfNkPo4FgGncb7eesZBXZbFYW9061GFsg9Vk5xApo1/DLchAJkEOCYsY+Gt5ZKm7tzEUtViE8zoYbzDmbPHJjBlmyasL3/zNd4deQP04GKranyLYwG0PNDfRMSWQQ=
+	t=1739782461; cv=none; b=F9bBQJVVyeZRblvaQBVmOKHu6ABpPE4Iy3F5GvCXrgqRMAJi8RSTaQtTjVXBeLmzwhh348j4IfjUK5kTmKQBB0ArWFwb2NPDhDFWJjpEzmfdTEMLAgJ+SnQ/o5cjQA3UXxBsjikbaS7gCk3r/diftpfx4D3JJ4xJzMSuesREVt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739782418; c=relaxed/simple;
-	bh=NQAGRszoXd7XKuzprwEoRex28p+4g9ymhtAUqgJpjSg=;
+	s=arc-20240116; t=1739782461; c=relaxed/simple;
+	bh=oWineBVGnkNk6iKLOeOh/F+cD1tt/QEO+9jjmOxZo+U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lT2Q7Bt9EOLRssVeVJSYaHh/O4P+Nl79iiCxSqsu4nmRUOpbD5ulHdcFq/PsF0Um5Th++S7DvI4mOfbW6JdlJ2xjwCHWnrLUQwc4FHC0pMKlcNO5oqh1MpRNoRuhJG62ta5TB3E4nCcBG5e4Lk1LL72zRPhBjr9d80TRWRQAxD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=o1ihM3c0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206D3C4CED1;
-	Mon, 17 Feb 2025 08:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739782417;
-	bh=NQAGRszoXd7XKuzprwEoRex28p+4g9ymhtAUqgJpjSg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o1ihM3c0k1Gi4V7VTw/MQnoWlbhwT8JF4wRDuwszLncV0NtqTgKBVUV5ct6geo/uO
-	 dFKMdvYrpnR/raXgPeWQh8w4mgoAUsR7UFNn5zifb4NSrC0s1+4GQbIs/ku9LLYwsy
-	 5F103MI4sPs5o4axCUmlCpdlvku/cfCjAlZbV5GA=
-Date: Mon, 17 Feb 2025 09:53:34 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs
- isoc_alt
-Message-ID: <2025021717-prepay-sharpener-37fb@gregkh>
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021425-surgical-wackiness-0940@gregkh>
- <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O6R3aw5EdSArI2lSoUCH0jZM6vOd8gWDfwDXMnso3dxmhkRriGEQzJ3tGrSHy5IkUItKrOTfPnptbpMT5B8q+/+NwPn54H3INar9zaEkMQyDM+QxhiDK4hL8SqgS8Iq76sZHBzLSD/7r0OTYvO+VuZq8G6Hq//x3jsppczPCBZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xoZE3DCU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hN/9/MVhJnRh726Rcj9Zi8lsbYpYMhXieCYJUD1CniY=; b=xoZE3DCUPt3ST+/Vrq48t25XRG
+	9lqo7ecj0SG5BJ6VUDSiX35C3j98aFLP9ekK0SfBxN0UZq0CIxdeFd7Dm8nOw86O6tZFDbYNQHyJT
+	nTLkmqA8FCLQY8xvwN3oPKo4dRTery46QO8JzM3jxCslzBjiplLV61g20DDuNdgZjoAx0rOpf26CT
+	1XVH5hOZh2vYEWBb3OElDA4muyOmqZJXit1yQDTAzJ0XxJtXJOuj+REN3wdww/YdpQQCWLO9n6amB
+	+ttZ3gIrAmKi3fs+M/iHfm+CXgLvDeXc65G9AQrFBM6w1o41mFtVQhdYJdVnCMyMF81FvLe1F/RB5
+	bZB6jMyA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48368)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tjwtB-0005rM-1h;
+	Mon, 17 Feb 2025 08:54:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tjwt8-00064b-1m;
+	Mon, 17 Feb 2025 08:54:02 +0000
+Date: Mon, 17 Feb 2025 08:54:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/6] net: phy: move definition of phy_is_started
+ before phy_disable_eee_mode
+Message-ID: <Z7L5KuOg8-ZPJ3iP@shell.armlinux.org.uk>
+References: <3caa3151-13ac-44a8-9bb6-20f82563f698@gmail.com>
+ <04d1e7a5-f4c0-42ab-8fa4-88ad26b74813@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
+In-Reply-To: <04d1e7a5-f4c0-42ab-8fa4-88ad26b74813@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
-> On Fri, Feb 14, 2025 at 7:37 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > >
-> > > Expose the isoc_alt attr with device group to avoid the racing.
-> > >
-> > > Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> > > it also becomes the parent device of hci dev.
-> > >
-> > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-> >
-> > Wait, step back, why is this commit needed if you can change the alt
-> > setting already today through usbfs/libusb without needing to mess with
-> > the bluetooth stack at all?
+On Sun, Feb 16, 2025 at 10:15:42PM +0100, Heiner Kallweit wrote:
+> In preparation of a follow-up patch, move phy_is_started() to before
+> phy_disable_eee_mode().
 > 
-> In short: We want to configure the alternate settings without
-> detaching the btusb driver, while detaching seems necessary for
-> libusb_set_interface_alt_setting to work (Please correct me if I'm
-> wrong!)
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-I think changing the alternate setting should work using usbfs as you
-would send that command to the device, not the interface, so the driver
-bound to the existing interface would not need to be removed.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Try it out and see yourself to verify this before you continue down any
-of this.  There's no need to use libfs for just a single usbfs command,
-right?
+Thanks!
 
-thanks,
-
-greg k-h
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
