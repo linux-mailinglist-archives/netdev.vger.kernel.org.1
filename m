@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-166985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D92A383D2
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:05:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A621A38407
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8821B173FAB
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:03:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BAB63B8147
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6145921E098;
-	Mon, 17 Feb 2025 13:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D177122370D;
+	Mon, 17 Feb 2025 13:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FjRCX2fD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRK5rkj7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3965D21C9E5;
-	Mon, 17 Feb 2025 13:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7105223705;
+	Mon, 17 Feb 2025 13:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739797331; cv=none; b=M6Q6X8R1p466Hg686ZHzcl4r9Kx+Q9h9v3rM3EDv5vxkE44jp+MUFq4svIyEujdObaJkW/TAmQFps0o2cyxANQfh7AF6B0cjwCEmoCR8FfB6qaB3ITkvhSRKkDrcfX1P9wdPbIPzYrOyFnaW0hvAsnbMZj3bNrxK0QHbi7OOdnk=
+	t=1739797333; cv=none; b=Jkgi26aTU8jTwQdZcigVs8nFcLJZYrFJQ9c65jT6kajqhydzYFGLkuxHK9sz3Ty1Bp2YK6Vv6UksccGVYd/R49tz5+4jjtsmSJsylh0i1ZIpX5AB4OGQ6xHuCpOhPUo9coM0peGwG50PvcRhuo6LhW7q/KWweltV+7R370bdEXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739797331; c=relaxed/simple;
-	bh=hNiq4VQ4l2nodOzFA4bxlJ9b6KGz4dBXXOthlUMOuVU=;
+	s=arc-20240116; t=1739797333; c=relaxed/simple;
+	bh=JZDiAKKeX0eSnGFkmKTsrRKkLXrlYR1V8xaHJKtSw9k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iunfAxzyBlrij5axiCvakpnkN5FChuIa5iFGRa+KEyKNEY5IQyUHBMDvHahXEDTv1OcYY9zxFGgaSZ1edA/1e3NQrpnw8S2WO62f9YalNYRX7ferw1DrLuHjG330QVAqpZVIm6kHyRRbNgfTeL8dGYpj0pO8HRTO+5dIjqUbJi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FjRCX2fD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51ABFC4CED1;
-	Mon, 17 Feb 2025 13:02:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=B5orhyuqlHd0ZTIckxdbhQfGrrlVaZUVLDc4EUxJHrUo6XIoSAXiZxcKRLnGu7LpxHR2H8YJ4jAjyAelsNCp0tSP2uB6yp+HhtNBXa1/e0BggvHrbYQsFzOVdCLXMqDsLRQrDj0SiKTbZiHMnDgQxnYWQ50A1by2ScpOUsFI6Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRK5rkj7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6473C4CED1;
+	Mon, 17 Feb 2025 13:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739797330;
-	bh=hNiq4VQ4l2nodOzFA4bxlJ9b6KGz4dBXXOthlUMOuVU=;
+	s=k20201202; t=1739797333;
+	bh=JZDiAKKeX0eSnGFkmKTsrRKkLXrlYR1V8xaHJKtSw9k=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FjRCX2fD+yhYPIPqpTLwPov64LsNoG0+5aaCGX6uw3qBq9uWkIC08w4qodBnTZFR2
-	 BtR+bghKtk+sURHA+z5+dlzQBwFVn2ry6yNhedBDXh1rQFmlW2aaNHWE2zCup5R8+/
-	 yHD7Yh8PONxTLvo0HGlsCxx4ujSuKaKZXVbmcNmeCKUrFcXqIA7ZFaKGZi7Cy9OBwG
-	 SCBuN6ZSBzOnkEAYgyb/b6njg6fA/Z1yn97Pjrw23VjYXERRPx/wYyJxP0EcQTClPT
-	 YovKhFCqLXHJKaEXDfspmvoXcUdmGh6OQqWTUE30t+SdX52xmW4Ys05qwPwMIvH6X4
-	 okRWb8AtzVfbA==
+	b=eRK5rkj798vGPYyTCyyOCTwt5Fvdtu8oVVKZcOW199858sroZfJvlJZLMRXVJBDhn
+	 cDq22qCIFzH/eDoOEJomOtQrbIRQeGwHvBeCoOhsVZyI0nmgD+BDhOdWf3nlLvf6Dk
+	 pI7LWiHP8aLijuDDErafNSETq72ptin3FHgnnjvpkPdbgX4Nm9f4IfCpnbbq5F8NWq
+	 omqbCic2ZUu2UwVTLGnM21KfJbBZZ0J7webPnYut+2BbeHWW3/r0MuouL4RuS06y++
+	 SoYaAt+jgWjgiQtUM6Gduo4OZ4rdzOukNvSHfdcSjN40PCkUXT8U9TpQvpRCVX8KBP
+	 YYpf4yITz1F0A==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 17 Feb 2025 14:01:14 +0100
-Subject: [PATCH net-next v5 10/15] dt-bindings: net: airoha: Add the NPU
- node for EN7581 SoC
+Date: Mon, 17 Feb 2025 14:01:15 +0100
+Subject: [PATCH net-next v5 11/15] dt-bindings: net: airoha: Add airoha,npu
+ phandle property
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250217-airoha-en7581-flowtable-offload-v5-10-28be901cb735@kernel.org>
+Message-Id: <20250217-airoha-en7581-flowtable-offload-v5-11-28be901cb735@kernel.org>
 References: <20250217-airoha-en7581-flowtable-offload-v5-0-28be901cb735@kernel.org>
 In-Reply-To: <20250217-airoha-en7581-flowtable-offload-v5-0-28be901cb735@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,95 +73,45 @@ Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  upstream@airoha.com, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.2
 
-This patch adds the NPU document binding for EN7581 SoC.
-The Airoha Network Processor Unit (NPU) provides a configuration interface
-to implement wired and wireless hardware flow offloading programming Packet
-Processor Engine (PPE) flow table.
+Introduce the airoha,npu property for the NPU node available on
+EN7581 SoC. The airoha Network Processor Unit (NPU) is used to
+offload network traffic forwarded between Packet Switch Engine
+(PSE) ports.
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- .../devicetree/bindings/net/airoha,en7581-npu.yaml | 72 ++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..414e5c0615b8a8db487c23978a283b0254b2b63c
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-@@ -0,0 +1,72 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/airoha,en7581-npu.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Airoha Network Processor Unit for EN7581 SoC
-+
-+maintainers:
-+  - Lorenzo Bianconi <lorenzo@kernel.org>
-+
-+description:
-+  The Airoha Network Processor Unit (NPU) provides a configuration interface
-+  to implement wired and wireless hardware flow offloading programming Packet
-+  Processor Engine (PPE) flow table.
-+
-+properties:
-+  compatible:
-+    enum:
-+      - airoha,en7581-npu
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    items:
-+      - description: mbox host irq line
-+      - description: watchdog0 irq line
-+      - description: watchdog1 irq line
-+      - description: watchdog2 irq line
-+      - description: watchdog3 irq line
-+      - description: watchdog4 irq line
-+      - description: watchdog5 irq line
-+      - description: watchdog6 irq line
-+      - description: watchdog7 irq line
-+
-+  memory-region:
-+    maxItems: 1
+diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+index c578637c5826db4bf470a4d01ac6f3133976ae1a..0fdd1126541774acacc783d98e4c089b2d2b85e2 100644
+--- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
++++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+@@ -63,6 +63,14 @@ properties:
+   "#size-cells":
+     const: 0
+ 
++  airoha,npu:
++    $ref: /schemas/types.yaml#/definitions/phandle
 +    description:
-+      Memory used to store NPU firmware binary.
++      Phandle to the node used to configure the NPU module.
++      The Airoha Network Processor Unit (NPU) provides a configuration
++      interface to implement hardware flow offloading programming Packet
++      Processor Engine (PPE) flow table.
 +
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - memory-region
+ patternProperties:
+   "^ethernet@[1-4]$":
+     type: object
+@@ -132,6 +140,8 @@ examples:
+                      <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+                      <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+ 
++        airoha,npu = <&npu>;
 +
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    soc {
-+      #address-cells = <2>;
-+      #size-cells = <2>;
-+
-+      npu@1e900000 {
-+        compatible = "airoha,en7581-npu";
-+        reg = <0 0x1e900000 0 0x313000>;
-+        interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>;
-+        memory-region = <&npu_binary>;
-+      };
-+    };
+         #address-cells = <1>;
+         #size-cells = <0>;
+ 
 
 -- 
 2.48.1
