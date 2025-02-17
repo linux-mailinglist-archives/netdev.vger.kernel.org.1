@@ -1,104 +1,202 @@
-Return-Path: <netdev+bounces-166860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E020EA3797E
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 02:48:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37229A37980
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 02:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4A757A2A6F
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 01:47:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E3F83A8B2A
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 01:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F9120DF4;
-	Mon, 17 Feb 2025 01:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9246142A8B;
+	Mon, 17 Feb 2025 01:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiO1YXE7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B551CFBC
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 01:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E963479D2;
+	Mon, 17 Feb 2025 01:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739756895; cv=none; b=nhRuzFt2Lw0wRmMzu5nTr/YNNJInDofLa7w3D4ytdqN3dZAXPXUS2D/Es1sbKcgcz17+2x2O8xxjZp8FO7CL2xR1wFA6vyEnj7q2LkHNr1oeM9RxK10jluPEwciYNh4vo/tJjlupCBzOyhrRtfdrRDJjhr5jNnJNSPENc1tGvCw=
+	t=1739757098; cv=none; b=r4TnItJWcyKqvrzDp19YsQ3x6E7PTHJA00ZJEPrYhJDQtF228I6OeeIUYcCyLDo9DP0UUkjkAp0c3KKMkTxDuharfuwRpTp3T6LNgRMxNs40k4E+i7cuzATlY+23qRqTmEU9n1qBBm7+ndw6ZuKK0wWqfn7xO94ZxtCvUgw06ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739756895; c=relaxed/simple;
-	bh=SPsunDBPiK8LKYg952xV2FoyU77eKeZ+RklBgkS7puw=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MA1x4xlsTEKBGIS7GkSO+5CVh0GnOqnFQtmvM09KP1q/LvdwXMkQnLFDGC26UyqkKbyXlZA5T+fElt80ZAMR5cW5l0RMWmPhj/hu17RhxGVjZiSCx1rUIb9pSlDaBd8PsongjuJnF1kxuSF1xyHRJF2rkeqhwoklEWqZkVSSxDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1739756873t074t61148
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.205.26])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 17215311018305959511
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>,
-	<vadim.fedorenko@linux.dev>,
-	<mengyuanlou@net-swift.com>
-References: <20250213083041.78917-1-jiawenwu@trustnetic.com> <20250214165218.5bce48c3@kernel.org>
-In-Reply-To: <20250214165218.5bce48c3@kernel.org>
-Subject: RE: [PATCH net-next v7 0/4] Support PTP clock for Wangxun NICs
-Date: Mon, 17 Feb 2025 09:47:51 +0800
-Message-ID: <050201db80dd$f4b45bb0$de1d1310$@trustnetic.com>
+	s=arc-20240116; t=1739757098; c=relaxed/simple;
+	bh=i2y9NCKAA5mf0lCCR4CE06BpzZ/tWFLaANF1MitbJQQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fa/DKk1htYdHE4WXMfwVxXQ/Y44k9Ae3OPdEm56UVMhWGTkCubSqm7n4vyetTphwy5t3JxsygMD/Py2yR7f7ElLEqT9IiDk636dmX3uednz07V1UD0dOFSlcRUdPGTnm30Wsk3WM7KckgmkJ27xnmywrDOq9XH/9dj2z8clP15s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiO1YXE7; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-46fa7678ef3so43238751cf.1;
+        Sun, 16 Feb 2025 17:51:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739757096; x=1740361896; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HqwamwawLH6bGg8Wb3IGxPf64cClhyn1gpuzpHxM+RM=;
+        b=UiO1YXE7uJUV0+KC0vAI/sww3B5odZSldl0TK6In2WIkh/qPOVJzw+CmVBWfqSD0Ke
+         oQQxUURlB6E+16LxHHU4Vyg5TRH2aOFcKmQy9YXAtGecF+AcS84epLXOo6FZ7AFLo8Pi
+         PuBhlo02zv3WpoxXcj2AX2rOl6+KkGcEmuxACzIYXNt0Ku/zarnTY2t+qrtHSOp2zrrH
+         +SXNN8OHwLYLPeAGPZXcTMFfjCKRbgAhCZhTPZ9fqc2J10USHF6M+Qv3lqExJuEDEE2i
+         gMgoVbZNk8w8h7K9NZXAwKxJByWbrdZjtDe19OBArHdQXcvKCp6S+RlRY+msGtWTqDo2
+         UrWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739757096; x=1740361896;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HqwamwawLH6bGg8Wb3IGxPf64cClhyn1gpuzpHxM+RM=;
+        b=I8QzAfOQCb1WUauFslwGDCQS3Zwf/60ByZIGKTPVMF7AxKztyQtFnDBKOQln+wXmpQ
+         +erS4JwOCsc999yyh9Oi22fl3v9WtZlSCAYI3EPXGH7oBX+gLQ2jx4C9/RuLnavWnmzZ
+         YL9dFVdRiuCZqqmc85Q/oer2zFOlANOqKcExZfM8r2ziqQ5BHJRmYhKnhUSOw/WYxTXd
+         VDbSkKSW9ALNnrvKP1QZ3OqDwgPB3LtD52vSHzI/K3Ohaos4sXMjK4EH5JmRLoMmXcu1
+         QPryjGO0HtcGg2MZ/Q6M90WF4rh2oBQ/eqXdy25kOPLiVthps913wXjYzcWryXo24ZPW
+         IYEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkbxHtpqPpqQ4I+oIHVtsL8bI5wrscQlojA0+Ol0Ae/D+lDmAVuA4zWJdb6RTQkGfid+Zu1MCZ@vger.kernel.org, AJvYcCVzQBEANXWCKnCnvcLH0pPO1IaFn01arJ/fzuznyNAUQbfx6TnKUKxma44qVBVHyyB98sJLrChoUWeVdhUZsf4=@vger.kernel.org, AJvYcCXy7P1LRSEVSKj2XKf0gwbZtT4Fw0SFdk+oYN9tT4YxJ+kNPrCqCp6EZeZ5v7mO63LBM2ggbT/jh8FM2To=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7o7uI61rS2KaP2Ccy/21KRuRjHtGK7h3bTqebHfHPKHPXbfJM
+	AM0MUHaoW8fCap0EvHUBfsVx6rEBGVxxM9fD03eTeO7gRXg3nKNI
+X-Gm-Gg: ASbGncvDxFUG8KkUchNlQ7ME6K0hUZpfez7jpqRkP8uX4Zmp3dUTiXFqdrAeNHffOhC
+	bjQXi2ljmi2uCxZ1/Orrn4qrvKFpbhbor4owKCv8ODPWm8Z5J565/hFmuh2L+tiUBrt85ktxuau
+	BM5WcgrKDNP2issULOb9iA7uZk7c9Sw6bLldlAgE1rmlEtWiauG/eQHjR1Bq/2rb9Q4BmIhWv2/
+	O/G2AEYp9SoT4IYIro/RP0osypkUleAJ3T/zRL0/yuF9PtBqC7+Fb+5eNwQ1TvBN06+05+cahoe
+	Jfjw7O7kEBMiI3nfe8xlvozng0PWrAs5QPn5BSna94LVveySxHZvvKxL8eS6w3fjdaR9Q8lPTdc
+	XQTi6mA==
+X-Google-Smtp-Source: AGHT+IFCe3muZ9N1jrtvkc2NqYvORhIIhHsHMZGjyqrd+lG1J5/kWyY6Pb4fw2mxowJVBIQrrXEfBQ==
+X-Received: by 2002:a05:622a:28a:b0:471:d67d:fe54 with SMTP id d75a77b69052e-471dbe9fc70mr119764401cf.49.1739757095695;
+        Sun, 16 Feb 2025 17:51:35 -0800 (PST)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471f5a75cc3sm570451cf.25.2025.02.16.17.51.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 17:51:35 -0800 (PST)
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 6292B1200068;
+	Sun, 16 Feb 2025 20:51:34 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Sun, 16 Feb 2025 20:51:34 -0500
+X-ME-Sender: <xms:JpayZzFgb2jBnzWRzWFU2fivVlcG5-_0KHx-qWnWXQ0UUEMw9a_phQ>
+    <xme:JpayZwUX-voj6J-w-aQsptM-_Mw-tjCXz0B17Qn5UDEAGAejF5APfyJV_kcdDxzD6
+    vVa8_qrd-StjYv_5A>
+X-ME-Received: <xmr:JpayZ1KjJhNYjOyaGesCeH_cxDViqCR-COo5DFMaabkVQU7AIXuwB2yWlQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehjedtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
+    jeenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeevgffhueevkedutefgveduuedujeefledt
+    hffgheegkeekiefgudekhffggeelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
+    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
+    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepfeefpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopegrlhhitggvrhihhhhlsehgohhoghhlvg
+    drtghomhdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhisehgmhgrihhlrdgt
+    ohhmpdhrtghpthhtohepuggrvhhiugdrlhgrihhghhhtrdhlihhnuhigsehgmhgrihhlrd
+    gtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrg
+    hllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuhhm
+    ihgthhdrvgguuh
+X-ME-Proxy: <xmx:JpayZxGiqs5OO17IPWI7TIMB_hzDJu2B6YNPFL4mJEUow_V4mowfmw>
+    <xmx:JpayZ5ULMq7zlP-BMYv9BX17MMdbCtMvSVggKGychMxfbSTBFn6g2Q>
+    <xmx:JpayZ8No-YWyGu2LfnlTAlJIAh31kSAAdH2dkWITYkNgDsmAllau9w>
+    <xmx:JpayZ41esj_Gf6Nx7SxvO7jSrBECSmct0M4zfJOz9IJUkjTWHzvAcw>
+    <xmx:JpayZ-W8kdh1uvgTEd6sUZhNdz6ZNhJB9eo9kjpMfKvbJXMuV6XL-xgT>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 16 Feb 2025 20:51:33 -0500 (EST)
+Date: Sun, 16 Feb 2025 17:51:32 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	david.laight.linux@gmail.com, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, anna-maria@linutronix.de,
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+	jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+	peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
+Subject: Re: [PATCH v10 1/8] sched/core: Add __might_sleep_precision()
+Message-ID: <Z7KWJGc-Dji3Kacu@Mac.home>
+References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
+ <20250207132623.168854-2-fujita.tomonori@gmail.com>
+ <20250207181258.233674df@pumpkin>
+ <20250208.120103.2120997372702679311.fujita.tomonori@gmail.com>
+ <CAH5fLgiDCNj3C313JHGDrBS=14K1COOLF5vpV287pT9TM6a4zQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQGUGoOS8IXF4ptWDFBIVDWWEs4OAQMHYeYks8FKdCA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Mutteg8H72qDJ0RXW8KZoUAu0sWTePdDZ8aWgwtzibo2pf+TqafNfOWS
-	lCWQCFnplttm/HL34q++oiz4Yb9Gg6GDS0XOaJWbG6I9nr7yVKr7kbYNBbIZAXZXYhdG1ba
-	ZrsphOG1BuFx1X1sHHz323prY5TYIHAhpft4ESDXaO57d38DQHl53hHALJYFCMD9cbiaBpe
-	kjzz8klyEhJmZbzmD40lwDf8jourpvQ5dvjFoJcP5TttL5fFPT2j1MQF9R0SN4J2lsJmlh4
-	qPbwDsb/7zeRM7b26J7k2si3CLRaFA9TrRE/b1Qsqchq++BfhcFoaqHWxYe39IrGI8BRWWM
-	eF1soos4B2Vuhy3ynFVOt3RbloDeok9+VG8wVNA8wn4fRpkA3QjOe7/Y/ktlXPrdtIa/TyO
-	wqgRTqJdOorWcHuhoDwhfAPTekEOmpGng6LfMxlmbWa1sZMvhiMzVDHYjTbocf7h0Bxd5TX
-	5Zg1VBbIaBP7fddOfJS6fysZP4MAVipYQCzfwbEBcRYc4U18qGoOzMtlP24C2HRTbEctrWs
-	+sXRXi0b0dy1uzmbLjI8Xn9I49z924Lj4eK6SowfQS3q+2pjVwTIHd6gxE8y69f1fV+qAIH
-	8EezXN0Gl5DoY7GrU8m6JZp98uSlhObPMN/PnnmtVhQqxBGu+LBGTZBlbcugZEE78QEuat0
-	0VolcSblQQjbyfCKPN9zFimZDLtyG4hUgjg8wwcPuMqE9StRGw3XEWpiPa5aprFQOur+adY
-	5vGssTScF2/QwWod3VY4O8+PKKUtcpHVhHI5ZHn0/A9D/AkkJL7yVzR+b9WuGkyLx2U8jh8
-	OG1j30+c5vH0hVuwXxgFnG/yS9CjFmlhbJM32W/1Z/aO2kS300x9BxMT8KWSe27OWis4QTO
-	hSF2px8KhIDsP8XtcANDmqbDqFN6mvwy0wzr9k7SHWTGkrlYoh5jtffpMs10nDC9ZSosbm5
-	E8WtP7r4DNF1OmP/4Rn5avmiwg1WEb0OzidRcJX3SCk4jK/vJpZ+tKgj7
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH5fLgiDCNj3C313JHGDrBS=14K1COOLF5vpV287pT9TM6a4zQ@mail.gmail.com>
 
-On Sat, Feb 15, 2025 8:52 AM, Jakub Kicinski wrote:
-> On Thu, 13 Feb 2025 16:30:37 +0800 Jiawen Wu wrote:
-> > Implement support for PTP clock on Wangxun NICs.
+On Mon, Feb 10, 2025 at 10:41:00AM +0100, Alice Ryhl wrote:
+> On Sat, Feb 8, 2025 at 4:01 AM FUJITA Tomonori
+> <fujita.tomonori@gmail.com> wrote:
+> >
+> > On Fri, 7 Feb 2025 18:12:58 +0000
+> > David Laight <david.laight.linux@gmail.com> wrote:
+> >
+> > >>  static void print_preempt_disable_ip(int preempt_offset, unsigned long ip)
+> > >>  {
+> > >>      if (!IS_ENABLED(CONFIG_DEBUG_PREEMPT))
+> > >> @@ -8717,7 +8699,8 @@ static inline bool resched_offsets_ok(unsigned int offsets)
+> > >>      return nested == offsets;
+> > >>  }
+> > >>
+> > >> -void __might_resched(const char *file, int line, unsigned int offsets)
+> > >> +static void __might_resched_precision(const char *file, int len, int line,
+> > >
+> > > For clarity that ought to be file_len.
+> >
+> > Yeah, I'll update.
+> >
+> > >> +                                  unsigned int offsets)
+> > >>  {
+> > >>      /* Ratelimiting timestamp: */
+> > >>      static unsigned long prev_jiffy;
+> > >> @@ -8740,8 +8723,10 @@ void __might_resched(const char *file, int line, unsigned int offsets)
+> > >>      /* Save this before calling printk(), since that will clobber it: */
+> > >>      preempt_disable_ip = get_preempt_disable_ip(current);
+> > >>
+> > >> -    pr_err("BUG: sleeping function called from invalid context at %s:%d\n",
+> > >> -           file, line);
+> > >> +    if (len < 0)
+> > >> +            len = strlen(file);
+> > >
+> > > No need for strlen(), just use a big number instead of -1.
+> > > Anything bigger than a sane upper limit on the filename length will do.
+> >
+> > Ah, that's right. Just passing the maximum precision (1<<15-1) works.
+> >
+> > The precision specifies the maximum length. vsnprintf() always
+> > iterates through a string until it reaches the maximum length or
+> > encounters the null terminator. So strlen() here is useless.
+> >
+> > Alice and Boqun, the above change is fine? Can I keep the tags?
 > 
-> Please run:
+> I'd probably like a comment explaining the meaning of this constant
+> somewhere, but sure ok with me.
 > 
-> ./scripts/kernel-doc -none -Wall drivers/net/ethernet/wangxun/*/*
-> 
-> Existing errors are fine, but you shouldn't be adding new ones.
-> You're missing documentation for return values for a lot of functions.
-> 
-> Note that adding kdoc is not required, you can just remove it where
-> it doesn't add value. But if you add kdoc comments they need to be
-> fully specified.
 
-OK, I'll fix it in the V8 patch set.
-So what is the conclusion about the "work" item. Should I revert it to V6?
+Agreed. The code should be fine but need some comments.
 
+Regards,
+Boqun
+
+> Alice
 
