@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-167089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86886A38C94
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 20:42:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8591FA38C99
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 20:42:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 831B01893F46
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 19:42:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B6ED3A357D
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 19:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE6F22B5A3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F9F237194;
 	Mon, 17 Feb 2025 19:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l50jy7zI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5SwKK6q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7711624F9
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 19:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A496C23716E
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 19:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739821324; cv=none; b=cw1SRoVaJAR2Io/ktzsAjbq7Ayaqnu/PXokgAyfY71XbvPKp0XX8zQssphXnaVPThyu0YwIGxWL6dd6pyz7YmI/JIGpillOuPXE/pXozK+MLs61QXzZ8Is/w+pVqasAgCUGvGPDHLzOvZb8Ir16zA9Gslk1PcqyIsZUdD8mfqoE=
+	t=1739821324; cv=none; b=SYM6OTK1RyMg18dDUy2o9keEY136KkyjXQBulSVGB5XsmqQ+0tSHrnIEytgACkvMkiUFtwA5xQi2f7qL07cjH4Bw/tMGkXecopZZJs/zubKOYdmH2biwDTyCyi2AE+l7QTjNrlBOPmcfwdKGvmzk7ktb8wz64ce+l2KsRgakJgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739821324; c=relaxed/simple;
-	bh=/wS6NwYDBdZNoKBWb+ldmB44MkA8M/HFlsu4DTJDbss=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UGDbgna9SdsbckIObYN8KLkGoJQbntIuU9lD1efUsLIOr29doMiXvwXT7x+uQ93RK9tv0NAcW2YfENeXNvmtsXPeSN5jB7jlOp6knWt3+oYpRe98jgpQplED4vBwipi/CMTfk6feTn7uNyOVEF8uQJiwUaJ5/dyFxWqDul8xjgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l50jy7zI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7247C4CEE4;
-	Mon, 17 Feb 2025 19:42:02 +0000 (UTC)
+	bh=XLKWiJUs5Q7VhOwY+XIKPdeeyH9CF5ZvsVrFxguSOhM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mVilVoe9vWkpZsqKeLAMqDk/OuvvZ2kGYidZNKl1Fw1qqq2J/4DJzKXwSo7WxdNkkfE5BOKcRUju+lZ+r6Yh5Rb2QkT1rBWCEA9HnXoFs6fvRBS7BVTI9NFJ86UK/Zfvp1psfy4JhnSWqqdVBPE9LAHOGR8wXFfcTe6qwwvew/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5SwKK6q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90ACAC4CEEB;
+	Mon, 17 Feb 2025 19:42:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739821323;
-	bh=/wS6NwYDBdZNoKBWb+ldmB44MkA8M/HFlsu4DTJDbss=;
-	h=From:To:Cc:Subject:Date:From;
-	b=l50jy7zIcJCcU3aYedn1HQoHlkWFL3F8zhyGj2owFpbVXpo3yhcnth5o/KL0tJvNC
-	 nLeu9osRb+vb4cyQag98PRkXKhWCLsg8XHW3s+w/NOEQgBf3ffFY1oL34/6mSA+QQv
-	 5uZi6t+dHXtuOZsedHY9oCZ9EuwvYd/MgDWroKCdjlKeP9g7unGZRQOBk70LYVBi70
-	 r1K57Z+OVgXd/wNK3gR7GxM3b29lXTr2gQw1cyLkd/Wn/uUhbMTNNKSrm4WZzLUeHN
-	 P6GeUWzmmTiijpn84AngA0MP0YMDL+7aDIzvzdpXJdeA+kHr1E8qP6ymXc2aVkGbmA
-	 qyPK6yW1RJKhg==
+	s=k20201202; t=1739821324;
+	bh=XLKWiJUs5Q7VhOwY+XIKPdeeyH9CF5ZvsVrFxguSOhM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=f5SwKK6q/YS6SVVNM/6mgCeZXNEai9l0ciCg/Iy08u0+Pzlt1XDe3ZzPDIZJYEYPP
+	 syFmk1/v6oINZqU57GcRHDj7CcBlNgwS/CTpbzIn5CNU9TeEuLcq0/AXGxoz1q8G3T
+	 Jb8vbm5U8+S7E/tb3ZdL/ps53b6V9NVoo14+zvB1pNy1tRjTAbsNDPpphybnkeVRao
+	 u7rm//C36ofJjYWHQLKxWl4FOopc3x38WhrfdpWsrGGeahamX5Yry5ON1zQdE7L5pM
+	 Wf9jJlxDA5IxSEzhePO0+YqbCrPKnm6seormfP+Lz88TACCM/ju+JrR8khIqHfxZZo
+	 gCPWnLdi9TOnw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,11 +51,14 @@ Cc: netdev@vger.kernel.org,
 	willemdebruijn.kernel@gmail.com,
 	petrm@nvidia.com,
 	stfomichev@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 0/4] selftests: drv-net: add a simple TSO test
-Date: Mon, 17 Feb 2025 11:41:56 -0800
-Message-ID: <20250217194200.3011136-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v3 1/4] selftests: drv-net: resolve remote interface name
+Date: Mon, 17 Feb 2025 11:41:57 -0800
+Message-ID: <20250217194200.3011136-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250217194200.3011136-1-kuba@kernel.org>
+References: <20250217194200.3011136-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,37 +67,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a simple test for exercising TSO over tunnels.
+Find out and record in env the name of the interface which remote host
+will use for the IP address provided via config.
 
-Similarly to csum test we want to iterate over ip versions.
-Rework how addresses are stored in env to make this easier.
+Interface name is useful for mausezahn and for setting up tunnels.
 
-v3:
- - [patch 3] new patch
- - [patch 4] rework after new patch added
-v2: https://lore.kernel.org/20250214234631.2308900-1-kuba@kernel.org
- - [patch 1] check for IP being on multiple ifcs
- - [patch 4] lower max noise
- - [patch 4] mention header overhead in the comment
- - [patch 4] fix the basic v4 TSO feature name
- - [patch 4] also run a stream with just GSO partial for tunnels
-v1: https://lore.kernel.org/20250213003454.1333711-1-kuba@kernel.org
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - check for IP being on multiple ifcs
+v1: https://lore.kernel.org/20250213003454.1333711-2-kuba@kernel.org
+---
+ tools/testing/selftests/drivers/net/lib/py/env.py | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Jakub Kicinski (4):
-  selftests: drv-net: resolve remote interface name
-  selftests: drv-net: get detailed interface info
-  selftests: drv-net: store addresses in dict indexed by ipver
-  selftests: drv-net: add a simple TSO test
-
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../testing/selftests/drivers/net/hw/csum.py  |  48 ++--
- .../selftests/drivers/net/hw/devmem.py        |   6 +-
- tools/testing/selftests/drivers/net/hw/tso.py | 222 ++++++++++++++++++
- .../selftests/drivers/net/lib/py/env.py       |  58 +++--
- tools/testing/selftests/drivers/net/ping.py   |  12 +-
- 6 files changed, 286 insertions(+), 61 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/hw/tso.py
-
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index 886b4904613c..55d6b3d992b6 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -154,6 +154,9 @@ from .remote import Remote
+         self.ifname = self.dev['ifname']
+         self.ifindex = self.dev['ifindex']
+ 
++        # resolve remote interface name
++        self.remote_ifname = self.resolve_remote_ifc()
++
+         self._required_cmd = {}
+ 
+     def create_local(self):
+@@ -200,6 +203,18 @@ from .remote import Remote
+             raise Exception("Invalid environment, missing configuration:", missing,
+                             "Please see tools/testing/selftests/drivers/net/README.rst")
+ 
++    def resolve_remote_ifc(self):
++        v4 = v6 = None
++        if self.remote_v4:
++            v4 = ip("addr show to " + self.remote_v4, json=True, host=self.remote)
++        if self.remote_v6:
++            v6 = ip("addr show to " + self.remote_v6, json=True, host=self.remote)
++        if v4 and v6 and v4[0]["ifname"] != v6[0]["ifname"]:
++            raise Exception("Can't resolve remote interface name, v4 and v6 don't match")
++        if (v4 and len(v4) > 1) or (v6 and len(v6) > 1):
++            raise Exception("Can't resolve remote interface name, multiple interfaces match")
++        return v6[0]["ifname"] if v6 else v4[0]["ifname"]
++
+     def __enter__(self):
+         return self
+ 
 -- 
 2.48.1
 
