@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-166894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C70A37CBF
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:06:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12400A37D05
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F0971707A3
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:05:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6EB83B0E16
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC4C1A23AC;
-	Mon, 17 Feb 2025 08:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F23719CD13;
+	Mon, 17 Feb 2025 08:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRjwPcS9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QqUJMTiz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995051A0BF3;
-	Mon, 17 Feb 2025 08:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B154155C82;
+	Mon, 17 Feb 2025 08:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739779534; cv=none; b=dBgXrfYp9jA1iA16lUYn1RwmNnKcQobxDwoYXniOsOWfXEJDYMXGAWcPyx0R5NcWZFrfV9Q4I/STJmj7aC/WpSonqRqpA4b++i3ZxVnuUwcfMgHgJeHJURKuAAX4NW1lDOs1ZflOc8jNK1aKBUJoduo0EvBk00t5OcexqMnXiOI=
+	t=1739780409; cv=none; b=p3v3SOlxLzk97Vs53siL/U8h4NeJONd4nnIadRidTuZWq7bOoOPzhneJyxh78S7ZZUfWK1B2PD13I9jaBL8Oj7iFR31dyrMk2OsTGTQQ2Wyn+EArSfURY2wmh/BHqnay1ocVRie0G/hcycfB8rdeTm00Tp+In9rO4gvjmjZ5FpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739779534; c=relaxed/simple;
-	bh=dDkeJ7GH7avcKXBfyV1k8BkyzXTe+QGQ53jKuGm0Crc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gf/B7+yZ0DpK82Eg7mUGSMLEe7cKvE4gfE27oiek2/2/n0wjqv376Nxl/ZCbzWeBt45VpkayeT6elHZcolFehfQtRPMzFhoIOyi+5HDMH7Z/03/G/Yw2YHPGIf1H5y3Hs4nJpqx/+sW4I4jzWelWRSRP0jU+3tClpn8aPM5glnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FRjwPcS9; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5452ed5b5b2so2389431e87.0;
-        Mon, 17 Feb 2025 00:05:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739779531; x=1740384331; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AzEsmazWfkKI94Mb3+KwyFEdwSSXdViX2jkMcHce6as=;
-        b=FRjwPcS9Q3ZOCltQ4ZmPHb0pMw6XVzdyxznNe0x7Y0SRpG9iA9MdHxGvGaDZl/0PhD
-         RG2YuZEY0GpvMQoKiBTa8C3MpwDrNLCl5o6iCj/67jpxoSVhIuAS5xNsKcA1vxT6lfgH
-         +dAZc0WKUoMDUptO8MYGyHXIjAAxLqVrgU3YzbznpFf60ti+gbGoNNFFqqYeQ4igIsrl
-         TbD+OionSLXwh6rq+UdrzhlwWhG7hw6dGQP5gMKNhbrwFh5YRvz8hpu/hW9Z2qKVvRnf
-         PH/WUfDsWDOfijwFfKVrBZtReRSGqucBL8iR0n8hXnZs7zkPXaElN6YiceLrFYj0+TYT
-         zn2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739779531; x=1740384331;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AzEsmazWfkKI94Mb3+KwyFEdwSSXdViX2jkMcHce6as=;
-        b=IjawxwICZtcrR+YCnz1MBme/JpSCh36RYp1jSYURVXtGTH7J4U+rR14NybOIoMjyXu
-         F7uI46ZpHxzU+b9tGNa4u0tJkOr/JcCYRpzYd0s1726yNxq6a7O60NDCvAck8JCeKYeb
-         v6LSvyzvkF8EGaDaPJUbS4KX655oXVDLO7S2dZz4n6xL+AmsdCmkCHe8AnVx2a2+EQA5
-         J2jXhtibz4AsV3mV6EuqvIanBEFzkYiDHe0RxnjcYMOXdoekBwK4xtQtQpfRj7yy5Qyj
-         ffQbHepcwo7bZ3zYL8ILawYdnrGZa7qatgHfmqB7kRE/sFIE+zeyEwG8hi33LetAxXp1
-         2hCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVf2LW0ttyc7ztoY6I9oAkHRa++xn8VaQCh7V+kZJdHBMQCs+mt0E4z2YN3vtA/nb4Q3ecd/NW@vger.kernel.org, AJvYcCXtSIGmvBg0yfIsVLFPGRladeZm/tzhjNX7uyx8QsGU1v58DUrmauLVuXhZsdwKCsFRnSmSUb042xtM@vger.kernel.org, AJvYcCXwn8LassWcVZusr9dIQo05nFMiWaSvb6Cfi9VLQY+Jjao9tfhkpBVK1FoZ9vJEtpkKcO4swicDEFQCQdCQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr3MJMzCBS41ozmhutXwgGZmZ2/5SaxOXno46G4NWBtSmO1ZrL
-	gfTzWuZXBLRCDNm81z8PCbrgweGZU9GeVa0zHo23D6wBNbL2KVXmEdEGO2lnTQc=
-X-Gm-Gg: ASbGncv2ofI+uO5QQe0Fk1B0ocAkzcP8OAqbhH8V2a7JH/ehdosOihv2liATfGvHbCp
-	VCjpBnoUA9Q6WEBcQuzHeALnOZhkDDajNdSvPoGsbf1w/z6JvDRkVk04FFlWmx7K14oeiqzxIna
-	yxFctY3ipKfuaH9v3rMzhUo49VRWEpOoRJ3mXgvTdacGo2ZfHtOVDIUe6qTHRtAXdabUBU/EriT
-	PZVgtB64dhhn7W+rh+utg985TdphBMxiOAdCfRaO6MOkN9Av+7PmytqZjHrQJH5kNPKAkmbosbV
-	BtGvOC/JP54lVnvF5vHR3PbO568FZ62G
-X-Google-Smtp-Source: AGHT+IH0gQt6LbSVzt7ANJ79QPtBjmUGIh3dOqM8t0B1cAgFQOMYUuVEsqc+9rOEGXqZm90qlOS2kw==
-X-Received: by 2002:a05:6512:a91:b0:544:12b8:d9bc with SMTP id 2adb3069b0e04-5452fe264f6mr2464728e87.8.1739779530326;
-        Mon, 17 Feb 2025 00:05:30 -0800 (PST)
-Received: from clast-p14s.prevas.se ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5452848ed13sm1173028e87.255.2025.02.17.00.05.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 00:05:29 -0800 (PST)
-From: Claus Stovgaard <claus.stovgaard@gmail.com>
-To: claus.stovgaard@prevas.dk
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1739780409; c=relaxed/simple;
+	bh=oPkuHL9Dy3/UxnFwaQibKWWo5ejIr+ylnjV+e/PO7Mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JkdD9iaPldQt2MDwTtKM5dGiLn4TcwKYznJFCHFcJoXXsLZ9zGC5E5PlNe0B022QsLUgkcvJvTaHCBljXv3oISGFtX0+/0xpfmGM9Vj2XBJ28nalWorVhZJB9gnxe85h4nTglcblEtA4fZeUf2A0SzHcMzXAAN2J8EMNms9vnh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QqUJMTiz; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739780408; x=1771316408;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=oPkuHL9Dy3/UxnFwaQibKWWo5ejIr+ylnjV+e/PO7Mc=;
+  b=QqUJMTiz+ztUKgqipZU9B1H/oNnixNoD6fmVFRhxFv3NosbXSibU7hg3
+   1ANbLpj9By2kKWR+Pp1Fd7YM+uinY5Q3IHGd3QWlWkGNcqn4tEaUsv5Kb
+   8wszyQQ9YRLr30wwPmZRcDJbfVDIDmEhfZoeOf6HfjwvS2iMtuzZ85eb7
+   X4/eKM3g1Z/NRZyQ8sOef3cGTzfEftwWo5vycphh67eNCqwvJajbf202O
+   JsvnXfxI1Wll/M3MZQaEUSNWaBGu7XH5rZCY70WtqksnyDCfjTcs3VN9b
+   /xFdooevdeO6/Y2/JXZOzQLHLLN4WX+qZiS1DieDGMruhoo4QI2hodGja
+   w==;
+X-CSE-ConnectionGUID: exyO+C9FTsaorUEvfBrKRA==
+X-CSE-MsgGUID: yAIWtOQZT/+C79lDZZDrRQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="40377392"
+X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
+   d="scan'208";a="40377392"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:20:07 -0800
+X-CSE-ConnectionGUID: psU11MIcQB+yvaheySR5bA==
+X-CSE-MsgGUID: OMcPVd88Qeai6K8lHCZInQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="118977219"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 17 Feb 2025 00:20:04 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tjwMD-001CmY-1A;
+	Mon, 17 Feb 2025 08:20:01 +0000
+Date: Mon, 17 Feb 2025 16:19:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Qingfang Deng <dqfext@gmail.com>, Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] dt-bindings: net: dsa: b53: add BCM53101 support
-Date: Mon, 17 Feb 2025 09:05:02 +0100
-Message-ID: <20250217080503.1390282-2-claus.stovgaard@gmail.com>
-X-Mailer: git-send-email 2.45.3
-In-Reply-To: <20250217080503.1390282-1-claus.stovgaard@gmail.com>
-References: <20250217080503.1390282-1-claus.stovgaard@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: ethernet: mediatek: add EEE support
+Message-ID: <202502171610.TU1Cuzq5-lkp@intel.com>
+References: <20250217033954.3698772-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250217033954.3698772-1-dqfext@gmail.com>
 
-From: Claus Stovgaard <claus.stovgaard@prevas.dk>
+Hi Qingfang,
 
-BCM53101 is a ethernet switch, very similar to the BCM53115.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Claus Stovgaard <claus.stovgaard@prevas.dk>
----
- Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+[auto build test WARNING on net-next/main]
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
-index 4c78c546343f..d6c957a33b48 100644
---- a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
-@@ -16,6 +16,7 @@ properties:
-   compatible:
-     oneOf:
-       - const: brcm,bcm5325
-+      - const: brcm,bcm53101
-       - const: brcm,bcm53115
-       - const: brcm,bcm53125
-       - const: brcm,bcm53128
-@@ -77,6 +78,7 @@ allOf:
-           contains:
-             enum:
-               - brcm,bcm5325
-+              - brcm,bcm53101
-               - brcm,bcm53115
-               - brcm,bcm53125
-               - brcm,bcm53128
+url:    https://github.com/intel-lab-lkp/linux/commits/Qingfang-Deng/net-ethernet-mediatek-add-EEE-support/20250217-114148
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250217033954.3698772-1-dqfext%40gmail.com
+patch subject: [PATCH net-next v3] net: ethernet: mediatek: add EEE support
+config: arm64-randconfig-001-20250217 (https://download.01.org/0day-ci/archive/20250217/202502171610.TU1Cuzq5-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250217/202502171610.TU1Cuzq5-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502171610.TU1Cuzq5-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/mediatek/mtk_eth_soc.c: In function 'mtk_mac_enable_tx_lpi':
+>> drivers/net/ethernet/mediatek/mtk_eth_soc.c:860:1: warning: control reaches end of non-void function [-Wreturn-type]
+     860 | }
+         | ^
+
+
+vim +860 drivers/net/ethernet/mediatek/mtk_eth_soc.c
+
+   826	
+   827	static int mtk_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+   828					 bool tx_clk_stop)
+   829	{
+   830		struct mtk_mac *mac = container_of(config, struct mtk_mac,
+   831						   phylink_config);
+   832		struct mtk_eth *eth = mac->hw;
+   833		u32 val;
+   834	
+   835		/* Tx idle timer in ms */
+   836		timer = DIV_ROUND_UP(timer, 1000);
+   837	
+   838		/* If the timer is zero, then set LPI_MODE, which allows the
+   839		 * system to enter LPI mode immediately rather than waiting for
+   840		 * the LPI threshold.
+   841		 */
+   842		if (!timer)
+   843			val = MAC_EEE_LPI_MODE;
+   844		else if (FIELD_FIT(MAC_EEE_LPI_TXIDLE_THD, timer))
+   845			val = FIELD_PREP(MAC_EEE_LPI_TXIDLE_THD, timer);
+   846		else
+   847			val = MAC_EEE_LPI_TXIDLE_THD;
+   848	
+   849		if (tx_clk_stop)
+   850			val |= MAC_EEE_CKG_TXIDLE;
+   851	
+   852		/* PHY Wake-up time, this field does not have a reset value, so use the
+   853		 * reset value from MT7531 (36us for 100M and 17us for 1000M).
+   854		 */
+   855		val |= FIELD_PREP(MAC_EEE_WAKEUP_TIME_1000, 17) |
+   856		       FIELD_PREP(MAC_EEE_WAKEUP_TIME_100, 36);
+   857	
+   858		mtk_w32(eth, val, MTK_MAC_EEECR(mac->id));
+   859		mtk_m32(eth, 0, MAC_MCR_EEE100M | MAC_MCR_EEE1G, MTK_MAC_MCR(mac->id));
+ > 860	}
+   861	
+
 -- 
-2.45.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
