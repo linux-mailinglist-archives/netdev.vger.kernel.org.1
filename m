@@ -1,135 +1,116 @@
-Return-Path: <netdev+bounces-166858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08CA1A37952
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 01:58:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C66B3A37978
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 02:34:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1EC33A9520
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 00:58:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3CC53AE949
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 01:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A8ADDAB;
-	Mon, 17 Feb 2025 00:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3FED528;
+	Mon, 17 Feb 2025 01:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OehdSTFo"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Z7sUvIgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-191.mail.qq.com (out203-205-221-191.mail.qq.com [203.205.221.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCF2C8CE;
-	Mon, 17 Feb 2025 00:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317CF847B;
+	Mon, 17 Feb 2025 01:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739753913; cv=none; b=QQaHZG4NH8IJdOItj/4vMYxr51s8vmQi8cA6edXOjGoKU6ELJeQuyufazfYyv+pnxfQvabcBOtP5BzIhI+E+9B/7CGSP5N5FCkm7tZsbew9/855XnC/i8eOaXawWHrdDzIDs2hyfeeV0ntMY3v+Qg3Qk1XA4N2LxwYEFJg/kQFE=
+	t=1739756088; cv=none; b=q+y/DGfZoLhcfJJZmbYte1fCSjAJpVoim83Eg7Fy7w8lD5WgCnFBXZiW6tlPlEZMETQoITfqTDf3oFhLur44FWgguFY8zB+ARVhgjZTYxM7KScUOxweszXTuxH4YgBdfb0bZN7L5tBYGnwHjHUoEobWBYaAmSvmu1H6PrbMWKVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739753913; c=relaxed/simple;
-	bh=Jp8o8qVhIJkaOVn8N2q451ecCoVBAtz9pozCbiQhoPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bUz27Pz06A/v/kONO4itffh2DzDm9e6Q67OPgIhDsXYS6Qy+/+DG71kAdEXGOMaSHDQf8Dfv5MBlwVGUETebxyEkJQSNbMtmvVKyYUjpF32u8llDnQ2PICgu8lGqX5mC9bvJ5+7FOX/avBkLDpj4CnB7QpWBQGXP8zMBz45amVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OehdSTFo; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6dd049b5428so32352936d6.2;
-        Sun, 16 Feb 2025 16:58:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739753911; x=1740358711; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HXn7orZMrPjYfNUMRy6CXAqwRe5GzTPX3oZy/iJZ4Gk=;
-        b=OehdSTFoA+x0qPeb1XdusX7gQiQUVmXwlVlkkefsN8Ak1ahGfcP8RmqjJfWJx6bMCY
-         1SoMheek0W0VloIIUvDiWk2Yqb0OkIV9THZR5CH7EF/hs7jdJxs2m203GaBrlSnaPdfg
-         t/c/VpOU/CUwZW+2/1J4/+03qm2J35hpaR5YSMoHEljDnzD60DLrthEjh0CjbDUnjAcR
-         RwKUGwO8N4A+rNlL91FKVc1GlmxkXM0ISjEOkpMmGPpPfQwqTj8HoRBmlYw8eegEDl9W
-         Nd9Wv8bD8ikyLwX0jXn7DYIb9C7JD1KsvjpYrBrjuxCMSsesnbKcOmzE10SJYAwTMeav
-         3vzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739753911; x=1740358711;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HXn7orZMrPjYfNUMRy6CXAqwRe5GzTPX3oZy/iJZ4Gk=;
-        b=J4+4JJix7mlbSJMj1p+FNJT06+wB93zTh2+EopdztuayATRscQwwpxhlQ0nIPQ3BKf
-         l13QM4sG87VFqg/73HqKyEdTrzD6/WD4Zlmtb8aPjm3WT1sZwZiKyaYAVOoDubTBnGT/
-         A9qcz++jRh8drzAsvh7FwJVIUB+TktRX4TXkubxnfgMluaJQnrINlebeep26KvdpMQs0
-         6ZDf+5XJOiSXUH+6MFpzPBVgj5Ig51BLqWIiPGC9TLG0Y02/Rq02R5fXo3f/u4XzsfJ5
-         uzmKR131GqXc3jHNjZm73TVEiPLEVUnUtnIn6itnxJNBMAY8O9eC4rVSsPqOsQVHw+QB
-         gz1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUKK3/I27Dilwopv1+0Ku/Y83Kpx02fsnzVSuQFs6qyPuVkrCQQxNB3pJeTb92JELDIs9dA2dTRz71E@vger.kernel.org, AJvYcCWR1abx9mXThjXYNQkMrL+Iy8qyOe4/551KeTNqB/naC3WFMoY/EamkHIbrh1ePkoXQO+pWJronZDZd@vger.kernel.org, AJvYcCXFEU2z50zT/fqo4a1XH6fVq7KRcMQlVl70zcb2T/gigRdB6uMBjOnBLGjpY+oCXuAPSTN+ZDWi@vger.kernel.org, AJvYcCXXvPT8W4AcQmLx0FywrGWk6Ih5FV/vVm1qO7HdHIHI5WDZcXcabNjBDpg9XiI9gFscaKQeDLg8yztWw44n@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfZZ/F9VZknFcjSNtfPJxj01cff3Hs+ungPcoFgbgmImWD9bxC
-	KCogGGBEDoxbmSRrVWz6hZqVXE7yF/F9wRD6yuiokBGWO37pSM95
-X-Gm-Gg: ASbGncvgTsp9X91OvZ3E8jG0BJoJinVqwg7GREH58itNtPv+cj+WiV77CgdZ6jCzk2Z
-	rzpDvH7pni6YtrmK384wJPuVuZTf8U/CbPH1BuWVeBlEEaO8WYhAaKpc+R8F2Jt2xMiB8WpTZ3o
-	bBl625GKIf83BLH86pZeNWke3VnJFtqAlQ4RUvK6895M5uQYOWqzIYxyXbm8s3X5RiGx1UW6NWs
-	shwxGDYIXhmgYsy8L+AAb6JpQ4Q3YeHCogWRJmX2y46hQKb0eeivVkmSakyAenGH5s=
-X-Google-Smtp-Source: AGHT+IEgSQyQW3zA8QJefSJEenw/B9cty6/ifR4qhZM8XgSTbrQMgAJJkDUDnzQXeXhRPzlbR81NSw==
-X-Received: by 2002:ad4:5fcb:0:b0:6e6:69d9:2bc0 with SMTP id 6a1803df08f44-6e66cd0dea0mr102261396d6.37.1739753911143;
-        Sun, 16 Feb 2025 16:58:31 -0800 (PST)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6e65d784e99sm47187946d6.28.2025.02.16.16.58.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Feb 2025 16:58:30 -0800 (PST)
-Date: Mon, 17 Feb 2025 08:58:19 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@outlook.com>, 
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Inochi Amaoto <inochiama@gmail.com>, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH v2 0/2] clk: sophgo: add SG2044 clock controller support
-Message-ID: <pxej4mmrhvfpvbj2mxy6zoa65tfqpxrkul5amebwjtuuebrixf@mzpcxq7zc47h>
-References: <20250204084439.1602440-1-inochiama@gmail.com>
+	s=arc-20240116; t=1739756088; c=relaxed/simple;
+	bh=e4/AAbisHJachlaK+66eVdcu+K5OGrjNBbTmBBovcOQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=pSWFIM/ILbnYaYXhNbGLUE9ONxhFvTI19QfshTUsroHa+ROIPKLbxgvw95+9ndMUGTEJlP1rKbf4O0G4pR3vIuMFV8YKG2O1nhciqCRePAC4ciePSAN0MgCucqaBQkzY9IbhAwb35ZN9Om73mkJYpgA28oz9+TWEHrMItGEAtyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Z7sUvIgT; arc=none smtp.client-ip=203.205.221.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1739755773;
+	bh=pP07imU1yRZo5VJuVB+0B4Te8JSt7A3ydHeyAZRXe2k=;
+	h=From:To:Cc:Subject:Date;
+	b=Z7sUvIgT4e3HJIYcHrL6/0jBGEFDVgmv/+mHAeGKSyryBNUQ2jMh8AyPAxWV8NQaV
+	 S1iFe1z/2jJaTUg2zPg2hzFLwG9ruWCe6NE+0GMHeKSqJNWgxt9ZGUZc65RREljTDA
+	 WfdUrI2QYmoszWvnD8iuP+hoQHi99H9NWA+FIcO4=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
+	id 75F9AABE; Mon, 17 Feb 2025 09:29:31 +0800
+X-QQ-mid: xmsmtpt1739755771trd9me21x
+Message-ID: <tencent_30122FBA93E93911578208176E68AA00C807@qq.com>
+X-QQ-XMAILINFO: M0yQCYO1Pk4BQK9MwsPiXqLGdYYZSCLOPPfcpbnW81QswNSiwoPu1fQRPn7F4g
+	 Mydr584M1QsAx8p9vJW2dNlaGgSs9qjxzUQoqGMgEXOKNDptenroPhnIdT7wOUzWwiCRjhyfexyk
+	 TfYjGCNFByNDY6+DQ68CGxbWvmgRgPbVmxef1Yh3jlTSixjrFchIAGSh6SaHI14zkLLM3m5I+/Kh
+	 ZQbL6/7GqFUrphyQwokQVvJkqsh1oRCKJz6klboLy/nEMeQhd7Q4icPHtOy4bXoMvMHrq6pfGkWg
+	 ImYQA7TkTp+/IVwx8k7vJLN2yRL6HAj/DXjzr3oao5WcMkc12OFmm8OY4fIffYrNtNpl6Yg5WLzz
+	 yk6y0BkDvpFi7hN2FllxQ2WHuWFl1fi29fC2vi2XKycICaR17lRkskAhDBE3F9Mk0wglksHagyU6
+	 FB8NjSuJzycDlj2INNuygQBkdFTwRj9ApcHaLMyasP1Iqd0hGrKRd9OUTodpMSAlZkF1NBEXH1Nv
+	 ymbMLU2prsmupp2Rq3wqCkA9aupjiejnS7QaUy5VO0grngJJoZfWJyeSRJMC8WLVHE1vigZ91ez2
+	 GYHGccGvDCW5WpLW2fIPGSX+7Uoc4NMhNZqCUXfFbvAAgNmdsc3EuyphnzemUi6UrI7BDRxUSZ++
+	 lOPyhTidGDJ5IrDdHWly5ByE4VPXNT7coAzK9926lFvsy8MqYS0sRTdCaC4MyYUxzH7zmYDcf+99
+	 qMVY3fT7gcmgRUEqxaoKA0k/oGVrQwB1dessQJ4A34X93QMKQNxPZZxwyHNNtOG8GCxOD7kxnQAZ
+	 CxwEIzKlVS5C/c6TRERMAQ6SK1XRdzsEmR1Fgy8XwJ1vp9gFSZscNiZeUNHdDtVK30/1s14ouo4J
+	 p8EheVKqazUI0RO3xJHOSNook+sCdapEXcuTDEjTslQlXx1l866VpYw4r9KxpXXx9ty88vwRblqw
+	 S3aqY4Miq4Snich5DAvT97+HhukaXt526TtBBLBgJIAq9yfTIGlw==
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+From: xiaopeitux@foxmail.com
+To: andrew+netdev@lunn.ch,
+	maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Cc: Pei Xiao <xiaopei01@kylinos.cn>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH V2] net: freescale: ucc_geth: make ugeth_mac_ops be static const
+Date: Mon, 17 Feb 2025 09:29:30 +0800
+X-OQ-MSGID: <05ccd0ec9dda47a7bb26b78ef41fea2f2ce675c8.1739755552.git.xiaopei01@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204084439.1602440-1-inochiama@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 04, 2025 at 04:44:33PM +0800, Inochi Amaoto wrote:
-> The clock controller of SG2044 provides multiple clocks for various
-> IPs on the SoC, including PLL, mux, div and gates. As the PLL and
-> div have obvious changed and do not fit the framework of SG2042,
-> a new implement is provided to handle these.
-> 
-> Changed from v1:
-> patch 1:
-> 1. Applied Krzysztof's tag
-> 
-> patch 2:
-> 1. Fix the build warning from bot.
-> 
-> Inochi Amaoto (2):
->   dt-bindings: clock: sophgo: add clock controller for SG2044
->   clk: sophgo: Add clock controller support for SG2044 SoC
-> 
->  .../bindings/clock/sophgo,sg2044-clk.yaml     |   40 +
->  drivers/clk/sophgo/Kconfig                    |   11 +
->  drivers/clk/sophgo/Makefile                   |    1 +
->  drivers/clk/sophgo/clk-sg2044.c               | 2271 +++++++++++++++++
->  drivers/clk/sophgo/clk-sg2044.h               |   62 +
->  include/dt-bindings/clock/sophgo,sg2044-clk.h |  170 ++
->  6 files changed, 2555 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
->  create mode 100644 drivers/clk/sophgo/clk-sg2044.c
->  create mode 100644 drivers/clk/sophgo/clk-sg2044.h
->  create mode 100644 include/dt-bindings/clock/sophgo,sg2044-clk.h
-> 
-> --
-> 2.48.1
-> 
+From: Pei Xiao <xiaopei01@kylinos.cn>
 
-Hi Stephen,
+sparse warning:
+    sparse: symbol 'ugeth_mac_ops' was not declared. Should it be
+static.
 
-Would you like to share some suggestions on this patch?
+Add static to fix sparse warnings and add const. phylink_create() will
+accept a const struct.
 
-Regards,
-Inochi
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202502141128.9HfxcdIE-lkp@intel.com/
+Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
+Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
+
+changlog:
+V2:change to add 'const' suggestion from Andrew Lunn's review.
+---
+ drivers/net/ethernet/freescale/ucc_geth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index f47f8177a93b..ed4f57701485 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -3408,7 +3408,7 @@ static int ucc_geth_parse_clock(struct device_node *np, const char *which,
+ 	return 0;
+ }
+ 
+-struct phylink_mac_ops ugeth_mac_ops = {
++static const struct phylink_mac_ops ugeth_mac_ops = {
+ 	.mac_link_up = ugeth_mac_link_up,
+ 	.mac_link_down = ugeth_mac_link_down,
+ 	.mac_config = ugeth_mac_config,
+-- 
+2.25.1
+
 
