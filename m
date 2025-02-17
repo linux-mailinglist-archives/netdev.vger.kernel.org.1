@@ -1,237 +1,224 @@
-Return-Path: <netdev+bounces-166925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51139A37E5E
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:26:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2004FA37EBF
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:37:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63FD43A7CD6
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:26:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66C663A33B9
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE25E212B3A;
-	Mon, 17 Feb 2025 09:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F17421519F;
+	Mon, 17 Feb 2025 09:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MLFtirCx"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eX+Ko4E/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072.outbound.protection.outlook.com [40.107.94.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D013EC8FE;
-	Mon, 17 Feb 2025 09:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739784371; cv=none; b=Bnmd6Q678BSiAu9lZo3W46WJqf7EguZE/ElxGHDia30qLv3P9RdXA9oWCMZreZ7AbJkCQVUUPLW3anvvudqxk1juB0jexd2pxmvth3TnfJ7e2ak9Wa033IjnnWPeEwEAq70g7C+0Pw7rFL1jBHXzdsTZhzwje0ZuIbKdbiFS4Mk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739784371; c=relaxed/simple;
-	bh=IKQs58geIf6VApu4EVnDj+XctVVzkrTjTdBiFfP+2VE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eNvwMv+NMefumc08dvl1/6u6fNso4gyh3D0j8s8WoStAaHtqptkoqIm8PXHChHlzpk0DeCXhNljVuhdsb//MNyVZmpmy334AtfUnFVXlKnAvEOLSN7DO3Bw+JBJU6oQp0PJFo9fBPGx9ffttVdqjGezn/pPaTawYih2FaXMrKj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MLFtirCx; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E9AC43287;
-	Mon, 17 Feb 2025 09:26:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739784366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SO8T0nIRKcbdmM4ftj1RFljqcKZxemj3VTPTdtlNmjc=;
-	b=MLFtirCxqUcwJLqDAF9h1I3aRDy2RzlA7h1E+0KjutTWO/wcKl9ZvtjtBwdKchSCyaJDgy
-	CaxGL5CGTLJplLIvSYEpH8fqOeGchC0bYgBehPZzPyO9swh92IOGDIUs0qVkGVh0w/PUPR
-	GSb/6weTO2IvE+PDO2D1gKXCLtUh4My8GR1xgiyB6jhQelAC0Q7rY2Rssv3qrAdgxQvQza
-	75Pde7zQE6/rEwCbZHi5hBdDVvXx0dC+impytylGgwEo1bJIxRwex1B7bCTYhtrLJ0974X
-	MFGDaYDIiu3DB7bJRxXl6wHIorTetdJCGWA1PB62miaDEYo2BWmhHJpDLsxENQ==
-Date: Mon, 17 Feb 2025 10:26:03 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Fedrau Dimitri (LED)" <Dimitri.Fedrau@liebherr.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
- <linux-arm-msm@vger.kernel.org>, "thomas.petazzoni@bootlin.com"
- <thomas.petazzoni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- "mwojtas@chromium.org" <mwojtas@chromium.org>, Antoine Tenart
- <atenart@kernel.org>, "devicetree@vger.kernel.org"
- <devicetree@vger.kernel.org>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Sean Anderson <seanga2@gmail.com>, "dima.fedrau@gmail.com"
- <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v4 04/15] net: phy: dp83822: Add support for
- phy_port representation
-Message-ID: <20250217102603.3e9f79c6@fedora.home>
-In-Reply-To: <DB8P192MB08386B9F0FB342EB7B0FA785F3F92@DB8P192MB0838.EURP192.PROD.OUTLOOK.COM>
-References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
-	<20250213101606.1154014-5-maxime.chevallier@bootlin.com>
-	<DB8P192MB08386B9F0FB342EB7B0FA785F3F92@DB8P192MB0838.EURP192.PROD.OUTLOOK.COM>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4902019F115;
+	Mon, 17 Feb 2025 09:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739784914; cv=fail; b=SHOrvKzWjKy77Rfq707G6tFUSCGHLLc+QQHIV3CQbd+IS41ZocNd3ZsWZU2utrU35IMVQ0EN6XxDYM0ynlbH+qPKhn4QE7IS6/qkJq1nNQpqwpmUnnCpau6LGVitv1cy5cJ8eB7dJ4GBoSjPzKbzdM3YjWs9+ZkHy+w73sHrPIU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739784914; c=relaxed/simple;
+	bh=zF8rdYevqiMd01kpmXO7bmvWLj50nV0HYobzhYsb1j0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SK7+AdxqpOks1ZL8gDsGaoOqHffkFS81mqFqPBhS8L1onXSpCoRuEGWX2HtHO6/1LTfBVUQ3I5ul2jV+myaVw0qQ5gywLgAJ9geTTFDXzOPgwyUsdmMS5kFwsOtWOtkQLgyqV7EUZBKljU94ljfZCkYTIo/VnffXKl76I3oO4qA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eX+Ko4E/; arc=fail smtp.client-ip=40.107.94.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BeRkuD+8uQ/R4DoBWrwtfzsw4zmKTy3sH5jWTKG1gWZhVix3suHpcgu0kSYyTATIreD58qiWRkqxvrRVFpjt1MM3CQX7EGAptCubKowR71CI6rkXuAGFmW7f37t9/OK/KbYbVvg0HJahplLvuaxvzlU5hlCuejpkEJ+fo2GB9OFlFNM2I/WBBHn2EI2TlcBkg3bW3vhH8ThH3IGHRRdurOTULO3Wq304hDXixXL/XDwJe1poRSzYHeOa4+x3oiECx7JF+PSNDV+vc/MQhE9DmCJHSxfhQN5OFWoptKBvH4XSLhRyfjaEEQRDYHqz2aFrEkaulGIkK9dEAcYMgjhLaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vg6albj183lB6RYoxba7CXwQqe7IAZRqp/NPFw1ItI0=;
+ b=ZeevhoxPe7ElT08qZUmoWkjAepSCU4oX5P76a71MQXFIM1b4Fxl+WuIrQKSX6vy+/winVu3UAbspV9Ukoh6GtMq9qRQC3voRDVlEMQOT3fIDg6VXaKuuKQphtNMuv7C7K3TOmUNUQx6NrKZpyqCsW0ykxxkUxf8KTQbqpdSVp0IN9HG6D+yUuCFqx+KIN2g5QiTQFERet1S0zaK/pt+gbszxBYUy3oLwzAWUQBvyEXxZKg+vOqlHSBbfpHZFEebebLg8ZpXo45m6LxKWGeG9ts/gf7tpvu6SMSP0Y+1WzDpm1HmTf8jxV1TPt+h65z+lT4J3GUCg493CWGP+BMFNvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vg6albj183lB6RYoxba7CXwQqe7IAZRqp/NPFw1ItI0=;
+ b=eX+Ko4E/7L6rPwVf2DR7x1QKr/830wWxUvrFd344/7aeT0CLe3lmSpZu5xg4uvtKFewzjqvQJ6sCyjaGkFqUiHbYSaguQo0+oZzN7kY+ZiLYqzWe3llAZ/PNuSL+X2YQzlN7wFmf+h/+ShElAtHGRq1X0i8YjSoW7klDepW9kWUBox07cXJGOungY2diyuZLg+JIOqgsCsOhZZgH1zvERGPngam2O194F7f1Zg1xc2tUXrSo/cKS7kdiG2RgXEiFFr/wm+wDB2cgRgtaGopwiVjVbgNYZCNVezifZr/SvvCYOHbe8iGZcLtpJFfVRDW5A/DW82NB2jklc0jJCbHwEA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CY8PR12MB7564.namprd12.prod.outlook.com (2603:10b6:930:97::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.16; Mon, 17 Feb
+ 2025 09:35:10 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%7]) with mapi id 15.20.8445.015; Mon, 17 Feb 2025
+ 09:35:10 +0000
+Date: Mon, 17 Feb 2025 11:35:01 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Amit Cohen <amcohen@nvidia.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Network Development <netdev@vger.kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	bpf <bpf@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
+Message-ID: <Z7MCxTDyVWGpRtOv@shredder>
+References: <cover.1738665783.git.petrm@nvidia.com>
+ <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
+ <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+ <CAADnVQLJfd201t_-bgWHRJRDHm4FQDNapbmAQhPd18OEFq_QdA@mail.gmail.com>
+ <BL1PR12MB5922564282DA2C2C5CA671C1CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+ <20250205090958.278ffaff@kernel.org>
+ <20250215140252.GP1615191@kernel.org>
+ <20250215081043.063e995a@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250215081043.063e995a@kernel.org>
+X-ClientProxiedBy: LO4P265CA0281.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:37a::13) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkedtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeuhfefgffgtdfhgffhvdfhhffhteeutdektefghfetveehheejjefgudeiudehudenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefvddprhgtphhtthhopeffihhmihhtrhhirdfhvggurhgruheslhhivggshhgvrhhrrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkv
- ghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CY8PR12MB7564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 31d42da7-bafe-4b74-c2a1-08dd4f365f42
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EaCz7/VEQtNyNHnMVwiQoAOxvSvBR/R2j3ovO1MzqLBKq8lyBBmAyL3Lv/it?=
+ =?us-ascii?Q?8JJjYA6g1aXleWfc51CC4ZXiMTH5lsWcbWmdyk/lI00CWLAbUtf1u6zWRp6c?=
+ =?us-ascii?Q?60BL8DcLmRiwgb0xibKx4oLzcWP2HC1zRH4P5sUX61ulj+kfd36uL94N+SZy?=
+ =?us-ascii?Q?FmOXQnBiqGVAFWMjbpun4tWA5j7pKaZLxUljmebJ5jzbRWujz3Fog+gtqBej?=
+ =?us-ascii?Q?XYk97GhBHsOFLL7Elyre9uu79ygHiCnPUSaIIJOEAfXMd0mDBfsGo8lYZseM?=
+ =?us-ascii?Q?OmOuHSeGsDE0pRS7FMVPy6LcbQx8WzA4yr7JowD2nu1R19URs+uRY66tLdXh?=
+ =?us-ascii?Q?lRdJGQOqo5XnKEbSsSH7F/NhM6i6ySEQEFQWY3v0sPFLWF/qW2p9Tri+4/TX?=
+ =?us-ascii?Q?eXEaWT/ju7E4XdFBbByEGpFre3bTzwCF8rK/77eb8w8SFJBwNEpLOXwQ5k/f?=
+ =?us-ascii?Q?sMVe80Bkv/COKhDA1CdlV87EbYxhhrFNVIFfRvaPvAI+PSlzmmliiRfUHLTk?=
+ =?us-ascii?Q?pEqEAe34eiKog1Oh8ZsWejQ55EcMsPl0rFFTHcKj6ux5oYRn8Mz7N5JQ1Nfc?=
+ =?us-ascii?Q?/gOh4Oxx2l6oQ/A4BTCvW0gm5WKdNcnGGtXl0/h7vMynFP4hefiCsvWQoAJB?=
+ =?us-ascii?Q?AdnwDcmN91NnKbHtT4SG7IRTmnXYJan+PHdId9xLkkLD3pna9ndOYwygexR+?=
+ =?us-ascii?Q?24sBLTVUHMH9BXdhsycFPLqeEh1gnjQeLo40BdI9IKPjnWf0/1VfkQ2YAQfW?=
+ =?us-ascii?Q?AFCNIHVl15IWLQHhvKbvzWXWfcz82XFkg/PJk2tAmTMLhq8kzb2jltN29MoF?=
+ =?us-ascii?Q?rHC7/IIleDTNWNGkPdALm3LyUJEMyK3ZVRDbHcl305xoMk2axpM3qkXVOKOT?=
+ =?us-ascii?Q?3Ccc/CPtJrvmNMrTZRbgq+gDkhA0/L+zC3yD6ng3JirlgQnNfGZFr7SHmvst?=
+ =?us-ascii?Q?xsVvHszxUqd81Xb1PmYhnpoBpH6IpEq0mIj4YhaWj7XPwW6FGKJTOU9WUdy0?=
+ =?us-ascii?Q?k9AH/Zz+PxVu2WD1l63G5/SSoPaU3PFqfXLyieS5iRl7fDeMTsdZU3FuBkxb?=
+ =?us-ascii?Q?8f4d9LSFJfNNbJtKpNrFqvydUC/X62vzPMemv+KQHZcRLD95u9qypCuMgL22?=
+ =?us-ascii?Q?oEhdB//7JjZdBQykw3hWU4Uhx3hxGya12Xg4MLSGwU0w1yotGXBdl/0Q2wgN?=
+ =?us-ascii?Q?VY+os2GW02CR9GG7jMH3cx87FmjlXk9UXbFAWJ8EoU+y++GLbXz2+f9bkPHr?=
+ =?us-ascii?Q?h+h1dcHNUVfL5y8FbrchOKfwwqe3sUvKDnx825gxBimvbgG6D1JoGXxBjasS?=
+ =?us-ascii?Q?cDXMtOV/Zll7xD/TMP/QWgeDpAeUIIWPKfV576SQVb3pmWk0yEkn0AGk+//u?=
+ =?us-ascii?Q?82Cct2kiYtj8hHeQ9yUTgMrS+JVF?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ci7O1yIGd77XFObmqwBH2OQxxZtn+6jA6HafZ1C2DFzI2T96dD6/Oh6/UeKT?=
+ =?us-ascii?Q?VKPKqoZUe73GdeIi4HiH6Dgk6CYajcdmoLLZp39q3++vtjFJrLIATMDIMQZr?=
+ =?us-ascii?Q?PE6ut5j8vBdLmD3TL1ZzqdoBxwiDKM3soG7qupRKmv5tFRnSxO9pJVa0KeOq?=
+ =?us-ascii?Q?d3TChM3u7ne3boEcq93d4tDIiXwObx4nfduGjxpAOOE26b9AlS8g4r1ubd94?=
+ =?us-ascii?Q?QxkLiJxOvrCttrzNmssNl5l5e7iSVGsFMX1IFKYgikrmQI77Smg45XDEJrA8?=
+ =?us-ascii?Q?2o+49vt3X4b/Nop2FRa+8uTGR5FKgfipj/H7EgIHfvjCz/E1AfU2MHswvc6P?=
+ =?us-ascii?Q?Cbkuz/bQQ8Ngs/suBOS9iUdvio7JzWQDJQpbIzJ6e952gsNqMnltXM3PP9Uq?=
+ =?us-ascii?Q?pBe6BMsJQMVhGBYs4m9FmokG5Gm+4kCp9EHwQ4Urqb0skqAkKowWifZ8S4oh?=
+ =?us-ascii?Q?byvJtWkoEEqCvIu4HprSNsuDezjYQuO9Tn4NlV+JCbbmk/QmQ0SgmaCeDabO?=
+ =?us-ascii?Q?hue1Ali6iX3HPGK8YnL0QUFEEJcwgDsPkkUUB/tTWLMTL7LEOjCtRhrCA03/?=
+ =?us-ascii?Q?Se5bPFlAWnDcwy38s/ZW9jcH/HjOtbH6tZOglR6U5oHPKYYJ522jXIHBc3Oj?=
+ =?us-ascii?Q?TCZDu1YDozXSnLUcNDpNfN28Kbts3tGIF47oyAKXomXl+AlU9aydaFvmGES9?=
+ =?us-ascii?Q?23y1WI8MkO+m62DvLbje5ELaenOPzgZsTvFeNVr/KGzGCN4kRmUjS1u0CY2j?=
+ =?us-ascii?Q?fetiZR2x1Y19rM5GelGvVyo/p0G+Lo4JLmw4L9NFRVlFsqJdCYXQHZjoBgkN?=
+ =?us-ascii?Q?dk25+8rZaNC6QUzFPee3EwkOSclGfrTvd4wVKEMvfwsQmWqu2jMbl4mgxpEK?=
+ =?us-ascii?Q?gw8/WumveXgon4htv6lNPqVqvMXpOhuJjRwE+vYP6/owB2zhXeEhm6r1fwjs?=
+ =?us-ascii?Q?XIl+/xRCmKjCaO386HqD6BC+uK9R4sgZE+MwADLJDtpl5rnsoxhRUVuVWHdi?=
+ =?us-ascii?Q?JW6xS1Fnp1brBu5DKf057M5cFobijW7y6j9ORKuJrTPGJT0f46uWfSko0HLo?=
+ =?us-ascii?Q?dxRjKDQfS42CBgKmkd6sulcIRr9/nYiR0F01zH72Ltx/f9rxDhKtYIe95SVl?=
+ =?us-ascii?Q?i5wOqJh5usuWCUIZTCD7dLYwOxWu8MRSUxk6uVECEs+rgBJDUQ+KfF1TZx5U?=
+ =?us-ascii?Q?GEnC9w4eA2in53XYojTHl2JKnZkK7RzRog/RkSsm5egvgMM6DaCwL+aIMwAD?=
+ =?us-ascii?Q?RYzEx9hSK3Ano+GmTbrrSnT+CqRbLO5tljcx69GjsM84/ug5n0oBeaQ4++hu?=
+ =?us-ascii?Q?kBjA4/JoIArP7K6fdx+dZatKLokHYbUNmc83PA8pbiSdRg5SJJvebjeQa6Qo?=
+ =?us-ascii?Q?IpLk9DdDNPd6019crrvQ/mHwH3xH7+8Va35SYxighNBSpAdrZSjU4/GsJMmw?=
+ =?us-ascii?Q?q8EkFkprkoVIiSwbgkwhowO7H4qujXhKXymbuc5qmeF0W+Dbz109PbX/WcIz?=
+ =?us-ascii?Q?EwedrRZ3MxS5jeT1Lin8vlgUdUG+LV0sgSawaywtgk+nGBdlda3HC0AB6Hg1?=
+ =?us-ascii?Q?/AAc6tsMFp1D9yx7Z4TyyD1nYV5BM9k26VrNLYLf?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31d42da7-bafe-4b74-c2a1-08dd4f365f42
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2025 09:35:10.4307
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hKNFvjqLaFWN9jogFFM495q0l7SP11qZPRPtUprqJ/CG4rhsFrNjlbSPqR18PHcyJ8PuxImNyjFVKsnTlgSxhQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7564
 
-Hello Dimitri,
+On Sat, Feb 15, 2025 at 08:10:43AM -0800, Jakub Kicinski wrote:
+> On Sat, 15 Feb 2025 14:02:52 +0000 Simon Horman wrote:
+> > > TBH I also feel a little ambivalent about adding advanced software
+> > > features to mlxsw. You have a dummy device off which you hang the NAPIs,
+> > > the page pools, and now the RXQ objects. That already works poorly with
+> > > our APIs. How are you going to handle the XDP side? Program per port, 
+> > > I hope? But the basic fact remains that only fallback traffic goes thru
+> > > the XDP program which is not the normal Linux model, routing is after
+> > > XDP.
+> > > 
+> > > On one hand it'd be great if upstream switch drivers could benefit from
+> > > the advanced features. On the other the HW is clearly not capable of
+> > > delivering in line with how NICs work, so we're signing up for a stream
+> > > of corner cases, bugs and incompatibility. Dunno.  
+> > 
+> > FWIIW, I do think that as this driver is actively maintained by the vendor,
+> > and this is a grey zone, it is reasonable to allow the vendor to decide if
+> > they want the burden of this complexity to gain some performance.
+> 
+> Yes, I left this series in PW for an extra couple of days expecting
+> a discussion but I suppose my email was taken as a final judgment.
 
-On Sat, 15 Feb 2025 11:31:28 +0000
-"Fedrau Dimitri (LED)" <Dimitri.Fedrau@liebherr.com> wrote:
+Yes.
 
-> Hi Maxime,
->=20
-> > -----Urspr=C3=BCngliche Nachricht-----
-> > Von: Maxime Chevallier <maxime.chevallier@bootlin.com>=20
-> > Gesendet: Donnerstag, 13. Februar 2025 11:16
-> > =20
-> [...]
-> > =20
-> > @@ -781,17 +782,6 @@ static int dp83822_of_init(struct phy_device *phyd=
-ev)
-> >  	struct device *dev =3D &phydev->mdio.dev;
-> >  	const char *of_val;
-> > =20
-> > -	/* Signal detection for the PHY is only enabled if the FX_EN and the
-> > -	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
-> > -	 * is strapped otherwise signal detection is disabled for the PHY.
-> > -	 */ =20
-> Does it make sense to keep the comment ?
->
+> The object separation can be faked more accurately, and analyzed
+> (in the cover letter) to give us more confidence that the divergence
+> won't create problems.
 
-I think so, this behaviour isn't expected to change with this patchset
+Unlike regular NICs, this device has more ports than Rx queues, so we
+cannot associate a Rx queue with a net device. Like you said, this is
+why NAPI instances and RXQ objects are associated with a dummy net
+device. However, there are already drivers such as mtk that have the
+same problem and do the same thing. The only API change that we made in
+this regard is adding a net device argument to xdp_build_skb_from_buff()
+instead of having it use rxq->dev.
 
-> > -	if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> > -		dp83822->fx_signal_det_low =3D device_property_present(dev,
-> > -								     "ti,link-loss-low");
-> > -	if (!dp83822->fx_enabled)
-> > -		dp83822->fx_enabled =3D device_property_present(dev,
-> > -							      "ti,fiber-mode");
-> > -
-> >  	if (!device_property_read_string(dev, "ti,gpio2-clk-out", &of_val)) {
-> >  		if (strcmp(of_val, "mac-if") =3D=3D 0) {
-> >  			dp83822->gpio2_clk_out =3D DP83822_CLK_SRC_MAC_IF;
-> > @@ -884,6 +874,43 @@ static int dp83822_read_straps(struct phy_device *=
-phydev)
-> >  	return 0;
-> >  }
-> > =20
-> > +static int dp83822_attach_port(struct phy_device *phydev, struct phy_p=
-ort *port)
-> > +{
-> > +	struct dp83822_private *dp83822 =3D phydev->priv;
-> > +	int ret;
-> > +
-> > +	if (port->mediums) {
-> > +		if (phy_port_is_fiber(port) ||
-> > +		    port->mediums & BIT(ETHTOOL_LINK_MEDIUM_BASEX))
-> > +			dp83822->fx_enabled =3D true;
-> > +	} else {
-> > +		ret =3D dp83822_read_straps(phydev);
-> > +		if (ret)
-> > +			return ret;
-> > +
-> > +#ifdef CONFIG_OF_MDIO
-> > +		if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> > +			dp83822->fx_signal_det_low =3D
-> > +				device_property_present(dev, "ti,link-loss-low");
-> > +		if (!dp83822->fx_enabled)
-> > +			dp83822->fx_enabled =3D
-> > +				device_property_present(dev, "ti,fiber-mode");
-> > +#endif =20
->=20
-> I think this is to make it backwards compatible to the dp83822 bindings,
-> is it worth mentioning this in a comment ?
+Regarding the invocation of XDP programs, they are of course invoked on
+a per-port basis. It's just that the driver first needs to look up the
+XDP program in an internal array based on the Rx port in the completion
+info.
 
-Good point yes, I'll mention that.
-
-> > +
-> > +		if (dp83822->fx_enabled) {
-> > +			port->lanes =3D 1;
-> > +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASEF) |
-> > +					BIT(ETHTOOL_LINK_MEDIUM_BASEX);
-> > +		} else {
-> > +			/* This PHY can only to 100BaseTX max, so on 2 lanes */
-> > +			port->lanes =3D 2;
-> > +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASET);
-> > +		}
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int dp8382x_probe(struct phy_device *phydev)
-> >  {
-> >  	struct dp83822_private *dp83822;
-> > @@ -900,25 +927,13 @@ static int dp8382x_probe(struct phy_device *phyde=
-v)
-> > =20
-> >  static int dp83822_probe(struct phy_device *phydev)
-> >  {
-> > -	struct dp83822_private *dp83822;
-> >  	int ret;
-> > =20
-> >  	ret =3D dp8382x_probe(phydev);
-> >  	if (ret)
-> >  		return ret;
-> > =20
-> > -	dp83822 =3D phydev->priv;
-> > -
-> > -	ret =3D dp83822_read_straps(phydev);
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	ret =3D dp83822_of_init(phydev);
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	if (dp83822->fx_enabled)
-> > -		phydev->port =3D PORT_FIBRE;
-> > +	dp83822_of_init(phydev); =20
->=20
-> Keep the check of the return value.
-
-Ah yes indeed, the check should indeed stay. Thanks !
-
-> > =20
-> >  	return 0;
-> >  }
-> > @@ -1104,6 +1119,7 @@ static int dp83822_led_hw_control_get(struct phy_=
-device *phydev, u8 index,
-> >  		.led_hw_is_supported =3D dp83822_led_hw_is_supported,	\
-> >  		.led_hw_control_set =3D dp83822_led_hw_control_set,	\
-> >  		.led_hw_control_get =3D dp83822_led_hw_control_get,	\
-> > +		.attach_port =3D dp83822_attach_port		\
-> >  	}
-> > =20
-> >  #define DP83825_PHY_DRIVER(_id, _name)				\
-> > --=20
-> > 2.48.1 =20
->=20
-> Best regards,
-> Dimitri Fedrau
-
-Thanks for reviewing,
-
-Maxime
+Regarding motivation, one use case we thought about is telemetry. For
+example, today you can configure a tc filter with a sample action that
+will mirror one out of N packets to the CPU. The driver identifies such
+packets according to the trap ID in the completion info and then passes
+them to the psample module with various metadata that it extracted from
+the completion info (e.g., latency, egress queue occupancy, if sampled
+on egress). Some users don't want to process these packets locally, but
+instead have them sent together with the metadata to a server for
+processing. If XDP programs had access to this metadata we could do this
+on the CPU with relatively low overhead. However, this is not supported
+with tc-bpf, so you might tell me that it shouldn't be supported with
+XDP either.
 
