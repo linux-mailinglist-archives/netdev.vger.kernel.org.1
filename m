@@ -1,97 +1,159 @@
-Return-Path: <netdev+bounces-166962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3811A38273
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 12:56:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D033BA381B3
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 12:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4427218953EC
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 11:55:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41B13B24ED
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 11:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93815218EA8;
-	Mon, 17 Feb 2025 11:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E351B218AC3;
+	Mon, 17 Feb 2025 11:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="pBFGpNEm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FntKGJ2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D90217733;
-	Mon, 17 Feb 2025 11:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43E119F104;
+	Mon, 17 Feb 2025 11:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739793301; cv=none; b=Ilgkcq29u9uD1f4Kecknc2P5C3nYevoPaWeYIIyMugRVmySbn+qGBNlrJ74OE9FYNg1BOe9zftR41wXroUNpRnk/E3+ncDLDlZRG9WsUWj0GDs0Yb6vc3hD0KiSoRPhpJ6JsVDpczzrSozkY2zSzZV0rV+tq5whTOTbF6oKxNUU=
+	t=1739791882; cv=none; b=kD40OoVHhzEELn6AAJzs3UUuZ1G+8LOtsf39UU1gLlaT/XrPj0ebGhWBzbXx8nnAoG3inoG1qhIVYTXUGb23BfT1md5ytNlEdiz11RmwGqtEZnINBdtrxsoXj3ifqJ/88EBSJSAuA6gOzKiJQ/ZYMh5+hlj+expX3wV4b5C5rD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739793301; c=relaxed/simple;
-	bh=h+O+ibFzxC5CAgefPBkwm/5PJBNefvtc+BzFWMlwpiw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t5z87ck+gj2nSC1y8xI550hWDW7TGQqVr2/VkyZYrNNn1yPs8fbdryjORrlof/EacULgM8dc11NQFNiKv9oMNMEQVSjf5rAE2H0f1cqjf3x+hrnQePHH6KYCTz7I84kQKLy3Fs51z+wSULtQqHVEthPahRWsGmAOd86qKwbH098=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=pBFGpNEm; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=UDUhVrBdPRQjgsQkHQ57OQBrnvRcX2sjoY8WgVvH3ls=; b=pBFGpNEmjEzf8R9AXNOh0/fRv9
-	Uamz+e6kKXAN9UJE5xRcwreb4iX8dd4EDhXxZEcjj5pVozANasfCEuxKkfFiN6ukVeKGSmVn+L/3a
-	3dyGrY5WA4W2siFk5YBIbhU8Gkskjc/3KoZ7y7jGSJi65qXwFDKQV5naP3Fc7VWpEraU=;
-Received: from p5b206ef1.dip0.t-ipconnect.de ([91.32.110.241] helo=Maecks.lan)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1tjzGa-006FEq-0d;
-	Mon, 17 Feb 2025 12:26:24 +0100
-From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1739791882; c=relaxed/simple;
+	bh=x59L7IqL94IFM2zao/QYrrn1Ck873l+zRRObe6nR3ZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnDuRXJn2cz50KZQ0OJ1q7VDzRrrBX4YKZPe6vOmq+tW9tZF5SnHToVGKvqDs3jgE1LmQknDv9RBfV4/7mv0DxjnNXPKcnTUL5Zf+Hzmn/+w9ugQFkTCOtHcaQQBE2dp6jFVkPzwttugYsD6hmOFnGZsJxc1g+i5DXmUCqlSiYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FntKGJ2g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 322ECC4CED1;
+	Mon, 17 Feb 2025 11:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739791882;
+	bh=x59L7IqL94IFM2zao/QYrrn1Ck873l+zRRObe6nR3ZY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FntKGJ2gEe8KQtXAM1A7/RQn+PfYq8H5dWKYZn5oss5qZBf9JJncJE+R18hFL8Lm9
+	 PFPpYqcpS5EoPKMf2J66Tc0mJGlB837NAOJlOR8NTAl4z0mfHEvAkYdhwMS9wYhdKJ
+	 HEiZuuptHx2U2UuENVvlZPPOD8mlcYbVLdg9xYKBvzRLVk1cxv7vKgZUb9VcRqL5Lp
+	 nZcpJgysIZTcUAwuJCuFc5CgPBBFycmNx72h4mVdtw8TrXX0x7EKS9IV1CpLtU44w5
+	 2lFAIvwLk9KmxV7+5Q6jltQEsCH16ycLhTcgGiskBxqc2hX/gfn1u19wzSWtFwHK40
+	 qURVopF4ZbD4g==
+Date: Mon, 17 Feb 2025 11:31:13 +0000
+From: Simon Horman <horms@kernel.org>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: bridge@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: bridge: locally receive all multicast packets if IFF_ALLMULTI is set
-Date: Mon, 17 Feb 2025 12:26:20 +0100
-Message-ID: <20250217112621.66916-1-nbd@nbd.name>
-X-Mailer: git-send-email 2.47.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v4 5/9] igc: Add support for frame preemption
+ verification
+Message-ID: <20250217113113.GK1615191@kernel.org>
+References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
+ <20250210070207.2615418-6-faizal.abdul.rahim@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210070207.2615418-6-faizal.abdul.rahim@linux.intel.com>
 
-If multicast snooping is enabled, multicast packets may not always end up on
-the local bridge interface, if the host is not a member of the multicast
-group. Similar to how IFF_PROMISC allows all packets to be received locally,
-let IFF_ALLMULTI allow all multicast packets to be received.
+On Mon, Feb 10, 2025 at 02:02:03AM -0500, Faizal Rahim wrote:
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
- net/bridge/br_input.c | 2 ++
- 1 file changed, 2 insertions(+)
+...
 
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index 232133a0fd21..7fa2da6985b5 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -155,6 +155,8 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- 			pkt_type = BR_PKT_MULTICAST;
- 			if (br_multicast_rcv(&brmctx, &pmctx, vlan, skb, vid))
- 				goto drop;
-+			if (br->dev->flags & IFF_ALLMULTI)
-+				local_rcv = true;
- 		}
- 	}
- 
--- 
-2.47.1
+> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
 
+...
+
+> +bool igc_fpe_transmitted_smd_v(union igc_adv_tx_desc *tx_desc)
+> +{
+> +	u8 smd = FIELD_GET(IGC_TXD_POPTS_SMD_MASK, tx_desc->read.olinfo_status);
+
+olininfo_status is little-endian, so I think it needs
+to be converted to host byte order when used as an
+argument to FIELD_GET().
+
+Flagged by Sparse.
+
+> +
+> +	return smd == SMD_V;
+> +}
+
+...
+
+> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ethernet/intel/igc/igc_tsn.h
+
+...
+
+> +static inline void igc_fpe_lp_event_status(union igc_adv_rx_desc *rx_desc,
+> +					   struct ethtool_mmsv *mmsv)
+> +{
+> +	__le32 status_error = le32_to_cpu(rx_desc->wb.upper.status_error);
+
+It looks like the type of status_error should be a host byte order integer,
+such as u32.
+
+Also flagged by Sparse.
+
+> +	int smd;
+> +
+> +	smd = FIELD_GET(IGC_RXDADV_STAT_SMD_TYPE_MASK, status_error);
+> +
+> +	if (smd == IGC_RXD_STAT_SMD_TYPE_V)
+> +		ethtool_mmsv_event_handle(mmsv, ETHTOOL_MMSV_LP_SENT_VERIFY_MPACKET);
+> +	else if (smd == IGC_RXD_STAT_SMD_TYPE_R)
+> +		ethtool_mmsv_event_handle(mmsv, ETHTOOL_MMSV_LP_SENT_RESPONSE_MPACKET);
+> +}
+> +
+> +static inline bool igc_fpe_is_verify_or_response(union igc_adv_rx_desc *rx_desc,
+> +						 unsigned int size)
+> +{
+> +	__le32 status_error = le32_to_cpu(rx_desc->wb.upper.status_error);
+
+Ditto.
+
+> +	int smd;
+> +
+> +	smd = FIELD_GET(IGC_RXDADV_STAT_SMD_TYPE_MASK, status_error);
+> +
+> +	return ((smd == IGC_RXD_STAT_SMD_TYPE_V || smd == IGC_RXD_STAT_SMD_TYPE_R) &&
+> +		size == SMD_FRAME_SIZE);
+> +}
+> +
+>  #endif /* _IGC_BASE_H */
+> -- 
+> 2.34.1
+> 
 
