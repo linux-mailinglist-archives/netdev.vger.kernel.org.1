@@ -1,147 +1,182 @@
-Return-Path: <netdev+bounces-166970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B856A38352
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:46:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DECCA3835C
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C47A16A96D
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 12:46:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DDEB172221
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 12:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7969D21C16D;
-	Mon, 17 Feb 2025 12:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0A521A454;
+	Mon, 17 Feb 2025 12:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZU59D6wk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oERNcDvs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E026021ADB9
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 12:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9409F2F5B
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 12:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739796373; cv=none; b=KyO+OZPOzmubLCVnCtCBQr/YdAmm3D2w3DA3nwbWbBJr5p8enPB5CPtwHI6+NbfRR59B26WQjZpHbWNq+o4peVQPrKrFSWpi6R+PZ1RwlaSFnvEzMdCOiiTL313NJiu6rbqhInXjqpAnsH0XVaXJiNfdvptp5UuurNUlZuGVn2k=
+	t=1739796566; cv=none; b=KCvXFdsGUk7deOKknKJA+xHmxC/nGbuPitncpcCtjADN/W6ULI0jB8qfwtFZpKw974TdvSuSVDHrpr4Khml8CQuc6RMJ1W3TajvKWSxqTKr9isQowQqlKg2UhfH9pEXESnDrE0x9632Fv2sAx6AyCBoV72SZgxu07ckhiSbNZOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739796373; c=relaxed/simple;
-	bh=6UxApZbLBGau6S5atdSL0jd/Tar6i7kAvdFASHuiDHM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MlJ8y/vy4xvkgKUbGuuBakGiboRNgMmbGD27wUCUFN+zmg/uTuKlh9Bflo03mSOXWYSiKS6i6CJE3xASs4mBB2dkWVBWfLerhX3Wexk0FdbzTCkIDhfJXbn/2csbXejkvelbm7kxfEWQlzvKpcGwrCWmCTl2TH7Fh+DzkhHnBFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZU59D6wk; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3cf880d90bdso10785625ab.3
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 04:46:11 -0800 (PST)
+	s=arc-20240116; t=1739796566; c=relaxed/simple;
+	bh=bHiqDRvc1mhDBHiIQVyYyfXBxjcUKSSG8qBQZ4+CDoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OAmsahHIH/rq9SPWuD4SaRiKS9EYUxmFr+h0ZmGs/NKd87UjRme6S0LP5Pc8oFV9ZG/dumX0uU1nkHYpWoFTH4W1oweQQ4AykKMrargKmcyiJzXpe7u9J8IZaHK6TamWzTWiJAnFDryOLM3Vay3t0F7vj8Pt/LH5Xy4ynai+48c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=oERNcDvs; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43989226283so3995535e9.1
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 04:49:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739796371; x=1740401171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=imuHlOVGZN9G1+b4pMyAik18tnwHQmcoRbN++9g5DvE=;
-        b=ZU59D6wk3RPaFGzQRMhx1ODHyzGzNI+3y+JCVIgZZ936L3esVZWW+pCHald+KSqI+G
-         wQ0ZZ+9PdGxGSNhRAzdmGFsXGQGPV7GTf394mAsZaEFqzUs6NUr3iNqdFLGehZ/YB8Ah
-         PWcy7VP1bnnI3XPP93/RfJVkqtH9wh2YrF335s6SGvOQWXw3MAbYf1urdiA3RFyPSrnc
-         tKDXCWY/Wmoj/SUGy+u7u19rw3lmFQicMq4OGYH2rahvC838pPhgVxT1pHjD3Un28Qk+
-         uHqUZmMhtOZyP/NMM2sqPbFrKFz23tAnd52ANeKcnTQEZD+rbIWFe8DvkVl7TP2wNfuk
-         AKUA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1739796563; x=1740401363; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wmKKVjUehtS4u8tMOfG7kOlQSPuERUC0wbaOm58IPWU=;
+        b=oERNcDvslrcUvl8V2WHrDCfUBqoX690LCOwbQBjG4v3luwTFtpeeagSm2FTUCAEFAX
+         xYsz0BpSGZ9NBflYPKZInpMkPQxofgZ1mqSd1wyWsfzqQNojeB2ZNR/zelfrUZjQRQuo
+         lNp4j2yAiYmKn3jY173rJJlm2JE9avXzeDrsm3DIELPsr0+9Ii3dDd7/OxNHhJIp6Vnh
+         eN8pMIS/3HAIyGADUyr0THwdQ20XvptpPkRnSoVynl58Xs7j5bomSCS2GYY2ah4dibBB
+         V8mH5GBJkX+MHnT8RUO/z/MHRT1BeKpq10Z7yhyItGaanpnGlblZZi3mExdVe6c4uWRJ
+         MnUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739796371; x=1740401171;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=imuHlOVGZN9G1+b4pMyAik18tnwHQmcoRbN++9g5DvE=;
-        b=Hvku+CLzwJsmxVzJxIB7b6PMEu2V/+XzbQmPBq74lhTXwypgc4KDXmIKX/8TvYciqk
-         jh7gmPH0T8ULDY0y6kN+yVaHs3jxcXWz75WSpbpJYWEYSW6t3CD4hCyL/mDkEHvisCen
-         /EwlMLGNU2tyigNWx9ioLH2LI6H0e/2Mzk2TuSJA+Cn8nnJn+Ems9MtfSnFEkcmYso3L
-         oyqin6+dAj0Yyfgcesvp3AgSpEsp8//M9xwJ9ICnfOrV3VPpIMyCkzmHEYqeVx/9ReE2
-         TbZnQt2r/c5lbX4GlPdZRNveB2mFFg7RPORRivvcm84yJZHXKLj9FM1ZaC84H7NRmMen
-         tSOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfufPoWWx8UWZDi+IIMh3VGy6dapBooOJ6rI/8OMsdaNBLr+AMTFViy1CHFjLxsX6iTSx+Jh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCoLFBsSF9osPNtyZfDkoquYz3t7wEn+tDJa8hZoZ5yZu5dJ1D
-	otLdFaXxGubrxdfT3Bxn/JB2CuN+Nh1NvXYis+lF2O4pb04zf+gQ6qmoaTbJJm8=
-X-Gm-Gg: ASbGncuZ+jUsFRDiUpvVgnoQNUV6vQKBjwfKjzPQG2E87af3YqL2vpjUOVcpW5pItVQ
-	yxqIDhgUXFZyjN0T3G/fFegm3P/Vlwa5nLnrpIwLC2Vn332+Z4SrPA+ql9aXE5vh0YemmxhDfK0
-	A6eNvYm0RMZMTrXFSVUegCQvMuwR4TQa/ZSu8udturR1V8e5uzjUpB8CYcdl+ONDBaYxUJXr8fe
-	oFeNDEye9Bs66GhL7CBDsYkay4v7bRR8EoSOBrepgXleuIOMBs3LE7143vT9zQ5Tbm5txeO/QEu
-	5p2FCDQ=
-X-Google-Smtp-Source: AGHT+IFDTfs1Vxn2hjyHtnEBa1Q+Vakh+5p/Cg6QDyXSbnxDmedJ2oPgTZIB/21B6FFdPIg27A2ReQ==
-X-Received: by 2002:a05:6e02:3488:b0:3d0:101e:4609 with SMTP id e9e14a558f8ab-3d2809df3a5mr81794695ab.15.1739796370934;
-        Mon, 17 Feb 2025 04:46:10 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ee81857773sm1247159173.66.2025.02.17.04.46.09
+        d=1e100.net; s=20230601; t=1739796563; x=1740401363;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wmKKVjUehtS4u8tMOfG7kOlQSPuERUC0wbaOm58IPWU=;
+        b=byNUNbRVhPfbQ+D/HVFxnUHeaSnzOgSKozsVk9qLfQSpHzEwj7ExNDHUFE4Ronui+x
+         g3ke6bZOzPw6oJiu8ckSftVGeotweOfm2KZjLeEOAwKLqRiuW61Q+wYZqgLhIRHsTFFG
+         3ngN3ZBehN612XHo5SfjfdZBBR9oKtq7e0aZR6+a+WF0d4pqN+dIAqSlRCHnJpaHDlMc
+         qJQNpAijjeHDTMflPGvdzVguMxHdl8LyDUKhy2Mv1KvTLxcrUmWmOJSmhM5ItGovwtcr
+         uSiOUHSEEEpxZG/YD3XAYDFkKXqiamR7Ns5SIfkwGKw91/13jb0+3rPBYF49LJUB7Syu
+         s7KA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWZ4ReDBCMcFvhiW8x0UhekwniL3Nr/P/fWwadTQUSiKtarlBCH7k75ql9gVYhX++0G/HX+/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSD/bUZjmy3Kmyv62SYfdnoz0UH1d2FBxV9UqnrAlBWM0wdW9q
+	vl9EXB38i3omE0a1uW1vtwi+9xXwnmw0JuVnn4HxWrUXu4WT22Ya1WmGZz1gyZo=
+X-Gm-Gg: ASbGncu280UucJ3yZvWmz7f4v/4e4v+DcuG6lAKHdy+eIGKzy7/fUF1ZxXlDCvKnC/P
+	QZud42wvayLU4Eo84wXu6konS2/fOgUcaQ9t0447Z7lyZXyl9mRzML2s0rzqnQGMOuOTXHq8HGM
+	d8cAy6T3v+OC4bezfMRASPvyUaxyBPMXAZT90L+PQD4a8FJ9yciJ++/dmnnSgQEDRJkne3tyqZt
+	VtgiGoL3PXtgsFU2e1uCXnKxEmOWa886sV9+aAmn8G90dW9652bVNfelThcimWgQPni1TjPDoB3
+	zreHznTujOyQhbeVHA==
+X-Google-Smtp-Source: AGHT+IG+t23B0+CZfK+bvk75oBr8zrz/PAsau7x36xGrXz0Kh9HYWs46MPNjv6SioOyW10077oLjnQ==
+X-Received: by 2002:a5d:530a:0:b0:38f:2b59:3f78 with SMTP id ffacd0b85a97d-38f33f54f2bmr7539978f8f.45.1739796562469;
+        Mon, 17 Feb 2025 04:49:22 -0800 (PST)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ccd46sm12190378f8f.21.2025.02.17.04.49.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 04:46:10 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
- David Wei <dw@davidwei.uk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
- Mina Almasry <almasrymina@google.com>, 
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
- Pedro Tammela <pctammela@mojatatu.com>, lizetao <lizetao1@huawei.com>
-In-Reply-To: <20250215000947.789731-1-dw@davidwei.uk>
-References: <20250215000947.789731-1-dw@davidwei.uk>
-Subject: Re: [PATCH v14 00/11] io_uring zero copy rx
-Message-Id: <173979636951.644986.4694104673663127682.b4-ty@kernel.dk>
-Date: Mon, 17 Feb 2025 05:46:09 -0700
+        Mon, 17 Feb 2025 04:49:21 -0800 (PST)
+Date: Mon, 17 Feb 2025 13:49:12 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, 
+	"Nelson, Shannon" <shannon.nelson@amd.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, 
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
+	Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig <hch@infradead.org>, 
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
+Message-ID: <ccdz4sq2dzclxhevnj4ecfbehgtbiiw4pxtwctvknjzlvp72fl@lvfpjzfekm6z>
+References: <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+ <20250207073648.1f0bad47@kernel.org>
+ <Z6ZsOMLq7tt3ijX_@x130>
+ <20250207135111.6e4e10b9@kernel.org>
+ <20250208011647.GH3660748@nvidia.com>
+ <20250210170423.62a2f746@kernel.org>
+ <20250211075553.GF17863@unreal>
+ <b0395452-dc56-414d-950c-9d0c68cf0f4a@amd.com>
+ <20250212132229.GG17863@unreal>
+ <Z66WfMwNpVBeWLLq@x130>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z66WfMwNpVBeWLLq@x130>
+
+Fri, Feb 14, 2025 at 02:03:56AM +0100, saeed@kernel.org wrote:
+>On 12 Feb 15:22, Leon Romanovsky wrote:
+>> On Tue, Feb 11, 2025 at 10:36:37AM -0800, Nelson, Shannon wrote:
+>> > On 2/10/2025 11:55 PM, Leon Romanovsky wrote:
+>> > >
+>> > > On Mon, Feb 10, 2025 at 05:04:23PM -0800, Jakub Kicinski wrote:
+>> > > > On Fri, 7 Feb 2025 21:16:47 -0400 Jason Gunthorpe wrote:
+>> > > > > On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
+>> > > > >
+>> > > > > > But if you agree the netdev doesn't need it seems like a fairly
+>> > > > > > straightforward way to unblock your progress.
+>> > > > >
+>> > > > > I'm trying to understand what you are suggesting here.
+>> > > > >
+>> > > > > We have many scenarios where mlx5_core spawns all kinds of different
+>> > > > > devices, including recovery cases where there is no networking at all
+>> > > > > and only fwctl. So we can't just discard the aux dev or mlx5_core
+>> > > > > triggered setup without breaking scenarios.
+>> > > > >
+>> > > > > However, you seem to be suggesting that netdev-only configurations (ie
+>> > > > > netdev loaded but no rdma loaded) should disable fwctl. Is that the
+>> > > > > case? All else would remain the same. It is very ugly but I could see
+>> > > > > a technical path to do it, and would consider it if that brings peace.
+>> > > >
+>> > > > Yes, when RDMA driver is not loaded there should be no access to fwctl.
+>> > >
+>> > > There are users mentioned in cover letter, which need FWCTL without RDMA.
+>> > > https://lore.kernel.org/all/0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com/
+>> > >
+>> > > I want to suggest something different. What about to move all XXX_core
+>> > > logic (mlx5_core, bnxt_core, e.t.c.) from netdev to some other dedicated
+>> > > place?
+>> > >
+>> > > There is no technical need to have PCI/FW logic inside networking stack.
+>> > >
+>> > > Thanks
+>> > 
+>> > Our pds_core device fits this description as well: it is not an ethernet PCI
+>> > device, but helps manage the FW/HW for Eth and other things that are
+>> > separate PCI functions.  We ended up in the netdev arena because we first
+>> > went in as a support for vDPA VFs.
+>> > 
+>> > Should these 'core' devices live in linux-pci land?  Is it possible that
+>> > some 'core' things might be platform devices rather than PCI?
+>> 
+>> IMHO, linux-pci was right place before FWCTL and auxbus arrived, but now
+>> these core drivers can be placed in drivers/fwctl instead. It will be natural
+>+1
+>
+>Fwctl subsystem is perfect for shared modules that need to initialize the
+>pci device to a minimal state where fwctl uAPIs are enabled for debug and
+>bare metal device configs while aux sunsystem can carry out the
+>spawning of other subsystems.
+
+Wouldn't it be better to call it drivers/core/ and have corectl or
+corefwctl ?
 
 
-On Fri, 14 Feb 2025 16:09:35 -0800, David Wei wrote:
-> This patchset contains io_uring patches needed by a new io_uring request
-> implementing zero copy rx into userspace pages, eliminating a kernel to
-> user copy.
-> 
-> We configure a page pool that a driver uses to fill a hw rx queue to
-> hand out user pages instead of kernel pages. Any data that ends up
-> hitting this hw rx queue will thus be dma'd into userspace memory
-> directly, without needing to be bounced through kernel memory. 'Reading'
-> data out of a socket instead becomes a _notification_ mechanism, where
-> the kernel tells userspace where the data is. The overall approach is
-> similar to the devmem TCP proposal.
-> 
-> [...]
-
-Applied, thanks!
-
-[01/11] io_uring/zcrx: add interface queue and refill queue
-        commit: 6f377873cb23905009759b7366b9fe85c2a6ff37
-[02/11] io_uring/zcrx: add io_zcrx_area
-        commit: cf96310c5f9a0d542db99c887742811425ba2ec0
-[03/11] io_uring/zcrx: grab a net device
-        commit: 035af94b39fd13751abf5f0a2948c9eddede55d0
-[04/11] io_uring/zcrx: implement zerocopy receive pp memory provider
-        commit: 34a3e60821ab9f335a58d43a88cccdbefdebdec3
-[05/11] io_uring/zcrx: dma-map area for the device
-        commit: db070446f5af8c7a384b89367a10cddbf5498717
-[06/11] io_uring/zcrx: add io_recvzc request
-        commit: 11ed914bbf948c4a37248f2876973ac18014056d
-[07/11] io_uring/zcrx: set pp memory provider for an rx queue
-        commit: e0793de24a9f610bd8ce106f7033b3966e7fca0e
-[08/11] io_uring/zcrx: throttle receive requests
-        commit: 931dfae19032d13266cf1fac080cec66469a2042
-[09/11] io_uring/zcrx: add copy fallback
-        commit: bc57c7d36c4c9c352ed13d98a4f1e4dc27919d6a
-[10/11] net: add documentation for io_uring zcrx
-        commit: d9ac1d5fc9510a170eb43e8c129b8e1cd5e1c3e1
-[11/11] io_uring/zcrx: add selftest
-        commit: 71082faa2c648a2adc1167b37565e195a8df1bc7
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+>
+>> place for them as they will be located near the UAPI which provides an access
+>> to them.
+>> 
+>> All other components will be auxbus devices in their respective
+>> subsystems (eth, RDMA ...).
+>> 
+>> Thanks
+>> 
+>> > 
+>> > sln
+>> > 
+>> > 
+>> 
+>
 
