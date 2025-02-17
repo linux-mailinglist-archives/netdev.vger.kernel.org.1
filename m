@@ -1,161 +1,181 @@
-Return-Path: <netdev+bounces-167116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD83A38F7E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:14:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9A6A38F90
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:22:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440CB168573
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 23:14:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D8A1881CBA
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 23:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB301AA1F4;
-	Mon, 17 Feb 2025 23:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5D51AAA1F;
+	Mon, 17 Feb 2025 23:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CmOfMUkO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ThIg1xQQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NESdsBBL"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C1B14F9E2;
-	Mon, 17 Feb 2025 23:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698ED14D444;
+	Mon, 17 Feb 2025 23:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739834076; cv=none; b=Pn4pd8YyBEqsPguOGZHcVKyZnaJSiv6QU8C2Wcy0b5P54NRbHceweakFOHfzw7o6hh/9cPqnX7+ojlQCVMk9IB/7Rovq/K1hXK5MKUylHEIwM3B22GuHm6hXHY884IZplyLFxX38meX6mlR3A1FqKmZlF5YthrU/bhJ+h1TZ6FY=
+	t=1739834528; cv=none; b=qwVXfG1J0k1XVtl7JevFh8ANj4ZfZ0A7tCbkD7w5SvzLBZhmYNxJHdvgofdLAqWILc+Z6KtjIQowu8Hc/4ZNk2hH0dx41i66xzrlDmgy4xjaGCoyx7MBVBvzS1EU/J1qfxMi6KsHxJK7SfT9dqrW4tkR2TW8mhzDNB6WJnNNLAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739834076; c=relaxed/simple;
-	bh=NMxipclVNI8ph4c1sJVpJ8RRFWUxSx7dZywnmy1ZJF4=;
+	s=arc-20240116; t=1739834528; c=relaxed/simple;
+	bh=f83O3KxdUX2e1SDP+npF3Cm47CLmohfTTXT+mmIhBIo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kATJjDYqwxKIZ7Z31YgqlFCFNx16A1hG8qqmnUI/VG8ctz0ZGlh+NeskNHgjrUjr812jKq3b4GBwWJF+gKHFk0QDjzwJ5VPSHqCtH/KO1dQ0GPxGVNHNMNYjFrfAdNYlk44dT1kRB2PL6QMRE0U/qXcrqKZj8yq84ezk809VFeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CmOfMUkO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ThIg1xQQ; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 6610E2540109;
-	Mon, 17 Feb 2025 18:14:31 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Mon, 17 Feb 2025 18:14:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1739834071; x=1739920471; bh=BVPxY/AN1UFMIdx71q3f56HEcF1umPZl
-	YfP8ptr5yIA=; b=CmOfMUkO2F9ADd1Z/gkU7grTYGiPLkkiuMfjHkngVml0dK0V
-	gzve+SsU8usdxmbc2/zNRgSFJfOmLKCog0iC6rb2j55hN7EhWnxAMNQnzOHLvJ/p
-	IUJC0B+ayuu4ZiugKoVhi97/bWET52faK9QcYmXQE1PRBFaSbuPBo2q6ZDCy1G42
-	lvGAvALqUIs0RmwE7TYdrK/8iCkLUFM5VlIMwSk/6KaDAAog1nsSqXleSpHcJPwd
-	kP5P2znoJEvac5EUVnw2jR1aR3CXbfbUbPnZv98c+XsgNiJXXyQ0hW8rfvo6QKxL
-	PQ2aLRhrtQlrb2p89CBfTLlkgKvsl7guSRiLDw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1739834071; x=
-	1739920471; bh=BVPxY/AN1UFMIdx71q3f56HEcF1umPZlYfP8ptr5yIA=; b=T
-	hIg1xQQ7+uhwbgWpm34PmpDVjz18wOq0RT9OgZBlA7f6zhKcG1pOjaq2qakLosja
-	43w1urIGfWg9V+zSbrcSyg3xSfv6fBvySa/Eb4IPZxdpmlZyj6FbjQvDSVWryQye
-	76Z0/UqC1Gfq7rQAvSI4BK2gtnGMYamDjn/fOP6ceQioFkJ1dHFq7fiHqfZsIvQG
-	2SFDirS2wUXZ+BM3DTZOfCViFZj6fDyR4CbAHSy7t2vhXnEzsr90sVPh/+Nxn/DB
-	QyIR4VnVFTzOfhs2MUBczXXYPfVBwkJPm+lQY/c43ttL4vusTIHHC+QApZ7T150F
-	UJlb7D5SvpyMbY9ifMVpw==
-X-ME-Sender: <xms:1sKzZ8aVZcke_x5JuwFNc26TSafKXdZ_RB8clENV2hWyYjkoSu2KYg>
-    <xme:1sKzZ3bFThM6X9xqsMjEPs3cbAwAu663UlE9sjCAauChIExLibK207O-US2luZNQ-
-    i6btw59_zxvv5Bx3UM>
-X-ME-Received: <xmr:1sKzZ29vGlJmKmNKCnG5poVEVLmeOfJZ6VY8S2caDK_agrWOhTbV4X58WqAr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehleejtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepveduvddtveehteekvdeiueegheei
-    veejkeetfefgfeeffeejgfdvfedtleeufeegnecuffhomhgrihhnpehkvghrnhgvlhdroh
-    hrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehs
-    ugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvg
-    epshhmthhpohhuthdprhgtphhtthhopehprghulhesphgruhhlqdhmohhorhgvrdgtohhm
-    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthes
-    ghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-    dprhgtphhtthhopehntggrrhgufigvlhhlsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehkuhhnihihuhesrghmrgiiohhnrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqshgvtghurhhithihqdhmohgu
-    uhhlvgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:1sKzZ2qYlvbmXdO9cAqBXIUloHSAq9jbskS9ZckT7aBlzknBrd8o_w>
-    <xmx:1sKzZ3rlCfU_69QjVWUNtWsBF4HZvewVddqA3i_cJTKljydYGY5swA>
-    <xmx:1sKzZ0TtwBK8kplrAuIThZTbIXqr5XVkEzmc7fM01qjlD0BnMDv9GQ>
-    <xmx:1sKzZ3qvnXYTkHoklp7-25SPTs5c46hrQBencBveu1RWdT5cNluuBA>
-    <xmx:18KzZ0jK_Jb0yx5nYrtd4hJszdCrQn1uIXxFYdqHoqJuS4vwPWv-5zym>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Feb 2025 18:14:30 -0500 (EST)
-Date: Tue, 18 Feb 2025 00:14:28 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Paul Moore <paul@paul-moore.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	David Ahern <dsahern@kernel.org>,
-	linux-security-module@vger.kernel.org, Xiumei Mu <xmu@redhat.com>
-Subject: Re: [PATCH net v2] tcp: drop secpath at the same time as we
- currently drop dst
-Message-ID: <Z7PC1JoBvgFL9JAU@hog>
-References: <5055ba8f8f72bdcb602faa299faca73c280b7735.1739743613.git.sd@queasysnail.net>
- <CAHC9VhT2YnbCKcAz5ff+CCnBkSwWijC4r7-meLE7wPW6iK2FUQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwOh+uGx3U6SGGTnNSBeNxtldVL0BJnQlN86f9OmJyW7GUCGjRlhfNRmZvl11Jj0bKf74KY7Cyi5buchiJYKLxq1aoQNQlccjNQqkH5bNIe2iURB7n4KEXO7BPhepFKSupHVBJ8pnwZ5y0m3glQ80ADyHxAOBKLc/nr95mK60tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NESdsBBL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=z4zZA+SHhnpmJYDOp0NswBWcZOVtoN7RDeuxjfGWwYM=; b=NESdsBBLeV/I0kXm45xJYp1bTL
+	oWkZIdEUuBRoCa45X0wQa6fuOpZrM5lGjcanXPnllxXNH6pTn1/m/7yaJSbv+O7Ymg8dAVt6f6Wfy
+	bTaDLLNYsjGRf6lT0m/MGUsLjIfJH8mjAgK522uHle1UDz8LcWyCv9GGcplS0nfP5EJExAltRINzo
+	559KURpSKhEvCcEG6EkJCXOKVEhh1HF/8QUJ+jAMhz8We6zWJ8UKFVmvqyELxtyrh+n7v4aMZoSpb
+	zbBToIGKwNOQVgqeJzR0WJabFApK02ghl42zyjJ6ciFTq1R2nXF2o6jG0J5tRuff5bcvWFqPSewg1
+	TGBaTskA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58678)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tkAQk-0008Gn-2z;
+	Mon, 17 Feb 2025 23:21:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tkAQb-0006c4-02;
+	Mon, 17 Feb 2025 23:21:29 +0000
+Date: Mon, 17 Feb 2025 23:21:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Lothar Rubusch <l.rubusch@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for Sophgo
+ SG2044 SoC
+Message-ID: <Z7PEeGmNvlYD33rZ@shell.armlinux.org.uk>
+References: <20250216123953.1252523-1-inochiama@gmail.com>
+ <20250216123953.1252523-4-inochiama@gmail.com>
+ <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
+ <5e481b95-3cf8-4f71-a76b-939d96e1c4f3@lunn.ch>
+ <js3z3ra7fyg4qwxbly24xqpnvsv76jyikbhk7aturqigewllbx@gvus6ub46vow>
+ <24eecc48-9061-4575-9e3b-6ef35226407a@lunn.ch>
+ <Z7NDakd7zpQ_345D@shell.armlinux.org.uk>
+ <rsysy3p5ium5umzz34rtinppcu2b36klgjdtq5j4lm3mylbqbz@z44yeje5wgat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhT2YnbCKcAz5ff+CCnBkSwWijC4r7-meLE7wPW6iK2FUQ@mail.gmail.com>
+In-Reply-To: <rsysy3p5ium5umzz34rtinppcu2b36klgjdtq5j4lm3mylbqbz@z44yeje5wgat>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-2025-02-17, 17:35:32 -0500, Paul Moore wrote:
-> On Mon, Feb 17, 2025 at 5:23 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
-> >
-> > Xiumei reported hitting the WARN in xfrm6_tunnel_net_exit while
-> > running tests that boil down to:
-> >  - create a pair of netns
-> >  - run a basic TCP test over ipcomp6
-> >  - delete the pair of netns
-> >
-> > The xfrm_state found on spi_byaddr was not deleted at the time we
-> > delete the netns, because we still have a reference on it. This
-> > lingering reference comes from a secpath (which holds a ref on the
-> > xfrm_state), which is still attached to an skb. This skb is not
-> > leaked, it ends up on sk_receive_queue and then gets defer-free'd by
-> > skb_attempt_defer_free.
-> >
-> > The problem happens when we defer freeing an skb (push it on one CPU's
-> > defer_list), and don't flush that list before the netns is deleted. In
-> > that case, we still have a reference on the xfrm_state that we don't
-> > expect at this point.
-> >
-> > We already drop the skb's dst in the TCP receive path when it's no
-> > longer needed, so let's also drop the secpath. At this point,
-> > tcp_filter has already called into the LSM hooks that may require the
-> > secpath, so it should not be needed anymore.
+On Tue, Feb 18, 2025 at 06:50:24AM +0800, Inochi Amaoto wrote:
+> On Mon, Feb 17, 2025 at 02:10:50PM +0000, Russell King (Oracle) wrote:
+> > On Mon, Feb 17, 2025 at 02:25:33PM +0100, Andrew Lunn wrote:
+> > > > I am not sure all whether devices has this clock, but it appears in
+> > > > the databook. So I think it is possible to move this in the core so
+> > > > any platform with these clock can reuse it.
+> > > 
+> > > Great
+> > > 
+> > > The next problem will be, has everybody called it the same thing in
+> > > DT. Since there has been a lot of cut/paste, maybe they have, by
+> > > accident.
+> > 
+> > Tegra186: "tx"
+> > imx: "tx"
+> > intel: "tx_clk"
+> > rk: "clk_mac_speed"
+> > s32: "tx"
+> > starfive: "tx"
+> > sti: "sti-ethclk"
+> > 
 > 
-> I don't recall seeing any follow up in the v1 patchset regarding
-> IP_CMSG_PASSSEC/security_socket_getpeersec_dgram(), can you confirm
-> that the secpath is preserved for that code path?
+> The dwc-qos-eth also use clock name "tx", but set the clock with
+> extra calibration logic.
+
+Yep, that's what I meant by "Tegra186" above.
+
+> > so 50% have settled on "tx" and the rest are doing their own thing, and
+> > that horse has already bolted.
+> > 
 > 
-> https://lore.kernel.org/linux-security-module/CAHC9VhQZ+k1J0UidJ-bgdBGBuVX9M18tQ+a+fuqXQM_L-PFvzA@mail.gmail.com
+> The "rx" clock in s32 also uses the same logic. I think the core also
+> needs to take it, as this rx clock is also mentioned in the databook.
 
-Sorry, I thought we'd addressed this in the v1 discussion with Eric.
+The "rx" clock on s32 seems to only be set to 125MHz, and the driver
+seems to be limited to RGMII.
 
-IP_CMSG_PASSSEC is not blocked for TCP sockets, but it will only
-process skbs that came from the error queue (ip_recv_error ->
-ip_cmsg_recv -> ip_cmsg_recv_offset -> ip_cmsg_recv_security ->
-security_socket_getpeersec_dgram), which don't go through those code
-paths at all. So AFAICT IP_CMSG_PASSSEC for TCP isn't affected by
-dropping the secpath early.
+This seems weird as the receive clock is supposed to be supplied by the
+PHY, and is recovered from the media (and thus will be 2.5, 25 or
+125MHz as determined by the PHY.) So, I'm not sure that the s32 "rx"
+clock is really the clk_rx_i clock supplied to the DWMAC core.
+
+Certainly on stm32mp151, it states that ETH_RX_CLK in RGMII mode will
+be 2.5, 25 or 125MHz provided by the PHY, and the clock tree indicates
+that ETH_RX_CLK in RGMII mode will be routed directly to the clk_rx_i
+input on the DWMAC(4) core.
+
+> > I have some ideas on sorting this out, and I'm working on some patches
+> > today.
+> 
+> Great, Could you cc me when you submit them? So I can take it and
+> change my series.
+
+Will do - I'm almost at that point, I have three other cleanup patches
+I will be sending before hand, so I'll send those out and then this
+series as RFC.
+
+The only platform drivers I've left with a call to rgmii_clock() are
+sti, imx (for imx93 only as that does extra fiddling after setting the
+clock and I'm not sure if there's an ordering dependency there) and
+the rk platforms.
+
+Five platforms converted, three not, and hopefully your platform can
+also use the helper as well!
 
 -- 
-Sabrina
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
