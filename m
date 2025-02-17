@@ -1,129 +1,128 @@
-Return-Path: <netdev+bounces-166876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 425DAA37B09
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 06:44:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D5FCA37B20
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 07:00:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46BBF3ABEF5
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 05:44:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1652A3ACDC9
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 06:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9D4187FEC;
-	Mon, 17 Feb 2025 05:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8061418FDA9;
+	Mon, 17 Feb 2025 06:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PX8QS+JK"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="HpTYJ+B2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95E2137750;
-	Mon, 17 Feb 2025 05:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC48A1862BB
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 06:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739771066; cv=none; b=VbmruGqpg5D2TLi6lh3BmzjnBYCU+HCkelmIrjUTqyL8EaNEyswr0Egm2fVu3BkS0Pc+6IDWwxEGIw2GwioGYebzm0iElC57pc5aTaH+Kz4jQvpfKh7R+fE3vWBBie9Lc58foCdkC0s+1NhO51A3y58tnOKXPs8q42mqxHGEp80=
+	t=1739772022; cv=none; b=cP/j5AN8nP4CfgsddwwIFXUkHRs/k/rcv+xvYevR/6slUGP5BJtFO8jfZ08xBW6z/0chd3Y9gu8ROCfhTXmLghu0k79mJZDdSs6KVEhYn32tZLdzHssnNaWVM3qsJWHqjxKxrDMBaTqGOgeH3+WuME9jjUOuDmNtmoNwo/vub5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739771066; c=relaxed/simple;
-	bh=Z86hbm+AyS40zmwoHV2FxJBl2pnWWB7QD1M0ZpXBWRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pRn//c5MIslQi8MwyQhsvhE1+E50Cn5G+ZwfL7JAS10sbq2lDl7qDp2uI0c6vGCnmODDgr+P0OoPYTk8uNj4/c1HU/7lMAMsoab4zgs6PdOo7HIpWHnjlmlRTq3ZmXZpZfK1AE/kr5I/wRnzCNbE2kE3JSZqvjURjkDD3uaWYUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PX8QS+JK; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1739771059; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=UDJBPz4tDQX1n8wj6sZdtoJl0cQHrWxiQmekpH9nHDc=;
-	b=PX8QS+JK30jhN347gQJ5PMYByXClopS5qYi68KvwJpPusxRcBW3lFF2Fhdt8FZApH4hMWht478CMmrUsr1f3xWZsvZDvUzhmbpRSlp449CSMF+36RKlKgVxAoNHCw/fnrk/J2NEXjR2PK/KtnYN4PRH7njh7pIseqdJa7DHozhM=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WPZCnV4_1739771057 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 17 Feb 2025 13:44:17 +0800
-Date: Mon, 17 Feb 2025 13:44:17 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, jaka@linux.ibm.com,
-	kgraul@linux.ibm.com, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, pabeni@redhat.com,
-	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
-	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v7 0/6] net/smc: Introduce smc_ops
-Message-ID: <20250217054417.GA91494@j66a10360.sqa.eu95>
-References: <20250123015942.94810-1-alibuda@linux.alibaba.com>
- <20250214092209.GA88970@j66a10360.sqa.eu95>
- <2ae65126-73a3-4c18-bef5-d4067c727cf5@linux.ibm.com>
+	s=arc-20240116; t=1739772022; c=relaxed/simple;
+	bh=QfJsyVg0VP0z/iFwR8gySbOpR88WHfuxjwMBTCbk9dE=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=do28Yq/TVnfdobglxVAPa9Sri7sk24UVucETzIYJt97frPG0BYhLoPtiR1QsYIJEubdD7qgaCMFFojbaxnmyTYsrCCblCIq25+lGFb0GvyYJVefllbDauOvxkPz15RLCnhLwZIq3kUZQGKxz9njnm4A+M8ZFIzLARHEvUKvA+7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=HpTYJ+B2; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-471f7261f65so574131cf.0
+        for <netdev@vger.kernel.org>; Sun, 16 Feb 2025 22:00:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1739772019; x=1740376819; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TNLaZYweysNghkTQQ5vEunIOEfjB7A4eivqMKKKSU0k=;
+        b=HpTYJ+B2RYexiJRyXZ7LNvpkYlq05nAbW0kOWe1tX7hpRIy5uJz1mVbaudsOEis3w9
+         TgRtWEJaY+B9UvzxnHQ+WImsEas/cvZW/umloO4eLn/ai36SXmlZPGt0ZYj4DuKSdtAX
+         bFj91dYPT9Rjh+VCNb7M05KNyDWIEddRYI+wgemDPVwoIw9SgbP3jlmC+aqQ4NHTBicO
+         wcGqHywE1WtWB7gmNPo8EF7WOFPrMg9oTeKQ/WkwRj5Kt5UQjNGVuJNfimWEYg4bTszY
+         xkMQqRMb65vImrV9FOKm3JeMHRcM7sUwt86IeV+ArFqkfooVkFXypg9E7KnKA8IAlv+Y
+         mI2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739772019; x=1740376819;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TNLaZYweysNghkTQQ5vEunIOEfjB7A4eivqMKKKSU0k=;
+        b=mhdse4os2or01fewOUSantZP+OLDyZSM2JWYMRI4OUovnnczYBy2HBmYjLqcVlfxpu
+         d1ZYtracDMKRFmuiA7cRId44LWrituBuIm6llVsIX7Mi2t1Q9lGFg4zWtKy5jASZKWLF
+         DGyuW7V6C+G7gmLtkgrY0K5Sbrl9RwT3s2RIlCdhVumh95Yemqh0kh6JS/d4W/WqfEz5
+         8ILb1JxXaWVZVJ/Zd0Oo2UXtzT30B5xr0RRMaq2nvpGzQcOhzN+8QbLT6tF/6JhqMhZ3
+         SXjDT0cqdh6fM+f1NW2vACtCSJ1/fgncKZPEdNo+r55e9wsAetKM1L2fTx+y9kLEowfE
+         FCOw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYC54zUshHKkqRWNjYtmmclFWJpadaxQtEg/QmIEJZv5s6Yvv3ooFSMb6ZjNrcDxIusMYdFgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSQpxGDU/o6YzmYbOv4DZmojbsVm1FhzZpWoBE4RlwWWpHuIWS
+	8IwtSF7FabNtgwx9dL7FZ+emLcQuJM5XfS8Z9eow+HJ15nK4VNpthx0YROQUvt4=
+X-Gm-Gg: ASbGncuvvzsgH2UTKA/T1LZQhCG/dBwTIr07iDScyddU9J1lo2w9e1WwR7N2r3471oy
+	4vKl3435IWbDTyZH2t8UpwAcghTc8dpn5GJy2MrQi4NgCFLLcAkYlfwgtUN7xaWDIE4hp1auGr2
+	jWQs0J6vk9BOUHrG+hBfyt2XHePwXckujTFyDhB6pTAw5c0i/JC0i4w4HNnZqPij/PXmZUsO1/a
+	AJWZlZlgm48Kqm2bwcLnA+tyjohVSpiC3EB9TubTtulbJkTchSenbNfQ30kNIkY6zJBQYjE3194
+	YbINFi/YXGZIuQNXmhhPrbAVRigMSiC7lu2JfQ==
+X-Google-Smtp-Source: AGHT+IEa/Pzs7CbSJS6B4jiAkbAvdqUHWHU03XvpyMfamqGiwX7MVgYWBqRl7K2/oJni/7AC6EA7iA==
+X-Received: by 2002:a05:622a:8b:b0:46e:2d0b:e1bf with SMTP id d75a77b69052e-471c015077bmr226327871cf.11.1739772019591;
+        Sun, 16 Feb 2025 22:00:19 -0800 (PST)
+Received: from hsinchu26.internal.sifive.com ([210.176.154.34])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471f6674aafsm1396881cf.76.2025.02.16.22.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 22:00:19 -0800 (PST)
+From: Nick Hu <nick.hu@sifive.com>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Praneeth Bajjuri <praneeth@ti.com>
+Cc: Nick Hu <nick.hu@sifive.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: axienet: Set mac_managed_pm
+Date: Mon, 17 Feb 2025 13:58:42 +0800
+Message-Id: <20250217055843.19799-1-nick.hu@sifive.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2ae65126-73a3-4c18-bef5-d4067c727cf5@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Fri, Feb 14, 2025 at 12:37:55PM +0100, Wenjia Zhang wrote:
-> 
-> 
-> On 14.02.25 10:22, D. Wythe wrote:
-> >On Thu, Jan 23, 2025 at 09:59:36AM +0800, D. Wythe wrote:
-> >>This patch aims to introduce BPF injection capabilities for SMC and
-> >>includes a self-test to ensure code stability.
-> >>
-> >>Since the SMC protocol isn't ideal for every situation, especially
-> >>short-lived ones, most applications can't guarantee the absence of
-> >>such scenarios. Consequently, applications may need specific strategies
-> >>to decide whether to use SMC. For example, an application might limit SMC
-> >>usage to certain IP addresses or ports.
-> >>
-> >>To maintain the principle of transparent replacement, we want applications
-> >>to remain unaffected even if they need specific SMC strategies. In other
-> >>words, they should not require recompilation of their code.
-> >>
-> >>Additionally, we need to ensure the scalability of strategy implementation.
-> >>While using socket options or sysctl might be straightforward, it could
-> >>complicate future expansions.
-> >>
-> >>Fortunately, BPF addresses these concerns effectively. Users can write
-> >>their own strategies in eBPF to determine whether to use SMC, and they can
-> >>easily modify those strategies in the future.
-> >
-> >Hi smc folks, @Wenjia @Ian
-> >
-> >Is there any feedback regarding this patches ? This series of code has
-> >gone through multiple rounds of community reviews. However, the parts
-> >related to SMC, including the new sysctl and ops name, really needs
-> >your input and acknowledgment.
-> >
-> >Additionally, this series includes a bug fix for SMC, which is easily
-> >reproducible in the BPF CI tests.
-> >
-> >Thanks,
-> >D. Wythe
-> >
-> Hi D.Wythe,
-> 
-> Thanks for the reminder! I have a few higher-priority tasks to
-> handle first, but I’ll get back to you as soon as I can—hopefully
-> next week.
-> 
-> Thanks,
-> Wenjia
+The external PHY will undergo a soft reset twice during the resume process
+when it wake up from suspend. The first reset occurs when the axienet
+driver calls phylink_of_phy_connect(), and the second occurs when
+mdio_bus_phy_resume() invokes phy_init_hw(). The second soft reset of the
+external PHY does not reinitialize the internal PHY, which causes issues
+with the internal PHY, resulting in the PHY link being down. To prevent
+this, setting the mac_managed_pm flag skips the mdio_bus_phy_resume()
+function.
 
-Hi Wenjia,
+Fixes: a129b41fe0a8 ("Revert "net: phy: dp83867: perform soft reset and retain established link"")
+Signed-off-by: Nick Hu <nick.hu@sifive.com>
+---
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thank you for your reply and explanation! I completely understand that
-you have higher-priority tasks to handle right now. I just wanted to
-ensure that this patch isn't overlooked, as it contains important
-changes and fixes related to SMC.
-
-Best wishes,
-D. Wythe
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 2ffaad0b0477..2deeb982bf6b 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -3078,6 +3078,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 
+ 	lp->phylink_config.dev = &ndev->dev;
+ 	lp->phylink_config.type = PHYLINK_NETDEV;
++	lp->phylink_config.mac_managed_pm = true;
+ 	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+ 		MAC_10FD | MAC_100FD | MAC_1000FD;
+ 
+-- 
+2.17.1
 
 
