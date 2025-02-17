@@ -1,125 +1,165 @@
-Return-Path: <netdev+bounces-167004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E6A384A5
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:29:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6335AA38480
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 012093B69DA
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:23:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E908189223E
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8144321CC55;
-	Mon, 17 Feb 2025 13:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D69721B1BC;
+	Mon, 17 Feb 2025 13:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EAjCxV3U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3wGO67j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB8A21CA19;
-	Mon, 17 Feb 2025 13:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5875C603;
+	Mon, 17 Feb 2025 13:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739798631; cv=none; b=lSZDjcSR8JKRc9+pnvNGw1D1cFPmAiJ3mjHFpv0V+6ZlwMXpDWgS1abYVsBanW9UXzjGrPzmisNNofXJihMwy/rmzAENnZ0wfESRV0pZe+LsbgEdqVjWuJ4Hr4wNBYqwTVpV7RdNh3Vf/y6YwBMwfxeiydDDiSFtyHoOqpIQzd8=
+	t=1739798529; cv=none; b=Tva3TIlalO8MI0p77rYkN3sYQxg7modKyT0Azviw1xAtmznfM60ArzJKMiGomg2gmK7XlDaXSSnGeKpX7C7O0dEZYrkgxMnFCTlptieC9P2z7EN7/AKfqj7HZR5zE1aMCRRFbXTxl0rGC8GMIs32nPKeXTuVlhsCqOx1WvYkE+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739798631; c=relaxed/simple;
-	bh=5jI7yAwfnD29sHW7cjA1e58vatW5I20of910rii2ypU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGINllIBWoQtfinMewLZ6qNBdnURhl20LWV1vabIpcW/3a6gl3C4Bgl13Jl0kF/UsqliH6FcGpuvf7FQSRqzb4heb2qp25P4jgZMkyUcKLl1AUJ9QVaNO6p3j+IV8Clp+U5v18jzNdufvY9KeKJRCPquVKPOIwp316Ew+GfMVfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EAjCxV3U; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739798630; x=1771334630;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5jI7yAwfnD29sHW7cjA1e58vatW5I20of910rii2ypU=;
-  b=EAjCxV3U/YuenkFW+m17C/DRreYggzzzolC5xsuLJi9jKCiJzEWw4hvE
-   0yavNJbYbcyABioRVzJmTqjLDw3w2wCCWclXkWPi3tKPVBMDk9msqD7ew
-   wyAdFf8zTbJlAKO7pUNxTiOPKaFJlYHXVTGWoHMbziIHUshKYilGk/D55
-   3dkveDGTogWUrbbf9w7Os1zBbEVEU75gyMe6CaQ6VHPar04JDNlcHRPuQ
-   5l5UgHmYLXFKrcUO6vfxQZo2ukdMaDC8IdFv747uPEA5AxkAtsfKe1uWR
-   8biTpPT4N23bYGk7mi12lWHj5+UZKDl6ny8cX5uXEC+Xh+xmMx9J6OQoT
-   A==;
-X-CSE-ConnectionGUID: efiP2CjQTfyPlVXCi4Dguw==
-X-CSE-MsgGUID: MUUIoKuXSu2kg/fKtpN0zQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="44407675"
-X-IronPort-AV: E=Sophos;i="6.13,293,1732608000"; 
-   d="scan'208";a="44407675"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 05:23:49 -0800
-X-CSE-ConnectionGUID: dravQctqRiSK8gousaJ5GQ==
-X-CSE-MsgGUID: itWmg63nSVmT3xLBpY/ocw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,293,1732608000"; 
-   d="scan'208";a="119123696"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 05:23:46 -0800
-Date: Mon, 17 Feb 2025 14:20:05 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ioana.ciornei@nxp.com,
-	yangbo.lu@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 2/8] net: enetc: correct the tx_swbd statistics
-Message-ID: <Z7M3heKHsQBvIRBi@mev-dev.igk.intel.com>
-References: <20250217093906.506214-1-wei.fang@nxp.com>
- <20250217093906.506214-3-wei.fang@nxp.com>
+	s=arc-20240116; t=1739798529; c=relaxed/simple;
+	bh=cjkUYj+Oju2fmJ6PA2eSnbPDN38qkYIJI5bmMJeyiWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OlDb5DBP9C8Wbz7sgLE4pEUnk0UkIMpkmXuaPp2R1R4oOKOcBDybne1LBTXQTkGZ9cIiJwL1bPjnW5qecpQnR+bw1pfzzFMMmO1tex6WUO0kRY96Fm7m4OGs0y2ksY7VT4jgEAT8GPuJC7465qjpHGfYBHZjGnBqhKYxwNBIVU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3wGO67j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49AADC4CED1;
+	Mon, 17 Feb 2025 13:21:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739798528;
+	bh=cjkUYj+Oju2fmJ6PA2eSnbPDN38qkYIJI5bmMJeyiWc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=g3wGO67jesrTUMQ9NbHPL4Bhpj/svCflzd4yqTcLoLH7AKNUOG0EylV1C27g/UrKl
+	 upEJkucYnzY4rPkR+sjsENrLTyyPvWpjBATiExB0kt93L5cljGcAxrN2vbyiLb+tLa
+	 5uCfuyvDGeYp6+PI/WSQWedNhXelLSlnRN17qxU9IZfYn34qMI7GRowSu8xJy1H6cg
+	 MQY2PmB1sRO5qXFoB8qPcAoIrKW4JDA7azhA7XEscNWCyK8ztr0fY9TP6QfdFuXNua
+	 BhkWLUeX72OSeKs2oM3tk2CK1k1lixlhuZKTp/OkCSn/Wz2vbujcgzE33RaMJIctAz
+	 a/pQSsBWqwaew==
+Date: Mon, 17 Feb 2025 13:21:52 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: David Lechner <dlechner@baylibre.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, Michael
+ Hennerich <Michael.Hennerich@analog.com>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay
+ Abraham I <kishon@kernel.org>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v3 00/15] gpiolib: add gpiod_multi_set_value_cansleep
+Message-ID: <20250217132152.29d86d6c@jic23-huawei>
+In-Reply-To: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250217093906.506214-3-wei.fang@nxp.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 17, 2025 at 05:39:00PM +0800, Wei Fang wrote:
-> When creating a TSO header, if the skb is VLAN tagged, the extended BD
-> will be used and the 'count' should be increased by 2 instead of 1.
-> Otherwise, when an error occurs, less tx_swbd will be freed than the
-> actual number.
+On Mon, 10 Feb 2025 16:33:26 -0600
+David Lechner <dlechner@baylibre.com> wrote:
+
+> This series was inspired by some minor annoyance I have experienced a
+> few times in recent reviews.
 > 
-> Fixes: fb8629e2cbfc ("net: enetc: add support for software TSO")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Calling gpiod_set_array_value_cansleep() can be quite verbose due to
+> having so many parameters. In most cases, we already have a struct
+> gpio_descs that contains the first 3 parameters so we end up with 3 (or
+> often even 6) pointer indirections at each call site. Also, people have
+> a tendency to want to hard-code the first argument instead of using
+> struct gpio_descs.ndescs, often without checking that ndescs >= the
+> hard-coded value.
+> 
+> So I'm proposing that we add a gpiod_multi_set_value_cansleep()
+> function that is a wrapper around gpiod_set_array_value_cansleep()
+> that has struct gpio_descs as the first parameter to make it a bit
+> easier to read the code and avoid the hard-coding temptation.
+> 
+> I've just done gpiod_multi_set_value_cansleep() for now since there
+> were over 10 callers of this one. There aren't as many callers of
+> the get and atomic variants, but we can add those too if this seems
+> like a useful thing to do.
+> 
+> Maintainers, if you prefer to have this go through the gpio tree, please
+> give your Acked-by:. Several maintainers have also requested an
+> immutable branch, so I expect that will be made available. And if there
+> is anything leftover after the next kernel release, I will resend it.
+I've applied 7-10 to the IIO tree after merging the immutable tag with patch 1.
+
+Jonathan
+
+> 
 > ---
->  drivers/net/ethernet/freescale/enetc/enetc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Changes in v3:
+> - Added IS_ERR_OR_NULL() check to gpiod_multi_set_value_cansleep()
+> - Added new patches to clean up accessing bitmap directly (ts-nbus, ad2s1210).
+> - Added function prefix for max3191x.
+> - Removed unnecessary braces in ad7606 patch.
+> - Picked up additional trailers.
+> - Link to v2: https://lore.kernel.org/r/20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com
 > 
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-> index f7bc2fc33a76..0a1cea368280 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> @@ -759,6 +759,7 @@ static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
->  static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
->  {
->  	struct enetc_ndev_priv *priv = netdev_priv(tx_ring->ndev);
-> +	bool ext_bd = skb_vlan_tag_present(skb);
->  	int hdr_len, total_len, data_len;
->  	struct enetc_tx_swbd *tx_swbd;
->  	union enetc_tx_bd *txbd;
-> @@ -792,7 +793,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
->  		csum = enetc_tso_hdr_csum(&tso, skb, hdr, hdr_len, &pos);
->  		enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd, &i, hdr_len, data_len);
->  		bd_data_num = 0;
-> -		count++;
-> +		count += ext_bd ? 2 : 1;
+> Changes in v2:
+> - Renamed new function from gpiods_multi_set_value_cansleep() to
+>   gpiod_multi_set_value_cansleep()
+> - Fixed typo in name of replaced function in all commit messages.
+> - Picked up trailers.
+> - Link to v1: https://lore.kernel.org/r/20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com
+> 
+> ---
+> David Lechner (15):
+>       gpiolib: add gpiod_multi_set_value_cansleep()
+>       auxdisplay: seg-led-gpio: use gpiod_multi_set_value_cansleep
+>       bus: ts-nbus: validate ts,data-gpios array size
+>       bus: ts-nbus: use gpiod_multi_set_value_cansleep
+>       bus: ts-nbus: use bitmap_get_value8()
+>       gpio: max3191x: use gpiod_multi_set_value_cansleep
+>       iio: adc: ad7606: use gpiod_multi_set_value_cansleep
+>       iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
+>       iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
+>       iio: resolver: ad2s1210: use bitmap_write
+>       mmc: pwrseq_simple: use gpiod_multi_set_value_cansleep
+>       mux: gpio: use gpiod_multi_set_value_cansleep
+>       net: mdio: mux-gpio: use gpiod_multi_set_value_cansleep
+>       phy: mapphone-mdm6600: use gpiod_multi_set_value_cansleep
+>       ASoC: adau1701: use gpiod_multi_set_value_cansleep
+> 
+>  drivers/auxdisplay/seg-led-gpio.c           |  3 +--
+>  drivers/bus/ts-nbus.c                       | 15 +++++++++------
+>  drivers/gpio/gpio-max3191x.c                | 18 +++++++-----------
+>  drivers/iio/adc/ad7606.c                    |  3 +--
+>  drivers/iio/adc/ad7606_spi.c                |  7 +++----
+>  drivers/iio/amplifiers/hmc425a.c            |  3 +--
+>  drivers/iio/resolver/ad2s1210.c             | 13 +++++--------
+>  drivers/mmc/core/pwrseq_simple.c            |  3 +--
+>  drivers/mux/gpio.c                          |  4 +---
+>  drivers/net/mdio/mdio-mux-gpio.c            |  3 +--
+>  drivers/phy/motorola/phy-mapphone-mdm6600.c |  4 +---
+>  include/linux/gpio/consumer.h               | 11 +++++++++++
+>  sound/soc/codecs/adau1701.c                 |  4 +---
+>  13 files changed, 43 insertions(+), 48 deletions(-)
+> ---
+> base-commit: df4b2bbff898227db0c14264ac7edd634e79f755
+> change-id: 20250131-gpio-set-array-helper-bd4a328370d3
+> 
+> Best regards,
 
-Looks fine, beside you need to fix the unroll like in patch 1.
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
-
->  
->  		while (data_len > 0) {
->  			int size;
-> -- 
-> 2.34.1
 
