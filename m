@@ -1,83 +1,62 @@
-Return-Path: <netdev+bounces-167042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319D5A38788
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 16:29:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C907A387E9
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 16:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B3FC7A1F94
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:28:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9B9A3B0AE3
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20435224AE2;
-	Mon, 17 Feb 2025 15:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF062253E3;
+	Mon, 17 Feb 2025 15:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1k1STfMO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8yIdhF7"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E841494DF;
-	Mon, 17 Feb 2025 15:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F34224AF9;
+	Mon, 17 Feb 2025 15:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739806182; cv=none; b=bV0S0tf7T7chUsoMAODY0ONXh6EjULs3qiiq/JHH/KpakodyCGg5QW4+kpn8xyFG+GzMEEBvGqGblk35uhWwOCxU5xLJjnGzlwuVrfTL6RvmHTwSf/vpV/eAG804qQYL9F00G2edEty854QatQThfaduosDaB9UTbJUVl8+qZ7w=
+	t=1739806834; cv=none; b=jyrY6AW20dc6VcJO/Kcjcgpv7Pg4+n+3iWwLUwbBf2m8o0mDeZiOKGV8c3gd/cr4KwdVPnZKkJRvYLKIYELd8hB6pMVHda1GLo6RRXcgyXIa8aWdkiBHFg0fiESZ6jts/5yahUfv2+SORzoOQZxhyp8+kwN4p0EwhjWebGajnEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739806182; c=relaxed/simple;
-	bh=d+GskYFB5OX9ASZUN7hD4NLWJWM9+7vGlcErfaEnuJ4=;
+	s=arc-20240116; t=1739806834; c=relaxed/simple;
+	bh=Xy3shhobRgfXOO0gcUvi6Q58ojxHN3hZzhyPOJq5uwY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DwALFBp77M4pNNFMTEGdjRv9HMKOdhS3tc5Xon6FYNoxx+GGv9K1dwMLCl+bfZa90E3UZUBl9uYa7YOgQbNzHdZ7biKrycFKxVLQjAi/lqjkvkoFru0FOa0m+xOCm6AIM0fW8Znswgsx/qNqcdmMVk+kkwScNtQi1YlNKmQshGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1k1STfMO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+P4Mpectj/6/0am8dXU2KXP02bvuc53X5h8fNZ10rK8=; b=1k1STfMOkQti3uds9OuyjOMNA5
-	vq99x42ZtFDRa8xdYiiTYeKEXC8WrkNr9VbMpkjX7UqcIDds4lMLXGbBkYYbVtRxUGGADqsx69ofd
-	f84ONF4ybMwA6zY4xseRfP1BY80QuxP58m1YwddMn6npp+0cF4wFoKssyyhv+h4aeRQc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tk33p-00F0Wh-7S; Mon, 17 Feb 2025 16:29:29 +0100
-Date: Mon, 17 Feb 2025 16:29:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Sean Anderson <seanga2@gmail.com>
-Subject: Re: [PATCH net-next v4 05/15] net: phy: Create a phy_port for
- PHY-driven SFPs
-Message-ID: <f88c0ed5-c50b-4bea-81e5-41a1c8c50de7@lunn.ch>
-References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
- <20250213101606.1154014-6-maxime.chevallier@bootlin.com>
- <Z7DjfRwd3dbcEXTY@shell.armlinux.org.uk>
- <20250217092911.772da5d0@fedora.home>
- <5d618829-a9bc-4dd4-8a2e-6ce3a4acd51e@lunn.ch>
- <20250217152216.5b206284@fedora.home>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hs3G6I7o2gxJhCXsTyAPVDSicN6JW/qU0BVoy4SAfpNeweEyINv+ERLHudwYW+ia9yWfnBjBvXlG0/yYnNOoTWGFThx0JrWTbT3M8DF+GIgGigeIpqFvOnNjnKO7661k8LUgnSZDmU1/qnnAl5FPxLTAVGMO9BjA/o6ByMZIj+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8yIdhF7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B73E2C4CED1;
+	Mon, 17 Feb 2025 15:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739806834;
+	bh=Xy3shhobRgfXOO0gcUvi6Q58ojxHN3hZzhyPOJq5uwY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W8yIdhF74bOEhqirSfBNy8zhuEjIjNVbMYoFkBGoT+ASgpLuGQaYuwwqrMbH6l1os
+	 1aYxp5U3HCMYU2X5AXWxppScyE3DtJ10/YM1zUM2GD9HYX3znrjOj5Q1dkZUmDHDDS
+	 FOm7VoQCiAjXpMxno43YGHS0qBeyxCFqoPRcgt4D5qgYjTMtU/Zn728mUuVfSaKmuJ
+	 XeIPeqsSnqkuuUE/A3xPy84ZEnNVn+t821TufyYfRk2ycY2YuMeDB/0ghQeWlFKcqo
+	 REZ3ogFby/kp2BSmmxSgDzDS87JLJO4ulzA0ERLbXJjc0j2Qn7qvQI4MZnv9/qh0lP
+	 xbFm4YqY2RQHQ==
+Date: Mon, 17 Feb 2025 15:40:28 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
+	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+	chenhao418@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
+ supported in this module
+Message-ID: <20250217154028.GM1615191@kernel.org>
+References: <20250213035529.2402283-1-shaojijie@huawei.com>
+ <20250213035529.2402283-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,31 +65,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250217152216.5b206284@fedora.home>
+In-Reply-To: <20250213035529.2402283-4-shaojijie@huawei.com>
 
-> > Please be careful with the scope of these. Heiner is going through
-> > phylib and trying to reduce the scope of some of the functions we
-> > exporting in include/linux/phy.h to just being available in
-> > drivers/net/phy. That will help stop MAC drivers abuse them. We should
-> > do the same here, limit what can actually use these helpers to stop
-> > abuse.
+On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
+> This patch implements the rx checksum offload feature
+> including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
 > 
-> Can we consider having an header file sitting in drivers/net/phy
-> directly for this kind of things ?
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-Yes, we then only need to worry about phy drivers, not MAC
-drivers. PHY driver writers tend to abuse things less.
+...
 
-	Andrew
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> index 8c631a9bcb6b..aa1d128a863b 100644
+> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
+>  }
+>  
+>  static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
+> -				    struct hbg_rx_desc *desc)
+> +				    struct hbg_rx_desc *desc,
+> +				    struct sk_buff *skb)
+>  {
+> +	bool rx_checksum_offload = priv->netdev->features & NETIF_F_RXCSUM;
 
+nit: I think this would be better expressed in a way that
+     rx_checksum_offload is assigned a boolean value (completely untested).
 
+	bool rx_checksum_offload = !!(priv->netdev->features & NETIF_F_RXCSUM);
 
-
-
-
-
-
-
-
-
+> +
+>  	if (likely(!FIELD_GET(HBG_RX_DESC_W4_L3_ERR_CODE_M, desc->word4) &&
+>  		   !FIELD_GET(HBG_RX_DESC_W4_L4_ERR_CODE_M, desc->word4)))
+>  		return true;
 
