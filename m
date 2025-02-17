@@ -1,167 +1,125 @@
-Return-Path: <netdev+bounces-167002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D924CA3846D
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:21:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E6A384A5
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:29:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC7216876D
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 012093B69DA
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE8621C9E8;
-	Mon, 17 Feb 2025 13:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8144321CC55;
+	Mon, 17 Feb 2025 13:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrhKH2/t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EAjCxV3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9B25C603;
-	Mon, 17 Feb 2025 13:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB8A21CA19;
+	Mon, 17 Feb 2025 13:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739798342; cv=none; b=SLy3q+JfP/GCRmTEEQUFa3gqc/yUS81j1nkx7U0hzaS98LL0mkcS4//Zeya0pgOhNco2P0dhhI0+7yzZewVi4CjS14iyYtoCSUIJS1/sNz6cecEy30/53TK392aOTJl2EkMiREcBTL4vcN6DJeQ4ltEgK6oNSskGQtR4HLPwpsg=
+	t=1739798631; cv=none; b=lSZDjcSR8JKRc9+pnvNGw1D1cFPmAiJ3mjHFpv0V+6ZlwMXpDWgS1abYVsBanW9UXzjGrPzmisNNofXJihMwy/rmzAENnZ0wfESRV0pZe+LsbgEdqVjWuJ4Hr4wNBYqwTVpV7RdNh3Vf/y6YwBMwfxeiydDDiSFtyHoOqpIQzd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739798342; c=relaxed/simple;
-	bh=vDp+ULcTmetlszpVsMoQh+ubngAgcM3/x1bls2GBlOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BWxZhq0LamXtonEWQVBGwLP7t/p2xWxNd0e0/FLg0ouDotQ03HOCWWMhilExFruAmnE9KmEUw41p+XJbp22W1sr96X12rhhYVrizne3dFVYYR2WpAqA5/Ax0oPrBaYTkXJfAtzcXXkVNdX8EiiPtv8VQsb3OlDc+SkuZb7i/eBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrhKH2/t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9CA1C4CED1;
-	Mon, 17 Feb 2025 13:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739798341;
-	bh=vDp+ULcTmetlszpVsMoQh+ubngAgcM3/x1bls2GBlOE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YrhKH2/tVMa0FpWO9g0XO8hxtLgH2+w1OP5sZmMti3kJjl78lgCth7DBm7pW2h98z
-	 HbWBNm+qq1WpHwTsvUlAr4+bMCqsSLdulE6yiJIrMIWdoZR2SOF+QcrPL18m8WgP0A
-	 N4zFFQX+GkCUy+ojnMRGLmyX+nU0vNhPH0ElHrCE8yi44Ad1pTCoNJnwMGhmqYwqLM
-	 aVEj4WrgfH5ILXv+2CrMW+rYZFJd83Ii58SIxKT3HSvrSiLRU0BmtkPwgBz7izJfsV
-	 6rP/ppMNzEsRhPAXu0wsSntZua6mcERaf44vE2XBTinKcNShc8pyt8/cMPowZfJD2q
-	 tYOuPGLYzqABg==
-Date: Mon, 17 Feb 2025 13:18:45 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: David Lechner <dlechner@baylibre.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, Michael
- Hennerich <Michael.Hennerich@analog.com>, Ulf Hansson
- <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay
- Abraham I <kishon@kernel.org>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v3 07/15] iio: adc: ad7606: use
- gpiod_multi_set_value_cansleep
-Message-ID: <20250217131845.17af66a4@jic23-huawei>
-In-Reply-To: <20250210-gpio-set-array-helper-v3-7-d6a673674da8@baylibre.com>
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
-	<20250210-gpio-set-array-helper-v3-7-d6a673674da8@baylibre.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1739798631; c=relaxed/simple;
+	bh=5jI7yAwfnD29sHW7cjA1e58vatW5I20of910rii2ypU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGINllIBWoQtfinMewLZ6qNBdnURhl20LWV1vabIpcW/3a6gl3C4Bgl13Jl0kF/UsqliH6FcGpuvf7FQSRqzb4heb2qp25P4jgZMkyUcKLl1AUJ9QVaNO6p3j+IV8Clp+U5v18jzNdufvY9KeKJRCPquVKPOIwp316Ew+GfMVfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EAjCxV3U; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739798630; x=1771334630;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5jI7yAwfnD29sHW7cjA1e58vatW5I20of910rii2ypU=;
+  b=EAjCxV3U/YuenkFW+m17C/DRreYggzzzolC5xsuLJi9jKCiJzEWw4hvE
+   0yavNJbYbcyABioRVzJmTqjLDw3w2wCCWclXkWPi3tKPVBMDk9msqD7ew
+   wyAdFf8zTbJlAKO7pUNxTiOPKaFJlYHXVTGWoHMbziIHUshKYilGk/D55
+   3dkveDGTogWUrbbf9w7Os1zBbEVEU75gyMe6CaQ6VHPar04JDNlcHRPuQ
+   5l5UgHmYLXFKrcUO6vfxQZo2ukdMaDC8IdFv747uPEA5AxkAtsfKe1uWR
+   8biTpPT4N23bYGk7mi12lWHj5+UZKDl6ny8cX5uXEC+Xh+xmMx9J6OQoT
+   A==;
+X-CSE-ConnectionGUID: efiP2CjQTfyPlVXCi4Dguw==
+X-CSE-MsgGUID: MUUIoKuXSu2kg/fKtpN0zQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="44407675"
+X-IronPort-AV: E=Sophos;i="6.13,293,1732608000"; 
+   d="scan'208";a="44407675"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 05:23:49 -0800
+X-CSE-ConnectionGUID: dravQctqRiSK8gousaJ5GQ==
+X-CSE-MsgGUID: itWmg63nSVmT3xLBpY/ocw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,293,1732608000"; 
+   d="scan'208";a="119123696"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 05:23:46 -0800
+Date: Mon, 17 Feb 2025 14:20:05 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ioana.ciornei@nxp.com,
+	yangbo.lu@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net 2/8] net: enetc: correct the tx_swbd statistics
+Message-ID: <Z7M3heKHsQBvIRBi@mev-dev.igk.intel.com>
+References: <20250217093906.506214-1-wei.fang@nxp.com>
+ <20250217093906.506214-3-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250217093906.506214-3-wei.fang@nxp.com>
 
-On Mon, 10 Feb 2025 16:33:33 -0600
-David Lechner <dlechner@baylibre.com> wrote:
-
-> Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
-> gpiod_set_array_value().
+On Mon, Feb 17, 2025 at 05:39:00PM +0800, Wei Fang wrote:
+> When creating a TSO header, if the skb is VLAN tagged, the extended BD
+> will be used and the 'count' should be increased by 2 instead of 1.
+> Otherwise, when an error occurs, less tx_swbd will be freed than the
+> actual number.
 > 
-> These are not called in an atomic context, so changing to the cansleep
-> variant is fine.
-> 
-> Also drop unnecessary braces while we are at it.
-> 
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: David Lechner <dlechner@baylibre.com>
-I've applied this to the IIO tree now but won't push out as anything other than
-testing until Bartosz has dropped it. (thanks for doing that btw!)
-
-Due to code movement it ends up being all in ad7606.c
-
-diff --git a/drivers/iio/adc/ad7606.c b/drivers/iio/adc/ad7606.c
-index 1e8b03a518b8..87908cc51e48 100644
---- a/drivers/iio/adc/ad7606.c
-+++ b/drivers/iio/adc/ad7606.c
-@@ -828,8 +828,7 @@ static int ad7606_write_os_hw(struct iio_dev *indio_dev, int val)
- 
-        values[0] = val & GENMASK(2, 0);
- 
--       gpiod_set_array_value(st->gpio_os->ndescs, st->gpio_os->desc,
--                             st->gpio_os->info, values);
-+       gpiod_multi_set_value_cansleep(st->gpio_os, values);
- 
-        /* AD7616 requires a reset to update value */
-        if (st->chip_info->os_req_reset)
-@@ -1260,10 +1259,9 @@ static int ad7606b_sw_mode_setup(struct iio_dev *indio_dev)
-         * in the device tree, then they need to be set to high,
-         * otherwise, they must be hardwired to VDD
-         */
--       if (st->gpio_os) {
--               gpiod_set_array_value(st->gpio_os->ndescs, st->gpio_os->desc,
--                                     st->gpio_os->info, os);
--       }
-+       if (st->gpio_os)
-+               gpiod_multi_set_value_cansleep(st->gpio_os, os);
-+
-        /* OS of 128 and 256 are available only in software mode */
-        st->oversampling_avail = ad7606b_oversampling_avail;
-        st->num_os_ratios = ARRAY_SIZE(ad7606b_oversampling_avail);
-
-
+> Fixes: fb8629e2cbfc ("net: enetc: add support for software TSO")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > ---
->  drivers/iio/adc/ad7606.c     | 3 +--
->  drivers/iio/adc/ad7606_spi.c | 7 +++----
->  2 files changed, 4 insertions(+), 6 deletions(-)
+>  drivers/net/ethernet/freescale/enetc/enetc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/iio/adc/ad7606.c b/drivers/iio/adc/ad7606.c
-> index d8e3c7a43678c57470a5118715637a68b39125c1..9a124139924e4a4fbbbd234a8514eb77024442b3 100644
-> --- a/drivers/iio/adc/ad7606.c
-> +++ b/drivers/iio/adc/ad7606.c
-> @@ -818,8 +818,7 @@ static int ad7606_write_os_hw(struct iio_dev *indio_dev, int val)
->  
->  	values[0] = val & GENMASK(2, 0);
->  
-> -	gpiod_set_array_value(st->gpio_os->ndescs, st->gpio_os->desc,
-> -			      st->gpio_os->info, values);
-> +	gpiod_multi_set_value_cansleep(st->gpio_os, values);
->  
->  	/* AD7616 requires a reset to update value */
->  	if (st->chip_info->os_req_reset)
-> diff --git a/drivers/iio/adc/ad7606_spi.c b/drivers/iio/adc/ad7606_spi.c
-> index e2c1475257065c98bf8e2512bda921d6d88a3002..091f31edb6604da3a8ec4d2d5328ac6550faa22c 100644
-> --- a/drivers/iio/adc/ad7606_spi.c
-> +++ b/drivers/iio/adc/ad7606_spi.c
-> @@ -296,10 +296,9 @@ static int ad7606B_sw_mode_config(struct iio_dev *indio_dev)
->  	 * in the device tree, then they need to be set to high,
->  	 * otherwise, they must be hardwired to VDD
->  	 */
-> -	if (st->gpio_os) {
-> -		gpiod_set_array_value(st->gpio_os->ndescs,
-> -				      st->gpio_os->desc, st->gpio_os->info, os);
-> -	}
-> +	if (st->gpio_os)
-> +		gpiod_multi_set_value_cansleep(st->gpio_os, os);
-> +
->  	/* OS of 128 and 256 are available only in software mode */
->  	st->oversampling_avail = ad7606B_oversampling_avail;
->  	st->num_os_ratios = ARRAY_SIZE(ad7606B_oversampling_avail);
-> 
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index f7bc2fc33a76..0a1cea368280 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -759,6 +759,7 @@ static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
+>  static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
+>  {
+>  	struct enetc_ndev_priv *priv = netdev_priv(tx_ring->ndev);
+> +	bool ext_bd = skb_vlan_tag_present(skb);
+>  	int hdr_len, total_len, data_len;
+>  	struct enetc_tx_swbd *tx_swbd;
+>  	union enetc_tx_bd *txbd;
+> @@ -792,7 +793,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
+>  		csum = enetc_tso_hdr_csum(&tso, skb, hdr, hdr_len, &pos);
+>  		enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd, &i, hdr_len, data_len);
+>  		bd_data_num = 0;
+> -		count++;
+> +		count += ext_bd ? 2 : 1;
 
+Looks fine, beside you need to fix the unroll like in patch 1.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+
+>  
+>  		while (data_len > 0) {
+>  			int size;
+> -- 
+> 2.34.1
 
