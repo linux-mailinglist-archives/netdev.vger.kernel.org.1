@@ -1,77 +1,83 @@
-Return-Path: <netdev+bounces-166924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9710EA37E50
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:20:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51139A37E5E
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:26:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7825A7A3EFF
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:19:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63FD43A7CD6
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEF2204F95;
-	Mon, 17 Feb 2025 09:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE25E212B3A;
+	Mon, 17 Feb 2025 09:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O8hZx/ym"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MLFtirCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6AD200BA8;
-	Mon, 17 Feb 2025 09:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D013EC8FE;
+	Mon, 17 Feb 2025 09:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739784041; cv=none; b=aYjuovMeIKukyFvpbLzgsjHydJV9vSXCEjnEMcnllzMz5OsKoql03nGGORAb5D6u+g0A7qGPdb27AZgFN3F/T2k1sAiJEgPEB1hTTfVfhSfl14gHm3G+LwzJZ3S+NSKA8Gnbtp2a2fsiLcsnMGZZya19xqXhbV2Q7I2itmDtV/c=
+	t=1739784371; cv=none; b=Bnmd6Q678BSiAu9lZo3W46WJqf7EguZE/ElxGHDia30qLv3P9RdXA9oWCMZreZ7AbJkCQVUUPLW3anvvudqxk1juB0jexd2pxmvth3TnfJ7e2ak9Wa033IjnnWPeEwEAq70g7C+0Pw7rFL1jBHXzdsTZhzwje0ZuIbKdbiFS4Mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739784041; c=relaxed/simple;
-	bh=B7AeQ3K/+X7WndovNJX4Lf8aEdNeBasRxace1em9mGI=;
+	s=arc-20240116; t=1739784371; c=relaxed/simple;
+	bh=IKQs58geIf6VApu4EVnDj+XctVVzkrTjTdBiFfP+2VE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K2Y9vxGAEvtNc/Yyt1nweQp4ZIbZVlxu5tcLg4hdsJoKawFtM3JwyGM8cRax6ZrjDYUpFa5cnpVde/tpKcPEeCJ65fjHtHXniNVRQ1/uWHtbvC7VcgxlRBVDztqNv4BPp5sX9NtbFvsKKXCD0CEMUIa23QmcJkI7g2A19TU/hBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O8hZx/ym; arc=none smtp.client-ip=217.70.183.201
+	 MIME-Version:Content-Type; b=eNvwMv+NMefumc08dvl1/6u6fNso4gyh3D0j8s8WoStAaHtqptkoqIm8PXHChHlzpk0DeCXhNljVuhdsb//MNyVZmpmy334AtfUnFVXlKnAvEOLSN7DO3Bw+JBJU6oQp0PJFo9fBPGx9ffttVdqjGezn/pPaTawYih2FaXMrKj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MLFtirCx; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C149D433F7;
-	Mon, 17 Feb 2025 09:20:27 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E9AC43287;
+	Mon, 17 Feb 2025 09:26:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739784031;
+	t=1739784366;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7GD/trcjVijv8BKevRiWl5MHpKoDGJj6DiZdAEWA58A=;
-	b=O8hZx/ymgHX4GoVoMacfk+ZkAzzQFc8Y7uJbRnSDolWhl89wf2G+d7CH3FJtjOatyk+7Fx
-	USQoWr1Pp3D6Wy1YAUPv/kS2Wx9nw1yGzFzsCJ6uGO7dAKBvzpR6EvasweX3J0REhK9XTa
-	gx1FZiZRpuwAkWDXaq8mReLD894MUa18pTlSlV+v4Ud6MRD5vPDilf4jApT7cDSE3wn4M5
-	ihurz1M7oMaQOOrYllUZCpaiYalw0RAwEdxs9PhcdF/4RygANnjjNz3e0myezG0ZDzysSQ
-	3/g46MUaBaJ5C9WAQtYIN+SOfCCNoBnN6z7XKxVhauG7MbSPVT0ACC5/d0zdXA==
-Date: Mon, 17 Feb 2025 10:20:26 +0100
+	bh=SO8T0nIRKcbdmM4ftj1RFljqcKZxemj3VTPTdtlNmjc=;
+	b=MLFtirCxqUcwJLqDAF9h1I3aRDy2RzlA7h1E+0KjutTWO/wcKl9ZvtjtBwdKchSCyaJDgy
+	CaxGL5CGTLJplLIvSYEpH8fqOeGchC0bYgBehPZzPyO9swh92IOGDIUs0qVkGVh0w/PUPR
+	GSb/6weTO2IvE+PDO2D1gKXCLtUh4My8GR1xgiyB6jhQelAC0Q7rY2Rssv3qrAdgxQvQza
+	75Pde7zQE6/rEwCbZHi5hBdDVvXx0dC+impytylGgwEo1bJIxRwex1B7bCTYhtrLJ0974X
+	MFGDaYDIiu3DB7bJRxXl6wHIorTetdJCGWA1PB62miaDEYo2BWmhHJpDLsxENQ==
+Date: Mon, 17 Feb 2025 10:26:03 +0100
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+To: "Fedrau Dimitri (LED)" <Dimitri.Fedrau@liebherr.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
+ <linux-arm-msm@vger.kernel.org>, "thomas.petazzoni@bootlin.com"
+ <thomas.petazzoni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
  =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
  =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
  <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
  <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ "mwojtas@chromium.org" <mwojtas@chromium.org>, Antoine Tenart
+ <atenart@kernel.org>, "devicetree@vger.kernel.org"
+ <devicetree@vger.kernel.org>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
  Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
  Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>, Sean Anderson
- <seanga2@gmail.com>
-Subject: Re: [PATCH net-next v4 00/15] Introduce an ethernet port
- representation
-Message-ID: <20250217102026.780ebf36@fedora.home>
-In-Reply-To: <20250214165345.6cab996f@kernel.org>
+ Sean Anderson <seanga2@gmail.com>, "dima.fedrau@gmail.com"
+ <dima.fedrau@gmail.com>
+Subject: Re: [PATCH net-next v4 04/15] net: phy: dp83822: Add support for
+ phy_port representation
+Message-ID: <20250217102603.3e9f79c6@fedora.home>
+In-Reply-To: <DB8P192MB08386B9F0FB342EB7B0FA785F3F92@DB8P192MB0838.EURP192.PROD.OUTLOOK.COM>
 References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
-	<20250214165345.6cab996f@kernel.org>
+	<20250213101606.1154014-5-maxime.chevallier@bootlin.com>
+	<DB8P192MB08386B9F0FB342EB7B0FA785F3F92@DB8P192MB0838.EURP192.PROD.OUTLOOK.COM>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -80,33 +86,152 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkedtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefuddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtp
- hhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkedtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeuhfefgffgtdfhgffhvdfhhffhteeutdektefghfetveehheejjefgudeiudehudenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefvddprhgtphhtthhopeffihhmihhtrhhirdfhvggurhgruheslhhivggshhgvrhhrrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkv
+ ghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, 14 Feb 2025 16:53:45 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hello Dimitri,
 
-> On Thu, 13 Feb 2025 11:15:48 +0100 Maxime Chevallier wrote:
-> > This is V4 of the series introducing the phy_port infrastructure.  
-> 
-> FWIW it doesn't seem to apply:
-> 
-> Applying: net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
-> Applying: net: ethtool: Export the link_mode_params definitions
-> error: sha1 information is lacking or useless (net/ethtool/common.c).
-> error: could not build fake ancestor
+On Sat, 15 Feb 2025 11:31:28 +0000
+"Fedrau Dimitri (LED)" <Dimitri.Fedrau@liebherr.com> wrote:
 
-Hmm strange, I may have messed-up somewhere ? I'll rebase anyways for
-the next iterations, some of the recently merged work with the
-.get_nexy_update_time conflicts with the series as well.
+> Hi Maxime,
+>=20
+> > -----Urspr=C3=BCngliche Nachricht-----
+> > Von: Maxime Chevallier <maxime.chevallier@bootlin.com>=20
+> > Gesendet: Donnerstag, 13. Februar 2025 11:16
+> > =20
+> [...]
+> > =20
+> > @@ -781,17 +782,6 @@ static int dp83822_of_init(struct phy_device *phyd=
+ev)
+> >  	struct device *dev =3D &phydev->mdio.dev;
+> >  	const char *of_val;
+> > =20
+> > -	/* Signal detection for the PHY is only enabled if the FX_EN and the
+> > -	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
+> > -	 * is strapped otherwise signal detection is disabled for the PHY.
+> > -	 */ =20
+> Does it make sense to keep the comment ?
+>
 
-Thanks,
+I think so, this behaviour isn't expected to change with this patchset
+
+> > -	if (dp83822->fx_enabled && dp83822->fx_sd_enable)
+> > -		dp83822->fx_signal_det_low =3D device_property_present(dev,
+> > -								     "ti,link-loss-low");
+> > -	if (!dp83822->fx_enabled)
+> > -		dp83822->fx_enabled =3D device_property_present(dev,
+> > -							      "ti,fiber-mode");
+> > -
+> >  	if (!device_property_read_string(dev, "ti,gpio2-clk-out", &of_val)) {
+> >  		if (strcmp(of_val, "mac-if") =3D=3D 0) {
+> >  			dp83822->gpio2_clk_out =3D DP83822_CLK_SRC_MAC_IF;
+> > @@ -884,6 +874,43 @@ static int dp83822_read_straps(struct phy_device *=
+phydev)
+> >  	return 0;
+> >  }
+> > =20
+> > +static int dp83822_attach_port(struct phy_device *phydev, struct phy_p=
+ort *port)
+> > +{
+> > +	struct dp83822_private *dp83822 =3D phydev->priv;
+> > +	int ret;
+> > +
+> > +	if (port->mediums) {
+> > +		if (phy_port_is_fiber(port) ||
+> > +		    port->mediums & BIT(ETHTOOL_LINK_MEDIUM_BASEX))
+> > +			dp83822->fx_enabled =3D true;
+> > +	} else {
+> > +		ret =3D dp83822_read_straps(phydev);
+> > +		if (ret)
+> > +			return ret;
+> > +
+> > +#ifdef CONFIG_OF_MDIO
+> > +		if (dp83822->fx_enabled && dp83822->fx_sd_enable)
+> > +			dp83822->fx_signal_det_low =3D
+> > +				device_property_present(dev, "ti,link-loss-low");
+> > +		if (!dp83822->fx_enabled)
+> > +			dp83822->fx_enabled =3D
+> > +				device_property_present(dev, "ti,fiber-mode");
+> > +#endif =20
+>=20
+> I think this is to make it backwards compatible to the dp83822 bindings,
+> is it worth mentioning this in a comment ?
+
+Good point yes, I'll mention that.
+
+> > +
+> > +		if (dp83822->fx_enabled) {
+> > +			port->lanes =3D 1;
+> > +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASEF) |
+> > +					BIT(ETHTOOL_LINK_MEDIUM_BASEX);
+> > +		} else {
+> > +			/* This PHY can only to 100BaseTX max, so on 2 lanes */
+> > +			port->lanes =3D 2;
+> > +			port->mediums =3D BIT(ETHTOOL_LINK_MEDIUM_BASET);
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int dp8382x_probe(struct phy_device *phydev)
+> >  {
+> >  	struct dp83822_private *dp83822;
+> > @@ -900,25 +927,13 @@ static int dp8382x_probe(struct phy_device *phyde=
+v)
+> > =20
+> >  static int dp83822_probe(struct phy_device *phydev)
+> >  {
+> > -	struct dp83822_private *dp83822;
+> >  	int ret;
+> > =20
+> >  	ret =3D dp8382x_probe(phydev);
+> >  	if (ret)
+> >  		return ret;
+> > =20
+> > -	dp83822 =3D phydev->priv;
+> > -
+> > -	ret =3D dp83822_read_straps(phydev);
+> > -	if (ret)
+> > -		return ret;
+> > -
+> > -	ret =3D dp83822_of_init(phydev);
+> > -	if (ret)
+> > -		return ret;
+> > -
+> > -	if (dp83822->fx_enabled)
+> > -		phydev->port =3D PORT_FIBRE;
+> > +	dp83822_of_init(phydev); =20
+>=20
+> Keep the check of the return value.
+
+Ah yes indeed, the check should indeed stay. Thanks !
+
+> > =20
+> >  	return 0;
+> >  }
+> > @@ -1104,6 +1119,7 @@ static int dp83822_led_hw_control_get(struct phy_=
+device *phydev, u8 index,
+> >  		.led_hw_is_supported =3D dp83822_led_hw_is_supported,	\
+> >  		.led_hw_control_set =3D dp83822_led_hw_control_set,	\
+> >  		.led_hw_control_get =3D dp83822_led_hw_control_get,	\
+> > +		.attach_port =3D dp83822_attach_port		\
+> >  	}
+> > =20
+> >  #define DP83825_PHY_DRIVER(_id, _name)				\
+> > --=20
+> > 2.48.1 =20
+>=20
+> Best regards,
+> Dimitri Fedrau
+
+Thanks for reviewing,
 
 Maxime
-
 
