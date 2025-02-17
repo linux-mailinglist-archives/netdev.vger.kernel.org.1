@@ -1,528 +1,237 @@
-Return-Path: <netdev+bounces-166899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C10BA37D5C
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:45:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABD3A37D84
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:54:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFB7F3B0FEE
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00D633A5975
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 08:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921221A2630;
-	Mon, 17 Feb 2025 08:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D40A1A3147;
+	Mon, 17 Feb 2025 08:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="THDu/qdl"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ade+iUFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF471A3155
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 08:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D45118A92D;
+	Mon, 17 Feb 2025 08:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739781906; cv=none; b=WkeiGENrLjzp5dbfAUvemrMcSXRVR4WXiuQeCLU++nq0t0DVz4GDIgdPP8GAkvwykAZhFe2zV34Zrqqqnykj9f7VREvi0F0BQ65/ywURw0BFxuX1suWCEtC+gAwrnDQ5ZgTKzBtLuMnXgs/gl7hs5IcGnSgDrubcJpraEUvD4fk=
+	t=1739782407; cv=none; b=Z9sqju3WnLpCyAmFb/PznUSyrG/30tDrDqnXRgchABy97/L5rsAR07uxCqskPggr7k9qHChL4RRyAfLmTDH5qo2VhDE1rho2LXDoLFMFIY3xXHymWm9CzFaEGq6NdxBB//SU91BKRpdhmRd6cfgadSYwyHizqabFwWh3txknRN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739781906; c=relaxed/simple;
-	bh=uHKqqnEnYVzh3/HhKoXxwHr3L+iFlmKJ7NHNrFpxNOk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NlGOON+AlgyzQMAL55OvLICOxjo0T5sVNWyD1DHFtmjEQZSbvbDo0yHCGET5dQpFuXv9s6I9G+Sm/Fyexwqggs+/uJnIyq1uEQNujvRW3I0lBGTgjpy3tcH+i53evDALLYY/cnAuk9olezVXY4y8RrunG5JE/He9sZ1WmNZfbz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=THDu/qdl; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6fb2a0e4125so31259597b3.1
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 00:45:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739781903; x=1740386703; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QtQU9bp9FLNUk8UWpGUSEUOWyePThwilF4/88ev1EGQ=;
-        b=THDu/qdlGKow8UGmbwKOmihBBE0ieU8W+rhLZxS0b3ilaOEXLorGaT8ItlTrnV9SzO
-         TvmjZbyOtpcaIv+fN2Z+AM4bzdSnx7ACvm5/N0J8YVfhSHpC0UFaOa0cArjd7bNcWjoV
-         RpAgK10pd+IOnWzsfQL1qYKAoZ90xG4hAPMc1eajc/5637gionAus7gsEZKgRLDtRrCN
-         Eg5aiUW0lOAYAXjTO74a9mACiZmtO93KDE/2EYpqfAcN1CuqdJ92oBajsf4NBMvwDTN2
-         bTNy6tptgJQH+47UoXf/IhPCYWhhzf2WGD2PlVMYvmhdLWHcMTVVaLWI64rQyCbHHzsr
-         y6ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739781903; x=1740386703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QtQU9bp9FLNUk8UWpGUSEUOWyePThwilF4/88ev1EGQ=;
-        b=dKC+IUQyy5YtCZIZtuJhWk35KpxRMTFLshTXd7iZbiG43KeVN7gxyQlOT5gf2G7adu
-         +HWDT/yWDbjyDPyTo6r1tt32yoPN6T2TPTpaP0oY4TuNFaoj4F/wXaimOivHPXza9qmE
-         YZtbwPddjxAzzbWUuJm/buwqY7QyhPCo/04HgZdifHc4nuS67Y7fNfEcQu5i/lmbMBxQ
-         nnRFK+rcHnMtcLd7XIavnZaR10FQjR8hqPSzTwx+jdPCdRl6Arh5yabeHGsNVbMvojF5
-         E8lMAwPnzewHrwtR2FlepzGAUzx5hSgQRTrr+9+Cshvqi8SAz3pr5mkM2P5dTuaIWyLJ
-         iSrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVU2eFwWT7R816Vf+Ezqk48iJG12WLdlEGH6Se+HMiVLoE1ux+2Nm4/Hk9Q9ugNP0Zu486ggfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykqXQiG46hV3lN8atTRYWNIjzkLIr6kJZ2YzeLwSnDcSkmch/7
-	l7EOIIJ3UXjbY1jiOirC3j9Hi1gSbQ0nB7xWGcJUGWofsGeCvkHJxyhIvWtkRd7NEoE/hwvVWIi
-	eN9LPgW6A7Zm+PSsMBcerKyH65tcgttU71RMo
-X-Gm-Gg: ASbGncuS5QuF4JkS04fqOOkkRlPuUpdspogMnt70s0QlRqUCmDsgr3tEFHEC1UvhQti
-	5UHo58zaA/x/mlCBf6SE7dZc8UTgHvJLXZDMkXby51YkdY+IVcvKYJNKAhOlKuCWh41LYbXew4g
-	==
-X-Google-Smtp-Source: AGHT+IH0+1ygY43Twywfd69CCe1zGCQpGW9I0UDrVR7uGgx+v0GzSjTKx9YaRxZuXBSgo0Tyvz8K1CWLqo2rjZZooeI=
-X-Received: by 2002:a05:6902:228e:b0:e5d:b7d8:ad3b with SMTP id
- 3f1490d57ef6-e5dc90494c4mr7071537276.19.1739781903000; Mon, 17 Feb 2025
- 00:45:03 -0800 (PST)
+	s=arc-20240116; t=1739782407; c=relaxed/simple;
+	bh=x7loA1XH8SHyLqAH2pxq8JzwHfMv7gVzwJRQfsmvagA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SqHY/OdoMZWvmngLmO+9DPuqNvwACW+XYeN8ciGjv2brUVhmOUuPrwtc5bPXLHSA+1VVkLUzQ0SSbEbWmLLATyYYqm4qmgcTEuY/AfkeocOwWDgpptAdudAIV0X9QsKB9RPjvuAc4tGfc4KvofXoM55sd8jnmVYv7ACj/JSttk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ade+iUFl; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51GNjhcL006916;
+	Mon, 17 Feb 2025 00:53:15 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=CU69piWw3bhgFgIDFnnBqaI
+	afBgawzTiJhuZoTIVa18=; b=Ade+iUFla2CcE/5P1Y5+ShH/0oczVuveHl/68ve
+	BXdltL8K9O5PNMC+guqfE5qst+cf+maZR/l9TsnvbBCGVKQL/bpTKXagpOfsKDMp
+	uI6SXptnbBW0N4wGB4rwHZxy+/9OUaHIBe+nreSkOZL2amYTM/oOH9Y9OcOvHN4Q
+	P6d32HHUR/f4kh2ZgA5yKPrNgQ4xRid4XcRc2IW/gmhuUoPPiea3CYOqdHMhWYoB
+	5SwYzmupqvTRGASNAR5urcJFxWkGEzHcVuuCCC86po7AD+iW0raxjLt5PYTWEGzd
+	IQP+41M9fg1CnF/PSjSCykJMNgwzmd03vonZR7ThGA8EeXg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 44u5rdj4r5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Feb 2025 00:53:14 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 17 Feb 2025 00:53:14 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 17 Feb 2025 00:53:14 -0800
+Received: from hyd1425.marvell.com (unknown [10.29.37.152])
+	by maili.marvell.com (Postfix) with ESMTP id 86EBF3F706D;
+	Mon, 17 Feb 2025 00:53:09 -0800 (PST)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
+        <kalesh-anakkur.purayil@broadcom.com>
+CC: Sai Krishna <saikrishnag@marvell.com>
+Subject: [net-next PATCH v10 0/6] CN20K silicon with mbox support
+Date: Mon, 17 Feb 2025 14:22:51 +0530
+Message-ID: <20250217085257.173652-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021425-surgical-wackiness-0940@gregkh>
-In-Reply-To: <2025021425-surgical-wackiness-0940@gregkh>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Mon, 17 Feb 2025 16:44:35 +0800
-X-Gm-Features: AWEUYZkU4pAvQqrg9Y27OTUWlYEhkhk1cyfkzNcIxbkv2X1qa0Cn2tjdpsxIdyM
-Message-ID: <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: lAv29F1FrY-GfFsMo7oAAIO3sXm2Om-r
+X-Proofpoint-GUID: lAv29F1FrY-GfFsMo7oAAIO3sXm2Om-r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-17_04,2025-02-13_01,2024-11-22_01
 
-On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > Expose the isoc_alt attr with device group to avoid the racing.
-> >
-> > Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> > it also becomes the parent device of hci dev.
-> >
-> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
-USB alt setting")
->
-> Wait, step back, why is this commit needed if you can change the alt
-> setting already today through usbfs/libusb without needing to mess with
-> the bluetooth stack at all?
+CN20K is the next generation silicon in the Octeon series with various
+improvements and new features.
 
-In short: We want to configure the alternate settings without
-detaching the btusb driver, while detaching seems necessary for
-libusb_set_interface_alt_setting to work (Please correct me if I'm
-wrong!)
+Along with other changes the mailbox communication mechanism between RVU
+(Resource virtualization Unit) SRIOV PFs/VFs with Admin function (AF) has
+also gone through some changes.
 
-Background:
-The Bluetooth Core Specification defines a protocol for the operating
-system to communicate with a Bluetooth chipset, called HCI (Host
-Controller Interface) (Host=3DOS, Controller=3Dchipset).
-We could say the main purpose of the Linux Bluetooth drivers is to set
-up and get the HCI ready for the "upper layer" to use.
+Some of those changes are
+- Separate IRQs for mbox request and response/ack.
+- Configurable mbox size, default being 64KB.
+- Ability for VFs to communicate with RVU AF instead of going through
+  parent SRIOV PF.
 
-Who could be the "upper layer" then? There are mainly 2: "Control" and
-"User" channels.
-Linux has its default Bluetooth stack, BlueZ, which is splitted into 2
-parts: the kernel space and the user space. The kernel space part
-provides an abstracted Bluetooth API called MGMT, and is exposed
-through the Bluetooth HCI socket "Control" channel.
-On the other hand Linux also exposes the Bluetooth HCI socket "User"
-channel, allowing the user space APPs to send/receive the HCI packets
-directly to/from the chipset. Google's products (Android, ChromeOS,
-etc) use this channel.
+Due to more memory requirement due to configurable mbox size, mbox memory
+will now have to be allocated by
+- AF (PF0) for communicating with other PFs and all VFs in the system.
+- PF for communicating with it's child VFs.
 
-Now why this patch?
-It's because the Bluetooth spec defines something specific to USB
-transport: A USB Bluetooth chipset must/should support these alternate
-settings; When transferring this type of the Audio data this alt must
-be used, bla bla bla...
-The Control channel handles this in the kernel part. However, the
-applications built on top of the User channel are unable to configure
-the alt setting, and I'd like to add the support through sysfs.
+On previous silicons mbox memory was reserved and configured by firmware.
 
->
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> > Changes in v5:
-> > - Merge the ABI doc into this patch
-> > - Manage the driver data with device
-> >
-> > Changes in v4:
-> > - Create a dev node for btusb. It's now hci dev's parent and the
-> >   isoc_alt now belongs to it.
-> > - Since the changes is almost limitted in btusb, no need to add the
-> >   callbacks in hdev anymore.
-> >
-> > Changes in v3:
-> > - Make the attribute exported only when the isoc_alt is available.
-> > - In btusb_probe, determine data->isoc before calling hci_alloc_dev_pri=
-v
-> >   (which calls hci_init_sysfs).
-> > - Since hci_init_sysfs is called before btusb could modify the hdev,
-> >   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs=
-.
-> >
-> > Changes in v2:
-> > - The patch has been removed from series
-> >
-> >  .../ABI/stable/sysfs-class-bluetooth          |  13 ++
-> >  drivers/bluetooth/btusb.c                     | 111 ++++++++++++++----
-> >  include/net/bluetooth/hci_core.h              |   1 +
-> >  net/bluetooth/hci_sysfs.c                     |   3 +-
-> >  4 files changed, 102 insertions(+), 26 deletions(-)
-> >
-> > diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documenta=
-tion/ABI/stable/sysfs-class-bluetooth
-> > index 36be02471174..c1024c7c4634 100644
-> > --- a/Documentation/ABI/stable/sysfs-class-bluetooth
-> > +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
-> > @@ -7,3 +7,16 @@ Description:         This write-only attribute allows =
-users to trigger the vendor reset
-> >               The reset may or may not be done through the device trans=
-port
-> >               (e.g., UART/USB), and can also be done through an out-of-=
-band
-> >               approach such as GPIO.
-> > +
-> > +What:                /sys/class/bluetooth/btusb<usb-intf>/isoc_alt
-> > +Date:                13-Feb-2025
-> > +KernelVersion:       6.13
-> > +Contact:     linux-bluetooth@vger.kernel.org
-> > +Description: This attribute allows users to configure the USB Alternat=
-e setting
-> > +             for the specific HCI device. Reading this attribute retur=
-ns the
-> > +             current setting, and writing any supported numbers would =
-change
-> > +             the setting. See the USB Alternate setting definition in =
-Bluetooth
-> > +             core spec 5, vol 4, part B, table 2.1.
-> > +             If the HCI device is not yet init-ed, the write fails wit=
-h -ENODEV.
-> > +             If the data is not a valid number, the write fails with -=
-EINVAL.
-> > +             The other failures are vendor specific.
->
-> Again, what's wrong with libusb/usbfs to do this today?
->
->
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 1caf7a071a73..e2fb3d08a5ed 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -920,6 +920,8 @@ struct btusb_data {
-> >       int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> >
-> >       struct qca_dump_info qca_dump;
-> > +
-> > +     struct device dev;
->
-> Ah, so now this structure's lifecycle is determined by the device you
-> just embedded in it?  Are you sure you got this right?
+This patch series add basic mbox support for AF (PF0) <=> PFs and
+PF <=> VFs. AF <=> VFs communication and variable mbox size support will
+come in later.
 
-Yes, I think so. The structure should be freed when usb disconnects.
-In the current implementation all its members are released when usb
-disconnects except for the structure itself, because it's allocated
-through devm_kzalloc. Since we now make it a device we could make the
-lifecycle clearer.
+Patch #1 Supported co-existance of bit encoding PFs and VFs in 16-bit
+         hardware pcifunc format between CN20K silicon and older octeon
+         series. Also exported PF,VF masks and shifts present in mailbox
+         module to all other modules.
 
->
-> >  };
-> >
-> >  static void btusb_reset(struct hci_dev *hdev)
-> > @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
-> >       int alt;
-> >       int ret;
-> >
-> > +     if (!data->hdev)
-> > +             return -ENODEV;
-> > +
-> >       if (kstrtoint(buf, 10, &alt))
-> >               return -EINVAL;
-> >
-> > @@ -3702,6 +3707,36 @@ static ssize_t isoc_alt_store(struct device *dev=
-,
-> >
-> >  static DEVICE_ATTR_RW(isoc_alt);
-> >
-> > +static struct attribute *btusb_sysfs_attrs[] =3D {
-> > +     NULL,
-> > +};
-> > +ATTRIBUTE_GROUPS(btusb_sysfs);
-> > +
-> > +static void btusb_sysfs_release(struct device *dev)
-> > +{
-> > +     struct btusb_data *data =3D dev_get_drvdata(dev);
->
-> That feels wrong, it's embedded in the device, not pointed to by the
-> device.  So this should be a container_of() call, right?
+Patch #2 Added basic mbox operation APIs and structures to support both
+         CN20K and previous version of silicons.
 
-Thanks for the feedback. So now rather than dev_set_drvdata() +
-dev_get_drvdata() I am going to use container_of() only.
+Patch #3 This patch adds support for basic mbox infrastructure
+         implementation for CN20K silicon in AF perspective. There are
+         few updates w.r.t MBOX ACK interrupt and offsets in CN20k.
+         
+Patch #4 Added mbox implementation between NIC PF and AF for CN20K.
 
->
-> > +
-> > +     kfree(data);
-> > +}
-> > +
-> > +static const struct device_type btusb_sysfs =3D {
-> > +     .name    =3D "btusb",
-> > +     .release =3D btusb_sysfs_release,
-> > +     .groups  =3D btusb_sysfs_groups,
-> > +};
-> > +
-> > +static struct attribute *btusb_sysfs_isoc_alt_attrs[] =3D {
-> > +     &dev_attr_isoc_alt.attr,
-> > +     NULL,
-> > +};
-> > +ATTRIBUTE_GROUPS(btusb_sysfs_isoc_alt);
-> > +
-> > +static const struct device_type btusb_sysfs_isoc_alt =3D {
-> > +     .name    =3D "btusb",
-> > +     .release =3D btusb_sysfs_release,
-> > +     .groups  =3D btusb_sysfs_isoc_alt_groups,
-> > +};
-> > +
-> >  static int btusb_probe(struct usb_interface *intf,
-> >                      const struct usb_device_id *id)
-> >  {
-> > @@ -3743,7 +3778,7 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                       return -ENODEV;
-> >       }
-> >
-> > -     data =3D devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-> > +     data =3D kzalloc(sizeof(*data), GFP_KERNEL);
-> >       if (!data)
-> >               return -ENOMEM;
-> >
-> > @@ -3766,8 +3801,10 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >               }
-> >       }
-> >
-> > -     if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep)
-> > -             return -ENODEV;
-> > +     if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep) {
-> > +             err =3D -ENODEV;
-> > +             goto out_free_data;
-> > +     }
-> >
-> >       if (id->driver_info & BTUSB_AMP) {
-> >               data->cmdreq_type =3D USB_TYPE_CLASS | 0x01;
-> > @@ -3821,16 +3858,47 @@ static int btusb_probe(struct usb_interface *in=
-tf,
-> >
-> >       data->recv_acl =3D hci_recv_frame;
-> >
-> > +     if (id->driver_info & BTUSB_AMP) {
-> > +             /* AMP controllers do not support SCO packets */
-> > +             data->isoc =3D NULL;
-> > +     } else {
-> > +             /* Interface orders are hardcoded in the specification */
-> > +             data->isoc =3D usb_ifnum_to_if(data->udev, ifnum_base + 1=
-);
-> > +             data->isoc_ifnum =3D ifnum_base + 1;
-> > +     }
-> > +
-> > +     if (id->driver_info & BTUSB_BROKEN_ISOC)
-> > +             data->isoc =3D NULL;
-> > +
-> > +     /* Init a dev for btusb. The attr depends on the support of isoc.=
- */
-> > +     if (data->isoc)
-> > +             data->dev.type =3D &btusb_sysfs_isoc_alt;
-> > +     else
-> > +             data->dev.type =3D &btusb_sysfs;
->
-> When walking the class, are you sure you check for the proper types now?
-> Does anyone walk all of the class devices anywhere?
+Patch #5 Added mbox communication support between AF and AF's VFs.
 
-Sorry I don't quite understand. What does walk mean in this case? Is
-it the user space program walks the /sys/class/bluetooth?
+Patch #6 This patch adds support for MBOX communication between NIC PF and
+         its VFs.
 
->
-> > +     data->dev.class =3D &bt_class;
-> > +     data->dev.parent =3D &intf->dev;
-> > +
-> > +     err =3D dev_set_name(&data->dev, "btusb%s", dev_name(&intf->dev))=
-;
->
-> what does this name look like in a real system?  squashing them together
-> feels wrong, why is 'btusb' needed here at all?
 
-Below is the Bluetooth class layout that could be like after this patch.
-I guess we better keep the "btusb" or "usb" prefix so it's less
-confusing when more transports (UART, PCIe, etc) are added.
+Sai Krishna (5):
+  octeontx2-af: CN20k basic mbox operations and structures
+  octeontx2-af: CN20k mbox to support AF REQ/ACK functionality
+  octeontx2-pf: CN20K mbox REQ/ACK implementation for NIC PF
+  octeontx2-af: CN20K mbox implementation for AF's VF
+  octeontx2-pf: CN20K mbox implementation between PF-VF
 
-# ls -l /sys/class/bluetooth
-total 0
-lrwxrwxrwx. 1 root root 0 Feb 17 15:23 btusb2-1.5:1.0 ->
-../../devices/platform/soc/16700000.usb/usb2/2-1/2-1.5/2-1.5:1.0/bluetooth/=
-btusb2-1.5:1.0
-lrwxrwxrwx. 1 root root 0 Feb 17 15:23 hci0 ->
-../../devices/platform/soc/16700000.usb/usb2/2-1/2-1.5/2-1.5:1.0/bluetooth/=
-btusb2-1.5:1.0/hci0
+Subbaraya Sundeep (1):
+  octeontx2: Set appropriate PF, VF masks and shifts based on silicon
 
->
-> > +     if (err)
-> > +             goto out_free_data;
-> > +
-> > +     dev_set_drvdata(&data->dev, data);
-> > +     err =3D device_register(&data->dev);
-> > +     if (err < 0)
-> > +             goto out_put_sysfs;
-> > +
-> >       hdev =3D hci_alloc_dev_priv(priv_size);
-> > -     if (!hdev)
-> > -             return -ENOMEM;
-> > +     if (!hdev) {
-> > +             err =3D -ENOMEM;
-> > +             goto out_free_sysfs;
-> > +     }
-> >
-> >       hdev->bus =3D HCI_USB;
-> >       hci_set_drvdata(hdev, data);
-> >
-> >       data->hdev =3D hdev;
-> >
-> > -     SET_HCIDEV_DEV(hdev, &intf->dev);
-> > +     SET_HCIDEV_DEV(hdev, &data->dev);
-> >
-> >       reset_gpio =3D gpiod_get_optional(&data->udev->dev, "reset",
-> >                                       GPIOD_OUT_LOW);
-> > @@ -3969,15 +4037,6 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >               hci_set_msft_opcode(hdev, 0xFD70);
-> >       }
-> >
-> > -     if (id->driver_info & BTUSB_AMP) {
-> > -             /* AMP controllers do not support SCO packets */
-> > -             data->isoc =3D NULL;
-> > -     } else {
-> > -             /* Interface orders are hardcoded in the specification */
-> > -             data->isoc =3D usb_ifnum_to_if(data->udev, ifnum_base + 1=
-);
-> > -             data->isoc_ifnum =3D ifnum_base + 1;
-> > -     }
-> > -
-> >       if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
-> >           (id->driver_info & BTUSB_REALTEK)) {
-> >               btrtl_set_driver_name(hdev, btusb_driver.name);
-> > @@ -4010,9 +4069,6 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                       set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirk=
-s);
-> >       }
-> >
-> > -     if (id->driver_info & BTUSB_BROKEN_ISOC)
-> > -             data->isoc =3D NULL;
-> > -
-> >       if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
-> >               set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirk=
-s);
-> >
-> > @@ -4065,10 +4121,6 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >                                                data->isoc, data);
-> >               if (err < 0)
-> >                       goto out_free_dev;
-> > -
-> > -             err =3D device_create_file(&intf->dev, &dev_attr_isoc_alt=
-);
->
-> You have now moved the file, are you sure you don't also need to update
-> the documentation?
+---
+v10 changes:
+	Fixed compilation issue reported by kernel test robot.
 
-There's no documentation for this attr so far, and this patch aims to
-add the doc.
+v9 changes:
+	Addressed review comments given by Jakub Kicinski
+	 1. Removed macro indirections and converted PF func mask, shift macros
+	 usage into helper APIs and used the same in different modules.
 
->
->
-> > -             if (err)
-> > -                     goto out_free_dev;
-> >       }
-> >
-> >       if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> > @@ -4099,6 +4151,16 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >       if (data->reset_gpio)
-> >               gpiod_put(data->reset_gpio);
-> >       hci_free_dev(hdev);
-> > +
-> > +out_free_sysfs:
-> > +     device_del(&data->dev);
-> > +
-> > +out_put_sysfs:
-> > +     put_device(&data->dev);
-> > +     return err;
-> > +
-> > +out_free_data:
-> > +     kfree(data);
-> >       return err;
-> >  }
-> >
-> > @@ -4115,10 +4177,8 @@ static void btusb_disconnect(struct usb_interfac=
-e *intf)
-> >       hdev =3D data->hdev;
-> >       usb_set_intfdata(data->intf, NULL);
-> >
-> > -     if (data->isoc) {
-> > -             device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> > +     if (data->isoc)
-> >               usb_set_intfdata(data->isoc, NULL);
-> > -     }
-> >
-> >       if (data->diag)
-> >               usb_set_intfdata(data->diag, NULL);
-> > @@ -4150,6 +4210,7 @@ static void btusb_disconnect(struct usb_interface=
- *intf)
-> >               gpiod_put(data->reset_gpio);
-> >
-> >       hci_free_dev(hdev);
-> > +     device_unregister(&data->dev);
-> >  }
-> >
-> >  #ifdef CONFIG_PM
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index 05919848ea95..776dd6183509 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -1843,6 +1843,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_de=
-v *hdev);
-> >
-> >  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-> >
-> > +extern const struct class bt_class;
-> >  void hci_init_sysfs(struct hci_dev *hdev);
-> >  void hci_conn_init_sysfs(struct hci_conn *conn);
-> >  void hci_conn_add_sysfs(struct hci_conn *conn);
-> > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> > index 041ce9adc378..aab3ffaa264c 100644
-> > --- a/net/bluetooth/hci_sysfs.c
-> > +++ b/net/bluetooth/hci_sysfs.c
-> > @@ -6,9 +6,10 @@
-> >  #include <net/bluetooth/bluetooth.h>
-> >  #include <net/bluetooth/hci_core.h>
-> >
-> > -static const struct class bt_class =3D {
-> > +const struct class bt_class =3D {
-> >       .name =3D "bluetooth",
-> >  };
-> > +EXPORT_SYMBOL(bt_class);
->
-> EXPORT_SYMBOL_GPL(), right?
->
-> thanks,
->
-> greg k-h
+v8 changes:
+	No changes, re-posting, as the previous patchset got deferred.
 
---=20
-Best Regards,
-Hsin-chen
+v7 changes:
+	Addressed review comments given by Jakub Kicinski
+	1. Fixed few clang warnings of enum conversion related to the patchset.
+
+v6 changes:
+	Addressed review comments given by Jakub Kicinski
+	1. Fixed minor line alignment issue to fit in 80 char.
+	2. Jakub also suggested to convert macros from patch1 into helper APIs.
+	   Since this will result in lot of changes (at >100 places across
+	   multiple drivers), will submit that patch as a separate cleanup
+	   patch.
+
+v5 changes:
+	No changes, re-posting.
+
+v4 changes:
+	Addressed minor conflits suggested by Jakub Kicinski
+        1. This V4 version of patch set is just a rebase of V3 on top of
+	net-next to address some minor conflicts.
+
+v3 changes:
+	Addressed review comments given by Jakub Kicinski, Simon Horman
+        1. Fixed sparse errors, warnings.
+        2. Fixed a comment mistake, inline with kernel-doc format.
+        3. Removed un-necessary type casting to honor Networking code format.
+
+v2 changes:
+	Addressed review comments given by Kalesh Anakkur Purayil
+        1. Optimized code in parts of patches, removed redundant code
+        2. Fixed sparse warning
+        3. Removed debug log.
+
+ .../marvell/octeontx2/otx2_cpt_common.h       |   5 +-
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  13 +-
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |   4 +-
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |   6 +-
+ .../ethernet/marvell/octeontx2/af/Makefile    |   2 +-
+ .../ethernet/marvell/octeontx2/af/cn20k/api.h |  34 ++
+ .../marvell/octeontx2/af/cn20k/mbox_init.c    | 421 ++++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/cn20k/reg.h |  81 ++++
+ .../marvell/octeontx2/af/cn20k/struct.h       |  40 ++
+ .../ethernet/marvell/octeontx2/af/common.h    |   2 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  | 106 ++++-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   8 +
+ .../marvell/octeontx2/af/mcs_rvu_if.c         |   6 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   | 226 +++++++---
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  81 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   |  68 +--
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   4 +-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |   4 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  22 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  54 +--
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |   8 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.c       |  16 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.h       |   4 +-
+ .../ethernet/marvell/octeontx2/af/rvu_rep.c   |  13 +-
+ .../ethernet/marvell/octeontx2/af/rvu_sdp.c   |  10 +-
+ .../marvell/octeontx2/af/rvu_struct.h         |   6 +-
+ .../marvell/octeontx2/af/rvu_switch.c         |   8 +-
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |  18 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.h    |   1 +
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       |   2 +-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn20k.c    | 252 +++++++++++
+ .../ethernet/marvell/octeontx2/nic/cn20k.h    |  17 +
+ .../marvell/octeontx2/nic/otx2_common.c       |  10 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |  35 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 173 +++++--
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h |  49 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  |   3 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  44 +-
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  |   7 +-
+ include/linux/soc/marvell/silicons.h          |  25 ++
+ 42 files changed, 1574 insertions(+), 318 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
+ create mode 100644 include/linux/soc/marvell/silicons.h
+
+-- 
+2.25.1
+
 
