@@ -1,134 +1,170 @@
-Return-Path: <netdev+bounces-167035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651C3A386EA
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:50:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458F8A386F5
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B86B1887EF0
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:48:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB713AC896
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19FC221560;
-	Mon, 17 Feb 2025 14:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BDE22489E;
+	Mon, 17 Feb 2025 14:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mx4kRtrY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FuKbJGTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2899F21CA0E
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 14:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11528223324;
+	Mon, 17 Feb 2025 14:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739803717; cv=none; b=u2+0QLunlbWOruOfolgpxv5vRMOV5BQcU1fy5Nf1eebd3v7wC+Z2fC9oEdeeETqSQAL6XzPHMHM+wdxFPA421jukdQFIN5WEmYyVAOCO7ngiDy9pw5npD08UxraQSfTVRKyYAvp5pPMRQDDFIJXxY9tQOqWCSGfaUVFF7WFTj/Y=
+	t=1739803782; cv=none; b=jO+TDoeabCgusOW1QBc3FvVKW6Wq7uEtS1BJUmwbQuGA0iBLdJ09uoSfiL7S78jsPKSzzhkPI72hvMdYUeiBaaKLIcvwPH0ItPntZUuXp29pDj6hNxUP+zVCe02zLHaUfJq25oUy/v43r3fT9Wq+H6JNrshdAj6PLcgYRI7RR0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739803717; c=relaxed/simple;
-	bh=8dhjqi6RQt0qUvh026uE2aPh7osHZWJ3X8d5NYVkLm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VBQAotwWTfACMg4ocxsiBMThU5b135jXH1m3KBECgX8WKv3qj4RDrw9lgE2qCt/4CxVd+91av+taJjK+joMM2n993fKVe2Sm7+OFl/DTBYyumbMJYRPVZEwAEbsiQ0vofN0CIqdH+5px5CZMgrufOkJpB3ti1/SO/vnILN5WF/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mx4kRtrY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739803714;
+	s=arc-20240116; t=1739803782; c=relaxed/simple;
+	bh=noBWesDhIHu2UKaR18tw6XBMmfBZeqYD391YNtBjELo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NPxJ3CPMev7TwTi0X2hg75EaLEP4pXpJdPlRczduxu9yY/7Of3khN+34zcK30tvotYBSgkeWv6E5dowT9e2Sh1iGctAk+hwjxoEgCFSZLSy38dgzKtQUf11CKv/7cpELtTwJ7PDu3SDJumcrruE2oYfUM48s8u2qC9HvW1+F0T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FuKbJGTP; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 64A4A44430;
+	Mon, 17 Feb 2025 14:49:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739803777;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Rc6qCN4ETICC8azLtjrKdOIt2/nf2AWh/k3ErXHTy00=;
-	b=Mx4kRtrYwSqJrvpRZyFiPMQ9XQpXthslg+UYXDRvXKfPfmu7D5p3dUH8q7kkaePfFixSbx
-	Hf7CN0zMOhS8AqTiiQkohFaAxpx4XJup4ciPULKovkek3mjsN9iVlH6kGepcOgvB3n8pzT
-	6jp7RVGEOMSEbN/bnfb+j0wIDELnFmI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-147-mrWbPi0hNja-OIALSx04Uw-1; Mon, 17 Feb 2025 09:48:32 -0500
-X-MC-Unique: mrWbPi0hNja-OIALSx04Uw-1
-X-Mimecast-MFC-AGG-ID: mrWbPi0hNja-OIALSx04Uw_1739803711
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-439385b08d1so40485655e9.1
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 06:48:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739803711; x=1740408511;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rc6qCN4ETICC8azLtjrKdOIt2/nf2AWh/k3ErXHTy00=;
-        b=U3+2Rty4mD/lHOb+/VkHwj09bFkHmVDphwx9BZcaGuIZuvOXi4eXtPEIX0VNVrJamu
-         MaOPek+82EhKqR2VymUTsRU1YRYf91/cidPQ4yBjk7QWNUm05xmYtuYBM2cWq44Lwu6G
-         r9QADhTkQYHYPa8RBIpOUmL1oUHZeaJCqh+/NmTZGhpIzbK7OPP9vpTUpbZVHqe17Xg9
-         iL2AhsQemrrkbj11BtuR/19qmB/pBcRWncJi5iZXAEfvCXFYoJ4jYmhly10DQOYhSI/p
-         AyKoW0sJresKOuCZWWRnxCX87/Npk/K0B1uwt3Wgur+IDuJp8cdbc7+GaNNP4qOZEggA
-         n5kg==
-X-Gm-Message-State: AOJu0YwH5z1vRWWUkxiUZ6AU6XWsKwPZrMKd7UNpgG7azxQbloR+vAAM
-	z7NUGzU5xPnWXBsEy4w/zLCjoQ0jTqdK5B58bI6cephAxDETRSG5h2UBWx8B/FAbNr7FdLN9hWp
-	Ecv1Nz5SPuoHBfVITYp7UpoR99xSio/04wSFcJn8obBicqwk7sXRSUw==
-X-Gm-Gg: ASbGnctfzViNm2gg0Lsx9YbXQ91w6EAAddwdYS1fSTqyHtejCOUj0CCPI5AhmyM3vuI
-	8diMc8M/JMFx6uHKV5g+CU4Uo9QqCCrQBFYWhQ/FnK3HMjSk2DBhuT+Au5rI5NKQ7Fd5k4qNhaB
-	sufimP97n8GHDH04tQDO8fP7mgdXw0cpr6+78//NFznHkMYX67GURs4etnkuM+1U3kiLvgTbq0c
-	LMSGYV+fjmmlMtCMFWWdMwAPddIpkjV+7aqaCzKyeIC0fTK3r1lgyscMBEaGJL+HvmkQY2bCCgo
-	odZJBUwgKBtYlsn6mIoUwUlMRcTZvafQYto=
-X-Received: by 2002:a05:600c:1c24:b0:439:6304:e28a with SMTP id 5b1f17b1804b1-4396e5b56e7mr110357185e9.0.1739803711291;
-        Mon, 17 Feb 2025 06:48:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE4dxgzvDp9rr1MXvaB9poBGfjXuDnm6JJThZOwkW5h8/2vTvlD/gGcLEba0dFztjL+/zHSAQ==
-X-Received: by 2002:a05:600c:1c24:b0:439:6304:e28a with SMTP id 5b1f17b1804b1-4396e5b56e7mr110356975e9.0.1739803710901;
-        Mon, 17 Feb 2025 06:48:30 -0800 (PST)
-Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439617da91asm126105915e9.2.2025.02.17.06.48.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Feb 2025 06:48:30 -0800 (PST)
-Message-ID: <41482213-e600-4024-9ca7-a085ac50f2db@redhat.com>
-Date: Mon, 17 Feb 2025 15:48:29 +0100
+	bh=PCSw3bmWjwYwuAQWl8doOYDVdqtoYKvVbYaoog5r6cI=;
+	b=FuKbJGTPideoR9c6VeuSbGxTWhWv12fvminuJ8DDMWnRMjtEVQxnV/c1g4jtSw+pBHf3A6
+	RQBlVhGKexKMWaPV/8ju+UkrJ4fsyEhpPDWgeSW8hNw3tJkQRjPC9cU+sOxOlNvfA/by7C
+	h3P+/mW1/rFJ8UnPvJzgZHg52sj3CdJtWQc0TXqfKYgM0+7f+eZZ+hqZV5jTXhMHl06IU3
+	Ln8wHc7cu4kdYfBxzCeKT2Wd5Puw1/vFTMCGyOSWgqfOOP2CXY5j0yg5IO3/FFnlK0npwb
+	jvf1FZ3mskLOe3QP0WqZIcWoA2+0A9b1MUBCanwxV9yTMgSLsDf+eYpxkyErmA==
+Date: Mon, 17 Feb 2025 15:49:34 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
+ Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>, Sean Anderson
+ <seanga2@gmail.com>
+Subject: Re: [PATCH net-next v4 05/15] net: phy: Create a phy_port for
+ PHY-driven SFPs
+Message-ID: <20250217154934.76ec03e5@fedora.home>
+In-Reply-To: <Z7NF6ciz4RHMaGo6@shell.armlinux.org.uk>
+References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
+	<20250213101606.1154014-6-maxime.chevallier@bootlin.com>
+	<Z7DjfRwd3dbcEXTY@shell.armlinux.org.uk>
+	<20250217092911.772da5d0@fedora.home>
+	<Z7NF6ciz4RHMaGo6@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: allow small head cache usage with large
- MAX_SKB_FRAGS values
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
- <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkeeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefuddprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdro
+ hhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 2/12/25 9:47 PM, Eric Dumazet wrote:
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 5b2b04835688f65daa25ca208e29775326520e1e..a14ab14c14f1bd6275ab2d1d93bf230b6be14f49
-> 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -56,7 +56,11 @@ DECLARE_PER_CPU(u32, tcp_tw_isn);
+On Mon, 17 Feb 2025 14:21:29 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> On Mon, Feb 17, 2025 at 09:29:11AM +0100, Maxime Chevallier wrote:
+> > Hello Russell,
+> > 
+> > On Sat, 15 Feb 2025 18:57:01 +0000
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> >   
+> > > On Thu, Feb 13, 2025 at 11:15:53AM +0100, Maxime Chevallier wrote:  
+> > > > Some PHY devices may be used as media-converters to drive SFP ports (for
+> > > > example, to allow using SFP when the SoC can only output RGMII). This is
+> > > > already supported to some extend by allowing PHY drivers to registers
+> > > > themselves as being SFP upstream.
+> > > > 
+> > > > However, the logic to drive the SFP can actually be split to a per-port
+> > > > control logic, allowing support for multi-port PHYs, or PHYs that can
+> > > > either drive SFPs or Copper.
+> > > > 
+> > > > To that extent, create a phy_port when registering an SFP bus onto a
+> > > > PHY. This port is considered a "serdes" port, in that it can feed data
+> > > > to anther entity on the link. The PHY driver needs to specify the
+> > > > various PHY_INTERFACE_MODE_XXX that this port supports.
+> > > > 
+> > > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>    
+> > > 
+> > > With this change, using phy_port requires phylink to also be built in
+> > > an appropriate manner. Currently, phylink depends on phylib. phy_port
+> > > becomes part of phylib. This patch makes phylib depend on phylink,
+> > > thereby creating a circular dependency when modular.
+> > > 
+> > > I think a different approach is needed here.  
+> > 
+> > That's true.
+> > 
+> > One way to avoid that would be to extract out of phylink/phylib all the
+> > functions for linkmode handling that aren't tied to phylink/phylib
+> > directly, but are about managing the capabilities of each interface,
+> > linkmode, speed, duplex, etc. For phylink, that would be :
+> > 
+> > phylink_merge_link_mode
+> > phylink_get_capabilities
+> > phylink_cap_from_speed_duplex
+> > phylink_limit_mac_speed
+> > phylink_caps_to_linkmodes
+> > phylink_interface_max_speed
+> > phylink_interface_signal_rate
+> > phylink_is_empty_linkmode
+> > phylink_an_mode_str
+> > phylink_set_port_modes
+> > 
+> > For now all these are phylink internal and that makes sense, but if we want
+> > phy-driven SFP support, stackable PHYs and so on, we'll need some ways for
+> > the PHY to expose its media-side capabilities, and we'd reuse these.
+> > 
+> > These would go into linkmode.c/h for example, and we'd have a shared set
+> > of helpers that we can use in phylink, phylib and phy_port.
+> > 
+> > Before I go around and rearrange that, are you OK with this approach ?  
 > 
->  void tcp_time_wait(struct sock *sk, int state, int timeo);
+> I'm not convinced. If you're thinking of that level of re-use, you're
+> probably going to miss out on a lot of logic that's in phylink. Maybe
+> there should be a way to re-use phylink in its entirety between the
+> PHY and SFP.
 > 
-> -#define MAX_TCP_HEADER L1_CACHE_ALIGN(128 + MAX_HEADER)
-> +#define MAX_TCP_HEADER L1_CACHE_ALIGN(64 + MAX_HEADER)
+> Some of the above (that deal only with linkmodes) would make sense
+> to move out though.
 
-I'm sorry for the latency following-up here, I really want to avoid
-another fiasco.
-
-If I read correctly, you see the warning on top of my patch because you
-have the above chunk in your local tree, am I correct?
-
-If so, would you be ok to split the change in a 'net' patch doing the
-minimal fix (basically the initially posted patch) and following-up on
-net-next to adjust MAX_TCP_HEADER and SKB_SMALL_HEAD_SIZE as you suggest?
-
-I have a vague fear some encap scenario may suffer from the reduced TCP
-headroom, I would refrain from pushing such change on stable, if possible.
+Yeah I'm thinking about moving only stuff that is phylink-independent
+and only deals with linkmodes indeed. I'll spin a quick series to see
+what it looks like then :)
 
 Thanks,
 
-Paolo
+Maxime
 
 
