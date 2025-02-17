@@ -1,117 +1,247 @@
-Return-Path: <netdev+bounces-166865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5ACA379FA
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 04:00:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE04A37A16
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 04:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62E53A8199
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 03:00:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA1816BBB4
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 03:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD8113D51E;
-	Mon, 17 Feb 2025 03:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605AC137C35;
+	Mon, 17 Feb 2025 03:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TLgHKZg9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXn+4njk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA5828F3;
-	Mon, 17 Feb 2025 03:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69EB14A8B;
+	Mon, 17 Feb 2025 03:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739761250; cv=none; b=Aev2jUBWE5hkank7O4nrwnNsM/eWYR7Blyo8Ejc8CdlqbnoasMtm/TwnUoytuGqR5IvA50m1Br/g0qEu1gooQTFaAaaULsh5UiAH2BDGMujaTsWnKxLCxoX2gTaDPRrShkKmDrhhFPDQwJkPBWOKkxmeO5uubEI6fmZXxmo6KAo=
+	t=1739763603; cv=none; b=WWm9rzrhqR7RbqhFNIb8SYPVv/mrJbchNMeb7WDt2nPF5PCq2Tr1hDbAMHIuEur4mc+mCQCs+4iR2jP4Q86Oc5KbKYf6M6iEdVc1bysb9hSO3sw8FHig7UkiWbZGJ/vcff/61Hb/Rq/DHitgR/wrQCjJYMsIcDAsr0EE4l4rRnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739761250; c=relaxed/simple;
-	bh=098GAOcKJg2uwNyJFgX23kEQUSWjMe3wSSU467lSHII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L3m8iEtayHj/jDhV39h7at7dfttRjXL+ByUFALZ9K0kgXwDHRSwtbI++f9Zx34irlSywW1WjChL1sCm6a8RUwOZT5uBmqkv3eIL+5rE5b4VVASPF6P07rgVbVPNw+I+oppIRiFq8z5Ogm3riZJ/fxxoQH24ryotUfcwVr2T8UQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TLgHKZg9; arc=none smtp.client-ip=209.85.216.45
+	s=arc-20240116; t=1739763603; c=relaxed/simple;
+	bh=RK/P+pWG4JXB19s/DWzQXlS4u/zUdRoJ/2f25zmF/J4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZL8EBboGG5Xg8fmC+4zF+jeODnqfrbkzWPQ/Ei2lX1b8U4cCgSlfsxED6GByDcWKUXL4Zj8k2qLhxRNKF240luj8USiOla/NuiubZKqxUwBTSok0h4gzrnkHS14aJ60CDkUdHSHAvq4d0zRhGeOP4WIo9KU0I1thzeNz+7IX6SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXn+4njk; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2fbfc9ff0b9so5841339a91.2;
-        Sun, 16 Feb 2025 19:00:49 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2f83a8afcbbso5955251a91.1;
+        Sun, 16 Feb 2025 19:40:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739761249; x=1740366049; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RM9oXdBZNW/iQqyTSg1FXsRacwBHB2wVEo55z428eLA=;
-        b=TLgHKZg9laGqQb6IVf8mPgbHYpAIkvUERX7kWfGlR7aEO4OOZQD/k5/fFgv6Em17BQ
-         VfGu4lXHRYij9jRIvRLZs4oaVb5HSrNDtNCLSxv9s/u522XISRfVmZc9DV0Ei/wgxSyi
-         uR9/RyeYs4kJ43uKqf2iAM0HTtqML04D8qb7eSZhXrC6yH+OV3X64izVbleU0S3B/Tna
-         ndjnEzoucHvuMLnL59ODNENojTEURralLsw4DgMbEug7Ka/Qcy1w2TRfSJSz04lsxVY0
-         lvVSdB0xJPkLgfmUtlXrZ3jjKcgcWvVBSk9fs/6/HYndjO7lW9oSxkpshqFaOn8zUguw
-         jylg==
+        d=gmail.com; s=20230601; t=1739763601; x=1740368401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nl62NtlkEq5ALtFLjtQ5AGx38czK9K3XMJPBTb4YpgM=;
+        b=mXn+4njkhkSI0CL6IcajJQJCWtUyFIgO8dkn7MpTJyMcCrv6Fl/d3XL2rTZQvTv4tG
+         2kfv0v4amCP7JqD7d3WhD+bOgHZbZigx0RQvZFlV8YbfudYNepa46jOg/qJ+de8UlPP6
+         kOEv/QaeeqEDzOt9No9PfhnHoTqBVj0qvsdy0qlOLM+6afN5k51JhmLHLJ0D2Q6ZHUhw
+         71X7/Ylxw7m2Z3iym8Ibt4IqcAeOGsyb1ydyl3VJvVWMaIKfwPcs/QTJF5+i+pZMPTY+
+         /qeHFNs8fb505y/0TMz8Uhpw1/Ra2ncbfjl0wydNtqyh8LLNca+vqHEBSCO+OUSDc+Ra
+         Gszg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739761249; x=1740366049;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RM9oXdBZNW/iQqyTSg1FXsRacwBHB2wVEo55z428eLA=;
-        b=h3owaFm6f6yIOT0cAMRPeU963K2QiXoskF2N43rYges4X1MblK8NIpEK+U5ZmHvTgm
-         6Z7WyRcLon+X4z8AGJdGHykqoXcizMKqlCi4hTMDJVi9KlsMQUzmooDwU+WEYCmueex2
-         EaNg+/xfFE6mAyB/+ctvyAceJxceGldTH6MNQ0Fo9xdTbOk5kK9p+qSI4X0tkiy+Othm
-         bn+0a+/f4uwsXcF9qw7nhDt/Bx14wp10YskAlfkOXWYDYiApPPqsZTshk8+ZCM7pAv/8
-         x+5mOzLYUOAPi3yvYK5ZHroaoMBwnS7At3hljFysqWd2ODyZ+78R/L+tZnAtKeXGwQD7
-         TKkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUu0DUty1i4BV+keeE4eZXdE4dzYJr+peqx6YZeKwnvGMoexGvz/vT70SjJaYuTp0bm0qfg7FCvOcGHW1Sd@vger.kernel.org, AJvYcCWObp4RU1otE+20/Ib8Ssd/ODLmvilCZUdcXjQswB3EYFBbcqS6pIL74O/RaU5uGpO2vMb4zmZC@vger.kernel.org, AJvYcCXyDAzgPXDbmXJjwOO3lVqxCNo5SYwtCfzcE6aDHVbjep/Yd/hlLFR+wi0TVvhUzUErm2mVHkrM@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2/53Cj+TWostcubFgeqL37t3NIET5oEJZXqVcLX2IUST11xrT
-	GYsPFLtbLK5XN+CaaKViyiS+AYamfaB4oL+TCbzsbDgi1h2HcaEb
-X-Gm-Gg: ASbGncvLWlQ3bZkHOLEIdsBd3SDL//5wGthwrXXxoPwcXPv5uzdhfCSO5vClbI3GEq3
-	fRke94GA0XQdpZ7Y7YgSTIv5SauYaf3+1q4x8ENUZOw2ePXiV/idbzqrCTOoPjicYkri/3M777a
-	wewBBH3dzL7pZbwPcp26FJmKIjenjeeubwDRhmafjFopic+EOZNq1g4lnJNFSDf85f9IM/oqYge
-	PCGn+SiRsBuTSeskpFzNuVRNrvvOqqQ5lF8WhHc17NmewEpf97e5DQScB3T4DXgKjAvR0MxXZgc
-	nbTbSVL8DuvP6hlURwzL
-X-Google-Smtp-Source: AGHT+IFlbZXzjTjaiCfw7RWv2kRvgfxitjDjmHfqC8UYJCSB2hhBiRs+ip/IcfoDod4m+VWndDNKwQ==
-X-Received: by 2002:a05:6a00:244e:b0:71e:21:d2d8 with SMTP id d2e1a72fcca58-7326179d668mr14480366b3a.7.1739761248651;
-        Sun, 16 Feb 2025 19:00:48 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73265678abasm3272624b3a.27.2025.02.16.19.00.42
+        d=1e100.net; s=20230601; t=1739763601; x=1740368401;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nl62NtlkEq5ALtFLjtQ5AGx38czK9K3XMJPBTb4YpgM=;
+        b=u/4xkKC7Cl0af2fBbGWLttx1YqoXvpzazwsov+FkAvx5PxdCnw4HM6BUPsKMeqiEnq
+         CC3H4bl10TR6XhMiFmxDpB9QMBmvsM6fi1yrRF2gI8lem3GvHFOcYEXegNE0f3f6YdjU
+         tN57B2IwaEfZm0sFWp42NLPqpxTFQWMLIRAYRb8l1uETdn8ZKSH2xRufxL7TZwgKWDQv
+         E0LiG/fLVxVwnk65hp6CfNB7ztcgq1+kx4waZFdGbl5OPa3pJ1HaJ6JazhckK+TymIyY
+         U8CBMxVpwYIc+5MxaKArnJs7DFYt/ydHOoXiZOsppFH4A7JrHXT5/25Z//q9alsDHt9T
+         8Xog==
+X-Forwarded-Encrypted: i=1; AJvYcCU9pW217OKtGhSzi8aLohQffMIY5MosTnUavWlyr9G8FAi7o8ZQ+60sQzsl+8xA1kZiIQND3JPa@vger.kernel.org, AJvYcCVnbIpjz+RK+4qCNZhhuW1gtb9e+4f2ewtmZ19RbgdYXTCZyEKxBumULnrl/tOFKD5UWAkw04IwhF9QA4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxuc4tg1MpTXopNNetztFKGQTTfIs16OR/zj8Iox2r0dgAiNnjr
+	6ZK6m/pfGNAaX7yo6yzKth/G+ew5VWXGcpB0QXZxxivPPIZBB1RO
+X-Gm-Gg: ASbGncuN7yda73FF3c11lPZNkb/cO2dudMorzqXWfuUcl8UHnA7lPSSRDHKeebOYoVw
+	KKYVnLIOzS8SEgo6zYk5zi134HhIh9BOsboGX/k/SRywiZ6IFeRQVTIWTNJi4jbRu/Z0++0Tdnh
+	grVDcEldOVHwqmF9FVPj409Bz/F3+rYLGg3sbwJmBqf5agtTO82ooI9C87i0orbkVsUkJP1VZz4
+	ZV+XD+HGZDm2+bXPkTiWfGLhb9LetKYMsVteia2s3IbXCh2W5J7g0YLDRL80FPH/nHSwnMExU3k
+	ej7DGpLg
+X-Google-Smtp-Source: AGHT+IFMjtFP6+eFxDZoPED1z+G8rAnlAtkY/tMQA24zNyKne9VxhqPhvrZG/sxzoSOa5figDdM6qw==
+X-Received: by 2002:a17:90b:4b48:b0:2fa:2133:bc87 with SMTP id 98e67ed59e1d1-2fc0f955234mr25277232a91.6.1739763600850;
+        Sun, 16 Feb 2025 19:40:00 -0800 (PST)
+Received: from gmail.com ([116.237.135.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fc327a9d68sm5895139a91.1.2025.02.16.19.39.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Feb 2025 19:00:47 -0800 (PST)
-Date: Mon, 17 Feb 2025 03:00:40 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: Aditya Dutt <duttaditya18@gmail.com>, Shuah Khan <shuah@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] selftests: make shell scripts POSIX-compliant
-Message-ID: <Z7KmWNNIsXCnhiax@fedora>
-References: <20250216120225.324468-1-duttaditya18@gmail.com>
- <Z7IOR2UNzjy7cQA7@slm.duckdns.org>
+        Sun, 16 Feb 2025 19:40:00 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next v3] net: ethernet: mediatek: add EEE support
+Date: Mon, 17 Feb 2025 11:39:53 +0800
+Message-ID: <20250217033954.3698772-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7IOR2UNzjy7cQA7@slm.duckdns.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 16, 2025 at 06:11:51AM -1000, Tejun Heo wrote:
-> On Sun, Feb 16, 2025 at 05:32:25PM +0530, Aditya Dutt wrote:
-> > Changes include:
-> > - Replaced [[ ... ]] with [ ... ]
-> > - Replaced == with =
-> > - Replaced printf -v with cur=$(printf ...).
-> > - Replaced echo -e with printf "%b\n" ...
-> > 
-> > The above mentioned are Bash/GNU extensions and are not part of POSIX.
-> > Using shells like dash or non-GNU coreutils may produce errors.
-> > They have been replaced with POSIX-compatible alternatives.
-> 
-> Maybe just update them to use /bin/bash instead? There haven't been a lot of
-> reports of actual breakges and a lot of existing tests are using /bin/bash
-> already.
+Add EEE support to MediaTek SoC Ethernet. The register fields are
+similar to the ones in MT7531, except that the LPI threshold is in
+milliseconds.
 
-+1
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+v3: use phylink managed EEE
 
-Hangbin
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 65 +++++++++++++++++++++
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 11 ++++
+ 2 files changed, 76 insertions(+)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 0ad965ced5ef..985010a7b277 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -815,12 +815,58 @@ static void mtk_mac_link_up(struct phylink_config *config,
+ 	mtk_w32(mac->hw, mcr, MTK_MAC_MCR(mac->id));
+ }
+ 
++static void mtk_mac_disable_tx_lpi(struct phylink_config *config)
++{
++	struct mtk_mac *mac = container_of(config, struct mtk_mac,
++					   phylink_config);
++	struct mtk_eth *eth = mac->hw;
++
++	mtk_m32(eth, MAC_MCR_EEE100M | MAC_MCR_EEE1G, 0, MTK_MAC_MCR(mac->id));
++}
++
++static int mtk_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
++				 bool tx_clk_stop)
++{
++	struct mtk_mac *mac = container_of(config, struct mtk_mac,
++					   phylink_config);
++	struct mtk_eth *eth = mac->hw;
++	u32 val;
++
++	/* Tx idle timer in ms */
++	timer = DIV_ROUND_UP(timer, 1000);
++
++	/* If the timer is zero, then set LPI_MODE, which allows the
++	 * system to enter LPI mode immediately rather than waiting for
++	 * the LPI threshold.
++	 */
++	if (!timer)
++		val = MAC_EEE_LPI_MODE;
++	else if (FIELD_FIT(MAC_EEE_LPI_TXIDLE_THD, timer))
++		val = FIELD_PREP(MAC_EEE_LPI_TXIDLE_THD, timer);
++	else
++		val = MAC_EEE_LPI_TXIDLE_THD;
++
++	if (tx_clk_stop)
++		val |= MAC_EEE_CKG_TXIDLE;
++
++	/* PHY Wake-up time, this field does not have a reset value, so use the
++	 * reset value from MT7531 (36us for 100M and 17us for 1000M).
++	 */
++	val |= FIELD_PREP(MAC_EEE_WAKEUP_TIME_1000, 17) |
++	       FIELD_PREP(MAC_EEE_WAKEUP_TIME_100, 36);
++
++	mtk_w32(eth, val, MTK_MAC_EEECR(mac->id));
++	mtk_m32(eth, 0, MAC_MCR_EEE100M | MAC_MCR_EEE1G, MTK_MAC_MCR(mac->id));
++}
++
+ static const struct phylink_mac_ops mtk_phylink_ops = {
+ 	.mac_select_pcs = mtk_mac_select_pcs,
+ 	.mac_config = mtk_mac_config,
+ 	.mac_finish = mtk_mac_finish,
+ 	.mac_link_down = mtk_mac_link_down,
+ 	.mac_link_up = mtk_mac_link_up,
++	.mac_disable_tx_lpi = mtk_mac_disable_tx_lpi,
++	.mac_enable_tx_lpi = mtk_mac_enable_tx_lpi,
+ };
+ 
+ static int mtk_mdio_init(struct mtk_eth *eth)
+@@ -4469,6 +4515,20 @@ static int mtk_set_pauseparam(struct net_device *dev, struct ethtool_pauseparam
+ 	return phylink_ethtool_set_pauseparam(mac->phylink, pause);
+ }
+ 
++static int mtk_get_eee(struct net_device *dev, struct ethtool_keee *eee)
++{
++	struct mtk_mac *mac = netdev_priv(dev);
++
++	return phylink_ethtool_get_eee(mac->phylink, eee);
++}
++
++static int mtk_set_eee(struct net_device *dev, struct ethtool_keee *eee)
++{
++	struct mtk_mac *mac = netdev_priv(dev);
++
++	return phylink_ethtool_set_eee(mac->phylink, eee);
++}
++
+ static u16 mtk_select_queue(struct net_device *dev, struct sk_buff *skb,
+ 			    struct net_device *sb_dev)
+ {
+@@ -4501,6 +4561,8 @@ static const struct ethtool_ops mtk_ethtool_ops = {
+ 	.set_pauseparam		= mtk_set_pauseparam,
+ 	.get_rxnfc		= mtk_get_rxnfc,
+ 	.set_rxnfc		= mtk_set_rxnfc,
++	.get_eee		= mtk_get_eee,
++	.set_eee		= mtk_set_eee,
+ };
+ 
+ static const struct net_device_ops mtk_netdev_ops = {
+@@ -4610,6 +4672,9 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+ 	mac->phylink_config.type = PHYLINK_NETDEV;
+ 	mac->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+ 		MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD;
++	mac->phylink_config.lpi_capabilities = MAC_100FD | MAC_1000FD |
++		MAC_2500FD;
++	mac->phylink_config.lpi_timer_default = 1000;
+ 
+ 	/* MT7623 gmac0 is now missing its speed-specific PLL configuration
+ 	 * in its .mac_config method (since state->speed is not valid there.
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index 0d5225f1d3ee..90a377ab4359 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -453,6 +453,8 @@
+ #define MAC_MCR_RX_FIFO_CLR_DIS	BIT(12)
+ #define MAC_MCR_BACKOFF_EN	BIT(9)
+ #define MAC_MCR_BACKPR_EN	BIT(8)
++#define MAC_MCR_EEE1G		BIT(7)
++#define MAC_MCR_EEE100M		BIT(6)
+ #define MAC_MCR_FORCE_RX_FC	BIT(5)
+ #define MAC_MCR_FORCE_TX_FC	BIT(4)
+ #define MAC_MCR_SPEED_1000	BIT(3)
+@@ -461,6 +463,15 @@
+ #define MAC_MCR_FORCE_LINK	BIT(0)
+ #define MAC_MCR_FORCE_LINK_DOWN	(MAC_MCR_FORCE_MODE)
+ 
++/* Mac EEE control registers */
++#define MTK_MAC_EEECR(x)		(0x10104 + (x * 0x100))
++#define MAC_EEE_WAKEUP_TIME_1000	GENMASK(31, 24)
++#define MAC_EEE_WAKEUP_TIME_100		GENMASK(23, 16)
++#define MAC_EEE_LPI_TXIDLE_THD		GENMASK(15, 8)
++#define MAC_EEE_CKG_TXIDLE		BIT(3)
++#define MAC_EEE_CKG_RXLPI		BIT(2)
++#define MAC_EEE_LPI_MODE		BIT(0)
++
+ /* Mac status registers */
+ #define MTK_MAC_MSR(x)		(0x10108 + (x * 0x100))
+ #define MAC_MSR_EEE1G		BIT(7)
+-- 
+2.43.0
+
 
