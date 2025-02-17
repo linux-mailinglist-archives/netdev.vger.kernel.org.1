@@ -1,175 +1,133 @@
-Return-Path: <netdev+bounces-167055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443D3A38A07
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 17:49:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34C0CA38A13
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 17:53:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E98D16480D
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 16:48:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81BE23AFFD9
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 16:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1070224AE2;
-	Mon, 17 Feb 2025 16:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2027B226164;
+	Mon, 17 Feb 2025 16:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="COEeIN/d"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Gx4Sc2h4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FEE219A73;
-	Mon, 17 Feb 2025 16:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26986225A5E;
+	Mon, 17 Feb 2025 16:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739810857; cv=none; b=OR/eOiGUNqf4SHNqtxCkuaLi0dC1W8s71wdP17oCFyU3M7Uz+79mtX6E4jiM+lk1r9vRzrHV6Wnu2FWa959FPy2RuUAEuCQMna6rumGdBzD7u8ysPAyGXVug7iQNoNv3/VAg5NMru4LelF3TfZen8b2TRKCIMN+C4HPMxQ5vwnE=
+	t=1739811172; cv=none; b=hETayvUJLN9zlts8xrT89g9EtQ0+n/AkgCpiN3XmT7h/Aa/Sl5d6enGRJarPsb84OBX2nocX1x0u4NdGi8i2o5tvDfUfeMGZKENRY4LoGnfAev3rfpEER7wioNMr5aiZGW66s8j8JKiSiZfYMWgapKWvbjbLiKQQZCny/nuakjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739810857; c=relaxed/simple;
-	bh=sw8pTD5L7f/xyTmDClNuUdGkQf3mf7K3EDXECSx0tW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fpyrj9PQkxZgKduwu0E52pR55jrZDdvYm4JBez3UgB81se9o/1UGzAFdX0gno4qWX94KNCI11ipq/DvLFk5Dijt+0xbS1uIfzBy+xP9IPfBn4+NdMl4rISl0MB+2OWvaOffPn0Qy9hWvbpojup929LhDhLqfzlmV5+Wi0ZebI38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=COEeIN/d; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-221050f3f00so38383055ad.2;
-        Mon, 17 Feb 2025 08:47:34 -0800 (PST)
+	s=arc-20240116; t=1739811172; c=relaxed/simple;
+	bh=X4cvVIWVhux9AouNtmKi1B1TTu5K6YBiJUq7zv/wHlM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ElYidw3HV8mvYJAQ3luIqXxkNbc88k4cfWzo0P/MmA908nSYLKyTZRZIRJOFOl9qemFGEQ5vrBE8xFNKyMk31lVJAPfmku6H/JFwtf/diL5YDPY8We1a9DitEqMGG3yfrRd4K70UfCwqHgK0Q9twpP79LKEmSAi9UCoIZ2SoHbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Gx4Sc2h4; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739810854; x=1740415654; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L5NFIOo8aeK30zNembu50MeEzUimT6pz5br8YkV9ZoA=;
-        b=COEeIN/djNYdd9t8FiPoDZBjOa9b15+MupuSq7Wp8JZglanpvUWZ7dYJtAwqnNSbR9
-         6jJMaLHjyYDLC/DGTcmrTvjKLQ2DR6euIw4ChwUSqj3cOsXsJjdTUk8y2bSU4yJtxCcT
-         B4J/aGhV4EpqKOwLZUu7qKNF5cux3uvrExxwMWc7ngEjBZqK+dfG+MYk23pPhkNjTqoZ
-         pCqFFB5dZqEly/NFZuhf9X7OdlZf8cKkblF7tC49kTy3YpK/6fYDJ4U/80KXZF0JlizR
-         Ttsvz4EulatL2OFh7mRE1xjbgahx+g/m4gC7pXLoUftGqPWgr5jORXhxx8ZAq2U70QJh
-         kVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739810854; x=1740415654;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L5NFIOo8aeK30zNembu50MeEzUimT6pz5br8YkV9ZoA=;
-        b=La5z0B5lKnk1BV6VHlYm2DnhQ4Hgtp4bJmHZ6CCFel4OFEsLMi8kNlPGPoPQ2GNpXN
-         Krg1DIBUGEzLalyclUW7/VsoBvsgPTpTHtNyYdhYKGclKTrB04mG1VQc357i7KBHQgfl
-         Xr9JxoHy5uLW51tDFYDnUXUjird4GpCEcNHPWwbpdLBSnxrcttw12cDkJ1Es7vCc+TW+
-         CffrUJ09wofMhrsBu8DpXD0U2Vrd/NwYkQk5wMAcAsClEj1/4l8GY+ub55uVWTO1eFjs
-         fYOhOUfqqjGcnWl8oCX+rSAAS6n3rFz0GHKSQ+V7JQGPixSuXfDGHtIWf00M7cNL5R8n
-         dv2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVwZQuFX6CXyqLuKVkBS3jouBEo2CgqeNplcpKPK+HKUIyYjBGshgM/ahE7L27weVumKlS+xAI=@vger.kernel.org, AJvYcCXXkKfiPmjWMpWn2UVFdrIpPKOF3p9KM+fDYrKoSKIucEfXPiknd0+3cAPKCuo5EO5QUAljWd5P@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq4qVEWBVmB0kPfdgBAe0vIhLO5YcTgN/t43ATBLJ/Zh/sX783
-	YB/5QCttEsdgx5c1HntD1pFGqQExACklJy8KgNPiKHtaCVf//hcwbCudOQ==
-X-Gm-Gg: ASbGncvXUd1lkUbbUi78VOFxJFULUGYAu8lUV++ZTfesNT4iFJG3Q9LoKqarSas8S4i
-	wDJ9Qqsh6MzwS8mUSnM36QZ29J2dRlr29E7D91TZEGwOnSY7R8d4VgdKNFN2J9eaGAcATz9QTs6
-	T10/SmZklQmNsIWuG0JzjuuvR8nBDHnBDgcWmX879hSgVxQTgIrZrC/+MuQfdKorbPmZdCYPZt5
-	y33s1gNOkdQBSW46CYsvIYmGtxSOECEPwG9/T7+v1nJak10N2tF+1/7tsQ5BNuE1vAd+Gd0Z5Yo
-	2eHGJgk+VG5GElsAWDCkHQ==
-X-Google-Smtp-Source: AGHT+IFIaPv7NyLLy/UOLz0rxwj+Ad1zK/Zvxkn4+3f9o2V+R6fuvptqhKuq5mccuBSIPdyjYCU0jA==
-X-Received: by 2002:a05:6a20:93a1:b0:1ee:8bd2:5717 with SMTP id adf61e73a8af0-1ee8cc18814mr17494408637.42.1739810854231;
-        Mon, 17 Feb 2025 08:47:34 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:3ed7:9c4c:c545:4371])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-732521b82b3sm6602344b3a.92.2025.02.17.08.47.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 08:47:33 -0800 (PST)
-Date: Mon, 17 Feb 2025 08:47:32 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Qiang Zhang <dtzq01@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	regressions@lists.linux.dev
-Subject: Re: [RESEND]tc-flower not worked when configured dst_port and
- src_port range in one rule.
-Message-ID: <Z7NoJHQ7hLiTXuA1@pop-os.localdomain>
-References: <CAPx+-5uvFxkhkz4=j_Xuwkezjn9U6kzKTD5jz4tZ9msSJ0fOJA@mail.gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739811170; x=1771347170;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=fIklRPm2/sNZHi8okh/gRXXTiabhqQojur/3BF22Cgs=;
+  b=Gx4Sc2h4dT7L23r4G7Ah+ngUYIK2QDGF+YRnvUVzNwYqSKwO0IscnpXs
+   SXH1UVMZbge+PfCIrG8hXzgiup1yGKcPo+0aU9EHYbbjoaeKOaGUFsqWY
+   pTyro0IU/65THUWFA5zJxLFgV1ehUV0clFCP5VgxkQVBb/wn2cyFq57pw
+   I=;
+X-IronPort-AV: E=Sophos;i="6.13,293,1732579200"; 
+   d="scan'208";a="467592388"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 16:52:45 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:29541]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.186:2525] with esmtp (Farcaster)
+ id cee1e0c6-a83f-487c-88e5-59e67027c934; Mon, 17 Feb 2025 16:52:44 +0000 (UTC)
+X-Farcaster-Flow-ID: cee1e0c6-a83f-487c-88e5-59e67027c934
+Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 17 Feb 2025 16:52:44 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.7) by
+ EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 17 Feb 2025 16:52:38 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <enjuk@amazon.com>, <gnaaman@drivenets.com>,
+	<horms@kernel.org>, <joel.granados@kernel.org>, <kohei.enju@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<lizetao1@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<cl@linux.com>, <penberg@kernel.org>, <rientjes@google.com>,
+	<iamjoonsoo.kim@lge.com>, <akpm@linux-foundation.org>, <vbabka@suse.cz>,
+	<roman.gushchin@linux.dev>, <42.hyeyoo@gmail.com>
+Subject: Re: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc() when GFP_ATOMIC is specified
+Date: Tue, 18 Feb 2025 01:52:29 +0900
+Message-ID: <20250217165229.87240-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <CANn89i+ap-8BB_XKfcjMnXLR0ae+XV+6s_jacPLUd8rqSgyayA@mail.gmail.com>
+References: <CANn89i+ap-8BB_XKfcjMnXLR0ae+XV+6s_jacPLUd8rqSgyayA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPx+-5uvFxkhkz4=j_Xuwkezjn9U6kzKTD5jz4tZ9msSJ0fOJA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D003ANC003.ant.amazon.com (10.37.240.197)
 
-On Fri, Feb 14, 2025 at 05:00:30PM +0800, Qiang Zhang wrote:
-> Hi, all.
-> 
-> recently met an issue: tc-flower not worked when configured dst_port
-> and src_port range in one rule.
-> 
-> detailed like this:
-> $ tc qdisc add dev ens38 ingress
-> $ tc filter add dev ens38 ingress protocol ip flower ip_proto udp \
->   dst_port 5000 src_port 2000-3000 action drop
-> 
-> I try to find the root cause in kernel source code:
-> 1. FLOW_DISSECTOR_KEY_PORTS and FLOW_DISSECTOR_KEY_PORTS_RANGE flag of
-> mask->dissector were set
-> in fl_classify from flow_dissector.c.
-> 2. then skb_flow_dissect -> __skb_flow_dissect -> __skb_flow_dissect_ports.
-> 3. FLOW_DISSECTOR_KEY_PORTS handled and FLOW_DISSECTOR_KEY_PORTS_RANGE
-> not handled
-> in __skb_flow_dissect_ports, so tp_range.tp.src was 0 here expected
-> the actual skb source port.
-> 
-> By the way, __skb_flow_bpf_to_target function may has the same issue.
-> 
-> Please help confirm and fix it, thank you.
-> 
++ SLAB ALLOCATOR maintainers and reviewers
 
-Thanks for your analysis and report!
+> > From: Kohei Enju <enjuk@amazon.com>
+> > Date: Mon, 17 Feb 2025 01:30:16 +0900
+> > > Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
+> > > specified, since kvzalloc() doesn't support non-sleeping allocations such
+> > > as GFP_ATOMIC.
+> > >
+> > > With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
+> > > path and returns immediately after the kmalloc path fails.
+> > > Therefore, using kzalloc() is sufficient in this case.
+> > >
+> > > Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
+> >
+> > This commit followed the old hash_buckets allocation, so I'd add
+> >
+> >   Fixes: ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()")
+> >
+> > too.
+> >
+> > Both commits were introduced in v6.13, so there's no difference in terms
+> > of backporting though.
+> >
+> > Also, it would be nice to CC mm maintainers in case they have some
+> > comments.
+> 
+> Oh well, we need to trigger neigh_hash_grow() from a process context,
+> or convert net/core/neighbour.c to modern rhashtable.
 
-I think you are right, please try the following patch. I tested it by
-myself and I am working on a selftest to cover this case.
+Hi all, thanks for your comments.
 
----
+kzalloc() uses page allocator when size is larger than 
+KMALLOC_MAX_CACHE_SIZE, so I think what commit ab101c553bc1 ("neighbour: 
+use kvzalloc()/kvfree()") intended could be achieved by using kzalloc().
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 5db41bf2ed93..c33af3ef0b79 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -853,23 +853,30 @@ __skb_flow_dissect_ports(const struct sk_buff *skb,
- 			 void *target_container, const void *data,
- 			 int nhoff, u8 ip_proto, int hlen)
- {
--	enum flow_dissector_key_id dissector_ports = FLOW_DISSECTOR_KEY_MAX;
--	struct flow_dissector_key_ports *key_ports;
-+	struct flow_dissector_key_ports_range *key_ports_range = NULL;
-+	struct flow_dissector_key_ports *key_ports = NULL;
-+	__be32 ports;
- 
- 	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS))
--		dissector_ports = FLOW_DISSECTOR_KEY_PORTS;
--	else if (dissector_uses_key(flow_dissector,
--				    FLOW_DISSECTOR_KEY_PORTS_RANGE))
--		dissector_ports = FLOW_DISSECTOR_KEY_PORTS_RANGE;
-+		key_ports = skb_flow_dissector_target(flow_dissector,
-+						      FLOW_DISSECTOR_KEY_PORTS,
-+						      target_container);
- 
--	if (dissector_ports == FLOW_DISSECTOR_KEY_MAX)
-+	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS_RANGE))
-+		key_ports_range = skb_flow_dissector_target(flow_dissector,
-+							    FLOW_DISSECTOR_KEY_PORTS_RANGE,
-+							    target_container);
-+
-+	if (!key_ports && !key_ports_range)
- 		return;
- 
--	key_ports = skb_flow_dissector_target(flow_dissector,
--					      dissector_ports,
--					      target_container);
--	key_ports->ports = __skb_flow_get_ports(skb, nhoff, ip_proto,
--						data, hlen);
-+	ports = __skb_flow_get_ports(skb, nhoff, ip_proto, data, hlen);
-+
-+	if (key_ports)
-+		key_ports->ports = ports;
-+
-+	if (key_ports_range)
-+		key_ports_range->tp.ports = ports;
- }
- 
- static void
+As mentioned, when using GFP_ATOMIC, kvzalloc() only tries the kmalloc 
+path, since the vmalloc path doesn't support the flag.
+In this case, kvzalloc() is equivalent to kzalloc() in that neither try 
+the vmalloc path, so there is no functional change between this patch and 
+either commit ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()") or 
+commit 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour").
+
+Actually there's no real bug in the current code so the Fixes tag was not 
+appropriate. I shall remove the tag.
+
+Regards,
+Kohei
 
