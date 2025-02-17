@@ -1,124 +1,151 @@
-Return-Path: <netdev+bounces-167027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F01A385E6
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:18:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB9BA3860C
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:22:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74C893B475E
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C52C173C88
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397B521D004;
-	Mon, 17 Feb 2025 14:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AEF2248A8;
+	Mon, 17 Feb 2025 14:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CoFuUB7V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzDTMiZo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCBF21CA07
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 14:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEB42248AC;
+	Mon, 17 Feb 2025 14:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739801662; cv=none; b=fCTSaD+H3XmyWQeRkMFCOuCRq0Jr0cWWDU2C/KNg+NufF1iW2941BDbyGlzL6fSv+gUEOlCZLTF12ESYqCeMq6ONpvF4dce6RVz3nPWxsc6yL+folv84sdE/KvexYLLnTH73mxAUYOPawczVPQ7wZaIUDZiLXEGFLVCMZFSHjPg=
+	t=1739801858; cv=none; b=tc+is4th8AmJHOiEzjTAALc2mWMr4fgzR6Sa77lMkyhg41PFU4xBw63Robve3cQizKgSkbftI3uCp92JD/gEgIsSFNX4KMuomUByzuduUE+Z0peuVctRLsXL3nCQ6s/GEJpn+EU9VeYadO+4ilc9eZ+oFGhyJQiETlgbst8GU+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739801662; c=relaxed/simple;
-	bh=DmRKIA81ischDwAmOUMnE56ItcSr1yGOCW5aJOAlBi4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fMV5al01JSKRDW/vWtjoU9lMCIkpfI1DohP3J4uSEQw+pBrEIv6NAjlWQTAd6KQEoJMeIa7ZRZek4SBFIgcHu/7Wiq+PQzHym1BPU7Q6bhgh3BEovyQa+omG/u7ltVAnPeLY+kGnoKWctBsCa4X9GvLORNcq0PoBpLa9gZPzTAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CoFuUB7V; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-abb86beea8cso293847166b.1
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 06:14:20 -0800 (PST)
+	s=arc-20240116; t=1739801858; c=relaxed/simple;
+	bh=o39YROBuVbA6O3ko9Qq4yI5dRM0+WT1BVbhUu9uV5uM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LNTx65Gn2qy6qoMWmsn9p9YG/QAxI/HuXSwO6kbuyGZk+VKMX9XcEJjh0Z9j4DUu+xo1AwEOYlQBLRCocvbD9mqncZniXaJBrVCiL2dDHLfbQtMvpyzU0VW5fPa3j5L74kodIdqZ+9d+ksOdmxdCfm1B362GthZpz80AzX9OhcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FzDTMiZo; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21c2f1b610dso110864635ad.0;
+        Mon, 17 Feb 2025 06:17:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739801659; x=1740406459; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NekdZXTafvfqhoDySEOcOucxcXKvkkXorz4QTbjm09c=;
-        b=CoFuUB7Va2KM2WkUvr8rHHtuXRuF5vEmV4WS4i77FzWP7MPIkbCUhNusf3nGuWTISB
-         YRJIYEppJQaxKFsE2ZrEovaorkE7MKt4YBJSbYKEvlYcD1431KQwn/G64vEPD7AGOg+A
-         Rsa17W56HAHwpyc1aLEMA5hDmpAPWMyibFCG5ZSkve98ngBrUxRhBqjbUpLmb2tVY79a
-         SFw+HgZLGii4eFm3XKDQlHfdpwdeRhSwh8jciN856MB/KfnNezsQGDFjw6LeOdNpFkft
-         TNgs8ksMnP/OWMh9ZZ/uX4XXl5xalaB5fiAnjtDpbktPAPAFYHODnTzasLXLRWBIUs1Q
-         y/8A==
+        d=gmail.com; s=20230601; t=1739801856; x=1740406656; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=euGD3DtL6BCGM+b7jkbY7enHbQAEo+xzdmRvXrR2nc0=;
+        b=FzDTMiZo8/oAVe9Hd0uk1REysvhn++aw2bT7qFeoyp0MskM6JrJSeryanqpvODJ+0J
+         kIOR27hemeg53WmxgsHaukYzTjKkHL7lHVhkUguzNpuELph9NgemPTkZLMq1YC5dgEBK
+         wVr1FzxCHLuyxqWwLJU5KHbG9uyF0kftD+2nO8M/dhm5s/7d2+dB/UYarCmhsdMghS/u
+         4c5R3b3zV3iqV0A728ofUXsZAGQNOa6DO/vevondDQiVLGN/92WTrwfeDAVcmfK8HQrl
+         6AJpOTuVNfo/2jAHGKi3t9le08l9oaTdS2rOrzoeqJQ6W17JiTB+YrFm2ZrV3Dh9XHlQ
+         NRNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739801659; x=1740406459;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NekdZXTafvfqhoDySEOcOucxcXKvkkXorz4QTbjm09c=;
-        b=Mwqr9gAAzQUeR6euqyASQun4n0hOAaS8I/D8NXOC+/XPs3VJltLLjAJ0yE8oKZLfoR
-         bJwYwlBwj+ytE8cOeTDa95kQ+JLQAcS787U4wYLOc4nf0FODWlOmwezMT0L+A0/W7V3O
-         cql/Qpo6cB5WcTKtSrmzrrdOZeFSwZFToiTZZmb3fHIc/elfmRLXeHfMKnYukqcdx+pI
-         +7yiarKG4rLjC60PIWicCI3sJZSqLfl2XlJY140SLMx1N/MVk7bY6e/DX+Yeran/6H7m
-         Hl4c1KmSEOxcJ7jvdYvi9+GEXn4oQaPkOeCeTD9HChgbCaE9TFvTuMfu955L90VCqX7E
-         WDLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXglCGzL84FyqIn5bGsQ/wRTy+bz+LW6GnZnFeO8YJf0lJH57D6CaDhKa4lElU4vPlJp2GHjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxueXgnlwuoL45iRR58vMTLPj5S6u0A0ksv7Rx3HZ5vZU7d9qgb
-	9VogZ/DUJBF5lEnTGJw0bCHM9z3IxBXwIt+5CS8lx/Zg4qG08f7K/46w8q38Ydg=
-X-Gm-Gg: ASbGncvk99AVSzUE2WUJ1WESKXRl4ist+wPCjnATViZ2ceX04MNBhaGifhjkIFyWze0
-	m/XtSNdRyYrXLZa8bbZVxriB7CoPpxQ1BClBFrrDnRukX1Y4hbqgJiRPzfRrEq8JuLjuxGsef8F
-	8YSjJL/Aae+6ess8KfOvo+2RRwf1GuAQ6sU7Wt/MG4rVEJ8DWEEgfCyrTY8FPpUb7MbvvSLr3Bp
-	lcU4bhDsB+c+XAP6Dwin9serLc2MxfSL6iylOXXcDj9j79C4TKlJX979rRFVWELsgzIKaQlEhv4
-	i6vasiCliszXE131bSz6
-X-Google-Smtp-Source: AGHT+IFIBR3Zp7n4KLa1AEo72USiTDt41XIvlExhYbBs/eXLCwhTItsYSqPIAHweOwZVqQQcbYAUmw==
-X-Received: by 2002:a17:907:780f:b0:ab7:440e:7d08 with SMTP id a640c23a62f3a-abb70bff32emr769230766b.4.1739801658666;
-        Mon, 17 Feb 2025 06:14:18 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-abb8fef1332sm308806366b.69.2025.02.17.06.14.17
+        d=1e100.net; s=20230601; t=1739801856; x=1740406656;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=euGD3DtL6BCGM+b7jkbY7enHbQAEo+xzdmRvXrR2nc0=;
+        b=PLVz9SE9ilvDrGivRPmDfgUvdKPs3ImUSGp5BsUV4o1S/DB2091GZDDanUe6ZQWC51
+         wYwl8AQo3fdUR/EC6uPxuGkQ9l4KOkQT7QTo5CNhn9LltWWbuTSrC4Vjfo/dtL55B91i
+         TCgqCPL2DJm0NpqNjG78XYRM5SQFsxJcCcdksChiuMnKyrRdyJnB5nMhsa7ty8CArCUe
+         Ex1xH1RFOqzoVLEuFxICn9PKzTGEVPjHpOaNZhjvkBf6v1BoUjJ/+CYv5EJ84WtElB6w
+         fqvKVf2br3Pwp5zzX4S8BN3oR3D3Df2THrBoI6ZHMcd3guNUx82ddgNQAmM00BIovTH6
+         rO9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVG9yLppmEmXwelKlu68whs8TAZDAx8X4WsCiObQpYx406U5Y0TFgcZg5Dg+9J+AiFiZHjn6/0xEhxMjuMcgMU=@vger.kernel.org, AJvYcCXAUaAVoh36wjUF0w48lu6PYy3SGytGyI2yruJYuL0FBIn9VQ+S1bkoqov7S31PLTVwfeX9xepd@vger.kernel.org
+X-Gm-Message-State: AOJu0YyftSJCf1OVFigyPasIg++x7EYXlChhNeqtZXMxhQ+T4ihg7ELu
+	lnS0iONpJhMIrhrQhJl7ZF7EAl1f/6Qk+o589IE4x147qZRifxeZ
+X-Gm-Gg: ASbGncubaqit+zjyMQrcbmNT3MR2z3IEtTK6lS6awgAMqQ1Oo2aV6oAuf9zD/xhHpzq
+	X/u500nNKZX6ysrdOAAePZITaSWFmCRL7uJD9ZElddgmb9YpVd2+TVSpBsIKocmQIuo7i3t2/UB
+	Ga24Pj9seluCsEh8T10kg+A5c5HwwCcTNyw4UqB8jz/w19T92gLdoUCIZz65kU/aUYkFAExhL35
+	yb/mEUecS/yccYPehkzEX+R17MU1DyAljQUrw7991PGybVHsMYxZDPNsyb1P2s3Lp1oLJBtipyB
+	YJL3Vd/8yd1ImZfyg4d3dCbpoXxIyEwspEHiyLcI
+X-Google-Smtp-Source: AGHT+IFpFeBSNuUJ9Jopviu3/MljT4Y04e+Tksr52wJhW7iAizRMSd95PeaL9LxYgEEhXppqNW6Htg==
+X-Received: by 2002:a17:903:1a0e:b0:220:f1a1:b6e1 with SMTP id d9443c01a7336-22104028854mr164379845ad.19.1739801856490;
+        Mon, 17 Feb 2025 06:17:36 -0800 (PST)
+Received: from localhost.localdomain ([122.171.19.71])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d545c8d1sm71648185ad.113.2025.02.17.06.17.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 06:14:18 -0800 (PST)
-Date: Mon, 17 Feb 2025 17:14:14 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Purva Yeshi <purvayeshi550@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	skhan@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	linux-sparse@vger.kernel.org
-Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
-Message-ID: <bbf51850-814a-4a30-8165-625d88f221a5@stanley.mountain>
-References: <20250210075006.9126-1-purvayeshi550@gmail.com>
- <20250215172440.GS1615191@kernel.org>
- <4fbba9c0-1802-43ec-99c4-e456b38b6ffd@stanley.mountain>
- <20250217111515.GI1615191@kernel.org>
+        Mon, 17 Feb 2025 06:17:36 -0800 (PST)
+From: Chandra Mohan Sundar <chandru.dav@gmail.com>
+To: skhan@linuxfoundation.org,
+	shuah@kernel.org
+Cc: Chandra Mohan Sundar <chandru.dav@gmail.com>,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] selftests: net : Fix few spelling mistakes
+Date: Mon, 17 Feb 2025 19:45:16 +0530
+Message-ID: <20250217141520.81033-1-chandru.dav@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250217111515.GI1615191@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 17, 2025 at 11:15:15AM +0000, Simon Horman wrote:
-> So, hypothetically, Smatch could be enhanced and there wouldn't be any
-> locking warnings with this patch applied?
+Fix few spelling mistakes in net selftests
 
-Heh.  No.  What I meant to say was that none of this has anything to do
-with Smatch.  This is all Sparse stuff.  But also I see now that my email
-was wrong...
+Signed-off-by: Chandra Mohan Sundar <chandru.dav@gmail.com>
+---
+ tools/testing/selftests/net/fcnal-test.sh   | 4 ++--
+ tools/testing/selftests/net/fdb_flush.sh    | 2 +-
+ tools/testing/selftests/net/fib_nexthops.sh | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-What happened is that we changed unix_sk() and that meant Sparse couldn't
-parse the annotations and prints "error: undefined identifier 'other'".
-The error disables Sparse checking for the file.
-
-When we fix the error then the checking is enabled again.  The v1 patch
-which changes the annotation is better than the v2 patch because then
-it's 9 warnings vs 11 warnings.
-
-The warnings are all false positives.  All old warnings are false
-positives.  And again, these are all Sparse warnings, not Smatch.  Smatch
-doesn't care about annotations.  Smatch has different bugs completely.
-;)
-
-regards,
-dan carpenter
+diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
+index 899dbad0104b..4fcc38907e48 100755
+--- a/tools/testing/selftests/net/fcnal-test.sh
++++ b/tools/testing/selftests/net/fcnal-test.sh
+@@ -3667,7 +3667,7 @@ ipv6_addr_bind_novrf()
+ 	# when it really should not
+ 	a=${NSA_LO_IP6}
+ 	log_start
+-	show_hint "Tecnically should fail since address is not on device but kernel allows"
++	show_hint "Technically should fail since address is not on device but kernel allows"
+ 	run_cmd nettest -6 -s -l ${a} -I ${NSA_DEV} -t1 -b
+ 	log_test_addr ${a} $? 0 "TCP socket bind to out of scope local address"
+ }
+@@ -3724,7 +3724,7 @@ ipv6_addr_bind_vrf()
+ 	# passes when it really should not
+ 	a=${VRF_IP6}
+ 	log_start
+-	show_hint "Tecnically should fail since address is not on device but kernel allows"
++	show_hint "Technically should fail since address is not on device but kernel allows"
+ 	run_cmd nettest -6 -s -l ${a} -I ${NSA_DEV} -t1 -b
+ 	log_test_addr ${a} $? 0 "TCP socket bind to VRF address with device bind"
+ 
+diff --git a/tools/testing/selftests/net/fdb_flush.sh b/tools/testing/selftests/net/fdb_flush.sh
+index d5e3abb8658c..9931a1e36e3d 100755
+--- a/tools/testing/selftests/net/fdb_flush.sh
++++ b/tools/testing/selftests/net/fdb_flush.sh
+@@ -583,7 +583,7 @@ vxlan_test_flush_by_remote_attributes()
+ 	$IP link del dev vx10
+ 	$IP link add name vx10 type vxlan dstport "$VXPORT" external
+ 
+-	# For multicat FDB entries, the VXLAN driver stores a linked list of
++	# For multicast FDB entries, the VXLAN driver stores a linked list of
+ 	# remotes for a given key. Verify that only the expected remotes are
+ 	# flushed.
+ 	multicast_fdb_entries_add
+diff --git a/tools/testing/selftests/net/fib_nexthops.sh b/tools/testing/selftests/net/fib_nexthops.sh
+index 77c83d9508d3..bea1282e0281 100755
+--- a/tools/testing/selftests/net/fib_nexthops.sh
++++ b/tools/testing/selftests/net/fib_nexthops.sh
+@@ -741,7 +741,7 @@ ipv6_fcnal()
+ 	run_cmd "$IP nexthop add id 52 via 2001:db8:92::3"
+ 	log_test $? 2 "Create nexthop - gw only"
+ 
+-	# gw is not reachable throught given dev
++	# gw is not reachable through given dev
+ 	run_cmd "$IP nexthop add id 53 via 2001:db8:3::3 dev veth1"
+ 	log_test $? 2 "Create nexthop - invalid gw+dev combination"
+ 
+-- 
+2.43.0
 
 
