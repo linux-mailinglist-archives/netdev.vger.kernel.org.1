@@ -1,262 +1,146 @@
-Return-Path: <netdev+bounces-166972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1334DA38361
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:49:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72501A383BC
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D64297A1A93
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 12:49:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7F2517332B
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 13:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8B321ADCE;
-	Mon, 17 Feb 2025 12:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ptCWW42q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3817C21D5B3;
+	Mon, 17 Feb 2025 13:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10D12F5B;
-	Mon, 17 Feb 2025 12:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739796591; cv=fail; b=HyyRjKsBsM5TtIL3JPgcOynLXtRwZER3LAChuyeeLE8eq6r24p7IPEs7zZN8/T0ze7Xbu3sorsV5Gdwfiiq1dvWluuY4cJmJTlNzl+3EUnL3ompfm2/OWp1dNiWYFDzeXS/4k0+5/62SRFtkRmTbGXXctrw1aqDmNdh+wHId6JQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739796591; c=relaxed/simple;
-	bh=bJ4601kNKuCrks1I/MQVwoC30UHn7Ymc/byQysUxwNY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mGABDKapdgYBpwOWgr/2ohvm/Sfcvdcp9LzuYZksd6mZtI1JbbGvIFvakQrwhuoF0pe6nVsrFP+gjaSftoh/e9J9fpLt2oSuot6eJ/IUKPbnh2I1G5T1L4VpKT9tJ3DEXuJwwy9fWT+DRQJdQNHqjrQX12ax1L1lwa1iG4clgbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ptCWW42q; arc=fail smtp.client-ip=40.107.220.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XC1vmdl4+EBYl5TAThxzzdSjoiv1W7j7F4gx5Pj6Aes5CG2CzTLinjZSwWhAieejut1xQbP9xEIANs7UnrObv9LjXPv9DLfycfelxjebZcSM7W6+gJWpjyjleDoOORhU7V5dWELqvCpguFgytM3+glGq09CbpFLigqigaFL2X2rwKQJzoC/NBpXj4X5FM8AUKqpJXg0M6d9ILPIM/h7ipGvvMSwTHG3Y+W9weNPbnVUJEG+Qi90AlRyjvIF8G40x4luJE+c1xyoxK8zdPieVP7moDosXKqjs412oJf55qM3VqElu/6H7tZj80CuT1i5QIwNb5nTw++b723KpA+5nEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yoow0e2r8yM/kyyzmz5taKOuK8D9yA0nFVW1qCfekYg=;
- b=XRuCXlc41yewUC9S8D/Fi1EwJwYWQKeshyi2ydl4laX89HIX8AUvw+4AbGzqop9vhHi9XWjkuqEexI+IY4qLrvkr/Sn3reAOgPKcZCKJ293EY+qUkf9KM3JJOPyllHUkEwApyqHEk00ZGzel4TSMXAsufymRfWCJhqeQzEeNlL284680ONyzh4dAzAgw0fieqWANkQBMRWDflrV3rBOXBPsGt5s/qFvF/L7wfk++IpNBixPaJ/vGI+8x5dKJ5hfkYUb6yD9waP51o8I3/SpxnnhdEjvQHdayiknyBNFME5DZpRwJiKoFiDBGoa4wkTew7vzuN2xrGnM4/6ULNLBbmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yoow0e2r8yM/kyyzmz5taKOuK8D9yA0nFVW1qCfekYg=;
- b=ptCWW42qI7+Mjf97DJRcxOaBI8i+E79+BvDou/20dZMyqHA2KXMVuzCltGrmvcoUPYiRa1UOoTiNWkBI2zCASThSuCBD1Gno5yVB3Hmlz5UustJcWhkhxztqOpwzhJwuop9baDYCy7H2R/MKRFfFMr2XOlCumfCEgTTg984hTaE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB7106.namprd12.prod.outlook.com (2603:10b6:806:2a1::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Mon, 17 Feb
- 2025 12:49:47 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8445.017; Mon, 17 Feb 2025
- 12:49:47 +0000
-Message-ID: <e5971f28-8c94-44f7-a3ce-b3198a1591fb@amd.com>
-Date: Mon, 17 Feb 2025 12:49:42 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 01/26] cxl: make memdev creation type agnostic
-Content-Language: en-US
-To: Alison Schofield <alison.schofield@intel.com>
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20250205151950.25268-1-alucerop@amd.com>
- <20250205151950.25268-2-alucerop@amd.com>
- <Z61tsoz3_MGrjvjG@aschofie-mobl2.lan>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <Z61tsoz3_MGrjvjG@aschofie-mobl2.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO6P123CA0027.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:313::19) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA32C21C180
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 13:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739797245; cv=none; b=AyMO4uOQPzRMukjOI8EXaorzLoiXY1LkDwV7vAtKoO+JHO54984qkwX+vO7HU4N5mNyZB9z1P/Qf9By5scNtKiRQyCe9CH6rrltMBXoJcBlzaehFviDivsBwkCZOcbv/xHCmNPVmbaKpL0DNpZBzVmxLYLeiYQzPE5PGtXS4yDU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739797245; c=relaxed/simple;
+	bh=W0xJp2fHBSO+TzErYJnMGlOWfxHwZNWRa8XWc/U/pJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7MJClKS/+cCHFMNxDiCFBYxnSe7U5banqwL6EP0cMItmTkoYE+opGZWwBEN9p9V0vPVBDK7xqw3AFtFGg/WMo0Rgazsf0CtwSfKl79hypHw8XJ+MFcr4TGbLErIPfSniPr2nmvZ9c5jP+rELrgfni/weoqChwXVJgQxxEPV9Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tk0jX-0005AT-Aw; Mon, 17 Feb 2025 14:00:23 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tk0jV-001PZg-07;
+	Mon, 17 Feb 2025 14:00:21 +0100
+Received: from pengutronix.de (p5b164285.dip0.t-ipconnect.de [91.22.66.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id E345E3C4C3B;
+	Mon, 17 Feb 2025 12:57:06 +0000 (UTC)
+Date: Mon, 17 Feb 2025 13:57:06 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: syzbot <syzbot+d7d8c418e8317899e88c@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, gregkh@linuxfoundation.org, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mailhol.vincent@wanadoo.fr, netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	stern@rowland.harvard.edu, syzkaller-bugs@googlegroups.com, Xu Panda <xu.panda@zte.com.cn>
+Subject: Re: [syzbot] [can?] WARNING in ucan_probe
+Message-ID: <20250217-spectral-cordial-booby-968731-mkl@pengutronix.de>
+References: <67b323a4.050a0220.173698.002b.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB7106:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab5f7f7f-bfae-4c20-d856-08dd4f518f52
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZzhGTWZpcm8wK3lnRWVhcTNYQkVFZHNTQUF3L0hVYWZOay92ei9vWDZTSVZC?=
- =?utf-8?B?dmhYa2JTZVBXSy82NFBKeEg5Q2l1S0E2ODNlWjdHQTB3bzR0YUZVeGp4eWhX?=
- =?utf-8?B?NTdzMUFZeXNqb0N3SDQ1a1p5Z21FNUJGYnZOeGY3cjEwVFR0VUxQU1VQeUZV?=
- =?utf-8?B?eFZtWG4vaDNtbkdvaEJSeUZkZm1qc2RHbXRPNHBrZHorOUJIQitoVmdXU3Y2?=
- =?utf-8?B?V21UZWR0UlQ4V0E5R0VRMTYwRDlpUW0wZlR0NzI3Ujh3Z3hNYnhmSjUvSGcr?=
- =?utf-8?B?OGtPTUMva2VCRHliQmdTMVc5WHlqU1QvbjhsN1kvaDQvVFZNTGprbnp2MWkx?=
- =?utf-8?B?NHY1WGx4eVRaRmVXYjRhYk1Nck1xREtmeEtEZ0ZiWWlwMDdWOTI0OWszby9o?=
- =?utf-8?B?ME56VjdDekgvYk1vZ3Ztalo5RWZ2ZEF6QVRUNDN0S1M0THltc3FEYTlJZVR5?=
- =?utf-8?B?cThlR1hEQXExenNKQUFXOUlERDQ1RnlpU1ZCeGVrcXFSd2N5aWdDWEwycnp0?=
- =?utf-8?B?OGZ1SERmaU1uN0pUMWxJTHJRWEM1eE4wL3NmbjJGbEVTb3BUUFp5STRuKzd5?=
- =?utf-8?B?a09Fa0V4Vk1oLy83djhELzFjT2hVYWlrREMrT0wwaEhUdENzTlEyKy9oT25q?=
- =?utf-8?B?eGNmU2ZGQUNKRzY0N3AxdDVvYUNobG1iOVhNNTJXNVIxZi9LdjhPU0EwWGxS?=
- =?utf-8?B?RTZXNDFQWldVNXNDREdjaGtSZk1KVEF5RmpnMXB0RkYvVmp1blRVMUFIZU53?=
- =?utf-8?B?bUFPaUlzV2JwOU5PVVJuYXFGU3ZjcHplc2ZLVWxBMmtnQlg4QTRzbnEwRG5y?=
- =?utf-8?B?Ym5zR01GT1BibmNQNmhFVHlFcTBmR3ZuM1NKZ0M1SENXQzhFaWhsOE01SHBl?=
- =?utf-8?B?QUtsYldwQTd1cGFlemtaYkNDdnQ4QndNcWpOZk9semdwN3VabkhXMWYzV2ZN?=
- =?utf-8?B?RkErSjdQUjBXVCtkdmpMZHZ5ckVZajVlMjRlRmEvT0IzVS9tYmljV1RHZnBO?=
- =?utf-8?B?MkJQaXkxTkgrYXJhNFR4aythWVVCbEVKbXBpUjV1dUIzNy9DUnJ4N2kzVFA0?=
- =?utf-8?B?QmFWNW1jMmlEMWpxYjlTMElXSXJJTnFISTlJeThCSjJGV2Q4TjNvemlFakNw?=
- =?utf-8?B?QnFzYkNncUFWODVaalRvbmlqS0lVVGd4Rk9sdUd5cmZwalhmd1h1dWFLSkxw?=
- =?utf-8?B?T1lQVG9pMTRNVDVXU0ozTUo5NldaOGdnZFBvY1dYUzBFdE00dWViRDhRVXdW?=
- =?utf-8?B?VXlWOEZjL0Q5cGoxRTdRR2owK1VsUjNiR3VVVnBvMWNpYWc2MS94em0wT2l5?=
- =?utf-8?B?dk9nNzhzdHlUTXVqamhHYTZ6TksvL3dGcFBHUHpzVFBkVkpSWVRnZnhGcHZQ?=
- =?utf-8?B?dVJVZElFVDcvNFA3MWQrN2cwb2lud0FwMGw4NzBsTDZaSGJ6UWZ0bkRZbFdY?=
- =?utf-8?B?Zm1jazR3WEExUWpKNWpRd0RQNHBzNWtOYkp5WFRsTDdMbm1OTVR5anI4Sitj?=
- =?utf-8?B?VitxUTFhVW1ablhEWVkvelYrUVl6WTJuOWhlMkRSb0tsNDVWUzgyTzBWb0JQ?=
- =?utf-8?B?Z2xPT1d2NDFzaFlObmpPNkxxNWkwalJlUW03U1BUalpmVlgyS2JqLys3eG9X?=
- =?utf-8?B?TXVtNU90Qlo4QmtGS1NLdC9SQzZqNXFlQ1NIVDFQVVhVNmJmN1pOZU96Mzdm?=
- =?utf-8?B?RndaWFQ2WTIxTVhGTE1WdHdxVmNoWGNWMUdYV0oySkdmdHl4Q2FTRGtsMHQ5?=
- =?utf-8?B?c1JlcExvVU80TXNKRUxOVG00L2ZnMkZPaHVtYnNTU3Z1UVlNTDk5NzJzU1hW?=
- =?utf-8?B?NjBkN0dYT3dkSS9aanI5SzhicVBPWURWZzJlellQcVJIMlQ3aGVtVkRMeHZz?=
- =?utf-8?Q?5Ghi3rkVmVqrv?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M3R0SXFtbnY5TUpmcU1RT2Fua2luK0VJRVY1dnVnNzVsQkFFSEJDd0w3SXlK?=
- =?utf-8?B?MXkrLzBuc21NTkFHUVhzZnEvOGhDMk40dmxJQ0hRZ1JPNWJTSURVWUpFUlZz?=
- =?utf-8?B?OGpLQTVpWTNIZjFqZHRNblcwR25tMnpSNHp5M1ErNlhjTGNidFpWRjN0MHRQ?=
- =?utf-8?B?a0ZuUHd6WlhJVUxJdXJDMERmRWZpUTU3QXdFS2FlM1FNQmpjdy80VGN4RzRZ?=
- =?utf-8?B?dVhINys3U1pMWmxxQ1FOTVhNTk1vYmhKbG9VeXAzYVF4OEN4WE5JV1lGb3JL?=
- =?utf-8?B?cW1iRThuK09jcmdqbE5Obmw2dm10Sm42Qm85NVMrcFVWcTFNTnpjNTN6NHZZ?=
- =?utf-8?B?aldXUCsxS2JCdGxjNk5FUjhxeDUzS0orL3dHZ2twWXI4ZW1hYUVMZUNEWFJQ?=
- =?utf-8?B?T1MxaWh0bTF3OFpud3lseVJyOGgxK1dIQy9qeEZUQXpGR1cyKzlmSmtkTVpi?=
- =?utf-8?B?MkIwVHg4RGU5VEVhRkZkL1FkQ3E3cDgyZXNrWWtDSUlHcnpCZHEra2xzQVVJ?=
- =?utf-8?B?dW5yOXNnY3dkSnMxMFg3Q3JXWG9HcjYzUDAyMS9XMFVBMVlFcGVzQjVmbGZX?=
- =?utf-8?B?MTNuaEZ3c1FFa2UrK2I1L25acVA5VjBxajNkZ1gwNFptUFpMOCtrWDNaMTBH?=
- =?utf-8?B?cFhRYWpkYU9QUk9WYnBGdzVnNUQ1Z21rWXRpZUxoN0tZVGtlYlRDaHErTVRU?=
- =?utf-8?B?K3g4aC9vN05VSlhMNW1mbS9BbTRENVJHVThwbUZCYmRlNTVyZk8vT2M4RURV?=
- =?utf-8?B?Y2RrcFE4Y2RkMkcvbE5WZ01oT09UQlpwNCtuSU1XKzIwOVg2ZWY4UXliVFBR?=
- =?utf-8?B?Ylk0cTV3TjY3eGV2Y2U4UmtPd0lnakw2cTFvdTVRS2xZaGxOSlhPUERpRk9E?=
- =?utf-8?B?N0xJVm1ORXlMbm1RZWhzMkdDLzRnYlh1WUJFNWpIYUg4cXlveGhWWXdKRFdx?=
- =?utf-8?B?RjIwdk1BOEJpek1WLzlxK0RhdTE2cU5Ja0kxK3VaVk1BV3ZISUtlWUJXVy9C?=
- =?utf-8?B?UXp4T0NMYzI0SE5ESi9wd0x6bHYwdks5Tnd5RldrZTlmS1RMK29tOXIxZ2xt?=
- =?utf-8?B?OGlaWEZ4d1FVOEcxSzc1TlZmcjM0VFNPMFdrWVF6eDZ3Wk9jZmREYzZ6c3li?=
- =?utf-8?B?SUJQTlcyQ1h4dDdvamp4bUM1NDBuYkIrcGhOVUV6SDdYOGoySXg4RUlYZi9C?=
- =?utf-8?B?Um52SWl1dnRSSTJLOWhYUWxKRndaUTZWTDlrMkR0dnFxcGxQRmEyajBjL2pN?=
- =?utf-8?B?blYvNDJDM2F5Q3l1aFJmVnloN3NRSytBbDJIWnZ1WEQ3OXQ3b0t4c0xzbkI1?=
- =?utf-8?B?a3lMUVZiRWk0M2lFaVgzR0FiMWljbE9relc1dDJhR1NzTXlLa3BqSnJCb2Nh?=
- =?utf-8?B?blA3SCtCWDRHVlNyMGRkdGZlZkNTemhjYWZpSUVteSt3aGlQaTNtNm1qV1hM?=
- =?utf-8?B?RDJNc2luaHFnSHBIMlpSNlZQTitCdXNDS1BmU0hsLy9qMVBvTFlNazg3ajV3?=
- =?utf-8?B?VEEzQWFRbFpxd3h5ckZrVmloYks2VjY3WXF5NmJiYUhtVzFtU3FwQVBtUE42?=
- =?utf-8?B?Q3dENnNTaTE1bXY3UkVVNHljT0hPSy9aWFp6ZDdtV1craHhBS3kyNStjeVp6?=
- =?utf-8?B?UXhSRGNyZ3RxN0tNZllPSzB5TURyS2tBRVlEbnhrc1pVeVRZc1VkdlNUZWJF?=
- =?utf-8?B?bWkzWndRRnBxeWVmZXpsbzZCUmZNOGZJTy8wcW50K0pFa2JYdENSNkdjemZ5?=
- =?utf-8?B?QzJEQVJubHFPWTJLNjV5UFBHcHJNdk5MUThHS1F2WlFYeEZVR3gxQm4vcWZZ?=
- =?utf-8?B?TWs4bHlxVDhHa1g2aG9PQnlxdzRqaURRMDZVOEtUZm85V3prN1lWKzZ4OFBN?=
- =?utf-8?B?SHU4MXFZSFBscXI1YUVSY3owUGdUaEk1cG5Ed3JhSXhMOCtyZHZQVEd2NEZp?=
- =?utf-8?B?M3YxTSszSzZRcUZ0QUorcTJzUXhId0lDUkUvREM5TERUR2J2MTdnRVJHUUxM?=
- =?utf-8?B?c0R3VTZsaVlDZGJUc1VsM2lUZ3ZBRDJCREN1ZGRHQ2JobzlpVlJSQTIrQ3Iv?=
- =?utf-8?B?T2EvY3RpdHg4cVJyZzZSZWVnRDFqbGN1VG9GQ0lXS1liZ1pUZjhwYlB5Y21q?=
- =?utf-8?Q?6kmZVIn3IxzzkSrdU/m6cCDjR?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab5f7f7f-bfae-4c20-d856-08dd4f518f52
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2025 12:49:47.4231
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iKemsOljCy8+aIN9CbRgOyaVcQ0LsniPwk9F6rFEDYKFEhX+dKSAa2cp3miKX8iL8+Ns0BFsGIr5vvBvaesLiA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7106
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g7xglj7mfzpk3kuh"
+Content-Disposition: inline
+In-Reply-To: <67b323a4.050a0220.173698.002b.GAE@google.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
-On 2/13/25 03:57, Alison Schofield wrote:
-> On Wed, Feb 05, 2025 at 03:19:25PM +0000, alucerop@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> In preparation for Type2 support, change memdev creation making
->> type based on argument.
->>
->> Integrate initialization of dvsec and serial fields in the related
->> cxl_dev_state within same function creating the memdev.
->>
->> Move the code from mbox file to memdev file.
->>
->> Add new header files with type2 required definitions for memdev
->> state creation.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> ---
->>   drivers/cxl/core/mbox.c   | 20 --------------------
->>   drivers/cxl/core/memdev.c | 23 +++++++++++++++++++++++
->>   drivers/cxl/cxlmem.h      | 18 +++---------------
->>   drivers/cxl/cxlpci.h      | 17 +----------------
->>   drivers/cxl/pci.c         | 16 +++++++++-------
->>   include/cxl/cxl.h         | 26 ++++++++++++++++++++++++++
->>   include/cxl/pci.h         | 23 +++++++++++++++++++++++
->>   7 files changed, 85 insertions(+), 58 deletions(-)
->>   create mode 100644 include/cxl/cxl.h
->>   create mode 100644 include/cxl/pci.h
->>
->> diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
->> index 4d22bb731177..96155b8af535 100644
->> --- a/drivers/cxl/core/mbox.c
->> +++ b/drivers/cxl/core/mbox.c
->> @@ -1435,26 +1435,6 @@ int cxl_mailbox_init(struct cxl_mailbox *cxl_mbox, struct device *host)
->>   }
->>   EXPORT_SYMBOL_NS_GPL(cxl_mailbox_init, "CXL");
->>   
->> -struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev)
->> -{
->> -	struct cxl_memdev_state *mds;
->> -
->> -	mds = devm_kzalloc(dev, sizeof(*mds), GFP_KERNEL);
->> -	if (!mds) {
->> -		dev_err(dev, "No memory available\n");
->> -		return ERR_PTR(-ENOMEM);
->> -	}
->> -
->> -	mutex_init(&mds->event.log_lock);
->> -	mds->cxlds.dev = dev;
->> -	mds->cxlds.reg_map.host = dev;
->> -	mds->cxlds.reg_map.resource = CXL_RESOURCE_NONE;
->> -	mds->cxlds.type = CXL_DEVTYPE_CLASSMEM;
->> -
->> -	return mds;
->> -}
->> -EXPORT_SYMBOL_NS_GPL(cxl_memdev_state_create, "CXL");
->> -
->>   void __init cxl_mbox_init(void)
->>   {
->>   	struct dentry *mbox_debugfs;
->> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
->> index 63c6c681125d..456d505f1bc8 100644
->> --- a/drivers/cxl/core/memdev.c
->> +++ b/drivers/cxl/core/memdev.c
->> @@ -632,6 +632,29 @@ static void detach_memdev(struct work_struct *work)
->>   
->>   static struct lock_class_key cxl_memdev_key;
->>   
->> +struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev, u64 serial,
->> +						 u16 dvsec, enum cxl_devtype type)
->> +{
->> +	struct cxl_memdev_state *mds;
->> +
->> +	mds = devm_kzalloc(dev, sizeof(*mds), GFP_KERNEL);
->> +	if (!mds) {
->> +		dev_err(dev, "No memory available\n");
->> +		return ERR_PTR(-ENOMEM);
->> +	}
-> I know you are only the 'mover' of the above code, but can
-> you drop the dev_err message. OOM messages from the core are
-> typically enough.
->
->
+--g7xglj7mfzpk3kuh
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [syzbot] [can?] WARNING in ucan_probe
+MIME-Version: 1.0
 
-Sure. I'll do so.
+On 17.02.2025 03:55:16, syzbot wrote:
+> Hello,
+>=20
+> syzbot found the following issue on:
+>=20
+> HEAD commit:    496659003dac Merge tag 'i2c-for-6.14-rc3' of git://git.ke=
+r..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D11012bf8580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc776e555cfbdb=
+82d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dd7d8c418e831789=
+9e88c
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14f7b9b0580=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D155602e4580000
+>=20
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c1675d5fc116/dis=
+k-49665900.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/0342ce7d0bc9/vmlinu=
+x-49665900.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/5ce5b4978fc4/b=
+zImage-49665900.xz
+>=20
+> The issue was bisected to:
+>=20
+> commit b3e40fc85735b787ce65909619fcd173107113c2
+> Author: Oliver Neukum <oneukum@suse.com>
+> Date:   Thu May 2 11:51:40 2024 +0000
+>=20
+>     USB: usb_parse_endpoint: ignore reserved bits
 
+I think the issue was introduced in: 7fdaf8966aae ("can: ucan: use
+strscpy() to instead of strncpy()"). I'm preparing a fix.
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--g7xglj7mfzpk3kuh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmezMh8ACgkQDHRl3/mQ
+kZzmzQgAhZ+U89NLPUKjnFb9vAGYtSjKJb+1+b3OLpNzt9Ta5nZXyX1gMS0I2zd/
+6E3cDfJ7vN/BOGCWTzgTMU5jbLyg4YzCZ2IyfMIyexJjxEUUJ35BkvHj29KUQgtr
+bDrK30tqr/XK3tKOvLDZkacNmKRT8dad8Lv36VOCueQU7bJJVUzTx+SbdRiCn2Bv
+jMMN3hnhJLQpfALoH/GnzESJcka4xyrHd5ZpD3SDx3mJiw82AEcJ+DLOA8X18ZiF
+t1JIY4jgXpD77uMBwsHrhP7FCoW9j/ps/yAbJdc4Je9FCbtvyagP8/uYBNNKGIkJ
+QIrwURE0P+NRGibiA//rqR55T8WU0Q==
+=sBNn
+-----END PGP SIGNATURE-----
+
+--g7xglj7mfzpk3kuh--
 
