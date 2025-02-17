@@ -1,115 +1,133 @@
-Return-Path: <netdev+bounces-166862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB76A379A5
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 03:18:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8A8A379B4
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 03:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64D503AA3B1
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 02:17:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5421E7A2D84
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 02:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7646B76026;
-	Mon, 17 Feb 2025 02:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F47146580;
+	Mon, 17 Feb 2025 02:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="WXzE5PoC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aD1YnZWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from lf-2-45.ptr.blmpb.com (lf-2-45.ptr.blmpb.com [101.36.218.45])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0403145B27
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 02:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C62084D0E;
+	Mon, 17 Feb 2025 02:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739758658; cv=none; b=Sl7tOFvGp1c8jUHdhsuDI39emDU6QTpbhTfza3mKbXeKCs6PGU5LhpFwXCDW1If3889iPdaJ4i9OnofxAK6SyExCLZFYe4nK//K7cckQXjBm+phItlIjC7Dcd7jRfi2HPaKAkv3l9haloaBV+QfVsDeIba1cexIoAbJW/uKypn8=
+	t=1739758998; cv=none; b=XW8jxw1XoRrexXd+ubPeJTLo2WLFaLE8h+FD3PWd+7tZ+oBQXkvj/+oCeGsQoqUfwcuLdkigOyuO2RuCAAGywVDR4eOC6PpM1Atk92xLWAFEX61dZnigSe8rzb6qgnU86OBN2+AiVO7YTvIa5YLy0F61BASMI+mHN7VwWLz1S5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739758658; c=relaxed/simple;
-	bh=8/5JKed0sNAcOnVbarcf7pIHGRajREI1ktIHnRRwZzw=;
-	h=From:Message-Id:Content-Type:References:To:Cc:Mime-Version:
-	 Subject:Date:In-Reply-To; b=Tie8blAlcL4pNynvG61Sli1/kGQJrTq2PBC2OtBgY/av0QTu33pb7dFb+9IRhU/PSTDFqJMTRrwQ7FITyJBN3Yxgv6xB5HjcMpcKyhplABmNd90Ahoyx8GtfYPsB2P+zDjPNWhOVwiYJQ0XdmHUg0dCTtnzT7cU/dxJtTkrZVdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=WXzE5PoC; arc=none smtp.client-ip=101.36.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1739758574; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=qoiYzsIrKCWzUoCsHd7X6IHzkK2ea8ZtGgmfTbVYr+o=;
- b=WXzE5PoCaQfkpbAmLCxqFafwZX3zfc+cr89gJavg4XG0heMQZ131hDveW1iYMyWr477Ihm
- 3ATWAwWUKb6mk60zQE1q3wCU7rsGO5GM+SIDgfyzYyZEjsv2/gv1A0T6/X0TtdG/DoJ69C
- BbCtQe03tq6tBB3qkFovuN2MC7MUS39oBUWZu4ITnHMSGpTiD23MpPkJNxBKTl6HRpzW2L
- GKEgmLiTT/tOhmmBbk4YIlY2pvXPmlkflr57Ad/miVMhae+NJ9vT+Irj8b69fUtDTUxrA4
- yl3AgDpBvPAGc1bECJY2/L9VyTuK6W0u9ab748guflL5GMKMbILLbHxNOUvbEw==
-From: "tianx" <tianx@yunsilicon.com>
-Message-Id: <6e8f16e5-6425-47ae-97b1-f9dd1363937b@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-User-Agent: Mozilla Thunderbird
-References: <20250213091402.2067626-1-tianx@yunsilicon.com> <20250213091418.2067626-8-tianx@yunsilicon.com> <20250213143702.GN17863@unreal> <0e83c125-b69e-46a0-a760-fe090b53bc70@yunsilicon.com> <20250216095915.GT17863@unreal>
-X-Original-From: tianx <tianx@yunsilicon.com>
-To: "Leon Romanovsky" <leon@kernel.org>
-Cc: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <horms@kernel.org>, 
-	<parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>
+	s=arc-20240116; t=1739758998; c=relaxed/simple;
+	bh=yxz8zrIHDtO7kQkfjxlZZSzlZ1TclU9ag6W2VmYuy9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F9Ti58djq/AlBVH5mJYyZIg3Y9WTrtYZwL//SnNYDVftniXFarj9N399DPfAtN+A+Gl0bkuGTeki9qEQ7JxYDYFJLcjPbhAzm9s38Sxzqqk0beDmirUOoXuPJKtfGOGkwixYQsi2vIaHLf0OwyW2Y+opUALQcLpQs/Xa6YKuXRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aD1YnZWD; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22104c4de96so21937445ad.3;
+        Sun, 16 Feb 2025 18:23:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739758996; x=1740363796; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eATGpv/yzwW7RwTTlAQI0b6AWmzMq+BHQwUQKB0Quro=;
+        b=aD1YnZWDuiz1/qlVLOZ1wU4XiF6nlh4ZPM6yFtIX+jj9TCCbqdz2DPhCJylyNBVl99
+         uk+d8usrEFUSu9+7eqs8jFL3AbWDGZ2ScCWv49by1wjQ+Mewprp2LVpsucph5towxUup
+         NRoQ9hc0BCbqvZJeCFjqTBeJFqJ0yKKGArIU3t4Gl0ZnoqkXKSnd8ersZSoRexL/nXAZ
+         ehBJRtRBSOLPfacPsm2/tnSVX9963TO1q7NLcMHkhxlmt/uGD74s+n6L3jEVkCLGG4m7
+         15rM8RkMVUnqCTAMknVOaVXrNrvAmlFpKibXBsLb99qGNP3Ox4xEJE+dCn1H0TeKfZYI
+         MSPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739758996; x=1740363796;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eATGpv/yzwW7RwTTlAQI0b6AWmzMq+BHQwUQKB0Quro=;
+        b=GbRm7K1+UdQtLz0c7T6ADpGiP/sS2sAEIYO7mnx89811xB3ZvmITtmEVOZgTnU4Dq2
+         AQMMe29QhhtxWh8jJe/vrqNU0Hr8QHcMsue6/MrwNUbVrJn1/REpiY/Ur6RqA2E6E/uj
+         3XFgl6qKkm4jVxCHV6Ls8PddgoPwS511Kx7e0Ozhik3aUCHbYIoTK8zPfxrHGoC/cCdu
+         pn5QWARhJyfaAb+l/dWE+6vWH3wdYOqNxtJavKxK5NiyXWFjjau3nm0H72TGV1fegRQL
+         /dPrkluKoUHXO6blzWDDkrRNflAQvp05Yr6u2n8C2wKM4F0yGDcl0IQWVXRHlF7p9UdK
+         ioQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW4eesGVJrPOJsMXhzCBpspfllzXowXDbI41ohYuWIlrhF1I8DTU/txt2STW9UBVq15pi7JbQhKbgKryllDtE=@vger.kernel.org, AJvYcCW2LbB9Qg8fBGe/9Sx6fCsrLtGDqhcKdycv39krNMjTMz8Ro8/SIrLRVTIQkQQc4HsysbXPxIsVpUThBJPNI07V@vger.kernel.org, AJvYcCXfKWPBDp9bOdfGzsWBkBppeydfD7bdvEY15ekqBxc0D7mi7nBTmc2c5rGdHYYAcxQpH44TRJex@vger.kernel.org
+X-Gm-Message-State: AOJu0YweaTeQ6B/aYBG1jf9S7RS9BcDRZZtX6dTKOQAN4FAG+yxAYxwg
+	DHG3lT5j2hAN/YxJHIeS0Sty42DP9ZtdxpyQ07torOXoLXDfuXGz
+X-Gm-Gg: ASbGncuXdS/IeDAagBM87k7a/BxLuiD877iGwpV7941UDZoVDqEG4HjF6oZTNz6a9nt
+	SyUnmpBHX75CvACle4VdmzdI3gX80kba/1ozI49cCR3rwH+2sdrYqGU6XGRNDNSJ0y9GZPF9p72
+	zoGq/V7o/bebg7PakmVmenhSYV8hNWSaYt90UQhIgWxvCPUcKIkecCuGUpREc5R4F+CV+Nv431Y
+	YyzXT4k3Jto9C33RWyQYXeURB5LE+9cA1bR4a3+ntRo9Cck3cqbbVZ/g0BdpJUaLuosFc1XDASi
+	d5LL+R7YsMsSYH+4bRBj
+X-Google-Smtp-Source: AGHT+IFViZjLBVkpW3BxuNj7fXUHmg1Djc/5+NyaIqfXwEcnE1lFoV6Cujl/dUine4R6CXlTH10+QA==
+X-Received: by 2002:a17:902:ef49:b0:220:fe51:1aab with SMTP id d9443c01a7336-221040b1359mr150473335ad.38.1739758996248;
+        Sun, 16 Feb 2025 18:23:16 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-adb57c5e0b9sm6356740a12.6.2025.02.16.18.23.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 18:23:15 -0800 (PST)
+Date: Mon, 17 Feb 2025 02:23:09 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Andres Urian Florez <andres.emb.sys@gmail.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, skhan@linuxfoundation.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: Re: [PATCH net-next] selftest:net: fixed spelling mistakes
+Message-ID: <Z7KdjZ80R5H4RlIo@fedora>
+References: <20250217001452.29578-1-andres.emb.sys@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: Re: [PATCH v4 07/14] net-next/yunsilicon: Init auxiliary device
-Date: Mon, 17 Feb 2025 10:16:10 +0800
-In-Reply-To: <20250216095915.GT17863@unreal>
-X-Lms-Return-Path: <lba+267b29bec+e4e417+vger.kernel.org+tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Mon, 17 Feb 2025 10:16:11 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250217001452.29578-1-andres.emb.sys@gmail.com>
 
-On 2025/2/16 17:59, Leon Romanovsky wrote:
-> On Fri, Feb 14, 2025 at 11:14:45AM +0800, tianx wrote:
->> On 2025/2/13 22:37, Leon Romanovsky wrote:
->>> On Thu, Feb 13, 2025 at 05:14:19PM +0800, Xin Tian wrote:
->>>> Initialize eth auxiliary device when pci probing
->>>>
->>>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
->>>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
->>>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
->>>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
->>>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
->>>> ---
->>>>    .../ethernet/yunsilicon/xsc/common/xsc_core.h |  12 ++
->>>>    .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   3 +-
->>>>    .../net/ethernet/yunsilicon/xsc/pci/adev.c    | 110 ++++++++++++++++++
->>>>    .../net/ethernet/yunsilicon/xsc/pci/adev.h    |  14 +++
->>>>    .../net/ethernet/yunsilicon/xsc/pci/main.c    |  10 ++
->>>>    5 files changed, 148 insertions(+), 1 deletion(-)
->>>>    create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
->>>>    create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
->>> <...>
-> <...>
->
->>>> +	[XSC_ADEV_IDX_ETH] = XSC_ETH_ADEV_NAME,
->>>> +};
->>>> +
->>>> +static void xsc_release_adev(struct device *dev)
->>>> +{
->>>> +	/* Doing nothing, but auxiliary bus requires a release function */
->>>> +}
->>> It is unlikely to be true in driver lifetime model. At least you should
->>> free xsc_adev here.
->>>
->>> Thanks
->> Hi Leon, xsc_adev has already been freed after calling
->> auxiliary_device_uninit. If I free it again in the release callback, it
->> will cause a double free.
-> You should follow standard driver lifetime model. Your
-> auxiliary_device_uninit() is wrong and shouldn't exist from the
-> beginning.
->
-> Thanks
+On Sun, Feb 16, 2025 at 07:14:50PM -0500, Andres Urian Florez wrote:
+> Fixed spelling errors in test_redirect6() error message and
+> test_port_shadowing() comments
+> 
+> Signed-off-by: Andres Urian Florez <andres.emb.sys@gmail.com>
 
-OK, I'll change it.
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Thanks for reviewing.
+> ---
+>  tools/testing/selftests/net/netfilter/nft_nat.sh | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/netfilter/nft_nat.sh b/tools/testing/selftests/net/netfilter/nft_nat.sh
+> index 9e39de26455f..8143b877ae7d 100755
+> --- a/tools/testing/selftests/net/netfilter/nft_nat.sh
+> +++ b/tools/testing/selftests/net/netfilter/nft_nat.sh
+> @@ -569,7 +569,7 @@ test_redirect6()
+>  	ip netns exec "$ns0" sysctl net.ipv6.conf.all.forwarding=1 > /dev/null
+>  
+>  	if ! ip netns exec "$ns2" ping -q -c 1 dead:1::99 > /dev/null;then
+> -		echo "ERROR: cannnot ping $ns1 from $ns2 via ipv6"
+> +		echo "ERROR: cannot ping $ns1 from $ns2 via ipv6"
+>  		lret=1
+>  	fi
+>  
+> @@ -859,7 +859,7 @@ EOF
+>  	# from router:service bypass connection tracking.
+>  	test_port_shadow_notrack "$family"
+>  
+> -	# test nat based mitigation: fowarded packets coming from service port
+> +	# test nat based mitigation: forwarded packets coming from service port
+>  	# are masqueraded with random highport.
+>  	test_port_shadow_pat "$family"
+>  
+> -- 
+> 2.43.0
+> 
 
