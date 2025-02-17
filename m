@@ -1,612 +1,244 @@
-Return-Path: <netdev+bounces-167077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62FADA38B60
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 19:39:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F30CA38B65
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 19:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9302B16812E
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:39:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F4DC3A929D
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 18:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB07235BF9;
-	Mon, 17 Feb 2025 18:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851B222DFB4;
+	Mon, 17 Feb 2025 18:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TputmEFh"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MmCGamMB";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="c3h1eEAL";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rQGTzicH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jYy7YrY6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68262253BA;
-	Mon, 17 Feb 2025 18:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E145818DB39
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 18:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739817542; cv=none; b=VBmTIPPxCd9AynSeE89GxW1J9Bbb9U8QcblL0u6TExXpqhhuYOW2SWP0Mwd+PCEvD9NC8tHI1fn9tYuJ/sSGspzH90fzr1YqK6YabWAeYVq1gYi8SzlJcYZyTqyRmhKONL4iB530Ka25gscDW6+/gKqu7d0wD6xfOg+mOetSveg=
+	t=1739817803; cv=none; b=lt1gLpw6zHdPX6lBTYgDBaNff97lXqtMJV1ksqM1awlDuu3goZo7kOa0K5sSOcij37AiajRsF1jroXpHOYKP8WwGJC6bGFwoP8qaf+BWycsTQmcrfazFpWubYCY9e4Vg+riSL2PnPzCSnU1uZVTWiqCubDtbS1knEGPUC7SgVCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739817542; c=relaxed/simple;
-	bh=dZsC/3h/MKO8YfPS5c8QTfQjs6ZTCKMOtcNcVvSS5+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SU905kRoK7hrGrHJoPjkinPyQ0s2xP4jbZsOe2TnwfS9M7RoJpWD1UV3yl6ctyZ74UHzL5WpkV6A1WUCRX3R9e5RJI9J7XQTN8v+iuL651j+OyijRAiOrAvFGXZDfd6LpSVqJJGTFK1TSlOn6vr+IIImKUarOecOJguAxzLhKAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TputmEFh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180BFC4CED1;
-	Mon, 17 Feb 2025 18:38:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739817541;
-	bh=dZsC/3h/MKO8YfPS5c8QTfQjs6ZTCKMOtcNcVvSS5+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TputmEFhGLuDkSadMvjCrBnrYPBQ981+8f1P+q7EctybtfBgbapK54U1ua6Jwbf8H
-	 sQIyuXwklpqkaCj34MiFpl+l1MwvKeZ3Wj79VH6dYgSD/tiH/3GWC1gpF1/E3SPXyr
-	 p3jF/uKHfxummcjwZ6VO6WpB6x2XTYJ+eJvuGWkI7ij596Zqo4oSsQDNItcPXeWiF8
-	 PoAMj6ibTObC0E79gj0EkVjVCCjDCMAoYHnbbdXJbxjyi31m2D3FderirberBolW4/
-	 SRF8Jc3e27ZgbluuIKIsl05nRiuFu8RjTq04Ty0QH0ogXBVMePTPFIY3ZyE/yB+eRD
-	 M6uQkH1dDnqKA==
-Date: Mon, 17 Feb 2025 18:38:54 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next v4 13/16] net: airoha: Introduce Airoha NPU
- support
-Message-ID: <20250217183854.GP1615191@kernel.org>
-References: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
- <20250213-airoha-en7581-flowtable-offload-v4-13-b69ca16d74db@kernel.org>
+	s=arc-20240116; t=1739817803; c=relaxed/simple;
+	bh=aQ8/F+Lh2P9Vy2jF93ARw99yi6bnud3ngrkQ+wzhoGk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=odmSsempe+lByc65wYGo5BUkRnoiAzvEqTTZhT4v+j/e2FJPTo5K8AyPDwtaUP1md6MKgpvyGzpiSf7tU1JCMj7tRjhxIsFWpeglsBSSm6ExYyUVW3tkI0ksgfzPlJ4/Qy7eeKnhTfUbSbwCumrVGSVuW7lt0ZZxC1++wWI6MHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=fail smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MmCGamMB; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=c3h1eEAL; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rQGTzicH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jYy7YrY6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E5EE421172;
+	Mon, 17 Feb 2025 18:43:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1739817800; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=V5lZynmEUR+YeywYZpcWxhoHhkH//bvz+HMMgYXLssE=;
+	b=MmCGamMB4yR/kMGuOav/oCZgNlsKbej/iEDivKWQAfphN4rpAwvJjh0aMh0UotpiBHvvQ9
+	FhhfvkfMMIL17X2+0o7iuGnjk4vSrZluie8HPcc4RjRvEwBA15Y4CerLh/8IJQhIgtGHqF
+	nHNgiCs3lbKg4xNmpImZKHWb0dbg6jE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1739817800;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=V5lZynmEUR+YeywYZpcWxhoHhkH//bvz+HMMgYXLssE=;
+	b=c3h1eEALIj4xQAPDWcBAgSJvcYNpeaT6PY9xlGPfCUw2ArR70RKQbR6NXIkrwqj5RqU+Tt
+	mZMoTpLQVD8g+pAA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1739817799; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=V5lZynmEUR+YeywYZpcWxhoHhkH//bvz+HMMgYXLssE=;
+	b=rQGTzicHaa/o0iyUdHK+ki7RUOjPeW4cWuYz0nOYWCsmNX0bYf13T/OpDlytCaAkLQjrHu
+	2ZA8ZK4/QXcm5zbDs/xEUN0qxJiRERNdbNZbVfV+ItUXWTuN2C2fIREcco8D1YUFxbXb9A
+	ObiZXjcHCn15wZhjpfnnTOOUcKN+CiY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1739817799;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=V5lZynmEUR+YeywYZpcWxhoHhkH//bvz+HMMgYXLssE=;
+	b=jYy7YrY6o22q+HHXYv7P8SMXq/tc3qerKhB7voZpijM+bmV7KAR/SKXMr0Oyy289/o6pQ6
+	ozhIswbbCIwhMrBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BBF6D13485;
+	Mon, 17 Feb 2025 18:43:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id lMyELUeDs2fOegAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 17 Feb 2025 18:43:19 +0000
+Message-ID: <b4a2bf18-c1ec-4ccd-bed9-671a2fd543a9@suse.cz>
+Date: Mon, 17 Feb 2025 19:43:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213-airoha-en7581-flowtable-offload-v4-13-b69ca16d74db@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc()
+ when GFP_ATOMIC is specified
+Content-Language: en-US
+To: Kohei Enju <enjuk@amazon.com>, edumazet@google.com
+Cc: davem@davemloft.net, gnaaman@drivenets.com, horms@kernel.org,
+ joel.granados@kernel.org, kohei.enju@gmail.com, kuba@kernel.org,
+ kuniyu@amazon.com, linux-kernel@vger.kernel.org, lizetao1@huawei.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, cl@linux.com, penberg@kernel.org,
+ rientjes@google.com, iamjoonsoo.kim@lge.com, akpm@linux-foundation.org,
+ roman.gushchin@linux.dev, 42.hyeyoo@gmail.com
+References: <CANn89i+ap-8BB_XKfcjMnXLR0ae+XV+6s_jacPLUd8rqSgyayA@mail.gmail.com>
+ <20250217165229.87240-1-enjuk@amazon.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <20250217165229.87240-1-enjuk@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,drivenets.com,kernel.org,gmail.com,amazon.com,vger.kernel.org,huawei.com,redhat.com,linux.com,google.com,lge.com,linux-foundation.org,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Thu, Feb 13, 2025 at 04:34:32PM +0100, Lorenzo Bianconi wrote:
-> Packet Processor Engine (PPE) module available on EN7581 SoC populates
-> the PPE table with 5-tuples flower rules learned from traffic forwarded
-> between the GDM ports connected to the Packet Switch Engine (PSE) module.
-> The airoha_eth driver can enable hw acceleration of learned 5-tuples
-> rules if the user configure them in netfilter flowtable (netfilter
-> flowtable support will be added with subsequent patches).
-> airoha_eth driver configures and collects data from the PPE module via a
-> Network Processor Unit (NPU) RISC-V module available on the EN7581 SoC.
-> Introduce basic support for Airoha NPU moudle.
-
-nit: module
-
+On 2/17/25 17:52, Kohei Enju wrote:
+> + SLAB ALLOCATOR maintainers and reviewers
 > 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>> > From: Kohei Enju <enjuk@amazon.com>
+>> > Date: Mon, 17 Feb 2025 01:30:16 +0900
+>> > > Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
+>> > > specified, since kvzalloc() doesn't support non-sleeping allocations such
+>> > > as GFP_ATOMIC.
+>> > >
+>> > > With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
+>> > > path and returns immediately after the kmalloc path fails.
+>> > > Therefore, using kzalloc() is sufficient in this case.
+>> > >
+>> > > Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
+>> >
+>> > This commit followed the old hash_buckets allocation, so I'd add
+>> >
+>> >   Fixes: ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()")
+>> >
+>> > too.
+>> >
+>> > Both commits were introduced in v6.13, so there's no difference in terms
+>> > of backporting though.
+>> >
+>> > Also, it would be nice to CC mm maintainers in case they have some
+>> > comments.
+>> 
+>> Oh well, we need to trigger neigh_hash_grow() from a process context,
+>> or convert net/core/neighbour.c to modern rhashtable.
+> 
+> Hi all, thanks for your comments.
+> 
+> kzalloc() uses page allocator when size is larger than 
+> KMALLOC_MAX_CACHE_SIZE, so I think what commit ab101c553bc1 ("neighbour: 
+> use kvzalloc()/kvfree()") intended could be achieved by using kzalloc().
 
-...
+Indeed, kzalloc() should be equivalent to pre-ab101c553bc1 code. kvmalloc()
+would only be necessary if you need more than order-3 page worth of memory
+and don't want it to fail because of fragmentation (but indeed it's not
+supported in GFP_ATOMIC context). But since you didn't need such large
+allocations before, you probably don't need them now too?
 
-> diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+> As mentioned, when using GFP_ATOMIC, kvzalloc() only tries the kmalloc 
+> path, since the vmalloc path doesn't support the flag.
+> In this case, kvzalloc() is equivalent to kzalloc() in that neither try 
+> the vmalloc path, so there is no functional change between this patch and 
+> either commit ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()") or 
 
-...
+Agreed.
 
-> +static int airoha_npu_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct reserved_mem *rmem;
-> +	struct airoha_npu *npu;
-> +	struct device_node *np;
-> +	void __iomem *base;
-> +	int i, irq, err;
-> +
-> +	base = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(base))
-> +		return PTR_ERR(base);
-> +
-> +	npu = devm_kzalloc(dev, sizeof(*npu), GFP_KERNEL);
-> +	if (!npu)
-> +		return -ENOMEM;
-> +
-> +	npu->dev = dev;
-> +	npu->regmap = devm_regmap_init_mmio(dev, base, &regmap_config);
-> +	if (IS_ERR(npu->regmap))
-> +		return PTR_ERR(npu->regmap);
-> +
-> +	np = of_parse_phandle(dev->of_node, "memory-region", 0);
-> +	if (!np)
-> +		return -ENODEV;
-> +
-> +	rmem = of_reserved_mem_lookup(np);
-> +	of_node_put(np);
-> +
-> +	if (!rmem)
-> +		return -ENODEV;
-> +
-> +	irq = platform_get_irq(pdev, 0);
-> +	if (irq < 0)
-> +		return irq;
-> +
-> +	err = devm_request_irq(dev, irq, airoha_npu_mbox_handler,
-> +			       IRQF_SHARED, "airoha-npu-mbox", npu);
-> +	if (err)
-> +		return err;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++) {
-> +		struct airoha_npu_core *core = &npu->cores[i];
-> +
-> +		spin_lock_init(&core->lock);
-> +		core->npu = npu;
-> +
-> +		irq = platform_get_irq(pdev, i + 1);
-> +		if (irq < 0)
-> +			return err;
+> commit 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour").
+> 
+> Actually there's no real bug in the current code so the Fixes tag was not 
+> appropriate. I shall remove the tag.
 
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..3620f4e771e659de4c91b40575e18d689199fb4c
-> --- /dev/null
-> +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> @@ -0,0 +1,521 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2025 AIROHA Inc
-> + * Author: Lorenzo Bianconi <lorenzo@kernel.org>
-> + */
-> +
-> +#include <linux/devcoredump.h>
-> +#include <linux/firmware.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/of_net.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/of_reserved_mem.h>
-> +#include <linux/regmap.h>
-> +
-> +#include "airoha_npu.h"
-> +
-> +#define NPU_EN7581_FIRMWARE_DATA		"airoha/en7581_npu_data.bin"
-> +#define NPU_EN7581_FIRMWARE_RV32		"airoha/en7581_npu_rv32.bin"
-> +#define NPU_EN7581_FIRMWARE_RV32_MAX_SIZE	0x200000
-> +#define NPU_EN7581_FIRMWARE_DATA_MAX_SIZE	0x10000
-> +#define NPU_DUMP_SIZE				512
-> +
-> +#define REG_NPU_LOCAL_SRAM		0x0
-> +
-> +#define NPU_PC_BASE_ADDR		0x305000
-> +#define REG_PC_DBG(_n)			(0x305000 + ((_n) * 0x100))
-> +
-> +#define NPU_CLUSTER_BASE_ADDR		0x306000
-> +
-> +#define REG_CR_BOOT_TRIGGER		(NPU_CLUSTER_BASE_ADDR + 0x000)
-> +#define REG_CR_BOOT_CONFIG		(NPU_CLUSTER_BASE_ADDR + 0x004)
-> +#define REG_CR_BOOT_BASE(_n)		(NPU_CLUSTER_BASE_ADDR + 0x020 + ((_n) << 2))
-> +
-> +#define NPU_MBOX_BASE_ADDR		0x30c000
-> +
-> +#define REG_CR_MBOX_INT_STATUS		(NPU_MBOX_BASE_ADDR + 0x000)
-> +#define MBOX_INT_STATUS_MASK		BIT(8)
-> +
-> +#define REG_CR_MBOX_INT_MASK(_n)	(NPU_MBOX_BASE_ADDR + 0x004 + ((_n) << 2))
-> +#define REG_CR_MBQ0_CTRL(_n)		(NPU_MBOX_BASE_ADDR + 0x030 + ((_n) << 2))
-> +#define REG_CR_MBQ8_CTRL(_n)		(NPU_MBOX_BASE_ADDR + 0x0b0 + ((_n) << 2))
-> +#define REG_CR_NPU_MIB(_n)		(NPU_MBOX_BASE_ADDR + 0x140 + ((_n) << 2))
-> +
-> +#define NPU_TIMER_BASE_ADDR		0x310100
-> +#define REG_WDT_TIMER_CTRL(_n)		(NPU_TIMER_BASE_ADDR + ((_n) * 0x100))
-> +#define WDT_EN_MASK			BIT(25)
-> +#define WDT_INTR_MASK			BIT(21)
-> +
-> +enum {
-> +	NPU_OP_SET = 1,
-> +	NPU_OP_SET_NO_WAIT,
-> +	NPU_OP_GET,
-> +	NPU_OP_GET_NO_WAIT,
-> +};
-> +
-> +enum {
-> +	NPU_FUNC_WIFI,
-> +	NPU_FUNC_TUNNEL,
-> +	NPU_FUNC_NOTIFY,
-> +	NPU_FUNC_DBA,
-> +	NPU_FUNC_TR471,
-> +	NPU_FUNC_PPE,
-> +};
-> +
-> +enum {
-> +	NPU_MBOX_ERROR,
-> +	NPU_MBOX_SUCCESS,
-> +};
-> +
-> +enum {
-> +	PPE_FUNC_SET_WAIT,
-> +	PPE_FUNC_SET_WAIT_HWNAT_INIT,
-> +	PPE_FUNC_SET_WAIT_HWNAT_DEINIT,
-> +	PPE_FUNC_SET_WAIT_API,
-> +};
-> +
-> +enum {
-> +	PPE2_SRAM_SET_ENTRY,
-> +	PPE_SRAM_SET_ENTRY,
-> +	PPE_SRAM_SET_VAL,
-> +	PPE_SRAM_RESET_VAL,
-> +};
-> +
-> +enum {
-> +	QDMA_WAN_ETHER = 1,
-> +	QDMA_WAN_PON_XDSL,
-> +};
-> +
-> +#define MBOX_MSG_FUNC_ID	GENMASK(14, 11)
-> +#define MBOX_MSG_STATIC_BUF	BIT(5)
-> +#define MBOX_MSG_STATUS		GENMASK(4, 2)
-> +#define MBOX_MSG_DONE		BIT(1)
-> +#define MBOX_MSG_WAIT_RSP	BIT(0)
-> +
-> +#define PPE_TYPE_L2B_IPV4	2
-> +#define PPE_TYPE_L2B_IPV4_IPV6	3
-> +
-> +struct ppe_mbox_data {
-> +	u32 func_type;
-> +	u32 func_id;
-> +	union {
-> +		struct {
-> +			u8 cds;
-> +			u8 xpon_hal_api;
-> +			u8 wan_xsi;
-> +			u8 ct_joyme4;
-> +			int ppe_type;
-> +			int wan_mode;
-> +			int wan_sel;
-> +		} init_info;
-> +		struct {
-> +			int func_id;
-> +			u32 size;
-> +			u32 data;
-> +		} set_info;
-> +	};
-> +};
-> +
-> +static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
-> +			       void *p, int size)
-> +{
-> +	u16 core = 0; /* FIXME */
-> +	u32 val, offset = core << 4;
-> +	dma_addr_t dma_addr;
-> +	void *addr;
-> +	int ret;
-> +
-> +	addr = kzalloc(size, GFP_ATOMIC | GFP_DMA);
-> +	if (!addr)
-> +		return -ENOMEM;
-> +
-> +	memcpy(addr, p, size);
-> +	dma_addr = dma_map_single(npu->dev, addr, size, DMA_TO_DEVICE);
-> +	ret = dma_mapping_error(npu->dev, dma_addr);
-> +	if (ret)
-> +		goto out;
-> +
-> +	spin_lock_bh(&npu->cores[core].lock);
-> +
-> +	regmap_write(npu->regmap, REG_CR_MBQ0_CTRL(0) + offset, dma_addr);
-> +	regmap_write(npu->regmap, REG_CR_MBQ0_CTRL(1) + offset, size);
-> +	regmap_read(npu->regmap, REG_CR_MBQ0_CTRL(2) + offset, &val);
-> +	regmap_write(npu->regmap, REG_CR_MBQ0_CTRL(2) + offset, val + 1);
-> +	val = FIELD_PREP(MBOX_MSG_FUNC_ID, func_id) | MBOX_MSG_WAIT_RSP;
-> +	regmap_write(npu->regmap, REG_CR_MBQ0_CTRL(3) + offset, val);
-> +
-> +	ret = regmap_read_poll_timeout_atomic(npu->regmap,
-> +					      REG_CR_MBQ0_CTRL(3) + offset,
-> +					      val, (val & MBOX_MSG_DONE),
-> +					      100, 100 * MSEC_PER_SEC);
-> +	if (!ret && FIELD_GET(MBOX_MSG_STATUS, val) != NPU_MBOX_SUCCESS)
-> +		ret = -EINVAL;
-> +
-> +	spin_unlock_bh(&npu->cores[core].lock);
-> +
-> +	dma_unmap_single(npu->dev, dma_addr, size, DMA_TO_DEVICE);
-> +out:
-> +	kfree(addr);
-> +
-> +	return ret;
-> +}
-> +
-> +static int airoha_npu_run_firmware(struct device *dev, void __iomem *base,
-> +				   struct reserved_mem *rmem)
-> +{
-> +	const struct firmware *fw;
-> +	void __iomem *addr;
-> +	int ret;
-> +
-> +	ret = request_firmware(&fw, NPU_EN7581_FIRMWARE_RV32, dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (fw->size > NPU_EN7581_FIRMWARE_RV32_MAX_SIZE) {
-> +		dev_err(dev, "%s: fw size too overlimit (%zu)\n",
-> +			NPU_EN7581_FIRMWARE_RV32, fw->size);
-> +		ret = -E2BIG;
-> +		goto out;
-> +	}
-> +
-> +	addr = devm_ioremap(dev, rmem->base, rmem->size);
-> +	if (!addr) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	memcpy_toio(addr, fw->data, fw->size);
-> +	release_firmware(fw);
-> +
-> +	ret = request_firmware(&fw, NPU_EN7581_FIRMWARE_DATA, dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (fw->size > NPU_EN7581_FIRMWARE_DATA_MAX_SIZE) {
-> +		dev_err(dev, "%s: fw size too overlimit (%zu)\n",
-> +			NPU_EN7581_FIRMWARE_DATA, fw->size);
-> +		ret = -E2BIG;
-> +		goto out;
-> +	}
-> +
-> +	memcpy_toio(base + REG_NPU_LOCAL_SRAM, fw->data, fw->size);
-> +out:
-> +	release_firmware(fw);
-> +
-> +	return ret;
-> +}
-> +
-> +static irqreturn_t airoha_npu_mbox_handler(int irq, void *npu_instance)
-> +{
-> +	struct airoha_npu *npu = npu_instance;
-> +
-> +	/* clear mbox interrupt status */
-> +	regmap_write(npu->regmap, REG_CR_MBOX_INT_STATUS,
-> +		     MBOX_INT_STATUS_MASK);
-> +
-> +	/* acknowledge npu */
-> +	regmap_update_bits(npu->regmap, REG_CR_MBQ8_CTRL(3),
-> +			   MBOX_MSG_STATUS | MBOX_MSG_DONE, MBOX_MSG_DONE);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static void airoha_npu_wdt_work(struct work_struct *work)
-> +{
-> +	struct airoha_npu_core *core;
-> +	struct airoha_npu *npu;
-> +	void *dump;
-> +	u32 val[3];
-> +	int c;
-> +
-> +	core = container_of(work, struct airoha_npu_core, wdt_work);
-> +	npu = core->npu;
-> +
-> +	dump = vzalloc(NPU_DUMP_SIZE);
-> +	if (!dump)
-> +		return;
-> +
-> +	c = core - &npu->cores[0];
-> +	regmap_bulk_read(npu->regmap, REG_PC_DBG(c), val, ARRAY_SIZE(val));
-> +	snprintf(dump, NPU_DUMP_SIZE, "PC: %08x SP: %08x LR: %08x\n",
-> +		 val[0], val[1], val[2]);
-> +
-> +	dev_coredumpv(npu->dev, dump, NPU_DUMP_SIZE, GFP_KERNEL);
-> +}
-> +
-> +static irqreturn_t airoha_npu_wdt_handler(int irq, void *core_instance)
-> +{
-> +	struct airoha_npu_core *core = core_instance;
-> +	struct airoha_npu *npu = core->npu;
-> +	int c = core - &npu->cores[0];
-> +	u32 val;
-> +
-> +	regmap_set_bits(npu->regmap, REG_WDT_TIMER_CTRL(c), WDT_INTR_MASK);
-> +	if (!regmap_read(npu->regmap, REG_WDT_TIMER_CTRL(c), &val) &&
-> +	    FIELD_GET(WDT_EN_MASK, val))
-> +		schedule_work(&core->wdt_work);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int airoha_npu_ppe_init(struct airoha_npu *npu)
-> +{
-> +	struct ppe_mbox_data ppe_data = {
-> +		.func_type = NPU_OP_SET,
-> +		.func_id = PPE_FUNC_SET_WAIT_HWNAT_INIT,
-> +		.init_info = {
-> +			.ppe_type = PPE_TYPE_L2B_IPV4_IPV6,
-> +			.wan_mode = QDMA_WAN_ETHER,
-> +		},
-> +	};
-> +
-> +	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
-> +				   sizeof(struct ppe_mbox_data));
-> +}
-> +
-> +int airoha_npu_ppe_deinit(struct airoha_npu *npu)
-> +{
-> +	struct ppe_mbox_data ppe_data = {
-> +		.func_type = NPU_OP_SET,
-> +		.func_id = PPE_FUNC_SET_WAIT_HWNAT_DEINIT,
-> +	};
-> +
-> +	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
-> +				   sizeof(struct ppe_mbox_data));
-> +}
-> +EXPORT_SYMBOL_GPL(airoha_npu_ppe_deinit);
-> +
-> +int airoha_npu_ppe_flush_sram_entries(struct airoha_npu *npu,
-> +				      dma_addr_t foe_addr,
-> +				      int sram_num_entries)
-> +{
-> +	struct ppe_mbox_data ppe_data = {
-> +		.func_type = NPU_OP_SET,
-> +		.func_id = PPE_FUNC_SET_WAIT_API,
-> +		.set_info = {
-> +			.func_id = PPE_SRAM_RESET_VAL,
-> +			.data = foe_addr,
-> +			.size = sram_num_entries,
-> +		},
-> +	};
-> +
-> +	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
-> +				   sizeof(struct ppe_mbox_data));
-> +}
-> +EXPORT_SYMBOL_GPL(airoha_npu_ppe_flush_sram_entries);
-> +
-> +int airoha_npu_foe_commit_entry(struct airoha_npu *npu, dma_addr_t foe_addr,
-> +				u32 entry_size, u32 hash, bool ppe2)
-> +{
-> +	struct ppe_mbox_data ppe_data = {
-> +		.func_type = NPU_OP_SET,
-> +		.func_id = PPE_FUNC_SET_WAIT_API,
-> +		.set_info = {
-> +			.data = foe_addr,
-> +			.size = entry_size,
-> +		},
-> +	};
-> +	int err;
-> +
-> +	ppe_data.set_info.func_id = ppe2 ? PPE2_SRAM_SET_ENTRY
-> +					 : PPE_SRAM_SET_ENTRY;
-> +
-> +	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
-> +				  sizeof(struct ppe_mbox_data));
-> +	if (err)
-> +		return err;
-> +
-> +	ppe_data.set_info.func_id = PPE_SRAM_SET_VAL;
-> +	ppe_data.set_info.data = hash;
-> +	ppe_data.set_info.size = sizeof(u32);
-> +
-> +	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
-> +				   sizeof(struct ppe_mbox_data));
-> +}
-> +EXPORT_SYMBOL_GPL(airoha_npu_foe_commit_entry);
-> +
-> +struct airoha_npu *airoha_npu_get(struct device *dev)
-> +{
-> +	struct platform_device *pdev;
-> +	struct device_node *np;
-> +	struct airoha_npu *npu;
-> +
-> +	np = of_parse_phandle(dev->of_node, "airoha,npu", 0);
-> +	if (!np)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	pdev = of_find_device_by_node(np);
-> +	of_node_put(np);
-> +
-> +	if (!pdev) {
-> +		dev_err(dev, "cannot find device node %s\n", np->name);
-> +		return ERR_PTR(-ENODEV);
-> +	}
-> +
-> +	if (!try_module_get(THIS_MODULE)) {
-> +		dev_err(dev, "failed to get the device driver module\n");
-> +		npu = ERR_PTR(-ENODEV);
-> +		goto error_pdev_put;
-> +	}
-> +
-> +	npu = platform_get_drvdata(pdev);
-> +	if (!npu) {
-> +		npu = ERR_PTR(-ENODEV);
-> +		goto error_module_put;
-> +	}
-> +
-> +	if (!device_link_add(dev, &pdev->dev, DL_FLAG_AUTOREMOVE_SUPPLIER)) {
-> +		dev_err(&pdev->dev,
-> +			"failed to create device link to consumer %s\n",
-> +			dev_name(dev));
-> +		npu = ERR_PTR(-EINVAL);
-> +		goto error_module_put;
-> +	}
-> +
-> +	return npu;
-> +
-> +error_module_put:
-> +	module_put(THIS_MODULE);
-> +error_pdev_put:
-> +	platform_device_put(pdev);
-> +
-> +	return npu;
-> +}
-> +EXPORT_SYMBOL_GPL(airoha_npu_get);
-> +
-> +void airoha_npu_put(struct airoha_npu *npu)
-> +{
-> +	module_put(THIS_MODULE);
-> +	put_device(npu->dev);
-> +}
-> +EXPORT_SYMBOL_GPL(airoha_npu_put);
-> +
-> +static const struct of_device_id of_airoha_npu_match[] = {
-> +	{ .compatible = "airoha,en7581-npu" },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(of, of_airoha_npu_match);
-> +
-> +static const struct regmap_config regmap_config = {
-> +	.name			= "npu",
-> +	.reg_bits		= 32,
-> +	.val_bits		= 32,
-> +	.reg_stride		= 4,
-> +	.disable_locking	= true,
-> +};
+True, the code is just more clear.
 
-Should this return irq rather than err?
+Thanks,
+Vlastimil
 
-Flagged by Smatch.
+> Regards,
+> Kohei
 
-> +
-> +		err = devm_request_irq(dev, irq, airoha_npu_wdt_handler,
-> +				       IRQF_SHARED, "airoha-npu-wdt", core);
-> +		if (err)
-> +			return err;
-> +
-> +		INIT_WORK(&core->wdt_work, airoha_npu_wdt_work);
-> +	}
-> +
-> +	if (dma_set_coherent_mask(dev, 0xbfffffff))
-> +		dev_warn(dev, "failed coherent DMA configuration\n");
-> +
-> +	err = airoha_npu_run_firmware(dev, base, rmem);
-> +	if (err)
-> +		return err;
-> +
-> +	regmap_write(npu->regmap, REG_CR_NPU_MIB(10),
-> +		     rmem->base + NPU_EN7581_FIRMWARE_RV32_MAX_SIZE);
-> +	regmap_write(npu->regmap, REG_CR_NPU_MIB(11), 0x40000); /* SRAM 256K */
-> +	regmap_write(npu->regmap, REG_CR_NPU_MIB(12), 0);
-> +	regmap_write(npu->regmap, REG_CR_NPU_MIB(21), 1);
-> +	msleep(100);
-> +
-> +	/* setting booting address */
-> +	for (i = 0; i < NPU_NUM_CORES; i++)
-> +		regmap_write(npu->regmap, REG_CR_BOOT_BASE(i), rmem->base);
-> +	usleep_range(1000, 2000);
-> +
-> +	/* enable NPU cores */
-> +	/* do not start core3 since it is used for WiFi offloading */
-> +	regmap_write(npu->regmap, REG_CR_BOOT_CONFIG, 0xf7);
-> +	regmap_write(npu->regmap, REG_CR_BOOT_TRIGGER, 0x1);
-> +	msleep(100);
-> +
-> +	err = airoha_npu_ppe_init(npu);
-> +	if (err)
-> +		return err;
-> +
-> +	platform_set_drvdata(pdev, npu);
-> +
-> +	return 0;
-> +}
-
-...
 
