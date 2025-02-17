@@ -1,170 +1,141 @@
-Return-Path: <netdev+bounces-167036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 458F8A386F5
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:51:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4B7A3873C
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 16:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB713AC896
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 14:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C388216B76F
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 15:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BDE22489E;
-	Mon, 17 Feb 2025 14:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B339921CA17;
+	Mon, 17 Feb 2025 15:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FuKbJGTP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fMYzlZeB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11528223324;
-	Mon, 17 Feb 2025 14:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3A2153BE4;
+	Mon, 17 Feb 2025 15:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739803782; cv=none; b=jO+TDoeabCgusOW1QBc3FvVKW6Wq7uEtS1BJUmwbQuGA0iBLdJ09uoSfiL7S78jsPKSzzhkPI72hvMdYUeiBaaKLIcvwPH0ItPntZUuXp29pDj6hNxUP+zVCe02zLHaUfJq25oUy/v43r3fT9Wq+H6JNrshdAj6PLcgYRI7RR0c=
+	t=1739804986; cv=none; b=aN5S9M+0uuSVcBbERR8WyJC7x2UwUxtgaujV8Fdwd/j81SrJmCsUuGHA8IzQevlX0bztALYqs9pka4/t9pl+JjmNkSJ5P1Ecolaf6F4LP4XaCrSh/pX5qQvZS45RblvcFVThQlmHmP1sb6H6BqU+aEXPcBWcbkWwvOOZtnq5l9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739803782; c=relaxed/simple;
-	bh=noBWesDhIHu2UKaR18tw6XBMmfBZeqYD391YNtBjELo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NPxJ3CPMev7TwTi0X2hg75EaLEP4pXpJdPlRczduxu9yY/7Of3khN+34zcK30tvotYBSgkeWv6E5dowT9e2Sh1iGctAk+hwjxoEgCFSZLSy38dgzKtQUf11CKv/7cpELtTwJ7PDu3SDJumcrruE2oYfUM48s8u2qC9HvW1+F0T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FuKbJGTP; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 64A4A44430;
-	Mon, 17 Feb 2025 14:49:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739803777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PCSw3bmWjwYwuAQWl8doOYDVdqtoYKvVbYaoog5r6cI=;
-	b=FuKbJGTPideoR9c6VeuSbGxTWhWv12fvminuJ8DDMWnRMjtEVQxnV/c1g4jtSw+pBHf3A6
-	RQBlVhGKexKMWaPV/8ju+UkrJ4fsyEhpPDWgeSW8hNw3tJkQRjPC9cU+sOxOlNvfA/by7C
-	h3P+/mW1/rFJ8UnPvJzgZHg52sj3CdJtWQc0TXqfKYgM0+7f+eZZ+hqZV5jTXhMHl06IU3
-	Ln8wHc7cu4kdYfBxzCeKT2Wd5Puw1/vFTMCGyOSWgqfOOP2CXY5j0yg5IO3/FFnlK0npwb
-	jvf1FZ3mskLOe3QP0WqZIcWoA2+0A9b1MUBCanwxV9yTMgSLsDf+eYpxkyErmA==
-Date: Mon, 17 Feb 2025 15:49:34 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>, Sean Anderson
- <seanga2@gmail.com>
-Subject: Re: [PATCH net-next v4 05/15] net: phy: Create a phy_port for
- PHY-driven SFPs
-Message-ID: <20250217154934.76ec03e5@fedora.home>
-In-Reply-To: <Z7NF6ciz4RHMaGo6@shell.armlinux.org.uk>
-References: <20250213101606.1154014-1-maxime.chevallier@bootlin.com>
-	<20250213101606.1154014-6-maxime.chevallier@bootlin.com>
-	<Z7DjfRwd3dbcEXTY@shell.armlinux.org.uk>
-	<20250217092911.772da5d0@fedora.home>
-	<Z7NF6ciz4RHMaGo6@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1739804986; c=relaxed/simple;
+	bh=J8Q+ouyUGMJmAIQWvjqhkuaXP2nvzroCE42M6Pt219k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDYJ0g+zlPiDY8SpBI0AmrFVHgmgqAsd5nPgKdNp9nLZmGKMrGu5coTHdX84UFoJNrTyDX3sGSTptMnNzwsGzqripxRvMCVJm44TCD0w3dzS1x98QWxV7mW67DWF0q9bvMNqCLaPiiKkhsACXzdKb5+o2ZpnN2v0xYnqRfdt/w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fMYzlZeB; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51H5POVp000551;
+	Mon, 17 Feb 2025 15:09:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=rsGbBDyvPWvIey+H276PvvAAydIWC3
+	3Gz/fReaevlwQ=; b=fMYzlZeB6XhR/l/RGfD95AAgjY82DvsfdN5W3L8JCQPI1G
+	F3X0kn/wPRHDArHIsynunCkhsdo8FZQHXAaqu4WfbVmZePmSIQAHEIZZLExMTAmJ
+	heVvPGLCyVTIyVO4KHSs/ZU828s9MikeCZEpS31B67w4QkDL27eRpNs0gxpUkkAF
+	75PQQo+CHGi4w21BQjwMDeSH8+RetcbKCxLK8qYShLvz9rsq0xmKRxtl22wfFIxk
+	5sZgBYtJdtlhuf/XwHFCsxzK1eIsFjq6JlxEXN5G2u+nBJzs7qJp/a65cvb/5Bnl
+	1OQxkibEiNRlb3vaQPHh/aYqk9WxPWkF35a4kFgw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44uxx7ttm1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Feb 2025 15:09:40 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51HF9dwQ025781;
+	Mon, 17 Feb 2025 15:09:39 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44uxx7ttku-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Feb 2025 15:09:39 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51HDUAnl032326;
+	Mon, 17 Feb 2025 15:09:38 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44u6rkphs0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 17 Feb 2025 15:09:38 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51HF9YtM17760608
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Feb 2025 15:09:34 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6979558063;
+	Mon, 17 Feb 2025 15:09:34 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 563A458056;
+	Mon, 17 Feb 2025 15:09:34 +0000 (GMT)
+Received: from localhost (unknown [9.61.91.157])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 17 Feb 2025 15:09:34 +0000 (GMT)
+Date: Mon, 17 Feb 2025 09:09:34 -0600
+From: Nick Child <nnac123@linux.ibm.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
+        nick.child@ibm.com, jacob.e.keller@intel.com
+Subject: Re: [PATCH 1/3] hexdump: Implement macro for converting large buffers
+Message-ID: <Z7NRLmcWJFNkyHGN@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
+References: <20250214162436.241359-1-nnac123@linux.ibm.com>
+ <20250214162436.241359-2-nnac123@linux.ibm.com>
+ <20250215163612.GR1615191@kernel.org>
+ <20250215174039.20fbbc42@pumpkin>
+ <20250215174635.3640fb28@pumpkin>
+ <20250216093204.GZ1615191@kernel.org>
+ <20250216112430.29c725c5@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehkeeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefuddprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdro
- hhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250216112430.29c725c5@pumpkin>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mAASe0gVh-_z6flf8QwL2q88tVmvwtbu
+X-Proofpoint-ORIG-GUID: YBrXGj0-RBG-NJDkjB0Pja_eQ5z7wPAv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-17_06,2025-02-13_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ adultscore=0 bulkscore=0 clxscore=1015 suspectscore=0 mlxlogscore=400
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502170126
 
-On Mon, 17 Feb 2025 14:21:29 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Thank you David and Simon for testing and review!
 
-> On Mon, Feb 17, 2025 at 09:29:11AM +0100, Maxime Chevallier wrote:
-> > Hello Russell,
-> > 
-> > On Sat, 15 Feb 2025 18:57:01 +0000
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >   
-> > > On Thu, Feb 13, 2025 at 11:15:53AM +0100, Maxime Chevallier wrote:  
-> > > > Some PHY devices may be used as media-converters to drive SFP ports (for
-> > > > example, to allow using SFP when the SoC can only output RGMII). This is
-> > > > already supported to some extend by allowing PHY drivers to registers
-> > > > themselves as being SFP upstream.
-> > > > 
-> > > > However, the logic to drive the SFP can actually be split to a per-port
-> > > > control logic, allowing support for multi-port PHYs, or PHYs that can
-> > > > either drive SFPs or Copper.
-> > > > 
-> > > > To that extent, create a phy_port when registering an SFP bus onto a
-> > > > PHY. This port is considered a "serdes" port, in that it can feed data
-> > > > to anther entity on the link. The PHY driver needs to specify the
-> > > > various PHY_INTERFACE_MODE_XXX that this port supports.
-> > > > 
-> > > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>    
-> > > 
-> > > With this change, using phy_port requires phylink to also be built in
-> > > an appropriate manner. Currently, phylink depends on phylib. phy_port
-> > > becomes part of phylib. This patch makes phylib depend on phylink,
-> > > thereby creating a circular dependency when modular.
-> > > 
-> > > I think a different approach is needed here.  
-> > 
-> > That's true.
-> > 
-> > One way to avoid that would be to extract out of phylink/phylib all the
-> > functions for linkmode handling that aren't tied to phylink/phylib
-> > directly, but are about managing the capabilities of each interface,
-> > linkmode, speed, duplex, etc. For phylink, that would be :
-> > 
-> > phylink_merge_link_mode
-> > phylink_get_capabilities
-> > phylink_cap_from_speed_duplex
-> > phylink_limit_mac_speed
-> > phylink_caps_to_linkmodes
-> > phylink_interface_max_speed
-> > phylink_interface_signal_rate
-> > phylink_is_empty_linkmode
-> > phylink_an_mode_str
-> > phylink_set_port_modes
-> > 
-> > For now all these are phylink internal and that makes sense, but if we want
-> > phy-driven SFP support, stackable PHYs and so on, we'll need some ways for
-> > the PHY to expose its media-side capabilities, and we'd reuse these.
-> > 
-> > These would go into linkmode.c/h for example, and we'd have a shared set
-> > of helpers that we can use in phylink, phylib and phy_port.
-> > 
-> > Before I go around and rearrange that, are you OK with this approach ?  
+On Sun, Feb 16, 2025 at 11:24:30AM +0000, David Laight wrote:
 > 
-> I'm not convinced. If you're thinking of that level of re-use, you're
-> probably going to miss out on a lot of logic that's in phylink. Maybe
-> there should be a way to re-use phylink in its entirety between the
-> PHY and SFP.
+> I just changed the prototypes (include/linux/printk.h) to make both
+> rowsize and groupsize 'unsigned int'.
+> The same change in lib/hexdump.c + changing the local 'i, linelen, remaining'
+> to unsigned int and it all compiled.
 > 
-> Some of the above (that deal only with linkmodes) would make sense
-> to move out though.
+> FWIW that hexdump code is pretty horrid (especially if groupsize != 1).
+> 
 
-Yeah I'm thinking about moving only stuff that is phylink-independent
-and only deals with linkmodes indeed. I'll spin a quick series to see
-what it looks like then :)
+Given this discussion and my own head-scratching, I think I will take a
+closer look at hex_dump_to_buffer.
 
-Thanks,
+I was trying to avoid editing this function due the number of callers it
+has across the kernel. But I think we can get away with keeping the
+API (but change args to uint's) and editing the body of the function
+to always iterate byte-by-byte, addding space chars where necessary. At the
+cost of a few more cycles, this will allow for more dynamic values
+for rowsize and groupsize and shorten the code up a bit. This would also
+address the "Side question" in my cover letter. Will send a v3
+regardless if I can figure that out or not.
 
-Maxime
+The return value of hex_dump_to_buffer on error still irks me a bit but
+I don't think that can easily be changed.
 
+Thanks again!
 
