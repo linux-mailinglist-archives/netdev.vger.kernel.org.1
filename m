@@ -1,133 +1,221 @@
-Return-Path: <netdev+bounces-166922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-166923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DEBA37DEA
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:10:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC52A37E52
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 10:21:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9565F3A8A5B
-	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:06:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 717A33AD012
+	for <lists+netdev@lfdr.de>; Mon, 17 Feb 2025 09:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F6B1A3157;
-	Mon, 17 Feb 2025 09:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1B21FDA9D;
+	Mon, 17 Feb 2025 09:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V6CzhRh1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jPMcr1vm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FD5155316
-	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 09:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750861FDA96
+	for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 09:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739783211; cv=none; b=mDs0euGMdTimenRlqn8JUYjnO90QzbbYMnm60AT55mCw2tGqHnJVn7dNHCUP/0riinwfrK3uxEir/HXZTk7N3yQ9NUHFtdEH4gQsAiUg4aDr0Vl5/ozEzxkGHZDV1+IJdQYkk4PKZ2taBlcc9PJWHFNBrISEy8xmFtqWpT4GbRU=
+	t=1739783901; cv=none; b=iwzy0CbRR+m/UxJCitOo4myldGiObVP2Zjs9ewrGunVW/QHItnlkJZtBdTuJph9tz98aC7JB5c3SSkfeM3NSYjNVTL9vyNXNtqWKrLsW1Gu4+xS3r7uZLi+R7/EirvgvUMeoFz2iECKOy3NgHMm4VjBRHzWKYCZtFgHcMk4eOQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739783211; c=relaxed/simple;
-	bh=nJCkytmPtDyYoEpk7Y2B0AQ4HJ0hsEDOqc+k3dFC+kY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R/8Qewdngxk41cM5O4lJPh4aKIQ086aLIMtk38rIyRDEJ3oQMihzDq2KSIOkeo7TTuogrcwbvZPgceJnKJwTHcOuRrclBTVFJLWNCcXJpnXEGYVRA8hb4URdmqS/jPzdaVTDZRZzJ2RLF0TLv6hIUVOfrb6/+DQGlxfTfmmutTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V6CzhRh1; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739783209; x=1771319209;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nJCkytmPtDyYoEpk7Y2B0AQ4HJ0hsEDOqc+k3dFC+kY=;
-  b=V6CzhRh1Hq8YdbDl+3HZN7Yx9hDmKF0Qq9ndwbOGqzz/yhZh/eujOLWi
-   Fg10XpDnWOImBodjbNE/KMvDkhBhAei0GLMv2/ClaKupAVIPL7Xhao/u8
-   Xrk1y6YNkwbQBq6Bb4qeHLQFi6ZPsa8h6AHQCLdBL/AnC/InyNVCCFKMB
-   XAyufCb4/rgwLyvFXV62F7bbbtAHqaQjTFGlAOUBCQ705cic9xMY4QfVm
-   6H2FAzGqMnuADJ6Hs3/nwcQKrW6TZ/bjcMwg+iGuKe7LN4zzaacU2+ggf
-   aKDdblSQrilqv8XSVkptl3nbS7g07GTUDSTASCH8Da4nP9oF4yMsXTA8N
-   g==;
-X-CSE-ConnectionGUID: I+NslV/qS7WaItDtz0+fZQ==
-X-CSE-MsgGUID: NcDjsk8vRP2caaYyXyP+0Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="51078515"
-X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
-   d="scan'208";a="51078515"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 01:06:49 -0800
-X-CSE-ConnectionGUID: 6cIaYjYMR3SucZqcu8CbZg==
-X-CSE-MsgGUID: 2YPdZIDPTdKjw092Rjbk6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
-   d="scan'208";a="113937627"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa006.fm.intel.com with ESMTP; 17 Feb 2025 01:06:47 -0800
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	marcin.szycik@linux.intel.com,
-	jedrzej.jagielski@intel.com,
-	przemyslaw.kitszel@intel.com,
-	piotr.kwapulinski@intel.com,
-	anthony.l.nguyen@intel.com,
-	dawid.osuchowski@intel.com,
-	horms@kernel.org,
-	pmenzel@molgen.mpg.de
-Subject: [iwl-next v3 4/4] ixgbe: turn off MDD while modifying SRRCTL
-Date: Mon, 17 Feb 2025 10:06:36 +0100
-Message-ID: <20250217090636.25113-5-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20250217090636.25113-1-michal.swiatkowski@linux.intel.com>
-References: <20250217090636.25113-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1739783901; c=relaxed/simple;
+	bh=JyC3DsKd7jW/3RxPZY6kje384o9WR4UklJlEwhSelB4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HMkyrvm98IUzTECW6ToyTvXjj89Y8zfj4yqx/b7ssPRILBS8bxHhYXGrj1cfdJt7gE4P0Oz2GMaePAqtw9Okigov/T/ZE+/kZ1p+incB8V6jo2pTm2O8lHPkw5zhLftD3NXNo10RakbJqfHdvP952Ikp6LasFiv67c5VM+rkbRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jPMcr1vm; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so3020144276.3
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 01:18:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739783898; x=1740388698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0ZzX8tGLTQD9vuUORGnzCnOyePntqbaoJmyRLXunXls=;
+        b=jPMcr1vmY3apL9c5u/R2qyhrqVgPM/RRvtk7Yx5yHYdGM+26MXPwDHG6fen85aavXk
+         qCiBc4T0MdIRQF4aB12GT6dA1RnMTDOwZSWIfDERKzEwUaQO35Oq3iBW83Y45/KDr0Ja
+         oCxvojbj2rRF4Iy/rMaP4LRtYI/8neG++xCNUUr3mL+aHIpZJmgtFBLjerO1TzkoJolu
+         yrNKkUl6oAjiBKgjz4kO+D5cmwSXG+b3KYTDNEE0pt/0urbNQApNfVFp1+BGTZE6ChsI
+         sN0302cZqjs8KYSvV0So7soVbTyNyEUmjxYbp0yX9S8qxzBBSymNctXJ6Wrcxg4w7bRy
+         oFAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739783898; x=1740388698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0ZzX8tGLTQD9vuUORGnzCnOyePntqbaoJmyRLXunXls=;
+        b=qrkhZ68C3MkWFDqw5O5/u7dktAlQ03sDiW1PSbRQVYxGTgq0teQnG6NdjI341A0IGz
+         i8ocbdQ2NiDxX+WTDEtE7CoR/EdQt4rNrg6VMnM+8XJXkekm/krpLVitgWo2rzldjcrB
+         0jpSo8Hfs9jZaN4rc1Bq2TMwRKFyaT320M5ErQngyDT/sF5+Y1VbvNYRmOi8uye1uTEc
+         gTrq9lZC5wjzGiGKKChIp59IkrXiza1CjCf+pBtq16TdA5h8VBmuCnRrpLzSJMyUFKB/
+         41O0T70LOl5VJVE9RvOh9sJonSFN2DmREtTY16mDb64XywGWcEug3wLKheLe6VCsrfPv
+         +RkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVivHGrFMo/s8vgVG1dpnOrWE0UbDzf21N2jz5O4wDXYCEUY2ULgplhxh5AnLy9pn9mQpgdwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC+blOwW4JByTO3+drBUHW/cbx4N2f5WLyZo9xbCcYzAvz3asQ
+	5ydG4PxYXT7ue6gfGOM7Risng5vJSLPF0eHIkf+5gJbK516yYUIRRgTZPuYqbRqbdBAOjUi59+W
+	TuxBS1h7ke2mG53f8Tk6FpsBXVTcshZiUSJQD
+X-Gm-Gg: ASbGnctryRyRcNtBrsfTdJQuVgcClEPS3uyRa2T5WgAl7PzX7QTjIf61APuwwYARsv9
+	Lh7nyZbT1YuQYOzO7REcSufnRq6HBRJUY6b1O6F60ofvHQfgw3MFaL+TWiPd0x19JOahUQ0CXFg
+	==
+X-Google-Smtp-Source: AGHT+IH3Yhhhb5o4OOHhwkCE2P+VxdpO+BObbKbP0i7sGJ2qYMSa9fy76gnizP4Jt2bIUOnaBYsc2ith6LgrCmWmmNs=
+X-Received: by 2002:a05:6902:1102:b0:e58:98d0:2d27 with SMTP id
+ 3f1490d57ef6-e5dc90265a1mr5427194276.7.1739783898211; Mon, 17 Feb 2025
+ 01:18:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <2025021425-surgical-wackiness-0940@gregkh> <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
+ <2025021705-speckled-ooze-c4d0@gregkh>
+In-Reply-To: <2025021705-speckled-ooze-c4d0@gregkh>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Mon, 17 Feb 2025 17:17:50 +0800
+X-Gm-Features: AWEUYZl7o3FAHCQLs9yJwCOplO6bcmFh381n0TsGn9s_rXdfVZOBNJ4tE-ab4D0
+Message-ID: <CADg1FFd3nWiZqA8huodnsjezgrAL-p9t2BLHf3MzO3cJD6xZ+w@mail.gmail.com>
+Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Radoslaw Tyl <radoslawx.tyl@intel.com>
+On Mon, Feb 17, 2025 at 4:53=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
+> > On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
+.org> wrote:
+> > >
+> > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
+> > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > >
+> > > > Expose the isoc_alt attr with device group to avoid the racing.
+> > > >
+> > > > Now we create a dev node for btusb. The isoc_alt attr belongs to it=
+ and
+> > > > it also becomes the parent device of hci dev.
+> > > >
+> > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to cont=
+rol USB alt setting")
+> > >
+> > > Wait, step back, why is this commit needed if you can change the alt
+> > > setting already today through usbfs/libusb without needing to mess wi=
+th
+> > > the bluetooth stack at all?
+> >
+> > In short: We want to configure the alternate settings without
+> > detaching the btusb driver, while detaching seems necessary for
+> > libusb_set_interface_alt_setting to work (Please correct me if I'm
+> > wrong!)
+>
+> I think changing the alternate setting should work using usbfs as you
+> would send that command to the device, not the interface, so the driver
+> bound to the existing interface would not need to be removed.
+>
+> Try it out and see yourself to verify this before you continue down any
+> of this.  There's no need to use libfs for just a single usbfs command,
+> right?
 
-Modifying SRRCTL register can generate MDD event.
+I will give it a try. Great thanks for this suggestion!
 
-Turn MDD off during SRRCTL register write to prevent generating MDD.
+>
+> thanks,
+>
+> greg k-h
 
-Fix RCT in ixgbe_set_rx_drop_en().
 
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Radoslaw Tyl <radoslawx.tyl@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+On Mon, Feb 17, 2025 at 4:55=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
+> > On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
+.org> wrote:
+> > >
+> > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
+> > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > >
+> > > > Expose the isoc_alt attr with device group to avoid the racing.
+> > > >
+> > > > Now we create a dev node for btusb. The isoc_alt attr belongs to it=
+ and
+> > > > it also becomes the parent device of hci dev.
+> > > >
+> > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to cont=
+rol USB alt setting")
+> > >
+> > > Wait, step back, why is this commit needed if you can change the alt
+> > > setting already today through usbfs/libusb without needing to mess wi=
+th
+> > > the bluetooth stack at all?
+> >
+> > In short: We want to configure the alternate settings without
+> > detaching the btusb driver, while detaching seems necessary for
+> > libusb_set_interface_alt_setting to work (Please correct me if I'm
+> > wrong!)
+> >
+> > Background:
+> > The Bluetooth Core Specification defines a protocol for the operating
+> > system to communicate with a Bluetooth chipset, called HCI (Host
+> > Controller Interface) (Host=3DOS, Controller=3Dchipset).
+> > We could say the main purpose of the Linux Bluetooth drivers is to set
+> > up and get the HCI ready for the "upper layer" to use.
+> >
+> > Who could be the "upper layer" then? There are mainly 2: "Control" and
+> > "User" channels.
+> > Linux has its default Bluetooth stack, BlueZ, which is splitted into 2
+> > parts: the kernel space and the user space. The kernel space part
+> > provides an abstracted Bluetooth API called MGMT, and is exposed
+> > through the Bluetooth HCI socket "Control" channel.
+> > On the other hand Linux also exposes the Bluetooth HCI socket "User"
+> > channel, allowing the user space APPs to send/receive the HCI packets
+> > directly to/from the chipset. Google's products (Android, ChromeOS,
+> > etc) use this channel.
+> >
+> > Now why this patch?
+> > It's because the Bluetooth spec defines something specific to USB
+> > transport: A USB Bluetooth chipset must/should support these alternate
+> > settings; When transferring this type of the Audio data this alt must
+> > be used, bla bla bla...
+> > The Control channel handles this in the kernel part. However, the
+> > applications built on top of the User channel are unable to configure
+> > the alt setting, and I'd like to add the support through sysfs.
+>
+> So the "problem" is that Google doesn't want to use BlueZ, which is
+> fine, you do you :)
+>
+> But how does BlueZ handle this same problem today?  What api to the
+> kernel does it use to change the interface that you can't also do with
+> your "BlueZ replacement"?
+>
+> Surely this isn't a new issue suddenly, but if it is, it needs to be
+> solved so BOTH userspace stacks can handle it.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 22148e65e596..873b46d21042 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -4099,8 +4099,12 @@ void ixgbe_set_rx_drop_en(struct ixgbe_adapter *adapter)
- static void ixgbe_set_rx_drop_en(struct ixgbe_adapter *adapter)
- #endif
- {
--	int i;
- 	bool pfc_en = adapter->dcb_cfg.pfc_mode_enable;
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	int i;
-+
-+	if (hw->mac.ops.disable_mdd)
-+		hw->mac.ops.disable_mdd(hw);
- 
- 	if (adapter->ixgbe_ieee_pfc)
- 		pfc_en |= !!(adapter->ixgbe_ieee_pfc->pfc_en);
-@@ -4122,6 +4126,9 @@ static void ixgbe_set_rx_drop_en(struct ixgbe_adapter *adapter)
- 		for (i = 0; i < adapter->num_rx_queues; i++)
- 			ixgbe_disable_rx_drop(adapter, adapter->rx_ring[i]);
- 	}
-+
-+	if (hw->mac.ops.enable_mdd)
-+		hw->mac.ops.enable_mdd(hw);
- }
- 
- #define IXGBE_SRRCTL_BSIZEHDRSIZE_SHIFT 2
--- 
-2.42.0
+BlueZ handles that in their MGMT command, that is, through Control
+channel -> BlueZ kernel space code -> driver callbacks.
+Once a Bluetooth chipset is opened with the User channel, it can't be
+used with the Control channel simultaneously, and vice versa.
 
+>
+> thanks,
+>
+> greg k-h
+
+--=20
+Best Regards,
+Hsin-chen
 
