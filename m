@@ -1,146 +1,106 @@
-Return-Path: <netdev+bounces-167385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7DCA3A102
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:22:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EE5A3A14F
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113CD165D64
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:22:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B55301888A95
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09526B96A;
-	Tue, 18 Feb 2025 15:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA9226BD8F;
+	Tue, 18 Feb 2025 15:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BjcBlLn2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2bQybeC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAA026D5C8
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 15:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190A726AA94;
+	Tue, 18 Feb 2025 15:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739892106; cv=none; b=BaRnoeLE/Lc9CYT2P0AL8feV3AgBF/7mTl2JRBhe8ozbziSNpbs1NGS3Iv0hQabMy6Kv4gdfOMrzHKxNOBF8dwfsMtP4n26530Ug4WlVT0IVegYOeuEy1Rt+prinXU5KMFoxCU98UuZssPctj1RZ+/3agsvC56MdXJWbiR2swKw=
+	t=1739892828; cv=none; b=Hih/UJ6jGYJGCVchYea3v94k131C7ODEZdUgk6s9XRjvMxpVnYFfVkHK4nXrHqmqm80iXJ9DW5MoopNofk5NJv4Ez5fKsDXASVE6zRWARKjojQ1a56Hheu34E7Sow0/bc33hPLIi72G4nppGXrxenevjIGycEaYw4+JHqDUDgYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739892106; c=relaxed/simple;
-	bh=6WtVAfAhOQBhmPNF3eva73UYC/Wsc3+i+rBcWuwzoCY=;
+	s=arc-20240116; t=1739892828; c=relaxed/simple;
+	bh=pBZ6DBcpflfPTTSV2qkpelSifShPkMmpmLDJ2Bgc24E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cv1LqTFDb3teyDaIpW4mTg/9Z3r9bUDgcCpYrBlkWMLRi4jggUbnhOO7gxM9vAd5Q9L8SKUhtJhW77EkiXJ4utYDqolW5H6yFvkxxwXlMKeNdh6CyikL97yyQfw9ylP9fzMK2a/IrY8yx3JbISRZUOrK3g0kZqTXWopXby28rEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BjcBlLn2; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 4E935114023B;
-	Tue, 18 Feb 2025 10:21:43 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Tue, 18 Feb 2025 10:21:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1739892103; x=
-	1739978503; bh=ESiXGQA7LoMCz2qROe4jft1yBdvs96YNdMTAzY4Vrik=; b=B
-	jcBlLn2TJVPo+XQ7fTaCQStL19HdyoB3szzpWCNW0MKZqdEYt4ANamBmIj6W2H+2
-	T30RXAI8ei/d/YbyzLvF5VOrJnvDA9IRPQYyrEu/lOodfsXiBKo50opDo9SP0EBR
-	3ix8Lkj0JEx+Grr5VdDVzpLeqS6MhX0iBzsDvYv8+OJScNpZuxMGQdxkeUAbjczL
-	v9lQdG0/RyIfasREMWD/aYlrvzC1DuJuft581Zwpbe49+Wdscjxy/IVpT5fUWQvq
-	2iJeo522ocGQJsoJ17f8hJS+0h2Qr9kE6vTARMLXdeHrXo4W9KrS/0R0KjE83dSt
-	m2ZD3blIFCeIWX2mF35nw==
-X-ME-Sender: <xms:hqW0Z9XJ8yK-gEuMzMwSyb6AAE5FQvQJ1GJQVmwsXnPG3UOSFv7bzA>
-    <xme:hqW0Z9lpdPex8avMuqrOTfoIKWjJjnYxgJp_hZTSWYwe_abMEc4Dg9AT_u5Lskki6
-    GcBD_64O0F0hsE>
-X-ME-Received: <xmr:hqW0Z5ZfFq2Jts5hD_2JV5rpIOgj-IbtY7NzvQ8hMO8_KcXdDYGWsy29On8a>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeiudeiiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
-    jeenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
-    drohhrgheqnecuggftrfgrthhtvghrnhepkeeggfeghfeuvdegtedtgedvuedvhfdujedv
-    vdejteelvdeutdehheellefhhfdunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
-    thhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhutghivghnrdigih
-    hnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghphhgvnhesnhgvthifohhrkhhp
-    lhhumhgsvghrrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehfmhgvihesshhfshdrtghomhdprhgtphhtthhopeifvghifigrnhesghhooh
-    hglhgvrdgtohhm
-X-ME-Proxy: <xmx:hqW0ZwXjkkMtkBYbZoS70YDt25QjPY_KOjKj8yANSrNOarUBn8t4-w>
-    <xmx:hqW0Z3nrYJhnS64RbhZCFgQFWKTVqLUnLxZBRj6AOktLDmKfMtzMOQ>
-    <xmx:hqW0Z9eURXd8IArSrqalY5nMyzH--WcoZyRbjbzpx_1Dc17kEiePgg>
-    <xmx:hqW0ZxEbK2c-MlWGpAnXmgNfxHYsGSoaLqw3GZuN0LjXlLtBInDMcA>
-    <xmx:h6W0Zyv1QAKFOBT2vcBJxXKALynNSx-ZVMcwAD316kJHJAHm9iJCbHfO>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 18 Feb 2025 10:21:41 -0500 (EST)
-Date: Tue, 18 Feb 2025 17:21:38 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, edumazet@google.com,
-	netdev@vger.kernel.org, fmei@sfs.com, Wei Wang <weiwan@google.com>
-Subject: Re: Fw: [Bug 219766] New: Garbage Ethernet Frames
-Message-ID: <Z7SlggSKBDk2wDj-@shredder>
-References: <20250210084931.23a5c2e4@hermes.local>
- <Z7D9cR22BDPN7WSJ@shredder>
- <CADvbK_eZp5ikahxH4wvPm5_PuK1khvVKpGnY5LUd9nwHgS96Cw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kf21TsLxXVUMN7Dafwfc3PtzK+EVVGiCw4gCpnWY0GoLsD0ot6Xd5uXhsbnZT6DbdddzkW22TQ0piD3V7ctxljX4HB/OXbzku2M0BLvB6y+CvD880YsZEBrqK/WZ20tYLrN3/WI9X2iypGEzhvuNFphFqYl3cQWz7F49C6L7XDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2bQybeC3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+SR6bZ23Iqbr9gYinpkbLkkCfOXGYiitlLTZ/pTqB2k=; b=2bQybeC3IMlugSflIXxflyUFQz
+	ovuJU1pjz1QG/81pSg5ugxg5hB52YnTM9JviZUPcxWW+02PWxwtJG/2R39OAWS84C02ERiduOm2v/
+	WnAjHF/KStEfYdvt4Uiq2cMlCCWvGzA7invLn7XTZUaqt6YqNpW6HooEoKkh5YgbQCgA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tkPbD-00FKur-Pa; Tue, 18 Feb 2025 16:33:27 +0100
+Date: Tue, 18 Feb 2025 16:33:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	'Pankaj	Dubey' <pankaj.dubey@samsung.com>, ravi.patel@samsung.com
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Message-ID: <69d1b0fe-d35f-4242-bf80-6c024cf72dd1@lunn.ch>
+References: <20250213044624.37334-1-swathi.ks@samsung.com>
+ <CGME20250213044955epcas5p110d1e582c8ee02579ead73f9686819ff@epcas5p1.samsung.com>
+ <20250213044624.37334-2-swathi.ks@samsung.com>
+ <85e0dec0-5b40-427a-9417-cae0ed2aa484@lunn.ch>
+ <00b001db7e9f$ca7cfbd0$5f76f370$@samsung.com>
+ <ffb13051-ab93-4729-8b98-20e278552673@lunn.ch>
+ <011901db80fb$8e968f60$abc3ae20$@samsung.com>
+ <18746e2f-4124-4f85-97d2-a040b78b4b34@lunn.ch>
+ <015601db81b8$ee7237f0$cb56a7d0$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADvbK_eZp5ikahxH4wvPm5_PuK1khvVKpGnY5LUd9nwHgS96Cw@mail.gmail.com>
+In-Reply-To: <015601db81b8$ee7237f0$cb56a7d0$@samsung.com>
 
-On Mon, Feb 17, 2025 at 05:31:16PM -0500, Xin Long wrote:
-> On Sat, Feb 15, 2025 at 3:47 PM Ido Schimmel <idosch@idosch.org> wrote:
-> > Another possible solution is to have the blackhole device consume the
-> > packets instead of letting them go out without an Ethernet header [4].
-> > Doesn't seem great as the packets disappear without telling anyone
-> > (before 22600596b675 an error was returned).
-> This looks fine to me. The fix in commit 22600596b675 was specifically
-> intended to prevent an error from being returned in these cases, as it
-> would break userspace UDP applications.
-
-Yes, I later realized that this is fine as well. Packets are already
-discarded today via dst_discard_out() if dst_dev_put() was called on a
-dst entry before calling dst_output():
-
-# bpftrace -e 'k:dst_discard_out { @[kstack()] = count(); }'
-Attaching 1 probe...
-^C
-
-@[
-    dst_discard_out+5
-    ip_send_skb+25
-    udp_send_skb+376
-    udp_sendmsg+2516
-    sock_write_iter+365
-    vfs_write+937
-    ksys_write+200
-    do_syscall_64+158
-    entry_SYSCALL_64_after_hwframe+119
-]: 2034
-
-While running the reproducer I shared earlier.
-
-> If you prefer to avoid silent drops, you could add a warning like:
+> Hi Andrew, 
+> Thanks for the clarification.
+> Will post v7 with the following updates:
 > 
->   net_warn_ratelimited("%s(): Dropping skb.\n", __func__);
-> 
-> similar to how blackhole_netdev_xmit() handles it.
+> 1. Changing phy-mode in dt-binding as shown below:
+>   phy-mode:
+>     enum:
+>       - rgmii
+>       - rgmii-id
+>       - rgmii-rxid
+>       - rgmii-txid
+> 	  
+> 2. Removing phy-mode from .dtsi and example given in dt-binding
 
-I would like to avoid spamming the kernel log with these messages. I
-checked and we see these messages on a few machines while running the
-IPv6 torture tests in fib_nexthops.sh. Maybe in net-next I will add a
-new drop reason for these scenarios.
+The example can use phy-mode, since the example is the combination of
+the .dtsi and the .dts parts of the device tree. And having the
+example using 'rgmii-id' will hopefully prevent some people wrongly
+using 'rgmii'
 
-> Thanks.
+> 3. Add phy-mode to .dts file and specify 'rgmii-id' there.
 
-Thanks. I will run this patch through regression and post later this
-week if everything is fine.
+Great. History shows if you get the example and the first user
+correct, everybody blindly copies it and gets it right by accident. If
+the first user is wrong, everybody blindly copies it, and get is wrong
+by not sanity checking what they copy.
+
+	Andrew
 
