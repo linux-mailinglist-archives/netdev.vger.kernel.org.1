@@ -1,109 +1,98 @@
-Return-Path: <netdev+bounces-167548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC94A3AC5C
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:10:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C34D5A3AC90
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E5AB1895200
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:10:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A86C7A5C96
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9591DD88D;
-	Tue, 18 Feb 2025 23:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C68D1DDC36;
+	Tue, 18 Feb 2025 23:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWjnjjE6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQyYaiAt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA5A1D61B1;
-	Tue, 18 Feb 2025 23:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E66619CC17;
+	Tue, 18 Feb 2025 23:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739920204; cv=none; b=c9t28L6GAfnisSru6oAfil5l3J7scH15b8PwS0cQEeEaTERjIBLW98HLm6G8emBhzkRz8Aacn/+v3D8FLqwsoxhGs0V6kd8L5tWnt0H0QWV9P7+q4JVvAZCNRqcQ6vgGmttuOIyHKVtobBpGkW/aWeGs/NkecCrWonpG0F/OeNg=
+	t=1739921472; cv=none; b=mJdcP8VfThW2wA7cmt3u8w5TVuxYsTxFDc99dzpkSlKyzMErtyp6Wn75GKpGjHto4dllpKTgKmiBCDXwX5sYUYp8jRAVlwBSreP27tXoMrELvFuxfCjHbnLRC1Q00hA9kNpDDH1q9mPQcFLFZjSZ4wNYitrxyN4pUtubeounkSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739920204; c=relaxed/simple;
-	bh=G0gJEYl8XkYWl55XF29TIA+jeJYaG+qPI/N7IHDFyco=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D44x+nBFo+SJPvPloOTAQXp88Y54YIxbdpcJBQ5uVukD6pSywRsx7jmsweTqxZ5oSV95qgyBNptzEakftDA0qsi2v/jF64fs6MpWbg2FTI24IAZP77a392UzlJrnRTBTo8LSXZxRDivUToNPSulQ6pITPGDU+XfRobe7plyTJCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWjnjjE6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB802C4CEE2;
-	Tue, 18 Feb 2025 23:10:03 +0000 (UTC)
+	s=arc-20240116; t=1739921472; c=relaxed/simple;
+	bh=Ktp3q+vyFgGJNlGF9go2OGf8msLlPBzcKI8SNITpBMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N03xoIl2KPw3MblA6K7+zG5kBxN8Du7U/z/opaVMAhGSFa9Ot9qaTJL1gnBJP2/FbA+W7bT3q8ZKZDqi7WjZwvEioCH1SodtqTvFUPu857usIpwTXrf3ilXGs6Gs0ujJH3+cqbPG4CED28FHnaQr/WJHARfk8yx1M+vzfZNYKa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQyYaiAt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5112DC4CEE7;
+	Tue, 18 Feb 2025 23:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739920203;
-	bh=G0gJEYl8XkYWl55XF29TIA+jeJYaG+qPI/N7IHDFyco=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JWjnjjE6b1we6u+ZXKysajBCcQQ9LgtkOE3q/kktMQKurPsu+AZl+ykWgJpRE5tKL
-	 g4pngJsXiKBKJ/YpR9Pi5Wc4g822wfcaDOnIhFrz5+zMBenEtFExJZEohor/55p820
-	 LFD/o71O+AvDabrWQgv4jHtfDx7iGHJfXsjk15AYnvCqDUQqcO7oxuZvk/ASCWHECY
-	 GAiLNUyW+BMW/tLe5lSIq8uLpK3CxFymMunWwO/xr16MUCgT0UV7ZsFKRHZcliYfmS
-	 vMRwSiG3h9w8ENls6v2QCu701jv7cjxZNCcGN7HU7bWYzR9Kp0xP0i1lrhiZgFtohT
-	 plmU7KLr8yFMQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71604380AAE9;
-	Tue, 18 Feb 2025 23:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1739921471;
+	bh=Ktp3q+vyFgGJNlGF9go2OGf8msLlPBzcKI8SNITpBMA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AQyYaiAtvcRCjhCsuwS1ceipPD6ej6yrZ9oSoO81c2kDEj9AzAb7MK63EL3/CwEt7
+	 YCp7Q+UCHffH5jp2iNrIvkAZ+Z9bE7gQaTos2eCSUQfwtZ4PVG42AuSDgSPxwcBdK2
+	 /C8vYFfDrwtINHYxHAIatJSEXS5LmP3j2uSFIvJ6LwvkL/iwxut8iXqi72ZOoc1pyQ
+	 /lOGaQc3iwR94PsGt7Ryusaga5VdBtTnxM0TZfISVdvmhSP9efrbxtfJ/G7vBd4QP8
+	 +xUPa1ZBQNSXFX++UOsPFN0Ii4RHmztFiXyRkPglrXyrxIV6C4EbFSkL/Wd8TyIahu
+	 JNbe+C1RYZUTA==
+Date: Tue, 18 Feb 2025 15:31:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
+ <aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig
+ <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid
+ Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, "Nelson, Shannon" <shannon.nelson@amd.com>, Michael
+ Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for
+ fwctl_bnxt
+Message-ID: <20250218153110.0c10e72c@kernel.org>
+In-Reply-To: <532d2530-5c12-43b7-973f-ce43dbc36e67@kernel.org>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+	<10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+	<20250206164449.52b2dfef@kernel.org>
+	<CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+	<20250207073648.1f0bad47@kernel.org>
+	<Z6ZsOMLq7tt3ijX_@x130>
+	<20250207135111.6e4e10b9@kernel.org>
+	<20250208011647.GH3660748@nvidia.com>
+	<20250210170423.62a2f746@kernel.org>
+	<a74484b3-9f69-45ef-a040-a46fbc2607d6@kernel.org>
+	<20250218200520.GI4183890@nvidia.com>
+	<532d2530-5c12-43b7-973f-ce43dbc36e67@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v5 0/6] selftests/bpf: Migrate
- test_xdp_redirect_multi.sh to test_progs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173992023426.60439.8671131684601738339.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 23:10:34 +0000
-References: <20250212-redirect-multi-v5-0-fd0d39fca6e6@bootlin.com>
-In-Reply-To: <20250212-redirect-multi-v5-0-fd0d39fca6e6@bootlin.com>
-To: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- alexis.lothore@bootlin.com, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Wed, 12 Feb 2025 12:11:08 +0100 you wrote:
-> Hi all,
+On Tue, 18 Feb 2025 14:42:48 -0700 David Ahern wrote:
+> On 2/18/25 1:05 PM, Jason Gunthorpe wrote:
+> > On Tue, Feb 11, 2025 at 09:24:35AM -0700, David Ahern wrote:
+> >   
+> >> "Any resources in use by the netdev stack can only be created and
+> >> modified by established netdev tools."  
+> > 
+> > That is already a restriction described in the doc, not just netdev,
+> > but any kernel driver running with any kernel owned resource. You
+> > can't reach in and change kernel owned objects.
 > 
-> This patch series continues the work to migrate the *.sh tests into
-> prog_tests framework.
-> 
-> test_xdp_redirect_multi.sh tests the XDP redirections done through
-> bpf_redirect_map().
-> 
-> [...]
+> ok, then Jakub's concerns should be met.
 
-Here is the summary with links:
-  - [bpf-next,v5,1/6] selftests/bpf: test_xdp_veth: Create struct net_configuration
-    https://git.kernel.org/bpf/bpf-next/c/6bdac0e317e9
-  - [bpf-next,v5,2/6] selftests/bpf: test_xdp_veth: Use a dedicated namespace
-    https://git.kernel.org/bpf/bpf-next/c/19a9484c1bbc
-  - [bpf-next,v5,3/6] selftests/bpf: Optionally select broadcasting flags
-    https://git.kernel.org/bpf/bpf-next/c/09c8bb1fae15
-  - [bpf-next,v5,4/6] selftests/bpf: test_xdp_veth: Add XDP broadcast redirection tests
-    https://git.kernel.org/bpf/bpf-next/c/1e7e6345429c
-  - [bpf-next,v5,5/6] selftests/bpf: test_xdp_veth: Add XDP program on egress test
-    https://git.kernel.org/bpf/bpf-next/c/a93bfd824d95
-  - [bpf-next,v5,6/6] selftests/bpf: Remove test_xdp_redirect_multi.sh
-    https://git.kernel.org/bpf/bpf-next/c/e06f5bfd937d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I appreciate the doc, but no, it's not enough. The fwctl interface must
+not be exposed if RDMA is disabled or driver not loaded.
 
