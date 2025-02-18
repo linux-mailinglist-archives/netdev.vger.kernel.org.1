@@ -1,115 +1,130 @@
-Return-Path: <netdev+bounces-167339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65186A39DCE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:45:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10FBBA39DA9
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:39:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C2183AAF3A
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:36:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1F61898ABC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCB026AA84;
-	Tue, 18 Feb 2025 13:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7ED2698B9;
+	Tue, 18 Feb 2025 13:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nYWcyrtA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESWC4G6R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814EC26AA81
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55782269890;
+	Tue, 18 Feb 2025 13:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885539; cv=none; b=W8L2ttrTEKMEumjYoqB1Py/2zFTO1MCBqkbS1H7y/6t7pxkKEAj2lj2mkJYJaL5gCN4UoLJqmaZPWrtq86or8Ea529lBVn2mGjWZALgs9417Gk6qusj+K2WDbtgbNEkTDscJBt3puwXgc5aH7mQNRFLJB7njQii9INQQm1uGm2Y=
+	t=1739885552; cv=none; b=RY2ucnp/Kc1N2yVCqDHoPRp+SDaOhWlCgBXrl2rcXwoGtt7UT6n1HyfEYgbhl9HIRTCBprNk15ZL2YxX/eLH/mjjvL+P59QujI1emXMFypWvwlvJWznDafZglrvv9nQyR0d3IwuIqlXtM2Hh8xgnFQ8iA8XRImXdNJMwm3Y3viE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885539; c=relaxed/simple;
-	bh=Y4bb2gMg2fhQX3UumMqYLIY1mVeZXXRdQb69m4+STL4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TAnAMfoeGeyBIgFf7PA8s95VgH4FX80Yy8QyWp0lKzi5082RXwl5N80YX33Yaiwkx2ASslrDptjELTCg3fDtP0DqEThAMXOII7mrT1no/+1LM/7A26nPh6fThNIZmDKqOCD00R81VGPlfGqttTnxWUOksMnKgdCCrUxNYpbET/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nYWcyrtA; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739885535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HYjio39CMFV+Mh6EEVWTUj22Y7RBm4Gi+VVLarh3BvE=;
-	b=nYWcyrtAK2xqFBLaFB3HRZ2IxF6NVcxEUBcKDh3zyZQWxiykNSn8cdkIATx4O8gqFXFcFO
-	zQKPogA0Fqj2JT0l8VZq+u17y2o8/NEq4uWXQJ9xvnpmCf5lliRWyiM+q2CHGn2pLml/s7
-	zOpGSd8FzsLEdoNwn75vLxGoPb6NK8Q=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.ne,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ricardo@marliere.net,
-	jiayuan.chen@linux.dev,
-	viro@zeniv.linux.org.uk,
-	dmantipov@yandex.ru,
-	aleksander.lobakin@intel.com,
-	linux-ppp@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mrpre@163.com,
-	syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Subject: [PATCH net-next v1 1/1] ppp: Fix KMSAN warning by initializing 2-byte header
-Date: Tue, 18 Feb 2025 21:31:44 +0800
-Message-ID: <20250218133145.265313-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20250218133145.265313-1-jiayuan.chen@linux.dev>
-References: <20250218133145.265313-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1739885552; c=relaxed/simple;
+	bh=DPfGQkoaGGA7K17sBH7fBSpRKAqhiuP0N7V+15GQphA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PkaksKMRHu+pYRrvhl9ZamWQ6/KNy62ML4ZvU561aO72pmPr+qq6OWVSzW4lYWyKCOXGfCKTkJ10WJf37EpHoF9RkG5kohyxMO5EjC0e3A2TrhtEmQyfL/MsFnCfIovx7j78yBPLM3zdVF37YFMkiICdRIr6NlbhoOnCJK6bQSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESWC4G6R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D167FC4CEE2;
+	Tue, 18 Feb 2025 13:32:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739885551;
+	bh=DPfGQkoaGGA7K17sBH7fBSpRKAqhiuP0N7V+15GQphA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ESWC4G6Romjw6Pv/gO2Hy9zQInAVopYDpFnb7BVKi014JquWmNOFtPsdpCe83vzwZ
+	 e7tnieDLWisVcNxmJyPOkEmttiiHSoTxNOUkiHbFKWDzOPsGD4/fjiPyYCbIgAL7j6
+	 r61C10zQUaixkf1j23E4K7y+dh07zkA/cGdMYxjSxNtOXgQhw4f9ji6davVvpkEAbl
+	 B0jbhX4wRo8qWBLx4VTK9aqc52+6A/lqcHYcAiC/eb8hCNd+XTL4jPegus6gbjoZvh
+	 RomL4ZhhVS9yc2NNI90pjzceVugHuVov70nqkPmp9vp2gzY/yBgNN5aElHOKGoN7AX
+	 6cj2dWTFlypeg==
+Date: Tue, 18 Feb 2025 13:32:27 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com
+Subject: Re: [PATCH v10 02/26] sfc: add basic cxl initialization
+Message-ID: <20250218133227.GW1615191@kernel.org>
+References: <20250205151950.25268-1-alucerop@amd.com>
+ <20250205151950.25268-3-alucerop@amd.com>
+ <20250207130342.GS554665@kernel.org>
+ <679b8737-8655-456e-949a-63db07a71d2b@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <679b8737-8655-456e-949a-63db07a71d2b@amd.com>
 
-The ppp program adds a 2-byte pseudo-header for socket filters, which is
-normally skipped by regular BPF programs, causing no issues.
+On Mon, Feb 17, 2025 at 01:11:41PM +0000, Alejandro Lucero Palau wrote:
+> 
+> On 2/7/25 13:03, Simon Horman wrote:
+> > On Wed, Feb 05, 2025 at 03:19:26PM +0000, alucerop@amd.com wrote:
+> > > From: Alejandro Lucero <alucerop@amd.com>
+> > > 
+> > > Create a cxl_memdev_state with CXL_DEVTYPE_DEVMEM, aka CXL Type2 memory
+> > > device.
+> > > 
+> > > Make sfc CXL initialization dependent on kernel CXL configuration.
+> > > 
+> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> > > ---
+> > >   drivers/net/ethernet/sfc/Kconfig      |  5 +++
+> > >   drivers/net/ethernet/sfc/Makefile     |  1 +
+> > >   drivers/net/ethernet/sfc/efx.c        | 16 ++++++-
+> > >   drivers/net/ethernet/sfc/efx_cxl.c    | 60 +++++++++++++++++++++++++++
+> > >   drivers/net/ethernet/sfc/efx_cxl.h    | 40 ++++++++++++++++++
+> > >   drivers/net/ethernet/sfc/net_driver.h | 10 +++++
+> > >   6 files changed, 131 insertions(+), 1 deletion(-)
+> > >   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+> > >   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+> > > 
+> > > diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
+> > > index 3eb55dcfa8a6..0ce4a9cd5590 100644
+> > > --- a/drivers/net/ethernet/sfc/Kconfig
+> > > +++ b/drivers/net/ethernet/sfc/Kconfig
+> > > @@ -65,6 +65,11 @@ config SFC_MCDI_LOGGING
+> > >   	  Driver-Interface) commands and responses, allowing debugging of
+> > >   	  driver/firmware interaction.  The tracing is actually enabled by
+> > >   	  a sysfs file 'mcdi_logging' under the PCI device.
+> > > +config SFC_CXL
+> > > +	bool "Solarflare SFC9100-family CXL support"
+> > > +	depends on SFC && CXL_BUS && !(SFC=y && CXL_BUS=m)
+> > > +	depends on CXL_BUS >= CXL_BUS
+> > Hi Alejandro,
+> > 
+> > I'm confused by the intent of the line above.
+> > Could you clarify?
+> 
+> 
+> Dan original comments will do:
+> 
+> https://lore.kernel.org/all/677ddb432dafe_2aff429488@dwillia2-xfh.jf.intel.com.notmuch/
 
-However, for abnormal BPF programs that use these uninitialized 2 bytes,
-a KMSAN warning is triggered.
+Thanks, that makes things a bit clearer.
+But do you mean:
 
-Reported-by: syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/bpf/000000000000dea025060d6bc3bc@google.com/
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- drivers/net/ppp/ppp_generic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ depends on CXL_BUS >= SFC
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 4583e15ad03a..a913403d5847 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -1765,7 +1765,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- 		/* check if we should pass this packet */
- 		/* the filter instructions are constructed assuming
- 		   a four-byte PPP header on each packet */
--		*(u8 *)skb_push(skb, 2) = 1;
-+		*(u16 *)skb_push(skb, 2) = 1;
- 		if (ppp->pass_filter &&
- 		    bpf_prog_run(ppp->pass_filter, skb) == 0) {
- 			if (ppp->debug & 1)
-@@ -2489,7 +2489,7 @@ ppp_receive_nonmp_frame(struct ppp *ppp, struct sk_buff *skb)
- 			if (skb_unclone(skb, GFP_ATOMIC))
- 				goto err;
- 
--			*(u8 *)skb_push(skb, 2) = 0;
-+			*(u16 *)skb_push(skb, 2) = 0;
- 			if (ppp->pass_filter &&
- 			    bpf_prog_run(ppp->pass_filter, skb) == 0) {
- 				if (ppp->debug & 1)
--- 
-2.47.1
+Rather than:
 
+ depends on CXL_BUS >= CXL_BUS
+
+Because the line above appears to be a truism.
+
+> 
+> 
+> > > +	default SFC
+> > >   source "drivers/net/ethernet/sfc/falcon/Kconfig"
+> > >   source "drivers/net/ethernet/sfc/siena/Kconfig"
+> > ...
+> 
 
