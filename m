@@ -1,134 +1,156 @@
-Return-Path: <netdev+bounces-167474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23DC0A3A5EC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:42:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 071F6A3A658
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7B6F7A257B
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:42:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27363B53BB
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7DE1EB5F0;
-	Tue, 18 Feb 2025 18:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E05C1F5822;
+	Tue, 18 Feb 2025 18:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWsdcUgn"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DZt7UW1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BE91EB5D6;
-	Tue, 18 Feb 2025 18:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575C02356BA;
+	Tue, 18 Feb 2025 18:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739904162; cv=none; b=m65tkYgaahRq4BiPYy/+gY/GVS1CQk3HQHiQgzZT42c0GKn930dIZQG8Gjg12dvn+j8Iw3e/q8j6UoGx94LbxoYF8LBNWDrwp7tVMaoo/yc7z+XJq5vXKiRVjAYy9vWXdaIqU8OFmQPsvweNW6YYaNiJGf9ROTjhGjRLqntLa3g=
+	t=1739904653; cv=none; b=tFELqTjIjT0U3lkog8sxuA+1wuv9Gs3jy9+CKnxmEOpMR5hgA/KHtwjUWA86O8dYr3Vhn8IEDOxiCbXYoZ4w+1fZ8vmiItDksB4Ms/qZ1icEnG1FavQsICCV2rUsFSVLQzEW2hD0x6r//rSQBfVINWAcyOBY9DYdTNZy5n0/NSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739904162; c=relaxed/simple;
-	bh=i/UtyEFPHlCOBSsfiq4a0thj4mCfuRPUFyigwEr5PVk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p0kOceyu9RcP221QrRktu4fB711rcwxZL0FMCjrySxN+MCo56IM2BjZ5ocRKRIi3wCZTaAdKdSQgwSqJ8lCjjcEuP56L/MzYfLYYvjmbJVVu40QdAd2qWQb385kVoDr593FcrorLDA4c7iykXJB820SnhKhlwUxbVyHyOQlztiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWsdcUgn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1308AC4CEE8;
-	Tue, 18 Feb 2025 18:42:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739904161;
-	bh=i/UtyEFPHlCOBSsfiq4a0thj4mCfuRPUFyigwEr5PVk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZWsdcUgnBh3/yB9+vbmoQFZkUiDC3tHKvTrxXJRZKDOX1ZmxSLI6uUIXdRhkQPyIv
-	 MHb9Jm2Ppo6aMfZC7VZkP7CJe3wNVBUDjOYmdaLGOXwpQoevjzpp2n6gM2CLl4VrwC
-	 t+2h6mlhys2tHG558bob0DylTBGmXG/i9dZPdmxqL6jXBq76Wh0RFA9izFBz8zKRY6
-	 GzvHRsAqI8GbsU+UIL7bcXZmAhL6rGdj7ErkhtCNjgumkEUPm5/IyuWd6n+DgopYf2
-	 ZgBkGBheXvLkH9btvcz3RUkJjmfclFFLk6Rp8wjQcUePBgHF+IYcQbErM0t2QeWgzR
-	 w37EqsdqIk3XA==
-Message-ID: <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
-Date: Tue, 18 Feb 2025 19:42:37 +0100
+	s=arc-20240116; t=1739904653; c=relaxed/simple;
+	bh=lsflQrO1N48O+jshUWxiHl8d7dgJUl8JR7UUofGDcOU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cxLRRPWfNs1eDBZf4J5Ka3GEJaUZagSF5/lczajNGB286tetBTcnO5p9xq0he00jHSicJHOh2czX9trtOjqRuQXA/L/Ei2HZG0JFjDUe0O+RC8aGx+4hhzaLa8zcALQUajtBv2bL8Ftxbsafs9dcqjeIAo0YgpszIdtIHawdcSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DZt7UW1l; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739904651; x=1771440651;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=/1XY/m7rlHy9RJvp29NIT0p6dcrQvEcQVV1BnoOoOvg=;
+  b=DZt7UW1l/2ky4722t3/PIRud+K7BivymcsD91nyw+va21WNfHR7A9Jh6
+   onz6NuouVBzoE9hxQOJdUENIUeUqIOqs+cDhBU5j/Eje51bFlrT34i3ov
+   ODI/+xY9COHTi7OEzVhV/0IvuI0CkbODdssUehXFUPSfGNKbp3noewquj
+   A=;
+X-IronPort-AV: E=Sophos;i="6.13,296,1732579200"; 
+   d="scan'208";a="494971099"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 18:50:46 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:49314]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.115:2525] with esmtp (Farcaster)
+ id ad366e28-5030-4d80-9ae4-2708614bf9a9; Tue, 18 Feb 2025 18:50:45 +0000 (UTC)
+X-Farcaster-Flow-ID: ad366e28-5030-4d80-9ae4-2708614bf9a9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 18 Feb 2025 18:50:44 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Feb 2025 18:50:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <purvayeshi550@gmail.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<linux-ppp@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<skhan@linuxfoundation.org>,
+	<syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] ppp: Prevent out-of-bounds access in ppp_sync_txmunge
+Date: Tue, 18 Feb 2025 10:50:33 -0800
+Message-ID: <20250218185033.26399-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <1e906059-83c7-4f29-a026-76cd73d8b6fa@gmail.com>
+References: <1e906059-83c7-4f29-a026-76cd73d8b6fa@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and psock
- tests
-Content-Language: en-GB
-To: Suchit K <suchitkarunakaran@gmail.com>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, horms@kernel.org, skhan@linuxfoundation.org,
- linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250218165923.20740-1-suchitkarunakaran@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250218165923.20740-1-suchitkarunakaran@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Suchit,
-
-On 18/02/2025 17:59, Suchit K wrote:
-> From: Suchit <suchitkarunakaran@gmail.com>
+From: Purva Yeshi <purvayeshi550@gmail.com>
+Date: Tue, 18 Feb 2025 11:58:17 +0530
+> On 18/02/25 02:46, Kuniyuki Iwashima wrote:
+> > From: Purva Yeshi <purvayeshi550@gmail.com>
+> > Date: Sun, 16 Feb 2025 11:34:46 +0530
+> >> Fix an issue detected by syzbot with KMSAN:
+> >>
+> >> BUG: KMSAN: uninit-value in ppp_sync_txmunge
+> >> drivers/net/ppp/ppp_synctty.c:516 [inline]
+> >> BUG: KMSAN: uninit-value in ppp_sync_send+0x21c/0xb00
+> >> drivers/net/ppp/ppp_synctty.c:568
+> >>
+> >> Ensure sk_buff is valid and has at least 3 bytes before accessing its
+> >> data field in ppp_sync_txmunge(). Without this check, the function may
+> >> attempt to read uninitialized or invalid memory, leading to undefined
+> >> behavior.
+> >>
+> >> To address this, add a validation check at the beginning of the function
+> >> to safely handle cases where skb is NULL or too small. If either condition
+> >> is met, free the skb and return NULL to prevent processing an invalid
+> >> packet.
+> >>
+> >> Reported-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+> >> Closes: https://syzkaller.appspot.com/bug?extid=29fc8991b0ecb186cf40
+> >> Tested-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+> >> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+> >> ---
+> >>   drivers/net/ppp/ppp_synctty.c | 6 ++++++
+> >>   1 file changed, 6 insertions(+)
+> >>
+> >> diff --git a/drivers/net/ppp/ppp_synctty.c b/drivers/net/ppp/ppp_synctty.c
+> >> index 644e99fc3..e537ea3d9 100644
+> >> --- a/drivers/net/ppp/ppp_synctty.c
+> >> +++ b/drivers/net/ppp/ppp_synctty.c
+> >> @@ -506,6 +506,12 @@ ppp_sync_txmunge(struct syncppp *ap, struct sk_buff *skb)
+> >>   	unsigned char *data;
+> >>   	int islcp;
+> >>   
+> >> +	/* Ensure skb is not NULL and has at least 3 bytes */
+> >> +	if (!skb || skb->len < 3) {
+> > 
+> > When is skb NULL ?
 > 
-> Fixes minor spelling errors:
-> - `simult_flows.sh`: "al testcases" -> "all testcases"
-> - `psock_tpacket.c`: "accross" -> "across"
+> skb pointer can be NULL in cases where memory allocation for the socket 
+> buffer fails, or if an upstream function incorrectly passes a NULL 
+> reference due to improper error handling.
 
-Thank you, the patch is no longer corrupted.
+Which caller passes NULL skb ?
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+If it's really possible, you'll see null-ptr-deref at
 
-This patch can be directly applied in net-next.
+  data = skb->data;
 
-Note: please next time don't repost your patches within one 24h period,
-and use the [PATCH net-next] prefix, see:
+below instead of KMSAN's uninit splat.
 
-  https://docs.kernel.org/process/maintainer-netdev.html
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+> 
+> Additionally, skb->len being less than 3 can occur if the received 
+> packet is truncated or malformed, leading to out-of-bounds memory access 
+> when attempting to read data[2].
+> 
+> > 
+> > 
+> >> +		kfree_skb(skb);
+> >> +		return NULL;
+> >> +	}
+> >> +
+> >>   	data  = skb->data;
+> >>   	proto = get_unaligned_be16(data);
+> >>   
+> >> -- 
+> >> 2.34.1
 
