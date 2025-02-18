@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-167410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C9C3A3A29C
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:24:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31D4A3A294
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E2697A5888
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:21:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4890016ABD1
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BEEC271824;
-	Tue, 18 Feb 2025 16:19:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC3B274240;
+	Tue, 18 Feb 2025 16:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QVZ+yM68"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PUiS1GY7"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B089826B97E;
-	Tue, 18 Feb 2025 16:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5733D27129B;
+	Tue, 18 Feb 2025 16:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739895576; cv=none; b=fCtFUspod905/dOlCWQYl7GXrtLZXR2PO+4B/azNUurGcyt2a0/Fue7Pv0ZpqT2E4ebLduNciPPSL0WaplwY6Fbar0yXBIvFSBhfTiBrw6ueEEKlQszdqqJjyp/3/o4g/XSi817Bu+Ve1nnsyg7YmRwEcqUNcDy4AsDCjzqXc6Y=
+	t=1739895578; cv=none; b=QQPZP5urn0JH840RjVbiyLiESN8yDR6mTzQYXSFLIcvAbJTpj4y+paLEzZup0QyUp+nls/p0gxRpXwb9Srq6s3jVl2suprRLHNxM8aDBQF+ycvXjz7zWyuEjnu+TIR6K2yu7vwyiKxJ1o/p+A06eSNr+OaIZrZD2FykwnhkHwKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739895576; c=relaxed/simple;
-	bh=SkTrjYUTPHx/u7/OlrDw3uzyv+f47eBs47ympQRfVo4=;
+	s=arc-20240116; t=1739895578; c=relaxed/simple;
+	bh=PmY88tnGeW02pgK0HsQmQY1AZXqE0wF413bsi5ANzwo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dSgjB3aVqQV2vS6NE7bz3SNAHAoA1j4US3iUp5L0jupBzcDcjAAg+NDTfYs/VFOAHLPQbjb2tEoeLE8BGl6486ocMd9lkHgYUru9fXLYUlP2zJZPeEoFELRplNelsAlvdGDj6nSOTc2DQVYMobWjdexLBShNVXtVRDXmy6gRi5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QVZ+yM68; arc=none smtp.client-ip=217.70.183.197
+	 In-Reply-To:To:Cc; b=draCo05ntiG1sZRu+3erXyZZjHo9DQ/RsJ6egGZ79JKrJj5iQp8LhBTbrcHWDHXAMIz+gePCto/1LtMa/BYvlK3xH/z6diJeyCM/E97TTzOCGep5nkkmtOnAMOVrVoF7YkDISm9gmkzluDZATywybUWs4eBvbtjk+w9KuNXSXzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PUiS1GY7; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3B8D944314;
-	Tue, 18 Feb 2025 16:19:30 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7E0DF4431E;
+	Tue, 18 Feb 2025 16:19:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739895572;
+	t=1739895574;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=71Xl2ckhkl70kKEq+hNR28QP5b9pnjFO/l5J3XNGdxU=;
-	b=QVZ+yM68o1RuHFkrh/DgsquUbPgCWoryKJh0sSinF37gDNu1Tok+81hfjnSrGiZGDy5+nv
-	1fXigKcIYxKClobo50dBBwXjRGakMY05Mvy8lj//cFTpqHYUWmp5YB/uOXt5jOWGx2hGpI
-	5wBYOENd12N0TvAvmOhGmINLCXEzRgA4PWlzpZUbbwqjtAp4w2XAxwikPR62qSSZKBruWf
-	SILL7eUUmciyr1hA9m0NUkznEIipJCmnwDYkk3FN3CrH8kWTiSI4NVD1obRXihRuElx4TW
-	oyy3MRRi3TxU87wwSrHg6fGs/nSzyJwU66j15FXPVEvgGrwiCldM/bNKPwfdmw==
+	bh=WWzwA9ufwQp/X73FXM72/ollAFYlBIZRmPf37SDbJQc=;
+	b=PUiS1GY7dExIoE2QbhvleviX07rlxKkvdJBASsNVo/dqLGJQX9ys4zoGwHyoZ6xQRD60ZQ
+	CPFnKu2beygObH5mxpVAKqrr3V+RPLWxlrUvU2cO1U+1o4Xd4Z6d+MxT8x0+a+rcojL9Pq
+	dEpvrfvc50AAWQgI6a7VHs42MFPCpR+65jfrcXn1B66Gyri1IhtYzqwdJsYr/yGkqgPIhY
+	O+7eLDRKniI9z2MUcaJTjrPC7U4SjSGd84NIAeZ4rOgrfTVgKdew1/y67i4I8zMxdWh+Dc
+	lfnON/QPy0anA9/5VqgfRYvDeFDJcS62t4YwPzNc0qySwB6wFyyeirVkXdckPg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 18 Feb 2025 17:19:12 +0100
-Subject: [PATCH net-next v5 08/12] net: pse-pd: pd692x0: Add support for
- PSE PI priority feature
+Date: Tue, 18 Feb 2025 17:19:13 +0100
+Subject: [PATCH net-next v5 09/12] net: pse-pd: pd692x0: Add support for
+ controller and manager power supplies
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250218-feature_poe_port_prio-v5-8-3da486e5fd64@bootlin.com>
+Message-Id: <20250218-feature_poe_port_prio-v5-9-3da486e5fd64@bootlin.com>
 References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
 In-Reply-To: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -84,329 +84,73 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This patch extends the PSE callbacks by adding support for the newly
-introduced pi_set_prio() callback, enabling the configuration of PSE PI
-priorities. The current port priority is now also included in the status
-information returned to users.
+Add support for managing the VDD and VDDA power supplies for the PD692x0
+PSE controller, as well as the VAUX5 and VAUX3P3 power supplies for the
+PD6920x PSE managers.
 
 Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 ---
 
-Changes in v3:
+Changes in v5:
 - New patch
 ---
- drivers/net/pse-pd/pd692x0.c | 205 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 205 insertions(+)
+ drivers/net/pse-pd/pd692x0.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 7d60a714ca53..44ded2aa6fca 100644
+index 44ded2aa6fca..c9fa60b314ce 100644
 --- a/drivers/net/pse-pd/pd692x0.c
 +++ b/drivers/net/pse-pd/pd692x0.c
-@@ -12,6 +12,8 @@
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/pse-pd/pse.h>
-+#include <linux/regulator/driver.h>
-+#include <linux/regulator/machine.h>
+@@ -976,8 +976,10 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
+ 	reg_name_len = strlen(dev_name(dev)) + 23;
  
- #define PD692X0_PSE_NAME "pd692x0_pse"
- 
-@@ -76,6 +78,8 @@ enum {
- 	PD692X0_MSG_GET_PORT_CLASS,
- 	PD692X0_MSG_GET_PORT_MEAS,
- 	PD692X0_MSG_GET_PORT_PARAM,
-+	PD692X0_MSG_GET_POWER_BANK,
-+	PD692X0_MSG_SET_POWER_BANK,
- 
- 	/* add new message above here */
- 	PD692X0_MSG_CNT
-@@ -95,6 +99,8 @@ struct pd692x0_priv {
- 	unsigned long last_cmd_key_time;
- 
- 	enum ethtool_c33_pse_admin_state admin_state[PD692X0_MAX_PIS];
-+	struct regulator_dev *manager_reg[PD692X0_MAX_MANAGERS];
-+	int manager_pw_budget[PD692X0_MAX_MANAGERS];
- };
- 
- /* Template list of communication messages. The non-null bytes defined here
-@@ -170,6 +176,16 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
- 		.data = {0x4e, 0x4e, 0x4e, 0x4e,
- 			 0x4e, 0x4e, 0x4e, 0x4e},
- 	},
-+	[PD692X0_MSG_GET_POWER_BANK] = {
-+		.key = PD692X0_KEY_REQ,
-+		.sub = {0x07, 0x0b, 0x57},
-+		.data = {   0, 0x4e, 0x4e, 0x4e,
-+			 0x4e, 0x4e, 0x4e, 0x4e},
-+	},
-+	[PD692X0_MSG_SET_POWER_BANK] = {
-+		.key = PD692X0_KEY_CMD,
-+		.sub = {0x07, 0x0b, 0x57},
-+	},
- };
- 
- static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
-@@ -739,6 +755,29 @@ pd692x0_pi_get_actual_pw(struct pse_controller_dev *pcdev, int id)
- 	return (buf.data[0] << 4 | buf.data[1]) * 100;
- }
- 
-+static int
-+pd692x0_pi_get_prio(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-+	struct pd692x0_msg msg, buf = {0};
-+	int ret;
-+
-+	ret = pd692x0_fw_unavailable(priv);
-+	if (ret)
-+		return ret;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
-+	msg.sub[2] = id;
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
-+	if (ret < 0)
-+		return ret;
-+	if (buf.data[2] < 1 || 3 < buf.data[2])
-+		return -ERANGE;
-+
-+	/* PSE core priority start at 0 */
-+	return buf.data[2] - 1;
-+}
-+
- static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
- {
- 	struct device *dev = &priv->client->dev;
-@@ -766,6 +805,7 @@ static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
- 
- struct pd692x0_manager {
- 	struct device_node *port_node[PD692X0_MAX_MANAGER_PORTS];
-+	struct device_node *node;
- 	int nports;
- };
- 
-@@ -857,6 +897,8 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
- 		if (ret)
- 			goto out;
- 
-+		of_node_get(node);
-+		manager[manager_id].node = node;
- 		nmanagers++;
- 	}
- 
-@@ -869,6 +911,8 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
- 			of_node_put(manager[i].port_node[j]);
- 			manager[i].port_node[j] = NULL;
- 		}
-+		of_node_put(manager[i].node);
-+		manager[i].node = NULL;
- 	}
- 
- 	of_node_put(node);
-@@ -876,6 +920,130 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
- 	return ret;
- }
- 
-+static const struct regulator_ops dummy_ops;
-+
-+static struct regulator_dev *
-+pd692x0_register_manager_regulator(struct device *dev, char *reg_name,
-+				   struct device_node *node)
-+{
-+	struct regulator_init_data *rinit_data;
-+	struct regulator_config rconfig = {0};
-+	struct regulator_desc *rdesc;
-+	struct regulator_dev *rdev;
-+
-+	rinit_data = devm_kzalloc(dev, sizeof(*rinit_data),
-+				  GFP_KERNEL);
-+	if (!rinit_data)
-+		return ERR_PTR(-ENOMEM);
-+
-+	rdesc = devm_kzalloc(dev, sizeof(*rdesc), GFP_KERNEL);
-+	if (!rdesc)
-+		return ERR_PTR(-ENOMEM);
-+
-+	rdesc->name = reg_name;
-+	rdesc->type = REGULATOR_VOLTAGE;
-+	rdesc->ops = &dummy_ops;
-+	rdesc->owner = THIS_MODULE;
-+
-+	rinit_data->supply_regulator = "vmain";
-+
-+	rconfig.dev = dev;
-+	rconfig.init_data = rinit_data;
-+	rconfig.of_node = node;
-+
-+	rdev = devm_regulator_register(dev, rdesc, &rconfig);
-+	if (IS_ERR(rdev)) {
-+		dev_err_probe(dev, PTR_ERR(rdev),
-+			      "Failed to register regulator\n");
-+		return rdev;
-+	}
-+
-+	return rdev;
-+}
-+
-+static int
-+pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
-+				    const struct pd692x0_manager *manager,
-+				    int nmanagers)
-+{
-+	struct device *dev = &priv->client->dev;
-+	size_t reg_name_len;
-+	int i;
-+
-+	/* Each regulator name len is dev name + 12 char +
-+	 * int max digit number (10) + 1
-+	 */
-+	reg_name_len = strlen(dev_name(dev)) + 23;
-+
-+	for (i = 0; i < nmanagers; i++) {
-+		struct regulator_dev *rdev;
-+		char *reg_name;
-+
-+		reg_name = devm_kzalloc(dev, reg_name_len, GFP_KERNEL);
-+		if (!reg_name)
-+			return -ENOMEM;
-+		snprintf(reg_name, 26, "pse-%s-manager%d", dev_name(dev), i);
-+		rdev = pd692x0_register_manager_regulator(dev, reg_name,
-+							  manager[i].node);
-+		if (IS_ERR(rdev))
-+			return PTR_ERR(rdev);
-+
-+		priv->manager_reg[i] = rdev;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+pd692x0_conf_manager_power_budget(struct pd692x0_priv *priv, int id, int pw)
-+{
-+	struct pd692x0_msg msg, buf;
-+	int ret, pw_mW = pw / 1000;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_POWER_BANK];
-+	msg.data[0] = id;
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
-+	if (ret < 0)
-+		return ret;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_POWER_BANK];
-+	msg.data[0] = id;
-+	msg.data[1] = pw_mW >> 8;
-+	msg.data[2] = pw_mW & 0xff;
-+	msg.data[3] = buf.sub[2];
-+	msg.data[4] = buf.data[0];
-+	msg.data[5] = buf.data[1];
-+	msg.data[6] = buf.data[2];
-+	msg.data[7] = buf.data[3];
-+	return pd692x0_sendrecv_msg(priv, &msg, &buf);
-+}
-+
-+static int
-+pd692x0_configure_managers(struct pd692x0_priv *priv, int nmanagers)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < nmanagers; i++) {
-+		struct regulator *supply = priv->manager_reg[i]->supply;
-+		int pw_budget;
-+
-+		pw_budget = regulator_get_unclaimed_power_budget(supply);
-+		/* Max power budget per manager */
-+		if (pw_budget > 6000000)
-+			pw_budget = 6000000;
-+		ret = regulator_request_power_budget(supply, pw_budget);
-+		if (ret < 0)
-+			return ret;
-+
-+		priv->manager_pw_budget[i] = pw_budget;
-+		ret = pd692x0_conf_manager_power_budget(priv, i, pw_budget);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int
- pd692x0_set_port_matrix(const struct pse_pi_pairset *pairset,
- 			const struct pd692x0_manager *manager,
-@@ -998,6 +1166,14 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
- 		return ret;
- 
- 	nmanagers = ret;
-+	ret = pd692x0_register_managers_regulator(priv, manager, nmanagers);
-+	if (ret)
-+		goto out;
-+
-+	ret = pd692x0_configure_managers(priv, nmanagers);
-+	if (ret)
-+		goto out;
-+
- 	ret = pd692x0_set_ports_matrix(priv, manager, nmanagers, port_matrix);
- 	if (ret)
- 		goto out;
-@@ -1008,8 +1184,14 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
- 
- out:
  	for (i = 0; i < nmanagers; i++) {
-+		struct regulator *supply = priv->manager_reg[i]->supply;
++		static const char * const regulators[] = { "vaux5", "vaux3p3" };
+ 		struct regulator_dev *rdev;
+ 		char *reg_name;
++		int ret;
+ 
+ 		reg_name = devm_kzalloc(dev, reg_name_len, GFP_KERNEL);
+ 		if (!reg_name)
+@@ -988,6 +990,17 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
+ 		if (IS_ERR(rdev))
+ 			return PTR_ERR(rdev);
+ 
++		/* VMAIN is described as main supply for the manager.
++		 * Add other VAUX power supplies and link them to the
++		 * virtual device rdev->dev.
++		 */
++		ret = devm_regulator_bulk_get_enable(&rdev->dev,
++						     ARRAY_SIZE(regulators),
++						     regulators);
++		if (ret)
++			return dev_err_probe(&rdev->dev, ret,
++					     "Failed to enable regulators\n");
 +
-+		regulator_free_power_budget(supply,
-+					    priv->manager_pw_budget[i]);
-+
- 		for (j = 0; j < manager[i].nports; j++)
- 			of_node_put(manager[i].port_node[j]);
-+		of_node_put(manager[i].node);
+ 		priv->manager_reg[i] = rdev;
  	}
- 	return ret;
- }
-@@ -1071,6 +1253,25 @@ static int pd692x0_pi_set_pw_limit(struct pse_controller_dev *pcdev,
- 	return pd692x0_sendrecv_msg(priv, &msg, &buf);
- }
  
-+static int pd692x0_pi_set_prio(struct pse_controller_dev *pcdev, int id,
-+			       unsigned int prio)
-+{
-+	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-+	struct pd692x0_msg msg, buf = {0};
-+	int ret;
-+
-+	ret = pd692x0_fw_unavailable(priv);
+@@ -1640,6 +1653,7 @@ static const struct fw_upload_ops pd692x0_fw_ops = {
+ 
+ static int pd692x0_i2c_probe(struct i2c_client *client)
+ {
++	static const char * const regulators[] = { "vdd", "vdda" };
+ 	struct pd692x0_msg msg, buf = {0}, zero = {0};
+ 	struct device *dev = &client->dev;
+ 	struct pd692x0_msg_ver ver;
+@@ -1647,6 +1661,12 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 	struct fw_upload *fwl;
+ 	int ret;
+ 
++	ret = devm_regulator_bulk_get_enable(dev, ARRAY_SIZE(regulators),
++					     regulators);
 +	if (ret)
-+		return ret;
++		return dev_err_probe(dev, ret,
++				     "Failed to enable regulators\n");
 +
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
-+	msg.sub[2] = id;
-+	/* Controller priority from 1 to 3 */
-+	msg.data[4] = prio + 1;
-+
-+	return pd692x0_sendrecv_msg(priv, &msg, &buf);
-+}
-+
- static const struct pse_controller_ops pd692x0_ops = {
- 	.setup_pi_matrix = pd692x0_setup_pi_matrix,
- 	.pi_get_admin_state = pd692x0_pi_get_admin_state,
-@@ -1084,6 +1285,8 @@ static const struct pse_controller_ops pd692x0_ops = {
- 	.pi_get_pw_limit = pd692x0_pi_get_pw_limit,
- 	.pi_set_pw_limit = pd692x0_pi_set_pw_limit,
- 	.pi_get_pw_limit_ranges = pd692x0_pi_get_pw_limit_ranges,
-+	.pi_get_prio = pd692x0_pi_get_prio,
-+	.pi_set_prio = pd692x0_pi_set_prio,
- };
- 
- #define PD692X0_FW_LINE_MAX_SZ 0xff
-@@ -1500,6 +1703,8 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 	priv->pcdev.ops = &pd692x0_ops;
- 	priv->pcdev.dev = dev;
- 	priv->pcdev.types = ETHTOOL_PSE_C33;
-+	priv->pcdev.supp_budget_eval_strategies = ETHTOOL_PSE_BUDGET_EVAL_STRAT_DYNAMIC;
-+	priv->pcdev.pis_prio_max = 2;
- 	ret = devm_pse_controller_register(dev, &priv->pcdev);
- 	if (ret)
- 		return dev_err_probe(dev, ret,
+ 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+ 		dev_err(dev, "i2c check functionality failed\n");
+ 		return -ENXIO;
 
 -- 
 2.34.1
