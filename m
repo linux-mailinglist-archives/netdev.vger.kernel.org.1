@@ -1,229 +1,134 @@
-Return-Path: <netdev+bounces-167473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1548A3A5DF
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:41:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DC0A3A5EC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 415287A086D
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:40:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7B6F7A257B
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0892356D7;
-	Tue, 18 Feb 2025 18:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7DE1EB5F0;
+	Tue, 18 Feb 2025 18:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bNjr8LBK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWsdcUgn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049151EB5E6
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 18:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BE91EB5D6;
+	Tue, 18 Feb 2025 18:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739904045; cv=none; b=jaS0fjROFyoxnxyFrHJZDdoMbzrOb9+26OPgPngX/p4SfjyK7iFORFYfz7NpUNmBM8BY/6bmd20jnTgTEjDHIC9W437pQ02kQ2ja7H0GLQ3F9+f9e5+8OLLw3NMuFrZeReZ8f75zl1i+1zHp0+eTeazO5b/1n7pzfIkbnrlhImM=
+	t=1739904162; cv=none; b=m65tkYgaahRq4BiPYy/+gY/GVS1CQk3HQHiQgzZT42c0GKn930dIZQG8Gjg12dvn+j8Iw3e/q8j6UoGx94LbxoYF8LBNWDrwp7tVMaoo/yc7z+XJq5vXKiRVjAYy9vWXdaIqU8OFmQPsvweNW6YYaNiJGf9ROTjhGjRLqntLa3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739904045; c=relaxed/simple;
-	bh=ndjPWtX7rroSOcGoM4QaISHDnkpiTZJ4yABVwJSUESw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j/Li9+dMF9qRrHriK1J1TVNeuQmTWx5Rq4DCM1Ysxzy3SX7a6XRKPvvXxC24i6wJbkG+NG88a5aiFczqeA2bATHcSR51KaIQWZUbiS717kQ1SoRAczLqEgXY0Aqj1bA0FIuMsBm7yQFJ1dP5IwwxsmfzX6nq/fYKJwj+KBPZbUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bNjr8LBK; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739904045; x=1771440045;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jcBX2Xe4iCPca6XQZw9mBinut0CKeXldNyQ0wVtkj70=;
-  b=bNjr8LBKIJaH/KR3Yv9oltzFZUfnokCHVhwqawlGNjjapVX5CSAfl9MG
-   8oM2ltC76bcstl/X/loGDkbAb66got4zjKnKxG9sZtdrHFUpgmwi32q5Y
-   rOLtxZUjhXJI80Md6nVWsxhgC3rddVDv4XeU3FEoZXZe0KPbxnj9kclCQ
-   8=;
-X-IronPort-AV: E=Sophos;i="6.13,296,1732579200"; 
-   d="scan'208";a="467948861"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 18:40:43 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:49590]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.141:2525] with esmtp (Farcaster)
- id bc148ae9-d0cd-48f7-afdf-d5d11970eaa0; Tue, 18 Feb 2025 18:40:41 +0000 (UTC)
-X-Farcaster-Flow-ID: bc148ae9-d0cd-48f7-afdf-d5d11970eaa0
-Received: from EX19D021UWA003.ant.amazon.com (10.13.139.74) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 18 Feb 2025 18:40:41 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19D021UWA003.ant.amazon.com (10.13.139.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 18 Feb 2025 18:40:40 +0000
-Received: from email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Tue, 18 Feb 2025 18:40:40 +0000
-Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.176])
-	by email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com (Postfix) with ESMTP id 42E94A0108;
-	Tue, 18 Feb 2025 18:40:34 +0000 (UTC)
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
- Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH v7 net-next 5/5] net: ena: Add PHC documentation
-Date: Tue, 18 Feb 2025 20:39:48 +0200
-Message-ID: <20250218183948.757-6-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250218183948.757-1-darinzon@amazon.com>
-References: <20250218183948.757-1-darinzon@amazon.com>
+	s=arc-20240116; t=1739904162; c=relaxed/simple;
+	bh=i/UtyEFPHlCOBSsfiq4a0thj4mCfuRPUFyigwEr5PVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p0kOceyu9RcP221QrRktu4fB711rcwxZL0FMCjrySxN+MCo56IM2BjZ5ocRKRIi3wCZTaAdKdSQgwSqJ8lCjjcEuP56L/MzYfLYYvjmbJVVu40QdAd2qWQb385kVoDr593FcrorLDA4c7iykXJB820SnhKhlwUxbVyHyOQlztiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWsdcUgn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1308AC4CEE8;
+	Tue, 18 Feb 2025 18:42:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739904161;
+	bh=i/UtyEFPHlCOBSsfiq4a0thj4mCfuRPUFyigwEr5PVk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZWsdcUgnBh3/yB9+vbmoQFZkUiDC3tHKvTrxXJRZKDOX1ZmxSLI6uUIXdRhkQPyIv
+	 MHb9Jm2Ppo6aMfZC7VZkP7CJe3wNVBUDjOYmdaLGOXwpQoevjzpp2n6gM2CLl4VrwC
+	 t+2h6mlhys2tHG558bob0DylTBGmXG/i9dZPdmxqL6jXBq76Wh0RFA9izFBz8zKRY6
+	 GzvHRsAqI8GbsU+UIL7bcXZmAhL6rGdj7ErkhtCNjgumkEUPm5/IyuWd6n+DgopYf2
+	 ZgBkGBheXvLkH9btvcz3RUkJjmfclFFLk6Rp8wjQcUePBgHF+IYcQbErM0t2QeWgzR
+	 w37EqsdqIk3XA==
+Message-ID: <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
+Date: Tue, 18 Feb 2025 19:42:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and psock
+ tests
+Content-Language: en-GB
+To: Suchit K <suchitkarunakaran@gmail.com>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, horms@kernel.org, skhan@linuxfoundation.org,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250218165923.20740-1-suchitkarunakaran@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250218165923.20740-1-suchitkarunakaran@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Provide the relevant information and guidelines
-about the feature support in the ENA driver.
+Hi Suchit,
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
-Signed-off-by: David Arinzon <darinzon@amazon.com>
----
- .../device_drivers/ethernet/amazon/ena.rst    | 96 +++++++++++++++++++
- 1 file changed, 96 insertions(+)
+On 18/02/2025 17:59, Suchit K wrote:
+> From: Suchit <suchitkarunakaran@gmail.com>
+> 
+> Fixes minor spelling errors:
+> - `simult_flows.sh`: "al testcases" -> "all testcases"
+> - `psock_tpacket.c`: "accross" -> "across"
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 4561e8ab..b93473dc 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -53,9 +53,11 @@ ena_eth_io_defs.h   Definition of ENA data path interface.
- ena_common_defs.h   Common definitions for ena_com layer.
- ena_regs_defs.h     Definition of ENA PCI memory-mapped (MMIO) registers.
- ena_netdev.[ch]     Main Linux kernel driver.
-+ena_sysfs.[ch]      Sysfs files.
- ena_ethtool.c       ethtool callbacks.
- ena_xdp.[ch]        XDP files
- ena_pci_id_tbl.h    Supported device IDs.
-+ena_phc.[ch]        PTP hardware clock infrastructure (see `PHC`_ for more info)
- =================   ======================================================
- 
- Management Interface:
-@@ -221,6 +223,100 @@ descriptor it was received on would be recycled. When a packet smaller
- than RX copybreak bytes is received, it is copied into a new memory
- buffer and the RX descriptor is returned to HW.
- 
-+.. _`PHC`:
-+
-+PTP Hardware Clock (PHC)
-+========================
-+.. _`ptp-userspace-api`: https://docs.kernel.org/driver-api/ptp.html#ptp-hardware-clock-user-space-api
-+.. _`testptp`: https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/ptp/testptp.c
-+
-+ENA Linux driver supports PTP hardware clock providing timestamp reference to achieve nanosecond resolution.
-+
-+**PHC support**
-+
-+PHC depends on the PTP module, which needs to be either loaded as a module or compiled into the kernel.
-+
-+Verify if the PTP module is present:
-+
-+.. code-block:: shell
-+
-+  grep -w '^CONFIG_PTP_1588_CLOCK=[ym]' /boot/config-`uname -r`
-+
-+- If no output is provided, the ENA driver cannot be loaded with PHC support.
-+
-+- ``CONFIG_PTP_1588_CLOCK=y``: the PTP module is already compiled and loaded inside the kernel binary file.
-+
-+- ``CONFIG_PTP_1588_CLOCK=m``: the PTP module needs to be loaded prior to loading the ENA driver:
-+
-+Load PTP module:
-+
-+.. code-block:: shell
-+
-+  sudo modprobe ptp
-+
-+**PHC activation**
-+
-+The feature is turned off by default, in order to turn the feature on,
-+please use the following:
-+
-+- sysfs (during runtime):
-+
-+.. code-block:: shell
-+
-+  echo 1 > /sys/bus/pci/devices/<domain:bus:slot.function>/phc_enable
-+
-+All available PTP clock sources can be tracked here:
-+
-+.. code-block:: shell
-+
-+  ls /sys/class/ptp
-+
-+PHC support and capabilities can be verified using ethtool:
-+
-+.. code-block:: shell
-+
-+  ethtool -T <interface>
-+
-+**PHC timestamp**
-+
-+To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example using `testptp`_:
-+
-+.. code-block:: shell
-+
-+  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware Clock:/ {print $NF}') -k 1
-+
-+PHC get time requests should be within reasonable bounds,
-+avoid excessive utilization to ensure optimal performance and efficiency.
-+The ENA device restricts the frequency of PHC get time requests to a maximum
-+of 125 requests per second. If this limit is surpassed, the get time request
-+will fail, leading to an increment in the phc_err statistic.
-+
-+**PHC statistics**
-+
-+PHC counters can be monitored using the following:
-+
-+sysfs:
-+
-+.. code-block:: shell
-+
-+  cat /sys/bus/pci/devices/<domain:bus:slot.function>/phc_stats
-+
-+=================   ======================================================
-+**phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
-+**phc_exp**         Number of expired retrieved timestamps (above expire timeout).
-+**phc_skp**         Number of skipped get time attempts (during block period).
-+**phc_err**         Number of failed get time attempts (entering into block state).
-+=================   ======================================================
-+
-+PHC timeouts:
-+
-+=================   ======================================================
-+**expire**          Max time for a valid timestamp retrieval, passing this threshold will fail
-+                    the get time request and block new requests until block timeout.
-+**block**           Blocking period starts once get time request expires or fails, all get time
-+                    requests during block period will be skipped.
-+=================   ======================================================
-+
- Statistics
- ==========
- 
+Thank you, the patch is no longer corrupted.
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+This patch can be directly applied in net-next.
+
+Note: please next time don't repost your patches within one 24h period,
+and use the [PATCH net-next] prefix, see:
+
+  https://docs.kernel.org/process/maintainer-netdev.html
+
+Cheers,
+Matt
 -- 
-2.47.1
+Sponsored by the NGI0 Core fund.
 
 
