@@ -1,104 +1,183 @@
-Return-Path: <netdev+bounces-167551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10351A3AC9E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:40:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F2DA3ACB3
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:45:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11E3818897F0
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:40:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B513A6D3E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24A61DDA2D;
-	Tue, 18 Feb 2025 23:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594DD1DF240;
+	Tue, 18 Feb 2025 23:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PI5kP+JQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsUOoVj5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D41E1CEAC3
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 23:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868D61DE3D2;
+	Tue, 18 Feb 2025 23:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739922002; cv=none; b=dyptHze+V5dzPq+VUliaZitZa4C9cQ5kdHXOWH6XbX19TODMEfpaHgib1UxvJiXNDRGGPf9E0ShgCBi01jT1NA0Ks5+MByzSJenq5GDKw9N7h4fwcLf32pKiAnBUdnu1mQ6YQVNTDvalyuJKqcEV4FPIgJdxBI6ROpCAYcA7lxE=
+	t=1739922220; cv=none; b=V6vwphG5WNeLJq49oBcZ55jJ7nRbvGVfEuS625hNE13yj+VzEyeuaFWALvIkuo7Ms38v4ZUzYBet65IRTckgVthv8TDlh7JSkCggAj/R6zFnGDGFGuOWoI71mcrkSdlK6vnwlV8Ls4zrbYZa1EqUKZjbSBr7ikmEeK8q0YrJHbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739922002; c=relaxed/simple;
-	bh=fyl0+Ypds+UM/TE8oRGskVHmoIZpP1nG0XuIrmJHvX8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XvkOG0cP524zy8a7zV4CHmAomsLjJSMf9fFyWFkrF7/041hiZ83mdGxn2rL4az8ZTOs5RAM7MYRGYP6zG9hEtxPgJXpPWFBEahXwEQxUJmU9+LliMc2ywpOd4GQQnseFUpQCDbgH7ytsTWwHsMYmCqnOfyIxOE5AGUN3x0y9eRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PI5kP+JQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BBB6C4CEE2;
-	Tue, 18 Feb 2025 23:40:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739922002;
-	bh=fyl0+Ypds+UM/TE8oRGskVHmoIZpP1nG0XuIrmJHvX8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PI5kP+JQCwZDH8cS/NkbKzY92N7AWIL7Rt6KcdLD2t5CK79HjzXcrZ+POsxTsvtim
-	 gFahjNFMVMh44l8S7s7qYLwS+NEkvQlu8pDQQUlmLnYYcP8Wt70wb/d5j71hb8OZdH
-	 2kX6hx92OQF2otMN1pelyN70bTaZdd3f1g7vChzIYL7d5GE2fqCBjhOIxAfPF+xCbD
-	 MkB3pINSLzV9LOK+CtrGcfSS4sgugLfqY2yqVL6fa8HnciJJ7MqPYrjx5lt4Yuth/u
-	 cg65bYl51SZjZILUuTtj/NU4FCRtAm+s3nMva+ZkVHlmwVuuNPlQ8EKXqo21dMRbYb
-	 FChi3QGTBBB2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE20A380AAE9;
-	Tue, 18 Feb 2025 23:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739922220; c=relaxed/simple;
+	bh=R0mbgDEUYsAISp6DlRyjK1oSIF1vp0LJJTAv3Fm4DqU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tNbZcnNCmAOmzSIYMWQm/Zi3wEC5l/vx1Ka74h9Hauwh6WCY9BeX+KrZp1UVSG9XafsTaUEA6VnkTKnpYAfKQ1DSBC4NvgmstYzvhugPlQ0xFDp3SZhlGEDsgMus7Pz2eembEZqKBteR5cwU0oiYs8J6rVyKUTNG+JPEWZEB2VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsUOoVj5; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3ce886a2d5bso53743775ab.1;
+        Tue, 18 Feb 2025 15:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739922217; x=1740527017; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q/z5fXZ8Vib72gpFUXyR/uRzw54cXDVMxNmWLdPNKgg=;
+        b=IsUOoVj5+uOvRWb7tWOyky8w1/fCRUfLkP9x96AaO+2K9ZnaOdS8X25K2HVW1HdDky
+         qKTrjYhOe1TfumTNUHXuIKvQCOcyzC28EATRnCez/k6BNxOIQvlLUgWgJscTGdT8IyvK
+         NHhjxOvd6TIFjHM30oJaET+iigZqGYWYAfzO1RLsG3rkcyLK5/Z2/LLXRmXQP8auvVn4
+         ADQE9J2Xy7F0azugTJdmqiMgkwKPmzgWxdz3IkcBRzdt13Rh2E7ruc58I3lVBHZkrB5e
+         nC8tsICEiQTwZdpDSlRE++hcW9YR8YqonyN8P+gcpiLd5vAovPSmTtEE7IKTOX4+NzFy
+         C2LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739922217; x=1740527017;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q/z5fXZ8Vib72gpFUXyR/uRzw54cXDVMxNmWLdPNKgg=;
+        b=oV6RAVA4oCLdxUW/l0ncE5aXedxM2F2W0fc5pFtMX8Hv4T82NC6PNpZok7CODYeGDY
+         XLWtOx2JIgjSm4N/tKwuSr0Fco66aUUAE2To6cQOtpkzrmDxeGYTosRBXGxVfnO7YeC5
+         NPNIGTrmlWCcoyVxIlq0BLV3EzAGxwCcFIy8S05Ssa3Hmq0P7KBo/GABRhWHbOYskBPc
+         PKJgc77SetFcszbEv3sJaMDVxjApvfXZzRrkL/EOHvf0zs36A7tU3Cy+LbYX3I/scdJ4
+         xwHhm9Go1xEDP23wTiMMYCnSnijlpkK5xBQFyR2Y5Zxc4sO0vc+BDzLgczvmJdRGs7x7
+         mGrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBKnp3qJ/GFkbHy0sUtFCPvtb8UusvmvBzdGyg+JFc4hssARgRatljOgBYWR6plwByNfY=@vger.kernel.org, AJvYcCWwQBBCaO5MEv+C0Quaz/UduO1OimCCny+31/8AKG5B4vLzoPok1LmXRAMvyx/Ywtj6JGtmBuEJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiRAf2NXBtu85Nu5S4mpUTSnCfVx6VALAuaxyYG1xbztzC0VKu
+	PU6NOepjsJPh2B5NdEjMLYCd6VlZ5gvTFVcDqFMdPgynsm0vrmoWs8rgeUgDv9wfshly0qCvdoB
+	JKdwet/rdM3McNfz/ZVkbMCJH7XM=
+X-Gm-Gg: ASbGnctzxkJTbC5OfDtVsD21a7uMkCJRXFsaZ+L/SDRSLqHD3W5Ql6dBmZ7PNnuPzvw
+	mNPwMWtg3MLkT27n8/EUOyskOY9xT3JDUs9TQdPzPgZCXs4I4ojm7/IsRZBOw/rEs0LKHlybe
+X-Google-Smtp-Source: AGHT+IFbJTbIZEuiy0yjtYqoNP+UFrunLpoGuSXLjw86go8CIpcUYuBRakSrjbi+zHz+MpzATohzB00H8sM9kAwrNMU=
+X-Received: by 2002:a92:c54d:0:b0:3d2:6f1e:8a59 with SMTP id
+ e9e14a558f8ab-3d2b536da12mr16344275ab.14.1739922217200; Tue, 18 Feb 2025
+ 15:43:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/4] eth: mlx4: use the page pool for Rx buffers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173992203251.66396.7782136856830583801.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 23:40:32 +0000
-References: <20250213010635.1354034-1-kuba@kernel.org>
-In-Reply-To: <20250213010635.1354034-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, tariqt@nvidia.com, idosch@idosch.org,
- hawk@kernel.org, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250218050125.73676-1-kerneljasonxing@gmail.com>
+ <20250218050125.73676-2-kerneljasonxing@gmail.com> <67b497b974fc3_10d6a32948b@willemb.c.googlers.com.notmuch>
+ <03553725-648d-467f-9076-0d5c22b3cfb3@linux.dev>
+In-Reply-To: <03553725-648d-467f-9076-0d5c22b3cfb3@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 19 Feb 2025 07:43:01 +0800
+X-Gm-Features: AWEUYZmxaFFtHME10fmWhWTut863I6IHSHYZSYxRjAK-Zc1kAbC4IlL9eaMZs_Y
+Message-ID: <CAL+tcoA==aPOmBjDTOi2WgZ7HEE4OJiZ+4Z-OD_yGn_XN2Onqw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v12 01/12] bpf: add networking timestamping
+ support to bpf_get/setsockopt()
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, Feb 19, 2025 at 5:55=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/18/25 6:22 AM, Willem de Bruijn wrote:
+> > Jason Xing wrote:
+> >> The new SK_BPF_CB_FLAGS and new SK_BPF_CB_TX_TIMESTAMPING are
+> >> added to bpf_get/setsockopt. The later patches will implement the
+> >> BPF networking timestamping. The BPF program will use
+> >> bpf_setsockopt(SK_BPF_CB_FLAGS, SK_BPF_CB_TX_TIMESTAMPING) to
+> >> enable the BPF networking timestamping on a socket.
+> >>
+> >> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> >> ---
+> >>   include/net/sock.h             |  3 +++
+> >>   include/uapi/linux/bpf.h       |  8 ++++++++
+> >>   net/core/filter.c              | 23 +++++++++++++++++++++++
+> >>   tools/include/uapi/linux/bpf.h |  1 +
+> >>   4 files changed, 35 insertions(+)
+> >>
+> >> diff --git a/include/net/sock.h b/include/net/sock.h
+> >> index 8036b3b79cd8..7916982343c6 100644
+> >> --- a/include/net/sock.h
+> >> +++ b/include/net/sock.h
+> >> @@ -303,6 +303,7 @@ struct sk_filter;
+> >>     *        @sk_stamp: time stamp of last packet received
+> >>     *        @sk_stamp_seq: lock for accessing sk_stamp on 32 bit arch=
+itectures only
+> >>     *        @sk_tsflags: SO_TIMESTAMPING flags
+> >> +  * @sk_bpf_cb_flags: used in bpf_setsockopt()
+> >>     *        @sk_use_task_frag: allow sk_page_frag() to use current->t=
+ask_frag.
+> >>     *                           Sockets that can be used under memory =
+reclaim should
+> >>     *                           set this to false.
+> >> @@ -445,6 +446,8 @@ struct sock {
+> >>      u32                     sk_reserved_mem;
+> >>      int                     sk_forward_alloc;
+> >>      u32                     sk_tsflags;
+> >> +#define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG)=
+)
+> >> +    u32                     sk_bpf_cb_flags;
+> >>      __cacheline_group_end(sock_write_rxtx);
+> >
+> > So far only one bit is defined. Does this have to be a 32-bit field in
+> > every socket?
+>
+> iirc, I think there were multiple callback (cb) flags/bits in the earlier
+> revisions, but it had been simplified to one bit in the later revisions.
+>
+> It's an internal implementation detail. We can reuse some free bits from =
+another
+> variable for now. Probably get a bit from sk_tsflags? SOCKCM_FLAG_TS_OPT_=
+ID uses
+> BIT(31). Maybe a new SK_TS_FLAG_BPF_TX that uses BIT(30)? I don't have a =
+strong
+> preference on the name.
+>
+> When the BPF program calls bpf_setsockopt(SK_BPF_CB_FLAGS,
+> SK_BPF_CB_TX_TIMESTAMPING), the kernel will set/test the BIT(30) of sk_ts=
+flags.
+>
+> We can wait until there are more socket-level cb flags in the future (e.g=
+., more
+> SK_BPF_CB_XXX will be needed) before adding a dedicated int field in the =
+sock.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Sorry, I still preferred the way we've discussed already:
+1) Introducing a new field sk_bpf_cb_flags extends the use for bpf
+timestamping, more than SK_BPF_CB_TX_TIMESTAMPING one flag. I think
+SK_BPF_CB_RX_TIMESTAMPING is also needed in the next move. And more
+subfeatures (like bpf extension for OPT_ID) will use it. It gives us a
+separate way to do more things based on this bpf timestamping.
+2) sk_bpf_cb_flags provides a way to let the socket-level use new
+features for bpf while now we only have a tcp_sock-level, namely,
+bpf_sock_ops_cb_flags. It's obviously good for others.
 
-On Wed, 12 Feb 2025 17:06:31 -0800 you wrote:
-> Convert mlx4 to page pool. I've been sitting on these patches for
-> over a year, and Jonathan Lemon had a similar series years before.
-> We never deployed it or sent upstream because it didn't really show
-> much perf win under normal load (admittedly I think the real testing
-> was done before Ilias's work on recycling).
-> 
-> During the v6.9 kernel rollout Meta's CDN team noticed that machines
-> with CX3 Pro (mlx4) are prone to overloads (double digit % of CPU time
-> spent mapping buffers in the IOMMU). The problem does not occur with
-> modern NICs, so I dusted off this series and reportedly it still works.
-> And it makes the problem go away, no overloads, perf back in line with
-> older kernels. Something must have changed in IOMMU code, I guess.
-> 
-> [...]
+It's the first move to open the gate for socket-level usage for BPF,
+just like how TCP_BPF_SOCK_OPS_CB_FLAGS works in sol_tcp_sockopt(). So
+I hope we will not abandon this good approach :(
 
-Here is the summary with links:
-  - [net-next,v3,1/4] eth: mlx4: create a page pool for Rx
-    (no matching commit)
-  - [net-next,v3,2/4] eth: mlx4: don't try to complete XDP frames in netpoll
-    https://git.kernel.org/netdev/net-next/c/8fdeafd66eda
-  - [net-next,v3,3/4] eth: mlx4: remove the local XDP fast-recycling ring
-    (no matching commit)
-  - [net-next,v3,4/4] eth: mlx4: use the page pool for Rx buffers
-    (no matching commit)
+Now I wonder if I should use the u8 sk_bpf_cb_flags in V13 or just
+keep it as-is? Either way is fine with me :) bpf_sock_ops_cb_flags
+uses u8 as an example, thus I think we prefer the former?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Jason
 
