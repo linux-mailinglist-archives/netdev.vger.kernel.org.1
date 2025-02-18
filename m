@@ -1,96 +1,185 @@
-Return-Path: <netdev+bounces-167230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0D9A393E6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:42:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26169A3941D
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D42F6170E86
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:42:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3BB8165E6E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A681B9831;
-	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784CF1F180F;
+	Tue, 18 Feb 2025 07:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gthhYI9H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbbFLjOZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966EA1B87CF;
-	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1281F17EB;
+	Tue, 18 Feb 2025 07:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739864531; cv=none; b=qZsF9SM1iF1KhGpMUwoyGJE36H8TuX2CHfACmbWes3A26km18+6ufUNHMTIHpeykpLfz1aP1QVlpSYWYMBCYb/WGkB9VXwYKtYP0/mj7x5BiodQvf3VvjWj/IVXbGGmdJS3dmtZgEiBrdW1MZ6yu7N75asCVDBx0KGvmALVa7bU=
+	t=1739864994; cv=none; b=DRjB4UGfg21Z4/I49as1JvwSZwbECsgaMP9RLBpC8eI226egfvw20DkTjqLbTHNrEH6dafpIZnG5UrI8v+W+riYS0kNmXYXu/almN/mKc0DpEoPuQfH00tM6aEEElZruzqugS3Srk4nTcum/vlV1WAvreX+Z79nzkEwxQYWt0Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739864531; c=relaxed/simple;
-	bh=IvK/YZdxhIzz+WQDui+6ei6dQMpDPKxU2syoofLtyUI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4XjQcqEsj84+HAhD96xp+8ONUgGBf2TD+cGM8o56Z4aT8nGJgAvQPJmXFsPKUtOnPRl17ja1pr0s/R52FJvMhzbaCe798q1YH90GM5Sjr7pn28Dpd9zZ6WJFtxYFlL7jajybP//yK+lFIVkh5SeL8LXuRydWKOcJYGduvFBltc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gthhYI9H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18009C4CEE6;
-	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
+	s=arc-20240116; t=1739864994; c=relaxed/simple;
+	bh=P1q49kmYJ1DKMzMpGC0ebZsxyzkRb/s7NK7yqdrQuZ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rK9eyvITqlLRtrkdzvrZAsz+v9JEVKMC/JholDdRM7j6z9MPfKS6rbhxZQ0/gvWaLr+k4xKECmHdTwVUUzigUg8KhPGUQF+KhTEuKv0jk6z+2MsppUKb6lAVgUKgTcyKhgPXexxoXWVmSzwqfZ9n5iZKjKcXX9UcQg9vYuEkFyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JbbFLjOZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48474C4CEE2;
+	Tue, 18 Feb 2025 07:49:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739864531;
-	bh=IvK/YZdxhIzz+WQDui+6ei6dQMpDPKxU2syoofLtyUI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gthhYI9H3TZNlItYwrKDSFuBdEkiKZrIrU49lRCIALScYrla7kqdufoYgJbGesW/s
-	 ZfqxxSTLbGj+8Qi02jw6wsu7IjVEgz+bO00kvW3TUsL0f4tzjbMOd/9uV2HfiIurGn
-	 9m47eoooc9igVM7Kr/FL6sr3en6A29okd0rLtNhhTWvF/CB0QtRNolG7vflfcsD6xz
-	 5Y/qo9rK8O3PiqfxmhGwBv3+ZcwBzQrmF1rOAzJKp2/QmhVDrqXUJv1jdVM5dlk+on
-	 Cu6aRVRbEFTEck7PdHrsS7uMdIMjjN8PGkfUTeir2LhQ/k8qQ00Esd9LqRLeaDttod
-	 NGahJwRUtODMg==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5452c29bacfso4304621e87.3;
-        Mon, 17 Feb 2025 23:42:11 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVX9TsriKvcfn4hVZI1VloDV3FC7mHZvLakwigpi2n9w8OI1BlQGRCm6AMI+1847VlTSt9vqsIK@vger.kernel.org, AJvYcCVnJrG/D+MDFf7oVd0UMa4I7q2uY6egkVmfQaqxd71rCKtgPlZg2dNkjaLwVGw5Z3X8T87keoNqaNuEx5M=@vger.kernel.org, AJvYcCWn5LnzDlCdlTcw3lAXzq272gO0eYkBBBCkEC9O7UbXd0mqsdM3IjACABcZM/k4jBWeAzrUdHcE4Y/6rsIG@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb+U4C5xFyWpzIl6PFTcTIefpXtdAitYUf47102VwcCu1dPQ8L
-	WW0ATvXusUuzshplXhiRosMB94kuI5Q5fXkFiutw3kN8jZvZBAcYDpwCC3kxpTTH+bC7ds+alQ5
-	tcWTzZSXSnGVLzmara5lmTrjuCyE=
-X-Google-Smtp-Source: AGHT+IHcwsPEwQwvSNlp7+txo1ExLwL6bb64NekXlJS4T9EnBQWu9yYoLt2pG9NrnPvUbCr2H8go8Lh60C6VvcSVOhE=
-X-Received: by 2002:a05:6512:2342:b0:545:60b:f394 with SMTP id
- 2adb3069b0e04-5452fe27255mr4337762e87.4.1739864529480; Mon, 17 Feb 2025
- 23:42:09 -0800 (PST)
+	s=k20201202; t=1739864993;
+	bh=P1q49kmYJ1DKMzMpGC0ebZsxyzkRb/s7NK7yqdrQuZ4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JbbFLjOZnqd0xeibVXu8HpU3+TvQXxyiJc3Xt+WTrAeaXik3eUMd3+9z8vnu5QWOC
+	 rX6z1VqokYkcF79FcO9BuexjFU+ZijBw3XY/zZg+tiT3WFJY/l/9NdNzRnE+0eHSJe
+	 /DMkCAhqxx7a8gURormOpb53NGbLOnNIl+9oMf5uQEB/eO7rtBs223ZASOHCVKKcTe
+	 lH88TnwY6/Jh5I49MFcvI6+eMKQeUoKiY2Q8QZsDOWwK/p8um085sXRZ3i6R7kltur
+	 XyXeYGnWNlra7wvH/t9VWx+YRlXr2QUc7otV/D1B0UYSGXXdveor+rw4Le4XcQ9PTT
+	 EFSF8hgWIUssA==
+Message-ID: <a1112ce0-c3d8-4765-8b80-5fb31e2cfcc5@kernel.org>
+Date: Tue, 18 Feb 2025 08:49:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain> <20250215090412.46937c11@kernel.org>
- <Z7FM9rhEA7n476EJ@gondor.apana.org.au> <20250217094032.3cbe64c7@kernel.org> <Z7QBuIvr4Asiezgc@gondor.apana.org.au>
-In-Reply-To: <Z7QBuIvr4Asiezgc@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 18 Feb 2025 08:41:57 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
-X-Gm-Features: AWEUYZnpo_Rxk-ow416mB2XJK3Qj-eZIWTL3GmEexif4qB9L-kVkI7AOouI7sOg
-Message-ID: <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
+To: Kyle Hendry <kylehendrydev@gmail.com>, Lee Jones <lee@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Fern=C3=A1ndez_Rojas?=
+ <noltari@gmail.com>, Jonas Gorski <jonas.gorski@gmail.com>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250218013653.229234-1-kylehendrydev@gmail.com>
+ <20250218013653.229234-2-kylehendrydev@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20250218013653.229234-2-kylehendrydev@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Feb 2025 at 04:43, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Mon, Feb 17, 2025 at 09:40:32AM -0800, Jakub Kicinski wrote:
-> >
-> > Yes, that's true for tunnels and for IPsec.
-> > TLS does crypto in sendmsg/recvmsg, process context.
->
-> OK that's good to know.  So whether SIMD is always allowed or
-> not won't impact TLS at least.
->
+On 18/02/2025 02:36, Kyle Hendry wrote:
+> This patch adds support for the internal gigabit PHY on the
+> BCM63268 SoC. The PHY has a low power mode that has can be
+> enabled/disabled through the GPHY control register. The
+> register is passed in through the device tree, and the
+> relevant bits are set in the suspend and resume functions.
+> 
+> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> ---
+>  drivers/net/phy/bcm63xx.c | 96 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 96 insertions(+)
 
-And for IPsec, I'd assume that the cryptd fallback is only needed when
-TX and RX are competing for the same CPU.
 
-So for modern systems, I don't think the SIMD helper does anything
-useful, and we should just remove it, especially if we can relax the
-softirq/preemption rules for kernel SIMD on x86 like I did for arm64.
+Also two more nits:
+
+> 
+> diff --git a/drivers/net/phy/bcm63xx.c b/drivers/net/phy/bcm63xx.c
+> index b46a736a3130..613c3da315ac 100644
+> --- a/drivers/net/phy/bcm63xx.c
+> +++ b/drivers/net/phy/bcm63xx.c
+> @@ -3,8 +3,11 @@
+>   *	Driver for Broadcom 63xx SOCs integrated PHYs
+>   */
+>  #include "bcm-phy-lib.h"
+> +#include <linux/mfd/syscon.h>
+>  #include <linux/module.h>
+>  #include <linux/phy.h>
+> +#include <linux/regmap.h>
+> +
+>  
+
+
+No need for new line.
+
+>  #define MII_BCM63XX_IR		0x1a	/* interrupt register */
+>  #define MII_BCM63XX_IR_EN	0x4000	/* global interrupt enable */
+> @@ -13,10 +16,19 @@
+>  #define MII_BCM63XX_IR_LINK	0x0200	/* link changed */
+>  #define MII_BCM63XX_IR_GMASK	0x0100	/* global interrupt mask */
+>  
+> +#define PHY_ID_BCM63268_GPHY	0x03625f50
+> +
+> +#define GPHY_CTRL_IDDQ_BIAS	BIT(0)
+> +#define GPHY_CTRL_LOW_PWR	BIT(3)
+> +
+>  MODULE_DESCRIPTION("Broadcom 63xx internal PHY driver");
+>  MODULE_AUTHOR("Maxime Bizon <mbizon@freebox.fr>");
+>  MODULE_LICENSE("GPL");
+>  
+> +struct bcm_gphy_priv {
+> +		struct regmap *gphy_ctrl;
+
+
+Messed indentation.
+
+> +};
+> +
+>  static int bcm63xx_config_intr(struct phy_device *phydev)
+>  {
+>  	int reg, err;
+> @@ -69,6 +81,80 @@ static int bcm63xx_config_init(struct phy_device *phydev)
+>  	return phy_write(phydev, MII_BCM63XX_IR, reg);
+>  }
+
+
+
+Best regards,
+Krzysztof
 
