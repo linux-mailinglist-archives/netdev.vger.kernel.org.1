@@ -1,145 +1,152 @@
-Return-Path: <netdev+bounces-167328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05797A39C87
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:52:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0682A39C8E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45D43188D00F
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:52:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC563A527E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FD725A62C;
-	Tue, 18 Feb 2025 12:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA17D26138A;
+	Tue, 18 Feb 2025 12:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzqjgusV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLfjMyzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EF125A35C
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 12:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C2E25A35C
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 12:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739883111; cv=none; b=gCxdZZBlVKeWMKrgsBHbi1plx/LnurWlDa5FUejQNELQGvrGqJazzZB2JQiJ9NhvkayuCnjBa93uI0V70Bk3gzCIn0gHHDSbPnnUBZE6y01OgyzRSBBMhUMJ9J9cO9fzi06yNwfJtWFPJp9aiqqnazTFKICz2GFTZkKV9940jI4=
+	t=1739883202; cv=none; b=N/CAqaJhYC5csbSDBVLQWhLQlljb7GovtVIXSgFw/5fpSY82wg6uA10O2BAu7tivqqrfeOXdyo3fQndG1/6okylbvTa9RLiNsD8R4z4I1iHf5hoKMNrECC0eXkxo/WJKGEH+86xx4S8oCh88XeX7ZDXF9Q96s81Zjno/8vMZd80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739883111; c=relaxed/simple;
-	bh=yDeksfbZKe1JdBhjuF5yIitFtTc58RboGR1pDNtz+jA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WBu0Vnxmp2BMEv0+zJ7qQ45xpRLFsrmXEUJOi3+1HeEhu1Gk74b3DN3eTsYVgPDeBfe6X/FZt9cQb8vM4pUTzsi2MU7U5e3PdqxujxfPMuyaBS+UOsIwfEMmZDk8zNJoW371dbcdzeEnd+QGdIdgC+6xsmLtN71SUFL5qjiXeFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GzqjgusV; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1739883202; c=relaxed/simple;
+	bh=B6rcI33jR0AkhpRZXIBj9cKrGXC+Z78I+ZFwTdFFfe0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=snOeQTU1epxlqeuOUUcJ33VytD7SiqPp4kH31jbfzuSHboWi1uTBifBeg6f4GMxz6pCZa5wqwKi9hYA35zlpmlWRnvDnIwh5mquuvODTkd6kUV36HUPDKMpq7CoPFObzgEhifYZU1txrDNeA59bK+VCUYXYnd9cvzBZbNPKmX1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bLfjMyzu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739883108;
+	s=mimecast20190719; t=1739883200;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yDeksfbZKe1JdBhjuF5yIitFtTc58RboGR1pDNtz+jA=;
-	b=GzqjgusVOazxyh+CSd20H7ubxnb3GDXP3O0V8d/54Js0K/Dse3+ns41X3BJBzJpotJtSWf
-	1hipE7LJs/Ceetc93F0eSe/RTEIQuik9A6MwZ++uehDGZSUoA4VaHJFWfqt4p5hpKUOMqr
-	+GzoJE0SJDs1/RHB9qS5kpVV1K0sxy0=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WsfKFHU32JDYtPZqdtJcI1xvfyN6A84vuhKqOKdqLYQ=;
+	b=bLfjMyzupBokMg6T0V531JCTQy8yJ1D/BgzB1u1XWgn5PDVtq/5ze5kMeaGJ6MKXy8ZZvW
+	8gA2chY4xOcTgpGe3hjAuv8ULtLzH2gPY1vt6UtRkvCovxEweQ6GNe5DYCMWVYNXH815mj
+	N8IU79g/kaKIXCCec4mY76Wpb8E7J5k=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-gdvCWjrAN_KTO5lQr3MXXQ-1; Tue, 18 Feb 2025 07:51:46 -0500
-X-MC-Unique: gdvCWjrAN_KTO5lQr3MXXQ-1
-X-Mimecast-MFC-AGG-ID: gdvCWjrAN_KTO5lQr3MXXQ_1739883105
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5462c601f48so252594e87.1
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:51:46 -0800 (PST)
+ us-mta-35-dCPsb_scPFKSlgr0XeA2lA-1; Tue, 18 Feb 2025 07:53:18 -0500
+X-MC-Unique: dCPsb_scPFKSlgr0XeA2lA-1
+X-Mimecast-MFC-AGG-ID: dCPsb_scPFKSlgr0XeA2lA_1739883197
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38f2cefb154so3515686f8f.0
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:53:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739883105; x=1740487905;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yDeksfbZKe1JdBhjuF5yIitFtTc58RboGR1pDNtz+jA=;
-        b=l3DrEkbAhwoZdZFtvpTIexuk6YChjg924jk6b6/bcERlYHwz2HGrVDCP1UjL7qua2x
-         WfJ0Ez3RfCD1eHyvyppOn1DAL/CEvMbvIeCRzRvD8ENLqgR7tGHDyJJ2PxJb8dLBFKev
-         lZKXxcOvm11StOsYqLtCOGTSQYF9QCjK7oTkYbNfEh1/iv/DeYBt6C26nlhrOiN6uwae
-         8mhQCDks+PxetA7HxKgPezxJ5ljelrZ107TbhakK/uYqlgBDUlYnBaLdPpwH4Z/NEm/e
-         Lr256PWrSST7KyIuoHDZmYU8jx3lkfvx9w92ZlQKejOsTRGQBvujM1njPKtYHUKHaDPI
-         GULg==
-X-Forwarded-Encrypted: i=1; AJvYcCUI8r8GBkSHtcWqLVVdFGlElQhFj3nAc4QHAWXawRRUbXOTf8C3VuRja5SwDJnrYkdAYzInjzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNGw08JvaJ36/GZedZRhYzi8oK0Xk5QAoc6Eqi2RfQq0x9+B7g
-	+SoQZNecsBd6VitJCf2mPBmriC+cMV7Sx/cm0TABDTwptCeMeNEnrA0P4x6K2IuA3HL5uYCMzJ8
-	LumDmEaSCvxxU1e3uTEgY7yaEzcLxdBrtweqXXVwwPZGgd+NoF4zG7Q==
-X-Gm-Gg: ASbGncuDweATBYLNyrBopy5xeD9yGTPVHv2CHpskLiBmZ8iFPykaURa1+w9bfVSDUl0
-	of5KhpDHJKihXLoERcqew+kQQFqdlnVP6jgemF0DFksIRQLcKumSYR7lrzCF2Y2OWBllFhjS7ob
-	adnKlUQtpP0zemLcFBKXgcZlsW+VIiMlKkkJkxhZXOccg6SKm1X2dBseVhYUvISG7UC0OhFLo3E
-	1I+hCz3rWp0xxe9IkdZ1scnepPRgZPnj4J1meXHJK99AWlAj+wDPvLXRxOR5l9jUFnY+Q7PKt7W
-	+w==
-X-Received: by 2002:a05:6512:31d3:b0:545:2e85:c152 with SMTP id 2adb3069b0e04-5452fe8bec4mr4597943e87.34.1739883105294;
-        Tue, 18 Feb 2025 04:51:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFDB6OdZI9uKwygC2D3eM9WhtOarfSlBLR7LXmDhxom0B6+5cY1SrgMcEswSUgxEE3VlJqKUA==
-X-Received: by 2002:a05:6512:31d3:b0:545:2e85:c152 with SMTP id 2adb3069b0e04-5452fe8bec4mr4597928e87.34.1739883104895;
-        Tue, 18 Feb 2025 04:51:44 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5458da7ec7esm1087076e87.103.2025.02.18.04.51.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 04:51:44 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 7CD94185024D; Tue, 18 Feb 2025 13:51:42 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] rtnetlink: Allow setting IFLA_PERM_ADDRESS at
- device creation time
-In-Reply-To: <20250217095150.12cdec05@kernel.org>
-References: <20250213-virt-dev-permaddr-v1-1-9a616b3de44b@redhat.com>
- <20250213074039.23200080@kernel.org> <87zfipom9q.fsf@toke.dk>
- <20250217095150.12cdec05@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 18 Feb 2025 13:51:42 +0100
-Message-ID: <874j0ro1pd.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1739883197; x=1740487997;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WsfKFHU32JDYtPZqdtJcI1xvfyN6A84vuhKqOKdqLYQ=;
+        b=Y/G+eARXEPiqqRywdskEGcOjdBzFvV/l+uSJwevaB6efaoGro04WB93ltpz25cooVM
+         JEcmXUmfOwFIowZ1GSdHfh2XC7Hq2jVcD8fb11j3UCg5zoRZoTABDEDQE3e4WZIL6W/6
+         D0S/Cf5vqATbcx97XMT0pUfasgURoRyJQfed3xtPb5pPwtVp0KybsQvWOFw4UUseJg6T
+         oJRDdosoip5B1dUWerCGC6Eyci5y6Y2DexJmqDvrR1GGpHxzU1czXHPQsiV11kddfKHt
+         L93xRJEYMAjEXEBs6KVbabjv/COlgRVJRcNwb4lRLu/3Us1x8FQDDURthrRq1EUUgTL1
+         CJGA==
+X-Gm-Message-State: AOJu0Ywe3+IfNFNT22gUEucbod2lT0dOk78oGgzMYwsuyWqiK/Yzn1Iv
+	Fyr3zqIz+Qe8eSaLa8Sn2EIi3Ic7bndLuL9j6DLbRJ0MxrWbPij81M6apGN/+AM/Qg9ZLn2Lhda
+	Uzp2hE4qrOjPoOb3eovjqJHYBcKyf2GhVRo/PHBolX3lboLSd4392EQ==
+X-Gm-Gg: ASbGncuwhVvQ59D/6yEs0D9kgWH1JoHZnKwF966+52LgFJSOO+T4sFaWdbrrQ9dgEgk
+	pq8YygaX1CfJlMZ3WOkmpBdpitmu5pGKbaXuk1qg8Du1DfNiE3cIHBT0GsG5bR8CCCcvHF1CiBA
+	IIWgCjKga3jRgr19Lt7W2H+P+xrO1r83tMUmzaqxWmcncFfe0t5dHylJ3Fg/6WqVXHrOwUwTXZf
+	n41o3GbbduiAlTuENfInDKTYtk/P2mPKWg6vts84OKqCV+SjVvIiTMaEDGD3aATs5mh/W2iQ2xl
+	vusaFVr62eQ+ZwgMjBCX+FYEZWfpcnW0juA=
+X-Received: by 2002:a5d:564d:0:b0:38f:2173:b7b7 with SMTP id ffacd0b85a97d-38f33f28c73mr9321376f8f.18.1739883197494;
+        Tue, 18 Feb 2025 04:53:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGmuOBQoBPGkm0apcXujpsKNRJknLqhiWdlArj2xmAH10Rv73rZHl5OqE/4YMT5tnZCWC0Bzw==
+X-Received: by 2002:a5d:564d:0:b0:38f:2173:b7b7 with SMTP id ffacd0b85a97d-38f33f28c73mr9321354f8f.18.1739883197088;
+        Tue, 18 Feb 2025 04:53:17 -0800 (PST)
+Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258dab74sm15132973f8f.32.2025.02.18.04.53.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 04:53:16 -0800 (PST)
+Message-ID: <cc84f98f-d3d6-499e-9d2f-47eaeb56aad3@redhat.com>
+Date: Tue, 18 Feb 2025 13:53:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] trace: tcp: Add tracepoint for
+ tcp_cwnd_reduction()
+To: Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ linux-trace-kernel@vger.kernel.org, kernel-team@meta.com,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ David Ahern <dsahern@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>
+References: <20250214-cwnd_tracepoint-v2-1-ef8d15162d95@debian.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250214-cwnd_tracepoint-v2-1-ef8d15162d95@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi,
 
-> On Thu, 13 Feb 2025 17:13:53 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Jakub Kicinski <kuba@kernel.org> writes:
->>=20
->> > On Thu, 13 Feb 2025 14:45:22 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wr=
-ote:=20=20
->> >> Eric suggested[0] allowing user-settable values for dev->perm_addr at
->> >> device creation time, instead of mucking about with netdevsim to get a
->> >> virtual device with a permanent address set.=20=20
->> >
->> > I vote no. Complicating the core so that its easier for someone=20
->> > to write a unit test is the wrong engineering trade off.
->> > Use a VM or netdevsim, that's what they are for.=20=20
->>=20
->> Hmm, and you don't see any value in being able to specify a permanent
->> identifier for virtual devices? That bit was not just motivated
->> reasoning on my part... :)
->
-> I can't think of any :( Specifying an address is already possible.
+On 2/14/25 6:07 PM, Breno Leitao wrote:
+> Add a lightweight tracepoint to monitor TCP congestion window
+> adjustments via tcp_cwnd_reduction(). This tracepoint enables tracking
+> of:
+> - TCP window size fluctuations
+> - Active socket behavior
+> - Congestion window reduction events
+> 
+> Meta has been using BPF programs to monitor this function for years.
+> Adding a proper tracepoint provides a stable API for all users who need
+> to monitor TCP congestion window behavior.
+> 
+> Use DECLARE_TRACE instead of TRACE_EVENT to avoid creating trace event
+> infrastructure and exporting to tracefs, keeping the implementation
+> minimal. (Thanks Steven Rostedt)
+> 
+> Given that this patch creates a rawtracepoint, you could hook into it
+> using regular tooling, like bpftrace, using regular rawtracepoint
+> infrastructure, such as:
+> 
+> 	rawtracepoint:tcp_cwnd_reduction_tp {
+> 		....
+> 	}
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+> ---
+> Changes in v2:
+> - Close the parenthesis in a new line to honor the tcp.h format (Jakub).
+> - Add the bpftrace example in the commit message (Jakub)
+> - Link to v1: https://lore.kernel.org/r/20250207-cwnd_tracepoint-v1-1-13650f3ca96d@debian.org
 
-Right, but the address can be changed later. Setting the perm_addr makes
-it possible for a management daemon to set a unique identifier at device
-creation time which is guaranteed to persist through any renames and
-address changes that other utilities may perform. That seems like a
-useful robustness feature that comes at a relatively low cost (the patch
-is fairly small and uncomplicated)?
+For future similar situations, note that it's expected to carry-on the
+tag already collected in the previous versions, since the delta is only
+cosmetic.
 
-> Permanent address is a property of the hardware platform.
-> Virtual devices OTOH are primarily used by containers,=20
-> which are ephemeral by design. At least that's my mental model.
+No further actions required on your side.
 
-Sure, any device feature that comes from hardware is only going to fit
-virtual devices by analogy. But I don't think the analogy here is super
-far fetched (cf the above)? :)
+Cheers,
 
--Toke
+Paolo
 
 
