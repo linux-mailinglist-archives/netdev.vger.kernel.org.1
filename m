@@ -1,156 +1,168 @@
-Return-Path: <netdev+bounces-167349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19534A39DF6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:53:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA40A39DDA
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:46:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C6F13A8864
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:45:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFA05188B19A
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29016269897;
-	Tue, 18 Feb 2025 13:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMtz+lIU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6344F2698BC;
+	Tue, 18 Feb 2025 13:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD9321CC6E;
-	Tue, 18 Feb 2025 13:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD24A269897
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739886345; cv=none; b=mf5HyyN7zfzJOY1Q+dr7BQ5rzg1bW1byTHmpUW/LJzf3CW+/isqQNQRzZ7qO0XkNp9dTjz7sXRGWPO6F/+50yLVSZh3jY9AIcKyLPNzTqMvN/1LQ0Ksn12HaZ0o/2Q1E5uqw6LVdJTMlQVriJPb36VGD2WAP/qBq2fY5otmHJJ8=
+	t=1739886386; cv=none; b=crRXtIcQfn+vbpDwZWf9QDuuF/CSj1SOsrTC5HziMHEs0a6CRimr/jWYXeNoa5DffBpQknPIOB0NWr0+NFCBtZsSMfqVDlbJvPRFl8YeN/SDWB69uTaK5xxQyqw2Oipi3061fj8l8HFbp0h095NH3JgZMp/EVuAC+Au86Z5BnO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739886345; c=relaxed/simple;
-	bh=NGVf+P6KvHNTb1CcTFmAMfl9hGQIGIue5R+BMUnA0bk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RgFM1umbYHNzdDU1h06I9TfAJjmiGJc/eqTCBUTrP8rs6vj4chTK6ZnqUBoAqK5f5eJ6Dg0wrrdP5PbZm6S5qrNRx9zVW2fo0X8pWCkrGCGC/LXulgw7h11gIU153eklqHlHnxqqJ0bdavz/zCALuICueTO5nenDujCBlTNg3Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMtz+lIU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E85FFC4CEE6;
-	Tue, 18 Feb 2025 13:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739886344;
-	bh=NGVf+P6KvHNTb1CcTFmAMfl9hGQIGIue5R+BMUnA0bk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LMtz+lIUo5lJA/yhcSPVdzxocKt3ncQeer0uUJhqtEaSVQw4aCu4SDtNRMQt0WS4d
-	 kX0ec66X2rAvJGMh/28M8li2Q3cNSfYfmFU4zPfOgSwMPl4+cclCkudB2SNnaTRxqA
-	 7OZq9wiIwS668tKQ3ntagl25dodHmPY3HPucf5OXJ0q7YB5k3xT6nlez5axGKQcCV0
-	 5OWeWKG/HlsD1CcwFQgU2JBlQDT1LbNFSEekqkwUDzbEApRkOvwxD2skK3OOmI56vF
-	 JVVQwzKX+if8AohHa/q2s8S7rN+NBdI+OslrEvT5kXJHLz3PT4pIJQL+G0jEfGZJ76
-	 4ouz70a8E6rTw==
-Date: Tue, 18 Feb 2025 14:45:41 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next v4 13/16] net: airoha: Introduce Airoha NPU
- support
-Message-ID: <Z7SPBfzzKt1nhYFo@lore-desk>
-References: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
- <20250213-airoha-en7581-flowtable-offload-v4-13-b69ca16d74db@kernel.org>
- <20250217183854.GP1615191@kernel.org>
- <Z7OMv-7UBVtKaEFb@lore-desk>
- <20250218132756.GU1615191@kernel.org>
+	s=arc-20240116; t=1739886386; c=relaxed/simple;
+	bh=il08OLKjKuHNV8BTSYpPsn4tJgo+kR2RqcDKWXGg2gQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Uwb5MEvj/MKeyuap7sC+z1ne6CeMCcniBHFfwXVDV+gL5Y7jqGpl1cV/zkO0FvYH7XrUPjCsNrzFZfBgsfNkV2WVJ+iJALhBlegh586qynQBDAXeq8MZsz7iP3VR4QNfMwayOot5kj6pY3O/fgKaM906nJo81FHT+clmDzzxGj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-8559792ada5so287077939f.0
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 05:46:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739886384; x=1740491184;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wlp3UV1yF73fleHjaJzrNOPIjk7ttS5DgEpGbxNngV8=;
+        b=dToVSsd5VVaaacLHXTz0FDQkgGGFsJwhEPSfq4JsnQZBKuvAqMigqmUHNYfmtDEvs5
+         BeXv1fitQ0FGmXBbpj4nuTkZkFXZi9GuhUfP1FRHKe9Ezv+PVL9auW+4cXqvz6cjed7P
+         EbWQZKCIHl2KIp3H0sKbWl5BAUs954YZZg3B7Pd+XECQuZlM5KPHaYHgmKM0erSYzTJh
+         5MTeHhCItNPRI7N7SRBPubCEK53m8ONXBfLMKHmUftG+C1AQGJ9rRmlnYJf2dz1oN1XI
+         aCcPHX0dj0bYYE2DiAi9En4RNH7wNrQ+WccXpKi8iG2P6h8i83E5IbQCB7hPazBFVUxt
+         vflw==
+X-Forwarded-Encrypted: i=1; AJvYcCWz1YtqJQ0nexoXlODV4uMGhpNALbbnvNg3TE8sNJ1AF8/cYEzaZPpVT8VSgH53S++keinGr0s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxILBN+NPQ5DMLuaWlOJdGtiTixYUemiQMB8Hn39ca2X4QLM+Rz
+	Zg0CmvPm1fHpMTQehRfTukRegHTnxGC2Nvh7+oi4fM0avsWoLclNB2cUbiNwP2qESAPPbyXruyC
+	esJTsCfKKzhcctrC2hCoqd3pTKFcOUcLDlYVcXt3KNDp76ZyqgqaZWAE=
+X-Google-Smtp-Source: AGHT+IHRF8HXAs3t/VFjdcyM1iNnTahzHbeP27tXqsh2vjEjukNWoxag3AddLmPmeC5h3wzJiZW/36N7QYTboy/DfaVCT+iKPIxD
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bN7niAAw7M/hEpBR"
-Content-Disposition: inline
-In-Reply-To: <20250218132756.GU1615191@kernel.org>
+X-Received: by 2002:a05:6602:1686:b0:855:2f41:f85a with SMTP id
+ ca18e2360f4ac-8557a13f969mr1345339839f.9.1739886383740; Tue, 18 Feb 2025
+ 05:46:23 -0800 (PST)
+Date: Tue, 18 Feb 2025 05:46:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b48f2f.050a0220.173698.0063.GAE@google.com>
+Subject: [syzbot] [mptcp?] WARNING in mptcp_pm_nl_addr_send_ack
+From: syzbot <syzbot+cd3ce3d03a3393ae9700@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    ad1b832bf1cf Merge tag 'devicetree-fixes-for-6.14-1' of gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13798898580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e55cabe422b4fcaf
+dashboard link: https://syzkaller.appspot.com/bug?extid=cd3ce3d03a3393ae9700
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9de6d97a8d34/disk-ad1b832b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/258463d6a9b5/vmlinux-ad1b832b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f0449b94f00a/bzImage-ad1b832b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cd3ce3d03a3393ae9700@syzkaller.appspotmail.com
+
+netlink: 8 bytes leftover after parsing attributes in process `syz.0.205'.
+netlink: 8 bytes leftover after parsing attributes in process `syz.0.205'.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 6693 at ./include/net/sock.h:1711 sock_owned_by_me include/net/sock.h:1711 [inline]
+WARNING: CPU: 0 PID: 6693 at ./include/net/sock.h:1711 msk_owned_by_me net/mptcp/protocol.h:363 [inline]
+WARNING: CPU: 0 PID: 6693 at ./include/net/sock.h:1711 mptcp_pm_nl_addr_send_ack+0x57c/0x610 net/mptcp/pm_netlink.c:788
+Modules linked in:
+CPU: 0 UID: 0 PID: 6693 Comm: syz.0.205 Not tainted 6.14.0-rc2-syzkaller-00303-gad1b832bf1cf #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:sock_owned_by_me include/net/sock.h:1711 [inline]
+RIP: 0010:msk_owned_by_me net/mptcp/protocol.h:363 [inline]
+RIP: 0010:mptcp_pm_nl_addr_send_ack+0x57c/0x610 net/mptcp/pm_netlink.c:788
+Code: 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 ca 7b d3 f5 eb b9 e8 c3 7b d3 f5 90 0f 0b 90 e9 dd fb ff ff e8 b5 7b d3 f5 90 <0f> 0b 90 e9 3e fb ff ff 44 89 f1 80 e1 07 38 c1 0f 8c eb fb ff ff
+RSP: 0000:ffffc900034f6f60 EFLAGS: 00010283
+RAX: ffffffff8bee3c2b RBX: 0000000000000001 RCX: 0000000000080000
+RDX: ffffc90004d42000 RSI: 000000000000a407 RDI: 000000000000a408
+RBP: ffffc900034f7030 R08: ffffffff8bee37f6 R09: 0100000000000000
+R10: dffffc0000000000 R11: ffffed100bcc62e4 R12: ffff88805e6316e0
+R13: ffff88805e630c00 R14: dffffc0000000000 R15: ffff88805e630c00
+FS:  00007f7e9a7e96c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2fd18ff8 CR3: 0000000032c24000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ mptcp_pm_remove_addr+0x103/0x1d0 net/mptcp/pm.c:59
+ mptcp_pm_remove_anno_addr+0x1f4/0x2f0 net/mptcp/pm_netlink.c:1486
+ mptcp_nl_remove_subflow_and_signal_addr net/mptcp/pm_netlink.c:1518 [inline]
+ mptcp_pm_nl_del_addr_doit+0x118d/0x1af0 net/mptcp/pm_netlink.c:1629
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb1f/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:733
+ ____sys_sendmsg+0x53a/0x860 net/socket.c:2573
+ ___sys_sendmsg net/socket.c:2627 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2659
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f7e9998cde9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f7e9a7e9038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f7e99ba5fa0 RCX: 00007f7e9998cde9
+RDX: 000000002000c094 RSI: 0000400000000000 RDI: 0000000000000007
+RBP: 00007f7e99a0e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f7e99ba5fa0 R15: 00007fff49231088
+ </TASK>
 
 
---bN7niAAw7M/hEpBR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On Feb 18, Simon Horman wrote:
-> On Mon, Feb 17, 2025 at 08:23:43PM +0100, Lorenzo Bianconi wrote:
->=20
-> ...
->=20
-> > > > +	err =3D devm_request_irq(dev, irq, airoha_npu_mbox_handler,
-> > > > +			       IRQF_SHARED, "airoha-npu-mbox", npu);
-> > > > +	if (err)
-> > > > +		return err;
-> > > > +
-> > > > +	for (i =3D 0; i < ARRAY_SIZE(npu->cores); i++) {
-> > > > +		struct airoha_npu_core *core =3D &npu->cores[i];
-> > > > +
-> > > > +		spin_lock_init(&core->lock);
-> > > > +		core->npu =3D npu;
-> > > > +
-> > > > +		irq =3D platform_get_irq(pdev, i + 1);
-> > > > +		if (irq < 0)
-> > > > +			return err;
->=20
-> ...
->=20
-> > > Should this return irq rather than err?
-> >=20
-> > are you referring to devm_request_irq()?
-> >=20
-> > https://elixir.bootlin.com/linux/v6.13.2/source/include/linux/interrupt=
-=2Eh#L215
-> > https://elixir.bootlin.com/linux/v6.13.2/source/kernel/irq/devres.c#L52
-> >=20
-> > I guess it returns 0 on success and a negative value in case of error.
->=20
-> Hi Lorenzo,
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Hi Simon,
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
->=20
-> Sorry, somehow I completely messed-up trimming context and managed to make
-> things utterly confusing.
->=20
-> I've trimmed things again, and it is the platform_get_irq() call
-> not far above this line that I'm referring to. It assigns the
-> return value of a function to irq, tests irq, but returns err.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-ack, right. I will fix it in v6.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Regards,
-Lorenzo
-
->=20
-> It is one of (at least) two calls to platform_get_irq() in airoha_npu_pro=
-be().
->=20
-
---bN7niAAw7M/hEpBR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ7SPBQAKCRA6cBh0uS2t
-rKsQAP9QYUVrqGhw3N4HoThHMo6upM1fVYEMznrrOpbmN0z4iwEApdOkmd6OHAnI
-qAhZUPJpZNB70oO/k90a0TMOLcqBfAg=
-=AafE
------END PGP SIGNATURE-----
-
---bN7niAAw7M/hEpBR--
+If you want to undo deduplication, reply with:
+#syz undup
 
