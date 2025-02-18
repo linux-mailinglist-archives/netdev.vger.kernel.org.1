@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-167193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264DEA390EE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:47:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A757CA39108
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6334188F622
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DECE1894B90
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3C77E0E4;
-	Tue, 18 Feb 2025 02:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8135A16A956;
+	Tue, 18 Feb 2025 02:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dawQy4uE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bRdPyQVY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92D845BE3
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51481494CF
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739846817; cv=none; b=pU9K+fWGqw82+uzvnAcj8VNQibKKILjDbLEtbncHDk7HwJA7I9rLJdx5YxLZrkx1489mhs2O4bBUa5XlPrLjuLaJ8jOeLMnd+mCqcx1EeD7NYvpebfLC/FpeUyzpyMFIZzXeYOJ/KBrg3Pb2fpIQc5kP0xTowQGse/EsPOObByo=
+	t=1739847257; cv=none; b=RwtEmCKB4lijxccYv1aQ3XK9VmRxl/w56V1uUv3SSqPqegGDj9o2iFwErot/NsPx9tFIv+svPSBOnS00OMX94MSblYvQh8wyhkehVra4gG5D/soyU8kRli/C4rnbY4YmKqC11LcJ5iYWS5jRRoCuG4V3Xg7qMiFaf8+eggvFH3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739846817; c=relaxed/simple;
-	bh=XONZ1AhlAsEL7X1/V0jeLvAl8zgnAHq9y2eAs1mKPyY=;
+	s=arc-20240116; t=1739847257; c=relaxed/simple;
+	bh=IN2hQgevUgxRs4DcNsWggIpZxkGHIZUz0vFJrFK/938=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AvF8vIZlV3EQSaNds6+iMr/JUVhJLl5bzd3mFhLosgAPyevHLTsNnt2HB9Joig8K29gAcd+lR/XGQrlHF8ru3eKczd/B/qB2JWsh2m4WpGxbOFLHzCFBccjf7/EXCst4cTjT5AndcPBW+4bGMAHn+L0Q7q0U/V4cC72S+BEVwg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dawQy4uE; arc=none smtp.client-ip=209.85.221.178
+	 To:Cc:Content-Type; b=A3mK/yoZewVzq6hzD+3dhc0Q17KcTsfe5AMaj3HLToP/6yBcXJUrzKk4ykIM4s1/AS0nUJcqQPuvAt4/HuKsA48jSXtJ2o+23LYBh8+6gLrp4ga6Hemjvt58TnPbU/E7Avi0cDxOjSqxyQunp7ojkF9Hwt1ZrYnytZ48uTw8lcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bRdPyQVY; arc=none smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5209ea469e9so1867853e0c.0
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 18:46:55 -0800 (PST)
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4bd3679279bso1089524137.3
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 18:54:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1739846814; x=1740451614; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1739847253; x=1740452053; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AM6obmCRf49o6BfonaeW/EArmWLgZ1M2Pz+ZE9SXXdM=;
-        b=dawQy4uE8NoIep0N56UycuoS8J5h6YEpqbaHfwyOcbCwAMDVpWZoMgHvYA7pKdikma
-         R0NFp2X9BisPVIZlgGwB0NIt2JRmjwQA3KTEPyWhdEbA0T9YTYPOuUqLnPZJSiZI1LC/
-         oxCmba0HmoW7jIu/vE4euM6TGgsYrkqATbMas=
+        bh=IN2hQgevUgxRs4DcNsWggIpZxkGHIZUz0vFJrFK/938=;
+        b=bRdPyQVYUHVgtf/lue6SQPmV4uy89hHA17wB+EXIl2w/O+IAShd5dLZjPWKe5f10Rq
+         nGSpL4Lqp4cUBGjy6TDC0J8iK8UsWSEczJJ/0OIXpc6aLMfIx7U4UB8LMX29uiV9hADz
+         vObad6hE+amUbL7HEtCeWW+C2afBwNoL6eO/I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739846814; x=1740451614;
+        d=1e100.net; s=20230601; t=1739847253; x=1740452053;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AM6obmCRf49o6BfonaeW/EArmWLgZ1M2Pz+ZE9SXXdM=;
-        b=Kir6XkNKNo/Miy9GH1V0lPwUSG96eem8yxf2/yuu6eN1PBlpGTd0St8RGIAq3TCCcl
-         C8BG3CdFvr3TyEQstdVjwPVQ4xvRiaiIJf43tRqyZf11jjFrmc0s3qrFfFmUdLnIueHg
-         7jDXxQoJTBlvmqLBL/KVQnlIwCr4xCWgqlXmISkeiJaawKyTHfwXOh0wiw8maUfDUHE/
-         NUefG12SMqvI7jfQAhkDtieJcgbbfOcVeLffUSYJuYHQoP/xL7tF7PWyQRlvYzinyeIj
-         ng6CVSeE1lPd29QgXhcVUQzp+5Ojx3Hrtb18/3IWAu3FrLfKJD103x9LPt9uViFctapZ
-         YCkA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyX++YVcsb5v4yjrvkMFfSEmV2KQ7oLkIc76SZArPH4My9tOZBgURTHahoQXY44ofghpa3AAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTHkSJV+8bqMaj190KiaKh30JPd+8smBpwsiTASsLS8clp2Kz1
-	VLLT2hOtuprS6laHoAb2Vl8hukoOb0Pteqq03jDMBARAgwExZ7pfQVYpRqdj+pzw6S+UODoku4v
-	T+HVB2E/QyX02fBUuf973cHThQuQeIjv6YcP6
-X-Gm-Gg: ASbGncspTLmpVDrUlN7rdi7uouBuBsJTcycD9k18Nfdzn0kJQhontL2Y2n/89qYFxBk
-	QHOB2fGh1sa8NH4WYn0pOBRkFHBemqp3+s/cDNwzuPzewekcMWt/tsDcdHIKLj0LSSZ1PPZKd3g
+        bh=IN2hQgevUgxRs4DcNsWggIpZxkGHIZUz0vFJrFK/938=;
+        b=PcLTU775t8lIvelYf54rh1hdsJZSsEHi0qTuRFtiAzc2YKJoZoX4GceL3kICzTI62c
+         k0+lFEogAWNTR2yT4v7FMux/YwK57O/4DAyxsoAjVDdqnZcZxyV7cWvU0ZtUVNIXRHIw
+         CCI6sxHaU43cdXwXlaHnymo474fZZicSXo/DmXhKFrPncRsMqpEssSqlAMB8pVZMzyJ0
+         c7bRp1J0Pf2NEpkxC7/w8HKPCH0FB+QT35Np1JS2VJuE+tjPqhu8x/lAIKvl1l6vR4+a
+         gbakXKemR2duz9QqTl4rc5nJ5SVjsKBHwopAcAZS34HyOkn22wiDsMkJ8ohKMZPYglgK
+         3UgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqzhkBJWoJlaGbFcVME/HsM6xRkqoD8turP4hquMEKVz0T1d7DCteoSOQCqPFQ/sr2OhQMyGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRjJoR+2bnjzJKKWpgO2hohOJYMRMjCyAdhMAZYj5O6cRsrMga
+	c2WihfzCh2b4k4YNIVJ8XuqfqRFyr2dnxneFzoT+dCwlfuAVwTLCyxpfbv5fJpqUcwvpXZAH2Yw
+	+PHlcsrL2pqByb6408vstuFxTsvUmMxRCaGt9
+X-Gm-Gg: ASbGnctcDUWD3r9G9iObSftv1RDta5uZdPUN1ukNVXluyHeG6NAa8k2mfP9lut+4YkC
+	QbQXQ1x9/em6sjQj+2LwvP34CVJ4uCN+hDT1tp4zdRC59cCG4oJETiP+Z9I39wNu8hGftIL8/wQ
 	==
-X-Google-Smtp-Source: AGHT+IH1jXAzFNI3nw3rXWAYD7AhGbQylFbPlKcVG17ev5n7QVBk37l/bLM0XyAd5uZLy/cpARKIlpYUcXbEMYTg9SA=
-X-Received: by 2002:a05:6122:1184:b0:521:b3ee:4970 with SMTP id
- 71dfb90a1353d-521b3ee4e69mr1480498e0c.2.1739846814634; Mon, 17 Feb 2025
- 18:46:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9SZUdqysoQhs9EbtkQn933N+Jljou7Uv2SWp4WKMWMSpWxLhiIYWyq05iRYzySsQ0IR1Xy/Kh6+Jn92rNfD4=
+X-Received: by 2002:a05:6102:4410:b0:4bb:dfd8:4177 with SMTP id
+ ada2fe7eead31-4bd3fc6c4c9mr5637645137.7.1739847253571; Mon, 17 Feb 2025
+ 18:54:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-4-shaojijie@huawei.com> <20250217154028.GM1615191@kernel.org>
- <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
-In-Reply-To: <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
+References: <20250213180134.323929-1-tariqt@nvidia.com> <20250213180134.323929-2-tariqt@nvidia.com>
+In-Reply-To: <20250213180134.323929-2-tariqt@nvidia.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 18 Feb 2025 08:16:41 +0530
-X-Gm-Features: AWEUYZm3wbwgFu1jKUKQMq8gZdlJei2TqJLo6_vIYukmN4QyebSJKDR7mNPGIt8
-Message-ID: <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
- supported in this module
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com, 
-	chenhao418@huawei.com, sudongming1@huawei.com, xujunsheng@huawei.com, 
-	shiyongbang@huawei.com, libaihan@huawei.com, jonathan.cameron@huawei.com, 
-	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 18 Feb 2025 08:24:01 +0530
+X-Gm-Features: AWEUYZkCl3MZ70-zouOti4G4AZeLKQHyJr2g3a9mCU2ZxpMjKS8qX9cgJclxrPI
+Message-ID: <CAH-L+nNJsjm9kADTX6YXkAUzsPeKJKJu47ndJ=qqtA5J6uA8_A@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/10] devlink: Remove unused param of devlink_rate_nodes_check
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jiri Pirko <jiri@nvidia.com>, 
+	Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Mark Bloch <mbloch@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005d5581062e61a7e4"
+	boundary="000000000000880967062e61c107"
 
---0000000000005d5581062e61a7e4
+--000000000000880967062e61c107
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 18, 2025 at 7:47=E2=80=AFAM Jijie Shao <shaojijie@huawei.com> w=
+On Thu, Feb 13, 2025 at 11:34=E2=80=AFPM Tariq Toukan <tariqt@nvidia.com> w=
 rote:
 >
+> From: Cosmin Ratiu <cratiu@nvidia.com>
 >
-> on 2025/2/17 23:40, Simon Horman wrote:
-> > On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
-> >> This patch implements the rx checksum offload feature
-> >> including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
-> >>
-> >> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> > ...
-> >
-> >> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drive=
-rs/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
-> >> index 8c631a9bcb6b..aa1d128a863b 100644
-> >> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
-> >> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
-> >> @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct=
- *napi, int budget)
-> >>   }
-> >>
-> >>   static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
-> >> -                                struct hbg_rx_desc *desc)
-> >> +                                struct hbg_rx_desc *desc,
-> >> +                                struct sk_buff *skb)
-> >>   {
-> >> +    bool rx_checksum_offload =3D priv->netdev->features & NETIF_F_RXC=
-SUM;
-> > nit: I think this would be better expressed in a way that
-> >       rx_checksum_offload is assigned a boolean value (completely untes=
-ted).
-> >
-> >       bool rx_checksum_offload =3D !!(priv->netdev->features & NETIF_F_=
-RXCSUM);
+> The 'mode' param is unused so remove it.
 >
-> Okay, I'll modify it in v2.
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Maybe you can remove " in this module" from the patch title as it is
-implicit. This comment/suggestion applies to all patches in this
-series.
->
-> Thanks
-> Jijie Shao
->
-> >
-> >> +
-> >>      if (likely(!FIELD_GET(HBG_RX_DESC_W4_L3_ERR_CODE_M, desc->word4) =
-&&
-> >>                 !FIELD_GET(HBG_RX_DESC_W4_L4_ERR_CODE_M, desc->word4))=
-)
-> >>              return true;
->
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 
 --=20
 Regards,
 Kalesh AP
 
---0000000000005d5581062e61a7e4
+--000000000000880967062e61c107
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -225,14 +184,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIH/8BG/tt2860JmLranvbkSP71lCPs3CvjtfYowfmnQaMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIxODAyNDY1NFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIA+CWct3EYyjIIQqYG3Q20uIlMQaRD45UcnA2c5vbQjOMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIxODAyNTQxM1owaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC7b4oBuHwl
-HTd5np5B9Jq35i1TStnZqZRDLM8EkIQ/UBhy2spC96GxWkdImXI9uf79wBb9VvrEcwzFcAMoUJkS
-pI6VPY7pYvzv2AhdFkdxZS9penUnzxvYdDKcQXrfQ1n8AMeZkWmc9wZLJdPJPOtzNBT/41Blu473
-Z8OoAGWf7k7vDxRnyiTp6HRd4HsbBLUo+66WF9A6KbSbW0YDUMqLnwvYXm0M5nPAM33xjl0pxfKl
-2FIToPT3psUFxHlRKJE4ybI1sXfAaiuIL2MRJq3FX8E9qdBKaCFCqZxG9MHrED64IDOmyJTFdeDh
-tdkiAf0csQsvL9QwVxwkM9uD7TfT
---0000000000005d5581062e61a7e4--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBzlE2kWt3l
+DnMwB4b0YrCfZFTO4/QvoZmWI6dgl6eSOpWLsTv1WM6aqsnZoi6nKNuDdnZDT6eHLBiYxhHHldXX
+qde1OtokQquw+bfNhtw1kP+E8k4/qu1ZFPG60eRTkts3yivE/wqOzHZbgXLNFLa31mu7n3QCHl9r
+frA+6Jma7DiCEizCeEHEAQvEKfSXHYaZoBbNGqT+XimzU/iMcrq7zUUX5WzIsEpyR//O72lKrNHC
+JUNOl87lJRTVi0P5mJUTOaPMR2rBdTC2lGTHOeOkVVVFJY8k1nXEU4GSJDLkoJFTOEOXpZO8ZsM4
+JSlsOXNi+yZARAOC2hgMXYt478lU
+--000000000000880967062e61c107--
 
