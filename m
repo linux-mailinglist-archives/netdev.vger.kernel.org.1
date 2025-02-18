@@ -1,143 +1,107 @@
-Return-Path: <netdev+bounces-167201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9126FA3921A
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:24:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B606A3921F
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61101188DDD3
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:24:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 343E516A3F6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01081A83F4;
-	Tue, 18 Feb 2025 04:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C24F15E5DC;
+	Tue, 18 Feb 2025 04:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0acIJGvw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2sce6Ec"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397D11A256E
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C6B81E
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739852676; cv=none; b=hLg59kmZDI6eYyCafDx7bf1JbtgPs1NFYlHtB/BU+lEz9Vw7qfo2acLukYpBapbBpzFOFQuAlHFDXq78nZ6VraOcCXRgrpeENZgXZGDQ6KX8+nK+SMpO04FxLrKi5F/RqMfcNQzA3YkKWQ/0j2YSGf/KivVboYcZVqZp6BReqjw=
+	t=1739853150; cv=none; b=p0/E2/WYLkgqdR6tfT5JN2Mkh1WgDb8L4uw4pBsIk8mPhPLr6t5Kpz29Vk6Bs4MMdm3YZd8DcWStcHotAYS4wFI/nuUkWxtpfRh5EN8azRAI9auo1AkFte9/Tp/Z93taDyIRGdfiT91sYaweVrPWtptuWb4/LV5MNdK5ZH7LRFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739852676; c=relaxed/simple;
-	bh=fw/Kh4vFp+mf2JGXgSm3+iHZaIffmUvILlDOJqLbf5o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YQbYO7Y3iwmUMRnhXQclo67ihZ980ZrTOfUTBDoydkyLjliZzuHuHeP7WpEn8ZIcCWRnScK4Q2po4iQryvn8n8vFd9aRIyRO4gcaxogWhljzM7+YUpQmHD7NmhPb6RqFRJBApqOAZIV7CCvRkAnjgpCuhlwr51B2ZZCNNHk5LQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0acIJGvw; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6f679788fd1so35583777b3.2
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:24:34 -0800 (PST)
+	s=arc-20240116; t=1739853150; c=relaxed/simple;
+	bh=eP1ApaxinshP+F9LGKbghQgKlhP+2Jy8c9zKsejpdNE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gU/m1iXXl0/P8d5dRFSonuDGV8HhnrCno+K9LcvReFgUKRvetvS0p3aa6vNYSuSsC/OII8aUT87Jmcw6JtBRm7CAWK+jRuT12UpIFdQtAkw9fs7+mF9OTSk6fUuVpolmAOWgAnS16aoWrb5r7e3FaGISI6J+j0q+nrxTLdvGet0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I2sce6Ec; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-220d398bea9so69096825ad.3
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:32:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739852674; x=1740457474; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tJo+0ZlAdHOz9Gg66XFjfUOilGx/xXuy04+cDUSNa8o=;
-        b=0acIJGvwOf2IQLNQNXiiTalC2+klLp8RQeAgjqwi3XqiT3extSAA1whfl4OQ6YY8ll
-         W9BV9abUgvdZ9wLtVp1hFjJ8JzPG7/uM2W0xHNBaxHK0OQFXf4YY/mEObVTuG84HTS6I
-         pLB03nn5nz8CYC0qW0qkspgR6M+iwHqE/EXKc7B2KtwHWcgfY+cHdZ4Pykvqoz9FIWSt
-         f9RopfN6ZdJHjdMwdQya1wreaHBThCP68hyWIZ6j3FdniTtsNQbgAvkk6T+r5pWsrMOS
-         LbabxsGZVIednAzFJu5FLMgQlPabpGxDks9ZV+kJumMEq6jkyc3Q66pu6PELAfGQ6Bec
-         pXFg==
+        d=gmail.com; s=20230601; t=1739853148; x=1740457948; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nhjwsYuI45a4ovomg1B+JO7iiXzrfo2+vXAAHqC2Ziw=;
+        b=I2sce6EcjVQAryyiePmPbgUc34z+saRvHO3+JaCk3k+HkngBrkclW5h32WM+T2YtSO
+         g+QFy7AIhPvkpjFFH7CxpVqcX0c0i7vjt8UstKYZJt9THT/JIzSVtL/V6+oHxdJzNzqb
+         bccRWgIskWXDI5RzKH/xi8uTXxzbZrhYQIUnQ24lVEBjHKAZIkpMddKgXOfAPf5yxY1a
+         FuI/WVboqnHvemat/IOXFevPOgBXUEWjUq2GTVmJm6yYfZSHs1snPwUxbCNLK+eClpcP
+         8Yh5yT1ypGyh7lh5J8wD3ogQ+MyqHZSJTXh+pE7KMEzwYGoPmsMQHQGD9VduRbWJb/1Q
+         sO1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739852674; x=1740457474;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tJo+0ZlAdHOz9Gg66XFjfUOilGx/xXuy04+cDUSNa8o=;
-        b=Zxr46PgqGar4yWR02lc0VuG3Vro8pPmFzp5sKsre1qGCuv7LqWrN4CMAyUcA56JTvH
-         g7N3sUd/Pgxy2z6PsYtfZR3x/yh+iHjxs8zXOusuiurSXQjmcwyORskf0lLCAeshakfZ
-         MvmU9waQGfne+D6PuRMThWuEz+aZaL5pBCgTKhndrKARkoVPYFS0HexEGDV6mribdbSU
-         y/Q2GzJNaRFkbnFCGXvK/vSqElTFH/ASNNCkTeDy5c5VUyZbxdr14h3ybKt75MgKj0fz
-         f6bzLg+BGak1qyfWLzocjTsz6LbRatMXIOc93/bpkwmwmac+2Xs/wfM3WiU53OUyf6nB
-         qBDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUo0Ir+mtpdnHSdca0hYWr4EvIM1Z8a0sYkR9Vk251XJY+9Ced2BB+xX1tfQCv/bMUqaVwYA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfIvjtZTDExEY7L2RG1RF3B0Z4DLlDoeiOLHYOAcWj2FV6GmU3
-	Tp9TaeTKlAg/phgvB29UxaBLfiqlR4AveCRgfdZdghl5QBOAMa2zPXaPOvkitrISAmKLkWBR8re
-	5aGLMFBV8STtGYm6tJN1UXhu7Fa9Dg6j56z3W
-X-Gm-Gg: ASbGncu82+RL2b+lIC8SvGVMcJyEtZdKZwKf9RxOYE1rE3qDF+4HZcyTHmy+huiMnJ1
-	w849ugXVRWK1czPMhM8x4ScmTTlGPkpdDCnKc7U20/bgQ9m9LpXo7pIEIpyRXtg1GZoPvtjfF7g
-	==
-X-Google-Smtp-Source: AGHT+IExoJCNXHIjUMVk1sdBiV9SOyDr6EnWbd2vk6ze6NK5ER5srFACy3NEeD9n+dKZJD+IoaCx+f6NH1ljb6VUDmI=
-X-Received: by 2002:a05:690c:6887:b0:6fb:974e:dac3 with SMTP id
- 00721157ae682-6fb974edd76mr6172817b3.13.1739852674014; Mon, 17 Feb 2025
- 20:24:34 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739853148; x=1740457948;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nhjwsYuI45a4ovomg1B+JO7iiXzrfo2+vXAAHqC2Ziw=;
+        b=FOwtmRjKA2JjrldxUOJFvToqLN8bIXLfXhN15tJAcUe2mnBG1E7eTZoaYF8TKxNgkp
+         7J6HeF5dikXwVocUle8LnCQeB2+t/Am5D9esyFcEl6PM+bZ3ZZ7LWtH6NMY/IbMMfBu1
+         sjKvs1CUngrZ6rsyox7FXkDXNNAHhOiEkcHSCS9U23P6jXzeNnzllMSyRUSD5gM1UeTd
+         6Q6UFY2jzb+ssGlXs5JqvoXr1xoZwVzrwDpZBuKcsTpJbJVyPXvPXqjW5mexardlY2I3
+         2FBj9An9AUQ1xGBp5Y/WuZwXgXcHesj8NdYIEx9pwAkSkyfuV2/zKGN2oQn2eWkFz6EF
+         /F1A==
+X-Gm-Message-State: AOJu0Yxk4jNHzT0xqAKw7H1qn/gKKCUX1SAvePkuz/pZiu3uFrUGv7sI
+	toTDPIuq1Cx1kDF5I6jhdqR8AvqlniCPzc/rYUoRO+8e0dh5HVub8Ak2FA==
+X-Gm-Gg: ASbGncvmuZwfM8HOceC+4ikrf6TTc6usBp1ioBlhBgNdvfjKNiR6XLl3UikUhIImo//
+	m7PqC+oQknTUG3Q9mFc+/qYXjA3US5KyvU5J8rx02vWDFBlFwOYato0CSJYomn638l/2iuYJodu
+	g2GufAr4j2ZKkGKRi5iwWODgOajA1Xh8UjmW7SDa5HYvLW+33aXjJSqVQocz8WuPHBuzB8vJOCk
+	lcVL0Rm994I+rxXi3LOjdmrqX2DA70E2dpKBHqs4h/LM+wL04wsaVyo4ANr9ZL9xljWvu+IN+Te
+	tqFZAOP/yDGvMqIG0bdCluf+9OOUiZVB1N0s9JpgS2sQ
+X-Google-Smtp-Source: AGHT+IGf4sh2jeppqnuX0Mba77hhtX21Ew+6sJiN4QUEtyDDYaK6X9jXLxqmueYdlbZegAw24bGnwQ==
+X-Received: by 2002:a05:6a00:1a89:b0:725:cfa3:bc6b with SMTP id d2e1a72fcca58-732617757c7mr23455211b3a.3.1739853147695;
+        Mon, 17 Feb 2025 20:32:27 -0800 (PST)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:304e:ca62:f87b:b334])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326aef465dsm4907501b3a.177.2025.02.17.20.32.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 20:32:27 -0800 (PST)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch net 0/4] flow_dissector: Fix handling of mixed port and port-range keys
+Date: Mon, 17 Feb 2025 20:32:06 -0800
+Message-Id: <20250218043210.732959-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021425-surgical-wackiness-0940@gregkh> <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
- <2025021717-prepay-sharpener-37fb@gregkh>
-In-Reply-To: <2025021717-prepay-sharpener-37fb@gregkh>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Tue, 18 Feb 2025 12:24:07 +0800
-X-Gm-Features: AWEUYZknjZnpnPXU3RpJnqSIGHgESMJNEzhEO9EeUs6CxWq63gqYeGuK79ATGwY
-Message-ID: <CADg1FFf7fONc+HJT8rq55rVFRnS_UxnEPnAGQ476WVe+208_pA@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Greg,
+This patchset contains two fixes for flow_dissector handling of mixed
+port and port-range keys, for both tc-flower case and bpf case. Each
+of them also comes with a selftest.
 
-On Mon, Feb 17, 2025 at 4:53=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
-> > On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> > > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > > >
-> > > > Expose the isoc_alt attr with device group to avoid the racing.
-> > > >
-> > > > Now we create a dev node for btusb. The isoc_alt attr belongs to it=
- and
-> > > > it also becomes the parent device of hci dev.
-> > > >
-> > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to cont=
-rol USB alt setting")
-> > >
-> > > Wait, step back, why is this commit needed if you can change the alt
-> > > setting already today through usbfs/libusb without needing to mess wi=
-th
-> > > the bluetooth stack at all?
-> >
-> > In short: We want to configure the alternate settings without
-> > detaching the btusb driver, while detaching seems necessary for
-> > libusb_set_interface_alt_setting to work (Please correct me if I'm
-> > wrong!)
->
-> I think changing the alternate setting should work using usbfs as you
-> would send that command to the device, not the interface, so the driver
-> bound to the existing interface would not need to be removed.
+---
+Cong Wang (4):
+  flow_dissector: Fix handling of mixed port and port-range keys
+  selftests/net/forwarding: Add a test case for tc-flower of mixed port
+    and port-range
+  flow_dissector: Fix port range key handling in BPF conversion
+  selftests/bpf: Add a specific dst port matching
 
-I thought USBDEVFS_SETINTERFACE was the right command to begin with,
-but it seems not working in this case.
-The command itself attempts to claim the interface, but the interface
-is already claimed by btusb so it failed with Device or resource busy
+ net/core/flow_dissector.c                     | 49 +++++++++++--------
+ .../flow_dissector_classification.c           |  7 ++-
+ .../net/forwarding/tc_flower_port_range.sh    | 46 +++++++++++++++++
+ 3 files changed, 81 insertions(+), 21 deletions(-)
 
-drivers/usb/core/devio.c:
-  USBDEVFS_SETINTERFACE -> proc_setintf -> checkintf -> claimintf
+-- 
+2.34.1
 
---=20
-Best Regards,
-Hsin-chen
 
