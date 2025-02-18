@@ -1,129 +1,183 @@
-Return-Path: <netdev+bounces-167240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85E9A39617
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:52:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 568C5A395FD
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 356CA167AF2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:45:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D055318865C9
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D297022E419;
-	Tue, 18 Feb 2025 08:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFA722CBF1;
+	Tue, 18 Feb 2025 08:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="UAFcJyJn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfpeJs2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9F922E40A
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 08:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4484DC2FA
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 08:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739868224; cv=none; b=Ug66rKbVGwvLPW9s4yzQijBl6ffIox45VzxLdlmksQt9bXJtRvaSYqXcWdBb/zxPI3sRKaRArOiavpbO1MO6buDv8CtPT95pmYRsI1oIormL9ekdk4b9DPcuNaZOZR/U+swEV33INUBvk8HE8uTAYkuc4ByTM7PIW3BHAwIZ1KA=
+	t=1739868581; cv=none; b=NO9q1IoXz7mFxcu4pcx2Mrm9MgIL+JPQO3FchJPW7QsKkEW3Mg6VTnleFzRzCKzyueW+9Z+XnYEGBBpDVBAMN9baFJigGJazCR9olpj6iERDauSResaS0vuKPWSRJCNRrPljjpeXJ+sOGQohjQ+hacf+xHxA46cOQRRXj0PTeuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739868224; c=relaxed/simple;
-	bh=9H1gm5nERYEERWwiINCgkzxyRF5+Q6HYw6CVCLqtI1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wh4DPs5owsOa92nokZ55a0AnfU5JnEGNrTRwcAG4l1STgbYEFMTQtaq+W5LKIE6hHf3PpwX4bKc47F6sIKRHC01cqe3SOCDeXiCFyT+XapM/W2OyZ58W1aM1eJUsN2CF1mVcUP2aXOPtsQfpqjYei9XJQU00FSd8u0Vaski9CaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=UAFcJyJn; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-439702d77f6so1995315e9.1
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 00:43:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1739868221; x=1740473021; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=07OEdF7j7fGOpaK4PIAFdjn9U5fUFtm+0uA4oE0Ha88=;
-        b=UAFcJyJnHolJxKIbWRSlkzODN5JYMpQ9z+bzpI90oR7iIeqzDCXqtEAZZbuUqXB8oe
-         EcM7XZ0rdYMqYnqDjikDFU3LCj/joKn0iiAh0qVHJBK4ZP391F2Qo/ekhBA2E8v1UJp1
-         KsUmu0QPJEU+wQfa2+wqvxlIU42NLYzIpkwkzujbbVFJJ7uVWUltTSW9wkE+EQxg0Gsz
-         oSs3VbCheyh7InY5MMeaZ7PyeDNu/wF1UpZUfenTSjuAL7ddgjGHRyAXpgLWl2KsNc/m
-         kz2EootgjyQBi244R5r2lbjvC5ozWDoJv5oTWKH6rxSf6agaQQ7XbSGN6dyv8H0lrfbx
-         JbTQ==
+	s=arc-20240116; t=1739868581; c=relaxed/simple;
+	bh=WKs0Dn+7nNQrdZ1Tq1ZH9EkB6hG8pxOuj2h1nVQIaoo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UykASYnvjbUzc8H6nBMKNNijP6POBNk5yeOa1M/GJEDZaHHk/kdouhANUsI3rlZo5+OlFF6rEg+5E44k+gHGPUFFtFYLdMCW8mlgHyLPKi6p4giC+A8e9kidn5KqNMIAgMMmttvmPVvSZZrBIVT88FQKwdVnpr2aohsCis4IZVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YfpeJs2+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739868577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wk3JStDPByaR3KnJ1fmYpfYYbnWQoSxUfAheMthZiPg=;
+	b=YfpeJs2+GJUfZOJTiaecPD10Zr4ZAA0OK1zmFbnD5siyj5otqAbo86W/7hjLlnPsqHe+nN
+	DsMPHweLTrMU2FTO7GlazYLH0KH1rBlaQsefrxe+TAEwT2u1HPpLrezwKmp8MJSiXgGoVJ
+	VvQkb5wb187hx3+WiQsXYtCehD2sLDE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-364-ad28pSC4P2efcXR4tTWgrg-1; Tue, 18 Feb 2025 03:49:36 -0500
+X-MC-Unique: ad28pSC4P2efcXR4tTWgrg-1
+X-Mimecast-MFC-AGG-ID: ad28pSC4P2efcXR4tTWgrg_1739868575
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38f37b4a72fso1423674f8f.1
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 00:49:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739868221; x=1740473021;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=07OEdF7j7fGOpaK4PIAFdjn9U5fUFtm+0uA4oE0Ha88=;
-        b=Ad6gFPgMzc9LuyMVn+eVp6qy/jbrJzCBfmQz7h65etFob9Zj2RCR7rSY6Pj64wZbPW
-         ryGPwunaAUiDSBi5NYIPNNFClSgHrAR7iETqpbBeOpmJihr4a6pN2nqJ4fyRVPUzCl/g
-         8ohdhDmrm3ZU9npPF/d7hGK6zvmn+ZvlTcjXKBIH6/IpTrctk+pVBT6td7BOJgtIbqNy
-         SlfJT4flrb595VP8Nt9/oacpV5Mo0iUgJLK+x0svyIzEphgKyM3/P01prG5eRifyXHjr
-         4THM9n2nTXY8mBzF/k3TINuuK8R1DiB5NGWteU7qmCpK4+b0mAEEXINKuoRv6MTF4PDS
-         OYxw==
-X-Gm-Message-State: AOJu0YwrpiO3Tp7WakgoBxaE9ch8+lfo1IUjImEMWK0osd7p2L1yVpO9
-	JE6R/6FapUvwF5l1KZq0aXBHMNxV6opgCFKxXiHflRsxG5kBE4nNkbaHy40fp/oJ2+yZxmx3CM6
-	Z
-X-Gm-Gg: ASbGncsj2QDEnQEeuWIgzT9GIHrBtxfFwV3jjzAur5Zdfsugmknlh4awJQwdzcMhVIZ
-	/yh8uwAbnFwHda+tpw0KKuLK+XwznUCC1lezeK/T/Gz4vaXzmfJv/+0TeZblYzNTgiKYw2TeL4j
-	tAmuB7klO0TYL82WIZrZn9pjJHpkHcQYoHXIUU9LJBIhFbRNoyNef7L3emM8qLeSaTc2w9K1XoU
-	H74R8Z9MDUcOw7u91cj5kiCx1B1dWRbP3u4vPwT8QchZnByEvDQUlZDh8vAo5UwmFmxw4LCS/1/
-	kZpHZc/c9p7znoFApQdnNTe5JttXItZcD38LhB4v7L0KhTW2rhkXLkn67ZC8jLZ6Cdk5
-X-Google-Smtp-Source: AGHT+IG603ij4o5hHa/WfJSqksRX5ZtCb3bIAsuiKI3S/5FgkptWZhf9avKNURVcVpcp0depLahbeQ==
-X-Received: by 2002:a05:600c:1c84:b0:439:8c80:6aee with SMTP id 5b1f17b1804b1-4398c806c54mr14486605e9.4.1739868221188;
-        Tue, 18 Feb 2025 00:43:41 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:8e5f:76fd:491b:501e? ([2a01:e0a:b41:c160:8e5f:76fd:491b:501e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982a2f92esm56410535e9.17.2025.02.18.00.43.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 00:43:40 -0800 (PST)
-Message-ID: <1e99ece5-3ee6-4446-886a-ddc708aa8e0d@6wind.com>
-Date: Tue, 18 Feb 2025 09:43:40 +0100
+        d=1e100.net; s=20230601; t=1739868574; x=1740473374;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wk3JStDPByaR3KnJ1fmYpfYYbnWQoSxUfAheMthZiPg=;
+        b=AQmC7/6TGyJkwH0KOkvtRQE8sTPkXIdbxaIu1bSQmSPoyGb52iypzDx9FZ8vD3JN84
+         ZLKnHOpI/sl9RBJXGuKk1/CNe1Cxv4uuVuJgF4IUnKgZmQvXU0GEHn8zuVZOZxBmI6rt
+         bSAelLG+UVtYXvqSnIepXgJtMJiB99PxGohvizlmNrKSi+q0cl5kCrAigP7zyiHQ4Hpm
+         UNe0SFzplPpfD0o5Xq+hkdgbyHmznfd9hClPhoyQyZ+33ymPftecAnhlo0F+hU6J3gL+
+         ou3ya2ecND/y07td5jRQ9u1m+/1Uw9hwnrDkBqot4RDxpyBLZDdZws5MB83okQtguR8/
+         f16A==
+X-Forwarded-Encrypted: i=1; AJvYcCWJoMmS0vCUxG65N6CFu5ziGY+QzxIUNE8T44ZbvQkgxh4IsYNI7LhpqjMJIcZ3clpfHYXIlrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFWorigq9ArbxS64ifOF7wG2PJ1NjFiQES9ybBqzXhQcS2/qfa
+	AD1qILHHQK5tjk0V7w6We5HiJhPBl3HTpWG/6MBIVuQHezgs/yYyBVipTAdQxrSAwKMqxDuAcbM
+	PPxIyC/vVp2Ive+UJSZQIA0cyW/qV/AxBatWyuqhHQyTTGC66/RHzcQ==
+X-Gm-Gg: ASbGncvCVP20NDf1s1QgBER8VSuxf0JDCZ7yNRibTx9umlAFbo+HzafIRSSK6lwSTxm
+	vdmIlYsMmGmTwp4oSS5DoVjkYORWdinLppTopxmfCSzmnZcOnU/1Gz2XKHtUAke6y3W16nTsV78
+	o8FDXDVib90CWaEc8wxDCEJpOwALO8PufleLg/jNR5+R50oBaYwYOIv0XmyrZXXZwxs4t1mniUY
+	8fhsr7FqRfnDkvD3YM6bkyepb7kjzg28s6t5e/6wzox5d/SfM/UCJVt7cibEwmprhOZATBerF15
+	zWUkxYJnKzD2LGyA45cOoOiS+IA0TEvBtP7ILKpNn8nfalPre0+DrA==
+X-Received: by 2002:a5d:47c7:0:b0:38d:d8c0:1f7f with SMTP id ffacd0b85a97d-38f24cfa3e6mr22870829f8f.9.1739868574622;
+        Tue, 18 Feb 2025 00:49:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG4aV9CL+YYvOEopfPFUg399AqsHk/ZEAllC3IFL3w+WqsuPI2P/2sZIPZIEITAqhlJZWAKiQ==
+X-Received: by 2002:a5d:47c7:0:b0:38d:d8c0:1f7f with SMTP id ffacd0b85a97d-38f24cfa3e6mr22870782f8f.9.1739868573877;
+        Tue, 18 Feb 2025 00:49:33 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43991c84fa4sm21290725e9.39.2025.02.18.00.49.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 00:49:33 -0800 (PST)
+Date: Tue, 18 Feb 2025 09:49:28 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 2/4] vsock/bpf: Warn on socket without transport
+Message-ID: <2u3kbhiduy7mxfn33pbbafrbn7wki2wg2rlj473lzuraeigsor@pvnhznevpclc>
+References: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
+ <20250213-vsock-listen-sockmap-nullptr-v1-2-994b7cd2f16b@rbox.co>
+ <ygqdky4py42soj6kovk5z3l65h6xpglcse4mp37jsmlm6rjwzu@dcntngtsygj3>
+ <ff1d32c8-e01e-45e3-8811-eb19a5cb6960@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 2/2] ipv6: fix blackhole routes
-To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Paul Ripke <stix@google.com>,
- Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
-References: <20250212164323.2183023-1-edumazet@google.com>
- <20250212164323.2183023-3-edumazet@google.com>
- <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ff1d32c8-e01e-45e3-8811-eb19a5cb6960@rbox.co>
 
-Le 12/02/2025 à 19:00, David Ahern a écrit :
-> On 2/12/25 9:43 AM, Eric Dumazet wrote:
->> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
->> index 78362822b9070df138a0724dc76003b63026f9e2..335cdbfe621e2fc4a71badf4ff834870638d5e13 100644
->> --- a/net/ipv6/route.c
->> +++ b/net/ipv6/route.c
->> @@ -1048,7 +1048,7 @@ static const int fib6_prop[RTN_MAX + 1] = {
->>  	[RTN_BROADCAST]	= 0,
->>  	[RTN_ANYCAST]	= 0,
->>  	[RTN_MULTICAST]	= 0,
->> -	[RTN_BLACKHOLE]	= -EINVAL,
->> +	[RTN_BLACKHOLE]	= 0,
->>  	[RTN_UNREACHABLE] = -EHOSTUNREACH,
->>  	[RTN_PROHIBIT]	= -EACCES,
->>  	[RTN_THROW]	= -EAGAIN,
-> 
-> EINVAL goes back to ef2c7d7b59708 in 2012, so this is a change in user
-> visible behavior. Also this will make ipv6 deviate from ipv4:
-> 
->         [RTN_BLACKHOLE] = {
->                 .error  = -EINVAL,
->                 .scope  = RT_SCOPE_UNIVERSE,
->         },
-Yes, if I remember well, to be consistent I mimicked what existed in IPv4. I
-never found a good answer to why 'EINVAL' :)
+On Mon, Feb 17, 2025 at 08:45:06PM +0100, Michal Luczaj wrote:
+>On 2/17/25 11:59, Stefano Garzarella wrote:
+>> On Thu, Feb 13, 2025 at 12:58:50PM +0100, Michal Luczaj wrote:
+>>> In the spirit of commit 91751e248256 ("vsock: prevent null-ptr-deref in
+>>> vsock_*[has_data|has_space]"), armorize the "impossible" cases with a
+>>> warning.
+>>>
+>>> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>> ---
+>>> net/vmw_vsock/af_vsock.c  | 3 +++
+>>> net/vmw_vsock/vsock_bpf.c | 2 +-
+>>> 2 files changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index 53a081d49d28ac1c04e7f8057c8a55e7b73cc131..7e3db87ae4333cf63327ec105ca99253569bb9fe 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -1189,6 +1189,9 @@ static int vsock_read_skb(struct sock *sk, skb_read_actor_t read_actor)
+>>> {
+>>> 	struct vsock_sock *vsk = vsock_sk(sk);
+>>>
+>>> +	if (WARN_ON_ONCE(!vsk->transport))
+>>> +		return -ENODEV;
+>>> +
+>>> 	return vsk->transport->read_skb(vsk, read_actor);
+>>> }
+>>>
+>>> diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+>>> index f201d9eca1df2f8143638cf7a4d08671e8368c11..07b96d56f3a577af71021b1b8132743554996c4f 100644
+>>> --- a/net/vmw_vsock/vsock_bpf.c
+>>> +++ b/net/vmw_vsock/vsock_bpf.c
+>>> @@ -87,7 +87,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>>> 	lock_sock(sk);
+>>> 	vsk = vsock_sk(sk);
+>>>
+>>> -	if (!vsk->transport) {
+>>> +	if (WARN_ON_ONCE(!vsk->transport)) {
+>>> 		copied = -ENODEV;
+>>> 		goto out;
+>>> 	}
+>>
+>> I'm not a sockmap expert, so I don't understand why here print an
+>> error.
+>>
+>> Since there was already a check, I expected it to be a case that can
+>> happen, but instead calling `rcvmsg()` on a socket not yet connected is
+>> impossible?
+>
+>That's right, calling vsock_bpf_recvmsg() on a not-yet-connected
+>connectible socket is impossible since PATCH 1/4 of this series.
 
-Nicolas
+Okay, I get it now.
+
+If you need to send a v2, can you write it in the commit description 
+that the behavior changed in the previous patch and so in 
+vsock_bpf_recvmsg() now we no longer expect to be called with a null 
+transport.
+
+In any case, LGTM:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+>
+>That is because to reach vsock_bpf_recvmsg(), you must have sock's proto
+>replaced in vsock_bpf_update_proto(). For that you need to run
+>sock_map_init_proto(), which you can't because the patched
+>sock_map_sk_state_allowed() will stop you.
+>
+
 
