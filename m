@@ -1,136 +1,359 @@
-Return-Path: <netdev+bounces-167423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17232A3A374
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:01:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1C6A3A3CD
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 606BB162BBE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:59:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83A6B166E8E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDC426F46B;
-	Tue, 18 Feb 2025 16:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3F4272912;
+	Tue, 18 Feb 2025 17:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbSYuc8w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lelzDAP6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D90826F44E;
-	Tue, 18 Feb 2025 16:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B9927290D
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739897975; cv=none; b=K4lMm5cZv3Xef+Ulp6vu210JsNzE9UGTV/6X3gg9B9m3KX5LVNPjD2ULvZj5sWne04t2/ycR4AugFvvIkLL/iJmmsE7+VDp0MAYyDzkjIO3gnLFJ5/9o367hzGlBRAePruBSaf4voKJAzxvxdUTxcnuRYEZEZy5ADQIUvZJVrwc=
+	t=1739898642; cv=none; b=fXtLL9xgGrPZmPzzp6p4Ehh7/jGuFJ0YjTJDxuTasLb4J/97h6e3vLHvcJiw0wWd9awJX74F8taUPKzG91lglOA5k5BLqaq+Ypzma7DtxsZdtLh9qb39ymp3jnzFLYVaFN3AyCwCd4C8ikooXlW8T0sfOnGMlxBHCslzAAdWnnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739897975; c=relaxed/simple;
-	bh=3RFWOtHbuVv6Nc1ZE3k6eCKE8OuVH5G1a5Nyu4685aE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ITsJKBU4K97J8cVUgQuDVF5kLv5/S2pK/R8oK1tM1mfhCU6ZXeYWkwKHOdMmynSn/h+mkRIkyzTAyW3+uGutZ0Xh8J0GLZUItgaQKFbAOUAW51pAnhkWO3wM5K2j0eocHLApLSy4qw1lXZvA4kSfCs6mn+VJOJpFa9UShM8aAGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbSYuc8w; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2210d92292eso85139985ad.1;
-        Tue, 18 Feb 2025 08:59:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739897973; x=1740502773; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NQ0iczs/f01PaFvxLk0T+RHP0Y74cglMUGc/eTOXWT8=;
-        b=bbSYuc8wG8T6STaAfv9CdK9SoUMFUSwR335XFYFmeuDdjP67c+bL466RaH8IPSofYB
-         ZqU2JmWvtkCd9exgUmytbIbkWtmbrPlySH69ANaLexQel5NJEsdAtBeVPDduUBsjU4Zo
-         rcI7vgIn/cS7UDLXXBH4tRuGzUxJ+fPynEaZhP6FC+DRs+WwXb2ZO4DDE8FFGt/c0jU9
-         51WAGdt0xWOrs2qWflrHXp0oGCZUjtMLzwHz7mHBw9Dqed6AP+qrh4JHC+FxIT9rcU2u
-         4ICyBZASpNgYS88loM/KTUbnUVsV+gtU4egxjToEdUN5q3cOJihc/V1e1oDMHqLWdS0N
-         WUTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739897973; x=1740502773;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NQ0iczs/f01PaFvxLk0T+RHP0Y74cglMUGc/eTOXWT8=;
-        b=MA5NkI+eFf+F6uv2IN4MGIC64sV0ID685ab12HIclp79o7wpbZ0cZ1zpVY3G9+NsAV
-         5gAbJdHEbZGkCkNE6vok5A60gm9PZVfKAoYebCvObGjQbdE742EIo05ROqnyV4AW77ju
-         7OhkpiCaFELvVOpSy34bXWOsgSgXbXYnZ03F3YgcuQWi22LJ5aoPfgQC3Iuidf6JLJ3D
-         dfHFeWy6oPIkBRDQQd0Y3mVOF5jjXU8OBQm9onVFOYmAmkVf0UXysawAeq0Fmi2C+S4D
-         1qJLjFRM9wou3pKACROpHpEQmLQIMcPWnJ0jn9V/oaknnsZxiqn5pZDmULPEpNAQBj1L
-         z1CA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDQKz4WJtw9P5WqrOryr+F+js9ZN6tAAymPCNgDhjd8WZPEaXOdG3NB57MO962RfdorAkhdNbPB2UITDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQLUAlYBct3NaiHZY47ptNXgvmovzQzFbDagmiIlC5JuVud7zA
-	LCt9XlXOhIOP/sbhNvRvrDDkM+9pWE3IC2AwYlRalZE8qyKze7Ko77c7Tuwni7Y=
-X-Gm-Gg: ASbGnctNKSWULRvD3fr52odc3YXypuA0XBX18Z6u2qvAflYXR60Y4cll8obLe1Q7+Qm
-	DO/K23/nB0GoyOmTK+ngunzFuk3jkSMOwKqXZ3xvrMbekQTsHCyf3XdkpijH4sGFmskojsRREnE
-	lBCr4AlhZdQj9iYCFafZrnafWwzp+THw7zBfJ1imHjfw1ZBef+kqnitLXzkhbLLCrA4kZgoKXSo
-	UPMoVE2nErZXUEQOuXhWRcz6iwecZSDVirgk2pc/R/C6n2/I9CSsrRCS+Gkb57t1hwNbMu8ocC5
-	2NKjK/w2x8Q5b4KYVBA03LJUzcsh3RJRr0KoQr/1DQ==
-X-Google-Smtp-Source: AGHT+IF1JuWYJdCOgkh3XC0mHjU0ZlfP/j0jnRLaHEDrwR/uBAScx7ddu3oZrBXPR0lPCThpWj6pWg==
-X-Received: by 2002:a05:6a21:6b05:b0:1e1:e2d9:7f0a with SMTP id adf61e73a8af0-1ee8cbbba0dmr29332802637.34.1739897973071;
-        Tue, 18 Feb 2025 08:59:33 -0800 (PST)
-Received: from localhost.localdomain ([2401:4900:16eb:c16:eb93:d961:71b9:73fe])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73258dece33sm7916298b3a.37.2025.02.18.08.59.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 08:59:32 -0800 (PST)
-From: Suchit K <suchitkarunakaran@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	horms@kernel.org,
-	matttbe@kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Suchit <suchitkarunakaran@gmail.com>
-Subject: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and psock tests
-Date: Tue, 18 Feb 2025 22:29:23 +0530
-Message-ID: <20250218165923.20740-1-suchitkarunakaran@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1739898642; c=relaxed/simple;
+	bh=FaOkrmQL/Jr8gx0EIfzVSrV+9cb4Lx7AsLuN13P/+14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h4JxiVOerji2rWVGyQDoB4J3uCzyRJ2Lp8VjG7rgOxEM4t6rjrkT/rEBOiREhwlTpD0DM0mr4NQYIfCkb/DNT7vqnRjt/T6Hgg8BRjbYP48cghWCekEAdYGHrMQSSyUvgJd4/2sPTkrnBTej/71YeLaxGSVZWNQXcaOIHsWUBos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lelzDAP6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04EBAC4CEE2;
+	Tue, 18 Feb 2025 17:10:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739898641;
+	bh=FaOkrmQL/Jr8gx0EIfzVSrV+9cb4Lx7AsLuN13P/+14=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lelzDAP64XBYn4EutgpYRgeAHzU/V0wM/QvlC4b05TYMpB1Bo4gbFB0UfBTuXi+eU
+	 f/pxuslb/II6Pz7/VKt2nNZxEUCsIbmcj/tT/KpkNZwsV4WqlrumK33h7OI39tInXO
+	 OL/V9spkain51hptBLAat416dhBib8Swe5s6nPQ3DpuBtIE+aucYyOyZgYXCvJUvJA
+	 veSyrW+169+IHiSLkIRpXXXmO5TDjVZcqfwg/RCHj3JoVYLvzs2YUjcC0lFyp72/bT
+	 Y6cwATQSXIcfrUkN6QHO+UxQNdZAZVqOxmQkimMP+DMx6WdPBAtoHePL1HslM42NFF
+	 9U5hwxgCUGQzw==
+Date: Tue, 18 Feb 2025 17:10:36 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, parthiban.veerasooran@microchip.com,
+	masahiroy@kernel.org
+Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
+Message-ID: <20250218171036.GB1615191@kernel.org>
+References: <20250213091402.2067626-1-tianx@yunsilicon.com>
+ <20250213091412.2067626-6-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250213091412.2067626-6-tianx@yunsilicon.com>
 
-From: Suchit <suchitkarunakaran@gmail.com>
+On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
+> Add eq management and buffer alloc apis
+> 
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
 
-Fixes minor spelling errors:
-- `simult_flows.sh`: "al testcases" -> "all testcases"
-- `psock_tpacket.c`: "accross" -> "across"
+...
 
-Signed-off-by: Suchit Karunakaran <suchitkarunakaran@gmail.com>
----
- tools/testing/selftests/net/mptcp/simult_flows.sh | 2 +-
- tools/testing/selftests/net/psock_tpacket.c       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
 
-diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh b/tools/testing/selftests/net/mptcp/simult_flows.sh
-index 9c2a41597..2329c2f85 100755
---- a/tools/testing/selftests/net/mptcp/simult_flows.sh
-+++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
-@@ -28,7 +28,7 @@ size=0
- 
- usage() {
- 	echo "Usage: $0 [ -b ] [ -c ] [ -d ] [ -i]"
--	echo -e "\t-b: bail out after first error, otherwise runs al testcases"
-+	echo -e "\t-b: bail out after first error, otherwise runs all testcases"
- 	echo -e "\t-c: capture packets for each test using tcpdump (default: no capture)"
- 	echo -e "\t-d: debug this script"
- 	echo -e "\t-i: use 'ip mptcp' instead of 'pm_nl_ctl'"
-diff --git a/tools/testing/selftests/net/psock_tpacket.c b/tools/testing/selftests/net/psock_tpacket.c
-index 404a2ce75..221270cee 100644
---- a/tools/testing/selftests/net/psock_tpacket.c
-+++ b/tools/testing/selftests/net/psock_tpacket.c
-@@ -12,7 +12,7 @@
-  *
-  * Datapath:
-  *   Open a pair of packet sockets and send resp. receive an a priori known
-- *   packet pattern accross the sockets and check if it was received resp.
-+ *   packet pattern across the sockets and check if it was received resp.
-  *   sent correctly. Fanout in combination with RX_RING is currently not
-  *   tested here.
-  *
--- 
-2.48.1
+...
 
+> +struct xsc_eq_table {
+> +	void __iomem	       *update_ci;
+> +	void __iomem	       *update_arm_ci;
+> +	struct list_head       comp_eqs_list;
+
+nit: The indentation of the member names above seems inconsistent
+     with what is below.
+
+> +	struct xsc_eq		pages_eq;
+> +	struct xsc_eq		async_eq;
+> +	struct xsc_eq		cmd_eq;
+> +	int			num_comp_vectors;
+> +	int			eq_vec_comp_base;
+> +	/* protect EQs list
+> +	 */
+> +	spinlock_t		lock;
+> +};
+
+...
+
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+
+...
+
+> +/* Handling for queue buffers -- we allocate a bunch of memory and
+> + * register it in a memory region at HCA virtual address 0.  If the
+> + * requested size is > max_direct, we split the allocation into
+> + * multiple pages, so we don't require too much contiguous memory.
+> + */
+
+I can't help but think there is an existing API to handle this.
+
+> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
+
+I think unsigned long would be slightly better types for size and max_direct.
+
+> +		  struct xsc_buf *buf)
+> +{
+> +	dma_addr_t t;
+> +
+> +	buf->size = size;
+> +	if (size <= max_direct) {
+> +		buf->nbufs        = 1;
+> +		buf->npages       = 1;
+> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
+> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
+> +						       size,
+> +						       &t,
+> +						       GFP_KERNEL | __GFP_ZERO);
+> +		if (!buf->direct.buf)
+> +			return -ENOMEM;
+> +
+> +		buf->direct.map = t;
+> +
+> +		while (t & ((1 << buf->page_shift) - 1)) {
+
+I think GENMASK() can be used here.
+
+> +			--buf->page_shift;
+> +			buf->npages *= 2;
+> +		}
+> +	} else {
+> +		int i;
+> +
+> +		buf->direct.buf  = NULL;
+> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+
+I think this is open-coding DIV_ROUND_UP
+
+> +		buf->npages      = buf->nbufs;
+> +		buf->page_shift  = PAGE_SHIFT;
+> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
+> +					   GFP_KERNEL);
+> +		if (!buf->page_list)
+> +			return -ENOMEM;
+> +
+> +		for (i = 0; i < buf->nbufs; i++) {
+> +			buf->page_list[i].buf =
+> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
+> +						   &t, GFP_KERNEL | __GFP_ZERO);
+> +			if (!buf->page_list[i].buf)
+> +				goto err_free;
+> +
+> +			buf->page_list[i].map = t;
+> +		}
+> +
+> +		if (BITS_PER_LONG == 64) {
+> +			struct page **pages;
+> +
+> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
+> +					      GFP_KERNEL);
+> +			if (!pages)
+> +				goto err_free;
+> +			for (i = 0; i < buf->nbufs; i++) {
+> +				void *addr = buf->page_list[i].buf;
+> +
+> +				if (is_vmalloc_addr(addr))
+> +					pages[i] = vmalloc_to_page(addr);
+> +				else
+> +					pages[i] = virt_to_page(addr);
+> +			}
+> +			buf->direct.buf = vmap(pages, buf->nbufs,
+> +					       VM_MAP, PAGE_KERNEL);
+> +			kfree(pages);
+> +			if (!buf->direct.buf)
+> +				goto err_free;
+> +		}
+
+I think some explanation is warranted of why the above is relevant
+only when BITS_PER_LONG == 64.
+
+> +	}
+> +
+> +	return 0;
+> +
+> +err_free:
+> +	xsc_buf_free(xdev, buf);
+> +
+> +	return -ENOMEM;
+> +}
+
+...
+
+> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
+
+As per my comment on unsigned long in my response to another patch,
+I think npages can be unsigned long.
+
+> +{
+> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
+> +	int mask = (1 << shift) - 1;
+
+Likewise, I think that mask should be an unsigned long.
+Or, both shift and mask could be #defines, as they are compile-time
+constants.
+
+Also, mask can be generated using GENMASK, e.g.
+
+#define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
+#define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
+
+And I note, in the (common) case of 4k pages, that both shift and mask are 0.
+
+> +	u64 addr;
+> +	int i;
+> +
+> +	for (i = 0; i < npages; i++) {
+> +		if (buf->nbufs == 1)
+> +			addr = buf->direct.map + (i << PAGE_SHIFT_4K);
+> +		else
+> +			addr = buf->page_list[i >> shift].map
+> +			       + ((i & mask) << PAGE_SHIFT_4K);
+
+The like above is open-coding FIELD_PREP().
+However, I don't think it can be used here as
+the compiler complains very loudly because the mask is 0.
+
+> +
+> +		pas[i] = cpu_to_be64(addr);
+> +	}
+> +}
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
+
+...
+
+> +static void eq_update_ci(struct xsc_eq *eq, int arm)
+> +{
+> +	struct xsc_eq_doorbell db = {0};
+> +
+> +	db.data0 = XSC_SET_FIELD(cpu_to_le32(eq->cons_index),
+> +				 XSC_EQ_DB_NEXT_CID) |
+> +		   XSC_SET_FIELD(cpu_to_le32(eq->eqn), XSC_EQ_DB_EQ_ID);
+
+Each of the two uses of XSC_SET_FIELD() are passed a little-endian value
+and a host-byte order mask. This does not seem correct as it seems
+they byte order should be consistent.
+
+> +	if (arm)
+> +		db.data0 |= XSC_EQ_DB_ARM;
+
+Likewise, here data0 is little-endian while XSC_EQ_DB_ARM is host
+byte-order.
+
+> +	writel(db.data0, XSC_REG_ADDR(eq->dev, eq->doorbell));
+
+And here, db.data0 is little-endian, but writel expects a host-byte order
+value (which it converts to little-endian).
+
+I didn't dig deeper but it seems to me that it would be easier to change
+the type of data0 to host byte-order and drop the use of cpu_to_le32()
+above.
+
+Issues flagged by Sparse.
+
+> +	/* We still want ordering, just not swabbing, so add a barrier */
+> +	mb();
+> +}
+
+...
+
+> +static int xsc_eq_int(struct xsc_core_device *xdev, struct xsc_eq *eq)
+> +{
+> +	u32 cqn, qpn, queue_id;
+> +	struct xsc_eqe *eqe;
+> +	int eqes_found = 0;
+> +	int set_ci = 0;
+> +
+> +	while ((eqe = next_eqe_sw(eq))) {
+> +		/* Make sure we read EQ entry contents after we've
+> +		 * checked the ownership bit.
+> +		 */
+> +		rmb();
+> +		switch (eqe->type) {
+> +		case XSC_EVENT_TYPE_COMP:
+> +		case XSC_EVENT_TYPE_INTERNAL_ERROR:
+> +			/* eqe is changing */
+> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+> +							     XSC_EQE_QUEUE_ID));
+
+Similarly, here XSC_GET_FIELD() is passed a little-endian value and a host
+byte-order mask, which is inconsistent.
+
+Perhaps this should be (completely untested!):
+
+			queue_id = XSC_GET_FIELD(le16_to_cpu(eqe->queue_id_data),
+						 XSC_EQE_QUEUE_ID);
+
+Likewise for the two uses of XSC_GET_FIELD below.
+
+And perhaps queue_id could be renamed, say to q_id, to make things a bit
+more succinct.
+
+
+> +			cqn = queue_id;
+
+I'm unsure why both cqn and queue_id are needed.
+
+> +			xsc_cq_completion(xdev, cqn);
+> +			break;
+> +
+> +		case XSC_EVENT_TYPE_CQ_ERROR:
+> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+> +							     XSC_EQE_QUEUE_ID));
+> +			cqn = queue_id;
+> +			xsc_eq_cq_event(xdev, cqn, eqe->type);
+> +			break;
+> +		case XSC_EVENT_TYPE_WQ_CATAS_ERROR:
+> +		case XSC_EVENT_TYPE_WQ_INVAL_REQ_ERROR:
+> +		case XSC_EVENT_TYPE_WQ_ACCESS_ERROR:
+> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+> +							     XSC_EQE_QUEUE_ID));
+> +			qpn = queue_id;
+> +			xsc_qp_event(xdev, qpn, eqe->type);
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +
+> +		++eq->cons_index;
+> +		eqes_found = 1;
+> +		++set_ci;
+> +
+> +		/* The HCA will think the queue has overflowed if we
+> +		 * don't tell it we've been processing events.  We
+> +		 * create our EQs with XSC_NUM_SPARE_EQE extra
+> +		 * entries, so we must update our consumer index at
+> +		 * least that often.
+> +		 */
+> +		if (unlikely(set_ci >= XSC_NUM_SPARE_EQE)) {
+> +			eq_update_ci(eq, 0);
+> +			set_ci = 0;
+> +		}
+> +	}
+> +
+> +	eq_update_ci(eq, 1);
+> +
+> +	return eqes_found;
+> +}
+
+...
 
