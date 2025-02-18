@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-167152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2694A39048
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:21:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2BDAA3904A
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:21:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F6311716DC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D21083B454B
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E7E1487F6;
-	Tue, 18 Feb 2025 01:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1279315B0EE;
+	Tue, 18 Feb 2025 01:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWb/VpUJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WA4GVv0W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE40537F8;
-	Tue, 18 Feb 2025 01:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE0A1581E5;
+	Tue, 18 Feb 2025 01:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739841621; cv=none; b=T2qAX/ZmZtxywDwe5WJn5DiKzSwoTco+1SoiRoBwxPUOAu1oRZBZ4P4d3CoDGYzaqalZ8Hjegj3C5y8EsauKfWstcsDgZjxWwYpkOOnEk4PlrRZi8brzOfklZnveog8hIKcukCI/9hWhRv96sdyD+8fVvKpNguDTeY8kUr8oN9c=
+	t=1739841623; cv=none; b=BBJPU0KUff6OALpEVpph7B8/t1suz48nkqugL1kvewWz3EsiRNXK/EoGOgRZViYfNZygfkHCfagq0d0nwwnrOrN2Rpd2/yn4pNIIinsoArN/3/1SHUiCkEfYHUnmVaJVgANrLVHfGZ5++DBN6M/z05Muw93q000Yyku6gN0pnL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739841621; c=relaxed/simple;
-	bh=faw9/dQRG1yyXfFilLPDy5GQnixQoVs1FkcKsxZbL3I=;
+	s=arc-20240116; t=1739841623; c=relaxed/simple;
+	bh=VTd07HBUgh46I+5T+oMUa+K0VhIrDwJkwlf4iWFOi9o=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HcaSL0GJ20zyDLQbsVfD5IzRKWLbzxxbPpa0g+02+Uu4F2kc7njw89m/hIE7qOexpnQ55o5KQYb9/SYA3vF8VC+2z1lSJTTiHunXfQT/I94PBs5ZkOhHstzAJkLo/e0PGMqkj2q+T2nJjZMPrnhz+aRvFAH6Nx5p+76X1CSTDng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWb/VpUJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB5BC4CEE4;
-	Tue, 18 Feb 2025 01:20:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kBPk770ClDSa9EPrRQj37YFlEgFHRuKRMgaDoDN4XoBwS0pxVaKLRhy3Oz4we5gGrMWdIdJ/ZV7y+TeE0oxLVDIHrTvDZm7ExZlDx2Tyl3nATiqYn6Mm7rVf6AAwayDyFEruZYSiMaEhcNWQoi6S7ofRBi1AKxar4yxX5t4mEpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WA4GVv0W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDDFEC4CEE4;
+	Tue, 18 Feb 2025 01:20:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739841621;
-	bh=faw9/dQRG1yyXfFilLPDy5GQnixQoVs1FkcKsxZbL3I=;
+	s=k20201202; t=1739841622;
+	bh=VTd07HBUgh46I+5T+oMUa+K0VhIrDwJkwlf4iWFOi9o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GWb/VpUJETmWTep+sh2o8ryfOUwowkwBrGdoeEsg0e2gtFAu8AcMQh28ysFEMSdo+
-	 Kh7zf5TBkTTMbWuPlg3RmpVpNWqKaE4kQki6Rsbl9HIJ2ECyEEd89hcBC7NnnfY9QC
-	 DreNL/HGJtOCDTlkSA+PBJvEqVq/dAI2eZPJPB5XkT/Y7oY4N8w+8z3W6Ft36oQHa2
-	 UClcSlqRYz1aj9CftIDghxKFZlwGz0I2bAD7NfSR6BjMq3TBBM0LGI78GjknI07Lbj
-	 FMrLLvoyQu+ORbyhaIATZgXMSAKv0QEeXCdxuN4miJ7Zq5mmwwFdsHU536JHA2k1xv
-	 7+AUU91JCjsPg==
+	b=WA4GVv0WFGBbmcHmEghrN7pG73Uf526ezMIoPsQ49lB0SeoVm7mHbAh4wMNrKc5AF
+	 HDU22TgLD5ea7IjzdrUKnu5337Tc3KMr1zexniwTjHoqyHNzltgWle6tSSWazgwTVg
+	 s3cH8zR3aPFYEHjTqkymz2/0F3RzbDS35ftXEaNkA1tR4a3cPCXroI8yqDmZnLKWA+
+	 ozd/q+kwbREIN9K+QgNlj6YHY+3DXFGftDzO7aWRrbCkxl6ROJK7aq4r08fbOIpXY2
+	 oFIG82vIIGY8W75onlJKRVetiCN4k+WL759RGEh0gXuYtQmWiC2z8T09nUFAXgX57J
+	 4UBXeBowVGXrQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE82380AAD5;
-	Tue, 18 Feb 2025 01:20:52 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3409D380AAD5;
+	Tue, 18 Feb 2025 01:20:54 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,51 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
+Subject: Re: [PATCH net-next v3] selftests: net: add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173984165125.3591662.98390841427840675.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 01:20:51 +0000
-References: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
-In-Reply-To: <20250214-dp83822-tx-swing-v5-0-02ca72620599@liebherr.com>
-To: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, afd@ti.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, f.fainelli@gmail.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- dimitri.fedrau@liebherr.com, dima.fedrau@gmail.com,
- conor.dooley@microchip.com
+ <173984165275.3591662.2450574356094790999.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Feb 2025 01:20:52 +0000
+References: <20250214205828.48503-1-annaemesenyiri@gmail.com>
+In-Reply-To: <20250214205828.48503-1-annaemesenyiri@gmail.com>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemb@google.com, idosch@idosch.org,
+ horms@kernel.org, davem@davemloft.net, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 14 Feb 2025 15:14:08 +0100 you wrote:
-> Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-> Add support for configuration via DT.
+On Fri, 14 Feb 2025 21:58:28 +0100 you wrote:
+> Introduce tests to verify the correct functionality of the SO_RCVMARK and
+> SO_RCVPRIORITY socket options.
 > 
-> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> ---
-> Changes in v5:
-> - Remove default from binding
-> - Fix description in binding by defining what 100% gain means
-> - Switch to reverse christmas tree in phy_get_internal_delay
-> - Add kernel doc for phy_get_tx_amplitude_gain
-> - EXPORT_SYMBOL_GPL for phy_get_tx_amplitude_gain
-> - Link to v4: https://lore.kernel.org/r/20250211-dp83822-tx-swing-v4-0-1e8ebd71ad54@liebherr.com
+> Key changes include:
+> 
+> - so_rcv_listener.c: Implements a receiver application to test the correct
+> behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
+> - test_so_rcv.sh: Provides a shell script to automate testing for these options.
+> - Makefile: Integrates test_so_rcv.sh into the kernel selftests.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v5,1/3] dt-bindings: net: ethernet-phy: add property tx-amplitude-100base-tx-percent
-    https://git.kernel.org/netdev/net-next/c/7fff5d958648
-  - [net-next,v5,2/3] net: phy: Add helper for getting tx amplitude gain
-    https://git.kernel.org/netdev/net-next/c/961ee5aeea04
-  - [net-next,v5,3/3] net: phy: dp83822: Add support for changing the transmit amplitude voltage
-    https://git.kernel.org/netdev/net-next/c/4f3735e82d8a
+  - [net-next,v3] selftests: net: add support for testing SO_RCVMARK and SO_RCVPRIORITY
+    https://git.kernel.org/netdev/net-next/c/c935af429ec2
 
 You are awesome, thank you!
 -- 
