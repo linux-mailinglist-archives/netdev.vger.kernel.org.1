@@ -1,156 +1,118 @@
-Return-Path: <netdev+bounces-167475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071F6A3A658
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:55:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CD5A3A732
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27363B53BB
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:52:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2A9E17602F
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E05C1F5822;
-	Tue, 18 Feb 2025 18:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EAF31E8339;
+	Tue, 18 Feb 2025 19:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DZt7UW1l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apNO0xT7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575C02356BA;
-	Tue, 18 Feb 2025 18:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BFE1E51F8;
+	Tue, 18 Feb 2025 19:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739904653; cv=none; b=tFELqTjIjT0U3lkog8sxuA+1wuv9Gs3jy9+CKnxmEOpMR5hgA/KHtwjUWA86O8dYr3Vhn8IEDOxiCbXYoZ4w+1fZ8vmiItDksB4Ms/qZ1icEnG1FavQsICCV2rUsFSVLQzEW2hD0x6r//rSQBfVINWAcyOBY9DYdTNZy5n0/NSo=
+	t=1739905972; cv=none; b=i1nCF5DMW5aKhNtVfEv1aphdfIRdqNWbqu40IGNasMNJglGOv4BaqGUCBBe1qhJJr85OGi3FbCpGP5/iy1G5ZZrpiMyVKS8KFw6LFQA3BM1QLMw/5Wf25wtmI9+E2S8DtVP8SzEAUHatUOtnK2YeTUMkJhqqRa4UHAtatq46ykk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739904653; c=relaxed/simple;
-	bh=lsflQrO1N48O+jshUWxiHl8d7dgJUl8JR7UUofGDcOU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cxLRRPWfNs1eDBZf4J5Ka3GEJaUZagSF5/lczajNGB286tetBTcnO5p9xq0he00jHSicJHOh2czX9trtOjqRuQXA/L/Ei2HZG0JFjDUe0O+RC8aGx+4hhzaLa8zcALQUajtBv2bL8Ftxbsafs9dcqjeIAo0YgpszIdtIHawdcSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DZt7UW1l; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1739905972; c=relaxed/simple;
+	bh=WoUKh5c/vDRm4FlNeCNrkzPuHxYE4Y4scX3UMvAd5O4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fioGpGPolYM914iknbFRtJ0u9gqlEC6SD3us8tx6TlqUat4gL0F90Jl2Ui6HB9GydmhxODILHEYPDFLSvwG8T+l0a7R1hin9pnunamFZrdQ9Nr2p+rDVwmsaSKVP0U211btmWssZKVO8iITXyOGl1iCXNbQ8GqHEv4CinIG7gPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apNO0xT7; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3f40ad1574fso512515b6e.0;
+        Tue, 18 Feb 2025 11:12:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739904651; x=1771440651;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/1XY/m7rlHy9RJvp29NIT0p6dcrQvEcQVV1BnoOoOvg=;
-  b=DZt7UW1l/2ky4722t3/PIRud+K7BivymcsD91nyw+va21WNfHR7A9Jh6
-   onz6NuouVBzoE9hxQOJdUENIUeUqIOqs+cDhBU5j/Eje51bFlrT34i3ov
-   ODI/+xY9COHTi7OEzVhV/0IvuI0CkbODdssUehXFUPSfGNKbp3noewquj
-   A=;
-X-IronPort-AV: E=Sophos;i="6.13,296,1732579200"; 
-   d="scan'208";a="494971099"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 18:50:46 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:49314]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.115:2525] with esmtp (Farcaster)
- id ad366e28-5030-4d80-9ae4-2708614bf9a9; Tue, 18 Feb 2025 18:50:45 +0000 (UTC)
-X-Farcaster-Flow-ID: ad366e28-5030-4d80-9ae4-2708614bf9a9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 18 Feb 2025 18:50:44 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 18 Feb 2025 18:50:41 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <purvayeshi550@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<linux-ppp@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<skhan@linuxfoundation.org>,
-	<syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com>
-Subject: Re: [PATCH] ppp: Prevent out-of-bounds access in ppp_sync_txmunge
-Date: Tue, 18 Feb 2025 10:50:33 -0800
-Message-ID: <20250218185033.26399-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <1e906059-83c7-4f29-a026-76cd73d8b6fa@gmail.com>
-References: <1e906059-83c7-4f29-a026-76cd73d8b6fa@gmail.com>
+        d=gmail.com; s=20230601; t=1739905970; x=1740510770; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oF3IZ5dNlMyYD63Wzfa4O0wknfeiB+PfksPMCxVRCig=;
+        b=apNO0xT7oS8blITVvU5AA+T6WNsY+6TwmxVVmJRMLlKjITvOGyzXNV7ZnRjY12n/8b
+         sMJWFNdPaNXVlPzMZWB6U5F6Opyl+gZQHTxSTo/Fgrowe/jPQdueQ7NR1ifl1z9Zxzjk
+         hFCO8ojfy8FxDfiZWnE9IQoZeQ6d1YVf2Dls+BvEQLWtLrJ/QTxs/NZpG7TcT+/H90Qu
+         ZYKB92vz5Kbdwue+BNKAu5MSL8qEwx09PWD0vtsDFjWdA0XYRw9KEBnMTVZSYNQF4WVX
+         CnU1a+3ASEdd+J+GWhNrWVSEB2s8GZUXx0uwnBtvECB/caEGaKRxMnVP3WKF3TM0MnMw
+         WIGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739905970; x=1740510770;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oF3IZ5dNlMyYD63Wzfa4O0wknfeiB+PfksPMCxVRCig=;
+        b=kw47hKfXSdmyC37aW96kZ5iqrwRJkY8gBsp4+1MPc2H5ov6jKtx/zhmh4Iw91DCF9v
+         JJsID0Tl7uqW17LGwQxIKDYfWvjyJSSuSq/2G1MbQcvvAie+ik70PLDTscOAKl717oDH
+         fzujy0RAa68bU4Au3YfU6w6OLDMdiVY/UssXDKWaPK+xCbe5DXZpxD+z0yNCSyjCStWv
+         65CqgyZUN+1xnV+2h085IfFzQkfFnjBnD+/J2PaT5/5O63FPmZOQUH0UEQY9l3CDhfNY
+         qZFcT5W2ytGaurNVwCA+42UCfzBibjnVWz/ixnTL6h1OwJaVSYPJlASVAwACPATIheMw
+         s8yw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTKu8iA+qY5X1X6M2J9L6SEwWwhC429l/9D0Y9NsszCEXu527ToCd6lr7RgxORdZTVIKOPMRVHPwF/vYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiBwb81mg7OYyYtQR+77/HGgaABTeiS5pzXuMxM3w9QHoptY38
+	H/5JTOWrRWSCdvadf2SVVfMBlqOGufqcXU1Z98ioAn8NWxi/IHKw1ARmM9QwzSzLiVvpU2GDws6
+	Ob+60ohipHazBWnCFFrFNsK1RBk0=
+X-Gm-Gg: ASbGncsjiVtgW8YqwVTOyf5N3JSGDOT8wAPs1o7H3QD0kfz9VsSRz0yQ8Zu3WkE3tFS
+	aWFYWLntHcUoOsN37aUVl32zn4usUzfOH2ztjUdr3DWvI10uCFTCHvr3SPIJp+inGrHhWf6XYmM
+	G73ok/iI0BTNiKpA==
+X-Google-Smtp-Source: AGHT+IFb4knJMi3AOcDr6zaVeojXvLaFJxcBcDyvpUv4oVbjmkI7Mm6ZZOndeOhxjCi1+zyZXOxXG+rYjRuy9gA1yt0=
+X-Received: by 2002:a05:6808:181e:b0:3f3:d742:c2bd with SMTP id
+ 5614622812f47-3f40f1e5799mr776743b6e.13.1739905969652; Tue, 18 Feb 2025
+ 11:12:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250218165923.20740-1-suchitkarunakaran@gmail.com> <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
+In-Reply-To: <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
+From: Suchit K <suchitkarunakaran@gmail.com>
+Date: Wed, 19 Feb 2025 00:42:38 +0530
+X-Gm-Features: AWEUYZkoRmcxpgXd1SyCu20aEGPfydJydoqEvXvTkpjbLGDJXP09KIF_zfs0pMk
+Message-ID: <CAO9wTFhVx9nCPyMzHKCTnuBfrTmvA2QADg8La0z6KcYWpsxnEg@mail.gmail.com>
+Subject: Re: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and psock tests
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, horms@kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Purva Yeshi <purvayeshi550@gmail.com>
-Date: Tue, 18 Feb 2025 11:58:17 +0530
-> On 18/02/25 02:46, Kuniyuki Iwashima wrote:
-> > From: Purva Yeshi <purvayeshi550@gmail.com>
-> > Date: Sun, 16 Feb 2025 11:34:46 +0530
-> >> Fix an issue detected by syzbot with KMSAN:
-> >>
-> >> BUG: KMSAN: uninit-value in ppp_sync_txmunge
-> >> drivers/net/ppp/ppp_synctty.c:516 [inline]
-> >> BUG: KMSAN: uninit-value in ppp_sync_send+0x21c/0xb00
-> >> drivers/net/ppp/ppp_synctty.c:568
-> >>
-> >> Ensure sk_buff is valid and has at least 3 bytes before accessing its
-> >> data field in ppp_sync_txmunge(). Without this check, the function may
-> >> attempt to read uninitialized or invalid memory, leading to undefined
-> >> behavior.
-> >>
-> >> To address this, add a validation check at the beginning of the function
-> >> to safely handle cases where skb is NULL or too small. If either condition
-> >> is met, free the skb and return NULL to prevent processing an invalid
-> >> packet.
-> >>
-> >> Reported-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
-> >> Closes: https://syzkaller.appspot.com/bug?extid=29fc8991b0ecb186cf40
-> >> Tested-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
-> >> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
-> >> ---
-> >>   drivers/net/ppp/ppp_synctty.c | 6 ++++++
-> >>   1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/drivers/net/ppp/ppp_synctty.c b/drivers/net/ppp/ppp_synctty.c
-> >> index 644e99fc3..e537ea3d9 100644
-> >> --- a/drivers/net/ppp/ppp_synctty.c
-> >> +++ b/drivers/net/ppp/ppp_synctty.c
-> >> @@ -506,6 +506,12 @@ ppp_sync_txmunge(struct syncppp *ap, struct sk_buff *skb)
-> >>   	unsigned char *data;
-> >>   	int islcp;
-> >>   
-> >> +	/* Ensure skb is not NULL and has at least 3 bytes */
-> >> +	if (!skb || skb->len < 3) {
-> > 
-> > When is skb NULL ?
-> 
-> skb pointer can be NULL in cases where memory allocation for the socket 
-> buffer fails, or if an upstream function incorrectly passes a NULL 
-> reference due to improper error handling.
+Thanks for the feedback!
 
-Which caller passes NULL skb ?
-
-If it's really possible, you'll see null-ptr-deref at
-
-  data = skb->data;
-
-below instead of KMSAN's uninit splat.
-
-
-> 
-> Additionally, skb->len being less than 3 can occur if the received 
-> packet is truncated or malformed, leading to out-of-bounds memory access 
-> when attempting to read data[2].
-> 
-> > 
-> > 
-> >> +		kfree_skb(skb);
-> >> +		return NULL;
-> >> +	}
-> >> +
-> >>   	data  = skb->data;
-> >>   	proto = get_unaligned_be16(data);
-> >>   
-> >> -- 
-> >> 2.34.1
+On Wed, 19 Feb 2025 at 00:12, Matthieu Baerts <matttbe@kernel.org> wrote:
+>
+> Hi Suchit,
+>
+> On 18/02/2025 17:59, Suchit K wrote:
+> > From: Suchit <suchitkarunakaran@gmail.com>
+> >
+> > Fixes minor spelling errors:
+> > - `simult_flows.sh`: "al testcases" -> "all testcases"
+> > - `psock_tpacket.c`: "accross" -> "across"
+>
+> Thank you, the patch is no longer corrupted.
+>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>
+> This patch can be directly applied in net-next.
+>
+> Note: please next time don't repost your patches within one 24h period,
+> and use the [PATCH net-next] prefix, see:
+>
+>   https://docs.kernel.org/process/maintainer-netdev.html
+>
+> Cheers,
+> Matt
+> --
+> Sponsored by the NGI0 Core fund.
+>
 
