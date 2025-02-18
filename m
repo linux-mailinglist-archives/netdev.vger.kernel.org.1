@@ -1,116 +1,189 @@
-Return-Path: <netdev+bounces-167288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB54A399EE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:10:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C5FA39A71
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D5547A40FC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:09:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C138B3B6D17
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A43123AE8B;
-	Tue, 18 Feb 2025 11:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056881DEFEB;
+	Tue, 18 Feb 2025 11:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DpItD0sM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mMsS565B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1346B23958C;
-	Tue, 18 Feb 2025 11:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3631235348
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 11:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739877001; cv=none; b=N+1SbgJhVnftM8q/DQ0fW0GhWmnjakfRGg1CXreIY1Ydv8zk3sEBEAYENG/ozwRXTfoUkgk+3mBm865PDmQgZNnPVOPO7Xoftsy/MJ7+73Gn00dBsMIUuw2TMaYssuBLDH3Ak6I7rsKlHLf24ypeWZr5KiZvIEOEkID1OntRXEg=
+	t=1739877315; cv=none; b=MC7Nt3gVr59a6W+fwa4z9iJcehlICJqUKLrSHpQRmxEG3FlP+jysJuDfnl1foJ4HJ6Bpz38RtG0v87L1Omfwtna9YLLz5HwUo9STwItOEtPi1bUhbbD+WZqV68JCC84xa5ltTnD3NbK7PchwvV5/naj+AMRyzI98zzMlAv3oKno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739877001; c=relaxed/simple;
-	bh=yxYYlJBoiZm+umfoO+u20ai1V04G+CgdbT+PHgCEfM8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nfeMLl1TttbAsdwVCMxX02USOCiUjN6KtxozRbEYvd4L9uD8uHorHzqYL3p5rGkXLZZiYOXlILyFpw6IBLBuP9P/zfaoyb+QqA4lBTR5tG97YXEPeD6XTslFnR068U4IdfCYL/0BxngjbzU3XW55c4RfB+NoPTxkUGF+z8ofIPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DpItD0sM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F11C4CEE2;
-	Tue, 18 Feb 2025 11:10:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739877000;
-	bh=yxYYlJBoiZm+umfoO+u20ai1V04G+CgdbT+PHgCEfM8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DpItD0sMWHXYQNVy/EjKjs76cbZCsDuh9CDiri4uN4Ds6S+fYWRqlMmR5M1XKVxQf
-	 xGHxZ/4gGYHpLsw8+hr8Svn8sjsa0J1xjrxs1FIxiYjBELDBqNvNw9qzzsV1fw25AQ
-	 RRc1nJqHGK4nA1t5CJjvNCsxf5fsDrpHaUCEZ/HgNcckkOSIVRcJn9utGI4sOoknH/
-	 +PMGrnA2mTjzjSTCw5ko/s5aUumDemFkslTWJAy/jxCPs49cGcDDdpobzn75nQwbcC
-	 I+ATTEvyBngsenxjVzg59qPQmPX7PPQ46I8XW7wRP12705bpGpgiwR7/HC5QRRBL4g
-	 qF99VaZh4kEEQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB759380AA7E;
-	Tue, 18 Feb 2025 11:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739877315; c=relaxed/simple;
+	bh=zMbeOmxU4nNQBy1wYB6Gd45G0IGifPTt4H/meeTCRQQ=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=NnlWrAWsagmZB7cormOew0rqVmukusMuEqhFuAKhXWOBTeo0voORFN9YygyZ00vzLkxqhd7ct0guer3TqViYAeaU/RKUjfnR+7a7yoWGKzT8HGSsRk0I1i6hPLsbGC+E1KMyyE2T5Y8C7gXVQtIb2h9AbwLq3fVCzXjOYuzZOCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mMsS565B; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5ZH1bVksmCx0plQEMgCUt60mErOEDPQEJF+dciIer4w=; b=mMsS565BSOMEGYOhTy8coteI7H
+	zXwIWtFNm0MvmcZVzpD+jAe66mi/w59zeijL3/EsJbdlgdMYcPursaxV9e7LdvSyw0zEzxds6x41U
+	fv0HweRrjDM0J0PPQnApZCK7F4cppq6OFlsB4RxDE2tpqouFWlVPj+9ZmcSoBFWS9YNj1m2A6owR6
+	fWNAUzsdHlyHJvq8YOXdQ4vuEK2DkTb3fG6+cgDaFedYNLg4+VT1y/fEi0hPZUxz330WkFmSavAHp
+	1Xy6nP+2w3jlQ8xBM3mqpliVx6JqIKVxpwvX7DC2EbCzMfob2ROcsQySWxq1Y+xWOrby97FZX52JL
+	KVnlHfkw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51354 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tkLZ5-0001hg-1A;
+	Tue, 18 Feb 2025 11:14:59 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tkLYl-004RYv-Gz; Tue, 18 Feb 2025 11:14:39 +0000
+In-Reply-To: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
+References: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	imx@lists.linux.dev,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Thierry Reding <treding@nvidia.com>
+Subject: [PATCH RFC net-next 1/7] net: stmmac: provide generic transmit clock
+ configuration hook
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] sockmap, vsock: For connectible sockets allow only
- connected
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173987703076.4044275.12767164064897444183.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 11:10:30 +0000
-References: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
-In-Reply-To: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, edumazet@google.com,
- kuniyu@amazon.com, pabeni@redhat.com, willemb@google.com,
- davem@davemloft.net, kuba@kernel.org, horms@kernel.org, sgarzare@redhat.com,
- mst@redhat.com, bobby.eshleman@bytedance.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- mykolal@fb.com, shuah@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tkLYl-004RYv-Gz@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 18 Feb 2025 11:14:39 +0000
 
-Hello:
+Several stmmac sub-drivers which support RGMII follow the same pattern.
+They calculate the transmit clock, and then call the clk API to set a
+clock to that rate.
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Analysis of documentation suggests that the platform is responsible for
+providing the transmit clock to the DWMAC core (clk_tx_i). The expected
+rates are:
 
-On Thu, 13 Feb 2025 12:58:48 +0100 you wrote:
-> Series deals with one more case of vsock surprising BPF/sockmap by being
-> inconsistency about (having an) assigned transport.
-> 
-> KASAN: null-ptr-deref in range [0x0000000000000120-0x0000000000000127]
-> CPU: 7 UID: 0 PID: 56 Comm: kworker/7:0 Not tainted 6.14.0-rc1+
-> Workqueue: vsock-loopback vsock_loopback_work
-> RIP: 0010:vsock_read_skb+0x4b/0x90
-> Call Trace:
->  sk_psock_verdict_data_ready+0xa4/0x2e0
->  virtio_transport_recv_pkt+0x1ca8/0x2acc
->  vsock_loopback_work+0x27d/0x3f0
->  process_one_work+0x846/0x1420
->  worker_thread+0x5b3/0xf80
->  kthread+0x35a/0x700
->  ret_from_fork+0x2d/0x70
->  ret_from_fork_asm+0x1a/0x30
-> 
-> [...]
+	10Mbps	100Mbps	1Gbps
+MII	2.5MHz	25MHz
+GMII			125MHz
+RGMI	2.5MHz	25MHz	125MHz
+RMII	2.5MHz	25MHz
 
-Here is the summary with links:
-  - [net,1/4] sockmap, vsock: For connectible sockets allow only connected
-    https://git.kernel.org/netdev/net/c/8fb5bb169d17
-  - [net,2/4] vsock/bpf: Warn on socket without transport
-    https://git.kernel.org/netdev/net/c/857ae05549ee
-  - [net,3/4] selftest/bpf: Adapt vsock_delete_on_close to sockmap rejecting unconnected
-    https://git.kernel.org/netdev/net/c/8350695bfb16
-  - [net,4/4] selftest/bpf: Add vsock test for sockmap rejecting unconnected
-    https://git.kernel.org/netdev/net/c/85928e9c4363
+It seems some platforms require this clock to be manually configured,
+but there are outputs from the MAC core that indicate the speed, so a
+platform may use these to automatically configure the clock. Thus, we
+can't just provide one solution to configuring the clock.
 
-You are awesome, thank you!
+Moreover, the clock may need to be derived from one of several sources
+depending on the interface mode.
+
+Provide a platform hook that is passed the interface mode, speed, and
+transmit clock.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++++
+ include/linux/stmmac.h                            |  4 ++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 4d542f482ecb..f7ff94a09da2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -928,6 +928,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+ 	unsigned int flow_ctrl;
+ 	u32 old_ctrl, ctrl;
++	int ret;
+ 
+ 	if ((priv->plat->flags & STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP) &&
+ 	    priv->plat->serdes_powerup)
+@@ -1000,6 +1001,16 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 	if (priv->plat->fix_mac_speed)
+ 		priv->plat->fix_mac_speed(priv->plat->bsp_priv, speed, mode);
+ 
++	if (priv->plat->set_clk_tx_rate) {
++		ret = priv->plat->set_clk_tx_rate(priv->plat->bsp_priv,
++						priv->plat->clk_tx_i,
++						interface, speed);
++		if (ret < 0)
++			netdev_err(priv->dev,
++				   "failed to configure transmit clock for %dMbps: %pe\n",
++				   speed, ERR_PTR(ret));
++	}
++
+ 	if (!duplex)
+ 		ctrl &= ~priv->hw->link.duplex;
+ 	else
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 6d2aa77ea963..cd0d1383df87 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -78,6 +78,7 @@
+ 			| DMA_AXI_BLEN_32 | DMA_AXI_BLEN_64 \
+ 			| DMA_AXI_BLEN_128 | DMA_AXI_BLEN_256)
+ 
++struct clk;
+ struct stmmac_priv;
+ 
+ /* Platfrom data for platform device structure's platform_data field */
+@@ -231,6 +232,8 @@ struct plat_stmmacenet_data {
+ 	u8 tx_sched_algorithm;
+ 	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
+ 	struct stmmac_txq_cfg tx_queues_cfg[MTL_MAX_TX_QUEUES];
++	int (*set_clk_tx_rate)(void *priv, struct clk *clk_tx_i,
++			       phy_interface_t interface, int speed);
+ 	void (*fix_mac_speed)(void *priv, int speed, unsigned int mode);
+ 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
+ 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
+@@ -252,6 +255,7 @@ struct plat_stmmacenet_data {
+ 	struct clk *stmmac_clk;
+ 	struct clk *pclk;
+ 	struct clk *clk_ptp_ref;
++	struct clk *clk_tx_i;		/* clk_tx_i to MAC core */
+ 	unsigned long clk_ptp_rate;
+ 	unsigned long clk_ref_rate;
+ 	struct clk_bulk_data *clks;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.2
 
 
