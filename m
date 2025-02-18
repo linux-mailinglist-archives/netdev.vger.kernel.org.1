@@ -1,139 +1,123 @@
-Return-Path: <netdev+bounces-167477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17073A3A742
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:23:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A13A3A747
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9105164A91
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:22:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1DB1668B7
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1647F21B9DF;
-	Tue, 18 Feb 2025 19:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2847E21B9F6;
+	Tue, 18 Feb 2025 19:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="prwidybA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ath3CRFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D9221B9C4
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3164521B9C4
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739906576; cv=none; b=RADG/n9whdfrHeIEO46TQ73IAcPgEp/QYhnZD8DAqpxfDsgxkRxYIIbhi36Nj6wylFSylaAR3Hl3Tb7rJuZhs8iHv/dEdi8wkK+DTZSR00Zm4SD0yANVEmSeVxqyYnasGIdTL/n7JeB03NzbcUn/8EL7AiuiFp2V6kdY8Ic42Gg=
+	t=1739906582; cv=none; b=t4OGA9hwp3WP/whA4i8h8QRcAv15S4p/vNT4HQhCSJVuDMsoCMp77T1M7JRs50uiVEHm/HrMu9s+o06MtcjlvVvPaE2WwQ5QyqeSuQXsZlBHhBdd1Cv878wkavD/P3jfv8tqCHInPLat87wRTNfUWUQzvcJgoWxzPJAACCOk6sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739906576; c=relaxed/simple;
-	bh=wUnAO1ZDvxZpPJeymZsKfkAJ/DnDMsWAHnbCMlFP2vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=buh9O2TtF+YRza0MKmKmstoGlow9yZxR0c3Eqxz4SENkH9byCjZTvgl8K/x4PRCyYH/RBiSWcWpT9bkDPHrEnTUz4od89D9fSF805+wnNVxBjjJzBp2x1/FszcuxlOPpZ1H+L2+sik63GPGBXTDvfSAQmpq8xPfGl10TVsYllSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=prwidybA; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 833F144444;
-	Tue, 18 Feb 2025 19:22:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739906564;
+	s=arc-20240116; t=1739906582; c=relaxed/simple;
+	bh=swGB3xGE9Yoh2kRKbPlYsUFSqqbPDflfTARdV/Ubt4g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QjM5dbeCQSexiiNaYndytALyoqnBMNwgHdbkUXNaKqbWHCYimGt5Y5cQfghIX8kIB7gricXLWFaKFoHYnzykwseXkCsee7NytI4eMl3QDzKzmYmPNI2JEu5vKf8FhtFGqALvZTXgIS1Xc2JduYkaW1sL/RKWdrI4slVZMLTxj8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ath3CRFT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739906579;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s0Ck/s9l4dl8ts5NEnBIJT3tF6gm0Eapi2M7IOAwyjs=;
-	b=prwidybALn4eNqu5JfeWZ48L5rKVUeylKTkvVA+XboC/i3UNSiFQU747gnj8S5J8Sno/U9
-	VMmMSvMTkSswvxmBKFCNatViLPVVOgdaCdVxgi12SlMW3NZCzXa1MVRSt1kklhfiLBI2MI
-	3kf+6ipv7oi+xn/l+AEIsqZn1OPWIRlX9ToMNtP3NblQNsJRyN8+fQ6utELEr7jw5peIKk
-	CUDFCUY9vy34Nzp4EOlH2K3dXzqXrGQOHy/BYy4D1BrT8A57/NnMiA9oEtdHaRrWxuFq62
-	1qYrMLCFM/xmZ+VBfRD6YWRt4ObQGuofF06n+/Qm8lbyWfBKFTwEJhCcpm34Fw==
-Date: Tue, 18 Feb 2025 20:22:41 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
- donald.hunter@gmail.com, dsahern@kernel.org, petrm@nvidia.com,
- gnault@redhat.com
-Subject: Re: [PATCH net-next 5/8] net: fib_rules: Enable port mask usage
-Message-ID: <20250218202241.3b0cf52c@kmaincent-XPS-13-7390>
-In-Reply-To: <Z7TOVUyjrric13aw@shredder>
-References: <20250217134109.311176-1-idosch@nvidia.com>
-	<20250217134109.311176-6-idosch@nvidia.com>
-	<20250218181523.71926b7e@kmaincent-XPS-13-7390>
-	<Z7TOVUyjrric13aw@shredder>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YaNAwOy0l3tTCLhav17cAtoV5hBrzuMcbhO7CyzKHR8=;
+	b=ath3CRFTNLirjh6+x0sM9NcdyGErIG6R9cTnZPsmf3Pnmj33r73aSvdE4oOSXHsu16KOrZ
+	g6XjZPOGla1J6IK+EKTcOn4davlxXh4miHeVRNH9JTaHBH7bGEy1AGsGHhSiaKML12T+3f
+	K4DQDERDESLuXuCf3IZ0MFKMc64n5fk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-D2-hc7eYN4mzExwpWZUUqQ-1; Tue,
+ 18 Feb 2025 14:22:57 -0500
+X-MC-Unique: D2-hc7eYN4mzExwpWZUUqQ-1
+X-Mimecast-MFC-AGG-ID: D2-hc7eYN4mzExwpWZUUqQ_1739906576
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 213F5180087B;
+	Tue, 18 Feb 2025 19:22:56 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.9])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1538E180087C;
+	Tue, 18 Feb 2025 19:22:52 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/5] rxrpc, afs: Miscellaneous fixes
+Date: Tue, 18 Feb 2025 19:22:43 +0000
+Message-ID: <20250218192250.296870-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeivddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdtudemfedtheefmegrvdeiieemsgeileekmeekvdgrtdemgeguugekmegsrggvtgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggstddumeeftdehfeemrgdvieeimegsieelkeemkedvrgdtmeeguggukeemsggrvggtpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehiughoshgthhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrv
- hgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, 18 Feb 2025 20:15:49 +0200
-Ido Schimmel <idosch@nvidia.com> wrote:
+Here are some miscellaneous fixes for rxrpc and afs:
 
-> On Tue, Feb 18, 2025 at 06:15:23PM +0100, Kory Maincent wrote:
-> > On Mon, 17 Feb 2025 15:41:06 +0200
-> > Ido Schimmel <idosch@nvidia.com> wrote:
-> >  =20
-> > > Allow user space to configure FIB rules that match on the source and
-> > > destination ports with a mask, now that support has been added to the
-> > > FIB rule core and the IPv4 and IPv6 address families.
-> > >=20
-> > > Reviewed-by: Petr Machata <petrm@nvidia.com>
-> > > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> > > ---
-> > >  net/core/fib_rules.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-> > > index ba6beaa63f44..5ddd34cbe7f6 100644
-> > > --- a/net/core/fib_rules.c
-> > > +++ b/net/core/fib_rules.c
-> > > @@ -843,8 +843,8 @@ static const struct nla_policy
-> > > fib_rule_policy[FRA_MAX + 1] =3D { [FRA_DSCP]	=3D
-> > > NLA_POLICY_MAX(NLA_U8, INET_DSCP_MASK >> 2), [FRA_FLOWLABEL] =3D { .t=
-ype =3D
-> > > NLA_BE32 }, [FRA_FLOWLABEL_MASK] =3D { .type =3D NLA_BE32 },
-> > > -	[FRA_SPORT_MASK] =3D { .type =3D NLA_REJECT },
-> > > -	[FRA_DPORT_MASK] =3D { .type =3D NLA_REJECT },
-> > > +	[FRA_SPORT_MASK] =3D { .type =3D NLA_U16 },
-> > > +	[FRA_DPORT_MASK] =3D { .type =3D NLA_U16 },
-> > >  }; =20
-> >=20
-> > I don't get the purpose of this patch and patch 1.
-> > Couldn't you have patch 3 and 4 first, then patch 2 that adds the netli=
-nk
-> > and UAPI support? =20
->=20
-> Current order is:
->=20
-> 1. Add attributes as REJECT.
-> 2. Add support in core.
-> 3. Add support in IPv4.
-> 4. Add support in IPv6.
-> 5. Expose feature to user space.
->=20
-> Looks straight forward and easy to review to me and that's the order I
-> prefer.
+ (1) In the rxperf test server, make it correctly receive and decode the
+     terminal magic cookie.
 
-Ok, it is surprising to me. If there is an issue in patch 2,3 or 4. git
-bisect will locate patch 5 and it won't be easy to find the real patch that
-cause the issue. Having this type of patch series in the git history will h=
-arder
-the issue debugging.
-I was not am not a net maintainer so I won't complain more and will let them
-decide.
+ (2) In rxrpc, get rid of the peer->mtu_lock as it is not only redundant,
+     it now causes a lockdep complaint.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+ (3) In rxrpc, fix a lockdep-detected instance where a spinlock is being
+     bh-locked whilst irqs are disabled.
+
+ (4) In afs, fix the ref of a server displaced from an afs_server_list
+     struct.
+
+ (5) In afs, make afs_server records belonging to a cell take refs on the
+     afs_cell record so that the latter doesn't get deleted first when that
+     cell is being destroyed.
+
+David
+
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
+
+David Howells (5):
+  rxrpc: rxperf: Fix missing decoding of terminal magic cookie
+  rxrpc: peer->mtu_lock is redundant
+  rxrpc: Fix locking issues with the peer record hash
+  afs: Fix the server_list to unuse a displaced server rather than
+    putting it
+  afs: Give an afs_server object a ref on the afs_cell object it points
+    to
+
+ fs/afs/server.c            |  3 +++
+ fs/afs/server_list.c       |  4 ++--
+ include/trace/events/afs.h |  2 ++
+ net/rxrpc/ar-internal.h    |  1 -
+ net/rxrpc/input.c          |  2 --
+ net/rxrpc/peer_event.c     |  9 +--------
+ net/rxrpc/peer_object.c    |  5 ++---
+ net/rxrpc/rxperf.c         | 12 ++++++++++++
+ 8 files changed, 22 insertions(+), 16 deletions(-)
+
 
