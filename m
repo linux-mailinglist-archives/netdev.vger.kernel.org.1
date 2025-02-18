@@ -1,140 +1,178 @@
-Return-Path: <netdev+bounces-167538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5A6A3AB76
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:07:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB174A3AB7F
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12B393AD9B5
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:06:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05201889630
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EED1D47B4;
-	Tue, 18 Feb 2025 22:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487BA1D61BC;
+	Tue, 18 Feb 2025 22:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="zqrVF1Iy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9LkRAZ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C4B1CEE90
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 22:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1501D5AD3;
+	Tue, 18 Feb 2025 22:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739916415; cv=none; b=FcBnDamaGTVHzsmcUkel5er/PkcyhTPFlo6N2dcQgavf0FyExiiDrr2NpZLmo0o1KOIppXJ7QCxDKp7+Agn6S5b07lgO4O5YD+ngkdT6wUeiO40TfjooJMS6v+dRMp0ILpUDu6IpS4hVnp8B7bC0e+dSWm4mgBbrDIq2O/UpZc0=
+	t=1739916897; cv=none; b=j/J5SuLlBrpdUW2Viy5xfvgs9OXTIIZGJJxwS2EpTKll4RgfqhKdoF/nMVG007w95vQ8to520vvm8qKDMYQ71OpzTRf6otY51f5NJ3ILnUtMwo0oh/IsHbeMTmvLVAn3sN15XhA9uyL981sLv7U2C7FhrTvSOmeIJNGHB6Ho4Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739916415; c=relaxed/simple;
-	bh=AJbD0VhEqktAJuSbrw8sGimzHBizOzGrTkKzm+Z1J4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iYeX3Wk0pkPuqPrgSrcFYCB1mtLadnZ+81bbQnDZjfKxkkEV7YjV/NCtZMEVLb2cL4NW7WkfjVBv8Ji25xkdCdO6ri+pa7fm5mThbl36XcNwHWoA/48skT3/U+ur3NP5oDnmP2d5+3wq0XZHQPzROmfzq3ejRYyl/qJMIcSbbsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=zqrVF1Iy; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22128b7d587so50511415ad.3
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 14:06:53 -0800 (PST)
+	s=arc-20240116; t=1739916897; c=relaxed/simple;
+	bh=2HcRlkYB4SIOQsuKibLFVSOu4Gjo8DHziTSIaUTUWc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jQ0QJUr+fm4HtEXBev3qoLkFi3Rk0KJmORPvlMDz8FL/bTcxKO42hzCSwnmjj+RXXa7FIrlFe9s8biaXZzloLWVL56IoxQS3F+igvkdDETDypFJXTeHh1JlQUNr68gWCIovqcfEo7tnfkntinUa4GtzkS41IO4mUEuCOxisi6hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y9LkRAZ+; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21f2339dcfdso3702365ad.1;
+        Tue, 18 Feb 2025 14:14:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1739916413; x=1740521213; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vtN7DCDXT4P0ZtMj21KzNqzVT5mPv1hMJBMgdgryY0s=;
-        b=zqrVF1IySSBpyOhu/0aSPsfuiveXWPCbp9G5ROC/M3SefVPTfYT/+tv+JwAnM79zrm
-         SMlqZoTYC6+zxVfLC2ISPsKCXGyoLw4nGHqjKg28eaPAcggu7ZssduFck99rbkw7iN4+
-         zEqf82TRLzk+dQZRYh/0tqKo4Y+/V6UWMWC0aXLe9u3m4Cfb8dH9EeArtTOBY0VsP+ob
-         iuQlchvBghOQWYzzrpqbkDpV2e9XuqDovxO8qyc1J8M1ln/neonmLkmCU54tOl+Vr5dG
-         DllySkkDVYXsUNjdhpSpj8XUrmjnUf4/SCyK0aRrzuY9Dj3NvOo5G5YB8g9nHnDQzE85
-         1isA==
+        d=gmail.com; s=20230601; t=1739916895; x=1740521695; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RAqFeRjzJ01jsajjI3CpDOztjdZxsfucy8g5FIh8ezA=;
+        b=Y9LkRAZ+YB0/ri9UdZrBnwuKmGMWh9A8hRrXnu9THPbyzqfTBluCbIFcKDQiACfHjk
+         qAgFHBSvL2lEjHKv5MTmPdmx1zMXxvdoF8vvXt5ARQ9YyhedguH+hjqEdikSTEKlep0f
+         tuOXOoniIOAXbP4/CeolqOrzq+NLFJV99AVGAjE7laJkvpz4tdJLjdq1XMlN/8569DQr
+         P/e1XhIl+Eoombp1BJ7XEg0WW3XJfLOurcPAxAstVnkmzxj71y4ENr9WHbLthAW4AfdX
+         bGU6VL8r72cNpJV3kUElCBXqHyGPK0ekjosDPjXYkjeN1Nvxxzgn5kgDo2BgLV7AWS+J
+         cu4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739916413; x=1740521213;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1739916895; x=1740521695;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vtN7DCDXT4P0ZtMj21KzNqzVT5mPv1hMJBMgdgryY0s=;
-        b=frieh19ueWtff9hSDeshfwhUPQzdIcj/y1QYs4cT47dSnnnIL8dX3no5gIbOeR5/Of
-         wz0mKZh+uzLl1eLHUHD7Ypuj+3CoT3Z/au4/o5429ryfjNJx3/MSwD2m380cbCBMZf6T
-         m/qJoDeT2J3o0mn4082MJYO9iWcjssmo2a5E7DrnFVukfWiwXzplwWR9pakTcKjR+KmP
-         dGf307YJm6PdZVW2cO8XCZfpaasgi+NYztlR8gVaOEGlbnMA+BuOsQcZmYmG63hw8ELV
-         F5mi0dkaDQBjKB/DYIiGKPzfkXtj4OGs1gQzvIhy9FNUc17bY04bg7p1c6dL4sPqPI+D
-         QwWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV55oYmjVHLbA9UrJ9M5wT0FTl6FIUxnMSZ/gQaIU8w8eM6hb8lUSzhvs1Ykiy5ytE7uEzZKQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkwLnk+EO16JSwqi6i3VylcKWqQPg1FtWj3UFWWQ3ZUblJj4Dn
-	BmhfC+U7SmAVIYSQtOWLGoIhhM/iL5bIP8MiZomsfMryKp4/NqcfbMS26aasDuY=
-X-Gm-Gg: ASbGncus1NU9BH83ubFNSK6ov6xTbOjv72qh55SsVaNgUzdGRcOHBhtK43+V9X77fmI
-	EMThZ6fC9Ux81iYq5RaqOuTG7zpSH3EyffTFriXkg9o//IAzp3JQdFdEC3qdcEuczQvj9nVnEGc
-	ispVrKwAjLQTZty2OkMLUmYkINzAQJ1PlM2EW9obcwjlQFFhQSGLQww170bDQ9d3LYcodBijEGS
-	ThN3WjInEWn53yd4y18UPPHB6mbitcdRJ4uSUh1RgkJo9lciI3amoFPagXgKoUpxHOQtCiJFZYD
-	60MvJ67ddFxgXwffYNEDIzpnpqLInzkL4IIAYHY8VTi47XMlwae8Yg==
-X-Google-Smtp-Source: AGHT+IG/A/bMTekzmDbdpz3xMBmnVuelBTlzZd10/URTHLkaDPvfz+k5BsAxJxaQjCKm2JetrQ5V7g==
-X-Received: by 2002:a05:6a00:10c3:b0:730:9567:c3d4 with SMTP id d2e1a72fcca58-7329de4f102mr1773986b3a.3.1739916413194;
-        Tue, 18 Feb 2025 14:06:53 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:1:18cb:90d0:372a:99ae? ([2620:10d:c090:500::7:d699])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242546177sm10599035b3a.5.2025.02.18.14.06.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 14:06:52 -0800 (PST)
-Message-ID: <5eac0173-c75e-40b3-a1bd-7cedf86237df@davidwei.uk>
-Date: Tue, 18 Feb 2025 14:06:50 -0800
+        bh=RAqFeRjzJ01jsajjI3CpDOztjdZxsfucy8g5FIh8ezA=;
+        b=EhLioro6RnAHFIyPAwJH2DqZD0MGQ0V+Fl64kstNYac7yDJLx/TnUQbNDG9WJ854NS
+         SwaOi+tkgpbTZIYJCkkvMnl8DQlFuNfa2X05CSuGOIkmirjUcyBu5vFLkesGJwSXfW/j
+         +T6hFJcWTUBWqoL7IpILLZcqJz1Zm0It7DTSgqZ35Py1YoWZLsoEbTZV/cJMcldSMK9o
+         ADSs5jv8/wKAeHRu9Y+Id0Ss3Ita7vFh3QUK6h/oRgWrj9Uh6vmbnJEVLAVEYG/BwYLy
+         DW4aH3uvYmHFkjHNuIrEB8CRlguWCx8g3c3tzvcgGR18OogV+wM8V1N7BHHrhLAut5nW
+         3uaA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1EBOpFnElY/HI1+Xd/vebm/wmklGVePzOyLO96byI6uBvB/k6mBoH/dOd2I14/a+2h095VINlWMd6bjg=@vger.kernel.org, AJvYcCXFucYFjTjoVl65VFGHsXEWpsV0kXOYy5Wd/waPykRn/hZ070llUSWJCivkbGCkYU8V+jVnFHE+@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDoz/jTJrwFhqwOgWreu+KM+So5n7TZSsMReZn0EIrJRpG2eJH
+	fIJ00NN3Sxg+wJXJz2xQBUIe2VDWyKv1VtCBOj6LhCNQUwhk814=
+X-Gm-Gg: ASbGncs3M4fVOm1wM31sAwRKkLYg/6YdG2FB4GXH0LuYAx8Q7PAABPqTvbnGHiO0+ew
+	JvVGNJEoV/cHsOArKkQYIWpChY7WBPN75pp1gDvVRIs8uJfU0GwtKzsPlPtoEXaGg4PvI7KQMrb
+	y59OJSuH+pLf8V2o+LKFFdhYr+Ks4n2oW3fwvAPJTIBrzUbBfHEiFHYMCpSEi4Yy08MwJtfxrFC
+	Q8PgaH5JKvHHe/71CyyOJZDTrj3cOzXh1p2XjD25G9gN06Vr4wzdvsSzF78av26kBsiRosMT4/M
+	rfNUdqzIUjEUdDI=
+X-Google-Smtp-Source: AGHT+IEtKfYgpOzCR+jWn1Itj9z5zUFPH8gPoxvbR6+suOxNA38+APJ2lNHO6RRPo8+64bV16GbhKQ==
+X-Received: by 2002:a17:902:eccf:b0:220:fbde:5d70 with SMTP id d9443c01a7336-2216f11132dmr24314065ad.21.1739916894920;
+        Tue, 18 Feb 2025 14:14:54 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d53491c9sm92845635ad.15.2025.02.18.14.14.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 14:14:54 -0800 (PST)
+Date: Tue, 18 Feb 2025 14:14:53 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	ncardwell@google.com, kuniyu@amazon.com, dsahern@kernel.org,
+	horms@kernel.org, willemb@google.com, kaiyuanz@google.com
+Subject: Re: [PATCH net] tcp: devmem: properly export MSG_CTRUNC to userspace
+Message-ID: <Z7UGXdx-Wx4-mkXK@mini-arch>
+References: <20250218194056.380647-1-sdf@fomichev.me>
+ <CAHS8izP7fGd+6jvT7q1dRxfmRGbVSQwhwW=pFMpc21YtGqQm4A@mail.gmail.com>
+ <Z7T48iNrBvnc8TZq@mini-arch>
+ <CAHS8izOu33xLNQUJZgKq971f+rfzqaj0f5CG8sQ7U3pKth_QBA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 07/11] io_uring/zcrx: set pp memory provider for an rx
- queue
-Content-Language: en-GB
-To: Kees Bakker <kees@ijzerbout.nl>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>, lizetao <lizetao1@huawei.com>
-References: <20250215000947.789731-1-dw@davidwei.uk>
- <20250215000947.789731-8-dw@davidwei.uk>
- <cc1b81b3-f02c-46d0-b4be-34bba23d20c7@ijzerbout.nl>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <cc1b81b3-f02c-46d0-b4be-34bba23d20c7@ijzerbout.nl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izOu33xLNQUJZgKq971f+rfzqaj0f5CG8sQ7U3pKth_QBA@mail.gmail.com>
 
-On 2025-02-18 11:40, Kees Bakker wrote:
-> Op 15-02-2025 om 01:09 schreef David Wei:
->> Set the page pool memory provider for the rx queue configured for zero
->> copy to io_uring. Then the rx queue is reset using
->> netdev_rx_queue_restart() and netdev core + page pool will take care of
->> filling the rx queue from the io_uring zero copy memory provider.
->>
->> For now, there is only one ifq so its destruction happens implicitly
->> during io_uring cleanup.
->>
->> Reviewed-by: Jens Axboe <axboe@kernel.dk>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->>   io_uring/zcrx.c | 49 +++++++++++++++++++++++++++++++++++++++++--------
->>   1 file changed, 41 insertions(+), 8 deletions(-)
->>
->> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
->> index 8833879d94ba..7d24fc98b306 100644
->> --- a/io_uring/zcrx.c
->> +++ b/io_uring/zcrx.c
->> [...]
->> @@ -444,6 +475,8 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
->>         if (ctx->ifq)
->>           io_zcrx_scrub(ctx->ifq);
->> +
->> +    io_close_queue(ctx->ifq);
-> If ctx->ifq is NULL (which seems to be not unlikely given the if statement above)
-> then you'll get a NULL pointer dereference in io_close_queue().
-
-The only caller of io_shutdown_zcrx_ifqs() is io_ring_exit_work() which
-checks for ctx->ifq first. That does mean the ctx->ifq check is
-redundant in this function though.
-
->>   }
->>     static inline u32 io_zcrx_rqring_entries(struct io_zcrx_ifq *ifq)
+On 02/18, Mina Almasry wrote:
+> On Tue, Feb 18, 2025 at 1:17 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 02/18, Mina Almasry wrote:
+> > > On Tue, Feb 18, 2025 at 11:40 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
+> > > >
+> > > > Currently, we report -ETOOSMALL (err) only on the first iteration
+> > > > (!sent). When we get put_cmsg error after a bunch of successful
+> > > > put_cmsg calls, we don't signal the error at all. This might be
+> > > > confusing on the userspace side which will see truncated CMSGs
+> > > > but no MSG_CTRUNC signal.
+> > > >
+> > > > Consider the following case:
+> > > > - sizeof(struct cmsghdr) = 16
+> > > > - sizeof(struct dmabuf_cmsg) = 24
+> > > > - total cmsg size (CMSG_LEN) = 40 (16+24)
+> > > >
+> > > > When calling recvmsg with msg_controllen=60, the userspace
+> > > > will receive two(!) dmabuf_cmsg(s), the first one will
+> > >
+> > > The intended API in this scenario is that the user will receive *one*
+> > > dmabuf_cmgs. The kernel will consider that data in that frag to be
+> > > delivered to userspace, and subsequent recvmsg() calls will not
+> > > re-deliver that data. The next recvmsg() call will deliver the data
+> > > that we failed to put_cmsg() in the current call.
+> > >
+> > > If you receive two dmabuf_cmsgs in this scenario, that is indeed a
+> > > bug. Exposing CMSG_CTRUNC could be a good fix. It may indicate to the
+> > > user "ignore the last cmsg we put, because it got truncated, and
+> > > you'll receive the full cmsg on the next recvmsg call". We do need to
+> > > update the docs for this I think.
+> > >
+> > > However, I think a much much better fix is to modify put_cmsg() so
+> > > that we only get one dmabuf_cmsgs in this scenario, if possible. We
+> > > could add a strict flag to put_cmsg(). If (strict == true &&
+> > > msg->controlllen < cmlen), we return an error instead of putting a
+> > > truncated cmsg, so that the user only sees one dmabuf_cmsg in this
+> > > scenario.
+> > >
+> > > Is this doable?
+> >
+> > Instead of modifying put_cmsg(), I can have an extra check before
+> > calling it to make sure the full entry fits. Something like:
+> >
 > 
+> Yes, that sounds perfect. I would add a new helper, maybe
+> put_dmabuf_cmsg, that checks that we have enough space before calling
+> the generic put_cmsg().
+> 
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -2498,6 +2498,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+> >                                 offset += copy;
+> >                                 remaining_len -= copy;
+> >
+> > +                               if (msg.msg_controllen < CMSG_LEN(sizeof(dmabuf_cmsg))) {
+> > +                                       err = -ETOOSMALL;
+> > +                                       goto out;
+> > +                               }
+> > +
+> >                                 err = put_cmsg(msg, SOL_SOCKET,
+> >                                                SO_DEVMEM_DMABUF,
+> >                                                sizeof(dmabuf_cmsg),
+> >
+> > WDYT? I'll still probably remove '~MSG_CTRUNC' parts as well to avoid
+> > confusion.
+> 
+> Yes, since we check there is enough space before calling put_cmsg(),
+> it should now become impossible for put_cmsg() to set MSG_CTRUNC
+> anyway, so the check in tcp_recvmsg_dmabuf() becomes an unnecessary
+> defensive check that should be removed.
+> 
+> Thanks for catching this!
+
+Perfect, thanks for a quick review!
+
+---
+pw-bot: cr
 
