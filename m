@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-167203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F99A39220
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:32:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDBDA39221
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C84016A6D6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:32:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94380189438B
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51B31A9B4F;
-	Tue, 18 Feb 2025 04:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F2C1ABED7;
+	Tue, 18 Feb 2025 04:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TltOrtvW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxjElHep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492CF1537DA
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EC981E
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739853151; cv=none; b=TBy9cPlmkgUUhO90rLRXRvo4uyknxrm57C5pGDGAncFSML2RHlLk74hoU7cy9uj13N7duL3TFth6fxO+yxH7Yu74jRVd9rQclIqCyV65cbEO5EQyhDcq0h3Xes+1OY2S+xSlig2YCyIlb72H09DY4Zct2mSPv/N5HH4+E9QAUfI=
+	t=1739853153; cv=none; b=r3FO+zDdJVfZ9XD3UOcKhP89eajyQStsw9EIgt1puDEBjd34PpAlBlrZX84xYfQMMrgmzGt2ah33S/lZpD7F4fdNsbkSA0YWrGRgJzcnSDQlwKTdzJnr3Q4iiPYcNE2HZAmUNkGESczN+NYBGp044K5gGVT6cUxpzRxVXZdFS4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739853151; c=relaxed/simple;
-	bh=9cx0/eu6P1T5ks4PM6wl4/IHG4kGRc2vpFfqmPOkwto=;
+	s=arc-20240116; t=1739853153; c=relaxed/simple;
+	bh=Xvkq8uTdPCJXApQqsNTYajyVZLVKJG8z8rsV3kajv/Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MgNk97SLOWhN+TS9Gku/nFL4UATKX+gCwjIHc8f6AWkxnsl8PNK5Z6VqYiETCG+UcxmYwTPRZ/1bsGc/XH2iRkpMYu32QQBJQ24fQCjElVQcZEDy841A57J+wFvfmUn6g5mcCpMH3sSwTJzDqqlhOYdjCSOWq342kSUY5MgD2wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TltOrtvW; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=VbbgxFKpkZDHWYDdGkiJHXL8lgOlXwvdvrruvksGYu91GqpX8Bj8cg/WXIJ5l4Iz8FljGCuMaX7mM+qa3zWNGGAS6qZxhCVObJRaRiyycpqccr+hJk4JDqtRDxow9FiifZMv9ZAZz5TaujGxUZkxur/QKxI7LKiNLplLdIN3b0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxjElHep; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-221206dbd7eso31887125ad.2
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:32:30 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f61b01630so92945655ad.1
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:32:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739853149; x=1740457949; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739853150; x=1740457950; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GEHMqt+ucWGB42zAlQegd8aAHoZHpwN1ts3CV/Z7IV8=;
-        b=TltOrtvWAK7MvUKdwy30itd4EJahDkl9jvLu+Yxx+2g3kfi8ARWaNmIVYtUX9PRhDV
-         EoF7OWRktmaw3A++Nzps8k/T8tjRU96BCMKhclEtGqLbHYkHn4TjRrkzkJI8HcDp4zH0
-         5jDud8+IicMFExwRYo0OyZd0l3SkLLuWeklUoxMknbogBp/rIm+b+I83BPKJ26YwJIra
-         rzX2jI3nhCrnefvfDjg2ePGkXWZUfMFwKkHia6OXPtqbekxULzsMj9BzRWh82oyHh/or
-         2S/kMXIuUY6K1Xmx9fE3v4YwNWoVa5+R8K/z1M7eLHp7VxohIB8Ra9tyvGgoImlhcO30
-         Orzw==
+        bh=/9cc3S0M29XarWk16c0bKedE92oIPNNchrVRuGkZCz4=;
+        b=lxjElHeprVQfuhCsizn8YT76ll3ujS8v2034s3UbpZsNq+ZJpELgO66C3z5LK29xmu
+         JoIq80f+DNjryWJYXZEuqHKpp+xaIfYuo1eOT3f48XMzpjWYvnnTVwExDbbOoM0LbL42
+         VGzAEamyqJvtanxH54Bnf/Dn27ca3+YisGqGn9ArsVXR5LgzSo23TGDp+pd7CPMghPRY
+         AyDFuUaFldut3oegslEppeNrfdKnr1Qo2bKV1l3J8o7XbsgKPs4zVQ0/Ul+FTYaSpOTQ
+         PbygRsIMzptB7evsvkvm6tIdR92AAu0mO3/Bd71Rfzmh9ih765+7ikY5a/X1DrSZ7Sc+
+         CKiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739853149; x=1740457949;
+        d=1e100.net; s=20230601; t=1739853150; x=1740457950;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GEHMqt+ucWGB42zAlQegd8aAHoZHpwN1ts3CV/Z7IV8=;
-        b=uYxcCLgfRxvpIebn3Hn7Kez62dJEGjqoPkZ+Mv9o1bTSkvzxOfFYrkjsgNzfcpdrZf
-         AIbmCQh6lj98kZaD4YYeFxsy1jk6snF9hDRHnOMcXAUG1czQ2r9FeVFYVKHJkc3I88Ss
-         4aYzfF2o9usvG9ZI5Py784gT6CqQ5s7cqQ8u0HQyyKmMWVUahFVRfIk6G85x89AVkeu0
-         oEdPJd98CAvV4x4i8MgsWUbL93WsUb4H1Y0H7mfhZ7NtNXtUp4MsQV3QfHYDNGSzlA6u
-         U9gSH1rhxr43HmxvCku2lddyMP36gTOSPOAJqZMC92oUtznqNK+hfFFRPKju6xrWgBjd
-         Hp/A==
-X-Gm-Message-State: AOJu0YzbkqEfOzOZs4Ebz3cSO/xmkynVIl8HKR0JpQS+8rhrQMcsdiaR
-	Ej2SXMkwSjs1wBOKO58HnS/VKpT1O/tXO0yZzqT2hkwjBI3oSHu+5EZSOw==
-X-Gm-Gg: ASbGncufc6z45GyWAP4/CX/YbYV/k7mMBKtgLejPdyrIhljeLdrrMrIDNTW7su1NbCC
-	OaVcJbSkjKPXLJXnZ71jVtIXhL37ZlQBx36wNMyFN4+30ort3eanwtDgJ8wG6tsW/DBoZ2WuMBw
-	8kucNt+ZEAgRHwLO9TsIbqvSGiHlNcBbbmI24Vfygrj7nj7SQgt1ByN/iLAhSEj4vofnPkVS+q1
-	wIDtqWJbeggz62Cfa1bZeAyWnOFNXsyZGmEBhs7z+YCpnKl2AiYq1PUwo0o6whujEXtHTLDpfeX
-	J9TALNle8yiDUbrehFMaiC0c18+LeaRl85zOhZc2fjIQ
-X-Google-Smtp-Source: AGHT+IFLQO/mxfYjqYZmLesVF796Zfxq4lDRk9JNCH8ScHYq9IPV0ZUofmOtoWLMiZ9vp1HS1baV8Q==
-X-Received: by 2002:a05:6a00:847:b0:732:2170:b69a with SMTP id d2e1a72fcca58-732618ba2d2mr21910997b3a.18.1739853149098;
-        Mon, 17 Feb 2025 20:32:29 -0800 (PST)
+        bh=/9cc3S0M29XarWk16c0bKedE92oIPNNchrVRuGkZCz4=;
+        b=OQ9fkpzHz890QwG+ZKiISLOF/jc0JW4cmChLU2nFadMNLh09OAoIZxFi4fd43OLk7W
+         wWWlZm6DsiUsFz3NGqXaogclcZaXRvZbTvYGEaU1gMTrBdAWMME3TwXTO0F4Ly8Ef9zv
+         1FIu+3vvcCRYyM5EIuebYcWycQfh8D4LtJlQHmGM/O5ZBormx3cd0IkGyj62J1zULrpZ
+         Fk6fxwKtqGT01989KgJPOMlS1R5IQ4+O3yUBbghTxGHuPms2SKyZs09xv442JDLewkB/
+         Mbj05uQSNcSqL0b04G4B7gQtHpmyyIFkCkpXUbnedEaHH++vXiIImHPU8r1kJsSF3wlf
+         xz1Q==
+X-Gm-Message-State: AOJu0Yxln1blo6QMbMDBHN/yoKbaVPfqo6fG9voq/kmfON1CMWWrCofK
+	zZbC8lTaRRG07ljVX5Vcyr15t439SyQ1ai4OlECYQkMOf1/+hv4RCfvpyw==
+X-Gm-Gg: ASbGncvbJUBIHwwaj+5xHv72tS0oWQkiJA38IYx243xcy6LVrxBLDRrVVbEJ2rbOPHE
+	11Hz1Tufv/vT5X5uX+ueqE95W8lfFcQfHcntacYpusMNE/bi/cF4X/y8J/PqyYWsLW8CAOKvE8r
+	5IP6Jbl3G6TXXSrKTkb66PG716JUcmnp75tyxKXtjaJS8jzoSZ+7giGa7pExY3EKVPJ05rnX/4R
+	7eI5rWzViabD5BBxFudIhwJCJ99dZCFj5irRsZuCbQbq//LhwPwNTfIuQrWmMKc6nY4CUkEJXp7
+	FHOKkDh8G5AkQLsmHBAoasJzcc/usKVPxp5dMZ9CclYs
+X-Google-Smtp-Source: AGHT+IGZDq0t68bwJV/7aryfXyU4n4p+gD+6mJZuUpTVdm0rlQ7AV9FqqJPKQ109iRPcpfi3SrsMBQ==
+X-Received: by 2002:a05:6a21:4014:b0:1ed:a5f2:dba6 with SMTP id adf61e73a8af0-1ee8d7acd39mr19917439637.14.1739853150456;
+        Mon, 17 Feb 2025 20:32:30 -0800 (PST)
 Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:304e:ca62:f87b:b334])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326aef465dsm4907501b3a.177.2025.02.17.20.32.27
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326aef465dsm4907501b3a.177.2025.02.17.20.32.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 20:32:28 -0800 (PST)
+        Mon, 17 Feb 2025 20:32:29 -0800 (PST)
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>,
 	Qiang Zhang <dtzq01@gmail.com>,
-	Yoshiki Komachi <komachi.yoshiki@gmail.com>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Jiri Pirko <jiri@resnulli.us>
-Subject: [Patch net 1/4] flow_dissector: Fix handling of mixed port and port-range keys
-Date: Mon, 17 Feb 2025 20:32:07 -0800
-Message-Id: <20250218043210.732959-2-xiyou.wangcong@gmail.com>
+Subject: [Patch net 2/4] selftests/net/forwarding: Add a test case for tc-flower of mixed port and port-range
+Date: Mon, 17 Feb 2025 20:32:08 -0800
+Message-Id: <20250218043210.732959-3-xiyou.wangcong@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250218043210.732959-1-xiyou.wangcong@gmail.com>
 References: <20250218043210.732959-1-xiyou.wangcong@gmail.com>
@@ -92,84 +91,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch fixes a bug in TC flower filter where rules combining a
-specific destination port with a source port range weren't working
-correctly.
+After this patch:
 
-The specific case was when users tried to configure rules like:
+ # ./tc_flower_port_range.sh
+ TEST: Port range matching - IPv4 UDP                                [ OK ]
+ TEST: Port range matching - IPv4 TCP                                [ OK ]
+ TEST: Port range matching - IPv6 UDP                                [ OK ]
+ TEST: Port range matching - IPv6 TCP                                [ OK ]
+ TEST: Port range matching - IPv4 UDP Drop                           [ OK ]
 
-tc filter add dev ens38 ingress protocol ip flower ip_proto udp \
-dst_port 5000 src_port 2000-3000 action drop
-
-The root cause was in the flow dissector code. While both
-FLOW_DISSECTOR_KEY_PORTS and FLOW_DISSECTOR_KEY_PORTS_RANGE flags
-were being set correctly in the classifier, the __skb_flow_dissect_ports()
-function was only populating one of them: whichever came first in
-the enum check. This meant that when the code needed both a specific
-port and a port range, one of them would be left as 0, causing the
-filter to not match packets as expected.
-
-Fix it by removing the either/or logic and instead checking and
-populating both key types independently when they're in use.
-
-Fixes: 8ffb055beae5 ("cls_flower: Fix the behavior using port ranges with hw-offload")
-Reported-by: Qiang Zhang <dtzq01@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAPx+-5uvFxkhkz4=j_Xuwkezjn9U6kzKTD5jz4tZ9msSJ0fOJA@mail.gmail.com/
-Cc: Yoshiki Komachi <komachi.yoshiki@gmail.com>
+Cc: Qiang Zhang <dtzq01@gmail.com>
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: Jiri Pirko <jiri@resnulli.us>
 Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- net/core/flow_dissector.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
+ .../net/forwarding/tc_flower_port_range.sh    | 46 +++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 5db41bf2ed93..c33af3ef0b79 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -853,23 +853,30 @@ __skb_flow_dissect_ports(const struct sk_buff *skb,
- 			 void *target_container, const void *data,
- 			 int nhoff, u8 ip_proto, int hlen)
- {
--	enum flow_dissector_key_id dissector_ports = FLOW_DISSECTOR_KEY_MAX;
--	struct flow_dissector_key_ports *key_ports;
-+	struct flow_dissector_key_ports_range *key_ports_range = NULL;
-+	struct flow_dissector_key_ports *key_ports = NULL;
-+	__be32 ports;
+diff --git a/tools/testing/selftests/net/forwarding/tc_flower_port_range.sh b/tools/testing/selftests/net/forwarding/tc_flower_port_range.sh
+index 3885a2a91f7d..baed5e380dae 100755
+--- a/tools/testing/selftests/net/forwarding/tc_flower_port_range.sh
++++ b/tools/testing/selftests/net/forwarding/tc_flower_port_range.sh
+@@ -20,6 +20,7 @@ ALL_TESTS="
+ 	test_port_range_ipv4_tcp
+ 	test_port_range_ipv6_udp
+ 	test_port_range_ipv6_tcp
++	test_port_range_ipv4_udp_drop
+ "
  
- 	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS))
--		dissector_ports = FLOW_DISSECTOR_KEY_PORTS;
--	else if (dissector_uses_key(flow_dissector,
--				    FLOW_DISSECTOR_KEY_PORTS_RANGE))
--		dissector_ports = FLOW_DISSECTOR_KEY_PORTS_RANGE;
-+		key_ports = skb_flow_dissector_target(flow_dissector,
-+						      FLOW_DISSECTOR_KEY_PORTS,
-+						      target_container);
- 
--	if (dissector_ports == FLOW_DISSECTOR_KEY_MAX)
-+	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS_RANGE))
-+		key_ports_range = skb_flow_dissector_target(flow_dissector,
-+							    FLOW_DISSECTOR_KEY_PORTS_RANGE,
-+							    target_container);
-+
-+	if (!key_ports && !key_ports_range)
- 		return;
- 
--	key_ports = skb_flow_dissector_target(flow_dissector,
--					      dissector_ports,
--					      target_container);
--	key_ports->ports = __skb_flow_get_ports(skb, nhoff, ip_proto,
--						data, hlen);
-+	ports = __skb_flow_get_ports(skb, nhoff, ip_proto, data, hlen);
-+
-+	if (key_ports)
-+		key_ports->ports = ports;
-+
-+	if (key_ports_range)
-+		key_ports_range->tp.ports = ports;
+ NUM_NETIFS=4
+@@ -194,6 +195,51 @@ test_port_range_ipv6_tcp()
+ 	__test_port_range $proto $ip_proto $sip $dip $mode "$name"
  }
  
- static void
++test_port_range_ipv4_udp_drop()
++{
++	local proto=ipv4
++	local ip_proto=udp
++	local sip=192.0.2.1
++	local dip=192.0.2.2
++	local mode="-4"
++	local name="IPv4 UDP Drop"
++	local dmac=$(mac_get $h2)
++	local smac=$(mac_get $h1)
++	local sport_min=2000
++	local sport_max=3000
++	local sport_mid=$((sport_min + (sport_max - sport_min) / 2))
++	local dport=5000
++
++	RET=0
++
++	tc filter add dev $swp1 ingress protocol $proto handle 101 pref 1 \
++		flower src_ip $sip dst_ip $dip ip_proto $ip_proto \
++		src_port $sport_min-$sport_max \
++		dst_port $dport \
++		action drop
++
++	# Test ports outside range - should pass
++	$MZ $mode $h1 -c 1 -q -p 100 -a $smac -b $dmac -A $sip -B $dip \
++		-t $ip_proto "sp=$((sport_min - 1)),dp=$dport"
++	$MZ $mode $h1 -c 1 -q -p 100 -a $smac -b $dmac -A $sip -B $dip \
++		-t $ip_proto "sp=$((sport_max + 1)),dp=$dport"
++
++	# Test ports inside range - should be dropped
++	$MZ $mode $h1 -c 1 -q -p 100 -a $smac -b $dmac -A $sip -B $dip \
++		-t $ip_proto "sp=$sport_min,dp=$dport"
++	$MZ $mode $h1 -c 1 -q -p 100 -a $smac -b $dmac -A $sip -B $dip \
++		-t $ip_proto "sp=$sport_mid,dp=$dport"
++	$MZ $mode $h1 -c 1 -q -p 100 -a $smac -b $dmac -A $sip -B $dip \
++		-t $ip_proto "sp=$sport_max,dp=$dport"
++
++	tc_check_packets "dev $swp1 ingress" 101 3
++	check_err $? "Filter did not drop the expected number of packets"
++
++	tc filter del dev $swp1 ingress protocol $proto pref 1 handle 101 flower
++
++	log_test "Port range matching - $name"
++}
++
+ setup_prepare()
+ {
+ 	h1=${NETIFS[p1]}
 -- 
 2.34.1
 
