@@ -1,103 +1,117 @@
-Return-Path: <netdev+bounces-167141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C772A3902D
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:10:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF410A39033
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 012F3168C26
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B72243AE958
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A22286A9;
-	Tue, 18 Feb 2025 01:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lj3ovUrV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561621DFF0;
+	Tue, 18 Feb 2025 01:13:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C8484D34;
-	Tue, 18 Feb 2025 01:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788CD182BD;
+	Tue, 18 Feb 2025 01:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739841028; cv=none; b=HP54uh/5pSfn9yfYxz5JcQRGMa50yy8OaqLVZlX0L9XCFQd4TQ7XxVCgHPNPJmJv+6/WOL0szHcNJRxO0C3WxMidh9ZJDJkzt1VitOCXnN2PMFBxTtFgQfMj9cGxJCI4//Jj9g5k30OWZ94Bsn/+LQl+EDMAy1fLs511L0zsphQ=
+	t=1739841187; cv=none; b=f219k0/k+5q07+JjTX9j7EqAY9MOKxo3KHKtBzXQXlj4l7IX6DZzhFU8KDARfTIq0qfj7xmGIgUs1xCi26qTpTLyC+0DAusGn8QsiG49Vsf18RzOQzrsy2yt4X8X3J/+knhis7s30sZ+6gvkRVRsNDQaZ7tS0OLJvLjaNsyW4AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739841028; c=relaxed/simple;
-	bh=mp41Y2E+0Yi5ho4XyG2Vk8jU5I+itfdLIQ/z4tHFpHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LzC2FUgNmzCyC5fdMzRIZCLqxhZ/3lpoLqs17vsny22ZvZi3T2bQZ8CMd54SH1qGk69kyKVTOnt4EGQvD/csVAB9i65Fd1AngWrxLFjmDILEHNNRn2upO1fvKSZy9Jkh8lIq6uu+FoGj+KGF1fiPzpswz1lh1DK0Vb5T4c1YKVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lj3ovUrV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hQf6BQmTrhmN5xM7XWiDSR55b1HKStYnTUiapIt/KYM=; b=lj3ovUrVNBrgmFnmw6mSqZ6L/1
-	hyFv5scaXARlvfmV69IzrWj3xM31BmASongb3cFpc43edLuIsBw0X8FNeHNlZMn1OCWyyMU9GAyOe
-	qluzF6PRSDAkKtNGdKjjTElXbsnH+imoUtLL5X44MyiNXaxII8SCdMJ7GkRK1zrCBphY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tkC7k-00F8VR-PI; Tue, 18 Feb 2025 02:10:08 +0100
-Date: Tue, 18 Feb 2025 02:10:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Qasim Ijaz <qasdev00@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: fix uninitialised access in mii_nway_restart()
-Message-ID: <cf0d2929-d854-48ce-97eb-69747f0833f2@lunn.ch>
-References: <20250218002443.11731-1-qasdev00@gmail.com>
+	s=arc-20240116; t=1739841187; c=relaxed/simple;
+	bh=xKSunbQDy+ZdHopNpEGMjfWuv5Bb9bZaGtaJDqZHGus=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=eerUO/MkJHnAo50DLfDasxw8zYmTIGKSbbVRW5Pxccbvsf6FvCa257y5l2YkX+qUJH1S4o38BzI+5ys3MqmvlSBxSuScAfhgAevpetWDjHWKWyTz2i57nuMmkelrQ8JxDUPjGTHAeij9mxl8vNUpf+rC1Jty+1CasFjYQQYqd58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YxhGy6nSPzgcB2;
+	Tue, 18 Feb 2025 09:08:26 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 764FA1403A2;
+	Tue, 18 Feb 2025 09:13:01 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Feb 2025 09:12:59 +0800
+Message-ID: <3c0861b7-c999-4202-b5c9-12ca714107f6@huawei.com>
+Date: Tue, 18 Feb 2025 09:12:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218002443.11731-1-qasdev00@gmail.com>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/7] net: hibmcge: Add self test supported in
+ this module
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20250213035529.2402283-1-shaojijie@huawei.com>
+ <20250213035529.2402283-3-shaojijie@huawei.com>
+ <6501012c-fecf-42b3-a70a-2c8a968b6fbd@lunn.ch>
+ <842c3542-95a6-4112-9c50-70226b0caadc@huawei.com>
+ <9bc6a8b9-2d78-4aef-801d-21425426d3a1@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <9bc6a8b9-2d78-4aef-801d-21425426d3a1@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, Feb 18, 2025 at 12:24:43AM +0000, Qasim Ijaz wrote:
-> In mii_nway_restart() during the line:
-> 
-> 	bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
-> 
-> The code attempts to call mii->mdio_read which is ch9200_mdio_read().
-> 
-> ch9200_mdio_read() utilises a local buffer, which is initialised 
-> with control_read():
-> 
-> 	unsigned char buff[2];
-> 	
-> However buff is conditionally initialised inside control_read():
-> 
-> 	if (err == size) {
-> 		memcpy(data, buf, size);
-> 	}
-> 
-> If the condition of "err == size" is not met, then buff remains 
-> uninitialised. Once this happens the uninitialised buff is accessed 
-> and returned during ch9200_mdio_read():
-> 
-> 	return (buff[0] | buff[1] << 8);
-> 	
-> The problem stems from the fact that ch9200_mdio_read() ignores the
-> return value of control_read(), leading to uinit-access of buff.
-> 
-> To fix this we should check the return value of control_read()
-> and return early on error.
 
-What about get_mac_address()?
+on 2025/2/14 21:53, Andrew Lunn wrote:
+> On Fri, Feb 14, 2025 at 10:46:31AM +0800, Jijie Shao wrote:
+>> on 2025/2/14 3:59, Andrew Lunn wrote:
+>>> On Thu, Feb 13, 2025 at 11:55:24AM +0800, Jijie Shao wrote:
+>>>> This patch supports many self test: Mac, SerDes and Phy.
+>>>>
+>>>> To implement self test, this patch implements a simple packet sending and
+>>>> receiving function in the driver. By sending a packet in a specific format,
+>>>> driver considers that the test is successful if the packet is received.
+>>>> Otherwise, the test fails.
+>>>>
+>>>> The SerDes hardware is on the BMC side, Therefore, when the SerDes loopback
+>>>> need enabled, driver notifies the BMC through an event message.
+>>>>
+>>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>>> Please take a look at the work Gerhard Engleder is doing, and try not
+>>> to reinvent net/core/selftest.c
+>>>
+>>>       Andrew
+>> I actually knew about this, but after browsing the source code, I gave up using it.
+>>
+>> I have an additional requirement: serdes loopback and mac loopback.
+>> However, they are not supported in net/core/selftest.c.
+> Which is why i pointed you toward Gerhard. He found similar
+> limitations in the code, wanting to add in extra tests, same as you.
+> Two developers wanting to do that same things, suggests the core
+> should be extended to support that, not two different copies hidden
+> away in drivers.
+>
+> Maybe my initial advice about not exporting the helpers was bad? I
+> don't know. Please chat with Gerhard and come up with a design that
+> makes the core usable for both your uses cases, and anybody else
+> wanting to embed similar self tests in their driver.
+>
+> 	Andrew
 
-If you find a bug, it is a good idea to look around and see if there
-are any more instances of the same bug. I could be wrong, but it seems
-like get_mac_address() suffers from the same problem?
+OK, this patch will be removed from this patchset in v2.
+I will re-send it as RFC to discuss it.
 
-	Andrew
+Thanks，
+Jijie Shao
+
 
