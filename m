@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-167441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142B8A3A498
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:47:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C32C4A3A4B6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99D4D188A283
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:47:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C41D16E3D1
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E06826FDAD;
-	Tue, 18 Feb 2025 17:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858D26FD93;
+	Tue, 18 Feb 2025 17:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="go4Ql9AB"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Vo1/Dqic"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0893B26B975
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D33F26F45E;
+	Tue, 18 Feb 2025 17:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739900849; cv=none; b=ptiLDndJ2TbxszA0sm//XfrHO5iJXmdJvIwLE26aydhWYSi78EAu0G03PWUj3re+wOG7ght8iAgR6OR67Q5ILZe28Fs+vkQqaN7nOj3/AX2GLhMHGbAk8a7zQ+8AHiQeAKLDE1N4hgXLnBaDpcm70bTBzu1Mt7wPJ/GWeRZEVpY=
+	t=1739901394; cv=none; b=NUCC2G1RtlIzUTS1q9kLaxV3dAch7msiEbiy1y89P26/VqOtnYpQXHGH468fSqUf5RnS1g8vG/aFJQoxBw1Z574ZQxD7wUOFI5d14ASfWs4M7qIcu9QgdUxqdItbOlJJJ6XVFA8nvweQamMb/RZCOPZ/ls9gWRYB9iE7E0xLKbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739900849; c=relaxed/simple;
-	bh=N77XQ5Q5mO4PoQ6m80+S+vewn+DOxv1GOBJVib08tpY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L6fCI40Es1VlB26d+b68vtl0Jk9K9Hbql05LyYZBnA5AwFMKwCrdy474RSSuYcVHbWKxB935boi3OiT49eZywc7YrDN43DK6tKM1JecA24ax/bu1AfhbmcV24wlUY3Ht5mOAmBuLgjML/+nusWTRMbQNmHlh5AT3cNn92VumGdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=go4Ql9AB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739900848; x=1771436848;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=N77XQ5Q5mO4PoQ6m80+S+vewn+DOxv1GOBJVib08tpY=;
-  b=go4Ql9AB0PGrZVWLdI3ABe9NB5IlAWYCwOKEjLHmDXTSoiI9B5LxuC74
-   2UcBY6vZy6bMRAqFY4eJWQXlm/UO1kJavdrm83VBBHpLuihSRVsnTYRwz
-   EdHEKEFM4WZ+g9g8SuRRiOyB02krT7U2x+IONX09roUlnkhAmtqdlUZG8
-   mjhUNIePv/nRNRdbuIaMEnGOGSBETv5T/qPmRQHzCWug83ZM8pMgd+ztc
-   BwI1qxwJ6hrKjXw35JPm15mnOyxtGwhLy/Uh/j7tpZMWAqG8LqVHbF+ZZ
-   X0SbbchCkVf1hQyAT6LrELqG5jiCDTL8KQ79ex6hrpjDdRer3+Y86e3DQ
-   Q==;
-X-CSE-ConnectionGUID: FebntgmIRJWlUycDhgk9ww==
-X-CSE-MsgGUID: caik0tk6T0eKy4R8tKdnkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="44368502"
-X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="44368502"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 09:47:28 -0800
-X-CSE-ConnectionGUID: bI+yRe0sRZ6TvppdCpo8kw==
-X-CSE-MsgGUID: ahusy2nzQMGJcZQP9+ekJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="119396148"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.102.22.54])
-  by orviesa003.jf.intel.com with ESMTP; 18 Feb 2025 09:47:26 -0800
-From: Milena Olech <milena.olech@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Milena Olech <milena.olech@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH v7 iwl-next 10/10] idpf: change the method for mailbox workqueue allocation
-Date: Tue, 18 Feb 2025 18:42:37 +0100
-Message-Id: <20250218174221.2291673-11-milena.olech@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250218174221.2291673-1-milena.olech@intel.com>
-References: <20250218174221.2291673-1-milena.olech@intel.com>
+	s=arc-20240116; t=1739901394; c=relaxed/simple;
+	bh=8/xeGIFMWIi4dm7oFuwYay00JIETRD/k+jULot2/mq4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZPPDB5w0retg8yc447gns6hS/v9kvimhlh8PUkWuCvZ5hJrEikR+Y0+apAfAc8rWSLlDmY6t0oSYpRqJQU1YNGYTPityns95uQP0S2pvxV1ivld0XOUVjYaEPWiXkj+qh24t0oaNOGveNW9kWYek4urzR0aLc2p0kjWglSkAciU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Vo1/Dqic; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51IHtwWL052717
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 18 Feb 2025 11:55:58 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1739901358;
+	bh=ZxZPMPRqc2YVU3nXWwH2+2obTCBbW0fH/0Zd2nYlJcY=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=Vo1/Dqic6aBhdbEUDoG5pV4dOv9AL6C/o6819Wdi9txicvAyU07Afyk9eE2quGkWQ
+	 sIDl04TcV4U+4liBmvLPb5rJUOQAb9CzUmHF3wUjQIu4qyVT+5TaJfhrPXitz6OhAE
+	 6VCXzDUQtTXxl3OGhwHpb9Fd8R87iD1VNYu7ZSNY=
+Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51IHtwW1031510;
+	Tue, 18 Feb 2025 11:55:58 -0600
+Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 18
+ Feb 2025 11:55:58 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 18 Feb 2025 11:55:57 -0600
+Received: from [10.249.140.156] ([10.249.140.156])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51IHtn69060469;
+	Tue, 18 Feb 2025 11:55:50 -0600
+Message-ID: <e1800e66-9043-4add-bbc9-19a8121de2f2@ti.com>
+Date: Tue, 18 Feb 2025 23:25:49 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/3] Add native mode XDP support
+To: Jesper Dangaard Brouer <hawk@kernel.org>, <rogerq@kernel.org>,
+        <danishanwar@ti.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <u.kleine-koenig@baylibre.com>, <krzysztof.kozlowski@linaro.org>,
+        <dan.carpenter@linaro.org>, <schnelle@linux.ibm.com>,
+        <glaroque@baylibre.com>, <rdunlap@infradead.org>,
+        <diogo.ivo@siemens.com>, <jan.kiszka@siemens.com>,
+        <john.fastabend@gmail.com>, <daniel@iogearbox.net>, <ast@kernel.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250210103352.541052-1-m-malladi@ti.com>
+ <285d1541-6af4-4dc3-bdcd-720bfc1f9aa4@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <285d1541-6af4-4dc3-bdcd-720bfc1f9aa4@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Since workqueues are created per CPU, the works scheduled to this
-workqueues are run on the CPU they were assigned. It may result in
-overloaded CPU that is not able to handle virtchnl messages in
-relatively short time. Allocating workqueue with WQ_UNBOUND and
-WQ_HIGHPRI flags allows scheduler to queue virtchl messages on less loaded
-CPUs, what eliminates delays.
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 60bae3081035..022645f4fa9c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -198,9 +198,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_serv_wq_alloc;
- 	}
- 
--	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx",
--					  WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
--					  dev_driver_string(dev),
-+	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", WQ_UNBOUND | WQ_HIGHPRI,
-+					  0, dev_driver_string(dev),
- 					  dev_name(dev));
- 	if (!adapter->mbx_wq) {
- 		dev_err(dev, "Failed to allocate mailbox workqueue\n");
--- 
-2.31.1
+On 2/18/2025 9:32 PM, Jesper Dangaard Brouer wrote:
+> 
+> On 10/02/2025 11.33, Meghana Malladi wrote:
+>> This series adds native XDP support using page_pool.
+> 
+> Please also describe *what driver* to adds XDP support for.
+> 
+> This cover letter will (by netdev maintainers) be part of the merge
+> commit text.  Thus, please mention the driver name in the text.
+> 
+> This also applies for the Subject line.  It should either be prefix with
+> "net: ti: icssg-prueth:" like you did for other patches, or be renamed
+> to e.g.: "Add native mode XDP support for driver ti/icssg-prueth".
+> 
+
+Oh ok got it. Will update the subject line accordingly in v3 and follow 
+the same for my upcoming patches. Thanks.
+
+> Thanks,
+> --Jesper
 
 
