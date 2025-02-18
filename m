@@ -1,184 +1,126 @@
-Return-Path: <netdev+bounces-167260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6021A3972A
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:33:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A83A39718
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10BB83AE641
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:25:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E3B61891FAA
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E3D230D0A;
-	Tue, 18 Feb 2025 09:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E16622FDEE;
+	Tue, 18 Feb 2025 09:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l02GRoEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C0F1F94A;
-	Tue, 18 Feb 2025 09:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C134C14A614;
+	Tue, 18 Feb 2025 09:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739870723; cv=none; b=BbDmZkwEJHpOngvjngZJUY/jxgQ6mURUx+sTrTslY2CJPPO499ZibVLJbaSjkpGFGKHAfE57+plIb0EaxfiW+P0vxVdg/DNi0G+9Jx/x6qgzjpGl6F0OGmnYYi01sacnQDHL5DywHrg6y4U8lxrWDMzv+q8ykn4JNZiuKnlmnvw=
+	t=1739870905; cv=none; b=F3Ow/iQa4wNNNrfhHUIBVbhDDLl4ib/iMrEKLUEerVrvTVO6bgHe4dZNpXVnQ0RIbfBr0U5YimDz2RMpTaZ2fLMf3MvbysiFT3n3LVxFTp4+Xy8KfJXUkmvL6Gvg5+ISDu94MFYOuWyqnR9j1BgHCtw5tcKD7EHHbeGnMoZfLYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739870723; c=relaxed/simple;
-	bh=2A+HPgq4kw3LHWNne2m/gQ/v0dE8qcC9rhzvU6/BKms=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ed5vn3HmQKELJBeQR7HqwJSS7lFb0hum/NBmTHc6tRkd1v3Uo3uZbF1eovkkYQnmObLFK7zk+k/HTGMe5aRIl1nCaP1HuDXVf9sTo2PwX2X1lu3aqjiHQY+I4NkMEfOgqZNGJm2kArfrpfUTR7SvqHAqR9DPG2Y8G8nwS1sQxqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1739870905; c=relaxed/simple;
+	bh=KUCO7GOcoDrDHadjAC27o2CRSYfaHDgMDjMGMYIWFcw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dbKw4F8yH+oeS8/r4UHBJ3EH8Y3Qq1eGlNX1IjTM2x2JpEGZoDZTOtEKNyuHh9LZWHyXQmOk+eoQ0yl15aJcJ6SVS2qhoBi0uiJrUFar3jqylquzWKxYQRx3DUouYZ1bnkY6FC8uqxaVBZKSOGKPsoHOBzJs+WQcd1LuKWq07p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l02GRoEB; arc=none smtp.client-ip=209.85.161.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5209ea469e9so2042279e0c.0;
-        Tue, 18 Feb 2025 01:25:21 -0800 (PST)
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5fc447b03f2so1296187eaf.0;
+        Tue, 18 Feb 2025 01:28:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739870902; x=1740475702; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8kJMtWw9wVrl3aRZwWKVOYpt3qrRhCd81TsGEYFpLTg=;
+        b=l02GRoEBchKwQV48uqwjpUb3yJblAVEHvlm6Wugx8RhZUjpLjdf0k7UW0Iq/ESvsHJ
+         u3usHASAgbTzamlkuXd2bT8kIRd54Y1OIETcAoqTPUApoK8Frtnf8StwkULuMFj6F4oH
+         zaffIIK9AI+P7VM91YXdd/RpEkSeUaCEeXrHFkgBnlXVisS0BpUoF6dsT+8MSVxyjIKL
+         VRmEyV3QGle1U0+iqk2Kc7vEtIrOLKf9Hp49KJg2RWIX7QVUq5zC8Pl8ByeOh0N+F+08
+         tz3TiZx1M3ggQvdl+IP4WR8LwO44mfBPNlwvAA8GlZBe7fGPT7f5L6hZ9gjDNRclyREi
+         OPaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739870719; x=1740475519;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6e+XkVhruxUj9hYDMFwzpshD1I1yvdexdZUX8aeqRjQ=;
-        b=Sp+2rTCXn8yCvha93yEvj4SE8O8xqBjGuoAicI2vEo2yNQ41YdwZC40SRbIpj6KtdU
-         5HMqd7LbiLj2RMH6aIw/4yAX/LGUyfUxw/eM9NDGbzajSjvJG7FC2EsrFilANznNdJIC
-         u9dG0tIvAziGEKGRrs6wAqUvLyFyTM0csgEdHBSK/uMUhKmDfFd7jYt/kPtCsP00GVDr
-         GjIPAyTtGN3awBOJayRGJxzI4LCXZrygk0PpIqkamRtspuVv2Pq6FEXJEVqGGq/nd2h/
-         IJ9ZHBzIcF+miciNV/zh2bGOYDswr+UvUgYF0eCeTZfiB744y/SPj0xM22YZCeDjIa0Y
-         JBJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTLX/onvgWpm3fikqPNMnTRwRQVc6wzPLWAJjB4WEuFnwhfQg+SLbKM6SNg9hl+LionleDZCalQjNld7/CmecsCQ==@vger.kernel.org, AJvYcCVcf2jSwrpVtOypbwLmhROgZRonjilytt49lZemsOWpsyxV7LhKelCab/FGeaQmWLnMVWuB7uaf@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOtfanjcN/bxNGpYve2QlNL90qHfOo3BxHMaZGGYG960HjxSAN
-	JvFSF2quOAOAMpMqV5i1qt/Q2SstH9OoFeByLvPYMlrUBs3iLt9GQQ7RwzH8FYM=
-X-Gm-Gg: ASbGnctFj+hENqoDwEjKO5raJk20Hnj1yC6XoYTvoIVkZrIIjUp31HpPTASE1zt6+OW
-	nSmodr1GCYZVqCF4HVCVCG59GP2ZKs53dIiwap0xPOoDT57fwntF6GCu7Jpx+FsZNBy4iBukJp0
-	CU4jsLB+oHcL13rQOVCrqDveiXO+Yz2D+tDuQ9dvfJxrMHQlkA/csS/zu/6JQeu1RW3AzF2PegL
-	AZTdQEBG5G/ovHj6OB9NtLdnd15xmOnoBp3PhMu6qx5MtFySRTcZV4uycghr+u6Sx7NcQEPrO4H
-	9DG+cvRvMQNBiknK6/rxH8GJ6ISBkfNasiXUJrSVD8ony/jXCP/v/w==
-X-Google-Smtp-Source: AGHT+IEEF/9w4eanA8pthwvr4xzFjx6NKjXpDBdJWnJ252CK5mg2qI/Ab6ZmWoEaDgeYf9R0eDlsCg==
-X-Received: by 2002:ac5:c85b:0:b0:520:abfc:4f10 with SMTP id 71dfb90a1353d-520abfc5121mr3456433e0c.3.1739870718888;
-        Tue, 18 Feb 2025 01:25:18 -0800 (PST)
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com. [209.85.217.50])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-869044f1107sm1601956241.17.2025.02.18.01.25.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 01:25:18 -0800 (PST)
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4b9486a15a0so3781119137.0;
-        Tue, 18 Feb 2025 01:25:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUCyFcJtvz+w2tz71cAnTipl8gxbtgHGn+SVWzyj8jSOC0QzAE3LL9EhtfZixy3OgVNb//o9rLJ@vger.kernel.org, AJvYcCWu8GrNw7UYRJkFXGZ7udLdxyO9iYQUjdLm0g0VpnPBvfKS2T6RbeojR/cGEiO9SA5xJBkp4goV/O0PYNoM4QBZuw==@vger.kernel.org
-X-Received: by 2002:a05:6102:34b:b0:4bd:860f:ff2 with SMTP id
- ada2fe7eead31-4bd860f10cfmr4418314137.4.1739870718057; Tue, 18 Feb 2025
- 01:25:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739870902; x=1740475702;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8kJMtWw9wVrl3aRZwWKVOYpt3qrRhCd81TsGEYFpLTg=;
+        b=Hk7Zo8xtrlTWOvsVGo7i+x0VrzgRiMWCG+kjo8FIbryOedd6JOGMm4zUp90gosd+3X
+         zH5+fmZBug9xMO4emngenXKsPf8BYHov/vC9vCirBRUq5lM1DvJJ9a3MdLtMl3yYW2fQ
+         N87FAwmWp7ycpQgsRabemiwM5OvLQixJCPvl3F/SQQ0MtjWMb1NpBha6dNNVPHreJaX5
+         cGJSksfyk45FqGbDlYrJ0D87dFWbrbKoszEvVx5vFzgbWvtCBk6asEAbSdVzsBjUrVmg
+         QU09WLtlKFBqxxBI0mFt5cumz/TpBR4rK93buIlz8WSlu5mhfFx2DX1F2E5qSCZ6KRT9
+         4+nA==
+X-Forwarded-Encrypted: i=1; AJvYcCXy9TFYybw/hbDbJga5El3x0QJ0hP3T1Ga8on958Aw0CjZW4Jgo1wTl1SomuML1peJglsnmcwWLanFRsqQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0225cu6FVHMqI8ERVEqS5EyFnxyz86FiIE/2OkwQsVk4BZddP
+	yEbTiUXaKgl8EyfkDt6/K0NfR5Sr+jX0h12EM3WkL+B79OFKid6qnUS/TTvd+Hxq69AjVVAtp4Q
+	zMX2BZiVsbxaC3GoAGkK4RyoL330C5AAZKYoNvw==
+X-Gm-Gg: ASbGncsmN71Dbv5lVpATNImg4W2kd8bfr5IMv/Lpz/IPr1dxroexQmifZgxKTCFqZn0
+	PHuJqWfVHpIcIczc3RUYtxtCUR9c/PS3S+BQoIGDiol1+bRkXIKipPVkPulNumUYif8HwWjc=
+X-Google-Smtp-Source: AGHT+IGbMnXi83Muhh7hozQR7z1/wxvHIyNCpzQKVTEOGDO+J9syLNm5krScvYcmKeztpkeSfzp0rQUdKL4bvpaU70c=
+X-Received: by 2002:a05:6808:2025:b0:3f4:28:1cd6 with SMTP id
+ 5614622812f47-3f400281de6mr3182376b6e.39.1739870902398; Tue, 18 Feb 2025
+ 01:28:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214174650.2056949-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20250214174650.2056949-1-niklas.soderlund+renesas@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 18 Feb 2025 10:25:06 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXBUU3rNxQbHZxGgC2S1GecsLs7RmB8FJvmc9F3SCUDSg@mail.gmail.com>
-X-Gm-Features: AWEUYZl4_uJMHXPeHvfbjIrwfWbSOO1mQge9bKgHdmnh8AXGWvdCSYwBMMdGvH0
-Message-ID: <CAMuHMdXBUU3rNxQbHZxGgC2S1GecsLs7RmB8FJvmc9F3SCUDSg@mail.gmail.com>
-Subject: Re: [net-next] net: phy: marvell-88q2xxx: Init PHY private structure
- for mv88q211x
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Eichenberger <eichest@gmail.com>, Dimitri Fedrau <dima.fedrau@gmail.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
+From: Suchit K <suchitkarunakaran@gmail.com>
+Date: Tue, 18 Feb 2025 14:58:11 +0530
+X-Gm-Features: AWEUYZn9N8YQjSA8rz4TzhThrcXz6tH7kdaOCaUbGFtWZGGJO-UH_9KpRuvxN4s
+Message-ID: <CAO9wTFggVh9LvJa_aH=dDBLrwBo8Ho4ZfYET3myExiqf0yfDCA@mail.gmail.com>
+Subject: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and
+ psock_tpacket tests
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, horms@kernel.org, matttbe@kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Suchit K <suchitkarunakaran@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Niklas,
+Fixes minor spelling errors:
+- `simult_flows.sh`: "al testcases" -> "all testcases"
+- `psock_tpacket.c`: "accross" -> "across"
 
-On Fri, 14 Feb 2025 at 18:50, Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> When adding LED support for mv88q222x devices the PHY private data
-> structure was added to the mv88q211x code path, the data structure is
-> however only allocated during mv88q222x probe. This results in a nullptr
-> deference for mv88q2110 devices.
->
->         Unable to handle kernel NULL pointer dereference at virtual addre=
-ss 0000000000000001
->         Mem abort info:
->           ESR =3D 0x0000000096000004
->           EC =3D 0x25: DABT (current EL), IL =3D 32 bits
->           SET =3D 0, FnV =3D 0
->           EA =3D 0, S1PTW =3D 0
->           FSC =3D 0x04: level 0 translation fault
->         Data abort info:
->           ISV =3D 0, ISS =3D 0x00000004, ISS2 =3D 0x00000000
->           CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
->           GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
->         [0000000000000001] user address but active_mm is swapper
->         Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
->         CPU: 3 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.14.0-rc1-arm64=
--renesas-00342-ga3783dbf2574 #7
->         Hardware name: Renesas White Hawk Single board based on r8a779g2 =
-(DT)
->         pstate: 20400005 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
->         pc : mv88q2xxx_config_init+0x28/0x84
->         lr : mv88q2110_config_init+0x98/0xb0
->         sp : ffff8000823eb9d0
->         x29: ffff8000823eb9d0 x28: ffff000440942000 x27: ffff80008144e400
->         x26: 0000000000001002 x25: 0000000000000000 x24: 0000000000000000
->         x23: 0000000000000009 x22: ffff8000810534f0 x21: ffff800081053550
->         x20: 0000000000000000 x19: ffff0004437d6800 x18: 0000000000000018
->         x17: 00000000000961c8 x16: ffff0006bef75ec0 x15: 0000000000000001
->         x14: 0000000000000001 x13: ffff000440218080 x12: 071c71c71c71c71c
->         x11: ffff000440218080 x10: 0000000000001420 x9 : ffff8000823eb770
->         x8 : ffff8000823eb650 x7 : ffff8000823eb750 x6 : ffff8000823eb710
->         x5 : 0000000000000000 x4 : 0000000000000800 x3 : 0000000000000001
->         x2 : 0000000000000000 x1 : 00000000ffffffff x0 : ffff0004437d6800
->         Call trace:
->          mv88q2xxx_config_init+0x28/0x84 (P)
->          mv88q2110_config_init+0x98/0xb0
->          phy_init_hw+0x64/0x9c
->          phy_attach_direct+0x118/0x320
->          phy_connect_direct+0x24/0x80
->          of_phy_connect+0x5c/0xa0
->          rtsn_open+0x5bc/0x78c
->          __dev_open+0xf8/0x1fc
->          __dev_change_flags+0x198/0x220
->          dev_change_flags+0x20/0x64
->          ip_auto_config+0x270/0xefc
->          do_one_initcall+0xe4/0x22c
->          kernel_init_freeable+0x2a8/0x308
->          kernel_init+0x20/0x130
->          ret_from_fork+0x10/0x20
->         Code: b907e404 f9432814 3100083f 540000e3 (39400680)
->         ---[ end trace 0000000000000000 ]---
->         Kernel panic - not syncing: Attempted to kill init! exitcode=3D0x=
-0000000b
->         SMP: stopping secondary CPUs
->         Kernel Offset: disabled
->         CPU features: 0x000,00000070,00801250,8200700b
->         Memory Limit: none
->         ---[ end Kernel panic - not syncing: Attempted to kill init! exit=
-code=3D0x0000000b ]---
->
-> Fix this by using a generic probe function for both mv88q211x and
-> mv88q222x devices that allocates the PHY private data structure, while
-> only the mv88q222x probes for LED support.
->
-> Fixes: a3783dbf2574 ("net: phy: marvell-88q2xxx: Add support for PHY LEDs=
- on 88q2xxx")
-> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
-se>
+Signed-off-by: Suchit Karunakaran <suchitkarunakaran@gmail.com>
+---
+ tools/testing/selftests/net/mptcp/simult_flows.sh | 2 +-
+ tools/testing/selftests/net/psock_tpacket.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Thanks, this fixes the crash during boot on Gray Hawk Single
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh
+b/tools/testing/selftests/net/mptcp/simult_flows.sh
+index 9c2a41597..2329c2f85 100755
+--- a/tools/testing/selftests/net/mptcp/simult_flows.sh
++++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
+@@ -28,7 +28,7 @@ size=0
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+ usage() {
+  echo "Usage: $0 [ -b ] [ -c ] [ -d ] [ -i]"
+- echo -e "\t-b: bail out after first error, otherwise runs al testcases"
++ echo -e "\t-b: bail out after first error, otherwise runs all testcases"
+  echo -e "\t-c: capture packets for each test using tcpdump (default:
+no capture)"
+  echo -e "\t-d: debug this script"
+  echo -e "\t-i: use 'ip mptcp' instead of 'pm_nl_ctl'"
+diff --git a/tools/testing/selftests/net/psock_tpacket.c
+b/tools/testing/selftests/net/psock_tpacket.c
+index 404a2ce75..221270cee 100644
+--- a/tools/testing/selftests/net/psock_tpacket.c
++++ b/tools/testing/selftests/net/psock_tpacket.c
+@@ -12,7 +12,7 @@
+  *
+  * Datapath:
+  *   Open a pair of packet sockets and send resp. receive an a priori known
+- *   packet pattern accross the sockets and check if it was received resp.
++ *   packet pattern across the sockets and check if it was received resp.
+  *   sent correctly. Fanout in combination with RX_RING is currently not
+  *   tested here.
+  *
+-- 
+2.48.1
 
