@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-167170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96AD2A390A9
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:09:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B39A390AE
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1AE73B2DAE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:09:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 575523B2DA7
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8672D148857;
-	Tue, 18 Feb 2025 02:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2485145FE0;
+	Tue, 18 Feb 2025 02:09:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1136482EB
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7595F14F117
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739844589; cv=none; b=sqErvYg/gLkaR9OeoYCbLKS4Gd/bGsAoHh5O7Er7UZ+U6fd6TDfiBwOTXSN47h2yU1N5oCTpQLUeumJtpIDLRbKAWxa6sDidMyICIABZvVLpHjBTNm6VtZ/kl3lmv5B+YNp4kjFo/l2f8EM7H1TKaRR6I834OVL5ufjEvPK0Hds=
+	t=1739844594; cv=none; b=p9pIuOuRiS/egk/yNtO7KSG6dvs8O0tE0zQMBJQLWfZBT8CdbN3g2rKHyThy1AqFIMKLoMJUPDZF1V2TmOZoiDkP9h+b5AjQsIbq+GmCL8bOxZO9dwVrm5/WvlCkrKgk3ps1qOnR1HzQBDzAVXzWZ4GWhk3jWfBi92c/dHh6ylg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739844589; c=relaxed/simple;
-	bh=8/7T84lpFwYJg3JJQZfnZa6swqZ+aMXk2kTJjIZ271Q=;
+	s=arc-20240116; t=1739844594; c=relaxed/simple;
+	bh=WGlWRgm/1Ltz7fkVY1FkkIPPYOgNjs0/FqXf45/6Rls=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oKH23yRV7zlMm6STYs69nRueB17uVL+yCLS6aaMZ97hSEoxW345rWHyhQ4fw5Ap+deDCVb3uBaeegtESM1vwYQNN4K5Z4eRWTPksVT4xdFSpv7089XRazOM1Txj91u4MtlSiAig6at93gyDN0M6er89dQQAD9rp8BkMTSCQZef0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
+	 MIME-Version; b=Zw1w/Q0mX3gB7+xQu3J72Aaqezktx4m/xHoqquxhSmbGuCLv/Zz3kqjC7TxNkFVcMptbGvms7GO7rYjwZ3ElTJWj1RxP0uRBg/ULkYm/tGkPqaHkgSRN8inM0AsiT46hyMOi2X8Wum2R+tl7ivHPRcli5jiKdlCU9WpAj4CSBwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz5t1739844577ty0ejay
-X-QQ-Originating-IP: ZogU6NONzzy5Ew8a5nZObBSB+GlvUA1326i0164g2Jg=
+X-QQ-mid: bizesmtpsz5t1739844580tpl15kv
+X-QQ-Originating-IP: qf9Q/njeBIZ/ZQyOyOB3A5MHp5AgWQRoUDXrILaVnnk=
 Received: from wxdbg.localdomain.com ( [36.24.205.26])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Feb 2025 10:09:36 +0800 (CST)
+	id ; Tue, 18 Feb 2025 10:09:38 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2578718508898896570
+X-BIZMAIL-ID: 2338889483868943175
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -51,9 +51,9 @@ To: andrew+netdev@lunn.ch,
 	vadim.fedorenko@linux.dev
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v8 3/4] net: wangxun: Add periodic checks for overflow and errors
-Date: Tue, 18 Feb 2025 10:34:31 +0800
-Message-Id: <20250218023432.146536-4-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v8 4/4] net: ngbe: Add support for 1PPS and TOD
+Date: Tue, 18 Feb 2025 10:34:32 +0800
+Message-Id: <20250218023432.146536-5-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250218023432.146536-1-jiawenwu@trustnetic.com>
 References: <20250218023432.146536-1-jiawenwu@trustnetic.com>
@@ -66,204 +66,465 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OCG/O0Z17aKrwlY5pJsdzvjo7v8osYK+dR051I9+Q1K140zVTg1t+R0o
-	zgY4tiBUFSpmwxo7PFwjy0j9YY4lH3QxUV4Eg7XdeAunBjVhi4s8f+Ildhayl9+XumqyHP+
-	SDb39U0EeJ6iJ+Y4hp8BdleYuyFzOzipD1pHFdzZ6k4mp6iJWuyc0Pc3ftyWtEnQhzIyCSv
-	jVPrlDR36mc/SAztG1YLtnwkw3MPwKCtp7dcOAwl6Sfb5XwKTt51stpTp1SmoZ4+uQNcv/R
-	ZX23ceh1n7/lfiBzKx6GGAG/bnLh4rZ4dHm+mumvRxMriRkfsrZjN7utuFD7+QecJQa6fVy
-	1Gzt3xnma7aY5evMpXjF/1f92ct3gfPjoDoIsUZUcX4NK28XNCtGJ5Mm6/oh1/i3yPlSKWL
-	R3sVBi+5ajCc12FJ5eYwP4ay5BRNx5YzjPgmey1iVODCFhHcT4XQ3Mv1K6jAAw6qaZGTT3d
-	lVYROEq1Jvaxvcvvy9WWVdcrNLl2GrX3oAw6fUw/OWILpyLMwhPCqevzzqanIx3avWAuao8
-	WLm03eCvi09bbt2Wosuxh7IgxKAEb7mtjKwtEbwQGGcpxmtu4DGC/ppWEgC6u9WLZ/l/tu9
-	I1Mlz7vyl0+1G96NbygOf9q4aJGKClHplF7IMFEcI268KrCB7osnT9g44gedMY/h/8f0V2J
-	nsijywcitpwCWDhhUzSsr0dAkMqSDVYPQGYXCIoy+Z/c0hoNK3RZlrU++fpSgo9D96gQy5d
-	zWjCOX16uxLiFEV43Yq7yC8Q7do2Rcg+Xt8hjdx4gYeIZksZXvhoRhKVOk4bGeJOFNm9z1H
-	KLKRzjpU830qhirKMsQkB6tD8du0nvlmUb7JUxYyEYYlEHBI57buq9wpm5YZcp9IyKfce73
-	iYjz4fnidG4NEEowo3fOIkYnbvAe7zrmLERS9hyvLHZa6oJZ16Hl0/RgdPYyHrlHAWUUXeK
-	u/a1Gs62vchzdwZ/EuOl3ONZ7Nsv8xGLsR81RBcGxbPOA7kEML8zZ/EDoy8SB/LjhW7pexa
-	vRwq2TCCyJMQX8/Vdp
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: ODO7gCA19e1N4vI8z6miD3bEgnFuiZgyW+15JR/tthTf3BvzxsMsYKXa
+	aRR2Ck24K/PN5fG5oxa0H5iiOQHNRN+QSDjyVtPo58kccmz2ENkKqjivePOkp/IVjt4otM7
+	Jir9mSM811o41HH2atkN8QQb+DQEPsJuYzfI+sLMAniM4EzEswSgcYQ5pkOimOSTA2Y61bK
+	kNWKurAwAim2cizPi2qYZRPX9syc2LzY/hwDraCY5a+LyjpKE3j+LnWWsScCIt8BN40u7uN
+	DoaMl++BKTJwqxcLPr0q79XeoMRaK1l7BqWFFA91WETgAB6ycniX04uYU70opefOMNFEhV+
+	LfTHWCjHHZ2/hxOUmE1VsdwPaE1/qJi68xDz1ppYG3CpV3OZLSF3RBSWPxNkQ+LjGS+SnTn
+	wjBqT7jMDp78VECCDpSogjXwujmkP/c7Nh4vG3Nh9D1ldNufDtFm1u6c9Y+bSymMshPaumQ
+	EYLJnfbm12vUnJtpZEBU3Adhq/XQiggAp8dnM4x793TU0Y4QhkUwAXgUDdSgFrNJU9P/ldJ
+	XtX4DLxOul5XRKnf4x33AMd9IUKBq+oDrnNce+UK2y+FEvswam4xEzooOUSYDg4RpVJzP8J
+	su84jiYlpaGVwyXxWp/QL56QR2u9OW86eGegheL2+4l3AB7e5kvpF+jL4+XRWZSI8i5o0Qm
+	Qea24Gv41NQYC4ADlACs1bO6+iG8efnbDtnJQrYjHedsRyjNRHoswcSUH2qDcBXi+0Mgcs0
+	DHKhJgqH6VdtrKQZFGUfvg497JNzyq2J4euAHRxMcK7DrDJXrB1uA9vWtOEAsF1Ck4xHuMf
+	5OhVwBsCv1r2wJlCeOJtG8AlqC/12FReb7TVhNcxh1y2NPK5bVw+vWalHbEaoH0Kjc7Zkc3
+	j7S97Cz8vQ6+v5BJKJ4+YctilnJlMS9jhn4UGeYn3IOjwKBge1WaIdjFHFORCX/8UB2uAsi
+	IcyHr2z0IjUbufkz9uWoCpdkaLDa5RGM44oPSF0zItfkYygQgqOHbgmtV2D+c0EdkLDv/ld
+	0oglVGjhI7+R/i2z95
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
 X-QQ-RECHKSPAM: 0
 
-Implement watchdog task to detect SYSTIME overflow and error cases of
-Rx/Tx timestamp.
+Implement support for generating a 1pps output signal on SDP0.
+And support custom firmware to output TOD.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 105 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   2 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   1 +
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   1 +
- 4 files changed, 109 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  19 ++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 181 +++++++++++++++++-
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  35 ++++
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  12 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   5 +
+ 7 files changed, 250 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index deaf670c160e..907d13ade404 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -393,6 +393,25 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
+ }
+ EXPORT_SYMBOL(wx_host_interface_command);
+ 
++int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles)
++{
++	struct wx_hic_set_pps pps_cmd;
++
++	pps_cmd.hdr.cmd = FW_PPS_SET_CMD;
++	pps_cmd.hdr.buf_len = FW_PPS_SET_LEN;
++	pps_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
++	pps_cmd.lan_id = wx->bus.func;
++	pps_cmd.enable = (u8)enable;
++	pps_cmd.nsec = nsec;
++	pps_cmd.cycles = cycles;
++	pps_cmd.hdr.checksum = FW_DEFAULT_CHECKSUM;
++
++	return wx_host_interface_command(wx, (u32 *)&pps_cmd,
++					 sizeof(pps_cmd),
++					 WX_HI_COMMAND_TIMEOUT,
++					 false);
++}
++
+ /**
+  *  wx_read_ee_hostif_data - Read EEPROM word using a host interface cmd
+  *  assuming that the semaphore is already obtained.
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+index 11fb33349482..b883342bb576 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+@@ -18,6 +18,7 @@ void wx_control_hw(struct wx *wx, bool drv);
+ int wx_mng_present(struct wx *wx);
+ int wx_host_interface_command(struct wx *wx, u32 *buffer,
+ 			      u32 length, u32 timeout, bool return_data);
++int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles);
+ int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
+ int wx_read_ee_hostif_buffer(struct wx *wx,
+ 			     u16 offset, u16 words, u16 *data);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-index e56288a18614..76986e41afe0 100644
+index 76986e41afe0..07c015ba338f 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-@@ -212,6 +212,102 @@ static int wx_ptp_tx_hwtstamp_work(struct wx *wx)
- 	return -1;
+@@ -88,6 +88,9 @@ static int wx_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	timecounter_adjtime(&wx->hw_tc, delta);
+ 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
+ 
++	if (wx->ptp_setup_sdp)
++		wx->ptp_setup_sdp(wx);
++
+ 	return 0;
  }
  
-+/**
-+ * wx_ptp_overflow_check - watchdog task to detect SYSTIME overflow
-+ * @wx: pointer to wx struct
-+ *
-+ * this watchdog task periodically reads the timecounter
-+ * in order to prevent missing when the system time registers wrap
-+ * around. This needs to be run approximately twice a minute for the fastest
-+ * overflowing hardware. We run it for all hardware since it shouldn't have a
-+ * large impact.
-+ */
-+static void wx_ptp_overflow_check(struct wx *wx)
-+{
-+	bool timeout = time_is_before_jiffies(wx->last_overflow_check +
-+					      WX_OVERFLOW_PERIOD);
-+	unsigned long flags;
-+
-+	if (timeout) {
-+		/* Update the timecounter */
-+		write_seqlock_irqsave(&wx->hw_tc_lock, flags);
-+		timecounter_read(&wx->hw_tc);
-+		write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
-+
-+		wx->last_overflow_check = jiffies;
-+	}
-+}
-+
-+/**
-+ * wx_ptp_rx_hang - detect error case when Rx timestamp registers latched
-+ * @wx: pointer to wx struct
-+ *
-+ * this watchdog task is scheduled to detect error case where hardware has
-+ * dropped an Rx packet that was timestamped when the ring is full. The
-+ * particular error is rare but leaves the device in a state unable to
-+ * timestamp any future packets.
-+ */
-+static void wx_ptp_rx_hang(struct wx *wx)
-+{
-+	struct wx_ring *rx_ring;
-+	unsigned long rx_event;
-+	u32 tsyncrxctl;
-+	int n;
-+
-+	tsyncrxctl = rd32(wx, WX_PSR_1588_CTL);
-+
-+	/* if we don't have a valid timestamp in the registers, just update the
-+	 * timeout counter and exit
-+	 */
-+	if (!(tsyncrxctl & WX_PSR_1588_CTL_VALID)) {
-+		wx->last_rx_ptp_check = jiffies;
-+		return;
-+	}
-+
-+	/* determine the most recent watchdog or rx_timestamp event */
-+	rx_event = wx->last_rx_ptp_check;
-+	for (n = 0; n < wx->num_rx_queues; n++) {
-+		rx_ring = wx->rx_ring[n];
-+		if (time_after(rx_ring->last_rx_timestamp, rx_event))
-+			rx_event = rx_ring->last_rx_timestamp;
-+	}
-+
-+	/* only need to read the high RXSTMP register to clear the lock */
-+	if (time_is_before_jiffies(rx_event + 5 * HZ)) {
-+		rd32(wx, WX_PSR_1588_STMPH);
-+		wx->last_rx_ptp_check = jiffies;
-+
-+		wx->rx_hwtstamp_cleared++;
-+		dev_warn(&wx->pdev->dev, "clearing RX Timestamp hang");
-+	}
-+}
-+
-+/**
-+ * wx_ptp_tx_hang - detect error case where Tx timestamp never finishes
-+ * @wx: private network wx structure
-+ */
-+static void wx_ptp_tx_hang(struct wx *wx)
-+{
-+	bool timeout = time_is_before_jiffies(wx->ptp_tx_start +
-+					      WX_PTP_TX_TIMEOUT);
-+
-+	if (!wx->ptp_tx_skb)
-+		return;
-+
-+	if (!test_bit(WX_STATE_PTP_TX_IN_PROGRESS, wx->state))
-+		return;
-+
-+	/* If we haven't received a timestamp within the timeout, it is
-+	 * reasonable to assume that it will never occur, so we can unlock the
-+	 * timestamp bit when this occurs.
-+	 */
-+	if (timeout) {
-+		wx_ptp_clear_tx_timestamp(wx);
-+		wx->tx_hwtstamp_timeouts++;
-+		dev_warn(&wx->pdev->dev, "clearing Tx timestamp hang\n");
-+	}
-+}
-+
- static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
- {
- 	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
-@@ -219,6 +315,12 @@ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
+@@ -118,6 +121,9 @@ static int wx_ptp_settime64(struct ptp_clock_info *ptp,
+ 	timecounter_init(&wx->hw_tc, &wx->hw_cc, ns);
+ 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
  
- 	ts_done = wx_ptp_tx_hwtstamp_work(wx);
- 
-+	wx_ptp_overflow_check(wx);
-+	if (unlikely(test_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
-+			      wx->flags)))
-+		wx_ptp_rx_hang(wx);
-+	wx_ptp_tx_hang(wx);
++	if (wx->ptp_setup_sdp)
++		wx->ptp_setup_sdp(wx);
 +
+ 	return 0;
+ }
+ 
+@@ -324,6 +330,160 @@ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
  	return ts_done ? 1 : HZ;
  }
  
-@@ -475,6 +577,9 @@ void wx_ptp_reset(struct wx *wx)
- 	timecounter_init(&wx->hw_tc, &wx->hw_cc,
- 			 ktime_to_ns(ktime_get_real()));
- 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
++static u64 wx_ptp_trigger_calc(struct wx *wx)
++{
++	struct cyclecounter *cc = &wx->hw_cc;
++	unsigned long flags;
++	u64 ns = 0;
++	u32 rem;
 +
-+	wx->last_overflow_check = jiffies;
-+	ptp_schedule_worker(wx->ptp_clock, HZ);
++	/* Read the current clock time, and save the cycle counter value */
++	write_seqlock_irqsave(&wx->hw_tc_lock, flags);
++	ns = timecounter_read(&wx->hw_tc);
++	wx->pps_edge_start = wx->hw_tc.cycle_last;
++	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
++	wx->pps_edge_end = wx->pps_edge_start;
++
++	/* Figure out how far past the next second we are */
++	div_u64_rem(ns, WX_NS_PER_SEC, &rem);
++
++	/* Figure out how many nanoseconds to add to round the clock edge up
++	 * to the next full second
++	 */
++	rem = (WX_NS_PER_SEC - rem);
++
++	/* Adjust the clock edge to align with the next full second. */
++	wx->pps_edge_start += div_u64(((u64)rem << cc->shift), cc->mult);
++	wx->pps_edge_end += div_u64(((u64)(rem + wx->pps_width) <<
++				     cc->shift), cc->mult);
++
++	return (ns + rem);
++}
++
++static int wx_ptp_setup_sdp(struct wx *wx)
++{
++	struct cyclecounter *cc = &wx->hw_cc;
++	u32 tsauxc;
++	u64 nsec;
++
++	if (wx->pps_width >= WX_NS_PER_SEC) {
++		wx_err(wx, "PTP pps width cannot be longer than 1s!\n");
++		return -EINVAL;
++	}
++
++	/* disable the pin first */
++	wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
++	WX_WRITE_FLUSH(wx);
++
++	if (!test_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags)) {
++		if (wx->pps_enabled) {
++			wx->pps_enabled = false;
++			wx_set_pps(wx, false, 0, 0);
++		}
++		return 0;
++	}
++
++	wx->pps_enabled = true;
++	nsec = wx_ptp_trigger_calc(wx);
++	wx_set_pps(wx, wx->pps_enabled, nsec, wx->pps_edge_start);
++
++	tsauxc = WX_TSC_1588_AUX_CTL_PLSG | WX_TSC_1588_AUX_CTL_EN_TT0 |
++		WX_TSC_1588_AUX_CTL_EN_TT1 | WX_TSC_1588_AUX_CTL_EN_TS0;
++	wr32ptp(wx, WX_TSC_1588_TRGT_L(0), (u32)wx->pps_edge_start);
++	wr32ptp(wx, WX_TSC_1588_TRGT_H(0), (u32)(wx->pps_edge_start >> 32));
++	wr32ptp(wx, WX_TSC_1588_TRGT_L(1), (u32)wx->pps_edge_end);
++	wr32ptp(wx, WX_TSC_1588_TRGT_H(1), (u32)(wx->pps_edge_end >> 32));
++	wr32ptp(wx, WX_TSC_1588_SDP(0),
++		WX_TSC_1588_SDP_FUN_SEL_TT0 | WX_TSC_1588_SDP_OUT_LEVEL_H);
++	wr32ptp(wx, WX_TSC_1588_SDP(1), WX_TSC_1588_SDP_FUN_SEL_TS0);
++	wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
++	wr32ptp(wx, WX_TSC_1588_INT_EN, WX_TSC_1588_INT_EN_TT1);
++	WX_WRITE_FLUSH(wx);
++
++	/* Adjust the clock edge to align with the next full second. */
++	wx->sec_to_cc = div_u64(((u64)WX_NS_PER_SEC << cc->shift), cc->mult);
++
++	return 0;
++}
++
++static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
++				 struct ptp_clock_request *rq, int on)
++{
++	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++
++	/**
++	 * When PPS is enabled, unmask the interrupt for the ClockOut
++	 * feature, so that the interrupt handler can send the PPS
++	 * event when the clock SDP triggers. Clear mask when PPS is
++	 * disabled
++	 */
++	if (rq->type != PTP_CLK_REQ_PEROUT || !wx->ptp_setup_sdp)
++		return -EOPNOTSUPP;
++
++	/* Reject requests with unsupported flags */
++	if (rq->perout.flags & ~(PTP_PEROUT_DUTY_CYCLE |
++				 PTP_PEROUT_PHASE))
++		return -EOPNOTSUPP;
++
++	if (rq->perout.phase.sec || rq->perout.phase.nsec) {
++		wx_err(wx, "Absolute start time not supported.\n");
++		return -EINVAL;
++	}
++
++	if (rq->perout.period.sec != 1 || rq->perout.period.nsec) {
++		wx_err(wx, "Only 1pps is supported.\n");
++		return -EINVAL;
++	}
++
++	if (rq->perout.flags & PTP_PEROUT_DUTY_CYCLE) {
++		struct timespec64 ts_on;
++
++		ts_on.tv_sec = rq->perout.on.sec;
++		ts_on.tv_nsec = rq->perout.on.nsec;
++		wx->pps_width = timespec64_to_ns(&ts_on);
++	} else {
++		wx->pps_width = 120000000;
++	}
++
++	if (on)
++		set_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
++	else
++		clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
++
++	return wx->ptp_setup_sdp(wx);
++}
++
++void wx_ptp_check_pps_event(struct wx *wx)
++{
++	u32 tsauxc, int_status;
++
++	/* this check is necessary in case the interrupt was enabled via some
++	 * alternative means (ex. debug_fs). Better to check here than
++	 * everywhere that calls this function.
++	 */
++	if (!wx->ptp_clock)
++		return;
++
++	int_status = rd32ptp(wx, WX_TSC_1588_INT_ST);
++	if (int_status & WX_TSC_1588_INT_ST_TT1) {
++		/* disable the pin first */
++		wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
++		WX_WRITE_FLUSH(wx);
++
++		wx_ptp_trigger_calc(wx);
++
++		tsauxc = WX_TSC_1588_AUX_CTL_PLSG | WX_TSC_1588_AUX_CTL_EN_TT0 |
++			 WX_TSC_1588_AUX_CTL_EN_TT1 | WX_TSC_1588_AUX_CTL_EN_TS0;
++		wr32ptp(wx, WX_TSC_1588_TRGT_L(0), (u32)wx->pps_edge_start);
++		wr32ptp(wx, WX_TSC_1588_TRGT_H(0), (u32)(wx->pps_edge_start >> 32));
++		wr32ptp(wx, WX_TSC_1588_TRGT_L(1), (u32)wx->pps_edge_end);
++		wr32ptp(wx, WX_TSC_1588_TRGT_H(1), (u32)(wx->pps_edge_end >> 32));
++		wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
++		WX_WRITE_FLUSH(wx);
++	}
++}
++EXPORT_SYMBOL(wx_ptp_check_pps_event);
++
+ static long wx_ptp_create_clock(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+@@ -338,17 +498,22 @@ static long wx_ptp_create_clock(struct wx *wx)
+ 	wx->ptp_caps.owner = THIS_MODULE;
+ 	wx->ptp_caps.n_alarm = 0;
+ 	wx->ptp_caps.n_ext_ts = 0;
+-	wx->ptp_caps.n_per_out = 0;
+ 	wx->ptp_caps.pps = 0;
+ 	wx->ptp_caps.adjfine = wx_ptp_adjfine;
+ 	wx->ptp_caps.adjtime = wx_ptp_adjtime;
+ 	wx->ptp_caps.gettimex64 = wx_ptp_gettimex64;
+ 	wx->ptp_caps.settime64 = wx_ptp_settime64;
+ 	wx->ptp_caps.do_aux_work = wx_ptp_do_aux_work;
+-	if (wx->mac.type == wx_mac_em)
++	if (wx->mac.type == wx_mac_em) {
+ 		wx->ptp_caps.max_adj = 500000000;
+-	else
++		wx->ptp_caps.n_per_out = 1;
++		wx->ptp_setup_sdp = wx_ptp_setup_sdp;
++		wx->ptp_caps.enable = wx_ptp_feature_enable;
++	} else {
+ 		wx->ptp_caps.max_adj = 250000000;
++		wx->ptp_caps.n_per_out = 0;
++		wx->ptp_setup_sdp = NULL;
++	}
+ 
+ 	wx->ptp_clock = ptp_clock_register(&wx->ptp_caps, &wx->pdev->dev);
+ 	if (IS_ERR(wx->ptp_clock)) {
+@@ -580,6 +745,12 @@ void wx_ptp_reset(struct wx *wx)
+ 
+ 	wx->last_overflow_check = jiffies;
+ 	ptp_schedule_worker(wx->ptp_clock, HZ);
++
++	/* Now that the shift has been calculated and the systime
++	 * registers reset, (re-)enable the Clock out feature
++	 */
++	if (wx->ptp_setup_sdp)
++		wx->ptp_setup_sdp(wx);
  }
  EXPORT_SYMBOL(wx_ptp_reset);
  
+@@ -620,6 +791,10 @@ void wx_ptp_suspend(struct wx *wx)
+ 	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
+ 		return;
+ 
++	clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
++	if (wx->ptp_setup_sdp)
++		wx->ptp_setup_sdp(wx);
++
+ 	wx_ptp_clear_tx_timestamp(wx);
+ }
+ EXPORT_SYMBOL(wx_ptp_suspend);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+index 8742d2797363..50db90a6e3ee 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+@@ -4,6 +4,7 @@
+ #ifndef _WX_PTP_H_
+ #define _WX_PTP_H_
+ 
++void wx_ptp_check_pps_event(struct wx *wx);
+ void wx_ptp_reset_cyclecounter(struct wx *wx);
+ void wx_ptp_reset(struct wx *wx);
+ void wx_ptp_init(struct wx *wx);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index f83c54d4657c..0fabfa90d4e7 100644
+index 0fabfa90d4e7..db446e690dc7 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1175,6 +1175,8 @@ struct wx {
- 	u32 tx_hwtstamp_skipped;
- 	u32 tx_hwtstamp_errors;
- 	u32 rx_hwtstamp_cleared;
-+	unsigned long last_overflow_check;
-+	unsigned long last_rx_ptp_check;
- 	unsigned long ptp_tx_start;
- 	seqlock_t hw_tc_lock; /* seqlock for ptp */
- 	struct cyclecounter hw_cc;
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-index c7944e62838a..ea1d7e9a91f3 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-@@ -111,6 +111,7 @@ static void ngbe_mac_link_up(struct phylink_config *config,
- 	wr32(wx, WX_MAC_WDG_TIMEOUT, reg);
+@@ -281,6 +281,23 @@
+ #define WX_TSC_1588_SYSTIML          0x11F0C
+ #define WX_TSC_1588_SYSTIMH          0x11F10
+ #define WX_TSC_1588_INC              0x11F14
++#define WX_TSC_1588_INT_ST           0x11F20
++#define WX_TSC_1588_INT_ST_TT1       BIT(5)
++#define WX_TSC_1588_INT_EN           0x11F24
++#define WX_TSC_1588_INT_EN_TT1       BIT(5)
++#define WX_TSC_1588_AUX_CTL          0x11F28
++#define WX_TSC_1588_AUX_CTL_EN_TS0   BIT(8)
++#define WX_TSC_1588_AUX_CTL_EN_TT1   BIT(2)
++#define WX_TSC_1588_AUX_CTL_PLSG     BIT(1)
++#define WX_TSC_1588_AUX_CTL_EN_TT0   BIT(0)
++#define WX_TSC_1588_TRGT_L(i)        (0x11F2C + ((i) * 8)) /* [0,1] */
++#define WX_TSC_1588_TRGT_H(i)        (0x11F30 + ((i) * 8)) /* [0,1] */
++#define WX_TSC_1588_SDP(i)           (0x11F5C + ((i) * 4)) /* [0,3] */
++#define WX_TSC_1588_SDP_OUT_LEVEL_H  FIELD_PREP(BIT(4), 0)
++#define WX_TSC_1588_SDP_OUT_LEVEL_L  FIELD_PREP(BIT(4), 1)
++#define WX_TSC_1588_SDP_FUN_SEL_MASK GENMASK(2, 0)
++#define WX_TSC_1588_SDP_FUN_SEL_TT0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 1)
++#define WX_TSC_1588_SDP_FUN_SEL_TS0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 5)
  
- 	wx->speed = speed;
-+	wx->last_rx_ptp_check = jiffies;
- 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
- 		wx_ptp_reset_cyclecounter(wx);
- }
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 60e5f3288ad8..7e17d727c2ba 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -222,6 +222,7 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
+ /************************************** MNG ********************************/
+ #define WX_MNG_SWFW_SYNC             0x1E008
+@@ -410,6 +427,8 @@ enum WX_MSCA_CMD_value {
+ #define FW_CEM_CMD_RESERVED          0X0
+ #define FW_CEM_MAX_RETRIES           3
+ #define FW_CEM_RESP_STATUS_SUCCESS   0x1
++#define FW_PPS_SET_CMD               0xF6
++#define FW_PPS_SET_LEN               0x14
  
- 	wx->speed = speed;
-+	wx->last_rx_ptp_check = jiffies;
- 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
- 		wx_ptp_reset_cyclecounter(wx);
- }
+ #define WX_SW_REGION_PTR             0x1C
+ 
+@@ -730,6 +749,15 @@ struct wx_hic_reset {
+ 	u16 reset_type;
+ };
+ 
++struct wx_hic_set_pps {
++	struct wx_hic_hdr hdr;
++	u8 lan_id;
++	u8 enable;
++	u16 pad2;
++	u64 nsec;
++	u64 cycles;
++};
++
+ /* Bus parameters */
+ struct wx_bus_info {
+ 	u8 func;
+@@ -1068,6 +1096,7 @@ enum wx_pf_flags {
+ 	WX_FLAG_FDIR_PERFECT,
+ 	WX_FLAG_RX_HWTSTAMP_ENABLED,
+ 	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
++	WX_FLAG_PTP_PPS_ENABLED,
+ 	WX_PF_FLAGS_NBITS               /* must be last */
+ };
+ 
+@@ -1168,7 +1197,13 @@ struct wx {
+ 	void (*atr)(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype);
+ 	void (*configure_fdir)(struct wx *wx);
+ 	void (*do_reset)(struct net_device *netdev);
++	int (*ptp_setup_sdp)(struct wx *wx);
+ 
++	bool pps_enabled;
++	u64 pps_width;
++	u64 pps_edge_start;
++	u64 pps_edge_end;
++	u64 sec_to_cc;
+ 	u32 base_incval;
+ 	u32 tx_hwtstamp_pkts;
+ 	u32 tx_hwtstamp_timeouts;
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index c60a96cc3508..a6159214ec0a 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -168,7 +168,7 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
+ 	struct wx_q_vector *q_vector;
+ 	struct wx *wx  = data;
+ 	struct pci_dev *pdev;
+-	u32 eicr;
++	u32 eicr, eicr_misc;
+ 
+ 	q_vector = wx->q_vector[0];
+ 	pdev = wx->pdev;
+@@ -186,6 +186,10 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
+ 	if (!(pdev->msi_enabled))
+ 		wr32(wx, WX_PX_INTA, 1);
+ 
++	eicr_misc = wx_misc_isb(wx, WX_ISB_MISC);
++	if (unlikely(eicr_misc & NGBE_PX_MISC_IC_TIMESYNC))
++		wx_ptp_check_pps_event(wx);
++
+ 	wx->isb_mem[WX_ISB_MISC] = 0;
+ 	/* would disable interrupts here but it is auto disabled */
+ 	napi_schedule_irqoff(&q_vector->napi);
+@@ -199,6 +203,12 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
+ static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
+ {
+ 	struct wx *wx = data;
++	u32 eicr;
++
++	eicr = wx_misc_isb(wx, WX_ISB_MISC);
++
++	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
++		wx_ptp_check_pps_event(wx);
+ 
+ 	/* re-enable the original interrupt state, no lsc, no queues */
+ 	if (netif_running(wx->netdev))
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+index f48ed7fc1805..992adbb98c7d 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
+@@ -70,15 +70,20 @@
+ 
+ /* Extended Interrupt Enable Set */
+ #define NGBE_PX_MISC_IEN_DEV_RST		BIT(10)
++#define NGBE_PX_MISC_IEN_TIMESYNC		BIT(11)
+ #define NGBE_PX_MISC_IEN_ETH_LK			BIT(18)
+ #define NGBE_PX_MISC_IEN_INT_ERR		BIT(20)
+ #define NGBE_PX_MISC_IEN_GPIO			BIT(26)
+ #define NGBE_PX_MISC_IEN_MASK ( \
+ 				NGBE_PX_MISC_IEN_DEV_RST | \
++				NGBE_PX_MISC_IEN_TIMESYNC | \
+ 				NGBE_PX_MISC_IEN_ETH_LK | \
+ 				NGBE_PX_MISC_IEN_INT_ERR | \
+ 				NGBE_PX_MISC_IEN_GPIO)
+ 
++/* Extended Interrupt Cause Read */
++#define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
++
+ #define NGBE_INTR_ALL				0x1FF
+ #define NGBE_INTR_MISC				BIT(0)
+ 
 -- 
 2.27.0
 
