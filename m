@@ -1,59 +1,82 @@
-Return-Path: <netdev+bounces-167341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10FBBA39DA9
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:39:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A230A39DAD
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:39:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1F61898ABC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:36:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37286188B476
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7ED2698B9;
-	Tue, 18 Feb 2025 13:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESWC4G6R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762CC269883;
+	Tue, 18 Feb 2025 13:33:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55782269890;
-	Tue, 18 Feb 2025 13:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B060623BF9A;
+	Tue, 18 Feb 2025 13:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885552; cv=none; b=RY2ucnp/Kc1N2yVCqDHoPRp+SDaOhWlCgBXrl2rcXwoGtt7UT6n1HyfEYgbhl9HIRTCBprNk15ZL2YxX/eLH/mjjvL+P59QujI1emXMFypWvwlvJWznDafZglrvv9nQyR0d3IwuIqlXtM2Hh8xgnFQ8iA8XRImXdNJMwm3Y3viE=
+	t=1739885593; cv=none; b=lO42VZCBjSgNmrPGOCk+OhuVfx23vXppJiYFB0G8spXRv9mdjoTEq6JoQRHfCoqITXAd78HabHl1RQz4KMn3NVQywKIpWcu+3FSkaehoHMb5AL81Rix6c7UFDG48TELz9haE3lipctBOFbO4caMR4LNVc9CStJxH9AWBit4sVw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885552; c=relaxed/simple;
-	bh=DPfGQkoaGGA7K17sBH7fBSpRKAqhiuP0N7V+15GQphA=;
+	s=arc-20240116; t=1739885593; c=relaxed/simple;
+	bh=zw9wPD0cZ2Lg1Lu+CaJQbG9ZVlJ4oAHyJaPkVTDGwck=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PkaksKMRHu+pYRrvhl9ZamWQ6/KNy62ML4ZvU561aO72pmPr+qq6OWVSzW4lYWyKCOXGfCKTkJ10WJf37EpHoF9RkG5kohyxMO5EjC0e3A2TrhtEmQyfL/MsFnCfIovx7j78yBPLM3zdVF37YFMkiICdRIr6NlbhoOnCJK6bQSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESWC4G6R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D167FC4CEE2;
-	Tue, 18 Feb 2025 13:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739885551;
-	bh=DPfGQkoaGGA7K17sBH7fBSpRKAqhiuP0N7V+15GQphA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ESWC4G6Romjw6Pv/gO2Hy9zQInAVopYDpFnb7BVKi014JquWmNOFtPsdpCe83vzwZ
-	 e7tnieDLWisVcNxmJyPOkEmttiiHSoTxNOUkiHbFKWDzOPsGD4/fjiPyYCbIgAL7j6
-	 r61C10zQUaixkf1j23E4K7y+dh07zkA/cGdMYxjSxNtOXgQhw4f9ji6davVvpkEAbl
-	 B0jbhX4wRo8qWBLx4VTK9aqc52+6A/lqcHYcAiC/eb8hCNd+XTL4jPegus6gbjoZvh
-	 RomL4ZhhVS9yc2NNI90pjzceVugHuVov70nqkPmp9vp2gzY/yBgNN5aElHOKGoN7AX
-	 6cj2dWTFlypeg==
-Date: Tue, 18 Feb 2025 13:32:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com
-Subject: Re: [PATCH v10 02/26] sfc: add basic cxl initialization
-Message-ID: <20250218133227.GW1615191@kernel.org>
-References: <20250205151950.25268-1-alucerop@amd.com>
- <20250205151950.25268-3-alucerop@amd.com>
- <20250207130342.GS554665@kernel.org>
- <679b8737-8655-456e-949a-63db07a71d2b@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gP6p8moEBvOuc0ijC0w/jSsRq78mx/t8CG9QjgMrssxEwcUDjumwHbBTrLf8xMU5ggWulb9+4uLAP9rIoLgUBu6xygGKRj8ZFAH6hoSz9LGwI8JDRrWwKKAjlAmFO6Z3va9ekwAW/pKLGpt+DIvvLY7lwA4BBTwjdqveLh6+bt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-abb90f68f8cso448455166b.3;
+        Tue, 18 Feb 2025 05:33:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739885590; x=1740490390;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fWiUlVTiHOeTkc4pIfg7w83qDgdyows487uF1rjzqiU=;
+        b=qM5/T9GE6GodZ21wedeB25hK6aP/rIXEUhXYYDgXNc31CfhtgPGyO9+3lTPW0RSDhz
+         CjEsOuINR9xv2jY9OySISRHtcJ9cBXJK3fiduKtJkusC/tcLIQY/RJYKEi4pu6Pqev1D
+         +TDFlwZzpCJe8Ip+knnPKOm6ux9NShK9fE8GeeONUcTd6FBo28lFpwBfP+/OixcZZfLk
+         Spcz1N1Ep0Wv1pnNyMfa5jjCC6KyYhhdq4vqzwkNDVIs6cHOGhezYUkaqVB2DlE9Ussr
+         2XH+fHaGL8doGlkhu8UPknoNj5VEGYx+2rmlnKuMPbTYftjWJhcLkOUm2XPcOXjO4guV
+         MY6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVZFAXYQEIu6h1s5gINrT/JT0+0Kxey0w1lojDmY779gTZHsx1L5ufA7QSoRn0/9B5wMlaF+FtQrZTCL9I=@vger.kernel.org, AJvYcCWfymFj6Bc3ojHYWoJxcl7ICvC5kas6ORxSSydJFBvBg4ySlQ/QMov571GdIAPXiwspQozCG7KdECvkLFssJ/7i4kp+@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGmgwrNHCf9pcsnToL0DqpGJ4GwjPYknfL9z45dWRVMNb3wob2
+	kABz5aV0ZlKXppyr3G4VoWn9igdkgJB9RVqzEoAcs+CASiIz4lq2
+X-Gm-Gg: ASbGncvAfywzWzFOHH4cEMkkipyUkPwYHgXh/7IUmdAOkA+m4eAJEsbmGcxOG+OTkb8
+	uPcTssa8m8Jh20Z2I31INa7+EZsgUj81XyFG3TDio2S9WT60j/ETrx40ymk5d2pst1QVBddamUV
+	veW7DV7PplEZwr0jtCVWbsRfPfUU3BACt/dIXeikkn4rWRXnZhGkZm5242vz6u/k21PylEOtNpw
+	vv7FbZdd2iIITejBXifvDvfE2SxDMP6p5KIeOz/RvOGDG/upff+bJJRZ+BrB5l96n01eZ85QdpJ
+	XB2N4Q==
+X-Google-Smtp-Source: AGHT+IFda2Nj++VmsOMVFkxsPwtVMktXaY7BoajbEeCSOP7w+ytjkjbjYtnmMKjhRF5VvfmGgiymLQ==
+X-Received: by 2002:a17:906:6a03:b0:ab7:4632:e3df with SMTP id a640c23a62f3a-abb70c266e1mr1481278566b.31.1739885589578;
+        Tue, 18 Feb 2025 05:33:09 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abbaa99f283sm254406166b.32.2025.02.18.05.33.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 05:33:09 -0800 (PST)
+Date: Tue, 18 Feb 2025 05:33:06 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-trace-kernel@vger.kernel.org, kernel-team@meta.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>
+Subject: Re: [PATCH net-next v2] trace: tcp: Add tracepoint for
+ tcp_cwnd_reduction()
+Message-ID: <20250218-honored-pronghorn-of-focus-ffabb2@leitao>
+References: <20250214-cwnd_tracepoint-v2-1-ef8d15162d95@debian.org>
+ <cc84f98f-d3d6-499e-9d2f-47eaeb56aad3@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,69 +85,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <679b8737-8655-456e-949a-63db07a71d2b@amd.com>
+In-Reply-To: <cc84f98f-d3d6-499e-9d2f-47eaeb56aad3@redhat.com>
 
-On Mon, Feb 17, 2025 at 01:11:41PM +0000, Alejandro Lucero Palau wrote:
-> 
-> On 2/7/25 13:03, Simon Horman wrote:
-> > On Wed, Feb 05, 2025 at 03:19:26PM +0000, alucerop@amd.com wrote:
-> > > From: Alejandro Lucero <alucerop@amd.com>
-> > > 
-> > > Create a cxl_memdev_state with CXL_DEVTYPE_DEVMEM, aka CXL Type2 memory
-> > > device.
-> > > 
-> > > Make sfc CXL initialization dependent on kernel CXL configuration.
-> > > 
-> > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > > ---
-> > >   drivers/net/ethernet/sfc/Kconfig      |  5 +++
-> > >   drivers/net/ethernet/sfc/Makefile     |  1 +
-> > >   drivers/net/ethernet/sfc/efx.c        | 16 ++++++-
-> > >   drivers/net/ethernet/sfc/efx_cxl.c    | 60 +++++++++++++++++++++++++++
-> > >   drivers/net/ethernet/sfc/efx_cxl.h    | 40 ++++++++++++++++++
-> > >   drivers/net/ethernet/sfc/net_driver.h | 10 +++++
-> > >   6 files changed, 131 insertions(+), 1 deletion(-)
-> > >   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
-> > >   create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
-> > > 
-> > > diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
-> > > index 3eb55dcfa8a6..0ce4a9cd5590 100644
-> > > --- a/drivers/net/ethernet/sfc/Kconfig
-> > > +++ b/drivers/net/ethernet/sfc/Kconfig
-> > > @@ -65,6 +65,11 @@ config SFC_MCDI_LOGGING
-> > >   	  Driver-Interface) commands and responses, allowing debugging of
-> > >   	  driver/firmware interaction.  The tracing is actually enabled by
-> > >   	  a sysfs file 'mcdi_logging' under the PCI device.
-> > > +config SFC_CXL
-> > > +	bool "Solarflare SFC9100-family CXL support"
-> > > +	depends on SFC && CXL_BUS && !(SFC=y && CXL_BUS=m)
-> > > +	depends on CXL_BUS >= CXL_BUS
-> > Hi Alejandro,
+Hello Paolo,
+
+On Tue, Feb 18, 2025 at 01:53:15PM +0100, Paolo Abeni wrote:
+> On 2/14/25 6:07 PM, Breno Leitao wrote:
+> > Add a lightweight tracepoint to monitor TCP congestion window
+> > adjustments via tcp_cwnd_reduction(). This tracepoint enables tracking
+> > of:
+> > - TCP window size fluctuations
+> > - Active socket behavior
+> > - Congestion window reduction events
 > > 
-> > I'm confused by the intent of the line above.
-> > Could you clarify?
+> > Meta has been using BPF programs to monitor this function for years.
+> > Adding a proper tracepoint provides a stable API for all users who need
+> > to monitor TCP congestion window behavior.
+> > 
+> > Use DECLARE_TRACE instead of TRACE_EVENT to avoid creating trace event
+> > infrastructure and exporting to tracefs, keeping the implementation
+> > minimal. (Thanks Steven Rostedt)
+> > 
+> > Given that this patch creates a rawtracepoint, you could hook into it
+> > using regular tooling, like bpftrace, using regular rawtracepoint
+> > infrastructure, such as:
+> > 
+> > 	rawtracepoint:tcp_cwnd_reduction_tp {
+> > 		....
+> > 	}
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> > ---
+> > Changes in v2:
+> > - Close the parenthesis in a new line to honor the tcp.h format (Jakub).
+> > - Add the bpftrace example in the commit message (Jakub)
+> > - Link to v1: https://lore.kernel.org/r/20250207-cwnd_tracepoint-v1-1-13650f3ca96d@debian.org
 > 
-> 
-> Dan original comments will do:
-> 
-> https://lore.kernel.org/all/677ddb432dafe_2aff429488@dwillia2-xfh.jf.intel.com.notmuch/
+> For future similar situations, note that it's expected to carry-on the
+> tag already collected in the previous versions, since the delta is only
+> cosmetic.
 
-Thanks, that makes things a bit clearer.
-But do you mean:
+That is fair. I simply forgot about it. Sorry about it.
 
- depends on CXL_BUS >= SFC
-
-Rather than:
-
- depends on CXL_BUS >= CXL_BUS
-
-Because the line above appears to be a truism.
-
-> 
-> 
-> > > +	default SFC
-> > >   source "drivers/net/ethernet/sfc/falcon/Kconfig"
-> > >   source "drivers/net/ethernet/sfc/siena/Kconfig"
-> > ...
-> 
 
