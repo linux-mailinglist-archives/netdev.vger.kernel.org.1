@@ -1,109 +1,122 @@
-Return-Path: <netdev+bounces-167528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336A2A3AAD2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:25:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C61CA3AADF
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:30:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA6E7188B68B
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:26:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7373C188BFB8
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA731C84DA;
-	Tue, 18 Feb 2025 21:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684411D90D7;
+	Tue, 18 Feb 2025 21:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="FS95BqjC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dB6SDTqO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D4D1C6FFD
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 21:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF551DA116
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 21:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739913954; cv=none; b=ScttfbxxjJBp4eT3/nXJ9XoLTa9U3Iu7tnWLVMw22/9t4pFfWc1l5e6KheAiY0tvv2NLXOe/audwwjyMwAB9POdIdudvPajgniIb4jJERV6q9oxfqE4rg75hM/PfbMp0N6JUjjfN5O4/CICl8jLCVh5XadY+gQyxuDhWMtTrcsc=
+	t=1739914163; cv=none; b=K8N+i9o/EqUSw2Ch98tIIWv+C0FUvKRY00VVwF3Vo4d8xnHX5lAtH/urB56EGRLUoRQR46y6sA0p9huTHJ8xKsgC3ZPhY1SV24QJ1e77LNa4O3FD5mEInEUQUVqgd2xI1t3k5j2bCLjmsFnNJ6KirOp1iDiYsw420hZrr2s/W6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739913954; c=relaxed/simple;
-	bh=h4/2Ifu71s1+Qsdc2hbTYe1Z8ycfoZcWEq0JTHVjgUE=;
+	s=arc-20240116; t=1739914163; c=relaxed/simple;
+	bh=mUGdxQzECTuLuha/z7AhxqZ7/DDCXV6fprGA577woO0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgPQgnwJ7+ZKG9a2HBQI1czi3CZkzimSagv3pGIU2qT7fy/5c2Gfjw0jJjWzptvYCRjwJhesVeZwtlQgEArJ8T54XxgRRfOwqZrzuK/aNSnw3cRqp+0roCKCB7vge/GJDbWa5A9Lggis80ydMWO/KOvfzeCLXsnEkpRTpNxUwuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=FS95BqjC; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c0ade6036aso22491385a.0
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:25:52 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=nSkE5JOLqGML9tO61wDbrTez/XTFHFv2UT61f5XgE5QtApTSk526kVc2vxlarDcgtwua64Ju30D806vFqYIh3Mnx9QrC19pD9fc6qy1rE+PYihiuZIIpxJoJZ+atSzcJPYTTARgJ+YTNcDY2CSwnWTVvVz+zZZYg/79amNxSoPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dB6SDTqO; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-220c4159f87so80083685ad.0
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:29:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739913951; x=1740518751; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2B9HcEB8su+I6sy6fueVdBm/jXwAuJHPoAC9KvMC6uA=;
-        b=FS95BqjCz6xWQfV7KowP+cwXZpXZ7oS1qw366293xTOGd6s+22prT/7RjPqYAyPeLv
-         DIb0uuCDqS9k08pAbb4WVxnhaPYfLAgfOMdgabtfFoc4NmO64olX1DA/NLe0i1qG8o+x
-         ugoKCwty4Cuc6NtrUg8XodXwOQg/I50zCmPWQ=
+        d=gmail.com; s=20230601; t=1739914161; x=1740518961; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nEj4UUxPHZAclT8rJKVvArxaN1Wsq3hx3VsHKowSfIE=;
+        b=dB6SDTqOtC1HNicoteKTxLw6wX9mdaB1QmhnNmhHR9aRLhV8+PDHyFAV5LtxccLBin
+         1asn56AmO6UNDMq+Zcp0r3Fl/uOpJEFCd4BskbCKxdo8/Z8cezDMuzpfVK1GoAB/fP/d
+         p2pyj+TKQ0SXsxPAR8r84+o+s+3VJoASGXvbsTw7tqXWFE49Z3fgQnMf8Aqa/JoBq3l+
+         pRpp2+h9vfaEpOpebAaX/A2z+XrhFlpXiD0Z85aLsFeuWS116Crz4SWIC0UQHkriR8X7
+         KkFdpB9ja4SrTzVIrN3BGi3pCAJbcb1uOOjNqhM0xR1C1TUqcRLOX0MZIB9bdP7ewePc
+         lftA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739913951; x=1740518751;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2B9HcEB8su+I6sy6fueVdBm/jXwAuJHPoAC9KvMC6uA=;
-        b=SlFm/ndaDPQnadn/SlPyRpA0TGgyE0fm1fh2GEH2k0NHsFNECD/jJS4ZyvhrA875jP
-         RnP8dLiM71AqKGbGj1EMZs9JV7XIw9Gu8Ni99ukaXNAvdUYsxha4GIq+Sh2kjLBcShZ1
-         L5HTH0EJUeQP/1wMO/RqwahNkbqekWJKwMrtBl6PUvy2bUQxL+9Tnl8TqSnOdjy3L+Vn
-         M4SPJDRiWqVdsB3jfGJVP7bd0KHOqFReeVR/yCocT4GBjup0ByTznckh3DXpmFVSPOL7
-         d+wFey4VB71Rtc5FJPyIJtHYq8+Uk/JYJ7PjjCqQfhl/NFQ1pXGv/SQM3CbqwGXFCIJg
-         I+sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVDRr4X5JEoq9tY8nsuL1p3P+7C6ChEKXwYqFRSWcalBtx4CNXwtzuFNlzLTb5sCXayHCxgsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXqs+GC1tSS4v+k79DEq80RzZvvH6zjfsAx9/B0YyyqF5dNaXE
-	3ZilaKsjjRFbFAlUuchZXL2Vg9AsOCOh3ypeW4aKoOsJhVyqRJaZ5s11IJyCHtA=
-X-Gm-Gg: ASbGncuOTmn98X5txqKRDVFFy6qFVq1fuysGJkKw5YNI7DjaG4B7iL7k28BoRp0jvLG
-	tcM0k3UV9M7wrsCBmHyssZ3/BaWz2taPtkd2S5tKzECRmGhHABBDQWz4RvuVZVGefQKNKGdvEbI
-	C8gXkVg3pL1vutmZYc/msX2+8DjMAEmLK1qPuTyX+1zgV35/NzMpOFnzx9Lk52scQz1cXge1OVn
-	yYoL8EByUTfwr59/g8/2PpkXB4C9He0ZO6vRS46//q1ZZ0NOwc+qwLXXiO9RWCSq5keWnbbZE2T
-	uI7WUohQjt/Qr8AH2Em1akdLMiEh72O0TM4JkjjD9QW9pmH/pLThoA==
-X-Google-Smtp-Source: AGHT+IGGMlJhuVPem1hvggd7sSQ6qaKplJpy7kdSeYAIc6J23V81FcXX0ixrsP14ifZSvYsR1hyRgw==
-X-Received: by 2002:a05:620a:27c1:b0:7c0:b422:e2ef with SMTP id af79cd13be357-7c0b4cdd42dmr217218785a.5.1739913951656;
-        Tue, 18 Feb 2025 13:25:51 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c096e87af7sm327894185a.79.2025.02.18.13.25.50
+        d=1e100.net; s=20230601; t=1739914161; x=1740518961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nEj4UUxPHZAclT8rJKVvArxaN1Wsq3hx3VsHKowSfIE=;
+        b=rQgycbrCJ9ouAI5axP46ggHjV6E6wnHj2arR6fqdOBshRPeOLvqjrhn2v+W0LfC8yj
+         NQWVhk8NkPE6RWaYvJ3pqPUAECOu4b9Ewjb/dRSchOckCUz95Anq61aHT71rzS5Q+K6o
+         dpggMEGUyxquytTYrcT0fNb81m0LCYZXUdbso8pzTk1INOrtcm+VZtXAc/lvpAKR0qrW
+         MV/ehUQVpkAek4oy5lDwClnsDbGXEzQonf9DIiD7zePX+H8n5vUdHXHWz4/IPY9wvngh
+         ry1hjee838u3w6I6Ps4G80ub0Bq+AJYx/Gv3DBTTKC2zWyh5tnekj8gqgMeZ/tjIk9GW
+         eMJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYKcUvQ5+VyIVrbKLwUfAVec7DNxsbKSY46dOpQW6VzErNmiMqMNwbDGZPYDzI7o+xsLQ8Blc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpiA5uNwqgT6gQS5PWlmyP3BBULkULq64JSq3d6BtBa8/7ajRc
+	yNycYgDpsM6wSOrR4fWIbgf6k0GSPtlGZTdpmGJbnLOA4hAM4+c=
+X-Gm-Gg: ASbGncudP5LosMqmieoG300ll6eb3m3GlTK38DZUg+AELRY+JO8Fc6DeuXM7HWJn2Qw
+	Z5dtrTkQXXZflg51qr9cAfxhgZ2DcVfQpMes2bCCiXv9jMXI1MqaDv8GLjtd524RqTxMcpn7NZB
+	LlG1nCHN820PsIJ4GFFCGj9bNyOrgJ+dTHP3Wyj/9E+ANxyvqyu/DlflHv3DpzOzXFfrF6v2nUV
+	0W684xKRfFwEQd0vu1Fu0wyA58En3ajNtEXW8QEeJcNMUdkXlkYNKcB2hzG/iMPLfFBuHRHKr6o
+	9ummqDKEy6btgVw=
+X-Google-Smtp-Source: AGHT+IEJkyhf3sPbUwAEZIZi6Eerg3IZeKwAUaN3SjW8yFEjdcWb5QYCmSywT7kmpeopQxITkP7W8Q==
+X-Received: by 2002:a17:902:dac5:b0:21f:140e:2929 with SMTP id d9443c01a7336-22103f16b04mr246715025ad.15.1739914161087;
+        Tue, 18 Feb 2025 13:29:21 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d5348f29sm93138605ad.37.2025.02.18.13.29.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 13:25:50 -0800 (PST)
-Date: Tue, 18 Feb 2025 16:25:48 -0500
-From: Joe Damato <jdamato@fastly.com>
+        Tue, 18 Feb 2025 13:29:20 -0800 (PST)
+Date: Tue, 18 Feb 2025 13:29:19 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
 	shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 4/4] selftests: drv-net: rename queues check_xdp
- to check_xsk
-Message-ID: <Z7T63MIQEdgrgWOU@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
-	hawk@kernel.org, petrm@nvidia.com, willemdebruijn.kernel@gmail.com
+	jdamato@fastly.com, willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next 2/4] selftests: drv-net: add a way to wait for a
+ local process
+Message-ID: <Z7T7r9VtuN78qhL6@mini-arch>
 References: <20250218195048.74692-1-kuba@kernel.org>
- <20250218195048.74692-5-kuba@kernel.org>
+ <20250218195048.74692-3-kuba@kernel.org>
+ <Z7T3NqZtfCA5C53W@mini-arch>
+ <20250218132122.278a9b00@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250218195048.74692-5-kuba@kernel.org>
+In-Reply-To: <20250218132122.278a9b00@kernel.org>
 
-On Tue, Feb 18, 2025 at 11:50:48AM -0800, Jakub Kicinski wrote:
-> The test is for AF_XDP, we refer to AF_XDP as XSK.
+On 02/18, Jakub Kicinski wrote:
+> On Tue, 18 Feb 2025 13:10:14 -0800 Stanislav Fomichev wrote:
+> > > +	env_str = getenv("KSFT_READY_FD");
+> > > +	if (!env_str)
+> > > +		return;
+> > > +
+> > > +	fd = atoi(env_str);
+> > > +	if (!fd)
+> > > +		return;  
+> > 
+> > optional nit: should these fail with error() instead of silent return?
+> > Should guarantee that the caller is doing everything correctly.
+> > (passing wait_init vs waiting for a port)
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/drivers/net/queues.py | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> My thinking was that you may want to run the helper manually during
+> development and then the env variable won't be set.
 > 
+> Given that we currently don't expose the stdout/stderr if wait fails
+> adding a print seemed a little performative..  We need to go back
+> and provide better support for debug (/verbose output) at some stage.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+Good point. In this case, we can fail only on the first case (!env_str);
+should still catch the wrong invocation and let you do KSFT_READY_FD= ./helper
+manual run. But agreed, that not worth the respin..
 
