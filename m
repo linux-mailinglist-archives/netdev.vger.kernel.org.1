@@ -1,105 +1,142 @@
-Return-Path: <netdev+bounces-167338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10D2A39DA0
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:37:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE56A39DDB
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE597A4C90
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:33:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B29D3BC991
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CCF26FD87;
-	Tue, 18 Feb 2025 13:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D55E26AAA4;
+	Tue, 18 Feb 2025 13:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4hpbTSP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Lz62ZmZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C58B26FA44;
-	Tue, 18 Feb 2025 13:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C7C269832
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885350; cv=none; b=uXz95558ODBy5MR1dGEjGLI453Y7yLFFilS22g6PRcwvC0XF7Q8QmZzDpSBZpcmtMtu4qGG5lqQfgefDCkyLgfmZ6diqpR9ZPYUd5YxCmns9a/s98WdkUvEQfhm6tq8C1CEdNqyV9yhbIUOSzEE3bNrEl1OP4bHtERQBVNdeWQM=
+	t=1739885540; cv=none; b=TEkCzqIoXT183XEoOossql6fDoAWB3lOSWuG0SsJlmaxGK1UZ9Z1bXEGB1fbN4iXr0kuVdhKc8K0oo+S/yZb6tKXHB2Txad0WMgCBGvq+csdryUZqzgfY3tj5Aqpa7iAJvy9fzlKNxzCl20xvETo4P/0cAOQjVMVx6w90K5Q3I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885350; c=relaxed/simple;
-	bh=D+giwnx2fldVt2NPCnwByiTTAhof1N0hesdxo6LjBJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cQsQ2hI/fUD5LIOEdezEzyGf/nT6xaIcaraYh1xSL9OoYQk7fxno6bN827V4wGk7dwYCcmSMYNUkyc6TTzYtpG09fv8KxsHcbiFh0O01uIFckjrS1KyGgmOUpHfY8ijVupU3cUCmaj9N0Kdk3+msdXwURIi5QT1W4LFzos65t8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4hpbTSP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD522C4CEE6;
-	Tue, 18 Feb 2025 13:29:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739885350;
-	bh=D+giwnx2fldVt2NPCnwByiTTAhof1N0hesdxo6LjBJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d4hpbTSPtTh3MMtyZt88Vf46BaWKT+sSyPtxQJOZqD89A4ZQO8FsNVncvcAR0Lhz5
-	 /nFUVxvSTo1BXCTN23SgZDvUOE33B2Li0fZsPelUexQlviKxP/aM8oaeY5FcY/Y2FM
-	 lf8s495WAAbSt7lBcgTW2XhIfbFQtbSyWMu9yveB1RQvJboxBzdfYNFArpytp079Cn
-	 DP8Z1sJSYTZnrqRbuUn9DPsNn+HxZhx4abMPO+6QvN689nHDFsuS56VcmBVokRu55C
-	 s/PMGVlT6YzQkJKAsNQ9l5+2ZEDWFnLSjwoVV2MQBw15SaHVzcZuP2+X6TFXOj2Qu8
-	 GCs/vV5uSsDvg==
-Date: Tue, 18 Feb 2025 13:29:05 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Peter Seiderer <ps.report@gmx.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
-	Nam Cao <namcao@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>
-Subject: Re: [PATCH net-next v5 8/8] net: pktgen: use defines for the various
- dec/hex number parsing digits lengths
-Message-ID: <20250218132905.GV1615191@kernel.org>
-References: <20250213110025.1436160-1-ps.report@gmx.net>
- <20250213110025.1436160-9-ps.report@gmx.net>
- <20250214201145.2f824428@kernel.org>
- <20250216091739.GW1615191@kernel.org>
- <20250217094740.76a25671@kernel.org>
+	s=arc-20240116; t=1739885540; c=relaxed/simple;
+	bh=N4g6QUKBv0hrbd2d5K+Izcwtyx7UVmTbogTjheFSivA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Co/pi2SiT7GG+RQGCyrhlcckvP+XebhDjSOYjp7tEKdInoOr0jXDpm7TBkixcmEXGrw5Je6U95TvvKHIgf7APIj/cHNTMJObd6h/qExg5cUMkP69RmPxFv3+tVK4XzA0Ewu8Sbm6jcDMDStbHEwdkL+lUh1UMXyrPpkwWJXMLEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Lz62ZmZg; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739885527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1owyGoVG+hJEAVjlb29HvV4RQGKZjOiBR9fNEU4IJr4=;
+	b=Lz62ZmZg3QSh0KoZZwM44daV9czYvRMFJ+A0rEcLTqoVZYwUlbZhHmnfWyvN3z0GK3nkEg
+	H0XZjzUDTJxj3R/YLmui5jkFB4ShzJqVIe/QhDMYOXDUm/9p3ZGg8bIz5wA4PfNq/FVGZk
+	s1612+SxahwBJsB83LhhT4EBWxZTsWs=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.ne,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ricardo@marliere.net,
+	jiayuan.chen@linux.dev,
+	viro@zeniv.linux.org.uk,
+	dmantipov@yandex.ru,
+	aleksander.lobakin@intel.com,
+	linux-ppp@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mrpre@163.com
+Subject: [PATCH net-next v1 0/1] ppp: Fix KMSAN uninit-value warning
+Date: Tue, 18 Feb 2025 21:31:43 +0800
+Message-ID: <20250218133145.265313-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250217094740.76a25671@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 17, 2025 at 09:47:40AM -0800, Jakub Kicinski wrote:
-> On Sun, 16 Feb 2025 09:17:39 +0000 Simon Horman wrote:
-> > On Fri, Feb 14, 2025 at 08:11:45PM -0800, Jakub Kicinski wrote:
-> > > On Thu, 13 Feb 2025 12:00:25 +0100 Peter Seiderer wrote:  
-> > > > Use defines for the various dec/hex number parsing digits lengths
-> > > > (hex32_arg/num_arg calls).  
-> > > 
-> > > I don't understand the value of this patch, TBH.
-> > > 
-> > > Example:
-> > > 
-> > > +#define HEX_2_DIGITS 2
-> > > 
-> > > -		len = hex32_arg(&user_buffer[i], 2, &tmp_value);
-> > > +		len = hex32_arg(&user_buffer[i], HEX_2_DIGITS, &tmp_value);
-> > > 
-> > > The word hex is already there.
-> > > There is still a two.
-> > > I don't think the new define has any explanatory power?
-> > > 
-> > > Previous 7 patches look ready indeed.  
-> > 
-> > This one is on me. I felt the magic number 2 and so on
-> > was unclear. But if you prefer the code as-is that is fine by me too.
-> 
-> I agree that it's a bit hard to guess what the call does and what 
-> the arguments are. To me at least, the constants as named don't help. 
-> We can get a third opinion, or if none is provided skip the patch for
-> now?
+Syzbot caught an "KMSAN: uninit-value" warning [1], which is caused by the
+ppp driver not initializing a 2-byte header when using socket filters.
 
-Yes, I see your point.
-No objections from me to skipping this patch.
+Here's a detailed explanation:
+
+1. PPP protocol format
+The PPP protocol format looks like this:
+
+|<--------------------------      7 - 1508 bytes      --------------------------->|
++---0x7E---+---0xFF---+---0x03---+----------+---------------+----------+---0x7E----
+|   Flag   | Address  | Control  | Protocol | Information   |   FCS    |   Flag   |
+| 01111110 | 11111111 | 00000011 | 8/16bits |      *        | 16 bits  | 01111110 |
++----------+----------+----------+----------+---------------+----------+-----------
+
+
+2. Normal BPF program
+For example, when filtering IP over PPP, libpcap generates BPF
+instructions like this:
+
+(000) ldh [2]
+(001) jeq #0x21 jt 2 jf 3
+(002) ret #65535
+(003) ret #0
+
+2 bytes data are skipped by bpf program and then bpf program reads the
+'Protocol' field to determine if it's an IP packet. Clearly, libpcap
+assumes the packet starts from the Address field, just like the comment in
+'drivers/net/ppp/ppp_generic.c':
+/* the filter instructions are constructed assuming
+   a four-byte PPP header on each packet */
+
+Corresponding libpcap code is here:
+https://github.com/the-tcpdump-group/libpcap/blob/master/gencode.c#L1421
+
+
+3. Current problem
+The problem is that the skb->data generated by ppp_write() starts from the
+'Protocol' field.
+
+To correctly use the BPF filter program, a 2-byte header is added to
+simulate the presence of Address and Control fields. And then, after
+running the socket filter, it's restored:
+
+1768 *(u8 *)skb_push(skb, 2) = 1;
+1770 bpf_prog_run()
+1782 skb_pull(skb, 2);
+
+The thing is, only one byte of the new 2-byte header is initialized. For
+normal BPF programs generated by libpcap, uninitialized data won't be
+used, so it's not a problem.
+
+However, for carefully crafted BPF programs, such as those generated by
+syzkaller [2], which start reading from offset 0, the uninitialized data
+will be used and caught by KMSAN.
+
+4. Fix
+The fix is simple: initialize the entire 2-byte header.
+
+[1] https://syzkaller.appspot.com/bug?extid=853242d9c9917165d791
+[2] https://syzkaller.appspot.com/text?tag=ReproC&x=11994913980000
+
+Jiayuan Chen (1):
+  ppp: Fix KMSAN warning by initializing 2-byte header
+
+ drivers/net/ppp/ppp_generic.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+2.47.1
+
 
