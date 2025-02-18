@@ -1,80 +1,125 @@
-Return-Path: <netdev+bounces-167132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DD3A38FF4
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:33:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FFCA39001
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24B2F1889ED4
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:33:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79E3B171D60
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28518C2FA;
-	Tue, 18 Feb 2025 00:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAF8EED8;
+	Tue, 18 Feb 2025 00:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPYBCLh0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOd7vDmm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22788F40;
-	Tue, 18 Feb 2025 00:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72094EEC3;
+	Tue, 18 Feb 2025 00:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739838826; cv=none; b=aURGQQeFWKmyk19UP+D+UwilzDiwh9p+XxS2pOHkUCtFtldUqA6sibO2rPm7q+DUTPMbbi3MzNzRP3b8WDOuqN9J09lEeGROXqTl1dKCj2mwuBd/6U11UDwRwp4exX7BM2C/28L4JmUgkON6M0Qeq4BxfqU5sn2ZaOl8gokDF5A=
+	t=1739839203; cv=none; b=t7Jq8qaBvlvdEovYVgrpcqWKwogBY9GLeslZS6Dkjh9xP6fJOF5dJvayKHf3JRoQmTfR1aFWYIWJPLFRVJZ+i6dEuCIC6f/lW8smlQZia0U+ro5Gkdla/PqMibTPxbKa70JZ7bZ0BUVXoV2WeV5x3BCfWA2ROug64h2fdCpSg/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739838826; c=relaxed/simple;
-	bh=q0rcWJuVp3xACT0C9VSicr9GFn4icXokQr6eAKrie3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qsYOoUccQGAu3+nBR3GCJfOboJj1ver8iIILiEqNVuIAkkGfTjS7tKpC9xYeevSSiH+faQCRvuFAN7AjNnRjdHu538Is8bqf33R4hB+D03MG6CD9rzIznvuiamsyCuP42phcQRo5BCLRyI4mp+jC9po9S922o+t/4dYl/Jv/DQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPYBCLh0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9DF0C4CEE7;
-	Tue, 18 Feb 2025 00:33:44 +0000 (UTC)
+	s=arc-20240116; t=1739839203; c=relaxed/simple;
+	bh=V1WexgkaHOBQikIRrkTSn+Mq8VWyzkcWlkPtjI+FmYo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=a0nZbAHjaoIJDIL/zUcohFqxgJ4XCy5X7J1NVoijGYqEYvLuVE0JQx3KC72LwrNyMohiaX6gqXgc1QiiOMw9ooznrC2fgckNFJ3s1uh5i1idu1dLAITmKgDnpxCjJ/dfdxhet8aeez+TymiWvItZwQAv42zby7aob8SQ6tCxbbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOd7vDmm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCD7C4CED1;
+	Tue, 18 Feb 2025 00:40:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739838825;
-	bh=q0rcWJuVp3xACT0C9VSicr9GFn4icXokQr6eAKrie3U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mPYBCLh048/MnFcVIMotJk/mVcUUWpWas+X/Fc8SjrfAYhwoGKtg1cdviibGNNlAi
-	 TZZ9dSuu7lwyztrpCvdgBk7nqiRCZ1FQZ00o8WuyLWvi7Wlm+7IEys0tBFIyRC9gME
-	 h2AutDLPaCjtbWodiIpi7WRwxoW5/jzv24b0mlrJWL1luB3Wv/CN7v/e/ylfuC90MF
-	 Ywi2g5E08uC+ZnvDdNQOwKdsoFRhkHV+YyBqe4IpBDTAjtpcY801kZXeVqa1zRicsM
-	 GN55nDjb2nFlRsSlMEBJW/JBk18clBkNuhf4mz5Ro3S7VvFt4gRN2teIsxYChfgT4R
-	 vovoJ7QSaYYbw==
-Date: Mon, 17 Feb 2025 16:33:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern
- <dsahern@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>, kuniyu@amazon.co.jp,
- ushankar@purestorage.com, Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH net v4 2/2] arp: switch to dev_getbyhwaddr() in
- arp_req_set_public()
-Message-ID: <20250217163344.0b9c4a8f@kernel.org>
-In-Reply-To: <20250213-arm_fix_selftest-v4-2-26714529a6cf@debian.org>
-References: <20250213-arm_fix_selftest-v4-0-26714529a6cf@debian.org>
-	<20250213-arm_fix_selftest-v4-2-26714529a6cf@debian.org>
+	s=k20201202; t=1739839202;
+	bh=V1WexgkaHOBQikIRrkTSn+Mq8VWyzkcWlkPtjI+FmYo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UOd7vDmmrtglsNxb5yzLz0WBcyZLNT25SO++ONfXoBEGn9fWi0Y6UK9Q7n9O+J8R+
+	 nlTo04rSl2sLPrI2rbfj4Tp2RI+AmVNOX0WvJ7PncUmztX9pUJm3V4Djh5y5SBPtLi
+	 cTBIfpt87CkDHN5Jtg6VDYinPb0HjM2Id0DbOuzhzkOsHMYPw9BLvLwiyGM4YMQ3S0
+	 eXtXV1EXEwSZK01z9Wpr3Jp2BRX1zsxKptDsOhUk23/mTCVNaCr6oXQ4J9ia+IjmnU
+	 eJ2SInEpCqiVpR/txeQe6Y5xgnvEMyvU+JceMnkaPGNluWhzj97NPsxuU6yCVbmFFU
+	 L9uvGfB+LECqQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3496D380CEE2;
+	Tue, 18 Feb 2025 00:40:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] drop_monitor: fix incorrect initialization order
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173983923302.3583210.2597018228565274704.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Feb 2025 00:40:33 +0000
+References: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: nhorman@tuxdriver.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ stable@vger.kernel.org
 
-On Thu, 13 Feb 2025 04:42:38 -0800 Breno Leitao wrote:
-> The arp_req_set_public() function is called with the rtnl lock held,
-> which provides enough synchronization protection. This makes the RCU
-> variant of dev_getbyhwaddr() unnecessary. Switch to using the simpler
-> dev_getbyhwaddr() function since we already have the required rtnl
-> locking.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 13 Feb 2025 15:20:55 +0000 you wrote:
+> Syzkaller reports the following bug:
 > 
-> This change helps maintain consistency in the networking code by using
-> the appropriate helper function for the existing locking context.
+> BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
+>  lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+> CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+ #1
+> Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x119/0x179 lib/dump_stack.c:118
+>  debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
+>  do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
+>  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
+>  _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
+>  reset_per_cpu_data+0xe6/0x240 [drop_monitor]
+>  net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
+>  genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
+>  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+>  genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
+>  netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
+>  genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+>  netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
+>  netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
+>  sock_sendmsg_nosec net/socket.c:651 [inline]
+>  __sock_sendmsg+0x157/0x190 net/socket.c:663
+>  ____sys_sendmsg+0x712/0x870 net/socket.c:2378
+>  ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
+>  __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
+>  do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
+>  entry_SYSCALL_64_after_hwframe+0x62/0xc7
+> RIP: 0033:0x7f3f9815aee9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
+> RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
+> RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
+> 
+> [...]
 
-I think you should make it clearer whether this fixes a splat with
-PROVE_RCU_LIST=y
+Here is the summary with links:
+  - [net,v2] drop_monitor: fix incorrect initialization order
+    https://git.kernel.org/netdev/net/c/07b598c0e6f0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
