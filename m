@@ -1,259 +1,85 @@
-Return-Path: <netdev+bounces-167138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A3FA39010
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:56:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD66A39015
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3EED188BDE3
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:56:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 482533B2DC7
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82D218AE2;
-	Tue, 18 Feb 2025 00:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DB4182BD;
+	Tue, 18 Feb 2025 01:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M45nmBlj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/z1+Mtw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D7E6FBF;
-	Tue, 18 Feb 2025 00:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F22D1FC8
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 01:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739840197; cv=none; b=B6JBUI2JbklDFIBoVw1lFFglXEDehqTgWVAIXHPuyKuE6dgQU7HkIVy6QP1uD7Ejq5coNSDv9l/b6ZBeHPafzzxlYq17zzZ53gnt6ak5mJozb4kSgDWBnsdD0BP5gLlfPdG4rHDdPYM6i9AhKfSUe69FLK0CxvEo0rWkvGr/QM4=
+	t=1739840409; cv=none; b=Vu3D0NWKJmc5jkC1qBPr2Alf6SRXf/hHfqy3W/nei3DBbB5SqJFjpZKovnlO7XelbT+KtuHmC6ODLNBQG9v6FQS7N9a2dNNUXafWlOh7wPDO8aN9DkoZMbjhn0g618I0xV1ZlxgcwZy9YLbwFBAuLO7fjSbDoIQ5R2CmlRZLr2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739840197; c=relaxed/simple;
-	bh=gktuXd4cZv4swI/Apa4j4BHzU8YLtNUEzVxA3MR771w=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=r64XPLEp75K3e2XPSbcWr9Bf/qc9YXxxa0j+l/pehxOsbsrops7bZqMC+kk8nzxMme6nZzeCsVOcQTxadIT48o4xrf+yU7VnlI7ltg8kFIwzgiznZRk6w96dMQAR+3ZIM/OSqziLw/p4gQcv8SbrPIvPvMM42c6eoYAdFNADito=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M45nmBlj; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-471ebfbad4dso16020771cf.3;
-        Mon, 17 Feb 2025 16:56:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739840195; x=1740444995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gktuXd4cZv4swI/Apa4j4BHzU8YLtNUEzVxA3MR771w=;
-        b=M45nmBljY4xrumXeRdEDbewZVpn6UjNHm5UmEaKxh8Q5uwXDZF6gtq7f8xZELHFrLE
-         kUbhKrHrHLAIMPHhZlCPOMZEfXSPBYiOk48SFi+jCJFXup8BTMx5smbS9jWG216AmAyz
-         3eu81XLIoT9aMKVbZjIAGfusCj+saBKntRI8Zy0Xi8ZXbXwdhugUFr2Ihgsku+oQNSup
-         Mwk18oHQIn1nul8/E6z1lmPZqytu4KtonlNnvE/yD8/1HCBWmzdqBqCJHkkAKTEyixGb
-         TkXFLh/KBNeBuni31OMO1UQiNLFdjn+S4aB4qSmam+eE1Qp0tt1mSH4shNLPHTaiC6tS
-         VY/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739840195; x=1740444995;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gktuXd4cZv4swI/Apa4j4BHzU8YLtNUEzVxA3MR771w=;
-        b=IZBN3mwtu1LnUQLjqcd4DdQqAr2ImFaCCgIsLGkLkBW8S+0U+R0LCR8DCi0nZGnL8l
-         QvsGEvabQCQ2JGy5LdbpW8OPIL055FpqxhQTi4UcmqkEykQ78YiZdQepWbTY0opSe0ve
-         hMh0gLLKoyNLo4BRp+jaQmZszvGWQn0s0Wxh4iF0HVYnbvdriaXLfqqXSgdJrtDmCLMo
-         xkzoUkcjgaWUEKlWI/4ey0SXMmVaxnbAITSY5IBubNXqbmaNBIQWdXAKuNkbtPZHSFDQ
-         R+EHrWmmtoLy1xhoMdrimI8cKsiZtton7L3+Mj7rt02288+lmoA+XFALerzIq8R57AQe
-         wfag==
-X-Forwarded-Encrypted: i=1; AJvYcCVRDXATb6QT27qlv98ixn6358GgzoHRAU1zZHpilCSvghq/dX8PptpVLHRRp3F0eSXy5g7hNrqw@vger.kernel.org, AJvYcCVfjRG+IlHLsCuIjUqNI1jEjDvx2HBkiYtpxx8vnJNBcBGwx/1QJtJ4Hr4jem0JjDUUSds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrahgpdtZhxzDODiQ866/VxIbrZ+LTxjQAjl7Ur6KLbnB3dj67
-	erlwQzyhloAKp7241XM021rhNHN3rH2Pob+bpinjMxxkb54TvY3b
-X-Gm-Gg: ASbGncuqVLOE3vb6ZFdsXtErWVbNjSvg0pjz8JABtDfqLxDElvgzVdR5n8dMbVAmWFS
-	GqkWzJpoGOqjlgNzBu/G/ho0iySkW1OVj5TtEnBU/rXSZ/KgcambOftczWG8i10LXoAE8BEn1q7
-	Ib1p6HdLokbg2+52mDVNGjgKmdHBGpbrEmwL2YfGrPks5aKhci7bXRSN4+jy+uBeS6WXQ6t315f
-	VbbC5QlCNLsQKNbnh8YVK484XCeWEJj3o88+H37DYqifDujPmsbHp2TwZnBGxCt1QL0djXgBbUW
-	3D7i95UwVBVz8Qhpqt3mLUIpe414VW7v+H/kmzHczlRhTHeu6iaAcCpKkZ6n5aM=
-X-Google-Smtp-Source: AGHT+IF9NR7nqD8yxi/sGp27VLl3DjdQI9WOiYGth2oO8ho51Nn61uuHTQINzedSfZgfnRle7+2TPQ==
-X-Received: by 2002:a05:622a:1aa5:b0:471:ba31:ce8c with SMTP id d75a77b69052e-471dbd237e2mr210189801cf.13.1739840195000;
-        Mon, 17 Feb 2025 16:56:35 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471f4766a48sm12911111cf.52.2025.02.17.16.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 16:56:34 -0800 (PST)
-Date: Mon, 17 Feb 2025 19:56:33 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- horms@kernel.org, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <67b3dac192f76_c0e25294c8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoAjdaBPZE96T=YrgtZVUZNTmFpXr8C2+iVXLSZKB+01cA@mail.gmail.com>
-References: <20250214010038.54131-1-kerneljasonxing@gmail.com>
- <20250214010038.54131-9-kerneljasonxing@gmail.com>
- <67b0ad8819948_36e344294a7@willemb.c.googlers.com.notmuch>
- <CAL+tcoAJHSfBrfdn-Cmk=9ZkMNSdkGYKJbZ0mynn_=qU9Mp1Ag@mail.gmail.com>
- <67b0d831bf13f_381893294f4@willemb.c.googlers.com.notmuch>
- <CAL+tcoDhtBFjVBMWObHq3LaSNXgJN_UWBVONAqD=t7CRYN_PAg@mail.gmail.com>
- <89989129-9336-4863-a66e-e9c8adc60072@linux.dev>
- <CAL+tcoDB=Vv=smpP9rUaj3tug2Vt6dQz9Ay8DRxMwAs-Q9iexg@mail.gmail.com>
- <67b1f7f02320f_3f936429436@willemb.c.googlers.com.notmuch>
- <CAL+tcoCWmzFvz=GtbmfVoDwacTDXi2XeHt-Fc10rxc5S2WMN_Q@mail.gmail.com>
- <CAL+tcoAjdaBPZE96T=YrgtZVUZNTmFpXr8C2+iVXLSZKB+01cA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v11 08/12] bpf: add BPF_SOCK_OPS_TS_HW_OPT_CB
- callback
+	s=arc-20240116; t=1739840409; c=relaxed/simple;
+	bh=3qhUEoGS5t2QpJiBlNQB2GUjVFY+33g+tgBbzW2LEdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tf7Y5B3R1zwHZSmzzj0DgzQ92eHLFMhq9PJ/dnGzLJcXx63Ixm2ZEh0KN/vvennhXurhp3BmWOpd9NE1qSzKHZLopx10+UHa7gsYzSm+HjA/VlL2NApcTABsjD/rLGkQA44PPgsyfeZa2jqtKiKW4f2meForOgYOl3u1wbNwsfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b/z1+Mtw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F398C4CED1;
+	Tue, 18 Feb 2025 01:00:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739840408;
+	bh=3qhUEoGS5t2QpJiBlNQB2GUjVFY+33g+tgBbzW2LEdA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b/z1+MtwKk5PEUwcWPjHcqCpfXNf2yGtq2O3GSmcINhL6p0imJXWtw2HMUKpRP1SI
+	 RQ57IAnR9qg3pp0Ngf8rYgqMqJeCmgB5JaaJ0LutnsA6AQOMtIDN/foANt2u2+wJuC
+	 e7tS/quxELfFdHnBwRvnp64BHMoqwwWG3z9ktAIspeqqA4vV0Bf6AWbTDk8RWb2dTk
+	 AnM+HZwzLEHz6UokPZSD4JlZHU9OF96nsDJwD2iUQyGHb1EYEcBIq/oAJJovH2AuAa
+	 Md+KOrwNsBQUW631+r/VM37yK+08vROlot+Eg2K4TZHhsMoZ4bt/1XrVjyzfeb0WPH
+	 5nc71aeF3sxtg==
+Date: Mon, 17 Feb 2025 17:00:07 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH net-next] net: sfp: add quirk for 2.5G OEM BX SFP
+Message-ID: <20250217170007.5ab408d1@kernel.org>
+In-Reply-To: <20250215-lkmsub-v1-1-1ffd6ae97229@birger-koblitz.de>
+References: <20250215-lkmsub-v1-1-1ffd6ae97229@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Jason Xing wrote:
-> On Sun, Feb 16, 2025 at 10:45=E2=80=AFPM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> >
-> > On Sun, Feb 16, 2025 at 10:36=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > On Sun, Feb 16, 2025 at 6:58=E2=80=AFAM Martin KaFai Lau <martin.=
-lau@linux.dev> wrote:
-> > > > >
-> > > > > On 2/15/25 2:23 PM, Jason Xing wrote:
-> > > > > > On Sun, Feb 16, 2025 at 2:08=E2=80=AFAM Willem de Bruijn
-> > > > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > > >>
-> > > > > >> Jason Xing wrote:
-> > > > > >>> On Sat, Feb 15, 2025 at 11:06=E2=80=AFPM Willem de Bruijn
-> > > > > >>> <willemdebruijn.kernel@gmail.com> wrote:
-> > > > > >>>>
-> > > > > >>>> Jason Xing wrote:
-> > > > > >>>>> Support hw SCM_TSTAMP_SND case for bpf timestamping.
-> > > > > >>>>>
-> > > > > >>>>> Add a new sock_ops callback, BPF_SOCK_OPS_TS_HW_OPT_CB. T=
-his
-> > > > > >>>>> callback will occur at the same timestamping point as the=
- user
-> > > > > >>>>> space's hardware SCM_TSTAMP_SND. The BPF program can use =
-it to
-> > > > > >>>>> get the same SCM_TSTAMP_SND timestamp without modifying t=
-he
-> > > > > >>>>> user-space application.
-> > > > > >>>>>
-> > > > > >>>>> To avoid increasing the code complexity, replace SKBTX_HW=
-_TSTAMP
-> > > > > >>>>> with SKBTX_HW_TSTAMP_NOBPF instead of changing numerous c=
-allers
-> > > > > >>>>> from driver side using SKBTX_HW_TSTAMP. The new definitio=
-n of
-> > > > > >>>>> SKBTX_HW_TSTAMP means the combination tests of socket tim=
-estamping
-> > > > > >>>>> and bpf timestamping. After this patch, drivers can work =
-under the
-> > > > > >>>>> bpf timestamping.
-> > > > > >>>>>
-> > > > > >>>>> Considering some drivers doesn't assign the skb with hard=
-ware
-> > > > > >>>>> timestamp,
-> > > > > >>>>
-> > > > > >>>> This is not for a real technical limitation, like the skb =
-perhaps
-> > > > > >>>> being cloned or shared?
-> > > > > >>>
-> > > > > >>> Agreed on this point. I'm kind of familiar with I40E, so I =
-dare to say
-> > > > > >>> the reason why it doesn't assign the hwtstamp is because th=
-e skb will
-> > > > > >>> soon be destroyed, that is to say, it's pointless to assign=
- the
-> > > > > >>> timestamp.
-> > > > > >>
-> > > > > >> Makes sense.
-> > > > > >>
-> > > > > >> But that does not ensure that the skb is exclusively owned. =
-Nor that
-> > > > > >> the same is true for all drivers using this API (which is no=
-t small,
-> > > > > >> but small enough to manually review if need be).
-> > > > > >>
-> > > > > >> The first two examples I happened to look at, i40e and bnx2x=
-, both use
-> > > > > >> skb_get() to get a non-exclusive skb reference for their ptp=
-_tx_skb.
-> > > > >
-> > > > > I think the existing __skb_tstamp_tx() function is also assigni=
-ng to
-> > > > > skb_hwtstamps(skb). The skb may be cloned from the orig_skb fir=
-st, but they
-> > > > > still share the same shinfo. My understanding is that this patc=
-h is assigning to
-> > > > > the shinfo earlier, so it should not have changed the driver's =
-expectation on
-> > > > > the skb_hwtstamps(skb) after calling __skb_tstamp_tx(). If ther=
-e are drivers
-> > > > > assuming exclusive access to the skb_hwtstamps(skb), probably i=
-t is something
-> > > > > that needs to be addressed regardless and should not be the com=
-mon case?
-> > > >
-> > > > Right, it's also what I was trying to say but missed. Thanks for =
-the
-> > > > supplementary info:)
-> > >
-> > > That existing behavior looks dodgy then, too.
-> > >
-> > > I don't have time to look into it deeply right now. But it seems to=
- go
-> > > back all the way to the introduction of hw timestamping in commit
-> > > ac45f602ee3d in 2009.
-> >
-> > Right. And hardware timestamping has been used for many years, I pres=
-ume.
-> >
-> > >
-> > > I can see how it works in that nothing else holding a clone will
-> > > likely have a reason to touch those fields. But that does not make =
-it
-> > > correct.
-> > >
-> > > Your point that the new code is no worse than today probably is tru=
-e.
-> >
-> > Right.
-> >
-> > > But when we spot something we prefer to fix it probably. Will need =
-a
-> > > deeper look..
-> >
-> > Got it. I added it to my to-do list. If you don't mind, I plan to tak=
-e
-> > a deep look in March and then get back to you because recently I'm
-> > occupied by many things. I need to study some of the drivers that
-> > don't use skb_get() there.
-> >
-> =
+On Sat, 15 Feb 2025 07:29:44 +0100 Birger Koblitz wrote:
+> The OEM SFP-2.5G-BX10-D/U SFP module pair is meant to operate with
+> 2500Base-X. However, in their EEPROM they incorrectly specify:
+> Transceiver codes   : 0x00 0x12 0x00 0x00 0x12 0x00 0x01 0x05 0x00
+> BR, Nominal         : 2500MBd
+> 
+> Use sfp_quirk_2500basex for this module to allow 2500Base-X mode anyway.
+> Tested on BananaPi R3.
 
-> Oh, sorry, I forgot to ask: what should we do next regarding this serie=
-s ?
+better, the patch looks correct now :)
 
-Please resubmit with the two remaining small issues addressed:
+our checkers flagged that the maintainers were not CCed:
 
-- Martin's point about moving code to patch 8
-- Remove unused variable
+ Missing CC:
+   andrew@lunn.ch 
+   linux@armlinux.org.uk 
+   edumazet@google.com 
+   hkallweit1@gmail.com 
+   pabeni@redhat.com 
 
-
+Could you repost one more time, and make sure these addresses are CCed
+(per scripts/get_maintainer.pl) ?
+-- 
+pw-bot: cr
 
