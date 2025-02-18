@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-167228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42391A393D2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:35:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD1AA393D6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:37:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39DB8188871E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:35:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0404616EF80
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40431B85DF;
-	Tue, 18 Feb 2025 07:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6734F1B85E4;
+	Tue, 18 Feb 2025 07:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0a8AMSt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWgr0778"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BFB182BD;
-	Tue, 18 Feb 2025 07:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1F7482;
+	Tue, 18 Feb 2025 07:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739864122; cv=none; b=VRxfIRA2l+v+rmdrEAgnWql3igqf47j6hMBkmgj57wM03iTndYRH6AHkkx2RncPIaojOBdDHLI2xzUUNzO+mioMwdpT+OCtwScaxGCB+CjIa88iVCLvFzHeniNoVbe+htfYgy2CPpkvbVxMKLmNeeXz1DHodsxUzVCDPsEJHIPo=
+	t=1739864233; cv=none; b=Uf1UZp6Zwb8YnIG6k2kYg4yduUCOFkW8/mPY/jD+2kJ0gLIt+5e1xXpliwMmVELXfLLocgzAzoRf3fuNNL+rDdj+VLYtA9SMAD3y/oUxEJm6/r7q5onDYX5BhME7IQdo7onbEqeG+90SAdG9xsFVjHc5Vkt5cpKdpxYKKG9mSlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739864122; c=relaxed/simple;
-	bh=Sgy5q+4uhLggtzYVrIERv0e63cBiHocC6TBqgwZQm0s=;
+	s=arc-20240116; t=1739864233; c=relaxed/simple;
+	bh=rHPdrQ2R4tIc9vjiIZ/Zr4xqp3jsk+xgImcAQGo2rqI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ClDqXDzxcTtsKb5cDj6nXLIjeJ0QLqK3YqiNhiz7BUWxUS6tKlGUJpAOPuid9U70SMS7zRbknLePEc/u3oo6i0C2bBViW2WK0dKur0RFipB9sFXjBvwrhra3kqGwf0M59+PvvCUFOeuPMD+UbLAmC06CqrdOsAZHCCjD+Y07448=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0a8AMSt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E7F3C4CEE2;
-	Tue, 18 Feb 2025 07:35:20 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tgCZnPU74lhB2xs4uWylVMR8XBGryW5JLltFlU1AaV0WmmiB2xAK9IpCZeX4qsN+Lbs2oY8lq5YXPZI1EVdmIF6LKCi2gHf+2Qh6D73MoQ5aY1W4k4CAXt+ZZD3zZIDe/yBbhUMcp4Ot85c2U7j5h52gGw1lMHX4R8hKvYPUDBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWgr0778; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0903AC4CEE2;
+	Tue, 18 Feb 2025 07:37:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739864121;
-	bh=Sgy5q+4uhLggtzYVrIERv0e63cBiHocC6TBqgwZQm0s=;
+	s=k20201202; t=1739864232;
+	bh=rHPdrQ2R4tIc9vjiIZ/Zr4xqp3jsk+xgImcAQGo2rqI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o0a8AMStt2thyGJAQ6qKC66ZI62l8N0TwL8jSQUbglAPxVw2zcz1pvEij9ZcxKR3M
-	 6KjmHa8gqzm3FLIfQ/uUjdyykWXGdg+qAxhELWK3o4R8TgJEzMo1VJ2B0eNfLa+ddZ
-	 VFTQmwhq47Oo8MkLSGIXg15erGX1+U+AeCVT6ft/dHgwpeRFgTg2/vQJnWyaOWtvTJ
-	 WfjJMlUYxQdgwUN/8NuB47Pylmrj1m+AvVLCfnP7H3rptyucSu+rvssw36RlPI40WZ
-	 0M4/Y9Fl+Rb2gZj5pgg6Rb+tdp6Zhsr0k+7zXhLsDMt0qPgdVPTL3fUkOIme/EQw/6
-	 LCU3LxrNVaQbg==
-Date: Tue, 18 Feb 2025 08:35:18 +0100
+	b=EWgr0778EQEcAmFbQlNT+nT/KNYZ4SKqJCtyez4pOLFV/1CyA+H4jbh2/8GzXpxmZ
+	 DSETZ78SCIhcwM/TzPSV695GL4T/7p4N+gs3bfWzLZvYHwU+D/KtTAdB8mRlVKqRmy
+	 dCJDNcp0QrgjM8NXLLp9558+VXlHGG281dDwe1jkP7+0baHL48O3bI1QAdl4hYm2Zr
+	 Z5vB4WYwjJJhdNmM9OTO12kvY4xK1clkZap3ZXjPQBRTWPE14/EI65IIpODmCL1PVh
+	 jTX6JbbRD6KLa2iCfx9DID3jGOtQpawzwklNLTUGFFW/GM+85Km67CVrgDEj51623m
+	 /3cclq2Kyl5vg==
+Date: Tue, 18 Feb 2025 08:37:09 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Kyle Hendry <kylehendrydev@gmail.com>
 Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, 
@@ -53,11 +53,10 @@ Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?Q?Fern=C3=A1ndez?= Rojas <noltari@gmail.com>, 
 	Jonas Gorski <jonas.gorski@gmail.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] dt-bindings: mfd: brcm: add gphy controller to
- BCM63268 sysctl
-Message-ID: <20250218-fearless-statuesque-zebra-3e79a8@krzk-bin>
+Subject: Re: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
+Message-ID: <20250218-lumpy-arrogant-orangutan-adeec8@krzk-bin>
 References: <20250218013653.229234-1-kylehendrydev@gmail.com>
- <20250218013653.229234-6-kylehendrydev@gmail.com>
+ <20250218013653.229234-2-kylehendrydev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,55 +65,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250218013653.229234-6-kylehendrydev@gmail.com>
+In-Reply-To: <20250218013653.229234-2-kylehendrydev@gmail.com>
 
-On Mon, Feb 17, 2025 at 05:36:44PM -0800, Kyle Hendry wrote:
-> Add documentation for BCM63268 gphy controller in the
-> bcm63268-gpio-sysctl register range.
+On Mon, Feb 17, 2025 at 05:36:40PM -0800, Kyle Hendry wrote:
+> This patch adds support for the internal gigabit PHY on the
+
+Please do not use "This commit/patch/change", but imperative mood. See
+longer explanation here:
+https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+
+> BCM63268 SoC. The PHY has a low power mode that has can be
+> enabled/disabled through the GPHY control register. The
+> register is passed in through the device tree, and the
+> relevant bits are set in the suspend and resume functions.
 > 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
-> ---
->  .../bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml     | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml b/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
-> index 9c2a04829da5..99610a5f2912 100644
-> --- a/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
-> +++ b/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
-> @@ -50,6 +50,15 @@ patternProperties:
->        should follow the bindings specified in
->        Documentation/devicetree/bindings/pinctrl/brcm,bcm63268-pinctrl.yaml.
->  
-> +  "^gphy_ctrl@[0-9a-f]+$":
 
-Read DTS coding style.
+...
 
-> +    # Child node
-> +    type: object
-> +    $ref: /schemas/mfd/syscon.yaml
-
-No, not really... how is syscon a child of other syscon? Isn't the other
-device the syscon?
-
-This looks really fake hardware description, like recent bootlin claim that
-"one register in syscon is device".
-
-> +    description:
-> +      Control register for GPHY modes. This child node definition
-> +      should follow the bindings specified in
-> +      Documentation/devicetree/bindings/mfd/syscon.yaml
+> +int bcm63268_gphy_resume(struct phy_device *phydev)
+> +{
+> +	int ret;
 > +
->  required:
->    - "#address-cells"
->    - compatible
-> @@ -191,4 +200,8 @@ examples:
->            pins = "dsl_gpio9";
->          };
->        };
-> +      gphy_ctrl: gphy_ctrl@54 {
-> +      compatible = "brcm,bcm63268-gphy-ctrl", "syscon";
+> +	ret = bcm63268_gphy_set(phydev, true);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = genphy_resume(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +int bcm63268_gphy_suspend(struct phy_device *phydev)
 
-Messed indentation.
+Why these are not static? Where is EXPORT_SYMBOL and kerneldoc?
+
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_suspend(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = bcm63268_gphy_set(phydev, false);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int bcm63268_gphy_probe(struct phy_device *phydev)
+> +{
+> +	struct device_node *np = dev_of_node(&phydev->mdio.bus->dev);
+> +	struct mdio_device *mdio = &phydev->mdio;
+> +	struct device *dev = &mdio->dev;
+> +	struct bcm_gphy_priv *priv;
+> +	struct regmap *regmap;
+> +	int err;
+> +
+> +	err = devm_phy_package_join(dev, phydev, 0, 0);
+> +	if (err)
+> +		return err;
+> +
+> +	priv = devm_kzalloc(dev, sizeof(struct bcm_gphy_priv), GFP_KERNEL);
+
+sizeof(*)
+
+> +	if (!priv)
+> +		return -ENOMEM;
+> +
+> +	phydev->priv = priv;
+> +
+> +	regmap = syscon_regmap_lookup_by_phandle(np, "brcm,gphy-ctrl");
+
+No. ABI break without any explanation in commit msg.
 
 Best regards,
 Krzysztof
