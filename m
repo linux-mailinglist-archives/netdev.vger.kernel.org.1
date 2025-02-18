@@ -1,278 +1,236 @@
-Return-Path: <netdev+bounces-167164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EEA2A39092
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:47:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3589AA39097
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:48:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46077171460
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:47:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5764A7A3F18
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D4B8249F;
-	Tue, 18 Feb 2025 01:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C72613777E;
+	Tue, 18 Feb 2025 01:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEk7WWFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8A03A1B6;
-	Tue, 18 Feb 2025 01:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FE6219FC;
+	Tue, 18 Feb 2025 01:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739843242; cv=none; b=gPCabOoZxxgNiWAcXgjL+QdzTJoR2WwlmO1yCy5Zjb9BVTulBLZ/zGJ+W2aKRWKLnlUw7hgx5cqZe4Mh1+oIwDJLvNPi9XbnYw/DcYW9L9xEju03Dd8cpWjmm5XU3+gSCQWwB4aznW6KqPKFBomE8KeMngUmiT6De8HeYxC6tJs=
+	t=1739843258; cv=none; b=ZCW1soHSPuOfXQACEzfjQQoOXB+JrgCNifx2R+q8/bD+cgo7DYQZmm5aR5cMzLJ0K063m1O+dmCSQnrAm/NB6TDVrm8OdHuoHC9bpastLZSUnIBYHg3GWpRr0lvDtvpHb2+N5+lp1KfSJfLDUgVsR3PPbPE864ndlnOyRmBYeOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739843242; c=relaxed/simple;
-	bh=a4vCrPgAH/CQc0B0F3CNtgmIzbEM7spI8PQVPfELnlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jIUsp0vwEwdJ8snUzcYRI8SYwIk8hm2bR0odB2xYvU4DFUoTnyZ9dg6wNezwm7oEEoRLrM4hEWmt22hGICOTDgWxiM0Xbu7qm0S4+WtYO0xsKC3xWQuiKuQa9AyWAvueKw1i5ADtaJ0kz09ztfyc/XLsaLn1jhXNZNR6/sNN4Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Yxj5y5lswzcq51;
-	Tue, 18 Feb 2025 09:45:42 +0800 (CST)
-Received: from kwepemg200008.china.huawei.com (unknown [7.202.181.35])
-	by mail.maildlp.com (Postfix) with ESMTPS id 78BAB140136;
-	Tue, 18 Feb 2025 09:47:16 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemg200008.china.huawei.com (7.202.181.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 18 Feb 2025 09:47:15 +0800
-Message-ID: <30ac5cb5-ee1f-66fc-641f-5f42140f0045@huawei.com>
-Date: Tue, 18 Feb 2025 09:47:15 +0800
+	s=arc-20240116; t=1739843258; c=relaxed/simple;
+	bh=MD0O++YsPWI7g9h2EbnImSYEctbv5gi+1ZvRA2ioAg4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=YcChCDfsiHD1qPtY8FUfL/0qbLTAJvzThfaEv0QJ7YeX8ScH0N+qzgh534zmlPcZPZlGsqYCIGvVOEHjAv3X4mCh0G7oAB6wMZ9DEwkfeFCoLLV5mfYdXho04dMw3g6a/GQQgQIMlZ9UuHWUxS3KqdWdQXGm1U/lAS+TxmxirGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEk7WWFK; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-471fe5e0a80so4487661cf.1;
+        Mon, 17 Feb 2025 17:47:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739843256; x=1740448056; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A2cOjmO89AYodXPo11gNtDewEZteT2LNDBnbm1wOXKY=;
+        b=CEk7WWFKhKLQ4CzCFitMPBQj4WSH6C1YrG3XPYuf4x+Ljls8uMzEUL74ucBTRMaz6B
+         1H5Ww90rW0RrHwCqrN4sySo2pnudFB835Txy1T2ZDX18a0fML26Q4nMfdbJw4fvpEQG8
+         UZ3wK6+77X0n99XdSEBdJ/c1hOaD23S1UysxtBeSPHsHbLrqurEgbAQJhjgPDAOhnAg5
+         xKkusZFhYlPuAe4EEWXfuG6HdQjN48E7YoZLNyTYHN0xKTe9dKOt1ZrTOUvb2rHlwxCW
+         YALWjrdKDHjXT2NMFawOgdMWRhPp0EXo04U2ahDCrbu5YGWmJ4LyedXd4cVALmyCzBkU
+         iuVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739843256; x=1740448056;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A2cOjmO89AYodXPo11gNtDewEZteT2LNDBnbm1wOXKY=;
+        b=tTfDrnFc1TBoNg/6g8RkmqPvv2mVqsR5H1XQCluadQy842jrRKio4Ulpo/1uL+Q87S
+         q29hseNWz2/5AQ9SVgNQ1UdxKFH2qtZyo6cm2AIvg72QRodq5Sr1L1oRFOHYIl6eNxnl
+         3mK3caPyhTCMMm3sZzqEC3kM64+rgK+qDJZWMx5VfuOYG6fFBNw+wMrSsr7giCMLLx3Z
+         0lPU5RHDtrO3Ykef2MxJd0p/T2xwfk0Dr4HRrvA++maohUlkJ6molVORjAbHHYyPPB2P
+         BcASuAsZQD76Bk5yrmjqbg5zSd173kTK/WxwwEPfcjlI8rdtYS5JSaskkFqE0Di62GPa
+         oNWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBiG8YL1BdJ38K1EOqzWUOJWynEhveMa6iHcaNG7OuJFZAjH2iAcwyzmv7zBga5Qss7ZY=@vger.kernel.org, AJvYcCWYehNfMgLuKnwdxdzcoh1JoIivFO9PWqmExe2mb7aPOsjBNxfp7GSH9hNS8xynDSb2uAe6i6XA@vger.kernel.org, AJvYcCWj9sfQjHoVhML8x4iJO+ikRmJnr13uMxbGCHJnfbmdEs2ra6ad2+wqKj+AkFcWy8dX2kk6eh4CZUS0GEDdeNJ7@vger.kernel.org, AJvYcCX8z6imlkDcmdudHdgqZxgPxDNmfC3OpuOujHbJ2ezfA4/0tGkU/AtPRBqrhfyXJZd2IIpiGqebe9JCU8O9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3OKQOyQEFTLle0eHFVpMm2zBqJetQqrIwYtkfQdJZwHoSfv7u
+	rGGh/etptj5oi7/9B/QTU1kUDkJpartRX/kitQSylAPsMnaB1rUC
+X-Gm-Gg: ASbGnctpqwVd+CjNCGTGMdyhRUpAlW0ephcEP7gb+tu47eRanssBL4mTbLKc4+c5y9g
+	sOtq7auamY31FwJES3GfcAbIg6QWyN3qnz6FZmBnOBu0EFzR3fZNBZoZo2HnE8cS3Ho2YpbuHnQ
+	33krX+fU/IXnY7zvB0DoeBWqVUCr5C5yz3E9ScjEA1Mh8QC1zBMv6+45ml3jvvouumv4ZtwftNm
+	oMWrpwBpGpSHE4LS0z0J3con3mkau9TF2idG7cd8m0jTv3379m9tRGFYfhlA8CMgL89ekGZWWnU
+	BjFGMjba4JC44g+j2Z2n4KhJVvRbJa6dRWgt0nEcBNzBFmZfNdONmXrVfxmWnx8=
+X-Google-Smtp-Source: AGHT+IFGgETKhlo/uMkwC6itYIAoHfWPc1J6iqltxry1ghsVvueLEc/nCmHXq/x8V7O65Ks6+inS6Q==
+X-Received: by 2002:ac8:7c47:0:b0:471:97db:60d4 with SMTP id d75a77b69052e-471dbe8d755mr137648981cf.45.1739843255555;
+        Mon, 17 Feb 2025 17:47:35 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471c2a130adsm53812931cf.26.2025.02.17.17.47.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 17:47:35 -0800 (PST)
+Date: Mon, 17 Feb 2025 20:47:34 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ mykolal@fb.com, 
+ shuah@kernel.org, 
+ hawk@kernel.org, 
+ marcus.wichelmann@hetzner-cloud.de
+Message-ID: <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
+References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
+ <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
+Subject: Re: [PATCH bpf-next v2 2/6] net: tun: enable transfer of XDP metadata
+ to skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next v5 00/27] io_uring zerocopy send
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, <io-uring@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>, Willem de
- Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, David Ahern
-	<dsahern@kernel.org>, <kernel-team@fb.com>
-References: <cover.1657643355.git.asml.silence@gmail.com>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <cover.1657643355.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg200008.china.huawei.com (7.202.181.35)
+
+Marcus Wichelmann wrote:
+> When the XDP metadata area was used, it is expected that the same
+> metadata can also be accessed from TC, as can be read in the description
+> of the bpf_xdp_adjust_meta helper function. In the tun driver, this was
+> not yet implemented.
+> 
+> To make this work, the skb that is being built on XDP_PASS should know
+> of the current size of the metadata area. This is ensured by adding
+> calls to skb_metadata_set. For the tun_xdp_one code path, an additional
+> check is necessary to handle the case where the externally initialized
+> xdp_buff has no metadata support (xdp->data_meta == xdp->data + 1).
+> 
+> More information about this feature can be found in the commit message
+> of commit de8f3a83b0a0 ("bpf: add meta pointer for direct access").
+> 
+> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+> ---
+>  drivers/net/tun.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index c95ab9c46bd2..3dde6cd29a84 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1604,7 +1604,8 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
+>  
+>  static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
+>  				       struct page_frag *alloc_frag, char *buf,
+> -				       int buflen, int len, int pad)
+> +				       int buflen, int len, int pad,
+> +				       int metasize)
+>  {
+>  	struct sk_buff *skb = build_skb(buf, buflen);
+>  
+> @@ -1613,6 +1614,8 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
+>  
+>  	skb_reserve(skb, pad);
+>  	skb_put(skb, len);
+> +	if (metasize)
+> +		skb_metadata_set(skb, metasize);
+>  	skb_set_owner_w(skb, tfile->socket.sk);
+>  
+>  	get_page(alloc_frag->page);
+> @@ -1672,6 +1675,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
+>  	char *buf;
+>  	size_t copied;
+>  	int pad = TUN_RX_PAD;
+> +	int metasize = 0;
+>  	int err = 0;
+>  
+>  	rcu_read_lock();
+> @@ -1699,7 +1703,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
+>  	if (hdr->gso_type || !xdp_prog) {
+>  		*skb_xdp = 1;
+>  		return __tun_build_skb(tfile, alloc_frag, buf, buflen, len,
+> -				       pad);
+> +				       pad, metasize);
+>  	}
+>  
+>  	*skb_xdp = 0;
+> @@ -1734,12 +1738,18 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
+>  
+>  		pad = xdp.data - xdp.data_hard_start;
+>  		len = xdp.data_end - xdp.data;
+> +
+> +		/* It is known that the xdp_buff was prepared with metadata
+> +		 * support, so no additional check is necessary.
+> +		 */
+> +		metasize = xdp.data - xdp.data_meta;
+>  	}
+>  	bpf_net_ctx_clear(bpf_net_ctx);
+>  	rcu_read_unlock();
+>  	local_bh_enable();
+>  
+> -	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad);
+> +	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad,
+> +			       metasize);
+>  
+>  out:
+>  	bpf_net_ctx_clear(bpf_net_ctx);
+> @@ -2456,6 +2466,7 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  	struct sk_buff_head *queue;
+>  	u32 rxhash = 0, act;
+>  	int buflen = hdr->buflen;
+> +	int metasize = 0;
+>  	int ret = 0;
+>  	bool skb_xdp = false;
+>  	struct page *page;
+> @@ -2510,6 +2521,10 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+>  	skb_put(skb, xdp->data_end - xdp->data);
+>  
+> +	metasize = max(xdp->data - xdp->data_meta, 0);
+
+Can xdp->data_meta ever be greater than xdp->data?
+
+This is pointer comparison, which is tricky wrt type. It likely is
+ptrdiff_t and thus signed. But may want to use max_t(long int, ..) to
+make this explicit.
+
+> +	if (metasize)
+> +		skb_metadata_set(skb, metasize);
+> +
+
+Not strictly needed. As skb_metadata_clear is just
+skb_metadata_set(skb, 0). But also not wrong, so fine to keep.
+
+>  	if (virtio_net_hdr_to_skb(skb, gso, tun_is_little_endian(tun))) {
+>  		atomic_long_inc(&tun->rx_frame_errors);
+>  		kfree_skb(skb);
+> -- 
+> 2.43.0
+> 
 
 
-
-On 2022/7/13 4:52, Pavel Begunkov wrote:
-> NOTE: Not to be picked directly. After getting necessary acks, I'll be
->       working out merging with Jakub and Jens.
-> 
-> The patchset implements io_uring zerocopy send. It works with both registered
-> and normal buffers, mixing is allowed but not recommended. Apart from usual
-> request completions, just as with MSG_ZEROCOPY, io_uring separately notifies
-> the userspace when buffers are freed and can be reused (see API design below),
-> which is delivered into io_uring's Completion Queue. Those "buffer-free"
-> notifications are not necessarily per request, but the userspace has control
-> over it and should explicitly attaching a number of requests to a single
-> notification. The series also adds some internal optimisations when used with
-> registered buffers like removing page referencing.
-> 
->>From the kernel networking perspective there are two main changes. The first
-> one is passing ubuf_info into the network layer from io_uring (inside of an
-> in kernel struct msghdr). This allows extra optimisations, e.g. ubuf_info
-> caching on the io_uring side, but also helps to avoid cross-referencing
-> and synchronisation problems. The second part is an optional optimisation
-> removing page referencing for requests with registered buffers.
-> 
-> Benchmarking UDP with an optimised version of the selftest (see [1]), which
-
-Hi, Pavel, I'm interested in zero copy sending of io_uring, but I can't
-reproduce its performance using zerocopy send selftest test case, such
-as "bash io_uring_zerocopy_tx.sh 6 udp -m 0/1/2/3 -n 64", even baseline
-performance may be the best.
-
-               MB/s
-NONZC         8379
-ZC            5910
-ZC_FIXED      6294
-MIXED         6350
-
-And the zero-copy example in [1] does not seem to work because the
-kernel is modified by following commit:
-
-https://lore.kernel.org/all/cover.1662027856.git.asml.silence@gmail.com/
-
-Can you help me reproduce this performance test result? Is it necessary
-to configure better parameters to reproduce the problem?
-
-
-> sends a bunch of requests, waits for completions and repeats. "+ flush" column
-> posts one additional "buffer-free" notification per request, and just "zc"
-> doesn't post buffer notifications at all.
-> 
-> NIC (requests / second):
-> IO size | non-zc    | zc             | zc + flush
-> 4000    | 495134    | 606420 (+22%)  | 558971 (+12%)
-> 1500    | 551808    | 577116 (+4.5%) | 565803 (+2.5%)
-> 1000    | 584677    | 592088 (+1.2%) | 560885 (-4%)
-> 600     | 596292    | 598550 (+0.4%) | 555366 (-6.7%)
-> 
-> dummy (requests / second):
-> IO size | non-zc    | zc             | zc + flush
-> 8000    | 1299916   | 2396600 (+84%) | 2224219 (+71%)
-> 4000    | 1869230   | 2344146 (+25%) | 2170069 (+16%)
-> 1200    | 2071617   | 2361960 (+14%) | 2203052 (+6%)
-> 600     | 2106794   | 2381527 (+13%) | 2195295 (+4%)
-> 
-> Previously it also brought a massive performance speedup compared to the
-> msg_zerocopy tool (see [3]), which is probably not super interesting. There
-> is also an additional bunch of refcounting optimisations that was omitted from
-> the series for simplicity and as they don't change the picture drastically,
-> they will be sent as follow up, as well as flushing optimisations closing the
-> performance gap b/w two last columns.
-> 
-> For TCP on localhost (with hacks enabling localhost zerocopy) and including
-> additional overhead for receive:
-> 
-> IO size | non-zc    | zc
-> 1200    | 4174      | 4148
-> 4096    | 7597      | 11228
-> 
-> Using a real NIC 1200 bytes, zc is worse than non-zc ~5-10%, maybe the
-> omitted optimisations will somewhat help, should look better for 4000,
-> but couldn't test properly because of setup problems.
-> 
-> Links:
-> 
->   liburing (benchmark + tests):
->   [1] https://github.com/isilence/liburing/tree/zc_v4
-> 
->   kernel repo:
->   [2] https://github.com/isilence/linux/tree/zc_v4
-> 
->   RFC v1:
->   [3] https://lore.kernel.org/io-uring/cover.1638282789.git.asml.silence@gmail.com/
-> 
->   RFC v2:
->   https://lore.kernel.org/io-uring/cover.1640029579.git.asml.silence@gmail.com/
-> 
->   Net patches based:
->   git@github.com:isilence/linux.git zc_v4-net-base
->   or
->   https://github.com/isilence/linux/tree/zc_v4-net-base
-> 
-> API design overview:
-> 
->   The series introduces an io_uring concept of notifactors. From the userspace
->   perspective it's an entity to which it can bind one or more requests and then
->   requesting to flush it. Flushing a notifier makes it impossible to attach new
->   requests to it, and instructs the notifier to post a completion once all
->   requests attached to it are completed and the kernel doesn't need the buffers
->   anymore.
-> 
->   Notifications are stored in notification slots, which should be registered as
->   an array in io_uring. Each slot stores only one notifier at any particular
->   moment. Flushing removes it from the slot and the slot automatically replaces
->   it with a new notifier. All operations with notifiers are done by specifying
->   an index of a slot it's currently in.
-> 
->   When registering a notification the userspace specifies a u64 tag for each
->   slot, which will be copied in notification completion entries as
->   cqe::user_data. cqe::res is 0 and cqe::flags is equal to wrap around u32
->   sequence number counting notifiers of a slot.
-> 
-> Changelog:
-> 
->   v4 -> v5
->     remove ubuf_info checks from custom iov_iter callbacks to
->     avoid disabling the page refs optimisations for TCP
-> 
->   v3 -> v4
->     custom iov_iter handling
-> 
->   RFC v2 -> v3:
->     mem accounting for non-registered buffers
->     allow mixing registered and normal requests per notifier
->     notification flushing via IORING_OP_RSRC_UPDATE
->     TCP support
->     fix buffer indexing
->     fix io-wq ->uring_lock locking
->     fix bugs when mixing with MSG_ZEROCOPY
->     fix managed refs bugs in skbuff.c
-> 
->   RFC -> RFC v2:
->     remove additional overhead for non-zc from skb_release_data()
->     avoid msg propagation, hide extra bits of non-zc overhead
->     task_work based "buffer free" notifications
->     improve io_uring's notification refcounting
->     added 5/19, (no pfmemalloc tracking)
->     added 8/19 and 9/19 preventing small copies with zc
->     misc small changes
-> 
-> David Ahern (1):
->   net: Allow custom iter handler in msghdr
-> 
-> Pavel Begunkov (26):
->   ipv4: avoid partial copy for zc
->   ipv6: avoid partial copy for zc
->   skbuff: don't mix ubuf_info from different sources
->   skbuff: add SKBFL_DONT_ORPHAN flag
->   skbuff: carry external ubuf_info in msghdr
->   net: introduce managed frags infrastructure
->   net: introduce __skb_fill_page_desc_noacc
->   ipv4/udp: support externally provided ubufs
->   ipv6/udp: support externally provided ubufs
->   tcp: support externally provided ubufs
->   io_uring: initialise msghdr::msg_ubuf
->   io_uring: export io_put_task()
->   io_uring: add zc notification infrastructure
->   io_uring: cache struct io_notif
->   io_uring: complete notifiers in tw
->   io_uring: add rsrc referencing for notifiers
->   io_uring: add notification slot registration
->   io_uring: wire send zc request type
->   io_uring: account locked pages for non-fixed zc
->   io_uring: allow to pass addr into sendzc
->   io_uring: sendzc with fixed buffers
->   io_uring: flush notifiers after sendzc
->   io_uring: rename IORING_OP_FILES_UPDATE
->   io_uring: add zc notification flush requests
->   io_uring: enable managed frags with register buffers
->   selftests/io_uring: test zerocopy send
-> 
->  include/linux/io_uring_types.h                |  37 ++
->  include/linux/skbuff.h                        |  66 +-
->  include/linux/socket.h                        |   5 +
->  include/uapi/linux/io_uring.h                 |  45 +-
->  io_uring/Makefile                             |   2 +-
->  io_uring/io_uring.c                           |  42 +-
->  io_uring/io_uring.h                           |  22 +
->  io_uring/net.c                                | 187 ++++++
->  io_uring/net.h                                |   4 +
->  io_uring/notif.c                              | 215 +++++++
->  io_uring/notif.h                              |  87 +++
->  io_uring/opdef.c                              |  24 +-
->  io_uring/rsrc.c                               |  55 +-
->  io_uring/rsrc.h                               |  16 +-
->  io_uring/tctx.h                               |  26 -
->  net/compat.c                                  |   1 +
->  net/core/datagram.c                           |  14 +-
->  net/core/skbuff.c                             |  37 +-
->  net/ipv4/ip_output.c                          |  50 +-
->  net/ipv4/tcp.c                                |  32 +-
->  net/ipv6/ip6_output.c                         |  49 +-
->  net/socket.c                                  |   3 +
->  tools/testing/selftests/net/Makefile          |   1 +
->  .../selftests/net/io_uring_zerocopy_tx.c      | 605 ++++++++++++++++++
->  .../selftests/net/io_uring_zerocopy_tx.sh     | 131 ++++
->  25 files changed, 1628 insertions(+), 128 deletions(-)
->  create mode 100644 io_uring/notif.c
->  create mode 100644 io_uring/notif.h
->  create mode 100644 tools/testing/selftests/net/io_uring_zerocopy_tx.c
->  create mode 100755 tools/testing/selftests/net/io_uring_zerocopy_tx.sh
-> 
 
