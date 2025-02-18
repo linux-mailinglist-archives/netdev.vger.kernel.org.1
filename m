@@ -1,140 +1,126 @@
-Return-Path: <netdev+bounces-167323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19133A39C21
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:29:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933B9A39C25
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10F49188DA2F
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 834493A631D
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDCC2417F7;
-	Tue, 18 Feb 2025 12:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="EWO1en5z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE27D2417FE;
+	Tue, 18 Feb 2025 12:29:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED17E9479;
-	Tue, 18 Feb 2025 12:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AA32417F7;
+	Tue, 18 Feb 2025 12:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739881753; cv=none; b=Wums2w867m61NE+1zp9jhiX7fK+S8yJ7Vi+BBbS57vCG9p3XX3I40JTTWq+xXIGUjwTbcVT85C4Cjya18dlADKYtAKjpyM3kB+4c/B8hMjPf5Qve8bT9+kpSZsRBdAr0njt4yKyStg3y8zo9Ruo2cIhWCNlYn0aMqUbNCLELSIQ=
+	t=1739881761; cv=none; b=hN/tI/nf+35FISOBrDSzZ/1OrTuGbqKU5EkmbjDtGXtKHAcwDM1mSNhaMuwBpbL7/br+fLHP4JY3wedrlAzEdM5L/1NtbRM56MflSD7i0+4FdVMbR4c5/eiwtzQMIOYpe7S6mOxlYqt4Lhi9E6rCYciko4ZerjI5GuDUqjTEh2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739881753; c=relaxed/simple;
-	bh=efmpp9iVcKx6fv05L3Xyb5BwKMnnItOAh1S/HkWfiVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WrohTGnTW20xE2/+6/KtPGL7jlRlBFEmJR8XnJWLuRlJc0lLgZ1Gxyq+MFVXPM7lEi3xIINXLD+avjHDNhim9JGhbcWUPQULsZyUP2MMKPxoMel8YrHWVf6rvY2o1h7H6LaslY49uNfNypfmpuTmRe7wJZrA0v2W1zKbzoj0seU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=EWO1en5z; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51ICSafl1670795
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Feb 2025 06:28:36 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1739881716;
-	bh=SGEjmL6AiEaHGdfRsy6AnNrW7FJmxRmggnhRMW4Zow0=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=EWO1en5zq8n48cQ7K/SNm/cWwkLYpAsYEFSKDuKUnCZqj/sR5zBrFl5R/+ERQ5hYN
-	 SY8+qykzvzgQq0iUOjy7WUSJ3azkEvoD+cd4lJgbUW1seHxtZrtAgUc9C7VRoVGJQR
-	 NYP0saM4W5NLD+Y2FkRiRjHC5HQZx7wk7GF5d+Jw=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51ICSacM070600
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 18 Feb 2025 06:28:36 -0600
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 18
- Feb 2025 06:28:35 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 18 Feb 2025 06:28:35 -0600
-Received: from [172.24.20.199] (lt9560gk3.dhcp.ti.com [172.24.20.199])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51ICSSYE102530;
-	Tue, 18 Feb 2025 06:28:28 -0600
-Message-ID: <94425bfd-7f2b-4fc4-86f8-a56e56173d22@ti.com>
-Date: Tue, 18 Feb 2025 17:58:27 +0530
+	s=arc-20240116; t=1739881761; c=relaxed/simple;
+	bh=tMVRAzuzBpRTZlihfsRY9cdts21bPdJ/6WhLJlq511k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QVOxArYpNbJBt3Z13LDMt42mCVvUTYdoGPDgE0Ld1dvgerw3I4SxYZWhwhTWr1vE4JaL0jPm8VF56CH2XzH1d2yYTA6bZ+0PeUUxwAkEHfRmQpUrfqv/7WTCtUOvCs2CXxX984R/1W1P92/OOq1hRXmf70ui+NEknkWEm1SUduM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30762598511so51381451fa.0;
+        Tue, 18 Feb 2025 04:29:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739881756; x=1740486556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h+VJIQ0ApMIfEX8niiA/w5UOINZk4mk6qd15CEV+pRs=;
+        b=uwXzOH6eaVOdI5dmlT8bqPljesLEhncN1lf5pLZZ5bov8357KYvNsseRqaX5VQvEil
+         FSvtTxw78C82eceJxzFt3v6P9hFqH4iOm7+O3QEixeM7XQjvdcGicIZs02FHs7QiB3ko
+         omfanrNzDihn42kqmmM56JJ5RuQ4So+Eaivexc4cauYl0Bcnq1qp/Zt9n32nxoDQ4eqJ
+         2dVgdJbMia/v55xgvIoYjfqTI6Ebs5R1uGpbzzPRM4msZLBs1DRjiqPGwNQwri/Ya+Ji
+         uyEnRzmKggrQwuwzynMxCJ8uEIl1RnU77rWsoXMPuaO/Egc34kvmCPVKLl30Vbw55Gln
+         CYTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbCvpIi+cqJTe2g11HGDucIsrZBuzBl+gOlycLWLjkYNSea2/Y94dzwqfL1dABpi8tP0JhGOM1A+4dd83A@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2GROJlTLDtBbDcnOaW0fGQ6P0FLC3wlbZBhBAl88DAF00vj3k
+	D7YpJruqpDSs2GLK2kXvgwTERPHGJBCLSp3TGGDO/a9qjlBVs1eOxvG8ipzNvA0=
+X-Gm-Gg: ASbGncv/mx7e+o2sP6BmZ8Ee3BkZ3ahcJf7P68t9Y8HcGfnuSWvhIFNJLc+XYReyq1i
+	kyq9u8z2j6PYn0894/++TmCZMvXqSPJTTPuPpyoubwQrAOrolInPcso7piUVdyP4WE4AAMds0lX
+	ZRIl043WXLJqVLedVuqjPpm2xHJmh5ctJAvRhSWwPPjry0OcJ3UrOAX6scdRiGJc1hfU36Wyz7F
+	WU2Z3icfgkdmUOkRpz2AHeZxhh9cD/IRNP2DqtdT0XliXGzsvg3biI72fYV3NGVP4AgwpD/eY+i
+	ctAgHpFyX1lAY6NoQmNLtp417LBGvi9AOa3WKM877ijsYYdo
+X-Google-Smtp-Source: AGHT+IHRJ4OuefJFzGrcxp3a99PyY/zCwGM+nBztZhpHnJZUfZvbuBwAxABp3dky7vx89bNLmnzLlA==
+X-Received: by 2002:a05:6512:238a:b0:545:2871:7cd5 with SMTP id 2adb3069b0e04-5452fe2e9e0mr5338187e87.15.1739881755308;
+        Tue, 18 Feb 2025 04:29:15 -0800 (PST)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5462bfe33f4sm136084e87.82.2025.02.18.04.29.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 04:29:15 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30a317e4c27so18774161fa.2;
+        Tue, 18 Feb 2025 04:29:15 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUZvEPLNv4ieTgg5xER8MBGCw9rDU8O8RIgPrVxMueNl+DNv5psvjsYVRMvc9gEiCvFQZYGmWyOcbvmv3F9@vger.kernel.org
+X-Received: by 2002:a2e:9995:0:b0:308:fac7:9cc9 with SMTP id
+ 38308e7fff4ca-30927a474acmr41266951fa.14.1739881754898; Tue, 18 Feb 2025
+ 04:29:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v2 1/3] net: ti: icssg-prueth: Use
- page_pool API for RX buffer allocation
-To: Diogo Ivo <diogo.ivo@siemens.com>, Roger Quadros <rogerq@kernel.org>,
-        <danishanwar@ti.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <u.kleine-koenig@baylibre.com>, <krzysztof.kozlowski@linaro.org>,
-        <dan.carpenter@linaro.org>, <schnelle@linux.ibm.com>,
-        <glaroque@baylibre.com>, <rdunlap@infradead.org>,
-        <jan.kiszka@siemens.com>, <john.fastabend@gmail.com>,
-        <hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
-References: <20250210103352.541052-1-m-malladi@ti.com>
- <20250210103352.541052-2-m-malladi@ti.com>
- <152b032e-fcd9-4d49-8154-92a475c0670c@kernel.org>
- <615a2e1f-5ee5-4d80-a499-8ff06596a2fc@ti.com>
- <c8bdd93d-5690-4b8a-819f-853756b57a71@siemens.com>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <c8bdd93d-5690-4b8a-819f-853756b57a71@siemens.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <Z7Rf2daOaf778TOg@shell.armlinux.org.uk> <E1tkKmN-004ObM-Ge@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tkKmN-004ObM-Ge@rmk-PC.armlinux.org.uk>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Tue, 18 Feb 2025 20:29:02 +0800
+X-Gmail-Original-Message-ID: <CAGb2v67xPoo-LQp9Z70yEBDXmgJTD=RvLP0tYYEXUJZr6B+Xkw@mail.gmail.com>
+X-Gm-Features: AWEUYZmOiTlBF_l0MM194DGfKDDxifchVc42QrgCh8BPzRfhHgMRNbv9Q3dSaz0
+Message-ID: <CAGb2v67xPoo-LQp9Z70yEBDXmgJTD=RvLP0tYYEXUJZr6B+Xkw@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: "speed" passed to fix_mac_speed
+ is an int
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Drew Fustini <drew@pdp7.com>, Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
+	Fabio Estevam <festevam@gmail.com>, Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>, 
+	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>, 
+	Jan Petrous <jan.petrous@oss.nxp.com>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, Kevin Hilman <khilman@baylibre.com>, 
+	linux-amlogic@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Minda Chen <minda.chen@starfivetech.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, 
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, NXP S32 Linux Team <s32@nxp.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Samuel Holland <samuel@sholland.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Shawn Guo <shawnguo@kernel.org>, Vinod Koul <vkoul@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Diogo,
+On Tue, Feb 18, 2025 at 6:25=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
+>
+> priv->plat->fix_mac_speed() is called from stmmac_mac_link_up(), which
+> is passed the speed as an "int". However, fix_mac_speed() implicitly
+> casts this to an unsigned int. Some platform glue code print this value
+> using %u, others with %d. Some implicitly cast it back to an int, and
+> others to u32.
+>
+> Good practice is to use one type and only one type to represent a value
+> being passed around a driver.
+>
+> Switch all of these over to consistently use "int" when dealing with a
+> speed passed from stmmac_mac_link_up(), even though the speed will
+> always be positive.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-On 2/18/2025 5:54 PM, Diogo Ivo wrote:
-> Hi Meghana, On 2/18/25 10: 10 AM, Malladi, Meghana wrote: > On 2/12/2025 
-> 7: 26 PM, Roger Quadros wrote: >> Can we get rid of SKB entirely from 
-> the management channel code? >> The packet received on this channel is 
-> never passed to
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
-> uvdgfB3F_Ow7QIXEnBKj3ybYT8I9yL0CM5RLkel44YW99zMeqk_TnCBkOwR0q45N5dLjtBz49EalJyUJ1-U1lPk6DIBve_3-$>
-> ZjQcmQRYFpfptBannerEnd
-> 
-> Hi Meghana,
-> 
-> On 2/18/25 10:10 AM, Malladi, Meghana wrote:
->> On 2/12/2025 7:26 PM, Roger Quadros wrote:
->>> Can we get rid of SKB entirely from the management channel code?
->>> The packet received on this channel is never passed to user space so
->>> I don't see why SKB is required.
->>>
->> 
->> Yes I do agree with you on the fact the SKB here is not passed to the 
->> network stack, hence this is redundant. But honestly I am not sure how 
->> that can be done, because the callers of this function access skb->data
->> from the skb which is returned and the same can't be done with page (how 
->> to pass the same data using page?)
->> Also as you are aware we are not currently supporting SR1 devices 
->> anymore, hence I don't have any SR1 devices handy to test these changes 
->> and ensure nothing is broken if I remove SKB entirely.
-> 
-> I have some SR1 devices available and would be happy to test these
-> proposed changes in case they are feasible.
-> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c       | 2 +-
 
-That's awesome. Once the changes have been aligned with Roger, I will 
-share the changes with you for testing before posting v3. Thanks for 
-your support.
-
-> Best regards,
-> Diogo
-> 
-
+Acked-by: Chen-Yu Tsai <wens@csie.org>
 
