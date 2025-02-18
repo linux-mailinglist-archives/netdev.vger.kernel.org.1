@@ -1,359 +1,121 @@
-Return-Path: <netdev+bounces-167424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1C6A3A3CD
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:13:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7ACA3A3DC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:16:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83A6B166E8E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:12:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADABB3AD7C4
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3F4272912;
-	Tue, 18 Feb 2025 17:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D11228CA5;
+	Tue, 18 Feb 2025 17:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lelzDAP6"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="cB5vqLgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B9927290D
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74157246348
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739898642; cv=none; b=fXtLL9xgGrPZmPzzp6p4Ehh7/jGuFJ0YjTJDxuTasLb4J/97h6e3vLHvcJiw0wWd9awJX74F8taUPKzG91lglOA5k5BLqaq+Ypzma7DtxsZdtLh9qb39ymp3jnzFLYVaFN3AyCwCd4C8ikooXlW8T0sfOnGMlxBHCslzAAdWnnY=
+	t=1739898826; cv=none; b=AwC+9QK8h456ZckNZRjG05S+OFmAIgJC0mAKc0gDOc2H0yABiwQtvxboGpQQG12XcNXcGwdYc5axMCOiUzEVPxw6jCTUYTiOAN5fjvF0jmVozJm8NjNZGqq0kx7n9tR/EhaAlrNow/ez1aO8ge8SnJHm26KRG31nnjWEi6/D+7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739898642; c=relaxed/simple;
-	bh=FaOkrmQL/Jr8gx0EIfzVSrV+9cb4Lx7AsLuN13P/+14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h4JxiVOerji2rWVGyQDoB4J3uCzyRJ2Lp8VjG7rgOxEM4t6rjrkT/rEBOiREhwlTpD0DM0mr4NQYIfCkb/DNT7vqnRjt/T6Hgg8BRjbYP48cghWCekEAdYGHrMQSSyUvgJd4/2sPTkrnBTej/71YeLaxGSVZWNQXcaOIHsWUBos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lelzDAP6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04EBAC4CEE2;
-	Tue, 18 Feb 2025 17:10:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739898641;
-	bh=FaOkrmQL/Jr8gx0EIfzVSrV+9cb4Lx7AsLuN13P/+14=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lelzDAP64XBYn4EutgpYRgeAHzU/V0wM/QvlC4b05TYMpB1Bo4gbFB0UfBTuXi+eU
-	 f/pxuslb/II6Pz7/VKt2nNZxEUCsIbmcj/tT/KpkNZwsV4WqlrumK33h7OI39tInXO
-	 OL/V9spkain51hptBLAat416dhBib8Swe5s6nPQ3DpuBtIE+aucYyOyZgYXCvJUvJA
-	 veSyrW+169+IHiSLkIRpXXXmO5TDjVZcqfwg/RCHj3JoVYLvzs2YUjcC0lFyp72/bT
-	 Y6cwATQSXIcfrUkN6QHO+UxQNdZAZVqOxmQkimMP+DMx6WdPBAtoHePL1HslM42NFF
-	 9U5hwxgCUGQzw==
-Date: Tue, 18 Feb 2025 17:10:36 +0000
-From: Simon Horman <horms@kernel.org>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
-	wanry@yunsilicon.com, parthiban.veerasooran@microchip.com,
-	masahiroy@kernel.org
-Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
-Message-ID: <20250218171036.GB1615191@kernel.org>
-References: <20250213091402.2067626-1-tianx@yunsilicon.com>
- <20250213091412.2067626-6-tianx@yunsilicon.com>
+	s=arc-20240116; t=1739898826; c=relaxed/simple;
+	bh=KD5f52kSOGy6SFAzSmWw7xexUpKWQr50ONQIB2LQYfY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n5SRHYOXCuKiOmuUbkEye0EmlQFtw4mPhY4pWJjd0zUeCs3NO4wXNnaEgQJUgmwnfZzcTYFXlkl7xfLvs+0McT1mwV2UZu3zmegAAmvtx28XjoffC8+0SOD1Z7xsJPgUiviANRGK8zgxU7fM7A603ON4JU1QGqx57VqjZ5wHroM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=cB5vqLgx; arc=none smtp.client-ip=209.85.218.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-ab7c4350826so104008366b.3
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 09:13:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1739898823; x=1740503623; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwgFh+hIFvSzOS/rK8aiurfj3uUOJ3o5txVxE1dKC8s=;
+        b=cB5vqLgxMGFnqTLtk08FVNbQ4l4wXnGhRr8Fd2DF1JFC6LvfvnMJ3jQ/Vfett5VXSV
+         LorHEPNlAzm4GuzIrW/KFYD83Wu9Gy/Mj1wdqaXjqhtlgwEy1r707yHkUhlJWhVidbnQ
+         IIbb/2NK0+LN7in3jYX9E2SMOJ6s/7i4hkTn8FYgYjTHh/taiKYQuMz0sUkjBnPNYewk
+         1ce9UoL5/URY5rOwh07wKq+KXJhMrpdQ7Qfsfu1zxpk5jzzIXewJceM+Em5v/uIVWAea
+         m89hBe+OwmFUzMWuPM49xXzuTWAj54E6lAxphoM2M5gfySTTVBwulyw+CJO3tJw0aeXn
+         KEmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739898823; x=1740503623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OwgFh+hIFvSzOS/rK8aiurfj3uUOJ3o5txVxE1dKC8s=;
+        b=lVjRL4gxycp1ejQR8Vf/LJ1jfIA2XmzIoJyf6b23YsszIUHAheNLGYMB5tO/369XD4
+         8XH43IyYXU55iidJK/yxneKapzQDRf+7zQXzrbr42QoTsW5+vxCSN95ykhrhPS0O79KZ
+         L0nECA9Dq1QSsc+ogGSGmx6WwZoHkydi/ME1rMK/2TJpJR3DAjKP05FL8LiIiXuQMN7G
+         PUR3Q0PbW8K4VNl9A44wNAhD8GrD9wfTwmilzX/tJxKbAlthuXwv/moXVvST0EZwyoT6
+         r5GpzISd9CiU1qv97lJxuVOOyUfhW8K/nka8l27NJT/MKfF2l8tnDE+0FZg6VWWdeNCK
+         G4aw==
+X-Forwarded-Encrypted: i=1; AJvYcCXutkS/NhxfrQkvfzOIKZzBOZjpe1fgsyVDTlr+O/Scb1qa9Fnl7eK5ZPad0P6ebDmYlRy0ORs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB0nyrLSd1DL+a77PlPNKm9NOhpNTneZae3+drrrSuU5CToXsd
+	AMXeXdGdrTj5M3aCl6+uDQZfhH6zIaAdw8yfJWfgZOg+kYsV0lsbgVtqzva7RARseEqFOiQepnQ
+	3YaUE1RehkuHWaM/akbSYLjBMIadAIQnQ
+X-Gm-Gg: ASbGnctrM6zEb/HG96L7pMsq8UCZAMC9GSeftq62uvkp0dSCBqHjyOnwlWDNPqNg2JP
+	jh+5EHRE8FsjMIo7hbflY2hu7K456gYB/j7IzQmwPDz8li5M0bex5owR/DkdvTPkGAeYKJ9iXas
+	+ZGmZCUy2ZASVmAsPkZnZAYA8rRmC70ZQBUo1xxfRuzEpexrXzjEnUFqthFW2CUSGcCJhjc8jYx
+	rgGpefG42ZemkLuLbWn6pqDvBILLgJspzYigVwgosRGGSmne7Y24gG4jEl1z/qnPpfPN3dDTZTc
+	a7mGtILnVheAwhz9wmp6SzKQqru8OEVghGkNKNj+cEy/yg7JcGnfPz6VrKzy
+X-Google-Smtp-Source: AGHT+IGfeiIoz4nj5wGjOA7G7kS8eac4whBlvLxwWHGB1DT6Ju1igCF3oyPiKz8ZKmaeoyVL5UJ28JH7ipIL
+X-Received: by 2002:a17:907:1c8b:b0:ab7:5fcd:d4be with SMTP id a640c23a62f3a-abb7093051bmr579305766b.1.1739898822488;
+        Tue, 18 Feb 2025 09:13:42 -0800 (PST)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-abb80c78c93sm55856266b.56.2025.02.18.09.13.42;
+        Tue, 18 Feb 2025 09:13:42 -0800 (PST)
+X-Relaying-Domain: 6wind.com
+Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 482CD12515;
+	Tue, 18 Feb 2025 18:13:42 +0100 (CET)
+Received: from dichtel by bretzel with local (Exim 4.94.2)
+	(envelope-from <nicolas.dichtel@6wind.com>)
+	id 1tkRAE-00F4xH-1Q; Tue, 18 Feb 2025 18:13:42 +0100
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Ido Schimmel <idosch@idosch.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 0/2] net: notify users when an iface cannot change its netns
+Date: Tue, 18 Feb 2025 18:12:34 +0100
+Message-ID: <20250218171334.3593873-1-nicolas.dichtel@6wind.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250213091412.2067626-6-tianx@yunsilicon.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
-> Add eq management and buffer alloc apis
-> 
-> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
-> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+This series adds a way to see if an interface cannot be moved to another netns.
 
-...
+v1 -> v2:
+ - target the series to net-next
+ - patch #1: 
+   + use NLA_REJECT for the nl policy
+   + update the rt link spec
+ - patch #2: plumb extack in __dev_change_net_namespace()
 
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+ Documentation/netlink/specs/rt_link.yaml |  3 +++
+ include/linux/netdevice.h                |  5 ++--
+ include/uapi/linux/if_link.h             |  1 +
+ net/core/dev.c                           | 41 +++++++++++++++++++++++++-------
+ net/core/rtnetlink.c                     |  5 +++-
+ 5 files changed, 44 insertions(+), 11 deletions(-)
 
-...
+Comments are welcome.
 
-> +struct xsc_eq_table {
-> +	void __iomem	       *update_ci;
-> +	void __iomem	       *update_arm_ci;
-> +	struct list_head       comp_eqs_list;
-
-nit: The indentation of the member names above seems inconsistent
-     with what is below.
-
-> +	struct xsc_eq		pages_eq;
-> +	struct xsc_eq		async_eq;
-> +	struct xsc_eq		cmd_eq;
-> +	int			num_comp_vectors;
-> +	int			eq_vec_comp_base;
-> +	/* protect EQs list
-> +	 */
-> +	spinlock_t		lock;
-> +};
-
-...
-
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
-
-...
-
-> +/* Handling for queue buffers -- we allocate a bunch of memory and
-> + * register it in a memory region at HCA virtual address 0.  If the
-> + * requested size is > max_direct, we split the allocation into
-> + * multiple pages, so we don't require too much contiguous memory.
-> + */
-
-I can't help but think there is an existing API to handle this.
-
-> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
-
-I think unsigned long would be slightly better types for size and max_direct.
-
-> +		  struct xsc_buf *buf)
-> +{
-> +	dma_addr_t t;
-> +
-> +	buf->size = size;
-> +	if (size <= max_direct) {
-> +		buf->nbufs        = 1;
-> +		buf->npages       = 1;
-> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
-> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
-> +						       size,
-> +						       &t,
-> +						       GFP_KERNEL | __GFP_ZERO);
-> +		if (!buf->direct.buf)
-> +			return -ENOMEM;
-> +
-> +		buf->direct.map = t;
-> +
-> +		while (t & ((1 << buf->page_shift) - 1)) {
-
-I think GENMASK() can be used here.
-
-> +			--buf->page_shift;
-> +			buf->npages *= 2;
-> +		}
-> +	} else {
-> +		int i;
-> +
-> +		buf->direct.buf  = NULL;
-> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
-
-I think this is open-coding DIV_ROUND_UP
-
-> +		buf->npages      = buf->nbufs;
-> +		buf->page_shift  = PAGE_SHIFT;
-> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
-> +					   GFP_KERNEL);
-> +		if (!buf->page_list)
-> +			return -ENOMEM;
-> +
-> +		for (i = 0; i < buf->nbufs; i++) {
-> +			buf->page_list[i].buf =
-> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
-> +						   &t, GFP_KERNEL | __GFP_ZERO);
-> +			if (!buf->page_list[i].buf)
-> +				goto err_free;
-> +
-> +			buf->page_list[i].map = t;
-> +		}
-> +
-> +		if (BITS_PER_LONG == 64) {
-> +			struct page **pages;
-> +
-> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
-> +					      GFP_KERNEL);
-> +			if (!pages)
-> +				goto err_free;
-> +			for (i = 0; i < buf->nbufs; i++) {
-> +				void *addr = buf->page_list[i].buf;
-> +
-> +				if (is_vmalloc_addr(addr))
-> +					pages[i] = vmalloc_to_page(addr);
-> +				else
-> +					pages[i] = virt_to_page(addr);
-> +			}
-> +			buf->direct.buf = vmap(pages, buf->nbufs,
-> +					       VM_MAP, PAGE_KERNEL);
-> +			kfree(pages);
-> +			if (!buf->direct.buf)
-> +				goto err_free;
-> +		}
-
-I think some explanation is warranted of why the above is relevant
-only when BITS_PER_LONG == 64.
-
-> +	}
-> +
-> +	return 0;
-> +
-> +err_free:
-> +	xsc_buf_free(xdev, buf);
-> +
-> +	return -ENOMEM;
-> +}
-
-...
-
-> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
-
-As per my comment on unsigned long in my response to another patch,
-I think npages can be unsigned long.
-
-> +{
-> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
-> +	int mask = (1 << shift) - 1;
-
-Likewise, I think that mask should be an unsigned long.
-Or, both shift and mask could be #defines, as they are compile-time
-constants.
-
-Also, mask can be generated using GENMASK, e.g.
-
-#define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
-#define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
-
-And I note, in the (common) case of 4k pages, that both shift and mask are 0.
-
-> +	u64 addr;
-> +	int i;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		if (buf->nbufs == 1)
-> +			addr = buf->direct.map + (i << PAGE_SHIFT_4K);
-> +		else
-> +			addr = buf->page_list[i >> shift].map
-> +			       + ((i & mask) << PAGE_SHIFT_4K);
-
-The like above is open-coding FIELD_PREP().
-However, I don't think it can be used here as
-the compiler complains very loudly because the mask is 0.
-
-> +
-> +		pas[i] = cpu_to_be64(addr);
-> +	}
-> +}
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
-
-...
-
-> +static void eq_update_ci(struct xsc_eq *eq, int arm)
-> +{
-> +	struct xsc_eq_doorbell db = {0};
-> +
-> +	db.data0 = XSC_SET_FIELD(cpu_to_le32(eq->cons_index),
-> +				 XSC_EQ_DB_NEXT_CID) |
-> +		   XSC_SET_FIELD(cpu_to_le32(eq->eqn), XSC_EQ_DB_EQ_ID);
-
-Each of the two uses of XSC_SET_FIELD() are passed a little-endian value
-and a host-byte order mask. This does not seem correct as it seems
-they byte order should be consistent.
-
-> +	if (arm)
-> +		db.data0 |= XSC_EQ_DB_ARM;
-
-Likewise, here data0 is little-endian while XSC_EQ_DB_ARM is host
-byte-order.
-
-> +	writel(db.data0, XSC_REG_ADDR(eq->dev, eq->doorbell));
-
-And here, db.data0 is little-endian, but writel expects a host-byte order
-value (which it converts to little-endian).
-
-I didn't dig deeper but it seems to me that it would be easier to change
-the type of data0 to host byte-order and drop the use of cpu_to_le32()
-above.
-
-Issues flagged by Sparse.
-
-> +	/* We still want ordering, just not swabbing, so add a barrier */
-> +	mb();
-> +}
-
-...
-
-> +static int xsc_eq_int(struct xsc_core_device *xdev, struct xsc_eq *eq)
-> +{
-> +	u32 cqn, qpn, queue_id;
-> +	struct xsc_eqe *eqe;
-> +	int eqes_found = 0;
-> +	int set_ci = 0;
-> +
-> +	while ((eqe = next_eqe_sw(eq))) {
-> +		/* Make sure we read EQ entry contents after we've
-> +		 * checked the ownership bit.
-> +		 */
-> +		rmb();
-> +		switch (eqe->type) {
-> +		case XSC_EVENT_TYPE_COMP:
-> +		case XSC_EVENT_TYPE_INTERNAL_ERROR:
-> +			/* eqe is changing */
-> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
-> +							     XSC_EQE_QUEUE_ID));
-
-Similarly, here XSC_GET_FIELD() is passed a little-endian value and a host
-byte-order mask, which is inconsistent.
-
-Perhaps this should be (completely untested!):
-
-			queue_id = XSC_GET_FIELD(le16_to_cpu(eqe->queue_id_data),
-						 XSC_EQE_QUEUE_ID);
-
-Likewise for the two uses of XSC_GET_FIELD below.
-
-And perhaps queue_id could be renamed, say to q_id, to make things a bit
-more succinct.
-
-
-> +			cqn = queue_id;
-
-I'm unsure why both cqn and queue_id are needed.
-
-> +			xsc_cq_completion(xdev, cqn);
-> +			break;
-> +
-> +		case XSC_EVENT_TYPE_CQ_ERROR:
-> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
-> +							     XSC_EQE_QUEUE_ID));
-> +			cqn = queue_id;
-> +			xsc_eq_cq_event(xdev, cqn, eqe->type);
-> +			break;
-> +		case XSC_EVENT_TYPE_WQ_CATAS_ERROR:
-> +		case XSC_EVENT_TYPE_WQ_INVAL_REQ_ERROR:
-> +		case XSC_EVENT_TYPE_WQ_ACCESS_ERROR:
-> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
-> +							     XSC_EQE_QUEUE_ID));
-> +			qpn = queue_id;
-> +			xsc_qp_event(xdev, qpn, eqe->type);
-> +			break;
-> +		default:
-> +			break;
-> +		}
-> +
-> +		++eq->cons_index;
-> +		eqes_found = 1;
-> +		++set_ci;
-> +
-> +		/* The HCA will think the queue has overflowed if we
-> +		 * don't tell it we've been processing events.  We
-> +		 * create our EQs with XSC_NUM_SPARE_EQE extra
-> +		 * entries, so we must update our consumer index at
-> +		 * least that often.
-> +		 */
-> +		if (unlikely(set_ci >= XSC_NUM_SPARE_EQE)) {
-> +			eq_update_ci(eq, 0);
-> +			set_ci = 0;
-> +		}
-> +	}
-> +
-> +	eq_update_ci(eq, 1);
-> +
-> +	return eqes_found;
-> +}
-
-...
+Regards,
+Nicolas
 
