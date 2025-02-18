@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-167205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DF0FA39222
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:32:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DB2FA39223
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:33:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D207316A493
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26BB83AB323
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF841ACECB;
-	Tue, 18 Feb 2025 04:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10A11AE01C;
+	Tue, 18 Feb 2025 04:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="myghX7l7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8+MzaHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9041AB6DE
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435F61ACEBA;
+	Tue, 18 Feb 2025 04:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739853154; cv=none; b=Bl25ZMaCWfGTPHoAXa3RBoycnm0hSXxO9wqsroO59/XM0Q2alq4reLOURWgkTfEQgcYPxug5HfohJJxzJUGje0kr+NA4kImjfpJt1aBjfmGcJ0twWLetBnuGh7f/Wh9OO3beBFBiOeFeDwaronWZqdBjwXXNvKLqWYOm6abL6eE=
+	t=1739853155; cv=none; b=dgQncC2r9FYGZwXlb5IRqF6wRb2rt3KTXmSmHVwJSRaDNeMFU5V4o+6066rM9SWxa59dwj3Nbsd6zJ3HMmk/h2R33+N+O9vBLk+dupa/ErBj3awq75dXg38f0PJbRk0AxAIXQTElTeRWW/D5yg47utZf6N52OXiqHXexLbmVYEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739853154; c=relaxed/simple;
-	bh=K0nUvKTL+oKjINXniaj/u7aFwM1Yq9iSu+s3rsVQTG8=;
+	s=arc-20240116; t=1739853155; c=relaxed/simple;
+	bh=ZlCxIQ6nLSNKYpFJNe5bVjFTd4IzLJgoQB/l0C4mt9k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ok/pUKNPpEjopFs3VH86unTQWflDuUY4vEnmktgqis6RlKSunytUCSVTLUlYK4vi6Xd6c4r9zgrGlNYv2FBqMqHAYiT1OffX4QEa7T9FIz3wgis4wrfTN1JOk83HKh9CfXKT3am8IqMA5CKP5RIo+nX2etSIwPP2gepRzAc4Fvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=myghX7l7; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=HY8cvZtZ2NqaMUh1vWUi9c9MgQ/erUzdjyK+UCW03jYbtqg36ZlHNkl0NAtS79mlirkaoIXKlCQbmB7jbhU+Si8C2QdxAeAaHlrVbl+ZMYGSQKBeznAYjjgk7y1MsNaZAykZ/AMINXS7s/69ByZ1Osu8rXH/SBE59lUyI/lH92k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8+MzaHl; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-220e6028214so82279115ad.0
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:32:32 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-221057b6ac4so41065995ad.2;
+        Mon, 17 Feb 2025 20:32:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739853152; x=1740457952; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739853153; x=1740457953; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QaMoKp/08ZfOYxZZIFyKP1+AXjFJ41FwH1Rc4CFQ+5E=;
-        b=myghX7l7ZuCJnNDZ1ZBpjxQX38B/XUe/DtgX24PJIKJzdCudRV/DfuTo3qDgk7C99R
-         iidpVlXNbbX4LmEKm3k70easUCRlgygqrrWslVuHKzKHzGLov+26O5RzJTmCWbzHmN32
-         emGrK2XG6Hh/KNdIjy9jgRpoGiFSA8TAt2BU9SRZFjmUP/UO4798Si8i3lM4/Jcyuyzw
-         UCxpbVcKd3n6d69euzBny+2Am9kL5n+jCQ42UoSf3cp5ktuCREcmJhG/dutXBIlsTwuU
-         JtnFc4oqOXHqjun49hY9Rh6TvqNs1wDo+fF10VBGYrc7hKykJqLok2D6f2aXtFfkcIYl
-         IrIw==
+        bh=oXkc5D8zSe0fz724t/KPS1px8hlKa4AQcyFwB/aU3Z4=;
+        b=T8+MzaHluHEFKwbgfU8WXiNXFG8vucAxN+IFdcxrXR3URD7xXv8A253OTRLg+ocPBs
+         mWF3CivfdSItH2DcDcwwbV+l7eJW07OnRjWStLkWuq0aWBmAEtSeBawaT0pDA2cMMo3Q
+         ZurQxF9tvf/ZHscCMegxMl/FXpduEVTv+K5BSBzi65XJZa9g7UTBvrBM66e4EVaGsZX8
+         C+PU8TPizEGgzXg+NKEJ/QcPnNY/6U1k0Sht/I68sNH+mOSvPA+ukZLwDhkQCNj3VAh6
+         v9YTB2mvgymCP/mFFugunfXlAUNCKXXePRd1CWkcauVgL3CHZv79wuUBRbd+5ig5kCHs
+         E5dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739853152; x=1740457952;
+        d=1e100.net; s=20230601; t=1739853153; x=1740457953;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QaMoKp/08ZfOYxZZIFyKP1+AXjFJ41FwH1Rc4CFQ+5E=;
-        b=LzhVBOMEz96+vO3m8zMvwlk2Y2MxLL7VKRDfpl1OJ6aAhgQLbFfrqHYRxRPxJmUpoZ
-         3CXjnj9H9ZifS55KJ4wPZQT2RaOBzStHvkHRgLl9LtA2+pECMk0K/OqK08BXlcsTlowW
-         8QTG5Sq5DSjr6Jki7QviJI3wQKs34XZTaC+8Xp1SOLtBw195GAnfOi11DD3rNTb+oYEx
-         vP8LzQlaYHZwolol1I5GLdQQHsSHTBMSxzIhK/KOkSMM318eRfXl35O1m21I2rYqztGu
-         tZ9szuUz9HSa3YfKA9eX3UCHhjsfpkNUyUT98/LsJRGlUblyV6mtvd8qqEG5zfFSFTt0
-         XwQQ==
-X-Gm-Message-State: AOJu0YxGb5T9/V2nQ5Jlz5JgjJXm42G3OgjwucRdqJDTG08eqhs1YI+v
-	1LSVu4FdJQF7RyQK0vGF2G893JOzKCyjQctEb+ge4o2xDBeT180EPsc4Dg==
-X-Gm-Gg: ASbGncsJPKK7Q2iTmbnqO7u/xkwjAeXQpAxU85vFnxBxCXvD1BnHAp1MyxW2YTgrpzF
-	336ekgkdAF5diGdc1oz63cc/KoUdy1m437NC14IJQAOyZkALxBNYAysYeLeClW08dO0sUJPbXkU
-	aZmtuLFxntgGcuy8/E5dyslZONPy6MadgKyIcXhzK4IHU48kXMWnyGgvkWqtbNwm8tpX2hJQpzF
-	jYPb4/7zwFawal6XuiQ95Vuik4ddamc7glkb2eQLGZJpV4GwUUL4j8LCFWvs8IxKoRRW4Eo9Hx0
-	hMfXqd5XzPnNA3VaObJUHVByj+RhrhyVUcVedWwPApni
-X-Google-Smtp-Source: AGHT+IH81BRK+IoU2xmJ2VR8pW+yiu7XQx1xaOYfeC3zbTEkMWVoUREJgA6ZNRe8GMYb87DXP21I3g==
-X-Received: by 2002:a05:6300:8005:b0:1ee:b8bc:3d2e with SMTP id adf61e73a8af0-1eeb8be5abdmr7371630637.8.1739853151741;
-        Mon, 17 Feb 2025 20:32:31 -0800 (PST)
+        bh=oXkc5D8zSe0fz724t/KPS1px8hlKa4AQcyFwB/aU3Z4=;
+        b=TT9EkApnzGAXbEx4UtFYGt1zqBsrpYRUcSZvhN2buAOEkD9yAKcxrvHDE1xCMBF2kq
+         A6hfKPw8713Fw1eBirKGSkDUg8xavN642TZNZR5YgKBHyNEOuUCorEqSkUaQS9Pki3j7
+         wx4Fzcnp6wHsA3vbEJdgoAxcp99KcnE96AyTXBQlmZFq/wdb8euKGbE1AkUjDdKMF/jG
+         Ur4AOJQRP1iX9EOF3tALijBTp8rHKssZ+WTQW8N0dWzijfsV0QnaUhlPsYvqfU0fD1YA
+         4BSlKJkpHLtfgkfSNOv0JA8jZNqDzRRD12BCKpUER1Ett/ji0BpfZRyVNvBRkDyyDR52
+         xROg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlAVzqrIAP7MtFm3CaQEKuVZCKPgr7OXoAKW6kcWo3SA4DlfSsqqwyr8aH0Xb8X5kN7f8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbx86gtyeAmor9Z5W5HPRl4FbY/KwiRcwZtL7C1WBPODbkaKOX
+	7stQQwXVnirFs7QDzEo2qGmTnIfmmZYOp29FU8Gb32hVqqtmGKCS8jfw7w==
+X-Gm-Gg: ASbGncsaP7wyyxIoheOHp2+PGYTO6xw+1X3v304/UHhTPgR1WgqxCVL/0dxmJ05gCHo
+	eE+iOultUA1dfcrVWUqyP9Kb3hZAWXt7Y5vRhfDARgrgfIpEqYWLBOndS3PHVRE10+FPEJARNgY
+	PJQPOrZWYUedclfdaF/qLI0fbLZ2CIL9ecblcyEn26/MIsTXyWsFDzQ261h2AIfaVtIHnOpCcrf
+	FElIHUHUUQMAqNmcZ47zySl9QtXelGtQTNK88OTCQV37B+Y2arj5+AO8Ua/S+RIVO34ptUpy45G
+	WPa+T1aedR3JAhM7WpQb6bccgDqGISbv9DsvTTpEOIJ6
+X-Google-Smtp-Source: AGHT+IG0PMJ197PoE6O2S7ppmjCksxA0DUXdJ+Abf2BzmR+SqxxroSDzqPMo+/cx0wcElHs9lMqsqw==
+X-Received: by 2002:a05:6a00:1746:b0:732:535d:bb55 with SMTP id d2e1a72fcca58-732617757demr19112518b3a.4.1739853153078;
+        Mon, 17 Feb 2025 20:32:33 -0800 (PST)
 Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:304e:ca62:f87b:b334])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326aef465dsm4907501b3a.177.2025.02.17.20.32.30
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7326aef465dsm4907501b3a.177.2025.02.17.20.32.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 20:32:31 -0800 (PST)
+        Mon, 17 Feb 2025 20:32:32 -0800 (PST)
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>,
-	Qiang Zhang <dtzq01@gmail.com>,
-	Yoshiki Komachi <komachi.yoshiki@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Subject: [Patch net 3/4] flow_dissector: Fix port range key handling in BPF conversion
-Date: Mon, 17 Feb 2025 20:32:09 -0800
-Message-Id: <20250218043210.732959-4-xiyou.wangcong@gmail.com>
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Subject: [Patch net 4/4] selftests/bpf: Add a specific dst port matching
+Date: Mon, 17 Feb 2025 20:32:10 -0800
+Message-Id: <20250218043210.732959-5-xiyou.wangcong@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250218043210.732959-1-xiyou.wangcong@gmail.com>
 References: <20250218043210.732959-1-xiyou.wangcong@gmail.com>
@@ -92,67 +92,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix how port range keys are handled in __skb_flow_bpf_to_target() by:
-- Separating PORTS and PORTS_RANGE key handling
-- Using correct key_ports_range structure for range keys
-- Properly initializing both key types independently
+After this patch:
 
-This ensures port range information is correctly stored in its dedicated
-structure rather than incorrectly using the regular ports key structure.
+ #102/1   flow_dissector_classification/ipv4:OK
+ #102/2   flow_dissector_classification/ipv4_continue_dissect:OK
+ #102/3   flow_dissector_classification/ipip:OK
+ #102/4   flow_dissector_classification/gre:OK
+ #102/5   flow_dissector_classification/port_range:OK
+ #102/6   flow_dissector_classification/ipv6:OK
+ #102     flow_dissector_classification:OK
+ Summary: 1/6 PASSED, 0 SKIPPED, 0 FAILED
 
-Fixes: 59fb9b62fb6c ("flow_dissector: Fix to use new variables for port ranges in bpf hook")
-Reported-by: Qiang Zhang <dtzq01@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAPx+-5uvFxkhkz4=j_Xuwkezjn9U6kzKTD5jz4tZ9msSJ0fOJA@mail.gmail.com/
-Cc: Yoshiki Komachi <komachi.yoshiki@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jiri Pirko <jiri@resnulli.us>
+Cc: bpf@vger.kernel.org
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Andrii Nakryiko <andrii@kernel.org>
 Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- net/core/flow_dissector.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ .../bpf/prog_tests/flow_dissector_classification.c         | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index c33af3ef0b79..9cd8de6bebb5 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -931,6 +931,7 @@ static void __skb_flow_bpf_to_target(const struct bpf_flow_keys *flow_keys,
- 				     struct flow_dissector *flow_dissector,
- 				     void *target_container)
+diff --git a/tools/testing/selftests/bpf/prog_tests/flow_dissector_classification.c b/tools/testing/selftests/bpf/prog_tests/flow_dissector_classification.c
+index 3729fbfd3084..80b153d3ddec 100644
+--- a/tools/testing/selftests/bpf/prog_tests/flow_dissector_classification.c
++++ b/tools/testing/selftests/bpf/prog_tests/flow_dissector_classification.c
+@@ -542,8 +542,12 @@ static void detach_program(struct bpf_flow *skel, int prog_fd)
+ 
+ static int set_port_drop(int pf, bool multi_port)
  {
-+	struct flow_dissector_key_ports_range *key_ports_range = NULL;
- 	struct flow_dissector_key_ports *key_ports = NULL;
- 	struct flow_dissector_key_control *key_control;
- 	struct flow_dissector_key_basic *key_basic;
-@@ -975,20 +976,21 @@ static void __skb_flow_bpf_to_target(const struct bpf_flow_keys *flow_keys,
- 		key_control->addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
- 	}
++	char dst_port[16];
++
++	snprintf(dst_port, sizeof(dst_port), "%d", CFG_PORT_INNER);
++
+ 	SYS(fail, "tc qdisc add dev lo ingress");
+-	SYS(fail_delete_qdisc, "tc filter add %s %s %s %s %s %s %s %s %s %s",
++	SYS(fail_delete_qdisc, "tc filter add %s %s %s %s %s %s %s %s %s %s %s %s",
+ 	    "dev lo",
+ 	    "parent FFFF:",
+ 	    "protocol", pf == PF_INET6 ? "ipv6" : "ip",
+@@ -551,6 +555,7 @@ static int set_port_drop(int pf, bool multi_port)
+ 	    "flower",
+ 	    "ip_proto udp",
+ 	    "src_port", multi_port ? "8-10" : "9",
++	    "dst_port", dst_port,
+ 	    "action drop");
+ 	return 0;
  
--	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS))
-+	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_PORTS)) {
- 		key_ports = skb_flow_dissector_target(flow_dissector,
- 						      FLOW_DISSECTOR_KEY_PORTS,
- 						      target_container);
--	else if (dissector_uses_key(flow_dissector,
--				    FLOW_DISSECTOR_KEY_PORTS_RANGE))
--		key_ports = skb_flow_dissector_target(flow_dissector,
--						      FLOW_DISSECTOR_KEY_PORTS_RANGE,
--						      target_container);
--
--	if (key_ports) {
- 		key_ports->src = flow_keys->sport;
- 		key_ports->dst = flow_keys->dport;
- 	}
-+	if (dissector_uses_key(flow_dissector,
-+			       FLOW_DISSECTOR_KEY_PORTS_RANGE)) {
-+		key_ports_range = skb_flow_dissector_target(flow_dissector,
-+							    FLOW_DISSECTOR_KEY_PORTS_RANGE,
-+							    target_container);
-+		key_ports_range->tp.src = flow_keys->sport;
-+		key_ports_range->tp.dst = flow_keys->dport;
-+	}
- 
- 	if (dissector_uses_key(flow_dissector,
- 			       FLOW_DISSECTOR_KEY_FLOW_LABEL)) {
 -- 
 2.34.1
 
