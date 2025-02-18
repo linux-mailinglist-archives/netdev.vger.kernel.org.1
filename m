@@ -1,74 +1,65 @@
-Return-Path: <netdev+bounces-167337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77078A39DA5
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:37:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10D2A39DA0
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F303B35EE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:30:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE597A4C90
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B3F26AAB7;
-	Tue, 18 Feb 2025 13:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CCF26FD87;
+	Tue, 18 Feb 2025 13:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRkY5wkh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4hpbTSP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B49E269AE3;
-	Tue, 18 Feb 2025 13:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C58B26FA44;
+	Tue, 18 Feb 2025 13:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885283; cv=none; b=p1jSTeLAmrmZxuwZ5+pkTv99kE4vh++7G22xXvLdSCX7cUSpsO5vVijdqIUd18/w2Nac3GgoWqBMS+8SaUSzTE5bmgX4g2eDLcwfldFD5L4e7SOe3jhrinf24aKrgffOAQ9KgLVooBHX1BVa+oT7aMndcYU5snlUtqpsZxjANgE=
+	t=1739885350; cv=none; b=uXz95558ODBy5MR1dGEjGLI453Y7yLFFilS22g6PRcwvC0XF7Q8QmZzDpSBZpcmtMtu4qGG5lqQfgefDCkyLgfmZ6diqpR9ZPYUd5YxCmns9a/s98WdkUvEQfhm6tq8C1CEdNqyV9yhbIUOSzEE3bNrEl1OP4bHtERQBVNdeWQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885283; c=relaxed/simple;
-	bh=WUKim6I0GIa7OB0lKVP3eWVJgzUnm9e3oqomWqD2WwE=;
+	s=arc-20240116; t=1739885350; c=relaxed/simple;
+	bh=D+giwnx2fldVt2NPCnwByiTTAhof1N0hesdxo6LjBJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I+v41yGds+6xiNbbG9x5mrGEv+i5hanXTfAcVV2OwzLoupVgV6GKfpLS6fi190ciqQYde7EXeW9h2pucBJW4ViaU9oGFJzPEoxzi5iDPNrsVTGpipztSYda+EEkWets61FsaHD6J4SmAC4u42W4MXiw2RY4ruejci3EjtAVF8/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRkY5wkh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B20C4CEE2;
-	Tue, 18 Feb 2025 13:27:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQsQ2hI/fUD5LIOEdezEzyGf/nT6xaIcaraYh1xSL9OoYQk7fxno6bN827V4wGk7dwYCcmSMYNUkyc6TTzYtpG09fv8KxsHcbiFh0O01uIFckjrS1KyGgmOUpHfY8ijVupU3cUCmaj9N0Kdk3+msdXwURIi5QT1W4LFzos65t8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4hpbTSP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD522C4CEE6;
+	Tue, 18 Feb 2025 13:29:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739885283;
-	bh=WUKim6I0GIa7OB0lKVP3eWVJgzUnm9e3oqomWqD2WwE=;
+	s=k20201202; t=1739885350;
+	bh=D+giwnx2fldVt2NPCnwByiTTAhof1N0hesdxo6LjBJA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QRkY5wkhLUTZa8Vgk9CcWZJea74bEM97C45lbFLORkAUB5t+VRmdEfU71ySeA/yxW
-	 5NMqAIX9A0mbShZ+R0dswW7gak2vOJLFcxXy6KrkdB5sPzBqsEpf3AzkIGxXnIhi1j
-	 jMtH7ZgyYxe6ZU5hCKKLmDtFA4fD/bK+9C7rBVuEwPMl03ASmv8RMDMtUK75L5AGBj
-	 gSoA+Q3PlsZPfztif70R0TpNPtuuu2NmOTlfjkyJlRXepDS0ZzSBdQ9hWCbfFthAl9
-	 QZaaiqQDwFbj7B/EIHbZFOtv1qiyrmUw8WSerUvHwo6E8JULcreHVOo51tozIV+s6t
-	 eXpiL0Mo+Wqbw==
-Date: Tue, 18 Feb 2025 13:27:56 +0000
+	b=d4hpbTSPtTh3MMtyZt88Vf46BaWKT+sSyPtxQJOZqD89A4ZQO8FsNVncvcAR0Lhz5
+	 /nFUVxvSTo1BXCTN23SgZDvUOE33B2Li0fZsPelUexQlviKxP/aM8oaeY5FcY/Y2FM
+	 lf8s495WAAbSt7lBcgTW2XhIfbFQtbSyWMu9yveB1RQvJboxBzdfYNFArpytp079Cn
+	 DP8Z1sJSYTZnrqRbuUn9DPsNn+HxZhx4abMPO+6QvN689nHDFsuS56VcmBVokRu55C
+	 s/PMGVlT6YzQkJKAsNQ9l5+2ZEDWFnLSjwoVV2MQBw15SaHVzcZuP2+X6TFXOj2Qu8
+	 GCs/vV5uSsDvg==
+Date: Tue, 18 Feb 2025 13:29:05 +0000
 From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next v4 13/16] net: airoha: Introduce Airoha NPU
- support
-Message-ID: <20250218132756.GU1615191@kernel.org>
-References: <20250213-airoha-en7581-flowtable-offload-v4-0-b69ca16d74db@kernel.org>
- <20250213-airoha-en7581-flowtable-offload-v4-13-b69ca16d74db@kernel.org>
- <20250217183854.GP1615191@kernel.org>
- <Z7OMv-7UBVtKaEFb@lore-desk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Peter Seiderer <ps.report@gmx.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
+	Nam Cao <namcao@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>
+Subject: Re: [PATCH net-next v5 8/8] net: pktgen: use defines for the various
+ dec/hex number parsing digits lengths
+Message-ID: <20250218132905.GV1615191@kernel.org>
+References: <20250213110025.1436160-1-ps.report@gmx.net>
+ <20250213110025.1436160-9-ps.report@gmx.net>
+ <20250214201145.2f824428@kernel.org>
+ <20250216091739.GW1615191@kernel.org>
+ <20250217094740.76a25671@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,47 +68,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z7OMv-7UBVtKaEFb@lore-desk>
+In-Reply-To: <20250217094740.76a25671@kernel.org>
 
-On Mon, Feb 17, 2025 at 08:23:43PM +0100, Lorenzo Bianconi wrote:
-
-...
-
-> > > +	err = devm_request_irq(dev, irq, airoha_npu_mbox_handler,
-> > > +			       IRQF_SHARED, "airoha-npu-mbox", npu);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	for (i = 0; i < ARRAY_SIZE(npu->cores); i++) {
-> > > +		struct airoha_npu_core *core = &npu->cores[i];
-> > > +
-> > > +		spin_lock_init(&core->lock);
-> > > +		core->npu = npu;
-> > > +
-> > > +		irq = platform_get_irq(pdev, i + 1);
-> > > +		if (irq < 0)
-> > > +			return err;
-
-...
-
-> > Should this return irq rather than err?
+On Mon, Feb 17, 2025 at 09:47:40AM -0800, Jakub Kicinski wrote:
+> On Sun, 16 Feb 2025 09:17:39 +0000 Simon Horman wrote:
+> > On Fri, Feb 14, 2025 at 08:11:45PM -0800, Jakub Kicinski wrote:
+> > > On Thu, 13 Feb 2025 12:00:25 +0100 Peter Seiderer wrote:  
+> > > > Use defines for the various dec/hex number parsing digits lengths
+> > > > (hex32_arg/num_arg calls).  
+> > > 
+> > > I don't understand the value of this patch, TBH.
+> > > 
+> > > Example:
+> > > 
+> > > +#define HEX_2_DIGITS 2
+> > > 
+> > > -		len = hex32_arg(&user_buffer[i], 2, &tmp_value);
+> > > +		len = hex32_arg(&user_buffer[i], HEX_2_DIGITS, &tmp_value);
+> > > 
+> > > The word hex is already there.
+> > > There is still a two.
+> > > I don't think the new define has any explanatory power?
+> > > 
+> > > Previous 7 patches look ready indeed.  
+> > 
+> > This one is on me. I felt the magic number 2 and so on
+> > was unclear. But if you prefer the code as-is that is fine by me too.
 > 
-> are you referring to devm_request_irq()?
-> 
-> https://elixir.bootlin.com/linux/v6.13.2/source/include/linux/interrupt.h#L215
-> https://elixir.bootlin.com/linux/v6.13.2/source/kernel/irq/devres.c#L52
-> 
-> I guess it returns 0 on success and a negative value in case of error.
+> I agree that it's a bit hard to guess what the call does and what 
+> the arguments are. To me at least, the constants as named don't help. 
+> We can get a third opinion, or if none is provided skip the patch for
+> now?
 
-Hi Lorenzo,
-
-Sorry, somehow I completely messed-up trimming context and managed to make
-things utterly confusing.
-
-I've trimmed things again, and it is the platform_get_irq() call
-not far above this line that I'm referring to. It assigns the
-return value of a function to irq, tests irq, but returns err.
-
-It is one of (at least) two calls to platform_get_irq() in airoha_npu_probe().
-
+Yes, I see your point.
+No objections from me to skipping this patch.
 
