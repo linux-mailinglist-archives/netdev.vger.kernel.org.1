@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-167486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2F2A3A7B8
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:36:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9814DA3A7BA
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 131393B1515
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:36:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D7497A2F2C
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCF117A2FD;
-	Tue, 18 Feb 2025 19:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DA91ACEDA;
+	Tue, 18 Feb 2025 19:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rg3HruaQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8aHHNkX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CEA21B9C7
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF75221B9FF
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739907398; cv=none; b=hS8/23U061lWj2oDoWzdcvkxCTWAUKS01V3jNc90/rIwAaam8h2thSSN7Dnjk/nYVkkzQaJpjctWnOq4/0rggtIoYQbPIHN9HTp2fZdHKqrxN/jLqu31qu4UYajwWCj7u/GNcNFsWbsjrGtv3tWpvKtMim6sk7VyL8m44CVeZ8A=
+	t=1739907410; cv=none; b=KWvKZ84xhC2c7JzzJmnkIz0WGcd4jK6Wg89o/uQ65HnqQfiiYViexnZNLY9OSEJlEAzG399GX/1z4I7QdUBWz3DwyOCJgQd9UF6ZlC81RrFFwKwsW4JtctGCi4Xvmyz+uzqyshDSOjXqrEY52bAQFwYwQ5i8fFauxpq3DqMJ5ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739907398; c=relaxed/simple;
-	bh=sE/fUARRNHyp59sxR3Q+zmGjFoVYdfhTn6es8kCpY+M=;
+	s=arc-20240116; t=1739907410; c=relaxed/simple;
+	bh=oFEhF3wt6ZT0mOj/XPg0GSRReiIjfauwIWnBqH3w9gM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AOBW7SSUiid/80tKu326G5A6I0490FebY+K35Mc8rTir5e8M/uGofFdyTiCq/SxkGLwo0stE3VozkW7+eBuE1J7FclmcnCr4qFabtelay7tBEWZyYi0j+xOuqCZpMQB1V8UHXuoYEr7tgn/2sSgjTrFhUVt+S+67krIP9+dFedk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rg3HruaQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43858C4CEE2;
-	Tue, 18 Feb 2025 19:36:36 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GST7J+BsX834ZvGnBw+k78p/3kGo9jhpSrY00iJyI5rvafG4ih0AabiTy4nYvYLc9UKk+MHrLVzBzjSFoU+BxPooyiyFj35N9dA3LK/ZUcf6O/rqn5hczCf1k2YHFCvw9AX0H7MGmQmZrRTMOGVS8sVvXE/aU04yRbsG7AsYJEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8aHHNkX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F99BC4CEE2;
+	Tue, 18 Feb 2025 19:36:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739907398;
-	bh=sE/fUARRNHyp59sxR3Q+zmGjFoVYdfhTn6es8kCpY+M=;
+	s=k20201202; t=1739907410;
+	bh=oFEhF3wt6ZT0mOj/XPg0GSRReiIjfauwIWnBqH3w9gM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rg3HruaQUZRaemXPdH7hU1+YsgDYCL49kSeh7PZxgTZruKMxIzlASQKxq9CVBmSK/
-	 69o5gw10U5eX1CXLZ6D8vWHvkrz7Tyeoz4jwJIOTwh4/sgX3aKrD3u+Wm7IGolHt4i
-	 DW/CWP0cY+sqHYzKPVy8HZrlL0OXqEjXtV25zNe/9YfryW9GVkSCC9PCfCq+AkGyJs
-	 C2bsOBXxazBJijAH0RmoXv+lPwy5Fe84au5SavsLAEHcReHwjPjJh2VnIOjciAz+cm
-	 LcYgjDQVw0cIzCANk1NDe3FtRBGn15DGfXWn6uIVad7+I0cKM7LWZjU29rAsbeyWAU
-	 /EMs2+ZgrTEKA==
-Date: Tue, 18 Feb 2025 19:36:34 +0000
+	b=c8aHHNkXHR5wL11T2YB2E2oCvm87h9wv5eBQhqj8lccbzt4iG8/J8t+bsivhqTksL
+	 FzUqLxL9vmGymo4EJlKB0ZsdbgL4lA7hebhGmgvwiinvhnkwYcx/0CHJqV1A8LgcH5
+	 1m/uLWQ9QMyiK1IbTK5+X0Q2ioK9TZhNPb5AM7zORNT4Ulk8h4cgSJd4sqPp3hvnUz
+	 YAEXmC/d+K5LC3T9td+TbrCWK87ssGvmYvM7Zb4to+DJtreh24r79zdC/NmQQs0VTS
+	 LSKVYHaeHaIsOsF7sF7aBPNe5D/38J9I+FLvyWxbdhrlMmbufFcToZMAGDaGK+HEwg
+	 WdeyUdHP7Pcsw==
+Date: Tue, 18 Feb 2025 19:36:46 +0000
 From: Simon Horman <horms@kernel.org>
 To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
@@ -49,10 +49,10 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
 	anthony.l.nguyen@intel.com, dawid.osuchowski@intel.com,
 	pmenzel@molgen.mpg.de
-Subject: Re: [iwl-next v3 2/4] ixgbe: check for MDD events
-Message-ID: <20250218193634.GI1615191@kernel.org>
+Subject: Re: [iwl-next v3 3/4] ixgbe: add Tx hang detection unhandled MDD
+Message-ID: <20250218193646.GJ1615191@kernel.org>
 References: <20250217090636.25113-1-michal.swiatkowski@linux.intel.com>
- <20250217090636.25113-3-michal.swiatkowski@linux.intel.com>
+ <20250217090636.25113-4-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,19 +61,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250217090636.25113-3-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20250217090636.25113-4-michal.swiatkowski@linux.intel.com>
 
-On Mon, Feb 17, 2025 at 10:06:34AM +0100, Michal Swiatkowski wrote:
-> From: Don Skidmore <donald.c.skidmore@intel.com>
+On Mon, Feb 17, 2025 at 10:06:35AM +0100, Michal Swiatkowski wrote:
+> From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
 > 
-> When an event is detected it is logged and, for the time being, the
-> queue is immediately re-enabled.  This is due to the lack of an API
-> to the hypervisor so it could deal with it as it chooses.
+> Add Tx Hang detection due to an unhandled MDD Event.
+> 
+> Previously, a malicious VF could disable the entire port causing
+> TX to hang on the E610 card.
+> Those events that caused PF to freeze were not detected
+> as an MDD event and usually required a Tx Hang watchdog timer
+> to catch the suspension, and perform a physical function reset.
+> 
+> Implement flows in the affected PF driver in such a way to check
+> the cause of the hang, detect it as an MDD event and log an
+> entry of the malicious VF that caused the Hang.
+> 
+> The PF blocks the malicious VF, if it continues to be the source
+> of several MDD events.
 > 
 > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Don Skidmore <donald.c.skidmore@intel.com>
+> Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+> Co-developed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
