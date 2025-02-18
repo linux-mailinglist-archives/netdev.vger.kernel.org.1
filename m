@@ -1,190 +1,175 @@
-Return-Path: <netdev+bounces-167271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7F6A39897
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:19:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69377A398B1
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BCFB1888201
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:16:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7B53A2944
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D28238D32;
-	Tue, 18 Feb 2025 10:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6FB23024C;
+	Tue, 18 Feb 2025 10:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="kXfHpD6d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2QapTgU"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2087.outbound.protection.outlook.com [40.107.22.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771F7234989;
-	Tue, 18 Feb 2025 10:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739873630; cv=fail; b=jtQF5oplg6J2q1Bj1SBijq18YZgR+9DcXygq5dBjNlSiHJeuy0aOuRwWYSQ2xT65+o0Pu6W34+ehEMlq6pLRIYZ4pGMU1aekcLK6MchncJaeG5I/7vxZaKAEH/AlDjwZwO2VrIVXBQmiS/xtP5GJnAy0w1oL7/xoY/WluO8648I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739873630; c=relaxed/simple;
-	bh=YrnRRGryAya7JfUzICTDYyuuuvwXCQmxYwaVVomx/To=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=axBTL3oV7fyH9YOhJcMlMRy1sHpO52Wx1iGx0fdK8k/bAYrCCr9cPsPGn4zvxYfNf5Gq7jSUjIG+UCYa+pWdPjr3DeauBptWaPELVAAC6n6dOICwhGStcNeCffX1Xk+L1oJboRvlTUt7fEzLZkokDQ9MSOuIMJ6ENfx3q4GDVdo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=kXfHpD6d; arc=fail smtp.client-ip=40.107.22.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bTKX+UHfD7nZeEuz+7o9Nf6Sw9A8eEYZS2VxgUJpVwPA/EWYfpBmD364ri+p5sAJPBl8+AGcJ6BEpFWHUgj8zbrXWPwM2JPZLv7mekyNTatn9r43HAsy1qXF9LSW9+81PecTbVTqKBikPJLCfblExuiW+Q2Rg55dJ8ZWvWZPEyIJqpxn9IBOgUFJXeTDgBws81AsayJZGpvzm1WRqDgCluXxOz8yNRc/o+OxtgilieXsViu1BuRC3z1xKrp/0knvRsDbGCW7qkkHC0wzW/hQRZw51T5DJNq3LJwTTSZnh9YU8DVkZf85fdlGAtEO6aUdAkbWSPxOxZSA2oWJyB47LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YrnRRGryAya7JfUzICTDYyuuuvwXCQmxYwaVVomx/To=;
- b=nedOyJjU2gmPPlGG0Wal3TPwcXStHa9hUCsZArZJmeAIuslnaUsRRNJCp6oUAG4q5xhqjK/Sat71KqrQrTvx4W/IIPjVBxHoZNkXg6KaYqCvatQUWlkncO0AfU+p1uK/LTvUh1rjT6M8UotWT5xOrQoQ5jsyh2ISqo7Oj5d92n+5s1bVTPaS2gAXJQChvN6zVMM2EabW8oc3YMmRZG6TyCfTd094/1VOU9UjxYob8MuW2m3/nYMlFzkjHbEBNs/iKynzEmEOG+v5nzyN+fXxra83sRYC1wmtheYdZ0k5dNSbdm+p02vzRuLhOqtZKKNqoq52cc27oDVVG2V0NExAag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YrnRRGryAya7JfUzICTDYyuuuvwXCQmxYwaVVomx/To=;
- b=kXfHpD6dFMRp7dDPs6wu1mkYy25R5As5+LEcAV4ou6W2GQ6/C5q1tA69Qyi/v+6lXoybZd9bZzgv7GlyFedFUE0TnKBZMaC+ow4EoQXEp9iTOXZSWBeCogC1c5r6CUBZTq4dByduXdWNlAW46pXTiWhNJuGXWW+rpImZxvYh45xxQGeqjlfkpGcHmZnuBYCK7cHbKtYsBTbiNOTUlPlHbD/k7u3e6qS3+UKJk5t0OglkLHZI9sUz6amHg5S+2tw8E0KvaqYs0qkfHP5nWubAjiNUGm5OwfAhgtcd9MD5XBSx/WwouNzETMQ2vUFmRefT/vt/SlrmvRaQOhjPCTcWwQ==
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com (2603:10a6:20b:42c::17)
- by AS8PR04MB7734.eurprd04.prod.outlook.com (2603:10a6:20b:2a6::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.20; Tue, 18 Feb
- 2025 10:13:45 +0000
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684]) by AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684%7]) with mapi id 15.20.8445.013; Tue, 18 Feb 2025
- 10:13:43 +0000
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: Ioana Ciornei <ioana.ciornei@nxp.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH net 1/8] net: enetc: fix the off-by-one issue in
- enetc_map_tx_buffs()
-Thread-Topic: [PATCH net 1/8] net: enetc: fix the off-by-one issue in
- enetc_map_tx_buffs()
-Thread-Index: AQHbgSIyYzp3wPB+I0SIp7LSGpxlULNL+EhwgABX2wCAAHR4YIAABTSAgAAIVgA=
-Date: Tue, 18 Feb 2025 10:13:43 +0000
-Message-ID:
- <AS8PR04MB8849C54C08DCAFB7C0196E1196FA2@AS8PR04MB8849.eurprd04.prod.outlook.com>
-References: <20250217093906.506214-1-wei.fang@nxp.com>
- <20250217093906.506214-2-wei.fang@nxp.com>
- <AS8PR04MB8849FB282339EB6D5DC2637396FB2@AS8PR04MB8849.eurprd04.prod.outlook.com>
- <PAXPR04MB85105B5C71672A828E8D6F6988FA2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <AS8PR04MB8849AC9B20849B615AD5B67196FA2@AS8PR04MB8849.eurprd04.prod.outlook.com>
- <PAXPR04MB85101AE086500F20BEAC67FC88FA2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-In-Reply-To:
- <PAXPR04MB85101AE086500F20BEAC67FC88FA2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR04MB8849:EE_|AS8PR04MB7734:EE_
-x-ms-office365-filtering-correlation-id: e1098096-327f-4815-b98a-08dd5004ecac
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?IeoHZt4ru7HVUTRTgtf/oZAIge81PVfAOM0O5NkMOKgBUubUgC9S+NCIi4bW?=
- =?us-ascii?Q?Fpem1VSIwsvFJzPhvlfPeunor4TAfNoYEuu/wqtaQZLCQJe91IHextGvMu92?=
- =?us-ascii?Q?b8viJggZH+3zuUblLFCKl0Kb5SfzsxtS+8r5nxe3doVxfip4iJ+Gy6xUJN/l?=
- =?us-ascii?Q?t/9cqbG2cg32aOVO/OeSrirQCqJCO3OBLDWVRHNnEAe492W5DYBpWCDpxQAF?=
- =?us-ascii?Q?BjrLLInGaDiZt5oJbihZDyAd8nNlTXBZUrc25C8qjVCt9bHw6SdaBtWqXBcE?=
- =?us-ascii?Q?+jxYzS5lFns9KQM8XyEltIONcqSXHf+U+nhUy9atkUutXUOqfUt+paLN7LnN?=
- =?us-ascii?Q?UDrq/rJlFJp9zHC7sHCOC6MEjyv2q8VxiuYEn9IYQ5/lqfG8IT6AixA8y/Pk?=
- =?us-ascii?Q?afMV3x5hI3DpOFUmKO7VgIBJqx4aBk6Mr/eDCpa3QzQH/0cA1CzV4yr9caVY?=
- =?us-ascii?Q?vobXBQL2K1Lv/H2P+SwLq8P08m8mMP9JtVZ8tWJ/nfGAho/poLCpLIS3yFWk?=
- =?us-ascii?Q?QqC8DhJhhqxVqp4mTQbzQ1vToxC97wJYl2MBhGxNFGHSz1ADj3XNxVgItX3E?=
- =?us-ascii?Q?3S1DQtZziZ19ry5rmQOAMV6uPni0OPE6KGP1ZzJnWltV3R47BGdVUv1QtIS3?=
- =?us-ascii?Q?Qkn0DKAsXv+P0AqOA++UcvvjPrxrgCbMxG7oBUCpveq6WKntXG0lVBJk1zuK?=
- =?us-ascii?Q?Vs6qSIUBRz74Yc8Ke9Xd3jm8XfE7WQqFmJNyoFzSYMzIIZfkZpEh+5G7aaxh?=
- =?us-ascii?Q?sqvQ9iaGM+Tbe/fsgoEh34Pqb8LLpuWngV0Ytic2giHrikz9yeOfxpDDTtzD?=
- =?us-ascii?Q?q1hDW1HBwjbti8wzY46ZyNRCxcN0IU+Yih0PmL6ptU9fO+p93O9+cW19o3D1?=
- =?us-ascii?Q?6NdkOKkVUbXL0JP00LR7w5ZR3Lgp9HEqIixnE7kbZWljowGaevljcJDqr3Rm?=
- =?us-ascii?Q?zpSGzyFVRhGSq7+ro59xbWSxXTBAZXF98p7xUULm42aWI6FJvimqHzC0Z60m?=
- =?us-ascii?Q?b1nmtoVskc4uwGJ2hnWbyyex9q/dU47FTXfHKtVGEFrbxF5BnYf5ZtU/notl?=
- =?us-ascii?Q?b3MFwCEo530nJkQiE+hFvkcZORD3F9eASB46XgEeGvGYPfriKNmMTi2h5CpX?=
- =?us-ascii?Q?kCMQd4mULAaSRx/WrYmZ8zyM5GGbcKWg/F4xubJ8hs2uhPuuxoarO/augDh/?=
- =?us-ascii?Q?LfB1Vn2O2QoQdGVYPSFTGLq7EcANP85YxVU0t6bpDDkYAx0/b2WqDbwXvA4A?=
- =?us-ascii?Q?M9FXV8uNCjJ4ZmT1HP0WM1j2rspDq6NENNyYNOPOF+HlvmMfQ075peGv8OUj?=
- =?us-ascii?Q?PyGOvncVqZE2SYMibk7TVeltSC+JHUzupCDxIjKw8aew2FHAW1boyPPs3LiC?=
- =?us-ascii?Q?sT5A42A1qLtV3PzQnEywb3wN55i0I+gjX1GOnqKav2tBnYe4dTL0/OTmbQf5?=
- =?us-ascii?Q?/V9lErL4wO2pVhSE9rK1i8ktOdjatNF0?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8849.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?LRXyRPlXmmraeBOdnC6DJO0l0CY/SIAdJOGH5g3/qjRtVaoaOtDCuEjeYsx1?=
- =?us-ascii?Q?vGj8e/vjWVYy4FHbS+8P+NBEIONHu2XwW+PQvwZXOpzlrAljZB2FVDWlEXra?=
- =?us-ascii?Q?bZ25H7wHs+OfjY3jvn62QbdM6RSwqnTwl4e8JlYyi2iZfHzqqaBEe0YV2GzU?=
- =?us-ascii?Q?r6uaDjftikIF0aXh3je667tl8FH1dfpeOmGFQM964D2D+lrSC+C2cx3vhIcK?=
- =?us-ascii?Q?KGisa8oRt/dhXkm0MimwUYs4Tfz+6kfM26yQbhzJ5d6+IlnytQ94Vz+19kWB?=
- =?us-ascii?Q?nGUYcFyYM9LtYTG49rF4N6oqz7WGxkeSSKQ72T+x95IMQ9TURjMlwJyJc3zW?=
- =?us-ascii?Q?bFLIH8o5suXIMrwAqPnYuT2z8kjWuzxZvPVUqk78Ecjt/5AvzQ/cdqLFQYAX?=
- =?us-ascii?Q?XjL0jA8oQRotQ0blnF8eQkhAsBlMNGvmLwKohg9+IdDvdHeWHBMrP9jSiths?=
- =?us-ascii?Q?Ui1q4RW6KY6S4c+XCI8J3dEgBeq9AWhr4DWh6mLhKq9zeqAR9gRh0NpiWp/R?=
- =?us-ascii?Q?oqiCbVvHcGRDwetpBS9Y96dRS9UJSteADimkBOjHe3wbm4M2dyYGPmSFy+NN?=
- =?us-ascii?Q?kfgkc+r0ppLbNKk2rYur292lSv2EN6OlBFIZmeENIVxYgCxIQluRvtBFzisr?=
- =?us-ascii?Q?oUhXsY2Fw8PFl/88iLkyus8vQVqFQiVh4fqsq9gWJ4YEwTizfCGqv0eRIFO5?=
- =?us-ascii?Q?85HuAA2REvEtuCzpvJ6iMtC3zKW/rCud75Y4vZXBLPna36yrDdXTghaOiP/t?=
- =?us-ascii?Q?Yv7LV0s2L9DZph3VaXyRhN0esDBcMr4vA4H2ahO0g/pkzvFSzPW+OqfJJ/nk?=
- =?us-ascii?Q?np5BeYOrLIu890hyDDjEE1e3My0Zgvy1FgiZPACep7wHDSv4Jm8Uy0ItLsD9?=
- =?us-ascii?Q?R8TchKgNl8E8aDg9wruqCBz2Yorh4JjKVOcxZWoQ0fqh0UykEzyx7DQN9I7n?=
- =?us-ascii?Q?MXUyAbQdjud8cyQSoYv38fvR8Vrab2TuGkD3I5cdL28BRceZfJOige2eC1mK?=
- =?us-ascii?Q?do7R3K4IzF0sC8iAbk9S7V3tOcDjThz2p4MhSpfhvEjioRlebs8qyQkcyhtU?=
- =?us-ascii?Q?wYuk6zUSesYUaH2mbOwEpQisdxY+SyDCw4zEjRWH3wxpbnhsr4u7tmctoacu?=
- =?us-ascii?Q?dPQW8+gjjFE7/xHT8ghjje1kq26pRYP0AeWvnn60aC3isX1XemjNsOERKlN5?=
- =?us-ascii?Q?pxZbSYBmm3rFzsw4VZIiK/G+2jLFbl75V6WJB/TOAChW7PENWabtWvYZbj2b?=
- =?us-ascii?Q?PTAyf8ZgFbUI3hdqG2biPiQgdkxE2rEoNj9W8fQYfeY3pM6q7WrImEnawQ7P?=
- =?us-ascii?Q?hLl9T0jgmhUg3s8ziulhrGOPqbpR7JkZNB35W6skveFi0/RuUk9ur0vh/Gs+?=
- =?us-ascii?Q?4wAE22U0LCeqJi9J/8HziL0xnUp6wOl8oLUPpfRdVVCbWb6/tNyLuFLIrNjt?=
- =?us-ascii?Q?yQZEBxKh5267wSnT5pvNhL9Q+iFD8+8gnMvN2iPD8q/FiTmCtpDqfH+EZbMf?=
- =?us-ascii?Q?XymZVQeOGbw6K5gpTkU+0slUr0/fwGSuP6up3Ad7Kud4sCebzjX/pCc9n5D6?=
- =?us-ascii?Q?0+R/1kX8Y9+KHb65RWu6Zk6SmrAssFPQ9gCUUMW8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D04A198E81;
+	Tue, 18 Feb 2025 10:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739873921; cv=none; b=dFuWcQWCUSbuelvbHaTy85JsxvCQlk1TUcS4N7SkUuCmBUqnCmsSWdoBM3craEk89NbBp9nrLBTbzvL7zMspNBcKiu2R1CDIUXxX6g7A8Xz22nypnqdjwViaVQKCuuPrqjNd2qTqm1lTU0a/3NXm5HnKW1vf2aR86mywzvcuw30=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739873921; c=relaxed/simple;
+	bh=1+S3gKfrEcgZOPoRZp4/LU2M06dkJFc1PkOFh9PlaKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bexsAaEYtsev+MlJ/Wqzkkc2oAQo9Q8N5ZmHn2nMbVzsd4OSpIyoNuqZT6xC1vdyBFntxx9JpUzdPbwobPJLKsmMYzJkcrm6fvLxtt613t1Mdw+XAvxffibDQIP/GaVyhxpFGxJs9C+psE6ttrq5VMNOEIyFLi8Fu3xEKoZSvkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2QapTgU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 805AEC4CEE2;
+	Tue, 18 Feb 2025 10:18:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739873920;
+	bh=1+S3gKfrEcgZOPoRZp4/LU2M06dkJFc1PkOFh9PlaKo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M2QapTgU2gq2Up/G9Rgx35AA/GTQMsa/gndyQ9YiYsIuFS+hqrpuqP0pbtB17dWho
+	 R49OrRHUBphR4vTQdabbm6F83fWYQpKWyDr5u31mXLeNrRGK+xualhJueiDLOrhBAu
+	 BwRoFRD9aE2zIUz8/RF+2zBTckZIngaWwP3dWhHBE9GIhbBbUozduFx+obvvlYdhSj
+	 CsZo2W70GoivaQQ0KlOexkI8tiiM9qArQoyzBdSoPkop8MBEf+eU6+VFUroKmsP7f3
+	 fbPX62GzjJRT+Tu2eJchNuPkDbtCLy2EBAoGr6T1x2drzF7dDA4toty8BN7FCCnBhw
+	 gSONTeWvp5wjg==
+Message-ID: <f5e6302e-f91a-4fc8-b12e-faebb7c26e05@kernel.org>
+Date: Tue, 18 Feb 2025 11:18:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8849.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1098096-327f-4815-b98a-08dd5004ecac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2025 10:13:43.6888
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NYSnU3lWBnkpiBTCIYl4R6St6u/NkYD8E0muUKT2Zf2148X01LC2TFucINCf84Kk4ofMty0nNi4n46+9X9iPrA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7734
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and
+ psock_tpacket tests
+Content-Language: en-GB
+To: Suchit K <suchitkarunakaran@gmail.com>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, horms@kernel.org, skhan@linuxfoundation.org,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <CAO9wTFggVh9LvJa_aH=dDBLrwBo8Ho4ZfYET3myExiqf0yfDCA@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CAO9wTFggVh9LvJa_aH=dDBLrwBo8Ho4ZfYET3myExiqf0yfDCA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Suchit,
 
+On 18/02/2025 10:28, Suchit K wrote:
+> Fixes minor spelling errors:
+> - `simult_flows.sh`: "al testcases" -> "all testcases"
+> - `psock_tpacket.c`: "accross" -> "across"
+> 
+> Signed-off-by: Suchit Karunakaran <suchitkarunakaran@gmail.com>
+> ---
+>  tools/testing/selftests/net/mptcp/simult_flows.sh | 2 +-
+>  tools/testing/selftests/net/psock_tpacket.c       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh
+> b/tools/testing/selftests/net/mptcp/simult_flows.sh
 
-> -----Original Message-----
-> From: Wei Fang <wei.fang@nxp.com>
-> Sent: Tuesday, February 18, 2025 11:18 AM
-[...]
-> > enetc_free_tx_frame() call on dma_err path is still needed for count 0
-> > because it needs to free the skb.
->=20
-> First, the tx_swbd is not set when count is 0, so tx_swbd->skb is NULL wh=
-en
-> the error occurs.
->=20
-> Second, the skb is freed in enetc_start_xmit() not enetc_free_tx_frame().
+The patch is exactly the same as v1, containing the same issues: long
+lines are wrapped, corrupting the patch, like here above.
 
-Yeah, noticed too finally.
-'do {} while()' is not ok on error path here.
+> index 9c2a41597..2329c2f85 100755
+> --- a/tools/testing/selftests/net/mptcp/simult_flows.sh
+> +++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
+> @@ -28,7 +28,7 @@ size=0
+> 
+>  usage() {
+>   echo "Usage: $0 [ -b ] [ -c ] [ -d ] [ -i]"
+> - echo -e "\t-b: bail out after first error, otherwise runs al testcases"
+> + echo -e "\t-b: bail out after first error, otherwise runs all testcases"
+>   echo -e "\t-c: capture packets for each test using tcpdump (default:
+> no capture)"
+
+Same here
+
+>   echo -e "\t-d: debug this script"
+>   echo -e "\t-i: use 'ip mptcp' instead of 'pm_nl_ctl'"
+> diff --git a/tools/testing/selftests/net/psock_tpacket.c
+> b/tools/testing/selftests/net/psock_tpacket.c
+
+Same here
+
+> index 404a2ce75..221270cee 100644
+> --- a/tools/testing/selftests/net/psock_tpacket.c
+> +++ b/tools/testing/selftests/net/psock_tpacket.c
+> @@ -12,7 +12,7 @@
+>   *
+>   * Datapath:
+>   *   Open a pair of packet sockets and send resp. receive an a priori known
+> - *   packet pattern accross the sockets and check if it was received resp.
+> + *   packet pattern across the sockets and check if it was received resp.
+>   *   sent correctly. Fanout in combination with RX_RING is currently not
+>   *   tested here.
+>   *
+
+How are you sending this patch? Using 'git send-email' following
+instructions like the ones from [1]?
+
+I do recommend using b4 to prepare and send patches, see [2].
+
+[1] https://git-send-email.io
+[2] https://b4.docs.kernel.org/en/latest/contributor/overview.html
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
