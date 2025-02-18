@@ -1,76 +1,50 @@
-Return-Path: <netdev+bounces-167296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086E7A39A26
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:14:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BB54A399EE
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6D73B48DE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:12:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D5547A40FC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395D523C8A3;
-	Tue, 18 Feb 2025 11:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A43123AE8B;
+	Tue, 18 Feb 2025 11:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oFLP61vb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DpItD0sM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1C723BF96
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 11:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1346B23958C;
+	Tue, 18 Feb 2025 11:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739877135; cv=none; b=UZcF6yctVJ2ml7NYkHi5bYM8CCU8DKEiMvwFMSiL0+WKJzGto7DLJUMKebU+NPHmarM3ilFHuU/n0qSuOZ+X2e56x+lLP4G9dQDxgpmUywXw8WXn59wZ5d4tupg3ZWOW4VcCXLneXVM9LBwI80apy7PuIAv1jW3Jd9Ybo5c8BFI=
+	t=1739877001; cv=none; b=N+1SbgJhVnftM8q/DQ0fW0GhWmnjakfRGg1CXreIY1Ydv8zk3sEBEAYENG/ozwRXTfoUkgk+3mBm865PDmQgZNnPVOPO7Xoftsy/MJ7+73Gn00dBsMIUuw2TMaYssuBLDH3Ak6I7rsKlHLf24ypeWZr5KiZvIEOEkID1OntRXEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739877135; c=relaxed/simple;
-	bh=N77XQ5Q5mO4PoQ6m80+S+vewn+DOxv1GOBJVib08tpY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PwYvusLmRSQpuBlqEJ30/zMlv7W+B8782OgS+O1p7/8VENxAkyYQHvkO7bFPq74OOTAPEObB/GQktlqVA6B4mutDJ6E4RNZrDskzhkEUQnxjuqABCTrq7UKkNRFiu1OF1FjyLVkl+B5RvvWEYKHGE2GI8oeQ0S3UEtmHPXisq5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oFLP61vb; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739877133; x=1771413133;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=N77XQ5Q5mO4PoQ6m80+S+vewn+DOxv1GOBJVib08tpY=;
-  b=oFLP61vbmdRwNS0SDyyXWGi0ZWzc1VgBtIHpmFNVvWxDvLWblzjNVFeG
-   EJyC7+Vuj89MSJZ+Ng1kDH5Yvc/tvFEtrtkGIxK3Sjck1/u11dACEhCPj
-   8WE1EtfZqJkphv0Yurbge+Rvg+VL5nVA0TUL2dEfsEzqBebxRk6Lfu7cZ
-   hHg7dYK3AW9DHCqyr+BE5NTEHEFfXQl6bre6RFxmF+jGTOGc6OIUD90tx
-   PtPnz79nSC/Kjcji0lzW91fshtinw+IWfa/LWJ8Y3nRUysZK/ss3o4pfa
-   0JnPcH17yo62fDiKKMhgr0yoo4uUrvskdC1BuJs/Tzo4yPLFvJKVjdP8E
-   g==;
-X-CSE-ConnectionGUID: MZ35P5kyRvqbPu96jZ/u1A==
-X-CSE-MsgGUID: HOi5uw9+TDeCZOMxeM3xmg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="51208308"
-X-IronPort-AV: E=Sophos;i="6.13,295,1732608000"; 
-   d="scan'208";a="51208308"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 03:12:13 -0800
-X-CSE-ConnectionGUID: cR29wDLgR4SeDV0DtzKc4Q==
-X-CSE-MsgGUID: Wkpk2dCkTWWvw6oD1l3CQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="114234023"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.102.22.54])
-  by orviesa010.jf.intel.com with ESMTP; 18 Feb 2025 03:12:11 -0800
-From: Milena Olech <milena.olech@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Milena Olech <milena.olech@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH v6 iwl-next 10/10] idpf: change the method for mailbox workqueue allocation
-Date: Tue, 18 Feb 2025 12:07:37 +0100
-Message-Id: <20250218110724.2263357-11-milena.olech@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250218110724.2263357-1-milena.olech@intel.com>
-References: <20250218110724.2263357-1-milena.olech@intel.com>
+	s=arc-20240116; t=1739877001; c=relaxed/simple;
+	bh=yxYYlJBoiZm+umfoO+u20ai1V04G+CgdbT+PHgCEfM8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nfeMLl1TttbAsdwVCMxX02USOCiUjN6KtxozRbEYvd4L9uD8uHorHzqYL3p5rGkXLZZiYOXlILyFpw6IBLBuP9P/zfaoyb+QqA4lBTR5tG97YXEPeD6XTslFnR068U4IdfCYL/0BxngjbzU3XW55c4RfB+NoPTxkUGF+z8ofIPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DpItD0sM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F11C4CEE2;
+	Tue, 18 Feb 2025 11:10:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739877000;
+	bh=yxYYlJBoiZm+umfoO+u20ai1V04G+CgdbT+PHgCEfM8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DpItD0sMWHXYQNVy/EjKjs76cbZCsDuh9CDiri4uN4Ds6S+fYWRqlMmR5M1XKVxQf
+	 xGHxZ/4gGYHpLsw8+hr8Svn8sjsa0J1xjrxs1FIxiYjBELDBqNvNw9qzzsV1fw25AQ
+	 RRc1nJqHGK4nA1t5CJjvNCsxf5fsDrpHaUCEZ/HgNcckkOSIVRcJn9utGI4sOoknH/
+	 +PMGrnA2mTjzjSTCw5ko/s5aUumDemFkslTWJAy/jxCPs49cGcDDdpobzn75nQwbcC
+	 I+ATTEvyBngsenxjVzg59qPQmPX7PPQ46I8XW7wRP12705bpGpgiwR7/HC5QRRBL4g
+	 qF99VaZh4kEEQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB759380AA7E;
+	Tue, 18 Feb 2025 11:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,37 +52,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/4] sockmap, vsock: For connectible sockets allow only
+ connected
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173987703076.4044275.12767164064897444183.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Feb 2025 11:10:30 +0000
+References: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
+In-Reply-To: <20250213-vsock-listen-sockmap-nullptr-v1-0-994b7cd2f16b@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: john.fastabend@gmail.com, jakub@cloudflare.com, edumazet@google.com,
+ kuniyu@amazon.com, pabeni@redhat.com, willemb@google.com,
+ davem@davemloft.net, kuba@kernel.org, horms@kernel.org, sgarzare@redhat.com,
+ mst@redhat.com, bobby.eshleman@bytedance.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ mykolal@fb.com, shuah@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
 
-Since workqueues are created per CPU, the works scheduled to this
-workqueues are run on the CPU they were assigned. It may result in
-overloaded CPU that is not able to handle virtchnl messages in
-relatively short time. Allocating workqueue with WQ_UNBOUND and
-WQ_HIGHPRI flags allows scheduler to queue virtchl messages on less loaded
-CPUs, what eliminates delays.
+Hello:
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 60bae3081035..022645f4fa9c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -198,9 +198,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_serv_wq_alloc;
- 	}
- 
--	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx",
--					  WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
--					  dev_driver_string(dev),
-+	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", WQ_UNBOUND | WQ_HIGHPRI,
-+					  0, dev_driver_string(dev),
- 					  dev_name(dev));
- 	if (!adapter->mbx_wq) {
- 		dev_err(dev, "Failed to allocate mailbox workqueue\n");
+On Thu, 13 Feb 2025 12:58:48 +0100 you wrote:
+> Series deals with one more case of vsock surprising BPF/sockmap by being
+> inconsistency about (having an) assigned transport.
+> 
+> KASAN: null-ptr-deref in range [0x0000000000000120-0x0000000000000127]
+> CPU: 7 UID: 0 PID: 56 Comm: kworker/7:0 Not tainted 6.14.0-rc1+
+> Workqueue: vsock-loopback vsock_loopback_work
+> RIP: 0010:vsock_read_skb+0x4b/0x90
+> Call Trace:
+>  sk_psock_verdict_data_ready+0xa4/0x2e0
+>  virtio_transport_recv_pkt+0x1ca8/0x2acc
+>  vsock_loopback_work+0x27d/0x3f0
+>  process_one_work+0x846/0x1420
+>  worker_thread+0x5b3/0xf80
+>  kthread+0x35a/0x700
+>  ret_from_fork+0x2d/0x70
+>  ret_from_fork_asm+0x1a/0x30
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/4] sockmap, vsock: For connectible sockets allow only connected
+    https://git.kernel.org/netdev/net/c/8fb5bb169d17
+  - [net,2/4] vsock/bpf: Warn on socket without transport
+    https://git.kernel.org/netdev/net/c/857ae05549ee
+  - [net,3/4] selftest/bpf: Adapt vsock_delete_on_close to sockmap rejecting unconnected
+    https://git.kernel.org/netdev/net/c/8350695bfb16
+  - [net,4/4] selftest/bpf: Add vsock test for sockmap rejecting unconnected
+    https://git.kernel.org/netdev/net/c/85928e9c4363
+
+You are awesome, thank you!
 -- 
-2.31.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
