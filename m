@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-167302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C43A39A7D
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:19:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABAB0A39A7F
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:19:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 122C81748F1
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:16:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5956172A0D
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786D2242917;
-	Tue, 18 Feb 2025 11:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768B423C8BD;
+	Tue, 18 Feb 2025 11:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pv4grxLO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NboZtx9J"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C525B241CA3
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 11:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C460023FC4C
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 11:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739877338; cv=none; b=f0wt2VR8ZnK/u+8l9N1bZQwIw0LB8TXVpydfAg2YDQ/nW7+P0ursE0p7iJ3m1oW9gDHKkcRh9s/uAuSjufn3zdGszyFMM7uRFo8Kx1bLT0LhRW/NAWCzicRuqTbtjmEGeiBu8CRiNJyQ/A7WVcMqVPRXlui+CeTt+zl9nR5sjfk=
+	t=1739877343; cv=none; b=ce6s7ZbMyisN3+UEgKyOvzjQPqVPcuP/qNVJfEVPjXlri8mHSY8TnQopz0A3JRv1bBd6U4/rN0Ybi1YAa23z52MagSgsLjveWPo9e1aE5TPudVvZJB/0UHeODYs2Fn037YMKCW3TmV2FueYc9sUHb5YcaGtTbpn7FEzgp1acq5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739877338; c=relaxed/simple;
-	bh=iNB+KHUG8/IXey7G32odoqDgG8va+ldPSM/jV2TMBWc=;
+	s=arc-20240116; t=1739877343; c=relaxed/simple;
+	bh=P4bthImPQbPaNHLUph8LJWkOyCMmKzhMcvPVSjBrMCE=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=kEyQ+EsKCqSVO7cfMYE/2L3456slSmhGAO5T1Z3ZpZuFSDmIQX5/hAAukfBlAo1t+7PKFSIp1i/dZVi1QhRBBRgPgD04jDZiaxXUZNtmulAfYjewY/xAAiGFvrvG90cvI6BC90lZuivJBvi1Q7c/eCYxFjBA0TGnRsWk1JW5pBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pv4grxLO; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=SUTdR2uUB2UvI2zCZ3UrZyKWj5pvX11ogA/XpZpqUWMzM8zYNYmbG2UJPmBwx1941cV/98lIsimp76fw7tGgvfxYu0jOf0K2Lh6xg3EzbJ+b1iEJYMHl1yq3I7hZjkryqVuS9iwpW7hxGQE8m84ntHKFaUuHDuTvj8zN3WuOcnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NboZtx9J; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=KSe0c69jHaZowf9s+caWtXk4sDZG6Bn7YtQiiu7h0+0=; b=pv4grxLOfAy1HTamSWjhCAJhnd
-	vDFC0rhwnWlZcDfja5x8XaQsRi/2wTZYbHddAcMYqYvgT0GTl8g5vdyX3PASsLLan5wpnyrbLJ9Zj
-	qtTcQzKGb4+nMCB5j8uC+3V3Jp+8u5bgJ2PvnykzggWLcbnzSX/d2xW3pSQ26APCp+buv83oT2w3g
-	ZbZuLTNK0ZyUz4Cm5LLbzCassiQLRKhlmDifBsCyLTxCFd0PNz5F1qDSoFWFVhPgZ3dV83psZFDMm
-	ltndkBeMLWG5DqDZpKJE0l59sUtvQjLEAQtJmVPRqCLKkflVWDFqYe/cHSSUIa/h1fnwvTN7hT33O
-	O++gP5yg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51256 helo=rmk-PC.armlinux.org.uk)
+	bh=pJ+VuClAIugyh12DlKfpLSkGYbdt3PX3ZLE4Cic03KE=; b=NboZtx9JIpAxdBcylbAGrjfYJX
+	H4Nzg2i3NgdNP+cOoncpKpKqRD1ePajqZoHhwweFY1a0fx9Uys91r0LGJcwcWUJ3djwUQuIsphVIZ
+	2xGp/E1GUBzsm7zdEGcsgIvVezwIh3+ZKCD16u0ThFh4gB8Vueas3qBvzLPcn0hIXhFXgFNA0VzVc
+	Xh9BzxaGIdMu3vLBOEXaJBiJzlV1At9g/qvppj1w8vAb2Z3wbfINekNum3iTrO9Ptp9PhzYHHW5H/
+	7dB9EdENZlQSIXLiG0aIQ/O8PMYDGu2Vj0iCNYR+JdV46BEyOBGtcUf3hDZIYUxQUsvc3tv5OBBxf
+	z4yRRymw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:50882 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tkLZQ-0001jR-2t;
-	Tue, 18 Feb 2025 11:15:21 +0000
+	id 1tkLZW-0001jr-07;
+	Tue, 18 Feb 2025 11:15:26 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tkLZ6-004RZO-0H; Tue, 18 Feb 2025 11:15:00 +0000
+	id 1tkLZB-004RZU-4A; Tue, 18 Feb 2025 11:15:05 +0000
 In-Reply-To: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
 References: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -79,7 +79,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Sascha Hauer <s.hauer@pengutronix.de>,
 	Shawn Guo <shawnguo@kernel.org>,
 	Thierry Reding <treding@nvidia.com>
-Subject: [PATCH RFC net-next 5/7] net: stmmac: s32: use generic
+Subject: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
  stmmac_set_clk_tx_rate()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,58 +90,73 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tkLZ6-004RZO-0H@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 18 Feb 2025 11:15:00 +0000
+Date: Tue, 18 Feb 2025 11:15:05 +0000
 
 Use the generic stmmac_set_clk_tx_rate() to configure the MAC transmit
 clock.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 22 +++----------------
- 1 file changed, 3 insertions(+), 19 deletions(-)
+ .../stmicro/stmmac/dwmac-intel-plat.c         | 24 +++----------------
+ 1 file changed, 3 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index 6a498833b8ed..b76bfa41af82 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -100,24 +100,6 @@ static void s32_gmac_exit(struct platform_device *pdev, void *priv)
- 	clk_disable_unprepare(gmac->rx_clk);
- }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+index 0591756a2100..e81d81e44127 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+@@ -22,31 +22,12 @@ struct intel_dwmac {
+ };
  
--static void s32_fix_mac_speed(void *priv, int speed, unsigned int mode)
+ struct intel_dwmac_data {
+-	void (*fix_mac_speed)(void *priv, int speed, unsigned int mode);
+ 	unsigned long ptp_ref_clk_rate;
+ 	unsigned long tx_clk_rate;
+ 	bool tx_clk_en;
+ };
+ 
+-static void kmb_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
 -{
--	struct s32_priv_data *gmac = priv;
--	long tx_clk_rate;
+-	struct intel_dwmac *dwmac = priv;
+-	long rate;
 -	int ret;
 -
--	tx_clk_rate = rgmii_clock(speed);
--	if (tx_clk_rate < 0) {
--		dev_err(gmac->dev, "Unsupported/Invalid speed: %d\n", speed);
+-	rate = rgmii_clock(speed);
+-	if (rate < 0) {
+-		dev_err(dwmac->dev, "Invalid speed\n");
 -		return;
 -	}
 -
--	dev_dbg(gmac->dev, "Set tx clock to %ld Hz\n", tx_clk_rate);
--	ret = clk_set_rate(gmac->tx_clk, tx_clk_rate);
+-	ret = clk_set_rate(dwmac->tx_clk, rate);
 -	if (ret)
--		dev_err(gmac->dev, "Can't set tx clock\n");
+-		dev_err(dwmac->dev, "Failed to configure tx clock rate\n");
 -}
 -
- static int s32_dwmac_probe(struct platform_device *pdev)
- {
- 	struct plat_stmmacenet_data *plat;
-@@ -172,7 +154,9 @@ static int s32_dwmac_probe(struct platform_device *pdev)
+ static const struct intel_dwmac_data kmb_data = {
+-	.fix_mac_speed = kmb_eth_fix_mac_speed,
+ 	.ptp_ref_clk_rate = 200000000,
+ 	.tx_clk_rate = 125000000,
+ 	.tx_clk_en = true,
+@@ -89,8 +70,6 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
+ 	 * platform_match().
+ 	 */
+ 	dwmac->data = device_get_match_data(&pdev->dev);
+-	if (dwmac->data->fix_mac_speed)
+-		plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
  
- 	plat->init = s32_gmac_init;
- 	plat->exit = s32_gmac_exit;
--	plat->fix_mac_speed = s32_fix_mac_speed;
+ 	/* Enable TX clock */
+ 	if (dwmac->data->tx_clk_en) {
+@@ -130,6 +109,9 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
+ 				goto err_tx_clk_disable;
+ 			}
+ 		}
 +
-+	plat->clk_tx_i = dmac->tx_clk;
-+	plat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
++		plat_dat->clk_tx_i = dwmac->tx_clk;
++		plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+ 	}
  
- 	plat->bsp_priv = gmac;
- 
+ 	plat_dat->bsp_priv = dwmac;
 -- 
 2.30.2
 
