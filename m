@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-167172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE69A390AC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:10:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96AD2A390A9
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BE23188BA37
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:10:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1AE73B2DAE
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C5D1527B1;
-	Tue, 18 Feb 2025 02:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8672D148857;
+	Tue, 18 Feb 2025 02:09:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43DE54670
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1136482EB
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739844591; cv=none; b=QJZoYANL+uq0Ls0uFy+JjMtOSq2CH3PBKPJIuN0rU0mddISLW7Oxsmd9kI0UC2/4U7MHiXY9IOnUDYxoIFm+eU4ooCtcx61+Q9D2OK/le3BL7xr5oujysGgIUyzvwwqqjRJkLXECEZH6e3qyHpbzP1M8Fa6YWgKVsGfctdFApm8=
+	t=1739844589; cv=none; b=sqErvYg/gLkaR9OeoYCbLKS4Gd/bGsAoHh5O7Er7UZ+U6fd6TDfiBwOTXSN47h2yU1N5oCTpQLUeumJtpIDLRbKAWxa6sDidMyICIABZvVLpHjBTNm6VtZ/kl3lmv5B+YNp4kjFo/l2f8EM7H1TKaRR6I834OVL5ufjEvPK0Hds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739844591; c=relaxed/simple;
-	bh=Qq8SSureU8S3Ou0zbBou6Got6asQczN5/bB2E+jm894=;
+	s=arc-20240116; t=1739844589; c=relaxed/simple;
+	bh=8/7T84lpFwYJg3JJQZfnZa6swqZ+aMXk2kTJjIZ271Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pN81Ek8h5tl9vn9CnaUXFrFv+TuJI2/+vyZU74qRS9cSSGmApBh4Uo98++BeGJ/bmQek9Rkq7oYJVC5iJ6hbuNPj+Tg5wQEnsyeFE/xje1N6zi9oRYmBzOUoiRg8uxXM5tfWQPLjmnZa357Cl5Me/W/ZyYzonBq/yM1aoLr9gP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
+	 MIME-Version; b=oKH23yRV7zlMm6STYs69nRueB17uVL+yCLS6aaMZ97hSEoxW345rWHyhQ4fw5Ap+deDCVb3uBaeegtESM1vwYQNN4K5Z4eRWTPksVT4xdFSpv7089XRazOM1Txj91u4MtlSiAig6at93gyDN0M6er89dQQAD9rp8BkMTSCQZef0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz5t1739844575t8619cc
-X-QQ-Originating-IP: m+bwn7IFjKCLF+x58hcstYQ+9rxROWTBKvn/aLWJsXU=
+X-QQ-mid: bizesmtpsz5t1739844577ty0ejay
+X-QQ-Originating-IP: ZogU6NONzzy5Ew8a5nZObBSB+GlvUA1326i0164g2Jg=
 Received: from wxdbg.localdomain.com ( [36.24.205.26])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Feb 2025 10:09:33 +0800 (CST)
+	id ; Tue, 18 Feb 2025 10:09:36 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11202924122806695270
+X-BIZMAIL-ID: 2578718508898896570
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -51,9 +51,9 @@ To: andrew+netdev@lunn.ch,
 	vadim.fedorenko@linux.dev
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v8 2/4] net: wangxun: Support to get ts info
-Date: Tue, 18 Feb 2025 10:34:30 +0800
-Message-Id: <20250218023432.146536-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v8 3/4] net: wangxun: Add periodic checks for overflow and errors
+Date: Tue, 18 Feb 2025 10:34:31 +0800
+Message-Id: <20250218023432.146536-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250218023432.146536-1-jiawenwu@trustnetic.com>
 References: <20250218023432.146536-1-jiawenwu@trustnetic.com>
@@ -66,133 +66,204 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MfQnJH+7WKv6Q0fwmbVWRa3SsYe1Vld3T064jtKGNOZz6gXQCFEW2KnQ
-	6UYKoZ0mVqgIX0NjUHCM52qB6SLJn1r3msrEJerMUI8IehiBj1j6u4dOY8YEfyla27KJXnO
-	7IhFg4/lR5MCEko1oXrMygOIiO6ZGVjN5xrAcxgqI/IKIB36u8yV5sU4Z5UaPPMT0QBqqRi
-	zDJvDUypb/+GlZKl/sOzvbgLY3LAriUxS/vWFGkOmP4lV+fb0lytOHw5Auvm8IwR1tl3EK+
-	fMouEsj7emgZ3dvpbG8FkcS+WeBd2SDe+7vTgmgN8nAoApf1GuGexPnR4mXG3qM1cDLNO1H
-	jS+wvbqE0Ka6lnDxOJgT2L0/Oir0G6LG3EFJanEFiPAZRoqWC4crwtaYnu1eFsbbMk9z42z
-	FLthTVC1aMwlkid43RyKiOg/MJx2Lm+i1Ftvmvwm6Xqq2bFfCvppjTxwEvk4wXtAwU4w90q
-	+CRa3tccLsXq9YOM/e7P6rQ7l9dDiQH2NsQYsAwn0HOXlFdUvzTxHUEd1DOFxVKFiKXlTrw
-	fPt0gr6NRdhsq3jBPwU38KvJ4E/93Ut9PCVtau0srnUhVvhXIpewfys2GdxBVQ9Ux+fF+dV
-	/za2lTvsYyp05u2Op8ZuPTnqbN5wz9TByWv5QHb38vI8Q2yRryOICYUKhx+KmYoIDEFCy2F
-	iIsZy2yYokair3f+yktrrGDt9cQcQyTQyjbCD1jPQoNLA6t9uDYfOKlHVml859H3I3nq7Zx
-	5tAmJFIHSEg4bDD6MGiYEvfWUVuhstp4gXsJdQ22CFFgAGdMvQM8ogxmnnveWrUpcT4iTMi
-	GiGaowUQTiJU/MgBv7qjdKs5dPR/sDDaXCJiQPbdwM6k/Kzz2EOlFrbngjKYZCBwkQlbhsu
-	v3Pe0ZjwogQRSubJeX2vvU8qw2gpx/7LccfuGIkKl+KphsMN4+zQbeGUaxsfOBSsL2gnNqn
-	eQq7gAgIWIjYuk29oLpSeSQyYWqNDN88f2J9pCwa/HxOhGKk3uwo21qKD
+X-QQ-XMAILINFO: OCG/O0Z17aKrwlY5pJsdzvjo7v8osYK+dR051I9+Q1K140zVTg1t+R0o
+	zgY4tiBUFSpmwxo7PFwjy0j9YY4lH3QxUV4Eg7XdeAunBjVhi4s8f+Ildhayl9+XumqyHP+
+	SDb39U0EeJ6iJ+Y4hp8BdleYuyFzOzipD1pHFdzZ6k4mp6iJWuyc0Pc3ftyWtEnQhzIyCSv
+	jVPrlDR36mc/SAztG1YLtnwkw3MPwKCtp7dcOAwl6Sfb5XwKTt51stpTp1SmoZ4+uQNcv/R
+	ZX23ceh1n7/lfiBzKx6GGAG/bnLh4rZ4dHm+mumvRxMriRkfsrZjN7utuFD7+QecJQa6fVy
+	1Gzt3xnma7aY5evMpXjF/1f92ct3gfPjoDoIsUZUcX4NK28XNCtGJ5Mm6/oh1/i3yPlSKWL
+	R3sVBi+5ajCc12FJ5eYwP4ay5BRNx5YzjPgmey1iVODCFhHcT4XQ3Mv1K6jAAw6qaZGTT3d
+	lVYROEq1Jvaxvcvvy9WWVdcrNLl2GrX3oAw6fUw/OWILpyLMwhPCqevzzqanIx3avWAuao8
+	WLm03eCvi09bbt2Wosuxh7IgxKAEb7mtjKwtEbwQGGcpxmtu4DGC/ppWEgC6u9WLZ/l/tu9
+	I1Mlz7vyl0+1G96NbygOf9q4aJGKClHplF7IMFEcI268KrCB7osnT9g44gedMY/h/8f0V2J
+	nsijywcitpwCWDhhUzSsr0dAkMqSDVYPQGYXCIoy+Z/c0hoNK3RZlrU++fpSgo9D96gQy5d
+	zWjCOX16uxLiFEV43Yq7yC8Q7do2Rcg+Xt8hjdx4gYeIZksZXvhoRhKVOk4bGeJOFNm9z1H
+	KLKRzjpU830qhirKMsQkB6tD8du0nvlmUb7JUxYyEYYlEHBI57buq9wpm5YZcp9IyKfce73
+	iYjz4fnidG4NEEowo3fOIkYnbvAe7zrmLERS9hyvLHZa6oJZ16Hl0/RgdPYyHrlHAWUUXeK
+	u/a1Gs62vchzdwZ/EuOl3ONZ7Nsv8xGLsR81RBcGxbPOA7kEML8zZ/EDoy8SB/LjhW7pexa
+	vRwq2TCCyJMQX8/Vdp
 X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
 X-QQ-RECHKSPAM: 0
 
-Implement the function get_ts_info and get_ts_stats in ethtool_ops to
-get the HW capabilities and statistics for timestamping.
+Implement watchdog task to detect SYSTIME overflow and error cases of
+Rx/Tx timestamp.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 50 +++++++++++++++++++
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  4 ++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |  2 +
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  2 +
- 4 files changed, 58 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 105 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   1 +
+ 4 files changed, 109 insertions(+)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index c4b3b00b0926..28f982fbc64c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -455,3 +455,53 @@ void wx_set_msglevel(struct net_device *netdev, u32 data)
- 	wx->msg_enable = data;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+index e56288a18614..76986e41afe0 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+@@ -212,6 +212,102 @@ static int wx_ptp_tx_hwtstamp_work(struct wx *wx)
+ 	return -1;
  }
- EXPORT_SYMBOL(wx_set_msglevel);
-+
-+int wx_get_ts_info(struct net_device *dev,
-+		   struct kernel_ethtool_ts_info *info)
+ 
++/**
++ * wx_ptp_overflow_check - watchdog task to detect SYSTIME overflow
++ * @wx: pointer to wx struct
++ *
++ * this watchdog task periodically reads the timecounter
++ * in order to prevent missing when the system time registers wrap
++ * around. This needs to be run approximately twice a minute for the fastest
++ * overflowing hardware. We run it for all hardware since it shouldn't have a
++ * large impact.
++ */
++static void wx_ptp_overflow_check(struct wx *wx)
 +{
-+	struct wx *wx = netdev_priv(dev);
++	bool timeout = time_is_before_jiffies(wx->last_overflow_check +
++					      WX_OVERFLOW_PERIOD);
++	unsigned long flags;
 +
-+	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V1_L4_SYNC) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_SYNC) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_SYNC) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L4_SYNC) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_DELAY_REQ) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ) |
-+			   BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
++	if (timeout) {
++		/* Update the timecounter */
++		write_seqlock_irqsave(&wx->hw_tc_lock, flags);
++		timecounter_read(&wx->hw_tc);
++		write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
 +
-+	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
-+				SOF_TIMESTAMPING_TX_HARDWARE |
-+				SOF_TIMESTAMPING_RX_HARDWARE |
-+				SOF_TIMESTAMPING_RAW_HARDWARE;
-+
-+	if (wx->ptp_clock)
-+		info->phc_index = ptp_clock_index(wx->ptp_clock);
-+	else
-+		info->phc_index = -1;
-+
-+	info->tx_types = BIT(HWTSTAMP_TX_OFF) |
-+			 BIT(HWTSTAMP_TX_ON);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_get_ts_info);
-+
-+void wx_get_ptp_stats(struct net_device *dev,
-+		      struct ethtool_ts_stats *ts_stats)
-+{
-+	struct wx *wx = netdev_priv(dev);
-+
-+	if (wx->ptp_clock) {
-+		ts_stats->pkts = wx->tx_hwtstamp_pkts;
-+		ts_stats->lost = wx->tx_hwtstamp_timeouts +
-+				 wx->tx_hwtstamp_skipped +
-+				 wx->rx_hwtstamp_cleared;
-+		ts_stats->err = wx->tx_hwtstamp_errors;
++		wx->last_overflow_check = jiffies;
 +	}
 +}
-+EXPORT_SYMBOL(wx_get_ptp_stats);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index 600c3b597d1a..9e002e699eca 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -40,4 +40,8 @@ int wx_set_channels(struct net_device *dev,
- 		    struct ethtool_channels *ch);
- u32 wx_get_msglevel(struct net_device *netdev);
- void wx_set_msglevel(struct net_device *netdev, u32 data);
-+int wx_get_ts_info(struct net_device *dev,
-+		   struct kernel_ethtool_ts_info *info);
-+void wx_get_ptp_stats(struct net_device *dev,
-+		      struct ethtool_ts_stats *ts_stats);
- #endif /* _WX_ETHTOOL_H_ */
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index e868f7ef4920..7e2d9ec38a30 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -138,6 +138,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.set_channels		= ngbe_set_channels,
- 	.get_msglevel		= wx_get_msglevel,
- 	.set_msglevel		= wx_set_msglevel,
-+	.get_ts_info		= wx_get_ts_info,
-+	.get_ts_stats		= wx_get_ptp_stats,
- };
++
++/**
++ * wx_ptp_rx_hang - detect error case when Rx timestamp registers latched
++ * @wx: pointer to wx struct
++ *
++ * this watchdog task is scheduled to detect error case where hardware has
++ * dropped an Rx packet that was timestamped when the ring is full. The
++ * particular error is rare but leaves the device in a state unable to
++ * timestamp any future packets.
++ */
++static void wx_ptp_rx_hang(struct wx *wx)
++{
++	struct wx_ring *rx_ring;
++	unsigned long rx_event;
++	u32 tsyncrxctl;
++	int n;
++
++	tsyncrxctl = rd32(wx, WX_PSR_1588_CTL);
++
++	/* if we don't have a valid timestamp in the registers, just update the
++	 * timeout counter and exit
++	 */
++	if (!(tsyncrxctl & WX_PSR_1588_CTL_VALID)) {
++		wx->last_rx_ptp_check = jiffies;
++		return;
++	}
++
++	/* determine the most recent watchdog or rx_timestamp event */
++	rx_event = wx->last_rx_ptp_check;
++	for (n = 0; n < wx->num_rx_queues; n++) {
++		rx_ring = wx->rx_ring[n];
++		if (time_after(rx_ring->last_rx_timestamp, rx_event))
++			rx_event = rx_ring->last_rx_timestamp;
++	}
++
++	/* only need to read the high RXSTMP register to clear the lock */
++	if (time_is_before_jiffies(rx_event + 5 * HZ)) {
++		rd32(wx, WX_PSR_1588_STMPH);
++		wx->last_rx_ptp_check = jiffies;
++
++		wx->rx_hwtstamp_cleared++;
++		dev_warn(&wx->pdev->dev, "clearing RX Timestamp hang");
++	}
++}
++
++/**
++ * wx_ptp_tx_hang - detect error case where Tx timestamp never finishes
++ * @wx: private network wx structure
++ */
++static void wx_ptp_tx_hang(struct wx *wx)
++{
++	bool timeout = time_is_before_jiffies(wx->ptp_tx_start +
++					      WX_PTP_TX_TIMEOUT);
++
++	if (!wx->ptp_tx_skb)
++		return;
++
++	if (!test_bit(WX_STATE_PTP_TX_IN_PROGRESS, wx->state))
++		return;
++
++	/* If we haven't received a timestamp within the timeout, it is
++	 * reasonable to assume that it will never occur, so we can unlock the
++	 * timestamp bit when this occurs.
++	 */
++	if (timeout) {
++		wx_ptp_clear_tx_timestamp(wx);
++		wx->tx_hwtstamp_timeouts++;
++		dev_warn(&wx->pdev->dev, "clearing Tx timestamp hang\n");
++	}
++}
++
+ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
+ {
+ 	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
+@@ -219,6 +315,12 @@ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
  
- void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index d98314b26c19..78999d484f18 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -529,6 +529,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_rxnfc		= txgbe_set_rxnfc,
- 	.get_msglevel		= wx_get_msglevel,
- 	.set_msglevel		= wx_set_msglevel,
-+	.get_ts_info		= wx_get_ts_info,
-+	.get_ts_stats		= wx_get_ptp_stats,
- };
+ 	ts_done = wx_ptp_tx_hwtstamp_work(wx);
  
- void txgbe_set_ethtool_ops(struct net_device *netdev)
++	wx_ptp_overflow_check(wx);
++	if (unlikely(test_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
++			      wx->flags)))
++		wx_ptp_rx_hang(wx);
++	wx_ptp_tx_hang(wx);
++
+ 	return ts_done ? 1 : HZ;
+ }
+ 
+@@ -475,6 +577,9 @@ void wx_ptp_reset(struct wx *wx)
+ 	timecounter_init(&wx->hw_tc, &wx->hw_cc,
+ 			 ktime_to_ns(ktime_get_real()));
+ 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
++
++	wx->last_overflow_check = jiffies;
++	ptp_schedule_worker(wx->ptp_clock, HZ);
+ }
+ EXPORT_SYMBOL(wx_ptp_reset);
+ 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index f83c54d4657c..0fabfa90d4e7 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -1175,6 +1175,8 @@ struct wx {
+ 	u32 tx_hwtstamp_skipped;
+ 	u32 tx_hwtstamp_errors;
+ 	u32 rx_hwtstamp_cleared;
++	unsigned long last_overflow_check;
++	unsigned long last_rx_ptp_check;
+ 	unsigned long ptp_tx_start;
+ 	seqlock_t hw_tc_lock; /* seqlock for ptp */
+ 	struct cyclecounter hw_cc;
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index c7944e62838a..ea1d7e9a91f3 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -111,6 +111,7 @@ static void ngbe_mac_link_up(struct phylink_config *config,
+ 	wr32(wx, WX_MAC_WDG_TIMEOUT, reg);
+ 
+ 	wx->speed = speed;
++	wx->last_rx_ptp_check = jiffies;
+ 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
+ 		wx_ptp_reset_cyclecounter(wx);
+ }
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 60e5f3288ad8..7e17d727c2ba 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -222,6 +222,7 @@ static void txgbe_mac_link_up(struct phylink_config *config,
+ 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
+ 
+ 	wx->speed = speed;
++	wx->last_rx_ptp_check = jiffies;
+ 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
+ 		wx_ptp_reset_cyclecounter(wx);
+ }
 -- 
 2.27.0
 
