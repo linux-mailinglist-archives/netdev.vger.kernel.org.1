@@ -1,147 +1,96 @@
-Return-Path: <netdev+bounces-167229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD1AA393D6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:37:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0D9A393E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:42:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0404616EF80
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:37:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D42F6170E86
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 07:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6734F1B85E4;
-	Tue, 18 Feb 2025 07:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A681B9831;
+	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWgr0778"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gthhYI9H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C1F7482;
-	Tue, 18 Feb 2025 07:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966EA1B87CF;
+	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739864233; cv=none; b=Uf1UZp6Zwb8YnIG6k2kYg4yduUCOFkW8/mPY/jD+2kJ0gLIt+5e1xXpliwMmVELXfLLocgzAzoRf3fuNNL+rDdj+VLYtA9SMAD3y/oUxEJm6/r7q5onDYX5BhME7IQdo7onbEqeG+90SAdG9xsFVjHc5Vkt5cpKdpxYKKG9mSlM=
+	t=1739864531; cv=none; b=qZsF9SM1iF1KhGpMUwoyGJE36H8TuX2CHfACmbWes3A26km18+6ufUNHMTIHpeykpLfz1aP1QVlpSYWYMBCYb/WGkB9VXwYKtYP0/mj7x5BiodQvf3VvjWj/IVXbGGmdJS3dmtZgEiBrdW1MZ6yu7N75asCVDBx0KGvmALVa7bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739864233; c=relaxed/simple;
-	bh=rHPdrQ2R4tIc9vjiIZ/Zr4xqp3jsk+xgImcAQGo2rqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tgCZnPU74lhB2xs4uWylVMR8XBGryW5JLltFlU1AaV0WmmiB2xAK9IpCZeX4qsN+Lbs2oY8lq5YXPZI1EVdmIF6LKCi2gHf+2Qh6D73MoQ5aY1W4k4CAXt+ZZD3zZIDe/yBbhUMcp4Ot85c2U7j5h52gGw1lMHX4R8hKvYPUDBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWgr0778; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0903AC4CEE2;
-	Tue, 18 Feb 2025 07:37:11 +0000 (UTC)
+	s=arc-20240116; t=1739864531; c=relaxed/simple;
+	bh=IvK/YZdxhIzz+WQDui+6ei6dQMpDPKxU2syoofLtyUI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g4XjQcqEsj84+HAhD96xp+8ONUgGBf2TD+cGM8o56Z4aT8nGJgAvQPJmXFsPKUtOnPRl17ja1pr0s/R52FJvMhzbaCe798q1YH90GM5Sjr7pn28Dpd9zZ6WJFtxYFlL7jajybP//yK+lFIVkh5SeL8LXuRydWKOcJYGduvFBltc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gthhYI9H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18009C4CEE6;
+	Tue, 18 Feb 2025 07:42:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739864232;
-	bh=rHPdrQ2R4tIc9vjiIZ/Zr4xqp3jsk+xgImcAQGo2rqI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EWgr0778EQEcAmFbQlNT+nT/KNYZ4SKqJCtyez4pOLFV/1CyA+H4jbh2/8GzXpxmZ
-	 DSETZ78SCIhcwM/TzPSV695GL4T/7p4N+gs3bfWzLZvYHwU+D/KtTAdB8mRlVKqRmy
-	 dCJDNcp0QrgjM8NXLLp9558+VXlHGG281dDwe1jkP7+0baHL48O3bI1QAdl4hYm2Zr
-	 Z5vB4WYwjJJhdNmM9OTO12kvY4xK1clkZap3ZXjPQBRTWPE14/EI65IIpODmCL1PVh
-	 jTX6JbbRD6KLa2iCfx9DID3jGOtQpawzwklNLTUGFFW/GM+85Km67CVrgDEj51623m
-	 /3cclq2Kyl5vg==
-Date: Tue, 18 Feb 2025 08:37:09 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Kyle Hendry <kylehendrydev@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?Q?Fern=C3=A1ndez?= Rojas <noltari@gmail.com>, 
-	Jonas Gorski <jonas.gorski@gmail.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
-Message-ID: <20250218-lumpy-arrogant-orangutan-adeec8@krzk-bin>
-References: <20250218013653.229234-1-kylehendrydev@gmail.com>
- <20250218013653.229234-2-kylehendrydev@gmail.com>
+	s=k20201202; t=1739864531;
+	bh=IvK/YZdxhIzz+WQDui+6ei6dQMpDPKxU2syoofLtyUI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=gthhYI9H3TZNlItYwrKDSFuBdEkiKZrIrU49lRCIALScYrla7kqdufoYgJbGesW/s
+	 ZfqxxSTLbGj+8Qi02jw6wsu7IjVEgz+bO00kvW3TUsL0f4tzjbMOd/9uV2HfiIurGn
+	 9m47eoooc9igVM7Kr/FL6sr3en6A29okd0rLtNhhTWvF/CB0QtRNolG7vflfcsD6xz
+	 5Y/qo9rK8O3PiqfxmhGwBv3+ZcwBzQrmF1rOAzJKp2/QmhVDrqXUJv1jdVM5dlk+on
+	 Cu6aRVRbEFTEck7PdHrsS7uMdIMjjN8PGkfUTeir2LhQ/k8qQ00Esd9LqRLeaDttod
+	 NGahJwRUtODMg==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5452c29bacfso4304621e87.3;
+        Mon, 17 Feb 2025 23:42:11 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVX9TsriKvcfn4hVZI1VloDV3FC7mHZvLakwigpi2n9w8OI1BlQGRCm6AMI+1847VlTSt9vqsIK@vger.kernel.org, AJvYcCVnJrG/D+MDFf7oVd0UMa4I7q2uY6egkVmfQaqxd71rCKtgPlZg2dNkjaLwVGw5Z3X8T87keoNqaNuEx5M=@vger.kernel.org, AJvYcCWn5LnzDlCdlTcw3lAXzq272gO0eYkBBBCkEC9O7UbXd0mqsdM3IjACABcZM/k4jBWeAzrUdHcE4Y/6rsIG@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb+U4C5xFyWpzIl6PFTcTIefpXtdAitYUf47102VwcCu1dPQ8L
+	WW0ATvXusUuzshplXhiRosMB94kuI5Q5fXkFiutw3kN8jZvZBAcYDpwCC3kxpTTH+bC7ds+alQ5
+	tcWTzZSXSnGVLzmara5lmTrjuCyE=
+X-Google-Smtp-Source: AGHT+IHcwsPEwQwvSNlp7+txo1ExLwL6bb64NekXlJS4T9EnBQWu9yYoLt2pG9NrnPvUbCr2H8go8Lh60C6VvcSVOhE=
+X-Received: by 2002:a05:6512:2342:b0:545:60b:f394 with SMTP id
+ 2adb3069b0e04-5452fe27255mr4337762e87.4.1739864529480; Mon, 17 Feb 2025
+ 23:42:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250218013653.229234-2-kylehendrydev@gmail.com>
+References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain> <20250215090412.46937c11@kernel.org>
+ <Z7FM9rhEA7n476EJ@gondor.apana.org.au> <20250217094032.3cbe64c7@kernel.org> <Z7QBuIvr4Asiezgc@gondor.apana.org.au>
+In-Reply-To: <Z7QBuIvr4Asiezgc@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 18 Feb 2025 08:41:57 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
+X-Gm-Features: AWEUYZnpo_Rxk-ow416mB2XJK3Qj-eZIWTL3GmEexif4qB9L-kVkI7AOouI7sOg
+Message-ID: <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Jakub Kicinski <kuba@kernel.org>, Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 17, 2025 at 05:36:40PM -0800, Kyle Hendry wrote:
-> This patch adds support for the internal gigabit PHY on the
+On Tue, 18 Feb 2025 at 04:43, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Feb 17, 2025 at 09:40:32AM -0800, Jakub Kicinski wrote:
+> >
+> > Yes, that's true for tunnels and for IPsec.
+> > TLS does crypto in sendmsg/recvmsg, process context.
+>
+> OK that's good to know.  So whether SIMD is always allowed or
+> not won't impact TLS at least.
+>
 
-Please do not use "This commit/patch/change", but imperative mood. See
-longer explanation here:
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+And for IPsec, I'd assume that the cryptd fallback is only needed when
+TX and RX are competing for the same CPU.
 
-> BCM63268 SoC. The PHY has a low power mode that has can be
-> enabled/disabled through the GPHY control register. The
-> register is passed in through the device tree, and the
-> relevant bits are set in the suspend and resume functions.
-> 
-
-...
-
-> +int bcm63268_gphy_resume(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = bcm63268_gphy_set(phydev, true);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = genphy_resume(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +int bcm63268_gphy_suspend(struct phy_device *phydev)
-
-Why these are not static? Where is EXPORT_SYMBOL and kerneldoc?
-
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_suspend(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = bcm63268_gphy_set(phydev, false);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +static int bcm63268_gphy_probe(struct phy_device *phydev)
-> +{
-> +	struct device_node *np = dev_of_node(&phydev->mdio.bus->dev);
-> +	struct mdio_device *mdio = &phydev->mdio;
-> +	struct device *dev = &mdio->dev;
-> +	struct bcm_gphy_priv *priv;
-> +	struct regmap *regmap;
-> +	int err;
-> +
-> +	err = devm_phy_package_join(dev, phydev, 0, 0);
-> +	if (err)
-> +		return err;
-> +
-> +	priv = devm_kzalloc(dev, sizeof(struct bcm_gphy_priv), GFP_KERNEL);
-
-sizeof(*)
-
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	phydev->priv = priv;
-> +
-> +	regmap = syscon_regmap_lookup_by_phandle(np, "brcm,gphy-ctrl");
-
-No. ABI break without any explanation in commit msg.
-
-Best regards,
-Krzysztof
-
+So for modern systems, I don't think the SIMD helper does anything
+useful, and we should just remove it, especially if we can relax the
+softirq/preemption rules for kernel SIMD on x86 like I did for arm64.
 
