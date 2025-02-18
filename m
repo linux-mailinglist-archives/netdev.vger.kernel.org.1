@@ -1,106 +1,115 @@
-Return-Path: <netdev+bounces-167280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2306CA399A2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:52:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461E9A399B5
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:54:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 589EC3A8457
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:50:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEAD516A781
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9083236A6B;
-	Tue, 18 Feb 2025 10:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814B1239099;
+	Tue, 18 Feb 2025 10:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIxcbpYC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NGdJ0xWo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB59913D51E;
-	Tue, 18 Feb 2025 10:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3476822D7B1;
+	Tue, 18 Feb 2025 10:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739875807; cv=none; b=p3At9qfW3WdakmnV8mwGivYNDNKQ05cOdjMVtDzw4PcblsxKv2Gm+vnG9SLKp0ylm3I9cIJBvyZorAvTrMpQXFW+0M0WGokf+PBLvkb7o0BpPiINbcjMNWCM+7WCJQEIUvpxtgpyGbGmS5BiElALkJIVOH8Gt/WKuxKZvWpnA98=
+	t=1739876079; cv=none; b=CAPoGX0nttFuclGDQaeW7Kjqgk1TZcKkd6P0EkQpeJFQuP7KjvQldRp45xz87dSvTLyj1evOMjQUXCjArwtV0PI/unP5Rv48n5v6o86kES+juAot1UDeohDXGzkN0KtCJPd/kct3BG9+yqNCr0OBTUHs/lmEKrAX+eJLAPVocTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739875807; c=relaxed/simple;
-	bh=0ta9iRqvOL/XyCbfOk5/m0s+WL02GRT3CgMUuEb8Y2A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EpQ3ylAsyzrPJwGpuknQvEDM1y8BOq/4wY62O0fOfjl/gN7xzxOhd+QtTk2hNALi0mN+bDJ9OiiRW8b2ZSpd66r3vLwJ7/1KBFmwaYl6TC37VLCiyri4Elry2MG1TJf86tBC1Zn9J04POOOT4pC6Zan8rBu9JsjmT0FQGJoACVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIxcbpYC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11FDFC4CEE2;
-	Tue, 18 Feb 2025 10:50:05 +0000 (UTC)
+	s=arc-20240116; t=1739876079; c=relaxed/simple;
+	bh=RdaxUeKvZh5sL0uJ9BtFySXbqU59fk3zLkq47gAsBp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kGNLHsEKg1XeUDBwxLbFtr8hWw/NF+mQgB4oqcu12Kg/0Jb6u9oMMSGvlPa40KmL1fUoF1hSrN4YCEtdYjjssnVgXK68NMWCXP/RvTuGzNWNmpLBKgNOECczyK4J+JKsPE71Pu5+/kgWx73N6cjnJ1vLAVoBs0HV7XrnZhqHVn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NGdJ0xWo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED8EC4CEE2;
+	Tue, 18 Feb 2025 10:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739875805;
-	bh=0ta9iRqvOL/XyCbfOk5/m0s+WL02GRT3CgMUuEb8Y2A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fIxcbpYCIDGn3q2a5S2PyQ2TbijgrIPq+T0vunKI52/8Xnl0DRBv1gAWtUGBUhz2A
-	 D/qHkQ/1X6NlGIjkm3/zN1aa3RU9WpcKP9s8Z+uFuwg1RXbrkxOzh0AZ6b/TbdSkqk
-	 nhHErV+inkIK9/lLX5O4LTnMLfLHpna6X5qHGy59QlquCQkCquvDeceJG2QUOqM5js
-	 osgliYXLHRsAqnKI4XvO6pSVfDtwcP3na3CLOpIKwzKrpjqiQDQ4BT47b8c+LLS38J
-	 x7kf5QoyFVSerSJBh30TQfO1rY13FjsajbGdT5jnpmbnCquHOO7p5ri3Uam7sx31bP
-	 SN0b7i3GqS9+A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714B8380AA7E;
-	Tue, 18 Feb 2025 10:50:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1739876078;
+	bh=RdaxUeKvZh5sL0uJ9BtFySXbqU59fk3zLkq47gAsBp0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NGdJ0xWorHM+qXxP6z1rSeaxtuPdGwDGjNbPbIrWqn2LZYrgAwf7tfZPrZJfTUp2k
+	 HAQMk4W5ei9khWJkMH+utPXmDd1oRqzwdKNh9yBkDxqo1Kwqm7JawToKHk8S3bNLF5
+	 QMihBcdYKQBetKQdUBAtsQ1mDQE0HTxkQv5d2v8ZgI2LSYNRcy31utnMKWhBXPPncG
+	 ypCuFYUO6ZlKV2AfP3Yxt9Fl9YLBOWK9PtChtQ2AxuKkBcc6dZu/LME9uclFbq9nbh
+	 a0BqbTtPB8mlohh/4vGAClo6rDyAh9d1d6UUrjKeY+V9JAqdWuFSvfb13pdTSf+qOJ
+	 NQ9zKlK53hOGw==
+Date: Tue, 18 Feb 2025 16:24:35 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Michal Simek <michal.simek@amd.com>
+Cc: linux-kernel@vger.kernel.org, monstr@monstr.eu, michal.simek@xilinx.com,
+	git@xilinx.com, Anand Ashok Dumbre <anand.ashok.dumbre@xilinx.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Mark Brown <broonie@kernel.org>,
+	Michael Tretter <m.tretter@pengutronix.de>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Mubin Sayyed <mubin.sayyed@amd.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Niklas Cassel <cassel@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	"open list:DMA GENERIC OFFLOAD ENGINE SUBSYSTEM" <dmaengine@vger.kernel.org>,
+	"moderated list:ARM/ZYNQ ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+	"open list:COMMON CLK FRAMEWORK" <linux-clk@vger.kernel.org>,
+	"open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" <linux-ide@vger.kernel.org>,
+	"open list:XILINX AMS DRIVER" <linux-iio@vger.kernel.org>,
+	"open list:SPI SUBSYSTEM" <linux-spi@vger.kernel.org>,
+	"open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 2/2] dt-bindings: xilinx: Deprecate header with firmware
+ constants
+Message-ID: <Z7Rm6/DYM67QbXvT@vaman>
+References: <cover.1738600745.git.michal.simek@amd.com>
+ <2a6f0229522327939e6893565e540b75f854a37b.1738600745.git.michal.simek@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v6 0/6] Add af_xdp support for cn10k
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173987583526.4038826.3171177356659390982.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 10:50:35 +0000
-References: <20250213053141.2833254-1-sumang@marvell.com>
-In-Reply-To: <20250213053141.2833254-1-sumang@marvell.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: horms@kernel.org, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lcherian@marvell.com,
- jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
- hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org, daniel@iogearbox.net,
- bpf@vger.kernel.org, larysa.zaremba@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a6f0229522327939e6893565e540b75f854a37b.1738600745.git.michal.simek@amd.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 13 Feb 2025 11:01:35 +0530 you wrote:
-> This patchset includes changes to support AF_XDP for cn10k chipsets. Both
-> non-zero copy and zero copy will be supported after these changes. Also,
-> the RSS will be reconfigured once a particular receive queue is
-> added/removed to/from AF_XDP support.
+On 03-02-25, 17:39, Michal Simek wrote:
+> Firmware contants do not fit the purpose of bindings because they are not
+> independent IDs for abstractions. They are more or less just contants which
+> better to wire via header with DT which is using it.
+> That's why add deprecated message to dt binding header and also update
+> existing dt bindings not to use macros from the header  and replace them by
+> it's value. Actually value is not relevant because it is only example.
 > 
-> Patch #1: octeontx2-pf: use xdp_return_frame() to free xdp buffers
+> The similar changes have been done by commit 9d9292576810 ("dt-bindings:
+> pinctrl: samsung: deprecate header with register constants").
 > 
-> [...]
+> Signed-off-by: Michal Simek <michal.simek@amd.com>
+> ---
+> 
+>  Documentation/devicetree/bindings/ata/ceva,ahci-1v84.yaml  | 4 +---
+>  .../bindings/dma/xilinx/xlnx,zynqmp-dma-1.0.yaml           | 3 +--
 
-Here is the summary with links:
-  - [net-next,v6,1/6] octeontx2-pf: use xdp_return_frame() to free xdp buffers
-    https://git.kernel.org/netdev/net-next/c/94c80f748873
-  - [net-next,v6,2/6] octeontx2-pf: Add AF_XDP non-zero copy support
-    https://git.kernel.org/netdev/net-next/c/b4164de5041b
-  - [net-next,v6,3/6] octeontx2-pf: AF_XDP zero copy receive support
-    https://git.kernel.org/netdev/net-next/c/efabce290151
-  - [net-next,v6,4/6] octeontx2-pf: Reconfigure RSS table after enabling AF_XDP zerocopy on rx queue
-    https://git.kernel.org/netdev/net-next/c/25b07c1a8694
-  - [net-next,v6,5/6] octeontx2-pf: Prepare for AF_XDP
-    https://git.kernel.org/netdev/net-next/c/c5c2398eb88b
-  - [net-next,v6,6/6] octeontx2-pf: AF_XDP zero copy transmit support
-    https://git.kernel.org/netdev/net-next/c/53616af09b5a
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+~Vinod
 
