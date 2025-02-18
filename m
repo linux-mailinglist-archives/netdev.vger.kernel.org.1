@@ -1,107 +1,129 @@
-Return-Path: <netdev+bounces-167233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB2BA39470
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:02:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F4AA394A4
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E4E37A3811
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:01:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6369B3B2921
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A9822A810;
-	Tue, 18 Feb 2025 08:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29D422B5A5;
+	Tue, 18 Feb 2025 08:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="iCfF8/cM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DXFmkTlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD9522ACD3;
-	Tue, 18 Feb 2025 08:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BB622B5AB;
+	Tue, 18 Feb 2025 08:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739865758; cv=none; b=Dq1ckzUxIsRjQ9z2R1JyQGd8yQRB5LOqKRCahO+/4f1WExS9idviGeG5bDwQWf+aSYOs1+dpA222LBuwYOmmKj59OfabLDZTpGdxD1dfINZ9B1h0xt/RgA8DWFRNdaHOuQec96nbs8oYxbAYbxuM3Ki6YbVkSo+G5UtShJRqUTU=
+	t=1739866345; cv=none; b=sOjC93P+/Cuu+7iS6Q2D+thPX4a34pahOiSa3sty1Tt0IbKCYi87g/kHbgq7XOXRgH//zmTntyyg9xTWSMrp1DsadMMp32UkTAlpGZUudbtoe5e3DVsXeiQH/otYSk6uVyKESaK3jcFU7C96tZiALtz15jWNiFeiBdAnik+r7Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739865758; c=relaxed/simple;
-	bh=hgBUpsnpr1ub7hlRJV0ehuWKWc9Dq4qTzLaxzwRbG/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGHcfom8TqG7523cRu25PzpLJPHuUrnX9oBhzOhfEZxW7FtZtjKJDuTBJE416iylCw5Y53RPO1mSux86/IomN9LNlcgDxeo2CxW04IPKVulvteWAy0j9Vd3uHi8As2vlyVk50UTqJlCHfgkCIxOPVq5xB7w2o1H3IbaRA883H54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=iCfF8/cM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=WMUQZRQIhgP1DqRoKFKVytGvZcO014vRgMYtE+1LX14=; b=iCfF8/cMHupM+auCxOveCoQwin
-	+bUN0CgMRVLMFVoLXpQD+rL32YVolkozFLuEEBf9NTFkw7It9d8HIhYwoQ8zAn5/QMv2Sx7i3hXsg
-	do5CtLg7SGdoQdUfBYlxsse8HhOOXfZQ134pYZ9Rz0MebOD7PjRBHvz7gGPoHScPX4BjOfo4on+/6
-	jxaoEQaQFxarurr56rzMThVq7nfz+T1cVd0jOIVzH9NCNoZ/99zd6u0skT5A1Vmjwn9y7jlhKWTD9
-	XRP1akQc6OgYsb/aY5ml3pmflQyDLVIzq2OWXPyFERhfm0h4JUBRX8KDXVVnvzzJjcpUoBbVCjbLr
-	trfhZnTw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tkILs-001BI4-2J;
-	Tue, 18 Feb 2025 16:02:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Feb 2025 16:02:29 +0800
-Date: Tue, 18 Feb 2025 16:02:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
-	fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
- hashing
-Message-ID: <Z7Q-lRwkCbXFpgXS@gondor.apana.org.au>
-References: <20250212154718.44255-1-ebiggers@kernel.org>
- <Z61yZjslWKmDGE_t@gondor.apana.org.au>
- <20250213063304.GA11664@sol.localdomain>
- <20250215090412.46937c11@kernel.org>
- <Z7FM9rhEA7n476EJ@gondor.apana.org.au>
- <20250217094032.3cbe64c7@kernel.org>
- <Z7QBuIvr4Asiezgc@gondor.apana.org.au>
- <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
+	s=arc-20240116; t=1739866345; c=relaxed/simple;
+	bh=VDDF0drE0v6aM8n2GdZ900DDcfak8917AYeCfZSSyMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e9oD3A5HrJgG0HgGIkNX+igXgc/HQDyJC9d5yJVjtg45K6DcPmDMtq2GkjWf21dSTvH1DYj19AdZYqZqIeTzVclAlhBvZ8DBJvqCTzddjaG4MWplLxOObfQ7lJiokFn31Ucf+NoA+pRgwIXMSOq9/P/1LdDdugvRRcfINcvKqGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DXFmkTlR; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22104c4de96so43462635ad.3;
+        Tue, 18 Feb 2025 00:12:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739866343; x=1740471143; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jOp0J6pj2QhljoJSRa5U74JabHLSILEyEQi3fxw4PJM=;
+        b=DXFmkTlRohhCs1FizfVZqOR2kca3VPaULBDrro7065c156gYpBygzcQ+CRSbM3NzJm
+         hbtA2kP2hkylsfYRFqdWTKDLcwCLthv3iQQOvMI5XIA8xeFYzQ7dtIMMGzR4dzQw6e6J
+         /s755nqTmq9Gt0YAnzHvn3tiM4O7c4eLbbjEshE5TUvpBrbEKT/m2mejyUExNJfrzkqI
+         /5LXrkzkBkciLGlxl1G9SWca1LPTVuEDIt+bHDtZ5KumhO0HE0XA/LNhBOEloDEHrV0u
+         xvfwRqUk0Lou2ViEGewEG3GNZsskCw7/6w6gsS+2w0KMaODqZtIaBWkeIMJf2KNGQIso
+         5VOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739866343; x=1740471143;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jOp0J6pj2QhljoJSRa5U74JabHLSILEyEQi3fxw4PJM=;
+        b=KyTapWt06oXpl7OkkLgrxCz6sSmNWIdtgghpKSBQpderyhKnvZisTCmbDUBNxBp8DO
+         R9NN4fT5k6T+WFKjxgV9ELa1x9InjpUYlFaBd6uQzy+GFlGbotV2x33WmmPY4xzwV+HU
+         FcuLJNNNLxp95AWxgSBpNO8mP89OSmMASOjFQlJjGCN16n1b+syrVL/W2D5TSDlZ3DMM
+         zOey/RrL3ILrVGqjyqsJSLNMdPbp118IXUSo5DkOE7Bs2Bhaxvo4GNBpv7Cganqlpp4U
+         X+KiaV6muG8qfn/teOODqip0aR/rIYGNxwT8UwDzF0zGWZ1XMW1X5/oLwQ1O6U6ZDo9R
+         VDRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUS+1do6vJ+8g974OqZweLNeQQPPRq0xL7dtt23YAUziA/IKOi/BUm9bbrkVwIQkzkINB1XOWkA@vger.kernel.org, AJvYcCVeUAHI96dwKbmjJ7bZEUF9D0AgAeR7pgEAsh/gNQq0NScbHwyy9x8t91T0Dj3QcWZt3pq45I1hYWL3t0E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBUl9IMClvXqiwJWalzUf9G7ZQnFr9vA1lnYDUhwrC6kcqKW/u
+	/mKrSYma3mR2rrl1EcRrVNW/L2RBe4e7GDauaYERqoNAPzm+4tDRogi0zPeP
+X-Gm-Gg: ASbGncv1dwGiUzWB2GIoagruk8vCejNIeQpgU/ePkEA60O3LKa2CZUEZzFsqgdKbK/c
+	ORClNfQ+NJgd3D9oTcqJnErAdoqg4WwmE+3FIGQFZA9NYLg+MXatk6RsWX+dzlAyElY9yobUKWf
+	SiUT37S6eOkx8V1NDQUm+5Jk1C0g0f6e6T7cSjACkmoarV5FcRanEIQs3cIgIKgLHKS4RmvHAKN
+	D4Tr12/Z9AUjXhKLtlms5cDzh5HSSjDAfhkSEgsyb2qvH4pLT+u4di0DBfJFzElVmm3/cb0hY4S
+	uyKNzOMGgHqX1S537OOJ
+X-Google-Smtp-Source: AGHT+IFOJzWqTtD0VGVy/7gzR52hP2VG/n0XwVxVK5cql1UwPXceP2mIyhCVePXU5Bhd4zk6pU/IQA==
+X-Received: by 2002:a17:902:ec83:b0:21f:5933:b3eb with SMTP id d9443c01a7336-22104087bc1mr162223775ad.31.1739866343320;
+        Tue, 18 Feb 2025 00:12:23 -0800 (PST)
+Received: from eleanor-wkdl.. ([140.116.96.203])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d537d0f2sm83726135ad.105.2025.02.18.00.12.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 00:12:22 -0800 (PST)
+From: Yu-Chun Lin <eleanor15x@gmail.com>
+To: marcelo.leitner@gmail.com,
+	lucien.xin@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jserv@ccns.ncku.edu.tw,
+	visitorckw@gmail.com,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: [PATCH net] sctp: Fix undefined behavior in left shift operation
+Date: Tue, 18 Feb 2025 16:12:16 +0800
+Message-ID: <20250218081217.3468369-1-eleanor15x@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXFe2f0cCYznorrO-wJyh-qxJP5z-HdR9rbQiuMKC5u6qw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 18, 2025 at 08:41:57AM +0100, Ard Biesheuvel wrote:
->
-> And for IPsec, I'd assume that the cryptd fallback is only needed when
-> TX and RX are competing for the same CPU.
+According to the C11 standard (ISO/IEC 9899:2011, 6.5.7):
+"If E1 has a signed type and E1 x 2^E2 is not representable in the result
+type, the behavior is undefined."
 
-Which can happen if the system is handling encrypted data in both
-directions.  Sometimes you do want to have the hardware steer a
-given flow to the same CPU in both directions.
+Shifting 1 << 31 causes signed integer overflow, which leads to undefined
+behavior.
 
-> So for modern systems, I don't think the SIMD helper does anything
-> useful, and we should just remove it, especially if we can relax the
-> softirq/preemption rules for kernel SIMD on x86 like I did for arm64.
+Fix this by explicitly using '1U << 31' to ensure the shift operates on
+an unsigned type, avoiding undefined behavior.
 
-Sure, if we can ensure that SIMD is always useable even in softirq
-context then we should definitely remove the simd wrapper.  But until
-that happens, suddenly switching from AESNI to the generic C
-implementation because a system is loaded is not good.
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+---
+ net/sctp/stream.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/net/sctp/stream.c b/net/sctp/stream.c
+index c241cc552e8d..bfcff6d6a438 100644
+--- a/net/sctp/stream.c
++++ b/net/sctp/stream.c
+@@ -735,7 +735,7 @@ struct sctp_chunk *sctp_process_strreset_tsnreq(
+ 	 *     value SHOULD be the smallest TSN not acknowledged by the
+ 	 *     receiver of the request plus 2^31.
+ 	 */
+-	init_tsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map) + (1 << 31);
++	init_tsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map) + (1U << 31);
+ 	sctp_tsnmap_init(&asoc->peer.tsn_map, SCTP_TSN_MAP_INITIAL,
+ 			 init_tsn, GFP_ATOMIC);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
 
