@@ -1,149 +1,143 @@
-Return-Path: <netdev+bounces-167200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40938A39215
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:22:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9126FA3921A
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 05:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1646F16AE98
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:22:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61101188DDD3
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 04:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8DF1A2554;
-	Tue, 18 Feb 2025 04:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01081A83F4;
+	Tue, 18 Feb 2025 04:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="juL/issS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0acIJGvw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAD1198823;
-	Tue, 18 Feb 2025 04:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397D11A256E
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739852558; cv=none; b=JmEtOKONEyOZCYNRbsNIRK4gQVNHIgGWK5WGf/0VYimq/b94+bylAt+V1VzR0V0EafqftjYbTV9Sy9FNJw1qbRlYpiVYESI351DooatRYPkla1JSRopLYcmvaYPn3ghjHZkaeId8xHjr94vA6BHLxHgr1LT8cf0Z8/wSScRMSRw=
+	t=1739852676; cv=none; b=hLg59kmZDI6eYyCafDx7bf1JbtgPs1NFYlHtB/BU+lEz9Vw7qfo2acLukYpBapbBpzFOFQuAlHFDXq78nZ6VraOcCXRgrpeENZgXZGDQ6KX8+nK+SMpO04FxLrKi5F/RqMfcNQzA3YkKWQ/0j2YSGf/KivVboYcZVqZp6BReqjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739852558; c=relaxed/simple;
-	bh=pxH1nfbEv2RRWKjUnE9knf+tEmhK6ZwKRJBxBZjuKUE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j95h4Ehpz44JwytWH/3Fn1yUm1fuIAZSaXWeWeerABhK1VY0x1Nf7RhFe31Xp2eEOB9Hq7oC3bVbGIfStWNXEm8o8ITUZyjY4Yq9G00pHtdFB7lBvPqhXdadw/KJ/ijOLAKHBuNldVcoEdmBohkxE8Ntbpl8xyotBhxgarv8HSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=juL/issS; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1739852676; c=relaxed/simple;
+	bh=fw/Kh4vFp+mf2JGXgSm3+iHZaIffmUvILlDOJqLbf5o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YQbYO7Y3iwmUMRnhXQclo67ihZ980ZrTOfUTBDoydkyLjliZzuHuHeP7WpEn8ZIcCWRnScK4Q2po4iQryvn8n8vFd9aRIyRO4gcaxogWhljzM7+YUpQmHD7NmhPb6RqFRJBApqOAZIV7CCvRkAnjgpCuhlwr51B2ZZCNNHk5LQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0acIJGvw; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6f679788fd1so35583777b3.2
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 20:24:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739852558; x=1771388558;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=z0H8g2Ig0p4sOXdDEzUc4q6vUJHVYW75M1gNOnWK9kU=;
-  b=juL/issSOHOXb9CTS2QAFCHOvU0yQQMUtkelPAgPiNDu80cZwUh1htVV
-   CZ/fkErNHpDi+2KsBuAX3L9HGVY/xVQ7Z/yno6uFUQ/j1WWbqnB13fUr/
-   Ilmsv4pA39v8KaK/FPPJi4OUZBvLd1ccHa4bZ2bppep4zQtT/I60OHuwP
-   M=;
-X-IronPort-AV: E=Sophos;i="6.13,294,1732579200"; 
-   d="scan'208";a="272065216"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 04:22:34 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:53261]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.115:2525] with esmtp (Farcaster)
- id f87b2c59-5b8e-4b9a-8c18-524ac1273d36; Tue, 18 Feb 2025 04:22:32 +0000 (UTC)
-X-Farcaster-Flow-ID: f87b2c59-5b8e-4b9a-8c18-524ac1273d36
-Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 18 Feb 2025 04:22:31 +0000
-Received: from b0be8375a521.amazon.com (10.119.14.201) by
- EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 18 Feb 2025 04:22:25 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <vbabka@suse.cz>
-CC: <42.hyeyoo@gmail.com>, <akpm@linux-foundation.org>, <cl@linux.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<gnaaman@drivenets.com>, <horms@kernel.org>, <iamjoonsoo.kim@lge.com>,
-	<joel.granados@kernel.org>, <kohei.enju@gmail.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>, <lizetao1@huawei.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <penberg@kernel.org>,
-	<rientjes@google.com>, <roman.gushchin@linux.dev>
-Subject: Re: [PATCH net-next v1] neighbour: Replace kvzalloc() with kzalloc() when GFP_ATOMIC is specified
-Date: Tue, 18 Feb 2025 13:22:16 +0900
-Message-ID: <20250218042216.30357-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <b4a2bf18-c1ec-4ccd-bed9-671a2fd543a9@suse.cz>
-References: <b4a2bf18-c1ec-4ccd-bed9-671a2fd543a9@suse.cz>
+        d=google.com; s=20230601; t=1739852674; x=1740457474; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tJo+0ZlAdHOz9Gg66XFjfUOilGx/xXuy04+cDUSNa8o=;
+        b=0acIJGvwOf2IQLNQNXiiTalC2+klLp8RQeAgjqwi3XqiT3extSAA1whfl4OQ6YY8ll
+         W9BV9abUgvdZ9wLtVp1hFjJ8JzPG7/uM2W0xHNBaxHK0OQFXf4YY/mEObVTuG84HTS6I
+         pLB03nn5nz8CYC0qW0qkspgR6M+iwHqE/EXKc7B2KtwHWcgfY+cHdZ4Pykvqoz9FIWSt
+         f9RopfN6ZdJHjdMwdQya1wreaHBThCP68hyWIZ6j3FdniTtsNQbgAvkk6T+r5pWsrMOS
+         LbabxsGZVIednAzFJu5FLMgQlPabpGxDks9ZV+kJumMEq6jkyc3Q66pu6PELAfGQ6Bec
+         pXFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739852674; x=1740457474;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tJo+0ZlAdHOz9Gg66XFjfUOilGx/xXuy04+cDUSNa8o=;
+        b=Zxr46PgqGar4yWR02lc0VuG3Vro8pPmFzp5sKsre1qGCuv7LqWrN4CMAyUcA56JTvH
+         g7N3sUd/Pgxy2z6PsYtfZR3x/yh+iHjxs8zXOusuiurSXQjmcwyORskf0lLCAeshakfZ
+         MvmU9waQGfne+D6PuRMThWuEz+aZaL5pBCgTKhndrKARkoVPYFS0HexEGDV6mribdbSU
+         y/Q2GzJNaRFkbnFCGXvK/vSqElTFH/ASNNCkTeDy5c5VUyZbxdr14h3ybKt75MgKj0fz
+         f6bzLg+BGak1qyfWLzocjTsz6LbRatMXIOc93/bpkwmwmac+2Xs/wfM3WiU53OUyf6nB
+         qBDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUo0Ir+mtpdnHSdca0hYWr4EvIM1Z8a0sYkR9Vk251XJY+9Ced2BB+xX1tfQCv/bMUqaVwYA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfIvjtZTDExEY7L2RG1RF3B0Z4DLlDoeiOLHYOAcWj2FV6GmU3
+	Tp9TaeTKlAg/phgvB29UxaBLfiqlR4AveCRgfdZdghl5QBOAMa2zPXaPOvkitrISAmKLkWBR8re
+	5aGLMFBV8STtGYm6tJN1UXhu7Fa9Dg6j56z3W
+X-Gm-Gg: ASbGncu82+RL2b+lIC8SvGVMcJyEtZdKZwKf9RxOYE1rE3qDF+4HZcyTHmy+huiMnJ1
+	w849ugXVRWK1czPMhM8x4ScmTTlGPkpdDCnKc7U20/bgQ9m9LpXo7pIEIpyRXtg1GZoPvtjfF7g
+	==
+X-Google-Smtp-Source: AGHT+IExoJCNXHIjUMVk1sdBiV9SOyDr6EnWbd2vk6ze6NK5ER5srFACy3NEeD9n+dKZJD+IoaCx+f6NH1ljb6VUDmI=
+X-Received: by 2002:a05:690c:6887:b0:6fb:974e:dac3 with SMTP id
+ 00721157ae682-6fb974edd76mr6172817b3.13.1739852674014; Mon, 17 Feb 2025
+ 20:24:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D003ANC003.ant.amazon.com (10.37.240.197)
+References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <2025021425-surgical-wackiness-0940@gregkh> <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
+ <2025021717-prepay-sharpener-37fb@gregkh>
+In-Reply-To: <2025021717-prepay-sharpener-37fb@gregkh>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Tue, 18 Feb 2025 12:24:07 +0800
+X-Gm-Features: AWEUYZknjZnpnPXU3RpJnqSIGHgESMJNEzhEO9EeUs6CxWq63gqYeGuK79ATGwY
+Message-ID: <CADg1FFf7fONc+HJT8rq55rVFRnS_UxnEPnAGQ476WVe+208_pA@mail.gmail.com>
+Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->>> > From: Kohei Enju <enjuk@amazon.com>
->>> > Date: Mon, 17 Feb 2025 01:30:16 +0900
->>> > > Replace kvzalloc()/kvfree() with kzalloc()/kfree() when GFP_ATOMIC is
->>> > > specified, since kvzalloc() doesn't support non-sleeping allocations such
->>> > > as GFP_ATOMIC.
->>> > >
->>> > > With incompatible gfp flags, kvzalloc() never falls back to the vmalloc
->>> > > path and returns immediately after the kmalloc path fails.
->>> > > Therefore, using kzalloc() is sufficient in this case.
->>> > >
->>> > > Fixes: 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour")
->>> >
->>> > This commit followed the old hash_buckets allocation, so I'd add
->>> >
->>> >   Fixes: ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()")
->>> >
->>> > too.
->>> >
->>> > Both commits were introduced in v6.13, so there's no difference in terms
->>> > of backporting though.
->>> >
->>> > Also, it would be nice to CC mm maintainers in case they have some
->>> > comments.
->>> 
->>> Oh well, we need to trigger neigh_hash_grow() from a process context,
->>> or convert net/core/neighbour.c to modern rhashtable.
->> 
->> Hi all, thanks for your comments.
->> 
->> kzalloc() uses page allocator when size is larger than 
->> KMALLOC_MAX_CACHE_SIZE, so I think what commit ab101c553bc1 ("neighbour: 
->> use kvzalloc()/kvfree()") intended could be achieved by using kzalloc().
+Hi Greg,
+
+On Mon, Feb 17, 2025 at 4:53=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
 >
->Indeed, kzalloc() should be equivalent to pre-ab101c553bc1 code. kvmalloc()
->would only be necessary if you need more than order-3 page worth of memory
->and don't want it to fail because of fragmentation (but indeed it's not
->supported in GFP_ATOMIC context). But since you didn't need such large
->allocations before, you probably don't need them now too?
-
-Yes, from pre-ab101c553bc1 code, it looks like we don't need the vmalloc 
-path for large allocations now too.
-
->> As mentioned, when using GFP_ATOMIC, kvzalloc() only tries the kmalloc 
->> path, since the vmalloc path doesn't support the flag.
->> In this case, kvzalloc() is equivalent to kzalloc() in that neither try 
->> the vmalloc path, so there is no functional change between this patch and 
->> either commit ab101c553bc1 ("neighbour: use kvzalloc()/kvfree()") or 
+> On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
+> > On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
+.org> wrote:
+> > >
+> > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
+> > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > >
+> > > > Expose the isoc_alt attr with device group to avoid the racing.
+> > > >
+> > > > Now we create a dev node for btusb. The isoc_alt attr belongs to it=
+ and
+> > > > it also becomes the parent device of hci dev.
+> > > >
+> > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to cont=
+rol USB alt setting")
+> > >
+> > > Wait, step back, why is this commit needed if you can change the alt
+> > > setting already today through usbfs/libusb without needing to mess wi=
+th
+> > > the bluetooth stack at all?
+> >
+> > In short: We want to configure the alternate settings without
+> > detaching the btusb driver, while detaching seems necessary for
+> > libusb_set_interface_alt_setting to work (Please correct me if I'm
+> > wrong!)
 >
->Agreed.
->
->> commit 41b3caa7c076 ("neighbour: Add hlist_node to struct neighbour").
->> 
->> Actually there's no real bug in the current code so the Fixes tag was not 
->> appropriate. I shall remove the tag.
->
->True, the code is just more clear.
+> I think changing the alternate setting should work using usbfs as you
+> would send that command to the device, not the interface, so the driver
+> bound to the existing interface would not need to be removed.
 
-Thank you for looking at the patches and providing your comments.
+I thought USBDEVFS_SETINTERFACE was the right command to begin with,
+but it seems not working in this case.
+The command itself attempts to claim the interface, but the interface
+is already claimed by btusb so it failed with Device or resource busy
 
-I'll send out v2 with the revised commit message, removing the Fixes tag.
+drivers/usb/core/devio.c:
+  USBDEVFS_SETINTERFACE -> proc_setintf -> checkintf -> claimintf
 
-Regards,
-Kohei
+--=20
+Best Regards,
+Hsin-chen
 
