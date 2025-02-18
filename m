@@ -1,95 +1,81 @@
-Return-Path: <netdev+bounces-167375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F63BA3A055
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 115D4A3A069
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8407177DC6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:41:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EABF17C4F6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A280526AAB8;
-	Tue, 18 Feb 2025 14:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F3F26AAB9;
+	Tue, 18 Feb 2025 14:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjlXTsY/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pSqCv0tR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A1226AAAF;
-	Tue, 18 Feb 2025 14:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056B726A1CC
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 14:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739889603; cv=none; b=dTmAotCT8ZNHAYgZSieuz3kqH9anuxJOpBeI4eGzq53atVvO6IJDT/gU8mJB3PlGYcUw5NSXYxR7hRqlgGfE8+sWdvsRyE9wyjJkzB6kPz3ZOsMUzzt4oZ67Wg2DZjmIbKaeVoMRGvchW75DHAE8BCEVOHPNP+TR+eoiSmm90UU=
+	t=1739889766; cv=none; b=JdC/AizT8U5m4ycrESnPG0JDPM9mmO2M/tDxIK1IReKqzOVwYe5a5ev/2Zyd0Vr0uQOcquVnTawdZrsqfFiwj+u2XrXmjNZUIUtwoN4MKugQv2ExoAgXxXV9GG7BHY8xDuuTkFPVaOpvNHQkVSaWbrvdp9mIIsUoxk9ZT5Hh5wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739889603; c=relaxed/simple;
-	bh=NMy4Gw6L5rQhTIwdvCQIzp6p8eCeHC82U8qXljvChfs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c6H+LGHsZv2D5zLwU43HiwIFrEGfD92O5SitSJa9PehTab25B2OsS3/fY0pYeoHUrye6O2zXTCCsoCdnpkiTcFats5NEk7BYLHF98s0fIwx1TrstJyBbqtAcLoo870hRd1SyN/QLtFqdsvfoU6HFs3VPVMQPhbPZeDW9iTlOC/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjlXTsY/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84454C19425;
-	Tue, 18 Feb 2025 14:40:02 +0000 (UTC)
+	s=arc-20240116; t=1739889766; c=relaxed/simple;
+	bh=h4Sz68cDi8sNlheSqNKjltwMOMUjs8fRxT87yFyhDyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PKtOE10+kETjOXLyFWWM+hP7FDc2XrHu/qzXT3XyeJ3N+rbvCV7jyS1QmzQ4rDbrAU32pMPWVucHVCWSmE68qFTUypElM7xE1RNxZoikaCvZNGjJ7gwerP6SrpNTzO3jFtf8R14/vDeRGgRrXE9yEUXFhdkrgtxi47bs5GNEhik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pSqCv0tR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 204F6C4CEE2;
+	Tue, 18 Feb 2025 14:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739889602;
-	bh=NMy4Gw6L5rQhTIwdvCQIzp6p8eCeHC82U8qXljvChfs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EjlXTsY/f75fOFP1F1VMK1N60yLPerLAdq/bSx6B4+T26Er7+a2dw2tZgHGsjphI/
-	 IQJm+jZDlXXd0jSwrZDWyTa3wPBNAIolbsgty8u2NGktD6fJ0D6f/czJlgmBO7R4NG
-	 XkQFR+fCyigzjppM0tbsWx3YGM/oAdBGSes9DIVAwbz6/uz3VJLeKorFHWmz9mLTQb
-	 xC8jfiboBYf6LvsHOaiaLZ8lFiTCl/Imr/B46JSuod193mnVcTkrHhPzIo+1CSugS6
-	 9c0+ObQUukvYbu3wjS0bYjK6j/W7X4vLQ9R6pPELm0YFyMWPpzlqZRzcYxNfBAjvRw
-	 0CkuQUl6QHWDg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB979380AAE9;
-	Tue, 18 Feb 2025 14:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1739889765;
+	bh=h4Sz68cDi8sNlheSqNKjltwMOMUjs8fRxT87yFyhDyM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pSqCv0tRFDX7UY8zvb9XwpmSywgTDymCX/3H4GAB1ytOjLpKrkR9Hyy6HYEayOt1e
+	 AoHjxNV69F/Lbekc0imDD7Ijz4STO4iqlYaSpg/bBBxjMTCxjxN7LuY6nI70o3J5Dg
+	 tgyLhXlTZNq73pkMNdN2f107/9AexCjnukeXWqOCBJj++uHNTLMbuBwFQmoSlg8eJX
+	 +PBAdkLx2hcvedaHV8B/QmNJC2CTXzUoFYwkJCzyFH1e2bUK5L66aOZfhgx0Uaowck
+	 pdE6ATBq4ldijeT2/6E/6J7wmCDkN1tpt6YwjOcHWxskbAPTMWzwQ4QfOWmYhj0Oti
+	 fWl2JwmU7KcTQ==
+Date: Tue, 18 Feb 2025 06:42:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King - ARM Linux
+ <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: realtek: add helper
+ RTL822X_VND2_C22_REG
+Message-ID: <20250218064244.0089ce20@kernel.org>
+In-Reply-To: <31a901f6-02ed-4baa-902e-d385d1808f4b@gmail.com>
+References: <6344277b-c5c7-449b-ac89-d5425306ca76@gmail.com>
+	<20250217164447.4d59e75c@kernel.org>
+	<31a901f6-02ed-4baa-902e-d385d1808f4b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173988963251.4107754.12885780180593326493.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 14:40:32 +0000
-References: <20250214-cwnd_tracepoint-v2-1-ef8d15162d95@debian.org>
-In-Reply-To: <20250214-cwnd_tracepoint-v2-1-ef8d15162d95@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: edumazet@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, davem@davemloft.net, dsahern@kernel.org,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ncardwell@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 14 Feb 2025 09:07:11 -0800 you wrote:
-> Add a lightweight tracepoint to monitor TCP congestion window
-> adjustments via tcp_cwnd_reduction(). This tracepoint enables tracking
-> of:
-> - TCP window size fluctuations
-> - Active socket behavior
-> - Congestion window reduction events
+On Tue, 18 Feb 2025 07:33:32 +0100 Heiner Kallweit wrote:
+> On 18.02.2025 01:44, Jakub Kicinski wrote:
+> > On Fri, 14 Feb 2025 21:31:14 +0100 Heiner Kallweit wrote:  
+> >> -#define RTL822X_VND2_GANLPAR				0xa414
+> >> +#define	RTL822X_VND2_C22_REG(reg)		(0xa400 + 2 * (reg))  
+> > 
+> > Just to double check - is the tab between define and RTL intentional?  
 > 
-> [...]
+> Yes. In the terminal a space or a tab after #define are the same,
+> not sure whether there's any preference from your side.
+> At least checkpatch doesn't complain.
 
-Here is the summary with links:
-  - [net-next,v2] trace: tcp: Add tracepoint for tcp_cwnd_reduction()
-    https://git.kernel.org/netdev/net-next/c/8e677a466145
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Weak preference for following what the rest of the file does,
+so space would be better. I'll change when applying.
 
