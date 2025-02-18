@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-167133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3FFCA39001
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:40:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE42A39005
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79E3B171D60
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:40:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AA997A3ACD
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAF8EED8;
-	Tue, 18 Feb 2025 00:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435539FCE;
+	Tue, 18 Feb 2025 00:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOd7vDmm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXZoI8h8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72094EEC3;
-	Tue, 18 Feb 2025 00:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4FB28373;
+	Tue, 18 Feb 2025 00:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739839203; cv=none; b=t7Jq8qaBvlvdEovYVgrpcqWKwogBY9GLeslZS6Dkjh9xP6fJOF5dJvayKHf3JRoQmTfR1aFWYIWJPLFRVJZ+i6dEuCIC6f/lW8smlQZia0U+ro5Gkdla/PqMibTPxbKa70JZ7bZ0BUVXoV2WeV5x3BCfWA2ROug64h2fdCpSg/w=
+	t=1739839208; cv=none; b=O/jdi8IVvIN4lx2rggaTbxE7jFxW2QKH3/Xlor/SCZPtpbKE6v9tiis0r7QKHeNbVz1aCxryKaMwdDxOcNuoJoTO83Hv3i9Wx+RudU44T5htBubn4ynrQhdJRKhQWO2XZtK25i/ja2RbvAmf3HNv25yWZ5JEP8s6uP/qZXjlOmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739839203; c=relaxed/simple;
-	bh=V1WexgkaHOBQikIRrkTSn+Mq8VWyzkcWlkPtjI+FmYo=;
+	s=arc-20240116; t=1739839208; c=relaxed/simple;
+	bh=AO9yO00MduwbUcjO+Ez3Ys6EHCh5XVjfuxn8kmtTN8A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a0nZbAHjaoIJDIL/zUcohFqxgJ4XCy5X7J1NVoijGYqEYvLuVE0JQx3KC72LwrNyMohiaX6gqXgc1QiiOMw9ooznrC2fgckNFJ3s1uh5i1idu1dLAITmKgDnpxCjJ/dfdxhet8aeez+TymiWvItZwQAv42zby7aob8SQ6tCxbbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOd7vDmm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCD7C4CED1;
-	Tue, 18 Feb 2025 00:40:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rHH2c3/YF22i0gk6781EPjd1TY5+lhvqzEBFu4p6FHZ+mjAize3Fboila/RT9bbOh2852aZeAEdupN/k9qkl5wUFLyE8fnggkCaX8kmOtL608jJq6LP79RPzloufjOkyDBYUX5VLg9sLwvKQLGR04dyPtLS/UFndnyz3tMnAL7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXZoI8h8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51BF3C4CED1;
+	Tue, 18 Feb 2025 00:40:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739839202;
-	bh=V1WexgkaHOBQikIRrkTSn+Mq8VWyzkcWlkPtjI+FmYo=;
+	s=k20201202; t=1739839207;
+	bh=AO9yO00MduwbUcjO+Ez3Ys6EHCh5XVjfuxn8kmtTN8A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UOd7vDmmrtglsNxb5yzLz0WBcyZLNT25SO++ONfXoBEGn9fWi0Y6UK9Q7n9O+J8R+
-	 nlTo04rSl2sLPrI2rbfj4Tp2RI+AmVNOX0WvJ7PncUmztX9pUJm3V4Djh5y5SBPtLi
-	 cTBIfpt87CkDHN5Jtg6VDYinPb0HjM2Id0DbOuzhzkOsHMYPw9BLvLwiyGM4YMQ3S0
-	 eXtXV1EXEwSZK01z9Wpr3Jp2BRX1zsxKptDsOhUk23/mTCVNaCr6oXQ4J9ia+IjmnU
-	 eJ2SInEpCqiVpR/txeQe6Y5xgnvEMyvU+JceMnkaPGNluWhzj97NPsxuU6yCVbmFFU
-	 L9uvGfB+LECqQ==
+	b=PXZoI8h8CgWv+d+6SzGbE6ZGE296iUWLINsALeHxnAifXZ3L8mUo3sBWP7HpPupZH
+	 dfmJISIe2PsOMMkgKP5xh+19XpVw/iiBr9/iKwTpX3sNkqITGeaoZWwSriWqW/1b8o
+	 H1NfyEvMym1YoG3l2ms1HLSEMhar8Ef9mVqF3ddC0fnax2Y3xzXKXrJ7r/j/iDqIRg
+	 jMvDmyQCQPa8d1735nlTqQzXrCLEKk44jx+jQIdubc6MT9B8Kp43Yx1Li4e3LBb6fO
+	 eqUwwX2FWCCw+PHseKGRJyHoufsRACfkIudRNuHph0U/yxQgBLG5BTtQmfCQA+ygzI
+	 yDBgRgQ0PbNFQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3496D380CEE2;
-	Tue, 18 Feb 2025 00:40:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE734380CEE2;
+	Tue, 18 Feb 2025 00:40:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,69 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] drop_monitor: fix incorrect initialization order
+Subject: Re: [PATCH net-next 0/4] mlx5: Add sensor name in temperature message
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173983923302.3583210.2597018228565274704.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 00:40:33 +0000
-References: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20250213152054.2785669-1-Ilia.Gavrilov@infotecs.ru>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: nhorman@tuxdriver.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- stable@vger.kernel.org
+ <173983923749.3583210.12936325771072711787.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Feb 2025 00:40:37 +0000
+References: <20250213094641.226501-1-tariqt@nvidia.com>
+In-Reply-To: <20250213094641.226501-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, shshitrit@nvidia.com,
+ gal@nvidia.com, saeedm@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 13 Feb 2025 15:20:55 +0000 you wrote:
-> Syzkaller reports the following bug:
+On Thu, 13 Feb 2025 11:46:37 +0200 you wrote:
+> Hi,
 > 
-> BUG: spinlock bad magic on CPU#1, syz-executor.0/7995
->  lock: 0xffff88805303f3e0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
-> CPU: 1 PID: 7995 Comm: syz-executor.0 Tainted: G            E     5.10.209+ #1
-> Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
-> Call Trace:
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x119/0x179 lib/dump_stack.c:118
->  debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
->  do_raw_spin_lock+0x1f6/0x270 kernel/locking/spinlock_debug.c:112
->  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:117 [inline]
->  _raw_spin_lock_irqsave+0x50/0x70 kernel/locking/spinlock.c:159
->  reset_per_cpu_data+0xe6/0x240 [drop_monitor]
->  net_dm_cmd_trace+0x43d/0x17a0 [drop_monitor]
->  genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/genetlink.c:739
->  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
->  genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:800
->  netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink.c:2497
->  genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
->  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->  netlink_unicast+0x54b/0x800 net/netlink/af_netlink.c:1348
->  netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
->  sock_sendmsg_nosec net/socket.c:651 [inline]
->  __sock_sendmsg+0x157/0x190 net/socket.c:663
->  ____sys_sendmsg+0x712/0x870 net/socket.c:2378
->  ___sys_sendmsg+0xf8/0x170 net/socket.c:2432
->  __sys_sendmsg+0xea/0x1b0 net/socket.c:2461
->  do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
->  entry_SYSCALL_64_after_hwframe+0x62/0xc7
-> RIP: 0033:0x7f3f9815aee9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f3f972bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f3f9826d050 RCX: 00007f3f9815aee9
-> RDX: 0000000020000000 RSI: 0000000020001300 RDI: 0000000000000007
-> RBP: 00007f3f981b63bd R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000006e R14: 00007f3f9826d050 R15: 00007ffe01ee6768
+> This small series from Shahar adds the sensors names to the temperature
+> event messages, in addition to the existing bitmap indicators.
+> This improves human readability.
+> 
+> Series starts with simple refactoring and modifications. The top patch
+> adds the sensors names.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] drop_monitor: fix incorrect initialization order
-    https://git.kernel.org/netdev/net/c/07b598c0e6f0
+  - [net-next,1/4] net/mlx5: Apply rate-limiting to high temperature warning
+    https://git.kernel.org/netdev/net-next/c/9dd3d5d258ac
+  - [net-next,2/4] net/mlx5: Prefix temperature event bitmap with '0x' for clarity
+    https://git.kernel.org/netdev/net-next/c/b9b72ce0f5f4
+  - [net-next,3/4] net/mlx5: Modify LSB bitmask in temperature event to include only the first bit
+    https://git.kernel.org/netdev/net-next/c/633f16d7e07c
+  - [net-next,4/4] net/mlx5: Add sensor name to temperature event message
+    https://git.kernel.org/netdev/net-next/c/46fd50cfcc12
 
 You are awesome, thank you!
 -- 
