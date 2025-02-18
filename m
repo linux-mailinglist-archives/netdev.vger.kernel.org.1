@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-167346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5774AA39DBF
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:42:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB91A39DED
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762C6188560B
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:40:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF1FA3AB2DA
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC9522B8B9;
-	Tue, 18 Feb 2025 13:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658B722E401;
+	Tue, 18 Feb 2025 13:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YnHWD7cu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/t9SFRL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3EA13AA5D
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA0F42C0B;
+	Tue, 18 Feb 2025 13:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739886037; cv=none; b=NzS42DLfl/GZjRG+hUgbjw7tpvQpN7LODf0dadV2ZpoBvCMcQqtL3YjOIicQven5CWvdBTcWF/Jze5COijZaOdomhE2iWNrH0YTeIdVAKE7T9k+xFZIg2CalHx4TSrL2MVeBCUTKPPxTLY+SqNqj3xLaO9fZphqRzb5kXVczivk=
+	t=1739886140; cv=none; b=RO7KUZHdqunIgbikKy56VTCj7nnCfuiZjkfg4J0JxzzOvhw/lBvSrrzGkzl4P79UWI0eNhLgd8w58Lp2S98uSKnDXMeBJur8KkltXfr5uDqd7VIwhZ3Odivbylk3J26zqBMpD4ChHItxPaSLD8WJWmeq7ZS4+m1ckqZRtY17UFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739886037; c=relaxed/simple;
-	bh=LOrvRScCTvK/gdOTKEkyuePY0dEl+Q2jKlYjYE54OjA=;
+	s=arc-20240116; t=1739886140; c=relaxed/simple;
+	bh=k4T1GostSpWpNOeyQDf1D/GlZj2EggYI+1EHv7/NqQA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LPKTT4CSyAurebPs+NFIjzXkloWPGk5ZThx7iLG+3LQrVo9Iv9Okr7S4BU99NeiDyT+YPYh/tKGy1ydEsQX2HWyucNnI/Uw/CSZx0M6M+gpaCJMQvbSNdSe4LhYC5p+YL/Qox6JROspnrwwv2nsLQTK+VzqYCq2RIaLDfsFL9eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YnHWD7cu; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5ded6c31344so6631829a12.1
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 05:40:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1739886033; x=1740490833; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOrvRScCTvK/gdOTKEkyuePY0dEl+Q2jKlYjYE54OjA=;
-        b=YnHWD7cum75UbvwTM2acQsMRJGWbAWAW8PCBVT+aJv1UoB1WGMPOt2yhLa0sefuo4z
-         OvzCO65IIEjLn4L3+UGDAWbkAaCKBFsQ0+DLx/YAxgme/c7yZeYM2h6FnZE4X6c4apYt
-         h+FmWEDiDs5b3ajOz7RuGOIPW5mBjjwij3QNATCz8llvcq37Dw7viZn6ch1ziKrrj3Le
-         w1VzhWhyf1CZGmSmlZlA44uEor4s2xiGRwbVAkqGR333BeXs3ynHDKL3yjvUk1K/jw9/
-         oN379QYm0jhRjeQ2n0pVhT2nnPeF8ZWQ3YS355mhm3OxjMHdVtH3uAKxPchlFUk2B6JF
-         Mtsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739886033; x=1740490833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LOrvRScCTvK/gdOTKEkyuePY0dEl+Q2jKlYjYE54OjA=;
-        b=NJ3h/fHV3g9VWHaX9m3pUU9a9ManfFC32ZSxSzLyHfO8U1fZ56gDi7Uj76iPZONTB/
-         J/UXoixM9goRyM7jRla7hGNzkS6sOAtzjoJqVqpn1keUxYorcdxAZuKa9XRmUuu6hxs0
-         zehOfUIgwd6rTA6LM7cLo+F85JZS54CU/nW9Sj6ioyPoaM7TNgrUf9qULjSrf12wG8SW
-         bLSN163Umm6vYaWUCVQCDy6v1I8yEuPw3KQJ04JM4/H/hfFDZzohdM/mvm/u5VrtxPGa
-         QXIlp6tdaUm725x0qwkmuzHd78EJuLqjUI84gsRwdshoZsNFXwDbZPWVzOlkXzBC8a3k
-         sTjg==
-X-Gm-Message-State: AOJu0YzDZrIllanF/pp4tcwqeC5fSCNQSSzW5pnETS1fLEgewYt10gKs
-	+bDqbfgAO0fWaK33F6V82cgjwawbY0Ttqle/Lt4ZXyOuyjdSr4bLDiEAy0oAEt35iWoJBLGnZmW
-	jvNA=
-X-Gm-Gg: ASbGncufe6Jr9k0hfHKGaCvC85+zsIdg+OmidtHkxDlXqjxDrB5ao69GX0AbTq+6Lws
-	nihGskwFCt9Pw68e3EBU76XmvhmCAoHG+BAlsITS9EMPAdfZ3AdAJE3ZP6UrtjfbRucXZtd5m3l
-	2RZkYamF/gRz4uyH3n0LtXAcBPoHCSb45Lz/ExzKFdnLfwBQUVhkshSFihMVpm4T6maqqHV4z17
-	8dhuCalNvEBnzvcqCPG0PtDEBufn0VusdRmgeaTpDFtUXkm5IdkfJjAr2joa9CHXKtdz+bBtFWE
-	m0Nf2c57/SiYwO6lhg==
-X-Google-Smtp-Source: AGHT+IFbgzdn+N0V4iHjjlDpDDFZtbgBP57ci69pw7ketdN5bB/NssLV2Quwo8reL0WV2nTOUKgFDg==
-X-Received: by 2002:a05:6402:350d:b0:5e0:2d53:b2a with SMTP id 4fb4d7f45d1cf-5e035ff9ca1mr37744214a12.3.1739886032362;
-        Tue, 18 Feb 2025 05:40:32 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb9d1a0049sm357359766b.40.2025.02.18.05.40.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 05:40:31 -0800 (PST)
-Date: Tue, 18 Feb 2025 14:40:30 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Davide Benini <davide.benini@suse.com>
-Cc: netdev@vger.kernel.org, mkubecek@suse.cz
-Subject: Re: [PATCH] ss: Tone down cgroup path resolution
-Message-ID: <3wlkt2o2ghjmqn652745btelzceth6mvhqmj3fbjusonwm6etl@p62u63i2zjl6>
-References: <20250210141103.44270-1-mkoutny@suse.com>
- <1818b3c8-b952-4dba-8b46-a3175adaeb8e@suse.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SrBM2xfqWo1UzCFb0xBNkMpaydpVlMK6tT6qvvYZ/Teb1H4t9NqqIwLwd7JerLebaQfa8sFut9zDYKaVoM1XHobMy95EFliKnP9t9ig3e3QW0R57ncvNi3CbsHFfsjqxFYj8fNfigQLh1iQAmJzcs5vOHZFk63iFfPflgL43nlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/t9SFRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1770CC4CEE6;
+	Tue, 18 Feb 2025 13:42:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739886139;
+	bh=k4T1GostSpWpNOeyQDf1D/GlZj2EggYI+1EHv7/NqQA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k/t9SFRLC8M7j3j/bYYdHQ09ywLzqBQVHYhNMruXaeuIUaf9YWt80mryRcoBLD9k5
+	 5KC/bi3Er24tWOczD6Yx8l9ZEJS376fh4n9AvHEgN6ZZmhxOc9plNG25heg/zA+iJG
+	 ptxdRPOSsI83LEEcr2WMXEsu1jqShsYn8iPK5zfNSmgM2tcEsH/dVpgQrHX8xNj9K7
+	 6Sv6GxVwtWyyLgmQwEhIc7UYZ0d9+qZfOJIvnuO4rRjuvtAUVAYNmYu04AorXVRtZI
+	 BwZoHU5Dyeake2iX5vlqQbv4JjscF1A7eyiSIKtjgCCttkN9eVhALgKq45Ox8Du3Az
+	 RUc4+f7z+CNhg==
+Date: Tue, 18 Feb 2025 13:42:14 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
+	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+	chenhao418@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
+ supported in this module
+Message-ID: <20250218134214.GY1615191@kernel.org>
+References: <20250213035529.2402283-1-shaojijie@huawei.com>
+ <20250213035529.2402283-4-shaojijie@huawei.com>
+ <20250217154028.GM1615191@kernel.org>
+ <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
+ <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
+ <9d55d0a8-7a85-4caf-8358-7e04621813cc@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ajzesoxw7q4ywdhf"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1818b3c8-b952-4dba-8b46-a3175adaeb8e@suse.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9d55d0a8-7a85-4caf-8358-7e04621813cc@huawei.com>
 
+On Tue, Feb 18, 2025 at 04:27:28PM +0800, Jijie Shao wrote:
+> 
+> on 2025/2/18 10:46, Kalesh Anakkur Purayil wrote:
+> > On Tue, Feb 18, 2025 at 7:47 AM Jijie Shao <shaojijie@huawei.com> wrote:
+> > > 
+> > > on 2025/2/17 23:40, Simon Horman wrote:
+> > > > On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
+> > > > > This patch implements the rx checksum offload feature
+> > > > > including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
+> > > > > 
+> > > > > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> > > > ...
+> > > > 
+> > > > > diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> > > > > index 8c631a9bcb6b..aa1d128a863b 100644
+> > > > > --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> > > > > +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+> > > > > @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
+> > > > >    }
+> > > > > 
+> > > > >    static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
+> > > > > -                                struct hbg_rx_desc *desc)
+> > > > > +                                struct hbg_rx_desc *desc,
+> > > > > +                                struct sk_buff *skb)
+> > > > >    {
+> > > > > +    bool rx_checksum_offload = priv->netdev->features & NETIF_F_RXCSUM;
+> > > > nit: I think this would be better expressed in a way that
+> > > >        rx_checksum_offload is assigned a boolean value (completely untested).
+> > > > 
+> > > >        bool rx_checksum_offload = !!(priv->netdev->features & NETIF_F_RXCSUM);
+> > > Okay, I'll modify it in v2.
+> > Maybe you can remove " in this module" from the patch title as it is
+> > implicit. This comment/suggestion applies to all patches in this
+> > series.
+> 
+> Sorry this may not have any bad effect,
+> so I don't plan to change it in V2.
+> If anyone else thinks it should be modified,
+> I will modify it.
 
---ajzesoxw7q4ywdhf
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH] ss: Tone down cgroup path resolution
-MIME-Version: 1.0
-
-On Tue, Feb 18, 2025 at 02:11:06PM +0100, Davide Benini <davide.benini@suse.com> wrote:
-> however the cg_id_to_path() will return a string "unreachable:%llx"
-> and the output will still be similar to
-
-And I think that is good -- it captures the situation with the socket
-like its "property" and not a global error.
-
-> But I agree that removing the specific error message would be enough
-> to prevent customer concern.
-
-One can do only so much with sockets of rmdir'd cgroups.
-
-Thanks,
-Michal
-
---ajzesoxw7q4ywdhf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ7SNywAKCRAt3Wney77B
-SQ1sAQDTh0/7SxTiBtGn/9ThswOWALoj4+7dUZUBQS7kJughjQEA8c1zFdrOJ79N
-iSt/OpBv7+bB+yC0MUhRyG8m/OAjXQU=
-=PXT5
------END PGP SIGNATURE-----
-
---ajzesoxw7q4ywdhf--
+I agree that a shorter subject would be better.
 
