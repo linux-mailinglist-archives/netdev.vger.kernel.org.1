@@ -1,109 +1,166 @@
-Return-Path: <netdev+bounces-167189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA4EA390CC
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:16:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC972A390A8
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C5ED1891E3A
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:17:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C64703B2C87
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DEF77111;
-	Tue, 18 Feb 2025 02:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C9C78F43;
+	Tue, 18 Feb 2025 02:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5412B29D05;
-	Tue, 18 Feb 2025 02:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602B61BC41
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739845004; cv=none; b=ARU6/ylvr5MQkntcHxHb0DSRC7LzV8RzUhz2gcEbwopAOdTEQorQ6ZzXihOxjgWbBtbuEMLVQIP6c6yhj5eiz3zDnnY90BVgYj5/rSBZkNkjUWJfGOmFpaDFpoefFQDpeXM8z3rueuO6lcNHfoSSNSZFUlDz9Cjg2NSGagjgxEE=
+	t=1739844587; cv=none; b=KqmslnKnmEqEbilxtDhGqV+a4GRB6Nn7Cb+qIwyHzfQ2P6qr//eA+c4d4gvEn0nUNjNDNx2RZgQjWTBZmVc1x0mrp151yyguwAHLhQzzyaEUsWSA4wqdpBZ6E3HqBlQ1t43qkNwu5d/RyvhyZa3IOuIE8ibKydkcXTZadmvaJqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739845004; c=relaxed/simple;
-	bh=KSIKrqgUfcQc3XIwuDOIL69wUlOQnzOwboxFHLMyJUc=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cdheoJgYbFqnvIduMNEJRSFbL2QRvyrj5fr1QxVQG4q7RASPNu22lsUTX66A8QcMpvzFS/BhdGMFhl5T+c0qdVyJzpMdDZHpA6SuaSHCheM8KPIqWEg6M40He3b/je02L6GEg0jXCvYwa1+tTb/1N1So1bR22uxdVEI6CBNADo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Yxjp83fwlz17LYC;
-	Tue, 18 Feb 2025 10:17:04 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E75AE1A016C;
-	Tue, 18 Feb 2025 10:16:33 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 18 Feb 2025 10:16:32 +0800
-Message-ID: <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
-Date: Tue, 18 Feb 2025 10:16:32 +0800
+	s=arc-20240116; t=1739844587; c=relaxed/simple;
+	bh=PwR26CIlZ/6RD0uMlR85PboCWoJshfw7sRsWZpbt9a4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bDJIoNWjo4jrJ30VYMPtGCCs2+DJBNKmRyHVOo2TSE9QuuQwRyKcUHr8hLSIhTbVqcQozxGYlB934aWuBUKCMvzxLggWyyBbunAKwMcbFNLZdXo21Meu5OsyTj3KpEL8xwTEWarfcm9tGLVcReBX7iqhla8tZftlgeoTxr4KPGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz5t1739844568t3gpk44
+X-QQ-Originating-IP: K00LyHCpd6faOZWutc+rPx1VryhQGGKTqByQwdEFmbk=
+Received: from wxdbg.localdomain.com ( [36.24.205.26])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Feb 2025 10:09:19 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 4946844343877922781
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v8 0/4] Support PTP clock for Wangxun NICs
+Date: Tue, 18 Feb 2025 10:34:28 +0800
+Message-Id: <20250218023432.146536-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
-	<shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
- supported in this module
-To: Simon Horman <horms@kernel.org>
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-4-shaojijie@huawei.com>
- <20250217154028.GM1615191@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250217154028.GM1615191@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OKhYnE1LzMsBy0oN1tOQOMlU1J4JPRNH/7kd/u45azG1nspKhbmUoMM5
+	k2IEZNCinhx9Vx9PEzYOVdNDIID8nyDO2HRWSeBPCxJB5DsBmfa7jqqLkmaBVqmNemk850m
+	FdomQgPWdXmXG3Nck9SlvCUlp9ONndh70UEzoZmNZyTJFvzqlwzr81BcQ91VgS5O/IMNFFy
+	XGfhFXHPpK7Jqz2IMwkHLtoOqVA6aOb3Oqt9oYMrrI/0trIYV3+hmLaACeOp68QHBXVfrLv
+	pSZCN4YMzZARATOk+xylT2ZMu1ZLSMdsrXWxnyJJ1xUzy3KnEecInZ4Yy8jEZqEGEqYm/4N
+	ugmBVvZ0QYJBE/PVDquDUwMIrol5twBMqOTTOje31eU8GeoS3h/fY/jtjUTz1J4xZ7RiI3S
+	Kw4qiIR9Wl0iUaNSrg/RKZs6jCaJX7Ufj9EpD0+64ooUQiQJfYkk+GoTDgGp8GD/tRsS55H
+	HOGO2CYRthFqugFFHlOHWIth6A/WmXbmX1A/pB4D+ej64qOTJ8V6JW1I8CT0mLf4tPcgZus
+	nIeRiLm7mQpMHDFtjLv0bPh9DCfBtHHdrJTgmqPSA9yutQ4XckCepuQx69ukn3iRsAcjVlM
+	hzIhxWswDLe18gjL1XgjBf976QKvqfQE6pXXJOtGt4Y53t4BHQN6wa67kJPlTphIo2DucbD
+	nooYXyITJD3KY5xOS0jYFbyU5nMqL7rXTDozMSTs/iPTL0kuKfaq1wlri+hs8N6EcYBccU+
+	Ml6FatgdkKe0nf20OI09uW/JvtnqGD9wDy6ktg741j4RZhjtwgXcYoUZAZ2jQmBRPmcZ2af
+	jckLp8+vuhUXCzRu5bk2Ls+Kqo5DU0MurZPqyFYuOvd4P7+sLq+wAKcKdqrdtdDkuShsSSy
+	/wVq4G9bAS76sdldYT+DOTyiMB6+YJthpxbPIf5qiwMTXrwRO2gorBHT/cQL44WxT01N/aY
+	Ih0ItFetKuEVduVs1mXvE3HxaaP82YVpQ/e/7UD6c78ehFdnDKNAsbHfq9MKakbOYVNY=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
+Implement support for PTP clock on Wangxun NICs.
 
-on 2025/2/17 23:40, Simon Horman wrote:
-> On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
->> This patch implements the rx checksum offload feature
->> including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ...
->
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->> index 8c631a9bcb6b..aa1d128a863b 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->> @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
->>   }
->>   
->>   static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
->> -				    struct hbg_rx_desc *desc)
->> +				    struct hbg_rx_desc *desc,
->> +				    struct sk_buff *skb)
->>   {
->> +	bool rx_checksum_offload = priv->netdev->features & NETIF_F_RXCSUM;
-> nit: I think this would be better expressed in a way that
->       rx_checksum_offload is assigned a boolean value (completely untested).
->
-> 	bool rx_checksum_offload = !!(priv->netdev->features & NETIF_F_RXCSUM);
+Changes in v8:
+- Link to v7: https://lore.kernel.org/all/20250213083041.78917-1-jiawenwu@trustnetic.com/
+- Fix warnings for kernel-doc check
 
-Okay, I'll modify it in v2.
+Changes in v7:
+- Link to v6: https://lore.kernel.org/all/20250208031348.4368-1-jiawenwu@trustnetic.com/
+- Merge the task for checking TX timestamp into do_aux_work
+- Add Intel copyright in wx_ptp.c
 
-Thanks
-Jijie Shao
+Changes in v6:
+- Link to v5: https://lore.kernel.org/all/20250117062051.2257073-1-jiawenwu@trustnetic.com/
+- Add "depends on PTP_1588_CLOCK_OPTIONAL" in Kconfig to fix build
+  errors
 
->
->> +
->>   	if (likely(!FIELD_GET(HBG_RX_DESC_W4_L3_ERR_CODE_M, desc->word4) &&
->>   		   !FIELD_GET(HBG_RX_DESC_W4_L4_ERR_CODE_M, desc->word4)))
->>   		return true;
+Changes in v5:
+- Link to v4: https://lore.kernel.org/all/20250114084425.2203428-1-jiawenwu@trustnetic.com/
+- Use reading template for timecounter_cyc2time()
+- Move the same piece of codes to the functions
+- Fix read sequence for time registers
+- Remove skb_shared_hwtstamps zero out
+- Pass duty cycle for the pulse width
+
+Changes in v4:
+- Link to v3: https://lore.kernel.org/all/20250110031716.2120642-1-jiawenwu@trustnetic.com/
+- Add tx_hwtstamp_errors to record errors of DMA mapping
+- Remove flag bits clear for default case in setting TS mode
+- Change to use seqlock_t hw_tc_lock
+- Add ptp_schedule_worker in wx_ptp_reset()
+- Remove perout index check
+- Refactor the same code into a function
+
+Changes in v3:
+- Link to v2: https://lore.kernel.org/all/20250106084506.2042912-1-jiawenwu@trustnetic.com/
+- Clean up messy patches
+- Return delay value in wx_ptp_do_aux_work()
+- Remove dev_warn()
+- Implement ethtool get_ts_stats
+- Support PTP_CLK_REQ_PEROUT instead of PTP_CLK_REQ_PPS
+- Change to start polling Tx timestamp once descriptor done bit is set
+
+Changes in v2:
+- Link to v1: https://lore.kernel.org/all/20250102103026.1982137-1-jiawenwu@trustnetic.com/
+- Fix build warning
+- Convert to .ndo_hwtstamp_get and .ndo_hwtstamp_set
+- Remove needless timestamp flags
+- Use .do_aux_work instead of driver service task
+- Use the better error code
+- Rename function wx_ptp_start_cyclecounter()
+- Keep the register names consistent between comments and code
+
+Jiawen Wu (4):
+  net: wangxun: Add support for PTP clock
+  net: wangxun: Support to get ts info
+  net: wangxun: Add periodic checks for overflow and errors
+  net: ngbe: Add support for 1PPS and TOD
+
+ drivers/net/ethernet/wangxun/Kconfig          |   1 +
+ drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  53 ++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  19 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  52 +-
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 883 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |  20 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  | 105 +++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  20 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |  11 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   5 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  11 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  10 +
+ 17 files changed, 1194 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+
+-- 
+2.27.0
+
 
