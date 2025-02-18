@@ -1,144 +1,145 @@
-Return-Path: <netdev+bounces-167344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E8A3A39DE9
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:49:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092BCA39DB7
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:40:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56AFA3B56A8
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:37:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D70091897606
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D592322B8B9;
-	Tue, 18 Feb 2025 13:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689BF269832;
+	Tue, 18 Feb 2025 13:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MxNc6cMg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SaDeKty/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAC438F91
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46A0175BF;
+	Tue, 18 Feb 2025 13:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885773; cv=none; b=boChMIlRMztW6GMFkasjf+w3WeDtScDXxdl8429gCv/MqW2JvjEGVPYswd+Gsgrn6Cvk0GDC+eeP8hoWrjMCfMGlag6FxC8ZY6nU0O4hJnbxR74UlMeJgMjOS4lv8SFYL5k5wfdvcohGA/e6DqHuJWIFxKVHOGWi2N119l/x0wM=
+	t=1739885830; cv=none; b=O8DLgUwetoZtaAcgjpG1O0GyenVM+NxdFNK1jgbn7qPlHCUSftTeCE+T3iUqEvc2GrJ5PJn+gzVtgfMess36Qf93Q726XnIAvCgkQ1Gk/eZCNcqc7pneOHa5swlOwpGH+fiKQQ+ShrEBxVcXcEIcwwo+KT9HQDYLRUelTxeyol0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885773; c=relaxed/simple;
-	bh=1el1r1ku6nDEmYk1WaQqya0idTEm4g/kYnaOmrEaSns=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Oo4ZuuthD63QtoegMTal06VCDexSCEqJlAqHSWDf4lbNsqGSAwCFLbUkQqLYAaqmZToE1S2UVh+lMRzGvdv1ibmGVPDWLyTiLKWLSgvjtzgrrD2y2Bw7+5o5/jeiB8w+3i3/Pl8PxegAnA/1M4oYfdcVJos3numn0HTFQdkmneg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MxNc6cMg; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-abb81285d33so527107966b.0
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 05:36:11 -0800 (PST)
+	s=arc-20240116; t=1739885830; c=relaxed/simple;
+	bh=eEHGfn31I8CnhhzVB7iBU6gchtyan8J3HLDDVcsgx2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nz2SiQQ5bhCcb7g7Uvi7pZqqG1JUQXr0QZTJXYpiqwQQuGmkLIF7WaDEYCZS6ZghOP2hoXzY6kjTQWaJopA8IfA+D7XjRIZY5DWy84dI5COZe6KXCH4wpUeG29Fn6eeizAgoRGn7kp5GYEMFSBRNGihokwIWM/NLLHXBPXnjR9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SaDeKty/; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2212a930001so54933185ad.0;
+        Tue, 18 Feb 2025 05:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739885770; x=1740490570; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7OZcDt15QGW7oHl6wgsivz4nNFlZzuuT/h8x1d+aw7I=;
-        b=MxNc6cMgeYuNqngBq0HfXorOV/5dvgC/ugWn8ciQv3DLCrcnS5OsdOTlY/y4Xibi87
-         jq6M2wwnjTJewvut8vGCETrlb1ZGJLweTjUMQFPUs5MgLoL4s5H9tjukEufL9Czasmpa
-         WAylT1DRFTzkqh2rJtdFxYAVhvG8jIhyKwOZCtAiSesXwDUr9+JxCUIWAUCGZfa2etaJ
-         17vkyzS0MjWX5nvP8zI/mqD5oGBqsEa8C9MLHGAgzzFVvoZMqKT4UfwBHIkAPKNmR2+h
-         6PE0FVFiUVwiRLsRetNfhDldZS5tViTsdXN0VGG5OnYSMjNMgaf/tRsJC55Jgb7GgpCA
-         AxUA==
+        d=gmail.com; s=20230601; t=1739885828; x=1740490628; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8jdDVOKHqYOsG0zTYeRIb762+LRWCt+s5e6AAnN87iM=;
+        b=SaDeKty/hqqfeQjXibaiMm2GieF5+0FE9XEZ1Vd8G3eKM4RnB6HWuiLgkLpGaesgre
+         AJOlHPPeDAGJ1AfbrlAT37EoL0KgPpT9xNcu4oOgRJd32tGY4JFO5OSDUkvnXznPm9ZR
+         o3Wkf5Oapa92BpZTgZDvZg9DB/mFnIzzL/x8zVt0T/3b5jGM0mpb7aD6qOpBlb2mTvhG
+         TdM4F+pkmHKeVdh4EHofAHwYc07DRQ+16hVICTGyFEAIMEzKOTGRTpWVKzxhUiY36iXT
+         fDYBwkDGTKJUcy1GighuZUEHb02vDT5O+uVo4cEjRg8JD0EaCNnIqQ91ZZDR02J68+hZ
+         uiZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739885770; x=1740490570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7OZcDt15QGW7oHl6wgsivz4nNFlZzuuT/h8x1d+aw7I=;
-        b=bqz7CC0WUByLKidWXgSS2r+AvoXLHouSAKfd6O3KXnMqkkMRDXT0jdRPs42tnjidvw
-         tH2C/2G7SNnR+uLFG1TAQbgXaWSx882s+/PxvUTWsekdUwcjWZ+kFiBgY9hTozt2r334
-         OkwKhgcHccGyah0HF0VV5Qgu/sdkjoLyxH4xQDUSvl/QXkb1vDZZBdwVyNrDWsR3JjuT
-         TVqS3gTAhXpCMDID+sgAStxn5baePqVxudTXV4CDGJ4e56AjtKdTMc8bHedeG46EhSgh
-         nc5NUsl6UqnfFHIFd8ElVyz/AqtA7GamUappw9H1asVlxf9owp31xJoNaKX70L0tO8wW
-         gYow==
-X-Forwarded-Encrypted: i=1; AJvYcCWmfsch2jxgjZzu5AWfpJ8xbGTcTmMKG+VlVbIVwfyg+MGiY/12YlRzsZZE9K7kxj9uNAhjEKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfulTZ2u0zHYmBaerjAZqgGoPrNBW9dbQrvbSo5qPY8HbdjyKh
-	D884Fbq9H8zD91yqXh2rZNXJmeSOKgX7AGWB70w+CEpeQWq9VCxCerkpS6VeNQ/jV5EcF4WrZvA
-	tGfW8ZkSFs5l5jxJBVNxsXAwPraBLtZUoXxy7
-X-Gm-Gg: ASbGncu9TsMiH/zZWN3ZhJgWe/Dshz53Scmd3RxJ1hvOzB23b3KinLbagU5pI95lTWT
-	g+HF62mR8o5mDQJMUU33kRJhqmkly7CHc49HHlzSAkr/+nxVsYNQxIZootwryqHMj1kYDd9TY
-X-Google-Smtp-Source: AGHT+IGKadZ959xikteUpLo1xqvSnX/oHQ/2ndJ1UoV7NqvtX7mJ2Og8+iF4jhhUUhHozu8b3w04Kcq/C+xHLP8AV+w=
-X-Received: by 2002:a17:906:2443:b0:abb:b533:3ecb with SMTP id
- a640c23a62f3a-abbb5334582mr301097766b.17.1739885768726; Tue, 18 Feb 2025
- 05:36:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739885828; x=1740490628;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8jdDVOKHqYOsG0zTYeRIb762+LRWCt+s5e6AAnN87iM=;
+        b=wBS7WvTG368OQc++NH60zsn9BuFHUfuXRQU6wFzoB4Hf+5GgGmPoHCXlMPHOw8vuIc
+         WP91TUgZHZ72O1k9TvX8XGXvBKZsS0FHaZ51a+Kru76e8ueMYiA1kvmb2dnwTedtKhYs
+         t7tCafQFEjTVrm2Z5jVERDb4fzmucfYzPCtbzbsPmq7pdwgRwU3IXkCdBt6fL+rJgg2W
+         DVBrhjvxsAr2SiYrjYCRgQ1Rp3wMlNqc4EpIImNbBBiBwLWxYLVde6+vPRQEo8cGTsIS
+         3Xac7s2PruW6hOEuYITuvN3QyHcTOw0XbMdGCQlj0kuev+s51U3a4eL2MEnwp/rHJ/8y
+         TXAg==
+X-Forwarded-Encrypted: i=1; AJvYcCULi4lZsPdKgBNQwjFhpoShn1ehNVithpFa66pxEQqHXZAlNfYODFo2b7UPXHd8EHs6mSz+9jqL@vger.kernel.org, AJvYcCW8uT0sHyjxjt8lJPb7PRrg5a5IApKwrm0K+6DZqSgqBCt4dtVCRwRmJDNBqpCGm6llFrpQxkBa8kxN3aY=@vger.kernel.org, AJvYcCWAuQcCWWa2Blk61NDwVSI02sysnqZbe5oRmN2n2M2ipjoz6wqSAa4wDt6vTvopDEvDTFxMwDV/PHNk9wJn@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCKNi8BgNuq+ELKPptpVpCb/BioBt4Tq/4usV0lbRtlhyiJeya
+	9Ntp1rU6bjq7emteNumRXyNdTR8DSI5NinQapJvexx1769dn8Juo
+X-Gm-Gg: ASbGnctmL9mqYZQJyx8wv0E7DbZzrm/Pc6EpTBdSnSdcbjRMkFEx3YEUwpASb5th+CE
+	XJN0dMDqyCob7UZH8pNG1/nQ0tttg9a9bg2AD11N44xWFnomnT2OJbvVwA06dBu9ifK/+oyqNmh
+	ZZ2K2FFJlCGXtW1ihmyfQ05s2idBd/2duanv7dsU6i/4Rujqxy0PKSQHGy869a+zlh/T44W71RA
+	biFBDQHsuRSc1uLO6yL3vessvBO/vL3c/QO4VL//vQSrPvsnxVqDK0I6D9n3PD5EHZfbhiga7q1
+	ltv6FSgdBswojEciT9Qa1p+yCpTM8a10WEytqSgDVZk4iHUgcKjONBATN3ntVggrz6DD
+X-Google-Smtp-Source: AGHT+IFAYv6dxLs8ydLkGWmiyk2TMBMKqMexuJxecoTUNnPqX7xuJaDjkSEiNhPja+6i+N766Hr0jg==
+X-Received: by 2002:a05:6a20:e30b:b0:1ee:7fa1:9160 with SMTP id adf61e73a8af0-1ee8cb0c9e5mr25573150637.6.1739885827908;
+        Tue, 18 Feb 2025 05:37:07 -0800 (PST)
+Received: from ?IPV6:2409:4040:eb3:5fa4:b097:c3d6:9ee9:156c? ([2409:4040:eb3:5fa4:b097:c3d6:9ee9:156c])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ade80053bf9sm4374585a12.29.2025.02.18.05.37.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 05:37:07 -0800 (PST)
+Message-ID: <0dcf0f9d-6ced-4fdd-9dc0-083ff161354f@gmail.com>
+Date: Tue, 18 Feb 2025 19:07:01 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218105824.34511-1-wanghai38@huawei.com>
-In-Reply-To: <20250218105824.34511-1-wanghai38@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 18 Feb 2025 14:35:57 +0100
-X-Gm-Features: AWEUYZkTkYp5qWAJLLVVtJo_9aJwB7ywvIiOdhHV2BtfOisw9oMUSGlN21yY0qE
-Message-ID: <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way handshake
-To: Wang Hai <wanghai38@huawei.com>
-Cc: ncardwell@google.com, kuniyu@amazon.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
+To: Simon Horman <horms@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, skhan@linuxfoundation.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, linux-sparse@vger.kernel.org
+References: <20250210075006.9126-1-purvayeshi550@gmail.com>
+ <20250215172440.GS1615191@kernel.org>
+ <4fbba9c0-1802-43ec-99c4-e456b38b6ffd@stanley.mountain>
+ <20250217111515.GI1615191@kernel.org>
+ <bbf51850-814a-4a30-8165-625d88f221a5@stanley.mountain>
+ <20250218132123.GT1615191@kernel.org>
+Content-Language: en-US
+From: Purva Yeshi <purvayeshi550@gmail.com>
+In-Reply-To: <20250218132123.GT1615191@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 18, 2025 at 12:00=E2=80=AFPM Wang Hai <wanghai38@huawei.com> wr=
-ote:
->
-> If two ack packets from a connection enter tcp_check_req at the same time
-> through different cpu, it may happen that req->ts_recent is updated with
-> with a more recent time and the skb with an older time creates a new sock=
-,
-> which will cause the tcp_validate_incoming check to fail.
->
-> cpu1                                cpu2
-> tcp_check_req
->                                     tcp_check_req
-> req->ts_recent =3D tmp_opt.rcv_tsval =3D t1
->                                     req->ts_recent =3D tmp_opt.rcv_tsval =
-=3D t2
->
-> newsk->ts_recent =3D req->ts_recent =3D t2 // t1 < t2
-> tcp_child_process
-> tcp_rcv_state_process
-> tcp_validate_incoming
-> tcp_paws_check
-> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <=3D paws_win) // failed
->
-> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> ---
->  net/ipv4/tcp_minisocks.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index b089b08e9617..0208455f9eb8 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct s=
-k_buff *skb,
->         sock_rps_save_rxhash(child, skb);
->         tcp_synack_rtt_meas(child, req);
->         *req_stolen =3D !own_req;
-> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
-> +           unlikely(tcp_sk(child)->rx_opt.ts_recent !=3D tmp_opt.rcv_tsv=
-al))
-> +               tcp_sk(child)->rx_opt.ts_recent =3D tmp_opt.rcv_tsval;
-> +
->         return inet_csk_complete_hashdance(sk, child, req, own_req);
+On 18/02/25 18:51, Simon Horman wrote:
+> On Mon, Feb 17, 2025 at 05:14:14PM +0300, Dan Carpenter wrote:
+>> On Mon, Feb 17, 2025 at 11:15:15AM +0000, Simon Horman wrote:
+>>> So, hypothetically, Smatch could be enhanced and there wouldn't be any
+>>> locking warnings with this patch applied?
+>>
+>> Heh.  No.  What I meant to say was that none of this has anything to do
+>> with Smatch.  This is all Sparse stuff.  But also I see now that my email
+>> was wrong...
+>>
+>> What happened is that we changed unix_sk() and that meant Sparse couldn't
+>> parse the annotations and prints "error: undefined identifier 'other'".
+>> The error disables Sparse checking for the file.
+>>
+>> When we fix the error then the checking is enabled again.  The v1 patch
+>> which changes the annotation is better than the v2 patch because then
+>> it's 9 warnings vs 11 warnings.
+>>
+>> The warnings are all false positives.  All old warnings are false
+>> positives.  And again, these are all Sparse warnings, not Smatch.  Smatch
+>> doesn't care about annotations.  Smatch has different bugs completely.
+>> ;)
+> 
+> Thanks for clarifying :)
+> 
+> Based on the above I'd advocate accepting the code changes in v2 [*].
+> And live with the warnings.
+> 
+> Which I think is to say that Iwashima-san was right all along.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> [*] Purva, please post a v3 that updates the commit message as per
+>      Jakub's request elsewhere in this thread:
+>      https://lore.kernel.org/all/20250212104845.2396abcf@kernel.org/
+> 
 
-Have you seen the comment at line 818 ?
+Thanks for the review and clarification! I'll prepare v3 with no 
+trailing double spaces and a more detailed description.
 
-/* TODO: We probably should defer ts_recent change once
- * we take ownership of @req.
- */
-
-Plan was clear and explained. Why implement something else (and buggy) ?
+Best regards,
+Purva
 
