@@ -1,122 +1,131 @@
-Return-Path: <netdev+bounces-167356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513D2A39E5C
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:12:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD3CA39E66
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C577B1895EF4
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:11:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29353A2CC2
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A466926A087;
-	Tue, 18 Feb 2025 14:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B50C269B0B;
+	Tue, 18 Feb 2025 14:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s61Zd+sy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tssv+/zW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA46269D19
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 14:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF53269B02;
+	Tue, 18 Feb 2025 14:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739887849; cv=none; b=dH4Sgq1K2yrajiVWsCdmpHGjREhsBdWw0CXEV+TylnvS/UIlR2OS58UB2rj87w+bA0Abfi6NfECdJxqdHb6+TtFG+2subkCKVgtAB1MO//+YAMdRSePliXGyGnkXFSiIV7mm6kjTeyPA5L5pNnDN3NHsuBHPbXe0Co87yZGKL3I=
+	t=1739887930; cv=none; b=t9MbxJu4awrX9dZlQTw/wMe+Od+ANSSamxgIZ0xMqabtDjYeYnTP2+lDUEbvjU94KjI+MD2li85dhf53TVVNzvn4OENGMdMWfockXSbagOFzT0uitoG7erpWzW5h5FlCjKEH1OARjMTFFTTiQ73QoPTvNhZ38umETQbvlyIKbWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739887849; c=relaxed/simple;
-	bh=pYZQoGq0Q6jiIla+I6H4Cy+gFjN7ntyNXEcQWfUkRfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aOT+bMrdlDYKlwM0SiInj3ZkSMnK4vIOuhBywyZQdbxUdtYuahW7nZOzDWjzPgJlYs8gv/4rIu5g7wC1kXDpuMjsh+tzWJTANklSLjm9NYdwL9eo3rg6o28NIKZdF7o4LLVL4lThbGoxc1eJlVMW71tqjh4EZu99rob57dkyBgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s61Zd+sy; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ab771575040so1270015066b.1
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 06:10:47 -0800 (PST)
+	s=arc-20240116; t=1739887930; c=relaxed/simple;
+	bh=5CvKgXsuRBvmykHjC1w18/8tMhy23ucUvHmtEyE59+0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ExN2w6ndS7WXRMGt5eSWCmfir7sEzsdKucTb/JeESS/jeNl5LWP+pZp+PtV7irn2xZD6wyF0TkkTjQPL8cuhlU3wPzQy8Wq9kfsipIidJntEXN9N7haBy1juM1E10/76TBYi67tmV0RILmgcMGiJ6OU7vZT6refllxDlr1XUhPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tssv+/zW; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22100006bc8so57117125ad.0;
+        Tue, 18 Feb 2025 06:12:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739887846; x=1740492646; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J/Px4JvO38gHs5ao30isbGAauKHfVt5a0v/k8jIDyq8=;
-        b=s61Zd+sy/JvNYeo32paIAhfdjXcekbQ5Wzngt+FdmuiOG1LctcQsUMSywTQrhN1+V5
-         weR5uwXdGQrG3qVH1BNKW454YW1hpPxoVdEDGugFjdjtEMVoVoJHd7IQhQX62Ma9ky6Y
-         AqQ9DKkgR9ddW6H3egRqoIUQWqcRM1DRDVF/yYVw0LdvAzJNXEJnzjokesIGgRlejikl
-         Gs5oYu5qbA4Dz9ABrJsTjlTi+ygolA/LO5YkJzKVQpzIM/1+Lkx+0KcUWb0qJ1e+4cxe
-         6jpj/gdrw+3mzC19gbE2BPtju3y/lvosEShXuUzQiLEWMEjaDOemZXuXFd6/D5pAoZZi
-         mAPA==
+        d=gmail.com; s=20230601; t=1739887928; x=1740492728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BfLraw7a+Ajw27pFw30ert9XFd7ZiNuKEHFKLdTH9nY=;
+        b=Tssv+/zW4j1t5S5ejQYPs3zC/PLPD626jrZzvrlBL6jOO/JlxtPOWXbAi42frqJhJ+
+         1N50pLNhtKdFIlH3r+JC/VeeYof0Mk/KgFNTMzRC00c8x59/AeFu3yzmPO9CZbgvocIO
+         /wfX1/bOP/B2+aVvt1+aqV2vzwc5yR/hGkRlfId6M7nUl0IrtHS+sIT57GScuyNEQcwt
+         VQvXUe4z4wBfSWRjRpOx5Kavb7n2tapVDLR8rxwA7m0qLGSbGQnfXLnjG8qvqeAq4fJ8
+         BeQ7XstgGZrAdNmNDSX6EuCtzyAhVw0B/u9SBRi4NmIOnT999nK9UBMJJkvjrDZbcDEY
+         ARtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739887846; x=1740492646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J/Px4JvO38gHs5ao30isbGAauKHfVt5a0v/k8jIDyq8=;
-        b=IdBOeJ3nrTOEZfwg1u9LbXFbNda3+Oq9D9cADqWFyisRUMBzpN5q2BiOQqCergCc0v
-         dS/HF/66M7TlvorpnWAMn9LrkCLELO6ZeMCeZWm9u4r9TqxJ8bJ9wxKVZrGst+E6za4P
-         5g0CJmnU4tUdPxjNIuBbU9wEWPKXTrnGzRmqlpVSzBRiBRBpokDnGFzWnGDUlqf125RJ
-         gtd71LbhipoHr6MWpnzAd05NkIEkIiknN9K1gutmssh97HXByxiv20U0IheFC5y3GCsF
-         61yJcTEdmBtFi3PJ2c81pNW67rRH949eN/C8Qt6mcCPkvpq/FCj7yphgpuSR80OZJ92F
-         B+Ng==
-X-Gm-Message-State: AOJu0YxLfI6BlWxIpYHVkBD2OhuGuUZ3pELyRmOdZftC0mqAG5X2EA5x
-	X6sv14gAlWoghbLZx/XDqxqmsoXm6D6gAk/jqcgcoHxKK//amh44/XOuBuefbytdYYXi8s9jQXt
-	h+sbT17EHhjdrk/gdMFj+kOwj1qfvWU18Q2oeOiK6vBSdsD5oxw==
-X-Gm-Gg: ASbGnctaxGQKDIjy1KUICCpC2OTr68qMPrx2wa3HHUum8D5dHyjpe/8e8Z3dcLaZ5S0
-	VEfBfmeQkFLe7VGWWqEF4kKA5c0zNpsvWtd7gGmxUDay0EkD9At90dSEjrofC7I9E/dpMJ1Dv
-X-Google-Smtp-Source: AGHT+IE1dJvhnIvFLWZwika96Z4PCepmLPP76R+6toQn2zfH3moEMEgM9+mGyhPPpldf3h50snfI0Yt6j+b4MXaS93I=
-X-Received: by 2002:a17:906:314f:b0:aba:e1eb:1a90 with SMTP id
- a640c23a62f3a-abb70410b2fmr1328338266b.0.1739887845830; Tue, 18 Feb 2025
- 06:10:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739887928; x=1740492728;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BfLraw7a+Ajw27pFw30ert9XFd7ZiNuKEHFKLdTH9nY=;
+        b=OtSt/DmLYaJl8D8fgu6JM8xuJQVFqcOr05BcfGojK2hrIlCW1CbbaeEN2VzBJ3eeW/
+         d+SWnuae8aBE0+J/qp3Z+j8DEQSEtSgOPJFPQB06PTDnnjOmPJVCkiSz323Iy32OHzLP
+         2fMBTsmFEJypLyX1uux22XPasrN3Gh/P4ArZbGAhfqAeNYFlKwqfr+QxPubhrz3Tv2oZ
+         o5s9ClUhXLPGxs5hI4oUBV+LV8ViriRmo2tNvNGsWnL+/QJt+dDDe6aUBnAmoovfVbdf
+         p41a4KRCXg0uxTv1DtS/Om2CQGz4zZARnAjgcjQ8yW1raisj5zL+gbbWdheu4/vUCB0E
+         X6YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYNn63zeiONi2Lke02Py3BkiAREFHKaBDshqcNhE/5UBkxR4efrd4lwPYybieNqrThEsFFgRQb@vger.kernel.org, AJvYcCWsJioxfbpvjFAEnc5moLxGxwEd8FDfzKN9TB2KcSlnZaiYUDphUJIq8oDZ3rSy0KdXv9487jiu9wUMw8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyXSFuaQAWTZzIeInTflgGPnXuynlqmQ3R5ZtUqBrP8rNuQvBC
+	sX3KX9GOn4U+bK5beh7nratJbKTiuNOAzln3/qxZt8W6VKhouCJn
+X-Gm-Gg: ASbGncsoUY7qRD8SJveWs0zOov1ldjydDaUVyrTNchUpV9eJgv9HAdx58LlLrR4/K9o
+	LQn9IPzjXyQ/vCSOfgA49Sa2GOUrmUCWJGplPcYXDLsL9mmp6b/MZqtuq8Uy7OyCY+U6hUD7LHP
+	uZSYOhYft97+UbwVDSJV7Goxai8ik3YOcWmGhgymnhxcOxe6l7SrTbRIRQ3Ctb4dQs9X5pOKm2d
+	GyXI2Dqeww7jYYXuMLKtmfovwJn/v2ERvpbLOGh/j6mTQGz6nfx9tcxB2PX92rHYeiP0zQUOvFa
+	lr8y9Aky9di6wyPYazSf0XJ8lpkseIl2o0bVl44Bv9xVlA==
+X-Google-Smtp-Source: AGHT+IFfW78URc0uKz1eSBulFF7DfLoan+pw0pQkguvlBz6MSHawAy10c5CTqETdC7D9zNjk/soOZw==
+X-Received: by 2002:a17:902:e890:b0:21f:6885:2b0b with SMTP id d9443c01a7336-221040697ecmr220368935ad.26.1739887928258;
+        Tue, 18 Feb 2025 06:12:08 -0800 (PST)
+Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([152.58.43.125])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d608sm89396885ad.171.2025.02.18.06.12.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 06:12:07 -0800 (PST)
+From: Purva Yeshi <purvayeshi550@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: skhan@linuxfoundation.org,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Purva Yeshi <purvayeshi550@gmail.com>
+Subject: [PATCH net-next v3] af_unix: Fix undefined 'other' error
+Date: Tue, 18 Feb 2025 19:40:45 +0530
+Message-Id: <20250218141045.38947-1-purvayeshi550@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250217232905.3162187-1-kuba@kernel.org>
-In-Reply-To: <20250217232905.3162187-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 18 Feb 2025 15:10:34 +0100
-X-Gm-Features: AWEUYZlJETlY32j9jekVjsBYuM8nMla_Wmt0l0MOAbPovoDlKyF0WEu1bFsX6WI
-Message-ID: <CANn89i+bKi_fyfj5ui1Evq0WTjGRFj5Aj9Yf1f+L31FfVQeF6Q@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: adjust rcvq_space after updating scaling ratio
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, ncardwell@google.com, 
-	kuniyu@amazon.com, hli@netflix.com, quic_stranche@quicinc.com, 
-	quic_subashab@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 18, 2025 at 12:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> Since commit under Fixes we set the window clamp in accordance
-> to newly measured rcvbuf scaling_ratio. If the scaling_ratio
-> decreased significantly we may put ourselves in a situation
-> where windows become smaller than rcvq_space, preventing
-> tcp_rcv_space_adjust() from increasing rcvbuf.
->
-> The significant decrease of scaling_ratio is far more likely
-> since commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio")=
-,
-> which increased the "default" scaling ratio from ~30% to 50%.
->
-> Hitting the bad condition depends a lot on TCP tuning, and
-> drivers at play. One of Meta's workloads hits it reliably
-> under following conditions:
->  - default rcvbuf of 125k
->  - sender MTU 1500, receiver MTU 5000
->  - driver settles on scaling_ratio of 78 for the config above.
-> Initial rcvq_space gets calculated as TCP_INIT_CWND * tp->advmss
-> (10 * 5k =3D 50k). Once we find out the true scaling ratio and
-> MSS we clamp the windows to 38k. Triggering the condition also
-> depends on the message sequence of this workload. I can't repro
-> the problem with simple iperf or TCP_RR-style tests.
->
-> Fixes: a2cbb1603943 ("tcp: Update window clamping condition")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Fix an issue detected by the Smatch static analysis tool where an
+"undefined 'other'" error occurs due to `__releases(&unix_sk(other)->lock)`
+being placed before 'other' is in scope.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Remove the `__releases()` annotation from the `unix_wait_for_peer()`
+function to eliminate the Smatch warning. The annotation references `other`
+before it is declared, leading to a false positive error during static
+analysis.
 
-Thanks !
+Since AF_UNIX does not use Sparse annotations, this annotation is
+unnecessary and does not impact functionality.
+
+Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+---
+V1 - https://lore.kernel.org/lkml/20250209184355.16257-1-purvayeshi550@gmail.com/
+V2 - https://lore.kernel.org/all/20250212104845.2396abcf@kernel.org/
+V3 - Remove trailing double spaces.
+
+ net/unix/af_unix.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 34945de1f..319153850 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1508,7 +1508,6 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+ }
+ 
+ static long unix_wait_for_peer(struct sock *other, long timeo)
+-	__releases(&unix_sk(other)->lock)
+ {
+ 	struct unix_sock *u = unix_sk(other);
+ 	int sched;
+-- 
+2.34.1
+
 
