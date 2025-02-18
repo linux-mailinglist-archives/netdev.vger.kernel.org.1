@@ -1,117 +1,125 @@
-Return-Path: <netdev+bounces-167535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C45A3AB63
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:55:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11719A3AB64
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:55:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59271724A0
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:55:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFDC9189224C
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D711CEAC3;
-	Tue, 18 Feb 2025 21:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E021CEAC3;
+	Tue, 18 Feb 2025 21:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VZ+rj7yc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FXrTptG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF7A1BBBD3
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 21:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5401C75E2
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 21:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739915713; cv=none; b=s9visLpN6rP1A0pUl3kFpzt+W3+GQjQIcU25uH9f1+JiGhu5xitQhGVIkFXhvvRPVAae6HBi7HSds4k7MNF+ZruePOyY8XkPukdqTHSdJ/QnRx6iTKQ0/EDmgpEc0k/lq4FUBLmZpHL4b7nYr/ZstOV2BEta4lMi20M1HaF8aIo=
+	t=1739915732; cv=none; b=UILVQxBZMNqWAskYf9VGxWcj3zlbzqU3Mg1x0M3QRK/nHu58sHz6ueQdEN/nTy7x3yOT/D+YvZzeCjH8DenHjfUH+fME6VtGZ/dquwziHrjUkd/OVKJ/L8XMWm8ul4Lr9qCDAy5F/J31yFyoAl/yuIuni9wL4rdq6jVTOjydQfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739915713; c=relaxed/simple;
-	bh=tW+DCc+g1sN2aFymYnXo4g17/7KVMurE1lHm9auinMc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B0j/tClCSjXRMBQ8qZL8j/CMoNiCo9Klp9DgR2V9nzuwQ/15pLddwohSIERAihVzDcXcatOtSXnPKDcQFHV9GgyaDCCx69gwfZ8bQpdxb6BjJZaXjM2Wt+JwxOVbQYZUvUVuw+iYxmcY349yTgWKj1VAqQ/DKV+s3ROs4v+rv10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VZ+rj7yc; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471c8bcb4a9so47908611cf.2
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:55:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739915710; x=1740520510; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VnXszEah+Ty7cauHES4zXQeu8+LthL72aw0tPcjzlo8=;
-        b=VZ+rj7yc5KHEu68wmfH0G7Oo6y7nRQb9Vv7JFlH1byDAWfP/bt3JPIauMQdE8q5BK7
-         kDqwOUDun783Iat9Xj7xjRZwN+nQX8VSZbCskvhpYmmU6FD0rL6In1FukvAyqh5DLPow
-         CrEvwtg3WbBWmZ36wOzSq5e1kgH2SUBXVJK/o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739915710; x=1740520510;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VnXszEah+Ty7cauHES4zXQeu8+LthL72aw0tPcjzlo8=;
-        b=mGJkVgtrUb/5dqhZgbU/zzCKK3wLVKPAGJx3n0u6/4fFccSo+kC8y0mYvX1Qvm64jx
-         RD28iZ9ZgYjvmVkJnEjoFPM3p1r+0+Bdy5m3bMDtHd1xXviFYt6AW0OH2SObjpGOIZkG
-         jCFNCC8kAvaecp/Oc5yPCZM6196GFwB0VUTLs2tYA//d9l+PnHGdjm3PulcO0v7C2kbz
-         DQRzFeF+TC3w0uS79DQkv5693JfijyvlMkpcHJQE9V07ptyLwVN9FCDjnJunS/rTEOpF
-         Xmo5AhozXfanB109MSUewuKE72mlzopzEY8IR99UHEU773XhYF8j7B//p4VSjI7HJmJX
-         Uw9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUTpk2Qtb6slUBSWYzvWCtG4mVaSv7IHEZWm2qNS7CQFE/tujEwhqqfLH3xGVQN0B+p8oSm6wk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQC9h74Zoq5OkE8g4KQs9Tr3wFlhCu0JzhNm1q/sYFAgVFQnT2
-	6tC0F73zobxDniGw3dxedUNkt5mRAs+KaP5WUTq6e2Eegr5HSajy06Mg36y62AQ=
-X-Gm-Gg: ASbGncv7TBgIwnFY7Jtvkh/vV9zvvOpJDWGiohg6HPX89HGJtU7Kh4WR4f1pgsTj9jm
-	VxQP67WKLSpRaSDvTwCIoUN6KUve0ybpSkMiy6G8ZlBY+g7a6C/ioeoa/QE2iJvIau9Af2SDhp3
-	R7uLn0lGEqPnw8VE/lzjXc1vF24rtUfH4ZFjR69Dvb/k8Cn8wNPj2N8VG386O0wHx49JHaAqz3D
-	dHoSHBKsHTX285ilrWaKiVjlt/BGQkSikDvL/ON1KN89I64lE9kwzXfPiTOelwMF8abPifFdyz5
-	TnrQpEmuQFty/l0l+aNANd4EybPUO1LwBQzN3/QqNbQlUaTsgbr8hg==
-X-Google-Smtp-Source: AGHT+IGB1ilbwK3Zc2JucUxnCriOphPNIMfv6AQv1pHgFeDt3yYzPkMUYeB2tvZP9tPS/K6XLEw1Rw==
-X-Received: by 2002:ac8:7d48:0:b0:471:b956:e21d with SMTP id d75a77b69052e-471dbe7c1f3mr168184011cf.42.1739915710415;
-        Tue, 18 Feb 2025 13:55:10 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471fcbef8d6sm16160981cf.56.2025.02.18.13.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 13:55:10 -0800 (PST)
-Date: Tue, 18 Feb 2025 16:55:07 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 0/4] selftests: drv-net: improve the queue test
- for XSK
-Message-ID: <Z7UBu8dgOZhYohvw@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
-	hawk@kernel.org, petrm@nvidia.com, willemdebruijn.kernel@gmail.com
-References: <20250218195048.74692-1-kuba@kernel.org>
+	s=arc-20240116; t=1739915732; c=relaxed/simple;
+	bh=gjrdDypVIdA4haXxU16AKYcenMcRuxwQ6R+WNcHp+vQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sxBCF5527k/TMraqEZvSU7F8sUIdr+VC/0R3sn9hCUqx4a5vaSdakEKKhDyK6mGyDiLB+Zr0HWIrTHBTsMmdRVd+8WRl+audOSeVHCIvR3P9aTWNYL9zhb7vedQsrF/hOeyh3ojgWR9i8cRyQNOZRT36b0PYhuYcWsdYdaynkKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FXrTptG5; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <03553725-648d-467f-9076-0d5c22b3cfb3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739915726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MFvzlj17vF3RfnrA5cUt+/Bc+hy+HetI/JCrxlNw5g4=;
+	b=FXrTptG5kh+rP6vZRg8gcxEpQwM3F41EFaNtvO/rq7gy2uxn7FSERZCnfzWGVDWcoIZ9e2
+	j8EoiTt1EJrzjFGm8klGqnrocYVaRyY+EQZgfL/vlSSSVOj8W8WhELuzyDAqYxfXw4RZK+
+	2ikS3h4YY9IFl33sW3sdTWDo+QIvY7w=
+Date: Tue, 18 Feb 2025 13:55:19 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218195048.74692-1-kuba@kernel.org>
+Subject: Re: [PATCH bpf-next v12 01/12] bpf: add networking timestamping
+ support to bpf_get/setsockopt()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250218050125.73676-1-kerneljasonxing@gmail.com>
+ <20250218050125.73676-2-kerneljasonxing@gmail.com>
+ <67b497b974fc3_10d6a32948b@willemb.c.googlers.com.notmuch>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <67b497b974fc3_10d6a32948b@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Feb 18, 2025 at 11:50:44AM -0800, Jakub Kicinski wrote:
-> We see some flakes in the the XSK test:
+On 2/18/25 6:22 AM, Willem de Bruijn wrote:
+> Jason Xing wrote:
+>> The new SK_BPF_CB_FLAGS and new SK_BPF_CB_TX_TIMESTAMPING are
+>> added to bpf_get/setsockopt. The later patches will implement the
+>> BPF networking timestamping. The BPF program will use
+>> bpf_setsockopt(SK_BPF_CB_FLAGS, SK_BPF_CB_TX_TIMESTAMPING) to
+>> enable the BPF networking timestamping on a socket.
+>>
+>> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+>> ---
+>>   include/net/sock.h             |  3 +++
+>>   include/uapi/linux/bpf.h       |  8 ++++++++
+>>   net/core/filter.c              | 23 +++++++++++++++++++++++
+>>   tools/include/uapi/linux/bpf.h |  1 +
+>>   4 files changed, 35 insertions(+)
+>>
+>> diff --git a/include/net/sock.h b/include/net/sock.h
+>> index 8036b3b79cd8..7916982343c6 100644
+>> --- a/include/net/sock.h
+>> +++ b/include/net/sock.h
+>> @@ -303,6 +303,7 @@ struct sk_filter;
+>>     *	@sk_stamp: time stamp of last packet received
+>>     *	@sk_stamp_seq: lock for accessing sk_stamp on 32 bit architectures only
+>>     *	@sk_tsflags: SO_TIMESTAMPING flags
+>> +  *	@sk_bpf_cb_flags: used in bpf_setsockopt()
+>>     *	@sk_use_task_frag: allow sk_page_frag() to use current->task_frag.
+>>     *			   Sockets that can be used under memory reclaim should
+>>     *			   set this to false.
+>> @@ -445,6 +446,8 @@ struct sock {
+>>   	u32			sk_reserved_mem;
+>>   	int			sk_forward_alloc;
+>>   	u32			sk_tsflags;
+>> +#define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG))
+>> +	u32			sk_bpf_cb_flags;
+>>   	__cacheline_group_end(sock_write_rxtx);
 > 
->    Exception| Traceback (most recent call last):
->    Exception|   File "/home/virtme/testing-18/tools/testing/selftests/net/lib/py/ksft.py", line 218, in ksft_run
->    Exception|     case(*args)
->    Exception|   File "/home/virtme/testing-18/tools/testing/selftests/drivers/net/./queues.py", line 53, in check_xdp
->    Exception|     ksft_eq(q['xsk'], {})
->    Exception| KeyError: 'xsk'
-> 
-> I think it's because the method or running the helper in the background
-> is racy. Add more solid infra for waiting for a background helper to be
-> initialized.
+> So far only one bit is defined. Does this have to be a 32-bit field in
+> every socket?
 
-Sorry for the raciness I introduced. I think overall the direction
-this is going is good - thanks for cleaning this up.
+iirc, I think there were multiple callback (cb) flags/bits in the earlier 
+revisions, but it had been simplified to one bit in the later revisions.
 
-Please see my comments on patch 2 and the hang introduced with this
-change.
+It's an internal implementation detail. We can reuse some free bits from another 
+variable for now. Probably get a bit from sk_tsflags? SOCKCM_FLAG_TS_OPT_ID uses 
+BIT(31). Maybe a new SK_TS_FLAG_BPF_TX that uses BIT(30)? I don't have a strong 
+preference on the name.
+
+When the BPF program calls bpf_setsockopt(SK_BPF_CB_FLAGS, 
+SK_BPF_CB_TX_TIMESTAMPING), the kernel will set/test the BIT(30) of sk_tsflags.
+
+We can wait until there are more socket-level cb flags in the future (e.g., more 
+SK_BPF_CB_XXX will be needed) before adding a dedicated int field in the sock.
 
