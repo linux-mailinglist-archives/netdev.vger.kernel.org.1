@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-167161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A327A39079
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:38:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225BEA3907E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:39:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9E7518926D0
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6D6164EF0
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D2A190068;
-	Tue, 18 Feb 2025 01:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E5D1A840D;
+	Tue, 18 Feb 2025 01:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6zW4dXa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdgoGRjP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6593418132A;
-	Tue, 18 Feb 2025 01:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DFE1A08B1;
+	Tue, 18 Feb 2025 01:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739842639; cv=none; b=aIhEoC7n7n8jzEgZGIOohNvyRKeyNfO/RY6f9udBFNsFFwzTgSc6VZbrG1O4DwyJ+oU7ppxrdYS3HCJeSHkLHjo2n+gpW9rABfN5LY1iOW9Ygjdf9gXGSySpsDu9tWAck/ScpACA2GxfVu8Jojh04dKsOBYnmVJaf/7uUhsJgDY=
+	t=1739842642; cv=none; b=MiNqN3xv97UF8AMHoxaOANUPOq5+GV63krOONoZFUProvlPzA8vU0sVa20EiIYYbjH5XlFBgpjIfDJg/0q1XukMydm9Qy3TqLU7nhDAKmiWF2LK96RSKHH1rPyjSe14Eon/kFy4CK6hEBmTSFFok1VPmyO9X4Y70G/ryICyzT08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739842639; c=relaxed/simple;
-	bh=Qi4otraQ/tzfmjMVkLSMqikA8FMNRlA3OcBbfwg+YYk=;
+	s=arc-20240116; t=1739842642; c=relaxed/simple;
+	bh=wp6fErtgRQAw9QT6alD2YZKiQPW6JyirNIZqxzsplWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wb/r2hR44WSccsJReRVAue5noF29/p7xtG+wFruHLsiiz/uHn8ttv7upNGMkAD90ZnrALc8moQYp8KGtUgcTKivD3yhs6zin9LDxuASupkiGhE9S0lqk/+wQAHRuSA5K2/xpVqK3I/TimIN01kG0W9dF5svI08kIfJBiayZ/nMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6zW4dXa; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=E8+IBkUxScMAiBrHhLK4uE7Q3pDBY6riurc/13MC/bbWR2VNzSWCvb6MSYfjC/N8aUkO0aOIGgogYB/Ia+T4fxY7yMax6bVRkaefB9R52Q6HYpvLykHmMwak72KUhNEJ7vUVeGWt7QozAiqOfLXk7RttM7C95UNeO35mnYfKgdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LdgoGRjP; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-220d132f16dso70245405ad.0;
-        Mon, 17 Feb 2025 17:37:18 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-220f048c038so59327135ad.2;
+        Mon, 17 Feb 2025 17:37:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739842638; x=1740447438; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739842640; x=1740447440; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AnT/e6F6Fi0LyXX+Ihgia8DQKf8/6Rddg8YXuUwcV6w=;
-        b=f6zW4dXaaM+oOX+s0QmnjxnHnyRTKfTmyTrZOpSalV0u6Ar4XHaYcK8XKW3uZnEZx1
-         29mR/NQECINqRyB6bdvAfvjg57/Xi49BaGikmun+MwXidDbuy0Rsx7zSw+l8s5vagOO7
-         MAV1k07Vd5AgXjO+Pl8HKJRGl0M7hu8ek6sHlYOS5j4mOsrQFQ64YVbWgtH3iGV/pC1s
-         i1+rTM2IUij6e3OUeYyXnTG5v+Q5ySQoBNUlDxsIdFi4wwWAq0xuCzsh6ww6QslPPxC+
-         HsnuiH4H93l+rYT8LghmST+nNtGHmDqD/RXQO9CaXp3ylcTQaR0oLND7+ahppljksUz6
-         Ksmg==
+        bh=zKLCDKY+mHeKsXEoXryyFkORSM+PA76Iv+i/R/w7Bcw=;
+        b=LdgoGRjP3Eny6jh9y4gU4GMuzqGpssxrHw64L0X3HPzqSb7+W3L12Z202Q+WvQiitO
+         gB88Kzo7FPb8EgpNeGtQmCPNEJV+e/TeJYyomxrOLbfHT9EXYXENBGKQCYHwmMuraOTO
+         bMXTaNjtDb6IV5Pql/NMLAvUTX9L8rd5jttPEnElgb696ZBnQ3kdGxMDCavKqplg2/Sb
+         hD/kS33mNv9Lkg+BWNa/c/yeKM6+lCPyDfkXu4CWgLcUmCzTPAFYsx6+JT22j7YPfHSH
+         i4w8W/28M7wWIprOn66dMmx84qBiWVZ9+kpM7LMfkvoUisL3TTgRRmHamkVzeB0jtn1P
+         0+aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739842638; x=1740447438;
+        d=1e100.net; s=20230601; t=1739842640; x=1740447440;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AnT/e6F6Fi0LyXX+Ihgia8DQKf8/6Rddg8YXuUwcV6w=;
-        b=qKwcl9JHfcluEB9J3plMmabUIsVZfuNogpgMz84lOiZbQvB5fdW7zB1/rwxY1+mnMV
-         qyUYM5yPHtbqVaL5GUJ6zB28qwmRABmlfaAcue4qjPXC4FFdd3PiW+G2QZR+UiNL74lu
-         Eyrart+pRGVuRLSUE2HV3XIdLxx6weTH786hVoNBlhqZ9okIP/6T0yT8Ua/BL/tAMjQ8
-         HzwTYyopzJ/K7gAXOjpbpLLuhyW4LVUdXfFEGBw2C4FaunJ3q0ALhtEYBs2355yr9NGL
-         JsQauSW5TGw8Z8aDf5az0Jj/XhT7QqvI7EK4dJn3eADFPlno7OZMTalwDUHnlwD9EBNw
-         zh6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUsNnBcvHM6NH9uopIn8hvwELuXBgmnl6TGk6VQpq5iuh7+tNrrh5uUQXd0JJx6XPzmTzz5xCGjLuBE@vger.kernel.org, AJvYcCVp9WOeIqjAE3OLQe9RRHczEN7+sd4WSJieMDCDohJJk5uVbKcdlkfbO/YZo40suRlqyoFfnTuQ@vger.kernel.org, AJvYcCWBs1bHvY67iZQmJR3YkppnSqLYUhtGwQ7APZ2iyw/yP1J5p4ccHVn7Vr6jCpNTKRVyd5vSD4JtMTQ6wQUY@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJhhqZo9ANGVNAmMmJoglH/385lIn/MzeG0EoCEC5ETOBm/7Dc
-	T3X4wAMK3qqg5k27jIvp4LAhOidlbZj9qMlyhqrM5C0fm1wWMjH/
-X-Gm-Gg: ASbGncs4zGJv+GBQNsxvXe/eevD7gaaqy2g23454UPJu/UR4BtgRZlmQ1Ff66vaXGCU
-	6VOgmzNTEgFT2R0zydXGARj+ckx39If8XtXqf21jXDZ7Spp9GyEXGTKakgcheT8XFWy+vNyxtxA
-	JiyeAT9oINqSsGbmCM1TUnMsjthCnRyZ7IG1h5p21jRdPDCEnDiyRLm0SAOMHrPlDh31OqW+UfK
-	7ospqhqBX6GDNDmt0yKsJuFTtCS26YO4FyC541ZlOY1NtMPA6HIf7mnKpY0205UL5m25wGzHw4c
-	0E46U/nKUi2pFAUSerJitZyepB7pRmFcGw==
-X-Google-Smtp-Source: AGHT+IFDu4hYdotyyziohrCdHf9suBIFyx+bvqhDmBKsMwrc2z6aM7HNvbrEUdFJLhy5MdcxD12ltA==
-X-Received: by 2002:a17:902:e54a:b0:220:da88:2009 with SMTP id d9443c01a7336-221040c1b01mr176388335ad.45.1739842637719;
-        Mon, 17 Feb 2025 17:37:17 -0800 (PST)
+        bh=zKLCDKY+mHeKsXEoXryyFkORSM+PA76Iv+i/R/w7Bcw=;
+        b=vEdSM0HHUJmdmTFNOofZbuZe4KP91C27SRCBw8kHAEpGOUmCx1AvAObMF5j7Y4xZM+
+         xi7kRzh6npeYUeGMqzJ122TLQPiKp+4rCFkjetd8vGzCSnQCeW+vPhWwA8eb3PJgU5kW
+         qELbxwU0hSXUg1f8vM+Ix6L8sGHpslZgks7k/QCtK+WWBb7tG4y1/1UTCLwml4QeB2kc
+         8ocf6TTU4k4ASXENGRfWkSC27E2aPH/GadnR4nHmvKlpatOfQGTb0e6dp6JC8BgBP44H
+         nXaI0+UV9x316djI6nBCOO/vQGOrHytRa7bct2HMZXQaSXfLKzNQ1bFCbSxEce2jWdzQ
+         Di3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUNpRZm6zsmP9EfCNBfTRpjd0N3DZvR/qHjcm66kSriaVszf0TBkOfTVEgA4yRGm9pYLcPXP6niwmgQX862@vger.kernel.org, AJvYcCX+8rkRNNths2/uVZou/PKAOYKNVrL81yKqKtyvaKfquubb43AbAl9ud6fem/wK+bt7ta2CpKe/@vger.kernel.org, AJvYcCX1dcNrsYgwJAWxUeLZtPJEwTjjnq2ii5rt57i1qO9WxffOpVtma9nkG/eka+4FhAhPpJlLW3CbOSyo@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxhE7LFEslACF3U+ZL8ZIvvwND9sXaUu+JMtAe9mLyEMNxwlTO
+	/y05769GWbWwcQe/vpycUXkOxvO3gAG3NL+pkv5iOgFkcCR4byn/
+X-Gm-Gg: ASbGncsOP1hE7z/VL30DlPuzKVllcU9PieaYw4ZeiXT2/CyxBB7GgyukWiwRQuillgB
+	EFaeXBNybQsQ6Zxv8H+7ZNDY5Jpv4vvY3vf/94/s9jm73slMERTCD2pS5PIArF+ESt9sK4wkWZo
+	viBq18wyY8RJVGSSwwPjP9BEjD1yeuu2RxPCSbZxDrFoaYLlVQtKrHPBjgQVPkeAB+mCkFbD8UO
+	VSmJc9jHriHib7b8GgBXoyK9ksLzCnT5IdgC5Nr0M8Zv73zx+POnydrYPbcVSURReQura//pJJW
+	sOc1R75LSM75girXjZodaTnKTz2ZoQzXwg==
+X-Google-Smtp-Source: AGHT+IG6fuy4M3/uT1eijsCyZC0kZPunvOKQvdJWWuzg/1lXp63eqJRL241hIIWx/62ssxvn9TCnsw==
+X-Received: by 2002:a17:902:ebd0:b0:220:be86:a421 with SMTP id d9443c01a7336-221040a9b15mr153229775ad.38.1739842640126;
+        Mon, 17 Feb 2025 17:37:20 -0800 (PST)
 Received: from localhost.localdomain ([64.114.251.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d4d8sm76910165ad.170.2025.02.17.17.37.16
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d4d8sm76910165ad.170.2025.02.17.17.37.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 17:37:17 -0800 (PST)
+        Mon, 17 Feb 2025 17:37:19 -0800 (PST)
 From: Kyle Hendry <kylehendrydev@gmail.com>
 To: Lee Jones <lee@kernel.org>,
 	Rob Herring <robh@kernel.org>,
@@ -92,9 +92,9 @@ Cc: Kyle Hendry <kylehendrydev@gmail.com>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 4/5] dt-bindings: mfd: brcm: add brcm,bcm63268-gphy-ctrl compatible
-Date: Mon, 17 Feb 2025 17:36:43 -0800
-Message-ID: <20250218013653.229234-5-kylehendrydev@gmail.com>
+Subject: [PATCH v2 5/5] dt-bindings: mfd: brcm: add gphy controller to BCM63268 sysctl
+Date: Mon, 17 Feb 2025 17:36:44 -0800
+Message-ID: <20250218013653.229234-6-kylehendrydev@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250218013653.229234-1-kylehendrydev@gmail.com>
 References: <20250218013653.229234-1-kylehendrydev@gmail.com>
@@ -106,33 +106,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add BCM63268 GPHY control register compatible.
+Add documentation for BCM63268 gphy controller in the
+bcm63268-gpio-sysctl register range.
 
 Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
 ---
- Documentation/devicetree/bindings/mfd/syscon.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+ .../bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml     | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Documentation/devicetree/bindings/mfd/syscon.yaml
-index 4d67ff26d445..1d4c66014340 100644
---- a/Documentation/devicetree/bindings/mfd/syscon.yaml
-+++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
-@@ -54,6 +54,7 @@ select:
-           - atmel,sama5d4-sfrbu
-           - axis,artpec6-syscon
-           - brcm,cru-clkset
-+          - brcm,bcm63268-gphy-ctrl
-           - brcm,sr-cdru
-           - brcm,sr-mhb
-           - cirrus,ep7209-syscon1
-@@ -153,6 +154,7 @@ properties:
-           - atmel,sama5d4-sfrbu
-           - axis,artpec6-syscon
-           - brcm,cru-clkset
-+          - brcm,bcm63268-gphy-ctrl
-           - brcm,sr-cdru
-           - brcm,sr-mhb
-           - cirrus,ep7209-syscon1
+diff --git a/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml b/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
+index 9c2a04829da5..99610a5f2912 100644
+--- a/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
++++ b/Documentation/devicetree/bindings/mfd/brcm,bcm63268-gpio-sysctl.yaml
+@@ -50,6 +50,15 @@ patternProperties:
+       should follow the bindings specified in
+       Documentation/devicetree/bindings/pinctrl/brcm,bcm63268-pinctrl.yaml.
+ 
++  "^gphy_ctrl@[0-9a-f]+$":
++    # Child node
++    type: object
++    $ref: /schemas/mfd/syscon.yaml
++    description:
++      Control register for GPHY modes. This child node definition
++      should follow the bindings specified in
++      Documentation/devicetree/bindings/mfd/syscon.yaml
++
+ required:
+   - "#address-cells"
+   - compatible
+@@ -191,4 +200,8 @@ examples:
+           pins = "dsl_gpio9";
+         };
+       };
++      gphy_ctrl: gphy_ctrl@54 {
++      compatible = "brcm,bcm63268-gphy-ctrl", "syscon";
++      reg = <0x54 0x4>;
++      };
+     };
 -- 
 2.43.0
 
