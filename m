@@ -1,83 +1,111 @@
-Return-Path: <netdev+bounces-167526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 669F8A3AACF
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:25:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CF18A3AAD1
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 22:25:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56F003A5C69
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:24:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F32BC3A5FB6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 21:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00CC1C6FFD;
-	Tue, 18 Feb 2025 21:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89E01C7001;
+	Tue, 18 Feb 2025 21:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZVWjkS0"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pkz2TP2w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8536286286;
-	Tue, 18 Feb 2025 21:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185961C3BE7
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 21:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739913896; cv=none; b=lSGx1WvvWmDl/QCezQaTj8xi37H0WlOI+nJIUyWu+pC0LmhaPAMByl907GXMy85kEe4WNMuBhpCkYE0LsebuwtoqTqJjoolwKSXN4ZZpHxF56H4M+yZQHYJ8shDC7zsD6wkynVfyDyC0rxgdZS0s+KPTPtIA9G56KTVBmCVHD5k=
+	t=1739913928; cv=none; b=tmndfmdwnYMnG8pQ3IceUyTEtwKEZdVTtJB1b+fRxfcWxDY41CLMGjRUb919buHfTLjBgWcNVUSA0XG3sRjQe997zblLn4wJhobFSa0lFRcfIm+HARpFb65Krdv3fmiujR4i+OFuR8f10OonF3L2cZfXN20oRdorgi5g94Np2vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739913896; c=relaxed/simple;
-	bh=j1wOK1WtP3hJwN/NmZJ5XR/o3Elun+UHcrO3nEkIDL4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sqYBkZLIW8pYgnwLOOG8MaOSf6zfkJOKhjrQkyh9Mr5yY0tkaIsee9vLaEUqzI9rVivNp+FIYZxnhJ/q30iyM6O2gBT19wvYxFYk7T93Rtz9zLw/ApL8i8F5pHBzOh60oRfUx6TrOdm8wmRtj5F/kb4MwmG3v0ZnKYti47S1dk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZVWjkS0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C693FC4CEE2;
-	Tue, 18 Feb 2025 21:24:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739913896;
-	bh=j1wOK1WtP3hJwN/NmZJ5XR/o3Elun+UHcrO3nEkIDL4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PZVWjkS0Ud5rDE4zqCL5lzSn72OTjLZmFgzuI0yrJ7uij+nJihfklxdbUL14NXgoI
-	 LH671gUdoZtKEDyxbQjrkpBsgiAH42WQdB+4zYDOb6sBZ4o6CUx8ahvZfSW5MQPaLs
-	 WGiivCnwBTnqDZgJ1OGt0Gi+O6LceQH38/ghhhOWV+Y057c96yDWhYwMo87qQfHYd7
-	 MvdzSl2tb2zlXtGtRSEbD+gIVmTtsiXjk5uFM1JpmcgyRfu9+BAZmM1tH5qTnRfW2C
-	 dTnC822uScKhlAisMSO14++3Vfsudg+PUBSwsJTuQifze0pqQ3dVoY18/6itkYchif
-	 gZ3uoSmCYNzWg==
-Date: Tue, 18 Feb 2025 13:24:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Tariq
- Toukan <tariqt@nvidia.com>, Edward Cree <ecree.xilinx@gmail.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, linux-doc@vger.kernel.org, Nimrod Oren
- <noren@nvidia.com>
-Subject: Re: [PATCH net-next v3 5/5] selftests: drv-net-hw: Add a test for
- symmetric RSS hash
-Message-ID: <20250218132454.01345f86@kernel.org>
-In-Reply-To: <9eb3db1a-514b-4fcc-8318-7af0bd0a62df@nvidia.com>
-References: <20250216182453.226325-1-gal@nvidia.com>
-	<20250216182453.226325-6-gal@nvidia.com>
-	<20250217161954.57fd1457@kernel.org>
-	<9eb3db1a-514b-4fcc-8318-7af0bd0a62df@nvidia.com>
+	s=arc-20240116; t=1739913928; c=relaxed/simple;
+	bh=jSt9WNk4rtGV8CktviYl0/VLAqk7GcQr+B576kTE+pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ltms+lCmVcpy40Z8AlHxNpjn5pkk1DK5/7o20HRkkyDiakYJzXDJfsFlH/UHvPEI5vUjFKdAMpchZ6YjLIXZGQgtsBVbA2B1CYpWElMKqElgwBM79JqWQC+bsljCdRq8uHeEES6NGdEmETxuTnPgdlFXJi4989MWGPQUnwfL+ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pkz2TP2w; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-471b5372730so76392191cf.1
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:25:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1739913926; x=1740518726; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y+9t7rVgCbD9nSI/KEETzPkt/9TwQ5fwOiYnpEErqNs=;
+        b=pkz2TP2wJu6I4D9pgRfqUG4IZ9wldqERSaMJhaL+SY19QIPHiMZzxoIfH4aJNcFNeb
+         30oV9CRme/IvaIAb1/6VvAn6QmYpNTiRsYPKia8J0y4bPJolkED0NVbwwEh5k771OUSn
+         TrulUBrXLfMatCh5q5XjLqMQKYqO0f0Nx4Yy4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739913926; x=1740518726;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y+9t7rVgCbD9nSI/KEETzPkt/9TwQ5fwOiYnpEErqNs=;
+        b=TteSL/5nM0HmZRkzXfSYdavjPcFiqgLETfNU7bKCdFrcVTZCkAdopOwmMjyTLU161W
+         o1/3m57z1ipWzazhslSC7UfQoR637FUJTik2Ur0CMSPqzmS5zM7athfyr/VgvZIoaVTo
+         EsMDKCkUf/Qt/904M89dKzn1kfPafkYHp60EMN/I/vFGWOIqGgIV+Ca8xM37N6qwm6I4
+         GikX1bdMTaW38Jh3Jr8XLOE4v1r4EHEwIkrOy65b/AuBf0jGKxKSik5JqpFFydHzfHjz
+         R1dsHcL6awrENypH239Qbt/CPAXsPJeumumAEuUzqEgZGRJpMWLBg+gzFcV5TdyDAPWG
+         tk4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVTDfIvsWPb0NdmL/vDXb4sV01U+bvgU9uYZYa+CdfXVtRcRj1GRYeQBfDYlm5t07DUSQJCrwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9eLe1vaqzw/qCd9ioTh2nYRTcpfQiCi/+1mraOA0KHsLWGqKg
+	A86E5NcEMZRTtRrVEtxhoEkpMyLsbvVyi8H8QhSUn3ukrKlKUJ9EALT14dX4UvI=
+X-Gm-Gg: ASbGnctw3BhTQ4s2fm+hSMtjW7iejrAh30KthTQon8Ht4c1EbHXxQEvif3WUnXuqQ9c
+	+mxKrGWlhVokJmLzqVbqebgizkKLHeGWlsLFOPH2q/AdrYYMsK3kHQe2syxLrBvCjUGv7vBhHDW
+	ZNvGxW9+mKEQEXt/9oecLhCynvaaNZaZS8WxyaxhpKyUqWNox54r/+EEGgtoqW9R3CQzWb9QXh4
+	v5+2+K0FYDaAbbeAOuoQ+s8yuwqlJ0GGvcR0Fy1QbLaFzqWFvydEp4EpO0awb2hL8eZdM/OwFxZ
+	3luBvl10NWvhn8npKpsncRZLHDVGpTwGyo3uOXrnhowSqa5kkZVnrQ==
+X-Google-Smtp-Source: AGHT+IFZsZHRHegvREvuU36ot/Obqke2rAXx/n/WvwuDVNexdP3bGDR5Wvt13iEorQpNuCjH+51dyA==
+X-Received: by 2002:ac8:5a82:0:b0:467:70ce:75f5 with SMTP id d75a77b69052e-471dbe7b209mr225638291cf.37.1739913925908;
+        Tue, 18 Feb 2025 13:25:25 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47209a1b133sm1135101cf.70.2025.02.18.13.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 13:25:25 -0800 (PST)
+Date: Tue, 18 Feb 2025 16:25:23 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next 3/4] selftests: drv-net: improve the use of ksft
+ helpers in XSK queue test
+Message-ID: <Z7T6w9aP5J3yOv2a@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+	hawk@kernel.org, petrm@nvidia.com, willemdebruijn.kernel@gmail.com
+References: <20250218195048.74692-1-kuba@kernel.org>
+ <20250218195048.74692-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218195048.74692-4-kuba@kernel.org>
 
-On Tue, 18 Feb 2025 22:26:25 +0200 Gal Pressman wrote:
-> > Would be good to test both IPv4 and IPv6. I'm going to merge:
-> >   https://lore.kernel.org/all/20250217194200.3011136-4-kuba@kernel.org/
-> > it should make writing the v4 + v6 test combos easier.  
+On Tue, Feb 18, 2025 at 11:50:47AM -0800, Jakub Kicinski wrote:
+> Avoid exceptions when xsk attr is not present, and add a proper ksft
+> helper for "not in" condition.
 > 
-> Should I wait for it to get merged?
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/testing/selftests/drivers/net/queues.py | 9 +++++----
+>  tools/testing/selftests/net/lib/py/ksft.py    | 5 +++++
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+> 
 
-Yes, please, I remove the members you'd need to use to test both v4
-and v6 so you patch will stop working once mine is merged. Stan reported
-a problem, I'll repost once again and hopefully the new version goes in
-tomorrow.
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
