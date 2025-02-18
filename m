@@ -1,62 +1,97 @@
-Return-Path: <netdev+bounces-167174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B39A390AE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:10:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1702A390DF
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 03:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 575523B2DA7
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:10:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBA293AFFF4
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2485145FE0;
-	Tue, 18 Feb 2025 02:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A84D29D05;
+	Tue, 18 Feb 2025 02:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ta14DIk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7595F14F117
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473C14C9F
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739844594; cv=none; b=p9pIuOuRiS/egk/yNtO7KSG6dvs8O0tE0zQMBJQLWfZBT8CdbN3g2rKHyThy1AqFIMKLoMJUPDZF1V2TmOZoiDkP9h+b5AjQsIbq+GmCL8bOxZO9dwVrm5/WvlCkrKgk3ps1qOnR1HzQBDzAVXzWZ4GWhk3jWfBi92c/dHh6ylg=
+	t=1739846163; cv=none; b=PavAkvbg4q2YJjM+31D58hSTJz5cFvyMrDRQXuaOO4jlzBKQcdtmAtBbp9jORiNFjEFS595+yCpWq2HW0Q3wgcyzenS34EWWuBJ+rOzPU20Jx0nL6KO/wAeGFWR5mP9pcnWS1fXZM7D/0Uner1V+NqZx0iIbjRHhVOyS2f0+X1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739844594; c=relaxed/simple;
-	bh=WGlWRgm/1Ltz7fkVY1FkkIPPYOgNjs0/FqXf45/6Rls=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Zw1w/Q0mX3gB7+xQu3J72Aaqezktx4m/xHoqquxhSmbGuCLv/Zz3kqjC7TxNkFVcMptbGvms7GO7rYjwZ3ElTJWj1RxP0uRBg/ULkYm/tGkPqaHkgSRN8inM0AsiT46hyMOi2X8Wum2R+tl7ivHPRcli5jiKdlCU9WpAj4CSBwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz5t1739844580tpl15kv
-X-QQ-Originating-IP: qf9Q/njeBIZ/ZQyOyOB3A5MHp5AgWQRoUDXrILaVnnk=
-Received: from wxdbg.localdomain.com ( [36.24.205.26])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Feb 2025 10:09:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2338889483868943175
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1739846163; c=relaxed/simple;
+	bh=y88EbolgpKIBYReUhHKh9d1+JK3Ca8gqNdo1YcutapM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=prfF5PP2lGuZuCU/vwtgqcDyYfPdZ1cf+6rJ91mbErfA7Pq2wekMOInt3xF3QZRvLR+1Fwcg41RVj2szjC36sHFv6cz2W5tgLRbz3c4pgqnK4pnP6KTrg4fpolfJGxKHFXHGwsasoVYkO//eRipZXLFvqoxyhkj3JsZ0ms9cGD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ta14DIk1; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-abb999658fbso192415066b.3
+        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 18:36:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739846159; x=1740450959; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmJHSSonnT5liIl40L0gPNkrE8JfUVZiK2KhxjA8V4A=;
+        b=Ta14DIk10MSrZvGNq3ZuF8xnt550l291jxYdCM/t/SwckAewQe7S3r96VOGhRJ1YfA
+         M060uzjlZlnwi1vaP9wLIES9lyKQpXGPc0tl+96Ss715iih3Ym+3Trbt9WIy5HXhIYC5
+         zFVJzohW1Tg8uqKfq/uhTCIwG/I1ZZLIu6SSyEHa6Pj7KUYpXNsJDLZs3rwfZcex2RLM
+         T6TvMGKM6EEZQ2x4AV5dzfbZzS6TlaupfuSKOjgi8xTsW4yDLYBFxbhemi64NXsMYbIF
+         6KsKgzdqiTEpjH1XKowhUEu20QW+SabDPBAKu55gGhcfExPNajkIlbxH3OzKerB01BVI
+         Wi3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739846159; x=1740450959;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dmJHSSonnT5liIl40L0gPNkrE8JfUVZiK2KhxjA8V4A=;
+        b=pivgBPkTNNMExgbo97JHW1bsxw1JpDSFolzo6POuiQRTwg7DEu6A8hR+PQg4RIYuz/
+         sFDVRnLY+aAm3j82/LtplDvi3Nb2wliEB6CPUQLC76V7nH8M2tqMySQXhH8f/Uy7R/6a
+         6YH2o9yGKsaalUuhAu8pU3dlSi0B+IKsBeDggQMSauw8pP3PMdoNoLnMV3Asd7Dn6vNq
+         gYjWH0eP0J9oWT+ufzzOxXbFCP3K5jxV7sld+z6UbXYRomegttMAZGci6trvdtOWkAzJ
+         tvodzg289XgvjTQoS44p1DOOZcu4Px7tHWHyP5u/9KLP4viOttFHpaqLvZpFp+//+xEZ
+         wVyA==
+X-Gm-Message-State: AOJu0YwGge8YL8+oWIFfY7aiGAv/84rzIi9bMvgcZptt1W+Tg0WlryiE
+	Z1wzyGN+Eex8KjAkS0fKcrPM1OfCBsT5eokq5YpO1WYzThRkRlo3sDJIwQ==
+X-Gm-Gg: ASbGnctpsW7FW28KN0PJk9MsBLzVymSpw5Cd0tcbBLCymKWRS/U21m35sSfbAxPQW1r
+	aMlMq2R1XjOPzCFka2gVVb3yUCby8Dt1DSbWKTusEdjo80Dv5nKIfkGO2HV+P+tVF2Bnsz306KX
+	SI6NhHAjS3vL+x5Npm2tuI9bl0XuyOXKwkvwRso3OWJRhc883RVnUXK5bNF14VvBM1bzsRN4Xec
+	TpqLuslbPjEE2nyJXf9W/6L4XguXfNZp4NgH02ZIAkThz3yPwALILJ3MOq7uSnVTaUdxbxSSwTN
+	gD4zs6webs4y
+X-Google-Smtp-Source: AGHT+IGfAxzZiMyHLYQE/HN9cyITVVJVWw0eWWfOtNgL57WQB2EeE0bUxK5cuAZY0+YEQnlvc1S5ng==
+X-Received: by 2002:a05:6402:4609:b0:5e0:2ea2:e583 with SMTP id 4fb4d7f45d1cf-5e03605b96fmr28859279a12.14.1739846158661;
+        Mon, 17 Feb 2025 18:35:58 -0800 (PST)
+Received: from localhost ([2a03:2880:31ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb8190d15esm501597766b.16.2025.02.17.18.35.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 18:35:57 -0800 (PST)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com,
+	kuba@kernel.org,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	richardcochran@gmail.com,
 	linux@armlinux.org.uk,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	netdev@vger.kernel.org,
-	vadim.fedorenko@linux.dev
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v8 4/4] net: ngbe: Add support for 1PPS and TOD
-Date: Tue, 18 Feb 2025 10:34:32 +0800
-Message-Id: <20250218023432.146536-5-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250218023432.146536-1-jiawenwu@trustnetic.com>
-References: <20250218023432.146536-1-jiawenwu@trustnetic.com>
+	sanman.p211993@gmail.com,
+	vadim.fedorenko@linux.dev,
+	suhui@nfschina.com,
+	sdf@fomichev.me,
+	jdamato@fastly.com,
+	brett.creeley@amd.com,
+	aleksander.lobakin@intel.com,
+	kernel-team@meta.com,
+	mohsin.bashr@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next V4] eth: fbnic: Add ethtool support for IRQ coalescing
+Date: Mon, 17 Feb 2025 18:35:20 -0800
+Message-ID: <20250218023520.2038010-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,468 +99,297 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: ODO7gCA19e1N4vI8z6miD3bEgnFuiZgyW+15JR/tthTf3BvzxsMsYKXa
-	aRR2Ck24K/PN5fG5oxa0H5iiOQHNRN+QSDjyVtPo58kccmz2ENkKqjivePOkp/IVjt4otM7
-	Jir9mSM811o41HH2atkN8QQb+DQEPsJuYzfI+sLMAniM4EzEswSgcYQ5pkOimOSTA2Y61bK
-	kNWKurAwAim2cizPi2qYZRPX9syc2LzY/hwDraCY5a+LyjpKE3j+LnWWsScCIt8BN40u7uN
-	DoaMl++BKTJwqxcLPr0q79XeoMRaK1l7BqWFFA91WETgAB6ycniX04uYU70opefOMNFEhV+
-	LfTHWCjHHZ2/hxOUmE1VsdwPaE1/qJi68xDz1ppYG3CpV3OZLSF3RBSWPxNkQ+LjGS+SnTn
-	wjBqT7jMDp78VECCDpSogjXwujmkP/c7Nh4vG3Nh9D1ldNufDtFm1u6c9Y+bSymMshPaumQ
-	EYLJnfbm12vUnJtpZEBU3Adhq/XQiggAp8dnM4x793TU0Y4QhkUwAXgUDdSgFrNJU9P/ldJ
-	XtX4DLxOul5XRKnf4x33AMd9IUKBq+oDrnNce+UK2y+FEvswam4xEzooOUSYDg4RpVJzP8J
-	su84jiYlpaGVwyXxWp/QL56QR2u9OW86eGegheL2+4l3AB7e5kvpF+jL4+XRWZSI8i5o0Qm
-	Qea24Gv41NQYC4ADlACs1bO6+iG8efnbDtnJQrYjHedsRyjNRHoswcSUH2qDcBXi+0Mgcs0
-	DHKhJgqH6VdtrKQZFGUfvg497JNzyq2J4euAHRxMcK7DrDJXrB1uA9vWtOEAsF1Ck4xHuMf
-	5OhVwBsCv1r2wJlCeOJtG8AlqC/12FReb7TVhNcxh1y2NPK5bVw+vWalHbEaoH0Kjc7Zkc3
-	j7S97Cz8vQ6+v5BJKJ4+YctilnJlMS9jhn4UGeYn3IOjwKBge1WaIdjFHFORCX/8UB2uAsi
-	IcyHr2z0IjUbufkz9uWoCpdkaLDa5RGM44oPSF0zItfkYygQgqOHbgmtV2D+c0EdkLDv/ld
-	0oglVGjhI7+R/i2z95
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
 
-Implement support for generating a 1pps output signal on SDP0.
-And support custom firmware to output TOD.
+Add ethtool support to configure the IRQ coalescing behavior. Support
+separate timers for Rx and Tx for time based coalescing. For frame based
+configuration, currently we only support the Rx side.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+The hardware allows configuration of descriptor count instead of frame
+count requiring conversion between the two. We assume 2 descriptors
+per frame, one for the metadata and one for the data segment.
+
+When rx-frames are not configured, we set the RX descriptor count to
+half the ring size as a fail safe.
+
+Default configuration:
+ethtool -c eth0 | grep -E "rx-usecs:|tx-usecs:|rx-frames:"
+rx-usecs:       30
+rx-frames:      0
+tx-usecs:       35
+
+IRQ rate test:
+With single iperf flow we monitor IRQ rate while changing the tx-usesc and
+rx-usecs to high and low values.
+
+ethtool -C eth0 rx-frames 8192 rx-usecs 150 tx-usecs 150
+irq/sec   13k
+irq/sec   14k
+irq/sec   14k
+
+ethtool -C eth0 rx-frames 8192 rx-usecs 10 tx-usecs 10
+irq/sec  27k
+irq/sec  28k
+irq/sec  28k
+
+Validating the use of extack:
+ethtool -C eth0 rx-frames 16384
+netlink error: fbnic: rx_frames is above device max
+netlink error: Invalid argument
+
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  19 ++
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 181 +++++++++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  35 ++++
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  12 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   5 +
- 7 files changed, 250 insertions(+), 4 deletions(-)
+V4: Add missing 'Reviewed-by' tags
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index deaf670c160e..907d13ade404 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -393,6 +393,25 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
- }
- EXPORT_SYMBOL(wx_host_interface_command);
+V3: https://lore.kernel.org/netdev/20250215035325.752824-1-mohsin.bashr@gmail.com
+- Rebased on the net-next
+
+V2: https://lore.kernel.org/netdev/20250214035037.650291-1-mohsin.bashr@gmail.com
+- Update fbnic_set_coalesce() to use extack to highlight incorrect config
+- Simplify fbnic_config_rx_frames()
+
+V1: https://lore.kernel.org/netdev/20250212234946.2536116-1-mohsin.bashr@gmail.com
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  3 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 60 +++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  4 ++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  6 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 53 +++++++++++++---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  3 +
+ 6 files changed, 121 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index 37f81db1fc30..4ca7b99ef131 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -186,6 +186,9 @@ void fbnic_dbg_exit(void);
+ void fbnic_csr_get_regs(struct fbnic_dev *fbd, u32 *data, u32 *regs_version);
+ int fbnic_csr_regs_len(struct fbnic_dev *fbd);
  
-+int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles)
++void fbnic_config_txrx_usecs(struct fbnic_napi_vector *nv, u32 arm);
++void fbnic_config_rx_frames(struct fbnic_napi_vector *nv);
++
+ enum fbnic_boards {
+ 	fbnic_board_asic
+ };
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+index fb7139a1da46..c1477aad98a0 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+@@ -136,6 +136,61 @@ static void fbnic_clone_free(struct fbnic_net *clone)
+ 	kfree(clone);
+ }
+ 
++static int fbnic_get_coalesce(struct net_device *netdev,
++			      struct ethtool_coalesce *ec,
++			      struct kernel_ethtool_coalesce *kernel_coal,
++			      struct netlink_ext_ack *extack)
 +{
-+	struct wx_hic_set_pps pps_cmd;
++	struct fbnic_net *fbn = netdev_priv(netdev);
 +
-+	pps_cmd.hdr.cmd = FW_PPS_SET_CMD;
-+	pps_cmd.hdr.buf_len = FW_PPS_SET_LEN;
-+	pps_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
-+	pps_cmd.lan_id = wx->bus.func;
-+	pps_cmd.enable = (u8)enable;
-+	pps_cmd.nsec = nsec;
-+	pps_cmd.cycles = cycles;
-+	pps_cmd.hdr.checksum = FW_DEFAULT_CHECKSUM;
-+
-+	return wx_host_interface_command(wx, (u32 *)&pps_cmd,
-+					 sizeof(pps_cmd),
-+					 WX_HI_COMMAND_TIMEOUT,
-+					 false);
-+}
-+
- /**
-  *  wx_read_ee_hostif_data - Read EEPROM word using a host interface cmd
-  *  assuming that the semaphore is already obtained.
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index 11fb33349482..b883342bb576 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -18,6 +18,7 @@ void wx_control_hw(struct wx *wx, bool drv);
- int wx_mng_present(struct wx *wx);
- int wx_host_interface_command(struct wx *wx, u32 *buffer,
- 			      u32 length, u32 timeout, bool return_data);
-+int wx_set_pps(struct wx *wx, bool enable, u64 nsec, u64 cycles);
- int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
- int wx_read_ee_hostif_buffer(struct wx *wx,
- 			     u16 offset, u16 words, u16 *data);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-index 76986e41afe0..07c015ba338f 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
-@@ -88,6 +88,9 @@ static int wx_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	timecounter_adjtime(&wx->hw_tc, delta);
- 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
- 
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	return 0;
- }
- 
-@@ -118,6 +121,9 @@ static int wx_ptp_settime64(struct ptp_clock_info *ptp,
- 	timecounter_init(&wx->hw_tc, &wx->hw_cc, ns);
- 	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
- 
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	return 0;
- }
- 
-@@ -324,6 +330,160 @@ static long wx_ptp_do_aux_work(struct ptp_clock_info *ptp)
- 	return ts_done ? 1 : HZ;
- }
- 
-+static u64 wx_ptp_trigger_calc(struct wx *wx)
-+{
-+	struct cyclecounter *cc = &wx->hw_cc;
-+	unsigned long flags;
-+	u64 ns = 0;
-+	u32 rem;
-+
-+	/* Read the current clock time, and save the cycle counter value */
-+	write_seqlock_irqsave(&wx->hw_tc_lock, flags);
-+	ns = timecounter_read(&wx->hw_tc);
-+	wx->pps_edge_start = wx->hw_tc.cycle_last;
-+	write_sequnlock_irqrestore(&wx->hw_tc_lock, flags);
-+	wx->pps_edge_end = wx->pps_edge_start;
-+
-+	/* Figure out how far past the next second we are */
-+	div_u64_rem(ns, WX_NS_PER_SEC, &rem);
-+
-+	/* Figure out how many nanoseconds to add to round the clock edge up
-+	 * to the next full second
-+	 */
-+	rem = (WX_NS_PER_SEC - rem);
-+
-+	/* Adjust the clock edge to align with the next full second. */
-+	wx->pps_edge_start += div_u64(((u64)rem << cc->shift), cc->mult);
-+	wx->pps_edge_end += div_u64(((u64)(rem + wx->pps_width) <<
-+				     cc->shift), cc->mult);
-+
-+	return (ns + rem);
-+}
-+
-+static int wx_ptp_setup_sdp(struct wx *wx)
-+{
-+	struct cyclecounter *cc = &wx->hw_cc;
-+	u32 tsauxc;
-+	u64 nsec;
-+
-+	if (wx->pps_width >= WX_NS_PER_SEC) {
-+		wx_err(wx, "PTP pps width cannot be longer than 1s!\n");
-+		return -EINVAL;
-+	}
-+
-+	/* disable the pin first */
-+	wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
-+	WX_WRITE_FLUSH(wx);
-+
-+	if (!test_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags)) {
-+		if (wx->pps_enabled) {
-+			wx->pps_enabled = false;
-+			wx_set_pps(wx, false, 0, 0);
-+		}
-+		return 0;
-+	}
-+
-+	wx->pps_enabled = true;
-+	nsec = wx_ptp_trigger_calc(wx);
-+	wx_set_pps(wx, wx->pps_enabled, nsec, wx->pps_edge_start);
-+
-+	tsauxc = WX_TSC_1588_AUX_CTL_PLSG | WX_TSC_1588_AUX_CTL_EN_TT0 |
-+		WX_TSC_1588_AUX_CTL_EN_TT1 | WX_TSC_1588_AUX_CTL_EN_TS0;
-+	wr32ptp(wx, WX_TSC_1588_TRGT_L(0), (u32)wx->pps_edge_start);
-+	wr32ptp(wx, WX_TSC_1588_TRGT_H(0), (u32)(wx->pps_edge_start >> 32));
-+	wr32ptp(wx, WX_TSC_1588_TRGT_L(1), (u32)wx->pps_edge_end);
-+	wr32ptp(wx, WX_TSC_1588_TRGT_H(1), (u32)(wx->pps_edge_end >> 32));
-+	wr32ptp(wx, WX_TSC_1588_SDP(0),
-+		WX_TSC_1588_SDP_FUN_SEL_TT0 | WX_TSC_1588_SDP_OUT_LEVEL_H);
-+	wr32ptp(wx, WX_TSC_1588_SDP(1), WX_TSC_1588_SDP_FUN_SEL_TS0);
-+	wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
-+	wr32ptp(wx, WX_TSC_1588_INT_EN, WX_TSC_1588_INT_EN_TT1);
-+	WX_WRITE_FLUSH(wx);
-+
-+	/* Adjust the clock edge to align with the next full second. */
-+	wx->sec_to_cc = div_u64(((u64)WX_NS_PER_SEC << cc->shift), cc->mult);
++	ec->tx_coalesce_usecs = fbn->tx_usecs;
++	ec->rx_coalesce_usecs = fbn->rx_usecs;
++	ec->rx_max_coalesced_frames = fbn->rx_max_frames;
 +
 +	return 0;
 +}
 +
-+static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
-+				 struct ptp_clock_request *rq, int on)
++static int fbnic_set_coalesce(struct net_device *netdev,
++			      struct ethtool_coalesce *ec,
++			      struct kernel_ethtool_coalesce *kernel_coal,
++			      struct netlink_ext_ack *extack)
 +{
-+	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
++	struct fbnic_net *fbn = netdev_priv(netdev);
 +
-+	/**
-+	 * When PPS is enabled, unmask the interrupt for the ClockOut
-+	 * feature, so that the interrupt handler can send the PPS
-+	 * event when the clock SDP triggers. Clear mask when PPS is
-+	 * disabled
-+	 */
-+	if (rq->type != PTP_CLK_REQ_PEROUT || !wx->ptp_setup_sdp)
-+		return -EOPNOTSUPP;
-+
-+	/* Reject requests with unsupported flags */
-+	if (rq->perout.flags & ~(PTP_PEROUT_DUTY_CYCLE |
-+				 PTP_PEROUT_PHASE))
-+		return -EOPNOTSUPP;
-+
-+	if (rq->perout.phase.sec || rq->perout.phase.nsec) {
-+		wx_err(wx, "Absolute start time not supported.\n");
++	/* Verify against hardware limits */
++	if (ec->rx_coalesce_usecs > FIELD_MAX(FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT)) {
++		NL_SET_ERR_MSG_MOD(extack, "rx_usecs is above device max");
++		return -EINVAL;
++	}
++	if (ec->tx_coalesce_usecs > FIELD_MAX(FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT)) {
++		NL_SET_ERR_MSG_MOD(extack, "tx_usecs is above device max");
++		return -EINVAL;
++	}
++	if (ec->rx_max_coalesced_frames >
++	    FIELD_MAX(FBNIC_QUEUE_RIM_THRESHOLD_RCD_MASK) /
++	    FBNIC_MIN_RXD_PER_FRAME) {
++		NL_SET_ERR_MSG_MOD(extack, "rx_frames is above device max");
 +		return -EINVAL;
 +	}
 +
-+	if (rq->perout.period.sec != 1 || rq->perout.period.nsec) {
-+		wx_err(wx, "Only 1pps is supported.\n");
-+		return -EINVAL;
++	fbn->tx_usecs = ec->tx_coalesce_usecs;
++	fbn->rx_usecs = ec->rx_coalesce_usecs;
++	fbn->rx_max_frames = ec->rx_max_coalesced_frames;
++
++	if (netif_running(netdev)) {
++		int i;
++
++		for (i = 0; i < fbn->num_napi; i++) {
++			struct fbnic_napi_vector *nv = fbn->napi[i];
++
++			fbnic_config_txrx_usecs(nv, 0);
++			fbnic_config_rx_frames(nv);
++		}
 +	}
 +
-+	if (rq->perout.flags & PTP_PEROUT_DUTY_CYCLE) {
-+		struct timespec64 ts_on;
-+
-+		ts_on.tv_sec = rq->perout.on.sec;
-+		ts_on.tv_nsec = rq->perout.on.nsec;
-+		wx->pps_width = timespec64_to_ns(&ts_on);
-+	} else {
-+		wx->pps_width = 120000000;
-+	}
-+
-+	if (on)
-+		set_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-+	else
-+		clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-+
-+	return wx->ptp_setup_sdp(wx);
++	return 0;
 +}
 +
-+void wx_ptp_check_pps_event(struct wx *wx)
+ static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
+ {
+ 	int i;
+@@ -1287,10 +1342,15 @@ fbnic_get_eth_mac_stats(struct net_device *netdev,
+ }
+ 
+ static const struct ethtool_ops fbnic_ethtool_ops = {
++	.supported_coalesce_params	=
++				  ETHTOOL_COALESCE_USECS |
++				  ETHTOOL_COALESCE_RX_MAX_FRAMES,
+ 	.rxfh_max_num_contexts	= FBNIC_RPC_RSS_TBL_COUNT,
+ 	.get_drvinfo		= fbnic_get_drvinfo,
+ 	.get_regs_len		= fbnic_get_regs_len,
+ 	.get_regs		= fbnic_get_regs,
++	.get_coalesce		= fbnic_get_coalesce,
++	.set_coalesce		= fbnic_set_coalesce,
+ 	.get_strings		= fbnic_get_strings,
+ 	.get_ethtool_stats	= fbnic_get_ethtool_stats,
+ 	.get_sset_count		= fbnic_get_sset_count,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index c59f1ce8de32..cf8feb90b617 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -641,6 +641,10 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+ 	fbn->ppq_size = FBNIC_PPQ_SIZE_DEFAULT;
+ 	fbn->rcq_size = FBNIC_RCQ_SIZE_DEFAULT;
+ 
++	fbn->tx_usecs = FBNIC_TX_USECS_DEFAULT;
++	fbn->rx_usecs = FBNIC_RX_USECS_DEFAULT;
++	fbn->rx_max_frames = FBNIC_RX_FRAMES_DEFAULT;
++
+ 	default_queues = netif_get_num_default_rss_queues();
+ 	if (default_queues > fbd->max_num_queues)
+ 		default_queues = fbd->max_num_queues;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index b84b447a8d8a..561837e80ec8 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -12,6 +12,7 @@
+ #include "fbnic_txrx.h"
+ 
+ #define FBNIC_MAX_NAPI_VECTORS		128u
++#define FBNIC_MIN_RXD_PER_FRAME		2
+ 
+ /* Natively supported tunnel GSO features (not thru GSO_PARTIAL) */
+ #define FBNIC_TUN_GSO_FEATURES		NETIF_F_GSO_IPXIP6
+@@ -30,6 +31,11 @@ struct fbnic_net {
+ 	u32 ppq_size;
+ 	u32 rcq_size;
+ 
++	u16 rx_usecs;
++	u16 tx_usecs;
++
++	u32 rx_max_frames;
++
+ 	u16 num_napi;
+ 
+ 	struct phylink *phylink;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index b2e544a66de3..aba4c65974ee 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -2184,9 +2184,51 @@ static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
+ 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RDE_CTL0, rcq_ctl);
+ }
+ 
++static void fbnic_config_rim_threshold(struct fbnic_ring *rcq, u16 nv_idx, u32 rx_desc)
 +{
-+	u32 tsauxc, int_status;
++	u32 threshold;
 +
-+	/* this check is necessary in case the interrupt was enabled via some
-+	 * alternative means (ex. debug_fs). Better to check here than
-+	 * everywhere that calls this function.
++	/* Set the threhsold to half the ring size if rx_frames
++	 * is not configured
 +	 */
-+	if (!wx->ptp_clock)
-+		return;
++	threshold = rx_desc ? : rcq->size_mask / 2;
 +
-+	int_status = rd32ptp(wx, WX_TSC_1588_INT_ST);
-+	if (int_status & WX_TSC_1588_INT_ST_TT1) {
-+		/* disable the pin first */
-+		wr32ptp(wx, WX_TSC_1588_AUX_CTL, 0);
-+		WX_WRITE_FLUSH(wx);
++	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_CTL, nv_idx);
++	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_THRESHOLD, threshold);
++}
 +
-+		wx_ptp_trigger_calc(wx);
++void fbnic_config_txrx_usecs(struct fbnic_napi_vector *nv, u32 arm)
++{
++	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
++	struct fbnic_dev *fbd = nv->fbd;
++	u32 val = arm;
 +
-+		tsauxc = WX_TSC_1588_AUX_CTL_PLSG | WX_TSC_1588_AUX_CTL_EN_TT0 |
-+			 WX_TSC_1588_AUX_CTL_EN_TT1 | WX_TSC_1588_AUX_CTL_EN_TS0;
-+		wr32ptp(wx, WX_TSC_1588_TRGT_L(0), (u32)wx->pps_edge_start);
-+		wr32ptp(wx, WX_TSC_1588_TRGT_H(0), (u32)(wx->pps_edge_start >> 32));
-+		wr32ptp(wx, WX_TSC_1588_TRGT_L(1), (u32)wx->pps_edge_end);
-+		wr32ptp(wx, WX_TSC_1588_TRGT_H(1), (u32)(wx->pps_edge_end >> 32));
-+		wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
-+		WX_WRITE_FLUSH(wx);
++	val |= FIELD_PREP(FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT, fbn->rx_usecs) |
++	       FBNIC_INTR_CQ_REARM_RCQ_TIMEOUT_UPD_EN;
++	val |= FIELD_PREP(FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT, fbn->tx_usecs) |
++	       FBNIC_INTR_CQ_REARM_TCQ_TIMEOUT_UPD_EN;
++
++	fbnic_wr32(fbd, FBNIC_INTR_CQ_REARM(nv->v_idx), val);
++}
++
++void fbnic_config_rx_frames(struct fbnic_napi_vector *nv)
++{
++	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
++	int i;
++
++	for (i = nv->txt_count; i < nv->rxt_count + nv->txt_count; i++) {
++		struct fbnic_q_triad *qt = &nv->qt[i];
++
++		fbnic_config_rim_threshold(&qt->cmpl, nv->v_idx,
++					   fbn->rx_max_frames *
++					   FBNIC_MIN_RXD_PER_FRAME);
 +	}
 +}
-+EXPORT_SYMBOL(wx_ptp_check_pps_event);
 +
- static long wx_ptp_create_clock(struct wx *wx)
+ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
+ 			     struct fbnic_ring *rcq)
  {
- 	struct net_device *netdev = wx->netdev;
-@@ -338,17 +498,22 @@ static long wx_ptp_create_clock(struct wx *wx)
- 	wx->ptp_caps.owner = THIS_MODULE;
- 	wx->ptp_caps.n_alarm = 0;
- 	wx->ptp_caps.n_ext_ts = 0;
--	wx->ptp_caps.n_per_out = 0;
- 	wx->ptp_caps.pps = 0;
- 	wx->ptp_caps.adjfine = wx_ptp_adjfine;
- 	wx->ptp_caps.adjtime = wx_ptp_adjtime;
- 	wx->ptp_caps.gettimex64 = wx_ptp_gettimex64;
- 	wx->ptp_caps.settime64 = wx_ptp_settime64;
- 	wx->ptp_caps.do_aux_work = wx_ptp_do_aux_work;
--	if (wx->mac.type == wx_mac_em)
-+	if (wx->mac.type == wx_mac_em) {
- 		wx->ptp_caps.max_adj = 500000000;
--	else
-+		wx->ptp_caps.n_per_out = 1;
-+		wx->ptp_setup_sdp = wx_ptp_setup_sdp;
-+		wx->ptp_caps.enable = wx_ptp_feature_enable;
-+	} else {
- 		wx->ptp_caps.max_adj = 250000000;
-+		wx->ptp_caps.n_per_out = 0;
-+		wx->ptp_setup_sdp = NULL;
-+	}
++	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
+ 	u32 log_size = fls(rcq->size_mask);
+ 	u32 rcq_ctl;
  
- 	wx->ptp_clock = ptp_clock_register(&wx->ptp_caps, &wx->pdev->dev);
- 	if (IS_ERR(wx->ptp_clock)) {
-@@ -580,6 +745,12 @@ void wx_ptp_reset(struct wx *wx)
+@@ -2214,8 +2256,8 @@ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
+ 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RCQ_SIZE, log_size & 0xf);
  
- 	wx->last_overflow_check = jiffies;
- 	ptp_schedule_worker(wx->ptp_clock, HZ);
-+
-+	/* Now that the shift has been calculated and the systime
-+	 * registers reset, (re-)enable the Clock out feature
-+	 */
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
- }
- EXPORT_SYMBOL(wx_ptp_reset);
+ 	/* Store interrupt information for the completion queue */
+-	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_CTL, nv->v_idx);
+-	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_THRESHOLD, rcq->size_mask / 2);
++	fbnic_config_rim_threshold(rcq, nv->v_idx, fbn->rx_max_frames *
++						   FBNIC_MIN_RXD_PER_FRAME);
+ 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_MASK, 0);
  
-@@ -620,6 +791,10 @@ void wx_ptp_suspend(struct wx *wx)
- 	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
- 		return;
+ 	/* Enable queue */
+@@ -2254,12 +2296,7 @@ void fbnic_enable(struct fbnic_net *fbn)
  
-+	clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-+	if (wx->ptp_setup_sdp)
-+		wx->ptp_setup_sdp(wx);
-+
- 	wx_ptp_clear_tx_timestamp(wx);
- }
- EXPORT_SYMBOL(wx_ptp_suspend);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-index 8742d2797363..50db90a6e3ee 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.h
-@@ -4,6 +4,7 @@
- #ifndef _WX_PTP_H_
- #define _WX_PTP_H_
- 
-+void wx_ptp_check_pps_event(struct wx *wx);
- void wx_ptp_reset_cyclecounter(struct wx *wx);
- void wx_ptp_reset(struct wx *wx);
- void wx_ptp_init(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 0fabfa90d4e7..db446e690dc7 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -281,6 +281,23 @@
- #define WX_TSC_1588_SYSTIML          0x11F0C
- #define WX_TSC_1588_SYSTIMH          0x11F10
- #define WX_TSC_1588_INC              0x11F14
-+#define WX_TSC_1588_INT_ST           0x11F20
-+#define WX_TSC_1588_INT_ST_TT1       BIT(5)
-+#define WX_TSC_1588_INT_EN           0x11F24
-+#define WX_TSC_1588_INT_EN_TT1       BIT(5)
-+#define WX_TSC_1588_AUX_CTL          0x11F28
-+#define WX_TSC_1588_AUX_CTL_EN_TS0   BIT(8)
-+#define WX_TSC_1588_AUX_CTL_EN_TT1   BIT(2)
-+#define WX_TSC_1588_AUX_CTL_PLSG     BIT(1)
-+#define WX_TSC_1588_AUX_CTL_EN_TT0   BIT(0)
-+#define WX_TSC_1588_TRGT_L(i)        (0x11F2C + ((i) * 8)) /* [0,1] */
-+#define WX_TSC_1588_TRGT_H(i)        (0x11F30 + ((i) * 8)) /* [0,1] */
-+#define WX_TSC_1588_SDP(i)           (0x11F5C + ((i) * 4)) /* [0,3] */
-+#define WX_TSC_1588_SDP_OUT_LEVEL_H  FIELD_PREP(BIT(4), 0)
-+#define WX_TSC_1588_SDP_OUT_LEVEL_L  FIELD_PREP(BIT(4), 1)
-+#define WX_TSC_1588_SDP_FUN_SEL_MASK GENMASK(2, 0)
-+#define WX_TSC_1588_SDP_FUN_SEL_TT0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 1)
-+#define WX_TSC_1588_SDP_FUN_SEL_TS0  FIELD_PREP(WX_TSC_1588_SDP_FUN_SEL_MASK, 5)
- 
- /************************************** MNG ********************************/
- #define WX_MNG_SWFW_SYNC             0x1E008
-@@ -410,6 +427,8 @@ enum WX_MSCA_CMD_value {
- #define FW_CEM_CMD_RESERVED          0X0
- #define FW_CEM_MAX_RETRIES           3
- #define FW_CEM_RESP_STATUS_SUCCESS   0x1
-+#define FW_PPS_SET_CMD               0xF6
-+#define FW_PPS_SET_LEN               0x14
- 
- #define WX_SW_REGION_PTR             0x1C
- 
-@@ -730,6 +749,15 @@ struct wx_hic_reset {
- 	u16 reset_type;
- };
- 
-+struct wx_hic_set_pps {
-+	struct wx_hic_hdr hdr;
-+	u8 lan_id;
-+	u8 enable;
-+	u16 pad2;
-+	u64 nsec;
-+	u64 cycles;
-+};
-+
- /* Bus parameters */
- struct wx_bus_info {
- 	u8 func;
-@@ -1068,6 +1096,7 @@ enum wx_pf_flags {
- 	WX_FLAG_FDIR_PERFECT,
- 	WX_FLAG_RX_HWTSTAMP_ENABLED,
- 	WX_FLAG_RX_HWTSTAMP_IN_REGISTER,
-+	WX_FLAG_PTP_PPS_ENABLED,
- 	WX_PF_FLAGS_NBITS               /* must be last */
- };
- 
-@@ -1168,7 +1197,13 @@ struct wx {
- 	void (*atr)(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype);
- 	void (*configure_fdir)(struct wx *wx);
- 	void (*do_reset)(struct net_device *netdev);
-+	int (*ptp_setup_sdp)(struct wx *wx);
- 
-+	bool pps_enabled;
-+	u64 pps_width;
-+	u64 pps_edge_start;
-+	u64 pps_edge_end;
-+	u64 sec_to_cc;
- 	u32 base_incval;
- 	u32 tx_hwtstamp_pkts;
- 	u32 tx_hwtstamp_timeouts;
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index c60a96cc3508..a6159214ec0a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -168,7 +168,7 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- 	struct wx_q_vector *q_vector;
- 	struct wx *wx  = data;
- 	struct pci_dev *pdev;
--	u32 eicr;
-+	u32 eicr, eicr_misc;
- 
- 	q_vector = wx->q_vector[0];
- 	pdev = wx->pdev;
-@@ -186,6 +186,10 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- 	if (!(pdev->msi_enabled))
- 		wr32(wx, WX_PX_INTA, 1);
- 
-+	eicr_misc = wx_misc_isb(wx, WX_ISB_MISC);
-+	if (unlikely(eicr_misc & NGBE_PX_MISC_IC_TIMESYNC))
-+		wx_ptp_check_pps_event(wx);
-+
- 	wx->isb_mem[WX_ISB_MISC] = 0;
- 	/* would disable interrupts here but it is auto disabled */
- 	napi_schedule_irqoff(&q_vector->napi);
-@@ -199,6 +203,12 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
+ static void fbnic_nv_irq_enable(struct fbnic_napi_vector *nv)
  {
- 	struct wx *wx = data;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+
-+	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
-+		wx_ptp_check_pps_event(wx);
+-	struct fbnic_dev *fbd = nv->fbd;
+-	u32 val;
+-
+-	val = FBNIC_INTR_CQ_REARM_INTR_UNMASK;
+-
+-	fbnic_wr32(fbd, FBNIC_INTR_CQ_REARM(nv->v_idx), val);
++	fbnic_config_txrx_usecs(nv, FBNIC_INTR_CQ_REARM_INTR_UNMASK);
+ }
  
- 	/* re-enable the original interrupt state, no lsc, no queues */
- 	if (netif_running(wx->netdev))
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index f48ed7fc1805..992adbb98c7d 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -70,15 +70,20 @@
+ void fbnic_napi_enable(struct fbnic_net *fbn)
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index 89a5c394f846..54368dc22328 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -31,6 +31,9 @@ struct fbnic_net;
+ #define FBNIC_HPQ_SIZE_DEFAULT		256
+ #define FBNIC_PPQ_SIZE_DEFAULT		256
+ #define FBNIC_RCQ_SIZE_DEFAULT		1024
++#define FBNIC_TX_USECS_DEFAULT		35
++#define FBNIC_RX_USECS_DEFAULT		30
++#define FBNIC_RX_FRAMES_DEFAULT		0
  
- /* Extended Interrupt Enable Set */
- #define NGBE_PX_MISC_IEN_DEV_RST		BIT(10)
-+#define NGBE_PX_MISC_IEN_TIMESYNC		BIT(11)
- #define NGBE_PX_MISC_IEN_ETH_LK			BIT(18)
- #define NGBE_PX_MISC_IEN_INT_ERR		BIT(20)
- #define NGBE_PX_MISC_IEN_GPIO			BIT(26)
- #define NGBE_PX_MISC_IEN_MASK ( \
- 				NGBE_PX_MISC_IEN_DEV_RST | \
-+				NGBE_PX_MISC_IEN_TIMESYNC | \
- 				NGBE_PX_MISC_IEN_ETH_LK | \
- 				NGBE_PX_MISC_IEN_INT_ERR | \
- 				NGBE_PX_MISC_IEN_GPIO)
- 
-+/* Extended Interrupt Cause Read */
-+#define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
-+
- #define NGBE_INTR_ALL				0x1FF
- #define NGBE_INTR_MISC				BIT(0)
- 
+ #define FBNIC_RX_TROOM \
+ 	SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
 -- 
-2.27.0
+2.43.5
 
 
