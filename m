@@ -1,98 +1,78 @@
-Return-Path: <netdev+bounces-167549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C34D5A3AC90
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:31:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99478A3AC9D
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A86C7A5C96
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:30:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7108C167B33
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C68D1DDC36;
-	Tue, 18 Feb 2025 23:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F2B1DDC0F;
+	Tue, 18 Feb 2025 23:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQyYaiAt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tnXpOafl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E66619CC17;
-	Tue, 18 Feb 2025 23:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C711D61B1
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 23:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739921472; cv=none; b=mJdcP8VfThW2wA7cmt3u8w5TVuxYsTxFDc99dzpkSlKyzMErtyp6Wn75GKpGjHto4dllpKTgKmiBCDXwX5sYUYp8jRAVlwBSreP27tXoMrELvFuxfCjHbnLRC1Q00hA9kNpDDH1q9mPQcFLFZjSZ4wNYitrxyN4pUtubeounkSY=
+	t=1739921918; cv=none; b=YhzpsfQCZThes7LZf3EV78ph5O0LlACaKrdNpyBmCiLr5G3feZdvUAeuYPzecr7GanpSC+e3EmGlau37kc+0D73YfpT+6SXEA/Ilcjcvvh1b1jtlJP7utAhooDSbNbCmvjyyfpZjo8JHMl5xMIC10/R/CU+8hU1876meo3wTXSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739921472; c=relaxed/simple;
-	bh=Ktp3q+vyFgGJNlGF9go2OGf8msLlPBzcKI8SNITpBMA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N03xoIl2KPw3MblA6K7+zG5kBxN8Du7U/z/opaVMAhGSFa9Ot9qaTJL1gnBJP2/FbA+W7bT3q8ZKZDqi7WjZwvEioCH1SodtqTvFUPu857usIpwTXrf3ilXGs6Gs0ujJH3+cqbPG4CED28FHnaQr/WJHARfk8yx1M+vzfZNYKa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQyYaiAt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5112DC4CEE7;
-	Tue, 18 Feb 2025 23:31:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739921471;
-	bh=Ktp3q+vyFgGJNlGF9go2OGf8msLlPBzcKI8SNITpBMA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AQyYaiAtvcRCjhCsuwS1ceipPD6ej6yrZ9oSoO81c2kDEj9AzAb7MK63EL3/CwEt7
-	 YCp7Q+UCHffH5jp2iNrIvkAZ+Z9bE7gQaTos2eCSUQfwtZ4PVG42AuSDgSPxwcBdK2
-	 /C8vYFfDrwtINHYxHAIatJSEXS5LmP3j2uSFIvJ6LwvkL/iwxut8iXqi72ZOoc1pyQ
-	 /lOGaQc3iwR94PsGt7Ryusaga5VdBtTnxM0TZfISVdvmhSP9efrbxtfJ/G7vBd4QP8
-	 +xUPa1ZBQNSXFX++UOsPFN0Ii4RHmztFiXyRkPglrXyrxIV6C4EbFSkL/Wd8TyIahu
-	 JNbe+C1RYZUTA==
-Date: Tue, 18 Feb 2025 15:31:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
- <aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
- Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig
- <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid
- Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, "Nelson, Shannon" <shannon.nelson@amd.com>, Michael
- Chan <michael.chan@broadcom.com>
-Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for
- fwctl_bnxt
-Message-ID: <20250218153110.0c10e72c@kernel.org>
-In-Reply-To: <532d2530-5c12-43b7-973f-ce43dbc36e67@kernel.org>
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-	<10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-	<20250206164449.52b2dfef@kernel.org>
-	<CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
-	<20250207073648.1f0bad47@kernel.org>
-	<Z6ZsOMLq7tt3ijX_@x130>
-	<20250207135111.6e4e10b9@kernel.org>
-	<20250208011647.GH3660748@nvidia.com>
-	<20250210170423.62a2f746@kernel.org>
-	<a74484b3-9f69-45ef-a040-a46fbc2607d6@kernel.org>
-	<20250218200520.GI4183890@nvidia.com>
-	<532d2530-5c12-43b7-973f-ce43dbc36e67@kernel.org>
+	s=arc-20240116; t=1739921918; c=relaxed/simple;
+	bh=54FVSRGcC2rsBfqo3QsjOLWTLAJZC/VditjcootSkbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CuTC5MokCWEBShlK0UTZiv3yjf6+Dgad1n8yzQPRWooiDVPzlm5WbU3qKdLknCy6cCSWNO97SzEFVLKpvvQZy+Bfyro6obOL1/w5qwmon2ge5SVKcsZ9MwkbQjYhHnx+Q1SmtXMMTXxK0UWlxexQlt31MVI7u1FdieZ7mcZatv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tnXpOafl; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739921904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=54FVSRGcC2rsBfqo3QsjOLWTLAJZC/VditjcootSkbY=;
+	b=tnXpOaflyyC9voJnYySLhiqkXORPjFW742YwlsbnkOM2als1VylXMMl5xLhvDj+qgk9EQ0
+	rb+qEdChd6aFUC6CoPyyLNK1bKV4WigoiDmWU+FkWQpAVxw9kOHi1i+Qeon5E+Coi9ox3u
+	8FFWh+m4QZ9rt+54/70O4cIC7Zq19io=
+Date: Tue, 18 Feb 2025 15:38:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v2 1/3] tcp: add TCP_RTO_MAX_MIN_SEC definition
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
+ <20250217034245.11063-2-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250217034245.11063-2-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 18 Feb 2025 14:42:48 -0700 David Ahern wrote:
-> On 2/18/25 1:05 PM, Jason Gunthorpe wrote:
-> > On Tue, Feb 11, 2025 at 09:24:35AM -0700, David Ahern wrote:
-> >   
-> >> "Any resources in use by the netdev stack can only be created and
-> >> modified by established netdev tools."  
-> > 
-> > That is already a restriction described in the doc, not just netdev,
-> > but any kernel driver running with any kernel owned resource. You
-> > can't reach in and change kernel owned objects.
-> 
-> ok, then Jakub's concerns should be met.
+On 2/16/25 7:42 PM, Jason Xing wrote:
+> Add minimum value definition as the lower bound of RTO MAX
+> set by users. No functional changes here.
 
-I appreciate the doc, but no, it's not enough. The fwctl interface must
-not be exposed if RDMA is disabled or driver not loaded.
+If it is no-op, why it is needed? The commit message didn't explain it either.
+I also cannot guess how patch 2 depends on patch 1.
+
+pw-bot: cr
 
