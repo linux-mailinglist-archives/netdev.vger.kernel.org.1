@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-167464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDB5A3A5C1
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:38:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163E6A3A5C9
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:39:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E85D16264E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:38:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0C91645DC
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22FD26F45A;
-	Tue, 18 Feb 2025 18:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C433B17A31F;
+	Tue, 18 Feb 2025 18:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKs+BKHb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0EnWWX7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DB726B2D3;
-	Tue, 18 Feb 2025 18:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963ED270EC3;
+	Tue, 18 Feb 2025 18:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739903805; cv=none; b=dAaBdk29YyM9KVDqUT+81cfLk3DJ8pL8XU6xjT3+2Zc99ZunfWgx3erh4b4an2cAAbcrhCioc9lwqXh3RcUrI9mWWNojUk99mfv5VFvQvnG4xJMfvvuonyNQeY31kK3UMx/YHE4pL058O07a9V1aBWqXhv6FYW4PTbXiC2QTsoI=
+	t=1739903809; cv=none; b=JehsqM5h1oUSZCq3V81DbeevHfbUGw2H9r/SHT2Bi8oK7hKwI9jJZZ6dfKsHQW3ExoXdWfd4xhF3/nFTNJ3FaHguD3zIRnkCXDHMDUj0pxVZOc6YzSwOPUdcTzL0x86rLgf3S8o6W8yj1EwqvwzM8Erd8w17aa1xgPyPcVCPeuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739903805; c=relaxed/simple;
-	bh=a2n1iRP+j6iFehN5PBuGMpY43pwjb/WhoWJ7Nx56u8Q=;
+	s=arc-20240116; t=1739903809; c=relaxed/simple;
+	bh=JHX0AHDU9Z3wO5E/PzOjf/tEoouvJ5ogW4zW/Wl9gQQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=g0MD9TSPcQqmkY9caPwCPMEarSUKy2ocL7M7NmItJfvOcyCGUXFNiiARox0N62W2G77n9XZvPb/5/HdIUZQxdEDuRuh7pTEYyk1hblIMUHsVOcKsflygoRuAMR6UtJzB9iXltL3j/9VG+w0b9HCkjKvi9jXAqv9Sj5kamSHv3T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKs+BKHb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FCF8C4CEE4;
-	Tue, 18 Feb 2025 18:36:42 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YtbN/HmYpH5dIEEzxWO5HKKLPjLm6mnQBGCz3WuvnsGsNBGlFPN05CbHetpLBeNPK12PZaL+MwuepbzaXTyzLHbWJmBSJzfnSsp4TuoeP4LqXOJUOkUW399yV6dQ8GcBDWKYNorfKljsam1YelacN3mhA+JMmRBa9xRd5K7plqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0EnWWX7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB96AC4CEEB;
+	Tue, 18 Feb 2025 18:36:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739903805;
-	bh=a2n1iRP+j6iFehN5PBuGMpY43pwjb/WhoWJ7Nx56u8Q=;
+	s=k20201202; t=1739903809;
+	bh=JHX0AHDU9Z3wO5E/PzOjf/tEoouvJ5ogW4zW/Wl9gQQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=WKs+BKHbuj7T4KehhFAsemBS9FoQrVFyGcFLIBh6gTLvvt/C7b+h0yc+ivlDX4fK3
-	 73ME2Fhv4n8jUEvLzIwgpvKdemviZwsikf1hBA4N44uzEZahOAjjXR5lHllGZfp57b
-	 xtml2Rdgbl5tBWPCmJL0+40kkKmWhUQt00BNKhIa9f4r2bju/W38dIrZO4QcjPEdiL
-	 ZbY8dV6Ika6wQ4bZ0TYxEo3G+8bsJWbqmDrhPSY9d8FZPqi3r/Idj3TTHO1k2l68I5
-	 DHLm/ms9yPrFWngzGl1HxQ5050Re88HJu+qPk7rjQsJgk8TBgNLMmK0Y/bmn5u5O9I
-	 HEaNkNAtWpRRQ==
+	b=d0EnWWX7njrWBA1vyWmv3LhqNoqBkpquxupxyPYu3V5LV7mO+p+r2kXXwRRbxzNrK
+	 oRueJZ5JGZfYM3sRciHZCcvaDXztP48oST8amvk/H4S+yhT59dK0qfb59fvAoVAiHC
+	 EjBSAzzECG0h8LeYH7e1TNEQIw574QZqHylT60VAkHXEXIcpHqDPz5xra/6FbKjqIN
+	 qMRlDpM6aHXtZDK0akxi05KPG2fKGzS0PGsZ/Kez207cwzop0jEFxjZYPmJlhlHzIb
+	 06iqlcVRGIy8tA8Q7AWnyv8toMtZ0K1+k5qNemFiErwZ3KFI87rdNserehdAeekQZh
+	 s/JV7LQq4fxxg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 18 Feb 2025 19:36:16 +0100
-Subject: [PATCH net-next 5/7] net: dismiss sk_forward_alloc_get()
+Date: Tue, 18 Feb 2025 19:36:17 +0100
+Subject: [PATCH net-next 6/7] mptcp: dismiss __mptcp_rmem()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250218-net-next-mptcp-rx-path-refactor-v1-5-4a47d90d7998@kernel.org>
+Message-Id: <20250218-net-next-mptcp-rx-path-refactor-v1-6-4a47d90d7998@kernel.org>
 References: <20250218-net-next-mptcp-rx-path-refactor-v1-0-4a47d90d7998@kernel.org>
 In-Reply-To: <20250218-net-next-mptcp-rx-path-refactor-v1-0-4a47d90d7998@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -65,124 +65,105 @@ Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
  Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4080; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=viiaOyZW64iyCHKnCj0hoDEEHUJ4EIG7vZ9h8lhf3Gk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBntNMnYA3KhIc1NRpfdciZGIALMCW6GMTMW20Z2
- V3Hu/DXVT2JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7TTJwAKCRD2t4JPQmmg
- cw4FD/4ttVC+hSUqJBWuS+exx/4G58u/1diepZ3yK0/xbX2eg6hCflT/KNpzWouEyINnwZph4L0
- 4EhKU1109fFZSphu7/aGh2nQwfJ+qQB4PdEZAUZTPL0TOaTxoKRKn9sAch3vzeUHN3+lo+eO/fz
- TLQthg5ZJV/pIBh84aWweCaYSSwEMVjpF7IRFo41exV5UdlctHpMVZX4CxQd5qEdx7+e+ywD2nf
- Ur25vuB2je4eCMXN71sSTccReKW9NVJJxxSua4hAkXJGCXQDgFd8ShlKJdUyZFbSeU0Nnhz1+jp
- pcIsMak4veyWLXw/tDFmWTXACkH0RIpM9ZtsI2XhfQbAMygvXOolh+Ze1jt5mWFzb3NTF2vW0N1
- VeA5VLy7PA1JJw6d/fdxeB45y0uXwf5DkBHBoscZOTeDIQbgbrw9v9Dyb2zCuDlpEpJK1OMq/SW
- YbxJpSOaA0hu7f9jvS94wlyQrgfFUaNlawei8EJ9pQBRbAUBnzJnQk8wJcNUdthERLggW+1lKWV
- wyjpFoIOg5s7XIxYihXrYVtd6NqrHKit8kR3xTTi/CuKtFjeQfLUAmVYtO1bsW+84ZnorwmFG+y
- qQg/ilNkE1EyjHgSd807RQ7IGzF1Gelivm56TRBbk5x6qoFDQizDscz1mydzC1I8wLEGYDE8D87
- nzrJ7Z5XWVHBP0g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3152; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=eXI8QUSL7/rXzK6E2jx6P6T/20wyQGDw98FRoytZKY8=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBntNMnBYnWH2koruYhyBP2MYhxM5254T/PsjBAo
+ CYYDUvWX++JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7TTJwAKCRD2t4JPQmmg
+ c9VqEACMNiqYIb7EJmojhr3S0niZ+WGvzsXVYeE2zjbLAkS4hWaTkr9RL/HxRXXRz1xGXA3CuRj
+ j2SDDsM9H8fgm9JCZbiu2GUWM7VKQEvC399NjvMQoNJZSAjNrOH0WuHl/F045z8cjKdJJ3gPKS/
+ wGiBSsdivbSslbwU0ihBNDx1IiaUNGpBqRo6kX92gtV4ScDOZbPrhQRq3bgBhTimj2uuM3PlPPk
+ B6fMpHT/Wco66ayBOAV51VUAbopML4OWdTrR8xP0Pa2ro3ak+cqXX+m3M8OJYrN22V0ZoZ6iwKL
+ 8NjBmkbo09W7KHHXqoOGnjp6uyFXoGaHZf6bSvFkvSAE0VcOhsxF8cdi1/rY/vguFsuVh0Fikiz
+ KoKSJLbRxS3LH7wdLZmKdL5Ha7tHIks1NIsPVWYIVopFrilUPlvgT2VgZ/hVzYB/kHclu5pCQ4B
+ F8P4gCT9fBNB7qu+1qwcd3dAGA8oV1+nHXjbi9DvvTto1WF+1MBz/ew1hMPWcXVwcW547c4yuKd
+ 65Y5BpQxi2DvYxrI6Newh3aMmwNQ51TiFJ+kWfaZsIooEr4/tjbWi53Rjz6iRAoZb27kS+irFSP
+ HU8Y/N2rXmc0mF6UAMNqTMGbW1RXRsUtO3OclwhZICrI0Tm8jUIBN13K/TMv5cDmjSm690/Fo5i
+ L8pn2rpcjcHhcLw==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
 From: Paolo Abeni <pabeni@redhat.com>
 
-After the previous patch we can remove the forward_alloc_get
-proto callback, basically reverting commit 292e6077b040 ("net: introduce
-sk_forward_alloc_get()") and commit 66d58f046c9d ("net: use
-sk_forward_alloc_get() in sk_get_meminfo()").
+After the RX path refactor, it become a wrapper for sk_rmem_alloc
+access, with a slightly misleading name. Just drop it.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Acked-by: Mat Martineau <martineau@kernel.org>
+Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- include/net/sock.h   | 13 -------------
- net/core/sock.c      |  2 +-
- net/ipv4/af_inet.c   |  2 +-
- net/ipv4/inet_diag.c |  2 +-
- net/sched/em_meta.c  |  2 +-
- 5 files changed, 4 insertions(+), 17 deletions(-)
+ net/mptcp/protocol.c |  8 ++++----
+ net/mptcp/protocol.h | 11 ++---------
+ 2 files changed, 6 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 60ebf3c7b229e257b164e0de1f56543ea69f38f3..ac7fb5bd8ef9af10135a6e703408f2b24bd3d713 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1285,10 +1285,6 @@ struct proto {
- 	unsigned int		inuse_idx;
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 080877f8daf7e3ff36531f3e11079d2163676f2d..c709f654cd5a4944390cf1e160f59cd3b509b66d 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -496,7 +496,7 @@ static void mptcp_cleanup_rbuf(struct mptcp_sock *msk, int copied)
+ 	bool cleanup, rx_empty;
+ 
+ 	cleanup = (space > 0) && (space >= (old_space << 1)) && copied;
+-	rx_empty = !__mptcp_rmem(sk) && copied;
++	rx_empty = !sk_rmem_alloc_get(sk) && copied;
+ 
+ 	mptcp_for_each_subflow(msk, subflow) {
+ 		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
+@@ -645,7 +645,7 @@ static bool __mptcp_move_skbs_from_subflow(struct mptcp_sock *msk,
+ 		WRITE_ONCE(tp->copied_seq, seq);
+ 		more_data_avail = mptcp_subflow_data_available(ssk);
+ 
+-		if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf) {
++		if (sk_rmem_alloc_get(sk) > sk->sk_rcvbuf) {
+ 			done = true;
+ 			break;
+ 		}
+@@ -782,7 +782,7 @@ static void __mptcp_data_ready(struct sock *sk, struct sock *ssk)
+ 	__mptcp_rcvbuf_update(sk, ssk);
+ 
+ 	/* over limit? can't append more skbs to msk, Also, no need to wake-up*/
+-	if (__mptcp_rmem(sk) > sk->sk_rcvbuf)
++	if (sk_rmem_alloc_get(sk) > sk->sk_rcvbuf)
+ 		return;
+ 
+ 	/* Wake-up the reader only for in-sequence data */
+@@ -2049,7 +2049,7 @@ static bool __mptcp_move_skbs(struct sock *sk)
+ 		mptcp_for_each_subflow(msk, subflow)
+ 			__mptcp_rcvbuf_update(sk, subflow->tcp_sock);
+ 
+-	if (__mptcp_rmem(sk) > sk->sk_rcvbuf)
++	if (sk_rmem_alloc_get(sk) > sk->sk_rcvbuf)
+ 		return false;
+ 
+ 	do {
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index 613d556ed938a99a2800b4384ee4c6cda9483381..a1a077bae7b6ec4fab5b266e2613acb145eb343f 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -380,14 +380,6 @@ static inline void msk_owned_by_me(const struct mptcp_sock *msk)
+ #define mptcp_sk(ptr) container_of_const(ptr, struct mptcp_sock, sk.icsk_inet.sk)
  #endif
  
--#if IS_ENABLED(CONFIG_MPTCP)
--	int			(*forward_alloc_get)(const struct sock *sk);
--#endif
--
- 	bool			(*stream_memory_free)(const struct sock *sk, int wake);
- 	bool			(*sock_is_readable)(struct sock *sk);
- 	/* Memory pressure */
-@@ -1349,15 +1345,6 @@ int sock_load_diag_module(int family, int protocol);
- 
- INDIRECT_CALLABLE_DECLARE(bool tcp_stream_memory_free(const struct sock *sk, int wake));
- 
--static inline int sk_forward_alloc_get(const struct sock *sk)
+-/* the msk socket don't use the backlog, also account for the bulk
+- * free memory
+- */
+-static inline int __mptcp_rmem(const struct sock *sk)
 -{
--#if IS_ENABLED(CONFIG_MPTCP)
--	if (sk->sk_prot->forward_alloc_get)
--		return sk->sk_prot->forward_alloc_get(sk);
--#endif
--	return READ_ONCE(sk->sk_forward_alloc);
+-	return atomic_read(&sk->sk_rmem_alloc);
 -}
 -
- static inline bool __sk_stream_memory_free(const struct sock *sk, int wake)
+ static inline int mptcp_win_from_space(const struct sock *sk, int space)
  {
- 	if (READ_ONCE(sk->sk_wmem_queued) >= READ_ONCE(sk->sk_sndbuf))
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 53c7af0038c4fca630e1ac2ebecf55558cb16eef..0d385bf27b38d97458e6a695a559f4f1600773c4 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3882,7 +3882,7 @@ void sk_get_meminfo(const struct sock *sk, u32 *mem)
- 	mem[SK_MEMINFO_RCVBUF] = READ_ONCE(sk->sk_rcvbuf);
- 	mem[SK_MEMINFO_WMEM_ALLOC] = sk_wmem_alloc_get(sk);
- 	mem[SK_MEMINFO_SNDBUF] = READ_ONCE(sk->sk_sndbuf);
--	mem[SK_MEMINFO_FWD_ALLOC] = sk_forward_alloc_get(sk);
-+	mem[SK_MEMINFO_FWD_ALLOC] = READ_ONCE(sk->sk_forward_alloc);
- 	mem[SK_MEMINFO_WMEM_QUEUED] = READ_ONCE(sk->sk_wmem_queued);
- 	mem[SK_MEMINFO_OPTMEM] = atomic_read(&sk->sk_omem_alloc);
- 	mem[SK_MEMINFO_BACKLOG] = READ_ONCE(sk->sk_backlog.len);
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 21f46ee7b6e95329a2f7f0e0429eebf1648e7f9d..5df1f1325259d9b9dbe3be19a81066f85cf306e5 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -153,7 +153,7 @@ void inet_sock_destruct(struct sock *sk)
- 	WARN_ON_ONCE(atomic_read(&sk->sk_rmem_alloc));
- 	WARN_ON_ONCE(refcount_read(&sk->sk_wmem_alloc));
- 	WARN_ON_ONCE(sk->sk_wmem_queued);
--	WARN_ON_ONCE(sk_forward_alloc_get(sk));
-+	WARN_ON_ONCE(sk->sk_forward_alloc);
+ 	return __tcp_win_from_space(mptcp_sk(sk)->scaling_ratio, space);
+@@ -400,7 +392,8 @@ static inline int mptcp_space_from_win(const struct sock *sk, int win)
  
- 	kfree(rcu_dereference_protected(inet->inet_opt, 1));
- 	dst_release(rcu_dereference_protected(sk->sk_dst_cache, 1));
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 321acc8abf17e8c7d6a4e3326615123fff19deab..efe2a085cf68e90cd1e79b5556e667a0fd044bfd 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -282,7 +282,7 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
- 		struct inet_diag_meminfo minfo = {
- 			.idiag_rmem = sk_rmem_alloc_get(sk),
- 			.idiag_wmem = READ_ONCE(sk->sk_wmem_queued),
--			.idiag_fmem = sk_forward_alloc_get(sk),
-+			.idiag_fmem = READ_ONCE(sk->sk_forward_alloc),
- 			.idiag_tmem = sk_wmem_alloc_get(sk),
- 		};
- 
-diff --git a/net/sched/em_meta.c b/net/sched/em_meta.c
-index 8996c73c9779b5fa804e6f913834cf1fe4d071e6..3f2e707a11d18922d7d9dd93e8315c1ab26eebc7 100644
---- a/net/sched/em_meta.c
-+++ b/net/sched/em_meta.c
-@@ -460,7 +460,7 @@ META_COLLECTOR(int_sk_fwd_alloc)
- 		*err = -1;
- 		return;
- 	}
--	dst->value = sk_forward_alloc_get(sk);
-+	dst->value = READ_ONCE(sk->sk_forward_alloc);
+ static inline int __mptcp_space(const struct sock *sk)
+ {
+-	return mptcp_win_from_space(sk, READ_ONCE(sk->sk_rcvbuf) - __mptcp_rmem(sk));
++	return mptcp_win_from_space(sk, READ_ONCE(sk->sk_rcvbuf) -
++				    sk_rmem_alloc_get(sk));
  }
  
- META_COLLECTOR(int_sk_sndbuf)
+ static inline struct mptcp_data_frag *mptcp_send_head(const struct sock *sk)
 
 -- 
 2.47.1
