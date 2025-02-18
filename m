@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-167238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47032A39578
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:34:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A14A39589
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:37:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DE713ACC3E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:27:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88E8216FEA3
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7666E1D90DB;
-	Tue, 18 Feb 2025 08:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7E322C352;
+	Tue, 18 Feb 2025 08:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="biSovEpA"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6961B4250;
-	Tue, 18 Feb 2025 08:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BD122AE59
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 08:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739867260; cv=none; b=DRqcKtoZIYZ3jaTKsNF4Up6wqCxaySQhnTXf4uMlU+9Hho9MhIHOyCI6sB3odlYwIxB4R/i9+0SIihUn01R2s/9swdbYfd0YJV/PMu93wBIzGl8I8VU0cOHLjX6BousiNGeQZNtzFYR4yqZ0MtIQjm3cbmzOefveZjecDdT2Ahw=
+	t=1739867760; cv=none; b=orawY4ebKPR211bJvB7+3kKCzzsaPBZohMMOz7LaqH7Cwr+5xyRDej4UKeFxhLFLqqmDid7acK4rPMthoCSAFHfUU5zY9g7Iec1EuSduPxf/ozeBhHD5ahDo9mWIZXu5LPLnv1cnzXu1cKpa8yeTrBazMi157a5KKeVBGs5XJ7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739867260; c=relaxed/simple;
-	bh=1soCMC1mDzlUguPyqOBPKxSSzf+ZHtXkwqiV35e1GYA=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ANKerQZPtFJV3tZNasQtM7oFUfjA8w32aqFgBxdNfTW3GxOXjjnbbWqOyAaW1rSN3xdb/PLNJytCwVMxdq3OIJEsH7uXDl0c+nI+mLOujeCjDwGPJQCxGdY2H9NiCUYnIFJC/oKuGcFracZiossvrbjUEj8MV+OXQtTBH32y8e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Yxsx40sHkz1wn5P;
-	Tue, 18 Feb 2025 16:23:36 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 179661A0188;
-	Tue, 18 Feb 2025 16:27:30 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 18 Feb 2025 16:27:29 +0800
-Message-ID: <9d55d0a8-7a85-4caf-8358-7e04621813cc@huawei.com>
-Date: Tue, 18 Feb 2025 16:27:28 +0800
+	s=arc-20240116; t=1739867760; c=relaxed/simple;
+	bh=feF1eHyyT0zWjy4z/Md8u1+8+0ZLHRFpAShbWTlr/Qg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aHA/fxtXEV8lRGiuFPKWJzJoo/Oi6eLP++4jptmSAE8Tbdrj6TedNIcA2Vr+2fLDb40v0zloFrumckJbP6aqWdIbdbqJzk4Y1rC2+bIw2oByAeUz3RdNM+KD+eonThjCOu2rlbT1iXNMn+wnWnYQkKtb0ZNJxI2hPHkLs9WATEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=biSovEpA; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4399509058dso493745e9.3
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 00:35:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1739867757; x=1740472557; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSJ23b7dcp2nXbCFtNTYLtGlvCk+YzKblQR08ITEHhc=;
+        b=biSovEpAlE38/v4+KDQyJgZSbwF/zPlf7WvgG0duyMN04oAZ1udX/rkeLmf0f2KCes
+         XrIqKcLyBtVy4U69nNVrLi+R3ED3wNcTTItEWUA95EOZQggaqiiwnHp5FAhAdw+d7WM6
+         6YH3sZqKyFoDwtoor1DIE3P0tEy7dnIWBIE1D/porQxnkqyikFrPxAQD9R6z3RVCO2xV
+         ncQ4kcuE/DlHyoRwoj1I0DsngPlfYWFv2DvjHifmtuoZnjewTO9Dp7B30PWzu8fadltL
+         BsiL9577C6AYT4GGiBC1yyEO6fZsw4trvTKikHqS5wGApwmjxTWYFAVkqLHQGRZoKa34
+         rJLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739867757; x=1740472557;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MSJ23b7dcp2nXbCFtNTYLtGlvCk+YzKblQR08ITEHhc=;
+        b=fmWiN3SuTyrV3EqmpJh2U3+d9KrQKOnUvWyhrWwY7BLE3nW1BDQE2Wev2PsVQDzSg1
+         4MOQfiJZGv07xnrEM8NzSbY0Dt9SojicHR90iIPIqmtreqXUEMFBNpMc+yhkYqLdZus5
+         oOf+rZkxSXXVRC6yt/ZhczGDjQtM39h8e5fN9v4MguXtH7SBMszT6G3sUVthaWCQXBE6
+         wq4RXwTN4sA8NOUaysrSDGwEkZeMg/ldVIronLGrA9ZhmGrWYj/yNBkKX9DQtZubprSI
+         lJvtBpvYoxO4iQiREKfTuEAlLu98tsXc7z5sl/2DJbkr1+OtgeBqhg9a2qJFuBjXa/wf
+         /roA==
+X-Gm-Message-State: AOJu0YzN6NEKoEHje3p9d+SlwEbDmQy3ZYrLi6fWjHZ/24h0A/aUk+a5
+	pfzozqDw+kVBnr1KpRvgBR9hzKXLhfMFCpxWoOIW3ecmIOE8IokrQ3y5BONoCbk=
+X-Gm-Gg: ASbGncv4tavh1mcSkmVuObbeYOgLXuDeP6usURCYTcqnrYJS2RbIikqaZYR/Hbv4tyM
+	Pe5NaG8gOUW3PB7uVs/Y968Nf0jDKvCh/oql0jsmHRkqrCkbZwZG3bQeSpjgmD4tNJVsjZGZyEq
+	tABGIs5SCr8GibzbRoGdVPDAZNhpdXjJc8N9XEgnDSSf8b23+yCsT9Cecb1ORVTmUyRP7YGWwKx
+	W+fueIbXni/hwXnTr7JUn5fieS80gxNC01efRxuomUBRJJ8IXTg2H38rV7rE6y0rba9hFwWZ+kU
+	skK57pt6728HFoK6s+3Zgkfe3pz0x+MLfvfIMqW6CC67+xVCDFIisJcFjsK/7RshPTYy
+X-Google-Smtp-Source: AGHT+IG92hjCJWGEFWUkF1TNBt8VJRHE77BbFuIFujokh0dlUjpL0uxRKa49heL6SedL+6HcLajH0w==
+X-Received: by 2002:a05:600c:2d04:b0:439:84d3:f7fd with SMTP id 5b1f17b1804b1-43984d3fb0bmr21918935e9.4.1739867757357;
+        Tue, 18 Feb 2025 00:35:57 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:8e5f:76fd:491b:501e? ([2a01:e0a:b41:c160:8e5f:76fd:491b:501e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439858ec5fasm48100965e9.29.2025.02.18.00.35.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 00:35:56 -0800 (PST)
+Message-ID: <715a9dd2-4309-436d-bdfc-716932ccb95c@6wind.com>
+Date: Tue, 18 Feb 2025 09:35:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,77 +81,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Simon Horman <horms@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <shenjian15@huawei.com>,
-	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<libaihan@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
- supported in this module
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-References: <20250213035529.2402283-1-shaojijie@huawei.com>
- <20250213035529.2402283-4-shaojijie@huawei.com>
- <20250217154028.GM1615191@kernel.org>
- <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
- <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next v2] net: Remove redundant variable declaration in
+ __dev_change_flags()
+To: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, andrew@lunn.ch
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+References: <20250217-old_flags-v2-1-4cda3b43a35f@debian.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20250217-old_flags-v2-1-4cda3b43a35f@debian.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
-
-on 2025/2/18 10:46, Kalesh Anakkur Purayil wrote:
-> On Tue, Feb 18, 2025 at 7:47 AM Jijie Shao <shaojijie@huawei.com> wrote:
->>
->> on 2025/2/17 23:40, Simon Horman wrote:
->>> On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
->>>> This patch implements the rx checksum offload feature
->>>> including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
->>>>
->>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->>> ...
->>>
->>>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->>>> index 8c631a9bcb6b..aa1d128a863b 100644
->>>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->>>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
->>>> @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
->>>>    }
->>>>
->>>>    static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
->>>> -                                struct hbg_rx_desc *desc)
->>>> +                                struct hbg_rx_desc *desc,
->>>> +                                struct sk_buff *skb)
->>>>    {
->>>> +    bool rx_checksum_offload = priv->netdev->features & NETIF_F_RXCSUM;
->>> nit: I think this would be better expressed in a way that
->>>        rx_checksum_offload is assigned a boolean value (completely untested).
->>>
->>>        bool rx_checksum_offload = !!(priv->netdev->features & NETIF_F_RXCSUM);
->> Okay, I'll modify it in v2.
-> Maybe you can remove " in this module" from the patch title as it is
-> implicit. This comment/suggestion applies to all patches in this
-> series.
-
-Sorry this may not have any bad effect,
-so I don't plan to change it in V2.
-If anyone else thinks it should be modified,
-I will modify it.
-
-Thanks a lot
-Jijie Shao
-
->> Thanks
->> Jijie Shao
->>
->>>> +
->>>>       if (likely(!FIELD_GET(HBG_RX_DESC_W4_L3_ERR_CODE_M, desc->word4) &&
->>>>                  !FIELD_GET(HBG_RX_DESC_W4_L4_ERR_CODE_M, desc->word4)))
->>>>               return true;
->
+Le 17/02/2025 à 16:48, Breno Leitao a écrit :
+> The old_flags variable is declared twice in __dev_change_flags(),
+> causing a shadow variable warning. This patch fixes the issue by
+> removing the redundant declaration, reusing the existing old_flags
+> variable instead.
+> 
+> 	net/core/dev.c:9225:16: warning: declaration shadows a local variable [-Wshadow]
+> 	9225 |                 unsigned int old_flags = dev->flags;
+> 	|                              ^
+> 	net/core/dev.c:9185:15: note: previous declaration is here
+> 	9185 |         unsigned int old_flags = dev->flags;
+> 	|                      ^
+> 	1 warning generated.
+> 
+> Remove the redundant inner declaration and reuse the existing old_flags
+> variable since its value is not needed outside the if block, and it is
+> safe to reuse the variable. This eliminates the warning while
+> maintaining the same functionality.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
