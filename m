@@ -1,118 +1,139 @@
-Return-Path: <netdev+bounces-167476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CD5A3A732
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:17:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17073A3A742
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2A9E17602F
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:14:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9105164A91
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EAF31E8339;
-	Tue, 18 Feb 2025 19:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1647F21B9DF;
+	Tue, 18 Feb 2025 19:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apNO0xT7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="prwidybA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BFE1E51F8;
-	Tue, 18 Feb 2025 19:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D9221B9C4
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739905972; cv=none; b=i1nCF5DMW5aKhNtVfEv1aphdfIRdqNWbqu40IGNasMNJglGOv4BaqGUCBBe1qhJJr85OGi3FbCpGP5/iy1G5ZZrpiMyVKS8KFw6LFQA3BM1QLMw/5Wf25wtmI9+E2S8DtVP8SzEAUHatUOtnK2YeTUMkJhqqRa4UHAtatq46ykk=
+	t=1739906576; cv=none; b=RADG/n9whdfrHeIEO46TQ73IAcPgEp/QYhnZD8DAqpxfDsgxkRxYIIbhi36Nj6wylFSylaAR3Hl3Tb7rJuZhs8iHv/dEdi8wkK+DTZSR00Zm4SD0yANVEmSeVxqyYnasGIdTL/n7JeB03NzbcUn/8EL7AiuiFp2V6kdY8Ic42Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739905972; c=relaxed/simple;
-	bh=WoUKh5c/vDRm4FlNeCNrkzPuHxYE4Y4scX3UMvAd5O4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fioGpGPolYM914iknbFRtJ0u9gqlEC6SD3us8tx6TlqUat4gL0F90Jl2Ui6HB9GydmhxODILHEYPDFLSvwG8T+l0a7R1hin9pnunamFZrdQ9Nr2p+rDVwmsaSKVP0U211btmWssZKVO8iITXyOGl1iCXNbQ8GqHEv4CinIG7gPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apNO0xT7; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3f40ad1574fso512515b6e.0;
-        Tue, 18 Feb 2025 11:12:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739905970; x=1740510770; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oF3IZ5dNlMyYD63Wzfa4O0wknfeiB+PfksPMCxVRCig=;
-        b=apNO0xT7oS8blITVvU5AA+T6WNsY+6TwmxVVmJRMLlKjITvOGyzXNV7ZnRjY12n/8b
-         sMJWFNdPaNXVlPzMZWB6U5F6Opyl+gZQHTxSTo/Fgrowe/jPQdueQ7NR1ifl1z9Zxzjk
-         hFCO8ojfy8FxDfiZWnE9IQoZeQ6d1YVf2Dls+BvEQLWtLrJ/QTxs/NZpG7TcT+/H90Qu
-         ZYKB92vz5Kbdwue+BNKAu5MSL8qEwx09PWD0vtsDFjWdA0XYRw9KEBnMTVZSYNQF4WVX
-         CnU1a+3ASEdd+J+GWhNrWVSEB2s8GZUXx0uwnBtvECB/caEGaKRxMnVP3WKF3TM0MnMw
-         WIGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739905970; x=1740510770;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oF3IZ5dNlMyYD63Wzfa4O0wknfeiB+PfksPMCxVRCig=;
-        b=kw47hKfXSdmyC37aW96kZ5iqrwRJkY8gBsp4+1MPc2H5ov6jKtx/zhmh4Iw91DCF9v
-         JJsID0Tl7uqW17LGwQxIKDYfWvjyJSSuSq/2G1MbQcvvAie+ik70PLDTscOAKl717oDH
-         fzujy0RAa68bU4Au3YfU6w6OLDMdiVY/UssXDKWaPK+xCbe5DXZpxD+z0yNCSyjCStWv
-         65CqgyZUN+1xnV+2h085IfFzQkfFnjBnD+/J2PaT5/5O63FPmZOQUH0UEQY9l3CDhfNY
-         qZFcT5W2ytGaurNVwCA+42UCfzBibjnVWz/ixnTL6h1OwJaVSYPJlASVAwACPATIheMw
-         s8yw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTKu8iA+qY5X1X6M2J9L6SEwWwhC429l/9D0Y9NsszCEXu527ToCd6lr7RgxORdZTVIKOPMRVHPwF/vYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiBwb81mg7OYyYtQR+77/HGgaABTeiS5pzXuMxM3w9QHoptY38
-	H/5JTOWrRWSCdvadf2SVVfMBlqOGufqcXU1Z98ioAn8NWxi/IHKw1ARmM9QwzSzLiVvpU2GDws6
-	Ob+60ohipHazBWnCFFrFNsK1RBk0=
-X-Gm-Gg: ASbGncsjiVtgW8YqwVTOyf5N3JSGDOT8wAPs1o7H3QD0kfz9VsSRz0yQ8Zu3WkE3tFS
-	aWFYWLntHcUoOsN37aUVl32zn4usUzfOH2ztjUdr3DWvI10uCFTCHvr3SPIJp+inGrHhWf6XYmM
-	G73ok/iI0BTNiKpA==
-X-Google-Smtp-Source: AGHT+IFb4knJMi3AOcDr6zaVeojXvLaFJxcBcDyvpUv4oVbjmkI7Mm6ZZOndeOhxjCi1+zyZXOxXG+rYjRuy9gA1yt0=
-X-Received: by 2002:a05:6808:181e:b0:3f3:d742:c2bd with SMTP id
- 5614622812f47-3f40f1e5799mr776743b6e.13.1739905969652; Tue, 18 Feb 2025
- 11:12:49 -0800 (PST)
+	s=arc-20240116; t=1739906576; c=relaxed/simple;
+	bh=wUnAO1ZDvxZpPJeymZsKfkAJ/DnDMsWAHnbCMlFP2vw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=buh9O2TtF+YRza0MKmKmstoGlow9yZxR0c3Eqxz4SENkH9byCjZTvgl8K/x4PRCyYH/RBiSWcWpT9bkDPHrEnTUz4od89D9fSF805+wnNVxBjjJzBp2x1/FszcuxlOPpZ1H+L2+sik63GPGBXTDvfSAQmpq8xPfGl10TVsYllSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=prwidybA; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 833F144444;
+	Tue, 18 Feb 2025 19:22:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739906564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s0Ck/s9l4dl8ts5NEnBIJT3tF6gm0Eapi2M7IOAwyjs=;
+	b=prwidybALn4eNqu5JfeWZ48L5rKVUeylKTkvVA+XboC/i3UNSiFQU747gnj8S5J8Sno/U9
+	VMmMSvMTkSswvxmBKFCNatViLPVVOgdaCdVxgi12SlMW3NZCzXa1MVRSt1kklhfiLBI2MI
+	3kf+6ipv7oi+xn/l+AEIsqZn1OPWIRlX9ToMNtP3NblQNsJRyN8+fQ6utELEr7jw5peIKk
+	CUDFCUY9vy34Nzp4EOlH2K3dXzqXrGQOHy/BYy4D1BrT8A57/NnMiA9oEtdHaRrWxuFq62
+	1qYrMLCFM/xmZ+VBfRD6YWRt4ObQGuofF06n+/Qm8lbyWfBKFTwEJhCcpm34Fw==
+Date: Tue, 18 Feb 2025 20:22:41 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ donald.hunter@gmail.com, dsahern@kernel.org, petrm@nvidia.com,
+ gnault@redhat.com
+Subject: Re: [PATCH net-next 5/8] net: fib_rules: Enable port mask usage
+Message-ID: <20250218202241.3b0cf52c@kmaincent-XPS-13-7390>
+In-Reply-To: <Z7TOVUyjrric13aw@shredder>
+References: <20250217134109.311176-1-idosch@nvidia.com>
+	<20250217134109.311176-6-idosch@nvidia.com>
+	<20250218181523.71926b7e@kmaincent-XPS-13-7390>
+	<Z7TOVUyjrric13aw@shredder>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218165923.20740-1-suchitkarunakaran@gmail.com> <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
-In-Reply-To: <d194435e-88bf-49f6-bb6f-b52f77248965@kernel.org>
-From: Suchit K <suchitkarunakaran@gmail.com>
-Date: Wed, 19 Feb 2025 00:42:38 +0530
-X-Gm-Features: AWEUYZkoRmcxpgXd1SyCu20aEGPfydJydoqEvXvTkpjbLGDJXP09KIF_zfs0pMk
-Message-ID: <CAO9wTFhVx9nCPyMzHKCTnuBfrTmvA2QADg8La0z6KcYWpsxnEg@mail.gmail.com>
-Subject: Re: [PATCH REPOST] selftests: net: Fix minor typos in MPTCP and psock tests
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, horms@kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeivddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdtudemfedtheefmegrvdeiieemsgeileekmeekvdgrtdemgeguugekmegsrggvtgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggstddumeeftdehfeemrgdvieeimegsieelkeemkedvrgdtmeeguggukeemsggrvggtpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehiughoshgthhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrv
+ hgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Thanks for the feedback!
+On Tue, 18 Feb 2025 20:15:49 +0200
+Ido Schimmel <idosch@nvidia.com> wrote:
 
-On Wed, 19 Feb 2025 at 00:12, Matthieu Baerts <matttbe@kernel.org> wrote:
->
-> Hi Suchit,
->
-> On 18/02/2025 17:59, Suchit K wrote:
-> > From: Suchit <suchitkarunakaran@gmail.com>
-> >
-> > Fixes minor spelling errors:
-> > - `simult_flows.sh`: "al testcases" -> "all testcases"
-> > - `psock_tpacket.c`: "accross" -> "across"
->
-> Thank you, the patch is no longer corrupted.
->
-> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->
-> This patch can be directly applied in net-next.
->
-> Note: please next time don't repost your patches within one 24h period,
-> and use the [PATCH net-next] prefix, see:
->
->   https://docs.kernel.org/process/maintainer-netdev.html
->
-> Cheers,
-> Matt
-> --
-> Sponsored by the NGI0 Core fund.
->
+> On Tue, Feb 18, 2025 at 06:15:23PM +0100, Kory Maincent wrote:
+> > On Mon, 17 Feb 2025 15:41:06 +0200
+> > Ido Schimmel <idosch@nvidia.com> wrote:
+> >  =20
+> > > Allow user space to configure FIB rules that match on the source and
+> > > destination ports with a mask, now that support has been added to the
+> > > FIB rule core and the IPv4 and IPv6 address families.
+> > >=20
+> > > Reviewed-by: Petr Machata <petrm@nvidia.com>
+> > > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> > > ---
+> > >  net/core/fib_rules.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
+> > > index ba6beaa63f44..5ddd34cbe7f6 100644
+> > > --- a/net/core/fib_rules.c
+> > > +++ b/net/core/fib_rules.c
+> > > @@ -843,8 +843,8 @@ static const struct nla_policy
+> > > fib_rule_policy[FRA_MAX + 1] =3D { [FRA_DSCP]	=3D
+> > > NLA_POLICY_MAX(NLA_U8, INET_DSCP_MASK >> 2), [FRA_FLOWLABEL] =3D { .t=
+ype =3D
+> > > NLA_BE32 }, [FRA_FLOWLABEL_MASK] =3D { .type =3D NLA_BE32 },
+> > > -	[FRA_SPORT_MASK] =3D { .type =3D NLA_REJECT },
+> > > -	[FRA_DPORT_MASK] =3D { .type =3D NLA_REJECT },
+> > > +	[FRA_SPORT_MASK] =3D { .type =3D NLA_U16 },
+> > > +	[FRA_DPORT_MASK] =3D { .type =3D NLA_U16 },
+> > >  }; =20
+> >=20
+> > I don't get the purpose of this patch and patch 1.
+> > Couldn't you have patch 3 and 4 first, then patch 2 that adds the netli=
+nk
+> > and UAPI support? =20
+>=20
+> Current order is:
+>=20
+> 1. Add attributes as REJECT.
+> 2. Add support in core.
+> 3. Add support in IPv4.
+> 4. Add support in IPv6.
+> 5. Expose feature to user space.
+>=20
+> Looks straight forward and easy to review to me and that's the order I
+> prefer.
+
+Ok, it is surprising to me. If there is an issue in patch 2,3 or 4. git
+bisect will locate patch 5 and it won't be easy to find the real patch that
+cause the issue. Having this type of patch series in the git history will h=
+arder
+the issue debugging.
+I was not am not a net maintainer so I won't complain more and will let them
+decide.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
