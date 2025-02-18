@@ -1,159 +1,208 @@
-Return-Path: <netdev+bounces-167313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F82A39BB6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:05:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABDCA39BC5
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC32F1778B9
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74656171758
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 12:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69862405FE;
-	Tue, 18 Feb 2025 12:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A142417C0;
+	Tue, 18 Feb 2025 12:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLIc7LAs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fTLn4Rdl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072AA24113A;
-	Tue, 18 Feb 2025 12:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2F423ED70
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 12:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739880161; cv=none; b=LI2lMXsrUKBqwAMWum2dOPFWeRhEUIJaLZ3xkEitn5Cm5XzxnVkmj6CsRN16gwvO11Sj0QvUL6lbyX9LEvhQZPvdjlYAOk2RfFNGSdlcTAsG1nzn5fv74Sg0+eQ0u2TpsJT2r0zq8d/h+5lQiuKxbIk2ejbJUqGZjFUyU9taXIU=
+	t=1739880636; cv=none; b=hzOtpn1aHQbJsQ+ndoKIBxUDkRxklbfAKLVmOwV9gfUrghqo07vvzfMAOZrvvHI3l6I9wvsKWY4A2YqWbZZI1aVYhzkIxRgWT2NeMnM4bxkkSUB5zWA55RvrYbXcep7x7jywjW+nam0pH91OkR8BWuZPawLJdFSnSwSqTfjJ+WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739880161; c=relaxed/simple;
-	bh=PdYabW9U3VgJQcFFjKmvrLTJRGwMYLOYYMyAs3nj3J8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X5iiD1VVDBVagLLUuowhTa6pvbAxucWDfhzsOxvlxba/4e1vvFOBcmVMQnUBzgMYm/2elyc9O56iL9XUcuGXborrBMcVV7hSO77duQgOaTrFnXUWtN2B+ggXCGIV/ZJKioPzGtIHBRSQkUI/8IHFpd8L+MxOjGfV+11cLwExrDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lLIc7LAs; arc=none smtp.client-ip=209.85.166.174
+	s=arc-20240116; t=1739880636; c=relaxed/simple;
+	bh=Mk62jvhw6ko49dfwLhJwGxQPKlQidZgIasxbma8ffMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QCXkV3xiGW1sQVVj1Oh4E/vm/8xvJUtK+SomwPa1wMhFrdgNqUAH7QcPFRaVKZxMZMVowhwOsXlQSFMchQFlpM2nkaAyOXSO8AgwNR4RFg02CDCligk7JY0ZNg8mlhMwVVqJ6WA7wWpplghgBCaIDt6SSAxNZ6gloxBoZWlnQuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fTLn4Rdl; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3ce87d31480so18178375ab.2;
-        Tue, 18 Feb 2025 04:02:39 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43971025798so17159845e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 04:10:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739880159; x=1740484959; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EH0/wvVygyFEunzi4kDEAj+hSoHIIO4r5B7j6dKdl8w=;
-        b=lLIc7LAsruF02Mp/1u3sgJHvJ9HJRSRq1HTJI+NgNHW14h9FGsnyifd6axpTvW6nd7
-         cUqqPZl3LjCMNFc2V1e+gZcfNHu84rfp1p4or36iQf50HU39aeSUGY8IMlHqTpyFmvqA
-         Hdxrp2yw02VLfciwT+R0ifJsPfk8O9rE5MlI0McvMwd2IoIBnzUpjPfOmf7qRlEFTz3J
-         q+KvrTui3NF9xD04EjW0OREVzmmHDIeK1uBhSOOLuyNjCFP27L94KIea/icieZkrCSlo
-         1PFyLngUGXFlEQy64B/zb2nIYUqS1akPg0I2uqDXplRkac/60mUpuTZGq1kuittYeozD
-         T9jA==
+        d=gmail.com; s=20230601; t=1739880632; x=1740485432; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tKVQ+Leobbwxn2c+p/dbggVPUfw2EMZvd1JGMa7PQPw=;
+        b=fTLn4RdlIBQzoWcc6DgniMdOL2ylPBXrV7jqNnQV/HrZbIYiPEOUe1+uHHDXyceQay
+         g5uk0Ojgi3qplcFaFdjAQCBYm8lZAqOAo6uSR8L0NHg/2D1BexJ4JP+3vC7o5C8oQWJt
+         WSqRlO/eiiWhG93A/8oPfELDHAYDbVmPVUSVEwgjLzKzhN1L8nLL+TBgLyv4UJY47Yh5
+         8dOeZSUTEHQPtpVJNi6dKvMS61y6Z2aPHM6JbzhmwAsdGGe6mxjY+T/gAkU41ZgKlKpw
+         Mo8SWmqRR5eZewLdr70Ir8ikj02Xkt6tuI1Pjhjidkpncf7f3oRLceec4dyY3uoYKU0j
+         W3JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739880159; x=1740484959;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EH0/wvVygyFEunzi4kDEAj+hSoHIIO4r5B7j6dKdl8w=;
-        b=SBdyDWHd/rDryE9i2K4LC9nhBGkdVU4X6S4izlT9LwXpegY/jEYXlTqChnAVmQTtF2
-         A7f2G4mKhh72HQjZ5rvcbbabdlSFmVhkYlzbez5xXfpPzIyunVTLTrAR79V2WCEb0zTZ
-         C9Fgv7doUBq6UXtWZxKQOMVbvUTzjN9G08n6OpZJZm8YGAz0lu73oueacMEiTrFKpRRr
-         MuZTZt78wtl07xZI4nftRP/4e9Mr0n7pusEs9SoeOae1V/1yzTNxOjVUGkp/Ua+82uSs
-         yG5HSO5je7bZGN2XVzmHo8CPov49gUw5JwtUSCvqeqdzmbhAFpMcOFI0QSUwUTMCsJMI
-         qz1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVqRe4EkUdN7dSa1S4XuvxB9dOKxZ9Xy34LmfY/R2zfXoiXByHckuyqfGr79YJYL592drffaRGn@vger.kernel.org, AJvYcCXBNQmjT4TgRTDvK4BtABlnDT7yg9QoY2J4KEbAYl5myV/1iZtZStzi55FE0QeduPZ8zqYxIpBIU4V9x+U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu933GKCT5+s7nAtJhvPbGU25ILf5uB0gWcH7C6335HhNyqKH3
-	ePTun+is+vlvtrpAAXVEq1zrnCigk38bvYeCG3Js6eNOf5XPYt9xh22RuNE8UJ6r/upYKW0FWUV
-	ooz3z+rgaeE838lxphhaj0l0sqz0=
-X-Gm-Gg: ASbGncuseM/+EGLjnWn451G8jrVqDOAheIN8IEpubiS0OvsSTG0UWA+K8+L8AO8zNuO
-	0YSWpKIch40vX5SuTu5X1uj3FGi4QN2f7tBHXXGQdkKGiNcJGlaVZNzHPtrRNoPeAIcIAMtQb
-X-Google-Smtp-Source: AGHT+IHUeLoHQcKiL8lW+wrpD+fz/Nx/D5ztWpyjTnSRs4G8L5aql7pqkfBtz5ir+uTY7PTrFM6uizC11h31tS1rXoE=
-X-Received: by 2002:a05:6e02:170b:b0:3d0:4e57:bbda with SMTP id
- e9e14a558f8ab-3d280763e58mr120853935ab.1.1739880158966; Tue, 18 Feb 2025
- 04:02:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739880632; x=1740485432;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tKVQ+Leobbwxn2c+p/dbggVPUfw2EMZvd1JGMa7PQPw=;
+        b=jxEchUvNzROq7XBFHNOYbyi56Bd78NmI8yh7WKEzk4wJcLFKr9EJhRp9zno/CqJsqX
+         o4ovOnWIOLS1cJnAEShcso/nx2vHjwIC5fxILmGcc9hpm5pAFigSmZaW/MfO4jmUn69c
+         0/lZRRenZNwQXkKu4MqX01WjI3BJu3ixzWgsmmIcIxozZPDuedocz6/L0oZYRvCgO49O
+         JVAMSiZQPJ0ZtLsT4r6OTD36ze/xat/+9K4K5L7pVv34YdP0wAlzxHEA+mmcaTvjF9wA
+         neLJp3y7qOYy0IhRuI5qnblGEGkAZ6ShLTmyOjKKMsJsmoFzPQWcSY/vqdEqa3JHYCod
+         mKEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbTUZAKkp+QJZhJx4KoiHfAZ0uhjMhC4ZR4rGMmzF8ce3jGIG5dKl7YowZtHxWHG9Fw6iT0SU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMqDIFQuwyE3SpyTGTmGuZGdv+ZKs5jrjrXYOEtBF6zBmNchFD
+	GkYWiLc2OIWoq3gl0NBRgiH+PdJFOmzXIeQwBLw0DTsCwFXNmfog
+X-Gm-Gg: ASbGnctLSxiWC4+a+V9z0UHlYECKamYKff+aAdMgc4CI/qLjErSrU5k4SSSziJcZ8ZM
+	evA2wSxpI/s74o8fZUBAdVY9Lyi9YUKj+cmdAGFCMB9UmIz27COMPDrNLjPU2p7FElUTu5b+Zri
+	Djtj0pLTML/vgcz80kReuh8Q2UvrtuC8jZoC1eNSPBA1dNfE6J8aMAqKc6SOhZLD1BRk89cFIop
+	eWVIxrB9KLDdkdDsdEo34a5blYVfsmrwVs/0T8Rngo9Cw04IkIBAwFg9ncYuvRB6cqhuwiIJ9i7
+	dRstLhyOPxsUYcZFUjRY40Fsf7mwAky1M51C
+X-Google-Smtp-Source: AGHT+IGVUk72bsqjmRWqmvyLQrSV8MP+cxYDiFnWkoJ4UtZWVo1TrnDSBcChkN4akrI94dCNjVLnfw==
+X-Received: by 2002:a05:600c:19d0:b0:439:4355:2f7e with SMTP id 5b1f17b1804b1-4396e6e1a32mr118198405e9.13.1739880631733;
+        Tue, 18 Feb 2025 04:10:31 -0800 (PST)
+Received: from [172.27.59.237] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982bcc607sm60964445e9.16.2025.02.18.04.10.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 04:10:30 -0800 (PST)
+Message-ID: <38898d98-80c9-4bc9-8603-e968a7c495d0@gmail.com>
+Date: Tue, 18 Feb 2025 14:10:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218105824.34511-1-wanghai38@huawei.com>
-In-Reply-To: <20250218105824.34511-1-wanghai38@huawei.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 18 Feb 2025 20:02:02 +0800
-X-Gm-Features: AWEUYZmYwJzlWpycVnHN_n7tw5SCCerfFcjjLinZ7I9wb-OgwxRNYHQ37V1fyoQ
-Message-ID: <CAL+tcoCZQZWdTBNM5o2PEpzEnmgfZFFps1WuB9D75p2=Gkbf2Q@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way handshake
-To: Wang Hai <wanghai38@huawei.com>
-Cc: edumazet@google.com, ncardwell@google.com, kuniyu@amazon.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/4] eth: mlx4: create a page pool for Rx
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: tariqt@nvidia.com, idosch@idosch.org, hawk@kernel.org,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250213010635.1354034-1-kuba@kernel.org>
+ <20250213010635.1354034-2-kuba@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250213010635.1354034-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Wang,
 
-On Tue, Feb 18, 2025 at 7:02=E2=80=AFPM Wang Hai <wanghai38@huawei.com> wro=
-te:
->
-> If two ack packets from a connection enter tcp_check_req at the same time
-> through different cpu, it may happen that req->ts_recent is updated with
-> with a more recent time and the skb with an older time creates a new sock=
-,
-> which will cause the tcp_validate_incoming check to fail.
->
-> cpu1                                cpu2
-> tcp_check_req
->                                     tcp_check_req
-> req->ts_recent =3D tmp_opt.rcv_tsval =3D t1
->                                     req->ts_recent =3D tmp_opt.rcv_tsval =
-=3D t2
->
-> newsk->ts_recent =3D req->ts_recent =3D t2 // t1 < t2
-> tcp_child_process
-> tcp_rcv_state_process
-> tcp_validate_incoming
-> tcp_paws_check
-> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <=3D paws_win) // failed
->
-> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
 
-It's known that it's possible to receive two packets in two different
-cpus like this case nearly at the same time. I'm curious if the socket
-was running on the loopback?
-
-Even if the above check that you commented in tcp_paws_check() fails,
-how about the rest of the checks in tcp_validate_incoming()? In your
-test, I doubt if really that check failed which finally caused the skb
-from CPU2 to be discarded. Let me put it this way, is the paws_win
-check the root cause? What is the drop reason for
-tcp_validate_incoming()?
-
-Thanks,
-Jason
-
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+On 13/02/2025 3:06, Jakub Kicinski wrote:
+> Create a pool per rx queue. Subsequent patches will make use of it.
+> 
+> Move fcs_del to a hole to make space for the pointer.
+> 
+> Per common "wisdom" base the page pool size on the ring size.
+> Note that the page pool cache size is in full pages, so just
+> round up the effective buffer size to pages.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  net/ipv4/tcp_minisocks.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index b089b08e9617..0208455f9eb8 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct s=
-k_buff *skb,
->         sock_rps_save_rxhash(child, skb);
->         tcp_synack_rtt_meas(child, req);
->         *req_stolen =3D !own_req;
-> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
-> +           unlikely(tcp_sk(child)->rx_opt.ts_recent !=3D tmp_opt.rcv_tsv=
-al))
-> +               tcp_sk(child)->rx_opt.ts_recent =3D tmp_opt.rcv_tsval;
+> v3:
+>   - use priv->rx_skb_size for effective buffer size
+>   - use priv->dma_dir for DMA mapping direction, instead of always BIDIR
+> v2: https://lore.kernel.org/20250211192141.619024-2-kuba@kernel.org
+>   - update pp.pool_size
+> v1: https://lore.kernel.org/20250205031213.358973-2-kuba@kernel.org
+> ---
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  3 ++-
+>   drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 24 +++++++++++++++++++-
+>   2 files changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> index 28b70dcc652e..29f48e63081b 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> @@ -335,10 +335,11 @@ struct mlx4_en_rx_ring {
+>   	u16 stride;
+>   	u16 log_stride;
+>   	u16 cqn;	/* index of port CQ associated with this ring */
+> +	u8  fcs_del;
+>   	u32 prod;
+>   	u32 cons;
+>   	u32 buf_size;
+> -	u8  fcs_del;
+> +	struct page_pool *pp;
+>   	void *buf;
+>   	void *rx_info;
+>   	struct bpf_prog __rcu *xdp_prog;
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> index 15c57e9517e9..a8c0cf5d0d08 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> @@ -48,6 +48,7 @@
+>   #if IS_ENABLED(CONFIG_IPV6)
+>   #include <net/ip6_checksum.h>
+>   #endif
+> +#include <net/page_pool/helpers.h>
+>   
+>   #include "mlx4_en.h"
+>   
+> @@ -268,6 +269,7 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+>   			   u32 size, u16 stride, int node, int queue_index)
+>   {
+>   	struct mlx4_en_dev *mdev = priv->mdev;
+> +	struct page_pool_params pp = {};
+>   	struct mlx4_en_rx_ring *ring;
+>   	int err = -ENOMEM;
+>   	int tmp;
+> @@ -286,9 +288,26 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+>   	ring->log_stride = ffs(ring->stride) - 1;
+>   	ring->buf_size = ring->size * ring->stride + TXBB_SIZE;
+>   
+> -	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
+> +	pp.flags = PP_FLAG_DMA_MAP;
+> +	pp.pool_size = size * DIV_ROUND_UP(priv->rx_skb_size, PAGE_SIZE);
+> +	pp.nid = node;
+> +	pp.napi = &priv->rx_cq[queue_index]->napi;
+> +	pp.netdev = priv->dev;
+> +	pp.dev = &mdev->dev->persist->pdev->dev;
+> +	pp.dma_dir = priv->dma_dir;
 > +
->         return inet_csk_complete_hashdance(sk, child, req, own_req);
->
->  listen_overflow:
-> --
-> 2.17.1
->
->
+> +	ring->pp = page_pool_create(&pp);
+> +	if (!ring->pp)
+>   		goto err_ring;
+>   
+> +	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
+> +		goto err_pp;
+> +
+> +	err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq, MEM_TYPE_PAGE_POOL,
+> +					 ring->pp);
+> +	if (err)
+> +		goto err_xdp_info;
+> +
+>   	tmp = size * roundup_pow_of_two(MLX4_EN_MAX_RX_FRAGS *
+>   					sizeof(struct mlx4_en_rx_alloc));
+>   	ring->rx_info = kvzalloc_node(tmp, GFP_KERNEL, node);
+> @@ -319,6 +338,8 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+>   	ring->rx_info = NULL;
+>   err_xdp_info:
+>   	xdp_rxq_info_unreg(&ring->xdp_rxq);
+> +err_pp:
+> +	page_pool_destroy(ring->pp);
+>   err_ring:
+>   	kfree(ring);
+>   	*pring = NULL;
+> @@ -445,6 +466,7 @@ void mlx4_en_destroy_rx_ring(struct mlx4_en_priv *priv,
+>   	xdp_rxq_info_unreg(&ring->xdp_rxq);
+>   	mlx4_free_hwq_res(mdev->dev, &ring->wqres, size * stride + TXBB_SIZE);
+>   	kvfree(ring->rx_info);
+> +	page_pool_destroy(ring->pp);
+>   	ring->rx_info = NULL;
+>   	kfree(ring);
+>   	*pring = NULL;
+
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+
+Thanks for your patches,
+Tariq
 
