@@ -1,195 +1,461 @@
-Return-Path: <netdev+bounces-167155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF974A39054
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:22:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36187A39068
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 02:34:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D03113AECA5
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:21:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0FB188BA31
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8253537F8;
-	Tue, 18 Feb 2025 01:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87EF4315E;
+	Tue, 18 Feb 2025 01:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOnXH10y"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gL/xySdy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A0A2AE74
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 01:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDAD913BC0C;
+	Tue, 18 Feb 2025 01:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739841720; cv=none; b=iu9wv4efci0W8IY5BaR1QZemQSbLWYxinP+anLX1jzTZNxXWH1nIMGo3dvMyxsT+56Q4hU6PLSpLLQDXTIzA1wW2JPMAWNqgZjxYzNDLWYFmwTTF/AatDr3Yts4IOz1bU7QI0o7y314AMxTo3XVrNv9mi9+OtruFRZsjWBdZf04=
+	t=1739842471; cv=none; b=NMFsWHKJNR90PqF6TF1Kci0QJjnegHWjdwanxAFp0dTMH1O7MIPRc9rN6Tri5wfQDBUiRJjpT9BXxJ7hH6t7SuXB6QkkMgHifTxP9+48Kmpskz19Euoc6/TB6653WCVjBybZHBlUox9bn1I3hbr2KqCqORpSbSp/eEG6Kw28QnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739841720; c=relaxed/simple;
-	bh=5YDAaH9ePfyjIuogmaTlTM7VqSOok1Cck+HGvE+m1MY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=PxipSlZSj3bNmXg7RMwWlGTOfzVregtPdIDfLKNf5Xqu0avuhO1TRoxOKLrvC0Ec6uy0AC8iO8bKb7sN6NDVLApLqdex7uHlgexR3OdMdXYwpfBBZX7Zy0FNyJBCceG21SeLACXSXSTEV6+KPg5PaW7luy9ext5oEmzp1F2NY2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bOnXH10y; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7be8f281714so523123785a.1
-        for <netdev@vger.kernel.org>; Mon, 17 Feb 2025 17:21:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739841718; x=1740446518; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WLP5KgbATxiA0mewxoF9U/sNl+nyo86wkA8b2h9k9Cw=;
-        b=bOnXH10yrgHWVBHPUW5peYSMyC9hwuAWudKToJFGchm/eSndyTvbcjR4eDuZm4qZ5w
-         GQqdmZ/ViGu2bPCOcD25e5Ntiyben0YkhEBVmaqa2tB5NA+2vjRkeHRN8UrfhbB3TqVf
-         y5N/RFYqP6o0q4t2snfbIcEu8vO6CyOspu4ukO5CRRNc3RLIH5EU4cRyslSgwxvwEBz1
-         0ePal4PWaRg8DeUKMlJMecYSJMVcY5IaGvRVuQ/OaWkyxMI8rjnXMkikrRDeR6l1uUQ5
-         FtD9qXU2FdqlRGiLkfoe+uLDQnt7505KwsubB3zoiqQtO71rIhvbK0GXAGQu3cyLT4vR
-         QKMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739841718; x=1740446518;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WLP5KgbATxiA0mewxoF9U/sNl+nyo86wkA8b2h9k9Cw=;
-        b=axgsZzDbR9y/WhJ7U5XW90akATrYlTCx8f0szfTaRvOXwVPnteHG9X/i8+Jb221u+J
-         vbr8GQ48C29OeVgjKq0nTkGB4x3d3zW0HQ/V4/FvnBBsyZUyhf+XcEPhE2sCAuR31jTq
-         97G4Pl2ln6FV+0AY72BLkWXVNFVjbtVbESlhA3Dx6Ac6VDg4dlKCpwKnHhQVi3IQbafE
-         ml3paUUt3bVZLMrNREkHHk9NA0OI8bAwDgwj3+kOzFgpEGJvVpHav5scrAcao/KjNaQd
-         t3veAnqPRmf0mnLpR2dC6eTJHWhQg2snqZJoVoDGTSmA/eRN/Qm3H+DLaKTwak0cU4gp
-         i5EQ==
-X-Gm-Message-State: AOJu0YygATgWD1Lnim3RhueFHVkFoGTOIzDgxSO9NStCWlnercp5JQIJ
-	d6G8zdbV8NM/XldPWT6nmB1y84Ghb/mjikauzElY89WAV6gUl2f5
-X-Gm-Gg: ASbGncuuTF70+FN4IhhlZ+wm75Rz2h5HHIO4F7h7/m70eLHFMZCMScybg6r87iXsQby
-	tnpvn9vuvawGgdEyyqe+mDGMjvHBggr42W6/2Mr2zuBEfAEjIGzMYVEkN5zkMIvxdab64DeM3SY
-	fBA1tH5KXhwLY48QSb68syzx48d+CmsYd82tCPgAHvGyihMhCfSSVN0Zu7rzi27/G9TguDc3JXv
-	ZqFiso8JYAMFZ7so2aR/ltguGrXVxhjpdElfzr07ua1wPRJJhHi9+yISILon/g4nfMQBuf3q8GQ
-	5qP/OhtKF0NClG9zBL1Dj4PDqEJLOMZPnJFNXwzLUHgUSYr78lmFp3fQNxfkNGc=
-X-Google-Smtp-Source: AGHT+IEnhEDdvjEKhM89ZFKIm0NTkCNnE5bQ6WJ8XIM2CFsNSJg2tR0cqqIZclr2QddktymhJwjixA==
-X-Received: by 2002:a05:620a:3186:b0:7bd:bafc:32b0 with SMTP id af79cd13be357-7c08aa72db9mr1898709085a.47.1739841718105;
-        Mon, 17 Feb 2025 17:21:58 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d9f46a8sm57864246d6.82.2025.02.17.17.21.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 17:21:57 -0800 (PST)
-Date: Mon, 17 Feb 2025 20:21:57 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- petrm@nvidia.com, 
- stfomichev@gmail.com, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <67b3e0b53f246_c0e25294ee@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250217194200.3011136-5-kuba@kernel.org>
-References: <20250217194200.3011136-1-kuba@kernel.org>
- <20250217194200.3011136-5-kuba@kernel.org>
-Subject: Re: [PATCH net-next v3 4/4] selftests: drv-net: add a simple TSO test
+	s=arc-20240116; t=1739842471; c=relaxed/simple;
+	bh=FbHhttVlORGonxs8H0S5iJCRTlanFr93rOt/1jJz8Tk=;
+	h=From:To:Subject:Date:Message-Id; b=FmnKQS0TqLe4zzevtsqoQwRuWeeaXhBuS/ckQqfqAtpDqXBQkuAd4EcE2e2kX8JV7deGwAZv1DPq6FNJXC8wirwFV9+w9aeqZc/+11Eb7V/d6606jRsM32KNUxUrEaIoUaYUtYFZfhH73NU6OLkktSb668etW1ByKQLhAIhNXqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gL/xySdy; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 564DE20376D8; Mon, 17 Feb 2025 17:34:29 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 564DE20376D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1739842469;
+	bh=Eh+eKNsaZPft3eZnsNK/4M9XSnx0/DdmhuwJkwuLv8o=;
+	h=From:To:Subject:Date:From;
+	b=gL/xySdyANYAkQ1571l9RsvszhKcAAt1kwVqfYGxSwj3TwXqV3dtDJedvTMEJej3L
+	 XpUAB6U9geYv26+1v360YSaDLh+L3gF7YIKIQV0epEiWiWb5pjhr/YRv9SM9KfuYQc
+	 HHdH2pWnXTAWkNHODSf6G1ogC+0tridKAinpzc/A=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	michal.swiatkowski@linux.intel.com,
+	mlevitsk@redhat.com,
+	yury.norov@gmail.com,
+	shradhagupta@linux.microsoft.com,
+	kotaranov@microsoft.com,
+	peterz@infradead.org,
+	akpm@linux-foundation.org,
+	ernis@linux.microsoft.com,
+	schakrabarti@linux.microsoft.com,
+	kent.overstreet@linux.dev,
+	longli@microsoft.com,
+	erick.archer@outlook.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: mana: Add debug logs in MANA network driver
+Date: Mon, 17 Feb 2025 17:34:15 -0800
+Message-Id: <1739842455-23899-1-git-send-email-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski wrote:
-> Add a simple test for TSO. Send a few MB of data and check device
-> stats to verify that the device was performing segmentation.
-> Do the same thing over a few tunnel types.
-> 
-> Injecting GSO packets directly would give us more ability to test
-> corner cases, but perhaps starting simple is good enough?
-> 
->   # ./ksft-net-drv/drivers/net/hw/tso.py
->   # Detected qstat for LSO wire-packets
->   KTAP version 1
->   1..14
->   ok 1 tso.ipv4 # SKIP Test requires IPv4 connectivity
->   ok 2 tso.vxlan4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 3 tso.vxlan6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 4 tso.vxlan_csum4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 5 tso.vxlan_csum6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 6 tso.gre4_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 7 tso.gre6_ipv4 # SKIP Test requires IPv4 connectivity
->   ok 8 tso.ipv6
->   ok 9 tso.vxlan4_ipv6
->   ok 10 tso.vxlan6_ipv6
->   ok 11 tso.vxlan_csum4_ipv6
->   ok 12 tso.vxlan_csum6_ipv6
->   ok 13 tso.gre4_ipv6
->   ok 14 tso.gre6_ipv6
->   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:7 error:0
-> 
-> Note that the test currently depends on the driver reporting
-> the LSO count via qstat, which appears to be relatively rare
-> (virtio, cisco/enic, sfc/efc; but virtio needs host support).
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v3:
->  - rework after the v4/v6 address split
-> v2: https://lore.kernel.org/20250214234631.2308900-4-kuba@kernel.org
->  - lower max noise
->  - mention header overhead in the comment
->  - fix the basic v4 TSO feature name
->  - also run a stream with just GSO partial for tunnels
-> v1: https://lore.kernel.org/20250213003454.1333711-4-kuba@kernel.org
+Add more logs to assist in debugging and monitoring
+driver behaviour, making it easier to identify potential
+issues  during development and testing.
 
-> +def test_builder(name, cfg, ipver, feature, tun=None, inner_ipver=None):
-> +    """Construct specific tests from the common template."""
-> +    def f(cfg):
-> +        cfg.require_ipver(ipver)
-> +
-> +        if not cfg.have_stat_super_count and \
-> +           not cfg.have_stat_wire_count:
-> +            raise KsftSkipEx(f"Device does not support LSO queue stats")
-> +
-> +        if tun:
-> +            remote_v4, remote_v6 = build_tunnel(cfg, ipver, tun)
-> +        else:
-> +            remote_v4 = cfg.remote_addr_v["4"]
-> +            remote_v6 = cfg.remote_addr_v["6"]
-> +
-> +        tun_partial = tun and tun[1]
-> +        has_gso_partial = tun and 'tx-gso-partial' in cfg.features
-> +
-> +        # First test without the feature enabled.
-> +        ethtool(f"-K {cfg.ifname} {feature} off")
-> +        if has_gso_partial:
-> +            ethtool(f"-K {cfg.ifname} tx-gso-partial off")
-> +        run_one_stream(cfg, ipver, remote_v4, remote_v6, should_lso=False)
-> +
-> +        # Now test with the feature enabled.
-> +        # For compatible tunnels only - just GSO partial, not specific feature.
-> +        if has_gso_partial:
-> +            ethtool(f"-K {cfg.ifname} tx-gso-partial on")
-> +            run_one_stream(cfg, ipver, remote_v4, remote_v6,
-> +                           should_lso=tun_partial)
-> +
-> +        # Full feature enabled.
-> +        if feature in cfg.features:
-> +            ethtool(f"-K {cfg.ifname} {feature} on")
-> +            run_one_stream(cfg, ipver, remote_v4, remote_v6, should_lso=True)
-> +        else:
-> +            raise KsftXfailEx(f"Device does not support {feature}")
-> +
-> +    f.__name__ = name + ((ipver + "_") if tun else "") + "ipv" + ipver
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+---
+Changes in v2:
+* Change "debug statements" in commit message to "more logs".
+* Replace dev_err with dev_dbg in out: label in 
+  mana_gd_create_dma_region.
+* Use dev_err in resp header status check.
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 50 +++++++++++++---
+ .../net/ethernet/microsoft/mana/hw_channel.c  |  6 +-
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 58 +++++++++++++++----
+ 3 files changed, 94 insertions(+), 20 deletions(-)
 
-use inner_ipver if tun?
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index be95336ce089..c15a5ef4674e 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -666,8 +666,11 @@ int mana_gd_create_hwc_queue(struct gdma_dev *gd,
+ 
+ 	gmi = &queue->mem_info;
+ 	err = mana_gd_alloc_memory(gc, spec->queue_size, gmi);
+-	if (err)
++	if (err) {
++		dev_err(gc->dev, "GDMA queue type: %d, size: %u, gdma memory allocation err: %d\n",
++			spec->type, spec->queue_size, err);
+ 		goto free_q;
++	}
+ 
+ 	queue->head = 0;
+ 	queue->tail = 0;
+@@ -688,6 +691,8 @@ int mana_gd_create_hwc_queue(struct gdma_dev *gd,
+ 	*queue_ptr = queue;
+ 	return 0;
+ out:
++	dev_err(gc->dev, "Failed to create queue type %d of size %u, err: %d\n",
++		spec->type, spec->queue_size, err);
+ 	mana_gd_free_memory(gmi);
+ free_q:
+ 	kfree(queue);
+@@ -770,7 +775,13 @@ static int mana_gd_create_dma_region(struct gdma_dev *gd,
+ 	}
+ 
+ 	gmi->dma_region_handle = resp.dma_region_handle;
++	dev_dbg(gc->dev, "Created DMA region handle 0x%llx\n",
++		gmi->dma_region_handle);
+ out:
++	if (err)
++		dev_dbg(gc->dev,
++			"Failed to create DMA region of length: %u, page_type: %d, status: 0x%x, err: %d\n",
++			length, req->gdma_page_type, resp.hdr.status, err);
+ 	kfree(req);
+ 	return err;
+ }
+@@ -793,8 +804,11 @@ int mana_gd_create_mana_eq(struct gdma_dev *gd,
+ 
+ 	gmi = &queue->mem_info;
+ 	err = mana_gd_alloc_memory(gc, spec->queue_size, gmi);
+-	if (err)
++	if (err) {
++		dev_err(gc->dev, "GDMA queue type: %d, size: %u, gdma memory allocation err: %d\n",
++			spec->type, spec->queue_size, err);
+ 		goto free_q;
++	}
+ 
+ 	err = mana_gd_create_dma_region(gd, gmi);
+ 	if (err)
+@@ -815,6 +829,8 @@ int mana_gd_create_mana_eq(struct gdma_dev *gd,
+ 	*queue_ptr = queue;
+ 	return 0;
+ out:
++	dev_err(gc->dev, "Failed to create queue type %d of size: %u, err: %d\n",
++		spec->type, spec->queue_size, err);
+ 	mana_gd_free_memory(gmi);
+ free_q:
+ 	kfree(queue);
+@@ -841,8 +857,11 @@ int mana_gd_create_mana_wq_cq(struct gdma_dev *gd,
+ 
+ 	gmi = &queue->mem_info;
+ 	err = mana_gd_alloc_memory(gc, spec->queue_size, gmi);
+-	if (err)
++	if (err) {
++		dev_err(gc->dev, "GDMA queue type: %d, size: %u, memory allocation err: %d\n",
++			spec->type, spec->queue_size, err);
+ 		goto free_q;
++	}
+ 
+ 	err = mana_gd_create_dma_region(gd, gmi);
+ 	if (err)
+@@ -862,6 +881,8 @@ int mana_gd_create_mana_wq_cq(struct gdma_dev *gd,
+ 	*queue_ptr = queue;
+ 	return 0;
+ out:
++	dev_err(gc->dev, "Failed to create queue type %d of size: %u, err: %d\n",
++		spec->type, spec->queue_size, err);
+ 	mana_gd_free_memory(gmi);
+ free_q:
+ 	kfree(queue);
+@@ -1157,8 +1178,11 @@ int mana_gd_post_and_ring(struct gdma_queue *queue,
+ 	int err;
+ 
+ 	err = mana_gd_post_work_request(queue, wqe_req, wqe_info);
+-	if (err)
++	if (err) {
++		dev_err(gc->dev, "Failed to post work req from queue type %d of size %u (err=%d)\n",
++			queue->type, queue->queue_size, err);
+ 		return err;
++	}
+ 
+ 	mana_gd_wq_ring_doorbell(gc, queue);
+ 
+@@ -1435,8 +1459,10 @@ static int mana_gd_setup(struct pci_dev *pdev)
+ 	mana_smc_init(&gc->shm_channel, gc->dev, gc->shm_base);
+ 
+ 	err = mana_gd_setup_irqs(pdev);
+-	if (err)
++	if (err) {
++		dev_err(gc->dev, "Failed to setup IRQs: %d\n", err);
+ 		return err;
++	}
+ 
+ 	err = mana_hwc_create_channel(gc);
+ 	if (err)
+@@ -1454,12 +1480,14 @@ static int mana_gd_setup(struct pci_dev *pdev)
+ 	if (err)
+ 		goto destroy_hwc;
+ 
++	dev_dbg(&pdev->dev, "mana gdma setup successful\n");
+ 	return 0;
+ 
+ destroy_hwc:
+ 	mana_hwc_destroy_channel(gc);
+ remove_irq:
+ 	mana_gd_remove_irqs(pdev);
++	dev_err(&pdev->dev, "%s failed (error %d)\n", __func__, err);
+ 	return err;
+ }
+ 
+@@ -1470,6 +1498,7 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
+ 	mana_hwc_destroy_channel(gc);
+ 
+ 	mana_gd_remove_irqs(pdev);
++	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
+ }
+ 
+ static bool mana_is_pf(unsigned short dev_id)
+@@ -1488,8 +1517,10 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	BUILD_BUG_ON(2 * MAX_PORTS_IN_MANA_DEV * GDMA_EQE_SIZE > EQ_SIZE);
+ 
+ 	err = pci_enable_device(pdev);
+-	if (err)
++	if (err) {
++		dev_err(&pdev->dev, "Failed to enable pci device (err=%d)\n", err);
+ 		return -ENXIO;
++	}
+ 
+ 	pci_set_master(pdev);
+ 
+@@ -1498,9 +1529,10 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto disable_dev;
+ 
+ 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+-	if (err)
++	if (err) {
++		dev_err(&pdev->dev, "DMA set mask failed: %d\n", err);
+ 		goto release_region;
+-
++	}
+ 	dma_set_max_seg_size(&pdev->dev, UINT_MAX);
+ 
+ 	err = -ENOMEM;
+@@ -1575,6 +1607,8 @@ static void mana_gd_remove(struct pci_dev *pdev)
+ 
+ 	pci_release_regions(pdev);
+ 	pci_disable_device(pdev);
++
++	dev_dbg(&pdev->dev, "mana gdma remove successful\n");
+ }
+ 
+ /* The 'state' parameter is not used. */
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index a00f915c5188..1ba49602089b 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -440,7 +440,8 @@ static int mana_hwc_alloc_dma_buf(struct hw_channel_context *hwc, u16 q_depth,
+ 	gmi = &dma_buf->mem_info;
+ 	err = mana_gd_alloc_memory(gc, buf_size, gmi);
+ 	if (err) {
+-		dev_err(hwc->dev, "Failed to allocate DMA buffer: %d\n", err);
++		dev_err(hwc->dev, "Failed to allocate DMA buffer size: %u, err %d\n",
++			buf_size, err);
+ 		goto out;
+ 	}
+ 
+@@ -529,6 +530,9 @@ static int mana_hwc_create_wq(struct hw_channel_context *hwc,
+ out:
+ 	if (err)
+ 		mana_hwc_destroy_wq(hwc, hwc_wq);
++
++	dev_err(hwc->dev, "Failed to create HWC queue size= %u type= %d err= %d\n",
++		queue_size, q_type, err);
+ 	return err;
+ }
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index aa1e47233fe5..32e2c5cd7152 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -52,10 +52,12 @@ static int mana_open(struct net_device *ndev)
+ {
+ 	struct mana_port_context *apc = netdev_priv(ndev);
+ 	int err;
+-
+ 	err = mana_alloc_queues(ndev);
+-	if (err)
++
++	if (err) {
++		netdev_err(ndev, "%s failed to allocate queues: %d\n", __func__, err);
+ 		return err;
++	}
+ 
+ 	apc->port_is_up = true;
+ 
+@@ -64,7 +66,7 @@ static int mana_open(struct net_device *ndev)
+ 
+ 	netif_carrier_on(ndev);
+ 	netif_tx_wake_all_queues(ndev);
+-
++	netdev_dbg(ndev, "%s successful\n", __func__);
+ 	return 0;
+ }
+ 
+@@ -176,6 +178,9 @@ static int mana_map_skb(struct sk_buff *skb, struct mana_port_context *apc,
+ 	return 0;
+ 
+ frag_err:
++	if (net_ratelimit())
++		netdev_err(apc->ndev, "Failed to map skb of size %u to DMA\n",
++			   skb->len);
+ 	for (i = sg_i - 1; i >= hsg; i--)
+ 		dma_unmap_page(dev, ash->dma_handle[i], ash->size[i],
+ 			       DMA_TO_DEVICE);
+@@ -687,6 +692,7 @@ int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_qu
+ 	return 0;
+ 
+ error:
++	netdev_err(mpc->ndev, "Failed to pre-allocate RX buffers for %d queues\n", num_queues);
+ 	mana_pre_dealloc_rxbufs(mpc);
+ 	return -ENOMEM;
+ }
+@@ -1304,8 +1310,10 @@ static int mana_create_eq(struct mana_context *ac)
+ 	for (i = 0; i < gc->max_num_queues; i++) {
+ 		spec.eq.msix_index = (i + 1) % gc->num_msix_usable;
+ 		err = mana_gd_create_mana_eq(gd, &spec, &ac->eqs[i].eq);
+-		if (err)
++		if (err) {
++			dev_err(gc->dev, "Failed to create EQ %d : %d\n", i, err);
+ 			goto out;
++		}
+ 		mana_create_eq_debugfs(ac, i);
+ 	}
+ 
+@@ -2080,6 +2088,8 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 
+ 	return 0;
+ out:
++	netdev_err(net, "Failed to create %d TX queues, %d\n",
++		   apc->num_queues, err);
+ 	mana_destroy_txq(apc);
+ 	return err;
+ }
+@@ -2415,6 +2425,7 @@ static int mana_add_rx_queues(struct mana_port_context *apc,
+ 		rxq = mana_create_rxq(apc, i, &ac->eqs[i], ndev);
+ 		if (!rxq) {
+ 			err = -ENOMEM;
++			netdev_err(ndev, "Failed to create rxq %d : %d\n", i, err);
+ 			goto out;
+ 		}
+ 
+@@ -2661,12 +2672,18 @@ int mana_alloc_queues(struct net_device *ndev)
+ 	int err;
+ 
+ 	err = mana_create_vport(apc, ndev);
+-	if (err)
++	if (err) {
++		netdev_err(ndev, "Failed to create vPort %u : %d\n", apc->port_idx, err);
+ 		return err;
++	}
+ 
+ 	err = netif_set_real_num_tx_queues(ndev, apc->num_queues);
+-	if (err)
++	if (err) {
++		netdev_err(ndev,
++			   "netif_set_real_num_tx_queues () failed for ndev with num_queues %u : %d\n",
++			   apc->num_queues, err);
+ 		goto destroy_vport;
++	}
+ 
+ 	err = mana_add_rx_queues(apc, ndev);
+ 	if (err)
+@@ -2675,14 +2692,20 @@ int mana_alloc_queues(struct net_device *ndev)
+ 	apc->rss_state = apc->num_queues > 1 ? TRI_STATE_TRUE : TRI_STATE_FALSE;
+ 
+ 	err = netif_set_real_num_rx_queues(ndev, apc->num_queues);
+-	if (err)
++	if (err) {
++		netdev_err(ndev,
++			   "netif_set_real_num_rx_queues () failed for ndev with num_queues %u : %d\n",
++			   apc->num_queues, err);
+ 		goto destroy_vport;
++	}
+ 
+ 	mana_rss_table_init(apc);
+ 
+ 	err = mana_config_rss(apc, TRI_STATE_TRUE, true, true);
+-	if (err)
++	if (err) {
++		netdev_err(ndev, "Failed to configure RSS table: %d\n", err);
+ 		goto destroy_vport;
++	}
+ 
+ 	if (gd->gdma_context->is_pf) {
+ 		err = mana_pf_register_filter(apc);
+@@ -2823,8 +2846,10 @@ int mana_detach(struct net_device *ndev, bool from_close)
+ 
+ 	if (apc->port_st_save) {
+ 		err = mana_dealloc_queues(ndev);
+-		if (err)
++		if (err) {
++			netdev_err(ndev, "%s failed to deallocate queues: %d\n", __func__, err);
+ 			return err;
++		}
+ 	}
+ 
+ 	if (!from_close) {
+@@ -2968,6 +2993,8 @@ static int add_adev(struct gdma_dev *gd)
+ 		goto add_fail;
+ 
+ 	gd->adev = adev;
++	dev_dbg(gd->gdma_context->dev,
++		"Auxiliary device added successfully\n");
+ 	return 0;
+ 
+ add_fail:
+@@ -3009,8 +3036,10 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 	}
+ 
+ 	err = mana_create_eq(ac);
+-	if (err)
++	if (err) {
++		dev_err(dev, "Failed to create EQs: %d\n", err);
+ 		goto out;
++	}
+ 
+ 	err = mana_query_device_cfg(ac, MANA_MAJOR_VERSION, MANA_MINOR_VERSION,
+ 				    MANA_MICRO_VERSION, &num_ports);
+@@ -3066,8 +3095,14 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 
+ 	err = add_adev(gd);
+ out:
+-	if (err)
++	if (err) {
+ 		mana_remove(gd, false);
++	} else {
++		dev_dbg(dev, "gd=%p, id=%u, num_ports=%d, type=%u, instance=%u\n",
++			gd, gd->dev_id.as_uint32, ac->num_ports,
++			gd->dev_id.type, gd->dev_id.instance);
++		dev_dbg(dev, "%s succeeded\n", __func__);
++	}
+ 
+ 	return err;
+ }
+@@ -3129,6 +3164,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	gd->driver_data = NULL;
+ 	gd->gdma_context = NULL;
+ 	kfree(ac);
++	dev_dbg(dev, "%s succeeded\n", __func__);
+ }
+ 
+ struct net_device *mana_get_primary_netdev_rcu(struct mana_context *ac, u32 port_index)
+-- 
+2.34.1
 
-based on previous version of the patch:
-
-    +    if tun:
-    +        name += ("4" if inner_ipv4 else "6") + "_"
-
-
-> +    return f
-> +
 
