@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-167239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A14A39589
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:37:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85E9A39617
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88E8216FEA3
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:36:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 356CA167AF2
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7E322C352;
-	Tue, 18 Feb 2025 08:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D297022E419;
+	Tue, 18 Feb 2025 08:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="biSovEpA"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="UAFcJyJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BD122AE59
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 08:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9F922E40A
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 08:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739867760; cv=none; b=orawY4ebKPR211bJvB7+3kKCzzsaPBZohMMOz7LaqH7Cwr+5xyRDej4UKeFxhLFLqqmDid7acK4rPMthoCSAFHfUU5zY9g7Iec1EuSduPxf/ozeBhHD5ahDo9mWIZXu5LPLnv1cnzXu1cKpa8yeTrBazMi157a5KKeVBGs5XJ7g=
+	t=1739868224; cv=none; b=Ug66rKbVGwvLPW9s4yzQijBl6ffIox45VzxLdlmksQt9bXJtRvaSYqXcWdBb/zxPI3sRKaRArOiavpbO1MO6buDv8CtPT95pmYRsI1oIormL9ekdk4b9DPcuNaZOZR/U+swEV33INUBvk8HE8uTAYkuc4ByTM7PIW3BHAwIZ1KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739867760; c=relaxed/simple;
-	bh=feF1eHyyT0zWjy4z/Md8u1+8+0ZLHRFpAShbWTlr/Qg=;
+	s=arc-20240116; t=1739868224; c=relaxed/simple;
+	bh=9H1gm5nERYEERWwiINCgkzxyRF5+Q6HYw6CVCLqtI1c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aHA/fxtXEV8lRGiuFPKWJzJoo/Oi6eLP++4jptmSAE8Tbdrj6TedNIcA2Vr+2fLDb40v0zloFrumckJbP6aqWdIbdbqJzk4Y1rC2+bIw2oByAeUz3RdNM+KD+eonThjCOu2rlbT1iXNMn+wnWnYQkKtb0ZNJxI2hPHkLs9WATEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=biSovEpA; arc=none smtp.client-ip=209.85.128.46
+	 In-Reply-To:Content-Type; b=Wh4DPs5owsOa92nokZ55a0AnfU5JnEGNrTRwcAG4l1STgbYEFMTQtaq+W5LKIE6hHf3PpwX4bKc47F6sIKRHC01cqe3SOCDeXiCFyT+XapM/W2OyZ58W1aM1eJUsN2CF1mVcUP2aXOPtsQfpqjYei9XJQU00FSd8u0Vaski9CaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=UAFcJyJn; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4399509058dso493745e9.3
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 00:35:58 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-439702d77f6so1995315e9.1
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 00:43:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1739867757; x=1740472557; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1739868221; x=1740473021; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSJ23b7dcp2nXbCFtNTYLtGlvCk+YzKblQR08ITEHhc=;
-        b=biSovEpAlE38/v4+KDQyJgZSbwF/zPlf7WvgG0duyMN04oAZ1udX/rkeLmf0f2KCes
-         XrIqKcLyBtVy4U69nNVrLi+R3ED3wNcTTItEWUA95EOZQggaqiiwnHp5FAhAdw+d7WM6
-         6YH3sZqKyFoDwtoor1DIE3P0tEy7dnIWBIE1D/porQxnkqyikFrPxAQD9R6z3RVCO2xV
-         ncQ4kcuE/DlHyoRwoj1I0DsngPlfYWFv2DvjHifmtuoZnjewTO9Dp7B30PWzu8fadltL
-         BsiL9577C6AYT4GGiBC1yyEO6fZsw4trvTKikHqS5wGApwmjxTWYFAVkqLHQGRZoKa34
-         rJLA==
+        bh=07OEdF7j7fGOpaK4PIAFdjn9U5fUFtm+0uA4oE0Ha88=;
+        b=UAFcJyJnHolJxKIbWRSlkzODN5JYMpQ9z+bzpI90oR7iIeqzDCXqtEAZZbuUqXB8oe
+         EcM7XZ0rdYMqYnqDjikDFU3LCj/joKn0iiAh0qVHJBK4ZP391F2Qo/ekhBA2E8v1UJp1
+         KsUmu0QPJEU+wQfa2+wqvxlIU42NLYzIpkwkzujbbVFJJ7uVWUltTSW9wkE+EQxg0Gsz
+         oSs3VbCheyh7InY5MMeaZ7PyeDNu/wF1UpZUfenTSjuAL7ddgjGHRyAXpgLWl2KsNc/m
+         kz2EootgjyQBi244R5r2lbjvC5ozWDoJv5oTWKH6rxSf6agaQQ7XbSGN6dyv8H0lrfbx
+         JbTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739867757; x=1740472557;
+        d=1e100.net; s=20230601; t=1739868221; x=1740473021;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MSJ23b7dcp2nXbCFtNTYLtGlvCk+YzKblQR08ITEHhc=;
-        b=fmWiN3SuTyrV3EqmpJh2U3+d9KrQKOnUvWyhrWwY7BLE3nW1BDQE2Wev2PsVQDzSg1
-         4MOQfiJZGv07xnrEM8NzSbY0Dt9SojicHR90iIPIqmtreqXUEMFBNpMc+yhkYqLdZus5
-         oOf+rZkxSXXVRC6yt/ZhczGDjQtM39h8e5fN9v4MguXtH7SBMszT6G3sUVthaWCQXBE6
-         wq4RXwTN4sA8NOUaysrSDGwEkZeMg/ldVIronLGrA9ZhmGrWYj/yNBkKX9DQtZubprSI
-         lJvtBpvYoxO4iQiREKfTuEAlLu98tsXc7z5sl/2DJbkr1+OtgeBqhg9a2qJFuBjXa/wf
-         /roA==
-X-Gm-Message-State: AOJu0YzN6NEKoEHje3p9d+SlwEbDmQy3ZYrLi6fWjHZ/24h0A/aUk+a5
-	pfzozqDw+kVBnr1KpRvgBR9hzKXLhfMFCpxWoOIW3ecmIOE8IokrQ3y5BONoCbk=
-X-Gm-Gg: ASbGncv4tavh1mcSkmVuObbeYOgLXuDeP6usURCYTcqnrYJS2RbIikqaZYR/Hbv4tyM
-	Pe5NaG8gOUW3PB7uVs/Y968Nf0jDKvCh/oql0jsmHRkqrCkbZwZG3bQeSpjgmD4tNJVsjZGZyEq
-	tABGIs5SCr8GibzbRoGdVPDAZNhpdXjJc8N9XEgnDSSf8b23+yCsT9Cecb1ORVTmUyRP7YGWwKx
-	W+fueIbXni/hwXnTr7JUn5fieS80gxNC01efRxuomUBRJJ8IXTg2H38rV7rE6y0rba9hFwWZ+kU
-	skK57pt6728HFoK6s+3Zgkfe3pz0x+MLfvfIMqW6CC67+xVCDFIisJcFjsK/7RshPTYy
-X-Google-Smtp-Source: AGHT+IG92hjCJWGEFWUkF1TNBt8VJRHE77BbFuIFujokh0dlUjpL0uxRKa49heL6SedL+6HcLajH0w==
-X-Received: by 2002:a05:600c:2d04:b0:439:84d3:f7fd with SMTP id 5b1f17b1804b1-43984d3fb0bmr21918935e9.4.1739867757357;
-        Tue, 18 Feb 2025 00:35:57 -0800 (PST)
+        bh=07OEdF7j7fGOpaK4PIAFdjn9U5fUFtm+0uA4oE0Ha88=;
+        b=Ad6gFPgMzc9LuyMVn+eVp6qy/jbrJzCBfmQz7h65etFob9Zj2RCR7rSY6Pj64wZbPW
+         ryGPwunaAUiDSBi5NYIPNNFClSgHrAR7iETqpbBeOpmJihr4a6pN2nqJ4fyRVPUzCl/g
+         8ohdhDmrm3ZU9npPF/d7hGK6zvmn+ZvlTcjXKBIH6/IpTrctk+pVBT6td7BOJgtIbqNy
+         SlfJT4flrb595VP8Nt9/oacpV5Mo0iUgJLK+x0svyIzEphgKyM3/P01prG5eRifyXHjr
+         4THM9n2nTXY8mBzF/k3TINuuK8R1DiB5NGWteU7qmCpK4+b0mAEEXINKuoRv6MTF4PDS
+         OYxw==
+X-Gm-Message-State: AOJu0YwrpiO3Tp7WakgoBxaE9ch8+lfo1IUjImEMWK0osd7p2L1yVpO9
+	JE6R/6FapUvwF5l1KZq0aXBHMNxV6opgCFKxXiHflRsxG5kBE4nNkbaHy40fp/oJ2+yZxmx3CM6
+	Z
+X-Gm-Gg: ASbGncsj2QDEnQEeuWIgzT9GIHrBtxfFwV3jjzAur5Zdfsugmknlh4awJQwdzcMhVIZ
+	/yh8uwAbnFwHda+tpw0KKuLK+XwznUCC1lezeK/T/Gz4vaXzmfJv/+0TeZblYzNTgiKYw2TeL4j
+	tAmuB7klO0TYL82WIZrZn9pjJHpkHcQYoHXIUU9LJBIhFbRNoyNef7L3emM8qLeSaTc2w9K1XoU
+	H74R8Z9MDUcOw7u91cj5kiCx1B1dWRbP3u4vPwT8QchZnByEvDQUlZDh8vAo5UwmFmxw4LCS/1/
+	kZpHZc/c9p7znoFApQdnNTe5JttXItZcD38LhB4v7L0KhTW2rhkXLkn67ZC8jLZ6Cdk5
+X-Google-Smtp-Source: AGHT+IG603ij4o5hHa/WfJSqksRX5ZtCb3bIAsuiKI3S/5FgkptWZhf9avKNURVcVpcp0depLahbeQ==
+X-Received: by 2002:a05:600c:1c84:b0:439:8c80:6aee with SMTP id 5b1f17b1804b1-4398c806c54mr14486605e9.4.1739868221188;
+        Tue, 18 Feb 2025 00:43:41 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:b41:c160:8e5f:76fd:491b:501e? ([2a01:e0a:b41:c160:8e5f:76fd:491b:501e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439858ec5fasm48100965e9.29.2025.02.18.00.35.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982a2f92esm56410535e9.17.2025.02.18.00.43.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 00:35:56 -0800 (PST)
-Message-ID: <715a9dd2-4309-436d-bdfc-716932ccb95c@6wind.com>
-Date: Tue, 18 Feb 2025 09:35:55 +0100
+        Tue, 18 Feb 2025 00:43:40 -0800 (PST)
+Message-ID: <1e99ece5-3ee6-4446-886a-ddc708aa8e0d@6wind.com>
+Date: Tue, 18 Feb 2025 09:43:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,42 +83,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next v2] net: Remove redundant variable declaration in
- __dev_change_flags()
-To: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, andrew@lunn.ch
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-References: <20250217-old_flags-v2-1-4cda3b43a35f@debian.org>
+Subject: Re: [PATCH net-next 2/2] ipv6: fix blackhole routes
+To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Paul Ripke <stix@google.com>,
+ Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
+References: <20250212164323.2183023-1-edumazet@google.com>
+ <20250212164323.2183023-3-edumazet@google.com>
+ <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Content-Language: en-US
 Organization: 6WIND
-In-Reply-To: <20250217-old_flags-v2-1-4cda3b43a35f@debian.org>
+In-Reply-To: <9f4ba585-7319-4fba-87e0-1993c5ae64d3@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 17/02/2025 à 16:48, Breno Leitao a écrit :
-> The old_flags variable is declared twice in __dev_change_flags(),
-> causing a shadow variable warning. This patch fixes the issue by
-> removing the redundant declaration, reusing the existing old_flags
-> variable instead.
+Le 12/02/2025 à 19:00, David Ahern a écrit :
+> On 2/12/25 9:43 AM, Eric Dumazet wrote:
+>> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+>> index 78362822b9070df138a0724dc76003b63026f9e2..335cdbfe621e2fc4a71badf4ff834870638d5e13 100644
+>> --- a/net/ipv6/route.c
+>> +++ b/net/ipv6/route.c
+>> @@ -1048,7 +1048,7 @@ static const int fib6_prop[RTN_MAX + 1] = {
+>>  	[RTN_BROADCAST]	= 0,
+>>  	[RTN_ANYCAST]	= 0,
+>>  	[RTN_MULTICAST]	= 0,
+>> -	[RTN_BLACKHOLE]	= -EINVAL,
+>> +	[RTN_BLACKHOLE]	= 0,
+>>  	[RTN_UNREACHABLE] = -EHOSTUNREACH,
+>>  	[RTN_PROHIBIT]	= -EACCES,
+>>  	[RTN_THROW]	= -EAGAIN,
 > 
-> 	net/core/dev.c:9225:16: warning: declaration shadows a local variable [-Wshadow]
-> 	9225 |                 unsigned int old_flags = dev->flags;
-> 	|                              ^
-> 	net/core/dev.c:9185:15: note: previous declaration is here
-> 	9185 |         unsigned int old_flags = dev->flags;
-> 	|                      ^
-> 	1 warning generated.
+> EINVAL goes back to ef2c7d7b59708 in 2012, so this is a change in user
+> visible behavior. Also this will make ipv6 deviate from ipv4:
 > 
-> Remove the redundant inner declaration and reuse the existing old_flags
-> variable since its value is not needed outside the if block, and it is
-> safe to reuse the variable. This eliminates the warning while
-> maintaining the same functionality.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+>         [RTN_BLACKHOLE] = {
+>                 .error  = -EINVAL,
+>                 .scope  = RT_SCOPE_UNIVERSE,
+>         },
+Yes, if I remember well, to be consistent I mimicked what existed in IPv4. I
+never found a good answer to why 'EINVAL' :)
+
+Nicolas
 
