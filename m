@@ -1,210 +1,136 @@
-Return-Path: <netdev+bounces-167332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98198A39D0C
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:12:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEAFFA39D27
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 14:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52AF417921D
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68E03A4E82
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 13:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598A12673A9;
-	Tue, 18 Feb 2025 13:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA0714B08E;
+	Tue, 18 Feb 2025 13:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeH3cH2g"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="LCUZT5+w";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="LCUZT5+w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9911D265CDB;
-	Tue, 18 Feb 2025 13:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46D2417CF
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 13:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739883809; cv=none; b=Oju8gz00V8CtHCf0TayIJQDjRlXaObbgEqBrKMlL8Lst4HYCU14UVG3IVUBQiYQmdCe0UNBTX5Y74XlVVwf1b+AyZ3l67E56dK0oSG2mEWH36RKiJWz6dt2xjgqZWdiXhKJiEWeh6QJZnE1zOsZtiE1boDos8eDP9kwEcT8DDKQ=
+	t=1739884271; cv=none; b=iOEcYi5okqZ6/Zmi/2wEFRB5N7GsUE4EHcU62pl1DxnoxSvHa9/p21ab3LBo9RqnltEoCU84ZM1LhrlF9pH1zzSJ9WAm5RwXqelPnFKJQlotUdo80mm5m/6rhzwzQ2UNmCBfToVP0fzJqNr7L+9cXczCHAgOTz4QdQWkVZe/lqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739883809; c=relaxed/simple;
-	bh=flUlf8HSS8oigGTq4cDt8CaW81S8RWojiSVP5bbCKX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JjiwPmTOSTZRmQNT8osfjKD2CVITsQTS+UloZ+1eQJwXfD7+jEQ1yY2+HXO45pU4v7Nfbij0QhSpzlkjh77LhH9BSkKux8+OHcNPUJHHsPNVw/u8s2zDsosmLPRm/0WGMBrjzK71LtVdZ4M1uaFY5XKrA/g+Y4Z/mCEfgKl4Lc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeH3cH2g; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7be49f6b331so537293885a.1;
-        Tue, 18 Feb 2025 05:03:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739883806; x=1740488606; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=shcHVe5ScV+KF73Cqgadpco0XHdM/Pvt/zjUdwF7k8A=;
-        b=FeH3cH2gVNS0mrTAvxybLU0+jbOvOxMiIaHqb31LFfJr8t8BrFBky5qU3vuhOmCGgr
-         PKaaYuYrW/GYR8qzvreXIgOPOi1VPwShlEZnTueCwx0uUpWBKmHgXXyii449fN5dgCev
-         Xbm83rVdzV47zDofdbX1rIyRc9EyfMeNGXChqp1Wno6IpjCc4hRJC9ixzuanN34Lot7W
-         ekSBjgGAPrFoCAeqkwfMfghqI8nFfrZES4JtepqU6Uk2ujUp28A5k7zFiclU4/dwzsi2
-         aaAT6eMONzwhhHBJZpM7bTc12AYV+PS7mSozyGk1RsansKXp3unjITVQFcnpJXFcMeY1
-         A2pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739883806; x=1740488606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=shcHVe5ScV+KF73Cqgadpco0XHdM/Pvt/zjUdwF7k8A=;
-        b=GABTj/l62QtTO/7UQ59K59IW+qJg8MMXP6tNNKDQULiKYZQzsqfqCk2udUuWDoW+Uh
-         PcfwlFBcnWw6ND2N2ZxzCnrPSyXN672waK5qx/uqJcBPHzjpxlWxf+OWg+gmez+5paR5
-         oDC+IBVWGYyl0TYNhPQFOsTmBrI+XYAAat9gEdjGWVxw2+3c/Z+JxmFhlU/HXOogl9CA
-         gOV7PwGxdS+5R8eaB8GHVjKcYp6p3TUP68hJYCpyEEl5io2wGd+CkT+/WSWTWDYWzsZU
-         YUEMxXGAkQ8c2FVjX593mZh5olcaAcJSjLNaBhnkc6fgHl84c+tY6uWuYAAEgDFqoCas
-         kbFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhCNGkAViDapcFpTLvoBGKuHWdk+mAqqARNVjyKJvaUQQA4ct70a6DzigVlcIYx0ROk9PQ/BQU25zewvFB@vger.kernel.org, AJvYcCWjbnf/CfFVxeyIWvQV5Z1rbdO+jbNtGizkq9J46Cu2ExmPskOhdQ+zObnb1FON2im4749x4197oL6o@vger.kernel.org, AJvYcCXpqFkvyyth7PUWJsaOD1IVBo9ZRCQVEBXBtnL8nr3PyY9p91CElEV2VxiPKGOj2v4qJqk00FHh@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvhJI/RwG8sIqc7VqUOS3Vcs8k34wpSY3MzCACNNRwHc0govib
-	fUDl9X/yIijYUk53W84j+Y4zgU8xrdvK4HNhkoP/cWvIe0HDjmjg
-X-Gm-Gg: ASbGncvgOU/sx/HDObTLC2qW/eX8ahDYucLeZNBovQSUS4idKutn6bqI+ziIQw41Ik8
-	u/QawV3a+E3MmHs8h7xF16F4pyt6H4N3H/79rFgC77/andSWLdRL34N3QZfB24HFAs8zeEuGu7J
-	3x9hSp6Bd/Nixxs/1Kjwnc7aOXGpNSsxP92oARQesSX9hHpxGopoctz2bcmwNTqgiT7yxJcAta0
-	UrtnfpI2JoOYDTeqjVJaT+MbGKqViQU2Lj8YWATo0oq6JSaou7JdbNY3vQ3RpHV+jo=
-X-Google-Smtp-Source: AGHT+IHMvBa2pdrsPXBeOhKSDCxofcBeoktPP7uW0o0YVj6yGzgsaMY5yizsS+ID7z1U76ykO/2aOg==
-X-Received: by 2002:a05:620a:31a2:b0:7c0:7ca3:b123 with SMTP id af79cd13be357-7c08aa98cdfmr1890605085a.46.1739883806193;
-        Tue, 18 Feb 2025 05:03:26 -0800 (PST)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c0a28e8700sm189185085a.113.2025.02.18.05.03.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 05:03:25 -0800 (PST)
-Date: Tue, 18 Feb 2025 21:03:13 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
-	Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen Wang <unicorn_wang@outlook.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
-	Hariprasad Kelam <hkelam@marvell.com>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Jisheng Zhang <jszhang@kernel.org>, Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	Drew Fustini <dfustini@tenstorrent.com>, Furong Xu <0x1207@gmail.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>, 
-	Serge Semin <fancer.lancer@gmail.com>, Lothar Rubusch <l.rubusch@gmail.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, sophgo@lists.linux.dev, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for Sophgo
- SG2044 SoC
-Message-ID: <rkcf6tmgv44uxof3oxsmzqduvc4bumtnsjlkvenxezu2tjrp6l@vy5rbr4p7f3d>
-References: <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
- <5e481b95-3cf8-4f71-a76b-939d96e1c4f3@lunn.ch>
- <js3z3ra7fyg4qwxbly24xqpnvsv76jyikbhk7aturqigewllbx@gvus6ub46vow>
- <24eecc48-9061-4575-9e3b-6ef35226407a@lunn.ch>
- <Z7NDakd7zpQ_345D@shell.armlinux.org.uk>
- <rsysy3p5ium5umzz34rtinppcu2b36klgjdtq5j4lm3mylbqbz@z44yeje5wgat>
- <Z7PEeGmNvlYD33rZ@shell.armlinux.org.uk>
- <6obom7jyciq2kqw5iuqlugbzbsebgd7ymnq2crlm565ybbz7de@n7o3tcqn5idi>
- <Z7Rjjo5nZ0gnCbzq@shell.armlinux.org.uk>
- <thc5oknaqaw54wghyxpx6nr4kbykxvpgkgvpqsnsp2osjlxgwv@dekgtkxoywrm>
+	s=arc-20240116; t=1739884271; c=relaxed/simple;
+	bh=EW/xXWd85/l55A2g+WlVndeHmYBZUu45j5AUXdU84Os=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mTD02Lj3Endm2BHx18/GpHMx6TBFGTKdx9zPQDyZc9gAcEhVKUg2e6xaZaWQNz7I45F9Ve55p/u8R0kJPO6CKdzrVIxW9x7FulFgViG5+I2A4Y7sTPgGnWm3FxLovSuNcvD/AItg7yU4MP1xFrUDKJuJMXtWpEiXQvK1XuEd0ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=LCUZT5+w; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=LCUZT5+w; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 850402116B;
+	Tue, 18 Feb 2025 13:11:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1739884267; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uDk74hVZj2fSSFjAp11DwD92ZHzXKT2sSBuSO59C/4I=;
+	b=LCUZT5+wyh12nZtVTJGQXk1aYWA1dCsNCs+fQqW3ZZ92QHSxfubAAELLOWyIW95z5tvtll
+	jEzd7ZmPA6AKyaHWRm+d9q72sMS+RTgjFB6A43K4v6JG5/5py8VeMSalyWR48k9lZ14c8c
+	dCRT3Gp1YkvQ9Box+TQo5jEoDUTsUw8=
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=LCUZT5+w
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1739884267; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uDk74hVZj2fSSFjAp11DwD92ZHzXKT2sSBuSO59C/4I=;
+	b=LCUZT5+wyh12nZtVTJGQXk1aYWA1dCsNCs+fQqW3ZZ92QHSxfubAAELLOWyIW95z5tvtll
+	jEzd7ZmPA6AKyaHWRm+d9q72sMS+RTgjFB6A43K4v6JG5/5py8VeMSalyWR48k9lZ14c8c
+	dCRT3Gp1YkvQ9Box+TQo5jEoDUTsUw8=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4CC7413A1D;
+	Tue, 18 Feb 2025 13:11:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id kc9xD+uGtGebRQAAD6G6ig
+	(envelope-from <davide.benini@suse.com>); Tue, 18 Feb 2025 13:11:07 +0000
+Message-ID: <1818b3c8-b952-4dba-8b46-a3175adaeb8e@suse.com>
+Date: Tue, 18 Feb 2025 14:11:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <thc5oknaqaw54wghyxpx6nr4kbykxvpgkgvpqsnsp2osjlxgwv@dekgtkxoywrm>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ss: Tone down cgroup path resolution
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, netdev@vger.kernel.org
+Cc: mkubecek@suse.cz
+References: <20250210141103.44270-1-mkoutny@suse.com>
+Content-Language: en-US, it
+From: Davide Benini <davide.benini@suse.com>
+In-Reply-To: <20250210141103.44270-1-mkoutny@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 850402116B
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.98%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	DKIM_TRACE(0.00)[suse.com:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-On Tue, Feb 18, 2025 at 07:34:47PM +0800, Inochi Amaoto wrote:
-> On Tue, Feb 18, 2025 at 10:40:14AM +0000, Russell King (Oracle) wrote:
-> > On Tue, Feb 18, 2025 at 09:01:59AM +0800, Inochi Amaoto wrote:
-> > > On Mon, Feb 17, 2025 at 11:21:28PM +0000, Russell King (Oracle) wrote:
-> > > > On Tue, Feb 18, 2025 at 06:50:24AM +0800, Inochi Amaoto wrote:
-> > > > > On Mon, Feb 17, 2025 at 02:10:50PM +0000, Russell King (Oracle) wrote:
-> > > > > > On Mon, Feb 17, 2025 at 02:25:33PM +0100, Andrew Lunn wrote:
-> > > > > > > > I am not sure all whether devices has this clock, but it appears in
-> > > > > > > > the databook. So I think it is possible to move this in the core so
-> > > > > > > > any platform with these clock can reuse it.
-> > > > > > > 
-> > > > > > > Great
-> > > > > > > 
-> > > > > > > The next problem will be, has everybody called it the same thing in
-> > > > > > > DT. Since there has been a lot of cut/paste, maybe they have, by
-> > > > > > > accident.
-> > > > > > 
-> > > > > > Tegra186: "tx"
-> > > > > > imx: "tx"
-> > > > > > intel: "tx_clk"
-> > > > > > rk: "clk_mac_speed"
-> > > > > > s32: "tx"
-> > > > > > starfive: "tx"
-> > > > > > sti: "sti-ethclk"
-> > > > > > 
-> > > > > 
-> > > > > The dwc-qos-eth also use clock name "tx", but set the clock with
-> > > > > extra calibration logic.
-> > > > 
-> > > > Yep, that's what I meant by "Tegra186" above.
-> > > > 
-> > > > > > so 50% have settled on "tx" and the rest are doing their own thing, and
-> > > > > > that horse has already bolted.
-> > > > > > 
-> > > > > 
-> > > > > The "rx" clock in s32 also uses the same logic. I think the core also
-> > > > > needs to take it, as this rx clock is also mentioned in the databook.
-> > > > 
-> > > > The "rx" clock on s32 seems to only be set to 125MHz, and the driver
-> > > > seems to be limited to RGMII.
-> > > > 
-> > > > This seems weird as the receive clock is supposed to be supplied by the
-> > > > PHY, and is recovered from the media (and thus will be 2.5, 25 or
-> > > > 125MHz as determined by the PHY.) So, I'm not sure that the s32 "rx"
-> > > > clock is really the clk_rx_i clock supplied to the DWMAC core.
-> > > > 
-> > > > Certainly on stm32mp151, it states that ETH_RX_CLK in RGMII mode will
-> > > > be 2.5, 25 or 125MHz provided by the PHY, and the clock tree indicates
-> > > > that ETH_RX_CLK in RGMII mode will be routed directly to the clk_rx_i
-> > > > input on the DWMAC(4) core.
-> > > > 
-> > > 
-> > > RGMII is not the problem. The databook says the RGMII clock (rx/tx)
-> > > follows this set rate logic. 
-> > 
-> > Sorry, I find this ambiguous. "This" doesn't tell me whether you are
-> > referring to either what s32 does (setting the "rx" clock to 125MHz
-> > only) or what RGMII spec says about RX_CLK (which is that it comes from
-> > the PHY and is 2.5/25/125MHz) which stm32mp151 agrees with and feeds
-> > the PHY's RX_CLK to the clk_rx_i inputs on the DWMAC in RGMII, GMII
-> > and MII modes.
-> > 
-> 
-> What I said follows the second, the clock is set at 2.5/25/125MHz
-> with speed at 10/100/1000Mbps. The only thing I can refer to is the
-> ip databook.
-> 
-> > clk_rx_i comes through a bunch of muxes on stm32mp151. When the clock
-> > tree is configured for RMII mode, the rate on clk_rx_i depends on the
-> > MAC speed (10/100Mbps).
-> > 
-> 
-> OK, I have no problem and find some descriptions related to this in
-> the databook.
-> 
-> > This suggests as far as the core is concerned, the clock supplied as
-> > clk_rx_i isn't a fixed rate clock but depends on the speed just like
-> > the transmit clock.
-> > 
-> 
-> This is what I want to say. clk_rx_i is not fixed but the
-> s32 uses it as a fixed one (This is the thing I felt weird).
-> 
 
-> In fact, Non-fixed clk_rx_i is why I suggested adding the rx
-> clock to the core at first. Since the drive may not use rx
-> clock as the databook says, it is good to leave it alone.
 
-Please ignore my wrong point, I mistake the direction of the
-rx clock. It is not provided by the mac, but the phy.
+On 10/02/25 15:11, Michal Koutný wrote:
+> Sockets and cgroups have different lifetimes (e.g. fd passing between
+> cgroups) so obtaining a cgroup id to a removed cgroup dir is not an
+> error. Furthermore, the message is printed for each such a socket.
+> Improve user experience by silencing these specific errors.
 
-Regards,
-Inochi
+Note that if ss has been called with -e (to show detailed socket information) or with --cgroup (to show cgroup information), even if the message "Failed to open cgroup2 by ID" will no longer appear, however the cg_id_to_path() will return a string "unreachable:%llx" and the output will still be similar to
+
+tcp	LISTEN	0	4096	[::]:2049	[::]:*	ino:710321	sk:10da	cgroup:unreachable:8ed7	v6only:1 <->
+
+But I agree that removing the specific error message would be enough to prevent customer concern.
+
+Davide Benini
+
+
 
