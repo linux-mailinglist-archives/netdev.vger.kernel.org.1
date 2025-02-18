@@ -1,113 +1,143 @@
-Return-Path: <netdev+bounces-167428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E752CA3A3DB
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:15:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1DCA3A3E9
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0694161E3C
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:15:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40A8F3AAB3B
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 17:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E1426983F;
-	Tue, 18 Feb 2025 17:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B57B26F443;
+	Tue, 18 Feb 2025 17:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mfCuEOGh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eepZ5Mzi"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9872126E648
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF1324113C
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 17:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739898936; cv=none; b=ephgbPTKEymnqA+KzrOH24TcU8JqUvN1iviaLmxtFeHCuNzDbS2UaPi/3YH6cphDq6z9jgOmL4TlP/xm+BUErzYj+wEp9xehhH3KcwwJZEf5jYpw9uCc8jMDunevjfg+suvSpssj6hldTT98aUN9jeYQLZS+xxEdb8dmlbuVXBw=
+	t=1739898996; cv=none; b=fiaKcNu1InedHzYpJUAIS+3wybeA7XJY3X+uNwTjaa4gdt+WrYwhpqXyHGpV5WQH+QGR7h8MpStQOmRroonOpmmsWAgSR2HH+2ZfizAzg/GqP24r0h+/YAvc4y5vLaz5a7isPTnr9xH2bJprJ8ITsSwMv2qY9URPHdzaZJnJUO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739898936; c=relaxed/simple;
-	bh=WqXuLzgMxDqbx35g4hAObsmHu2LdfWz2UG42BCC6r5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kf/XcxCAiwwlqbugASRc+qiczHE8ljDTcvqceOefE3I13OMLqSJ2UnYpLyOJI+kzKBlXFFpzHqZUdIKzQepAf6VleJ2Pi6YBOJgWPNYpscm62bSc4o7AmO4smiUO+7bV/CMcMU0XidowNARgmcrGzHhQwfyViJIiqEOM+fSMWfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mfCuEOGh; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0EC6B4329A;
-	Tue, 18 Feb 2025 17:15:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739898926;
+	s=arc-20240116; t=1739898996; c=relaxed/simple;
+	bh=9dIIdFQgmysnp5dqxXCZNDzCI2/9ZCDa1aTFsYRVot4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dvwvkKD/d9DwRc4d4yrrmFilnfHZfeGZOUIS2JWcxjWEw5JGG3clX176Aata1I5IqiPTtMdt8dEkhzVuC/L1ZTfak0pQKi8Nlxp3z4SMfic7dJfDzOHJU96hizXVnPh8yoORD0mfv0lynRL0Em+hstZJmA5r+ecmkxqTEhM7eZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eepZ5Mzi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739898993;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ze0gjov6UFAM9Nc2SES+UkpImak9wX6sdp3PqJj9fuw=;
-	b=mfCuEOGhdBWCTTjQXn7puXH9uMLu7PdC3opoLIloQDJBdLzycQeydTuCilKeyPMooePCNC
-	IfR84k+DNJXL+XieStp5Mlmc4F5YHx1mG54NwUouKL2VtITlCspL14YAXY/4eJOSCYauOb
-	MkbeBRLGkGuesxg4BmIkNAiQhPYfjEoK+uK7G05VxeLnemvri4uXJFgRDAzv2NzEAkWJFl
-	FrCkY+sbumv6aHPX9g0otQnIa4Tnrr10/kCI7rHfRyCPMp/3PWbrX+LKUufET+OJA9j4Fg
-	aQyZCEB6R5sc3wNRa13AnHiHqW+OmYodXUvc2EzSwc/iSxEvWIYrelpGf/eQ/g==
-Date: Tue, 18 Feb 2025 18:15:23 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <edumazet@google.com>, <horms@kernel.org>,
- <donald.hunter@gmail.com>, <dsahern@kernel.org>, <petrm@nvidia.com>,
- <gnault@redhat.com>
-Subject: Re: [PATCH net-next 5/8] net: fib_rules: Enable port mask usage
-Message-ID: <20250218181523.71926b7e@kmaincent-XPS-13-7390>
-In-Reply-To: <20250217134109.311176-6-idosch@nvidia.com>
-References: <20250217134109.311176-1-idosch@nvidia.com>
-	<20250217134109.311176-6-idosch@nvidia.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=p6QQXdqzTnem+UBcwWG6Cta9dSxQF1jtODmeDWvwxLw=;
+	b=eepZ5MziuClZjM5x85xO+XQiS99bjfIEzxx4yslEL0xT1V7K75mlGeBr3YwgnUMN8tSIY6
+	X4SkncPZMqLZId5GWRnFz+jFKbicmhgiIpkfesy5QzCrPGh8mcOOdUkh/qm43PDycOHcqy
+	bv9sBFfA+BPu0aVDJDqiCrCeooPa3jg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-563-0CJ3LZyBNvWLjhrgtIqkfA-1; Tue, 18 Feb 2025 12:16:31 -0500
+X-MC-Unique: 0CJ3LZyBNvWLjhrgtIqkfA-1
+X-Mimecast-MFC-AGG-ID: 0CJ3LZyBNvWLjhrgtIqkfA_1739898990
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4398e841963so10665775e9.3
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 09:16:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739898990; x=1740503790;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p6QQXdqzTnem+UBcwWG6Cta9dSxQF1jtODmeDWvwxLw=;
+        b=TuKI7acJv6ClqhPXAwn7N6viEzWxvxjSogRUVnzLLMOQDfKj2jMQ5uPz+nBuiqSSfN
+         ng0+MPuwUhkm/EM1CeHtvSE8Q99JoVPme6RA5JkbpbtgqPmqvk/YPwZ981HFkqrNumcs
+         NShaUQhdr9PN6KqJ4pvlqcnjFrwXV8fZIeb1h9FA5UI/06peDIMLPvkeSStdVoTNRIbN
+         zYpnC2Pxxxj9VmquCmx8krhjNL7/etibl7latE9Q73Mq4qrO8mclLxq3sZOP7rKt4KoP
+         emCEIzz3DH9cgYIo5okLJ5on4l8jErL+2EEIg6HdNDx5/XdfWqikBgFVzHd4yEn4UgqC
+         b0fQ==
+X-Gm-Message-State: AOJu0YwI6UpuZFADb6vkmlB35MmcUC79vkY2TyAOI/Ab/jE6+tDaxqnW
+	bdrMOOdemvOBAglEeTMJYCT3z2JWGyJTGm3UmAVa76GlGYakOXj2/+QtTh79+ctQJPGNH4OfeqY
+	aoH2hAdHFaknN++G4oJGIRfHTW9zO9HHwnkLoAIEKBRISRvt3c2w57g==
+X-Gm-Gg: ASbGncstK8NcWpMaMLFEqdAX1MHPeDhHg2/OXdA3fck6eJmGkyT7z/nkUlYsqL6FZ2P
+	KjT79Vmm4Vv4e2INsETYlbICGloApuowVmUkGrbPY7lM/SSJv1nwJCk42ui2+NPTIJJZy5xr4D6
+	Ca2lBcfkZW5GqsLYuLsIljYlB8dqDkepCIFkmdrUZjBDbq1PTtxCFfquuV4GZvjD5siaziQHBfW
+	KW/6ksHd9HCKp6MSB8po1NkU3PGJd5NFzi8FziImYMVg13VR+VVxybw4F5Au+9m+dwtFoFgb9Tv
+	hta0CA4kfqnGZVRSl6Fj5KmIzKHG8vUs3+4=
+X-Received: by 2002:a05:600c:4e8c:b0:439:99e6:2ab with SMTP id 5b1f17b1804b1-43999e60444mr3983465e9.28.1739898990492;
+        Tue, 18 Feb 2025 09:16:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHBNYQl/sWuYrb8KfZHgyvvRIWCctaAlN/OMIdNckSEKQleSM880AHK5Jh9HukV3sX6BA4xCw==
+X-Received: by 2002:a05:600c:4e8c:b0:439:99e6:2ab with SMTP id 5b1f17b1804b1-43999e60444mr3983115e9.28.1739898990175;
+        Tue, 18 Feb 2025 09:16:30 -0800 (PST)
+Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4399600257asm19958835e9.4.2025.02.18.09.16.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2025 09:16:29 -0800 (PST)
+Message-ID: <2f3b3cef-e623-4c02-af71-9d1f861075d1@redhat.com>
+Date: Tue, 18 Feb 2025 18:16:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: allow small head cache usage with large
+ MAX_SKB_FRAGS values
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <6bf54579233038bc0e76056c5ea459872ce362ab.1739375933.git.pabeni@redhat.com>
+ <CANn89iJfiNZi5b-b-FqVP8VOwahx6tnp3_K3AGX3YUwpbe+9yQ@mail.gmail.com>
+ <41482213-e600-4024-9ca7-a085ac50f2db@redhat.com>
+ <CANn89iLbe2fpLUvMJk-0Keaz1yvWb7WUe9X-3Gd5wmNQn7DN9w@mail.gmail.com>
+ <389ee8e5-8c25-414c-ae19-7dfeebecf1d3@redhat.com>
+Content-Language: en-US
+In-Reply-To: <389ee8e5-8c25-414c-ae19-7dfeebecf1d3@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeiudeklecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdtudemfedtheefmegrvdeiieemsgeileekmeekvdgrtdemgeguugekmegsrggvtgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggstddumeeftdehfeemrgdvieeimegsieelkeemkedvrgdtmeeguggukeemsggrvggtpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehiughoshgthhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrv
- hgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Mon, 17 Feb 2025 15:41:06 +0200
-Ido Schimmel <idosch@nvidia.com> wrote:
+On 2/18/25 3:50 PM, Paolo Abeni wrote:
+> On 2/18/25 2:43 PM, Eric Dumazet wrote:
+>> On Mon, Feb 17, 2025 at 3:48 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>
+>>> On 2/12/25 9:47 PM, Eric Dumazet wrote:
+>>>> diff --git a/include/net/tcp.h b/include/net/tcp.h
+>>>> index 5b2b04835688f65daa25ca208e29775326520e1e..a14ab14c14f1bd6275ab2d1d93bf230b6be14f49
+>>>> 100644
+>>>> --- a/include/net/tcp.h
+>>>> +++ b/include/net/tcp.h
+>>>> @@ -56,7 +56,11 @@ DECLARE_PER_CPU(u32, tcp_tw_isn);
+>>>>
+>>>>  void tcp_time_wait(struct sock *sk, int state, int timeo);
+>>>>
+>>>> -#define MAX_TCP_HEADER L1_CACHE_ALIGN(128 + MAX_HEADER)
+>>>> +#define MAX_TCP_HEADER L1_CACHE_ALIGN(64 + MAX_HEADER)
+>>>
+>>> I'm sorry for the latency following-up here, I really want to avoid
+>>> another fiasco.
+>>>
+>>> If I read correctly, you see the warning on top of my patch because you
+>>> have the above chunk in your local tree, am I correct?
+>>
+>> Not at all, simply using upstream trees, perhaps a different .config
+>> than yours ?
+> 
+> Could you please share the conf, if you have that still handy?
 
-> Allow user space to configure FIB rules that match on the source and
-> destination ports with a mask, now that support has been added to the
-> FIB rule core and the IPv4 and IPv6 address families.
->=20
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  net/core/fib_rules.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-> index ba6beaa63f44..5ddd34cbe7f6 100644
-> --- a/net/core/fib_rules.c
-> +++ b/net/core/fib_rules.c
-> @@ -843,8 +843,8 @@ static const struct nla_policy fib_rule_policy[FRA_MA=
-X +
-> 1] =3D { [FRA_DSCP]	=3D NLA_POLICY_MAX(NLA_U8, INET_DSCP_MASK >> 2),
->  	[FRA_FLOWLABEL] =3D { .type =3D NLA_BE32 },
->  	[FRA_FLOWLABEL_MASK] =3D { .type =3D NLA_BE32 },
-> -	[FRA_SPORT_MASK] =3D { .type =3D NLA_REJECT },
-> -	[FRA_DPORT_MASK] =3D { .type =3D NLA_REJECT },
-> +	[FRA_SPORT_MASK] =3D { .type =3D NLA_U16 },
-> +	[FRA_DPORT_MASK] =3D { .type =3D NLA_U16 },
->  };
+Please ignore, the needed config is actually quite obvious. I did not
+take in account that my running config here had a few common options
+stripped down.
 
-I don't get the purpose of this patch and patch 1.
-Couldn't you have patch 3 and 4 first, then patch 2 that adds the netlink a=
-nd
-UAPI support?
+Cheers,
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Paolo
+
 
