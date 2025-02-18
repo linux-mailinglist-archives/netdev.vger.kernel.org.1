@@ -1,121 +1,124 @@
-Return-Path: <netdev+bounces-167237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE5CA39539
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:25:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47032A39578
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 09:34:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03D597A125E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:24:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DE713ACC3E
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 08:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827DE22B8B6;
-	Tue, 18 Feb 2025 08:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="N2rjtMJY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7666E1D90DB;
+	Tue, 18 Feb 2025 08:27:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF8E22B8AC;
-	Tue, 18 Feb 2025 08:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6961B4250;
+	Tue, 18 Feb 2025 08:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739866995; cv=none; b=KUuHq0bIloPbNUKMphOAxvpPw8Klz/VdVG6Kq8stBfsBo7g014nZAsXDg9oBuBty9XmViGQdu6Qia9/Pd827x4pB9Eo+U9g6Ut0EywZz3oZki+3TtznrbInWYVdTiSbbhrbf+aV2k0flGViosp+7aU9QI3cooSvf3jY5yS4lkCY=
+	t=1739867260; cv=none; b=DRqcKtoZIYZ3jaTKsNF4Up6wqCxaySQhnTXf4uMlU+9Hho9MhIHOyCI6sB3odlYwIxB4R/i9+0SIihUn01R2s/9swdbYfd0YJV/PMu93wBIzGl8I8VU0cOHLjX6BousiNGeQZNtzFYR4yqZ0MtIQjm3cbmzOefveZjecDdT2Ahw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739866995; c=relaxed/simple;
-	bh=neeFVALKbKwQUPHxKrTHs/kVl2XxJWwQWOBdLZElY94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y0dxAA4/f8T+FxyXeTum+U+VRDI4Ftd+BQffKeRivUpWQrP3UDjJkX3bZFzcqqgenDNTTJKGK1i3pk4kMCBaEQKBPD2a7B58qr4FkRnPOxInHalh6tB1RZlbm9Ad4NuHX55F/6joLJ8CN8jEOaViTN3lVezrbD+PVGgPwK65Fy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=N2rjtMJY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176AFC4CEE2;
-	Tue, 18 Feb 2025 08:23:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739866994;
-	bh=neeFVALKbKwQUPHxKrTHs/kVl2XxJWwQWOBdLZElY94=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N2rjtMJYFrD16J2ut1MoO/nzfvlY4PeHMMF470CaK971/Tp4bYfsa1ItIz39BTEaL
-	 MSN5czFgQaYui30dNETEwZjLLYUuJNE9NOTYB2WPsw0rkMuI3r+NXvh3k1mJyVIc2E
-	 nRWiyvMpLa3tZGZjIW6J6hi9WgDmHzbPTVVlluzE=
-Date: Tue, 18 Feb 2025 09:23:11 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs
- isoc_alt
-Message-ID: <2025021829-clamor-lavish-9126@gregkh>
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021425-surgical-wackiness-0940@gregkh>
- <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
- <2025021717-prepay-sharpener-37fb@gregkh>
- <CADg1FFf7fONc+HJT8rq55rVFRnS_UxnEPnAGQ476WVe+208_pA@mail.gmail.com>
+	s=arc-20240116; t=1739867260; c=relaxed/simple;
+	bh=1soCMC1mDzlUguPyqOBPKxSSzf+ZHtXkwqiV35e1GYA=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ANKerQZPtFJV3tZNasQtM7oFUfjA8w32aqFgBxdNfTW3GxOXjjnbbWqOyAaW1rSN3xdb/PLNJytCwVMxdq3OIJEsH7uXDl0c+nI+mLOujeCjDwGPJQCxGdY2H9NiCUYnIFJC/oKuGcFracZiossvrbjUEj8MV+OXQtTBH32y8e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Yxsx40sHkz1wn5P;
+	Tue, 18 Feb 2025 16:23:36 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 179661A0188;
+	Tue, 18 Feb 2025 16:27:30 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Feb 2025 16:27:29 +0800
+Message-ID: <9d55d0a8-7a85-4caf-8358-7e04621813cc@huawei.com>
+Date: Tue, 18 Feb 2025 16:27:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Simon Horman <horms@kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <shenjian15@huawei.com>,
+	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add rx checksum offload
+ supported in this module
+To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+References: <20250213035529.2402283-1-shaojijie@huawei.com>
+ <20250213035529.2402283-4-shaojijie@huawei.com>
+ <20250217154028.GM1615191@kernel.org>
+ <14b562d6-7006-4fe0-be61-48fe1abebe49@huawei.com>
+ <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <CAH-L+nM0axD3QWXixe6p7U4dyVx=qn9zh5crOXLTxTH9Gpd9dQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADg1FFf7fONc+HJT8rq55rVFRnS_UxnEPnAGQ476WVe+208_pA@mail.gmail.com>
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, Feb 18, 2025 at 12:24:07PM +0800, Hsin-chen Chuang wrote:
-> Hi Greg,
-> 
-> On Mon, Feb 17, 2025 at 4:53 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
-> > > On Fri, Feb 14, 2025 at 7:37 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> > > > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > > > >
-> > > > > Expose the isoc_alt attr with device group to avoid the racing.
-> > > > >
-> > > > > Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> > > > > it also becomes the parent device of hci dev.
-> > > > >
-> > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-> > > >
-> > > > Wait, step back, why is this commit needed if you can change the alt
-> > > > setting already today through usbfs/libusb without needing to mess with
-> > > > the bluetooth stack at all?
-> > >
-> > > In short: We want to configure the alternate settings without
-> > > detaching the btusb driver, while detaching seems necessary for
-> > > libusb_set_interface_alt_setting to work (Please correct me if I'm
-> > > wrong!)
-> >
-> > I think changing the alternate setting should work using usbfs as you
-> > would send that command to the device, not the interface, so the driver
-> > bound to the existing interface would not need to be removed.
-> 
-> I thought USBDEVFS_SETINTERFACE was the right command to begin with,
-> but it seems not working in this case.
-> The command itself attempts to claim the interface, but the interface
-> is already claimed by btusb so it failed with Device or resource busy
-> 
-> drivers/usb/core/devio.c:
->   USBDEVFS_SETINTERFACE -> proc_setintf -> checkintf -> claimintf
 
-Ah, ok, thanks for checking.  So as you control this device, why not
-just disconnect it, change the setting, and then reconnect it?
+on 2025/2/18 10:46, Kalesh Anakkur Purayil wrote:
+> On Tue, Feb 18, 2025 at 7:47 AM Jijie Shao <shaojijie@huawei.com> wrote:
+>>
+>> on 2025/2/17 23:40, Simon Horman wrote:
+>>> On Thu, Feb 13, 2025 at 11:55:25AM +0800, Jijie Shao wrote:
+>>>> This patch implements the rx checksum offload feature
+>>>> including NETIF_F_IP_CSUM NETIF_F_IPV6_CSUM and NETIF_F_RXCSUM
+>>>>
+>>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>>> ...
+>>>
+>>>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+>>>> index 8c631a9bcb6b..aa1d128a863b 100644
+>>>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+>>>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+>>>> @@ -202,8 +202,11 @@ static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
+>>>>    }
+>>>>
+>>>>    static bool hbg_rx_check_l3l4_error(struct hbg_priv *priv,
+>>>> -                                struct hbg_rx_desc *desc)
+>>>> +                                struct hbg_rx_desc *desc,
+>>>> +                                struct sk_buff *skb)
+>>>>    {
+>>>> +    bool rx_checksum_offload = priv->netdev->features & NETIF_F_RXCSUM;
+>>> nit: I think this would be better expressed in a way that
+>>>        rx_checksum_offload is assigned a boolean value (completely untested).
+>>>
+>>>        bool rx_checksum_offload = !!(priv->netdev->features & NETIF_F_RXCSUM);
+>> Okay, I'll modify it in v2.
+> Maybe you can remove " in this module" from the patch title as it is
+> implicit. This comment/suggestion applies to all patches in this
+> series.
 
-Also, see my other review comment, how does BlueZ do this today?
+Sorry this may not have any bad effect,
+so I don't plan to change it in V2.
+If anyone else thinks it should be modified,
+I will modify it.
 
-thanks,
+Thanks a lot
+Jijie Shao
 
-greg k-h
+>> Thanks
+>> Jijie Shao
+>>
+>>>> +
+>>>>       if (likely(!FIELD_GET(HBG_RX_DESC_W4_L3_ERR_CODE_M, desc->word4) &&
+>>>>                  !FIELD_GET(HBG_RX_DESC_W4_L4_ERR_CODE_M, desc->word4)))
+>>>>               return true;
+>
 
