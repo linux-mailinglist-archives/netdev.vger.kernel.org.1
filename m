@@ -1,306 +1,122 @@
-Return-Path: <netdev+bounces-167455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEE5A3A5AF
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:33:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B8FA3A5AD
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3E5016A754
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:33:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30A711893E5C
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 18:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037252356D4;
-	Tue, 18 Feb 2025 18:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA34217A2E0;
+	Tue, 18 Feb 2025 18:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP97u5pN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOJP5LaK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2234E17A2E2
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 18:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264252356D6;
+	Tue, 18 Feb 2025 18:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739903582; cv=none; b=DqCIEsn5pEHzFWLmTSr3EG48gLUi4gv2hMDVc/0c8uXEmu1rYUFVb6e08NzfzBjapBjPgL5RIfut336t+I3RWBSdlGUDGq27aKpXs9sES98ZOw1LPSYoO7l7YJNRIXNMw2gov6Y7QQDIv1jGYIqznA2qcOQr2Ygm436F1QnZtpo=
+	t=1739903608; cv=none; b=XgawM8rRgjoR+UP9AyNrSTYjTFtuzUe8yK0p6FGqcHcoSmFaZNEdHttYMEAnc8cQuw3g7loYiy8O17BLhn7Nb/a04NNAJILDuF4YupPRKgtN+DJ9WWdDROiMQr+s/IyuyM5BTZumxf4uHUMAkGDvnGN6pGULt+M8PEx4SnhqOgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739903582; c=relaxed/simple;
-	bh=foZlHpd4Cpnxr4ps6/i7MsAj6LMRSlQKaUQKceHcsPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XTNJvkhfIyXT6Ina0RoTWEwH1MUW6MfAdQBGtu9t+JJd/lawJpPaty5Iih7NCVpmpw8ERjIhWWTU6AT9nAlVvi4Ty1u5qLp1tpRcikPPUfK2GkybBudUwQhlWOrvL6y3YPAh4iTwR3AYaBb5wmrbZEu4zj1zjuxyB/Alafn+q6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cP97u5pN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739903579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9bYxVZO36oZVHT+ipELEPt1IHEPavnv8VxLc2nDnSwI=;
-	b=cP97u5pNHHfkE8GNLYTs85qVOoexX9/s9gviXPTZpbzUM0c3sz2rrBQP7P0CTn90HEsERJ
-	4Fjv+26SB9+fvjAU09TfkQpP2SnuymOVx2fqc4fw+cZusQieJ/5JGDzJirVxRPk9+lYSra
-	re/9MlDKLsm55/m30ckzOxNGtgP6Y10=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-84-5B599bGFOs6WV9B09aKdAg-1; Tue,
- 18 Feb 2025 13:32:54 -0500
-X-MC-Unique: 5B599bGFOs6WV9B09aKdAg-1
-X-Mimecast-MFC-AGG-ID: 5B599bGFOs6WV9B09aKdAg_1739903573
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2520519783B5;
-	Tue, 18 Feb 2025 18:32:53 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.155])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0C85A1956094;
-	Tue, 18 Feb 2025 18:32:49 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH v2 net 2/2] Revert "net: skb: introduce and use a single page frag cache"
-Date: Tue, 18 Feb 2025 19:29:40 +0100
-Message-ID: <fc3a8b034ba2a0ce03c5d0f93cc033a8c66821ad.1739899357.git.pabeni@redhat.com>
-In-Reply-To: <cover.1739899357.git.pabeni@redhat.com>
-References: <cover.1739899357.git.pabeni@redhat.com>
+	s=arc-20240116; t=1739903608; c=relaxed/simple;
+	bh=CLX+RDq2VWcGf6HMksoo+sold6zfnddBA8DO/uK8jSg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=E/hAjR/SAnplaQjCdDy2m7bTdHfWsez+Q2ffEZmaDKMS7LHy9hBxsLncFEMioA/Dt7KjUYcZWGagjQrC66jmw+RR6BPpfHGsNqgYw73Wy4FeE0E6AodqKhbuyj/X9FzHf3XmjdOnZSxQCvKUMf9S0/9OaOw5Y2cX+cR70WOtv4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FOJP5LaK; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso890221866b.1;
+        Tue, 18 Feb 2025 10:33:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739903605; x=1740508405; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QiWaYyIQgq/zvsUV9YAcDJlEM1SSFLHFaWet2X/6k/M=;
+        b=FOJP5LaK4dGQwghoi/FgrvTzG1nEpHcdJaj2WFF8bK0wQABQS2UolGhwg5T0QWsa27
+         6MkdyuDEst6N8b7JiFGNjL9pArlOgMQN3juQ4PClgtTNrSnY76E5qjzXaYjIlU5iRKGl
+         SPyLuIm3tGn9TNkbXhub8nNEj/3pVU/VR9+H1tKn9Nkr0LUgbUmjoThYfoAQKgy+EIWp
+         AhWFwK7oMnBjpeIH4BzMQ6e18RfVXSG2S9aEGA+9dUF4OMhhweDJ9rfOTDb4ylzdE899
+         Xl9aGESNw1nLNs2ZIHrn0zXvuVaQ7bY9U4O40gyLpHavaa0ELKhDLW9LGaW9R5THV5nK
+         5+Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739903605; x=1740508405;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QiWaYyIQgq/zvsUV9YAcDJlEM1SSFLHFaWet2X/6k/M=;
+        b=Fn6fVc8AbiGaqQivLPWzT7tVOXrUUhtQ1iY/uIR8+nfC/wrN2x4f6MVX0U7Z9hTB2L
+         fqx6/N/p0yP/TFGiHACnJ3gKT02/2Msc+dd1XjLJ2w0zA1h0AgrxbSYKB6jufB/MITUa
+         7cCntbt6mbL1iXXZy7JuGXsVX41ZhkCiXh85pnZ3+NMlp2qcO9WdvXIXAn7eyzRVHr3t
+         sqIF6FQ2FL5eunUkfopjsipHdWrpqA40wLKu/koLGO8iARNrbHTf8c8m7VPGpWGXth2v
+         9ugQXE+XSgH4OCcYA92AQaDZ7/fnrgGdJQxZwrB2CfnuICF6mjNR5aQFUnbL2CClRwm2
+         Kqbg==
+X-Forwarded-Encrypted: i=1; AJvYcCU80+5OR+ltxhnumKG7fQSgPCr7+Kq2AXndoZMfbkG+Jfcld/fpkV2M9Aur/Edj2UpBCTV9MljMdt49914=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH5cgs/oYcQoyE2XRn3PZJ48cnG469utWsg987rF+goj1f81q2
+	udXaiOQPetCJppYQAYYi/u5Rm+Lx1UXbMhRnZK6DCbkuxE8XRA37XOovkw==
+X-Gm-Gg: ASbGncsjD2CFKaw3HiOUWtFRnU1ZCCzeHyByIKr7QyGLPwfNF4beCMIbhmU38Qc9N2I
+	cg+WmjVKw1ULXE+wTzk+hcODuZ+EbTbMZJkADAv10IH3gGjvNRu0yiwD75M0rK3m2vtkfMhL20c
+	uHbebUiwhGQSZ1BioTmJu4gSwCwqsgYN2oiI+JCbv5EM/KjedM0pan3PdQ682/6kTgY/gWefJp4
+	CitSLRaUeuu3xl2kyysQxCG8+JfIEfbbFxogIE2QeNN2tXo5YCiSRFCsGikmu1K/KC/+/w1kV6X
+	f3xrVE4f5qz/pttEPeg=
+X-Google-Smtp-Source: AGHT+IHilc1/LeFkTHY2RAJaXraZFQ2RzkRGy8HMc2JHm31GKT3plqARIwcVuuhbYOL1sMbOUgtxbw==
+X-Received: by 2002:a17:907:7743:b0:ab7:ee47:993f with SMTP id a640c23a62f3a-abbcd0a6399mr69832066b.47.1739903605019;
+        Tue, 18 Feb 2025 10:33:25 -0800 (PST)
+Received: from [127.0.1.1] ([2a00:79c0:625:3600:3000:d590:6fca:357f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53232039sm1106649266b.9.2025.02.18.10.33.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 10:33:24 -0800 (PST)
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+Subject: [PATCH 0/2] net: phy: marvell-88q2xxx: Enable temperature
+ measurement in probe again
+Date: Tue, 18 Feb 2025 19:33:08 +0100
+Message-Id: <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-0-999a304c8a11@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGTStGcC/x3NwQrCMAyA4VcZORvYIq3VVxEPmUYX6NqZyiyMv
+ bvF43f5/w2KmEqBS7eByapFc2oYDh3cJ04vQX00A/XkehpOOLOtEiOG8KZaK07fOSeUxGMU5A8
+ ulkdBYvLeH8mdg4PWWkyeWv+f623ff++7x7J3AAAA
+X-Change-ID: 20250217-marvell-88q2xxx-hwmon-enable-at-probe-2a2666325985
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
+ Gregor Herburger <gregor.herburger@ew.tq-group.com>, 
+ Stefan Eichenberger <eichest@gmail.com>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Dimitri Fedrau <dima.fedrau@gmail.com>
+X-Mailer: b4 0.14.2
 
-After the previous commit is finally safe to revert commit dbae2b062824
-("net: skb: introduce and use a single page frag cache"): do it here.
+Patchset fixes these:
+- Enable temperature measurement in probe again
+- Prevent reading temperature with asserted reset
 
-The intended goal of such change was to counter a performance regression
-introduced by commit 3226b158e67c ("net: avoid 32 x truesize
-under-estimation for tiny skbs").
-
-Unfortunately, the blamed commit introduces another regression for the
-virtio_net driver. Such a driver calls napi_alloc_skb() with a tiny
-size, so that the whole head frag could fit a 512-byte block.
-
-The single page frag cache uses a 1K fragment for such allocation, and
-the additional overhead, under small UDP packets flood, makes the page
-allocator a bottleneck.
-
-Thanks to commit bf9f1baa279f ("net: add dedicated kmem_cache for
-typical/small skb->head"), this revert does not re-introduce the
-original regression. Actually, in the relevant test on top of this
-revert, I measure a small but noticeable positive delta, just above
-noise level.
-
-The revert itself required some additional mangling due to recent updates
-in the affected code.
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Fixes: dbae2b062824 ("net: skb: introduce and use a single page frag cache")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 ---
- include/linux/netdevice.h |   1 -
- net/core/dev.c            |  17 +++++++
- net/core/skbuff.c         | 104 ++------------------------------------
- 3 files changed, 22 insertions(+), 100 deletions(-)
+Dimitri Fedrau (2):
+      net: phy: marvell-88q2xxx: Enable temperature measurement in probe again
+      net: phy: marvell-88q2xxx: Prevent reading temperature with asserted reset
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index c0a86afb85da..365f0e2098d1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4115,7 +4115,6 @@ void netif_receive_skb_list(struct list_head *head);
- gro_result_t napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb);
- void napi_gro_flush(struct napi_struct *napi, bool flush_old);
- struct sk_buff *napi_get_frags(struct napi_struct *napi);
--void napi_get_frags_check(struct napi_struct *napi);
- gro_result_t napi_gro_frags(struct napi_struct *napi);
- 
- static inline void napi_free_frags(struct napi_struct *napi)
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b91658e8aedb..55e356a68db6 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6920,6 +6920,23 @@ netif_napi_dev_list_add(struct net_device *dev, struct napi_struct *napi)
- 	list_add_rcu(&napi->dev_list, higher); /* adds after higher */
- }
- 
-+/* Double check that napi_get_frags() allocates skbs with
-+ * skb->head being backed by slab, not a page fragment.
-+ * This is to make sure bug fixed in 3226b158e67c
-+ * ("net: avoid 32 x truesize under-estimation for tiny skbs")
-+ * does not accidentally come back.
-+ */
-+static void napi_get_frags_check(struct napi_struct *napi)
-+{
-+	struct sk_buff *skb;
-+
-+	local_bh_disable();
-+	skb = napi_get_frags(napi);
-+	WARN_ON_ONCE(skb && skb->head_frag);
-+	napi_free_frags(napi);
-+	local_bh_enable();
-+}
-+
- void netif_napi_add_weight_locked(struct net_device *dev,
- 				  struct napi_struct *napi,
- 				  int (*poll)(struct napi_struct *, int),
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index f5a6d50570c4..7b03b64fdcb2 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -223,67 +223,9 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
- #define NAPI_SKB_CACHE_BULK	16
- #define NAPI_SKB_CACHE_HALF	(NAPI_SKB_CACHE_SIZE / 2)
- 
--#if PAGE_SIZE == SZ_4K
--
--#define NAPI_HAS_SMALL_PAGE_FRAG	1
--#define NAPI_SMALL_PAGE_PFMEMALLOC(nc)	((nc).pfmemalloc)
--
--/* specialized page frag allocator using a single order 0 page
-- * and slicing it into 1K sized fragment. Constrained to systems
-- * with a very limited amount of 1K fragments fitting a single
-- * page - to avoid excessive truesize underestimation
-- */
--
--struct page_frag_1k {
--	void *va;
--	u16 offset;
--	bool pfmemalloc;
--};
--
--static void *page_frag_alloc_1k(struct page_frag_1k *nc, gfp_t gfp)
--{
--	struct page *page;
--	int offset;
--
--	offset = nc->offset - SZ_1K;
--	if (likely(offset >= 0))
--		goto use_frag;
--
--	page = alloc_pages_node(NUMA_NO_NODE, gfp, 0);
--	if (!page)
--		return NULL;
--
--	nc->va = page_address(page);
--	nc->pfmemalloc = page_is_pfmemalloc(page);
--	offset = PAGE_SIZE - SZ_1K;
--	page_ref_add(page, offset / SZ_1K);
--
--use_frag:
--	nc->offset = offset;
--	return nc->va + offset;
--}
--#else
--
--/* the small page is actually unused in this build; add dummy helpers
-- * to please the compiler and avoid later preprocessor's conditionals
-- */
--#define NAPI_HAS_SMALL_PAGE_FRAG	0
--#define NAPI_SMALL_PAGE_PFMEMALLOC(nc)	false
--
--struct page_frag_1k {
--};
--
--static void *page_frag_alloc_1k(struct page_frag_1k *nc, gfp_t gfp_mask)
--{
--	return NULL;
--}
--
--#endif
--
- struct napi_alloc_cache {
- 	local_lock_t bh_lock;
- 	struct page_frag_cache page;
--	struct page_frag_1k page_small;
- 	unsigned int skb_count;
- 	void *skb_cache[NAPI_SKB_CACHE_SIZE];
- };
-@@ -293,23 +235,6 @@ static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache) = {
- 	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
- };
- 
--/* Double check that napi_get_frags() allocates skbs with
-- * skb->head being backed by slab, not a page fragment.
-- * This is to make sure bug fixed in 3226b158e67c
-- * ("net: avoid 32 x truesize under-estimation for tiny skbs")
-- * does not accidentally come back.
-- */
--void napi_get_frags_check(struct napi_struct *napi)
--{
--	struct sk_buff *skb;
--
--	local_bh_disable();
--	skb = napi_get_frags(napi);
--	WARN_ON_ONCE(!NAPI_HAS_SMALL_PAGE_FRAG && skb && skb->head_frag);
--	napi_free_frags(napi);
--	local_bh_enable();
--}
--
- void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
- {
- 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
-@@ -816,11 +741,8 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 
- 	/* If requested length is either too small or too big,
- 	 * we use kmalloc() for skb->head allocation.
--	 * When the small frag allocator is available, prefer it over kmalloc
--	 * for small fragments
- 	 */
--	if ((!NAPI_HAS_SMALL_PAGE_FRAG &&
--	     len <= SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE)) ||
-+	if (len <= SKB_WITH_OVERHEAD(SKB_SMALL_HEAD_CACHE_SIZE) ||
- 	    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
- 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
- 		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX | SKB_ALLOC_NAPI,
-@@ -830,32 +752,16 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		goto skb_success;
- 	}
- 
-+	len = SKB_HEAD_ALIGN(len);
-+
- 	if (sk_memalloc_socks())
- 		gfp_mask |= __GFP_MEMALLOC;
- 
- 	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 	nc = this_cpu_ptr(&napi_alloc_cache);
--	if (NAPI_HAS_SMALL_PAGE_FRAG && len <= SKB_WITH_OVERHEAD(1024)) {
--		/* we are artificially inflating the allocation size, but
--		 * that is not as bad as it may look like, as:
--		 * - 'len' less than GRO_MAX_HEAD makes little sense
--		 * - On most systems, larger 'len' values lead to fragment
--		 *   size above 512 bytes
--		 * - kmalloc would use the kmalloc-1k slab for such values
--		 * - Builds with smaller GRO_MAX_HEAD will very likely do
--		 *   little networking, as that implies no WiFi and no
--		 *   tunnels support, and 32 bits arches.
--		 */
--		len = SZ_1K;
- 
--		data = page_frag_alloc_1k(&nc->page_small, gfp_mask);
--		pfmemalloc = NAPI_SMALL_PAGE_PFMEMALLOC(nc->page_small);
--	} else {
--		len = SKB_HEAD_ALIGN(len);
--
--		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
--	}
-+	data = page_frag_alloc(&nc->page, len, gfp_mask);
-+	pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 	if (unlikely(!data))
+ drivers/net/phy/marvell-88q2xxx.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+---
+base-commit: 071ed42cff4fcdd89025d966d48eabef59913bf2
+change-id: 20250217-marvell-88q2xxx-hwmon-enable-at-probe-2a2666325985
+
+Best regards,
 -- 
-2.48.1
+Dimitri Fedrau <dima.fedrau@gmail.com>
 
 
