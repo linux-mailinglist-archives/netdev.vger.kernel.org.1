@@ -1,106 +1,80 @@
-Return-Path: <netdev+bounces-167130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571BFA38FEE
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:30:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97CB9A38FF2
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 01:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4600218922A6
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:30:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952411891ED6
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 00:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA95418E20;
-	Tue, 18 Feb 2025 00:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A996EC13D;
+	Tue, 18 Feb 2025 00:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="im1MYjQm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSuYdJaf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949DF182CD;
-	Tue, 18 Feb 2025 00:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBA979E1;
+	Tue, 18 Feb 2025 00:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739838603; cv=none; b=rV53QWZ3vFEjBTF7FV/t+sK6gAx2aRGUkA3+H78HCzts5OYrexnRC0hDGjqvqGA/G/4WNqv6SNXcfsbmid6WRRyt9IgVzK0jvnLB+0i55aUwqHTyBUKHiBEQ52Sn7KCKMUCkPs7in+IdLOX9RjfHTAY97AaqiCcw/2FIRk4EzKA=
+	t=1739838779; cv=none; b=QDxxf2Xv97UB+2wvbPdTETcNjDQhAi9jv7PKJgGTPBLm0UF3/qN7oXYvQn6qmyk+0he9aXpsr8fDV7zdJKVxLdH8wacePqlxrVP7sb7oG/CY0VpuUzpCSjMTd0emKayaan4yBONyZMoOyM/uE4KHHeFeYY/ndUnRBVTSSfVpuRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739838603; c=relaxed/simple;
-	bh=d6CWwgW19OdA/2Ji7FIZ+CWAq2AbqXRMXAygzlW8J8M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZHdJKbHc1pBa7BTc9/kMaAtICoTqOAhPoot9CRSOmJOLbPcOup5AUVueBqxFEhw1NcFYw/62Kqbfwb1hIDTnhyglmBO81rJaKyNoQGbAcJWxZtouy6ek5pi+1F6ugYHIyeKYhj1oh4beqQLUUrjswIcJ+K+PcAQ51NNHBmn3X1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=im1MYjQm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14468C4CEE7;
-	Tue, 18 Feb 2025 00:30:03 +0000 (UTC)
+	s=arc-20240116; t=1739838779; c=relaxed/simple;
+	bh=7TsYm0VQroDLIwBtLeWiZg26n3x1/vAnj9r5cLl1Yys=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dCaU/j2nYsC80sH9vwbYvbVoH4Atz3tzyE3q1qqIX/1XCoyfeNKXWqwYjYnTbI9FgFfI36xwpUADu17+F6ovDL/fprRIhJUxoUNC02kMG7ycwkL4Gf0MSZSDI7bwwzXiUa3/65GSTQJxOOo3Sm/H7lcoBS0vLW528uJPJZYUddc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSuYdJaf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64615C4CED1;
+	Tue, 18 Feb 2025 00:32:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739838603;
-	bh=d6CWwgW19OdA/2Ji7FIZ+CWAq2AbqXRMXAygzlW8J8M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=im1MYjQmyAtO7fQn6VjXNUjFYQ2QhbuAivdMVXl8TI6fAuzwPmTvY1YkeeHwlgB/c
-	 QuN/Nczrc8peJ69yW5gtJao/krpdVfDSlpnQEthZFteXbwHm0mSfh9AJ59JzkpoiMt
-	 vo9V8v9KtMdzqrJ/KU3/z4jAFRQlRRkh6GyCuSDX0bI4N8XPUzfYu4RRb2f7fiOQ/r
-	 34SBT+FKp/l0lMatdaLGO3duX0GYFAbeCn5W44eLD3DbSpY5bw6/yREIgPUh8PJx8h
-	 hKPDBTjOZUilbI13iyncqNj5xtOT8HOd2Ey5/o4PdS7ESduFpAVYmjbOs1r8dOMKO1
-	 SnIRucQI2Chww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71762380CEE2;
-	Tue, 18 Feb 2025 00:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1739838778;
+	bh=7TsYm0VQroDLIwBtLeWiZg26n3x1/vAnj9r5cLl1Yys=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XSuYdJafDRomcc3U5LvDDbZC82tRbN5EyNEI8WBqMehznMicBH0Gsnp5exaFarYMc
+	 qDZnf1Wu6uXAYL0WaC1R/BdMiQQsbeV9N8xbm7vdpECVRViy4wGWz3SmIXwcRaX5GW
+	 vtROAoeUHlmGOsjqhVF9DR19Y4+xd7uUYtQhycuu63NjXbf9W8emIjsJNCHUHm9reI
+	 7d4TqX5LvW3waM1o6WV1R2s2+2qg+23Kk93X4mEJZ8ZPcfOm7T5YKax01ad5f6zdV2
+	 SaoWMNK4BOe3dm9zwjX/U2iSbCEwWMGxq18nAWM2HkGyxkcCKAznd6MYdY+6vTCrMf
+	 SPqJ9GtY2gh/w==
+Date: Mon, 17 Feb 2025 16:32:56 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern
+ <dsahern@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>, kuniyu@amazon.co.jp,
+ ushankar@purestorage.com, kuniyu@amazon.com
+Subject: Re: [PATCH net v4 1/2] net: Add non-RCU dev_getbyhwaddr() helper
+Message-ID: <20250217163256.491b7990@kernel.org>
+In-Reply-To: <20250213-arm_fix_selftest-v4-1-26714529a6cf@debian.org>
+References: <20250213-arm_fix_selftest-v4-0-26714529a6cf@debian.org>
+	<20250213-arm_fix_selftest-v4-1-26714529a6cf@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] net: phy: mediatek: Add token-ring helper
- functions
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173983863299.3581223.1664796707026603430.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Feb 2025 00:30:32 +0000
-References: <20250213080553.921434-1-SkyLake.Huang@mediatek.com>
-In-Reply-To: <20250213080553.921434-1-SkyLake.Huang@mediatek.com>
-To: =?utf-8?b?U2t5TGFrZSBIdWFuZyAo6buD5ZWf5r6kKSA8c2t5bGFrZS5odWFuZ0BtZWRpYXRl?=@codeaurora.org,
-	=?utf-8?b?ay5jb20+?=@codeaurora.org
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- daniel@makrotopia.org, dqfext@gmail.com, SkyLake.Huang@mediatek.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- horms@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Steven.Liu@mediatek.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 13 Feb 2025 04:42:37 -0800 Breno Leitao wrote:
+> +static bool dev_comp_addr(struct net_device *dev, unsigned short type,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+sorry for the nit, but: dev_comp_addr() -> dev_addr_cmp() ?
 
-On Thu, 13 Feb 2025 16:05:48 +0800 you wrote:
-> From: Sky Huang <skylake.huang@mediatek.com>
-> 
-> This patchset add token-ring helper functions and moves some macros from
-> mtk-ge.c into mtk-phy-lib.c.
-> 
-> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
-> 
-> [...]
+cmp is the typical abbreviation for compare in C
 
-Here is the summary with links:
-  - [net-next,v2,1/5] net: phy: mediatek: Change to more meaningful macros
-    https://git.kernel.org/netdev/net-next/c/2f435137a048
-  - [net-next,v2,2/5] net: phy: mediatek: Add token ring access helper functions in mtk-phy-lib
-    https://git.kernel.org/netdev/net-next/c/afa08fde7c47
-  - [net-next,v2,3/5] net: phy: mediatek: Add token ring set bit operation support
-    https://git.kernel.org/netdev/net-next/c/40d33d6d3c90
-  - [net-next,v2,4/5] net: phy: mediatek: Add token ring clear bit operation support
-    https://git.kernel.org/netdev/net-next/c/4786eff288bc
-  - [net-next,v2,5/5] net: phy: mediatek: Move some macros to phy-lib for later use
-    https://git.kernel.org/netdev/net-next/c/be378ebd6cfb
+> + * dev_getbyhwaddr - find a device by its hardware address
 
-You are awesome, thank you!
+another tiny nit here: I think ideally there should be a () after the
+function name
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
