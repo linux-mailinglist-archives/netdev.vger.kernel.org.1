@@ -1,141 +1,146 @@
-Return-Path: <netdev+bounces-167384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 487EAA3A0C2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:05:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7DCA3A102
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 16:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D47D16510E
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:03:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113CD165D64
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 15:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA35D26AA8F;
-	Tue, 18 Feb 2025 15:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09526B96A;
+	Tue, 18 Feb 2025 15:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeHK4GAE"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BjcBlLn2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF5522AE4E
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 15:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAA026D5C8
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 15:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739890993; cv=none; b=uYDeLQt1XwvLQM4rTy2t8N193v7qu7AS5tRcF7yig4pPxqVlRjPwt3FH2nA+euA/vgxWF+LOaNp8iInlUxrhi9ZTO1GsCos6STEXv64ESQfUC3wrw73NAk2TmSXEGCDawVLVmLdMMlT407prL4CUj+xDtdm2mKqrW1gM/7OxKuA=
+	t=1739892106; cv=none; b=BaRnoeLE/Lc9CYT2P0AL8feV3AgBF/7mTl2JRBhe8ozbziSNpbs1NGS3Iv0hQabMy6Kv4gdfOMrzHKxNOBF8dwfsMtP4n26530Ug4WlVT0IVegYOeuEy1Rt+prinXU5KMFoxCU98UuZssPctj1RZ+/3agsvC56MdXJWbiR2swKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739890993; c=relaxed/simple;
-	bh=c74ZNXkpLj18bQQ/GIrBnl1QCYsto29cWJfNxFpdddY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kYGnyKHe4+ewdEdQMmGC1SHYvztAJwMEWN99NOMksdb1E91+NluTA4eMYGcDxzpbZQw16BdwaoYHxuSNz60fXlEM/1qUFqQtbAuQOBN1Fc4hDFQDqs+RhlWKBS5mQKXviQEV5e5koRQMApTYB9a1yohAS9PzlxPg8IgmnHPM0xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeHK4GAE; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c07838973eso531499585a.2
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 07:03:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739890991; x=1740495791; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kujaYswuwb3oO/m0MI7vxd44W0z40aE/z6FCixYlClI=;
-        b=NeHK4GAEkNN301D9veacO6tjky9qJtainMTcFvPd30u+Vzy8xQR63OoeW1m6e2QuuU
-         EMf9hqv54uCDPB6A2loj9V0XX8iif0eSUnWJc/9ioIrIrBQBRXbZDhOPoczLPhYpy5C9
-         LqgCEBIkiTYbJzkuAEud5+pY4rhieIhJ1HzZcYvtzStiFhjbD/jFxBXiBBcVfMMkXdKk
-         ajxmgGrvUI+WFXaCPS7yLDmllyGQvMmH7eiYJPhDvZKRJ1PoJzayV061MAPrhXaEzaNT
-         OxPsERyhA5wDhidlFPG+njfBCGsmZVcDcbEDKntIrLWJexiIPAVNVoFrivyvQf/s4S+G
-         SjYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739890991; x=1740495791;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kujaYswuwb3oO/m0MI7vxd44W0z40aE/z6FCixYlClI=;
-        b=ssfVt/113tdqL6LbawUXu5DmwzoAX/k65OiZhsgrU5ZAHmJCLMpXY4W5ABmPRajBhO
-         JNTa2XnGu8/BYiwndu7fKHhtq4y3de6S+KI2E7ygcixbUt5dr07Mi4oLvSLlz4hgJocs
-         6tNjy5YVxpBkHr4LksoaIHlYEdt/vpLwfHgnbGYKm8XMpac7o0ZlVkxh2PvdFxCo7CAr
-         /ER7fWrskjXyOB/oDY69pDN+B+VdLeFnx0/imbF5DXJkCue3QpyIOiDG/dE+pJhez0yD
-         cPPj7CcIfuj0tk5PUZCbHUguibxU/sCuWGDg3hMZIDEk0SmCnbrEr8TbWy0/gKh8LYBF
-         FEDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUF4Bj7I8ETE/nUiVdhiSR+KR3XVcmhmP34RuXfO42UDyRaeWFW6JDWgyddtk7cvaJ8jZBsL/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrb1PjW61p5vXfHM5CIagoLLW21lPg/GmyIIWHs+i/AuwCA/nl
-	YLJPmDip03QBb60iy9xR0s8zFnbX4LxLinHmb6Ew4vnrNJtz6gae
-X-Gm-Gg: ASbGnctyakY8XMfGozdWE5kldVrbBYkwshD/kM69lfO1Q3uKImSwyiH030NN03DJbmz
-	+PpPuTdNiRFu8LQoOdjKKDS8dq5cB4x8+y2ROBh+1exlHo5x4e0RCNXKHICyOrE9NK0Fr6bV+Th
-	EevPqaez7XcZ3zF26E+LRoyyPV6ZP6DrxVj3erMBybMtzWiR4XpgNLgXcQdKHRQbMQOwiDtq99N
-	ZR9Gk/20ZBy+N37jbBqxW0xKyYL1ko3Gl7j4uVdqn2lvfbdKKzcJwl5ujexdwziPt/Mod1/LB0j
-	8kkaeC42sVpB4w3dO+OV14KFpu48dkNs6mvvFJvaLOOL+lElsgM4icK1ZnwuWuU=
-X-Google-Smtp-Source: AGHT+IH12YOvfE4C+/XGnHePJZcmUpPNJjWDYSLZeQKfAgImQe3rBIEzYPcDz37ONKO83tpgXLTgiw==
-X-Received: by 2002:a05:620a:44ca:b0:7c0:af6d:a522 with SMTP id af79cd13be357-7c0af6da6f2mr279844285a.33.1739890990996;
-        Tue, 18 Feb 2025 07:03:10 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d7a40b2sm64426236d6.58.2025.02.18.07.03.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 07:03:10 -0800 (PST)
-Date: Tue, 18 Feb 2025 10:03:10 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- petrm@nvidia.com
-Message-ID: <67b4a12e2c118_11781b294a2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250218064801.2b43ad83@kernel.org>
-References: <20250217194200.3011136-1-kuba@kernel.org>
- <20250217194200.3011136-4-kuba@kernel.org>
- <67b3df4f8d88a_c0e2529493@willemb.c.googlers.com.notmuch>
- <Z7QK5BBo-ufND1yB@mini-arch>
- <20250218064801.2b43ad83@kernel.org>
-Subject: Re: [PATCH net-next v3 3/4] selftests: drv-net: store addresses in
- dict indexed by ipver
+	s=arc-20240116; t=1739892106; c=relaxed/simple;
+	bh=6WtVAfAhOQBhmPNF3eva73UYC/Wsc3+i+rBcWuwzoCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cv1LqTFDb3teyDaIpW4mTg/9Z3r9bUDgcCpYrBlkWMLRi4jggUbnhOO7gxM9vAd5Q9L8SKUhtJhW77EkiXJ4utYDqolW5H6yFvkxxwXlMKeNdh6CyikL97yyQfw9ylP9fzMK2a/IrY8yx3JbISRZUOrK3g0kZqTXWopXby28rEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BjcBlLn2; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 4E935114023B;
+	Tue, 18 Feb 2025 10:21:43 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Tue, 18 Feb 2025 10:21:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1739892103; x=
+	1739978503; bh=ESiXGQA7LoMCz2qROe4jft1yBdvs96YNdMTAzY4Vrik=; b=B
+	jcBlLn2TJVPo+XQ7fTaCQStL19HdyoB3szzpWCNW0MKZqdEYt4ANamBmIj6W2H+2
+	T30RXAI8ei/d/YbyzLvF5VOrJnvDA9IRPQYyrEu/lOodfsXiBKo50opDo9SP0EBR
+	3ix8Lkj0JEx+Grr5VdDVzpLeqS6MhX0iBzsDvYv8+OJScNpZuxMGQdxkeUAbjczL
+	v9lQdG0/RyIfasREMWD/aYlrvzC1DuJuft581Zwpbe49+Wdscjxy/IVpT5fUWQvq
+	2iJeo522ocGQJsoJ17f8hJS+0h2Qr9kE6vTARMLXdeHrXo4W9KrS/0R0KjE83dSt
+	m2ZD3blIFCeIWX2mF35nw==
+X-ME-Sender: <xms:hqW0Z9XJ8yK-gEuMzMwSyb6AAE5FQvQJ1GJQVmwsXnPG3UOSFv7bzA>
+    <xme:hqW0Z9lpdPex8avMuqrOTfoIKWjJjnYxgJp_hZTSWYwe_abMEc4Dg9AT_u5Lskki6
+    GcBD_64O0F0hsE>
+X-ME-Received: <xmr:hqW0Z5ZfFq2Jts5hD_2JV5rpIOgj-IbtY7NzvQ8hMO8_KcXdDYGWsy29On8a>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeiudeiiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
+    jeenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
+    drohhrgheqnecuggftrfgrthhtvghrnhepkeeggfeghfeuvdegtedtgedvuedvhfdujedv
+    vdejteelvdeutdehheellefhhfdunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
+    thhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhutghivghnrdigih
+    hnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghphhgvnhesnhgvthifohhrkhhp
+    lhhumhgsvghrrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehfmhgvihesshhfshdrtghomhdprhgtphhtthhopeifvghifigrnhesghhooh
+    hglhgvrdgtohhm
+X-ME-Proxy: <xmx:hqW0ZwXjkkMtkBYbZoS70YDt25QjPY_KOjKj8yANSrNOarUBn8t4-w>
+    <xmx:hqW0Z3nrYJhnS64RbhZCFgQFWKTVqLUnLxZBRj6AOktLDmKfMtzMOQ>
+    <xmx:hqW0Z9eURXd8IArSrqalY5nMyzH--WcoZyRbjbzpx_1Dc17kEiePgg>
+    <xmx:hqW0ZxEbK2c-MlWGpAnXmgNfxHYsGSoaLqw3GZuN0LjXlLtBInDMcA>
+    <xmx:h6W0Zyv1QAKFOBT2vcBJxXKALynNSx-ZVMcwAD316kJHJAHm9iJCbHfO>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 18 Feb 2025 10:21:41 -0500 (EST)
+Date: Tue, 18 Feb 2025 17:21:38 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, edumazet@google.com,
+	netdev@vger.kernel.org, fmei@sfs.com, Wei Wang <weiwan@google.com>
+Subject: Re: Fw: [Bug 219766] New: Garbage Ethernet Frames
+Message-ID: <Z7SlggSKBDk2wDj-@shredder>
+References: <20250210084931.23a5c2e4@hermes.local>
+ <Z7D9cR22BDPN7WSJ@shredder>
+ <CADvbK_eZp5ikahxH4wvPm5_PuK1khvVKpGnY5LUd9nwHgS96Cw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvbK_eZp5ikahxH4wvPm5_PuK1khvVKpGnY5LUd9nwHgS96Cw@mail.gmail.com>
 
-Jakub Kicinski wrote:
-> On Mon, 17 Feb 2025 20:21:56 -0800 Stanislav Fomichev wrote:
-> > > >  def test_v4(cfg) -> None:
-> > > > -    cfg.require_v4()
-> > > > +    cfg.require_ipver("4")
-> > > >  
-> > > > -    cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
-> > > > -    cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
-> > > > +    cmd(f"ping -c 1 -W0.5 {cfg.remote_addr_v["4"]}")
-> > > > +    cmd(f"ping -c 1 -W0.5 {cfg.addr_v["4"]}", host=cfg.remote)  
-> > > 
-> > > Here and below, intended to use single quote around constant?  
-> > 
-> > Let's kick it off the testing queue as well..
-> > 
-> > # overriding timeout to 90
-> > # selftests: drivers/net: ping.py
-> > #   File "/home/virtme/testing-18/tools/testing/selftests/drivers/net/./ping.py", line 13
-> > #     cmd(f"ping -c 1 -W0.5 {cfg.remote_addr_v["4"]}")
-> > #                                               ^
-> > # SyntaxError: f-string: unmatched '['
+On Mon, Feb 17, 2025 at 05:31:16PM -0500, Xin Long wrote:
+> On Sat, Feb 15, 2025 at 3:47 PM Ido Schimmel <idosch@idosch.org> wrote:
+> > Another possible solution is to have the blackhole device consume the
+> > packets instead of letting them go out without an Ethernet header [4].
+> > Doesn't seem great as the packets disappear without telling anyone
+> > (before 22600596b675 an error was returned).
+> This looks fine to me. The fix in commit 22600596b675 was specifically
+> intended to prevent an error from being returned in these cases, as it
+> would break userspace UDP applications.
+
+Yes, I later realized that this is fine as well. Packets are already
+discarded today via dst_discard_out() if dst_dev_put() was called on a
+dst entry before calling dst_output():
+
+# bpftrace -e 'k:dst_discard_out { @[kstack()] = count(); }'
+Attaching 1 probe...
+^C
+
+@[
+    dst_discard_out+5
+    ip_send_skb+25
+    udp_send_skb+376
+    udp_sendmsg+2516
+    sock_write_iter+365
+    vfs_write+937
+    ksys_write+200
+    do_syscall_64+158
+    entry_SYSCALL_64_after_hwframe+119
+]: 2034
+
+While running the reproducer I shared earlier.
+
+> If you prefer to avoid silent drops, you could add a warning like:
 > 
-> Huh, it worked for me locally, must be a python version thing..
+>   net_warn_ratelimited("%s(): Dropping skb.\n", __func__);
 > 
-> Python 3.13.2
-> 
-> >>> a={"a": ' '}
-> >>> f"test{a["a"]}test"
-> 'test test'
+> similar to how blackhole_netdev_xmit() handles it.
 
-Failed for me on 3.11.
+I would like to avoid spamming the kernel log with these messages. I
+checked and we see these messages on a few machines while running the
+IPv6 torture tests in fib_nexthops.sh. Maybe in net-next I will add a
+new drop reason for these scenarios.
 
-Apparently this was indeed addressed in 3.12:
+> Thanks.
 
-https://realpython.com/python-f-strings/#using-quotation-marks
+Thanks. I will run this patch through regression and post later this
+week if everything is fine.
 
