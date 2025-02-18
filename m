@@ -1,142 +1,198 @@
-Return-Path: <netdev+bounces-167277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79271A39902
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:34:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5EAA3995C
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 11:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 375153A2040
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:27:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B6E8163030
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 10:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3291723C8C2;
-	Tue, 18 Feb 2025 10:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288992343C5;
+	Tue, 18 Feb 2025 10:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJIlFz8f"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="o6c4u2Hq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DFF23957C
-	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 10:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FA418C933;
+	Tue, 18 Feb 2025 10:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739874391; cv=none; b=I+Gq8gxJMJN8T8bl/rKLejj57w9e3pqxgrBHwo+HApYCSEM1serM8y67FGMJR4SE3w42dMLGTX70rHJ6bGgTEEunJgx8dnmsMk836gGzTMuZVHpfTJfhSG0ECaGsZ/ENhLlvHZS7ZIwlWQ/OpFfTdt6iQy3TW5hZxEFr4uwhwzg=
+	t=1739875262; cv=none; b=U+vLcDpFD9w2ogMwe1HPaiB3FCVBG62WCps1lohdPDzrGxtcBYXo3nUHoFwaKC5C3R1+TWcMxAGfn4hN+Xhg18omKsLblS7KPh4yEAvBqXluOSY0xDt8ll+CrOcuufvzr9IeS5FZJaYBEp3hBJkWuxrPRSrKOYAKpvcODAswWa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739874391; c=relaxed/simple;
-	bh=lTGVYVOIgtjNSuSseJT7KQGGiUReOwLr3tUic5SDfP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MrGoVi8L4xh0iClfRXbKB+Aorc7fGfT7wgNLkJ98tDww9Wdz1dPJLetllBJZDTqLM8kg5Y7LQfJ4krfaBYDMBuxVTQiO9ZuRtOSYH20L8DBlF/AsmeG6HqhMxqybdWpfSMCfcx4TU40i6xXVLJfaLktvrhtziLKOUrN390uBvZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fJIlFz8f; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739874387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vj8aRneA036R40Z/93/r0n4BsJ0KrjIQQUbrcu4BIVM=;
-	b=fJIlFz8fhKjMNuDYkNkYU4agBDaAtWnpkX0tMYFrxoYMx/cEKP/i5aIj8i5/rD+l8BkLuy
-	I4m+RfwckfRlN/tgcYOp1hou1wHwZtQoecp/vMGK7Gtocm13248R46nL8j0p7JBt/EHwm9
-	eAFdBmUzecKkTf5GCt7AlOFwlaEVMCU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-451-pwRIPk18OB2pU9yL8oGm9w-1; Tue, 18 Feb 2025 05:26:25 -0500
-X-MC-Unique: pwRIPk18OB2pU9yL8oGm9w-1
-X-Mimecast-MFC-AGG-ID: pwRIPk18OB2pU9yL8oGm9w_1739874385
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43961fb0bafso27051475e9.2
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 02:26:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739874384; x=1740479184;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vj8aRneA036R40Z/93/r0n4BsJ0KrjIQQUbrcu4BIVM=;
-        b=OiaK7NfrwByuGHqaG0M9Zq92zQWLI0ZdIq3ofmrgMd4piKzEOPvAq/uWxGuIbmysH5
-         HyawbSnwwkgGRdgXD7Lxfh0TT9VJabBhAFIP4Obd/DxyaDu/kUf2nGPLjZ/llkHMaIBz
-         K5W1s0xBKSC28UrryoGSelEsIsyEo3v9XjORa4E7Y7M5QPwkZN4MJNZXjEwiYoiUDF8T
-         xi1zUnIF0C/H1fPDUZhWx2LXOpiY3lH+8DJ4VszwyOERdKhkFfEHVdI+fcq/jicjPcAf
-         lGKk8f0S8Ij+S/xoTT08T0qJ76wnJdMJaP1YXk41Kd/ctnlSfubsyakb4M1dpnDmAvtT
-         d8Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCXqhIjpoxO36TRF+Vntt/LeSHNqUN8bJpHM0Ez35lb01Ru2Rd+pXXvFkRdfXTbvd5YCONgxpe4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx26OhfBsIcgqRWiLALeIL3UNJDT0plgbXx6dklnEd7qD/SzHnL
-	L9LrxBGNBOVH88ddK+CqFXONzwNoPfa7BYTPq4ykThSLxHXJg5T740cVetIm4jvBSA5cDbocetq
-	xE+6iPOjE3S/85Ac1JufkKr4Qh0tqsuambNkCekTGmX62HkREtjaLLg==
-X-Gm-Gg: ASbGncvXkEo8ZAgJuYp4ehEHgyLOkevxy+Bi6J6wq9pwDm1nCDWniyZMtDgRU28yUbj
-	9MvVKvfwTysXRs2I7/4aahrjmsyBW0rNA+kNIoIti1zmItBTXw2R6BS3m034aZaFtQROP1Z16EM
-	0eyxcvV242x8pHX6zN0WVrFznfLq4GlT8SYRXwmMpBndthC4v2bG3iN+Mn6CDaK+ute1ami3Njz
-	s2HNJL646sglyrvMzA/CALAujKmDdAUEjlylvFJuyNdxSQE/r4hjprx2+sErukjpu1tqpS25+U3
-	VjSH8FmvOgvJM1fKUOA3mymLybexzpbOvBU=
-X-Received: by 2002:a05:600c:3ca3:b0:439:5f7a:e259 with SMTP id 5b1f17b1804b1-4396e739aa7mr116417555e9.23.1739874384575;
-        Tue, 18 Feb 2025 02:26:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGkSU/VSnOl2Lx5jSHDnvFMf1SdmHIIFIgmwDPLjf61CIhWkI2u1PLCMfAvVZ5aFuhqVLRdZQ==
-X-Received: by 2002:a05:600c:3ca3:b0:439:5f7a:e259 with SMTP id 5b1f17b1804b1-4396e739aa7mr116417345e9.23.1739874384260;
-        Tue, 18 Feb 2025 02:26:24 -0800 (PST)
-Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982bcc607sm58367795e9.16.2025.02.18.02.26.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 02:26:23 -0800 (PST)
-Message-ID: <1ff73b64-2745-473d-a12d-87e1501262d5@redhat.com>
-Date: Tue, 18 Feb 2025 11:26:21 +0100
+	s=arc-20240116; t=1739875262; c=relaxed/simple;
+	bh=76Az1Nrp9KPwWRLvYAkwkDtEEMlYOkX/gn4Wm54Ggeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WhhbVbiQ1kF30meX+ziNVD+twjlJ4E+ctfGYeihmzobSkXJFh8sjUjLiCBvi+qkv5LxXx/BFSpN/fI5FuP270mSH4raPmGTQ7FBLg8O6MHaK5awT92o5ccV0OyRjVLEd4/CF8Cx1nVEmpEoanvrJQFcRcg4dUe5I+PZn1BD3ZqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=o6c4u2Hq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Z8u1HFNvQFj00JNaA7UaE7kZ0fKIp/C21Or6VG3Kq3c=; b=o6c4u2Hq6aOiw0zopooYt7wvcp
+	E3+jJCUM7nHq46JD0aXLOfQ5Jm9ZhiuFSdXnxjiWn9cVMEovMxHN7TD4ujzEjPQEVc6txt7E4gDph
+	BHWvbtGL9aaT4ZgG0CHp7d6oKKCXz32SmZ0jB9UccZ/92My6rP3+Y5OrkuvJ8ftIm4VjlE02Pbr4k
+	nIrWR3UsptipUVbzuYoaJvi8ShzHrPLpO88aDnZusLz1wytWrp0eazSi9VGFBz9Pa7EZgViJT1rCI
+	Ae0dUoitzhjc8huX/pRHtI95OX5/ZxGGj5lqlzmrV1FnqdO7uzbiTcQG61C0pcjWDafsPxQS+tWSX
+	ji52VNQQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48852)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tkL1a-0001bu-2a;
+	Tue, 18 Feb 2025 10:40:22 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tkL1S-0007CN-2u;
+	Tue, 18 Feb 2025 10:40:14 +0000
+Date: Tue, 18 Feb 2025 10:40:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Lothar Rubusch <l.rubusch@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add glue layer for Sophgo
+ SG2044 SoC
+Message-ID: <Z7Rjjo5nZ0gnCbzq@shell.armlinux.org.uk>
+References: <20250216123953.1252523-1-inochiama@gmail.com>
+ <20250216123953.1252523-4-inochiama@gmail.com>
+ <Z7IIht2Q-iXEFw7x@shell.armlinux.org.uk>
+ <5e481b95-3cf8-4f71-a76b-939d96e1c4f3@lunn.ch>
+ <js3z3ra7fyg4qwxbly24xqpnvsv76jyikbhk7aturqigewllbx@gvus6ub46vow>
+ <24eecc48-9061-4575-9e3b-6ef35226407a@lunn.ch>
+ <Z7NDakd7zpQ_345D@shell.armlinux.org.uk>
+ <rsysy3p5ium5umzz34rtinppcu2b36klgjdtq5j4lm3mylbqbz@z44yeje5wgat>
+ <Z7PEeGmNvlYD33rZ@shell.armlinux.org.uk>
+ <6obom7jyciq2kqw5iuqlugbzbsebgd7ymnq2crlm565ybbz7de@n7o3tcqn5idi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v6 6/6] octeontx2-pf: AF_XDP zero copy transmit
- support
-To: Suman Ghosh <sumang@marvell.com>, horms@kernel.org, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lcherian@marvell.com,
- jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
- hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
- daniel@iogearbox.net, bpf@vger.kernel.org, larysa.zaremba@intel.com
-References: <20250213053141.2833254-1-sumang@marvell.com>
- <20250213053141.2833254-7-sumang@marvell.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250213053141.2833254-7-sumang@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6obom7jyciq2kqw5iuqlugbzbsebgd7ymnq2crlm565ybbz7de@n7o3tcqn5idi>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2/13/25 6:31 AM, Suman Ghosh wrote:
-> +void otx2_zc_napi_handler(struct otx2_nic *pfvf, struct xsk_buff_pool *pool,
-> +			  int queue, int budget)
-> +{
-> +	struct xdp_desc *xdp_desc = pool->tx_descs;
-> +	int err, i, work_done = 0, batch;
-> +
-> +	budget = min(budget, otx2_read_free_sqe(pfvf, queue));
-> +	batch = xsk_tx_peek_release_desc_batch(pool, budget);
-> +	if (!batch)
-> +		return;
-> +
-> +	for (i = 0; i < batch; i++) {
-> +		dma_addr_t dma_addr;
-> +
-> +		dma_addr = xsk_buff_raw_get_dma(pool, xdp_desc[i].addr);
-> +		err = otx2_xdp_sq_append_pkt(pfvf, NULL, dma_addr, xdp_desc[i].len,
-> +					     queue, OTX2_AF_XDP_FRAME);
-> +		if (!err) {
-> +			netdev_err(pfvf->netdev, "AF_XDP: Unable to transfer packet err%d\n", err);
+On Tue, Feb 18, 2025 at 09:01:59AM +0800, Inochi Amaoto wrote:
+> On Mon, Feb 17, 2025 at 11:21:28PM +0000, Russell King (Oracle) wrote:
+> > On Tue, Feb 18, 2025 at 06:50:24AM +0800, Inochi Amaoto wrote:
+> > > On Mon, Feb 17, 2025 at 02:10:50PM +0000, Russell King (Oracle) wrote:
+> > > > On Mon, Feb 17, 2025 at 02:25:33PM +0100, Andrew Lunn wrote:
+> > > > > > I am not sure all whether devices has this clock, but it appears in
+> > > > > > the databook. So I think it is possible to move this in the core so
+> > > > > > any platform with these clock can reuse it.
+> > > > > 
+> > > > > Great
+> > > > > 
+> > > > > The next problem will be, has everybody called it the same thing in
+> > > > > DT. Since there has been a lot of cut/paste, maybe they have, by
+> > > > > accident.
+> > > > 
+> > > > Tegra186: "tx"
+> > > > imx: "tx"
+> > > > intel: "tx_clk"
+> > > > rk: "clk_mac_speed"
+> > > > s32: "tx"
+> > > > starfive: "tx"
+> > > > sti: "sti-ethclk"
+> > > > 
+> > > 
+> > > The dwc-qos-eth also use clock name "tx", but set the clock with
+> > > extra calibration logic.
+> > 
+> > Yep, that's what I meant by "Tegra186" above.
+> > 
+> > > > so 50% have settled on "tx" and the rest are doing their own thing, and
+> > > > that horse has already bolted.
+> > > > 
+> > > 
+> > > The "rx" clock in s32 also uses the same logic. I think the core also
+> > > needs to take it, as this rx clock is also mentioned in the databook.
+> > 
+> > The "rx" clock on s32 seems to only be set to 125MHz, and the driver
+> > seems to be limited to RGMII.
+> > 
+> > This seems weird as the receive clock is supposed to be supplied by the
+> > PHY, and is recovered from the media (and thus will be 2.5, 25 or
+> > 125MHz as determined by the PHY.) So, I'm not sure that the s32 "rx"
+> > clock is really the clk_rx_i clock supplied to the DWMAC core.
+> > 
+> > Certainly on stm32mp151, it states that ETH_RX_CLK in RGMII mode will
+> > be 2.5, 25 or 125MHz provided by the PHY, and the clock tree indicates
+> > that ETH_RX_CLK in RGMII mode will be routed directly to the clk_rx_i
+> > input on the DWMAC(4) core.
+> > 
+> 
+> RGMII is not the problem. The databook says the RGMII clock (rx/tx)
+> follows this set rate logic. 
 
-Here `err` is always 0, dumping it's value is quite confusing.
+Sorry, I find this ambiguous. "This" doesn't tell me whether you are
+referring to either what s32 does (setting the "rx" clock to 125MHz
+only) or what RGMII spec says about RX_CLK (which is that it comes from
+the PHY and is 2.5/25/125MHz) which stm32mp151 agrees with and feeds
+the PHY's RX_CLK to the clk_rx_i inputs on the DWMAC in RGMII, GMII
+and MII modes.
 
-The root cause is that otx2_xdp_sq_append_pkt() returns a success
-boolean value, the variable holding it should possibly be renamed
-accordingly.
+clk_rx_i comes through a bunch of muxes on stm32mp151. When the clock
+tree is configured for RMII mode, the rate on clk_rx_i depends on the
+MAC speed (10/100Mbps).
 
-Since this is the only nit I could find, I think we are better without a
-repost, but please follow-up on this chunk soon.
+This suggests as far as the core is concerned, the clock supplied as
+clk_rx_i isn't a fixed rate clock but depends on the speed just like
+the transmit clock.
 
-Thanks,
+> For other things, I agree with you. A fixed "rx" clock does reach the
+> limit of what I know. And the databook told nothing about it. As we
+> can not determine the rx clock of s32 and it may be set for the phy,
+> it will be better to not move it into the core.
 
-Paolo
+I'm intending to leave s32's rx clock alone for this reason as it does
+not match what I expect. Maybe on s32 there is a bunch of dividers
+which are selected by the mac_speed_o signals from the core to divide
+the 125MHz clock down to 25 or 2.5MHz for 100 and 10Mbps respectively.
+As I don't know, it's safer that I leave it alone as that means the
+"rx" clock used there is not clk_rx_i.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
