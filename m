@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-167492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54372A3A7FB
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:47:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B024A3A7EB
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 20:44:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560F318857C1
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:47:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80384173FC8
+	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 19:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381CE1B3725;
-	Tue, 18 Feb 2025 19:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45A81E835F;
+	Tue, 18 Feb 2025 19:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="nsRDHHiF"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="nFB1wImg"
 X-Original-To: netdev@vger.kernel.org
-Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A747D21B9EA;
-	Tue, 18 Feb 2025 19:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E35E1ACEDA
+	for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 19:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739908042; cv=none; b=Gd4NnW72gDcR50m4O/Om4cenX8zkj9amIKQ1dSjVIiOHmHJH1PA16+RZwOj+5jVeIwT3HQrdPRtWoeN5I36Zp0Dec6PN/3TDQR1mmJ3OpbFYkca2GDCdoMOXYT4aJx/+iiQWpf4kP9DIXxzdVprevU16xMdSTH2SOArNgPEX1K4=
+	t=1739907828; cv=none; b=k0HPqrvZugDNYIrQnuiHakzk8nIzLXINVuGWhAJDWe79tzoV7OeRfoZLGwBr3Wz6JngmpL9ObinBi8RFxtVqDDfmDOcvApvS+r7pY8XOa+dmHlNCCqg2xLmwUwhLBTmTCORm6/Dg5wp1d6rRZgSgbSeGYdG1DAQkRDwtVP2Kbrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739908042; c=relaxed/simple;
-	bh=KEeAPqwdWAl+/oPSkdxO2/o1p3K53MqPyinGxQV+SCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ppnf3HU8oz445ebp/ZMN9aSV9hiTWJG39WDSE/UwljAfNiu6q7CZsRk7MV0sNt2LFprRHAJLy8hSBp3pZU9mBQBqe938R/t7spOpibQ5jj8L4aAxUQs/plTx3rbsPFcMAN19GSWDsfxEQloJvEBX9NwDwDXJ2TnJuo87G4M4310=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=nsRDHHiF; arc=none smtp.client-ip=136.144.140.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
-	t=1739907661; bh=KEeAPqwdWAl+/oPSkdxO2/o1p3K53MqPyinGxQV+SCc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nsRDHHiFwywQtXgRDqOg7hjVJsQ0/sF2W7aCUa+/Ad7ruWuhbmpjm4C2LoIVDIiOi
-	 TJT/tnwg1gpZUXUpR+Dgp0vpCap9Xz5JitoJ1ALe3v2y6qt1Ilxs+D6VDeURMB9MGB
-	 85nrbbgQUDZYPxZsG/gJgcCv4UEG30ZUqoonLv6dJXwQdC8BpxfkAc7uXVoprpNsAL
-	 pOQ6Pi1E1OhDqM9SyjgiPiX79y67eEa/ix8uB4XvrbYjgNM9uYbnsLVgS4kIJ6rplr
-	 I0qAPRcTNNXV4T0mV6FtK9ez1tLV6HmJOVdJR9tyQVda0qceQeLkZBMiho5qjri30n
-	 I2GFY+YMwru43a6I8qSPtU5X9Km4zBexDfNW2sDf1cUbON2c1U5U05HhFuy9osCaJJ
-	 qSdr/vqIqZ1+NXPkHByrACB6TdAm4rcsl9BWrubDbOoU4mL61Xl2D6VirfWBndqgaW
-	 gFklSNwK25MDnoO6KrnrHEq+q064+mefWJvQ4nXeUe2lopbn3Ha0IVwZP2m7uVRkrf
-	 otkeUCFbUTNVE1gqawN9cVCywsxSIlrkzJz3K1l5Ihhm2o0qch05nqYz8MFf2lrK7y
-	 cOwdfa2MkuAoW/JwYHn2AdyQ0JRfS9MafLgpMu0TlAYnB7bw2C6uED3x8N1AO6m1cs
-	 XmPfzleEbPJgqicX6UMn9Gwk=
-Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
-	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id 540CF160133;
-	Tue, 18 Feb 2025 20:41:00 +0100 (CET)
-Message-ID: <cc1b81b3-f02c-46d0-b4be-34bba23d20c7@ijzerbout.nl>
-Date: Tue, 18 Feb 2025 20:40:57 +0100
+	s=arc-20240116; t=1739907828; c=relaxed/simple;
+	bh=LpAAQoUNk3/39b+DDE7ghJY0MayIzXSvCJY+PvaQz7w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=euGSXf2U/FWE9ZfuYPALyntYRnt7vQPa6bvrh2tm5pO98PDZwW46eT3iTdbzQHZSajQdKVTQXJhYTf3S0gAyTA/tr8C3lwBmD2un43jbm6X7CTy7XlJAd2SlSJkXMDaYQ3eQaIIcoOMyRoH4aDajmtm1WE6Dmj3HABEKClfSzek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=nFB1wImg; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 7FF312C045C;
+	Wed, 19 Feb 2025 08:43:38 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1739907818;
+	bh=LpAAQoUNk3/39b+DDE7ghJY0MayIzXSvCJY+PvaQz7w=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=nFB1wImg9SRRglJ+kgHaveyaJI3LEsrDRzLeMdCzHcxTMc9kQZwo0dBg6OOJvrZ10
+	 INu+ZvuSk2e9qnTQZjeDMkWJUXaOVUwn+9tXL7DDGuCZQ4br0V0aw2E7nGJfK8zt0/
+	 40xHh7rK9sLFNJi3hPtEDoWP4mIbY4QQYLm0epRu9/FzexrLtTz2JcdV/omSCJq0qQ
+	 KPrbnihqYGHA+0jB2pNeiglPvNfqhVJbnFLZg+279fS+hH0E96jEtca7EGt9XKOyzN
+	 tzeDAbyJe+c9PvsebgusRM9x0/rdSO3+vGLt/YSf2N5uc+7r0Mi1F6ynKfR+LM/8HQ
+	 WaLx1AQxg8fUQ==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B67b4e2ea0001>; Wed, 19 Feb 2025 08:43:38 +1300
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 19 Feb 2025 08:43:38 +1300
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Wed, 19 Feb 2025 08:43:38 +1300
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"lee@kernel.org" <lee@kernel.org>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: Re: [PATCH net-next 0/5] dt-bindings: net: realtek,rtl9301-switch
+Thread-Topic: [PATCH net-next 0/5] dt-bindings: net: realtek,rtl9301-switch
+Thread-Index: AQHbe00LR12J3rc01k2nBSeLzVaK0LNGgv4AgAXW2oCAAFBtgA==
+Date: Tue, 18 Feb 2025 19:43:38 +0000
+Message-ID: <afecbb81-da65-4da3-a97a-8ae4beca410f@alliedtelesis.co.nz>
+References: <20250209234751.460404-1-chris.packham@alliedtelesis.co.nz>
+ <20250214134528.4630b6b2@kernel.org> <20250218065545.533bab5f@kernel.org>
+In-Reply-To: <20250218065545.533bab5f@kernel.org>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E8D506536F748D46BC21760B7E4536B5@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 07/11] io_uring/zcrx: set pp memory provider for an rx
- queue
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>, lizetao <lizetao1@huawei.com>
-References: <20250215000947.789731-1-dw@davidwei.uk>
- <20250215000947.789731-8-dw@davidwei.uk>
-Content-Language: en-US
-From: Kees Bakker <kees@ijzerbout.nl>
-In-Reply-To: <20250215000947.789731-8-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=ccpxrWDM c=1 sm=1 tr=0 ts=67b4e2ea a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=T2h4t0Lz3GQA:10 a=1BCOp0UO-uXOSZf1QVgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-Op 15-02-2025 om 01:09 schreef David Wei:
-> Set the page pool memory provider for the rx queue configured for zero
-> copy to io_uring. Then the rx queue is reset using
-> netdev_rx_queue_restart() and netdev core + page pool will take care of
-> filling the rx queue from the io_uring zero copy memory provider.
->
-> For now, there is only one ifq so its destruction happens implicitly
-> during io_uring cleanup.
->
-> Reviewed-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->   io_uring/zcrx.c | 49 +++++++++++++++++++++++++++++++++++++++++--------
->   1 file changed, 41 insertions(+), 8 deletions(-)
->
-> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> index 8833879d94ba..7d24fc98b306 100644
-> --- a/io_uring/zcrx.c
-> +++ b/io_uring/zcrx.c
-> [...]
-> @@ -444,6 +475,8 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
->   
->   	if (ctx->ifq)
->   		io_zcrx_scrub(ctx->ifq);
-> +
-> +	io_close_queue(ctx->ifq);
-If ctx->ifq is NULL (which seems to be not unlikely given the if 
-statement above)
-then you'll get a NULL pointer dereference in io_close_queue().
->   }
->   
->   static inline u32 io_zcrx_rqring_entries(struct io_zcrx_ifq *ifq)
-
+SGkgSmFrdWIsDQoNCk9uIDE5LzAyLzIwMjUgMDM6NTUsIEpha3ViIEtpY2luc2tpIHdyb3RlOg0K
+PiBPbiBGcmksIDE0IEZlYiAyMDI1IDEzOjQ1OjI4IC0wODAwIEpha3ViIEtpY2luc2tpIHdyb3Rl
+Og0KPj4gT24gTW9uLCAxMCBGZWIgMjAyNSAxMjo0Nzo0NiArMTMwMCBDaHJpcyBQYWNraGFtIHdy
+b3RlOg0KPj4+ICAgIGR0LWJpbmRpbmdzOiBuZXQ6IE1vdmUgcmVhbHRlayxydGw5MzAxLXN3aXRj
+aCB0byBuZXQNCj4+PiAgICBkdC1iaW5kaW5nczogbmV0OiBBZGQgc3dpdGNoIHBvcnRzIGFuZCBp
+bnRlcnJ1cHRzIHRvIFJUTDkzMDANCj4+PiAgICBkdC1iaW5kaW5nczogbmV0OiBBZGQgUmVhbHRl
+ayBNRElPIGNvbnRyb2xsZXINCj4+IEFGQUlVIHdlJ3JlIHdhaXRpbmcgZm9yIGEgcmV2aWV3IGZy
+b20gRFQgbWFpbnRhaW5lcnMgb24gdGhpcyBvbmUsDQo+PiBpcyB0aGlzIHNlcmllcyBvbiB5b3Vy
+IHJhZGFyPw0KPiBOb3Qgc3VyZSB3aHkgd2UncmUgZ2V0dGluZyBubyByZXZpZXdzIGhlcmUuDQo+
+IENocmlzLCBjb3VsZCB5b3UgcmVwb3N0PyBNYXliZSB3ZSdsbCBnZXQgdGhpcyBiYWNrIGludG8g
+cGVvcGxlJ3MgcmV2aWV3DQo+IHF1ZXVlcyB0aGF0IHdheS4uDQoNCkkga25vdyB0aGVyZSBoYXZl
+IGJlZW4gc29tZSBpc3N1ZXMgd2l0aCBnbWFpbCByZWplY3Rpbmcgc3R1ZmYgY29taW5nIA0KZnJv
+bSBvdXIgZG9tYWluLiBJIHdhc24ndCBzdXJlIGlmIGl0IHdhcyB0aGF0IG9yIGlmIEknZCBqdXN0
+IGV4aGF1c3RlZCANCnRoZSBEVCBtYWludGFpbmVycy4gUG9zc2libHkgYm90aC4NCg0KSSdsbCBz
+ZW5kIG91dCB0aGUgc2VyaWVzIGFnYWluIHdpdGggYSBSRVNFTkQgdGFnLg0K
 
