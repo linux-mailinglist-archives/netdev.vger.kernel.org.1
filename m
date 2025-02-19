@@ -1,105 +1,139 @@
-Return-Path: <netdev+bounces-167735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB60A3BF4E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:03:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79CDDA3BF72
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14ABC7A6E1A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3159B3B67AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9AC1EB1BC;
-	Wed, 19 Feb 2025 13:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA9D1E1A14;
+	Wed, 19 Feb 2025 13:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hgXUXLSL"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="c7C0yDME"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011A61EB197;
-	Wed, 19 Feb 2025 13:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D511D1E25EF;
+	Wed, 19 Feb 2025 13:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970071; cv=none; b=dnCfFIe0+WFk4mFVjfWmy6h7oiBx073DSC11xbWUW2E7FYLn2a78JSNwbchENVLHwmHKemWLNwMetldBVPfnm9YBXInjgrCzTJV5HRr0neZgLKEVxVQ89ZqMgLiZ5s8UluYuU4mgjlZzq2s31Vsr9ovUQClxtb9nF+CE089SRvE=
+	t=1739970082; cv=none; b=P9W926eh4kAfKpCKLcIRNyMdsOlchDh2RGSkPRg0JT3OGhKWg9gUwav0UTzDhV+Jnxj3C9pPWOx1Pcbyfhtf4U5NJppvepSJfCwaYPsYSXFPE183/LSs5rDe4xjK38BpImVvqo37upszmAgm1MOQWVjDGW+Fa1AGrXGeCC03znU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970071; c=relaxed/simple;
-	bh=wV7WZZcCNP/LMaDYch87A8tYbhsLVIbdIQGHrqnWVlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZ4IkJ1aVvPHz9YHTZ0AKUHUTOzJQKuuk+AFQfmvXKfWUUV28NxhDyDTX1/iCGK2LDHA9jNVxmx4/fz8Ovvyl4WbxTJiLohSxtyEgVW66DuPEzCyuaYbNMJHoRiG+2A10YUfYj32gyqxdxGg8KzD7FSmkSRS8Cvz/3kXRISBWQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hgXUXLSL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=32sNvnUS5aFpqGf+nH8pDJkKfydmj7kKdZsj/+G1liw=; b=hgXUXLSLipy5kXkuTkVa+pdfwz
-	cTP5n2fj1QFro3oTQSQQll46J9DjJGWBj31ATYuHVmjyk88Bkkc/zfzDo1mXXuvIVwsc+M/nNTyWD
-	cLuPN82DEfSaIqVm6KTdzmNywDNSOohnLq91wJ89FmBZYqsEL5l6ip3rtL9bfcvYGlBU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tkjgt-00FdHC-0i; Wed, 19 Feb 2025 14:00:39 +0100
-Date: Wed, 19 Feb 2025 14:00:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: charmitro@posteo.net, tmgross@umich.edu, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: qt2025: Fix hardware revision check comment
-Message-ID: <c83a4d5f-3e98-4fec-a84a-669f04677774@lunn.ch>
-References: <20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net>
- <20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1739970082; c=relaxed/simple;
+	bh=QcccMRbXtdO3gmmJTjotleh7lPgIqkwTESnzznTvJvg=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=DHjXB28Spg/XFDXDJOrRbPW5ihfoecSTkSjiGvKWrRR6pDbaPYIbfS/n11AWcx2ZaUCMpNqdV4BdM77H8eS/uB0hVWb4XpViaJLW5qGGy8UDI1nIn9mBhifA28HWdnpHyQEBLz5HPSVEm+dF9vRDAsXPXAqmxH4ulmj3hdKzhMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=c7C0yDME; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51J8NRbm014898;
+	Wed, 19 Feb 2025 13:01:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	6KgOzMA8ihMoUxGj5Qw6lNE4j2AzNyOH0PA1NQsnhJI=; b=c7C0yDMEnkbIvyRN
+	vctHbQmTt0jo6TD4MK2X2usM2lG8Cos1u6smvWAihNL4HXSkfYzCG+sEcJK0g8mP
+	l5bjb3JahMY0dg1HLck5SARMvzK/+SzWD1ixqcss7ejrHGa8QbgG+1pm0oZFI+iB
+	2bX38gGUCu8E9l9FREoKv6WXNUA3uoW/FgUZkOWAYbUpcAIexP4dCcl9bjTtztNh
+	vP7yyyC3KvHEIGI/2iH8VOK8LU+VIs02PmYLLtEx9i2+JsqTQ7/Il2D4R7oykENz
+	eUd/IiCdFHPpDT5C1sMhZup5v1iFP218A/xV54NcKqysbVBGvd9lf5ecjwg2XBKp
+	MIl2JQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44vyy12kuw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Feb 2025 13:01:03 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51JD1274015906
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Feb 2025 13:01:02 GMT
+Received: from [10.253.35.15] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 19 Feb
+ 2025 05:00:55 -0800
+Message-ID: <2aa1c649-6fce-40b1-bbf7-1d6d756dbbec@quicinc.com>
+Date: Wed, 19 Feb 2025 21:00:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Jie Luo <quic_luoj@quicinc.com>
+Subject: Re: [PATCH net-next v3 04/14] net: ethernet: qualcomm: Initialize PPE
+ buffer management for IPQ9574
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
+        Suruchi Agarwal
+	<quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>,
+        "Simon
+ Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Kees Cook
+	<kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "Philipp
+ Zabel" <p.zabel@pengutronix.de>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <john@phrozen.org>
+References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
+ <20250209-qcom_ipq_ppe-v3-4-453ea18d3271@quicinc.com>
+ <17d9f02c-3eb3-4bae-8a2c-0504747de6f2@lunn.ch>
+Content-Language: en-US
+In-Reply-To: <17d9f02c-3eb3-4bae-8a2c-0504747de6f2@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Oqth_QsftGBuhgXf9_XkLsBETwYRHjW8
+X-Proofpoint-ORIG-GUID: Oqth_QsftGBuhgXf9_XkLsBETwYRHjW8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-19_05,2025-02-19_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 clxscore=1015
+ suspectscore=0 spamscore=0 mlxlogscore=910 mlxscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2502100000 definitions=main-2502190104
 
-On Wed, Feb 19, 2025 at 10:02:00AM +0900, FUJITA Tomonori wrote:
-> On Mon, 17 Feb 2025 23:53:50 +0000
-> Charalampos Mitrodimas <charmitro@posteo.net> wrote:
-> 
-> > Correct the hardware revision check comment in the QT2025 driver. The
-> > revision value was documented as 0x3b instead of the correct 0xb3,
-> > which matches the actual comparison logic in the code.
-> > 
-> > Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
-> > ---
-> >  drivers/net/phy/qt2025.rs | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-> > index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
-> > --- a/drivers/net/phy/qt2025.rs
-> > +++ b/drivers/net/phy/qt2025.rs
-> > @@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
-> >  
-> >      fn probe(dev: &mut phy::Device) -> Result<()> {
-> >          // Check the hardware revision code.
-> > -        // Only 0x3b works with this driver and firmware.
-> > +        // Only 0xb3 works with this driver and firmware.
-> >          let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
-> >          if (hw_rev >> 8) != 0xb3 {
-> >              return Err(code::ENODEV);
-> 
-> Oops,
-> 
-> Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> 
-> Given that this patch is expected to be merged via netdev, you might
-> need to resend with a proper subject:
-> 
-> https://elixir.bootlin.com/linux/v6.13/source/Documentation/process/maintainer-netdev.rst
 
-Please also include a Fixes: tag.
 
-	Andrew
+On 2/11/2025 9:14 PM, Andrew Lunn wrote:
+>> +/* Assign the share buffer number 1550 to group 0 by default. */
+>> +static const int ipq9574_ppe_bm_group_config = 1550;
+> 
+> To a large extent, the comment is useless. What should be in the
+> comment is why, not what.
+> 
+> 	Andrew
+> 
+
+OK, I will improve the comment to describe it better.
+
+There are total 2048 buffers available in PPE, out of which some
+buffers are reserved for some specific purposes. The rest of the
+pool of 1550 buffers are assigned to the general 'group0' which
+is shared among all ports of the PPE.
+
 
