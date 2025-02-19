@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-167777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C745EA3C3AA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:30:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DC2A3C3AD
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238311889F94
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39F2F3AFDFE
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09991F461F;
-	Wed, 19 Feb 2025 15:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2368F1F460A;
+	Wed, 19 Feb 2025 15:29:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B249C1F460B;
-	Wed, 19 Feb 2025 15:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A631F4189;
+	Wed, 19 Feb 2025 15:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739978934; cv=none; b=uU1F/g/JRyaGTGa3eLbbNKzoeKLPsoounyaEzCmvxNTA4AQorffgUkTWPrQ8sZY+FMAYo+si45c2Y1nSgkaA8N+nDcJobxDmovD7UE7zElQ4ynQpCKeZHdtragCsJZXy8mlDWCIP+Z0YrnE/HMYVXORlLcXjZiSYtfL6D5uKbRI=
+	t=1739978985; cv=none; b=KlR50vkKvtaVJCfR7aNCgmlCwo/2+W48EhhhPe5O/hG7+8Fc6V7VpDgGYaQ1rJ+D+Xq1JURTFXWPUtiMDxprUhxckUba67eJAs7xbRPXG4cTptX6DSHl/W4ncsY5SqmULVAcbdjzAatgtTKqTeCj/IBiCW5bF/cuUq1LXikIwKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739978934; c=relaxed/simple;
-	bh=x9ailOTXzWx6wgkaOYecX06SAiQdtNujXzKhbhPfE5E=;
+	s=arc-20240116; t=1739978985; c=relaxed/simple;
+	bh=UsKZ39nIpTlqgfW7RnzFvobcmXbvJRZKB5HsCiFSs40=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rzup1sM2UrthCDdr+QJkDALpfercRslu5b9VgkcpPeFM2+LrBEMNBTGGVveJ5Q+uHjBcU0ITLJtMOCBHBPBu51aLqvbFwczrP16SFxkLKZw867/8abxf4wXzlvOkLv/OvaBoUZZTKpw5R+A5bTS3iAFEtEzI/7Tf1Dh1OcDU1io=
+	 MIME-Version:Content-Type; b=KlRg5rWgyQVVWBjWFK/dP1sBb9QC4LvJC5XItglAjOH4oh94y7mf1R8mKAqUwLA2/jkBAv7qQLzgAw5eVDUZMjWIQQaVCFNq6DcM6T/tq9hNXMO8vBmNmlTc4Fe1ZRCz/IgxeWWYx/FhGVF3Gl3mnHa8Pu8Eone0/Dy8/90p0vQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAEEBC4CED6;
-	Wed, 19 Feb 2025 15:28:52 +0000 (UTC)
-Date: Wed, 19 Feb 2025 10:29:16 -0500
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11B2AC4CED1;
+	Wed, 19 Feb 2025 15:29:42 +0000 (UTC)
+Date: Wed, 19 Feb 2025 10:30:06 -0500
 From: Steven Rostedt <rostedt@goodmis.org>
 To: Wander Lairson Costa <wander@redhat.com>
 Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Tony Nguyen
@@ -39,8 +39,8 @@ Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Tony Nguyen
  yuma@redhat.com, linux-rt-devel@lists.linux.dev
 Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other()
  handling for PREEMPT_RT
-Message-ID: <20250219102916.78b64ee4@gandalf.local.home>
-In-Reply-To: <mtmm2bwn3lrsmsx3evzemzjvaddmzfvnk6g37yr3fmzb77bpyu@ffto5sq7nvfw>
+Message-ID: <20250219103006.6a1ef14d@gandalf.local.home>
+In-Reply-To: <20250219102916.78b64ee4@gandalf.local.home>
 References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 	<20250205094818.I-Jl44AK@linutronix.de>
 	<mrw3tpwsravsaibkcpptdkko3ff6qtk6w6ernqvjisk4l7owok@q6hmxkzcdkey>
@@ -50,6 +50,7 @@ References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 	<CAAq0SU=aU=xpw0bDwaanFh_-r5tts0QNCtSmoteP3dM8-K6BFA@mail.gmail.com>
 	<20250212152925.M7otWPiV@linutronix.de>
 	<mtmm2bwn3lrsmsx3evzemzjvaddmzfvnk6g37yr3fmzb77bpyu@ffto5sq7nvfw>
+	<20250219102916.78b64ee4@gandalf.local.home>
 X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,37 +61,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Feb 2025 11:50:55 -0300
-Wander Lairson Costa <wander@redhat.com> wrote:
+On Wed, 19 Feb 2025 10:29:16 -0500
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
->      kworker/0:0-8       [000] b..13  2121.730643: e1000_init_hw_vf <-igbvf_reset
->      kworker/0:0-8       [000] b..13  2121.730643: e1000_rar_set_vf <-e1000_init_hw_vf
->      kworker/0:0-8       [000] b..13  2121.730643: e1000_write_posted_mbx <-e1000_rar_set_vf
->      kworker/0:0-8       [000] D.Zf2  2121.730645: igbvf_reset_L14: (igbvf_reset+0x62/0x120 [igbvf])
->      kworker/0:0-8       [000] .N...  2121.730649: igbvf_reset_L16: (igbvf_reset+0x7b/0x120 [igbvf])
->   irq/63-ens14f0-1112    [000] b..12  2121.730652: igb_msix_other <-irq_thread_fn
->   irq/63-ens14f0-1112    [000] b..12  2121.730652: igb_rd32 <-igb_msix_other
->   irq/63-ens14f0-1112    [000] b..13  2121.730653: igb_check_for_rst <-igb_msix_other
->   irq/63-ens14f0-1112    [000] b..13  2121.730653: igb_check_for_rst_pf <-igb_msix_other
-> 
+> After adding the probes by perf, what's the content of the format files for them?
 
-> This is the trace-cmd command line I ran:
-> 
-> $ trace-cmd start -p function -l 'e1000*' -l 'igb*' -l process_one_work -e irq:irq_handler_entry -e probe
->   plugin 'function'
-> 
-> The threaded interrupt handler is called right after (during?)
-> spin_unlock_bh(). I wonder what the 'f' means in the preempt-count
-> field there.
+Also, what's in:
 
-The preempt count is hex, so 'f' means 15. But that that latency field looks corrupted.
+  /sys/kernel/tracing/dynamic_events
 
-After adding the probes by perf, what's the content of the format files for them?
-
-That would likely be in /sys/kernel/tracing/events/probe/*/format
-
-Thanks,
+ ?
 
 -- Steve
-
 
