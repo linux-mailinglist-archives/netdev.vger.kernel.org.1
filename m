@@ -1,91 +1,114 @@
-Return-Path: <netdev+bounces-167577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3704A3AF59
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:11:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9F6A3AF5F
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:13:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63C6C189834C
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:11:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A8C1897D19
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AF51A239F;
-	Wed, 19 Feb 2025 02:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD1F13AD05;
+	Wed, 19 Feb 2025 02:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1I5lkrQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jq0Zmujt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D851A08A8;
-	Wed, 19 Feb 2025 02:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0546E54918;
+	Wed, 19 Feb 2025 02:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739931014; cv=none; b=Rs1l7WLR85w9ZWjGR7eaVEWBVL7ESVvpaoaBtFIYkvFALVBky/LvMgsXdhlnLkFUOG3V0EExihMrqAs7JxBp2f0gqDcn0Akr/CEWDBHYN/svHTNDIICh7dAFmocZNMG9+vrNGVMfuNzbWd8kT2cPFqcK/x7OecZRZ0yUrr1vN0E=
+	t=1739931188; cv=none; b=BxajgVBO+hoIcAQ9yx20mqxX6pbCO+ddnHAhxn0EVsXHv6XtItcuv88QaNCAag6iD/Dy2O23dm8cTGlVt4BxBOJAAribiEzsI/y7xuz0iDoyayLjuy/s37hpm5emVKu5Xg46Wg3alFsyIVv2Ya+EwfWZNyWEsDaw6LNmap/JjB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739931014; c=relaxed/simple;
-	bh=QX0uKsFHqK5EZhY4YLrtYsUZm+NyM8VMY2lVCsFaDLg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SJTr2XruquNWOY0LfMVS5apprflbgYak1USD+Zxje4ra54pwmWORgY8itstNJMLXcjfzSNTNCcjfux87XkRHLR10a7ox6u1kJUegew6FEasb4YY7xG5Mo2lQ6Doy9S6+yWZYPwwFIpoQ3Pkmzh0aK5n5EFpO/1ia3yA4M7F+jjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1I5lkrQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52494C4CEE6;
-	Wed, 19 Feb 2025 02:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739931014;
-	bh=QX0uKsFHqK5EZhY4YLrtYsUZm+NyM8VMY2lVCsFaDLg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i1I5lkrQ8y+D9hv7GA4L/cItNFU0tzVoKDHvKK7JP3n2LRaVC5kkkcUTf36qRmddB
-	 haev0lrKKdHFClJ24RFcdXjvwWSwjPv4aX4mPpWz1/sOx0JBqXW7AAE5SIYaEnXW9q
-	 wN5UFYYxl2j5+49JM8sbL8/NVZDc83IRI1WCydQtcNSOEx64E5zFOFmDukof4jQ0w/
-	 mKJLPwjmwQDYPFAow9l8fB04RDXbeCBnONcS19W9knGeJCzVxqFEg4BNGK8aJpuJEs
-	 CihsqbRBiOUpX6R6OUXfzUrFrKv/i4uM9g3d9G7yOkNT+QJzNSeAEi/Mn5fO2X7skf
-	 JGfKJkVkbqVPg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF9380AAE9;
-	Wed, 19 Feb 2025 02:10:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739931188; c=relaxed/simple;
+	bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QY9IRhtZ7N+wrZkG/6Gk++x7UXHt3jr3rxx2Fglhi8SMp2aywQKI2vmRW/v4QJ+Pbowlvz8X4feJfOtD9zUmxbrjT5QK8EbklqAxsMk4Qg0ZFFjxO6LVJao3vuhOt9BKp8ydczGe1D4o75KCKezj+jEkt5KRsQ+5QHbxINwTrbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jq0Zmujt; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3cfc8772469so19836595ab.3;
+        Tue, 18 Feb 2025 18:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739931186; x=1740535986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
+        b=Jq0ZmujtW8cH6GGMP+vJQlIsmL6j6Bx4egQYCE4xcScZzAzvcW7ign+c0USYaBa4Pm
+         s94omOR/kQxCZ325PqkqwHx37RbjB2RtqAOeGeQPavxYfHMh1OWn+B77aQ0kFNzmEc+T
+         2bBap+4wIhWqzhqAAal+XV6oCK8Bqb7zCXj5H0kSgOh+SGPrJ9VyBvZ3v5WQzLAfQb/A
+         8c5bLHhaQpiathGrTnt00svaBFUGcfZrS9l+B9UalOfQZYUD3ji90LR/84Ej/A/jNTJq
+         BRQ8Nd8dTz000c4iac2lHt2CXwjqLsTvmoOimA/yhVSaenllgyDpkYodbY70eop33+RT
+         LJKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739931186; x=1740535986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
+        b=klgxJHOYCpHwiqkwUPlL28RmyQ8SISr8AlFql7srOOzhloLpmb67Jif+YXrfL+cmt4
+         h/2rfVsx8K5lVgQWmIanlItxNVQDmXKgBLKnJXhty8cXwhYr/hZ7Gnk4skzjtES/NkCH
+         tigdbA0OBLP0fiV+U9aj08DbXEWk7pB6MHwJSal6UOv+QtDCaZ4lUVFNJZVnuGE7fETy
+         SfknqWxKykOvTToS/gmmU9vcm4HH3Dir4SUjotkARFCGKu3ZqD02jDWbKGPjwK6MAQUj
+         tZevOlOBV3IKNZDDGG4mejpc+ahEZDhvDR6KVauWeyu+8AbEbFVST00bxK1QgyOZogmR
+         pV2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVt6mb9BOwjogCULZH6yIqZS0Y4LdtGKlBoXrXNayZTjI+xiG72wjMGh6T2LoYsqTPL1ZIc+5Y8@vger.kernel.org, AJvYcCXKIv7qgO5MjBbQ3JmgviCJQnEMtsrtj3lvf+1feSBI6PaIYl5LRlZf5TZoOzA4e8+d3xE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg+59wKxrVDpgkzmFOlwy85GfnP4hF8hMu0FfQln5I3vOlxOw7
+	2ESc3GQK33rjELsrYTm6MbW72ckpS9sp/5k0HqF2ohsTLnGXg6JuySkY3p/Gbu8Qyaozv+JdAb9
+	cVoVgV2/gRrCvgfMZ/TXENEtzzJQ=
+X-Gm-Gg: ASbGncufck78XmxryJyFULAsqOWxspsBRxi84Lf2Gbrg5xHAvJ/kO0gF1dJ/yjJ0QX4
+	B0Ohq2Ut0Kn/sJCXIRU0J+XVN+fY5nN/B9aNAfsKU+sKyxlDVlsLS14H6E1giovVf3POf+NjB
+X-Google-Smtp-Source: AGHT+IEesxvTSZRnkrrfVG4JDLjqg9TlKJ/CF5hAEqsbjtZ4pL0JM0MU2u/WxAz4vIZxNsKp3Q/vGj2Qk2opJIT6pug=
+X-Received: by 2002:a05:6e02:3312:b0:3d0:4700:db0b with SMTP id
+ e9e14a558f8ab-3d2b52a1164mr20342275ab.2.1739931185934; Tue, 18 Feb 2025
+ 18:13:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] netlink: Unset cb_running when terminating dump on release
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173993104449.103969.1148424479511504135.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Feb 2025 02:10:44 +0000
-References: <aff028e3eb2b768b9895fa6349fa1981ae22f098.camel@oracle.com>
-In-Reply-To: <aff028e3eb2b768b9895fa6349fa1981ae22f098.camel@oracle.com>
-To: Siddh Raman Pant <siddh.raman.pant@oracle.com>
-Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- netdev@vger.kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
+ <20250217034245.11063-2-kerneljasonxing@gmail.com> <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
+ <20250218174754.150c82c3@kernel.org>
+In-Reply-To: <20250218174754.150c82c3@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 19 Feb 2025 10:12:29 +0800
+X-Gm-Features: AWEUYZlZ9YayU8cbNpXMrN3Ad4YipgYDXBsMUxAl-xJrFKdk66cORRrC_pkxgI4
+Message-ID: <CAL+tcoAbVnJwTT_dvFFH+n3aWUG2DHf3Z+Uc8LhYo9fd31Zp+w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 1/3] tcp: add TCP_RTO_MAX_MIN_SEC definition
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, 
+	ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, Feb 19, 2025 at 9:47=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 18 Feb 2025 15:38:17 -0800 Martin KaFai Lau wrote:
+> > On 2/16/25 7:42 PM, Jason Xing wrote:
+> > > Add minimum value definition as the lower bound of RTO MAX
+> > > set by users. No functional changes here.
+> >
+> > If it is no-op, why it is needed? The commit message didn't explain it =
+either.
+> > I also cannot guess how patch 2 depends on patch 1.
+>
+> FWIW this patch also gave me pause when looking at v1.
+> I don't think this define makes the code any easier to follow.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Okay, I will drop this in the next re-spin.
 
-On Sat, 15 Feb 2025 09:40:51 +0000 you wrote:
-> When we terminated the dump, the callback isn't running, so cb_running
-> should be set to false to be logically consistent.
-> 
-> cb_running signifies whether a dump is ongoing. It is set to true in
-> cb->start(), and is checked in netlink_dump() to be true initially.
-> After the dump, it is set to false in the same function.
-> 
-> [...]
-
-Here is the summary with links:
-  - netlink: Unset cb_running when terminating dump on release
-    https://git.kernel.org/netdev/net-next/c/438989137acd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Jason
 
