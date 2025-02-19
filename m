@@ -1,120 +1,143 @@
-Return-Path: <netdev+bounces-167716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390A6A3BE58
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:42:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B6AA3BE5F
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:44:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C67F3AD918
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:42:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64394161DFD
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4173E1E0DDF;
-	Wed, 19 Feb 2025 12:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB3E1DF974;
+	Wed, 19 Feb 2025 12:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="pQT6NnvZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4mGM4l6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC981DF26A
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 12:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD27D1C8618
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 12:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739968950; cv=none; b=Xs8yJCx4N4qfckP3zT3P59FQk9ouTMvj73CeBSSk2XDZIa1/O8JSUjgOqx7ADi4ZNP100TzkrQ/UOo1YDVmiJohlwIJb/k4Fdjm6OedEPIlKHSnVJea5NCR6xmrfyS0aSTbC5MDjhxlgpl9wZPNooocDFMpZZ3i77tVER529o+M=
+	t=1739969079; cv=none; b=TWH4PJ7VJaHxVaI0x6xyDjYbanbWdWeoub1X1p4RWgeOcg4zIkpiv7yqDk/wAOJCHvAmNUzEbVCWmiF9rWdxK2GhEcOUdewMGCJ/6dzuM+4EG+vNNEJHGd77SMJLXXeS1+OBTwLnays+crY6L+5RDaYiBN4P3HuB9tj6QokTLFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739968950; c=relaxed/simple;
-	bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=se1qr1XGhurqXWG445SkMgwRgF91y8FM+YkuaruPQvXRg20Nkr019u4nmOLc1wFjqK3hvURJbkE9FjjdfgpbWqT7SjXxZhuO1/inXSWD1BccI5sPpnVMna1o34Epb6EwOZ030SqMc+to68+F7YpNxvMOHHyOClAR6cO9G5g0tJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=pQT6NnvZ; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id EA101240027
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:42:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1739968944; bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
-	b=pQT6NnvZ6QfK1XDthLHJDMPKVx3k8igsFAYEsAIgkHpyT6BY+1nN8tUrupat7jimK
-	 zHTpYhnn30MdGiye563aBLsivzaviAiLcJiepd/274OuadD8TJH2aFNeApGBfM26D+
-	 99NCeR7KerlqLOFN5G+LQsU4Dn7I+l69LvZChk2t+MvIFqQMsoeMDsdDXsBNcbiFC+
-	 z4B1oSHb7Sju9cJywgAQ26xp88Lr1/e7AlL6fBZaXcRyY9VcaESTH7/Pyi6nV+ZJuC
-	 FhJENGJ1yBSaJ6oBTR2jMjdfZ/kZ6Z4y2EtMLwY05GD3SqB1INXpu33+h8DZw2fo7+
-	 HNKQeHdOJTpOA==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4YybdB0TTPz6twQ;
-	Wed, 19 Feb 2025 13:42:21 +0100 (CET)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-Date: Wed, 19 Feb 2025 12:41:55 +0000
-Subject: [PATCH net v2] net: phy: qt2025: Fix hardware revision check
- comment
+	s=arc-20240116; t=1739969079; c=relaxed/simple;
+	bh=uC/gbmuIbz9CfDD9QTJ9GPLub88c8NeckYlYWDb5Nj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xj1uPDIMBAPrxHXrChW+3UiZG+9jIsZgJ/3NY3+wa5eLx3zZgzxfh79Dh2nxAlvlzpgP/h3KxFEkrz8aY4vPJs0L3sRlZ3VkTDXH1Es37rvRgRzqqpfD0xKW75vc1AjqJooxXqPGx/Jd4oeynlBEO3wAgwEm9EHtP7Xea9iWjXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4mGM4l6; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22128b7d587so60981305ad.3
+        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 04:44:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739969077; x=1740573877; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=veqQrnLC1vkTB8v0fR7bFysmPAsyll090YrIwI/WyGg=;
+        b=D4mGM4l6REJ9vZw61rQ8n0PNeNBIneB0bosFOO6YUEuFI0XRRQ4B1+JPAhXJqtNosu
+         OOu3z40VE15CpwdiH/Pc7ccJzP1JHWrm++M/PPpmVOwNn/bTanv1kQfUSS4Eg1fbU68B
+         Dy7KTCz9wcDNqapH76mEzgxRKRxpN2RKSMaWmRvzEatEIs/VFZr7JmcM2QHjBbSmMTMQ
+         paIwHF95m7t9gxspUcfZ3ibH6MpazfU1LLSGiFT53AKgdtKHG/bpX/N8+dy9bXUhwy8+
+         H45cpc3EXCB5ZA3T1sHqRY0gRo7Hl/R3pZCbWs0L3QrYtSRcvE8z9FFUY3I5EmfAF/RT
+         j34Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739969077; x=1740573877;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=veqQrnLC1vkTB8v0fR7bFysmPAsyll090YrIwI/WyGg=;
+        b=HJs6HneiKH863J3sWlOYiU/ElQRyQ8eA5e3Z9YN927oNcn46daR2CGQu8wi2R+wYlu
+         R/7KEX7nbMLkZJa7jwFBOfSp6AARN4q/E33IO9HI+V4z76gJV4j8lZzg9pL7ec7fHlcn
+         9jydxNLcWPtqhyHx/dvCJYmC35qTvSgCdYj5PiTHypi4D/oNxQtz9Lif2jxtCpaU1zpF
+         Gq3nlEmXZoIvkywyWPBKdMqMhNkv8W67UN7denVwQMAObrvLJJY4DQhp/yhrmx1hdULc
+         f6FNBk/FxfzOgWTRK+mhIIqDspIpEsG4pyFlh3iuoT5zdDZ0EcPfjR79aGFPA26Qu5wj
+         SjZg==
+X-Gm-Message-State: AOJu0Yy5xilQFGvMcoQ1rq8NUg1KUDGCbZ6ZAoqe9aoLOPHdObja31MU
+	K+CL/8U2q/DumsowqkftJ3hH2Nb1on7SWONZ0RGT/xY5K5KN4sCP
+X-Gm-Gg: ASbGncsJLBSe5+z1cgaoyiA44NAZyQLzrHigMzWqZzijV46Jg/QUKtcNradT8DIHBEv
+	z/b4fvsbnAzgfW0gyzy7mXYNbGTzxxecO6dvHIrQLT528GqBAKfB4dAbu5gExIRKJ71ooR0z5LE
+	PGN/UcEv/rWsLTlS2jV8lNLj2Rjp1k7GOGl9OfIqPQ4zZjSuZZgajVfR3QNuufTuzOAUOdtq61w
+	Y6ouW4ayegKJHLDFgOdvrBPgXP/v7mOsPTPzfASk57fd8DX6RdxE33rwWEq2N5O//hejwW+Zr5K
+	rHJhiK9O3aKiC/8rlli+
+X-Google-Smtp-Source: AGHT+IHOJTf5JjkMoAiF9726cdvTyRKLl9leBPJ0deGourTeYMJV4PJn9/RJkzDp8I7Ioy0Cx3sYJg==
+X-Received: by 2002:a17:903:1d0:b0:21f:3e2d:7d58 with SMTP id d9443c01a7336-22170773856mr44879085ad.13.1739969076990;
+        Wed, 19 Feb 2025 04:44:36 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556c857sm103517565ad.161.2025.02.19.04.44.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 04:44:36 -0800 (PST)
+Date: Wed, 19 Feb 2025 12:44:29 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Roopa Prabhu <roopa@nvidia.com>
+Subject: Re: [Bridge question] Issue with removing MDB entry after enabling
+ VLAN filtering
+Message-ID: <Z7XSLZQWm-_B3zqT@fedora>
+References: <Z7WnyC2eSFeb8CA_@fedora>
+ <25fbccf1-38e9-455a-b114-da723041e413@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250219-qt2025-comment-fix-v2-1-029f67696516@posteo.net>
-X-B4-Tracking: v=1; b=H4sIAJLRtWcC/32NTQ7CIBCFr9LM2jFAUYgr72FcVBwsi0ILhGga7
- i5yAHfvJ+97OySKjhJchh0iFZdc8M2IwwBmnvyL0D2bB8HEiQmuccs/iSYsC/mM1r1x5JOy2pq
- HOUtowzVSizv0Bp4y3Fs4u5RD/PSjwnv1j1k4clRyJK0MY5KZ6xpSpnDsvFrrF0cv2YG6AAAA
-X-Change-ID: 20250218-qt2025-comment-fix-31a7f8fcbc64
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
- Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739968933; l=1517;
- i=charmitro@posteo.net; s=20250218; h=from:subject:message-id;
- bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
- b=rjm5rN4NKlBBwxqtODOZ62E5SaiIwJVOr7MYv+DUdwOfAoKfVDgfiHI+azP52m/u1tkggWizk
- 96yrORzotrkCAN9hSMpfRgWQviEksl+UYf1bvmTy5AvGN3kmPMY4z/8
-X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
- pk=tqvFF75nwS3URscujaAaCD+j9ViKh5jLMkj1mnX7Rws=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <25fbccf1-38e9-455a-b114-da723041e413@blackwall.org>
 
-Correct the hardware revision check comment in the QT2025 driver. The
-revision value was documented as 0x3b instead of the correct 0xb3,
-which matches the actual comparison logic in the code.
+On Wed, Feb 19, 2025 at 11:56:08AM +0200, Nikolay Aleksandrov wrote:
+> On 2/19/25 11:43, Hangbin Liu wrote:
+> > Hi everyone,
+> > 
+> > Our QE team reported that after adding an MDB entry, enabling VLAN filtering,
+> > and then removing the MDB entry, the removal fails. e.g.
+> > 
+> > + ip link add dev br0 type bridge
+> > + ip link add dev vethin type veth peer name vethout
+> > + ip link add dev vethin1 type veth peer name vethout1
+> > + ip link set vethout up && ip link set vethout1 up && ip link set vethin up  && ip link set vethin1 up && ip link set br0 up
+> > + ip link set vethout master br0
+> > + ip link set vethout1 master br0
+> > + echo 1 > /sys/class/net/br0/bridge/multicast_snooping
+> > + echo 1 > /sys/class/net/br0/bridge/multicast_querier
+> > + bridge mdb add dev br0 port vethout1 grp 225.1.1.10 src 192.168.2.1
+> > + echo 1 > /sys/class/net/br0/bridge/vlan_filtering
+> > + bridge mdb del dev br0 port vethout1 grp  225.1.1.10  src 192.168.2.1
+> > RTNETLINK answers: Invalid argument
+> > 
+> > From reviewing the code in br_mdb_del(), I noticed that it sets the VLAN tag
+> > if VLAN filtering is enabled and the VLAN is not specified.
+> > 
+> > I'm not sure if the QE’s operation is valid under these circumstances.
+> > Do we need to disable VLAN filtering before removing the MDB entry if
+> > it was added without VLAN filtering?
+> > 
+> > Thanks
+> > Hangbin
+> 
+> Hi,
+> It seems you did not specify a vlan when trying to delete the entry after enabling vlan filtering
+> so the bridge code tries to delete it from all vlans on the port and some of them don't have
+> that mdb entry so you get the -EINVAL, but it should delete it from any vlans that have
+> the entry.
+> 
+> In this case since the entry was added before vlan filtering was enabled it won't have any
+> vlan set making it unreachable for a delete after filtering was enabled. It is a corner case
+> for sure and TBH I don't see any value in adding more logic to resolve it (it would require
+> some special way to signal the kernel that we want to delete an entry that doesn't have a
+> vlan after filtering was enabled), instead you can just disable vlan filtering and
+> delete the entry. So IMO it is just wrong config and not worth the extra complexity to be
+> able to delete such entries.
 
-Fixes: fd3eaad826da ("net: phy: add Applied Micro QT2025 PHY driver")
-Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
----
-Changes in v2:
-- Resend with proper patch subject, according to netdev documentation
-- Add "Fixes: " tag
-- Link to v1: https://lore.kernel.org/r/20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net
----
- drivers/net/phy/qt2025.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks, I agree this is a config issue and does not worth to fix.
 
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
- 
-     fn probe(dev: &mut phy::Device) -> Result<()> {
-         // Check the hardware revision code.
--        // Only 0x3b works with this driver and firmware.
-+        // Only 0xb3 works with this driver and firmware.
-         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
-         if (hw_rev >> 8) != 0xb3 {
-             return Err(code::ENODEV);
-
----
-base-commit: beeb78d46249cab8b2b8359a2ce8fa5376b5ad2d
-change-id: 20250218-qt2025-comment-fix-31a7f8fcbc64
-
-Best regards,
--- 
-Charalampos Mitrodimas <charmitro@posteo.net>
-
+Regards
+Hangbin
 
