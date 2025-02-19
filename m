@@ -1,112 +1,143 @@
-Return-Path: <netdev+bounces-167743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2DDA3BFBB
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:21:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E50A3C01A
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA0C188607F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1445C3A5A4E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFCE1E00B6;
-	Wed, 19 Feb 2025 13:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D581E0DFE;
+	Wed, 19 Feb 2025 13:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3oaR00oT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a+C92HNw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685681DFE36;
-	Wed, 19 Feb 2025 13:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AB920B22
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739971300; cv=none; b=H+vQrr4Oe7R3ESTaE7I1aYTR3ZolJtwOP+t/mE/CpEWo8FbGojW1W17MfSebOWLmYy1+V8sLhiVpUhf9ChuKaXsZd8WqB7zb1EyLyeR7pGGKXwX04MY4CXXWorD3K7xvGQJSwrxrc0M/NSjCkqG9fOsfjbA+Vnx+orATXenpbCs=
+	t=1739972178; cv=none; b=k5QOEVkUti/zQrBzfr3Mu2du0vBP+E9alDr8JjnOwYg2+CJ56Vaws43sLfFiK/QoXepGyOg6twAOk7aCjLeduJTDyzSt3b8ofoLGkJ8N1dhulVfFm9AszJ0G3uGZJ+Fc7+pjFbzL8nhWhfQpw61rffZLVKR700NIxGiR8oALAmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739971300; c=relaxed/simple;
-	bh=ibkqAzOOTpcKMN7n+mjZ+14f3KWphjHsh/YjVuefvqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SM+rlpo3GNVCbkFZHW4Qa3g8evng4zcfl5GkVkIh7T+o4u/0jnJTcvuBetci/AqgWzrfyPoXmT8bh1DjcbvtIZZElRYVdHjvapJ6Ql8ZrDSBPN4oxIZADGJMyOZxDNjXM/UhYKo2lBwDsrxIS7mUSPvUXRu0oGhzD5WjOko3h0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3oaR00oT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DMyxvn+GQc/UyfWq8B+kAUMHY5C1ZEtJDA2H85+czpM=; b=3oaR00oTwj135TbO69imlcG5uT
-	hhjS3aq2tDRRGK+8kUm+YZe0MiEvqrgrI31hxY01IQS8eBHyC3eAl4Vda8dvQ1T9dMg3ITpN25FoH
-	tnXd9ImfDu5sjWTaKsA7itCfEw/lMfzNE5Ney9cTysCc4geC8XJELBy4fFu3Tomcy+LE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tkk0x-00Fdb6-4V; Wed, 19 Feb 2025 14:21:23 +0100
-Date: Wed, 19 Feb 2025 14:21:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: marvell-88q2xxx: Prevent reading
- temperature with asserted reset
-Message-ID: <48c4cd14-be56-438e-9561-c85b0245178c@lunn.ch>
-References: <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-0-999a304c8a11@gmail.com>
- <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-2-999a304c8a11@gmail.com>
+	s=arc-20240116; t=1739972178; c=relaxed/simple;
+	bh=LOKX4E6ujPutAZTVYfYNM95m76n5U1LtRGnhA3Kt6Io=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L3tIX2cCY8TOZUkzJ0Di0q/Uqoz29n+A90LAa0pj7JTMcPz0ALAfPTFC2uqj/sDJNBMorZOqUuMPQxN1weTE+20Q5oA12e7SGXOQs1m2GaaihHr1XBm6IfWMxvQrWXUX41CD3rPTbZNaPr692JAWBr5hCJbIEATCMv1rJ8jzbiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a+C92HNw; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739972177; x=1771508177;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LOKX4E6ujPutAZTVYfYNM95m76n5U1LtRGnhA3Kt6Io=;
+  b=a+C92HNwdO+V61rjBQNMbahvd+LD+DQCejRiNsuLIphv9OWoYib2jrjp
+   kcCaxGLxMRcfOavP+6zjpy9xn8pKY5kmgV/0CFeRJcJy9prETyNaQo0ZF
+   2qlmqIVdNL5zpAn5pmbPBmJEnM/Uz8tZt1PlIWy+3NK+FS1QguZwxn/bg
+   Q0ix+PQ11toIug1k3+noHB0uErAeYWrdOspb6P3Pt69xkQScUriojJDZY
+   xzqmXQEgeH8bAGvSr2a0Vge+7riK2EkkNcqy0goPeDKn0KQwu4mzZSQkR
+   p4HKoa7ztwFz0AoGSyUGk59+Lb1ahoyDOKAYKB7la/aNs/VrKJ1YmCn/m
+   g==;
+X-CSE-ConnectionGUID: glXiEUvTTGq4HlI/hRZXLA==
+X-CSE-MsgGUID: 7NUtPallR5aBVJKYlUDLxg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="44473946"
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="44473946"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 05:36:15 -0800
+X-CSE-ConnectionGUID: t0j7cc7wRBOnif+xEzOf/g==
+X-CSE-MsgGUID: RUvCVmUdQ9GbQ/1js0djuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="115236101"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa010.fm.intel.com with ESMTP; 19 Feb 2025 05:36:12 -0800
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 340B333EB6;
+	Wed, 19 Feb 2025 13:36:11 +0000 (GMT)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Konrad Knitter <konrad.knitter@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH iwl-net v1] ice: register devlink prior to creating health reporters
+Date: Wed, 19 Feb 2025 14:30:39 +0100
+Message-Id: <20250219133039.38895-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-2-999a304c8a11@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 18, 2025 at 07:33:10PM +0100, Dimitri Fedrau wrote:
-> If the PHYs reset is asserted it returns 0xffff for any read operation.
-> Prevent reading the temperature in this case and return with an I/O error.
-> Write operations are ignored by the device.
+ice_health_init() was introduced in the commit 2a82874a3b7b ("ice: add
+Tx hang devlink health reporter"). The call to it should have been put
+after ice_devlink_register(). It went unnoticed until next reporter by
+Konrad, which recieves events from FW. FW is reporting all events, also
+from prior driver load, and thus it is not unlikely to have something
+at the very begining. And that results in a splat:
+[   24.455950]  ? devlink_recover_notify.constprop.0+0x198/0x1b0
+[   24.455973]  devlink_health_report+0x5d/0x2a0
+[   24.455976]  ? __pfx_ice_health_status_lookup_compare+0x10/0x10 [ice]
+[   24.456044]  ice_process_health_status_event+0x1b7/0x200 [ice]
 
-I think the commit message could be improved. Explain why the PHY
-reset would be asserted. You are saying it is because the interface is
-admin down. That is a concept the user is more likely to understand.
+Do the analogous thing for deinit patch.
 
-> Fixes: a197004cf3c2 ("net: phy: marvell-88q2xxx: Fix temperature measurement with reset-gpios")
+Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Konrad Knitter <konrad.knitter@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+Konrad wonders if regions registration should too be moved prior
+to devlink_register(). From net/devlink code it looks safe both ways,
+and there is no documentation on what should be the registration order.
+(But in the past some things were necessary to be prior to register).
 
-Is this really a fix? My personal reason for this change was
-architecture, it seemed odd to probe the hwmon device in one spot and
-then enable it later. But is it really broken? Stable rules say:
+CC: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+CC: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  It must either fix a real bug that bothers people or just add a device ID
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index c3a0fb97c5ee..e13bd5a6cb6c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5065,16 +5065,16 @@ static int ice_init_devlink(struct ice_pf *pf)
+ 		return err;
+ 
+ 	ice_devlink_init_regions(pf);
+-	ice_health_init(pf);
+ 	ice_devlink_register(pf);
++	ice_health_init(pf);
+ 
+ 	return 0;
+ }
+ 
+ static void ice_deinit_devlink(struct ice_pf *pf)
+ {
+-	ice_devlink_unregister(pf);
+ 	ice_health_deinit(pf);
++	ice_devlink_unregister(pf);
+ 	ice_devlink_destroy_regions(pf);
+ 	ice_devlink_unregister_params(pf);
+ }
+-- 
+2.39.3
 
-> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> ---
->  drivers/net/phy/marvell-88q2xxx.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> index 30d71bfc365597d77c34c48f05390db9d63c4af4..c1ae27057ee34feacb31c2e3c40b2b1769596408 100644
-> --- a/drivers/net/phy/marvell-88q2xxx.c
-> +++ b/drivers/net/phy/marvell-88q2xxx.c
-> @@ -647,6 +647,12 @@ static int mv88q2xxx_hwmon_read(struct device *dev,
->  	struct phy_device *phydev = dev_get_drvdata(dev);
->  	int ret;
->  
-> +	/* If the PHYs reset is asserted it returns 0xffff for any read
-> +	 * operation. Return with an I/O error in this case.
-> +	 */
-> +	if (phydev->mdio.reset_state == 1)
-> +		return -EIO;
-
-Maybe ENETDOWN is better?
-
-	Andrew
 
