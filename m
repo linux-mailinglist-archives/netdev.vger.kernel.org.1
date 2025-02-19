@@ -1,123 +1,90 @@
-Return-Path: <netdev+bounces-167737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4901A3BF73
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:08:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C89F6A3BF86
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:11:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FB797A43BF
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:07:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27A63189100E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5351E1A18;
-	Wed, 19 Feb 2025 13:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81391E0DE5;
+	Wed, 19 Feb 2025 13:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="UH9i82fT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6N9/mEt4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07622AD00
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC001DF724;
+	Wed, 19 Feb 2025 13:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970502; cv=none; b=uPQczc++bH5EMcmJrlETCpQlQbaXV6b/3ymeD5G+XjKML77UGG4iHUmxAWA3WtSGOdYNPxpMgok02/YG+m81v1qlSN0EkeuTD01mlwaLr6oRh+njm8nExyBxp4Ve6DSTTasB6JV8vs67/ajQ6SgRw+HZxhz4dyR3gca8uu/brxE=
+	t=1739970529; cv=none; b=YAHFBLitYoTiqdasDDe30YRBbIGWRw3XQ0NRbgBw1jkbuK4DCJzuP7vcljimp7uMzZWbNmdLeNi28GxHJClYPe/eJ2ocp/d8N9OQ59aSt1GKJnPgwPeYfoWquLxuWbC6NaLy3q/Y+y31otb2SIMOutj5sMFIn03+wJQFHfRJdOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970502; c=relaxed/simple;
-	bh=MUhvxhHnTvoE+duYjJ7YbfPA0nuYQDtOLydS3RR3bNA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=di2Ua+RBCZqm2YCyYiB0qetgcuA+5fZjIr2B3NoqTf5tNgKhPd4XdAzFDozLBUvwvu3XGy6JjfwaO+m9DnQuIr/E0PxM8ZSzFsfuPVL3BagYyyaxYiEqSqtnT7ZiQJ1r0roJQg/R8C5dTSB+eQ4zbzZYA6F9Zdi3XslL4APBhDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=UH9i82fT; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 00955240028
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 14:08:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1739970499; bh=MUhvxhHnTvoE+duYjJ7YbfPA0nuYQDtOLydS3RR3bNA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 From;
-	b=UH9i82fTg1h7w7390ECacBPovUQoE8P/G5GNVXYseGnWGCVDOfKQ5PyhulAe9YWgM
-	 oyTMO0GRgM+BGAb1yk2PX8U0Jez7tWa3rWWsM3L0wN7OiFtRvw8Z86NXQQc00rW0a2
-	 bGN9zqUxK+CRxw41x+UPWFS66pL0+d1Bmi0LqYqu41Tltg7EoGEoWN7cUYhyiMIcBi
-	 IRGjwKoOVVWBHDLTjvUrytTcrYIVeMYvlhWOcFQgLEEolpENntmiIchN+J48caOyVV
-	 anSpO8RUVC/wueOuEqucDUR/JBUQjagjTyrWKotNUIQS6c5YyhA244D7EfF8rJKH+J
-	 WyT0bq9Dz/AqA==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4YycC36ZPlz9rxQ;
-	Wed, 19 Feb 2025 14:08:15 +0100 (CET)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,  tmgross@umich.edu,
-  hkallweit1@gmail.com,  linux@armlinux.org.uk,  davem@davemloft.net,
-  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
-  netdev@vger.kernel.org,  rust-for-linux@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: qt2025: Fix hardware revision check comment
-In-Reply-To: <c83a4d5f-3e98-4fec-a84a-669f04677774@lunn.ch>
-References: <20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net>
-	<20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
-	<c83a4d5f-3e98-4fec-a84a-669f04677774@lunn.ch>
-Date: Wed, 19 Feb 2025 13:08:07 +0000
-Message-ID: <87jz9m13rc.fsf@posteo.net>
+	s=arc-20240116; t=1739970529; c=relaxed/simple;
+	bh=Dmhq1otLEb52QzA5/vDqPObz/CJLQjndNWKTPXQJrVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UP4Tq7WpW+oQnkKg5bn2zOEXO2m6kdjkMOrsK33Jwq/8V3sgg7wqTnBJznzdMb/EmI0QvFBhfWaPk5+mQI2A9FFdwGq28TzxMk7WxiXsuW+OuvZzR9uvJEzkzIWZJD4AMVYgZPO2KcRDAAL8jrRPZLP2KVBMVUYevMCfZb7+Vhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6N9/mEt4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ps97fPFgvv7ms46pdb7Qt0QiYmDXak+HI5iWt8qfj18=; b=6N9/mEt4wns58U5pxS7JkGhoPU
+	UFX563rzhNHSXzCCq2Jet0BYWl4sNkymJ8TAE/z5OOIGxvRczgf65AOkGucoerbi+NUVIG3CbWs8g
+	E3tvfbA72FvMDSoh52QcJ19ca9RIWQH1F0kd82c2MdxJwxtwCNlAh468rRDWOlBiGepo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tkjoZ-00FdPJ-95; Wed, 19 Feb 2025 14:08:35 +0100
+Date: Wed, 19 Feb 2025 14:08:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: advertise 'netns local' property
+ via netlink
+Message-ID: <e542b4f8-176d-4c2a-bb93-6c7380a5a16b@lunn.ch>
+References: <20250218171334.3593873-1-nicolas.dichtel@6wind.com>
+ <20250218171334.3593873-2-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218171334.3593873-2-nicolas.dichtel@6wind.com>
 
-Andrew Lunn <andrew@lunn.ch> writes:
+On Tue, Feb 18, 2025 at 06:12:35PM +0100, Nicolas Dichtel wrote:
+> Since the below commit, there is no way to see if the netns_local property
+> is set on a device. Let's add a netlink attribute to advertise it.
+> 
+> CC: stable@vger.kernel.org
+> Fixes: 05c1280a2bcf ("netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local")
 
-> On Wed, Feb 19, 2025 at 10:02:00AM +0900, FUJITA Tomonori wrote:
->> On Mon, 17 Feb 2025 23:53:50 +0000
->> Charalampos Mitrodimas <charmitro@posteo.net> wrote:
->> 
->> > Correct the hardware revision check comment in the QT2025 driver. The
->> > revision value was documented as 0x3b instead of the correct 0xb3,
->> > which matches the actual comparison logic in the code.
->> > 
->> > Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
->> > ---
->> >  drivers/net/phy/qt2025.rs | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> > 
->> > diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
->> > index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
->> > --- a/drivers/net/phy/qt2025.rs
->> > +++ b/drivers/net/phy/qt2025.rs
->> > @@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
->> >  
->> >      fn probe(dev: &mut phy::Device) -> Result<()> {
->> >          // Check the hardware revision code.
->> > -        // Only 0x3b works with this driver and firmware.
->> > +        // Only 0xb3 works with this driver and firmware.
->> >          let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
->> >          if (hw_rev >> 8) != 0xb3 {
->> >              return Err(code::ENODEV);
->> 
->> Oops,
->> 
->> Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
->> 
->> Given that this patch is expected to be merged via netdev, you might
->> need to resend with a proper subject:
->> 
->> https://elixir.bootlin.com/linux/v6.13/source/Documentation/process/maintainer-netdev.rst
->
-> Please also include a Fixes: tag.
->
-> 	Andrew
+So you would like this backported. The patch Subject is then wrong and
+indicate it is for net. Please see:
 
-Hi Andrew,
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-Included it, as the documentation states.
+The second patch does not have a fixes tag, and i would say is just
+ongoing development, not a fix. So please submit that one to net-next.
 
-A v2 patch is up[1].
+The code changes themselves look O.K. to me.
 
-C. Mitrodimas
+    Andrew
 
-[1]: https://lore.kernel.org/rust-for-linux/20250219-qt2025-comment-fix-v2-1-029f67696516@posteo.net
+---
+pw-bot: cr
 
