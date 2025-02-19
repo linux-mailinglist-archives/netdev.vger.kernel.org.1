@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-167684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44DDA3BC8F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:17:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88BD0A3BC99
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB65718899B1
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 11:17:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 572441704B1
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 11:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C867E1A5BA4;
-	Wed, 19 Feb 2025 11:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C431DED5A;
+	Wed, 19 Feb 2025 11:20:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137E21CAA6D
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 11:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76931A2C29;
+	Wed, 19 Feb 2025 11:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739963844; cv=none; b=psl7Bz791R1igo9d+d9X7UvZoTbRPa7Smpw/ZU72XHiWhn5kp8xd8fsaPoIfeTFIhuM0K3rlLfTBSTheqbYW4Uv4JM9NXzcRIuSFWs35gXAJ50vXATwQr4Rp7O2qtyNQJDDwIjevSxZejZDre9rQ0o7XaR/MFjY3T8s/TjEyVog=
+	t=1739964017; cv=none; b=SjRp+tjus/YljY2w3us9Z+beFFPokMLgjLJHXAJla2T/6Hszcmw7oTIOQM1KAkIoZ5ZR5C2ZvyrC5PdSR/VzBiIwarhA+5T/zSwlsaJY8iR6S94pErd0mvLYpwQWTSE3ukyefAiWN3H1+ZN06+ZmdZIvh29BPviJgaOdglWP1rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739963844; c=relaxed/simple;
-	bh=BPaho48JNaYzbC+e1CwDqbG6IEdwp4thCNchfxp7k+o=;
+	s=arc-20240116; t=1739964017; c=relaxed/simple;
+	bh=21iMGn5nmMgxSUhNifIphPXQHgu7d4Uv/JM64va/VIs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Beq/pGKS6DTZ4RVdO1bd7+eglm6G1T84LqxhDKReNgsX36ey7qiGNlzvTd+tRNIFIYN+5YuHmBOhj6TjIks6eI0aO4UQJhMsMb96kZNb+bwMlnUmNWFNl+mTXHZIEx6/k5s5OirsqCNqoUAQc6meAFPLoRni1A/hE5X8/hcWMkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 In-Reply-To:Content-Type; b=h03P3jDI85tkEjeyDEeMH4ti1+gir/Xp45EUV1LFayAIk9vwxTpwfr/R8XAoxPzElLjImwvq/rKY7XELruu3NQ3aLkKSp7KPCylqVntHjkOHggbRRRv1XSq1KefjWntls3WZj4V6c5TpAOYDca7GPTwnGk9jmmz4WzQRnanU31Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YyYj73r7Xzcrv0;
-	Wed, 19 Feb 2025 19:15:39 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4YyYpr37n2z22kst;
+	Wed, 19 Feb 2025 19:20:36 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EB12914022D;
-	Wed, 19 Feb 2025 19:17:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 9333E140360;
+	Wed, 19 Feb 2025 19:20:05 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 19 Feb 2025 19:17:12 +0800
-Message-ID: <f45fa065-a72c-46d6-a196-f4bc1d9f395e@huawei.com>
-Date: Wed, 19 Feb 2025 19:17:12 +0800
+ 15.2.1544.11; Wed, 19 Feb 2025 19:20:05 +0800
+Message-ID: <c9950a79-7bcb-41c2-a59e-af315dc6d7ff@huawei.com>
+Date: Wed, 19 Feb 2025 19:20:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,222 +48,204 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] powerpc/pseries/iommu: Wait until all TCEs are
- unmapped before deleting DDW
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Gaurav Batra
-	<gbatra@linux.ibm.com>, <maddy@linux.ibm.com>
-CC: <linuxppc-dev@lists.ozlabs.org>, <brking@linux.vnet.ibm.com>,
-	<mpe@ellerman.id.au>, <iommu@lists.linux.dev>, <ilias.apalodimas@linaro.org>,
-	Netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Mina
- Almasry <almasrymina@google.com>
-References: <20250213171051.63748-1-gbatra@linux.ibm.com>
- <3e6505a4-ba21-4dd6-8ad2-8e0ef8846fc3@kernel.org>
+Subject: Re: [RFC] mm: alloc_pages_bulk: remove assumption of populating only
+ NULL elements
+To: Dave Chinner <david@fromorbit.com>
+CC: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
+ Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
+	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
+ Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
+ Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
+	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
+References: <20250217123127.3674033-1-linyunsheng@huawei.com>
+ <Z7Oqy2j4xew7FW9Z@dread.disaster.area>
+ <cf270a65-c9fa-453a-b7a0-01708063f73e@huawei.com>
+ <Z7T4NZAn4wD_DLTl@dread.disaster.area>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <3e6505a4-ba21-4dd6-8ad2-8e0ef8846fc3@kernel.org>
+In-Reply-To: <Z7T4NZAn4wD_DLTl@dread.disaster.area>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2025/2/18 22:40, Jesper Dangaard Brouer wrote:
-> Cc. netdev and Yunsheng Lin
+On 2025/2/19 5:14, Dave Chinner wrote:
+> On Tue, Feb 18, 2025 at 05:21:27PM +0800, Yunsheng Lin wrote:
+>> On 2025/2/18 5:31, Dave Chinner wrote:
+>>
+>> ...
+>>
+>>> .....
+>>>
+>>>> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+>>>> index 15bb790359f8..9e1ce0ab9c35 100644
+>>>> --- a/fs/xfs/xfs_buf.c
+>>>> +++ b/fs/xfs/xfs_buf.c
+>>>> @@ -377,16 +377,17 @@ xfs_buf_alloc_pages(
+>>>>  	 * least one extra page.
+>>>>  	 */
+>>>>  	for (;;) {
+>>>> -		long	last = filled;
+>>>> +		long	alloc;
+>>>>  
+>>>> -		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
+>>>> -					  bp->b_pages);
+>>>> +		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - refill,
+>>>> +					 bp->b_pages + refill);
+>>>> +		refill += alloc;
+>>>>  		if (filled == bp->b_page_count) {
+>>>>  			XFS_STATS_INC(bp->b_mount, xb_page_found);
+>>>>  			break;
+>>>>  		}
+>>>>  
+>>>> -		if (filled != last)
+>>>> +		if (alloc)
+>>>>  			continue;
+>>>
+>>> You didn't even compile this code - refill is not defined
+>>> anywhere.
+>>>
+>>> Even if it did complile, you clearly didn't test it. The logic is
+>>> broken (what updates filled?) and will result in the first
+>>> allocation attempt succeeding and then falling into an endless retry
+>>> loop.
+>>
+>> Ah, the 'refill' is a typo, it should be 'filled' instead of 'refill'.
+>> The below should fix the compile error:
+>> --- a/fs/xfs/xfs_buf.c
+>> +++ b/fs/xfs/xfs_buf.c
+>> @@ -379,9 +379,9 @@ xfs_buf_alloc_pages(
+>>         for (;;) {
+>>                 long    alloc;
+>>
+>> -               alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - refill,
+>> -                                        bp->b_pages + refill);
+>> -               refill += alloc;
+>> +               alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
+>> +                                        bp->b_pages + filled);
+>> +               filled += alloc;
+>>                 if (filled == bp->b_page_count) {
+>>                         XFS_STATS_INC(bp->b_mount, xb_page_found);
+>>                         break;
+>>
+>>>
+>>> i.e. you stepped on the API landmine of your own creation where
+>>> it is impossible to tell the difference between alloc_pages_bulk()
+>>> returning "memory allocation failed, you need to retry" and
+>>> it returning "array is full, nothing more to allocate". Both these
+>>> cases now return 0.
+>>
+>> As my understanding, alloc_pages_bulk() will not be called when
+>> "array is full" as the above 'filled == bp->b_page_count' checking
+>> has ensured that if the array is not passed in with holes in the
+>> middle for xfs.
+> 
+> You miss the point entirely. Previously, alloc_pages_bulk() would
+> return a value that would tell us the array is full, even if we
+> call it with a full array to begin with.
+> 
+> Now it fails to tell us that the array is full, and we have to track
+> that precisely ourselves - it is impossible to tell the difference
+> between "array is full" and "allocation failed". Not being able to
+> determine from the allocation return value whether the array is
+> ready for use or whether another go-around to fill it is needed is a
+> very poor API choice, regardless of anything else.
+> 
+> You've already demonstrated this: tracking array usage in every
+> caller is error-prone and much harder to get right than just having
+> alloc_pages_bulk() do everything for us.
 
-Thanks for Cc'ing.
+While I am agreed that it might be hard to track array usage in every
+caller to see if removing assumption of populating only NULL elements
+cause problem for them, I still think the page bulk alloc API before
+this patch have some space for improvement from performance and
+easy-to-use perspective as the most existing calllers of page bulk
+alloc API are trying to bulk allocate the page for the whole array
+sequentially.
 
 > 
-> On 13/02/2025 18.10, Gaurav Batra wrote:
->> Some of the network drivers, like Mellanox, use core linux page_pool APIs
->> to manage DMA buffers. These page_pool APIs cache DMA buffers with
->> infrequent map/unmap calls for DMA mappings, thus increasing performance.
+>>> The existing code returns nr_populated in both cases, so it doesn't
+>>> matter why alloc_pages_bulk() returns with nr_populated != full, it
+>>> is very clear that we still need to allocate more memory to fill it.
 >>
->> When a device is initialized, the drivers makes a call to the page_pool API
->> to create a DMA buffer pool. Hence forth DMA buffers are allocated and
->> freed from this pool by the driver. The DMA map/unmap is done by the core
->> page_pool infrastructure.
+>> I am not sure if the array will be passed in with holes in the
+>> middle for the xfs fs as mentioned above, if not, it seems to be
+>> a typical use case like the one in mempolicy.c as below:
 >>
->> These DMA buffers could be allocated for RX/TX buffer rings for the device
->> or could be in-process by the network stack.
->>
->> When a network device is closed, driver will release all DMA mapped
->> buffers. All the DMA buffers allocated to the RX/TX rings are released back
->> to the page_pool by the driver. Some of the DMA mapped buffers could still
->> be allocated and in-process by the network stack.
->>
->> DMA buffers that are relased by the Network driver are synchronously
->> unmapped by the page_pool APIs. But, DMA buffers that are passed to the
->> network stack and still in-process are unmapped later asynchronously by the
->> page_pool infrastructure.
->>
->> This asynchronous unmapping of the DMA buffers, by the page_pool, can lead
->> to issues when a network device is dynamically removed in PowerPC
->> architecture.  When a network device is DLPAR removed, the driver releases
->> all the mapped DMA buffers and stops using the device. Driver returns
->> successfully. But, at this stage there still could be mapped DMA buffers
->> which are in-process by the network stack.
->>
->> DLPAR code proceeds to remove the device from the device tree, deletes
->> Dynamic DMA Window (DDW) and associated IOMMU tables. DLPAR of the device
->> succeeds.
->>
->> Later, when network stack release some of the DMA buffers, page_pool
->> proceeds to unmap them. The page_pool relase path calls into PowerPC TCE
->> management to release the TCE. This is where the LPAR OOPses since the DDW
->> and associated resources for the device are already free'ed.
+>> https://elixir.bootlin.com/linux/v6.14-rc1/source/mm/mempolicy.c#L2525
+> 
+> That's not "typical" usage. That is implementing "try alloc" fast
+> path that avoids memory reclaim with a slow path fallback to fill
+> the rest of the array when the fast path fails.
+> 
+> No other users of alloc_pages_bulk() is trying to do this.
 
-Yes, the above seems like a similar issue the below patch is trying to
-fix too. After several iteration of trying to fixing the bug, the generic
-fix seems to avoid calling the DMA API after driver has unbound, which
-means page_pool need to keep track of all the inflight pages and do the
-dma unmapping for all the inflight page when page_pool_destroy() is called.
+What I meant by "typical" usage is the 'page_array + nr_allocated'
+trick that avoids the NULL checking when page bulk allocation API
+is used in mm/mempolicy.c, most of existing callers for page bulk
+allocation in other places seems likely to be changed to do the
+similar trick as this patch does.
 
-It would be good if the below patchset is tested to see if it fix the
-problem for iommu problem in this patch for powerpc system.
+> 
+> Indeed, it looks somewhat pointless to do this here (i.e. premature
+> optimisation!), because the only caller of
+> alloc_pages_bulk_mempolicy_noprof() has it's own fallback slowpath
+> for when alloc_pages_bulk() can't fill the entire request.
+> 
+>>> IOWs, you just demonstrated why the existing API is more desirable
+>>> than a highly constrained, slightly faster API that requires callers
+>>> to get every detail right. i.e. it's hard to get it wrong with the
+>>> existing API, yet it's so easy to make mistakes with the proposed
+>>> API that the patch proposing the change has serious bugs in it.
+>>
+>> IMHO, if the API is about refilling pages for the only NULL elements,
+>> it seems better to add a API like refill_pages_bulk() for that, as
+>> the current API seems to be prone to error of not initializing the
+>> array to zero before calling alloc_pages_bulk().
+> 
+> How is requiring a well defined initial state for API parameters
+> "error prone"?  What code is failing to do the well known, defined
+> initialisation before calling alloc_pages_bulk()?
+> 
+> Allowing uninitialised structures in an API (i.e. unknown initial
+> conditions) means we cannot make assumptions about the structure
+> contents within the API implementation.  We cannot assume that all
+> variables are zero on the first use, nor can we assume that anything
+> that is zero has a valid state.
 
-https://lore.kernel.org/all/20250212092552.1779679-3-linyunsheng@huawei.com/
+It seems the above is the main differenece we see from the API perspective,
+as I see the array as output parameter and you seems to treat the array as
+both input and output parameter?
 
->>
->> This issue was exposed during (Live Partition Migration) LPM from a Power9
->> to Power10 machine with HNV configuration. The bonding device is Virtual
->> Ethernet with SR-IOV. During LPM, I/O is switched from SR-IOV to passive
->> Virtual Ethernet and DLPAR remove of SR-IOV is initiated. This lead to the
->> above mentioned scenario.
->>
->> It is possible to hit this issue by just Dynamically removing SR-IOV device
->> which is under heavy I/O load, a scenario where some of the mapped DMA
->> buffers are in-process somewhere in the network stack and not mapped to the
->> RX/TX ring of the device.
->>
->> The issue is only encountered when TCEs are dynamically managed. In this
->> scenario map/unmap of TCEs goes into the PowerPC TCE management path as and
->> when DMA bufffers are mapped/unmaped and accesses DDW resources. When RAM
->> is directly mapped during device initialization, this dynamic TCE
->> management is by-passed and LPAR doesn't OOPses.
->>
->> Solution:
->>
->> During DLPAR remove of the device, before deleting the DDW and associated
->> resources, check to see if there are any outstanding TCEs. If there are
->> outstanding TCEs, sleep for 50ms and check again, until all the TCEs are
->> unmapped.
->>
->> Once all the TCEs are unmapped, DDW is removed and DLPAR succeeds. This
->> ensures there will be no reference to the DDW after it is deleted.
->>
->> Here is the stack for reference
->>
->> [ 3610.403820] tce_freemulti_pSeriesLP: 48 callbacks suppressed
->> [ 3610.403833] tce_freemulti_pSeriesLP: plpar_tce_stuff failed
->> [ 3610.403869]  rc      = -4
->> [ 3610.403872]  index   = 0x70000016
->> [ 3610.403876]  limit     = 0x1
->> [ 3610.403879]  tce       = 0x80000061ee00000
->> [ 3610.403882]  pgshift = 0x10
->> [ 3610.403884]  npages  = 0x1
->> [ 3610.403887]  tbl     = 000000003a6a2145
->> [ 3610.403912] CPU: 86 PID: 97129 Comm: kworker/86:2 Kdump: loaded Tainted: G            E        6.4.0-623164-default #1 SLE15-SP6 763d454e096eda7d91355fd5b171013052d83ed3
->> [ 3610.403928] Hardware name: IBM,9080-M9S POWER9 (raw) 0x4e2101 0xf000005 of:IBM,FW950.80 (VH950_131) hv:phyp pSeries
->> [ 3610.403937] Workqueue: events page_pool_release_retry
->> [ 3610.404003] Call Trace:
->> [ 3610.404006] [c000055034e6bb30] [c000000000f63108] dump_stack_lvl+0x6c/0x9c (unreliable)
->> [ 3610.404039] [c000055034e6bb60] [c000000000101258] tce_freemulti_pSeriesLP+0x1e8/0x1f0
->> [ 3610.404070] [c000055034e6bbf0] [c00000000005d248] __iommu_free+0x118/0x220
->> [ 3610.404086] [c000055034e6bc80] [c00000000005d4e8] iommu_free+0x28/0x70
->> [ 3610.404106] [c000055034e6bcb0] [c00000000005c4b4] dma_iommu_unmap_page+0x24/0x40
->> [ 3610.404113] [c000055034e6bcd0] [c00000000024b56c] dma_unmap_page_attrs+0x1ac/0x1e0
->> [ 3610.404139] [c000055034e6bd30] [c000000000cfa178] page_pool_return_page+0x58/0x1b0
->> [ 3610.404146] [c000055034e6bd60] [c000000000cfb7bc] page_pool_release+0x10c/0x270^
->> [ 3610.404152] [c000055034e6be00] [c000000000cfbb2c] page_pool_release_retry+0x2c/0x110
->> [ 3610.404159] [c000055034e6be70] [c00000000018e294] process_one_work+0x314/0x620
->> [ 3610.404173] [c000055034e6bf10] [c00000000018ee88] worker_thread+0x78/0x620
->> [ 3610.404179] [c000055034e6bf90] [c00000000019b958] kthread+0x148/0x150
->> [ 3610.404188] [c000055034e6bfe0] [c00000000000ded8] start_kernel_thread+0x14/0x18
->>
->> Signed-off-by: Gaurav Batra <gbatra@linux.ibm.com>
->> ---
->>   arch/powerpc/kernel/iommu.c            | 22 ++++++++++++++++++++--
->>   arch/powerpc/platforms/pseries/iommu.c |  8 ++++----
->>   2 files changed, 24 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
->> index 76381e14e800..af7511a8f480 100644
->> --- a/arch/powerpc/kernel/iommu.c
->> +++ b/arch/powerpc/kernel/iommu.c
->> @@ -14,6 +14,7 @@
->>   #include <linux/types.h>
->>   #include <linux/slab.h>
->>   #include <linux/mm.h>
->> +#include <linux/delay.h>
->>   #include <linux/spinlock.h>
->>   #include <linux/string.h>
->>   #include <linux/dma-mapping.h>
->> @@ -803,6 +804,7 @@ bool iommu_table_in_use(struct iommu_table *tbl)
->>   static void iommu_table_free(struct kref *kref)
->>   {
->>       struct iommu_table *tbl;
->> +    unsigned long start_time;
->>         tbl = container_of(kref, struct iommu_table, it_kref);
->>   @@ -817,8 +819,24 @@ static void iommu_table_free(struct kref *kref)
->>       iommu_debugfs_del(tbl);
->>         /* verify that table contains no entries */
->> -    if (iommu_table_in_use(tbl))
->> -        pr_warn("%s: Unexpected TCEs\n", __func__);
->> +    start_time = jiffies;
->> +    while (iommu_table_in_use(tbl)) {
->> +        int sec;
->> +
->> +        pr_info("%s: Unexpected TCEs, wait for 50ms\n", __func__);
->> +        msleep(50);
->> +
->> +        /* Come out of the loop if we have already waited for 120 seconds
->> +         * for the TCEs to be free'ed. TCE are being free'ed
->> +         * asynchronously by some DMA buffer management API - like
->> +         * page_pool.
->> +         */
->> +        sec = (s32)((u32)jiffies - (u32)start_time) / HZ;
->> +        if (sec >= 120) {
->> +            pr_warn("%s: TCEs still mapped even after 120 seconds\n", __func__);
->> +            break;
->> +        }
+The kmem_cache_alloc_bulk() API related API seems to treat the array as
+output parameter too as this patch does, the difference from this patch
+is that if there is no enough memory, it will free the allocated memory
+and return 0 to the caller while this patch returns already allocated
+memory to its caller even when there is no enough memory.
 
-As mentioned in the above patch, the delay doesn't really work for the
-case 2 below:
-"Currently it seems there are at least two cases that the page
-is not released fast enough causing dma unmmapping done after
-driver has already unbound:
-1. ipv4 packet defragmentation timeout: this seems to cause
-   delay up to 30 secs.
-2. skb_defer_free_flush(): this may cause infinite delay if
-   there is no triggering for net_rx_action()."
-
-
->> +    }
->>         /* free bitmap */
->>       vfree(tbl->it_map);
->> diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
->> index 534cd159e9ab..925494b6fafb 100644
->> --- a/arch/powerpc/platforms/pseries/iommu.c
->> +++ b/arch/powerpc/platforms/pseries/iommu.c
->> @@ -2390,6 +2390,10 @@ static int iommu_reconfig_notifier(struct notifier_block *nb, unsigned long acti
->>         switch (action) {
->>       case OF_RECONFIG_DETACH_NODE:
->> +        if (pci && pci->table_group)
->> +            iommu_pseries_free_group(pci->table_group,
->> +                    np->full_name);
->> +
->>           /*
->>            * Removing the property will invoke the reconfig
->>            * notifier again, which causes dead-lock on the
->> @@ -2400,10 +2404,6 @@ static int iommu_reconfig_notifier(struct notifier_block *nb, unsigned long acti
->>           if (remove_dma_window_named(np, false, DIRECT64_PROPNAME, true))
->>               remove_dma_window_named(np, false, DMA64_PROPNAME, true);
->>   -        if (pci && pci->table_group)
->> -            iommu_pseries_free_group(pci->table_group,
->> -                    np->full_name);
->> -
->>           spin_lock(&dma_win_list_lock);
->>           list_for_each_entry(window, &dma_win_list, list) {
->>               if (window->device == np) {
->>
->> base-commit: 6e4436539ae182dc86d57d13849862bcafaa4709
+> 
+> Again, this is poor API design - structures passed to interfaces
+> -should- have a well defined initial state, either set by a *_init()
+> function or by defining the initial state to be all zeros (i.e. via
+> memset, kzalloc, etc).
+> 
+> Performance and speed is not an excuse for writing fragile, easy to
+> break code and APIs.
+> 
+> -Dave.
 
