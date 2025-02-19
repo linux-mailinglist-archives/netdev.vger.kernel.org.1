@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-167604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A0FA3B052
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 05:21:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88762A3B05F
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 05:31:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 058CC1891EA4
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 04:21:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C7961895C4F
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 04:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BFC1A5BA9;
-	Wed, 19 Feb 2025 04:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25CC1A8F9E;
+	Wed, 19 Feb 2025 04:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aUNQy1LQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bJVVe53W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4433FD4;
-	Wed, 19 Feb 2025 04:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708771D554;
+	Wed, 19 Feb 2025 04:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739938868; cv=none; b=s3V40YNTkvbUXKZlEObTjpHwrCKS6Amr7C3x/w4VTkNNBcBQHBzCUPDv/WRQuS+gWcC1XgIvTh8VBN7HK6y3fU1xI281ruGl9nRufMChCYxo8zN+64j8hs34LtAoHG2dyzj07OaTGnV2/sThOPqAkfcEWvLLaSaGeJKCh6jg/LU=
+	t=1739939501; cv=none; b=ICw1BuIaieHlqSoAW5BQl6krDjKjnhrphSn9+RVbAbFxYt4ffSCbO0TIR5kEylpdys0N7YZ1wr73YdSkQwc/VJ+GCpDyDqct6JpPRS7PP/sV8VFJessI2BeMD3GyFIRYAGTiUPfp4iLJM+RqJ1sjeEyN3pOQohkbcUg5GiKI4h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739938868; c=relaxed/simple;
-	bh=ckkrBzfsdso+T2awCaIUQiZvGU2IkHGhc+H4I3t65fk=;
+	s=arc-20240116; t=1739939501; c=relaxed/simple;
+	bh=AAXRzVWm6+QKbg0q7VhMuL2NH/Rn8BgKA9ElBx5Gpkk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C4dyvZhK23ZmjEgpQyF8XKIwn8g+ct4F79njVN5RQzoVUe9kvSqP7K0amKoOIshp9jSK1jSEHqZIC5f8qcGsA4Op/nMYN5YlqjDmmCWWyV8VUVkMacMY/SGc83vuQpGjxtL3nCuGi6vpwdZ5+6QtiDKc400zPK5pcc1oTBSsPcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aUNQy1LQ; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=ulSETpBB2WCiDBXeaAN62Olm2I6+KxOZSxOGqSQMs9h5lAeECzeiJWTNkAU3QLnrdiCVm35A6/TQ43xgd07JFAGzqnxdzR80FKqIzV5cH48sqrJPk3VCOJ8k8aJtsJdNWK513cqoUwsbsmTExgJOoB+lO4kOkTaF3be4VBlbG7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bJVVe53W; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739938866; x=1771474866;
+  t=1739939499; x=1771475499;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=ckkrBzfsdso+T2awCaIUQiZvGU2IkHGhc+H4I3t65fk=;
-  b=aUNQy1LQbgusN+UJddcOhVHRX4DLb2DzY/qDOIRZggrE/pL0mG5DkdnF
-   TZdHNZ0ylAJ7h+AAAW7/U8y/WK8HLzNYYU7ZsqMllt9HKszmieLjGaipD
-   ruvaNJotIUZiaNWeN2Y1dvIEb7UjJJgaUXOXmjLGKtgD1Qgvc4/EsmFjs
-   SN0DfLo7/zOrS7s12RHA3CskNU1imrfwk7o+8aEOUUOh6+t5xEuzpKW/r
-   Hduu56YUy5yv03S7RA8QreGy9FteoUp8gISZNCRrYeAtj4UvqApsFPASi
-   p4i9YLxGtkRGpo6oj9AGdwImxwKftdtt0GXl+XpEC4SmrbCflgLHLypdp
-   Q==;
-X-CSE-ConnectionGUID: dkuShneJRg2y4fZiEKjyIQ==
-X-CSE-MsgGUID: XrkXwP7zQ+KEHxFspGr0ow==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="58062440"
+  bh=AAXRzVWm6+QKbg0q7VhMuL2NH/Rn8BgKA9ElBx5Gpkk=;
+  b=bJVVe53WpXFSGwGjs9mqUhDGSG2kE6p/v0iuw/upFPWIed7RDabgRt1g
+   4q6+oYPkjDa4S36YVFajqgqizDlElpLULvZWWLYtiLA8QU6sO0if/npBM
+   Shy7GTqb91Ohs66ax0RD1OlngeXkNcTdvVvlW0i52D811kG2/ltp7ZUsp
+   ZEMbUZ2PVi65TvUsIgwcuY5w1dBQ6yeFIqaJ76LzRhhFlvkNZRX1Cx2Sw
+   Odnzmnwa4LbBsZuVltZGC8242xv5qeibNLg3qL7vPm7WktGPyyLolzu+u
+   lr1RUqgWsTQmMlK+mU/fDZ/So/DkO9tGITx5i55EtkjUvfcWVWEKzwKf9
+   g==;
+X-CSE-ConnectionGUID: 23Uo4ECjTXuxIhT2VIAbQA==
+X-CSE-MsgGUID: oV8RF4W4SVyogouH1h8m5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="63138301"
 X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="58062440"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 20:21:05 -0800
-X-CSE-ConnectionGUID: V8xrp3+cQyG9v96azC7CMA==
-X-CSE-MsgGUID: xx5oaXeYT06QKPJpPoD3MA==
+   d="scan'208";a="63138301"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 20:31:38 -0800
+X-CSE-ConnectionGUID: anHUsH6hT9agwGAAhvmeDA==
+X-CSE-MsgGUID: df/rmvh4QZyzvdSOMK+S+A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="114450358"
+   d="scan'208";a="137837363"
 Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 18 Feb 2025 20:20:59 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 18 Feb 2025 20:31:34 -0800
 Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tkbZB-0001EN-1J;
-	Wed, 19 Feb 2025 04:20:49 +0000
-Date: Wed, 19 Feb 2025 12:18:57 +0800
+	id 1tkbjw-0001Ep-2g;
+	Wed, 19 Feb 2025 04:31:22 +0000
+Date: Wed, 19 Feb 2025 12:29:47 +0800
 From: kernel test robot <lkp@intel.com>
 To: Kyle Hendry <kylehendrydev@gmail.com>, Lee Jones <lee@kernel.org>,
 	Rob Herring <robh@kernel.org>,
@@ -78,11 +78,11 @@ To: Kyle Hendry <kylehendrydev@gmail.com>, Lee Jones <lee@kernel.org>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
 	Jonas Gorski <jonas.gorski@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Kyle Hendry <kylehendrydev@gmail.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kyle Hendry <kylehendrydev@gmail.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
-Message-ID: <202502191212.s0NqhQ3T-lkp@intel.com>
+Message-ID: <202502191246.zER47JXl-lkp@intel.com>
 References: <20250218013653.229234-2-kylehendrydev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -108,39 +108,26 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Kyle-Hendry/net-phy-bcm63
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next
 patch link:    https://lore.kernel.org/r/20250218013653.229234-2-kylehendrydev%40gmail.com
 patch subject: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
-config: x86_64-buildonly-randconfig-004-20250219 (https://download.01.org/0day-ci/archive/20250219/202502191212.s0NqhQ3T-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250219/202502191212.s0NqhQ3T-lkp@intel.com/reproduce)
+config: loongarch-randconfig-001-20250219 (https://download.01.org/0day-ci/archive/20250219/202502191246.zER47JXl-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250219/202502191246.zER47JXl-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502191212.s0NqhQ3T-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502191246.zER47JXl-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
->> drivers/net/phy/bcm63xx.c:84:5: warning: no previous prototype for function 'bcm63268_gphy_set' [-Wmissing-prototypes]
+>> drivers/net/phy/bcm63xx.c:84:5: warning: no previous prototype for 'bcm63268_gphy_set' [-Wmissing-prototypes]
       84 | int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
-         |     ^
-   drivers/net/phy/bcm63xx.c:84:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-      84 | int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
-         | ^
-         | static 
->> drivers/net/phy/bcm63xx.c:100:5: warning: no previous prototype for function 'bcm63268_gphy_resume' [-Wmissing-prototypes]
+         |     ^~~~~~~~~~~~~~~~~
+>> drivers/net/phy/bcm63xx.c:100:5: warning: no previous prototype for 'bcm63268_gphy_resume' [-Wmissing-prototypes]
      100 | int bcm63268_gphy_resume(struct phy_device *phydev)
-         |     ^
-   drivers/net/phy/bcm63xx.c:100:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     100 | int bcm63268_gphy_resume(struct phy_device *phydev)
-         | ^
-         | static 
->> drivers/net/phy/bcm63xx.c:115:5: warning: no previous prototype for function 'bcm63268_gphy_suspend' [-Wmissing-prototypes]
+         |     ^~~~~~~~~~~~~~~~~~~~
+>> drivers/net/phy/bcm63xx.c:115:5: warning: no previous prototype for 'bcm63268_gphy_suspend' [-Wmissing-prototypes]
      115 | int bcm63268_gphy_suspend(struct phy_device *phydev)
-         |     ^
-   drivers/net/phy/bcm63xx.c:115:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     115 | int bcm63268_gphy_suspend(struct phy_device *phydev)
-         | ^
-         | static 
-   3 warnings generated.
+         |     ^~~~~~~~~~~~~~~~~~~~~
 
 
 vim +/bcm63268_gphy_set +84 drivers/net/phy/bcm63xx.c
