@@ -1,156 +1,100 @@
-Return-Path: <netdev+bounces-167772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD514A3C35C
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:17:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D8AA3C35E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:17:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CAD83BA059
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:15:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83BB17018B
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D109195B33;
-	Wed, 19 Feb 2025 15:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8B315CD52;
+	Wed, 19 Feb 2025 15:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bIAHbkQx"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA2915CD52;
-	Wed, 19 Feb 2025 15:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6AA1E885;
+	Wed, 19 Feb 2025 15:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739978136; cv=none; b=SmI3ipIM+QzfrBtAYAKTm9PO8vqP9HF+rYLOTQU3PkR7qj+1iIAGamYG9F7cHvMBNPNXpGV9A3x/TPJhDZpj4keFaUS+4OUniNp8TRzi89x0IA8jCzpbRxwhKNc9Um9IL4M0uS4IKCyYUpeQtXpac7XQD383foeHMyD2MHoaeGY=
+	t=1739978210; cv=none; b=TnCGQ2/3KFj215GixL13NwxjjTNcN2WZFeURRZ0LNP40TzRh/kipTYIwAhT709Ow8lL6zFzOI1Ypl5AmN84yiHhZdGnydssdQkHw0dLSdL8QbLFbEKESkoDr42zPfOkrqjC7ZHC9KvbQ+BvcTDcSDtrI8u6Sn3nhAym2HkXgbcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739978136; c=relaxed/simple;
-	bh=y9WgzGffg+Am1VM1kKEZ+wLyOI55SBmza0HtJx0xEaQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=WRft6mv9h6XVO1BXNZKUPEG778i8vQdYFwl6pjByQ/OhAoKSKHRYDG1WJ3ghfdNsxD/FwnPIOrZCejv6DKWNjpB2pLL4wrBbbPiXYdFWcDniwN+d4/muXBrVCZSrlO6kp6X4fmbsXb3101wV4b4+sRMGAQfRCC0IozivVHxDd9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklnE-000C1J-Hk; Wed, 19 Feb 2025 16:15:20 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklnE-000GLI-1m;
-	Wed, 19 Feb 2025 16:15:20 +0100
-Message-ID: <fea35f08-3f29-4f7e-8be5-c77d4cee8be1@hetzner-cloud.de>
-Date: Wed, 19 Feb 2025 16:15:17 +0100
+	s=arc-20240116; t=1739978210; c=relaxed/simple;
+	bh=ZykFC8bnHwpmxrkNc+2ymmxT1VsaK/Ltu2/oL3ISzDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O2LW1Xjf1gQ/r0CbIDb/v+CNrqPdO3ozW3pUUI8wTu7zv+/8rS2CUQlutl3SNpMMtu9PLH1+qztLyAyBRo2WxKUbpVILY33sOGPkS05fJk+9nJMPMk7bcC60fn3Z+YiWpIS4+rZCrTVo2L/Z4AEz98q21LCGRnK5yh2JraXInyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bIAHbkQx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7XNjSxYshEtTvXChmY5fi80Lo+W2gHUxjNLerZH4GJI=; b=bIAHbkQx/aLzCkOW+Qx6j602+6
+	jT/V4PkuU1d6zs7eKtMXRUOb6gdGaIfV4qRrQ5epDKETwTLsmhoBmmt0T1wLlJwdRdKqSm7taSVl1
+	1sB4TukoM31nqxr6hwYyLyzN/QCjb1U9zXw7AF+WAxbee+3SBON7Z9x9bRjOXT171Yw8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tkloO-00FfIt-1k; Wed, 19 Feb 2025 16:16:32 +0100
+Date: Wed, 19 Feb 2025 16:16:32 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Sky Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
+ built-in 2.5G ethernet PHY on MT7988
+Message-ID: <87318b5f-e67d-417d-8149-e1d918b23568@lunn.ch>
+References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
+ <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
+ <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- hawk@kernel.org
-References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
- <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
- <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
- <dee9bc39-e666-4d97-8a42-240ffb458bcc@hetzner-cloud.de>
- <67b5f392408d7_1b78d8294e7@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v2 2/6] net: tun: enable transfer of XDP metadata
- to skb
-In-Reply-To: <67b5f392408d7_1b78d8294e7@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27554/Wed Feb 19 10:50:24 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
 
-Am 19.02.25 um 16:06 schrieb Willem de Bruijn:
-> Marcus Wichelmann wrote:
->> Am 18.02.25 um 02:47 schrieb Willem de Bruijn:
->>> [...]
->>> This is pointer comparison, which is tricky wrt type. It likely is
->>> ptrdiff_t and thus signed. But may want to use max_t(long int, ..) to
->>> make this explicit.
->>
->> Ah, I see, good point.
->>
->> So like that?
->>
->> 	metasize = max_t(long int, xdp->data - xdp->data_meta, 0);
->> 	if (metasize)
->> 		skb_metadata_set(skb, metasize);
+On Wed, Feb 19, 2025 at 09:33:44AM +0000, Russell King (Oracle) wrote:
+> On Wed, Feb 19, 2025 at 04:39:10PM +0800, Sky Huang wrote:
+> > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
+> > +{
+> > +	struct pinctrl *pinctrl;
+> > +	int ret;
+> > +
+> > +	/* Check if PHY interface type is compatible */
+> > +	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
+> > +		return -ENODEV;
+> > +
+> > +	ret = mt798x_2p5ge_phy_load_fw(phydev);
+> > +	if (ret < 0)
+> > +		return ret;
 > 
-> Or just this? Also ensures the test uses signed int.
-> 
->      int metasize;
-> 
->      ...
-> 
-> 
->      metasize = xdp->data - xdp->data_meta;
->      if (metasize > 0)
->              skb_metadata_set(skb, metasize);
-> 
+> Firmware should not be loaded in the .config_init method. The above
+> call will block while holding the RTNL which will prevent all other
+> network configuration until the firmware has been loaded or the load
+> fails.
 
-Well, yeah, just keep it simple I guess. ;) Will do that.
+The aquantia and qt2025 drivers are good examples to copy.
 
-I'll send a V3 patch series with the change.
-
-Thanks!
-
-Marcus
+	Andrew
 
