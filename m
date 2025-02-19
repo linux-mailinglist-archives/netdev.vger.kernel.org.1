@@ -1,100 +1,111 @@
-Return-Path: <netdev+bounces-167773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D8AA3C35E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:17:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0CDEA3C388
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:23:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83BB17018B
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:16:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 039E0188C553
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8B315CD52;
-	Wed, 19 Feb 2025 15:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5E71EFFAB;
+	Wed, 19 Feb 2025 15:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bIAHbkQx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BnbkHvvm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6AA1E885;
-	Wed, 19 Feb 2025 15:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58208199237
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 15:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739978210; cv=none; b=TnCGQ2/3KFj215GixL13NwxjjTNcN2WZFeURRZ0LNP40TzRh/kipTYIwAhT709Ow8lL6zFzOI1Ypl5AmN84yiHhZdGnydssdQkHw0dLSdL8QbLFbEKESkoDr42zPfOkrqjC7ZHC9KvbQ+BvcTDcSDtrI8u6Sn3nhAym2HkXgbcI=
+	t=1739978576; cv=none; b=uBbUfNVdzkXdcc4D8jlmt5vF2gjt9NgCibIHskE148fte2Z5efUpVaBn+/3BM/U5zPy6xK4VQLlOO49k6D/t4HA8Lvyo+2m2qmFmN0qrNe7iC9egSfhw9dqzePvNI17N79yW5dEafd4qOEd8+nGmRRxgkpFQPeuhxUM0MwobU/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739978210; c=relaxed/simple;
-	bh=ZykFC8bnHwpmxrkNc+2ymmxT1VsaK/Ltu2/oL3ISzDw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O2LW1Xjf1gQ/r0CbIDb/v+CNrqPdO3ozW3pUUI8wTu7zv+/8rS2CUQlutl3SNpMMtu9PLH1+qztLyAyBRo2WxKUbpVILY33sOGPkS05fJk+9nJMPMk7bcC60fn3Z+YiWpIS4+rZCrTVo2L/Z4AEz98q21LCGRnK5yh2JraXInyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bIAHbkQx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7XNjSxYshEtTvXChmY5fi80Lo+W2gHUxjNLerZH4GJI=; b=bIAHbkQx/aLzCkOW+Qx6j602+6
-	jT/V4PkuU1d6zs7eKtMXRUOb6gdGaIfV4qRrQ5epDKETwTLsmhoBmmt0T1wLlJwdRdKqSm7taSVl1
-	1sB4TukoM31nqxr6hwYyLyzN/QCjb1U9zXw7AF+WAxbee+3SBON7Z9x9bRjOXT171Yw8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tkloO-00FfIt-1k; Wed, 19 Feb 2025 16:16:32 +0100
-Date: Wed, 19 Feb 2025 16:16:32 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Sky Huang <SkyLake.Huang@mediatek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Message-ID: <87318b5f-e67d-417d-8149-e1d918b23568@lunn.ch>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
- <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
+	s=arc-20240116; t=1739978576; c=relaxed/simple;
+	bh=iCShM6dMfchXUH1xVrsrvefhLW9VtaeS/gyRxgOTRX4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nF9gPFgZqmvGlDmIp8lRdh7kdk/DhjpGhnU2Ef/1fCPVDGx3ZROdGinuY8VjgxuXFmSK8lgUEXHBiLXG8pzzjtRRvTWaHNZ/IQQu2i9LeCI5YJbXjWkgLxjcxWN+iwCDx5x8gAf5q3yfjSCzOAxiA4wZ6xvsUg/zYtHRX0osCzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BnbkHvvm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 603B8C4CED1;
+	Wed, 19 Feb 2025 15:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739978575;
+	bh=iCShM6dMfchXUH1xVrsrvefhLW9VtaeS/gyRxgOTRX4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BnbkHvvmUHnxX8TqdaT99zvL+EipnlnJMYgOJHI3TYTY04gb39uuV2U4Hf8fZSI5r
+	 qdrqGgLDx5gLK2EwLtw/QxATkQLN39f9vea93pP67+rmNQNK3YTUJC8hvMuofVW+iW
+	 AdNFdfJv1kV5AerygYKVdCeuOsvruevb8gGPVzi8UFFHkQQSbIcFaK6ZJXWWLaX1AQ
+	 RGUYwhsH8PTrRresbJKMpNcJkz6aguZTpmZqhktYGTng5zmNFuNPqpC5KKikUWimc+
+	 UE9f+tVwZtkjY+zUu1x3J9SV8BFXzULQJL5urQ6J7DvqO3MlSh04/mp4FGBSW2t3Zl
+	 fjlc0IpPU4S+g==
+Message-ID: <c125747a-8300-4282-894c-73c19ad7ce2f@kernel.org>
+Date: Wed, 19 Feb 2025 08:22:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/8] net: fib_rules: Add port mask support
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, horms@kernel.org, donald.hunter@gmail.com,
+ petrm@nvidia.com, gnault@redhat.com
+References: <20250217134109.311176-1-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250217134109.311176-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 19, 2025 at 09:33:44AM +0000, Russell King (Oracle) wrote:
-> On Wed, Feb 19, 2025 at 04:39:10PM +0800, Sky Huang wrote:
-> > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > +{
-> > +	struct pinctrl *pinctrl;
-> > +	int ret;
-> > +
-> > +	/* Check if PHY interface type is compatible */
-> > +	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
-> > +		return -ENODEV;
-> > +
-> > +	ret = mt798x_2p5ge_phy_load_fw(phydev);
-> > +	if (ret < 0)
-> > +		return ret;
+On 2/17/25 6:41 AM, Ido Schimmel wrote:
+> In some deployments users would like to encode path information into
+> certain bits of the IPv6 flow label, the UDP source port and the DSCP
+> field and use this information to route packets accordingly.
 > 
-> Firmware should not be loaded in the .config_init method. The above
-> call will block while holding the RTNL which will prevent all other
-> network configuration until the firmware has been loaded or the load
-> fails.
+> Redirecting traffic to a routing table based on specific bits in the UDP
+> source port is not currently possible. Only exact match and range are
+> currently supported by FIB rules.
+> 
+> This patchset extends FIB rules to match on layer 4 ports with an
+> optional mask. The mask is not supported when matching on a range. A
+> future patchset will add support for matching on the DSCP field with an
+> optional mask.
+> 
+> Patches #1-#6 gradually extend FIB rules to match on layer 4 ports with
+> an optional mask.
+> 
+> Patches #7-#8 add test cases for FIB rule port matching.
+> 
+> iproute2 support can be found here [1].
+> 
+> [1] https://github.com/idosch/iproute2/tree/submit/fib_rule_mask_v1
+> 
+> Ido Schimmel (8):
+>   net: fib_rules: Add port mask attributes
+>   net: fib_rules: Add port mask support
+>   ipv4: fib_rules: Add port mask matching
+>   ipv6: fib_rules: Add port mask matching
+>   net: fib_rules: Enable port mask usage
+>   netlink: specs: Add FIB rule port mask attributes
+>   selftests: fib_rule_tests: Add port range match tests
+>   selftests: fib_rule_tests: Add port mask match tests
+> 
+>  Documentation/netlink/specs/rt_rule.yaml      | 10 +++
+>  include/net/fib_rules.h                       | 19 +++++
+>  include/uapi/linux/fib_rules.h                |  2 +
+>  net/core/fib_rules.c                          | 69 ++++++++++++++++++-
+>  net/ipv4/fib_rules.c                          |  8 +--
+>  net/ipv6/fib6_rules.c                         |  8 +--
+>  tools/testing/selftests/net/fib_rule_tests.sh | 36 ++++++++++
+>  7 files changed, 143 insertions(+), 9 deletions(-)
+> 
 
-The aquantia and qt2025 drivers are good examples to copy.
+For the set:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-	Andrew
 
