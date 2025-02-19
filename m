@@ -1,170 +1,150 @@
-Return-Path: <netdev+bounces-167817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3849AA3C720
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:14:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC377A3C765
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39441887F0A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:14:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B933AE603
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7748521506C;
-	Wed, 19 Feb 2025 18:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0355214A68;
+	Wed, 19 Feb 2025 18:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="HUiu4XHP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPGrKe6W"
 X-Original-To: netdev@vger.kernel.org
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEDD215052;
-	Wed, 19 Feb 2025 18:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739988839; cv=pass; b=g3AlqvU5ux7ivIfe8b3FE8P3eTIsB/8QyQaP9LG40gGCQzTM307TzIK1C2dTCc/EHhWY3E46iLUDXaLI3UOa0rmzxm/+ws1rGrkxzWJF2uCWWM4S1btP+P+/6VQxJjaNRp6MlxKSZtXH5VH2FZr2ZVD/mk/d0xSMjg/+Mrsgk5Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739988839; c=relaxed/simple;
-	bh=tFjxQ4xwKJ5WYk4VHccCnN0hp6U7ni1nBRfMdKbhUR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RmTfn/H5mTZ4tqB/ablm9Z6fhAua0/RsTRJmhJsM10kuePI5QVOPbF6uHFigJVXeAUYvIsSNbIdp2pZAIP7+0IKmtiPqfm0ca8wHZMMnZtdt/zl1gfDoMdwGuFfAbOnOc5+e2jfIF7FFVr7kpHun5eOZ9amblyw7CeuVvzRx2Ro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=HUiu4XHP; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from monolith.lan (unknown [193.138.7.178])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yykzj3Tndz10DN;
-	Wed, 19 Feb 2025 20:13:53 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1739988834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vJNzXI82cDFYIUX+q6pOVmeAvH8m6xfO5n99kk/kpC8=;
-	b=HUiu4XHPcHn17HK/B5oEjc8D9KvnDdDYG0zGhZc8xb2hz91DXZVPC1gIvyzEL8w0UApV6z
-	yv5QlDNzrnedYiqfLAu70TvJKa7cI+Avq3lhk0TLazYZEKl1dtMyIFMAJTzTXJDR3zloXp
-	MkW3ySAqwAJllPiTPCHrHPIuzuD/VI0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1739988834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vJNzXI82cDFYIUX+q6pOVmeAvH8m6xfO5n99kk/kpC8=;
-	b=ZPBUqBC//+XBvrBL32pwhdVDOb2gY02YQM161pmwUlqqHAI+UHWxrZ9Dscq+e+sg6SRoQN
-	2OS58sS91/90kswqTZNpmjeWt6K2yL0d7kMwm9UJDhvxIxFkoMUFHzmPPztGDhtHqT0JEN
-	4C24jXoofi4/Y+Lhmlh9l9SoQPv7PXA=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988834; a=rsa-sha256; cv=none;
-	b=ZDaoMVt1ov3YWhawEjeE0Hyb9ffuzB4V+8LFIx8Yw2RigOjdrpNDBperOw5Vnk/KatgiSa
-	jkcdefYMIiUT7BLxyON7UvcqklPAJyoqxBlzxJ94habarC5bh+wwEFySHqX8BHluR7f9fx
-	YGHV68LpKDDJcCOI71Yk3TUU1CEv1NE=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v4 5/5] Bluetooth: SCO: add TX timestamping socket-level mechanism
-Date: Wed, 19 Feb 2025 20:13:37 +0200
-Message-ID: <79a6ebae9e43c390a9d06278a38f00c8d3af81b6.1739988644.git.pav@iki.fi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C4221481B;
+	Wed, 19 Feb 2025 18:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739989467; cv=none; b=d19bZMwWgawk+TKw4v5I7dW64ElJ7OD+hu/jFPFYsJhD4HqNPnsx6bqGfnq69Nk3cbNej3IDgA2EJ306bXsQ+pJV9BtA+3jZXEqprpb94Fnwt7kL7TUZeq9Mabb3pZVeA08k0UQnYuhtq/y5Mfq34czs5+MduQ05ldQvfUeJ/KU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739989467; c=relaxed/simple;
+	bh=MnAffNGuOsgnzdGST98He9D12GmU6n41qfc44ByLtiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j5VqRwoPvkuzNMdh85UBR/wameYTqVhYvozBMpEiaHsSJdZgE5GsrqZQ1LBKUe8avCsXdLmn5NNyj0GJlf7DC4JsjrThpYf1ltYdDvNdilsXZnr881kMv38wWsDEXnccFK4Zs6JuzePTAU+CXwN18WuQCKhbnLrx63kxWPTmbrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPGrKe6W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028C7C4CED1;
+	Wed, 19 Feb 2025 18:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739989467;
+	bh=MnAffNGuOsgnzdGST98He9D12GmU6n41qfc44ByLtiI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YPGrKe6WopB9r+cQOljZNncGAxLtvjs3kio1C1TPdc1hr5wc2IbmljIQ0HIEX04u5
+	 Lo+MhcAOBaa4xQGvYOWA1fTchQLK0wJHUeTDJO+rqPEWbb0G2Rs+3zODzKXdbHFEHO
+	 ne8dna6ynngvy3kN0Q25j5APWOgUyFK4nFHbqMIdE0GqwsTFlLnAslFB0mxEOENvxp
+	 OeYVVv7U53y2gY960MRCRVbISIynQVsS3K8AQ1ZP4m82n0EntuYkCvheWCc42ZgTq3
+	 MJFX8zb4motA1Z3Q3jnmi84MIphZQC4ld8nvPh/oqubwLXHN3qAETDG0oLANRCjMXv
+	 jQ6ejMsHRSyaw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 00/19] crypto: scatterlist handling improvements
+Date: Wed, 19 Feb 2025 10:23:22 -0800
+Message-ID: <20250219182341.43961-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1739988644.git.pav@iki.fi>
-References: <cover.1739988644.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Support TX timestamping in SCO sockets.
+This series can also be retrieved from:
 
-Support MSG_ERRQUEUE in SCO recvmsg.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crypto-scatterlist-v3
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
+This series cleans up and optimizes the code that translates between
+scatterlists (the input to the API) and virtual addresses (what software
+implementations operate on) for skcipher and aead algorithms.
 
-Notes:
-    v4: no changes
+This takes the form of cleanups and optimizations to the skcipher_walk
+functions and a rework of the underlying scatter_walk functions.
 
- net/bluetooth/sco.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+The unnecessary use of scatterlists still remains a huge pain point of
+many of the crypto APIs, with the exception of lib/crypto/, shash, and
+scomp which do it properly.  But this series at least reduces (but not
+eliminates) the impact on performance that the scatterlists have.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index aa7bfe26cb40..f39c57ac594f 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -370,7 +370,8 @@ static int sco_connect(struct sock *sk)
- 	return err;
- }
- 
--static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
-+static int sco_send_frame(struct sock *sk, struct sk_buff *skb,
-+			  const struct sockcm_cookie *sockc)
- {
- 	struct sco_conn *conn = sco_pi(sk)->conn;
- 	int len = skb->len;
-@@ -381,6 +382,7 @@ static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
- 
- 	BT_DBG("sk %p len %d", sk, len);
- 
-+	hci_setup_tx_timestamp(skb, 1, sockc);
- 	hci_send_sco(conn->hcon, skb);
- 
- 	return len;
-@@ -776,6 +778,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- {
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb;
-+	struct sockcm_cookie sockc;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -787,6 +790,14 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	sockcm_init(&sockc, sk);
-+
-+	if (msg->msg_controllen) {
-+		err = sock_cmsg_send(sk, msg, &sockc);
-+		if (err)
-+			return err;
-+	}
-+
- 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
-@@ -794,7 +805,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = sco_send_frame(sk, skb);
-+		err = sco_send_frame(sk, skb, &sockc);
- 	else
- 		err = -ENOTCONN;
- 
-@@ -860,6 +871,10 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct sock *sk = sock->sk;
- 	struct sco_pinfo *pi = sco_pi(sk);
- 
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
-+					  BT_SCM_ERROR);
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECT2 &&
+An an example, this patchset improves IPsec throughput by about 5%, as
+measured using iperf3 bidirectional TCP between two c3d-standard-4 (AMD
+Genoa) instances in Google Compute Engine using transport mode IPsec
+with AES-256-GCM.
+
+This series is organized as follows:
+
+- Patch 1-5 improve scatter_walk, introducing easier-to-use functions
+  and optimizing performance in some cases.
+- Patch 6-17 convert users to use the new functions.
+- Patch 18 removes functions that are no longer needed.
+- Patch 19 optimizes the walker on !HIGHMEM platforms to start returning
+  data segments that can cross a page boundary.  This can significantly
+  improve performance in cases where messages can cross pages, such as
+  IPsec.  Previously there was a large overhead caused by packets being
+  unnecessarily divided into multiple parts by the walker, including
+  hitting skcipher_next_slow() which uses a single-block bounce buffer.
+
+Changed in v3:
+- Dropped patches that were upstreamed.
+- Added a Reviewed-by and Tested-by.
+
+Changed in v2:
+- Added comment to scatterwalk_done_dst().
+- Added scatterwalk_get_sglist() and use it in net/tls/.
+- Dropped the keywrap patch, as keywrap is being removed by
+  https://lore.kernel.org/r/20241227220802.92550-1-ebiggers@kernel.org
+
+Eric Biggers (19):
+  crypto: scatterwalk - move to next sg entry just in time
+  crypto: scatterwalk - add new functions for skipping data
+  crypto: scatterwalk - add new functions for iterating through data
+  crypto: scatterwalk - add new functions for copying data
+  crypto: scatterwalk - add scatterwalk_get_sglist()
+  crypto: skcipher - use scatterwalk_start_at_pos()
+  crypto: aegis - use the new scatterwalk functions
+  crypto: arm/ghash - use the new scatterwalk functions
+  crypto: arm64 - use the new scatterwalk functions
+  crypto: nx - use the new scatterwalk functions
+  crypto: s390/aes-gcm - use the new scatterwalk functions
+  crypto: s5p-sss - use the new scatterwalk functions
+  crypto: stm32 - use the new scatterwalk functions
+  crypto: x86/aes-gcm - use the new scatterwalk functions
+  crypto: x86/aegis - use the new scatterwalk functions
+  net/tls: use the new scatterwalk functions
+  crypto: skcipher - use the new scatterwalk functions
+  crypto: scatterwalk - remove obsolete functions
+  crypto: scatterwalk - don't split at page boundaries when !HIGHMEM
+
+ arch/arm/crypto/ghash-ce-glue.c       |  15 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c   |  17 +--
+ arch/arm64/crypto/ghash-ce-glue.c     |  16 +-
+ arch/arm64/crypto/sm4-ce-ccm-glue.c   |  27 ++--
+ arch/arm64/crypto/sm4-ce-gcm-glue.c   |  31 ++--
+ arch/s390/crypto/aes_s390.c           |  33 ++---
+ arch/x86/crypto/aegis128-aesni-glue.c |  10 +-
+ arch/x86/crypto/aesni-intel_glue.c    |  28 ++--
+ crypto/aegis128-core.c                |  10 +-
+ crypto/scatterwalk.c                  |  91 +++++++-----
+ crypto/skcipher.c                     |  65 +++------
+ drivers/crypto/nx/nx-aes-ccm.c        |  16 +-
+ drivers/crypto/nx/nx-aes-gcm.c        |  17 +--
+ drivers/crypto/nx/nx.c                |  31 +---
+ drivers/crypto/nx/nx.h                |   3 -
+ drivers/crypto/s5p-sss.c              |  38 ++---
+ drivers/crypto/stm32/stm32-cryp.c     |  34 ++---
+ include/crypto/scatterwalk.h          | 203 +++++++++++++++++++++-----
+ net/tls/tls_device_fallback.c         |  31 +---
+ 19 files changed, 363 insertions(+), 353 deletions(-)
+
+
+base-commit: c346fef6fef53fa57ff323b701e7bad82290d0e7
 -- 
 2.48.1
 
