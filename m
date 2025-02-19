@@ -1,124 +1,171 @@
-Return-Path: <netdev+bounces-167876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBA0A3C9D8
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:32:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B82A3C9DF
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DB1218866C8
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:30:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CC3A17A9F4
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8EB23C8C6;
-	Wed, 19 Feb 2025 20:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="evARzIu6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8755923BF9B;
+	Wed, 19 Feb 2025 20:31:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F32522FAD4;
-	Wed, 19 Feb 2025 20:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F154D1B393D;
+	Wed, 19 Feb 2025 20:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739997040; cv=none; b=HEvN1M5nGoU2zIcrafYX/phjH4oxyrPRao5LgxVvWG6hz467lEF1vvWYYxqabogNzQ6S3XZa76GtCAMUXpDnjWLL1TTIy0L7slW+hNJxHXecb/aqXVyVu3EXxLUN3LJOPvNPeHUH2dQYsXPDucXn/BK0+DYucWEuB61ExXVqFv8=
+	t=1739997066; cv=none; b=ifOK7KmGpQpQwy0yFJ8MuWvuBWn3E7ls+szqHnuoRm8gcE3NTpv/J9wrAIUQ8sXzC2u/jAbOrqAjbw24Ys9uP30gFocBhwLicYqpscGFv5FPmsF90gVNIPYkijMRkgb7NyZIQ39pQkvO8N0bitT5jjsw/nH0cF8YIvqzseWsjF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739997040; c=relaxed/simple;
-	bh=VIoB7qiTLaV7Z1JX5PmXLYanxXX/r8BMP27IJazNm84=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pRe+HUH97gUDtyJ9VXrGtdtPv4tzTu9ZS8wPs+GxR/TYch4p5oSta9VC+i6gJeH2tAKWnpZVEw0BIZaxi4B+wICGrljBVf4u+qBae/oS56+14dLXlzJv+pI0NJwT977BDu5Y1+8mLB+SJq/5AgC9MGaF6zsaYQqsajYalGiezCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=evARzIu6; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 396A02043E1E;
-	Wed, 19 Feb 2025 12:30:38 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 396A02043E1E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1739997038;
-	bh=ZQBUkjDtvUw42acvYUgd6vDbgxWPxXM2A3fBzrkCpHM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=evARzIu6/NX/9bIBI2sfnXYCdJ1nGvbU+dT6yPCQ1yzeubqxOcOD7XP2biSMadmZB
-	 a59SM5gvupbfOizLJ+pP03crueVpvNWGnnKSCZ8vz6RoeICb4Rsb0zMD5kVAlJlxkK
-	 7OmgwKLxyHF6cJsFvZHGR3MAVoedH7OLKzcKMQ9s=
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Date: Wed, 19 Feb 2025 20:30:38 +0000
-Subject: [PATCH net-next 3/3] net: ipconfig: convert timeouts to
- secs_to_jiffies()
+	s=arc-20240116; t=1739997066; c=relaxed/simple;
+	bh=0bePGmfHtl35NTbAMyaoUBDGce9xhv6pmYnUXL5lbhU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ttOCthpflrTwB/G0indTRC5MLk6fpOy1fQSWQJ6cj+kTQM7plojN0MVIlub23EoSHaf3Au3m7QUWF/dbHHsh5/buhubTL7MPwh/pjq4ssWQudC57gQ+uG2fUsAIgRWI5AXKOTr2tTWeeEHEu6qZTBnmUARrovtb1+4FqUnG3I+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22100006bc8so2943545ad.0;
+        Wed, 19 Feb 2025 12:31:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739997064; x=1740601864;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kRK2JfG2AGCjzGSvpwHXZ3foDZgl6m2wW0qbGdXRWqE=;
+        b=kSs3VvCK83MMo9i8V74pNYu77l4Wt6HnReAz07jue9F5QHguDhkvo3yomEUbzjix/c
+         Blg3jYvv1Uv6BBr8EmRmJywfDUsTgUCPbR9NNwFt5+lYCDs1iFzh1iUMEr23nV+UA9wf
+         rmHg/ET+Lz/VKid8sb3mQTM27aMYlw6fAnNYRFhHs+4QtF4kxMYYi3+LaNKaxZ2Wd5PB
+         mC2lJvwZ33y1qUzjEXEy1mXGzAxUYbzc+cXcUmYfxbjzHImyKk+wD9eVeoIZjOsMfRrk
+         bW+kTM0XqHmb+9zPbQ0mbXcg0QetYF9o0KV7br/fgm73rloTOUZMIxTIxJlsZqxc7Pfa
+         yaDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkhDu4Z+3hUvh76SAdG0fwhHF+b/qdNmdhXyYK+9V+NLMfJ9WyXLZHyW+pxLFPMSVcXjM8sbF0yjet4/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYqit+1bPWGGZ9zcfcvS0O6MnfYF645z0WeljMpxUT67K+NcBz
+	1dmrbwPF0vDD4EYUMKo4gB5RVdsNqiO/Lh7G+hXb2+fDox7z90PEFTkY
+X-Gm-Gg: ASbGncuSLcCV9IrmvMx2e6oeyOrnoZ8aFm721V5lff22jLVEwxstLQ2d1ie8nMwk3Ws
+	4/xZMd9JR5kBJCHgUjpSLlLbYGd368n00uuieT9S/CteHSOdgG5NsHdZ7ze06c7HLTsFpLnwD9t
+	lxSnM9ssdAt5k3mcn5/UrowejmQzDPdmIn56mNVb491JXUsUFBaRFdf4x888HtcARLsmmXZOEz5
+	KWeccJK2KGJ4hMnlmGrUTN8TRDeDNwUk0TN9BdcNL5nEudY/4oCIL6LestLs4MwblpA1TNZvlzI
+	+je23ZGq/6u8dXE=
+X-Google-Smtp-Source: AGHT+IFT2XOWIrW/21fFy5EjwW01Qin5ADO++YJueG5kbDKcvcpEo3SznaoYKf8r8cA7PpXXITlWJA==
+X-Received: by 2002:a17:903:2351:b0:216:7ee9:220b with SMTP id d9443c01a7336-2210404e4e0mr367274285ad.22.1739997063934;
+        Wed, 19 Feb 2025 12:31:03 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fcbab49a05sm805884a91.1.2025.02.19.12.31.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 12:31:03 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	ncardwell@google.com,
+	kuniyu@amazon.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	almasrymina@google.com,
+	kaiyuanz@google.com,
+	asml.silence@gmail.com
+Subject: [PATCH net v2] tcp: devmem: don't write truncated dmabuf CMSGs to userspace
+Date: Wed, 19 Feb 2025 12:31:02 -0800
+Message-ID: <20250219203102.1053122-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250219-netdev-secs-to-jiffies-part-2-v1-3-c484cc63611b@linux.microsoft.com>
-References: <20250219-netdev-secs-to-jiffies-part-2-v1-0-c484cc63611b@linux.microsoft.com>
-In-Reply-To: <20250219-netdev-secs-to-jiffies-part-2-v1-0-c484cc63611b@linux.microsoft.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
- Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, David Ahern <dsahern@kernel.org>
-Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- Easwar Hariharan <eahariha@linux.microsoft.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-secs_to_jiffies().  As the value here is a multiple of 1000, use
-secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+Currently, we report -ETOOSMALL (err) only on the first iteration
+(!sent). When we get put_cmsg error after a bunch of successful
+put_cmsg calls, we don't signal the error at all. This might be
+confusing on the userspace side which will see truncated CMSGs
+but no MSG_CTRUNC signal.
 
-This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
-the following Coccinelle rules:
+Consider the following case:
+- sizeof(struct cmsghdr) = 16
+- sizeof(struct dmabuf_cmsg) = 24
+- total cmsg size (CMSG_LEN) = 40 (16+24)
 
-@depends on patch@
-expression E;
-@@
+When calling recvmsg with msg_controllen=60, the userspace
+will receive two(!) dmabuf_cmsg(s), the first one will
+be a valid one and the second one will be silently truncated. There is no
+easy way to discover the truncation besides doing something like
+"cm->cmsg_len != CMSG_LEN(sizeof(dmabuf_cmsg))".
 
--msecs_to_jiffies(E * 1000)
-+secs_to_jiffies(E)
+Introduce new put_devmem_cmsg wrapper that reports an error instead
+of doing the truncation. Mina suggests that it's the intended way
+this API should work.
 
--msecs_to_jiffies(E * MSEC_PER_SEC)
-+secs_to_jiffies(E)
+Note that we might now report MSG_CTRUNC when the users (incorrectly)
+call us with msg_control == NULL.
 
-While here, manually convert a couple timeouts denominated in seconds
-
-Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+Fixes: 8f0b3cc9a4c1 ("tcp: RX path for devmem TCP")
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/ipv4/ipconfig.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/ipv4/tcp.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index c56b6fe6f0d771e9275bb66c159d9abb330bdf4c..22a7889876c1cf7d5233fe8a0ee12e134b20c1cd 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -274,9 +274,9 @@ static int __init ic_open_devs(void)
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 0d704bda6c41..ba77beba60c4 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2394,6 +2394,16 @@ static int tcp_xa_pool_refill(struct sock *sk, struct tcp_xa_pool *p,
+ 	return k ? 0 : err;
+ }
  
- 	/* wait for a carrier on at least one device */
- 	start = jiffies;
--	next_msg = start + msecs_to_jiffies(20000);
-+	next_msg = start + secs_to_jiffies(20);
- 	while (time_before(jiffies, start +
--			   msecs_to_jiffies(carrier_timeout * 1000))) {
-+			   secs_to_jiffies(carrier_timeout))) {
- 		int wait, elapsed;
++static int put_devmem_cmsg(struct msghdr *msg, int level, int type, int len,
++			   void *data)
++{
++	/* Don't produce truncated CMSGs */
++	if (msg->msg_controllen < CMSG_LEN(len))
++		return -ETOOSMALL;
++
++	return put_cmsg(msg, level, type, len, data);
++}
++
+ /* On error, returns the -errno. On success, returns number of bytes sent to the
+  * user. May not consume all of @remaining_len.
+  */
+@@ -2438,10 +2448,10 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+ 			 */
+ 			memset(&dmabuf_cmsg, 0, sizeof(dmabuf_cmsg));
+ 			dmabuf_cmsg.frag_size = copy;
+-			err = put_cmsg(msg, SOL_SOCKET, SO_DEVMEM_LINEAR,
+-				       sizeof(dmabuf_cmsg), &dmabuf_cmsg);
++			err = put_devmem_cmsg(msg, SOL_SOCKET, SO_DEVMEM_LINEAR,
++					      sizeof(dmabuf_cmsg),
++					      &dmabuf_cmsg);
+ 			if (err || msg->msg_flags & MSG_CTRUNC) {
+-				msg->msg_flags &= ~MSG_CTRUNC;
+ 				if (!err)
+ 					err = -ETOOSMALL;
+ 				goto out;
+@@ -2499,12 +2509,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+ 				offset += copy;
+ 				remaining_len -= copy;
  
- 		rtnl_lock();
-@@ -295,7 +295,7 @@ static int __init ic_open_devs(void)
- 		elapsed = jiffies_to_msecs(jiffies - start);
- 		wait = (carrier_timeout * 1000 - elapsed + 500) / 1000;
- 		pr_info("Waiting up to %d more seconds for network.\n", wait);
--		next_msg = jiffies + msecs_to_jiffies(20000);
-+		next_msg = jiffies + secs_to_jiffies(20);
- 	}
- have_carrier:
- 
-
+-				err = put_cmsg(msg, SOL_SOCKET,
+-					       SO_DEVMEM_DMABUF,
+-					       sizeof(dmabuf_cmsg),
+-					       &dmabuf_cmsg);
++				err = put_devmem_cmsg(msg, SOL_SOCKET,
++						      SO_DEVMEM_DMABUF,
++						      sizeof(dmabuf_cmsg),
++						      &dmabuf_cmsg);
+ 				if (err || msg->msg_flags & MSG_CTRUNC) {
+-					msg->msg_flags &= ~MSG_CTRUNC;
+ 					if (!err)
+ 						err = -ETOOSMALL;
+ 					goto out;
 -- 
-2.43.0
+2.48.1
 
 
