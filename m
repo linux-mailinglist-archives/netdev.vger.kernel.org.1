@@ -1,145 +1,118 @@
-Return-Path: <netdev+bounces-167568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B115DA3AF3E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:01:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EBEA3AF43
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:03:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017EB1754DE
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:01:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72CC83A30FE
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE75714B07A;
-	Wed, 19 Feb 2025 02:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760BD18E25;
+	Wed, 19 Feb 2025 02:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="STq9dNmP"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="bjYDMJEP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13FC1531D5
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 02:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBA62AD0C;
+	Wed, 19 Feb 2025 02:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739930492; cv=none; b=X2JyapddbmCLhcvgMKmZMXx7Em3+U2NcF2Bj51M0Ptif4p+5xXaKHJndR7lw3hkVnzDXoauFK2GeJGvClaXvgYwW95XulZ5wxWL0zJQVXABMMm6//9HnuQsCFmWwb6E2oJKzqDdiz8GWFKYoo3pnLXQkfLKq9+lhwsMe4xs42TY=
+	t=1739930587; cv=none; b=QTVCBqWgoETXXaDm05Rl54bmbFWgwArpgaPqpeBwPrxZVVIl667KsXnTs59KlHTa63qaGwMoS/fEuINmp+1p76TE4UF1iOhjeHyUsl18kJnLh+nB2K/3a+/5XXTHkBaFskjum5gZlkJJNYI71viTuCc77XayYBW+cuBFVa5LG8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739930492; c=relaxed/simple;
-	bh=B+y7aKIb8LX3y21if8vnuwQMNR9mHxasMxj1pZePSGI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ejhz/vevOOZes8pwLakHUFxVnsYfx4WxvRSPFSznQ+jO5Re6YflTmDlJ23OrYnj0sp5x4P5K8EAfXcRoteM5EGOLAMAfjUOIBMTLRQ30je/gJ0okFgQP19EqEg09YquUeEbcUxhUmkI0cKHPq/6Fl1xHtO/NzfWlp/3E1ZKwsO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=STq9dNmP; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <71d6c5e8-058b-470d-b411-347e2a1266a5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739930478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FEtjXGl1qqa76BD2EjdGCsJVy0dC9Gkc8kcKoXrX2U8=;
-	b=STq9dNmPFvDlCfRrU5Dxr1aA/Vvuxk6url/morHDvl1zQW/mWXfDzl8W3nn9K49CcBml41
-	0We28uwBOIkbLJmTml1dfX5i/knf7th2B878nta4Vql2IFk4rThG19hAZBklljdA5NQTC/
-	eaWZttr0yQkFPwAG9sX5D9KP2jj8K/Q=
-Date: Tue, 18 Feb 2025 18:01:10 -0800
+	s=arc-20240116; t=1739930587; c=relaxed/simple;
+	bh=fELp2PNa8iDJ1WHE5FVlLsHwIN3FhNevWlC0Rway+E4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NqNHrRUoQeG3HuQJENBRXaTx/WN+dc9fbx+DLmdwx0Donwo9YoawdQ6x5vEY2yyRoUu44BRlOGocvnBL9Hsaj2kOYzCeILPOwIUsOvN1pRZx8sqb2h/dvOdDmAi1U7+3ABUy2cB0xyreOX1h+A+TLEtkkRT9CEm4r71AGO8ZhsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=bjYDMJEP; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=+CyruaMHsTGV/esc470Cv4UW/4i85eYmfd8kVyFEF94=; b=bjYDMJEPyWWtbtGJ
+	3MgTpmX0O/o1bZV65G8CrQ5oUqv+xTrVGUvuxl81QeE9abupdTUSFhc6QLHMbRxBnhtdrLmIGdgId
+	2YvRcuhZsz6swJCJOg67h8bgDL0oZ3eeklx58TYYkXbl5+B8SgBWl8K8mHHQl5ImhBP01bXnrD24B
+	+IvsbwyMRuEuOtKhW4jNjtBbP5KLFdug04LiwMuyTrfkurOrJwEgY2ngFX3MhoANkOMy6NomeyEXE
+	emKQlhnndhQaSoQvGC6/hqQUcurafbGspGABO0ecxIHdqbGVPaCwX566nSGLOyrM+yNR/RJbLKufr
+	30Yvc2/Lq0oLp+eRMg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tkZQR-00GmVS-0D;
+	Wed, 19 Feb 2025 02:02:59 +0000
+From: linux@treblig.org
+To: krzk@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] nfc: hci: Remove unused nfc_llc_unregister
+Date: Wed, 19 Feb 2025 02:02:58 +0000
+Message-ID: <20250219020258.297995-1-linux@treblig.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 3/3] selftests/bpf: add rto max for
- bpf_setsockopt test
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
- <20250217034245.11063-4-kerneljasonxing@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250217034245.11063-4-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 2/16/25 7:42 PM, Jason Xing wrote:
-> Add TCP_RTO_MAX_MS selftests for active and passive flows
-> in various bpf callbacks. Even though the TCP_RTO_MAX_MS
-> can be used in established phase, we highly discourage
-> to do so because it may trigger unexpected behaviour.
-> On the contrary, it's highly recommended that the maximum
-> value of RTO is set before first time of transmission, such
-> as BPF_SOCK_OPS_{PASSIVE|ACTIVE}_ESTABLISHED_CB,
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-s/,/./
+nfc_llc_unregister() has been unused since it was added in 2012's
+commit 67cccfe17d1b ("NFC: Add an LLC Core layer to HCI")
 
-What unexpected behavior when setting in BPF after the established state?
+Remove it.
 
-Setting it after the established state or not is not specific to BPF. syscall 
-can choose to do it after the connection established also. The above makes it 
-unclear what unexpected behavior that the BPF prog will cause if TCP_RTO_MAX_MS 
-is used in BPF instead of syscall.
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ net/nfc/hci/llc.c | 11 -----------
+ net/nfc/hci/llc.h |  1 -
+ 2 files changed, 12 deletions(-)
 
-If there is subtle difference between calling TCP_RTO_MAX_MS from bpf and from 
-syscall, please write it clearly what are the unexpected behaviors when calling 
-in BPF after the established states.
-
-Otherwise, the commit message can be just this:
-
-Test the TCP_RTO_MAX_MS optname in the existing setget_sockopt test.
-
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   tools/include/uapi/linux/tcp.h                      | 1 +
->   tools/testing/selftests/bpf/progs/bpf_tracing_net.h | 1 +
->   tools/testing/selftests/bpf/progs/setget_sockopt.c  | 1 +
->   3 files changed, 3 insertions(+)
-> 
-> diff --git a/tools/include/uapi/linux/tcp.h b/tools/include/uapi/linux/tcp.h
-> index 13ceeb395eb8..7989e3f34a58 100644
-> --- a/tools/include/uapi/linux/tcp.h
-> +++ b/tools/include/uapi/linux/tcp.h
-> @@ -128,6 +128,7 @@ enum {
->   #define TCP_CM_INQ		TCP_INQ
->   
->   #define TCP_TX_DELAY		37	/* delay outgoing packets by XX usec */
-> +#define TCP_RTO_MAX_MS		44	/* max rto time in ms */
-
-Have you checked if this change is really needed?
-
->   
->   
->   #define TCP_REPAIR_ON		1
-> diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-> index 59843b430f76..eb6ed1b7b2ef 100644
-> --- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-> +++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-> @@ -49,6 +49,7 @@
->   #define TCP_SAVED_SYN		28
->   #define TCP_CA_NAME_MAX		16
->   #define TCP_NAGLE_OFF		1
-> +#define TCP_RTO_MAX_MS		44
->   
->   #define TCP_ECN_OK              1
->   #define TCP_ECN_QUEUE_CWR       2
-> diff --git a/tools/testing/selftests/bpf/progs/setget_sockopt.c b/tools/testing/selftests/bpf/progs/setget_sockopt.c
-> index 6dd4318debbf..106fe430f41b 100644
-> --- a/tools/testing/selftests/bpf/progs/setget_sockopt.c
-> +++ b/tools/testing/selftests/bpf/progs/setget_sockopt.c
-> @@ -61,6 +61,7 @@ static const struct sockopt_test sol_tcp_tests[] = {
->   	{ .opt = TCP_NOTSENT_LOWAT, .new = 1314, .expected = 1314, },
->   	{ .opt = TCP_BPF_SOCK_OPS_CB_FLAGS, .new = BPF_SOCK_OPS_ALL_CB_FLAGS,
->   	  .expected = BPF_SOCK_OPS_ALL_CB_FLAGS, },
-> +	{ .opt = TCP_RTO_MAX_MS, .new = 2000, .expected = 2000, },
->   	{ .opt = 0, },
->   };
->   
+diff --git a/net/nfc/hci/llc.c b/net/nfc/hci/llc.c
+index ba91284f4086..e6cf4eb06b46 100644
+--- a/net/nfc/hci/llc.c
++++ b/net/nfc/hci/llc.c
+@@ -78,17 +78,6 @@ static struct nfc_llc_engine *nfc_llc_name_to_engine(const char *name)
+ 	return NULL;
+ }
+ 
+-void nfc_llc_unregister(const char *name)
+-{
+-	struct nfc_llc_engine *llc_engine;
+-
+-	llc_engine = nfc_llc_name_to_engine(name);
+-	if (llc_engine == NULL)
+-		return;
+-
+-	nfc_llc_del_engine(llc_engine);
+-}
+-
+ struct nfc_llc *nfc_llc_allocate(const char *name, struct nfc_hci_dev *hdev,
+ 				 xmit_to_drv_t xmit_to_drv,
+ 				 rcv_to_hci_t rcv_to_hci, int tx_headroom,
+diff --git a/net/nfc/hci/llc.h b/net/nfc/hci/llc.h
+index d66271d211a5..09914608ec43 100644
+--- a/net/nfc/hci/llc.h
++++ b/net/nfc/hci/llc.h
+@@ -40,7 +40,6 @@ struct nfc_llc {
+ void *nfc_llc_get_data(struct nfc_llc *llc);
+ 
+ int nfc_llc_register(const char *name, const struct nfc_llc_ops *ops);
+-void nfc_llc_unregister(const char *name);
+ 
+ int nfc_llc_nop_register(void);
+ 
+-- 
+2.48.1
 
 
