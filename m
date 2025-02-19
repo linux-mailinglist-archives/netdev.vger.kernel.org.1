@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-167581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C810FA3AF70
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:20:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24099A3AF72
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B47663A2850
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:20:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41A8B7A5D53
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550AD187553;
-	Wed, 19 Feb 2025 02:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF3918CC1D;
+	Wed, 19 Feb 2025 02:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRnpynao"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUClFexB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309A635953
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 02:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3F18C011;
+	Wed, 19 Feb 2025 02:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739931611; cv=none; b=WP6BphSusqhhkuCvYYkG55pxeMsJJWXYwS75jiKxWXEYHBLLeB18zUQQSNmYidQtw/lr603uaq1Yn3PHKniD1bRakuLjFkdqBpxgNHBh1pyanoWBnENdSlxWhjODTnNVc2mOHnID+gu/HRMy34yGStIsM1gLyoRl8wtd9u5xvkY=
+	t=1739931612; cv=none; b=XRWs84gY0DGbEFA+10CMqtDrOM6/2ov5KAMkGXaDiWtDY2YD2zhweifo7lqlUQUpeMvZdZVlDRbrtn2fhP5Ngdfg54S2enW5nlpdw/wfSpI6rPB1jfQ7zvu+gvPDJ1pReWw/+Y0FoG56s0uf0smmq9R05agyV1bp9GG29xMAHzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739931611; c=relaxed/simple;
-	bh=AasZ/cjCiU6sYv+FAo/NOhB6rWcjksVd0o7BL9eoByI=;
+	s=arc-20240116; t=1739931612; c=relaxed/simple;
+	bh=XBQHYQrJoRPL+Fp0/YA4AGa2fMscsSePleT2f8Sonkk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Vo2Q9cv8ZrWTu1pQ5Zli1JfHQJZNyFqgmb2+yEAP20iixIXutKYQhFNCOpKEy4o1Tzwhb53EqueKN9h8+fdTUdBlB/+JI3hP8QI1OMFnIQsPEYtYPuASfr+SAqeoYmBCY9DJ7/tHJLg/378laGWmcjszyXvKkSYbmdAlsJ0vcKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRnpynao; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95CDBC4CEE2;
-	Wed, 19 Feb 2025 02:20:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mvkbQaTCg0JozbK5fWRRIpPDJWXyIuyIs9HhsiKwfcb4/gwLDG8XXyl+t9kg2o2slEqjFbCY/E3XnOB5neeCRJrmGxPTLfquiDs1K78d+B7aC3cMcUKyyLBF2u6qoZENtYeFCGViAgqVEDyTPmlbVBlBZoxuvwi7ji0vR6UD3is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUClFexB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20E0DC4CEE2;
+	Wed, 19 Feb 2025 02:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739931610;
-	bh=AasZ/cjCiU6sYv+FAo/NOhB6rWcjksVd0o7BL9eoByI=;
+	s=k20201202; t=1739931612;
+	bh=XBQHYQrJoRPL+Fp0/YA4AGa2fMscsSePleT2f8Sonkk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FRnpynaoLbAlxZ6r6CHdmT8crnAXurzK3VCkcgeo6FPujaDCh+aEatGcGVY73jmZd
-	 wTJemRtqoeb9iGRJ5yxrE/Sp2bGoYciipzDCF228PgWcm47K+urbtCtThkhk7U5oO6
-	 j6TJOnIP1RjpL3hnAeA3HLkwjLWlIQDaWmXuqpORhtAqdeI8/1IKttJy4zCt3ceNym
-	 EWzDvTimRGBaUl2hfeo7xYfz1GIgt/oagKxiFkAsMl/ymT8SSLznNk/jJHV5k9JRg5
-	 /QuOrpa5gSaozu9GRbQ69hECLkTgFSVd5W0QLBPqkcHKjEDdbys49dmwlG6dhIjy8z
-	 xRhAOIEVm+/hw==
+	b=PUClFexBVHNx5rCHEgXdzFIWb0MWfZzVlqDoh3h5hnSF+0pQWXFiKZP7Ywj/1PYWb
+	 F/D7MRYjyRenEdLxBTPA4hyuMiqSGRjOVit3s/7COUYudPYOEskaajQLWAgBcSgqCt
+	 Ohy3EW47BpsC2F2Gw+BGMF5kHyMVO2rLCCA/pmlG1hfS+cXjwrt8yWN3fLYpEwyFzy
+	 bl3XUbwjW36vcfWpwQHJbh0NNg9wsWrSw4QFKVSziDEcirqu7e8iIg6qxdfim8LoFp
+	 GuHW3TQfJSFDUJ0uAjd6TtsPJDUKPmZM7dmLkPB6gcKrbzEcN4aGv96u5FdABTN3uz
+	 LHfsHF90olrEQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E2A380AAE9;
-	Wed, 19 Feb 2025 02:20:42 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0CD380AAE9;
+	Wed, 19 Feb 2025 02:20:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,53 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: phy: improve and simplify EEE handling in
- phylib
+Subject: Re: [PATCH] selftests: net : Fix few spelling mistakes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173993164070.106119.8776440793383341066.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Feb 2025 02:20:40 +0000
-References: <3caa3151-13ac-44a8-9bb6-20f82563f698@gmail.com>
-In-Reply-To: <3caa3151-13ac-44a8-9bb6-20f82563f698@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org
+ <173993164236.106119.786009468500083710.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Feb 2025 02:20:42 +0000
+References: <20250217141520.81033-1-chandru.dav@gmail.com>
+In-Reply-To: <20250217141520.81033-1-chandru.dav@gmail.com>
+To: Chandra Mohan Sundar <chandru.dav@gmail.com>
+Cc: skhan@linuxfoundation.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 16 Feb 2025 22:14:56 +0100 you wrote:
-> This series improves and simplifies phylib's EEE handling.
+On Mon, 17 Feb 2025 19:45:16 +0530 you wrote:
+> Fix few spelling mistakes in net selftests
 > 
-> Heiner Kallweit (6):
->   net: phy: move definition of phy_is_started before
->     phy_disable_eee_mode
->   net: phy: improve phy_disable_eee_mode
->   net: phy: remove disabled EEE modes from advertising in phy_probe
->   net: phy: c45: Don't silently remove disabled EEE modes any longer
->     when writing advertisement register
->   net: phy: c45: use cached EEE advertisement in
->     genphy_c45_ethtool_get_eee
->   net: phy: c45: remove local advertisement parameter from
->     genphy_c45_eee_is_active
-> 
-> [...]
+> Signed-off-by: Chandra Mohan Sundar <chandru.dav@gmail.com>
+> ---
+>  tools/testing/selftests/net/fcnal-test.sh   | 4 ++--
+>  tools/testing/selftests/net/fdb_flush.sh    | 2 +-
+>  tools/testing/selftests/net/fib_nexthops.sh | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [net-next,1/6] net: phy: move definition of phy_is_started before phy_disable_eee_mode
-    https://git.kernel.org/netdev/net-next/c/8a6a77bb5a41
-  - [net-next,2/6] net: phy: improve phy_disable_eee_mode
-    https://git.kernel.org/netdev/net-next/c/a9b6a860d778
-  - [net-next,3/6] net: phy: remove disabled EEE modes from advertising_eee in phy_probe
-    https://git.kernel.org/netdev/net-next/c/7f33fea6bb53
-  - [net-next,4/6] net: phy: c45: Don't silently remove disabled EEE modes any longer when writing advertisement register
-    https://git.kernel.org/netdev/net-next/c/aa951feb5426
-  - [net-next,5/6] net: phy: c45: use cached EEE advertisement in genphy_c45_ethtool_get_eee
-    https://git.kernel.org/netdev/net-next/c/199d0ce385ad
-  - [net-next,6/6] net: phy: c45: remove local advertisement parameter from genphy_c45_eee_is_active
-    https://git.kernel.org/netdev/net-next/c/809265fe96fe
+  - selftests: net : Fix few spelling mistakes
+    https://git.kernel.org/netdev/net-next/c/f29e41454b94
 
 You are awesome, thank you!
 -- 
