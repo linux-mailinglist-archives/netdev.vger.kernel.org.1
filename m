@@ -1,157 +1,100 @@
-Return-Path: <netdev+bounces-167714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96242A3BDFC
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:28:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA3DA3BE23
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88220188F966
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:28:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E721A1782A9
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55871DFD91;
-	Wed, 19 Feb 2025 12:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184B91E102D;
+	Wed, 19 Feb 2025 12:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJzypi75"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE+Bpsw3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7DC1C5D4D;
-	Wed, 19 Feb 2025 12:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA451E0E0A;
+	Wed, 19 Feb 2025 12:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739968086; cv=none; b=NnfaHtUqdt5s9sKLI8JB981AFSO2eFu0skbfSRve5JVIP+mcqbBhJjyXjvRSZjWcMM7vOOcaSxHZMJY0eQXk4FVAMBDv9SauzH/E1711gHAdFW5jiNMmzewF8Frkh/d5Uwxpt/rKEaapWC+Cfr47qcEU7FKPIG5NMaMiTG4vFb8=
+	t=1739968263; cv=none; b=bvpvxqtfZcLv0pwuJ3G1YML2xFHGkscAwXpt2L1blpRvkzpmqTfegXFm2CseEDd5qZmOG6Woo33VkfbEaTNdWTNj7iQwlGgb/RL2hShc/UVDLNdi85APSROXfQhBCLqFbqNWFav4gyjYIjePwz0ssam82dn1RHDnhry3rOFJZy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739968086; c=relaxed/simple;
-	bh=9x7OMq3Uo1SSRlyewCvYnNFTgHpclfdIqmwk8zzfDK0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EjkGXocoUIRZZWenApWIgPkL767IkcoOt52bM1497L6ul366yy3ke2Wfl/GoXpiKa4YgK/T/C7/L+TOPYcjdewCkGSgbbN5JtAmP/E8k7xCsB6cIRkuxrcceAg8nIG1AOnwqMEt6csZbtSDGYeedV9XTxx5WbLCquQIgw8F81NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJzypi75; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F607C4CED1;
-	Wed, 19 Feb 2025 12:28:02 +0000 (UTC)
+	s=arc-20240116; t=1739968263; c=relaxed/simple;
+	bh=N127fdTUboMPXuJ362+JGpLt7EcgMa+g6C8TmK2MXBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FwSDsPY/08L8h3/0t7owGfEc2ZLy3OX0chARpF16AZq4Yg2PNwPVAFO6gsHyXX5vwFdPoxGsV3ABlJ0ot2ioBiL5Dv6ff8fzFe/Hb86U7nVWbKvgETbpTiNpQNfHMZTjCK0y3yHwCqK4J+j1EuXgY2H8nYTJEI0MKDW23L9jGyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE+Bpsw3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D688DC4CED1;
+	Wed, 19 Feb 2025 12:31:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739968086;
-	bh=9x7OMq3Uo1SSRlyewCvYnNFTgHpclfdIqmwk8zzfDK0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EJzypi75zg0AD3f31BT5RocyHqMJzFFAOW1Rh1pRg3oMpJUsQQe5ZMvtXgmOYGEuO
-	 7jggKoI2+GHzc2ygUPwh/Bk41520elr9Sl/wQViUZuXJk+KJcok1FR/b7iyj3keELi
-	 t6yfvK0e84dE0E3i3RByLA6BjjFMK8vYHVjImBLkNxLR3OUSbr6wrxDI8CWMXreuJk
-	 yBgTT+2+wLWFvPvBrIfFTWGNJIMqX5oRO733VCjFXqwDmROAS0IrzD8U24ZvfKHcta
-	 /q2B5Bzq6Na5O5eY1zWY9cZhj4ynhva5VK675XzZwFMslufndIj45uTgrhqiOPHfU7
-	 ikAAEhTIdTGhw==
-Message-ID: <58fc17a2-58fe-4815-a501-e7ddd87b7e12@kernel.org>
-Date: Wed, 19 Feb 2025 13:28:00 +0100
+	s=k20201202; t=1739968262;
+	bh=N127fdTUboMPXuJ362+JGpLt7EcgMa+g6C8TmK2MXBc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SE+Bpsw3ZkRmPo8/ZeJCgBP7lN7a+beE2wSqBGg5xUslnPJ4Bm3pPK+1ZRYf/FrVU
+	 r3yPik7sW/eYuCsNbplRwS7jdVDHN7m//uQG23yajxfsaDyiUCW+YwFXJvO3R7nv/L
+	 6+7wSBxGWQMGfP2341pGY+j23H90kr1VstsdzzGrfwGAB4MLiAkKIftt3dE6x9F1Zy
+	 7Gm/WqtilJT/EsxRp5ftv6x90f1npyRC8tRPHfXM/NvvJD61iSQlUxObr2B8U8j3vv
+	 pSo8x4VDq+e83n1xlhOt3peJ/lYQBgZOyvhxqk6dY7xp49conQm3bOpMiuuJpGy8TR
+	 42b8JJCBXwrBA==
+Date: Wed, 19 Feb 2025 14:30:57 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: jgg@ziepe.ca, sd@queasysnail.net, phaddad@nvidia.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] mlx5: Add check for get_macsec_device()
+Message-ID: <20250219123057.GF53094@unreal>
+References: <20250218100200.2535141-1-haoxiang_li2024@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/3] dts: mt7988a: Add built-in ethernet phy
- firmware node
-To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- Qingfang Deng <dqfext@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Cc: Steven Liu <Steven.Liu@mediatek.com>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-3-SkyLake.Huang@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250219083910.2255981-3-SkyLake.Huang@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218100200.2535141-1-haoxiang_li2024@163.com>
 
-On 19/02/2025 09:39, Sky Huang wrote:
-> From: Sky Huang <skylake.huang@mediatek.com>
+On Tue, Feb 18, 2025 at 06:02:00PM +0800, Haoxiang Li wrote:
+> Add check for the return value of get_macsec_device() in
+> mlx5r_del_gid_macsec_operations() to prevent null pointer
+> dereference.
 > 
-> Add built-in ethernet phy firmware node in mt7988a.dtsi.
-> 
-> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+> Fixes: 58dbd6428a68 ("RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion")
+> Cc: stable@vger.kernel.org
+
+Definitely not.
+
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 > ---
->  arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 6 ++++++
-
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching. For bindings, the preferred subjects are
-explained here:
-https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
-
-
->  1 file changed, 6 insertions(+)
+>  drivers/infiniband/hw/mlx5/macsec.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> index 88b56a24efca..f2679702c328 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> @@ -322,6 +322,12 @@ lvts: lvts@1100a000 {
->  			nvmem-cell-names = "lvts-calib-data-1";
->  		};
->  
-> +		phyfw: phy-firmware@f000000 {
+> diff --git a/drivers/infiniband/hw/mlx5/macsec.c b/drivers/infiniband/hw/mlx5/macsec.c
+> index 3c56eb5eddf3..623b0a58f721 100644
+> --- a/drivers/infiniband/hw/mlx5/macsec.c
+> +++ b/drivers/infiniband/hw/mlx5/macsec.c
+> @@ -354,6 +354,11 @@ void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr)
+>  		}
+>  	}
+>  	macsec_device = get_macsec_device(ndev, &dev->macsec.macsec_devices_list);
 
-Not a real device.
+At this stage macsec_device is valid.
 
-> +			compatible = "mediatek,2p5gphy-fw";
-> +			reg = <0 0x0f100000 0 0x20000>,
-
-Not tested enough. See SoC maintainer profile for clean DTS.
-
-> +			      <0 0x0f0f0018 0 0x20>;
-> +		};
-
-Best regards,
-Krzysztof
+> +	if (!macsec_device) {
+> +		dev_put(ndev);
+> +		mutex_unlock(&dev->macsec.lock);
+> +		return;
+> +	}
+>  	mlx5_macsec_del_roce_rule(attr->index, dev->mdev->macsec_fs,
+>  				  &macsec_device->tx_rules_list, &macsec_device->rx_rules_list);
+>  	mlx5_macsec_del_roce_gid(macsec_device, attr->index);
+> -- 
+> 2.25.1
+> 
 
