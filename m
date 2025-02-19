@@ -1,100 +1,120 @@
-Return-Path: <netdev+bounces-167715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA3DA3BE23
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:32:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 390A6A3BE58
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E721A1782A9
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:31:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C67F3AD918
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184B91E102D;
-	Wed, 19 Feb 2025 12:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4173E1E0DDF;
+	Wed, 19 Feb 2025 12:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE+Bpsw3"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="pQT6NnvZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA451E0E0A;
-	Wed, 19 Feb 2025 12:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC981DF26A
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 12:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739968263; cv=none; b=bvpvxqtfZcLv0pwuJ3G1YML2xFHGkscAwXpt2L1blpRvkzpmqTfegXFm2CseEDd5qZmOG6Woo33VkfbEaTNdWTNj7iQwlGgb/RL2hShc/UVDLNdi85APSROXfQhBCLqFbqNWFav4gyjYIjePwz0ssam82dn1RHDnhry3rOFJZy0=
+	t=1739968950; cv=none; b=Xs8yJCx4N4qfckP3zT3P59FQk9ouTMvj73CeBSSk2XDZIa1/O8JSUjgOqx7ADi4ZNP100TzkrQ/UOo1YDVmiJohlwIJb/k4Fdjm6OedEPIlKHSnVJea5NCR6xmrfyS0aSTbC5MDjhxlgpl9wZPNooocDFMpZZ3i77tVER529o+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739968263; c=relaxed/simple;
-	bh=N127fdTUboMPXuJ362+JGpLt7EcgMa+g6C8TmK2MXBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FwSDsPY/08L8h3/0t7owGfEc2ZLy3OX0chARpF16AZq4Yg2PNwPVAFO6gsHyXX5vwFdPoxGsV3ABlJ0ot2ioBiL5Dv6ff8fzFe/Hb86U7nVWbKvgETbpTiNpQNfHMZTjCK0y3yHwCqK4J+j1EuXgY2H8nYTJEI0MKDW23L9jGyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE+Bpsw3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D688DC4CED1;
-	Wed, 19 Feb 2025 12:31:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739968262;
-	bh=N127fdTUboMPXuJ362+JGpLt7EcgMa+g6C8TmK2MXBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SE+Bpsw3ZkRmPo8/ZeJCgBP7lN7a+beE2wSqBGg5xUslnPJ4Bm3pPK+1ZRYf/FrVU
-	 r3yPik7sW/eYuCsNbplRwS7jdVDHN7m//uQG23yajxfsaDyiUCW+YwFXJvO3R7nv/L
-	 6+7wSBxGWQMGfP2341pGY+j23H90kr1VstsdzzGrfwGAB4MLiAkKIftt3dE6x9F1Zy
-	 7Gm/WqtilJT/EsxRp5ftv6x90f1npyRC8tRPHfXM/NvvJD61iSQlUxObr2B8U8j3vv
-	 pSo8x4VDq+e83n1xlhOt3peJ/lYQBgZOyvhxqk6dY7xp49conQm3bOpMiuuJpGy8TR
-	 42b8JJCBXwrBA==
-Date: Wed, 19 Feb 2025 14:30:57 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: jgg@ziepe.ca, sd@queasysnail.net, phaddad@nvidia.com,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] mlx5: Add check for get_macsec_device()
-Message-ID: <20250219123057.GF53094@unreal>
-References: <20250218100200.2535141-1-haoxiang_li2024@163.com>
+	s=arc-20240116; t=1739968950; c=relaxed/simple;
+	bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=se1qr1XGhurqXWG445SkMgwRgF91y8FM+YkuaruPQvXRg20Nkr019u4nmOLc1wFjqK3hvURJbkE9FjjdfgpbWqT7SjXxZhuO1/inXSWD1BccI5sPpnVMna1o34Epb6EwOZ030SqMc+to68+F7YpNxvMOHHyOClAR6cO9G5g0tJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=pQT6NnvZ; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id EA101240027
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:42:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1739968944; bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
+	h=From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
+	b=pQT6NnvZ6QfK1XDthLHJDMPKVx3k8igsFAYEsAIgkHpyT6BY+1nN8tUrupat7jimK
+	 zHTpYhnn30MdGiye563aBLsivzaviAiLcJiepd/274OuadD8TJH2aFNeApGBfM26D+
+	 99NCeR7KerlqLOFN5G+LQsU4Dn7I+l69LvZChk2t+MvIFqQMsoeMDsdDXsBNcbiFC+
+	 z4B1oSHb7Sju9cJywgAQ26xp88Lr1/e7AlL6fBZaXcRyY9VcaESTH7/Pyi6nV+ZJuC
+	 FhJENGJ1yBSaJ6oBTR2jMjdfZ/kZ6Z4y2EtMLwY05GD3SqB1INXpu33+h8DZw2fo7+
+	 HNKQeHdOJTpOA==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4YybdB0TTPz6twQ;
+	Wed, 19 Feb 2025 13:42:21 +0100 (CET)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+Date: Wed, 19 Feb 2025 12:41:55 +0000
+Subject: [PATCH net v2] net: phy: qt2025: Fix hardware revision check
+ comment
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218100200.2535141-1-haoxiang_li2024@163.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250219-qt2025-comment-fix-v2-1-029f67696516@posteo.net>
+X-B4-Tracking: v=1; b=H4sIAJLRtWcC/32NTQ7CIBCFr9LM2jFAUYgr72FcVBwsi0ILhGga7
+ i5yAHfvJ+97OySKjhJchh0iFZdc8M2IwwBmnvyL0D2bB8HEiQmuccs/iSYsC/mM1r1x5JOy2pq
+ HOUtowzVSizv0Bp4y3Fs4u5RD/PSjwnv1j1k4clRyJK0MY5KZ6xpSpnDsvFrrF0cv2YG6AAAA
+X-Change-ID: 20250218-qt2025-comment-fix-31a7f8fcbc64
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1739968933; l=1517;
+ i=charmitro@posteo.net; s=20250218; h=from:subject:message-id;
+ bh=aEZmkm1hV21rp3YTZCGbmxtF7lznLzqBxNFTStfv000=;
+ b=rjm5rN4NKlBBwxqtODOZ62E5SaiIwJVOr7MYv+DUdwOfAoKfVDgfiHI+azP52m/u1tkggWizk
+ 96yrORzotrkCAN9hSMpfRgWQviEksl+UYf1bvmTy5AvGN3kmPMY4z/8
+X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
+ pk=tqvFF75nwS3URscujaAaCD+j9ViKh5jLMkj1mnX7Rws=
 
-On Tue, Feb 18, 2025 at 06:02:00PM +0800, Haoxiang Li wrote:
-> Add check for the return value of get_macsec_device() in
-> mlx5r_del_gid_macsec_operations() to prevent null pointer
-> dereference.
-> 
-> Fixes: 58dbd6428a68 ("RDMA/mlx5: Handles RoCE MACsec steering rules addition and deletion")
-> Cc: stable@vger.kernel.org
+Correct the hardware revision check comment in the QT2025 driver. The
+revision value was documented as 0x3b instead of the correct 0xb3,
+which matches the actual comparison logic in the code.
 
-Definitely not.
+Fixes: fd3eaad826da ("net: phy: add Applied Micro QT2025 PHY driver")
+Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+---
+Changes in v2:
+- Resend with proper patch subject, according to netdev documentation
+- Add "Fixes: " tag
+- Link to v1: https://lore.kernel.org/r/20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net
+---
+ drivers/net/phy/qt2025.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
-> ---
->  drivers/infiniband/hw/mlx5/macsec.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/infiniband/hw/mlx5/macsec.c b/drivers/infiniband/hw/mlx5/macsec.c
-> index 3c56eb5eddf3..623b0a58f721 100644
-> --- a/drivers/infiniband/hw/mlx5/macsec.c
-> +++ b/drivers/infiniband/hw/mlx5/macsec.c
-> @@ -354,6 +354,11 @@ void mlx5r_del_gid_macsec_operations(const struct ib_gid_attr *attr)
->  		}
->  	}
->  	macsec_device = get_macsec_device(ndev, &dev->macsec.macsec_devices_list);
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
+ 
+     fn probe(dev: &mut phy::Device) -> Result<()> {
+         // Check the hardware revision code.
+-        // Only 0x3b works with this driver and firmware.
++        // Only 0xb3 works with this driver and firmware.
+         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+         if (hw_rev >> 8) != 0xb3 {
+             return Err(code::ENODEV);
 
-At this stage macsec_device is valid.
+---
+base-commit: beeb78d46249cab8b2b8359a2ce8fa5376b5ad2d
+change-id: 20250218-qt2025-comment-fix-31a7f8fcbc64
 
-> +	if (!macsec_device) {
-> +		dev_put(ndev);
-> +		mutex_unlock(&dev->macsec.lock);
-> +		return;
-> +	}
->  	mlx5_macsec_del_roce_rule(attr->index, dev->mdev->macsec_fs,
->  				  &macsec_device->tx_rules_list, &macsec_device->rx_rules_list);
->  	mlx5_macsec_del_roce_gid(macsec_device, attr->index);
-> -- 
-> 2.25.1
-> 
+Best regards,
+-- 
+Charalampos Mitrodimas <charmitro@posteo.net>
+
 
