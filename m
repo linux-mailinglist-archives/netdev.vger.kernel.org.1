@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-167562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD65A3AF06
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:37:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18375A3AF17
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:48:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E82172CD0
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 01:37:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB5777A2A17
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 01:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19496224D6;
-	Wed, 19 Feb 2025 01:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9803596B;
+	Wed, 19 Feb 2025 01:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZXd85x0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3a3ls1x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AA714F70
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 01:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3841805A;
+	Wed, 19 Feb 2025 01:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739929061; cv=none; b=h7pewfLgPq8A4+E98NrSdd8aPFNc1Yeu9aLU49zk0MK7vbTTGCTg802J6ApuxA0wBgkN062IJ8rAkkh3M5EL0nYGVpzwwck3SOYCYnXvnzqbFjG1K7Si8Hrs1YpN9FEfihin3YumBCsfH6NYIIjntGyaqzAU5lUdTtOAHi563vY=
+	t=1739929676; cv=none; b=XrvtC/UBUljFE+9hoWnbN7Xn54+Iv46naw7fJqMJE3LpOKBoUXD4jbRCQX04bEnNqfYsPaG596jZLxfUtBmev6gGCz+bRVfQ/YTChd+rXSnqOR1dbAJ9HKbFurLiz8D+1nu/14fip/+GT96kWTBxscFdW/rhTgKGcOnW27Rk6pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739929061; c=relaxed/simple;
-	bh=8y/u/3+yfRbT0kMh+8jnAAMR3zzPOiG60rP0v7ZZY64=;
+	s=arc-20240116; t=1739929676; c=relaxed/simple;
+	bh=ndCcrzrBiAjTDQApM4bqPTYtbDiMk7ZWYdoIjieVkIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kEvC+oqKls1kSzEiUvuqnhQ5dZ6XWmkJN3UslzYKewR1peJt+1ofy9D68NJ79DdMAkOx6Ava0wbDAZF/HjeHcDPcAvC1MDQc22yEjp/qcMCFaepHWYRZZjs4ds1ASNOfCvkc+GJv5PMJ+lSlJNm7lWdnJAUlafATUlmWM/PDi2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZXd85x0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02F7BC4CEE2;
-	Wed, 19 Feb 2025 01:37:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TMiTlHtA4MgxW9h+MR0T84xwh9Wc2OdiG/v5NRUY5XpVv+NUCgPfgDA2GDzuAwpgxl2+saCRO42LzUj3ybJ9P8kd+/cuql3SNKL+gd+sbS0P/bN+04dyRnxJR21rzli7OC6sYCdJdabmNNEqDz6lnjpVt7Cnpo0g156XMlRnemY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3a3ls1x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3317BC4CEE2;
+	Wed, 19 Feb 2025 01:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739929060;
-	bh=8y/u/3+yfRbT0kMh+8jnAAMR3zzPOiG60rP0v7ZZY64=;
+	s=k20201202; t=1739929675;
+	bh=ndCcrzrBiAjTDQApM4bqPTYtbDiMk7ZWYdoIjieVkIU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sZXd85x0xg1PNO/W3ODyR3fAjrRpa9lZJa1OqV+XBCzwgrP+ccc09Jj/vomW+d0+0
-	 yAdseSirDF47V1ncMUAp0kZLlvpnXaNQ51n5hW+TXmBn1GDD95weFwvgMMNlA2JHif
-	 KgQDvt0OACQz5REWzAFs5otZZrLZMflVLfWsZgL/R9+wtOfu3JG1Y4VjgEkxpeZBYx
-	 5cgbw2eSkWbOLtPQJxabZHWSS4E2JtEtR1bQhGRi8Talt7HEJ1aLnhpYOrafSuX3Ss
-	 N1z+Lr2n03wr2/4mR675bOyhVPDXasp80C4g3NxXaav+hp40pyBmYyM0Un/ih3u/e7
-	 rD+CQxGkUuIzg==
-Date: Tue, 18 Feb 2025 17:37:39 -0800
+	b=P3a3ls1xraBcKvsaiSYPBq8cfj5OvqksjZ/IdbP4Xe31zCV4UqmxXfZsN9n0e34xh
+	 yE/CLA8apX7EtS0uL9ZOhwkV/vnJuYT+Dgjtn5QFM3B94PXLrABmaYjV/nKEgAezOQ
+	 PQqUTBd7B4TPVt7UsRc/QX+40dnhVm5REqBqL+zAfuH3es23GjRG0H91DO0tB1Jcvk
+	 lA4zgt/iGS+gGqcH8xTftcrlvdEALIsVuxO6e/b3MRZjoHVhJ843agxh409X91z60L
+	 JWiVKV7oQL4gypCi/njNT6InR2m4DTREirw192NFllga+OSKxSln7DDOu9TO46bjVR
+	 Vb4EhvfjXTYPQ==
+Date: Tue, 18 Feb 2025 17:47:54 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
- willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 2/4] selftests: drv-net: add a way to wait for
- a local process
-Message-ID: <20250218173739.0eac493b@kernel.org>
-In-Reply-To: <20250218150512.282c94eb@kernel.org>
-References: <20250218195048.74692-1-kuba@kernel.org>
-	<20250218195048.74692-3-kuba@kernel.org>
-	<Z7UBJ_CIrvsSdmnt@LQ3V64L9R2>
-	<20250218150512.282c94eb@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org,
+ kuniyu@amazon.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 1/3] tcp: add TCP_RTO_MAX_MIN_SEC definition
+Message-ID: <20250218174754.150c82c3@kernel.org>
+In-Reply-To: <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
+References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
+	<20250217034245.11063-2-kerneljasonxing@gmail.com>
+	<4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,10 +66,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Feb 2025 15:05:12 -0800 Jakub Kicinski wrote:
-> We shall find out if NIPA agrees with my local system at 4p.
+On Tue, 18 Feb 2025 15:38:17 -0800 Martin KaFai Lau wrote:
+> On 2/16/25 7:42 PM, Jason Xing wrote:
+> > Add minimum value definition as the lower bound of RTO MAX
+> > set by users. No functional changes here.  
+> 
+> If it is no-op, why it is needed? The commit message didn't explain it either.
+> I also cannot guess how patch 2 depends on patch 1.
 
-NIPA agrees with you, I'll take another look tomorrow.
--- 
-pw-bot: cr
+FWIW this patch also gave me pause when looking at v1.
+I don't think this define makes the code any easier to follow.
 
