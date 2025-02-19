@@ -1,203 +1,199 @@
-Return-Path: <netdev+bounces-167603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF60DA3B00A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 04:32:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A0FA3B052
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 05:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 894FB1751C6
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 058CC1891EA4
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 04:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF741547FF;
-	Wed, 19 Feb 2025 03:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BFC1A5BA9;
+	Wed, 19 Feb 2025 04:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayTxPLa/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aUNQy1LQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57ED136A;
-	Wed, 19 Feb 2025 03:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4433FD4;
+	Wed, 19 Feb 2025 04:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739935919; cv=none; b=dZ3ZC+O4HZcvtLccigecqlPc80+48uTrNNuEZkLWB6cGrS+ZNA89atj44GRaqe/TIrMDbtugrmaGZsenkYRxcwzIFFvj5/3ffjydwlJmlmoMxkHAlrq39LOcfhexuQVYxp3CYMCUifm0QMMTbxd3HJ/qy8/CXkmuJYh9mN6Rb2s=
+	t=1739938868; cv=none; b=s3V40YNTkvbUXKZlEObTjpHwrCKS6Amr7C3x/w4VTkNNBcBQHBzCUPDv/WRQuS+gWcC1XgIvTh8VBN7HK6y3fU1xI281ruGl9nRufMChCYxo8zN+64j8hs34LtAoHG2dyzj07OaTGnV2/sThOPqAkfcEWvLLaSaGeJKCh6jg/LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739935919; c=relaxed/simple;
-	bh=okHOJqxKpAgGDK5EYqVExz7WeDz4/LDo6DEtsGqv/hw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dlm3ueJrl4sIdqTmPgz/mk28uVXLYhD+7cJ0u4rwYHg4kul/lWHybih0W8yM1NJtnikqhgUtHpP2laOXeyLTRozxwIuQ4NT98vtxjbT8/QgFZqHZKehqCRLVgo2dQXXzo3rNHxDcbANcac8DYhS/S44p6vTE9CNETEsSP7vKODs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ayTxPLa/; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-85517db52a2so125348339f.3;
-        Tue, 18 Feb 2025 19:31:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739935916; x=1740540716; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e+OUaaJXwOMrUhgWSUKQkkYMtzqTZvR6HK4jSYX4dyc=;
-        b=ayTxPLa/I7bh+Z8Bv4oOxhUsLk3x9+nSTPajJL5w+HTU2vH63U+EThKVczcw5nmf7K
-         fs2X1fDWTYuj3wMF4n1bUCcspwEwIqg6i9XFO3Wv124qati6XFL2ChKueiOfGk7tABdu
-         LcEqV/E9dL/U7nHf4/pT8k/XP8mTeVlbKTJks7C7mQl1DvbW650zwL2N8jl8iDI3Bi7T
-         x83Ny9HcArxK6A3DBod9o6k9oq/jPJMMf16cYapCVvasXo6kD/uMODwZ7kcSVT/fJcI/
-         jzRXixSBoZfVzpl5M8JOyDLdchNbiXKyzjYnW1z7YyFFbabIkZFc3+eHy68W5p3gAySq
-         BqZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739935916; x=1740540716;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e+OUaaJXwOMrUhgWSUKQkkYMtzqTZvR6HK4jSYX4dyc=;
-        b=cjDGUx5aSe72otUeXtwD9wW8+Lnrj9ipvPaqEsGlyJun9pbGYNnrdTMEtNM6x35f+D
-         WGQqmP/vRWQ9wEXMznanzA2Ex9MzycjJQqozlZ08pgg4Wh1Jdy+xwmnoanG8oQZJihIj
-         /wSAW6TTSIzubh+G8fevlfNK9UD44mevf6Akz9GH2BW2AXtNrK7aKloapf1QRkVuT5oN
-         wArz45kKqIcgD4k+j4NMXxmQqlUJmV8yzZIeZOk4+IXFtJVhc9PRZtpjFhp255G84Xez
-         CXT3mbFlQiJzul27P+5MpaLSOlyu5YuGP2V0ReMZeJgW3hLsatzldN+TFAeE8nb0vbBt
-         6H4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUvod2OdYLUsTJ1hBnqwdBxfNxrpJQnZmpPDDckM7FobAJ+fNw7n49nQJBm/356XG6cvFhpX26q@vger.kernel.org, AJvYcCVu1dh+e5PTu1lRCaB7ym/yb/3hRv9TEMg4CwX1NeGFzH1eaP/NdDZgs0GxABS553uTxyY0G8hq3us+36Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsrTCI0RKEwXRDY1ThiDlnBakRkSsG3t0JV4BW9N2zIieT20M8
-	ehl79f80iMMgcI82qHOoriTV7DA1/IiWSpPK7d2RJjJ8u+XS3sr87ibcRs4hq4n5C4HBnPjcjN5
-	xqG9ixThZ2onRt0gFwc4fSqW1yJA=
-X-Gm-Gg: ASbGnctTTqXS3HMR2ZWkglGHHVNIMlp+56Ntd68AXPlnBnMtEn6s5lH8ygsfGNTP3Ge
-	Su0bfl7mVEhziavuoZr2WBNkV4Htn5s9sY9GW4teMtBNwCjAlNgR++ZywfKF7KOw3Dr2cPOGU
-X-Google-Smtp-Source: AGHT+IGFIM48LDWdSa0fM5fv6vkMF0cAOM3ChwQmFZppyg/pXLCL/7tj9VQDGyJHhFNYXTkM8ptCDG5YY7aMJdcAcEA=
-X-Received: by 2002:a05:6e02:3182:b0:3d0:1ee6:731b with SMTP id
- e9e14a558f8ab-3d28092be7cmr151318145ab.15.1739935916079; Tue, 18 Feb 2025
- 19:31:56 -0800 (PST)
+	s=arc-20240116; t=1739938868; c=relaxed/simple;
+	bh=ckkrBzfsdso+T2awCaIUQiZvGU2IkHGhc+H4I3t65fk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C4dyvZhK23ZmjEgpQyF8XKIwn8g+ct4F79njVN5RQzoVUe9kvSqP7K0amKoOIshp9jSK1jSEHqZIC5f8qcGsA4Op/nMYN5YlqjDmmCWWyV8VUVkMacMY/SGc83vuQpGjxtL3nCuGi6vpwdZ5+6QtiDKc400zPK5pcc1oTBSsPcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aUNQy1LQ; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739938866; x=1771474866;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ckkrBzfsdso+T2awCaIUQiZvGU2IkHGhc+H4I3t65fk=;
+  b=aUNQy1LQbgusN+UJddcOhVHRX4DLb2DzY/qDOIRZggrE/pL0mG5DkdnF
+   TZdHNZ0ylAJ7h+AAAW7/U8y/WK8HLzNYYU7ZsqMllt9HKszmieLjGaipD
+   ruvaNJotIUZiaNWeN2Y1dvIEb7UjJJgaUXOXmjLGKtgD1Qgvc4/EsmFjs
+   SN0DfLo7/zOrS7s12RHA3CskNU1imrfwk7o+8aEOUUOh6+t5xEuzpKW/r
+   Hduu56YUy5yv03S7RA8QreGy9FteoUp8gISZNCRrYeAtj4UvqApsFPASi
+   p4i9YLxGtkRGpo6oj9AGdwImxwKftdtt0GXl+XpEC4SmrbCflgLHLypdp
+   Q==;
+X-CSE-ConnectionGUID: dkuShneJRg2y4fZiEKjyIQ==
+X-CSE-MsgGUID: XrkXwP7zQ+KEHxFspGr0ow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="58062440"
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="58062440"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 20:21:05 -0800
+X-CSE-ConnectionGUID: V8xrp3+cQyG9v96azC7CMA==
+X-CSE-MsgGUID: xx5oaXeYT06QKPJpPoD3MA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="114450358"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 18 Feb 2025 20:20:59 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tkbZB-0001EN-1J;
+	Wed, 19 Feb 2025 04:20:49 +0000
+Date: Wed, 19 Feb 2025 12:18:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kyle Hendry <kylehendrydev@gmail.com>, Lee Jones <lee@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kyle Hendry <kylehendrydev@gmail.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
+Message-ID: <202502191212.s0NqhQ3T-lkp@intel.com>
+References: <20250218013653.229234-2-kylehendrydev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218105824.34511-1-wanghai38@huawei.com> <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
- <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
-In-Reply-To: <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Feb 2025 11:31:19 +0800
-X-Gm-Features: AWEUYZmOxzFEIzfrWT_r5uxgZ41XeOzvhnB8B6r_lhXCBrI3iq_vYTcDYDlZm9w
-Message-ID: <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way handshake
-To: Wang Hai <wanghai38@huawei.com>
-Cc: Eric Dumazet <edumazet@google.com>, ncardwell@google.com, kuniyu@amazon.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218013653.229234-2-kylehendrydev@gmail.com>
 
-On Wed, Feb 19, 2025 at 10:16=E2=80=AFAM Wang Hai <wanghai38@huawei.com> wr=
-ote:
->
->
->
-> On 2025/2/18 21:35, Eric Dumazet wrote:
-> > On Tue, Feb 18, 2025 at 12:00=E2=80=AFPM Wang Hai <wanghai38@huawei.com=
-> wrote:
-> >>
-> >> If two ack packets from a connection enter tcp_check_req at the same t=
-ime
-> >> through different cpu, it may happen that req->ts_recent is updated wi=
-th
-> >> with a more recent time and the skb with an older time creates a new s=
-ock,
-> >> which will cause the tcp_validate_incoming check to fail.
-> >>
-> >> cpu1                                cpu2
-> >> tcp_check_req
-> >>                                      tcp_check_req
-> >> req->ts_recent =3D tmp_opt.rcv_tsval =3D t1
-> >>                                      req->ts_recent =3D tmp_opt.rcv_ts=
-val =3D t2
-> >>
-> >> newsk->ts_recent =3D req->ts_recent =3D t2 // t1 < t2
-> >> tcp_child_process
-> >> tcp_rcv_state_process
-> >> tcp_validate_incoming
-> >> tcp_paws_check
-> >> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <=3D paws_win) // fai=
-led
-> >>
-> >> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
-> >>
-> >> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> >> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> >> ---
-> >>   net/ipv4/tcp_minisocks.c | 4 ++++
-> >>   1 file changed, 4 insertions(+)
-> >>
-> >> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> >> index b089b08e9617..0208455f9eb8 100644
-> >> --- a/net/ipv4/tcp_minisocks.c
-> >> +++ b/net/ipv4/tcp_minisocks.c
-> >> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struc=
-t sk_buff *skb,
-> >>          sock_rps_save_rxhash(child, skb);
-> >>          tcp_synack_rtt_meas(child, req);
-> >>          *req_stolen =3D !own_req;
-> >> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
-> >> +           unlikely(tcp_sk(child)->rx_opt.ts_recent !=3D tmp_opt.rcv_=
-tsval))
-> >> +               tcp_sk(child)->rx_opt.ts_recent =3D tmp_opt.rcv_tsval;
-> >> +
-> >>          return inet_csk_complete_hashdance(sk, child, req, own_req);
-> >
-> > Have you seen the comment at line 818 ?
-> >
-> > /* TODO: We probably should defer ts_recent change once
-> >   * we take ownership of @req.
-> >   */
-> >
-> > Plan was clear and explained. Why implement something else (and buggy) =
-?
-> >
-> Hi Eric,
->
-> Currently we have a real problem, so we want to solve it. This bug
-> causes the upper layers to be unable to be notified to call accept after
-> the successful three-way handshake.
->
-> Skb from cpu1 that fails at tcp_paws_check (which it could have
-> succeeded) will not be able to enter the TCP_ESTABLISHED state, and
-> therefore parent->sk_data_ready(parent) will not be triggered, and skb
-> from cpu2 can complete the three-way handshake, but there is also no way
-> to call parent->sk_data_ready(parent) to notify the upper layer, which
-> will result
-> in the upper layer not being able to sense and call accept to obtain the
-> nsk.
->
-> cpu1                                cpu2
-> tcp_check_req
->                                      tcp_check_req
-> req->ts_recent =3D tmp_opt.rcv_tsval =3D t1
->                                      req->ts_recent=3Dtmp_opt.rcv_tsval=
-=3D t2
->
-> newsk->ts_recent =3D req->ts_recent =3D t2 // t1 < t2
-> tcp_child_process
->   tcp_rcv_state_process
->    tcp_validate_incoming
->     tcp_paws_check // failed
->   parent->sk_data_ready(parent); // will not be called
->                                      tcp_v4_do_rcv
->                                      tcp_rcv_state_process // Complete th=
-e three-way handshake
->                                                                          =
-                               // missing parent->sk_data_ready(parent);
+Hi Kyle,
 
-IIUC, the ack received from cpu1 triggered calling
-inet_csk_complete_hashdance() so its state transited from
-TCP_NEW_SYN_RECV to TCP_SYN_RECV, right? If so, the reason why not
-call sk_data_ready() if the skb entered into tcp_child_process() is
-that its state failed to transit to TCP_ESTABLISHED?
+kernel test robot noticed the following build warnings:
 
-Here is another question. How did the skb on the right side enter into
-tcp_v4_do_rcv() after entering tcp_check_req() if the state of sk
-which the skb belongs to is TCP_NEW_SYN_RECV? Could you elaborate more
-on this point?
+[auto build test WARNING on lee-mfd/for-mfd-next]
+[also build test WARNING on robh/for-next lee-leds/for-leds-next linus/master lee-mfd/for-mfd-fixes v6.14-rc3 next-20250218]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks,
-Jason
+url:    https://github.com/intel-lab-lkp/linux/commits/Kyle-Hendry/net-phy-bcm63xx-add-support-for-BCM63268-GPHY/20250218-094117
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next
+patch link:    https://lore.kernel.org/r/20250218013653.229234-2-kylehendrydev%40gmail.com
+patch subject: [PATCH v2 1/5] net: phy: bcm63xx: add support for BCM63268 GPHY
+config: x86_64-buildonly-randconfig-004-20250219 (https://download.01.org/0day-ci/archive/20250219/202502191212.s0NqhQ3T-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250219/202502191212.s0NqhQ3T-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502191212.s0NqhQ3T-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/phy/bcm63xx.c:84:5: warning: no previous prototype for function 'bcm63268_gphy_set' [-Wmissing-prototypes]
+      84 | int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
+         |     ^
+   drivers/net/phy/bcm63xx.c:84:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+      84 | int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
+         | ^
+         | static 
+>> drivers/net/phy/bcm63xx.c:100:5: warning: no previous prototype for function 'bcm63268_gphy_resume' [-Wmissing-prototypes]
+     100 | int bcm63268_gphy_resume(struct phy_device *phydev)
+         |     ^
+   drivers/net/phy/bcm63xx.c:100:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     100 | int bcm63268_gphy_resume(struct phy_device *phydev)
+         | ^
+         | static 
+>> drivers/net/phy/bcm63xx.c:115:5: warning: no previous prototype for function 'bcm63268_gphy_suspend' [-Wmissing-prototypes]
+     115 | int bcm63268_gphy_suspend(struct phy_device *phydev)
+         |     ^
+   drivers/net/phy/bcm63xx.c:115:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     115 | int bcm63268_gphy_suspend(struct phy_device *phydev)
+         | ^
+         | static 
+   3 warnings generated.
+
+
+vim +/bcm63268_gphy_set +84 drivers/net/phy/bcm63xx.c
+
+    83	
+  > 84	int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
+    85	{
+    86		struct bcm_gphy_priv *priv = phydev->priv;
+    87		u32 pwr_bits;
+    88		int ret;
+    89	
+    90		pwr_bits = GPHY_CTRL_IDDQ_BIAS | GPHY_CTRL_LOW_PWR;
+    91	
+    92		if (enable)
+    93			ret = regmap_update_bits(priv->gphy_ctrl, 0, pwr_bits, 0);
+    94		else
+    95			ret = regmap_update_bits(priv->gphy_ctrl, 0, pwr_bits, pwr_bits);
+    96	
+    97		return ret;
+    98	}
+    99	
+ > 100	int bcm63268_gphy_resume(struct phy_device *phydev)
+   101	{
+   102		int ret;
+   103	
+   104		ret = bcm63268_gphy_set(phydev, true);
+   105		if (ret)
+   106			return ret;
+   107	
+   108		ret = genphy_resume(phydev);
+   109		if (ret)
+   110			return ret;
+   111	
+   112		return 0;
+   113	}
+   114	
+ > 115	int bcm63268_gphy_suspend(struct phy_device *phydev)
+   116	{
+   117		int ret;
+   118	
+   119		ret = genphy_suspend(phydev);
+   120		if (ret)
+   121			return ret;
+   122	
+   123		ret = bcm63268_gphy_set(phydev, false);
+   124		if (ret)
+   125			return ret;
+   126	
+   127		return 0;
+   128	}
+   129	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
