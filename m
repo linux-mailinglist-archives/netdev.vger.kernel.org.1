@@ -1,114 +1,156 @@
-Return-Path: <netdev+bounces-167578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9F6A3AF5F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:13:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA8CCA3AF66
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A8C1897D19
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:13:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4FD3175C15
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD1F13AD05;
-	Wed, 19 Feb 2025 02:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jq0Zmujt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4822BAF4;
+	Wed, 19 Feb 2025 02:16:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0546E54918;
-	Wed, 19 Feb 2025 02:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F722862BE;
+	Wed, 19 Feb 2025 02:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739931188; cv=none; b=BxajgVBO+hoIcAQ9yx20mqxX6pbCO+ddnHAhxn0EVsXHv6XtItcuv88QaNCAag6iD/Dy2O23dm8cTGlVt4BxBOJAAribiEzsI/y7xuz0iDoyayLjuy/s37hpm5emVKu5Xg46Wg3alFsyIVv2Ya+EwfWZNyWEsDaw6LNmap/JjB4=
+	t=1739931403; cv=none; b=UTl0Y6OpkOhKqGIlEioItEnpiLWAWcruU6sxn00SDnpE3Nx9/VaNzI/K8cAvWeuePVnlya1n0MHYahi4BiYyaYZWvC4PiwTFb58nEY6frZabGNl4H4NQ7WPDvduJ+N65gDOcx1RW3J1b9tA+xq27BY95NyEObPl5SZT8CIkDlBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739931188; c=relaxed/simple;
-	bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QY9IRhtZ7N+wrZkG/6Gk++x7UXHt3jr3rxx2Fglhi8SMp2aywQKI2vmRW/v4QJ+Pbowlvz8X4feJfOtD9zUmxbrjT5QK8EbklqAxsMk4Qg0ZFFjxO6LVJao3vuhOt9BKp8ydczGe1D4o75KCKezj+jEkt5KRsQ+5QHbxINwTrbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jq0Zmujt; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3cfc8772469so19836595ab.3;
-        Tue, 18 Feb 2025 18:13:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739931186; x=1740535986; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
-        b=Jq0ZmujtW8cH6GGMP+vJQlIsmL6j6Bx4egQYCE4xcScZzAzvcW7ign+c0USYaBa4Pm
-         s94omOR/kQxCZ325PqkqwHx37RbjB2RtqAOeGeQPavxYfHMh1OWn+B77aQ0kFNzmEc+T
-         2bBap+4wIhWqzhqAAal+XV6oCK8Bqb7zCXj5H0kSgOh+SGPrJ9VyBvZ3v5WQzLAfQb/A
-         8c5bLHhaQpiathGrTnt00svaBFUGcfZrS9l+B9UalOfQZYUD3ji90LR/84Ej/A/jNTJq
-         BRQ8Nd8dTz000c4iac2lHt2CXwjqLsTvmoOimA/yhVSaenllgyDpkYodbY70eop33+RT
-         LJKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739931186; x=1740535986;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MXdL2r988f57IcnxnV5NB0njUX0aL9IvbAws6rU3xjM=;
-        b=klgxJHOYCpHwiqkwUPlL28RmyQ8SISr8AlFql7srOOzhloLpmb67Jif+YXrfL+cmt4
-         h/2rfVsx8K5lVgQWmIanlItxNVQDmXKgBLKnJXhty8cXwhYr/hZ7Gnk4skzjtES/NkCH
-         tigdbA0OBLP0fiV+U9aj08DbXEWk7pB6MHwJSal6UOv+QtDCaZ4lUVFNJZVnuGE7fETy
-         SfknqWxKykOvTToS/gmmU9vcm4HH3Dir4SUjotkARFCGKu3ZqD02jDWbKGPjwK6MAQUj
-         tZevOlOBV3IKNZDDGG4mejpc+ahEZDhvDR6KVauWeyu+8AbEbFVST00bxK1QgyOZogmR
-         pV2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVt6mb9BOwjogCULZH6yIqZS0Y4LdtGKlBoXrXNayZTjI+xiG72wjMGh6T2LoYsqTPL1ZIc+5Y8@vger.kernel.org, AJvYcCXKIv7qgO5MjBbQ3JmgviCJQnEMtsrtj3lvf+1feSBI6PaIYl5LRlZf5TZoOzA4e8+d3xE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg+59wKxrVDpgkzmFOlwy85GfnP4hF8hMu0FfQln5I3vOlxOw7
-	2ESc3GQK33rjELsrYTm6MbW72ckpS9sp/5k0HqF2ohsTLnGXg6JuySkY3p/Gbu8Qyaozv+JdAb9
-	cVoVgV2/gRrCvgfMZ/TXENEtzzJQ=
-X-Gm-Gg: ASbGncufck78XmxryJyFULAsqOWxspsBRxi84Lf2Gbrg5xHAvJ/kO0gF1dJ/yjJ0QX4
-	B0Ohq2Ut0Kn/sJCXIRU0J+XVN+fY5nN/B9aNAfsKU+sKyxlDVlsLS14H6E1giovVf3POf+NjB
-X-Google-Smtp-Source: AGHT+IEesxvTSZRnkrrfVG4JDLjqg9TlKJ/CF5hAEqsbjtZ4pL0JM0MU2u/WxAz4vIZxNsKp3Q/vGj2Qk2opJIT6pug=
-X-Received: by 2002:a05:6e02:3312:b0:3d0:4700:db0b with SMTP id
- e9e14a558f8ab-3d2b52a1164mr20342275ab.2.1739931185934; Tue, 18 Feb 2025
- 18:13:05 -0800 (PST)
+	s=arc-20240116; t=1739931403; c=relaxed/simple;
+	bh=4bSW4K+gbt3sFOuxBssTMp43VhqeJuAd/btPUf4ThMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iwKN5oYsI5XCoWJq1nO69K4Id8UfOeH+z8lAP4ynA95g/SIl4dutbIxjQTQGTpWHP4lRH5Poh9dFbaX7cmMtPC14/7/DONYcHHDUIXcY4rvmg+iQ5rQlpOC/aUWQlmlcsSN4H+brZQW61HfNLHlvkHfRGm60FyuACN7I21vCrLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YyKdl69QgzjYD3;
+	Wed, 19 Feb 2025 10:11:55 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id B6161140367;
+	Wed, 19 Feb 2025 10:16:31 +0800 (CST)
+Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 19 Feb 2025 10:16:31 +0800
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemn100006.china.huawei.com (7.202.194.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 19 Feb 2025 10:16:30 +0800
+Message-ID: <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
+Date: Wed, 19 Feb 2025 10:16:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
- <20250217034245.11063-2-kerneljasonxing@gmail.com> <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
- <20250218174754.150c82c3@kernel.org>
-In-Reply-To: <20250218174754.150c82c3@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Feb 2025 10:12:29 +0800
-X-Gm-Features: AWEUYZlZ9YayU8cbNpXMrN3Ad4YipgYDXBsMUxAl-xJrFKdk66cORRrC_pkxgI4
-Message-ID: <CAL+tcoAbVnJwTT_dvFFH+n3aWUG2DHf3Z+Uc8LhYo9fd31Zp+w@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/3] tcp: add TCP_RTO_MAX_MIN_SEC definition
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, 
-	ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way
+ handshake
+To: Eric Dumazet <edumazet@google.com>
+CC: <ncardwell@google.com>, <kuniyu@amazon.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Jason Xing <kerneljasonxing@gmail.com>
+References: <20250218105824.34511-1-wanghai38@huawei.com>
+ <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
+Content-Language: en-US
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemn100006.china.huawei.com (7.202.194.109)
 
-On Wed, Feb 19, 2025 at 9:47=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 18 Feb 2025 15:38:17 -0800 Martin KaFai Lau wrote:
-> > On 2/16/25 7:42 PM, Jason Xing wrote:
-> > > Add minimum value definition as the lower bound of RTO MAX
-> > > set by users. No functional changes here.
-> >
-> > If it is no-op, why it is needed? The commit message didn't explain it =
-either.
-> > I also cannot guess how patch 2 depends on patch 1.
->
-> FWIW this patch also gave me pause when looking at v1.
-> I don't think this define makes the code any easier to follow.
 
-Okay, I will drop this in the next re-spin.
 
-Thanks,
-Jason
+On 2025/2/18 21:35, Eric Dumazet wrote:
+> On Tue, Feb 18, 2025 at 12:00 PM Wang Hai <wanghai38@huawei.com> wrote:
+>>
+>> If two ack packets from a connection enter tcp_check_req at the same time
+>> through different cpu, it may happen that req->ts_recent is updated with
+>> with a more recent time and the skb with an older time creates a new sock,
+>> which will cause the tcp_validate_incoming check to fail.
+>>
+>> cpu1                                cpu2
+>> tcp_check_req
+>>                                      tcp_check_req
+>> req->ts_recent = tmp_opt.rcv_tsval = t1
+>>                                      req->ts_recent = tmp_opt.rcv_tsval = t2
+>>
+>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+>> tcp_child_process
+>> tcp_rcv_state_process
+>> tcp_validate_incoming
+>> tcp_paws_check
+>> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win) // failed
+>>
+>> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>> ---
+>>   net/ipv4/tcp_minisocks.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+>> index b089b08e9617..0208455f9eb8 100644
+>> --- a/net/ipv4/tcp_minisocks.c
+>> +++ b/net/ipv4/tcp_minisocks.c
+>> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>>          sock_rps_save_rxhash(child, skb);
+>>          tcp_synack_rtt_meas(child, req);
+>>          *req_stolen = !own_req;
+>> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
+>> +           unlikely(tcp_sk(child)->rx_opt.ts_recent != tmp_opt.rcv_tsval))
+>> +               tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
+>> +
+>>          return inet_csk_complete_hashdance(sk, child, req, own_req);
+> 
+> Have you seen the comment at line 818 ?
+> 
+> /* TODO: We probably should defer ts_recent change once
+>   * we take ownership of @req.
+>   */
+> 
+> Plan was clear and explained. Why implement something else (and buggy) ?
+> 
+Hi Eric,
+
+Currently we have a real problem, so we want to solve it. This bug 
+causes the upper layers to be unable to be notified to call accept after 
+the successful three-way handshake.
+
+Skb from cpu1 that fails at tcp_paws_check (which it could have 
+succeeded) will not be able to enter the TCP_ESTABLISHED state, and 
+therefore parent->sk_data_ready(parent) will not be triggered, and skb 
+from cpu2 can complete the three-way handshake, but there is also no way 
+to call parent->sk_data_ready(parent) to notify the upper layer, which 
+will result
+in the upper layer not being able to sense and call accept to obtain the 
+nsk.
+
+cpu1                                cpu2
+tcp_check_req
+                                     tcp_check_req
+req->ts_recent = tmp_opt.rcv_tsval = t1
+                                     req->ts_recent=tmp_opt.rcv_tsval= t2
+
+newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+tcp_child_process
+  tcp_rcv_state_process
+   tcp_validate_incoming
+    tcp_paws_check // failed
+  parent->sk_data_ready(parent); // will not be called
+                                     tcp_v4_do_rcv
+				     tcp_rcv_state_process // Complete the three-way handshake
+													// missing parent->sk_data_ready(parent);
+
 
