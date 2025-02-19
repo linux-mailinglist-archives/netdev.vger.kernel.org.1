@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-167867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F3DEA3C9AE
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:27:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13882A3C9AD
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:27:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6EA173114
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:27:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C46A172120
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC2B2356A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF57230997;
 	Wed, 19 Feb 2025 20:27:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE6E233140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C9B230980
 	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 20:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739996851; cv=none; b=B4Z3cyXJNi9DwuEhDqtzsFUeDDBVjJZp5wSKpjIMZnaWmsFnunwk9n6U/qvVUe4RtTWq1N5LmyajbAJxjd94cfklRm/26qX11/jW7F+O9ehQ3tba+07ypt+e+xsZ9rCbfPBRKq7SRy4MdfzceFa1OyflIAfkJUHvRIflBBc4wy4=
+	t=1739996851; cv=none; b=RT0bfQvvflA5nh5+fI8qhCfj3K0FAuWdtTKsFsa94fEQfhcVrsVFwzRKNX4i4KZz4DA7PFt5TideFinkxWzxO/xAgh8wcOUOI0cYtDvNXdp8D1iCIAKYrDmDlUu+9nqS2I2eRSMwcHdr6bjInJRA9/VzFrIGHP3uMpwSPIzWdkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739996851; c=relaxed/simple;
-	bh=AIGrtSctj0mPWdU5qMsIGDJ2GxY3Xarzk7bfVX/lN1A=;
+	bh=teJMvblEI3jIB+wfSi4/UkmIC8ilsWeyfiUNXabGRZ0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a5xeuYoKGcQhQvvfyA9+0xr9npFSx815rsqBZ5GnjHu8QWujbBQByc23ZhuQKoEukTKirEvsgEu5+nof4iAuWC/4D9wnYhIyScoCCFDJ2AHErq9CYZluQvgGIOVa6j03BaM2WBcFHkMlDlY7TJ3N00fUNYtPMQYM+GR650m9LuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=r3ajNDLd1XCAJr8BCpfsQyz3muxeN0y349pMvISW0qJSoI5bFIhcQBthSs1hTL9egReG9UnyD2RLa87+SihobwJOIBeMyxr9ck81ib4NPd1aZxTgESni5+cpVOcZj7qL61CTY3DKcKupdAYFTIaX3KgWP1lOW2towBQmFY5SyBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220ca204d04so2297095ad.0
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-220d132f16dso2556425ad.0
         for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 12:27:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1739996848; x=1740601648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xwNoSRDffO+xddl3RoJ1zSDOcFAeRaleW1sp7I/p1V8=;
-        b=lDNcnOvIJS/iIjBS3EORzPnwqBzaUbLuTx2nUOsqFYRjRVlcWX+DFC4CO/53lIPtgA
-         t1QYPVsAs7oB84IrxJe6xngz20K1hQYSkL9frffpwSn3p9Cbd6FBUP1NgmTW3SjZSVvW
-         S1rUzJdmFeOsuDZ+zDXMHzUZU4567ED0edRWaCKiZvb7GzGpyvthDzOTgdYqz+cX1Dm5
-         VUBg4Op/gLJ2BQENBhnYqxaD0cz4zsZNu7C5Osj313dN4VfiCEnNNM5OhdUnCPIipTES
-         LxkenDVugjDHcLPzCuICGCEFYYRrBEzPFNyjnrzc9Oi3ew1BArR+tJS1k5A3DVWUhPhu
-         4ohw==
-X-Gm-Message-State: AOJu0Yz8vizLDR+1nrmRzr5jyi0PqHPYyJhQD3XDqZWGZE+AsP/Syzb4
-	Di9I3jciKh0n2n4jp3ubjqf7WmL4I+xD5pagwzLtY11IWM+UkRDaJeTS
-X-Gm-Gg: ASbGnctemM85i5NCUYfbbUlC93kl4FRaWeCFeOi89GAMm0dY4LRyCkJle1DjvWmZsDo
-	f5I2AGnLZ5eq9BffbbnDEVjkIC2nahLLQjB4yJErK+e73y5qzr6IJbab4V2Agnzftm2GGKlXDtC
-	XzFQh8l6SzXF2dmKCAxY/UoKswXrRPnfaXu8GNgKaqbjBFdEHcu0v6fLKMf+iGOY69ji8/quTGz
-	WIhaiKff4H7lb9oatXeVwF12bQZmMqQP3GnBLaT1VCP58ORrlBc4HqnF18GwH1mXvZHvvCsNCua
-	PIrCtmWapct7QoY=
-X-Google-Smtp-Source: AGHT+IEYWxNFZCwt4sZoiSF0LK95TpPYrEe0nhNdrsLrQOPuRGkEuxy2aBtcFLQVB3qqPd50triX/A==
-X-Received: by 2002:a05:6a00:1828:b0:732:6248:8f5f with SMTP id d2e1a72fcca58-7329de495f2mr7089189b3a.5.1739996846945;
-        Wed, 19 Feb 2025 12:27:26 -0800 (PST)
+        bh=19t0yCLd+KrfC9zXm/S9AE5aqWj07VpwLZM2y5Kajss=;
+        b=ueg7zKbm02K5uHzAjF2Tke54mTO9SLF5NKuxarw7C44/qY8kkI7CktUg3VSaBHWC5K
+         aG4/l7AlNiD2yznMnT6I3wUI9N2OQJvBc/uuajM+/Zt98RY2ENA4/fh874fHkAseeK7g
+         4Bx0F1t+QuQqbRQ3JmZvM7yFUIBg8uYbGlOYIOmmiWyrsnZgiNY1jhzW9173l46VwpeK
+         3iAMGFwvdeW8wyN4PwuE1sjkeV0et9oJ9+gIwjxD6Bf+Mnc502k+fBxcTVt3iS/TcqBc
+         Hcv6LRRY79XXcH2cNRYK/Y9E7fmJ0hRspN+rXKibmZJITd7pj86sDTeBev8gG81uzDVL
+         zw4Q==
+X-Gm-Message-State: AOJu0YzZ3OHI+G57WE2ieN/p79+5VbELjJ7RiEaDCR7h+lm1blddo7OS
+	TiNKvCYILScvOIvpGRgRRmNH06EHLMrt00KBfMgH+xLoTt38JkSDQxFK
+X-Gm-Gg: ASbGnctAOkODCzcSvZWwlCPq28xE2U+9SIhp2s2aPcLEsjaehkqjUKb/WLRw7J/0NQt
+	7joAb4GWuzUUeFY1ObwHr6Nj3JdzYIDKMZNW2vu9DLJQxct9ULWdLzLrVee0oewN6H1zk1cTeKQ
+	JEJuwUnPkmfv46KEp4eU5n5JYyyUb5GgNI7kUcfPLXfzVW8jpldxd/ET3I9XGkFScRl9UiDoS6R
+	Sa8ApJajKWCb8QSjE7bFhRt4c8N/QsdE5WWR+nM3hO8GeGvlHubDMD7JBqRGhgFJFzVZAQklhPF
+	yme1/dxCJhPKTNE=
+X-Google-Smtp-Source: AGHT+IHf5MkPfwzb3+RGC//H1vntq73lwq5+zDYx73CzDvuAr22FqDOVJRHlkkBIL97S2UnwivXdUg==
+X-Received: by 2002:a05:6a21:6b11:b0:1ee:cfaa:f174 with SMTP id adf61e73a8af0-1eed505be52mr7677467637.42.1739996848428;
+        Wed, 19 Feb 2025 12:27:28 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7327fa51eb9sm5947109b3a.166.2025.02.19.12.27.26
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73242568146sm12376139b3a.47.2025.02.19.12.27.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 12:27:26 -0800 (PST)
+        Wed, 19 Feb 2025 12:27:27 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Saeed Mahameed <saeed@kernel.org>
-Subject: [PATCH net-next v5 05/12] net: hold netdev instance lock during ioctl operations
-Date: Wed, 19 Feb 2025 12:27:12 -0800
-Message-ID: <20250219202719.957100-6-sdf@fomichev.me>
+Subject: [PATCH net-next v5 06/12] net: hold netdev instance lock during sysfs operations
+Date: Wed, 19 Feb 2025 12:27:13 -0800
+Message-ID: <20250219202719.957100-7-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250219202719.957100-1-sdf@fomichev.me>
 References: <20250219202719.957100-1-sdf@fomichev.me>
@@ -78,308 +78,282 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert all ndo_eth_ioctl invocations to dev_eth_ioctl which does the
-locking. Reflow some of the dev_siocxxx to drop else clause.
+Most of them are already covered by the converted dev_xxx APIs.
+Add the locking wrappers for the remaining ones.
 
 Cc: Saeed Mahameed <saeed@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/bonding/bond_main.c |  9 ++---
- include/linux/netdevice.h       |  3 ++
- net/8021q/vlan_dev.c            |  4 +-
- net/core/dev.c                  |  4 +-
- net/core/dev_api.c              | 30 +++++++++++++++
- net/core/dev_ioctl.c            | 67 ++++++++++++++++++++-------------
- 6 files changed, 80 insertions(+), 37 deletions(-)
+ drivers/net/bonding/bond_main.c |  7 +++-
+ include/linux/netdevice.h       |  4 ++
+ net/core/dev.c                  | 58 ++++++-----------------------
+ net/core/dev_api.c              | 65 +++++++++++++++++++++++++++++++++
+ net/core/net-sysfs.c            |  2 +
+ 5 files changed, 88 insertions(+), 48 deletions(-)
 
 diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index f6d0628a36d9..19775e9d7341 100644
+index 19775e9d7341..05afda23829f 100644
 --- a/drivers/net/bonding/bond_main.c
 +++ b/drivers/net/bonding/bond_main.c
-@@ -855,7 +855,6 @@ static int bond_check_dev_link(struct bonding *bond,
- 			       struct net_device *slave_dev, int reporting)
- {
- 	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
--	int (*ioctl)(struct net_device *, struct ifreq *, int);
- 	struct ifreq ifr;
- 	struct mii_ioctl_data *mii;
- 
-@@ -871,8 +870,7 @@ static int bond_check_dev_link(struct bonding *bond,
- 			BMSR_LSTATUS : 0;
- 
- 	/* Ethtool can't be used, fallback to MII ioctls. */
--	ioctl = slave_ops->ndo_eth_ioctl;
--	if (ioctl) {
-+	if (slave_ops->ndo_eth_ioctl) {
- 		/* TODO: set pointer to correct ioctl on a per team member
- 		 *       bases to make this more efficient. that is, once
- 		 *       we determine the correct ioctl, we will always
-@@ -888,9 +886,10 @@ static int bond_check_dev_link(struct bonding *bond,
- 		/* Yes, the mii is overlaid on the ifreq.ifr_ifru */
- 		strscpy_pad(ifr.ifr_name, slave_dev->name, IFNAMSIZ);
- 		mii = if_mii(&ifr);
--		if (ioctl(slave_dev, &ifr, SIOCGMIIPHY) == 0) {
-+
-+		if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIPHY) == 0) {
- 			mii->reg_num = MII_BMSR;
--			if (ioctl(slave_dev, &ifr, SIOCGMIIREG) == 0)
-+			if (dev_eth_ioctl(slave_dev, &ifr, SIOCGMIIREG) == 0)
- 				return mii->val_out & BMSR_LSTATUS;
- 		}
+@@ -2644,10 +2644,13 @@ static int __bond_release_one(struct net_device *bond_dev,
+ 		dev_set_mac_address(slave_dev, (struct sockaddr *)&ss, NULL);
  	}
+ 
+-	if (unregister)
++	if (unregister) {
++		netdev_lock_ops(slave_dev);
+ 		__dev_set_mtu(slave_dev, slave->original_mtu);
+-	else
++		netdev_unlock_ops(slave_dev);
++	} else {
+ 		dev_set_mtu(slave_dev, slave->original_mtu);
++	}
+ 
+ 	if (!netif_is_bond_master(slave_dev))
+ 		slave_dev->priv_flags &= ~IFF_BONDING;
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5500eafc1704..c350c89cb447 100644
+index c350c89cb447..44882c91d484 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -4191,6 +4191,8 @@ int put_user_ifreq(struct ifreq *ifr, void __user *arg);
- int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr,
- 		void __user *data, bool *need_copyout);
- int dev_ifconf(struct net *net, struct ifconf __user *ifc);
-+int dev_eth_ioctl(struct net_device *dev,
-+		  struct ifreq *ifr, unsigned int cmd);
- int generic_hwtstamp_get_lower(struct net_device *dev,
- 			       struct kernel_hwtstamp_config *kernel_cfg);
- int generic_hwtstamp_set_lower(struct net_device *dev,
-@@ -4212,6 +4214,7 @@ int netif_change_net_namespace(struct net_device *dev, struct net *net,
- int dev_change_net_namespace(struct net_device *dev, struct net *net,
- 			     const char *pat);
- int __dev_set_mtu(struct net_device *, int);
-+int netif_set_mtu(struct net_device *dev, int new_mtu);
+@@ -3349,6 +3349,7 @@ void dev_close(struct net_device *dev);
+ void dev_close_many(struct list_head *head, bool unlink);
+ int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 		 void *type_data);
++void netif_disable_lro(struct net_device *dev);
+ void dev_disable_lro(struct net_device *dev);
+ int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
+ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
+@@ -4218,6 +4219,8 @@ int netif_set_mtu(struct net_device *dev, int new_mtu);
  int dev_set_mtu(struct net_device *, int);
  int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
  			      struct netlink_ext_ack *extack);
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 91d134961357..ee3283400716 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -377,7 +377,6 @@ static int vlan_hwtstamp_set(struct net_device *dev,
- static int vlan_dev_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- {
- 	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
--	const struct net_device_ops *ops = real_dev->netdev_ops;
- 	struct ifreq ifrr;
- 	int err = -EOPNOTSUPP;
- 
-@@ -388,8 +387,7 @@ static int vlan_dev_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- 	case SIOCGMIIPHY:
- 	case SIOCGMIIREG:
- 	case SIOCSMIIREG:
--		if (netif_device_present(real_dev) && ops->ndo_eth_ioctl)
--			err = ops->ndo_eth_ioctl(real_dev, &ifrr, cmd);
-+		err = dev_eth_ioctl(real_dev, &ifrr, cmd);
- 		break;
- 	}
- 
++int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
++			  struct netlink_ext_ack *extack);
+ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 			struct netlink_ext_ack *extack);
+ int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+@@ -4977,6 +4980,7 @@ static inline void __dev_mc_unsync(struct net_device *dev,
+ /* Functions used for secondary unicast and multicast support */
+ void dev_set_rx_mode(struct net_device *dev);
+ int dev_set_promiscuity(struct net_device *dev, int inc);
++int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
+ int dev_set_allmulti(struct net_device *dev, int inc);
+ void netdev_state_change(struct net_device *dev);
+ void __netdev_notify_peers(struct net_device *dev);
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 3e19d9548cec..12b268b3274a 100644
+index 12b268b3274a..c40cb752a419 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -9307,7 +9307,7 @@ int netif_set_mtu_ext(struct net_device *dev, int new_mtu,
- 	return err;
+@@ -1726,15 +1726,7 @@ int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ }
+ EXPORT_SYMBOL(dev_setup_tc);
+ 
+-/**
+- *	dev_disable_lro - disable Large Receive Offload on a device
+- *	@dev: device
+- *
+- *	Disable Large Receive Offload (LRO) on a net device.  Must be
+- *	called under RTNL.  This is needed if received packets may be
+- *	forwarded to another interface.
+- */
+-void dev_disable_lro(struct net_device *dev)
++void netif_disable_lro(struct net_device *dev)
+ {
+ 	struct net_device *lower_dev;
+ 	struct list_head *iter;
+@@ -1745,10 +1737,12 @@ void dev_disable_lro(struct net_device *dev)
+ 	if (unlikely(dev->features & NETIF_F_LRO))
+ 		netdev_WARN(dev, "failed to disable LRO!\n");
+ 
+-	netdev_for_each_lower_dev(dev, lower_dev, iter)
+-		dev_disable_lro(lower_dev);
++	netdev_for_each_lower_dev(dev, lower_dev, iter) {
++		netdev_lock_ops(lower_dev);
++		netif_disable_lro(lower_dev);
++		netdev_unlock_ops(lower_dev);
++	}
+ }
+-EXPORT_SYMBOL(dev_disable_lro);
+ 
+ /**
+  *	dev_disable_gro_hw - disable HW Generic Receive Offload on a device
+@@ -5972,7 +5966,7 @@ static int generic_xdp_install(struct net_device *dev, struct netdev_bpf *xdp)
+ 			static_branch_dec(&generic_xdp_needed_key);
+ 		} else if (new && !old) {
+ 			static_branch_inc(&generic_xdp_needed_key);
+-			dev_disable_lro(dev);
++			netif_disable_lro(dev);
+ 			dev_disable_gro_hw(dev);
+ 		}
+ 		break;
+@@ -8995,7 +8989,7 @@ int dev_set_promiscuity(struct net_device *dev, int inc)
+ }
+ EXPORT_SYMBOL(dev_set_promiscuity);
+ 
+-static int __dev_set_allmulti(struct net_device *dev, int inc, bool notify)
++int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+ {
+ 	unsigned int old_flags = dev->flags, old_gflags = dev->gflags;
+ 	unsigned int allmulti, flags;
+@@ -9030,25 +9024,6 @@ static int __dev_set_allmulti(struct net_device *dev, int inc, bool notify)
+ 	return 0;
  }
  
--int dev_set_mtu(struct net_device *dev, int new_mtu)
-+int netif_set_mtu(struct net_device *dev, int new_mtu)
+-/**
+- *	dev_set_allmulti	- update allmulti count on a device
+- *	@dev: device
+- *	@inc: modifier
+- *
+- *	Add or remove reception of all multicast frames to a device. While the
+- *	count in the device remains above zero the interface remains listening
+- *	to all interfaces. Once it hits zero the device reverts back to normal
+- *	filtering operation. A negative @inc value is used to drop the counter
+- *	when releasing a resource needing all multicasts.
+- *	Return 0 if successful or a negative errno code on error.
+- */
+-
+-int dev_set_allmulti(struct net_device *dev, int inc)
+-{
+-	return __dev_set_allmulti(dev, inc, true);
+-}
+-EXPORT_SYMBOL(dev_set_allmulti);
+-
+ /*
+  *	Upload unicast and multicast address lists to device and
+  *	configure RX filtering. When the device doesn't support unicast
+@@ -9181,7 +9156,7 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 		int inc = (flags & IFF_ALLMULTI) ? 1 : -1;
+ 
+ 		dev->gflags ^= IFF_ALLMULTI;
+-		__dev_set_allmulti(dev, inc, false);
++		netif_set_allmulti(dev, inc, false);
+ 	}
+ 
+ 	return ret;
+@@ -9373,16 +9348,8 @@ int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
+ }
+ EXPORT_SYMBOL(dev_pre_changeaddr_notify);
+ 
+-/**
+- *	dev_set_mac_address - Change Media Access Control Address
+- *	@dev: device
+- *	@sa: new address
+- *	@extack: netlink extended ack
+- *
+- *	Change the hardware (MAC) address of the device
+- */
+-int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+-			struct netlink_ext_ack *extack)
++int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
++			  struct netlink_ext_ack *extack)
  {
- 	struct netlink_ext_ack extack;
+ 	const struct net_device_ops *ops = dev->netdev_ops;
  	int err;
-@@ -9318,7 +9318,7 @@ int dev_set_mtu(struct net_device *dev, int new_mtu)
- 		net_err_ratelimited("%s: %s\n", dev->name, extack._msg);
- 	return err;
+@@ -9406,7 +9373,6 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 	add_device_randomness(dev->dev_addr, dev->addr_len);
+ 	return 0;
  }
--EXPORT_SYMBOL(dev_set_mtu);
-+EXPORT_SYMBOL(netif_set_mtu);
+-EXPORT_SYMBOL(dev_set_mac_address);
  
- int netif_change_tx_queue_len(struct net_device *dev, unsigned long new_len)
- {
+ DECLARE_RWSEM(dev_addr_sem);
+ 
+@@ -9416,7 +9382,7 @@ int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+ 	int ret;
+ 
+ 	down_write(&dev_addr_sem);
+-	ret = dev_set_mac_address(dev, sa, extack);
++	ret = netif_set_mac_address(dev, sa, extack);
+ 	up_write(&dev_addr_sem);
+ 	return ret;
+ }
 diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index ce3a38c8e326..7dae30781411 100644
+index 7dae30781411..87a62022ef1c 100644
 --- a/net/core/dev_api.c
 +++ b/net/core/dev_api.c
-@@ -222,3 +222,33 @@ void dev_close(struct net_device *dev)
- 	netdev_unlock_ops(dev);
+@@ -252,3 +252,68 @@ int dev_set_mtu(struct net_device *dev, int new_mtu)
+ 	return ret;
  }
- EXPORT_SYMBOL(dev_close);
+ EXPORT_SYMBOL(dev_set_mtu);
 +
-+int dev_eth_ioctl(struct net_device *dev,
-+		  struct ifreq *ifr, unsigned int cmd)
++/**
++ * dev_disable_lro() - disable Large Receive Offload on a device
++ * @dev: device
++ *
++ * Disable Large Receive Offload (LRO) on a net device.  Must be
++ * called under RTNL.  This is needed if received packets may be
++ * forwarded to another interface.
++ */
++void dev_disable_lro(struct net_device *dev)
 +{
-+	const struct net_device_ops *ops = dev->netdev_ops;
-+	int ret = -ENODEV;
-+
-+	if (!ops->ndo_eth_ioctl)
-+		return -EOPNOTSUPP;
-+
 +	netdev_lock_ops(dev);
-+	if (netif_device_present(dev))
-+		ret = ops->ndo_eth_ioctl(dev, ifr, cmd);
++	netif_disable_lro(dev);
 +	netdev_unlock_ops(dev);
-+
-+	return ret;
 +}
-+EXPORT_SYMBOL(dev_eth_ioctl);
++EXPORT_SYMBOL(dev_disable_lro);
 +
-+int dev_set_mtu(struct net_device *dev, int new_mtu)
++/**
++ * dev_set_allmulti() - update allmulti count on a device
++ * @dev: device
++ * @inc: modifier
++ *
++ * Add or remove reception of all multicast frames to a device. While the
++ * count in the device remains above zero the interface remains listening
++ * to all interfaces. Once it hits zero the device reverts back to normal
++ * filtering operation. A negative @inc value is used to drop the counter
++ * when releasing a resource needing all multicasts.
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++
++int dev_set_allmulti(struct net_device *dev, int inc)
 +{
 +	int ret;
 +
 +	netdev_lock_ops(dev);
-+	ret = netif_set_mtu(dev, new_mtu);
++	ret = netif_set_allmulti(dev, inc, true);
 +	netdev_unlock_ops(dev);
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL(dev_set_mtu);
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 4c2098ac9d72..d9f350593121 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -110,7 +110,7 @@ static int dev_getifmap(struct net_device *dev, struct ifreq *ifr)
- 	return 0;
- }
- 
--static int dev_setifmap(struct net_device *dev, struct ifreq *ifr)
-+static int netif_setifmap(struct net_device *dev, struct ifreq *ifr)
- {
- 	struct compat_ifmap *cifmap = (struct compat_ifmap *)&ifr->ifr_map;
- 
-@@ -240,20 +240,6 @@ int net_hwtstamp_validate(const struct kernel_hwtstamp_config *cfg)
- 	return 0;
- }
- 
--static int dev_eth_ioctl(struct net_device *dev,
--			 struct ifreq *ifr, unsigned int cmd)
--{
--	const struct net_device_ops *ops = dev->netdev_ops;
--
--	if (!ops->ndo_eth_ioctl)
--		return -EOPNOTSUPP;
--
--	if (!netif_device_present(dev))
--		return -ENODEV;
--
--	return ops->ndo_eth_ioctl(dev, ifr, cmd);
--}
--
- /**
-  * dev_get_hwtstamp_phylib() - Get hardware timestamping settings of NIC
-  *	or of attached phylib PHY
-@@ -305,7 +291,9 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 		return -ENODEV;
- 
- 	kernel_cfg.ifr = ifr;
++EXPORT_SYMBOL(dev_set_allmulti);
++
++/**
++ * dev_set_mac_address() - change Media Access Control Address
++ * @dev: device
++ * @sa: new address
++ * @extack: netlink extended ack
++ *
++ * Change the hardware (MAC) address of the device
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
++			struct netlink_ext_ack *extack)
++{
++	int ret;
++
 +	netdev_lock_ops(dev);
- 	err = dev_get_hwtstamp_phylib(dev, &kernel_cfg);
++	ret = netif_set_mac_address(dev, sa, extack);
 +	netdev_unlock_ops(dev);
- 	if (err)
++
++	return ret;
++}
++EXPORT_SYMBOL(dev_set_mac_address);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 3fe2c521e574..35f79a308d7b 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1480,8 +1480,10 @@ static ssize_t tx_maxrate_store(struct kobject *kobj, struct attribute *attr,
  		return err;
  
-@@ -429,7 +417,9 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 
+ 	err = -EOPNOTSUPP;
 +	netdev_lock_ops(dev);
- 	err = dev_set_hwtstamp_phylib(dev, &kernel_cfg, &extack);
+ 	if (dev->netdev_ops->ndo_set_tx_maxrate)
+ 		err = dev->netdev_ops->ndo_set_tx_maxrate(dev, index, rate);
 +	netdev_unlock_ops(dev);
- 	if (err)
- 		return err;
  
-@@ -504,10 +494,14 @@ static int dev_siocbond(struct net_device *dev,
- 	const struct net_device_ops *ops = dev->netdev_ops;
- 
- 	if (ops->ndo_siocbond) {
-+		int ret = -ENODEV;
-+
-+		netdev_lock_ops(dev);
- 		if (netif_device_present(dev))
--			return ops->ndo_siocbond(dev, ifr, cmd);
--		else
--			return -ENODEV;
-+			ret = ops->ndo_siocbond(dev, ifr, cmd);
-+		netdev_unlock_ops(dev);
-+
-+		return ret;
- 	}
- 
- 	return -EOPNOTSUPP;
-@@ -519,10 +513,14 @@ static int dev_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
- 	const struct net_device_ops *ops = dev->netdev_ops;
- 
- 	if (ops->ndo_siocdevprivate) {
-+		int ret = -ENODEV;
-+
-+		netdev_lock_ops(dev);
- 		if (netif_device_present(dev))
--			return ops->ndo_siocdevprivate(dev, ifr, data, cmd);
--		else
--			return -ENODEV;
-+			ret = ops->ndo_siocdevprivate(dev, ifr, data, cmd);
-+		netdev_unlock_ops(dev);
-+
-+		return ret;
- 	}
- 
- 	return -EOPNOTSUPP;
-@@ -533,10 +531,14 @@ static int dev_siocwandev(struct net_device *dev, struct if_settings *ifs)
- 	const struct net_device_ops *ops = dev->netdev_ops;
- 
- 	if (ops->ndo_siocwandev) {
-+		int ret = -ENODEV;
-+
-+		netdev_lock_ops(dev);
- 		if (netif_device_present(dev))
--			return ops->ndo_siocwandev(dev, ifs);
--		else
--			return -ENODEV;
-+			ret = ops->ndo_siocwandev(dev, ifs);
-+		netdev_unlock_ops(dev);
-+
-+		return ret;
- 	}
- 
- 	return -EOPNOTSUPP;
-@@ -580,11 +582,16 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 		memcpy(dev->broadcast, ifr->ifr_hwaddr.sa_data,
- 		       min(sizeof(ifr->ifr_hwaddr.sa_data_min),
- 			   (size_t)dev->addr_len));
-+		netdev_lock_ops(dev);
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
-+		netdev_unlock_ops(dev);
- 		return 0;
- 
- 	case SIOCSIFMAP:
--		return dev_setifmap(dev, ifr);
-+		netdev_lock_ops(dev);
-+		err = netif_setifmap(dev, ifr);
-+		netdev_unlock_ops(dev);
-+		return err;
- 
- 	case SIOCADDMULTI:
- 		if (!ops->ndo_set_rx_mode ||
-@@ -592,7 +599,10 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 			return -EINVAL;
- 		if (!netif_device_present(dev))
- 			return -ENODEV;
--		return dev_mc_add_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netdev_lock_ops(dev);
-+		err = dev_mc_add_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netdev_unlock_ops(dev);
-+		return err;
- 
- 	case SIOCDELMULTI:
- 		if (!ops->ndo_set_rx_mode ||
-@@ -600,7 +610,10 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 			return -EINVAL;
- 		if (!netif_device_present(dev))
- 			return -ENODEV;
--		return dev_mc_del_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netdev_lock_ops(dev);
-+		err = dev_mc_del_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netdev_unlock_ops(dev);
-+		return err;
- 
- 	case SIOCSIFTXQLEN:
- 		if (ifr->ifr_qlen < 0)
+ 	if (!err) {
+ 		queue->tx_maxrate = rate;
 -- 
 2.48.1
 
