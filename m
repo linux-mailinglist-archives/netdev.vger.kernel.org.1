@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-167815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AB3A3C725
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:15:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3849AA3C720
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0CED3B0F1B
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:13:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39441887F0A
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C179B214A90;
-	Wed, 19 Feb 2025 18:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7748521506C;
+	Wed, 19 Feb 2025 18:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="gItkgGAR"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="HUiu4XHP"
 X-Original-To: netdev@vger.kernel.org
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F220B2144CE;
-	Wed, 19 Feb 2025 18:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEDD215052;
+	Wed, 19 Feb 2025 18:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739988836; cv=pass; b=Rz+vTI8mkLUB3MxK7xed4TA2nUD7axMZSDmvlWNgigeioXiN4cqrRIgczncX28pB3QjXfNJM49BHAXOIDwp2WXjala9dk0K0txHROvNO1FznxgQq/wsnNKDJWRAJKMHWKT2foc7YIGRXCZ0FAlfur6wNyrVFuaHXRd4kszhTGCM=
+	t=1739988839; cv=pass; b=g3AlqvU5ux7ivIfe8b3FE8P3eTIsB/8QyQaP9LG40gGCQzTM307TzIK1C2dTCc/EHhWY3E46iLUDXaLI3UOa0rmzxm/+ws1rGrkxzWJF2uCWWM4S1btP+P+/6VQxJjaNRp6MlxKSZtXH5VH2FZr2ZVD/mk/d0xSMjg/+Mrsgk5Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739988836; c=relaxed/simple;
-	bh=HSFaJJqu3GoePGcxgys65r8yGgY1ywVhXIhQs2IKWdw=;
+	s=arc-20240116; t=1739988839; c=relaxed/simple;
+	bh=tFjxQ4xwKJ5WYk4VHccCnN0hp6U7ni1nBRfMdKbhUR8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c56j9+3XbLvIyXkrFcG8chrVrKySEW4iPeLFWtY07kYRyLA8sNin2GNSOTjr/R0pJ8TKzU73WUE7ZP9kBsfWXPb9EfUy4wY2EFzZBsmdxuP67wO4Cf/L2X0wwGTye2Rq7s+dbhMd4azUYzHfS/uF7ongXh1t7xqhd1FLjnPAJJ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=gItkgGAR; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=RmTfn/H5mTZ4tqB/ablm9Z6fhAua0/RsTRJmhJsM10kuePI5QVOPbF6uHFigJVXeAUYvIsSNbIdp2pZAIP7+0IKmtiPqfm0ca8wHZMMnZtdt/zl1gfDoMdwGuFfAbOnOc5+e2jfIF7FFVr7kpHun5eOZ9amblyw7CeuVvzRx2Ro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=HUiu4XHP; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Received: from monolith.lan (unknown [193.138.7.178])
@@ -36,35 +36,35 @@ Received: from monolith.lan (unknown [193.138.7.178])
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yykzg6v8lz104S;
-	Wed, 19 Feb 2025 20:13:51 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yykzj3Tndz10DN;
+	Wed, 19 Feb 2025 20:13:53 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1739988833;
+	t=1739988834;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CdGQ9Qt2yIFp0o61zDWGYrcwevLbsfdetIovOGDGsJI=;
-	b=gItkgGAR+qhgt1HZGWwxTE0StYkMjnrh8WdnprJfbjzkYGfEW4LJWhfS0PjRM/N3dYf5D9
-	yeGSRT92MBxiosmMGIFi3uMCk0qOpjdXybgtzMTqgTvCsBjKLcQVrCJqPutUcq2yvFNFVu
-	DWg/ykLcQbgsMANk0VBg/e5wcWj2rhQ=
+	bh=vJNzXI82cDFYIUX+q6pOVmeAvH8m6xfO5n99kk/kpC8=;
+	b=HUiu4XHPcHn17HK/B5oEjc8D9KvnDdDYG0zGhZc8xb2hz91DXZVPC1gIvyzEL8w0UApV6z
+	yv5QlDNzrnedYiqfLAu70TvJKa7cI+Avq3lhk0TLazYZEKl1dtMyIFMAJTzTXJDR3zloXp
+	MkW3ySAqwAJllPiTPCHrHPIuzuD/VI0=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1739988833;
+	s=meesny; t=1739988834;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CdGQ9Qt2yIFp0o61zDWGYrcwevLbsfdetIovOGDGsJI=;
-	b=TijBdP+MJqpDwYPa4jKSH0qDZRrjY+TkbrudARxEiUqllAKPD8PDNo3pci3eFZLP5+zv03
-	aEf7L60Spnc0X0ftF2m6Ix8JI/pBeAil/fU+hZj0P/rassxyN3kMF4EffwhV7WQnyFOtld
-	Ohld8RXIfiMlcHg6dMF6VFzvKZAt92A=
+	bh=vJNzXI82cDFYIUX+q6pOVmeAvH8m6xfO5n99kk/kpC8=;
+	b=ZPBUqBC//+XBvrBL32pwhdVDOb2gY02YQM161pmwUlqqHAI+UHWxrZ9Dscq+e+sg6SRoQN
+	2OS58sS91/90kswqTZNpmjeWt6K2yL0d7kMwm9UJDhvxIxFkoMUFHzmPPztGDhtHqT0JEN
+	4C24jXoofi4/Y+Lhmlh9l9SoQPv7PXA=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988833; a=rsa-sha256; cv=none;
-	b=H/JDI5SOQkefkWUT11qZLuNuE9ulEaZhtI5CF2NJ0bxMGEAfty2LuJABHeqV38EkIkB84v
-	qMSb7YGhBGsLQkHm93IOwkfMfIlWWllp0QuQ6h1kbVM11Iq/E7nL1zq2aYYatLoCxWzSOl
-	9TsbD0Gz6C1sMrmegHRKDF0OPNmkNf4=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988834; a=rsa-sha256; cv=none;
+	b=ZDaoMVt1ov3YWhawEjeE0Hyb9ffuzB4V+8LFIx8Yw2RigOjdrpNDBperOw5Vnk/KatgiSa
+	jkcdefYMIiUT7BLxyON7UvcqklPAJyoqxBlzxJ94habarC5bh+wwEFySHqX8BHluR7f9fx
+	YGHV68LpKDDJcCOI71Yk3TUU1CEv1NE=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>,
@@ -73,9 +73,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v4 4/5] Bluetooth: L2CAP: add TX timestamping
-Date: Wed, 19 Feb 2025 20:13:36 +0200
-Message-ID: <3c625adab75d7b07d2a6e5705de970e0d8ddb399.1739988644.git.pav@iki.fi>
+Subject: [PATCH v4 5/5] Bluetooth: SCO: add TX timestamping socket-level mechanism
+Date: Wed, 19 Feb 2025 20:13:37 +0200
+Message-ID: <79a6ebae9e43c390a9d06278a38f00c8d3af81b6.1739988644.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <cover.1739988644.git.pav@iki.fi>
 References: <cover.1739988644.git.pav@iki.fi>
@@ -87,18 +87,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support TX timestamping in L2CAP sockets.
+Support TX timestamping in SCO sockets.
 
-Support MSG_ERRQUEUE recvmsg.
-
-For other than SOCK_STREAM L2CAP sockets, if a packet from sendmsg() is
-fragmented, only the first ACL fragment is timestamped.
-
-For SOCK_STREAM L2CAP sockets, use the bytestream convention and
-timestamp the last fragment and count bytes in tskey.
-
-Timestamps are not generated in the Enhanced Retransmission mode, as
-meaning of COMPLETION stamp is unclear if L2CAP layer retransmits.
+Support MSG_ERRQUEUE in SCO recvmsg.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
@@ -106,137 +97,42 @@ Signed-off-by: Pauli Virtanen <pav@iki.fi>
 Notes:
     v4: no changes
 
- include/net/bluetooth/l2cap.h |  3 ++-
- net/bluetooth/6lowpan.c       |  2 +-
- net/bluetooth/l2cap_core.c    | 41 ++++++++++++++++++++++++++++++++---
- net/bluetooth/l2cap_sock.c    | 15 ++++++++++++-
- net/bluetooth/smp.c           |  2 +-
- 5 files changed, 56 insertions(+), 7 deletions(-)
+ net/bluetooth/sco.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9189354c568f..00e182a22720 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -955,7 +955,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type, u16 timeout);
- int l2cap_chan_reconfigure(struct l2cap_chan *chan, __u16 mtu);
--int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
-+int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
-+		    const struct sockcm_cookie *sockc);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail);
- int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 50cfec8ccac4..0eb1ecb54105 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -443,7 +443,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
- 	memset(&msg, 0, sizeof(msg));
- 	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iv, 1, skb->len);
- 
--	err = l2cap_chan_send(chan, &msg, skb->len);
-+	err = l2cap_chan_send(chan, &msg, skb->len, NULL);
- 	if (err > 0) {
- 		netdev->stats.tx_bytes += err;
- 		netdev->stats.tx_packets++;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fec11e576f31..56a36e872e7b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2514,7 +2514,33 @@ static void l2cap_le_flowctl_send(struct l2cap_chan *chan)
- 	       skb_queue_len(&chan->tx_q));
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index aa7bfe26cb40..f39c57ac594f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -370,7 +370,8 @@ static int sco_connect(struct sock *sk)
+ 	return err;
  }
  
--int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static void l2cap_tx_timestamp(struct sk_buff *skb,
-+			       const struct sockcm_cookie *sockc,
-+			       size_t len)
-+{
-+	struct sock *sk = skb ? skb->sk : NULL;
-+
-+	if (sk && sk->sk_type == SOCK_STREAM)
-+		hci_setup_tx_timestamp(skb, len, sockc);
-+	else
-+		hci_setup_tx_timestamp(skb, 1, sockc);
-+}
-+
-+static void l2cap_tx_timestamp_seg(struct sk_buff_head *queue,
-+				   const struct sockcm_cookie *sockc,
-+				   size_t len)
-+{
-+	struct sk_buff *skb = skb_peek(queue);
-+	struct sock *sk = skb ? skb->sk : NULL;
-+
-+	if (sk && sk->sk_type == SOCK_STREAM)
-+		l2cap_tx_timestamp(skb_peek_tail(queue), sockc, len);
-+	else
-+		l2cap_tx_timestamp(skb, sockc, len);
-+}
-+
-+int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
-+		    const struct sockcm_cookie *sockc)
+-static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
++static int sco_send_frame(struct sock *sk, struct sk_buff *skb,
++			  const struct sockcm_cookie *sockc)
  {
- 	struct sk_buff *skb;
- 	int err;
-@@ -2529,6 +2555,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (IS_ERR(skb))
- 			return PTR_ERR(skb);
+ 	struct sco_conn *conn = sco_pi(sk)->conn;
+ 	int len = skb->len;
+@@ -381,6 +382,7 @@ static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
  
-+		l2cap_tx_timestamp(skb, sockc, len);
-+
- 		l2cap_do_send(chan, skb);
- 		return len;
- 	}
-@@ -2552,6 +2580,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (err)
- 			return err;
+ 	BT_DBG("sk %p len %d", sk, len);
  
-+		l2cap_tx_timestamp_seg(&seg_queue, sockc, len);
-+
- 		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
++	hci_setup_tx_timestamp(skb, 1, sockc);
+ 	hci_send_sco(conn->hcon, skb);
  
- 		l2cap_le_flowctl_send(chan);
-@@ -2573,6 +2603,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (IS_ERR(skb))
- 			return PTR_ERR(skb);
- 
-+		l2cap_tx_timestamp(skb, sockc, len);
-+
- 		l2cap_do_send(chan, skb);
- 		err = len;
- 		break;
-@@ -2596,10 +2628,13 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 		if (err)
- 			break;
- 
--		if (chan->mode == L2CAP_MODE_ERTM)
-+		if (chan->mode == L2CAP_MODE_ERTM) {
-+			/* TODO: ERTM mode timestamping */
- 			l2cap_tx(chan, NULL, &seg_queue, L2CAP_EV_DATA_REQUEST);
--		else
-+		} else {
-+			l2cap_tx_timestamp_seg(&seg_queue, sockc, len);
- 			l2cap_streaming_send(chan, &seg_queue);
-+		}
- 
- 		err = len;
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index acd11b268b98..92305530e2e5 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1106,6 +1106,7 @@ static int l2cap_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	return len;
+@@ -776,6 +778,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  {
  	struct sock *sk = sock->sk;
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	struct sk_buff *skb;
 +	struct sockcm_cookie sockc;
  	int err;
  
  	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -1120,6 +1121,14 @@ static int l2cap_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (sk->sk_state != BT_CONNECTED)
- 		return -ENOTCONN;
+@@ -787,6 +790,14 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
  
 +	sockcm_init(&sockc, sk);
 +
@@ -246,21 +142,21 @@ index acd11b268b98..92305530e2e5 100644
 +			return err;
 +	}
 +
+ 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+@@ -794,7 +805,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  	lock_sock(sk);
- 	err = bt_sock_wait_ready(sk, msg->msg_flags);
- 	release_sock(sk);
-@@ -1127,7 +1136,7 @@ static int l2cap_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		return err;
  
- 	l2cap_chan_lock(chan);
--	err = l2cap_chan_send(chan, msg, len);
-+	err = l2cap_chan_send(chan, msg, len, &sockc);
- 	l2cap_chan_unlock(chan);
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = sco_send_frame(sk, skb);
++		err = sco_send_frame(sk, skb, &sockc);
+ 	else
+ 		err = -ENOTCONN;
  
- 	return err;
-@@ -1168,6 +1177,10 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct l2cap_pinfo *pi = l2cap_pi(sk);
- 	int err;
+@@ -860,6 +871,10 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct sock *sk = sock->sk;
+ 	struct sco_pinfo *pi = sco_pi(sk);
  
 +	if (unlikely(flags & MSG_ERRQUEUE))
 +		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
@@ -268,20 +164,7 @@ index acd11b268b98..92305530e2e5 100644
 +
  	lock_sock(sk);
  
- 	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8b9724fd752a..f5e5c2f111b9 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -608,7 +608,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
- 
- 	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, iv, 2, 1 + len);
- 
--	l2cap_chan_send(chan, &msg, 1 + len);
-+	l2cap_chan_send(chan, &msg, 1 + len, NULL);
- 
- 	if (!chan->data)
- 		return;
+ 	if (sk->sk_state == BT_CONNECT2 &&
 -- 
 2.48.1
 
