@@ -1,81 +1,79 @@
-Return-Path: <netdev+bounces-167631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E39AA3B1B4
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 07:37:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC7BA3B1D3
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 07:51:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF54B172747
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 06:37:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B9521893437
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 06:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D1F1B425D;
-	Wed, 19 Feb 2025 06:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DDA1BCA1C;
+	Wed, 19 Feb 2025 06:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jj85mlx5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIq3TrW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F2F4C6D
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 06:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115FC2AE95
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 06:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739947033; cv=none; b=iyxv+z7t37iaRKpZAYQRLdPVcP7EXFpmPFkM54oV0uuJeSsN0LvDu6qGPgr73Og9N3lWHrUyc90DrXLQYQKU5scnAb69yNsWRIMpD1d35GxocIf+KQD1EnvRv6FVtupHZSBCMxL7bbwe0cGU30k+4RzWD8H/6xHtAAW2FqAN1+M=
+	t=1739947884; cv=none; b=jJqpF0oDdyPl3+0bJQBE5k3c90IeI0OKhidOyCY1cIyLbVavV5j2xoPsguEsHSfgfeKlHOdXU5c79WeHKj2APr4CYcfvmbXEVWMfi/OA9fwbzzcnFPoiDJ2JPrYK3Z5zmkDEtqJMlQPW4GxBQH61fGdlGUxoYkIZhQnlIs6joHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739947033; c=relaxed/simple;
-	bh=59DY9Uq3JnOEboD/8p0HFYMtBVYdKcUe5SFl9jrohOo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Y1Kqtxr2xzKRW4dEr+b986eBdndX/F6UeG29Qtf1DioAePiVQfZTisCiGSYNtyEDk3/4xd4Ocb42YiG2IakRtJDrJR5e5Yl7djl1OyLi4lk5dRTr5JUiH5pPRvbbr1BNqsc/bEdTVWuBbwDBzngLxYHEMtIo+cS+FF1LHczd6uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jj85mlx5; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1739947884; c=relaxed/simple;
+	bh=DhQcPoXxQd2XPnORLQdT8S/PtDC9TMWsGJbZEc/MAS8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nOpFlaFnx+vt9v7BeZhOC7wu88vNhmANW4ocrWvq//9ra1iLejAjJLkVWlevifuu4xtifd3GW9O4uPdJUDD6DMaiRUc9K65AtiBz/ocjXz8LklUnCOPk65GrwBcguVdj/vBYOPMNpKAevyPKj4xGF8Q1HoTwCir/E6zSYDOciz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIq3TrW/; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1295352866b.1
-        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 22:37:11 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aba868c6e88so789420766b.2
+        for <netdev@vger.kernel.org>; Tue, 18 Feb 2025 22:51:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739947030; x=1740551830; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eXcsT6EBHeRzjpifAvGOJupya5mbWmpkLfsBOVI1WOw=;
-        b=Jj85mlx5xiZbkrF68pltrtY8lDhXi2RPGwSnszdWSSFn9qwKWyasbBLAto181xDeVj
-         J6MCIj7CE1MvC96DVs6m1ttlWC4ZfqKQgLnKfz6wyLh4Kfw+v0CtayYpxSxCbyRglSLF
-         cxBKBbgay0OQHcNTFABJPTTNcCWlLafbiwf8wpdi7RQ/zoaclPjqwpn9oTYJhI5Xcdk4
-         ESGOgndEyv075orxRUQ/V41FDC/h/vJpuzTweq2kNkGTGJsLCf+iqL5UAImpLNRlp4Ik
-         aVU4Zp3ZZ4UVBb5U5QJfRexAgRPr0TzqcArm18NH4gQ82MFq7j7QHw96rxNWE6Xlnbe4
-         P9Hw==
+        d=gmail.com; s=20230601; t=1739947881; x=1740552681; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=59S+UWlAcWB8GhPPbkUDwxvQzXERVvGWPJgohTw+KA8=;
+        b=SIq3TrW/tQlIgQgzAsQBwj5NUPlF9M7wkb63dfO13eyJZLgTukOK7LkO0T3uRLqLsr
+         3NVKOZaQgS3wQPgcjwF0dKspBWHEMtnIxrumpDOoodHGzjblX1X9ZryQyD/nMrBG5rFo
+         dRKgvkv/12SCUxH6ledCw5DQNnMXq9+EfXuahgzevlidjmxIMUJD5TtvKPffyWbrH9yi
+         8froRSNL8l/lzfMVi0BpaBy5qquL/HqADVQqPm165TF7FuO9nlbJ7zAlihdtkhHN6uXK
+         Dz8ztntC8F8L3aD72hhIFri8ejAC+H8dv/ywSj7q4xZAH5eHVC2Q8ZsU8zKq4eZxKctS
+         SwEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739947030; x=1740551830;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eXcsT6EBHeRzjpifAvGOJupya5mbWmpkLfsBOVI1WOw=;
-        b=MXNj0qp6LVz4zBsEQY440PSBZbtx53diUrz0f4xxGaGhaMMUsAVZQNbQkr9hSlWMoc
-         btboVGdq00KQFvOY4M2FHxSRe7f07c6g+XmYO/l+DKxLY4T76ZEKzyLmp+j0NX7NmdbX
-         ufJ5iCp+ztQ8Z6lmhwauOWLCPY/3rP0AnZpWjepCbPQnNdJIbzFMnLmk34AZPakQK6+S
-         DxgZu+2/13FcLiTdwyzwFNy5s5QMPe0wmRLL22Xm9viVaLI3KGaw1ZCatJo7FyA3S7VB
-         90swduVEtyJ7GAjBSKJOQXLXi1grlEopUqHCBlIt9jljWUGnvfIfHWbEVMUkCFpL4qV0
-         hg2g==
-X-Gm-Message-State: AOJu0YzQI1OWVLPJE+4zvhK0freRW7HBT4cVvSzLyw+8TTn/8eqUXRaL
-	hspiTM3ro9l4gX69KoWQcYwuP5idrsgwnU4cIYvVgzfK8vQd0F3U
-X-Gm-Gg: ASbGnctaVFajbPjDpXQP/XaJgfpSU7cII8LmOQH4/Rkv+bcSOpiSEOQgEAZ/7vgMbKb
-	6ma5BD7HrYTCrHuXB+zvGOvIKAMmIjAVdc0QE/kuSEucypFJ2uWpO0ydRhv+SyGWNNX/2hWPRib
-	gKo8O9xD/lIsGXZe1o4xuccTQB1sOpmYU/hh2+3Tvhsxrwq5MMB+gfrB0xn8e/Opy6EXxq1ShdB
-	QQtUPxmUtcM6HP+4VeRb4xWeX3ZqT/WM5748HTzOti4ULgPseb9r+I1JRLZGpg73krfwhD/k76R
-	dmNlHobk6NjbT+y53BFmlejxOSOzkT2Gx45sARUykRPNM2wxI/hzfhyA25rLYZo1uDXSBrlxh/Z
-	BNKKW7GPBK76HUZFoipqQrsWK/nsdeJcMmqCliTSvCWKt4YUXxnJay+dWz53pJFukK/lCy7ejCt
-	MYLf/MtZE=
-X-Google-Smtp-Source: AGHT+IElPr/8IxtkGS0IaRiGo1OB7/YqFrnlASLgg88k2wPONpPYQxUpbcPOc6D3mFmbZwR6P5uMPg==
-X-Received: by 2002:a17:906:c154:b0:ab7:8930:5669 with SMTP id a640c23a62f3a-abb70d2f836mr1603442066b.18.1739947029565;
-        Tue, 18 Feb 2025 22:37:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739947881; x=1740552681;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=59S+UWlAcWB8GhPPbkUDwxvQzXERVvGWPJgohTw+KA8=;
+        b=xDqmmgDDOUYDNz+dpvD5Ovcd8prgemxShtra0gNK7Fvsr2Mj+c+kDdK2qDedckDpjY
+         HpKThQlgfA1V1Oo8SgDoxm6RvKwbOb+onUDTR5UiZkILshfEm6dpPiTK0f921nmYk7jh
+         i6qp3tO6H4jsn3xHIoIvdrJU21o+qXa7WGp9CWYy5SzIOWNicDj+SAIYpXceCmYBB+bc
+         TwXZgRTVvizMN7lxH4ul0y77I7iWU8mJnn/YyRk9rR4KoC+Tt66vzh+kfspFsw23J4SI
+         z0T9PkVA6LC1tbLnse++SlZEFSoOuoJUkKd5pNJZdJP3i9V4sLQYM/cnr4blI1wuVyEW
+         8WaQ==
+X-Gm-Message-State: AOJu0YxRrpmwpgjNYGGABZKV5P0wJziwx/KEd1O5JMvW86IYZ/kSKLbt
+	4CG4+fQPGkUzUHfv8LYBrKPUGluKukJfSRcYp22MOpurU6PcbqDLOHsVBz3p
+X-Gm-Gg: ASbGncvqekwcGmf5JlaGASPy5zrTqW3msSmnFLfFkyan3cfR0JVe2IsdZo1lalKIxPK
+	MRDSZcRIo+Gyt3X+Aipg95dx5EnPj2nsuVK0ck2lDc54GW7GOeezy/dCkaIX4MkpWbQRyninLjS
+	ijc2YjGXTRKso07bNYgHyDNR08zC0U55mwn/KLYKNuqLVHZ5oW0XrM7caYVDTECQXnKz3Q3/mVE
+	euAo3tcEp3wt8dqTGOEdXP4P1Dk3sZ3Wtcr1X4FlgEatjYcJTKV9yjIRhunSP81WwHBQ9OH3p/A
+	qO4EfjaN+EUhzwbpXlfDPCNcy/aMkLmrPl0AKbZTrefZLoU70NCk99PrShijUKYrOkygRErs/gu
+	mAGJy7cEaqrrrhUlJaEVc5VXVRpngKEE8EaWMiK/9Z14a7Bsz33K1sw71sBMDiEsazoQ/S2u6ZF
+	mNII4KNb0=
+X-Google-Smtp-Source: AGHT+IHQvSfWMOsAiM1GP6gwch1M3Iai70JrARvaHcM0ESQWorxqSYviepkwD3aiNIQ6JSmwg//IPg==
+X-Received: by 2002:a17:907:7706:b0:ab2:bd0b:acdf with SMTP id a640c23a62f3a-abb70de286amr1634714266b.36.1739947881192;
+        Tue, 18 Feb 2025 22:51:21 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a982:e400:a8b2:dfb2:4efb:8f82? (dynamic-2a02-3100-a982-e400-a8b2-dfb2-4efb-8f82.310.pool.telefonica.de. [2a02:3100:a982:e400:a8b2:dfb2:4efb:8f82])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aba5337673dsm1193565766b.89.2025.02.18.22.37.07
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-abbb66ebb84sm289693166b.181.2025.02.18.22.51.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2025 22:37:08 -0800 (PST)
-Message-ID: <8f7cf3ac-14f4-4120-a8ed-01b83737e6b8@gmail.com>
-Date: Wed, 19 Feb 2025 07:37:52 +0100
+        Tue, 18 Feb 2025 22:51:20 -0800 (PST)
+Message-ID: <82e4dfdb-5140-4b8f-8f61-099a52545389@gmail.com>
+Date: Wed, 19 Feb 2025 07:52:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,15 +81,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: add phylib-internal.h
-From: Heiner Kallweit <hkallweit1@gmail.com>
+Content-Language: en-US
 To: Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <290db2fb-01f3-46af-8612-26d30b98d8b3@gmail.com>
-Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH RESUBMIT net-next] net: phy: add phylib-internal.h
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -135,30 +132,173 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <290db2fb-01f3-46af-8612-26d30b98d8b3@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 18.02.2025 23:43, Heiner Kallweit wrote:
-> This patch is a starting point for moving phylib-internal
-> declarations to a private header file.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/phy/phy-c45.c          |  1 +
->  drivers/net/phy/phy-core.c         |  3 ++-
->  drivers/net/phy/phy.c              |  2 ++
->  drivers/net/phy/phy_device.c       |  2 ++
->  drivers/net/phy/phy_led_triggers.c |  2 ++
->  drivers/net/phy/phylib-internal.h  | 25 +++++++++++++++++++++++++
->  include/linux/phy.h                | 13 -------------
->  7 files changed, 34 insertions(+), 14 deletions(-)
->  create mode 100644 drivers/net/phy/phylib-internal.h
-> 
-Patch only applies on top of patches which weren't applied yet.
-So I'll resubmit.
+This patch is a starting point for moving phylib-internal
+declarations to a private header file.
 
---
-pw-bot: cr
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/phy-c45.c          |  1 +
+ drivers/net/phy/phy-core.c         |  3 ++-
+ drivers/net/phy/phy.c              |  2 ++
+ drivers/net/phy/phy_device.c       |  2 ++
+ drivers/net/phy/phy_led_triggers.c |  2 ++
+ drivers/net/phy/phylib-internal.h  | 25 +++++++++++++++++++++++++
+ include/linux/phy.h                | 13 -------------
+ 7 files changed, 34 insertions(+), 14 deletions(-)
+ create mode 100644 drivers/net/phy/phylib-internal.h
+
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 37c9a344b..0bcbdce38 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -9,6 +9,7 @@
+ #include <linux/phy.h>
+ 
+ #include "mdio-open-alliance.h"
++#include "phylib-internal.h"
+ 
+ /**
+  * genphy_c45_baset1_able - checks if the PMA has BASE-T1 extended abilities
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index 2fd1d153a..b1c1670de 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -6,6 +6,8 @@
+ #include <linux/phy.h>
+ #include <linux/of.h>
+ 
++#include "phylib-internal.h"
++
+ /**
+  * phy_speed_to_str - Return a string representing the PHY link speed
+  *
+@@ -544,7 +546,6 @@ void phy_check_downshift(struct phy_device *phydev)
+ 
+ 	phydev->downshifted_rate = 1;
+ }
+-EXPORT_SYMBOL_GPL(phy_check_downshift);
+ 
+ static int phy_resolve_min_speed(struct phy_device *phydev, bool fdx_only)
+ {
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index b454e31d4..fd8d8dd29 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -36,6 +36,8 @@
+ #include <net/genetlink.h>
+ #include <net/sock.h>
+ 
++#include "phylib-internal.h"
++
+ #define PHY_STATE_TIME	HZ
+ 
+ #define PHY_STATE_STR(_state)			\
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 103a4d102..7d21379fa 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -41,6 +41,8 @@
+ #include <linux/uaccess.h>
+ #include <linux/unistd.h>
+ 
++#include "phylib-internal.h"
++
+ MODULE_DESCRIPTION("PHY library");
+ MODULE_AUTHOR("Andy Fleming");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/phy/phy_led_triggers.c b/drivers/net/phy/phy_led_triggers.c
+index f550576eb..bd3c9554f 100644
+--- a/drivers/net/phy/phy_led_triggers.c
++++ b/drivers/net/phy/phy_led_triggers.c
+@@ -5,6 +5,8 @@
+ #include <linux/phy_led_triggers.h>
+ #include <linux/netdevice.h>
+ 
++#include "phylib-internal.h"
++
+ static struct phy_led_trigger *phy_speed_to_led_trigger(struct phy_device *phy,
+ 							unsigned int speed)
+ {
+diff --git a/drivers/net/phy/phylib-internal.h b/drivers/net/phy/phylib-internal.h
+new file mode 100644
+index 000000000..dc9592c6b
+--- /dev/null
++++ b/drivers/net/phy/phylib-internal.h
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * phylib-internal header
++ */
++
++#ifndef __PHYLIB_INTERNAL_H
++#define __PHYLIB_INTERNAL_H
++
++struct phy_device;
++
++/*
++ * phy_supported_speeds - return all speeds currently supported by a PHY device
++ */
++unsigned int phy_supported_speeds(struct phy_device *phy,
++				  unsigned int *speeds,
++				  unsigned int size);
++void of_set_phy_supported(struct phy_device *phydev);
++void of_set_phy_eee_broken(struct phy_device *phydev);
++void of_set_phy_timing_role(struct phy_device *phydev);
++int phy_speed_down_core(struct phy_device *phydev);
++void phy_check_downshift(struct phy_device *phydev);
++
++int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv);
++
++#endif /* __PHYLIB_INTERNAL_H */
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index c0f524579..3076b4caa 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -184,13 +184,6 @@ static inline void phy_interface_set_rgmii(unsigned long *intf)
+ 	__set_bit(PHY_INTERFACE_MODE_RGMII_TXID, intf);
+ }
+ 
+-/*
+- * phy_supported_speeds - return all speeds currently supported by a PHY device
+- */
+-unsigned int phy_supported_speeds(struct phy_device *phy,
+-				      unsigned int *speeds,
+-				      unsigned int size);
+-
+ /**
+  * phy_modes - map phy_interface_t enum to device tree binding of phy-mode
+  * @interface: enum phy_interface_t value
+@@ -1324,10 +1317,6 @@ phy_lookup_setting(int speed, int duplex, const unsigned long *mask,
+ 		   bool exact);
+ size_t phy_speeds(unsigned int *speeds, size_t size,
+ 		  unsigned long *mask);
+-void of_set_phy_supported(struct phy_device *phydev);
+-void of_set_phy_eee_broken(struct phy_device *phydev);
+-void of_set_phy_timing_role(struct phy_device *phydev);
+-int phy_speed_down_core(struct phy_device *phydev);
+ 
+ /**
+  * phy_is_started - Convenience function to check whether PHY is started
+@@ -1353,7 +1342,6 @@ static inline void phy_disable_eee_mode(struct phy_device *phydev, u32 link_mode
+ 
+ void phy_resolve_aneg_pause(struct phy_device *phydev);
+ void phy_resolve_aneg_linkmode(struct phy_device *phydev);
+-void phy_check_downshift(struct phy_device *phydev);
+ 
+ /**
+  * phy_read - Convenience function for reading a given PHY register
+@@ -2028,7 +2016,6 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ 			       struct ethtool_keee *data);
+ int genphy_c45_an_config_eee_aneg(struct phy_device *phydev);
+-int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv);
+ 
+ /* Generic C45 PHY driver */
+ extern struct phy_driver genphy_c45_driver;
+-- 
+2.48.1
 
 
