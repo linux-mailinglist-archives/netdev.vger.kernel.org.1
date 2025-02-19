@@ -1,356 +1,198 @@
-Return-Path: <netdev+bounces-167612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F60A3B0D4
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 06:21:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D62A3B136
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 07:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96C70174A54
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 05:21:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B59189730C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 06:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197371B21B2;
-	Wed, 19 Feb 2025 05:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449FD1BAEF8;
+	Wed, 19 Feb 2025 05:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w2E5Dvmd"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cnq7oJBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013044.outbound.protection.outlook.com [40.107.162.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17753189902
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 05:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739942481; cv=none; b=Plwxcq4sDGCBZ4r7OjZl5sw0O4qyVsiHGkc7Z9KVT7M0HztYzX52y9ib2XMcOZUbxOFbLTtTDNg5q5YbecVkb9GbmAwFDOFxi5pW6Wgy0rF235s3bZMFK5LN+8y9Wfoqm7+yMWzGv0bmarTwUmlTp6rkWIUm+8/4BlGYjXTtcio=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739942481; c=relaxed/simple;
-	bh=rFlyBFF897GPn6hw313WLphHkT0bNgX3OOhSM/Os4Gs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KeUWOFwn5HQZ+gsSLV3g6S5/ZT2FzuaS90L+ClKnruHH2Xcbyol+/GjB1jlUZGuzGY96RIxhorhV1+G5GEoTXhAoc+EmGqv/NIZf2YDnE553jcnSpc+hD6RExi762+OqtDzUr7JquXUhHfnqu3MaG1ZlV7h34InQjcDB6jDltwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w2E5Dvmd; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739942477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWApHiICTlgYzj+/tJ66MHJm2Dsou0Ghrxgtc1RnfGU=;
-	b=w2E5DvmdhictxuLgSbHfcXCatScqN2LgiitrPgy7Kj8k+kkY6xo9Fz3Rys7E64audHw1TY
-	7hqvRF2f7PJ8PQZP1lkmIzDM2V4tRQY0O+OJM7MU/+FajEJxvVpbpq21w70tRQ7Dq4EeJI
-	ZLkrEnK6nEjIzzab5zn7Btl5FGSOhmY=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0012E1B87E3;
+	Wed, 19 Feb 2025 05:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739944790; cv=fail; b=PHEO/9tOnv2c5cI0N+lq+Wer4ZRWQrbGiQWa29zYzPimn9nRmbN/ZJ/D8rWNSFPjq/7GNAfz6QVTWeYWrthZlp1/SIffEQ7AWVcNPknOIHnpW5FD7jNdf01RcOQcSpwIMRPx0ljs50HjEaCpsEb/kxjEZ8m0dewgLwcYEQDamsg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739944790; c=relaxed/simple;
+	bh=apO2jZbpkjF7AtwBRIZrPiXjDxzt6VEEkDAkq7oP7mA=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=KKf22k1EWOlPjeH5qie3nROU0gRpad87pu7ndcuF6cUMSvHfMCyu/SIeUayWUy/NlKfUSSRyiAm8UzEjtp9MM/n9bg69gKaye6cyUyw/oybiV6qrXej1TCtEvoPN4TR2YlO1zZh2/ZWesNo+LkOSv2K6Lcu4xYGGFjCQG9dPwxk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cnq7oJBX; arc=fail smtp.client-ip=40.107.162.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=inzaoIG+jgqj3RfjCNFnE/CJH0PUDDLudsBvDb9ybj3vWJM13kjZfy6L+aL8S1CUWdHtflOJNvFCQDTqJU4+2l12WiXaaV0/+I5UqGF6CcBUn/I0cqReGWWLqibvbSyfHMezJd7AV8gMs0lVUSwAE38+wKybfXYlr9m675Nob6cwmape2EElVFrJeMIYhHjT+h30rhEFalxH7lqImcmjrdwHSqhgyDssNc+ox4QU+tWSq9bI0B0eURIlbMXnZIpHFC+XTt2kwrT0xvx2H+Fyxg6lVQ6DWKEpxrG9FABEUIQZEVHavA2bPX9XQPLkfOf6uEZJ580Kzc9LgI1TLl+PrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zcksdm+GdZcdY/gntH9gf9veEUCyRBbPuwJ41cfJKsk=;
+ b=q3DLcGC/BbFdXyFdxxOeuQ+kf6cJMFIiEnz9Ukm6guaeqH6bOOMxAq9/7SST6+8htZSvN5b1K9E8je4ivUu1WlsMupxA8XHrqzn/IoTKfgEfte/+N8wNUGY6cKiFtixbyIwUA67XBWnDxY0zwuRiVXbmuvYcJWGbFUuMOroUJJvd52WMMIAj86HtFb5sUO5GYUEL28/xjQg2oM3N0k7vho6jx+RX9YMvT5uHTzUGKqKGhZaZWCMJAwVIyFzCmi1xXhrv07O9zL7IVxWtGosFqDheGuL/2GpAu8s7xBTcJ2X7zZeheltPrrdn6jfJhdGFKO18JYOLlxPPeUgO0WGwKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zcksdm+GdZcdY/gntH9gf9veEUCyRBbPuwJ41cfJKsk=;
+ b=cnq7oJBXPGObsUQ7rMGcRlOrZJAyKvALQ26WbERCg6bVNa55bVTeZPPzszL1JT3dy7wB88bt4CUYEnPv7/1inAW3UvzN9WX33z/mYCbAdQOHJM6iwTojqdNj1ZVl6/hDwRpq5/YruqGqW21H4bc3upVbE8EkLFF6vsu6axS231p8bUSvzNPPOWMbMWJfH/CAbJaE5qTYKqg5irUBth0agX1bHem4KLoonU70XTuJrDr4MvKwQlqQisWbdFpbtctc3ChnUN9QwsWfCK7Tb4aIS1FIPI08trK/x6lHjQHG613XJn+Oxs31/W1u9hmgCMVJjpvqXUjeBKxd/ceJHcXvTw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AS4PR04MB9409.eurprd04.prod.outlook.com (2603:10a6:20b:4e8::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Wed, 19 Feb
+ 2025 05:59:45 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8445.011; Wed, 19 Feb 2025
+ 05:59:45 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	mykolal@fb.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	shuah@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: ioana.ciornei@nxp.com,
+	yangbo.lu@nxp.com,
+	michal.swiatkowski@linux.intel.com,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	mrpre@163.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>
-Subject: [PATCH bpf-next v2 2/2] selftests/bpf: add ktls selftest
-Date: Wed, 19 Feb 2025 13:20:15 +0800
-Message-ID: <20250219052015.274405-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20250219052015.274405-1-jiayuan.chen@linux.dev>
-References: <20250219052015.274405-1-jiayuan.chen@linux.dev>
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: [PATCH v2 net 0/9] net: enetc: fix some known issues
+Date: Wed, 19 Feb 2025 13:42:38 +0800
+Message-Id: <20250219054247.733243-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SGBP274CA0023.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::35)
+ To PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|AS4PR04MB9409:EE_
+X-MS-Office365-Filtering-Correlation-Id: d8ff8d44-6691-4efa-d694-08dd50aa9bf9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?cAUf5XQW/SeCETlMzq0vPEg+3HipvxHsigyE302OgmHkv7dVrkOWU1VXi0GR?=
+ =?us-ascii?Q?Ccx5Yyh4aqKrssKK0SPfOBqXyNuREscWQs0Grj++1oN0RuVdhq7g6cQsHsV9?=
+ =?us-ascii?Q?/3jGXldP1t01AeBVEwk9rGJ4rwhVZ3SwcEMYOF7Oy2sqphiCMRZH5M4yMsBm?=
+ =?us-ascii?Q?Od69Rm+64qt7H01oZoe1uqhf0GnBM/73odmGw8+/hv584xzK1dVQrU4J/tEF?=
+ =?us-ascii?Q?NhT+wFPU/Dh4Vs37o2Bf5YecOlXKgz6gUaFxHw5+Ynxl07AHhuP0XfMUHe3c?=
+ =?us-ascii?Q?MVHD9MgOv0/bskqwycGT9X+bDDfE37T49Z32jCeoCdDdMuiQvI32y5wFvoJa?=
+ =?us-ascii?Q?61IOK1/jx4z0vAVfqUy+xLMDA7ahsqAR1FVA8qCmAyuVghs5YBR9nRnlgBiZ?=
+ =?us-ascii?Q?yTkbaMxIp9StI63fYiXKNpRaMiH9/M2Mnc4dzY7zk8u9qjq5b2OqdrRXx3BF?=
+ =?us-ascii?Q?JComG1Mu9V7vjUmwMGx4Kr3eNFL3MutSTms4AqHWdhmsys04XAtwqjRae91J?=
+ =?us-ascii?Q?BOW2YG76x/dkvfAmcQehLN549efC1FMnPu87MrVD9jbG7ck/KkaUPvXKziDI?=
+ =?us-ascii?Q?5Zef93nZMGCoS7XX+ODnpxiMR9rbZVVUKDvO8UUZjb7W37n5WP1SvsPaTpuY?=
+ =?us-ascii?Q?yBiGsc71Lih5sPmHb28OYBo6BoQ+QwhBuk+ApL+l0v9Q7hR8UtjV0htmGqCp?=
+ =?us-ascii?Q?pqCsHdZK+xVPLyI/8eIL3QN5cgav2Okd6w8InwrUm3jWzAQTqpxqoyUBXymJ?=
+ =?us-ascii?Q?1gB0Wt0cVGFUJXop0z5mnfEwpSk5+3JMHa4kYa77k/NFrao9NXuKmRFLReXv?=
+ =?us-ascii?Q?F3iloye8NslMXYRj5bibjXjDiMbn7INCoK5C1S5v8k1WsfYf4BtJedi3fubH?=
+ =?us-ascii?Q?TTCRm5Hgl0JJJPKX1PCJFTExsB9TyL8OiTvVMPcaKaOBnVEU+ghmSr/a2Epf?=
+ =?us-ascii?Q?oLNCbeY9+Af3idhxK00r2VmQ/5T6V1Wb9Uh3eavsaz5hIwrt1TzTSEDM3Ct4?=
+ =?us-ascii?Q?T3+sM9k64fxFms7ZLXrtrlRDCA03c13tLhqVEYjTJAHLBuga3NLk8F0IVIFP?=
+ =?us-ascii?Q?7DSwzsBfTa7xit1HYxHqOjKZcbXOn7pt999dKXvP+LyXdVTWc5BIzCcPsPET?=
+ =?us-ascii?Q?RSZ1nGjWyIVj2DhU5BorD+F0PMYOnBIheemohXfq/L2uOEW0lwM82ufn2dHd?=
+ =?us-ascii?Q?3IldyJAud6s/VHxD4Ng0Ttc+H4oSY0KegHd74UNpuBQONOmR+//AXrOsqOyg?=
+ =?us-ascii?Q?8LLHhxjfC1w+BfwPuvYubhDyNbAn4ID9LzCsXwKxKpn/1ORVJISXYkmbkuub?=
+ =?us-ascii?Q?szCx1vr6KE8oGft3Gjsi9sQpbmYloQrJo0WG9p4ad7vWo6qXWsA5iEoGbFzB?=
+ =?us-ascii?Q?fDAVSAYLUcGDnnhIKiYXlvHCiCPGG17t0Mn0IV/fUJSM7vKYOWlZFUpIaQnZ?=
+ =?us-ascii?Q?h+e91OUVYZuQ2FnKqgeeArUVNrBm7fMZ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?aMuwSXJPqbYXqfjNsgnYcNY5eSnUD0q/VI0w1z7yHw6ir30lgXZ0oJwtLIed?=
+ =?us-ascii?Q?oIh5flxAR/xtDeZfJbJlSyOn4XFAKAhLYqDAuL0b8jUYZG6nFRS8f45bQ72z?=
+ =?us-ascii?Q?bOfE91+AvjKC6Zpp5bUHOEfURC2cqwcUmGCkcsCYhmak4BDmP9JAVr3QR4ug?=
+ =?us-ascii?Q?U9o4dD8Zh/zZCAJH3tlHLydE0Im8xbtm10aHvHnBjxwfDOIXWXTk3ww+NjFH?=
+ =?us-ascii?Q?DhbzEi/QFJacF0hInjb8+oSIGB4Im9wY+0HapBbfindHAeZbAT0s324uwOg+?=
+ =?us-ascii?Q?e5XsrYIUjCbGd+3loPFqcyy9rJT7H7bxNIY2wS+H8oNhQ/CgrX86X+rgcG8O?=
+ =?us-ascii?Q?nkO56DPJLUyKmbPgBaRSR7lc2nVITyqt2GEgEGi7DkFErc6p74kU6oJ9QUko?=
+ =?us-ascii?Q?cYEKvGMX5OO+OGR6oI06BqqGk9lVAuAgmdVMPdpdx4+NfbzpGBBSHxJ/Tphl?=
+ =?us-ascii?Q?RJK6R67EDUAxVI941VMtWrIFO+WPB+ufqxAppTgOMxAvg5ksbS5feV4VzLeJ?=
+ =?us-ascii?Q?54bDVAtQiFIjTWV/pPDu8vIRehV6dKYDFljPw1SSJG2H2LPe5x5Mg8RdS0ey?=
+ =?us-ascii?Q?PcFpRILpgNybsMr+izbJkyW2s3D9KnmzQMRkeQ5wYvxINoSIaJT+HZP8xa8t?=
+ =?us-ascii?Q?1CJ2J7wriNI3/BO/9bs3WY/jRviVFdMVQqaEL/GI0bdLQNnT7RjO5HxtIGt9?=
+ =?us-ascii?Q?DtCaUCJz8aVi8L3jg38NMjGBJlmDWn8cDe50JrWinCtmNT3AwodOZUxOcite?=
+ =?us-ascii?Q?6Z1zaq8bCAm4pDPluGn/xFC+EKMA2FNymzfyQn544h7dBKXD2xnZ9zUkPJ1i?=
+ =?us-ascii?Q?UC6C0WTYMw70NUWJ0wJCLs9E5RogUuZFyirUlMMROpUHFAMLx2wBMA/N2q3K?=
+ =?us-ascii?Q?vlXM9Iy9wzmUlwjaRMq3lOEnSxoR350y0I1vGGGfwF08by5pg1KifF6X4mw1?=
+ =?us-ascii?Q?SB+WUwLOT+6Yv1wWRr0YkXYWiInVHPduuTWBaUBf9BdnnBQzEIvH3uxbZDlv?=
+ =?us-ascii?Q?i+CKwYrU6Ra6+q1d6zU4TsiU7VSp9UDvbyxHMd4ESxSFMmuaqM9tZwauebEk?=
+ =?us-ascii?Q?xYjO3e3neWdcJta4Cs8iDyCJqWxTfeww9UytGhCzasYd6dkaMsNAiy3V7CQ1?=
+ =?us-ascii?Q?YJTV7p3AIvYpsnkor/S53mZx2Semx1JztpR/yxOLH97eVvkKDMqWnVViZKWg?=
+ =?us-ascii?Q?RkWIOhwKq/Ksbs/GkH+FsADahhNJBZB16Lwsay+gIUzcKsySNijJOqcuh9XV?=
+ =?us-ascii?Q?etWnelNarl9FaJubIKGqgtlFGiy5N32DCfdo7QUU7psKXodk8qEjNyGg+bsh?=
+ =?us-ascii?Q?wG6UO3mkNBqJVFA50Jezxb6bspENqIwRXTDJwy7TjxGY01vMTTgrZIDZbMh2?=
+ =?us-ascii?Q?0+P1jF8g4eTXx8lAEYvX0xDkN8XoxSPo89C8UGHpu6j7QhluApWLtFUunHbo?=
+ =?us-ascii?Q?nX3UMbGChfK8LCY2d9bM1lgQXPpnryQolITMH5P7uTcTCGT7JpaNoI+ekUKa?=
+ =?us-ascii?Q?RKkJQlSGXpZlZuJRF/In9G5KryoJ957imTBx3IYfOyE1NrmvGYx4mLJ9MKtt?=
+ =?us-ascii?Q?zXCHG6zct93gdq8is4EQQmWfPnXGLT3cTD7fDN8L?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8ff8d44-6691-4efa-d694-08dd50aa9bf9
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 05:59:45.1985
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Hx2Re2AVeyNTpffb2CRcWmYgOkXIQ+KtOFUsn3+b2RsGenByZlJbC+O6I6nVmea7NblLXAcB3jTSQP+2nzVx8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9409
 
-add ktls selftest for sockmap
+There are some issues with the enetc driver, some of which are specific
+to the LS1028A platform, and some of which were introduced recently when
+i.MX95 ENETC support was added, so this patch set aims to clean up those
+issues.
 
-Test results:
-sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
-sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
-sockmap_ktls/tls simple offload:OK
-sockmap_ktls/tls tx cork:OK
-sockmap_ktls/tls tx cork with push:OK
-sockmap_ktls/tls simple offload:OK
-sockmap_ktls/tls tx cork:OK
-sockmap_ktls/tls tx cork with push:OK
-sockmap_ktls:OK
-
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- .../selftests/bpf/prog_tests/sockmap_ktls.c   | 174 +++++++++++++++++-
- .../selftests/bpf/progs/test_sockmap_ktls.c   |  26 +++
- 2 files changed, 199 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
+v1 link: https://lore.kernel.org/imx/20250217093906.506214-1-wei.fang@nxp.com/
+v2 changes:
+1. Remove the unneeded semicolon from patch 1
+2. Modify the commit message of patch 1
+3. Add new patch 9 to fix another off-by-one issue
+---
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-index 2d0796314862..49b85c1c7552 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-@@ -3,13 +3,64 @@
- /*
-  * Tests for sockmap/sockhash holding kTLS sockets.
-  */
--
-+#include <error.h>
- #include <netinet/tcp.h>
-+#include <linux/tls.h>
- #include "test_progs.h"
-+#include "sockmap_helpers.h"
-+#include "test_skmsg_load_helpers.skel.h"
-+#include "test_sockmap_ktls.skel.h"
- 
- #define MAX_TEST_NAME 80
- #define TCP_ULP 31
- 
-+static int init_ktls_pairs(int c, int p)
-+{
-+	int err;
-+	struct tls12_crypto_info_aes_gcm_128 crypto_rx;
-+	struct tls12_crypto_info_aes_gcm_128 crypto_tx;
-+
-+	err = setsockopt(c, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
-+	if (!ASSERT_OK(err, "setsockopt(TCP_ULP)"))
-+		goto out;
-+
-+	err = setsockopt(p, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
-+	if (!ASSERT_OK(err, "setsockopt(TCP_ULP)"))
-+		goto out;
-+
-+	memset(&crypto_rx, 0, sizeof(crypto_rx));
-+	memset(&crypto_tx, 0, sizeof(crypto_tx));
-+	crypto_rx.info.version = TLS_1_2_VERSION;
-+	crypto_tx.info.version = TLS_1_2_VERSION;
-+	crypto_rx.info.cipher_type = TLS_CIPHER_AES_GCM_128;
-+	crypto_tx.info.cipher_type = TLS_CIPHER_AES_GCM_128;
-+
-+	err = setsockopt(c, SOL_TLS, TLS_TX, &crypto_tx, sizeof(crypto_tx));
-+	if (!ASSERT_OK(err, "setsockopt(TLS_TX)"))
-+		goto out;
-+
-+	err = setsockopt(p, SOL_TLS, TLS_RX, &crypto_rx, sizeof(crypto_rx));
-+	if (!ASSERT_OK(err, "setsockopt(TLS_RX)"))
-+		goto out;
-+	return 0;
-+out:
-+	return -1;
-+}
-+
-+static int create_ktls_pairs(int family, int sotype, int *c, int *p)
-+{
-+	int err;
-+
-+	err = create_pair(family, sotype, c, p);
-+	if (!ASSERT_OK(err, "create_pair()"))
-+		return -1;
-+
-+	err = init_ktls_pairs(*c, *p);
-+	if (!ASSERT_OK(err, "init_ktls_pairs(c, p)"))
-+		return -1;
-+	return 0;
-+}
-+
- static int tcp_server(int family)
- {
- 	int err, s;
-@@ -146,6 +197,115 @@ static const char *fmt_test_name(const char *subtest_name, int family,
- 	return test_name;
- }
- 
-+static void test_sockmap_ktls_offload(int family, int sotype)
-+{
-+	int err;
-+	int c = 0, p = 0, sent, recvd;
-+	char msg[12] = "hello world\0";
-+	char rcv[13];
-+
-+	err = create_ktls_pairs(family, sotype, &c, &p);
-+	if (!ASSERT_OK(err, "create_ktls_pairs()"))
-+		goto out;
-+
-+	sent = send(c, msg, sizeof(msg), 0);
-+	if (!ASSERT_OK(err, "send(msg)"))
-+		goto out;
-+
-+	recvd = recv(p, rcv, sizeof(rcv), 0);
-+	if (!ASSERT_OK(err, "recv(msg)") ||
-+	    !ASSERT_EQ(recvd, sent, "length mismatch"))
-+		goto out;
-+
-+	ASSERT_OK(memcmp(msg, rcv, sizeof(msg)), "data mismatch");
-+
-+out:
-+	if (c)
-+		close(c);
-+	if (p)
-+		close(p);
-+}
-+
-+static void test_sockmap_ktls_tx_cork(int family, int sotype, bool push)
-+{
-+	int err, off;
-+	int i, j;
-+	int start_push = 0, push_len = 0;
-+	int c = 0, p = 0, one = 1, sent, recvd;
-+	int prog_fd, map_fd;
-+	char msg[12] = "hello world\0";
-+	char rcv[20] = {0};
-+	struct test_sockmap_ktls *skel;
-+
-+	skel = test_sockmap_ktls__open_and_load();
-+	if (!ASSERT_TRUE(skel, "open ktls skel"))
-+		return;
-+
-+	err = create_pair(family, sotype, &c, &p);
-+	if (!ASSERT_OK(err, "create_pair()"))
-+		goto out;
-+
-+	prog_fd = bpf_program__fd(skel->progs.prog_sk_policy);
-+	map_fd = bpf_map__fd(skel->maps.sock_map);
-+
-+	err = bpf_prog_attach(prog_fd, map_fd, BPF_SK_MSG_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach sk msg"))
-+		goto out;
-+
-+	err = bpf_map_update_elem(map_fd, &one, &c, BPF_NOEXIST);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem(c)"))
-+		goto out;
-+
-+	err = init_ktls_pairs(c, p);
-+	if (!ASSERT_OK(err, "init_ktls_pairs(c, p)"))
-+		goto out;
-+
-+	skel->bss->cork_byte = sizeof(msg);
-+	if (push) {
-+		start_push = 1;
-+		push_len = 2;
-+	}
-+	skel->bss->push_start = start_push;
-+	skel->bss->push_end = push_len;
-+
-+	off = sizeof(msg) / 2;
-+	sent = send(c, msg, off, 0);
-+	if (!ASSERT_EQ(sent, off, "send(msg)"))
-+		goto out;
-+
-+	recvd = recv_timeout(p, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
-+	if (!ASSERT_EQ(-1, recvd, "expected no data"))
-+		goto out;
-+
-+	/* send remaining msg */
-+	sent = send(c, msg + off, sizeof(msg) - off, 0);
-+	if (!ASSERT_EQ(sent, sizeof(msg) - off, "send remaining data"))
-+		goto out;
-+
-+	recvd = recv_timeout(p, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
-+	if (!ASSERT_OK(err, "recv(msg)") ||
-+	    !ASSERT_EQ(recvd, sizeof(msg) + push_len, "check length mismatch"))
-+		goto out;
-+
-+	for (i = 0, j = 0; i < recvd;) {
-+		/* skip checking the data that has been pushed in */
-+		if (i >= start_push && i <= start_push + push_len - 1) {
-+			i++;
-+			continue;
-+		}
-+		if (!ASSERT_EQ(rcv[i], msg[j], "data mismatch"))
-+			goto out;
-+		i++;
-+		j++;
-+	}
-+out:
-+	if (c)
-+		close(c);
-+	if (p)
-+		close(p);
-+	test_sockmap_ktls__destroy(skel);
-+}
-+
- static void run_tests(int family, enum bpf_map_type map_type)
- {
- 	int map;
-@@ -162,10 +322,22 @@ static void run_tests(int family, enum bpf_map_type map_type)
- 	close(map);
- }
- 
-+static void run_ktls_test(int family, int sotype)
-+{
-+	if (test__start_subtest("tls simple offload"))
-+		test_sockmap_ktls_offload(family, sotype);
-+	if (test__start_subtest("tls tx cork"))
-+		test_sockmap_ktls_tx_cork(family, sotype, false);
-+	if (test__start_subtest("tls tx cork with push"))
-+		test_sockmap_ktls_tx_cork(family, sotype, true);
-+}
-+
- void test_sockmap_ktls(void)
- {
- 	run_tests(AF_INET, BPF_MAP_TYPE_SOCKMAP);
- 	run_tests(AF_INET, BPF_MAP_TYPE_SOCKHASH);
- 	run_tests(AF_INET6, BPF_MAP_TYPE_SOCKMAP);
- 	run_tests(AF_INET6, BPF_MAP_TYPE_SOCKHASH);
-+	run_ktls_test(AF_INET, SOCK_STREAM);
-+	run_ktls_test(AF_INET6, SOCK_STREAM);
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
-new file mode 100644
-index 000000000000..e0f757929ef4
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+
-+int cork_byte;
-+int push_start;
-+int push_end;
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-+	__uint(max_entries, 20);
-+	__type(key, int);
-+	__type(value, int);
-+} sock_map SEC(".maps");
-+
-+SEC("sk_msg")
-+int prog_sk_policy(struct sk_msg_md *msg)
-+{
-+	if (cork_byte > 0)
-+		bpf_msg_cork_bytes(msg, cork_byte);
-+	if (push_start > 0 && push_end > 0)
-+		bpf_msg_push_data(msg, push_start, push_end, 0);
-+
-+	return SK_PASS;
-+}
+Wei Fang (9):
+  net: enetc: fix the off-by-one issue in enetc_map_tx_buffs()
+  net: enetc: correct the tx_swbd statistics
+  net: enetc: correct the xdp_tx statistics
+  net: enetc: VFs do not support HWTSTAMP_TX_ONESTEP_SYNC
+  net: enetc: update UDP checksum when updating originTimestamp field
+  net: enetc: add missing enetc4_link_deinit()
+  net: enetc: remove the mm_lock from the ENETC v4 driver
+  net: enetc: correct the EMDIO base offset for ENETC v4
+  net: enetc: fix the off-by-one issue in enetc_map_tx_tso_buffs()
+
+ drivers/net/ethernet/freescale/enetc/enetc.c  | 59 ++++++++++++++-----
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  3 +
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  |  2 +-
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |  7 ++-
+ .../freescale/enetc/enetc_pf_common.c         | 10 +++-
+ 5 files changed, 63 insertions(+), 18 deletions(-)
+
 -- 
-2.47.1
+2.34.1
 
 
