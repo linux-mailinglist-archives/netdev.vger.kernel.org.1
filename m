@@ -1,323 +1,261 @@
-Return-Path: <netdev+bounces-167900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92415A3CBDE
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 22:55:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC9DA3CC2C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 23:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F49172589
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:55:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74BC6177109
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 22:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19B720F082;
-	Wed, 19 Feb 2025 21:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED27D1D47C7;
+	Wed, 19 Feb 2025 22:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="g8tBG6+n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKDt6FKD"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631C023DEB6;
-	Wed, 19 Feb 2025 21:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CA7286280;
+	Wed, 19 Feb 2025 22:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740002099; cv=pass; b=EW/8i3QX0AYfxXKmps5dQ6pDebklgV5u95cO0PnyWBtke+YzfAFK1HDmtftr57tnkqnjQUK9zaSO6in2IcHwchhol2m2iXAWZR6B8lbS7M8TzSte1EpXBgiIwn88Fh3IXUVowvV+BRWGfsvxv9824VIskYoaaLt5o5Khpg0GS0w=
+	t=1740003559; cv=fail; b=QBWNqcWKm6P1SCRT4bmsPZuchtvUzePI4AcbGRmJpeA01L+53ls5U9RG8tXtNEd707qZxDLs6QjNXKej1SzIdG1ah9rpjSSVS81W9aLG3NGKsPQpeifRyJLOP86Xgph7reU0FhqOfanKEzGh/s41FsqveABWPt7pwgkn15j69mE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740002099; c=relaxed/simple;
-	bh=3smt+KX0feUWzWD5u7BX0QOcielt0U4BKUcnhRCMcLY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GJNyNbxNuTxarmqc4UJ/Zt5rk1nMpHGHMfMCgaXEKhuL+nos8Zr/yTsGUu/IJU4EXbQzZWrAn8olGzg5fpBuXhUQ6PlKlbC9cC9fsP5srf6LvCUZfmi3OW60q5D5hVqzJA5b1HC7ZclPh1PtXDOUj6ViXD6GXnBchwgvNvf9zck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=g8tBG6+n; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YyqtX0gwHz49PvR;
-	Wed, 19 Feb 2025 23:54:43 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1740002086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mG6x2AWDkrkQOGEGxoDcHtbU8g613LdS4e6+qEBm2fA=;
-	b=g8tBG6+nviP7GzomdDc832mVTsw+GCgFZaitwduKPBMy56GcVBf6PA4gUCUItP8eWWDUl/
-	QSqdgDLnELQFV4gV+8f2jedm62YV+Fq7ZTlp49QS+9wRugAqYrTkZDm5sBxPtwLuf2dBB/
-	OSY041vNXvFNRdhgSju16/S1Zh8fFMLg+wFrnxNaVju6jlolHozCDgJksq8aTC6QAgOML1
-	LXgPUy9b81iqgFUbNZ2WMb+RLaLQ0KRN5MIZ44UlFbzcNMs/fHe4/GfAi4OXrcLD8HfQ2O
-	xQRjAVG1bZIvqVjv3uJWM8b5rrgf7AGc4mbMC/tFCrUXMtrJhYmJD5tnc1Idsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1740002086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mG6x2AWDkrkQOGEGxoDcHtbU8g613LdS4e6+qEBm2fA=;
-	b=RFyVeQO+A2ZNoCQFYTvo7yH4xj0vPrvc6WFVq1WX+81A+d2hY4TqsgJ7L//Pa/XgAvmd6Y
-	9RmLNpyrGhbRux54D3WM6k2d7HVY2tTINB03IhXpfnaJUQfgFX/QQg7HzDAd0FGnzFCL3f
-	B3AZuDpfEwhZDfM2jyeXa9EcXIVV9arEhSNqYir7fv6iusMjZbfUdwbS/lDBjByDs29lGI
-	qqceL/Zav6A/wzLtq5e3lBx0pzH2Ycr0MAdg3Pz1uLuwzOQMLUG2v4y6L50ts5gII9fEk9
-	mppL1EO7YlrjDufFpRZtvjTEw0tVBmoA/Hildw49HSC2ExUKrxy+LG9ti1Agyw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740002086; a=rsa-sha256;
-	cv=none;
-	b=LSSgndqzsJfCFr+bWH2fs5pQxRyhEg6DEK/gqBxc8c4zu8D+Ix1NLWKnsOGFFbP/hWqDqj
-	/TTRNy665+Uj0iNjt3yVW9QDGjb3TYjso2ebZKPle1m9n1yzOP5QAqEKNPiTtAb42c0mmy
-	aAz7UJm0TmOYdjtj+PODGYnOK6WQoIF56ZBPSsU+cakHfR2PLsauUoNTRwtBnNKC2l0ANs
-	r+AL7Oo1NrnMDBPR++2Yted2PxHBhNWNRCW5aYzIZesmW+wiiI1AyXsroVV6ih7LeAEZtg
-	9CFBdn0o6KL5AskpuguKAUJ2DgxQmSnsoapW7vlGec4yLdraGh6iU43OkN16pw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <5a916cd4906749eb715561bfe92ae91b3e052028.camel@iki.fi>
-Subject: Re: [PATCH v4 0/5] net: Bluetooth: add TX timestamping for
- ISO/L2CAP/SCO
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Date: Wed, 19 Feb 2025 23:54:42 +0200
-In-Reply-To: <CABBYNZ+j=TYq27g-Ym7NnCm_Mhd=f8JZ=gT-Veq75BdHqzvUEw@mail.gmail.com>
-References: <cover.1739988644.git.pav@iki.fi>
-	 <CABBYNZ+j=TYq27g-Ym7NnCm_Mhd=f8JZ=gT-Veq75BdHqzvUEw@mail.gmail.com>
+	s=arc-20240116; t=1740003559; c=relaxed/simple;
+	bh=Wn5DaYIde3pNfphWW1JPqmX5rqp4hJS+7MCybX1cTkw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=E3WpNZKsPtCqNCCcuZ/jtAlgg5+abIWK7F1JSssziAgwZYR806H3dnKPKbVrhNZdmNR1JLTg5iBCQaqZRWRSNf8+It1sVtoy7TYC2ElVam5g5Of4Iz6+EemUUistaGU2tPPsQxzUN2tiA3D+W7UtCX1SvasLxy0TQtc55thJt0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iKDt6FKD; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740003558; x=1771539558;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Wn5DaYIde3pNfphWW1JPqmX5rqp4hJS+7MCybX1cTkw=;
+  b=iKDt6FKDrslQwJg0+c3Q/aem5dsUTYFeszCFL9ecLk7j2mgyeMFs9JpA
+   EUxx/cFpdEQG7ES9DGGMhH1ifLVQwc3TvWmsV9nM+Dz3ii6ejVv8U65EK
+   h1ixbto2uyd+0rx2k8jkbUUGJlN9+I7KFI6syOb/G7lhb5DNfr3MkuXQ3
+   gYZHC5YPRbeBrdDxxjtYu6UEVrAsqiLkMA7vP5ruqExxtCW95xqFCDnXh
+   5zpjDl7ZGZfIgjgHH34joYkrAo6qZWXHjRb9k8cLaSAWVNo8c9l5wVHPV
+   z6Xpts80xycTgKntIal+LsDq9CQSFbWEy8FAXWi50zNA1EsjPsyVtpeWm
+   w==;
+X-CSE-ConnectionGUID: A1gcEj5ETGy5KsRTLyhSEQ==
+X-CSE-MsgGUID: EL4fEE0VRBOEpzYn0ts9Rw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="44409481"
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="44409481"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 14:19:17 -0800
+X-CSE-ConnectionGUID: nd9yJcSFQtma/TQV16Ovog==
+X-CSE-MsgGUID: P8hI1mi/SaeuwHS58DfXlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="115386603"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2025 14:11:21 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 19 Feb 2025 14:11:10 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 19 Feb 2025 14:11:10 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 19 Feb 2025 14:11:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JTXQ2Z2hP2rKhYbMIM0Msfdby4My/6GtOWftFkNm6ZdSU00nUuQ6H9P0xJAl5yWGUTJlfWWfKF1KdS1Uo/4n2CSYSi6IQc4yVfPWPW3hLyXQOw027dtRGfkiDBXXYxSYL1ejlNr7tVBFu40cOJq26Y4y8JotqTz5wMJ+O1f2WU5dP/hfJ46IA7GXJEwpP+pSI1IpvyA/hfxmQR4AQuirteEpr1M6FP3lUiNVQkOHHByq+3xGYcUsxt+9W4auYtMRiqD+TagJkEX9G62+hMhefj2U0xKpUTXe96oXl6CI9D6gBOxp10NdNUSRm5iHUK55QNIPqjfQ6VYqAFGtkdtf9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HiZhV5vdqCU6KI/1MzvU3pMnToidfqtbww02nPHuG0c=;
+ b=pO7Z5U4uFfdTpK8nFB/nItYM3urbhi3512ihuDq5D15L3PtDK2pFcdHX9Kyfg5OCAmsNPNJ3sUtM1DeYQrzP/wE4t1E1mWUKSZcroiTqNSPT6K7hZYBPibHUDzWHVi4pYZ/dTMR3aJ+iFTRiGmQqJTXUo5Sj0e8QYiejqTbPZ1aBY3omm7AZA78hzjvc7fjvlLu5WzLLLw0EfbIucvskIxZaoGKq56mIQS5CmIlzKNkcgFmCz710pD8wE4IpYsWSPDXDAIfPyE4RaJgQVLY6j4GG2E8Ce5sKE42aDWzaFJDAg+/ARdx9MiSVF5aWO2iDGELlxITKREQYzU60BojLnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MN2PR11MB4757.namprd11.prod.outlook.com (2603:10b6:208:26b::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.14; Wed, 19 Feb
+ 2025 22:11:07 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.8445.017; Wed, 19 Feb 2025
+ 22:11:07 +0000
+Message-ID: <057b2809-0185-45db-a533-48a4dc4d06ce@intel.com>
+Date: Wed, 19 Feb 2025 14:11:05 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v2 1/2] devlink: add whole device devlink instance
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, Cosmin Ratiu
+	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+CC: <netdev@vger.kernel.org>, Konrad Knitter <konrad.knitter@intel.com>,
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	<linux-kernel@vger.kernel.org>, ITP Upstream
+	<nxne.cnse.osdt.itp.upstreaming@intel.com>, Carolina Jubran
+	<cjubran@nvidia.com>
+References: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
+ <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0323.namprd03.prod.outlook.com
+ (2603:10b6:303:dd::28) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MN2PR11MB4757:EE_
+X-MS-Office365-Filtering-Correlation-Id: 757ebf8c-adec-43e4-7085-08dd51324ef5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?c3hZdWtMbzk2T0pUTXlVM2k1eVB6Q0Z5T1FWcnpVUktQaGpTa1VTT3pkbmdp?=
+ =?utf-8?B?TVQ4aG1veUJhU3dkanJwMUlpa09vYXVpOHMrQ0NDSGhHT2UxYmRCWkNZSVk2?=
+ =?utf-8?B?OGllR28wZUl4eFI5enJXcEhIcTh6MERob0hVeUlkVVdZbXJxVmw4Qit1MEhm?=
+ =?utf-8?B?REtLRXZpSnpOVG9XRGx6VEd4SUpqa014UEpwMmt6dW9PbFljcFIwMFBaZzNn?=
+ =?utf-8?B?UnNzcDhiR095T1M2UWpVenVQK2p5NjFJb3d4Y2ZacGY5ZTd0eW9IL1lpdCtl?=
+ =?utf-8?B?d3JkRlFhaXJXeFpRTXpYVzBscXJYbksrYlMvUFNPUmpVeWNMUjZVY3l0bU9h?=
+ =?utf-8?B?TVJNQkFHNUhVY3ZGSkZLMUxzc0wwdGhDR1hldy82enBvU1VlSk9DYlZKYkdw?=
+ =?utf-8?B?OFBNWEpjMzM4cjB2UGtMdVBPem03RENvKzdyZ0hFZzhhSGdyczFLaklmSWJh?=
+ =?utf-8?B?SGM1WWVkcFFtTFUyeXpDbkRHbGZzclVhZXV3WnJieXV2WFRZLzMwZk5pVnVj?=
+ =?utf-8?B?WTJKRjVZakFiWkFBYjNsK1BTcFdXN3Njdy9vRVZ4UkdIY0h0RStLUkN6ZGsr?=
+ =?utf-8?B?VjdZZUNuOSt6ME40SGZxbjdZb2NaVnpOYUhvYlkzNlE1c1Z5NFVPS1UvTHhs?=
+ =?utf-8?B?Q29WaXdZYmZrcHV0bis3UzhQQTlrNXlNUlNOaEN4VHV3c3dtalpBaWF5MkNC?=
+ =?utf-8?B?Mnp0OUN4UUxKU2QwaDJTWHhPeHRZblduS0ZHUXBiOXBPbC9WUmZtMWQwbWsy?=
+ =?utf-8?B?VjJBUElDckNwY2xZOG5XWk5aaG9tOUczeXorRjlhVitCa3JkWVhURVo4NUJh?=
+ =?utf-8?B?enVHYlU3ZldKbmt3ZFlQN096ekVUcFRLdjJkQU8zZ2s3bUxERVNDb1NZWE04?=
+ =?utf-8?B?RUNFejQ5YVhNTUpwTTdUQk9vS3JCOUFzcWE0UHNYQUxQL3Q2VTRseGJadG1Z?=
+ =?utf-8?B?cW0rN1dqSUM5cmNVMWUwc0RsU3dsb2tPU09DczNOYkhMUEcybnNKRDhlYWZ3?=
+ =?utf-8?B?eWl1Wnh4bWI5dWxLYUNCRTBWOW1EaDVFNlY2ZnJTNVd2SWMrUUx4Uml2cDU3?=
+ =?utf-8?B?a2ppb09mTkpFWUZuVklCU1p4d2RySjRYcitYYjFRKzFXeS9pV0lWbWlwdlBv?=
+ =?utf-8?B?VEtnYkZlNHBzcFFZUWtPeWlmWGpHSWpnZllJNlV0bER4Rlo4Tzd0SFJTM0ZG?=
+ =?utf-8?B?OTl3WVNOT3NSWkJ2VEg5Ky9Pa2JoYVJKWGhqODlxaXdQR2RKSjc1c2RzTWhs?=
+ =?utf-8?B?SlhEeUZZU2d3WFMwVDV3cVd3U2UyYm13V1ZOTDBSNmdUWWdWVjAvQXZnN0lU?=
+ =?utf-8?B?R0p1dExFa05FQTRQdlFFeWlhTmFaUWtRcnppYVBJTzRpaWxyb2ErNHBtd01E?=
+ =?utf-8?B?c1BRYVBNY3BIdjByV2o1RGVDdTdMekhNWjB6ei9JNzdFT05YdDEzOERnVU9m?=
+ =?utf-8?B?VktPemNYYXlYVXM0SnhuQjBQbkpmWXBZQ2Z3WFlLY1hGemxGbHZiMGVMM1hs?=
+ =?utf-8?B?bGgyRmtHZjdGYmdNNnlvdDJpczlraTBjeTBaMHEyMXJ0bWNFN1VLMUxvVnFF?=
+ =?utf-8?B?S1RpVzBVK1VtNzVWV1JXR3lPZ1FvM2tncTBnYzFpS01uRDFsSXZOa1RQY01o?=
+ =?utf-8?B?cThIRTA5Wm91b0F2SkM5VjVxZVB1TDNrZkRWaVRuR3M0VXdqYTBIbG56dTZU?=
+ =?utf-8?B?MTByVERVVmJEWEIrT25CRWpEUzI3eXVYZUdwY0tPUjVUbkYzcXRIaDB3ZHBr?=
+ =?utf-8?B?YjF3SUZvT2ZwRFI5VFc2eWtUM3JsSUlFNjg1UG1vKzU5Y0trWEJJQ29QOG9N?=
+ =?utf-8?B?WnVtL0g0ZTgzRGRpUVJRbFNVUlptbTZuSm5WdmNNV0xFUXVzcnBNQ2ppcTE2?=
+ =?utf-8?Q?FK68c8L9so5Co?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SU1ENFc3aXdDVjBsTkNvYVRwSURDU3lLZXNJam5lWWRmRWNDUTlyUHVuWUgz?=
+ =?utf-8?B?eUZRcEFUNm9vZDhudTd5ZDhlc2JsZWIxaEFjL3U1MllHYzRXNjY4YnowZHBF?=
+ =?utf-8?B?UjN2UnMwcHlsanpqMVpRZjB4NVV1LzlieFl5QWxmMmJ1bi91TlIzeVRkSE15?=
+ =?utf-8?B?K3V4U0oxRzRoU00wOTc4akVMa3VwQ1lMVUk2Q2tiZk1aS0R1ZlJQcVpMNUZZ?=
+ =?utf-8?B?QlFaNDltaG5lcXFjdW52L1kxcU4vTHlzL054Ym5IL0NReHpzaHRQcWpDeG5G?=
+ =?utf-8?B?aUlUVGE2TWtIVWtObzNZUVBLUDVWRXJDQ1VTdXpXeWZjTkFDWjl0VlZtNVVr?=
+ =?utf-8?B?eVNoSmFPV2s4OGo2R2JoT3c1Y0VMNjFvdmR2ZnV4dTE1L0RCT0ZSU1FHSmtm?=
+ =?utf-8?B?UnNxK25BTzU4dW5wS0phRVJTVXk3L3FpMmdzMEdVYXdPSFlhdjd1eEQzVnJ0?=
+ =?utf-8?B?STVVZFBDdDNjcnFIeGh3WjYrdi9idEhEYk4yeStvSE55Wkc5RUVKZzVBL0Zp?=
+ =?utf-8?B?bzF3S3JxNFYrUkc4cFBYTXFKZ3ZnY1hNRW5Sb0I0ZmpoVzd3SmdoUzVsNHRF?=
+ =?utf-8?B?azZkNjFMeDNuQ1ZybU1TT1lzZmNRbFFSNDlnaXNzNFhmeGEwUDRxcDlRRTFW?=
+ =?utf-8?B?NkMxQmF4S1AwakprVWxvWXpsYms3OVgxRGt3dzMwUFRFZTR2cXVycjlrOXBR?=
+ =?utf-8?B?aDJIbEJsQmQxVEhkUEFtSHdCcWJSc3FnRWNlQ1VmZG5MZ2ViZGJXN1h1YU9o?=
+ =?utf-8?B?S3ByMGZPUmRjTjFHbnFuTzQ2dnJZVVNJRGpNYUxyR21HcTBJNkJkNkt5SkVJ?=
+ =?utf-8?B?MmhrR1JpSFpGYVZGT0JwcS9OSkpIMW5MYWZSemovbExvWDRlZmthVG9vSmVP?=
+ =?utf-8?B?NnZKRk1kL1FxcGVQS090R3dZR1JCdXRwUnFVdW9rc2VQRW1xZGJEMjdXeVVI?=
+ =?utf-8?B?eUhubmFtOENBUVo1Z2tPUHIzZjYvQWg0bjRiV0hpWUp2Nk9LK2ZPVjlKa1VR?=
+ =?utf-8?B?MDU1WHJVeHd4TjlCL2RrZ0FvYUp6NzhIN1RVV3JtdE9zcWczV0FuTEtoSkxM?=
+ =?utf-8?B?ZTNIcUt3Qm9KN3M4NURiT0E2eTMvQlI0bHRicUZ4TnhwQWg1QXBHaHVMMGtP?=
+ =?utf-8?B?U3NST0Q2aW9jZGt1Y0k0YllITzFwdWhSWThXTmt5dHhJWlJSOTg4VE9NNWFm?=
+ =?utf-8?B?T3I1WUhlaUprUHA0dTI4RFgxd05lajRLZDhDY1AzbWtOWnh3VTRsVlJJOEFU?=
+ =?utf-8?B?bjFLZGlBeXgvRXBnb0VKT0tRTTFFN0lEWDFXY2hkaHVaOVV1UTA1dDFidFU5?=
+ =?utf-8?B?WGpmTElOZnk1d2lXR2FYZ0hwUUFBaEI2R2hRai9MbWlJcFFWZVIweHdCTFFI?=
+ =?utf-8?B?dHNQaE00QWljQWlVbnBNMnRUS1hNK2VvRmxYN09pSTl2OWtGa0d6RmVHZmky?=
+ =?utf-8?B?TGg1VDdLQmJnRTk5TnhTZCt0YzZzc1NjT2x2OVBkeTZONmlnWkVpTmkzL01o?=
+ =?utf-8?B?dG5LYzVuTFhFL1A5OTZDOGlYTExMWUJmajVzRG5pUHFLQ1JBVlBhZHplWTJW?=
+ =?utf-8?B?KzFmS21HY0pxVE42VlVMVlI2R3haY0ZKVkJTNGs4ZFhSaCtoT3paQkJzSHJy?=
+ =?utf-8?B?OXIxWGl0cXpCUzMzM0FiSmlNZndLalJ3aEFudW8rMGdHRm1ldVNkbmQrWkEr?=
+ =?utf-8?B?aXhmbnhsRkVLSTUxYVNmMVBWYTZPTTFHUis0enZFS0JBeTduT1pNUkN1bDls?=
+ =?utf-8?B?R3UrQUlnVHRtR2VISWVPWVk0WHJ3YnNyLzdnZ2pNTlFDa05lNmE1elNjOWxS?=
+ =?utf-8?B?TURxMXJGYkRVNWFtRjkrd2o4WFBmWVNyakl1MWxQaEFnZlZSci9wQXM2Sm5M?=
+ =?utf-8?B?eHovVkhXYnIzUXEwVWRiSTdOY2pHUWZzci8xekc4ajRsdVRhSU9uUlovSmhp?=
+ =?utf-8?B?dmJEazBkMlpjQ2svOU51eUNtQzczOXdUaFBWQUQ0VG1DSmthSTZtbmdQWFlV?=
+ =?utf-8?B?NllRaTdvdXRMeDFPUVMrK0JzQkZvRkFKRTcra2lvdUR6WEtDdWpwdFh4cUpz?=
+ =?utf-8?B?c1hqd1RqcXM3ZVluNy9EQ3hob2hrNjcvclZCN29ib1VCZVhyenppV2xtN014?=
+ =?utf-8?B?NFBCeExBbnAvc0hneThlTHVzVHZnbHJPUVdmSFlVcHBER2FlR29LTkhlMFJp?=
+ =?utf-8?B?ZVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 757ebf8c-adec-43e4-7085-08dd51324ef5
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 22:11:07.7776
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BK8b69BfTASQvvkFDDnO0/3kPii2WUmYmRDpEE7J1AAFp2ShBfLS28rbWEyCAmj43NHCQ5p2hXU/WmhjwkLZgvvhTBdTBydB9AqYMPgQ+sI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4757
+X-OriginatorOrg: intel.com
 
-Hi,
-
-ke, 2025-02-19 kello 14:55 -0500, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
->=20
-> On Wed, Feb 19, 2025 at 1:13=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >=20
-> > Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
-> >=20
-> > Add new COMPLETION timestamp type, to report a software timestamp when
-> > the hardware reports a packet completed. (Cc netdev for this)
-> >=20
-> > Previous discussions:
-> > https://lore.kernel.org/linux-bluetooth/cover.1739097311.git.pav@iki.fi=
-/
-> > https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googler=
-s.com.notmuch/
-> > https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
-> >=20
-> > Changes
-> > =3D=3D=3D=3D=3D=3D=3D
-> > v4:
-> > - Change meaning of SOF_TIMESTAMPING_TX_COMPLETION, to save a bit in
-> >   skb_shared_info.tx_flags:
-> >=20
-> >   It now enables COMPLETION only for packets that also have software SN=
-D
-> >   enabled.  The flag can now be enabled only via a socket option, but
-> >   coupling with SND allows user to still choose for which packets
-> >   SND+COMPLETION should be generated.  This choice maybe is OK for
-> >   applications which can skip SND if they're not interested.
-> >=20
-> >   However, this would make the timestamping API not uniform, as the
-> >   other TX flags can be enabled via CMSG.
-> >=20
-> >   IIUC, sizeof skb_shared_info cannot be easily changed and I'm not sur=
-e
-> >   there is somewhere else in general skb info, where one could safely
-> >   put the extra separate flag bit for COMPLETION. So here's alternative
-> >   suggestion.
->
-> Due to cloning/dup of socket by bluetoothd wouldn't it be better to
-> have the completion on a per-packet basis?
-
-So this is about a few lines change to v3, not a big redesign.
-
-This change is a suggestion in response to the concern on using the
-last available bit in tx_flags raised here:
-
-https://lore.kernel.org/linux-bluetooth/67a972a6e2704_14761294b0@willemb.c.=
-googlers.com.notmuch/
-
-So normally how it works is that based on socket flags and CMSG, skb
-info is tagged with bit flags that indicate which tstamps they emit.
-The v3->v4 change just avoids needing another bit for COMPLETION, by
-using the existing bit for SND tstamp together with socket flag (which
-in v3 instead controlled whether skbs are tagged for COMPLETION) to
-decide between SND and SND+COMPLETION.
-
-So I'm not sure if this sounds preferable over using the last free
-tx_flags bit to indicate COMPLETION is requested (or if there is some
-other place in skb to put a bit that I'm not seeing).
-
->  Not really sure if that is what setting it via CMSG would mean,
-
-I was here referring to the CMSG timestamping API, Sec 1.3.4 in
-
-https://www.kernel.org/doc/Documentation/networking/timestamping.rst
-
-> but in the other hand perhaps the
-> problem is that the error queue is socket wide, not per-fd, anyway it
-> doesn't sound very useful to notify the completion on all fd pointing
-> to the same socket. Or perhaps it is time for introducing a proper TX
-> complete queue rather than reuse the error queue? I mean we can keep
-> using the error queue for backwards compatibility but moving forward I
-> think it would be better not to mix errors with tx complete events, so
-> perhaps we can add something like a socket option that dissociates the
-> error queue from tx completion queue.
 
 
-Some good solution to the issue of wakeups on timestamps and multiple
-errqueue consumers would be useful, but that probably requires a
-separate patch series.
+On 2/19/2025 8:32 AM, Przemek Kitszel wrote:
+> Add a support for whole device devlink instance. Intented as a entity
+> over all PF devices on given physical device.
+> 
+> In case of ice driver we have multiple PF devices (with their devlink
+> dev representation), that have separate drivers loaded. However those
+> still do share lots of resources due to being the on same HW. Examples
+> include PTP clock and RSS LUT. Historically such stuff was assigned to
+> PF0, but that was both not clear and not working well. Now such stuff
+> is moved to be covered into struct ice_adapter, there is just one instance
+> of such per HW.
+> 
+> This patch adds a devlink instance that corresponds to that ice_adapter,
+> to allow arbitrage over resources (as RSS LUT) via it (further in the
+> series (RFC NOTE: stripped out so far)).
+> 
+> Thanks to Wojciech Drewek for very nice naming of the devlink instance:
+> PF0:		pci/0000:00:18.0
+> whole-dev:	pci/0000:00:18
+> But I made this a param for now (driver is free to pass just "whole-dev").
+> 
+> $ devlink dev # (Interesting part of output only)
+> pci/0000:af:00:
+>   nested_devlink:
+>     pci/0000:af:00.0
+>     pci/0000:af:00.1
+>     pci/0000:af:00.2
+>     pci/0000:af:00.3
+>     pci/0000:af:00.4
+>     pci/0000:af:00.5
+>     pci/0000:af:00.6
+>     pci/0000:af:00.7
+> 
 
-> > - Better name in sof_timestamping_names
-> >=20
-> > - I decided to keep using sockcm_init(), to avoid open coding READ_ONCE
-> >   and since it's passed to sock_cmsg_send() which anyway also may init
-> >   such fields.
-> >=20
-> > v3:
-> > - Add new COMPLETION timestamp type, and emit it in HCI completion.
-> > - Emit SND instead of SCHED, when sending to driver.
-> > - Do not emit SCHED timestamps.
-> > - Don't safeguard tx_q length explicitly. Now that hci_sched_acl_blk()
-> >   is no more, the scheduler flow control is guaranteed to keep it
-> >   bounded.
-> > - Fix L2CAP stream sockets to use the bytestream timestamp conventions.
-> >=20
-> > Overview
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > The packet flow in Bluetooth is the following. Timestamps added here
-> > indicated:
-> >=20
-> > user sendmsg() generates skbs
-> > >=20
-> > * skb waits in net/bluetooth queue for a free HW packet slot
-> > >=20
-> > * orphan skb, send to driver -> TSTAMP_SND
-> > >=20
-> > * driver: send packet data to transport (eg. USB)
-> > >=20
-> > * wait for transport completion
-> > >=20
-> > * driver: transport tx completion, free skb (some do this immediately)
-> > >=20
-> > * packet waits in HW side queue
-> > >=20
-> > * HCI report for packet completion -> TSTAMP_COMPLETION (for non-SCO)
-> >=20
-> > In addition, we may want to do the following in future (but not
-> > implemented in this series as we don't have ISO sequence number
-> > synchronization yet which is needed first, moreover e.g. Intel
-> > controllers return only zeros in timestamps):
-> >=20
-> > * if packet is ISO, send HCI LE Read ISO TX Sync
-> > >=20
-> > * HCI response -> hardware TSTAMP_SND for the packet the response
-> >   corresponds to if it was waiting for one, might not be possible
-> >   to get a tstamp for every packet
-> >=20
-> > Bluetooth does not have tx timestamps in the completion reports from
-> > hardware, and only for ISO packets there are HCI commands in
-> > specification for querying timestamps afterward.
-> >=20
-> > The drivers do not provide ways to get timestamps either, I'm also not
-> > aware if some devices would have vendor-specific commands to get them.
-> >=20
-> > Driver-side timestamps
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > Generating SND on driver side may be slightly more accurate, but that
-> > requires changing the BT driver API to not orphan skbs first.  In theor=
-y
-> > this probably won't cause problems, but it is not done in this patchset=
-.
-> >=20
-> > For some of the drivers it won't gain much. E.g. btusb immediately
-> > submits the URB, so if one would emit SND just before submit (as
-> > drivers/net/usb/usbnet.c does), it is essentially identical to emitting
-> > before sending to driver.  btintel_pcie looks like it does synchronous
-> > send, so looks the same.  hci_serdev has internal queue, iiuc flushing
-> > as fast as data can be transferred, but it shouldn't be waiting for
-> > hardware slots due to HCI flow control.
-> >=20
-> > Unless HW buffers are full, packets mostly wait on the HW side.  E.g.
-> > with btusb (non-SCO) median time from sendmsg() to URB generation is
-> > ~0.1 ms, to USB completion ~0.5 ms, and HCI completion report at ~5 ms.
-> >=20
-> > The exception is SCO, for which HCI flow control is disabled, so they d=
-o
-> > not get completion events so it's possible to build up queues inside th=
-e
-> > driver. For SCO, COMPLETION needs to be generated from driver side, eg.
-> > for btusb maybe at URB completion.  This could be useful for SCO PCM
-> > modes (but which are more or less obsolete nowadays), where USB isoc
-> > data rate matches audio data rate, so queues on USB side may build up.
-> >=20
-> > Use cases
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > In audio use cases we want to track and avoid queues building up, to
-> > control latency, especially in cases like ISO where the controller has =
-a
-> > fixed schedule that the sending application must match.  E.g.
-> > application can aim to keep 1 packet in HW queue, so it has 2*7.5ms of
-> > slack for being woken up too late.
-> >=20
-> > Applications can use SND & COMPLETION timestamps to track in-kernel and
-> > in-HW packet queues separately.  This can matter for ISO, where the
-> > specification allows HW to use the timings when it gets packets to
-> > determine what packets are synchronized together. Applications can use
-> > SND to track that.
-> >=20
-> > Tests
-> > =3D=3D=3D=3D=3D
-> >=20
-> > See
-> > https://lore.kernel.org/linux-bluetooth/cover.1739026302.git.pav@iki.fi=
-/
-> >=20
-> > Pauli Virtanen (5):
-> >   net-timestamp: COMPLETION timestamp on packet tx completion
-> >   Bluetooth: add support for skb TX SND/COMPLETION timestamping
-> >   Bluetooth: ISO: add TX timestamping
-> >   Bluetooth: L2CAP: add TX timestamping
-> >   Bluetooth: SCO: add TX timestamping socket-level mechanism
-> >=20
-> >  Documentation/networking/timestamping.rst |   9 ++
-> >  include/net/bluetooth/bluetooth.h         |   1 +
-> >  include/net/bluetooth/hci_core.h          |  13 +++
-> >  include/net/bluetooth/l2cap.h             |   3 +-
-> >  include/uapi/linux/errqueue.h             |   1 +
-> >  include/uapi/linux/net_tstamp.h           |   6 +-
-> >  net/bluetooth/6lowpan.c                   |   2 +-
-> >  net/bluetooth/hci_conn.c                  | 118 ++++++++++++++++++++++
-> >  net/bluetooth/hci_core.c                  |  17 +++-
-> >  net/bluetooth/hci_event.c                 |   4 +
-> >  net/bluetooth/iso.c                       |  24 ++++-
-> >  net/bluetooth/l2cap_core.c                |  41 +++++++-
-> >  net/bluetooth/l2cap_sock.c                |  15 ++-
-> >  net/bluetooth/sco.c                       |  19 +++-
-> >  net/bluetooth/smp.c                       |   2 +-
-> >  net/core/sock.c                           |   2 +
-> >  net/ethtool/common.c                      |   1 +
-> >  17 files changed, 258 insertions(+), 20 deletions(-)
-> >=20
-> > --
-> > 2.48.1
-> >=20
->=20
->=20
+This adds an additional devlink interface instead of replacing the
+existing scheme? Seems reasonable to avoid compatibility issues with
+older driver versions. I had wanted to use a single instance pretty much
+from my initial attempts at flash update, but ended up giving up at the
+time.
 
---=20
-Pauli Virtanen
+I do like that we can see the nesting so its clear which ones are connected.
+
+One downside to this approach is in dealing with something like direct
+assignment with virtualization. In practice, I think that already exists
+because of HW limitations, and I would expect most such setups want to
+assign the entire device rather than just one of its functions.
 
