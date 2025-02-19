@@ -1,176 +1,141 @@
-Return-Path: <netdev+bounces-167768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C47DA3C278
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:48:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FDACA3C27E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:50:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6E8175D28
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:47:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 996B13AFEE4
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ED41F30A4;
-	Wed, 19 Feb 2025 14:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C4E18C008;
+	Wed, 19 Feb 2025 14:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IEwKX5Xk"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEF928628E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4543595B;
 	Wed, 19 Feb 2025 14:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739976464; cv=none; b=Bis4ajilexR0VPzPhl+2YxXti7SiGpRdovsvvyxqSowrTL+rDfSHtaIVtoewsb3gkG56ng5KZby8lKcHGMv0P/vaHmjPqJvUZMkyom4AHzbAvJW38OiBIndWDCSORlVZ4jzq643gCO03F4RbyNlWh7EMBzC/HtYgjAVxIbIZfvk=
+	t=1739976464; cv=none; b=HXpkEZQHd0qChTn80Ni31BEY+oB61X05CJq7uqpZirn0OA8ZPZalW2Js3VV2wvjaXFdc0rdeewZZ7NJqv3a7s9l8SoxEgMga4bBCHv2RzmvyJ4usGcLi/DqHJlBxNZYUtPB+DPi9k0nD6Hqt5cLVvQSE8jGBIWowmJsj27pwHp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739976464; c=relaxed/simple;
-	bh=bVhdQ6db7vpeRW96FXxkda9FROiCv9l+LI7ZCrTmn6U=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=iSHtV5agESVmDmnDyeK4D68gKU22WGZR/iSl3mHaB171hh6lg3HAjJBI9CGD+c4z981yJUpHXboN/mJ26Kx+8ZgVPQxIcXMagKnUE7O70+I/HpaZtAn2N7f58ZJjLk4pcCAQG5ja0qUc59+JMaVnCzBWn0xU5yJFWPgyMx9C9M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklLz-000ADq-88; Wed, 19 Feb 2025 15:47:11 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklLy-0008aU-39;
-	Wed, 19 Feb 2025 15:47:11 +0100
-Message-ID: <dee9bc39-e666-4d97-8a42-240ffb458bcc@hetzner-cloud.de>
-Date: Wed, 19 Feb 2025 15:47:09 +0100
+	bh=PWf83lHH1CbX7g4OE56Q3tOSzAlGY69s8uTYqC4rU/w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DjQazhMmrZiassMRlw0R5wZ9c8zkLitJ9H7euBizIPf2FD/O69VQgCo5L5GN0XKPatlHnfE3+QoOuKrS+D0HzsiwG6fl25AKCLpo+ORPh71k3XpVeLTnP6zTiTN+MGxsWCMqhL8Z5ZkBeVQYTZCd6fFGSu08n0ZRqre2nWNAmuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IEwKX5Xk; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fc0bd358ccso13665118a91.2;
+        Wed, 19 Feb 2025 06:47:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739976461; x=1740581261; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=x5dsTYe1UcGt3x043SagaFh0jmczJ8yiUGL829wJKMw=;
+        b=IEwKX5XkeyPY87Cv8L+kv0M+MOCAtkxKznNLZEYFKQP2RjWSUQvdvDJKbm9J59m5ZP
+         FfsswcgiYCIkmmUIlQXEnPi+UjdmthgsqBh8auNtUpXZk4zkSpfupGHlOzTodjnH6OZ3
+         sMeaLIWP96KG6CdugB7qcTq5+eB4u7AwgcwSl2z9CKrzrof4ObMpnWQPhG46K7/lRZ2E
+         MzGF7tnADOz9c6gCVkx6ucll392eAOf5vpmhqcaL6mRKGLW21JuJAVq/eHQGTbJALTYW
+         mG0PXoyNvCrT3FKdnKBaWElsnLnDFET/0EHk+aQ+VZz5KUnHDrLJ7oXRzM7JWyA68PHK
+         ewvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739976461; x=1740581261;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x5dsTYe1UcGt3x043SagaFh0jmczJ8yiUGL829wJKMw=;
+        b=OSHOz/RF7DssACIYqYskNAkImN2+zQ7dGxH7ZGaEPNKh5hfFECBFwFnlT9hBldMv2M
+         GXKJw/lO3HvqP6AiMayg929lZUaPpx983ORwsgDyY40yQOEod54BuJINWvALQ3BeHVtt
+         yRYeaPWUAq3+9gnvwMZdzmUsd5Nyido3rNqDUSduk8PGt7fnX7Irf/QZ1Q1ZGtcNuVDO
+         04wEbjSTJw5V3XA8AcI3Is9tc157q/HHkN+qv/mLg4W2cUp8KU9IS/NzDY3DeHbEG7k6
+         t6uGAo8Vz66zL+9/RQa8jUGRhbt+/85oE6eGMRjiiiz7aBG9oTc0LqHY2V2QR22w+ezS
+         ES6w==
+X-Forwarded-Encrypted: i=1; AJvYcCU3kbfx21qDYkFuqmRd8IxgQyR7NGYETfjeID074nnH2dRyj2gmoWPVW0H7Q5oQVYGbQj1NChmRlJvNKx8=@vger.kernel.org, AJvYcCU4qDAKu9ROdPAVkBs1ybq/k4eyZo+bZ3H0AnREpe2L4j+6loqzatkxZIr6L1pSwb2qLwtrbUVo@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9ALDd/qQL6cacWYnOVjB0s8/hEj2A4g+fEC3p/nmZ6FmnUxCE
+	4ZleeP8hZ+w9okyjU4J+IxNLYp7J0ZwPHGUisQlmLMquc/W41ERc+vXoQixhmuTOwiID6tJOoxn
+	RG91iP9fvOn2L3zEg8dRyaJDjDB40g0ZSnUs=
+X-Gm-Gg: ASbGncu8vzjeh/Y0Lu83HNvvqZdpxYsWXrk9niKBde/TRfC0LtYeRxBAyHcZgy6O1Be
+	gxpVu44QOEAO7dzEu9gQRIiJYem/kpK00RbfGMFY8BDm3q2JPcMYbuezAzqZpSMo44INGPmEavK
+	8=
+X-Google-Smtp-Source: AGHT+IGTm0/gDlwx71/Xw2OaMGDWR52C7tQCBQxrWVSO50CktdLR2VUPQbyX5z4L6RKXGSIhm5JkjyP9Mkosm9D0Eks=
+X-Received: by 2002:a17:90b:2241:b0:2ea:83a0:47a5 with SMTP id
+ 98e67ed59e1d1-2fc40d124c7mr28768178a91.4.1739976461283; Wed, 19 Feb 2025
+ 06:47:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- hawk@kernel.org
-References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
- <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
- <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v2 2/6] net: tun: enable transfer of XDP metadata
- to skb
-In-Reply-To: <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27554/Wed Feb 19 10:50:24 2025)
+References: <20250116160314.23873-1-aha310510@gmail.com> <20250117102920.GI6206@kernel.org>
+In-Reply-To: <20250117102920.GI6206@kernel.org>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Wed, 19 Feb 2025 23:47:34 +0900
+X-Gm-Features: AWEUYZnAUIyaru8MWqDKgk3-dUJ-t4E7Nz19GBkUaFwkxF4Klji97LxCaNQiA3k
+Message-ID: <CAO9qdTEmgdN2CyAJGyeSXMKbM1uZDRwZ-6vGu_ft4uHsNjgCqg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: sxgbe: change conditional statement from if
+ to switch
+To: Simon Horman <horms@kernel.org>
+Cc: bh74.an@samsung.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Am 18.02.25 um 02:47 schrieb Willem de Bruijn:
-> Marcus Wichelmann wrote:
->> [...]
->> +	metasize = max(xdp->data - xdp->data_meta, 0);
-> 
-> Can xdp->data_meta ever be greater than xdp->data?
+Simon Horman <horms@kernel.org> wrote:
+>
+> On Fri, Jan 17, 2025 at 01:03:14AM +0900, Jeongjun Park wrote:
+> > Change the if conditional statement in sxgbe_rx_ctxt_wbstatus() to a switch
+> > conditional statement to improve readability, and also add processing for
+> > cases where all conditions are not satisfied.
+> >
+> > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> > ---
+> >  .../net/ethernet/samsung/sxgbe/sxgbe_desc.c   | 43 +++++++++++++------
+> >  1 file changed, 30 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
+> > index b33ebf2dca47..5e69ab8a4b90 100644
+> > --- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
+> > +++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
+> > @@ -421,31 +421,48 @@ static void sxgbe_rx_ctxt_wbstatus(struct sxgbe_rx_ctxt_desc *p,
+>
+> ...
+>
+> > +     default:
+> > +             pr_err("Invalid PTP Message type\n");
+> > +             break;
+> > +     }
+> >  }
+>
+> Hi Jeongjun,
+>
+> I was wondering if it would be best if the error message above should be
+> rate limited, or perhaps the callback enhanced to return an error in such
+> cases. But that depends on where sxgbe_rx_ctxt_wbstatus is called.
+> And I'm unable to find where the it called.
+>
+> I see that sxgbe_rx_ctxt_wbstatus is registered as a get_rx_ctxt_tstamp_status
+> callback. But is the get_rx_ctxt_tstamp_status callback called anywhere?
 
-When an xdp_buff has no metadata support, then this is marked by setting
-xdp->data_meta to xdp->data + 1. See xdp_prepare_buff or
-xdp_set_data_meta_invalid.
+Hello. Sorry for the late reply.
 
-In the case of tun_xdp_one, the xdp_buff is externally created by another
-driver and passed to the tun driver using sendmsg and TUN_MSG_PTR. For
-now, the vhost_net driver is the only driver doing that, and
-xdp->data_meta is set to xdp->data there, marking support for metadata.
+I still don't know exactly where sxgbe_rx_ctxt_wbstatus() is called. What I
+do know is that I can't find a function that calls this function within the
+Linux kernel. When I wrote this patch, I thought it would be good to refactor
+this function, so I wrote the patch, but I didn't know exactly where
+this function
+was being used. I think it might be a function called from an external
+kernel driver
+written by Samsung itself.
 
-So knowing that vhost_net is currently the only driver passing xdp_buffs
-to tun_sendmsg, the check is not strictly necessary. But other drivers
-may use this API as well in the future. That's why I'd like to not make
-the assumption that other drivers always create the xdp_buffs with
-metadata support, when they pass them to tun_sendmsg.
+Regards,
 
-Or am I just to careful about this? What do you think?
-
-> This is pointer comparison, which is tricky wrt type. It likely is
-> ptrdiff_t and thus signed. But may want to use max_t(long int, ..) to
-> make this explicit.
-
-Ah, I see, good point.
-
-So like that?
-
-	metasize = max_t(long int, xdp->data - xdp->data_meta, 0);
-	if (metasize)
-		skb_metadata_set(skb, metasize);
-
-Alternatively, there is also xdp_data_meta_unsupported(xdp_buff) which
-could be used to make this check very explicit, but I don't see it being
-used in network drivers elsewhere. Not sure why.
-
->> +	if (metasize)
->> +		skb_metadata_set(skb, metasize);
->> +
-> 
-> Not strictly needed. As skb_metadata_clear is just
-> skb_metadata_set(skb, 0). But also not wrong, so fine to keep.
-
-Oh, haven't seen that.
-I'm following a common pattern here that I've seen in many other network
-drivers (grep for "skb_metadata_set"):
-
-	unsigned int metasize = xdp->data - xdp->data_meta;
-	[...]
-	if (metasize)
-		skb_metadata_set(skb, metasize);
-
-Marcus
+Jeongjun Park
 
