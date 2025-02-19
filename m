@@ -1,258 +1,176 @@
-Return-Path: <netdev+bounces-167797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFA1A3C60F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:22:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 559DFA3C5AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19873A77E7
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 17:22:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16F267A8621
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 17:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D86C211710;
-	Wed, 19 Feb 2025 17:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F0B1FECAE;
+	Wed, 19 Feb 2025 17:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HBvLWFrF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrRUuZOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F574286284;
-	Wed, 19 Feb 2025 17:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA1B2862B2
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 17:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739985772; cv=none; b=TUSRuLr7ufO/RnNxGmyKtZypFeK14ZQZGE8MhMl98RtGZid3FXUVSZD4Cme0wMjc6lwe8yHQDyxwNg1l955hRYI4074mxfSmCzjMFRjEn5fOnXtByzcfQubt73r2ZtzGqMJB5J/eHiOTTapAPQQyh3ZIR4tM3S6zRxp/XdTmolY=
+	t=1739984894; cv=none; b=pqG15SXsKLbzHuCuUz9NWEDXRFqNWihAIujoVJ4TcirugapVVYDDupRlmSRJgTZ5r5g/kJApiF84QJuktcKF+zlCKo1/At1z1qvQo+MrWWPacqgRTpzZQJhQN6x7Rwi+CkkX5tFt4jQekyGeaSPD0eam+yhAPK/IUqAfrZ//+6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739985772; c=relaxed/simple;
-	bh=akhUxN+QxLEckZcxCpguN5EnjkBnD9oRnQSuFZ8ZKSM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F7zw4CUA8UKCmC1wNffn32d2UGag0zozPNsGKjlMP92/rYD9LdkAidIYakRi2J/CYj8gsGOu0ivmcTT/UQCqPCnc17Ua8PvCghBXT8dAiTlUmRHZUFQpXDT4cYw+A9XB/O+P2E9K5rO2P/amQbOdEftUo+BSEu+V+kAtKkcvrwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HBvLWFrF; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739985770; x=1771521770;
-  h=message-id:subject:from:reply-to:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=akhUxN+QxLEckZcxCpguN5EnjkBnD9oRnQSuFZ8ZKSM=;
-  b=HBvLWFrF0q9k7azTn2vzgHb/ko0I60FZl4WJnzike7VS3GTPGNe3LuQR
-   mQC2DPzDPq32o4wgR0FeNedIREmPwEFt2XeWnH7zl1+wtiD0+YFz7EbPg
-   nQi7ajk2tfMoElHjxSgTPvXE4mIzWXneBfNJWtVYjZRWLy3lNcycrXA2m
-   iJXaThod454xChkpg9vFzHqNLi0xDjNh6jjfQT5MybczjznZ+vYYwR5/O
-   2G+VOox7mKXO3o5UnuWxhmmTCYrR7ttr7eGKTRmeK70u/ZP/6tjW9IXJH
-   4fipLDcRzaXVbU4ZT3Nx/PQa1B+i7yTkdBHICWt/p0emr6dHtHqjF9Ji6
-   g==;
-X-CSE-ConnectionGUID: eZsX1oNiReC5n5o0rxp7wA==
-X-CSE-MsgGUID: Bror4W8QRCKD68IFQj6HzQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="51354824"
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="51354824"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 09:22:49 -0800
-X-CSE-ConnectionGUID: BRlidm1zTwmv/BO/vvlzuA==
-X-CSE-MsgGUID: PHqqdaA9SB2DY4ysxBUtAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="115432705"
-Received: from iherna2-mobl4.amr.corp.intel.com ([10.125.110.29])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 09:01:22 -0800
-Message-ID: <4cf99d5f9b63aec22c24c445dea9a80d71f5f024.camel@linux.intel.com>
-Subject: Re: [PATCH net-next v7 3/7] arch: x86: add IPC mailbox accessor
- function and add SoC register access
-From: "David E. Box" <david.e.box@linux.intel.com>
-Reply-To: david.e.box@linux.intel.com
-To: Dave Hansen <dave.hansen@intel.com>, Choong Yong Liang
- <yong.liang.choong@linux.intel.com>, Simon Horman <horms@kernel.org>, Jose
- Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "H .
- Peter Anvin" <hpa@zytor.com>, Rajneesh Bhardwaj
- <irenic.rajneesh@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Hans de Goede
- <hdegoede@redhat.com>, Ilpo =?ISO-8859-1?Q?J=E4rvinen?=
- <ilpo.jarvinen@linux.intel.com>, Richard Cochran
- <richardcochran@gmail.com>, Serge Semin <fancer.lancer@gmail.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- platform-driver-x86@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org
-Date: Wed, 19 Feb 2025 09:01:20 -0800
-In-Reply-To: <063bd012-d377-4d3d-9dcc-57e360d8f462@intel.com>
-References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
-	 <20250206131859.2960543-4-yong.liang.choong@linux.intel.com>
-	 <063bd012-d377-4d3d-9dcc-57e360d8f462@intel.com>
-Organization: David E. Box
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1739984894; c=relaxed/simple;
+	bh=mx+pZtejgZCVFuaX6CO7LXdxiU02z+QqQVwnFTrlxlg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=es2lPfnL5R2L1bHVT7BdFvoSKGbDuLS/zn6IIQ+idoLUDwKIE3jpOczZc6deq0xihexvitLbL39pkZ2qIfXAwR8t3C8zNiYh0yHieQFzkj4w0c2/h980CWQAmYLv9kF3JsGHmVBa+vZor4kACoVKoWFJXJiJKxwR/U0PBSORziI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VrRUuZOS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739984891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cdFa+6sAJC8FE0XGbdNodoweiEsAs5HKSiXmXUFyJ98=;
+	b=VrRUuZOSdf/YiN9S/cjG8fWzRJZC3AiFeycgCn9xYVlY18jBJVMJxDg2LssvOGZbddhEqw
+	oQZ039Az9jk8OLXCbqe4BRkbFKukhE1DjQiA9d6Dx2JtZzNNs4ieKV0oBRbqFp1H7Cj887
+	wnF7hJS4Fafhppn8oXWMNIdj7EQsUBk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-YB5WfQVEOJuWtfG9HH1DGg-1; Wed,
+ 19 Feb 2025 12:08:07 -0500
+X-MC-Unique: YB5WfQVEOJuWtfG9HH1DGg-1
+X-Mimecast-MFC-AGG-ID: YB5WfQVEOJuWtfG9HH1DGg_1739984886
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFCA018004A7;
+	Wed, 19 Feb 2025 17:08:05 +0000 (UTC)
+Received: from pablmart-thinkpadt14gen4.rmtes.csb (unknown [10.44.32.29])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D4724300019F;
+	Wed, 19 Feb 2025 17:08:02 +0000 (UTC)
+From: Pablo Martin Medrano <pablmart@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Pablo Martin Medrano <pablmart@redhat.com>
+Subject: [PATCH net v2] selftests/net: big_tcp: return xfail on slow machines
+Date: Wed, 19 Feb 2025 18:07:58 +0100
+Message-ID: <23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, 2025-02-06 at 08:46 -0800, Dave Hansen wrote:
-> On 2/6/25 05:18, Choong Yong Liang wrote:
-> >=20
-> > - Exports intel_pmc_ipc() for host access to the PMC IPC mailbox
-> > - Add support to use IPC command allows host to access SoC registers=
-=20
-> > through PMC firmware that are otherwise inaccessible to the host due
-> > to security policies.
-> I'm not quite parsing that second bullet as a complete sentence.
->=20
-> But that sounds scary! Why is the fact that they are "otherwise
-> inaccessible" relevant here?
+After debugging the following output for big_tcp.sh on a board:
 
-The PMC IPC mailbox is a host interface to the PMC. Its purpose is to allow=
- the
-host to access certain areas of the PMC that are restricted from direct MMI=
-O
-access due to security policies. Other parts of the PMC are accessible via =
-MMIO
-(most of what the intel_pmc_core driver touches with is MMIO), so I think t=
-he
-original statement was trying to explain why the mailbox is needed instead =
-of
-MMIO in this case. However, I agree that the mention of security policies i=
-s not
-relevant to the change itself.
+CLI GSO | GW GRO | GW GSO | SER GRO
+on        on       on       on      : [PASS]
+on        off      on       off     : [PASS]
+off       on       on       on      : [FAIL_on_link1]
+on        on       off      on      : [FAIL_on_link1]
 
-> ...
-> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> > index 87198d957e2f..631c1f10776c 100644
-> > --- a/arch/x86/Kconfig
-> > +++ b/arch/x86/Kconfig
-> > @@ -688,6 +688,15 @@ config X86_AMD_PLATFORM_DEVICE
-> > =C2=A0	=C2=A0 I2C and UART depend on COMMON_CLK to set clock. GPIO driv=
-er is
-> > =C2=A0	=C2=A0 implemented under PINCTRL subsystem.
-> > =C2=A0
-> > +config INTEL_PMC_IPC
-> > +	tristate "Intel Core SoC Power Management Controller IPC mailbox"
-> > +	depends on ACPI
-> > +	help
-> > +	=C2=A0 This option enables sideband register access support for Intel
-> > SoC
-> > +	=C2=A0 power management controller IPC mailbox.
-> > +
-> > +	=C2=A0 If you don't require the option or are in doubt, say N.
->=20
-> Could we perhaps beef this up a bit to help users figure out if they
-> want to turn this on? Really the only word in the entire help text
-> that's useful is "Intel".
->=20
-> I'm not even sure we *want* to expose this to users. Can we just leave
-> it as:
->=20
-> 	config INTEL_PMC_IPC
-> 		def_tristate n
-> 		depends on ACPI
->=20
-> so that it only gets enabled by the "select" in the other patches?
+Davide Caratti found that by default the test duration 1s is too short
+in slow systems to reach the correct cwd size necessary for tcp/ip to
+generate at least one packet bigger than 65536 (matching the iptables
+match on length rule the test evaluates)
 
-I agree with this change Choong. This can be selected by the driver that's =
-using
-it. There's no need to expose it to users.
+This skips (with xfail) the aforementioned failing combinations when
+KSFT_MACHINE_SLOW is set. For that the test has been modified to use
+facilities from net/lib.sh.
 
->=20
-> > + * Authors: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> > + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 David E. Box =
-<david.e.box@linux.intel.com>
->=20
-> I'd probably just leave the authors bit out. It might have been useful
-> in the 90's, but that's what git is for today.
->=20
-> > +	obj =3D buffer.pointer;
-> > +	/* Check if the number of elements in package is 5 */
-> > +	if (obj && obj->type =3D=3D ACPI_TYPE_PACKAGE && obj->package.count =
-=3D=3D
-> > 5) {
-> > +		const union acpi_object *objs =3D obj->package.elements;
-> > +
->=20
-> The comment there is just not super useful. It might be useful to say
-> *why* the number of elements needs to be 5.
->=20
-> > +EXPORT_SYMBOL(intel_pmc_ipc);
-> > +
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_DESCRIPTION("Intel PMC IPC Mailbox accessor");
->=20
-> Honestly, is this even worth being a module? How much code are we
-> talking about here?
+The new output for the test will look like this (example with a forced
+XFAIL)
 
-Yeah, this doesn't need to be a module either.
+Testing for BIG TCP:
+      CLI GSO | GW GRO | GW GSO | SER GRO
+TEST: on        on       on       on                    [ OK ]
+TEST: on        off      on       off                   [ OK ]
+TEST: off       on       on       on                    [XFAIL]
 
-David
+Changes in v2:
+- Don't break the loop and use lib.sh facilities (thanks Peter Machata)
+- Rephrased the subject from "longer netperf session on slow machines"
+  as the patch is not configuring a longer session but skipping
+- Added tags and SOB and the Fixes: hash (thank you Davide Caratti)
+- Link to v1: https://lore.kernel.org/all/b800a71479a24a4142542051636e980c3b547434.1739794830.git.pablmart@redhat.com/
 
->=20
-> > diff --git a/include/linux/platform_data/x86/intel_pmc_ipc.h
-> > b/include/linux/platform_data/x86/intel_pmc_ipc.h
-> > new file mode 100644
-> > index 000000000000..d47b89f873fc
-> > --- /dev/null
-> > +++ b/include/linux/platform_data/x86/intel_pmc_ipc.h
-> > @@ -0,0 +1,34 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * Intel Core SoC Power Management Controller Header File
-> > + *
-> > + * Copyright (c) 2023, Intel Corporation.
-> > + * All Rights Reserved.
-> ...
->=20
-> This copyright is a _bit_ funky. It's worth at least saying in the cover
-> letter that this patch has been sitting untouched for over a year, thus
-> the old copyright.
->=20
-> Or, if you've done actual work with it, I'd assume the copyright needs
-> to get updated.
->=20
-> > +struct pmc_ipc_cmd {
-> > +	u32 cmd;
-> > +	u32 sub_cmd;
-> > +	u32 size;
-> > +	u32 wbuf[4];
-> > +};
-> > +
-> > +/**
-> > + * intel_pmc_ipc() - PMC IPC Mailbox accessor
-> > + * @ipc_cmd:=C2=A0 struct pmc_ipc_cmd prepared with input to send
->=20
-> You probably don't need to restate the literal type of ipc_cmd.
->=20
-> > + * @rbuf:=C2=A0=C2=A0=C2=A0=C2=A0 Allocated u32[4] array for returned =
-IPC data
->=20
-> The "Allocated" thing here threw me a bit. Does this mean it *must* be
-> "allocated" as in it comes from kmalloc()? Or can it be on the stack? Or
-> part of a static variable?
->=20
-> > + * Return: 0 on success. Non-zero on mailbox error
-> > + */
-> > +int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, u32 *rbuf);
->=20
-> Also, if it can *only* be u32[4], then the best way to declare it is:
->=20
-> struct pmc_ipc_rbuf {
-> 	u32 buf[4];
-> };
->=20
-> and:
->=20
-> int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd,
-> 		=C2=A0 struct pmc_ipc_rbuf rbuf *rbuf);
->=20
-> Then you don't need a comment saying that it must be a u32[4]. It's
-> implied in the structure.
+Fixes: a19747c3b9b ("selftests: net: let big_tcp test cope with slow env")
+Suggested-by: Davide Caratti <dcaratti@redhat.com>
+Suggested-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Pablo Martin Medrano <pablmart@redhat.com>
+---
+ tools/testing/selftests/net/big_tcp.sh | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selftests/net/big_tcp.sh
+index 2db9d15cd45f..dc2ecfd58961 100755
+--- a/tools/testing/selftests/net/big_tcp.sh
++++ b/tools/testing/selftests/net/big_tcp.sh
+@@ -21,8 +21,7 @@ CLIENT_GW6="2001:db8:1::2"
+ MAX_SIZE=128000
+ CHK_SIZE=65535
+ 
+-# Kselftest framework requirement - SKIP code is 4.
+-ksft_skip=4
++source lib.sh
+ 
+ setup() {
+ 	ip netns add $CLIENT_NS
+@@ -143,21 +142,20 @@ do_test() {
+ 	start_counter link3 $SERVER_NS
+ 	do_netperf $CLIENT_NS
+ 
+-	if check_counter link1 $ROUTER_NS; then
+-		check_counter link3 $SERVER_NS || ret="FAIL_on_link3"
+-	else
+-		ret="FAIL_on_link1"
+-	fi
++	check_counter link1 $ROUTER_NS
++	check_err $? "fail on link1"
++	check_counter link3 $SERVER_NS
++	check_err $? "fail on link3"
+ 
+ 	stop_counter link1 $ROUTER_NS
+ 	stop_counter link3 $SERVER_NS
+-	printf "%-9s %-8s %-8s %-8s: [%s]\n" \
+-		$cli_tso $gw_gro $gw_tso $ser_gro $ret
++	log_test "$(printf "%-9s %-8s %-8s %-8s" \
++			$cli_tso $gw_gro $gw_tso $ser_gro)"
+ 	test $ret = "PASS"
+ }
+ 
+ testup() {
+-	echo "CLI GSO | GW GRO | GW GSO | SER GRO" && \
++	echo "      CLI GSO | GW GRO | GW GSO | SER GRO" && \
+ 	do_test "on"  "on"  "on"  "on"  && \
+ 	do_test "on"  "off" "on"  "off" && \
+ 	do_test "off" "on"  "on"  "on"  && \
+@@ -176,7 +174,8 @@ if ! ip link help 2>&1 | grep gso_ipv4_max_size &> /dev/null; then
+ fi
+ 
+ trap cleanup EXIT
++xfail_on_slow
+ setup && echo "Testing for BIG TCP:" && \
+ NF=4 testup && echo "***v4 Tests Done***" && \
+ NF=6 testup && echo "***v6 Tests Done***"
+-exit $?
++exit $EXIT_STATUS
+-- 
+2.48.1
 
 
