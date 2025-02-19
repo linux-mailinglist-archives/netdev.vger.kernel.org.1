@@ -1,215 +1,111 @@
-Return-Path: <netdev+bounces-167756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59548A3C1AD
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:15:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1223A3C1C8
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:18:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43188189BFBA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473F03BD796
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A621F3BB3;
-	Wed, 19 Feb 2025 14:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69331EFFA7;
+	Wed, 19 Feb 2025 14:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="U9W+w5Fh";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2mIsfES2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvS+xiVG"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C051EEA34
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 14:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F741E520A;
+	Wed, 19 Feb 2025 14:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739973827; cv=none; b=MNkINzYyABB8s8T2vj9cULBV0kxJVnVD9AZ4P7chNAZjptvYOTPRKSBgITrv+PEQbT3Ou8yo0bx4qy8vlHvpJ/VcwffhvWcJGlgQiX61VPtAT2rqJRPzqhzXtTUsXNPLY1VWtta1TwO/g+FjfEZBkca2mJSApkJpC/a64oMZHrQ=
+	t=1739973998; cv=none; b=sDGBVfPyPdPvDl0fF4Jb7L0T3FzXV2I2YTzY8L8DlsExpgDygJqeMQ3kUkSc31uOfXP/N29s0R1Q8+kDZCCQ/ghsfdb7T+eavwBbOaEoK9Z2Svog4xFSPmV8jVQSkmmYd25ciBQqoe/GhJoKNq688xgVvcUrVGiQDRX/xCYx6pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739973827; c=relaxed/simple;
-	bh=G5dDOKU7qY/5H3lmdcgjI4CUCt2mDye6VqweumhWRog=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GYQZ/Ks4Vs8T7wLBhP4KWAQcruign5elfGGkZa7Idk1ne5dmnRZUNNctcN8I3FQ3G69ItqbG70IiY7uNbEvneLkFSlZJ1ggN7SpqYkbPedKkFbUElcazEf7/2h/o3oOEWlJ7fk/zWiInSDiX1ej/r0XV1Ugvne4MYER6Sf/Ga64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=U9W+w5Fh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2mIsfES2; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1739973817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WRmexGZnBn28ZwYufH8JgpfTsCjo43yY2wzZiMrsTrc=;
-	b=U9W+w5Fh5BW4pwTK9wPXaPkZc2pmaRKtku6lWziTjPlyVrGLD/ydPRO7Q4XsliMbWPur09
-	IkvUUsLu58BnmSNBmuuI2MNfynM9OWCzxuv3qqJSr/rbQk2kwFu8t2C1/PNNhoHvVa13pM
-	FeJin0C7EvEI8S5vB633K3jYqtdJf20S+MEKAeEef5IlCL10RBvFqMHS5ZsuJ58p1dWtrc
-	bZR+V6b2OSRFOJhvzLIpaUPrw1U19CI4ceCltCYxUDc5UXIy78PwYlcKp4tOEc7dugOmwt
-	bJ7S75/baXEg88nFKnXz8GN+j6IMuWBY1el6VzjOPc+YaNMaQNoHb6G4KKp+qQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1739973817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WRmexGZnBn28ZwYufH8JgpfTsCjo43yY2wzZiMrsTrc=;
-	b=2mIsfES2UlPwadCvzS0WHm04ZpljFucGvHphvWBsp4ZQVXW4dph4Cxvlm900+GSXPQb+eh
-	0M0Syc7T1+fzs2DQ==
-To: Joe Damato <jdamato@fastly.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Gerhard Engleder <gerhard@engleder-embedded.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2 0/4] igb: XDP/ZC follow up
-In-Reply-To: <Z7UDCSckkK7J30oP@LQ3V64L9R2>
-References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
- <Z7T5G9ZQRBb4EtdG@LQ3V64L9R2> <Z7UDCSckkK7J30oP@LQ3V64L9R2>
-Date: Wed, 19 Feb 2025 15:03:36 +0100
-Message-ID: <87jz9mghfr.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1739973998; c=relaxed/simple;
+	bh=BcIYev34/H5KdZyk/gL0x2bpmggeWZsheUrrtj9CCFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iPhOHV6mmgjqRcrR34CvDwCKX032RRzumbUtdAKrj5SBA+5BCBqfwtePp1W0gmo8QP8m54L1IomnIwXx9rXzjPT0MOF2hsHrpPn6MzxzWkm1apX/viZxbRYdwAFmlqUmDBmgw2Oeogp13WQYILFDvQ5OzftusUhtLPi5St0329I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvS+xiVG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAEF1C4CED1;
+	Wed, 19 Feb 2025 14:06:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739973998;
+	bh=BcIYev34/H5KdZyk/gL0x2bpmggeWZsheUrrtj9CCFA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IvS+xiVGhM7cXpY80CIZFSln5mDYng4e33aJhKTXiSJ4mkR16DG64mhQknqbIXHP9
+	 f6H4QpiRLvsmHd7bsbcIHxbJHuxonOLfBGmfoYAHBQOJTuCNFlrr7JoL0+1TO8HOrs
+	 PYNJFeLNwR7mSPlZn6vreiCi/e1MgXRawCvBWuTfnvDTqnfhHnJTHC/MZ37PNob7py
+	 z/HrVzxvfOZGZ584tR7DaywqTF/5Jj/GptSmaM47shFFZJVnECD8+naPO5ct3Ef7nF
+	 Hs3Uj2ZPWun8bdU5ZOlXsKgsQ0VF7x4vv7aVQ7kOsxnUkYUqd027jH/2KP5X58wgqY
+	 k5l585sqhCFuw==
+Date: Wed, 19 Feb 2025 08:06:36 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: conor+dt@kernel.org, krzk+dt@kernel.org, linux-mips@vger.kernel.org,
+	tsbogend@alpha.franken.de, andrew+netdev@lunn.ch, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+	lee@kernel.org, davem@davemloft.net
+Subject: Re: [RESEND PATCH net-next 3/5] dt-bindings: net: Add Realtek MDIO
+ controller
+Message-ID: <173997391420.2383401.13425265155310657100.robh@kernel.org>
+References: <20250218195216.1034220-1-chris.packham@alliedtelesis.co.nz>
+ <20250218195216.1034220-4-chris.packham@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218195216.1034220-4-chris.packham@alliedtelesis.co.nz>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
-On Tue Feb 18 2025, Joe Damato wrote:
-> On Tue, Feb 18, 2025 at 04:18:19PM -0500, Joe Damato wrote:
->> On Mon, Feb 17, 2025 at 12:31:20PM +0100, Kurt Kanzenbach wrote:
->> > This is a follow up for the igb XDP/ZC implementation. The first two=20
->> > patches link the IRQs and queues to NAPI instances. This is required t=
-o=20
->> > bring back the XDP/ZC busy polling support. The last patch removes=20
->> > undesired IRQs (injected via igb watchdog) while busy polling with=20
->> > napi_defer_hard_irqs and gro_flush_timeout set.
->> >=20
->> > Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
->> > ---
->> > Changes in v2:
->> > - Take RTNL lock in PCI error handlers (Joe)
->> > - Fix typo in commit message (Gerhard)
->> > - Use netif_napi_add_config() (Joe)
->> > - Link to v1: https://lore.kernel.org/r/20250210-igb_irq-v1-0-bde078cd=
-b9df@linutronix.de
->>=20
->> Thanks for sending a v2.
->>=20
->> My comment from the previous series still stands, which simply that
->> I have no idea if the maintainers will accept changes using this API
->> or prefer to wait until Stanislav's work [1] is completed to remove
->> the RTNL requirement from this API altogether.
->
-> Also, may be worth running the newly added XSK test with the NETIF
-> env var set to the igb device? Assuming eth0 is your igb device:
->
->   NETIF=3Deth0 ./tools/testing/selftests/drivers/net/queues.py
->
-> should output:
->
->   KTAP version 1
->   1..4
->   ok 1 queues.get_queues
->   ok 2 queues.addremove_queues
->   ok 3 queues.check_down
->   ok 4 queues.check_xdp
->   # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
->
-> Note the check_xdp line above.
->
+On Wed, 19 Feb 2025 08:52:14 +1300, Chris Packham wrote:
+> Add dtschema for the MDIO controller found in the RTL9300 Ethernet
+> switch. The controller is slightly unusual in that direct MDIO
+> communication is not possible. We model the MDIO controller with the
+> MDIO buses as child nodes and the PHYs as children of the buses. The
+> mapping of switch port number to MDIO bus/addr requires the
+> ethernet-ports sibling to provide the mapping via the phy-handle
+> property.
+> 
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> ---
+> 
+> Notes:
+>     This is technically v7 of [1] and [2] which are combined now that
+>     rtl9301-switch.yaml under net/ the only change from those is that the
+>     $ref: in rtl9301-switch.yaml can now use a relative path
+> 
+>     I could technically do away with the reg property on the mdio-controller
+>     node. I don't currently need to use it in my driver and it looks like
+>     the register offsets are the same between the RTL9300 and RTL9310.
+> 
+>     [1] - https://lore.kernel.org/lkml/20250204030249.1965444-6-chris.packham@alliedtelesis.co.nz/
+>     [2] - https://lore.kernel.org/lkml/20250204030249.1965444-4-chris.packham@alliedtelesis.co.nz/
+> 
+>  .../bindings/net/realtek,rtl9301-mdio.yaml    | 86 +++++++++++++++++++
+>  .../bindings/net/realtek,rtl9301-switch.yaml  | 31 +++++++
+>  2 files changed, 117 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
+> 
 
-Sure, why not. Seems to work.
 
-|root@apl1:~/linux# uname -a
-|Linux apl1 6.14.0-rc2+ #2 SMP PREEMPT_RT Wed Feb 19 14:41:23 CET 2025 x86_=
-64 GNU/Linux
-|root@apl1:~/linux# NETIF=3Denp2s0 ./tools/testing/selftests/drivers/net/qu=
-eues.py
-|KTAP version 1
-|1..4
-|ok 1 queues.get_queues
-|ok 2 queues.addremove_queues
-|ok 3 queues.check_down
-|ok 4 queues.check_xdp
-|# Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+Please add Acked-by/Reviewed-by tags when posting new versions. However,
+there's no need to repost patches *only* to add the tags. The upstream
+maintainer will do that for acks received on the version they apply.
 
-Has this xsk netlink attribute been added fairly recently? The test
-failed on my kernel from a few days ago (kernel from today works). I
-think there's room for improvement though:
+If a tag was not added on purpose, please state why and what changed.
 
-|root@apl1:~/linux# NETIF=3Denp2s0 ./tools/testing/selftests/drivers/net/qu=
-eues.py
-|KTAP version 1
-|1..4
-|ok 1 queues.get_queues
-|ok 2 queues.addremove_queues
-|ok 3 queues.check_down
-|# Exception| Traceback (most recent call last):
-|# Exception|   File "/root/linux/tools/testing/selftests/net/lib/py/ksft.p=
-y", line 218, in ksft_run
-|# Exception|     case(*args)
-|# Exception|   File "/root/linux/./tools/testing/selftests/drivers/net/que=
-ues.py", line 53, in check_xdp
-|# Exception|     ksft_eq(q['xsk'], {})
-|# Exception|             ~^^^^^^^
-|# Exception| KeyError: 'xsk'
-|not ok 4 queues.check_xdp
-|# Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
+Missing tags:
 
-I'd assume this shouldn't be a Python exception, but rather say
-something like "Expected xsk attribute, but none found. Fix the driver!" :)
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-While at it would you mind to add a newline to the xdp_helper usage
-line (and fix the one typo)?
 
-diff --git a/tools/testing/selftests/drivers/net/xdp_helper.c b/tools/testi=
-ng/selftests/drivers/net/xdp_helper.c
-index cf06a88b830b..55bad307d81b 100644
-=2D-- a/tools/testing/selftests/drivers/net/xdp_helper.c
-+++ b/tools/testing/selftests/drivers/net/xdp_helper.c
-@@ -20,7 +20,7 @@
-  * this test program is not intended to actually process packets, but coul=
-d be
-  * extended in the future if that is actually needed.
-  *
-=2D * it is used by queues.py to ensure the xsk netlinux attribute is set
-+ * it is used by queues.py to ensure the xsk netlink attribute is set
-  * correctly.
-  */
- int main(int argc, char **argv)
-@@ -35,7 +35,7 @@ int main(int argc, char **argv)
-        char byte;
-=20
-        if (argc !=3D 3) {
-=2D               fprintf(stderr, "Usage: %s ifindex queue_id", argv[0]);
-+               fprintf(stderr, "Usage: %s ifindex queue_id\n", argv[0]);
-                return 1;
-        }
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAme15LgTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgmuOEACTWKcjSqUxn3lLxtzYeT21FhY9zoue
-YNf9abCQXoFWnmwSYGJknmmAfG2DscLKmLAeZW2ommRj0QyEYuMgMNGEz0csFy+b
-9RWvOkdlzGHmP0dvyWE3F1DbkrHgPIjo3Txcd4DO5P1a+MuVqzY3+3VEZwNKq6nc
-q+CcEIX9nUrru0jfdHbYWlquLXfqCghwkD8XXEtQVS6Hr0hXXAXxu95VKWiC2j//
-0s25FXjrESK+SdbEQSKPPknAxFMO+coWvJAJJ3mempTy08vOXE+iYFMLdbh8agIl
-HMQ4JiPeHRXYWvRiQzOoOSIbuh+C/WP6bcT8+/MN0eHvLIBcjyORRzXrnFRq1Fm0
-5JsdRrh44IMknZwNr7cpNi0zg7+L6UebnyzT7GsNgc3WbZiblG0WSwlMZueNtKXz
-FFAZqpcImm26+FgcKa/VTLzbI6dxwvEJFXizcjBzJfDZpxv8rW8gC56dmv8TzFPI
-moOwxC4Ssood/0HE6F3M819ac5P8ics7aEq9tnb5YXjGreISxrrjquBuf7iwr53N
-5d+LxX15AkhoTZLbXNbtFQd7sLuJbKeFIHR/44TwqPduAqkA1MOuoqmBrZlDyal3
-UcweZaA7IDmUWIjrqqjp7E3yMtQVWg6VFkUDlEz8mZvWZCZQpeRAIiZvBPgUXueS
-1F/dDocJV6mZrQ==
-=0UN6
------END PGP SIGNATURE-----
---=-=-=--
 
