@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-167833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D37FA3C781
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:29:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36053A3C770
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3103817BA38
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:26:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 772C41896584
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C678E21B19E;
-	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213B221B9E9;
+	Wed, 19 Feb 2025 18:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pm5aLEls"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="szreaeud"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C82721A455;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D7321B9CE;
 	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739989471; cv=none; b=NfddZh4AOZl9isUgWm0FTKcYCsdUEvYH2REnGwzF7scMVpHmF/CXhwdoc604L6b8vXh4mCejQbPG+MBgxD2eIV/0ILFlSjWccEwS2B7plyaTxjgcWa5OuUUGPooUH4lYDw4A+TX392ypa+uvXQX9C2Vfa5E3HwHcuf7TmSGsP18=
+	t=1739989472; cv=none; b=CaBzQJm8CTlT8mBLqE/W09bfgUa+liGL5cTaqTtgID/W/i0uAbdDS0hf7CRZ8bBCSSyHD0kSAX/nPQuBq5lrfGHOIlzy4ykCQ3A4dmbO1CBE6ZvsmybJnon/siCBUJiLKlsYlwwlHRIqjQrP5T1mXCDtcn9A5IBvok25DBRuIxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739989471; c=relaxed/simple;
-	bh=DMl5gHfD8qUZ3YL0b5yRXo2ontnZm0E6uzFbcU4n97Q=;
+	s=arc-20240116; t=1739989472; c=relaxed/simple;
+	bh=e6jH75bm56vh0co03y8l2mrU5UpBPrA2ekMFTLfJovw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hvQWXVj0/lcCV7qLF/E7kJOm10n9XXqDhT65oqyyD7edzGfEk9cN4D2tdvAOk/zlgXQ0PmyEk407EHLC5Cr9OxlCBPVCbdJYPCTxuVYB0gAI6k1+Vo1rLgIlFMRgaI2U9q+T/CLgY1wruCw1/qA1DJ/iAho16aJ6n8GbolGOuas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pm5aLEls; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08CECC4CEDD;
+	 MIME-Version; b=VkaJAJo5LO47Lidt1m9BloWNapA9065ROTEonIGwpn4tnDDsErj1u2H50g2E0S80ln1+bcUk3dyZG9y+dimYjBf8+2j4EiCboZjJfkaFYb8xMXxxXOS8fxznzbKXC2GLjOfVJCJmDde4JBm8cKTy804MSdWm3A7p5ws8WLzl+s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=szreaeud; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43D3CC4CED1;
 	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739989471;
-	bh=DMl5gHfD8qUZ3YL0b5yRXo2ontnZm0E6uzFbcU4n97Q=;
+	bh=e6jH75bm56vh0co03y8l2mrU5UpBPrA2ekMFTLfJovw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pm5aLElsFC9f8IRhcPWIG7PYWCKWJe5LAjTvmEo+WqLtfMWdqKMTvpte5ibgOSdhW
-	 d9GIcEHvqXx8VCOvVzkt5/RwQ5VRaNHA+c92FDEX5jRm+c4EteQp5lgtm89OkV6v8m
-	 czhZWMA/4mYa+9izPUDyJ1p0B9fs6WKMAXzSsXc3dEhn1CoL0pQa6AjwIztVVC+7AA
-	 yaEBGcYSnfifqZtYo6NbX3SNWFADfupAEGA7L7kuBQzLT9QypC11vgkxzTQgubKV9h
-	 g+ln6hlW8NpYyBkhWMb+VbgWoxDsN2nlSDdoTrMngr+kvFaoEf5k4yzQ0u69rWJtfw
-	 HTPivI50Kxevw==
+	b=szreaeudSyGlyXEDsUCwHo8DEQpRXBjNhy9pD92PJoyBb/e3GJkH6AB+a4+3oRrxt
+	 UXXn3jZeFiqiMBA9WG47io0uf6U6coNDD3dIhCBWaQ+a+/1VhurQmuKMrFa5H16kwP
+	 MqONiVwbHOLwPqjxV56LVK3BEmnb5XjwVHc9+av6MLDk9GIZ8U7SINvRDaow7JibjQ
+	 vAq2zkMC6bNIlsNpkAg1d4hnDz57Q2ypV6c2B+gBtiz7AgWoUxq8tCMGnujxmk5XiM
+	 EVUR7A6UZ4vlrmlNXuhgOowEK0R2+JtITaAahHORHuLxo28tJAYg6eOseqK6UR+76D
+	 6/sQXnCH/QU4A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v3 14/19] crypto: x86/aes-gcm - use the new scatterwalk functions
-Date: Wed, 19 Feb 2025 10:23:36 -0800
-Message-ID: <20250219182341.43961-15-ebiggers@kernel.org>
+Subject: [PATCH v3 15/19] crypto: x86/aegis - use the new scatterwalk functions
+Date: Wed, 19 Feb 2025 10:23:37 -0800
+Message-ID: <20250219182341.43961-16-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250219182341.43961-1-ebiggers@kernel.org>
 References: <20250219182341.43961-1-ebiggers@kernel.org>
@@ -61,84 +61,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-In gcm_process_assoc(), use scatterwalk_next() which consolidates
-scatterwalk_clamp() and scatterwalk_map().  Use scatterwalk_done_src()
-which consolidates scatterwalk_unmap(), scatterwalk_advance(), and
-scatterwalk_done().
-
-Also rename some variables to avoid implying that anything is actually
-mapped (it's not), or that the loop is going page by page (it is for
-now, but nothing actually requires that to be the case).
+In crypto_aegis128_aesni_process_ad(), use scatterwalk_next() which
+consolidates scatterwalk_clamp() and scatterwalk_map().  Use
+scatterwalk_done_src() which consolidates scatterwalk_unmap(),
+scatterwalk_advance(), and scatterwalk_done().
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ arch/x86/crypto/aegis128-aesni-glue.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 3e0cc15050f32..f963f5c04006d 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1279,45 +1279,45 @@ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
+diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
+index 01fa568dc5fc4..1bd093d073ed6 100644
+--- a/arch/x86/crypto/aegis128-aesni-glue.c
++++ b/arch/x86/crypto/aegis128-aesni-glue.c
+@@ -69,14 +69,14 @@ static void crypto_aegis128_aesni_process_ad(
+ 	struct aegis_block buf;
+ 	unsigned int pos = 0;
  
- 	memset(ghash_acc, 0, 16);
  	scatterwalk_start(&walk, sg_src);
- 
- 	while (assoclen) {
--		unsigned int len_this_page = scatterwalk_clamp(&walk, assoclen);
+ 	while (assoclen != 0) {
+-		unsigned int size = scatterwalk_clamp(&walk, assoclen);
++		unsigned int size;
++		const u8 *mapped = scatterwalk_next(&walk, assoclen, &size);
+ 		unsigned int left = size;
 -		void *mapped = scatterwalk_map(&walk);
--		const void *src = mapped;
-+		unsigned int orig_len_this_step;
-+		const u8 *orig_src = scatterwalk_next(&walk, assoclen,
-+						      &orig_len_this_step);
-+		unsigned int len_this_step = orig_len_this_step;
- 		unsigned int len;
-+		const u8 *src = orig_src;
+-		const u8 *src = (const u8 *)mapped;
++		const u8 *src = mapped;
  
--		assoclen -= len_this_page;
--		scatterwalk_advance(&walk, len_this_page);
- 		if (unlikely(pos)) {
--			len = min(len_this_page, 16 - pos);
-+			len = min(len_this_step, 16 - pos);
- 			memcpy(&buf[pos], src, len);
- 			pos += len;
- 			src += len;
--			len_this_page -= len;
-+			len_this_step -= len;
- 			if (pos < 16)
- 				goto next;
- 			aes_gcm_aad_update(key, ghash_acc, buf, 16, flags);
- 			pos = 0;
- 		}
--		len = len_this_page;
-+		len = len_this_step;
- 		if (unlikely(assoclen)) /* Not the last segment yet? */
- 			len = round_down(len, 16);
- 		aes_gcm_aad_update(key, ghash_acc, src, len, flags);
- 		src += len;
--		len_this_page -= len;
--		if (unlikely(len_this_page)) {
--			memcpy(buf, src, len_this_page);
--			pos = len_this_page;
-+		len_this_step -= len;
-+		if (unlikely(len_this_step)) {
-+			memcpy(buf, src, len_this_step);
-+			pos = len_this_step;
- 		}
- next:
+ 		if (pos + size >= AEGIS128_BLOCK_SIZE) {
+ 			if (pos > 0) {
+ 				unsigned int fill = AEGIS128_BLOCK_SIZE - pos;
+ 				memcpy(buf.bytes + pos, src, fill);
+@@ -95,13 +95,11 @@ static void crypto_aegis128_aesni_process_ad(
+ 
+ 		memcpy(buf.bytes + pos, src, left);
+ 		pos += left;
+ 		assoclen -= size;
+ 
 -		scatterwalk_unmap(mapped);
--		scatterwalk_pagedone(&walk, 0, assoclen);
-+		scatterwalk_done_src(&walk, orig_src, orig_len_this_step);
- 		if (need_resched()) {
- 			kernel_fpu_end();
- 			kernel_fpu_begin();
- 		}
-+		assoclen -= orig_len_this_step;
+-		scatterwalk_advance(&walk, size);
+-		scatterwalk_done(&walk, 0, assoclen);
++		scatterwalk_done_src(&walk, mapped, size);
  	}
- 	if (unlikely(pos))
- 		aes_gcm_aad_update(key, ghash_acc, buf, pos, flags);
- }
  
+ 	if (pos > 0) {
+ 		memset(buf.bytes + pos, 0, AEGIS128_BLOCK_SIZE - pos);
+ 		aegis128_aesni_ad(state, buf.bytes, AEGIS128_BLOCK_SIZE);
 -- 
 2.48.1
 
