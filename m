@@ -1,152 +1,126 @@
-Return-Path: <netdev+bounces-167645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B777A3B3D5
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:30:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D72E5A3B4CA
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF23F1729B4
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B86E189C78E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B98D1CAA82;
-	Wed, 19 Feb 2025 08:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01A71E51F5;
+	Wed, 19 Feb 2025 08:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="ZmckBGFJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbOWhKTF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8551C3C1E;
-	Wed, 19 Feb 2025 08:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D97C1E32D3
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 08:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739953841; cv=none; b=qrrAVmdaHENgmIJjI8I19cmjNIzedQ2csTsXEnDLDWT3oafRYeE3HMQL9bQMMrqbdrda5GUrhe6ZNOb1Y3hbJWHUS6rXaU79DVSf04Hwx80WoM3c543UZPtoT4L5odOdkpbUoKuOQh0+tQ8UJjm3dOGU4DAjeUF1vsgm91OHUok=
+	t=1739954252; cv=none; b=WLsdIKxhBXxVTLdmkzBSCmcaoBI4IzpcEzxWlQnXZqUsBvhVma2MSZY12iBLNwP23gJ7PGZ2ALojZ1d9NhYrgAu0lH+nwTPUm/lFhKGPkaZqodkytSdsnZHG+zuIJ00WtSdeaNcrTHFfylMICczsIG0/l2xAfs2Q5FvwAU9cVfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739953841; c=relaxed/simple;
-	bh=ycMmntT6RYiK5scQQyQ1vBE7RgIc+pBQA6KccXjAD54=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J9DKQs9cyManOmNfCBcMuMUhLMHP0oByiZtnPcFQLixsu2bUjSdDR3mxR2NYkV5QGXH+mLsgfSZiU30qoOj6KoAxQNeO8KtiCdKJLq6g6wUr0a7JuE2ByP7jolo3/3vnxIBPoZRbeEAF4izj7Tw4gVvqisAZoZVe1zDKlu9dJsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=ZmckBGFJ; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1739953820; x=1740558620; i=ps.report@gmx.net;
-	bh=x5EWN2R4z/1IwzTQftryyia0iXMKaHI0maPKka1LwOI=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ZmckBGFJ6zPUEs34K+sQ40Fq9X3B+xzw28RAzMv28Nw1Kx0A03TJYLFsyJZsIE/9
-	 pPk3onq40RglhOvGBHAu7IfGgIGKMW3txQ+Cujatm4KGRQNP5o6VqRsznU0oLGDIE
-	 xMobx+o9kJISN40PYSTTdJcnlAYN60znc3JF8eFPnrzDtl6spFM9u05EGCAOWCAgF
-	 pIZpUFv7m9P+qNEwM9ymPf401Dsc/BZ8yIZl3UggCWhE0QTUllLQpDOeT13o4AiJi
-	 rN1PjoUiYcDdxJXnGNygb4SA14tKUBMyR4rDglyCG7CAx96ec2ITGSXNhZz9tMgKR
-	 9a5ivBExdabZxWZWIg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost ([82.135.81.84]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MryT9-1swlvl2X13-00mKHH; Wed, 19
- Feb 2025 09:30:20 +0100
-Date: Wed, 19 Feb 2025 09:30:18 +0100
-From: Peter Seiderer <ps.report@gmx.net>
-To: Simon Horman <horms@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Artem Chernyshev
- <artem.chernyshev@red-soft.ru>, Nam Cao <namcao@linutronix.de>, Frederic
- Weisbecker <frederic@kernel.org>
-Subject: Re: [PATCH net-next v5 8/8] net: pktgen: use defines for the
- various dec/hex number parsing digits lengths
-Message-ID: <20250219093018.7907296f@gmx.net>
-In-Reply-To: <20250218132905.GV1615191@kernel.org>
-References: <20250213110025.1436160-1-ps.report@gmx.net>
-	<20250213110025.1436160-9-ps.report@gmx.net>
-	<20250214201145.2f824428@kernel.org>
-	<20250216091739.GW1615191@kernel.org>
-	<20250217094740.76a25671@kernel.org>
-	<20250218132905.GV1615191@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1739954252; c=relaxed/simple;
+	bh=/bNbrBFFMVddKdQVi4fHOOgishG5U3ZJbLlFkbCgeWU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XPu/2/hqMmVcbsZBXehmTP/ppYcXSPFk1rSpfJwBZecH5ue/3GxaeWh6fKUVySV0e8XoDLUIWJ70Kz9ED2KUweyBBl4WUVzuykP+ApNmpy4pOVNc2CfpMJP2nhOoIJdhQii0+yEdvwhyZeLT1IVtZaJnrTJ+9DLpGRuYEl32Iyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HbOWhKTF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739954245;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/bNbrBFFMVddKdQVi4fHOOgishG5U3ZJbLlFkbCgeWU=;
+	b=HbOWhKTFmPZ2lhPr2Vmda2TZFf5Emca9SXRGRxxbTOX/Vw9+IuIHqkv96F5ndSVSE6t3cn
+	MhyUO3JvqPFxh0Myqe/uMatT90t6HeBeGWxmvGAO89SlIuZ2Vua6iBVWyCoMdC1flOswBr
+	6UrZq/Pdq9eVwv6pSuWga88gV0ZnU0g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-386-nQEGWk9wMA67RgGU_oi54w-1; Wed, 19 Feb 2025 03:37:24 -0500
+X-MC-Unique: nQEGWk9wMA67RgGU_oi54w-1
+X-Mimecast-MFC-AGG-ID: nQEGWk9wMA67RgGU_oi54w_1739954243
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38f28a4647eso3454477f8f.1
+        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 00:37:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739954243; x=1740559043;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/bNbrBFFMVddKdQVi4fHOOgishG5U3ZJbLlFkbCgeWU=;
+        b=cVDIjctw6Gj+AFAm7zPOsJyaxzpvMGyapxaPECo5Ks9sME6yWrhKYxPfQNmdeatd1S
+         RklgXIjGp5AEt+jYiCOExVk4ZRng3DAQ0xOjp/+NRzmXlPdiVEN1v/iD9r2fDByuMs0M
+         afjY2qzEhGmLr1RiRv+L3+F5SZYzvqG16Ivx5q5peBYCj3/+tbn2soKVG500nqsP3pyT
+         PiE6k6QaN+3okuqFBjvL/Hp2zsfyvnRtbKE8A9KMZakRKn0yh71hboy69/g32mtnH5xQ
+         snBTukXocKERv1Hdh5jVUsP73S0EfxmMh6cThnxdTcTIBysznyqKatobn2KrQLVb/rie
+         vi3w==
+X-Forwarded-Encrypted: i=1; AJvYcCX8Vmz/5mCBHNGKJDBNlZfhZRRMEGyCzhENeU7a6ZU7v5NROghuNoD+qEcRDrH3XWF1fOI3z7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxuldwf4XNbsJ1o9KatMeW5JBoMKpUeHsaD7F/M7GXrJdDO4HOk
+	XK9+5G5ny/EQjt3AAx1lydwZkDCZIg2GPSGNWk+pd/m3Htdgq9vrnjw06ITijOrKNGcKLBLWDVK
+	mRQLPdAVH9ZXNbeXMXdovI2enlFOtW6ySz2Y7dyVFp91yIGHFtjkPTg==
+X-Gm-Gg: ASbGncvf48S9Q5InuIq1UnkUh29k2nubNDZJ3MiO0RMpJwvgttMOC1kNqpp/+j64w/u
+	1xENYNT2aElqqDya9kswX5cLqFl3sZv5UuYgq+9eEhzu8H757KuQ5YT3UrbhSaTyGOmwoAozrZT
+	RTH32SqKCrLbZzQ81nkbCm0WG52XJteLgrQiJPZ5dQxKF3t98nibW5eixGrEgRmjO4Mf3nDokuy
+	sqX0sr8tt0B8IVclZf/KLJ6J045eAKNIX/SKvqzUL/VaRmUP2vHKehGd8Iolb74VeNpnuTKdOIF
+	b5A8fImeZIOgyink/eSRb8jDdtCPGkSXMQU=
+X-Received: by 2002:a5d:5f4e:0:b0:38d:ce70:8bc8 with SMTP id ffacd0b85a97d-38f33f119d1mr14836245f8f.9.1739954243136;
+        Wed, 19 Feb 2025 00:37:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFYmanNBEc1/LKld7u/WRc22w1ScBQGUbdmsmPp4f8lNHp7KYRRbJFv5zwWdszstXjt/kspTA==
+X-Received: by 2002:a5d:5f4e:0:b0:38d:ce70:8bc8 with SMTP id ffacd0b85a97d-38f33f119d1mr14836217f8f.9.1739954242819;
+        Wed, 19 Feb 2025 00:37:22 -0800 (PST)
+Received: from [192.168.88.253] (146-241-89-107.dyn.eolo.it. [146.241.89.107])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4398e35c522sm58467275e9.34.2025.02.19.00.37.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2025 00:37:21 -0800 (PST)
+Message-ID: <2ce3a63c-8c05-4b70-a6ed-4131fdf9ee34@redhat.com>
+Date: Wed, 19 Feb 2025 09:37:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Cgs668cn6wrF97BfN2bVd3FAJhAjX1x1hv67Apab+yN/2Xlj4EO
- mef5eh5Kd7VsBqkNXd5cbAlZCKWlXcrVXFG3rHLbPfEteI23i1HrENP3ISEPUfPCg2ODGL9
- eXkpjgjK9cyWHV39XY0BPw/85sqAG7OkDjrWCK9g0vGt2n1IhKc8OV6WQqbN4Zbwc1/ragU
- jqnKyM18leFYLSbBW23+w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:51Tm+bc4Q+4=;lhQlaUuDjbQzR1uRxmJN9iL/w4I
- 8Jm5L01C1lD9qstmj8SDuZXKAw0RDkNU7LGexQnH4ut4PBPSAeDSpfBeWzFk2P0uq+IHMhyoo
- Ke23Xg/1s+8K02QH4ZCbC8HTWu3hljHHsjd60JOoUvnVcpUoLw3LPqoyhGv1ihaCzunPRH0E4
- tbqkvtr0TehDyRglhU7xYzxgHPzUL0CUNdhjJvQ3CeGvr20EszHEfWDHuGOqLt7noTVqMffax
- icKa6SgWbfEE2HXLkaszw5ih0mK6WLdhLsdDBbDnKV72Cp4HEckJfymSdnMt6L2F980We0NXl
- didZcCPZ9HXQYaM/lfvueHiCPcolSto1eTWOSveISbuQpoYZg2C8aTPhlGSlvPSk9wkSjQE5w
- BgqD6NgHxd9yQMqUuD1pFtz33QS1v+de2J2J4SeV3g9Od7wC3GO6lJ7Fm+35e8gtFALDMYOoR
- UM5jQX7ifiQvHPnLXtqJIuoodwRBsSt1WkMVyeDxXRtx2YV1vcgo4Dtk4q7Ij2zPkyXG0Jopd
- zFp6msWMegpWmyxtN6H79YS8ivC1z9EgsiQ32P1hIjrHZ/46kT15XNLHDxBfMNuLyTEYZrJSb
- zoZ9IhzPI9yCJ8jkdOoJvwdlOTDL0cI/ZFpghYfSprDV0R+KQFNFVXZpF+fOhUUsuNpuGXC6Y
- kWlVWNbwMAst9yNVrPZKvnadKozOGAV6s1kT0/lFPtNXfuI9Pl0Q2S4bD/1bgR8/xY+Sw9MYD
- z5Xeq2L+MuLiNYAE+eR5rmVmdL5CPzwI0+zdRZ5aMZapahA2jdj/G3GNgIsviPihehMJmqBDH
- ci4AXI4gFaFbI5vvMLMrzJaN+wgcp4AIuvplsURDxCF27h41P6o+0Fvfu8DEFhe349K+ZkkZ+
- 8L3nrLVn7MH6ZNZaZEY3jE5PDhPDdA5jrRsAV+3vuQCuW32uBCnUaLS3ne9iXmpEd+ptkMa8x
- JfkS70BAwli4WP/qn5lvVPGWfZG2EshbKEkejYnzmEACuu6NFn+MMNs0rzqNG+MVH3478W5is
- kOnurVMjuCXlrirtZ5Qp0+Do/pYYTtUZ2SnMy7XN/zKMWuGpoQOXWwqHG1DmxEvEg7yYIXbKM
- ykQnSZTvtPfyPWJK9m65Q2iTbc4SYWOkVuqqNOwU06PpnHzD74oWbEqY18Qinh75/3zaFXoLI
- Yw7JaknoRrwdCkmavzH3QTQsl7XvhwbBtjFlKrLqytAjSrVqRr7ibeXYug+OautwS2f8xEx7L
- Ahqhmm1dpSF/wN5c+KBTqiuUYW1yNzcU6lnPHmd+yAhgqS4RVLfnwkfMgTO8Et0BLQVKXSU5D
- MtRealvLBrwthbdvlw3ZDSxxzC5Oj9ZrE74l1DvIWpokXGFkWzmjkRD38H+yYIBMX9nZMHWcz
- u1YTdQ0r+0CgMogx93kAse2djnQCMheovyfb4EXB1LRBAjSS47EcTaEV62
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 11/12] docs: net: document new locking reality
+To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ Saeed Mahameed <saeed@kernel.org>
+References: <20250218020948.160643-1-sdf@fomichev.me>
+ <20250218020948.160643-12-sdf@fomichev.me>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250218020948.160643-12-sdf@fomichev.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello *,
+On 2/18/25 3:09 AM, Stanislav Fomichev wrote:
+[...]
+> +RTNL and netdev instance lock
+> +=============================
+> +
+> +Historically, all networking control operations were protected by a single
+> +global lock known as RTNL. There is an ongoing effort to replace this global
+> +lock with separate locks for each network namespace. The netdev instance lock
+> +represents another step towards making the locking mechanism more granular.
+> +
+> +For device drivers that implement shaping or queue management APIs, all control
+> +operations will be performed under the netdev instance lock. Currently, this
+> +instance lock is acquired within the context of RTNL. In the future, there will
+> +be an option for individual drivers to opt out of using RTNL and instead
+> +perform their control operations directly under the netdev instance lock.
+> +
+> +Devices drivers are encouraged to rely on the instance lock where possible.
 
-On Tue, 18 Feb 2025 13:29:05 +0000, Simon Horman <horms@kernel.org> wrote:
+Possibly worth mentioning explicitly the netif_* <> dev_* helpers
+relationship?
 
-> On Mon, Feb 17, 2025 at 09:47:40AM -0800, Jakub Kicinski wrote:
-> > On Sun, 16 Feb 2025 09:17:39 +0000 Simon Horman wrote:
-> > > On Fri, Feb 14, 2025 at 08:11:45PM -0800, Jakub Kicinski wrote:
-> > > > On Thu, 13 Feb 2025 12:00:25 +0100 Peter Seiderer wrote:
-> > > > > Use defines for the various dec/hex number parsing digits length=
-s
-> > > > > (hex32_arg/num_arg calls).
-> > > >
-> > > > I don't understand the value of this patch, TBH.
-> > > >
-> > > > Example:
-> > > >
-> > > > +#define HEX_2_DIGITS 2
-> > > >
-> > > > -		len =3D hex32_arg(&user_buffer[i], 2, &tmp_value);
-> > > > +		len =3D hex32_arg(&user_buffer[i], HEX_2_DIGITS, &tmp_value);
-> > > >
-> > > > The word hex is already there.
-> > > > There is still a two.
-> > > > I don't think the new define has any explanatory power?
-> > > >
-> > > > Previous 7 patches look ready indeed.
-> > >
-> > > This one is on me. I felt the magic number 2 and so on
-> > > was unclear. But if you prefer the code as-is that is fine by me too=
-.
-> >
-> > I agree that it's a bit hard to guess what the call does and what
-> > the arguments are. To me at least, the constants as named don't help.
-> > We can get a third opinion, or if none is provided skip the patch for
-> > now?
->
-> Yes, I see your point.
-> No objections from me to skipping this patch.
-
-O.k., will re-send the patch set without this one and the
-rev-by for patch 2 added...
-
-Regards,
-Peter
-
+/P
 
 
