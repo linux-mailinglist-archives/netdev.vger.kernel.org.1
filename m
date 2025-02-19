@@ -1,207 +1,156 @@
-Return-Path: <netdev+bounces-167771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65AC3A3C33A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:13:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD514A3C35C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B6EC188D58D
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CAD83BA059
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495681F417E;
-	Wed, 19 Feb 2025 15:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLK1Mfy9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D109195B33;
+	Wed, 19 Feb 2025 15:15:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B61F37C3;
-	Wed, 19 Feb 2025 15:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA2915CD52;
+	Wed, 19 Feb 2025 15:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739977977; cv=none; b=VZlgCsm5yitvWEg6kwt7xJrMHJKsWX4lAmD3H4NLifAoT8mCinJd1haGXw50wsXoLKBeHWfnDSmy6iAiVu6M1DjIzSmliiLeSiM4EgHdBUAI+k89FCwHmQ/VDZQABC0T/zaWO++nmIpuw9+6EWToUnn0aMZrJuZRYQFOM6qyIiQ=
+	t=1739978136; cv=none; b=SmI3ipIM+QzfrBtAYAKTm9PO8vqP9HF+rYLOTQU3PkR7qj+1iIAGamYG9F7cHvMBNPNXpGV9A3x/TPJhDZpj4keFaUS+4OUniNp8TRzi89x0IA8jCzpbRxwhKNc9Um9IL4M0uS4IKCyYUpeQtXpac7XQD383foeHMyD2MHoaeGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739977977; c=relaxed/simple;
-	bh=4XKcl9PDsS77A34MYCKFCp67OI8caQR836vxK8sI+Sk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=V2B/PSnS7My4h2LOqGjjE0wWWzIpTc5ukl6s5On8ivN62bq/b8/a+kPSHT95iQdJeqSPpAe37tiXEVqq7TwXOBsj0sWifbUBbKCkbXaGqhB/wQ4RRP/FzoTJyxHviQzC80+2Cct/SkQFQkjQC762LjJyojBkz0rG11d/9RSt4nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLK1Mfy9; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c0155af484so32631285a.0;
-        Wed, 19 Feb 2025 07:12:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739977974; x=1740582774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VpO+if+/loa3bPP+te0IoE6zBxpb8bPH3QpUBm0ETo8=;
-        b=cLK1Mfy9/zsg0e77OdHfkVvcH1im4jMBZpEOaGAC51aen4m6rB/OwZW0cGCuWwVWv3
-         vnl6nKiJTtRFijsMA17WlJzlM3cW5nfsz9/5FICcr8ngSXzkhhVuE4Dfz65cAPBDRGtO
-         6WeHLQOHQnVc+UXJNmKvM9ccqjXnxv6DyD8KA/ELKVukLk8kgorRe+diFH7FL8LD2hbF
-         AQPRXB/XX4AHvHST/zfj5/Faj3/17WpEtLkPv+garUUadHVVarxTKdWfoVX4MX55TCfz
-         wFw/qk5jV9N1BoF8ji6qdCQojKaCvGnZrKz9zARA4LQojyihZMZH5pJhDUxbcX6MPRkZ
-         YiUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739977974; x=1740582774;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VpO+if+/loa3bPP+te0IoE6zBxpb8bPH3QpUBm0ETo8=;
-        b=ieJU69Wu6Q/309+E61ZSsyMHha9sgOmfurdkPieyITN7ZsYHiCVJWWjs7OSEGYixb0
-         bTVKSnXZinYFMKT4POw8fxfbY1lAqC/UfKhPxga7Ld0tPdPz+OggNkPxRzKciJ9e9qYf
-         mEvKDdBsuUSDCoZMCbw3I4nKrep0DMPIDzn6N/EHM4ufoP/b9k4hDWhTuwGt8JHEUMNs
-         K9AITEXeSe4865dMSwKl5Jw/zjBVOvY5Fbq4v9lSBD8Tci0zDkm9UdvyYmnJcAmiczHR
-         VfH/4Ui8x8C+rjvrwWLwlySKG3Rbgx9D+DdD5W3aX1ij7jjMnj62/wyxgjhEHuJ6OPjW
-         d/Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQpGml5XRmgJA9MR1Tj2k87vgIfnJunv4NXupE3xqN4iq8DtT15Py2/3LHwqhQQ3LIoHVKEcKz@vger.kernel.org, AJvYcCVk1Mrhyr1/nUjyUoUfby/rpKawk7pmbLdwhi6xsXSRzD1dKNbUNbVvCjWiZ+yY9Mfujuc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTUGz4llru6J70Ri4X4mboP7JbUecyXBm2I9gmcDBnm+1UzAGs
-	G2X0Fue4apJI2H9qOwjW0z4UcdyTgHt2UN53cn+2lLIVIIjd4g4J
-X-Gm-Gg: ASbGncu/ekpsuOh5dwkUFFk8CtUISk+q0MVg02EkW0eMccqoG2OMwvqLNXGmbiLlhMC
-	cL9DgsncB70u8IXKcLjyC61JMSCTM8rQqyqBeNM3+muPysweTTUr816cq+XsTfhm/sqcC6z+rqk
-	6lEEONADIiBVdoJm03fvs76Em61oyzwTYVMKrQDRuKItbiwOz+FGh4y0OL+VAxyOUtlXOQFfUxI
-	8dZn5KhT+Us60U+4c/yvrGlMJHJf1RguvWzS558HHBWBKgFvgGBswip9r38Ib3wGJ6ovdKRDBIb
-	aDjDjtlRaaFI7hjlXMkEVgIn17Xa7wkold3bWzcVIsPQzCQtoVsI7UdHWTBs2KU=
-X-Google-Smtp-Source: AGHT+IEG6q6j15oHjc7R3Q4dcdP7o54pbY5LZO0IvcuMoglpeak4Fu/Pk1fOCobAvKLW9TyPKO2y5Q==
-X-Received: by 2002:a05:620a:2a0f:b0:7c0:6976:cea3 with SMTP id af79cd13be357-7c08a9aa3f3mr2492020185a.21.1739977974469;
-        Wed, 19 Feb 2025 07:12:54 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c09f00e355sm366804285a.38.2025.02.19.07.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 07:12:53 -0800 (PST)
-Date: Wed, 19 Feb 2025 10:12:53 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- shuah@kernel.org, 
- ykolal@fb.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <67b5f4f5990b0_1b78d829412@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoCHsJ9KQf5w6TLHmQy9DrkhPHChRPQb=+9L_WKTTd8FQA@mail.gmail.com>
-References: <20250218050125.73676-1-kerneljasonxing@gmail.com>
- <20250218050125.73676-2-kerneljasonxing@gmail.com>
- <67b497b974fc3_10d6a32948b@willemb.c.googlers.com.notmuch>
- <03553725-648d-467f-9076-0d5c22b3cfb3@linux.dev>
- <CAL+tcoA==aPOmBjDTOi2WgZ7HEE4OJiZ+4Z-OD_yGn_XN2Onqw@mail.gmail.com>
- <67b542b9c4e3d_1692112944@willemb.c.googlers.com.notmuch>
- <CAL+tcoCHsJ9KQf5w6TLHmQy9DrkhPHChRPQb=+9L_WKTTd8FQA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v12 01/12] bpf: add networking timestamping
- support to bpf_get/setsockopt()
+	s=arc-20240116; t=1739978136; c=relaxed/simple;
+	bh=y9WgzGffg+Am1VM1kKEZ+wLyOI55SBmza0HtJx0xEaQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=WRft6mv9h6XVO1BXNZKUPEG778i8vQdYFwl6pjByQ/OhAoKSKHRYDG1WJ3ghfdNsxD/FwnPIOrZCejv6DKWNjpB2pLL4wrBbbPiXYdFWcDniwN+d4/muXBrVCZSrlO6kp6X4fmbsXb3101wV4b4+sRMGAQfRCC0IozivVHxDd9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tklnE-000C1J-Hk; Wed, 19 Feb 2025 16:15:20 +0100
+Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tklnE-000GLI-1m;
+	Wed, 19 Feb 2025 16:15:20 +0100
+Message-ID: <fea35f08-3f29-4f7e-8be5-c77d4cee8be1@hetzner-cloud.de>
+Date: Wed, 19 Feb 2025 16:15:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
+ hawk@kernel.org
+References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
+ <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
+ <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
+ <dee9bc39-e666-4d97-8a42-240ffb458bcc@hetzner-cloud.de>
+ <67b5f392408d7_1b78d8294e7@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
+ xsFNBGJGrHIBEADXeHfBzzMvCfipCSW1oRhksIillcss321wYAvXrQ03a9VN2XJAzwDB/7Sa
+ N2Oqs6JJv4u5uOhaNp1Sx8JlhN6Oippc6MecXuQu5uOmN+DHmSLObKVQNC9I8PqEF2fq87zO
+ DCDViJ7VbYod/X9zUHQrGd35SB0PcDkXE5QaPX3dpz77mXFFWs/TvP6IvM6XVKZce3gitJ98
+ JO4pQ1gZniqaX4OSmgpHzHmaLCWZ2iU+Kn2M0KD1+/ozr/2bFhRkOwXSMYIdhmOXx96zjqFV
+ vIHa1vBguEt/Ax8+Pi7D83gdMCpyRCQ5AsKVyxVjVml0e/FcocrSb9j8hfrMFplv+Y43DIKu
+ kPVbE6pjHS+rqHf4vnxKBi8yQrfIpQqhgB/fgomBpIJAflu0Phj1nin/QIqKfQatoz5sRJb0
+ khSnRz8bxVM6Dr/T9i+7Y3suQGNXZQlxmRJmw4CYI/4zPVcjWkZyydq+wKqm39SOo4T512Nw
+ fuHmT6SV9DBD6WWevt2VYKMYSmAXLMcCp7I2EM7aYBEBvn5WbdqkamgZ36tISHBDhJl/k7pz
+ OlXOT+AOh12GCBiuPomnPkyyIGOf6wP/DW+vX6v5416MWiJaUmyH9h8UlhlehkWpEYqw1iCA
+ Wn6TcTXSILx+Nh5smWIel6scvxho84qSZplpCSzZGaidHZRytwARAQABzTZNYXJjdXMgV2lj
+ aGVsbWFubiA8bWFyY3VzLndpY2hlbG1hbm5AaGV0em5lci1jbG91ZC5kZT7CwZgEEwEIAEIW
+ IQQVqNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbAwUJEswDAAULCQgHAgMiAgEGFQoJCAsC
+ BBYCAwECHgcCF4AACgkQSdMHv5+sRw4BNxAAlfufPZnHm+WKbvxcPVn6CJyexfuE7E2UkJQl
+ s/JXI+OGRhyqtguFGbQS6j7I06dJs/whj9fOhOBAHxFfMG2UkraqgAOlRUk/YjA98Wm9FvcQ
+ RGZe5DhAekI5Q9I9fBuhxdoAmhhKc/g7E5y/TcS1s2Cs6gnBR5lEKKVcIb0nFzB9bc+oMzfV
+ caStg+PejetxR/lMmcuBYi3s51laUQVCXV52bhnv0ROk0fdSwGwmoi2BDXljGBZl5i5n9wuQ
+ eHMp9hc5FoDF0PHNgr+1y9RsLRJ7sKGabDY6VRGp0MxQP0EDPNWlM5RwuErJThu+i9kU6D0e
+ HAPyJ6i4K7PsjGVE2ZcvOpzEr5e46bhIMKyfWzyMXwRVFuwE7erxvvNrSoM3SzbCUmgwC3P3
+ Wy30X7NS5xGOCa36p2AtqcY64ZwwoGKlNZX8wM0khaVjPttsynMlwpLcmOulqABwaUpdluUg
+ soqKCqyijBOXCeRSCZ/KAbA1FOvs3NnC9nVqeyCHtkKfuNDzqGY3uiAoD67EM/R9N4QM5w0X
+ HpxgyDk7EC1sCqdnd0N07BBQrnGZACOmz8pAQC2D2coje/nlnZm1xVK1tk18n6fkpYfR5Dnj
+ QvZYxO8MxP6wXamq2H5TRIzfLN1C2ddRsPv4wr9AqmbC9nIvfIQSvPMBx661kznCacANAP/O
+ wU0EYkascgEQAK15Hd7arsIkP7knH885NNcqmeNnhckmu0MoVd11KIO+SSCBXGFfGJ2/a/8M
+ y86SM4iL2774YYMWePscqtGNMPqa8Uk0NU76ojMbWG58gow2dLIyajXj20sQYd9RbNDiQqWp
+ RNmnp0o8K8lof3XgrqjwlSAJbo6JjgdZkun9ZQBQFDkeJtffIv6LFGap9UV7Y3OhU+4ZTWDM
+ XH76ne9u2ipTDu1pm9WeejgJIl6A7Z/7rRVpp6Qlq4Nm39C/ReNvXQIMT2l302wm0xaFQMfK
+ jAhXV/2/8VAAgDzlqxuRGdA8eGfWujAq68hWTP4FzRvk97L4cTu5Tq8WIBMpkjznRahyTzk8
+ 7oev+W5xBhGe03hfvog+pA9rsQIWF5R1meNZgtxR+GBj9bhHV+CUD6Fp+M0ffaevmI5Untyl
+ AqXYdwfuOORcD9wHxw+XX7T/Slxq/Z0CKhfYJ4YlHV2UnjIvEI7EhV2fPhE4WZf0uiFOWw8X
+ XcvPA8u0P1al3EbgeHMBhWLBjh8+Y3/pm0hSOZksKRdNR6PpCksa52ioD+8Z/giTIDuFDCHo
+ p4QMLrv05kA490cNAkwkI/yRjrKL3eGg26FCBh2tQKoUw2H5pJ0TW67/Mn2mXNXjen9hDhAG
+ 7gU40lS90ehhnpJxZC/73j2HjIxSiUkRpkCVKru2pPXx+zDzABEBAAHCwXwEGAEIACYWIQQV
+ qNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbDAUJEswDAAAKCRBJ0we/n6xHDsmpD/9/4+pV
+ IsnYMClwfnDXNIU+x6VXTT/8HKiRiotIRFDIeI2skfWAaNgGBWU7iK7FkF/58ys8jKM3EykO
+ D5lvLbGfI/jrTcJVIm9bXX0F1pTiu3SyzOy7EdJur8Cp6CpCrkD+GwkWppNHP51u7da2zah9
+ CQx6E1NDGM0gSLlCJTciDi6doAkJ14aIX58O7dVeMqmabRAv6Ut45eWqOLvgjzBvdn1SArZm
+ 7AQtxT7KZCz1yYLUgA6TG39bhwkXjtcfT0J4967LuXTgyoKCc969TzmwAT+pX3luMmbXOBl3
+ mAkwjD782F9sP8D/9h8tQmTAKzi/ON+DXBHjjqGrb8+rCocx2mdWLenDK9sNNsvyLb9oKJoE
+ DdXuCrEQpa3U79RGc7wjXT9h/8VsXmA48LSxhRKn2uOmkf0nCr9W4YmrP+g0RGeCKo3yvFxS
+ +2r2hEb/H7ZTP5PWyJM8We/4ttx32S5ues5+qjlqGhWSzmCcPrwKviErSiBCr4PtcioTBZcW
+ VUssNEOhjUERfkdnHNeuNBWfiABIb1Yn7QC2BUmwOvN2DsqsChyfyuknCbiyQGjAmj8mvfi/
+ 18FxnhXRoPx3wr7PqGVWgTJD1pscTrbKnoI1jI1/pBCMun+q9v6E7JCgWY181WjxgKSnen0n
+ wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
+Subject: Re: [PATCH bpf-next v2 2/6] net: tun: enable transfer of XDP metadata
+ to skb
+In-Reply-To: <67b5f392408d7_1b78d8294e7@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27554/Wed Feb 19 10:50:24 2025)
 
-> > > Now I wonder if I should use the u8 sk_bpf_cb_flags in V13 or just
-> > > keep it as-is? Either way is fine with me :) bpf_sock_ops_cb_flags
-> > > uses u8 as an example, thus I think we prefer the former?
-> >
-> > If it fits in a u8 and that in practice also results in less memory
-> > and cache pressure (i.e., does not just add a 24b hole), then it is a
-> > net improvement.
+Am 19.02.25 um 16:06 schrieb Willem de Bruijn:
+> Marcus Wichelmann wrote:
+>> Am 18.02.25 um 02:47 schrieb Willem de Bruijn:
+>>> [...]
+>>> This is pointer comparison, which is tricky wrt type. It likely is
+>>> ptrdiff_t and thus signed. But may want to use max_t(long int, ..) to
+>>> make this explicit.
+>>
+>> Ah, I see, good point.
+>>
+>> So like that?
+>>
+>> 	metasize = max_t(long int, xdp->data - xdp->data_meta, 0);
+>> 	if (metasize)
+>> 		skb_metadata_set(skb, metasize);
 > 
-> Probably I didn't state it clearly. I agree with you on saving memory:)
+> Or just this? Also ensures the test uses signed int.
 > 
-> In the previous response, I was trying to keep the sk_bpf_cb_flags
-> flag and use a u8 instead. I admit u32 is too large after you noticed
-> this.
+>      int metasize;
 > 
-> Would the following diff on top of this series be acceptable for you?
-> And would it be a proper place to put the u8 sk_bpf_cb_flags in struct
-> sock?
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 6f4d54faba92..e85d6fb3a2ba 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -447,7 +447,7 @@ struct sock {
->         int                     sk_forward_alloc;
->         u32                     sk_tsflags;
->  #define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG))
-> -       u32                     sk_bpf_cb_flags;
-> +       u8                      sk_bpf_cb_flags;
->         __cacheline_group_end(sock_write_rxtx);
+>      ...
 > 
->         __cacheline_group_begin(sock_write_tx);
 > 
-> The following output is the result of running 'pahole --hex -C sock vmlinux'.
-> Before this series:
->         u32                        sk_tsflags;           /* 0x168   0x4 */
->         __u8
-> __cacheline_group_end__sock_write_rxtx[0]; /* 0x16c     0 */
->         __u8
-> __cacheline_group_begin__sock_write_tx[0]; /* 0x16c     0 */
->         int                        sk_write_pending;     /* 0x16c   0x4 */
->         atomic_t                   sk_omem_alloc;        /* 0x170   0x4 */
->         int                        sk_sndbuf;            /* 0x174   0x4 */
->         int                        sk_wmem_queued;       /* 0x178   0x4 */
->         refcount_t                 sk_wmem_alloc;        /* 0x17c   0x4 */
->         /* --- cacheline 6 boundary (384 bytes) --- */
->         long unsigned int          sk_tsq_flags;         /* 0x180   0x8 */
-> ...
-> /* sum members: 773, holes: 1, sum holes: 1 */
+>      metasize = xdp->data - xdp->data_meta;
+>      if (metasize > 0)
+>              skb_metadata_set(skb, metasize);
 > 
-> After this diff patch:
->         u32                        sk_tsflags;           /* 0x168   0x4 */
->         u8                         sk_bpf_cb_flags;      /* 0x16c   0x1 */
->         __u8
-> __cacheline_group_end__sock_write_rxtx[0]; /* 0x16d     0 */
->         __u8
-> __cacheline_group_begin__sock_write_tx[0]; /* 0x16d     0 */
-> 
->         /* XXX 3 bytes hole, try to pack */
-> 
->         int                        sk_write_pending;     /* 0x170   0x4 */
->         atomic_t                   sk_omem_alloc;        /* 0x174   0x4 */
->         int                        sk_sndbuf;            /* 0x178   0x4 */
->         int                        sk_wmem_queued;       /* 0x17c   0x4 */
->         /* --- cacheline 6 boundary (384 bytes) --- */
->         refcount_t                 sk_wmem_alloc;        /* 0x180   0x4 */
-> 
->         /* XXX 4 bytes hole, try to pack */
-> 
->         long unsigned int          sk_tsq_flags;         /* 0x188   0x8 */
-> ...
-> /* sum members: 774, holes: 3, sum holes: 8 */
-> 
-> It will introduce 7 extra sum holes if this series with this u8 change
-> gets applied. I think it's a proper position because this new
-> sk_bpf_cb_flags will be used in the tx and rx path just like
-> sk_tsflags, aligned with rules introduced by the commit[1].
 
-Reducing a u64 to u8 can leave 7b of holes, but that is not great,
-of course.
+Well, yeah, just keep it simple I guess. ;) Will do that.
 
-Since this bitmap is only touched if a BPF program is loaded, arguably
-it need not be in the hot path cacheline groups.
+I'll send a V3 patch series with the change.
 
-Can you find a hole further down to place this in, or at least a spot
-that does not result in 7b of wasted space (in the hotpath cacheline
-groups of all places).
+Thanks!
+
+Marcus
 
