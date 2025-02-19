@@ -1,501 +1,203 @@
-Return-Path: <netdev+bounces-167650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D0CA3B54F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:56:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A1DA3B5A5
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 805803BA0A7
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:49:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8A203BBF65
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243CF1DED70;
-	Wed, 19 Feb 2025 08:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CCE1E8329;
+	Wed, 19 Feb 2025 08:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="befVdJ2m"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="PVSvwqaq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AA01DED45;
-	Wed, 19 Feb 2025 08:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFA81E8322;
+	Wed, 19 Feb 2025 08:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739954446; cv=none; b=pTFT/Mfx3Qo9jfeo1iYYplSMvNBpNr7m6neZERHXjKshuuPp9y1bjoOL7FThEbcdf7MrI5XG2pKfBTtBJ3rWgD8aDQUVskkREKFfOK3L2/THNmHD0MMT6X/72AxDbRxS8ENrZyqQbEK+Nrr1daqO5vM2F/5hluP0vUNMWWR4Os8=
+	t=1739954739; cv=none; b=OdhHTwMvkjS5YynwTP1d1eBoLmxuBsKedsXWvmY9PQNh3nc1Q8uWHiXZ9rLoKZKlXkdJUvf/oLCTYmBFC9zyWu1GgCFnDRuEPaJXsSeN/RQjQxf+UbmIveRBwG/daWOdYdeArB8tnKJBd9fAXlA4Bmwex95ae/M/iZJDwFROtOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739954446; c=relaxed/simple;
-	bh=ApGcgOvtCnBLvanSjdTgCrFB58XxB2j29CZS5NHrlEI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D8hO1JokKvebjlwqQxO9Rj4wE9dKqJu4d4YNJABNbd7fRKYh4wlGpK/0N9FX+J3Xn6ARdmB5seb+HkPFg6MzB/5SU8IDhhHMfqccHUgh1cDdmFd40hX0BR2JFLjO2YzuSNGcIMcXSfEP0aiJpmjTRMhB+XeBiJePfKU6LWsZ4CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=befVdJ2m; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 2e0c797eee9d11ef8eb9c36241bbb6fb-20250219
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=aJl4p8lV5Ys/nT/3s9l0MVg638VfRDTXS7o2JL6bcb0=;
-	b=befVdJ2mjNPgDMtc2NdcBGZ0OeUcuuRSHcBNzU7p6SKaVXZLX3MxF+bVaJ34Kjqnc5+hrFcjnMvRPrlZgpHdwYifmWxZUyUBdI4X46gCLJHlMimkTmPQXsTaXZ1WAK50XoujHng0i6V15P8jsajhaBXoleRjNkLRGGdtWa/szeI=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.46,REQID:525b34e4-3eed-4130-a047-5f7bdb2748c8,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-50
-X-CID-META: VersionHash:60aa074,CLOUDID:8ead4ba4-5c06-4e72-8298-91cabc9efadf,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:81|82|102,TC:nil,Content:0|50,EDM:1,
-	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
-	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 2e0c797eee9d11ef8eb9c36241bbb6fb-20250219
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 235903503; Wed, 19 Feb 2025 16:40:32 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 19 Feb 2025 16:40:30 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.28 via Frontend Transport; Wed, 19 Feb 2025 16:40:30 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Simon
- Horman" <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, Sky Huang
-	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for built-in 2.5G ethernet PHY on MT7988
-Date: Wed, 19 Feb 2025 16:39:10 +0800
-Message-ID: <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1739954739; c=relaxed/simple;
+	bh=N8FKd1y9sx2kP6D+NpX8eCIKG+Qi7i1WGdQ3MQuOdIE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ed022N4eQVSyqN3tyHIBTzWtfh4HLVkb6Q7yKLr/DoWAh2y9RjGoeyZ+z2kNXOEcmSzOhiJp69pTm8tOAs2aBjarHvH08WzY4oJwV7a7vJ46LW5SZSZeHMNulnY3xeghWO4me3rE7QG2M8mgZuPYe7uQvsuJq6YnVqWXtSiqXBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=PVSvwqaq; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1739954733; x=1740559533; i=ps.report@gmx.net;
+	bh=N8FKd1y9sx2kP6D+NpX8eCIKG+Qi7i1WGdQ3MQuOdIE=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=PVSvwqaqWxq+jCB+AtxPzPKKUFODgyMrZ7gt+K2NoBAWk/LrDDOaSzB4fGegAl+X
+	 rgmUGv7czPdp2a6bqiZI4cARsZGp/z/9Ub8aU0rTF21URu9PbvlVgwC2QXIROMWnc
+	 JI3VNKlqrryVpPzPFz1+yN6orm57JQKR9Jy81U3+3TmYdgcX8+lOCA/RzyRO2NtO/
+	 nWiuAdrDqmoZJ9rT14R44ZTlVvbH8jX61wOEy2oRlzXlBFAEyxg61m15KABOR9kr9
+	 1jsIFSS5zjySPYGJ9jp7EbDFzzj4RWsoE+bTHy9JJuxgLKTR3nTnOpTTe8eiBHywb
+	 SJxTob31coav4S7WGg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost.fritz.box ([82.135.81.84]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M72oH-1thcm22gQx-001O5Z; Wed, 19
+ Feb 2025 09:45:33 +0100
+From: Peter Seiderer <ps.report@gmx.net>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Peter Seiderer <ps.report@gmx.net>,
+	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
+	Frederic Weisbecker <frederic@kernel.org>
+Subject: [PATCH net-next v6 0/7] Some pktgen fixes/improvments (part I)
+Date: Wed, 19 Feb 2025 09:45:20 +0100
+Message-ID: <20250219084527.20488-1-ps.report@gmx.net>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+Content-Transfer-Encoding: base64
+X-Provags-ID: V03:K1:CU1ll5xGBegrW6P8sRPmNQW2NPo7XEfPHpUPvfxRXq7M88ncuA2
+ Hp+MjRwt+awObOF7FOSMPJh8Ug4rNKaKyd9Vh6vp1fqAaOrsTqwa3GY8kTHVNjNsnZRjyrQ
+ xqncPYjiyK3JpHrmnsXu8x2zL1npr1ewPZZGXUmcD0FQ1RIXBGLlpIX2OA6OA7RZy1ezjXU
+ sPexsr2e6OHli9wpoGUYQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Z5sx5iUzW30=;ziBqDdH42UmN0p2nBrl9K+I29Rf
+ XWU9+b882/YCmTNf4R7YpGQinXT8yGKXEr3NZC7EwSeiXBVZeJTZx3MjgDg3rApbEfqheyCGb
+ 7bZU0pD//6czmww1elfZh0IuNxu8mV7EO+l8i59Avtg4KJTvYzmXs3TDW/hyCQk12xKNbVk5z
+ VPkBQ5+PhIU0xy5X/ESMXs4S5AJnMzmPJ4oenpMes+SfxiWM2piA9McghfSPylLhDSuROxHob
+ 6uYrbwEoPNVn396RlyTGkoqz0MzpR0mHpI/K9UOPOyvbsUGyn1oXd4zRuWTfvijOu4upLiOzi
+ DSFU7lSUM3fPJH2SonND0D0m7vXjenYIZdizXqdQLO72Sttbtik3GVGSWihU3TNR2w40xPmZq
+ SNYh7vsmD8Z5utaKAnoYPNtJMxOuxDKMUxDDuUwUDZgF9I66pmtvMPcWZ2v0eYQDmJsmD0jQn
+ cDDv1SnFmojhpBpRp5ccR9/8ThWI2FFQNiWoUDjpADX9+CcfoFMOAop5qiSMlOBQB+jyr4no8
+ ULbb3XGokXwsfAJL3N3jgO9RlY3HLkeTEh7SHGvyNmjzEaS0bmND+ePFMlUORfKAGlQ9vYe5B
+ +07yWgLu7bxus8FEYngZt28S5QaYnD25MeG5o/8298tjFRVKuFLOBlZDNJQStuUCO5AEiye6C
+ v56dN2P/LMOgkWRn5aN7uJo+/O2LqOZYwYmJ3cZ7kNh3DUywRgrhB7q1uok6RvRWKgD1fBqdf
+ +q4QfCJUBjJfgzF1xnhvWQU4h0VKUHf+ldLB5yCLF6w5SmGBMCIt5nNUXhdkDaeVuOYdZDjID
+ 7XL36/rfcSlT8pJAiPpPpppicgVR9wLlrZAW+wgF5/STxiEWF0n4eJa5KOsoF9wZ3AhOU/L/w
+ 6b2MP4oOuYzCvMTPMT+wnFWfrz3UZEEWkz3u3/esam/1fvFci7GB9tdVFsenRocYoz82xC2d6
+ 6a/82tl0lr78JopktcoJYNeKrJNPzx8ZxmAXGHmiOQ1F3h8s+2iGrQZjsm7dQJDXdNqLOZVjI
+ Shqa1OPUR/wH+lf1guAmCv79KzRFRaRtcsF56sYCdMxgNOnXf50p6hMkQlKlDV5+VxQnzZZpR
+ DaYUW5UNUrzn6ir5+bdBx2nYXM4m8rYgxwEbtR7U369vVmh6/dZygYMFe9lIYkaL96vHJp8ED
+ K80e5zmuwOsQCFFItClgrv56PxkzgQnbscdEVHaq5EamaJkQtHj6DQCn1hXCzEsOU8O8WOdAH
+ hD9Z4a5cg06ypNbAO/3vocewMDX4kNH0Z3S1fihkVWw4ACBA2ux3PnPi2vILotpgRPQJjjF98
+ mAEPbgHXkdG9NkeuJkBHHz/kEUK2psmdzQ14Gds3Le1OuuTGeYzssDHSixvY55HQqKGq7N1XK
+ 2jk3eBbv74OSvL988OXGSaEdeaPukLByNh6utEGaU8WHc8oJByN0izvXKZ
 
-From: Sky Huang <skylake.huang@mediatek.com>
-
-Add support for internal 2.5Gphy on MT7988. This driver will load
-necessary firmware and add appropriate time delay to make sure
-that firmware works stably. Also, certain control registers will
-be set to fix link-up issues.
-
-Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
----
- MAINTAINERS                          |   1 +
- drivers/net/phy/mediatek/Kconfig     |  11 +
- drivers/net/phy/mediatek/Makefile    |   1 +
- drivers/net/phy/mediatek/mtk-2p5ge.c | 346 +++++++++++++++++++++++++++
- 4 files changed, 359 insertions(+)
- create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 42ec8b8d03bf..250ffe90b056 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14720,6 +14720,7 @@ M:	Sky Huang <SkyLake.Huang@mediatek.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/net/mediatek,2p5gphy-fw.yaml
-+F:	drivers/net/phy/mediatek/mtk-2p5ge.c
- F:	drivers/net/phy/mediatek/mtk-ge-soc.c
- F:	drivers/net/phy/mediatek/mtk-phy-lib.c
- F:	drivers/net/phy/mediatek/mtk-ge.c
-diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kconfig
-index 2a8ac5aed0f8..02d0c215cfe0 100644
---- a/drivers/net/phy/mediatek/Kconfig
-+++ b/drivers/net/phy/mediatek/Kconfig
-@@ -25,3 +25,14 @@ config MEDIATEK_GE_SOC_PHY
- 	  the MT7981 and MT7988 SoCs. These PHYs need calibration data
- 	  present in the SoCs efuse and will dynamically calibrate VCM
- 	  (common-mode voltage) during startup.
-+
-+config MEDIATEK_2P5GE_PHY
-+	tristate "MediaTek 2.5Gb Ethernet PHYs"
-+	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
-+	select MTK_NET_PHYLIB
-+	help
-+	  Supports MediaTek SoC built-in 2.5Gb Ethernet PHYs.
-+
-+	  This will load necessary firmware and add appropriate time delay.
-+	  Accelerate this procedure through internal pbus instead of MDIO
-+	  bus. Certain link-up issues will also be fixed here.
-diff --git a/drivers/net/phy/mediatek/Makefile b/drivers/net/phy/mediatek/Makefile
-index 814879d0abe5..c6db8abd2c9c 100644
---- a/drivers/net/phy/mediatek/Makefile
-+++ b/drivers/net/phy/mediatek/Makefile
-@@ -2,3 +2,4 @@
- obj-$(CONFIG_MTK_NET_PHYLIB)		+= mtk-phy-lib.o
- obj-$(CONFIG_MEDIATEK_GE_PHY)		+= mtk-ge.o
- obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mtk-ge-soc.o
-+obj-$(CONFIG_MEDIATEK_2P5GE_PHY)	+= mtk-2p5ge.o
-diff --git a/drivers/net/phy/mediatek/mtk-2p5ge.c b/drivers/net/phy/mediatek/mtk-2p5ge.c
-new file mode 100644
-index 000000000000..adb03df331ab
---- /dev/null
-+++ b/drivers/net/phy/mediatek/mtk-2p5ge.c
-@@ -0,0 +1,346 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+#include <linux/bitfield.h>
-+#include <linux/firmware.h>
-+#include <linux/module.h>
-+#include <linux/nvmem-consumer.h>
-+#include <linux/of_address.h>
-+#include <linux/of_platform.h>
-+#include <linux/pinctrl/consumer.h>
-+#include <linux/phy.h>
-+#include <linux/pm_domain.h>
-+#include <linux/pm_runtime.h>
-+
-+#include "mtk.h"
-+
-+#define MTK_2P5GPHY_ID_MT7988	(0x00339c11)
-+
-+#define MT7988_2P5GE_PMB_FW		"mediatek/mt7988/i2p5ge-phy-pmb.bin"
-+#define MT7988_2P5GE_PMB_FW_SIZE	(0x20000)
-+#define MD32_EN_CFG			(0x18)
-+#define   MD32_EN			BIT(0)
-+
-+#define BASE100T_STATUS_EXTEND		(0x10)
-+#define BASE1000T_STATUS_EXTEND		(0x11)
-+#define EXTEND_CTRL_AND_STATUS		(0x16)
-+
-+#define PHY_AUX_CTRL_STATUS		(0x1d)
-+#define   PHY_AUX_DPX_MASK		GENMASK(5, 5)
-+#define   PHY_AUX_SPEED_MASK		GENMASK(4, 2)
-+
-+/* Registers on MDIO_MMD_VEND1 */
-+#define MTK_PHY_LPI_PCS_DSP_CTRL		(0x121)
-+#define   MTK_PHY_LPI_SIG_EN_LO_THRESH100_MASK	GENMASK(12, 8)
-+
-+#define MTK_PHY_HOST_CMD1		0x800e
-+#define MTK_PHY_HOST_CMD2		0x800f
-+/* Registers on Token Ring debug nodes */
-+/* ch_addr = 0x0, node_addr = 0xf, data_addr = 0x3c */
-+#define AUTO_NP_10XEN				BIT(6)
-+
-+struct mtk_i2p5ge_phy_priv {
-+	bool fw_loaded;
-+};
-+
-+enum {
-+	PHY_AUX_SPD_10 = 0,
-+	PHY_AUX_SPD_100,
-+	PHY_AUX_SPD_1000,
-+	PHY_AUX_SPD_2500,
-+};
-+
-+static int mt798x_2p5ge_phy_load_fw(struct phy_device *phydev)
-+{
-+	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-+	void __iomem *mcu_csr_base, *pmb_addr;
-+	struct device *dev = &phydev->mdio.dev;
-+	const struct firmware *fw;
-+	struct device_node *np;
-+	int ret, i;
-+	u32 reg;
-+
-+	if (priv->fw_loaded)
-+		return 0;
-+
-+	np = of_find_compatible_node(NULL, NULL, "mediatek,2p5gphy-fw");
-+	if (!np)
-+		return -ENOENT;
-+
-+	pmb_addr = of_iomap(np, 1);
-+	if (!pmb_addr)
-+		return -ENOMEM;
-+	mcu_csr_base = of_iomap(np, 2);
-+	if (!mcu_csr_base) {
-+		ret = -ENOMEM;
-+		goto free_pmb;
-+	}
-+
-+	ret = request_firmware(&fw, MT7988_2P5GE_PMB_FW, dev);
-+	if (ret) {
-+		dev_err(dev, "failed to load firmware: %s, ret: %d\n",
-+			MT7988_2P5GE_PMB_FW, ret);
-+		goto free;
-+	}
-+
-+	if (fw->size != MT7988_2P5GE_PMB_FW_SIZE) {
-+		dev_err(dev, "Firmware size 0x%zx != 0x%x\n",
-+			fw->size, MT7988_2P5GE_PMB_FW_SIZE);
-+		ret = -EINVAL;
-+		goto release_fw;
-+	}
-+
-+	reg = readw(mcu_csr_base + MD32_EN_CFG);
-+	if (reg & MD32_EN) {
-+		phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-+		usleep_range(10000, 11000);
-+	}
-+	phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN);
-+
-+	/* Write magic number to safely stall MCU */
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_HOST_CMD1, 0x1100);
-+	phy_write_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_HOST_CMD2, 0x00df);
-+
-+	for (i = 0; i < MT7988_2P5GE_PMB_FW_SIZE - 1; i += 4)
-+		writel(*((uint32_t *)(fw->data + i)), pmb_addr + i);
-+	dev_info(dev, "Firmware date code: %x/%x/%x, version: %x.%x\n",
-+		 be16_to_cpu(*((__be16 *)(fw->data +
-+					  MT7988_2P5GE_PMB_FW_SIZE - 8))),
-+		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 6),
-+		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 5),
-+		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 2),
-+		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 1));
-+
-+	writew(reg & ~MD32_EN, mcu_csr_base + MD32_EN_CFG);
-+	writew(reg | MD32_EN, mcu_csr_base + MD32_EN_CFG);
-+	phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-+	/* We need a delay here to stabilize initialization of MCU */
-+	usleep_range(7000, 8000);
-+	dev_info(dev, "Firmware loading/trigger ok.\n");
-+
-+	priv->fw_loaded = true;
-+
-+release_fw:
-+	release_firmware(fw);
-+free:
-+	iounmap(mcu_csr_base);
-+free_pmb:
-+	iounmap(pmb_addr);
-+
-+	return ret;
-+}
-+
-+static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-+{
-+	struct pinctrl *pinctrl;
-+	int ret;
-+
-+	/* Check if PHY interface type is compatible */
-+	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
-+		return -ENODEV;
-+
-+	ret = mt798x_2p5ge_phy_load_fw(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Setup LED */
-+	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_ON_CTRL,
-+			 MTK_PHY_LED_ON_POLARITY | MTK_PHY_LED_ON_LINK10 |
-+			 MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK1000 |
-+			 MTK_PHY_LED_ON_LINK2500);
-+	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
-+			 MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX);
-+
-+	/* Switch pinctrl after setting polarity to avoid bogus blinking */
-+	pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "i2p5gbe-led");
-+	if (IS_ERR(pinctrl))
-+		dev_err(&phydev->mdio.dev, "Fail to set LED pins!\n");
-+
-+	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_LPI_PCS_DSP_CTRL,
-+		       MTK_PHY_LPI_SIG_EN_LO_THRESH100_MASK, 0);
-+
-+	/* Enable 16-bit next page exchange bit if 1000-BT isn't advertising */
-+	mtk_tr_modify(phydev, 0x0, 0xf, 0x3c, AUTO_NP_10XEN,
-+		      FIELD_PREP(AUTO_NP_10XEN, 0x1));
-+
-+	/* Enable HW auto downshift */
-+	phy_modify_paged(phydev, MTK_PHY_PAGE_EXTENDED_1,
-+			 MTK_PHY_AUX_CTRL_AND_STATUS,
-+			 0, MTK_PHY_ENABLE_DOWNSHIFT);
-+
-+	return 0;
-+}
-+
-+static int mt798x_2p5ge_phy_config_aneg(struct phy_device *phydev)
-+{
-+	bool changed = false;
-+	u32 adv;
-+	int ret;
-+
-+	ret = genphy_c45_an_config_aneg(phydev);
-+	if (ret < 0)
-+		return ret;
-+	if (ret > 0)
-+		changed = true;
-+
-+	/* Clause 45 doesn't define 1000BaseT support. Use Clause 22 instead in
-+	 * our design.
-+	 */
-+	adv = linkmode_adv_to_mii_ctrl1000_t(phydev->advertising);
-+	ret = phy_modify_changed(phydev, MII_CTRL1000, ADVERTISE_1000FULL, adv);
-+	if (ret < 0)
-+		return ret;
-+	if (ret > 0)
-+		changed = true;
-+
-+	return __genphy_config_aneg(phydev, changed);
-+}
-+
-+static int mt798x_2p5ge_phy_get_features(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_c45_pma_read_abilities(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* This phy can't handle collision, and neither can (XFI)MAC it's
-+	 * connected to. Although it can do HDX handshake, it doesn't support
-+	 * CSMA/CD that HDX requires.
-+	 */
-+	linkmode_clear_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
-+			   phydev->supported);
-+
-+	return 0;
-+}
-+
-+static int mt798x_2p5ge_phy_read_status(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* When MDIO_STAT1_LSTATUS is raised genphy_c45_read_link(), this phy
-+	 * actually hasn't finished AN. So use CL22's link update function
-+	 * instead.
-+	 */
-+	ret = genphy_update_link(phydev);
-+	if (ret)
-+		return ret;
-+
-+	phydev->speed = SPEED_UNKNOWN;
-+	phydev->duplex = DUPLEX_UNKNOWN;
-+	phydev->pause = 0;
-+	phydev->asym_pause = 0;
-+
-+	/* We'll read link speed through vendor specific registers down below.
-+	 * So remove phy_resolve_aneg_linkmode (AN on) & genphy_c45_read_pma
-+	 * (AN off).
-+	 */
-+	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
-+		ret = genphy_c45_read_lpa(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		/* Clause 45 doesn't define 1000BaseT support. Read the link
-+		 * partner's 1G advertisement via Clause 22.
-+		 */
-+		ret = phy_read(phydev, MII_STAT1000);
-+		if (ret < 0)
-+			return ret;
-+		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, ret);
-+	} else if (phydev->autoneg == AUTONEG_DISABLE) {
-+		linkmode_zero(phydev->lp_advertising);
-+	}
-+
-+	if (phydev->link) {
-+		ret = phy_read(phydev, PHY_AUX_CTRL_STATUS);
-+		if (ret < 0)
-+			return ret;
-+
-+		switch (FIELD_GET(PHY_AUX_SPEED_MASK, ret)) {
-+		case PHY_AUX_SPD_10:
-+			phydev->speed = SPEED_10;
-+			break;
-+		case PHY_AUX_SPD_100:
-+			phydev->speed = SPEED_100;
-+			break;
-+		case PHY_AUX_SPD_1000:
-+			phydev->speed = SPEED_1000;
-+			break;
-+		case PHY_AUX_SPD_2500:
-+			phydev->speed = SPEED_2500;
-+			break;
-+		}
-+
-+		phydev->duplex = DUPLEX_FULL;
-+		/* FIXME:
-+		 * The current firmware always enables rate adaptation mode.
-+		 */
-+		phydev->rate_matching = RATE_MATCH_PAUSE;
-+	}
-+
-+	return 0;
-+}
-+
-+static int mt798x_2p5ge_phy_get_rate_matching(struct phy_device *phydev,
-+					      phy_interface_t iface)
-+{
-+	return RATE_MATCH_PAUSE;
-+}
-+
-+static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
-+{
-+	struct mtk_i2p5ge_phy_priv *priv;
-+
-+	priv = devm_kzalloc(&phydev->mdio.dev,
-+			    sizeof(struct mtk_i2p5ge_phy_priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	switch (phydev->drv->phy_id) {
-+	case MTK_2P5GPHY_ID_MT7988:
-+		/* The original hardware only sets MDIO_DEVS_PMAPMD */
-+		phydev->c45_ids.mmds_present |= MDIO_DEVS_PCS |
-+						MDIO_DEVS_AN |
-+						MDIO_DEVS_VEND1 |
-+						MDIO_DEVS_VEND2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	priv->fw_loaded = false;
-+	phydev->priv = priv;
-+
-+	mtk_phy_leds_state_init(phydev);
-+
-+	return 0;
-+}
-+
-+static struct phy_driver mtk_2p5gephy_driver[] = {
-+	{
-+		PHY_ID_MATCH_MODEL(MTK_2P5GPHY_ID_MT7988),
-+		.name = "MediaTek MT7988 2.5GbE PHY",
-+		.probe = mt798x_2p5ge_phy_probe,
-+		.config_init = mt798x_2p5ge_phy_config_init,
-+		.config_aneg = mt798x_2p5ge_phy_config_aneg,
-+		.get_features = mt798x_2p5ge_phy_get_features,
-+		.read_status = mt798x_2p5ge_phy_read_status,
-+		.get_rate_matching = mt798x_2p5ge_phy_get_rate_matching,
-+		.suspend = genphy_suspend,
-+		.resume = genphy_resume,
-+		.read_page = mtk_phy_read_page,
-+		.write_page = mtk_phy_write_page,
-+	},
-+};
-+
-+module_phy_driver(mtk_2p5gephy_driver);
-+
-+static struct mdio_device_id __maybe_unused mtk_2p5ge_phy_tbl[] = {
-+	{ PHY_ID_MATCH_VENDOR(0x00339c00) },
-+	{ }
-+};
-+
-+MODULE_DESCRIPTION("MediaTek 2.5Gb Ethernet PHY driver");
-+MODULE_AUTHOR("SkyLake Huang <SkyLake.Huang@mediatek.com>");
-+MODULE_LICENSE("GPL");
-+
-+MODULE_DEVICE_TABLE(mdio, mtk_2p5ge_phy_tbl);
-+MODULE_FIRMWARE(MT7988_2P5GE_PMB_FW);
--- 
-2.45.2
-
+V2hpbGUgdGFraW5nIGEgbG9vayBhdCAnW1BBVENIIG5ldF0gcGt0Z2VuOiBBdm9pZCBvdXQtb2Yt
+cmFuZ2UgaW4KZ2V0X2ltaXhfZW50cmllcycgKFsxXSkgYW5kICdbUEFUQ0ggbmV0IHYyXSBwa3Rn
+ZW46IEF2b2lkIG91dC1vZi1ib3VuZHMKYWNjZXNzIGluIGdldF9pbWl4X2VudHJpZXMnIChbMl0s
+IFszXSkgYW5kIGRvaW5nIHNvbWUgdGVzdHMgYW5kIGNvZGUgcmV2aWV3CkkgZGV0ZWN0ZWQgdGhh
+dCB0aGUgL3Byb2MvbmV0L3BrdGdlbi8uLi4gcGFyc2luZyBsb2dpYyBkb2VzIG5vdCBob25vdXIg
+dGhlCnVzZXIgZ2l2ZW4gYnVmZmVyIGJvdW5kcyAocmVzdWx0aW5nIGluIG91dC1vZi1ib3VuZHMg
+YWNjZXNzKS4KClRoaXMgY2FuIGJlIG9ic2VydmVkIGUuZy4gYnkgdGhlIGZvbGxvd2luZyBzaW1w
+bGUgdGVzdCAoc29tZXRpbWVzIHRoZQpvbGQvJ2xvbmdlcicgcHJldmlvdXMgdmFsdWUgaXMgcmUt
+cmVhZCBmcm9tIHRoZSBidWZmZXIpOgoKICAgICAgICAkIGVjaG8gYWRkX2RldmljZSBsb0AwID4g
+L3Byb2MvbmV0L3BrdGdlbi9rcGt0Z2VuZF8wCgogICAgICAgICQgZWNobyAibWluX3BrdF9zaXpl
+IDEyMzQ1IiA+IC9wcm9jL25ldC9wa3RnZW4vbG9cQDAgJiYgZ3JlcCBtaW5fcGt0X3NpemUgL3By
+b2MvbmV0L3BrdGdlbi9sb1xAMApQYXJhbXM6IGNvdW50IDEwMDAgIG1pbl9wa3Rfc2l6ZTogMTIz
+NDUgIG1heF9wa3Rfc2l6ZTogMApSZXN1bHQ6IE9LOiBtaW5fcGt0X3NpemU9MTIzNDUgCgogICAg
+ICAgICQgZWNobyAtbiAibWluX3BrdF9zaXplIDEyMyIgPiAvcHJvYy9uZXQvcGt0Z2VuL2xvXEAw
+ICYmIGdyZXAgbWluX3BrdF9zaXplIC9wcm9jL25ldC9wa3RnZW4vbG9cQDAKUGFyYW1zOiBjb3Vu
+dCAxMDAwICBtaW5fcGt0X3NpemU6IDEyMzQ1ICBtYXhfcGt0X3NpemU6IDAKUmVzdWx0OiBPSzog
+bWluX3BrdF9zaXplPTEyMzQ1CgogICAgICAgICQgZWNobyAibWluX3BrdF9zaXplIDEyMyIgPiAv
+cHJvYy9uZXQvcGt0Z2VuL2xvXEAwICYmIGdyZXAgbWluX3BrdF9zaXplIC9wcm9jL25ldC9wa3Rn
+ZW4vbG9cQDAKUGFyYW1zOiBjb3VudCAxMDAwICBtaW5fcGt0X3NpemU6IDEyMyAgbWF4X3BrdF9z
+aXplOiAwClJlc3VsdDogT0s6IG1pbl9wa3Rfc2l6ZT0xMjMKClNvIGZpeCB0aGUgb3V0LW9mLWJv
+dW5kcyBhY2Nlc3MgKGFuZCBzb21lIG1pbm9yIGZpbmRpbmdzKSBhbmQgYWRkIGEgc2ltcGxlCnBy
+b2NfbmV0X3BrdGdlbiBzZWxmdGVzdC4uLgoKUGF0Y2ggc2V0IHNwbGl0ZWQgaW50byBwYXJ0IEkg
+KHRoaXMgb25lKQoKLSBuZXQ6IHBrdGdlbjogcmVwbGFjZSBFTk9UU1VQUCB3aXRoIEVPUE5PVFNV
+UFAKLSBuZXQ6IHBrdGdlbjogZW5hYmxlICdwYXJhbT12YWx1ZScgcGFyc2luZwotIG5ldDogcGt0
+Z2VuOiBmaXggaGV4MzJfYXJnIHBhcnNpbmcgZm9yIHNob3J0IHJlYWRzCi0gbmV0OiBwa3RnZW46
+IGZpeCAncmF0ZSAwJyBlcnJvciBoYW5kbGluZyAocmV0dXJuIC1FSU5WQUwpCi0gbmV0OiBwa3Rn
+ZW46IGZpeCAncmF0ZXAgMCcgZXJyb3IgaGFuZGxpbmcgKHJldHVybiAtRUlOVkFMKQotIG5ldDog
+cGt0Z2VuOiBmaXggY3RybCBpbnRlcmZhY2UgY29tbWFuZCBwYXJzaW5nCi0gbmV0OiBwa3RnZW46
+IGZpeCBhY2Nlc3Mgb3V0c2lkZSBvZiB1c2VyIGdpdmVuIGJ1ZmZlciBpbiBwa3RnZW5fdGhyZWFk
+X3dyaXRlKCkKCkFuZCBwYXJ0IElJICh3aWxsIGZvbGxvdyk6CgotIG5ldDogcGt0Z2VuOiBmaXgg
+bWl4IG9mIGludC9sb25nCi0gbmV0OiBwa3RnZW46IHJlbW92ZSBleHRyYSB0bXAgdmFyaWFibGUg
+KHJlLXVzZSBsZW4gaW5zdGVhZCkKLSBuZXQ6IHBrdGdlbjogcmVtb3ZlIHNvbWUgc3VwZXJmbHVv
+dXMgdmFyaWFibGUgaW5pdGlhbGl6aW5nCi0gbmV0OiBwa3RnZW46IGZpeCBtcGxzIG1heGltdW0g
+bGFiZWxzIGxpc3QgcGFyc2luZwotIG5ldDogcGt0Z2VuOiBmaXggYWNjZXNzIG91dHNpZGUgb2Yg
+dXNlciBnaXZlbiBidWZmZXIgaW4gcGt0Z2VuX2lmX3dyaXRlKCkKLSBuZXQ6IHBrdGdlbjogZml4
+IG1wbHMgcmVzZXQgcGFyc2luZwotIG5ldDogcGt0Z2VuOiByZW1vdmUgYWxsIHN1cGVyZmx1b3Vz
+IGluZGV4IGFzc2lnbmVtZW50cwotIHNlbGZ0ZXN0OiBuZXQ6IGFkZCBwcm9jX25ldF9wa3RnZW4K
+ClJlZ2FyZHMsClBldGVyCgpDaGFuZ2VzIHY1IC0+IHY2OgogLSBhZGQgcmV2LWJ5IFNpbW9uIEhv
+cm1hbgogLSBkcm9wIHBhdGNoICduZXQ6IHBrdGdlbjogdXNlIGRlZmluZXMgZm9yIHRoZSB2YXJp
+b3VzIGRlYy9oZXggbnVtYmVyCiAgIHBhcnNpbmcgZGlnaXRzIGxlbmd0aHMnCgpDaGFuZ2VzIHY0
+IC0+IHY1OgogLSBzcGxpdCB1cCBwYXRjaHNldCBpbnRvIHBhcnQgaS9paSAoc3VnZ2VzdGVkIGJ5
+IFNpbW9uIEhvcm1hbikKCkNoYW5nZXMgdjMgLT4gdjQ6CiAtIGFkZCByZXYtYnkgU2ltb24gSG9y
+bWFuCiAtIG5ldyBwYXRjaCAnbmV0OiBwa3RnZW46IHVzZSBkZWZpbmVzIGZvciB0aGUgdmFyaW91
+cyBkZWMvaGV4IG51bWJlciBwYXJzaW5nCiAgIGRpZ2l0cyBsZW5ndGhzJyAoc3VnZ2VzdGVkIGJ5
+IFNpbW9uIEhvcm1hbikKIC0gcmVwbGFjZSBDOTkgY29tbWVudCAoc3VnZ2VzdGVkIGJ5IFBhb2xv
+IEFiZW5pKQogLSBkcm9wIGF2YWlsYWJsZSBjaGFyYWN0ZXJzIGNoZWNrIGluIHN0cm5fbGVuKCkg
+KHN1Z2dlc3RlZCBieSBQYW9sbyBBYmVuaSkKIC0gZmFjdG9yZWQgb3V0IHBhdGNoICduZXQ6IHBr
+dGdlbjogYWxpZ24gc29tZSB2YXJpYWJsZSBkZWNsYXJhdGlvbnMgdG8gdGhlCiAgIG1vc3QgY29t
+bW9uIHBhdHRlcm4nIChzdWdnZXN0ZWQgYnkgUGFvbG8gQWJlbmkpCiAtIGZhY3RvcmVkIG91dCBw
+YXRjaCAnbmV0OiBwa3RnZW46IHJlbW92ZSBleHRyYSB0bXAgdmFyaWFibGUgKHJlLXVzZSBsZW4K
+ICAgaW5zdGVhZCknIChzdWdnZXN0ZWQgYnkgUGFvbG8gQWJlbmkpCiAtIGZhY3RvcmVkIG91dCBw
+YXRjaCAnbmV0OiBwa3RnZW46IHJlbW92ZSBzb21lIHN1cGVyZmx1b3VzIHZhcmlhYmxlCiAgIGlu
+aXRpYWxpemluZycgKHN1Z2dlc3RlZCBieSBQYW9sbyBBYmVuaSkKIC0gZmFjdG9yZWQgb3V0IHBh
+dGNoICduZXQ6IHBrdGdlbjogZml4IG1wbHMgbWF4aW11bSBsYWJlbHMgbGlzdCBwYXJzaW5nJwog
+ICAoc3VnZ2VzdGVkIGJ5IFBhb2xvIEFiZW5pKQogLSBmYWN0b3JlZCBvdXQgJ25ldDogcGt0Z2Vu
+OiBoZXgzMl9hcmcvbnVtX2FyZyBlcnJvciBvdXQgaW4gY2FzZSBubwogICBjaGFyYWN0ZXJzIGFy
+ZSBhdmFpbGFibGUnIChzdWdnZXN0ZWQgYnkgUGFvbG8gQWJlbmkpCiAtIGZhY3RvcmVkIG91dCAn
+bmV0OiBwa3RnZW46IG51bV9hcmcgZXJyb3Igb3V0IGluIGNhc2Ugbm8gdmFsaWQgY2hhcmFjdGVy
+CiAgIGlzIHBhcnNlZCcgKHN1Z2dlc3RlZCBieSBQYW9sbyBBYmVuaSkKCkNoYW5nZXMgdjIgLT4g
+djM6CiAtIG5ldyBwYXRjaDogJ25ldDogcGt0Z2VuOiBmaXggY3RybCBpbnRlcmZhY2UgY29tbWFu
+ZCBwYXJzaW5nJwogLSBuZXcgcGF0Y2g6ICduZXQ6IHBrdGdlbjogZml4IG1wbHMgcmVzZXQgcGFy
+c2luZycKIC0gdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvbmV0L3Byb2NfbmV0X3BrdGdlbi5jOgog
+ICAtIGZpeCB0eXBvIGluIGNoYW5nZSBkZXNjcmlwdGlvbiAoJ3YxIC0+IHYxJyBhbmQgdHlvcCkK
+ICAgLSByZW5hbWUgc29tZSB2YXJzIHRvIGJldHRlciBtYXRjaCB1c2FnZQogICAgIGFkZF9sb29w
+YmFja18wIC0+IHRocl9jbWRfYWRkX2xvb3BiYWNrXzAKICAgICBybV9sb29wYmFja18wIC0+IHRo
+cl9jbWRfcm1fbG9vcGJhY2tfMAogICAgIHdyb25nX2N0cmxfY21kIC0+IHdyb25nX3Rocl9jbWQK
+ICAgICBsZWdhY3lfY3RybF9jbWQgLT4gbGVnYWN5X3Rocl9jbWQKICAgICBjdHJsX2ZkIC0+IHRo
+cl9mZAogICAtIGFkZCBjdHJsIGludGVyZmFjZSB0ZXN0cwoKQ2hhbmdlcyB2MSAtPiB2MjoKIC0g
+bmV3IHBhdGNoOiAnbmV0OiBwa3RnZW46IGZpeCBoZXgzMl9hcmcgcGFyc2luZyBmb3Igc2hvcnQg
+cmVhZHMnCiAtIG5ldyBwYXRjaDogJ25ldDogcGt0Z2VuOiBmaXggJ3JhdGUgMCcgZXJyb3IgaGFu
+ZGxpbmcgKHJldHVybiAtRUlOVkFMKScKIC0gbmV3IHBhdGNoOiAnbmV0OiBwa3RnZW46IGZpeCAn
+cmF0ZXAgMCcgZXJyb3IgaGFuZGxpbmcgKHJldHVybiAtRUlOVkFMKScKIC0gbmV0L2NvcmUvcGt0
+Z2VuLmM6IGFkZGl0aW9uYWwgZml4IGdldF9pbWl4X2VudHJpZXMoKSBhbmQgZ2V0X2xhYmVscygp
+CiAtIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9wcm9jX25ldF9wa3RnZW4uYzoKICAgLSBm
+aXggdHlvcCBub3QgdnMuIG5vZCAoc3VnZ2VzdGVkIGJ5IEpha3ViIEtpY2luc2tpKQogICAtIGZp
+eCBtaXNhbGlnbmVkIGxpbmUgKHN1Z2dlc3RlZCBieSBKYWt1YiBLaWNpbnNraSkKICAgLSBlbmFi
+bGUgZm9tZXJseSBjb21tZW50ZWQgb3V0IENPTkZJR19YRlJNIGRlcGVuZGVudCB0ZXN0IChjb21t
+YW5kIHNwaSksCiAgICAgYXMgQ09ORklHX1hGUk0gaXMgZW5hYmxlZCB2aWEgdG9vbHMvdGVzdGlu
+Zy9zZWxmdGVzdHMvbmV0L2NvbmZpZwogICAgIENPTkZJR19YRlJNX0lOVEVSRkFDRS9DT05GSUdf
+WEZSTV9VU0VSIChzdWdnZXN0ZXggYnkgSmFrdWIgS2ljaW5za2kpCiAgIC0gYWRkIENPTkZJR19O
+RVRfUEtUR0VOPW0gdG8gdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvbmV0L2NvbmZpZwogICAgIChz
+dWdnZXN0ZWQgYnkgSmFrdWIgS2ljaW5za2kpCiAgIC0gYWRkIG1vZHByb2JlIHBrdGdlbiB0byBG
+SVhUVVJFX1NFVFVQKCkgKHN1Z2dlc3RlZCBieSBKYWt1YiBLaWNpbnNraSkKICAgLSBmaXggc29t
+ZSBjaGVja3BhdGNoIHdhcm5pbmdzIChNaXNzaW5nIGEgYmxhbmsgbGluZSBhZnRlciBkZWNsYXJh
+dGlvbnMpCiAgIC0gc2hyaW5rIGxpbmUgbGVuZ3RoIGJ5IHJlLW5hbWluZyBzb21lIHZhcmlhYmxl
+cyAoY29tbWFuZCAtPiBjbWQsCiAgICAgZGV2aWNlIC0+IGRldikKICAgLSBhZGQgJ3JhdGUgMCcg
+dGVzdGNhc2UKICAgLSBhZGQgJ3JhdGVwIDAnIHRlc3RjYXNlCgpbMV0gaHR0cHM6Ly9sb3JlLmtl
+cm5lbC5vcmcvbmV0ZGV2LzIwMjQxMDA2MjIxMjIxLjM3NDQ5OTUtMS1hcnRlbS5jaGVybnlzaGV2
+QHJlZC1zb2Z0LnJ1LwpbMl0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjUwMTA5
+MDgzMDM5LjE0MDA0LTEtcGNoZWxraW5AaXNwcmFzLnJ1LwpbM10gaHR0cHM6Ly9naXQua2VybmVs
+Lm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvdG9ydmFsZHMvbGludXguZ2l0L2NvbW1pdC8/
+aWQ9NzYyMDFiNTk3OTc2ODUwMGJjYTM2Mjg3MWRiNjZkNzdjYjRjMjI1ZQoKUGV0ZXIgU2VpZGVy
+ZXIgKDcpOgogIG5ldDogcGt0Z2VuOiByZXBsYWNlIEVOT1RTVVBQIHdpdGggRU9QTk9UU1VQUAog
+IG5ldDogcGt0Z2VuOiBlbmFibGUgJ3BhcmFtPXZhbHVlJyBwYXJzaW5nCiAgbmV0OiBwa3RnZW46
+IGZpeCBoZXgzMl9hcmcgcGFyc2luZyBmb3Igc2hvcnQgcmVhZHMKICBuZXQ6IHBrdGdlbjogZml4
+ICdyYXRlIDAnIGVycm9yIGhhbmRsaW5nIChyZXR1cm4gLUVJTlZBTCkKICBuZXQ6IHBrdGdlbjog
+Zml4ICdyYXRlcCAwJyBlcnJvciBoYW5kbGluZyAocmV0dXJuIC1FSU5WQUwpCiAgbmV0OiBwa3Rn
+ZW46IGZpeCBjdHJsIGludGVyZmFjZSBjb21tYW5kIHBhcnNpbmcKICBuZXQ6IHBrdGdlbjogZml4
+IGFjY2VzcyBvdXRzaWRlIG9mIHVzZXIgZ2l2ZW4gYnVmZmVyIGluCiAgICBwa3RnZW5fdGhyZWFk
+X3dyaXRlKCkKCiBuZXQvY29yZS9wa3RnZW4uYyB8IDM5ICsrKysrKysrKysrKysrKysrKysrKyst
+LS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDE3IGRl
+bGV0aW9ucygtKQoKLS0gCjIuNDguMQoK
 
