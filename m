@@ -1,103 +1,128 @@
-Return-Path: <netdev+bounces-167744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF1CA3C00F
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:36:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4102DA3C0B9
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E646188BC4D
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:36:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B635D189A53B
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6B31E0DFE;
-	Wed, 19 Feb 2025 13:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5C61EA7ED;
+	Wed, 19 Feb 2025 13:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OboORU5z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mD5MLQeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665691D90A5
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5241E0B61;
+	Wed, 19 Feb 2025 13:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739972166; cv=none; b=Q4fkmvmz27n0xQQztQ779szMv5QuHQIvAensZvGqRQRg0ZH2aJdD2Rp+sbUoazfQoelKXCE6Uz+3pyYHvzZIQvrzaJMyDnpN90O0ucd6eerbmvqdbVpM5OM90xOLCsWGVuQPXuHOjdoumBtWF8qqXK7Gz885pthLzWLgN86++EM=
+	t=1739973078; cv=none; b=GLEPOUl3o2C7Rel+nughXjOszdSu3JhEkaeoEtMJ8RtxoDUiONKKlFpPZsG9nFdpYx/qFFPyTQMWy+GSxPXLmWJOWTak6ZJ8GxrvaT+tzCCPrNYBBJRl84p07+jn3B0GecAiajCUIFfyYf2sxC77Hxk7EwyR9jzzyIVOx0gg72k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739972166; c=relaxed/simple;
-	bh=vMeSW1zvRepqzCiNEFCGVnhpQI0xBPH9NM90uBz6wYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elsKRaA3iki7ifULtDrbxLW4LEV4UTYZBct98tFPkK7TdbBZ0Yp/VMp2KWEsbhK9qO3g0BtCXHdPdR9R0Ic7ZJFRT+8D0w2Iqxyzw2A4dYJCGCrTzjwmEy0+WrQpa7pUare6vWuyd8Ax+jqOqFG1RZPgsJbp1ckwA5ir3jOnshY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OboORU5z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5RKXL7Pr+B0O9seaerq9LcKhvhCxKtfn2XfpbvP95Q8=; b=OboORU5zk7+Pa+nHwzajTMX0mp
-	W2SORrqhipef9dQU19UTt4jY8nKvz/mW86dB1pnQdGMI6iuN8OWU6zM9dy14KKdheT6JBqhr4uPpe
-	sPVVp529i+BTqTmiwlCa9Js70pYhcDfLoR4Msd3Ct+boTNlSdPp1Pm5wGWP1IQDX2NXQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tkkF3-00FdoT-90; Wed, 19 Feb 2025 14:35:57 +0100
-Date: Wed, 19 Feb 2025 14:35:57 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1739973078; c=relaxed/simple;
+	bh=Djbf4KqW2xY32dbdHluYN/2ezxhAVFXdhkJiMbQukAs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kul+UoEGCclB5Z4KAWfkF73ZSTrBVJ77RzHHpzVplWXzUjICl4IaMNIuG6pSKMy7THBjFTA1cRGSyQ5dlcQEDmxXLvQb4bv2DRLNnc2ADNGMRbgPC53YTajOOUI9m34uvScaHjzcjEHnedyVMQ7SOtt4fDEt/1J0GWlCz+cbpm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mD5MLQeP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E0BC4CED1;
+	Wed, 19 Feb 2025 13:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739973075;
+	bh=Djbf4KqW2xY32dbdHluYN/2ezxhAVFXdhkJiMbQukAs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mD5MLQePuBA3co7TadcIZ8FuyExS1Lu4iYTWa60nIag6zE2hYC52thT8jM2Gj6tu3
+	 hVh8PKwTv/tDG15CmaV+vkbjSozCeA4I8ZIpCZdfYrcwUEyynZsdSDEHgQ9fCg7jFi
+	 vho8y3/8vL7jXXhOssH43yIVifxpiXMlFfobO82kU1gKxw9PKD5SEyXTgeNUUgYbAM
+	 jz30tXTEaj25NZlLA/ZzpxsK/I/GkfiH6FA/pW69h2Azkg8L0AQtC51qQ4CIAcmmG+
+	 9qV8vj8B43sPhHqS+unafmJU+I7Oz3YpZ3PUD4azxX2iSkuL/g4NNbyzD5HPXiHV97
+	 9qUnQ/jwX+0pg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: add phylib-internal.h
-Message-ID: <4b2ebf2e-28b3-4b6a-9772-e5495c18b1d6@lunn.ch>
-References: <290db2fb-01f3-46af-8612-26d30b98d8b3@gmail.com>
- <8f7cf3ac-14f4-4120-a8ed-01b83737e6b8@gmail.com>
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	intel-wired-lan@lists.osuosl.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Louis Peens <louis.peens@corigine.com>,
+	netdev@vger.kernel.org,
+	oss-drivers@corigine.com,
+	Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>,
+	Bharat Bhushan <bharatb.linux@gmail.com>
+Subject: [PATCH ipsec-next v1 0/5] Support PMTU in tunnel mode for packet offload
+Date: Wed, 19 Feb 2025 15:50:56 +0200
+Message-ID: <cover.1739972570.git.leon@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f7cf3ac-14f4-4120-a8ed-01b83737e6b8@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 19, 2025 at 07:37:52AM +0100, Heiner Kallweit wrote:
-> On 18.02.2025 23:43, Heiner Kallweit wrote:
-> > This patch is a starting point for moving phylib-internal
-> > declarations to a private header file.
-> > 
-> > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> > ---
-> >  drivers/net/phy/phy-c45.c          |  1 +
-> >  drivers/net/phy/phy-core.c         |  3 ++-
-> >  drivers/net/phy/phy.c              |  2 ++
-> >  drivers/net/phy/phy_device.c       |  2 ++
-> >  drivers/net/phy/phy_led_triggers.c |  2 ++
-> >  drivers/net/phy/phylib-internal.h  | 25 +++++++++++++++++++++++++
-> >  include/linux/phy.h                | 13 -------------
-> >  7 files changed, 34 insertions(+), 14 deletions(-)
-> >  create mode 100644 drivers/net/phy/phylib-internal.h
+Changelog:
+v1:
+ * Changed signature and names of functions which set and clear type_offload
+ * Fixed typos
+ * Add Zhu's ROB tag
+v0: https://lore.kernel.org/all/cover.1738778580.git.leon@kernel.org
 
-Maybe we should discuss a little where we are going with this...
+Hi,
 
-I like the idea, we want to limit the scope of some functions so they
-don't get abused. MAC drivers are the main abusers here, they should
-have a small set of methods they can use.
+This series refactors the xdo_dev_offload_ok() to be global place for
+drivers to check if their offload can perform encryption for xmit
+packets.
 
-If you look at some other subsystems they have a header for consumers,
-and a header for providers. include/linux/gpio/{consumer|driver}.h,
-clk-provider.h and clk.h, etc.
+Such common place gives us an option to check MTU and PMTU at one place.
 
-Do we want include/linux/phy.h to contain the upper API for phylib,
-which MAC drivers can use? Should phylib-internal.h be just the
-internal API between parts of the core? There will be another header
-which has everything a PHY driver needs for the lower interface of
-phylib?
+Thanks
 
-Is this what you are thinking?
+Leon Romanovsky (5):
+  xfrm: delay initialization of offload path till its actually requested
+  xfrm: simplify SA initialization routine
+  xfrm: rely on XFRM offload
+  xfrm: provide common xdo_dev_offload_ok callback implementation
+  xfrm: check for PMTU in tunnel mode for packet offload
 
-	Andrew
+ Documentation/networking/xfrm_device.rst      |  3 +-
+ drivers/net/bonding/bond_main.c               | 16 ++----
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   | 21 --------
+ .../inline_crypto/ch_ipsec/chcr_ipsec.c       | 16 ------
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    | 21 --------
+ drivers/net/ethernet/intel/ixgbevf/ipsec.c    | 21 --------
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 15 ------
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 16 ------
+ .../net/ethernet/netronome/nfp/crypto/ipsec.c | 11 ----
+ drivers/net/netdevsim/ipsec.c                 | 11 ----
+ drivers/net/netdevsim/netdevsim.h             |  1 -
+ include/net/xfrm.h                            | 21 +++++++-
+ net/xfrm/xfrm_device.c                        | 46 ++++++++++++-----
+ net/xfrm/xfrm_output.c                        |  6 ++-
+ net/xfrm/xfrm_state.c                         | 50 ++++++++-----------
+ net/xfrm/xfrm_user.c                          |  2 +-
+ 16 files changed, 87 insertions(+), 190 deletions(-)
+
+-- 
+2.48.1
+
 
