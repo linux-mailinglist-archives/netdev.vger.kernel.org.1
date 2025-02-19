@@ -1,142 +1,123 @@
-Return-Path: <netdev+bounces-167734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE70A3BF6C
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:06:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4901A3BF73
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C632188658C
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:02:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FB797A43BF
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923DE1EFFBF;
-	Wed, 19 Feb 2025 13:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5351E1A18;
+	Wed, 19 Feb 2025 13:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkrTiSE8"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="UH9i82fT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA561EB1BC;
-	Wed, 19 Feb 2025 13:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07622AD00
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970065; cv=none; b=ArHMovMynEXnGg2co5oAc3r8ZPNuZjHjltrFuLiGT9jAy72Zw/uW+OFY+tZFtDkDw1F1Ookck/rOy0YzkOK949PbhkmsoISKUSbfl+3kuFyzZLwZOtu2NH9gaBDA14cwMuuWLpTldVIBeJfVUTUGs0mdLvHTXS1RksDI2O09c2g=
+	t=1739970502; cv=none; b=uPQczc++bH5EMcmJrlETCpQlQbaXV6b/3ymeD5G+XjKML77UGG4iHUmxAWA3WtSGOdYNPxpMgok02/YG+m81v1qlSN0EkeuTD01mlwaLr6oRh+njm8nExyBxp4Ve6DSTTasB6JV8vs67/ajQ6SgRw+HZxhz4dyR3gca8uu/brxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970065; c=relaxed/simple;
-	bh=pGOE535JPESVOkJalcuOjvOQHEl00UMEuL4t4kpsmTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EUkqjkNgPOLW6GinOOuEes0MMObiSdTYMdVfAmHekoc9AhX6Jqh5M/5NSr9JKmpujluYmSihQVGn0BPt3t8LssUADJDdCzB5IjoUGENtqo2hocPAGU4L2Me0me87HGX1B/w2hkBhDxLZ0uwEkR+0zz6fjzhFw37gf1jKYJvhVAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MkrTiSE8; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38f378498b0so3407237f8f.0;
-        Wed, 19 Feb 2025 05:01:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739970062; x=1740574862; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P3HpZLd+aYslb+R149ASLHhysO3/cTsAOVwWXC8DuTI=;
-        b=MkrTiSE8WInnBb+yAPTwVV8m+kYfEAFocbGGKt5s8P1DNjMDRQJoCUWwJvo9RnBU5c
-         bxSKfWMB5jODShGWVUMYIzpJwraU9g14lXOo9w+HCoiPcFe9IQrGxQTF6AwCavqLjTqB
-         ZoeOCqgZK/VA5GRSSWsNRyN5Oh6riLVqhnoHp5PXaXnzlH3qHRRZF4vPLVP3Fj5NClIx
-         REY4a1N1K2kzIb+DfMgIdMz0UL/61PJmvtTJ385kyf7BQAHIfEfbNQ0gCDarRMpFenGF
-         sWs4qH5JjrimDwP5AOSHpZLsdxH6HfcESZMEkrBRHotnH3xQR3F5t2Mz4LxPjGlLHYwM
-         bVGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739970062; x=1740574862;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P3HpZLd+aYslb+R149ASLHhysO3/cTsAOVwWXC8DuTI=;
-        b=vK2/MXKmORyHH/bTJ1pUglYnIuLdLmPzkVvSh1c4hUVL2OPyTMsAFSpeuLlhY7lbkt
-         wXx/XMMo3PBa2dpDoKQ/kl0X7VBq+KUZbw446iSxLPLNhIrd4krlD/5UyBhKVO/2NB1J
-         IkHOi+lOO3ubtysKxN6it1wA0Z970cKzXuXhiJB2U0eS4/rosslQn0MonGv0n3hgbzGc
-         L1guig46nFCYPmozbVHCFdE/JBzwnOJhFXtCzGDtjI9eYqT8/JOl9VNiqJ9wwxLaWEJc
-         fVkXGnFHo7IOZDH3tc4q6cRGutcxv3JimkKPdFM64+8h1be3JCfXeGqa78oM9YRMIzaH
-         4HAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbriJ4mS39TJJGMrk7IvRY6yma1nmZYNmAIpJ3WdzEVKLfkCV/a9PoWOnwZju70aCTkWvBeKQrs7mvLg==@vger.kernel.org, AJvYcCUpJn5dwXaBEmPV58WMQNxSm2zLC0gBpnYlgxrzA19vb92/DTr3DeADFNATAr7D9vd5abSiQa0D@vger.kernel.org, AJvYcCWPSNxbHy7bx8gqUdf38kApQIh+oQyeU+LXfi99V8ODX3HYFDx6yCOsQi7oQOAgnDtNG2MPtIfL8SMS+3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHBB6WPrhua1Wpxb2Cf7eJM9ivQcFZHVSlHQYR1vNx50uvD8Wb
-	dYB3pQ3NzEi/xKEuWDKP3yryhT9t63E4bQuDtqg77yDOC1A2hct1
-X-Gm-Gg: ASbGncvsyDdT8kr4aokZg881hE0yG+ywqzgZpd2Ogcrmdtc0AsGEFRDhqzcWnl8r68a
-	PaK4oENRWnJ8xzAKpSYI3F5D+60HzNAu4I/VFEpItYqEeUbA/il4reptLsyKVxCc+tmXIN0twAx
-	k9sTZ9A01s3GfhvT8LrRxWklU7RV4Unrop1XlLINlCS/GZfsowSSEdLGflGnTv3jl5K5POvUXFW
-	qpF0cJ52FbDSy7qPcdk46JSvz5ksa5wt8IYNQTI2gdbwTbIhlik3J1gFvG9Q6GbBWOqc1u7HYfM
-	AKNSpyxVjOdzIEU59P4yAVMDv+tQ4XUjFUDy
-X-Google-Smtp-Source: AGHT+IHxeWotohuf1kI7KK6w/ViTEakVBNdMfZ3xL3gBkPm8R3XNTmC3J7Prc/MrPjdWbeL1SbeFLg==
-X-Received: by 2002:adf:e989:0:b0:38f:30a3:51fe with SMTP id ffacd0b85a97d-38f587ca4ebmr2482955f8f.42.1739970061532;
-        Wed, 19 Feb 2025 05:01:01 -0800 (PST)
-Received: from [172.27.59.237] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258f8c4bsm17825416f8f.46.2025.02.19.05.00.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Feb 2025 05:01:01 -0800 (PST)
-Message-ID: <8369b884-71c9-495a-8a1f-ab8ca4ee5f59@gmail.com>
-Date: Wed, 19 Feb 2025 15:00:57 +0200
+	s=arc-20240116; t=1739970502; c=relaxed/simple;
+	bh=MUhvxhHnTvoE+duYjJ7YbfPA0nuYQDtOLydS3RR3bNA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=di2Ua+RBCZqm2YCyYiB0qetgcuA+5fZjIr2B3NoqTf5tNgKhPd4XdAzFDozLBUvwvu3XGy6JjfwaO+m9DnQuIr/E0PxM8ZSzFsfuPVL3BagYyyaxYiEqSqtnT7ZiQJ1r0roJQg/R8C5dTSB+eQ4zbzZYA6F9Zdi3XslL4APBhDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=UH9i82fT; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id 00955240028
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 14:08:19 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1739970499; bh=MUhvxhHnTvoE+duYjJ7YbfPA0nuYQDtOLydS3RR3bNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 From;
+	b=UH9i82fTg1h7w7390ECacBPovUQoE8P/G5GNVXYseGnWGCVDOfKQ5PyhulAe9YWgM
+	 oyTMO0GRgM+BGAb1yk2PX8U0Jez7tWa3rWWsM3L0wN7OiFtRvw8Z86NXQQc00rW0a2
+	 bGN9zqUxK+CRxw41x+UPWFS66pL0+d1Bmi0LqYqu41Tltg7EoGEoWN7cUYhyiMIcBi
+	 IRGjwKoOVVWBHDLTjvUrytTcrYIVeMYvlhWOcFQgLEEolpENntmiIchN+J48caOyVV
+	 anSpO8RUVC/wueOuEqucDUR/JBUQjagjTyrWKotNUIQS6c5YyhA244D7EfF8rJKH+J
+	 WyT0bq9Dz/AqA==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4YycC36ZPlz9rxQ;
+	Wed, 19 Feb 2025 14:08:15 +0100 (CET)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,  tmgross@umich.edu,
+  hkallweit1@gmail.com,  linux@armlinux.org.uk,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  netdev@vger.kernel.org,  rust-for-linux@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: qt2025: Fix hardware revision check comment
+In-Reply-To: <c83a4d5f-3e98-4fec-a84a-669f04677774@lunn.ch>
+References: <20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net>
+	<20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
+	<c83a4d5f-3e98-4fec-a84a-669f04677774@lunn.ch>
+Date: Wed, 19 Feb 2025 13:08:07 +0000
+Message-ID: <87jz9m13rc.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
- event message
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Shahar Shitrit <shshitrit@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- Carolina Jubran <cjubran@nvidia.com>
-References: <20250213094641.226501-1-tariqt@nvidia.com>
- <20250213094641.226501-5-tariqt@nvidia.com>
- <20250215192935.GU1615191@kernel.org> <20250217162719.1e20afac@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250217162719.1e20afac@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Andrew Lunn <andrew@lunn.ch> writes:
 
+> On Wed, Feb 19, 2025 at 10:02:00AM +0900, FUJITA Tomonori wrote:
+>> On Mon, 17 Feb 2025 23:53:50 +0000
+>> Charalampos Mitrodimas <charmitro@posteo.net> wrote:
+>> 
+>> > Correct the hardware revision check comment in the QT2025 driver. The
+>> > revision value was documented as 0x3b instead of the correct 0xb3,
+>> > which matches the actual comparison logic in the code.
+>> > 
+>> > Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+>> > ---
+>> >  drivers/net/phy/qt2025.rs | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> > 
+>> > diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+>> > index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
+>> > --- a/drivers/net/phy/qt2025.rs
+>> > +++ b/drivers/net/phy/qt2025.rs
+>> > @@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
+>> >  
+>> >      fn probe(dev: &mut phy::Device) -> Result<()> {
+>> >          // Check the hardware revision code.
+>> > -        // Only 0x3b works with this driver and firmware.
+>> > +        // Only 0xb3 works with this driver and firmware.
+>> >          let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+>> >          if (hw_rev >> 8) != 0xb3 {
+>> >              return Err(code::ENODEV);
+>> 
+>> Oops,
+>> 
+>> Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> 
+>> Given that this patch is expected to be merged via netdev, you might
+>> need to resend with a proper subject:
+>> 
+>> https://elixir.bootlin.com/linux/v6.13/source/Documentation/process/maintainer-netdev.rst
+>
+> Please also include a Fixes: tag.
+>
+> 	Andrew
 
-On 18/02/2025 2:27, Jakub Kicinski wrote:
-> On Sat, 15 Feb 2025 19:29:35 +0000 Simon Horman wrote:
->>> +	for_each_set_bit(i, bit_set_ptr, num_bits) {
->>> +		const char *sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
->>> +
->>> +		mlx5_core_warn(dev, "Sensor name[%d]: %s\n", i + bit_set_offset, sensor_name);
->>> +	}
->>> +}
->>
->> nit:
->>
->> If you have to respin for some other reason, please consider limiting lines
->> to 80 columns wide or less here and elsewhere in this patch where it
->> doesn't reduce readability (subjective I know).
-> 
-> +1, please try to catch such situations going forward
-> 
+Hi Andrew,
 
-Hi Jakub,
+Included it, as the documentation states.
 
-This was not missed.
-This is not a new thing...
-We've been enforcing a max line length of 100 chars in mlx5 driver for 
-the past few years.
-I don't have the full image now, but I'm convinced that this dates back 
-to an agreement between the mlx5 and netdev maintainers at that time.
+A v2 patch is up[1].
 
-80 chars could be too restrictive, especially with today's large 
-monitors, while 100-chars is still highly readable.
-This is subjective of course...
+C. Mitrodimas
 
-If you don't have a strong preference, we'll keep the current 100 chars 
-limit. Otherwise, just let me know and we'll start enforcing the 
-80-chars limit for future patches.
-
-Regards,
-Tariq
+[1]: https://lore.kernel.org/rust-for-linux/20250219-qt2025-comment-fix-v2-1-029f67696516@posteo.net
 
