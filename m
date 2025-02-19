@@ -1,209 +1,182 @@
-Return-Path: <netdev+bounces-167845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82490A3C8E7
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:36:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA07A3C8EF
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB163189CF75
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:35:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17EF5189B8FB
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6BD22FE10;
-	Wed, 19 Feb 2025 19:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D7C22B595;
+	Wed, 19 Feb 2025 19:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="i/OR+iNN"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BVC9iWak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A671A22FE0C;
-	Wed, 19 Feb 2025 19:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF89B1FECAE;
+	Wed, 19 Feb 2025 19:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739993656; cv=none; b=N5XwzwsRgnrttObRZYremCwl5art68uAT9uyDi9deyakp/zvEXYvdD8ggi4SPsknMNTv1zEh60tRcDPIlv5yXCI6DY/GvXdZVH7vvcT/gsxEegfAzipbufl4zJ8SO9rpgXKQVwrkhvzXx1pm6niWzye9cRrLi1DY1Gx+E150F+A=
+	t=1739993790; cv=none; b=js2r78i+d62NBNC1+pYvEPI146m6+B/IyotjWEBWesRqoZz3EwKDOImUynPB/QY9zPtM2Uj5rfjU3QCTDdAz+7pxNi8WSQkuXES0fhgZ6NjAJUx+BFJmMla3CgUsHQwD+TbyhlcswQLkIqwz6L6A8IG8fJEZIanUUUYtMrFxwls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739993656; c=relaxed/simple;
-	bh=9FeOV8opCfObi7tUr9fs/g4qDJP3TkkrH+YNcZHJ7x4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JZxZlCcPYBMXCL2irGVYc8J++IxYQf9mSbCgl1FAjIQoedYOwsNag84/9RCkQcyDz5V3INZ+SQoOIqcAu9x70jK8UFRbutRwzO0rxcZkCMif2r88WNqILOIcNotbT2YdIQLVUflqnojjys4/gR+4CRBt2wB9K6dQ9J2myWERRpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=i/OR+iNN; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51JB9ZZX031423;
-	Wed, 19 Feb 2025 19:33:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	AspjgZU0NXlHOcDl8+7Gm7WhlKv9jpXd70aQl0fbvEo=; b=i/OR+iNNCSj7q64M
-	ZndljuuOIPrB6j/Fpo1LxhYuqlVJMXtojSsDqHyQFtuN0fuTQDX4xpxg8Wg2jT0M
-	Bl+GE/YZS9aW7WMI5GSwRJT2U07Oo+2NV+qLpu6niVdE44vyD3nep8ZKMf4pKUHk
-	JbG/vuCT+o1SdIGGMSVBJe4BN3dsj0QwFwddc30/pgROIOVs7wTw9DmLwnsae677
-	vJ4RJiy/fS7uuQbjn4ZXCEa1179Ku97guBHzQ0rdeR6NJXn+HaV52jabk5M2vjMq
-	q/aYyfwsU0BBg8DaMOYwf6koCVmjnDhJnZNbCcEWxWO9YzA9v7MFZHTv7uyDNP4K
-	mt9CLg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44we69hete-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 19:33:53 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51JJXr9L023958
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 19:33:53 GMT
-Received: from PHILBER.qualcomm.com (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 19 Feb
- 2025 11:33:47 -0800
-From: Peter Hilber <quic_philber@quicinc.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-CC: Trilok Soni <quic_tsoni@quicinc.com>,
-        Srivatsa Vaddagiri
-	<quic_svaddagi@quicinc.com>,
-        Peter Hilber <quic_philber@quicinc.com>,
-        "Xuan
- Zhuo" <xuanzhuo@linux.alibaba.com>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?=
-	<eperezma@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "Ridoux, Julien" <ridouxj@amazon.com>, Marc Zyngier <maz@kernel.org>,
-        "Mark
- Rutland" <mark.rutland@arm.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Parav Pandit
-	<parav@nvidia.com>,
-        Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, <virtio-dev@lists.linux.dev>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 3/4] virtio_rtc: Add Arm Generic Timer cross-timestamping
-Date: Wed, 19 Feb 2025 20:32:58 +0100
-Message-ID: <20250219193306.1045-4-quic_philber@quicinc.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250219193306.1045-1-quic_philber@quicinc.com>
-References: <20250219193306.1045-1-quic_philber@quicinc.com>
+	s=arc-20240116; t=1739993790; c=relaxed/simple;
+	bh=YUZVKPNnWqfMc6DHELioLciuEgVLDK11YWAFpFQIrpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oY0NKppHyuOx2SAc6XYX5VDlUt13HSshk26Wjkth6D8MrZuT8NVwF5hygiBm8m88Zh6M8QC347ZG6dYeq8dQ8ZbXELbg7HxGF/TAKS3W/xDJZWkjjrAmGMbBTCMcMh7DMkmbviGzYx0B2zTvj4a15YMfGVnl01l/tJaqE4fIw+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=BVC9iWak; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51JJa5pU2063500
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Feb 2025 13:36:05 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1739993765;
+	bh=8EvVce+jqD12k32qwF7nR1NxOePu4ZKlcn0n3l2IJUI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=BVC9iWakCbU6AvMW2RylcRWtY2vSIlU6vNlIuUCnK4Ng+AAdwW87md1tFYmgpYkk/
+	 Pb5Nyoyd8ZQnvICjNZ6BHJdopuWS48+T21BvEh/rHfrkOHc0xHsy4Y9dxmXeGXFSkz
+	 rBsTTX0wCN+Adn9YZBnt/0voh4n+z6FkXUzC4qmg=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51JJa5me014675
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 19 Feb 2025 13:36:05 -0600
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 19
+ Feb 2025 13:36:04 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 19 Feb 2025 13:36:04 -0600
+Received: from [10.249.135.49] ([10.249.135.49])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51JJZxUp074733;
+	Wed, 19 Feb 2025 13:36:00 -0600
+Message-ID: <b399c73b-359a-4dde-acc3-0bf4aea900e9@ti.com>
+Date: Thu, 20 Feb 2025 01:05:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _P01MOAEurE50vWQg8Zm_Mj9kSECT_O8
-X-Proofpoint-ORIG-GUID: _P01MOAEurE50vWQg8Zm_Mj9kSECT_O8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-19_08,2025-02-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
- phishscore=0 impostorscore=0 clxscore=1015 adultscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502190151
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/2] irqchip: ti-tsir: Add support for Timesync
+ Interrupt Router
+To: Thomas Gleixner <tglx@linutronix.de>, Jason Reeder <jreeder@ti.com>,
+        <vigneshr@ti.com>, <nm@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <s-vadapalli@ti.com>, <danishanwar@ti.com>, <m-malladi@ti.com>,
+        "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>
+References: <20250205160119.136639-1-c-vankar@ti.com>
+ <20250205160119.136639-2-c-vankar@ti.com> <87lduin4o5.ffs@tglx>
+ <09880b14-cef1-44cd-9fa4-8840fb673c0a@ti.com> <87cyfplg8s.ffs@tglx>
+ <dda464e2-d442-4e20-bc6d-cea854c5f17f@ti.com> <87jz9tjwjk.ffs@tglx>
+ <4238ddcc-d6ab-41a3-8725-b948f013a5b9@ti.com> <87ikp8jph9.ffs@tglx>
+Content-Language: en-US
+From: "Vankar, Chintan" <c-vankar@ti.com>
+In-Reply-To: <87ikp8jph9.ffs@tglx>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add PTP_SYS_OFFSET_PRECISE2 support on platforms using the Arm Generic
-Timer.
+Hello Thomas/Greg,
 
-Always report the CP15 virtual counter as the HW counter in use by
-arm_arch_timer, since the Linux kernel's usage of the Arm Generic Timer
-should always be compatible with this.
+On 2/18/2025 1:47 AM, Thomas Gleixner wrote:
+> Chintan!
+> 
+> On Sat, Feb 15 2025 at 17:19, Chintan Vankar wrote:
+>> On 14/02/25 04:13, Thomas Gleixner wrote:
+>>> Two questions:
+>>>
+>>>    1) For the case where no interrupt is involved, how is the routing
+>>>       configured?
+>>>
+>>>    2) For the case where it routes an input line to an interupt, then how
+>>>       is this interrupt going to be handled by this interrupt domain which
+>>>       is not connected to anything and implements an empty disfunctional
+>>>       interrupt chip?
+>>>
+>>
+>> For both the cases above the job of Timesync INTR is to map the output
+>> register with the corresponding input.
+>>
+>> As described in section 11.3.2.1 in the TRM at:
+>> https://www.ti.com/lit/ug/spruiu1d/spruiu1d.pdf,
+>> the job of the Timesync INTR is to provide a configuration of the
+>> "output registers which controls the selection". Hence we just have to
+>> provide configuration APIs in the Timesync INTR which programs output
+>> registers of the Timesync INTR. About the handling of the interrupts,
+>> the device which receives an interrupt needs to handle the interrupt.
+>>
+>> Could you please explain why we consider these two cases to be
+>> different?
+> 
+> They are different as
+> 
+>    #1 Routes the signal from one IP block to another IP block
+> 
+>       So there is no notion of an actual interrupt, but still you use the
+>       interrupt domain mechanism, which requires to allocate a Linux
+>       interrupt number just to configure that router.
+> 
+>       What's the purpose of this interrupt number and the allocated
+>       resources behind it?
+> 
+>    #2 Routes the signal from an IP block to an actual interrupt "input"
+> 
+>       Again, this requires to allocate a Linux interrupt number which is
+>       disfunctional as it is not connected in the interrupt domain
+>       hierarchy and just provides an interrupt chip with a name and no
+>       actual functionality behind it.
+> 
+>       So the resulting real interrupt needs yet another interrupt number
+>       which then maps to something which actually can handle interrupts.
+> 
+> So in some aspect they are not that different because both have nothing
+> to do with the actual concept of interrupt management in the Linux
+> kernel.
+> 
+>  From the kernel's interrupt handling POV this is a completely
+> transparent piece of hardware, which is not associated to any interrupt
+> handling mechanism. Just because the manual mentions INTR in the name of
+> the IP block does not make it part of the actual kernel interrupt
+> handling.
+> 
+> I have no idea into which subsystem such a SoC configuration belongs to,
+> but Greg might have an idea.
+> 
 
-Signed-off-by: Peter Hilber <quic_philber@quicinc.com>
----
+Thanks for the reviewing the patch. Since you suggest to implement it
+with a different subsystem, I want your and Greg's suggestion for that.
 
-Notes:
-    v4:
-    
-    - Update names and types to spec v6.
-    
-    v2:
-    
-    - Depend on prerequisite patch series "treewide: Use clocksource id for
-      get_device_system_crosststamp()".
-    
-    - Return clocksource id instead of calling dropped arm_arch_timer helpers.
-    
-    - Always report the CP15 virtual counter to be in use by arm_arch_timer,
-      since distinction of Arm physical and virtual counter appears unneeded
-      after discussion with Marc Zyngier.
+As we discussed and also from the documentation, Timesync INTR should be
+configured by programming it's output registers to control the selection
+corresponding to the input. Mux-controller subsystem also works on the
+similar kind of principle, to program the output by selectively choosing
+from multiple input sources, I am trying to relate Timesync INTR with
+that subsystem.
 
- drivers/virtio/Kconfig          | 13 +++++++++++++
- drivers/virtio/Makefile         |  1 +
- drivers/virtio/virtio_rtc_arm.c | 23 +++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
- create mode 100644 drivers/virtio/virtio_rtc_arm.c
+Could you please suggest if the implementation can be achieved using the
+mux-subsystem ?
 
-diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-index a14a2b77e142..3d8b366c0625 100644
---- a/drivers/virtio/Kconfig
-+++ b/drivers/virtio/Kconfig
-@@ -221,6 +221,19 @@ config VIRTIO_RTC_PTP
- 
- 	 If unsure, say Y.
- 
-+config VIRTIO_RTC_ARM
-+	bool "Virtio RTC cross-timestamping using Arm Generic Timer"
-+	default y
-+	depends on VIRTIO_RTC_PTP && ARM_ARCH_TIMER
-+	help
-+	 This enables Virtio RTC cross-timestamping using the Arm Generic Timer.
-+	 It only has an effect if the Virtio RTC device also supports this. The
-+	 cross-timestamp is available through the PTP clock driver precise
-+	 cross-timestamp ioctl (PTP_SYS_OFFSET_PRECISE2 aka
-+	 PTP_SYS_OFFSET_PRECISE).
-+
-+	 If unsure, say Y.
-+
- endif # VIRTIO_RTC
- 
- endif # VIRTIO_MENU
-diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-index 88d6fb8d4731..dbd77f124ba9 100644
---- a/drivers/virtio/Makefile
-+++ b/drivers/virtio/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_VIRTIO_DEBUG) += virtio_debug.o
- obj-$(CONFIG_VIRTIO_RTC) += virtio_rtc.o
- virtio_rtc-y := virtio_rtc_driver.o
- virtio_rtc-$(CONFIG_VIRTIO_RTC_PTP) += virtio_rtc_ptp.o
-+virtio_rtc-$(CONFIG_VIRTIO_RTC_ARM) += virtio_rtc_arm.o
-diff --git a/drivers/virtio/virtio_rtc_arm.c b/drivers/virtio/virtio_rtc_arm.c
-new file mode 100644
-index 000000000000..211299d72870
---- /dev/null
-+++ b/drivers/virtio/virtio_rtc_arm.c
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Provides cross-timestamp params for Arm.
-+ *
-+ * Copyright (C) 2022-2023 OpenSynergy GmbH
-+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
-+ */
-+
-+#include <linux/clocksource_ids.h>
-+
-+#include <uapi/linux/virtio_rtc.h>
-+
-+#include "virtio_rtc_internal.h"
-+
-+/* see header for doc */
-+
-+int viortc_hw_xtstamp_params(u8 *hw_counter, enum clocksource_ids *cs_id)
-+{
-+	*hw_counter = VIRTIO_RTC_COUNTER_ARM_VCT;
-+	*cs_id = CSID_ARM_ARCH_COUNTER;
-+
-+	return 0;
-+}
--- 
-2.43.0
 
+Regards,
+Chintan.
+
+> Thanks,
+> 
+>          tglx
 
