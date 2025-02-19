@@ -1,128 +1,161 @@
-Return-Path: <netdev+bounces-167654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9475DA3B5C1
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 10:01:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1135A3B652
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 10:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E81B17D7FA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E23D177C06
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 08:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2E31EFF96;
-	Wed, 19 Feb 2025 08:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AE01DE3C5;
+	Wed, 19 Feb 2025 08:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="I0nBBLc0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R9s+9nrn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372BD1EDA1A;
-	Wed, 19 Feb 2025 08:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CAC1DE3BE;
+	Wed, 19 Feb 2025 08:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739954747; cv=none; b=t9oxP3zx6vHRMbxQf/FjJXsph++L0HKSGsMzl0EO33bsqH9zuTB45vlozh3loFt/oiow2tUkou39UHrEbAConmq56OjZkGygwcPDW2fj34ZGJ+BkJWpmLzzLYND6k5zF+YBQ1NyJ6zKFsEfdSOXY/ApbRMzk900a21TjlSUoI0o=
+	t=1739954937; cv=none; b=cwCRJLBLrj6gXlCm51862FsDNl5LvcazUzZLbKCtUJ0lBZYbuBT8aFOJjl0dzS4UCxGw2xOYtydQAg/8rCL8+UoZ4jkhzQF5PINwvA9y6wWi5GFcVkrBkhWW0Hi4pAepEIcgQiSdm2NTR+nxw8HsBLj3vE3KnUykhThxgp8STA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739954747; c=relaxed/simple;
-	bh=bjidigATEzuWQD1HyEEpyCpxx5S1BE16Jsk3LXcB5iI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZNRpOYwui99A+98/YJX773A08dFnajgDsTCQauz59DgZGfHtvX1BXJAEKBLZij1tCqsE/YgWMx6sO7LCY6CtMI/djAlfJthHYEDtiNHpmD/hnlP5o1xq15xjMtWfgoOPkxTB8YIP01qbHGPSAL1CNB5v+hG62/NJrFaue/2JvPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=I0nBBLc0; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1739954736; x=1740559536; i=ps.report@gmx.net;
-	bh=bjidigATEzuWQD1HyEEpyCpxx5S1BE16Jsk3LXcB5iI=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=I0nBBLc03G2888UGX8ADBzLphpiuW8O/CPXSOt9d+hRJCOUK9CAyOjckCdLPS3Yv
-	 sFQc76pO+DKVJyOScx4CYG2o0qKCpXlOdWHqhQNgM9Elx3X1toPuzFMFg4EoR5/r5
-	 0OMonbjQweF5cKpQQwfh3SAV9zS5GklVtnL9/zeBNujbr+30xJLgrpjRnzhjsqsq4
-	 x/jMCFqXE27waRDtZlY6NaWbSxiyDU5FlP8KCl3DwNYAXQ2IWlXeZXh96UTjFbqcJ
-	 0XzDzwWmunCaThp28ppwACwglttJQmBmt4ZTE8yLjd1lDCABP3LScWThyF9uJWN9Y
-	 HFZUsrT+dAR2cerr+Q==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost.fritz.box ([82.135.81.84]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M3DJv-1tlUeY3Tyf-006MAF; Wed, 19
- Feb 2025 09:45:35 +0100
-From: Peter Seiderer <ps.report@gmx.net>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Seiderer <ps.report@gmx.net>,
-	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
-	Frederic Weisbecker <frederic@kernel.org>
-Subject: [PATCH net-next v6 7/7] net: pktgen: fix access outside of user given buffer in pktgen_thread_write()
-Date: Wed, 19 Feb 2025 09:45:27 +0100
-Message-ID: <20250219084527.20488-8-ps.report@gmx.net>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250219084527.20488-1-ps.report@gmx.net>
-References: <20250219084527.20488-1-ps.report@gmx.net>
+	s=arc-20240116; t=1739954937; c=relaxed/simple;
+	bh=fQbJ1QkpxFm4SGCWfxJzdDPB5fI9jirKoaXycqEgolc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MT6NMfG85tj9q2PT/6HKdLkW8O5FXRffpAkLx0wyTkZXc86oZyFfrntU+dnLmRXT/P/ki6CZt7oNdVHve2z3jMlHDO7eNSsj1efFtScPKd9tjiNM7SnQ+Q3lDGX5B0F94eFkfhl7nFX4nH2QV7gwkcT+biknlxofH6Aci4cYiB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R9s+9nrn; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DC92F44443;
+	Wed, 19 Feb 2025 08:48:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739954933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7uQR7Ryzn6i4UNyU9zcKaYBUdL/qVB7QaGkD/Wt9o6k=;
+	b=R9s+9nrniofjhO95BXMJmUUr1CFUhslXjgpUMJM3tORBZZdAUyzU+/rBYKvpVY8zZjdOU0
+	uaZp1o2BSikw69d3XAqTIfWKsQT2EeFq+fk8C+cxbp0wv1bip5cQYY5GQABxk0DLgBuw9l
+	Tq9D5WolkMPizxMWtpO4HuyPH2nuUbCr+62N9QUG8qZtuxm9BHLVViF0hOaHIQnMXWIrHB
+	emQggSTYM08I4edTDTUoGs56F8N6dJp3N5qdG+FagwyYglnAE6b30Fn+hV35vNtGpnujYN
+	j7nttnbBAHcJVmielnnOyhqE6rHl8kMgzogvip3onh6hiqQiQraj2ak6wsN6mA==
+Date: Wed, 19 Feb 2025 09:48:51 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, netdev@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net] net: cadence: macb: Synchronize stats calculations
+Message-ID: <20250219094851.0419759f@2a02-8440-d103-5c0b-874f-3af8-c06f-cd89.rev.sfr.net>
+In-Reply-To: <20250218195036.37137-1-sean.anderson@linux.dev>
+References: <20250218195036.37137-1-sean.anderson@linux.dev>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Provags-ID: V03:K1:QYZWc2fuov1jErqZjC89tMwDODSdFswkp9QSi9mbCHwZSy/Dzip
- JFy07ob2QbugkRt9mXY84MvYVHA4fnyBmyOXJXOMRGM9yMtA6tiOGrCdiul/MYACJJOncqy
- jHHs46frM1FXsbzHsbQ6j5jWlIhBjnytLwMGGzi8h29gyKEP8LXNmEzydgTciGDDX8gq/Mo
- Sna7Zb+/fOlzU6OOe44lw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:lOjTUpc05cY=;1MCESKz6EgFsA83KEwR68m2Brqd
- R59PVwvK/+7BQWz+6qZ+WE85NVRYTtJTni0KY3m+Du6uQybqNQNc7z+J+SxjJ8kSprseg8DLe
- WdR6867gdhPifVb5xaHbr1ZtuqfUKM+SjpKAJ2V+q7X+0V8AOaX8OM1/t7rGzdwE66VWE6D/S
- U6AMn9DT5uyvBxZC+/Oy2kVgZFs0aog23hVKWtHZhp3oiK0FsibVahtTdYWSI0COIK/xHCIW9
- AriyzApnt4b7S8Bv2F9MffMXqXTNdJdGOEYAQvRTy6feAqxp1W0w/7CqP+JpbDtr1xeXp6Ilv
- AnArmbR8rdgvGbKA/YgFuss1aI9prlw5XRKTkZonnrOM8BGWWJeIwHzqD9dIMLFRw9akNolB0
- gUhgI3GPnFyZnfVsVMSFNmXsgo6IDSPyMScaYCkKGbsWLOYe9VQfZnSKjEujq3QBOYY2jNdyM
- /m9pKUXElGsRDhbCZ7dfknRX9ySvZQs5rVC0SmlR93aOVBNyMz6BMNc5J+K4gLiizihabycqv
- mX0rVEdOUbNfnvDIIJHMHb3AMUIJx4Dnv87EeGfoT5keo8Fq6vB86t1yjkCZIkC+keLrHyR9T
- bO3Cvt27PwTQtrrC4h+xtgibSub3C+6CLeO3jCw+19L1n2XD2XYMKkEYpIappVQNC/jaqvhJl
- NC1oEjIUuKUYIQWTh+GkLGfJz/VS6UybGxXngRg3xu3wYSSsog+P74/unsJHG2xDGwRufPwZi
- 2bkgklJaTFxAoDIXOhPiV0NwW4Mn1kxVifj2b4o6mpN91RDtq3Yj1hp/dPq/5oudKnSV2dvMl
- +bqvaAvGeIYpD4RBVRHTHZwG5MZfJg1ABGbkIQQFHz5Al8tDCjYYBs9FC6AQe3yvT2lZg3rPe
- 9jumudFYPDLMREUl54WVrKMVJ9qBQaLbyx5Ogy7fTh80D2IPTpT8e+bBi3F+ZDH7N4DZANWnM
- zQJuLUlNg02vn3MrpEOwxYzH8bgT4jk03jc4by05vDO1qQwXmnbXXcN8QKWIvFN4NJUTkV9f2
- gj2c75/gEkdGo51Jvs14E9/k+r9gfseKkWO9a/AT43Q8NRshzV40Pd3aYkF8anCPESwEsyXc/
- arT6fjuILUpXARg+cuodN47uU868ncV0ohNvQFVwhy7OF6r288Q34JiT+PpnQBJIPRfIgfhzn
- O0t/iSYJUJs4t6Y/CUa7j81NFqpAP7bUwuMUj5fgI+XJVWe7fQpp6obnG5nBQ1LFXy4tiiaEB
- PcoRB1+cnwP4wKGcx4jbe3oyMOwiuSbhD9KCC56rNdurjWpTmivHmH0s+J7//e17YVGjjDxsK
- TwOsSWlS+ybbrYeiUJbKAULDn7B8XQU+W0BKW+tHhHFg83pE9shgEhTR7vcc7+o4iR6xQXAZR
- J+iFsbsFPvB4ykhjuAXp9H9WiEmZflMePPPksHzeaQsOT2vUPBFP7Kq1/0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeifeekudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepvdgrtddvqdekgeegtddqugdutdefqdehtgdtsgdqkeejgehfqdefrghfkedqtgdtiehfqdgtugekledrrhgvvhdrshhfrhdrnhgvthdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedutddprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghvpdhrtghpthhtohepnhhitghol
+ hgrshdrfhgvrhhrvgesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-SG9ub3VyIHRoZSB1c2VyIGdpdmVuIGJ1ZmZlciBzaXplIGZvciB0aGUgc3Rybl9sZW4oKSBjYWxs
-cyAob3RoZXJ3aXNlCnN0cm5fbGVuKCkgd2lsbCBhY2Nlc3MgbWVtb3J5IG91dHNpZGUgb2YgdGhl
-IHVzZXIgZ2l2ZW4gYnVmZmVyKS4KClNpZ25lZC1vZmYtYnk6IFBldGVyIFNlaWRlcmVyIDxwcy5y
-ZXBvcnRAZ214Lm5ldD4KUmV2aWV3ZWQtYnk6IFNpbW9uIEhvcm1hbiA8aG9ybXNAa2VybmVsLm9y
-Zz4KLS0tCkNoYW5nZXMgdjUgLT4gdjYKICAtIG5vIGNoYW5nZXMKCkNoYW5nZXMgdjQgLT4gdjUK
-ICAtIHNwbGl0IHVwIHBhdGNoc2V0IGludG8gcGFydCBpL2lpIChzdWdnZXN0ZWQgYnkgU2ltb24g
-SG9ybWFuKQoKQ2hhbmdlcyB2MyAtPiB2NAogIC0gYWRkIHJldi1ieSBTaW1vbiBIb3JtYW4KCkNo
-YW5nZXMgdjIgLT4gdjM6CiAgLSBubyBjaGFuZ2VzCgpDaGFuZ2VzIHYxIC0+IHYyOgogIC0gbm8g
-Y2hhbmdlcwotLS0KIG5ldC9jb3JlL3BrdGdlbi5jIHwgNyArKysrLS0tCiAxIGZpbGUgY2hhbmdl
-ZCwgNCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL25ldC9jb3Jl
-L3BrdGdlbi5jIGIvbmV0L2NvcmUvcGt0Z2VuLmMKaW5kZXggZjZlMzViYTAzNWM3Li41NTA2NDcx
-MzIyM2UgMTAwNjQ0Ci0tLSBhL25ldC9jb3JlL3BrdGdlbi5jCisrKyBiL25ldC9jb3JlL3BrdGdl
-bi5jCkBAIC0xOTAwLDggKzE5MDAsOCBAQCBzdGF0aWMgc3NpemVfdCBwa3RnZW5fdGhyZWFkX3dy
-aXRlKHN0cnVjdCBmaWxlICpmaWxlLAogCWkgPSBsZW47CiAKIAkvKiBSZWFkIHZhcmlhYmxlIG5h
-bWUgKi8KLQotCWxlbiA9IHN0cm5fbGVuKCZ1c2VyX2J1ZmZlcltpXSwgc2l6ZW9mKG5hbWUpIC0g
-MSk7CisJbWF4ID0gbWluKHNpemVvZihuYW1lKSAtIDEsIGNvdW50IC0gaSk7CisJbGVuID0gc3Ry
-bl9sZW4oJnVzZXJfYnVmZmVyW2ldLCBtYXgpOwogCWlmIChsZW4gPCAwKQogCQlyZXR1cm4gbGVu
-OwogCkBAIC0xOTMxLDcgKzE5MzEsOCBAQCBzdGF0aWMgc3NpemVfdCBwa3RnZW5fdGhyZWFkX3dy
-aXRlKHN0cnVjdCBmaWxlICpmaWxlLAogCWlmICghc3RyY21wKG5hbWUsICJhZGRfZGV2aWNlIikp
-IHsKIAkJY2hhciBmWzMyXTsKIAkJbWVtc2V0KGYsIDAsIDMyKTsKLQkJbGVuID0gc3Rybl9sZW4o
-JnVzZXJfYnVmZmVyW2ldLCBzaXplb2YoZikgLSAxKTsKKwkJbWF4ID0gbWluKHNpemVvZihmKSAt
-IDEsIGNvdW50IC0gaSk7CisJCWxlbiA9IHN0cm5fbGVuKCZ1c2VyX2J1ZmZlcltpXSwgbWF4KTsK
-IAkJaWYgKGxlbiA8IDApIHsKIAkJCXJldCA9IGxlbjsKIAkJCWdvdG8gb3V0OwotLSAKMi40OC4x
-Cgo=
+Hello Sean,
+
+On Tue, 18 Feb 2025 14:50:36 -0500
+Sean Anderson <sean.anderson@linux.dev> wrote:
+
+> Stats calculations involve a RMW to add the stat update to the existing
+> value. This is currently not protected by any synchronization mechanism,
+> so data races are possible. Add a spinlock to protect the update. The
+> reader side could be protected using u64_stats, but we would still need
+> a spinlock for the update side anyway. And we always do an update
+> immediately before reading the stats anyway.
+> 
+> Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> ---
+> 
+>  drivers/net/ethernet/cadence/macb.h      |  2 ++
+>  drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++--
+>  2 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+> index 5740c98d8c9f..2847278d9cd4 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -1279,6 +1279,8 @@ struct macb {
+>  	struct clk		*rx_clk;
+>  	struct clk		*tsu_clk;
+>  	struct net_device	*dev;
+> +	/* Protects hw_stats and ethtool_stats */
+> +	spinlock_t		stats_lock;
+>  	union {
+>  		struct macb_stats	macb;
+>  		struct gem_stats	gem;
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 48496209fb16..990a3863c6e1 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1978,10 +1978,12 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
+>  
+>  		if (status & MACB_BIT(ISR_ROVR)) {
+>  			/* We missed at least one packet */
+> +			spin_lock(&bp->stats_lock);
+>  			if (macb_is_gem(bp))
+>  				bp->hw_stats.gem.rx_overruns++;
+>  			else
+>  				bp->hw_stats.macb.rx_overruns++;
+> +			spin_unlock(&bp->stats_lock);
+>  
+>  			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
+>  				queue_writel(queue, ISR, MACB_BIT(ISR_ROVR));
+> @@ -3102,6 +3104,7 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+>  	if (!netif_running(bp->dev))
+>  		return nstat;
+>  
+> +	spin_lock(&bp->stats_lock);
+>  	gem_update_stats(bp);
+>  
+>  	nstat->rx_errors = (hwstat->rx_frame_check_sequence_errors +
+> @@ -3131,6 +3134,7 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+>  	nstat->tx_aborted_errors = hwstat->tx_excessive_collisions;
+>  	nstat->tx_carrier_errors = hwstat->tx_carrier_sense_errors;
+>  	nstat->tx_fifo_errors = hwstat->tx_underrun;
+> +	spin_unlock(&bp->stats_lock);
+>  
+>  	return nstat;
+>  }
+> @@ -3138,12 +3142,13 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+>  static void gem_get_ethtool_stats(struct net_device *dev,
+>  				  struct ethtool_stats *stats, u64 *data)
+>  {
+> -	struct macb *bp;
+> +	struct macb *bp = netdev_priv(dev);
+>  
+> -	bp = netdev_priv(dev);
+> +	spin_lock(&bp->stats_lock);
+
+Sorry if I missed something, but as you're using that lock within the
+macb_interrupt(), shouldn't it be a spin_lock_irqsave() for all the
+callsites that aren't in irq context ?
+
+You would risk a deadlock otherwise.
+
+Thanks,
+
+Maxime
 
