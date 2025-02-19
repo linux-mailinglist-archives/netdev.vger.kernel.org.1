@@ -1,109 +1,96 @@
-Return-Path: <netdev+bounces-167553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D1BA3ACC1
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:46:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7715AA3ACF4
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 01:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 510DB16E8D2
-	for <lists+netdev@lfdr.de>; Tue, 18 Feb 2025 23:45:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51DF01733FE
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 00:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823F81DE2BD;
-	Tue, 18 Feb 2025 23:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4414C6D;
+	Wed, 19 Feb 2025 00:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpiZto3g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8Njok14"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB521B4137;
-	Tue, 18 Feb 2025 23:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66E04690
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 00:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739922344; cv=none; b=iJRucZnn/OFbVr63E0Zp3m1K5fgWdS8Zz1hohGjq0zSMESbJVf5S7qTn/a5gwOOkd7d4lxMglW0VKrH3vglP7dOTEjyc536eSOVar4/Q3xHYWhN3VlXew25YWYXP7ojrSBjpsUDv8Yq283HMapllD7cDJoAx7vz7eTDse14b8uw=
+	t=1739923815; cv=none; b=sl4X9veb152btdUZxs2Yv6VYfZRwKTeQdES93LNiRDnTgHy3KifA3ELVpMNd1kCbI7rv1swbaFbYKpdneXVUHqwL1HhTb1SHuhEWABUGaKsBXsVrWf5jdx3tUoD24REC4fcacsOr0asKcPGeauo2ev0FKXLNnn0S6P3XubLyoyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739922344; c=relaxed/simple;
-	bh=65VBNt0S7qZziB7bTMy0CHcTCMWGqCIh1ZfJXgUuat4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GMLCC/XJHNKNDJP+DIZUuu8/QCMlTnFqW5pxDjLt5+H+wdMbDNcQMUxzKSBF8RB6ukEjK1LH613Xnjmv52N8v+p2xcWqIUEH6ODiGmXOJhJOc5Trv4qyJ+gAP37thnJ+hMJNarm2gpAuZkkh2BvHmf9pSzrXRLwo8YMnsncMk/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpiZto3g; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-85527b814abso99794639f.1;
-        Tue, 18 Feb 2025 15:45:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739922342; x=1740527142; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=65VBNt0S7qZziB7bTMy0CHcTCMWGqCIh1ZfJXgUuat4=;
-        b=JpiZto3gV4c3e/F23yGjMq0pVx9Q8K9HHaQjxmG+t38h7GrcGZUQBxT5UaxGnr5i1S
-         Q+mGE7W8XOoWzekgmd5KMMoED9WiZycZIhPecl04f5j9XHYlNZVGlMG0+KMXYJliq5mJ
-         X1YPJHUj0yjSsWKa7C6Ow23ZGvSCPRINV3MuwJgp/Hr4xr2D6dgZpXgezZqFSkGUdny0
-         nqqT2cDKtpP6cWwl1mbrmvDcaCIpaQNR5GLFZRTKoEIM5LMtU6vzLVKfbluZ+t+Ggg0T
-         DJ0m1PogOoLMRNoq30XVjotfScGTxtwZwGBwEAAFpiSpUmQ4Ck1r4WrDMdO2ZeuoGdM5
-         551A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739922342; x=1740527142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=65VBNt0S7qZziB7bTMy0CHcTCMWGqCIh1ZfJXgUuat4=;
-        b=iHe7U1mN10PGH7OYbP5RuHIVkaQzltS7gMaGg7Y5aJfqxfDSaBcmU2ClNt6aagg56a
-         7uPilxW7ntVZx+DaojyqYJbX9oK6InHICLRJUfH5awzKy2xY+4BDL3gDwpNceB68stya
-         I/6ul+n8sEywnApAJ05wfH5SvZwS2meUWk4s+SJdbbSsDmQWE2CXTVCUZ26Ce9QssHQt
-         JR2k5jOE+0Wgw9a3ZmdfSNE5h0Ki1VVUVPCvK9REcuStgxHJBROVPi5XNuBGyz5prgNH
-         gYHmuA8876EReYWbIH0MwJed68niRyc1dpMA5f8fAqEV/xDLWi10T8YhkXZP7CY9hLet
-         8u5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVDY3uCycg5OWu4xZa3Cn06Ble094498BGoTyfnR2ddaY7Tjqbz0Dv+z/UzS40GGqc6zbyrB47v@vger.kernel.org, AJvYcCVYFEUnX6EWu8BjuGL8wdIol0vOx6pDBQBYwpCiqg+EubAn8fpEQTSm6ESRdjMBqFHb+8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuQ5HjJIVst2B/tzConSfJPOHDS7KB9IXqkaac+Yf2sUzZsmd1
-	vqvVN4qBtT/kPi42V4sQqX0djE+4iSHvc/ubpdMT1EKhsR6brCdghga+HhClF6KzPdnMOa2rEl7
-	5l8iYqDN7n2me3jA46UIC/nLFkN4=
-X-Gm-Gg: ASbGnctp+EP7LreCzUUPbbtwcBfjpKnOPxzug4I+AJyp3L1CJnKx5WRWfEY7qrwW8Sw
-	GjWFjNEvLsNAlG1LYP3EOLifvY0CNiZiyD3Oy4M16b0lIgj5T14VDfPe/9ikBPJukjCZ7ayWx
-X-Google-Smtp-Source: AGHT+IFzStReaQhv2B5fXmhtQ+bREG70OmQ2LxBw0rnKHSoSCAbjDOI8BdfT5/XMwDa/mWQloj/8aUG45KyE8Dm+5pg=
-X-Received: by 2002:a05:6e02:12c3:b0:3d1:946c:e69b with SMTP id
- e9e14a558f8ab-3d28078ed3fmr122244955ab.8.1739922342074; Tue, 18 Feb 2025
- 15:45:42 -0800 (PST)
+	s=arc-20240116; t=1739923815; c=relaxed/simple;
+	bh=YwRHAPyqrsXrJLl99Rtqk+Wm/8rNf0I57yfZKvDZNbc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PfjIEooHilcX9zIIz+dAS2TqGeogD0R8cfG6T2a2jqRh+T3xp7UbEIz8KDzTNDJdyDjdrL+7lCR7kbWK5HlXGo+Eq+T0Xoe5xbyrZspITV5eFH6k4cyAby0PwHItZaDFlC6QZpx+xKVcT/rDKSoDBCFmielMSrgsPqRuGFIu0FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8Njok14; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149FDC4CEE2;
+	Wed, 19 Feb 2025 00:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739923815;
+	bh=YwRHAPyqrsXrJLl99Rtqk+Wm/8rNf0I57yfZKvDZNbc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=C8Njok14tDNwHxPCt65INLhQfg737VGrbP7OFShDl4/8AoRQmr2sK0tYCC1SPNssv
+	 +tNqjrziD+nB+UzP8ULwZ9mEZDIDVkJi5J8cVKPFrU4X12bDuUN4CaqZhlB+hfqH6q
+	 22pIbYxM0ej14ZIEvt7yTIom35Tqq9AvgW1C5jaq5DnAllkpqa1aCoQa7CY2Gv4Qcb
+	 5JqO7yky7L0PQUGtIWc2YG8TL9pbg8rV9TM/Mv11mulpfeX5wXQLLmdbbsWxFZQY1x
+	 P6Z5WLdLZe2AzW11UQmRrq4vafa47PeTlLlXW5EMFlxII4eM1dyQsNdMzl55l8OEVe
+	 fXvktDqRLGYhw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4B8380AAE9;
+	Wed, 19 Feb 2025 00:10:46 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250217034245.11063-1-kerneljasonxing@gmail.com>
- <20250217034245.11063-2-kerneljasonxing@gmail.com> <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
-In-Reply-To: <4dc10429-29dd-47bb-bd5f-6a8654ed2fec@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Feb 2025 07:45:06 +0800
-X-Gm-Features: AWEUYZnULHAhxi8CqVdrcZGL07pkdVVOjws9rWNrxPS7rgEfJdoQH8QriCUSnV0
-Message-ID: <CAL+tcoANZ5MZFoqcB3d_G-BWuL=04165QpZeePLxfukDDo7Ldg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/3] tcp: add TCP_RTO_MAX_MIN_SEC definition
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, 
-	ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] tcp: adjust rcvq_space after updating scaling ratio
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173992384549.72368.8058032840496083519.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Feb 2025 00:10:45 +0000
+References: <20250217232905.3162187-1-kuba@kernel.org>
+In-Reply-To: <20250217232905.3162187-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: edumazet@google.com, netdev@vger.kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ ncardwell@google.com, kuniyu@amazon.com, hli@netflix.com,
+ quic_stranche@quicinc.com, quic_subashab@quicinc.com
 
-On Wed, Feb 19, 2025 at 7:38=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 2/16/25 7:42 PM, Jason Xing wrote:
-> > Add minimum value definition as the lower bound of RTO MAX
-> > set by users. No functional changes here.
->
-> If it is no-op, why it is needed? The commit message didn't explain it ei=
-ther.
-> I also cannot guess how patch 2 depends on patch 1.
+Hello:
 
-It's more of a cleanup patch :)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks,
-Jason
+On Mon, 17 Feb 2025 15:29:05 -0800 you wrote:
+> Since commit under Fixes we set the window clamp in accordance
+> to newly measured rcvbuf scaling_ratio. If the scaling_ratio
+> decreased significantly we may put ourselves in a situation
+> where windows become smaller than rcvq_space, preventing
+> tcp_rcv_space_adjust() from increasing rcvbuf.
+> 
+> The significant decrease of scaling_ratio is far more likely
+> since commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio"),
+> which increased the "default" scaling ratio from ~30% to 50%.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] tcp: adjust rcvq_space after updating scaling ratio
+    https://git.kernel.org/netdev/net/c/f5da7c45188e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
