@@ -1,318 +1,250 @@
-Return-Path: <netdev+bounces-167917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58455A3CD73
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 00:25:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7528DA3CD8D
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 00:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ECA9178280
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 23:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B01603B7E5D
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 23:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA91D25D539;
-	Wed, 19 Feb 2025 23:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433DF260A44;
+	Wed, 19 Feb 2025 23:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P8h3UOm6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YCxgrSTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C9A1D7E30
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 23:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740007543; cv=none; b=DbuVhnn4butdzv7Ua8j5+yUEqO36cryYsw9pKNAiXWEX7jok8ET35kOPlFjizxQSNjzPhxpU8HPG3K4hAuIaYrNCzoiQYMSyuMgWVUdtQZmq6DVWNCICjX8YQ1Mh3kHeXyph5yTzEuqtLN2ZasrETfGNHZLuH0C1VwA0gaqLoPw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740007543; c=relaxed/simple;
-	bh=9ohG2QD/tJh3Roiv4JmGmUSY1d2GfUHaKUCFxoZJjrA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C9xEQc5XzFezA9gsUy/D1w0DKnuN3Ut4NcVqgkQxZbHomodOxk7+POYJ+o8JbF/rHbWMEKZ1parBpM1mmcvXepl5/EQo5yblseMtNGnT3CQxV1NRIYpLZR8T6MRXfO6Ql/mSTJ0QO6N8Z72yxAe/ImP26UQTPrJZoWGM0/vfH9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P8h3UOm6; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51JGt2dL011634;
-	Wed, 19 Feb 2025 23:25:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=MMTase
-	bDCcrtL3CYiVpYsdakTw4gen2R/Jig2+VRt8w=; b=P8h3UOm6wHHQUqlWhYpjck
-	SRaBK7lLML5QkNGHw/UTFymX9Gd0KdW5RoVn0lSVBl543q9c2I2K54owzvTPElMp
-	DMWbWmL3eNYfowgX7j2yH2P6qc4Yh4PSdasn8sG7ulJzKGDG7R4Pn3do1lpOqprN
-	VRgk+xP5xXVCBdjzgAGaWBL1tdO0C4/3qH5/wJtJ8oFDKUpwQ4a++LUdgfb5ey9V
-	TLLj43m6p4Jrc7atmIUnbVphabWTlQ1G0AhrcG3IWpFsUAoll9hQtr4dSOUAO2cj
-	7z2dqSpkxqnnAd3bQT0tPFYAzSXey4+ii1Hp0Hzcvav+jJcmk2W28Ds2fOh1nTlA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44w5c9dujp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 23:25:20 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51JNGINp011880;
-	Wed, 19 Feb 2025 23:25:19 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44w5c9dujm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 23:25:19 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51JKmk1I002323;
-	Wed, 19 Feb 2025 23:25:18 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44w03x6rh9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 23:25:18 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51JNPHQM51053008
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Feb 2025 23:25:18 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CAE7D5803F;
-	Wed, 19 Feb 2025 23:25:17 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 833BE5805A;
-	Wed, 19 Feb 2025 23:25:17 +0000 (GMT)
-Received: from [9.61.242.219] (unknown [9.61.242.219])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 19 Feb 2025 23:25:17 +0000 (GMT)
-Message-ID: <e77b6ea0-7989-4c58-9524-ad8e3941a7a8@linux.ibm.com>
-Date: Wed, 19 Feb 2025 17:25:17 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7465025EF86;
+	Wed, 19 Feb 2025 23:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740007799; cv=fail; b=erN80a9ILHZG8x1A90qnA/8Y3SQuPrec1dIHtHEGOJ2JDITGX25rq+OJOLrWbwKwNuOX9UVJQWju9C4ooWp6Fc7sNjASOQCSd3B5ckULkbWttJkevmQlSpsy0wCtVKn91mxtJdHLJy9qrWn6Tr25bZiTs5hjhAtcewJPvEVrnxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740007799; c=relaxed/simple;
+	bh=+fa0Itj0648kXPNBHP4kWzwvw+wxGEJ5UhnYVlw7hEo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q5RIJvY2FgyN8kPjtyrzvTvZDMf+BNR0Curoe5S45FFL6ArJTCx7S4dptx8DtMR9Uhn0/BO5aYwxEmOBZxZtvrr3HF8q9Qwwf9T3yyw0pUsrBmcmp3nGozwNE/+vr9fsdrHE1iPH4MK49BW+m2QOk/FcnEZCGUbo2ZYbYhRCe+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YCxgrSTP; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740007798; x=1771543798;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+fa0Itj0648kXPNBHP4kWzwvw+wxGEJ5UhnYVlw7hEo=;
+  b=YCxgrSTPDaJ1Pwn2bDP2nQSi6WNGhfy/29i9q/QshanWbPWkiKwu5Wfb
+   YmhnlJRMa0IvZsQAMdCKqyHf6QGoTJ4TfzF4WhNvOy0/oWu6/gsPw2gTt
+   M56CCd3UuhsvBfY5aMa6FkiLeqcbKYOOFoDXatHjIibTSTn1abryz2Ehw
+   PHVEv3a0QgxPz29sZwLYJIhrt4J8REQANDjRDImrAWG0vXyBGk981tc2Q
+   1yrTQBO6HliFOkbvtPM1OCaFGst4Ey4NxwsHkbYoZsYbuJ3BrIDgjN3sg
+   Rw0RyT9rEfbFIlbb+iqKRc01jFJgitrrbFt6ds/TVf67BxurKAhPC+u2u
+   g==;
+X-CSE-ConnectionGUID: j1JGTeMuTEisC/b/sZpk6g==
+X-CSE-MsgGUID: 1ewmHlFUQ4mD9A21MfEkXA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="58311838"
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="58311838"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 15:29:57 -0800
+X-CSE-ConnectionGUID: BU//EWmiSV+8b+fy4r0ThA==
+X-CSE-MsgGUID: V0z3dILkROave8fA4BwdGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="115404344"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 15:29:56 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Wed, 19 Feb 2025 15:29:55 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 19 Feb 2025 15:29:55 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 19 Feb 2025 15:29:55 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HFkcF0ynF9Lbv+o1bQgEIeFD/g4YaZ8aSxT/DkXijoLCQST4dwwkv2VSLv71N2bDn03ZLRCLWtAaH0e4WkApN2+KkEbX895dYgPBg780g+LEYkLAShBvBjHKcDeAEMeovb3/or95LqRhztyZwsTMrnlx+yZlsZLErRlJx0S4D00X9WydWsBX29oboSM0Ugjdl/1HztgrY9pWWTXp35fYdU3mHr/2DLgYmhR0CCBq+HUNFZ+ZSdOVTS0Ztg7o06pjkz1IhiZnPU1R8Hm3HiDUUK9e1svOek6NWyn1wbSty9wQWd7hF7m32LJ22hHX1rXFv4YUjunLpSIuuXuV78GVWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CYwraooxORnTPQaXdcLQUWBaR8U8eEnaD5QZs0yfwDs=;
+ b=Qr+DjYNQXLc+3n3zPeGpkz6PN9uZGYRLTpoCPBiKyGB9GUpgGyNToxxrFYUZscpUfbt6EXqN53LBETnsTld7liHVsNbbQnbrv5vN0l/BDxerCQMvQ0fKZgT+2ob3mKmY7AbA0imlHIiJz18ejQqxmLVM/GEtBmnjupupoiud5t9fA/3VScpxldOlD1WILkFWu0afaMmF8u+SN/w+3blrbjbBjzEfOxyrRktGLn3cRjDK19nHMvQMl9sB/u+p5sE3GrPDzAb/lpr13J3pWtaWwkNVvxRCB25iskWi+iZF9nYQL95CBsUerqxzxS3L4zh8A903wJaKykiJk7aSWhBU+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by LV3PR11MB8577.namprd11.prod.outlook.com (2603:10b6:408:1b8::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.14; Wed, 19 Feb
+ 2025 23:29:53 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.8445.017; Wed, 19 Feb 2025
+ 23:29:53 +0000
+Message-ID: <889918c4-51ae-4216-9374-510e4cbdc3f1@intel.com>
+Date: Wed, 19 Feb 2025 15:29:52 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: axienet: Set mac_managed_pm
+To: Nick Hu <nick.hu@sifive.com>, Radhey Shyam Pandey
+	<radhey.shyam.pandey@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek
+	<michal.simek@amd.com>, Russell King <linux@armlinux.org.uk>, "Francesco
+ Dolcini" <francesco.dolcini@toradex.com>, Praneeth Bajjuri <praneeth@ti.com>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250217055843.19799-1-nick.hu@sifive.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20250217055843.19799-1-nick.hu@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0242.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::7) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] powerpc/pseries/iommu: Wait until all TCEs are
- unmapped before deleting DDW
-To: Yunsheng Lin <linyunsheng@huawei.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>, maddy@linux.ibm.com
-Cc: linuxppc-dev@lists.ozlabs.org, brking@linux.vnet.ibm.com,
-        mpe@ellerman.id.au, iommu@lists.linux.dev, ilias.apalodimas@linaro.org,
-        Netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Mina Almasry <almasrymina@google.com>
-References: <20250213171051.63748-1-gbatra@linux.ibm.com>
- <3e6505a4-ba21-4dd6-8ad2-8e0ef8846fc3@kernel.org>
- <f45fa065-a72c-46d6-a196-f4bc1d9f395e@huawei.com>
-Content-Language: en-US
-From: Gaurav Batra <gbatra@linux.ibm.com>
-In-Reply-To: <f45fa065-a72c-46d6-a196-f4bc1d9f395e@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: H-JTGzv7SVgsEnZfBJ8_wiislZhZzU5q
-X-Proofpoint-GUID: rtK4WXl0ULkdpucHY4-7AjZZYIZa8pVJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-19_10,2025-02-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1011 bulkscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502190169
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|LV3PR11MB8577:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6dafc638-1cca-4881-9185-08dd513d4ff2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RHd6L2huaDZnU0ZONGJLM3VoQ1Z3RXdEOTFEMXZNR2Q2eklmMjliRmxsWDNS?=
+ =?utf-8?B?YXgyaHhpazBNQlBTTEtDWWY2T0JaWDFDTmYzeEc0RTFhVTVrQXU2SjlsNlpP?=
+ =?utf-8?B?VUtLc2lDU202ZU1pdlZvVE0wVGFZWlB4Z01jWjhMNVJCUHJZb2xvTHJCN1ZN?=
+ =?utf-8?B?TGZpUkNtNXh3YkZyWDlUQS96bXpKY3BHakk1RjRrMEh1WG1CL0ozb0p2bm8w?=
+ =?utf-8?B?bm9BZG9kZDEzd0JNNXhzU01uMFZPNElhVVR2Y2JxS2o2Tjc5a21JdC9aaFpC?=
+ =?utf-8?B?ZDMzRGdURHN3Y2dvS0NkNDBVK1hObisrZWpQNHZhS2k0R3dqa3graWtlTkxM?=
+ =?utf-8?B?QkdLMHpzUnVTWno5dHNhUDQ5bFZDWFNxcG5tSDN0V0lneXNoV0IrUlBnb0RJ?=
+ =?utf-8?B?TXNqendIR2ZOQnRGeDlVd3VZKzM2bDZnTkRUMVpYYmFGZXQvMlJaamJkc0NZ?=
+ =?utf-8?B?a1V0aURKL0xaT25GSm0wV2VuTHhTODJPYWpnaXVPOVk0eVIya096c21Xc3hR?=
+ =?utf-8?B?QnJGWDhQU2d1elhvSytUb1hKeml6WnA4aFJRUnF4YThCMjN4ODYydDEzNk5o?=
+ =?utf-8?B?dGNXZkNMMU9vUzhWcThvZTZqV1pucXM1QUpVS29Ob0h1U0lsa01MUkRuY0ZZ?=
+ =?utf-8?B?MzhLRGZTRlJnSElkblJhWlFvellJb1NDRWJMaWRMTXg1Vmg0VkhrZjlSMDVJ?=
+ =?utf-8?B?NEhtaENVOWFuQ2huNVJyMjdMajZ1VEVKZnRPeDJDcGhndkNzWFhubGtmdHVM?=
+ =?utf-8?B?VkVEWEtrakdiZU1CaUlzZEUyelJ1YndpbnRaU3pmTVMxZzRrelEwQm5tSHJy?=
+ =?utf-8?B?NTlPNjI5eWZnS01NQ0dTUmtHb3VNMHZzdzNpU0RaSGtrYzN4eWR4YWx3K1lY?=
+ =?utf-8?B?RjJ4RlFvRDFXL25MN0hDWFNXVVFMSHErdy93Yk9sTGl4Z0FESWVLTENPVmcx?=
+ =?utf-8?B?Q2ZCK1BSTlZ3QmVIR0RWSjdqdHIxNlNUQTdMbERGSW93Wks1TGxzdzVaemsz?=
+ =?utf-8?B?cjdxU2VkaVJuNTNpa0t0NStUOGE3L1BKSW42TlhPMlpGQ09rUHBDQ3hzS3Nt?=
+ =?utf-8?B?UDFhYWdIM25yMlV3TmNNYy9jTjBqR1ljR2pWRnQvRlVHWTYrOHNPMTdyQVZ6?=
+ =?utf-8?B?d2VQclliaHFHRk5naEUvNHlJMWJTRDZEN3FyZUZwcGNaQmR0UjlvV01naTd3?=
+ =?utf-8?B?bTRMLzlwQUdET2k4bjFXUEhGUFNHc2tibXVQbXpXR09xSVE5UHJaeW9JSUhi?=
+ =?utf-8?B?cWtlWGlURGt1cUNIZ3RKOG1WZURLMm42SkhadzAydFpPTll0Y1BtTm96Q1pj?=
+ =?utf-8?B?MFRrRmxlcHpGSngwL1dWSVZOUnJWaFQ5YTBiQ1VweVhqMlF6ZUpBaTNlL2V2?=
+ =?utf-8?B?REdsc3FkQmFqYmdCVmZqbWZDbDgzZjVTMThqeGZBb1dZSGlPdEZiVFlxUzhh?=
+ =?utf-8?B?K0duNUtwSnZXTzRFczZRVHN6SGd5ZVYrbHFEZHZZK2ZGN1I2U2NrbHVNRDcy?=
+ =?utf-8?B?SEJxNjlIV25ieUgxQ09JWGJNSUsxYjlPZ1kxRGFCTGZPbjE4YUVvMFZmRzFW?=
+ =?utf-8?B?cnUzd0xHNHJPV0JleTk5WE11WGxBK0wzWVZHTm5WL2duSndYc0NuVEpVMVMz?=
+ =?utf-8?B?WFBkS3kvUlpaVXN3bDVickdqNUdXaUpEamhVZVlGczRkZVdiSGJsUi9pV0xx?=
+ =?utf-8?B?TzdLVkdFbGdWekxOL2xnZmdKL2lRaEc2Nm9PQnFNVkYxQjdnTm1HOE9rRHdl?=
+ =?utf-8?B?cm5vbXR5d1R6VUl6L2NuU29LczQ4UDNyMHI5WWpaaVdtWStRWFFUdmRUb1VR?=
+ =?utf-8?B?cG5CK2FlTU5USlFLdDFCN3BsKy9OYlB0eElMYnlUTDFISTBsakhjd3AxVGVm?=
+ =?utf-8?B?ZTJiWkx2Tk9IZnRnZTlhSENWRGpPS3FCTUV0cHlGSGI5Sk0yWEFqOEM0VjJs?=
+ =?utf-8?Q?QKtnCFE074w=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N0F4V3l0UzF6cGhINFBtc1lUSUtnQTJBM2dhL2t6OEhERW5nNldYS0V2ZkpU?=
+ =?utf-8?B?SFlVYnFKVHJnM25wamgxejI3Q3BnN2NVWXd2K2NNZkMzbWdodVVwTmYvUkhx?=
+ =?utf-8?B?d3djRXVQTEN3b1FpMW1uUm91RFJHRUZLSHJ3b0ptRHMvNm1EVGVMMUFoR1Rr?=
+ =?utf-8?B?bnpSTGZSU3FaS2Q5cWdSWFdBNkpWU1FNMjNySjZrWWhHZTZYYUwvUjA1Mk9w?=
+ =?utf-8?B?cEIrQ2czZ0FsMDJvMnZyR3pPUVBnRzdpRXRhRkRFSUZaeks2dnBNMWZDWXpV?=
+ =?utf-8?B?M0pDeWJTUHNKVVY5TEkyaE5GK0w0eStUOENSbXp4UXhtajF3VytSNHB4VElm?=
+ =?utf-8?B?VGpWTXZDeWp5b1lYa0RHQU5LRjBRTHQwZjBqRkdob0J4K1VmMkxVbTQzMU1l?=
+ =?utf-8?B?TmRRVDBKMW5PR2R0Z0sxUTlFRzl1VHptNG1uZ2tENkkyNFlRZ1BUcjY5Sy9l?=
+ =?utf-8?B?TXhwSFBkVjVFT01Lc0h0RDJGRWlMNlUvK0kxY0o2aHZkSEI0OGdLUmhoQlRi?=
+ =?utf-8?B?ZFYyNEJSQmhXYWtsdmtVQldBU0FPRVBESmhqUUdsWkFiTGhJRmVLd1BPZjdJ?=
+ =?utf-8?B?QjBkYXNmR01JRTlDcEptQTNNOVNaendOZm1aaW9sTmJiMmdGY0tCS1VEeitv?=
+ =?utf-8?B?RVNIenVYY0xBcVlUcjBsT0VoS2srMWZjb0hMeTBOTHJEU3VJMnNHMHNHa2FK?=
+ =?utf-8?B?TC9mYzYxVE5hL2RhT2F1ZEU3R3kvYW9EY3pTNFlzUHVqd0xRRW9XUlhRK2RK?=
+ =?utf-8?B?M2RmU3RuRHJXUDh2cjFrR3cvdmc5MmJNM3Z1TjJBNWN1akFOMk9mQWZYaFZP?=
+ =?utf-8?B?SFZncG1aUVk0RmxvRTlvK05UYmIya3VtaDZlL2VUdnVFNUFZclhHTkt6NmRM?=
+ =?utf-8?B?NGlWMHVlOHo1d01hWm82SjNnSlpGUmRQVTZxQ2hkZHY2OWRLb04vdFVkOUJP?=
+ =?utf-8?B?cGhXUTRZMHZLcnRLeGVGY000YlVNRnlrWExXdmxYVGNFVzRZSmZSVjBHbUh4?=
+ =?utf-8?B?UCsxLzl0R2ZBOUtRSEhEVEVjeHpremxBU2pqZE4yNXk5WmxiTHIxeDBSWDRm?=
+ =?utf-8?B?WXdnM0RrM3p1d2RLSjFhZHVwWmU3eTA1OUpoTXBjZGxvcUF2RTZwYnJDVmtS?=
+ =?utf-8?B?Vm9SdnZISDk5ZFBHVm9PZFc5MFMzZHpIaDJWT0tWclFVMTVCYkg3MGowMHBO?=
+ =?utf-8?B?a3k4MXNJdDVER0FYRy9Yd3FDYUNSdUsyMDYwQ2JiYVFwSG5hY0NUZUtaa1Az?=
+ =?utf-8?B?RHJhcGVPVGUzNkM3UlAweEg3UGdsekpyUkpFOS9aS3J0bE9wUmthVkhubGVk?=
+ =?utf-8?B?Tkx1OU9QcDRKZVlHaGlOVlBXOFdKL0xzRW1lYTlpdnNzbXVSOEpKYmlybDRp?=
+ =?utf-8?B?SVNZSDl0dFh3YXQvQlBTdGVqUHFqWE83S0JiNTd6alFUWUd1d3djcmd5b2ov?=
+ =?utf-8?B?aTd3cHk1OEdnejFOR3QxM2xKcGVyOEsxakVkckxBWUIyaklzcWpNVms5RkY3?=
+ =?utf-8?B?TFNNMW5RTDI4U1NuZXAwV3FKbnV1WmpncWtxODVjTlZ4MWJsTXNRNTJDcnpP?=
+ =?utf-8?B?TzliTzhUSzEzL09JdXpTdDFzRFMzOGNYdE9WOTlGeGQxcUxyT1l4WWI1cmhh?=
+ =?utf-8?B?SHNBWThOU0N5bzdibnNQNTBoMHdFWkhGY1BLOG9VZTg1VUs4a0s0NHVqUTNy?=
+ =?utf-8?B?UjI3dlAwYkE0M1piWGg2YUhOR3hJOG9mRGxScGZvQ1owZlBNRHdvcFBmd3hz?=
+ =?utf-8?B?YzArd0pIN1prSG4zQlMwWVpSWEpVRVh6czVYSStZTzlTWTNjeU54QS9rYzJB?=
+ =?utf-8?B?RTJ6MGMwM2FOZXBzUnZFWGExMW1UV1pmTG9FellXTWZWWW5ZN2tFbTMvREtP?=
+ =?utf-8?B?eVlCYnRHSytZQ3ZobXV1ek8xa05wWmh5b0k0aUNGemU2dE9zZzJJQVcxTk5Q?=
+ =?utf-8?B?L2k0OXFjdlhrbXRUU01WL1FLZkNYU1NPODZMMDdGTXFvMXArTmpBTExvTnVV?=
+ =?utf-8?B?TE82S00zSFBCQTJRcEQ4RTdqVmtPMEZHQkl3Y1RPMmJrQkQ2NkMwMDZQYUF2?=
+ =?utf-8?B?enBmS1BMTENZbkRkWUJjcjhsWjZaMDdaNzBqaFdYS2JXVEhPRHpoeGRuUWcx?=
+ =?utf-8?B?ZGs3SFpmTzNzVHdyZWs1MlRWME9rMUl5RUlEaUM4bUd2Q1oyRjVqL0lmUmt1?=
+ =?utf-8?B?QlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dafc638-1cca-4881-9185-08dd513d4ff2
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 23:29:53.3810
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Myx09c5eQJA05vT88C0lmeATefhzU8kSJSzIs/0b0vP+Qhve3yto+4PoYUc3ikCfEol7EQg4dBt1/hQuzunYwfRzVjQbVFtItkU9+ApMOVw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8577
+X-OriginatorOrg: intel.com
 
-I agree the right fix for this issue would be in the page_pool code. I 
-will see if we can reproduce the issue and try out the patch
 
-Thanks,
 
-Gaurav
+On 2/16/2025 9:58 PM, Nick Hu wrote:
+Nit: subject should include the "net" prefix since this is clearly a bug
+fix.
 
-On 2/19/25 5:17 AM, Yunsheng Lin wrote:
-> On 2025/2/18 22:40, Jesper Dangaard Brouer wrote:
->> Cc. netdev and Yunsheng Lin
-> Thanks for Cc'ing.
->
->> On 13/02/2025 18.10, Gaurav Batra wrote:
->>> Some of the network drivers, like Mellanox, use core linux page_pool APIs
->>> to manage DMA buffers. These page_pool APIs cache DMA buffers with
->>> infrequent map/unmap calls for DMA mappings, thus increasing performance.
->>>
->>> When a device is initialized, the drivers makes a call to the page_pool API
->>> to create a DMA buffer pool. Hence forth DMA buffers are allocated and
->>> freed from this pool by the driver. The DMA map/unmap is done by the core
->>> page_pool infrastructure.
->>>
->>> These DMA buffers could be allocated for RX/TX buffer rings for the device
->>> or could be in-process by the network stack.
->>>
->>> When a network device is closed, driver will release all DMA mapped
->>> buffers. All the DMA buffers allocated to the RX/TX rings are released back
->>> to the page_pool by the driver. Some of the DMA mapped buffers could still
->>> be allocated and in-process by the network stack.
->>>
->>> DMA buffers that are relased by the Network driver are synchronously
->>> unmapped by the page_pool APIs. But, DMA buffers that are passed to the
->>> network stack and still in-process are unmapped later asynchronously by the
->>> page_pool infrastructure.
->>>
->>> This asynchronous unmapping of the DMA buffers, by the page_pool, can lead
->>> to issues when a network device is dynamically removed in PowerPC
->>> architecture.  When a network device is DLPAR removed, the driver releases
->>> all the mapped DMA buffers and stops using the device. Driver returns
->>> successfully. But, at this stage there still could be mapped DMA buffers
->>> which are in-process by the network stack.
->>>
->>> DLPAR code proceeds to remove the device from the device tree, deletes
->>> Dynamic DMA Window (DDW) and associated IOMMU tables. DLPAR of the device
->>> succeeds.
->>>
->>> Later, when network stack release some of the DMA buffers, page_pool
->>> proceeds to unmap them. The page_pool relase path calls into PowerPC TCE
->>> management to release the TCE. This is where the LPAR OOPses since the DDW
->>> and associated resources for the device are already free'ed.
-> Yes, the above seems like a similar issue the below patch is trying to
-> fix too. After several iteration of trying to fixing the bug, the generic
-> fix seems to avoid calling the DMA API after driver has unbound, which
-> means page_pool need to keep track of all the inflight pages and do the
-> dma unmapping for all the inflight page when page_pool_destroy() is called.
->
-> It would be good if the below patchset is tested to see if it fix the
-> problem for iommu problem in this patch for powerpc system.
->
-> https://lore.kernel.org/all/20250212092552.1779679-3-linyunsheng@huawei.com/
->
->>> This issue was exposed during (Live Partition Migration) LPM from a Power9
->>> to Power10 machine with HNV configuration. The bonding device is Virtual
->>> Ethernet with SR-IOV. During LPM, I/O is switched from SR-IOV to passive
->>> Virtual Ethernet and DLPAR remove of SR-IOV is initiated. This lead to the
->>> above mentioned scenario.
->>>
->>> It is possible to hit this issue by just Dynamically removing SR-IOV device
->>> which is under heavy I/O load, a scenario where some of the mapped DMA
->>> buffers are in-process somewhere in the network stack and not mapped to the
->>> RX/TX ring of the device.
->>>
->>> The issue is only encountered when TCEs are dynamically managed. In this
->>> scenario map/unmap of TCEs goes into the PowerPC TCE management path as and
->>> when DMA bufffers are mapped/unmaped and accesses DDW resources. When RAM
->>> is directly mapped during device initialization, this dynamic TCE
->>> management is by-passed and LPAR doesn't OOPses.
->>>
->>> Solution:
->>>
->>> During DLPAR remove of the device, before deleting the DDW and associated
->>> resources, check to see if there are any outstanding TCEs. If there are
->>> outstanding TCEs, sleep for 50ms and check again, until all the TCEs are
->>> unmapped.
->>>
->>> Once all the TCEs are unmapped, DDW is removed and DLPAR succeeds. This
->>> ensures there will be no reference to the DDW after it is deleted.
->>>
->>> Here is the stack for reference
->>>
->>> [ 3610.403820] tce_freemulti_pSeriesLP: 48 callbacks suppressed
->>> [ 3610.403833] tce_freemulti_pSeriesLP: plpar_tce_stuff failed
->>> [ 3610.403869]  rc      = -4
->>> [ 3610.403872]  index   = 0x70000016
->>> [ 3610.403876]  limit     = 0x1
->>> [ 3610.403879]  tce       = 0x80000061ee00000
->>> [ 3610.403882]  pgshift = 0x10
->>> [ 3610.403884]  npages  = 0x1
->>> [ 3610.403887]  tbl     = 000000003a6a2145
->>> [ 3610.403912] CPU: 86 PID: 97129 Comm: kworker/86:2 Kdump: loaded Tainted: G            E        6.4.0-623164-default #1 SLE15-SP6 763d454e096eda7d91355fd5b171013052d83ed3
->>> [ 3610.403928] Hardware name: IBM,9080-M9S POWER9 (raw) 0x4e2101 0xf000005 of:IBM,FW950.80 (VH950_131) hv:phyp pSeries
->>> [ 3610.403937] Workqueue: events page_pool_release_retry
->>> [ 3610.404003] Call Trace:
->>> [ 3610.404006] [c000055034e6bb30] [c000000000f63108] dump_stack_lvl+0x6c/0x9c (unreliable)
->>> [ 3610.404039] [c000055034e6bb60] [c000000000101258] tce_freemulti_pSeriesLP+0x1e8/0x1f0
->>> [ 3610.404070] [c000055034e6bbf0] [c00000000005d248] __iommu_free+0x118/0x220
->>> [ 3610.404086] [c000055034e6bc80] [c00000000005d4e8] iommu_free+0x28/0x70
->>> [ 3610.404106] [c000055034e6bcb0] [c00000000005c4b4] dma_iommu_unmap_page+0x24/0x40
->>> [ 3610.404113] [c000055034e6bcd0] [c00000000024b56c] dma_unmap_page_attrs+0x1ac/0x1e0
->>> [ 3610.404139] [c000055034e6bd30] [c000000000cfa178] page_pool_return_page+0x58/0x1b0
->>> [ 3610.404146] [c000055034e6bd60] [c000000000cfb7bc] page_pool_release+0x10c/0x270^
->>> [ 3610.404152] [c000055034e6be00] [c000000000cfbb2c] page_pool_release_retry+0x2c/0x110
->>> [ 3610.404159] [c000055034e6be70] [c00000000018e294] process_one_work+0x314/0x620
->>> [ 3610.404173] [c000055034e6bf10] [c00000000018ee88] worker_thread+0x78/0x620
->>> [ 3610.404179] [c000055034e6bf90] [c00000000019b958] kthread+0x148/0x150
->>> [ 3610.404188] [c000055034e6bfe0] [c00000000000ded8] start_kernel_thread+0x14/0x18
->>>
->>> Signed-off-by: Gaurav Batra <gbatra@linux.ibm.com>
->>> ---
->>>    arch/powerpc/kernel/iommu.c            | 22 ++++++++++++++++++++--
->>>    arch/powerpc/platforms/pseries/iommu.c |  8 ++++----
->>>    2 files changed, 24 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
->>> index 76381e14e800..af7511a8f480 100644
->>> --- a/arch/powerpc/kernel/iommu.c
->>> +++ b/arch/powerpc/kernel/iommu.c
->>> @@ -14,6 +14,7 @@
->>>    #include <linux/types.h>
->>>    #include <linux/slab.h>
->>>    #include <linux/mm.h>
->>> +#include <linux/delay.h>
->>>    #include <linux/spinlock.h>
->>>    #include <linux/string.h>
->>>    #include <linux/dma-mapping.h>
->>> @@ -803,6 +804,7 @@ bool iommu_table_in_use(struct iommu_table *tbl)
->>>    static void iommu_table_free(struct kref *kref)
->>>    {
->>>        struct iommu_table *tbl;
->>> +    unsigned long start_time;
->>>          tbl = container_of(kref, struct iommu_table, it_kref);
->>>    @@ -817,8 +819,24 @@ static void iommu_table_free(struct kref *kref)
->>>        iommu_debugfs_del(tbl);
->>>          /* verify that table contains no entries */
->>> -    if (iommu_table_in_use(tbl))
->>> -        pr_warn("%s: Unexpected TCEs\n", __func__);
->>> +    start_time = jiffies;
->>> +    while (iommu_table_in_use(tbl)) {
->>> +        int sec;
->>> +
->>> +        pr_info("%s: Unexpected TCEs, wait for 50ms\n", __func__);
->>> +        msleep(50);
->>> +
->>> +        /* Come out of the loop if we have already waited for 120 seconds
->>> +         * for the TCEs to be free'ed. TCE are being free'ed
->>> +         * asynchronously by some DMA buffer management API - like
->>> +         * page_pool.
->>> +         */
->>> +        sec = (s32)((u32)jiffies - (u32)start_time) / HZ;
->>> +        if (sec >= 120) {
->>> +            pr_warn("%s: TCEs still mapped even after 120 seconds\n", __func__);
->>> +            break;
->>> +        }
-> As mentioned in the above patch, the delay doesn't really work for the
-> case 2 below:
-> "Currently it seems there are at least two cases that the page
-> is not released fast enough causing dma unmmapping done after
-> driver has already unbound:
-> 1. ipv4 packet defragmentation timeout: this seems to cause
->     delay up to 30 secs.
-> 2. skb_defer_free_flush(): this may cause infinite delay if
->     there is no triggering for net_rx_action()."
->
->
->>> +    }
->>>          /* free bitmap */
->>>        vfree(tbl->it_map);
->>> diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
->>> index 534cd159e9ab..925494b6fafb 100644
->>> --- a/arch/powerpc/platforms/pseries/iommu.c
->>> +++ b/arch/powerpc/platforms/pseries/iommu.c
->>> @@ -2390,6 +2390,10 @@ static int iommu_reconfig_notifier(struct notifier_block *nb, unsigned long acti
->>>          switch (action) {
->>>        case OF_RECONFIG_DETACH_NODE:
->>> +        if (pci && pci->table_group)
->>> +            iommu_pseries_free_group(pci->table_group,
->>> +                    np->full_name);
->>> +
->>>            /*
->>>             * Removing the property will invoke the reconfig
->>>             * notifier again, which causes dead-lock on the
->>> @@ -2400,10 +2404,6 @@ static int iommu_reconfig_notifier(struct notifier_block *nb, unsigned long acti
->>>            if (remove_dma_window_named(np, false, DIRECT64_PROPNAME, true))
->>>                remove_dma_window_named(np, false, DMA64_PROPNAME, true);
->>>    -        if (pci && pci->table_group)
->>> -            iommu_pseries_free_group(pci->table_group,
->>> -                    np->full_name);
->>> -
->>>            spin_lock(&dma_win_list_lock);
->>>            list_for_each_entry(window, &dma_win_list, list) {
->>>                if (window->device == np) {
->>>
->>> base-commit: 6e4436539ae182dc86d57d13849862bcafaa4709
+> The external PHY will undergo a soft reset twice during the resume process
+> when it wake up from suspend. The first reset occurs when the axienet
+> driver calls phylink_of_phy_connect(), and the second occurs when
+> mdio_bus_phy_resume() invokes phy_init_hw(). The second soft reset of the
+> external PHY does not reinitialize the internal PHY, which causes issues
+> with the internal PHY, resulting in the PHY link being down. To prevent
+> this, setting the mac_managed_pm flag skips the mdio_bus_phy_resume()
+> function.
+> 
+> Fixes: a129b41fe0a8 ("Revert "net: phy: dp83867: perform soft reset and retain established link"")
+> Signed-off-by: Nick Hu <nick.hu@sifive.com>
+> ---
+
+Otherwise, the fix seems correct to me.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 2ffaad0b0477..2deeb982bf6b 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -3078,6 +3078,7 @@ static int axienet_probe(struct platform_device *pdev)
+>  
+>  	lp->phylink_config.dev = &ndev->dev;
+>  	lp->phylink_config.type = PHYLINK_NETDEV;
+> +	lp->phylink_config.mac_managed_pm = true;
+>  	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+>  		MAC_10FD | MAC_100FD | MAC_1000FD;
+>  
+
 
