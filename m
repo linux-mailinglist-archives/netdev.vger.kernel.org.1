@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-167762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C37A3C236
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:34:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79870A3C242
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B7F87A6B60
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:33:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19543A6638
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3542F1EFFAF;
-	Wed, 19 Feb 2025 14:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5E01EFF9D;
+	Wed, 19 Feb 2025 14:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SPZk+ZvV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mWhKYGYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9398F1EFFA4;
-	Wed, 19 Feb 2025 14:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656091EB5FA;
+	Wed, 19 Feb 2025 14:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739975632; cv=fail; b=a6+VQJaM6yg6fJ+382HYw2m1eQFjBvbBQJAgM4bdZOFjvS68H7eAIOvAhQRVg4PyWUR5iYYHdnu5zL/aD7UMbkrclXNL1NXg+0cvZ/jHCqd8YhhYq0vfy1PhrErUV9rlY1FgjSmwTatOcCCAIVhtQ6opi+AwbAzGiVMK4Rv1RQk=
+	t=1739975622; cv=fail; b=cjkjpUVgNlR2FU/TD+gKICvpJTZ2AmqbAA6t60sC0j49j4yuL9cmjcKCA8aH1y4+vMAeOTFnd4igf153OURfMkFED0jpR0pOHHigEyQraSJlZApAMPc+BTaFQd/D6kUU1YSiu5d8RYDe2XAlDcOjjLAafJRXlCsgt3kOQnzL7iw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739975632; c=relaxed/simple;
-	bh=JmgyYESn3CUmt4JE9EQ3CIAC/4TZP1D1XlcFaSsAffw=;
+	s=arc-20240116; t=1739975622; c=relaxed/simple;
+	bh=VjPA8OY4NcWA/Tt3rc8krRkS58SqmjpS5RRUn5OGAEM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KJMMx64vJJohKW7LrDSRbIPGMO3G/dwrWNiFWlTCfOelV5Ss9oVeYaTY3cs5qkMKsfq05bc0zrnbi911DwrcltPOi/NrUvuOkl6b4ogBnVwY4VdSq7OskGFL8AySgYy1uutgWLZjBYEW/XuXYe4/wAScg5SYyvBOL07tMyNPOQ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SPZk+ZvV; arc=fail smtp.client-ip=40.107.244.73
+	 MIME-Version:Content-Type; b=Y6vnziXk04f/bKY3kM/VHfQaT3bto5q3bE+pj9wh4RFLazruPZzHeaWGodlaJw3l9D1TY5lhPSmaoVLcqL4esdcecpaRrc+5cZI/gt8hpGQXjlV3h090+rGvB4XHSEYbyD5ADS22nTuzO6yiwReebUDygePQMA3BAHGPGAWyedc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mWhKYGYs; arc=fail smtp.client-ip=40.107.95.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XfvOIhi1SobOY2qzruxNifssNgVt093yz8T4RqwG+yp/vpnbFv6L1/3fcfawkPiVWTyf0I0GQ5UJiiVJTJ9dgDZvgp5xm6VBefow5Nqdm7w/d83Czm3vOZNZt9O6dOFBOydiT8YWKvAPUlPtvORktf1PIiU3YsUNL3ScFyBEjZ1zLCnxJnASKwqBHXGf4Qbj43duf4UsWNyKUaYvxm8M4EQd6s17sk0wcWTRNhpOCtHtONg0sGvGUXg6/KYPm6axxsUjZ9CR+qcVTJx/8BX11nqyIM+TgoR8OKX7kE1HlxlIrQGVWG0qf7BlYGi6U9wxHIIrFJdZhXb6WHFfUglgxA==
+ b=pA+OL4bLyjo02hDvhoU8cABoMDayDSrkP1bO7Oa2/5ku35t3ImaqlUeViDdFmA4K3MXgRd1g4N/PU39gsY5jSYGlNNZk39b0Btay3+6gTrvmJUgAW/u9DM4k+J2aHH1vUsjK/tDqNAM29WoT4onug0nRPwhJQE7d9RAV/arYhmbFIEbdlNRr1V6QCiBBh3MVDbWjPupvvZ89iLUvRyNfDeq0d3tZzGxTlIyBPQf9mpswb27zzvBFTNAHJ4VUmAf4ORIfHcgWJf1Si21nvKn7xKQlbbCVQb7Za/6MexGYnAQG17U5VplW7SWdwLkClO2X9jnR1WR3cg4GnICB/xtkLw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ppamyy/TXwLa4SxAueWd0CLpRg+uf7kr2RX27YPWzIo=;
- b=eYWpU+jnLV8oxANARMgzs/bJsZZDxdJzI915eZFg9Jyboi5FmJV5Lnb+p7pXCAmBiV7iqCKAs05vgIP8xa3rlLy2PGLg6G1bI+LREl9fNtAVXRsZhsWXZ2SD5k2w+pkvesbAhuFrvuvybWAhWOK529v4kPcehatkgAqVFvxfqJxolnIHzqnosMsNvnJwkU3JWFBYanN5iqrV6H8qdq4VLukLB5yudOsGHo68WhMHveZ0oe3m3T1ebkShHtjbdRugQi4pgCacEk9+xhmbUg/b+/1vSUGjiuS8ap6iAvcLKnr03oRvcsiJyR5r/HXAXSqGadd6zJUXGJNHH7hu3rzmLQ==
+ bh=dDsnLxrwS4iXed8QxH9Bq21n6Ki5LCZ+X8pfnLhY4Yw=;
+ b=KQ/MJkDrwZ5KiyTIkrzcIuVyCyXVmq76XCeWW7GPxIdM34tJxhABFPK3TqR7IF+bQOPTlKikBkc0Ij3yW59DQTMxC06V1qjynDkbsBs+ygF72BdBaLLzunfHxd0GNf7jk5drCUyCtc+1Pa5R73pV6MI0ebqQlsZcyoRJJrOYRt+FZMmxVuieEHo5A75LuOoubNfqEjeVChByc/s2Z3KMTK2FhFbz2vioyWtDZrdLRCeZKKtdZXUn8Q0iWZ4+wMiG16PuF9SAU4Jd9sTaqSoli95MCtK4bDcD5WSUpLLH7R3lkFlmSC4ZETbBnTOyQCv1tkNOckR7JygkJky7lSP66Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ppamyy/TXwLa4SxAueWd0CLpRg+uf7kr2RX27YPWzIo=;
- b=SPZk+ZvVZ/pubRgs26sOyVPndddK3qcr0HIBqRKy51+9krVumEwEwMVD2+BM0OrN/fQGqsQnCBRg+HhQbdUlus5JRLSSwqKFeMzewmA/9CYmSprUMoREFTZ87dxLhuky4AG3H+h3y3MNWK/L69GPvE7ePyH85lLsuaY7Xh68o/r8QRlpjIgvCxUbO2EgU+7WM+asFH3qympu0ErM34NGdqMD1PlbhVEjv1VUEg+LRwfIM9IOsmn36kISa5+tkzL46q49k3mhGle4CpFamb5O7ZN/qO+Of2jopqqOgOx9nLI2nc1/1haA/Y0NLsNyw5zXWk2FbREsK7Sb4TS1d9AEfg==
-Received: from CH0PR03CA0068.namprd03.prod.outlook.com (2603:10b6:610:cc::13)
- by DS0PR12MB7970.namprd12.prod.outlook.com (2603:10b6:8:149::13) with
+ bh=dDsnLxrwS4iXed8QxH9Bq21n6Ki5LCZ+X8pfnLhY4Yw=;
+ b=mWhKYGYsMdDQeqXV1h4gKt5qE2PpBLhIBrwSFqa2gv87xUJN7dLUHspd7/+NErIGWQfUzjbqLLwMcyUR1xbDpty0fpQxAZXSVMmQjw4Y4UY+GvFiFbfUoVtQProO1+p/k+YkDmtPvGobz6xc5VzUR3WJLKQww26BXU+96CHgBdEe2EaNZTJWLJlcyNLD7GKqPl2ZowIj+7qNRnXY0qwU9SUhiI2RE6jgBhvYydOMj6/8hSQ1kLE5CcXNZGqoCyUYbGCrtUbKlVyCsaP5qgl9/qls0YZ1Rk8lKX3sNJ/ZgWJTvsukmVtA7a2giMTmvfoBOXbBET73VHymwivKd0Km2Q==
+Received: from SJ0PR13CA0072.namprd13.prod.outlook.com (2603:10b6:a03:2c4::17)
+ by CYYPR12MB8991.namprd12.prod.outlook.com (2603:10b6:930:b9::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Wed, 19 Feb
- 2025 14:33:41 +0000
-Received: from CH2PEPF0000013E.namprd02.prod.outlook.com
- (2603:10b6:610:cc:cafe::fd) by CH0PR03CA0068.outlook.office365.com
- (2603:10b6:610:cc::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.18; Wed, 19 Feb
+ 2025 14:33:35 +0000
+Received: from SA2PEPF000015CD.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c4:cafe::76) by SJ0PR13CA0072.outlook.office365.com
+ (2603:10b6:a03:2c4::17) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.14 via Frontend Transport; Wed,
- 19 Feb 2025 14:33:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 19 Feb 2025 14:33:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF0000013E.mail.protection.outlook.com (10.167.244.70) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SA2PEPF000015CD.mail.protection.outlook.com (10.167.241.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8466.11 via Frontend Transport; Wed, 19 Feb 2025 14:33:41 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8466.11 via Frontend Transport; Wed, 19 Feb 2025 14:33:34 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 19 Feb
- 2025 06:33:11 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ 2025 06:33:17 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 19 Feb
- 2025 06:33:11 -0800
+ 2025 06:33:16 -0800
 Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.10)
  with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 19
- Feb 2025 06:33:06 -0800
+ Feb 2025 06:33:11 -0800
 From: Gal Pressman <gal@nvidia.com>
 To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
  Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -90,10 +90,10 @@ CC: Tariq Toukan <tariqt@nvidia.com>, Louis Peens <louis.peens@corigine.com>,
 	<gustavoars@kernel.org>, <dev@openvswitch.org>,
 	<linux-hardening@vger.kernel.org>, Ilya Maximets <i.maximets@ovn.org>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>, Gal Pressman
-	<gal@nvidia.com>
-Subject: [PATCH net-next v4 1/2] ip_tunnel: Use ip_tunnel_info() helper instead of 'info + 1'
-Date: Wed, 19 Feb 2025 16:32:55 +0200
-Message-ID: <20250219143256.370277-2-gal@nvidia.com>
+	<gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH net-next v4 2/2] net: Add options as a flexible array to struct ip_tunnel_info
+Date: Wed, 19 Feb 2025 16:32:56 +0200
+Message-ID: <20250219143256.370277-3-gal@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20250219143256.370277-1-gal@nvidia.com>
 References: <20250219143256.370277-1-gal@nvidia.com>
@@ -108,116 +108,187 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000013E:EE_|DS0PR12MB7970:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44e912f5-5572-4322-cc0b-08dd50f26832
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015CD:EE_|CYYPR12MB8991:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b3cd424-74d3-4c43-2c2a-08dd50f26440
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|82310400026|376014|1800799024;
+	BCL:0;ARA:13230040|7416014|36860700013|1800799024|376014|82310400026|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nWS9tOmHUXV6kd259G1Euq1EDKHCyDZ1Kity6Xot6lcmDtlKf/sUTLTDj+uc?=
- =?us-ascii?Q?8DrHa0C9Y04gtXBb5c+1SVXVN3luB1qU932PzbV+y9zPqXxOmCGH2JX6D+zK?=
- =?us-ascii?Q?5oEOsClvaViwsuAlFcVSkEVvf4kRiMvr54a4tggLSA5H5xDs0zS6cBcuG1Xg?=
- =?us-ascii?Q?w7fcpz9I/F38I1tq0ARZp+Wty0Gv0DRZX1Dvo2Jc2fYQ/QYv3lArjvy0MFDz?=
- =?us-ascii?Q?1ll+5WOQXJ3Ze8iFdGk8tyxnATzqRzEDu7JQvKQUrsrxO+SIt1Sb1P1ZtjQJ?=
- =?us-ascii?Q?bQxttlGL2WeRqTMSmy7SvljjSsqn0XQgDbrvN7/0WXJyaKdVxmA0BQw6XVER?=
- =?us-ascii?Q?XT3+6Yzdum+adpsSi9VkaCF1EP/FP3rFUcJzykgqXenZXcn4UmAToo/u0y7M?=
- =?us-ascii?Q?F+E+xCCTez24M+2hPvLvFt0pqOl1QDFddTJQknNzfEbefXNP0JHfKt2KN9G2?=
- =?us-ascii?Q?PiMr9HqFQLdrwSeRQS74MHbdFR6QYeoddL8HA+OG2becj5l3hRU5KLJLlo9g?=
- =?us-ascii?Q?SLdXreR9rV91zRwDEvP7EcGid9SAVrRPfXeQFjW/IQQ5wHZpi9uUVqrzS3No?=
- =?us-ascii?Q?xhTbf0Nw8PxCSU8M1X0HC6JNyS3ueBB2SRYm5kej7uj+bPXV94vn1e5Iin+k?=
- =?us-ascii?Q?v35/YWCkYiWcggK6W2Md9+BQAdKeo6xY2wyQ3w+i14hFHXMqx0ukZyiAisin?=
- =?us-ascii?Q?So2uYNUBpGIJNFcHpLDcgJXaILH+XTUo/FHKvH64Sxmh0/ufD+uGXBwnjZK3?=
- =?us-ascii?Q?6J+uyCLcx/hrdIRx5HQVDDdv2GDoVFu01tes8XrqcoTGWGpShhr1roigewTs?=
- =?us-ascii?Q?W+oUN/kHiJowMMbgAo+clCBATcGVKBMWdziVYo3jeamhYnmVem9RUucOpQ3v?=
- =?us-ascii?Q?3NYkVhK0O1aBHEuH0DgKDk0moTmYzSMapTU3DIohuJA6N6wVOghSdPDhJrKd?=
- =?us-ascii?Q?5BOhv+unq5vUC3ONUy4QsRWxTGg4KAZIrn2kXfv+LwLy3b0pGkbZL7YtLhHR?=
- =?us-ascii?Q?rRoIn0A27v6WJ/f4Tmf01gFsZadfueEGgJULw1ZgmJABYIT5f4k/LxzEjKQ2?=
- =?us-ascii?Q?BNSOGJhKNVGqbd8QVcTTCRX7Xj4c076/9Xenso4UJ7H07BH8njciDpMsQghP?=
- =?us-ascii?Q?u5ieocZTxfZ/7bD3RwVAg0e6k7pklt3dl/i3sDNnTdQF1rrqe44o5vLQZ00n?=
- =?us-ascii?Q?iUaA2Ajx6LzOWpVaQ47utMBWxQ0tovapakc4NSrMjvYIYdNsmWfT7qOYaWXU?=
- =?us-ascii?Q?4OJ3kQTfTIMjEF9hgSO9fTFwEQwyaGI4HPECphvefYQoJ79diJbE6gkfj/n5?=
- =?us-ascii?Q?JGP671F6JtMy0s2AzNBb/haJ1QOO8TaMZHQdbcpKhcfW/i9LWWKwQTOXTOva?=
- =?us-ascii?Q?nFaefQJsFQr3tur+aVz3m7vtfRAiox4+ncsM2jJwzYafG6Jx9B9LNq4jbLES?=
- =?us-ascii?Q?EjXw791cNJ4QWvojAK3bARfi4BA47noOu7bbStpFZjVHlq3LbNUO5heojdvq?=
- =?us-ascii?Q?SS1yrxlQYt9kmbI=3D?=
+	=?us-ascii?Q?4oYMcw0WsT+NeTOAIlry1+iAb9k0HxXDOwZB80kaIQ58sA3bSzVCAKwTGuV/?=
+ =?us-ascii?Q?sF3IecHPEHYB1DsZbgJf5RfKXISt7HKiwW1VZ7Ud0NT+67WO94wzgGiPjeqJ?=
+ =?us-ascii?Q?wgPHFX5z2PAPrXiqpdABGnZ5t1POBSAajtBybz1uysE/sdfk+Vuo28XTko/4?=
+ =?us-ascii?Q?mxhiK0T2OpwANIttQ9EzxMqjNDbaMzZJv09N+u5lNNuIAy/CTLHwVYlvV3KO?=
+ =?us-ascii?Q?E66eh1aWykCE9vOcrxvPkcW865z+JWwzLgnovXRrG9kXKvblKAcw52h0kogA?=
+ =?us-ascii?Q?8wGftIi3FjaWjFq3365EsLc7HgyZZPdmwBWukhrCSUlLwxO1D62b2rJXqyhp?=
+ =?us-ascii?Q?sqhhpDg7FPKr5SIYfsKNxEF8RjrRJuKKEyxg53bBuLwE8WBr5f0T4h/t6b+F?=
+ =?us-ascii?Q?ktgIglSFkOvJjO/dfJYMZgr6RWEFL9ze5cnPRW1T7CCWa7dk7nHm6j2tb2gI?=
+ =?us-ascii?Q?78HQfQ+IzTDWxlUiuRutsWEnRXieJR791SsD/P9U5REN9XWhmLY2aIRyUPWh?=
+ =?us-ascii?Q?Pi+0/2nNvNbXE/NsB/eWaPj6NfuR2Y1gek3nBis5krdSc72xbUiFg0zJvtnu?=
+ =?us-ascii?Q?/AnlkP/LjP+3nTBIiQKAC/KW/RAC+8QytnvoU9LS6SA2U2XmQ8uq+aRZUNyF?=
+ =?us-ascii?Q?Sc9BXT1HUldz+oJfdTFs5u58uyMS8htDhm1fvmvIMnUMP0CpgkJrIBSoGzMa?=
+ =?us-ascii?Q?ViCQopQI0hL7A9snS0N2gKYFyLJ6+VIY3tKy0TSV2bDgdJtyYiH/MyPEUwrZ?=
+ =?us-ascii?Q?bmVpxr1oeg+ilVAm15vRWjkTNY4KOmzjeDcM+5lh4JhVWJyceFLO3Hm/1rvk?=
+ =?us-ascii?Q?p1E+FSxh72freZ9VKjdFwwjK03hIpfUzjo998OqxsyzZ476A4Xgj7oKNLUyG?=
+ =?us-ascii?Q?ahH3s11H6gRvqLUBjWGHL2WFLS3Ex3FvTAUEFEpxaFCK2iBgqOFYarPgOhvr?=
+ =?us-ascii?Q?FDvpm5maE9Onnfabgl6M+i4e4I4gqcD08VQQYSgl7MEHFhuFJzCL+8gVOz/Q?=
+ =?us-ascii?Q?PuzZ3NkDyBpZHQYCouGRPSrTzrXQxoznx9D5g0ncIEWaL6yvs+3jylRpBpgp?=
+ =?us-ascii?Q?+s9CbKmz5KjFruhKbcSmy8zKcP5DPjZV4rvHyj4/Wss32h9Cjo2YvgBGmdTy?=
+ =?us-ascii?Q?s4RfBb1WTvhpz3AAiMFYmMZJC0UL8xbQG+3MJlIGu8vte1SivPMeUYpKUD8O?=
+ =?us-ascii?Q?k7PNZfmUApnLmLcqRUC2PXmUHtl4wMaw3VIcjmnNgrB9Qa2f7IB4i0+vkypG?=
+ =?us-ascii?Q?Xn+8Sr4CCs/Yn1HVxBrcGpp/I3G0lX6OrozUMJ8tX9UYfM3/ElEDY4SbVtps?=
+ =?us-ascii?Q?zmekISXGVuDfr3mSrOjI1dmfemEMC0JmraLpG5uuYtWHAdPc10RpHvqOHjA5?=
+ =?us-ascii?Q?C7iQxqFKMR99nNwx4mUgRLP61Xgc+ocn2mhQWYro74Dvbcch40Ts79aderWy?=
+ =?us-ascii?Q?JMr/b2PXlHVwlzGINPz42fsbHo8mFNKYL8ltODvLlmbZ+tf9Mw5Lrg1kBxhy?=
+ =?us-ascii?Q?uKKew//wo/ruwqc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(36860700013)(1800799024)(376014)(82310400026)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 14:33:41.5226
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 14:33:34.9150
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44e912f5-5572-4322-cc0b-08dd50f26832
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b3cd424-74d3-4c43-2c2a-08dd50f26440
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000013E.namprd02.prod.outlook.com
+	SA2PEPF000015CD.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7970
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8991
 
-Tunnel options should not be accessed directly, use the ip_tunnel_info()
-accessor instead.
+Remove the hidden assumption that options are allocated at the end of
+the struct, and teach the compiler about them using a flexible array.
 
+With this, we can revert the unsafe_memcpy() call we have in
+tun_dst_unclone() [1], and resolve the false field-spanning write
+warning caused by the memcpy() in ip_tunnel_info_opts_set().
+
+The layout of struct ip_tunnel_info remains the same with this patch.
+Before this patch, there was an implicit padding at the end of the
+struct, options would be written at 'info + 1' which is after the
+padding.
+This will remain the same as this patch explicitly aligns 'options'.
+The alignment is needed as the options are later casted to different
+structs, and might result in unaligned memory access.
+
+Pahole output before this patch:
+struct ip_tunnel_info {
+    struct ip_tunnel_key       key;                  /*     0    64 */
+
+    /* XXX last struct has 1 byte of padding */
+
+    /* --- cacheline 1 boundary (64 bytes) --- */
+    struct ip_tunnel_encap     encap;                /*    64     8 */
+    struct dst_cache           dst_cache;            /*    72    16 */
+    u8                         options_len;          /*    88     1 */
+    u8                         mode;                 /*    89     1 */
+
+    /* size: 96, cachelines: 2, members: 5 */
+    /* padding: 6 */
+    /* paddings: 1, sum paddings: 1 */
+    /* last cacheline: 32 bytes */
+};
+
+Pahole output after this patch:
+struct ip_tunnel_info {
+    struct ip_tunnel_key       key;                  /*     0    64 */
+
+    /* XXX last struct has 1 byte of padding */
+
+    /* --- cacheline 1 boundary (64 bytes) --- */
+    struct ip_tunnel_encap     encap;                /*    64     8 */
+    struct dst_cache           dst_cache;            /*    72    16 */
+    u8                         options_len;          /*    88     1 */
+    u8                         mode;                 /*    89     1 */
+
+    /* XXX 6 bytes hole, try to pack */
+
+    u8                         options[] __attribute__((__aligned__(16))); /*    96     0 */
+
+    /* size: 96, cachelines: 2, members: 6 */
+    /* sum members: 90, holes: 1, sum holes: 6 */
+    /* paddings: 1, sum paddings: 1 */
+    /* forced alignments: 1, forced holes: 1, sum forced holes: 6 */
+    /* last cacheline: 32 bytes */
+} __attribute__((__aligned__(16)));
+
+[1] Commit 13cfd6a6d7ac ("net: Silence false field-spanning write warning in metadata_dst memcpy")
+
+Link: https://lore.kernel.org/all/53D1D353-B8F6-4ADC-8F29-8C48A7C9C6F1@kernel.org/
+Suggested-by: Kees Cook <kees@kernel.org>
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Gal Pressman <gal@nvidia.com>
 ---
- include/net/ip_tunnels.h   | 2 +-
- net/sched/act_tunnel_key.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ include/net/dst_metadata.h | 7 ++-----
+ include/net/ip_tunnels.h   | 5 +++--
+ net/core/dst.c             | 6 ++++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+index 84c15402931c..4160731dcb6e 100644
+--- a/include/net/dst_metadata.h
++++ b/include/net/dst_metadata.h
+@@ -163,11 +163,8 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+ 	if (!new_md)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	unsafe_memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+-		      sizeof(struct ip_tunnel_info) + md_size,
+-		      /* metadata_dst_alloc() reserves room (md_size bytes) for
+-		       * options right after the ip_tunnel_info struct.
+-		       */);
++	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
++	       sizeof(struct ip_tunnel_info) + md_size);
+ #ifdef CONFIG_DST_CACHE
+ 	/* Unclone the dst cache if there is one */
+ 	if (new_md->u.tun_info.dst_cache.cache) {
 diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index 1aa31bdb2b31..7b54cea5de27 100644
+index 7b54cea5de27..e041e4865373 100644
 --- a/include/net/ip_tunnels.h
 +++ b/include/net/ip_tunnels.h
-@@ -650,7 +650,7 @@ static inline void iptunnel_xmit_stats(struct net_device *dev, int pkt_len)
- static inline void ip_tunnel_info_opts_get(void *to,
- 					   const struct ip_tunnel_info *info)
+@@ -95,8 +95,8 @@ struct ip_tunnel_encap {
+ 
+ #define ip_tunnel_info_opts(info)				\
+ 	_Generic(info,						\
+-		 const struct ip_tunnel_info * : ((const void *)((info) + 1)),\
+-		 struct ip_tunnel_info * : ((void *)((info) + 1))\
++		 const struct ip_tunnel_info * : ((const void *)(info)->options),\
++		 struct ip_tunnel_info * : ((void *)(info)->options)\
+ 	)
+ 
+ struct ip_tunnel_info {
+@@ -107,6 +107,7 @@ struct ip_tunnel_info {
+ #endif
+ 	u8			options_len;
+ 	u8			mode;
++	u8			options[] __aligned_largest __counted_by(options_len);
+ };
+ 
+ /* 6rd prefix/relay information */
+diff --git a/net/core/dst.c b/net/core/dst.c
+index 9552a90d4772..c99b95cf9cbb 100644
+--- a/net/core/dst.c
++++ b/net/core/dst.c
+@@ -286,7 +286,8 @@ struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
  {
--	memcpy(to, info + 1, info->options_len);
-+	memcpy(to, ip_tunnel_info_opts(info), info->options_len);
- }
+ 	struct metadata_dst *md_dst;
  
- static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
-diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
-index af7c99845948..ae5dea7c48a8 100644
---- a/net/sched/act_tunnel_key.c
-+++ b/net/sched/act_tunnel_key.c
-@@ -571,8 +571,8 @@ static void tunnel_key_release(struct tc_action *a)
- static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
- 				       const struct ip_tunnel_info *info)
- {
-+	const u8 *src = ip_tunnel_info_opts(info);
- 	int len = info->options_len;
--	u8 *src = (u8 *)(info + 1);
- 	struct nlattr *start;
+-	md_dst = kmalloc(sizeof(*md_dst) + optslen, flags);
++	md_dst = kmalloc(struct_size(md_dst, u.tun_info.options, optslen),
++			 flags);
+ 	if (!md_dst)
+ 		return NULL;
  
- 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_GENEVE);
-@@ -580,7 +580,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
- 		return -EMSGSIZE;
+@@ -314,7 +315,8 @@ metadata_dst_alloc_percpu(u8 optslen, enum metadata_type type, gfp_t flags)
+ 	int cpu;
+ 	struct metadata_dst __percpu *md_dst;
  
- 	while (len > 0) {
--		struct geneve_opt *opt = (struct geneve_opt *)src;
-+		const struct geneve_opt *opt = (const struct geneve_opt *)src;
- 
- 		if (nla_put_be16(skb, TCA_TUNNEL_KEY_ENC_OPT_GENEVE_CLASS,
- 				 opt->opt_class) ||
-@@ -603,7 +603,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
- static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
- 				      const struct ip_tunnel_info *info)
- {
--	struct vxlan_metadata *md = (struct vxlan_metadata *)(info + 1);
-+	const struct vxlan_metadata *md = ip_tunnel_info_opts(info);
- 	struct nlattr *start;
- 
- 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_VXLAN);
-@@ -622,7 +622,7 @@ static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
- static int tunnel_key_erspan_opts_dump(struct sk_buff *skb,
- 				       const struct ip_tunnel_info *info)
- {
--	struct erspan_metadata *md = (struct erspan_metadata *)(info + 1);
-+	const struct erspan_metadata *md = ip_tunnel_info_opts(info);
- 	struct nlattr *start;
- 
- 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_ERSPAN);
+-	md_dst = __alloc_percpu_gfp(sizeof(struct metadata_dst) + optslen,
++	md_dst = __alloc_percpu_gfp(struct_size(md_dst, u.tun_info.options,
++						optslen),
+ 				    __alignof__(struct metadata_dst), flags);
+ 	if (!md_dst)
+ 		return NULL;
 -- 
 2.40.1
 
