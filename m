@@ -1,78 +1,73 @@
-Return-Path: <netdev+bounces-167664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C859BA3BABE
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 10:47:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A9CA3BAAA
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 10:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C46203B65BA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:37:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F00F1883C25
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 09:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69201BD9D3;
-	Wed, 19 Feb 2025 09:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D26D1B85EC;
+	Wed, 19 Feb 2025 09:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Zy9X1JhI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gpONM+FW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B259317A30C;
-	Wed, 19 Feb 2025 09:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A163D15B971
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 09:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739957653; cv=none; b=liHDWgaDiKPPNkJlXf7EkPc4mZxL0iTESAFbzcsyzaiUggd0XoDeOHP+SYLt2poCZVWGYGJ9Upx63jnIXG6hc4l/Z7qCvcVEBp6kAuGghSNqB6EJ/tEWzHe3WwfIGfDtKXfRr8t2tx9XZ9Vl4PVMVMlGjkLvT+5DaGeMWOB+l9g=
+	t=1739958096; cv=none; b=TAWJm9e2nO+Sy2iR8sm4RZ/eqHdo7jEBsGFW59rIeEbDEe9M3klPmyABZ518mB09tCfEaBXVjELltI1Lg64SGqOTfKeh4/VbSfSlzcxUwmMUE5mz77CNX9Wl9rYIfMexAW3HpeyXeDEa5X0d5nl/qkYdNPLozOvcKUc+FvB8sUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739957653; c=relaxed/simple;
-	bh=LVjYs3+R2Y0RSYxVDr9by6OtNXzH5dBxzqN9Q5FeqLM=;
+	s=arc-20240116; t=1739958096; c=relaxed/simple;
+	bh=v2KLgziDLI2JVysYzMMszw6RybzprazFv1InI2kbyFU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ih7hHlvQi/e9BDd1hsWq/OTzEzjU1GBP4dinW8Nx00HXGShK4a7OfGKr2IrqWSyrSsWC+Tyh5Y39M/WF0zDzEiDw1AJP+qUxFni/1aB7dtNuer8TRiO1qQHRrFUZIiH/0LQMraCoEJ0Lva7RjhD/OFU+uApTLF8u6KCu2LkrO7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Zy9X1JhI; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UJi/ZZDPytMZa3Hcg3Ha7wf64wi1Jm9YQ1zlxDcQewI=; b=Zy9X1JhIJ3vzwjwF5hdcaVF4Db
-	ynvZJFXSrpv0cw2uz0MMbMIkrPon/gvwpwuh5rS1Aa1cBRD4/Cls3j5fLmFc6OiK8FNI51VuuFJt3
-	pE6buavaSuWku/q4XoDdjp2O6OD4deN3GRczII7XEAoXcZ9U5rWOrSuxm5WE9C5UVB/kl94kP65ki
-	R64kRQJsqthOC1M3eenqlafeh4IcXuf1Y0gA7/s4VrEM7lNnlEiPeaUz9DsOek21R5htLzxGEEVmh
-	BCvYtfJFtvi1lkSXIc+7+lzzvUIYwAnfy9K4gMjZznd2v0zt7AU+6v6H+mi8xJlZo6TE9SaHD/S6G
-	XHfhKYqg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52572)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tkgSj-0005Bw-2d;
-	Wed, 19 Feb 2025 09:33:49 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tkgSe-0008Gi-1m;
-	Wed, 19 Feb 2025 09:33:44 +0000
-Date: Wed, 19 Feb 2025 09:33:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Message-ID: <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W8yq8bKv7K44bS6U6nuBBToCQXssPDseUI6XHfNg6DoTTd3VOdSzf9UGA9yvsCoboJn/4a1ir/wjUFfa3UpkMtIvfMgfLPkTqt0Fw340/EzW22jOHociuFo34Oizl2YUcmZcQ4EKf26aIZazFPsFdTLkUuCmZYD1GoiOk7IODpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gpONM+FW; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739958095; x=1771494095;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=v2KLgziDLI2JVysYzMMszw6RybzprazFv1InI2kbyFU=;
+  b=gpONM+FWgUMc+gWA5lC7YxQBSc82k1p0btWdaEo2NuRQn8zJALCdRV0b
+   Snpr/83AY4Vl0Nvrab/i+74H9lqgKtaANIwGOA2hHjtuSiuJKqlm+QXZI
+   M7SOyScgQlYtwO1/ftFAsZjKzWdTmWOlRuatixXeqsYi31hfwRW2J9LJh
+   lDym+rOd9/DtyFXADAMgb4XwI7i/oAZ6kZv5gwhRmf8jx+tWhL5h3745D
+   7QgwjOKtq7ZityNXDO6MoYntplZUQ4H3luij4pRAxqMfzvrnNIHGNizbH
+   190gRRyTQuOGSMIFl/oiD7XhPxiADzRnJA+uh7NqN+reAgd3J0EknpCEy
+   w==;
+X-CSE-ConnectionGUID: sXTIdS7GTOuPr3BrRNxiTg==
+X-CSE-MsgGUID: WnRmmw8wSeWT7yBHrgeZHg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="44443628"
+X-IronPort-AV: E=Sophos;i="6.13,298,1732608000"; 
+   d="scan'208";a="44443628"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 01:41:34 -0800
+X-CSE-ConnectionGUID: ZZIxJgZ5RCKieousb9JNzA==
+X-CSE-MsgGUID: K3VY4FQgRP+GpYrZVFFa+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,298,1732608000"; 
+   d="scan'208";a="114517753"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 01:41:32 -0800
+Date: Wed, 19 Feb 2025 10:37:53 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Paul Greenwalt <paul.greenwalt@intel.com>
+Subject: Re: [PATCH iwl-net] ice: fix Get Tx Topology AQ command error on E830
+Message-ID: <Z7WmcXf8J5j/ksNX@mev-dev.igk.intel.com>
+References: <20250218-jk-e830-ddp-loading-fix-v1-1-47dc8e8d4ab5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,31 +76,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250218-jk-e830-ddp-loading-fix-v1-1-47dc8e8d4ab5@intel.com>
 
-On Wed, Feb 19, 2025 at 04:39:10PM +0800, Sky Huang wrote:
-> +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> +{
-> +	struct pinctrl *pinctrl;
-> +	int ret;
-> +
-> +	/* Check if PHY interface type is compatible */
-> +	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
-> +		return -ENODEV;
-> +
-> +	ret = mt798x_2p5ge_phy_load_fw(phydev);
-> +	if (ret < 0)
-> +		return ret;
+On Tue, Feb 18, 2025 at 04:46:34PM -0800, Jacob Keller wrote:
+> From: Paul Greenwalt <paul.greenwalt@intel.com>
+> 
+> With E830 Get Tx Topology AQ command (opcode 0x0418) returns an error when
+> setting the AQ command read flag, and since the get command is a direct
+> command there is no need to set the read flag.
+> 
+> Fix this by only setting read flag on set command.
 
-Firmware should not be loaded in the .config_init method. The above
-call will block while holding the RTNL which will prevent all other
-network configuration until the firmware has been loaded or the load
-fails.
+Why it isn't true for other hw? I mean, why not:
+if (set)
+	RD_FLAG
+else 
+	NOT_RD_FLAG
+Other hw needs RD flag in case of get too?
 
-Thanks.
+> 
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Don't you need fixes tag?
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ddp.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> index 03988be03729b76e96188864896527060c8c4d5b..49bd49ab3ccf36c990144894e887341459377a2d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> @@ -2345,15 +2345,15 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
+>  			cmd->set_flags |= ICE_AQC_TX_TOPO_FLAGS_SRC_RAM |
+>  					  ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW;
+>  
+> -		if (ice_is_e825c(hw))
+> -			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+> +		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+>  	} else {
+>  		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_tx_topo);
+>  		cmd->get_flags = ICE_AQC_TX_TOPO_GET_RAM;
+> -	}
+>  
+> -	if (!ice_is_e825c(hw))
+> -		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+> +		if (hw->mac_type != ICE_MAC_GENERIC_3K_E825 &&
+> +		    hw->mac_type != ICE_MAC_E830)
+> +			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+> +	}
+>  
+>  	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
+>  	if (status)
+>
+
+In general looks fine, only one question.
+
+Thanks,
+Michal
+
+> ---
+> base-commit: f5da7c45188eea71394bf445655cae2df88a7788
+> change-id: 20250218-jk-e830-ddp-loading-fix-9efdbdfc270a
+> 
+> Best regards,
+> -- 
+> Jacob Keller <jacob.e.keller@intel.com>
 
