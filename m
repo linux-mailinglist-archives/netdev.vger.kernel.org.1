@@ -1,94 +1,87 @@
-Return-Path: <netdev+bounces-167840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FC03A3C7CA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:40:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA24A3C855
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C18F18925BC
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:41:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0138C3A6441
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AEA214203;
-	Wed, 19 Feb 2025 18:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB3021B183;
+	Wed, 19 Feb 2025 19:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="UcjqLm9M"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LBPbPLYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756DC1B6CF5
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 18:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9557421A457;
+	Wed, 19 Feb 2025 19:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739990450; cv=none; b=am/Ca3fH69fB+44eX9rWntFQQerS4+qkRCNByXev8qwiGZQfXPIpRiZLwz9Ox/dGXPGAK0l2GeEftOT2r+adUYbEswx12dDQBLTHPyk0dLMFAyjg/AHb7/ZMqQ+y1oK3UcfknxIZEgqZW7aGjvb6O/TXVvy0HOJ7TNgV8JCYTkM=
+	t=1739992432; cv=none; b=eRv9zmlZhXazg4hDdhcU+znxfP62Y5Up4o9HPOzg/tvDtFwPtzBsNKnBOI06vkHBmB+6X4zttaXHHMobtkM+CEehllij/DwqOaY//d0si8evsGb1IVeyuhzPPx5kZ5JUi/TxT4S2OSCtxFzE8ohu3sgmn6Jvv6CY4rxx+Jp8m54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739990450; c=relaxed/simple;
-	bh=e1Bmllmdhp3fiwelLpfsJMvc+XiGJfNz/Hl/5N4BYYw=;
+	s=arc-20240116; t=1739992432; c=relaxed/simple;
+	bh=QuSZCOPVZYWa9LYtcJiDp8tlKZN9MYKpMLXHtTH29h4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PlxO/8wuOK2EZE0sOy9Nf8C8ECo38IQmmRjnqHarOYLjTmamfU/Ezv09DVcmPHxbZfNivsJ8hiwdeYzZeN/1iupSZq38HGylxdBLtGSPHb9H3qX8b5/6KKdc2klt7+5gF7doOxbWaV1jC64LhQiobh3NEk3wRm2ZMz/sa9iWCY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=UcjqLm9M; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c0a5aa0f84so14573385a.1
-        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 10:40:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739990448; x=1740595248; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oWjN6SjCLsPI+Cyw6VXCikrA2BKo6zuHXQJO1x4tFWg=;
-        b=UcjqLm9M55GXnSLA1mxw3VRjUUMkTEXBtd8csKz1tctePX7vFOh9hDMEWqEGDHfQy4
-         YPTnDOUpewVFl2afVP0sy0PSQaRq0ckS75AcMu1lVRgFP7XGM6A0dQNZ4JfdLpImLAw+
-         AXl/E/SvCyeCSidEB5j2sPjxMOk0SlRCfT8Ok=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739990448; x=1740595248;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWjN6SjCLsPI+Cyw6VXCikrA2BKo6zuHXQJO1x4tFWg=;
-        b=u26v+j7YtmNNc5BM0X0CqoL4ty4+NeoFiAPZmXLXMzIzGSFavrfNy8UP4uoZk249P6
-         Wj7hoJ4bvHTNNTSpffy/642WR4oTvitqcngAXtvL3f1wkXrMTLz2aIW6XrCdfrfkSqIT
-         J4wL2nMDRKGaxY8Lk7U9WpILvnXSIZuPT3F7yPAPc1f85HecctrxzmNRSkSYLy1GdlI8
-         SEi13U/hfyiREimmck4BSNNV8iO4qrX3rgMRTQnw6XEL24HZQNdHKlbUSrojQUNCQpZN
-         zGN9JEX/c2gKaydx7DF13ZfZxU8H7Tdvi6tPl5525+iVZ9m4/1DDyyVFeMCCF2izHbk8
-         yIsg==
-X-Forwarded-Encrypted: i=1; AJvYcCV20Dt4hit2hwv1ad2tqGRfgR27S8JrbNSqpJNQG3dTQ1UnLJVNCIKVPhTKTLQiWS3M1YclTL4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywach47mPbLYv61+jKc1XUjFzPyIhjaUbnckdE4X4p8/0+XSFz/
-	yq917ZlzD05BsnYjz8/vAaUP6L4kEFSfHVKuJoBi3qpHswk15fTXjMIQ+Uxx4T8=
-X-Gm-Gg: ASbGncu4YOw4omhDrx2DXG3jZtE1l9VSzEvxPiOmE7/xRTYudZRd3ZGUlnBeYdWWhCl
-	hqKQAs1fHiT0NJq566a+yyITTz4GO729hOtuZuH+QGLbd/QF9Fv1Jjv8s95boN0NgmmrpYlJTTW
-	TuD4Jk5JZn9Jveb1j8gta3ltWr6Tv4cKeg+wm/Os/hn+Q/blZNLmkueBmHxebSkSPttw2JPa+hu
-	YaVbkLBzx91N4vmUh1eW6fCBrB/AcqORCz6y52r2p0/4SgSi78nbL1D+8emkHXLIuELIUDAwAhu
-	UBJPzHQgDUlO6rwsRUvtdVA+0Tl2el2GETHSG49hpPfMOQfVcfOJWw==
-X-Google-Smtp-Source: AGHT+IFwj3wn7tiRtj9kYnuZcLly+evnL4sHNXc2AQzgrKvRr95g7RqN+OERcFU5C68Ol7Iqw2cMBQ==
-X-Received: by 2002:a05:620a:1918:b0:7b6:cf60:396d with SMTP id af79cd13be357-7c0c21a0ad0mr40230385a.1.1739990448351;
-        Wed, 19 Feb 2025 10:40:48 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0b3cb359esm151920485a.6.2025.02.19.10.40.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 10:40:48 -0800 (PST)
-Date: Wed, 19 Feb 2025 13:40:46 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 2/4] selftests: drv-net: add a way to wait for a
- local process
-Message-ID: <Z7YlroJR_hEbOK1-@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
-	hawk@kernel.org, petrm@nvidia.com, willemdebruijn.kernel@gmail.com
-References: <20250218195048.74692-1-kuba@kernel.org>
- <20250218195048.74692-3-kuba@kernel.org>
- <Z7UBJ_CIrvsSdmnt@LQ3V64L9R2>
- <20250218150512.282c94eb@kernel.org>
- <20250218173739.0eac493b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=K6gxu5ZWxPNklMAI94aQLIQygAF8uQP3D05mBI2Z+HEJUuPFqffRyqTBTOkJgXMX+K8kMurU84qNHe3JvhaRvFt1A7bC2JfDLEiPizQalnF0uppaBajeDbHI3VqFya3YWtW8QFhoS8Ogwh9YCXbyEhQVwOHS+ILfxf6rBf6qPFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LBPbPLYV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AXdrK0FW7YBCiiP1kX6NoL+0DT8yWctwGO9dXqbApP0=; b=LBPbPLYVfyUVGqIt7OCUrlXrd5
+	lIHTDU6Mx3DQRND5VLydjwu3aBm/affJCwLVJn++b0RWN6vGZj3IpBtIg7uRC++gz4TL4PwiVkYkU
+	qiNkxSwrxIuWvOYHRkMit1/pf0mLV59aCtp7JQuSzNpGnsvy1jRMD434rxyMNWR3+/0TDBzcV0Uzp
+	44/uqEJ46rBpP2qpKbwzunVcpM/Gyj6XWyJtPtkiqViAPKFHLk4on4POUr+EOJJ4nVb69TLcRs98K
+	E5wtWMGa+mt4q7QuHVklVtwfJUeaG8K+iKE67srxZPrMY1Bk6DkswRG6fUrKnmz5vOu+xgTtk1RhZ
+	M8GtZjXA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36382)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tkpVm-0006ih-21;
+	Wed, 19 Feb 2025 19:13:36 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tkpVi-00009w-2O;
+	Wed, 19 Feb 2025 19:13:30 +0000
+Date: Wed, 19 Feb 2025 19:13:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+Message-ID: <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
+References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+ <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
+ <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+ <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
+ <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
+ <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
+ <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
+ <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
+ <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
+ <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,14 +90,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250218173739.0eac493b@kernel.org>
+In-Reply-To: <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Feb 18, 2025 at 05:37:39PM -0800, Jakub Kicinski wrote:
-> On Tue, 18 Feb 2025 15:05:12 -0800 Jakub Kicinski wrote:
-> > We shall find out if NIPA agrees with my local system at 4p.
+On Wed, Feb 19, 2025 at 05:52:34PM +0000, Jon Hunter wrote:
+> On 19/02/2025 15:36, Russell King (Oracle) wrote:
+> > So clearly the phylink resolver is racing with the rest of the stmmac
+> > resume path - which doesn't surprise me in the least. I believe I raised
+> > the fact that calling phylink_resume() before the hardware was ready to
+> > handle link-up is a bad idea precisely because of races like this.
+> > 
+> > The reason stmmac does this is because of it's quirk that it needs the
+> > receive clock from the PHY in order for stmmac_reset() to work.
 > 
-> NIPA agrees with you, I'll take another look tomorrow.
+> I do see the reset fail infrequently on previous kernels with this device
+> and when it does I see these messages ...
+> 
+>  dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
+>  dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine
+>   initialization failed
 
-I think I debugged why it happens on my system, hopefully you see
-that message before you go through your own debug cycle :)
+I wonder whether it's also racing with phylib, but phylink_resume()
+calling phylink_start() going in to call phy_start() is all synchronous.
+That causes __phy_resume() to be called.
+
+Which PHY device/driver is being used?
+
+> > So, my preference would be to move phylink_resume() later, removing
+> > the race condition. If there's any regressions, then we need to
+> > _properly_ solve them by ensuring that the PHY keeps the RX clock
+> > running by honouring PHY_F_RXC_ALWAYS_ON. That's going to need
+> > everyone to test their stmmac platforms to find all the cases that
+> > need fixing...
+> 
+> Thanks for the in-depth analysis and feedback. We have 3 SoCs that use this
+> driver and so I will do some testing with this change on all of them.
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
