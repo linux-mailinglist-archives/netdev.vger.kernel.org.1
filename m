@@ -1,183 +1,117 @@
-Return-Path: <netdev+bounces-167740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF3DA3BF90
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:13:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75849A3BFA8
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B89993A5E4A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:11:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E242188FED5
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EF91E3DC6;
-	Wed, 19 Feb 2025 13:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5961E47D6;
+	Wed, 19 Feb 2025 13:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="ivX5hMkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3FA1E5B97;
-	Wed, 19 Feb 2025 13:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072F31E231A
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 13:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970687; cv=none; b=lI3lCvs2R3g3hddNWzNVZK8OMxHrRcd5e4zdker6FF3OgIiRBXyrCxEp0GzwEp6XCc/JPQQ455ITrFTKkqqTcASILKwPlLJ46eYNdgUzpihG8hz5/Z7M6+DhczKaUceYZuRTqWvaLCDzxkSOlbTfihV/mCSEe9A6dat8GKdijb8=
+	t=1739970871; cv=none; b=P1YUExAWNZWltj2a94/44PcPEhT90fCNt4zmzyHE4StVOEmUEdNS7n+VgOQ58IUIkeuznAuSbt+4FBzInuE+h/QtjqKqqz+/On+jEQzz4YPHZudL/H1OTNLn2NczUStxZuRfCzkI0AGUDfeCurWJm5CmrI9TV8HnAK8DUrdQtZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970687; c=relaxed/simple;
-	bh=IZPWOWfdVpOQpOW8h2ZxKykyu2r3t9RE7R/ymrdQ8Ko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fYaKmQV/s+sEin1wVp948mCtH8OjHMyGDtQ6YdhpqpBirBa7P+U75dmCLanUlfQ3/MnSpBkSPUmzN4odQpAVUTAauo8qquf3nnruM/FD4tafUFh/LE88wbpsocHGsWQdoyId2vm2jXWJFgc1Lu0mi30w2O/hB1DMy9714Ywktgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YycBN5xsNzkXPk;
-	Wed, 19 Feb 2025 21:07:40 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1C38C1402CF;
-	Wed, 19 Feb 2025 21:11:21 +0800 (CST)
-Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 19 Feb 2025 21:11:20 +0800
-Received: from [10.174.176.245] (10.174.176.245) by
- kwepemn100006.china.huawei.com (7.202.194.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 19 Feb 2025 21:11:19 +0800
-Message-ID: <5fa8fc14-b67b-4da1-ac8e-339fd3e536c2@huawei.com>
-Date: Wed, 19 Feb 2025 21:11:19 +0800
+	s=arc-20240116; t=1739970871; c=relaxed/simple;
+	bh=aBfhyYh/1maY07Q3PbKHHzGC1Nn2vhQfeMDonwvAoC8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BYAu3DJgiccYEUyk9M/N3FJCCbp0MGJu7KGRCKwnz5/MzllM6PzkuxSGKGhHO+re6OcmnUKDYFTOszi73Fm7E89AyRBpJFrbBQIBnmX72oCCMu/VBn9pd+zTch5RSNd4DJqorMJILg+FgLWzusqgVJ0sHQtvPHxZGhwuSuZl7TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=ivX5hMkR; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 55A8F240105
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 14:14:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1739970867; bh=aBfhyYh/1maY07Q3PbKHHzGC1Nn2vhQfeMDonwvAoC8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 From;
+	b=ivX5hMkRQiJpX7exH3lWbAu8F/Smqy5GXQuLoXf/d0vGZ/tX0gOg3fumXRcyFcPKL
+	 7rlPrrdXDFpav5U7pUx7C4nUUAhkxPJ1/e86pm00K5saCeJVPrWBA6s1UdQaNP5rcG
+	 kpATJA0RdRKdVOXhLt42KN5HhLGjf6MIUCblig1faF7TYv72+FX7oWCOBeKHGmyASa
+	 sfE1TPUDzGNrVp5ledMQh0yesk/UJYAXCBHZKRySEeRfABJ4u38w2yOB+oHKp7g5PK
+	 soepbQ2FT2TOQU3VyYdQsKEigyMarLz0CxuvD3LmAVdmqU3A9pkE2mFzjDgoiVCo6w
+	 KAA+s7VBG5gPg==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4YycL90VBdz9rxK;
+	Wed, 19 Feb 2025 14:14:25 +0100 (CET)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: tmgross@umich.edu,  andrew@lunn.ch,  hkallweit1@gmail.com,
+  linux@armlinux.org.uk,  davem@davemloft.net,  edumazet@google.com,
+  kuba@kernel.org,  pabeni@redhat.com,  netdev@vger.kernel.org,
+  rust-for-linux@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: qt2025: Fix hardware revision check comment
+In-Reply-To: <20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
+References: <20250218-qt2025-comment-fix-v1-1-743e87c0040c@posteo.net>
+	<20250219.100200.440798533601878204.fujita.tomonori@gmail.com>
+Date: Wed, 19 Feb 2025 13:14:16 +0000
+Message-ID: <87zfiiyt3r.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way
- handshake
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: Eric Dumazet <edumazet@google.com>, <ncardwell@google.com>,
-	<kuniyu@amazon.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250218105824.34511-1-wanghai38@huawei.com>
- <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
- <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
- <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
-Content-Language: en-US
-From: Wang Hai <wanghai38@huawei.com>
-In-Reply-To: <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemn100006.china.huawei.com (7.202.194.109)
+Content-Type: text/plain
 
+FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
 
+> On Mon, 17 Feb 2025 23:53:50 +0000
+> Charalampos Mitrodimas <charmitro@posteo.net> wrote:
+>
+>> Correct the hardware revision check comment in the QT2025 driver. The
+>> revision value was documented as 0x3b instead of the correct 0xb3,
+>> which matches the actual comparison logic in the code.
+>> 
+>> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+>> ---
+>>  drivers/net/phy/qt2025.rs | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+>> index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..7e754d5d71544c6d6b6a6d90416a5a130ba76108 100644
+>> --- a/drivers/net/phy/qt2025.rs
+>> +++ b/drivers/net/phy/qt2025.rs
+>> @@ -41,7 +41,7 @@ impl Driver for PhyQT2025 {
+>>  
+>>      fn probe(dev: &mut phy::Device) -> Result<()> {
+>>          // Check the hardware revision code.
+>> -        // Only 0x3b works with this driver and firmware.
+>> +        // Only 0xb3 works with this driver and firmware.
+>>          let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+>>          if (hw_rev >> 8) != 0xb3 {
+>>              return Err(code::ENODEV);
+>
+> Oops,
+>
+> Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>
+> Given that this patch is expected to be merged via netdev, you might
+> need to resend with a proper subject:
+>
+> https://elixir.bootlin.com/linux/v6.13/source/Documentation/process/maintainer-netdev.rst
 
-On 2025/2/19 11:31, Jason Xing wrote:
-> On Wed, Feb 19, 2025 at 10:16 AM Wang Hai <wanghai38@huawei.com> wrote:
->>
->>
->>
->> On 2025/2/18 21:35, Eric Dumazet wrote:
->>> On Tue, Feb 18, 2025 at 12:00 PM Wang Hai <wanghai38@huawei.com> wrote:
->>>>
->>>> If two ack packets from a connection enter tcp_check_req at the same time
->>>> through different cpu, it may happen that req->ts_recent is updated with
->>>> with a more recent time and the skb with an older time creates a new sock,
->>>> which will cause the tcp_validate_incoming check to fail.
->>>>
->>>> cpu1                                cpu2
->>>> tcp_check_req
->>>>                                       tcp_check_req
->>>> req->ts_recent = tmp_opt.rcv_tsval = t1
->>>>                                       req->ts_recent = tmp_opt.rcv_tsval = t2
->>>>
->>>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
->>>> tcp_child_process
->>>> tcp_rcv_state_process
->>>> tcp_validate_incoming
->>>> tcp_paws_check
->>>> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win) // failed
->>>>
->>>> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
->>>>
->>>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->>>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
->>>> ---
->>>>    net/ipv4/tcp_minisocks.c | 4 ++++
->>>>    1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
->>>> index b089b08e9617..0208455f9eb8 100644
->>>> --- a/net/ipv4/tcp_minisocks.c
->>>> +++ b/net/ipv4/tcp_minisocks.c
->>>> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
->>>>           sock_rps_save_rxhash(child, skb);
->>>>           tcp_synack_rtt_meas(child, req);
->>>>           *req_stolen = !own_req;
->>>> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
->>>> +           unlikely(tcp_sk(child)->rx_opt.ts_recent != tmp_opt.rcv_tsval))
->>>> +               tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
->>>> +
->>>>           return inet_csk_complete_hashdance(sk, child, req, own_req);
->>>
->>> Have you seen the comment at line 818 ?
->>>
->>> /* TODO: We probably should defer ts_recent change once
->>>    * we take ownership of @req.
->>>    */
->>>
->>> Plan was clear and explained. Why implement something else (and buggy) ?
->>>
->> Hi Eric,
->>
->> Currently we have a real problem, so we want to solve it. This bug
->> causes the upper layers to be unable to be notified to call accept after
->> the successful three-way handshake.
->>
->> Skb from cpu1 that fails at tcp_paws_check (which it could have
->> succeeded) will not be able to enter the TCP_ESTABLISHED state, and
->> therefore parent->sk_data_ready(parent) will not be triggered, and skb
->> from cpu2 can complete the three-way handshake, but there is also no way
->> to call parent->sk_data_ready(parent) to notify the upper layer, which
->> will result
->> in the upper layer not being able to sense and call accept to obtain the
->> nsk.
->>
->> cpu1                                cpu2
->> tcp_check_req
->>                                       tcp_check_req
->> req->ts_recent = tmp_opt.rcv_tsval = t1
->>                                       req->ts_recent=tmp_opt.rcv_tsval= t2
->>
->> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
->> tcp_child_process
->>    tcp_rcv_state_process
->>     tcp_validate_incoming
->>      tcp_paws_check // failed
->>    parent->sk_data_ready(parent); // will not be called
->>                                       tcp_v4_do_rcv
->>                                       tcp_rcv_state_process // Complete the three-way handshake
->>                                                                                                          // missing parent->sk_data_ready(parent);
-> 
-> IIUC, the ack received from cpu1 triggered calling
-> inet_csk_complete_hashdance() so its state transited from
-> TCP_NEW_SYN_RECV to TCP_SYN_RECV, right? If so, the reason why not
-> call sk_data_ready() if the skb entered into tcp_child_process() is
-> that its state failed to transit to TCP_ESTABLISHED?
-> 
-Yes, because it didn't switch to TCP_ESTABLISHED
-> Here is another question. How did the skb on the right side enter into
-> tcp_v4_do_rcv() after entering tcp_check_req() if the state of sk
-> which the skb belongs to is TCP_NEW_SYN_RECV? Could you elaborate more
-> on this point?
-Since cpu1 successfully created the child sock, cpu2 will return
-null in tcp_check_req and req_stolen is set to true, so that it will
-subsequently go to 'goto lookup' to re-process the packet, and at
-this point, sk->sk_state is already in TCP_SYN_RECV state, and then
-then tcp_v4_do_rcv is called.
-> 
+Hi Fujita,
+
+Very helpful; didn't think to check the Networking subsystem workflow
+docs.
+
+Thanks,
+C. Mitrodimas
+
+>
 > Thanks,
-> Jason
-
 
