@@ -1,163 +1,175 @@
-Return-Path: <netdev+bounces-167883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D028FA3CA9A
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:59:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 649DDA3CAB4
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 22:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98D42170287
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:58:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A02178615
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0028024E4B7;
-	Wed, 19 Feb 2025 20:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC7A253F16;
+	Wed, 19 Feb 2025 21:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n8ViKVvK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L2Pu5f+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF63821516A;
-	Wed, 19 Feb 2025 20:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4217A253345;
+	Wed, 19 Feb 2025 21:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739998691; cv=none; b=s1ULth7Y+NGHg+jdcaxlBA6F8m+7PUzAC0DPO2R3zJ0ZL8MWsRZeCGhdrHRPV+G4UH2CKm7QvNWglz4B0uE6Id/F/tEJJTpePT9HNGsIZhP53IETeeGMGiNKkKbloQvZJILHkgooycXwXPVK0O9FB16UhAZHHYDYCDMmxM//w1U=
+	t=1739998872; cv=none; b=d+QiCIBdNAMS7tObSs/6ubVA58nU1CA32tHI7SwUngGDPWuebI88kVrJ+Nejpz8UyKARSB5H699JEbvMCLxLgkxfthPKyuRNHCIhWVjZZ6VOVfZsZywUj6skeAnihu+AOyozSmnJguD/a5kEcFfTETwUclF6Lz8cjOdDZQ+FDdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739998691; c=relaxed/simple;
-	bh=uY9tpDYXVCCT3oI01wALVYqdN1lMr0kJ3zLRomdZBfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U+I7+KAY+4vPLNnJ3gySsC7/z9QX2kAglY728j0YcMieFlcWDe4RAbEjWzRfK+QUXKNSAznZcvWF1zsJRq7yyW9jmZ0LgbBkmpyR1ZoK4yCCuLs6a6R2IrAxGT12EKu+xrDDnN4Qc6kJzUgBdA3debqTw8JOTv+/lV06DbjirII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=n8ViKVvK; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ox9CV6LHUd6gMf+zEh49UTkS5cD9NmltHJfCvXce8LM=; b=n8ViKVvKPHMGMgCG7hd0ZjkDop
-	vRrK8EqFjl6XVOMIziTBve1ppUE4XDjhAly0AlAMU5JohcyadSfLdQxpgdbV0U46N1g24urRc4bky
-	rpEoBoRkJoJPOHiLqV+MOp2P+ePgMT9+fnme5HPdLS/FfPwne73dWH35eBco1FqmPUYF/2I9Y5n+X
-	wTC5lp5qa5FPX1CDRlyw+mG/BMPQAkJr+BzLgTCE+fcqgLcjKtgLzr4UU1isKe49TWsmf6LgfbzFi
-	LCWbW/i9ll2qUk+h4x3J4GbhUPLKPr52n+ZfZA9CG99Sd7CZ1/Aj2y9qvPCOlWSSqRxrgiyNuM/2e
-	TFBYXFRw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34186)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tkr8n-00071t-1d;
-	Wed, 19 Feb 2025 20:57:57 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tkr8j-0000DX-2Z;
-	Wed, 19 Feb 2025 20:57:53 +0000
-Date: Wed, 19 Feb 2025 20:57:53 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
- support
-Message-ID: <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
-References: <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
- <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
- <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
- <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
- <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
- <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
- <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
- <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
- <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
- <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
+	s=arc-20240116; t=1739998872; c=relaxed/simple;
+	bh=5tuFDmpLvrB9efTDBdJXXM3zDVl7im2uMUcvPPKT44s=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=JMJrUU2uxvbBCTvwOQpa5q8gkhd6BQ4ZABzyzvAM++RTi6L5x9/iNV9c/fKBbb/wF/obQTqv8ITNEThNxE0PX2Ez5vf+hTkj4isHMTmC4nyrAdeA915MBfzmk7roDwe5K0X7oOIp/2BxRrfhT/GPTIiyMWzVsw+56W5l5/4hneY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L2Pu5f+2; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dccaaca646so507941a12.0;
+        Wed, 19 Feb 2025 13:01:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739998868; x=1740603668; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n/HcLc1vBRDNLkVs/ylW8/ztC8KcpMW5l5ZyrlNLue4=;
+        b=L2Pu5f+2HPQFbeMv84IVVuO8r5s7eVv9NQ/pbtg6ixLpWFSWCQ95JwAmLiRHEtVOez
+         B4HXLOvVzHNsWYAgsobteGgJxqrvzY5j8sC6QyyAcfrkXgpOoeX9YP09ooNg0XtKgDBM
+         rITpzTAgOLhvLNfTFlW5Db2XG2itdrfip9otMXs5OTGI363JdLzvUHeQVrwGyi+gj6Nl
+         wGmmw3aOR5Dokc/4fip5esT3PohsD8f9XMTk/6ylLPI8pyD1IE8H7HsiHULk1eyr8Ra5
+         eIoRezPkbC8o2t+iGBSOBfkstOKEmvDkvUz40W2HxZD7KCUDhiPJ0w52V2EobHW0ROqV
+         6Byg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739998868; x=1740603668;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n/HcLc1vBRDNLkVs/ylW8/ztC8KcpMW5l5ZyrlNLue4=;
+        b=FKJ7BCcDWqQo5MgSbExMdtpUJqohW4+6rHKrroON2mn5Y+eyGd6tCNpmwAofib6siX
+         I86+95g/HP6+qpASjw3P76TqiAoofL5kmI6hzoh+42niOyZK56zJBJLoXpdpwjuSoE8l
+         B8QC40XszZ4Tv2wATclporSjraUijP1ptXfD8uyRRBL3cuUC7WXGPwyVXzr8U3ou99aq
+         oRyp9rW1U7dzl4SzWKaOsqtFGTdNR+BminBkOvUhMRnVJPEeTN/KotoOVW8OS3FykP4L
+         uMzr/O3KcnTPA/zmZ5/UegKDzbr4L0dt+RXvqnmdi/iZlbmWK5U0DqCGaYjtwISrGnVF
+         Ro6w==
+X-Forwarded-Encrypted: i=1; AJvYcCW1S5R+vjmu8KDvWKgrljQSz5nbAu0YKoPrMPg2Jfipzoif6PFE2Tvnp9Y00atTo4AqA3vCYQQFTR9JBa8c@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAO3in4Mv6KW63P1U0sWaiu5C1hBaevTcfKiHQKZg6rKLTqASc
+	/ifqLZ0cJUDhSYnHpITIc+xHAOx85nWknlSgxY/IeHJP0JTQsCEi
+X-Gm-Gg: ASbGncvgI1JzZjBTB7gY0CB5AebVrpdQf5xw3wK0Hn1tfoYfGCymqjnJwpUR351F+9z
+	ueRq4dkjZijClk8I246RrZLPfRufKl9ierBkELJfmB5BSa/WL4ITY/k/5BwQ1vjHDgwnJlGcK1t
+	lDtSzGvbNwSnKHwLMJM/kbBnIX5i7oFaYnxwG2v8Cxbu2cqls96HzXbb3mH7DxuCZj5MadvKB/I
+	RuH3rsapDWCmPzHKMQ5WVl6xglfUxc3YIGFtm0XmG0pfyA74AxUO8oEbZlJRcb6qK0KNte5+/dn
+	vknYEmUrGBlqZ0dNkkVuOeVdA5DDcL3lJKTf1rH2EBlbUnjhoMvOqNPB2byfxcUTpCNw7mFj9XI
+	ztz+XpQ0VbZe/kBYQ+00YMTaU+Nc8JTenj57XmXUI57h+K3ZYosXk46i2Ony+ZEYfzF8C4HfVQE
+	B+58XF5v0=
+X-Google-Smtp-Source: AGHT+IH9ZMq8ky2erXIOhsHzCfqhRS36ZUg26/HaCIV4syGcJuFX40SQztd94cUQWV3y4A8uHd5E5g==
+X-Received: by 2002:a05:6402:1d4f:b0:5de:d932:a54c with SMTP id 4fb4d7f45d1cf-5e0a1200077mr873058a12.2.1739998868275;
+        Wed, 19 Feb 2025 13:01:08 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a982:e400:6dd0:628c:981b:2783? (dynamic-2a02-3100-a982-e400-6dd0-628c-981b-2783.310.pool.telefonica.de. [2a02:3100:a982:e400:6dd0:628c:981b:2783])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5dece28808fsm10877033a12.75.2025.02.19.13.01.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2025 13:01:07 -0800 (PST)
+Message-ID: <c02c50ab-da01-4cfa-af72-4bed109fa8e2@gmail.com>
+Date: Wed, 19 Feb 2025 22:01:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next 0/8] net: phy: move PHY package code to its own
+ source file
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 19, 2025 at 08:05:57PM +0000, Jon Hunter wrote:
-> On 19/02/2025 19:13, Russell King (Oracle) wrote:
-> > On Wed, Feb 19, 2025 at 05:52:34PM +0000, Jon Hunter wrote:
-> > > On 19/02/2025 15:36, Russell King (Oracle) wrote:
-> > > > So clearly the phylink resolver is racing with the rest of the stmmac
-> > > > resume path - which doesn't surprise me in the least. I believe I raised
-> > > > the fact that calling phylink_resume() before the hardware was ready to
-> > > > handle link-up is a bad idea precisely because of races like this.
-> > > > 
-> > > > The reason stmmac does this is because of it's quirk that it needs the
-> > > > receive clock from the PHY in order for stmmac_reset() to work.
-> > > 
-> > > I do see the reset fail infrequently on previous kernels with this device
-> > > and when it does I see these messages ...
-> > > 
-> > >   dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
-> > >   dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine
-> > >    initialization failed
-> > 
-> > I wonder whether it's also racing with phylib, but phylink_resume()
-> > calling phylink_start() going in to call phy_start() is all synchronous.
-> > That causes __phy_resume() to be called.
-> > 
-> > Which PHY device/driver is being used?
-> 
-> 
-> Looks like it is this Broadcom driver ...
-> 
->  Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+This series contributes to cleaning up phylib by moving PHY package
+related code to its own source file.
 
-I don't see anything special happening in the PHY driver - it doesn't
-implement suspend/resume/config_aneg methods, so there's nothing going
-on with clocks in that driver beyond generic stuff.
+Heiner Kallweit (8):
+  net: phy: move PHY package code from phy_device.c to own source file
+  net: phy: move PHY package related code from phy.h to phy_package.c
+  net: phy: add getters for public members in struct phy_package_shared
+  net: phy: qca807x: use new phy_package_shared getters
+  net: phy: micrel: use new phy_package_shared getters
+  net: phy: mtk-ge-soc: use new phy_package_shared getters
+  net: phy: mscc: use new phy_package_shared getters
+  net: phy: make struct phy_package_shared private to phylib
 
-So, let's try something (I haven't tested this, and its likely you
-will need to work it in to your other change.)
-
-Essentially, this disables the receive clock stop around the reset,
-something the stmmac driver has never done in the past.
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 1cbea627b216..8e975863a2e3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7926,6 +7926,8 @@ int stmmac_resume(struct device *dev)
- 	rtnl_lock();
- 	mutex_lock(&priv->lock);
- 
-+	phy_eee_rx_clock_stop(priv->dev->phydev, false);
-+
- 	stmmac_reset_queues_param(priv);
- 
- 	stmmac_free_tx_skbufs(priv);
-@@ -7937,6 +7939,9 @@ int stmmac_resume(struct device *dev)
- 
- 	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
- 
-+	phy_eee_rx_clock_stop(priv->dev->phydev,
-+			      priv->phylink_config.eee_rx_clk_stop_enable);
-+
- 	stmmac_enable_all_queues(priv);
- 	stmmac_enable_all_dma_irq(priv);
- 
+ drivers/net/phy/Makefile              |   3 +-
+ drivers/net/phy/mediatek/mtk-ge-soc.c |  10 +-
+ drivers/net/phy/micrel.c              |  12 +-
+ drivers/net/phy/mscc/mscc_ptp.c       |  15 +-
+ drivers/net/phy/phy_device.c          | 237 ------------------
+ drivers/net/phy/phy_package.c         | 348 ++++++++++++++++++++++++++
+ drivers/net/phy/qcom/qca807x.c        |  20 +-
+ include/linux/phy.h                   | 125 +--------
+ 8 files changed, 396 insertions(+), 374 deletions(-)
+ create mode 100644 drivers/net/phy/phy_package.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
