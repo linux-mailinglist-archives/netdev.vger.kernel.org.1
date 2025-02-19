@@ -1,134 +1,183 @@
-Return-Path: <netdev+bounces-167739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C63A3BF87
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:11:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF3DA3BF90
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 476311883424
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:10:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B89993A5E4A
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF771DF724;
-	Wed, 19 Feb 2025 13:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZqr+ilV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37EF91E3DC6;
+	Wed, 19 Feb 2025 13:11:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4546B12B73;
-	Wed, 19 Feb 2025 13:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3FA1E5B97;
+	Wed, 19 Feb 2025 13:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970596; cv=none; b=TU2Bu4VuPQ/MU+0BM5GRKkh6lOFUu4et4zpFCEdOcUuXSd7YWMS7rz0oBxnxCIr+JZrWBIApdPQGYPUvYDvUe95a+Y30DNgwYZxpnZYKD8fzA2qFT3cS/N+rYZwJ8MR9f23XUUPHyMWWPq/PLVCutVurXFIhbtGcFHWNXX83qsA=
+	t=1739970687; cv=none; b=lI3lCvs2R3g3hddNWzNVZK8OMxHrRcd5e4zdker6FF3OgIiRBXyrCxEp0GzwEp6XCc/JPQQ455ITrFTKkqqTcASILKwPlLJ46eYNdgUzpihG8hz5/Z7M6+DhczKaUceYZuRTqWvaLCDzxkSOlbTfihV/mCSEe9A6dat8GKdijb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970596; c=relaxed/simple;
-	bh=lbm9EMvHSC3HGg8sbayokeiGq1GS4Q8HOslmFXwOhlw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ldMhzAqJeQflk4ZxcmJQO0MDQCSbdPFU05QSmd2b3cfov9Tzh/ATJMhXiobL7R+JeFhGij78LwM1+4Y2wAlwuk/BS6aXdb6nHtxoH8M80m/qRgENMTv4FshuTV66sxOj3f2jNGVKfSf+Zbvv8gDen97OyxpXva/3/HYVOrSHzzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UZqr+ilV; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38dd9b3419cso3614753f8f.0;
-        Wed, 19 Feb 2025 05:09:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739970593; x=1740575393; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z0Kbyp7CupAYs5UbQsl7w/FVHCaTEohFav94XT7tXLI=;
-        b=UZqr+ilVTqQQq+vAJlF+eiF0EYBu519vGaoATPDBR2qVufM/JsKw0je0lQFVvYZxre
-         x/DuRLNC7McYKVZxcRn/lNJZzfhVorJWsl+ocAer71OUmbRlQ5g+JRRsawL9y8tVnGzM
-         M2+Rgx5hkW1nVRcGBbHY17UtmdfflrpMAdsEXDYhjhhxyjvzGT8S39AhB7W0NwqMX2hB
-         Jh5tMzIcUM3w9Gwf27YlUyDKGJWE1g+JnRasdFwNXrScCNqdw7mD5/g1kPObJcwQpwEX
-         OdzXLNXMHmUJqt4at0v59F62WoPZJMufaGmXlJNCdHGuf92LolhLcnUGwxalvcuymPGh
-         f79A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739970593; x=1740575393;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z0Kbyp7CupAYs5UbQsl7w/FVHCaTEohFav94XT7tXLI=;
-        b=LIBRXeO0oDAvsKYMl0gtQIZRvdC1TDICxggi+b1lO932HSaLfDhN4qdoL1HYGvTzi1
-         78rCfyiDsqLCp2aHLhnLeoJ396+E8WP90acNgZmcBLeK40hMn6FxYyMONuWt9GwW0N2N
-         jcUQWu6F1sn1JJzAehDhLKmjpQE0PkbmJeiHyxCblgq7g2NWIdWIkYNTrBFMvyiRP41m
-         Vn9BscpEyN1jmiOLSWj1zZwKhApnc/Srb6bkvzNkqnX7593CXUa1zrvVZMSySINly9Wa
-         81W3Iu9Yhjji1IhHRiECtp3ktE4rHqK31WiYLPhlsniorpbfFWpBKzKt81fmpgts1Hh7
-         QdvA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9l6XC6lli1qeSqEp2qw9q9AQ8Nkd3ccwGBTZ3/A2Xv0TVuBAYmZh7x7Y4w332tEBy5DDXnO/KJgLGs70g@vger.kernel.org, AJvYcCUrfH6JurghnjrONS5kwrq65XDpb0qSArkGhELMQ6EpjEXfWNRpeHfxJcqIOOIgsd2yCqEGkPo3@vger.kernel.org, AJvYcCUrjzgwqpR2gR3rpWQNpdqj84ZN8PcyAdVO8vBCo1LBHwBYjRVWhRFHiKOhuBkBINUjg3gKBWcU4BazEUW/@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiRgpODYwImhTzosGp8UXQa021fcydT780Vu/QLPM6TYqFZWzo
-	FAG62wS8NKyYstDNyDiML1WhWINflo2H3ePl8pqGRZFUs6urBQey
-X-Gm-Gg: ASbGnctJcjesBzxOjNf3oaRmvry/JSL8mQGOEY46uIQ/m7xrVdvybGyrgo3Y1CLeZ8g
-	/gnY0Io8u1gfHrOHpspVmP2SpTV2d8aM8njv9eL7m8SKp/6SoEB5B45yXUXK3Ob+wT0z0a5R9Sg
-	6YHe+xx+Zus6JRdkQlDscqIp4bgfhzcITr/YEj9ywwkrLzsClc0GfKD6loKwS9RbO8VCp2jbvbi
-	k9tkhL8QJx/a5wsq6Mu/IpHO8jMOoRQjHksGPq5WcFra8Ch8Zw0Q+nAyZdGHoobGy37xYpE3EX6
-	TO+lbIoah80rjS7DsuIQhqqZE6SMqxin1lqcAkxLkCIl1H7qjlEoyKGg690aIQ3My8NJstI=
-X-Google-Smtp-Source: AGHT+IFCaHY0kzUOzM91PMiUlVU3mwEfBxBS9L99pdJlK6WgwXE5yUiGE5nRgxRPTq9PSpDKdeDk5g==
-X-Received: by 2002:a05:6000:154f:b0:38f:2093:6e75 with SMTP id ffacd0b85a97d-38f33f3599fmr17480037f8f.33.1739970593210;
-        Wed, 19 Feb 2025 05:09:53 -0800 (PST)
-Received: from localhost.localdomain (host-87-11-14-46.retail.telecomitalia.it. [87.11.14.46])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38f259f7979sm17576873f8f.83.2025.02.19.05.09.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 05:09:52 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	George Moussalem <george.moussalem@outlook.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [net PATCH] net: phy: qcom: qca807x fix condition for DAC_DSP_BIAS_CURRENT
-Date: Wed, 19 Feb 2025 14:09:21 +0100
-Message-ID: <20250219130923.7216-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1739970687; c=relaxed/simple;
+	bh=IZPWOWfdVpOQpOW8h2ZxKykyu2r3t9RE7R/ymrdQ8Ko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=fYaKmQV/s+sEin1wVp948mCtH8OjHMyGDtQ6YdhpqpBirBa7P+U75dmCLanUlfQ3/MnSpBkSPUmzN4odQpAVUTAauo8qquf3nnruM/FD4tafUFh/LE88wbpsocHGsWQdoyId2vm2jXWJFgc1Lu0mi30w2O/hB1DMy9714Ywktgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YycBN5xsNzkXPk;
+	Wed, 19 Feb 2025 21:07:40 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1C38C1402CF;
+	Wed, 19 Feb 2025 21:11:21 +0800 (CST)
+Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 19 Feb 2025 21:11:20 +0800
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemn100006.china.huawei.com (7.202.194.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 19 Feb 2025 21:11:19 +0800
+Message-ID: <5fa8fc14-b67b-4da1-ac8e-339fd3e536c2@huawei.com>
+Date: Wed, 19 Feb 2025 21:11:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way
+ handshake
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: Eric Dumazet <edumazet@google.com>, <ncardwell@google.com>,
+	<kuniyu@amazon.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250218105824.34511-1-wanghai38@huawei.com>
+ <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
+ <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
+ <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
+Content-Language: en-US
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemn100006.china.huawei.com (7.202.194.109)
 
-From: George Moussalem <george.moussalem@outlook.com>
 
-While setting the DAC value, the wrong boolean value is evaluated to set
-the DSP bias current. So let's correct the conditional statement and use
-the right boolean value read from the DTS set in the priv.
 
-Cc: stable@vger.kernel.org
-Fixes: d1cb613efbd3 ("net: phy: qcom: add support for QCA807x PHY Family")
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/qcom/qca807x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
-index 3279de857b47..2ad8c2586d64 100644
---- a/drivers/net/phy/qcom/qca807x.c
-+++ b/drivers/net/phy/qcom/qca807x.c
-@@ -774,7 +774,7 @@ static int qca807x_config_init(struct phy_device *phydev)
- 	control_dac &= ~QCA807X_CONTROL_DAC_MASK;
- 	if (!priv->dac_full_amplitude)
- 		control_dac |= QCA807X_CONTROL_DAC_DSP_AMPLITUDE;
--	if (!priv->dac_full_amplitude)
-+	if (!priv->dac_full_bias_current)
- 		control_dac |= QCA807X_CONTROL_DAC_DSP_BIAS_CURRENT;
- 	if (!priv->dac_disable_bias_current_tweak)
- 		control_dac |= QCA807X_CONTROL_DAC_BIAS_CURRENT_TWEAK;
--- 
-2.47.1
+On 2025/2/19 11:31, Jason Xing wrote:
+> On Wed, Feb 19, 2025 at 10:16 AM Wang Hai <wanghai38@huawei.com> wrote:
+>>
+>>
+>>
+>> On 2025/2/18 21:35, Eric Dumazet wrote:
+>>> On Tue, Feb 18, 2025 at 12:00 PM Wang Hai <wanghai38@huawei.com> wrote:
+>>>>
+>>>> If two ack packets from a connection enter tcp_check_req at the same time
+>>>> through different cpu, it may happen that req->ts_recent is updated with
+>>>> with a more recent time and the skb with an older time creates a new sock,
+>>>> which will cause the tcp_validate_incoming check to fail.
+>>>>
+>>>> cpu1                                cpu2
+>>>> tcp_check_req
+>>>>                                       tcp_check_req
+>>>> req->ts_recent = tmp_opt.rcv_tsval = t1
+>>>>                                       req->ts_recent = tmp_opt.rcv_tsval = t2
+>>>>
+>>>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+>>>> tcp_child_process
+>>>> tcp_rcv_state_process
+>>>> tcp_validate_incoming
+>>>> tcp_paws_check
+>>>> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win) // failed
+>>>>
+>>>> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
+>>>>
+>>>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>>>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>>>> ---
+>>>>    net/ipv4/tcp_minisocks.c | 4 ++++
+>>>>    1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+>>>> index b089b08e9617..0208455f9eb8 100644
+>>>> --- a/net/ipv4/tcp_minisocks.c
+>>>> +++ b/net/ipv4/tcp_minisocks.c
+>>>> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>>>>           sock_rps_save_rxhash(child, skb);
+>>>>           tcp_synack_rtt_meas(child, req);
+>>>>           *req_stolen = !own_req;
+>>>> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
+>>>> +           unlikely(tcp_sk(child)->rx_opt.ts_recent != tmp_opt.rcv_tsval))
+>>>> +               tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
+>>>> +
+>>>>           return inet_csk_complete_hashdance(sk, child, req, own_req);
+>>>
+>>> Have you seen the comment at line 818 ?
+>>>
+>>> /* TODO: We probably should defer ts_recent change once
+>>>    * we take ownership of @req.
+>>>    */
+>>>
+>>> Plan was clear and explained. Why implement something else (and buggy) ?
+>>>
+>> Hi Eric,
+>>
+>> Currently we have a real problem, so we want to solve it. This bug
+>> causes the upper layers to be unable to be notified to call accept after
+>> the successful three-way handshake.
+>>
+>> Skb from cpu1 that fails at tcp_paws_check (which it could have
+>> succeeded) will not be able to enter the TCP_ESTABLISHED state, and
+>> therefore parent->sk_data_ready(parent) will not be triggered, and skb
+>> from cpu2 can complete the three-way handshake, but there is also no way
+>> to call parent->sk_data_ready(parent) to notify the upper layer, which
+>> will result
+>> in the upper layer not being able to sense and call accept to obtain the
+>> nsk.
+>>
+>> cpu1                                cpu2
+>> tcp_check_req
+>>                                       tcp_check_req
+>> req->ts_recent = tmp_opt.rcv_tsval = t1
+>>                                       req->ts_recent=tmp_opt.rcv_tsval= t2
+>>
+>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+>> tcp_child_process
+>>    tcp_rcv_state_process
+>>     tcp_validate_incoming
+>>      tcp_paws_check // failed
+>>    parent->sk_data_ready(parent); // will not be called
+>>                                       tcp_v4_do_rcv
+>>                                       tcp_rcv_state_process // Complete the three-way handshake
+>>                                                                                                          // missing parent->sk_data_ready(parent);
+> 
+> IIUC, the ack received from cpu1 triggered calling
+> inet_csk_complete_hashdance() so its state transited from
+> TCP_NEW_SYN_RECV to TCP_SYN_RECV, right? If so, the reason why not
+> call sk_data_ready() if the skb entered into tcp_child_process() is
+> that its state failed to transit to TCP_ESTABLISHED?
+> 
+Yes, because it didn't switch to TCP_ESTABLISHED
+> Here is another question. How did the skb on the right side enter into
+> tcp_v4_do_rcv() after entering tcp_check_req() if the state of sk
+> which the skb belongs to is TCP_NEW_SYN_RECV? Could you elaborate more
+> on this point?
+Since cpu1 successfully created the child sock, cpu2 will return
+null in tcp_check_req and req_stolen is set to true, so that it will
+subsequently go to 'goto lookup' to re-process the packet, and at
+this point, sk->sk_state is already in TCP_SYN_RECV state, and then
+then tcp_v4_do_rcv is called.
+> 
+> Thanks,
+> Jason
 
 
