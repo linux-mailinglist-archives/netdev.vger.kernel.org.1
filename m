@@ -1,56 +1,53 @@
-Return-Path: <netdev+bounces-167834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEFFEA3C789
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:30:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A824DA3C785
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 19:29:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 555233B34B0
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:26:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B03D16DDF7
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C5F21B9D2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4181E21C9E5;
 	Wed, 19 Feb 2025 18:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBs4SFo1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9UEEboq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2B421B1B5;
-	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1266F21B9DE;
+	Wed, 19 Feb 2025 18:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739989471; cv=none; b=U25LTH5DjJnbGI2GJ9KR4NpJTbGg2UpYjnheSSKM5inriUHM46Hgqp8hVuOEuQzllhyBALTZlwS01PdQdcqdeRl0d2DbXNoixiB5WaSuWeFjzopIL1uQ0z5ALEzr8abrtVStPlUyyJX3zOtpp24A8ErhEAKQLhpvxR/lPwRI4BM=
+	t=1739989472; cv=none; b=lAAGTYsFo35m7+EqhsgaFz8VmwEAaxOTT75DotCcaQEtDHmv/FPrt1c/oSnj/TLPPtPwRS+PybCeHz+BPUA5s4r4ulPj1F65L4ev1y13FOqcKZdOqQ1lj+EJafLtp/XSPCeL4VFzAHZpc31mYkzkoCW3FXoJjozfpIuZznx7bic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739989471; c=relaxed/simple;
-	bh=cXUqK6gzrQ6Jb8f2XQHgstHPltOXwTTStbk2H1bPmow=;
+	s=arc-20240116; t=1739989472; c=relaxed/simple;
+	bh=O7RPYfjnYfLaOxt45Eob56Z/zyh6ZSMPzVlUtammgZM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xygc26FoTw8ZRlkCkKjGWW2cyu/KGdZtMqufiblvilP58y+068vsKhcOrXCf+arC5xDYgcipidgJjgwHMXDuGrcTx0t/75ZDGA0/79YYrF0ZBiDSKx4fu51whM4+EHmXuGzp+3pliIbOcwALEAMHCiDWkb/dFLIOzwjZ8N0NC1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBs4SFo1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F8FDC4CEE9;
+	 MIME-Version; b=E1H75hAhY27FiU6ARb0fmkTcjXz2SuF/WKmgHoKtK63oblDfu4XpBNa5mea8zO3LcS4nP+YMYVAYqx4wbjP/tJ/vRhFbMBsaJ4i5HFLwvKNUohXLPG5krAw4eeSzEp6x6sxnDDmFyQs0B0Xy21tjKWzOYWWu5+pB0hwD5KoWFy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9UEEboq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE845C4CEE0;
 	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739989471;
-	bh=cXUqK6gzrQ6Jb8f2XQHgstHPltOXwTTStbk2H1bPmow=;
+	bh=O7RPYfjnYfLaOxt45Eob56Z/zyh6ZSMPzVlUtammgZM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kBs4SFo1yJD+EOXqO74HzIV7aOWP8Zs4387sigrp++bBLIaVkEQxhnBDdW+6dEGh1
-	 AlrcIasD9/EKoOd+GGwmKXWPq1yFkUkv/4/LjCpv8sGPBZSQ9BdBVncrONvEKO7Y4p
-	 sga/5WKolx5qUc5EJUO/wYsK3nRygi4L9W8NPfUoIeQx/ryqCHRBMCgJGxBaQkv0MC
-	 Umj1Q5PtHGD8INYDOVPMA6BZBzRFqSxy1abrg9k7WsPvv2uXqlr7YHRxWyeI4xByh4
-	 7RfW1OxrI3s8FVHx48kjN+dnVt4kYd67egfiD2N0USjGVVYV5e/qe9zL+ahymajH0t
-	 BYu9hHiyjDqWw==
+	b=H9UEEboq4ARdzWf1aAgGNsYR0NOLiOiwrmEv50htPRV1RE+WhWZJsoJAtFG1cAYZ5
+	 6vde5N4B/P0tUwgAv1RQ98ORJMVBaS4S7oHG7OyXHsDXHRjbK0cL8owJ+g9GS3H8zP
+	 fRSI0JOuURqk37CdqSJ5A+0TfZYIn4bPtVfWWI5xq5abogtvemgp+rIyFyr4l9HPbI
+	 +QfJi4169ZZd0Jhr7uYZeJlcpk4OLCwQdXqRTHFyw8zpEzRUwvf5OcUBVqR7TOipPS
+	 A8W5I8bu+y7wtsxkVcc1CNnY2G2TtN7zYxJkMBCikdlcu60ywnvtnLzpYAvNSMc7QA
+	 9ccan5zgiIT6A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Boris Pismenny <borisp@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: [PATCH v3 16/19] net/tls: use the new scatterwalk functions
-Date: Wed, 19 Feb 2025 10:23:38 -0800
-Message-ID: <20250219182341.43961-17-ebiggers@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH v3 17/19] crypto: skcipher - use the new scatterwalk functions
+Date: Wed, 19 Feb 2025 10:23:39 -0800
+Message-ID: <20250219182341.43961-18-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250219182341.43961-1-ebiggers@kernel.org>
 References: <20250219182341.43961-1-ebiggers@kernel.org>
@@ -64,121 +61,151 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Replace calls to the deprecated function scatterwalk_copychunks() with
-memcpy_from_scatterwalk(), memcpy_to_scatterwalk(), or
-scatterwalk_skip() as appropriate.  The new functions generally behave
-more as expected and eliminate the need to call scatterwalk_done() or
-scatterwalk_pagedone().
+Convert skcipher_walk to use the new scatterwalk functions.
 
-However, the new functions intentionally do not advance to the next sg
-entry right away, which would have broken chain_to_walk() which is
-accessing the fields of struct scatter_walk directly.  To avoid this,
-replace chain_to_walk() with scatterwalk_get_sglist() which supports the
-needed functionality.
+This includes a few changes to exactly where the different parts of the
+iteration happen.  For example the dcache flush that previously happened
+in scatterwalk_done() now happens in scatterwalk_dst_done() or in
+memcpy_to_scatterwalk().  Advancing to the next sg entry now happens
+just-in-time in scatterwalk_clamp() instead of in scatterwalk_done().
 
-Cc: Boris Pismenny <borisp@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- net/tls/tls_device_fallback.c | 31 ++++++-------------------------
- 1 file changed, 6 insertions(+), 25 deletions(-)
+ crypto/skcipher.c | 51 ++++++++++++++++++-----------------------------
+ 1 file changed, 19 insertions(+), 32 deletions(-)
 
-diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
-index f9e3d3d90dcf5..03d508a45aaee 100644
---- a/net/tls/tls_device_fallback.c
-+++ b/net/tls/tls_device_fallback.c
-@@ -35,21 +35,10 @@
- #include <net/ip6_checksum.h>
- #include <linux/skbuff_ref.h>
- 
- #include "tls.h"
- 
--static void chain_to_walk(struct scatterlist *sg, struct scatter_walk *walk)
--{
--	struct scatterlist *src = walk->sg;
--	int diff = walk->offset - src->offset;
--
--	sg_set_page(sg, sg_page(src),
--		    src->length - diff, walk->offset);
--
--	scatterwalk_crypto_chain(sg, sg_next(src), 2);
--}
--
- static int tls_enc_record(struct aead_request *aead_req,
- 			  struct crypto_aead *aead, char *aad,
- 			  char *iv, __be64 rcd_sn,
- 			  struct scatter_walk *in,
- 			  struct scatter_walk *out, int *in_len,
-@@ -67,20 +56,17 @@ static int tls_enc_record(struct aead_request *aead_req,
- 	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
- 
- 	buf_size = TLS_HEADER_SIZE + cipher_desc->iv;
- 	len = min_t(int, *in_len, buf_size);
- 
--	scatterwalk_copychunks(buf, in, len, 0);
--	scatterwalk_copychunks(buf, out, len, 1);
-+	memcpy_from_scatterwalk(buf, in, len);
-+	memcpy_to_scatterwalk(out, buf, len);
- 
- 	*in_len -= len;
- 	if (!*in_len)
- 		return 0;
- 
--	scatterwalk_pagedone(in, 0, 1);
--	scatterwalk_pagedone(out, 1, 1);
--
- 	len = buf[4] | (buf[3] << 8);
- 	len -= cipher_desc->iv;
- 
- 	tls_make_aad(aad, len - cipher_desc->tag, (char *)&rcd_sn, buf[0], prot);
- 
-@@ -88,12 +74,12 @@ static int tls_enc_record(struct aead_request *aead_req,
- 
- 	sg_init_table(sg_in, ARRAY_SIZE(sg_in));
- 	sg_init_table(sg_out, ARRAY_SIZE(sg_out));
- 	sg_set_buf(sg_in, aad, TLS_AAD_SPACE_SIZE);
- 	sg_set_buf(sg_out, aad, TLS_AAD_SPACE_SIZE);
--	chain_to_walk(sg_in + 1, in);
--	chain_to_walk(sg_out + 1, out);
-+	scatterwalk_get_sglist(in, sg_in + 1);
-+	scatterwalk_get_sglist(out, sg_out + 1);
- 
- 	*in_len -= len;
- 	if (*in_len < 0) {
- 		*in_len += cipher_desc->tag;
- 		/* the input buffer doesn't contain the entire record.
-@@ -108,14 +94,12 @@ static int tls_enc_record(struct aead_request *aead_req,
- 
- 		*in_len = 0;
- 	}
- 
- 	if (*in_len) {
--		scatterwalk_copychunks(NULL, in, len, 2);
--		scatterwalk_pagedone(in, 0, 1);
--		scatterwalk_copychunks(NULL, out, len, 2);
--		scatterwalk_pagedone(out, 1, 1);
-+		scatterwalk_skip(in, len);
-+		scatterwalk_skip(out, len);
- 	}
- 
- 	len -= cipher_desc->tag;
- 	aead_request_set_crypt(aead_req, sg_in, sg_out, len, iv);
- 
-@@ -160,13 +144,10 @@ static int tls_enc_records(struct aead_request *aead_req,
- 				    cpu_to_be64(rcd_sn), &in, &out, &len, prot);
- 		rcd_sn++;
- 
- 	} while (rc == 0 && len);
- 
--	scatterwalk_done(&in, 0, 0);
--	scatterwalk_done(&out, 1, 0);
--
- 	return rc;
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 33508d001f361..0a78a96d8583d 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -47,20 +47,10 @@ static inline void skcipher_map_src(struct skcipher_walk *walk)
+ static inline void skcipher_map_dst(struct skcipher_walk *walk)
+ {
+ 	walk->dst.virt.addr = scatterwalk_map(&walk->out);
  }
  
- /* Can't use icsk->icsk_af_ops->send_check here because the ip addresses
-  * might have been changed by NAT.
+-static inline void skcipher_unmap_src(struct skcipher_walk *walk)
+-{
+-	scatterwalk_unmap(walk->src.virt.addr);
+-}
+-
+-static inline void skcipher_unmap_dst(struct skcipher_walk *walk)
+-{
+-	scatterwalk_unmap(walk->dst.virt.addr);
+-}
+-
+ static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
+ {
+ 	return walk->flags & SKCIPHER_WALK_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
+ }
+ 
+@@ -68,18 +58,10 @@ static inline struct skcipher_alg *__crypto_skcipher_alg(
+ 	struct crypto_alg *alg)
+ {
+ 	return container_of(alg, struct skcipher_alg, base);
+ }
+ 
+-static int skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
+-{
+-	u8 *addr = PTR_ALIGN(walk->buffer, walk->alignmask + 1);
+-
+-	scatterwalk_copychunks(addr, &walk->out, bsize, 1);
+-	return 0;
+-}
+-
+ /**
+  * skcipher_walk_done() - finish one step of a skcipher_walk
+  * @walk: the skcipher_walk
+  * @res: number of bytes *not* processed (>= 0) from walk->nbytes,
+  *	 or a -errno value to terminate the walk due to an error
+@@ -110,44 +92,45 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
+ 	}
+ 
+ 	if (likely(!(walk->flags & (SKCIPHER_WALK_SLOW |
+ 				    SKCIPHER_WALK_COPY |
+ 				    SKCIPHER_WALK_DIFF)))) {
+-unmap_src:
+-		skcipher_unmap_src(walk);
++		scatterwalk_advance(&walk->in, n);
+ 	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
+-		skcipher_unmap_dst(walk);
+-		goto unmap_src;
++		scatterwalk_unmap(walk->src.virt.addr);
++		scatterwalk_advance(&walk->in, n);
+ 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
++		scatterwalk_advance(&walk->in, n);
+ 		skcipher_map_dst(walk);
+ 		memcpy(walk->dst.virt.addr, walk->page, n);
+-		skcipher_unmap_dst(walk);
+ 	} else { /* SKCIPHER_WALK_SLOW */
+ 		if (res > 0) {
+ 			/*
+ 			 * Didn't process all bytes.  Either the algorithm is
+ 			 * broken, or this was the last step and it turned out
+ 			 * the message wasn't evenly divisible into blocks but
+ 			 * the algorithm requires it.
+ 			 */
+ 			res = -EINVAL;
+ 			total = 0;
+-		} else
+-			n = skcipher_done_slow(walk, n);
++		} else {
++			u8 *buf = PTR_ALIGN(walk->buffer, walk->alignmask + 1);
++
++			memcpy_to_scatterwalk(&walk->out, buf, n);
++		}
++		goto dst_done;
+ 	}
+ 
++	scatterwalk_done_dst(&walk->out, walk->dst.virt.addr, n);
++dst_done:
++
+ 	if (res > 0)
+ 		res = 0;
+ 
+ 	walk->total = total;
+ 	walk->nbytes = 0;
+ 
+-	scatterwalk_advance(&walk->in, n);
+-	scatterwalk_advance(&walk->out, n);
+-	scatterwalk_done(&walk->in, 0, total);
+-	scatterwalk_done(&walk->out, 1, total);
+-
+ 	if (total) {
+ 		if (walk->flags & SKCIPHER_WALK_SLEEP)
+ 			cond_resched();
+ 		walk->flags &= ~(SKCIPHER_WALK_SLOW | SKCIPHER_WALK_COPY |
+ 				 SKCIPHER_WALK_DIFF);
+@@ -190,11 +173,11 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
+ 		walk->buffer = buffer;
+ 	}
+ 	walk->dst.virt.addr = PTR_ALIGN(buffer, alignmask + 1);
+ 	walk->src.virt.addr = walk->dst.virt.addr;
+ 
+-	scatterwalk_copychunks(walk->src.virt.addr, &walk->in, bsize, 0);
++	memcpy_from_scatterwalk(walk->src.virt.addr, &walk->in, bsize);
+ 
+ 	walk->nbytes = bsize;
+ 	walk->flags |= SKCIPHER_WALK_SLOW;
+ 
+ 	return 0;
+@@ -204,11 +187,15 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
+ {
+ 	u8 *tmp = walk->page;
+ 
+ 	skcipher_map_src(walk);
+ 	memcpy(tmp, walk->src.virt.addr, walk->nbytes);
+-	skcipher_unmap_src(walk);
++	scatterwalk_unmap(walk->src.virt.addr);
++	/*
++	 * walk->in is advanced later when the number of bytes actually
++	 * processed (which might be less than walk->nbytes) is known.
++	 */
+ 
+ 	walk->src.virt.addr = tmp;
+ 	walk->dst.virt.addr = tmp;
+ 	return 0;
+ }
 -- 
 2.48.1
 
