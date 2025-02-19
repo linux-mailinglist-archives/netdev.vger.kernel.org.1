@@ -1,94 +1,77 @@
-Return-Path: <netdev+bounces-167682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B324A3BC21
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 11:55:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16105A3BC69
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:08:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DEE33B3D04
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 10:54:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A33907A3CA3
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 11:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFF71DE891;
-	Wed, 19 Feb 2025 10:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99491DED44;
+	Wed, 19 Feb 2025 11:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhjK3uw7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bhEoV8Z+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057B61D5142;
-	Wed, 19 Feb 2025 10:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0881A840D;
+	Wed, 19 Feb 2025 11:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739962504; cv=none; b=eXrTDEQA2DotkFtpSmyLc30ebZW1I0iynR9v1gLRkdw4lzuS5lvNj95ziIhU/46oR+ArV7pUKJ6C9SFDdWXw5LUdrGb4jf074wqRYCPiMEcRgW+ZBcg6KDBIZCCKJZoqX9+MNgyVZ2KyqT5ulYKqbRnr4wkKLu2nkZ7ejwob7FE=
+	t=1739963276; cv=none; b=pnmrW9cxKlqjuyPEz3f50IUmkjtQ21fZYy/pA4VGO1v2sqMgrlDSvPID6Oj2rFW8nf8YCXWzXk9SOFWMcpMDjuwzv5IcqrHw+zuosSMKbpO9/cyDo6+jJp9oHJyx7I09QQxwo6R/SzbgjF72NQXDCF1MruXxK7II5RGJ5YlfivM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739962504; c=relaxed/simple;
-	bh=f2wGNXtYwMeXQW+P/MGlrJEmmHcHxmjrzIIhWnOeqRQ=;
+	s=arc-20240116; t=1739963276; c=relaxed/simple;
+	bh=tl5pzB5lQ0dT/Bi0R1NrudW2rHGEeLRrxww72qbAKnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r+raH+BOYdDEoQ4vR0HxNV9lYlxR8XVj/YbOxsQgneTGBg1P4CDwKsqcmQWijMuDN4Y3QQIwpjjzCi/+l0+bhvs+zoiVTCwOZ3wnat5nz+pIg90af0jD8HBS7Djmjn4Vkw4xQ4CSn/yvJyxf2+JFlV+AN2/M1gF6zXMDAuOxXb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhjK3uw7; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso998063766b.1;
-        Wed, 19 Feb 2025 02:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739962501; x=1740567301; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ys4aX0kZ2RnwhLm0CFrbF54OKLgPiywuwcJ3LXl47U=;
-        b=HhjK3uw7sICG5Z9BiwcddXkosPYcLsRlDUIHv9JN3OKAtWM87kwC/fmItENSSm0KyZ
-         sfj5GtyNvLZalAN16Zm/YL9zgzFrB7zBdtS5Hc5ayTA+2gqhIlQoeyWs1fdhl6ZQxQ2B
-         5JWUca9rGysKLwHCIXh1icNOLSlcCVa8f17Bx9ot0IBWdhjTbkjUgT3uCKtCA03Ie2oA
-         9PXwwlGtb0vV2k9fgDMafAGRwKsgn6xrp21w+Nhg6kxJ3yXiyqrDYNBnT+XJPgzTrUM3
-         K4zAlXtLTjd31IRNCFMJ1Mo0fiSILsOvsbCURzXXEbcPZsUhnzvf2YKACu0+hJ1N2Jv0
-         3VzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739962501; x=1740567301;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ys4aX0kZ2RnwhLm0CFrbF54OKLgPiywuwcJ3LXl47U=;
-        b=V/AtewuNSSpO/21h73tLuyFmMCnUjSA/dMoFeoGBeiBrGrOQ9qH3oUhyV75VpS3kPG
-         V2OOf9R7tLD19S/UMTmRq5Ly/a3NqLNM3zDSjsrGN1WoKEfBnYC43TaLwueIUjlsC4jG
-         DPpJZE+JwAkSGXMiJEA1eSae/o4f99JTNea0GhvNPErWIT7GtK19Aej8ZtTaNW/BQw6t
-         X5Oxdn/EArJ8SpruZcTLWQkbCFo//4z10GBNWcePfcNMb9jGyxrLW3wzJKQoD21O+RJ0
-         6eDhVTIAySpyJXcbO+OM9SKK1HrhToslxAutv24rr5rXInBQnYAhv6KHZiXKFkfBKo2B
-         QtUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKcutmnyDrYbinglvIIQ3GSbLCCNIkHe5hj2sBH6TlfUR9ssb6HqOmGUzgObDAI5RoRpcsXHhzcAKt54E=@vger.kernel.org, AJvYcCXEzHjOVepZDk7za2ngmaSNlWLRzz2OFC8pQXI7s2RuErH0ynBvAFB3A+wPfT7I8UHf+8fcPBjH@vger.kernel.org
-X-Gm-Message-State: AOJu0YySfsrLnzT7OOk22wn/niOUiJpmJhcMNjn2iccM+tXCdreyIIqx
-	ihsQmAMNgd+8JTyP8osfFfsa9M76zzQDkF3CnLCBmUxN9obfG5lD
-X-Gm-Gg: ASbGncu2ivaCAbTYtJDbrQqU6ll36fa097UVZ/cyzBGkHppeIWgfMCFzqOsH79zcb/c
-	XAVhLBQKQJcOismfJr2hrBh9BYWLCnwHnh/1wtJUeCsYNIrbluL0VKMbmUp9KTYPkjGSJHlyAkY
-	Cq86LHoTzxn5bBCXSm1pXfXRQ3shlz61E19A9ubSx8QnmK5uTnL4X1j3OTHx61L7DV0xZBkAIZC
-	lxMYASj9zRP5U93w6DcPhI383Y80Xc44fH2IMGnCpALBykPiqcK1ta7HvVdGcOgQfiVyCorCk/H
-	4xL6fzF0G1tI
-X-Google-Smtp-Source: AGHT+IGxe3suuHUwkDRetmVPIAsBXxfrQKwYy1X6Fs09X1gAUcHXLXz83wizKLs830ep2DMusTAdMw==
-X-Received: by 2002:a17:907:c13:b0:aa6:9624:78f7 with SMTP id a640c23a62f3a-abbcccf9ffemr268783166b.17.1739962500889;
-        Wed, 19 Feb 2025 02:55:00 -0800 (PST)
-Received: from debian ([2a00:79c0:646:8200:45fb:7d1a:5e4d:9727])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abba0ab1457sm513570166b.73.2025.02.19.02.54.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 02:55:00 -0800 (PST)
-Date: Wed, 19 Feb 2025 11:54:58 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: marvell-88q2xxx: Prevent reading
- temperature with asserted reset
-Message-ID: <20250219105458.GD3888@debian>
-References: <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-0-999a304c8a11@gmail.com>
- <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-2-999a304c8a11@gmail.com>
- <Z7V6XZ7VRTkYNi2G@eichest-laptop>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ktI4UQO2ov69gfXWEd4bSvgCaEAP7AV6LRaI9AN6z3PNesP9F7KOAaPwGLwtidf+fFDCKFmwrInGqhYcm6BJ4ihgoK9ixzXCftvu5733WoEZu3+9CeY832bm872k0Ya05ipB5BObLLOcgtFPoRLC9w81+J5geL7BuvDX6ujPl8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bhEoV8Z+; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739963275; x=1771499275;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tl5pzB5lQ0dT/Bi0R1NrudW2rHGEeLRrxww72qbAKnA=;
+  b=bhEoV8Z++qY8EYGnL0+f2HGbnbffexorbXWF13Cr9PasIqoEPR8YUjlt
+   4uWL8OulLxb33pqmk1xtruKuRkaJ/WVBPYSlRVBzWGK06md2N4wyUGf3H
+   C4qvC7kNN7EQwq7BB5O9crbu4BTCORhuFutvxLN0JVSOSJZU2j8AaAFdC
+   aOuf+aBEGsnCuJPLi4Q/UXsNetG+UV23Iin7bsNKY8WufhmP48aK//wIN
+   XU5sse2CeYyRtLK1w2BAlP++lQv+IJOCGl283z7Bvht5sa/OfASDNFVKg
+   2uF4oDAQx46PMpeSNax1nAljXpnb7A4LCJqGrBuRhZnTzN7ZVi60xFG2h
+   w==;
+X-CSE-ConnectionGUID: v/njSpbpT4q34DsXTjieAg==
+X-CSE-MsgGUID: T3Ie6bYnRBSJpVxaDtwxRA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="58101236"
+X-IronPort-AV: E=Sophos;i="6.13,298,1732608000"; 
+   d="scan'208";a="58101236"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 03:07:55 -0800
+X-CSE-ConnectionGUID: wXhrJnbqR0q5d0rDK0cZnA==
+X-CSE-MsgGUID: CbAA0e9KS9OZe1ScliBf1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="115580794"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 03:07:50 -0800
+Date: Wed, 19 Feb 2025 12:04:14 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ioana.ciornei@nxp.com,
+	yangbo.lu@nxp.com, michal.swiatkowski@linux.intel.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH v2 net 9/9] net: enetc: fix the off-by-one issue in
+ enetc_map_tx_tso_buffs()
+Message-ID: <Z7W6rtLwpHGlox3T@mev-dev.igk.intel.com>
+References: <20250219054247.733243-1-wei.fang@nxp.com>
+ <20250219054247.733243-10-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,50 +80,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z7V6XZ7VRTkYNi2G@eichest-laptop>
+In-Reply-To: <20250219054247.733243-10-wei.fang@nxp.com>
 
-Hi Stefan,
-
-Am Wed, Feb 19, 2025 at 07:29:49AM +0100 schrieb Stefan Eichenberger:
-> Hi Dimitri,
+On Wed, Feb 19, 2025 at 01:42:47PM +0800, Wei Fang wrote:
+> There is an off-by-one issue for the err_chained_bd path, it will free
+> one more tx_swbd than expected. But there is no such issue for the
+> err_map_data path. To fix this off-by-one issue and make the two error
+> handling consistent, the loop condition of error handling is modified
+> and the 'count++' operation is moved before enetc_map_tx_tso_data().
 > 
-> On Tue, Feb 18, 2025 at 07:33:10PM +0100, Dimitri Fedrau wrote:
-> > If the PHYs reset is asserted it returns 0xffff for any read operation.
-> > Prevent reading the temperature in this case and return with an I/O error.
-> > Write operations are ignored by the device.
-> > 
-> > Fixes: a197004cf3c2 ("net: phy: marvell-88q2xxx: Fix temperature measurement with reset-gpios")
-> > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> > ---
-> >  drivers/net/phy/marvell-88q2xxx.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> > index 30d71bfc365597d77c34c48f05390db9d63c4af4..c1ae27057ee34feacb31c2e3c40b2b1769596408 100644
-> > --- a/drivers/net/phy/marvell-88q2xxx.c
-> > +++ b/drivers/net/phy/marvell-88q2xxx.c
-> > @@ -647,6 +647,12 @@ static int mv88q2xxx_hwmon_read(struct device *dev,
-> >  	struct phy_device *phydev = dev_get_drvdata(dev);
-> >  	int ret;
-> >  
-> > +	/* If the PHYs reset is asserted it returns 0xffff for any read
-> > +	 * operation. Return with an I/O error in this case.
-> > +	 */
-> > +	if (phydev->mdio.reset_state == 1)
-> > +		return -EIO;
-> > +
-> >  	switch (attr) {
-> >  	case hwmon_temp_input:
-> >  		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> > 
+> Fixes: fb8629e2cbfc ("net: enetc: add support for software TSO")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+>  drivers/net/ethernet/freescale/enetc/enetc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> It makes sense to me. However, aren't most phys that allow reading
-> sensors over MDIO affected by this issue? I couldn't find anything
-> similar, are they ignoring that use-case?
->
-Yes, you are right, but only if the PHYs hard reset is controlled with
-"reset-gpios" or similar. I didn't find anything about it too.
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index 9a24d1176479..fe3967268a19 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -832,6 +832,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
+>  			txbd = ENETC_TXBD(*tx_ring, i);
+>  			tx_swbd = &tx_ring->tx_swbd[i];
+>  			prefetchw(txbd);
+> +			count++;
+>  
+>  			/* Compute the checksum over this segment of data and
+>  			 * add it to the csum already computed (over the L4
+> @@ -848,7 +849,6 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
+>  				goto err_map_data;
+>  
+>  			data_len -= size;
+> -			count++;
+>  			bd_data_num++;
+>  			tso_build_data(skb, &tso, size);
+>  
+> @@ -874,13 +874,13 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
+>  	dev_err(tx_ring->dev, "DMA map error");
+>  
+>  err_chained_bd:
+> -	do {
+> +	while (count--) {
+>  		tx_swbd = &tx_ring->tx_swbd[i];
+>  		enetc_free_tx_frame(tx_ring, tx_swbd);
+>  		if (i == 0)
+>  			i = tx_ring->bd_count;
+>  		i--;
+> -	} while (count--);
+> +	}
+>  
+>  	return 0;
+>  }
 
-Best regards,
-Dimitri Fedrau
+Thanks for fixing it.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+> -- 
+> 2.34.1
+> 
 
