@@ -1,63 +1,79 @@
-Return-Path: <netdev+bounces-167736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79CDDA3BF72
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:08:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DE70A3BF6C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:06:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3159B3B67AC
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:02:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C632188658C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA9D1E1A14;
-	Wed, 19 Feb 2025 13:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923DE1EFFBF;
+	Wed, 19 Feb 2025 13:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="c7C0yDME"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkrTiSE8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D511D1E25EF;
-	Wed, 19 Feb 2025 13:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA561EB1BC;
+	Wed, 19 Feb 2025 13:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739970082; cv=none; b=P9W926eh4kAfKpCKLcIRNyMdsOlchDh2RGSkPRg0JT3OGhKWg9gUwav0UTzDhV+Jnxj3C9pPWOx1Pcbyfhtf4U5NJppvepSJfCwaYPsYSXFPE183/LSs5rDe4xjK38BpImVvqo37upszmAgm1MOQWVjDGW+Fa1AGrXGeCC03znU=
+	t=1739970065; cv=none; b=ArHMovMynEXnGg2co5oAc3r8ZPNuZjHjltrFuLiGT9jAy72Zw/uW+OFY+tZFtDkDw1F1Ookck/rOy0YzkOK949PbhkmsoISKUSbfl+3kuFyzZLwZOtu2NH9gaBDA14cwMuuWLpTldVIBeJfVUTUGs0mdLvHTXS1RksDI2O09c2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739970082; c=relaxed/simple;
-	bh=QcccMRbXtdO3gmmJTjotleh7lPgIqkwTESnzznTvJvg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=DHjXB28Spg/XFDXDJOrRbPW5ihfoecSTkSjiGvKWrRR6pDbaPYIbfS/n11AWcx2ZaUCMpNqdV4BdM77H8eS/uB0hVWb4XpViaJLW5qGGy8UDI1nIn9mBhifA28HWdnpHyQEBLz5HPSVEm+dF9vRDAsXPXAqmxH4ulmj3hdKzhMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=c7C0yDME; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51J8NRbm014898;
-	Wed, 19 Feb 2025 13:01:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	6KgOzMA8ihMoUxGj5Qw6lNE4j2AzNyOH0PA1NQsnhJI=; b=c7C0yDMEnkbIvyRN
-	vctHbQmTt0jo6TD4MK2X2usM2lG8Cos1u6smvWAihNL4HXSkfYzCG+sEcJK0g8mP
-	l5bjb3JahMY0dg1HLck5SARMvzK/+SzWD1ixqcss7ejrHGa8QbgG+1pm0oZFI+iB
-	2bX38gGUCu8E9l9FREoKv6WXNUA3uoW/FgUZkOWAYbUpcAIexP4dCcl9bjTtztNh
-	vP7yyyC3KvHEIGI/2iH8VOK8LU+VIs02PmYLLtEx9i2+JsqTQ7/Il2D4R7oykENz
-	eUd/IiCdFHPpDT5C1sMhZup5v1iFP218A/xV54NcKqysbVBGvd9lf5ecjwg2XBKp
-	MIl2JQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44vyy12kuw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 13:01:03 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51JD1274015906
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Feb 2025 13:01:02 GMT
-Received: from [10.253.35.15] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 19 Feb
- 2025 05:00:55 -0800
-Message-ID: <2aa1c649-6fce-40b1-bbf7-1d6d756dbbec@quicinc.com>
-Date: Wed, 19 Feb 2025 21:00:53 +0800
+	s=arc-20240116; t=1739970065; c=relaxed/simple;
+	bh=pGOE535JPESVOkJalcuOjvOQHEl00UMEuL4t4kpsmTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EUkqjkNgPOLW6GinOOuEes0MMObiSdTYMdVfAmHekoc9AhX6Jqh5M/5NSr9JKmpujluYmSihQVGn0BPt3t8LssUADJDdCzB5IjoUGENtqo2hocPAGU4L2Me0me87HGX1B/w2hkBhDxLZ0uwEkR+0zz6fjzhFw37gf1jKYJvhVAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MkrTiSE8; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38f378498b0so3407237f8f.0;
+        Wed, 19 Feb 2025 05:01:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739970062; x=1740574862; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P3HpZLd+aYslb+R149ASLHhysO3/cTsAOVwWXC8DuTI=;
+        b=MkrTiSE8WInnBb+yAPTwVV8m+kYfEAFocbGGKt5s8P1DNjMDRQJoCUWwJvo9RnBU5c
+         bxSKfWMB5jODShGWVUMYIzpJwraU9g14lXOo9w+HCoiPcFe9IQrGxQTF6AwCavqLjTqB
+         ZoeOCqgZK/VA5GRSSWsNRyN5Oh6riLVqhnoHp5PXaXnzlH3qHRRZF4vPLVP3Fj5NClIx
+         REY4a1N1K2kzIb+DfMgIdMz0UL/61PJmvtTJ385kyf7BQAHIfEfbNQ0gCDarRMpFenGF
+         sWs4qH5JjrimDwP5AOSHpZLsdxH6HfcESZMEkrBRHotnH3xQR3F5t2Mz4LxPjGlLHYwM
+         bVGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739970062; x=1740574862;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P3HpZLd+aYslb+R149ASLHhysO3/cTsAOVwWXC8DuTI=;
+        b=vK2/MXKmORyHH/bTJ1pUglYnIuLdLmPzkVvSh1c4hUVL2OPyTMsAFSpeuLlhY7lbkt
+         wXx/XMMo3PBa2dpDoKQ/kl0X7VBq+KUZbw446iSxLPLNhIrd4krlD/5UyBhKVO/2NB1J
+         IkHOi+lOO3ubtysKxN6it1wA0Z970cKzXuXhiJB2U0eS4/rosslQn0MonGv0n3hgbzGc
+         L1guig46nFCYPmozbVHCFdE/JBzwnOJhFXtCzGDtjI9eYqT8/JOl9VNiqJ9wwxLaWEJc
+         fVkXGnFHo7IOZDH3tc4q6cRGutcxv3JimkKPdFM64+8h1be3JCfXeGqa78oM9YRMIzaH
+         4HAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbriJ4mS39TJJGMrk7IvRY6yma1nmZYNmAIpJ3WdzEVKLfkCV/a9PoWOnwZju70aCTkWvBeKQrs7mvLg==@vger.kernel.org, AJvYcCUpJn5dwXaBEmPV58WMQNxSm2zLC0gBpnYlgxrzA19vb92/DTr3DeADFNATAr7D9vd5abSiQa0D@vger.kernel.org, AJvYcCWPSNxbHy7bx8gqUdf38kApQIh+oQyeU+LXfi99V8ODX3HYFDx6yCOsQi7oQOAgnDtNG2MPtIfL8SMS+3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHBB6WPrhua1Wpxb2Cf7eJM9ivQcFZHVSlHQYR1vNx50uvD8Wb
+	dYB3pQ3NzEi/xKEuWDKP3yryhT9t63E4bQuDtqg77yDOC1A2hct1
+X-Gm-Gg: ASbGncvsyDdT8kr4aokZg881hE0yG+ywqzgZpd2Ogcrmdtc0AsGEFRDhqzcWnl8r68a
+	PaK4oENRWnJ8xzAKpSYI3F5D+60HzNAu4I/VFEpItYqEeUbA/il4reptLsyKVxCc+tmXIN0twAx
+	k9sTZ9A01s3GfhvT8LrRxWklU7RV4Unrop1XlLINlCS/GZfsowSSEdLGflGnTv3jl5K5POvUXFW
+	qpF0cJ52FbDSy7qPcdk46JSvz5ksa5wt8IYNQTI2gdbwTbIhlik3J1gFvG9Q6GbBWOqc1u7HYfM
+	AKNSpyxVjOdzIEU59P4yAVMDv+tQ4XUjFUDy
+X-Google-Smtp-Source: AGHT+IHxeWotohuf1kI7KK6w/ViTEakVBNdMfZ3xL3gBkPm8R3XNTmC3J7Prc/MrPjdWbeL1SbeFLg==
+X-Received: by 2002:adf:e989:0:b0:38f:30a3:51fe with SMTP id ffacd0b85a97d-38f587ca4ebmr2482955f8f.42.1739970061532;
+        Wed, 19 Feb 2025 05:01:01 -0800 (PST)
+Received: from [172.27.59.237] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258f8c4bsm17825416f8f.46.2025.02.19.05.00.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Feb 2025 05:01:01 -0800 (PST)
+Message-ID: <8369b884-71c9-495a-8a1f-ab8ca4ee5f59@gmail.com>
+Date: Wed, 19 Feb 2025 15:00:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,75 +81,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Jie Luo <quic_luoj@quicinc.com>
-Subject: Re: [PATCH net-next v3 04/14] net: ethernet: qualcomm: Initialize PPE
- buffer management for IPQ9574
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-4-453ea18d3271@quicinc.com>
- <17d9f02c-3eb3-4bae-8a2c-0504747de6f2@lunn.ch>
+Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
+ event message
+To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shahar Shitrit <shshitrit@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Carolina Jubran <cjubran@nvidia.com>
+References: <20250213094641.226501-1-tariqt@nvidia.com>
+ <20250213094641.226501-5-tariqt@nvidia.com>
+ <20250215192935.GU1615191@kernel.org> <20250217162719.1e20afac@kernel.org>
 Content-Language: en-US
-In-Reply-To: <17d9f02c-3eb3-4bae-8a2c-0504747de6f2@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250217162719.1e20afac@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Oqth_QsftGBuhgXf9_XkLsBETwYRHjW8
-X-Proofpoint-ORIG-GUID: Oqth_QsftGBuhgXf9_XkLsBETwYRHjW8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-19_05,2025-02-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 clxscore=1015
- suspectscore=0 spamscore=0 mlxlogscore=910 mlxscore=0 bulkscore=0
- malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2502100000 definitions=main-2502190104
 
 
 
-On 2/11/2025 9:14 PM, Andrew Lunn wrote:
->> +/* Assign the share buffer number 1550 to group 0 by default. */
->> +static const int ipq9574_ppe_bm_group_config = 1550;
+On 18/02/2025 2:27, Jakub Kicinski wrote:
+> On Sat, 15 Feb 2025 19:29:35 +0000 Simon Horman wrote:
+>>> +	for_each_set_bit(i, bit_set_ptr, num_bits) {
+>>> +		const char *sensor_name = hwmon_get_sensor_name(hwmon, i + bit_set_offset);
+>>> +
+>>> +		mlx5_core_warn(dev, "Sensor name[%d]: %s\n", i + bit_set_offset, sensor_name);
+>>> +	}
+>>> +}
+>>
+>> nit:
+>>
+>> If you have to respin for some other reason, please consider limiting lines
+>> to 80 columns wide or less here and elsewhere in this patch where it
+>> doesn't reduce readability (subjective I know).
 > 
-> To a large extent, the comment is useless. What should be in the
-> comment is why, not what.
-> 
-> 	Andrew
+> +1, please try to catch such situations going forward
 > 
 
-OK, I will improve the comment to describe it better.
+Hi Jakub,
 
-There are total 2048 buffers available in PPE, out of which some
-buffers are reserved for some specific purposes. The rest of the
-pool of 1550 buffers are assigned to the general 'group0' which
-is shared among all ports of the PPE.
+This was not missed.
+This is not a new thing...
+We've been enforcing a max line length of 100 chars in mlx5 driver for 
+the past few years.
+I don't have the full image now, but I'm convinced that this dates back 
+to an agreement between the mlx5 and netdev maintainers at that time.
 
+80 chars could be too restrictive, especially with today's large 
+monitors, while 100-chars is still highly readable.
+This is subjective of course...
+
+If you don't have a strong preference, we'll keep the current 100 chars 
+limit. Otherwise, just let me know and we'll start enforcing the 
+80-chars limit for future patches.
+
+Regards,
+Tariq
 
