@@ -1,148 +1,195 @@
-Return-Path: <netdev+bounces-167769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C6CA3C2DA
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B385A3C32F
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A43169B18
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:59:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3BB3AF3EA
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B291F30BE;
-	Wed, 19 Feb 2025 14:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4741F461F;
+	Wed, 19 Feb 2025 15:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDIHF1rZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856F81F30C4;
-	Wed, 19 Feb 2025 14:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A00A1F419B;
+	Wed, 19 Feb 2025 15:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739977147; cv=none; b=B6+ZgYXm1hiaTqwHAjGzOlFgvPllq/0WHzwb6od/FWz6HfHwssr44gbd43i4RdtTMvxDva81NcliS9EQKyLljjgaD5+cXDfVTE2QMTd/2bZ3AfPErtJwGchCqzc+ioDY+P1lH9bLxLwx3pdbfTQahW/p3H7k7NrIHbcEAzwji1U=
+	t=1739977622; cv=none; b=HI7tpwsnIewiSu2LzWZbAJWaVEyWQJIlj5yathzn7Myk4PsKfmttxbPdS1IxVFHOFbLkJWr4BEemZDc8jJWzNbH+Tuh0HG9Bh/t5hskDe08kB8924wvY6AILX/z/Xq7/RfEhO2KYGKF9ip9RVDTBklXyiaBi8YWTvSfmXOVYrKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739977147; c=relaxed/simple;
-	bh=OGSO62+2JvqPt1qN+HkEBLIKHzri0YNMLld7TykdQ3U=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=FW+UEKmXYrhs2N15c4OfNLKDoguko5MnU0BG+OPlpovMfBsyHF3/bWKbQEx60DRk0MX9lCY7NBDsYXpmE21bIaNMFIcmPuPVREjXrY2/qS00o4Fm6wHb2qZ2cq2Jmn1c2981PBqPg02ye9wzzHFBdNimW2tCFT0yp8QZ4jtRScY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklXE-000B0n-4L; Wed, 19 Feb 2025 15:58:48 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tklXD-0006iC-21;
-	Wed, 19 Feb 2025 15:58:47 +0100
-Message-ID: <f037f7f8-a171-428f-a5a3-77eda5d1bc8b@hetzner-cloud.de>
-Date: Wed, 19 Feb 2025 15:58:43 +0100
+	s=arc-20240116; t=1739977622; c=relaxed/simple;
+	bh=C4rzID1fsb642n2ypixekW06YxEC2w9WG1TtwpNSOaw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NR3kJ3JGrDwnO7zt3c2SEPd1rOsuZQ62l336XXTgJh7fXW6D2B4smzZDtbpVaKMhtK/JPrOiTBPUOpJB5IFpv+4E3AsV2V8nEuGbm6c58qbGiNH7fcbfKNm4EckWXxg4WoJdH123cFlr0PZ8Y/p9tBE0d3RQmYmBn/a63Plrs7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cDIHF1rZ; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6df83fd01cbso33886766d6.2;
+        Wed, 19 Feb 2025 07:07:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739977619; x=1740582419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZN9/JWs6uATVsw+HP9fYNfS7rnjBMcGMSGHQzOGC8k=;
+        b=cDIHF1rZG1EKtr0tcmpsFtOP0qDSkbT7Zw7oG3StcUkN5VR56Wj0Caeu+QZARCctMZ
+         ydgdrRuAvQP48BDiSsS+tBzzBrjkXi0gUhlYNXocz2gOTqVqsyo7sRA3SzCEVNDvFRRF
+         Fk6nRYeXzjWDh2vvd0TKdwrxwia1xBb1b7UEHEsHCtfiMbQtaXlQEHCJzjYx4KpUCj+z
+         U4TTeFNZZGxftEhyYXsu2QyDmKXqIOLDJan+Np/kMJ0EEoiKL66rLgXLkiEcLhOZ/FQ8
+         RfSyI8EN9ivXxOL6oRuTo25ASNr8hv/R6QNuEYnv6X32sErAdVjXrW/Z3a7jyfWvC6an
+         Qb5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739977619; x=1740582419;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sZN9/JWs6uATVsw+HP9fYNfS7rnjBMcGMSGHQzOGC8k=;
+        b=FXawc2/h1Rd7UX5lycJ8zeHT5+a0pUovsCcqOvg4Wp+txWdM9OM4dHGLxrHQh6a7ka
+         mN81YLUMwXJ/5KRbUIeaLak/IzD6PBAd1PPMHcL+bpVRx4RUrKdL4sDIkE2Ga7j/1Tjd
+         4l/ja3hgEkdh63KgHK0gQufaQPhPX/yH3aoxbbFuhFg4X466ewSYWGHAfbtRxjgwSjqb
+         +R/gVZSS9OfukAtTwca0wQRXewDei4UOjBRf833UqL1/UPrOwRXhROIr6M6IvHssUa58
+         JJySNK2eFQ/RoO/7YmX7sL2/ogqLu/hGN2B+BGmhX4yzFzE5F5uDL8npExXHw59nSD8w
+         wJ+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUA7GNjPlAGdxp2ucykFP3exZn6TIgVirrOmgctPB0UzWb/LCWQTl7F46yx8FdSTvyywZ7HGugJINRRpm69@vger.kernel.org, AJvYcCUpsKObTwhH1awnIEogLjTAiXqtUqWu+PT3RxaZ8pZFaAVyr4Wo3LPJYTcBvjHV+o+lSBA=@vger.kernel.org, AJvYcCVpuyQr3/WJ+n36Qgs5xZprNBi6whkjugkPyPibsKuLVuZ0Ym/d764R4+y+w7/zJQSm6+FGw+z4@vger.kernel.org, AJvYcCW9/sqOdVoMizNtB5of7pEKn3iWy26Jd87vOqpnFbDlRzuIEYUGEWSizDSIAutHtjFZSNpZv0hPkG/vfvX5j2+R@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ569qY3FIHnFN9C9H9i74I+k+OlkRxERXAO0nMoR1UP3EGyuZ
+	WVKbMz9ilOAUxTsc1SGF7xsHDZ1AyUGhN0GOB6+DJhhi3W+5YkREthtJJg==
+X-Gm-Gg: ASbGncsgn+JiRsrSY4FKzotNlKZym2HlSxr7KfrRgjakdTDOe8PhjMC30pxZVix3zB0
+	JOEeR/anzpvXPLEmu9HDfalQvtnwRJf3uTEwiYNRGq5EqsO1O2Onc/N9Qthf4qzv71wEdbaKwK5
+	yHbeH6c+1t8SZKSeuADPTh08L5yyiHAWeuywWZjvj37fiw9+o5cn+2E246kEfsj81lxoG5aq8jJ
+	LkH2bI9S6Vcj9OtitwYfJlW57xiwoNZbpDO8kq4vBdYU8qeFLUmQIHXCAJxY9KZsN3RE0/aNkq8
+	sd9dmT6NhYdY0a7njBMaaZ/eEBQew2fV3ZRNoULSWTY5VLkhLDYKx0K4whJeyJY=
+X-Google-Smtp-Source: AGHT+IHN0e1fpOoTbsMAs2QQufi3FSf0J+4G+aZV5JjMvZYozX8ZWEgVgEOCKkM+nr9xawgbfp8JOA==
+X-Received: by 2002:a05:6214:2485:b0:6e6:6caf:e6f6 with SMTP id 6a1803df08f44-6e697506db1mr65816956d6.16.1739977619274;
+        Wed, 19 Feb 2025 07:06:59 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d9f31b0sm75212816d6.90.2025.02.19.07.06.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 07:06:58 -0800 (PST)
+Date: Wed, 19 Feb 2025 10:06:58 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ mykolal@fb.com, 
+ shuah@kernel.org, 
+ hawk@kernel.org
+Message-ID: <67b5f392408d7_1b78d8294e7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <dee9bc39-e666-4d97-8a42-240ffb458bcc@hetzner-cloud.de>
+References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
+ <20250217172308.3291739-3-marcus.wichelmann@hetzner-cloud.de>
+ <67b3e6b6b9dc6_c0e2529482@willemb.c.googlers.com.notmuch>
+ <dee9bc39-e666-4d97-8a42-240ffb458bcc@hetzner-cloud.de>
+Subject: Re: [PATCH bpf-next v2 2/6] net: tun: enable transfer of XDP metadata
+ to skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- hawk@kernel.org
-References: <20250217172308.3291739-1-marcus.wichelmann@hetzner-cloud.de>
- <20250217172308.3291739-7-marcus.wichelmann@hetzner-cloud.de>
- <67b3e8e0928fc_c6df0294b8@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v2 6/6] selftests/bpf: fix file descriptor
- assertion in open_tuntap helper
-In-Reply-To: <67b3e8e0928fc_c6df0294b8@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27554/Wed Feb 19 10:50:24 2025)
 
-Am 18.02.25 um 02:56 schrieb Willem de Bruijn:
-> Marcus Wichelmann wrote:
->> [...]
->> When running the BPF selftests locally, this incorrect assertion was not
->> an issue, but the BPF kernel-patches CI failed because of this:
->>
->>    open_tuntap:FAIL:open(/dev/net/tun) unexpected open(/dev/net/tun):
->>    actual 0 <= expected 0
+Marcus Wichelmann wrote:
+> Am 18.02.25 um 02:47 schrieb Willem de Bruijn:
+> > Marcus Wichelmann wrote:
+> >> [...]
+> >> +	metasize = max(xdp->data - xdp->data_meta, 0);
+> > 
+> > Can xdp->data_meta ever be greater than xdp->data?
 > 
-> Wow. What kind of environment is this that 0 is not assigned stdin.
->   
->> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+> When an xdp_buff has no metadata support, then this is marked by setting
+> xdp->data_meta to xdp->data + 1. See xdp_prepare_buff or
+> xdp_set_data_meta_invalid.
 > 
-> The code makes sense.
+> In the case of tun_xdp_one, the xdp_buff is externally created by another
+> driver and passed to the tun driver using sendmsg and TUN_MSG_PTR. For
+> now, the vhost_net driver is the only driver doing that, and
+> xdp->data_meta is set to xdp->data there, marking support for metadata.
 > 
-> I suppose that if this condition can hit, then it can also affect
-> existing lwt_* tests and thus should be a fix to commit 43a7c3ef8a15
-> ("selftests/bpf: Add lwt_xmit tests for BPF_REDIRECT"), sent
-> separately to bpf (not bpf-next)?
+> So knowing that vhost_net is currently the only driver passing xdp_buffs
+> to tun_sendmsg, the check is not strictly necessary. But other drivers
+> may use this API as well in the future. That's why I'd like to not make
+> the assumption that other drivers always create the xdp_buffs with
+> metadata support, when they pass them to tun_sendmsg.
 > 
-> Since it's a test and no failure was reported so far, maybe fine
-> to just merge as part of this bpf-next series, not my call.
-I'm not sure why this only became an issue after I added the
-xdp_context_tuntap test and never before. This may have to do with
-the order of test execution.
+> Or am I just to careful about this? What do you think?
 
-If nobody speaks up, I'll leave it in this patch series for now.
+I agree.
+ 
+> > This is pointer comparison, which is tricky wrt type. It likely is
+> > ptrdiff_t and thus signed. But may want to use max_t(long int, ..) to
+> > make this explicit.
+> 
+> Ah, I see, good point.
+> 
+> So like that?
+> 
+> 	metasize = max_t(long int, xdp->data - xdp->data_meta, 0);
+> 	if (metasize)
+> 		skb_metadata_set(skb, metasize);
 
-Marcus
+Or just this? Also ensures the test uses signed int.
+
+    int metasize;
+
+    ...
+
+
+    metasize = xdp->data - xdp->data_meta;
+    if (metasize > 0)
+            skb_metadata_set(skb, metasize);
+
+
+> Alternatively, there is also xdp_data_meta_unsupported(xdp_buff) which
+> could be used to make this check very explicit, but I don't see it being
+> used in network drivers elsewhere. Not sure why.
+> 
+> >> +	if (metasize)
+> >> +		skb_metadata_set(skb, metasize);
+> >> +
+> > 
+> > Not strictly needed. As skb_metadata_clear is just
+> > skb_metadata_set(skb, 0). But also not wrong, so fine to keep.
+> 
+> Oh, haven't seen that.
+> I'm following a common pattern here that I've seen in many other network
+> drivers (grep for "skb_metadata_set"):
+> 
+> 	unsigned int metasize = xdp->data - xdp->data_meta;
+> 	[...]
+> 	if (metasize)
+> 		skb_metadata_set(skb, metasize);
+
+Thanks for that context. Sounds good.
+
 
