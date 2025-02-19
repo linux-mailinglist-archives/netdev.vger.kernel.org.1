@@ -1,94 +1,163 @@
-Return-Path: <netdev+bounces-167882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDECAA3CA63
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:53:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D028FA3CA9A
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 21:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 505BA1889FFD
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98D42170287
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 20:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0B124E4B7;
-	Wed, 19 Feb 2025 20:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0028024E4B7;
+	Wed, 19 Feb 2025 20:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cmfkF9iV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n8ViKVvK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA9D24E4B4
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 20:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF63821516A;
+	Wed, 19 Feb 2025 20:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739998361; cv=none; b=WIsUo25dNdZA0nouH5Q2JAepoJpJGGte+yLkN7RtKVsVk/lSY8U7oyalc8MnUCf60oEp1ZMTHwlqwiwQsbnJrk/J+x5J+LXaL36KdTtRdQwXBcFfNmly2Is5AOdVdWU64U0oduRVNSpw14PlF2Tyo1BNfmkbzqJ4u0FVr3YE09U=
+	t=1739998691; cv=none; b=s1ULth7Y+NGHg+jdcaxlBA6F8m+7PUzAC0DPO2R3zJ0ZL8MWsRZeCGhdrHRPV+G4UH2CKm7QvNWglz4B0uE6Id/F/tEJJTpePT9HNGsIZhP53IETeeGMGiNKkKbloQvZJILHkgooycXwXPVK0O9FB16UhAZHHYDYCDMmxM//w1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739998361; c=relaxed/simple;
-	bh=yMxpbEFynCsR1qX3Wqi4EAsIur8l51VBZuB9k077bvs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JwEb6TfmTCQ6Iv1SG4VNQUmcyChXa6n/rFvwo3mNGSvo+WfUqkjgirAiPxAEKxecWhPw8p5LbK26lqlxXoxiKtga1IXFKTqO3dknZv/exiRQdhFHHinYn+OpOm5+beMbKhJo3uQ9g5BPvhjTx3ZZsctFq5OeOfp+Y8dykTBU3Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cmfkF9iV; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739998346;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=y5CXcs0Zy2ncJTQugnSwFSyTZ09cYdvUi/pblL+134w=;
-	b=cmfkF9iVMOKJvC2dGTZ0JqoW6hHPXybf11QB3pIkuT/c4UKgZiqUO3P3weY4R50LGZ0d+g
-	yQkpBX55MDeyWyXtjOynQaEb9DhZ9zujt81HJJQ1Bef8gXJ2Nq87V8v29iKlk98K2rYHtb
-	bYN8S76xznh42O4L7APxPFN5oiZqIro=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
+	s=arc-20240116; t=1739998691; c=relaxed/simple;
+	bh=uY9tpDYXVCCT3oI01wALVYqdN1lMr0kJ3zLRomdZBfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+I7+KAY+4vPLNnJ3gySsC7/z9QX2kAglY728j0YcMieFlcWDe4RAbEjWzRfK+QUXKNSAznZcvWF1zsJRq7yyW9jmZ0LgbBkmpyR1ZoK4yCCuLs6a6R2IrAxGT12EKu+xrDDnN4Qc6kJzUgBdA3debqTw8JOTv+/lV06DbjirII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=n8ViKVvK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Ox9CV6LHUd6gMf+zEh49UTkS5cD9NmltHJfCvXce8LM=; b=n8ViKVvKPHMGMgCG7hd0ZjkDop
+	vRrK8EqFjl6XVOMIziTBve1ppUE4XDjhAly0AlAMU5JohcyadSfLdQxpgdbV0U46N1g24urRc4bky
+	rpEoBoRkJoJPOHiLqV+MOp2P+ePgMT9+fnme5HPdLS/FfPwne73dWH35eBco1FqmPUYF/2I9Y5n+X
+	wTC5lp5qa5FPX1CDRlyw+mG/BMPQAkJr+BzLgTCE+fcqgLcjKtgLzr4UU1isKe49TWsmf6LgfbzFi
+	LCWbW/i9ll2qUk+h4x3J4GbhUPLKPr52n+ZfZA9CG99Sd7CZ1/Aj2y9qvPCOlWSSqRxrgiyNuM/2e
+	TFBYXFRw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34186)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tkr8n-00071t-1d;
+	Wed, 19 Feb 2025 20:57:57 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tkr8j-0000DX-2Z;
+	Wed, 19 Feb 2025 20:57:53 +0000
+Date: Wed, 19 Feb 2025 20:57:53 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Itamar Gozlan <igozlan@nvidia.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net/mlx5: Use secs_to_jiffies() instead of msecs_to_jiffies()
-Date: Wed, 19 Feb 2025 21:49:42 +0100
-Message-ID: <20250219205012.28249-2-thorsten.blum@linux.dev>
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+Message-ID: <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
+References: <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+ <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
+ <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
+ <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
+ <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
+ <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
+ <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
+ <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
+ <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
+ <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Use secs_to_jiffies() and simplify the code.
+On Wed, Feb 19, 2025 at 08:05:57PM +0000, Jon Hunter wrote:
+> On 19/02/2025 19:13, Russell King (Oracle) wrote:
+> > On Wed, Feb 19, 2025 at 05:52:34PM +0000, Jon Hunter wrote:
+> > > On 19/02/2025 15:36, Russell King (Oracle) wrote:
+> > > > So clearly the phylink resolver is racing with the rest of the stmmac
+> > > > resume path - which doesn't surprise me in the least. I believe I raised
+> > > > the fact that calling phylink_resume() before the hardware was ready to
+> > > > handle link-up is a bad idea precisely because of races like this.
+> > > > 
+> > > > The reason stmmac does this is because of it's quirk that it needs the
+> > > > receive clock from the PHY in order for stmmac_reset() to work.
+> > > 
+> > > I do see the reset fail infrequently on previous kernels with this device
+> > > and when it does I see these messages ...
+> > > 
+> > >   dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
+> > >   dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine
+> > >    initialization failed
+> > 
+> > I wonder whether it's also racing with phylib, but phylink_resume()
+> > calling phylink_start() going in to call phy_start() is all synchronous.
+> > That causes __phy_resume() to be called.
+> > 
+> > Which PHY device/driver is being used?
+> 
+> 
+> Looks like it is this Broadcom driver ...
+> 
+>  Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I don't see anything special happening in the PHY driver - it doesn't
+implement suspend/resume/config_aneg methods, so there's nothing going
+on with clocks in that driver beyond generic stuff.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-index 3dbd4efa21a2..19dce1ba512d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-@@ -220,7 +220,7 @@ static int hws_bwc_queue_poll(struct mlx5hws_context *ctx,
- 			      bool drain)
- {
- 	unsigned long timeout = jiffies +
--				msecs_to_jiffies(MLX5HWS_BWC_POLLING_TIMEOUT * MSEC_PER_SEC);
-+				secs_to_jiffies(MLX5HWS_BWC_POLLING_TIMEOUT);
- 	struct mlx5hws_flow_op_result comp[MLX5HWS_BWC_MATCHER_REHASH_BURST_TH];
- 	u16 burst_th = hws_bwc_get_burst_th(ctx, queue_id);
- 	bool got_comp = *pending_rules >= burst_th;
+So, let's try something (I haven't tested this, and its likely you
+will need to work it in to your other change.)
+
+Essentially, this disables the receive clock stop around the reset,
+something the stmmac driver has never done in the past.
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 1cbea627b216..8e975863a2e3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7926,6 +7926,8 @@ int stmmac_resume(struct device *dev)
+ 	rtnl_lock();
+ 	mutex_lock(&priv->lock);
+ 
++	phy_eee_rx_clock_stop(priv->dev->phydev, false);
++
+ 	stmmac_reset_queues_param(priv);
+ 
+ 	stmmac_free_tx_skbufs(priv);
+@@ -7937,6 +7939,9 @@ int stmmac_resume(struct device *dev)
+ 
+ 	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
+ 
++	phy_eee_rx_clock_stop(priv->dev->phydev,
++			      priv->phylink_config.eee_rx_clk_stop_enable);
++
+ 	stmmac_enable_all_queues(priv);
+ 	stmmac_enable_all_dma_irq(priv);
+ 
+
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
