@@ -1,111 +1,112 @@
-Return-Path: <netdev+bounces-167774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CDEA3C388
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:23:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F67CA3C395
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 039E0188C553
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:23:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CEAF173AB1
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5E71EFFAB;
-	Wed, 19 Feb 2025 15:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3001F4608;
+	Wed, 19 Feb 2025 15:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BnbkHvvm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HKtUq0ZO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58208199237
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 15:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A8B1F4176;
+	Wed, 19 Feb 2025 15:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739978576; cv=none; b=uBbUfNVdzkXdcc4D8jlmt5vF2gjt9NgCibIHskE148fte2Z5efUpVaBn+/3BM/U5zPy6xK4VQLlOO49k6D/t4HA8Lvyo+2m2qmFmN0qrNe7iC9egSfhw9dqzePvNI17N79yW5dEafd4qOEd8+nGmRRxgkpFQPeuhxUM0MwobU/8=
+	t=1739978795; cv=none; b=jOmHIHq/gqC4R/Km7UB5AJDMl1Ys6bZlBiHPGv2DL+9TuWlUOMxC9jn+NcobtbJ8ALO3GpBSHw3g+L7RKKpHbElBvMjNO9ew6fEfVjd0Nn9e4yJgCFwKmk0th3k2CZeEalmPaTS/rT80qLrFDPGD3kY1bQk6E4TbaJ/d6+SRtLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739978576; c=relaxed/simple;
-	bh=iCShM6dMfchXUH1xVrsrvefhLW9VtaeS/gyRxgOTRX4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nF9gPFgZqmvGlDmIp8lRdh7kdk/DhjpGhnU2Ef/1fCPVDGx3ZROdGinuY8VjgxuXFmSK8lgUEXHBiLXG8pzzjtRRvTWaHNZ/IQQu2i9LeCI5YJbXjWkgLxjcxWN+iwCDx5x8gAf5q3yfjSCzOAxiA4wZ6xvsUg/zYtHRX0osCzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BnbkHvvm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 603B8C4CED1;
-	Wed, 19 Feb 2025 15:22:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739978575;
-	bh=iCShM6dMfchXUH1xVrsrvefhLW9VtaeS/gyRxgOTRX4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BnbkHvvmUHnxX8TqdaT99zvL+EipnlnJMYgOJHI3TYTY04gb39uuV2U4Hf8fZSI5r
-	 qdrqGgLDx5gLK2EwLtw/QxATkQLN39f9vea93pP67+rmNQNK3YTUJC8hvMuofVW+iW
-	 AdNFdfJv1kV5AerygYKVdCeuOsvruevb8gGPVzi8UFFHkQQSbIcFaK6ZJXWWLaX1AQ
-	 RGUYwhsH8PTrRresbJKMpNcJkz6aguZTpmZqhktYGTng5zmNFuNPqpC5KKikUWimc+
-	 UE9f+tVwZtkjY+zUu1x3J9SV8BFXzULQJL5urQ6J7DvqO3MlSh04/mp4FGBSW2t3Zl
-	 fjlc0IpPU4S+g==
-Message-ID: <c125747a-8300-4282-894c-73c19ad7ce2f@kernel.org>
-Date: Wed, 19 Feb 2025 08:22:54 -0700
+	s=arc-20240116; t=1739978795; c=relaxed/simple;
+	bh=8apiONi99fXvMDRH2eeNd9IQwb835Yp5HgLrSXlXpE4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aRJnEddTYmL124no/VaaBjFFrD7kMb37GL3iAB14nrvGM0lLctgWdzlbj4RUXKR2RG5jJwyZSLjth2wqVFjrTPIJDCrH6jALn+Hl7EmrHhxP6DmFp33uVrALAY/pA78WT7uY7AOa5KgwsCZi8gChXo0EdV8g3w5xVBGk2qkjbLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HKtUq0ZO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0tg7WHOAZGiU5dJu6jDHMgp0FljLb6BYbmKgb+ORJsg=; b=HKtUq0ZO7pExPTjALnTNPXAK9R
+	8Lk2t3+G1MDU+xg5LRpPzK16CZXpvFqL7utNDW0VzyBDS1s+SKkaS2oI2CABREUp4oq36eIuSKOze
+	xU1d/7W08c5tQRPW3amux848+o0e7wHsUhiNC4x+8gek6Bl0ImGgXIRoYudCgoCt92uw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tklxt-00FfQp-IQ; Wed, 19 Feb 2025 16:26:21 +0100
+Date: Wed, 19 Feb 2025 16:26:21 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v2 1/3] net: phy: mediatek: Add 2.5Gphy firmware
+ dt-bindings and dts node
+Message-ID: <a15cfd5d-7c1a-45b2-af14-aa4e8761111f@lunn.ch>
+References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
+ <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/8] net: fib_rules: Add port mask support
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, horms@kernel.org, donald.hunter@gmail.com,
- petrm@nvidia.com, gnault@redhat.com
-References: <20250217134109.311176-1-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250217134109.311176-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
 
-On 2/17/25 6:41 AM, Ido Schimmel wrote:
-> In some deployments users would like to encode path information into
-> certain bits of the IPv6 flow label, the UDP source port and the DSCP
-> field and use this information to route packets accordingly.
-> 
-> Redirecting traffic to a routing table based on specific bits in the UDP
-> source port is not currently possible. Only exact match and range are
-> currently supported by FIB rules.
-> 
-> This patchset extends FIB rules to match on layer 4 ports with an
-> optional mask. The mask is not supported when matching on a range. A
-> future patchset will add support for matching on the DSCP field with an
-> optional mask.
-> 
-> Patches #1-#6 gradually extend FIB rules to match on layer 4 ports with
-> an optional mask.
-> 
-> Patches #7-#8 add test cases for FIB rule port matching.
-> 
-> iproute2 support can be found here [1].
-> 
-> [1] https://github.com/idosch/iproute2/tree/submit/fib_rule_mask_v1
-> 
-> Ido Schimmel (8):
->   net: fib_rules: Add port mask attributes
->   net: fib_rules: Add port mask support
->   ipv4: fib_rules: Add port mask matching
->   ipv6: fib_rules: Add port mask matching
->   net: fib_rules: Enable port mask usage
->   netlink: specs: Add FIB rule port mask attributes
->   selftests: fib_rule_tests: Add port range match tests
->   selftests: fib_rule_tests: Add port mask match tests
-> 
->  Documentation/netlink/specs/rt_rule.yaml      | 10 +++
->  include/net/fib_rules.h                       | 19 +++++
->  include/uapi/linux/fib_rules.h                |  2 +
->  net/core/fib_rules.c                          | 69 ++++++++++++++++++-
->  net/ipv4/fib_rules.c                          |  8 +--
->  net/ipv6/fib6_rules.c                         |  8 +--
->  tools/testing/selftests/net/fib_rule_tests.sh | 36 ++++++++++
->  7 files changed, 143 insertions(+), 9 deletions(-)
-> 
+> +description: |
+> +  MediaTek Built-in 2.5G Ethernet PHY needs to load firmware so it can
+> +  run correctly.
+> +
+> +properties:
+> +  compatible:
+> +    const: "mediatek,2p5gphy-fw"
+> +
+> +  reg:
+> +    items:
+> +      - description: pmb firmware load address
+> +      - description: firmware trigger register
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    phyfw: phy-firmware@f000000 {
+> +      compatible = "mediatek,2p5gphy-fw";
+> +      reg = <0 0x0f100000 0 0x20000>,
+> +            <0 0x0f0f0018 0 0x20>;
+> +    };
 
-For the set:
-Reviewed-by: David Ahern <dsahern@kernel.org>
+This is not a device in itself is it? There is no driver for this.
 
+It seems like these should be properties in the PHY node, since it is
+the PHY driver which make use of them. This cannot be the first SoC
+device which is both on some sort of serial bus, but also has memory
+mapped registers. Please look around and find the correct way to do
+this.
+
+	Andrew
 
