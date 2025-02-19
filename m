@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-167713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50A96A3BDFB
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:27:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96242A3BDFC
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 13:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429F41889DAC
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:27:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88220188F966
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 12:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBCA1DF26A;
-	Wed, 19 Feb 2025 12:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55871DFD91;
+	Wed, 19 Feb 2025 12:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7Wikjao"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJzypi75"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E261BC073;
-	Wed, 19 Feb 2025 12:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7DC1C5D4D;
+	Wed, 19 Feb 2025 12:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739968025; cv=none; b=QvqkAZ05fceQx6Q2TKeSGsBqOER5Y5KP9EEOB3tdFHwPLp3Fq40+cUP+DKO1vQxspXHTHaIy+SOVwYODYBJbbYcQccgkwP4zFGTifCiGoG+vHgDGvG7yD+S1YfRbl6KSojySCM7mNmQZEi8U8GbhRkFEP1uh6JI8+Qt1wnjWGn4=
+	t=1739968086; cv=none; b=NnfaHtUqdt5s9sKLI8JB981AFSO2eFu0skbfSRve5JVIP+mcqbBhJjyXjvRSZjWcMM7vOOcaSxHZMJY0eQXk4FVAMBDv9SauzH/E1711gHAdFW5jiNMmzewF8Frkh/d5Uwxpt/rKEaapWC+Cfr47qcEU7FKPIG5NMaMiTG4vFb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739968025; c=relaxed/simple;
-	bh=TYCGDez3pcD8qU831Qfzul3cfHRwJuc0keDc4AylRkA=;
+	s=arc-20240116; t=1739968086; c=relaxed/simple;
+	bh=9x7OMq3Uo1SSRlyewCvYnNFTgHpclfdIqmwk8zzfDK0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L3RcVW8L/MSnvRiTvjJKJaE9KRZHiTWg7k3I2ChQGwLeM5ccOqRP+sTryK7ozxFlZrJ3nMcldvqK79tNCkXiAcJqQoYBLLnUxSVKgiFggPMYhEgfLatX8KYh9GEp9jEFlpfajte6jbs2TvyQZTeBSnU8FpRzZ3pxwfiUwxIug28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7Wikjao; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1710C4CEDD;
-	Wed, 19 Feb 2025 12:27:00 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=EjkGXocoUIRZZWenApWIgPkL767IkcoOt52bM1497L6ul366yy3ke2Wfl/GoXpiKa4YgK/T/C7/L+TOPYcjdewCkGSgbbN5JtAmP/E8k7xCsB6cIRkuxrcceAg8nIG1AOnwqMEt6csZbtSDGYeedV9XTxx5WbLCquQIgw8F81NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJzypi75; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F607C4CED1;
+	Wed, 19 Feb 2025 12:28:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739968024;
-	bh=TYCGDez3pcD8qU831Qfzul3cfHRwJuc0keDc4AylRkA=;
+	s=k20201202; t=1739968086;
+	bh=9x7OMq3Uo1SSRlyewCvYnNFTgHpclfdIqmwk8zzfDK0=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c7WikjaoQrpPnZisY5dzS6ElGXsulTd73ELB01ocwIP46YkIrQ1qllb1M+HoJRnbG
-	 LVzosMkhk90u7LfcUnt9IZeFfq48G8Pj/G0HFlC8xP6pTkaAfOGbjj6KxRCfj65PTj
-	 0i340AQbKXsRmqkQVoyaLMKKhayNwV2Wjk4X/D9rYvn8g8Gr8LDyHnIzEpKoovkzUe
-	 P5EQrxS+mBoIhSq5yEzfKvBE0GW4KiubEfscgwCEt7aTE3WXSWW70mTYN8BbChl8EE
-	 6T/xIoMzokT57kZPHRlQTg/klRLyjMsZfG/rHIDGtZGbwXX8Y4zQ5pB9hG7x0ZIigc
-	 EflQXecNz4jSw==
-Message-ID: <5cd11aac-52ea-4440-8a07-9b5b2fd8216b@kernel.org>
-Date: Wed, 19 Feb 2025 13:26:58 +0100
+	b=EJzypi75zg0AD3f31BT5RocyHqMJzFFAOW1Rh1pRg3oMpJUsQQe5ZMvtXgmOYGEuO
+	 7jggKoI2+GHzc2ygUPwh/Bk41520elr9Sl/wQViUZuXJk+KJcok1FR/b7iyj3keELi
+	 t6yfvK0e84dE0E3i3RByLA6BjjFMK8vYHVjImBLkNxLR3OUSbr6wrxDI8CWMXreuJk
+	 yBgTT+2+wLWFvPvBrIfFTWGNJIMqX5oRO733VCjFXqwDmROAS0IrzD8U24ZvfKHcta
+	 /q2B5Bzq6Na5O5eY1zWY9cZhj4ynhva5VK675XzZwFMslufndIj45uTgrhqiOPHfU7
+	 ikAAEhTIdTGhw==
+Message-ID: <58fc17a2-58fe-4815-a501-e7ddd87b7e12@kernel.org>
+Date: Wed, 19 Feb 2025 13:28:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] net: phy: mediatek: Add 2.5Gphy firmware
- dt-bindings and dts node
+Subject: Re: [PATCH net-next v2 2/3] dts: mt7988a: Add built-in ethernet phy
+ firmware node
 To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
  Heiner Kallweit <hkallweit1@gmail.com>, Russell King
  <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
@@ -64,7 +64,7 @@ To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
  linux-mediatek@lists.infradead.org
 Cc: Steven Liu <Steven.Liu@mediatek.com>
 References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
+ <20250219083910.2255981-3-SkyLake.Huang@mediatek.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -110,18 +110,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20250219083910.2255981-3-SkyLake.Huang@mediatek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 19/02/2025 09:39, Sky Huang wrote:
 > From: Sky Huang <skylake.huang@mediatek.com>
 > 
-> Add 2.5Gphy firmware dt-bindings and dts node since mtk-2p5ge
-> driver requires firmware to run. Also, update MAINTAINERS for
-> MediaTek's built-in 2.5Gphy dt-bindings and change MAINTAINER's name.
+> Add built-in ethernet phy firmware node in mt7988a.dtsi.
 > 
 > Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+> ---
+>  arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 6 ++++++
 
 Please use subject prefixes matching the subsystem. You can get them for
 example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
@@ -129,65 +129,28 @@ your patch is touching. For bindings, the preferred subjects are
 explained here:
 https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
 
-<form letter>
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
-
-Please kindly resend and include all necessary To/Cc entries.
-</form letter>
-
-
-> ---
->  .../bindings/net/mediatek,2p5gphy-fw.yaml     | 37 +++++++++++++++++++
->  MAINTAINERS                                   |  3 +-
->  2 files changed, 39 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/devicetree/bindings/net/mediatek,2p5gphy-fw.yaml
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/mediatek,2p5gphy-fw.yaml b/Documentation/devicetree/bindings/net/mediatek,2p5gphy-fw.yaml
-> new file mode 100644
-> index 000000000000..56ebe88b8921
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/mediatek,2p5gphy-fw.yaml
-> @@ -0,0 +1,37 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/mediatek,2p5gphy-fw.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek Built-in 2.5G Ethernet PHY
-> +
-> +maintainers:
-> +  - Sky Huang <SkyLake.Huang@mediatek.com>
-> +
-> +description: |
-> +  MediaTek Built-in 2.5G Ethernet PHY needs to load firmware so it can
-> +  run correctly.
-> +
-> +properties:
-> +  compatible:
-> +    const: "mediatek,2p5gphy-fw"
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+> index 88b56a24efca..f2679702c328 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+> @@ -322,6 +322,12 @@ lvts: lvts@1100a000 {
+>  			nvmem-cell-names = "lvts-calib-data-1";
+>  		};
+>  
+> +		phyfw: phy-firmware@f000000 {
 
+Not a real device.
 
-Not tested.
+> +			compatible = "mediatek,2p5gphy-fw";
+> +			reg = <0 0x0f100000 0 0x20000>,
 
-I have doubts that's a real device... Model name looks exactly like 2.5G
-phy. "FW" suggests you do it for driver.
+Not tested enough. See SoC maintainer profile for clean DTS.
 
-Read writing and submitting bindings documents.
+> +			      <0 0x0f0f0018 0 0x20>;
+> +		};
 
 Best regards,
 Krzysztof
