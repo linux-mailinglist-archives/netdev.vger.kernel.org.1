@@ -1,406 +1,406 @@
-Return-Path: <netdev+bounces-167782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8BDA3C3C4
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:37:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7894A3C3BB
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A801891E30
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65BEC176101
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5FB1F9416;
-	Wed, 19 Feb 2025 15:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EDB1F3BA8;
+	Wed, 19 Feb 2025 15:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AAX1E80H"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tpQMT88H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01301F91D6;
-	Wed, 19 Feb 2025 15:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739979422; cv=fail; b=thUHJqmtPWlD2jAZBuxaX12qyY+/oGC0vSFnpBZ+4K6A7b5PF0hFn542mql/ICazujsAleC5qe0lhp81g7+p3d+HHozxm5GFA9CZZqDHzWdk/WHBim6/T7Q5x+PtipSByY03JxFNwKHnG6gKwqTRbD6xRRp+cBbHA5/gzFCAjm8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739979422; c=relaxed/simple;
-	bh=3DL8bB6/6HijhXXJzYoGf5JRTtch7ZoRVdj64DZPfQg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G53/gzbn0i2J5nI/OOCzslTQEFOykE1Tm4PORzPBSQ0ssqGCCLoIykygVMcCKPc+PKeNPvomXBuxCq6g72snyaBoPwpIAuhVwQoodXAB+S0f5foHdIZgwWHWRPxEl5Q+oGwnFm7EyTIMXpu0pqaKUzuTIDp2YdP6XIvrplNdlRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AAX1E80H; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739979421; x=1771515421;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=3DL8bB6/6HijhXXJzYoGf5JRTtch7ZoRVdj64DZPfQg=;
-  b=AAX1E80HqlxMTTazL94SSdHNrvTz28Z3YOTPqFcbYYPs7A2UCqMB3z0K
-   a9zC5bbuh8rXmZK6LIwAtrJTIGAbEMm1Fmf16iFkYAifQNSCRofy5D/FL
-   SKvfoG9Di9dpHJPSKWcVAygMAHYLb558ngnwBvHYMhxpp7mvSIaCGVniL
-   XBkSXFd/9bY+2GLWAK2rfbV7K5ovP3Ev4+LHQxYPfP3PHExadC3eM/iAT
-   SBsGX7tN9ywjJanpvI3XrkCsZj+v4x90MJGjMXIu7ikuIgD0REVVvZZpy
-   6lISN5mwKxyz8aeGRbRK+qXwFb9rJgz/a/WBxptf8VUxVZS4FR9k7odhH
-   g==;
-X-CSE-ConnectionGUID: OyHYDAsjRLSEvHCm09mRwg==
-X-CSE-MsgGUID: JDUeds+eTvmf6QoJPxO1vQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="58262712"
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="58262712"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 07:36:59 -0800
-X-CSE-ConnectionGUID: tKbtPBRxSCeQNV6ZMKRy2g==
-X-CSE-MsgGUID: YBWWHDKATFusohRvsZcRow==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="115275554"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2025 07:31:44 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 19 Feb 2025 07:31:36 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 19 Feb 2025 07:31:36 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 19 Feb 2025 07:31:36 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lZKo4pg+B1aZUfVrbrEzqXg3D/mMgO15uOBk0wSqDvpiWiW0nofq59onWqJSZ0KaQf+RTEdHLbLAtkv9CDsdMvj4wI8DI7FejR0crs5poI5pkL4nSn5nUO/TTkhAsxXOJtOPZ9XqWDDDZ+n2J+1LnBpeP6Z6kkXm3pJHs5bfPAcVI4+CCJISnSU2LiiLFkdGuRtjWdLkygmA0qudv+vRPETk8uoFZtzsuIwkEcEB4bP7/Q8npO81aw/+Lsj3bgFEPAzTyWIVOqVyblIcKbCTNEZOILQW/eiI1f3gaa8PySheS8PrlwSa4QwR4utc2+IgYvt8F3cvP6Nep2kCzT27fQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e5joJfkx8EKl4xObD7II/ZUn3aCY/5K0L9Pw8OguxZ0=;
- b=mp9QE/jydpFNXU6/Rsyagcc2LVHvsqHMPKFMWlKNx+iSJcE+vhkoOd59WSUxfS763dGfReVD8RCj5mDeFdmxfQQkhfbal+Snxt1i8Q660WD/XWsCmFxJaamUR4lDJAITTW7SxNEla1/NrHNzDH9vdLbKk7oJyQk8V9H0UJI0cE680HYgQRE1uzFhMBx/kzYbIZCYML8WJ5cjEa3sAx4GM1x72uhO+OUoXR426y6kjm27LVBvmciZjQEkGAVlknb8g3mkVlMuRVVf4pJ06ARelty+0qeXqMVAuDBmvX+KerJ3RBvVJxGRBe8NR1UJJoM3NpbesCKSRy653W5Uqd7wTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6289.namprd11.prod.outlook.com (2603:10b6:208:3e7::9)
- by CO1PR11MB4849.namprd11.prod.outlook.com (2603:10b6:303:90::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Wed, 19 Feb
- 2025 15:31:33 +0000
-Received: from IA1PR11MB6289.namprd11.prod.outlook.com
- ([fe80::ec3c:2931:b0e8:c5b5]) by IA1PR11MB6289.namprd11.prod.outlook.com
- ([fe80::ec3c:2931:b0e8:c5b5%3]) with mapi id 15.20.8445.017; Wed, 19 Feb 2025
- 15:31:32 +0000
-From: "Joshi, Sreedevi" <sreedevi.joshi@intel.com>
-To: sreedevi.joshi <joshisre@ecsmtp.an.intel.com>, "edumazet@gmail.com"
-	<edumazet@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
-	<horms@kernel.org>, "ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
-	<daniel@iogearbox.net>
-CC: "Karlsson, Magnus" <magnus.karlsson@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "hawk@kernel.org" <hawk@kernel.org>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"almasrymina@google.com" <almasrymina@google.com>, "asml.silence@gmail.com"
-	<asml.silence@gmail.com>, "lorenzo@kernel.org" <lorenzo@kernel.org>,
-	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "chopps@labn.net"
-	<chopps@labn.net>, "bigeasy@linutronix.de" <bigeasy@linutronix.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: RE: [RFC PATCH net 0/1] transport_header set incorrectly when using
- veth
-Thread-Topic: [RFC PATCH net 0/1] transport_header set incorrectly when using
- veth
-Thread-Index: AQHbeMHRHWNWYkkSpU+E75RLaL8DrrM75wVAgBLop1A=
-Date: Wed, 19 Feb 2025 15:31:32 +0000
-Message-ID: <IA1PR11MB628988D4CC8F4E9B1903B37589C52@IA1PR11MB6289.namprd11.prod.outlook.com>
-References: <20250206180551.1716413-1-sreedevi.joshi@intel.com>
- <IA1PR11MB62899945E3D2DCED17259B1E89F12@IA1PR11MB6289.namprd11.prod.outlook.com>
-In-Reply-To: <IA1PR11MB62899945E3D2DCED17259B1E89F12@IA1PR11MB6289.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6289:EE_|CO1PR11MB4849:EE_
-x-ms-office365-filtering-correlation-id: 68a4fb5f-2440-474b-c3ee-08dd50fa7d0a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?hhZ+V/ZvjmHyfF83BwbSSLUp0/u/ry9FtSqlu3okmthnQI50B1REYZhnFJAa?=
- =?us-ascii?Q?g3Yb/oncQb9BJjBCw+HLPmhyaHu2R3oYEeRs21snmzJ7d7zbeI4Y9E7E/BId?=
- =?us-ascii?Q?j1OOUNFXmKLqezQLc0+gpCIwOoPwP4Mr2/ukBKC74HMmp30mRphRHsJHXdq1?=
- =?us-ascii?Q?eRJN1MktmyBcDsQoJs+Fvwqd5fjDBdFpxJg88uBxZINNPr8XeKd6WPs5mD/V?=
- =?us-ascii?Q?Cvd8V4ma73dKqld0mrutJ3f/kIVMcbFuMALcRorQuylESOkQMtFt4M899xVi?=
- =?us-ascii?Q?Atrb3k/oKRTWseEE4RA3nNOu5ciF1iYnIJhbsOZH23rYGf9yK7p3f2eV3OOD?=
- =?us-ascii?Q?H148nAM4JJPrsdmZghFVeNlzMXmfb9Kj+grEHLBW+ZokxRUwnQYLQiENhmpf?=
- =?us-ascii?Q?8atyny48W+RodRZy2dsWM7eO9wyNWnBWz1Be159uvZEJQTzYACxHYSJmox3Q?=
- =?us-ascii?Q?SKmiZak43tcZG5mR+WktETyR/5MRVMdTrYQHTfLtM5epbFoWiOsv9ds0ALJ5?=
- =?us-ascii?Q?3EXe5DsA06xfWuGvX7KRq8bnfDx53hbrgibeIdTT7I5u0c/WCzXidDTPMOb6?=
- =?us-ascii?Q?GprAbQy/OlAE0sT6FLamLEagMgzE8GYcjKxfSLh2GNu9Axmnvw/4G/G7K4Ff?=
- =?us-ascii?Q?byfWKrra8R4TPADHcAzCaCWDnSGog6LruOVmyVFyCzKy6rwx1qaLanBpZWgf?=
- =?us-ascii?Q?4cFhabMBRNZtq52ccJw1VB2WtUNtN60DvvcPmbmoLXAjeZ/sjMiYC2GMo+JP?=
- =?us-ascii?Q?GV5GR0Md50w+FP2LDJtgTuxRZPaukWj57Gs2xoipaIaJLZT9tnfFmcVERKfA?=
- =?us-ascii?Q?GRlK9X1c/XG+FGW6tqtwD3KMeSJCIxfNRtiF9w9RuQ0Kbe4UcnfQmZzs8aPn?=
- =?us-ascii?Q?N44K/qstQZ24+N70ghtMP4sDiT+O8NuLEEzJ0UACWiLzqgAcDvR1HImoMf9Y?=
- =?us-ascii?Q?UV/bXZpe0c/xWXVxNdZBw0sqM5+H7H0KBeJAI1MPnmSMyxA2Lw/BQ5c5HAkw?=
- =?us-ascii?Q?BePCcMdV1TED1YD3D2TLGvJ1hRJ2kFnNWy/EBStBLUh39JsPif3Ls3Aj0PDx?=
- =?us-ascii?Q?kZwjPzw+loLvcHrWPd+1UYPehF6nLsT6akzEwCLPSyhxwtvGfzDjJLdhK7kp?=
- =?us-ascii?Q?Oq4Bc+A4U2WV6iFIalvKE7Et2YLx/UQSxr8GCzYSX+9Y4GI4FcqzZa4YyykB?=
- =?us-ascii?Q?QIqNouu2MCYb9mY1qib9p9f94E0FwsaHdfFgBZVqqGNhYG0QRtjd+kbKpxdq?=
- =?us-ascii?Q?Rsq3nm+7NjNHHv15DH1bVKPy32/00SmJDxL1NFwryOyFBjKkVI/RGATzVRXC?=
- =?us-ascii?Q?VCiTufutUwMURTLRqouSbrpj9ntsp7GcD0oDqOJnaKMf7R/uESGojjbpo8fU?=
- =?us-ascii?Q?a9CAtTLlmbcbQctkCVAwYSFCVPVPXwxYCjg0u9qdZGsr5jLSmXPZC2yeH4lU?=
- =?us-ascii?Q?sFG2D2o/EyVWjS7XrhM3kWhKltu2UHuU?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6289.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9IxGxjnOQld4eFbyDCN8LV5J2WfdOse9toQvJ08tsFADMhattMkJZ70V+IwN?=
- =?us-ascii?Q?7txoBToyxTbjPRNiZoRMhn820NhoGzcH+0QzFnFRyHWpDKvU9A4Y1Bk6qdsR?=
- =?us-ascii?Q?3ILN6HUxCY2dRrYAMhoKhWneI3Y1voAV5B/oTTFK+s8V1CsA5tKsBqBPRoUx?=
- =?us-ascii?Q?0aBLQReOio0piugKkEkkZnoemHHuonJhVVd5nEQAkXETGubRamKoOh6CNOcl?=
- =?us-ascii?Q?AHf5vwia8ybMzjgZjkbdDO23zduJUjpdVMocqgWzwBToUgRAnmqlDs0u/utQ?=
- =?us-ascii?Q?nR82qlSM1M+DIrBs+EPVNbQBP6cmX87C57UXf21fROXXTITEQQ07rpyVurRD?=
- =?us-ascii?Q?oRGdgIu3xbyHZJRVVGDsA3s9w0VOOTrLl42BPNyrLySwdGOizR9Imtf2E24M?=
- =?us-ascii?Q?u2yL4s3y8jh/SETsi8UKkXPiSGk5MuqsxsAe7bmgyMVriRJDjTafrdjI4+TJ?=
- =?us-ascii?Q?3dEe1tpzDVueyBXyMiu8CQlMiyioiKSrFPis5i9OseQewTMiQImzTk8LsxQu?=
- =?us-ascii?Q?xrc3JoNVs9omCo8nUtCiv9gSPgevuta3iVzjDyM77e6cPo5eF9cZMLdaKICG?=
- =?us-ascii?Q?RJuCu3/cLf24f9h1ZtcmLj6q8Y+WRy3LTES16ye0uBUM08Mhq0eZZ8YjCg8N?=
- =?us-ascii?Q?/+wzgRhiqBb5A9hhKjqMtwnv1EGE5tkRKNfm6Dcw4eGBWthmz6Xl56BMRHq+?=
- =?us-ascii?Q?w11/MpSSy76Vfh0KPpIYr3Rpc0A+5jP2Bz7gp1zXRa1bVhgdI9E6+DlIOiSG?=
- =?us-ascii?Q?AahEooLLoYR8UXviioh/zh7eeOjB5RY9t8gVY4FeSnhMzgadB8JbR5sho6EQ?=
- =?us-ascii?Q?rJfJOX/BQecNkkN0m4TS3wuAie80KvANw0FM1sx267/sULr4i/Ih+WO1wn/6?=
- =?us-ascii?Q?GdRdEbzYWMYo3ypCPzHdX1C7DDAb1SAT8Gh20qdvWLg/OWptnGtiB2NpQCHe?=
- =?us-ascii?Q?8DBu7ueuAsfdF0mAPKkL23fe0EDzbft/mkoV4KjwvvnyMEUj2NIvTf6ZzHP/?=
- =?us-ascii?Q?PyZGyaHD0RKN0/pQE2GScHwc1sNCNDPIKxcTiupmFFyJhXntZbpLS2SwsEfg?=
- =?us-ascii?Q?DdN7ieaI+MoX2SxJUubCf6DmeBjX0qm+Qztxbx1qMFTqG9wKXRlEJRLEAQ1x?=
- =?us-ascii?Q?2jkbldMe9PMTsZDaEnIX9QHALmzuGLl2BUAg6y8VhUFsmj0ddBc3laif1g7C?=
- =?us-ascii?Q?8qvAxw3MeL+o1s83h5EAqsaUY+gdMzHUM86UfmQb+hel8WnrdZeQCLKpCc1N?=
- =?us-ascii?Q?NM/O+7xnYCH2HiyOP6YRgzLp1KcWGT94jwRcFjg1fidOo4BCzo85irI4o+GW?=
- =?us-ascii?Q?5k+/VEmWXETyRwiXGUkd3UrcNNf4JmuMIcWKLb+CiC1gfCE9Hu3fbeKAtBTy?=
- =?us-ascii?Q?cCCZu3PVMrU5AjDlZowxwlVW0arLuhOtOIiAR76ue074Lh1V3TF5cYawUtWt?=
- =?us-ascii?Q?xwFeShwTh+P9gzd4tIyd++WrSTw71hZ6HyGFiwQS4gX6wu77hfDS0Jrg8zl5?=
- =?us-ascii?Q?KynGEH5/UiwL7U+TyrWTe4jHtcrvwgntAAArN7Pqr7SOZmhxr1TEWRYR0Dt9?=
- =?us-ascii?Q?qcoeKK9neqvRpsqC6y/2QHMPPj4JwSputeYZ1QY2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F127A1C5F1B;
+	Wed, 19 Feb 2025 15:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739979386; cv=none; b=u/YccaqJaP1fFp2J0zyy+HJTQl1Bc6Pp1YLoDVqVJxYkdhy+l8qzgRTBmvj9W4r2ulOWI07BMSHH6UoC+Yju+nAkRlMjgsZk4BtgtNFClI57wnqLFMht24QZHp1UfrVY54cXy59wU8Woc7XXpWmE5Zu71q8vmo2nuBnyDhwwq9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739979386; c=relaxed/simple;
+	bh=UQd9t6UsQrfF5wMikVxDB1+W41oQr9vt2xglcSS7NbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=smvgqs4z8IacUC42xF5TVSTzadOBKKbyGIzHqd7D4O6vHsYsP4uU5QKQGbvJMFG+LxqJJMjwZincLvijj0gGcy7Iq5rz1tYVivPSWL23myJKtxfKtsVOWC1RZZuRRmKnYmS4MSqYl5e60CX3AHtx5Jfd6EQE5h6E8A8T/sHMI/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tpQMT88H; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HSoYtRU58Qk6GUrOu57f7XD5z3CMZTVbbGuHsdBc9/A=; b=tpQMT88HBc9KZjpSc1kETY8tkr
+	a26Es9sHMI7yCFiMlInV4tviOCdWxYnC7eKpgzcjEUBZ79x2efvpopcaXGi0JVjN4nc9kcFowqyXa
+	ob7Bs73b8AmUHWlmB8g4KoATqAnkSSFWg8quG7ANaqhDhhAquzseUcjrcfJslbpxG43krhhi6lybS
+	qLPZVVynYNSNLEZ5K/k0VK1iDEidsLndBH1G9ZuLTWH6CsqEd6mFd+Li2kXNEpLnC5rFJ/YQVDMlK
+	uYSjkoc8eQw1krlUTochiHmek+xwPXyamdfPvzbIbr8HnN7qphj5bFs1P/BsetOL4nNd/eWgUVvHQ
+	bNDiSdog==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46126)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tkm7P-0006B7-1a;
+	Wed, 19 Feb 2025 15:36:11 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tkm7L-0008TH-23;
+	Wed, 19 Feb 2025 15:36:07 +0000
+Date: Wed, 19 Feb 2025 15:36:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+Message-ID: <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
+References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+ <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
+ <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+ <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
+ <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
+ <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
+ <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
+ <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6289.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68a4fb5f-2440-474b-c3ee-08dd50fa7d0a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2025 15:31:32.6155
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JLHmRg1obzVv50dbKQyy2GuXAgHt6tLElxIfsFvdXu+tZ28iArgzwpcpJR79vXbGDbbVqTwKHi4hcKgase9lIUdqWEQoJDmATiEtFNZHCeA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4849
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> -----Original Message-----
-> From: Joshi, Sreedevi
-> Sent: Friday, February 7, 2025 9:28 AM
-> To: sreedevi.joshi <joshisre@ecsmtp.an.intel.com>; edumazet@gmail.com; ku=
-ba@kernel.org; pabeni@redhat.com; horms@kernel.org;
-> ast@kernel.org; daniel@iogearbox.net
-> Cc: Karlsson, Magnus <magnus.karlsson@intel.com>; Fijalkowski, Maciej <ma=
-ciej.fijalkowski@intel.com>; hawk@kernel.org;
-> john.fastabend@gmail.com; almasrymina@google.com; asml.silence@gmail.com;=
- lorenzo@kernel.org; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; chopps@labn.net; bigeasy@linutronix.de; n=
-etdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> bpf@vger.kernel.org
-> Subject: RE: [RFC PATCH net 0/1] transport_header set incorrectly when us=
-ing veth
->=20
->=20
-> > -----Original Message-----
-> > From: sreedevi.joshi <joshisre@ecsmtp.an.intel.com>
-> > Sent: Thursday, February 6, 2025 1:06 PM
-> > To: edumazet@gmail.com; kuba@kernel.org; pabeni@redhat.com; horms@kerne=
-l.org; ast@kernel.org; daniel@iogearbox.net
-> > Cc: Karlsson, Magnus <magnus.karlsson@intel.com>; Fijalkowski, Maciej <=
-maciej.fijalkowski@intel.com>; hawk@kernel.org;
-> > john.fastabend@gmail.com; almasrymina@google.com; asml.silence@gmail.co=
-m; lorenzo@kernel.org; Lobakin, Aleksander
-> > <aleksander.lobakin@intel.com>; chopps@labn.net; bigeasy@linutronix.de;=
- netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > bpf@vger.kernel.org; Joshi, Sreedevi <sreedevi.joshi@intel.com>
-> > Subject: [RFC PATCH net 0/1] transport_header set incorrectly when usin=
-g veth
-> >
-> > From: Sreedevi Joshi <sreedevi.joshi@intel.com>
-> >
-> > When testing a use-case on veth by attaching XDP and tc ingress hooks, =
-it was noticed that the transport_header is set incorrectly and
-> > causes the tc_ingress hook that is using bpf_skb_change_tail() call to =
-report a failure.
-> >
-> > Here is the flow:
-> > veth ingress:
-> > veth_convert_skb_to_xdp_buff()- [Example: skb->trannsport_header=3D6553=
-5 skb->network_header=3D0]
-> > ..>skb_pp_cow_data()
-> > ....>skb_headers_offset_update() - adds offset without checking and thi=
-s
-> > 		results in transport_header value roll over.
-> > 		[off: 192: results in  skb->transport_header =3D 191, skb->network_he=
-ader=3D192] tc_ingress hook: bpf_skb_change_tail()
-> >   - Since transport_header < network_header, min_len is negative and it=
- fails.
-> >
-> > Two possbible solutions:
-> > option 1: introducing the check in the skb_headers_offset_update() to s=
-kip adding offset
-> > 	to transport_header when it is not set. (patch attached) option 2: res=
-et transport header in veth_xdp_rcv_skb()
-> >
-> > Option 1 seems to be better as it will apply to any other interfaces th=
-at may use skb_headers_offset_update and there seems to
-> > similar logic in the same function to check if mac_header was set befor=
-e adding offset.
-> >
-> > Seeking your inputs on this.
-> >
-> > NOTES:
-> > 1. If veth is used without XDP hook attached, this issue is not observe=
-d as the logic uses __netif_rx() directly and the transport header
-> > is reset in __netif_receive_skb_core() as it detects it is not set.
-> >
-> > 2. Tested on i40e driver and confirmed it does not have this issue as t=
-he
-> > skb_headers_offset_update() is not in the processing path.
-> >
-> >
-> > Instructions to reproduce the issue along with the XDP and tc ingress p=
-rograms is attached below.
-> >
-> > -------------------------------8<-------------------------------
-> > instructions:
-> >
-> > #build XDP and tc programs
-> > clang -O2 -g -target bpf -D__TARGET_ARCH_x86 -c xdp_prog.c -o xdp_prog.=
-o clang -O2 -g -target bpf -D__TARGET_ARCH_x86 -c
-> > tc_bpf_prog.c -o tc_bpf_prog.o
-> >
-> > # create the veth pair
-> > ip link add veth0 numtxqueues 1 numrxqueues 1 type veth peer name veth1=
- \
-> >    numtxqueues 1 numrxqueues 1
-> >
-> > ip addr add 10.0.1.0/24 dev veth0
-> > ip addr add 10.0.1.1/24 dev veth1
-> > ip link set veth0 address 02:00:00:00:00:00 ip link set veth1 address 0=
-2:00:00:00:00:01 ip link set veth0 up ip link set veth1 up
-> >
-> > if [ -f /proc/net/if_inet6 ]; then
-> >     echo 1 > /proc/sys/net/ipv6/conf/veth0/disable_ipv6
-> >     echo 1 > /proc/sys/net/ipv6/conf/veth1/disable_ipv6
-> > fi
-> >
-> > #attach xdp hook and tc ingress hooks to veth1 xdp-loader load veth1 xd=
-p_prog.o
-> >
-> > tc qdisc add dev veth1 clsact
-> > tc filter add dev veth1 ingress bpf da obj tc_bpf_prog.o sec prog
-> >
-> > # generate traffic from veth0 egress -> veth1 ingress ping -c e 10.0.1.=
-3 -I veth0
-> >
-> > # observe the trace pipe (make sure tracing is on) # The following prin=
-ts will appear
-> > # ping-5330    [072] ..s2. 18266.403464: bpf_trace_printk: Failure.. ne=
-w len=3D52 ret=3D-22
-> > cat /sys/kernel/debug/tracing/trace_pipe
-> >
-> > -------------------------------8<-------------------------------
-> > xdp_prog.c:
-> >
-> > #include <linux/bpf.h>
-> > #include <bpf/bpf_helpers.h>
-> >
-> > SEC("xdp") int netd_xdp_prog(struct xdp_md *xdp) {
-> >         /* Squash compiler warning. */
-> >         (void)xdp;
-> >
-> >         return XDP_PASS;
-> > }
-> >
-> > char _license[] SEC("license") =3D "GPL";
-> >
-> > -------------------------------8<-------------------------------
-> > test_bpf_prog.c:
-> >
-> > #include <linux/bpf.h>
-> > #include <bpf/bpf_helpers.h>
-> > #include <linux/pkt_cls.h>
-> >
-> > SEC("prog") int netd_tc_test_ingress(struct __sk_buff *skb)
-> > {
-> >         long ret;
-> >
-> >         /* extend skb length by 10 */
-> >         ret =3D bpf_skb_change_tail(skb, skb->len + 10, 0);
-> >         if (ret < 0) {
-> >                 bpf_printk("Failure.. new len=3D%d ret=3D%d\n", skb->le=
-n+10, ret);
-> >                 return TC_ACT_SHOT;
-> >         }
-> >
-> >         bpf_printk("Success new len:%d \n", skb->len+10);
-> >
-> >         return TC_ACT_UNSPEC;
-> > }
-> >
-> > char _license[] SEC("license") =3D "GPL";
-> >
-> > -------------------------------8<-------------------------------
-> >
-> > Sreedevi Joshi (1):
-> >   net: check transport_header before adding offset
-> >
-> >  net/core/skbuff.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > --
-> > 2.25.1
-> []
-> Apologies for resending. Mail server had some issues earlier and didn't r=
-each some recipients.
+On Wed, Feb 19, 2025 at 02:01:34PM +0000, Jon Hunter wrote:
+> 
+> On 14/02/2025 11:21, Russell King (Oracle) wrote:
+> > On Fri, Feb 14, 2025 at 10:58:55AM +0000, Jon Hunter wrote:
+> > > Thanks for the feedback. So ...
+> > > 
+> > > 1. I can confirm that suspend works if I disable EEE via ethtool
+> > > 2. Prior to this change I do see phy_eee_rx_clock_stop being called
+> > >     to enable the clock resuming from suspend, but after this change
+> > >     it is not.
+> > > 
+> > > Prior to this change I see (note the prints around 389-392 are when
+> > > we resume from suspend) ...
+> > > 
+> > > [    4.654454] Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 0
+> > 
+> > This is a bug in phylink - it shouldn't have been calling
+> > phy_eee_rx_clock_stop() where a MAC doesn't support phylink managed EEE.
+> > 
+> > > [    4.723123] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+> > > [    7.629652] Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+> > 
+> > Presumably, this is when the link comes up before suspend, so the PHY
+> > has been configured to allow the RX clock to be stopped prior to suspend
+> > 
+> > > [  389.086185] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+> > > [  392.863744] Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+> > 
+> > Presumably, as this is after resume, this is again when the link comes
+> > up (that's the only time that stmmac calls phy_eee_rx_clock_stop().)
+> > 
+> > > After this change I see ...
+> > > 
+> > > [    4.644614] Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+> > > [    4.679224] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+> > > [  191.219828] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+> > 
+> > To me, this looks no different - the PHY was configured for clock stop
+> > before suspending in both cases.
+> > 
+> > However, something else to verify with the old code - after boot and the
+> > link comes up (so you get the second phy_eee_rx_clock_stop() at 7s),
+> > try unplugging the link and re-plugging it. Then try suspending.
+> 
+> I still need to try this but I am still not back to the office to get to this.
+>  > The point of this test is to verify whether the PHY ignores changes to
+> > the RX clock stop configuration while the link is up.
+> > 
+> > 
+> > 
+> > The next stage is to instrument dwmac4_set_eee_mode(),
+> > dwmac4_reset_eee_mode() and dwmac4_set_eee_lpi_entry_timer() to print
+> > the final register values in each function vs dwmac4_set_lpi_mode() in
+> > the new code. Also, I think instrumenting stmmac_common_interrupt() to
+> > print a message when we get either CORE_IRQ_TX_PATH_IN_LPI_MODE or
+> > CORE_IRQ_TX_PATH_EXIT_LPI_MODE indicating a change in LPI state would
+> > be a good idea.
+> > 
+> > I'd like to see how this all ties up with suspend, resume, link up
+> > and down events, so please don't trim the log so much.
+> 
+> I have been testing on top of v6.14-rc2 which does not have
+> dwmac4_set_lpi_mode(). However, instrumenting the other functions,
+> for a bad case I see ...
+> 
+> [  477.494226] PM: suspend entry (deep)
+> [  477.501869] Filesystems sync: 0.006 seconds
+> [  477.504518] Freezing user space processes
+> [  477.509067] Freezing user space processes completed (elapsed 0.001 seconds)
+> [  477.514770] OOM killer disabled.
+> [  477.517940] Freezing remaining freezable tasks
+> [  477.523449] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+> [  477.566870] tegra-xusb 3530000.usb: Firmware timestamp: 2020-07-06 13:39:28 UTC
+> [  477.586423] dwc-eth-dwmac 2490000.ethernet eth0: disable EEE
+> [  477.592052] dwmac4_set_eee_lpi_entry_timer: entered
+> [  477.596997] dwmac4_set_eee_lpi_entry_timer: GMAC4_LPI_CTRL_STATUS 0x0
+> [  477.680193] dwc-eth-dwmac 2490000.ethernet eth0: Link is Down
 
-The following commit that was introduced in 6.12.8 addresses this issue. We=
- no longer
-need to follow up on this RFC.
+This tells me WoL is not enabled, and thus phylink_suspend() did a
+phylink_stop() which took the link administratively down and disabled
+LPI at the MAC. The actual physical link on the media may still be up
+at this point, and the remote end may still signal LPI to the local
+PHY.
 
-Thanks for your time!
-Sreedevi
+...system suspends and resumes...
+> [  477.876778] CPU5: Booted secondary processor 0x0000000103 [0x411fd073]
+> [  477.883556] CPU5 is up
 
-commit 9ecc4d858b92c1bb0673ad9c327298e600c55659
-Author: Cong Wang <cong.wang@bytedance.com>
-Date:   Thu Dec 12 19:40:54 2024 -0800
+stmmac_resume() gets called here, which will call into phylink_resume()
+and, because WoL wasn't used at suspend time, will call phylink_start()
+which immediately prints:
 
-    bpf: Check negative offsets in __bpf_skb_min_len()
+> [  477.985628] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
 
-    skb_network_offset() and skb_transport_offset() can be negative when
-    they are called after we pull the transport header, for example, when
-    we use eBPF sockmap at the point of ->sk_data_ready().
+and then it allows the phylink resolver to run in a separate workqueue.
+The output from the phylink resolver thread, I'll label as "^WQ".
+Messages from the thread that called stmmac_resume() I'll labell with
+"^RES".
 
-    __bpf_skb_min_len() uses an unsigned int to get these offsets, this
-    leads to a very large number which then causes bpf_skb_change_tail()
-    failed unexpectedly.
+> [  477.993771] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_mac_enable_tx_lpi: tx_lpi_timer 1000000
+	^WQ
 
-    Fix this by using a signed int to get these offsets and ensure the
-    minimum is at least zero.
+At this point, the workqueue has called mac_link_up() and this indicates
+that that method has completed and it's now calling mac_enable_tx_lpi().
+In other words, the transmitter and receiver have been enabled here!
+This is key...
 
-    Fixes: 5293efe62df8 ("bpf: add bpf_skb_change_tail helper")
-    Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-    Acked-by: John Fastabend <john.fastabend@gmail.com>
-    Link: https://lore.kernel.org/bpf/20241213034057.246437-2-xiyou.wangcon=
-g@gmail.com
+> [  478.171396] dwmac4: Master AXI performs any burst length
+	^RES
 
+dwmac4_dma_axi(), which is called from stmmac_init_dma_engine() which
+then goes on to call stmmac_reset(). As noted above, however, the
+MAC has had its transmitter and receiver enabled at this point, so
+hitting the hardware with a reset probably undoes all that.
+stmmac_init_dma_engine() is called from stmmac_hw_setup() and
+stmmac_resume() _after_ calling phylink_resume().
+
+> [  478.174480] dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+	^RES
+
+Printed by stmmac_safety_feat_configuration() which is called from
+stmmac_hw_setup().
+
+> [  478.181934] dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+	^RES
+
+Printed by stmmac_init_ptp() called from stmmac_hw_setup().
+
+> [  478.202977] dwmac4_set_eee_lpi_entry_timer: entered
+	^WQ
+> [  478.207918] dwmac4_set_eee_lpi_entry_timer: GMAC4_LPI_CTRL_STATUS 0xf4240
+	^WQ
+> [  478.287646] dwc-eth-dwmac 2490000.ethernet eth0: Energy-Efficient Ethernet initialized
+	^WQ
+> [  478.295538] dwc-eth-dwmac 2490000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+	^WQ
+
+So clearly the phylink resolver is racing with the rest of the stmmac
+resume path - which doesn't surprise me in the least. I believe I raised
+the fact that calling phylink_resume() before the hardware was ready to
+handle link-up is a bad idea precisely because of races like this.
+
+The reason stmmac does this is because of it's quirk that it needs the
+receive clock from the PHY in order for stmmac_reset() to work.
+
+> For a good case I see ...
+> 
+> [   28.548472] PM: suspend entry (deep)
+> [   28.560503] Filesystems sync: 0.010 seconds
+> [   28.563622] Freezing user space processes
+> [   28.567838] Freezing user space processes completed (elapsed 0.001 seconds)
+> [   28.573380] OOM killer disabled.
+> [   28.576563] Freezing remaining freezable tasks
+> [   28.582100] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+> [   28.627180] tegra-xusb 3530000.usb: Firmware timestamp: 2020-07-06 13:39:28 UTC
+> [   28.646770] dwc-eth-dwmac 2490000.ethernet eth0: Link is Down
+
+Same as above...
+
+...system suspends and resumes...
+> [   29.099556] CPU5: Booted secondary processor 0x0000000103 [0x411fd073]
+> [   29.106351] CPU5 is up
+> [   29.218549] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+	^RES
+> [   29.234190] dwmac4: Master AXI performs any burst length
+	^RES
+> [   29.237263] dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+	^RES
+> [   29.244732] dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+	^RES
+> [   29.306981] Restarting tasks ... done.
+> [   29.311423] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   29.314095] random: crng reseeded on system resumption
+> [   29.321404] PM: suspend exit
+> [   29.370286] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   29.429655] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   29.496567] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   32.968855] Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+	^WQ
+> [   32.974779] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_mac_link_up: tx_lpi_timer 1000000
+	^WQ
+> [   32.988755] dwc-eth-dwmac 2490000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+	^WQ
+
+So here, phylink_resolve() runs later.
+
+I think if you run this same test with an earlier kernel, you'll get
+much the same random behaviour, maybe with different weightings on
+"success" and "failure" because of course the code has changed - but
+only because that's caused a change in timings of the already present
+race.
+
+> The more I have been testing, the more I feel that this is timing
+> related. In good cases, I see the MAC link coming up well after the
+> PHY. Even with your change I did see suspend work on occassion and
+> when it does I see ...
+> 
+> [   79.775977] dwc-eth-dwmac 2490000.ethernet eth0: configuring for phy/rgmii link mode
+> [   79.784196] dwmac4: Master AXI performs any burst length
+> [   79.787280] dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+> [   79.794736] dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+> [   79.816642] usb-conn-gpio 3520000.padctl:ports:usb2-0:connector: repeated role: device
+> [   79.820437] tegra-xusb 3530000.usb: Firmware timestamp: 2020-07-06 13:39:28 UTC
+> [   79.854481] OOM killer enabled.
+> [   79.855372] Restarting tasks ... done.
+> [   79.859460] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   79.861297] random: crng reseeded on system resumption
+> [   79.869773] PM: suspend exit
+> [   79.914909] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   79.974322] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   80.041236] VDDIO_SDMMC3_AP: voltage operation not allowed
+> [   83.547730] dwc-eth-dwmac 2490000.ethernet eth0: stmmac_mac_enable_tx_lpi: tx_lpi_timer 1000000
+> [   83.566859] dwmac4_set_eee_lpi_entry_timer: entered
+> [   83.571782] dwmac4_set_eee_lpi_entry_timer: GMAC4_LPI_CTRL_STATUS 0xf4240
+> [   83.651520] dwc-eth-dwmac 2490000.ethernet eth0: Energy-Efficient Ethernet initialized
+> [   83.659425] dwc-eth-dwmac 2490000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+> 
+> On a good case, the stmmac_mac_enable_tx_lpi call always happens
+> much later. It seems that after this change it is more often
+> that the link is coming up sooner and I guess probably too soon.
+> May be we were getting lucky before?
+
+I think this is pure lottery.
+
+> Anyway, I made the following change for testing and this is
+> working ...
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index b34ebb916b89..44187e230a1e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -7906,16 +7906,6 @@ int stmmac_resume(struct device *dev)
+>                         return ret;
+>         }
+> -       rtnl_lock();
+> -       if (device_may_wakeup(priv->device) && priv->plat->pmt) {
+> -               phylink_resume(priv->phylink);
+> -       } else {
+> -               phylink_resume(priv->phylink);
+> -               if (device_may_wakeup(priv->device))
+> -                       phylink_speed_up(priv->phylink);
+> -       }
+> -       rtnl_unlock();
+> -
+>         rtnl_lock();
+>         mutex_lock(&priv->lock);
+> @@ -7930,6 +7920,13 @@ int stmmac_resume(struct device *dev)
+>         stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
+> +       if (device_may_wakeup(priv->device) && priv->plat->pmt) {
+> +               phylink_resume(priv->phylink);
+> +       } else {
+> +               phylink_resume(priv->phylink);
+> +               if (device_may_wakeup(priv->device))
+> +                       phylink_speed_up(priv->phylink);
+> +       }
+>         stmmac_enable_all_queues(priv);
+>         stmmac_enable_all_dma_irq(priv);
+> 
+> I noticed that in __stmmac_open() the phylink_start() is
+> called after stmmac_hw_setup and stmmac_init_coalesce, where
+> as in stmmac_resume, phylink_resume() is called before these.
+> I am not saying that this is correct in any way, but seems
+> to indicate that the PHY is coming up too soon (at least for
+> this device). I have ran 100 suspend iterations with the above
+> and I have not seen any failures.
+> 
+> Let me know if you have any thoughts on this.
+
+With my phylink-maintainer hat on, this is definitely the correct
+solution - maybe even moving the phylink_resume() call later.
+phylink_resume() should only be called when the driver is prepared
+to handle and cope with an immediate call to the mac_link_up()
+method, and it's clear that its current placement is such that the
+driver isn't prepared for that.
+
+However... see:
+
+36d18b5664ef ("net: stmmac: start phylink instance before stmmac_hw_setup()")
+
+but I also questioned this in:
+
+https://lore.kernel.org/netdev/20210903080147.GS22278@shell.armlinux.org.uk/
+
+see the bottom of that email starting "While reading stmmac_resume(), I
+have to question the placement of this code block:". The response was:
+
+"There is a story here, SNPS EQOS IP need PHY provides RXC clock for
+MAC's receive logic, so we need phylink_start() to bring PHY link up,
+that make PHY resume back, PHY could stop RXC clock when in suspended
+state. This is the reason why calling phylink_start() before re-config
+MAC."
+
+However, in 21d9ba5bc551 ("net: phylink: add PHY_F_RXC_ALWAYS_ON to PHY
+dev flags") and associated patches, I added a way that phylib can be
+told that the MAC requires the RXC at all times.
+
+Romain Gantois arranged for this flag to always be set for stmmac in
+commit 58329b03a595 ("net: stmmac: Signal to PHY/PCS drivers to keep RX
+clock on"), which will pass PHY_F_RXC_ALWAYS_ON to the PHY driver.
+Whether the PHY driver honours this flag or not depends on which
+driver is used.
+
+So, my preference would be to move phylink_resume() later, removing
+the race condition. If there's any regressions, then we need to
+_properly_ solve them by ensuring that the PHY keeps the RX clock
+running by honouring PHY_F_RXC_ALWAYS_ON. That's going to need
+everyone to test their stmmac platforms to find all the cases that
+need fixing...
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
