@@ -1,111 +1,125 @@
-Return-Path: <netdev+bounces-167757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1223A3C1C8
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:18:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17726A3C20E
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473F03BD796
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC44E3A6C7D
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69331EFFA7;
-	Wed, 19 Feb 2025 14:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17771EB1BE;
+	Wed, 19 Feb 2025 14:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvS+xiVG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hO51AGUz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F741E520A;
-	Wed, 19 Feb 2025 14:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8501DFE32;
+	Wed, 19 Feb 2025 14:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739973998; cv=none; b=sDGBVfPyPdPvDl0fF4Jb7L0T3FzXV2I2YTzY8L8DlsExpgDygJqeMQ3kUkSc31uOfXP/N29s0R1Q8+kDZCCQ/ghsfdb7T+eavwBbOaEoK9Z2Svog4xFSPmV8jVQSkmmYd25ciBQqoe/GhJoKNq688xgVvcUrVGiQDRX/xCYx6pA=
+	t=1739975086; cv=none; b=XpyGQKVgzPq71lZRmYbiEiyoUju1WKkyHv35XkMZZYuEfGcm2CNdQ7vPL7nc8rIyqnuTPPEFS+JLiHy9/e3XlCuwbxhXwRcKwpQvn9wQlhlB/m5klNEOBnRfFdAfpiEvV8Gr8r1a/7wAe2UA8YYFwEQmWlqZG5TUw9ooyobFh1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739973998; c=relaxed/simple;
-	bh=BcIYev34/H5KdZyk/gL0x2bpmggeWZsheUrrtj9CCFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPhOHV6mmgjqRcrR34CvDwCKX032RRzumbUtdAKrj5SBA+5BCBqfwtePp1W0gmo8QP8m54L1IomnIwXx9rXzjPT0MOF2hsHrpPn6MzxzWkm1apX/viZxbRYdwAFmlqUmDBmgw2Oeogp13WQYILFDvQ5OzftusUhtLPi5St0329I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvS+xiVG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAEF1C4CED1;
-	Wed, 19 Feb 2025 14:06:37 +0000 (UTC)
+	s=arc-20240116; t=1739975086; c=relaxed/simple;
+	bh=mb10HQrEop5yEH1vJsBuc9BfNSAg9pXQ07Kq29Cz/3I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NV2Gs6s9KD4OH8JFcTbUzzUGZhQLGECa49kPPvqmvAcMi/9TAYaX+PI4CEsZ5fVb3PhffTEMXRyhPH0XlSXsDbAqlFoSanKOwxSVlrupW6vAE0gsq6ztyODwZlkJP1GXTj3YWxvb+a2ZaOOocXPFQ6TqFE2mh2a7ZGzr/fJnkdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hO51AGUz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 308E5C4CED1;
+	Wed, 19 Feb 2025 14:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739973998;
-	bh=BcIYev34/H5KdZyk/gL0x2bpmggeWZsheUrrtj9CCFA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IvS+xiVGhM7cXpY80CIZFSln5mDYng4e33aJhKTXiSJ4mkR16DG64mhQknqbIXHP9
-	 f6H4QpiRLvsmHd7bsbcIHxbJHuxonOLfBGmfoYAHBQOJTuCNFlrr7JoL0+1TO8HOrs
-	 PYNJFeLNwR7mSPlZn6vreiCi/e1MgXRawCvBWuTfnvDTqnfhHnJTHC/MZ37PNob7py
-	 z/HrVzxvfOZGZ584tR7DaywqTF/5Jj/GptSmaM47shFFZJVnECD8+naPO5ct3Ef7nF
-	 Hs3Uj2ZPWun8bdU5ZOlXsKgsQ0VF7x4vv7aVQ7kOsxnUkYUqd027jH/2KP5X58wgqY
-	 k5l585sqhCFuw==
-Date: Wed, 19 Feb 2025 08:06:36 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: conor+dt@kernel.org, krzk+dt@kernel.org, linux-mips@vger.kernel.org,
-	tsbogend@alpha.franken.de, andrew+netdev@lunn.ch, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
-	lee@kernel.org, davem@davemloft.net
-Subject: Re: [RESEND PATCH net-next 3/5] dt-bindings: net: Add Realtek MDIO
- controller
-Message-ID: <173997391420.2383401.13425265155310657100.robh@kernel.org>
-References: <20250218195216.1034220-1-chris.packham@alliedtelesis.co.nz>
- <20250218195216.1034220-4-chris.packham@alliedtelesis.co.nz>
+	s=k20201202; t=1739975086;
+	bh=mb10HQrEop5yEH1vJsBuc9BfNSAg9pXQ07Kq29Cz/3I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hO51AGUzLeToDnMwzJdCR7KOFwTXKqQmNsJ7bUPBsyPWZqS0woYeWrrhCOoTnyX/N
+	 GCX35wXWLAaGfmvml4ZAVzeYSjlsdGZfyND0WjU6YzHETI1xf8vgDKcMz3Wdlv80hm
+	 Ax8EJVePGOpkaw8rz+X7StChQYuGLVHbdlF4+cNh1AIDfCYyGMEeZtKjjGxbfgRMyR
+	 BzfX6A0zBFYHj/6nWbEPB7cuSJXwrUNt0w3rvdO9BK5Vl0MJk6D4zBo+lUjfgY8u+j
+	 CBXBB56QVLvpS3dJNI68ydA/i3jtJu6ZChQn4y0ctFhKTgMrwLb65tnHfyj18KCysc
+	 59sEVZqUA1Gzw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Suman Ghosh <sumang@marvell.com>,
+	Sai Krishna <saikrishnag@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] octeontx2: hide unused label
+Date: Wed, 19 Feb 2025 15:24:14 +0100
+Message-Id: <20250219142433.63312-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218195216.1034220-4-chris.packham@alliedtelesis.co.nz>
+Content-Transfer-Encoding: 8bit
 
+From: Arnd Bergmann <arnd@arndb.de>
 
-On Wed, 19 Feb 2025 08:52:14 +1300, Chris Packham wrote:
-> Add dtschema for the MDIO controller found in the RTL9300 Ethernet
-> switch. The controller is slightly unusual in that direct MDIO
-> communication is not possible. We model the MDIO controller with the
-> MDIO buses as child nodes and the PHYs as children of the buses. The
-> mapping of switch port number to MDIO bus/addr requires the
-> ethernet-ports sibling to provide the mapping via the phy-handle
-> property.
-> 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-> ---
-> 
-> Notes:
->     This is technically v7 of [1] and [2] which are combined now that
->     rtl9301-switch.yaml under net/ the only change from those is that the
->     $ref: in rtl9301-switch.yaml can now use a relative path
-> 
->     I could technically do away with the reg property on the mdio-controller
->     node. I don't currently need to use it in my driver and it looks like
->     the register offsets are the same between the RTL9300 and RTL9310.
-> 
->     [1] - https://lore.kernel.org/lkml/20250204030249.1965444-6-chris.packham@alliedtelesis.co.nz/
->     [2] - https://lore.kernel.org/lkml/20250204030249.1965444-4-chris.packham@alliedtelesis.co.nz/
-> 
->  .../bindings/net/realtek,rtl9301-mdio.yaml    | 86 +++++++++++++++++++
->  .../bindings/net/realtek,rtl9301-switch.yaml  | 31 +++++++
->  2 files changed, 117 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl9301-mdio.yaml
-> 
+A previous patch introduces a build-time warning when CONFIG_DCB
+is disabled:
 
+drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_probe':
+drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:3217:1: error: label 'err_free_zc_bmap' defined but not used [-Werror=unused-label]
+drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c: In function 'otx2vf_probe':
+drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c:740:1: error: label 'err_free_zc_bmap' defined but not used [-Werror=unused-label]
 
-Please add Acked-by/Reviewed-by tags when posting new versions. However,
-there's no need to repost patches *only* to add the tags. The upstream
-maintainer will do that for acks received on the version they apply.
+Add the same #ifdef check around it.
 
-If a tag was not added on purpose, please state why and what changed.
+Fixes: efabce290151 ("octeontx2-pf: AF_XDP zero copy receive support")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 ++
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Missing tags:
-
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index c7c562f0f5e5..4873225f77be 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -3214,8 +3214,10 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	return 0;
+ 
++#ifdef CONfiG_DCB
+ err_free_zc_bmap:
+ 	bitmap_free(pf->af_xdp_zc_qidx);
++#endif
+ err_sriov_cleannup:
+ 	otx2_sriov_vfcfg_cleanup(pf);
+ err_pf_sriov_init:
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index 63ddd262d122..7ef3ba477d49 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -737,8 +737,10 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	return 0;
+ 
++#ifdef CONFIG_DCB
+ err_free_zc_bmap:
+ 	bitmap_free(vf->af_xdp_zc_qidx);
++#endif
+ err_unreg_devlink:
+ 	otx2_unregister_dl(vf);
+ err_shutdown_tc:
+-- 
+2.39.5
 
 
