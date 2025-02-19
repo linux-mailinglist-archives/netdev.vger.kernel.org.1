@@ -1,125 +1,121 @@
-Return-Path: <netdev+bounces-167758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17726A3C20E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:25:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31CDA3C229
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 15:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC44E3A6C7D
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:24:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF7283A2DCE
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 14:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17771EB1BE;
-	Wed, 19 Feb 2025 14:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AAA1E0086;
+	Wed, 19 Feb 2025 14:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hO51AGUz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uRSNdgHS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8501DFE32;
-	Wed, 19 Feb 2025 14:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE831DA4E;
+	Wed, 19 Feb 2025 14:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739975086; cv=none; b=XpyGQKVgzPq71lZRmYbiEiyoUju1WKkyHv35XkMZZYuEfGcm2CNdQ7vPL7nc8rIyqnuTPPEFS+JLiHy9/e3XlCuwbxhXwRcKwpQvn9wQlhlB/m5klNEOBnRfFdAfpiEvV8Gr8r1a/7wAe2UA8YYFwEQmWlqZG5TUw9ooyobFh1s=
+	t=1739975298; cv=none; b=Yc/iUXO3QMaTys/sx6xvGSJZ0Q4HkC6TBkKWLdl5o58r3SUZuRG4s/ip/bcSOizyk7RITPExeMlfFciCRvjJ5l43QMt3XCI974Zmddzu2qg9yLKyj+Ay15EZrtdQOvP6pbVG9SduI3VrVosdNwCnmCn9GxzxUg28FIpzK4lv24Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739975086; c=relaxed/simple;
-	bh=mb10HQrEop5yEH1vJsBuc9BfNSAg9pXQ07Kq29Cz/3I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NV2Gs6s9KD4OH8JFcTbUzzUGZhQLGECa49kPPvqmvAcMi/9TAYaX+PI4CEsZ5fVb3PhffTEMXRyhPH0XlSXsDbAqlFoSanKOwxSVlrupW6vAE0gsq6ztyODwZlkJP1GXTj3YWxvb+a2ZaOOocXPFQ6TqFE2mh2a7ZGzr/fJnkdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hO51AGUz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 308E5C4CED1;
-	Wed, 19 Feb 2025 14:24:43 +0000 (UTC)
+	s=arc-20240116; t=1739975298; c=relaxed/simple;
+	bh=9Etpmf5e22Xbdm4JlYWVaFCYjn0kXB5K0jMskE7II08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bopdIVg9P/qnF+wtKlcaeXqpZWUK3gTgWyFfVCe4UxDBU9ED5u/aQ+js17prPt/3DNNmOxx8MUgs3MUq4Hw1l7mLkTgjs4eyKPV3TB+RS106Sbz6zutcyrqLQ+dROOAqUvtRZK+NcN+4KQOwmRo0NLm/M21TTmYYCiawJyoRbWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uRSNdgHS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C1FC4CED1;
+	Wed, 19 Feb 2025 14:28:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739975086;
-	bh=mb10HQrEop5yEH1vJsBuc9BfNSAg9pXQ07Kq29Cz/3I=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hO51AGUzLeToDnMwzJdCR7KOFwTXKqQmNsJ7bUPBsyPWZqS0woYeWrrhCOoTnyX/N
-	 GCX35wXWLAaGfmvml4ZAVzeYSjlsdGZfyND0WjU6YzHETI1xf8vgDKcMz3Wdlv80hm
-	 Ax8EJVePGOpkaw8rz+X7StChQYuGLVHbdlF4+cNh1AIDfCYyGMEeZtKjjGxbfgRMyR
-	 BzfX6A0zBFYHj/6nWbEPB7cuSJXwrUNt0w3rvdO9BK5Vl0MJk6D4zBo+lUjfgY8u+j
-	 CBXBB56QVLvpS3dJNI68ydA/i3jtJu6ZChQn4y0ctFhKTgMrwLb65tnHfyj18KCysc
-	 59sEVZqUA1Gzw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=k20201202; t=1739975298;
+	bh=9Etpmf5e22Xbdm4JlYWVaFCYjn0kXB5K0jMskE7II08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uRSNdgHS5lUos3u0kxJn5EdfIZ713GGq46yD5lCZiUqXEWiw6mjzsrp7qO5b03esn
+	 o0XJuWKQc9hai/KjvKDBGODJWjQSuuYcYUSkHkAIxtZwfsBG/L0agJON57ZMPvtsjD
+	 E+XlIEVSFzGLor9wEFOnOZkXuwniFlPyKXS1av8S0o3tL3odomtiX7g75U5LTCA5tT
+	 hivCDJevYZB/pndz3G/wydIK1uOno2XWeSsANU0A7Tlzh3q7HfoVbb5JEjYYaROGGt
+	 thzoXw6vftNlltbzAfNNyelG1e3X6QyWJ7gM4IzjCI5bmA7OVBBXJFHabND6BSnoAK
+	 q+kjpleJfSjJg==
+Date: Wed, 19 Feb 2025 16:28:12 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Suman Ghosh <sumang@marvell.com>,
-	Sai Krishna <saikrishnag@marvell.com>,
-	Nithin Dabilpuram <ndabilpuram@marvell.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] octeontx2: hide unused label
-Date: Wed, 19 Feb 2025 15:24:14 +0100
-Message-Id: <20250219142433.63312-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Yael Chemla <ychemla@nvidia.com>
+Subject: Re: [PATCH net] xfrm_output: Force software GSO only in tunnel mode
+Message-ID: <20250219142812.GG53094@unreal>
+References: <20250219105248.226962-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250219105248.226962-1-cratiu@nvidia.com>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Feb 19, 2025 at 12:52:48PM +0200, Cosmin Ratiu wrote:
+> The cited commit fixed a software GSO bug with VXLAN + IPSec in tunnel
+> mode. Unfortunately, it is slightly broader than necessary, as it also
+> severely affects performance for Geneve + IPSec transport mode over a
+> device capable of both HW GSO and IPSec crypto offload. In this case,
+> xfrm_output unnecessarily triggers software GSO instead of letting the
+> HW do it. In simple iperf3 tests over Geneve + IPSec transport mode over
+> a back-2-back pair of NICs with MTU 1500, the performance was observed
+> to be up to 6x worse when doing software GSO compared to leaving it to
+> the hardware.
+> 
+> This commit makes xfrm_output only trigger software GSO in crypto
+> offload cases for already encapsulated packets in tunnel mode, as not
+> doing so would then cause the inner tunnel skb->inner_networking_header
+> to be overwritten and break software GSO for that packet later if the
+> device turns out to not be capable of HW GSO.
+> 
+> Taking a closer look at the conditions for the original bug, to better
+> understand the reasons for this change:
+> - vxlan_build_skb -> iptunnel_handle_offloads sets inner_protocol and
+>   inner network header.
+> - then, udp_tunnel_xmit_skb -> ip_tunnel_xmit adds outer transport and
+>   network headers.
+> - later in the xmit path, xfrm_output -> xfrm_outer_mode_output ->
+>   xfrm4_prepare_output -> xfrm4_tunnel_encap_add overwrites the inner
+>   network header with the one set in ip_tunnel_xmit before adding the
+>   second outer header.
+> - __dev_queue_xmit -> validate_xmit_skb checks whether GSO segmentation
+>   needs to happen based on dev features. In the original bug, the hw
+>   couldn't segment the packets, so skb_gso_segment was invoked.
+> - deep in the .gso_segment callback machinery, __skb_udp_tunnel_segment
+>   tries to use the wrong inner network header, expecting the one set in
+>   iptunnel_handle_offloads but getting the one set by xfrm instead.
+> - a bit later, ipv6_gso_segment accesses the wrong memory based on that
+>   wrong inner network header.
+> 
+> With the new change, the original bug (or similar ones) cannot happen
+> again, as xfrm will now trigger software GSO before applying a tunnel.
+> This concern doesn't exist in packet offload mode, when the HW adds
+> encapsulation headers. For the non-offloaded packets (crypto in SW),
+> software GSO is still done unconditionally in the else branch.
+> 
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+> Fixes: a204aef9fd77 ("xfrm: call xfrm_output_gso when inner_protocol is set in xfrm_output")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> ---
+>  net/xfrm/xfrm_output.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-A previous patch introduces a build-time warning when CONFIG_DCB
-is disabled:
-
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_probe':
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:3217:1: error: label 'err_free_zc_bmap' defined but not used [-Werror=unused-label]
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c: In function 'otx2vf_probe':
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c:740:1: error: label 'err_free_zc_bmap' defined but not used [-Werror=unused-label]
-
-Add the same #ifdef check around it.
-
-Fixes: efabce290151 ("octeontx2-pf: AF_XDP zero copy receive support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 ++
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 2 ++
- 2 files changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index c7c562f0f5e5..4873225f77be 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3214,8 +3214,10 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	return 0;
- 
-+#ifdef CONfiG_DCB
- err_free_zc_bmap:
- 	bitmap_free(pf->af_xdp_zc_qidx);
-+#endif
- err_sriov_cleannup:
- 	otx2_sriov_vfcfg_cleanup(pf);
- err_pf_sriov_init:
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 63ddd262d122..7ef3ba477d49 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -737,8 +737,10 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	return 0;
- 
-+#ifdef CONFIG_DCB
- err_free_zc_bmap:
- 	bitmap_free(vf->af_xdp_zc_qidx);
-+#endif
- err_unreg_devlink:
- 	otx2_unregister_dl(vf);
- err_shutdown_tc:
--- 
-2.39.5
-
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
