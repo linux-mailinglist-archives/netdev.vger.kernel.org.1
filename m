@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-167793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E688DA3C54E
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 17:43:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F039BA3C67C
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 18:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4872717859B
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 16:42:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE258179C5A
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 17:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675CE20D4E5;
-	Wed, 19 Feb 2025 16:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF7C1B4254;
+	Wed, 19 Feb 2025 17:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ozypuuk2";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="oHs03R2q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GtOWIqMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D247820CCFF
-	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 16:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AF1286284;
+	Wed, 19 Feb 2025 17:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739983323; cv=none; b=NXlesTs3qCKBg1qISxfRu1QaTj9ae/R0T7Qrp7ibfKrjsAGvztP7+WOHYrEexo4avrjK1WDuYcsn5GT4XihNocCUzVrAamcNBPAyJy/RXfO5Nz3BEz3GscIhMFmRW4uZ75FetMo1UaL2oJm3ygVBJuZjlFb6GHjGffsl1/hTlI8=
+	t=1739987174; cv=none; b=HZWMBTTduEMFahaLlu6yBNy4MrFr3g1aablNSta8ULAuAmHO7n7pAUOJS3jfZWSQypO9EMagKH+xO9RRYM72FT6UITqumdljAiFcSWo0A4QCluqcU2b0EZHpMa+d3JX0pJP3H2w8iLn8gYx8NK9OKgUci8kHtYgmQy4aC0s8dJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739983323; c=relaxed/simple;
-	bh=3WE9c28nTenyOY01h4FVikYtEGe8vofatjLwnE1E6n8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IvkM/tR2X7hfX+lt549yTnoaU+W5b9RGIbGOrAYi14S8Ha40xPhUl7JK/umq+jvUDICTHvjQSM0B8cSGDzkt+e90sB5AW7DM1nXBRoHu/mRox72QjRGPd0/KywP7md7Ye8VaNOXVn+SGuyAiXxUCNHPT0JZtzfCWDsqc3Ds0hiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ozypuuk2; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=oHs03R2q; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 19 Feb 2025 17:41:58 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1739983320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xURdQvOTBYw1m16Ux5gg7ydKENxtpgSZTp0XlJmrw5c=;
-	b=Ozypuuk2Evj9/td5deWq4K7fnOM5aAQh2VMN8veuAZk22WThT+CmEooMOreCNL0Y9pYFNJ
-	YlDWz49SSsDl5NhbqJwA8TEs0qqR1l6+6wQZ4/Hb8b8MH5+XOazHckPaBoZYzD3YaewxSU
-	vytynPJp2aBIImBCiF0u5rIgrxnzw9iJhDaBDf8bWPJHcksFqxRxINctjuxUm9vwfYdGkB
-	tWKzB2GwriMzuXkJBhI5cXNh2VQnXy3N8LXe1sFPI16a2D1DQVYjTB7jn96UcuBVpgnzPF
-	W4mvQd6ySikDhvMytEBBwA1o7bTLXHOYuYrWs2OjDJBQrlWPVYhyizari3lwNA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1739983320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xURdQvOTBYw1m16Ux5gg7ydKENxtpgSZTp0XlJmrw5c=;
-	b=oHs03R2qrVrFNPrlpYwTwhwZgQ34Iyfrj4mpb01qeuKBPQ5OcGoVjCmwhQlzQOdOm5k3Ei
-	CPsdL2FcMC6A9bAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Wander Lairson Costa <wander@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	andrew+netdev@lunn.ch, netdev@vger.kernel.org, clrkwllms@kernel.org,
-	jgarzik@redhat.com, yuma@redhat.com, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
- for PREEMPT_RT
-Message-ID: <20250219164158.qYsR4V25@linutronix.de>
-References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
- <20250205094818.I-Jl44AK@linutronix.de>
- <mrw3tpwsravsaibkcpptdkko3ff6qtk6w6ernqvjisk4l7owok@q6hmxkzcdkey>
- <20250206115914.VfzGTwD8@linutronix.de>
- <zy3irjybyc32hnow3ckhkfsrtfm5nev44aeovinlkkfc6tyyjv@gcblibp5ng3o>
- <20250212151108.jI8qODdD@linutronix.de>
- <CAAq0SU=aU=xpw0bDwaanFh_-r5tts0QNCtSmoteP3dM8-K6BFA@mail.gmail.com>
- <20250212152925.M7otWPiV@linutronix.de>
- <mtmm2bwn3lrsmsx3evzemzjvaddmzfvnk6g37yr3fmzb77bpyu@ffto5sq7nvfw>
- <20250219102916.78b64ee4@gandalf.local.home>
+	s=arc-20240116; t=1739987174; c=relaxed/simple;
+	bh=OqS1vKlIpdTVaIkmp8i1OWbEscx84902VNdjPoE0Guk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EhaDrq8E3BIeEqT3pjYdbPGWH+3ep6trBUAr4+4+K0R2p5VUqed/Pe23Y0qWdDCimSAjqEvPjOKB4B6iGd8zIK5IzBbfF8zR/qUY/t1W5+EmdCVfjomhan0CLyvRNgVHfdsDvooWIWOlX8PAJvBv+6gr8BwUfmYiA2QDpDefLJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GtOWIqMo; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739987173; x=1771523173;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OqS1vKlIpdTVaIkmp8i1OWbEscx84902VNdjPoE0Guk=;
+  b=GtOWIqMoAmbpt68jLr2q5YBoshbmsOAfliAokHEEYE4E1xiTsQFO4jR1
+   cCI+sdvvomx0UhL35D3fchjra7RnKdQhK2AY2L+1TutCKjPz2H2/1yZRk
+   zjbf4WlDH7ozkDd5QxY8p0OCTyfO2Mk6Cbrz9WSSwQu0usJ4X2hS5JO9b
+   5zCSWSm09ffMFv28IvlECOxylrOHXtFbpeWvSMY7vyMrGPOIZEFMgur7P
+   gAbeoR4La28I6JXHcr50+eIpxIr6dUusRtq3AZnSNmOVn73MSd1OH5qQm
+   y+2bKBW+8d2fMgNy2dEMoPKg69P2iu8mwRAs7zELnfmkfFRzodfdNEQIq
+   Q==;
+X-CSE-ConnectionGUID: CYLpdAS9QjSenVm8uBckkg==
+X-CSE-MsgGUID: ZAI+qLHTQQe53vuxTOTi9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="50952999"
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="50952999"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 09:46:12 -0800
+X-CSE-ConnectionGUID: JfsQ4rI5SmOgRwqeVyN97g==
+X-CSE-MsgGUID: WUiLLwANSHyTznJPs8d55Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="119427318"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa005.fm.intel.com with ESMTP; 19 Feb 2025 08:44:32 -0800
+Received: from pkitszel-desk.intel.com (unknown [10.245.246.109])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id C85EE33E9A;
+	Wed, 19 Feb 2025 16:44:16 +0000 (GMT)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Cc: netdev@vger.kernel.org,
+	Konrad Knitter <konrad.knitter@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org,
+	ITP Upstream <nxne.cnse.osdt.itp.upstreaming@intel.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [RFC net-next v2 0/2] devlink: whole-device, resource .occ_set()
+Date: Wed, 19 Feb 2025 17:32:53 +0100
+Message-ID: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250219102916.78b64ee4@gandalf.local.home>
+Content-Transfer-Encoding: 8bit
 
-On 2025-02-19 10:29:16 [-0500], Steven Rostedt wrote:
-> On Tue, 18 Feb 2025 11:50:55 -0300
-> Wander Lairson Costa <wander@redhat.com> wrote:
-> 
-> >      kworker/0:0-8       [000] b..13  2121.730643: e1000_write_posted_mbx <-e1000_rar_set_vf
-> >      kworker/0:0-8       [000] D.Zf2  2121.730645: igbvf_reset_L14: (igbvf_reset+0x62/0x120 [igbvf])
-> >      kworker/0:0-8       [000] .N...  2121.730649: igbvf_reset_L16: (igbvf_reset+0x7b/0x120 [igbvf])
-> >   irq/63-ens14f0-1112    [000] b..12  2121.730652: igb_msix_other <-irq_thread_fn
-> 
-> The preempt count is hex, so 'f' means 15. But that that latency field looks corrupted.
 
-It is high but it kind of makes sense. We cap it at 15 so it might be
-higher. But then we would have nesting but why? What confuses me a bit
-is the Z because this would indicate NMI.
-Also the entry after is a N and nothing else. I would expect a
-sched_switch right after unlock so there should be no further entry from
-kworker which must run at RT priority because it is boosted by
-irq/63-ens14f0-1112.
+I'm working on ice+iavf changes that utilize the two devlink patches
+of this RFC series. The two are related in that I will group them anyway
+for my actual submission.
 
-> Thanks,
-> 
-> -- Steve
+Patch 1: add an option for drivers like ice (devlink instance per PF)
+	to add a whole-device devlink instance, that wraps them together.
 
-Sebastian
+Patch 2: add resource occupation setter and a (better) mode of resource
+	control for users
+
+Przemek Kitszel (2):
+  devlink: add whole device devlink instance
+  devlink: give user option to allocate resources
+
+ net/devlink/devl_internal.h | 14 +++---
+ net/devlink/core.c          | 58 ++++++++++++++++++-----
+ net/devlink/netlink.c       |  4 +-
+ net/devlink/port.c          |  4 +-
+ net/devlink/resource.c      | 94 +++++++++++++++++++++++++++++--------
+ 5 files changed, 132 insertions(+), 42 deletions(-)
+
+-- 
+2.46.0
+
 
