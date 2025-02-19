@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-167572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0829DA3AF51
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:10:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7881EA3AF54
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 03:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CD5E7A5983
-	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:09:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC3061897D0D
+	for <lists+netdev@lfdr.de>; Wed, 19 Feb 2025 02:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8338B14B08C;
-	Wed, 19 Feb 2025 02:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F39717BB0D;
+	Wed, 19 Feb 2025 02:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sPqNhZ8L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MXfxxAze"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB1622301;
-	Wed, 19 Feb 2025 02:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE89C208CA
+	for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 02:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739931004; cv=none; b=BGMLiXYXF5mRdlWw3b11AHPO86qfkkxvwgvFXdfRG1QlJu0N+L8ckhhodWJyYY9YR8xHTtPnVXUdWCvJNFl95Izs4o903/RESui98/2++55XsfnJkQDXVB/ufA44u6/pVAqhB8NtzLnSnxZe78stfwhXsc1mtPFPC69E8mYFrZk=
+	t=1739931005; cv=none; b=n9Y43oPemaSxfwfEsKQv9k92lWZlNCPNuFZs6S0lYn2cQm40kJ3uzmSU9jeSMtPh1vfHOw6asnjNp7DwaXLYJp3V7nZJp6zk9lOBqA+KqIXfvWcH1YcJtnd4GVsZmt73lfJ/C2CLHptUWD3rDY/+FuDg5Y+z62pbLxYJ+NkBrd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739931004; c=relaxed/simple;
-	bh=1vuRrzCv9xweqkmuH+srxMwEH5MPJ0Ub298fgEapBkE=;
+	s=arc-20240116; t=1739931005; c=relaxed/simple;
+	bh=z3SGjAhgYqyUWLEJ6PwkH2rifuxrP4WBeNIF36wbEsY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mLn8Tu2sPHpDfaWl0/votc/swq4xNrjQDMERR26znW8e2qqgRpyD0LWPtx284m52p5OlsjTFiOvXFgYbRqwlKGllfDjUw3vemg4QDd+trNJOeEhazsR4dC0mrP06WKCR7YR9RMqn3PvNUMJ7Y/LBY3+mA8VL2mRgAgXgQG8Rumk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sPqNhZ8L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C2A3C4CEE2;
-	Wed, 19 Feb 2025 02:10:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=f5FmSn/rEzCRwCJoivNrTgcv3M3M9K/5vGQFjbcrrC2Vv42ZlCxx6eRuAzJMPFGAo5BouKInDlEL81N6DtvlWqoKPz5LD+tp4UzPe+sW+o2aEBgXT8AUhSajq/sLe+60Yi/KypbYdRlfnLverDPdsMa0a7f9lPKA4UTI9t9Fvd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MXfxxAze; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5606EC4CEE9;
+	Wed, 19 Feb 2025 02:10:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739931003;
-	bh=1vuRrzCv9xweqkmuH+srxMwEH5MPJ0Ub298fgEapBkE=;
+	s=k20201202; t=1739931005;
+	bh=z3SGjAhgYqyUWLEJ6PwkH2rifuxrP4WBeNIF36wbEsY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sPqNhZ8LhVCX5z4gNqkF1PPv0lZoBTxTARFDdfZiMJigB7IUEQ755p5S4k3jXbOsG
-	 yP1Dsb679iism7Yz0EDTG4iozS3bgGZyDw/5SX9xCTOLa5u+AefnIUhrOJjh4IoIVo
-	 tiyyQsAVqHJk9BnRr6Kpm605XQvIDKgb4W4E9WR2l5ioAus7hrZIU7XcsrlDR8Zz/b
-	 mFiNUp7t+JDpHBeM8EXgKk1T68dbS5wD4FW0ML6/z/cPyU5fL0QQBXLVqHRyUG5K51
-	 6j5TlQ2O5l6kUgEi4A0op4AMrlYL0aa1O6MyGEtIz3w9klXHvMY8efXx3LIiVwGXHG
-	 dzz1JsnInEULg==
+	b=MXfxxAzeVAbvwUHjGZwrbz86wQc2ZMynYNwT2+DuzEj4r4i/90TrzdSJSqvDh4XcQ
+	 Z00n+el4/1rZs25+9PP5KhwJsNvC+HYe2Owr0pvD0vPz0tMmSCDN6x4Q8sOWJL2T+8
+	 pdTZNd30OX1cRkBGBfK9oGLtJhGEb3QyjBYATDW23VD/bu99cZ8wk0j+CmayY0w1hU
+	 Zb75kyGqpWuyHTw6FTCFwRL6NE1q6g9E903M+WT9cNgYBw+3cZCMzF9pgUJnmqkMpw
+	 DhcFH9Ie4q/36beGUDf6eFMNuWCgBLKsCT6trqMrNASZ//podKsZyChHSZy1q3KmU7
+	 KOvf6dsai/KSA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34055380AAE9;
-	Wed, 19 Feb 2025 02:10:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEF3380AAE9;
+	Wed, 19 Feb 2025 02:10:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] gve: set xdp redirect target only when it is available
+Subject: Re: [PATCH net] MAINTAINERS: trim the GVE entry
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173993103376.103969.7360725098289491054.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Feb 2025 02:10:33 +0000
-References: <20250214224417.1237818-1-joshwash@google.com>
-In-Reply-To: <20250214224417.1237818-1-joshwash@google.com>
-To: Joshua Washington <joshwash@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- stable@kernel.org, stable@vger.kernel.org, pkaligineedi@google.com,
- jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch,
- edumazet@google.com, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, willemb@google.com,
- ziweixiao@google.com, shailend@google.com, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
+ <173993103539.103969.6233271461379198908.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Feb 2025 02:10:35 +0000
+References: <20250215162646.2446559-1-kuba@kernel.org>
+In-Reply-To: <20250215162646.2446559-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jeroendb@google.com, hramamurthy@google.com, joshwash@google.com,
+ willemb@google.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 14 Feb 2025 14:43:59 -0800 you wrote:
-> From: Joshua Washington <joshwash@google.com>
+On Sat, 15 Feb 2025 08:26:46 -0800 you wrote:
+> We requested in the past that GVE patches coming out of Google should
+> be submitted only by GVE maintainers. There were too many patches
+> posted which didn't follow the subsystem guidance.
 > 
-> Before this patch the NETDEV_XDP_ACT_NDO_XMIT XDP feature flag is set by
-> default as part of driver initialization, and is never cleared. However,
-> this flag differs from others in that it is used as an indicator for
-> whether the driver is ready to perform the ndo_xdp_xmit operation as
-> part of an XDP_REDIRECT. Kernel helpers
-> xdp_features_(set|clear)_redirect_target exist to convey this meaning.
+> Recently Joshua was added to maintainers, but even tho he was asked
+> to follow the netdev "FAQ" in the past [1] he still does not follow
+> the trivial rules. It is not reasonable for a person who hasn't read
+> the maintainer entry for the subsystem to be a driver maintainer.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] gve: set xdp redirect target only when it is available
-    https://git.kernel.org/netdev/net/c/415cadd50546
+  - [net] MAINTAINERS: trim the GVE entry
+    https://git.kernel.org/netdev/net/c/2f56be7f52ec
 
 You are awesome, thank you!
 -- 
