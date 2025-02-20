@@ -1,98 +1,201 @@
-Return-Path: <netdev+bounces-167961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A865A3CF79
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BDE3A3CF83
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5040C3B85D6
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:50:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F312B1894580
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9421D8A0A;
-	Thu, 20 Feb 2025 02:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D74F1D79A6;
+	Thu, 20 Feb 2025 02:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/EOSy0/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V0BlL5pm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02817288D6;
-	Thu, 20 Feb 2025 02:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0591CD1E0;
+	Thu, 20 Feb 2025 02:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740019804; cv=none; b=OnBmtyqlrbUgXXZrjpHbfJT9uuXmQbSzoeWV2YIomG4pJToAvLTkP+Qenw+3CAPr6CR2hw/+X+OgCkxnC7ZyFm+kT202h1o4ZJzNWtI/r8eSeH88aGTdPGalrTOPPr1NGvsYNkWoUzXYYPB++29q/lSMbpFq7rAlEhRmBY4AsPo=
+	t=1740020053; cv=none; b=n+5OQV4dc/MXKNwgQUsDOPxInHYCiGovSUEMHCtNiJIjJr7jagajv5QYYMNdLlCCRE2hbGjMCD/dh1XfqKCULPUCg4NnuKENJJsby6LRHh3yniBzxzo3EaFjbnma7Yawaf0YDsOXndFxRCIKvzY4eHCmaAl2Nh65GIRKPdQuDU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740019804; c=relaxed/simple;
-	bh=1EFBr8jGP7VdlAZIMNCHUpVJedr+3H5A+v6tnrAdm6M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DNcipPawbsiSuJiVEuOF6DqIBjqghRjWbHlW0OiRN0E13AtYzQuGqx7YgePxlJNfFLYpVU8cb1VCQII39/JTooVxeqF2nGZXcclb9N/Gq76fUxx/+EvLb1S/BzvbOjtEEOviQVV45l279rNPXjCTV+Ci+7L3RjHjVXi0yxxu09I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/EOSy0/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D0D0C4CED6;
-	Thu, 20 Feb 2025 02:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740019802;
-	bh=1EFBr8jGP7VdlAZIMNCHUpVJedr+3H5A+v6tnrAdm6M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V/EOSy0//qGjdH+D8FiP9p0kOEqu8tAgehAmADlymKcwaJbW2s111QT2QjUIBQTcz
-	 VDb7FvJ2NuJfAZUKPHfc38papOI+hKNncPHfW/6Wt3Yuv4in5IqaZNVg/NgEWw9wqM
-	 eN5PmzX8+ixpsrVmCv2TcQlMrMZP6vaafIDXA5z4SFIBdgPbzOWXkKrL/ldUYFz6zM
-	 nMkViafJ+XTAgKSd5UATJaiQxK5ayZfp/PSUtQHaZQ0XlmMhOFVb+OcJXgTNxAgVCi
-	 ZyB2K3/cjPTUTzeVrlBAzvS8MJSpEhbYqXA2NZc2Mzvtfngv6BfK+PJrpmGpuDRnx0
-	 6lPOXO30459fg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34B68380AAEC;
-	Thu, 20 Feb 2025 02:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1740020053; c=relaxed/simple;
+	bh=4ihQ18W37YEybWTFHP6Gwh3fdEE8cMA2BHRpm9XvhAs=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=k7VHV09u4t6D4b7TB2oAVWRGC7nus5kCOfljzjUXMCel9J4nts0yxQiNqSCKY+3ziS2dFUBuVmNvnW0P0cnSFF/+zdxx2OAWNiqA/znjuZ+lKcH2+jgxIlnMSIy+jKYlFhZ07XcYitSJ68OF+BTH+RQLJ1Hr2PNNXtGKjETSANs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V0BlL5pm; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740020052; x=1771556052;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4ihQ18W37YEybWTFHP6Gwh3fdEE8cMA2BHRpm9XvhAs=;
+  b=V0BlL5pmoPkhaPOde0V7jBjb8fR5i+aUxeyg678uPk8PTxhephrvBI8x
+   1YwuilyMPOHqezuU/5fxYxfQJux9MVcXV7PdVztgdP35Xlm6YRhiGl3qZ
+   vjuGLhooXXcEG3s+Sd2NyJADC3JhQGjHiTJ9iB2VEQSMVostyiYq5hI1e
+   2pKE5XZUDSXOd2mRfWUX+orLME4slMWonEPTQD1Hwv209PIZl2KngQJdZ
+   UuKO9Ov72IdCMdyFxXm1LAEAuSyqcCXL7gxFQzywqmvomcUovYZZoI889
+   MeNvxcVBNPW0n4ktWpZoZ4KYGKrM87/AZIsKHT/4cv32hzcPccwCI7OS6
+   w==;
+X-CSE-ConnectionGUID: MmACAzwdTaGKNOVOLl+aOg==
+X-CSE-MsgGUID: AYfnXw3NSNiGgq5ARtps0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="41041860"
+X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
+   d="scan'208";a="41041860"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 18:54:11 -0800
+X-CSE-ConnectionGUID: McM5zojKT0+O6ISKQfpAYA==
+X-CSE-MsgGUID: qUnE/Qg0RkyVbNylouun2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
+   d="scan'208";a="115104228"
+Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
+  by fmviesa008.fm.intel.com with ESMTP; 19 Feb 2025 18:54:03 -0800
+From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	bpf@vger.kernel.org
+Subject: [PATCH iwl-next v5 0/9] igc: Add support for Frame Preemption feature in IGC
+Date: Wed, 19 Feb 2025 21:53:40 -0500
+Message-Id: <20250220025349.3007793-1-faizal.abdul.rahim@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] net: dsa: b53: mdio: add support for BCM53101
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174001983300.821562.10124139591919697311.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Feb 2025 02:50:33 +0000
-References: <20250217080503.1390282-1-claus.stovgaard@gmail.com>
-In-Reply-To: <20250217080503.1390282-1-claus.stovgaard@gmail.com>
-To: Claus Stovgaard <claus.stovgaard@gmail.com>
-Cc: claus.stovgaard@prevas.dk, torben.nielsen@prevas.dk,
- florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
 
-Hello:
+Introduces support for the FPE feature in the IGC driver.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The patches aligns with the upstream FPE API:
+https://patchwork.kernel.org/project/netdevbpf/cover/20230220122343.1156614-1-vladimir.oltean@nxp.com/
+https://patchwork.kernel.org/project/netdevbpf/cover/20230119122705.73054-1-vladimir.oltean@nxp.com/
 
-On Mon, 17 Feb 2025 09:05:01 +0100 you wrote:
-> From: Torben Nielsen <torben.nielsen@prevas.dk>
-> 
-> BCM53101 is a ethernet switch, very similar to the BCM53115.
-> Enable support for it, in the existing b53 dsa driver.
-> 
-> Signed-off-by: Torben Nielsen <torben.nielsen@prevas.dk>
-> Signed-off-by: Claus Stovgaard <claus.stovgaard@prevas.dk>
-> 
-> [...]
+It builds upon earlier work:
+https://patchwork.kernel.org/project/netdevbpf/cover/20220520011538.1098888-1-vinicius.gomes@intel.com/
 
-Here is the summary with links:
-  - [1/2] net: dsa: b53: mdio: add support for BCM53101
-    https://git.kernel.org/netdev/net-next/c/c4f873c2b65c
-  - [2/2] dt-bindings: net: dsa: b53: add BCM53101 support
-    https://git.kernel.org/netdev/net-next/c/dfc4b67db06c
+The patch series adds the following functionalities to the IGC driver:
+a) Configure FPE using `ethtool --set-mm`.
+b) Display FPE settings via `ethtool --show-mm`.
+c) View FPE statistics using `ethtool --include-statistics --show-mm'.
+e) Block setting preemptible tc in taprio since it is not supported yet.
+   Existing code already blocks it in mqprio.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Change Log:
+v4 -> v5:
+- Remove "igc: Add support for preemptible traffic class in taprio" patch (Vladimir)
+- Add a new patch "igc: Block setting preemptible traffic classes in taprio" (Vladimir)
+- Add kernel-doc for mmsv api (Vladimir)
+- olininfo_status to use host byte order (Simon)
+- status_error should host byte type (Simon)
+- Some code was misplaced in the wrong patch (Vladimir)
+- Mix of tabs and spaces in patch description (Vladimir)
+- Created igc_is_pmac_enabled() to reduce code repetition (Vladimir)
 
+v3 -> v4:
+- Fix compilation warnings introduced by this patch series
+
+v2 -> v3:
+- Implement configure_tx() mmsv callback (Vladimir)
+- Use static_branch_inc() and static_branch_dec() (Vladimir)
+- Add adapter->fpe.mmsv.pmac_enabled as extra check (Vladimir)
+- Remove unnecessary error check in igc_fpe_init_tx_descriptor() (Vladimir)
+- Additional places to use FIELD_PREP() instead of manual bit manipulation (Vladimir)
+- IGC_TXD_POPTS_SMD_V and IGC_TXD_POPTS_SMD_R type change to enum (Vladimir)
+- Remove unnecessary netif_running() check in igc_fpe_xmit_frame (Vladimir)
+- Rate limit print in igc_fpe_send_mpacket (Vladimir)
+
+v1 -> v2:
+- Extract the stmmac verification logic into a common library (Vladimir)
+- igc to use common library for verification (Vladimir)
+- Fix syntax for kernel-doc to use "Return:" (Vladimir)
+- Use FIELD_GET instead of manual bit masking (Vladimir)
+- Don't assign 0 to statistics counter in igc_ethtool_get_mm_stats() (Vladimir)
+- Use pmac-enabled as a condition to allow MAC address value 0 (Vladimir)
+- Define macro register value in increasing value order (Vladimir)
+- Fix tx-min-frag-size handling for igc (Vladimir)
+- Handle link state changes with verification in igc (Vladimir)
+- Add static key for fast path code (Vladimir)
+- rx_min_frag_size get from constant (Vladimir)
+
+v1: https://patchwork.kernel.org/project/netdevbpf/cover/20241216064720.931522-1-faizal.abdul.rahim@linux.intel.com/
+v2: https://patchwork.kernel.org/project/netdevbpf/cover/20250205100524.1138523-1-faizal.abdul.rahim@linux.intel.com/
+v3: https://patchwork.kernel.org/project/netdevbpf/cover/20250207165649.2245320-1-faizal.abdul.rahim@linux.intel.com/
+v4: https://patchwork.kernel.org/project/netdevbpf/cover/20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com/
+
+Faizal Rahim (8):
+  igc: Rename xdp_get_tx_ring() for non-xdp usage
+  igc: Optimize the TX packet buffer utilization
+  igc: Set the RX packet buffer size for TSN mode
+  igc: Add support for frame preemption verification
+  igc: Add support to set tx-min-frag-size
+  igc: Add support to get MAC Merge data via ethtool
+  igc: Add support to get frame preemption statistics via ethtool
+  igc: Block setting preemptible traffic class in taprio
+
+Vladimir Oltean (1):
+  net: ethtool: mm: extract stmmac verification logic into common
+    library
+
+ drivers/net/ethernet/intel/igc/igc.h          |  15 +-
+ drivers/net/ethernet/intel/igc/igc_base.h     |   1 +
+ drivers/net/ethernet/intel/igc/igc_defines.h  |  15 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c  |  76 ++++++
+ drivers/net/ethernet/intel/igc/igc_main.c     |  67 +++++-
+ drivers/net/ethernet/intel/igc/igc_regs.h     |  16 ++
+ drivers/net/ethernet/intel/igc/igc_tsn.c      | 190 ++++++++++++++-
+ drivers/net/ethernet/intel/igc/igc_tsn.h      |  52 ++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  16 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  41 +---
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 174 +++-----------
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |   5 -
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   8 +-
+ include/linux/ethtool.h                       | 131 ++++++++++
+ net/ethtool/mm.c                              | 227 +++++++++++++++++-
+ 15 files changed, 817 insertions(+), 217 deletions(-)
+
+--
+2.34.1
 
 
