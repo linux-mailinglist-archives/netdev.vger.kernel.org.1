@@ -1,105 +1,81 @@
-Return-Path: <netdev+bounces-168210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E7A9A3E1A3
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:59:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D03BA3E1B5
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:02:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 849327A57AA
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:58:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC1691889CCE
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE02213237;
-	Thu, 20 Feb 2025 16:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8583C20C028;
+	Thu, 20 Feb 2025 16:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pb9PmXpW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxVln6Az"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE711DFD85
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 16:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5964F1FFC6C;
+	Thu, 20 Feb 2025 16:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740070718; cv=none; b=X9l6DqdYXgJQH12029/n38LWF4iWB9p/87DNWpHoNen6Z+STzLhzlgBCjLa1SAxSzdJj6QOkEqn9O+VBvLU9sNZo+kmP0d1OQ9U4fQ0tGdSap4+rvlKuUzervudgMS8IYGCRtx8SPLAtOnpbhBwnthpEP2COhKfiTtWSVOZrAks=
+	t=1740070715; cv=none; b=MrvRjfd9FrQm6tfVRzH8E6US9cDx6uPw1SaP0lxYmk4VLoj+Xp8Isn3B/Qcm8qA8uTpWogcZ/4g+uxynrEiLU0DA2UPRU09ZaIbOhfJuTCB+hWlxVoyd1JF7bxYFu8W5Q9crfJPTXK43zLLHXzwCl9xMTErNYkpZB6cCxrvRwuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740070718; c=relaxed/simple;
-	bh=Q+Jb7AfoCiGdFXi62io4F0vSXl1qRocAJVycKuaL/D0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=A3gbOGJnd3paqtfOepkH8BjAgRihi39OYImpI6q53x6rjEIsob80tlcoUrZfiba8Gbpi3OcPH0JRols2Ny+SNgGwmT5oxOoNUzIgPafk3Tq12LWOK0bC4J9Q24GIZ9UPT1hE/jUXyFPkVzRdmk4GncSWHzZl5v4ywxZDpXyiflw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pb9PmXpW; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3a6e95ea-cdb0-4239-bb47-b29df45f52cc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740070714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FSAZDU3AQ1VuBM+5kuWntriYIhfJE92ii0LczQ8TURY=;
-	b=Pb9PmXpWIMKQJkmpnNqDfCGZgWDI5wwWnFau35gLZoTY+H8QCNvPYANLWGC+16l6mTPgFi
-	orT1GIthN1+y33Gzcvs4n5kP7IVnIbKjiZ8FmvnzWUm2hlW9eOmfFIq+GnIF0SHefEN/o8
-	5VPUYY5vg56awFcSldq+DXTogIDfAig=
-Date: Thu, 20 Feb 2025 11:58:30 -0500
+	s=arc-20240116; t=1740070715; c=relaxed/simple;
+	bh=h5khnN9rm493Ud45EVpbRXLTxQI1CXCGiYSILzqJP+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UMc6h6yjHjCwjqwyBd3i4N3/TGmxVZ7AaVtDF6xzBti5Mkv5uOeGx4fn2vTfYyWN5cxqt8vgNHZmHT6rZ8EZemiax7YGp4jeIfey1lD1q2HafgKLs0LAiXR3k54nm8aPVWugpkQNq2PPM2aEjA8uDX/M8/Qz35psa8cxiql8jXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxVln6Az; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C901C4CED1;
+	Thu, 20 Feb 2025 16:58:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740070714;
+	bh=h5khnN9rm493Ud45EVpbRXLTxQI1CXCGiYSILzqJP+Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MxVln6Aznb5RQsZQWGqyUZKsy62IVbPzUmyFF5Xv0d2oL8d5lsa9g9ESOwJP4tRE4
+	 1YCAM3Z5//VBMBMJevQJbFbtXyQIWcYHBYhDpbupMky7kCtCH1dHZWm+QGNmfamf0D
+	 qiuNQZ0YNSBIn5j72WEFslJa9qqgYVg1wtsQ68yTIkxlw26oSIijgbOBfSrDJ1Y/i4
+	 Nm93nt4OUpvoAtiaivQwKyxvssaGNqubqcYB3RIMG9YLFiSVivTIFfpZ3sElsb1JdP
+	 PGPDmFFFJ9yQblFU7oIgQAdFUgoIT+TGnd1G02N8IcfahwQTNU2uyq1n523rNBPM6m
+	 LsvWlBGvPSE0Q==
+Date: Thu, 20 Feb 2025 08:58:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nick Hu <nick.hu@sifive.com>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Michal
+ Simek <michal.simek@amd.com>, Russell King <linux@armlinux.org.uk>,
+ Francesco Dolcini <francesco.dolcini@toradex.com>, Praneeth Bajjuri
+ <praneeth@ti.com>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: axienet: Set mac_managed_pm
+Message-ID: <20250220085833.476b3f62@kernel.org>
+In-Reply-To: <20250217055843.19799-1-nick.hu@sifive.com>
+References: <20250217055843.19799-1-nick.hu@sifive.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: xilinx: axienet: Implement BQL
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
- "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, "Simek, Michal" <michal.simek@amd.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-References: <20250214211252.2615573-1-sean.anderson@linux.dev>
- <BL3PR12MB6571A18DA9E284A301FF70FAC9F92@BL3PR12MB6571.namprd12.prod.outlook.com>
- <aa58373c-a4ac-4994-821b-40574e19be3d@linux.dev>
-Content-Language: en-US
-In-Reply-To: <aa58373c-a4ac-4994-821b-40574e19be3d@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2/18/25 11:00, Sean Anderson wrote:
-> On 2/15/25 06:32, Gupta, Suraj wrote:
->> 
->> 
->>> -----Original Message-----
->>> From: Sean Anderson <sean.anderson@linux.dev>
->>> Sent: Saturday, February 15, 2025 2:43 AM
->>> To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>;
->>> netdev@vger.kernel.org
->>> Cc: linux-kernel@vger.kernel.org; Paolo Abeni <pabeni@redhat.com>; David S .
->>> Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Simek, Michal
->>> <michal.simek@amd.com>; linux-arm-kernel@lists.infradead.org; Eric Dumazet
->>> <edumazet@google.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Sean
->>> Anderson <sean.anderson@linux.dev>
->>> Subject: [PATCH net-next] net: xilinx: axienet: Implement BQL
->>> 
->>> Caution: This message originated from an External Source. Use proper caution
->>> when opening attachments, clicking links, or responding.
->>> 
->>> 
->>> Implement byte queue limits to allow queueing disciplines to account for packets
->>> enqueued in the ring buffers but not yet transmitted.
->>> 
->> 
->> Could you please check if BQL can be implemented for DMAengine flow?
+On Mon, 17 Feb 2025 13:58:42 +0800 Nick Hu wrote:
+> The external PHY will undergo a soft reset twice during the resume process
+> when it wake up from suspend. The first reset occurs when the axienet
+> driver calls phylink_of_phy_connect(), and the second occurs when
+> mdio_bus_phy_resume() invokes phy_init_hw(). The second soft reset of the
+> external PHY does not reinitialize the internal PHY, which causes issues
+> with the internal PHY, resulting in the PHY link being down. To prevent
+> this, setting the mac_managed_pm flag skips the mdio_bus_phy_resume()
+> function.
 > 
-> I can have a look, but TBH I do not test the dma engine configuration since it is
-> so much slower.
+> Fixes: a129b41fe0a8 ("Revert "net: phy: dp83867: perform soft reset and retain established link"")
+> Signed-off-by: Nick Hu <nick.hu@sifive.com>
 
-I had a look, and BQL is already implemented for dmaengine.
-
---Sean
+Applied, thanks!
 
