@@ -1,195 +1,207 @@
-Return-Path: <netdev+bounces-167956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E701A3CF5F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:30:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F49BA3CF68
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:35:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE19F16BBD6
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:29:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BDBD1898874
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831891D54D1;
-	Thu, 20 Feb 2025 02:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C9E1D61BB;
+	Thu, 20 Feb 2025 02:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T8w2jzFB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O1F/F/RO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420361CDA0B;
-	Thu, 20 Feb 2025 02:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4E01C6FF0;
+	Thu, 20 Feb 2025 02:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740018584; cv=none; b=lsvM96X7z8NQ8/Km8JM6coL5tH5IgYGZ1SSQeR2UkYr3yt7BCanDFUDa4LJkbvcnJdN6F1wCADPNyU3s6vI3MIVkCsbhhsIr8awAdVXbdTBFeR/SdSZWP7//DXbrvujs7SUPmWHl345Gf4Mf1Thf3W3NLppVFfyB7gIbFOS30Ns=
+	t=1740018933; cv=none; b=QjNQIx/ykfzkpL+Eo6qQLlbRQ+bf1CjwqANxdG6xpe3WMPX3uEirPGen83vpWuHcMWQ0P37TIlb1EyZcMFEYzT+/B3/TVWOgUHpNFu3TrnHDFiIhBhBH4XVaonONz+V/Tk2pcO1TaRDTR5ffFV9MRjXiwZZxaTOezmzjHkiHfY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740018584; c=relaxed/simple;
-	bh=qHJy/wVMlxB0RzaDnffLNI7sYULYz+gIzJ4B57XyBGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uQglsCGF3uUNxP0bv3cs6vfzQrbnhT7y/m8Vfe0aFdpqgZlK9OsefjatvMEaqiAre9t3YmkYER99LC2+GgKJdkA4O9YQxqdzvw5q5H0aGQbTwUU7rR+xxki7lpWdc88XTg/PtBfECQ7jA+PydtWe3y36zYnFH/ZrWLt5qOT6fFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T8w2jzFB; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740018582; x=1771554582;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qHJy/wVMlxB0RzaDnffLNI7sYULYz+gIzJ4B57XyBGM=;
-  b=T8w2jzFBD2L/Lc05xl6Qe+LwU33TLhHTUtsz9GXS3wKy/gHflQblIt17
-   qIu3uc5Yjc6zP286KxBq+2JYunNzGqcZKG5q/7uADVfIG9SmWrhyXXNWl
-   Qc7VwThWPyJcxD6wdBFoZU3CnJIs/s3tiq+n65SM9R/gZQhLxO1sup1Mb
-   jgkwcOp2YgSqU9ky8w6r5w1Jh3526gEq3dhcaMXj83rWwoDiIKkUdgsbE
-   Xipucw1VOZeBP9JAwxjbFLKM+kBSzrb4jY7buELHZRDt/gqdxaHNKtRAN
-   TE/V1yzbciay77y8O0ZMBDbBZIB4F/6H3CN6bdJ4izQzQBE+1mmtFpKuF
-   Q==;
-X-CSE-ConnectionGUID: BXsuu4ihQzSUEW78DqUT0A==
-X-CSE-MsgGUID: I7Z1Y4dlSw+umG/1IcKWvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="28378259"
-X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
-   d="scan'208";a="28378259"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 18:29:41 -0800
-X-CSE-ConnectionGUID: ZqGHmeIwRl65QQYDBiVAyw==
-X-CSE-MsgGUID: 0W87J4dIQfylMzMyKIP0yw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
-   d="scan'208";a="115572775"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.53.67]) ([10.247.53.67])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 18:29:34 -0800
-Message-ID: <0307750b-dd98-4718-8c3c-928df6a80ef5@linux.intel.com>
-Date: Thu, 20 Feb 2025 10:29:31 +0800
+	s=arc-20240116; t=1740018933; c=relaxed/simple;
+	bh=DXHFJ+tOPXcPoGcwm4xRajRbCFSCv9LfVE2LWOEOSIA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PLOVgrxeKYcVcv7AdxeBoW8s00odgzihZBOPVGrSUF3HPkivxZLeGY2u90xuLN5j+IFQyr8qx57qg9xWzEhR5YAwV6OFBz55N/AAO2evy6z6UfDkwFpGbHggN2nEjZdi8wjqO6hqfBFmad2rq5nd+cpgwCgKy5AAgEhg+VNQyb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O1F/F/RO; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c0a3d6a6e4so42538685a.1;
+        Wed, 19 Feb 2025 18:35:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740018930; x=1740623730; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AJ+p8dbSiIsoyTslXMyurJlydhBLuCYlpN+t/Y0lvCQ=;
+        b=O1F/F/RO0aS3h8CvJ1h20Jz9eH9sRybVDLTIxKDsRAtP2D0Q3xCAPxlPwgPQeVTAfD
+         Ucl6rrEOjwdeSfZuKdV44SypW6v4QTKamQF1hwLvDtRuWFiqXP22TPlkst8yGA399WtJ
+         KvIdsiwEEaAaa2zXuXNFlvjTkHmi6xpuLs+CKz3YovzuTZ6xGMloTc8lrSOMwDZYiczU
+         6dDymOum8r/PB/sTgwwFIBTWsjqgfnp+1l32XzB/wsYKBYul0AA0OyF4htQRAGIF2bQp
+         w5h5ImJVHGOSA4RX9yCN7p/xPmUDgMoTH2gE67anC0XPucWobAtMEqyB+Zx1kqnHqQ1Y
+         nv1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740018930; x=1740623730;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AJ+p8dbSiIsoyTslXMyurJlydhBLuCYlpN+t/Y0lvCQ=;
+        b=T9chwgAzCQQE0dXanSW7TJo/n8D/M+AkHxBuUh3Z4eoy7Xxgw+vJBK11gKhpt3FjyY
+         PouO93EMNPqWFjFCiKnqnMz9U5voFOlr3Z2Os6uPxNsSU4NdW/4ghHQVlEgKTTABVOA7
+         LZwHSQrYTgQMX1pluh2IxHzXs8ESwopqCduYi/xJfJd1YruCMNWLNXCt1jFQc7uTMHp1
+         KUo2Vd6nhLFSMgDa1ZzMGu+rW4YwC3ZskY2arYg3B1GQXNIlCrdphl9ZPRQJOWKhpryv
+         535OsXv7wboUxuboDkQgnnGl5jEM+svlO/3K6wHaUPsGojhw4bbypUke+ZGfQ7l0laBK
+         QN+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUUUaX7E/oqhNz6OlPIp5dGgXUvMO+ct+8FIMvguY44SUI0RX0ry3Q/N4bpe1rVrJMA3CsjEXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLte4Px8Fc8IGEjX8ymiBorkGsS7I2AIEiEL2kZpx7XA6HFjQH
+	PkgUzt8Y9SnQE7MFw6PIznnwPHv3AlNtpULVqBqqUG1hkCGOwlzc
+X-Gm-Gg: ASbGncvBBQ8+Ez0WIyLtnKJH3N3XBsINog9gFmtMc50Chqt/ZvC7Lptn8rg3t+HGcb5
+	uaXMrLNF1BkUolH2S8TeHqn0z6vcCCei6Y0UF2fMK8SigKm8raiqCPamsJELh8Rr/JdpnyJTiy6
+	Mv4qXO4uaD8cvvy//Md46iUp5dfRwlbdLuOUSIOC/cy3oXjMLP/XwBKAoMOFKlMURuXhNh5qWhM
+	7OpJjna/GT56paGE9SlUANJuMFnlnPGR72fLJV7zx8uNWCfiAIW0FnOyc2mFYlfnFbySiDfgh67
+	18BsbuWRRtjI6Qqeer+E0Udtb7am70unXfvPMwF7nh5T2eXArKsS7TSUKKeVh4c=
+X-Google-Smtp-Source: AGHT+IGuMwJjnFEvwQqpT16I0OaADyTAlIJua5xiXGoXZ0/IsVhlkahCISkCXlS92vKIQczHtaX5Pw==
+X-Received: by 2002:a05:620a:40d0:b0:7c0:79aa:4706 with SMTP id af79cd13be357-7c0c4376f56mr97560585a.53.1740018929787;
+        Wed, 19 Feb 2025 18:35:29 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0c2d9f679sm37840085a.5.2025.02.19.18.35.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 18:35:28 -0800 (PST)
+Date: Wed, 19 Feb 2025 21:35:28 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
+References: <cover.1739988644.git.pav@iki.fi>
+ <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
+ <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 3/7] arch: x86: add IPC mailbox accessor
- function and add SoC register access
-To: david.e.box@linux.intel.com, Dave Hansen <dave.hansen@intel.com>,
- Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Serge Semin <fancer.lancer@gmail.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
- <20250206131859.2960543-4-yong.liang.choong@linux.intel.com>
- <063bd012-d377-4d3d-9dcc-57e360d8f462@intel.com>
- <4cf99d5f9b63aec22c24c445dea9a80d71f5f024.camel@linux.intel.com>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <4cf99d5f9b63aec22c24c445dea9a80d71f5f024.camel@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Jason Xing wrote:
+> On Thu, Feb 20, 2025 at 2:15=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wro=
+te:
+> >
+> > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timesta=
+mp
+> > when hardware reports a packet completed.
+> >
+> > Completion tstamp is useful for Bluetooth, as hardware timestamps do =
+not
+> > exist in the HCI specification except for ISO packets, and the hardwa=
+re
+> > has a queue where packets may wait.  In this case the software SND
+> > timestamp only reflects the kernel-side part of the total latency
+> > (usually small) and queue length (usually 0 unless HW buffers
+> > congested), whereas the completion report time is more informative of=
+
+> > the true latency.
+> >
+> > It may also be useful in other cases where HW TX timestamps cannot be=
+
+> > obtained and user wants to estimate an upper bound to when the TX
+> > probably happened.
+> >
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > ---
+> >
+> > Notes:
+> >     v4: changed SOF_TIMESTAMPING_TX_COMPLETION to only emit COMPLETIO=
+N
+> >         together with SND, to save a bit in skb_shared_info.tx_flags
+> >
+> >         As it then cannot be set per-skb, reject setting it via CMSG.=
+
+> >
+> >  Documentation/networking/timestamping.rst | 9 +++++++++
+> >  include/uapi/linux/errqueue.h             | 1 +
+> >  include/uapi/linux/net_tstamp.h           | 6 ++++--
+> >  net/core/sock.c                           | 2 ++
+> >  net/ethtool/common.c                      | 1 +
+> >  5 files changed, 17 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/Documentation/networking/timestamping.rst b/Documentatio=
+n/networking/timestamping.rst
+> > index 61ef9da10e28..5034dfe326c0 100644
+> > --- a/Documentation/networking/timestamping.rst
+> > +++ b/Documentation/networking/timestamping.rst
+> > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+> >    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+> >    This flag can be enabled via both socket options and control messa=
+ges.
+> >
+> > +SOF_TIMESTAMPING_TX_COMPLETION:
+> > +  Request tx timestamps on packet tx completion, for the packets tha=
+t
+> > +  also have SOF_TIMESTAMPING_TX_SOFTWARE enabled.  The completion
+> =
+
+> Is it mandatory for other drivers that will try to use
+> SOF_TIMESTAMPING_TX_COMPLETION in the future? I can see you coupled
+> both of them in hci_conn_tx_queue in patch [2/5]. If so, it would be
+> better if you add the limitation in sock_set_timestamping() so that
+> the same rule can be applied to other drivers.
+> =
+
+> But may I ask why you tried to couple them so tight in the version?
+> Could you say more about this? It's optional, right? IIUC, you
+> expected the driver to have both timestamps and then calculate the
+> delta easily?
+
+This is a workaround around the limited number of bits available in
+skb_shared_info.tx_flags.
+
+Pauli could claim last available bit 7.. but then you would need to
+find another bit for SKBTX_BPF ;)
+
+FWIW I think we could probably free up 1 or 2 bits if we look closely,
+e.g., of SKBTX_HW_TSTAMP_USE_CYCLES or SKBTX_WIFI_STATUS.
 
 
 
-On 20/2/2025 1:01 am, David E. Box wrote:
-> On Thu, 2025-02-06 at 08:46 -0800, Dave Hansen wrote:
->> On 2/6/25 05:18, Choong Yong Liang wrote:
->>>
->>> - Exports intel_pmc_ipc() for host access to the PMC IPC mailbox
->>> - Add support to use IPC command allows host to access SoC registers
->>> through PMC firmware that are otherwise inaccessible to the host due
->>> to security policies.
->> I'm not quite parsing that second bullet as a complete sentence.
->>
->> But that sounds scary! Why is the fact that they are "otherwise
->> inaccessible" relevant here?
-> 
-> The PMC IPC mailbox is a host interface to the PMC. Its purpose is to allow the
-> host to access certain areas of the PMC that are restricted from direct MMIO
-> access due to security policies. Other parts of the PMC are accessible via MMIO
-> (most of what the intel_pmc_core driver touches with is MMIO), so I think the
-> original statement was trying to explain why the mailbox is needed instead of
-> MMIO in this case. However, I agree that the mention of security policies is not
-> relevant to the change itself.
-> 
->> ...
->>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
->>> index 87198d957e2f..631c1f10776c 100644
->>> --- a/arch/x86/Kconfig
->>> +++ b/arch/x86/Kconfig
->>> @@ -688,6 +688,15 @@ config X86_AMD_PLATFORM_DEVICE
->>>   	  I2C and UART depend on COMMON_CLK to set clock. GPIO driver is
->>>   	  implemented under PINCTRL subsystem.
->>>   
->>> +config INTEL_PMC_IPC
->>> +	tristate "Intel Core SoC Power Management Controller IPC mailbox"
->>> +	depends on ACPI
->>> +	help
->>> +	  This option enables sideband register access support for Intel
->>> SoC
->>> +	  power management controller IPC mailbox.
->>> +
->>> +	  If you don't require the option or are in doubt, say N.
->>
->> Could we perhaps beef this up a bit to help users figure out if they
->> want to turn this on? Really the only word in the entire help text
->> that's useful is "Intel".
->>
->> I'm not even sure we *want* to expose this to users. Can we just leave
->> it as:
->>
->> 	config INTEL_PMC_IPC
->> 		def_tristate n
->> 		depends on ACPI
->>
->> so that it only gets enabled by the "select" in the other patches?
-> 
-> I agree with this change Choong. This can be selected by the driver that's using
-> it. There's no need to expose it to users.
-> 
->>
->>> + * Authors: Choong Yong Liang <yong.liang.choong@linux.intel.com>
->>> + *          David E. Box <david.e.box@linux.intel.com>
->>
->> I'd probably just leave the authors bit out. It might have been useful
->> in the 90's, but that's what git is for today.
->>
->>> +	obj = buffer.pointer;
->>> +	/* Check if the number of elements in package is 5 */
->>> +	if (obj && obj->type == ACPI_TYPE_PACKAGE && obj->package.count ==
->>> 5) {
->>> +		const union acpi_object *objs = obj->package.elements;
->>> +
->>
->> The comment there is just not super useful. It might be useful to say
->> *why* the number of elements needs to be 5.
->>
->>> +EXPORT_SYMBOL(intel_pmc_ipc);
->>> +
->>> +MODULE_LICENSE("GPL");
->>> +MODULE_DESCRIPTION("Intel PMC IPC Mailbox accessor");
->>
->> Honestly, is this even worth being a module? How much code are we
->> talking about here?
-> 
-> Yeah, this doesn't need to be a module either.
-> 
-> David
-> 
+But given that two uses for those bits are in review at the same time,
+I doubt that this is the last such feature that is added.
 
-Hi David,
+This workaround is clever. Only, we're leaking implementation
+limitations into the API, making it API non-uniform and thus more
+complex.
 
-Thank you for the confirmation.
-Let's work together to address the comments.
+On the one hand, the feature should work just like all the existing
+ones, and thus be configurable independently, and maintaining a
+consistent API. But, this does require a tx_flags bit. And the
+same for each subsequent such feature that gets proposed.
+
+On the other, if we can anticipate more such additional requests,
+then perhaps it does make sense to use only one bit in the skb to
+encode whether the skb is sampled (in this case SKBTX_SW_TSTAMP),
+and use per-socket sk_tsflags to encode which types of timestamps
+to generate for such sampled packets.
+
+This is more or less how sampling in the new BPF mode works too.
+
+It is just not how SO_TIMESTAMPING works for existing bits.
+
+
+There's something to be said for either approach IMHO.
 
