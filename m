@@ -1,787 +1,179 @@
-Return-Path: <netdev+bounces-168067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62285A3D41C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:03:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C921A3D44B
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790BF16027E
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:03:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40A933A2CAB
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630AD1DCB24;
-	Thu, 20 Feb 2025 09:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9221EC013;
+	Thu, 20 Feb 2025 09:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LrBaGoGJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AA21EF09B
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8F41C6FF0
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740042137; cv=none; b=ba9JLEuHL6+ZplTPi1B06caU/zQqS2vJ6DaCS8px0hLSPWELJUxR5obMScCvsO3ZirBA7c39SkNv+ZsWR+NYd/X8ivClQ2XhE2pjOUHYh+tuipKKDKO8g4IiDX6AmM5nVmSCOhi29ElMSVEoo1bAcA62qmZ+ak+yxGn85CtIfX0=
+	t=1740042810; cv=none; b=fZyWbsDF10fKk6Psw5cP7XEnI49FyN2abJfhh+wKxXvM4h/t+HfwP7bcmk4tBRCZ8yS9MB5TcO8FpQnvAIttDg0UZnOHJlR+D6HE3gWTTOeFHVRZDAwCjQSsN1h5DFI1FnjRHVD6J5SIiiaMPnt+WmrG80vQhB2CraAUNOh1+Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740042137; c=relaxed/simple;
-	bh=hoLwhhljYcOuDLc80waE7iUVbiUVLcEwxuyr146fMY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jtv6HUnF11RlrjijEu5tXk6Ow+fTWama1NZrDaH6PfsPewmv8VLUhSOdI38ubMQdmUDDO36z70LUxNQetj0skqq7wZ4g1S+9g/6NOPmsIPuP/37pKefdBjyywIml5q5L9EODHDEIEbiUnfamdhFC9+nvoVOnel9OWXTnm96D5ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tl2RR-0007Bs-7I; Thu, 20 Feb 2025 10:01:57 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tl2RQ-001uII-0U;
-	Thu, 20 Feb 2025 10:01:56 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tl2RQ-00CKDr-0D;
-	Thu, 20 Feb 2025 10:01:56 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v3 3/3] arm: dts: stm32: Add Plymovent AQM devicetree
-Date: Thu, 20 Feb 2025 10:01:55 +0100
-Message-Id: <20250220090155.2937620-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250220090155.2937620-1-o.rempel@pengutronix.de>
-References: <20250220090155.2937620-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1740042810; c=relaxed/simple;
+	bh=ThtpQUIG9uWpPcVRfm/ZAycUqWanNuaXn9Bh7BL5WPg=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:References; b=ddfPax5bDLFjqZIzrDuU+AQB7dkyvPrI9PE8c8WCecgz3aHlRpM27gMSPaBSmd46p14UJOORjwoNJ98J11FMUSe4bshq0FyYuSQJ8XQhev+qZhSaZQ+JsCzxaCei/9sYsj6iA0MEzqKigfAiZszvxMMa+2gyNJo5z2fucLZxuWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LrBaGoGJ; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250220091325epoutp0444ca394155d0123e991a97dda9486c39~l37ZbGFwQ2042320423epoutp04L
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:13:25 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250220091325epoutp0444ca394155d0123e991a97dda9486c39~l37ZbGFwQ2042320423epoutp04L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1740042805;
+	bh=4misLsGizIp8iJMKt8X2Vm5Ecs/n9mjZr4L2QsqFWXM=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=LrBaGoGJ7evwoCMSk8hi7DaVOCciwIbblIEXmfgZMt64lJjrAvB/P5HFtN0aL1YN+
+	 +b3MJSE0VxUuYNjhxkm57BGNc/xXXbhk1a+M0NcJMkZf06CIoKmonS2602P1gXsNZV
+	 AdODV6RAxDYieuKsqSLlSJGMHdGqmU+JUDUqyuXk=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250220091324epcas5p42d6766705a53da738706cb26af96c3a0~l37YrWvpt1887418874epcas5p49;
+	Thu, 20 Feb 2025 09:13:24 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Yz6xZ3VfQz4x9QH; Thu, 20 Feb
+	2025 09:13:22 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	59.7F.19933.232F6B76; Thu, 20 Feb 2025 18:13:22 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250220073939epcas5p24b926b2dd3bcfda426b03309d8c29590~l2piTYbsi3085630856epcas5p2a;
+	Thu, 20 Feb 2025 07:39:39 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250220073939epsmtrp1850a517d022c0d7bb0aff188bbf88784~l2piSa9JX2536525365epsmtrp1o;
+	Thu, 20 Feb 2025 07:39:39 +0000 (GMT)
+X-AuditID: b6c32a4a-b87c770000004ddd-f2-67b6f23262df
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D7.3E.18729.B3CD6B76; Thu, 20 Feb 2025 16:39:39 +0900 (KST)
+Received: from cheetah.samsungds.net (unknown [107.109.115.53]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250220073937epsmtip2cb6b4cac36a7a6ea08a4d6f3ab053e3d~l2pgGOnLT3266832668epsmtip2s;
+	Thu, 20 Feb 2025 07:39:37 +0000 (GMT)
+From: Swathi K S <swathi.ks@samsung.com>
+To: krzk+dt@kernel.org, linux-fsd@tesla.com, robh@kernel.org,
+	conor+dt@kernel.org, richardcochran@gmail.com, alim.akhtar@samsung.com
+Cc: jayati.sahu@samsung.com, swathi.ks@samsung.com,
+	linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pankaj.dubey@samsung.com, ravi.patel@samsung.com,
+	gost.dev@samsung.com
+Subject: [PATCH v7 0/2] arm64: dts: fsd: Add Ethernet support for FSD SoC
+Date: Thu, 20 Feb 2025 13:05:25 +0530
+Message-Id: <20250220073527.22233-1-swathi.ks@samsung.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpik+LIzCtJLcpLzFFi42LZdlhTU9fo07Z0g2dnJSwezNvGZrFm7zkm
+	i/lHzrFa3Dywk8niyKklTBYvZ91js9j0+BqrxcNX4RaXd81hs5hxfh+TxbEFYhaLtn5ht3j4
+	YQ+7xZEzL5gt/u/ZwW7xZeNNdgcBj52z7rJ7bFrVyeaxeUm9R9+WVYwe/5rmsnt83iQXwBaV
+	bZORmpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdLWSQlli
+	TilQKCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9dLy+1xMrQwMDIFKgwITtj
+	ybLz7AW9PBUnTn9kbWD8wNnFyMkhIWAi8al1J1sXIxeHkMBuRokbbY+hnE+MEkeP/oRyvjFK
+	/L5/khWmZd6UBcwgtpDAXkaJVW8VIYq+MErM/tXPApJgE9CQuL5iOztIQkSgjVHi2NNGMIdZ
+	YC6TxKqD24DmcnAIC3hK3FrLDdLAIqAqcWdqL9hUXgEriTWnfrJDbJOXWL3hADNIr4TAT3aJ
+	3sV7WCASLhL3jn9ghrCFJV4d3wLVICXxsr8Nyo6XWN13Fao+Q+Lur4lsELa9xIErc1hAbmAW
+	0JRYv0sfIiwrMfXUOiYQm1mAT6L39xMmiDivxI55MLayxN/X16BGSkpsW/qeHWSMhICHxMaL
+	KpBAiZW4fOwv2wRG2VkICxYwMq5ilEwtKM5NTy02LTDKSy2HR1Ryfu4mRnBi1PLawfjwwQe9
+	Q4xMHIyHGCU4mJVEeNvqt6QL8aYkVlalFuXHF5XmpBYfYjQFBtlEZinR5Hxgas4riTc0sTQw
+	MTMzM7E0NjNUEudt3tmSLiSQnliSmp2aWpBaBNPHxMEp1cAUd8FWniUvb96WJYscSx7bs/Vv
+	6DrINr3cW2hH6hrW42Uiz/J/3L0vyix+gvMCl0wLh1LgbqtpUnZm0403XbTlMwoWa5yzPpb3
+	vMeDPZfevupYmjr5/gTvHXyrXpqXas80zN/CcLfn2f4WMaUze4r3MvtsljjPf63lnoJf3yKR
+	mf8OhBYlneB+e3LyDG2erjQunoprFwW6rzls+deUvVhOZeWL4vkup0PXXX2dxvjC4Mq6C5pd
+	7IqWUzkWP4/z1l55LbzgzY9kV4/Fh9/fm97AcM5xddSGr5I2obFv08zVznyctfrtASOZfXtP
+	W025MjU/2aQ0aeemu5suObCnG0823eg9te2CaHi7Yp2kkeojJZbijERDLeai4kQARMCm1RUE
+	AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPLMWRmVeSWpSXmKPExsWy7bCSvK71nW3pBq8P6Fk8mLeNzWLN3nNM
+	FvOPnGO1uHlgJ5PFkVNLmCxezrrHZrHp8TVWi4evwi0u75rDZjHj/D4mi2MLxCwWbf3CbvHw
+	wx52iyNnXjBb/N+zg93iy8ab7A4CHjtn3WX32LSqk81j85J6j74tqxg9/jXNZff4vEkugC2K
+	yyYlNSezLLVI3y6BK2PJsvPsBb08FSdOf2RtYPzA2cXIySEhYCIxb8oC5i5GLg4hgd2MElcn
+	rmKCSEhKfGqeygphC0us/PecHaLoE6PE4StXwYrYBDQkrq/YDpYQEehjlNiwvZUFxGEWWM4k
+	seBAA2MXIweHsICnxK213CANLAKqEnem9jKD2LwCVhJrTv1kh9ggL7F6wwHmCYw8CxgZVjFK
+	phYU56bnFhsWGOallusVJ+YWl+al6yXn525iBIepluYOxu2rPugdYmTiYDzEKMHBrCTC21a/
+	JV2INyWxsiq1KD++qDQntfgQozQHi5I4r/iL3hQhgfTEktTs1NSC1CKYLBMHp1QDk8aMZ8Jy
+	hvNFJpUmTY4Ls00pYXkplFK2c1VIZan1uqB7p6+e6tnLKRuQbDrruenOM9/lf0U4tSx9knr8
+	otvLUpPjpxIDLulzvWvcG8x5Mnxr1N6a0DXn/3sW24me273mY+sxnzZbV3WTR6kBBgU3/7Ae
+	U3Sb+FtJRVZzvl5jgkO59XsXtZLilCwnIyeJNm35G2f2yjnkGBx4WmN5qja/UveIYM71ra7T
+	wmseR3h6Ze4/tzfxfu7XrOPq6VnPll5M3Re8w/2Vl4fhjQTeBf8ZQyOO6Txy5Cn2szRs/nvt
+	Z4C38WTOs+azspRWaQus1X6/UaYjlJdxH6dE9rGdilV2N05KVux82x7WzvX+zHclluKMREMt
+	5qLiRACs3C//wgIAAA==
+X-CMS-MailID: 20250220073939epcas5p24b926b2dd3bcfda426b03309d8c29590
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250220073939epcas5p24b926b2dd3bcfda426b03309d8c29590
+References: <CGME20250220073939epcas5p24b926b2dd3bcfda426b03309d8c29590@epcas5p2.samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Introduce the devicetree for the Plymovent AQM board
-(stm32mp151c-plyaqm), based on the STM32MP151 SoC.
+FSD platform has two instances of EQoS IP, one is in FSYS0 block and
+another one is in PERIC block. This patch series add required DT file
+modifications for the same.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- remove spidev
----
- arch/arm/boot/dts/st/Makefile               |   1 +
- arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts | 669 ++++++++++++++++++++
- 2 files changed, 670 insertions(+)
- create mode 100644 arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
+Changes since v1:
+1. Addressed the format related corrections.
+2. Addressed the MAC address correction.
 
-diff --git a/arch/arm/boot/dts/st/Makefile b/arch/arm/boot/dts/st/Makefile
-index d8f297035812..561819ef7a32 100644
---- a/arch/arm/boot/dts/st/Makefile
-+++ b/arch/arm/boot/dts/st/Makefile
-@@ -38,6 +38,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
- 	stm32mp151a-dhcor-testbench.dtb \
- 	stm32mp151c-mecio1r0.dtb \
- 	stm32mp151c-mect1s.dtb \
-+	stm32mp151c-plyaqm.dtb \
- 	stm32mp153c-dhcom-drc02.dtb \
- 	stm32mp153c-dhcor-drc-compact.dtb \
- 	stm32mp153c-lxa-tac-gen3.dtb \
-diff --git a/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-new file mode 100644
-index 000000000000..4e050c49dfc5
---- /dev/null
-+++ b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-@@ -0,0 +1,669 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/dts-v1/;
-+
-+#include <arm/st/stm32mp151.dtsi>
-+#include <arm/st/stm32mp15xc.dtsi>
-+#include <arm/st/stm32mp15-pinctrl.dtsi>
-+#include <arm/st/stm32mp15xxad-pinctrl.dtsi>
-+#include <arm/st/stm32mp15-scmi.dtsi>
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/leds/common.h>
-+
-+/ {
-+	model = "Plymovent AQM board";
-+	compatible = "ply,plyaqm", "st,stm32mp151";
-+
-+	aliases {
-+		ethernet0 = &ethernet0;
-+		serial0 = &uart4;
-+		serial1 = &uart7;
-+	};
-+
-+	codec {
-+		compatible = "invensense,ics43432";
-+
-+		port {
-+			codec_endpoint: endpoint {
-+				remote-endpoint = <&i2s1_endpoint>;
-+				dai-format = "i2s";
-+			};
-+		};
-+	};
-+
-+	firmware {
-+		optee {
-+			compatible = "linaro,optee-tz";
-+			method = "smc";
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-0 {
-+			gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>; /* WHITE_EN */
-+			color = <LED_COLOR_ID_WHITE>;
-+			default-state = "on";
-+		};
-+	};
-+
-+	v3v3: fixed-regulator-v3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "v3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	v5v_sw: fixed-regulator-v5sw {
-+		compatible = "regulator-fixed";
-+		regulator-name = "5v-switched";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		gpio = <&gpioe 10 GPIO_ACTIVE_HIGH>; /* 5V_SWITCHED_EN */
-+		startup-delay-us = <100000>;
-+		enable-active-high;
-+		regulator-boot-on;
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		ranges;
-+
-+		optee@cfd00000 {
-+			reg = <0xcfd00000 0x300000>;
-+			no-map;
-+		};
-+	};
-+
-+	sound {
-+		compatible = "audio-graph-card";
-+		label = "STM32MP15";
-+		dais = <&i2s1_port>;
-+	};
-+
-+	wifi_pwrseq: wifi-pwrseq {
-+		compatible = "mmc-pwrseq-simple";
-+		reset-gpios = <&gpioe 12 GPIO_ACTIVE_LOW>; /* WLAN_REG_ON */
-+	};
-+};
-+
-+&adc {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&adc1_in10_aqm_pins_a>;
-+	vdda-supply = <&v3v3>;
-+	vref-supply = <&v3v3>;
-+	status = "okay";
-+
-+	adc@0 {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		status = "okay";
-+
-+		channel@10 { /* NTC */
-+			reg = <10>;
-+			st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+		};
-+	};
-+};
-+
-+&cpu0 {
-+	clocks = <&scmi_clk CK_SCMI_MPU>;
-+};
-+
-+&cryp1 {
-+	clocks = <&scmi_clk CK_SCMI_CRYP1>;
-+	resets = <&scmi_reset RST_SCMI_CRYP1>;
-+	status = "okay";
-+};
-+
-+&ethernet0 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&ethernet0_rmii_aqm_pins_a>;
-+	pinctrl-1 = <&ethernet0_rmii_sleep_aqm_pins_a>;
-+	phy-mode = "rmii";
-+	max-speed = <100>;
-+	phy-handle = <&ethphy0>;
-+	status = "okay";
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		compatible = "snps,dwmac-mdio";
-+
-+		/* KSZ8081RNA PHY */
-+		ethphy0: ethernet-phy@0 {
-+			reg = <0>;
-+			interrupts-extended = <&gpiob 0 IRQ_TYPE_LEVEL_LOW>;
-+			reset-gpios = <&gpiob 1 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <300>;
-+		};
-+	};
-+};
-+
-+&gpioa {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "HWID_PL_N", "HWID_CP", "";
-+};
-+
-+&gpiob {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "LED_LATCH", "",
-+		"", "RELAY1_EN", "", "", "", "", "", "";
-+};
-+
-+&gpioc {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "HWID_Q7", "", "";
-+};
-+
-+&gpioe {
-+	gpio-line-names =
-+		"", "", "", "", "RELAY2_EN", "", "", "",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpiog {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "SW1",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpioz {
-+	clocks = <&scmi_clk CK_SCMI_GPIOZ>;
-+};
-+
-+&hash1 {
-+	clocks = <&scmi_clk CK_SCMI_HASH1>;
-+	resets = <&scmi_reset RST_SCMI_HASH1>;
-+};
-+
-+&i2c1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c1_aqm_pins_a>;
-+	pinctrl-1 = <&i2c1_sleep_aqm_pins_a>;
-+	i2c-scl-rising-time-ns = <185>;
-+	i2c-scl-falling-time-ns = <20>;
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	/* CYPD3177 USB PD controller 0x08 */
-+};
-+
-+&i2c4 {
-+	clocks = <&scmi_clk CK_SCMI_I2C4>;
-+	resets = <&scmi_reset RST_SCMI_I2C4>;
-+};
-+
-+&i2c6 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c6_aqm_pins_a>;
-+	pinctrl-1 = <&i2c6_sleep_aqm_pins_a>;
-+	i2c-scl-rising-time-ns = <185>;
-+	i2c-scl-falling-time-ns = <20>;
-+	clocks = <&scmi_clk CK_SCMI_I2C6>;
-+	resets = <&scmi_reset RST_SCMI_I2C6>;
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pm-sensor@69 {
-+		compatible = "sensirion,sps30";
-+		reg = <0x69>;
-+	};
-+
-+	co2-sensor@62 {
-+		compatible = "sensirion,scd41";
-+		reg = <0x62>;
-+		vdd-supply = <&v5v_sw>;
-+	};
-+
-+	pressure-sensor@47 {
-+		compatible = "bosch,bmp580";
-+		reg = <0x47>;
-+		vdda-supply = <&v5v_sw>;
-+		vddd-supply = <&v5v_sw>;
-+	};
-+
-+	/* Used for ZMOD4410 in userspace */
-+};
-+
-+&i2s1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2s1_aqm_pins>;
-+	pinctrl-1 = <&i2s1_sleep_aqm_pins>;
-+	clocks = <&rcc SPI1>, <&rcc SPI1_K>, <&rcc PLL3_Q>, <&rcc PLL3_R>;
-+	clock-names = "pclk", "i2sclk", "x8k", "x11k";
-+	#clock-cells = <0>; /* Set I2S2 as master clock provider */
-+	status = "okay";
-+
-+	i2s1_port: port {
-+		i2s1_endpoint: endpoint {
-+			format = "i2s";
-+			mclk-fs = <256>;
-+			remote-endpoint = <&codec_endpoint>;
-+		};
-+	};
-+};
-+
-+&iwdg2 {
-+	clocks = <&rcc IWDG2>, <&scmi_clk CK_SCMI_LSI>;
-+	status = "okay";
-+};
-+
-+&m4_rproc {
-+	/delete-property/ st,syscfg-holdboot;
-+	resets = <&scmi_reset RST_SCMI_MCU>,
-+		 <&scmi_reset RST_SCMI_MCU_HOLD_BOOT>;
-+	reset-names =  "mcu_rst", "hold_boot";
-+};
-+
-+&mdma1 {
-+	resets = <&scmi_reset RST_SCMI_MDMA>;
-+};
-+
-+&rcc {
-+	compatible = "st,stm32mp1-rcc-secure", "syscon";
-+	clock-names = "hse", "hsi", "csi", "lse", "lsi";
-+	clocks = <&scmi_clk CK_SCMI_HSE>,
-+		 <&scmi_clk CK_SCMI_HSI>,
-+		 <&scmi_clk CK_SCMI_CSI>,
-+		 <&scmi_clk CK_SCMI_LSE>,
-+		 <&scmi_clk CK_SCMI_LSI>;
-+};
-+
-+&rng1 {
-+	clocks = <&scmi_clk CK_SCMI_RNG1>;
-+	resets = <&scmi_reset RST_SCMI_RNG1>;
-+	status = "okay";
-+};
-+
-+&rtc {
-+	clocks = <&scmi_clk CK_SCMI_RTCAPB>, <&scmi_clk CK_SCMI_RTC>;
-+};
-+
-+/* SD card without Card-detect */
-+&sdmmc1 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc1_b4_pins_a>;
-+	pinctrl-1 = <&sdmmc1_b4_od_pins_a>;
-+	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
-+	broken-cd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&v3v3>;
-+	status = "okay";
-+};
-+
-+/* EMMC */
-+&sdmmc2 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc2_b4_aqm_pins_a>;
-+	pinctrl-1 = <&sdmmc2_b4_od_aqm_pins_a>;
-+	pinctrl-2 = <&sdmmc2_b4_sleep_aqm_pins_a>;
-+	non-removable;
-+	no-sd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <8>;
-+	vmmc-supply = <&v3v3>;
-+	status = "okay";
-+};
-+
-+/* Wifi */
-+&sdmmc3 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc3_b4_aqm_pins_a>;
-+	pinctrl-1 = <&sdmmc3_b4_od_aqm_pins_a>;
-+	pinctrl-2 = <&sdmmc3_b4_sleep_aqm_pins_a>;
-+	non-removable;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&v3v3>;
-+	mmc-pwrseq = <&wifi_pwrseq>;
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	status = "okay";
-+
-+	wifi@1 {
-+		reg = <1>;
-+		compatible = "brcm,bcm4329-fmac";
-+	};
-+};
-+
-+&timers5 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm {
-+		pinctrl-0 = <&pwm1_aqm_pins_a>;
-+		pinctrl-1 = <&pwm1_sleep_aqm_pins_a>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&uart4 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart4_aqm_pins_a>;
-+	pinctrl-1 = <&uart4_idle_aqm_pins_a>;
-+	pinctrl-2 = <&uart4_sleep_aqm_pins_a>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&uart7 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart7_aqm_pins_a>;
-+	uart-has-rtscts;
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "brcm,bcm43438-bt";
-+		shutdown-gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>; /* BT_REG_ON */
-+		max-speed = <4000000>;
-+		vbat-supply = <&v3v3>;
-+		vddio-supply = <&v3v3>;
-+		interrupt-parent = <&gpiog>;
-+		interrupts = <12 IRQ_TYPE_EDGE_RISING>; /* BT_HOST_WAKE */
-+		interrupt-names = "host-wakeup";
-+	};
-+};
-+
-+&pinctrl {
-+	adc1_in10_aqm_pins_a: adc1in10-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('C', 0, ANALOG)>; /* NTC */
-+		};
-+	};
-+
-+	ethernet0_rmii_aqm_pins_a: rmii-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('B', 12, AF11)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('B', 13, AF11)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, AF11)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('A', 1, AF11)>, /* ETH1_RMII_REF_CLK */
-+				 <STM32_PINMUX('A', 2, AF11)>, /* ETH1_MDIO */
-+				 <STM32_PINMUX('C', 1, AF11)>; /* ETH1_MDC */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <2>;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('C', 4, AF11)>, /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, AF11)>, /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 7, AF11)>; /* ETH1_RMII_CRS_DV */
-+			bias-disable;
-+		};
-+	};
-+
-+	ethernet0_rmii_sleep_aqm_pins_a: rmii-sleep-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('B', 12, ANALOG)>, /* ETH1_RMII_TXD0 */
-+				 <STM32_PINMUX('B', 13, ANALOG)>, /* ETH1_RMII_TXD1 */
-+				 <STM32_PINMUX('B', 11, ANALOG)>, /* ETH1_RMII_TX_EN */
-+				 <STM32_PINMUX('A', 2, ANALOG)>, /* ETH1_MDIO */
-+				 <STM32_PINMUX('C', 1, ANALOG)>, /* ETH1_MDC */
-+				 <STM32_PINMUX('C', 4, ANALOG)>, /* ETH1_RMII_RXD0 */
-+				 <STM32_PINMUX('C', 5, ANALOG)>, /* ETH1_RMII_RXD1 */
-+				 <STM32_PINMUX('A', 1, ANALOG)>, /* ETH1_RMII_REF_CLK */
-+				 <STM32_PINMUX('A', 7, ANALOG)>; /* ETH1_RMII_CRS_DV */
-+		};
-+	};
-+
-+	/* i2c1 pins redefined because they differ from stm32mp15-pinctrl.dtsi */
-+	i2c1_aqm_pins_a: i2c1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, AF5)>, /* I2C1_SCL */
-+				 <STM32_PINMUX('D', 13, AF5)>; /* I2C1_SDA */
-+			bias-disable;
-+			drive-open-drain;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	i2c1_sleep_aqm_pins_a: i2c1-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 12, ANALOG)>, /* I2C1_SCL */
-+				 <STM32_PINMUX('D', 13, ANALOG)>; /* I2C1_SDA */
-+		};
-+	};
-+
-+	/* i2c6 pins redefined because they differ from stm32mp15-pinctrl.dtsi */
-+	i2c6_aqm_pins_a: i2c6-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 11, AF2)>, /* I2C6_SCL */
-+				 <STM32_PINMUX('A', 12, AF2)>; /* I2C6_SDA */
-+			bias-disable;
-+			drive-open-drain;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	i2c6_sleep_aqm_pins_a: i2c6-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 11, ANALOG)>, /* I2C6_SCL */
-+				 <STM32_PINMUX('A', 12, ANALOG)>; /* I2C6_SDA */
-+		};
-+	};
-+
-+	i2s1_aqm_pins: i2s1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 6, AF5)>, /* I2S2_SDI */
-+				 <STM32_PINMUX('A', 4, AF5)>, /* I2S2_WS */
-+				 <STM32_PINMUX('A', 5, AF5)>; /* I2S2_CK */
-+			slew-rate = <0>;
-+			drive-push-pull;
-+			bias-disable;
-+		};
-+	};
-+
-+	i2s1_sleep_aqm_pins: i2s1-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 6, ANALOG)>, /* I2S2_SDI */
-+				 <STM32_PINMUX('A', 4, ANALOG)>, /* I2S2_WS */
-+				 <STM32_PINMUX('A', 5, ANALOG)>; /* I2S2_CK */
-+		};
-+	};
-+
-+	pwm1_aqm_pins_a: pwm1-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, AF2)>; /* TIM5_CH1 */
-+			bias-pull-down;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+	};
-+
-+	pwm1_sleep_aqm_pins_a: pwm1-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('A', 0, ANALOG)>;
-+		};
-+	};
-+
-+	/* SDMMC1 pins same as stm32mp15-pinctrl.dtsi */
-+
-+	sdmmc2_b4_sleep_aqm_pins_a: sdmmc2-b4-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('B', 14, ANALOG)>, /* SDMMC2_D0 */
-+				 <STM32_PINMUX('B', 7, ANALOG)>, /* SDMMC2_D1 */
-+				 <STM32_PINMUX('B', 3, ANALOG)>, /* SDMMC2_D2 */
-+				 <STM32_PINMUX('B', 4, ANALOG)>, /* SDMMC2_D3 */
-+				 <STM32_PINMUX('A', 8, ANALOG)>, /* SDMMC2_D4 */
-+				 <STM32_PINMUX('A', 9, ANALOG)>, /* SDMMC2_D5 */
-+				 <STM32_PINMUX('C', 6, ANALOG)>, /* SDMMC2_D6 */
-+				 <STM32_PINMUX('C', 7, ANALOG)>, /* SDMMC2_D7 */
-+				 <STM32_PINMUX('E', 3, ANALOG)>, /* SDMMC2_CK */
-+				 <STM32_PINMUX('G', 6, ANALOG)>; /* SDMMC2_CMD */
-+		};
-+	};
-+
-+	sdmmc2_b4_aqm_pins_a: sdmmc2-b4-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('B', 14, AF9)>, /* SDMMC2_D0 */
-+				 <STM32_PINMUX('B', 7, AF10)>, /* SDMMC2_D1 */
-+				 <STM32_PINMUX('B', 3, AF9)>, /* SDMMC2_D2 */
-+				 <STM32_PINMUX('B', 4, AF9)>, /* SDMMC2_D3 */
-+				 <STM32_PINMUX('A', 8, AF9)>, /* SDMMC2_D4 */
-+				 <STM32_PINMUX('A', 9, AF10)>, /* SDMMC2_D5 */
-+				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
-+				 <STM32_PINMUX('C', 7, AF10)>, /* SDMMC2_D7 */
-+				 <STM32_PINMUX('G', 6, AF10)>; /* SDMMC2_CMD */
-+			slew-rate = <1>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 3, AF9)>; /* SDMMC2_CK */
-+			slew-rate = <2>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+	};
-+
-+	sdmmc2_b4_od_aqm_pins_a: sdmmc2-b4-od-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('B', 14, AF9)>, /* SDMMC2_D0 */
-+				 <STM32_PINMUX('B', 7, AF10)>, /* SDMMC2_D1 */
-+				 <STM32_PINMUX('B', 3, AF9)>, /* SDMMC2_D2 */
-+				 <STM32_PINMUX('B', 4, AF9)>, /* SDMMC2_D3 */
-+				 <STM32_PINMUX('A', 8, AF9)>, /* SDMMC2_D4 */
-+				 <STM32_PINMUX('A', 9, AF10)>, /* SDMMC2_D5 */
-+				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
-+				 <STM32_PINMUX('C', 7, AF10)>; /* SDMMC2_D7 */
-+			slew-rate = <1>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 3, AF9)>; /* SDMMC2_CK */
-+			slew-rate = <2>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins3 {
-+			pinmux = <STM32_PINMUX('G', 6, AF10)>; /* SDMMC2_CMD */
-+			slew-rate = <1>;
-+			drive-open-drain;
-+			bias-pull-up;
-+		};
-+	};
-+
-+	sdmmc3_b4_aqm_pins_a: sdmmc3-b4-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('D', 1, AF10)>, /* SDMMC3_D0 */
-+				 <STM32_PINMUX('D', 4, AF10)>, /* SDMMC3_D1 */
-+				 <STM32_PINMUX('D', 5, AF10)>, /* SDMMC3_D2 */
-+				 <STM32_PINMUX('D', 7, AF10)>, /* SDMMC3_D3 */
-+				 <STM32_PINMUX('D', 0, AF10)>; /* SDMMC3_CMD */
-+			slew-rate = <1>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('G', 15, AF10)>; /* SDMMC3_CK */
-+			slew-rate = <2>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+	};
-+
-+	sdmmc3_b4_od_aqm_pins_a: sdmmc3-b4-od-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('D', 1, AF10)>, /* SDMMC3_D0 */
-+				 <STM32_PINMUX('D', 4, AF10)>, /* SDMMC3_D1 */
-+				 <STM32_PINMUX('D', 5, AF10)>, /* SDMMC3_D2 */
-+				 <STM32_PINMUX('D', 7, AF10)>; /* SDMMC3_D3 */
-+			slew-rate = <1>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('G', 15, AF10)>; /* SDMMC3_CK */
-+			slew-rate = <2>;
-+			drive-push-pull;
-+			bias-pull-up;
-+		};
-+
-+		pins3 {
-+			pinmux = <STM32_PINMUX('D', 0, AF10)>; /* SDMMC3_CMD */
-+			slew-rate = <1>;
-+			drive-open-drain;
-+			bias-pull-up;
-+		};
-+	};
-+
-+	sdmmc3_b4_sleep_aqm_pins_a: sdmmc3-b4-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('D', 1, ANALOG)>, /* SDMMC3_D0 */
-+				 <STM32_PINMUX('D', 4, ANALOG)>, /* SDMMC3_D1 */
-+				 <STM32_PINMUX('D', 5, ANALOG)>, /* SDMMC3_D2 */
-+				 <STM32_PINMUX('D', 7, ANALOG)>, /* SDMMC3_D3 */
-+				 <STM32_PINMUX('G', 15, ANALOG)>, /* SDMMC3_CK */
-+				 <STM32_PINMUX('D', 0, ANALOG)>; /* SDMMC3_CMD */
-+		};
-+	};
-+
-+	uart4_aqm_pins_a: uart4-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 11, AF6)>; /* UART4_TX */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('B', 8, AF8)>; /* UART4_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	uart4_idle_aqm_pins_a: uart4-idle-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('G', 11, ANALOG)>; /* UART4_TX */
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('B', 8, AF8)>; /* UART4_RX */
-+			bias-disable;
-+		};
-+	};
-+
-+	uart4_sleep_aqm_pins_a: uart4-sleep-0 {
-+		pins {
-+			pinmux = <STM32_PINMUX('G', 11, ANALOG)>, /* UART4_TX */
-+				 <STM32_PINMUX('B', 2, ANALOG)>; /* UART4_RX */
-+		};
-+	};
-+
-+	uart7_aqm_pins_a: uart7-0 {
-+		pins1 {
-+			pinmux = <STM32_PINMUX('F', 7, AF7)>, /* UART7_TX */
-+				 <STM32_PINMUX('F', 8, AF7)>; /* UART7_RTS */
-+			bias-disable;
-+			drive-push-pull;
-+			slew-rate = <0>;
-+		};
-+
-+		pins2 {
-+			pinmux = <STM32_PINMUX('E', 7, AF7)>, /* UART7_RX */
-+				 <STM32_PINMUX('F', 9, AF7)>; /* UART7_CTS */
-+			bias-disable;
-+		};
-+	};
-+};
---
-2.39.5
+Changes since v2:
+1. Corrected intendation issues.
+
+Changes since v3:
+1. Removed alias names of ethernet nodes
+
+Changes since v4:
+1. Added more details to the commit message as per review comment.
+
+Changes since v5:
+1. Avoided inserting node in the end and inserted it in between as per
+address.
+2. Changed the node label.
+3. Separating DT patches from net patches and posting in different
+branches.
+
+Changes since v6:
+1. Addressed Andrew's review comment and removed phy-mode from .dtsi to
+.dts
+
+Here is the link to v6 patches for reference:
+https://lore.kernel.org/netdev/20250213132328.4405-1-swathi.ks@samsung.com/
+
+This patch depends on the DT binding patch
+https://lore.kernel.org/netdev/20250220043712.31966-2-swathi.ks@samsung.com/
+
+And the driver patch
+https://lore.kernel.org/netdev/20250220043712.31966-3-swathi.ks@samsung.com/
+
+Swathi K S (2):
+  arm64: dts: fsd: Add Ethernet support for FSYS0 Block of FSD SoC
+  arm64: dts: fsd: Add Ethernet support for PERIC Block of FSD SoC
+
+ arch/arm64/boot/dts/tesla/fsd-evb.dts      |  20 ++++
+ arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi | 112 +++++++++++++++++++++
+ arch/arm64/boot/dts/tesla/fsd.dtsi         |  47 +++++++++
+ 3 files changed, 179 insertions(+)
+
+-- 
+2.17.1
 
 
