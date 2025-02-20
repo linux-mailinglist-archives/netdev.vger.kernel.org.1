@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-168255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2D4FA3E453
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:57:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 705F5A3E455
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:57:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76EEA4213C4
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:57:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAD934217C0
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BC9264634;
-	Thu, 20 Feb 2025 18:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDAB264F90;
+	Thu, 20 Feb 2025 18:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RZYB1PR6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="InWgO/iL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF93264619
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC866264F8A
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:55:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740077755; cv=none; b=nKnSTmjHV8zkvvAkmwCEMZkJPMXe5a61K1NszBqcKTHBAw8vwbMSvvX2P/gHv0k+mPbW2r1vcaN4Xwl0mLsTPzqCmCxYQ10454xrOFcl9im4EqjKergeGVz+xkz1pQ0csjqt3rna8qYcgawJB8NG+aI2JkNhYMep5u11CNM9kNo=
+	t=1740077758; cv=none; b=crJfw/MK49Gyr5U2rAkuFSHmylLdmVYyZBtHK8XaJ4JhkMD/cBv3jLZ8W9UDqKeGk3iUMo2K+XD0z6Y5z06gmmB3uDhXy65UZpf7Ai29TOvwZX84ZTV9PDKv7ChUZDg99Apu4ZJFjNesY1Eb9G9eZj2C+D2A4Xhmtx3kU86F7YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740077755; c=relaxed/simple;
-	bh=DRyXIrtbadlAOTbSf4eaomN59p5ysVYTfj15XxsNg3g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=uCl9Ln8hKtKgLthdT+C/EwkqIYb8+ZktE4eJ52VOqHC/w0SMF5huav8tpYCkbtOqC95Mwnf/3d+x79WvEtyV0b1rnjcN82EBudaz1fGI3Te1+TpLVBUMAAOZdvOVrtjFfUV6hIBUyJFFd5l8vmQtgPHvPV2ycGvN5ac5XhDzhg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RZYB1PR6; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1740077758; c=relaxed/simple;
+	bh=KFiItcYA1+vfCd+hinIriGeUe9fKsH3FKL1ViQr6mGI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Uo+b6LLNWiQ5XyzvUDb1zj/xCv35jRTSI8DWFJUB0NXRgM6emGfSa2ROHG52cQlnw27hz19M4F3NsgL/jclnthD+R+S/oHMUjbwDXguD+M8MfMlJQH+N9Ss5/4nTthPjwaOEjsT5dtlqt2vPH/fxlPEL2zQ69uHcQgNu1pfIPjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=InWgO/iL; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220e83d65e5so25573315ad.1
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:55:52 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-220e6028214so28841085ad.0
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:55:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1740077752; x=1740682552; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1740077756; x=1740682556; darn=vger.kernel.org;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=10BDGIGdjI+2I+pAbbcrEY6QirgZ2x3nU1sHIH+QS5U=;
-        b=RZYB1PR6ijthAtsMhmqlMzLE83mJx0DGZRroLbuD73yvXyF0mar2TdIGBlB3lx1ynh
-         k1K0yiK5inm9H6NKUc0pBSdBBHPeDuRyCLh2dIauccOpSPbQrCkmmF99qO/KAfMLCjwh
-         c8LSkOgvlmIiDQoOnX0eKXGyJBuZsTRgmOv3I=
+        bh=Zr+FohAS+5s358/XL5DNb3kyfI1vHkhFvhvpgEYGLio=;
+        b=InWgO/iLJemDlouldjP+zHXUSKGAXRN4owAQBVQXKHIwjYo8SjJ2pbZHfqVX2hO/4K
+         v0BDTLPyCt5LqXfKGsg/TWPbIZeBtwuDPNJuTPyPGUXKbS97FkIjs6GkHZxpYpHxH/D9
+         E9SZu4MUxMjindphCFZgts8EPw4RFDujLyJZY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740077752; x=1740682552;
+        d=1e100.net; s=20230601; t=1740077756; x=1740682556;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=10BDGIGdjI+2I+pAbbcrEY6QirgZ2x3nU1sHIH+QS5U=;
-        b=fpfGpPRdPLY8GVWgKuxI6ravk32cEQDnyG1WTe+VTpRwSI9P/SKVP6QMIvR0eM6Gov
-         3AMCnALz+WAhwlEdegQpmOghXfMs4Zpc99yrgbd9+pldwD6XgBRU/VhmGF3sYDKsUHLH
-         EaLGcHyxtAOOmiWOrO4/E7jNU8qL+M7ZlqVWILqpUQM2SxKYvWAvTygH5DSqPT9tStuS
-         jWu4DrlxRyWh5ttmMJzeocUxYoLOSO7k337WOW1yt2gO8eXhPVvVgkDNyyKAj6SK4NpQ
-         LtF2++9b0Zs24aVqjrrculbHf1OzUEV5BZIUvgN6NVX56B9XVR3+Sz4yAs+gGMb2vAXu
-         V8Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPLfTn/emqCd3FV6E4G3vm+/8M6/wOmiHub1tVJ5E/0Ue4NTvjymWUC2H5pIWYrtdhtV6Fx9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQiwZMS+hltdEhuRmJp1wZYgxwEhFEC5MUa4R0wsZKAlEg5LF5
-	IFxioqiKMK7zkxr9jXC0zK0s3/zkGnDQsL4RKHjj48XKPo1wyL8AntofzF0qRA==
-X-Gm-Gg: ASbGncvA0ujVTyccxL0+TvDbKdFF3YjuXW7Ad2zw3CRteLGxFcwY8zqSOIaLwNkBlis
-	YJ/8D+Cdpk8WEvGrxImHotvwM62gExhys80hRHtuDznNVEKOyoFtW+QQPWgelq2CVGrCUG7hkSM
-	dSa18LeAcO7wGDo8t8Qfvipa9LaUkjVwUDFPqMxlpHL5Itmsmz2LQuxc3rAakglWVgYXn8F6xw4
-	J/bYvjJk7oLFvA0tF6DMiYtT4CTvqdocGCLpxybJ3V54TtFaHuXNo2ZHZ1mSPuTEn5oWnzY2q2n
-	DQzfOL2Gk/ekNdXIAugXIYoDNOhoty2NEJRVxoiXVstMh6Do0g4xi4e/4g7OLU6pfMKFgNs=
-X-Google-Smtp-Source: AGHT+IFjAlHdQjg7jtPWPxhoIoMWi6AdSAqqq3IVW4vbmaqpvymP+c1FKAid6KJD2t7F+UXIzoE+KQ==
-X-Received: by 2002:a05:6a20:9184:b0:1ee:ce5b:853d with SMTP id adf61e73a8af0-1eef3dcc063mr381560637.39.1740077752042;
-        Thu, 20 Feb 2025 10:55:52 -0800 (PST)
+        bh=Zr+FohAS+5s358/XL5DNb3kyfI1vHkhFvhvpgEYGLio=;
+        b=oMj+EaYdhTLa2REyf8yCyKDjhbx+wRvs+Y1lSHXPdJ5cWTqk4ssRUKaCDxADbyo7AY
+         TmPWzYXJTgotGKgastBw9t7hdDkMKF36kpycRcQGTDtRr3QcJ0g+Ka1Tc2gq75YJWuVz
+         zmarXZxaPcNhcwCRorPElnVjI4UQ86gAHBEdP4FnRcdiS7QOazwodBgO5MhbamgoEmvG
+         63z0SkPnSJb06N/o40L8+Zky7NqPuYKkHCpy+4tDvrhXHM2HjwqnqnjusOXkoqaYDf/D
+         saabd+0nFq8Odm4HGWLjikqmNw0o2wtkUjjvIp9knFsZwx/13RwMkCe0GQCXPNl7QoRB
+         hV1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUlM1fuyYma/qAOEduV8U1wmw6Kbph5lFS6HQfNKF4M5Zc75RJT5MepRUurAjUgMyPvNzO9Ui0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcOHdohxEhvWTUwS8p6WxrNlhEsuoubRHUorkPWSZorUq1e3ep
+	R3QMMfWD5AGr8ty9zzw+oDsNTiE3VISUEIUGjqMIuKdoe4aHbdTJvjYghSCd7A==
+X-Gm-Gg: ASbGncuXc4WhcbDrLT8yCmeZ7NHSTF8b4jZDksmndcBKUQaIkNWySglFLI6Zg1znreS
+	NAhbhiskq1DnM1N/xlA4Nnc4oOHcow8EQ4CJC48AeOkGevuSUe+VVCT7jACrh2FXbG0NPMJ6ATC
+	FpRL5PN1AphjXGfgdLoHBcKgorpIYcs26Q8jbcIrAqGs8kvy6Cy/ddvfuynLL/D0nHqWqH/QERB
+	mnG0L17kmgGExhTMH6Iu2XCL4jAYHdFFqnQEt8BYvD8pL05elhwHFAUJ19/DV0d2IEc2tKg1wln
+	LW5bD5AspEKsQ4sHPQQCJAOHxv/gF/TRsa6yM7pdYE+45xwl7iXRf4z5+nL2LB3r3drUpqk=
+X-Google-Smtp-Source: AGHT+IG5H60oDdyi7JNgfkxGe8sLuWExbjYsWJu3/e2SJDRMel5HMa3BX5oHa9sFdtx0xPH3Zg+4fA==
+X-Received: by 2002:a05:6a20:9144:b0:1ee:e24d:8fdc with SMTP id adf61e73a8af0-1eef3c883f7mr379399637.10.1740077756102;
+        Thu, 20 Feb 2025 10:55:56 -0800 (PST)
 Received: from sxavier-dev.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-addee79a984sm9572262a12.32.2025.02.20.10.55.48
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-addee79a984sm9572262a12.32.2025.02.20.10.55.52
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Feb 2025 10:55:51 -0800 (PST)
+        Thu, 20 Feb 2025 10:55:55 -0800 (PST)
 From: Selvin Xavier <selvin.xavier@broadcom.com>
 To: leon@kernel.org,
 	jgg@ziepe.ca
@@ -81,9 +81,9 @@ Cc: linux-rdma@vger.kernel.org,
 	michael.chan@broadcom.com,
 	Saravanan Vajravel <saravanan.vajravel@broadcom.com>,
 	Selvin Xavier <selvin.xavier@broadcom.com>
-Subject: [PATCH rdma-next 1/9] RDMA/bnxt_re: Add support for collecting the Queue dumps
-Date: Thu, 20 Feb 2025 10:34:48 -0800
-Message-Id: <1740076496-14227-2-git-send-email-selvin.xavier@broadcom.com>
+Subject: [PATCH rdma-next 2/9] RDMA/bnxt_re: Cache the QP information
+Date: Thu, 20 Feb 2025 10:34:49 -0800
+Message-Id: <1740076496-14227-3-git-send-email-selvin.xavier@broadcom.com>
 X-Mailer: git-send-email 2.5.5
 In-Reply-To: <1740076496-14227-1-git-send-email-selvin.xavier@broadcom.com>
 References: <1740076496-14227-1-git-send-email-selvin.xavier@broadcom.com>
@@ -95,154 +95,242 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
 From: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
 
-As part of enhancing the debug data collection, allocate
-few data structures to hold the resources after the queues
-are destroyed.
+Add routines to cache the information about the QP before
+destroying. This can be retrieved and used for further
+debugging.
 
-Initialize the data structures to capture the data. By default,
-driver will cache the info of the QPs that are in error state.
-The dump levels can be changed from debugfs hook in a later
-patch. Driver caches the info of the last 1024 entries only.
+The default behavior is to capture the QPs that are moved
+to error. The driver sets the flags to capture the dump
+from the error asynchronous event.
 
 Signed-off-by: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
 Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
 ---
- drivers/infiniband/hw/bnxt_re/bnxt_re.h | 64 +++++++++++++++++++++++++++++++++
- drivers/infiniband/hw/bnxt_re/main.c    | 18 ++++++++++
- 2 files changed, 82 insertions(+)
+ drivers/infiniband/hw/bnxt_re/ib_verbs.c | 67 ++++++++++++++++++++++++++++++++
+ drivers/infiniband/hw/bnxt_re/ib_verbs.h | 42 ++++++++++++++++++++
+ drivers/infiniband/hw/bnxt_re/main.c     |  8 +++-
+ drivers/infiniband/hw/bnxt_re/qplib_fp.h |  7 ++++
+ 4 files changed, 123 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/infiniband/hw/bnxt_re/bnxt_re.h b/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-index b33b04e..5818db1 100644
---- a/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-+++ b/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-@@ -173,6 +173,67 @@ static inline bool bnxt_re_chip_gen_p7(u16 chip_num)
- 		chip_num == CHIP_NUM_57608);
+diff --git a/drivers/infiniband/hw/bnxt_re/ib_verbs.c b/drivers/infiniband/hw/bnxt_re/ib_verbs.c
+index 2de101d..060143e 100644
+--- a/drivers/infiniband/hw/bnxt_re/ib_verbs.c
++++ b/drivers/infiniband/hw/bnxt_re/ib_verbs.c
+@@ -41,6 +41,7 @@
+ #include <linux/pci.h>
+ #include <linux/netdevice.h>
+ #include <linux/if_ether.h>
++#include <linux/vmalloc.h>
+ #include <net/addrconf.h>
+ 
+ #include <rdma/ib_verbs.h>
+@@ -954,6 +955,71 @@ static int bnxt_re_destroy_gsi_sqp(struct bnxt_re_qp *qp)
+ 	return rc;
  }
  
-+#define BNXT_RE_MAX_QDUMP_ENTRIES 1024
-+
-+struct qdump_qpinfo {
-+	u32 id;
-+	u32 dest_qpid;
-+	u64 qp_handle;
-+	u32 mtu;
-+	u8  type;
-+	u8  wqe_mode;
-+	u8  state;
-+	u8  is_user;
-+	u64 scq_handle;
-+	u64 rcq_handle;
-+	u32 scq_id;
-+	u32 rcq_id;
-+};
-+
-+struct qdump_mrinfo {
-+	int type;
-+	u32 lkey;
-+	u32 rkey;
-+	u64 total_size;
-+	u64 mr_handle;
-+};
-+
-+struct qdump_element {
-+	struct bnxt_qplib_pbl pbl[PBL_LVL_MAX];
-+	enum bnxt_qplib_pbl_lvl level;
-+	struct bnxt_qplib_hwq *hwq;
-+	struct bnxt_re_dev *rdev;
-+	struct ib_umem *umem;
-+	bool is_user_qp;
-+	char des[32];
-+	char *buf;
-+	size_t len;
-+	u16 stride;
-+	u32 prod;
-+	u32 cons;
-+};
-+
-+struct qdump_array {
-+	struct qdump_qpinfo qpinfo;
-+	struct qdump_mrinfo mrinfo;
-+	bool valid;
-+	bool is_mr;
-+};
-+
-+struct bnxt_re_qdump_head {
++static struct qdump_array *bnxt_re_get_next_qpdump(struct bnxt_re_dev *rdev)
++{
 +	struct qdump_array *qdump;
-+	u32 max_elements;
-+	struct mutex lock; /* lock qdump array elements */
 +	u32 index;
-+};
 +
-+enum {
-+	BNXT_RE_SNAPDUMP_NONE = 0,
-+	BNXT_RE_SNAPDUMP_ERR,
-+	/* Add new entry before this */
-+	BNXT_RE_SNAPDUMP_ALL
-+};
++	index = rdev->qdump_head.index;
++	qdump = &rdev->qdump_head.qdump[index];
++	memset(qdump, 0, sizeof(*qdump));
 +
- struct bnxt_re_dev {
- 	struct ib_device		ibdev;
- 	struct list_head		list;
-@@ -232,6 +293,9 @@ struct bnxt_re_dev {
- 	unsigned long			event_bitmap;
- 	struct bnxt_qplib_cc_param	cc_param;
- 	struct workqueue_struct		*dcb_wq;
-+	/* Head to track all QP dump */
-+	struct bnxt_re_qdump_head qdump_head;
-+	u8 snapdump_dbg_lvl;
- 	struct dentry                   *cc_config;
- 	struct bnxt_re_dbg_cc_config_params *cc_config_params;
++	index++;
++	index %= rdev->qdump_head.max_elements;
++	rdev->qdump_head.index = index;
++
++	return qdump;
++}
++
++/*
++ * bnxt_re_capture_qpdump - Capture snapshot of various queues of a QP.
++ * @qp	-	Pointer to QP for which data has to be collected
++ *
++ * This function will capture info about SQ/RQ/SCQ/RCQ of a QP which
++ * can be used to debug any issue
++ *
++ */
++void bnxt_re_capture_qpdump(struct bnxt_re_qp *qp)
++{
++	struct bnxt_qplib_qp *qpl = &qp->qplib_qp;
++	struct bnxt_re_dev *rdev = qp->rdev;
++	struct qdump_qpinfo *qpinfo;
++	struct qdump_array *qdump;
++	bool capture_snapdump;
++
++	if (rdev->snapdump_dbg_lvl == BNXT_RE_SNAPDUMP_NONE)
++		return;
++
++	capture_snapdump = test_bit(QP_FLAGS_CAPTURE_SNAPDUMP, &qpl->flags);
++	if (rdev->snapdump_dbg_lvl == BNXT_RE_SNAPDUMP_ERR &&
++	    !capture_snapdump)
++		return;
++
++	if (qp->is_snapdump_captured || !rdev->qdump_head.qdump)
++		return;
++
++	mutex_lock(&rdev->qdump_head.lock);
++	qdump = bnxt_re_get_next_qpdump(rdev);
++
++	qpinfo = &qdump->qpinfo;
++	qpinfo->id = qpl->id;
++	qpinfo->dest_qpid = qpl->dest_qpn;
++	qpinfo->is_user = qpl->is_user;
++	qpinfo->mtu = qpl->mtu;
++	qpinfo->state = qpl->state;
++	qpinfo->type = qpl->type;
++	qpinfo->wqe_mode = qpl->wqe_mode;
++	qpinfo->qp_handle = qpl->qp_handle;
++	qpinfo->scq_handle = qp->scq->qplib_cq.cq_handle;
++	qpinfo->rcq_handle = qp->rcq->qplib_cq.cq_handle;
++	qpinfo->scq_id = qp->scq->qplib_cq.id;
++	qpinfo->rcq_id = qp->rcq->qplib_cq.id;
++
++	qdump->valid = true;
++	qp->is_snapdump_captured = true;
++	mutex_unlock(&rdev->qdump_head.lock);
++}
++
+ /* Queue Pairs */
+ int bnxt_re_destroy_qp(struct ib_qp *ib_qp, struct ib_udata *udata)
+ {
+@@ -965,6 +1031,7 @@ int bnxt_re_destroy_qp(struct ib_qp *ib_qp, struct ib_udata *udata)
+ 	unsigned int flags;
+ 	int rc;
+ 
++	bnxt_re_capture_qpdump(qp);
+ 	bnxt_re_debug_rem_qpinfo(rdev, qp);
+ 
+ 	bnxt_qplib_flush_cqn_wq(&qp->qplib_qp);
+diff --git a/drivers/infiniband/hw/bnxt_re/ib_verbs.h b/drivers/infiniband/hw/bnxt_re/ib_verbs.h
+index fbb16a4..8d82066 100644
+--- a/drivers/infiniband/hw/bnxt_re/ib_verbs.h
++++ b/drivers/infiniband/hw/bnxt_re/ib_verbs.h
+@@ -96,6 +96,7 @@ struct bnxt_re_qp {
+ 	struct bnxt_re_cq	*scq;
+ 	struct bnxt_re_cq	*rcq;
+ 	struct dentry		*dentry;
++	bool			is_snapdump_captured;
  };
+ 
+ struct bnxt_re_cq {
+@@ -113,6 +114,7 @@ struct bnxt_re_cq {
+ 	int			resize_cqe;
+ 	void			*uctx_cq_page;
+ 	struct hlist_node	hash_entry;
++	bool			is_snapdump_captured;
+ };
+ 
+ struct bnxt_re_mr {
+@@ -267,6 +269,46 @@ int bnxt_re_alloc_ucontext(struct ib_ucontext *ctx, struct ib_udata *udata);
+ void bnxt_re_dealloc_ucontext(struct ib_ucontext *context);
+ int bnxt_re_mmap(struct ib_ucontext *context, struct vm_area_struct *vma);
+ void bnxt_re_mmap_free(struct rdma_user_mmap_entry *rdma_entry);
++void bnxt_re_capture_qpdump(struct bnxt_re_qp *qp);
++
++static inline const char *__to_qp_type_str(u8 type)
++{
++	switch (type) {
++	case CMDQ_CREATE_QP1_TYPE_GSI:
++	case CMDQ_CREATE_QP_TYPE_GSI:
++		return "GSI";
++	case CMDQ_CREATE_QP_TYPE_RC:
++		return "RC";
++	case CMDQ_CREATE_QP_TYPE_UD:
++		return "UD";
++	case CMDQ_CREATE_QP_TYPE_RAW_ETHERTYPE:
++		return "RAW_ETH";
++	default:
++		return "NotSupp";
++	}
++}
++
++static inline const char  *__to_qp_state_str(u8 state)
++{
++	switch (state) {
++	case CMDQ_MODIFY_QP_NEW_STATE_RESET:
++		return "RESET";
++	case CMDQ_MODIFY_QP_NEW_STATE_INIT:
++		return "INIT";
++	case CMDQ_MODIFY_QP_NEW_STATE_RTR:
++		return "RTR";
++	case CMDQ_MODIFY_QP_NEW_STATE_RTS:
++		return "RTS";
++	case CMDQ_MODIFY_QP_NEW_STATE_SQD:
++		return "SQD";
++	case CMDQ_MODIFY_QP_NEW_STATE_SQE:
++		return "SQE";
++	case CMDQ_MODIFY_QP_NEW_STATE_ERR:
++		return "ERR";
++	default:
++		return "NotSupp";
++	}
++}
+ 
+ static inline u32 __to_ib_port_num(u16 port_id)
+ {
 diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index e9e4da4..87fdf69 100644
+index 87fdf69..67d2bf0 100644
 --- a/drivers/infiniband/hw/bnxt_re/main.c
 +++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -2008,6 +2008,11 @@ static void bnxt_re_free_nqr_mem(struct bnxt_re_dev *rdev)
- 	rdev->nqr = NULL;
- }
+@@ -1420,9 +1420,15 @@ static int bnxt_re_handle_qp_async_event(struct creq_qp_event *qp_event,
+ 	struct ib_event event = {};
+ 	unsigned int flags;
  
-+static void bnxt_re_clean_qdump(struct bnxt_re_dev *rdev)
-+{
-+	vfree(rdev->qdump_head.qdump);
-+}
+-	if (qp->qplib_qp.srq)
++	if (qp->qplib_qp.srq) {
+ 		srq =  container_of(qp->qplib_qp.srq, struct bnxt_re_srq,
+ 				    qplib_srq);
++		set_bit(SRQ_FLAGS_CAPTURE_SNAPDUMP, &srq->qplib_srq.flags);
++	}
 +
- static void bnxt_re_dev_uninit(struct bnxt_re_dev *rdev, u8 op_type)
- {
- 	u8 type;
-@@ -2018,6 +2023,7 @@ static void bnxt_re_dev_uninit(struct bnxt_re_dev *rdev, u8 op_type)
- 	bnxt_re_net_unregister_async_event(rdev);
- 	bnxt_re_uninit_dcb_wq(rdev);
++	set_bit(QP_FLAGS_CAPTURE_SNAPDUMP, &qp->qplib_qp.flags);
++	set_bit(CQ_FLAGS_CAPTURE_SNAPDUMP, &qp->scq->qplib_cq.flags);
++	set_bit(CQ_FLAGS_CAPTURE_SNAPDUMP, &qp->rcq->qplib_cq.flags);
  
-+	bnxt_re_clean_qdump(rdev);
- 	if (test_and_clear_bit(BNXT_RE_FLAG_QOS_WORK_REG, &rdev->flags))
- 		cancel_delayed_work_sync(&rdev->worker);
+ 	if (qp->qplib_qp.state == CMDQ_MODIFY_QP_NEW_STATE_ERR &&
+ 	    rdma_is_kernel_res(&qp->ib_qp.res)) {
+diff --git a/drivers/infiniband/hw/bnxt_re/qplib_fp.h b/drivers/infiniband/hw/bnxt_re/qplib_fp.h
+index 0d9487c..d1acb01 100644
+--- a/drivers/infiniband/hw/bnxt_re/qplib_fp.h
++++ b/drivers/infiniband/hw/bnxt_re/qplib_fp.h
+@@ -106,6 +106,8 @@ struct bnxt_qplib_srq {
+ 	u16				eventq_hw_ring_id;
+ 	spinlock_t			lock; /* protect SRQE link list */
+ 	u8				toggle;
++	unsigned long			flags;
++#define SRQ_FLAGS_CAPTURE_SNAPDUMP	1
+ };
  
-@@ -2063,6 +2069,16 @@ static void bnxt_re_worker(struct work_struct *work)
- 	schedule_delayed_work(&rdev->worker, msecs_to_jiffies(30000));
- }
+ struct bnxt_qplib_sge {
+@@ -279,6 +281,8 @@ struct bnxt_qplib_qp {
+ 	u8				wqe_mode;
+ 	u8				state;
+ 	u8				cur_qp_state;
++	u16				ctx_size_sb;
++	u8				is_user;
+ 	u64				modify_flags;
+ 	u32				max_inline_data;
+ 	u32				mtu;
+@@ -344,6 +348,8 @@ struct bnxt_qplib_qp {
+ 	u32				msn_tbl_sz;
+ 	bool				is_host_msn_tbl;
+ 	u8				tos_dscp;
++	unsigned long			flags;
++#define QP_FLAGS_CAPTURE_SNAPDUMP	1
+ };
  
-+static void bnxt_re_init_qdump(struct bnxt_re_dev *rdev)
-+{
-+	rdev->qdump_head.max_elements = BNXT_RE_MAX_QDUMP_ENTRIES;
-+	rdev->qdump_head.index = 0;
-+	rdev->snapdump_dbg_lvl = BNXT_RE_SNAPDUMP_ERR;
-+	mutex_init(&rdev->qdump_head.lock);
-+	rdev->qdump_head.qdump = vzalloc(rdev->qdump_head.max_elements *
-+					 sizeof(struct qdump_array));
-+}
-+
- static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
- {
- 	struct bnxt_re_ring_attr rattr = {};
-@@ -2235,6 +2251,8 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
- 		hash_init(rdev->srq_hash);
- 
- 	bnxt_re_debugfs_add_pdev(rdev);
-+	if (bnxt_qplib_is_chip_gen_p5_p7(rdev->chip_ctx))
-+		bnxt_re_init_qdump(rdev);
- 
- 	bnxt_re_init_dcb_wq(rdev);
- 	bnxt_re_net_register_async_event(rdev);
+ #define BNXT_QPLIB_MAX_CQE_ENTRY_SIZE	sizeof(struct cq_base)
+@@ -448,6 +454,7 @@ struct bnxt_qplib_cq {
+ #define CQ_RESIZE_WAIT_TIME_MS		500
+ 	unsigned long			flags;
+ #define CQ_FLAGS_RESIZE_IN_PROG		1
++#define CQ_FLAGS_CAPTURE_SNAPDUMP	2
+ 	wait_queue_head_t		waitq;
+ 	struct list_head		sqf_head, rqf_head;
+ 	atomic_t			arm_state;
 -- 
 2.5.5
 
