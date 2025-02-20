@@ -1,261 +1,250 @@
-Return-Path: <netdev+bounces-168324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874F8A3E83E
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 00:20:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1BACA3E846
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 00:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CCAA188C806
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:19:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3665171830
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4FB266192;
-	Thu, 20 Feb 2025 23:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2F1266F12;
+	Thu, 20 Feb 2025 23:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tlxp7dEG"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ahodI3Oj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2046.outbound.protection.outlook.com [40.107.93.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19E9266B72;
-	Thu, 20 Feb 2025 23:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740093584; cv=none; b=pjT2HnYwi0Rh6QxrO6wKNN3m0EGGZ+NSM8vQ3ZYOvambWw+nGcPDBoAnduD6wFlO0SbKIeMfb/4W1IIzMhpZ3+hWCgzX/SZIEd5jVWDKBdOKXsh4uBYRCTF/afpX3H9ogX7inicroNpf04GmvLZfhVvEgm7FEn0waRM4PUOC7ZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740093584; c=relaxed/simple;
-	bh=TWGs/K4wKLtD2SLkheis6/+gZzVhnhpvBNBEymNM8W0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nR2eWom7096toWU5+Z+q/PqvZy+9/kVaaRhUoT8vWf8rigCErCRKCkGEDFBnXhC/B/HnY45QCwwBnRmJpLbrXw74Mr3LiXygQi0ufaqUbC+BGHkMxHui/zdNkehLYia5P59MfknL6Rs3rRIzTTV3zuKur5ArkUWcnYjA0aEqTfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tlxp7dEG; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c0c5682c41so81005085a.2;
-        Thu, 20 Feb 2025 15:19:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740093582; x=1740698382; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Vtm5c20sZxBO6gWOMijL+8GxrfYrKDreGU7AJ8SoFw=;
-        b=Tlxp7dEGot/ThQk+QovIhR592EugOEgH2EoEmGo4KfolMqm9lpeidiAI7nbBsInwU8
-         gVD+03Levp25j75RaO/Ltbnse9MQ8LKqzyjE8sm94fgtqBI8UrA+bmNX4HOAKOG3ufOC
-         HcsfMHOApkgWtMoqNYc1RGcyPr87ef0RzhMBjE24zORmFOxsQw9L6kkyqauzNJ7NMynj
-         jTqQpRb8IJC5URlsx3moJZ8tRAofTcW4PKM9Fm1Rmi3/Vx+hHrLoo+5Z5VpCCs2d6Fg9
-         PWhpkpmSOSOouNb9Y5Q1qpb5sJfr3OrjacgENrK0XVrT+wLJBEMsn9LfTDw6Vnrw4ozq
-         K/3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740093582; x=1740698382;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8Vtm5c20sZxBO6gWOMijL+8GxrfYrKDreGU7AJ8SoFw=;
-        b=ep16H9phmbVbOQf1QKBL+tZt95pJZJiQSx4X+ruGKHnNCzx7khcfO5++O9MiKK+2Pp
-         tZjL669vyoXC4Yu6OCT3SQp/9sDDnqrNGe7B+sxJQk3pFh/dmNKsXSUraE9y63RcVDV6
-         x8tNn2XxkYHHmxkZy5UnDMR7rv7u6U72AORFpv9eGt0o8Z0dmkfB9YDV6EJ0jMuUa21y
-         Mt9cy+SjFeBrdpRMfwKNFTazWg3HZ2C6U3JNAkcwFMYDLMOlMKjO/qWsBJ8Uid4ovlDi
-         7ZwSQEhopuSdYTw5ikopTploXCGLb19FuAfTRwBWZqM3PDN3z4XKZzAG3uPlbwbJuQ8z
-         cThQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPfCK+0dWwypYZJ4tevA24qMK8lwF4L+EMhyX2oDPAPyymYt4R7is++GYX4RatBk8Mc95rVDt8L0IiPu15Utc=@vger.kernel.org, AJvYcCXRa8uBqEw46aqVT4WDctiyqPnEM5zPe8fgffJVbBwziBkOc01dGDSn1LTw33WcHnoOpr7e6S8s@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeCLCr5VsY0HAIO3lf1ypTrXsmCAU0I/QkDGbuPo/33OQpZoKz
-	3p/o9KBDNrQ2mLN9Ev1ROk5nAySFbJfOegr0raFSoGAEyhvzgxKL
-X-Gm-Gg: ASbGncsx65kqPy4xIJ8Z/163XDNTuTU3bGs25ahMWtQgWE0GTIuqngW+tr+jIeKSZKv
-	BvqCplrTvCh99eKyPJgXjd1q5WvOBoc4cc3k4eK7h1ykmb69jMREPBrU9zYoKlDbNJHrzUXYWSO
-	uYP1JHqz44+x9Qkq69Ye9voQGgsLTLcHmBP2MivSp8dKskL/ahjZ8zcgZFdm20Ly4l/aE+TdF3i
-	8yQ983VXdQH9N2vmaPB1kX3PImGhwSKWmPAd8UWa3JEmBVajNxv576rsc4tskJH6ifzLw02rp8d
-	7DXWkk2b/sFQk4RCcL+SCg0TZAHMz/UfekteR7elFU+RbBMsoPG0FgE7KSCi8nM=
-X-Google-Smtp-Source: AGHT+IHmLkngWYNIu2ii8H5nd/WWRDiujVd5OQkCUV801fHA3nmz+VUVnaFpBWDNReEHieZhKNgbbw==
-X-Received: by 2002:a05:620a:880f:b0:7c0:b685:1bba with SMTP id af79cd13be357-7c0cf8cd09fmr82272085a.19.1740093581627;
-        Thu, 20 Feb 2025 15:19:41 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0aaee775asm412430485a.66.2025.02.20.15.19.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 15:19:40 -0800 (PST)
-Date: Thu, 20 Feb 2025 18:19:40 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>, 
- linux-bluetooth@vger.kernel.org, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- gerhard@engleder-embedded.com
-Message-ID: <67b7b88c60ea0_292289294bb@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67b74c47c14c7_261ab62943@willemb.c.googlers.com.notmuch>
-References: <cover.1739988644.git.pav@iki.fi>
- <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
- <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
- <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
- <CAL+tcoDJAYDce6Ud49q1+srq-wJ=04JxMm1w-Yzcdd1FGE3U7g@mail.gmail.com>
- <67b74c47c14c7_261ab62943@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx
- completion
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A4A1F4E3B;
+	Thu, 20 Feb 2025 23:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740093622; cv=fail; b=ePemp3H+QPiS29kA0Mq5+DYJ9lIteFTNUK2lCyUeL1P4OxpPcZim0eZgeyxib200dSdZ+8aKJsOZPdCgaVX4q0dQENwcQaawUsphBgt7TZ8YWNwrRs41a7u0nBf8ACbwO333WEbAPPOTCxz2exnzmYk3IoqBR1HIvjBTyWPtsbA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740093622; c=relaxed/simple;
+	bh=ypUEDTSugUC+oja31Dg/L6Fb+xD2jBAF+EVWCeX4Vgc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=t/xW/Bo2Pcohxi0iZHzJoo0genNZPJV2VS4/65sjOUUTjl0wdI47254K5FNVsgZe+kUp1LL4CB7eV7uAmjULoH/IiBrLc+MG5KgyLrPY+16vVz8fKOuhFxrnARpLXKuvg2Osm/h4u4jzvg3ANGBPzsstqJA91udeGu/viPj7uvg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ahodI3Oj; arc=fail smtp.client-ip=40.107.93.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=E785116CV4C9DgqnJea5f3eZpn+ieF3pbgq571+Y+gAvQabOOfUqhVIo+64z/Cco60tT3O0RrthWgYUCBEuL1ILhGjREmBfK9ra/ByJ6958kSG7bVM7gWDbLMmHgmYWDASJ9nJHWBWouDxXdNGFbYiJl8K8hIk03flAducrKnuOIeaBw9OiJluxQ5UL9Fos4PgRvGyr2XIFLuGkwmIG3O+dForRGuLWDbBsZvcx9yByNUM0TC0EGoTk3axvZNR6tdW1Tgoitf8BZc5n+6oUpnvnwXqPRSk/kXsAZ9LhHPQQ0da/b/QC4e3VhS5fTORB7YWBuPzMnTf+q33lFW+mP+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XlUYBsyMRIwGafiC9+FeXNjGVhN5RqKLP0shDcP4Kdw=;
+ b=mVRwcCwmUT9Va6kQWtaSoWuvYNX5FETT5kiBc4/62oGquUqmjto4C9A4ZF4jxf+GZiUKzbufRjuZhjk2vpDY0ufqpVKShWlavjmC01EWCfnOLNt3NMbOx233u7MKM6KYPK4FRtEce8fs+7pBz4JkdBZp5nl+v0fjUo7B/B1CJCqECmtctjM1QR2k3wxPDbjogr1GRbm+bX9mfarmlzaCbMBbxQ8+47rUY2MluE4wd6rHgLBqFZ37CvO7TeFerEuC1jgJBTI5VXWGNCb2i32yapUksSVk/mmgdVBxIzM8ovbzMKzdXHeoh87aNLB1m2vHwRE/WswU5oAhQXDQhpD37Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XlUYBsyMRIwGafiC9+FeXNjGVhN5RqKLP0shDcP4Kdw=;
+ b=ahodI3Oj/AT+3vw9IwTcCbbgPesQ329qNILSK34+FklzKUIhoyTbDNIqS6xx6VZgkjJXkw3V1OvWAB4fSBEi8bWRgQABRycpPMFHRrLme5LCPzjxe3CohPemrLcqe2GZrPYB4/XLMRTSA0euqRBoZ2dQaqBrAEQF/gD1QPw8Hl0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ SJ2PR12MB9086.namprd12.prod.outlook.com (2603:10b6:a03:55f::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.15; Thu, 20 Feb 2025 23:20:18 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb%5]) with mapi id 15.20.8466.015; Thu, 20 Feb 2025
+ 23:20:17 +0000
+Message-ID: <6fc8dae5-9bfb-4b74-b741-b85159a0daef@amd.com>
+Date: Thu, 20 Feb 2025 15:20:14 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH fwctl 2/5] pds_core: add new fwctl auxilary_device
+To: Leon Romanovsky <leon@kernel.org>
+Cc: jgg@nvidia.com, andrew.gospodarek@broadcom.com,
+ aron.silverton@oracle.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch,
+ dave.jiang@intel.com, dsahern@kernel.org, gospo@broadcom.com,
+ hch@infradead.org, itayavr@nvidia.com, jiri@nvidia.com,
+ Jonathan.Cameron@huawei.com, kuba@kernel.org, lbloch@nvidia.com,
+ saeedm@nvidia.com, linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, brett.creeley@amd.com
+References: <20250211234854.52277-1-shannon.nelson@amd.com>
+ <20250211234854.52277-3-shannon.nelson@amd.com>
+ <20250218192822.GA53094@unreal>
+ <604b058d-88e8-436d-abf7-229a624d9386@amd.com>
+ <20250219082405.GC53094@unreal>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20250219082405.GC53094@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR06CA0006.namprd06.prod.outlook.com
+ (2603:10b6:a03:d4::19) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SJ2PR12MB9086:EE_
+X-MS-Office365-Filtering-Correlation-Id: 542eceb0-186f-4b86-a6fc-08dd52052334
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d2plakdlS0VDQlRocFhWclNaaWlSZUNCY01wcm53N3poclpnUlFrS1FFb3hk?=
+ =?utf-8?B?OG5RcWVZYzYzMkhzempsbEF2WlRmL3UrdDU3MC90ZVEwTkR1MGFQY1Z0Rm5I?=
+ =?utf-8?B?RlZMMDFPeGxmajRlQ25uU1FKVDNsV2ZBUSs5bWJiUDVadFJPNUc5WGN1VUc1?=
+ =?utf-8?B?RjkzU0JidnBnYVJuN0J3MUh3UDdPYkhuRXNYaXJmbUFzeXlkMlJRYk1EbFFa?=
+ =?utf-8?B?YmJLckFtM0FCemF1cmV5eUlvVHN0cmExREQ2ZzdmRGlBa3JhTFhaV0lvcWg3?=
+ =?utf-8?B?SjIydjdYMVJ4aTBteWJHdGlYNmpZZ3ppZFhlR3FoUnM4M2dpQ1luTXFDOW5K?=
+ =?utf-8?B?QUpUQ1VTeXpkVlNYVkttTkk0dlhpZ1RNUGI2RjkxSmpQbmxMS1JSaXlYL1pF?=
+ =?utf-8?B?ZFdLcHBFaGM2Z0REc1FuNGg3dmtpZjRkRkNiQ0E0UDJxemQydkY1V2d3Y1Y0?=
+ =?utf-8?B?UnhRb2pBanpKSXRDWjV6cGtocUJxWE40ekpmVisrV3VHeHo4ZDFrQlFYS0dJ?=
+ =?utf-8?B?RWNOazlLd0cvUGxoUzlmMUJUelgvd05tNEg0Mlg5dVJSR2I0Nkh4Y0llWlFK?=
+ =?utf-8?B?SE5QNDM0Y3NIbDRkRXdVakJTNmJYVGRKOThkaXE4M0xiR3FabXE5Mmh1eldC?=
+ =?utf-8?B?VnVrWGVkZUxIdFVyTUV6QlY1NWxCRzVNb0t2MEZSSDRYT0JnR3BIL1JIWGFh?=
+ =?utf-8?B?UE5uZUJoWVkxTDVOZGlRV05sRXlBZGhIbnA2cExCYW8wNnEwMGtYNW9nVDZ3?=
+ =?utf-8?B?dm5DdFBQMU5KdzA0VGVMM0E1RU9GcDRoQys5eFphZ1IreWR6eFdwczZlcjJz?=
+ =?utf-8?B?UVl0eXYyY09SSU9yYzlra1dQdmRjcm05R1JyQkNJQit1Nm9OK0VuTzArNElt?=
+ =?utf-8?B?TWdmSmg0a3pGTTVQZGFTR2JrK1gzUzVxaVh1MGllRWJqcytDVzlSU21vUkVj?=
+ =?utf-8?B?cWQ2SWo2ZUp0Q09IU0lYUGRySlhEbm85U2dsK0RIc3dycDhpRmtpNmRCZU1R?=
+ =?utf-8?B?QUpaQ2luTTBycE5hUGE0SnFNMmpzbW1GcGhENWRMNlZmcDFjTWk4UHdvV3ln?=
+ =?utf-8?B?K2JaclFnL2dBcVNSZFF1M200OEJFeEd5RWhmREJyQmRpTUxJTFFnK0pYTzc5?=
+ =?utf-8?B?eDlHd0pYeEZzVnppY2dmemF0N09NSmRQT2JuZkcxL2tGQXZoMVRtK2NtbTBa?=
+ =?utf-8?B?T2ZNdXNNYlZKQTZvUFQyRE01Qmlzbmo1WTh3SnVaM2ZrZHNjS1JLRTFuckVn?=
+ =?utf-8?B?bmxTL251aVkyeVloY2FLM0hhQ2lGb1dwOEgrZGNPaHBrM2FIZHNjOGkyWDJr?=
+ =?utf-8?B?dHNQaC96QzlHWG9uNXExVThjcnp2THh5L3ZrYzd0L0grcHBhWlZHYXE0QmVC?=
+ =?utf-8?B?bWV2MGxGRTNCQTYzYnV6elBCV2JIYnVPZ2F1Uk55ZTlvTnZDbHU3andPcWx6?=
+ =?utf-8?B?RW5xRTMzaFh3Y2I2czIvc2ZTb0ZzdUxmeVE2ODF6Sm93NHg1ZDZMU0xXVVA0?=
+ =?utf-8?B?ekkzRlBDSkp3S2dOOGpRZlRiSHpQYzNRY0tMeUtOUzJXd2xRZWZyQUlPTno4?=
+ =?utf-8?B?OURGOXlFb3JhTnl5aDgwbGJFTmFSTlVkS1dSSGoxRHMzT25SbDlGbEJqc0pM?=
+ =?utf-8?B?OFdEUU9YWm5CSWdHOVFqdDZpQzJINzI0bzlFbEhndjFSWllJNHJXbHhVSjJx?=
+ =?utf-8?B?aENNWVVWUjJDRTI4UXlSbjA0cFlSZ1d1Y1kwWWhUYXRWQ3pBWUZtMkFldWdr?=
+ =?utf-8?B?RkZmOEtuYlorbS8zSTc0endmL3cxaXlXNVBjTEYrZmluUGg0OWNLNk9LWjM5?=
+ =?utf-8?B?RnQwbXFhYVRUVTVNZE91Z05qWVFhc2NLUzZNNDd4bWhWVmc1bndicndNeHov?=
+ =?utf-8?Q?u58276BdG065M?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MlRvNFBaMEx2ZTFBK28rVXI5WnpjcitLc1VhZW9POVhTQUNiSm1BeU40RmtR?=
+ =?utf-8?B?TGwyWEw4LzlSTDFjc291cFNabWtwelg0c1RJK2NURW1FVW9pZnRyajRXYVpW?=
+ =?utf-8?B?bys5ZWJWY1JWWXdSTXdkQWZ0RXFnb2o4NWpQcDA0bmJlbWUwdFVyT2hNdHQ4?=
+ =?utf-8?B?bm1vUnJPVWJZM0RFT2t0RjhVTzkrRVYvUE1iVkV1MUxGTG9va3crNFhCVVoz?=
+ =?utf-8?B?UzRCS0tSRTdQMjFDc1lNVE84bmF3bklVeXRjMzNrWlJleWpyaVZvS0V4WWg5?=
+ =?utf-8?B?UlJVclgzcWJoNXhzREJqbjBlOHJlRTRRNG03bWFNYnZMN3VpRkhYUTNKVjRn?=
+ =?utf-8?B?dk95M0dVYmRrNlkzVEpFTjVsdDVkUVdzMzJDK1NpVkcxVldIWnVzWXdPS045?=
+ =?utf-8?B?bXBZR29STDNOQ1duZDJXQXdXdWxxNndkdXlFdjdRU3ljRm1CZlhoOFY1cXBj?=
+ =?utf-8?B?WFdmRi9nZlFRS0tjZm5WS3pSdVgwVGdEL2pQakNZZEFqMktMZ2NmaDlTME1K?=
+ =?utf-8?B?VytBMWVvc2dqMUpKenRwV3B1UGM3QWdSdVhSUnQzREIyNjI2S1E0SHVVVzBk?=
+ =?utf-8?B?Zm8vbjE2TmpKSndORXl5MCt1SVRxWTR6eTZQSnRBZWxZb3U2akFOaEd4SWxK?=
+ =?utf-8?B?aDR6b0U3NlI2ck0vUEV0WDF5R2xtVmp6SndaaXFtUW9jV210amZpWmY1Zko5?=
+ =?utf-8?B?N3RJSnFIV0dPS3hqN20vY2FydEc2SzVsRWozdFJFN1dmSlE0MkZaYWNMcGY4?=
+ =?utf-8?B?MUgvekhDRkVrR0NUYlV6aHdXSmNFRzRxUjlXazNhMm5kOVBkaWJxMHJvNDNX?=
+ =?utf-8?B?ckdpbnprcExQSXhqdVJ2Sit3RU0va3Z1aWF1djd5T1ZZaHFvVjFQTFM4RjBO?=
+ =?utf-8?B?Tk5qY1lxWjNQSjN1azU0K1JGN042bGdqZ3haWlNUaGtHdkhmaTBydFMvMnVU?=
+ =?utf-8?B?eXJaZ0dvMFlRc2JVY0dSSi9nUUp0Wk5DNCtpVC9SWVMrRHVBUWZxcUZVR1pz?=
+ =?utf-8?B?cnZiUit6V21PNHdpRU5QWS9pN2JORGNtODRkSENsTEN5WTEvd3k3dHRkSHZN?=
+ =?utf-8?B?djE5RVVHNm5jaEVGbS9Sa1pkbVRaaWg1YWdyTzJDWXV2QThsSlVBeUdnVVR3?=
+ =?utf-8?B?MWtwd1JEZWJhTk9wVzhxMTZ0UERiQ2FxZW9QTnA0Sm5aaHZKc0lIcTFuWWtD?=
+ =?utf-8?B?RlpyaG05alZKdGU1VDkwOEovZGYvS3hxamIvTDhZZG12cFF4bXZ3bE9KZlov?=
+ =?utf-8?B?Z2RwakZiWGptNXJpS0NkUThJVnBIUS9qQjIwQVRESXdEWDlZMTBTK1R6UTR0?=
+ =?utf-8?B?ODhBNGxJQkJDWkdhVDlIZGRBU0RwdVF2VnQyR01ZNS8rd05hd092VFN3S2hF?=
+ =?utf-8?B?YitHTFl3WEN5MFFTRzVJcU5jTTBpZ3JrM2tRMkxwY2dpWG83ZFoyYVRrUU4r?=
+ =?utf-8?B?WGFNUHQwdTg0cVdrdHhsaDNrcWE0OUQ3NFJyS0RzbEs0RXpIMWFmaHl6MW4y?=
+ =?utf-8?B?MjRMRmZsQzdaVzJyU3M3c3dUMjdJZTE3azZjbCt1azZDTW9jc1Z0UnJTVDBZ?=
+ =?utf-8?B?UFN5aFdVSTdwS1VLQVVGZ0ZLRWhsK1ZrNnhMVGZVZzY5anI2V2cwMW5QVTJr?=
+ =?utf-8?B?ck41Q2h4VXZIZHRQL0ZEcG5nZTE0OVJORWV5ZHB2dS9vUHRTeWlmNTNhYlVK?=
+ =?utf-8?B?RzBYWnFXdWYvZWV5cjNsd2FROUdsNXJWUGlvcEUvMnJiM0w2ZUplNk5IbVAv?=
+ =?utf-8?B?VVZoNVB5RHFWTUxqQVBWazhHcnc5N09UNVNmM1FwR3FjMmRCdFFTS1RZa1Jz?=
+ =?utf-8?B?dEc5VUpvLy9MdW52S3pQTlVkb0FUVVhpaWFzSjRCaWc1TjZGM3VpSXNmdXVY?=
+ =?utf-8?B?Rkg5bkJUcWErNGFIR1pGbjBIZG5UWDliem13Z3dGb01zcDZ6Z2l2VXEwWk5E?=
+ =?utf-8?B?amtMZ3dEOXpodGhIdm0zQUJ0bGxmZS9CdFZoQ0lhTW9JZlcrSmVwbExnVlhV?=
+ =?utf-8?B?MWZyS3lLZUpybG1ZbHBHSlQ2NnYxdWczaGk1cVowc01yNGN4R2VQZHVPZG0z?=
+ =?utf-8?B?SndwMFRySFNQRHBkL25idHBQeisrNkZYTWZnZ3dYQzJSL1E4VzhYY3h1NXNI?=
+ =?utf-8?Q?9mJ3P1s0lhUECV8jbjpv/kCJV?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 542eceb0-186f-4b86-a6fc-08dd52052334
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 23:20:17.7466
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2TCx08ircJbvK6ogCBxyOYqAAWGKqzItvSVodO9RZr8mBIafMpw5ICOUGv9Ke6BqwOZsYwciyMri6ehr8rr0pQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9086
 
-Willem de Bruijn wrote:
-> Jason Xing wrote:
-> > On Thu, Feb 20, 2025 at 10:35=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > On Thu, Feb 20, 2025 at 2:15=E2=80=AFAM Pauli Virtanen <pav@iki.f=
-i> wrote:
-> > > > >
-> > > > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software t=
-imestamp
-> > > > > when hardware reports a packet completed.
-> > > > >
-> > > > > Completion tstamp is useful for Bluetooth, as hardware timestam=
-ps do not
-> > > > > exist in the HCI specification except for ISO packets, and the =
-hardware
-> > > > > has a queue where packets may wait.  In this case the software =
-SND
-> > > > > timestamp only reflects the kernel-side part of the total laten=
-cy
-> > > > > (usually small) and queue length (usually 0 unless HW buffers
-> > > > > congested), whereas the completion report time is more informat=
-ive of
-> > > > > the true latency.
-> > > > >
-> > > > > It may also be useful in other cases where HW TX timestamps can=
-not be
-> > > > > obtained and user wants to estimate an upper bound to when the =
-TX
-> > > > > probably happened.
-> > > > >
-> > > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > > > ---
-> > > > >
-> > > > > Notes:
-> > > > >     v4: changed SOF_TIMESTAMPING_TX_COMPLETION to only emit COM=
-PLETION
-> > > > >         together with SND, to save a bit in skb_shared_info.tx_=
-flags
-> > > > >
-> > > > >         As it then cannot be set per-skb, reject setting it via=
- CMSG.
-> > > > >
-> > > > >  Documentation/networking/timestamping.rst | 9 +++++++++
-> > > > >  include/uapi/linux/errqueue.h             | 1 +
-> > > > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
-> > > > >  net/core/sock.c                           | 2 ++
-> > > > >  net/ethtool/common.c                      | 1 +
-> > > > >  5 files changed, 17 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/Documentation/networking/timestamping.rst b/Docume=
-ntation/networking/timestamping.rst
-> > > > > index 61ef9da10e28..5034dfe326c0 100644
-> > > > > --- a/Documentation/networking/timestamping.rst
-> > > > > +++ b/Documentation/networking/timestamping.rst
-> > > > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
-> > > > >    cumulative acknowledgment. The mechanism ignores SACK and FA=
-CK.
-> > > > >    This flag can be enabled via both socket options and control=
- messages.
-> > > > >
-> > > > > +SOF_TIMESTAMPING_TX_COMPLETION:
-> > > > > +  Request tx timestamps on packet tx completion, for the packe=
-ts that
-> > > > > +  also have SOF_TIMESTAMPING_TX_SOFTWARE enabled.  The complet=
-ion
-> > > >
-> > > > Is it mandatory for other drivers that will try to use
-> > > > SOF_TIMESTAMPING_TX_COMPLETION in the future? I can see you coupl=
-ed
-> > > > both of them in hci_conn_tx_queue in patch [2/5]. If so, it would=
- be
-> > > > better if you add the limitation in sock_set_timestamping() so th=
-at
-> > > > the same rule can be applied to other drivers.
-> > > >
-> > > > But may I ask why you tried to couple them so tight in the versio=
-n?
-> > > > Could you say more about this? It's optional, right? IIUC, you
-> > > > expected the driver to have both timestamps and then calculate th=
-e
-> > > > delta easily?
-> > >
-> > > This is a workaround around the limited number of bits available in=
+On 2/19/2025 12:24 AM, Leon Romanovsky wrote:
+> 
+> On Tue, Feb 18, 2025 at 12:00:52PM -0800, Nelson, Shannon wrote:
+>> On 2/18/2025 11:28 AM, Leon Romanovsky wrote:
+>>>
+>>> On Tue, Feb 11, 2025 at 03:48:51PM -0800, Shannon Nelson wrote:
+>>>> Add support for a new fwctl-based auxiliary_device for creating a
+>>>> channel for fwctl support into the AMD/Pensando DSC.
+>>>>
+>>>> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+>>>> ---
+>>>>    drivers/net/ethernet/amd/pds_core/auxbus.c |  3 +--
+>>>>    drivers/net/ethernet/amd/pds_core/core.c   |  7 +++++++
+>>>>    drivers/net/ethernet/amd/pds_core/core.h   |  1 +
+>>>>    drivers/net/ethernet/amd/pds_core/main.c   | 10 ++++++++++
+>>>>    include/linux/pds/pds_common.h             |  2 ++
+>>>>    5 files changed, 21 insertions(+), 2 deletions(-)
+>>>
+>>> <...>
+>>>
+>>> My comment is only slightly related to the patch itself, but worth to
+>>> write it anyway.
+>>>
+>>>> diff --git a/include/linux/pds/pds_common.h b/include/linux/pds/pds_common.h
+>>>> index 5802e1deef24..b193adbe7cc3 100644
+>>>> --- a/include/linux/pds/pds_common.h
+>>>> +++ b/include/linux/pds/pds_common.h
+>>>> @@ -29,6 +29,7 @@ enum pds_core_vif_types {
+>>>>         PDS_DEV_TYPE_ETH        = 3,
+>>>>         PDS_DEV_TYPE_RDMA       = 4,
+>>>>         PDS_DEV_TYPE_LM         = 5,
+>>>> +     PDS_DEV_TYPE_FWCTL      = 6,
+>>>
+>>> This enum and defines below should be cleaned from unsupported types.
+>>> I don't see any code for RDMA, LM and ETH.
+>>>
+>>> Thanks
+>>
+>> I've looked at those a few times over the life of this code, but I continue
+>> to leave them there because they are part of the firmware interface
+>> definition, whether we use them or not.
+> 
+> How? You are passing some number which FW is not aware of it. You can
+> pass any number you want there. Even it is not true, you can
+> PDS_DEV_TYPE_FWCTL = 6 here, but remove rest of enums and *_STR defines.
 
-> > > skb_shared_info.tx_flags.
-> > =
+When pds_core starts up it gets ident/config information from the 
+firmware in a struct pds_core_dev_identity, which includes the 
+vif_types[] array which tells us how many of each PDS_DEV_TYPE_xx are 
+supported in the FW.  This is indexed by enum pds_core_vif_types.
 
-> > Oh, I'm surprised I missed the point even though I revisited the
-> > previous discussion.
-> > =
+> 
+>>
+>> You're right, there is no ETH or RDMA type code, they exist as historical
+>> artifacts of the early interface design.
+> 
+> This make me wonder why netdev merged this code which has nothing to do
+> with netdev subsystem at all.
 
-> > Pauli, please add the limitation when users setsockopt in
-> > sock_set_timestamping() :)
-> > =
+The pds_core was originally brought in for supporting pds_vdpa and 
+pds_vfio_pci.  At the time, it was essentially following the example of 
+the mlx core module; at the time there wasn't any push back or 
+suggestions of a different place to land.  Maybe further fwctl and 
+"core" related discussions will suggest another approach.
 
-> > >
-> > > Pauli could claim last available bit 7.. but then you would need to=
+sln
 
-> > > find another bit for SKBTX_BPF ;)
-> > =
+> 
+> Thanks
 
-> > Right :D
-> > =
-
-> > >
-> > > FWIW I think we could probably free up 1 or 2 bits if we look close=
-ly,
-> > > e.g., of SKBTX_HW_TSTAMP_USE_CYCLES or SKBTX_WIFI_STATUS.
-> > =
-
-> > Good. Will you submit a patch series to do that, or...?
-> =
-
-> Reclaiming space is really up to whoever needs it.
-> =
-
-> I'll take a quick look, just to see if there is an obvious path and
-> we can postpone this whole conversation to next time we need a bit.
-
-SKBTX_HW_TSTAMP_USE_CYCLES is only true if SOF_TIMESTAMPING_BIND_PHC.
-It cannot be set per cmsg (is not in SOF_TIMESTAMPING_TX_RECORD_MASK),
-so no need to record it per skb.
-
-It only has two drivers using it, which can easily be updated:
-
-	-                if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_USE_CYC=
-LES)
-	+                if (skb->sk &&
-	+                    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_BIND_P=
-HC)
-					tx_flags |=3D IGC_TX_FLAGS_TSTAMP_TIMER_1;
-
-They later call skb_tstamp_tx, which does nothing if !skb->sk.
-Only cost is a higher cost of accessing the sk cacheline.
-
-SKBTX_WIFI_STATUS essentially follows the same argument. It can only
-be set in the sockopt. It has a handful more callsites that would need
-to be updated. sock_flag(sk, SOCK_WIFI_STATUS) will be tested without
-the socket lock held. But this is already the case in the UDP lockless
-fast path through ip_make_skb.
-
-SKBTX_HW_TSTAMP_NETDEV is only used on Rx. Could shadow another bit
-that is used only on Tx.
-
-SKBTX_IN_PROGRESS is only used by the driver to suppress the software
-tx timestamp from skb_tx_timestamp if a later hardware timestamp will
-be generated. Predates SOF_TIMESTAMPING_OPT_TX_SWHW.
-
-In short plenty of bits we can reclaim if we try.
-
-SKBTX_BPF was just merged, so we will have to reclaim one. The first
-one seems most straightforward.=
 
