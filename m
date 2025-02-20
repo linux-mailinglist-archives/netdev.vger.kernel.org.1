@@ -1,177 +1,184 @@
-Return-Path: <netdev+bounces-168188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3676DA3DF55
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:52:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04281A3DF7F
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 577D3422828
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 15:50:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0EE6188B772
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 15:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7291FDA8E;
-	Thu, 20 Feb 2025 15:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928131D5CD9;
+	Thu, 20 Feb 2025 15:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="d6fygrVz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K1Jvy+1t"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2058.outbound.protection.outlook.com [40.107.105.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBEB14A82;
-	Thu, 20 Feb 2025 15:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740066627; cv=fail; b=Ulzk6VVx4IAMBOronn0sVwOnTdxb8+eXQVYpQn3HYUkIhlnggyDmyyOcAuqK5Za8S90ZpweSPqRolspZ982Zfn/JGiSqZGt5knhqGd3AfoDGVaZVgC8Bsq3iYXP6AxzVrX+I1qmV5QvPsOKqDUjp8L3o8XoIH7sUE/ebnpB6Tkk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740066627; c=relaxed/simple;
-	bh=SewKkjOvFKZ0VwZOnkpnFeuXiPXlcN5XGQ0Jv7XH3so=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Y1+1WqalEovvjOa3jRIYdMBf64Y1hewMI+577mQ+hZby50Yq+g9UEno46hS4MoBij2tL5eHTxYQBYSlBgH+F22wJ7ZoNF1K8mijVBaEpXxkKFUVSIbDcDQiRiq0fnlz8kacjS0ZVgVh372CG2XU4iJ3i0MbCeeRYGuYq3s9nCic=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=d6fygrVz; arc=fail smtp.client-ip=40.107.105.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=I4YK0v0ff16iNJeHGJnPaywdsjrfSggnTNIcoqkggmB0tqSM97LGBzaUetAcsapqU2gdev1yhOaS//1Dp4v3XBhdpfF1LTjSoMAr/q1QGjRt1xxnYuUaEuWSKvXrtP5Hi6ZNo/FgIqLK0bNAcryHWw4vNFIlpmlhVQKwn9tn4n9fvqWaBdJbpHlnx8oDTPtcNnbEasJzeqqU8V/NsAHv7Wl3gpYsNjo85sOfYptU7T/1lFRJ4P84IUuMFM9zD9bxf29ZIe4q4vmMD1rKu5DCziGXZzwV5VA3D9IvUgKvRGUBSsUqGjajWGGLPpFmaXK5IJ7rZEkZoFmaKhRvM1DkiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zDvAIJyFnAqdKCcRhp4rQ8ccN3zM/dHwNxD/etsia+k=;
- b=IOpcE88SePRmZ88Wsy3QsJMICkVzw10p6YvcK5/TCXWQ936GchKp3peJjHRri93xqRwvyjIUbWZyBDN2TUiSPIS32W0iv6TRQWuFq2Fa8arJeare7eDPU8/eKR7ph+8/2v53sjE+3eO84yGoDhVmmj9Krqfefxm0I4kaGw1i+3dUgaYw33N7qymELWqj0L1GVfoPN4z1HNYVG4eL+fEa6A4LYAwZ5DJqSXnHNWDu5tEp49P0kctWt7aPdPRsPZ7Ja0Zxa0fkVEBhTEbbJRykP1Gb5I76ZL2GAEwZMGqx5t0jyfD20xDBoKzBq819GNJbunHVQeyhiFzMNMnglj+QGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zDvAIJyFnAqdKCcRhp4rQ8ccN3zM/dHwNxD/etsia+k=;
- b=d6fygrVzeR66RbVFJLnmrLbqs0RTVJd60ragl6F8DrZytM1iqV7DVpGaGitwPfs7oGJkLKjC9Zkw28ELalCGHqMLsafU5b4yqXWA7LJ9sn7blDA9C+7XaO3El7KSTp9QEBRMnjVtA0SidARwu/icSJFCubAIMM4EU7AtAkR7TM6czCeR46zL6UT3gN9COyx8izNZvn0RAI2VKR1pOGnJ05f4ct6uXuDduujlgKda7tpI+u15yEEQxRAVplN2n2mZFxq5YDV/+ISbs436PcZBM9ZcHlNh/FMPYdANQ2Agb+VRBdMp25DVnKwlbqYXznppa9OVQbFjp2h5uoXt1BU+TQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by VI2PR04MB10146.eurprd04.prod.outlook.com (2603:10a6:800:229::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.16; Thu, 20 Feb
- 2025 15:50:22 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8466.015; Thu, 20 Feb 2025
- 15:50:22 +0000
-Date: Thu, 20 Feb 2025 17:50:19 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ioana.ciornei@nxp.com, yangbo.lu@nxp.com,
-	michal.swiatkowski@linux.intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 net 5/9] net: enetc: update UDP checksum when updating
- originTimestamp field
-Message-ID: <20250220155019.efvh7ncknmbckyox@skbuf>
-References: <20250219054247.733243-1-wei.fang@nxp.com>
- <20250219054247.733243-6-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250219054247.733243-6-wei.fang@nxp.com>
-X-ClientProxiedBy: BE1P281CA0271.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:84::12) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6588F5B
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 15:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740066821; cv=none; b=akRLsEE5dSQJISupBTQ4jFHkpYszEjQu1TFhjDNl49C6uHhDyJ7pYWM72LyQYimw8L/j8fjCt6KRzsNsiweF/Z0N+iXv73JGeE3+xzDpMPbFd3Hl/QbRNF+7MS5CUVOENmPq/5Ms0iig99KEQ2L1SRx4cBgQI0TjTTH9P/XYCUE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740066821; c=relaxed/simple;
+	bh=In2VJT90B5AbVOfSJT2HpgSaOJuRr0KFiJmIaA5Gddo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jWTkx7OduHSw/i4mcMlU5vKYfPPdCAspy1N16kLQMxLUMbV7Jy7wRq58302Hg3qvEAIvwSUWLknLcH8SLYNVtvo97LPXQJbAvIrkE4iSxeuz0+Qvg2U10vMIy702grN4fe0127hB4PoLuW9J5g6iroVb2gGHkoUOmtyUPjQFaNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K1Jvy+1t; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-47202b65720so21391671cf.3
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 07:53:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740066818; x=1740671618; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BlyGheRXC52SO80dqQ9cUtuqW77BTspJoeFhj28aOqA=;
+        b=K1Jvy+1tZBsv6CpYIlOBsM9ypr1qxcXeNbiOlHnMw+K/TYFm5G48JAtCKtp4rtw/If
+         7G7Sy/NMBOuNJ0oBTYA/GZb5O4pRuanrHbzzbk21ISw7gj2JIx9HzKbpFBA5Kw/D2W8J
+         cWEPiS7Ig0DU8Y+gqQbAzr2MY4rpS/Awk1pkQSQYbOJnRBSxbbzrc+z4BfSseZ/nTBN8
+         +nbRlX8HZpqGGkHEAY9dDe3Hk+WJMLzmUgIJWGMO2XgMTKgVpK48B2g9J3YIS+hAsa9U
+         7n142Ncbk2DhnvwNCQhz/k8DjyNN2dYPoND+vjlIIqbunH7uVROyOTSCBqur5eqJDAKx
+         LtHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740066818; x=1740671618;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BlyGheRXC52SO80dqQ9cUtuqW77BTspJoeFhj28aOqA=;
+        b=N1SRdJNCS6f9Y3ycGv3pWpX9SLFJjbxpqEnGG/qn01ZJqPOQt7Yq0Ciohp3xazVbMf
+         SiuyhEgz3+k6CsLwjuBiGdKzeCNArPNJzA+N3wkXEYF6jOB1PKwXcoKD83ve4qz31WUN
+         BGXBlK7hsfi22xsK4qJ7XrNnT7NbYiiAXq6kxhKo1Ec3SJN6ec+ytGB2YuGr8vl3Uto+
+         zGjAUoAgs8cGW4W+bUh+IC6XwXNRvD4tGQAuaV4gNzft+XH6LsOxO9vaTXn6GbcvyWlQ
+         g9gHPzd/z1bfyPCZL1Xc0p7taU+RXJGxCPysVRNbXyzTUd3pqGJfKewofxarTTjlRCfm
+         Dtlg==
+X-Gm-Message-State: AOJu0YxekM44I9hS5RLrG375VlUQvsFUwVvn8zDXRbxyUOfjALZa5bf3
+	l4HsG5rtrM7GhHfAXRoZTwJrCsO/MdZzSFL7M8Ak8Ckj+ZPt9pjqpIIAGspVRaS9eKRkP62OwPo
+	AN2DtUH5bCA==
+X-Google-Smtp-Source: AGHT+IEfBLcBzQkTesDjOQqX/V6OdePXN/g6+N1y0MAAYhCnO1t8sJTXD0PsNiYmr77Wji+tkAXdKgINoiLA+Q==
+X-Received: from qtbew15.prod.google.com ([2002:a05:622a:514f:b0:471:a6eb:18b9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:5782:0:b0:471:f6c4:1dce with SMTP id d75a77b69052e-472082d76fbmr104501191cf.51.1740066818739;
+ Thu, 20 Feb 2025 07:53:38 -0800 (PST)
+Date: Thu, 20 Feb 2025 15:53:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI2PR04MB10146:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3350a1b7-e478-4239-419d-08dd51c648cd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vrIJSwBUqG6KKEImimWawNr+uRdZA+OSHcse7iY/o3BqsWnDxYgsdUkndhMF?=
- =?us-ascii?Q?f4tbxljvhCOa3PiEsLtZfEGis9CaaT9PUmsOFhw1mE/bNGYPrPl2XPnn4uZa?=
- =?us-ascii?Q?ADB59KBZ7f/4Z1Tv7O7vjpWaRfzaPYoZMKV9/B31UF4E2ZSb2mGzkCpqtAby?=
- =?us-ascii?Q?Q4+DkCjmU3DecLFbNw2aLn4cgrpbs8XfbgTb5qfyfwG+USVlCRjPfXgfWgg9?=
- =?us-ascii?Q?lIwK+/H9+2NDLMgqCDDR3pGDHlA/TMk3WDUC7O2IR5PWDaCZfCVHVjLOixU1?=
- =?us-ascii?Q?hfJCurXkDRxUpM1YGxBvfkW6G0Fv0vfKbdshswpvnYALjqziBRi7NIHoutDy?=
- =?us-ascii?Q?oLooWAJeacoFUjphUyWHALh/SmImL6GLeBuZcWHYEjipO4EL7yokZ7mEGKSk?=
- =?us-ascii?Q?5miWyKNAbaXt8WZgWMjnh4JcSAy7hJJjnvNmlecS936C8AibpsHFiyxyVCNb?=
- =?us-ascii?Q?37moH1WlDZd2IRHdFw+uF4Pf4uveBU9p4XpACvEWm6CRs0pUTEHaXOmFHkGX?=
- =?us-ascii?Q?TCi17B0KTc01TQ1lhgnK9zIrur/QFVuzvA+zEqAhM324HXpTVPzgdIijyuO4?=
- =?us-ascii?Q?/DNHVV5EFzG9Hi+QW4vk0fmKvfTL5E2FEzZ6fcrzofduIqFs9CqJ7kxs1/c9?=
- =?us-ascii?Q?ITB0Nt85eGnjwoYoUMvbLDvoEaolOodgt+i1wB3v/RWOdvaorRN8kWzrWTjN?=
- =?us-ascii?Q?Qol+scWMONXHWk66SfDGOqnNeuJYVOIot9qs4S6p31u6hbqRzs01Qf6te67+?=
- =?us-ascii?Q?iZEPGxKXrIYAIVqxssQ9751/R2Fg55tSxb+vYpcVwspHBNkuo7HSqFsGZybf?=
- =?us-ascii?Q?2DeWIhFs2C9kp63wco/vSSO2bCYejthmXOW9gTFwT1t6bAMoX89KpGwdiIr8?=
- =?us-ascii?Q?5kRPrW431kcnaWCpu5ltgZ0DP1KnGBoB8sSFTRV8xCKJXpan/Nztbsyj9yUZ?=
- =?us-ascii?Q?+LD0Zx8xND4thNPKMtVg9aAbmw9/kNoqAVJ06CbseJ5ZJEqi6m+AY+kchsLt?=
- =?us-ascii?Q?MuINBto71C9+VGeuEILS5Lu8qyWT7bwDRgq61wFau1oi5iXstw11TeeZy5UC?=
- =?us-ascii?Q?r6vZ0tkTsnk4KQBZnlkDIU54AWft/Rc1fPDgv67xp6ywRRnS5OVY3uxlcp/t?=
- =?us-ascii?Q?f752x8O8bqTR3H/R7pXN1yxYONQQb9s5HY13GtO6Zhc4A6RGTLSPjlqw3leJ?=
- =?us-ascii?Q?6H44e2bLdhFIBw766/1UCbD7PAWpe2ScBW8c8tQPV6o2YqqHYOn9oQT9sGZb?=
- =?us-ascii?Q?H0cXZ89JonGILmiAbcjNxp8kGInKSK8Zz+EcWRF7K8BYsmMP1haAsYoi9uP6?=
- =?us-ascii?Q?SJt9poOhjNaa2ynNELGSeL3Du460LQ2H3He+hElyBGjPMyBItVOtGba6UiIg?=
- =?us-ascii?Q?WGGIMDdrQCQQsj2p96+tZyW5iz7f?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Wp+SjrLLEaVwe/3I/Os+Ll87c6dkVDWcZeShfG/rspEC2liNOnHqAiIlNrvQ?=
- =?us-ascii?Q?W59hRyC8JdsoGVWRTDzMMVXrd6NPJy+8CNcFUXHNrsCBl7j/e/O0U+yZdRWf?=
- =?us-ascii?Q?dSZniNSF24e04VUGPNBW4XcDseuRzD4qTYYfg8LcAouwT4MGwDDQksvWxs8e?=
- =?us-ascii?Q?oa/p1tq9S5kX/Vvuf+EM70QV9WZqAA5J8sS/IRV4wUT7x0m631e4Jzo/Wate?=
- =?us-ascii?Q?B/O9nUJNyHASMGhD2ZaobvhcYqIdNibzuyxNclEPH8t7D4NFyL2Tf1rP4/hv?=
- =?us-ascii?Q?zBDolGj/gjCeW856grEfjlsogQpemlxTlt39YJSKEPh/ZGvuhmwSMeFiF0Rz?=
- =?us-ascii?Q?IzlH0UOnJmw/WTIy9bFZwTDcQlIxt2XG6Cp+BZMRguAklFPJ4ioOesxD0sXP?=
- =?us-ascii?Q?g+NTRbLNj9Bm68gtCT3Pk95OCY5T/JmX9Qk4REeLG7PINga3++p0asJ6+zB0?=
- =?us-ascii?Q?L+e9SbhZhQbLFUBy9fiaVRGXD1LQ45lfEKSK91McnJCvWYlZv+b/aBydAB6B?=
- =?us-ascii?Q?78go0vwxSRmUCdLQx3IU+YP5Sg1TzsMuvpUI6wNtYz+TXPHYUFerJA3a2XnU?=
- =?us-ascii?Q?sXL0UulgpaYaRM/MpojkPI8m01FiueeqhKKJYb3KufSci3J50ZtMXV6Ropvd?=
- =?us-ascii?Q?q/rhjon1qXOEISSUUG0+y/OXbzVw26lhOk310JGAKrGSJxBUY73kV9d7+LEd?=
- =?us-ascii?Q?1AMhpuNQWZgHld78O7Y5uuC9zqL59latKQQlnhdE9KJtRmjcrGPBQ7fllwm9?=
- =?us-ascii?Q?XdBDVcPj1FGxuz1qhw0/nPZaeKkHAHvx/bd3e+XHjtxzpKt3ewmACcd9N3+R?=
- =?us-ascii?Q?YOtz8tQ/4EJyAVADD628pmI4fD3XIReNyxdb60FsYiG5MA1P1eJ5RJ+/55Iu?=
- =?us-ascii?Q?1GI+HNW47V+xJK9gWKiQOypmss1KoEMvq7Cg4JzxMaez+EzsYT1R0gTY6sHB?=
- =?us-ascii?Q?6tBW+T6q1pUmOQYR4DFUFee5da2PzoNaa8EGRX5GKDGLegZZLG19EkRIqMmz?=
- =?us-ascii?Q?oIcqhbuGAyGeMaIePQkNJmglIheMJL3QOGlwDMG26DcwtI8zy9Lp715W9LDA?=
- =?us-ascii?Q?HPHZz7PGti6YiCeZbw+ccnVje0zDz8xTPL8xlKwjxvg0YyQLdBCBfrhA1lmc?=
- =?us-ascii?Q?ZMMz1/5UNPX3Qk0U+ZIN5lPxIW3JhrhH082+eSDf9+gIed8UWJjG7VggJP8J?=
- =?us-ascii?Q?kvfSIWtIZlFTWZ22GfRMWwaudwiuU7Bwg/28VhE7V71o+Fx2JhANjxDd1Eg7?=
- =?us-ascii?Q?UOpr19elBGAyVRsQ7QT7ISZAxwW40Tk7P4w//pYj1VIhvyxVELDTrwqZgYAg?=
- =?us-ascii?Q?5AKRtDG2Bx+E5+pMdJwloQiya5dcoce+R9YkcItEw6aPsFtOx3E2vJi93RHi?=
- =?us-ascii?Q?9wEDNWdDrWFEMN6yw4APyV8TSZbOTmZZRrGz+xMYo6DNTY63sa8fEJIOetWq?=
- =?us-ascii?Q?qbgUh+8aDihbn+IC1yTeukJPxTDv5+eTd/IYxtD/ZoMMKmw/xZaHKhCVG4JK?=
- =?us-ascii?Q?lLR9eThsvr9FvnzcybrXmzUlvLW2g66KWO4X6rFgunCQmrqzvLSJo0NxBefg?=
- =?us-ascii?Q?ai9pSsh4PK/4Yhq5pSjY3YLtgAUbNE8VpKYr2aGnGC/BTj5A2gPQCM6U8x6q?=
- =?us-ascii?Q?Zg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3350a1b7-e478-4239-419d-08dd51c648cd
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 15:50:22.6721
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JRDPscQYru98jvkR8ymB8ROnmKgtNQn+LPaWll8z+L4mnSX+EHs/jAY20TEpmXWWkj0WMnkByl4ezAQBwvVHcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10146
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250220155336.61884-1-edumazet@google.com>
+Subject: [PATCH net] ipvlan: ensure network headers are in skb linear part
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com, 
+	Mahesh Bandewar <maheshb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 19, 2025 at 01:42:43PM +0800, Wei Fang wrote:
-> There is an issue with one-step timestamp based on UDP/IP. The peer will
-> discard the sync packet because of the wrong UDP checksum. For ENETC v1,
-> the software needs to update the UDP checksum when updating the
-> originTimestamp field, so that the hardware can correctly update the UDP
-> checksum when updating the correction field. Otherwise, the UDP checksum
-> in the sync packet will be wrong.
-> 
-> Fixes: 7294380c5211 ("enetc: support PTP Sync packet one-step timestamping")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
+syzbot found that ipvlan_process_v6_outbound() was assuming
+the IPv6 network header isis present in skb->head [1]
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Add the needed pskb_network_may_pull() calls for both
+IPv4 and IPv6 handlers.
 
-Really good catch!
+[1]
+BUG: KMSAN: uninit-value in __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
+  __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
+  ipv6_addr_type include/net/ipv6.h:555 [inline]
+  ip6_route_output_flags_noref net/ipv6/route.c:2616 [inline]
+  ip6_route_output_flags+0x51/0x720 net/ipv6/route.c:2651
+  ip6_route_output include/net/ip6_route.h:93 [inline]
+  ipvlan_route_v6_outbound+0x24e/0x520 drivers/net/ipvlan/ipvlan_core.c:476
+  ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:491 [inline]
+  ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:541 [inline]
+  ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:605 [inline]
+  ipvlan_queue_xmit+0xd72/0x1780 drivers/net/ipvlan/ipvlan_core.c:671
+  ipvlan_start_xmit+0x5b/0x210 drivers/net/ipvlan/ipvlan_main.c:223
+  __netdev_start_xmit include/linux/netdevice.h:5150 [inline]
+  netdev_start_xmit include/linux/netdevice.h:5159 [inline]
+  xmit_one net/core/dev.c:3735 [inline]
+  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3751
+  sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
+  qdisc_restart net/sched/sch_generic.c:408 [inline]
+  __qdisc_run+0x14da/0x35d0 net/sched/sch_generic.c:416
+  qdisc_run+0x141/0x4d0 include/net/pkt_sched.h:127
+  net_tx_action+0x78b/0x940 net/core/dev.c:5484
+  handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:561
+  __do_softirq+0x14/0x1a kernel/softirq.c:595
+  do_softirq+0x9a/0x100 kernel/softirq.c:462
+  __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:389
+  local_bh_enable include/linux/bottom_half.h:33 [inline]
+  rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+  __dev_queue_xmit+0x2758/0x57d0 net/core/dev.c:4611
+  dev_queue_xmit include/linux/netdevice.h:3311 [inline]
+  packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+  packet_snd net/packet/af_packet.c:3132 [inline]
+  packet_sendmsg+0x93e0/0xa7e0 net/packet/af_packet.c:3164
+  sock_sendmsg_nosec net/socket.c:718 [inline]
+
+Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+Reported-by: syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/67b74f01.050a0220.14d86d.02d8.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Mahesh Bandewar <maheshb@google.com>
+---
+ drivers/net/ipvlan/ipvlan_core.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index fd591ddb3884df2046b816bd57f0814f7f5c4dfc..ca62188a317ad436173215fa4552f1a188d99384 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
+@@ -416,20 +416,25 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
+ 
+ static noinline_for_stack int ipvlan_process_v4_outbound(struct sk_buff *skb)
+ {
+-	const struct iphdr *ip4h = ip_hdr(skb);
+ 	struct net_device *dev = skb->dev;
+ 	struct net *net = dev_net(dev);
+-	struct rtable *rt;
+ 	int err, ret = NET_XMIT_DROP;
++	const struct iphdr *ip4h;
++	struct rtable *rt;
+ 	struct flowi4 fl4 = {
+ 		.flowi4_oif = dev->ifindex,
+-		.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip4h)),
+ 		.flowi4_flags = FLOWI_FLAG_ANYSRC,
+ 		.flowi4_mark = skb->mark,
+-		.daddr = ip4h->daddr,
+-		.saddr = ip4h->saddr,
+ 	};
+ 
++	if (!pskb_network_may_pull(skb, sizeof(struct iphdr)))
++		goto err;
++
++	ip4h = ip_hdr(skb);
++	fl4.daddr = ip4h->daddr;
++	fl4.saddr = ip4h->saddr;
++	fl4.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip4h));
++
+ 	rt = ip_route_output_flow(net, &fl4, NULL);
+ 	if (IS_ERR(rt))
+ 		goto err;
+@@ -488,6 +493,12 @@ static int ipvlan_process_v6_outbound(struct sk_buff *skb)
+ 	struct net_device *dev = skb->dev;
+ 	int err, ret = NET_XMIT_DROP;
+ 
++	if (!pskb_network_may_pull(skb, sizeof(struct ipv6hdr))) {
++		DEV_STATS_INC(dev, tx_errors);
++		kfree_skb(skb);
++		return ret;
++	}
++
+ 	err = ipvlan_route_v6_outbound(dev, skb);
+ 	if (unlikely(err)) {
+ 		DEV_STATS_INC(dev, tx_errors);
+-- 
+2.48.1.601.g30ceb7b040-goog
+
 
