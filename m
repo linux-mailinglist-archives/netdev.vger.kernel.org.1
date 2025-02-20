@@ -1,132 +1,131 @@
-Return-Path: <netdev+bounces-168239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4C1A3E386
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:14:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48249A3E3A0
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE68B167AE8
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:14:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C2157023DD
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633DC213E84;
-	Thu, 20 Feb 2025 18:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A9A215053;
+	Thu, 20 Feb 2025 18:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="AzI7oogk"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="xad7Lbxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DD01F892D
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2C321480A
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740075244; cv=none; b=qkvalvIBAId4TFPWe9lVktf3zBCCQS77LnsgUzevX8rGZC1jWpI7JgD+uZ4eJka49JV1GyCMrSFvUvbvPrHixjZm8EG+i/wkOkZGOlVDw8V6igx6i+QCr5+gmXo2FSGVTiLaJV5C36VwiVoXFeoGLvf0gq+oJfpeSLLR04qvtUw=
+	t=1740075369; cv=none; b=pwNJZINa8N5nrs0a0c85wIkIxqag6eq9JcTlTaGEySyUwGDTnn9oWhMTLmUdQq226fnzaLhNxdtNg0uYrIctMjlBhYLVxDFAAxz+oDxLNq0ni3NZW3bW/SZBUINxm4DjcVbTKCkC/5jtp77VoJBogyg5UXS7Gixtq/EPtsXnQGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740075244; c=relaxed/simple;
-	bh=WaDDRF9fQy2zzLjZ3DEW2L29d2f/2qyHcaGgmIbHD3g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aF6YfWqZLljyTo9kkNgV50od3KpAopa51v47IEzbAhCKY3O96rdg0CggrxhdtKTMcwHa5chHVhR+u2YpaUsU83iBWS6od9MvosvNpY8DYG/IAHxD7eRV8PygqmCdFwlallzy3Kbjk+AFcj9DpXBdaAdzAsqGkATzVtu3zx8JwLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=AzI7oogk; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51K8eemD010958
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:14:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	8CnfDkA/lCu9jF96qqSRckSj3r+BJxpocyhFxojdSa4=; b=AzI7oogkwz1xxOZO
-	LWodueP6IjeP6VBDiJaqt3t1EwZmr0BjGr7LG1xQS+IUqKstXhcBV+IBSPnUpFAM
-	Qvi4wi2RVtuI2eeh6Npes8Oz++v/F/OvQq+VSF/bVfpbxf6bG5wRh8VFJe18xhzM
-	covJdtH9KBg5RsBSGTiZEUaMf0EtH+dTezs8OnOj/iadTHj3xXAEvvFPTc3WhQge
-	13ryyV+rjlAxSsWkQujacfPnguMNNl9tvTFD2ofw/LHl3pY7pR6OD8IAMfWkn7Sq
-	GvAe0FNddwhlfsEm85szirN86tDiRP3EecgxfPgfldWqxyNSWQ/dDSJZy1gpxliG
-	JNJ4UA==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44vyy1y3t1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:14:01 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2fc1e7efdffso4004448a91.0
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:14:01 -0800 (PST)
+	s=arc-20240116; t=1740075369; c=relaxed/simple;
+	bh=CqaYN9ba1JC4exm0v/aXoABkFQouqPchJ4A7TptrzA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H7Kvk362/trRZuKFWUwSiy1ywBpyp4+eH0FdrG7yUUrjXCB8v9PdHZwPhF6C17xB6f4odV9tofLDL0+lxxXYVGlTmFLKXF9Xd/JKFAcaF69WDhdvpvlpNeXFywyRb0rS6ceJ09NQHOngO8uJklWQnFHT76Z0OXMwAd4sAkkBumY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=xad7Lbxi; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c0b24cc566so103108885a.1
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:16:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1740075366; x=1740680166; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ihvxdX0Eo8QqJteSeQOugcj3Cmf99WeR7EZ0mstg924=;
+        b=xad7LbxiDt/WwHrVfeidGzi18EHwM/ZBxsoX+3Df/8LTf9NVaj4X3rxHkZTvygDJP2
+         LfZ+C8JOpnGUABxLBfIN7YPd2ceyRxn8aPOay02+ELGPIleZ7HVVdSbRKXhp2/9BstU+
+         kab2+BEbrc/0cZKtzQ3N1xAYH6x1HpF4oBGHI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740075240; x=1740680040;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1740075366; x=1740680166;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CnfDkA/lCu9jF96qqSRckSj3r+BJxpocyhFxojdSa4=;
-        b=P2mf1K18gy+BK4R2r3DhbQszUNTHeCpupoIhWi9SUz1rAO4/3KWv2LrVipCtIPna49
-         sNxP74FB2KikD5CLiSfZ7HnY3UmW6YcNqFqpFC3dnk2krhnYZDE31N2LYQpazQZsUk7t
-         4X/b3TSciodpbnmht8c+Wi12cGj2MSk1WRiPGpzXvU8Lhp7JxbGQpkQc6SdQTqgv5yIi
-         hejlCX+HQwv+Ey841NvqdCUj3/ZsEP3EXO0hcIq4udnK7sruhczIV9V+BbNwUEnsbiCT
-         7KthtOWZ8rp7C8WLiROHZ7ydIaADUwgyUmoGZs+01fovEhlyATOhpI/BW3S0hJbd8bGn
-         86mA==
-X-Gm-Message-State: AOJu0Yxq09gQh4/IzmJTziKKHGI7ejaYIsg/sfFlCP4JVInbgBlWG/VC
-	2Ldpi1LWWHLACJtkRZBAdr+ko5qya40H5t2uzZsn3I/KlUYJr57K0tCJE1PQY19s8sJ5youGlp0
-	AdwZQAV775uflnngBK0J/3LLLiCUcevMlwnodaQ4rqypn4kwwqbbEUh0=
-X-Gm-Gg: ASbGncuTEj0h/EIId+y9hsGLRX+fBrfsf6f1iNsw1vX0+xaRB1mY+PIDcP9LFbPhhoS
-	XrsH+FpvzwPdVm9WrxNvUM5zQzcwQvm516wdxDQgtmeP5V+Mf4CCEl2sR8ROuHE/TKiKzMGtqLu
-	I2n9AF/P9zumvSzdLfC6U/DZv5Ij19A65PVleQk/Si9fjASWhEExePzpm+v1bl6PcFzspSZSglv
-	YBBKlxgBixedDdVfKTZmwG3LhuZMPwt3qoVTl5SNtPJCUaySBCzMtqQ4SMkYUBenW4yhpBTHoAr
-	WTS7XUBxLvxTlWHMR6nHOnrF5WWD/h6XMrFw77hYlg==
-X-Received: by 2002:a17:90b:3ec3:b0:2ee:9e06:7db0 with SMTP id 98e67ed59e1d1-2fce78a503cmr221355a91.11.1740075240206;
-        Thu, 20 Feb 2025 10:14:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHv9ogDRSvPqN8972+OppvPfeC5b0EiodIB7DDO8PhtO6qM8mshIf64Jk/c7SROl+eWt/1uwQ==
-X-Received: by 2002:a17:90b:3ec3:b0:2ee:9e06:7db0 with SMTP id 98e67ed59e1d1-2fce78a503cmr221317a91.11.1740075239836;
-        Thu, 20 Feb 2025 10:13:59 -0800 (PST)
-Received: from [10.81.24.74] (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fc13ac0a06sm14230039a91.15.2025.02.20.10.13.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2025 10:13:59 -0800 (PST)
-Message-ID: <637284c7-84e9-40da-9b0d-94fc7488e6c9@oss.qualcomm.com>
-Date: Thu, 20 Feb 2025 10:13:57 -0800
+        bh=ihvxdX0Eo8QqJteSeQOugcj3Cmf99WeR7EZ0mstg924=;
+        b=sN73SUdaoLa28r8YB9M5rwnfSHrC+ULHIiXuz7FBYXLqKV2Q5aqkHzgHHi15dzzaE/
+         GagHjt2l8LVnIXks6/FF5gNnmv8jh+ZJZXIIJLiHx4g+JOD2/XfEAF5g2CEQxJxPDRmY
+         aiXeQIcSPnFPsoA10W0eLdhQ2yr1RyyjybcjXFjBbqbwGBPkZN47VVJPlKJcozpNm+ak
+         2afzqy5+BSANwcWJ2poEPlohoJ85BRogJjJWn3bF+OIVsQ44mNHyeDaHvuUhRDtlfp5a
+         VYCPLmDjawaGKfdVCX3h1oYpLo7wXLt0pAxXIfAieB3oWJ+beFG7c21vZn+lm0zxT/ZK
+         4oww==
+X-Forwarded-Encrypted: i=1; AJvYcCWnugTe33K5uAT39NGV01oXQjlbUsa6vt2G0pXmAWPgqdII8pKyEr2wNB5mdZ6ZJBQ7iuR/We4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRl9aUpsRXjgfmWHeGBCn8xvu7NscIGqZxCqIr/TVrmiqsQPtA
+	IJXMaIyvWjzROtICfxJ4uiFezHrNr9NU7TL5luFRnK+wDRMlQesMR1SojDG4c4U=
+X-Gm-Gg: ASbGncuk6VWhDruCjWCr2XHv6DIAW7KnFDpbCeQbSqz4crKtyNFBTRykSH/cwRvCaQX
+	fsqwGwdYThZ8sTERNoltoTWdJOnhQBUeMM63juugMMoIYSBxnPgiLWNaZruDc12vamrq8ssb1Yv
+	38wVmDzwgfxVr72GIdDIB2BfXtpnR2pDd62TH8CMivxXBrcxH55v7/zym9TziF4Tk/1Pe61TR3a
+	fug/JcN+Ot47C3/VkkEgxrtqyf+Sb5Uzuvuo6eqIQoFcanC66cPzUaJ5/tpwVf4VXFONN92T2kI
+	OF623vN/37KfsIKJcKoUDNO0qa/MwtTKQC8Zaea1KuTvg/6BQu2dJA==
+X-Google-Smtp-Source: AGHT+IEe8IPct2LrWG5x8QLQ/2Gvkswrv0qrGD4AgkeTITgNQW2Gw2o8EeNLGJv2tlp9Gr2jR6Tm+Q==
+X-Received: by 2002:a05:620a:171f:b0:7c0:b0b7:493e with SMTP id af79cd13be357-7c0ceeebcf2mr36000085a.7.1740075366685;
+        Thu, 20 Feb 2025 10:16:06 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0a26a1a03sm454961985a.46.2025.02.20.10.16.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 10:16:06 -0800 (PST)
+Date: Thu, 20 Feb 2025 13:16:03 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	stfomichev@gmail.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 4/7] selftests: drv-net: probe for AF_XDP
+ sockets more explicitly
+Message-ID: <Z7dxYyL9byyh1Fow@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
+	petrm@nvidia.com
+References: <20250219234956.520599-1-kuba@kernel.org>
+ <20250219234956.520599-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: mctp: Add MCTP USB transport driver
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-        Matt Johnston <matt@codeconstruct.com.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        Santosh Puranik <spuranik@nvidia.com>
-References: <20250206-dev-mctp-usb-v1-0-81453fe26a61@codeconstruct.com.au>
- <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: yDTU0K23Rqs7FQY83S7iIHzdBDe4RV6q
-X-Proofpoint-ORIG-GUID: yDTU0K23Rqs7FQY83S7iIHzdBDe4RV6q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-20_07,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
- bulkscore=0 phishscore=0 suspectscore=0 malwarescore=0 spamscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=834 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502200127
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250219234956.520599-5-kuba@kernel.org>
 
-On 2/5/25 22:48, Jeremy Kerr wrote:
-...
-> +module_usb_driver(mctp_usb_driver)
-> +
-> +MODULE_LICENSE("GPL");
+On Wed, Feb 19, 2025 at 03:49:53PM -0800, Jakub Kicinski wrote:
+> Separate the support check from socket binding for easier refactoring.
+> Use: ./helper - - just to probe if we can open the socket.
 > 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2: new
+> ---
+>  tools/testing/selftests/drivers/net/xdp_helper.c |  7 +++++++
+>  tools/testing/selftests/drivers/net/queues.py    | 12 +++++++-----
+>  2 files changed, 14 insertions(+), 5 deletions(-)
+>
 
-Since commit 1fffe7a34c89 ("script: modpost: emit a warning when the
-description is missing"), a module without a MODULE_DESCRIPTION() will
-result in a warning with make W=1. Please add a MODULE_DESCRIPTION()
-to avoid this warning.
+I've tested this on a kernel with XDP enabled and also a kernel with
+XDP disabled and the change appears to work as intended.
 
+Here's what it looks like on a kernel with XDP disabled:
+
+KTAP version 1
+1..4
+ok 1 queues.get_queues
+2ok 2 queues.addremove_queues
+ok 3 queues.check_down
+# Exception| Traceback (most recent call last):
+# Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/ksft.py", line 223, in ksft_run
+# Exception|     case(*args)
+# Exception|   File "/home/jdamato/code/net-next/./tools/testing/selftests/drivers/net/queues.py", line 33, in check_xsk
+# Exception|     raise KsftFailEx('unable to create AF_XDP socket')
+# Exception| net.lib.py.ksft.KsftFailEx: unable to create AF_XDP socket
+not ok 4 queues.check_xsk
+# Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
+
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
