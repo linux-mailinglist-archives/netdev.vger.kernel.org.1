@@ -1,171 +1,298 @@
-Return-Path: <netdev+bounces-168202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832E9A3E141
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:47:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 148A8A3E165
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 912A9188D555
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B8BD17F40C
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C7B20E6F7;
-	Thu, 20 Feb 2025 16:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CB12135D8;
+	Thu, 20 Feb 2025 16:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="evYb8R8f"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="aSiBQIAy"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011047.outbound.protection.outlook.com [52.101.65.47])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729EB17A2F0;
-	Thu, 20 Feb 2025 16:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740070027; cv=fail; b=NDIHdAhMD6RRH/omQ1r9lA4jBOZ3LVGbGzy8NeJONvAOJ9jeHZoKzIfUUY6X7rFcQ+DWd5QFFy3QaxktkRimOw99GQSH6CBZlk02W51XxYNzQspe2UnnD9hPAR9vnZlSeoxinMMgmAszn/vb2azQ8zooZek+y78MYvkcQn5c5lo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740070027; c=relaxed/simple;
-	bh=xfwxO8ZyYyHaOdGtSR3FYSYiDjFmtOtqPJlU8aumeBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=IPL0qu7FWMIwkjo/9Qi8iaoxkJqIG2OXv1Cp1l281h8NF9gjjVhJM9m4R+wAEq4dtsQHqpCYVeCu6fq47x3i+Tfh9gWTLwaN8Ye9l9TXTFwNFyHYMMh74gEqquxX8mGCmJShBKcMsX9d3uW3xd/9PGsZJmm9dtNCzVC62D/oxXA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=evYb8R8f; arc=fail smtp.client-ip=52.101.65.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lSeIGcDG1k4jViGRg145Gf/oTHDZTlzewaYt2SHdVc037RKVdpFMg6Pg0y3ImcSHJHuw/97bfPGzUyrkGymJubat2DX84lbS3ZFfwJu6Ze7W6iBJnq5c0/H9kjD0lGDmoUyv8MDK0xAymex76bGIxqK29oVsBTgQgH7pLZRAB2clyQMB5CxHzExBqtI5WvTLJOcXbMDhU3wcGUo7nLwM5lJywIp00SZFGDQnr6Wjrw4ZYFSdPyK5pHkBcwUpQRFzkjWIW+oLxoNt9lTEekigseUYhyLhCLNQxPYtithDt235UuYX6I0kU83n0D84+orbQebuMmIV8JEqah5fplUPCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xfwxO8ZyYyHaOdGtSR3FYSYiDjFmtOtqPJlU8aumeBU=;
- b=JXpxUWbYshNC1F5xDL48dOh9ledzdhQF7hTLwb0No1cjWRlDikEoQwFS3zRAQsLz2+iCAm+Jp0UOf0KM+zRhs9B9xNJQ805zeEiVFyywpH9boCrWYdHCiA4gcw1946d5y/2pZ48ii3zQjLpcHCsrStF33RuyO/hSyQeBFeNjZXyHiPXDBElOWYvZ+h+fFoPqzyaorJ54qPXqQn578v9tIreLKigde0UrPbRff/3n/nhESkel1v3xuO58C23r9+QZGzCC2lqXlxRfD9L8e/Zf8wwwv/w2K47JwhEOHONsNCb8hNz6Jym9uMzZCNOsLr4tmqkVi8hFAkRLtln+El/hnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xfwxO8ZyYyHaOdGtSR3FYSYiDjFmtOtqPJlU8aumeBU=;
- b=evYb8R8fT6yrAeozeFh/qWgtWbYMLpxvBojrLNek3PT9jsVRI9B6sfSbJUSLD9aDXxhMOS1fXODjOGGXJcqlggRQFv5Pmjjr7w33mKZde5WdkLyzpOP77NZyeoCRuw8k0LC0IRzI6ZX/NZZDT4MeQJ49CLKJtkAK5QZ7JgkjftAaZvymd06A15DK0OmjBWSajqVHM69pL7QXD51eU9aKOG1K01nwY8X9p+ki0c2LpgcbaDJogYkPE6u8/iCnDxs3odRLtcVpSBrseP4KV8mIqaOOdggkRQJBm2/LJ4Fs7VZXYC9nzESbWf0zU1p+7iGdpsOQDzLXOkR2npkzGehdtQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
- by DB9PR04MB9257.eurprd04.prod.outlook.com (2603:10a6:10:373::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.20; Thu, 20 Feb
- 2025 16:47:02 +0000
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc%5]) with mapi id 15.20.8466.015; Thu, 20 Feb 2025
- 16:47:02 +0000
-Date: Thu, 20 Feb 2025 18:46:59 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ioana.ciornei@nxp.com, yangbo.lu@nxp.com,
-	michal.swiatkowski@linux.intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 net 9/9] net: enetc: fix the off-by-one issue in
- enetc_map_tx_tso_buffs()
-Message-ID: <20250220164659.hqewxa3zb4oqgo5f@skbuf>
-References: <20250219054247.733243-1-wei.fang@nxp.com>
- <20250219054247.733243-1-wei.fang@nxp.com>
- <20250219054247.733243-10-wei.fang@nxp.com>
- <20250219054247.733243-10-wei.fang@nxp.com>
- <20250220163226.42wlaewgfueeezj3@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250220163226.42wlaewgfueeezj3@skbuf>
-X-ClientProxiedBy: BE1P281CA0057.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:23::13) To PA4PR04MB7790.eurprd04.prod.outlook.com
- (2603:10a6:102:cc::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CFF211712;
+	Thu, 20 Feb 2025 16:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740070099; cv=none; b=OuIT1lZq+yUNhsm13wbQjsEXOSdiNGCNFHfat75WVkTvziYVU8lx8EBZPX9aV5TyPUcM55ELsHqjNtjm/aGvqwvgDski3HI5/YYv1tKQkTZho4rKoQR/IHMg2KPeziutWN1J7L0Eu8XnyrVyQdN8xYkhjZVS6yTdTiRFfzd+x4o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740070099; c=relaxed/simple;
+	bh=n9Xbwl+fQoGnlHoZ6DhJpTxqftbyrczRb+VyfJeh9I8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KG4vlkfCe9H7HOzRUfhycen2Bfkgcpp5lmylKFOJtQb+/svKsoSoqk/RNfGjKq0CYx++G9XqR3FYcRDezbmZunFw/TT8dj9ZyDS1B9Pqp6d5uQM4sRGA79yuXmvAr2e/Pf4vVPnRHhi5P/w63zIX+j/Qo4ZtmLU3gpw6lrUbaZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=aSiBQIAy; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=82dqFK/+I+yQTkdCJUvoXC0E698TJBTXyRzhSQITprs=; b=aSiBQIAyWRInn5J6
+	2AlnzNRGerj1SpjtGOt/lUNc0KmzoUmVFTcns2rNreK2O0trQo8mmUPzt55i4lfaGCoHNaV3qwAgv
+	NCvD1QPTrY0TlrzT0VLcqbB/oD0GNf1IwpME1WKweamFNPZTQ9POa8fcqqFWxxxDVrhih1ay9wSRp
+	pWoxXpwJrVxi1qhX6i4LhUATHx5FwJxVHKDzWrMbiRxbliExqa6SR1J1LuN4KvbqVA/JNKQMvZ5YX
+	P23x4CoGzhatFn9x48CnX+aDdjljIJd1UgAS5qVDwJIAzotGTOsTULo2vI5x0mRAXcsSwj6RuOmR4
+	o53HzdS2e7cK/inTzg==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tl9iW-00HF5U-1b;
+	Thu, 20 Feb 2025 16:48:04 +0000
+Date: Thu, 20 Feb 2025 16:48:04 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: paul@paul-moore.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] netlabel: Remove unused cfg_calipso funcs
+Message-ID: <Z7dcxAYj_jsG9WL6@gallifrey>
+References: <20250220140808.71674-1-linux@treblig.org>
+ <aa6c6f4c-7d46-4e7e-bafc-f042436f47b6@schaufler-ca.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|DB9PR04MB9257:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2eb9dae-bfd0-4e4d-04a0-08dd51ce3350
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mnWKHTkJDY2qI1Ve/SAbtaGOIjnZAsnVGWAkouooqIT5NY3bS7imgg+9Mj8+?=
- =?us-ascii?Q?hAD2JrO+Lvc9PDGGOTcMVKIi+5rLTtUh86Mg/AlIMPCHraHxZHCiCQh//RGp?=
- =?us-ascii?Q?umgZ3Zdw3Aub3fysnbnbmd+B7z0g0s/6Rhh2gzPvdQglwXgAoEhT2eJEXTRJ?=
- =?us-ascii?Q?RpAUqaT4qRGhyUu3at2S5ypcqczCwz7SjqWNaXuBhw8x4q0HmpSV/1fa6Ob1?=
- =?us-ascii?Q?XM8SD+rme3O97/QQGXjPoJ8gMyv8gnxxrVJCMgSa0nCZ5v30mgag878eaZxD?=
- =?us-ascii?Q?7kcvJHTMTZYfMA95z/4adkG5Vpfn9Hyivi883XbgcYavBfL30gtCfEznEuWL?=
- =?us-ascii?Q?F7v7VBfuMpJlya/sWuyZQ9weofpawtQTOoIX9IvjkHmf5MBD/Xjv2CpC2DVx?=
- =?us-ascii?Q?DVLXam+wCiZfRBI6bXhiZYb58kCb8ozGb2cY9Ti7spZhFqrKPVtGX0awmCUE?=
- =?us-ascii?Q?DsH/hl34CInxqCXWA8jR237T83gJDUFSgtZMc1Rv6hpowqLHgKtisbJtptm4?=
- =?us-ascii?Q?YXMsHqjsfUL+uJhIRmv7+nNsZwehmu4tPP0mR/LNuTKY2GK4CReaeXCKN3ba?=
- =?us-ascii?Q?skynh4vLHTzGwhMApzX19rl2r/efrPvnhcJpNp3XuRYAMjkg/DI4Y05g89u5?=
- =?us-ascii?Q?Mw6btjbIQUKIXhe99K1VDwZQhT1aaylOULYUyLHGtqJOlRcyIlAiCk2XMvPE?=
- =?us-ascii?Q?Z8jmZ147ucTLHAUNhrvIBfGN9+0LX5GJKdb1WWvIS9lu73MyHetKk++qmctJ?=
- =?us-ascii?Q?p9+lCy0Saoz+VXRKbfLDasWnKpzyJW7+C7e1pvUNaQ+zlgoF93I+7a7Mw9sy?=
- =?us-ascii?Q?5B3Z7mMoC4JATKbbyultwdkfO150UCBn5GKPRmO3jNRH4BLPGApswd/Ocy3X?=
- =?us-ascii?Q?GLykhRfs0Udrkr6oUd/rfkbqIbfHyD8HrTq+StvILsg9l30LgDNBvXrniF1i?=
- =?us-ascii?Q?VcHgRceS4TazCjYySWs3e72Iw8+pQgexBVjXfg4deQ7FZ+y6IsKuzM2nhKj2?=
- =?us-ascii?Q?9khZpYMBimkSGzDqbmAIXIVf9NufA/lJ0vEhS31gvGMJhbkm/hsQOcqbVU64?=
- =?us-ascii?Q?R9s+K/fBJ5EvJomj6X2zsPaxnBHAtETSEQDZH8ySV6+bLnKOSGLgA8aP0Q0r?=
- =?us-ascii?Q?wIaTKYFYXcKpGUIkaZwLL2l6brRO+yk3ghJugyjavKWxMIQ0dPjM7Vbvtw8C?=
- =?us-ascii?Q?vreZpRt6lWGIPrbyie/5eEYcE30keqioSMbLV31nsPGqQ28QBs+6Vq4tfBps?=
- =?us-ascii?Q?C+pfQqMagu71i4g5sXnMg4USu2k5Sz7RpAOui3RxE4bOCopKC/PZPLvelYtn?=
- =?us-ascii?Q?9IuMmqVUWJsGe1eY7o+7pFjNOAW6lD59E9PSFL+yZNw3ijQG/aq5SsFdoLsR?=
- =?us-ascii?Q?+Y2De6W/EIm7vXlSk3xt2HlZtqBE?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PLp+bPmBjaZcUUgecqRIMdoyyUL/w6Q54766ZhcOwMMWoKwgkOaJO75l/yEJ?=
- =?us-ascii?Q?SqaaUa6e7du1j75LkDe+2xobBg/1Z0igbl6iqf+J8PFjqaG15Ql/jOZokpxO?=
- =?us-ascii?Q?h//f8v1QAKCGPHcqMXWhw0fug6AX16zU1grSinqJ6o54+SFKFphEm1fsp3kN?=
- =?us-ascii?Q?NShHwjtTWfvX1AKDQzHOQ42C2f96egakK6om3gnmbV5gauQkvWvHKgMYPZsw?=
- =?us-ascii?Q?WrlQuLkderkOdjgCKFA3eUR2z7pC5JrRJG2YAkAMcfaZO58n1vyjEvUJtpgG?=
- =?us-ascii?Q?Hzfqw5nCff2fKvXVLaPNlAuksBPVxuTI/no83z7DsP+KdXgYzh7S3Ri9HgDr?=
- =?us-ascii?Q?Kfr/FdNMWspLdFaExYrz5cPgpwsrZtf3srLTEJQHr9+Qh7pSTYsDh7Jpz6e+?=
- =?us-ascii?Q?JRrwYnnoXAvOWiasFdYeaX0xCo9S11XC3H/BhWPA8mZZyibPOj7Ql71KiCH1?=
- =?us-ascii?Q?MtQ6xDyYdf+Lrblw8E7CCqkAtzCAUp2BKI6mJGkohKQ8cym/qf527fx+SMFR?=
- =?us-ascii?Q?RW/y2L/+Tu/F+MT9CkdE+MHIwTHf+zbFQAR3Pphw9N99rWYL80OATyoZk1C+?=
- =?us-ascii?Q?KvT1TCv3u6tFWvlS/8GjHRZeTavwI/GaGwfSu0cf3sEJlOYRzwcicdjA39Qi?=
- =?us-ascii?Q?RUzDDmnmAVXaA+ylWyEzNd+3cQjYo09wUg57STgf6K0hNH7V/pSjzzOmQRFc?=
- =?us-ascii?Q?sgNH8q+1dMtGs6K0/rqct+UeKbTDNi1bcLo9fo6N+xeIiKZ2Sok5vpcajwwW?=
- =?us-ascii?Q?eWPW/iNFGyOdBL7mLO6G5JNTTWxfFQ9ExxxVXHVf0ajjpjH9TRhFG8RQT9M6?=
- =?us-ascii?Q?iick93S/BIOcGgyMKzPAn9swS7i7SeHIakUG/oaozjf/oy6nx1YLrXiE/Mv+?=
- =?us-ascii?Q?v89/QTEbfhTZ/rsK5nQ3Tiri78fC2DTH4Z/rxCf3Lov1dBoML04IQzmZjfSW?=
- =?us-ascii?Q?3BFwYdvQ4gBDwt9tMlqarVYSkgFBjux2zXZrVdw2XiIPwE5F5A65tt5NsA3n?=
- =?us-ascii?Q?019vF5Pn265KMx2hzEKFzgk9XyQ8CDUjhI4NWKSsWt9fLlvce1zRU4cPbojA?=
- =?us-ascii?Q?bz+qjYOcvKJU42vOYy8u6wQhuUDrPQplZF+a4i2XTgCFGWI65l3BvTfIj2xc?=
- =?us-ascii?Q?H8SNsH7rPeobcExLnN/XFJU/oYRoPI9nDr9ZBLXZa67KQa0+ZNCcVCOZbaEe?=
- =?us-ascii?Q?LfxDZxxDaFN2BZlDsnEwfbt9Q+mwgMoxO9UuCyT0YROxkq47rEQnapO3+NS+?=
- =?us-ascii?Q?Jnmn583phMpvdok7Wo7LhkY99HPQ8PyTEnEwqwSzLWu29IPaeAWEEhzICUoj?=
- =?us-ascii?Q?E8Y7XdSHs+mElb2M9FS7AS+CF+6nybYMIORc062Fu2XYKyPcC1laokWAZ9e4?=
- =?us-ascii?Q?cOhX+WFCrT8mrhcDYt3CTriB42aWs6QcaTKDXKvBpWKdyCVSlSoWqdtMWfbc?=
- =?us-ascii?Q?nkiAtwK51LJLd/29O+H8m05q0/sfOrQhUmeOIvlMbCOF+KU3TT8E4BVnxCO9?=
- =?us-ascii?Q?R3T9U6r+rInab+EF79nN0NbyqYtoL4NKU/3971K64DG6ED3SCR1YihWtHE/A?=
- =?us-ascii?Q?ApRUt3d8ljaqQEhSuMC6EH2L3f9ZDqzXA35IXbdsmAuFKGK4q+M9IOUWWf7w?=
- =?us-ascii?Q?5g=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2eb9dae-bfd0-4e4d-04a0-08dd51ce3350
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 16:47:02.3941
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZmuGCGHVAIG219PGWhB+hcUFEUfL8/xkgQmGyKSUHAOr9jo6LyRxvI5SyimR402knt6cBwbo0rpnBPI7B/1ISg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9257
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <aa6c6f4c-7d46-4e7e-bafc-f042436f47b6@schaufler-ca.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 16:46:41 up 288 days,  4:00,  1 user,  load average: 0.02, 0.01,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Thu, Feb 20, 2025 at 06:32:26PM +0200, Vladimir Oltean wrote:
-> +/**
-> + * enetc_unwind_tx_frame() - Unwind the DMA mappings of a multi-buffer TX frame
+* Casey Schaufler (casey@schaufler-ca.com) wrote:
+> On 2/20/2025 6:08 AM, linux@treblig.org wrote:
+> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> >
+> > netlbl_cfg_calipso_map_add(), netlbl_cfg_calipso_add() and
+> > netlbl_cfg_calipso_del() were added in 2016 as part of
+> > commit 3f09354ac84c ("netlabel: Implement CALIPSO config functions for
+> > SMACK.")
+> >
+> > Remove them.
+> 
+> Please don't. The Smack CALIPSO implementation has been delayed
+> for a number of reasons, some better than others, but is still on
+> the roadmap.
 
-Ok, maybe "multi-buffer TX frame" is not the best way of describing it,
-because with software TSO it's actually multiple TX frames. Perhaps
-"multiple TX BDs" is a better way of putting it, but we can argue about
-semantics later.
+Hmm OK.
+If it makes it to 10 years next year then perhaps it should hold
+a birthday party!
+
+Dave
+
+> 
+> >
+> > (I see a few other changes in that original commit, whether they
+> > are reachable I'm not sure).
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> > ---
+> >  include/net/netlabel.h       |  26 -------
+> >  net/netlabel/netlabel_kapi.c | 133 -----------------------------------
+> >  2 files changed, 159 deletions(-)
+> >
+> > diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+> > index 02914b1df38b..37c9bcfd5345 100644
+> > --- a/include/net/netlabel.h
+> > +++ b/include/net/netlabel.h
+> > @@ -435,14 +435,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
+> >  			       const struct in_addr *addr,
+> >  			       const struct in_addr *mask,
+> >  			       struct netlbl_audit *audit_info);
+> > -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
+> > -			   struct netlbl_audit *audit_info);
+> > -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info);
+> > -int netlbl_cfg_calipso_map_add(u32 doi,
+> > -			       const char *domain,
+> > -			       const struct in6_addr *addr,
+> > -			       const struct in6_addr *mask,
+> > -			       struct netlbl_audit *audit_info);
+> >  /*
+> >   * LSM security attribute operations
+> >   */
+> > @@ -561,24 +553,6 @@ static inline int netlbl_cfg_cipsov4_map_add(u32 doi,
+> >  {
+> >  	return -ENOSYS;
+> >  }
+> > -static inline int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
+> > -					 struct netlbl_audit *audit_info)
+> > -{
+> > -	return -ENOSYS;
+> > -}
+> > -static inline void netlbl_cfg_calipso_del(u32 doi,
+> > -					  struct netlbl_audit *audit_info)
+> > -{
+> > -	return;
+> > -}
+> > -static inline int netlbl_cfg_calipso_map_add(u32 doi,
+> > -					     const char *domain,
+> > -					     const struct in6_addr *addr,
+> > -					     const struct in6_addr *mask,
+> > -					     struct netlbl_audit *audit_info)
+> > -{
+> > -	return -ENOSYS;
+> > -}
+> >  static inline int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap,
+> >  				     u32 offset)
+> >  {
+> > diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+> > index cd9160bbc919..13b4bc1c30ec 100644
+> > --- a/net/netlabel/netlabel_kapi.c
+> > +++ b/net/netlabel/netlabel_kapi.c
+> > @@ -394,139 +394,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
+> >  	return ret_val;
+> >  }
+> >  
+> > -/**
+> > - * netlbl_cfg_calipso_add - Add a new CALIPSO DOI definition
+> > - * @doi_def: CALIPSO DOI definition
+> > - * @audit_info: NetLabel audit information
+> > - *
+> > - * Description:
+> > - * Add a new CALIPSO DOI definition as defined by @doi_def.  Returns zero on
+> > - * success and negative values on failure.
+> > - *
+> > - */
+> > -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
+> > -			   struct netlbl_audit *audit_info)
+> > -{
+> > -#if IS_ENABLED(CONFIG_IPV6)
+> > -	return calipso_doi_add(doi_def, audit_info);
+> > -#else /* IPv6 */
+> > -	return -ENOSYS;
+> > -#endif /* IPv6 */
+> > -}
+> > -
+> > -/**
+> > - * netlbl_cfg_calipso_del - Remove an existing CALIPSO DOI definition
+> > - * @doi: CALIPSO DOI
+> > - * @audit_info: NetLabel audit information
+> > - *
+> > - * Description:
+> > - * Remove an existing CALIPSO DOI definition matching @doi.  Returns zero on
+> > - * success and negative values on failure.
+> > - *
+> > - */
+> > -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info)
+> > -{
+> > -#if IS_ENABLED(CONFIG_IPV6)
+> > -	calipso_doi_remove(doi, audit_info);
+> > -#endif /* IPv6 */
+> > -}
+> > -
+> > -/**
+> > - * netlbl_cfg_calipso_map_add - Add a new CALIPSO DOI mapping
+> > - * @doi: the CALIPSO DOI
+> > - * @domain: the domain mapping to add
+> > - * @addr: IP address
+> > - * @mask: IP address mask
+> > - * @audit_info: NetLabel audit information
+> > - *
+> > - * Description:
+> > - * Add a new NetLabel/LSM domain mapping for the given CALIPSO DOI to the
+> > - * NetLabel subsystem.  A @domain value of NULL adds a new default domain
+> > - * mapping.  Returns zero on success, negative values on failure.
+> > - *
+> > - */
+> > -int netlbl_cfg_calipso_map_add(u32 doi,
+> > -			       const char *domain,
+> > -			       const struct in6_addr *addr,
+> > -			       const struct in6_addr *mask,
+> > -			       struct netlbl_audit *audit_info)
+> > -{
+> > -#if IS_ENABLED(CONFIG_IPV6)
+> > -	int ret_val = -ENOMEM;
+> > -	struct calipso_doi *doi_def;
+> > -	struct netlbl_dom_map *entry;
+> > -	struct netlbl_domaddr_map *addrmap = NULL;
+> > -	struct netlbl_domaddr6_map *addrinfo = NULL;
+> > -
+> > -	doi_def = calipso_doi_getdef(doi);
+> > -	if (doi_def == NULL)
+> > -		return -ENOENT;
+> > -
+> > -	entry = kzalloc(sizeof(*entry), GFP_ATOMIC);
+> > -	if (entry == NULL)
+> > -		goto out_entry;
+> > -	entry->family = AF_INET6;
+> > -	if (domain != NULL) {
+> > -		entry->domain = kstrdup(domain, GFP_ATOMIC);
+> > -		if (entry->domain == NULL)
+> > -			goto out_domain;
+> > -	}
+> > -
+> > -	if (addr == NULL && mask == NULL) {
+> > -		entry->def.calipso = doi_def;
+> > -		entry->def.type = NETLBL_NLTYPE_CALIPSO;
+> > -	} else if (addr != NULL && mask != NULL) {
+> > -		addrmap = kzalloc(sizeof(*addrmap), GFP_ATOMIC);
+> > -		if (addrmap == NULL)
+> > -			goto out_addrmap;
+> > -		INIT_LIST_HEAD(&addrmap->list4);
+> > -		INIT_LIST_HEAD(&addrmap->list6);
+> > -
+> > -		addrinfo = kzalloc(sizeof(*addrinfo), GFP_ATOMIC);
+> > -		if (addrinfo == NULL)
+> > -			goto out_addrinfo;
+> > -		addrinfo->def.calipso = doi_def;
+> > -		addrinfo->def.type = NETLBL_NLTYPE_CALIPSO;
+> > -		addrinfo->list.addr = *addr;
+> > -		addrinfo->list.addr.s6_addr32[0] &= mask->s6_addr32[0];
+> > -		addrinfo->list.addr.s6_addr32[1] &= mask->s6_addr32[1];
+> > -		addrinfo->list.addr.s6_addr32[2] &= mask->s6_addr32[2];
+> > -		addrinfo->list.addr.s6_addr32[3] &= mask->s6_addr32[3];
+> > -		addrinfo->list.mask = *mask;
+> > -		addrinfo->list.valid = 1;
+> > -		ret_val = netlbl_af6list_add(&addrinfo->list, &addrmap->list6);
+> > -		if (ret_val != 0)
+> > -			goto cfg_calipso_map_add_failure;
+> > -
+> > -		entry->def.addrsel = addrmap;
+> > -		entry->def.type = NETLBL_NLTYPE_ADDRSELECT;
+> > -	} else {
+> > -		ret_val = -EINVAL;
+> > -		goto out_addrmap;
+> > -	}
+> > -
+> > -	ret_val = netlbl_domhsh_add(entry, audit_info);
+> > -	if (ret_val != 0)
+> > -		goto cfg_calipso_map_add_failure;
+> > -
+> > -	return 0;
+> > -
+> > -cfg_calipso_map_add_failure:
+> > -	kfree(addrinfo);
+> > -out_addrinfo:
+> > -	kfree(addrmap);
+> > -out_addrmap:
+> > -	kfree(entry->domain);
+> > -out_domain:
+> > -	kfree(entry);
+> > -out_entry:
+> > -	calipso_doi_putdef(doi_def);
+> > -	return ret_val;
+> > -#else /* IPv6 */
+> > -	return -ENOSYS;
+> > -#endif /* IPv6 */
+> > -}
+> > -
+> >  /*
+> >   * Security Attribute Functions
+> >   */
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
