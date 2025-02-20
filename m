@@ -1,153 +1,133 @@
-Return-Path: <netdev+bounces-168271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70AB4A3E51F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:34:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71969A3E528
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:36:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F74D19C4084
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CB9A19C483A
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB80F2641D0;
-	Thu, 20 Feb 2025 19:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4909B26563A;
+	Thu, 20 Feb 2025 19:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fo8Smy6I"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Of8y4vrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4403C2638A3;
-	Thu, 20 Feb 2025 19:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B81213E80
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 19:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740080055; cv=none; b=T39WJNNkUPZ6Tr5grbKtg6Kkqxo1qBg0W3KKjlKmDWun00+H9+xIWqBttzC8AuUMylV6GPlsNTOwpFKwpfSQJrzg+I5uxYBFbkIAXDqselJh4q3CTwLsWXSgAJy9uDH5wsWBCo6njlWzTVNOw5tpCgOG91eoYZ5wzQsiMA31KV4=
+	t=1740080122; cv=none; b=QkHJYRCDuYURc5A3ARRQbp97Jpup4Qwl9bSDWFMRMKz9VH/312tu3Y6CyECr5y5kePuYuZ/iHT46PgF/c/q8V5CAubVfvBIk/yNUMrmOqAOM4CHjkAwti3SBCUk35jM82AvhM4pJ/eJNtaR58HMf7GZioNroivdXyRd7+tzlvwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740080055; c=relaxed/simple;
-	bh=lLvSCfGzR1G+5sP88MJmJoxG3MsULk9EywePmaCSpPA=;
+	s=arc-20240116; t=1740080122; c=relaxed/simple;
+	bh=Xlw6ZLbBNxd05wvbuaiphpxA2TltHws4B5kWG1MCRNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ixZkP6kjQ9mqY9+gd9kvWRuJiBHYI035rGJpa1Wl4asJbP3fLs7FUygmz89v+yEI+pexAVeJbqhAPMdyDcTyhCrYcBxO00x6D1bHL7jerzTE/RDGFuv9jW68WHgZmxj0XVScjWkC5cgxy7bdjeOKhv/g1UbyQ/8CIjrXC3zFEas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fo8Smy6I; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fc042c9290so2256968a91.0;
-        Thu, 20 Feb 2025 11:34:04 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=otWyR74MwmtWLgeKmQN/+dTAW2CocN9JRTnBh6SUbF+DWDiYeX8UXmS1vh2YyixZ1q1EmvyPdkwRDOgSo8DMhcFXIQMaRos53CetahiU4Gy5G4suRuJ3vSniOFvnPx4zMk0leTBwX/VOAF7ftVpWi7Mq34mkzqW7Bd047Wzly00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Of8y4vrU; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c0155af484so197687385a.0
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 11:35:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740080043; x=1740684843; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZTiSUkoMecG9RlHxgT6mcfjx4A34996Guxh4H1K/phg=;
-        b=fo8Smy6Iuc/abaQfBRgopj6QuLwQ94TnGkjkgZAxZuHqftzKqkuMB028lQquqsCjcc
-         I4Kj4/YceLJ9W564uYkMCwVYDsx7Rrm+bFQe/wplg4r5Bno7YZsDrqcVq4TTloTAPCfN
-         hbOIupyTOUzAA/Lf+WtP7OThLSCbwdVcfKAq/mNGxWE/EC04M087bSCSV7cCEIW1ztIg
-         d3+4FGnmtomfQfefKAs1DxDmVpcYlVMJm2FB6btoKiv6/ofH12YXvAi/Y1sVkHbLozIC
-         wxW1EE2OFrgZ23/Nrq5mPRSTQBXkbVTUHmMpOlX4vkDb3KKJOV9SGGQcWMcxooEO/fsu
-         SVcw==
+        d=fastly.com; s=google; t=1740080118; x=1740684918; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k9I8NJqPk5xe4i2G4yWDrh+CmokfE7FfncyzoLEVvnM=;
+        b=Of8y4vrUARoN1Wt3rMEOuVtspWgUUeutzY21dXJxGDUB/7X2R8xu+F80ez7LIZ8WRe
+         qpbYfn889kbF/QpxmesbzDPPMf+L07A9z/7N2F41ZKtylhUwydC6YFmkFxavWlv1KGss
+         gSjQ3/Fnv5kkSUpJpEX1N/W5iC8aRQxHTT/GQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740080043; x=1740684843;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZTiSUkoMecG9RlHxgT6mcfjx4A34996Guxh4H1K/phg=;
-        b=IOMOCkxMS3VFBNA+2gyIEvplWeT/S3MAjC4TWW9San1XDMwyYvgG50yY1KHVB98GVG
-         usZ/3zT/1qMMzANBurg4iru9i5YzhEqXbNO+RB73nrdNaTDTDyrYFJ7qQLYKcxnxd6rL
-         DNRi1uRgqk7Pm7m+Rn+hCxVUmOUigRIZoPSP3xlBYdB1M9NXVvr32Ib7zYexVBIVwfid
-         lB9UenpskrZZTpBeY/smSWQofHCM2tjdj0dPSGiRliO7YfQSt2n3Gweb5ethjRBbZFgx
-         7fL5jpaSU8HuyU+8F1I++txF/xv1jVEI4FumQn3pEFoowYZHjD5w55EsxhWgzC4xk9HF
-         3+IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1JpjdpaslVRiJsarplTHNVc3sgDgAhlG1BBp6Uq+FogDdipPNnIEGn82YHU0ypjZzdKaMyVnqxaPKZV8W@vger.kernel.org, AJvYcCUbsxRstSKUJXqI8MthpB+ATY4Ec2qK4Uw/k/aBLGjCfwzyGseX3vJ+UTXMD0bTWI4K5DK/X4toaJ40TYrs3/tU@vger.kernel.org, AJvYcCXJRnjq6y3FLUGsuJmu/m3N6+ZBXKkmwIkeVUTiG6c/bZADlEWqBtNkgupKxPcI5j8a2kEvwjremx+C@vger.kernel.org, AJvYcCXiy2SvlbB5FdQG4IQVzA2rmim8M5cKfOOvjXrSda+uwDOWJAVDzZYDEAhcYrZOBu+bUhs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx53pRu+6tVd1637Mh/I2UXMKNvUXFtxxIm0ZD9bGiuUkzl+dWA
-	2BSdlhh/R0mGt/IPBbCCauHT9Mrl7whUN70foUoIjSwpvVwQpgM=
-X-Gm-Gg: ASbGncuokvM/rJa5d8Dg3BCXqrfcHQPeKQ0yAsCCf7FTNKjMgB+HiLJFVZyPOf5Y+Ut
-	ysSKzJHXIm/md8/rEPQo/YijEiddxfcBqi35miitU4th5EOtVaRHTLVGde2G7BrBWHkc/NQkm5u
-	OlUPvpdzsKXALVWofrg3rOvDZPFL+Y+8ZJnYnsbGtiN6AcU+l9vn8lGFR/XFM1q6g+q1jHdM0s9
-	4BlkjaZ4Gd4OBgEj11z722yZXdHHEGBdAi/cRrkhLSk73yL8u6YUlzhStiQU2ZLJwDqEsxi+rCc
-	JatCOP5a8ezAh84=
-X-Google-Smtp-Source: AGHT+IHodAJTRfe1tv7kfQiCPKc2cGyPrUaPKRCuDC1rwACb5ZM8W6rjPG0qmP5bRg2hTlH0FYozsg==
-X-Received: by 2002:a17:90b:35ce:b0:2ee:cded:9ac7 with SMTP id 98e67ed59e1d1-2fce78ad9ddmr594804a91.20.1740080043522;
-        Thu, 20 Feb 2025 11:34:03 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d53494c0sm124354095ad.6.2025.02.20.11.34.02
+        d=1e100.net; s=20230601; t=1740080118; x=1740684918;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k9I8NJqPk5xe4i2G4yWDrh+CmokfE7FfncyzoLEVvnM=;
+        b=vtLgXE8rezSZb+wwlfQl+QYw0HrNPhwvklaYzvz0mgYPJ4NC+YnWrSrDJ+5+Ly/Njo
+         GnBsBLmb1FNNOc3AJDsl8gp37rpRi5Ww3DprnPCVvqy0YnyKs2ZUN3490hYeQyIPaCdV
+         Qw2D5J3VbhJiLqyDV/1gisBKxQ1RVpsfHkqGmBd4s7GAIGrpzPHfs5I2Y+aTMnQK5Pv6
+         2fB4nNfsSv1SWH20roVoP+jQQH7MupX9OAFCeQwCiLK4qN5xF2qijN45oQWkqB9iwxOy
+         LBB0DPOf85X7TUiHpdhmdEl1Pt3FWL9bmHebXmw044bOc8ComFnkqts2FDbaZtZXG/lw
+         sgIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsAGxmajPemLBJ3jFJXuDcK6BjeaUS4CQlXlaS27AyZnOo6JgjCPPkWBQwVeXECY+lVzsmeW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8n9/wQ9nSlAYFsncMl7FoW2Lde7UzR5+6Y3B/FQN6UMzUsgT/
+	zYyeMwIa0N1HXJ+32fIOqu5fBb/fZkazAwbVbpyMixyGASJw5OdLViuaDGiAAtA=
+X-Gm-Gg: ASbGnctxZsPoY2zuSHWovDJQ4v8uXSFwKlWG7baLDqqKS6U0DDvWxFg4Q9PXcE8hpCL
+	wtzatO7DEizlz/EpGJuLi/12MBi5L8tXxZi3RH19NWtqeCQbPhMyytG/xUP7QxxcCOqvpuJZtAR
+	8pzfTitOXCvE30kswK6pa7bfsTaLUr2+vK3LxYyZbzQAljJsK6I1NPIVv9UGnvzAocApaqgfRpr
+	k8v4jytPzX17nsBNDjj1Bj5QtPeZs5Pch0wODqBJpUjmYU+MswF/Btx721sX+Ns9XhHyyuN3Cpu
+	Y7eD40LvZ+tqL5hDN/lo6kd6h5bGcc8jE15oRvR/T8fXlUx1CXBgvQ==
+X-Google-Smtp-Source: AGHT+IEfpH/1FCYyoN8iFt32/CPSUyCBCQ79gdfwWu0rB1MwbULHmhvcdWqIWUoJz6IyTLjk4v3hdw==
+X-Received: by 2002:a05:620a:2620:b0:7c0:c195:fae4 with SMTP id af79cd13be357-7c0cef723c0mr75684585a.51.1740080118247;
+        Thu, 20 Feb 2025 11:35:18 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0ae3fa256sm347558585a.0.2025.02.20.11.35.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 11:34:03 -0800 (PST)
-Date: Thu, 20 Feb 2025 11:34:02 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
-	asml.silence@gmail.com, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Samiullah Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v4 1/9] net: add get_netmem/put_netmem support
-Message-ID: <Z7eDqnkwmpTW5963@mini-arch>
-References: <20250220020914.895431-1-almasrymina@google.com>
- <20250220020914.895431-2-almasrymina@google.com>
+        Thu, 20 Feb 2025 11:35:17 -0800 (PST)
+Date: Thu, 20 Feb 2025 14:35:15 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	stfomichev@gmail.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 0/7] selftests: drv-net: improve the queue
+ test for XSK
+Message-ID: <Z7eD866CFu_KeWOw@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
+	petrm@nvidia.com
+References: <20250219234956.520599-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250220020914.895431-2-almasrymina@google.com>
+In-Reply-To: <20250219234956.520599-1-kuba@kernel.org>
 
-On 02/20, Mina Almasry wrote:
-> Currently net_iovs support only pp ref counts, and do not support a
-> page ref equivalent.
+On Wed, Feb 19, 2025 at 03:49:49PM -0800, Jakub Kicinski wrote:
+> We see some flakes in the the XSK test:
 > 
-> This is fine for the RX path as net_iovs are used exclusively with the
-> pp and only pp refcounting is needed there. The TX path however does not
-> use pp ref counts, thus, support for get_page/put_page equivalent is
-> needed for netmem.
+>    Exception| Traceback (most recent call last):
+>    Exception|   File "/home/virtme/testing-18/tools/testing/selftests/net/lib/py/ksft.py", line 218, in ksft_run
+>    Exception|     case(*args)
+>    Exception|   File "/home/virtme/testing-18/tools/testing/selftests/drivers/net/./queues.py", line 53, in check_xdp
+>    Exception|     ksft_eq(q['xsk'], {})
+>    Exception| KeyError: 'xsk'
 > 
-> Support get_netmem/put_netmem. Check the type of the netmem before
-> passing it to page or net_iov specific code to obtain a page ref
-> equivalent.
+> I think it's because the method or running the helper in the background
+> is racy. Add more solid infra for waiting for a background helper to be
+> initialized.
 > 
-> For dmabuf net_iovs, we obtain a ref on the underlying binding. This
-> ensures the entire binding doesn't disappear until all the net_iovs have
-> been put_netmem'ed. We do not need to track the refcount of individual
-> dmabuf net_iovs as we don't allocate/free them from a pool similar to
-> what the buddy allocator does for pages.
-> 
-> This code is written to be extensible by other net_iov implementers.
-> get_netmem/put_netmem will check the type of the netmem and route it to
-> the correct helper:
-> 
-> pages -> [get|put]_page()
-> dmabuf net_iovs -> net_devmem_[get|put]_net_iov()
-> new net_iovs ->	new helpers
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> v2:
+>  - add patch 1, 3 and 4
+>  - redo patch 5
+> v1: https://lore.kernel.org/20250218195048.74692-1-kuba@kernel.org
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Thanks for doing this work.
 
-I remember you wanted to have more fine grained refcnt, but starting
-with this is good enough for me.
+I tested this on my system in four cases:
+  - XDP disabled:
+    - NETIF=mlx5
+    - NETIF unset
+  - XDP enabled
+    - NETIF=mlx5
+    - NETIF unset
+
+The warning in patch 1 does not print on my system, but the code
+changes introduced in patch 5/7 fix the hang.
+
+I've already given my Reviewed-by / Acked-by on all patches, so not
+sure if it matters but since I did test this as described above:
+
+Tested-by: Joe Damato <jdamato@fastly.com>
 
