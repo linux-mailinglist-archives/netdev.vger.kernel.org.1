@@ -1,105 +1,83 @@
-Return-Path: <netdev+bounces-168056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93100A3D38C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:46:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFF3A3D3C1
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C26B172C4E
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:45:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C2153BD64E
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA91C1EBA19;
-	Thu, 20 Feb 2025 08:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222601EB9ED;
+	Thu, 20 Feb 2025 08:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HDKSYMxr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NeLRyDfY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B831E9B07
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 08:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3B91B4254;
+	Thu, 20 Feb 2025 08:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041122; cv=none; b=tNRdq4X1ITEsCJVco51drAsOgKvt/RHPRtdC3xMr3FyX3LVp9VadcsIAWfYlyl6BQZYph9F8Mu1oqRy+nn5oVVP34Jw4t4f2Evx6oKl/P1xpm2YXmYDHGekvWMBfTdCs3KnyIT6rptpMLI/6R6DUTMvVYIVHYHWpB8Yfv1F+2e4=
+	t=1740041572; cv=none; b=Q+h+jNTFFaZSSBcKSfLhj0pnXGonDzwItyOlFg3Ff3s00QRzzks3VOzKzwTK3ZPg2mrlLl6Fa3NMgYplk67578b+it4V4u6rbn78mMbIqq3q/6cVNMng0ae58IJZGiMQ1On6xnKKRels7r0oSal6cY9j6hXAXpRk2JwUojhv2qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041122; c=relaxed/simple;
-	bh=0SHhfqD/vA4cGXP3SZz7IhYLrGj9qnR4GeFeMVjfvsU=;
+	s=arc-20240116; t=1740041572; c=relaxed/simple;
+	bh=+br6iE4Vm2zLYMuk2Se6o3kG57xO5aJM3NrDH6ex87Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XR4wZpA62qajJNRVyzYFdFAznx2RL2GO9i+8NgHHnckdkLkK6662d7oDDgrowUs7f/qMlfWmCf/RhYxSwjOjIAEeuRU30jgSTllqywn1m6dYEvN96zG4U4Rq44qFGbFBkxx3AlzL3mb1oF/ASiaZEh5O9p+9aT8shwsiE/KTbz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HDKSYMxr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740041119;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QowQNzpCtCsCtxr+X2Hdu42nsXJZ78IqGs75xqGcCm4=;
-	b=HDKSYMxrL8zXxl/Ph5nORd77ppKkIQX5WuXnf7idofE1RO7wFTKfRWyK/1qiMNu0M/auzj
-	R2SX5X9PMHqYakbhVf2C8AgL3rYTqZfxaEERvQCxgJmyPjsXrsjmjCeTJW2IExefwQYHZi
-	L9eEJNrdn+NpxAVhWkWmfqKLNuBNPNA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-DKDGd4p2Nq6Zy3SvPZEuCw-1; Thu, 20 Feb 2025 03:45:18 -0500
-X-MC-Unique: DKDGd4p2Nq6Zy3SvPZEuCw-1
-X-Mimecast-MFC-AGG-ID: DKDGd4p2Nq6Zy3SvPZEuCw_1740041117
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-abb87e3a3c9so73937966b.2
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 00:45:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740041117; x=1740645917;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QowQNzpCtCsCtxr+X2Hdu42nsXJZ78IqGs75xqGcCm4=;
-        b=a+nEArKK620jx/BAXQpM29OF4Zr1SQlcuHCI7reKGMUyfea0GKlUrVi08WOyMfVyC1
-         pWq7bk37GXHf+fz7rptzqdc05D28fC9B/luW26tOypzT0X4cY9dPaujuxfAD283OP9c4
-         AxrmFs9BLRZOJxGshsKtei16VwI14noNVkaoCMvSDyH8Q3/KrQVBjJJyDt6t9OuFR4aF
-         eyNniFjZOqDpWjl4S08lXJOdASSD+RVqko9YXkaSu/wQpMd1j69z2EA/SauXNQwAfwA1
-         ZJtaYow1MI226nswxfkaoQcj2RmlCc4Ls4FhCjb7F/Tex09vvTpofl8cpBzGUokTKS0h
-         mDvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3wmUo2F15x2J9BZDjGCF1swAM4Q698lFVAdKwWbNDRgxBBzh5xjRXHMa9wJHthnNSofXLhs8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKfrWkn39KnN8KEdi98DSFjIREzyOdTbOxmyjL4MrQh/pTelzL
-	0ahczzI3utrPCMzcly9CWzNjG781u7Ce80LbBTdEqxGS5uGrYYf3buYB7KCufqvrl5VH8ltuP+q
-	+69gT4BI5230gV5A6t1/brbWJv2lwEi0Xersb/odkaxxqdxvrs2Vpig==
-X-Gm-Gg: ASbGncuZ38g9p55H2MypRNfa/xFw6QHxlIlf2zTrcP961f/gkKfp5GSJbJLgD7apwuY
-	qjEN183eoC8DhAG0ZvreGXmIRk/IOpsubxC12KefuGAsDLJZu8OOHdgXTXfvPX5MHjlkUKjbhcW
-	HDUj43LmIRO5BP1HEoSRt5ajV2JXkL1w7zJ2KLz2/quvC8FwkQ8rj/r+O6BIW7mwtskdIQ9f28W
-	AzZU16pAFTxhNNFUWlxZXRluy+OHW+ptidfULB0nZH4w6YGekWQj3AVqDo1e+DUzFzEFA==
-X-Received: by 2002:a17:906:f5a2:b0:ab7:e3cb:ca81 with SMTP id a640c23a62f3a-abbcce2dce7mr658329466b.30.1740041116668;
-        Thu, 20 Feb 2025 00:45:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE3dogKAU3XJfB97xx6QDkV7Yj2gPqLTO6qgUQYyB3pQmxLIK3jEJkScPsnctuvKKAeoojJDg==
-X-Received: by 2002:a17:906:f5a2:b0:ab7:e3cb:ca81 with SMTP id a640c23a62f3a-abbcce2dce7mr658325866b.30.1740041116195;
-        Thu, 20 Feb 2025 00:45:16 -0800 (PST)
-Received: from redhat.com ([2.55.163.174])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb9bc1c667sm731938266b.131.2025.02.20.00.45.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 00:45:15 -0800 (PST)
-Date: Thu, 20 Feb 2025 03:45:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-kselftest@vger.kernel.org,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH net-next v2] tun: Pad virtio headers
-Message-ID: <20250220034042-mutt-send-email-mst@kernel.org>
-References: <20250215-buffers-v2-1-1fbc6aaf8ad6@daynix.com>
- <d4b7f8a0-db50-4b48-b5a3-f60eab76e96b@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YM98h0lkZbfjckEh7cKCOXu6xllWulfR+ewhVCGciLCjwixDcXNqdUIKCZWWd9DAw1s7h+vfWKARxabK0P6MXhtCMTmieVIYmJvEeUCZop1ZQG/wPcyVGVxErdOxDiwkY+gQo0a+y+nHopAY7dUCFzUGpqfjoHzikIvyN4u2WXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NeLRyDfY; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740041569; x=1771577569;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+br6iE4Vm2zLYMuk2Se6o3kG57xO5aJM3NrDH6ex87Y=;
+  b=NeLRyDfYnvks7WlSIfTyatOe2vDpKloAiZLSqW9qNHOY0PREf61ULdmt
+   8aoPnykzsdbUBaQqjxz34hzycHhcKQIJ0xqnK212EPdl2JVcomcdQtZYr
+   3T6SRaFdf5CuKqrorcLKgiAqC7dhuguQSdd9PJRDO92VTWzvroDWtzmIo
+   UjKY+2aCoK4UiUOVoCkuBI7KhWQpqzBs/9qgSkhrL9EShLZRDyxTsHAQM
+   inBa5BBoeEHbOWpT+PANT9lOxJkW0cpl3A1/NzKdKHGg7UYTORrzY3XU+
+   vPeew4Lry3C0JgzH2PP0S7rXFLlfpgGDQlFaZVJ3d3zmupfHLKdMmM8hM
+   Q==;
+X-CSE-ConnectionGUID: MNzMK68dSt64ST6l1B1Nyg==
+X-CSE-MsgGUID: JIPcBvJIS6S5WrY5HhtbDg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="44459453"
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="44459453"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 00:52:48 -0800
+X-CSE-ConnectionGUID: GvnFFMPaQiW1XG2/wfzTeg==
+X-CSE-MsgGUID: C0/02rgzRa2GdL8q7axQcA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="119956100"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 20 Feb 2025 00:52:43 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tl2IS-00043f-2s;
+	Thu, 20 Feb 2025 08:52:40 +0000
+Date: Thu, 20 Feb 2025 16:51:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+	ykolal@fb.com
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jason Xing <kerneljasonxing@gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for
+ bpf_setsockopt
+Message-ID: <202502201843.xA1qZbKX-lkp@intel.com>
+References: <20250219081333.56378-2-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,73 +86,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d4b7f8a0-db50-4b48-b5a3-f60eab76e96b@redhat.com>
+In-Reply-To: <20250219081333.56378-2-kerneljasonxing@gmail.com>
 
-On Thu, Feb 20, 2025 at 08:58:38AM +0100, Paolo Abeni wrote:
-> Hi,
-> 
-> On 2/15/25 7:04 AM, Akihiko Odaki wrote:
-> > tun simply advances iov_iter when it needs to pad virtio header,
-> > which leaves the garbage in the buffer as is. This will become
-> > especially problematic when tun starts to allow enabling the hash
-> > reporting feature; even if the feature is enabled, the packet may lack a
-> > hash value and may contain a hole in the virtio header because the
-> > packet arrived before the feature gets enabled or does not contain the
-> > header fields to be hashed. If the hole is not filled with zero, it is
-> > impossible to tell if the packet lacks a hash value.
-> 
-> Should virtio starting sending packets only after feature negotiation?
-> In other words, can the above happen without another bug somewhere else?
+Hi Jason,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on bpf-next/master]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/bpf-support-TCP_RTO_MAX_MS-for-bpf_setsockopt/20250219-161637
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250219081333.56378-2-kerneljasonxing%40gmail.com
+patch subject: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bpf_setsockopt
+config: x86_64-buildonly-randconfig-002-20250220 (https://download.01.org/0day-ci/archive/20250220/202502201843.xA1qZbKX-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250220/202502201843.xA1qZbKX-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502201843.xA1qZbKX-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/core/filter.c: In function 'sol_tcp_sockopt':
+>> net/core/filter.c:5385:14: error: 'TCP_RTO_MAX_MS' undeclared (first use in this function); did you mean 'TCP_RTO_MAX'?
+    5385 |         case TCP_RTO_MAX_MS:
+         |              ^~~~~~~~~~~~~~
+         |              TCP_RTO_MAX
+   net/core/filter.c:5385:14: note: each undeclared identifier is reported only once for each function it appears in
 
 
-Not if this is connected with a guest with the standard virtio driver, no.
-The issue is that tun has no concept of feature negotiation,
-and we don't know who uses the vnet header feature, or why.
+vim +5385 net/core/filter.c
 
-> I guess the following question is mostly for Jason and Michael: could be
-> possible (/would it make any sense) to use a virtio_net_hdr `flags` bit
-> to explicitly signal the hash fields presence? i.e. making the actual
-> virtio_net_hdr size 'dynamic'.
+  5365	
+  5366	static int sol_tcp_sockopt(struct sock *sk, int optname,
+  5367				   char *optval, int *optlen,
+  5368				   bool getopt)
+  5369	{
+  5370		if (sk->sk_protocol != IPPROTO_TCP)
+  5371			return -EINVAL;
+  5372	
+  5373		switch (optname) {
+  5374		case TCP_NODELAY:
+  5375		case TCP_MAXSEG:
+  5376		case TCP_KEEPIDLE:
+  5377		case TCP_KEEPINTVL:
+  5378		case TCP_KEEPCNT:
+  5379		case TCP_SYNCNT:
+  5380		case TCP_WINDOW_CLAMP:
+  5381		case TCP_THIN_LINEAR_TIMEOUTS:
+  5382		case TCP_USER_TIMEOUT:
+  5383		case TCP_NOTSENT_LOWAT:
+  5384		case TCP_SAVE_SYN:
+> 5385		case TCP_RTO_MAX_MS:
+  5386			if (*optlen != sizeof(int))
+  5387				return -EINVAL;
+  5388			break;
+  5389		case TCP_CONGESTION:
+  5390			return sol_tcp_sockopt_congestion(sk, optval, optlen, getopt);
+  5391		case TCP_SAVED_SYN:
+  5392			if (*optlen < 1)
+  5393				return -EINVAL;
+  5394			break;
+  5395		case TCP_BPF_SOCK_OPS_CB_FLAGS:
+  5396			if (*optlen != sizeof(int))
+  5397				return -EINVAL;
+  5398			if (getopt) {
+  5399				struct tcp_sock *tp = tcp_sk(sk);
+  5400				int cb_flags = tp->bpf_sock_ops_cb_flags;
+  5401	
+  5402				memcpy(optval, &cb_flags, *optlen);
+  5403				return 0;
+  5404			}
+  5405			return bpf_sol_tcp_setsockopt(sk, optname, optval, *optlen);
+  5406		default:
+  5407			if (getopt)
+  5408				return -EINVAL;
+  5409			return bpf_sol_tcp_setsockopt(sk, optname, optval, *optlen);
+  5410		}
+  5411	
+  5412		if (getopt) {
+  5413			if (optname == TCP_SAVED_SYN) {
+  5414				struct tcp_sock *tp = tcp_sk(sk);
+  5415	
+  5416				if (!tp->saved_syn ||
+  5417				    *optlen > tcp_saved_syn_len(tp->saved_syn))
+  5418					return -EINVAL;
+  5419				memcpy(optval, tp->saved_syn->data, *optlen);
+  5420				/* It cannot free tp->saved_syn here because it
+  5421				 * does not know if the user space still needs it.
+  5422				 */
+  5423				return 0;
+  5424			}
+  5425	
+  5426			return do_tcp_getsockopt(sk, SOL_TCP, optname,
+  5427						 KERNEL_SOCKPTR(optval),
+  5428						 KERNEL_SOCKPTR(optlen));
+  5429		}
+  5430	
+  5431		return do_tcp_setsockopt(sk, SOL_TCP, optname,
+  5432					 KERNEL_SOCKPTR(optval), *optlen);
+  5433	}
+  5434	
 
-But it is dynamic - that is why we have TUNSETVNETHDRSZ.
-
-
-
-> > In theory, a user of tun can fill the buffer with zero before calling
-> > read() to avoid such a problem, but leaving the garbage in the buffer is
-> > awkward anyway so replace advancing the iterator with writing zeros.
-> > 
-> > A user might have initialized the buffer to some non-zero value,
-> > expecting tun to skip writing it. As this was never a documented
-> > feature, this seems unlikely.
-> > 
-> > The overhead of filling the hole in the header is negligible when the
-> > header size is specified according to the specification as doing so will
-> > not make another cache line dirty under a reasonable assumption. Below
-> > is a proof of this statement:
-> > 
-> > The first 10 bytes of the header is always written and tun also writes
-> > the packet itself immediately after the 
-> > packet unless the packet is
-> 
->  ^^^^^ this possibly should be 'virtio header'. Otherwise the sentence
-> is hard to follow for me.
-> 
-> > empty. This makes a hole between these writes whose size is: sz - 10
-> > where sz is the specified header size.
-> > 
-> > Therefore, we will never make another cache line dirty when:
-> > sz < L1_CACHE_BYTES + 10
-> > where L1_CACHE_BYTES is the cache line size. Assuming
-> > L1_CACHE_BYTES >= 16, this inequation holds when: sz < 26.
-> > 
-> > sz <= 20 according to the current specification so we even have a
-> > margin of 5 bytes in case that the header size grows in a future version
-> > of the specification.
-> 
-> FTR, the upcoming GSO over UDP tunnel support will add other 4 bytes to
-> the header. but that will still fit the given boundary.
-> 
-> /P
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
