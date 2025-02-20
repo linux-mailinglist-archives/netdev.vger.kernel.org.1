@@ -1,65 +1,50 @@
-Return-Path: <netdev+bounces-168320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693EAA3E822
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 00:12:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28E9A3E81D
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 00:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 246343BF652
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:11:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81CA619C2170
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D90B265616;
-	Thu, 20 Feb 2025 23:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C249E265623;
+	Thu, 20 Feb 2025 23:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Lj45DVaq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lR+8eBm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2DC1EB1B9;
-	Thu, 20 Feb 2025 23:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F16264616;
+	Thu, 20 Feb 2025 23:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740093107; cv=none; b=A5jL8sKeIp4QWEFqPGNVmDuzdVDBbj4whxdwrB5MTeKPtYfZ7uyM/d36h4GJYtLs5yX5ATftpyw5iKgaJEUF/k4YSQDRL0Wq2ntgwxovnjyDHLRU7ypqerf3jWF9m228A4a3U+6cfJEDKdj/dMVlzfA/G6p77LT/pBkvFNhNVEY=
+	t=1740093014; cv=none; b=E/6z7E8Ildjp5y1sIMn4ak2q2iIyVl1ph65dSQMlpcVCrcDdHPbteBCiJ8VeNKBrdxO9g2/O249RdfRzAMGQejolXhGwP9OtfqGln1ZUQfZhFyJRvPgz8kVZV8JGWKcZJ+oEGPuAR7O8Lky2VuWNb7HJAGJyn1z5B1k8y52y7hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740093107; c=relaxed/simple;
-	bh=R0Fj56QDGOJyhVVHZjrG1Af8PrPuFhmH/B5G0gjo4Y8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hyuFsD/kK35lFGaQNt71SDvKmJ30NvW4/hNBPSoY0HY8gQfcf2CYXfOWNB+G7uuvCBCxlCYvckG1AY7uAcB1dbOUjGLRTt4D6oCZES5xjraHsHDCtIkws0rfIA0xfWWnjmlEumLYUyIIaSZjRg8JfKPZT0mTLE9aN1fGLd4x6oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Lj45DVaq; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=JYy9jYhd6Up0RBcecZv1pGyDC9oApGZN2T90sAZAV0A=; b=Lj45DVaq5dFkoib6vMaBPlT969
-	dGF6QZnqPgz4jklW4WIxoiHU68jAliEwKutCpf+lhq+jMIi66OtB4Um/HAkkDMmgaZooPIbRgQJzt
-	8kv0rlq6EDmhWckG5BkCEtDGXjgi4fvmQUGLFcjEgqVxfhR32yrLph6O97XV66Ookucd+ql7RsUqk
-	3A8gKhz0nIRbx5DhDuuInhIg/QWrK6a9tONGY8ycAcmaH6L6loKgRhyCnspxDCNIuswTUsvBkEKDW
-	EJO8JMwZe3RG2RvJHOD7dhF8v5p4ap6ACk+njV86VDvrckzHbxNTkSLzklrYQbTEziK4InitECHgg
-	Agfe4evA==;
-Received: from 50.249.197.178.dynamic.cust.swisscom.net ([178.197.249.50] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1tlFQC-0001UG-0F;
-	Thu, 20 Feb 2025 23:53:32 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org
-Subject: [GIT PULL] bpf for v6.14-rc4
-Date: Thu, 20 Feb 2025 23:53:31 +0100
-Message-ID: <20250220225331.46335-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1740093014; c=relaxed/simple;
+	bh=SCGVRp6GOl4cx1eigu66mZ6vlzczca2P/5/u8Zt6Saw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OTX4reBusjVwontsQLbBcnZYEi0Aqu///xANSY54Qtujg4KINIOUN64hZfVpGraMPKHPJWlCYGJ4a1O4rrnFAvfekqbq8wzkPXqZ8rtTAAceDIDSz00Qa6rY8crtXIg/qFYlI8PWXhs3a8iZonRNdcPlAoNNPhOjMgRe4Cw8K4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lR+8eBm2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B4CC4CED1;
+	Thu, 20 Feb 2025 23:10:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740093014;
+	bh=SCGVRp6GOl4cx1eigu66mZ6vlzczca2P/5/u8Zt6Saw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lR+8eBm29pOim34f7Oc1islIwbMTNcL/VK6wvCInGDpyHebUAvrUtNaW0CxdWlySv
+	 GH0NNEGbTa3RsyZiUpBJQ4wMbhe+5TwQI0Jbbu4O8dlZKPnolzwzw/tbGDyhkxMgQY
+	 TSrdjKlWFwY7aXVPOqheBkDwpVlVIX2qdyz5FN4TpDofGyCV4vbqdWn1cZ+q9l/Qj2
+	 kNS6PjfhOdXuPmeu5TxiwDiVScKvyV6/mQneRZ5inM845N7EqnRGcbtRP4nQ0/Uf0h
+	 RXtz97nL83s5c5rGn0y7Qev3tlI/59E/ivxS5L+wztP1QZUEx6btWuIQ/FCvzRfTFa
+	 goKzHBvrlrgXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EE54B380CEE2;
+	Thu, 20 Feb 2025 23:10:45 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,130 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27555/Thu Feb 20 10:43:53 2025)
+Subject: Re: [PATCH net-next v2] tun: Pad virtio headers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174009304478.1506397.8001698369516362752.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 23:10:44 +0000
+References: <20250215-buffers-v2-1-1fbc6aaf8ad6@daynix.com>
+In-Reply-To: <20250215-buffers-v2-1-1fbc6aaf8ad6@daynix.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: corbet@lwn.net, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mst@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ yuri.benditovich@daynix.com, andrew@daynix.com, stephen@networkplumber.org,
+ gur.stavi@huawei.com, devel@daynix.com
 
-Hi Linus,
+Hello:
 
-The following changes since commit 05dbaf8dd8bf537d4b4eb3115ab42a5fb40ff1f5:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  Merge tag 'x86-urgent-2025-01-28' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2025-01-28 14:32:03 -0800)
+On Sat, 15 Feb 2025 15:04:50 +0900 you wrote:
+> tun simply advances iov_iter when it needs to pad virtio header,
+> which leaves the garbage in the buffer as is. This will become
+> especially problematic when tun starts to allow enabling the hash
+> reporting feature; even if the feature is enabled, the packet may lack a
+> hash value and may contain a hole in the virtio header because the
+> packet arrived before the feature gets enabled or does not contain the
+> header fields to be hashed. If the hole is not filled with zero, it is
+> impossible to tell if the packet lacks a hash value.
+> 
+> [...]
 
-are available in the Git repository at:
+Here is the summary with links:
+  - [net-next,v2] tun: Pad virtio headers
+    https://git.kernel.org/netdev/net-next/c/4adf74971018
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-for you to fetch changes up to dbf7cc560007c8624ba42bbda369eca2973fc2da:
 
-  Merge branch 'bpf-skip-non-exist-keys-in-generic_map_lookup_batch' (2025-02-18 17:27:38 -0800)
-
-----------------------------------------------------------------
-BPF fixes:
-
-- Fix a soft-lockup in BPF arena_map_free on 64k page size
-  kernels (Alan Maguire)
-
-- Fix a missing allocation failure check in BPF verifier's
-  acquire_lock_state (Kumar Kartikeya Dwivedi)
-
-- Fix a NULL-pointer dereference in trace_kfree_skb by adding
-  kfree_skb to the raw_tp_null_args set (Kuniyuki Iwashima)
-
-- Fix a deadlock when freeing BPF cgroup storage (Abel Wu)
-
-- Fix a syzbot-reported deadlock when holding BPF map's
-  freeze_mutex (Andrii Nakryiko)
-
-- Fix a use-after-free issue in bpf_test_init when
-  eth_skb_pkt_type is accessing skb data not containing an
-  Ethernet header (Shigeru Yoshida)
-
-- Fix skipping non-existing keys in generic_map_lookup_batch
-  (Yan Zhai)
-
-- Several BPF sockmap fixes to address incorrect TCP copied_seq
-  calculations, which prevented correct data reads from recv(2)
-  in user space (Jiayuan Chen)
-
-- Two fixes for BPF map lookup nullness elision (Daniel Xu)
-
-- Fix a NULL-pointer dereference from vmlinux BTF lookup in
-  bpf_sk_storage_tracing_allowed (Jared Kangas)
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-
-----------------------------------------------------------------
-Abel Wu (1):
-      bpf: Fix deadlock when freeing cgroup storage
-
-Alan Maguire (1):
-      bpf: Fix softlockup in arena_map_free on 64k page kernel
-
-Alexei Starovoitov (2):
-      Merge branch 'bpf-some-fixes-for-nullness-elision'
-      Merge branch 'bpf-skip-non-exist-keys-in-generic_map_lookup_batch'
-
-Andrii Nakryiko (2):
-      bpf: unify VM_WRITE vs VM_MAYWRITE use in BPF map mmaping logic
-      bpf: avoid holding freeze_mutex during mmap operation
-
-Daniel Xu (3):
-      bpf: verifier: Do not extract constant map keys for irrelevant maps
-      bpf: selftests: Test constant key extraction on irrelevant maps
-      bpf: verifier: Disambiguate get_constant_map_key() errors
-
-Jared Kangas (1):
-      bpf: Remove unnecessary BTF lookups in bpf_sk_storage_tracing_allowed
-
-Jiayuan Chen (5):
-      strparser: Add read_sock callback
-      bpf: Fix wrong copied_seq calculation
-      bpf: Disable non stream socket for strparser
-      selftests/bpf: Fix invalid flag of recv()
-      selftests/bpf: Add strparser test for bpf
-
-Kumar Kartikeya Dwivedi (1):
-      bpf: Handle allocation failure in acquire_lock_state
-
-Kuniyuki Iwashima (1):
-      net: Add rx_skb of kfree_skb to raw_tp_null_args[].
-
-Martin KaFai Lau (1):
-      Merge branch 'bpf-fix-wrong-copied_seq-calculation-and-add-tests'
-
-Shigeru Yoshida (2):
-      bpf, test_run: Fix use-after-free issue in eth_skb_pkt_type()
-      selftests/bpf: Adjust data size to have ETH_HLEN
-
-Yan Zhai (2):
-      bpf: skip non exist keys in generic_map_lookup_batch
-      selftests: bpf: test batch lookup on array of maps with holes
-
- Documentation/networking/strparser.rst             |   9 +-
- include/linux/skmsg.h                              |   2 +
- include/net/strparser.h                            |   2 +
- include/net/tcp.h                                  |   8 +
- kernel/bpf/arena.c                                 |   2 +-
- kernel/bpf/bpf_cgrp_storage.c                      |   2 +-
- kernel/bpf/btf.c                                   |   2 +
- kernel/bpf/ringbuf.c                               |   4 -
- kernel/bpf/syscall.c                               |  43 +-
- kernel/bpf/verifier.c                              |  31 +-
- net/bpf/test_run.c                                 |   5 +-
- net/core/bpf_sk_storage.c                          |  13 +-
- net/core/skmsg.c                                   |   7 +
- net/core/sock_map.c                                |   5 +-
- net/ipv4/tcp.c                                     |  29 +-
- net/ipv4/tcp_bpf.c                                 |  36 ++
- net/strparser/strparser.c                          |  11 +-
- .../selftests/bpf/map_tests/map_in_map_batch_ops.c |  62 ++-
- .../selftests/bpf/prog_tests/sockmap_basic.c       |  59 +--
- .../selftests/bpf/prog_tests/sockmap_strp.c        | 454 +++++++++++++++++++++
- .../selftests/bpf/prog_tests/xdp_cpumap_attach.c   |   4 +-
- .../selftests/bpf/prog_tests/xdp_devmap_attach.c   |   8 +-
- .../selftests/bpf/progs/test_sockmap_strp.c        |  53 +++
- .../selftests/bpf/progs/verifier_array_access.c    |  15 +
- 24 files changed, 726 insertions(+), 140 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_strp.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_strp.c
 
