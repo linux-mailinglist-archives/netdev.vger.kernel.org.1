@@ -1,272 +1,258 @@
-Return-Path: <netdev+bounces-168153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2BDA3DB9C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:45:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB51A3DB93
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:44:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8282F175F92
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 13:45:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 619A816EC22
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 13:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9C31F5402;
-	Thu, 20 Feb 2025 13:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB911F8BC5;
+	Thu, 20 Feb 2025 13:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FBUR3bPa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnGc+g6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3BB1FBC89;
-	Thu, 20 Feb 2025 13:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4454E1F76C0;
+	Thu, 20 Feb 2025 13:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740059129; cv=none; b=Wdi5Mx5zJKjwXFPBfAjYGfLDwyNy4/pHLFtrLKKRXA10hjMIAj/A/qM+Z7lQ54F9OP8nBhexrZ3LurFGGviUsWN3zwwAzHUaWb2fI+9+ydOnQ22Z+L8Wd02n0KPboI6T4I7aY464pIFIE2GmMZLbsQ44nZGLnyTM6OuLBleUpjs=
+	t=1740059079; cv=none; b=g6zXOFyHRjEabhjBvhjS6YNlTm3CLKTUIMzYkJpUF6egkhf5pEax/LMNi0SFt0rZ6W79Dt449XUXJm1hyL1dTFH/4oq9w9NIjk7RZ8oD0+coszizL/NAu6RqUVtA69KkyBYJl9QYUJ5bbF9UWeacGE2x9GIkDfm9p4oEEhHEUMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740059129; c=relaxed/simple;
-	bh=5fj7mFPrfSNstxUkY6VTZHCkWduWWJVFcL0TwY04dWQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TrOKK8h91vS/SzyCE1HiTyo8AhO6d0wy1Fg9ukm85YI2u9N1nPSruO9Q6lukX2bO2XA8uXiLUNHq3zI4Y8idD1JgB10dwF4piunQTwtsRRaoMTsRKa1mMiD4GZatuXZUQ8hyLi9WLkXWbqzEltwg03W8oLJXKBzIJKHvrzqrLsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FBUR3bPa; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740059128; x=1771595128;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5fj7mFPrfSNstxUkY6VTZHCkWduWWJVFcL0TwY04dWQ=;
-  b=FBUR3bPagA0WuWDDEW4bUhuq9UtA5JsZqaTpHEE1LTyDCxI1RjoKLAni
-   9zrAGgX/lumdsMAepD0z1ujPj4cXllAkePGCgZpTyRx3RzDTMPtNZDl7F
-   ffngAzrRxh2FYJuyXC/FZvWvXiLgcXW/CQIAGZRv6DulhONdwVep0+DC8
-   O1mbcsfEA/bDKH4+ujFeh7NGcvqwCohCM1llxGA384N71Tp9HGe7X1VjO
-   IOGDTgQ7LliLvzDw457GdPpK1LcRSRAE/2ykXm9zEbiJSwZ1zStmmdji2
-   9zEex0ep+UEAet0hARG/4RfTwC/1ywWYPPfoeYS0JqwBdnMy/ehzd2tne
-   Q==;
-X-CSE-ConnectionGUID: uTZmziaLTwKO2+IgRZxrHQ==
-X-CSE-MsgGUID: vPjVxNRnTR2uRgvQht3ItA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="51479231"
-X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
-   d="scan'208";a="51479231"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 05:45:27 -0800
-X-CSE-ConnectionGUID: zRbntPTvT+2KVa7fQY7hXQ==
-X-CSE-MsgGUID: SFDwJGMrRx2dGwkvxBahVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="119146274"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa003.fm.intel.com with ESMTP; 20 Feb 2025 05:45:25 -0800
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	martin.lau@linux.dev,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH bpf-next 3/3] selftests: bpf: implement test case for skb kptr map storage
-Date: Thu, 20 Feb 2025 14:45:03 +0100
-Message-Id: <20250220134503.835224-4-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
-References: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1740059079; c=relaxed/simple;
+	bh=CMwWUZ03W806TkHXwe3kr5Wl7XYfSq37ASDCGimHEIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tj0/jpkEeQVto/kg+PFO0UaUoxZIkhylSsJTg78cVMT0mfbfd+BpCFE7JJJlx6zHY4lCqJOnUbcX4RBDX5pRutk+O3GcavWfQumCOx3Gr8se0zOXpDf9HiQ8HQSnw78K5I7i0IYvmCbnLWWVD4cU9CgDv7BLOftjJhOJ+/6xdcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnGc+g6C; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-abb86beea8cso195995066b.1;
+        Thu, 20 Feb 2025 05:44:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740059075; x=1740663875; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wH3ItxDnpHtPrcEc6Ys9D8rM2UII7vdj5WIe0si5L3c=;
+        b=cnGc+g6C56En6WyT8qQ+EoVCc6CM72LtG8EF8JP6UOZBFbnep8BND+NgwwjAWhBx90
+         VnLsjE2fedjK1LppDR1H4EHYezQgaKiHn2VUIhrZpwTTOgbBYatISHf+wsdm+l9ORQaI
+         p+puye5p3ZAt84kPhqr98YoREKlqWARLinohfLGUJ6qJV/pnGxej8npH0TErakuzbIZT
+         zeOE/ELMU06AWRerAB33nkSBWokLMgS5tCIOaCZS7Qyi7X6Z0gQrRJtOl01PX7DA0S6R
+         F5kUb6QFpliXjI7vrSYVa4CDTdXTrwuH7DrsvhcMu+j+dhUr9DRCbD0kBUV7QbKBK3fp
+         lA6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740059075; x=1740663875;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wH3ItxDnpHtPrcEc6Ys9D8rM2UII7vdj5WIe0si5L3c=;
+        b=Tu1wI/qnzJAhefClOBVP56izB/EaUeNyaQ5ALft1Gjj4vFd8M8sIMbGJOV72gF9vVv
+         NvMSBF1OeX1yAhDGLNlTrGJ2rSowknW7PN42ivk0a1l7LHJnmVGwbs7pfZaNG6phzBgd
+         SyTv4gy0vKAH4EVnzbqgzkZuRlONjwkqztitkeLor2ZaLL8OwSNh8f5gpfdCp+JTr5wg
+         1bpgJL1ngkcZ6oc7vR3a79/fkXqcQB/5hmzucCe5vdE/tSjK2VXse3OkAEbyJde89FB5
+         Dt2XBzcRqMgbxEZeBv8eI39siDXWcPJrBtOFBPvYSkm7ajAMNX/inWkw+cvNc3+oqeE7
+         Nm7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUgJhB33JUha1mBdITFTAltXC86DWCYe32WLJPXkIw5FwTOEkkUmZIl4jbddxhZW4Z61mekGg7J@vger.kernel.org, AJvYcCWI8prGza4+zvIkQyo279Tx/qXNbpp9NRMuTTgIfVtRr2zcjEgwq9IPQtmGRocX7uaKK1OJ7dCoiA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQWj0SZX6csmq2j8rFg9aBl8Hxsv0SJvvcaf9MBGAbZlJBePZ3
+	w5lrqXFGc+9ctMCh8vKVRcsJQh9D7dgL6yvPHSf7MjhEUsK6A10f
+X-Gm-Gg: ASbGncuYz4VW2/nTECUagad46LxcanMMqTP7ogqTYljrQcePoVROgtPsyR9d+hQxBdS
+	CRpjBmJPIb0F25honOrcVl29Wh5WlKh8e7gFYFtMHgDS5V+UkY8z2H0Tp9ROlo7070zxbSzOxjO
+	rz/yHmqZ+A+r/F7Jhq7U6RD2ZvIEn0+OAMFq4qAQhw9oGKmtABxh1aucAnAnMsHGi8BdQ2j6npS
+	PrFbabk/P6ImWPw4F/hqGrT0lQmF0r5idMq9RbplvySj5693FJc4RputnsvJEh7Kq3nQKJG8whx
+	7uabDMqmhCXTCGiEe1HLydCJhub3de8MH+qhDt2BkAYz7zap
+X-Google-Smtp-Source: AGHT+IELkEkYK+QAvOvQS5be6WORIcG1J6+OzZZX1+JCVNyeFLOHcip9wfXoeIBG+zOwECkOOu3Qlw==
+X-Received: by 2002:a17:906:309a:b0:abb:b3e6:26c2 with SMTP id a640c23a62f3a-abbccf054b5mr680717166b.25.1740059075149;
+        Thu, 20 Feb 2025 05:44:35 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:f455])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abba4fc0c29sm688721966b.157.2025.02.20.05.44.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Feb 2025 05:44:34 -0800 (PST)
+Message-ID: <270ce534-d33e-4642-b0dc-87e377025825@gmail.com>
+Date: Thu, 20 Feb 2025 13:45:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] io_uring/zcrx: add single shot recvzc
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+References: <20250218165714.56427-1-dw@davidwei.uk>
+ <20250218165714.56427-2-dw@davidwei.uk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250218165714.56427-2-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a test case to exercise kptrs behavior against sk_buff structs
-stored in eBPF map.
+On 2/18/25 16:57, David Wei wrote:
+> Currently only multishot recvzc requests are supported, but sometimes
+> there is a need to do a single recv e.g. peeking at some data in the
+> socket. Add single shot recvzc requests where IORING_RECV_MULTISHOT is
+> _not_ set and the sqe->len field is set to the number of bytes to read
+> N.
+> 
+> There could be multiple completions containing data, like the multishot
+> case, since N bytes could be split across multiple frags. This is
+> followed by a final completion with res and cflags both set to 0 that
+> indicate the completion of the request, or a -res that indicate an
+> error.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>   io_uring/net.c  | 26 ++++++++++++++++++--------
+>   io_uring/zcrx.c | 17 ++++++++++++++---
+>   io_uring/zcrx.h |  2 +-
+>   3 files changed, 33 insertions(+), 12 deletions(-)
+> 
+> diff --git a/io_uring/net.c b/io_uring/net.c
+> index 000dc70d08d0..d3a9aaa52a13 100644
+> --- a/io_uring/net.c
+> +++ b/io_uring/net.c
+> @@ -94,6 +94,7 @@ struct io_recvzc {
+>   	struct file			*file;
+>   	unsigned			msg_flags;
+>   	u16				flags;
+> +	u32				len;
 
-Let us have two programs, one for store and other for retrieving
-sk_buffs from pinned map. Load first prog and run as many times as size
-of map so that second program will see the map full and will be able to
-retrieve each of sk_buff that bpf_prog_test_run_skb() created for us.
+Something is up with the types, it's u32, for which you use
+UINT_MAX, and later convert to ulong.
 
-Reason for running the progs MAX_ENTRIES times from user space instead
-of utilizing @repeat argument of is that we would like to have unique
-skbs handled in map. With @repeat usage it would result in storing the
-same skb.
+>   	struct io_zcrx_ifq		*ifq;
+>   };
+>   
+...
+> @@ -1250,6 +1251,9 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>   	zc->ifq = req->ctx->ifq;
+>   	if (!zc->ifq)
+>   		return -EINVAL;
+> +	zc->len = READ_ONCE(sqe->len);
+> +	if (zc->len == UINT_MAX)
+> +		return -EINVAL;
+>   
+>   	zc->flags = READ_ONCE(sqe->ioprio);
+>   	zc->msg_flags = READ_ONCE(sqe->msg_flags);
+> @@ -1257,12 +1261,14 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>   		return -EINVAL;
+>   	if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
+>   		return -EINVAL;
+> -	/* multishot required */
+> -	if (!(zc->flags & IORING_RECV_MULTISHOT))
+> -		return -EINVAL;
+> -	/* All data completions are posted as aux CQEs. */
+> -	req->flags |= REQ_F_APOLL_MULTISHOT;
+> -
+> +	if (zc->flags & IORING_RECV_MULTISHOT) {
+> +		if (zc->len)
+> +			return -EINVAL;
+> +		/* All data completions are posted as aux CQEs. */
+> +		req->flags |= REQ_F_APOLL_MULTISHOT;
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- .../selftests/bpf/prog_tests/skb_map_kptrs.c  | 75 ++++++++++++++++++
- .../selftests/bpf/progs/skb_map_kptrs.c       | 77 +++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/skb_map_kptrs.c
- create mode 100644 tools/testing/selftests/bpf/progs/skb_map_kptrs.c
+If you're posting "aux" cqes you have to set the flag for
+synchronisation reasons. We probably can split out a "I want to post
+aux cqes" flag, but it seems like you don't actually care about
+multishot here but limiting the length, or limiting the length + nowait.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/skb_map_kptrs.c b/tools/testing/selftests/bpf/prog_tests/skb_map_kptrs.c
-new file mode 100644
-index 000000000000..993beac6c344
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/skb_map_kptrs.c
-@@ -0,0 +1,75 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+
-+#define SKB_KPTR_MAP_PATH "/sys/fs/bpf/skb_kptr_map"
-+
-+static void skb_map_kptrs(void)
-+{
-+	int err, prog_fd, store_fd, get_fd, map_fd;
-+	struct bpf_program *prog;
-+	struct bpf_object *obj;
-+	char buff[128] = {};
-+	struct bpf_map *map;
-+	int i;
-+	LIBBPF_OPTS(bpf_test_run_opts, topts,
-+		.data_in = buff,
-+		.data_size_in = sizeof(buff),
-+		.repeat = 1,
-+	);
-+
-+	err = bpf_prog_test_load("skb_map_kptrs.bpf.o", BPF_PROG_TYPE_SCHED_CLS, &obj,
-+				 &prog_fd);
-+	if (CHECK_FAIL(err))
-+		return;
-+
-+	map = bpf_object__find_map_by_name(obj, "skb_map");
-+	if (CHECK_FAIL(!map))
-+		goto map_err;
-+
-+	map_fd = bpf_map__fd(map);
-+	if (map_fd < 0)
-+		goto map_err;
-+
-+	err = bpf_obj_pin(map_fd, SKB_KPTR_MAP_PATH);
-+	if (err < 0)
-+		goto map_err;
-+
-+	prog = bpf_object__find_program_by_name(obj, "tc_skb_map_store");
-+	if (CHECK_FAIL(!prog))
-+		goto out;
-+
-+	store_fd = bpf_program__fd(prog);
-+	if (CHECK_FAIL(store_fd < 0))
-+		goto out;
-+
-+	// store skbs
-+	for (i = 0; i < bpf_map__max_entries(map); i++) {
-+		err = bpf_prog_test_run_opts(store_fd, &topts);
-+		ASSERT_OK(err, "skb kptr store");
-+	}
-+
-+	prog = bpf_object__find_program_by_name(obj, "tc_skb_map_get");
-+	if (CHECK_FAIL(!prog))
-+		goto out;
-+
-+	get_fd = bpf_program__fd(prog);
-+	if (CHECK_FAIL(get_fd < 0))
-+		goto out;
-+
-+	// get skbs
-+	for (i = 0; i < bpf_map__max_entries(map); i++) {
-+		err = bpf_prog_test_run_opts(get_fd, &topts);
-+		ASSERT_OK(err, "skb kptr get");
-+	}
-+
-+out:
-+	unlink(SKB_KPTR_MAP_PATH);
-+map_err:
-+	bpf_object__close(obj);
-+}
-+
-+void test_skb_map_kptrs(void)
-+{
-+	skb_map_kptrs();
-+}
-+
-diff --git a/tools/testing/selftests/bpf/progs/skb_map_kptrs.c b/tools/testing/selftests/bpf/progs/skb_map_kptrs.c
-new file mode 100644
-index 000000000000..f4972978cb04
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/skb_map_kptrs.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+
-+void *bpf_cast_to_kern_ctx(void *) __ksym;
-+struct sk_buff *bpf_skb_acquire(struct sk_buff *skb) __ksym;
-+void bpf_skb_release(struct sk_buff *skb) __ksym;
-+
-+struct skb_map_val {
-+	struct sk_buff __kptr * skb;
-+};
-+
-+static __u32 get_idx;
-+static __u32 store_idx;
-+
-+#define MAX_ENTRIES 100
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, __u32);
-+	__type(value, struct skb_map_val);
-+	__uint(max_entries, MAX_ENTRIES);
-+} skb_map SEC(".maps");
-+
-+static __always_inline __u32 idx_bump(__u32 idx)
-+{
-+	return idx >= MAX_ENTRIES ? 0 : idx + 1;
-+}
-+
-+SEC("tc") int tc_skb_map_store(struct __sk_buff *ctx)
-+{
-+	struct sk_buff *skbk = bpf_cast_to_kern_ctx(ctx);
-+	struct skb_map_val *map_entry, tmp_entry;
-+	struct sk_buff *tmp;
-+
-+	tmp_entry.skb = NULL;
-+	bpf_map_update_elem(&skb_map, &store_idx, &tmp_entry, BPF_ANY);
-+	map_entry = bpf_map_lookup_elem(&skb_map, &store_idx);
-+	if (!map_entry)
-+		return -1;
-+
-+	skbk = bpf_skb_acquire(skbk);
-+	if (!skbk)
-+		return -2;
-+
-+	tmp = bpf_kptr_xchg(&map_entry->skb, skbk);
-+	if (tmp)
-+		bpf_skb_release(tmp);
-+
-+	store_idx = idx_bump(store_idx);
-+
-+	return 0;
-+}
-+
-+SEC("tc") int tc_skb_map_get(struct __sk_buff *ctx)
-+{
-+	struct sk_buff *stored_skb = NULL;
-+	struct skb_map_val *map_entry;
-+	struct sk_buff *tmp = NULL;
-+
-+	(void)ctx;
-+
-+	map_entry = bpf_map_lookup_elem(&skb_map, &get_idx);
-+	if (!map_entry)
-+		return -1;
-+
-+	stored_skb = bpf_kptr_xchg(&map_entry->skb, tmp);
-+	if (!stored_skb)
-+		return -2;
-+
-+	bpf_skb_release(stored_skb);
-+	get_idx = idx_bump(get_idx);
-+
-+	return 0;
-+}
-+
-+char _license[] SEC("license") = "GPL";
+> +	}
+> +	if (!zc->len)
+> +		zc->len = UINT_MAX;
+>   	return 0;
+>   }
+>   
+> @@ -1281,7 +1287,7 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
+>   		return -ENOTSOCK;
+>   
+>   	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT,
+> -			   issue_flags);
+> +			   issue_flags, zc->len);
+>   	if (unlikely(ret <= 0) && ret != -EAGAIN) {
+>   		if (ret == -ERESTARTSYS)
+>   			ret = -EINTR;
+> @@ -1296,6 +1302,10 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
+>   		return IOU_OK;
+>   	}
+>   
+> +	if (zc->len != UINT_MAX) {
+> +		io_req_set_res(req, ret, 0);
+> +		return IOU_OK;
+> +	}
+>   	if (issue_flags & IO_URING_F_MULTISHOT)
+>   		return IOU_ISSUE_SKIP_COMPLETE;
+>   	return -EAGAIN;
+> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> index ea099f746599..834c887743c8 100644
+> --- a/io_uring/zcrx.c
+> +++ b/io_uring/zcrx.c
+> @@ -106,6 +106,7 @@ struct io_zcrx_args {
+>   	struct io_zcrx_ifq	*ifq;
+>   	struct socket		*sock;
+>   	unsigned		nr_skbs;
+> +	unsigned long		len;
+>   };
+>   
+>   static const struct memory_provider_ops io_uring_pp_zc_ops;
+> @@ -826,6 +827,10 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+>   	int i, copy, end, off;
+>   	int ret = 0;
+>   
+> +	if (args->len == 0)
+> +		return -EINTR;
+> +	len = (args->len != UINT_MAX) ? min_t(size_t, len, args->len) : len;
+
+Just min?
+
+> +
+>   	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
+>   		return -EAGAIN;
+>   
+> @@ -920,17 +925,21 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+>   out:
+>   	if (offset == start_off)
+>   		return ret;
+> +	args->len -= (offset - start_off);
+
+Doesn't it unconditionally change the magic value UINT_MAX
+you're trying to preserve?
+
+> +	if (args->len == 0)
+> +		desc->count = 0;
+>   	return offset - start_off;
+>   }
+>   
+>   static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+>   				struct sock *sk, int flags,
+> -				unsigned issue_flags)
+> +				unsigned issue_flags, unsigned long len)
+>   {
+>   	struct io_zcrx_args args = {
+>   		.req = req,
+>   		.ifq = ifq,
+>   		.sock = sk->sk_socket,
+> +		.len = len,
+>   	};
+>   	read_descriptor_t rd_desc = {
+>   		.count = 1,
+> @@ -956,6 +965,8 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+>   		ret = IOU_REQUEUE;
+>   	} else if (sock_flag(sk, SOCK_DONE)) {
+>   		/* Make it to retry until it finally gets 0. */
+> +		if (len != UINT_MAX)
+> +			goto out;
+>   		if (issue_flags & IO_URING_F_MULTISHOT)
+>   			ret = IOU_REQUEUE;
+>   		else
+
 -- 
-2.43.0
+Pavel Begunkov
 
 
