@@ -1,104 +1,113 @@
-Return-Path: <netdev+bounces-168059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7874A3D3C7
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:54:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4284DA3D405
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C1F03AFD2D
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:54:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90D5B7A454C
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77121EBFFF;
-	Thu, 20 Feb 2025 08:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2B01EB1A6;
+	Thu, 20 Feb 2025 08:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AhusA3n6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IqLSDVzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61FE1EBA1E;
-	Thu, 20 Feb 2025 08:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50981B3927
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 08:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041683; cv=none; b=VIAH0V/Ag9q/7+eoMtPwgrXLR4UH/1S9KKngpxkzVJtoICiWXU1iAKgFsmeiEhAIETnbM1PxxJxGPNZliHsHy/dXqUtAFWJFyOKzyGtCPBuSAbH0BovBL7WAFXhg8l5COI7sHdmK1GWaZrZ9EfWUvgGCybQu/DBFz3C3bDYlGHo=
+	t=1740041995; cv=none; b=KQztq4lIq4nZR7etXRmd6guK9Bcd4vndg5RvpouOJi2nmK2nqQpAtbM+Ma6kG5gCTgQFYNPneXio1U+MYZ1m4c97SWI3cZqEFxyKKdF9Uke4XYEscW+9qSwjQzkOnLhquBST/iAHpGVpv4xQz1Y7q4mCp1pDd/0hmLb3gYlT5uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041683; c=relaxed/simple;
-	bh=dqQ0SKzivqhys/digMbmEeqWgEakp5WM9xDxA2nBruI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=rDIsZ4x9nyFXJiKFfDb7ziyFbVw8GrSkW6jORDP19ET4ksDzOfsXfGm5zoFrGS/tSsOlbsOtzUHYxvmirB8NOZhs7ST2Nrewv7ernKmi8MRZS/bpxSNoIoShAsYGTqGlnAHXSRtfwlDSfpAaA9W75j3l6mXn8gyCpcZCInUbbhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AhusA3n6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02976C4CED1;
-	Thu, 20 Feb 2025 08:54:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740041682;
-	bh=dqQ0SKzivqhys/digMbmEeqWgEakp5WM9xDxA2nBruI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=AhusA3n6ogCPeJqwzTIc7zCEpBx9gtTPjhqFynV6rpziPNetpO3duWtTdc57/82Ef
-	 TSE22uU8nonEekQNXvox2yHOCF8mZQhsV4c6VFJ5FYXmM/g8jI3zLTF/F2+oqsOnYt
-	 RpD6joKq1boATFnQfokKRWrlephU5XQfJVx0ZaxZziOX+nEe5G4dTAPWjX2NCt8nfU
-	 xn4XZhIdOVKE05XnjP71qzQ7tlUXl6+42VaR+sXc3G+E1wiCOEt4jJMMenc7dRMffG
-	 Nj13tJzfMQpgVF4cpr675uj4brbSg+EZfM/Ca9+XTUBgcHqF1KgQKh+ue1VQN+5Bqk
-	 Zsn4tbSNIA3iA==
-Date: Thu, 20 Feb 2025 00:54:38 -0800
-From: Kees Cook <kees@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-CC: Allison Henderson <allison.henderson@oracle.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-hardening@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next=5D_net/rds=3A_Replace_?=
- =?US-ASCII?Q?deprecated_strncpy=28=29_with_strscpy=5Fpad=28=29?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <08A0C3AE-A255-467F-A007-5584E8E44517@linux.dev>
-References: <20250219224730.73093-2-thorsten.blum@linux.dev> <202502191855.C9B9A7AA@keescook> <08A0C3AE-A255-467F-A007-5584E8E44517@linux.dev>
-Message-ID: <CCF15545-8AF8-40A8-917C-E44B6373D9AE@kernel.org>
+	s=arc-20240116; t=1740041995; c=relaxed/simple;
+	bh=3Ubl3ns17CKpaPgNxOJL10nntVn3JWMbG2pySqgNZvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNTRQde3rJhaBN9/fch+73o6CmNqgZ+C6853cDlE+fH1jT7Dcov78bsLdeUgDvw+Pj0PiyqGlfhF6zVhx2sHR0UDZEpspe0fmQVNHN2Hd9DSm3gnnuyEqkzovVkyMRXEhzgOKi9w2Fqubz9VWKs6ClLU6hzAWY9v3icK28CNGXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IqLSDVzg; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740041994; x=1771577994;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3Ubl3ns17CKpaPgNxOJL10nntVn3JWMbG2pySqgNZvQ=;
+  b=IqLSDVzgZ7JCpSe9mROUDoz5tzXFkAK9lGZ3aWFU8wQH5kceW0i+EJ/T
+   iQYmgGhTxBQ84vwAE5bdaBQW7OTNjtcHhn9DQnIZy+id+ePqo0BXQo3s9
+   qSnnJC2OmkeE5oeFILm0iXQy16ONvMKaRKzRvzlUJrhaFmdnFobDCbgXM
+   mx/OiE2RhBA5tAbNiSGHNORKeFwBla1JREDJxX3sp0/jzGELSG+Dy8/zx
+   mrX5aF+QMIB9tIc9vEaH553F6vdP+yfTtDcTu9E1Z35idofAsCcgKUVs1
+   mJMpq/SRDnPJgAAP7CCvPEjhCBl/uB6iTBvyCqus6UUZZ+JKYJA4MK/19
+   Q==;
+X-CSE-ConnectionGUID: S6tfjh4eS1ShtJ4e8FfWRg==
+X-CSE-MsgGUID: oTtVxrTrQH+PIls8bBqecw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="58218787"
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="58218787"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 00:59:53 -0800
+X-CSE-ConnectionGUID: ecIZtj1sT3GJPfozYDKgHA==
+X-CSE-MsgGUID: sakqFLARTlqXddSWHiw8Yg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="120205244"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 00:59:51 -0800
+Date: Thu, 20 Feb 2025 09:56:11 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: remove unused feature array
+ declarations
+Message-ID: <Z7buKyQkBpIIlBgW@mev-dev.igk.intel.com>
+References: <b2883c75-4108-48f2-ab73-e81647262bc2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2883c75-4108-48f2-ab73-e81647262bc2@gmail.com>
 
+On Wed, Feb 19, 2025 at 09:15:05PM +0100, Heiner Kallweit wrote:
+> After 12d5151be010 ("net: phy: remove leftovers from switch to linkmode
+> bitmaps") the following declarations are unused and can be removed too.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  include/linux/phy.h | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index 3076b4caa..e36eb247c 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -37,10 +37,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1s_p2mp_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_fibre_features) __ro_after_init;
+> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_all_ports_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_features) __ro_after_init;
+> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_fec_features) __ro_after_init;
+> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_full_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
+>  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
+>  
 
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-On February 19, 2025 11:04:18 PM PST, Thorsten Blum <thorsten=2Eblum@linux=
-=2Edev> wrote:
->On 20=2E Feb 2025, at 03:57, Kees Cook wrote:
->> On Wed, Feb 19, 2025 at 11:47:31PM +0100, Thorsten Blum wrote:
->>> strncpy() is deprecated for NUL-terminated destination buffers=2E Use
->>> strscpy_pad() instead and remove the manual NUL-termination=2E
->>=20
->> When doing these conversions, please describe two aspects of
->> conversions:
->>=20
->> - Why is it safe to be NUL terminated
->> - Why is it safe to be/not-be NUL-padded
->>=20
->> In this case, the latter needs examination=2E Looking at how ctr is use=
-d,
->> it is memcpy()ed later, which means this string MUST be NUL padded or i=
-t
->> will leak stack memory contents=2E
->>=20
->> So, please use strscpy_pad() here=2E :)
->
->I am using strscpy_pad() here already because of the NUL-padding=2E
->
->Did you just miss that?
-
-Well that's embarrassing=2E Yes, I must need stronger glasses=2E *sigh* Ap=
-ologies for the noise!
-
-Reviewed-by: Kees Cook <kees@kernel=2Eorg>
-
-
---=20
-Kees Cook
+> -- 
+> 2.48.1
 
