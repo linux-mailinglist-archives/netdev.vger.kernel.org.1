@@ -1,132 +1,189 @@
-Return-Path: <netdev+bounces-168028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42337A3D272
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:41:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C89A3D27E
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BB531898CB5
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 07:41:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3F0717626F
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 07:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02F41E990D;
-	Thu, 20 Feb 2025 07:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947C81E98FF;
+	Thu, 20 Feb 2025 07:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SICnMiI7"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DCWP6Gkj";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eFtH6ofc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E280C1E5734;
-	Thu, 20 Feb 2025 07:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9FC1E379B
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 07:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740037275; cv=none; b=MsOr55OxGiOo+ac0Jx6NE7fdi0h00sA2Ep+dA2jSZu42uIJL22lKBDAsFg6GVEVlQGsPhLvd4kkpvIE7ApE8oGxhbugOCWK8hOoDvZynJiKRjnfdZ+pHp/USbX3PUY6WKjnO8GUvKC3rDcjAx3V0K/hl/FFaCHTUA0RsnbLhX+g=
+	t=1740037406; cv=none; b=XduoE2rLNAm1uHOxl+WTJfWVNquzk0Bfpc/NGf36Ri029KyTIc9pgkmK50JMOFlXH/Riey6iNlbELcrH88Q7x35D86+3WdAI6rzqdvZvmKynaTTlvlRgkdiOa4h/koamCExKsP7yOjH2TdGG0WCmRJ88BqbPi8QRME48pAsaQHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740037275; c=relaxed/simple;
-	bh=Y5kYSgfukTER1EK5fH9cMVwho5EJgWr6Kj/8SYChQEU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uJ3Qx5Y6UmEm5rBh9reY7KTuXfMbIWs87kzLKRYDLdgUhWRkRU7/pUh1OyX37OedGny6Mp9NVbtow8sdSSdH4EM0ttw3veXZfUG01NWzr+aSxHQkSOUceWvePApI10dEUMkHr3Qdq29ByQ5eEtZB6o5i+D+LOtBeZVRUTx6FmgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SICnMiI7; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-439a2780b44so3339975e9.1;
-        Wed, 19 Feb 2025 23:41:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740037272; x=1740642072; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MJYv7ynx+2KN3B5BBC3b4wZsS5Thp/vdHPKspluBDSY=;
-        b=SICnMiI7BPhcaPZngqawkSxFmW6RO8rXQ0Gd9nBJckm+jnclVIX1zmPklXzOY0OYCx
-         69ytKuiAThoMxe1ucJN5W/yh8R03oEqDwHvDNj9/KxR4yiBwaqscCZsxY/l6+ItQRGUu
-         2Oi8LVeK61NRB3ZkN5JTLDoTsYdUeas+zrfKY264gIpD1BqJ1jiq0f61KhhiYKR2VJE4
-         q0IhaxJTw4fgvRV4pDxwCWWnd+YGou5kBghoF8Yq5YfDpatWXv04kdwLTb2t4R5YmZsi
-         bByjidVy+Xg42V9U+T1W5aQ+MPL6pXmJPZXIdu5WZGRAg6pcitx60cNfBP66l09TcPdx
-         r4vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740037272; x=1740642072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MJYv7ynx+2KN3B5BBC3b4wZsS5Thp/vdHPKspluBDSY=;
-        b=iZXggKeofoI/vSMO38ArKNiHYN6ouj/B5X+x/vIg1O35oNBpewDVMNRORJk1/zjMXK
-         g4VCG/1I+Nx+U+u5LFqEYOmXrmgM6OKnY8IWmRm+yTyKtxA81kt0QP2UQYOhyneZumuv
-         oR5q9BM4XOUvNJDysiLp7B8lJ7Q9Hici5lCLEp/3m05pHvJgPN8BXZjC4uIO5irMOhdE
-         CK792T7Y7sK6A06gDOjOArD5udjxbVe9dckf2O0pOuLKDZGObuHedv5D0R1YgRDrYIdU
-         kpHLsJswouuODL8/46s8c2zQVXl8AbDTIv5dRGG/gtj0QkdRy3VIht0PElNA6o5ENqZ8
-         27AA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5O6zC3wnFzVWFDSav33LOrdzFIer4+djAazt7IYgtYPi+kwsgGeP10QSrzGri7ahR31AMm9f563GAYQ==@vger.kernel.org, AJvYcCVGr7slGETc3Lvs10WxH95QXzvh3n//L6kRCxSk5vEfZ/N8SyfPsQIgzmbBd4EExNC1pb7KAPPI7csmQ4GiarU=@vger.kernel.org, AJvYcCVQ0iRmKLyQ2V9haVJ2qnlVZLAuEFe6rNFUeyBXOVm0yIWY7kop1zANaHdj2VMsg0NbDpceXZKZ@vger.kernel.org, AJvYcCX9WrfcLW7VyUpcP81kNoLi6PjmG+OzBhZCIBuUrUs9tWEtkMxsBbi7TS0wtN1hKGBSr5R2lCGOBrrHqhxw@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKVs5EnKGuOlPW6io510Hzyf9M2Ljq/4jxQ4iU3Z7nn0GL2zs0
-	OWnzc9bxQvqGRQ5QlRJq6vzan0BA9dR/Ml92Zu3vzDVRq98WxOYTeVWwSw==
-X-Gm-Gg: ASbGncs9/XzyPyGcEWwIaulmPvN2RJaUpf+3b1HvVyzR0W/d068axeZFRws1e4TkeAn
-	gfyuuQ1mEdY8aRo0ehbq3jrImcWAaphVAVUoFRIeqS1OhEKLo80CSTMeDXV28PHTBYW9UEPP0u4
-	W/55UYzEo6PZyEAcwm3i+9d+ooPwXV2LglKpiN0Lh7rwiZvPfShXtw5ZganAEDBp9BqroAfnNgg
-	T1Vp0gw2+DCYejDEXbprRRCttnYnSdk/KyrwKqVOLxFPofPi1yNKHQ2+pWIGDJjUhDekIgi77Nq
-	VLy7XlAlK+aAFJBn7cfaearKa2uQxbi8fyk=
-X-Google-Smtp-Source: AGHT+IEMwSqIIsc4ebzckcZJDzHWuZ55uljwt7+wfboUSZakp8qJiZNrd0ew7LhjiwbxKJKaQ4irLw==
-X-Received: by 2002:a05:600c:35c1:b0:439:9377:fa29 with SMTP id 5b1f17b1804b1-43999de1a26mr57522325e9.31.1740037271566;
-        Wed, 19 Feb 2025 23:41:11 -0800 (PST)
-Received: from [172.27.61.29] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982a2f92esm114030585e9.17.2025.02.19.23.41.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Feb 2025 23:41:11 -0800 (PST)
-Message-ID: <98f1cc71-7699-40f5-909f-86e7317d8071@gmail.com>
-Date: Thu, 20 Feb 2025 09:41:06 +0200
+	s=arc-20240116; t=1740037406; c=relaxed/simple;
+	bh=CTz+cknRw924Sj7lk/e07hnncvFSP8juw2Kjw1on74Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lvIdM7r8VTT/XBXjQ6vvx1A+kEEiVdWLLqBDyYg7qqSnKfNYSk4ATC4BRo5A5TvAnX3TF0t2yURYiOcubUafi3ovINveTXIbDij2Av3HQBpVX4CLpl+eueK3b33lWExQRp9qEdWrX0+d7+mtopsRqOpLtwp7ZYlw/bte8aPLKVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DCWP6Gkj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eFtH6ofc; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1740037403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+GUdpt8jhU+TwWR+P33hZ1i5Nhkvg3D+KzIr80lF0vg=;
+	b=DCWP6Gkj2wv4t0s4z5TXd73C9Ok50CoO83r2gFBSuITxQAHohW1GiGxX+AZU+GvIMWzh9v
+	GD4wMfn9Hp9HZTrnVlyYT1JVKltylsvlId9KckYzHulx5W956XZChT5tzQ15VjryIaR3Yd
+	bmkm8fZfmR3/q1NYGTJee/q0icTp11JOThfFF5oeyLnPKsM3dJJEjJRvi0dkHEkOjTb09/
+	9+9nZYcJp89/U+2i251lLgdvURB4U5p7czQwlf2yh8GDJeWUno1Pkt/cgvMnIeYd5DOrM4
+	7d22xoXQ+vjYgdAXIx2zGx3ENhWiDCNCedHD26QGHOyUo5bWVOjMTBRK3lRU6g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1740037403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+GUdpt8jhU+TwWR+P33hZ1i5Nhkvg3D+KzIr80lF0vg=;
+	b=eFtH6ofciVdzfJu35L/cYP3qLbLkSSoARAOhGOMdeqLPI2eer/Tcp2ElcbNFF+AtO2u+ps
+	D994bcRrhXiU7oAQ==
+To: Joe Damato <jdamato@fastly.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Gerhard Engleder <gerhard@engleder-embedded.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2 2/4] igb: Link queues to NAPI instances
+In-Reply-To: <Z7YbBQqT4wOtmbgC@LQ3V64L9R2>
+References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
+ <20250217-igb_irq-v2-2-4cb502049ac2@linutronix.de>
+ <Z7T4Cpv80pWF45tc@LQ3V64L9R2> <875xl62xgy.fsf@kurt.kurt.home>
+ <Z7YbBQqT4wOtmbgC@LQ3V64L9R2>
+Date: Thu, 20 Feb 2025 08:43:21 +0100
+Message-ID: <87eczt3vty.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] net/mlx5e: Avoid a hundred
- -Wflex-array-member-not-at-end warnings
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, "Gustavo A. R. Silva"
- <gustavo@embeddedor.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <Z6GCJY8G9EzASrwQ@kspp>
- <4e556977-c7b9-4d37-b874-4f3d60d54429@embeddedor.com>
- <8d06f07c-5bb4-473d-90af-5f57ce2b068f@gmail.com>
- <7ce8d318-584f-42c2-b88a-2597acd67029@embeddedor.com>
- <5f2ca37f-3f6d-44d2-9821-7d6b0655937d@gmail.com>
- <36ab1f42-b492-497f-a1dc-34631f594da6@lunn.ch>
- <59b075bc-f6e6-42f0-bc01-c8921922299d@gmail.com>
- <20250218131345.6bd558cb@kernel.org>
- <99543a40-2a57-4c10-8876-cde08cb15199@gmail.com>
- <20250219174629.4791c1e9@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250219174629.4791c1e9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+On Wed Feb 19 2025, Joe Damato wrote:
+> On Wed, Feb 19, 2025 at 08:41:01AM +0100, Kurt Kanzenbach wrote:
+>> On Tue Feb 18 2025, Joe Damato wrote:
+>> > On Mon, Feb 17, 2025 at 12:31:22PM +0100, Kurt Kanzenbach wrote:
+>> >> Link queues to NAPI instances via netdev-genl API. This is required t=
+o use
+>> >> XDP/ZC busy polling. See commit 5ef44b3cb43b ("xsk: Bring back busy p=
+olling
+>> >> support") for details.
+>> >>=20
+>> >> This also allows users to query the info with netlink:
+>> >>=20
+>> >> |$ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ne=
+tdev.yaml \
+>> >> |                               --dump queue-get --json=3D'{"ifindex"=
+: 2}'
+>> >> |[{'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'rx'},
+>> >> | {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'rx'},
+>> >> | {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'rx'},
+>> >> | {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'rx'},
+>> >> | {'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'tx'},
+>> >> | {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'tx'},
+>> >> | {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'tx'},
+>> >> | {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'tx'}]
+>> >>=20
+>> >> Add rtnl locking to PCI error handlers, because netif_queue_set_napi()
+>> >> requires the lock held.
+>> >>=20
+>> >> While at __igb_open() use RCT coding style.
+>> >>=20
+>> >> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> >> ---
+>> >>  drivers/net/ethernet/intel/igb/igb.h      |  2 ++
+>> >>  drivers/net/ethernet/intel/igb/igb_main.c | 43 +++++++++++++++++++++=
+++++++----
+>> >>  drivers/net/ethernet/intel/igb/igb_xsk.c  |  2 ++
+>> >>  3 files changed, 42 insertions(+), 5 deletions(-)
+>> >
+>> > [...]
+>> >
+>> >> @@ -9737,16 +9765,21 @@ static void igb_io_resume(struct pci_dev *pde=
+v)
+>> >>  	struct net_device *netdev =3D pci_get_drvdata(pdev);
+>> >>  	struct igb_adapter *adapter =3D netdev_priv(netdev);
+>> >>=20=20
+>> >> +	rtnl_lock();
+>> >>  	if (netif_running(netdev)) {
+>> >>  		if (!test_bit(__IGB_DOWN, &adapter->state)) {
+>> >>  			dev_dbg(&pdev->dev, "Resuming from non-fatal error, do nothing.\n=
+");
+>> >> +			rtnl_unlock();
+>> >>  			return;
+>> >>  		}
+>> >> +
+>> >>  		if (igb_up(adapter)) {
+>> >>  			dev_err(&pdev->dev, "igb_up failed after reset\n");
+>> >> +			rtnl_unlock();
+>> >>  			return;
+>> >>  		}
+>> >>  	}
+>> >> +	rtnl_unlock();
+>> >
+>> > Does RTNL need to be held when calling netif_running()? If not, you
+>> > could probably reduce the size of the section under the lock a bit?
+>>=20
+>> All the other instances in the driver guard the netif_running(), too.
+>
+> OK, I spent a bit of time tracing through the paths in the igb
+> source. I think the v1 feedback I sent identified all the RTNL
+> paths, but:=20
+>   - I am not an igb expert
+>   - I don't have a device to test this on
 
-On 20/02/2025 3:46, Jakub Kicinski wrote:
-> On Wed, 19 Feb 2025 14:14:35 +0200 Tariq Toukan wrote:
->> On 18/02/2025 23:13, Jakub Kicinski wrote:
->>> On Tue, 18 Feb 2025 17:53:14 +0200 Tariq Toukan wrote:
->>>> Maybe it wasn't clear enough.
->>>> We prefer the original patch, and provided the Reviewed-by tag for it.
->>>
->>> Can you explain what do you mean by "cleaner"?
->>> I like the alternative much more.
->>
->> Cleaner in the sense that it doesn't touch existing code in en_rx.c
->> (datapath), and has shorter dereferences for the inner umr_wqe fields, like:
->> umr_wqe->ctrl
->> vs.
->> umr_wqe->hdr.ctrl
-> 
-> IMO that's minor, not sufficient to justify struct_group_tagged()
+Intel i210 is one of the supported cards by igb driver. These are
+relatively cheap (20-30 Euro/$) and easy to get hands on.
 
-No strong preference. I can accept both.
+>   - It is certainly possible I missed a path in my v1 analysis
+>
+> The above said, as far as I can tell this patch seems fine, so:
+>
+> Acked-by: Joe Damato <jdamato@fastly.com>
+
+Thanks.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAme23RkTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgvXLEACgiiZAfSNYnZuoEzryEsQTOC9/WhN6
+nt4RQFcL/mEZ/+ONkTU1+4kB7nqCrQMbVO0GbfvWRwvxt7FQ8oRGMe64s+A9duTr
+vmEjlqvRL76zsu4dPXfhKFfILKmNA3GKV7hjp+c+zUOW+ZHpUJRrTMHn8pFMyCtE
+cGIyrI+CRPwd3nQtZ5nSKbyK1UjS/61il/m3FsmXIaQMWlrZcsFKxyA5Eu2ntPGF
+nTxEd6vFDOCb2VYZsfRLDa24lb4Lhvw3pkd64wHyDJaN2JuotS8PpggxVOvaeHPq
+gGelHpwnaVEADFuq9LnjFQ5tG/AwLaMy3lnfV7g4GSYNjJKJEgOYKKAjcYXD0THP
+84beKLXuD2syGDjBMmAQkBmrTE8/SBX5/tgX9PGEup+z0E5JRzrx1ccOErKOba3x
+0F6QHjb1WohZjEl/mfdKa/QIWbDY/ac1X++0ZXSkr5Bc72zCSlGeFuQIhqFeCtRp
+h0g/G0uTgGZPq/+RNEaT8yQXz3EsKbAVP0j6j6G5jPcnELMASttHg4Dz+AQlwbe9
+H/tbYtYcWPB3ACZcBdhs/Qx9OD53SiYdQRjZKw20/Zef/t9guERQDyTEJu5etuzv
+K+VYYfz0WPe2iNpy/MKq6YY2Cz0GcHh6JKnhAW1JEJUFKU2gMGLoW9cyChNp/3NM
+llPXwcxsdYafvA==
+=m2YC
+-----END PGP SIGNATURE-----
+--=-=-=--
 
