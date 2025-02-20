@@ -1,168 +1,93 @@
-Return-Path: <netdev+bounces-167976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1ACA3CFD5
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:09:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15E9A3CFE0
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59373B66BB
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:09:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD963BB317
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EAF1D7E30;
-	Thu, 20 Feb 2025 03:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424941D7999;
+	Thu, 20 Feb 2025 03:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WXFXm8vb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSoejoHx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6743A10FD;
-	Thu, 20 Feb 2025 03:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063D10FD;
+	Thu, 20 Feb 2025 03:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740020946; cv=none; b=b4M8NYXSaSPYmV88FlfPYEtbvPCc1wamaFc8HiW7S6SBNWmGEFhf8NWB4zAZDPMHcI3OUyeUqat9DswQxHAX4Y201sRTQwKfpzZY5tpA/hDj09SDpdzRGwb2nCe0wo/uTPdlPByld8JO1sahDYGNuZKUPhLPdVgslu1dM59zVKg=
+	t=1740021002; cv=none; b=s2lQbEk7mhxWdvObVYUNF4Mhs6xpQMdLU/NkpC59G7RQcpRJRKLRWRvGk1UiN1FtUePQrk1NH0oobK2s+C08Wngfg8VubnvBKs0S6xo64NeST2iFKn38W0uv6JL7jRDbgjoSf7N/0X8HoLpbv7BNau8v6uCPn6wi2vukWB5U0uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740020946; c=relaxed/simple;
-	bh=6Om/YQ9BDTJoSdcjeVlNE5mx2TxHgQH+HygQWJDZxTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yn7m0ZVvwBcnYEEK5RxbkezoS4MmUTdjnETfVXCYvb81u7DRq22dr4BjPo05wIPgQz24adKU77iNIIMuCOBMkg00SmdSdXbJVM1IowH+P9CzPgbdUJ9/2V6eD0Z7XEdlAtRDTgZK4/8gDRBJabqo8R8xvgLP3kV3HIQNAEw0DlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WXFXm8vb; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740020944; x=1771556944;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6Om/YQ9BDTJoSdcjeVlNE5mx2TxHgQH+HygQWJDZxTI=;
-  b=WXFXm8vbeEQMlJ5dlpZo3xIcEZEntVRPy3q8yUwyKukTQv5EQX/9VjuQ
-   7gMFmQLwmeMbUaKEO64sPLUjHS3uT/0hx+A+48xCJpPh5k/9Idg8Nw/X5
-   W59N8FrzdbbwhofL4MSxwz270WiXYeIU7bt9w4TVlFdA2ALWSC0b9yk6V
-   b1ETkEOCNDTbFrJNy59soe4Dx9hkEvNfyVFeUDVJnKCslnsg/3TntdsCK
-   BZHijUhLxEe7yetixVOcozdwHC+jn/cZx6rtIamH92Ur8l8/aeaKrONuD
-   lU3+8jKX6boWH/KAg7nvwlygZFqKDfsEbFnOegs4WfsUXYZr61CEdzJU+
-   Q==;
-X-CSE-ConnectionGUID: PZlqgtoCSZS426YTQ3aStw==
-X-CSE-MsgGUID: YKqVST2OQguKSEEXHlKCgA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="44433446"
-X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
-   d="scan'208";a="44433446"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 19:09:03 -0800
-X-CSE-ConnectionGUID: NtSLS7/pTki0JlkmiayN3A==
-X-CSE-MsgGUID: phFnrHBBQ4u+5LiD6T/d6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
-   d="scan'208";a="114892383"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.77.104]) ([10.247.77.104])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 19:08:56 -0800
-Message-ID: <72c1a698-ba1e-44f6-a52f-ef03c7acba06@linux.intel.com>
-Date: Thu, 20 Feb 2025 11:08:53 +0800
+	s=arc-20240116; t=1740021002; c=relaxed/simple;
+	bh=sQPO5yuAP9YNK0zeHKSGAGdpOKFDWLU/81x17qsIr5U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rIZTF26pP7RJRZlz+UTIJp1ey/KjERwG9Cq8aK1E8RCP8Yv/PDbCBtPt7VeafCQ3F3fiufDNDYFVcs6dUhKNRfUpqqzeFW53iPCsQpHurmILz37x4N5HBAW9WvRkOsoJjZMo/Sgyp3wp4fCBdg3UlMQzCaKGb3KZGAAEs9PkvsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSoejoHx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 745A3C4CED1;
+	Thu, 20 Feb 2025 03:10:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740021001;
+	bh=sQPO5yuAP9YNK0zeHKSGAGdpOKFDWLU/81x17qsIr5U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VSoejoHxbjpsTolzXUDNI61+xocZk0QFS2UnWIo8fIicAvwsH8USYVir+FVZZDCpj
+	 3iYj85KKzCdTSrlwnxJ/iuHg4SWT3rYw24C9D3O8u3A7Lwjngajp/jvVmHU9Usf8nZ
+	 i6QTcM0jOEwcFsC1MEUjPyaxGqYw56sIvNavCzIADWt5a3hzF0ld2P3vW4cQmsuXom
+	 JahTbaN7Tm5/Jl4ZjsgJly57IT+/KWJdbzY0JMzfqO+h1IaRo7V92/WOlsDP6aGMAD
+	 +azdfKsqk/4buk0Vu57iC+/QujoO1HZ6bGd1HQYrSY4ExJvcctX2rPOcnB95GNUA/y
+	 c/Ku6ZdsE7gfA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DAA380AAEC;
+	Thu, 20 Feb 2025 03:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/9] igc: Add support for
- Frame Preemption feature in IGC
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Serge Semin <fancer.lancer@gmail.com>,
- Xiaolei Wang <xiaolei.wang@windriver.com>,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
- Jesper Nilsson <jesper.nilsson@axis.com>,
- Andrew Halaney <ahalaney@redhat.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- "Gomes, Vinicius" <vinicius.gomes@intel.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-References: <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
- <20250210070207.2615418-1-faizal.abdul.rahim@linux.intel.com>
- <20250212220121.ici3qll66pfoov62@skbuf>
- <SJ0PR11MB586651473E7F571ECD54B13BE5FF2@SJ0PR11MB5866.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <SJ0PR11MB586651473E7F571ECD54B13BE5FF2@SJ0PR11MB5866.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sctp: Fix undefined behavior in left shift operation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174002103182.825980.16973479436826416109.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 03:10:31 +0000
+References: <20250218081217.3468369-1-eleanor15x@gmail.com>
+In-Reply-To: <20250218081217.3468369-1-eleanor15x@gmail.com>
+To: Yu-Chun Lin <eleanor15x@gmail.com>
+Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw, visitorckw@gmail.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 13/2/2025 4:59 pm, Loktionov, Aleksandr wrote:
+On Tue, 18 Feb 2025 16:12:16 +0800 you wrote:
+> According to the C11 standard (ISO/IEC 9899:2011, 6.5.7):
+> "If E1 has a signed type and E1 x 2^E2 is not representable in the result
+> type, the behavior is undefined."
 > 
+> Shifting 1 << 31 causes signed integer overflow, which leads to undefined
+> behavior.
 > 
->> -----Original Message-----
->> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->> Vladimir Oltean
->> Sent: Wednesday, February 12, 2025 11:01 PM
->> To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
->> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
->> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
->> David S . Miller <davem@davemloft.net>; Eric Dumazet
->> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
->> <pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
->> Alexandre Torgue <alexandre.torgue@foss.st.com>; Simon Horman
->> <horms@kernel.org>; Russell King <linux@armlinux.org.uk>; Alexei
->> Starovoitov <ast@kernel.org>; Daniel Borkmann <daniel@iogearbox.net>;
->> Jesper Dangaard Brouer <hawk@kernel.org>; John Fastabend
->> <john.fastabend@gmail.com>; Furong Xu <0x1207@gmail.com>; Russell King
->> <rmk+kernel@armlinux.org.uk>; Serge Semin <fancer.lancer@gmail.com>;
->> Xiaolei Wang <xiaolei.wang@windriver.com>; Suraj Jaiswal
->> <quic_jsuraj@quicinc.com>; Kory Maincent <kory.maincent@bootlin.com>;
->> Gal Pressman <gal@nvidia.com>; Jesper Nilsson <jesper.nilsson@axis.com>;
->> Andrew Halaney <ahalaney@redhat.com>; Choong Yong Liang
->> <yong.liang.choong@linux.intel.com>; Kunihiko Hayashi
->> <hayashi.kunihiko@socionext.com>; Gomes, Vinicius
->> <vinicius.gomes@intel.com>; intel-wired-lan@lists.osuosl.org;
->> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-stm32@st-md-
->> mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
->> bpf@vger.kernel.org
->> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/9] igc: Add support for
->> Frame Preemption feature in IGC
-> 
-> Please start commit title from slam letters:
-> Igc: add ...
+> [...]
 
-Hi Aleksandr,
+Here is the summary with links:
+  - [net] sctp: Fix undefined behavior in left shift operation
+    https://git.kernel.org/netdev/net/c/606572eb22c1
 
-I haven't updated this in v5 yet. Could you share any reference or 
-guideline for this?
-
- From what I checked, the recently accepted patches in igc seem to follow a 
-similar commit title format as my patches:
-
-$ git log --oneline | grep igc
-b65969856d4f igc: Link queues to NAPI instances
-1a63399c13fe igc: Link IRQs to NAPI instances
-8b6237e1f4d4 igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
-484d3675f2aa igc: Allow hot-swapping XDP program
-c75889081366 igc: Remove unused igc_read/write_pcie_cap_reg
-121c3c6bc661 igc: Remove unused igc_read/write_pci_cfg wrappers
-b37dba891b17 igc: Remove unused igc_acquire/release_nvm
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
