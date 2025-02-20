@@ -1,93 +1,258 @@
-Return-Path: <netdev+bounces-167939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0C6A3CEDE
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:46:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C38A3CEE1
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7813B1218
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 01:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA3021798DD
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 01:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0161BF33F;
-	Thu, 20 Feb 2025 01:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01A81C5D53;
+	Thu, 20 Feb 2025 01:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ObMTd2Zl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZHvHWwyl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C90314D29B;
-	Thu, 20 Feb 2025 01:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14081C1F02
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 01:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740015991; cv=none; b=BlkUE2B2NbLHSKZgvVRxjxxhi0GVDBgshdFqXoF76HC6pzRrRmFTmikdiCUbrEVNJN8yQuV9SqTbjo6vD9EHbmkuAsCXQbmEppDSp2rYRP67cxecfxv7JYi+tW/i652tQowNPMjBtj0t84VmXemnnRkgV3jGy47OafWecNVR8Ik=
+	t=1740016012; cv=none; b=mA0t0hxAwam79dFrZEucGI0+nrwruj3LtpNbxaqHNjhNy4jRqpT9w/fPXFkgBWfCPS/YuN/AzY1LVQl6RrJuIgnn6jYA9K3xq/HdombRosRK1Wu1X64x9F58MRTx58IlJvC+dxL6JlHMfbZ/gXXffAwcNuSJ3dJdhlQ3TnVlOcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740015991; c=relaxed/simple;
-	bh=lOCIKrG4fnWuEnXHjMyM7hZ4f/XNChZyeVKyouzur8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KhV8SsbkseTU4I907DX4MRnQXgs9pkRaGAoeRpZyX3UqxpHZut378Tpj72phlbnCzQceFR2asFN11yoE0J6uiBzmCur0r+o4JBhQ0Xl0GGJ9xhxfzaAu1hL5wvwjr8GA47zQb5uKsnWOdH3Tmkcl8HPvYEgNrqWgiOgExTxT4Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ObMTd2Zl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CF1FC4CED1;
-	Thu, 20 Feb 2025 01:46:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740015990;
-	bh=lOCIKrG4fnWuEnXHjMyM7hZ4f/XNChZyeVKyouzur8U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ObMTd2ZlVJylLtds82Kj4tPBl7X05QL/6o7/5QbYWay8BODTX+lznxpN9Kcgb6+7s
-	 hsgwbKYz7r8cbVecsZpuQ/9GzIbob7O2fQPzKYixARFQvqy7sbKj4tLsorT+etfov8
-	 byOnVueq/JcSIPGCn6hJmmYWi61P//ft6gReLVDo8tDaRSGIhkVTnyA7Ht2YeWFBeQ
-	 bEmN2XLYG5fzGT6bkLxtWcFeQK+Bsv4xta0FuaEQ//WIiAglqSUNQRNPKMPgaxvUFL
-	 ufDMBU3qQ+bP1VPEF5T5y421nDEeDDXu2alyUMBGnH0Dcszqydt5XYrliCpKLP/57d
-	 RwvI7WDsJvOcw==
-Date: Wed, 19 Feb 2025 17:46:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "Gustavo A. R. Silva"
- <gustavo@embeddedor.com>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] net/mlx5e: Avoid a hundred
- -Wflex-array-member-not-at-end warnings
-Message-ID: <20250219174629.4791c1e9@kernel.org>
-In-Reply-To: <99543a40-2a57-4c10-8876-cde08cb15199@gmail.com>
-References: <Z6GCJY8G9EzASrwQ@kspp>
-	<4e556977-c7b9-4d37-b874-4f3d60d54429@embeddedor.com>
-	<8d06f07c-5bb4-473d-90af-5f57ce2b068f@gmail.com>
-	<7ce8d318-584f-42c2-b88a-2597acd67029@embeddedor.com>
-	<5f2ca37f-3f6d-44d2-9821-7d6b0655937d@gmail.com>
-	<36ab1f42-b492-497f-a1dc-34631f594da6@lunn.ch>
-	<59b075bc-f6e6-42f0-bc01-c8921922299d@gmail.com>
-	<20250218131345.6bd558cb@kernel.org>
-	<99543a40-2a57-4c10-8876-cde08cb15199@gmail.com>
+	s=arc-20240116; t=1740016012; c=relaxed/simple;
+	bh=arHaMf1VlgzmwsFpfVOXP4yaHpMS0ZNgicYCaJisT68=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kMClVknnIjmooIy+t/j1Xn07XEu7aTX0gr5jkt6hlMgj0iOhXRwvofPyPOgjpP5U9W2+pDV08BC+X7Y5dIM6USOfgkdQGYjITbPBsNimWVxhNhcpAlE3U9SSIdmZ3B8K/WuCzbRrqCx5rb7nLYUrVmLxc8dGQ7ZK7Dq4UKVfnm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZHvHWwyl; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22117c396baso53005ad.1
+        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 17:46:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740016010; x=1740620810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=arHaMf1VlgzmwsFpfVOXP4yaHpMS0ZNgicYCaJisT68=;
+        b=ZHvHWwylli4v/kwyvblumZWi5uwyL7nVsf7ALukl/Rg1rEXCl+8VSd/u+0aXK1pVZj
+         sxqo8VEF3MrLM2h+xY8vzuZdbgt/1N6M/qODIzHqIYlzB29biHRT5jRRWRgoJNPhRnmY
+         3GJWi904l/R987K4DBzL01g1Ku/kTbrH8nNGBAsjdjsIRZ/n8rGWRRJ1OQKLLO1KY9cF
+         5Ak0gfM7R9HeTBpn7cNzvLISV2ujINdHHTAEMlVxQk9p99xnJXrCAThCovb4n/dJxckY
+         mEfqrVwgjHrqoSswuivNplzZFkOE+eN5HPDNOFMI6JRMA2s90pQzb9i6mTVDqOgs5HT0
+         qLIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740016010; x=1740620810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=arHaMf1VlgzmwsFpfVOXP4yaHpMS0ZNgicYCaJisT68=;
+        b=jG1LBLQLAO/6Drl/3y8iKmdIteQ/+6Du801AVtH8JXjrWo2b+m0lVpHLD+w7LoBFOn
+         91EblBR5E2SgdsD3Z62FLM5uxLs2SvSEnx5UU2x1Rw8hUr2gTE6n4mzyG2drsSbjYsHA
+         7VUjQOoZ/DPFbsgaw3Op8M9nMJTkbd4OYu002zf7MiDkHsmVgptJIVdTJVDx8xQSdVAK
+         Pnv+GYMOe01nwOoNO3m/Mv2T9zy0otQILSOb+RAWP7T9arZoo3XBuJpgH6vjUjYXvWq2
+         zONwBfIH4OH+ngjSnKgYsg+fWmSxe9pWRItLFI61ZbnVnW/i8no+ZreHSukICuOPbY/L
+         WLOw==
+X-Gm-Message-State: AOJu0YwvQaSb76Wq1r91DYbBjFlKM60ztoJ5sOppEkRKGL94PKHK9fbT
+	BP4WHHWGEN6OadV93q31j4MoC6pH4q92L0OkYb0zC5REKrKYithPfrlPf4usBDwSN9XvE4PDDYW
+	olIPCNpM5qzOGC3ZIrPIsT1+t8Dma/uNnpKAa
+X-Gm-Gg: ASbGncu0nNPKyJ26cmctBA9j8GUG6JcD314b7+FB6YhAiDHsaLqHAyrAKr53BjqprDE
+	44qJuj7y0rcwBSmE3YQMfsSTWwNLihSHQ7DUVeQEWegoMRo0JweyYTUwrLuAAQqEV38iMSzgG
+X-Google-Smtp-Source: AGHT+IEz/wy+PbvayGyl/ZC2Oa91Z8b/neItdKm+4+1vyV76jCH3mzoPtf/GRrixk+9Ls+oK+3gmWERSJ245t2qC3RY=
+X-Received: by 2002:a17:903:19ef:b0:215:f0c6:4dbf with SMTP id
+ d9443c01a7336-2218dd576f9mr1423265ad.14.1740016009988; Wed, 19 Feb 2025
+ 17:46:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-6-almasrymina@google.com> <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+ <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com>
+ <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com> <CAHS8izOE-JzMszieHEXtYBs7_6D-ngVx2kJyMwp8eCWLK-c0cQ@mail.gmail.com>
+ <9210a12c-9adb-46ba-b92c-90fd07e1980f@gmail.com> <CAHS8izPHtk5x-W05_svxU53X-V4+++PiYErCgfr-3iDGgEaUig@mail.gmail.com>
+ <4cdfaff8-0623-4d3a-9204-5165ccbb84db@gmail.com>
+In-Reply-To: <4cdfaff8-0623-4d3a-9204-5165ccbb84db@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 19 Feb 2025 17:46:37 -0800
+X-Gm-Features: AWEUYZkdYTArMvyspFK_MTvc6qB9T7tm4wBNfrCPa7PpZJsZ-6EA0AUf_amyQgU
+Message-ID: <CAHS8izNHT_VjztrDk6t-OJoX=zB3vV81w2CYZTKA1yGB06tY-Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 19 Feb 2025 14:14:35 +0200 Tariq Toukan wrote:
-> On 18/02/2025 23:13, Jakub Kicinski wrote:
-> > On Tue, 18 Feb 2025 17:53:14 +0200 Tariq Toukan wrote:  
-> >> Maybe it wasn't clear enough.
-> >> We prefer the original patch, and provided the Reviewed-by tag for it.  
-> > 
-> > Can you explain what do you mean by "cleaner"?
-> > I like the alternative much more.  
-> 
-> Cleaner in the sense that it doesn't touch existing code in en_rx.c 
-> (datapath), and has shorter dereferences for the inner umr_wqe fields, like:
-> umr_wqe->ctrl
-> vs.
-> umr_wqe->hdr.ctrl
+On Wed, Feb 19, 2025 at 2:40=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 2/17/25 23:26, Mina Almasry wrote:
+> > On Thu, Feb 13, 2025 at 5:17=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
+ail.com> wrote:
+> ...
+> >>>>> It's asserting that sizeof(ubuf_info_msgzc) <=3D sizeof(skb->cb), a=
+nd
+> >>>>> I'm guessing increasing skb->cb size is not really the way to go.
+> >>>>>
+> >>>>> What I may be able to do here is stash the binding somewhere in
+> >>>>> ubuf_info_msgzc via union with fields we don't need for devmem, and=
+/or
+> >>>>
+> >>>> It doesn't need to account the memory against the user, and you
+> >>>> actually don't want that because dmabuf should take care of that.
+> >>>> So, it should be fine to reuse ->mmp.
+> >>>>
+> >>>> It's also not a real sk_buff, so maybe maintainers wouldn't mind
+> >>>> reusing some more space out of it, if that would even be needed.
+> >>>>
+> >>>
+> >>> netmem skb are real sk_buff, with the modification that frags are not
+> >>
+> >> We were discussing ubuf_info allocation, take a look at
+> >> msg_zerocopy_alloc(), it has nothing to do with netmems and all that.
+> >>
+> >
+> > Yes. My response was regarding the suggestion that we can use space in
+> > devmem skbs however we want though.
+>
+> Well, at least I didn't suggest that, assuming "devmem skbs" are skbs
+> filled with devmem frags. I think the confusion here is thinking
+> that skb->cb you mentioned above is about "devmem skbs", while it's
+> special skbs without data used only to piggy back ubuf allocation.
 
-IMO that's minor, not sufficient to justify struct_group_tagged()
+Ah, I see. I still don't see how we can just increase the size of
+skb->cb when it's shared between these special skbs and regular skbs.
+
+> Functionally speaking, it'd be perfectly fine to get rid of the
+> warning and allocate it with kmalloc().
+>
+
+More suggestions to refactor unrelated things to force through a
+msg->sg_from_iter approach.
+
+> ...
+> >>> But MSG_ZEROCOPY doesn't set msg->msg_ubuf. And not setting
+> >>> msg->msg_ubuf fails to trigger msg->sg_from_iter altogether.
+> >>>
+> >>> And also currently sg_from_iter isn't set up to take in a ubuf_info.
+> >>> We'd need that if we stash the binding in the ubuf_info.
+> >>
+> >> https://github.com/isilence/linux.git sg-iter-ops
+> >>
+> >> I have old patches for all of that, they even rebased cleanly. That
+> >> should do it for you, and I need to send then regardless of devmem.
+> >>
+> >>
+> >
+> > These patches help a bit, but do not make any meaningful dent in
+> > addressing the concern I have in the earlier emails.
+> >
+> > The concern is that we're piggybacking devmem TX on MSG_ZEROCOPY, and
+> > currently the MSG_ZEROCOPY code carefully avoids any code paths
+> > setting msg->[sg_from_iter|msg_ubuf].
+>
+> Fwiw, with that branch you don't need ->msg_ubuf at all, just pass
+> it as an argument from tcp_sendmsg_locked() as usual, and
+> ->sg_from_iter is gone from there as well.
+>
+> > If we want devmem to reuse both the MSG_ZEROCOPY mechanisms and the
+> > msg->[sg_from_iter|ubuf_info] mechanism, I have to dissect the
+> > MSG_ZEROCOPY code carefully so that it works with and without
+> > setting msg->[ubuf_info|msg->sg_from_iter]. Having gone through this
+> > rabbit hole so far I see that it complicates the implementation and
+> > adds more checks to the fast MSG_ZEROCOPY paths.
+>
+> If you've already done, maybe you can post it as a draft? At least
+> it'll be obvious why you say it's more complicated.
+>
+
+I don't have anything worth sharing. Just went down this rabbit hole
+and saw a bunch of MSG_ZEROCOPY checks (!msg->msg_ubuf checks around
+MSG_ZEROCOPY code) and restrictions (skb->cb size) need to be
+addressed and checks to be added. From this thread you seem to be
+suggesting more changes to force in a msg->sg_from_iter approach
+adding to the complications.
+
+> > The complication could be worth it if there was some upside, but I
+> > don't see one tbh. Passing the binding down to
+> > zerocopy_fill_skb_from_devmem seems like a better approach to my eye
+> > so far
+>
+> The upside is that 1) you currently you add overhead to common
+> path (incl copy),
+
+You mean the unlikely() check for devmem before delegating to
+skb_zerocopy_fill_from_devmem? Should be minimal.
+
+> 2) passing it down through all the function also
+> have overhead to the zerocopy and MSG_ZEROCOPY path, which I'd
+> assume is comparable to those extra checks you have.
+
+Complicating/refactoring existing code for devmem TCP to force in a
+msg->sg_from_iter and save 1 arg passed down a couple of functions
+doesn't seem like a good tradeoff IMO.
+
+> 3) tcp would
+> need to know about devmem tcp and its bindings, while it all could
+> be in one spot under the MSG_ZEROCOPY check.
+
+I don't see why this is binding to tcp somehow. If anything it makes
+the devmem TX implementation follow closely MSG_ZEROCOPY, and existing
+MSG_ZEROCOPY code would be easily extended for devmem TX without
+having to also carry refactors to migrate to msg->sg_from_iter
+approach (just grab the binding and pass it to
+skb_zerocopy_iter_stream).
+
+> 4) When you'd want
+> another protocol to support that, instead of a simple
+>
+> ubuf =3D get_devmem_ubuf();
+>
+> You'd need to plumb binding passing through the stack there as
+> well.
+>
+
+Similar to above, I think this approach will actually extend easier to
+any protocol already using MSG_ZEROCOPY, because we follow that
+closely instead of requiring refactors to force msg->sg_from_iter
+approach.
+
+
+> 5) And keeping it in one place makes it easier to keep around.
+>
+> I just don't see why it'd be complicated, but maybe I miss
+> something, which is why a draft prototype would explain it
+> better than any words.
+>
+> > I'm afraid I'm going to table this for now. If there is overwhelming
+> > consensus that msg->sg_from_iter is the right approach here I will
+> > revisit, but it seems to me to complicate code without a significant
+> > upside.
+>
+> --
+> Pavel Begunkov
+>
+
+
+--
+Thanks,
+Mina
 
