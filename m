@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-168232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0099FA3E301
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:48:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDABA3E303
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:50:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F701885D3F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:48:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C074A18958E9
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471311DEFD2;
-	Thu, 20 Feb 2025 17:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4002139D2;
+	Thu, 20 Feb 2025 17:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="H6ucX3+X"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VYRrk/fn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEAC1FF1AC
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8695A2B9AA
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740073701; cv=none; b=tH6yQQs+HFsDx0OqnV2VPPO1g77CEv7Nc75pIPbCFQzAkUwrghwjtogQvukrHAalLDOZJYaIBP1ZBrStDjJqL93RV5HA00KXJYVVULfembii+pLttYdvYVPp3stjTbzcufryGKsGuSFFkcJsEXpN6v09YYpWfKr6B8QO3dVCAK0=
+	t=1740073741; cv=none; b=XyEVlNc9YeKa6uSsGIaGzVP0v7/oF05nJ/8xsAJlib59ZsD6InxXHXiPfOb1CMQmY/5n1gMXK5gdShI4XBZ+H139SfgAZyspaKkr6gTZOwi236p9W1rwa+jHhG2VJ9QxqTyQ0uNeYvKrZTtMDnMU/SNViugpR0X7r6gOiIqp46Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740073701; c=relaxed/simple;
-	bh=7Brb15ELOOx+aMxUHLd5T3uulU9wTsodzmhvTcS/394=;
+	s=arc-20240116; t=1740073741; c=relaxed/simple;
+	bh=Njjn7mglB6x85ZHyod9b15fE8ygWv10+9BU4Hg66pGU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gmw1wIFH3qc0XLmGJd2CaYzpHWlciLeSmTG5CJvP5B+ht+uQRL2gN4rFTMrSt/OSygoXVFT6/OPl47GcjaNzTiaRiM+6JvuXe780/8CElgOs0KtfgZUlHkH21yPtUecCfcPbgQ3SciPtB5k+RNe9xsYyyn/MkG6mY/bvGne7gsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=H6ucX3+X; arc=none smtp.client-ip=209.85.219.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8dXq/8KKog4S2SzKoX25Yg9AWY1znpvfA5F/AfDahTSKlxkOANZkNJ9jrevo8MOHMfKuaZ2gKeoDyf6clYXGIWYoMzrEIZ6j+K1MFTSNmKHEQ71qToyqf0+km/PVLN/ib6DdDTsXnxd9q+C92+RtfmSoLcvMQ02Ol4S3FD1W3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VYRrk/fn; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6e69db792daso10407796d6.0
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:48:19 -0800 (PST)
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6e45dbf15c7so9178816d6.2
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:48:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740073698; x=1740678498; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1740073738; x=1740678538; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DVSrbzlxSlQivFeEiDE76Ox1eAVkREhwKkJSsU6C8OQ=;
-        b=H6ucX3+X3p4/b326fvzmar6pSvVL4Kj6T95enatlxESR9e+nNgmIylDDRS3z7uN4H6
-         l45PfbWA6Su30aUN3TN4oDaklrWvvpLsklviwJa78x0opJECCT9U7gC1x0Oo1Fa4xMP1
-         tXnfrv5zIkN4iNnH6jtuoq6NVOfw6U1uQQtpo=
+        bh=ndoHQwkmFgDR5FgV3IZ/57KVk6Byan36SrDD2kBg894=;
+        b=VYRrk/fnBZbmx5vWv9TWTEwcHMxYfZnhhrxyjlmEZvBBGMqxZPJ4zhmbgv1R2Hi+JT
+         Knovv7MMFbvcfioDnRjOqR/iXVhfvUeCapl6S3OTX2KyOyeFJ9syG+dBcD0ErITEF2L6
+         WAfTwJvdpyDBdfBpjbs7IbFNJFMvXn8OM36GY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740073698; x=1740678498;
+        d=1e100.net; s=20230601; t=1740073738; x=1740678538;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DVSrbzlxSlQivFeEiDE76Ox1eAVkREhwKkJSsU6C8OQ=;
-        b=PgE9L329k27KzsbGD0yvgv6tntfjs38Cc4WZZhsItBLRGIfLbv7Yv0LnXkYPIGfeex
-         DritONIvMidx8iRj/5fXrbsmNtEkoYeT6qdn6MfdgVaKafKBdhS1mqI7xyB1Vp2RrBpU
-         ejXu0+Hfm6BdYYT3Tue3wOxq2/RfBzrEdmPjsyQGnVuf6mMMjDFtrD0YrJddb6oDWUuQ
-         /Nu2tIWiOucjpx2bQhoJwAAGbziDht+gKvymYUHLRn24sVPUBWzsAAfXnEcxKgbsC09/
-         as9grvs2Jgw+T4DxJHGqaQyC23Pv7/3pohEqJ5ZaetiinxwQ8LAY8S1354Aw0WNGGHc8
-         7gdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFtsgL1B+h4yZWLiqZuGFUmkK7MlbOUS5TwWKn6ljAeGKbdByhK5Rx6r7jKYTNmm1L16+bc5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzY7Yu53LDsKXvL/LsbUMcaEo9O8NW+RVDBFJBjtRL3aJQNGX2B
-	LpBiD5E4waiilpnCjFDN8KMzk4KDLNUyXAABx02TIqUS8FjmUQXiJ3j7/KFQCFg=
-X-Gm-Gg: ASbGncurUpnAtNQYUWPcNs1nop5V8sbmmT3M75QnHBxssn3cmutmSDdfm4NId5DYs3O
-	w9JtPeL6BhPa9ejeKlixduJyor6AFdeRQy8rgxosOzISuZvo5e0Z+mlloRL80QuxUJukR662EZ9
-	R566SiWzxf+wV11SCQzOOyWP7FmCVdx7Y0uZQZHtuGromWLBvmIwHEUFss3yLkFCWlHmQMXRO+k
-	LyIaaSd853Vhj14ViQgEttGnBNAt6MVCr8xDh2TgeXvWafO8kXJ8koZU1yO5RhHWhfbj+B+ClIQ
-	YRUUlK+1SlzOhfFdhHZcf24MB975GNPtTIpCt/g0gzzl/MAdUQ+Wiw==
-X-Google-Smtp-Source: AGHT+IH6zUubKfa4gvxFjI1DEmZ0im5n9AZjUsesKb2VPmWIAWIMFiYYwzhIUEyiv5xwbeSg0lzRWA==
-X-Received: by 2002:a05:6214:27ca:b0:6d8:9cbf:d191 with SMTP id 6a1803df08f44-6e6ae802019mr272346d6.12.1740073698342;
-        Thu, 20 Feb 2025 09:48:18 -0800 (PST)
+        bh=ndoHQwkmFgDR5FgV3IZ/57KVk6Byan36SrDD2kBg894=;
+        b=HxRFulOFYBbqZ4fbLpn4Dcism7fyV3a/rKdWA5AOuaSTLrH0YHxg7Uw3ZUDIgbzGqP
+         mxXzA4XwJmn3v/sTSuJbmHIiJkjom8j1Hssa9RzaXl1vmzA3KcEERawog4GAiqZxoxBB
+         z7ddJIidSkBr6bCU1LxBtdg6N6x72NZtJE5lczyHg+lrQphxdfAgegG90oLIIp80fcA8
+         CE0K3gHFVi/+LjEel/HYcYx+Q4irCITazgV2R44B3B3cBxudUc1SkaEtz0TKVrVwjdu2
+         O1CSY2+/pWlcShSsXulsVkL4bk49w3XLY8gc1L9utn/DO9rZdPF5oPnxZ854wZwYuZZ3
+         E42Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWvwdNtPw2BN7LtIgrNCIzcSPrlvYl5822pNXwxpAmIBBaYwpI0CwADj5TuJtiUdqQSKCa3/aU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl9jmwnGkVL32PiVPvguNWnTjOEVHCkWMYgyr+/Jao1UeYr5h6
+	i9UdkltaBTYrrrCrn6MmURUW+rdMvbqG+mAwTciGpffNf3Mi2bfkSvm3dMIgZCc=
+X-Gm-Gg: ASbGncsftIzOjgBve4B4829/L0gPpREsHFwB5chm0xWKiwugXBrfvo4OYI6IU3HDKbG
+	fz9PK0lR5tj4fUfKpB18dQg5RErUNNYnX2UTVFcFQAFYydInyiLsrMEdFuiQFqItV1i2hOmIFfI
+	N0VPNdkm2wd9Eo5pIO4zVy2gdcDm8lnnptjUjsDBLb4pat0bMnsBsiECm0mqioRywqoeskWJVST
+	Q3LX3MBRCtS3zRi+KzQEasLQWxYwxXS2Z8qzMOhF0WEjbGMiqOf0HUCOKTrZM+OL9D37KnyqtCT
+	Wp3H2vdRcfIzUwuc2YoOkawzsbWNnwHbvceNFh7XVror2fzuo5rvCQ==
+X-Google-Smtp-Source: AGHT+IHhGV4QKejlmXeC0SiEKZTouZiBngn6yS/0/1ouCKz8q1payQTpbnn7fnmPISPDyS5qgXxDqg==
+X-Received: by 2002:ad4:4eaf:0:b0:6e4:3ddc:5d33 with SMTP id 6a1803df08f44-6e6ae8221d7mr345436d6.13.1740073738501;
+        Thu, 20 Feb 2025 09:48:58 -0800 (PST)
 Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d7793f5sm88090756d6.5.2025.02.20.09.48.17
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d7a3b64sm88400276d6.50.2025.02.20.09.48.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 09:48:17 -0800 (PST)
-Date: Thu, 20 Feb 2025 12:48:16 -0500
+        Thu, 20 Feb 2025 09:48:58 -0800 (PST)
+Date: Thu, 20 Feb 2025 12:48:56 -0500
 From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
 	stfomichev@gmail.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v2 1/7] selftests: drv-net: add a warning for
- bkg + shell + terminate
-Message-ID: <Z7dq4FUbEHe7QQg7@LQ3V64L9R2>
+Subject: Re: [PATCH net-next v2 3/7] selftests: drv-net: add missing new line
+ in xdp_helper
+Message-ID: <Z7drCEsGAQz6cxjf@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
 	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
 	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
 	petrm@nvidia.com
 References: <20250219234956.520599-1-kuba@kernel.org>
- <20250219234956.520599-2-kuba@kernel.org>
+ <20250219234956.520599-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,50 +93,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250219234956.520599-2-kuba@kernel.org>
+In-Reply-To: <20250219234956.520599-4-kuba@kernel.org>
 
-On Wed, Feb 19, 2025 at 03:49:50PM -0800, Jakub Kicinski wrote:
-> Joe Damato reports that some shells will fork before running
-> the command when python does "sh -c $cmd", while bash does
-> an exec of $cmd directly.
-
-I'm not sure what's going on, but as I mentioned in the other thread
-and below, I am using bash as well.
-
-> This will have implications for our
-> ability to terminate the child process on bash vs other shells.
-> Warn about using
+On Wed, Feb 19, 2025 at 03:49:52PM -0800, Jakub Kicinski wrote:
+> Kurt and Joe report missing new line at the end of Usage.
 > 
-> 	bkg(... shell=True, termininate=True)
-> 
-> most background commands can hopefully exit cleanly (exit_wait).
-> 
-> Link: https://lore.kernel.org/Z7Yld21sv_Ip3gQx@LQ3V64L9R2
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
 > v2: new
 > ---
->  tools/testing/selftests/net/lib/py/utils.py | 4 ++++
->  1 file changed, 4 insertions(+)
+>  tools/testing/selftests/drivers/net/xdp_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-> index 9e3bcddcf3e8..33b153767d89 100644
-> --- a/tools/testing/selftests/net/lib/py/utils.py
-> +++ b/tools/testing/selftests/net/lib/py/utils.py
-> @@ -61,6 +61,10 @@ import time
->          self.terminate = not exit_wait
->          self.check_fail = fail
+> diff --git a/tools/testing/selftests/drivers/net/xdp_helper.c b/tools/testing/selftests/drivers/net/xdp_helper.c
+> index cf06a88b830b..80f86c2fe1a5 100644
+> --- a/tools/testing/selftests/drivers/net/xdp_helper.c
+> +++ b/tools/testing/selftests/drivers/net/xdp_helper.c
+> @@ -35,7 +35,7 @@ int main(int argc, char **argv)
+>  	char byte;
 >  
-> +        if shell and self.terminate:
-> +            print("# Warning: combining shell and terminate is risky!")
-> +            print("#          SIGTERM may not reach the child on zsh/ksh!")
+>  	if (argc != 3) {
+> -		fprintf(stderr, "Usage: %s ifindex queue_id", argv[0]);
+> +		fprintf(stderr, "Usage: %s ifindex queue_id\n", argv[0]);
+>  		return 1;
+>  	}
 
-I'm not opposed to putting a warning here, but just as a disclaimer
-and for anyone else following along -- I am using bash:
-
-$ echo $SHELL
-/bin/bash
-
-$ bash --version
-GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
