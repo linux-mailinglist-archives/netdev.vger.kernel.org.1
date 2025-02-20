@@ -1,131 +1,175 @@
-Return-Path: <netdev+bounces-168197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882FAA3E04F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:20:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64816A3E0DF
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 504DF16ED9F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:18:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A3B1800B2A
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5681DFDA5;
-	Thu, 20 Feb 2025 16:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B7E212D68;
+	Thu, 20 Feb 2025 16:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oPBtLeiC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lcR7nfbp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF9E1FCFF0
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 16:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECD5212B0B;
+	Thu, 20 Feb 2025 16:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740068288; cv=none; b=jTIdRQ7xiyM7oZOD/WviEzY/iUpnugEWlXyRnogX3Or9nBrqoDz/vPLXVS//P84zyybEsj4cx8pOmbZsEVvlPokuRqqGg1R6tgtyxQFpn98j3THxy+QgRJl2BlRCf5tMECv0SNVveCBxhpU/HB3+mRieu8V9rk4RX+ULifntmpg=
+	t=1740069013; cv=none; b=i4ChbWRThMvwQO+7tktOAjI/YMMorIZHjHRGJuDRk667zXI0sZ0XFK5p4duHmXK26nNc3yfsZN3oUgflp5wWtFtuCE25CCvSv27D0jcv72xCtjwdWWEUW79LuJV3KsusZ6NsfSXCnj44Hf6aJSgTuYDywbgaZBtZKgu0rPeRSS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740068288; c=relaxed/simple;
-	bh=1lNfht+L4bkIUNSrksN/fnUjXkfLfHREPUBgrBzOBjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=YSqNJ4MPZS+caysz2Z6n//R3Q+7q9qn19C4B7MpbX4bC8WZoexdBn8IJurY2VKg48CgUA6FBNIqkk/0PJ5p1OQCVVbkpr8EGR6Dk7PgylQPukvE6p6fK7zq2YcBsM2CY0O1jJyz54/fWPUlh6C4731bEpr54kOqlf2yChlOu0VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oPBtLeiC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gTLXFDLqNr8w0l4M+kAbKMCxfWgBwXHT6fzNY44FTHo=; b=oPBtLeiCZioel5S0vze3Dv/djL
-	x4WqxS8113VtwsR9GSWnsPmv6YdnkSU6me66Q9PM2T5uo1dA94EBEgWd/4BzdnyyqyxCWumwZQRuQ
-	AlccaHqivk3iS+0eMeuUQriPK3E+5DGUkSr2mW+X9bQabGi9B+dRZJfOzbIP0rY+G1OIeAmoAnG2e
-	w7Gugev8ml4SScaB56TI0/lGLWVsVOX5Uo1j3ktrUIrUfdJuICjUQ9AmONZ6VX0RocHYDyDDZU9wv
-	YJ5VS1+LXqcljGvRA7uvyyLomPSaOdWvUF04r07/Z4iDNBmKUMt2OvF7KrhvUNxJI76kMqLGoKPNQ
-	veUrkKjw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44456)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tl9FG-0001b0-0t;
-	Thu, 20 Feb 2025 16:17:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tl9F9-00017G-1J;
-	Thu, 20 Feb 2025 16:17:43 +0000
-Date: Thu, 20 Feb 2025 16:17:43 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
-	Inochi Amaoto <inochiama@gmail.com>,
+	s=arc-20240116; t=1740069013; c=relaxed/simple;
+	bh=bUFRh/z0JE+Kbj6gH5vsY77Jp0K4hGvEKNQgkEbUZ5c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D5i0aCNh5XbrzNNvAueXJ/oIJ/8OYwpbRilCuPsDPGKdibyWURp+Bsx8xaPNxoX6GTIc78cM0fJBZvlirY7xEnDHuLcz4f/8geLKlq24/eVDq84vK6/PW4uozYLraYe0NbY0ALwJC++ejzEEA+hZqANqTutmfTb3/rXms4uBy04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lcR7nfbp; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740069008;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AhgezydcIAuiz95/Z6Dv2Ddbkghm0SNItVxer/dvUWA=;
+	b=lcR7nfbprjyIAW+4P7/+W7hc+kcMTO6iZ5E4gT5VGBjDYckOTPQfdqxfY16IOg1gAkRaxT
+	Poqp8Q8QOFOlbFaCSEUATRqnhjXX0oVx8Qxm1vtviBKzsNDQhTwZJ5Hwsc6M2gtWmpGjv5
+	SR6NMOjzggF1f3S4boIO02OM3fnIMu4=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	linux-kernel@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jan Petrous <jan.petrous@oss.nxp.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Thierry Reding <treding@nvidia.com>
-Subject: net: stmmac: weirdness in stmmac_hw_setup()
-Message-ID: <Z7dVp7_InAHe0q_y@shell.armlinux.org.uk>
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH net v2] net: cadence: macb: Synchronize stats calculations
+Date: Thu, 20 Feb 2025 11:29:50 -0500
+Message-Id: <20250220162950.95941-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-While looking through the stmmac driver, I've come across some
-weirdness in stmmac_hw_setup() which looks completely barmy to me.
+Stats calculations involve a RMW to add the stat update to the existing
+value. This is currently not protected by any synchronization mechanism,
+so data races are possible. Add a spinlock to protect the update. The
+reader side could be protected using u64_stats, but we would still need
+a spinlock for the update side anyway. And we always do an update
+immediately before reading the stats anyway.
 
-It seems that it follows the initialisation suggested by Synopsys
-(as best I can determine from the iMX8MP documentation), even going
-as far as to *enable* transmit and receive *before* the network
-device has been administratively brought up. stmmac_hw_setup() does
-this:
+Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+---
 
-        /* Enable the MAC Rx/Tx */
-        stmmac_mac_set(priv, priv->ioaddr, true);
+Changes in v2:
+- Use spin_lock_irq when not in IRQ context since we take this lock in
+  macb_interrupt
 
-which sets the TE and RE bits in the MAC configuration register.
+ drivers/net/ethernet/cadence/macb.h      |  2 ++
+ drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-This means that if the network link is active, packets will start
-to be received and will be placed into the receive descriptors.
-
-We won't transmit anything because we won't be placing packets in
-the transmit descriptors to be transmitted.
-
-However, this in stmmac_hw_setup() is just wrong. Can it be deleted
-as per the below?
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index c2913f003fe6..d6e492f523f5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3493,9 +3493,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 		priv->hw->rx_csum = 0;
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 5740c98d8c9f..2847278d9cd4 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1279,6 +1279,8 @@ struct macb {
+ 	struct clk		*rx_clk;
+ 	struct clk		*tsu_clk;
+ 	struct net_device	*dev;
++	/* Protects hw_stats and ethtool_stats */
++	spinlock_t		stats_lock;
+ 	union {
+ 		struct macb_stats	macb;
+ 		struct gem_stats	gem;
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 48496209fb16..c1f57d96e63f 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -1978,10 +1978,12 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
+ 
+ 		if (status & MACB_BIT(ISR_ROVR)) {
+ 			/* We missed at least one packet */
++			spin_lock(&bp->stats_lock);
+ 			if (macb_is_gem(bp))
+ 				bp->hw_stats.gem.rx_overruns++;
+ 			else
+ 				bp->hw_stats.macb.rx_overruns++;
++			spin_unlock(&bp->stats_lock);
+ 
+ 			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
+ 				queue_writel(queue, ISR, MACB_BIT(ISR_ROVR));
+@@ -3102,6 +3104,7 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+ 	if (!netif_running(bp->dev))
+ 		return nstat;
+ 
++	spin_lock_irq(&bp->stats_lock);
+ 	gem_update_stats(bp);
+ 
+ 	nstat->rx_errors = (hwstat->rx_frame_check_sequence_errors +
+@@ -3131,6 +3134,7 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+ 	nstat->tx_aborted_errors = hwstat->tx_excessive_collisions;
+ 	nstat->tx_carrier_errors = hwstat->tx_carrier_sense_errors;
+ 	nstat->tx_fifo_errors = hwstat->tx_underrun;
++	spin_unlock_irq(&bp->stats_lock);
+ 
+ 	return nstat;
+ }
+@@ -3138,12 +3142,13 @@ static struct net_device_stats *gem_get_stats(struct macb *bp)
+ static void gem_get_ethtool_stats(struct net_device *dev,
+ 				  struct ethtool_stats *stats, u64 *data)
+ {
+-	struct macb *bp;
++	struct macb *bp = netdev_priv(dev);
+ 
+-	bp = netdev_priv(dev);
++	spin_lock_irq(&bp->stats_lock);
+ 	gem_update_stats(bp);
+ 	memcpy(data, &bp->ethtool_stats, sizeof(u64)
+ 			* (GEM_STATS_LEN + QUEUE_STATS_LEN * MACB_MAX_QUEUES));
++	spin_unlock_irq(&bp->stats_lock);
+ }
+ 
+ static int gem_get_sset_count(struct net_device *dev, int sset)
+@@ -3193,6 +3198,7 @@ static struct net_device_stats *macb_get_stats(struct net_device *dev)
+ 		return gem_get_stats(bp);
+ 
+ 	/* read stats from hardware */
++	spin_lock_irq(&bp->stats_lock);
+ 	macb_update_stats(bp);
+ 
+ 	/* Convert HW stats into netdevice stats */
+@@ -3226,6 +3232,7 @@ static struct net_device_stats *macb_get_stats(struct net_device *dev)
+ 	nstat->tx_carrier_errors = hwstat->tx_carrier_errors;
+ 	nstat->tx_fifo_errors = hwstat->tx_underruns;
+ 	/* Don't know about heartbeat or window errors... */
++	spin_unlock_irq(&bp->stats_lock);
+ 
+ 	return nstat;
+ }
+@@ -5097,6 +5104,7 @@ static int macb_probe(struct platform_device *pdev)
+ 		}
  	}
+ 	spin_lock_init(&bp->lock);
++	spin_lock_init(&bp->stats_lock);
  
--	/* Enable the MAC Rx/Tx */
--	stmmac_mac_set(priv, priv->ioaddr, true);
--
- 	/* Set the HW DMA mode and the COE */
- 	stmmac_dma_operation_mode(priv);
- 
-
+ 	/* setup capabilities */
+ 	macb_configure_caps(bp, macb_config);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.35.1.1320.gc452695387.dirty
+
 
