@@ -1,205 +1,151 @@
-Return-Path: <netdev+bounces-167958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE76EA3CF73
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C78A3CF75
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8D0F189AF76
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:46:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9FB81893996
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682BF1D5AC0;
-	Thu, 20 Feb 2025 02:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02311D514E;
+	Thu, 20 Feb 2025 02:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXVsIdSq"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KEBBTN/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C304563A9;
-	Thu, 20 Feb 2025 02:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050A363A9
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 02:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740019565; cv=none; b=WfN6ZKFeh/mC1saQ3WfQQ34hg9Z7sEPwHsS/haY9fzwLfUZCCOf+iHNc5UPsLOIh5zaqNd11JwNCoGcFtwAe7yd9Titn3Re55H2stCQ1cvXszh29mn1vFbbWWs6WUUSXh5UEHyo3o6f1xLqNxL9P33lYsX3Omq4v8HbpuRJ2j20=
+	t=1740019675; cv=none; b=nWrgqtZP0gK9Tc7JbNSr7hpU4Ix5KMzNV3WCY2EasCvIKrMCFAHyRXHip0je4KV8RRQd4pz7ifPfr9GI8AHk/0UUGry9Ddg0sYoL+g58V+LnYLZsFR1eryXLD0pgBWKXs4hbFt9/GGZtcs+XJ2p3GpeC5Fmry0TB2WH9QdmD6mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740019565; c=relaxed/simple;
-	bh=73uLvuaiLscksGhZc+hY2cupAUVy2zHkoE90LdSw12E=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZisWYPUUmw4+OUXAIJtqEEw6TAropugqERFogUK7EQ/iH9YCpU9jrnv11AOHWzAwUgj5sXDILtTbVyPKtBCKKpP0LUj8MLbgczPqiemQ/b9O/r/ovfEs0IY0Mi/CGDgCn4Z9R+emSdXZflfY6ynadMSp+NXyQZz2asXepNCzt1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXVsIdSq; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-46c8474d8f6so4276951cf.3;
-        Wed, 19 Feb 2025 18:46:03 -0800 (PST)
+	s=arc-20240116; t=1740019675; c=relaxed/simple;
+	bh=2VvfnmXlr34dHXG/P3XG6letow4wupZdh48hZ5+IiwM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b2CQ7pkCm6kuO7HQB5g5tsVQ6zGWRNy1eIR+Q2WWNdKhwNsroxJ6EktsUq42vSUQIvNRtL5ASepdo/Sv63JDfMYUQBVwkz1buFkZX+PdmfyVvdFLc4O0h7rzEHycUb3N63bMRiieh5xHWpLUXaJRgxWTYmZiG8BZaZkhjbzW9TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=KEBBTN/Z; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fb2a6360efso3268527b3.0
+        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 18:47:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740019562; x=1740624362; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=sifive.com; s=google; t=1740019673; x=1740624473; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z/D3678QYRZKxPCIowYLLtnEL0WC8u1sCf7aliAuVuE=;
-        b=kXVsIdSqib3fZ9M4SQx1yh2bQXptUMTWi75eYfu9iU+AmAo9enZxR6zon9WRrLcR62
-         ZPVlVaj4eV7Xqgz2US6aA/s1KNwZrhqMx3/Y/T/x4Q+MHFB05P+H5dqmlLRLO/w0CE4U
-         gazSM/Oyj4LY7Z4Y4Gfu+nEVEvXSZS8ncG5QgtocvMcmexEtYsxlBohYPJtl0Nn3PKpR
-         XNaafEMw+X6l6GqARqmJrIGNk1gCuSTk3x/AmDM3wHl+g22RmfHErHbnSMgkFInx5C7y
-         rhDTpauxkTcysCTZA70MciEHELiQYlqgOqv/vsK9pgZGxgbDQ8TxtqtuXiN6Rp+d7L3q
-         SX4A==
+        bh=Xvp9vC0eMH1pKGCb8lxYuIWBY9DYcdV7nU72B3skZ6Y=;
+        b=KEBBTN/ZusaqxikmKmtLJnqMTtn4ks+InMoAoMQoSXfjcWbUXEJWrU71azbGzZWIKt
+         XkxJGZxDgXnPNNwQP9/EuSU/snNUOLtpzB+9tCAkQ+4GFC225CyN6utG2wrGMV24iswW
+         XImPoWeHp6qpJiQREq151HSEkhFC14g783qHwlmmPgiMiU/EjvsGEsWodP1iOs0r7H6U
+         S/3wfzsHWRA3G+vaCMIk/RPDZnr0xNAd+tJslrX0DZZJdFDewokMsIhH5KeS4WEbJjbk
+         wncznDiIyLMq8wnBb2GlAdgEnz/vPoNIXlOF+aU7/aOCjiFteuvOXKW45a6794TkHWCF
+         /I5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740019562; x=1740624362;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Z/D3678QYRZKxPCIowYLLtnEL0WC8u1sCf7aliAuVuE=;
-        b=Wejy5vA1dLyntxn960tiIwDl7l7nYURcY2+ZeeO4AxXP+5Lh9j6QiUyQhb5a/X9wRf
-         80ZGYEaLl8wopN/Ciick6a9rWmPMtpNPStqDU9b82qbcwNUebPTw2xi2Dl/C+6118AW7
-         XlgCfoZt13ps7yieEzPbZfODVE/XJRIrJ9NO2RdQZDjLfcJhpXgm1UyKcc0Rg3liAt4n
-         Vl6UN4U5YbeVDJ8r6idjoJ3hT1zRetAz4WYEBvT2AbIZ8k6D2/Wj9YU2SkodjSdXDVap
-         YZq7Iq+qTlrzfwsVqLaCnFVyh04LeWRxx+uW3X8ghxcQSNZ/wrTaFRBZKHapsMf/Q3Qt
-         lS4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVQDteKADtOxNI4XqqUVfJsDj/tspoJ5W7qCK8cHa3VEpLmuaF5WglilFX3v68DsLVzN8A=@vger.kernel.org, AJvYcCXlkdpyD1ny1Z+6y+TAv7PtqCyi5tHmHwePyQX+yNM1jpkiOdNUfVOMqCnzHd3TkxNWBvBxoRZW@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRvynN3NIcluLB96OcBnPZW6yZoqMNxQvxVMxz5abuBL1HWv7t
-	gQsrc3YYYtDb7nwQaN8fvbJ1vt9NDns26FIBZr4qOcSmjnMvJdCYJHOUnQ==
-X-Gm-Gg: ASbGncu1ujSGcFGHLOGPUedLs0IgFyLmcUtx+hpyUMA36+g6Q1wTBA8EEDTqoun4P5T
-	wL6cLtPdPyYFXw8ZmZeVX5LvZ/44yKrJ+kgK5XVsppXupCdo2QLdxVIzhJsOypmKp6RnUTOnnw9
-	OBy0Vj2AeMrbXB4/XcHJ8/tESiJJHwLLya/LUIZn57sotgBO2tAY/5BTvA5j52EG4THtFfx5gyn
-	phaJLPg2uWbIWXFEBMmK07aWDe7FCSLgvaxrDdnKCiZjerDASbPOMupWvgL9Ys7a2r0e+vMzvec
-	zSbccWtEa1hQ0+awmOvQAFc+3UI1UGIJyLRuYOPQpN0h6rhA69WASCp2lN7c7T8=
-X-Google-Smtp-Source: AGHT+IEG9YapflJf2cUv8UVoSRBdPpMklvTrO3BRiqvzN12JeBtxzTYK7SAEFKyyNJwNn4PZ61++XQ==
-X-Received: by 2002:ac8:5e0a:0:b0:472:1040:10b2 with SMTP id d75a77b69052e-472173e1c5amr14212311cf.39.1740019562567;
-        Wed, 19 Feb 2025 18:46:02 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47209a1b133sm14864501cf.70.2025.02.19.18.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 18:46:01 -0800 (PST)
-Date: Wed, 19 Feb 2025 21:46:01 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- shuah@kernel.org, 
- ykolal@fb.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <67b697697bdf8_20efb0294b4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoCJNM3YyLQpFCCUtHPN7dU+o721yBYE71+hs9-1r937Xg@mail.gmail.com>
-References: <20250218050125.73676-1-kerneljasonxing@gmail.com>
- <20250218050125.73676-2-kerneljasonxing@gmail.com>
- <67b497b974fc3_10d6a32948b@willemb.c.googlers.com.notmuch>
- <03553725-648d-467f-9076-0d5c22b3cfb3@linux.dev>
- <CAL+tcoA==aPOmBjDTOi2WgZ7HEE4OJiZ+4Z-OD_yGn_XN2Onqw@mail.gmail.com>
- <67b542b9c4e3d_1692112944@willemb.c.googlers.com.notmuch>
- <CAL+tcoCHsJ9KQf5w6TLHmQy9DrkhPHChRPQb=+9L_WKTTd8FQA@mail.gmail.com>
- <67b5f4f5990b0_1b78d829412@willemb.c.googlers.com.notmuch>
- <CAL+tcoCJNM3YyLQpFCCUtHPN7dU+o721yBYE71+hs9-1r937Xg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v12 01/12] bpf: add networking timestamping
- support to bpf_get/setsockopt()
+        d=1e100.net; s=20230601; t=1740019673; x=1740624473;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xvp9vC0eMH1pKGCb8lxYuIWBY9DYcdV7nU72B3skZ6Y=;
+        b=wcs4ycJbAGJ34WWm1IAow+sGH4XpObAVIx412noomzeARjbYQoE7dAaMsLmSfwnyKn
+         2u0W4JHe27zAdtyamijtdYRIxL0EWSmG19WKF4AMecsyWtXgipf4Nu7vTTf64zlkcbCO
+         dP92brk0lTd9GXENNkczU0M95wjAXFWZnhvml+yRohSIVd7gPFTHFJzaZVp+IhqwJw7Y
+         MDUgFwUl1EWw/ckb3/NYJruW59nZWi8Ix9/XJ3hCvxp43csdwcjmhveFwpFWg4+vHJJz
+         Y/Ct3ww5LgToIDFrSztlCG03lEJEs2YL7+H8Op5DDFuzNl/O7ej/uZ4g/EXwWtjpbXQ0
+         jLww==
+X-Forwarded-Encrypted: i=1; AJvYcCVZrPCLFOoky2LHm1ibVAteqxAPSEKWqJ9jmYc6sB16h4Df5IzbPo2CAeW+uuZVmf3lvRxvS2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq+KEJhsH/D1JPSmljJmxiS/ZiHj2DZCDGHkW/LzzdiKRVJqxx
+	bl9MkmdxkvSEZndVO0QVLjgZKDBoLLxoP1bv9DHCoGUetgSPc8Ti/6sKrlBiAtqEiWZ1QEAQpxS
+	UtuarkQRsOZaZ242AT6DMNV/tA60IGd+zi0wooVdMPGAKn8kamFUSCw==
+X-Gm-Gg: ASbGncsaZpHxj6jO4Hos3BcL++bMW3r1QBvsT0xa/1UhErnFij+KvzRTcQb4jOX1ujY
+	Z9OYKMmgP+wGInLwJ1H5BsE3NH1ZEVvzDinR+sp9TveSyWQcGj7+rXsOPrX/7oPXkYS9ryDkj5B
+	Y=
+X-Google-Smtp-Source: AGHT+IHpbcrdwizdZDEB2LKzf3t7N+L1gh7l/lSw8IgK31mOcpbcfuefgyvG7Eg9yB90MSd4D8fYOSrYNFEZa4g738Y=
+X-Received: by 2002:a05:690c:64c8:b0:6f7:ac3f:d589 with SMTP id
+ 00721157ae682-6fbbb7eafa8mr5012217b3.36.1740019672877; Wed, 19 Feb 2025
+ 18:47:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250217055843.19799-1-nick.hu@sifive.com> <889918c4-51ae-4216-9374-510e4cbdc3f1@intel.com>
+In-Reply-To: <889918c4-51ae-4216-9374-510e4cbdc3f1@intel.com>
+From: Nick Hu <nick.hu@sifive.com>
+Date: Thu, 20 Feb 2025 10:47:40 +0800
+X-Gm-Features: AWEUYZmjzhqzQbHmf9_A5Yil9YBABlCV2QtiQWGg09MoFGZlPCm-Nzx5MY3mUGU
+Message-ID: <CAKddAkBZWZqY+-TERah+Q+WUfkqzcpFMA=ySSuTxxBjfP7tKZg@mail.gmail.com>
+Subject: Re: [PATCH] net: axienet: Set mac_managed_pm
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek <michal.simek@amd.com>, 
+	Russell King <linux@armlinux.org.uk>, Francesco Dolcini <francesco.dolcini@toradex.com>, 
+	Praneeth Bajjuri <praneeth@ti.com>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > Can you find a hole further down to place this in, or at least a spot
-> > that does not result in 7b of wasted space (in the hotpath cacheline
-> > groups of all places).
-> 
-> There is one place where I can simply insert the flag.
-> 
-> The diff patch on top of this series is:
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index e85d6fb3a2ba..9fa27693fb02 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -446,8 +446,6 @@ struct sock {
->         u32                     sk_reserved_mem;
->         int                     sk_forward_alloc;
->         u32                     sk_tsflags;
-> -#define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG))
-> -       u8                      sk_bpf_cb_flags;
->         __cacheline_group_end(sock_write_rxtx);
-> 
->         __cacheline_group_begin(sock_write_tx);
-> @@ -528,6 +526,8 @@ struct sock {
->         u8                      sk_txtime_deadline_mode : 1,
->                                 sk_txtime_report_errors : 1,
->                                 sk_txtime_unused : 6;
-> +#define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG))
-> +       u8                      sk_bpf_cb_flags;
-> 
->         void                    *sk_user_data;
->  #ifdef CONFIG_SECURITY
-> 
-> 
-> 1) before applying the whole series:
-> ...
->         /* --- cacheline 10 boundary (640 bytes) --- */
->         ktime_t                    sk_stamp;             /* 0x280   0x8 */
->         int                        sk_disconnects;       /* 0x288   0x4 */
->         u8                         sk_txrehash;          /* 0x28c   0x1 */
->         u8                         sk_clockid;           /* 0x28d   0x1 */
->         u8                         sk_txtime_deadline_mode:1; /* 0x28e: 0 0x1 */
->         u8                         sk_txtime_report_errors:1; /*
-> 0x28e:0x1 0x1 */
->         u8                         sk_txtime_unused:6;   /* 0x28e:0x2 0x1 */
-> 
->         /* XXX 1 byte hole, try to pack */
-> 
->         void *                     sk_user_data;         /* 0x290   0x8 */
->         void *                     sk_security;          /* 0x298   0x8 */
->         struct sock_cgroup_data    sk_cgrp_data;         /* 0x2a0  0x10 */
-> ...
-> /* sum members: 773, holes: 1, sum holes: 1 */
-> 
-> 
-> 2) after applying the series with the above diff patch:
-> ...
->         /* --- cacheline 10 boundary (640 bytes) --- */
->         ktime_t                    sk_stamp;             /* 0x280   0x8 */
->         int                        sk_disconnects;       /* 0x288   0x4 */
->         u8                         sk_txrehash;          /* 0x28c   0x1 */
->         u8                         sk_clockid;           /* 0x28d   0x1 */
->         u8                         sk_txtime_deadline_mode:1; /* 0x28e: 0 0x1 */
->         u8                         sk_txtime_report_errors:1; /*
-> 0x28e:0x1 0x1 */
->         u8                         sk_txtime_unused:6;   /* 0x28e:0x2 0x1 */
->         u8                         sk_bpf_cb_flags;      /* 0x28f   0x1 */
->         void *                     sk_user_data;         /* 0x290
-> 0x8 */
->         void *                     sk_security;          /* 0x298   0x8 */
->         struct sock_cgroup_data    sk_cgrp_data;         /* 0x2a0  0x10 */
-> ...
-> /* sum members: 774 */
-> 
-> It turns out that the new sk_bpf_cb_flags fills the hole exactly. The
-> new field and some of its nearby fields are quite similar because they
-> are only/nearly written during the creation or setsockopt phase.
-> 
-> I think now it's a good place to insert the new flag?
+Hi Jacob
 
-Thanks. This seems fine to me.
- 
+On Thu, Feb 20, 2025 at 7:29=E2=80=AFAM Jacob Keller <jacob.e.keller@intel.=
+com> wrote:
+>
+>
+>
+> On 2/16/2025 9:58 PM, Nick Hu wrote:
+> Nit: subject should include the "net" prefix since this is clearly a bug
+> fix.
+>
+I've added the 'net' prefix to the subject 'net: axienet: Set
+mac_managed_pm'. Is there something I'm missing?
 
+> > The external PHY will undergo a soft reset twice during the resume proc=
+ess
+> > when it wake up from suspend. The first reset occurs when the axienet
+> > driver calls phylink_of_phy_connect(), and the second occurs when
+> > mdio_bus_phy_resume() invokes phy_init_hw(). The second soft reset of t=
+he
+> > external PHY does not reinitialize the internal PHY, which causes issue=
+s
+> > with the internal PHY, resulting in the PHY link being down. To prevent
+> > this, setting the mac_managed_pm flag skips the mdio_bus_phy_resume()
+> > function.
+> >
+> > Fixes: a129b41fe0a8 ("Revert "net: phy: dp83867: perform soft reset and=
+ retain established link"")
+> > Signed-off-by: Nick Hu <nick.hu@sifive.com>
+> > ---
+>
+> Otherwise, the fix seems correct to me.
+>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+>
+> >  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/driver=
+s/net/ethernet/xilinx/xilinx_axienet_main.c
+> > index 2ffaad0b0477..2deeb982bf6b 100644
+> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> > @@ -3078,6 +3078,7 @@ static int axienet_probe(struct platform_device *=
+pdev)
+> >
+> >       lp->phylink_config.dev =3D &ndev->dev;
+> >       lp->phylink_config.type =3D PHYLINK_NETDEV;
+> > +     lp->phylink_config.mac_managed_pm =3D true;
+> >       lp->phylink_config.mac_capabilities =3D MAC_SYM_PAUSE | MAC_ASYM_=
+PAUSE |
+> >               MAC_10FD | MAC_100FD | MAC_1000FD;
+> >
+>
 
+Regards,
+Nick
 
