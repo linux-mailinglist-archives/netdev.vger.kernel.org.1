@@ -1,65 +1,59 @@
-Return-Path: <netdev+bounces-168200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475B0A3E114
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:42:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FD2A3E148
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:48:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E1797A8D0A
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:40:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4282F862742
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B79204879;
-	Thu, 20 Feb 2025 16:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5952204F94;
+	Thu, 20 Feb 2025 16:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJNJYCpa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JgTLL5R6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC63D13A87C;
-	Thu, 20 Feb 2025 16:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789B320DD47
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 16:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740069705; cv=none; b=C9PRK7qtOSAfEGV/KAn9rnCbVXtaulZ4qLauSO/31E0LpT1CWxaBvNZPaTrgnL/22UUwBFj+M2vyj7b8EIhohNmxLt1cIoFJ/VWcxu8qfRg7gY4ErAm7L/6a2nUMKYnCpShu9m+yW+ITkG9wQdX19RginuqDGTfiOtdn/Ml0pqY=
+	t=1740069797; cv=none; b=Op5zyq+oNQd/Px5zaHY22WzwrnjEf6MWtbPtEbLdDSQ3zE0G4PH+TGkzV1w6euDvJzzBhRW/6Z5KCxD98kqb/tmHsZuRju/hA5/1mMN2qoVSi7FnJ2yt8uZNy2PJrbAej11Ev0qFDkgKWP7b5AqjniajrRjVawAtKDNa4LVAw08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740069705; c=relaxed/simple;
-	bh=HyXshobuVqA0RqPRtuVurArIvohbfETQanVpkFcibTg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QW+X3UYnjvMG1YnYnhXKYKLFpWYAYJukEnOHym72Bt7YO8hST9Rvruz4amOehGAad21s/JjiG1q4GY9oI+Oh6ctUaocahz0eQleOvDOpdKM9o3S3tIxzD2NIIMNmUJbkx7ZL9eoe832eLdsMskl4Y04G/N3U9U5e3a681gRR1sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJNJYCpa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49F95C4CED1;
-	Thu, 20 Feb 2025 16:41:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740069704;
-	bh=HyXshobuVqA0RqPRtuVurArIvohbfETQanVpkFcibTg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NJNJYCpaUum1F7pXgvxKAzTey+/y/cSpzoDM/1W7Qu5koLF4xu5BI9n4sa6HJrJ2p
-	 gTuBaxgIbeEIo4Iw53vdKou1gUzUOt7Pi8aPAvlifYsVd4zFObR5+XPDUi+e5Gke7y
-	 f7lqiUbf6rjVoBOlQvZxwRXgoWv1FobuJruVyuN+NSNAx62rUj0LWxpiy9mOZ7Do/h
-	 MFM4NdiPOX3m0jOTCqbL8SxY45FE/byY60Y5VWf7/lzFYQIILdEk0nG05icel81aWu
-	 ak0P+K0yHJt+VNYirpTV1eKknp3F9X3zw9nwgs0cn4sqJbEIuMxAlFieytPCCiq77q
-	 iOjR9ZiBdHF6A==
-Received: by wens.tw (Postfix, from userid 1000)
-	id 984635FB8F; Fri, 21 Feb 2025 00:41:41 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1740069797; c=relaxed/simple;
+	bh=CETFckSGLagswl0Pqfs57UFAtqcIvAdVoYsbh8b7tPc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=maSAaNM2ieH1zPEBrhmY0o0VkVxhoJ1XK2ZrS7o3WvwsKW8peqm96uYL9h64vVdLcNEkGFPg+peZ4xEe8xMQL5vRqBELI9N+UN4NJhc5/JRUx4bm075hbZnaha8d5UNiv5w+msk7lo2F+dq5lqDXI+TeqN5nRN50NX7d1B0z2WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JgTLL5R6; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740069783;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2EPvTSWtCKlN86g9+N+uYkxsZa3IluO/QJHLmqnQGwE=;
+	b=JgTLL5R6XUz4U+PfdujS2vMn1wjtV0gVZO6rqKXmZ/7W72pDRE8AIcvp5uozE7B6jnGZnv
+	f0XJCGACVuz+pDyK8Dx0I+R7dmaM0GkyZtnxlW9W05ilnEn2uL+0HiLiPMfuMfzWvk7EIF
+	kSj4Wy19C56PM9ZK0bB1MF5sTfc3sp4=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>
-Cc: Chen-Yu Tsai <wens@csie.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	stable@vger.kernel.org
-Subject: [PATCH RESEND net-next] net: stmmac: dwmac-rk: Provide FIFO sizes for DWMAC 1000
-Date: Fri, 21 Feb 2025 00:40:31 +0800
-Message-Id: <20250220164031.1886057-1-wens@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH net-next v2] net: cadence: macb: Implement BQL
+Date: Thu, 20 Feb 2025 11:42:57 -0500
+Message-Id: <20250220164257.96859-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,60 +61,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Chen-Yu Tsai <wens@csie.org>
+Implement byte queue limits to allow queuing disciplines to account for
+packets enqueued in the ring buffer but not yet transmitted. There are a
+separate set of transmit functions for AT91 that I haven't touched since
+I don't have hardware to test on.
 
-The DWMAC 1000 DMA capabilities register does not provide actual
-FIFO sizes, nor does the driver really care. If they are not
-provided via some other means, the driver will work fine, only
-disallowing changing the MTU setting.
-
-The recent commit 8865d22656b4 ("net: stmmac: Specify hardware
-capability value when FIFO size isn't specified") changed this by
-requiring the FIFO sizes to be provided, breaking devices that were
-working just fine.
-
-Provide the FIFO sizes through the driver's platform data, to not
-only fix the breakage, but also enable MTU changes. The FIFO sizes
-are confirmed to be the same across RK3288, RK3328, RK3399 and PX30,
-based on their respective manuals. It is likely that Rockchip
-synthesized their DWMAC 1000 with the same parameters on all their
-chips that have it.
-
-Fixes: eaf4fac47807 ("net: stmmac: Do not accept invalid MTU values")
-Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
-(Resending to net-next instead of netdev.)
 
-The commit that broke things has already been reverted in netdev.
+Changes in v2:
+- Reset BQL after disabling NAPI
+- Adjust variable ordering for improved aesthetics
 
-The reason for stable inclusion is not to fix the device breakage
-(which only broke in v6.14-rc1), but to provide the values so that MTU
-changes can work in older kernels.
+ drivers/net/ethernet/cadence/macb_main.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index a4dc89e23a68..71a4c4967467 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1966,8 +1966,11 @@ static int rk_gmac_probe(struct platform_device *pdev)
- 	/* If the stmmac is not already selected as gmac4,
- 	 * then make sure we fallback to gmac.
- 	 */
--	if (!plat_dat->has_gmac4)
-+	if (!plat_dat->has_gmac4) {
- 		plat_dat->has_gmac = true;
-+		plat_dat->rx_fifo_size = 4096;
-+		plat_dat->tx_fifo_size = 2048;
-+	}
- 	plat_dat->fix_mac_speed = rk_fix_speed;
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 48496209fb16..d0eac42d9ae0 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -1081,15 +1081,18 @@ static void macb_tx_error_task(struct work_struct *work)
+ 						      tx_error_task);
+ 	bool			halt_timeout = false;
+ 	struct macb		*bp = queue->bp;
++	u32			queue_index;
++	u32			packets = 0;
++	u32			bytes = 0;
+ 	struct macb_tx_skb	*tx_skb;
+ 	struct macb_dma_desc	*desc;
+ 	struct sk_buff		*skb;
+ 	unsigned int		tail;
+ 	unsigned long		flags;
  
- 	plat_dat->bsp_priv = rk_gmac_setup(pdev, plat_dat, data);
++	queue_index = queue - bp->queues;
+ 	netdev_vdbg(bp->dev, "macb_tx_error_task: q = %u, t = %u, h = %u\n",
+-		    (unsigned int)(queue - bp->queues),
+-		    queue->tx_tail, queue->tx_head);
++		    queue_index, queue->tx_tail, queue->tx_head);
+ 
+ 	/* Prevent the queue NAPI TX poll from running, as it calls
+ 	 * macb_tx_complete(), which in turn may call netif_wake_subqueue().
+@@ -1142,8 +1145,10 @@ static void macb_tx_error_task(struct work_struct *work)
+ 					    skb->data);
+ 				bp->dev->stats.tx_packets++;
+ 				queue->stats.tx_packets++;
++				packets++;
+ 				bp->dev->stats.tx_bytes += skb->len;
+ 				queue->stats.tx_bytes += skb->len;
++				bytes += skb->len;
+ 			}
+ 		} else {
+ 			/* "Buffers exhausted mid-frame" errors may only happen
+@@ -1160,6 +1165,9 @@ static void macb_tx_error_task(struct work_struct *work)
+ 		macb_tx_unmap(bp, tx_skb, 0);
+ 	}
+ 
++	netdev_tx_completed_queue(netdev_get_tx_queue(bp->dev, queue_index),
++				  packets, bytes);
++
+ 	/* Set end of TX queue */
+ 	desc = macb_tx_desc(queue, 0);
+ 	macb_set_addr(bp, desc, 0);
+@@ -1230,6 +1238,7 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 	unsigned int tail;
+ 	unsigned int head;
+ 	int packets = 0;
++	u32 bytes = 0;
+ 
+ 	spin_lock(&queue->tx_ptr_lock);
+ 	head = queue->tx_head;
+@@ -1271,6 +1280,7 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 				bp->dev->stats.tx_bytes += skb->len;
+ 				queue->stats.tx_bytes += skb->len;
+ 				packets++;
++				bytes += skb->len;
+ 			}
+ 
+ 			/* Now we can safely release resources */
+@@ -1285,6 +1295,9 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 		}
+ 	}
+ 
++	netdev_tx_completed_queue(netdev_get_tx_queue(bp->dev, queue_index),
++				  packets, bytes);
++
+ 	queue->tx_tail = tail;
+ 	if (__netif_subqueue_stopped(bp->dev, queue_index) &&
+ 	    CIRC_CNT(queue->tx_head, queue->tx_tail,
+@@ -2386,6 +2399,8 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	/* Make newly initialized descriptor visible to hardware */
+ 	wmb();
+ 	skb_tx_timestamp(skb);
++	netdev_tx_sent_queue(netdev_get_tx_queue(bp->dev, queue_index),
++			     skb->len);
+ 
+ 	spin_lock_irq(&bp->lock);
+ 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
+@@ -3021,6 +3036,7 @@ static int macb_close(struct net_device *dev)
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+ 		napi_disable(&queue->napi_rx);
+ 		napi_disable(&queue->napi_tx);
++		netdev_tx_reset_queue(netdev_get_tx_queue(dev, q));
+ 	}
+ 
+ 	phylink_stop(bp->phylink);
 -- 
-2.39.5
+2.35.1.1320.gc452695387.dirty
 
 
