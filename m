@@ -1,141 +1,167 @@
-Return-Path: <netdev+bounces-168060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53331A3D3D3
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:58:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C843CA3D402
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:59:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D6CE3AFE2A
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:57:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E8AA7A79BF
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8021EE01B;
-	Thu, 20 Feb 2025 08:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC19B1EB9FD;
+	Thu, 20 Feb 2025 08:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGlSnrkM"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="GpR3eduV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB731EE002;
-	Thu, 20 Feb 2025 08:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB57179A7
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 08:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041867; cv=none; b=i4ulbjCisvhZbqX3dZnKj5aMqWdDYOUwC143WpSMwZrB3b6v6tDJTYrFyEzVQ2xqblyy62NSBZ5J/6UsgYV/702XX/k1J7/jrG/rEMTPz0yqdOMNRGrtH+XvwzLANi7T6EJCll1T/96CEP32kWQTXNP1xCMRCCG5W1J73PD/Y0w=
+	t=1740041923; cv=none; b=uTUX9gd8q7kCaxrljlqetdIZ9jiAGnO3iu0V63XU5yA08U3NAdpFFAQCQNbiQq/NchKTAiAN+MjoUNKp7cAmYtUW1V6M9S/cFHdkmghQfb1pVQ1gDW+1aCyIIMY0qOIgH7zqicxm0WL6W/Y7aMTJG/JhEN9es5GB3vre/wV6GR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041867; c=relaxed/simple;
-	bh=Xe3KW08CtnTWxDsfXEunDUYKjhgHZTGBlTQTiSWGgco=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b/qJLrwosoTKnu0hTIU9k+SvPGOYkm9n7is+8sFbVNq1ko3ICv8/l+PY5ySsSHiJKlzIbOIOMcdUdj13zvzDBZTsIBV8xrpvT59X0FxvjI5EOgYmnCCvE7pG3VeTY9dCCqbVAJ+QWJtCMqUMFRbWT9GdyLQEHfsGtcha2ZPn7qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGlSnrkM; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d285a447a7so2038685ab.0;
-        Thu, 20 Feb 2025 00:57:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740041865; x=1740646665; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZJ1ukTj9LoDYtqtD5ecMxI2UxUwlSfIH76RTECIiysM=;
-        b=KGlSnrkMxcQlK6ipV3DNJueHJgW1I8NrDefK66Coo4IuMVvKN/sdo2g69ce/GyVq6I
-         rQRTaJWlBdfRLqeN6rmStBjswY1t6JH2NR0sWKb2HmazLbnWXyCOItTh8wkilFOrOTxB
-         9Lxw1OtJF9WGIOtCfNIypTxqg+I3oXoSUadojAGkktHn0fGOKa6eoRbUrV4cS5WG7yDf
-         Uz1T3F6p27eW1CeZqEt8yQYzBdL2mcdcK8We+6vjcWIxE+rFRKhkqPmNAe7yySZDi59r
-         fRRfDlXW4Xp97um9XxzW3PuMusO6rHT5Oo0Gxt/kGN9D8LVwHYRX/C1xdgnPIkJ7IOqk
-         KVrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740041865; x=1740646665;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZJ1ukTj9LoDYtqtD5ecMxI2UxUwlSfIH76RTECIiysM=;
-        b=KmokUI2XvTAbxW0UYABKxgoO1rJwwWLpMNpj0DdsLCJY/UcQnZMvdAi6mSAZPQfazb
-         mNHZ/kTnzIodzy6GxYvZr55a1IIDH7e0pyF07piLGSPjwrZrgSzT/DbKa7Lw8feLGeKa
-         5m6YfjSGHaWXlxZixkoU97m9krLJyHsb1+jyzVP8PGLv2B8gA2VnKNrdC5ZJ9LpTsOfy
-         TFugdxYE44hmEZ2SGFj9Dz4SxYedZqF8esBDIEbahUCVx4Ka85JTK5zBR6MyQ/62T9Sg
-         0iptXwKGR4yAf6y4WScomCJvPjSP6oGDqHB1SYmHXdKWcDFQxX55JEJIHsi6P4kJ2OyS
-         qYWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsjRmee00VC58Bb4OxUU685+5agVpxljgX+Q6/gz8wdjpYtaTmLMIAF9VmxGZUpKUn3QfZXHDQ@vger.kernel.org, AJvYcCUwaNcHv/VhdlJS2/aBdiYGK/uwz/dLjmGBhScmdUN+sb83rQHkFM7+0pc8EdaUEAqIn+U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyimTLxgbDqxZb6ClZEX3FPeKk7arHaaxnFmES/XXmppcshq/V
-	XTiOJ9eOpos6s7hd7Qd5ZEY/hLT/kR03swxiLYAbQJSJJqhxEXTQLovUyJntP7anRIxOTlXxaED
-	rphbFBz9g9gsdnbvZMxJPcWRNRG7AyrlZw0AdSQ==
-X-Gm-Gg: ASbGnctUaR6R18eB5PE6Rk56LS6icix6dQRi/2GP8gEcKCPLY9NF/9pKEc1NXtDO0UY
-	S16KqDkj5CcR8c4vhvCHcL8uNftFT19LrvthU6NEyQN34weDfPMo8LLauo6qXTlQaoRMdpDQq
-X-Google-Smtp-Source: AGHT+IFqzNFKSbcp0m+sVNShsOIjZnefnBiSt3e7dTYZO4FvWSEE9vIyYmmpnmKMzyBwF8FIEZfT3i4wI6Q0Vt6JVKE=
-X-Received: by 2002:a05:6e02:2686:b0:3d0:3fa2:ccfd with SMTP id
- e9e14a558f8ab-3d280771e1amr219813525ab.5.1740041864809; Thu, 20 Feb 2025
- 00:57:44 -0800 (PST)
+	s=arc-20240116; t=1740041923; c=relaxed/simple;
+	bh=ZeRhDPr+7INqjOTZvLDT5xceuifZ4AX1MsVLWP28Dpg=;
+	h=In-Reply-To:Mime-Version:References:Date:Message-Id:From:Subject:
+	 To:Content-Type:Cc; b=s5c/ybCzElrdxqgYMvStZe1Z/H+iu2POBbiJ7lHSGuMOQCNncZ3+VE1tx1rqD9XagDscT5edcqNeVheBfwOJ3sVaMOcUKLVO5v7unTc20ivZeKvDpgwCBtRdbhbH/YJ77LyG2KPb0QTq2s3lyd5tAhP068UnXqW6GwWWpkYUTUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=GpR3eduV; arc=none smtp.client-ip=209.127.231.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1740041904; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=zKzz/mNfZSGm9WmkaKbCfXgZrSogtjs+ag2dfjHvdYs=;
+ b=GpR3eduVJV39NK4gIFwIIJHdRqicg4v/3ccfkooZCsq/+pe/gxvZ4QxrabkKJLIXOBJ3D2
+ tRbR3mAaLB2F9gTtL8G/GOXGq//pcXPkwfoDcnOq2UtxKj72Bftsc50WhOe24+uQIctbMy
+ a+f+SeHBsD0aNlqM08igr/woKTNOhFXahLCYQ5jP5eh4v0sfaIUY2DRJViutNoZpc1Z01S
+ 01FdXq1hwlGGa8gxlKCGCBrEnX7IiyCbvcNDzzo3lE+vzSXJuv9kcHQGLeXET64RdLb3vh
+ MDiv7Yn9miuOwbZpjOUK902q6ZjggOarrvwQF3yFFMZ+wayABsbI3GT3JYDcmQ==
+In-Reply-To: <20250218163122.GA1615191@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250219081333.56378-2-kerneljasonxing@gmail.com> <202502201843.xA1qZbKX-lkp@intel.com>
-In-Reply-To: <202502201843.xA1qZbKX-lkp@intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 20 Feb 2025 16:57:08 +0800
-X-Gm-Features: AWEUYZkZEa_RTXX9eGIodABGhTE06_-yx8MFYAYIY0b_nk5Ib5cNvbHdq_7paqg
-Message-ID: <CAL+tcoC9nboQ9UNeP1-g4nQKqXg+fLDu68RHjwKRx97f_iuCZQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bpf_setsockopt
-To: kernel test robot <lkp@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250213091402.2067626-1-tianx@yunsilicon.com> <20250213091410.2067626-5-tianx@yunsilicon.com> <20250218163122.GA1615191@kernel.org>
+Date: Thu, 20 Feb 2025 16:58:21 +0800
+Message-Id: <13847c17-9c71-42ef-a1dd-31ef29caabf5@yunsilicon.com>
+From: "tianx" <tianx@yunsilicon.com>
+Subject: Re: [PATCH v4 04/14] net-next/yunsilicon: Add qp and cq management
+X-Lms-Return-Path: <lba+267b6eeae+18afc5+vger.kernel.org+tianx@yunsilicon.com>
+To: "Simon Horman" <horms@kernel.org>
+X-Original-From: tianx <tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Thu, 20 Feb 2025 16:58:21 +0800
+Content-Type: text/plain; charset=UTF-8
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, 
+	<davem@davemloft.net>, <jeff.johnson@oss.qualcomm.com>, 
+	<przemyslaw.kitszel@intel.com>, <weihg@yunsilicon.com>, 
+	<wanry@yunsilicon.com>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 20, 2025 at 4:52=E2=80=AFPM kernel test robot <lkp@intel.com> w=
-rote:
->
-> Hi Jason,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on bpf-next/master]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/bpf-sup=
-port-TCP_RTO_MAX_MS-for-bpf_setsockopt/20250219-161637
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git =
-master
-> patch link:    https://lore.kernel.org/r/20250219081333.56378-2-kerneljas=
-onxing%40gmail.com
-> patch subject: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bp=
-f_setsockopt
-> config: x86_64-buildonly-randconfig-002-20250220 (https://download.01.org=
-/0day-ci/archive/20250220/202502201843.xA1qZbKX-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20250220/202502201843.xA1qZbKX-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202502201843.xA1qZbKX-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>):
->
->    net/core/filter.c: In function 'sol_tcp_sockopt':
-> >> net/core/filter.c:5385:14: error: 'TCP_RTO_MAX_MS' undeclared (first u=
-se in this function); did you mean 'TCP_RTO_MAX'?
->     5385 |         case TCP_RTO_MAX_MS:
->          |              ^~~~~~~~~~~~~~
->          |              TCP_RTO_MAX
->    net/core/filter.c:5385:14: note: each undeclared identifier is reporte=
-d only once for each function it appears in
+[PATCH v4 04/14] net-next/yunsilicon: Add qp and cq management
 
-We've discussed this a few hours ago. It turned out to be the wrong
-branch which this series applied to. Please try bpf-next net branch
-instead :)
-
-Thanks,
-Jason
+On 2025/2/19 0:31, Simon Horman wrote:
+> On Thu, Feb 13, 2025 at 05:14:11PM +0800, Xin Tian wrote:
+>> Add qp(queue pair) and cq(completion queue) resource management APIs
+>>
+>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> Some general remark regarding this patchset:
+>
+> 1. "xsc" is probably a more appropriate prefix than "net-next/yunsilicon"
+>     in the patch subjects: it seems to be the name of the driver, and
+>     conveniently is nice and short.
+> 2. Please provide more descriptive patch descriptions, ideally
+>     explaining why changes are being made. As this is a new driver
+>     I think it is appropriate for the "why" to to describe how
+>     the patches fill-out the driver, leading to something users
+>     can use.
+>
+> ...
+OK, I will change subjects and add more descriptions in next version
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+>> index 4c8b26660..4e19b0989 100644
+>> --- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+>> @@ -29,6 +29,14 @@
+>>   
+>>   #define XSC_REG_ADDR(dev, offset)	\
+>>   	(((dev)->bar) + ((offset) - 0xA0000000))
+>> +#define XSC_SET_FIELD(value, field)	\
+>> +	(((value) << field ## _SHIFT) & field ## _MASK)
+>> +#define XSC_GET_FIELD(word, field)	\
+>> +	(((word)  & field ## _MASK) >> field ## _SHIFT)
+> I did not try, but I expect that if you express XSC_SET_FIELD() and
+> XSC_GET_FIELD() in terms of FIELD_PREP() and FIELD_GET() then the _SHIFT
+> part disappears. And, ideally, the corresponding _SHIFT defines don't need
+> to be defined.
+You're right, with FIELD_PREP and FIELD_GET, there's no need to add 
+XSC_SET_FIELD and XSC_GET_FIELD anymore. Thanks a lot!
+>> +
+>> +enum {
+>> +	XSC_MAX_EQ_NAME	= 20
+>> +};
+>>   
+>>   enum {
+>>   	XSC_MAX_PORTS	= 2,
+>> @@ -44,6 +52,147 @@ enum {
+>>   	XSC_MAX_UUARS		= XSC_MAX_UAR_PAGES * XSC_BF_REGS_PER_PAGE,
+>>   };
+>>   
+>> +// alloc
+>> +struct xsc_buf_list {
+>> +	void		       *buf;
+>> +	dma_addr_t		map;
+>> +};
+>> +
+>> +struct xsc_buf {
+>> +	struct xsc_buf_list	direct;
+>> +	struct xsc_buf_list	*page_list;
+>> +	int			nbufs;
+>> +	int			npages;
+>> +	int			page_shift;
+>> +	int			size;
+> Looking over the way the fields are used in this patchset
+> I think that unsigned long would be slightly better types
+> for nbufs, npages, and size.
+>
+> And more generally, I think it would be nice to use unsigned
+> types throughout this patchset for, in structure members, function
+> parameters, and local variables, to hold unsigned values.
+>
+> And likewise to use unsigned long (instead of unsigned int) as
+> appropriate, e.g. the size parameter of xsc_buf_alloc() which
+> is passed to get_order() in a subsequent patch in this series.
+Sure, I will change these.
+>> +};
+>> +
+>> +struct xsc_frag_buf {
+>> +	struct xsc_buf_list	*frags;
+>> +	int			npages;
+>> +	int			size;
+>> +	u8			page_shift;
+>> +};
+>> +
+>> +struct xsc_frag_buf_ctrl {
+>> +	struct xsc_buf_list	*frags;
+>> +	u32			sz_m1;
+>> +	u16			frag_sz_m1;
+>> +	u16			strides_offset;
+>> +	u8			log_sz;
+>> +	u8			log_stride;
+>> +	u8			log_frag_strides;
+>> +};
+> ...
 
