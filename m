@@ -1,320 +1,183 @@
-Return-Path: <netdev+bounces-168214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48D7A3E1E7
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:11:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E873A3E228
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683AA3B14C6
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:04:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C90B189C0B5
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEEB211A0E;
-	Thu, 20 Feb 2025 17:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="M7lICHL3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E352139DF;
+	Thu, 20 Feb 2025 17:14:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic313-15.consmr.mail.ne1.yahoo.com (sonic313-15.consmr.mail.ne1.yahoo.com [66.163.185.38])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F4621128F
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8AB21323C
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740071037; cv=none; b=gzzuqixIM/U/RI+TIhgg/Zea8pPBnFcXT9PR+UyxokmAuHne9244mmb95bUi/qml7XwbiOYtBjgTlycjDUFA0/XVoBjWEX06PJXj10sFMJbrJLA7d7ZZSgDZeudCPYJIF3wRcPIxEw6Q0BA81pbDhMiyCL9TBD0LzlLnkOYg+eQ=
+	t=1740071666; cv=none; b=kc0A/o7NcQdkfT5AsivSFSQlL/e885NJPhp3x3w9t3en0IpU2wncGQ88OX1lfnyvOWZwOOzv74R3ygKu/k+LJV2x8e7K1mMOtZ36bxqL9SAQZdwxeaPfvJ78rPIj8JD9tpKVfe8DY0MR2EgmlG5rAjl2iEkwBNgyZnX6JhpfXBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740071037; c=relaxed/simple;
-	bh=5+S9/Si9gNsDr9p4HVkVVkrMAupZZtn+rX610VhWUJ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sqitIxNRGyJ/kbH2wUH02JPq1NaJNXsuQMgCa/OlfOIagBRogO5tD+nOad/pNkFV+QwYVXqs7XURrTBypaA7jrKPMZQRcpZFqnJoz/78y8fGR/nzeRw1rZfX/QAWc4wXW4iuLbE2jZPvZoVgHJm1vbYfZnoAF0PL5pmldl3MEJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=M7lICHL3; arc=none smtp.client-ip=66.163.185.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1740071034; bh=MBDOOJln965UMaLJqLVpgP08hYXFIFAWNSXzmCDWeXg=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=M7lICHL3itRZ+cCsgKXVJsl9YJySNq2OPCSdWpMvqTPcWXjXkt+GLwsL2oEU5bpHsCN2ibtGaFAWEFo/qIEBXEkrFrULLBrefZFLZf9nyhjzpuQWydVwnX1MIsb7C/DTplj60symk6uG4q8kzWOmdMDGO7bUFoYdyOOfJVOJzuQ75SFcsCZq+A4/WFv47lpOqhsuIUgpg2lNHhjd181woBMi15udgwYCQnMpwUsZT4o2r5Av1S9fcVTU6sKovsetX+0raHKvFJp2wyb9mJwc9Akl5C8McIA6UdqsKpiyy0gBUEY67PL/4qTinV2D6wEgwIxUOLSi++4alHH51xzjIg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1740071034; bh=JVQSUMU/Fz2jay0QMUPBfbps1oXEq+ChL2f7ZKDEWf5=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=tnjXs1npUQ+tG56DWrbGNrc7qiAahj2qbACv3QieMr506DSG0NbxQffmdv2d/oYkoYwn3izvDGbhTyFDGj3VnTD2R2Kd1p8EhWbLs1g0lVTRoYWRf2lo59T9OF+FOrXW3y6x3vXLtj2tQ9nzfgl/d2fs0F3u563FUjj87Y4VrMAx4t5LjGWuS6owTzE8rFhpCoHTo86o7mb98vwZcQQbcZB5NPlq7s4xLRyz70MsVRN462xhKEDI0zB2Iy6D7Z5xU+B0NolB/H1jVJwCTsq/g2u2moPvH/W6r1WJQO9SaLZeZDQM/FQanPCJxCVgUDUxB8EkffUJC6pxTNelFmuLGA==
-X-YMail-OSG: Q8qn1SIVM1kVUO_za3yB4ULvDAxXYeAhMsZZ8aPjrY.3V6jwf0fuxXgqmdKomIg
- WSA8IZdDoqnjz9l.Qjv9vz9n7EZ.w67WyskmuQZrkD_HbUl29CmTbYIrokjUpPbsRHaSftvVNzKF
- iKrx9.fXk6dmJQFxGGzh1t.mCR0ZHydGkD1dJN0ZTyq7oXZiwP6XawS.Lz1uETY4HSoinG5gTEhP
- t0vGKbbaLEh.qQW6tYTkA1P052inloMr3XPyMdaLkYsUcYixIw6o0xIDMwkE_OovtqNaCs4mdCoS
- Out9ZpXz8XO_4SOllgljUn8tVpS7zGBtutcd9MV6Nx2dVLGNIwm9OSLLhTxMXNzYVlhGHg2DH1Cg
- QG03Cfv70of3yHJWnezFKZ46TKooZiK2eikrBWJ8ZpgfzqUVHsTCjhC1K60YMieoDV9x1JslavrO
- 9LCJFQhPwjeqkapFLF372eImj9MOQLwZhiJCWo7Otp7GHq_9CEW2Ws6cY7MdeJSEnAPPGCGrBaP7
- _0cpSC_1RnuJN6eQrMg7VJFTN52psui6shP6.YyoKWN3QolwSbaWiRNxSoBgiYrD3XND8kzjJHMz
- 0n.usN7gzLINIZF_aMqqSLI6jaGdHL9GXTcanGEAOgMiWapbm31qDuTkZU9v23iX4J8GrIFtFJpY
- oEJbz30QH56J.aYVkIxJcXjSv6pujtEz1ieghEzdpohVyOIA738UYPlUnQyGHBcN3mlH41Nnqfio
- bEbUyNXzaVfnFY8niVaVFurRVlbukE3CudMcy6DUCtbzf0jmokU65GOcQRJkGLYgWE2I53d4tmXK
- iSBaWrtRvh3LZMUT2KDk40s2ecmBN3VWu6XSmNtMWSdKNlPtlWh4vjysbEvogoCK1N0suPxHVF2N
- bbwrSn2h4yNbpnnEuMjmnnc85XFKaCEn.ip5sdnuQkyCGxt72sdPICTbnCjFb4f5rgd6N53Rzm57
- uJJ9clW3oxXjGaBt0MShC9s8xaADLHeJOjbT5oRjJrTZ4uRDyJpPrA0CoXoSAbXjRZ._YWq1evZ0
- QF3H.V1ozCp92yrBMQzq1o.NyJQ1dMtna4avGCWxizac9ran2NOCUbR4hLQ3TvQo9TxDCsVv_wab
- UNYwTbuBj10.a_7p7oP2XCdwLgqzcPIo2IgS31TVdvn2v6IDsC2tWoy6Ou6w_u9JS4KMTWzcU2mW
- fUPUKvKmEUqvRVwtsEQm9tObgPPQjyz_JhRNJP3GE8bx81S_CPSFXu0Teiv1hbgkVt2BCSdiN0s3
- KWcCGmxffQtzy2t0R3OCb8mPUkgriRJbbYwe8zZb.dJ2hhT4X1qYyq1rapJKsdfdY.AApeZEXyGO
- MsGMwWv7RwTfSeHy7Ds_.jSHKLDbEWvSCkb.qU10RgKRUdgOZFL2tOjOEpUAVjzsVxWyuidNWi._
- Eg66oxsvEztM4B6LAC7jKXp2_vQvPtF9UjpH5NmKmwfJXuDMwMqZPF7FCql7Y9oChigwymWFp5FT
- AMI5S9eVVEmHAiuQvgBfUxbzMsBfOiCTl3cR8FU5LR581ksLhylMJ0G2gtr1wLPANyoWxSqGYHZo
- 8PJRwrUzkEHbSmhJiJJxVbS0xhone2jwhtZaCksl_dRkbar1QjsrWtYVWsU3q.4B.BktUOeZauTd
- d9mm4fuTRmTH93GY8.kUi0LTwiyImSnmXaqWvq8osgVl0PeOyMrKI_646PRotHeRhgmuArIOnv_1
- sw4FfuZM6gGrhb6SpFoBR977sEq8pXy5.GwnclBKINzLT1uu37vYOTL9HypYIB3cZQC9lnVG7EAx
- QfPs8WWgldmrTz21ZTpQ06fFXpvIwIbNPM2nnphryVoqbXqfKm9LX9DE2yE02ByinBsdO2XMqIc4
- Oqr02ZQM74M6dA0N8RxAabPPN8ZidHU4TJ0LlwavO4hNloJ_REAyImtaFuZyqNHVkqX1sIvaLvB4
- SzlP1.ZV34OaterGu3hEcIA6rZLcX6dDIgOolbHSJEkSYTlIWOaazpbvW2bIGpL5BnRZiAuasyS.
- hgAkhprPDJGFnuVUToutkZRSG3PniWkbLSN3U4bXCCj8S9NClroyBpacmNEdEaTHDiwTABDGIeVd
- fFZ.b0UC1.dyJOVZS03w.9gNohuCTzAXPFRb0gGubWYKr5mX6.0CKy_Klk3IOMADPa4m76N6PzN.
- yawHaTnCfWpjRZmDNTN4kc6L6Brl6oJpuX9neunj8D9AtGXZ_EqS_7D_t7zS1IphZ_7EfnfSXmgh
- EmQfXHZw4v5xRyOSgoTyBS598oHj1JdZbHKhN2N9899BNdVlPwM84qbch.g2PUz_2hxcP4_1X.x6
- pXKotBCpR8jRRqO9qfzka5eZ0
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 0151b712-c283-4737-8710-2e744a49dee7
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.ne1.yahoo.com with HTTP; Thu, 20 Feb 2025 17:03:54 +0000
-Received: by hermes--production-gq1-5dd4b47f46-n48bg (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID aa324dd32419f52d60922829ecd3f996;
-          Thu, 20 Feb 2025 17:03:51 +0000 (UTC)
-Message-ID: <91cc89cd-a9c0-4936-8449-1b9ac6273dfc@schaufler-ca.com>
-Date: Thu, 20 Feb 2025 09:03:49 -0800
+	s=arc-20240116; t=1740071666; c=relaxed/simple;
+	bh=igE47N6rb90fbi7jP/FYjggnIIIz98KFKnJXLr5mDJg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=g5SYtrhs4qghv19oVqP9h/U5ZbhWzviGbn+7UwP+V99Ob9YfTDx79VG8j2ZZtVmlWZE5j5G4N0IuLVVTt+4YltwOhTP9AUgSGHb3PJJSeLy55GXVLgI7r5n5HAh00T8+G3Z4GX7/t2g/Q94nTpKOTA+RUh2+heEDbdsl4kXN/fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d2b70f5723so23323385ab.1
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:14:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740071663; x=1740676463;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uxzcrVz1DPpv4NyrxYkFgPqltPj5eMB8f6b7VADP8sk=;
+        b=Vn5cqKSOXfrc7OQmFVGm3WcC81QbAfIRQPZJGxNJb/MCm679sezxNeNNFfvhwmxgTr
+         67J0Eq3vPPhF12XIBpcKF7coQg+EaX+TBtTfvJAnyiERywwbulLe4dt0fRGmcUc1yL0a
+         2kQolgtHjxYzvwiEBZ+jqw5VglHvdqsFRia71h1A0v5P2hi1poqUPHRv1KlcfuEQFF+P
+         syIo6aNBEeie70iTi3drHBy1qdBlqtBHwmiTZCw5SSiTbW+N/3OZfed5OCTZOQWyshXk
+         LKMbWusocIJ0RVkdOAqOkJahE6v44FpyniameZ3wLgFatRxv+IyoRSl11XaFWozpCUgG
+         BaCA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbS8jGK7RBhy/xvUoMKh44L2VIqKjLdrAtgWkdOygL+1BVejIQgahzFAzsC//kErGQOkdQSP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg8fM6ijb8M5/TzBxFjCr2dhhbkB1lekLt9QCWuti7VXmu2BfZ
+	znOusYawaYoxxM6VhMzA7w3uG0s7EKymcAX+w447ZIHiBer1ldoAAGzx0ZMJBgITEPVSmMzCO+E
+	qZGsihJ+8aNOyv/jANJV+yvXh1m/k2SqfoAl3utW5vannXO6qOiSx1aM=
+X-Google-Smtp-Source: AGHT+IHdXIvN5gk3IYimZXexLjyS93xdfjq7LCu1lRf+/DKhODBCEWR9bWtFLZG+xnGrQefsB4cvF1v1Idcsx67jq+mxzA27VOnR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] netlabel: Remove unused cfg_calipso funcs
-To: "Dr. David Alan Gilbert" <linux@treblig.org>
-Cc: paul@paul-moore.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Casey Schaufler <casey@schaufler-ca.com>
-References: <20250220140808.71674-1-linux@treblig.org>
- <aa6c6f4c-7d46-4e7e-bafc-f042436f47b6@schaufler-ca.com>
- <Z7dcxAYj_jsG9WL6@gallifrey>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <Z7dcxAYj_jsG9WL6@gallifrey>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.23369 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Received: by 2002:a05:6e02:1849:b0:3ce:8ed9:ca94 with SMTP id
+ e9e14a558f8ab-3d2c25deed3mr34038625ab.14.1740071663454; Thu, 20 Feb 2025
+ 09:14:23 -0800 (PST)
+Date: Thu, 20 Feb 2025 09:14:23 -0800
+In-Reply-To: <67b74f01.050a0220.14d86d.02d8.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b762ef.050a0220.14d86d.02f0.GAE@google.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __ipv6_addr_type
+From: syzbot <syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, maheshb@google.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/20/2025 8:48 AM, Dr. David Alan Gilbert wrote:
-> * Casey Schaufler (casey@schaufler-ca.com) wrote:
->> On 2/20/2025 6:08 AM, linux@treblig.org wrote:
->>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
->>>
->>> netlbl_cfg_calipso_map_add(), netlbl_cfg_calipso_add() and
->>> netlbl_cfg_calipso_del() were added in 2016 as part of
->>> commit 3f09354ac84c ("netlabel: Implement CALIPSO config functions for
->>> SMACK.")
->>>
->>> Remove them.
->> Please don't. The Smack CALIPSO implementation has been delayed
->> for a number of reasons, some better than others, but is still on
->> the roadmap.
-> Hmm OK.
-> If it makes it to 10 years next year then perhaps it should hold
-> a birthday party!
+syzbot has found a reproducer for the following issue on:
 
-The difference between network and security developers is that a
-network developer thinks 10 microseconds is a long time, while a
-security developer thinks 10 years is no time at all.
+HEAD commit:    87a132e73910 Merge tag 'mm-hotfixes-stable-2025-02-19-17-4..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=109a5498580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8cf1217edc1cc7da
+dashboard link: https://syzkaller.appspot.com/bug?extid=93ab4a777bafb9d9f960
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125b75b0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14433ba4580000
 
->
-> Dave
->
->>> (I see a few other changes in that original commit, whether they
->>> are reachable I'm not sure).
->>>
->>> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
->>> ---
->>>  include/net/netlabel.h       |  26 -------
->>>  net/netlabel/netlabel_kapi.c | 133 -----------------------------------
->>>  2 files changed, 159 deletions(-)
->>>
->>> diff --git a/include/net/netlabel.h b/include/net/netlabel.h
->>> index 02914b1df38b..37c9bcfd5345 100644
->>> --- a/include/net/netlabel.h
->>> +++ b/include/net/netlabel.h
->>> @@ -435,14 +435,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
->>>  			       const struct in_addr *addr,
->>>  			       const struct in_addr *mask,
->>>  			       struct netlbl_audit *audit_info);
->>> -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
->>> -			   struct netlbl_audit *audit_info);
->>> -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info);
->>> -int netlbl_cfg_calipso_map_add(u32 doi,
->>> -			       const char *domain,
->>> -			       const struct in6_addr *addr,
->>> -			       const struct in6_addr *mask,
->>> -			       struct netlbl_audit *audit_info);
->>>  /*
->>>   * LSM security attribute operations
->>>   */
->>> @@ -561,24 +553,6 @@ static inline int netlbl_cfg_cipsov4_map_add(u32 doi,
->>>  {
->>>  	return -ENOSYS;
->>>  }
->>> -static inline int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
->>> -					 struct netlbl_audit *audit_info)
->>> -{
->>> -	return -ENOSYS;
->>> -}
->>> -static inline void netlbl_cfg_calipso_del(u32 doi,
->>> -					  struct netlbl_audit *audit_info)
->>> -{
->>> -	return;
->>> -}
->>> -static inline int netlbl_cfg_calipso_map_add(u32 doi,
->>> -					     const char *domain,
->>> -					     const struct in6_addr *addr,
->>> -					     const struct in6_addr *mask,
->>> -					     struct netlbl_audit *audit_info)
->>> -{
->>> -	return -ENOSYS;
->>> -}
->>>  static inline int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap,
->>>  				     u32 offset)
->>>  {
->>> diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
->>> index cd9160bbc919..13b4bc1c30ec 100644
->>> --- a/net/netlabel/netlabel_kapi.c
->>> +++ b/net/netlabel/netlabel_kapi.c
->>> @@ -394,139 +394,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
->>>  	return ret_val;
->>>  }
->>>  
->>> -/**
->>> - * netlbl_cfg_calipso_add - Add a new CALIPSO DOI definition
->>> - * @doi_def: CALIPSO DOI definition
->>> - * @audit_info: NetLabel audit information
->>> - *
->>> - * Description:
->>> - * Add a new CALIPSO DOI definition as defined by @doi_def.  Returns zero on
->>> - * success and negative values on failure.
->>> - *
->>> - */
->>> -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
->>> -			   struct netlbl_audit *audit_info)
->>> -{
->>> -#if IS_ENABLED(CONFIG_IPV6)
->>> -	return calipso_doi_add(doi_def, audit_info);
->>> -#else /* IPv6 */
->>> -	return -ENOSYS;
->>> -#endif /* IPv6 */
->>> -}
->>> -
->>> -/**
->>> - * netlbl_cfg_calipso_del - Remove an existing CALIPSO DOI definition
->>> - * @doi: CALIPSO DOI
->>> - * @audit_info: NetLabel audit information
->>> - *
->>> - * Description:
->>> - * Remove an existing CALIPSO DOI definition matching @doi.  Returns zero on
->>> - * success and negative values on failure.
->>> - *
->>> - */
->>> -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info)
->>> -{
->>> -#if IS_ENABLED(CONFIG_IPV6)
->>> -	calipso_doi_remove(doi, audit_info);
->>> -#endif /* IPv6 */
->>> -}
->>> -
->>> -/**
->>> - * netlbl_cfg_calipso_map_add - Add a new CALIPSO DOI mapping
->>> - * @doi: the CALIPSO DOI
->>> - * @domain: the domain mapping to add
->>> - * @addr: IP address
->>> - * @mask: IP address mask
->>> - * @audit_info: NetLabel audit information
->>> - *
->>> - * Description:
->>> - * Add a new NetLabel/LSM domain mapping for the given CALIPSO DOI to the
->>> - * NetLabel subsystem.  A @domain value of NULL adds a new default domain
->>> - * mapping.  Returns zero on success, negative values on failure.
->>> - *
->>> - */
->>> -int netlbl_cfg_calipso_map_add(u32 doi,
->>> -			       const char *domain,
->>> -			       const struct in6_addr *addr,
->>> -			       const struct in6_addr *mask,
->>> -			       struct netlbl_audit *audit_info)
->>> -{
->>> -#if IS_ENABLED(CONFIG_IPV6)
->>> -	int ret_val = -ENOMEM;
->>> -	struct calipso_doi *doi_def;
->>> -	struct netlbl_dom_map *entry;
->>> -	struct netlbl_domaddr_map *addrmap = NULL;
->>> -	struct netlbl_domaddr6_map *addrinfo = NULL;
->>> -
->>> -	doi_def = calipso_doi_getdef(doi);
->>> -	if (doi_def == NULL)
->>> -		return -ENOENT;
->>> -
->>> -	entry = kzalloc(sizeof(*entry), GFP_ATOMIC);
->>> -	if (entry == NULL)
->>> -		goto out_entry;
->>> -	entry->family = AF_INET6;
->>> -	if (domain != NULL) {
->>> -		entry->domain = kstrdup(domain, GFP_ATOMIC);
->>> -		if (entry->domain == NULL)
->>> -			goto out_domain;
->>> -	}
->>> -
->>> -	if (addr == NULL && mask == NULL) {
->>> -		entry->def.calipso = doi_def;
->>> -		entry->def.type = NETLBL_NLTYPE_CALIPSO;
->>> -	} else if (addr != NULL && mask != NULL) {
->>> -		addrmap = kzalloc(sizeof(*addrmap), GFP_ATOMIC);
->>> -		if (addrmap == NULL)
->>> -			goto out_addrmap;
->>> -		INIT_LIST_HEAD(&addrmap->list4);
->>> -		INIT_LIST_HEAD(&addrmap->list6);
->>> -
->>> -		addrinfo = kzalloc(sizeof(*addrinfo), GFP_ATOMIC);
->>> -		if (addrinfo == NULL)
->>> -			goto out_addrinfo;
->>> -		addrinfo->def.calipso = doi_def;
->>> -		addrinfo->def.type = NETLBL_NLTYPE_CALIPSO;
->>> -		addrinfo->list.addr = *addr;
->>> -		addrinfo->list.addr.s6_addr32[0] &= mask->s6_addr32[0];
->>> -		addrinfo->list.addr.s6_addr32[1] &= mask->s6_addr32[1];
->>> -		addrinfo->list.addr.s6_addr32[2] &= mask->s6_addr32[2];
->>> -		addrinfo->list.addr.s6_addr32[3] &= mask->s6_addr32[3];
->>> -		addrinfo->list.mask = *mask;
->>> -		addrinfo->list.valid = 1;
->>> -		ret_val = netlbl_af6list_add(&addrinfo->list, &addrmap->list6);
->>> -		if (ret_val != 0)
->>> -			goto cfg_calipso_map_add_failure;
->>> -
->>> -		entry->def.addrsel = addrmap;
->>> -		entry->def.type = NETLBL_NLTYPE_ADDRSELECT;
->>> -	} else {
->>> -		ret_val = -EINVAL;
->>> -		goto out_addrmap;
->>> -	}
->>> -
->>> -	ret_val = netlbl_domhsh_add(entry, audit_info);
->>> -	if (ret_val != 0)
->>> -		goto cfg_calipso_map_add_failure;
->>> -
->>> -	return 0;
->>> -
->>> -cfg_calipso_map_add_failure:
->>> -	kfree(addrinfo);
->>> -out_addrinfo:
->>> -	kfree(addrmap);
->>> -out_addrmap:
->>> -	kfree(entry->domain);
->>> -out_domain:
->>> -	kfree(entry);
->>> -out_entry:
->>> -	calipso_doi_putdef(doi_def);
->>> -	return ret_val;
->>> -#else /* IPv6 */
->>> -	return -ENOSYS;
->>> -#endif /* IPv6 */
->>> -}
->>> -
->>>  /*
->>>   * Security Attribute Functions
->>>   */
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/21aef40bc697/disk-87a132e7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d449987c6c11/vmlinux-87a132e7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/14c5f26d8765/bzImage-87a132e7.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
+ __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
+ ipv6_addr_type include/net/ipv6.h:555 [inline]
+ ip6_route_output_flags_noref net/ipv6/route.c:2616 [inline]
+ ip6_route_output_flags+0x51/0x720 net/ipv6/route.c:2651
+ ip6_route_output include/net/ip6_route.h:93 [inline]
+ ipvlan_route_v6_outbound+0x24e/0x520 drivers/net/ipvlan/ipvlan_core.c:476
+ ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:491 [inline]
+ ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:541 [inline]
+ ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:605 [inline]
+ ipvlan_queue_xmit+0xd72/0x1780 drivers/net/ipvlan/ipvlan_core.c:671
+ ipvlan_start_xmit+0x5b/0x210 drivers/net/ipvlan/ipvlan_main.c:223
+ __netdev_start_xmit include/linux/netdevice.h:5150 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5159 [inline]
+ xmit_one net/core/dev.c:3735 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3751
+ __dev_queue_xmit+0x366a/0x57d0 net/core/dev.c:4584
+ dev_queue_xmit include/linux/netdevice.h:3311 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3132 [inline]
+ packet_sendmsg+0x93e0/0xa7e0 net/packet/af_packet.c:3164
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:733
+ __sys_sendto+0x594/0x750 net/socket.c:2187
+ __do_sys_sendto net/socket.c:2194 [inline]
+ __se_sys_sendto net/socket.c:2190 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
+ x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ ipvlan_route_v6_outbound+0x18f/0x520 drivers/net/ipvlan/ipvlan_core.c:466
+ ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:491 [inline]
+ ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:541 [inline]
+ ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:605 [inline]
+ ipvlan_queue_xmit+0xd72/0x1780 drivers/net/ipvlan/ipvlan_core.c:671
+ ipvlan_start_xmit+0x5b/0x210 drivers/net/ipvlan/ipvlan_main.c:223
+ __netdev_start_xmit include/linux/netdevice.h:5150 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5159 [inline]
+ xmit_one net/core/dev.c:3735 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3751
+ __dev_queue_xmit+0x366a/0x57d0 net/core/dev.c:4584
+ dev_queue_xmit include/linux/netdevice.h:3311 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3132 [inline]
+ packet_sendmsg+0x93e0/0xa7e0 net/packet/af_packet.c:3164
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:733
+ __sys_sendto+0x594/0x750 net/socket.c:2187
+ __do_sys_sendto net/socket.c:2194 [inline]
+ __se_sys_sendto net/socket.c:2190 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
+ x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4121 [inline]
+ slab_alloc_node mm/slub.c:4164 [inline]
+ kmem_cache_alloc_node_noprof+0x907/0xe00 mm/slub.c:4216
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
+ alloc_skb include/linux/skbuff.h:1331 [inline]
+ alloc_skb_with_frags+0xc8/0xd00 net/core/skbuff.c:6612
+ sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2897
+ packet_alloc_skb net/packet/af_packet.c:2981 [inline]
+ packet_snd net/packet/af_packet.c:3075 [inline]
+ packet_sendmsg+0x7722/0xa7e0 net/packet/af_packet.c:3164
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:733
+ __sys_sendto+0x594/0x750 net/socket.c:2187
+ __do_sys_sendto net/socket.c:2194 [inline]
+ __se_sys_sendto net/socket.c:2190 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
+ x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 5864 Comm: syz-executor285 Not tainted 6.14.0-rc3-syzkaller-00079-g87a132e73910 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
