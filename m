@@ -1,183 +1,143 @@
-Return-Path: <netdev+bounces-168215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E873A3E228
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D30DA3E22D
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:21:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C90B189C0B5
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:16:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1410A189F271
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E352139DF;
-	Thu, 20 Feb 2025 17:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3315B20DD47;
+	Thu, 20 Feb 2025 17:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="0dHwAlgy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8AB21323C
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B73E1D5CC1
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740071666; cv=none; b=kc0A/o7NcQdkfT5AsivSFSQlL/e885NJPhp3x3w9t3en0IpU2wncGQ88OX1lfnyvOWZwOOzv74R3ygKu/k+LJV2x8e7K1mMOtZ36bxqL9SAQZdwxeaPfvJ78rPIj8JD9tpKVfe8DY0MR2EgmlG5rAjl2iEkwBNgyZnX6JhpfXBo=
+	t=1740071811; cv=none; b=b4/yQeU8xSQPp1ccA9iIEZ1YVUx6pg5KOr169XLwZlsm2nH4QKm2eJ9snwS72J8pT3kblu9hEc9RpPlCYMPns7qIUw65BqabJX+m5cXks56N4aiV6axd/3Na57XtfaPzlkNi7viej5vmJ3O5Y9w6AA3C+kB0DpxWpntiWTnIfi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740071666; c=relaxed/simple;
-	bh=igE47N6rb90fbi7jP/FYjggnIIIz98KFKnJXLr5mDJg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=g5SYtrhs4qghv19oVqP9h/U5ZbhWzviGbn+7UwP+V99Ob9YfTDx79VG8j2ZZtVmlWZE5j5G4N0IuLVVTt+4YltwOhTP9AUgSGHb3PJJSeLy55GXVLgI7r5n5HAh00T8+G3Z4GX7/t2g/Q94nTpKOTA+RUh2+heEDbdsl4kXN/fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d2b70f5723so23323385ab.1
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:14:24 -0800 (PST)
+	s=arc-20240116; t=1740071811; c=relaxed/simple;
+	bh=244XeKEKX+5A8ehxHdeeLmwJwhJA1rgjh3BsIfR/8tM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mVn80J7Z0QHDrtc6eGiwZjxK4DMKNfhxza9TOHTj9vCLM52qnYtCr7j9DtmVqIDfS17Xng19vFy4EuA9bxqbEzYhot4TLyJKLg+8/4R9G0dm++w8NuvPH89wPo8xwJTjvFMF/0mqJCuvxjWDllRpreSdAR+j0cwY0NuQpDzaj78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=0dHwAlgy; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3f3fa5699a1so589423b6e.0
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:16:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1740071808; x=1740676608; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QcApaWVKSxQSIvLEEHhnSoFMNHumzt0nl4dOj28dnl0=;
+        b=0dHwAlgykdXsqX1wYLYwXt2Ts6SA+KR2AVFl1WMrJgrYcqwb03g2FGq+gIlg79FlGl
+         HxGhNcYVONWq8D+2KmxIXUuurbEKtF5vSXt6rNUzHDenwAPnne5yVzPmYKFhRUestJUt
+         lnTuxe3XS4a+qI4UZdD/MqPZ/iSKemhkEga8k3sBjRsqEnrXSginVeTCQyBWYKjIrR1w
+         9m01GH1SD5LP5gObtGkv2JLIRP8g7Rttsrfda6eFuGk8j720J9T5rKunXb0SrEsRTrB5
+         PrpiTOkYk14eJuJrhMuJlOrg/UI8dDwO3e6bepwWbwqQZ92UqXDPipJ2wzSQTSeT1onq
+         5YJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740071663; x=1740676463;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1740071808; x=1740676608;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uxzcrVz1DPpv4NyrxYkFgPqltPj5eMB8f6b7VADP8sk=;
-        b=Vn5cqKSOXfrc7OQmFVGm3WcC81QbAfIRQPZJGxNJb/MCm679sezxNeNNFfvhwmxgTr
-         67J0Eq3vPPhF12XIBpcKF7coQg+EaX+TBtTfvJAnyiERywwbulLe4dt0fRGmcUc1yL0a
-         2kQolgtHjxYzvwiEBZ+jqw5VglHvdqsFRia71h1A0v5P2hi1poqUPHRv1KlcfuEQFF+P
-         syIo6aNBEeie70iTi3drHBy1qdBlqtBHwmiTZCw5SSiTbW+N/3OZfed5OCTZOQWyshXk
-         LKMbWusocIJ0RVkdOAqOkJahE6v44FpyniameZ3wLgFatRxv+IyoRSl11XaFWozpCUgG
-         BaCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbS8jGK7RBhy/xvUoMKh44L2VIqKjLdrAtgWkdOygL+1BVejIQgahzFAzsC//kErGQOkdQSP8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg8fM6ijb8M5/TzBxFjCr2dhhbkB1lekLt9QCWuti7VXmu2BfZ
-	znOusYawaYoxxM6VhMzA7w3uG0s7EKymcAX+w447ZIHiBer1ldoAAGzx0ZMJBgITEPVSmMzCO+E
-	qZGsihJ+8aNOyv/jANJV+yvXh1m/k2SqfoAl3utW5vannXO6qOiSx1aM=
-X-Google-Smtp-Source: AGHT+IHdXIvN5gk3IYimZXexLjyS93xdfjq7LCu1lRf+/DKhODBCEWR9bWtFLZG+xnGrQefsB4cvF1v1Idcsx67jq+mxzA27VOnR
+        bh=QcApaWVKSxQSIvLEEHhnSoFMNHumzt0nl4dOj28dnl0=;
+        b=lmZVBY5sxp79s900ByHEr0ommv9A252GO/AMqbKvqZ10RCnyQn1Seu6Q/2ADGvdEjI
+         W4AoZyBYnDUh1QtXIGehon5OY4FxCjzAUZRLR7JgeislMoR2ntGvEjUtvYzJgsmaS1EJ
+         13upQ4fVWt5WB83P08/ZRk9+jH+M8RO7MGvOLDuTOlK2UMwH4jNlbbGMgK5qpxc4WZ50
+         mWgUDMPVMKF73MGAgDEMuprbhFjjmqZIqK6t9/Y85lZBeO/24DCGnHiZmuF06AkYcUSR
+         7ntyZecTbrh6qUeuPZRy2HDkuxdMnz+UbaiUL9ih4SPXFCJEs/SAt8BUGV9G84SxilKt
+         B9tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWhPIAXyXu+NKNrYvMMza6RVU5lNGSNb9lNh6/AtCFtDn9UhUnBuj4qLq4rfRbjuQ6NXeKQRZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1vfzNc2djQnGnJx15EXzvtmMCOIFSP7ZquOSb9OFKkoe9yVRj
+	3y2SR5aHTTFtOV60GNDSP529bKAccTyLjvPQ+6fTT5ZZvMABtv4TUZkopIIK8J4=
+X-Gm-Gg: ASbGncs/hJZYRhSdwj8+EH+m7AuupcmhsJlYqwqatYSjkI5uadIq5HG0XSc7i2lot8+
+	iW9QOJ4fP6oaA5iAvvl1+fUe30eieoOwdHbkxFdt1okVG6sWjCmzdzs8lMXphZjvUe/vxc/z8C8
+	eXTbE77cLH0rGfkY0Dxtx5V62n88yUHnF3w0GyYFv9OF2QS5U9m49KNvIEHO543wESewy/kYSab
+	S6ZdMsndmHGrERJMIv5mewMv97DIpcD4Kp+6pdu9kNYjgpXVyEleMj3mwdUwnIFCA213bdC72r1
+	sijyV6YS9WMohWZjlMDb5gUOAOP1h7KCXI3vG+nXnYFJfPaSrINM
+X-Google-Smtp-Source: AGHT+IFQ4fpht1GK2L64Lff/K3FzPWt1QsXeXeofzfatOKhBNQXj463x1jUtS3u3WnZ5Fb1+N2LaOQ==
+X-Received: by 2002:a05:6808:3996:b0:3f4:205c:d9aa with SMTP id 5614622812f47-3f424701c1dmr163494b6e.21.1740071808115;
+        Thu, 20 Feb 2025 09:16:48 -0800 (PST)
+Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f3da962049sm5144033b6e.21.2025.02.20.09.16.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Feb 2025 09:16:46 -0800 (PST)
+Message-ID: <37dc5907-b04f-4879-8271-68e36a6a2924@baylibre.com>
+Date: Thu, 20 Feb 2025 11:16:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1849:b0:3ce:8ed9:ca94 with SMTP id
- e9e14a558f8ab-3d2c25deed3mr34038625ab.14.1740071663454; Thu, 20 Feb 2025
- 09:14:23 -0800 (PST)
-Date: Thu, 20 Feb 2025 09:14:23 -0800
-In-Reply-To: <67b74f01.050a0220.14d86d.02d8.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67b762ef.050a0220.14d86d.02f0.GAE@google.com>
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __ipv6_addr_type
-From: syzbot <syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, maheshb@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/15] bus: ts-nbus: use bitmap_get_value8()
+To: Andy Shevchenko <andy.shevchenko@gmail.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Lars-Peter Clausen <lars@metafoo.de>,
+ Michael Hennerich <Michael.Hennerich@analog.com>,
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
+ <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+ <20250210-gpio-set-array-helper-v3-5-d6a673674da8@baylibre.com>
+ <20250220101742.GR1615191@kernel.org>
+ <CAHp75Vch7QKyT8Fbya3u=YrPR8z-2-mbWXjHyOwZ-fqcBjjm0A@mail.gmail.com>
+Content-Language: en-US
+From: David Lechner <dlechner@baylibre.com>
+In-Reply-To: <CAHp75Vch7QKyT8Fbya3u=YrPR8z-2-mbWXjHyOwZ-fqcBjjm0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+On 2/20/25 6:06 AM, Andy Shevchenko wrote:
+> On Thu, Feb 20, 2025 at 12:17 PM Simon Horman <horms@kernel.org> wrote:
+>> On Mon, Feb 10, 2025 at 04:33:31PM -0600, David Lechner wrote:
+> 
+> ...
+> 
+>> But when compiling with GCC 14.2.0 I see warnings that values
+>> is used uninitialised - bitmap_set_value8() appears to rely on
+>> it being so.
+> 
+>> In file included from drivers/bus/ts-nbus.c:13:
+>> In function ‘bitmap_write’,
+>>     inlined from ‘ts_nbus_reset_bus’ at drivers/bus/ts-nbus.c:111:2:
+>> ./include/linux/bitmap.h:818:12: error: ‘values’ is used uninitialized [-Werror=uninitialized]
+>>   818 |         map[index] &= (fit ? (~(mask << offset)) : ~BITMAP_FIRST_WORD_MASK(start));
+>>       |         ~~~^~~~~~~
+> 
+> Heh, the compiler is dumb. Even if it's not initialised we do not care.
+> 
+> ...
+> 
+> Wondering if the bitmap_write() will work better...
+> 
 
-HEAD commit:    87a132e73910 Merge tag 'mm-hotfixes-stable-2025-02-19-17-4..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=109a5498580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8cf1217edc1cc7da
-dashboard link: https://syzkaller.appspot.com/bug?extid=93ab4a777bafb9d9f960
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125b75b0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14433ba4580000
+It is already using that:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/21aef40bc697/disk-87a132e7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d449987c6c11/vmlinux-87a132e7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/14c5f26d8765/bzImage-87a132e7.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+93ab4a777bafb9d9f960@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
- __ipv6_addr_type+0xa2/0x490 net/ipv6/addrconf_core.c:47
- ipv6_addr_type include/net/ipv6.h:555 [inline]
- ip6_route_output_flags_noref net/ipv6/route.c:2616 [inline]
- ip6_route_output_flags+0x51/0x720 net/ipv6/route.c:2651
- ip6_route_output include/net/ip6_route.h:93 [inline]
- ipvlan_route_v6_outbound+0x24e/0x520 drivers/net/ipvlan/ipvlan_core.c:476
- ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:491 [inline]
- ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:541 [inline]
- ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:605 [inline]
- ipvlan_queue_xmit+0xd72/0x1780 drivers/net/ipvlan/ipvlan_core.c:671
- ipvlan_start_xmit+0x5b/0x210 drivers/net/ipvlan/ipvlan_main.c:223
- __netdev_start_xmit include/linux/netdevice.h:5150 [inline]
- netdev_start_xmit include/linux/netdevice.h:5159 [inline]
- xmit_one net/core/dev.c:3735 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3751
- __dev_queue_xmit+0x366a/0x57d0 net/core/dev.c:4584
- dev_queue_xmit include/linux/netdevice.h:3311 [inline]
- packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3132 [inline]
- packet_sendmsg+0x93e0/0xa7e0 net/packet/af_packet.c:3164
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:733
- __sys_sendto+0x594/0x750 net/socket.c:2187
- __do_sys_sendto net/socket.c:2194 [inline]
- __se_sys_sendto net/socket.c:2190 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
- x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- ipvlan_route_v6_outbound+0x18f/0x520 drivers/net/ipvlan/ipvlan_core.c:466
- ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:491 [inline]
- ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:541 [inline]
- ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:605 [inline]
- ipvlan_queue_xmit+0xd72/0x1780 drivers/net/ipvlan/ipvlan_core.c:671
- ipvlan_start_xmit+0x5b/0x210 drivers/net/ipvlan/ipvlan_main.c:223
- __netdev_start_xmit include/linux/netdevice.h:5150 [inline]
- netdev_start_xmit include/linux/netdevice.h:5159 [inline]
- xmit_one net/core/dev.c:3735 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3751
- __dev_queue_xmit+0x366a/0x57d0 net/core/dev.c:4584
- dev_queue_xmit include/linux/netdevice.h:3311 [inline]
- packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3132 [inline]
- packet_sendmsg+0x93e0/0xa7e0 net/packet/af_packet.c:3164
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:733
- __sys_sendto+0x594/0x750 net/socket.c:2187
- __do_sys_sendto net/socket.c:2194 [inline]
- __se_sys_sendto net/socket.c:2190 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
- x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4121 [inline]
- slab_alloc_node mm/slub.c:4164 [inline]
- kmem_cache_alloc_node_noprof+0x907/0xe00 mm/slub.c:4216
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
- alloc_skb include/linux/skbuff.h:1331 [inline]
- alloc_skb_with_frags+0xc8/0xd00 net/core/skbuff.c:6612
- sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2897
- packet_alloc_skb net/packet/af_packet.c:2981 [inline]
- packet_snd net/packet/af_packet.c:3075 [inline]
- packet_sendmsg+0x7722/0xa7e0 net/packet/af_packet.c:3164
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:733
- __sys_sendto+0x594/0x750 net/socket.c:2187
- __do_sys_sendto net/socket.c:2194 [inline]
- __se_sys_sendto net/socket.c:2190 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2190
- x64_sys_call+0x346a/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 5864 Comm: syz-executor285 Not tainted 6.14.0-rc3-syzkaller-00079-g87a132e73910 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+#define bitmap_set_value8(map, value, start)		\
+	bitmap_write(map, value, start, BITS_PER_BYTE)
 
