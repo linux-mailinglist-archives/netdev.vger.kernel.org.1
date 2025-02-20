@@ -1,105 +1,134 @@
-Return-Path: <netdev+bounces-168308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015D3A3E767
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:20:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BCDFA3E77C
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:24:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3888119C0A09
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:21:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88A2B7AAD91
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8D11EE7DD;
-	Thu, 20 Feb 2025 22:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36557264FB4;
+	Thu, 20 Feb 2025 22:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="xQPSCB4+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQFrxb+w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710781EC00B
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 22:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7D81EDA2E;
+	Thu, 20 Feb 2025 22:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740090050; cv=none; b=q8R1nTnexCpzeDHQ2QY7U0PV245E4/IbLDCcQkbuHjkdbTuHnrZralUrcywTfNrEc9UBoUkYbC/ClafDahuSXTrD6SS9G3Wnn0MsKd31wkrMcRxFGYlqUX3mldOR1BYP0W0HYTcdQEPvtQarLcHEvFOXvlb+rQ4JUZ4CBHiaP+g=
+	t=1740090159; cv=none; b=G+OITMi8yY70EqdLgsPr9PWtEdiKQwaNdpwZaAzk0hNZDBz/92ArHL0VeoATK7kcvSzieniQ/Du+IAV4uXWjlw9BtGqev7C2OyoE9JDTF6YJ7y0Pyu+u5cgXWo8qyQfs++mu191n9gpfHWnR+STJHZjc95dYaRftDGLtcYj6z8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740090050; c=relaxed/simple;
-	bh=m53XDRRj5XWElq4UYrfkPAwWLouQlqlp1DjklflPBgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PHyvAkrYHIWk2w6iqWPxgVkR6bPggnvdMywplOhnhNzG1Hiz0cdLNksO9V7reDR9YabXDqOWQC/ps3xKGIe1hcG75g9n8KlzAGCR0PUbsnN5vnRnFAMAnA+0qKY8oY17SE/EaFxOAnpg1p05g5kfltsyh4K+UHYepsApjyF+rG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=xQPSCB4+; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2fa8ada6662so3009194a91.1
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 14:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1740090047; x=1740694847; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yiaJd5WLTIGG8W5RqlpBZuK7yjAZOHOL4qO1x72frzc=;
-        b=xQPSCB4+j3wmtxnjWYtcTj5WjNe11LBYPNZAlfHJICNR2rZ/ExAxSpZNiKb8UmLWsO
-         5BjJzYi3P5jjYa9wfQKtgtlp6RFLRE4u5ypD1Es6IhdviAm2TCOUYAAuahZSjRbJCEp7
-         9jBLjjFM2c7mg4j7l9zdveaqXa/gtYo8jqaLnNb+wymgUHlNupA7Pv7ZpR7A4OmE4lSO
-         9/xyh4IiQFtb8ppTLt6sdM6T6LCEP4Ot7vwXbB8xkPZaYDQqbNRL3mCtwGDGIU46HAKn
-         IahIbJAoMB8istZg5Q44EH19N6syBn8CJUKe3meOWpQlXsQ9VnnSYCHSLrotGMEQsY8/
-         jvWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740090047; x=1740694847;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yiaJd5WLTIGG8W5RqlpBZuK7yjAZOHOL4qO1x72frzc=;
-        b=Bb1DJLeH28B6GCvThvgh9RfOHwBpbBPPeOTgj06f2EU3COmXDzxDZHqCJPQHpVtwni
-         /u0gpaZZNg8QxKrzkwPCRL8irHuBRi2WIPsw5Bx23f/3ggnI1+1x8VUEisq2VVbldAuz
-         xrjpRMYAUr1FOMw43i0RNWS11Mp20dn915/8gZnC+Ii0NxfWZZrMO+S2BVTZCQXe7mdS
-         6alX9wZ8JP+c5dJ9y4xNrMPpkcAQtgRs6DVm7yHVXwDZC7NbJf45DNb6dUEdQgIrDKyb
-         Gh96wi7fpFQFjgG6kg1s17DJr0ct57QFFUGw6TQM5tnOhyBI0fgLE5b2JsiGDAleAQ9Q
-         iwYQ==
-X-Gm-Message-State: AOJu0Yx9Ugwmb4pq7xWWbWWnniPhzisPkmVQkTOYScSFjZLQVob9YYxr
-	yfll/Et+QgS8VZeExVR7rdLKlqlgsE0kHd4+1e6ng6yazxIx9/+8bLea0zHcczc=
-X-Gm-Gg: ASbGnctR/ZKBokfko4k8Y/QYtla3pdcuUZuGlGsuleJoOZHWl9bvEpaY5Id7IVS7Bsr
-	ZVvjcaFASd7P4Z8e8fRgcmGURPtrE/6/ju2E37CKEU8a4+24B+1QJRMBvmaBBrv8Cuqrnnctmpt
-	j4zGMsE8pqdvePHhFiVf3+ovxsETO0Ja61+ygh2fqoxxWqp+NGJLXx6tBsD0z3X+rozZGPusPn9
-	jLtXxg17DGYflSN1Rv0aKAWI33dPKg0HzkmS3KmCOAe49WiCUhqan++SoKLkh1FDPelpxodxuVX
-	DV6anxqJF5vChIOHv6tlWb5v/SRedSmV8qCJAbdXLn3FquWtSMcv+G2CdlbWyFBX73ZP
-X-Google-Smtp-Source: AGHT+IEFBy0dtz+sD4IHoE5u/AJiF8492iuTp25oCjZnkw+WmBLSfMoBQAOx6q/Gk5BiBXCtYZSq6g==
-X-Received: by 2002:a17:90b:1344:b0:2fa:2252:f438 with SMTP id 98e67ed59e1d1-2fce8740eb3mr670380a91.30.1740090045685;
-        Thu, 20 Feb 2025 14:20:45 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fcbaaf3f38sm2248734a91.1.2025.02.20.14.20.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 14:20:45 -0800 (PST)
-Date: Thu, 20 Feb 2025 14:20:43 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Michal =?UTF-8?B?S291dG7DvQ==?= <mkoutny@suse.com>
-Cc: netdev@vger.kernel.org, mkubecek@suse.cz
-Subject: Re: [PATCH] ss: Tone down cgroup path resolution
-Message-ID: <20250220142043.21492b4c@hermes.local>
-In-Reply-To: <20250210141103.44270-1-mkoutny@suse.com>
-References: <20250210141103.44270-1-mkoutny@suse.com>
+	s=arc-20240116; t=1740090159; c=relaxed/simple;
+	bh=Qq5fyp1AV+CpdB//yQ1N+e6P4hjmeikr9PqMi6ZYCpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AiWv6udXMlQbeQelVjVvq8wknWmyCwBPs4xahyuBNvdkJ+oukVxHXOLYP1YBti92cKfAtreLg3wbojSDUsxEd9v+PvKO+A4GDeaArhpP1i1aaWqmrDASUoc/xVIrUFs9a8uveEfJAfapdJVQq6I/s+3E6/HGYKGhVeo3qr3NiOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQFrxb+w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F2DC4CEE8;
+	Thu, 20 Feb 2025 22:22:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740090158;
+	bh=Qq5fyp1AV+CpdB//yQ1N+e6P4hjmeikr9PqMi6ZYCpE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gQFrxb+wGVuKFNqe4iYp5s2lNsH/ZO4gxs01a3zC7+df3KPWCygwQEur/ZnnjzCFJ
+	 aqTiTg+Uo/cyAfAdT4rZ101Dky4EgOrzAI9TjOD0N5xYUiM/xfPOat/OeoxUfLVESD
+	 8DFOBH9v6VoxaRs1dsdMagks3sNAsawAfSZhtMEYaqOp5iLqT4cWaSAQMDEbVo/fHB
+	 2MY+tbZhLV+QMlNpPCFF+4dXuNEs+s02V93b9uWiFOJoopr11v6jsJ7aKV/fSLBejq
+	 OaDAGvcjZL0dC2MBPzAoK0sE7cLm88n+fA1ZeLT//FXh1HPOP36dDfC05JaYpLeJcx
+	 Ox/wiLE5ujXrg==
+Date: Thu, 20 Feb 2025 14:22:37 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shahar Shitrit <shshitrit@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
+ event message
+Message-ID: <Z7erLQwDBHYoCV7X@x130>
+References: <20250213094641.226501-1-tariqt@nvidia.com>
+ <20250213094641.226501-5-tariqt@nvidia.com>
+ <20250215192935.GU1615191@kernel.org>
+ <20250217162719.1e20afac@kernel.org>
+ <8369b884-71c9-495a-8a1f-ab8ca4ee5f59@gmail.com>
+ <20250219072829.21ee1cfc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250219072829.21ee1cfc@kernel.org>
 
-On Mon, 10 Feb 2025 15:11:03 +0100
-Michal Koutn=C3=BD <mkoutny@suse.com> wrote:
+On 19 Feb 07:28, Jakub Kicinski wrote:
+>On Wed, 19 Feb 2025 15:00:57 +0200 Tariq Toukan wrote:
+>> >> If you have to respin for some other reason, please consider limiting lines
+>> >> to 80 columns wide or less here and elsewhere in this patch where it
+>> >> doesn't reduce readability (subjective I know).
+>> >
+>> > +1, please try to catch such situations going forward
+>>
+>> This was not missed.
+>> This is not a new thing...
+>> We've been enforcing a max line length of 100 chars in mlx5 driver for
+>> the past few years.
+>> I don't have the full image now, but I'm convinced that this dates back
+>> to an agreement between the mlx5 and netdev maintainers at that time.
+>>
+>> 80 chars could be too restrictive, especially with today's large
+>> monitors, while 100-chars is still highly readable.
+>> This is subjective of course...
+>>
+>> If you don't have a strong preference, we'll keep the current 100 chars
+>> limit. Otherwise, just let me know and we'll start enforcing the
+>> 80-chars limit for future patches.
+>
+>Right, I think mlx5 is the only exception to the 80 column guidance.
+>I don't think it's resulting in more readable code, so yes, my
+>preference is to end this experiment.
+>
 
-> Sockets and cgroups have different lifetimes (e.g. fd passing between
-> cgroups) so obtaining a cgroup id to a removed cgroup dir is not an
-> error. Furthermore, the message is printed for each such a socket.
-> Improve user experience by silencing these specific errors.
-> ---
->  lib/fs.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+The reason in mlx5 was that we wanted to preserve the official HW spec
+auto-generated fields names and they are really long.
+100 chars worked very well with us for example the following sequence of
+code setting up a FW command buffer would have to be broken in every line
+if we were to restrict 80 chars per line.
+
+  MLX5_SET(modify_vhca_state_in, in, opcode, MLX5_CMD_OP_MODIFY_VHCA_STATE);
+  MLX5_SET(modify_vhca_state_in, in, vhca_state_field_select.sw_function_id, 1);
+  MLX5_SET(modify_vhca_state_in, in, vhca_state_context.sw_function_id, sw_fn_id);
+  MLX5_SET(modify_vhca_state_in, in, vhca_state_context.arm_change_event, 1);
+  MLX5_SET(modify_vhca_state_in, in, vhca_state_field_select.arm_change_event, 1);
+
+But I believe the driver grow larger than caring about those lines too
+much, I just did a quick check and it seems less than 2% of the lines are
+actually > 80, not sure this is due to being more strict in the past few
+years or that we don't really need more than 80 lines.
+
+I also check the interesting cases with macros such
+MLX5_SET/MLX5_GET/MLX5_CAP and also the percentile of long lines was very
+minor just about 5% in all cases.. 
+
+So I kinda agree mlx5 doesn't need be so special anymore. 
+Tariq up to you, you are the main  reviewer now.
+
+Thanks
+Saeed.
 
 
-Patch looks good, but will not apply since missing Signed-off-by.
+
 
 
