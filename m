@@ -1,139 +1,153 @@
-Return-Path: <netdev+bounces-168270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE821A3E514
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:31:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70AB4A3E51F
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AAE619C1BBD
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F74D19C4084
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E5424BD04;
-	Thu, 20 Feb 2025 19:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB80F2641D0;
+	Thu, 20 Feb 2025 19:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tb0o+BRp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fo8Smy6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1881264606
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 19:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4403C2638A3;
+	Thu, 20 Feb 2025 19:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740079901; cv=none; b=X+c5cz+WfJKfbWVn5jnpum/rSYHxo8I2vu6eaAba/PzoIwnF+PTsJgJ+FDNJuZYa8gzOlKyP7cBfFOOzWgxismEgub2FKDkzauhzs4drR4aE80W+qH7GOSMfdJ/HWTsEtRzDLpVOLvhispTVXP0mWICfhumr6r/N+Ugqewugy34=
+	t=1740080055; cv=none; b=T39WJNNkUPZ6Tr5grbKtg6Kkqxo1qBg0W3KKjlKmDWun00+H9+xIWqBttzC8AuUMylV6GPlsNTOwpFKwpfSQJrzg+I5uxYBFbkIAXDqselJh4q3CTwLsWXSgAJy9uDH5wsWBCo6njlWzTVNOw5tpCgOG91eoYZ5wzQsiMA31KV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740079901; c=relaxed/simple;
-	bh=gjVdv85IOtwSGAPeN/DiEKYGwxtv5Bo6wthVJs5FDQk=;
+	s=arc-20240116; t=1740080055; c=relaxed/simple;
+	bh=lLvSCfGzR1G+5sP88MJmJoxG3MsULk9EywePmaCSpPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qyyo3zkZcjPECyRhvmHnZ8/du2t95eqM+YtMEZPMfEdmiN2rD6WhdLYy7X9HrqpCVmhJPG+b8kJKaNT44UnsvyIoZLhldqmwt1BXrm3vNN9aBmKiMRn9fZS/dDZGPCYho/mL9CrBbc9fqik/RQocQ6Cknqi6zRnEwaAHdbeh8KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tb0o+BRp; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6e670d29644so10160266d6.3
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 11:31:39 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixZkP6kjQ9mqY9+gd9kvWRuJiBHYI035rGJpa1Wl4asJbP3fLs7FUygmz89v+yEI+pexAVeJbqhAPMdyDcTyhCrYcBxO00x6D1bHL7jerzTE/RDGFuv9jW68WHgZmxj0XVScjWkC5cgxy7bdjeOKhv/g1UbyQ/8CIjrXC3zFEas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fo8Smy6I; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fc042c9290so2256968a91.0;
+        Thu, 20 Feb 2025 11:34:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740079898; x=1740684698; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iS9RPpdCDKZmMxP1N+PjKfIkBE/dcA+MACPgAylfD3E=;
-        b=tb0o+BRpFEP9PNhtHdX7MxbsLBxLNXRut9pEM2RP/Gfa+xFTnpyFVTv2Z/U+Izug7O
-         AGEKPO62W4ml7qGBeW18zJSkXyVpehdTQTzTLnedr06SGyJEOn8f7tRVgcjwqSylox/+
-         jqUa4zZsPl+yJ1WYrN8UkzGl9rns67VS7+Siw=
+        d=gmail.com; s=20230601; t=1740080043; x=1740684843; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTiSUkoMecG9RlHxgT6mcfjx4A34996Guxh4H1K/phg=;
+        b=fo8Smy6Iuc/abaQfBRgopj6QuLwQ94TnGkjkgZAxZuHqftzKqkuMB028lQquqsCjcc
+         I4Kj4/YceLJ9W564uYkMCwVYDsx7Rrm+bFQe/wplg4r5Bno7YZsDrqcVq4TTloTAPCfN
+         hbOIupyTOUzAA/Lf+WtP7OThLSCbwdVcfKAq/mNGxWE/EC04M087bSCSV7cCEIW1ztIg
+         d3+4FGnmtomfQfefKAs1DxDmVpcYlVMJm2FB6btoKiv6/ofH12YXvAi/Y1sVkHbLozIC
+         wxW1EE2OFrgZ23/Nrq5mPRSTQBXkbVTUHmMpOlX4vkDb3KKJOV9SGGQcWMcxooEO/fsu
+         SVcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740079898; x=1740684698;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iS9RPpdCDKZmMxP1N+PjKfIkBE/dcA+MACPgAylfD3E=;
-        b=GqXRaeh017FJ2xL+2tBa+3sMtaXs54W2BRvjpZFuvBP/7iHMFpf20hxxGD2Jvn1cH5
-         OOHTQwDfEZzF1P4lrN0+bqW0YsIZoOl/RrsM1k0pvyxZXlfBbNIA2TxTNBwbdr3YrIea
-         2Z7E/yV4jqx7lTJ78ahcMdjeBjoYV7as3BXJphFtH0n1lFpaE1TBRDFP8dJyWqa+fBcE
-         TZH0Ag0kXvsfVkvFV+mHHspPJTBHs8B+ovENv74hymdur/dMeXHhlzV7faE7m89ju7Ju
-         xpyDOqH3fVRoHx1Ulr5buKzgKmVAX5yWYozwF0vXaUr48JQUTYGIq/cREK9MH1yTcAwg
-         Flmg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpQtUOBxflVKmQN7gYb7vvsVCjMDrBGVwoDRlALc7kU0JoP//PDs1GU4vI5RJWBJJr0IrIdJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhlJVCDg6N/RFt78SsuZ4R3IT8jqKhJ6Ql9UEW02qJsmQ5T4lY
-	4x1mNEdwVga/kROOwegvwB6vE0Bb56WfD6Qkm5rxXc5JXVE+X5rPUpehZXKFprs=
-X-Gm-Gg: ASbGncsZuIrtR/3ElHYNnyTfNlGsIbuSx+wqmx/q+poLSaQVTawNC+XNkpbH6XL/G9V
-	G39DETvkNsz1qxGGMSr2iX2XUA8col+IWrehfvy7htWBfWWnFL0vToKmvJ77NJwC0mH3Cr5KnVp
-	a3gYWkXtVH9vPWql1vHJEOGQ5IRFS7cv8WQJXEjdYfth1q3m/tYath65kEC5woHNBB63NZ4xucX
-	9BAl/+QUr0wIlKP0F/l+rsnoRVmARWuAH5ODRGm76w4QtH0uaFPJ+jLCnvFbgL//zrCPpiFBGc6
-	k6GarUORXqgzYW4f1Jv7oVv9Idhwl9RAzSZmgZerDrHSDyJTDknNBg==
-X-Google-Smtp-Source: AGHT+IEQSqMpqsfTnva3rqQOV9C+uu9Nj8fYZJDtwaS9M8lvfXXPqXstgFWJ+ml90MAEpOq+PenHVg==
-X-Received: by 2002:a05:6214:2426:b0:6d8:9ead:c665 with SMTP id 6a1803df08f44-6e6ae888819mr6046096d6.27.1740079898151;
-        Thu, 20 Feb 2025 11:31:38 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d77927csm89073026d6.10.2025.02.20.11.31.36
+        d=1e100.net; s=20230601; t=1740080043; x=1740684843;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZTiSUkoMecG9RlHxgT6mcfjx4A34996Guxh4H1K/phg=;
+        b=IOMOCkxMS3VFBNA+2gyIEvplWeT/S3MAjC4TWW9San1XDMwyYvgG50yY1KHVB98GVG
+         usZ/3zT/1qMMzANBurg4iru9i5YzhEqXbNO+RB73nrdNaTDTDyrYFJ7qQLYKcxnxd6rL
+         DNRi1uRgqk7Pm7m+Rn+hCxVUmOUigRIZoPSP3xlBYdB1M9NXVvr32Ib7zYexVBIVwfid
+         lB9UenpskrZZTpBeY/smSWQofHCM2tjdj0dPSGiRliO7YfQSt2n3Gweb5ethjRBbZFgx
+         7fL5jpaSU8HuyU+8F1I++txF/xv1jVEI4FumQn3pEFoowYZHjD5w55EsxhWgzC4xk9HF
+         3+IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1JpjdpaslVRiJsarplTHNVc3sgDgAhlG1BBp6Uq+FogDdipPNnIEGn82YHU0ypjZzdKaMyVnqxaPKZV8W@vger.kernel.org, AJvYcCUbsxRstSKUJXqI8MthpB+ATY4Ec2qK4Uw/k/aBLGjCfwzyGseX3vJ+UTXMD0bTWI4K5DK/X4toaJ40TYrs3/tU@vger.kernel.org, AJvYcCXJRnjq6y3FLUGsuJmu/m3N6+ZBXKkmwIkeVUTiG6c/bZADlEWqBtNkgupKxPcI5j8a2kEvwjremx+C@vger.kernel.org, AJvYcCXiy2SvlbB5FdQG4IQVzA2rmim8M5cKfOOvjXrSda+uwDOWJAVDzZYDEAhcYrZOBu+bUhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx53pRu+6tVd1637Mh/I2UXMKNvUXFtxxIm0ZD9bGiuUkzl+dWA
+	2BSdlhh/R0mGt/IPBbCCauHT9Mrl7whUN70foUoIjSwpvVwQpgM=
+X-Gm-Gg: ASbGncuokvM/rJa5d8Dg3BCXqrfcHQPeKQ0yAsCCf7FTNKjMgB+HiLJFVZyPOf5Y+Ut
+	ysSKzJHXIm/md8/rEPQo/YijEiddxfcBqi35miitU4th5EOtVaRHTLVGde2G7BrBWHkc/NQkm5u
+	OlUPvpdzsKXALVWofrg3rOvDZPFL+Y+8ZJnYnsbGtiN6AcU+l9vn8lGFR/XFM1q6g+q1jHdM0s9
+	4BlkjaZ4Gd4OBgEj11z722yZXdHHEGBdAi/cRrkhLSk73yL8u6YUlzhStiQU2ZLJwDqEsxi+rCc
+	JatCOP5a8ezAh84=
+X-Google-Smtp-Source: AGHT+IHodAJTRfe1tv7kfQiCPKc2cGyPrUaPKRCuDC1rwACb5ZM8W6rjPG0qmP5bRg2hTlH0FYozsg==
+X-Received: by 2002:a17:90b:35ce:b0:2ee:cded:9ac7 with SMTP id 98e67ed59e1d1-2fce78ad9ddmr594804a91.20.1740080043522;
+        Thu, 20 Feb 2025 11:34:03 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d53494c0sm124354095ad.6.2025.02.20.11.34.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 11:31:37 -0800 (PST)
-Date: Thu, 20 Feb 2025 14:31:35 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	stfomichev@gmail.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v2 1/7] selftests: drv-net: add a warning for
- bkg + shell + terminate
-Message-ID: <Z7eDF2lsaQbWl0Yo@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
-	petrm@nvidia.com
-References: <20250219234956.520599-1-kuba@kernel.org>
- <20250219234956.520599-2-kuba@kernel.org>
+        Thu, 20 Feb 2025 11:34:03 -0800 (PST)
+Date: Thu, 20 Feb 2025 11:34:02 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v4 1/9] net: add get_netmem/put_netmem support
+Message-ID: <Z7eDqnkwmpTW5963@mini-arch>
+References: <20250220020914.895431-1-almasrymina@google.com>
+ <20250220020914.895431-2-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250219234956.520599-2-kuba@kernel.org>
+In-Reply-To: <20250220020914.895431-2-almasrymina@google.com>
 
-On Wed, Feb 19, 2025 at 03:49:50PM -0800, Jakub Kicinski wrote:
-> Joe Damato reports that some shells will fork before running
-> the command when python does "sh -c $cmd", while bash does
-> an exec of $cmd directly. This will have implications for our
-> ability to terminate the child process on bash vs other shells.
-> Warn about using
+On 02/20, Mina Almasry wrote:
+> Currently net_iovs support only pp ref counts, and do not support a
+> page ref equivalent.
 > 
-> 	bkg(... shell=True, termininate=True)
+> This is fine for the RX path as net_iovs are used exclusively with the
+> pp and only pp refcounting is needed there. The TX path however does not
+> use pp ref counts, thus, support for get_page/put_page equivalent is
+> needed for netmem.
 > 
-> most background commands can hopefully exit cleanly (exit_wait).
+> Support get_netmem/put_netmem. Check the type of the netmem before
+> passing it to page or net_iov specific code to obtain a page ref
+> equivalent.
 > 
-> Link: https://lore.kernel.org/Z7Yld21sv_Ip3gQx@LQ3V64L9R2
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2: new
-> ---
->  tools/testing/selftests/net/lib/py/utils.py | 4 ++++
->  1 file changed, 4 insertions(+)
+> For dmabuf net_iovs, we obtain a ref on the underlying binding. This
+> ensures the entire binding doesn't disappear until all the net_iovs have
+> been put_netmem'ed. We do not need to track the refcount of individual
+> dmabuf net_iovs as we don't allocate/free them from a pool similar to
+> what the buddy allocator does for pages.
 > 
-> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-> index 9e3bcddcf3e8..33b153767d89 100644
-> --- a/tools/testing/selftests/net/lib/py/utils.py
-> +++ b/tools/testing/selftests/net/lib/py/utils.py
-> @@ -61,6 +61,10 @@ import time
->          self.terminate = not exit_wait
->          self.check_fail = fail
->  
-> +        if shell and self.terminate:
-> +            print("# Warning: combining shell and terminate is risky!")
-> +            print("#          SIGTERM may not reach the child on zsh/ksh!")
-> +
+> This code is written to be extensible by other net_iov implementers.
+> get_netmem/put_netmem will check the type of the netmem and route it to
+> the correct helper:
+> 
+> pages -> [get|put]_page()
+> dmabuf net_iovs -> net_devmem_[get|put]_net_iov()
+> new net_iovs ->	new helpers
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-This warning did not print on my system, FWIW. Up to you if you want
-to respin and drop it or just leave it be.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-I am fine with this warning being added, although I disagree with
-the commit message as mentioned in my previous email.
-
-Since the code seems fine though:
-
-Acked-by: Joe Damato <jdamato@fastly.com>
+I remember you wanted to have more fine grained refcnt, but starting
+with this is good enough for me.
 
