@@ -1,79 +1,50 @@
-Return-Path: <netdev+bounces-168149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB51A3DB93
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:44:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52709A3DC02
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 15:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 619A816EC22
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 13:44:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C29718847C1
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB911F8BC5;
-	Thu, 20 Feb 2025 13:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnGc+g6C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B083EA83;
+	Thu, 20 Feb 2025 14:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4454E1F76C0;
-	Thu, 20 Feb 2025 13:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC191BC4E;
+	Thu, 20 Feb 2025 14:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740059079; cv=none; b=g6zXOFyHRjEabhjBvhjS6YNlTm3CLKTUIMzYkJpUF6egkhf5pEax/LMNi0SFt0rZ6W79Dt449XUXJm1hyL1dTFH/4oq9w9NIjk7RZ8oD0+coszizL/NAu6RqUVtA69KkyBYJl9QYUJ5bbF9UWeacGE2x9GIkDfm9p4oEEhHEUMU=
+	t=1740060197; cv=none; b=G3frQjcCEBxNQ8ma9D7kSCD9InF4sYT3Q4ljqvsVpzg+mLOOo1rIJeBf+g/JTwnoe7/hYXCZNzEXvaTx6TQ5KqYq9ZlfPzYfV0pONEANV4ozD8wx3lDSK7TsjcehtNxXsv9MHI6M48lrzoP6kwBzIDT9qul+RO7jXPWcmNsnfH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740059079; c=relaxed/simple;
-	bh=CMwWUZ03W806TkHXwe3kr5Wl7XYfSq37ASDCGimHEIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tj0/jpkEeQVto/kg+PFO0UaUoxZIkhylSsJTg78cVMT0mfbfd+BpCFE7JJJlx6zHY4lCqJOnUbcX4RBDX5pRutk+O3GcavWfQumCOx3Gr8se0zOXpDf9HiQ8HQSnw78K5I7i0IYvmCbnLWWVD4cU9CgDv7BLOftjJhOJ+/6xdcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnGc+g6C; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-abb86beea8cso195995066b.1;
-        Thu, 20 Feb 2025 05:44:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740059075; x=1740663875; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wH3ItxDnpHtPrcEc6Ys9D8rM2UII7vdj5WIe0si5L3c=;
-        b=cnGc+g6C56En6WyT8qQ+EoVCc6CM72LtG8EF8JP6UOZBFbnep8BND+NgwwjAWhBx90
-         VnLsjE2fedjK1LppDR1H4EHYezQgaKiHn2VUIhrZpwTTOgbBYatISHf+wsdm+l9ORQaI
-         p+puye5p3ZAt84kPhqr98YoREKlqWARLinohfLGUJ6qJV/pnGxej8npH0TErakuzbIZT
-         zeOE/ELMU06AWRerAB33nkSBWokLMgS5tCIOaCZS7Qyi7X6Z0gQrRJtOl01PX7DA0S6R
-         F5kUb6QFpliXjI7vrSYVa4CDTdXTrwuH7DrsvhcMu+j+dhUr9DRCbD0kBUV7QbKBK3fp
-         lA6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740059075; x=1740663875;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wH3ItxDnpHtPrcEc6Ys9D8rM2UII7vdj5WIe0si5L3c=;
-        b=Tu1wI/qnzJAhefClOBVP56izB/EaUeNyaQ5ALft1Gjj4vFd8M8sIMbGJOV72gF9vVv
-         NvMSBF1OeX1yAhDGLNlTrGJ2rSowknW7PN42ivk0a1l7LHJnmVGwbs7pfZaNG6phzBgd
-         SyTv4gy0vKAH4EVnzbqgzkZuRlONjwkqztitkeLor2ZaLL8OwSNh8f5gpfdCp+JTr5wg
-         1bpgJL1ngkcZ6oc7vR3a79/fkXqcQB/5hmzucCe5vdE/tSjK2VXse3OkAEbyJde89FB5
-         Dt2XBzcRqMgbxEZeBv8eI39siDXWcPJrBtOFBPvYSkm7ajAMNX/inWkw+cvNc3+oqeE7
-         Nm7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUgJhB33JUha1mBdITFTAltXC86DWCYe32WLJPXkIw5FwTOEkkUmZIl4jbddxhZW4Z61mekGg7J@vger.kernel.org, AJvYcCWI8prGza4+zvIkQyo279Tx/qXNbpp9NRMuTTgIfVtRr2zcjEgwq9IPQtmGRocX7uaKK1OJ7dCoiA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQWj0SZX6csmq2j8rFg9aBl8Hxsv0SJvvcaf9MBGAbZlJBePZ3
-	w5lrqXFGc+9ctMCh8vKVRcsJQh9D7dgL6yvPHSf7MjhEUsK6A10f
-X-Gm-Gg: ASbGncuYz4VW2/nTECUagad46LxcanMMqTP7ogqTYljrQcePoVROgtPsyR9d+hQxBdS
-	CRpjBmJPIb0F25honOrcVl29Wh5WlKh8e7gFYFtMHgDS5V+UkY8z2H0Tp9ROlo7070zxbSzOxjO
-	rz/yHmqZ+A+r/F7Jhq7U6RD2ZvIEn0+OAMFq4qAQhw9oGKmtABxh1aucAnAnMsHGi8BdQ2j6npS
-	PrFbabk/P6ImWPw4F/hqGrT0lQmF0r5idMq9RbplvySj5693FJc4RputnsvJEh7Kq3nQKJG8whx
-	7uabDMqmhCXTCGiEe1HLydCJhub3de8MH+qhDt2BkAYz7zap
-X-Google-Smtp-Source: AGHT+IELkEkYK+QAvOvQS5be6WORIcG1J6+OzZZX1+JCVNyeFLOHcip9wfXoeIBG+zOwECkOOu3Qlw==
-X-Received: by 2002:a17:906:309a:b0:abb:b3e6:26c2 with SMTP id a640c23a62f3a-abbccf054b5mr680717166b.25.1740059075149;
-        Thu, 20 Feb 2025 05:44:35 -0800 (PST)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:f455])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abba4fc0c29sm688721966b.157.2025.02.20.05.44.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2025 05:44:34 -0800 (PST)
-Message-ID: <270ce534-d33e-4642-b0dc-87e377025825@gmail.com>
-Date: Thu, 20 Feb 2025 13:45:37 +0000
+	s=arc-20240116; t=1740060197; c=relaxed/simple;
+	bh=O20IELQPiI+34MOiysPEaE7ghKnd+vs/0kkneEOGD9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oOysOP2antGd1T9qHF9ZC2u41/xYfldTkJGOjIsCoLNYvZwHUJyIBMKIsq4Mp3zgL1ltUumteqdxzd+//hWh5uaIIz70z2iy2eTfOGDUXb8IMGvxbp++JZ2Ns5uLiyvmHoOed/Y4UfD84J0wfG9mifW9uSeKR5k4mfd4OcylLo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YzFLB45L4zWn3G;
+	Thu, 20 Feb 2025 22:01:38 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id BE75A1800DB;
+	Thu, 20 Feb 2025 22:03:11 +0800 (CST)
+Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Feb 2025 22:03:11 +0800
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemn100006.china.huawei.com (7.202.194.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Feb 2025 22:03:10 +0800
+Message-ID: <c52f3ef0-0ae0-4913-a3f0-19d55147874d@huawei.com>
+Date: Thu, 20 Feb 2025 22:03:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,178 +52,164 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] io_uring/zcrx: add single shot recvzc
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-References: <20250218165714.56427-1-dw@davidwei.uk>
- <20250218165714.56427-2-dw@davidwei.uk>
+Subject: Re: [PATCH net] tcp: Fix error ts_recent time during three-way
+ handshake
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: Eric Dumazet <edumazet@google.com>, <ncardwell@google.com>,
+	<kuniyu@amazon.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250218105824.34511-1-wanghai38@huawei.com>
+ <CANn89iKF+LC_isruAAd+nyxgytr4LPeFTe9=ey0j=Xy5URMvkg@mail.gmail.com>
+ <f3b279ea-92c3-457f-915a-2f4963746838@huawei.com>
+ <CAL+tcoByx13C1Bk1E33C_TqhpXydNNMe=PF93-5daRQeUC=V7A@mail.gmail.com>
+ <5fa8fc14-b67b-4da1-ac8e-339fd3e536c2@huawei.com>
+ <CAL+tcoC3TuZPTwnHTDvXC+JPoJbgW2UywZ2=xv=E=utokb3pCQ@mail.gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250218165714.56427-2-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <CAL+tcoC3TuZPTwnHTDvXC+JPoJbgW2UywZ2=xv=E=utokb3pCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemn100006.china.huawei.com (7.202.194.109)
 
-On 2/18/25 16:57, David Wei wrote:
-> Currently only multishot recvzc requests are supported, but sometimes
-> there is a need to do a single recv e.g. peeking at some data in the
-> socket. Add single shot recvzc requests where IORING_RECV_MULTISHOT is
-> _not_ set and the sqe->len field is set to the number of bytes to read
-> N.
+
+
+On 2025/2/20 11:04, Jason Xing wrote:
+> On Wed, Feb 19, 2025 at 9:11 PM Wang Hai <wanghai38@huawei.com> wrote:
+>>
+>>
+>>
+>> On 2025/2/19 11:31, Jason Xing wrote:
+>>> On Wed, Feb 19, 2025 at 10:16 AM Wang Hai <wanghai38@huawei.com> wrote:
+>>>>
+>>>>
+>>>>
+>>>> On 2025/2/18 21:35, Eric Dumazet wrote:
+>>>>> On Tue, Feb 18, 2025 at 12:00 PM Wang Hai <wanghai38@huawei.com> wrote:
+>>>>>>
+>>>>>> If two ack packets from a connection enter tcp_check_req at the same time
+>>>>>> through different cpu, it may happen that req->ts_recent is updated with
+>>>>>> with a more recent time and the skb with an older time creates a new sock,
+>>>>>> which will cause the tcp_validate_incoming check to fail.
+>>>>>>
+>>>>>> cpu1                                cpu2
+>>>>>> tcp_check_req
+>>>>>>                                        tcp_check_req
+>>>>>> req->ts_recent = tmp_opt.rcv_tsval = t1
+>>>>>>                                        req->ts_recent = tmp_opt.rcv_tsval = t2
+>>>>>>
+>>>>>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+>>>>>> tcp_child_process
+>>>>>> tcp_rcv_state_process
+>>>>>> tcp_validate_incoming
+>>>>>> tcp_paws_check
+>>>>>> if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win) // failed
+>>>>>>
+>>>>>> In tcp_check_req, restore ts_recent to this skb's to fix this bug.
+>>>>>>
+>>>>>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>>>>>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>>>>>> ---
+>>>>>>     net/ipv4/tcp_minisocks.c | 4 ++++
+>>>>>>     1 file changed, 4 insertions(+)
+>>>>>>
+>>>>>> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+>>>>>> index b089b08e9617..0208455f9eb8 100644
+>>>>>> --- a/net/ipv4/tcp_minisocks.c
+>>>>>> +++ b/net/ipv4/tcp_minisocks.c
+>>>>>> @@ -878,6 +878,10 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>>>>>>            sock_rps_save_rxhash(child, skb);
+>>>>>>            tcp_synack_rtt_meas(child, req);
+>>>>>>            *req_stolen = !own_req;
+>>>>>> +       if (own_req && tcp_sk(child)->rx_opt.tstamp_ok &&
+>>>>>> +           unlikely(tcp_sk(child)->rx_opt.ts_recent != tmp_opt.rcv_tsval))
+>>>>>> +               tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
+>>>>>> +
+>>>>>>            return inet_csk_complete_hashdance(sk, child, req, own_req);
+>>>>>
+>>>>> Have you seen the comment at line 818 ?
+>>>>>
+>>>>> /* TODO: We probably should defer ts_recent change once
+>>>>>     * we take ownership of @req.
+>>>>>     */
+>>>>>
+>>>>> Plan was clear and explained. Why implement something else (and buggy) ?
+>>>>>
+>>>> Hi Eric,
+>>>>
+>>>> Currently we have a real problem, so we want to solve it. This bug
+>>>> causes the upper layers to be unable to be notified to call accept after
+>>>> the successful three-way handshake.
+>>>>
+>>>> Skb from cpu1 that fails at tcp_paws_check (which it could have
+>>>> succeeded) will not be able to enter the TCP_ESTABLISHED state, and
+>>>> therefore parent->sk_data_ready(parent) will not be triggered, and skb
+>>>> from cpu2 can complete the three-way handshake, but there is also no way
+>>>> to call parent->sk_data_ready(parent) to notify the upper layer, which
+>>>> will result
+>>>> in the upper layer not being able to sense and call accept to obtain the
+>>>> nsk.
+>>>>
+>>>> cpu1                                cpu2
+>>>> tcp_check_req
+>>>>                                        tcp_check_req
+>>>> req->ts_recent = tmp_opt.rcv_tsval = t1
+>>>>                                        req->ts_recent=tmp_opt.rcv_tsval= t2
+>>>>
+>>>> newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+>>>> tcp_child_process
+>>>>     tcp_rcv_state_process
+>>>>      tcp_validate_incoming
+>>>>       tcp_paws_check // failed
+>>>>     parent->sk_data_ready(parent); // will not be called
+>>>>                                        tcp_v4_do_rcv
+>>>>                                        tcp_rcv_state_process // Complete the three-way handshake
+>>>>                                                                                                           // missing parent->sk_data_ready(parent);
+>>>
+>>> IIUC, the ack received from cpu1 triggered calling
+>>> inet_csk_complete_hashdance() so its state transited from
+>>> TCP_NEW_SYN_RECV to TCP_SYN_RECV, right? If so, the reason why not
+>>> call sk_data_ready() if the skb entered into tcp_child_process() is
+>>> that its state failed to transit to TCP_ESTABLISHED?
+>>>
+>> Yes, because it didn't switch to TCP_ESTABLISHED
+>>> Here is another question. How did the skb on the right side enter into
+>>> tcp_v4_do_rcv() after entering tcp_check_req() if the state of sk
+>>> which the skb belongs to is TCP_NEW_SYN_RECV? Could you elaborate more
+>>> on this point?
+>> Since cpu1 successfully created the child sock, cpu2 will return
+>> null in tcp_check_req and req_stolen is set to true, so that it will
+>> subsequently go to 'goto lookup' to re-process the packet, and at
+>> this point, sk->sk_state is already in TCP_SYN_RECV state, and then
+>> then tcp_v4_do_rcv is called.
 > 
-> There could be multiple completions containing data, like the multishot
-> case, since N bytes could be split across multiple frags. This is
-> followed by a final completion with res and cflags both set to 0 that
-> indicate the completion of the request, or a -res that indicate an
-> error.
+> Now I can see what happened there. Perhaps it would be good to update
+> the commit message
+> in the next iteration.
+Hi Jason,
+
+Thanks for the suggestion, I'll test it out and improve the commit 
+message to send v2.
 > 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->   io_uring/net.c  | 26 ++++++++++++++++++--------
->   io_uring/zcrx.c | 17 ++++++++++++++---
->   io_uring/zcrx.h |  2 +-
->   3 files changed, 33 insertions(+), 12 deletions(-)
+> Another key information I notice is that the second lookup process
+> loses the chance to call sk_data_ready() for its parent socket. It's
+> the one of the main reasons that cause your application to be unable
+> to get notified. Taking a rough look at tcp_rcv_state_process(), I
+> think it's not easy to acquire the parent socket there and then call
+> sk_data_ready() without modifying more codes compared to the current
+> solution. It's a different solution in theory.
+Yes, I have considered this fix before, but the complexity of the fix 
+would be higher.
 > 
-> diff --git a/io_uring/net.c b/io_uring/net.c
-> index 000dc70d08d0..d3a9aaa52a13 100644
-> --- a/io_uring/net.c
-> +++ b/io_uring/net.c
-> @@ -94,6 +94,7 @@ struct io_recvzc {
->   	struct file			*file;
->   	unsigned			msg_flags;
->   	u16				flags;
-> +	u32				len;
+> If your new approach (like your previous reply) works, the following
+> commit[1] will be reverted/overwritten.
+I'm sorry, I may not have understood what you meant. Applying my fix, 
+commit[1] is still necessary because it doesn't solve the bug that 
+commit[1] fixes. can you explain in detail, why commit[1] will be 
+reverted/overwritten.
 
-Something is up with the types, it's u32, for which you use
-UINT_MAX, and later convert to ulong.
-
->   	struct io_zcrx_ifq		*ifq;
->   };
->   
-...
-> @@ -1250,6 +1251,9 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->   	zc->ifq = req->ctx->ifq;
->   	if (!zc->ifq)
->   		return -EINVAL;
-> +	zc->len = READ_ONCE(sqe->len);
-> +	if (zc->len == UINT_MAX)
-> +		return -EINVAL;
->   
->   	zc->flags = READ_ONCE(sqe->ioprio);
->   	zc->msg_flags = READ_ONCE(sqe->msg_flags);
-> @@ -1257,12 +1261,14 @@ int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->   		return -EINVAL;
->   	if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
->   		return -EINVAL;
-> -	/* multishot required */
-> -	if (!(zc->flags & IORING_RECV_MULTISHOT))
-> -		return -EINVAL;
-> -	/* All data completions are posted as aux CQEs. */
-> -	req->flags |= REQ_F_APOLL_MULTISHOT;
-> -
-> +	if (zc->flags & IORING_RECV_MULTISHOT) {
-> +		if (zc->len)
-> +			return -EINVAL;
-> +		/* All data completions are posted as aux CQEs. */
-> +		req->flags |= REQ_F_APOLL_MULTISHOT;
-
-If you're posting "aux" cqes you have to set the flag for
-synchronisation reasons. We probably can split out a "I want to post
-aux cqes" flag, but it seems like you don't actually care about
-multishot here but limiting the length, or limiting the length + nowait.
-
-> +	}
-> +	if (!zc->len)
-> +		zc->len = UINT_MAX;
->   	return 0;
->   }
->   
-> @@ -1281,7 +1287,7 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
->   		return -ENOTSOCK;
->   
->   	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT,
-> -			   issue_flags);
-> +			   issue_flags, zc->len);
->   	if (unlikely(ret <= 0) && ret != -EAGAIN) {
->   		if (ret == -ERESTARTSYS)
->   			ret = -EINTR;
-> @@ -1296,6 +1302,10 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
->   		return IOU_OK;
->   	}
->   
-> +	if (zc->len != UINT_MAX) {
-> +		io_req_set_res(req, ret, 0);
-> +		return IOU_OK;
-> +	}
->   	if (issue_flags & IO_URING_F_MULTISHOT)
->   		return IOU_ISSUE_SKIP_COMPLETE;
->   	return -EAGAIN;
-> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> index ea099f746599..834c887743c8 100644
-> --- a/io_uring/zcrx.c
-> +++ b/io_uring/zcrx.c
-> @@ -106,6 +106,7 @@ struct io_zcrx_args {
->   	struct io_zcrx_ifq	*ifq;
->   	struct socket		*sock;
->   	unsigned		nr_skbs;
-> +	unsigned long		len;
->   };
->   
->   static const struct memory_provider_ops io_uring_pp_zc_ops;
-> @@ -826,6 +827,10 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
->   	int i, copy, end, off;
->   	int ret = 0;
->   
-> +	if (args->len == 0)
-> +		return -EINTR;
-> +	len = (args->len != UINT_MAX) ? min_t(size_t, len, args->len) : len;
-
-Just min?
-
-> +
->   	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
->   		return -EAGAIN;
->   
-> @@ -920,17 +925,21 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
->   out:
->   	if (offset == start_off)
->   		return ret;
-> +	args->len -= (offset - start_off);
-
-Doesn't it unconditionally change the magic value UINT_MAX
-you're trying to preserve?
-
-> +	if (args->len == 0)
-> +		desc->count = 0;
->   	return offset - start_off;
->   }
->   
->   static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
->   				struct sock *sk, int flags,
-> -				unsigned issue_flags)
-> +				unsigned issue_flags, unsigned long len)
->   {
->   	struct io_zcrx_args args = {
->   		.req = req,
->   		.ifq = ifq,
->   		.sock = sk->sk_socket,
-> +		.len = len,
->   	};
->   	read_descriptor_t rd_desc = {
->   		.count = 1,
-> @@ -956,6 +965,8 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
->   		ret = IOU_REQUEUE;
->   	} else if (sock_flag(sk, SOCK_DONE)) {
->   		/* Make it to retry until it finally gets 0. */
-> +		if (len != UINT_MAX)
-> +			goto out;
->   		if (issue_flags & IO_URING_F_MULTISHOT)
->   			ret = IOU_REQUEUE;
->   		else
-
--- 
-Pavel Begunkov
+Thanks,
+Wang
 
 
