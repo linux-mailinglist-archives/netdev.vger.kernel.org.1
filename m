@@ -1,216 +1,112 @@
-Return-Path: <netdev+bounces-167985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66548A3D000
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:16:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C4C1A3D015
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8474A1895579
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:16:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A777C18924DA
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E904192B84;
-	Thu, 20 Feb 2025 03:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142E91DE885;
+	Thu, 20 Feb 2025 03:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKge7moJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tzosxarw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF9535958;
-	Thu, 20 Feb 2025 03:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BCC2AEF5
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 03:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740021375; cv=none; b=BdDlWAGCuAIpoxZhcsGtpblpkvaiGR3vq2Gtg63HoQPof/dTH1XVlkz/Kwl03B1Y2btCRukpvd3dqc7CRVU3DA5cW0PYdAjxh+0864rt9uETNwbyfkdNKkB4NfrC8lBMC+s+G+ZTIEde6CChebvz7UIgt9hI95+dUUJXaZaY4sA=
+	t=1740022201; cv=none; b=ZF6xQK7bgYB1xyO7N9c1NPzQMNqTdECT5nALmEZHCmD21epm3NaUI4zRLWP0fEeVEwpFAwqxDCEXnSdapGEETrhh8e+k+vuptk3B0G9yd8qmL5jzHzwgQWclKdHrJjKjMp+oAwpkoI/W9iujEi0kCZqC0SQaI+XLRFQ49YOYkDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740021375; c=relaxed/simple;
-	bh=LqjMOiy/ff2Sbq1m00+oXEGCLFal8dH/QhQqokcBRFM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q7RDvAJcup9tH8+56EM1dJn5ZAKZS4m+dsEXumc0UIfRTGi+Qk7ocQh99THK5LEnVdD4xRx5BK3JfgU2+rKPLeVc8dxlSDb/LGovVqBLWvYUNJpvtua3beHMq0Ji21OfIIAEwcFJVnXMO8q45dNNoRJw496bGTdB5WNy19LNE30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKge7moJ; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3d2b3811513so4471725ab.1;
-        Wed, 19 Feb 2025 19:16:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740021373; x=1740626173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cJ+9NLroRdqSnogSWpRmI9FM8BIDdEsyMNZjsjhAIuQ=;
-        b=PKge7moJSWmPVLLqURxo1kpFWvm/LGHu/E8MIJySGkdbsRU6Dy3p4k/ghRmVhbpfWy
-         TL552IHVQ6116Lh1j8pr4gjRipj+9BVq9mU+C+1JglR/Mmx287sgkDR6beCjapWdy5Im
-         m1enoKvsjz96Ellj6xrDc+7sm3RJdqIxkNRLO6xtL8G/d72MzdfOcEkvpMW4aOeWj2+T
-         qyaP0Nom2Q/m12sEECCLaB7aMIsJKdAEs7SFmk/vrRAKnAejam4JNC5pXbaeMutmJZH2
-         Aapwti1JB++2ct3tFkQnYLdVYAOJcd6rtsaFt/31PQvx8t+h+nn5tO/29QkDnyupDV5U
-         QERA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740021373; x=1740626173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cJ+9NLroRdqSnogSWpRmI9FM8BIDdEsyMNZjsjhAIuQ=;
-        b=pb3kYnauRt9+JdauomN8toLNUNDd3314JfBLTV6lk87Vji537LpAEWKHRbXK/dwrtY
-         q+NdoDDeooSPMg2Y5q6Hj3n3+HyRGbl43Bngr7Yl+ucA/gprseCGkg8WHw2MasuV/gyC
-         y+vs8VIYeJB0zGKxVhF9UR8NEVOXmytrWtdNRERn9B2D34B6J9tMYV0KDUXzmbIYk5RO
-         LHSUaNCA1f0z566+j5ZKcQkvbMb2mtgDMHHzXeUaaw0Fk10PAB64LbpAJCNLO31bgypW
-         kL2U0SHSM6uP8QKWQB+fizjG3jbY82ccQAt9BrB0xaOktyCmr32ZARjFOm3UJcDFGjNC
-         MdUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ/N3c2HCZ0lOgvxKx3vbv+GzgMHDkgzNlKAZxat8U6+CVFjP7/QiqnLNDrj7p3p+P1yg=@vger.kernel.org, AJvYcCWnbcvUsD/eN3dSl/szAaxwlrje7NgYn2K+4HH8uyZvGt7I84e7WrKQP/4MhMtlIr6B1aTA3dXR@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrYMC7IjDxBnehPuJUSjSLErs0ntL5CzzEUfAjQpCO4OTmB/2p
-	E/l3VXucn/Fl1NeJmWCXx41ilfwsONY1rpPY2ZJvGM5novL2qNEi/1NIHDwdup0vZmVrLsqiOTX
-	Rudn1s+H2lY7s6kJLGiuF4OZ7Jm4=
-X-Gm-Gg: ASbGncsws6ytFWgJMjZeQeyyxgfWMKn7HSgdpXjgZzP4IVRFgDUFKKBe6i0bJvawj1o
-	hOn5jagP6T5zYC7tuRLCQ+8sryvTJEgk41iyTQO10ittmw/7nAMYax/t8NEfo4N5X/T9p+fpX
-X-Google-Smtp-Source: AGHT+IFab3VbgpmuxGbWBT/npABgNbH5SAqIQG+XUAZCWYI6fa0OCN2NqC47Snb7TRkLo2TXJCA9wSTmFjtkfGRw2Ao=
-X-Received: by 2002:a05:6e02:12e8:b0:3d0:26a5:b2c with SMTP id
- e9e14a558f8ab-3d2c01cbd32mr13805675ab.8.1740021373354; Wed, 19 Feb 2025
- 19:16:13 -0800 (PST)
+	s=arc-20240116; t=1740022201; c=relaxed/simple;
+	bh=8RRQ9pCK1IMRDRrdi49iFqV4nssiRtTK/Wdg7yEvYrM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Nb055lW1f+eVsTmEAeZP8dysoscwqT0jaQLWphEFkrdRqRBpxR8NCL9BfsEfhYxPXpq5adrcUbGCAwbj0cYdLZ2OHXTzJ4iE+ohN4AMzkUpKJLWYJecvIMPDrartBHjQ0dFrQ57Z93GVWKYT4ILsNwwnrbZjEdnhby9lWQlpO8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tzosxarw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB73C4CED1;
+	Thu, 20 Feb 2025 03:30:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740022200;
+	bh=8RRQ9pCK1IMRDRrdi49iFqV4nssiRtTK/Wdg7yEvYrM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tzosxarwqVQ7vhbHu2/IdyWcx3jOawwWiZxH86CV+Gz/JRdLqvQv2XzRqSZOCP/4v
+	 xYnW1M9u93lq8u/PChwLSrH24waWui2tvB8eyN6xOC9i8+sKtbva4yQ+Fk70ifsETx
+	 rxfV89JLYFeVyv2Iz7WGSVkPslcsgu9s/Sm8gy7PVaLxmASAy+CtaFu+Sl2rxG/sKy
+	 cigCCydS62I52CNGasIBCs6aAa/8IQABgY0lhX6LphhoAlyK/fjdEF/zyQPCez4K3t
+	 Fhow1SJpFdLdKPYC6MV0Rf4Rd5XFlYBmFLhhJNAbolrcDV5osA6NEJWmOJi5uWNnyq
+	 htd9s14AzI2yw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D77380AAEC;
+	Thu, 20 Feb 2025 03:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218050125.73676-1-kerneljasonxing@gmail.com>
- <20250218050125.73676-11-kerneljasonxing@gmail.com> <67b699ab81a9_20efb029441@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67b699ab81a9_20efb029441@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 20 Feb 2025 11:15:36 +0800
-X-Gm-Features: AWEUYZm-upRx47ha6YEJg3UMSjyYrhTnzeJcs8vy7p4Ml5_LTNv-WmGThzIhqCg
-Message-ID: <CAL+tcoDqqt3QScTHAjWGownjc8-gcMCGq=rYqB9eu=rCwoCLiQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v12 10/12] bpf: add BPF_SOCK_OPS_TS_SND_CB callback
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/4] selftests: drv-net: add a simple TSO test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174002223100.830506.13522479369749861704.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 03:30:31 +0000
+References: <20250218225426.77726-1-kuba@kernel.org>
+In-Reply-To: <20250218225426.77726-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ willemdebruijn.kernel@gmail.com, petrm@nvidia.com, gal@nvidia.com
 
-On Thu, Feb 20, 2025 at 10:55=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > This patch introduces a new callback in tcp_tx_timestamp() to correlate
-> > tcp_sendmsg timestamp with timestamps from other tx timestamping
-> > callbacks (e.g., SND/SW/ACK).
-> >
-> > Without this patch, BPF program wouldn't know which timestamps belong
-> > to which flow because of no socket lock protection. This new callback
-> > is inserted in tcp_tx_timestamp() to address this issue because
-> > tcp_tx_timestamp() still owns the same socket lock with
-> > tcp_sendmsg_locked() in the meanwhile tcp_tx_timestamp() initializes
-> > the timestamping related fields for the skb, especially tskey. The
-> > tskey is the bridge to do the correlation.
-> >
-> > For TCP, BPF program hooks the beginning of tcp_sendmsg_locked() and
-> > then stores the sendmsg timestamp at the bpf_sk_storage, correlating
-> > this timestamp with its tskey that are later used in other sending
-> > timestamping callbacks.
-> >
-> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > ---
-> >  include/uapi/linux/bpf.h       | 5 +++++
-> >  net/ipv4/tcp.c                 | 4 ++++
-> >  tools/include/uapi/linux/bpf.h | 5 +++++
-> >  3 files changed, 14 insertions(+)
-> >
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index 9355d617767f..86fca729fbd8 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -7052,6 +7052,11 @@ enum {
-> >                                        * when SK_BPF_CB_TX_TIMESTAMPING
-> >                                        * feature is on.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_SND_CB,         /* Called when every sendmsg sysc=
-all
-> > +                                      * is triggered. It's used to cor=
-relate
-> > +                                      * sendmsg timestamp with corresp=
-onding
-> > +                                      * tskey.
-> > +                                      */
-> >  };
-> >
-> >  /* List of TCP states. There is a build check in net/ipv4/tcp.c to det=
-ect
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 12b9c4f9c151..4b9739cd3bc5 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -492,6 +492,10 @@ static void tcp_tx_timestamp(struct sock *sk, stru=
-ct sockcm_cookie *sockc)
-> >               if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
-> >                       shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len=
- - 1;
-> >       }
-> > +
-> > +     if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
-> > +         SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING) && skb)
-> > +             bpf_skops_tx_timestamping(sk, skb, BPF_SOCK_OPS_TS_SND_CB=
-);
-> >  }
-> >
-> >  static bool tcp_stream_is_readable(struct sock *sk, int target)
-> > diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/=
-bpf.h
-> > index d3e2988b3b4c..2739ee0154a0 100644
-> > --- a/tools/include/uapi/linux/bpf.h
-> > +++ b/tools/include/uapi/linux/bpf.h
-> > @@ -7042,6 +7042,11 @@ enum {
-> >                                        * when SK_BPF_CB_TX_TIMESTAMPING
-> >                                        * feature is on.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_SND_CB,         /* Called when every sendmsg sysc=
-all
-> > +                                      * is triggered. It's used to cor=
-relate
-> > +                                      * sendmsg timestamp with corresp=
-onding
-> > +                                      * tskey.
-> > +                                      */
->
-> Feel free to decline this late in the review process, but a bit more
-> bikeshedding..
->
-> Can we spell out TSTAMP instead of TS in these definitions? Within
-> the context of this series it is self-explanatory, but when reading
-> kernel code the meaning of a two letter acronym is not that clear.
+Hello:
 
-Even though I feel reluctant to change across the whole series because
-if so, I will adjust in many places. Of course, you're right about the
-new name being clearer :)
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->
-> And instead of SND can we use SENDMSG or something like that?
-> SND here confused me as the software timestamp is SCM_TSTAMP_SND.
+On Tue, 18 Feb 2025 14:54:22 -0800 you wrote:
+> Add a simple test for exercising TSO over tunnels.
+> 
+> Similarly to csum test we want to iterate over ip versions.
+> Rework how addresses are stored in env to make this easier.
+> 
+> v4:
+>  - [patch 3] fix f-strings on Python < 3.12
+>  - [patch 4] fix v4/v6 test naming
+>  - [patch 4] correctly select the inner vs outer protocol version
+>  - [patch 4] enable mangleid if tunnel is supported via GSO partial
+> v3: https://lore.kernel.org/20250217194200.3011136-1-kuba@kernel.org
+>  - [patch 3] new patch
+>  - [patch 4] rework after new patch added
+> v2: https://lore.kernel.org/20250214234631.2308900-1-kuba@kernel.org
+>  - [patch 1] check for IP being on multiple ifcs
+>  - [patch 4] lower max noise
+>  - [patch 4] mention header overhead in the comment
+>  - [patch 4] fix the basic v4 TSO feature name
+>  - [patch 4] also run a stream with just GSO partial for tunnels
+> v1: https://lore.kernel.org/20250213003454.1333711-1-kuba@kernel.org
+> 
+> [...]
 
-I'm not sure about this. For TCP, it's not implemented in the
-tcp_sendmsg_locked but tcp_tx_timestamp. Well, I have no strong
-preference.
+Here is the summary with links:
+  - [net-next,v4,1/4] selftests: drv-net: resolve remote interface name
+    https://git.kernel.org/netdev/net-next/c/2217bcb49149
+  - [net-next,v4,2/4] selftests: drv-net: get detailed interface info
+    https://git.kernel.org/netdev/net-next/c/2aefca8e1fa8
+  - [net-next,v4,3/4] selftests: drv-net: store addresses in dict indexed by ipver
+    https://git.kernel.org/netdev/net-next/c/de94e8697405
+  - [net-next,v4,4/4] selftests: drv-net: add a simple TSO test
+    https://git.kernel.org/netdev/net-next/c/0d0f4174f6c8
 
-You can make the final call :)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-Jason
 
->
-> For instance:
->
->     BPF_SOCK_OPS_TSTAMP_SENDMSG_CB,
->     BPF_SOCK_OPS_TSTAMP_SCHED_CB,
->     BPF_SOCK_OPS_TSTAMP_SND_SW_CB,
->     BPF_SOCK_OPS_TSTAMP_SND_HW_CB,
->    (BPF_SOCK_OPS_TSTAMP_TX_COMPLETION_CB,)
->     BPF_SOCK_OPS_TSTAMP_ACK_CB,
->
-> (not sure what the OPT in OPT_CB added).
->
->
 
