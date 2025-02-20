@@ -1,151 +1,108 @@
-Return-Path: <netdev+bounces-167959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C78A3CF75
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:47:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC149A3CF78
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:50:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9FB81893996
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:48:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2C4116AA66
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02311D514E;
-	Thu, 20 Feb 2025 02:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB54A1CD1E0;
+	Thu, 20 Feb 2025 02:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="KEBBTN/Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvg56Hcn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050A363A9
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 02:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DBE288D6
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 02:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740019675; cv=none; b=nWrgqtZP0gK9Tc7JbNSr7hpU4Ix5KMzNV3WCY2EasCvIKrMCFAHyRXHip0je4KV8RRQd4pz7ifPfr9GI8AHk/0UUGry9Ddg0sYoL+g58V+LnYLZsFR1eryXLD0pgBWKXs4hbFt9/GGZtcs+XJ2p3GpeC5Fmry0TB2WH9QdmD6mw=
+	t=1740019801; cv=none; b=n8jNCv0haryk9Z1YgxpL6qb+iav2w9cQqJqEubu2MbmrfCyp3jDAbZ3EuHhNiS72cL8pbxEwPmhQOOKUD3qGPtCtlibDR1ddb4rzlDjlMoiH0IdIhKkBu49K3MOGt4q0bRhffdZ8/ijRM8RlpwGdEP8VS+Y63w7B41QRf/2VO/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740019675; c=relaxed/simple;
-	bh=2VvfnmXlr34dHXG/P3XG6letow4wupZdh48hZ5+IiwM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b2CQ7pkCm6kuO7HQB5g5tsVQ6zGWRNy1eIR+Q2WWNdKhwNsroxJ6EktsUq42vSUQIvNRtL5ASepdo/Sv63JDfMYUQBVwkz1buFkZX+PdmfyVvdFLc4O0h7rzEHycUb3N63bMRiieh5xHWpLUXaJRgxWTYmZiG8BZaZkhjbzW9TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=KEBBTN/Z; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fb2a6360efso3268527b3.0
-        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 18:47:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1740019673; x=1740624473; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xvp9vC0eMH1pKGCb8lxYuIWBY9DYcdV7nU72B3skZ6Y=;
-        b=KEBBTN/ZusaqxikmKmtLJnqMTtn4ks+InMoAoMQoSXfjcWbUXEJWrU71azbGzZWIKt
-         XkxJGZxDgXnPNNwQP9/EuSU/snNUOLtpzB+9tCAkQ+4GFC225CyN6utG2wrGMV24iswW
-         XImPoWeHp6qpJiQREq151HSEkhFC14g783qHwlmmPgiMiU/EjvsGEsWodP1iOs0r7H6U
-         S/3wfzsHWRA3G+vaCMIk/RPDZnr0xNAd+tJslrX0DZZJdFDewokMsIhH5KeS4WEbJjbk
-         wncznDiIyLMq8wnBb2GlAdgEnz/vPoNIXlOF+aU7/aOCjiFteuvOXKW45a6794TkHWCF
-         /I5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740019673; x=1740624473;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xvp9vC0eMH1pKGCb8lxYuIWBY9DYcdV7nU72B3skZ6Y=;
-        b=wcs4ycJbAGJ34WWm1IAow+sGH4XpObAVIx412noomzeARjbYQoE7dAaMsLmSfwnyKn
-         2u0W4JHe27zAdtyamijtdYRIxL0EWSmG19WKF4AMecsyWtXgipf4Nu7vTTf64zlkcbCO
-         dP92brk0lTd9GXENNkczU0M95wjAXFWZnhvml+yRohSIVd7gPFTHFJzaZVp+IhqwJw7Y
-         MDUgFwUl1EWw/ckb3/NYJruW59nZWi8Ix9/XJ3hCvxp43csdwcjmhveFwpFWg4+vHJJz
-         Y/Ct3ww5LgToIDFrSztlCG03lEJEs2YL7+H8Op5DDFuzNl/O7ej/uZ4g/EXwWtjpbXQ0
-         jLww==
-X-Forwarded-Encrypted: i=1; AJvYcCVZrPCLFOoky2LHm1ibVAteqxAPSEKWqJ9jmYc6sB16h4Df5IzbPo2CAeW+uuZVmf3lvRxvS2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq+KEJhsH/D1JPSmljJmxiS/ZiHj2DZCDGHkW/LzzdiKRVJqxx
-	bl9MkmdxkvSEZndVO0QVLjgZKDBoLLxoP1bv9DHCoGUetgSPc8Ti/6sKrlBiAtqEiWZ1QEAQpxS
-	UtuarkQRsOZaZ242AT6DMNV/tA60IGd+zi0wooVdMPGAKn8kamFUSCw==
-X-Gm-Gg: ASbGncsaZpHxj6jO4Hos3BcL++bMW3r1QBvsT0xa/1UhErnFij+KvzRTcQb4jOX1ujY
-	Z9OYKMmgP+wGInLwJ1H5BsE3NH1ZEVvzDinR+sp9TveSyWQcGj7+rXsOPrX/7oPXkYS9ryDkj5B
-	Y=
-X-Google-Smtp-Source: AGHT+IHpbcrdwizdZDEB2LKzf3t7N+L1gh7l/lSw8IgK31mOcpbcfuefgyvG7Eg9yB90MSd4D8fYOSrYNFEZa4g738Y=
-X-Received: by 2002:a05:690c:64c8:b0:6f7:ac3f:d589 with SMTP id
- 00721157ae682-6fbbb7eafa8mr5012217b3.36.1740019672877; Wed, 19 Feb 2025
- 18:47:52 -0800 (PST)
+	s=arc-20240116; t=1740019801; c=relaxed/simple;
+	bh=J38p8HNr1Uug+moP7mDB1J14/1ImaYI5iN/P6cWP8pI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hPCdncWbMPme47TZBXRFcftA7nViRYOMQ4Ke5T+E1hMePoHgPEtRulDVzWHWGMc7DUJOBgpY6sr4I1MiBnZVFQv7wpuTuM8hIyZtxz+knj2n/zvFYmD6mZGWu6QYqSKk0erBXNQNMwPjz7pBuHQAQm6wTyxUvye2OiZmKKbiiFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvg56Hcn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26650C4CED1;
+	Thu, 20 Feb 2025 02:50:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740019801;
+	bh=J38p8HNr1Uug+moP7mDB1J14/1ImaYI5iN/P6cWP8pI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rvg56Hcnme5gglwT3C45hXhSxdpKUKvYkbI/GjcgdaYjU9tgHoU6JVYKbmCgexo5d
+	 Z1nsV7HyiF7RZWmUcy64wWuplUJMZTsH5+dMWmjmX2I8/IE64N/7tN7rh8kPwtzZ1N
+	 Mk2N9Z4xmR+NF4CpNtDkMfFu2HBySx6j/JRdG1Gt6Pwkie8NtM4FQGnxwbj1OWwQQ+
+	 XZfF0JK74+TLGbOlfGqHNLRMjX7Q5G1Dw7Edu/5HEk9Rmf7/4LUZHc8jQgn7Kt4SMZ
+	 09WKYnP0SNbCkJT8kGOnqiE5fHx6C5m57xVhOcYJtpQu0cQl0balOdqRbSnLzWfmHM
+	 JZaWnEqcnwCBQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB130380AAEC;
+	Thu, 20 Feb 2025 02:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250217055843.19799-1-nick.hu@sifive.com> <889918c4-51ae-4216-9374-510e4cbdc3f1@intel.com>
-In-Reply-To: <889918c4-51ae-4216-9374-510e4cbdc3f1@intel.com>
-From: Nick Hu <nick.hu@sifive.com>
-Date: Thu, 20 Feb 2025 10:47:40 +0800
-X-Gm-Features: AWEUYZmjzhqzQbHmf9_A5Yil9YBABlCV2QtiQWGg09MoFGZlPCm-Nzx5MY3mUGU
-Message-ID: <CAKddAkBZWZqY+-TERah+Q+WUfkqzcpFMA=ySSuTxxBjfP7tKZg@mail.gmail.com>
-Subject: Re: [PATCH] net: axienet: Set mac_managed_pm
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek <michal.simek@amd.com>, 
-	Russell King <linux@armlinux.org.uk>, Francesco Dolcini <francesco.dolcini@toradex.com>, 
-	Praneeth Bajjuri <praneeth@ti.com>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8] net: fib_rules: Add port mask support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174001983176.821562.11365987129288232530.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 02:50:31 +0000
+References: <20250217134109.311176-1-idosch@nvidia.com>
+In-Reply-To: <20250217134109.311176-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ donald.hunter@gmail.com, dsahern@kernel.org, petrm@nvidia.com,
+ gnault@redhat.com
 
-Hi Jacob
+Hello:
 
-On Thu, Feb 20, 2025 at 7:29=E2=80=AFAM Jacob Keller <jacob.e.keller@intel.=
-com> wrote:
->
->
->
-> On 2/16/2025 9:58 PM, Nick Hu wrote:
-> Nit: subject should include the "net" prefix since this is clearly a bug
-> fix.
->
-I've added the 'net' prefix to the subject 'net: axienet: Set
-mac_managed_pm'. Is there something I'm missing?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> > The external PHY will undergo a soft reset twice during the resume proc=
-ess
-> > when it wake up from suspend. The first reset occurs when the axienet
-> > driver calls phylink_of_phy_connect(), and the second occurs when
-> > mdio_bus_phy_resume() invokes phy_init_hw(). The second soft reset of t=
-he
-> > external PHY does not reinitialize the internal PHY, which causes issue=
-s
-> > with the internal PHY, resulting in the PHY link being down. To prevent
-> > this, setting the mac_managed_pm flag skips the mdio_bus_phy_resume()
-> > function.
-> >
-> > Fixes: a129b41fe0a8 ("Revert "net: phy: dp83867: perform soft reset and=
- retain established link"")
-> > Signed-off-by: Nick Hu <nick.hu@sifive.com>
-> > ---
->
-> Otherwise, the fix seems correct to me.
->
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->
-> >  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/driver=
-s/net/ethernet/xilinx/xilinx_axienet_main.c
-> > index 2ffaad0b0477..2deeb982bf6b 100644
-> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> > @@ -3078,6 +3078,7 @@ static int axienet_probe(struct platform_device *=
-pdev)
-> >
-> >       lp->phylink_config.dev =3D &ndev->dev;
-> >       lp->phylink_config.type =3D PHYLINK_NETDEV;
-> > +     lp->phylink_config.mac_managed_pm =3D true;
-> >       lp->phylink_config.mac_capabilities =3D MAC_SYM_PAUSE | MAC_ASYM_=
-PAUSE |
-> >               MAC_10FD | MAC_100FD | MAC_1000FD;
-> >
->
+On Mon, 17 Feb 2025 15:41:01 +0200 you wrote:
+> In some deployments users would like to encode path information into
+> certain bits of the IPv6 flow label, the UDP source port and the DSCP
+> field and use this information to route packets accordingly.
+> 
+> Redirecting traffic to a routing table based on specific bits in the UDP
+> source port is not currently possible. Only exact match and range are
+> currently supported by FIB rules.
+> 
+> [...]
 
-Regards,
-Nick
+Here is the summary with links:
+  - [net-next,1/8] net: fib_rules: Add port mask attributes
+    https://git.kernel.org/netdev/net-next/c/39f970aead3c
+  - [net-next,2/8] net: fib_rules: Add port mask support
+    https://git.kernel.org/netdev/net-next/c/da7665947b66
+  - [net-next,3/8] ipv4: fib_rules: Add port mask matching
+    https://git.kernel.org/netdev/net-next/c/79a4e21584b7
+  - [net-next,4/8] ipv6: fib_rules: Add port mask matching
+    https://git.kernel.org/netdev/net-next/c/fc1266a06164
+  - [net-next,5/8] net: fib_rules: Enable port mask usage
+    https://git.kernel.org/netdev/net-next/c/34e406a84928
+  - [net-next,6/8] netlink: specs: Add FIB rule port mask attributes
+    https://git.kernel.org/netdev/net-next/c/ab35ebfabb53
+  - [net-next,7/8] selftests: fib_rule_tests: Add port range match tests
+    https://git.kernel.org/netdev/net-next/c/94694aa64100
+  - [net-next,8/8] selftests: fib_rule_tests: Add port mask match tests
+    https://git.kernel.org/netdev/net-next/c/f5d783c08875
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
