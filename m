@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-168052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF92A3D362
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:40:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D87A3D366
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5F1B189DC31
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:40:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB0F4189DC75
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7228A1EB189;
-	Thu, 20 Feb 2025 08:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E3C1EB9ED;
+	Thu, 20 Feb 2025 08:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="shwLwVQ0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2NgOppW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474271E9B07;
-	Thu, 20 Feb 2025 08:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77541E9B07;
+	Thu, 20 Feb 2025 08:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740040799; cv=none; b=dWWLVK5a3wd7Z4ibFsSjVLFXUYK0Oa76tXGkgwAWykmbubuDbaWPPqYNjeCFLC5gbzizIC99I2fnpYRupRlnLyH1iUGHiCeDGWos4GAgEpMBP8RlV/6ezPvOnD+OeGB9COtzXH0ksKI5CvgorWmr68gxynIEyba8RpuZgwf93UU=
+	t=1740040801; cv=none; b=mLHrDlbnqTxhzAcRwoxo+Jn8LAMvDBxIXPG3Fnub3ZwIIAZQ4hX4JLBzgI+HakLQJ1dhhwe4PDPztrMAPH+H+RZtPEgbPW+56d2RYQBpd2VtHeFPA/WP5MZnuWdqtepQs8dBCt9SBLa2cPSxsC8C0+JCykOmEE4UoQSfMKWiKCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740040799; c=relaxed/simple;
-	bh=0EcBJxz9mfkh23PcIR3DTUy1k/b2btO/vBMMPMNe5Qw=;
+	s=arc-20240116; t=1740040801; c=relaxed/simple;
+	bh=eYc7LMKuByYRxGaNCW8otxZTs2GWL1JDGwpT23bnpp8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W3UqBfqWjHxl4sk6BvSrMXcP8Gs8ocqMHN9ImVq7exnvfUoMYhh2tcck0kk4INPlFiuNmlPBMdI83GSuPJ6FKomraY/fW46jbTiVhOdgCpOr0d0isKb72i62h7lw4WMQ9M7BK2vM2SAkYkbsJAD3lqEFoljE1OI171e/ibIjDPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=shwLwVQ0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14BD8C4CED1;
-	Thu, 20 Feb 2025 08:39:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fMt5MDAcFJRNKPsoySx+HFvTGtHobLruG0EuWuSvTQ/bKVgTykFAEvcshJHFhoVEG5oz37JTeFNsivjfrix75T7e9pdWi6ao16RlpZbGTSk8wGSbWh2Y7vHN+c5V6a+6aErYDSb/i7ab/dHfWu3EJk6OOOIA4HTSjsjnrmHY2FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2NgOppW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 579C1C4CEDD;
+	Thu, 20 Feb 2025 08:40:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740040799;
-	bh=0EcBJxz9mfkh23PcIR3DTUy1k/b2btO/vBMMPMNe5Qw=;
+	s=k20201202; t=1740040800;
+	bh=eYc7LMKuByYRxGaNCW8otxZTs2GWL1JDGwpT23bnpp8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=shwLwVQ01mIRxizgzAz74e1emjIfOBuuY8VA8s/IrfgWja7BwZ6wjYBIqNI+1Pmbr
-	 DIgMqYGksVNVRVaT5IGtixHXDjjqeG81DpgeQyrj9dEq6K8LyfnxaMt2yBLhYOTOWL
-	 fMp5PiS5NNgak8I3qV9341xoim5vLSPXQh0vRtyY1xRJ92UJvf8sAyGDlQonvotpLI
-	 WQuT2nf8KTszsCIlG+O6g2Zu6ibbmPu/RrkD7J8f7DIWPQDE6QwjKn3atAxPaCdwII
-	 ZwaiUFe3P+0YurxA28yLw2i4x07DE4AStcKyZak3g/mbfaftMEx8/OYgH1bpqmFf2q
-	 q3HOqUnkuU3iw==
+	b=e2NgOppWT845Ct+uSbitMkIYIEyQHv2XtfSLphu2OJ2COHZwUVD/uHlufulX1vRwX
+	 z4gN6O6vVPklEZTQMXnnKquuZEnRBCkIVBU6egsRH9jVtGMi3JCtjRjwHaEJmJdaIJ
+	 nKa5HuS+fyttsm0AZLKNRLj+22KJEprUwWiZUVd2JyCPX2yx1FivfsqnzjxkRETBNE
+	 wud0xeHYTdsgQtdCTOTIaMd6edoxKj4HucsY1736Lk7o/PKwYcFZBai5YjpPCMH7zT
+	 Ab5SshiPlAjtOl1v8GiSqr6RXaBIOciMoqGDWNKJeeBlyKJ94LU3Hc+NUqxSLrwh2a
+	 Q25ExRergKb8A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF20380CEE2;
-	Thu, 20 Feb 2025 08:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E6E380CEE2;
+	Thu, 20 Feb 2025 08:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] tcp: drop secpath at the same time as we currently
- drop dst
+Subject: Re: [PATCH net v3] nfp: bpf: Add check for nfp_app_ctrl_msg_alloc()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174004082976.1211626.2598809142396901405.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Feb 2025 08:40:29 +0000
-References: <5055ba8f8f72bdcb602faa299faca73c280b7735.1739743613.git.sd@queasysnail.net>
-In-Reply-To: <5055ba8f8f72bdcb602faa299faca73c280b7735.1739743613.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, ncardwell@google.com, kuniyu@amazon.com,
- dsahern@kernel.org, linux-security-module@vger.kernel.org,
- paul@paul-moore.com, xmu@redhat.com
+ <174004083099.1211626.15093376087065414266.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 08:40:30 +0000
+References: <20250218030409.2425798-1-haoxiang_li2024@163.com>
+In-Reply-To: <20250218030409.2425798-1-haoxiang_li2024@163.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: kuba@kernel.org, louis.peens@corigine.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, qmo@kernel.org,
+ daniel@iogearbox.net, bpf@vger.kernel.org, oss-drivers@corigine.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 17 Feb 2025 11:23:35 +0100 you wrote:
-> Xiumei reported hitting the WARN in xfrm6_tunnel_net_exit while
-> running tests that boil down to:
->  - create a pair of netns
->  - run a basic TCP test over ipcomp6
->  - delete the pair of netns
+On Tue, 18 Feb 2025 11:04:09 +0800 you wrote:
+> Add check for the return value of nfp_app_ctrl_msg_alloc() in
+> nfp_bpf_cmsg_alloc() to prevent null pointer dereference.
 > 
-> The xfrm_state found on spi_byaddr was not deleted at the time we
-> delete the netns, because we still have a reference on it. This
-> lingering reference comes from a secpath (which holds a ref on the
-> xfrm_state), which is still attached to an skb. This skb is not
-> leaked, it ends up on sk_receive_queue and then gets defer-free'd by
-> skb_attempt_defer_free.
+> Fixes: ff3d43f7568c ("nfp: bpf: implement helpers for FW map ops")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] tcp: drop secpath at the same time as we currently drop dst
-    https://git.kernel.org/netdev/net/c/9b6412e6979f
+  - [net,v3] nfp: bpf: Add check for nfp_app_ctrl_msg_alloc()
+    https://git.kernel.org/netdev/net/c/878e7b11736e
 
 You are awesome, thank you!
 -- 
