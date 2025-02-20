@@ -1,87 +1,132 @@
-Return-Path: <netdev+bounces-168276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F145A3E580
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 21:02:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6723A3E5A5
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 21:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32ED3175714
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:02:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E92863AFEB3
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A76214218;
-	Thu, 20 Feb 2025 20:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="En7pk8j6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCB9214A8B;
+	Thu, 20 Feb 2025 20:11:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533591E570E
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 20:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE729264610
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 20:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740081751; cv=none; b=SbMPQvpUgaWuxOwA7D9NdPUV6oAgHQZmt+maNW0Y/oBRbBf+1agWvoQ1O6kmSNbmtedA2mezG6ceI8Dvqi6ZIO1hBV/xSw30wohuOJKpuf1N4OiDEPR0ZzEPIu9Cd58L3ZfRvRtb5/Q46UMcQKDtN0Q9Kz4Cz6a765Kg13SeKBg=
+	t=1740082311; cv=none; b=pttJaPRNHWW48ymDv4nZ1k4PlXaJr7Fr2uOmIWFyRj2mKeT089IjWkMeQ48ZkkN9J6r1pOnV3GRAc4GHnmEXJU1rLQw1DlqmHr1wNd9azomfs6hkwHyDlCgVn9mc29EpZ+DurB3SFvQ3LdK2x6IBReQ62f/7AN4UrgB6b6jYltc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740081751; c=relaxed/simple;
-	bh=hpILy+3+EU9ILSRAJ3KXzhjnj5YTgS1SMPd2/RuJ1C4=;
+	s=arc-20240116; t=1740082311; c=relaxed/simple;
+	bh=p7x5xdC4rIH5/glKQmg4UEIV7RBoE6145C1l9P7saOI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jl2gTg3OLyYaaqGSPUU6fepf4hFhWGufl4KKhz0HqTfltgboXK1qWE58zezNvYq0/b8j8Kk2xZ0WicY6CYubfXan6F/qaC9W+qctO5djgRY8TAXNpHMua8jAE71vegWQO3gBzGc6ybUxgNF0JDg1VM0cxKTKYTeCfPPNNY7puzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=En7pk8j6; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <df9e0dea-bfcf-4199-ac26-55f04f72ae2c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740081747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fJHYVCQd+aLBIct9NdfukVqf0I+4+iDHWBrkMmpXD+0=;
-	b=En7pk8j6vchSYynsCz703qLWmShixhf/3qpU4gNqqTP9ub+LcmiiKhr7qJUXOrY4M8p9GL
-	vWh/FAcAEi2m+dznF7xroyHhD++Q8DrFsThhAvXjYSvClkfmmaA8uobXd+qTD6riy2rsXF
-	qGqx0sf0fHOQcvHp9KDBYutz0N7zGuo=
-Date: Thu, 20 Feb 2025 15:02:23 -0500
+	 In-Reply-To:Content-Type; b=QTBZ0oR7A+c4kGCNHbTua3TaX4XJdIj59J4TxtSwBN2hi9EyJdlr55PF27kDja0sTKqh04YZLcAa1VUduHOnMNQkkEvU/IMg/yPVggBkyjOeynw/xR50UYb4CKdGpZ5C/IiWbx/6LBvikYY73emVlIPxfKgs8k+4XYsfT+SRj78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af4e3.dynamic.kabel-deutschland.de [95.90.244.227])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6F3D461E6479C;
+	Thu, 20 Feb 2025 21:11:02 +0100 (CET)
+Message-ID: <eb5e8d47-30ba-4b95-9b34-ba2de829e131@molgen.mpg.de>
+Date: Thu, 20 Feb 2025 21:11:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: cadence: macb: Synchronize stats calculations
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>
-References: <20250218195036.37137-1-sean.anderson@linux.dev>
- <20250219094851.0419759f@2a02-8440-d103-5c0b-874f-3af8-c06f-cd89.rev.sfr.net>
- <451aca38-3b58-46c8-b6ce-6460f0504314@linux.dev>
- <32f5cc19-e4e6-4750-9942-e57126b0bad7@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: fix fwlog after driver
+ reinit
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20250220150438.352642-3-martyna.szapar-mudlaw@linux.intel.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <32f5cc19-e4e6-4750-9942-e57126b0bad7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250220150438.352642-3-martyna.szapar-mudlaw@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/20/25 14:48, Andrew Lunn wrote:
->> Yeah, looks like I missed this. Although I tested on a kernel with
->> lockdep enabled, and I thought that was supposed to catch this sort of
->> thing. Will send a v2.
+Dear Martyna,
+
+
+Thank you for your patch.
+
+Am 20.02.25 um 16:04 schrieb Martyna Szapar-Mudlaw:
+> Fix an issue when firmware logging stops after devlink reload action
+> driver_reinit or driver reset. Fix it by restoring fw logging when
+
+Maybe elaborate, why/how driver reinit or reset disables fwlog.
+
+> it was previously registered before these events.
+
+I’d add a blank line between paragraphs.
+
+> Restoring fw logging in these cases was faultily removed with new
+> debugfs fw logging implementation.
+> Failure to init fw logging is not a critical error so it is safely
+> ignored.
+
+How can this be tested?
+
+> Fixes: 73671c3162c8 ("ice: enable FW logging")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_main.c | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
 > 
-> It might be you need the sleep in atomic option, not lockdep. Better
-> still, just enable them all :-)
-> 
-> 	Andrew
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index a03e1819e6d5..6d6873003bcb 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -5151,6 +5151,13 @@ int ice_load(struct ice_pf *pf)
+>   
+>   	devl_assert_locked(priv_to_devlink(pf));
+>   
+> +	if (pf->hw.fwlog_cfg.options & ICE_FWLOG_OPTION_IS_REGISTERED) {
+> +		err = ice_fwlog_register(&pf->hw);
+> +		if (err)
+> +			pf->hw.fwlog_cfg.options &=
+> +				~ICE_FWLOG_OPTION_IS_REGISTERED;
 
-I think the issue was that the lock is only taken in an error path and I
-didn't trigger it during my testing. So lockdep never saw that this lock
-could be taken in an interrupt.
+Should an error be logged in the failure case?
 
---Sean
+> +	}
+> +
+>   	vsi = ice_get_main_vsi(pf);
+>   
+>   	/* init channel list */
+> @@ -7701,6 +7708,13 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+>   		goto err_init_ctrlq;
+>   	}
+>   
+> +	if (hw->fwlog_cfg.options & ICE_FWLOG_OPTION_IS_REGISTERED) {
+> +		err = ice_fwlog_register(hw);
+> +		if (err)
+> +			hw->fwlog_cfg.options &=
+> +				~ICE_FWLOG_OPTION_IS_REGISTERED;
+> +	}
+
+Ditto.
+
+> +
+>   	/* if DDP was previously loaded successfully */
+>   	if (!ice_is_safe_mode(pf)) {
+>   		/* reload the SW DB of filter tables */
+
+
+Kind regards,
+
+Paul
 
