@@ -1,105 +1,171 @@
-Return-Path: <netdev+bounces-168101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95ED3A3D7D8
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 12:09:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4B1DA3D821
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 12:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFFB4189CE3A
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 11:08:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495C119C09F7
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 11:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618531DE3A7;
-	Thu, 20 Feb 2025 11:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34A51F3BBE;
+	Thu, 20 Feb 2025 11:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FkQ9bk2A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b12PjNii"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576191D79B6
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 11:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ACC1F2BB5;
+	Thu, 20 Feb 2025 11:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740049706; cv=none; b=B+C9iwA3FBivqe8qLTxX7IenL+paWYHCE/JBPEgSnJknUtqWDDGm00mtp+fqK4NXMRzILtGNBYoAUoLDiUsVAwbsDK2CQKfynp7Xz05XfznYFQ4aorlxIGoJtRWNaTq4PNKNQOeh8GFgilyUEP2wnya0EiPNeBYKI9VCPXUPdkg=
+	t=1740050173; cv=none; b=PBqd53Ntl9Dc5cJTPE606V+PtWbmjwOkzWpQ/55KGWyhOJYVrtGjgXwU0Y/ghk02oq22m3KGi1dzpLA5RVu3zreg4QoJFqzIIQ8UDbZFWCatH+YELQTrxfhPJDxTZWoT74ohrSGKaVc7e0S4RAk8OkyOsez2HxnlfcnHTE+G6gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740049706; c=relaxed/simple;
-	bh=oXJNr/gxxvxCZ5rhqqjVPyBrGe3PMFy7vb+NY47McLg=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=KMbqC5Tn8aIa9MBC7iP6rEp1PoZhJRh3YXjmSDjN9Uc9YlVkft4eJowatph93r7IPh7azWP5N8xW41FPA+fSWX04hCHrCIcL7PqnxRG/GvA+32ga97ql+mQptDge3qGAhr0y38g7ThLV/k2F1aDqmCVpdBiVbT24x9KeU+sNef0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FkQ9bk2A; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740049701;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DN4B67Rzb5ZccHJbDxzAn/tcklLewziqHZr7OFYX8jU=;
-	b=FkQ9bk2AuLs0vWYjGGMFl6Lj+vVHipDJNXzsfpR7qS2n8jL8M96eIdFpqZE0mkEsqBqrup
-	cXcIpwu3Kelk+l0cIb0cIlOSPBSR9iJueirwtjD9w41qDY85XqUVQ5MafO4G2AYBfQMMUO
-	sq+0vFTMJlrysK918r42sAWxc6fsiew=
+	s=arc-20240116; t=1740050173; c=relaxed/simple;
+	bh=Iqri3H4l7MINuskI1RcHgMhBsNlYFaxp53yd+z2TvQE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sVD5qzt4AM4to0yTZe2rxktXGiBI/DtNaYE3uI8dnfY6WGYUPp7kOgBtk/aNHhSmnUOMzk0pH0tRtGnGPyvpgN7CtiDZt4Ah65gyMv0a+05J4FOx1kscCIBk4W+HSzdG9zFZHrVgVCqN46tRqsU4KUQjJ0bSj0Qm5LSB//eZJPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b12PjNii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03C7C4CED1;
+	Thu, 20 Feb 2025 11:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740050173;
+	bh=Iqri3H4l7MINuskI1RcHgMhBsNlYFaxp53yd+z2TvQE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b12PjNiiGqku601OHJrDa/9YCDx0fJyQ7Bdp/ajH184yil9nFzdUdcDe5/ZyRh5m4
+	 gLzO1tSw8M34I0X9YAkX4dhc1vCz1nrdAgNhIe1DfvgV6tMcBNDCCvRobcS7IJ8oCf
+	 xPSDPzpE9ULLVTIqAFS3ItO8Dl3mn37LJ661h4LPDOBbJgCuS3qjUGJkbV3+SlCQXc
+	 Wn5OMkQryz1tLQUJHbJuI72OkPI2qc58tTceZiTUlwAAboJsgJAMlz2p7QHI8ZlV/Z
+	 sHQIak/D/jc2CZZWmMl5XCwrQ7mzhT3fKX5LFSRzky0lfYQAPQsieBjjPLv0FP4X7x
+	 gqLF2shVX1i9g==
+From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+To: gregkh@linuxfoundation.org
+Cc: linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	David Lin <dtwlin@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	greybus-dev@lists.linaro.org,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Johan Hovold <johan@kernel.org>,
+	linux-alpha@vger.kernel.org,
+	linux-staging@lists.linux.dev,
+	Matt Turner <mattst88@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	sparclinux@vger.kernel.org
+Subject: [PATCH 00/29] tty: cleanup no. 99
+Date: Thu, 20 Feb 2025 12:15:37 +0100
+Message-ID: <20250220111606.138045-1-jirislaby@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
-Subject: Re: [PATCH] net/mlx5: Use secs_to_jiffies() instead of
- msecs_to_jiffies()
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-In-Reply-To: <20250220071327.GL53094@unreal>
-Date: Thu, 20 Feb 2025 12:08:07 +0100
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Yevgeny Kliteynik <kliteyn@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>,
- Itamar Gozlan <igozlan@nvidia.com>,
- netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <9694B455-87B0-4A70-93C0-93FE77E3CD17@linux.dev>
-References: <20250219205012.28249-2-thorsten.blum@linux.dev>
- <48456fc0-7832-4df1-8177-4346f74d3ccc@intel.com>
- <20250220071327.GL53094@unreal>
-To: Leon Romanovsky <leon@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 20. Feb 2025, at 08:13, Leon Romanovsky wrote:
-> On Wed, Feb 19, 2025 at 03:45:02PM -0800, Jacob Keller wrote:
->> On 2/19/2025 12:49 PM, Thorsten Blum wrote:
->>> Use secs_to_jiffies() and simplify the code.
->>> 
->>> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
->> 
->> nit: this is a cleanup which should have the net-next prefix applied,
->> since this doesn't fix any user visible behavior.
->> 
->> Otherwise, seems like an ok change.
-> 
-> IMHO, completely useless change for old code. I can see a value in new
-> secs_to_jiffies() function for new code, but not for old code. I want
-> to believe that people who write kernel patches aware that 1000 msec
-> equal to 1 sec.
+Hi,
 
-Using secs_to_jiffies() is shorter and requires less cognitive load to
-read imo. Plus, it now fits within the preferred 80 columns limit.
+this is (again) a series of cleanup in tty. I am trying to rework
+tty+serial to avoid limitations of devices (so called NR_UART or
+tty_alloc_driver()'s first parameter). And the below popped up while
+crawling through the code. So this is only a prep cleanup.
 
-This "old code" was added in d74ee6e197a2c ("net/mlx5: HWS, set timeout
-on polling for completion") in January 2025.
+* many tty flags are now enums
+* many functions were improved for readability
+* quite a few unused or old code dropped
 
-Thanks,
-Thorsten
+In particular, the runtime behaviour of the kernel before and after the
+changes is supposed to be bug to bug compatible (except moxa's ioctl
+and ISA evils dropped). That is, noone should notice.
+
+Cc: Alex Elder <elder@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: David Lin <dtwlin@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: greybus-dev@lists.linaro.org
+Cc: "Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Johan Hovold <johan@kernel.org>
+Cc: linux-alpha@vger.kernel.org
+Cc: linux-staging@lists.linux.dev
+Cc: Matt Turner <mattst88@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Rob Herring <robh@kernel.org>
+Cc: sparclinux@vger.kernel.org
+
+Jiri Slaby (SUSE) (29):
+  tty: convert "TTY Struct Flags" to an enum
+  tty: audit: do not use N_TTY_BUF_SIZE
+  tty: caif: do not use N_TTY_BUF_SIZE
+  tty: move N_TTY_BUF_SIZE to n_tty
+  tty: n_tty: use uint for space returned by tty_write_room()
+  tty: n_tty: simplify process_output()
+  tty: n_tty: clean up process_output_block()
+  tty: n_tty: drop n_tty_trace()
+  tty: n_tty: extract n_tty_continue_cookie() from n_tty_read()
+  tty: n_tty: extract n_tty_wait_for_input()
+  tty: n_tty: move more_to_be_read to the end of n_tty_read()
+  tty: tty_driver: move TTY macros to the top
+  tty: tty_driver: convert "TTY Driver Flags" to an enum
+  tty: tty_driver: document both {,__}tty_alloc_driver() properly
+  tty: tty_driver: introduce TTY driver sub/types enums
+  tty: serdev: drop serdev_controller_ops::write_room()
+  tty: moxa: drop version dump to logs
+  tty: moxa: drop ISA support
+  tty: moxa: carve out special ioctls and extra tty_port
+  tty: srmcons: fix retval from srmcons_init()
+  tty: staging/greybus: pass tty_driver flags to tty_alloc_driver()
+  tty: sunsu: drop serial_{in,out}p()
+  tty: sunsu: remove unused serial_icr_read()
+  serial: remove redundant tty_port_link_device()
+  serial: pass struct uart_state to uart_line_info()
+  serial: 8250: use serial_in/out() helpers
+  serial: 8250_rsa: simplify rsa8250_{request/release}_resource()
+  serial: 8250_port: do not use goto for UPQ_NO_TXEN_TEST code flow
+  serial: 8250_port: simplify serial8250_request_std_resource()
+
+ Documentation/driver-api/tty/tty_driver.rst |   4 +-
+ Documentation/driver-api/tty/tty_struct.rst |   2 +-
+ arch/alpha/kernel/srmcons.c                 |  62 ++---
+ drivers/net/caif/caif_serial.c              |   2 +-
+ drivers/staging/greybus/uart.c              |   4 +-
+ drivers/tty/Kconfig                         |   2 +-
+ drivers/tty/moxa.c                          | 251 +-------------------
+ drivers/tty/n_tty.c                         | 212 ++++++++---------
+ drivers/tty/serdev/core.c                   |  11 -
+ drivers/tty/serdev/serdev-ttyport.c         |   9 -
+ drivers/tty/serial/8250/8250_dw.c           |  17 +-
+ drivers/tty/serial/8250/8250_fsl.c          |   8 +-
+ drivers/tty/serial/8250/8250_omap.c         |   2 +-
+ drivers/tty/serial/8250/8250_port.c         |  59 ++---
+ drivers/tty/serial/8250/8250_rsa.c          |  21 +-
+ drivers/tty/serial/serial_core.c            |   6 +-
+ drivers/tty/serial/sunsu.c                  | 178 ++++++--------
+ drivers/tty/tty_audit.c                     |  10 +-
+ drivers/tty/tty_io.c                        |   8 +-
+ include/linux/serdev.h                      |   6 -
+ include/linux/tty.h                         |  53 +++--
+ include/linux/tty_driver.h                  | 180 +++++++-------
+ 22 files changed, 410 insertions(+), 697 deletions(-)
+
+-- 
+2.48.1
+
 
