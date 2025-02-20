@@ -1,103 +1,90 @@
-Return-Path: <netdev+bounces-168139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA91A3DAEC
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:10:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86C40A3DAFB
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 14:13:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85AA318996CB
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 13:10:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 699571719FA
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 13:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0741F76A8;
-	Thu, 20 Feb 2025 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360201F76B9;
+	Thu, 20 Feb 2025 13:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T5uS8/qG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y8bh0hag"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA331F584A
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 13:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AA53C3C
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 13:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740057040; cv=none; b=L+PWn7Fxe8gR+tbYiY6CCygzsRlh+zmseiJ94uLUQB8zfWH/TbAjK++KDvOhWXhDFQB5yy/fQ5LzKrcSMGto/rhUJ263coiyWUoLMUv5Qlt76Opq4qXT0m+5Gu7Hnc6sok5qYbSdR7RUGRk3CaVmfhiRLWW2RcjpSM6cGVp27hE=
+	t=1740057201; cv=none; b=CSh9l+RXaZ2VtHfS9SPsEm3jQAoCy+RFBoNeZvjthLUPK4s0GveK8MScJTimNLZDQAsXZIp/KMlu6Gu2Fdn3NAsekVjJRfc3omKvx4EBrHdwuRvpofbnYNa1UYVntu9j10I2/xz63XNUXEjcW1lI2iNPreRhtEbG8hyWV5pao8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740057040; c=relaxed/simple;
-	bh=QYsSw+flWPb/XypP/4ps0OqqUsuT+gRfcujoFFzAAiM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=evzpjBOQRE/HDCieCA2p8yEcniqSLb/z9MwLUREgaf9oQam0Y1k4O6CsLgh2i0oxALBG73W7g+vX3WRc+4cMUCA8y460cXj32/MK1AZrRcru0o6xtzfXMdFIgA4fexA0WdYb75WUWHlxYcH7e5BhvVbxOXnyNe19PcPUth0p+38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T5uS8/qG; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e04064af07so9217a12.0
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 05:10:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740057037; x=1740661837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QYsSw+flWPb/XypP/4ps0OqqUsuT+gRfcujoFFzAAiM=;
-        b=T5uS8/qGz1CmrxX763gDPf3OIX9/4ZdRjxgJZbZWTYl6bLZCME5+RpNztHJhoSoj8V
-         1zgB7nhDVp/nMXU6avvtysEd2o4D/ZuhbK82496EUUJq4nO9Oa6MPgbdPFDemo8gySSq
-         vXutFAWvwiQ2XbfgWB7pQU00BLTWgcefhLp6s0LMQhRIjFU1sJ54QQ0zFXyj/X3vqCGQ
-         nRZhW2qnAUWr6HvCeEXDevn3YgtbF/4OfVLhh/0PxXN1p3l5SFLim37aAxugoTbP/zC1
-         EnM3Uepby/4dDOcLbdj+6RtJZx5IerJWPvGkg1OLNci7SL9FPgo9IpnPnomIDI4ecw5m
-         LIKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740057037; x=1740661837;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QYsSw+flWPb/XypP/4ps0OqqUsuT+gRfcujoFFzAAiM=;
-        b=FSuTNyIWmfBgBrkoayyvGM1QBRlWmMHiK30oFUwr2JmDVlc2qNTM7cs2zinkuNFYWQ
-         x290byAdLM6oKpndkaHMwXNPKy73GPZlLBkEYSr9qBXvEF9huNc+V6iR8ZniCYucgmnJ
-         VuHv12smslsarNyiZOj/UMn8AS3XZRFfFZTkw7CnRX2TQYUcDajjXtI6xjI7OrKMjp49
-         AIeEZGzNgLkNuc7cFPnAR1K8Zmz5lVGkY87EkHsR1z57D/nMBRWBjyBhMQ9Gcegm9O3y
-         dPkh5C2MqsXl0Pn1XGcqMOR4DWHmRg931/K1ONyzjB8dJHYSKbhRHkusCGwwsz90WYym
-         LSig==
-X-Forwarded-Encrypted: i=1; AJvYcCWKY2SLhI6Ml7FYNcIiqFhULfJ2pPLxukCBfx1Ws3qvMzTZGZgmoVFlIYXmXNEMaXUzLJ6eB1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9dDEVoyiiSnu8vIZAsdq17MuTOhD7Yz7fo4R6VgeUDDn2emMu
-	PRc4C/yDHbLQgsTW4KwOkEDSx9sarDp6WvfAawHAcxZMWBWpnAIdy2TJgv2hB9Shq8+aMqHCX5s
-	K91IPbpMBK263ndCkxjn6cKFVAQw+uJGs2EEd
-X-Gm-Gg: ASbGncuFhOeNwfNXf90bc2oCLvwvZ+wm1dmV6mKMQl2aquL9uDbSvnoWDqHeWr+bBKn
-	aWiPcU1JkH8y4hVXf3J0xP5EGd24BlGpRufLuiBpHWmdNcZ6ri+xfwI4PExlMPIVaHmX4Zsc5fm
-	23k5rcIPkcKvi1cubPorV38IACychplQ==
-X-Google-Smtp-Source: AGHT+IFQUimq4C64r7AXRpR94GstIGlhMvNAvLyciN0TAGSzjli3D56Lo1KaIwQaz8ozbfED2rjUEOtwjX1bACxhPvY=
-X-Received: by 2002:a05:6402:3488:b0:5de:4b81:d3fd with SMTP id
- 4fb4d7f45d1cf-5e0360a781cmr22502038a12.13.1740057036855; Thu, 20 Feb 2025
- 05:10:36 -0800 (PST)
+	s=arc-20240116; t=1740057201; c=relaxed/simple;
+	bh=kfrR8B+O35qz/zXE38aAnrq3gSnLI1V0kGwQVK9LXOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8LM5v3g6f916KaLsQOL8YdXZhLhxvyDRzrWegEx+y9HB9NofQxkAWMgKgXAZy4uObv0Cwn/19N6iJJSKkQm5S2a14YT45TAPUpbWli2xKioxWX94c+7cTqW7NFkJHcdzP3NheU1RBP4UJs5Wgvdk7av3AboXAG02EZB5MVeCAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y8bh0hag; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ECEBC4CED1;
+	Thu, 20 Feb 2025 13:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740057200;
+	bh=kfrR8B+O35qz/zXE38aAnrq3gSnLI1V0kGwQVK9LXOM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y8bh0hag/oeJyibPwalbyILGMWc5capJvTuVsZagKuxBiFUdaXwMfK4fIgxw6ZVME
+	 /9FZhC+NxCeCaM4Fdq4p8ySw7V9sIuUL8i3SNrhp+4wrgqL3zPPk8Mb3iZVb7P3Fle
+	 6YoBkb+waeif/e3UyVTaeRjAMnn/1kyrxvMNu5011f5B/Ua2o1antuoOo6kSWHre+C
+	 5Py5DPktXrxE7ge4158MV1y0WAQl2b0LF/fopldp0rrNJj/6L5TSLO7VjA9iEZR7e1
+	 12CoSz2bWUh2SGEvTEp+iznw0Wu9hLHcxB77qsmKr/TYsu3AL53savO4Bp9Nj9Dk51
+	 79brcgJBiQuEw==
+Date: Thu, 20 Feb 2025 13:13:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next 1/3] ice: redesign dpll sma/u.fl pins control
+Message-ID: <20250220131317.GV1615191@kernel.org>
+References: <20250207180254.549314-1-arkadiusz.kubalewski@intel.com>
+ <20250207180254.549314-2-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250220130334.3583331-1-nicolas.dichtel@6wind.com> <20250220130334.3583331-2-nicolas.dichtel@6wind.com>
-In-Reply-To: <20250220130334.3583331-2-nicolas.dichtel@6wind.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 20 Feb 2025 14:10:25 +0100
-X-Gm-Features: AWEUYZnvDrmz6WrdC3BpeEAy4esiyp5n_19tTqYxbq7z0e9bJLWLCahCCbEXlcA
-Message-ID: <CANn89iLkbgLNXZSrko0uW0XVkm+Y-9McU7cA6d0gioHBHwKB7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net: advertise 'netns local' property via netlink
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Ido Schimmel <idosch@idosch.org>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207180254.549314-2-arkadiusz.kubalewski@intel.com>
 
-On Thu, Feb 20, 2025 at 2:03=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Since commit 05c1280a2bcf ("netdev_features: convert NETIF_F_NETNS_LOCAL =
-to
-> dev->netns_local"), there is no way to see if the netns_local property is
-> set on a device. Let's add a netlink attribute to advertise it.
->
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
+On Fri, Feb 07, 2025 at 07:02:52PM +0100, Arkadiusz Kubalewski wrote:
+> DPLL-enabled E810 NIC driver provides user with list of input and output
+> pins. Hardware internal design impacts user control over SMA and U.FL
+> pins. Currently end-user view on those dpll pins doesn't provide any layer
+> of abstraction. On the hardware level SMA and U.FL pins are tied together
+> due to existence of direction control logic for each pair:
+> - SMA1 (bi-directional) and U.FL1 (only output)
+> - SMA2 (bi-directional) and U.FL2 (only input)
+> The user activity on each pin of the pair may impact the state of the
+> other.
+> 
+> Previously all the pins were provided to the user as is, without the
+> control over SMA pins direction.
+> 
+> Introduce a software controlled layer of abstraction over external board
+> pins, instead of providing the user with access to raw pins connected to
+> the dpll:
+> - new software controlled SMA and U.FL pins,
+> - callback operations directing user requests to corresponding hardware
+>   pins according to the runtime configuration,
+> - ability to control SMA pins direction.
+> 
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
