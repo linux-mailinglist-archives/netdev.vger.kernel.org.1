@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-168259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF07BA3E45E
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:58:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A621A3E467
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:00:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF393A1D6F
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85BD01627E3
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B500D26388C;
-	Thu, 20 Feb 2025 18:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65815265CC9;
+	Thu, 20 Feb 2025 18:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="c5twu1Ee"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A4P0ySsn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CFB265622
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B892A2638B6
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 18:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740077770; cv=none; b=TWYimRCM19tTI0lbVy4H3FX4uwz5ZvN2OoLI2XzP3IEBsN8iRSHz7madx7smgrdkWxMcOa5z+5lWyNvTByCCqKdr7whrEkSCXEtKDqYh+wGNzSkMjrSHq5HLodgEudf6JupHJtBWK8O76oC1GJiWaBSOcDqcI0nqO4hgFRaZtME=
+	t=1740077774; cv=none; b=MOAg4usnKohxZqEt9+q2C1x2D7ZSwtDCPVT4AZ1npdpyg2eNqxBbLRMTnZbx5DshqNgxReinFVwtj/ogDnK738VqnUdM6PKTyd9Xk5YRUAoEhreZ74BkCvQ/whs9fwKkm1lK2bUpVqOVFts2eZzTHL7ZmHn6YV38akXpjKmu+GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740077770; c=relaxed/simple;
-	bh=D8r3NMs/v/gdOgXckK137771Z7EmXwYtM9x6L549VTk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=AIui9ZRhXfIzsgJO7b0g8+rD6AG7nWDmqNrEPZjHKJZpzrHDwHi3hYUdfG9sFwqzw5u8aNHlGwCzl/4CoAuluVtCleNuq/BboIwgi/sL9dtWVIXRvRlWgazL0TqCOVopy9yPqLY8cxGmTbOoaA0rSrCYMswKqZ3dNByDQ2s1k/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=c5twu1Ee; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1740077774; c=relaxed/simple;
+	bh=TmVHhw+YyfHJXm1Tk11ATr1f5Ybq7UumTRqLxFLOUkE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=jzGgz3QRqgqP83Udyb5C56r8hW3mBLcNOvAqYxren5YTqkWVroJLRp1ZnC/m8/6V6uBHWQBN+5qAFCPYDCJa+d7k7nep27t2s/BcIS6QwQ8F4+CA0Ec4ELs5JjCFqBQU5dmUcpyMwmDfQHjj/Kh0cTdB4rIzURl2hO//6sBhxPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A4P0ySsn; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22185cddbffso35409825ad.1
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:56:08 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-220dc3831e3so37839195ad.0
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 10:56:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1740077768; x=1740682568; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1740077772; x=1740682572; darn=vger.kernel.org;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=DDGE3L4+QtgAAh6Ko802g9HGK0Xw8N2Rxx0aARspUp4=;
-        b=c5twu1Ee+b62oEfz88Cq4R02kV0MES30ivKaXpVXLT3NAdG1xyEMmWFAWiiMEmO5WL
-         jVlLE0KOMTbDgb3brE2VvDmzDP1CtXDijhn64CuzYCbRFBIlDl7Jwcf7+NpHAJ6gPiDj
-         w7a85qfRjusiAP5jKkBjUc/9FL2eLSInR+UdU=
+        bh=wbEO2ZvYX8S6gkbKt5XzFSL0VmDi/kPQc2XpzR/hKDw=;
+        b=A4P0ySsnPzFxVRD6vE8EOCLWwoe7fKSSyqjuK2KBBM8fHFuJlvZvkCwkT4sLlZhhxW
+         EU2ZjwDDw5SwLnwyhj3fF/AnYVUYH7b6h8NIlzUIGdQ/3h+j8vcNnFXA4+aruqTH1vyU
+         LpU52g45bPbV330Je7L38TcenQp0CKnUMKZ54=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740077768; x=1740682568;
+        d=1e100.net; s=20230601; t=1740077772; x=1740682572;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DDGE3L4+QtgAAh6Ko802g9HGK0Xw8N2Rxx0aARspUp4=;
-        b=TjDXtrxrfMgNl5Yz3Nf/1Zk2K6kuAQWnc+thYDfSDHhYUpxk3zKEaNL7hX/RT+A7dc
-         DDLlKzL6HlPfcFrXTQuBap7vCuMIM11gjTm80xBGfnOHqmVQwFDB3qZmrMOZQI74VKyx
-         T+Y11tAi93bkcrnk4AKSySzzYEqZ/C0QdAr/24Tjreuj4aobZtJzyPFkXloBtwASDr0s
-         8hFOgXiqyH+elJixsIWA4NLsL9qsNqmWaugQrXo8wFPKu0xL/jLEb0z/kcpAz7p4nPzy
-         +QU8g/wGoSx6FAXGPwCHm5a4MOGa6C0QJj47bLFWAUiB/VXxyR2HLpt32IYHWiOjTWgu
-         pfjw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuq1XWRrY+LUQD5g8IYQcywbRQrkHrAdVppwTeP4hVaRTR9+0P1IXbDcx3mqDFEcDovSpL5RM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5MxxaFphSkvWWRXlCDIXSqbPffybJx7ileNGpA9Z7TE/EcTDo
-	FPmHiuqVZ7MWZXURHnfNV69IgeYnB7NEkY2BTVD4RGA+l4ybZNBl6ajwbmcr1w==
-X-Gm-Gg: ASbGncvHGwCVUzWvPLsRYS+pAwYUXbqnII5247uGliSPMgp8DpvBo9hj5zqZoCWUOjq
-	M1cO4Io/HczPBvWCvkLipKTAi/0tVJZ3gwjlmAKv9Cgt7hXCI2o+qTA8Ma9ycYC+5hVE1Kk9e3F
-	f/5URJ9Z0WbNo2UpWJaIee2z9b3I7FDLLMoXlSd6nAtDtcl+NNFFJUwgonfAR7Jf2Ssq6ja4kgU
-	5kNNiAOsnm8yADPtqOTIfsorb7FxOzMf9me5ZV8lMZF2tm235c2P4XW+KT9mD8fbatrvLNKGOfw
-	2qmxHPIlDqzgo8U7LVEvy4+ujSQdybTJgwmKlC7NDZI/cDA/vNY9kMYlWjqcYsRl/peaGmc=
-X-Google-Smtp-Source: AGHT+IGk3I5xMJOQybBNubZesmP0ZDBZjg0y/axwJ+QSrgEcCl4h1AEI/eEbdqV5zZZFRZPg+G0BBQ==
-X-Received: by 2002:a05:6a21:6d88:b0:1e1:a789:1b4d with SMTP id adf61e73a8af0-1eef3d9f0cfmr321809637.15.1740077768126;
-        Thu, 20 Feb 2025 10:56:08 -0800 (PST)
+        bh=wbEO2ZvYX8S6gkbKt5XzFSL0VmDi/kPQc2XpzR/hKDw=;
+        b=Ac7Pj3KLEf1D+nsTO3OlzlDmdLCZIHCo7U+ozZgf4PnuVwPWQVfqud2oCwGotCizVs
+         EmcQmO6RwjABEnODTRDXa9JCXY9HyHgwsYLG9M9OpHMeYx8pa9dfvTUk0VS8y2D5gyJL
+         /tL5P8z96bOZDMn9777ufH+IAG1HhaJ2KXhBMBYIjfuGVdw21gBoKJevT47pfHDzcP5y
+         5oLFfPXVveoQfxad2ch/UyoMeNPuetky6R+TMroNL8Yvl3jrcWYB9L1Co86cu38guzWh
+         NeeduLFgBdYwe7KloaTmwrErPzawsaTUwroxLwbaJwReWcYGgDXLsy1xgBpBxVyDE90J
+         nzuw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWD3I0BynMfDP17NwFIHZMwBbRxqzlaCaO9Z+RtQWYLTfRklScI2R5X5UpDpgfMauKu6EgSHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUIkyxjkK7bSBKg9VPdx+YmldP0UifrvGb5HOJ5Chuwg7XgT3C
+	gALeeQNvYVKS+zj39nKE4oT63vPh3ydXVKXgcJANxGXz8+Kf6jV0luE7ZoR4BA==
+X-Gm-Gg: ASbGnctucvQ9rN22pNbpfuBra4w+A7D2yqxnuZr8AyJtAU2kKcHLiN+UU0xj4P83IKY
+	uqRi4nv4b+OT9c8FMZd+jRJtawLyUs2V2aAkxTMt7tgd+YCU5Z2RrELMfB/1CCLNmcBfZyS+mhP
+	l3IYD92mo/bhqrehEGh2Dwq2OHcpaCx4J6h9waya/0KdMoiHRRnpaUgI9XI0uoYbWoUCpQx/cbk
+	+5Q2EVPupPqe4faNPHeTAW1YD5TOuxQE2cgOdyGz205FVHCoBXYIN3XhzzBjnGxdKTkwfrgdGjQ
+	cJEMmiyPAkylARYdOKQXRzBxJtgz8fc4m3PJBRUfGid5iBoL4kJLirF34uq3Azxi/eoMVDc=
+X-Google-Smtp-Source: AGHT+IHvxObTMqiJriOaCFcBkp4iNsiG0ly710DfyEz61MF6mHwZNyTEkxPtzIfoqhMu9KW7oIb1mA==
+X-Received: by 2002:a05:6a20:7f9c:b0:1ee:a410:4aa5 with SMTP id adf61e73a8af0-1eef3dd0e8bmr314966637.17.1740077771979;
+        Thu, 20 Feb 2025 10:56:11 -0800 (PST)
 Received: from sxavier-dev.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-addee79a984sm9572262a12.32.2025.02.20.10.56.04
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-addee79a984sm9572262a12.32.2025.02.20.10.56.08
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Feb 2025 10:56:07 -0800 (PST)
+        Thu, 20 Feb 2025 10:56:11 -0800 (PST)
 From: Selvin Xavier <selvin.xavier@broadcom.com>
 To: leon@kernel.org,
 	jgg@ziepe.ca
@@ -80,9 +80,9 @@ Cc: linux-rdma@vger.kernel.org,
 	horms@kernel.org,
 	michael.chan@broadcom.com,
 	Selvin Xavier <selvin.xavier@broadcom.com>
-Subject: [PATCH rdma-next 5/9] bnxt_en: Introduce ULP coredump callbacks
-Date: Thu, 20 Feb 2025 10:34:52 -0800
-Message-Id: <1740076496-14227-6-git-send-email-selvin.xavier@broadcom.com>
+Subject: [PATCH rdma-next 6/9] RDMA/bnxt_re: Support the dump infrastructure
+Date: Thu, 20 Feb 2025 10:34:53 -0800
+Message-Id: <1740076496-14227-7-git-send-email-selvin.xavier@broadcom.com>
 X-Mailer: git-send-email 2.5.5
 In-Reply-To: <1740076496-14227-1-git-send-email-selvin.xavier@broadcom.com>
 References: <1740076496-14227-1-git-send-email-selvin.xavier@broadcom.com>
@@ -94,185 +94,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
 From: Michael Chan <michael.chan@broadcom.com>
 
-Add .ulp_get_dump_info() and .ulp_get_dump_data() callbacks to
-struct bnxt_ulp_ops.  When ethtool -w is invoked to get the coredump,
-these 2 callbacks to the bnxt_re auxbus driver will be called if
-they are populated by the bnxt_re driver.  The first callback gets
-the number of coredump segments and the size of each coredump
-segment.  The 2nd callback copies the coredump data for each segment.
+Adds the stubs for the debug dump in bnxt_re
+driver.
+Each segment of the dump data holds a particalar resource
+type. get_dump_info returns the number of segments and the size
+of each segments. Driver currently supports segments for
+QP/CQ/SRQ/MR and for the generic host logs.
+
+While taking the dump, get_dump_data will be invoked for each
+of the segments and bnxt_re driver returns the data associated
+with each segment.
 
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Selvin Xavier <selvin.xavier@broadcom.com>
 Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c | 12 ++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c      | 57 ++++++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h      | 22 +++++++++
- 3 files changed, 89 insertions(+), 2 deletions(-)
+ drivers/infiniband/hw/bnxt_re/main.c | 85 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 84 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-index 7236d8e..2106d0d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-@@ -14,6 +14,7 @@
- #include "bnxt.h"
- #include "bnxt_hwrm.h"
- #include "bnxt_coredump.h"
-+#include "bnxt_ulp.h"
- 
- static const u16 bnxt_bstore_to_seg_id[] = {
- 	[BNXT_CTX_QP]			= BNXT_CTX_MEM_SEG_QP,
-@@ -414,13 +415,20 @@ static int __bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf,
+diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
+index 6b5a169..76dd0fa 100644
+--- a/drivers/infiniband/hw/bnxt_re/main.c
++++ b/drivers/infiniband/hw/bnxt_re/main.c
+@@ -497,10 +497,93 @@ static void bnxt_re_start_irq(void *handle, struct bnxt_msix_entry *ent)
  	}
- 
- 	if (dump_type == BNXT_DUMP_DRIVER) {
--		u32 drv_len, segs = 0;
-+		u32 drv_len, drv_segs, segs = 0;
-+		void *drv_buf = NULL;
- 
- 		drv_len = bnxt_get_ctx_coredump(bp, buf, offset, &segs);
-+		drv_segs = segs;
-+		segs = 0;
-+		if (buf)
-+			drv_buf = buf + offset + drv_len;
-+		drv_len += bnxt_get_ulp_dump(bp, dump_type, drv_buf, &segs);
-+		drv_segs += segs;
- 		*dump_len += drv_len;
- 		offset += drv_len;
- 		if (buf)
--			coredump.total_segs += segs;
-+			coredump.total_segs += drv_segs;
- 		goto err;
- 	}
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index e4a7f37..6f640b2 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -25,6 +25,7 @@
- #include "bnxt.h"
- #include "bnxt_hwrm.h"
- #include "bnxt_ulp.h"
-+#include "bnxt_coredump.h"
- 
- static DEFINE_IDA(bnxt_aux_dev_ids);
- 
-@@ -393,6 +394,62 @@ void bnxt_register_async_events(struct bnxt_en_dev *edev,
  }
- EXPORT_SYMBOL(bnxt_register_async_events);
  
-+static void bnxt_ulp_fill_dump_hdr(struct bnxt *bp, void *buf, u32 seg_id,
-+				   u32 seg_len)
-+{
-+	struct bnxt_coredump_segment_hdr seg_hdr;
++#define BNXT_SEGMENT_ROCE	255
++#define BNXT_SEGMENT_QP_CTX	256
++#define BNXT_SEGMENT_SRQ_CTX	257
++#define BNXT_SEGMENT_CQ_CTX	258
++#define BNXT_SEGMENT_MR_CTX	270
 +
-+	bnxt_fill_coredump_seg_hdr(bp, &seg_hdr, NULL, seg_len, 0, 0, 0,
-+				   BNXT_DRV_COMP_ID, seg_id);
-+	memcpy(buf, &seg_hdr, sizeof(seg_hdr));
++static void bnxt_re_dump_ctx(struct bnxt_re_dev *rdev, u32 seg_id, void *buf,
++			     u32 buf_len)
++{
 +}
 +
-+u32 bnxt_get_ulp_dump(struct bnxt *bp, u32 dump_flag, void *buf, u32 *segs)
-+{
-+	struct bnxt_en_dev *edev = bp->edev;
-+	struct bnxt_ulp_dump *dump;
-+	struct bnxt_ulp_ops *ops;
-+	struct bnxt_ulp *ulp;
-+	u32 i, dump_len = 0;
-+
-+	*segs = 0;
-+	if (!edev || !bnxt_ulp_registered(edev))
-+		return 0;
-+
-+	ulp = edev->ulp_tbl;
-+	ops = rtnl_dereference(ulp->ulp_ops);
-+	if (!ops || !ops->ulp_get_dump_info || !ops->ulp_get_dump_data)
-+		return 0;
-+
-+	dump = &ulp->ulp_dump;
-+	if (!buf) {
-+		memset(dump, 0, sizeof(*dump));
-+		ops->ulp_get_dump_info(ulp->handle, dump_flag, dump);
-+		if (dump->segs > BNXT_ULP_MAX_DUMP_SEGS)
-+			return 0;
-+		for (i = 0; i < dump->segs; i++) {
-+			dump_len += dump->seg_tbl[i].seg_len;
-+			dump_len += BNXT_SEG_HDR_LEN;
-+		}
-+	} else {
-+		for (i = 0; i < dump->segs; i++) {
-+			struct bnxt_ulp_dump_tbl *tbl = &dump->seg_tbl[i];
-+			u32 seg_len = tbl->seg_len;
-+			u32 seg_id = tbl->seg_id;
-+
-+			bnxt_ulp_fill_dump_hdr(bp, buf, seg_id, seg_len);
-+			buf += BNXT_SEG_HDR_LEN;
-+			dump_len += BNXT_SEG_HDR_LEN;
-+			ops->ulp_get_dump_data(ulp->handle, seg_id, buf,
-+					       seg_len);
-+			buf += seg_len;
-+			dump_len += seg_len;
-+		}
-+	}
-+	*segs = dump->segs;
-+	return dump_len;
-+}
-+
- void bnxt_rdma_aux_device_uninit(struct bnxt *bp)
- {
- 	struct bnxt_aux_priv *aux_priv;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-index 7fa3b8d..9298589 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-@@ -29,11 +29,31 @@ struct bnxt_msix_entry {
- 	u32	db_offset;
- };
- 
-+#define BNXT_ULP_MAX_DUMP_SEGS	8
-+
-+/**
-+ * struct bnxt_ulp_dump - bnxt ULP aux device coredump info
-+ * @segs:	number of coredump segments with info in the seg_tbl
-+ * @seg_tbl:	coredump segment table
-+ * @seg_tbl.seg_id:	coredump segment ID
-+ * @seg_tbl.seg_len:	coredump segment len
++/* bnxt_re_snapdump - Collect RoCE debug data for coredump.
++ * @rdev	-   rdma device instance
++ * @buf		-	Pointer to dump buffer
++ * @buf_len	-	Buffer length
++ *
++ * This function will dump RoCE debug data to the coredump.
++ *
++ * Returns: Nothing
++ *
 + */
-+struct bnxt_ulp_dump {
-+	u32	segs;
-+	struct bnxt_ulp_dump_tbl {
-+		u32	seg_id;
-+		u32	seg_len;
-+	} seg_tbl[BNXT_ULP_MAX_DUMP_SEGS];
-+};
++static void bnxt_re_snapdump(struct bnxt_re_dev *rdev, void *buf, u32 buf_len)
++{
++}
 +
- struct bnxt_ulp_ops {
- 	/* async_notifier() cannot sleep (in BH context) */
- 	void (*ulp_async_notifier)(void *, struct hwrm_async_event_cmpl *);
- 	void (*ulp_irq_stop)(void *, bool);
- 	void (*ulp_irq_restart)(void *, struct bnxt_msix_entry *);
-+	void (*ulp_get_dump_info)(void *handle, u32 dump_flags,
-+				  struct bnxt_ulp_dump *dump);
-+	void (*ulp_get_dump_data)(void *handle, u32 seg_id, void *buf, u32 len);
++#define BNXT_RE_TRACE_DUMP_SIZE	0x2000000
++
++/* bnxt_re_get_dump_info - ULP callback from L2 driver to collect dump info
++ * @handle	- en_dev information. L2 and RoCE device information
++ * @dump_flags	- ethtool dump flags
++ * @dump	- ulp structure containing all coredump segment info
++ *
++ * This function is the callback from the L2 driver to provide the list of
++ * dump segments for the ethtool coredump.
++ *
++ * Returns: Nothing
++ *
++ */
++static void bnxt_re_get_dump_info(void *handle, u32 dump_flags,
++				  struct bnxt_ulp_dump *dump)
++{
++	struct bnxt_re_en_dev_info *en_info = auxiliary_get_drvdata(handle);
++	struct bnxt_ulp_dump_tbl *tbl = dump->seg_tbl;
++	struct bnxt_re_dev *rdev = en_info->rdev;
++
++	dump->segs = 5;
++	tbl[0].seg_id = BNXT_SEGMENT_QP_CTX;
++	tbl[0].seg_len = rdev->rcfw.qp_ctxm_size * BNXT_RE_MAX_QDUMP_ENTRIES;
++	tbl[1].seg_id = BNXT_SEGMENT_CQ_CTX;
++	tbl[1].seg_len = rdev->rcfw.cq_ctxm_size * BNXT_RE_MAX_QDUMP_ENTRIES;
++	tbl[2].seg_id = BNXT_SEGMENT_MR_CTX;
++	tbl[2].seg_len = rdev->rcfw.mrw_ctxm_size * BNXT_RE_MAX_QDUMP_ENTRIES;
++	tbl[3].seg_id = BNXT_SEGMENT_SRQ_CTX;
++	tbl[3].seg_len = rdev->rcfw.srq_ctxm_size * BNXT_RE_MAX_QDUMP_ENTRIES;
++	tbl[4].seg_id = BNXT_SEGMENT_ROCE;
++	tbl[4].seg_len = BNXT_RE_TRACE_DUMP_SIZE;
++}
++
++/* bnxt_re_get_dump_data - ULP callback from L2 driver to collect dump data
++ * @handle	- en_dev information. L2 and RoCE device information
++ * @seg_id	- segment ID of the dump
++ * @buf		- dump buffer pointer
++ * @len		- length of the buffer
++ *
++ * This function is the callback from the L2 driver to fill the buffer with
++ * coredump data for each segment.
++ *
++ * Returns: Nothing
++ *
++ */
++static void bnxt_re_get_dump_data(void *handle, u32 seg_id, void *buf, u32 len)
++{
++	struct bnxt_re_en_dev_info *en_info = auxiliary_get_drvdata(handle);
++	struct bnxt_re_dev *rdev = en_info->rdev;
++
++	if (seg_id == BNXT_SEGMENT_ROCE)
++		return bnxt_re_snapdump(rdev, buf, len);
++
++	bnxt_re_dump_ctx(rdev, seg_id, buf, len);
++}
++
+ static struct bnxt_ulp_ops bnxt_re_ulp_ops = {
+ 	.ulp_async_notifier = bnxt_re_async_notifier,
+ 	.ulp_irq_stop = bnxt_re_stop_irq,
+-	.ulp_irq_restart = bnxt_re_start_irq
++	.ulp_irq_restart = bnxt_re_start_irq,
++	.ulp_get_dump_info = bnxt_re_get_dump_info,
++	.ulp_get_dump_data = bnxt_re_get_dump_data,
  };
  
- struct bnxt_fw_msg {
-@@ -51,6 +71,7 @@ struct bnxt_ulp {
- 	u16		max_async_event_id;
- 	u16		msix_requested;
- 	atomic_t	ref_count;
-+	struct bnxt_ulp_dump	ulp_dump;
- };
- 
- struct bnxt_en_dev {
-@@ -119,6 +140,7 @@ void bnxt_ulp_start(struct bnxt *bp, int err);
- void bnxt_ulp_sriov_cfg(struct bnxt *bp, int num_vfs);
- void bnxt_ulp_irq_stop(struct bnxt *bp);
- void bnxt_ulp_irq_restart(struct bnxt *bp, int err);
-+u32 bnxt_get_ulp_dump(struct bnxt *bp, u32 dump_flag, void *buf, u32 *segs);
- void bnxt_ulp_async_events(struct bnxt *bp, struct hwrm_async_event_cmpl *cmpl);
- void bnxt_rdma_aux_device_uninit(struct bnxt *bp);
- void bnxt_rdma_aux_device_del(struct bnxt *bp);
+ /* RoCE -> Net driver */
 -- 
 2.5.5
 
