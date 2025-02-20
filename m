@@ -1,191 +1,135 @@
-Return-Path: <netdev+bounces-168279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B364A3E624
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 21:55:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA0AA3E629
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 21:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C680842272A
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:55:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F047F3BEA2F
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F0026461B;
-	Thu, 20 Feb 2025 20:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189EC214237;
+	Thu, 20 Feb 2025 20:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="1dXXBJPK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXNz1nBK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EDD213E7C
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 20:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527D91F666B;
+	Thu, 20 Feb 2025 20:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740084899; cv=none; b=fT/F65Rl0lkmYyfv9c4GffYHpYY2gNMQF6eReBsujLqrPwvooSVfI+tmjJsoJKOLT/JXHGH0qKK6GFMvW12vbkukodNM3x3GwGJV6vHmOCY31U9aFpDby/pY50SIa6vzezcKVWmH6irOcrq/zaSFhoQ3AQ5saMCuE+fEYlm7z9c=
+	t=1740085035; cv=none; b=YEjM3671s33hOhLTrHQFqjG8aeVzI9/OSYeUMAkqe31QwTZ+H7aHpxRR6x6hAufq//vPzTL7Vlukx/2W8mgnkax0gQmj2kQv0DzdbuaI0D+VH/Aj+dVkIVBm1TQ0Nhsb0CgBlcjwx4fKB+fSwUOToFDevQJegPctxtq37LCN2oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740084899; c=relaxed/simple;
-	bh=Xc6o9obrZeidO3IrZs20EkZMwxxHvxTSWqEyw4C1voI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LUfjoClW/qdemcC8PLUZNHywFP9NoiPbF9Sy157w7eEPa8NXYitj4iE05s+LfzNlm2IBfHrGJcJxqbqNSPyL/HXd58z+KPnQUDIOMJza73ps6TNvI3gGL7/j54wYcZ+tZQ0CxZ+dowYvfRGbM5srYzOBxjcPuKCFsLwwfFUTMcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=1dXXBJPK; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7272dae0604so720978a34.1
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 12:54:56 -0800 (PST)
+	s=arc-20240116; t=1740085035; c=relaxed/simple;
+	bh=dlZNfarQey9h0/TyxX8JMP4ofEsYAogngKHqVFHdG+k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bf+Ye//yFNbuqaYSoKzUmdVjYqy74KG+WzZVbrWi27zO2AvMFrNkHqbYUttuzkytM2z3FsUQXAe7T8JkdcEkZ1mI8xX6mEu1TbSzFZu8rUdnFYqvSqSVXGDZs4/tBxwLnXGmUCGWgG2hVu6bASmXQFQ5g3qn0Xc/JvK29i+yYjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXNz1nBK; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30761be8fa8so14490501fa.2;
+        Thu, 20 Feb 2025 12:57:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1740084895; x=1740689695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lmfqNhipvTzpaPHouDLPUPBFfenRqD8FhVYBJFNu3b0=;
-        b=1dXXBJPKyl79MFL5kY+SZTVMp8uVM+kote9OOwmFCgKZymBx6jdSxG8PDQiRLbSRA8
-         tH+rTa1uqbAqzck8hq68ndXav2GgvFsjPdcV3XtjmJkCwuL2xLawOFMQswMJpB0a/67a
-         Zba8pUzG4LM8ucZ3o4Z4NM0lGhYGAnfbrqjeR2H5p4duEGR3wfJZdqEwPeymH7TMOR+y
-         sDk+n/NvSTlK/+2CYwbjl83wPxNd1wGvgyWbuAilVBCYBXDjFdxsa+mIEPU9pmahYppL
-         f1HdT8HaJPAtIZpPTNwwJHTQluH/ByMUCFdOOgB3wV+bKts9xv6E254vB+tiTdxv3tm5
-         08uA==
+        d=gmail.com; s=20230601; t=1740085031; x=1740689831; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AwmANW11KcJ+o8GEIBk1sW/g+43on2pUAfhOGICBmhk=;
+        b=fXNz1nBKcqu02fLNmjJBQOu3o8+iDqjrdz5Pwjzevn3paPhBYacIYAUDfmNQ24DwYy
+         G5ul13no4nNuTRkGShF6k/Zo/QX0ktCYJt6D2WrgGae+SZBz2nf3bClNkebUrM0pMvH3
+         rcfPz7Tn13a7dTKQKgZALfYuAor4n54n+qMCaPpnWidsQon0pJWJoyykObM72w7P3e5+
+         BOBTSKRfbwDvPpm13qcGLX3skKCpt6tzC2X6Rdl24bkWIpfFu90hz1B8oc7Ka8r8MuHl
+         9CG/mu6ciz0cWqfqM+zOiiZOVxXSGFJUKaqfc2u8yElYH8IzOgsRHUoVGJo0H6pSJiRb
+         jppQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740084895; x=1740689695;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lmfqNhipvTzpaPHouDLPUPBFfenRqD8FhVYBJFNu3b0=;
-        b=oftXHuhst7SkBez3oB79r1tYHl9vDOQ6oCvgzxhpRPhI4Qf5Asd5a97mOr41fFiUr2
-         JOZVhH2Ke2uzrCvz9iC+LdAq6zqO3rREVRZbiJ/pa8Q99fTlxQqHEkTL/JCTxUdrVeLK
-         k4PBK7NBuNE8nUvJO3KUrsuCYoiMKU76gyi6Vhh2Zqnf7gyibRSgGE1aGQknpRvVaDKV
-         bmUnggkqKiqSo65DeUUkYG9fxSO7tuK43ZA4crExWkqxIIo4neTizc81TsfxQGlQXstg
-         lpzjvkC7nmaPueK6821CWm3u7v1wpYCkv0I/ZSxOBNgJmRZHtUqnFPsYshfyJhQH392a
-         fvQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrRko5k2ms1bYG7zOcvC5/ymvVvMGtR+KzzIv6cm0EW0uTdbELMK0xs+1HBycw3qxG4HpOiYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUMeJesMi+gLteiqzCphLOEA6dd4TUT63/2PfozIVpemkdDCXR
-	FLeILXaN7WqhVV+6PNhgMLpdyLixz8O7OiqNiCS2VusyHIg9kbaRSg2IFrBV6tQ=
-X-Gm-Gg: ASbGnct6B7f98cA2hKbeCVlb8AnnkgQjyGVNoxdWpynFuovSgNnH7EkRbSt3S/hii4R
-	H+JLYRkWJLwgEk3VpFDr63NVGtKNJE5n06RUyln/jIU4J6GlphlJRUHz5Wo9eyf9DksDqW3aeeR
-	pSEYYgFTjf5kpBWdjBFSVjcJNanx6mN+4YhXvKpQhcHjJ+ceNG0GDclDz+pBmMNuXTtK4UWL0IC
-	0ffIFRiA8Rv3gwLlVaCNgO6dVjWwBxYTiflH/x8K8Us08boS51P97agY4CljAf54GU6o/khlP/s
-	wJ/Ts4/bSdBRp5O40DnKvx0pcV3aDm+YBpQAu5S+d2ZvXkGUOSDp
-X-Google-Smtp-Source: AGHT+IF3mi4w+ioATe/neRX31NhU+G5fVnUO+U3AY+NTTkR/32/joj3J25iUisGaUZnzV5dytcgeCw==
-X-Received: by 2002:a05:6830:3817:b0:727:4439:2079 with SMTP id 46e09a7af769-7274c563e6dmr324973a34.17.1740084895336;
-        Thu, 20 Feb 2025 12:54:55 -0800 (PST)
-Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7272a3751e0sm2223640a34.58.2025.02.20.12.54.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2025 12:54:54 -0800 (PST)
-Message-ID: <4052fd7b-dd8c-4a5a-8f82-dd515de14d20@baylibre.com>
-Date: Thu, 20 Feb 2025 14:54:53 -0600
+        d=1e100.net; s=20230601; t=1740085031; x=1740689831;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AwmANW11KcJ+o8GEIBk1sW/g+43on2pUAfhOGICBmhk=;
+        b=lsv+Puoefjmdih0t7w3r0UquanF4josfKo5yT4b+jYu6wMzgqdEg2z+0dakBntVh5M
+         LXEfUJGKvqFsfKG3BF9T/iqskwTaqhhtQ3B/EmUuJeyMJnrqIUEbTRRGfEBy89snco6P
+         BgFo07lxmpN7+KxicxHk3kChz/7SGrU7f+rbmnr/kMgM8tZbBmzvXiW0uBQLMlN85e8L
+         RIvFoH48/pV7gsbMmUPuRZfhOH/L9BfzO00xvSsEJD3Vn1GkEoB5VXHauR50vSHn5F2S
+         Obgvf2n5WLiOz1Ysm9l0WGSqdXxAhAEKI2gQ1qEemzYMMgUakuBS5fyQvkNLIBD66PhF
+         80LA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd6dHhjW0MRnC5OTWJcxeQi5DuWtiRbrLE+q6Cl4o3VksRykgKngIlBdym5t9NB6zQafiWQtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWPt8VplO9rKtCr/SMhjsGcs5RMtSPRwaWF45G0pJOZhfv6kKW
+	YTacRhbJ9EaZ+C6Q1Z1qJQHYnZVqDzq21LC+m1U+TE/RVI35he7m2bsmh5JnrnsWTresXJsH77t
+	GbKBVE5ZT8nvfTgHgQDDnPutsIoq6Dv3oNGg=
+X-Gm-Gg: ASbGncvlRfxrIcRfMSRGszWsxCZcyRKvfLIHmS08lfUfx7A6LwIdLA0YZRFYSleEU5b
+	zjA+Ry8J8WMcdFY8sI3CIjdnkLYD4vNZsJJBDvf8GU0Y09QUbswBT4nNBdIrv81CG4gzjgss=
+X-Google-Smtp-Source: AGHT+IHjKlzi4inFbnRyYsAxgjJ5CEHo4alCTy1GdaEVU9lgdOJ+LExmaprvddP8a8hLPsV48bltQVkazwwifdohhVw=
+X-Received: by 2002:a05:651c:1512:b0:309:1d34:1089 with SMTP id
+ 38308e7fff4ca-30a59777b2amr3014411fa.0.1740085031086; Thu, 20 Feb 2025
+ 12:57:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/15] iio: resolver: ad2s1210: use bitmap_write
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Lars-Peter Clausen <lars@metafoo.de>,
- Michael Hennerich <Michael.Hennerich@analog.com>,
- Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
- <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
- <20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
-Content-Language: en-US
-From: David Lechner <dlechner@baylibre.com>
-In-Reply-To: <20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250220202402.1986578-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250220202402.1986578-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Feb 2025 15:56:58 -0500
+X-Gm-Features: AWEUYZljrNKvrUtsOJQuYpVBKifIK_icaUHFVaCZtN1qRCzToO30gBDQg7KmiMI
+Message-ID: <CABBYNZJqMOhbVvJEKMOAvQOv2_3NnJW2VPCd5rwvGck5Bscecw@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2025-02-20
+To: davem@davemloft.net, kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/10/25 4:33 PM, David Lechner wrote:
-> Replace bitmap array access with bitmap_write.
-> 
-> Accessing the bitmap array directly is not recommended and now there is
-> a helper function that can be used.
-> 
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: David Lechner <dlechner@baylibre.com>
-> ---
->  drivers/iio/resolver/ad2s1210.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/iio/resolver/ad2s1210.c b/drivers/iio/resolver/ad2s1210.c
-> index 7f18df790157f1e411fb70de193a49f0677c999f..04879e6d538bce664469c5f6759d8b1cedea16e9 100644
-> --- a/drivers/iio/resolver/ad2s1210.c
-> +++ b/drivers/iio/resolver/ad2s1210.c
-> @@ -46,6 +46,7 @@
->   */
->  
->  #include <linux/bitfield.h>
-> +#include <linux/bitmap.h>
->  #include <linux/bits.h>
->  #include <linux/cleanup.h>
->  #include <linux/clk.h>
-> @@ -180,7 +181,7 @@ static int ad2s1210_set_mode(struct ad2s1210_state *st, enum ad2s1210_mode mode)
->  	if (!gpios)
->  		return mode == st->fixed_mode ? 0 : -EOPNOTSUPP;
->  
-> -	bitmap[0] = mode;
-> +	bitmap_write(bitmap, mode, 0, 2);
->  
->  	return gpiod_multi_set_value_cansleep(gpios, bitmap);
->  }
-> @@ -1470,7 +1471,7 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
->  			return dev_err_probe(dev, -EINVAL,
->  				      "requires exactly 2 resolution-gpios\n");
->  
-> -		bitmap[0] = st->resolution;
-> +		bitmap_write(bitmap, st->resolution, 0, 2);
->  
->  		ret = gpiod_multi_set_value_cansleep(resolution_gpios, bitmap);
->  		if (ret < 0)
-> 
+Hi,
 
-There is actually a bug here pointed out in a similar patch. bitmap_write()
-only modifies the bitmap, so this introduces an unintialized use bug. [1]
-Here, we only use the bits that we set, so runtime behavior would not actually
-be buggy but still best to fully initialize the memory.
+On Thu, Feb 20, 2025 at 3:24=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> The following changes since commit dd3188ddc4c49cb234b82439693121d2c1c69c=
+38:
+>
+>   Merge branch 'net-remove-the-single-page-frag-cache-for-good' (2025-02-=
+20 10:53:32 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git t=
+ags/for-net-2025-02-20
+>
+> for you to fetch changes up to fe476133a67a15bbe8c1357209e31b8d9a8e00c1:
+>
+>   Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO (2025-02-2=
+0 13:25:13 -0500)
+>
+> ----------------------------------------------------------------
+> bluetooth pull request for net:
+>
+>  - btusb: Always allow SCO packets for user channel
+>  - L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+>  - hci_core: Enable buffer flow control for SCO/eSCO
+>
+> ----------------------------------------------------------------
+> Hsin-chen Chuang (1):
+>       Bluetooth: Always allow SCO packets for user channel
+>
+> Luiz Augusto von Dentz (2):
+>       Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+>       Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
+>
+>  drivers/bluetooth/btusb.c  | 6 ++++--
+>  net/bluetooth/hci_core.c   | 2 ++
+>  net/bluetooth/l2cap_core.c | 9 +++++++--
+>  3 files changed, 13 insertions(+), 4 deletions(-)
 
-I'm a bit surprised that my local compiler and iio/testing both didn't catch that
-since GCC 14 caught it in the other driver.
+Please hold on pulling these changes, there is actually a problem with
+Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO, I will
+send a new pull once that is resolved.
 
-[1]: https://lore.kernel.org/linux-gpio/20250217132152.29d86d6c@jic23-huawei/T/#m3163d2c5db5b7376504d8ad6f23716f1119de761
-
-The fix is simple, we can zero-initialize the bitmap.
-
-diff --git a/drivers/iio/resolver/ad2s1210.c b/drivers/iio/resolver/ad2s1210.c
-index 04879e6d538b..ab860cedecd1 100644
---- a/drivers/iio/resolver/ad2s1210.c
-+++ b/drivers/iio/resolver/ad2s1210.c
-@@ -176,7 +176,7 @@ struct ad2s1210_state {
- static int ad2s1210_set_mode(struct ad2s1210_state *st, enum ad2s1210_mode mode)
- {
- 	struct gpio_descs *gpios = st->mode_gpios;
--	DECLARE_BITMAP(bitmap, 2);
-+	DECLARE_BITMAP(bitmap, 2) = { };
- 
- 	if (!gpios)
- 		return mode == st->fixed_mode ? 0 : -EOPNOTSUPP;
-@@ -1427,7 +1427,7 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
- 	struct device *dev = &st->sdev->dev;
- 	struct gpio_descs *resolution_gpios;
- 	struct gpio_desc *reset_gpio;
--	DECLARE_BITMAP(bitmap, 2);
-+	DECLARE_BITMAP(bitmap, 2) = { };
- 	int ret;
- 
- 	/* should not be sampling on startup */
-
+--=20
+Luiz Augusto von Dentz
 
