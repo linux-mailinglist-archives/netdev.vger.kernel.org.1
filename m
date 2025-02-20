@@ -1,130 +1,221 @@
-Return-Path: <netdev+bounces-168264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6284A3E4A7
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:04:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF88A3E4C6
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 20:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 998727A73CB
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4498702CD9
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 19:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816B3263F25;
-	Thu, 20 Feb 2025 19:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80CD24BCFE;
+	Thu, 20 Feb 2025 19:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VU2r/8Tv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewzv8ieo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E0A263897;
-	Thu, 20 Feb 2025 19:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4C21F4E47;
+	Thu, 20 Feb 2025 19:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740078073; cv=none; b=qVIrxUfkf+1BcwYiS4hguHKgt2DTAgrthHWNnTsv1Q3DRbeb6LdUXkPvrMRiu/xlZig0OZ2A+v11U5QbGqa9a9nEWKjaDXBzxEEJDHJRbE1D89RpQgpj1rl0QaNPaUDkVYnIA7MDhx5by4M/RQZAlrM2jNyDooR4IU80MWo9JXo=
+	t=1740078601; cv=none; b=k/ThvX8WqLp9NHTMT9fHwbMhnXX8plkHJ/MibhLjXAQLiaB9urWPx3QgnNRiTxf1p9wDyC26hwU/GVdyZ+N6S4zCnPrksD7Pl9lcZ1QN/OHc4HWBJzf2UtSAfzftiXCXr6Gh3mcMldNtM+x7AQnmXQzCu6+qhcAfESPo8LncJ1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740078073; c=relaxed/simple;
-	bh=3eSbTSY6gzid17O8YvJVmqL/qDONChvMx36LySAdg9w=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=iqRBv9XgyN7QlBQonwPyWM8Aqsl9DSasAcnc9h9TtuaLv/OvdmMi99Dc1ibNxC+O7ap1DcXZ5apz1BKL99jFkp+Mv/ZwH5kW6rVgtCx9+bVEQybgvKcpt5sKDDTU3mq7xqU0/uSL4bfQCMVR7pXksRtvTHPfZcRd62jwcw+cCvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VU2r/8Tv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93E7BC4CED1;
-	Thu, 20 Feb 2025 19:01:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740078072;
-	bh=3eSbTSY6gzid17O8YvJVmqL/qDONChvMx36LySAdg9w=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=VU2r/8TvTX1NZqulGBu9moXAsMcewLzpFHhx0lUz9lSfxHvaIu5RKl7UoxkyW0r6v
-	 vvFgxr0v3sPzsol4Q16uMZdWHd80wDDTuCg427w1SjWtcu9P0hW7gU1SCcqL4fN4Kl
-	 qc0wOfNrbGkDoecAUODHsjql+OzcMbp8djOrSQ2ULglyrUtefF3oGao10PER8DRznr
-	 jX7OmAWhSyEcZAkHOxRE97hd8GTV41ZnlPV+CqSyctqFWrlWEJPXshQ6q6XwURbhfO
-	 sl8tG0RG/kgC2TmSjvXu0RTvQl63Ff9XlYuwZQ8c37CPBYPDWWEegUfKjdmAgpRzAC
-	 m9c8XJpOoeehw==
-Date: Thu, 20 Feb 2025 13:01:11 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1740078601; c=relaxed/simple;
+	bh=mpA/MrEeSlFfQy/SUQZrdZ86KKOSDip+BWmaXv9pjDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Poli8oaH7fQ6KbUlaxC1j0V1utP++VxYvELgUrABGpux27uatG3iVXls4rWFM8M3Kjm/R5MCCvrklAuKLcFVHWY07gBoy5aR4vfLvQftvWQkyNhoHvXRZ0XnVZHB4MmQGMlAQBKq9SmCD9BJO++M0++YpxadgVNnEyiVIgmN7Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewzv8ieo; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-220dc3831e3so38018775ad.0;
+        Thu, 20 Feb 2025 11:09:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740078599; x=1740683399; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rQV/ZoI7XcCPA75+erkDe6R94FlXLvLV8fokf9ogYZQ=;
+        b=ewzv8ieo4Vv1N1dc1o9/gFFPozRkVWRodj5+F2bKZ7mLB4htZbhVjji6njRS7xaT5l
+         4m9FjQZKG5NZCLx4S+oTcPwstlJrvSyxRZtuJ0ZBP2uJwYgVm4HLetw9M+REZZVq7kpi
+         lE+M0ykL4hsOpwXIDpPhYK41WM4dbYywQwkxaMmOWe6nL9Wwbc8nFEw1sfmBTq2wq337
+         Mi3DNv+RIPrg2C5NiXVmShXGFGx8tHlrPsXqh+vL9TOoZFoj223XqAXqhPjR1EOkKMCA
+         qZA6W1LfpS8T/jv+ELMAZcgK5iUhryE8gY8G1vSYkBXSysa+C3Lgl9beiwodoiignnjL
+         KPVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740078599; x=1740683399;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rQV/ZoI7XcCPA75+erkDe6R94FlXLvLV8fokf9ogYZQ=;
+        b=siIAVdnETVVJv4TzDUEsiHRMDNwrnKiRX4uU/YbW/R0wCs+wuCPcbayPBRurWPUOAn
+         ZED9VS+jZ1DmOhvh3UsVJFooPajPIjI+37ZeFfAXskjIZtsE0TOh2iEx+eu0r7O6xj1b
+         HdE1LiLcT0z/6RyEnieyEU4+iZqHevigujhhXKyezlayfrytrxNhnJzvuViEz7d//RPt
+         ErgMeVU5Lk1hCaKyRqPPAvxiuCGmw5ZoIC+mXAUrt5qpADatLr5PEb0bNlSgIAG7/5Xy
+         fEDQg7Y663mvPGDrf/5cZQbruwoASTGo024JVJFxObIig5kE2h6wiWIFh5a+3HUs4E8g
+         DvJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXifdeXGlbIoCYbasXfZK9XxPUrWTWJbt8TZb0WLi5O1OoGNL1B/B09ORviSY6dF163ngTP2owevfe@vger.kernel.org, AJvYcCVwwULCxjMpB/QSRVk7NFfC73V55cFe2g2QdoxWKA2cBCf0Ht1TREhSxiPE/DGq1Z22shY2yFv+i0CumdrIKFju@vger.kernel.org, AJvYcCWWJtoikBTzuoiGGNjPtjCC54VY+waLYkMN1HuLUgu5orkHqPzOSRo2MH+Zp/hOYwhSr41Gq45Rw9b65Buk@vger.kernel.org, AJvYcCX7LyTZHaf1pxd5wOY+moMR+E/E+/HFHFKBDAtd16fYW73sBFdpNCQSbBysasRMIr4tlmM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlCYm65llLXklFZ1zRdG5YWNMMLo5AqrR0lqKR3Q5mxzZU9D73
+	Q2YlUmY82L9XghFoovfQpw50kUF1EViBt7kWFXUConEf5A1OS68=
+X-Gm-Gg: ASbGncvh04sqJy2yZfLMc8ifeV8Qw73jioO49DNWPaOND/YjH4cXYOLhansApdu0o55
+	1C+TjWiJi9y6JMk0zUHQ/N6p1JF39vXQ77PLGcD4cC3lBfqTvBocChhStLCgBPGJ8q/CacxeKWr
+	qJ/KmikSSQeq2qoQCsc8KpAFA6t6K7MFxG7F1KmgJdWMXTx34RfvnyhauJeD+byj0x01ygmtlAk
+	p96jlm5P8w5waEP/DB2XE4/FsnJPggixz+cga4rqx9F5mPOADcDQ3sfigx1dWGsV9Q8KgpAjD+c
+	wwoFPhXt9E5Fflo=
+X-Google-Smtp-Source: AGHT+IEvQXeZzfRjz714HfRbuoChSJiph3o3vx35z1y6/TWaF62kBH0YqfkLwI1WQdwkSFnjKYBxnA==
+X-Received: by 2002:a05:6a00:8a17:b0:732:6a48:22f6 with SMTP id d2e1a72fcca58-7341410bb54mr6308200b3a.9.1740078597790;
+        Thu, 20 Feb 2025 11:09:57 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7326b5ef448sm10144080b3a.173.2025.02.20.11.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 11:09:57 -0800 (PST)
+Date: Thu, 20 Feb 2025 11:09:55 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v4 9/9] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <Z7d-A7yhzH1t8D_3@mini-arch>
+References: <20250220020914.895431-1-almasrymina@google.com>
+ <20250220020914.895431-10-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-To: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-In-Reply-To: <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
-References: <20250220-gianfar-yaml-v1-0-0ba97fd1ef92@posteo.net>
- <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
-Message-Id: <174007807159.3628302.7511694627571289256.robh@kernel.org>
-Subject: Re: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250220020914.895431-10-almasrymina@google.com>
 
-
-On Thu, 20 Feb 2025 18:29:23 +0100, J. Neuschäfer wrote:
-> Add a binding for the "Gianfar" ethernet controller, also known as
-> TSEC/eTSEC.
+On 02/20, Mina Almasry wrote:
+> Add support for devmem TX in ncdevmem.
 > 
-> Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> which included the TX path, and work by Stan to include the netlink API
+> and refactored on top of his generic memory_provider support.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> 
 > ---
->  .../devicetree/bindings/net/fsl,gianfar.yaml       | 242 +++++++++++++++++++++
->  .../devicetree/bindings/net/fsl-tsec-phy.txt       |  39 +---
->  2 files changed, 243 insertions(+), 38 deletions(-)
 > 
+> v4:
+> - Add TX test to devmem.py (Paolo).
+> 
+> v3:
+> - Update ncdevmem docs to run validation with RX-only and RX-with-TX.
+> - Fix build warnings (Stan).
+> - Make the validation expect new lines in the pattern so we can have the
+>   TX path behave like netcat (Stan).
+> - Change ret to errno in error() calls (Stan).
+> - Handle the case where client_ip is not provided (Stan).
+> - Don't assume mid is <= 2000 (Stan).
+> 
+> v2:
+> - make errors a static variable so that we catch instances where there
+>   are less than 20 errors across different buffers.
+> - Fix the issue where the seed is reset to 0 instead of its starting
+>   value 1.
+> - Use 1000ULL instead of 1000 to guard against overflow (Willem).
+> - Do not set POLLERR (Willem).
+> - Update the test to use the new interface where iov_base is the
+>   dmabuf_offset.
+> - Update the test to send 2 iov instead of 1, so we get some test
+>   coverage over sending multiple iovs at once.
+> - Print the ifindex the test is using, useful for debugging issues where
+>   maybe the test may fail because the ifindex of the socket is different
+>   from the dmabuf binding.
+> 
+> ---
+>  .../selftests/drivers/net/hw/devmem.py        |  28 +-
+>  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+>  2 files changed, 312 insertions(+), 16 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+> index 1223f0f5c10c..3d4f7fc5e63f 100755
+> --- a/tools/testing/selftests/drivers/net/hw/devmem.py
+> +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+> @@ -1,6 +1,7 @@
+>  #!/usr/bin/env python3
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> +from os import path
+>  from lib.py import ksft_run, ksft_exit
+>  from lib.py import ksft_eq, KsftSkipEx
+>  from lib.py import NetDrvEpEnv
+> @@ -10,8 +11,7 @@ from lib.py import ksft_disruptive
+>  
+>  def require_devmem(cfg):
+>      if not hasattr(cfg, "_devmem_probed"):
+> -        port = rand_port()
+> -        probe_command = f"./ncdevmem -f {cfg.ifname}"
+> +        probe_command = f"{cfg.bin_local} -f {cfg.ifname}"
+>          cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
+>          cfg._devmem_probed = True
+>  
+> @@ -25,18 +25,36 @@ def check_rx(cfg) -> None:
+>      require_devmem(cfg)
+>  
+>      port = rand_port()
+> -    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
+> +    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Commit de94e8697405 ("selftests: drv-net: store addresses in dict indexed by
+ipver") just went it, so v6 needs to be addr_v['6'] and remote_v6 needs
+to be remote_addr_v['6'].
 
-yamllint warnings/errors:
+>  
+>      with bkg(listen_cmd) as socat:
+>          wait_port_listen(port)
+> -        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:[{cfg.v6}]:{port}", host=cfg.remote, shell=True)
+> +        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:{cfg.v6}:{port},bind={cfg.remote_v6}:{port}", host=cfg.remote, shell=True)
+> +
 
-dtschema/dtc warnings/errors:
-Warning: Duplicate compatible "gianfar" found in schemas matching "$id":
-	http://devicetree.org/schemas/net/fsl,gianfar.yaml#
-	http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: device_type:0: 'mdio' was expected
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: '#address-cells' is a required property
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: '#size-cells' is a required property
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: $nodename:0: 'ethernet@24000' does not match '^mdio(-(bus|external))?(@.+|-([0-9]+))?$'
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: Unevaluated properties are not allowed ('device_type', 'interrupts', 'local-mac-address', 'model', 'phy-handle' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: device_type:0: 'mdio' was expected
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: #size-cells: 0 was expected
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: $nodename:0: 'ethernet@24000' does not match '^mdio(-(bus|external))?(@.+|-([0-9]+))?$'
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: #size-cells: 0 was expected
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: mdio@520:reg:0:0: 1312 is greater than the maximum of 31
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: mdio@520:reg:0: [1312, 32] is too long
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/fsl,gianfar.example.dtb: ethernet@24000: Unevaluated properties are not allowed ('#size-cells', 'cell-index', 'device_type', 'interrupts', 'local-mac-address', 'mdio@520', 'model', 'ranges' were unexpected)
-	from schema $id: http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
+[..]
 
-doc reference errors (make refcheckdocs):
+> +    ksft_eq(ncdevmem.stdout.strip(), "hello\nworld")
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net
+s/ncdevmem/socat/ (or rename socat in the with block above)
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+> +@ksft_disruptive
+> +def check_tx(cfg) -> None:
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
+[..]
 
-pip3 install dtschema --upgrade
+> +    cfg.require_v6()
 
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+This is also now require_ipver("6") I think..
 
+Gonna try to run the selftest and see if anything else pops up...
 
