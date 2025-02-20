@@ -1,158 +1,220 @@
-Return-Path: <netdev+bounces-167987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53FB8A3D01A
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:33:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B09A3D079
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 05:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22F923B9252
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 03:33:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D653A5145
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 04:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55332339A8;
-	Thu, 20 Feb 2025 03:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101A52F852;
+	Thu, 20 Feb 2025 04:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HzUrdJgD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lz52NvFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825494C6C
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 03:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0CE3FD1;
+	Thu, 20 Feb 2025 04:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740022415; cv=none; b=ukD5HOlIu0NIalkoB1GREZNRroJl9K49AaCajCw2KlaF9lgAJQTC3yAkQ6nhg1OJ69isb60cZZEyqhf6RC+TbXl9uoXeSMtZJnXGGdVmbKU30T3i/6u9nmXtr+6PHy3dpI+6JWcN/OLA/wWU+tuTqU1j8OVHnJysLzOfoO4g/dU=
+	t=1740025854; cv=none; b=t4lvnyTLJzlwFuJSJFrKB2eZrIwT0H14WOXx5EqEAGRSFpL7vPzuVeLqbcE1zZsTu173hZr7/xWDEPt2e54t59PtKbA2g17ZqA7o35l5MvHZiBe3W9Mt4g++ss3dIpU3+aY527lf4qwWpWNa1XC9jilNzzUqtJn2i44UUmaoSyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740022415; c=relaxed/simple;
-	bh=TiDbb8Sj7p8vcGA7oO9KN99if2/ItQHR1nkuSDKwYEQ=;
+	s=arc-20240116; t=1740025854; c=relaxed/simple;
+	bh=PTL4DW0ryN/YxCPoZbOPnBzpjwc6PUEOHJdrJB28ALo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rhFPkR86lhaw8V4VbwzyV7sQYceYZKlxRi5JDhvXARauWtTnknQ/X9YpnHm50vB5F9UEMEX2smEKs4Z7WT8PM1rwwCEj3leAHeS8777IliefBCGFcU9pDEWeHYfAlKuzBHB3DPYuvPKr+EKMXjoTzWXxMSl5jzOesZZVqfB99cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HzUrdJgD; arc=none smtp.client-ip=209.85.208.45
+	 To:Cc:Content-Type; b=lo4Fs/ncrx0yVs+8vVyL9OCb+GYPdG/HQEmDk0ad9DPYeiYhUrdBRuQpVKnsA/qJMImP7UCwF648HnqYWtlJFsw1Qtg961CtHutX0bz3CaLrDSFZjS1UVuo1Asu9tFeETrj6kDhV1CLndgUiS5CC17uiU03LL8cQX1e/JiR7/i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lz52NvFo; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5ded51d31f1so743257a12.3
-        for <netdev@vger.kernel.org>; Wed, 19 Feb 2025 19:33:33 -0800 (PST)
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d284b9734fso4561185ab.2;
+        Wed, 19 Feb 2025 20:30:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740022412; x=1740627212; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740025851; x=1740630651; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7ZTm/h6PefFkC+fcSpUpqxMLVMI5XYCfvcIfVwcl1qQ=;
-        b=HzUrdJgDh881VjtSWPILyVST2gQp5EPSCGEUHis+MoNfxypv1RRgTKqSlpUTdelq2l
-         HihEmIAhHu5LMr7X8XzdGOi656u+cfNY1OGqfPVfI86TBvXcEkD00h05/ZSkH8tl68V+
-         P/O9+hVVNYGGIx9T6z5rYZdPXPM6Y63gR0FAKu+Up4WIY5ovq2WvY2jj9TRlp/oJ/fRg
-         iLrj36f2WE4wLaqkvyIGTZqDzuSEhn2gBuBx0oetaRcnfuPVaz3+MVugVfsCxzNdRL/J
-         T4uEd1RlywJvpQ2wfBmRw3ioNsHXNGK4NQMmyoLVBeqn/jpsb0ar6ldalmK608dB8NeM
-         58Ug==
+        bh=qM5pYm1QCPD/MQVuAfYurtdIOxPeikSDBLRIMom6N/0=;
+        b=lz52NvFoBf8fHAsopCibglp/OoYCeQBE6kFek5+ghgNOQE7vnpYxvYk/ajSM9IClyh
+         q5tubnyUPdKHkw/DkzaWvFq02p2+d/s9I42fMAq5RNPw6Feceh6m4sGryOzzT0A1Xed8
+         xCpyL7YQ5bCXw4/u9bKQlf5aQJulWi03fmRmBP+9v9HmXzOVN0yy3IL5o/J5V+y2dIU/
+         sOjwRLKS90WujYof/PmKXhsEPSDGqnHEveFucvqJ2pl6i37DWgyYPXnvWM7yUBvBvCRt
+         G+O+ItJV208YulrEq7kxl9KaYH5XOxS3OdtJ4PCuk1DzDaM7v7xuSGTaqD87wm8JmOID
+         O6tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740022412; x=1740627212;
+        d=1e100.net; s=20230601; t=1740025851; x=1740630651;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7ZTm/h6PefFkC+fcSpUpqxMLVMI5XYCfvcIfVwcl1qQ=;
-        b=KxopbOs3rE+7/l9R+xSG3VhyfM/YtKtIx6NsiqyJ0oOk9D33/+bcP9GtKF9rFwha8G
-         q5Pyl9IXKCsyV47xuBX+duOLyjOo/Klobw/o3RzGKGI9ZpSFdsO+I9S2PeP9+8A3zuEB
-         ZAxuYelXG9BPkRbkWf5RZM4gkx6r2sWfKrku9DCDiz56Gs+uJhwkEnoBaInTgEdF72rE
-         DbUQzORzJ5t/HR3sQ5Q+vW5YCWMnik4nzvbMU2FroyyhVtwOcypsVZoO48hYujYaJ7dH
-         Eib1pN8a4O87f6LfRp7xXlDoAPqpgLHHUns/I0UdR+1mvAkich6SsUyEruCe/GHxzi/R
-         e9BA==
-X-Forwarded-Encrypted: i=1; AJvYcCUY21Vp0wfKoUez5JPaqj+vlojw24IVOm4rOxU/N9zE6vSm8/Qxk53XCqy5ngpOVso8UZXcIZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa4Zv/FrWR1D080EyjI23bdrzn1Ixay2+DKwoGKlBOr0fO1lbB
-	jP+JhzSCPHEGdWzSZjf7RQgFy3Akp4NOUsYC4ewngz3HPZM4avFvAE64rhcjlaqOdQPAg33DCA8
-	KITTM0Ng/tCYjXTP2lPhRmlidzx8cm6PkbbE=
-X-Gm-Gg: ASbGnctP323YIeY71sx2NFgjj7/K/Zd+TzgY+EemyKdijt6VhIUU+q+a0FXxrixjPix
-	U+Ktzug1BnnCQhgXr5C42JFepstM9CefnoWV9THVBmUrcIP+I4evDM0jVKYVE9ftqbgD8dU/6iS
-	s=
-X-Google-Smtp-Source: AGHT+IEKhLe4ZsRP9YazygOnm0EaoCD5g+2qqVt8D0hSYYAYFiMlRanF7+mAHAdcQg7GNdU2MajMKjMUq26wM2ABSnA=
-X-Received: by 2002:a05:6402:40c7:b0:5db:f423:19c5 with SMTP id
- 4fb4d7f45d1cf-5e0894f7cbcmr6111114a12.5.1740022411506; Wed, 19 Feb 2025
- 19:33:31 -0800 (PST)
+        bh=qM5pYm1QCPD/MQVuAfYurtdIOxPeikSDBLRIMom6N/0=;
+        b=FaIKZwIaYIWY5KtYyjTsD5XR3PFy3tXVXGG67IF7nyS97Eqj6HLkOWqDrclD6JplpA
+         MYrxP9J15DJOmOkZTC9+08Bik8pGEdJVu7I+KaV4aOuQTAuSQQwWFj/0apgkIu0DLdtw
+         lCTUpkcS2x1XE4dTtWfgJ55ECKJMvNB/WqyVjXbu/UD6+S8NxuNNC8ih34trrCSwr+jx
+         X+z7jTTYNxr2cHxgGIjM0jHlD58uhzwnwUKvrHYhzRWLjFNoMi85v/KeZOVB9YS6iZuM
+         Of4tqyMWGGD3eDWQ/2bLyp/H/g1Osmq76K+mqRwkkOMSZCckFGdSKbYV0hKvVhNRPMUi
+         o7gw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+mSxZt04Q1SYvU23oizEHa5BnL9zqczET+06fBTI81Ivbl15svOPHyIPXMJOsepFov1hDYgNd@vger.kernel.org, AJvYcCXomXdASnhV0HijdPFUob0cKyHCGrIRI4YIKCwADuHrMet7t3pH2oYZt0qRH1BJ+JqIN/pM6orNXeq3TILtoxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkuoCAaLmyptXKmX1RTkw0bBs1t4UpnzF36w/IQ0I9oPk/ud8k
+	28rletXHU/9sC9bviCIDi5rGsc5NuVUpF1KoGDREjTiph060LrwSUh0uYDwzzRkKdBmFyb6vEbl
+	XCGOLV5027FqPVvuvmcX3SKAPbXSasAFcZY2gjMH/
+X-Gm-Gg: ASbGnctpxrgyXEBHdMVh/y8/buw5oF0UnWtlyBWOk1n/mHX+Z6JuV2m9R7/5k1i5eOM
+	9rso043b4hUT6j1U3yv+JQv4qt13NZgT/PcREdrNTRB8upjQD03iRpb1xquO7tT4AUWZcVxEB
+X-Google-Smtp-Source: AGHT+IGwBjNFQvhpIRAaHS8B4yiJ/mHxPG9z1y4l1P8QXWzmRtUCw0nTO6jMVLH1Q0ytyHV9uUbrrmjADQRdFNvHnjo=
+X-Received: by 2002:a92:c24f:0:b0:3d0:4e57:bbe3 with SMTP id
+ e9e14a558f8ab-3d2c24dbb34mr9933505ab.4.1740025851240; Wed, 19 Feb 2025
+ 20:30:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250220005318.560733-1-kuba@kernel.org> <w3kr4zyocloibq6mniumhtcbp6hqfur6uzqeem6hpoe76t2gqr@4jmz72w3wrw3>
- <20250219181427.3d7aa28f@kernel.org>
-In-Reply-To: <20250219181427.3d7aa28f@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 20 Feb 2025 12:33:20 +0900
-X-Gm-Features: AWEUYZmjw3TwmrKiHFA1gnGiPQAr3vkEpwQ4R6LuMctYUM_eICQuVnbw63SZNGw
-Message-ID: <CAMArcTXzGXBBjkhefM3iFiwYWxtsQ70QTRtVLSv_+hAERtaQKA@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] bnxt: don't reject XDP installation when HDS
- isn't forced on
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	horms@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com
+References: <cover.1739988644.git.pav@iki.fi> <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
+ <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com> <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 20 Feb 2025 12:30:14 +0800
+X-Gm-Features: AWEUYZkch07W90CvEFg9UMT23Cw8S6yAxbpfbluvG22mLEFuhXNxX2BlWOUy17s
+Message-ID: <CAL+tcoDJAYDce6Ud49q1+srq-wJ=04JxMm1w-Yzcdd1FGE3U7g@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025 at 11:14=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-
-Hi Jakub, Thank you so much for this fix!
-
+On Thu, Feb 20, 2025 at 10:35=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> On Wed, 19 Feb 2025 18:58:02 -0700 Daniel Xu wrote:
-> > > @@ -395,7 +397,7 @@ static int bnxt_xdp_set(struct bnxt *bp, struct b=
-pf_prog *prog)
-> > >                         bp->dev->mtu, BNXT_MAX_PAGE_MODE_MTU);
-> > >             return -EOPNOTSUPP;
-> > >     }
-> > > -   if (prog && bp->flags & BNXT_FLAG_HDS) {
-> > > +   if (prog && dev->cfg->hds_config =3D=3D ETHTOOL_TCP_DATA_SPLIT_EN=
-ABLED) {
-> > >             netdev_warn(dev, "XDP is disallowed when HDS is enabled.\=
-n");
-> > >             return -EOPNOTSUPP;
-> > >     }
-> > > --
-> > > 2.48.1
+> Jason Xing wrote:
+> > On Thu, Feb 20, 2025 at 2:15=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wro=
+te:
 > > >
+> > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timesta=
+mp
+> > > when hardware reports a packet completed.
+> > >
+> > > Completion tstamp is useful for Bluetooth, as hardware timestamps do =
+not
+> > > exist in the HCI specification except for ISO packets, and the hardwa=
+re
+> > > has a queue where packets may wait.  In this case the software SND
+> > > timestamp only reflects the kernel-side part of the total latency
+> > > (usually small) and queue length (usually 0 unless HW buffers
+> > > congested), whereas the completion report time is more informative of
+> > > the true latency.
+> > >
+> > > It may also be useful in other cases where HW TX timestamps cannot be
+> > > obtained and user wants to estimate an upper bound to when the TX
+> > > probably happened.
+> > >
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > ---
+> > >
+> > > Notes:
+> > >     v4: changed SOF_TIMESTAMPING_TX_COMPLETION to only emit COMPLETIO=
+N
+> > >         together with SND, to save a bit in skb_shared_info.tx_flags
+> > >
+> > >         As it then cannot be set per-skb, reject setting it via CMSG.
+> > >
+> > >  Documentation/networking/timestamping.rst | 9 +++++++++
+> > >  include/uapi/linux/errqueue.h             | 1 +
+> > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
+> > >  net/core/sock.c                           | 2 ++
+> > >  net/ethtool/common.c                      | 1 +
+> > >  5 files changed, 17 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/Documentation/networking/timestamping.rst b/Documentatio=
+n/networking/timestamping.rst
+> > > index 61ef9da10e28..5034dfe326c0 100644
+> > > --- a/Documentation/networking/timestamping.rst
+> > > +++ b/Documentation/networking/timestamping.rst
+> > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+> > >    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+> > >    This flag can be enabled via both socket options and control messa=
+ges.
+> > >
+> > > +SOF_TIMESTAMPING_TX_COMPLETION:
+> > > +  Request tx timestamps on packet tx completion, for the packets tha=
+t
+> > > +  also have SOF_TIMESTAMPING_TX_SOFTWARE enabled.  The completion
 > >
-> > Nice, that fixed it.
+> > Is it mandatory for other drivers that will try to use
+> > SOF_TIMESTAMPING_TX_COMPLETION in the future? I can see you coupled
+> > both of them in hci_conn_tx_queue in patch [2/5]. If so, it would be
+> > better if you add the limitation in sock_set_timestamping() so that
+> > the same rule can be applied to other drivers.
 > >
-> > Tested-by: Daniel Xu <dxu@dxuuu.xyz>
+> > But may I ask why you tried to couple them so tight in the version?
+> > Could you say more about this? It's optional, right? IIUC, you
+> > expected the driver to have both timestamps and then calculate the
+> > delta easily?
 >
-> I looked again after sending because it wasn't sitting 100% well with
-> me. As the commit message says this will work, because it forces all
-> flags to off. But the driver is also only setting its internal flag
-> when user requested. So why does it get set in the first place..
->
-> I think the real fix may be:
->
-> @@ -2071,6 +2072,8 @@ static int ethtool_set_ringparam(struct net_device =
-*dev, void __user *useraddr)
->
->         dev->ethtool_ops->get_ringparam(dev, &max, &kernel_ringparam, NUL=
-L);
->
-> +       kernel_ringparam.tcp_data_split =3D dev->cfg->hds_config;
-> +
->         /* ensure new ring parameters are within the maximums */
->         if (ringparam.rx_pending > max.rx_max_pending ||
->             ringparam.rx_mini_pending > max.rx_mini_max_pending ||
->
-> This is the legacy / ioctl path. We don't hit it in testing, but you
-> probably hit it via systemd.
->
-> At least that's my current theory, waiting for the test kernel
-> to deploy.  Sorry for the flip flop..
+> This is a workaround around the limited number of bits available in
+> skb_shared_info.tx_flags.
 
-As you mentioned, I tested it with legacy/ioctl path.
+Oh, I'm surprised I missed the point even though I revisited the
+previous discussion.
 
-How to reproduce:
-ethtool -K eth0 lro on gro on
-ethtool --disable-netlink -G eth0 rx 512
-ip link set eth0 xdp obj xdp.o
+Pauli, please add the limitation when users setsockopt in
+sock_set_timestamping() :)
 
-With this change, I can't see this bug anymore.
+>
+> Pauli could claim last available bit 7.. but then you would need to
+> find another bit for SKBTX_BPF ;)
 
-Thanks a lot!
-Taehee Yoo
+Right :D
+
+>
+> FWIW I think we could probably free up 1 or 2 bits if we look closely,
+> e.g., of SKBTX_HW_TSTAMP_USE_CYCLES or SKBTX_WIFI_STATUS.
+
+Good. Will you submit a patch series to do that, or...?
+
+>
+> But given that two uses for those bits are in review at the same time,
+> I doubt that this is the last such feature that is added.
+>
+> This workaround is clever. Only, we're leaking implementation
+> limitations into the API, making it API non-uniform and thus more
+> complex.
+
+Probably not a big deal because previously OPT_ID_TCP is also bound with OP=
+T_ID?
+
+>
+> On the one hand, the feature should work just like all the existing
+> ones, and thus be configurable independently, and maintaining a
+> consistent API. But, this does require a tx_flags bit. And the
+> same for each subsequent such feature that gets proposed.
+>
+> On the other, if we can anticipate more such additional requests,
+> then perhaps it does make sense to use only one bit in the skb to
+> encode whether the skb is sampled (in this case SKBTX_SW_TSTAMP),
+> and use per-socket sk_tsflags to encode which types of timestamps
+> to generate for such sampled packets.
+
+Very good idea, I think.
+
+>
+> This is more or less how sampling in the new BPF mode works too.
+>
+> It is just not how SO_TIMESTAMPING works for existing bits.
+
+If needed, especially when a new bit is added, I think we can refactor
+this part in the future? Or can we adjust it in advance? Speaking of
+the design itself, it's really good :)
+
+Thanks,
+Jason
+
+>
+>
+> There's something to be said for either approach IMHO.
 
