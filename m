@@ -1,114 +1,115 @@
-Return-Path: <netdev+bounces-168083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B8EA3D4E9
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:37:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10CBAA3D4F5
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88F5E17B8AC
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:37:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C83E188E305
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284C31F03CF;
-	Thu, 20 Feb 2025 09:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026A71EFF8D;
+	Thu, 20 Feb 2025 09:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EWigDSfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+wrmWCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8564E1F03C0;
-	Thu, 20 Feb 2025 09:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC82E1EE006;
+	Thu, 20 Feb 2025 09:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740044233; cv=none; b=tjVBuTg6FCwpvrZBIJUHAGC1vpgS8jRr63okakyu15OqMVz0TH4vue37G7U7u0uyzy4hFjwxMDIYRiFIiYmP/hlq/073qyTkVYcxhLSxgg0AFP63NAPZDnmIqxotzkqIhPPg/8MzOmRzfmUtWV0yapV/UFEbnBimgd9Q3WdbmMw=
+	t=1740044401; cv=none; b=MyKsPVOozFyN9QWF07VpLoIt+0yjNxh1k4eWC2G3cxLdqc7N91goIMRGml6rrVTvmyh7i+T2BFbfyd6j/cxhQDCyFVBiYeBOQ7WL63l6lcGRYCUs0GIvHw/1ImbAMdiVfTCz7n/pDCt5fA20SC7QKCTj//G95VtPaIJP1vrHE0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740044233; c=relaxed/simple;
-	bh=vCuWbxJpcKdKcAOe66DlD/TFiXV9c8xBVuKcplE64B4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RHhhheURehTYz3Ukug/u7T6g39fphz6zfX+a7yfeQWJYUPQFvlRQmAfbt9LvL27juKjhB+P8zLNoxRoVt3wNhSWekmZIqEsIDGloH6BFwweqiv/ff5V41EnNYaoFdahLkVp53/FnLN+EVKsFGcplLSYQeKT5urtwcdGSW0J8UXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EWigDSfe; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=phIkeiMZbtKUkz8zihSHcjuzyHiG/Jl1jNrls12kH7c=; b=EWigDSfeke3Is6poNt82ic9DKy
-	LhGt4BFhdRKjrhFXh61yP1/4ws6LRKr4izRndhA0qKS+JgDlCWSxoO1OPzUX4zx0A083kHiPMgLrx
-	NqEa9T0gE32L8XAw9IXMcBGwO3tXZcEkqLHyMRrQnSBoa4dCEUuYpAI1BYgx3AhApmVftBylYbRNR
-	1AHhF8PD6tTrkK4SdlMUI7xzbJyjjrxbwvF6tmCfDejTMxms3UAmWrJSfKTtib6WkKw956FV8FlXb
-	fvZzSHHgQjRi0VkiPQnUywi43pPXqs42QQQJnYR4uc+2GESkLu5bKF31Cy9yD2VI3+gW6fFOP1Nv6
-	7OfYuSjA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38750)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tl2zF-0000Vk-2E;
-	Thu, 20 Feb 2025 09:36:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tl2zB-0000rj-36;
-	Thu, 20 Feb 2025 09:36:49 +0000
-Date: Thu, 20 Feb 2025 09:36:49 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: phy: marvell-88q2xxx: Prevent hwmon
- access with asserted reset
-Message-ID: <Z7b3sU0w2daShkBH@shell.armlinux.org.uk>
-References: <20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-0-78b2838a62da@gmail.com>
- <20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-2-78b2838a62da@gmail.com>
+	s=arc-20240116; t=1740044401; c=relaxed/simple;
+	bh=vZzNOT4gALWue5sMR/lAhNhYasWl2rgb+iL4Q8yNsU0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=p6RQCGwB8oShqlrBrA186qlgnGIXDpcntIRyi66jXIeujb4NP66JL5tArZWUAcnQAWoTLsXINSqirYfha8J4VVoTHQgwx/yPbH8rgXBwbJpZfcou10BRjC0VvJSuhf+OTxRchUXMtw5XJOmlircuBAp9t/TSRto1CcbjMbu7TKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+wrmWCa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5587CC4CED1;
+	Thu, 20 Feb 2025 09:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740044401;
+	bh=vZzNOT4gALWue5sMR/lAhNhYasWl2rgb+iL4Q8yNsU0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V+wrmWCa0EuKOzodBLcgKwoLyQKn3xJiRnhc3i+Qqb+3WoyulamFtTz8kbfrMvY/J
+	 Z72WT2Me/j4d5IdvrNG2pCgThaLWSwvMq5kG2pXafU2nzciYZxUeAYASdbVarJsKsr
+	 CyHaOnRpuKU4JNqvx1w5X4aHfsUDkOFhwtMqJOFq+Hmw+mk+e2qDdckFk2Gap+cJgK
+	 +I4P33XRmK3EvHrCeXXoAzxRDnJudPufsw8ICLABxFt4e1n4JSa9yfK+O8eVamkLlN
+	 6zynTrdktmed7Y15K8mJF75mqX8U2Bv+NdclUS2g3dpmRY4I+hTI342+StvAU4UwhC
+	 37dKjn50H4lQQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3410A380CEE2;
+	Thu, 20 Feb 2025 09:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-2-78b2838a62da@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 01/12] can: c_can: Drop useless final probe failure
+ message
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174004443201.1228909.16478837779381725795.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 09:40:32 +0000
+References: <20250219113354.529611-2-mkl@pengutronix.de>
+In-Reply-To: <20250219113354.529611-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de,
+ krzysztof.kozlowski@linaro.org, mailhol.vincent@wanadoo.fr
 
-On Thu, Feb 20, 2025 at 09:11:12AM +0100, Dimitri Fedrau wrote:
-> If the PHYs reset is asserted it returns 0xffff for any read operation.
-> This might happen if the user admins down the interface and wants to read
-> the temperature. Prevent reading the temperature in this case and return
-> with an network is down error. Write operations are ignored by the device
-> when reset is asserted, still return a network is down error in this
-> case to make the user aware of the operation gone wrong.
+Hello:
 
-If we look at where mdio_device_reset() is called from:
+This series was applied to netdev/net-next.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-1. mdio_device_register() -> mdiobus_register_device() asserts reset
-   before adding the device to the device layer (which will then
-   cause the driver to be searched for and bound.)
+On Wed, 19 Feb 2025 12:21:06 +0100 you wrote:
+> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> Generic probe failure message is useless: does not give information what
+> failed and it duplicates messages provided by the core, e.g. from memory
+> allocation or platform_get_irq().  It also floods dmesg in case of
+> deferred probe, e.g. resulting from devm_clk_get().
+> 
+> [...]
 
-2. mdio_probe(), deasserts the reset signal before calling the MDIO
-   driver's ->probe method, which will be phy_probe().
+Here is the summary with links:
+  - [net-next,01/12] can: c_can: Drop useless final probe failure message
+    https://git.kernel.org/netdev/net-next/c/fd2a0c47fbae
+  - [net-next,02/12] can: c_can: Simplify handling syscon error path
+    https://git.kernel.org/netdev/net-next/c/6c00b580d1c9
+  - [net-next,03/12] can: c_can: Use of_property_present() to test existence of DT property
+    https://git.kernel.org/netdev/net-next/c/ab1bc2290fd8
+  - [net-next,04/12] can: c_can: Use syscon_regmap_lookup_by_phandle_args
+    https://git.kernel.org/netdev/net-next/c/9f0f0345d040
+  - [net-next,05/12] dt-bindings: can: fsl,flexcan: add S32G2/S32G3 SoC support
+    https://git.kernel.org/netdev/net-next/c/51723790b718
+  - [net-next,06/12] can: flexcan: Add quirk to handle separate interrupt lines for mailboxes
+    https://git.kernel.org/netdev/net-next/c/8c652cf030a7
+  - [net-next,07/12] can: flexcan: add NXP S32G2/S32G3 SoC support
+    https://git.kernel.org/netdev/net-next/c/8503a4b1a24d
+  - [net-next,08/12] dt-binding: can: mcp251xfd: remove duplicate word
+    https://git.kernel.org/netdev/net-next/c/bcb13d33221d
+  - [net-next,09/12] can: j1939: Extend stack documentation with buffer size behavior
+    https://git.kernel.org/netdev/net-next/c/6b89d89f2147
+  - [net-next,10/12] can: canxl: support Remote Request Substitution bit access
+    https://git.kernel.org/netdev/net-next/c/e1b2c7e902f7
+  - [net-next,11/12] can: gs_usb: add VID/PID for the CANnectivity firmware
+    https://git.kernel.org/netdev/net-next/c/32f08b22f3b8
+  - [net-next,12/12] can: rockchip_canfd: rkcanfd_chip_fifo_setup(): remove duplicated setup of RX FIFO
+    https://git.kernel.org/netdev/net-next/c/d9e1cc087a55
 
-3. after a probe failure to re-assert the reset signal.
-
-4. after ->remove has been called.
-
-That is the sum total. So, while the driver is bound to the device,
-phydev->mdio.reset_state is guaranteed to be zero.
-
-Therefore, is this patch fixing a real observed problem with the
-current driver?
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
