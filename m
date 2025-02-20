@@ -1,129 +1,125 @@
-Return-Path: <netdev+bounces-168313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11DF5A3E7C0
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:50:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F24EA3E7D1
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2702422C99
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76FE188F670
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24AB1F12F2;
-	Thu, 20 Feb 2025 22:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF04264F99;
+	Thu, 20 Feb 2025 22:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qCJ5zAqk"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="I7wdbQYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983741C5D67;
-	Thu, 20 Feb 2025 22:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6946C264F90
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 22:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740091804; cv=none; b=bfKDBwFC6KgdFoSyCr9TLuC5JkvL+8tgSF1bDlS8fxLP8mQwhcecMLzMP9+yseT01WTga8APlKeOeHbfyzCHGtk2HaBFaj+EIwsYGczdmJXg6kTDNEx4ja9QJ/U0gsj5eOfLTxF8XrpCk1EKGZrEHP6jJaN7fRx3TisZm414CGE=
+	t=1740092015; cv=none; b=fDpLROiiDJRFTmcnfIVy1h24z7AVBlbAn0ik58x6QAkUtPUsxmbwzjGtkWxZ8mtVoKvAkl5woHxWkyNcR7HUyiKP9H+2mHCG8QbIJo9mdgqeAZOylGQTgySWFrFR2ZhYazG17a1n+v2eAQ/QmY/SO78n2GBMNisGNniu5V4UaSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740091804; c=relaxed/simple;
-	bh=q/VpeOd87uiSFjqNCfspr2LpWPGa0Kqyk7Obefw35Wg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gc6LsLb31FPuthX3QTNQYB92vxyFj7QS6H6nHfhxJR84zxUozwbZKMnAYLDfl9+HH5Nzci/KplOvQb3njYKzaQ+4G1TYG+HLFBmzelzLvkDCigIARGipQQLbzLVfOo2unvuQgFYJwztbpSgwExCf2Z+w5Eo9QJJzzfFZcSY3caI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qCJ5zAqk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0989EC4CED1;
-	Thu, 20 Feb 2025 22:50:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740091804;
-	bh=q/VpeOd87uiSFjqNCfspr2LpWPGa0Kqyk7Obefw35Wg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qCJ5zAqkYbf1MLYRGP/2t1iRk6xjiEsgVKaNngGqqLoC3rGu6hLAHsTHySaZ95faX
-	 7lrFSBVXSZB/DSdoNArzOIsZFLoGF+1N3pGd5haO5aHJBACZh2NCx1ZmcYu1K5YJcr
-	 4qlWqfJD0uiNv0P38eUKJmVQgZZS28ATLeJdl2cAyKaS2RUQe4FiBaTxpVwMzFUTdw
-	 EyEHUdF/4haPxtiSs/sbmhw0krNtw+NEDD0naWuvE4OlZo0yYpo2OTc6BPcJZaC3Lf
-	 QA0P7Wxrg1Op/NbYuVPrk+APZ3PnLj4DyV0pz4R6I61kgRX43Zh33QDtvTN2ik/Ig5
-	 M0ZGLFmd07/cg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB628380CEE2;
-	Thu, 20 Feb 2025 22:50:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1740092015; c=relaxed/simple;
+	bh=/hJcOZBAHHavmddBKgJPkm4X1qFWj/NslqMbiXXVZ9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jIRRHxI6ethGBOe/v6ejQnfDN94vDhTUDz6WyatFYw1T+vSLTTA4rW9Pyo/ACY7TTHwkXj0k5GFyBf01CEnaikjVAxoGw+OVpxV2hbphwSFYTna/MnCN80TrcG9GG9RJSRuz+yHRf1xABVRzwRhR1db/7o4605i18i0ES3fNKJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=I7wdbQYt; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e65a00556aso12208216d6.3
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 14:53:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1740092012; x=1740696812; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dBGqa2XZdc+hGPTxNPbMoXCNOiu958Ou4ZNuSWdOAFA=;
+        b=I7wdbQYthcIJw7EKcqR22AgSFN4s7BG4VIXppCk4IjqjMHfARE3b5XjrXlXxSHcPiJ
+         Kb2B6dDbKJBQXFv/YKRYifJPKDf9Ktfu+zYbs50r3B7d44ySDArPz8PE8tXCCVW2DQke
+         3obOuXQCY6ct0nTiV5U/RRFFrWQT7mOvCQ/Zw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740092012; x=1740696812;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dBGqa2XZdc+hGPTxNPbMoXCNOiu958Ou4ZNuSWdOAFA=;
+        b=e4MakPmwBRvraioqPg+CW2R6/AHcD5DSJtNA9JV+BREKq7nx2oeLm9cWbpMdA4e+zh
+         elW5XUQHOoc1Lw+4W44Rj8xqlSLywwHBvLbpyXap330Oc5V9WgVoSUSOMSEJhiERMUKH
+         5jP+TmSCOZqpuaSRcJiEAQE0/jqnuEs2FEjURGT78e46gsSIXrEyTkU4T+ON+uIt0aFe
+         I2i1QLFyjXajRX+bop0zsDjegZDh9Pq+/5QuFsxAqO/2rrx4SXASzaPwZx60KGs/bpiB
+         JgQpSiLrgBGm05rMxviSIbf/x/wrS3cfL88V2v4nxQG+tvm9ZG0QT5DZhB3kWDuqCGM1
+         9VWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUwiEggO+JVaP5I7ntqkImZddabQkZ5zWEbLj2iAfiWdC0iACwmo45AYDOqm9QyCvXElB+2nRw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8uUKawOiFUJZYv8JEV4qjNrLCaYmUv29j/sGZJSZ8uGHvLBqp
+	Un9KdkpxqaVxpUtOZpQrxzCp5Hu3KhhVxWlscF2tEB8Z3ZwlsJm8PDeNVv/c0Tg=
+X-Gm-Gg: ASbGncsXkoCv+5jwvdQDCGLBKOc1rnXoSkfa0KRTzej10lt0ZsFrufiCuvkR+wMwc/b
+	ml6tbe8vdtjqz9NlJWvg1iVyRkwxd8CwnvXBmFjDJU7yfS6TJh28A3ZCKzK56i4dP81QnDjy1s3
+	kwmBdUABB865TAXebH1ytSN+M5+zEUXiI+9E4HH0it1z7AG8ngOue/5l+rRJG6X5d3nqXmqnbTO
+	oXk+yp/I/Zl1T2z+FAH/UjwO342wh/pE1haYXU0WA7kEO1mU6Nl1qNe22p1kw4pt4sVgx6SrpQf
+	8l+ok2zJER1UvQBtpfLbCawaEDjnl588l78G6DuOJ4CKVN51Pnx2ww==
+X-Google-Smtp-Source: AGHT+IFgXNlQIrOhx1tnzTt+LP5yDZ/o+Vq8GS8yckRpRh4VssYlsX4N7FGzjAWlqEKURRvZcQHc2A==
+X-Received: by 2002:a05:6214:d4e:b0:6e4:2e00:ddc1 with SMTP id 6a1803df08f44-6e6ae9ffd75mr14848766d6.40.1740092012172;
+        Thu, 20 Feb 2025 14:53:32 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65dafeb39sm90892046d6.95.2025.02.20.14.53.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 14:53:31 -0800 (PST)
+Date: Thu, 20 Feb 2025 17:53:29 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	stfomichev@gmail.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 1/7] selftests: drv-net: add a warning for
+ bkg + shell + terminate
+Message-ID: <Z7eyaUB_LUET8uS8@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
+	petrm@nvidia.com
+References: <20250219234956.520599-1-kuba@kernel.org>
+ <20250219234956.520599-2-kuba@kernel.org>
+ <Z7eDF2lsaQbWl0Yo@LQ3V64L9R2>
+ <20250220131059.66d590e0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v13 00/12] net-timestamp: bpf extension to equip
- applications transparently
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174009183478.1502593.975755252949089833.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Feb 2025 22:50:34 +0000
-References: <20250220072940.99994-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250220072940.99994-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250220131059.66d590e0@kernel.org>
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (net)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Thu, 20 Feb 2025 15:29:28 +0800 you wrote:
-> "Timestamping is key to debugging network stack latency. With
-> SO_TIMESTAMPING, bugs that are otherwise incorrectly assumed to be
-> network issues can be attributed to the kernel." This is extracted
-> from the talk "SO_TIMESTAMPING: Powering Fleetwide RPC Monitoring"
-> addressed by Willem de Bruijn at netdevconf 0x17).
+On Thu, Feb 20, 2025 at 01:10:59PM -0800, Jakub Kicinski wrote:
+> On Thu, 20 Feb 2025 14:31:35 -0500 Joe Damato wrote:
+> > > +        if shell and self.terminate:
+> > > +            print("# Warning: combining shell and terminate is risky!")
+> > > +            print("#          SIGTERM may not reach the child on zsh/ksh!")
+> > > +  
+> > 
+> > This warning did not print on my system, FWIW. Up to you if you want
+> > to respin and drop it or just leave it be.
 > 
-> There are a few areas that need optimization with the consideration of
-> easier use and less performance impact, which I highlighted and mainly
-> discussed at netconf 2024 with Willem de Bruijn and John Fastabend:
-> uAPI compatibility, extra system call overhead, and the need for
-> application modification. I initially managed to solve these issues
-> by writing a kernel module that hooks various key functions. However,
-> this approach is not suitable for the next kernel release. Therefore,
-> a BPF extension was proposed. During recent period, Martin KaFai Lau
-> provides invaluable suggestions about BPF along the way. Many thanks
-> here!
+> You mean when running this patchset? It shouldn't, the current 
+> test uses ksft_wait rather than terminate. The warning is for
+> test developers trying to use the risky config in new tests.
 > 
-> [...]
+> > I am fine with this warning being added, although I disagree with
+> > the commit message as mentioned in my previous email.
+> 
+> I'll edit the commit message when applying. Unless you want to dig
+> deeper and find out why your bash/env is different than mine :(
 
-Here is the summary with links:
-  - [bpf-next,v13,01/12] bpf: add networking timestamping support to bpf_get/setsockopt()
-    (no matching commit)
-  - [bpf-next,v13,02/12] bpf: prepare the sock_ops ctx and call bpf prog for TX timestamping
-    https://git.kernel.org/bpf/bpf-next/c/df600f3b1d79
-  - [bpf-next,v13,03/12] bpf: prevent unsafe access to the sock fields in the BPF timestamping callback
-    https://git.kernel.org/bpf/bpf-next/c/fd93eaffb3f9
-  - [bpf-next,v13,04/12] bpf: disable unsafe helpers in TX timestamping callbacks
-    https://git.kernel.org/bpf/bpf-next/c/2958624b2530
-  - [bpf-next,v13,05/12] net-timestamp: prepare for isolating two modes of SO_TIMESTAMPING
-    https://git.kernel.org/bpf/bpf-next/c/aa290f93a4af
-  - [bpf-next,v13,06/12] bpf: add BPF_SOCK_OPS_TSTAMP_SCHED_CB callback
-    https://git.kernel.org/bpf/bpf-next/c/6b98ec7e882a
-  - [bpf-next,v13,07/12] bpf: add BPF_SOCK_OPS_TSTAMP_SND_SW_CB callback
-    https://git.kernel.org/bpf/bpf-next/c/ecebb17ad818
-  - [bpf-next,v13,08/12] bpf: add BPF_SOCK_OPS_TSTAMP_SND_HW_CB callback
-    https://git.kernel.org/bpf/bpf-next/c/2deaf7f42b8c
-  - [bpf-next,v13,09/12] bpf: add BPF_SOCK_OPS_TSTAMP_ACK_CB callback
-    https://git.kernel.org/bpf/bpf-next/c/b3b81e6b009d
-  - [bpf-next,v13,10/12] bpf: add BPF_SOCK_OPS_TSTAMP_SENDMSG_CB callback
-    https://git.kernel.org/bpf/bpf-next/c/c9525d240c81
-  - [bpf-next,v13,11/12] bpf: support selective sampling for bpf timestamping
-    https://git.kernel.org/bpf/bpf-next/c/59422464266f
-  - [bpf-next,v13,12/12] selftests/bpf: add simple bpf tests in the tx path for timestamping feature
-    https://git.kernel.org/bpf/bpf-next/c/f4924aec58dd
+No, no - no need for that much extra work. Just wanted to mention
+for anyone following along or who stumbles on this in the future
+that my shell is bash, is all :)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks again for the work on this.
 
