@@ -1,78 +1,113 @@
-Return-Path: <netdev+bounces-168099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CB4A3D7A9
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 12:04:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DCD5A3D7D6
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 12:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E13D189BED4
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 11:04:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D46189CBE9
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 11:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218231D2F53;
-	Thu, 20 Feb 2025 11:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1831DE2D8;
+	Thu, 20 Feb 2025 11:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIS3q8E9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXN6T/bO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF70D2862BD
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 11:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348F21DA10C;
+	Thu, 20 Feb 2025 11:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740049465; cv=none; b=ompX/Sr8Ian+FdiamBLDIZovpxsrNg+bU13QFV+WERz38x6WgUTFSQR3ujnnsnL6v9JfXrOIFLB8nt+OSoXLMn5IM6WmjHYM1IF30pAR8mAoXXrEw1nbXuPSwJqM+MCXt0zwa9f2FD+oEROZKhq2b0Yp9QQD9bunaoGDWzqwmac=
+	t=1740049677; cv=none; b=DK+IScL0RPFFdAL6MvqsyykMKWktNEofiQ23aN3lKz/PzJM06T3xyBUap6T1l+ftHZgpvtbd5OesnrJKAvVTrTi3mcIb524AWjyvD8Z0A55SdlPPI1mtNV94u8Vlhk/N54iuCfVF/ixvfQCNJ47n/l1lSLU3cWZSuBWSigji7rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740049465; c=relaxed/simple;
-	bh=9JJLi5//xYGK4Radl004BlCb2owBsBf44fem4vyCV4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ybs8Hkrq/tjM6ADfifJEwv9CPHlqMcsgjWX9ErflvlVZlrg9gGPEssXEE9ksBOStfSNI6Og+2gY+WVspAUV9OscxwfGnSwxiJfov/e/skP7+pp/GnZNATb3HHf0azMwxx144fg8QE5W1zehR+jvVr8+Rxf8U1tQTgccFYwARZ0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIS3q8E9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC33EC4CED1;
-	Thu, 20 Feb 2025 11:04:22 +0000 (UTC)
+	s=arc-20240116; t=1740049677; c=relaxed/simple;
+	bh=dAOMnkWM48ceYbBeCq/KlkjRsHjtl1h9WRQVQqfvtZ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=niIJz9FReumCiYCkUeBAsN0F+Qn3j9WbloPKm55tVXhLRdDCvX+sr1HMwS7zi5F+Ail7LVBLNqQDuFpo1JnSffgz8yY5n9FNFHC2zukPNmHDEKtneFJZE0B0bA3uPsu3H3c9kisyL01ri9BEh9v0T9i7q1+qqvoYsKUh2YgDQJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXN6T/bO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72118C4CED1;
+	Thu, 20 Feb 2025 11:07:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740049464;
-	bh=9JJLi5//xYGK4Radl004BlCb2owBsBf44fem4vyCV4I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cIS3q8E97NVnM2r57uAF7oBFPzMTKoiGpsJxhVNdBLEh+I4e6Wc0w5cGHWmrEZp4v
-	 xoNMimatP4RlQub2scgoxaBrdzQIGpQ5khxA5fFMFqK49EYVRfHF1QkfYOvmeZQx71
-	 lgO/HJ4Wm2sFZ8QpWxs73tnLfx06/2wJMH8JzlVfu+uMxYYJfSM9K3EjCAQdxuRL1z
-	 du1tVDKwHbUVDa5+Ogh8COSnatY19PPFq7uJOX4wlzpH5G//1s2bGQodpMjgzh4qMQ
-	 yFEEgDjtqRA3Wufkm8RK0gjSc1VuShy+HvIFhyZoWUCl558tzguAWV0DqQGn03/8nB
-	 PHol71fPl5etw==
-Date: Thu, 20 Feb 2025 11:04:20 +0000
-From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: realtek: add helper
- RTL822X_VND2_C22_REG
-Message-ID: <20250220110420.GU1615191@kernel.org>
-References: <6344277b-c5c7-449b-ac89-d5425306ca76@gmail.com>
+	s=k20201202; t=1740049676;
+	bh=dAOMnkWM48ceYbBeCq/KlkjRsHjtl1h9WRQVQqfvtZ4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tXN6T/bO2IjYq/nkfp+mmiBNhdPL9VdR+tsFySJNtsEg5XMq2UBD3kpt83/dadFtQ
+	 2hbPJU7ltSoPM35sXf6XY2uYCUlC55M/sPqZvX6534rChiAnORAd7fCDm1f00iaxBI
+	 c0/o4/xabwJzQVm5tHgCGO+m/S6u5HEDAXjYGJh4xWQ/oeFR30LHSlbLa3kVXr9StQ
+	 M9GMgyZCM5xmLxf8fgmkMqykU9ymmMv9vIW95qf+DrukU9O+3vrrFR0OKeITL0kkYb
+	 7pV6kmPsu21FWI3p51DxPt2h3VRBuYlu1cFh4YnaJpXR9qsVVWIFp3o6/dSE/867do
+	 +sy7UED9bCXBA==
+From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Dmitry Yakunin <zeil@yandex-team.ru>,
+	Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Subject: [PATCH] net: set the minimum for net_hotdata.netdev_budget_usecs
+Date: Thu, 20 Feb 2025 12:07:52 +0100
+Message-ID: <20250220110752.137639-1-jirislaby@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6344277b-c5c7-449b-ac89-d5425306ca76@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 09:31:14PM +0100, Heiner Kallweit wrote:
-> C22 register space is mapped to 0xa400 in MMD VEND2 register space.
-> Add a helper to access mapped C22 registers.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Commit 7acf8a1e8a28 ("Replace 2 jiffies with sysctl netdev_budget_usecs
+to enable softirq tuning") added a possibility to set
+net_hotdata.netdev_budget_usecs, but added no lower bound checking.
 
-FTR, this is now present in net-next as:
+Commit a4837980fd9f ("net: revert default NAPI poll timeout to 2 jiffies")
+made the *initial* value HZ-dependent, so the initial value is at least
+2 jiffies even for lower HZ values (2 ms for 1000 Hz, 8ms for 250 Hz, 20
+ms for 100 Hz).
 
-- net: phy: realtek: add helper RTL822X_VND2_C22_REG
-  https://git.kernel.org/netdev/net-next/c/8af2136e7798
+But a user still can set improper values by a sysctl. Set .extra1
+(the lower bound) for net_hotdata.netdev_budget_usecs to the same value
+as in the latter commit. That is to 2 jiffies.
+
+Fixes: a4837980fd9f ("net: revert default NAPI poll timeout to 2 jiffies")
+Fixes: 7acf8a1e8a28 ("Replace 2 jiffies with sysctl netdev_budget_usecs to enable softirq tuning")
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Cc: Dmitry Yakunin <zeil@yandex-team.ru>
+Cc: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc: David S. Miller <davem@davemloft.net>
+---
+ net/core/sysctl_net_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index ad2741f1346a..c7769ee0d9c5 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -34,6 +34,7 @@ static int min_sndbuf = SOCK_MIN_SNDBUF;
+ static int min_rcvbuf = SOCK_MIN_RCVBUF;
+ static int max_skb_frags = MAX_SKB_FRAGS;
+ static int min_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE;
++static int netdev_budget_usecs_min = 2 * USEC_PER_SEC / HZ;
+ 
+ static int net_msg_warn;	/* Unused, but still a sysctl */
+ 
+@@ -587,7 +588,7 @@ static struct ctl_table net_core_table[] = {
+ 		.maxlen		= sizeof(unsigned int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+-		.extra1		= SYSCTL_ZERO,
++		.extra1		= &netdev_budget_usecs_min,
+ 	},
+ 	{
+ 		.procname	= "fb_tunnels_only_for_init_net",
+-- 
+2.48.1
 
 
