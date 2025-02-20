@@ -1,134 +1,130 @@
-Return-Path: <netdev+bounces-168309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BCDFA3E77C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:24:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F93A3E77E
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 23:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88A2B7AAD91
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:22:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D22D219C4100
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 22:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36557264FB4;
-	Thu, 20 Feb 2025 22:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6E21F1506;
+	Thu, 20 Feb 2025 22:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQFrxb+w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mt3Te2Ft"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7D81EDA2E;
-	Thu, 20 Feb 2025 22:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849A41EA7EA;
+	Thu, 20 Feb 2025 22:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740090159; cv=none; b=G+OITMi8yY70EqdLgsPr9PWtEdiKQwaNdpwZaAzk0hNZDBz/92ArHL0VeoATK7kcvSzieniQ/Du+IAV4uXWjlw9BtGqev7C2OyoE9JDTF6YJ7y0Pyu+u5cgXWo8qyQfs++mu191n9gpfHWnR+STJHZjc95dYaRftDGLtcYj6z8Q=
+	t=1740090337; cv=none; b=bpkbmqqMOFN9UMFuaAMiXKEe8cDLZQjJFj1pXqHtqDIQdxnInjmOG4tvT3vVUIfuy19eq8/xAlZCLa964V3fQTXcKHwSw363rUU98hgubj/j3tQNmp2+COE33qsZM/9z1uaXDLX+Riyjg6N82irh7IBhOi7VosY1P7OO262CkIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740090159; c=relaxed/simple;
-	bh=Qq5fyp1AV+CpdB//yQ1N+e6P4hjmeikr9PqMi6ZYCpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AiWv6udXMlQbeQelVjVvq8wknWmyCwBPs4xahyuBNvdkJ+oukVxHXOLYP1YBti92cKfAtreLg3wbojSDUsxEd9v+PvKO+A4GDeaArhpP1i1aaWqmrDASUoc/xVIrUFs9a8uveEfJAfapdJVQq6I/s+3E6/HGYKGhVeo3qr3NiOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQFrxb+w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F2DC4CEE8;
-	Thu, 20 Feb 2025 22:22:38 +0000 (UTC)
+	s=arc-20240116; t=1740090337; c=relaxed/simple;
+	bh=RJiaUdl2RvW6e22DMN7RYxWmy6sBbotkEMjdbKNhlxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gfWi32ylnMxBswRaJfUI8N4sDqH2Mj5ld4Q1n68H/MOgv8lbzcCDCwZ3O69C9AUxZMAH1D03sb+OVfyi9AX2qnjTktKcrvNiG0LEhgG7kXkwdhNb4XoZm4/JJgipog9qYLNxd40zj6S5ddA4NcngLp8iYLMDjudNkh5w2TByi9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mt3Te2Ft; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC3B2C4CED1;
+	Thu, 20 Feb 2025 22:25:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740090158;
-	bh=Qq5fyp1AV+CpdB//yQ1N+e6P4hjmeikr9PqMi6ZYCpE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gQFrxb+wGVuKFNqe4iYp5s2lNsH/ZO4gxs01a3zC7+df3KPWCygwQEur/ZnnjzCFJ
-	 aqTiTg+Uo/cyAfAdT4rZ101Dky4EgOrzAI9TjOD0N5xYUiM/xfPOat/OeoxUfLVESD
-	 8DFOBH9v6VoxaRs1dsdMagks3sNAsawAfSZhtMEYaqOp5iLqT4cWaSAQMDEbVo/fHB
-	 2MY+tbZhLV+QMlNpPCFF+4dXuNEs+s02V93b9uWiFOJoopr11v6jsJ7aKV/fSLBejq
-	 OaDAGvcjZL0dC2MBPzAoK0sE7cLm88n+fA1ZeLT//FXh1HPOP36dDfC05JaYpLeJcx
-	 Ox/wiLE5ujXrg==
-Date: Thu, 20 Feb 2025 14:22:37 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shahar Shitrit <shshitrit@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next 4/4] net/mlx5: Add sensor name to temperature
- event message
-Message-ID: <Z7erLQwDBHYoCV7X@x130>
-References: <20250213094641.226501-1-tariqt@nvidia.com>
- <20250213094641.226501-5-tariqt@nvidia.com>
- <20250215192935.GU1615191@kernel.org>
- <20250217162719.1e20afac@kernel.org>
- <8369b884-71c9-495a-8a1f-ab8ca4ee5f59@gmail.com>
- <20250219072829.21ee1cfc@kernel.org>
+	s=k20201202; t=1740090336;
+	bh=RJiaUdl2RvW6e22DMN7RYxWmy6sBbotkEMjdbKNhlxo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Mt3Te2FtyuZ+yp9KJmQeaNyj3kpDuuTeR+PBQW/1mCbe7JTKrTjx8EGBVUxmw1kh+
+	 o7r9iBQwNO5Cm1v3zGj9O0hBG9MCaAcp4bz/hLnbXCrt9I4AFo/m2niXpaOW4ybJPP
+	 l/mfC53NKy6Kgjq2SgeFv1sjbhtKpeAtxUwsr/XoyAhREgfPOzuBVhalr2FHwereKU
+	 x4h0DbVXYV/sE6NE2lO4efiXAkEAsbPg69xW9l3adGU56I8apAjAMJGGRRxt0iD1rk
+	 Efpye7hidjorq4dfja4hFPFvSFSINokwNxIKbJuLkkwhucnnJFFh9ekJ+lgxISlN6q
+	 VHraLlyodNQQw==
+Date: Thu, 20 Feb 2025 14:25:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+ <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+ upstream@airoha.com
+Subject: Re: [PATCH net-next v5 05/15] net: airoha: Move DSA tag in DMA
+ descriptor
+Message-ID: <20250220142535.584b0423@kernel.org>
+In-Reply-To: <20250217-airoha-en7581-flowtable-offload-v5-5-28be901cb735@kernel.org>
+References: <20250217-airoha-en7581-flowtable-offload-v5-0-28be901cb735@kernel.org>
+	<20250217-airoha-en7581-flowtable-offload-v5-5-28be901cb735@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250219072829.21ee1cfc@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 19 Feb 07:28, Jakub Kicinski wrote:
->On Wed, 19 Feb 2025 15:00:57 +0200 Tariq Toukan wrote:
->> >> If you have to respin for some other reason, please consider limiting lines
->> >> to 80 columns wide or less here and elsewhere in this patch where it
->> >> doesn't reduce readability (subjective I know).
->> >
->> > +1, please try to catch such situations going forward
->>
->> This was not missed.
->> This is not a new thing...
->> We've been enforcing a max line length of 100 chars in mlx5 driver for
->> the past few years.
->> I don't have the full image now, but I'm convinced that this dates back
->> to an agreement between the mlx5 and netdev maintainers at that time.
->>
->> 80 chars could be too restrictive, especially with today's large
->> monitors, while 100-chars is still highly readable.
->> This is subjective of course...
->>
->> If you don't have a strong preference, we'll keep the current 100 chars
->> limit. Otherwise, just let me know and we'll start enforcing the
->> 80-chars limit for future patches.
->
->Right, I think mlx5 is the only exception to the 80 column guidance.
->I don't think it's resulting in more readable code, so yes, my
->preference is to end this experiment.
->
+On Mon, 17 Feb 2025 14:01:09 +0100 Lorenzo Bianconi wrote:
+> +static u32 airoha_get_dsa_tag(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +#if IS_ENABLED(CONFIG_NET_DSA)
+> +	struct ethhdr *ehdr;
+> +	struct dsa_port *dp;
+> +	u8 xmit_tpid;
+> +	u16 tag;
+> +
+> +	if (!netdev_uses_dsa(dev))
+> +		return 0;
+> +
+> +	dp = dev->dsa_ptr;
+> +	if (IS_ERR(dp))
+> +		return 0;
+> +
+> +	if (dp->tag_ops->proto != DSA_TAG_PROTO_MTK)
+> +		return 0;
+> +
+> +	if (skb_ensure_writable(skb, ETH_HLEN))
+> +		return 0;
 
-The reason in mlx5 was that we wanted to preserve the official HW spec
-auto-generated fields names and they are really long.
-100 chars worked very well with us for example the following sequence of
-code setting up a FW command buffer would have to be broken in every line
-if we were to restrict 80 chars per line.
+skb_cow_head() is a lot cheaper (for TCP)
 
-  MLX5_SET(modify_vhca_state_in, in, opcode, MLX5_CMD_OP_MODIFY_VHCA_STATE);
-  MLX5_SET(modify_vhca_state_in, in, vhca_state_field_select.sw_function_id, 1);
-  MLX5_SET(modify_vhca_state_in, in, vhca_state_context.sw_function_id, sw_fn_id);
-  MLX5_SET(modify_vhca_state_in, in, vhca_state_context.arm_change_event, 1);
-  MLX5_SET(modify_vhca_state_in, in, vhca_state_field_select.arm_change_event, 1);
+> +	ehdr = (struct ethhdr *)skb->data;
+> +	tag = be16_to_cpu(ehdr->h_proto);
+> +	xmit_tpid = tag >> 8;
 
-But I believe the driver grow larger than caring about those lines too
-much, I just did a quick check and it seems less than 2% of the lines are
-actually > 80, not sure this is due to being more strict in the past few
-years or that we don't really need more than 80 lines.
+> @@ -2390,8 +2498,10 @@ static int airoha_probe(struct platform_device *pdev)
+>  	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
+>  		struct airoha_gdm_port *port = eth->ports[i];
+>  
+> -		if (port && port->dev->reg_state == NETREG_REGISTERED)
+> +		if (port && port->dev->reg_state == NETREG_REGISTERED) {
+> +			airoha_metadata_dst_free(port);
+>  			unregister_netdev(port->dev);
 
-I also check the interesting cases with macros such
-MLX5_SET/MLX5_GET/MLX5_CAP and also the percentile of long lines was very
-minor just about 5% in all cases.. 
+Looks a tiny bit reversed, isn't it?
+First unregister the netdev, then free its metadata.
 
-So I kinda agree mlx5 doesn't need be so special anymore. 
-Tariq up to you, you are the main  reviewer now.
+> +		}
+>  	}
+>  	free_netdev(eth->napi_dev);
+>  	platform_set_drvdata(pdev, NULL);
+> @@ -2416,6 +2526,7 @@ static void airoha_remove(struct platform_device *pdev)
+>  			continue;
+>  
+>  		airoha_dev_stop(port->dev);
+> +		airoha_metadata_dst_free(port);
+>  		unregister_netdev(port->dev);
 
-Thanks
-Saeed.
+same here
 
-
-
-
+>  	}
+>  	free_netdev(eth->napi_dev);
 
