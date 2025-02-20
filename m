@@ -1,226 +1,163 @@
-Return-Path: <netdev+bounces-167990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C3FA3D0A0
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 06:07:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31E40A3D0CB
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 06:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96B4179A84
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 05:07:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 050CA1762E1
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 05:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698941E231F;
-	Thu, 20 Feb 2025 05:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EB72AEF5;
+	Thu, 20 Feb 2025 05:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="aUqrAG2Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+xcpIkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2055.outbound.protection.outlook.com [40.107.247.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1898919007D;
-	Thu, 20 Feb 2025 05:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740028013; cv=fail; b=SmQDGIj8QUyUiYZvoDoLTwpBQGBJ30zr6s6cxtWdxDjKFPEroqMysujYqS0tDslriMQ/cpIWCuyGRhmkZS21HCFgkP3QmiDKEbBFB10wcKrX1doKbPnEhiU9FU3OIYxya4XbZVq6z5ereEmoe8ME/QcTkODPnNOXCjJnPsTGM8A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740028013; c=relaxed/simple;
-	bh=qIb7vCV5MbatAnF8fCAgh0vjbxBfpb2lQo0ivcZkKLA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y+BGB4dc2w7ybGrT3uzeD29XC8slrIemlok4NjjTenxbR5Dj+WXjsHJ43eLmwQBT7qqewuO5MBOkpIzDVPX+X+xtRS8ISDdT+f3vstjGmTjLEfNy1SB8bmV3b/fM//CaAjOLd91kZJY2+T1r0BtWyFzRLCUq6q/dFPpYLdIg1rQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=aUqrAG2Y; arc=fail smtp.client-ip=40.107.247.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X9zXXP2CElOgdjC/xHjzo/xgvL8TDKQPUkI7qaWYa4zEfCor/8g4P8Me57DCCX0rK4VzYHTAHlGtEeb+6PeGs9rG8aHYsgifhdHgnnYh6aOwErr/qyLXevy8iclx5TTgTMhflsRF2LBBsHj1FZlWgJibKnLbqdg1vtHzfxX7hTGU4Lzqlb7rxvyJHTd3LB+dSJdlEhhkX7qWsRGj3tKqgE5ImYdKsgC55+PyY00gm1zfNkKlpfeyXLbeXg5udkWZpH2xT6PxIZ0CQeOwOWIsPs2A8hw7M2p3VC+ArTYax8QeGz2Hd4Vj5PM5Nt+QU9aTd8ou3hDzfW9Hvemfoe1wyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jbsUFkK1kcdhpA/5zyW3NNFJc6lULpIYiUta6EKClNQ=;
- b=e7/GIHWEMywaxLJyJpTW7lUIRU3jrV+kUx3OdWcSZs/HSjpwCUfDoicdSHEC66dLDj8+JIRaXMJ2h0WQeTLSB+5hP9YqkiyB32pGAHUOrcXuyCdcuCd3zGPraRcCvKs8v1CZOQBwKXaPeVXv9jjxhO4T14S7dr0rXGPV0DgbKat7dnosinvz6RYyyVYt6O80i7+2vq7jUFZpYQ7gYZelFfNmiHyU98FR+jUBFHQGv/sDQvm8oYvPUYswSKmwqjQpjCAxmG16kq41IwgSIhkjqRT/uL9WpiHJEqL/Fo1E3e8Wn8NUislS9mS+ql1ghQeXiRCLt5t62q1samxqEPu5+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jbsUFkK1kcdhpA/5zyW3NNFJc6lULpIYiUta6EKClNQ=;
- b=aUqrAG2YmY6Et1cLRMh0UIiUP2mvOPqca826ybgemIj/7GvgV4Ri+qaJRUfZXrbxZQM6dyXWAa+hyU4ePNgbBYm93/AHGS8AVq2KiGYx/vCOROF6KmIKBUTbwGuG9K+JwbFYKcXDZOddMqWAefNXGkv/+VUjELklZcMohIqBKXx5hlxUBEK4/Df2ZoYVgw95tLEqXGuklBkUqaWOs04Zr24lGrCUMUHLSzE1nZaKf6wuuf2GmhHMTz3NuHn/Rb2T0lQe9xqtJsvUKyoFtxSwyQrhSsQk2Y9PRuBe3nca/Ns0lPEAujC+MMmaLgpUFnzwM9tCbE9B8ueHgEc527Ci3A==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GVXPR04MB10826.eurprd04.prod.outlook.com (2603:10a6:150:226::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Thu, 20 Feb
- 2025 05:06:46 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8445.011; Thu, 20 Feb 2025
- 05:06:46 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: Ioana Ciornei <ioana.ciornei@nxp.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
-	"michal.swiatkowski@linux.intel.com" <michal.swiatkowski@linux.intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH v2 net 9/9] net: enetc: fix the off-by-one issue in
- enetc_map_tx_tso_buffs()
-Thread-Topic: [PATCH v2 net 9/9] net: enetc: fix the off-by-one issue in
- enetc_map_tx_tso_buffs()
-Thread-Index: AQHbgpOTkcGlUe2F8Uqdee5IlYnyh7NO502AgAC9p2A=
-Date: Thu, 20 Feb 2025 05:06:46 +0000
-Message-ID:
- <PAXPR04MB85106BF748386C843FE28C6488C42@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250219054247.733243-1-wei.fang@nxp.com>
- <20250219054247.733243-10-wei.fang@nxp.com>
- <AS8PR04MB8849C3544A63C75E37D2079896C52@AS8PR04MB8849.eurprd04.prod.outlook.com>
-In-Reply-To:
- <AS8PR04MB8849C3544A63C75E37D2079896C52@AS8PR04MB8849.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GVXPR04MB10826:EE_
-x-ms-office365-filtering-correlation-id: 04655384-733b-4158-e8d4-08dd516c5fce
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?P0F5elpgwxqYRiOJXIh7wQdAOVrpNu8BdlZm8EHucez5WlXVEkS82uj3sIPc?=
- =?us-ascii?Q?THWhLyc63wfaWJTf9xhxcmtsD0RZSuPRjSdgPDpndExwk3T4xivtX3WMUFZy?=
- =?us-ascii?Q?u6VKACRGyk17BizMNTpvJZYl4yEXx9BNXgRFcHyeuwqzlj+bD79ca0YE4CfE?=
- =?us-ascii?Q?wWGX3vksoIl5nKn04eabbmMPllVzlPiiYbo/EB/561YX2+7Um9MJSwayzy/R?=
- =?us-ascii?Q?/eJRhe0uB7HzS76BXKjbFz8l5QEj9YA5krka4rzi0YHfRDHPV+Ra1uEOW/dc?=
- =?us-ascii?Q?wbk/J27jrYX1QkBPXlxEEeiOfGCFY3gEXzEqAb+b5qoXwnyzonvDhWx4KuUI?=
- =?us-ascii?Q?MTdPlLlpLzo74cs5gLhsmry2mOiqqhkjgdr8m2j+GBCUdzamdYfEVdLJGA7D?=
- =?us-ascii?Q?oJU0Cp/N96R86agpBLYxZnwynvQZEFPLdhF9Yal+gxBF+jeHviQwRzQQs50V?=
- =?us-ascii?Q?QXp6SEHzWEaycH7BO/u8oTJaBXIBoAZECpHyTL3XKe0S5JaeSlAFs3ByI7Mt?=
- =?us-ascii?Q?V6k8FyNjsP+Yz//HEN90uZ9WxylK2rE6sMo5RFSPPRhkNYjlvUnwuEAW3VtK?=
- =?us-ascii?Q?FZk+z/bT0mvAXH9lyx+HLFHx0e8h+ezumrxcmRqZJkI1uZxNkkWBicDR2zJr?=
- =?us-ascii?Q?hEZu80MXaCz77oEXEihpgNqp+bHDQbqxL59x2f2Uc04qn8Pyeq8eYqUkZB9e?=
- =?us-ascii?Q?P4j56u3qiNY7b6yvUewVNN5Zx/LpBn2ARjvB1tqgN1ampJKfkSvjeSMtmyIz?=
- =?us-ascii?Q?CdGflJVJB+cbXcqcDhFVQ/vYSqvXB2MhI7/bSf5Pc2LmneoHtAZxIMtw1hXK?=
- =?us-ascii?Q?Z1FtY84IcIowpHgDBqARRbANC6sRwpfWmcvHCvjQssHrz3KyyhNUW9EhWpB0?=
- =?us-ascii?Q?/1bR0xi0KkHHYmJDdFw4Btlm3zyPKvEyrVEWhs0MJ3ZLVhrWoRxLsDfMOgAV?=
- =?us-ascii?Q?Wc9nHX5b0TXfgaTeq3bv6l+5wsC3WGIretn2VCt51esIp8c5QUwovAeW0bWY?=
- =?us-ascii?Q?MM9v1rIC/sHQcd8gZ8aaOWrnvmQUD6WJmMT1nAddrFzAi11Rr0kls5z8v3mc?=
- =?us-ascii?Q?8Dsj/UvQTUm7KNYAvOQrXS/3FV/UIHBmexYzQNvtuaBZGD8wTp8+2K+hY0zk?=
- =?us-ascii?Q?V5t9IHZct3OcVnhpA/C8LrGDkD6QMB2a1Qavdqyos084wAAGAGOlWajtkvrQ?=
- =?us-ascii?Q?nu1F+0N4eI5MG5tUp3zfr0tjU9cPNUYxP6iSJ+DI9+KLQr+dgUKF/xC5xEAc?=
- =?us-ascii?Q?mG+dCwZJvjYsH7NTELXLwS4in6V/U6AFnpgqBvCdTcjvcDH1Uzgg5pKnaMDb?=
- =?us-ascii?Q?pbvNEWTPqxzdZh+82VwKr5sBKKjlB8vrIP/u53L9hToyeXt2CrK8jxgYpTu5?=
- =?us-ascii?Q?IIPD06irWscaixE9rrQlPZ2GbQM1b8MHcDCIETXCKnEbMFD3F5x0ovpdCL75?=
- =?us-ascii?Q?TsrsHBVBLRxooI6kznHf4ubjnN025F8p?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?6fSEPtAfRTGrNXNLvabS7cp7vku45wKUnbMzRIyqaXiUh+2a71yPaltEM11P?=
- =?us-ascii?Q?XrA16w9oQgGYlPrvrcmBCKgxS13qeuB+OkTbD6/dZ/fTEDn16Lz0RRdswwry?=
- =?us-ascii?Q?TO1UX0ZIM0i9uJ7A8iRVzMVudwQlE8g7f9jspzc8wVDzhPCaLGFwaq9xeB8S?=
- =?us-ascii?Q?134Z7IqTi/FRePe0B5r1+2qU60+uFAnb5nFJuDjqikv0xmnxiD/8P/mFjXnf?=
- =?us-ascii?Q?Tm5NRnRntQZMdiHcl5Ec0WwWMrP1dokW2aWX7nN/SKIKVPK1vdx+of8G8auY?=
- =?us-ascii?Q?ySsiKjaXu8AgHlyoGeQdkoTn80oxE7QDPoTjRGhYgeYOmFZnGYu+r4NMHOmT?=
- =?us-ascii?Q?lHB/ZSYoyNQT5QEm4JUf7R5aZvCeeTCmeeg8xcigrTj53pI1wGrbqSlCmZIH?=
- =?us-ascii?Q?GpLDHxj0idqXUN2onxThuaDAuvntvCRzQJn3CrEBOU++d0PWFP+PuHo5Yu4A?=
- =?us-ascii?Q?etjg+Xlp8x0sZXhZmAmAcu711UYO0dGOF5N9ShQfmW6eUsmiZcY/G8jTkK3A?=
- =?us-ascii?Q?geiCN4Dvut3BB62iKdyfxcUw6CcUUE8/MQoLse+jchxvmO5gYvChcjMhOs0h?=
- =?us-ascii?Q?BDqVoqrvAyvi3o9gdDxHV2YwuaDxT1GyFmjoNTKI/RZJpHP5BG8v+7sVgEhi?=
- =?us-ascii?Q?Pb9jSjV+kjPyV5SoMa6NBm/NUZL7oBdnngCwMiLW9nw9V+kz/1sb3fTYn/69?=
- =?us-ascii?Q?nGDHp12tcDopgnzhs6RNx70REUmTlg8nF7xRseaJRtGlaS8By6R1rFH6TVKO?=
- =?us-ascii?Q?zNDrokuMvJnV9qZ/kh/Toj6Ek5uA8Lw5RRDtglubLRw4amWomRbUzAyj7cVX?=
- =?us-ascii?Q?8S2enV4ECcCbHjRntd9XDSqeNYaq6/VMrJwcA6kGWfT/TO/WO1JeX3ZtEHy4?=
- =?us-ascii?Q?kUktBqiZj34TtHTmozATc4OO/PPPqOLNeClNDJLjP2yvRIwlVxs0S7b9VGmZ?=
- =?us-ascii?Q?DkNc39r5PQHQgdHaboa2lE03ZWSUlMn/UyFV44S15fRo/CDNJR/AYNWIFKNk?=
- =?us-ascii?Q?WFjGtoG/G9KwUnacQzRtvIuggznMZNDRhbxcOG05c4JTKDtV1aAmdhYa8ZOm?=
- =?us-ascii?Q?fjkNRROdY7iVwbEXEkz+hjRlzEtYwhjQTV0Erzhv7mCpVCo7Uz+oZEGC2BYc?=
- =?us-ascii?Q?nn7axZzccl9W7r9YMNdgwGm9VsEoxMP7DGVaZBEgGMAVvS4e6lpn9QJZe3gt?=
- =?us-ascii?Q?74aSv7qsDnFoTCpthsl9FLEo+2rCru9caGbXbLp4Vm4Lv1N8Lp1shmkA6E73?=
- =?us-ascii?Q?n0pBuBoFycfqYvK4DkaNZ3tPmfeR47kA69LRZWmXm043YMyBEnlZvN4JV8As?=
- =?us-ascii?Q?vlBRkOBbqnWJn0ZSM1Am0zbm7QZuI6lZIDufIofbcdsZihalJDMoWIIeInrY?=
- =?us-ascii?Q?xKqX70Uer1IeznkMRAaUqfwRqfhWSmKFVaoX6zw684PtGohSwPsxjilW4mxN?=
- =?us-ascii?Q?W1NUeIRv5uL6vD3Qj0y0CbR27//DGs4L0JjKp0YBuZ8Etojr4FLP2U/1q1w1?=
- =?us-ascii?Q?G2j4BfwSnYBzQVJlXoMEjfL3RHliws44lFSDuqfGpHXCz+ZheGd5O1gZXtGK?=
- =?us-ascii?Q?XnmNCyIu3NU1zFEUAkg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E8D524F;
+	Thu, 20 Feb 2025 05:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740029552; cv=none; b=VsEQAe3kY4Jl5m97DrDLbGV1JDIUYQE9PJcWZMPyJVUApJhQ1ELVj8W6a6kA0mVJaNi2wdiLNJrGAglh4VIp63brgV3JF7LpY6okU0b9Mb3T6/nHCO9yV4+1s85MXKzX53S1OYfklIMccLWpaPq41qCKWk/1qstSTq55pKjhqtk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740029552; c=relaxed/simple;
+	bh=3e9ITB0v0vv4TVkNHrbax69/+NT3q8n5gFLHHx7q1H4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwHpVir8rZvuhfuIShtFy/CHg91m6/kR013ZV3uCj9hvd7Jj1UcyIfiindtpP3SJHFdG3LKuj2E90UnF5TtpoKvRX5qlq2bDEs8oz0G/hWkQpLdIaKzz5EvID7E81N1WrFsZ2sNqgoBhlCwYOEON1FOitSMq8a8i+8A7pBU8Kqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f+xcpIkP; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5debbced002so1058793a12.1;
+        Wed, 19 Feb 2025 21:32:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740029549; x=1740634349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t59XJ1OOcCF4nLjXJy5R2daGlLc6nwlV0JhixHTmrLs=;
+        b=f+xcpIkPMjAwzWyNdpRMWKu03myVdRhfHQYHeraQmnjNca8cLKBLrA+w9B4RXzPHpO
+         DjMdqs2WAZ4wNTOHoCVmQrSVqFiiqHsiUBf+UFf6pEndNB1YLrYlgRggE8OarkMOhspg
+         4e2u11OoIvTM5UjCp/UObGwQPD9uvKgzNeMOgH2Ay2FOist1LWDBNgC1g17HHpdIMA6A
+         5sAs6adSVV/A4CJ5NP8DFk6iJ5ILRyk8VdnBR2xKMhZJOg8qqqbNFGOENdjufr70FJg4
+         PMLOjYP6uy/2BQrvFFTLDfmpwoPAunOFiy2wVbNyMW3rfKsHosX7bcS2CalgUy28MHhE
+         WLeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740029549; x=1740634349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t59XJ1OOcCF4nLjXJy5R2daGlLc6nwlV0JhixHTmrLs=;
+        b=iC+FKYxJ4luFUtb1WIdYoLwr90viBlQ8gr8OGr+K8YpRrSGHxt+dkOQDhzVPAd8TbR
+         6hGz84bKDqCITEWBH66nladgK9MgT5C6Gcca/cYxMSD/BMswXox5oGeJpS6vxd/Dgiha
+         1xWMOFQEP+uEXbh98R56WVIp1SfMY0OxuZOeK5nLr5psXoyl2GmdcSsndEdswEHODAyF
+         jJgxBRf4+zPz1TZvsPxqo6dAfWHuBbb8ewDtGS69gu5wk4DS9Aibux/Bh1fjw4m0TNaM
+         ej+m6NOJI67P4LhmFbBAeBGcfncrbimSBGsTjHg9OUAfqB4IMj6xV8owqLG50FiqCFaV
+         Flzg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4GybqrEzhKI2wO6Gpyo4qk9afX7VD7i4dubZApZqJ5zlkDx8R0LmHnbYJyMt3o6BLmL5FtoXF@vger.kernel.org, AJvYcCWVut1s3LWjkfrXmuKqsycni3SQy08D7a1vNA15QFzJ0zUEN5mJiRuPeGzDQjl6YBf+EFVTxfSH2r4uTV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwElIiQXvu+KBYnvBCetu8LQpq3OAfbs1Ikp4ptZ/lRrCww/KdO
+	6SQFCxLsqSrvSZmih9fUDBmp+4rY1V4FH+7L4QEpti0RgvzBTgF/
+X-Gm-Gg: ASbGnculMVmbhtpp3oFdKS6Wk8kWlofhu9TRlJu1zW6bvPXlpzTZASMh8rKfUAXnXuT
+	gYE+6CibE2yrRhKiJqWiKGpwN07GrfrdsWVAhaCKIKAN4zXnVpbL+WcJ+NwFSpbGhofRIsQkiT+
+	erhSMZYSEMJosZ4sZ5xRlK8wOMlPgSeATtO31uaIeUgM+EUPkYLA51B5jph2kLpisv4chH1EXVp
+	BSMMpYPMroyQL4/enSmI5WIQld5ZamjkEJ2Gnnwn0Si1NZ5HAJGLpiw4ExUNfbGtEr1RtZwZG4P
+	BRv5hw5N7q6J
+X-Google-Smtp-Source: AGHT+IG5X+Oirh4JKvNeSMlWoYa1IlfqRECBCeBBySZcsJ3c+Cct98CBZ/HOrW3zk4EV+wdO7JttHA==
+X-Received: by 2002:a05:6402:34c6:b0:5db:7353:2b5c with SMTP id 4fb4d7f45d1cf-5e0a1280fe2mr1684309a12.11.1740029548538;
+        Wed, 19 Feb 2025 21:32:28 -0800 (PST)
+Received: from debian ([2a00:79c0:604:ea00:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e076048c05sm4121660a12.35.2025.02.19.21.32.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 21:32:26 -0800 (PST)
+Date: Thu, 20 Feb 2025 06:32:23 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: phy: marvell-88q2xxx: Enable temperature
+ measurement in probe again
+Message-ID: <20250220053223.GA3914@debian>
+References: <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-0-999a304c8a11@gmail.com>
+ <20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-1-999a304c8a11@gmail.com>
+ <Z7V3Wsex1G7-zEYc@eichest-laptop>
+ <20250219104647.GC3888@debian>
+ <Z7YUG2RjpBImivqF@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04655384-733b-4158-e8d4-08dd516c5fce
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Feb 2025 05:06:46.1770
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y1bJoA+qPgGoNbnRV8prd/tH01Cwb8QrLvgYgMhA7GfMjOZMoHxorbbH1hZI2wUrG5UcwS5fXkwgQcCRbvfy9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10826
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7YUG2RjpBImivqF@eichest-laptop>
 
-> > -----Original Message-----
-> > From: Wei Fang <wei.fang@nxp.com>
-> > Sent: Wednesday, February 19, 2025 7:43 AM
-> [...]
-> > Subject: [PATCH v2 net 9/9] net: enetc: fix the off-by-one issue in
-> > enetc_map_tx_tso_buffs()
-> >
-> > There is an off-by-one issue for the err_chained_bd path, it will free
-> > one more tx_swbd than expected. But there is no such issue for the
-> > err_map_data path. To fix this off-by-one issue and make the two error
-> > handling consistent, the loop condition of error handling is modified
-> > and the 'count++' operation is moved before enetc_map_tx_tso_data().
-> >
-> > Fixes: fb8629e2cbfc ("net: enetc: add support for software TSO")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> > ---
-> >  drivers/net/ethernet/freescale/enetc/enetc.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > index 9a24d1176479..fe3967268a19 100644
-> > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > @@ -832,6 +832,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr
-> > *tx_ring, struct sk_buff *skb
-> >  			txbd =3D ENETC_TXBD(*tx_ring, i);
-> >  			tx_swbd =3D &tx_ring->tx_swbd[i];
-> >  			prefetchw(txbd);
-> > +			count++;
-> >
-> >  			/* Compute the checksum over this segment of data and
-> >  			 * add it to the csum already computed (over the L4
-> > @@ -848,7 +849,6 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr
-> > *tx_ring, struct sk_buff *skb
-> >  				goto err_map_data;
-> >
-> >  			data_len -=3D size;
-> > -			count++;
->=20
-> Hi Wei,
->=20
-> My issue is that:
-> enetc_map_tx_tso_hdr() not only updates the current tx_swbd (so 1 count++
-> needed), but in case of extension flag it advances 'tx_swbd' and 'i' with
-> another
-> position so and extra 'count++' would be needed in that case.
->=20
-
-I think the patch 2 (net: enetc: correct the tx_swbd statistics) is to reso=
-lve
-your issue.
-
+Am Wed, Feb 19, 2025 at 06:25:47PM +0100 schrieb Stefan Eichenberger:
+> Hi Dimitri,
+> 
+> On Wed, Feb 19, 2025 at 11:46:47AM +0100, Dimitri Fedrau wrote:
+> > Hi Stefan,
+> > 
+> > thanks for reviewing.
+> > 
+> > Am Wed, Feb 19, 2025 at 07:16:58AM +0100 schrieb Stefan Eichenberger:
+> > > Hi Dimitri,
+> > > 
+> > > On Tue, Feb 18, 2025 at 07:33:09PM +0100, Dimitri Fedrau wrote:
+> > > > Enabling of the temperature sensor was moved from mv88q2xxx_hwmon_probe to
+> > > > mv88q222x_config_init with the consequence that the sensor is only
+> > > > usable when the PHY is configured. Enable the sensor in
+> > > > mv88q2xxx_hwmon_probe as well to fix this.
+> > > > 
+> > > > Fixes: a197004cf3c2 ("net: phy: marvell-88q2xxx: Fix temperature measurement with reset-gpios")
+> > > > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> > > > ---
+> > > >  drivers/net/phy/marvell-88q2xxx.c | 7 +++++++
+> > > >  1 file changed, 7 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+> > > > index a3996471a1c9a5d4060d5d19ce44aa70e902a83f..30d71bfc365597d77c34c48f05390db9d63c4af4 100644
+> > > > --- a/drivers/net/phy/marvell-88q2xxx.c
+> > > > +++ b/drivers/net/phy/marvell-88q2xxx.c
+> > > > @@ -718,6 +718,13 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
+> > > >  	struct device *dev = &phydev->mdio.dev;
+> > > >  	struct device *hwmon;
+> > > >  	char *hwmon_name;
+> > > > +	int ret;
+> > > > +
+> > > > +	/* Enable temperature sense */
+> > > > +	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TEMP_SENSOR2,
+> > > > +			     MDIO_MMD_PCS_MV_TEMP_SENSOR2_DIS_MASK, 0);
+> > > > +	if (ret < 0)
+> > > > +		return ret;
+> > > >  
+> > > >  	priv->enable_temp = true;
+> > > >  	hwmon_name = devm_hwmon_sanitize_name(dev, dev_name(dev));
+> > > 
+> > > Is it necessary to have it enabled in probe and in config? Is that
+> > > because of the soft reset? Can it happen that the phy is reset but
+> > > config is not called, then we would end up in the same situation right?
+> > >
+> > Even if the phy is not configured yet, it is probed and the PHYs hard reset
+> > is deasserted, so I can read the temperature. I think the situation you
+> > mean is when the PHY is brought up and down again. In this case the hard
+> > reset of the PHY is asserted and I can't read the temperature. That's
+> > the second patch of the series that fixes this issue.
+> 
+> Okay I see, thanks for the explaination. So the code in
+> mv88q222x_config_init is required after a hard reset of the phy. I was
+> just thinking, if we could avoid the duplication but I guess both
+> enables are required. Could you maybe add a comment why we need to have
+> it enabled in both places?
+>
+Will add the comment.
 
