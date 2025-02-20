@@ -1,109 +1,142 @@
-Return-Path: <netdev+bounces-168231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D892A3E310
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:52:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0099FA3E301
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 18:48:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFDE73AB84C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:46:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F701885D3F
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 17:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E522139D2;
-	Thu, 20 Feb 2025 17:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471311DEFD2;
+	Thu, 20 Feb 2025 17:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6eAdfB4"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="H6ucX3+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA554213248;
-	Thu, 20 Feb 2025 17:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEAC1FF1AC
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740073610; cv=none; b=HmhRKh2ChfOiIkKeqmXkIt+/A32wwm3brksLc55bzW6O8jEJeRN0Evz+DDHXRKNRyif6HG4mF6lTQonZ7FCQKpK2/FOaVfGV+B23J9LQqtFebJ1DsppW2ezSPJIbCpUY32zhroj/Oebc8GwoNQhRSwsMp4MDRztbMXtPmAaX4/k=
+	t=1740073701; cv=none; b=tH6yQQs+HFsDx0OqnV2VPPO1g77CEv7Nc75pIPbCFQzAkUwrghwjtogQvukrHAalLDOZJYaIBP1ZBrStDjJqL93RV5HA00KXJYVVULfembii+pLttYdvYVPp3stjTbzcufryGKsGuSFFkcJsEXpN6v09YYpWfKr6B8QO3dVCAK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740073610; c=relaxed/simple;
-	bh=lLgqHdj21WZGU7caBZrmtcEgtGBVxsOciFSnbimYTvI=;
+	s=arc-20240116; t=1740073701; c=relaxed/simple;
+	bh=7Brb15ELOOx+aMxUHLd5T3uulU9wTsodzmhvTcS/394=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g9JR/oMmhboHANJYQes1S5Fo0R47F4yrwkO0BIlwaEXYI0YERAZBtAuTW0jT2EesoC2AA0XIFMI919MRusqibB3VnvFznWjpslYoI6JUny1/YjZOTOGspUCIf3X0v8vPrgPbVqtW8INgcwEVKLYPXfe23hpSC2QDk7xXSTgVepc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D6eAdfB4; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21c2f1b610dso33901705ad.0;
-        Thu, 20 Feb 2025 09:46:48 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gmw1wIFH3qc0XLmGJd2CaYzpHWlciLeSmTG5CJvP5B+ht+uQRL2gN4rFTMrSt/OSygoXVFT6/OPl47GcjaNzTiaRiM+6JvuXe780/8CElgOs0KtfgZUlHkH21yPtUecCfcPbgQ3SciPtB5k+RNe9xsYyyn/MkG6mY/bvGne7gsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=H6ucX3+X; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6e69db792daso10407796d6.0
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 09:48:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740073608; x=1740678408; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9iAAhIY/WYuEVljfYef7cyJfBd4Oum7SIVPeN0CQ/w=;
-        b=D6eAdfB4C7iAAkT9jqDPeY2jtVk+THXMDH/KOx7ckEi078HLA8CQce/8Nf4xlOzSbV
-         93b+axzZxcH8GhEcZIWcECwFpHR/W07W+MuxLx4JuQEQJaDAVfCr3fR3KcbIxvZ82EAT
-         knhYIH2KfMUDLuE4CqY3e6i91fzpZDVpsgSGxuYN7thXuhwGktdjMU0F5VWvUiYtc37l
-         BFyADqg/5h1pjkXUEP1Y8XydWod2izpPEb5tFqCR5WYJNgt6HyrFmOfPk8D/h+f47ERs
-         pKIc/rFHNQTBdmqvj5LKl5qvR7HHVo07RDnnC0t1kkSTkudSR5TEkl1CgZrPVZ6HqKvR
-         4kxw==
+        d=fastly.com; s=google; t=1740073698; x=1740678498; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DVSrbzlxSlQivFeEiDE76Ox1eAVkREhwKkJSsU6C8OQ=;
+        b=H6ucX3+X3p4/b326fvzmar6pSvVL4Kj6T95enatlxESR9e+nNgmIylDDRS3z7uN4H6
+         l45PfbWA6Su30aUN3TN4oDaklrWvvpLsklviwJa78x0opJECCT9U7gC1x0Oo1Fa4xMP1
+         tXnfrv5zIkN4iNnH6jtuoq6NVOfw6U1uQQtpo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740073608; x=1740678408;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V9iAAhIY/WYuEVljfYef7cyJfBd4Oum7SIVPeN0CQ/w=;
-        b=w7jwONkg6SV9GBYIQC+GKwxpuGSSrq3esMHL7a3Q/dvkug8tuZ+1a/4ANaT6CB1yp7
-         dkbaKjViUvrJBvgo+uSzLRqk3uQQMsI9GM1N5LIVOCZuEiIXRut0hdt2++NtMAG0g/lZ
-         9o7SrHsWdwzzjyl03AluU283h0bisbrXLJHb9MD6ChCWJhI0jf732pAY7ivd3qU7GIpC
-         IqoQ3o8NRfnHFNOi78etTubXRY3/friz/i7LPSVTwDk4wV5gioaFdjUU+kmpWoiBUfuj
-         lwSqjka2LVfr1zaDfvmlNkKN3FE8E0uYQ2aRJt2AEWV0A6XAp5xgGXoCADLhxnLbc74G
-         /nfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUe2AEXDsI24UslrrEhUibty7CsZ9LbSavCdoa6ZVHKymHZXPhYQYqt9OdquGPFT8ZUpfahQqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc6w6k/NEoq09PP7BAhsiFil6nqgNGtMDMkzHKmjNxktl/U3Cy
-	7giZmdnAgfZzLmSO/FjfbVChGRacqBfnHskKRLTDnvmZufPSzw4=
-X-Gm-Gg: ASbGnctunWNkdFKmt3YVAs8qB99+ItJDKzm0alusTWwbypjTpsTYYQxgvpQD7jMv+/f
-	5pRx2c4xLft0upaQ8bVJBCFPE3tdOc+vnSVu48N7Cpot8E1rx3Tm3RAEptutyI2HlMf60xEQwim
-	42joVITLXI9g2JOLAHZ5CR4QRd5Zn1kENbV4N/LDVAloysgffz5e4vis01rSKXW7vjc9zZIji52
-	S0psp9mxrio10GxedO4+/Oaun9wj+SH33QuhxqSyJzFlci0C/+nk3BDuG6o4v2txOFRRpi2W3sc
-	d/q/tVJkNmAiwQs=
-X-Google-Smtp-Source: AGHT+IHs01zHV9MMAq8D969ojGBf2w+gIIz3ayw66/TuAy+UI4Cfm7qiNgH1TEDBzOHMKqZyF9Hxxg==
-X-Received: by 2002:a17:902:dac4:b0:216:2bd7:1c4a with SMTP id d9443c01a7336-2219ff61deemr444635ad.26.1740073607820;
-        Thu, 20 Feb 2025 09:46:47 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d556d3b1sm124284175ad.163.2025.02.20.09.46.47
+        d=1e100.net; s=20230601; t=1740073698; x=1740678498;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DVSrbzlxSlQivFeEiDE76Ox1eAVkREhwKkJSsU6C8OQ=;
+        b=PgE9L329k27KzsbGD0yvgv6tntfjs38Cc4WZZhsItBLRGIfLbv7Yv0LnXkYPIGfeex
+         DritONIvMidx8iRj/5fXrbsmNtEkoYeT6qdn6MfdgVaKafKBdhS1mqI7xyB1Vp2RrBpU
+         ejXu0+Hfm6BdYYT3Tue3wOxq2/RfBzrEdmPjsyQGnVuf6mMMjDFtrD0YrJddb6oDWUuQ
+         /Nu2tIWiOucjpx2bQhoJwAAGbziDht+gKvymYUHLRn24sVPUBWzsAAfXnEcxKgbsC09/
+         as9grvs2Jgw+T4DxJHGqaQyC23Pv7/3pohEqJ5ZaetiinxwQ8LAY8S1354Aw0WNGGHc8
+         7gdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFtsgL1B+h4yZWLiqZuGFUmkK7MlbOUS5TwWKn6ljAeGKbdByhK5Rx6r7jKYTNmm1L16+bc5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY7Yu53LDsKXvL/LsbUMcaEo9O8NW+RVDBFJBjtRL3aJQNGX2B
+	LpBiD5E4waiilpnCjFDN8KMzk4KDLNUyXAABx02TIqUS8FjmUQXiJ3j7/KFQCFg=
+X-Gm-Gg: ASbGncurUpnAtNQYUWPcNs1nop5V8sbmmT3M75QnHBxssn3cmutmSDdfm4NId5DYs3O
+	w9JtPeL6BhPa9ejeKlixduJyor6AFdeRQy8rgxosOzISuZvo5e0Z+mlloRL80QuxUJukR662EZ9
+	R566SiWzxf+wV11SCQzOOyWP7FmCVdx7Y0uZQZHtuGromWLBvmIwHEUFss3yLkFCWlHmQMXRO+k
+	LyIaaSd853Vhj14ViQgEttGnBNAt6MVCr8xDh2TgeXvWafO8kXJ8koZU1yO5RhHWhfbj+B+ClIQ
+	YRUUlK+1SlzOhfFdhHZcf24MB975GNPtTIpCt/g0gzzl/MAdUQ+Wiw==
+X-Google-Smtp-Source: AGHT+IH6zUubKfa4gvxFjI1DEmZ0im5n9AZjUsesKb2VPmWIAWIMFiYYwzhIUEyiv5xwbeSg0lzRWA==
+X-Received: by 2002:a05:6214:27ca:b0:6d8:9cbf:d191 with SMTP id 6a1803df08f44-6e6ae802019mr272346d6.12.1740073698342;
+        Thu, 20 Feb 2025 09:48:18 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d7793f5sm88090756d6.5.2025.02.20.09.48.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Feb 2025 09:46:47 -0800 (PST)
-Date: Thu, 20 Feb 2025 09:46:46 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Tushar Vyavahare <tushar.vyavahare@intel.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org,
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net
-Subject: Re: [PATCH bpf-next 2/6] selftests/xsk: Add tail adjustment
- functionality to XDP
-Message-ID: <Z7dqhiWcXDszRSYF@mini-arch>
-References: <20250220084147.94494-1-tushar.vyavahare@intel.com>
- <20250220084147.94494-3-tushar.vyavahare@intel.com>
+        Thu, 20 Feb 2025 09:48:17 -0800 (PST)
+Date: Thu, 20 Feb 2025 12:48:16 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	stfomichev@gmail.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 1/7] selftests: drv-net: add a warning for
+ bkg + shell + terminate
+Message-ID: <Z7dq4FUbEHe7QQg7@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, stfomichev@gmail.com,
+	petrm@nvidia.com
+References: <20250219234956.520599-1-kuba@kernel.org>
+ <20250219234956.520599-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250220084147.94494-3-tushar.vyavahare@intel.com>
+In-Reply-To: <20250219234956.520599-2-kuba@kernel.org>
 
-On 02/20, Tushar Vyavahare wrote:
-> Introduce a new function, xsk_xdp_adjust_tail, within the XDP program to
-> adjust the tail of packets. This function utilizes bpf_xdp_adjust_tail to
-> modify the packet size dynamically based on the 'count' variable.
-> 
-> If the adjustment fails, the packet is dropped using XDP_DROP to ensure
-> processing of only correctly modified packets.
-> 
-> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+On Wed, Feb 19, 2025 at 03:49:50PM -0800, Jakub Kicinski wrote:
+> Joe Damato reports that some shells will fork before running
+> the command when python does "sh -c $cmd", while bash does
+> an exec of $cmd directly.
 
-Any reason not to combine patches 2..5 into a single one? I looked
-through each one briefly and it's a bit hard to follow when trying
-to put everything together..
+I'm not sure what's going on, but as I mentioned in the other thread
+and below, I am using bash as well.
+
+> This will have implications for our
+> ability to terminate the child process on bash vs other shells.
+> Warn about using
+> 
+> 	bkg(... shell=True, termininate=True)
+> 
+> most background commands can hopefully exit cleanly (exit_wait).
+> 
+> Link: https://lore.kernel.org/Z7Yld21sv_Ip3gQx@LQ3V64L9R2
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2: new
+> ---
+>  tools/testing/selftests/net/lib/py/utils.py | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+> index 9e3bcddcf3e8..33b153767d89 100644
+> --- a/tools/testing/selftests/net/lib/py/utils.py
+> +++ b/tools/testing/selftests/net/lib/py/utils.py
+> @@ -61,6 +61,10 @@ import time
+>          self.terminate = not exit_wait
+>          self.check_fail = fail
+>  
+> +        if shell and self.terminate:
+> +            print("# Warning: combining shell and terminate is risky!")
+> +            print("#          SIGTERM may not reach the child on zsh/ksh!")
+
+I'm not opposed to putting a warning here, but just as a disclaimer
+and for anyone else following along -- I am using bash:
+
+$ echo $SHELL
+/bin/bash
+
+$ bash --version
+GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
 
