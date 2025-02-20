@@ -1,307 +1,359 @@
-Return-Path: <netdev+bounces-168179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A1BA3DEBA
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:35:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 629E8A3DF05
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 16:44:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C321188B935
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 15:35:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05A787A68E6
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 15:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6D21DE4CE;
-	Thu, 20 Feb 2025 15:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC7A1FDE26;
+	Thu, 20 Feb 2025 15:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="fgXna+CL"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="L+MOj3l2"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic303-27.consmr.mail.ne1.yahoo.com (sonic303-27.consmr.mail.ne1.yahoo.com [66.163.188.153])
+Received: from lf-2-14.ptr.blmpb.com (lf-2-14.ptr.blmpb.com [101.36.218.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E162F1B4243
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 15:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.188.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9262A1D63F8
+	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 15:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740065721; cv=none; b=PGiWAiCikSnFPCRhR6IYt6gfwTmS0TR7iPhLzgTFXMIxFt/aqhHdNn+eZiylu0W05XFWuX7lGD4FDBOYwRWgkH6/lf5bflMaPJAgcVhAzKVMqaLm2MgfR+Nbu3Tfuz8eTkyqXDE/LcvwrAsFod0MlpfLBgBqxVQfgDNPeDyzsI4=
+	t=1740065954; cv=none; b=akx7dSS4wZij5Bz/CHZfUVwgghWZP7r0DkrLNKTVYj8tvROwqgqsM06mAqmmo+X4KhCr/0q7hJ+uwUJP1c52QsuWKZI1xMEgVKHM6ISw27pViudtqzbyqkwo0UxGUzqS4ewG3OJvr602FhLABSFWuAyHlDbUeF3nLX1wSebqvm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740065721; c=relaxed/simple;
-	bh=/H4DXco9xQ4lb8Te7gL+UVyO3rUpq5eC8ie7csVvN1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RApx+dnOngnyuTxmE0JT7BH/+T0yW+rnoVeDwd05v1SzhKp9xE8p0bJWeFlosOuxPWxKch/T7bD3HwhrM02nle50Iq7W/UjgW8mUunOmwjQ9KiVrhN2tqIV9fG8L73lR9VZ+dM2mFf8G++uWeeQKW/5KL6hjjKpb8JtEjtOBBSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=fgXna+CL; arc=none smtp.client-ip=66.163.188.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1740065712; bh=ekpCCgF7cpjJGlBUQltrcyy0xqFyiNUqJbBZlZihjSI=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=fgXna+CLybjpJAx9FsolIuR+PElHUjcl4tFgx1tKlI256L8yobcK8LG9F2gI6WN19uDFb6G9Gih8CB6L25vp6Qjct4RTlH2h6nAL6EElANyGjTOtgsmVUUAHKmpH4LFH1ktOmJlYo+xha+liq2kARdAwnzIpC8lo3uOIyLkvd+nje9pK4txC87+NnQ4IGOhwSN/TxrHRcqW4aKf3yepchB6DgnmkW+ZN1SnsoZEwfocptci2DlqbPJgse4eYHvy9zFfwodIlM6ivp1RHHvF5lkOjqiJmGDl+4oIHfdGyCDTbSwAHHHGT1QtrI3RiOzuQ2eUwmKPj/asfxlnIQwxp0w==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1740065712; bh=OrEylGmR1ETH8N6i90c1TSJOV4hynJD8EL2e41dP/XW=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=SVIwCSPWRlgYCRyoKdWvtAKpiRh9Q38pUsMVm86aEP3P+fPu6/MB9mYJNx/7e4xMj6m5vN3t3XN3mhdFNc9LNaAf+zJiFA964cVzlGf3apIJD+a+Ko8M1+EeEVSMMYsLUA2T4oNrmMyNeM0e0xeHLk6BrznfgKMUi/pPYDsBUUy5x2HvB3ygRsOWXESB/i4kgQiuxAcALx7XjFI3qtGkvAVlXoGBW1iUYZxIjUOD0SF292U0QS+CKX5npoR4/KZZzw1+QbmZx+HnpgN1dvq6wwzko18ygqiO09mQ2nX378qSRpSRgGNAcVngroiQmZgU1vlFROzj6Gklmg/8Yu6hKA==
-X-YMail-OSG: uhcwZIIVM1mxwp8UkThAc3Y_VLM2.oFWnsxyHKoXoYvolYx5TF2GnzWKyvPFV1c
- GkY0HhwkYuzhq0TkMgx6Z1yujoaxTKg8vIq4ycJ.eOXwuM7WILK.KsvpRkXd2BfJJKa8SOfrxEa7
- RI6.C5hE9fnk0W22W8YbrCOqW0voEBQLs5aBZsGcZyoS0XtT3SnUMvico3Yrh.Sog39YlZW1MX1Q
- P4ufYb0rwfYaFSiE9kvE0FKQhLchba1dTh6gRy_2zLxXdr5qn4FMqqjIOTH1zk8MD66_ZJfkntQb
- YDvkL2aJBWNLEmBRdUdJAI6.a3Qnh4jdCWFI.H.nI9PPlU5B80FJMvAsHYk5M8zSqsIC7Xj1LIxj
- C7H1AlRRHmKJAa9RrMST9wH3YPWe0Ooixy9esJq_LTiHTuY2PpE2fObuSRiroo203ZyKWNdNDNjX
- SGc5Vr3oDTAZdWzwqx5G3SWKsZ8bKhX1ls1j.7Te.vp2iHomJcU2XZ2WP6VIQmovxKL9nE6RYg7H
- .c_kVqaLBhvoJxXQY7.ZlfRdsHeJMNAdI.RE_vQOP46CAMggWdxu1xm8Pw_H0EZhvK.FUJZyd7Pr
- 6OlK8zTmyFao8QHOl5gl20fbpddW2Pste2mIJxF60ivyLbNx7fDbTrDnGJCEsnT5nPlgg3AqOLiJ
- jbc5n2.D1lo_lX27YiX2fnvhJS7_ZInz7vMo3ggt8PXEYqVC.De2IjDy34A6OwKcP5uzOKXfxrN7
- eA6uunD9HSI1fxH0NF88B8RnAqwqvCFO1ERy17eoayByLfEEQbvULcH8byeICmCRXke1U7m_._nV
- 1V6zqygXIPfCncee3ULnm6SkhL7Hvq5iSU5p3xOPTMReG8BRPjXC0uNKQqeDgP_2Z5BxLuqvGtIE
- YGGioUKUuCNJ9zq9TZ1robKcQ1YUBJZiHJUBzATkJ2OoahsB35sTkYIocccwxWp8Sf1_2k24cKAI
- nf7vlh8XjE7Qxi_uMPL1ksNa_CKTl1Ay4sijs4fLfi8w3J6Cj4vVwt3ZJZHlT_w2qHp1DR.dyhUl
- ep5NByEYDUkwMrpHjvJ7wCieT3Hndm_aLOhGYyh6Pi1Q5knNICsVvseZRh152YFYR127UbVsp7QU
- pS15xzAYWyvTQewnBQAYcDtH0uTL5Ln6KHqi4dN1_Lb73VliJ5yll.K8B.0ptwSjTevrbHizCI5s
- gEZgn50WpaVjoRoxdfzLVX3pUZiTBUMn_PhdNJHz4zhSX6aLRs67.u2jkXpZ3v390fu3iw6X2J74
- rUsWqHk75aW2c1CObBsR_iIDFJvOTqfbIIaaBcw7wKTmWeD5kDIwR8M.5wufAoGM7FO2C4sb70jF
- JksxM58lVhAusUZs9qnJUoJI5RqWhj9cFMsHeqp3vdOXPRGfluyE0dgiThTn6aClq8ZN9jZCJ7bj
- uJDIkW0YeYM31RKVtVVBQqQNI8uJWEqsEs0XYv2km2OLX8WNHthneKwGFVR4hQLL.qrcJc_Z3zbr
- h7Cs4hOdPVlbfIikVBnp9wXooJEP06._6MsXuKILwiCfnETHrzK4iGkP5T9c_dxvcYPGnOt6Qvgx
- _CaOTbplhgiY.xVO5NcvR4638VrccisI.JzQHikKkBmNdckFdqpM3rWKn2dIOfc9hOqelaHy5zAt
- UeQuzN.nYJVfRs2Sj1ub9VJIdMMR9Byxzk8KZqahBYFlSS84qAn4MiC0iKUb8EVmXJrfV7hNvEX5
- zU4r5tSgQC4SgoA1mh3WNsfSp_i1LKR2RvBeOzUIAU7NeSnooF_IRbsJYv1O4uLTXgCEfz9mrLQy
- 3k7uys6W3EUsAKzYdlfia3LNxb57ahiiypl1j93jfsvK9oX2cOjT7BMcvI8Y__DlEtoht9e98LHM
- _YzLfc09n0rSvAID9XE.BBerikZ5tc00TWi5mMAxpq09jquKRJnaE68JKcF2MykhTPN14XqYfJ41
- rGsopxFdB.UdQvOz2U7qyK44h6K6McCkTuJqlvISs8l1MSlPPP4ATyQDEGeUj6EhV_pjAJ01XNti
- ciE8nAHw_NtEhAIfTkgLA90AfFmroTyYWajSCdYWUBJF4jvRVGyGz6UC26YI.GNCDLqSoK9qPc1X
- sXsxqX7wRAVmqWBix.xenntcNTJ9eco_k2k2CoVY25UKHYOvy9HD6tDiZX8KCuHjX3bpWvNX.Nd2
- MxcmP_tVdCnfrto6g11KA1AHqPmcrv8tH3N8J8pFQ7Kvpnk7NzOc5sPWGsvwETaoeLyLdB5dVhHk
- da7IS0maIqYILjx9OmwaPKfbNJTT.nZ0mKmj3fbMM5nwiHsZmIAAgLpza6fxUSMLXMBet8NHwxLQ
- W1x9uFilC4o7Hn4hfJso-
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 5074b6c1-d1d0-467f-804a-4d6abf8211b1
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.ne1.yahoo.com with HTTP; Thu, 20 Feb 2025 15:35:12 +0000
-Received: by hermes--production-gq1-5dd4b47f46-dvwsq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 437aa463eb35749faded69ee77004126;
-          Thu, 20 Feb 2025 15:35:09 +0000 (UTC)
-Message-ID: <aa6c6f4c-7d46-4e7e-bafc-f042436f47b6@schaufler-ca.com>
-Date: Thu, 20 Feb 2025 07:35:07 -0800
+	s=arc-20240116; t=1740065954; c=relaxed/simple;
+	bh=he4hTAhgWTx+ZA/FodsXqZ4aec2FmWw1LRB1Ynk+NN0=;
+	h=To:Subject:Date:Content-Type:Cc:References:From:Message-Id:
+	 Mime-Version:In-Reply-To; b=Ibu5UAJ7DB9tLeboy7mGBbRWVX+ALumz4wyqsmRou5zRBqyzTuUJErMGiQtuJRZGr093vKAM4obIcRsn8kLzenJ8UTfXs9e51ByvHZnt8756NAWPnBOnp7gugjqU+n4AwVk8n1B8RjUDyh0v57BllHet8XdPVWdN4gr3lvPAiwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=L+MOj3l2; arc=none smtp.client-ip=101.36.218.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1740065732; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=NpGrn8aOytrn4CUUrmEk7SJeydb2UnWKWO7oO73J2f0=;
+ b=L+MOj3l28bVsAFlkQt2xPwBLd8Nk05hw549bYC/JBG65T+Z7ZR8OOCn2CCWirBlxJ3VUMp
+ YXLJsxGT735eeKM8dviSaDgif7jujPGl24ZCeJv51y2FPha+BVFAhCumFhivWex95gNBfD
+ aDt9XlNuXNasiVO/TWvQxbYA2BtQ06ePcu0MeA1qepn2xy1RlN+i0vyRD0BE3L0tedwgk3
+ 2BIhJ7KnRSQYww48xl8+dHvDDWWUuew5KmKNTN39mizkBJj0vxDsfNPGFb7Cj/AoXJpTOV
+ u+8Ng4ymHLihH3CZWjGiRzQanzqxf0hEV4fySa0H3A+P+GFo4Gdr1nSD69/Hvw==
+To: "Simon Horman" <horms@kernel.org>
+Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
+Date: Thu, 20 Feb 2025 23:35:26 +0800
+Content-Type: text/plain; charset=UTF-8
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, 
+	<davem@davemloft.net>, <jeff.johnson@oss.qualcomm.com>, 
+	<przemyslaw.kitszel@intel.com>, <weihg@yunsilicon.com>, 
+	<wanry@yunsilicon.com>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>
+X-Lms-Return-Path: <lba+267b74bc2+0b1e84+vger.kernel.org+tianx@yunsilicon.com>
+References: <20250213091402.2067626-1-tianx@yunsilicon.com> <20250213091412.2067626-6-tianx@yunsilicon.com> <20250218171036.GB1615191@kernel.org>
+User-Agent: Mozilla Thunderbird
+From: "tianx" <tianx@yunsilicon.com>
+Message-Id: <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] netlabel: Remove unused cfg_calipso funcs
-To: linux@treblig.org, paul@paul-moore.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Casey Schaufler <casey@schaufler-ca.com>
-References: <20250220140808.71674-1-linux@treblig.org>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20250220140808.71674-1-linux@treblig.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.23369 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+In-Reply-To: <20250218171036.GB1615191@kernel.org>
+X-Original-From: tianx <tianx@yunsilicon.com>
+Received: from [127.0.0.1] ([183.193.164.49]) by smtp.feishu.cn with ESMTPS; Thu, 20 Feb 2025 23:35:29 +0800
 
-On 2/20/2025 6:08 AM, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On 2025/2/19 1:10, Simon Horman wrote:
+> On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
+>> Add eq management and buffer alloc apis
+>>
+>> Signed-off-by: Xin Tian<tianx@yunsilicon.com>
+>> Signed-off-by: Honggang Wei<weihg@yunsilicon.com>
+> ...
 >
-> netlbl_cfg_calipso_map_add(), netlbl_cfg_calipso_add() and
-> netlbl_cfg_calipso_del() were added in 2016 as part of
-> commit 3f09354ac84c ("netlabel: Implement CALIPSO config functions for
-> SMACK.")
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> ...
 >
-> Remove them.
+>> +struct xsc_eq_table {
+>> +	void __iomem	       *update_ci;
+>> +	void __iomem	       *update_arm_ci;
+>> +	struct list_head       comp_eqs_list;
+> nit: The indentation of the member names above seems inconsistent
+>       with what is below.
+got it
+>> +	struct xsc_eq		pages_eq;
+>> +	struct xsc_eq		async_eq;
+>> +	struct xsc_eq		cmd_eq;
+>> +	int			num_comp_vectors;
+>> +	int			eq_vec_comp_base;
+>> +	/* protect EQs list
+>> +	 */
+>> +	spinlock_t		lock;
+>> +};
+> ...
+>
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> ...
+>
+>> +/* Handling for queue buffers -- we allocate a bunch of memory and
+>> + * register it in a memory region at HCA virtual address 0.  If the
+>> + * requested size is > max_direct, we split the allocation into
+>> + * multiple pages, so we don't require too much contiguous memory.
+>> + */
+> I can't help but think there is an existing API to handle this.
+failed to find one
+>> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
+> I think unsigned long would be slightly better types for size and max_direct.
+yes, will modify
+>> +		  struct xsc_buf *buf)
+>> +{
+>> +	dma_addr_t t;
+>> +
+>> +	buf->size = size;
+>> +	if (size <= max_direct) {
+>> +		buf->nbufs        = 1;
+>> +		buf->npages       = 1;
+>> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
+>> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
+>> +						       size,
+>> +						       &t,
+>> +						       GFP_KERNEL | __GFP_ZERO);
+>> +		if (!buf->direct.buf)
+>> +			return -ENOMEM;
+>> +
+>> +		buf->direct.map = t;
+>> +
+>> +		while (t & ((1 << buf->page_shift) - 1)) {
+> I think GENMASK() can be used here.
+ok
+>> +			--buf->page_shift;
+>> +			buf->npages *= 2;
+>> +		}
+>> +	} else {
+>> +		int i;
+>> +
+>> +		buf->direct.buf  = NULL;
+>> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+> I think this is open-coding DIV_ROUND_UP
+right, I'll change
+>> +		buf->npages      = buf->nbufs;
+>> +		buf->page_shift  = PAGE_SHIFT;
+>> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
+>> +					   GFP_KERNEL);
+>> +		if (!buf->page_list)
+>> +			return -ENOMEM;
+>> +
+>> +		for (i = 0; i < buf->nbufs; i++) {
+>> +			buf->page_list[i].buf =
+>> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
+>> +						   &t, GFP_KERNEL | __GFP_ZERO);
+>> +			if (!buf->page_list[i].buf)
+>> +				goto err_free;
+>> +
+>> +			buf->page_list[i].map = t;
+>> +		}
+>> +
+>> +		if (BITS_PER_LONG == 64) {
+>> +			struct page **pages;
+>> +
+>> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
+>> +					      GFP_KERNEL);
+>> +			if (!pages)
+>> +				goto err_free;
+>> +			for (i = 0; i < buf->nbufs; i++) {
+>> +				void *addr = buf->page_list[i].buf;
+>> +
+>> +				if (is_vmalloc_addr(addr))
+>> +					pages[i] = vmalloc_to_page(addr);
+>> +				else
+>> +					pages[i] = virt_to_page(addr);
+>> +			}
+>> +			buf->direct.buf = vmap(pages, buf->nbufs,
+>> +					       VM_MAP, PAGE_KERNEL);
+>> +			kfree(pages);
+>> +			if (!buf->direct.buf)
+>> +				goto err_free;
+>> +		}
+> I think some explanation is warranted of why the above is relevant
+> only when BITS_PER_LONG == 64.
+Some strange historical reasons, and no need for the check now. I'll 
+clean this up
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +err_free:
+>> +	xsc_buf_free(xdev, buf);
+>> +
+>> +	return -ENOMEM;
+>> +}
+> ...
+>
+>> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
+> As per my comment on unsigned long in my response to another patch,
+> I think npages can be unsigned long.
+ok
+>> +{
+>> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
+>> +	int mask = (1 << shift) - 1;
+> Likewise, I think that mask should be an unsigned long.
+> Or, both shift and mask could be #defines, as they are compile-time
+> constants.
+>
+> Also, mask can be generated using GENMASK, e.g.
+>
+> #define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
+> #define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
+>
+> And I note, in the (common) case of 4k pages, that both shift and mask are 0.
 
-Please don't. The Smack CALIPSO implementation has been delayed
-for a number of reasons, some better than others, but is still on
-the roadmap.
+Thank you for the suggestion, but that's not quite the case here. The 
+|shift| and |mask| are not used to extract fields from data. Instead, 
+they are part of a calculation. In |xsc_buf_alloc|, we allocate the 
+buffer based on the system's page size. However, in this function, we 
+need to break each page in the |buflist| into 4KB chunks, populate the 
+|pas| array with the corresponding DMA addresses, and then map them to 
+hardware.
 
+The |shift| is calculated as |PAGE_SHIFT - PAGE_SHIFT_4K|, allowing us 
+to convert the 4KB chunk index (|i|) to the corresponding page index in 
+|buflist| with |i >> shift|. The |i & mask| gives us the offset of the 
+current 4KB chunk within the page, and by applying |((i & mask) << 
+PAGE_SHIFT_4K)|, we can compute the offset of that chunk within the page.
+
+I hope this makes things clearer!
+
+>> +	u64 addr;
+>> +	int i;
+>> +
+>> +	for (i = 0; i < npages; i++) {
+>> +		if (buf->nbufs == 1)
+>> +			addr = buf->direct.map + (i << PAGE_SHIFT_4K);
+>> +		else
+>> +			addr = buf->page_list[i >> shift].map
+>> +			       + ((i & mask) << PAGE_SHIFT_4K);
+> The like above is open-coding FIELD_PREP().
+> However, I don't think it can be used here as
+> the compiler complains very loudly because the mask is 0.
+
+>> +
+>> +		pas[i] = cpu_to_be64(addr);
+>> +	}
+>> +}
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
+> ...
 >
-> (I see a few other changes in that original commit, whether they
-> are reachable I'm not sure).
+>> +static void eq_update_ci(struct xsc_eq *eq, int arm)
+>> +{
+>> +	struct xsc_eq_doorbell db = {0};
+>> +
+>> +	db.data0 = XSC_SET_FIELD(cpu_to_le32(eq->cons_index),
+>> +				 XSC_EQ_DB_NEXT_CID) |
+>> +		   XSC_SET_FIELD(cpu_to_le32(eq->eqn), XSC_EQ_DB_EQ_ID);
+> Each of the two uses of XSC_SET_FIELD() are passed a little-endian value
+> and a host-byte order mask. This does not seem correct as it seems
+> they byte order should be consistent.
+>> +	if (arm)
+>> +		db.data0 |= XSC_EQ_DB_ARM;
+> Likewise, here data0 is little-endian while XSC_EQ_DB_ARM is host
+> byte-order.
 >
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> ---
->  include/net/netlabel.h       |  26 -------
->  net/netlabel/netlabel_kapi.c | 133 -----------------------------------
->  2 files changed, 159 deletions(-)
+>> +	writel(db.data0, XSC_REG_ADDR(eq->dev, eq->doorbell));
+> And here, db.data0 is little-endian, but writel expects a host-byte order
+> value (which it converts to little-endian).
 >
-> diff --git a/include/net/netlabel.h b/include/net/netlabel.h
-> index 02914b1df38b..37c9bcfd5345 100644
-> --- a/include/net/netlabel.h
-> +++ b/include/net/netlabel.h
-> @@ -435,14 +435,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
->  			       const struct in_addr *addr,
->  			       const struct in_addr *mask,
->  			       struct netlbl_audit *audit_info);
-> -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
-> -			   struct netlbl_audit *audit_info);
-> -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info);
-> -int netlbl_cfg_calipso_map_add(u32 doi,
-> -			       const char *domain,
-> -			       const struct in6_addr *addr,
-> -			       const struct in6_addr *mask,
-> -			       struct netlbl_audit *audit_info);
->  /*
->   * LSM security attribute operations
->   */
-> @@ -561,24 +553,6 @@ static inline int netlbl_cfg_cipsov4_map_add(u32 doi,
->  {
->  	return -ENOSYS;
->  }
-> -static inline int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
-> -					 struct netlbl_audit *audit_info)
-> -{
-> -	return -ENOSYS;
-> -}
-> -static inline void netlbl_cfg_calipso_del(u32 doi,
-> -					  struct netlbl_audit *audit_info)
-> -{
-> -	return;
-> -}
-> -static inline int netlbl_cfg_calipso_map_add(u32 doi,
-> -					     const char *domain,
-> -					     const struct in6_addr *addr,
-> -					     const struct in6_addr *mask,
-> -					     struct netlbl_audit *audit_info)
-> -{
-> -	return -ENOSYS;
-> -}
->  static inline int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap,
->  				     u32 offset)
->  {
-> diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
-> index cd9160bbc919..13b4bc1c30ec 100644
-> --- a/net/netlabel/netlabel_kapi.c
-> +++ b/net/netlabel/netlabel_kapi.c
-> @@ -394,139 +394,6 @@ int netlbl_cfg_cipsov4_map_add(u32 doi,
->  	return ret_val;
->  }
->  
-> -/**
-> - * netlbl_cfg_calipso_add - Add a new CALIPSO DOI definition
-> - * @doi_def: CALIPSO DOI definition
-> - * @audit_info: NetLabel audit information
-> - *
-> - * Description:
-> - * Add a new CALIPSO DOI definition as defined by @doi_def.  Returns zero on
-> - * success and negative values on failure.
-> - *
-> - */
-> -int netlbl_cfg_calipso_add(struct calipso_doi *doi_def,
-> -			   struct netlbl_audit *audit_info)
-> -{
-> -#if IS_ENABLED(CONFIG_IPV6)
-> -	return calipso_doi_add(doi_def, audit_info);
-> -#else /* IPv6 */
-> -	return -ENOSYS;
-> -#endif /* IPv6 */
-> -}
-> -
-> -/**
-> - * netlbl_cfg_calipso_del - Remove an existing CALIPSO DOI definition
-> - * @doi: CALIPSO DOI
-> - * @audit_info: NetLabel audit information
-> - *
-> - * Description:
-> - * Remove an existing CALIPSO DOI definition matching @doi.  Returns zero on
-> - * success and negative values on failure.
-> - *
-> - */
-> -void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info)
-> -{
-> -#if IS_ENABLED(CONFIG_IPV6)
-> -	calipso_doi_remove(doi, audit_info);
-> -#endif /* IPv6 */
-> -}
-> -
-> -/**
-> - * netlbl_cfg_calipso_map_add - Add a new CALIPSO DOI mapping
-> - * @doi: the CALIPSO DOI
-> - * @domain: the domain mapping to add
-> - * @addr: IP address
-> - * @mask: IP address mask
-> - * @audit_info: NetLabel audit information
-> - *
-> - * Description:
-> - * Add a new NetLabel/LSM domain mapping for the given CALIPSO DOI to the
-> - * NetLabel subsystem.  A @domain value of NULL adds a new default domain
-> - * mapping.  Returns zero on success, negative values on failure.
-> - *
-> - */
-> -int netlbl_cfg_calipso_map_add(u32 doi,
-> -			       const char *domain,
-> -			       const struct in6_addr *addr,
-> -			       const struct in6_addr *mask,
-> -			       struct netlbl_audit *audit_info)
-> -{
-> -#if IS_ENABLED(CONFIG_IPV6)
-> -	int ret_val = -ENOMEM;
-> -	struct calipso_doi *doi_def;
-> -	struct netlbl_dom_map *entry;
-> -	struct netlbl_domaddr_map *addrmap = NULL;
-> -	struct netlbl_domaddr6_map *addrinfo = NULL;
-> -
-> -	doi_def = calipso_doi_getdef(doi);
-> -	if (doi_def == NULL)
-> -		return -ENOENT;
-> -
-> -	entry = kzalloc(sizeof(*entry), GFP_ATOMIC);
-> -	if (entry == NULL)
-> -		goto out_entry;
-> -	entry->family = AF_INET6;
-> -	if (domain != NULL) {
-> -		entry->domain = kstrdup(domain, GFP_ATOMIC);
-> -		if (entry->domain == NULL)
-> -			goto out_domain;
-> -	}
-> -
-> -	if (addr == NULL && mask == NULL) {
-> -		entry->def.calipso = doi_def;
-> -		entry->def.type = NETLBL_NLTYPE_CALIPSO;
-> -	} else if (addr != NULL && mask != NULL) {
-> -		addrmap = kzalloc(sizeof(*addrmap), GFP_ATOMIC);
-> -		if (addrmap == NULL)
-> -			goto out_addrmap;
-> -		INIT_LIST_HEAD(&addrmap->list4);
-> -		INIT_LIST_HEAD(&addrmap->list6);
-> -
-> -		addrinfo = kzalloc(sizeof(*addrinfo), GFP_ATOMIC);
-> -		if (addrinfo == NULL)
-> -			goto out_addrinfo;
-> -		addrinfo->def.calipso = doi_def;
-> -		addrinfo->def.type = NETLBL_NLTYPE_CALIPSO;
-> -		addrinfo->list.addr = *addr;
-> -		addrinfo->list.addr.s6_addr32[0] &= mask->s6_addr32[0];
-> -		addrinfo->list.addr.s6_addr32[1] &= mask->s6_addr32[1];
-> -		addrinfo->list.addr.s6_addr32[2] &= mask->s6_addr32[2];
-> -		addrinfo->list.addr.s6_addr32[3] &= mask->s6_addr32[3];
-> -		addrinfo->list.mask = *mask;
-> -		addrinfo->list.valid = 1;
-> -		ret_val = netlbl_af6list_add(&addrinfo->list, &addrmap->list6);
-> -		if (ret_val != 0)
-> -			goto cfg_calipso_map_add_failure;
-> -
-> -		entry->def.addrsel = addrmap;
-> -		entry->def.type = NETLBL_NLTYPE_ADDRSELECT;
-> -	} else {
-> -		ret_val = -EINVAL;
-> -		goto out_addrmap;
-> -	}
-> -
-> -	ret_val = netlbl_domhsh_add(entry, audit_info);
-> -	if (ret_val != 0)
-> -		goto cfg_calipso_map_add_failure;
-> -
-> -	return 0;
-> -
-> -cfg_calipso_map_add_failure:
-> -	kfree(addrinfo);
-> -out_addrinfo:
-> -	kfree(addrmap);
-> -out_addrmap:
-> -	kfree(entry->domain);
-> -out_domain:
-> -	kfree(entry);
-> -out_entry:
-> -	calipso_doi_putdef(doi_def);
-> -	return ret_val;
-> -#else /* IPv6 */
-> -	return -ENOSYS;
-> -#endif /* IPv6 */
-> -}
-> -
->  /*
->   * Security Attribute Functions
->   */
+> I didn't dig deeper but it seems to me that it would be easier to change
+> the type of data0 to host byte-order and drop the use of cpu_to_le32()
+> above.
+>
+> Issues flagged by Sparse.
+>
+>> +	/* We still want ordering, just not swabbing, so add a barrier */
+>> +	mb();
+>> +}
+> ...
+>
+>> +static int xsc_eq_int(struct xsc_core_device *xdev, struct xsc_eq *eq)
+>> +{
+>> +	u32 cqn, qpn, queue_id;
+>> +	struct xsc_eqe *eqe;
+>> +	int eqes_found = 0;
+>> +	int set_ci = 0;
+>> +
+>> +	while ((eqe = next_eqe_sw(eq))) {
+>> +		/* Make sure we read EQ entry contents after we've
+>> +		 * checked the ownership bit.
+>> +		 */
+>> +		rmb();
+>> +		switch (eqe->type) {
+>> +		case XSC_EVENT_TYPE_COMP:
+>> +		case XSC_EVENT_TYPE_INTERNAL_ERROR:
+>> +			/* eqe is changing */
+>> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+>> +							     XSC_EQE_QUEUE_ID));
+> Similarly, here XSC_GET_FIELD() is passed a little-endian value and a host
+> byte-order mask, which is inconsistent.
+>
+> Perhaps this should be (completely untested!):
+>
+> 			queue_id = XSC_GET_FIELD(le16_to_cpu(eqe->queue_id_data),
+> 						 XSC_EQE_QUEUE_ID);
+>
+> Likewise for the two uses of XSC_GET_FIELD below.
+
+I have noticed the sparse check warnings on Patchwork, and I will 
+address all the related issues in the next version.
+
+> And perhaps queue_id could be renamed, say to q_id, to make things a bit
+> more succinct.
+>
+>> +			cqn = queue_id;
+> I'm unsure why both cqn and queue_id are needed.
+The |queue_id| is indeed a bit redundant, and I will remove it.
+>> +			xsc_cq_completion(xdev, cqn);
+>> +			break;
+>> +
+>> +		case XSC_EVENT_TYPE_CQ_ERROR:
+>> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+>> +							     XSC_EQE_QUEUE_ID));
+>> +			cqn = queue_id;
+>> +			xsc_eq_cq_event(xdev, cqn, eqe->type);
+>> +			break;
+>> +		case XSC_EVENT_TYPE_WQ_CATAS_ERROR:
+>> +		case XSC_EVENT_TYPE_WQ_INVAL_REQ_ERROR:
+>> +		case XSC_EVENT_TYPE_WQ_ACCESS_ERROR:
+>> +			queue_id = le16_to_cpu(XSC_GET_FIELD(eqe->queue_id_data,
+>> +							     XSC_EQE_QUEUE_ID));
+>> +			qpn = queue_id;
+>> +			xsc_qp_event(xdev, qpn, eqe->type);
+>> +			break;
+>> +		default:
+>> +			break;
+>> +		}
+>> +
+>> +		++eq->cons_index;
+>> +		eqes_found = 1;
+>> +		++set_ci;
+>> +
+>> +		/* The HCA will think the queue has overflowed if we
+>> +		 * don't tell it we've been processing events.  We
+>> +		 * create our EQs with XSC_NUM_SPARE_EQE extra
+>> +		 * entries, so we must update our consumer index at
+>> +		 * least that often.
+>> +		 */
+>> +		if (unlikely(set_ci >= XSC_NUM_SPARE_EQE)) {
+>> +			eq_update_ci(eq, 0);
+>> +			set_ci = 0;
+>> +		}
+>> +	}
+>> +
+>> +	eq_update_ci(eq, 1);
+>> +
+>> +	return eqes_found;
+>> +}
+> ...
 
