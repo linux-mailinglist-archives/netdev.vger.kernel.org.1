@@ -1,113 +1,141 @@
-Return-Path: <netdev+bounces-168063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4284DA3D405
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 10:00:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53331A3D3D3
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 09:58:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90D5B7A454C
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:59:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D6CE3AFE2A
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2B01EB1A6;
-	Thu, 20 Feb 2025 08:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8021EE01B;
+	Thu, 20 Feb 2025 08:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IqLSDVzg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGlSnrkM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50981B3927
-	for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 08:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB731EE002;
+	Thu, 20 Feb 2025 08:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041995; cv=none; b=KQztq4lIq4nZR7etXRmd6guK9Bcd4vndg5RvpouOJi2nmK2nqQpAtbM+Ma6kG5gCTgQFYNPneXio1U+MYZ1m4c97SWI3cZqEFxyKKdF9Uke4XYEscW+9qSwjQzkOnLhquBST/iAHpGVpv4xQz1Y7q4mCp1pDd/0hmLb3gYlT5uk=
+	t=1740041867; cv=none; b=i4ulbjCisvhZbqX3dZnKj5aMqWdDYOUwC143WpSMwZrB3b6v6tDJTYrFyEzVQ2xqblyy62NSBZ5J/6UsgYV/702XX/k1J7/jrG/rEMTPz0yqdOMNRGrtH+XvwzLANi7T6EJCll1T/96CEP32kWQTXNP1xCMRCCG5W1J73PD/Y0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041995; c=relaxed/simple;
-	bh=3Ubl3ns17CKpaPgNxOJL10nntVn3JWMbG2pySqgNZvQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNTRQde3rJhaBN9/fch+73o6CmNqgZ+C6853cDlE+fH1jT7Dcov78bsLdeUgDvw+Pj0PiyqGlfhF6zVhx2sHR0UDZEpspe0fmQVNHN2Hd9DSm3gnnuyEqkzovVkyMRXEhzgOKi9w2Fqubz9VWKs6ClLU6hzAWY9v3icK28CNGXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IqLSDVzg; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740041994; x=1771577994;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3Ubl3ns17CKpaPgNxOJL10nntVn3JWMbG2pySqgNZvQ=;
-  b=IqLSDVzgZ7JCpSe9mROUDoz5tzXFkAK9lGZ3aWFU8wQH5kceW0i+EJ/T
-   iQYmgGhTxBQ84vwAE5bdaBQW7OTNjtcHhn9DQnIZy+id+ePqo0BXQo3s9
-   qSnnJC2OmkeE5oeFILm0iXQy16ONvMKaRKzRvzlUJrhaFmdnFobDCbgXM
-   mx/OiE2RhBA5tAbNiSGHNORKeFwBla1JREDJxX3sp0/jzGELSG+Dy8/zx
-   mrX5aF+QMIB9tIc9vEaH553F6vdP+yfTtDcTu9E1Z35idofAsCcgKUVs1
-   mJMpq/SRDnPJgAAP7CCvPEjhCBl/uB6iTBvyCqus6UUZZ+JKYJA4MK/19
-   Q==;
-X-CSE-ConnectionGUID: S6tfjh4eS1ShtJ4e8FfWRg==
-X-CSE-MsgGUID: oTtVxrTrQH+PIls8bBqecw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="58218787"
-X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
-   d="scan'208";a="58218787"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 00:59:53 -0800
-X-CSE-ConnectionGUID: ecIZtj1sT3GJPfozYDKgHA==
-X-CSE-MsgGUID: sakqFLARTlqXddSWHiw8Yg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="120205244"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 00:59:51 -0800
-Date: Thu, 20 Feb 2025 09:56:11 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: remove unused feature array
- declarations
-Message-ID: <Z7buKyQkBpIIlBgW@mev-dev.igk.intel.com>
-References: <b2883c75-4108-48f2-ab73-e81647262bc2@gmail.com>
+	s=arc-20240116; t=1740041867; c=relaxed/simple;
+	bh=Xe3KW08CtnTWxDsfXEunDUYKjhgHZTGBlTQTiSWGgco=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b/qJLrwosoTKnu0hTIU9k+SvPGOYkm9n7is+8sFbVNq1ko3ICv8/l+PY5ySsSHiJKlzIbOIOMcdUdj13zvzDBZTsIBV8xrpvT59X0FxvjI5EOgYmnCCvE7pG3VeTY9dCCqbVAJ+QWJtCMqUMFRbWT9GdyLQEHfsGtcha2ZPn7qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGlSnrkM; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d285a447a7so2038685ab.0;
+        Thu, 20 Feb 2025 00:57:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740041865; x=1740646665; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZJ1ukTj9LoDYtqtD5ecMxI2UxUwlSfIH76RTECIiysM=;
+        b=KGlSnrkMxcQlK6ipV3DNJueHJgW1I8NrDefK66Coo4IuMVvKN/sdo2g69ce/GyVq6I
+         rQRTaJWlBdfRLqeN6rmStBjswY1t6JH2NR0sWKb2HmazLbnWXyCOItTh8wkilFOrOTxB
+         9Lxw1OtJF9WGIOtCfNIypTxqg+I3oXoSUadojAGkktHn0fGOKa6eoRbUrV4cS5WG7yDf
+         Uz1T3F6p27eW1CeZqEt8yQYzBdL2mcdcK8We+6vjcWIxE+rFRKhkqPmNAe7yySZDi59r
+         fRRfDlXW4Xp97um9XxzW3PuMusO6rHT5Oo0Gxt/kGN9D8LVwHYRX/C1xdgnPIkJ7IOqk
+         KVrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740041865; x=1740646665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZJ1ukTj9LoDYtqtD5ecMxI2UxUwlSfIH76RTECIiysM=;
+        b=KmokUI2XvTAbxW0UYABKxgoO1rJwwWLpMNpj0DdsLCJY/UcQnZMvdAi6mSAZPQfazb
+         mNHZ/kTnzIodzy6GxYvZr55a1IIDH7e0pyF07piLGSPjwrZrgSzT/DbKa7Lw8feLGeKa
+         5m6YfjSGHaWXlxZixkoU97m9krLJyHsb1+jyzVP8PGLv2B8gA2VnKNrdC5ZJ9LpTsOfy
+         TFugdxYE44hmEZ2SGFj9Dz4SxYedZqF8esBDIEbahUCVx4Ka85JTK5zBR6MyQ/62T9Sg
+         0iptXwKGR4yAf6y4WScomCJvPjSP6oGDqHB1SYmHXdKWcDFQxX55JEJIHsi6P4kJ2OyS
+         qYWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsjRmee00VC58Bb4OxUU685+5agVpxljgX+Q6/gz8wdjpYtaTmLMIAF9VmxGZUpKUn3QfZXHDQ@vger.kernel.org, AJvYcCUwaNcHv/VhdlJS2/aBdiYGK/uwz/dLjmGBhScmdUN+sb83rQHkFM7+0pc8EdaUEAqIn+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyimTLxgbDqxZb6ClZEX3FPeKk7arHaaxnFmES/XXmppcshq/V
+	XTiOJ9eOpos6s7hd7Qd5ZEY/hLT/kR03swxiLYAbQJSJJqhxEXTQLovUyJntP7anRIxOTlXxaED
+	rphbFBz9g9gsdnbvZMxJPcWRNRG7AyrlZw0AdSQ==
+X-Gm-Gg: ASbGnctUaR6R18eB5PE6Rk56LS6icix6dQRi/2GP8gEcKCPLY9NF/9pKEc1NXtDO0UY
+	S16KqDkj5CcR8c4vhvCHcL8uNftFT19LrvthU6NEyQN34weDfPMo8LLauo6qXTlQaoRMdpDQq
+X-Google-Smtp-Source: AGHT+IFqzNFKSbcp0m+sVNShsOIjZnefnBiSt3e7dTYZO4FvWSEE9vIyYmmpnmKMzyBwF8FIEZfT3i4wI6Q0Vt6JVKE=
+X-Received: by 2002:a05:6e02:2686:b0:3d0:3fa2:ccfd with SMTP id
+ e9e14a558f8ab-3d280771e1amr219813525ab.5.1740041864809; Thu, 20 Feb 2025
+ 00:57:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2883c75-4108-48f2-ab73-e81647262bc2@gmail.com>
+References: <20250219081333.56378-2-kerneljasonxing@gmail.com> <202502201843.xA1qZbKX-lkp@intel.com>
+In-Reply-To: <202502201843.xA1qZbKX-lkp@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 20 Feb 2025 16:57:08 +0800
+X-Gm-Features: AWEUYZkZEa_RTXX9eGIodABGhTE06_-yx8MFYAYIY0b_nk5Ib5cNvbHdq_7paqg
+Message-ID: <CAL+tcoC9nboQ9UNeP1-g4nQKqXg+fLDu68RHjwKRx97f_iuCZQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bpf_setsockopt
+To: kernel test robot <lkp@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
+	oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 19, 2025 at 09:15:05PM +0100, Heiner Kallweit wrote:
-> After 12d5151be010 ("net: phy: remove leftovers from switch to linkmode
-> bitmaps") the following declarations are unused and can be removed too.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  include/linux/phy.h | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index 3076b4caa..e36eb247c 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -37,10 +37,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1s_p2mp_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_fibre_features) __ro_after_init;
-> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_all_ports_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_features) __ro_after_init;
-> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_fec_features) __ro_after_init;
-> -extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_full_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
->  extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
->  
+On Thu, Feb 20, 2025 at 4:52=E2=80=AFPM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi Jason,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on bpf-next/master]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/bpf-sup=
+port-TCP_RTO_MAX_MS-for-bpf_setsockopt/20250219-161637
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git =
+master
+> patch link:    https://lore.kernel.org/r/20250219081333.56378-2-kerneljas=
+onxing%40gmail.com
+> patch subject: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bp=
+f_setsockopt
+> config: x86_64-buildonly-randconfig-002-20250220 (https://download.01.org=
+/0day-ci/archive/20250220/202502201843.xA1qZbKX-lkp@intel.com/config)
+> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20250220/202502201843.xA1qZbKX-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202502201843.xA1qZbKX-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>    net/core/filter.c: In function 'sol_tcp_sockopt':
+> >> net/core/filter.c:5385:14: error: 'TCP_RTO_MAX_MS' undeclared (first u=
+se in this function); did you mean 'TCP_RTO_MAX'?
+>     5385 |         case TCP_RTO_MAX_MS:
+>          |              ^~~~~~~~~~~~~~
+>          |              TCP_RTO_MAX
+>    net/core/filter.c:5385:14: note: each undeclared identifier is reporte=
+d only once for each function it appears in
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+We've discussed this a few hours ago. It turned out to be the wrong
+branch which this series applied to. Please try bpf-next net branch
+instead :)
 
-> -- 
-> 2.48.1
+Thanks,
+Jason
 
