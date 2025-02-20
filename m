@@ -1,230 +1,102 @@
-Return-Path: <netdev+bounces-167935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-167936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 635BBA3CE44
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 01:53:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543A2A3CE6B
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 02:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EEF9172947
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 00:53:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E22F18900A0
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 01:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83715FEE6;
-	Thu, 20 Feb 2025 00:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5512AEFE;
+	Thu, 20 Feb 2025 01:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQCtl7WG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfAuMPYq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB15D2FB;
-	Thu, 20 Feb 2025 00:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1279923A0;
+	Thu, 20 Feb 2025 01:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740012820; cv=none; b=fTWfg/50bruofYxqKldd1FUTFgVKv4kwAybKdERLJWznZh6DZ+5+UTHM1UIoync23gZCRNZYrwkhlS5hMafYAe74eyVwkyd7PxfOTZf14adBSQi9I7dmEe3/142LVHmvKhAEH/tLWgMdKK8RvCTxTHZolJTGKZ6jRBfE11zatqE=
+	t=1740013660; cv=none; b=jbn799ZyITfT++2MbHtlD7+6j4sL6K2qAHhhF9nC0oIPkzHpMz8FtfDQMhWziTrKJ0WRGingq1albopKgv380iCtA7DY0vDybaw57IPv/q+BMnhfsqQOeckC1wC03TGNnT93bRrOEaOQZx3/0bkeQsOcw1xcPRkiVBe6bb5xnEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740012820; c=relaxed/simple;
-	bh=6IIF0p9YPSPV5dX53lG7qDn/1akDl51Vw9zyNsDOCBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C1Qbsw5Yl3FiZOx0CNLzhCeVOVlEYGKZDb9l/8QOYeCFEki4kpv8ArmX8T5gjrZK3V+dwYnq/BzbDjaNhOcr1/i3FtN89I1VAQp9XWSiT00aPCx4ojlSYvmqTpSZrPhKdCNjPYgXsbtr9ZXEZjEPJsDgbJS+jP7MqYN8lKx/zQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dQCtl7WG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292A7C4AF09;
-	Thu, 20 Feb 2025 00:53:40 +0000 (UTC)
+	s=arc-20240116; t=1740013660; c=relaxed/simple;
+	bh=IXRpGB7uDUnhmqWJ1/W2fqWqvDKPGkRzkpS+hVtJbJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E1TRbw2RY9HN9S/B/S2IOWW9LakNU1u7sdYa2uRoPAqYY7Za9S4Gzb5TPFPxMc6obi8yWwD+V/9QjKrnomy+ICQIycWGiYqosTDktz8lQfpBeX6gGwZ+W9YQXdU3DE3zfmeZCDem55is2hP9GubSTz2jV1q+dflLzugVrEnS/Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfAuMPYq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A8B5C4CED1;
+	Thu, 20 Feb 2025 01:07:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740012820;
-	bh=6IIF0p9YPSPV5dX53lG7qDn/1akDl51Vw9zyNsDOCBc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dQCtl7WGegWhC5WdClWu5DHLfMouKPQ9S9ZPZQJPbfxPR1ga+JpfY69KByBV1KYil
-	 vAAqUOIKgtH1pvujtXe8JgTs/BTcBBkroN0T6KuPKn5dHp14fbrwfGAjnIbnuUXF9V
-	 cD0xk4YzC3WcXTZZ779ORjEqCT60QnX2FQkbfXbEAu8jdWiYvRTOABLkTbvolHaDn5
-	 T797dgeBi8oV5L4klrROaipbwpBCh2hC3p6UBbeX32ao3pSTQOeGof4c++KXEn+oBx
-	 5aRdCqWOP3272NabmFuVKNIe5efEAuTj/sctcypyTGqQooNknmu/hqYjQ69JTID/Zg
-	 M4+21xO6qEHcQ==
+	s=k20201202; t=1740013659;
+	bh=IXRpGB7uDUnhmqWJ1/W2fqWqvDKPGkRzkpS+hVtJbJc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZfAuMPYq9cV7XmfYjWLOjgfT3I8/hllgctTjceietDwUuH0HmxTXRBvprxpGQWlP2
+	 LCOLRpb5AcoeGdssdzPUGy2u+XHZzYh9KpDQwLTwvl3GBx+DEU3aMZ0VPR9A1H1G68
+	 ZJy3J9Jq3OxSoPPfm17N5DrnAaj/HqKA1W0+ElYD5nmglHy/DC/ITdzXorEC9tTxZP
+	 7B3AukKVFQGBw/OYVfIcukkRwzTmIo2SiMup3qDsU2WtRvg6OG0TGvpNnPcw8UFfsK
+	 Z/BoxR6H+pe9Eu+g0naubT64FyLUmBHU78ikztJ5cZxURdr3lcMZ27G/HXNy7D3Ce8
+	 rXyqlUmwkT8fw==
+Date: Wed, 19 Feb 2025 17:07:37 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	dxu@dxuuu.xyz,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	hawk@kernel.org,
-	petrm@nvidia.com,
-	willemb@google.com,
-	jstancek@redhat.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 2/2] selftests: drv-net: test installing XDP with HDS set to auto
-Date: Wed, 19 Feb 2025 16:53:18 -0800
-Message-ID: <20250220005318.560733-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250220005318.560733-1-kuba@kernel.org>
-References: <20250220005318.560733-1-kuba@kernel.org>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, almasrymina@google.com,
+ donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com,
+ andrew+netdev@lunn.ch, hawk@kernel.org, ilias.apalodimas@linaro.org,
+ ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ dw@davidwei.uk, sdf@fomichev.me, asml.silence@gmail.com,
+ brett.creeley@amd.com, linux-doc@vger.kernel.org,
+ kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
+ danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ rrameshbabu@nvidia.com, idosch@nvidia.com, jiri@resnulli.us,
+ bigeasy@linutronix.de, lorenzo@kernel.org, jdamato@fastly.com,
+ aleksander.lobakin@intel.com, kaiyuanz@google.com, willemb@google.com,
+ daniel.zahka@gmail.com, Andy Gospodarek <gospo@broadcom.com>
+Subject: Re: [PATCH net-next v9 07/10] bnxt_en: add support for
+ tcp-data-split ethtool command
+Message-ID: <20250219170737.25a3a4ed@kernel.org>
+In-Reply-To: <lq62gh5sua72thbwswtodutom44d77nar2pxo7gue4h3w2muoc@tpol55i7vic5>
+References: <20250114142852.3364986-1-ap420073@gmail.com>
+	<20250114142852.3364986-8-ap420073@gmail.com>
+	<lq62gh5sua72thbwswtodutom44d77nar2pxo7gue4h3w2muoc@tpol55i7vic5>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Testing bnxt:
+On Wed, 19 Feb 2025 10:11:01 -0700 Daniel Xu wrote:
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > index f88b641533fc..1bfff7f29310 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
+> > @@ -395,6 +395,10 @@ static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
+> >  			    bp->dev->mtu, BNXT_MAX_PAGE_MODE_MTU);
+> >  		return -EOPNOTSUPP;
+> >  	}
+> > +	if (prog && bp->flags & BNXT_FLAG_HDS) {
+> > +		netdev_warn(dev, "XDP is disallowed when HDS is enabled.\n");
+> > +		return -EOPNOTSUPP;
+> > +	}  
+> 
+> I think there might be a bug here. On my 6.13 (ish) kernel when I try to
+> install an XDP driver mode program, I get:
+> 
+>     [Tue Feb 18 17:02:14 2025] bnxt_en 0000:01:00.0 eth0: XDP is disallowed when HDS is enabled.
+> 
+> Setting HDS to auto (seems like off isn't supported?) doesn't seem to
+> help either:
 
-  # NETIF=eth0  ./ksft-net-drv/drivers/net/hds.py
-  KTAP version 1
-  1..9
-  ok 1 hds.get_hds
-  ok 2 hds.get_hds_thresh
-  ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by the device
-  ok 4 hds.set_hds_enable
-  ok 5 hds.set_hds_thresh_zero
-  ok 6 hds.set_hds_thresh_max
-  ok 7 hds.set_hds_thresh_gt
-  ok 8 hds.set_xdp
-  ok 9 hds.set_xdp_enabled
-  # Totals: pass:8 fail:0 xfail:0 xpass:0 skip:1 error:0
+This should fix it, I think:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: hawk@kernel.org
-CC: petrm@nvidia.com
-CC: willemb@google.com
-CC: jstancek@redhat.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/lib/Makefile      |  3 +
- .../testing/selftests/net/lib/xdp_dummy.bpf.c | 13 +++++
- tools/testing/selftests/drivers/net/hds.py    | 55 ++++++++++++++++++-
- 3 files changed, 68 insertions(+), 3 deletions(-)
- create mode 100644 tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-
-diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
-index bc6b6762baf3..c22623b9a2a5 100644
---- a/tools/testing/selftests/net/lib/Makefile
-+++ b/tools/testing/selftests/net/lib/Makefile
-@@ -9,7 +9,10 @@ TEST_FILES := ../../../../../Documentation/netlink/specs
- TEST_FILES += ../../../../net/ynl
- 
- TEST_GEN_FILES += csum
-+TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
- 
- TEST_INCLUDES := $(wildcard py/*.py sh/*.sh)
- 
- include ../../lib.mk
-+
-+include ../bpf.mk
-diff --git a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-new file mode 100644
-index 000000000000..d988b2e0cee8
---- /dev/null
-+++ b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-@@ -0,0 +1,13 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#define KBUILD_MODNAME "xdp_dummy"
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+
-+SEC("xdp")
-+int xdp_dummy_prog(struct xdp_md *ctx)
-+{
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
-index 394971b25c0b..cd1a0eea39a8 100755
---- a/tools/testing/selftests/drivers/net/hds.py
-+++ b/tools/testing/selftests/drivers/net/hds.py
-@@ -2,17 +2,26 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- import errno
-+import os
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
--from lib.py import EthtoolFamily, NlError
-+from lib.py import CmdExitFailure, EthtoolFamily, NlError
- from lib.py import NetDrvEnv
-+from lib.py import defer, ip
- 
--def get_hds(cfg, netnl) -> None:
-+
-+def _get_hds_mode(cfg, netnl) -> str:
-     try:
-         rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
-     except NlError as e:
-         raise KsftSkipEx('ring-get not supported by device')
-     if 'tcp-data-split' not in rings:
-         raise KsftSkipEx('tcp-data-split not supported by device')
-+    return rings['tcp-data-split']
-+
-+
-+def get_hds(cfg, netnl) -> None:
-+    _get_hds_mode(cfg, netnl)
-+
- 
- def get_hds_thresh(cfg, netnl) -> None:
-     try:
-@@ -104,6 +113,44 @@ from lib.py import NetDrvEnv
-         netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': hds_gt})
-     ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
- 
-+
-+def set_xdp(cfg, netnl) -> None:
-+    """
-+    Enable single-buffer XDP on the device.
-+    When HDS is in "auto" / UNKNOWN mode, XDP installation should work.
-+    """
-+    mode = _get_hds_mode(cfg, netnl)
-+    if mode == 'enabled':
-+        netnl.rings_set({'header': {'dev-index': cfg.ifindex},
-+                         'tcp-data-split': 'unknown'})
-+
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    ip(f"link set dev %s xdp obj %s sec xdp" %
-+        (cfg.ifname, prog))
-+    ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+
-+def set_xdp_enabled(cfg, netnl) -> None:
-+    """
-+    Enable single-buffer XDP on the device.
-+    When HDS is in "enabled" mode, XDP installation should not work.
-+    """
-+    _get_hds_mode(cfg, netnl)
-+    netnl.rings_set({'header': {'dev-index': cfg.ifindex},
-+                     'tcp-data-split': 'enabled'})
-+
-+    defer(netnl.rings_set, {'header': {'dev-index': cfg.ifindex},
-+                            'tcp-data-split': 'unknown'})
-+
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    with ksft_raises(CmdExitFailure) as e:
-+        ip(f"link set dev %s xdp obj %s sec xdp" %
-+            (cfg.ifname, prog))
-+        ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+
- def main() -> None:
-     with NetDrvEnv(__file__, queue_count=3) as cfg:
-         ksft_run([get_hds,
-@@ -112,7 +159,9 @@ from lib.py import NetDrvEnv
-                   set_hds_enable,
-                   set_hds_thresh_zero,
-                   set_hds_thresh_max,
--                  set_hds_thresh_gt],
-+                  set_hds_thresh_gt,
-+                  set_xdp,
-+                  set_xdp_enabled],
-                  args=(cfg, EthtoolFamily()))
-     ksft_exit()
- 
--- 
-2.48.1
-
+https://lore.kernel.org/20250220005318.560733-1-kuba@kernel.org
 
