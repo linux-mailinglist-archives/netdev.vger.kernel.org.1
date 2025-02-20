@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-168002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C95FA3D1D6
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:12:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E01F8A3D1DB
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 08:14:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DC527A41B4
-	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 07:11:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4B3D17D1F4
+	for <lists+netdev@lfdr.de>; Thu, 20 Feb 2025 07:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34401E8837;
-	Thu, 20 Feb 2025 07:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8461E5B83;
+	Thu, 20 Feb 2025 07:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QiXP+3jG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfki2ASe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478001E5B6F;
-	Thu, 20 Feb 2025 07:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAB91E5B6F;
+	Thu, 20 Feb 2025 07:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740035462; cv=none; b=J1rRsliVzHyJd1uY/JEtGNEZGh1E0W/7SdjwLzjtY+yUBGDkFmpkPk3McxpFmUBnReosvtYqXJjklvadMcBQNLngTr8AfZcvjn1g/4APFVS6RNeiR2cyk6zcKzfaUjToLTDPDgUDI6hqsmPUwjY0jy2ZZ2qVFfUusqLZlv+zOWY=
+	t=1740035471; cv=none; b=aa1WsLb2jTotfqPFwj+EqU8MiQeS6dENM9rL54o07CYF/EJbpMd7GCh9YlPdA8FhVeuh3m2TgwTGqgLExt7uVkNEMG/9kfKSFpdMtxk8UjXAxTiWHefeQWo7VI+CROmmUVQl0ZAlcC4q+n9ABQ4KW2nT/OHj7rAE3tf2Nwf8lHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740035462; c=relaxed/simple;
-	bh=XYXF8zRIP8DOqitvSbGR8LPQL/Tde+3rrDrirNd5LyY=;
+	s=arc-20240116; t=1740035471; c=relaxed/simple;
+	bh=w4iGBvNOz+zD7SL3U+67uQljwCududwg6tU10OLcju4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cmgKGvpVrAs+7FpenZdT0HJYBkLD3UnPcDp4uYN+7cGhSyRNO3YId7KNRYSvwnlkccis7ric8+9AgSj4OD93zgEF2Mltu8/BASdCk1A8pt6oxQ8uLw/ulWiyxwPgTujCIlBW3WVc6hgHh1JtuoGfwoq1dr6q7qf/UCJI/Cy22Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QiXP+3jG; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=TnxOsUH2Ku0ng6EUgg/cInvUl43SX9ds057tRfxePAuZU/03clyCPm+SAiZf0QMHTddcJaVJgdmHP9KfJLp5J+ynq8eTa4GI61HkoBdR6HXs/sEwpVA2w0wRhNiuASMCV5RIEJPX6hl1TrU1HSDT69cMxL4UTshXgt7g3qJaMYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfki2ASe; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22185cddbffso20798295ad.1;
-        Wed, 19 Feb 2025 23:11:00 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22128b7d587so9656135ad.3;
+        Wed, 19 Feb 2025 23:11:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740035460; x=1740640260; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740035468; x=1740640268; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FjrteS14+rIGkmlmoSem3GknyTnLu0IBn0cQP7SPAMQ=;
-        b=QiXP+3jG1j4yZyWXpZ16cHGbxAMdZF7HKvRP4efgoY2AF45qCvkNoSDQU3EnyGVFQD
-         mcndKzD5XbtSFIzuTSqJx8zw7eMyteEn6UcV/IFQ9z1+psEGH8duI+r0Ndoi8D+kmNkQ
-         PVzWwdjOlQ4yzcL95Z1UeFWvZigsgKOJW/Tpql9bFFcSHOMQHu1RGph8nG1O5uBxnRqR
-         kaYYtEfQtj69EGRL2hcM2fYLvF9N3FlOnMHN42t5/WYOreaTXi1SjiC2pUKovbvM+Fbd
-         uq6zUzrfoIxi6SEtKkiqyDGGvdO+c2jOuiTdDDc57gj0dVU0/oY5tuS/O62epSf0J0I4
-         XYBg==
+        bh=t+MBuGWnj96pqN8g4XrjCHzKJT0duecX7mmWDcQ6My8=;
+        b=kfki2ASe1uB1S4l95v1V9ym2hd7E4YOEq1v6lnys1uyrRWbKfzQZ5+mXTyx+85p7u7
+         CiClbrx7YoqH5eeN4zwkEVQrEFLCsHVpKCQ5abZdQ8l4Zn3R0YIHjluqCHK9NfGGSct9
+         S4oA5bef7MP8Myu3BebttG8n3r/wR4prEz3od78yv0Vpbg5brAQT2SeYSLQvEj6EsgCt
+         aWqdcBHIp6Qn7EXcGXkLvKLWl3CV+TqI255gTuDB+Eu4baN7bx3wG5VWcIiCJo3UicBK
+         8qKwl8rB+S1Thpl1cDlgP6SGiptNHDZKHGCPE8b8pF0kAXv4h0AtHdEFu5JRPTSVBR3D
+         5zFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740035460; x=1740640260;
+        d=1e100.net; s=20230601; t=1740035468; x=1740640268;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FjrteS14+rIGkmlmoSem3GknyTnLu0IBn0cQP7SPAMQ=;
-        b=HCXMZ7ulclUP8j0IUXqS/i9uRD+mpQJNevvSgTZ5+1gg69GEECpYURF6hp7b6Fzyff
-         5Ikoa9EWr0azCqX5ecJDcNInUmtWiObCbt0R+ifEiRXQ+lFpLNlXEthsr4Esj0deXoIo
-         PfBg+AYKri1z5mV3qkOkEJjMAekAVgeK+/YeNp6lBh1MkJDmlHINWqORtAWnTkAVySmb
-         LfVeCwf2MvgcS0PW8YSXR+2/4RLeLnlH+W33rpTPff47qTKekJaxqeLFlFKKiuLvLPVK
-         wn7pHk8wXBxhyxELdJ+cCpN7F9QFCFzX8vz9ijjyijRD8eax4c2jnf6Dje9O7r5+A7hW
-         bo3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUAtgWhnuyXZjuxZrxtDnLFVcYGtZ8lDy3Zb1FWTBS/dEp/O92WJ9ct611f7oEPdXGSAeHqg50=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcMeC8GFZTELzuxlWC3MKzetZuG43cZbslGoQpx2J2soMVe1d4
-	kyjvBYnDRLv9MQnD9ftZbPWhjJKrc+6+l4UiDgJLNmkRY0ssa2i7bL0zKnh0
-X-Gm-Gg: ASbGncv0aoobScRgyWXJIHAJHOWB8BmVIqGoffcFwSH5vXL9fO0rnZKx0mQ5G5Qym5/
-	wl9WYW9sTC0mbz8XVpUDh9wZEpr+71HUq/D1NJU9diWWbxh6mxVycuMHb9jjVXBSbQwPmbN9uuA
-	FtqncK0bURulyJ+x2CaJzTu0cJR6iAZdiw6JF5deh7JdjFJe7T6ggn4bhwOG4JhZb8mhCl4QuJ+
-	j/7tJwqVe/BJz8zm6JCRUH4bj7tozyXNHgebyrMk9yla2pCUHCQI9jKVoCYP23iA5M0s6TFtYbM
-	EnnMNWGXkLnUwt8zhIcYQvv9YS9I3bxiIeGvLgf716G8DCUVC6D3TPRH7LrwexIBRPk=
-X-Google-Smtp-Source: AGHT+IF/olItWHKnhk7VHLJaDwihB2R/tPG3XfOIUMtj0D3NS7sTlawx/IoM+5mlh8oTLjj4JuAQVw==
-X-Received: by 2002:a05:6a20:7f8b:b0:1ee:d19c:45f9 with SMTP id adf61e73a8af0-1eee2f09d2dmr3516641637.19.1740035460239;
-        Wed, 19 Feb 2025 23:11:00 -0800 (PST)
+        bh=t+MBuGWnj96pqN8g4XrjCHzKJT0duecX7mmWDcQ6My8=;
+        b=Vzuv3Sdet2tQPNqVpjAFkjG5rqaJSSDd9+yiUl7BdcW9/PZFGP6puwOaDoYY5HCUIt
+         GvN10eTRYXpx7+M8C3ne0AM+tds7HX0sNcG2Btc+C6uL7Fj4DbcR5/Zvh2uEaOjGYkCP
+         k19UTxjWS9ARvnkbGJy0yDO3w/8QNMtL4/ARFtNzQzkcymtHlLyzrcn/1e5WkjUsHbv9
+         WWo+IGKd30nYX/dofi8/8KsCNld7ri2eIvp69j+wpU3CzHXFMXvMwVeeqTT5NgF0TdFR
+         3+DaeCJxeWIQuJIiB0TA/mj0i17qDSWRGWfuxFhjQTUnwXZBHYRFYIrotnkvpIPhPIoH
+         AZTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUToYX1hBYKP+FbJupse2SCCD28PAMLeuZ62V+j1k8Ppf9z0lHaOWDsrlsntFiiQ82owZLzsms=@vger.kernel.org, AJvYcCUsc5XJeE7XpRQqOQcsI5qNwaAOCUh5UykJAhqtN2JlOI0/K3k0FkE9HDr85bChCBcoXPXOYlVB0hNHAiv4IY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHZjMqsqwZIpHwvmz3FDDUR1d7r+BWcV/zQXwJRONNF1MvQWcV
+	J5EXmmz0rIfdX1VgSbHbai9h50xJ6KDaV3z7fAgR9xPugIMOatFySIMBk+6J
+X-Gm-Gg: ASbGncsT59Hm6oRD6/tBYPfIs5BE/+91in1qVAFRC7n8NlpGROjmf1o2Gmf9tRU6Z14
+	5xSlkJqlBUNbb3Io//joRyZHxrMGGLRyQVL2R5gWjQFespCvloabcVchIqRjBczPLBi+bJ6cmBT
+	W8PqtvrvjHWks+jMnYdxhYk2H4aQ+jgQijkek8uywwQNTGxoAohkwnqworHfPrKh/cMoOQKwaTI
+	r3Sgizh1HW0T47D67BHx4JljGbBKUFlzi5luqLjMTRpARyzPU6BOnsL1pp6WLomAk4ieKpF4J9d
+	voZzMLFG86Vm8fzKfuJDr0VN2zNP/NEHjmTyd0ZehK8RqdNsRJgVeCiPcozogwew0qo=
+X-Google-Smtp-Source: AGHT+IFvFieXVEzkxe7DkLDLt58IN6h8T4TU6a3jR2yOsz3aSd18Bp/NvUa/gEsW6sY+pOCRgd5M5g==
+X-Received: by 2002:a05:6a21:6b11:b0:1ee:cfaa:f174 with SMTP id adf61e73a8af0-1eed505be52mr10573169637.42.1740035468382;
+        Wed, 19 Feb 2025 23:11:08 -0800 (PST)
 Received: from mew.. (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568af8sm13059672b3a.48.2025.02.19.23.10.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568af8sm13059672b3a.48.2025.02.19.23.11.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 23:10:59 -0800 (PST)
+        Wed, 19 Feb 2025 23:11:08 -0800 (PST)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
+Cc: Daniel Almeida <daniel.almeida@collabora.com>,
+	rust-for-linux@vger.kernel.org,
 	netdev@vger.kernel.org,
 	andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -104,9 +105,9 @@ Cc: rust-for-linux@vger.kernel.org,
 	tgunders@redhat.com,
 	me@kloenk.dev,
 	david.laight.linux@gmail.com
-Subject: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for DELAY/SLEEP and TIMEKEEPING API
-Date: Thu, 20 Feb 2025 16:06:08 +0900
-Message-ID: <20250220070611.214262-7-fujita.tomonori@gmail.com>
+Subject: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+Date: Thu, 20 Feb 2025 16:06:09 +0900
+Message-ID: <20250220070611.214262-8-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250220070611.214262-1-fujita.tomonori@gmail.com>
 References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
@@ -118,48 +119,259 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add new sections for DELAY/SLEEP and TIMEKEEPING abstractions
-respectively. It was possible to include both abstractions in a single
-section, but following precedent, two sections were created to
-correspond with the entries for the C language APIs.
+Add read_poll_timeout functions which poll periodically until a
+condition is met or a timeout is reached.
 
+The C's read_poll_timeout (include/linux/iopoll.h) is a complicated
+macro and a simple wrapper for Rust doesn't work. So this implements
+the same functionality in Rust.
+
+The C version uses usleep_range() while the Rust version uses
+fsleep(), which uses the best sleep method so it works with spans that
+usleep_range() doesn't work nicely with.
+
+The sleep_before_read argument isn't supported since there is no user
+for now. It's rarely used in the C version.
+
+read_poll_timeout() can only be used in a nonatomic context. This
+requirement is not checked by these abstractions, but it is intended
+that klint [1] or a similar tool will be used to check it in the
+future.
+
+Link: https://rust-for-linux.com/klint [1]
+Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ rust/helpers/helpers.c |   1 +
+ rust/helpers/kernel.c  |  18 +++++++
+ rust/kernel/cpu.rs     |  13 +++++
+ rust/kernel/error.rs   |   1 +
+ rust/kernel/io.rs      |   2 +
+ rust/kernel/io/poll.rs | 120 +++++++++++++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs     |   1 +
+ 7 files changed, 156 insertions(+)
+ create mode 100644 rust/helpers/kernel.c
+ create mode 100644 rust/kernel/cpu.rs
+ create mode 100644 rust/kernel/io/poll.rs
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c8d9e8187eb0..775ea845f011 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10355,6 +10355,13 @@ F:	kernel/time/timer_list.c
- F:	kernel/time/timer_migration.*
- F:	tools/testing/selftests/timers/
- 
-+DELAY AND SLEEP API [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+L:	rust-for-linux@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
-+S:	Maintained
-+F:	rust/kernel/time/delay.rs
+diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+index 9565485a1a54..16d256897ccb 100644
+--- a/rust/helpers/helpers.c
++++ b/rust/helpers/helpers.c
+@@ -14,6 +14,7 @@
+ #include "cred.c"
+ #include "device.c"
+ #include "err.c"
++#include "kernel.c"
+ #include "fs.c"
+ #include "io.c"
+ #include "jump_label.c"
+diff --git a/rust/helpers/kernel.c b/rust/helpers/kernel.c
+new file mode 100644
+index 000000000000..f04c04d4cc4f
+--- /dev/null
++++ b/rust/helpers/kernel.c
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- HIGH-SPEED SCC DRIVER FOR AX.25
- L:	linux-hams@vger.kernel.org
- S:	Orphan
-@@ -23854,6 +23861,13 @@ F:	kernel/time/timekeeping*
- F:	kernel/time/time_test.c
- F:	tools/testing/selftests/timers/
- 
-+TIMEKEEPING API [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+L:	rust-for-linux@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
-+S:	Maintained
-+F:	rust/kernel/time.rs
++#include <linux/kernel.h>
 +
- TIPC NETWORK LAYER
- M:	Jon Maloy <jmaloy@redhat.com>
- L:	netdev@vger.kernel.org (core kernel code)
++void rust_helper_cpu_relax(void)
++{
++	cpu_relax();
++}
++
++void rust_helper___might_sleep_precision(const char *file, int len, int line)
++{
++	__might_sleep_precision(file, len, line);
++}
++
++void rust_helper_might_resched(void)
++{
++	might_resched();
++}
+diff --git a/rust/kernel/cpu.rs b/rust/kernel/cpu.rs
+new file mode 100644
+index 000000000000..eeeff4be84fa
+--- /dev/null
++++ b/rust/kernel/cpu.rs
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Processor related primitives.
++//!
++//! C header: [`include/linux/processor.h`](srctree/include/linux/processor.h).
++
++/// Lower CPU power consumption or yield to a hyperthreaded twin processor.
++///
++/// It also happens to serve as a compiler barrier.
++pub fn cpu_relax() {
++    // SAFETY: FFI call.
++    unsafe { bindings::cpu_relax() }
++}
+diff --git a/rust/kernel/error.rs b/rust/kernel/error.rs
+index f6ecf09cb65f..8858eb13b3df 100644
+--- a/rust/kernel/error.rs
++++ b/rust/kernel/error.rs
+@@ -64,6 +64,7 @@ macro_rules! declare_err {
+     declare_err!(EPIPE, "Broken pipe.");
+     declare_err!(EDOM, "Math argument out of domain of func.");
+     declare_err!(ERANGE, "Math result not representable.");
++    declare_err!(ETIMEDOUT, "Connection timed out.");
+     declare_err!(ERESTARTSYS, "Restart the system call.");
+     declare_err!(ERESTARTNOINTR, "System call was interrupted by a signal and will be restarted.");
+     declare_err!(ERESTARTNOHAND, "Restart if no handler.");
+diff --git a/rust/kernel/io.rs b/rust/kernel/io.rs
+index d4a73e52e3ee..be63742f517b 100644
+--- a/rust/kernel/io.rs
++++ b/rust/kernel/io.rs
+@@ -7,6 +7,8 @@
+ use crate::error::{code::EINVAL, Result};
+ use crate::{bindings, build_assert};
+ 
++pub mod poll;
++
+ /// Raw representation of an MMIO region.
+ ///
+ /// By itself, the existence of an instance of this structure does not provide any guarantees that
+diff --git a/rust/kernel/io/poll.rs b/rust/kernel/io/poll.rs
+new file mode 100644
+index 000000000000..5977b2082cc6
+--- /dev/null
++++ b/rust/kernel/io/poll.rs
+@@ -0,0 +1,120 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! IO polling.
++//!
++//! C header: [`include/linux/iopoll.h`](srctree/include/linux/iopoll.h).
++
++use crate::{
++    cpu::cpu_relax,
++    error::{code::*, Result},
++    time::{delay::fsleep, Delta, Instant},
++};
++
++/// Polls periodically until a condition is met or a timeout is reached.
++///
++/// The function repeatedly executes the given operation `op` closure and
++/// checks its result using the condition closure `cond`.
++/// If `cond` returns `true`, the function returns successfully with the result of `op`.
++/// Otherwise, it waits for a duration specified by `sleep_delta`
++/// before executing `op` again.
++/// This process continues until either `cond` returns `true` or the timeout,
++/// specified by `timeout_delta`, is reached. If `timeout_delta` is `None`,
++/// polling continues indefinitely until `cond` evaluates to `true` or an error occurs.
++///
++/// # Examples
++///
++/// ```rust,ignore
++/// fn wait_for_hardware(dev: &mut Device) -> Result<()> {
++///     // The `op` closure reads the value of a specific status register.
++///     let op = || -> Result<u16> { dev.read_ready_register() };
++///
++///     // The `cond` closure takes a reference to the value returned by `op`
++///     // and checks whether the hardware is ready.
++///     let cond = |val: &u16| *val == HW_READY;
++///
++///     match read_poll_timeout(op, cond, Delta::from_millis(50), Some(Delta::from_secs(3))) {
++///         Ok(_) => {
++///             // The hardware is ready. The returned value of the `op`` closure isn't used.
++///             Ok(())
++///         }
++///         Err(e) => Err(e),
++///     }
++/// }
++/// ```
++///
++/// ```rust
++/// use kernel::io::poll::read_poll_timeout;
++/// use kernel::time::Delta;
++/// use kernel::sync::{SpinLock, new_spinlock};
++///
++/// let lock = KBox::pin_init(new_spinlock!(()), kernel::alloc::flags::GFP_KERNEL)?;
++/// let g = lock.lock();
++/// read_poll_timeout(|| Ok(()), |()| true, Delta::from_micros(42), Some(Delta::from_micros(42)));
++/// drop(g);
++///
++/// # Ok::<(), Error>(())
++/// ```
++#[track_caller]
++pub fn read_poll_timeout<Op, Cond, T>(
++    mut op: Op,
++    mut cond: Cond,
++    sleep_delta: Delta,
++    timeout_delta: Option<Delta>,
++) -> Result<T>
++where
++    Op: FnMut() -> Result<T>,
++    Cond: FnMut(&T) -> bool,
++{
++    let start = Instant::now();
++    let sleep = !sleep_delta.is_zero();
++
++    if sleep {
++        might_sleep();
++    }
++
++    loop {
++        let val = op()?;
++        if cond(&val) {
++            // Unlike the C version, we immediately return.
++            // We know the condition is met so we don't need to check again.
++            return Ok(val);
++        }
++        if let Some(timeout_delta) = timeout_delta {
++            if start.elapsed() > timeout_delta {
++                // Unlike the C version, we immediately return.
++                // We have just called `op()` so we don't need to call it again.
++                return Err(ETIMEDOUT);
++            }
++        }
++        if sleep {
++            fsleep(sleep_delta);
++        }
++        // fsleep() could be busy-wait loop so we always call cpu_relax().
++        cpu_relax();
++    }
++}
++
++/// Annotation for functions that can sleep.
++///
++/// Equivalent to the C side [`might_sleep()`], this function serves as
++/// a debugging aid and a potential scheduling point.
++///
++/// This function can only be used in a nonatomic context.
++#[track_caller]
++fn might_sleep() {
++    #[cfg(CONFIG_DEBUG_ATOMIC_SLEEP)]
++    {
++        let loc = core::panic::Location::caller();
++        // SAFETY: FFI call.
++        unsafe {
++            crate::bindings::__might_sleep_precision(
++                loc.file().as_ptr().cast(),
++                loc.file().len() as i32,
++                loc.line() as i32,
++            )
++        }
++    }
++
++    // SAFETY: FFI call.
++    unsafe { crate::bindings::might_resched() }
++}
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 496ed32b0911..415c500212dd 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -40,6 +40,7 @@
+ pub mod block;
+ #[doc(hidden)]
+ pub mod build_assert;
++pub mod cpu;
+ pub mod cred;
+ pub mod device;
+ pub mod device_id;
 -- 
 2.43.0
 
