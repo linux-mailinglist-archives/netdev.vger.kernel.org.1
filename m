@@ -1,55 +1,91 @@
-Return-Path: <netdev+bounces-168654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA0AA40044
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:01:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03779A40056
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741E41630D1
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:01:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23AC23AD4E5
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CCC1FF602;
-	Fri, 21 Feb 2025 20:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C2E25334F;
+	Fri, 21 Feb 2025 20:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzvWwm1K"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UteSg52R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B49786342;
-	Fri, 21 Feb 2025 20:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7023F1D5173;
+	Fri, 21 Feb 2025 20:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740168095; cv=none; b=pITqGnlLA6mdylV+Hqd4RcSAqM/HT2lnMj5zaTJLkbvpSeBVAqgkiBUL8QTOuaeQaBaJZtzR7yttv/2G+Cb0o1Mxvek8bOC9F9laB8kd3d4NZ3hfIc7dhXjVaOrhBGzWjosZ9YfOsDVVS8xORh1TfSPIfafq6T7CIQ7//n0vJeg=
+	t=1740168131; cv=none; b=VS+AcolZ/TkO3dJfx3zKTFZ9roP4n7LREBC00b+xOFwGSXJsw6ED3gY0ii0if7KPf0yS8gUGm2EjdYn2Tw65gfclm665n7bbR5kARje1GD0LOO0JR3nOZkzrbVb7GE0P4ipXxXmlvDY9cO/uuMaaybIVkJ7u24XdTYJQBUe/3e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740168095; c=relaxed/simple;
-	bh=cf5LqsnpN6VFTpwOXNTW1APfLfH4q6dmpNXL477VNDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=kRIr9bLpbDk1DjYpyqxd86E0H/l5JQo3wIo2yGOzTbJh9rtS1Z60niV8aGC/2drmh6tV2VkvK7/sTteBDhuKIIFC4YxQRamNvFBcJBjO4y9J/Z7PeCim+O4h3fQAkUsBRFSfTcqJ5bDezuOc19rg9ObAgGlUFc1PuMdAJiDxl6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzvWwm1K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C435C4CED6;
-	Fri, 21 Feb 2025 20:01:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740168094;
-	bh=cf5LqsnpN6VFTpwOXNTW1APfLfH4q6dmpNXL477VNDk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=VzvWwm1K1/ko0FQDAmCea8tXIr71Dw1XUzYA8Vzs7RvTSzgvDA9f59I5/onwkoKrD
-	 sOZZz2JbdZaOYeGM9qOBTY7fgf23zm/6I+iuQPxO420j1lgZe95cJlWZ3yibqP4BSu
-	 Kf9POy0m2/2HCiRjMoDdc+YwpUQKWtfrzxD0/KjYuFKgxo2XBNHP2A/kX1YB1uzVSB
-	 HhTl48rzQyX1pICHf6qrcT28zdMq2ZhnkCyLwq1XsRj3YQQEz4OhM9b745+mDmuCY3
-	 HBphwu0EsgnUQsKIuQEvNlGAMVF+KzMCkug0rUx0uYxxvTySdZhU6mJWp4cvq81xHk
-	 RLqBPLfv3z0Og==
-Date: Fri, 21 Feb 2025 14:01:32 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: ChunHao Lin <hau@realtek.com>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] r8169: disable RTL8126 ZRX-DC timeout
-Message-ID: <20250221200132.GA357821@bhelgaas>
+	s=arc-20240116; t=1740168131; c=relaxed/simple;
+	bh=cqpH7TG6SAX4ZNWACei1aBxwCR5Ybf1VnjsqFb3f5zs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbIbHYxroP0u8MyRKX32VtKC0CmrrPyh+zI/l67SIEG4d3qR7kigXCsJJ+6muaJ4bTWkJl+fiE90kmg89OxeWrLZSuswOaiKCsOADOJvza0xQWlmwtWQ56w2QTjSN676QRVZeWYuxDa1lIS63g9IFQh5CAg0k/rV+zh2L9kz7ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UteSg52R; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=7gGBaRe4JgYzbdGSQQDl/iu7LJKLfKjaa+/NCZsQ+Ao=; b=UteSg52R0cyjvV7m5TTbonCM1h
+	nNaAO3jaW9OJTFD62ZSqIMkpbxkqDB1DnXGCDq1E9j76theeavHA/RRU5cr9Ld3y9wfjpXqbzl6ny
+	StfdLe4oNTNBs7AUNYsLHfvw/kaINS1IKRZ1sucXhgJkMsTs/iy5t0nieQstbQpmCN/ql5vASIsCB
+	garNWnx82z7wKP48scb0FcUXdE8h/CiJr7AzuSeezFGNc+OEyw6P8aofPitbVwLiEyPVPm69UbSh3
+	xtKeubLPCtDZQLsl/R9x4n93qUl1H2Gyc9cbQjUEI73Ffxu18HzmEy3NN4RJTxgXH80wZWZPvSf6f
+	vY9JATuw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tlZDO-00000002in9-0hY9;
+	Fri, 21 Feb 2025 20:01:38 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 48E7130066A; Fri, 21 Feb 2025 21:01:37 +0100 (CET)
+Date: Fri, 21 Feb 2025 21:01:37 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Will Deacon <will@kernel.org>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
+	Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Zijun Hu <zijun_hu@icloud.com>, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev, linux-mtd@lists.infradead.org
+Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
+ void API tlb_remove_page()
+Message-ID: <20250221200137.GH7373@noisy.programming.kicks-ass.net>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+ <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,30 +94,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250221071828.12323-442-nic_swsd@realtek.com>
+In-Reply-To: <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
 
-On Fri, Feb 21, 2025 at 03:18:28PM +0800, ChunHao Lin wrote:
-> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
-> device will exit L1 substate every 100ms. Disable it for saving more power
-> in L1 substate.
+On Fri, Feb 21, 2025 at 05:02:06AM -0800, Zijun Hu wrote:
+> Remove needless 'return' in void API tlb_remove_page() since both the
+> API and tlb_remove_page_size() are void functions.
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  include/asm-generic/tlb.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/asm-generic/tlb.h b/include/asm-generic/tlb.h
+> index e402aef79c93..812110813b84 100644
+> --- a/include/asm-generic/tlb.h
+> +++ b/include/asm-generic/tlb.h
+> @@ -501,7 +501,7 @@ static __always_inline bool __tlb_remove_page(struct mmu_gather *tlb,
+>   */
+>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
+>  {
+> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
+> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
+>  }
 
-s/dose/does/
+So I don't mind removing it, but note that that return enforces
+tlb_remove_page_size() has void return type.
 
-Is ZRX-DC a PCIe spec?  A Google search suggests that it might not be
-completely Realtek-specific?
-
-> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
-> +{
-> +	struct pci_dev *pdev = tp->pci_dev;
-> +	u8 val;
-> +
-> +	if (pdev->cfg_size > 0x0890 &&
-> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
-> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
-
-Is this a standard PCIe extended capability?  If so, it would be nice
-to search for it with pci_find_ext_capability() and use standard
-#defines.
-
-Bjorn
+It might not be your preferred coding style, but it is not completely
+pointless.
 
