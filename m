@@ -1,152 +1,251 @@
-Return-Path: <netdev+bounces-168411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB12A3EDFA
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:09:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3905A3EE87
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4528C176D23
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:09:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F499422F55
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6321FBCAD;
-	Fri, 21 Feb 2025 08:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84176200119;
+	Fri, 21 Feb 2025 08:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="heDVza3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E07E20101B
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 08:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740125375; cv=none; b=J5cqQM4xfcNW5aG0tAgqkcyI+GJVB0oXh0+/UOdN0oGJE9y1cM2RykqlMcnW2SWSzi5eaHid0esHmVPm5Hrr7yY7oLSi6s850nxt0Zw3rhO+wIj8QDYdjsgvTsvdfJX6u/bcLrQRYtRyz+Cuqh6IqvG0lCaoOaSVwML+nqWR5uM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740125375; c=relaxed/simple;
-	bh=W2+lqFB3yvUvKTgq6OrbULXW2hoBiT0kzSTRg8T/j5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0oTFRssY/tYBoPiTaVleYkgtbGVTrzy9ODSYKpAGVmXp2mIqdpdQ8ojZ2tlRyYAp7sslpzwPccM6nJgM7XJ2iAAhMuj4zMPVgUWxZAb/73fGWtdJ1w8Sce5gQuB+niz2uKK+vXfZi5LiAdhh/y8/0PEP7ljeYIyChd27V6N7/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tlO5e-0007gh-LR; Fri, 21 Feb 2025 09:08:54 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tlO5b-0024OL-2S;
-	Fri, 21 Feb 2025 09:08:51 +0100
-Received: from pengutronix.de (p5b164285.dip0.t-ipconnect.de [91.22.66.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 585363C8315;
-	Fri, 21 Feb 2025 08:08:51 +0000 (UTC)
-Date: Fri, 21 Feb 2025 09:08:51 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-Message-ID: <20250221-light-neat-doberman-1166a5-mkl@pengutronix.de>
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-5-a0282524688@gmail.com>
- <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
- <CAOoeyxX4guHzUap1ieQ_L3PrvpBAYbMiQKrb6ko=MGsF5RcXLg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0051FBE8C
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 08:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740125791; cv=fail; b=g9+aZGrDo7flmH8wcL0av/loryWRCpL1aZq4plw4di//rDKgpcTGb54eTBSsqEkfOUg2FQNz2XFU/5wC1I5pSZxMImzPcJCnDsTRsc1X1D+Ex767xoJ29TW9zZUs7Xh43wbYgtBAl99EQpztGdawJnXyWEpo55+SKOC9sFT3Hyk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740125791; c=relaxed/simple;
+	bh=ULnXFLafQ6DaunTLyUFQp95WyGJBSss/Y4zcQkBE8jM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=a3saw2txW7Q0Hu58eBiLum18oPnk1bHlx3XqNWddTVYDN9d+/Bg5AUw6DnT4SVNRbCiv4IedEE6g3MWqwkkzwMQuywtHRbcVGwxHih1xOqwYa7AoLVBen4aUw6+QGkgBvr/SPd8mK/8td+gszfcjTFW7m8ue3xbES5HCgmF7Ny8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=heDVza3W; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740125789; x=1771661789;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ULnXFLafQ6DaunTLyUFQp95WyGJBSss/Y4zcQkBE8jM=;
+  b=heDVza3Wpx70BiXNRInt8b03Ji+bVQ8Qvu482ZZstVxZxnV4LFZsce7w
+   eIQ0vYw0oTXtUq98spoSmjqqzBozGveAet4eBLTf6lK5LsKi68iAQXQ+S
+   PP8I5WrzyM6AHoLlhHMgHpBahjV7APjBiZekIdmOHcuoAdjHs09odY8fQ
+   2pAzgHLsrpylmq9Vl7FoCjEkdchGPEYR15+rOaB0Bz/UfXq/lOPC022Ji
+   mk/nhf86YRtw2EEfeEa7MazEmRLOK2AvfrZYmFvVS/cAqZyU3csbJcVcj
+   uXOMdydxx1lW/5E18y03oqXRVNtFrNECqcWP9i7eRAEEDd1ZWAePPnHby
+   g==;
+X-CSE-ConnectionGUID: UhJOT6dVTt6J6HyLHuyj5w==
+X-CSE-MsgGUID: 1D3gfK5sSLC+nv8GAgQM1A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="40163615"
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="40163615"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 00:16:26 -0800
+X-CSE-ConnectionGUID: 85DMu+o9TGGk1hg15uipbA==
+X-CSE-MsgGUID: kwD1Oc6jR+WZFEkDu6sE4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="119925459"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Feb 2025 00:16:26 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 21 Feb 2025 00:16:25 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 21 Feb 2025 00:16:25 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 21 Feb 2025 00:16:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fQDFPrOuZPYZ52eG4zmf4sNHHr5G3SLWOWYm1UwkuklReQzWaI/DSfNLNGXD+AMEN/8zV3Xfz9V2jaLmCS4a/mJl2C4HLU247pRTmLEwCZTHLAKQuPWAMeTK0g3QWTOkfbT9Jp5ccYcatuZZCkSCOhMxKN0ONf6b52eZAC+St10o/Xkh+2ZmX7Ep/vx5yyblODn5NvgojAt8iXir2SrVHtG0s4+E4O30rtZsH/XLq7yFLIfznbh9BU3yP95OG332oRIX73yqNECzHNWIo6oQ9pCOIrcIVjP9PpV65EFyRojuRJ+5klp7oYMfuFHFbyBnKGCNdEZpN4v9pnhODkh3RQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3oTIHFy70TkSr6fWdnWeC0Z5DL2MCGGdt589sK5IPJI=;
+ b=nSlr5nZ8y34Ki/jrixXlaZMtQ9w11+3k+Z7DP30whsafp02rqUbWurvJEUn8TDqoCEONkN6mdHpuBOO9cU9SKUJ3JeD+lVANs5WLbtOirGO1no79rtV4OPoBl1kh9zB3l5NmxtwbVLOnHUUNYNOL3/C28I5v0E5oCA06h1j3WlblAgZjk9wrn3TW54+vDGYKnkFcKwOfmxmzV8zQzYZNWuwK2SkrjJweBLNWnM43LOpC7Kqdsf3axQNY7F7ZBDBMRh7yQ+1Upj0Q2YaeGMMMnVpkP8iGEAY09xF39RWWGSQIITUXD4f9OzP8Epr3CTqd3spOYLmL/2Kv7bwZ6UNrQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by SA1PR11MB6760.namprd11.prod.outlook.com (2603:10b6:806:25f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Fri, 21 Feb
+ 2025 08:15:50 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b%7]) with mapi id 15.20.8466.016; Fri, 21 Feb 2025
+ 08:15:50 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"michal.swiatkowski@linux.intel.com" <michal.swiatkowski@linux.intel.com>,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Subject: RE: [PATCH iwl-net 1/2] ice: Fix deinitializing VF in error path
+Thread-Topic: [PATCH iwl-net 1/2] ice: Fix deinitializing VF in error path
+Thread-Index: AQHbfKxNrhuXv5ke6EyUUjlYwR1/sLNReCUA
+Date: Fri, 21 Feb 2025 08:15:50 +0000
+Message-ID: <PH0PR11MB5013367C7BE03CD20B4160C996C72@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20250211174322.603652-1-marcin.szycik@linux.intel.com>
+In-Reply-To: <20250211174322.603652-1-marcin.szycik@linux.intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|SA1PR11MB6760:EE_
+x-ms-office365-filtering-correlation-id: 840ec3b5-14bb-4aa3-9d0f-08dd524ff3d9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?XAB412zqHgnjqwKRVjRgv5iNXwX7SYH1EtpI0Lk9hGJxd5NksBALeRC8XnIL?=
+ =?us-ascii?Q?F6UK9AsgmaZGYM6ex04LyD/UeSHFkSldU6gX/061rwGLowI57Ens5zRu11Gm?=
+ =?us-ascii?Q?+T/0kqD0PLRv+LofGHSvhfCKXFR50vf+F+dTUnqgjLbr5Cp9MXwEqKVRkChd?=
+ =?us-ascii?Q?npux3ws6PPB3wMT+OSI9/m8y3xZZnTpD0WCWc+Cz5NC7NZXAqeGi+xBzNS36?=
+ =?us-ascii?Q?06qvopi26SJC/T00FB8GHEl/2vUrARKBvhuHOJqWJoW6hdC0HmE3TVoRgd1f?=
+ =?us-ascii?Q?j5foybffLUoRvY7PdGKcz37lE0Mr7hcw6AVPnZRo/W4o+WUkkZ1jC8jUApm+?=
+ =?us-ascii?Q?QqvxgwVIunp3d+FNsUVkI4F5baFigqlSb4hzLXC6qKBP9vrg0LqYeyECWkE2?=
+ =?us-ascii?Q?fVyI1Hdn/KlmtXu5AArMZ4VcefwpL5k5kfn/hqopsyai0I2U3ts3zoCxWkoY?=
+ =?us-ascii?Q?pc8MZQHHO+Pby4bObAycRJidMN8Izw0I+IIuRCNfVIJ7+7HzTnuz1xqMByPS?=
+ =?us-ascii?Q?DFSNsAr4Jjggwuujrd53iSvcUawL75PTU0rNI2+/XBFSfEA+p2APz7SE1RNO?=
+ =?us-ascii?Q?9/IwPSbMSQ+vTIduRnJpoM1SEdJazCqcoBtai6wt/qfNpFQ/OHtDejIPBsi/?=
+ =?us-ascii?Q?3cOsvmO9tFax7ErYz3FTG0gHgG3r4LwvN16h4vLLdpaUQ3FrSgvgMW/5aVH0?=
+ =?us-ascii?Q?963lDCVVlrxY76PQjDyf1yjbLzqxbRIwPArK9xqcrajXX/2Cw8AqPwoD5PNn?=
+ =?us-ascii?Q?qsr6d8TPjBA401G6kRCiyR/zmB8eaFSEVfvG46zY8e0sWhyVXfvIfTIx/Er1?=
+ =?us-ascii?Q?EQKly24u0JtsIMhnCwgIANEuout1BcMu0EMMlUsjne48OGSl7AJJI3qWjEQx?=
+ =?us-ascii?Q?HJMU8oY3s4FiMI5hmCcAaeiGVTCUceaGr2sSDJpg/5iAx21BPDpajXNvLOkP?=
+ =?us-ascii?Q?DjmTi9Nl+VQN3MqSGHzLQlL+FIJsLTRdCj+HOn5jwYRR1aNcxXBSQEyC5j8s?=
+ =?us-ascii?Q?avce+beVZPb/Evyz/j6E3hjtuGFbv0mH/fNJF2/xImvgCpbVxMNypErfi3eE?=
+ =?us-ascii?Q?V6C9a2mBKhxBN+pzsrNG76rgnscr0B69BQcpGZHNAtoDG0u+EFjx2oy758vk?=
+ =?us-ascii?Q?HBOPaM4WLgqZWG14RfALiC7z3FljS67yPL0EPWQorWaf7IH8CFmuT5Ykzvb6?=
+ =?us-ascii?Q?JIxMoOEPQfcQEOJRicJJd5XvqgfC5PvaAzAMmc4Wwsg8gO/nqNxsCKH6ieQZ?=
+ =?us-ascii?Q?9ZBmyx5H3oT7dVPRuA84olGUQvl1CL8nFhyUS8jDGyeHnlEpjGHNCIJS+rW1?=
+ =?us-ascii?Q?ezeqI+VZImvRwWhet5bkXvm+fU/yZKvW3BlelUNy80xqZZQUSHgbx3Fy0v0V?=
+ =?us-ascii?Q?oo2mqUMOkyXOUU8NidgP785II26WrbzgkoAF3QOc1HZdfiM2tgdXuuvCAwT3?=
+ =?us-ascii?Q?P8zzGbtY4/l9n1QzozZ7v03UuLmGp6x7?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Ayu+xmjfBHCB6ZAtlmTwh+1vEXPEsMnZt1BPMs9NL+/eOsNZ2+UF6rpqQJbg?=
+ =?us-ascii?Q?Iw3K74FQoqW508G6OI7ZnyiKUnDiMWmzB3T7J1TyGpcFEVgf71TGSBWgt70U?=
+ =?us-ascii?Q?MGJGNNjmeZdqtraYbkrD9OCY69RnREUsSY+ECWE0k40ZwvhmvqECBZEVlvA2?=
+ =?us-ascii?Q?3J9h0QCnQ5uaZYqhKeUSfi8zZuh0oiUJ3CHsitwuJKSZCGHBuTnNF10vsq8k?=
+ =?us-ascii?Q?xtKkYdZnuFjSEbX4xe6K8bsM3OWRaQDLkRnDMjR1NvIsm/1ETZqrZP2+75K/?=
+ =?us-ascii?Q?rD1b3AUcMfHikvUMR0D3XQbHUDCMMcixOVwd57OGuIbIDKIMR7rIuXmlylAy?=
+ =?us-ascii?Q?/LqyUVsGqRSS6RHC+00frhs+CPD0WcpX/J2f3PO9wtNjmNuDO94+YEmy4ome?=
+ =?us-ascii?Q?0AMtQ3F1AKg/VhXftf1Ye7kHlTWYETFuksFs+rIUsZQG1TXoHfny87GdGuY5?=
+ =?us-ascii?Q?ea1atrwOjfZkmVjtXQ7n+JVi7u8nde8q/8+Lk+j7vKEsg7L96G7FrQb4e4MT?=
+ =?us-ascii?Q?9OPUzwWt6IeInpdNqjJKW1YQYuGhXb5v+1hvS+zs23NSR7e83j8iJ1JJfAj6?=
+ =?us-ascii?Q?5RPXjHwaWvjw0BxjoCuRWR7mWl7nbYfPW6OqbbCEso/TB7HmsMHtbdes82cs?=
+ =?us-ascii?Q?jbuPXwxgDV9ws9kAnsHdOe108rru6M78gvZXQpMV8lo8zUB8FqJt2KCYTxsX?=
+ =?us-ascii?Q?aJQ8NCXhNnwUESQL5q7ZNrDTMQRO/+EoDCQmOQp7/ccqWO4qKikHH+QD4aig?=
+ =?us-ascii?Q?dItyv0I4/M9/ln2owzw5GNwQ73cAAz8PDk/lBssAox+F8w1YoeckeFmzlkSS?=
+ =?us-ascii?Q?ei8ZscTJUYjIXtLoMdfxbhNVWIGF3MTmy3gMNpyR4gKvlxc1XOU642wbUZmP?=
+ =?us-ascii?Q?3iPWJggDSrufF/OBFo7hcymFE2D0mgFZ7AVT7DVlSdwJTa5aHfdISQuBZHZw?=
+ =?us-ascii?Q?P1X1D1N9aktQCpDFDrkD/iS5aBEGBu1n+cHKvg37NV+qUAANcZAlaLt93brW?=
+ =?us-ascii?Q?0wwsJtY/1FqE/2dtrImdv8qH1gae1sBk7b/mZyS9jQJ1TXUuguu+1wvuY5sE?=
+ =?us-ascii?Q?0y5h6JuG5ldUaeoyLjg7kS17C71BswmmNqJ48U66fH5FgTN2Tm6NuC+TQyL0?=
+ =?us-ascii?Q?9zCIMa5RYwbSx0gFelblsD7HKFsPuXSHzmrZApE49unOnxLm8F0hPo9Sn4id?=
+ =?us-ascii?Q?f57DpMmY1KKKif0lnNVct5pB+5jbKZT5fF4j5jZcaVqG3r3c4wuESh+3mH9Y?=
+ =?us-ascii?Q?f7/Sw0p1DZouY32J93xjwoBQWGp8ExU7SjmxHhiOmr/b2rJHwlB3NKhIG9WH?=
+ =?us-ascii?Q?uvxUUVMh1iuBZq/2CSalIH2bHPCMy9+1gldTJGNxH7nzb0f1wXOac3bkLQTU?=
+ =?us-ascii?Q?9FGqe3SKrVD0hDMkOs3S24Q/5QLrmnGF+0tfAVVY0nSQnxGmyyLfy56fRqGX?=
+ =?us-ascii?Q?ubBsbkySPS8+advfHlk2OdeTzvgF+qzbKZHz9kG4x4nm/WSSGorS1vM5ilYc?=
+ =?us-ascii?Q?3rxjfsUIOAMl+OMCbSXWpAn3re+1o+xWoN2sGY6Cg76/5o/VHCl8OtjB8xc7?=
+ =?us-ascii?Q?7dD1yw2S0mqnfg12R0jbpbkPZJckWfcDtWKqcKQg?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tjblaazmatqfq76v"
-Content-Disposition: inline
-In-Reply-To: <CAOoeyxX4guHzUap1ieQ_L3PrvpBAYbMiQKrb6ko=MGsF5RcXLg@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 840ec3b5-14bb-4aa3-9d0f-08dd524ff3d9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2025 08:15:50.2883
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1FjFBaN5Pa7bxaIYbcuRQ3IzC1iwVzPu8IhfW0epwOilEg84mU2RpVJGfc79Z0tnK0EWZGCXi22kOmkjHzduFbDjb0r+UgPnSX1xMeb65qk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6760
+X-OriginatorOrg: intel.com
 
-
---tjblaazmatqfq76v
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-MIME-Version: 1.0
-
-On 21.02.2025 16:01:07, Ming Yu wrote:
-> Hi Marc,
+> -----Original Message-----
+> From: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Sent: Tuesday, February 11, 2025 11:13 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; michal.swiatkowski@linux.intel.com; Marcin
+> Szycik <marcin.szycik@linux.intel.com>; Buvaneswaran, Sujai
+> <sujai.buvaneswaran@intel.com>; Martyna Szapar-Mudlaw
+> <martyna.szapar-mudlaw@linux.intel.com>
+> Subject: [PATCH iwl-net 1/2] ice: Fix deinitializing VF in error path
 >=20
-> Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B42=E6=9C=887=
-=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=888:15=E5=AF=AB=E9=81=93=EF=BC=
-=9A
-> >
-> > > +static irqreturn_t nct6694_can_irq(int irq, void *data)
-> > > +{
-> > > +     struct net_device *ndev =3D data;
-> > > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > > +     struct nct6694_can_event *evt =3D priv->event;
-> > > +     struct nct6694_cmd_header cmd_hd =3D {
-> > > +             .mod =3D NCT6694_CAN_MOD,
-> > > +             .cmd =3D NCT6694_CAN_EVENT,
-> > > +             .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, NCT6694_C=
-AN_EVENT_MASK),
-> > > +             .len =3D cpu_to_le16(sizeof(priv->event))
-> > > +     };
-> > > +     irqreturn_t handled =3D IRQ_NONE;
-> > > +     int can_idx =3D priv->can_idx;
-> > > +     int ret;
-> >
-> > it would make sense to have a event pointer here instead of the can_idx?
-> >
-> >         const struct nct6694_can_event *event =3D &priv->event[priv->ca=
-n_idx];
-> >
-> The CAN Event command always returns 16bytes: the first 8 bytes
-> correspond to the CAN0 event, and the last 8 bytes correspond to the
-> CAN1 event. Therefore, the event pointer here refers to both event
-> buffers.
-
-Yes, but in the following code uses "priv->event[can_idx]" several
-times, this is why I proposed to have a dedicated "struct
-nct6694_can_event *event" variable.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---tjblaazmatqfq76v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAme4NJAACgkQDHRl3/mQ
-kZwgawgAqcasz/q2z0wDldtBADvSGWJpZYReThQnX06QjplHpEQwiaalyPWXJBK0
-IRkuBRHEj0mNahTZgsl731lg+Y+kz3DxS7QBVJIIKvuq4MebGerv+g96FJHQ/HPE
-6m7vE/Y46rSC5PJQpZgxL3K0V/L8NmFxDCMQjYOFaXvHvwG+4bgPi4vCmCElJYRn
-iOMtP7NhVwmP9c1YcFlraOBQ2exHFPrOnHA2J9myAewvFnXqLZRJDNQrEohPm7ZJ
-jlHgOB7cJYCzL8wed06r9RxSq6ZPHF3tPxCL6n5nVKgmxwTOdW2S8Mk1Z4LANrjY
-bjwfdAqvpMPU/EQQkTxSxIadWDQSWQ==
-=aqP2
------END PGP SIGNATURE-----
-
---tjblaazmatqfq76v--
+> If ice_ena_vfs() fails after calling ice_create_vf_entries(), it frees al=
+l VFs
+> without removing them from snapshot PF-VF mailbox list, leading to list
+> corruption.
+>=20
+> Reproducer:
+>   devlink dev eswitch set $PF1_PCI mode switchdev
+>   ip l s $PF1 up
+>   ip l s $PF1 promisc on
+>   sleep 1
+>   echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
+>   sleep 1
+>   echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
+>=20
+> Trace (minimized):
+>   list_add corruption. next->prev should be prev (ffff8882e241c6f0), but =
+was
+> 0000000000000000. (next=3Dffff888455da1330).
+>   kernel BUG at lib/list_debug.c:29!
+>   RIP: 0010:__list_add_valid_or_report+0xa6/0x100
+>    ice_mbx_init_vf_info+0xa7/0x180 [ice]
+>    ice_initialize_vf_entry+0x1fa/0x250 [ice]
+>    ice_sriov_configure+0x8d7/0x1520 [ice]
+>    ? __percpu_ref_switch_mode+0x1b1/0x5d0
+>    ? __pfx_ice_sriov_configure+0x10/0x10 [ice]
+>=20
+> Sometimes a KASAN report can be seen instead with a similar stack trace:
+>   BUG: KASAN: use-after-free in __list_add_valid_or_report+0xf1/0x100
+>=20
+> VFs are added to this list in ice_mbx_init_vf_info(), but only removed in
+> ice_free_vfs(). Move the removing to ice_free_vf_entries(), which is also
+> being called in other places where VFs are being removed (including
+> ice_free_vfs() itself).
+>=20
+> Fixes: 8cd8a6b17d27 ("ice: move VF overflow message count into struct
+> ice_mbx_vf_info")
+> Reported-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+> Closes: https://lore.kernel.org/intel-wired-
+> lan/PH0PR11MB50138B635F2E5CEB7075325D961F2@PH0PR11MB5013.nam
+> prd11.prod.outlook.com
+> Reviewed-by: Martyna Szapar-Mudlaw <martyna.szapar-
+> mudlaw@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_sriov.c          | 5 +----
+>  drivers/net/ethernet/intel/ice/ice_vf_lib.c         | 8 ++++++++
+>  drivers/net/ethernet/intel/ice/ice_vf_lib_private.h | 1 +
+>  3 files changed, 10 insertions(+), 4 deletions(-)
+>=20
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
