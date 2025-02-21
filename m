@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-168485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81592A3F20D
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:30:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1EF1A3F219
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1651E19C1084
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:29:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 943073A77CB
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DB9204F62;
-	Fri, 21 Feb 2025 10:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FA3206F3F;
+	Fri, 21 Feb 2025 10:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2mueItp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVsuoc1P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D0A205ADC;
-	Fri, 21 Feb 2025 10:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EC3205ADC;
+	Fri, 21 Feb 2025 10:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740133723; cv=none; b=oVqZzC2J5ZpUsNOnGwysqlojFBuS4I5o0I7D5La3QAPtSp3L84W326QJz1bCfepjG7xVW8ubFBUSQtOZOIRnu513/zi9aG+WLGXbWTlJ69lIUZUP5ilXu0/MFbEmSvYXuM5RmZbgpgo0PgXUKNvs7KWeO1T9KHHdLt5im5L9H/k=
+	t=1740133725; cv=none; b=UBoxIgE+qA56zhGn06kip3lBOCybbMt7p8IDDfMgklX3+FipfSA78cSTNNlAVNAUTTnbTdMl5v5s54DlPsYoeGmlqf7O9MpPFlreq7oi4BEiHFoRrbn0l/S/LqygsRgcHxBA7/qSTDgIz8Z3J8tQPpoRPG5DLUh5QOqnJZwB3lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740133723; c=relaxed/simple;
-	bh=Syook/k3osDoz8HpkUWZ96mxKRz3XOL/uBmVWEWdJH4=;
+	s=arc-20240116; t=1740133725; c=relaxed/simple;
+	bh=b7UOLBUJKKoeK0cpuu2PD8tMegQqWJlzg9CudWTnORE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BV4CcoWSgt5mQNY/ndtIX3mK+gbsvmP3bg+xHdkcUqG+LPia06H2ntVwNyHY+6qdLWlCfvjfJIEmCbPXWFiMkzQol0iDtwY6W7GG/rlzM4lcQnu5mbWw3l7qsID/VJn3gphGmJtVP2UTu632G/fGuTRiGhLipS7qOrXfq9yHyLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2mueItp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD26C4CED6;
-	Fri, 21 Feb 2025 10:28:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BPAV/bsq6sXt8bd+TB00Chk2rpMyPfK4/z6bg4Pj7SBmw3QtXtnBiW6zKuhygfkO7MYjDAL25e4Feb7meWAwMIq8kf2hJWQziI5Z989oHIdVSdWWd8QFM9F2Mooq7mmaGKCxDToWGLIM//i5Iwq3FZYMqGYYkaxnDngmzHcfmy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVsuoc1P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84BB1C4CEDD;
+	Fri, 21 Feb 2025 10:28:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740133722;
-	bh=Syook/k3osDoz8HpkUWZ96mxKRz3XOL/uBmVWEWdJH4=;
+	s=k20201202; t=1740133724;
+	bh=b7UOLBUJKKoeK0cpuu2PD8tMegQqWJlzg9CudWTnORE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=m2mueItpaPGvYsuixu/q1cyWqIbctGDtfbI1IgjxolFRi7SCTFkfp6cS0pvrDGQzA
-	 Fk2iyuY4cn6MNp+al7PRN198kHVXt4G/J1AVHh6ekGDUGDVoDENmiU34PQFKwezwCz
-	 6vdt2xncwH+oN0DqhdeGs6m8xyL6EHERqB65MEZqU1GjvGvBrRtupVMfK3kVQ+LUfi
-	 05HZiqGqdMEplA+p/7aXWeWWPEqWAUw9SrZqnHwNNSvHv+V0xybLimkvM71DLzzMsz
-	 da3YHiLsdCxCjsH3i2ngBWa6zYRARkSKzRR/uJ1cLBI/0EoTC4IPi0/qVekRqEmajm
-	 385zY8hmUjJZA==
+	b=KVsuoc1PkBlqKKEsM/v+5QuzHGNmV25AlA/nHeI+hmxvxgq5dDAuc5iT8Gpyx6S7d
+	 QpijKvHcIOr4cKpOZvtwrsinDzxbWS/ClXoYaFZVOqP/tS+L1TKy7wz3Ued3XbAzHc
+	 A//SZ/nQMYmCf9FRVzDRD8fngc4T1T5qrP836XR5VDxOeziSMfmn9Ln/gHS1Tj8YKV
+	 PwvvU8sk4XqHJMW9p+RAHEjFw7CBrO5AFoi/cofbHCUn/UfPvj5feZTxDhPfCzPGUH
+	 VKFGVsivZCbM6n5/5Fqz8s4W/0dxfhRq/PA+6vdM7jXgYuPur31zCEyN3qmhGBzCbk
+	 S5bWEwGhuBCGA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 21 Feb 2025 11:28:07 +0100
-Subject: [PATCH net-next v6 06/15] net: dsa: mt7530: Enable Rx sptag for
- EN7581 SoC
+Date: Fri, 21 Feb 2025 11:28:08 +0100
+Subject: [PATCH net-next v6 07/15] net: airoha: Enable support for multiple
+ net_devices
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250221-airoha-en7581-flowtable-offload-v6-6-d593af0e9487@kernel.org>
+Message-Id: <20250221-airoha-en7581-flowtable-offload-v6-7-d593af0e9487@kernel.org>
 References: <20250221-airoha-en7581-flowtable-offload-v6-0-d593af0e9487@kernel.org>
 In-Reply-To: <20250221-airoha-en7581-flowtable-offload-v6-0-d593af0e9487@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,53 +70,151 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
 Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
  linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, 
- upstream@airoha.com
+ upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>
 X-Mailer: b4 0.14.2
 
-Packet Processor Engine (PPE) module used for hw acceleration on EN7581
-mac block, in order to properly parse packets, requires DSA untagged
-packets on TX side and read DSA tag from DMA descriptor on RX side.
-For this reason, enable RX Special Tag (SPTAG) for EN7581 SoC.
-This is a preliminary patch to enable netfilter flowtable hw offloading
-on EN7581 SoC.
+In the current codebase airoha_eth driver supports just a single
+net_device connected to the Packet Switch Engine (PSE) lan port (GDM1).
+As shown in commit 23020f049327 ("net: airoha: Introduce ethernet
+support for EN7581 SoC"), PSE can switch packets between four GDM ports.
+Enable the capability to create a net_device for each GDM port of the
+PSE module. Moreover, since the QDMA blocks can be shared between
+net_devices, do not stop TX/RX DMA in airoha_dev_stop() if there are
+active net_devices for this QDMA block.
+This is a preliminary patch to enable flowtable hw offloading for EN7581
+SoC.
 
+Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/dsa/mt7530.c | 5 +++++
- drivers/net/dsa/mt7530.h | 4 ++++
- 2 files changed, 9 insertions(+)
+ drivers/net/ethernet/airoha/airoha_eth.c | 35 +++++++++++++++++++-------------
+ drivers/net/ethernet/airoha/airoha_eth.h |  4 +++-
+ 2 files changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 8422262febaf73821887e660c4db77047a91cffb..aaa36c27b0f9f6543db810a135b371bf1d326fa8 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2586,6 +2586,11 @@ mt7531_setup_common(struct dsa_switch *ds)
- 	/* Allow mirroring frames received on the local port (monitor port). */
- 	mt7530_set(priv, MT753X_AGC, LOCAL_EN);
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 06799dfdf7a41f9d23f4ba85430e9035ec882eea..e36a14c32cbe73ecabf62201203a0c32d4a2a773 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1562,6 +1562,7 @@ static int airoha_dev_open(struct net_device *dev)
+ 	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
+ 			GLOBAL_CFG_TX_DMA_EN_MASK |
+ 			GLOBAL_CFG_RX_DMA_EN_MASK);
++	atomic_inc(&qdma->users);
  
-+	/* Enable Special Tag for rx frames */
-+	if (priv->id == ID_EN7581)
-+		mt7530_write(priv, MT753X_CPORT_SPTAG_CFG,
-+			     CPORT_SW2FE_STAG_EN | CPORT_FE2SW_STAG_EN);
-+
- 	/* Flush the FDB table */
- 	ret = mt7530_fdb_cmd(priv, MT7530_FDB_FLUSH, NULL);
- 	if (ret < 0)
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index 448200689f492dcb73ef056d7284090c1c662e67..349d72a35771f35d478244ab29be1801b3466a5f 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -627,6 +627,10 @@ enum mt7531_xtal_fsel {
- #define  MT7531_GPIO12_RG_RXD3_MASK	GENMASK(19, 16)
- #define  MT7531_EXT_P_MDIO_12		(2 << 16)
+ 	return 0;
+ }
+@@ -1577,16 +1578,20 @@ static int airoha_dev_stop(struct net_device *dev)
+ 	if (err)
+ 		return err;
  
-+#define MT753X_CPORT_SPTAG_CFG		0x7c10
-+#define  CPORT_SW2FE_STAG_EN		BIT(1)
-+#define  CPORT_FE2SW_STAG_EN		BIT(0)
+-	airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
+-			  GLOBAL_CFG_TX_DMA_EN_MASK |
+-			  GLOBAL_CFG_RX_DMA_EN_MASK);
++	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++)
++		netdev_tx_reset_subqueue(dev, i);
+ 
+-	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
+-		if (!qdma->q_tx[i].ndesc)
+-			continue;
++	if (atomic_dec_and_test(&qdma->users)) {
++		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
++				  GLOBAL_CFG_TX_DMA_EN_MASK |
++				  GLOBAL_CFG_RX_DMA_EN_MASK);
+ 
+-		airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
+-		netdev_tx_reset_subqueue(dev, i);
++		for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
++			if (!qdma->q_tx[i].ndesc)
++				continue;
 +
- /* Registers for LED GPIO control (MT7530 only)
-  * All registers follow this pattern:
-  * [ 2: 0]  port 0
++			airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
++		}
+ 	}
+ 
+ 	return 0;
+@@ -2330,13 +2335,14 @@ static void airoha_metadata_dst_free(struct airoha_gdm_port *port)
+ 	}
+ }
+ 
+-static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
++static int airoha_alloc_gdm_port(struct airoha_eth *eth,
++				 struct device_node *np, int index)
+ {
+ 	const __be32 *id_ptr = of_get_property(np, "reg", NULL);
+ 	struct airoha_gdm_port *port;
+ 	struct airoha_qdma *qdma;
+ 	struct net_device *dev;
+-	int err, index;
++	int err, p;
+ 	u32 id;
+ 
+ 	if (!id_ptr) {
+@@ -2345,14 +2351,14 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
+ 	}
+ 
+ 	id = be32_to_cpup(id_ptr);
+-	index = id - 1;
++	p = id - 1;
+ 
+ 	if (!id || id > ARRAY_SIZE(eth->ports)) {
+ 		dev_err(eth->dev, "invalid gdm port id: %d\n", id);
+ 		return -EINVAL;
+ 	}
+ 
+-	if (eth->ports[index]) {
++	if (eth->ports[p]) {
+ 		dev_err(eth->dev, "duplicate gdm port id: %d\n", id);
+ 		return -EINVAL;
+ 	}
+@@ -2400,7 +2406,7 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
+ 	port->qdma = qdma;
+ 	port->dev = dev;
+ 	port->id = id;
+-	eth->ports[index] = port;
++	eth->ports[p] = port;
+ 
+ 	err = airoha_metadata_dst_alloc(port);
+ 	if (err)
+@@ -2472,6 +2478,7 @@ static int airoha_probe(struct platform_device *pdev)
+ 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
+ 		airoha_qdma_start_napi(&eth->qdma[i]);
+ 
++	i = 0;
+ 	for_each_child_of_node(pdev->dev.of_node, np) {
+ 		if (!of_device_is_compatible(np, "airoha,eth-mac"))
+ 			continue;
+@@ -2479,7 +2486,7 @@ static int airoha_probe(struct platform_device *pdev)
+ 		if (!of_device_is_available(np))
+ 			continue;
+ 
+-		err = airoha_alloc_gdm_port(eth, np);
++		err = airoha_alloc_gdm_port(eth, np, i++);
+ 		if (err) {
+ 			of_node_put(np);
+ 			goto error_napi_stop;
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index fee6c10eaedfd30207205b6557e856091fd45d7e..74bdfd9e8d2fb3706f5ec6a4e17fe07fbcb38c3d 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -13,7 +13,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/reset.h>
+ 
+-#define AIROHA_MAX_NUM_GDM_PORTS	1
++#define AIROHA_MAX_NUM_GDM_PORTS	4
+ #define AIROHA_MAX_NUM_QDMA		2
+ #define AIROHA_MAX_DSA_PORTS		7
+ #define AIROHA_MAX_NUM_RSTS		3
+@@ -212,6 +212,8 @@ struct airoha_qdma {
+ 	u32 irqmask[QDMA_INT_REG_MAX];
+ 	int irq;
+ 
++	atomic_t users;
++
+ 	struct airoha_tx_irq_queue q_tx_irq[AIROHA_NUM_TX_IRQ];
+ 
+ 	struct airoha_queue q_tx[AIROHA_NUM_TX_RING];
 
 -- 
 2.48.1
