@@ -1,167 +1,141 @@
-Return-Path: <netdev+bounces-168598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E09A3F928
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:42:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D6BA3F945
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46D317D761
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:42:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8521E424011
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5981DB551;
-	Fri, 21 Feb 2025 15:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCDA1DDA1E;
+	Fri, 21 Feb 2025 15:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Aua5F14v";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hK/x4O6o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3xfLFHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04601D5CCC;
-	Fri, 21 Feb 2025 15:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20291D88A6;
+	Fri, 21 Feb 2025 15:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152532; cv=none; b=Mdx1IT/hsDFGOs8qoan9jttG/uhTSegkMlG843mNtdOwGYF4iM6Ue35+I0M9vQX8QmmShKghlWQgn8dQk8X/zXrRb3h2BiqyKHcoh9cP1/3pE3bT9XWccEa0UJgUVDr8dOzZn5jq1NauABA20fyRB0X24ndpOFbY0env+4bfbUQ=
+	t=1740152651; cv=none; b=U8zzr5WU66BVS8Z+/o5D4eV3IGbgBRxHWiuHSRhNzAD/s/rOy3eWE47iZJsiCRoN1d1QYiF0R3tQDP92JdVcq9h8mdWvhWspt9+9u6vTYGV6l2T4xWYIBiZ8fT2wGeulmy/vVuiMR5bslxLECJTkgwDHWTQy+CAtCPd3jD3LEeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152532; c=relaxed/simple;
-	bh=QqbTVfRf9FmdvF8GodySpCwEsO8rjlDVjLOto+qoQ2k=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=WnXfwK3fqOvm3TRp1PBrUIB9WXVsnICw4/qc3hI6slLLAuHcK9BbiYmNd08HfNAm2Blj0qv1vakQ+4Rb/t8yGiQmY19PIJ3ls4l7Y6iFxdQnQO4yK8hs3Sp38AqNdZd4WSEWfg/+/tWWsd5vwA39OEeXlFU0SwmAT7Jr1sTgRD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Aua5F14v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hK/x4O6o; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id 68A162008E9;
-	Fri, 21 Feb 2025 10:42:07 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-11.internal (MEProxy); Fri, 21 Feb 2025 10:42:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1740152527;
-	 x=1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=
-	Aua5F14vWebL0DOxXVcNVFiZkYyvO+ZDn0lBIGthpSro7L8yySiSiaVg08WR7pLs
-	JojgEjUtKFzq3p96R+2HmZUtkfnB835nBY2UB1NRwsKhE3G6/KpCcrJCM9nOPLjg
-	2axdv5yBZa5jZAlSVtFXsSKh6/ocWFYVTAyli8xq5LHUWD1AKQJ5G4+Mr/4ewUSx
-	Yn/azkxhSGwazkgtAuJI1r5HiztAgb54Hy57zjASBXgbNstUSX1FQ056H8+WzBWb
-	bY73DEtylf/GOrATlkUX6KJLQyEzNftkEsaFLVyJSfRZdT3QoOtN3rFZ19iqpA5R
-	KJtz9HVtMoMVC5CtzTJTYw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740152527; x=
-	1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=h
-	K/x4O6oyNBPbMt/oANZVu7iwmMXMPEIsjZuQL8HZIOTsUUJO7Auhm1hFIArdijoJ
-	AB7VBKyq2IuRmCYnjPjcsdGs9S/cnI6aMm4jXLNLxVrlFDCnDgv/of6zLAJcxDcI
-	eL4AzPwv+QV8bY2ycaIOH64w/uZlZdCJ8e62DGEoD1siZA0vWqTZ/ReNgiqYKlv1
-	mihPOMp/ykpji+1Q19VspQRFz5r4aZTlYen0gNe9e7yhu15yzjE/MGurq1TMqurP
-	hR+5nH3l3BZzUbTYF6NMvpDtU6o63shcpD1jG8+Rp04xMu2H9dbuLLoa9S/eymhA
-	yXXAttMvAK8zmGaHmjzhA==
-X-ME-Sender: <xms:zJ64Z_O-mJRwvj1sCRG9GGTKNu1XV-MwxBvTkYAwkyjdP5scRxTp6w>
-    <xme:zJ64Z5-7kYr4fO9OJH0gelcDWR2xhP9EYBEJ8--FzYH7AgrGrnjPAP3VTDrGorGbV
-    -A7lGF4HomKqch4ruc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejtdegtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
-    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
-    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeeg
-    gedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhosghinhdrmhhurhhphhihse
-    grrhhmrdgtohhmpdhrtghpthhtohepsghrghhlsegsghguvghvrdhplhdprhgtphhtthho
-    pehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepug
-    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnphhighhgihhnsehg
-    mhgrihhlrdgtohhmpdhrtghpthhtohepgihihihouhdrfigrnhhgtghonhhgsehgmhgrih
-    hlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdho
-    rhhgrdgruhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
-    hpthhtohepiihijhhunhgphhhusehitghlohhuugdrtghomh
-X-ME-Proxy: <xmx:zJ64Z-QUkr7NyVicJsKDYCmEUML1cB41zvxitesRRl9w-vpZ4FIx9Q>
-    <xmx:zJ64ZzspC6JLy2xq6-H8dKC9b0W5UnN9XvAeR1biFGIhHAZHAhfaHQ>
-    <xmx:zJ64Z3dUc26wh_PxcfOohxsJWUrbvmi2AkE15Toc-0r6NXyMPFxzTg>
-    <xmx:zJ64Z_18mDWkVYuOyPdwsKM_ggsOAz5LQTjd3DnTKUlYpcS_8aoEYw>
-    <xmx:z564Z_SJKpL1igBqLIymTzZOJvFYGQRqn-AF7i_kx_KjtJ_VxT8ih3L7>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 469352220072; Fri, 21 Feb 2025 10:42:04 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1740152651; c=relaxed/simple;
+	bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rkCZXOJB3pcgFDqJpcQTbqv2qYEQpzswraqrnP3LYRql7mdhW5FUWzIgVrmIt2HNNgKc0VErULX4qlMIHIgmPQnN415wPdNM3G+i5eh8380AVGjBHxdBS6fy7yKVivfLFICyWpOZiIX0N9pDbApspuomL5dOGymCSn5AUn9LGF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3xfLFHa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366D8C4CEE2;
+	Fri, 21 Feb 2025 15:44:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740152650;
+	bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=L3xfLFHaTXNPRSgBEBEB7wDZXFIxpLfqHQG6E52G7wanftxnUhcfB4cqyJ5tBifAD
+	 yD+T3SErGxaa3VzeBZwqxrbwuwfwiww9i/sRwDPsFzrr9+/hmWQ1UBLsmSDvPhsWEC
+	 7DXDqQBz23Gbn3prceUaEHKsY8Ag/gu/6WeC++ZgIMnL5qd3nbPX2EZwZkr8LyoP3s
+	 qvmBxjwp8yDMozvF3D1a02OFRxlBB21U5zAIQIhNDqqCTi51UfLp3cNVexs94TCwoE
+	 PZJikR1C4HaTOKaa66ws1Ik3DLeSMXL+kR34G3KQbrxplLZPNdVVv+Z9I+JBqy5D9/
+	 nX6HdjkAYT3oQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 00/10] mptcp: pm: misc cleanups, part 3
+Date: Fri, 21 Feb 2025 16:43:53 +0100
+Message-Id: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 21 Feb 2025 16:40:58 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zijun Hu" <quic_zijuhu@quicinc.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Will Deacon" <will@kernel.org>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- "Rafael J . Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Jamal Hadi Salim" <jhs@mojatatu.com>,
- "Cong Wang" <xiyou.wangcong@gmail.com>, "Jiri Pirko" <jiri@resnulli.us>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Linus Walleij" <linus.walleij@linaro.org>,
- "Bartosz Golaszewski" <brgl@bgdev.pl>, "Lee Jones" <lee@kernel.org>,
- "Thomas Graf" <tgraf@suug.ch>, "Christoph Hellwig" <hch@lst.de>,
- "Marek Szyprowski" <m.szyprowski@samsung.com>,
- "Robin Murphy" <robin.murphy@arm.com>,
- "Miquel Raynal" <miquel.raynal@bootlin.com>,
- "Richard Weinberger" <richard@nod.at>,
- "Vignesh Raghavendra" <vigneshr@ti.com>
-Cc: "Zijun Hu" <zijun_hu@icloud.com>, Linux-Arch <linux-arch@vger.kernel.org>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-Message-Id: <5d662c4c-76f7-4e5c-82f3-2aeeaf9e3311@app.fastmail.com>
-In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void APIs
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADmfuGcC/zWNQQqDMBBFryKz7oCJRLFXERdhOtUBkw5JFEG8e
+ 0Ohi7d4i/f/BZmTcIZnc0HiQ7J8YhXzaIBWHxdGeVUH21rXWmswcqmcBYMWUtSAQTIhbezjrti
+ hMzxSP/jR+R7qjCZ+y/m7mOBfw3zfX5CZzTx8AAAA
+X-Change-ID: 20250221-net-next-mptcp-pm-misc-cleanup-3-51e9c67a95a6
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2226; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnuJ9HhkFtcSdI0pq/r71f3+yfnMsMTWMaANsVn
+ pw5f989CIaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7ifRwAKCRD2t4JPQmmg
+ c47LD/wJvbAHFVUh74E/WMql26dDfM539dzX27+2+Deoj5pLLuRW7bxzUFZa+U4hvUP04f6OnTE
+ fL5W5u2OyDn2oSZuu84Gn4TlxmtP88+W+o6XGc8Eoh60RtdocahunuVkrw7zsICBY/6nC5VY52A
+ lBh/YSAOHmf8xfNoezYy9+eWKEKuFyrMxcaQh0I2qIUYrWooaJc/mwjy5IIH7TxBpYdacNBZ6sz
+ PLpB6/1PUokyL161xf8d1uTFfVK5LtnKszyxKBIrmnrwHsFUHy9gRFvNeArkueIkPmbXR72bT89
+ 3fFOg0N8OskzfZ//mja016HZ2hqoEPa4pFHB6eQ3GTUkh6MhhZRdAOKWcj5L6w8tTJuvRWwgMEL
+ utVBk2o1yzUB9Q9FZxbJgglz3Q5TgE8+EsV0zV4M04VOK/zlMgw5B+V9KC5bKh015vuaq1yJr7k
+ GH2JX5kjMsSC4/YIc2CIjwXsCIW1lH5sMd2BFA6SKUqjbM1H4skhFAVr3t9ALWPYK8gUsNPNZBj
+ 9UPBTD6JV74PxqWk8qJMo+PAyVp5ntL2YDEA1vHR/WBj3XRA0MdLAG/uf9MyAjZnjauqSjCEcF0
+ XvZ7VzdRYLaFbhjDzoXmU49CIoZgxRhDGName8IWWJU5qd0JBYsa2Zyk5M78/xnVV/6Dt9taZab
+ CxLgBqLeaxxYmXg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Fri, Feb 21, 2025, at 14:02, Zijun Hu wrote:
-> This patch series is to remove weird and needless 'return' for
-> void APIs under include/ with the following pattern:
->
-> api_header.h:
->
-> void api_func_a(...);
->
-> static inline void api_func_b(...)
-> {
-> 	return api_func_a(...);
-> }
->
-> Remove the needless 'return' in api_func_b().
->
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+These cleanups lead the way to the unification of the path-manager
+interfaces, and allow future extensions. The following patches are not
+all linked to each others, but are all related to the path-managers,
+except the last three.
 
-I have no objection to the changes, but I think you should
-describe the motivation for them beyond them being 'weird'.
+- Patch 1: remove unused returned value in mptcp_nl_set_flags().
 
-Do these 'return' statements get in the way of some other
-work you are doing? Is there a compiler warning you want
-to enable to ensure they don't come back? Is this all of
-the instances in the kernel or just the ones you found by
-inspection?
+- Patch 2: new flag: avoid iterating over all connections if not needed.
 
-    Arnd
+- Patch 3: add a build check making sure there is enough space in cb-ctx.
+
+- Patch 4: new mptcp_pm_genl_fill_addr helper to reduce duplicated code.
+
+- Patch 5: simplify userspace_pm_append_new_local_addr helper.
+
+- Patch 6: drop unneeded inet6_sk().
+
+- Patch 7: use ipv6_addr_equal() instead of !ipv6_addr_cmp()
+
+- Patch 8: scheduler: split an interface in two.
+
+- Patch 9: scheduler: save 64 bytes of currently unused data.
+
+- Patch 10: small optimisation to exit early in case of retransmissions.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (6):
+      mptcp: pm: add a build check for userspace_pm_dump_addr
+      mptcp: pm: add mptcp_pm_genl_fill_addr helper
+      mptcp: pm: drop match in userspace_pm_append_new_local_addr
+      mptcp: pm: drop inet6_sk after inet_sk
+      mptcp: pm: use ipv6_addr_equal in addresses_equal
+      mptcp: sched: split get_subflow interface into two
+
+Matthieu Baerts (NGI0) (4):
+      mptcp: pm: remove unused ret value to set flags
+      mptcp: pm: change to fullmesh only for 'subflow'
+      mptcp: sched: reduce size for unused data
+      mptcp: blackhole: avoid checking the state twice
+
+ include/net/mptcp.h      |  5 +++--
+ net/mptcp/ctrl.c         | 32 ++++++++++++++++++--------------
+ net/mptcp/pm.c           | 21 +++++++++++++++++++++
+ net/mptcp/pm_netlink.c   | 46 ++++++++++++++++------------------------------
+ net/mptcp/pm_userspace.c | 29 +++++++----------------------
+ net/mptcp/protocol.h     |  3 +++
+ net/mptcp/sched.c        | 39 ++++++++++++++++++++++++++-------------
+ 7 files changed, 94 insertions(+), 81 deletions(-)
+---
+base-commit: bb3bb6c92e5719c0f5d7adb9d34db7e76705ac33
+change-id: 20250221-net-next-mptcp-pm-misc-cleanup-3-51e9c67a95a6
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
