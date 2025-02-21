@@ -1,111 +1,85 @@
-Return-Path: <netdev+bounces-168663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226CFA40121
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:37:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DD4A4014C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42507189F379
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:36:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1D019C660D
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB90321B9DB;
-	Fri, 21 Feb 2025 20:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5488C1FF5F9;
+	Fri, 21 Feb 2025 20:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBCblYak"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="NW/SdKYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx12lb.world4you.com (mx12lb.world4you.com [81.19.149.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0C1D8A14;
-	Fri, 21 Feb 2025 20:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9253C1FF1A2
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 20:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740170113; cv=none; b=MmxLc8Yh6jcqxWFyLdJ6db5eKRg8lbdOlUNTvo9xCq7txhiRvizc3BYKIJuciDB65ofMGcl4m2HNgzhoRSPo8YizHD91eZMvNYT+Nopc6ZWA8/9JQNG4JONNxH9r3v1HYa+1EhPzAg8APIGZi8loBxwbqsbYxl5AbStVL+Qzmn8=
+	t=1740170811; cv=none; b=N498P0dHCgnmFiWtY9kIzKIADRe1aNguMwKBzzMHOWz58WJyPbGFo2/nJPDaVjxnTL2P6ATEkqd4BPzYMZEO6gsszDexycAr5xyWTTpCTi5Hllrj8oQvz5hX3jWJO5IvpNQ6X1dBILWGvYctALVaUuQ+hxOf7O5vVCtFFK01DSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740170113; c=relaxed/simple;
-	bh=tah1Gs/B++YekM1GkZ6AN9/xlO/76z4hZGv/TUt22z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=HesaegFTsfQGrL8XK10oiHdtdbitMWDo4igCN1BzPwC0SzC439ye54Wip22PLZ4XZvROhZjnlu8rhd2XNAO17L3izFw4G7Vf5RVcdcQeNhfB1yrXplUeJcK/1r+SwFlilMmEu5Jt/x/rFIeYbI/nu7OcC6wohgrnD+YhDfY9iGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBCblYak; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8AE1C4CED6;
-	Fri, 21 Feb 2025 20:35:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740170113;
-	bh=tah1Gs/B++YekM1GkZ6AN9/xlO/76z4hZGv/TUt22z4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=YBCblYaks7r2MZKt9bUPG14CMJBoQ3BMZZJhO4v4b1PDcCxXtTztZkvRL9/CxDk83
-	 C9hrgaWxVwrCeR5p449MGQmwB3gHBVl0HaXttMn8bF+vYEkqWSINVWgAyX9TeJUXN6
-	 k1pZDbeSNapOCbHC28zwgZi5kuUQ7mfoCPoSR3dDS35nwwGVIR0SO3YxepOcIq8JKV
-	 /VWIG24+sikdsJDndmkMngLysqF2EBlXfcbcwniW1ZTy4+5wPabJBJ/lqevAskR2v2
-	 RndxTzhBmGwAfb3Rkd2ackZa+Py0eHZKpMWtLyRu+TmpKZmvhstwFlVHg9MJMh55UT
-	 REDwJi1edcOJg==
-Date: Fri, 21 Feb 2025 14:35:11 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] r8169: disable RTL8126 ZRX-DC timeout
-Message-ID: <20250221203511.GA359929@bhelgaas>
+	s=arc-20240116; t=1740170811; c=relaxed/simple;
+	bh=oiPIa6UFtcLyDXb3TVPU4dq0PZc7Wf/wQ4WmDCQ+s7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tVuhS3hmcNPorKscKLjlCgrWd/c78qngCMIguDzvvsKPgVf5unUt9fawTIQo4gGHtc/Q06Njxwvk8slDCqG0fabk7I+GtOYkLen2QeJVMhew/ZeRsbffyZVvV3c3e8FzYwhtjqs919+MqmlznAaJnKcPSxTFm6W5qZ0TDxf85FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=NW/SdKYv; arc=none smtp.client-ip=81.19.149.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zRM4ZeBVNHnzdRR9c9SOkgYxlcFJUwX6fNRxKOiLX5c=; b=NW/SdKYvjkCLEDJhnPbX17Ke6h
+	5n6NZuoXcSojU5Mnr8LRg7jIhfcoNv3tUsg4aKy6PS3g7oRtW9MPWZR4cc0nsKJyG1tMxTg3Zt6fx
+	2Bl81ZJfld0FeM3+tBwUwF3YCpELSY2feqv/MpC06fvg/eM6jy8WCHxhK07D9hM8npXI=;
+Received: from [88.117.55.1] (helo=[10.0.0.160])
+	by mx12lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tlZv3-000000001aq-2lgN;
+	Fri, 21 Feb 2025 21:46:46 +0100
+Message-ID: <b9ed9e8b-4af8-4dcb-88fe-8507134348a9@engleder-embedded.com>
+Date: Fri, 21 Feb 2025 21:46:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <eeba10a2-809a-4583-bd35-1f363c824e14@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 7/8] net: selftests: Add selftests sets with
+ fixed speed
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20250219194213.10448-1-gerhard@engleder-embedded.com>
+ <20250219194213.10448-8-gerhard@engleder-embedded.com>
+ <20250220181419.54155bd0@kernel.org>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250220181419.54155bd0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Fri, Feb 21, 2025 at 09:12:09PM +0100, Heiner Kallweit wrote:
-> On 21.02.2025 21:01, Bjorn Helgaas wrote:
-> > On Fri, Feb 21, 2025 at 03:18:28PM +0800, ChunHao Lin wrote:
-> >> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
-> >> device will exit L1 substate every 100ms. Disable it for saving more power
-> >> in L1 substate.
-> > 
-> > s/dose/does/
-> > 
-> > Is ZRX-DC a PCIe spec?  A Google search suggests that it might not be
-> > completely Realtek-specific?
-> > 
-> ZRX-DC is the receiver DC impedance as specified in the PCIe Base
-> Specification.  From what I've found after a quick search ASPM
-> restrictions apply if this impedance isn't in the range 40-60 ohm.
+On 21.02.25 03:14, Jakub Kicinski wrote:
+> On Wed, 19 Feb 2025 20:42:12 +0100 Gerhard Engleder wrote:
+>> Add PHY loopback selftest sets with fixed 100 Mbps and 1000 Mbps speed.
+> 
+> Maybe an obvious question, maybe I'm missing something - but how
+> is this going to scale? We have 120-ish link modes.
 
-Ah, so it looks like PCIe r6.0, sec 4.2.7.6.1.2, is the sort of thing
-this refers to:
+I will try to make the speed configurable by the driver which uses the
+selftests.
 
-  4.2.7.6.1.2 Rx_L0s.Idle §
-
-    - Next state is Rx_L0s.FTS if the Receiver detects an exit from
-      Electrical Idle on any Lane of the configured Link.
-
-    - Next state is Rx_L0s.FTS after a 100 ms timeout if the current
-      data rate is 8.0 GT/s or higher and the Port’s Receivers do not
-      meet the ZRX-DC specification for 2.5 GT/s (see § Table 8-11).
-      All Ports are permitted to implement the timeout and transition
-      to Rx_L0s.FTS when the data rate is 8.0 GT/s or higher.
-
-> >> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
-> >> +{
-> >> +	struct pci_dev *pdev = tp->pci_dev;
-> >> +	u8 val;
-> >> +
-> >> +	if (pdev->cfg_size > 0x0890 &&
-> >> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
-> >> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
-> > 
-> > Is this a standard PCIe extended capability?  If so, it would be nice
-> > to search for it with pci_find_ext_capability() and use standard
-> > #defines.
-
-I guess we could tell from "sudo lspci -vv" output whether this is a
-standard capability.
-
-Bjorn
+Gerhard
 
