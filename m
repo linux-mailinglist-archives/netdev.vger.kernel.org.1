@@ -1,157 +1,257 @@
-Return-Path: <netdev+bounces-168612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A160A3FA5A
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:12:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F532A3FA96
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07D1A7AE605
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF155442E74
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FF121507A;
-	Fri, 21 Feb 2025 15:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC041EE03D;
+	Fri, 21 Feb 2025 16:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="e2LjwSLl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2reqoYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80325215172;
-	Fri, 21 Feb 2025 15:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8511DF73A;
+	Fri, 21 Feb 2025 16:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740153583; cv=none; b=J1zVbsdN9mxTa3ucDOqLAoSL+aVjk5pmWNdwMSdiFSCIM61VNZ3CQT3onacXAmQxMUGmaVhuavOUhAmlfGrR1MFvu8nliqe/XEWQvwwNyJo++9ERK9/X07vyUQtjvDacjMpoCBicxbhEgqxrvZX8Grxmo3fOXDiPjZ1+NaX90+A=
+	t=1740154028; cv=none; b=uZSXdZauLSOjJ5SvGSfuhBxfzmD3mu5mwKXKLYZQifPIHLQpVcCGRDoGuVoVzrZ9qGcrwPTdnzLksoJtmZct4bruBbSbkxUF5PitUfu2wpN2gHk5eVRU191SM6KgG0QaskFBy4cmeqlGRACg0iNmW647Q1/gZAnVWqxrV8aREQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740153583; c=relaxed/simple;
-	bh=PxWdT8KjTiBPV/g4HJF+n40rUM1VBmqecO5CnMu24IA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Yqnm+fGMufPcjokiQ4jFRZPiEC3yFj6XFF0lSyK/kIc16UgHJzEA1lawWKJAQAsgx3mUl2JKjjEYN1GzkLZJvwJx2z7c8cWK4NMrO+hH17zTKFXeR2ArmTQtMKiFpwwG7p80ifXtrGjaCFoxuqAnEWRTywupGkyL4NNcUTZIX5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=e2LjwSLl; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 1FA6522C7A;
-	Fri, 21 Feb 2025 17:59:29 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-id:content-type:content-type:date:from:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=ssi; bh=l0LitblEbtKMznCE8ElI65Dsh7jKX6yGyHzIVUzjF3Y=; b=e
-	2LjwSLl5+EYHomTJoMOTz4DY7QMKP8G/D7yNORzx9ofgBuaUJY71z1vWUOttHiA6
-	B5uzFErZBitwS81baLG1h2kMjl4LPv7fjC0KlDqmTIFtTN1Iq9LrPWhl2X8XnhHq
-	lqPCucFNdiyaOaKHDVotSjiu1IER+LTTCcyr09JfUf5UYIIFnLEgShjr6umisKuB
-	+T4mxnpokBOuGnC0T9YvXK9TUYiM5cl466KtesU0TRtqjftmJHerJzpO0jNk8Ee1
-	R+useezaxQRo66xuHnTSC51Q8SZUaqNo+hK76vnIekU/X/MpB9mdCH7r1BRtn+Vi
-	XC3a9vXFc6YSyf0x331zt1jhWSW0TmrucAskn9Z4AFxJKO1NRiBv72cDaGGpVd6j
-	cWPR2+eQq+pfwJqzYhzdrIF8Ppp/RAZgiS/Q9d9Yrg7lUcYEV5RZx6qUUcaUlbdL
-	CMIEFFlA/Ev5UZdhPbzcS4ULnoODALMmuNRCYqcObWRpcI1+MUZ/crpxYK7cdRXy
-	HUdXt4NaYvTmf2SksTpSyUdihnp/Wk9zPYZOElhuhfnlfi9r7rUxSsgCvreYySf6
-	w3RTIxPyY2gWZ4cZCJHuT1rqSy89gBZopooAZUtoElCYcTMYgJU9MtQYdHocMb9x
-	+8C1bZNrMIa0ZCmzh4VLSpYhXskukJWmN7haKKiaC4=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Fri, 21 Feb 2025 17:59:28 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 119DB15EA8;
-	Fri, 21 Feb 2025 17:59:17 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 51LFxFk5041810;
-	Fri, 21 Feb 2025 17:59:16 +0200
-Date: Fri, 21 Feb 2025 17:59:15 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-cc: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, asml.silence@gmail.com,
-        willemb@google.com, almasrymina@google.com, chopps@labn.net,
-        aleksander.lobakin@intel.com, dust.li@linux.alibaba.com,
-        hustcat@gmail.com, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] ipvs: Always clear ipvs_property flag in
- skb_scrub_packet()
-In-Reply-To: <6202010a-412f-4d63-92a5-d78ba216c65e@6wind.com>
-Message-ID: <c42296ae-e7ad-7063-f87c-ddf516e72ed0@ssi.bg>
-References: <20250221013648.35716-1-lulie@linux.alibaba.com> <6202010a-412f-4d63-92a5-d78ba216c65e@6wind.com>
+	s=arc-20240116; t=1740154028; c=relaxed/simple;
+	bh=R9CX2qGFOMKtOpbBq89u8Ru20KtYEUQdBPmdT7JZ0kY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NElYi510QuJI9Mb8uwFFG439512bg13PFZ4rRSdzE4VgIj7F3aAh7tmmJzC1SgxjqW2NWwsjeJniYpvjsnpie5KIsoTsDPh77Gs1XDOwe8jbkJyju52ARvaG9lfCwSFCCsHn22hLFMzGdxs2gOCbYcsFRF3wgQoAHpQ+FqSMxjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X2reqoYI; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-220d601886fso35458495ad.1;
+        Fri, 21 Feb 2025 08:07:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740154024; x=1740758824; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EXMa2xyXvo743Y0woStBvwk3tmVqDmNqL4DB+2dBsrk=;
+        b=X2reqoYIqIVBb6n7llu45SeONXH9raVFq7xOYesqM7uSsNOc1MCrb92iMkj8PGnEi8
+         9CP4EBLmty0F15Zu4PTBE+fLxa9rcHGl2Oto2eImXoixBrF2YxoIbdi/TY1jQQvsX7F5
+         vMSXTzFZzjGVMdXc0BXTk2gXm26wQvVhVqeByWwAcecOOJSnQmwInP7iMtgs8fTmpjLp
+         xaWWUvSlfrgbhYGw6+t9yu7K5N+xDfaJAp0Jq147cORwCcvGSKL1bMvG9sZA22dhUhG+
+         YH3Yj3s1HWuRijTozlK60rCNWVLnTbNQYClE/slGQUhfFAShTX4eKiNOunoytFxhI7zA
+         jvOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740154024; x=1740758824;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EXMa2xyXvo743Y0woStBvwk3tmVqDmNqL4DB+2dBsrk=;
+        b=rkOcLM+UFzfcIXZUXqbxH5EaN6KRgJo3KIOg5Fx4fCSLjYI8SEuaThHJ3T89gw55Or
+         Wp193YcN9jLhhEX1BThM9xKfjTqUzS6QFVDj0ujLaI+b9PtYRm3H9dhkGJhFDrsc6uRG
+         OgZzMCWAfw1LDMxkbwFSE6rnmmBJGAbDoJUpZqoPCH6gBk+rqLeOCEpr8THW36khJ7+j
+         huaHk0FJQj4vbswUq/wk9vdaVK5CFhqw4lxkik0nStHOsXcwzzz6Yup1Vt6xBC2TKCNg
+         5zDTlnl4LfGHiZXMVVnz6mycoCxtm2GTP3QIkSKhUdoihdKl/wgRAYbomC/7xQO8Txj0
+         MtBg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7yGN3oSLfWwQQZfJdQcEmjnnJpkdTrOD2Eels8c+eQKtiTsqe/MjH8HwqB/mfNsrUhUuxRomuSLDDEFI6/yI=@vger.kernel.org, AJvYcCUG0gB4JtrQfXQbWGzkLApG2o3xeN5KX6uSorsCQloQn/SjIZOI428cdeYdehwbBC6OTQ9U6Pon@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLYcn0K/PdqHqA7R5E8pGBr8qWW5MXBrcDE8l+wTGzbYng+92b
+	BDMSTbEkMTFGu8ug2BQwMIqe/FK4HXjvlnvDR2vVB9LECkyEmi0=
+X-Gm-Gg: ASbGnctShnaYP8ORvmCVqyArmHrw6aAco2qImbWc962VSqsO8bEPMJz37h83aHNgdHG
+	64N0WoQFyMTp2q2ptl94YweI4L/dohZH50lREra992lOyG79913KlTQjXjCocL3dS8K+0zomC8g
+	9abOU90fIH9SdwTiWbFn+rHtrACEoY6kHEQFnqcP7LENTuz2jC59Lw7dYwP525QIZo49zs+qdyA
+	h5mbvLisoqD0G1XFKOW3pgzCqJXKSltWJKfEm0uC0tiPuEzbGphqUtTxu+VoD9l2GjPMntOEEk9
+	ZPiJmJOEVloCU1WvBKVBOCCwCw==
+X-Google-Smtp-Source: AGHT+IHml8fjUCSIE2ZuwvEzvgY1J8JC+QeEzEUMGL3CllgCnM7QU6VIWvUwwN17Oh6lW2+w27AZYQ==
+X-Received: by 2002:a05:6a21:688:b0:1ee:ced0:f0a4 with SMTP id adf61e73a8af0-1eef3d6b2ffmr8315655637.34.1740154023777;
+        Fri, 21 Feb 2025 08:07:03 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-ae6d9079f20sm3310928a12.48.2025.02.21.08.07.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 08:07:03 -0800 (PST)
+Date: Fri, 21 Feb 2025 08:07:02 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	dxu@dxuuu.xyz, shuah@kernel.org, hawk@kernel.org, petrm@nvidia.com,
+	willemb@google.com, jstancek@redhat.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v2 2/2] selftests: drv-net: test XDP, HDS auto and
+ the ioctl path
+Message-ID: <Z7ikpmXut900JqA1@mini-arch>
+References: <20250221025141.1132944-1-kuba@kernel.org>
+ <20250221025141.1132944-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="-1463811672-1664573096-1740151264=:14998"
-Content-ID: <e8109416-79ae-e910-da52-6d372102b395@ssi.bg>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250221025141.1132944-2-kuba@kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 02/20, Jakub Kicinski wrote:
+> Test XDP and HDS interaction. While at it add a test for using the IOCTL,
+> as that turned out to be the real culprit.
+> 
+> Testing bnxt:
+> 
+>   # NETIF=eth0 ./ksft-net-drv/drivers/net/hds.py
+>   KTAP version 1
+>   1..12
+>   ok 1 hds.get_hds
+>   ok 2 hds.get_hds_thresh
+>   ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by the device
+>   ok 4 hds.set_hds_enable
+>   ok 5 hds.set_hds_thresh_zero
+>   ok 6 hds.set_hds_thresh_max
+>   ok 7 hds.set_hds_thresh_gt
+>   ok 8 hds.set_xdp
+>   ok 9 hds.enabled_set_xdp
+>   ok 10 hds.ioctl
+>   ok 11 hds.ioctl_set_xdp
+>   ok 12 hds.ioctl_enabled_set_xdp
+>   # Totals: pass:11 fail:0 xfail:0 xpass:0 skip:1 error:0
+> 
+> and netdevsim:
+> 
+>   # ./ksft-net-drv/drivers/net/hds.py
+>   KTAP version 1
+>   1..12
+>   ok 1 hds.get_hds
+>   ok 2 hds.get_hds_thresh
+>   ok 3 hds.set_hds_disable
+>   ok 4 hds.set_hds_enable
+>   ok 5 hds.set_hds_thresh_zero
+>   ok 6 hds.set_hds_thresh_max
+>   ok 7 hds.set_hds_thresh_gt
+>   ok 8 hds.set_xdp
+>   ok 9 hds.enabled_set_xdp
+>   ok 10 hds.ioctl
+>   ok 11 hds.ioctl_set_xdp
+>   ok 12 hds.ioctl_enabled_set_xdp
+>   # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Netdevsim needs a sane default for tx/rx ring size.
+> 
+> ethtool 6.11 is needed for the --disable-netlink option.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
----1463811672-1664573096-1740151264=:14998
-Content-Type: text/plain; CHARSET=UTF-8
-Content-Transfer-Encoding: 8BIT
-Content-ID: <4fabcb62-9a35-763a-78d6-a694768e425f@ssi.bg>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
+> ---
+> Since this is targeting net there is no cfg.rpath(),
+> I'll follow up once in net-next.
+> 
+> v2:
+>  - add the ioctl tests
+>  - factor out some common logic
+> 
+> CC: shuah@kernel.org
+> CC: hawk@kernel.org
+> CC: petrm@nvidia.com
+> CC: willemb@google.com
+> CC: jstancek@redhat.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/net/lib/Makefile      |   3 +
+>  drivers/net/netdevsim/ethtool.c               |   2 +
+>  .../testing/selftests/net/lib/xdp_dummy.bpf.c |  13 ++
+>  tools/testing/selftests/drivers/net/hds.py    | 145 +++++++++++++++++-
+>  4 files changed, 160 insertions(+), 3 deletions(-)
+>  create mode 100644 tools/testing/selftests/net/lib/xdp_dummy.bpf.c
+> 
+> diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
+> index bc6b6762baf3..c22623b9a2a5 100644
+> --- a/tools/testing/selftests/net/lib/Makefile
+> +++ b/tools/testing/selftests/net/lib/Makefile
+> @@ -9,7 +9,10 @@ TEST_FILES := ../../../../../Documentation/netlink/specs
+>  TEST_FILES += ../../../../net/ynl
+>  
+>  TEST_GEN_FILES += csum
+> +TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
+>  
+>  TEST_INCLUDES := $(wildcard py/*.py sh/*.sh)
+>  
+>  include ../../lib.mk
+> +
+> +include ../bpf.mk
+> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+> index 5c80fbee7913..7ab358616e03 100644
+> --- a/drivers/net/netdevsim/ethtool.c
+> +++ b/drivers/net/netdevsim/ethtool.c
+> @@ -184,9 +184,11 @@ static const struct ethtool_ops nsim_ethtool_ops = {
+>  
+>  static void nsim_ethtool_ring_init(struct netdevsim *ns)
+>  {
+> +	ns->ethtool.ring.rx_pending = 512;
+>  	ns->ethtool.ring.rx_max_pending = 4096;
+>  	ns->ethtool.ring.rx_jumbo_max_pending = 4096;
+>  	ns->ethtool.ring.rx_mini_max_pending = 4096;
+> +	ns->ethtool.ring.tx_pending = 512;
+>  	ns->ethtool.ring.tx_max_pending = 4096;
+>  }
+>  
+> diff --git a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
+> new file mode 100644
+> index 000000000000..d988b2e0cee8
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
+> @@ -0,0 +1,13 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#define KBUILD_MODNAME "xdp_dummy"
+> +#include <linux/bpf.h>
+> +#include <bpf/bpf_helpers.h>
+> +
+> +SEC("xdp")
+> +int xdp_dummy_prog(struct xdp_md *ctx)
+> +{
+> +	return XDP_PASS;
+> +}
+> +
+> +char _license[] SEC("license") = "GPL";
+> diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
+> index 394971b25c0b..90807b21a6eb 100755
+> --- a/tools/testing/selftests/drivers/net/hds.py
+> +++ b/tools/testing/selftests/drivers/net/hds.py
+> @@ -2,17 +2,54 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+>  import errno
+> +import os
+>  from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
+> -from lib.py import EthtoolFamily, NlError
+> +from lib.py import CmdExitFailure, EthtoolFamily, NlError
+>  from lib.py import NetDrvEnv
+> +from lib.py import defer, ethtool, ip
+>  
+> -def get_hds(cfg, netnl) -> None:
+> +
+> +def _get_hds_mode(cfg, netnl) -> str:
+>      try:
+>          rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+>      except NlError as e:
+>          raise KsftSkipEx('ring-get not supported by device')
+>      if 'tcp-data-split' not in rings:
+>          raise KsftSkipEx('tcp-data-split not supported by device')
+> +    return rings['tcp-data-split']
+> +
+> +
+> +def _xdp_onoff(cfg):
+> +    test_dir = os.path.dirname(os.path.realpath(__file__))
+> +    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
+> +    ip(f"link set dev %s xdp obj %s sec xdp" %
+> +        (cfg.ifname, prog))
+> +    ip(f"link set dev %s xdp off" % cfg.ifname)
 
-	Hello,
+nit: any reason you're not using {format} strings here?
 
-On Fri, 21 Feb 2025, Nicolas Dichtel wrote:
-
-> Le 21/02/2025 à 02:36, Philo Lu a écrit :
-> > We found an issue when using bpf_redirect with ipvs NAT mode after
-> > commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
-> > the same name space"). Particularly, we use bpf_redirect to return
-> > the skb directly back to the netif it comes from, i.e., xnet is
-> > false in skb_scrub_packet(), and then ipvs_property is preserved
-> > and SNAT is skipped in the rx path.
-> > 
-> > ipvs_property has been already cleared when netns is changed in
-> > commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
-> > SKB net namespace changed"). This patch just clears it in spite of
-> > netns.
-> > 
-> > Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> > ---
-> > This is in fact a fix patch, and the issue was found after commit
-> > ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
-> > the same name space"). But I'm not sure if a "Fixes" tag should be
-> > added to that commit.
-> > ---
-> >  net/core/skbuff.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 7b03b64fdcb2..b1c81687e9d8 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -6033,11 +6033,11 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
-> >  	skb->offload_fwd_mark = 0;
-> >  	skb->offload_l3_fwd_mark = 0;
-> >  #endif
-> > +	ipvs_reset(skb);
-> >  
-> >  	if (!xnet)
-> >  		return;
-> >  
-> > -	ipvs_reset(skb);
-> I don't know IPVS, but I wonder if this patch will not introduce a regression
-> for other users. skb_scrub_packet() is used by a lot of tunnels, it's not
-> specific to bpf_redirect().
-
-	Indeed, now we will start to clear the flag for tunnels
-and it can cause IPVS to attempt rerouting for UDP tunnels, i.e.
-once the packet is routed by IPVS to tunnel and second time later 
-after tunneling again when ip_local_out() is called and we see 
-ipvs_property=0 for the outer UDP header. Before such patch
-ipvs_property remains 1 and we do not try to balance the UDP
-traffic. So, for now, this patch may be can spend more cycles for
-the traffic via UDP tunnels but this looks like a rare IPVS setup,
-i.e. real servers reachable via UDP tunnels. Note that IPVS
-has own support for UDP tunnels where it is set as forwarding
-method + tunnel type GUE for the real server. It is not affected
-by this patch.
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
----1463811672-1664573096-1740151264=:14998--
-
+    ip(f"link set dev {cfg.ifname} xdp obj {prog} sec xdp")
+    ip(f"link set dev {cfg.ifname} xdp off")
 
