@@ -1,143 +1,129 @@
-Return-Path: <netdev+bounces-168391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDC43A3EC21
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 06:12:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9654A3EC2E
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 06:18:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C69F3B2E93
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 05:12:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F811188C99E
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 05:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9026D1F758F;
-	Fri, 21 Feb 2025 05:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zVSd7JV9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FD81D5AA7;
+	Fri, 21 Feb 2025 05:18:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034098F6E
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 05:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC70635979;
+	Fri, 21 Feb 2025 05:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740114748; cv=none; b=NSkqwdaH9+J8bV4k295KTHqfLH/Ta9ziV/lEHuffwNngOGbXB2T8BVaF8KChTWBR8eD9X9el8v/TDnpxXjk74MnIY2hOZYPyZYWTPrnL6lvjWNm/7ZPDMOVXFZV2Aa+j+E5GAsDDZvaXozYfPW9fGFY6K402d4reRCjqP3mwXVk=
+	t=1740115117; cv=none; b=BjDOkBarRUkz8joRcOvy+d5RGmyFeyKW0NTRLt4HdpiTGIbbsSMRL+7wbIlfwpbK/vTB83mFffaixiqdil2QQftW3KXYEcpmMwEkENDQ9rPw19zMDm40HmvertQHBESg2YrctTZjLpECmZomlSQ7QBXxIZE1tYtYzMRdtB9bSAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740114748; c=relaxed/simple;
-	bh=s0L3SS2iDaMmMFYnqN76r6hyBBUesMNd+0GwVVNulUY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H7nRkUPikWujLWsBcUEgJnfluG21CctB4S4Dx82KXdqxZfzLABUH3kxV2C+3Br/hQbuz2gULgoRGbI04agBVHfKchickAy04cXwaGBmEzd91sC4IrqusitVA1Swig4j+m7hYpxsGAyu4fLtMDnWB9ptSmdispHJe+Mh6q3jaKfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zVSd7JV9; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-472051849acso29056271cf.0
-        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 21:12:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740114746; x=1740719546; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FcM5tFzsPz4keIRJwsQjxTttVZCWDZx2zXwRdrlLyKw=;
-        b=zVSd7JV9mWj8zAmxuvbHDRwS0P5tcIOLe16CY6isP3SUWq8PhpsHDbvLCs3CToiy62
-         aAV+a39e6r9ytK7UNv5G0xC7XpCx6LEyl1FmO7MS91q8YPsc/7MQECZj7lqWzzlFFzZg
-         I0bmYYj6qi8M+UP5agiTBOuLDgkCAAzSiHX3zCxmrT08CxClkT+Acj6duxnYKWcR5YNK
-         wUuE0ESmpCU66ss5qfUTFQwnR1SklraLJ19p65qzYXSenrok0cz6ZLHJ/YVHB5OvXt0s
-         maDhV4ederbBqU71FeI2or8sqsIJ3ptYvqn/iZuN7Tt+L3qHwxoVTiBYuEUxJAhrDFsz
-         tbyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740114746; x=1740719546;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FcM5tFzsPz4keIRJwsQjxTttVZCWDZx2zXwRdrlLyKw=;
-        b=vbBrgqbDu18OHuNsviRuC9wt7Or4hGSiYGxzmA9iDNbSrYppR+iX6ftMDKL2/2IkaD
-         OiHQYhQAFZpbjxS3JdsBnX2Afp+XnZfxgn9Zb5dQLdZY6TIPL4Mbz3fsCTwWxZjFVPTU
-         WlP5b/L6/G/1YdTe8Hb+rAfsiZ0/cvlgocsAn4jKhlQfitMU+CqsbKzzFQcFjxO4Ugpq
-         1jWR9Rw6hzVNKVcdjMglDnaxSoKJIBjZbAsOWR57WkRMV05TLZ3VNQ6q62n1TreSqG5S
-         5r5lpsjx9mT9PDJK/cseZx/7j79F5tEePfrW6EDkGtRHjjqv6C+60Ddftc0YcI5v4HDI
-         xsZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQqVb5QZSe3x00mP0FsSG9TOHA5ZvT/LNiFjjhpOBrS6Fy8KRl56t9zLkGFfkc2XW/hnxg5Mc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/rj+3uG6w8MfXRjNT8pklCmeK/O1OaCUeWrwLzWXjCiVcwfuJ
-	nkVwivlpyR4wmogSrluhBcsezEiS2Uo5Kq58o4ePkxKaa6PtCFxRxghlBRphg0Zm53iv6Ts0rAd
-	/KV+V7U8V3Q==
-X-Google-Smtp-Source: AGHT+IFi6O7xcS7GrWgZZVP9tN0hLgP420+IWcQ+411wMfOvLlOxuIhUJy+BrxHldnYzCgqPj1MPwGGap2IEzw==
-X-Received: from qtbbb15.prod.google.com ([2002:a05:622a:1b0f:b0:472:e0f:3fec])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1994:b0:472:70e:8995 with SMTP id d75a77b69052e-47222978129mr31175511cf.52.1740114745908;
- Thu, 20 Feb 2025 21:12:25 -0800 (PST)
-Date: Fri, 21 Feb 2025 05:12:23 +0000
+	s=arc-20240116; t=1740115117; c=relaxed/simple;
+	bh=EbUAX9Vl2P5753Jv8TWa4wWdEHrNy4FRvo0yPgix670=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=trzgaacN5WtpXQa5ewN3r3TAvV2ibSzEmtq8Vj6JTA2tVNeCSh8yb5z447i2hPIdEX+C5Xx53QltKyrwhk6m26BXHhrzXUvXa7pyyacrDCRCoa05nuMDEso+xlsfa7VFVAxVni/lAK3Lx8ff0R/uqTk5xP20TNR5pK3g2L4N+I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 21 Feb 2025 14:18:27 +0900
+Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
+	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id 21B6E20AE29A;
+	Fri, 21 Feb 2025 14:18:27 +0900 (JST)
+Received: from kinkan2.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Fri, 21 Feb 2025 14:18:27 +0900
+Received: from plum.e01.socionext.com (unknown [10.212.245.39])
+	by kinkan2.css.socionext.com (Postfix) with ESMTP id CAB493732;
+	Fri, 21 Feb 2025 14:18:26 +0900 (JST)
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Subject: [PATCH net-next v2] net: stmmac: Correct usage of maximum queue number macros
+Date: Fri, 21 Feb 2025 14:18:18 +0900
+Message-Id: <20250221051818.4163678-1-hayashi.kunihiko@socionext.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250221051223.576726-1-edumazet@google.com>
-Subject: [PATCH net-next] net-sysfs: restore behavior for not running devices
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Antoine Tenart <atenart@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-modprobe dummy dumdummies=1
+The maximum numbers of each Rx and Tx queues are defined by
+MTL_MAX_RX_QUEUES and MTL_MAX_TX_QUEUES respectively.
 
-Old behavior :
+There are some places where Rx and Tx are used in reverse. There is no
+issue when the Tx and Rx macros have the same value, but should correct
+usage of macros for maximum queue number to keep consistency and prevent
+unexpected mistakes.
 
-$ cat /sys/class/net/dummy0/carrier
-cat: /sys/class/net/dummy0/carrier: Invalid argument
-
-After blamed commit, an empty string is reported.
-
-$ cat /sys/class/net/dummy0/carrier
-$
-
-In this commit, I restore the old behavior for carrier,
-speed and duplex attributes.
-
-Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attributes")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Huacai Chen <chenhuacai@kernel.org>
+Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
 ---
- net/core/net-sysfs.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/stmicro/stmmac/common.h | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h | 7 +++----
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 3fe2c521e5740436687f09c572754c5d071038f4..f61c1d829811941671981a395fc4cbc57cf48d23 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -313,12 +313,13 @@ static ssize_t carrier_show(struct device *dev,
- 			    struct device_attribute *attr, char *buf)
- {
- 	struct net_device *netdev = to_net_dev(dev);
--	int ret = -EINVAL;
-+	int ret;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 55053528e498..412b07e77945 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -101,8 +101,8 @@ struct stmmac_rxq_stats {
+ /* Updates on each CPU protected by not allowing nested irqs. */
+ struct stmmac_pcpu_stats {
+ 	struct u64_stats_sync syncp;
+-	u64_stats_t rx_normal_irq_n[MTL_MAX_TX_QUEUES];
+-	u64_stats_t tx_normal_irq_n[MTL_MAX_RX_QUEUES];
++	u64_stats_t rx_normal_irq_n[MTL_MAX_RX_QUEUES];
++	u64_stats_t tx_normal_irq_n[MTL_MAX_TX_QUEUES];
+ };
  
- 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
- 	if (ret)
- 		return ret;
+ /* Extra statistic and debug information exposed by ethtool */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index f05cae103d83..dae279ee2c28 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -257,7 +257,7 @@ struct stmmac_priv {
+ 	/* Frequently used values are kept adjacent for cache effect */
+ 	u32 tx_coal_frames[MTL_MAX_TX_QUEUES];
+ 	u32 tx_coal_timer[MTL_MAX_TX_QUEUES];
+-	u32 rx_coal_frames[MTL_MAX_TX_QUEUES];
++	u32 rx_coal_frames[MTL_MAX_RX_QUEUES];
  
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		/* Synchronize carrier state with link watch,
- 		 * see also rtnl_getlink().
-@@ -349,6 +350,7 @@ static ssize_t speed_show(struct device *dev,
- 	if (ret)
- 		return ret;
+ 	int hwts_tx_en;
+ 	bool tx_path_in_lpi_mode;
+@@ -265,8 +265,7 @@ struct stmmac_priv {
+ 	int sph;
+ 	int sph_cap;
+ 	u32 sarc_type;
+-
+-	u32 rx_riwt[MTL_MAX_TX_QUEUES];
++	u32 rx_riwt[MTL_MAX_RX_QUEUES];
+ 	int hwts_rx_en;
  
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		struct ethtool_link_ksettings cmd;
+ 	void __iomem *ioaddr;
+@@ -343,7 +342,7 @@ struct stmmac_priv {
+ 	char int_name_sfty[IFNAMSIZ + 10];
+ 	char int_name_sfty_ce[IFNAMSIZ + 10];
+ 	char int_name_sfty_ue[IFNAMSIZ + 10];
+-	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
++	char int_name_rx_irq[MTL_MAX_RX_QUEUES][IFNAMSIZ + 14];
+ 	char int_name_tx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 18];
  
-@@ -376,6 +378,7 @@ static ssize_t duplex_show(struct device *dev,
- 	if (ret)
- 		return ret;
- 
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		struct ethtool_link_ksettings cmd;
- 
+ #ifdef CONFIG_DEBUG_FS
 -- 
-2.48.1.601.g30ceb7b040-goog
+2.25.1
 
 
