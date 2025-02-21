@@ -1,84 +1,136 @@
-Return-Path: <netdev+bounces-168506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D0BA3F2FA
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:35:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7155A3F315
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 350FC7033B3
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:34:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C64921891C9C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43023202F95;
-	Fri, 21 Feb 2025 11:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95157207DF8;
+	Fri, 21 Feb 2025 11:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="slJ1doNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E75202F65;
-	Fri, 21 Feb 2025 11:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB861FBE8E;
+	Fri, 21 Feb 2025 11:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740137697; cv=none; b=M600hbQKYhEWyKrUxNfSdZfXBHZ0cX1M+qnnkULGSOYdZknt25Uwk7DL6Cfal6ZTAGNnCau3RgkPKeCPrc1MPHgHU+Z4XjZB/hNmsMe3CeDK7os8ZyEpQnDWVeOtz2yE796PFPXqrY1hDXJHaxUw4wO0DR5UUnoUK0qhbt+qR4s=
+	t=1740137938; cv=none; b=JDC0u48hIh02X6+yswktaGEnrf+sfqoE3zYpgNvQHgRCIohJf/DBzbojkKTkfk8OkCK5U3j4fXLNg5++eZHMi7d/2L38UrT5m9/UHTbiioQIpig4nCdqqCTGTNDVdeN9DA4A5wOscG23jLeHl11BND/MQz5KSpksg7+2NvkEmUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740137697; c=relaxed/simple;
-	bh=Id1fAptqrUosRWS3N6q0jDxo6pmOozUPfyTOPAECM94=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KQD182DugQka0tdBPQn6QgCnxjbsNP412quC5giqjpnmRIejUNlNhBOzcYx2u4IfpaHLbV88sHkZzUkl7HSV5Ro0o4a+2Fu/k9j6QjVWfLEcsi7Wk1Klqm9NOYCZRGqjcxJRpDjx/17nt/kVCG6PPXkQXW64J2j93+rNgQsO9NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Yznxj50vhz2Jx93;
-	Fri, 21 Feb 2025 19:30:49 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 162F71A016C;
-	Fri, 21 Feb 2025 19:34:47 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 21 Feb 2025 19:34:46 +0800
-Message-ID: <09f9ae9e-6ccc-485d-a066-c13be64e7f99@huawei.com>
-Date: Fri, 21 Feb 2025 19:34:46 +0800
+	s=arc-20240116; t=1740137938; c=relaxed/simple;
+	bh=G6Tv4gdMgqK8URWlKGYUnz4nHwoiGKzXfTwUwauU//I=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=Jjg4xjPCR9dMPdUV7FbaN7KWzsXmXd3jj9zoFkGIbpkuxUqVsG0NhjJPvJCdkvy/tf36uWfNtlUQ9f9NNDOUlXm5gyQN9YLZV93M5QGfqbLMdVtTITiCaNlpXDRiji8NGXq3K5A7arMEv3oZCmvtF9cI9qxIg9E3JrsFjNOROjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=slJ1doNL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qugMnCcisAWRd3N7XpZaDvLqsnQ13hI4MnOJQYSPqR8=; b=slJ1doNLYx0gJdh83NuzDDMBis
+	jySo+YRg1x1stRmo8dE1FiD+VXvxu7aowfRHxBaPU7hK8tUgXJj1zSJ72tURzCOajhPknQZO6Oo5i
+	4Flh54HosFPQIk6SMglRaU3RZTS7zFUcnxRKtY9B4dGPEk/nIrbFwCLHEyKPb62IqAZ6ciZdlIRWn
+	rk8Z780gW8LFPfTA/N9TBNe9yL/axY6Sw4vaOd69xuVZoO0WWmXfsExMEg71FvxHfl0QBOnjoLKBU
+	qOlUnA3q7QPnDjirYRuAIALkZzQYksAEN1hV8qWKWqZh0pBREK04e7HhYUXGAcMaRXqobo7rgC03m
+	lXtD3lPg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36572 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tlRMe-0004Pp-28;
+	Fri, 21 Feb 2025 11:38:40 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tlRMK-004Vsx-Ss; Fri, 21 Feb 2025 11:38:20 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH net-next] net: stmmac: qcom-ethqos: use rgmii_clock() to set
+ the link clock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
-	<shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 1/6] net: hibmcge: Add dump statistics
- supported in this module
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20250218085829.3172126-1-shaojijie@huawei.com>
- <20250218085829.3172126-2-shaojijie@huawei.com>
- <20250220151710.78f4893f@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250220151710.78f4893f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tlRMK-004Vsx-Ss@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 21 Feb 2025 11:38:20 +0000
 
+The link clock operates at twice the RGMII clock rate. Therefore, we
+can use the rgmii_clock() helper to set this clock rate.
 
-on 2025/2/21 7:17, Jakub Kicinski wrote:
-> On Tue, 18 Feb 2025 16:58:24 +0800 Jijie Shao wrote:
->> Subject: [PATCH v2 net-next 1/6] net: hibmcge: Add dump statistics supported in this module
-> In addition to addressing my comment about fix_features please
-> also remove the "in this module" from all patch titles.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 23 ++++---------------
+ 1 file changed, 5 insertions(+), 18 deletions(-)
 
-okay
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 192f270197c8..eafe637540b6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -169,30 +169,17 @@ static void rgmii_dump(void *priv)
+ 		rgmii_readl(ethqos, EMAC_SYSTEM_LOW_POWER_DEBUG));
+ }
+ 
+-/* Clock rates */
+-#define RGMII_1000_NOM_CLK_FREQ			(250 * 1000 * 1000UL)
+-#define RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ	 (50 * 1000 * 1000UL)
+-#define RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ	  (5 * 1000 * 1000UL)
+-
+ static void
+ ethqos_update_link_clk(struct qcom_ethqos *ethqos, int speed)
+ {
++	long rate;
++
+ 	if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
+ 		return;
+ 
+-	switch (speed) {
+-	case SPEED_1000:
+-		ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
+-		break;
+-
+-	case SPEED_100:
+-		ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
+-		break;
+-
+-	case SPEED_10:
+-		ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
+-		break;
+-	}
++	rate = rgmii_clock(speed);
++	if (rate > 0)
++		ethqos->link_clk_rate = rate * 2;
+ 
+ 	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
+ }
+-- 
+2.30.2
 
->
-> Other than that code LGTM.
->
 
