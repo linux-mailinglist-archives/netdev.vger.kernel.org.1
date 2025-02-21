@@ -1,106 +1,101 @@
-Return-Path: <netdev+bounces-168523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C607EA3F3A0
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:04:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C7A3F385
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64BED17B221
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:04:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3E927A9C55
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA1C20B207;
-	Fri, 21 Feb 2025 12:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4675209F33;
+	Fri, 21 Feb 2025 11:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="J4o+ey0M"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE20C1AF0B8;
-	Fri, 21 Feb 2025 12:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0C9202F65;
+	Fri, 21 Feb 2025 11:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740139402; cv=none; b=DhBe9v9iiE0Yw884pQps/E+mNRtvDFBvS69RC0Cf/1qlRmNPh4KZkciXI9/r0awU8242aBDSCoBoJX+s1y0J4nYAyYukws3Nbh8x8vGVAI5aE6lDspL/YslFDDgs7yBMqT15FflMOnPikwMop2rUJ4zP7u4itZ2cGWhtbM2XtqY=
+	t=1740138937; cv=none; b=gn2qvIvX2WJQ7DSYSVICbR9EfCsfG+5a5gQS+nD03asjC7kzKVqXMgjii8pIoAJuZfwnAhyqHCyYLHmcP5RQhChXeURUHTW275W34Z9HVqOm1jXXOH8i6pmfYF378fOixYItV6Bk+NyiBIoWJcOGsgK29dKNNEBGMY+0J8D3BRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740139402; c=relaxed/simple;
-	bh=zRywRA7/WyMfvVOHBwPh9/SVjcWoMKvenkIiV2OlwHE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fmltYsXnp8ZXPD8CdQJjqb7LpRfyMV/8sJqXMA8lEwv/Y6s1tPKbCT77vbP+A1u0Pm7cFEjApcZcBr7873ZRtKr8l5tYuTdni5ASj4zOYiBgD9va3qV7IEKt/dyvyaI+mKP5iMpFGczF0c7ATRDmswd2BIBy1SDaqWmyn1NprXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YzpZw1fHQzkXMB;
-	Fri, 21 Feb 2025 19:59:36 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 719901800EB;
-	Fri, 21 Feb 2025 20:03:18 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 21 Feb 2025 20:03:17 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kalesh-anakkur.purayil@broadcom.com>,
-	<shaojijie@huawei.com>
-Subject: [PATCH v3 net-next 6/6] net: hibmcge: Add support for ioctl
-Date: Fri, 21 Feb 2025 19:55:26 +0800
-Message-ID: <20250221115526.1082660-7-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250221115526.1082660-1-shaojijie@huawei.com>
-References: <20250221115526.1082660-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1740138937; c=relaxed/simple;
+	bh=JC8ogyqOI8xN8zaQhdtMlNxpZBkM46jcluP/sZz9IUk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TpGRO7rHeBtUEfBpjazBMxrFpT6HErFXe9rchhOCygk1PAIivuO/s8GIJ9vW5riZlbi/iY6hG8o1fUdJMf0RuE7rQVB8q20sHROStVM2QvKBmwvlWi0Mx5WUcUH06k1mZYTdLL29SLfyAMcGHXItTSTpbH7Eg68yVwP8QRiv4+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=J4o+ey0M; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1740138929; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=rhCWKZ300d1LYGozeyZzfCVOrsA+uIHUJ8oJ+AoQ8Fw=;
+	b=J4o+ey0MdqpYv+khiciAaqTqGoIShlNMfrBa7/8RXZ1N5Q/50PTC96y1nSQjDqFeI6GKpQ0eW7fGmYOZQOM+FKiPAZKG6Nh9GkjllH/hAT/okO2rmlKk4cf3zuc5dXW45HJd+DINg73C8Y5Tm0iQGqvMYg0tWWcLtIW0h+izYZI=
+Received: from 30.221.144.133(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WPwJ1x1_1740138927 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 21 Feb 2025 19:55:28 +0800
+Message-ID: <365859bd-1457-4f83-91f4-34a7f21e1d8f@linux.alibaba.com>
+Date: Fri, 21 Feb 2025 19:55:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipvs: Always clear ipvs_property flag in
+ skb_scrub_packet()
+To: Julian Anastasov <ja@ssi.bg>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ asml.silence@gmail.com, willemb@google.com, almasrymina@google.com,
+ chopps@labn.net, aleksander.lobakin@intel.com, nicolas.dichtel@6wind.com,
+ dust.li@linux.alibaba.com, hustcat@gmail.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250221013648.35716-1-lulie@linux.alibaba.com>
+ <610b255c-51e4-0460-05a2-ab9cd8c43295@ssi.bg>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <610b255c-51e4-0460-05a2-ab9cd8c43295@ssi.bg>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This patch implements the .ndo_eth_ioctl() to
-read and write the PHY register.
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-ChangeLog:
-v1 -> v2:
-  - Use phy_do_ioctl() to simplify ioctl code, suggested by Andrew.
-  v1: https://lore.kernel.org/all/20250213035529.2402283-1-shaojijie@huawei.com/
----
- drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index c6a955e640fc..2ac5454338e4 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -5,6 +5,7 @@
- #include <linux/if_vlan.h>
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/phy.h>
- #include "hbg_common.h"
- #include "hbg_diagnose.h"
- #include "hbg_err.h"
-@@ -277,6 +278,7 @@ static const struct net_device_ops hbg_netdev_ops = {
- 	.ndo_tx_timeout		= hbg_net_tx_timeout,
- 	.ndo_set_rx_mode	= hbg_net_set_rx_mode,
- 	.ndo_get_stats64	= hbg_net_get_stats,
-+	.ndo_eth_ioctl		= phy_do_ioctl_running,
- };
- 
- static void hbg_service_task(struct work_struct *work)
+On 2025/2/21 19:42, Julian Anastasov wrote:
+> 
+> 	Hello,
+> 
+> On Fri, 21 Feb 2025, Philo Lu wrote:
+> 
+>> We found an issue when using bpf_redirect with ipvs NAT mode after
+>> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+>> the same name space"). Particularly, we use bpf_redirect to return
+>> the skb directly back to the netif it comes from, i.e., xnet is
+>> false in skb_scrub_packet(), and then ipvs_property is preserved
+>> and SNAT is skipped in the rx path.
+>>
+>> ipvs_property has been already cleared when netns is changed in
+>> commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
+>> SKB net namespace changed"). This patch just clears it in spite of
+>> netns.
+>>
+>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+>> ---
+>> This is in fact a fix patch, and the issue was found after commit
+>> ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+>> the same name space"). But I'm not sure if a "Fixes" tag should be
+>> added to that commit.
+> 
+> 	You can add 2b5ec1a5f973 as a Fixes tag in v2 and I'll ack it.
+
+Thank you, Julian. You also solve my worries. I'll post v2 soon.
+
 -- 
-2.33.0
+Philo
 
 
