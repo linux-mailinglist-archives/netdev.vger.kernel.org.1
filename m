@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-168425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD69A3F02E
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:26:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA78A3F02F
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90DBC8605F1
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:24:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71345861064
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D814204C34;
-	Fri, 21 Feb 2025 09:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0F1204087;
+	Fri, 21 Feb 2025 09:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTOMpnbc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAMlyV0h"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870E0204C39
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F931FAC46
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740129853; cv=none; b=FwYdAyTFSGQtZ7m2+okmPMuviWa7DeDg5nQtN2+XFgom9i2eLLmKEtr0VnXRynMy/A0BRV9GBeQRjTCHNr7M+VCqfq1SzaSb6aC6CzNEsZHgrMP9QLydI+GFfpneHIVMFT6+papOFGV+ioekMQdaaiDZJV/Q28ybkSCYFnfQexc=
+	t=1740129861; cv=none; b=lwsRHKpvJaDbDSgB5HLhdqliIDP0y/7eeaTr8XiiJb1yfZ2KunOdeaBQ+V+5Czrp8L5X9xfnM/VBI/j35PBUHZUAPgvCVC8HxE5H+gjII82Tihek5JjnjExl8dpwm87p2Sy9fJq/ZklX1Rs1X9T9BEvm6q/M2n11g4Q7xpGai6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740129853; c=relaxed/simple;
-	bh=cDLm2C1nI275N7W2/cLjmILIrNgL/CpWY5/XxEkE8XY=;
+	s=arc-20240116; t=1740129861; c=relaxed/simple;
+	bh=dC5tE7ag9gaxET1RhZIhWjH9+upcBjfxktyxOGFZ4xE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tWlPPnjZ2GCrzqybJ9JwUNWRgX3/JTwarJSW6C5r1//oEfBcONoiJ8DKXyK0HbKJRzht/H1xhV9mS0IqTwTF3A/NTOzLXWQ3yMUgwB6QHATzalzgA9wFJs0UpluA1QqHZ2t66dS/MzyRX+2QNQG67eLn/rx9k1AgeZk3fat0La0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fTOMpnbc; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9sLM+kRoCk/hIi1HY26iL62izPS0tyIayWcygBe+BSqOSTxC+0xffY8l1poUXfbwlaFvUzekQ5Xc3mgupQgUhAi7W+G+HtV7vfPonVqbi1JDVxHCmtlUagv6knV4fQmtSKFHMRU74PHxKzFbw+dMj5sm7EQZnh7gOBXu6FMJEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAMlyV0h; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740129850;
+	s=mimecast20190719; t=1740129859;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JSRYm/qNQakanMxCvXY8bFyXAFzTvxkUv5zufFxOGKM=;
-	b=fTOMpnbcOGkWH455I9dbKR5Txub3rB5GLCObenHdoBjkxWp5+nrs5hsqVMalzPap7mxDM2
-	LNagkDd9i9aBA4AdLaAEIt44nLMv8eLE9Rz6wu7E52s/ogwv6xaanTYYu3f5c9R4784kXG
-	7lps5bhI1GRVCGqdHHp2be4tM/EXJs4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kifSX+031tKwuktoajViO9/mvxv4MOw+Oe1xNioyW+U=;
+	b=gAMlyV0hNpY/DM8H5VUIVEH5iOsSgXVUU/XMm3DileDQREDyFgqBCJ581RGrCH1JlHYXWy
+	LUw/UYFyUsoPXYp7ruZPP0nEt7VH6Dm0K0Icg0t64bUuCSzbLvta+PxQGWa4YwQ21aiRoW
+	ylmHkeN4QJyQ+oUODm3IjG9yVXW58aU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-486-OXNV2PJpORqlDVtd_TgdAA-1; Fri, 21 Feb 2025 04:24:08 -0500
-X-MC-Unique: OXNV2PJpORqlDVtd_TgdAA-1
-X-Mimecast-MFC-AGG-ID: OXNV2PJpORqlDVtd_TgdAA_1740129848
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38f20b530dfso2727070f8f.3
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 01:24:08 -0800 (PST)
+ us-mta-370-xqjipo2iMWa6Kps5Qtj_gw-1; Fri, 21 Feb 2025 04:24:17 -0500
+X-MC-Unique: xqjipo2iMWa6Kps5Qtj_gw-1
+X-Mimecast-MFC-AGG-ID: xqjipo2iMWa6Kps5Qtj_gw_1740129856
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4393e873962so9383455e9.3
+        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 01:24:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740129847; x=1740734647;
+        d=1e100.net; s=20230601; t=1740129856; x=1740734656;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JSRYm/qNQakanMxCvXY8bFyXAFzTvxkUv5zufFxOGKM=;
-        b=FI6qZjpS0lG/pfihtD0lWbgIagOcMa3CTJzVHr2JixI0kAxNmnqsUc8KITgcU1Yoki
-         VMxFX2vRxhoxqjKuxwAZPtr6wcx3CDCGQaPNaKqczuCoR0DGPArchfbgvnqNAiWaxiuS
-         FWa/aj83nMDGNQaoiloxynxOIKjvDb2/N+GVfWqADvPyHN7Pzto3B/bfukyGgZZsdN+m
-         CVitXTaYtoVtbxZ4ZjWUeoYSwy960xFJGyMHFeTdggugZcqgNzHLNp+RqdxeORs0XdcV
-         hip7cCkNievZNhYv83/V12e5HXeJYV2rNn9tAsekj3ksAcYtEbMxPFqIw4zbcBFoXhkM
-         H4fA==
-X-Gm-Message-State: AOJu0YxY7LzmSBrPP+LzGuuAQbMpE483VzKSQvA174QYU2Trl4QqWvU+
-	wYwNgL6sd/m+sD8wiVCDAXui1wcX4cdF1AlsKnlE+Oy9zmGwoDow0LpXvmr1ZVcaQkQ1SFX9yKV
-	VLHse5G498oc0RFau8ls5hO0m2fnuYQudnuyOMxNa9r4RhCIDgrc1Ig==
-X-Gm-Gg: ASbGncskV7a+jSaoZ6/W6CG96IqhyC+BL0fkkQmsdydKtd2+OteDPEfqCad1VqKk+qi
-	tePT2Q0J1dO8yzzqWjlg1VnwbbxRy/O5OsRtbp9zwuGv+gTJeltr3YPvX1/pd8xUKKuBEXZZA6I
-	+o0p+bjL2uACjRBXYit7zf6OtpWTVp17E16lwbsOAbot99gTBQY4WkjlqpGV9F33dIbJFMlUwY8
-	RMOPQgLz06G5L9T5WAX+HBxjR72zJEE+0zLIljOUBVUxX9dP2iwgVrSpq8buCWWK0KgeLohlr/a
-	tCI=
-X-Received: by 2002:a5d:6c6e:0:b0:38f:2a3e:870c with SMTP id ffacd0b85a97d-38f70799f23mr1580848f8f.16.1740129847422;
-        Fri, 21 Feb 2025 01:24:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGW4kaKVY3wZyP2lhCcq49Y+JYuolRvoNf7ydAcLm/D2zsD9NGs/lmK4JDHenqQzAJBbq5Y7Q==
-X-Received: by 2002:a5d:6c6e:0:b0:38f:2a3e:870c with SMTP id ffacd0b85a97d-38f70799f23mr1580814f8f.16.1740129846976;
-        Fri, 21 Feb 2025 01:24:06 -0800 (PST)
+        bh=kifSX+031tKwuktoajViO9/mvxv4MOw+Oe1xNioyW+U=;
+        b=LW3fzWSp0rNk0wyQimJYMttLvTI/ZYu11ajbdJoC0e41PzPrMRB8D6MobaEFALLdMO
+         jEc8o8tVzFFZ33S779k7LyWxryrtGr8f64Ls3rHJxj+9bkRNEMfl5HBOUDC+DMkTGbgx
+         fk/kb5vljMZgUKcJ4b36LeIrxHGaSwMDm0zwPzRTCLlZToqqkSIQMd8eO91hS7iNAy/A
+         buE6TiMVu4BKCoVvKjww4/5KSxj/GgA0i8oJ3Lf0+Zed3DPXD/cjROTMuKkPXlfp65Hp
+         FdwDVMj1TDFFiPGIFiIK0pyHlmecIXuAmXDpUhLXA0zT0NRdmkxnU9I2nJ8sA9cBmBgW
+         9cvw==
+X-Gm-Message-State: AOJu0Yy2bkSglKt02oBuAHZb3WgWx1BfkHWjUaKblhlk2SdmvBDyS1rb
+	m9Yqm0JsOSBM1yYGuTtJNox1kSHTuGeX6XxqCkK+lqyzkVvgMFs27twT/6WOUxYIFQ/pvIaOU3W
+	/6HTtouwpgfqS+q21EvmExtdYHvk5KPHHn5iZeghknHYghwbd1IyRVg==
+X-Gm-Gg: ASbGncuGOH2zuGr9nn2P+Qx75EsXoy0VnFcwKYrdQQMc8HTxnx7kw+uYuNDsbZD+n4v
+	SKTlvpTopKw0nbivjLuJgA4ieodTIjPwD1kLhDe60F9MH0k6oRhVVE1eZsWZwCAIfvsxz9bnR+h
+	o2WTnFYK2Xj4Se4MGo4FlRGLcfdi/ndsvF66N7OdU6HUyq1dwB0HlyVqHvyd4UGX+YHy1aUijBs
+	euKLol/A06P2icpD1y3bfrxcsSB+eBjToiV2XJsM4bKoRBGOvb9XABZTjMbqiRM5+jvWaxyuxCp
+	lkU=
+X-Received: by 2002:a05:600c:45c6:b0:439:84ba:5773 with SMTP id 5b1f17b1804b1-439ae225a44mr18925455e9.31.1740129855740;
+        Fri, 21 Feb 2025 01:24:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFyQ4tqbJw1dzcfjYSv6AayXk/oJzgWrRboon7xzCcbaFVb9NhIjmbKpGDUR+e8Pq/+JfZpcg==
+X-Received: by 2002:a05:600c:45c6:b0:439:84ba:5773 with SMTP id 5b1f17b1804b1-439ae225a44mr18924035e9.31.1740129853695;
+        Fri, 21 Feb 2025 01:24:13 -0800 (PST)
 Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258b4491sm22462354f8f.7.2025.02.21.01.24.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02f5b38sm11391315e9.24.2025.02.21.01.24.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 01:24:06 -0800 (PST)
-Date: Fri, 21 Feb 2025 10:24:04 +0100
+        Fri, 21 Feb 2025 01:24:13 -0800 (PST)
+Date: Fri, 21 Feb 2025 10:24:10 +0100
 From: Guillaume Nault <gnault@redhat.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	Antonio Quartulli <antonio@mandelbit.com>
-Subject: [PATCH net v2 1/2] gre: Fix IPv6 link-local address generation.
-Message-ID: <942aa62423e0d7721abd99a5ca1069f4e4901a6d.1740129498.git.gnault@redhat.com>
+Subject: [PATCH net v2 2/2] selftests: Add IPv6 link-local address generation
+ tests for GRE devices.
+Message-ID: <5c40747f9c67a54f8ceba9478924a75755c42b07.1740129498.git.gnault@redhat.com>
 References: <cover.1740129498.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,102 +98,267 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1740129498.git.gnault@redhat.com>
 
-Use addrconf_addr_gen() to generate IPv6 link-local addresses on GRE
-devices in most cases and fall back to using add_v4_addrs() only in
-case the GRE configuration is incompatible with addrconf_addr_gen().
+GRE devices have their special code for IPv6 link-local address
+generation that has been the source of several regressions in the past.
 
-GRE used to use addrconf_addr_gen() until commit e5dd729460ca
-("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL
-address") restricted this use to gretap devices and created
-add_v4_addrs() (borrowed from SIT) for non-Ethernet GRE ones.
+Add selftest to check that all gre, ip6gre, gretap and ip6gretap get an
+IPv6 link-link local address in accordance with the
+net.ipv6.conf.<dev>.addr_gen_mode sysctl.
 
-The original problem came when commit 9af28511be10 ("addrconf: refuse
-isatap eui64 for INADDR_ANY") made __ipv6_isatap_ifid() fail when its
-addr parameter was 0. The commit says that this would create an invalid
-address, however, I couldn't find any RFC saying that the generated
-interface identifier would be wrong. Anyway, since plain gre devices
-pass their local tunnel address to __ipv6_isatap_ifid(), that commit
-broke their IPv6 link-local address generation when the local address
-was unspecified.
-
-Then commit e5dd729460ca ("ip/ip6_gre: use the same logic as SIT
-interfaces when computing v6LL address") tried to fix that case by
-defining add_v4_addrs() and calling it to generated the IPv6 link-local
-address instead of using addrconf_addr_gen() (appart for gretap devices
-which would still use the regular addrconf_addr_gen(), since they have
-a MAC address).
-
-That broke several use cases because add_v4_addrs() isn't properly
-integrated into the rest of IPv6 Neighbor Discovery code. Several of
-these shortcomings have been fixed over time, but add_v4_addrs()
-remains broken on several aspects. In particular, it doesn't send any
-Router Sollicitations, so the SLAAC process doesn't start until the
-interface receives a Router Advertisement. Also, add_v4_addrs() mostly
-ignores the address generation mode of the interface
-(/proc/sys/net/ipv6/conf/*/addr_gen_mode), thus breaking the
-IN6_ADDR_GEN_MODE_RANDOM and IN6_ADDR_GEN_MODE_STABLE_PRIVACY cases.
-
-Fix all this by reverting to addrconf_addr_gen() in all cases but the
-very specific one that remains incompatible.
-
-Fix the situation by using add_v4_addrs() only in the specific scenario
-where normal method would fail. That is, for interfaces that have all
-of the following characteristics:
-
-  * transport IP packets directly, not Ethernet (that is, not gretap),
-  * run over IPv4,
-  * tunnel endpoint is INADDR_ANY (that is, 0),
-  * device address generation mode is EUI64.
-
-In all other cases, revert back to the regular addrconf_addr_gen().
-
-Also, remove the special case for ip6gre interfaces in add_v4_addrs(),
-since ip6gre devices now always use addrconf_addr_gen() instead.
-
-Fixes: e5dd729460ca ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL address")
 Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- net/ipv6/addrconf.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+v2: Add selftest to Makefile.
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ac8cc1076536..8b6258819dad 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3209,16 +3209,13 @@ static void add_v4_addrs(struct inet6_dev *idev)
- 	struct in6_addr addr;
- 	struct net_device *dev;
- 	struct net *net = dev_net(idev->dev);
--	int scope, plen, offset = 0;
-+	int scope, plen;
- 	u32 pflags = 0;
- 
- 	ASSERT_RTNL();
- 
- 	memset(&addr, 0, sizeof(struct in6_addr));
--	/* in case of IP6GRE the dev_addr is an IPv6 and therefore we use only the last 4 bytes */
--	if (idev->dev->addr_len == sizeof(struct in6_addr))
--		offset = sizeof(struct in6_addr) - 4;
--	memcpy(&addr.s6_addr32[3], idev->dev->dev_addr + offset, 4);
-+	memcpy(&addr.s6_addr32[3], idev->dev->dev_addr, 4);
- 
- 	if (!(idev->dev->flags & IFF_POINTOPOINT) && idev->dev->type == ARPHRD_SIT) {
- 		scope = IPV6_ADDR_COMPATv4;
-@@ -3529,7 +3526,13 @@ static void addrconf_gre_config(struct net_device *dev)
- 		return;
- 	}
- 
--	if (dev->type == ARPHRD_ETHER) {
-+	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
-+	 * unless we have an IPv4 GRE device not bound to an IP address and
-+	 * which is in EUI64 mode (as __ipv6_isatap_ifid() would fail in this
-+	 * case). Such devices fall back to add_v4_addrs() instead.
-+	 */
-+	if (!(dev->type == ARPHRD_IPGRE && *(__be32 *)dev->dev_addr == 0 &&
-+	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
- 		addrconf_addr_gen(idev, true);
- 		return;
- 	}
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/gre_ipv6_lladdr.sh  | 227 ++++++++++++++++++
+ 2 files changed, 228 insertions(+)
+ create mode 100755 tools/testing/selftests/net/gre_ipv6_lladdr.sh
+
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 73ee88d6b043..5916f3b81c39 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -31,6 +31,7 @@ TEST_PROGS += veth.sh
+ TEST_PROGS += ioam6.sh
+ TEST_PROGS += gro.sh
+ TEST_PROGS += gre_gso.sh
++TEST_PROGS += gre_ipv6_lladdr.sh
+ TEST_PROGS += cmsg_so_mark.sh
+ TEST_PROGS += cmsg_so_priority.sh
+ TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
+diff --git a/tools/testing/selftests/net/gre_ipv6_lladdr.sh b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+new file mode 100755
+index 000000000000..85e40b6df55e
+--- /dev/null
++++ b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+@@ -0,0 +1,227 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++ERR=4 # Return 4 by default, which is the SKIP code for kselftest
++PAUSE_ON_FAIL="no"
++
++readonly NS0=$(mktemp -u ns0-XXXXXXXX)
++
++# Exit the script after having removed the network namespaces it created
++#
++# Parameters:
++#
++#   * The list of network namespaces to delete before exiting.
++#
++exit_cleanup()
++{
++	for ns in "$@"; do
++		ip netns delete "${ns}" 2>/dev/null || true
++	done
++
++	if [ "${ERR}" -eq 4 ]; then
++		echo "Error: Setting up the testing environment failed." >&2
++	fi
++
++	exit "${ERR}"
++}
++
++# Create the network namespaces used by the script (NS0)
++#
++create_namespaces()
++{
++	ip netns add "${NS0}" || exit_cleanup
++}
++
++# The trap function handler
++#
++exit_cleanup_all()
++{
++	exit_cleanup "${NS0}"
++}
++
++# Add fake IPv4 and IPv6 networks on the loopback device, to be used as
++# underlay by future GRE devices.
++#
++setup_basenet()
++{
++	ip -netns "${NS0}" link set dev lo up
++	ip -netns "${NS0}" address add dev lo 192.0.2.10/24
++	ip -netns "${NS0}" address add dev lo 2001:db8::10/64 nodad
++}
++
++# Check if network device has an IPv6 link-local address assigned.
++#
++# Parameters:
++#
++#   * $1: The network device to test
++#   * $2: An extra regular expression that should be matched (to verify the
++#         presence of extra attributes)
++#   * $3: The expected return code from grep (to allow checking the abscence of
++#         a link-local address)
++#   * $4: The user visible name for the scenario being tested
++#
++check_ipv6_ll_addr()
++{
++	local DEV="$1"
++	local EXTRA_MATCH="$2"
++	local XRET="$3"
++	local MSG="$4"
++	local RET
++
++	printf "%-75s  " "${MSG}"
++
++	set +e
++	ip -netns "${NS0}" -6 address show dev "${DEV}" scope link | grep "fe80::" | grep -q "${EXTRA_MATCH}"
++	RET=$?
++	set -e
++
++	if [ "${RET}" -eq "${XRET}" ]; then
++		printf "[ OK ]\n"
++	else
++		ERR=1
++		printf "[FAIL]\n"
++		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
++			printf "\nHit enter to continue, 'q' to quit\n"
++			read -r a
++			if [ "$a" = "q" ]; then
++				exit 1
++			fi
++		fi
++	fi
++}
++
++
++# Create a GRE device and verify that it gets an IPv6 link-local address as
++# expected.
++#
++# Parameters:
++#
++#   * $1: The device type (gre, ip6gre, gretap or ip6gretap)
++#   * $2: The local underlay IP address (can be an IPv4, an IPv6 or "any")
++#   * $3: The remote underlay IP address (can be an IPv4, an IPv6 or "any")
++#   * $4: The IPv6 interface identifier generation mode to use for the GRE
++#         device (eui64, none, stable-privacy or random).
++#
++test_gre_device()
++{
++	local GRE_TYPE="$1"
++	local LOCAL_IP="$2"
++	local REMOTE_IP="$3"
++	local MODE="$4"
++	local ADDR_GEN_MODE
++	local MATCH_REGEXP
++	local MSG
++
++	ip link add netns "${NS0}" name gretest type "${GRE_TYPE}" local "${LOCAL_IP}" remote "${REMOTE_IP}"
++
++	case "${MODE}" in
++	    "eui64")
++		ADDR_GEN_MODE=0
++		MATCH_REGEXP=""
++		MSG="${GRE_TYPE}, mode: 0 (EUI64), ${LOCAL_IP} -> ${REMOTE_IP}"
++		XRET=0
++		;;
++	    "none")
++		ADDR_GEN_MODE=1
++		MATCH_REGEXP=""
++		MSG="${GRE_TYPE}, mode: 1 (none), ${LOCAL_IP} -> ${REMOTE_IP}"
++		XRET=1 # No link-local address should be generated
++		;;
++	    "stable-privacy")
++		ADDR_GEN_MODE=2
++		MATCH_REGEXP="stable-privacy"
++		MSG="${GRE_TYPE}, mode: 2 (stable privacy), ${LOCAL_IP} -> ${REMOTE_IP}"
++		XRET=0
++		# Initialise stable_secret (required for stable-privacy mode)
++		ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.stable_secret="2001:db8::abcd"
++		;;
++	    "random")
++		ADDR_GEN_MODE=3
++		MATCH_REGEXP="stable-privacy"
++		MSG="${GRE_TYPE}, mode: 3 (random), ${LOCAL_IP} -> ${REMOTE_IP}"
++		XRET=0
++		;;
++	esac
++
++	# Check that IPv6 link-local address is generated when device goes up
++	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode="${ADDR_GEN_MODE}"
++	ip -netns "${NS0}" link set dev gretest up
++	check_ipv6_ll_addr gretest "${MATCH_REGEXP}" "${XRET}" "config: ${MSG}"
++
++	# Now disable link-local address generation
++	ip -netns "${NS0}" link set dev gretest down
++	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode=1
++	ip -netns "${NS0}" link set dev gretest up
++
++	# Check that link-local address generation works when re-enabled while
++	# the device is already up
++	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode="${ADDR_GEN_MODE}"
++	check_ipv6_ll_addr gretest "${MATCH_REGEXP}" "${XRET}" "update: ${MSG}"
++
++	ip -netns "${NS0}" link del dev gretest
++}
++
++test_gre4()
++{
++	local GRE_TYPE
++	local MODE
++
++	for GRE_TYPE in "gre" "gretap"; do
++		printf "\n####\nTesting IPv6 link-local address generation on ${GRE_TYPE} devices\n####\n\n"
++
++		for MODE in "eui64" "none" "stable-privacy" "random"; do
++			test_gre_device "${GRE_TYPE}" 192.0.2.10 192.0.2.11 "${MODE}"
++			test_gre_device "${GRE_TYPE}" any 192.0.2.11 "${MODE}"
++			test_gre_device "${GRE_TYPE}" 192.0.2.10 any "${MODE}"
++		done
++	done
++}
++
++test_gre6()
++{
++	local GRE_TYPE
++	local MODE
++
++	for GRE_TYPE in "ip6gre" "ip6gretap"; do
++		printf "\n####\nTesting IPv6 link-local address generation on ${GRE_TYPE} devices\n####\n\n"
++
++		for MODE in "eui64" "none" "stable-privacy" "random"; do
++			test_gre_device "${GRE_TYPE}" 2001:db8::10 2001:db8::11 "${MODE}"
++			test_gre_device "${GRE_TYPE}" any 2001:db8::11 "${MODE}"
++			test_gre_device "${GRE_TYPE}" 2001:db8::10 any "${MODE}"
++		done
++	done
++}
++
++usage()
++{
++	echo "Usage: $0 [-p]"
++	exit 1
++}
++
++while getopts :p o
++do
++	case $o in
++		p) PAUSE_ON_FAIL="yes";;
++		*) usage;;
++	esac
++done
++
++# Create namespaces before setting up the exit trap.
++# Otherwise, exit_cleanup_all() could delete namespaces that were not created
++# by this script.
++create_namespaces
++
++set -e
++trap exit_cleanup_all EXIT
++
++setup_basenet
++
++test_gre4
++test_gre6
++
++if [ "${ERR}" -eq 1 ]; then
++	echo "Some tests failed." >&2
++else
++	ERR=0
++fi
 -- 
 2.39.2
 
