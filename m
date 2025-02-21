@@ -1,148 +1,100 @@
-Return-Path: <netdev+bounces-168466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848BAA3F193
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:14:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD9CA3F192
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:14:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F5904224A3
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:13:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7A93BC7E3
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDFC204F83;
-	Fri, 21 Feb 2025 10:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8741204F6B;
+	Fri, 21 Feb 2025 10:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="SZz6YHn5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LH5iw/sQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8831F4299
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 10:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D824204596
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 10:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740132821; cv=none; b=hMncNMiy58nwjmRnh4TiKEBBbIkfJfw8NJqzG+mM6/YMnDMy6yy0jxZXqlE+IHYR1T5Qmv/Y2B/AE+ao15tFz6hzKxTgoBM4GFupcQtStcVeNf0kbYgGFFZMM8gIdffWuaGKiq4gONouZhYNDxDStNuBpDJ37PAovEnZHMO47/w=
+	t=1740132865; cv=none; b=cDqwbtzxlHlGJr4IMKE2Gda5n6jbyG7CTkVm2rvEkc8c2ZEUuJ0zq2sBsyuwzl8yteXG2au5rD5qN8lrHC3pnBc01yE0emPyIiPC+Oh2DrUGBWyaAfe6lvuFrYgxJZBVH61oKtwdOLV4sxUwXXliL9q3ixyF58wJQ4ffXPJSVSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740132821; c=relaxed/simple;
-	bh=nr5kJWhpCk/uCZ14BjEdkNFr7R+i3EPr+TWyKqi1BDU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XJ8w+TrJaJo8nhlkGjG6Mm+qeEMxgGVFss8Isn6w7nHQrpJdVKyYgJgDM/071Gs2koWsRvMkFIrNcDX0k3pEOVZskmopICp1FZITrcicqevXyKMTnTxaVDxoEA9m25gW3irXGGpYheu0nMrIl2myg66XVtEGVj6pn+KERfk9lgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=SZz6YHn5; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38f20fc478dso160174f8f.0
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 02:13:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1740132817; x=1740737617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UQQWiZCCYCChMS1t+rH0U+Cvy3EWJF3uRAMtMyoybGg=;
-        b=SZz6YHn536951oywpGeOGAUSnhSmADgeZh6sUVlNwIwUPBcdGlxqDqabI/Xcdr8WYw
-         eZaTpzRWA8ZCqmn9wCPCY4j8YcLKV/aEof5yPr7qJ5naC7mJSCMylWi4Suy0kCZHnZCQ
-         xh7VXk0zBShGs7GCOFnxxOvS7iya1Y/DsHGUFhjtTMuRmw139ptBkhxZK7G/gp/JLVb9
-         X7oYxbpkhyKRFjuVKTmGnZZt3JjmSp97Xf5ubG7/Oq1BJ2+dZrGBOMa7rrNVP62BZvDB
-         LQiSSDJ/cVw5j4Zztf5JLesW4Tu4QuIzaRP7d/jvgNDBMYWOv+/enPyQPRniAPCz9Aqg
-         dNEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740132817; x=1740737617;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UQQWiZCCYCChMS1t+rH0U+Cvy3EWJF3uRAMtMyoybGg=;
-        b=mh2dxMK/dhNrIkAvm7Y3iw7Kb1yEKpLb1OfHQbYbOoeu1/iMvX8Ty18nAXSULpl+Z3
-         b1lrxwGZfiu1A+Pl8h0AmYtNy7w1JMMOM50BGzr4NKcVZwCZfjmg0i2nVnR/mBS9QC9Z
-         oA5/pvQz+I9X0HMgiccblH7S7fxO4QSEBsDCivjJDldR2hmWzYEn420W6UxykbxqqnSo
-         hpAh5RqlIboQEt0EKjvtXVKyeWZMXX6xbX1KnR+oe8UZv+gKN2UgDcuSAhixtewHOrA2
-         x1aVC0o1P+Cr98NHrM3/ewR32wkGsXX70sBERSEmIbvzM2T41lB+PVGXaMblf7PZrOlz
-         fMyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUq3ujoLtqU6Olw2RT/uCL3PgSDb6WXlRGCINFD9l0d92/+PM31evAebP+RtoZh2F9DSeVv63g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDS5O89GLWnPASwYxLhJd3qfz/h5WwVaXrqks2sYaZXdbafBZE
-	kPQv75vjggW5RIQ2FtYNemIQcw85n5mne7lmmhex7PWBDj2uR92At7SvGre5nCs=
-X-Gm-Gg: ASbGncuUrbwk2XXmOm916YML7oDRH9gIMO2tTixNd0ic/JhOnKPe1SdYthGJnxoQKvy
-	1Lm5WdjinxRiJaTR+dqXd9WPD3MWLcQRx/IWjmbEXF4xbM1SL7cZy55AMPNdg7Bll05oE4cFcZp
-	Xi1o/TyqNc+7ZNtO6m64BIMkI470TPPM/FcSstpvvKVK5DKyoskOeJ1F4zK5EQHkpJS8l11RPRD
-	oHQwvK+eCb6oHuB1B9ZJmZL3y356+UolIX2aonlx91xq/Y3BFma6OxXJbheqdZCLPSpDVfq0PT/
-	GsCN1gJTKbEPuJg1VoXl8+PIdWpLdaL2jkE4mwPT7FsJCpBLKyjc3ygSZGYG5qpbsOx6hy6BX5l
-	SDtc=
-X-Google-Smtp-Source: AGHT+IFF0hqJbw0BkCdH9ok2JHMRD4EHl6xOSx0rPM/EYkiGqsgM9af9DHGXWwV6BsQS5eWQsKFFGw==
-X-Received: by 2002:a05:6000:4103:b0:382:4e5c:5c96 with SMTP id ffacd0b85a97d-38f6f09aa94mr656909f8f.8.1740132816833;
-        Fri, 21 Feb 2025 02:13:36 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:eba1:dfab:1772:232d? ([2a01:e0a:b41:c160:eba1:dfab:1772:232d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ddba7sm23288242f8f.38.2025.02.21.02.13.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2025 02:13:36 -0800 (PST)
-Message-ID: <6202010a-412f-4d63-92a5-d78ba216c65e@6wind.com>
-Date: Fri, 21 Feb 2025 11:13:35 +0100
+	s=arc-20240116; t=1740132865; c=relaxed/simple;
+	bh=Eu/x4XndsveWMgImNw4I38vkpeo92azgy642kuC5mBY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=LnREPOe9x+8YH04E67TY5VMpBGJMdVWH4oKISguPT2vgXj7LywIGmz0o8oAtXjJTjF4Z7Qs4Bju9nazxbWVKYzHzbrFwMuy2zQ2S+c5tHkSBdxrN7YDW9D2A4/7uQJiBIA2oH8gR6/FtBGKKU+cSHJb8i6VFRV2HPfpRoZR1R2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LH5iw/sQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740132863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h8pwT7itBDINz07ZIoG1R3aQGPqT12o5jQdj8aDxwjQ=;
+	b=LH5iw/sQ08KVba/zUovEvU6QyhuPK5tH16Vs+LgIh3D9QGfnxO2aeFDQZpO3rLx0LgXwx8
+	rlrrHjUFsVP1hrg0OAAbh6fBpVQumqbLHKftwxqNYLCPK/HedEno63EqkGkNNa4ivt8Z/Q
+	+idZErwMdQRExM5YrFtIuVqsqDb4jAk=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-gJ4eZLWAOFqJfZPm2A2l_w-1; Fri,
+ 21 Feb 2025 05:14:19 -0500
+X-MC-Unique: gJ4eZLWAOFqJfZPm2A2l_w-1
+X-Mimecast-MFC-AGG-ID: gJ4eZLWAOFqJfZPm2A2l_w_1740132858
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C5EE19039C1;
+	Fri, 21 Feb 2025 10:14:18 +0000 (UTC)
+Received: from pablmart-thinkpadt14gen4.rmtes.csb (unknown [10.44.32.29])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A7D819412A3;
+	Fri, 21 Feb 2025 10:14:14 +0000 (UTC)
+Date: Fri, 21 Feb 2025 11:14:11 +0100 (CET)
+From: Pablo Martin Medrano <pablmart@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+    Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net] selftests/net: big_tcp: longer netperf session on
+ slow machines
+In-Reply-To: <c36c6de0-fc01-4d8c-81e5-cbdf14936106@redhat.com>
+Message-ID: <d433a173-27cc-5ee9-4d00-133153dd44ef@redhat.com>
+References: <bd55c0d5a90b35f7eeee6d132e950ca338ea1d67.1739895412.git.pablmart@redhat.com> <20250220165401.6d9bfc8c@kernel.org> <c36c6de0-fc01-4d8c-81e5-cbdf14936106@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net] ipvs: Always clear ipvs_property flag in
- skb_scrub_packet()
-To: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, asml.silence@gmail.com,
- willemb@google.com, almasrymina@google.com, chopps@labn.net,
- aleksander.lobakin@intel.com, dust.li@linux.alibaba.com, hustcat@gmail.com,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Julian Anastasov <ja@ssi.bg>
-References: <20250221013648.35716-1-lulie@linux.alibaba.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20250221013648.35716-1-lulie@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Le 21/02/2025 à 02:36, Philo Lu a écrit :
-> We found an issue when using bpf_redirect with ipvs NAT mode after
-> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
-> the same name space"). Particularly, we use bpf_redirect to return
-> the skb directly back to the netif it comes from, i.e., xnet is
-> false in skb_scrub_packet(), and then ipvs_property is preserved
-> and SNAT is skipped in the rx path.
-> 
-> ipvs_property has been already cleared when netns is changed in
-> commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
-> SKB net namespace changed"). This patch just clears it in spite of
-> netns.
-> 
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> ---
-> This is in fact a fix patch, and the issue was found after commit
-> ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
-> the same name space"). But I'm not sure if a "Fixes" tag should be
-> added to that commit.
-> ---
->  net/core/skbuff.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 7b03b64fdcb2..b1c81687e9d8 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6033,11 +6033,11 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
->  	skb->offload_fwd_mark = 0;
->  	skb->offload_l3_fwd_mark = 0;
->  #endif
-> +	ipvs_reset(skb);
->  
->  	if (!xnet)
->  		return;
->  
-> -	ipvs_reset(skb);
-I don't know IPVS, but I wonder if this patch will not introduce a regression
-for other users. skb_scrub_packet() is used by a lot of tunnels, it's not
-specific to bpf_redirect().
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
 
-Regards,
-Nicolas
+
+On Fri, 21 Feb 2025, Paolo Abeni wrote:
+> On 2/21/25 1:54 AM, Jakub Kicinski wrote:
+>> Why not increase the test duration then?
+>
+> I gave this guidance, as with arbitrary slow machines we would need very
+> long runtime. Similarly to the packetdril tests, instead of increasing
+> the allowed time, simply allow xfail on KSFT_MACHINE_SLOW.
+
+I have resubmitted a properly versioned and tagged patch (and with the 
+right title as indeed it does not increase the netperf session duration) at:
+
+https://lore.kernel.org/netdev/23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com/
+
+In that patch the Fixes: commit, found by Paolo, was when the duration 
+moved from the netperf default (10 seconds) to 1 second. As he mentions 
+even with 10 seconds it is not guaranteed that in slow systems and/or 
+under load the test will not fail, hence the skip/xfail
+
 
