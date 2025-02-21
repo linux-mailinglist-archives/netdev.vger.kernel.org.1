@@ -1,114 +1,228 @@
-Return-Path: <netdev+bounces-168416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07988A3EEE8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:43:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9C8A3EF13
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:51:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AAC31896356
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:44:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C8C6702A45
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C5E201028;
-	Fri, 21 Feb 2025 08:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="y+BqoiQN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD57420125F;
+	Fri, 21 Feb 2025 08:50:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB061B0406;
-	Fri, 21 Feb 2025 08:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D047220103B
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 08:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740127431; cv=none; b=fNNgRLWWPjR1NiFjy9oZp96ZFPrIN5AyVhtViSEtduoi6pTexUG+bMhZ5Yjmg/qIEbAjzLIVuayaOUxOFWqOHXL1JIUGWzRnuiaRf/JJVDPibOq4q6gdxhfjwgMCILZ2aAUMqvXiiX1JDJuyOr1yuudD0XMacnt+2xs+MXuCsRg=
+	t=1740127857; cv=none; b=F+Pj8qlg/MBe0f+LhwezhQBSZrRZK2if6DzuB2MXm8HWooitCg8DrA/pvtDczDH2+Evgflq9bm3iyTWH3or7ytK10jU3v+XSy5RyhsNWNoMp0d7V9J2KeXC2rQIk3xlynz0NEVVlxUuwh4ksPmr9wImFN2HRls9JRMk2oPmh4Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740127431; c=relaxed/simple;
-	bh=0M+WT7F9uCqc+pyI4vg/MufuhXOb4oKidEj0ba8e3Fg=;
+	s=arc-20240116; t=1740127857; c=relaxed/simple;
+	bh=nSKLy1Ix2qRvmMeeA07XwFeiYxHYgil0sFq6yP7REX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cw0rwl0Imw5i/r7h2nrqAx6AUsSw8PHStMcVy8OkpCPprBJXCPFNGwLTf60Y2JYcs2u/MddZNIVDNtmPDkIu0ma4m3SvrLaTUPGleky3Es6Wr8l6sDLZ4UV1BioV3rVjRjNJ3zFXua2Zl/UYs6/CvmEx6CpQrj5yitb82U23oLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=y+BqoiQN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SO6UWzoc/zbS6DMMh8zzJ8wnANdSqb4FNiwFHAzJYB8=; b=y+BqoiQNhSi013U7h+X21U0GZk
-	kUhZl7J4G5qbsRwinzXjc8UmLPKJvmXz387NFenlUJSgk2twL8r+lD7ye07FSRiOo/9Ks343KnlHh
-	y05yeZDoICigBBma5dE0KEUOPe4XmRJ78fCCphqhNVYU/n2Kar9eBksJk5mzhfBy//GKBfhc3h+Yb
-	KDfNeXqI4BiEcOQBhkiSuPxIKzWaGbcjKPYWFqBmNItTTSE3DYN9L1oHV7o+6Gh27QSe96K9Ciham
-	vy2kEO1MBaFieDtSaADCzuc8wL4Ojzl3DDT0+mIXkNrp/4aKCtbTZwYt01rmpUP4wU6dskUdOmpjD
-	VkAJekJg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46216)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	 Content-Type:Content-Disposition:In-Reply-To; b=NkxUBSuLZL+72RVmctugsuoEaeLdPW/FYungCBpwQi8hjVzaj0sBDL0ZKRjOlN87FAK62s3k4qAjqDN7TIh27Hy+VMPvL079Tdkjck/rg88OYcSNUJ9ACYo1wN5tInypG06SVgUKqqG0BnTBbwkCJIrWAYBL7K7lq4B4ArDT0/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tlOk0-0003XF-RD; Fri, 21 Feb 2025 09:50:36 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tlOdM-0003tZ-0l;
-	Fri, 21 Feb 2025 08:43:44 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tlOdK-0001s5-2k;
-	Fri, 21 Feb 2025 08:43:42 +0000
-Date: Fri, 21 Feb 2025 08:43:42 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jan Petrous <jan.petrous@oss.nxp.com>, NXP S32 Linux Team <s32@nxp.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: fix DWMAC S32 entry
-Message-ID: <Z7g8vk-MrDQ271Dz@shell.armlinux.org.uk>
-References: <E1tkJow-004Nfn-Cs@rmk-PC.armlinux.org.uk>
- <20250220152248.3c05878a@kernel.org>
- <Z7fHNEFo7Aa4jfUO@shell.armlinux.org.uk>
- <20250220164819.044b509f@kernel.org>
+	(envelope-from <ore@pengutronix.de>)
+	id 1tlOjx-0024Vn-0c;
+	Fri, 21 Feb 2025 09:50:33 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tlOjx-009tjk-07;
+	Fri, 21 Feb 2025 09:50:33 +0100
+Date: Fri, 21 Feb 2025 09:50:33 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 02/12] net: pse-pd: Add support for reporting
+ events
+Message-ID: <Z7g-WYQNpVp5w7my@pengutronix.de>
+References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
+ <20250218-feature_poe_port_prio-v5-2-3da486e5fd64@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250220164819.044b509f@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250218-feature_poe_port_prio-v5-2-3da486e5fd64@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Feb 20, 2025 at 04:48:19PM -0800, Jakub Kicinski wrote:
-> On Fri, 21 Feb 2025 00:22:12 +0000 Russell King (Oracle) wrote:
-> > Right now, the situation is:
-> > 
-> > $ grep s32@nxp.com MAINTAINERS
-> > R:      NXP S32 Linux Team <s32@nxp.com>
-> > L:      NXP S32 Linux Team <s32@nxp.com>
-> > R:      NXP S32 Linux Team <s32@nxp.com>
-> > L:      s32@nxp.com
-> > 
-> > and the approach that has been taken in the past is:
-> > 
-> > -L:     NXP S32 Linux Team <s32@nxp.com>
-> > +R:     NXP S32 Linux Team <s32@nxp.com>
-> > 
-> > in commit bb2de9b04942 ("MAINTAINERS: fix list entries with display names")
-> > 
-> > However, commit 98dcb872779f ("ARM: s32c: update MAINTAINERS entry") did
-> > the reverse for the "ARM/NXP S32G ARCHITECTURE" entry breaking that and
-> > adding a new instance of this breakage elsewhere.
-> > 
-> > It seems these are just going to flip back and forth, so I don't think
-> > I can be bothered to try to fix it, and will modify my own scripts to
-> > eliminate the blank entry in get_maintainers output because of this.
-> > (In other words, s32@nxp.com will *not* be Cc'd for any patches I send.)
+Hi Kory,
+
+On Tue, Feb 18, 2025 at 05:19:06PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Literally would have taken you less time to fix it how I asked than
-> type this email :/
+> Add support for devm_pse_irq_helper() to register PSE interrupts. This aims
+> to report events such as over-current or over-temperature conditions
+> similarly to how the regulator API handles them but using a specific PSE
+> ethtool netlink socket.
 
-My point is that "fixing" it will only get unfixed later - as can be
-seen from the history of the s32 entries already present. They flip-flop
-between R: and L: as people's ideas about what is correct change.
+Thank you for your work. Here some comments.
+
+...
+
+> --- a/drivers/net/mdio/fwnode_mdio.c
+> +++ b/drivers/net/mdio/fwnode_mdio.c
+> @@ -18,7 +18,8 @@ MODULE_LICENSE("GPL");
+>  MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
+>  
+>  static struct pse_control *
+> -fwnode_find_pse_control(struct fwnode_handle *fwnode)
+> +fwnode_find_pse_control(struct fwnode_handle *fwnode,
+> +			struct phy_device *phydev)
+>  {
+
+This change seems to be not directly related to the commit message.
+Is it the preparation for the multi-phy support?
+
+>  	struct pse_control *psec;
+>  	struct device_node *np;
+> @@ -30,7 +31,7 @@ fwnode_find_pse_control(struct fwnode_handle *fwnode)
+>  	if (!np)
+>  		return NULL;
+>  
+> -	psec = of_pse_control_get(np);
+> +	psec = of_pse_control_get(np, phydev);
+>  	if (PTR_ERR(psec) == -ENOENT)
+>  		return NULL;
+>  
+> @@ -128,15 +129,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  	u32 phy_id;
+>  	int rc;
+>  
+> -	psec = fwnode_find_pse_control(child);
+> -	if (IS_ERR(psec))
+> -		return PTR_ERR(psec);
+> -
+>  	mii_ts = fwnode_find_mii_timestamper(child);
+> -	if (IS_ERR(mii_ts)) {
+> -		rc = PTR_ERR(mii_ts);
+> -		goto clean_pse;
+> -	}
+> +	if (IS_ERR(mii_ts))
+> +		return PTR_ERR(mii_ts);
+>  
+>  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+>  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
+> @@ -169,6 +164,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  			goto clean_phy;
+>  	}
+>  
+> +	psec = fwnode_find_pse_control(child, phy);
+> +	if (IS_ERR(psec)) {
+> +		rc = PTR_ERR(psec);
+> +		goto unregister_phy;
+> +	}
+> +
+>  	phy->psec = psec;
+>  
+>  	/* phy->mii_ts may already be defined by the PHY driver. A
+> @@ -180,12 +181,13 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  
+>  	return 0;
+>  
+> +unregister_phy:
+> +	if (is_acpi_node(child) || is_of_node(child))
+> +		phy_device_remove(phy);
+>  clean_phy:
+>  	phy_device_free(phy);
+>  clean_mii_ts:
+>  	unregister_mii_timestamper(mii_ts);
+> -clean_pse:
+> -	pse_control_put(psec);
+>  
+>  	return rc;
+>  }
+> diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+> index 4602e26eb8c8..10a5ab30afdd 100644
+> --- a/drivers/net/pse-pd/pse_core.c
+> +++ b/drivers/net/pse-pd/pse_core.c
+> @@ -7,6 +7,7 @@
+
+...
+
+> +/**
+> + * pse_to_regulator_notifs - Convert PSE notifications to Regulator
+> + *			     notifications
+> + * @notifs: PSE notifications
+> + *
+> + * Return: Regulator notifications
+> + */
+> +static unsigned long pse_to_regulator_notifs(unsigned long notifs)
+
+I prefer converting it the other way around to make it reusable for
+plain regulator-based PSEs. For example, the podl-pse-regulator driver
+won’t have its own interrupt handler but will instead use
+devm_regulator_register_notifier().
+
+Even full-fledged PSE controllers like the PD692x0 are just one part of
+a larger chain of regulators. An overcurrent event may originate from a
+downstream regulator that is not part of the PD692x0 itself. In this
+case, we need to process the event from the downstream regulator,
+convert it into an ethtool event, and forward it to the user.
+
+Here is one example how devm_regulator_register_notifier() can be used:
+https://lore.kernel.org/all/20250220074429.2906141-1-o.rempel@pengutronix.de/
+
+> +{
+> +	unsigned long rnotifs = 0;
+> +
+> +	if (notifs & ETHTOOL_PSE_EVENT_OVER_CURRENT)
+> +		rnotifs |= REGULATOR_EVENT_OVER_CURRENT;
+> +	if (notifs & ETHTOOL_PSE_EVENT_OVER_TEMP)
+> +		rnotifs |= REGULATOR_EVENT_OVER_TEMP;
+> +
+> +	return rnotifs;
+> +}
+> +
+
+Other parts look ok for me.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
