@@ -1,125 +1,111 @@
-Return-Path: <netdev+bounces-168662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5396CA400A9
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:21:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226CFA40121
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06B0F7B0AB1
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:18:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42507189F379
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B9A254B05;
-	Fri, 21 Feb 2025 20:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB90321B9DB;
+	Fri, 21 Feb 2025 20:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AY9nNXcq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBCblYak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDE8253F39
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 20:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0C1D8A14;
+	Fri, 21 Feb 2025 20:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740169112; cv=none; b=j23cljAQa8ii8gxyw6DydrQ1lnjB+qNKZIUa3FeU5GvdrGjs3RuucDBwTJcr9t4sIm77o2MH8G7WFh7wauILodPbenXLNkERfxyahz8czaQD8bh8JLH7ilDkS8uNjjNRa7Sgs6YE6kUzpbzRosPOFuSflkprrSptawf1N2oZTP0=
+	t=1740170113; cv=none; b=MmxLc8Yh6jcqxWFyLdJ6db5eKRg8lbdOlUNTvo9xCq7txhiRvizc3BYKIJuciDB65ofMGcl4m2HNgzhoRSPo8YizHD91eZMvNYT+Nopc6ZWA8/9JQNG4JONNxH9r3v1HYa+1EhPzAg8APIGZi8loBxwbqsbYxl5AbStVL+Qzmn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740169112; c=relaxed/simple;
-	bh=UQvJ8TwOigWO0FYaap4gRxRl+TXT1bVtsMv/MzGY7Hs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SVtkdqqo3YxPPXbhrSm+NVzDGxatH24for3Sga3g9+/2Fs5MKI5KrtLwAAWuEAGBlBTxwgLA/651QSQL6/BuSNvLau29Mvu2lted9DLeGR+SfGKub7WlWRvFvbypGcneQ5S4huSd9j8eWKOPfvC1EwM22bP2rE/wqUn/YM4sZrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AY9nNXcq; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e0373c7f55so3871480a12.0
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 12:18:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740169109; x=1740773909; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t0N59OGdTJN/A2/YOiQmlL2TDzEel3iIKLuRSf8Ulc4=;
-        b=AY9nNXcqxuAFvsVSVX1zTYEWRtx2ORujLs0+NVTsIQCFId3DQbIhC/Rqku4YJ7lQ3O
-         2Y6M9FWbO+/6JXFHpv/mtDqNTu+MTmUc/GNzDiDOpH9+/IS5okCbTiaaeJDONjGvdFSs
-         3tOp2QqwPycU0riEy29IfIjNg2LX7rcPohp9bH1maRCBSCCwShRhBZNrzpYs0tkpKBPQ
-         AzDlm5/P+0OMUSS8A/UpN0rstROPXfTPw9ifYSqb7x9/qM6v0coyiWDlmE5cNr19GTrQ
-         blx6jKhurgAiRNRSsrmBTf3ArmKAL+yM7CqO1xvBpqZecgTHpA5FtimMIkJAkO0dr4KV
-         awnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740169109; x=1740773909;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t0N59OGdTJN/A2/YOiQmlL2TDzEel3iIKLuRSf8Ulc4=;
-        b=XyqyjcWsq+DKr0+rdsfvRS4rFqtmLJtS/GNH3dmv9E544su82x0J6wVSK/wlkhA/Xu
-         n+ttth805lm+TPubUhF08n71vOkWFOdmTt0/WXoK2WpOi+w7JQ1u5JQGWTxMrbaMR75I
-         4/2t042TZYeiSpGvF6sEGdHYtjs4cPxxdtlPKWrAir7/Q591eOrhXq0/bgK3jQMw3Kg0
-         eTANz71S4tGun288LySc8lK/ZP8saB6liRqN4ge5S4IAWx7w8dsKD5C1ab/F/0AhQlqx
-         nbtBRni0dZIjdTjPyR7Kx6xkGbW6WfDkoxjo7eK/4/3h7p6KsTL523EElvNm8djOqK3d
-         F/lA==
-X-Gm-Message-State: AOJu0Yx1lyh6tPPc+nIg5+/T4I1UxKoIiHX0WLI7TNLvJtxNj/pYdCnc
-	d7iBH4XhwOq0hh0VWUUnksH3QR0NBHSrYb1QMjNTcJt3sxN3189VaLnbnpWO
-X-Gm-Gg: ASbGncsytwwCX7Ca2XZE03H5e92V1oKY6uZn3ScFsq2gCDaedZZHK8LK5YmGLge9mNk
-	RRYcm5cSQwB7pkos7RNwXHIdE2r4+cWeTASDRv9/c0mQdDSsXYFWg/loPLoCL4xqMtUwqW3Iu9V
-	Z2PMoxggYd/u+8nnNgIoq1UWz9lViEY90tmJtxzWQzgCf8dXlpdeDqjig0vPyib4vyRoDjIArNC
-	AHk6HGealgPv3KYTrGmZ7l0uGjqhPtVuE64PUBgjwqdrWR3YO+iNc7DHpjd719/kWtmG1Cg72XI
-	/J349hj8Z7wZMGgJjV0zWqkq
-X-Google-Smtp-Source: AGHT+IFUq0NHwKHO/eQ5uBFR8m/VP/SyVKgupAL4JTLC9IAnXv8HWfBStVyflKDFjk+APPHi9o4/Wg==
-X-Received: by 2002:a05:6402:510c:b0:5e0:4408:6bab with SMTP id 4fb4d7f45d1cf-5e0b7108e97mr4164601a12.19.1740169108719;
-        Fri, 21 Feb 2025 12:18:28 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:72::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e09072247esm4693938a12.51.2025.02.21.12.18.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 12:18:28 -0800 (PST)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com,
-	kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jdamato@fastly.com,
-	sanman.p211993@gmail.com,
-	vadim.fedorenko@linux.dev,
-	sdf@fomichev.me,
-	kernel-team@meta.com,
-	mohsin.bashr@gmail.com
-Subject: [PATCH net-next 3/3] eth: fbnic: Update return value in kdoc
-Date: Fri, 21 Feb 2025 12:18:13 -0800
-Message-ID: <20250221201813.2688052-4-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250221201813.2688052-1-mohsin.bashr@gmail.com>
-References: <20250221201813.2688052-1-mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1740170113; c=relaxed/simple;
+	bh=tah1Gs/B++YekM1GkZ6AN9/xlO/76z4hZGv/TUt22z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=HesaegFTsfQGrL8XK10oiHdtdbitMWDo4igCN1BzPwC0SzC439ye54Wip22PLZ4XZvROhZjnlu8rhd2XNAO17L3izFw4G7Vf5RVcdcQeNhfB1yrXplUeJcK/1r+SwFlilMmEu5Jt/x/rFIeYbI/nu7OcC6wohgrnD+YhDfY9iGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBCblYak; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8AE1C4CED6;
+	Fri, 21 Feb 2025 20:35:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740170113;
+	bh=tah1Gs/B++YekM1GkZ6AN9/xlO/76z4hZGv/TUt22z4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=YBCblYaks7r2MZKt9bUPG14CMJBoQ3BMZZJhO4v4b1PDcCxXtTztZkvRL9/CxDk83
+	 C9hrgaWxVwrCeR5p449MGQmwB3gHBVl0HaXttMn8bF+vYEkqWSINVWgAyX9TeJUXN6
+	 k1pZDbeSNapOCbHC28zwgZi5kuUQ7mfoCPoSR3dDS35nwwGVIR0SO3YxepOcIq8JKV
+	 /VWIG24+sikdsJDndmkMngLysqF2EBlXfcbcwniW1ZTy4+5wPabJBJ/lqevAskR2v2
+	 RndxTzhBmGwAfb3Rkd2ackZa+Py0eHZKpMWtLyRu+TmpKZmvhstwFlVHg9MJMh55UT
+	 REDwJi1edcOJg==
+Date: Fri, 21 Feb 2025 14:35:11 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] r8169: disable RTL8126 ZRX-DC timeout
+Message-ID: <20250221203511.GA359929@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <eeba10a2-809a-4583-bd35-1f363c824e14@gmail.com>
 
-Fix return value in kdoc for fbnic_netdev_alloc()
+On Fri, Feb 21, 2025 at 09:12:09PM +0100, Heiner Kallweit wrote:
+> On 21.02.2025 21:01, Bjorn Helgaas wrote:
+> > On Fri, Feb 21, 2025 at 03:18:28PM +0800, ChunHao Lin wrote:
+> >> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
+> >> device will exit L1 substate every 100ms. Disable it for saving more power
+> >> in L1 substate.
+> > 
+> > s/dose/does/
+> > 
+> > Is ZRX-DC a PCIe spec?  A Google search suggests that it might not be
+> > completely Realtek-specific?
+> > 
+> ZRX-DC is the receiver DC impedance as specified in the PCIe Base
+> Specification.  From what I've found after a quick search ASPM
+> restrictions apply if this impedance isn't in the range 40-60 ohm.
 
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ah, so it looks like PCIe r6.0, sec 4.2.7.6.1.2, is the sort of thing
+this refers to:
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index cf8feb90b617..79a01fdd1dd1 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -611,7 +611,7 @@ void fbnic_netdev_free(struct fbnic_dev *fbd)
-  * Allocate and initialize the netdev and netdev private structure. Bind
-  * together the hardware, netdev, and pci data structures.
-  *
-- *  Return: 0 on success, negative on failure
-+ *  Return: Pointer to net_device on success, NULL on failure
-  **/
- struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- {
--- 
-2.43.5
+  4.2.7.6.1.2 Rx_L0s.Idle §
 
+    - Next state is Rx_L0s.FTS if the Receiver detects an exit from
+      Electrical Idle on any Lane of the configured Link.
+
+    - Next state is Rx_L0s.FTS after a 100 ms timeout if the current
+      data rate is 8.0 GT/s or higher and the Port’s Receivers do not
+      meet the ZRX-DC specification for 2.5 GT/s (see § Table 8-11).
+      All Ports are permitted to implement the timeout and transition
+      to Rx_L0s.FTS when the data rate is 8.0 GT/s or higher.
+
+> >> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
+> >> +{
+> >> +	struct pci_dev *pdev = tp->pci_dev;
+> >> +	u8 val;
+> >> +
+> >> +	if (pdev->cfg_size > 0x0890 &&
+> >> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
+> >> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
+> > 
+> > Is this a standard PCIe extended capability?  If so, it would be nice
+> > to search for it with pci_find_ext_capability() and use standard
+> > #defines.
+
+I guess we could tell from "sudo lspci -vv" output whether this is a
+standard capability.
+
+Bjorn
 
