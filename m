@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-168374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F56A3EAE8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 03:52:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BECA3EAE9
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 03:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B1913B9605
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:51:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DA0B3BA2C3
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B590E1D86E8;
-	Fri, 21 Feb 2025 02:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBBD1DA612;
+	Fri, 21 Feb 2025 02:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlIlUCTW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pH6wf84g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917751D7E4C
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 02:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A881D9688;
+	Fri, 21 Feb 2025 02:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740106307; cv=none; b=SG4+UfxYW7hYcNqISQnggrzv1QVk4QTXUylupq3ZdDwC8n8kR4ZLjMlHXYbtDgHOJ3lJKwV+FY9qap7yS0P9kDw/90XEiWtTM/kv0iNsbu0hl8jch2cF791sQZybRsMj+SMoxCk/66HB6Enkib1UI5efWGiURfMF4lybenuZmXI=
+	t=1740106308; cv=none; b=a5S6sT/cfiNefL+/ULX7lYch+yAgZ0bqoKYtOSq2JPX1iwA+S7xcSIq24feRGNybRd/98v9nNH6KaZWngiusVRtL0z7KZbO2wGP4p9fMLNZE4fVZo9wko5doM6u9IsdWtBGuIlQ6GYv3nZ3qcstsF/viWPNKBBdumDgB5M/186c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740106307; c=relaxed/simple;
-	bh=M6ogg3pvXAFeFyPWx/ZD0yuYUnbTcYt4jncT6UcSgUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fD6RH+AJp3PYybiriux/E/vK2DxCa0gYVxLWRCuWyl9uli22rZpGm6FSE/uzPbOVRaJIZgPAt768O/PmRGN3sk/mqahx4SdeEnDbiN46997C2lKjAowOobrZU4j9NDPmxDHf6s8qw/TsmSFnHlQTSEnS6MpXo9v5kQtMYsY7x7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlIlUCTW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D12C4CED1;
-	Fri, 21 Feb 2025 02:51:46 +0000 (UTC)
+	s=arc-20240116; t=1740106308; c=relaxed/simple;
+	bh=t+St5HjA5Bqkcy1SBkbqDovCuONKT1cadgnYNcKioRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r+VB53BB3174FfeTt6BfD1O4Aa13E9fgdCw1oF8i8zkJAnAfxaQ9fHetsZJdNFNVIBpLuKnpiB2Ee22zjBfy/af6JZzY1mz20LGmzwrsgU8GuqT35QvRs7R+X7H1hy6qE1JIj+bVS2U3DsWcDVfxL8oDXMejFq5Pr0nRcDoBKWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pH6wf84g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F54CC4CEE6;
+	Fri, 21 Feb 2025 02:51:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740106307;
-	bh=M6ogg3pvXAFeFyPWx/ZD0yuYUnbTcYt4jncT6UcSgUA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rlIlUCTWKJWhw5WEJ67wUycvtZrCDqzujsKzMyhLFtxanjUbZtZ3eefyh3R6W+RFU
-	 SKj+MtOlEw4UdLguIjluDNlCL6QsW1nhuHvYpHHA2I1s2CnjVXzLUEO+V4nbp9nmaw
-	 R+TyRiPYlDmqB8vxTwQvdBAQ5tlPBZof2gTwHgVgFsxuIPiJ9sWyN/qB9F7XPcEqWi
-	 NTLXW3vlyT843GnrjelSbYaUrFgmZ+nQd3h8Pkw+iBoxyOAdyswCCqbHc1VvgO0TGg
-	 qXKXZzix98bya84r4M3NJBaZMqHp4b591MiGmKi43xdVFEuQoiuVprWUyktwZg1/PR
-	 95EenTrQJ5tTA==
+	bh=t+St5HjA5Bqkcy1SBkbqDovCuONKT1cadgnYNcKioRc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pH6wf84g2elqF5/jbPdzfcPH6cpeFmLbdEb8/nC5Acmnym6hP6VX8f2+qOSAhOF4V
+	 iova8C4AzfjhabouP2sf8n8FrXfmjIQX69n1qfpXcMYmVrYUI6A6/plaeeY1s9a2n9
+	 QqbxLBk4TtVO7pxoziFUSAMKWlVFf48ehA9hdVj3e2zjXqa8LXEX0PbhLagt8Bd9xp
+	 smtZQ6AKQPRVp7tT4X44cb6Hfjffyu4lo4RCJ+tEWmaYW9G83XcS9hVTv75KJsUfsQ
+	 tONwV+RikF1ODp3WRDmZ8BoZs12r953eex9DKx8Ln2qlFLVs/4jRhI6epjh4GhvE+5
+	 cUdgx2nlBZLcQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -49,12 +50,18 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	dxu@dxuuu.xyz,
 	Jakub Kicinski <kuba@kernel.org>,
-	michael.chan@broadcom.com,
-	ap420073@gmail.com
-Subject: [PATCH net v2 1/2] net: ethtool: fix ioctl confusing drivers about desired HDS user config
-Date: Thu, 20 Feb 2025 18:51:40 -0800
-Message-ID: <20250221025141.1132944-1-kuba@kernel.org>
+	shuah@kernel.org,
+	hawk@kernel.org,
+	petrm@nvidia.com,
+	willemb@google.com,
+	jstancek@redhat.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v2 2/2] selftests: drv-net: test XDP, HDS auto and the ioctl path
+Date: Thu, 20 Feb 2025 18:51:41 -0800
+Message-ID: <20250221025141.1132944-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250221025141.1132944-1-kuba@kernel.org>
+References: <20250221025141.1132944-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,132 +70,303 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The legacy ioctl path does not have support for extended attributes.
-So we issue a GET to fetch the current settings from the driver,
-in an attempt to keep them unchanged. HDS is a bit "special" as
-the GET only returns on/off while the SET takes a "ternary" argument
-(on/off/default). If the driver was in the "default" setting -
-executing the ioctl path binds it to on or off, even tho the user
-did not intend to change HDS config.
+Test XDP and HDS interaction. While at it add a test for using the IOCTL,
+as that turned out to be the real culprit.
 
-Factor the relevant logic out of the netlink code and reuse it.
+Testing bnxt:
 
-Fixes: 87c8f8496a05 ("bnxt_en: add support for tcp-data-split ethtool command")
+  # NETIF=eth0 ./ksft-net-drv/drivers/net/hds.py
+  KTAP version 1
+  1..12
+  ok 1 hds.get_hds
+  ok 2 hds.get_hds_thresh
+  ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by the device
+  ok 4 hds.set_hds_enable
+  ok 5 hds.set_hds_thresh_zero
+  ok 6 hds.set_hds_thresh_max
+  ok 7 hds.set_hds_thresh_gt
+  ok 8 hds.set_xdp
+  ok 9 hds.enabled_set_xdp
+  ok 10 hds.ioctl
+  ok 11 hds.ioctl_set_xdp
+  ok 12 hds.ioctl_enabled_set_xdp
+  # Totals: pass:11 fail:0 xfail:0 xpass:0 skip:1 error:0
+
+and netdevsim:
+
+  # ./ksft-net-drv/drivers/net/hds.py
+  KTAP version 1
+  1..12
+  ok 1 hds.get_hds
+  ok 2 hds.get_hds_thresh
+  ok 3 hds.set_hds_disable
+  ok 4 hds.set_hds_enable
+  ok 5 hds.set_hds_thresh_zero
+  ok 6 hds.set_hds_thresh_max
+  ok 7 hds.set_hds_thresh_gt
+  ok 8 hds.set_xdp
+  ok 9 hds.enabled_set_xdp
+  ok 10 hds.ioctl
+  ok 11 hds.ioctl_set_xdp
+  ok 12 hds.ioctl_enabled_set_xdp
+  # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Netdevsim needs a sane default for tx/rx ring size.
+
+ethtool 6.11 is needed for the --disable-netlink option.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
+Since this is targeting net there is no cfg.rpath(),
+I'll follow up once in net-next.
+
 v2:
- - fix the core rather than the driver
-v1: https://lore.kernel.org/20250220005318.560733-1-kuba@kernel.org
+ - add the ioctl tests
+ - factor out some common logic
 
-CC: michael.chan@broadcom.com
-CC: ap420073@gmail.com
+CC: shuah@kernel.org
+CC: hawk@kernel.org
+CC: petrm@nvidia.com
+CC: willemb@google.com
+CC: jstancek@redhat.com
+CC: linux-kselftest@vger.kernel.org
 ---
- net/ethtool/common.h |  6 ++++++
- net/ethtool/common.c | 16 ++++++++++++++++
- net/ethtool/ioctl.c  |  4 ++--
- net/ethtool/rings.c  |  9 ++++-----
- 4 files changed, 28 insertions(+), 7 deletions(-)
+ tools/testing/selftests/net/lib/Makefile      |   3 +
+ drivers/net/netdevsim/ethtool.c               |   2 +
+ .../testing/selftests/net/lib/xdp_dummy.bpf.c |  13 ++
+ tools/testing/selftests/drivers/net/hds.py    | 145 +++++++++++++++++-
+ 4 files changed, 160 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/net/lib/xdp_dummy.bpf.c
 
-diff --git a/net/ethtool/common.h b/net/ethtool/common.h
-index 58e9e7db06f9..a1088c2441d0 100644
---- a/net/ethtool/common.h
-+++ b/net/ethtool/common.h
-@@ -51,6 +51,12 @@ int ethtool_check_max_channel(struct net_device *dev,
- 			      struct ethtool_channels channels,
- 			      struct genl_info *info);
- int ethtool_check_rss_ctx_busy(struct net_device *dev, u32 rss_context);
-+
-+void ethtool_ringparam_get_cfg(struct net_device *dev,
-+			       struct ethtool_ringparam *param,
-+			       struct kernel_ethtool_ringparam *kparam,
-+			       struct netlink_ext_ack *extack);
-+
- int __ethtool_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info);
- int ethtool_get_ts_info_by_phc(struct net_device *dev,
- 			       struct kernel_ethtool_ts_info *info,
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index d88e9080643b..b97374b508f6 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -6,6 +6,7 @@
- #include <linux/rtnetlink.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/phy_link_topology.h>
-+#include <net/netdev_queues.h>
+diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
+index bc6b6762baf3..c22623b9a2a5 100644
+--- a/tools/testing/selftests/net/lib/Makefile
++++ b/tools/testing/selftests/net/lib/Makefile
+@@ -9,7 +9,10 @@ TEST_FILES := ../../../../../Documentation/netlink/specs
+ TEST_FILES += ../../../../net/ynl
  
- #include "netlink.h"
- #include "common.h"
-@@ -771,6 +772,21 @@ int ethtool_check_ops(const struct ethtool_ops *ops)
- 	return 0;
+ TEST_GEN_FILES += csum
++TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
+ 
+ TEST_INCLUDES := $(wildcard py/*.py sh/*.sh)
+ 
+ include ../../lib.mk
++
++include ../bpf.mk
+diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+index 5c80fbee7913..7ab358616e03 100644
+--- a/drivers/net/netdevsim/ethtool.c
++++ b/drivers/net/netdevsim/ethtool.c
+@@ -184,9 +184,11 @@ static const struct ethtool_ops nsim_ethtool_ops = {
+ 
+ static void nsim_ethtool_ring_init(struct netdevsim *ns)
+ {
++	ns->ethtool.ring.rx_pending = 512;
+ 	ns->ethtool.ring.rx_max_pending = 4096;
+ 	ns->ethtool.ring.rx_jumbo_max_pending = 4096;
+ 	ns->ethtool.ring.rx_mini_max_pending = 4096;
++	ns->ethtool.ring.tx_pending = 512;
+ 	ns->ethtool.ring.tx_max_pending = 4096;
  }
  
-+void ethtool_ringparam_get_cfg(struct net_device *dev,
-+			       struct ethtool_ringparam *param,
-+			       struct kernel_ethtool_ringparam *kparam,
-+			       struct netlink_ext_ack *extack)
+diff --git a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
+new file mode 100644
+index 000000000000..d988b2e0cee8
+--- /dev/null
++++ b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#define KBUILD_MODNAME "xdp_dummy"
++#include <linux/bpf.h>
++#include <bpf/bpf_helpers.h>
++
++SEC("xdp")
++int xdp_dummy_prog(struct xdp_md *ctx)
 +{
-+	memset(param, 0, sizeof(*param));
-+	memset(kparam, 0, sizeof(*kparam));
-+
-+	param->cmd = ETHTOOL_GRINGPARAM;
-+	dev->ethtool_ops->get_ringparam(dev, param, kparam, extack);
-+
-+	/* Driver gives us current state, we want to return current config */
-+	kparam->tcp_data_split = dev->cfg->hds_config;
++	return XDP_PASS;
 +}
 +
- static void ethtool_init_tsinfo(struct kernel_ethtool_ts_info *info)
- {
- 	memset(info, 0, sizeof(*info));
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 7609ce2b2c5e..1c3ba2247776 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -2059,8 +2059,8 @@ static int ethtool_get_ringparam(struct net_device *dev, void __user *useraddr)
++char _license[] SEC("license") = "GPL";
+diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
+index 394971b25c0b..90807b21a6eb 100755
+--- a/tools/testing/selftests/drivers/net/hds.py
++++ b/tools/testing/selftests/drivers/net/hds.py
+@@ -2,17 +2,54 @@
+ # SPDX-License-Identifier: GPL-2.0
  
- static int ethtool_set_ringparam(struct net_device *dev, void __user *useraddr)
- {
--	struct ethtool_ringparam ringparam, max = { .cmd = ETHTOOL_GRINGPARAM };
- 	struct kernel_ethtool_ringparam kernel_ringparam;
-+	struct ethtool_ringparam ringparam, max;
- 	int ret;
+ import errno
++import os
+ from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
+-from lib.py import EthtoolFamily, NlError
++from lib.py import CmdExitFailure, EthtoolFamily, NlError
+ from lib.py import NetDrvEnv
++from lib.py import defer, ethtool, ip
  
- 	if (!dev->ethtool_ops->set_ringparam || !dev->ethtool_ops->get_ringparam)
-@@ -2069,7 +2069,7 @@ static int ethtool_set_ringparam(struct net_device *dev, void __user *useraddr)
- 	if (copy_from_user(&ringparam, useraddr, sizeof(ringparam)))
- 		return -EFAULT;
+-def get_hds(cfg, netnl) -> None:
++
++def _get_hds_mode(cfg, netnl) -> str:
+     try:
+         rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+     except NlError as e:
+         raise KsftSkipEx('ring-get not supported by device')
+     if 'tcp-data-split' not in rings:
+         raise KsftSkipEx('tcp-data-split not supported by device')
++    return rings['tcp-data-split']
++
++
++def _xdp_onoff(cfg):
++    test_dir = os.path.dirname(os.path.realpath(__file__))
++    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
++    ip(f"link set dev %s xdp obj %s sec xdp" %
++        (cfg.ifname, prog))
++    ip(f"link set dev %s xdp off" % cfg.ifname)
++
++
++def _ioctl_ringparam_modify(cfg, netnl) -> None:
++    """
++    Helper for performing a hopefully unimportant IOCTL SET.
++    IOCTL does not support HDS, so it should not affect the HDS config.
++    """
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++
++    if 'tx' not in rings:
++        raise KsftSkipEx('setting Tx ring size not supported')
++
++    try:
++        ethtool(f"--disable-netlink -G {cfg.ifname} tx {rings['tx'] // 2}")
++    except CmdExitFailure as e:
++        ethtool(f"--disable-netlink -G {cfg.ifname} tx {rings['tx'] * 2}")
++    defer(ethtool, f"-G {cfg.ifname} tx {rings['tx']}")
++
++
++def get_hds(cfg, netnl) -> None:
++    _get_hds_mode(cfg, netnl)
++
  
--	dev->ethtool_ops->get_ringparam(dev, &max, &kernel_ringparam, NULL);
-+	ethtool_ringparam_get_cfg(dev, &max, &kernel_ringparam, NULL);
+ def get_hds_thresh(cfg, netnl) -> None:
+     try:
+@@ -104,6 +141,103 @@ from lib.py import NetDrvEnv
+         netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': hds_gt})
+     ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
  
- 	/* ensure new ring parameters are within the maximums */
- 	if (ringparam.rx_pending > max.rx_max_pending ||
-diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index 7839bfd1ac6a..aeedd5ec6b8c 100644
---- a/net/ethtool/rings.c
-+++ b/net/ethtool/rings.c
-@@ -215,17 +215,16 @@ ethnl_set_rings_validate(struct ethnl_req_info *req_info,
- static int
- ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- {
--	struct kernel_ethtool_ringparam kernel_ringparam = {};
--	struct ethtool_ringparam ringparam = {};
-+	struct kernel_ethtool_ringparam kernel_ringparam;
- 	struct net_device *dev = req_info->dev;
-+	struct ethtool_ringparam ringparam;
- 	struct nlattr **tb = info->attrs;
- 	const struct nlattr *err_attr;
- 	bool mod = false;
- 	int ret;
++
++def set_xdp(cfg, netnl) -> None:
++    """
++    Enable single-buffer XDP on the device.
++    When HDS is in "auto" / UNKNOWN mode, XDP installation should work.
++    """
++    mode = _get_hds_mode(cfg, netnl)
++    if mode == 'enabled':
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                         'tcp-data-split': 'unknown'})
++
++    _xdp_onoff(cfg)
++
++
++def enabled_set_xdp(cfg, netnl) -> None:
++    """
++    Enable single-buffer XDP on the device.
++    When HDS is in "enabled" mode, XDP installation should not work.
++    """
++    _get_hds_mode(cfg, netnl)
++    netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                     'tcp-data-split': 'enabled'})
++
++    defer(netnl.rings_set, {'header': {'dev-index': cfg.ifindex},
++                            'tcp-data-split': 'unknown'})
++
++    with ksft_raises(CmdExitFailure) as e:
++        _xdp_onoff(cfg)
++
++
++def set_xdp(cfg, netnl) -> None:
++    """
++    Enable single-buffer XDP on the device.
++    When HDS is in "auto" / UNKNOWN mode, XDP installation should work.
++    """
++    mode = _get_hds_mode(cfg, netnl)
++    if mode == 'enabled':
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                         'tcp-data-split': 'unknown'})
++
++    _xdp_onoff(cfg)
++
++
++def enabled_set_xdp(cfg, netnl) -> None:
++    """
++    Enable single-buffer XDP on the device.
++    When HDS is in "enabled" mode, XDP installation should not work.
++    """
++    _get_hds_mode(cfg, netnl)  # Trigger skip if not supported
++
++    netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                     'tcp-data-split': 'enabled'})
++    defer(netnl.rings_set, {'header': {'dev-index': cfg.ifindex},
++                            'tcp-data-split': 'unknown'})
++
++    with ksft_raises(CmdExitFailure) as e:
++        _xdp_onoff(cfg)
++
++
++def ioctl(cfg, netnl) -> None:
++    mode1 = _get_hds_mode(cfg, netnl)
++    _ioctl_ringparam_modify(cfg, netnl)
++    mode2 = _get_hds_mode(cfg, netnl)
++
++    ksft_eq(mode1, mode2)
++
++
++def ioctl_set_xdp(cfg, netnl) -> None:
++    """
++    Like set_xdp(), but we perturb the settings via the legacy ioctl.
++    """
++    mode = _get_hds_mode(cfg, netnl)
++    if mode == 'enabled':
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                         'tcp-data-split': 'unknown'})
++
++    _ioctl_ringparam_modify(cfg, netnl)
++
++    _xdp_onoff(cfg)
++
++
++def ioctl_enabled_set_xdp(cfg, netnl) -> None:
++    """
++    Enable single-buffer XDP on the device.
++    When HDS is in "enabled" mode, XDP installation should not work.
++    """
++    _get_hds_mode(cfg, netnl)  # Trigger skip if not supported
++
++    netnl.rings_set({'header': {'dev-index': cfg.ifindex},
++                     'tcp-data-split': 'enabled'})
++    defer(netnl.rings_set, {'header': {'dev-index': cfg.ifindex},
++                            'tcp-data-split': 'unknown'})
++
++    with ksft_raises(CmdExitFailure) as e:
++        _xdp_onoff(cfg)
++
++
+ def main() -> None:
+     with NetDrvEnv(__file__, queue_count=3) as cfg:
+         ksft_run([get_hds,
+@@ -112,7 +246,12 @@ from lib.py import NetDrvEnv
+                   set_hds_enable,
+                   set_hds_thresh_zero,
+                   set_hds_thresh_max,
+-                  set_hds_thresh_gt],
++                  set_hds_thresh_gt,
++                  set_xdp,
++                  enabled_set_xdp,
++                  ioctl,
++                  ioctl_set_xdp,
++                  ioctl_enabled_set_xdp],
+                  args=(cfg, EthtoolFamily()))
+     ksft_exit()
  
--	dev->ethtool_ops->get_ringparam(dev, &ringparam,
--					&kernel_ringparam, info->extack);
--	kernel_ringparam.tcp_data_split = dev->cfg->hds_config;
-+	ethtool_ringparam_get_cfg(dev, &ringparam, &kernel_ringparam,
-+				  info->extack);
- 
- 	ethnl_update_u32(&ringparam.rx_pending, tb[ETHTOOL_A_RINGS_RX], &mod);
- 	ethnl_update_u32(&ringparam.rx_mini_pending,
 -- 
 2.48.1
 
