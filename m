@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-168606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C9AA3F965
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:50:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E94CA3F95E
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8264519C68F3
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:46:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3A6986088B
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A4D21147D;
-	Fri, 21 Feb 2025 15:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E630E211A28;
+	Fri, 21 Feb 2025 15:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2EL121H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rnn0hpm9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB65205514;
-	Fri, 21 Feb 2025 15:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52051E47CA;
+	Fri, 21 Feb 2025 15:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152668; cv=none; b=FscV79hpMKIR0fycL5la5NWOmoHkFoFIVD28P3LXolB21yx8xuURK5G8vIniMXb0eqGJERdGgnTa5U1fK66RmA0TfDYNoyZrO0uN+r7xDVSP0FwW1FZikmt1KD3IbiWpMwBQ6n2f14bYA9QPO3t2VrJSfD/PVVGcZMEx6Hm0fMw=
+	t=1740152670; cv=none; b=JEXw6QKsnzfqp+PMrGVGeBvrvrJri7fFnapMQ7OszxKwS0p008j5zdYe/OYJkjZHHgPdr+iZdqZI7SHHddeBjmecftjgqIojyny0Jk5XwFWFQNe9p/qVJDqpUR2446g7Qmm9uPh2jKSq0DX+9VXkGTfzUAsy4OOeTljD0RFdwF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152668; c=relaxed/simple;
-	bh=a1PHG4oRYa5wYXlrTgrvlkE6wAw+WAhSTwMJ3XPR460=;
+	s=arc-20240116; t=1740152670; c=relaxed/simple;
+	bh=pIHmmZWQGeAQvcIrXjKJgOXjxp9GrZuLJAqY4jRYyR0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dLP5wWYDLmswFCoCvgI0rkwy40HVdl/MNBrGTog3YZXJmVdpz3jmPgh8FJoYOxCWfidgTPU6NylBBc0amhmbs0KUwMATqny+ovur2I0VvBe6mGH1PvgG6Fda0tKqxpeByCikqiQnSrAB3do2Z50qsh6a2WTZteZCNAvzk85T66U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2EL121H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ABEAC4CED6;
-	Fri, 21 Feb 2025 15:44:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mjKquQbpr3GJ3A4o6HIUdlhPE5nRYdO8b78o9tHXXy6cQNQ0qteZE78LrOvmudHYR79jzQ6AjHI7cZ+1viZp8btTykSQu41KTUNF2iS2F4Kcujhgp2LAg4OaR55M7Sl1HWKtvdZ0JWqiSO7ev20Qf/jai8cC82gMU4TGGhWyGMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rnn0hpm9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E39CC4CEE4;
+	Fri, 21 Feb 2025 15:44:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740152667;
-	bh=a1PHG4oRYa5wYXlrTgrvlkE6wAw+WAhSTwMJ3XPR460=;
+	s=k20201202; t=1740152670;
+	bh=pIHmmZWQGeAQvcIrXjKJgOXjxp9GrZuLJAqY4jRYyR0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=r2EL121HxSLqw57ez/5DP/DYtbt/130TGkJOjS0k5qpbTgqQBvbqGC/EucLxoytx4
-	 tWlfPreHiM71kEQtpVkkdihbC03WvoDqyk4uwQpEWuj2T+sCXoRd6j2qx6hoBii78i
-	 +exBxtzWOiNYPThiAXkzUTUgrcYu0MpQ4rJKl70TI3CIN4NtTuwgNgBiL1DDlm2S4N
-	 itiPp374ysbgF6Ed9aqQVG/ySMEzTI3t8c1qu0VhqZ+uwYiIf4cTB2WPcrOs+sEqrv
-	 RohjnMtBc3bxOUGwq81xw+uaJNpEz4syrZqF/ukxZkbdecw0a5Mc7EKiZTsmS3zbaO
-	 AfqecZ0dcxxsg==
+	b=rnn0hpm9NF0bKnTpwSiVgysq0AhvbCI36Gu/UTlWh6bsNMMvZ/FU6JFKVritb5JgJ
+	 F7dT6gm1/JfEwS/f6iMnAJ3T1an/I4A32f47QJw4bCdYmDstarxrJoQLQvFbEjo9sE
+	 XPDMIfIX+wyG3HrQ6q30kabtFD8VzD91ahbvA4cBD0IvQMIxujC5+0a4OeKZ+ZnNBm
+	 YQZSQx3AmqWXPJqVquyhWnqGWwGCjhywQMAgJi1o7NQvYiEOUuTF7FEbvqoNPIDHZl
+	 /12N9ZgQwfMxfrqISomST8sVTgkCBPHPKN1ciFc4neiTXOiaiDh82a1w9VFMFEXGD1
+	 H2c5y1zEijF2w==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 21 Feb 2025 16:44:00 +0100
-Subject: [PATCH net-next 07/10] mptcp: pm: use ipv6_addr_equal in
- addresses_equal
+Date: Fri, 21 Feb 2025 16:44:01 +0100
+Subject: [PATCH net-next 08/10] mptcp: sched: split get_subflow interface
+ into two
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-7-2b70ab1cee79@kernel.org>
+Message-Id: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-8-2b70ab1cee79@kernel.org>
 References: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
 In-Reply-To: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -64,50 +64,143 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
  Geliang Tang <geliang@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1079; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=B4keAA5ZHYw+PbPi00B+5NzpE+JM2Ll5Ekvtr28WNco=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnuJ9HgKgztIEWjGR2ANIpDvvp+nYp3ap67g0KX
- WoB/r4V6jKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7ifRwAKCRD2t4JPQmmg
- cxY/D/wM8bSZa+l+C2F4bJak/9vTgbHghg2z7NeJwx03eR6zVgiB1GAhDuou2gs2ZMuK0DaXhVS
- NSzXNFy471FH4Q4drvYlOh9iFeXmdZnrv5z9XYeJG6RieNP2lpQAcBWdvFxIBEncy6rYfSLWMLw
- eC/5eztgX60aT3trgBuF15+zCBplPun11Cfbduwj7yc1RAHU4f3mg1eAUl/Fly+rdO2pP6xUMiH
- /YtJVQt82oHkhwzAp1nGcIlO3+AImjAf8Aj7MsTzwK9PIx+LcIZ3Ale6W9sCDs9VBzAzbp5qHUG
- 4yyOyaYOl4npsj7ocT9n3/e0thQCfhqtDk2ujoxPOPAfFzT3T6T+0T4N52osO+QlmMmHqyvLbHo
- sCvF3un7vbM7V9Dyzh/cS78kBsHruMXBJLiF3bg/z6etulBxE/kY/5AdGwTo7BRmCA08HmX5XTq
- 9bfbw7Zu6gIczvARJLMq5ySOHLJisWs5ttGkONeKMCOXtVao8j9To4aBC8QGfVqf+ChO7H4my6S
- TYCCfIAYeuBb34+RJ/XEhj7wH7aQfhkAcHbpzTP693mOtpiH6Q8lIif5tkUAQpKlYwKkRojA3cT
- DIAujJx7vdQjOzH3f5+JowlSRi4Hc453mBY6r4l/Z63sKiBBVUJ3qZHCfJviXuUYmlYHbXTypcq
- THl/f8Ms0z56wRQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4111; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=4etufhjOFcm5rpcVbLB5Hl2mjEGGh+/HGlGO5Nqd8vQ=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnuJ9HXut+RXO7bryGeSFWKp6mSx5zeJQUIME1H
+ 8Yu2qA9xJOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7ifRwAKCRD2t4JPQmmg
+ c2pHEAC31BgHJRnIMxVTYaG69jvX2fXo6fYWm6lvUVKdz7Xtiol5KCkrVTgXMjmp4i/L7X/Wp4q
+ 9I8Y2k+2inMuNV1dbvkcrQv6yCvUWp9JZ0t92m0zGDUjNjOKbrsyTLOayItHIiQEHHyv1pJ3DtE
+ KyNtvutQ8ZRcnnU5R1wG1ZCWFEQZq4hHZP4h2CSv4BkP7orDQ/QnfYnekiKHlB4InwZ41DiH0wl
+ LmYPvR9Cn7TCHh5eP5TJ4Z1kjF/LUPY5o7k0frK4aCaJyNK9HqHN/h0l9ARHZIz6c7N71lDN77U
+ n1zw3uQsLDeymlDg2PorV5GLr4pkUhMqmhlGVp3TTA0JSfPwhanXVe1U9NyxlpIHzq+lO7ocKPv
+ caVcOHm7tTaAr1Ksqee9cnCZxDxmrmxaJ4dnZNV4qRqafqdvEQHueJcPugEmvAEfT7jVJs2yPBp
+ K2jD9uCb+txcPJ06pOnam6BQHY5SHVggH40LXMJRIX35zMAlzSyT8Ivbz54YjgPDzuTefkyxhlo
+ SdAg7ltQkpSB72EBkFhWX4BnMM1+9ip8MNHYFJ7IYWvf+xUEdapvB0kSNbOS3w11JCWapDNI7+2
+ ++/tg7qaqFBceX0Pfpbn+WZjs1iglpX1RYlyznlx8HtDowaJ8u1lwOa53LabQdBG4HC0bjSkkLh
+ DRzn8WMihb9caPA==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
 From: Geliang Tang <tanggeliang@kylinos.cn>
 
-Use ipv6_addr_equal() to check whether two IPv6 addresses are equal in
-mptcp_addresses_equal().
+get_retrans() interface of the burst packet scheduler invokes a sleeping
+function mptcp_pm_subflow_chk_stale(), which calls __lock_sock_fast().
+So get_retrans() interface should be set with BPF_F_SLEEPABLE flag in
+BPF. But get_send() interface of this scheduler can't be set with
+BPF_F_SLEEPABLE flag since it's invoked in ack_update_msk() under mptcp
+data lock.
 
-This is more appropriate than using !ipv6_addr_cmp().
+So this patch has to split get_subflow() interface of packet scheduer into
+two interfaces: get_send() and get_retrans(). Then we can set get_retrans()
+interface alone with BPF_F_SLEEPABLE flag.
 
 Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/pm_netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/mptcp.h |  5 +++--
+ net/mptcp/sched.c   | 35 ++++++++++++++++++++++++-----------
+ 2 files changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index f67b637c1fcf7c2930ced8b5c6b9df156118cbcd..ef85a60151ad796b445afc21bcbcae1c52ef64b6 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -64,7 +64,7 @@ bool mptcp_addresses_equal(const struct mptcp_addr_info *a,
- 			addr_equals = a->addr.s_addr == b->addr.s_addr;
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
- 		else
--			addr_equals = !ipv6_addr_cmp(&a->addr6, &b->addr6);
-+			addr_equals = ipv6_addr_equal(&a->addr6, &b->addr6);
- 	} else if (a->family == AF_INET) {
- 		if (ipv6_addr_v4mapped(&b->addr6))
- 			addr_equals = a->addr.s_addr == b->addr6.s6_addr32[3];
+diff --git a/include/net/mptcp.h b/include/net/mptcp.h
+index 814b5f2e3ed5e3e474a2bac5e4cca5a89abcfe1c..2c85ca92bb1c39989ae08a74ff4ef9b42099e60d 100644
+--- a/include/net/mptcp.h
++++ b/include/net/mptcp.h
+@@ -103,13 +103,14 @@ struct mptcp_out_options {
+ #define MPTCP_SUBFLOWS_MAX	8
+ 
+ struct mptcp_sched_data {
+-	bool	reinject;
+ 	u8	subflows;
+ 	struct mptcp_subflow_context *contexts[MPTCP_SUBFLOWS_MAX];
+ };
+ 
+ struct mptcp_sched_ops {
+-	int (*get_subflow)(struct mptcp_sock *msk,
++	int (*get_send)(struct mptcp_sock *msk,
++			struct mptcp_sched_data *data);
++	int (*get_retrans)(struct mptcp_sock *msk,
+ 			   struct mptcp_sched_data *data);
+ 
+ 	char			name[MPTCP_SCHED_NAME_MAX];
+diff --git a/net/mptcp/sched.c b/net/mptcp/sched.c
+index df7dbcfa3b71370cc4d7e4e4f16cc1e41a50dddf..94dc4b3ad82f6a462961ae5195b7eba2271d8275 100644
+--- a/net/mptcp/sched.c
++++ b/net/mptcp/sched.c
+@@ -16,13 +16,25 @@
+ static DEFINE_SPINLOCK(mptcp_sched_list_lock);
+ static LIST_HEAD(mptcp_sched_list);
+ 
+-static int mptcp_sched_default_get_subflow(struct mptcp_sock *msk,
++static int mptcp_sched_default_get_send(struct mptcp_sock *msk,
++					struct mptcp_sched_data *data)
++{
++	struct sock *ssk;
++
++	ssk = mptcp_subflow_get_send(msk);
++	if (!ssk)
++		return -EINVAL;
++
++	mptcp_subflow_set_scheduled(mptcp_subflow_ctx(ssk), true);
++	return 0;
++}
++
++static int mptcp_sched_default_get_retrans(struct mptcp_sock *msk,
+ 					   struct mptcp_sched_data *data)
+ {
+ 	struct sock *ssk;
+ 
+-	ssk = data->reinject ? mptcp_subflow_get_retrans(msk) :
+-			       mptcp_subflow_get_send(msk);
++	ssk = mptcp_subflow_get_retrans(msk);
+ 	if (!ssk)
+ 		return -EINVAL;
+ 
+@@ -31,7 +43,8 @@ static int mptcp_sched_default_get_subflow(struct mptcp_sock *msk,
+ }
+ 
+ static struct mptcp_sched_ops mptcp_sched_default = {
+-	.get_subflow	= mptcp_sched_default_get_subflow,
++	.get_send	= mptcp_sched_default_get_send,
++	.get_retrans	= mptcp_sched_default_get_retrans,
+ 	.name		= "default",
+ 	.owner		= THIS_MODULE,
+ };
+@@ -73,7 +86,7 @@ void mptcp_get_available_schedulers(char *buf, size_t maxlen)
+ 
+ int mptcp_register_scheduler(struct mptcp_sched_ops *sched)
+ {
+-	if (!sched->get_subflow)
++	if (!sched->get_send)
+ 		return -EINVAL;
+ 
+ 	spin_lock(&mptcp_sched_list_lock);
+@@ -164,10 +177,9 @@ int mptcp_sched_get_send(struct mptcp_sock *msk)
+ 			return 0;
+ 	}
+ 
+-	data.reinject = false;
+ 	if (msk->sched == &mptcp_sched_default || !msk->sched)
+-		return mptcp_sched_default_get_subflow(msk, &data);
+-	return msk->sched->get_subflow(msk, &data);
++		return mptcp_sched_default_get_send(msk, &data);
++	return msk->sched->get_send(msk, &data);
+ }
+ 
+ int mptcp_sched_get_retrans(struct mptcp_sock *msk)
+@@ -186,8 +198,9 @@ int mptcp_sched_get_retrans(struct mptcp_sock *msk)
+ 			return 0;
+ 	}
+ 
+-	data.reinject = true;
+ 	if (msk->sched == &mptcp_sched_default || !msk->sched)
+-		return mptcp_sched_default_get_subflow(msk, &data);
+-	return msk->sched->get_subflow(msk, &data);
++		return mptcp_sched_default_get_retrans(msk, &data);
++	if (msk->sched->get_retrans)
++		return msk->sched->get_retrans(msk, &data);
++	return msk->sched->get_send(msk, &data);
+ }
 
 -- 
 2.47.1
