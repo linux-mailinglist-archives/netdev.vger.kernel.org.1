@@ -1,98 +1,97 @@
-Return-Path: <netdev+bounces-168590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 031F5A3F6FB
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:15:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8516DA3F708
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 434618616A7
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2CB424F45
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A885B70821;
-	Fri, 21 Feb 2025 14:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF161D5177;
+	Fri, 21 Feb 2025 14:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0/Sbe6zB"
+	dkim=pass (2048-bit key) header.d=seytrax.com header.i=@seytrax.com header.b="oVWEke8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from s.wfbtzhsq.outbound-mail.sendgrid.net (s.wfbtzhsq.outbound-mail.sendgrid.net [159.183.224.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA9F7080D
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F4A2D05E
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.183.224.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740147336; cv=none; b=pYBifoxgjV6DPf9IJc8vIJ+e8Rn9IfrNuIlelyMTj/ANZUQO4GJeNO/Xx07W6H5FxEYRow7MTp5RQDkY4Kn4/jZChwwV1tYRmikSpQQEcAX36EjA/Q+KKcGRhVhghCI2IatvmFCebqq0YqNnO0h3HCOd5THl9O/z49K+vbP8TwE=
+	t=1740147547; cv=none; b=KP1Wz5BF3wj+3TvWTMTlaLoV6k6kRsvZ3q/QjXIi3ESVtf5mwhmJfZ/iIP9QCv5uAK+BY3AZeKcxyJ/3I2/j50O6u75MOAudWCRHxp/gOugKfYGJz00HHDPy4YgJwVQdZF4AaxuwfU+X6yh5tS1VYRTf5irZ8HOp/+Oh+7nHypQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740147336; c=relaxed/simple;
-	bh=H5yh3XlqfVet82WCCkr5ue7OJLEw93JfvwdwqcALVHA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fqbHc4NCKzVCk/dBQ/Begd/4FMRv2CMYrqzN7AmIyUiohlzd6nekB1nwWX7goDu3EVZR24KyLFe/CqX9GJ44J37Yhcx3hRSyHXLp0LrIyyaaQEd3Q0wdjK8a2w5OhI/njKmfuNQkv2zTAjVTA+1rqkDEXqDt+2HQVh2jjJWGpvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0/Sbe6zB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZN090mxAPz84RAmjDf1ffqgTe4ng9t/Mi1/ZHq++UpE=; b=0/Sbe6zBOF5wWfA8ZGcllkkHOu
-	tAQPGfV0LWLk2aLeX2iOW3NchjXJWQjzLAX652zVJ8XRPNZc6RRylLZVEzVtOfzgC9GgS5bxFd0WC
-	TyG0hSJXiSZSnId8QQCxJVWSdnr1ccNyBUxwUx0Wsbxx/C06VxWuEhNFProVooYVF1ShrIV7i1MK8
-	An9WxG+DHPwaJGy8aCFnKRKK0unAJjNtjvSfjl1/AKDj+Ie8ttmp2B+12n5mUEaV0gG5nJ5hFmGEM
-	ln+zk/UrQfwec/G+KuVUJakLk7zIqlAG/lv3zM2UoOrSb/ooFhNywzerlCXYNVMnb2+tfUS8S9WuJ
-	ZhqypXRQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33718)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tlToH-0004nV-1b;
-	Fri, 21 Feb 2025 14:15:21 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tlToD-00023s-0v;
-	Fri, 21 Feb 2025 14:15:17 +0000
-Date: Fri, 21 Feb 2025 14:15:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <drew@pdp7.com>, Eric Dumazet <edumazet@google.com>,
-	Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/2] net: stmmac: thead: clean up clock rate setting
-Message-ID: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
+	s=arc-20240116; t=1740147547; c=relaxed/simple;
+	bh=vo5OGOU/tQLy0Bo0Gst7hQMZLCB0zEw0P/i7va1o6AY=;
+	h=Content-Type:From:Subject:Message-ID:Date:MIME-Version:To; b=GtFECA9zchSOHeP+0GPpiQilMosEH6pjIP2XYPGDd3/1cqUMf8FojPrE/wqbqFV0tIucHnN3s5SVioy2LDeSW91ft7Ff6KIODyXzHVEA28OpsSv6Avyo1B2Pu2J2Gsmg7rfS7ooMsLOg9G2qvIkm6Qwm0r7FL8PaEiXvRpwAwcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=seytrax.com; spf=pass smtp.mailfrom=em200.seytrax.com; dkim=pass (2048-bit key) header.d=seytrax.com header.i=@seytrax.com header.b=oVWEke8X; arc=none smtp.client-ip=159.183.224.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=seytrax.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em200.seytrax.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seytrax.com;
+	h=content-type:from:subject:content-transfer-encoding:mime-version:
+	reply-to:to:cc:content-type:from:subject:to;
+	s=s1; bh=vo5OGOU/tQLy0Bo0Gst7hQMZLCB0zEw0P/i7va1o6AY=;
+	b=oVWEke8XUf4fPGgjxhv+sVaIgWFTF+0hhJPlMOETu2sTgEY9tAG4iUngqDNv4o7W6nwN
+	LHBwHxLxkrF49tHcC2zIkGXW8ad8c5/sIyrIchntyhxDSRdwmBmr/U7xRHnOJrvRQbtqFE
+	iGDYCEWoKphKzltcN/FYdQId974JuA96VbVnkaOFAGBWJzHI1Oj1Jbo/ZHLJk/sLfKLxGi
+	DX+NGmQEP15e/eTAjj/Q+6WjhmE3t38NFqhwpJ0h+ReRVwRgYBT5Dc9bpZ/dIHD4lwlJm4
+	0PpazikVVxXl6f7ruY/Pl/jfjhKrkmz9lAovvVDnroF0sd0CK0eAN2Jy4nolTveA==
+Received: by recvd-85768567ff-f4p9l with SMTP id recvd-85768567ff-f4p9l-1-67B88B57-5B
+	2025-02-21 14:19:03.776285787 +0000 UTC m=+8528105.131012219
+Received: from [127.0.0.1] (unknown)
+	by geopod-ismtpd-4 (SG) with ESMTP
+	id RtH-fhv1QTmLfiagBvwMEw
+	for <netdev@vger.kernel.org>;
+	Fri, 21 Feb 2025 14:19:03.684 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+From: Emily <sales@seytrax.com>
+Subject: -Preparation Services for 2024 Tax Year
+Message-ID: <29a4d9db-1523-55f9-4e90-f8625b26ceab@seytrax.com>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Feb 2025 14:19:03 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Reply-To: emily@oceanicvessels774.onmicrosoft.com
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EPudgTrHKvV+QMoT99zH9wLtzo0b5=2FJpxqrPcLrsRWDRDmu4jfWXa6wGoI?=
+ =?us-ascii?Q?N=2FAJ0VSnmFvbeBX9UnHx+RHBVrHG86uYPSFQmzW?=
+ =?us-ascii?Q?VfE2prdXKfD6g4plwiYfmEN+xyvJIW=2FMivwvbzD?=
+ =?us-ascii?Q?ezT2zyTNK5smOCy0oHKVe6RpFG5KWtUlVqkSR4L?=
+ =?us-ascii?Q?5beNvUThrAez5vw5GIgJynfAJQc1Ye+bao=2FLFzI?=
+ =?us-ascii?Q?oXaks47MgGq6Xr+qOC3yfA=3D?=
+To: netdev@vger.kernel.org
+X-Entity-ID: u001.OHwfc4nOvBQp2DzmxLSeww==
 
-Hi,
+Hello,
 
-This series cleans up the thead clock rate setting to use the
-rgmii_clock() helper function added to phylib.
+I hope this message finds you well.
 
-The first patch switches over to using the rgmii_clock() helper,
-and the second patch cleans up the verification that the desired
-clock rate is achievable, allowing the private clock rate
-definitions to be removed.
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 28 ++++++++---------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+My name is Emily, and I=E2=80=99m interested in working with you on the pre=
+paration of my individual taxes for the 2024 tax year. As a new client, I w=
+ould greatly appreciate the opportunity to discuss how your services can he=
+lp me file my taxes accurately and efficiently.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+Could you please let me know if you are currently accepting new clients for=
+ the upcoming tax season? I would also appreciate guidance on the necessary=
+ documents and next steps for getting started.
+
+
+Additionally, I can provide a copy of my 2023 tax filing for your reference=
+ to ensure a smooth process.
+
+
+I look forward to hearing from you and the possibility of working together.
+
+
+Best regards,
+Emily
 
