@@ -1,267 +1,244 @@
-Return-Path: <netdev+bounces-168685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBFDFA402E7
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:40:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BDD6A40299
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71B0B18959A0
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CAFE3B8811
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8282A20F083;
-	Fri, 21 Feb 2025 22:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18160253F3E;
+	Fri, 21 Feb 2025 22:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="VHjwrsTL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M5v2LttN"
 X-Original-To: netdev@vger.kernel.org
-Received: from bumble.maple.relay.mailchannels.net (bumble.maple.relay.mailchannels.net [23.83.214.25])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1852397BF
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.214.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E33253358;
+	Fri, 21 Feb 2025 22:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740177517; cv=pass; b=JNjrPyvZz6GvfXuVawrFTl9CsZif1AbijTjNij68h0uvzgjsZzOASDsQzPxdNWmbzxhtbqvH6dm7fhbbzEcw2BNOEC7E+h4GbKMk2k4KrRQ9H5uCM2AaFbEIJh/TCD1C2x3keNkS619kjuSbKmrilXaROVnJ/2AIe7wJuGTrt54=
+	t=1740176582; cv=fail; b=l88z56CEMRDoHHU9uqZqtHbOwglQ4EbDrv7DDTZALjSjkq9Q2q1D7hAskzdwG020ZubwleeklVY/QQbFwvl6Jw7jKXPcjdfgVhs2G3O4O4BIn24ZsbdihFwvKK3Tg0thKofNE5spnjO3JlPjaGXD8DGk0kq/K+eksblaodhQ74o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740177517; c=relaxed/simple;
-	bh=9AiURpy5+R8gJDma4ZT4sR33rNzMijv+iTmDFgc4Sxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=eQgN3NqL/vrbJywNeum8syy3yTkFC+dv5ZW8XD1SGvr5cMv72Hq282BADRidCudCU7LP71Yjwfpe1or04UDi9w4VyblMyVh+0FMj+uNyW6+X+g08nsCgc4PFw4sw/M+zSfT6DdLmYu8Z4Ybxo8wxoo1Yt/s5ZT8bGnydn2mVF7E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=VHjwrsTL; arc=pass smtp.client-ip=23.83.214.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id C0210844A3F
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:21:48 +0000 (UTC)
-Received: from pdx1-sub0-mail-a248.dreamhost.com (100-105-11-97.trex-nlb.outbound.svc.cluster.local [100.105.11.97])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 749A58448E1
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:21:48 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1740176508; a=rsa-sha256;
-	cv=none;
-	b=4+zPv/Yn0LsAHsHEzKbWRU4Kq8VOttfayUf4lgnmQbFB1SNXiySWe/ttpL3Hj9zm2QLimy
-	C03EjM36HsivBpy0xioKQFqgNVt6DqyPa4gCBL+eCWPj1kim3f8PGFytLDKID7/LnZh2ya
-	Va2xtbmL6+OwQ79XIMXpEGUdD56rH7IvGadgqafxrEnxNmEsydJWBUo2la5ls6fHDEaKT7
-	o8VXxPKS1//5FIRcgdwAXQKaw40EiRzhsA6BgecwHnuLVsDyLeFQArvPlQLNGRJNeUaJ8y
-	9I1ju/bNnyQx1HJbUZEhvnSU7o5jrHgUbzgcLlqDh5+b1x3UJ6BuEZBy88/OMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1740176508;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 dkim-signature; bh=SLywbHCLFlDtyJM4PIS4UgxATDmGldjtWxcXN7vCIu4=;
-	b=3c0o1uJ9lM87O6TiYMuIyvu0wsn8TJB8651GuekcmXzOxaFi2ttkcI/B6K5rhTlHIHyCaC
-	YmGhuDqbo3/ix6pROTzppd7Q1dS39t0gqIhdHkinHrLkWgQDi7NWRkxp4iirnN2elWsPWZ
-	tfkYZwwO6idGPEwLQ97WZH/jrYmgd3Wiza9T8zhvyIBb3i9RAEtVHSpk4XhdCJ2Vi8KOOa
-	CbHnPOKMn02544eacGjifI3DO+XswZXY+FzU67FiqcAoqO2bhAE6J/b1W2RonKcPZ2yLgo
-	n5zkPy+QQBu9kx2SBPjSQs8l5CtWozdsVznGk0koeVeDSUZ6+hCx6FkilFwpLQ==
-ARC-Authentication-Results: i=1;
-	rspamd-78ddd997cc-w9rnd;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MailChannels-Auth-Id: dreamhost
-X-Oafish-Juvenile: 0d726792692c29f9_1740176508682_4090014334
-X-MC-Loop-Signature: 1740176508682:1043141164
-X-MC-Ingress-Time: 1740176508682
-Received: from pdx1-sub0-mail-a248.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.105.11.97 (trex/7.0.2);
-	Fri, 21 Feb 2025 22:21:48 +0000
-Received: from kmjvbox.templeofstupid.com (c-73-70-109-47.hsd1.ca.comcast.net [73.70.109.47])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kjlx@templeofstupid.com)
-	by pdx1-sub0-mail-a248.dreamhost.com (Postfix) with ESMTPSA id 4Z04Nr0ycyzmv
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:21:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
-	s=dreamhost; t=1740176508;
-	bh=SLywbHCLFlDtyJM4PIS4UgxATDmGldjtWxcXN7vCIu4=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=VHjwrsTLU5Uob/P46sOlEdEUBaYhu6habDOgD8IYpPWhBqcJY/Z3MsTw0E9mgHo/i
-	 z4TIdpIQbkCIl7IvnA6STE/YepIA5eo4dxNoVQfwcNKOD+NE1M39Nc/ipkhDyuTYOU
-	 soNuNxG1HAl+ns5rDabPgGScfD+bFatge7JpQogsZlvETltcv/iD/VZU/miSQoBeLl
-	 tZQq7uOfcV4gyCzV3TyTRJhnaxVO9fQQVwp+D840r3A69mMIEdZ1pShIf5kS1a6Gy3
-	 nHAYjHB3peOUUt5Ngp3/ECIObPudxL4bxRRC7Ev+c9zzZz5CwzqRPsiJPfd+QHQCJf
-	 XrNppiU/uNW+w==
-Received: from johansen (uid 1000)
-	(envelope-from kjlx@templeofstupid.com)
-	id e0047
-	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.12);
-	Fri, 21 Feb 2025 14:21:46 -0800
-Date: Fri, 21 Feb 2025 14:21:46 -0800
-From: Krister Johansen <kjlx@templeofstupid.com>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>
-Cc: Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	mptcp@lists.linux.dev
-Subject: [PATCH mptcp] mptcp: fix 'scheduling while atomic' in
- mptcp_pm_nl_append_new_local_addr
-Message-ID: <20250221222146.GA1896@templeofstupid.com>
+	s=arc-20240116; t=1740176582; c=relaxed/simple;
+	bh=pje060e43ZWi8kvbw2ZtdBNwQjkyGMglQj9n8rKn8sA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=o81yYoCwLLv9PQmpZoGRe64DwArEqxsg1sOhCZ8S7pP/a3L51j2k8KFAKRjrZdqeuvpOieQQ/qQ3M7UmN027/JlS0qB/cDFW9Kdvmqm7GH8oBTp5gIrcSalnovTF1yA9I/qNipR2cZy/kyI02MVuzRrZkDMLF0QpyhJOxFzfugk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M5v2LttN; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740176580; x=1771712580;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pje060e43ZWi8kvbw2ZtdBNwQjkyGMglQj9n8rKn8sA=;
+  b=M5v2LttNwtNXAWfme1AB8TyPfFIXBem5wyUs8qZOVS9ljGmGNpL6OkEp
+   qEwZJ8tbnLL3pziU8KEXzwkDM3yl3Jml9EkejGK2z7r7m6N4pWiw1CRfg
+   OYzu1Stqym/t0PUEwDBZOib+o8m2LQalWHjH94XjtBidqkOwBEKzjrqz/
+   dbiUfx6ReueI/pJuRk3x54ViR1SC6+XPi7+/mGrWoU1YYXzBpdEr3vAHe
+   QLzoYXhrIm9AbHDskDtZqQ3JppmYJHx1R/H6M9izJ73BAdHXYkyC8pbXC
+   MGV0zuE2gMrS/UlE9z8AuUMxGWch7jUHUoeYfc+D8Sl5ZKeas7QG1NyvM
+   A==;
+X-CSE-ConnectionGUID: sAAQNdvmT5eb67XNnpsDHw==
+X-CSE-MsgGUID: /1mwDZdTS++ErZsH3akqHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="28606898"
+X-IronPort-AV: E=Sophos;i="6.13,306,1732608000"; 
+   d="scan'208";a="28606898"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 14:22:59 -0800
+X-CSE-ConnectionGUID: WWj3lycxTcyNNJUmwLr2lA==
+X-CSE-MsgGUID: XPfET5XoTIy0fpYSjuQ8Yg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="146381841"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 14:22:58 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 21 Feb 2025 14:22:57 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 21 Feb 2025 14:22:57 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.175)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 21 Feb 2025 14:22:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=brQhmWkE15Jxmfn+o1VB/n2wcbJc2dm1vREbW9yZ/EoX5XaW+gFO1vJsb+HYagHxaebV73/zMimmD2/0LYNDt/2Mr+mqROJ9zBEYPp7xff9Arkwk4OZQhntdqHo5INv+Fmv3BkI8sfR+6BZ4fSoZyl0M1WNx33Lhyz3/sY9wNpb0Pcj1l5g+sRUyvfVYPb3Kh1UWdNudelXfIklSACNFxIftzYXnNcbeDNq3IfRbaYRliv/1AZYrxYmVf+bvfqeXcd4uvLJ/7T2KXE+YbbxiiWXI/HqjrRrxux+plb2QuldSj744tHcvlWnbEUQIRfI3L/LF7QY8O5Vvnv8zLeVgQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iof7+zPLC4l68j8HAVnMxNHkCFnqbYpbounMTIrgYj0=;
+ b=hsStcCyE+NGQ5m4+yiwYEri8OFy7h4HT0wjvc8cSeJzJWqa8hwirocaZhsplloLXriO7FFendVmBG3x2dmD9kIbqmRvDV8T62hLyCkQJyrmzrHHj9/GrBWFlZ9afFP8Lb/OnpySKsgyutxZwUrRj/GRYFzg8fVhSiuV0whyt3PjMwZKqFJxT5pPV4UiuTeOZMZuXmPb2kmieW6yVdJkNomf8JgZCTOiaiOD/0MEptP2NXeXFbXM7QMRu4SD2oWdObAgsO65o/GXxXJRssqCrl04sUsHD8a7mjMcDPep3y5YAK9Z8q6fSgvskqTVHbtUzoKTizXb0q5WnnfiVk+FdeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by MW3PR11MB4729.namprd11.prod.outlook.com (2603:10b6:303:5d::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Fri, 21 Feb
+ 2025 22:22:53 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189%6]) with mapi id 15.20.8466.016; Fri, 21 Feb 2025
+ 22:22:53 +0000
+Message-ID: <a7e434a5-b5f6-4736-98e4-e671f88d1873@intel.com>
+Date: Fri, 21 Feb 2025 14:22:49 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/2] Fixes for perout configuration in IEP driver
+To: Jakub Kicinski <kuba@kernel.org>, Meghana Malladi <m-malladi@ti.com>
+CC: <lokeshvutla@ti.com>, <vigneshr@ti.com>, <javier.carrasco.cruz@gmail.com>,
+	<diogo.ivo@siemens.com>, <horms@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20250219062701.995955-1-m-malladi@ti.com>
+ <415f755d-18a6-4c81-a1a7-b75d54a5886a@intel.com>
+ <20250220172410.025b96d6@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20250220172410.025b96d6@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0216.namprd04.prod.outlook.com
+ (2603:10b6:303:87::11) To PH0PR11MB5095.namprd11.prod.outlook.com
+ (2603:10b6:510:3b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|MW3PR11MB4729:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1031bd46-2edb-4f53-1110-08dd52c64890
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Mlg4TmQ5VUc1bTR1OG82aFYvb1B5TWhpcnJadEphdEtrWk83bHNkdUdUSmlo?=
+ =?utf-8?B?eG9tRkk3dTh4Y0pzU3BCYk5JeXJDKzlaZ0FablNKOHlaM2lucUR6NUlrblJ5?=
+ =?utf-8?B?bW9GNHJmb2tPdHd6bGdodWVPc0FicTh4c0pZL21UcW1RNm1RQzY2OXdJa2Qw?=
+ =?utf-8?B?L2VGbjJtYi9tTUJOTmo5OVBZVmF6YUU4bTdDcGhQU004akpiWk96L2M5ZkdB?=
+ =?utf-8?B?QlQweldoTHFqaUh3UUpyR1VWa0VscVFIV1hFdEU5bE9DSmd1cCtWZXlsNWlB?=
+ =?utf-8?B?WmhCcGQ4UmtXUlRpeFpiUC9yY3VBTC91Umx3SVQzeVdMY0dlVEczcG9yV0pO?=
+ =?utf-8?B?QTZsd3JrZ2taUjY2VGR5RHBMaExmeU1SYWFFOVFqUmZjT0czdTF1dnBIZkg3?=
+ =?utf-8?B?ZUVoK2NvTmJneVFNUDUrZm4yR2NZYzIrOHJVSC9IQTc3ei94YWFIRGkzaGJL?=
+ =?utf-8?B?YzQ1TnVoZ2t1SHV4RCthYmpBSGFkR0RRMzg1SU1MNkNpbS91N0ExWHh0bENr?=
+ =?utf-8?B?a01NVE9ISDBZWVJreEk3eXFvOTFtd2hxZUFJSUZNVXZtTGV1c2FqVkhONjVw?=
+ =?utf-8?B?MWFLNXMyNjlCbHdiN0ZlSFYrVHlNbHlEcHZ0eCtrdjNCT0I2TVhEQXppRjl3?=
+ =?utf-8?B?U3oxRGZDUklmR0lTNUF1WU9ET3R1Y01td1hmaXdXTTZDRTdmVjBMelkwTDlm?=
+ =?utf-8?B?ZURqUkxSVEdsbFhlcXBFQjVwS2hvcFNhRmEza3RSOWM3TXFvZXFxS0pqWjdD?=
+ =?utf-8?B?VkVsVXV4UGVXeXJIREVsVWpZYTFNckNOQk0zYUZRK0pKVFZzaGVCTG4vNkx5?=
+ =?utf-8?B?Si9JeElVc1FDQWgwalNWbmtyMHRxTnZWT0VBRCtTMlFlNHN5azQ0QmVuTU1h?=
+ =?utf-8?B?NTc0NmFXS3Z4NEg4R2tUR3U2Z3BKOHBJME81a3VYclBsem4xVDFsUUI0cmJW?=
+ =?utf-8?B?dHplWS9FYzNwN3pwSVVzUmdTaFlwTGhTclNTWU5DdzlpOStKWVl5MjliT21v?=
+ =?utf-8?B?ZzVXUlBhb3JSaitFMHlqU0xvS1o4S05DZFQwMEVhYnpwVXpFSnNxTFhMVTNI?=
+ =?utf-8?B?MmJ4ZkRYSGp1bG9ONVlnQmVqd0g2UDJSVnBxbVQ3R3I2VTVNSXNUNVVoL0Rk?=
+ =?utf-8?B?NmpMS2pxSDhXTG5OeUEvYjdCNGlvVmt5bWpZM21tSHF6a2t6c1RHMXFtN09X?=
+ =?utf-8?B?OWxtNWNnajhsV1VRYUtvc3hBQ0YzdEkxSG1sdVo3QlpiSTJvZmtIQVV4cTcr?=
+ =?utf-8?B?QzdZLy9GV1JSeXdOd0FvckNVN2RJdG5xUGR6dEt4Q3BtVnltckYzU2wxVGRJ?=
+ =?utf-8?B?M3VEVGRVRGY1cUtqZzNsU3NLZUtyWktHZVA5NmFkWmordTNIREVhZmFCbFBG?=
+ =?utf-8?B?eWZOblNjM0VKL09hbGh3OWhPSmlQZEgrYnpEZndtcGlBcEgzS2dlbHJzVFNl?=
+ =?utf-8?B?WGIxSm8zOUJMdVgycnU4SUQ2SEdmTyswZFNYQ3FBWmhpV1JHS25zRnE4T0hj?=
+ =?utf-8?B?NDg2ci9ieXlLcjd1cmxPRktCWExreGZnRE5XUUFFR25MMXFmYy85VDB2YklU?=
+ =?utf-8?B?NXdjdU0zZ0FTMG5PaFpZckJuSkovdktWOTlXRVZjRUQxTkpiaDJvV05ITHQ1?=
+ =?utf-8?B?NmRXMzhIMTc1NVRrMGgyYWQwOTN3TDd1ams4UEltQVhTRFhiWlYrOUEwSFJI?=
+ =?utf-8?B?OFZQV1pQYyt4NWRvUmlpdzVDVTd3ZVE0MG9MazJLeFFvNnJxNTBBQlRzbDFr?=
+ =?utf-8?B?N0pLOGE2WkNsN2xwdGcxTWJKZWEzWHMvRnJ5TGVkY1NBbDFWQjA4TVNwUWN5?=
+ =?utf-8?B?OTd5ZUQyQUNoMDFJQ2xMbHRyc0x6Ymsya3h2RVFSeDZ1eXpJTEJ6VkFrcFgw?=
+ =?utf-8?Q?vrUB5cNdypyJr?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NUIyV3VHS2FPcjk0aUswQWltQVh0SHN6QUhEMlcyZzE1UFBUZE9MUTFwZit5?=
+ =?utf-8?B?cTdOYXEyTnN4eFhhV0tPL05XNHRoczN0dXJTUHZ3YUJzaGsxUXpZSE1BZWYy?=
+ =?utf-8?B?L3Jta0pad0Q1bzkrekRDcCtCak5YdUpXcXlTWG9XL2hBSDYrbDFBZ3VKZytO?=
+ =?utf-8?B?cjFEdEdYNnFTeXhtblhqRmxtUXNSL3BYak0yWVZLODF0Q2JORVVhT2dUOXI3?=
+ =?utf-8?B?SjlRdkFTYTZTN0laeHI3Um9XamRDc3dtV0hBQ01MVGoveWx5bVBsVnpMWU4x?=
+ =?utf-8?B?OE1TaDV2OHlUYjE1QmRxYXFYQlBVbGwvd29uQXhjcnZ6OUlaQnFzVFVHZkFa?=
+ =?utf-8?B?V1VVNzVIVy9YOHB6NktCWHNaN1JZanhVUnBYTVVwSm5FQjg1WGR0YVN2ZlY2?=
+ =?utf-8?B?dGphenV5c2ZKMWFFb3Z5OThKN1Q5V2VGWXFvTVhZUWsvUGpNN1VQL2k5U1hQ?=
+ =?utf-8?B?Q1poYWFDZFdwZVZZVTV6cmRtNHh0KzdNa0VXWDNMVGpxWWl5bEdBVG5iYUU4?=
+ =?utf-8?B?dFd2Vnh2VEFXTVFWUFZ0TWpGZlBHNWRoVG5tcnE4c2xqaVhhczVpc0tnOTZ2?=
+ =?utf-8?B?eVc4V3N0dDBRTGtIRHdEanJoYUpPb0RvSVF3MkZrVFVLZ1BPTFV2S1JraHhq?=
+ =?utf-8?B?TFJqUnVvVXljQ3BqSDd1ZUNXQ3hEdXhKZlNBWVJuS29hYjZKYks4WXJyV2Ra?=
+ =?utf-8?B?VnhTTHlvcUNFcHloZ25OUjJGb1ZtZDZnVWprc1MvanAzUGt6MVl3cUtHVnU4?=
+ =?utf-8?B?VUk3cEJQaXpSSG1UbUgxMng5ZGRaNjFNb0t5VXkzdHdMWkZuWmhlcldJNjQy?=
+ =?utf-8?B?YnYxYkVBUTlxd1R0b1ZNZjljbGNadDQ5WVhtQlRYdk5EbHB5TFVRQTROQUJF?=
+ =?utf-8?B?cWRma2J4bFdUSmxTN0NNL0Z4M0xJWWZObVFUK093SGpWMlJLZDh6Nk1KcTRh?=
+ =?utf-8?B?Y0ZQcnprVUJtc1p6bDczaUtkdnB5SlozdCtkNWNyeVovYXdNQnU3ckFWZE1K?=
+ =?utf-8?B?alVSQWJjV2p1dzRYS1lOTzlHdVE0RE9rM2pqZmNhUUU0c1NBcEJoVitQNG1h?=
+ =?utf-8?B?S1pWUzhCN0hMUWZsT3AybEhxRks0QUVCdFJDRVBkSDFTcXRyMTZVaHFxelhY?=
+ =?utf-8?B?Nk03ckNkeEpZZWJaQU5yaHFOUTZXRHFaQUxJYUNrSmtqSFlnSXJnU0wxeDk2?=
+ =?utf-8?B?dTJuMjZNWWk5Z1l5dkZHS2kxRyt2WW9kTGpqVXdtNlZsRzBsWE14a2o2MEI4?=
+ =?utf-8?B?eU5yLzJpcjdWZFlqa08zbm5qT0FhUzNZQW0rcFVGL3hsZC9SVnBGTXFJUElR?=
+ =?utf-8?B?LzhNcDg0N3FvaUFGL1dMT1pLVFU1VWlMdjN1eCt3YnVCVzlTQlFuKzZhcmc2?=
+ =?utf-8?B?VlJnQlpPWURmcEJCQWV4K1BKM2xZcWNVRGFHVkJ3QURyc3lCMVdNQ3doZ2ZH?=
+ =?utf-8?B?aVF2K1RJY25LSW1KK0twK0ZhRlJlb2MwN0s2QUZaV242OGVDWG5IYXBCeDI1?=
+ =?utf-8?B?bDV1THlKOCtKbnN3eGxSaHg1S1NDcmNLUTh2WkUwaUgwK3JKclpzSk9FQnJs?=
+ =?utf-8?B?SmZTQU80SEhKWUs3UElldFRPRTNDUnNtaVBWL3BxUFllb2Q3UlhZUXljSW1P?=
+ =?utf-8?B?R3dqbGJIQ29iMW5WNHhwK09mOWFOSDh0c284aHFNdUIxNXJQVm1JS2lmWEhm?=
+ =?utf-8?B?cW81aElHbHBPeG5vUjhoa00vMGFLcWVxTWtqMlNBd0t1ZkMvei9TSVpWbEJy?=
+ =?utf-8?B?K0JqRWdub2wveU1lL0l3Z1VLMXVZTDBwODk1Y0xlUnFPNjNhajlwcTRyZTFG?=
+ =?utf-8?B?THphaXRjYlhwTzVSOU1iQno5NUNxMkg0citTOEM4WmdKamF4TzU5RE9xaGtS?=
+ =?utf-8?B?RUJOWmgxMHkzUGM0eUJTT0lzMFNtenhsai9LWkJEdm5oTFEycjl4TFNqcTQv?=
+ =?utf-8?B?SStBaUpGd3BRNDUzb3JrdzhTYXdGc2lrTXJKZmV5T1YxaGJPZGVtalBvZXk0?=
+ =?utf-8?B?T3dnMkJoUUt2aFJseUpNS0crSllIZDBtaGZiMG02ZTB1MTRwUVVJbVRpQWw0?=
+ =?utf-8?B?Q2dpYnVha2QyM3Izem03YjlWOUJueGNwSHFhVG4vUGpZNGlmOUxSb0VGQWxY?=
+ =?utf-8?B?b1k0UTNFbVp4bDVRNUxtUllydWRjQU9zTlBIaC9VYlhKZEVTVEJNVW1ibFBj?=
+ =?utf-8?B?TGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1031bd46-2edb-4f53-1110-08dd52c64890
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2025 22:22:53.5062
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Pv/VSnsMt4e822xt7lp8ft3QvuKB6xZOyeZ/cPywwSPToNTwL26a9cZgytY5Py1Zmki7qWjoDH3Z7DndVKIyBB56p3jaTtDlrrJEXS46cI0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4729
+X-OriginatorOrg: intel.com
 
-If multiple connection requests attempt to create an implicit mptcp
-endpoint in parallel, more than one caller may end up in
-mptcp_pm_nl_append_new_local_addr because none found the address in
-local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
-case, the concurrent new_local_addr calls may delete the address entry
-created by the previous caller.  These deletes use synchronize_rcu, but
-this is not permitted in some of the contexts where this function may be
-called.  During packet recv, the caller may be in a rcu read critical
-section and have preemption disabled.
 
-An example stack:
 
-   BUG: scheduling while atomic: swapper/2/0/0x00000302
+On 2/20/2025 5:24 PM, Jakub Kicinski wrote:
+> On Wed, 19 Feb 2025 15:37:16 -0800 Jacob Keller wrote:
+>> On 2/18/2025 10:26 PM, Meghana Malladi wrote:
+>>> IEP driver supports both pps and perout signal generation using testptp
+>>> application. Currently the driver is missing to incorporate the perout
+>>> signal configuration. This series introduces fixes in the driver to
+>>> configure perout signal based on the arguments passed by the perout
+>>> request.
+>>>   
+>>
+>> This could be interpreted as a feature implementation rather than a fix.
+>>
+>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> Agreed, ideally we should get a patch for net which rejects
+> all currently (as in - in Linus's tree) unsupported settings.
+> That would be a fix.
+> 
+> Then once that's merged add support for the new settings in net-next.
+> 
+> Hope that makes sense?
 
-   Call Trace:
-   <IRQ>
-   dump_stack_lvl+0x76/0xa0
-   dump_stack+0x10/0x20
-   __schedule_bug+0x64/0x80
-   schedule_debug.constprop.0+0xdb/0x130
-   __schedule+0x69/0x6a0
-   schedule+0x33/0x110
-   schedule_timeout+0x157/0x170
-   wait_for_completion+0x88/0x150
-   __wait_rcu_gp+0x150/0x160
-   synchronize_rcu+0x12d/0x140
-   mptcp_pm_nl_append_new_local_addr+0x1bd/0x280
-   mptcp_pm_nl_get_local_id+0x121/0x160
-   mptcp_pm_get_local_id+0x9d/0xe0
-   subflow_check_req+0x1a8/0x460
-   subflow_v4_route_req+0xb5/0x110
-   tcp_conn_request+0x3a4/0xd00
-   subflow_v4_conn_request+0x42/0xa0
-   tcp_rcv_state_process+0x1e3/0x7e0
-   tcp_v4_do_rcv+0xd3/0x2a0
-   tcp_v4_rcv+0xbb8/0xbf0
-   ip_protocol_deliver_rcu+0x3c/0x210
-   ip_local_deliver_finish+0x77/0xa0
-   ip_local_deliver+0x6e/0x120
-   ip_sublist_rcv_finish+0x6f/0x80
-   ip_sublist_rcv+0x178/0x230
-   ip_list_rcv+0x102/0x140
-   __netif_receive_skb_list_core+0x22d/0x250
-   netif_receive_skb_list_internal+0x1a3/0x2d0
-   napi_complete_done+0x74/0x1c0
-   igb_poll+0x6c/0xe0 [igb]
-   __napi_poll+0x30/0x200
-   net_rx_action+0x181/0x2e0
-   handle_softirqs+0xd8/0x340
-   __irq_exit_rcu+0xd9/0x100
-   irq_exit_rcu+0xe/0x20
-   common_interrupt+0xa4/0xb0
-   </IRQ>
++1 on this direction, its important that the driver does not accept
+configuration which is incorrect.
 
-This problem seems particularly prevalent if the user advertises an
-endpoint that has a different external vs internal address.  In the case
-where the external address is advertised and multiple connections
-already exist, multiple subflow SYNs arrive in parallel which tends to
-trigger the race during creation of the first local_addr_list entries
-which have the internal address instead.
+Reminds me of my backlog to refactor this whole mess into a
+supported_flags field in the PTP ops structure. Maybe it is again time
+to revive that.
 
-Fix this problem by switching mptcp_pm_nl_append_new_local_addr to use
-call_rcu .  As part of plumbing this up, make
-__mptcp_pm_release_addr_entry take a rcu_head which is used by all
-callers regardless of cleanup method.
-
-Cc: stable@vger.kernel.org
-Fixes: d045b9eb95a9 ("mptcp: introduce implicit endpoints")
-Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
----
- net/mptcp/pm_netlink.c | 19 ++++++++++++-------
- net/mptcp/protocol.h   |  1 +
- 2 files changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index c0e47f4f7b1a..4115b83cc2c3 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -967,9 +967,15 @@ static bool address_use_port(struct mptcp_pm_addr_entry *entry)
- 		MPTCP_PM_ADDR_FLAG_SIGNAL;
- }
- 
--/* caller must ensure the RCU grace period is already elapsed */
--static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
-+/*
-+ * Caller must ensure the RCU grace period is already elapsed or call this
-+ * via a RCU callback.
-+ */
-+static void __mptcp_pm_release_addr_entry(struct rcu_head *head)
- {
-+	struct mptcp_pm_addr_entry *entry;
-+
-+	entry = container_of(head, struct mptcp_pm_addr_entry, rcu_head);
- 	if (entry->lsk)
- 		sock_release(entry->lsk);
- 	kfree(entry);
-@@ -1064,8 +1070,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 
- 	/* just replaced an existing entry, free it */
- 	if (del_entry) {
--		synchronize_rcu();
--		__mptcp_pm_release_addr_entry(del_entry);
-+		call_rcu(&del_entry->rcu_head, __mptcp_pm_release_addr_entry);
- 	}
- 	return ret;
- }
-@@ -1443,7 +1448,7 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
- 	return 0;
- 
- out_free:
--	__mptcp_pm_release_addr_entry(entry);
-+	__mptcp_pm_release_addr_entry(&entry->rcu_head);
- 	return ret;
- }
- 
-@@ -1623,7 +1628,7 @@ int mptcp_pm_nl_del_addr_doit(struct sk_buff *skb, struct genl_info *info)
- 
- 	mptcp_nl_remove_subflow_and_signal_addr(sock_net(skb->sk), entry);
- 	synchronize_rcu();
--	__mptcp_pm_release_addr_entry(entry);
-+	__mptcp_pm_release_addr_entry(&entry->rcu_head);
- 
- 	return ret;
- }
-@@ -1689,7 +1694,7 @@ static void __flush_addrs(struct list_head *list)
- 		cur = list_entry(list->next,
- 				 struct mptcp_pm_addr_entry, list);
- 		list_del_rcu(&cur->list);
--		__mptcp_pm_release_addr_entry(cur);
-+		__mptcp_pm_release_addr_entry(&cur->rcu_head);
- 	}
- }
- 
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index ad21925af061..29c4ee64cd0b 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -250,6 +250,7 @@ struct mptcp_pm_addr_entry {
- 	u8			flags;
- 	int			ifindex;
- 	struct socket		*lsk;
-+	struct rcu_head		rcu_head;
- };
- 
- struct mptcp_data_frag {
--- 
-2.25.1
-
+Thanks,
+Jake
 
