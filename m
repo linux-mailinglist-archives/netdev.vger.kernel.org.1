@@ -1,162 +1,181 @@
-Return-Path: <netdev+bounces-168633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A7B8A3FF10
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:51:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F08A3FF35
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:00:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D08418904EE
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744BC705BA7
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4599250BE9;
-	Fri, 21 Feb 2025 18:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F4D2528EE;
+	Fri, 21 Feb 2025 19:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tZsY028A"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="UNYvQFMm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2895F1D7E50;
-	Fri, 21 Feb 2025 18:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6B0250C01
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 19:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740163871; cv=none; b=CeA2Hh+nchK1UjT1AncRAhPNFxMBQ5Eri+6SCG39B5SmM06JqS2umSGFFPNM1tAA4/y/HEordfyAGKwpN/3thnKrH/jZ/xhEa/iXy7r637Y/Tm+6AlSEBGLRakJ0y9aygVtkWdpwZdpEqMTZ3pP1ZypJkiSY21YzfuEzLf4B1zc=
+	t=1740164448; cv=none; b=GoCYeVa+JP9Yk5/DZNceRrrP3Z9DqUbRrpzdd+5O/UmmWc+l0KRQhDs1zb/lEV/oNgg31ikWeo5Iuiv6k62LA9gaIob8qsW3dVi4L0enlLf/JT0Glxz4K/OmgvXesD+OLLfITj1BEeaPnPORP6gkl5M3FcvkRFErqUdVabXopyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740163871; c=relaxed/simple;
-	bh=LodTY/332Fl0l4DFbxlso3z+UePgU5j/5ZLkT5bhTlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=USCrTTFyEDXpBDqkvlvwSB6wqmAKc5onWDN/qkGB4WVhabYYKmWvWxa9b9Sy9/0TxBMS1sKps9K1smdQGQaP+hGBMgMcaMRKeSJbse32ruSLT3ieKQbf9HdAPo/N+mDsFPi4Y9V3PT6+4o7f6CN7iJ6yBkREiIdiLV2lHC+RmX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tZsY028A; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51LIMdxC011285;
-	Fri, 21 Feb 2025 18:51:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=6DvnguiOhPBQ5H10XYNeLZ2kDHi226
-	rXlvIDNRqU+WA=; b=tZsY028A7ATbpn4bMc41SzQ27AqaPpGZA10DKEk+Bv8WEQ
-	JBe8kNVkW9RxuUQO66XSwah5Sd9wyvRrxVYe67sv1W1PiY10m9vUtrVkE5ac2wEd
-	OB6q7kutiDl2uvJZiYQJT2B/iFmsh9ELrIV44mKeljZbPsoMXfpVgX8pOmy29NkA
-	wyDxmssH0yQ/Pz7AUeXIwhvivRdS9DOLT16OQqfb4b9jgi/nY0FWti6v1ayxofBC
-	yd+iFM/BkqHaRxwbmCt9LwhwNUiW28xkUGv0hAAwvqgIFqACsXH8c91XsRn7KUxg
-	rRXt6R/RxqAly1QpKwJCnBZxy7ATLh3TEDB0VUyA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44xdhawawv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 18:51:01 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51LIp1aV006490;
-	Fri, 21 Feb 2025 18:51:01 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44xdhawaws-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 18:51:01 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51LIeFE6002336;
-	Fri, 21 Feb 2025 18:51:00 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44w03xhk6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 18:51:00 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51LIoxB932506522
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 21 Feb 2025 18:50:59 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB9655805E;
-	Fri, 21 Feb 2025 18:50:59 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A78275805A;
-	Fri, 21 Feb 2025 18:50:59 +0000 (GMT)
-Received: from localhost (unknown [9.61.179.202])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 21 Feb 2025 18:50:59 +0000 (GMT)
-Date: Fri, 21 Feb 2025 12:50:59 -0600
-From: Nick Child <nnac123@linux.ibm.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
-        nick.child@ibm.com, pmladek@suse.com, rostedt@goodmis.org,
-        john.ogness@linutronix.de, senozhatsky@chromium.org
-Subject: Re: [PATCH net-next v3 1/3] hexdump: Implement macro for converting
- large buffers
-Message-ID: <Z7jLE-GKWPPn-cBT@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20250219211102.225324-1-nnac123@linux.ibm.com>
- <20250219211102.225324-2-nnac123@linux.ibm.com>
- <20250220220050.61aa504d@pumpkin>
- <Z7i56s7jwc_y0cIz@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
- <20250221180435.4bbf8c8f@pumpkin>
+	s=arc-20240116; t=1740164448; c=relaxed/simple;
+	bh=8DcTK+BWqvLFgfUlFyhU8LrkRaYzJUE29H3MUIQ1fWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pn6MoBFi8koK9EAe61pDn/BKf8X1ucX+u+67FjYj646L2kwx800vJVFXnaWDf6gKF+5qVz0D4M69zAzcpHuNOTNRjebTL7HxXjzV/sXE0z6G4crIkx5Do7N8Zu4N6axygYV036gdvWOuKoKV0IGiD9/k6JfHEyGTfqrunNuDvik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=UNYvQFMm; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-221050f3f00so56563325ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:00:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1740164445; x=1740769245; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
+        b=UNYvQFMm8ipUKK4diYQfDub/mJ3b9O2f8Chy60VevlYCmcNPan3W66AyRVIA6wmHxj
+         sEdXQvtj4pUx/R+o/c+9Zmw89vLM6qGHXoczVYe/kus4+VnTjeJqo+ISOq5INGRV0add
+         81hc29lvOOsp3WQW7s36p2Duld12MGGM3TexmriVIleBupxJSOy6Al3Ql+53xA39jkAm
+         tQzBJ5C2lr01f30oCQlgv9W7TdqF81kI7Go8YQ7NMuL+vxuNhMzx0DOGJQ7rvDh4FUnV
+         XCi9V8cVRDRleYhP/B6LzIiZc5tevohGrxttxwEdHxmKo7ox8fUQiKFYEXmpgPzY9T2p
+         XsfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740164445; x=1740769245;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
+        b=NJIBkdSmCMZYwUZJ5Y24G6XmzVNXbABRyXV8EdDJcxJENItL4Se4IT2nUVNFdAVPVv
+         1i8m/IbQAdS8VJ25S5M9GDobSoiKW7FRjdjJE+Z538KWhnPeQnQDPJKPK5r0zFjt6L4e
+         qB3q/FjlDVn/cblbUikrRgAKhk7k0hz2FaznY7gFRtAMZwMhiuJl+Znua0Ilu1LuhcXk
+         c/Zq2fg6Ty85QmWSDf3wOM0y80WUbRGNB7w5Empbq8oQFY0bfjLkcsRSBzeSnBfSbkY0
+         MEc0ita0bYM3aj17PP5/WUEq12lSOzmkfzsdlgGDh0XarZNv3JjKAdSBxnuNEc+YrXDb
+         NXbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWppBQL6ND0iO7VNiuE433rpV9YPmY7YeQRHtoTG6N2AiRP5yyYcqjvD3+iL4Y3c/PKvWOgH54=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyzr8Br8pM2oaK6TK4UIGeJsixp8sk49YZb/dbpNZ4a0Nu35LK/
+	dv1LKWb5bDiAwitSyacpDlAHOLYxAQGYpkdNaZTHGyX9frBAIlaj1X2ppyiuR7Q=
+X-Gm-Gg: ASbGncuP7FPliCkziFpD/dlF/tn19JpaZ9r9Wu/Yvew8N9N0cZKA9aNcLfPlsZ+E/Fj
+	6++/dDp7jjoE4xz5soU95nNkGDUdWPRudKXBPfl3ex1iR/YrujGYsR0WzYnSglQdb2IdlmG1JwU
+	bdmML177hwZhXelWVgApDghWJG9J96U7dMQ7hLi7J+vjHRGwmocSDdxXFtj7jicwOLnR69QGUfo
+	m1jSNDGelqeazhLxuvRd7Ymjx4IzdXqr1mVA57RjR29HOm0Y6cpnkwgAecNNQFrHrBOlQbKK5vy
+	67WpmooRsMJ3hdNQ/vtkb/y+25Y9O7zcQllk6SmtLSbdOzII4u5TBUt5tlA06KOyA9hHC9CK/ry
+	z7NQ=
+X-Google-Smtp-Source: AGHT+IGGJurj1ywGFGfMqLad+W4V0w/HWPMlDvnZ5WiNoOtzbXCiXiC9jiI+n/maSmmLogJdgVe5uw==
+X-Received: by 2002:a17:903:2346:b0:21f:6fb9:9299 with SMTP id d9443c01a7336-2219ff5e7c8mr68299995ad.27.1740164445571;
+        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5364676sm141352715ad.82.2025.02.21.11.00.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
+Date: Fri, 21 Feb 2025 11:00:42 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon
+ <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew
+ Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>, Peter
+ Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Thomas
+ Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Danilo Krummrich" <dakr@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Johannes Berg
+ <johannes@sipsolutions.net>, "Jamal Hadi Salim" <jhs@mojatatu.com>, Cong
+ Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, "Bartosz Golaszewski" <brgl@bgdev.pl>, Lee
+ Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, Christoph Hellwig
+ <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy
+ <robin.murphy@arm.com>, "Miquel Raynal" <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Zijun Hu <zijun_hu@icloud.com>, <linux-arch@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+ <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-wireless@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-gpio@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <iommu@lists.linux.dev>, <linux-mtd@lists.infradead.org>
+Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for
+ void APIs
+Message-ID: <20250221110042.2ec3c276@hermes.local>
+In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250221180435.4bbf8c8f@pumpkin>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0nfw2xw5-eDdb3k506j578CAqn5DICbs
-X-Proofpoint-ORIG-GUID: Bam3hKZSnKKtACOhGfV-xk9y4bnMqWGV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-21_05,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- mlxlogscore=981 mlxscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 suspectscore=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502210128
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 21, 2025 at 06:04:35PM +0000, David Laight wrote:
-> On Fri, 21 Feb 2025 11:37:46 -0600
-> Nick Child <nnac123@linux.ibm.com> wrote:
-> > On Thu, Feb 20, 2025 at 10:00:50PM +0000, David Laight wrote:
-> > > You could do:
-> > > #define for_each_line_in_hex_dump(buf_offset, rowsize, linebuf, linebuflen, groupsize, buf, len, ascii) \
-> > > for (unsigned int _offset = 0, _rowsize = (rowsize), _len = (len); \
-> > > 	((offset) = _offset) < _len && (hex_dump_to_buffer((const char *)(buf) + _offset, _len - _offset, \
->           ^ needs to be buf_offset.
+On Fri, 21 Feb 2025 05:02:05 -0800
+Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+
+> This patch series is to remove weird and needless 'return' for
+> void APIs under include/ with the following pattern:
 > 
-> > > 		_rowsize, (groupsize), (linebuf), (linebuflen), (ascii)), 1); \
-> > > 	_offset += _rowsize )
-> > > 
-> > > (Assuming I've not mistyped it.)
-> > >   
-> >
-> > Trying to understand the reasoning for declaring new tmp variables;
-> > Is this to prevent the values from changing in the body of the loop?
->
-> No, it is to prevent side-effects happening more than once.
-> Think about what would happen if someone passed 'foo -= 4' for len.
->
+> api_header.h:
+> 
+> void api_func_a(...);
+> 
+> static inline void api_func_b(...)
+> {
+> 	return api_func_a(...);
+> }
+> 
+> Remove the needless 'return' in api_func_b().
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+> Zijun Hu (18):
+>       mm/mmu_gather: Remove needless return in void API tlb_remove_page()
+>       cpu: Remove needless return in void API suspend_enable_secondary_cpus()
+>       crypto: api - Remove needless return in void API crypto_free_tfm()
+>       crypto: scomp - Remove needless return in void API crypto_scomp_free_ctx()
+>       sysfs: Remove needless return in void API sysfs_enable_ns()
+>       skbuff: Remove needless return in void API consume_skb()
+>       wifi: mac80211: Remove needless return in void API _ieee80211_hw_set()
+>       net: sched: Remove needless return in void API qdisc_watchdog_schedule_ns()
+>       ipv4/igmp: Remove needless return in void API ip_mc_dec_group()
+>       IB/rdmavt: Remove needless return in void API rvt_mod_retry_timer()
+>       ratelimit: Remove needless return in void API ratelimit_default_init()
+>       siox: Remove needless return in void API siox_driver_unregister()
+>       gpiolib: Remove needless return in two void APIs
+>       PM: wakeup: Remove needless return in three void APIs
+>       mfd: db8500-prcmu: Remove needless return in three void APIs
+>       rhashtable: Remove needless return in three void APIs
+>       dma-mapping: Remove needless return in five void APIs
+>       mtd: nand: Do not return void function in void function
+> 
+>  include/asm-generic/tlb.h           |  2 +-
+>  include/crypto/internal/scompress.h |  2 +-
+>  include/linux/cpu.h                 |  2 +-
+>  include/linux/crypto.h              |  2 +-
+>  include/linux/dma-mapping.h         | 12 ++++++------
+>  include/linux/gpio.h                |  4 ++--
+>  include/linux/igmp.h                |  2 +-
+>  include/linux/mfd/dbx500-prcmu.h    |  6 +++---
+>  include/linux/mtd/nand.h            | 18 ++++++++++++------
+>  include/linux/pm_wakeup.h           |  6 +++---
+>  include/linux/ratelimit.h           |  4 ++--
+>  include/linux/rhashtable.h          |  6 +++---
+>  include/linux/siox.h                |  2 +-
+>  include/linux/skbuff.h              |  2 +-
+>  include/linux/sysfs.h               |  2 +-
+>  include/net/mac80211.h              |  2 +-
+>  include/net/pkt_sched.h             |  2 +-
+>  include/rdma/rdmavt_qp.h            |  2 +-
+>  18 files changed, 42 insertions(+), 36 deletions(-)
+> ---
+> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+> change-id: 20250221-rmv_return-f1dc82d492f0
+> 
+> Best regards,
 
-If we are protecting against those cases then linebuf, linebuflen,
-groupsize and ascii should also be stored into tmp variables since they
-are referenced in the loop conditional every iteration.
-At which point the loop becomes too messy IMO.
-Are any other for_each implementations taking these precautions?
-
-Not trying to come off dismissive, I genuinely appreciate all the
-insight, trying to learn more for next time.
-
-> > I tried to avoid declaring new vars in this design because I thought it
-> > would recive pushback due to possible name collision and variable
-> > declaration inside for loop initializer.
->
-> The c std level got upped recently to allow declarations inside loops.
-> Usually for a 'loop iterator' - but I think you needed that to be
-> exposed outsize the loop.
-> (Otherwise you don't need _offset and buf_offset.
->
-
-As in decrementing _len and increasing a _buf var rather than tracking
-offset?
-I don't really care for exposing the offset, during design I figured
-some caller may make use of it but I think it is worth removing to reduce
-the number of arguments.
-
-Thanks again,
-Nick
+Is this something that could be done with a coccinelle script?
 
