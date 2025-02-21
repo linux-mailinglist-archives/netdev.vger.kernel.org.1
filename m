@@ -1,172 +1,350 @@
-Return-Path: <netdev+bounces-168657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CBBBA4007A
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:11:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02C7A4009D
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 377A742452E
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:11:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 895B61895109
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2459325333E;
-	Fri, 21 Feb 2025 20:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FFD253F05;
+	Fri, 21 Feb 2025 20:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUr2Q7a6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mFTVcZbh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C2C2512D7;
-	Fri, 21 Feb 2025 20:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740168684; cv=none; b=RDmF4JsWxO7ZaeBA2mcQPT21Sc+SmxKL/SZAGfKSn2xw7tnOYPfuVBrjTVm62vxYT2M33sjMH4Ka6j/GR1FZlyURCuCOpbd9bqP/ixKSC4tz/aMD1EXZZeu0kys6h+7zk8MqQkSIAcf7BT6Q+SXKeRQA71QjwlNMdVzTr2f8EQo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740168684; c=relaxed/simple;
-	bh=L9Ovkk/RRrfQrsD0lsLa4ubovPWTOd9u2jMfCHwM6us=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ILtYhU18eWZIb7+ppfLF5Wffr23bQpRhN2wMfXjD+rJHwRroW3rPSx5aDhWQQ2RMI+FpXkTXhwVNeni+Hc4KcBC/an8Uw/oZCm+YiC0aymn/6ghDevFzn7VFy6jRsL6xqu/sGh5Z/YeYChCp2ePWvWrzffgOSTZbWSUfb8cupKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUr2Q7a6; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5df07041c24so3660911a12.0;
-        Fri, 21 Feb 2025 12:11:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740168680; x=1740773480; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f6QfXUMWQv5rataWRZ+L/ZQO7XWSTCyFXZSgM/69Zyw=;
-        b=LUr2Q7a61imlfgueIlS/Lo88rJQZ18xCTCy7aN9IbdYtJfZ4P8utqSxU5lUnFn6L+B
-         2HFPYEIVY0GIIaVEAUHB9yZMOZOARPNURO8JixYcfi6N1lOntxMOFZ7a61hDAQLeyWAS
-         TviBWdFhs1+Uk72J+SCVjpP9qxpiriS0GlNX8DXUA1HGQNBcWdfR2FqIegmYsZtpYGLa
-         +dMZADPaZ8FmfUwXoTvR/oT4lwJFB3pbzgf6PvicyYTCs/XN2KmNmE+Oe8KIo3D1Bc5T
-         ADB2KZzmovpJOzTklp+F0+gK6qncvamcAfWb6s3YK86ZMcAVOqdiDUTdV1fudEQ8dxmT
-         euVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740168680; x=1740773480;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f6QfXUMWQv5rataWRZ+L/ZQO7XWSTCyFXZSgM/69Zyw=;
-        b=VcZ4ZrUHy9YA4hXwDsvbGy/NVjZlT+jLMIOX9TZp8ky3+dLrS5OWSmPAxZNTywWHgi
-         i9fv63SsOU9oZRcAqqnzPBDyxVebgUizhH/GTzHi+nlREb2fpS4RGFILIiJuy9jWWbN/
-         hLECs3IwEpSHvOJW2FIPB73SHdfMPOzhltkFNaeyCbFMkC0rOcjRC5byx3zcSWx0uIv9
-         R6rTFzR78OTF61GP3RT+xGbAxIrcSm6RaVKjP5qQBvqwIhaT2xHVdAeNYfS9UaUILcEM
-         HLF0Ec7n3sgQtynViXhjrv9DUNgs8nffuVfIQ+naFRzst+uizVI405TxGJS0bC3fZZN3
-         c1+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVfjiwBbrxHzcKSdtNFKdZ1/HRur2XFirhZNUVf9R3by0N8QzYFvwTl7s0ihYO2XQawrrWTWN8K@vger.kernel.org, AJvYcCWFefAwiluOz7HetxfjLehb7hOYPtKSvNigDfC/2IricX/1YM5fHpNPThtcEo2niOG5yPHfq6lXU1r8vCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyLKUpTKrfEpalcM2s2RbsK1qZxB8vlBVNOAc2UuZv3Tmxb5Mw
-	1A4WtRffm8ER/4rFyQn9eVnowqM++gnJv4RY330jr3tHxaySZR4P
-X-Gm-Gg: ASbGncvUV69m1q27gz141xnarfDcc6j1qjJFgU6t4k4Y+oUCReDY5FVLQLcg4I6+U+U
-	WnNGNJg8R+RzPc+z/FULSpCxeyr9BqYqdypf9IdBDqbsRmrlAebPnun1lx2kywTJODwTfzaPjrt
-	qKpNTSQbsUNTLqgnw+Y5LVTnXf95V/dP2mNdfss9rmmTAcO9MfrtKQ5pCjMejygN2UCuzYCazZo
-	Le7nIuD64oi8vXynYD9rvDPya8715mqyrLRzQg1Jsr0KKtOVdpEZJEISe1+We1VmmFlFZA2Nlk5
-	qjxQSLg5klFqQnLJj2nZE08KvZgIGGE4+Yec/clacGhCd2iDnzs1s/nFPWFT8zS06odnvdfloci
-	ylJ9olmbIJ9rO85vD2Michdnghnt10F/BKozgGANK15uu44VgPuLETPsn9+Tr2ScfRycW5mQyjU
-	WvKRp+2DT3CXK7
-X-Google-Smtp-Source: AGHT+IFNFb+yB0DGuaN58oRk5ysUosLAVKbBemzvkkTtGpLbRvy0yEKVeaIQMhJlEq8RkVd+mesLkA==
-X-Received: by 2002:a17:907:94c8:b0:aa6:6c46:7ca1 with SMTP id a640c23a62f3a-abc0d97e4eemr408476766b.10.1740168680088;
-        Fri, 21 Feb 2025 12:11:20 -0800 (PST)
-Received: from ?IPV6:2a02:3100:b29e:900:9dc2:647a:dfc:6311? (dynamic-2a02-3100-b29e-0900-9dc2-647a-0dfc-6311.310.pool.telefonica.de. [2a02:3100:b29e:900:9dc2:647a:dfc:6311])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-abbbe74100asm756317866b.95.2025.02.21.12.11.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2025 12:11:19 -0800 (PST)
-Message-ID: <eeba10a2-809a-4583-bd35-1f363c824e14@gmail.com>
-Date: Fri, 21 Feb 2025 21:12:09 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEABE25333A;
+	Fri, 21 Feb 2025 20:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740169065; cv=fail; b=snbB1G/B0ojqmfR5TXvjbcISjUn/AbPtBvJo2UrMhF9cGtd9Qkh8abydBSrC+rFTGq+Sa2Gdy6lnTOPywzTIh88g4yE+dEpDbSW0MFeOteAErMK9gy+itrS44XOuF6odDSPEdy5l5A9XcvVpkcL27uE3qMKgS8wb4z6mGx1R7Ww=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740169065; c=relaxed/simple;
+	bh=r5GqJI2/SjCrop/KjA0FMJA/GgJ6rh/ifyJ8svQTB3g=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=gw/uA4HXw9Xg2w4w2y1pkDb3PrjyVRJxIPXKJ1jTqDc53rHAAcA6CJOmuSipzXfIQvtvsKR1mfXAlFgtwz8SJ7NOnGNhiZT/qhyfvJafgFYGPywyEcFnHbgJiBA93dznj1M/0V+r2VNazyYZmLeJshtmZ4VsHbcDhfLlTk1UrwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mFTVcZbh; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740169064; x=1771705064;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=r5GqJI2/SjCrop/KjA0FMJA/GgJ6rh/ifyJ8svQTB3g=;
+  b=mFTVcZbhCAzfNiyWPSK+QLfEJL3o92qhDszkf65b3oNyrXWzz8dGqjPo
+   ZDsVHQVP0eOQkJUoJ3Zdg5ClYUg9cvjE3i9mwZt1z9YqYpTM/4ckrVl6d
+   6zjaS9lIIQGJA849S0Vx7QeT9UQmyi77Ozn27e1FFpOkeDumDpVQ/ip+s
+   ktIdaZHGZ83h+gPdhZEE8uK2TIMkw4s7OjS5LA4sEYrl08JDPx0Xsyvpt
+   2qdSUbeSqa/UXUaWa5jlUouhJdbF+apdY6rXalAYb0hu9n7d/hb0MK9S7
+   mZ49i81Y0GhFZe0RfrFHvJ6/ew+Ypg1MZjEjgHlMz9FTXHEwxLtqmNAKc
+   w==;
+X-CSE-ConnectionGUID: 3NbeAVZvTdeageRU1JJiwg==
+X-CSE-MsgGUID: UFEwOuLeRl6vYylGCAAC4g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="51626331"
+X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
+   d="scan'208";a="51626331"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 12:17:43 -0800
+X-CSE-ConnectionGUID: /iXKlTjSTMazYP1JLRJs6w==
+X-CSE-MsgGUID: tQRWUxbnSoG8rvDPyXh5zw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
+   d="scan'208";a="120092595"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 12:17:43 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 21 Feb 2025 12:17:42 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 21 Feb 2025 12:17:42 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.45) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 21 Feb 2025 12:17:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eY6XQcaprqcwZgeXzAiTKS3KQGMB1Dpic+oXCmtNsp17rneAf7BHeoHfjgwWoMQGloe0SjW5LaU/YWpAp+2TaRhka9RgaLFU9fvuy1VoX75h29FfORRrdbfaykqDwvQ+rxrEjSFZq2yokK+MrurO6l9PtG+pPExGVmV0gBdNqQHDvYvODUwCSCq68NCCa1lysHm+NzWltmfwoag2hGLWRKX78x6kBGW0l5jzduYJEuYz7yjcEaxlAZ7kQerTZyKNYlD5qZoW3dd7sultiDknni1FK5ZywBbXZAtncd0+oq5HNAiF7Leg9ow2bsb4dbSB6gv43PTSkbCyyHuxv+z7VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KvdrY70M98MIZVr6ClGshrf9TodE0gskBhsyucaRD2Y=;
+ b=mxG13qrqMoUi/VXuz3ivkwTufqlKt+vwaC4ZLUfaxVagGKUWWBDFeizjhWGvlGX2h7OL8EXZKa+8gHT+BiSrDkBymDCLpwEPPW9nzvTxLq5HW/yAy4W6AQcNivFfAua+BYCSlV+hygVKFjdEAnV3zdqWfhevB2YtXgNVl0qNKJ+DfTGbnr6wXvRmiFvqOHZdOE52hKWbgLFZM77qv0QTrMALjTxFmTndjEJesKee5MsdsmFnko4tF7YPz3WEVUSDO1x29AEbi3dzU+MgOvoB2FOwZjA/gLMZrKQ0K54A7QW2ZijAJQwYG+FCz2wuzhr7st6w8LsdMldd8sHFEfxiug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ PH8PR11MB8038.namprd11.prod.outlook.com (2603:10b6:510:25e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.17; Fri, 21 Feb
+ 2025 20:17:39 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%3]) with mapi id 15.20.8466.013; Fri, 21 Feb 2025
+ 20:17:39 +0000
+Date: Fri, 21 Feb 2025 21:17:33 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Amery Hung <ameryhung@gmail.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
+	<martin.lau@linux.dev>
+Subject: Re: [PATCH bpf-next 2/3] bpf: add kfunc for skb refcounting
+Message-ID: <Z7jfXXQ06MrlallF@boxer>
+References: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
+ <20250220134503.835224-3-maciej.fijalkowski@intel.com>
+ <0e66379b-3b37-4bbd-9e9d-1f934cb1fdc8@gmail.com>
+ <Z7iUMK1XePvptYc5@boxer>
+ <CAMB2axNJjsytoFrYF=PdsOOWE-bbficZa-54C9YHT5JFu5PFBQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMB2axNJjsytoFrYF=PdsOOWE-bbficZa-54C9YHT5JFu5PFBQ@mail.gmail.com>
+X-ClientProxiedBy: VI1PR04CA0105.eurprd04.prod.outlook.com
+ (2603:10a6:803:64::40) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] r8169: disable RTL8126 ZRX-DC timeout
-To: Bjorn Helgaas <helgaas@kernel.org>, ChunHao Lin <hau@realtek.com>
-Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250221200132.GA357821@bhelgaas>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20250221200132.GA357821@bhelgaas>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH8PR11MB8038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61cd73aa-3a51-41de-41d7-08dd52b4ca20
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NmExL1gzWk5yYlRRYVRYTXVTTE5iK0EyTElwZE5DYmRFWE4yVXE4ckR0bGRI?=
+ =?utf-8?B?Q2FnamhhQ3Jnd3pGZVpYNCthdXBSN05MMnduaXZWWVVERFUrY2VlNHBNdERL?=
+ =?utf-8?B?QW1sOTV0M1R4c1NwR0pwR1pWQ1VPTkZNWEJ2WkVNRVN3S2Z4V2pvTEsxQUtI?=
+ =?utf-8?B?Q1JuL1NPamRHSlpPL0VhdDBrZnhqb0FDaDA0ek9kSjJscUNMSmpqV0ppRVll?=
+ =?utf-8?B?VHlEZnZYVDB0THZMdndXbUhSLzJQUTIzUGhEcmJJN1RFbHgzR0FjMkRiT2pD?=
+ =?utf-8?B?UFV5ZUFmRmo2Q204S3dTajc3N2R2VFJDQS92ZnNWK1h2N2NhWHJPQ3BSaGYy?=
+ =?utf-8?B?SXI5ejE4Sjdxb3F4eUsxK0ZtZXMyT2Q3OS84b1VSVnV4cTRRRGltWnB4WDZP?=
+ =?utf-8?B?L09FaE1oV1FOdTZkZWpESWs2bXBSU0xkZk1PckU0RW9FVEZVUHdRTE5POGY0?=
+ =?utf-8?B?c2dSWWNCRjlmejRMZGZFNEdXMEFpU2lUVWxtcVFMQXAwOUEyUGN5V2VIUFBL?=
+ =?utf-8?B?R2gybnViRkRtVmZsL2ZiTnczY0l4WVJkTm93UytHd3FTbVFjcmhBS3UrWk9w?=
+ =?utf-8?B?a3prYThyZG1LVmdzOFlGZjFaVm5UaktRaElZWUs3OHY2Qit6TTJUZkxXWjhY?=
+ =?utf-8?B?TmFYdTh5RThwMFhLYzJOeUJXYTcxaXRVYnB5Q3RDUXkzbTJxM3d6M0taSlVO?=
+ =?utf-8?B?a2hzdDcwcjJONFZVN0ZJdEFkRkdleVFsQlBjbTVHN3FvbnR4SzIvQTB4N3J2?=
+ =?utf-8?B?WVMxa3F3T04rRk5XMlh6V0FMck1ocTNHcHpVS1NCK2tFMGU1V3RpVVRHNk1T?=
+ =?utf-8?B?QjlTVzRMY2NLdzNyRWc0NWZSWGFZZlVxd09ycTduN1FTV1RmZXNzQmNBWmh2?=
+ =?utf-8?B?Mk5ocTdMbFUrQnlGaHF5TTNVWWRieHlMdXJPNlRWYjhjVDg4WTByQ1JEbS80?=
+ =?utf-8?B?KzJtRlYzbE9UdUV6WFJNbTRxMVBGZFBpYkcwTGxsSGd5ZHk4V3BJaWlSWTVl?=
+ =?utf-8?B?dGRwbDVnUGhRZk14dWk1ajE1eFRsN2pXcm5NYTZ0aEg1SnVkdzJJU1lBaWRV?=
+ =?utf-8?B?Nm5KN0xOaEFUVCtOU1o5eEV6bUVtdHluNEEvSzJ4RXFPR1dtV2NsTStRZm5C?=
+ =?utf-8?B?OXBrMCtwZTBSWFhqNG1IdmZCVkVXb3l5c0dmMmVQQUxSYWQzUURzaGdOOFYz?=
+ =?utf-8?B?VVc4OWhqT1pQSVY3L05KNFBrNDZmbDllZUhCSk9MT0R3eGFXYW9XcURpTndl?=
+ =?utf-8?B?eU8zVGZyMjhZdlFhK3krTnEyaG5NdElGRzBMRjhpNVlyQ2dtK083SFRZc1pZ?=
+ =?utf-8?B?MEgrYVAvbmtjcUVldS9RL0RCdWkrRnZ3c0VxODd1dVlxQ3U0MFRRQ0QycW55?=
+ =?utf-8?B?amp2REZha3pRczd0Z2pkRTRvZWxPV2tuMWxEMzhqeDNtM2Y3bXI1Vkwxcldw?=
+ =?utf-8?B?YmpsWDUyYjZUYlc3QXZFZHcwdEc4bVdJTUc2ekd4SlhqUnJOazJSbU1jY0Fq?=
+ =?utf-8?B?d0dPTDNodm9EdVV5QVgvUkxtd0tabVFBeVBWbGprTWdCWVZPNVZ1STVKM3ZB?=
+ =?utf-8?B?TnlDQ3ZpL1hpS084NlRrdy9DcDZtYzVLYW8xZGFuaDNuKzA0K2ZocERCc3hz?=
+ =?utf-8?B?Rm43Q3JFSlQ4ZFFJN2UvWk0wWHEzT2ZMekpQY3VQdVk2SUdOcEcxSWR4Zi84?=
+ =?utf-8?B?aSt4a1NxMVdmTUlvRU5uanBDOGVjVVQ4Q1NDN242M2dGR05JOXNXdGNlSTRu?=
+ =?utf-8?B?TENqS292RWQ5Y2xPSnlTbDZMWkN4czE1MjdqRHFDS09jcG0wazd3RFM3d2VM?=
+ =?utf-8?B?bHd6aXlrMWJLbHFGUFNlZXdMVXI4d0NyWGloR1gwNHB6ZkJSOHNzQ0RGaml6?=
+ =?utf-8?Q?dPzBkg5sh1Mm7?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WUExYlFEaVdPMEVOT0huYTY2ZDBUaTJkR3FYYkFFcHNWTVZvU0hEUzkxbHFo?=
+ =?utf-8?B?bkJjVytiR1p2cExLUllvZXhQcGJhMXFRMVQ2Q2VDTGVnekkvSDR0TDV3SEdm?=
+ =?utf-8?B?amY0aS9SNUhXYUlhZ0R1dlZvUGhPS3Q3Tzc4SmZyR0VXeWNEc3gzTXJqYXIr?=
+ =?utf-8?B?L1lFZmUzUERza1lCamZieGc4UXZkTWgzN045SDdqZWlvNmxaZkRic1FNZkd5?=
+ =?utf-8?B?b3JvMk5BSDZ1b0VGWmZiYXJJaGdFRFM4NzN4dHp6dTUwNHhCMm5IaDYrWFFp?=
+ =?utf-8?B?VWpicFFsUE9HanNwTkJlRitIRnZvSnZ3aXFWNjhRVzdiMktJeWNUQThKT2k2?=
+ =?utf-8?B?TkJaaUI2T2pOVjg1bitHOWdkVzIwaEE2R2lRcVVRR2w1TC9zdHlFQ003aFlD?=
+ =?utf-8?B?WHBTRDBwc0l6aWdzNk9LTGxEbS9kTGFIekoyWmZGYmgyazBtcVJ3UXJ1cE9B?=
+ =?utf-8?B?R200azFzWmVlOGRxQ1FmdjlyblNhdTZnekZyS1Y0YzIwL1FVQ3MrZGxlWEdP?=
+ =?utf-8?B?VmJFVHpML3dobE1VelZEZk5UR1RLZEZLMWptU0xKcnhpa1V6cHg4VW1HVlA2?=
+ =?utf-8?B?ZnNFTFBNTmdpU0swb01EandiVDhlQ0ZDYWg1OHV4ZU91UFJVSlB1ZnNWVHFa?=
+ =?utf-8?B?TVNKSHRGdmloc0FBRUx1VEhSSklzQ3BaS01XVlBya0hraUtwaFU4N2o3eFRq?=
+ =?utf-8?B?OEUxSVJlZUJLWWtvbGtMd1RqZ1VUM2NGVSs3ZktyU3g2TnlHUG9rTEVJcEtv?=
+ =?utf-8?B?Mk0yaEthZE1tV2pPTSs4bEQ2YzZSQUpyMk9qNDkvUFJlMWQzOWIxSzhMcjlS?=
+ =?utf-8?B?TzVKMUFQZHRlZGZUcWsxWnFXSHJTdVQvZTFzT1ZaOWFVMEIza2szb3lZN2Vy?=
+ =?utf-8?B?OEU2WTMvSS8zY2JyREUxRmI2aUFKNHdHVTlrdkl6amtlbXJ5QmVsb2RoSVNZ?=
+ =?utf-8?B?WUhPVHJhdlI2U3pEUzJlUnhHVktCTzBKaFNSZFcwdVo1eVpDUHFETXdETGJ1?=
+ =?utf-8?B?aW5NdHBHUkxGc1ZPOVdYcjNKNGt2ZUNwelU5RmtKcTZDc1hRL09xYnlOV0NE?=
+ =?utf-8?B?Qm4xajhud0ZRZmxTbThHRUpIUFpBQ2ZQcUlZMkoxTThFZzFhcDJCbkhaemw4?=
+ =?utf-8?B?QnYzRm9PcXAvYjkyd2Z0Y3VGV084ZVI3elpudS8ycDFXWHVPR3pmd2FCS2Y1?=
+ =?utf-8?B?MzlrT0dib2Iybm1PRWRUOXZ1Mzg1SWd5cDBuRDFVV3BUeDVkUyt2c1VHbXJT?=
+ =?utf-8?B?eG01ekJsRmVLWkVMRW9vTWFzMVdRdTR0Unczc3N5QWczbUtSOGcxdjFlZEhU?=
+ =?utf-8?B?c29PMEdab2tDekxNeWM3SmE4TWMwVDRXa3FVbUhVQ0tGQ1c2d2tvbytjNmR3?=
+ =?utf-8?B?ODJzZHpLM1k5SzhRQlFSWlZaVnY3ODN5K0ZZYW4xWXc3QkcyRGtGL0ZrSU45?=
+ =?utf-8?B?NEpwTXZ1dnFrYUlRaE1lMmxMcS9Sc3dYVllnaStpMTN2cEdyU25DdzVZL2w1?=
+ =?utf-8?B?aHJxQ3pFbnM0cnpkWDAySlZmdlFQblFyd0FqRW9PSUN6TGx6WTNQU3l6cUx3?=
+ =?utf-8?B?Tzc0WXphejU5RWM2VXk5WlhWMHl2ajFGT3Fpd2dOZkxqSUtLNVpJcXJYSTl1?=
+ =?utf-8?B?bEpITTZxWml5Q3pLcUsrdDlIMXZ0Q0pkMU1sYlBVZml0alIycTY5QVRoSjdR?=
+ =?utf-8?B?VFpqTjE5b0RyMk0rYks5NzBqVUMvUExYc094MGRYLytTdDUrOGp3elBBQlJI?=
+ =?utf-8?B?b3RSejJHbENXMjJ0U1hvRGQvUEorekVNNUpRdFl2ZG50Ty9OMWw0Mm01VkpN?=
+ =?utf-8?B?ODZQT0p5WldJK0sxRzFKLzk2a20zeHdzenJoZHFvbG5LTkZ5dUlDMTcxd0Js?=
+ =?utf-8?B?S1gvMlRYREJES3U3VTBCVHlZMVRlVk5INXRWMlBpbEVDcHk2Qk0raEppTUlk?=
+ =?utf-8?B?bG5PcTAyTXE2dGpkV0ErTUsvTnhyM0htM0JIblhiVmZMV3M0WThMZFdKUUcy?=
+ =?utf-8?B?QkNwLzBmOHZiTkt4NG1QWnZncDRxdllFTk1GUUhyaFFEdWZxTkw4cDg5UHBF?=
+ =?utf-8?B?MVFweldvdVl5VzRYdUxVR2dwTy9zUHNmLzRjVFNzUjZBcWFmWThBdzVlT2k5?=
+ =?utf-8?B?OGhDUHFHSmYyclVpK0pEODRoeWg1QnVvUlQ5RU5LekdSQnJ0YUs5TjU5RWlJ?=
+ =?utf-8?B?eFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61cd73aa-3a51-41de-41d7-08dd52b4ca20
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2025 20:17:39.6321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MYQXZiXArLYbleNBPX7/eZGNMb5EPYKicJYYWsZ0AfiucUwTtbg+8bw+0qYfMVCm6lBd3ZunrYlGGLVK2LHVDB0ah59Bi8WKOmg7+Py+Mw4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8038
+X-OriginatorOrg: intel.com
 
-On 21.02.2025 21:01, Bjorn Helgaas wrote:
-> On Fri, Feb 21, 2025 at 03:18:28PM +0800, ChunHao Lin wrote:
->> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
->> device will exit L1 substate every 100ms. Disable it for saving more power
->> in L1 substate.
+On Fri, Feb 21, 2025 at 11:11:27AM -0800, Amery Hung wrote:
+> On Fri, Feb 21, 2025 at 6:57 AM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > On Thu, Feb 20, 2025 at 03:25:03PM -0800, Amery Hung wrote:
+> > >
+> > >
+> > > On 2/20/2025 5:45 AM, Maciej Fijalkowski wrote:
+> > > > These have been mostly taken from Amery Hung's work related to bpf qdisc
+> > > > implementation. bpf_skb_{acquire,release}() are for increment/decrement
+> > > > sk_buff::users whereas bpf_skb_destroy() is called for map entries that
+> > > > have not been released and map is being wiped out from system.
+> > > >
+> > > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > > > ---
+> > > >   net/core/filter.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++
+> > > >   1 file changed, 62 insertions(+)
+> > > >
+> > > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > > index 2ec162dd83c4..9bd2701be088 100644
+> > > > --- a/net/core/filter.c
+> > > > +++ b/net/core/filter.c
+> > > > @@ -12064,6 +12064,56 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
+> > > >   __bpf_kfunc_end_defs();
+> > > > +__diag_push();
+> > > > +__diag_ignore_all("-Wmissing-prototypes",
+> > > > +             "Global functions as their definitions will be in vmlinux BTF");
+> > > > +
+> > > > +/* bpf_skb_acquire - Acquire a reference to an skb. An skb acquired by this
+> > > > + * kfunc which is not stored in a map as a kptr, must be released by calling
+> > > > + * bpf_skb_release().
+> > > > + * @skb: The skb on which a reference is being acquired.
+> > > > + */
+> > > > +__bpf_kfunc struct sk_buff *bpf_skb_acquire(struct sk_buff *skb)
+> > > > +{
+> > > > +   if (refcount_inc_not_zero(&skb->users))
+> > > > +           return skb;
+> > > > +   return NULL;
+> > > > +}
+> > > > +
+> > > > +/* bpf_skb_release - Release the reference acquired on an skb.
+> > > > + * @skb: The skb on which a reference is being released.
+> > > > + */
+> > > > +__bpf_kfunc void bpf_skb_release(struct sk_buff *skb)
+> > > > +{
+> > > > +   skb_unref(skb);
+> > > > +}
+> > > > +
+> > > > +/* bpf_skb_destroy - Release an skb reference acquired and exchanged into
+> > > > + * an allocated object or a map.
+> > > > + * @skb: The skb on which a reference is being released.
+> > > > + */
+> > > > +__bpf_kfunc void bpf_skb_destroy(struct sk_buff *skb)
+> > > > +{
+> > > > +   (void)skb_unref(skb);
+> > > > +   consume_skb(skb);
+> > > > +}
+> > > > +
+> > > > +__diag_pop();
+> > > > +
+> > > > +BTF_KFUNCS_START(skb_kfunc_btf_ids)
+> > > > +BTF_ID_FLAGS(func, bpf_skb_acquire, KF_ACQUIRE | KF_RET_NULL)
+> > > > +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
+> > > > +BTF_KFUNCS_END(skb_kfunc_btf_ids)
+> > > > +
+> > > > +static const struct btf_kfunc_id_set skb_kfunc_set = {
+> > > > +   .owner = THIS_MODULE,
+> > > > +   .set   = &skb_kfunc_btf_ids,
+> > > > +};
+> > > > +
+> > > > +BTF_ID_LIST(skb_kfunc_dtor_ids)
+> > > > +BTF_ID(struct, sk_buff)
+> > > > +BTF_ID_FLAGS(func, bpf_skb_destroy, KF_RELEASE)
+> > > > +
+> > > >   int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> > > >                            struct bpf_dynptr *ptr__uninit)
+> > > >   {
+> > > > @@ -12117,6 +12167,13 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_tcp_reqsk = {
+> > > >   static int __init bpf_kfunc_init(void)
+> > > >   {
+> > > > +   const struct btf_id_dtor_kfunc skb_kfunc_dtors[] = {
+> > > > +           {
+> > > > +                   .btf_id       = skb_kfunc_dtor_ids[0],
+> > > > +                   .kfunc_btf_id = skb_kfunc_dtor_ids[1]
+> > > > +           },
+> > > > +   };
+> > > > +
+> > > >     int ret;
+> > > >     ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_skb);
+> > > > @@ -12133,6 +12190,11 @@ static int __init bpf_kfunc_init(void)
+> > > >     ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
+> > > >     ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> > > >                                            &bpf_kfunc_set_sock_addr);
+> > > > +   ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &skb_kfunc_set);
+> > > > +
+> > > > +   ret = ret ?: register_btf_id_dtor_kfuncs(skb_kfunc_dtors,
+> > > > +                                            ARRAY_SIZE(skb_kfunc_dtors),
+> > > > +                                            THIS_MODULE);
+> > >
+> > > I think we will need to deal with two versions of skb dtors here. Both qdisc
+> > > and cls will register dtor associated for skb. The qdisc one just call
+> > > kfree_skb(). While only one can exist for a specific btf id in the kernel if
+> > > I understand correctly. Is it possible to have one that work
+> > > for both use cases?
+> >
+> > Looking at the current code it seems bpf_find_btf_id() (which
+> > btf_parse_kptr() calls) will go through modules and return the first match
+> > against sk_buff btf but that's currently a wild guess from my side. So
+> > your concern stands as we have no mechanism that would distinguish the
+> > dtors for same btf id.
+> >
+> > I would have to take a deeper look at btf_parse_kptr() and find some way
+> > to associate dtor with its module during registering and then use it
+> > within btf_find_dtor_kfunc(). Would this be sufficient?
+> >
 > 
-> s/dose/does/
-> 
-> Is ZRX-DC a PCIe spec?  A Google search suggests that it might not be
-> completely Realtek-specific?
-> 
-ZRX-DC is the receiver DC impedance as specified in the PCIe Base Specification.
-From what I've found after a quick search ASPM restrictions apply if this impedance
-isn't in the range 40-60 ohm.
+> That might not be enough. Ultimately, if the user configures both
+> modules to be built-in, then there is no way to tell where a trusted
+> skb kptr in a bpf program is from.
 
->> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
->> +{
->> +	struct pci_dev *pdev = tp->pci_dev;
->> +	u8 val;
->> +
->> +	if (pdev->cfg_size > 0x0890 &&
->> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
->> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
-> 
-> Is this a standard PCIe extended capability?  If so, it would be nice
-> to search for it with pci_find_ext_capability() and use standard
-> #defines.
-> 
-> Bjorn
+Am I missing something or how are you going to use the kfuncs that are
+required for loading skb onto map as kptr without loaded module? Dtors are
+owned by same module as corresponding acquire/release kfuncs.
 
+> 
+> Two possible ways to solve this:
+> 
+> 1. Make the dtor be able to tell whether the skb is from qdisc or cls.
+> Since we are both in the TC layer, maybe we can use skb->cb for this?
+> 
+> 2. Associate KF_ACQUIRE kfuncs with the corresponding KF_RELEASE
+> kfuncs somehow. Carry this additional information as the kptr
+> propagates in the bpf world so that we know which dtor to call. This
+> seems to be overly complicated.
+> 
+> 
+> > >
+> > > >     return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> > > >   }
+> > > >   late_initcall(bpf_kfunc_init);
+> > >
 
