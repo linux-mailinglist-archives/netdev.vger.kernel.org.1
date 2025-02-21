@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-168669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96157A40201
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:24:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB45A401C8
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:07:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7862B19C7BF9
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:24:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 435F23A1116
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08398253F19;
-	Fri, 21 Feb 2025 21:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C12D253F3B;
+	Fri, 21 Feb 2025 21:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="bIXj/gp0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHtzlPiN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx12lb.world4you.com (mx12lb.world4you.com [81.19.149.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6BE253F0E
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 21:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD6C253B64;
+	Fri, 21 Feb 2025 21:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740173079; cv=none; b=FwzYIf3vHjB6d5fzPPSV1pMUYRiWmlXDnJj7Ifys8GE0R0+hkWTl3lEE2TTejDGecP+ja4h9u2NzppYItueq4aJtuBKMKOUgbbIWcrdMfTQo2sjhAoSl3mJN/ltYS/fM/BIWyMV47p4dZJz3iZCMeztzR7zO3V/oKr9MJH0sRIE=
+	t=1740171943; cv=none; b=fsr3OZ623OIF/Hgtw8yTGkTZ0l+sOGD3DLobtVpGTUa2EIp1fFRg79CHZHKWOSm/lDH08sTw0w+vTbggymzEEDe4GVER7nbtt8uUC0XNBKBjfoFO0cMr56aFnoLvvnQNGgf6qzjODqAVfqbseZy3W9mTRYDuoB1Tep2OxCz82gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740173079; c=relaxed/simple;
-	bh=NqsMXbYlaesKRuzTxDpMQUhbx1hL2nMbYU36SZARM64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LHyZ3encyWNwbjYFWgA6xiMBuvqVUtn5eMc2ctkPAgjpUYQgOdFBPnqseK5+zToc+SrCHTDl0hF+b4+fR6ZU96QWgOVn8UtgtkDZIpCvLDIx0egXePmlGp57e9DglMxISSKO927aQdhrlxxOFrSkVbR8FDLR/7nXFDscoI/Oz28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=bIXj/gp0; arc=none smtp.client-ip=81.19.149.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YK0Emar82nUxaVPtA2wf05uRvf2pJ1iTf4fDEh4cn/8=; b=bIXj/gp0TcHVVd+n7Y/tqYlOYD
-	bSDfKiKwL4xOggnSeAPDzeTaI0QH8OEfhpBlYusc1spk1VWjGJUMobrPspCYMQJTY3+SSrtZWeL3M
-	pQncHAEMBtFkZig1EtsSq8wSxcLnmvYTyE8rsSjLHMd5bsMJIur/aL0i2caxGfKjlPJ0=;
-Received: from [88.117.55.1] (helo=[10.0.0.160])
-	by mx12lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tlZtZ-000000001MY-1cTG;
-	Fri, 21 Feb 2025 21:45:13 +0100
-Message-ID: <ed721a10-d804-4c9b-86b1-a1fb77b77c4f@engleder-embedded.com>
-Date: Fri, 21 Feb 2025 21:45:12 +0100
+	s=arc-20240116; t=1740171943; c=relaxed/simple;
+	bh=0bZ69u0J8mKNwNBMFzORl5doQm4ibw8K9+y0rI9OSeA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZnY1KVZVYXTXGUy1Mpq2MlxyKOq6CNKZ+r3R1hEq/hN5s7SeymBGq1g7cqNSelPTZn5tyi7qj3UObI55SdzyRUDu0QYjN2v1VZ6kmjvKXEyA55COcJk0jX2IGuKaXH3mrcmf99ej3lcNBd1j5EAx20C0fej2e1iDTPwd3QdX1Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHtzlPiN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18900C4CED6;
+	Fri, 21 Feb 2025 21:05:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740171942;
+	bh=0bZ69u0J8mKNwNBMFzORl5doQm4ibw8K9+y0rI9OSeA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uHtzlPiNaCNGbBeHlrnCyBYkMLL0fhqY4i89dvWzyIWRrGpmeSOvhEAby294S14fO
+	 uReXEouIfA7fqHf3k8CZQDe3xBPlDQ2lth1PGpyvj4DkI/lTuyRBibdd4gfKtw38pX
+	 4PY89AI/o7yVuu0VDLKtpsrePslJsTApVCEt81FAHz8UZmAvUVr27bYr8jp2YGO/kf
+	 S4nk0AkWbdHJiSHB9BWe3OKVA/D4pPJUw0xyePGwbW5ifIgNS88T4PnEsl3pdipQy5
+	 MsMo7SYOSVRY3hQiyoDWBaJzkDXOqHOx0aXEJsePYUixoVDYiTDQ0OUKBgX1zXutU3
+	 ibH94VL7esm+Q==
+Date: Fri, 21 Feb 2025 15:05:40 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: andrew+netdev@lunn.ch, linux-mips@vger.kernel.org,
+	tsbogend@alpha.franken.de, edumazet@google.com, conor+dt@kernel.org,
+	krzk+dt@kernel.org, devicetree@vger.kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, lee@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net
+Subject: Re: [RESEND PATCH net-next 1/5] dt-bindings: net: Move
+ realtek,rtl9301-switch to net
+Message-ID: <174017193985.80495.3415505860680168485.robh@kernel.org>
+References: <20250218195216.1034220-1-chris.packham@alliedtelesis.co.nz>
+ <20250218195216.1034220-2-chris.packham@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 6/8] net: selftests: Support selftest sets
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>
-References: <20250219194213.10448-1-gerhard@engleder-embedded.com>
- <20250219194213.10448-7-gerhard@engleder-embedded.com>
- <20250220181042.0abe4ea0@kernel.org>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20250220181042.0abe4ea0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218195216.1034220-2-chris.packham@alliedtelesis.co.nz>
 
 
-
-On 21.02.25 03:10, Jakub Kicinski wrote:
-> On Wed, 19 Feb 2025 20:42:11 +0100 Gerhard Engleder wrote:
->> + * @NET_SELFTEST_CARRIER: Loopback tests based on carrier speed
->> + */
->> +enum net_selftest_set {
->> +	NET_TEST_LOOPBACK_CARRIER = 0,
+On Wed, 19 Feb 2025 08:52:12 +1300, Chris Packham wrote:
+> Initially realtek,rtl9301-switch was placed under mfd/ because it had
+> some non-switch related blocks (specifically i2c and reset) but with a
+> bit more review it has become apparent that this was wrong and the
+> binding should live under net/.
 > 
-> names doesn't match
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> ---
+> 
+> Notes:
+>     It would probably be simplest for this to come in via net-next with an
+>     ack from Lee.
+> 
+>  .../bindings/{mfd => net}/realtek,rtl9301-switch.yaml           | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>  rename Documentation/devicetree/bindings/{mfd => net}/realtek,rtl9301-switch.yaml (97%)
+> 
 
-I will align the naming.
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
-Gerhard
 
