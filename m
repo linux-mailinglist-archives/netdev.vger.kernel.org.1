@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-168435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C155A3F097
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:40:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA28A3F0E4
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:49:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E60257AB37B
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:39:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFB9E19C80C6
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432C5205518;
-	Fri, 21 Feb 2025 09:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91828209F47;
+	Fri, 21 Feb 2025 09:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MtaTkVs2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dl0phkgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA33205511
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC6F204087
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740130755; cv=none; b=CuXg0DjgJcRC/zZ2AihUq89RHe8JuPgRt8PNvCFV27xU3ndJtOpqb6D0yiqSk7s+sfJ6+RDeSldolT6w0YTRGomihlQAAs8kfZll2qfh0FPwMEK78C3nOfbBf820BpSmPDJF+LUyx/f2r+6dBrxED8ZXUVIXRJJRCDKWoEiWEe4=
+	t=1740131012; cv=none; b=XXy81jIIBwRSw5egjM+iC9ixu2UMhU3uXq+i2J+j1YRe64ioEV/uez3Qxz5uTlt5eZpve4Y/sFtV9HwZYtdlz6uT109xjnoyaR8ko5KaRiZyHdINKPDwXnJQooswb0jED3nY2cRs0hT5+X3X1Qf67IMYw+A5NkUnKiy08mq5sSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740130755; c=relaxed/simple;
-	bh=ypHSjeMhvEL6lzT/9gZtGZLdCaUojf6hRPWXsKHq6cA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WNSXqm+JaGXvMN+DPDThSBMjTo0lGz/c2SukgBLwhxTtijCkNPSNPuJ2rikhUJwXe+0O/ctCXf6r0vcwo7VoxmUedO69XRYQk+9JzIevqLSuWbkUItIna1/t4gs7NNmfBUFAGhjMfnYY11s5PZEpLBeDitIG032J8g+wuUaGMuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MtaTkVs2; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1740131012; c=relaxed/simple;
+	bh=522MooTYpYrtzHnLXBjlkvV0sFdSBCEqCsgZPGxH6BI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PohcxtZkCYr4VaynAzlUp5+R8effILpQBUTjuhS1vaw/7FfMFr3TtSeuJR352Du5C8znW7RA14GvK0bFic/q7aZgeGVQWs2Dxk/GZPeAwOLhN7E/94w5BZzXOrqAP5OHA3+jKCL4LEdoEfFJJS3FB9WB+1qZuWVBIWjVsjs+rLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dl0phkgo; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740130753; x=1771666753;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ypHSjeMhvEL6lzT/9gZtGZLdCaUojf6hRPWXsKHq6cA=;
-  b=MtaTkVs2XTGkFiJQ2GLjGnchnSppr0b1CGZ+gDzEmQ4twh/7UFVcz2GM
-   TWsh8P70ad0KjwdM7bN+L9zPjxsBOjHZFBaBJGJEg4/O0my1VchvEOukp
-   Mc9Fql3YND2rA4Xp7N8ywQJtNvjQZQqNARVh4HcPP/YPsqnwj/w0rGwD7
-   knDX7MDlJ1HYxJWdpgiu7zyM9zJLSL6RmqD9vRL9KrTnhZbGPEgDzp3Ri
-   mFU11BgkUX60kj/imrHm450yDWaOZVYcm5v5ZSmfzPGgsiW5Go2sj3yPH
-   5S929ppexpIZemUWe6d9EQtnzIrarAbdqsDoLPgH64gzG83sCWACufe8V
-   A==;
-X-CSE-ConnectionGUID: Bo7G0kxmTe6iDX/yVaOxEA==
-X-CSE-MsgGUID: /dN/9ZMnTcm/WA3YnF8qcw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="52374633"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="52374633"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 01:39:12 -0800
-X-CSE-ConnectionGUID: sCJgPV6FSh+R2T0LS+EcWA==
-X-CSE-MsgGUID: BNtqYb15R5CPtswph0+OVw==
-X-ExtLoop1: 1
+  t=1740131010; x=1771667010;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=522MooTYpYrtzHnLXBjlkvV0sFdSBCEqCsgZPGxH6BI=;
+  b=Dl0phkgotja1bN7cME+xsycIMuf8Rm39Fl5qKrzqoOlsHYyi0ZtTKAYp
+   PjZljXjywibHOcgCKhz6E0nnwUVbspZmkfGBlcs4m/e01WXgQNmdQJqN3
+   kHnAww1k9zoJs3ATbongjVCLtD1TgzLaTlrSyWKmHmslACU0ixl2ivXRL
+   LOTJdob20wfHw75nGfTbsBC/65TGncy8aPXRP4wi46i58jiWTY1pBa8KR
+   Wgt+AG1hl/i+a6HcUmrlqcxnJ8e938UKkegGo7Bi+t16rlzfmfKgvSN1u
+   gulYuooMsE7hFmCSEjStHVOiVW2Dme9jIx5wBgPxYrNbb3OBhaEpnuYUl
+   g==;
+X-CSE-ConnectionGUID: asgZdGDFRnOi3ZkSsvSA/A==
+X-CSE-MsgGUID: UH5ieAqNR5aO+QO4IeCj1g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="51588302"
 X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
-   d="scan'208";a="115276416"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.60.175]) ([10.247.60.175])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 01:39:09 -0800
-Message-ID: <d831ac5e-96b9-47de-93ed-3d4f10a8b2aa@linux.intel.com>
-Date: Fri, 21 Feb 2025 17:39:06 +0800
+   d="scan'208";a="51588302"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 01:43:30 -0800
+X-CSE-ConnectionGUID: UZ8654HgQxyk8hBCbgBuUg==
+X-CSE-MsgGUID: gWQjtqNiRPG6ZbGjteWRzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="146214739"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by fmviesa001.fm.intel.com with ESMTP; 21 Feb 2025 01:43:28 -0800
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Milena Olech <milena.olech@intel.com>
+Subject: [PATCH iwl-net v1] ice: fix lane number calculation
+Date: Fri, 21 Feb 2025 10:39:49 +0100
+Message-Id: <20250221093949.2436728-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next] igc: Change Tx mode for MQPRIO offloading
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20250217-igc_mqprio_tx_mode-v1-1-3a402fe1f326@linutronix.de>
- <6ff37238-ff0e-43c9-a88d-1258fd4ce7ef@linux.intel.com>
- <87wmdj8ydu.fsf@kurt.kurt.home>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <87wmdj8ydu.fsf@kurt.kurt.home>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+E82X adapters do not have sequential IDs, lane number is PF ID.
 
->>> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
->>> index 1e44374ca1ffbb86e9893266c590f318984ef574..6e4582de9602db2c6667f1736cc2acaa4d4b5201 100644
->>> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
->>> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
->>> @@ -47,7 +47,7 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
->>>    		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
->>>    
->>>    	if (adapter->strict_priority_enable)
->>> -		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
->>> +		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
->>>    
->>>    	return new_flags;
->>>    }
->>
->> IGC_FLAG_TSN_QBV_ENABLED is set multiple times in different lines:
->>
->> 	if (adapter->taprio_offload_enable)
->> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
->>
->> 	if (is_any_launchtime(adapter))
->> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
->>
->> 	if (is_cbs_enabled(adapter))
->> 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
->>
->> 	if (adapter->strict_priority_enable)
->> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
->>
->> 	return new_flags;
->> }
->>
->> We can combine the conditions to simplify:
->> 	if (adapter->taprio_offload_enable ||
->>               is_any_launchtime(adapter) ||
->>               adapter->strict_priority_enable)
->> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
-> 
-> Sure.
-> 
-> Should I send a v2 or do you want to carry this patch in your next fpe
-> series?
+Add check for ICE_MAC_GENERIC and skip checking port options.
 
-I think you can go ahead with v2. It shouldn’t conflict much with the next 
-fpe series, and if my future series gets stalled, at least yours won’t be 
-affected.
+Also, adjust logical port number for specific E825 device with external
+PHY support (PCI device id 0x579F). For this particular device,
+with 2x25G (PHY0) and 2x10G (PHY1) port configuration, modification of
+pf_id -> lane_number mapping is required. PF IDs on the 2nd PHY start
+from 4 in such scenario. Otherwise, the lane number cannot be
+determined correctly, leading to PTP init errors during PF initialization.
+
+Fixes: 258f5f9058159 ("ice: Add correct PHY lane assignment")
+Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Milena Olech <milena.olech@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 7a2a2e8da8fa..83b72414760a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -4171,6 +4171,15 @@ int ice_get_phy_lane_number(struct ice_hw *hw)
+ 	unsigned int lane;
+ 	int err;
+ 
++	/* E82X does not have sequential IDs, lane number is PF ID.
++	 * For E825 device, the exception is the variant with external
++	 * PHY (0x579F), in which there is also 1:1 pf_id -> lane_number
++	 * mapping.
++	 */
++	if (hw->mac_type == ICE_MAC_GENERIC ||
++	    hw->device_id == ICE_DEV_ID_E825C_SGMII)
++		return hw->pf_id;
++
+ 	options = kcalloc(ICE_AQC_PORT_OPT_MAX, sizeof(*options), GFP_KERNEL);
+ 	if (!options)
+ 		return -ENOMEM;
+
+base-commit: c4813820042d447c687cf4f1d5e240740638e586
+-- 
+2.39.3
+
 
