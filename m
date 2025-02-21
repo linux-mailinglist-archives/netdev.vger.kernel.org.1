@@ -1,103 +1,134 @@
-Return-Path: <netdev+bounces-168434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160DFA3F08C
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:38:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C155A3F097
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE8F189D777
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:38:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E60257AB37B
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9914C20459E;
-	Fri, 21 Feb 2025 09:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432C5205518;
+	Fri, 21 Feb 2025 09:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MtaTkVs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D082040BF;
-	Fri, 21 Feb 2025 09:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA33205511
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740130673; cv=none; b=FpAK4BgTaTULp3aBrjyNjnrd5Aw8erDTQ5bgnflNcTF2YI+u7gpXSnbWMOcwW287uNMJT6ijMoBH167hGC/w3bxOaSDEKFDQaoxBYeBHDyQm3PHiyvVQ81jpq+7Tr1LqSIr5rR215Fz7uG0mQXodjLto1o0zL/e2wvOdm866x+M=
+	t=1740130755; cv=none; b=CuXg0DjgJcRC/zZ2AihUq89RHe8JuPgRt8PNvCFV27xU3ndJtOpqb6D0yiqSk7s+sfJ6+RDeSldolT6w0YTRGomihlQAAs8kfZll2qfh0FPwMEK78C3nOfbBf820BpSmPDJF+LUyx/f2r+6dBrxED8ZXUVIXRJJRCDKWoEiWEe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740130673; c=relaxed/simple;
-	bh=bAeLxz+c1Ts7bphdqbep71s5QSoID+9JDJSBujnvkVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lTa0lLFtgsi8EIoBsr4qMZlP4nBTQ7UNB4eylam/vuXw/g1N5GnwdaTUm6PY8IvA+9xlkkimhCviP9ldArRjopNfbDyzm+QgGhhYuVBsysyQqvBVXzp+wVj6G1LtBW7Dsw5Zwnxltg9YkGdmF/1RE9OzqtcKdGTPi6FQ1nMSmXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e02eba02e8so2546139a12.0;
-        Fri, 21 Feb 2025 01:37:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740130670; x=1740735470;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3fSnnglnDE4OxiijvbfYtwaf+0cH0qRVW0DkL1E6oSo=;
-        b=SL6l8pTjeZhaMjbGdiCmhWn+Ujqr5Hc5eI5ywWCZwV4I2g9xfsAL+R1sJ732+/7fmw
-         w1RzBLFQvwKB/Ymeq/O25hVLLIbGrWVQwh7rOyJAPLyx/uCUqhbFtDdROCS+e/Rg3QVB
-         HJUZN9SmP3V3XDGh/7Yu1UrUMA/aXswRj1K5sQuv7unRAisHdCpyyK/2tKwqoTNptw24
-         lh2P3RvJyhzHljM4lMYdlz0KW936esz7dqI4WWJb772gE4zb5ZxiIaMMCUyulmz1Vono
-         Af194fj0LsueuajEifH+5CL4w4qtZzcFOX57vJFUKRb3KelGPB9ckmq9+bYrsJ8eVNgB
-         Dkzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMDNmbSrj+4FmfJPThzsoEmd2UQ9KGWf4LSw62hzur4pNKBGVv6Elb8hO1vNE4y0DUVtq1W6bnAM2KX2/Y6O8=@vger.kernel.org, AJvYcCV5W4lcc/GQ0RuaktH8pBb00uLgeoCbJtFEiX/gTrPqtNlpBj4bOVal4wn/a+Qvta9vK7efL0zw@vger.kernel.org, AJvYcCVKe6q7Mc1I6HQX2qolCFYcW0fKckr0Ap319chJ8VMSN028EI9+W3x1Hvz9WbbgRJKzKDUTWQlUBpT6gHFK@vger.kernel.org, AJvYcCXDTtBpLu4nBc6ssomFMe1eOc/lqSb7KKdzn2e94XOrkiMzNugD2vllpo2gxiI+9iMGwWzPW4Dad1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZQ2NdPmlZwqHjOiXf/SI0IUG1F1ZWnq03q6tpN0H4xlSHhdmX
-	Qe6gtO+G40Ln3GKLuffozuwkU/SdAbNyK9Qw/i3nBqRY8nAIzOHm
-X-Gm-Gg: ASbGnctXoa5b+tP6ewtVR4btyb/IkHLaWepTqyxIt0YEOP6ekjF/XFy/UBmMs+1Z9as
-	ezQ3DVb00UywEyCFNJ1sBMOLzQd0H88KadhxMwqqx5U7buBfH6XtZgCjiZH3uH4Bc0oXaluZWbp
-	YFPjjijfBalF9Oo54y4yxWE2LIN0CDqpQwmbE13vSjIxxZXkPmR6fjpGoZDKu5SHLjp8OZ/yBEo
-	WP9MMWUS5SxzYXHtVp1rmgxDr9+qLnmJepe5eB3InuAK3/VwQW7nHEd3wbm1Y81d9Ikv066fHoy
-	LLjiBDgohSmQaFCQ
-X-Google-Smtp-Source: AGHT+IHWNmEkqGtajxkcN65Dyk2qU9qs752a20orApMklK9etxurXq/hZktNRXLRI1CrjEYJmjdFLg==
-X-Received: by 2002:a05:6402:50c7:b0:5dc:cc02:5d25 with SMTP id 4fb4d7f45d1cf-5e0b70d5729mr2037533a12.11.1740130669931;
-        Fri, 21 Feb 2025 01:37:49 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:6::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e07464bcc7sm6281773a12.33.2025.02.21.01.37.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 01:37:49 -0800 (PST)
-Date: Fri, 21 Feb 2025 01:37:46 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH net-next v5 1/2] net, treewide: define and use
- MAC_ADDR_STR_LEN
-Message-ID: <20250221-glorious-evasive-piculet-40ad13@leitao>
-References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
- <20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
+	s=arc-20240116; t=1740130755; c=relaxed/simple;
+	bh=ypHSjeMhvEL6lzT/9gZtGZLdCaUojf6hRPWXsKHq6cA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WNSXqm+JaGXvMN+DPDThSBMjTo0lGz/c2SukgBLwhxTtijCkNPSNPuJ2rikhUJwXe+0O/ctCXf6r0vcwo7VoxmUedO69XRYQk+9JzIevqLSuWbkUItIna1/t4gs7NNmfBUFAGhjMfnYY11s5PZEpLBeDitIG032J8g+wuUaGMuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MtaTkVs2; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740130753; x=1771666753;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ypHSjeMhvEL6lzT/9gZtGZLdCaUojf6hRPWXsKHq6cA=;
+  b=MtaTkVs2XTGkFiJQ2GLjGnchnSppr0b1CGZ+gDzEmQ4twh/7UFVcz2GM
+   TWsh8P70ad0KjwdM7bN+L9zPjxsBOjHZFBaBJGJEg4/O0my1VchvEOukp
+   Mc9Fql3YND2rA4Xp7N8ywQJtNvjQZQqNARVh4HcPP/YPsqnwj/w0rGwD7
+   knDX7MDlJ1HYxJWdpgiu7zyM9zJLSL6RmqD9vRL9KrTnhZbGPEgDzp3Ri
+   mFU11BgkUX60kj/imrHm450yDWaOZVYcm5v5ZSmfzPGgsiW5Go2sj3yPH
+   5S929ppexpIZemUWe6d9EQtnzIrarAbdqsDoLPgH64gzG83sCWACufe8V
+   A==;
+X-CSE-ConnectionGUID: Bo7G0kxmTe6iDX/yVaOxEA==
+X-CSE-MsgGUID: /dN/9ZMnTcm/WA3YnF8qcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="52374633"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="52374633"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 01:39:12 -0800
+X-CSE-ConnectionGUID: sCJgPV6FSh+R2T0LS+EcWA==
+X-CSE-MsgGUID: BNtqYb15R5CPtswph0+OVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="115276416"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.60.175]) ([10.247.60.175])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 01:39:09 -0800
+Message-ID: <d831ac5e-96b9-47de-93ed-3d4f10a8b2aa@linux.intel.com>
+Date: Fri, 21 Feb 2025 17:39:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next] igc: Change Tx mode for MQPRIO offloading
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20250217-igc_mqprio_tx_mode-v1-1-3a402fe1f326@linutronix.de>
+ <6ff37238-ff0e-43c9-a88d-1258fd4ce7ef@linux.intel.com>
+ <87wmdj8ydu.fsf@kurt.kurt.home>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <87wmdj8ydu.fsf@kurt.kurt.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 20, 2025 at 06:29:20PM -0700, Uday Shankar wrote:
-> There are a few places in the tree which compute the length of the
-> string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
-> constant for this and use it where relevant. No functionality changes
-> are expected.
+
+>>> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>>> index 1e44374ca1ffbb86e9893266c590f318984ef574..6e4582de9602db2c6667f1736cc2acaa4d4b5201 100644
+>>> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
+>>> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>>> @@ -47,7 +47,7 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+>>>    		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
+>>>    
+>>>    	if (adapter->strict_priority_enable)
+>>> -		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
+>>> +		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
+>>>    
+>>>    	return new_flags;
+>>>    }
+>>
+>> IGC_FLAG_TSN_QBV_ENABLED is set multiple times in different lines:
+>>
+>> 	if (adapter->taprio_offload_enable)
+>> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
+>>
+>> 	if (is_any_launchtime(adapter))
+>> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
+>>
+>> 	if (is_cbs_enabled(adapter))
+>> 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
+>>
+>> 	if (adapter->strict_priority_enable)
+>> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
+>>
+>> 	return new_flags;
+>> }
+>>
+>> We can combine the conditions to simplify:
+>> 	if (adapter->taprio_offload_enable ||
+>>               is_any_launchtime(adapter) ||
+>>               adapter->strict_priority_enable)
+>> 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
 > 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> Sure.
+> 
+> Should I send a v2 or do you want to carry this patch in your next fpe
+> series?
 
-Reviwed-by: Breno Leitao <leitao@debian.org>
+I think you can go ahead with v2. It shouldn’t conflict much with the next 
+fpe series, and if my future series gets stalled, at least yours won’t be 
+affected.
 
