@@ -1,181 +1,247 @@
-Return-Path: <netdev+bounces-168634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4F08A3FF35
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:00:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFABA3FF74
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:11:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744BC705BA7
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:00:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D11E705A2C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F4D2528EE;
-	Fri, 21 Feb 2025 19:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967E02512C9;
+	Fri, 21 Feb 2025 19:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="UNYvQFMm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWsm056G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6B0250C01
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 19:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DA71FBC86;
+	Fri, 21 Feb 2025 19:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740164448; cv=none; b=GoCYeVa+JP9Yk5/DZNceRrrP3Z9DqUbRrpzdd+5O/UmmWc+l0KRQhDs1zb/lEV/oNgg31ikWeo5Iuiv6k62LA9gaIob8qsW3dVi4L0enlLf/JT0Glxz4K/OmgvXesD+OLLfITj1BEeaPnPORP6gkl5M3FcvkRFErqUdVabXopyw=
+	t=1740165101; cv=none; b=nXfBcVi5Du4a2SNENgMTRBrtL7e6JXQKwZ95x43Uy8no6Mb7ypGMcf7kRjOHDi8YMgzvAO6Z4vhSF1R7NNMVZidgs+gZiKd0awC02PcjO92BWJc0gYqvb0rNPgr+Zr6GTMz8hkWmOrjsjW0h+rfM5GvY0HsUDHIzeZ+MAaZ96n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740164448; c=relaxed/simple;
-	bh=8DcTK+BWqvLFgfUlFyhU8LrkRaYzJUE29H3MUIQ1fWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pn6MoBFi8koK9EAe61pDn/BKf8X1ucX+u+67FjYj646L2kwx800vJVFXnaWDf6gKF+5qVz0D4M69zAzcpHuNOTNRjebTL7HxXjzV/sXE0z6G4crIkx5Do7N8Zu4N6axygYV036gdvWOuKoKV0IGiD9/k6JfHEyGTfqrunNuDvik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=UNYvQFMm; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-221050f3f00so56563325ad.2
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:00:46 -0800 (PST)
+	s=arc-20240116; t=1740165101; c=relaxed/simple;
+	bh=PbOVlAJxc2Xo/N/P0W8qPuZ2rlzfngj6tfrP4tI1Wi8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s6ERdBydRY2ouP6nPlvYcIanIwwJp9q6J+RpwwYxtX79k+rLqLLS+W7wgv38fhT7MX0KVZoYxMfYSk0SuKNOKDh4QMbmIwXhKttKrXNHEvF0WQDewbbUkMl/79ynCUaKQ9LDtQKsSShpiGDI0POZ8OVUNjmgU4Fxqy3j89DH9VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RWsm056G; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so2180189276.3;
+        Fri, 21 Feb 2025 11:11:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1740164445; x=1740769245; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1740165099; x=1740769899; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
-        b=UNYvQFMm8ipUKK4diYQfDub/mJ3b9O2f8Chy60VevlYCmcNPan3W66AyRVIA6wmHxj
-         sEdXQvtj4pUx/R+o/c+9Zmw89vLM6qGHXoczVYe/kus4+VnTjeJqo+ISOq5INGRV0add
-         81hc29lvOOsp3WQW7s36p2Duld12MGGM3TexmriVIleBupxJSOy6Al3Ql+53xA39jkAm
-         tQzBJ5C2lr01f30oCQlgv9W7TdqF81kI7Go8YQ7NMuL+vxuNhMzx0DOGJQ7rvDh4FUnV
-         XCi9V8cVRDRleYhP/B6LzIiZc5tevohGrxttxwEdHxmKo7ox8fUQiKFYEXmpgPzY9T2p
-         XsfQ==
+        bh=8E9n7lWg37arGJJBC+cFoacQWq59M2kbyurzH/Jx9BE=;
+        b=RWsm056Gj+M89TGBUSKi5TS4kF407Gy7rzosC8eRedf5B448pFBd9lEEgPUPiqXMOs
+         p+o2EXDHKKy8ucRi8t7tVonWtkZamQy6xnawpwimM3mMjI/bIZUv6S6DRjKd2ZlNi3HI
+         0va+BqwyFkL85tDWCIUepM3TvvhlnQ8zAD0/tPi6IZ4idrbOuH3J4ZiV76aS43BJFhp/
+         XTsM4WtYju8uExF1ppj9/B7e+2US8clU/avBa11R7WddSq3YJ2NSJppFlTLzAlBx7QUd
+         6Wmy9BXVargr4j0ciNeIxH23yfLOrirdGfLSXCBwEQ9mgYErk+zyH2Sua1rWbi94zGfE
+         oDEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740164445; x=1740769245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1740165099; x=1740769899;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
-        b=NJIBkdSmCMZYwUZJ5Y24G6XmzVNXbABRyXV8EdDJcxJENItL4Se4IT2nUVNFdAVPVv
-         1i8m/IbQAdS8VJ25S5M9GDobSoiKW7FRjdjJE+Z538KWhnPeQnQDPJKPK5r0zFjt6L4e
-         qB3q/FjlDVn/cblbUikrRgAKhk7k0hz2FaznY7gFRtAMZwMhiuJl+Znua0Ilu1LuhcXk
-         c/Zq2fg6Ty85QmWSDf3wOM0y80WUbRGNB7w5Empbq8oQFY0bfjLkcsRSBzeSnBfSbkY0
-         MEc0ita0bYM3aj17PP5/WUEq12lSOzmkfzsdlgGDh0XarZNv3JjKAdSBxnuNEc+YrXDb
-         NXbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWppBQL6ND0iO7VNiuE433rpV9YPmY7YeQRHtoTG6N2AiRP5yyYcqjvD3+iL4Y3c/PKvWOgH54=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzr8Br8pM2oaK6TK4UIGeJsixp8sk49YZb/dbpNZ4a0Nu35LK/
-	dv1LKWb5bDiAwitSyacpDlAHOLYxAQGYpkdNaZTHGyX9frBAIlaj1X2ppyiuR7Q=
-X-Gm-Gg: ASbGncuP7FPliCkziFpD/dlF/tn19JpaZ9r9Wu/Yvew8N9N0cZKA9aNcLfPlsZ+E/Fj
-	6++/dDp7jjoE4xz5soU95nNkGDUdWPRudKXBPfl3ex1iR/YrujGYsR0WzYnSglQdb2IdlmG1JwU
-	bdmML177hwZhXelWVgApDghWJG9J96U7dMQ7hLi7J+vjHRGwmocSDdxXFtj7jicwOLnR69QGUfo
-	m1jSNDGelqeazhLxuvRd7Ymjx4IzdXqr1mVA57RjR29HOm0Y6cpnkwgAecNNQFrHrBOlQbKK5vy
-	67WpmooRsMJ3hdNQ/vtkb/y+25Y9O7zcQllk6SmtLSbdOzII4u5TBUt5tlA06KOyA9hHC9CK/ry
-	z7NQ=
-X-Google-Smtp-Source: AGHT+IGGJurj1ywGFGfMqLad+W4V0w/HWPMlDvnZ5WiNoOtzbXCiXiC9jiI+n/maSmmLogJdgVe5uw==
-X-Received: by 2002:a17:903:2346:b0:21f:6fb9:9299 with SMTP id d9443c01a7336-2219ff5e7c8mr68299995ad.27.1740164445571;
-        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5364676sm141352715ad.82.2025.02.21.11.00.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
-Date: Fri, 21 Feb 2025 11:00:42 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon
- <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew
- Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>, Peter
- Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Thomas
- Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "Danilo Krummrich" <dakr@kernel.org>, Eric Dumazet
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, "Jamal Hadi Salim" <jhs@mojatatu.com>, Cong
- Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jason
- Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, "Bartosz Golaszewski" <brgl@bgdev.pl>, Lee
- Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, Christoph Hellwig
- <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy
- <robin.murphy@arm.com>, "Miquel Raynal" <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Zijun Hu <zijun_hu@icloud.com>, <linux-arch@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-wireless@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-gpio@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-mtd@lists.infradead.org>
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for
- void APIs
-Message-ID: <20250221110042.2ec3c276@hermes.local>
-In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+        bh=8E9n7lWg37arGJJBC+cFoacQWq59M2kbyurzH/Jx9BE=;
+        b=SPGj3APSAHnN6+DyWkHEKmMJiTC5TF/gvXLSJR0TvncKTu2yx/XOzyhMo9/M+Vpf2w
+         6iwL9cnpmRwqG2gZtPOCTAPAkvFm6yZOM1RU6idK8MlEBTiHPHF8qOuaZr8gFSo5lCBe
+         dmNvQaWsN5A17on+IdMqsIGps0xd2HbpW404Rl/z2QszM3wEWKuiRl7lz09vlw7qQCgB
+         UzwB/kyS2hZSUuQAbiXgawZJTGbStGNglxAojcuICq3vNi7ZSx1EDBGIS5U8M2pt1yK2
+         hQ1Va92d99K1We1AIjRQHzH4qzAdcl7W2cuixr8qwsS0Nz42Jm0kg43fxkGuzPxduka7
+         XOaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWeA2jYpUOT1jA4x1xh6iF54+WbhldxeClyrSWFnd1IeLRNx8tx0zKuRVpMJWou/EYMeA8GFEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVelpzZ3MlIKZvpBUYp8GEzvGkITeADTzeXFLnE6flFf9iX/hZ
+	QtpfWolEk4iUMeK2YEEowSoXY3PxBWUElH7NbWsGoEa/Dqe4NCoby+U+iuCnqi0itIuVgZRXdn4
+	We3Sku237kYPMoKq6toOK+q8OPgU=
+X-Gm-Gg: ASbGncv69LpP0kCKdAE20jZ7kNZha3kwTvKYrLH/7cZxNmPZqPorjCsFdbQ8iiCquPQ
+	pyN6hXwGH3igDM01xgg3Ah3kBQ4oHL0TW5PWP6Uhbg0DwBbq/CD1k3inGSzY1y+TbPbrhjL1O1r
+	gbd33BO4U=
+X-Google-Smtp-Source: AGHT+IGre0sL6f6AjeXhGCxk71jxb9oVlxD0klSPR2BHx+8faiZPu2VZao6IQ/2JO5iMSP+2hS19EYhA1XX2CTg34bM=
+X-Received: by 2002:a05:6902:2484:b0:e5d:df2b:3b13 with SMTP id
+ 3f1490d57ef6-e5e2466eeddmr3394741276.32.1740165098684; Fri, 21 Feb 2025
+ 11:11:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
+ <20250220134503.835224-3-maciej.fijalkowski@intel.com> <0e66379b-3b37-4bbd-9e9d-1f934cb1fdc8@gmail.com>
+ <Z7iUMK1XePvptYc5@boxer>
+In-Reply-To: <Z7iUMK1XePvptYc5@boxer>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 21 Feb 2025 11:11:27 -0800
+X-Gm-Features: AWEUYZn2R-uTdT5C5RdOUUI2ZkhwlCn2_q-y0AbttoPyV7nxGfNMKOeQ-XZ-WXY
+Message-ID: <CAMB2axNJjsytoFrYF=PdsOOWE-bbficZa-54C9YHT5JFu5PFBQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/3] bpf: add kfunc for skb refcounting
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	martin.lau@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 21 Feb 2025 05:02:05 -0800
-Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+On Fri, Feb 21, 2025 at 6:57=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, Feb 20, 2025 at 03:25:03PM -0800, Amery Hung wrote:
+> >
+> >
+> > On 2/20/2025 5:45 AM, Maciej Fijalkowski wrote:
+> > > These have been mostly taken from Amery Hung's work related to bpf qd=
+isc
+> > > implementation. bpf_skb_{acquire,release}() are for increment/decreme=
+nt
+> > > sk_buff::users whereas bpf_skb_destroy() is called for map entries th=
+at
+> > > have not been released and map is being wiped out from system.
+> > >
+> > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > > ---
+> > >   net/core/filter.c | 62 ++++++++++++++++++++++++++++++++++++++++++++=
++++
+> > >   1 file changed, 62 insertions(+)
+> > >
+> > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > index 2ec162dd83c4..9bd2701be088 100644
+> > > --- a/net/core/filter.c
+> > > +++ b/net/core/filter.c
+> > > @@ -12064,6 +12064,56 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(stru=
+ct __sk_buff *s, struct sock *sk,
+> > >   __bpf_kfunc_end_defs();
+> > > +__diag_push();
+> > > +__diag_ignore_all("-Wmissing-prototypes",
+> > > +             "Global functions as their definitions will be in vmlin=
+ux BTF");
+> > > +
+> > > +/* bpf_skb_acquire - Acquire a reference to an skb. An skb acquired =
+by this
+> > > + * kfunc which is not stored in a map as a kptr, must be released by=
+ calling
+> > > + * bpf_skb_release().
+> > > + * @skb: The skb on which a reference is being acquired.
+> > > + */
+> > > +__bpf_kfunc struct sk_buff *bpf_skb_acquire(struct sk_buff *skb)
+> > > +{
+> > > +   if (refcount_inc_not_zero(&skb->users))
+> > > +           return skb;
+> > > +   return NULL;
+> > > +}
+> > > +
+> > > +/* bpf_skb_release - Release the reference acquired on an skb.
+> > > + * @skb: The skb on which a reference is being released.
+> > > + */
+> > > +__bpf_kfunc void bpf_skb_release(struct sk_buff *skb)
+> > > +{
+> > > +   skb_unref(skb);
+> > > +}
+> > > +
+> > > +/* bpf_skb_destroy - Release an skb reference acquired and exchanged=
+ into
+> > > + * an allocated object or a map.
+> > > + * @skb: The skb on which a reference is being released.
+> > > + */
+> > > +__bpf_kfunc void bpf_skb_destroy(struct sk_buff *skb)
+> > > +{
+> > > +   (void)skb_unref(skb);
+> > > +   consume_skb(skb);
+> > > +}
+> > > +
+> > > +__diag_pop();
+> > > +
+> > > +BTF_KFUNCS_START(skb_kfunc_btf_ids)
+> > > +BTF_ID_FLAGS(func, bpf_skb_acquire, KF_ACQUIRE | KF_RET_NULL)
+> > > +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
+> > > +BTF_KFUNCS_END(skb_kfunc_btf_ids)
+> > > +
+> > > +static const struct btf_kfunc_id_set skb_kfunc_set =3D {
+> > > +   .owner =3D THIS_MODULE,
+> > > +   .set   =3D &skb_kfunc_btf_ids,
+> > > +};
+> > > +
+> > > +BTF_ID_LIST(skb_kfunc_dtor_ids)
+> > > +BTF_ID(struct, sk_buff)
+> > > +BTF_ID_FLAGS(func, bpf_skb_destroy, KF_RELEASE)
+> > > +
+> > >   int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
+> > >                            struct bpf_dynptr *ptr__uninit)
+> > >   {
+> > > @@ -12117,6 +12167,13 @@ static const struct btf_kfunc_id_set bpf_kfu=
+nc_set_tcp_reqsk =3D {
+> > >   static int __init bpf_kfunc_init(void)
+> > >   {
+> > > +   const struct btf_id_dtor_kfunc skb_kfunc_dtors[] =3D {
+> > > +           {
+> > > +                   .btf_id       =3D skb_kfunc_dtor_ids[0],
+> > > +                   .kfunc_btf_id =3D skb_kfunc_dtor_ids[1]
+> > > +           },
+> > > +   };
+> > > +
+> > >     int ret;
+> > >     ret =3D register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_k=
+func_set_skb);
+> > > @@ -12133,6 +12190,11 @@ static int __init bpf_kfunc_init(void)
+> > >     ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_=
+kfunc_set_xdp);
+> > >     ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOC=
+K_ADDR,
+> > >                                            &bpf_kfunc_set_sock_addr);
+> > > +   ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS,=
+ &skb_kfunc_set);
+> > > +
+> > > +   ret =3D ret ?: register_btf_id_dtor_kfuncs(skb_kfunc_dtors,
+> > > +                                            ARRAY_SIZE(skb_kfunc_dto=
+rs),
+> > > +                                            THIS_MODULE);
+> >
+> > I think we will need to deal with two versions of skb dtors here. Both =
+qdisc
+> > and cls will register dtor associated for skb. The qdisc one just call
+> > kfree_skb(). While only one can exist for a specific btf id in the kern=
+el if
+> > I understand correctly. Is it possible to have one that work
+> > for both use cases?
+>
+> Looking at the current code it seems bpf_find_btf_id() (which
+> btf_parse_kptr() calls) will go through modules and return the first matc=
+h
+> against sk_buff btf but that's currently a wild guess from my side. So
+> your concern stands as we have no mechanism that would distinguish the
+> dtors for same btf id.
+>
+> I would have to take a deeper look at btf_parse_kptr() and find some way
+> to associate dtor with its module during registering and then use it
+> within btf_find_dtor_kfunc(). Would this be sufficient?
+>
 
-> This patch series is to remove weird and needless 'return' for
-> void APIs under include/ with the following pattern:
-> 
-> api_header.h:
-> 
-> void api_func_a(...);
-> 
-> static inline void api_func_b(...)
-> {
-> 	return api_func_a(...);
-> }
-> 
-> Remove the needless 'return' in api_func_b().
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> Zijun Hu (18):
->       mm/mmu_gather: Remove needless return in void API tlb_remove_page()
->       cpu: Remove needless return in void API suspend_enable_secondary_cpus()
->       crypto: api - Remove needless return in void API crypto_free_tfm()
->       crypto: scomp - Remove needless return in void API crypto_scomp_free_ctx()
->       sysfs: Remove needless return in void API sysfs_enable_ns()
->       skbuff: Remove needless return in void API consume_skb()
->       wifi: mac80211: Remove needless return in void API _ieee80211_hw_set()
->       net: sched: Remove needless return in void API qdisc_watchdog_schedule_ns()
->       ipv4/igmp: Remove needless return in void API ip_mc_dec_group()
->       IB/rdmavt: Remove needless return in void API rvt_mod_retry_timer()
->       ratelimit: Remove needless return in void API ratelimit_default_init()
->       siox: Remove needless return in void API siox_driver_unregister()
->       gpiolib: Remove needless return in two void APIs
->       PM: wakeup: Remove needless return in three void APIs
->       mfd: db8500-prcmu: Remove needless return in three void APIs
->       rhashtable: Remove needless return in three void APIs
->       dma-mapping: Remove needless return in five void APIs
->       mtd: nand: Do not return void function in void function
-> 
->  include/asm-generic/tlb.h           |  2 +-
->  include/crypto/internal/scompress.h |  2 +-
->  include/linux/cpu.h                 |  2 +-
->  include/linux/crypto.h              |  2 +-
->  include/linux/dma-mapping.h         | 12 ++++++------
->  include/linux/gpio.h                |  4 ++--
->  include/linux/igmp.h                |  2 +-
->  include/linux/mfd/dbx500-prcmu.h    |  6 +++---
->  include/linux/mtd/nand.h            | 18 ++++++++++++------
->  include/linux/pm_wakeup.h           |  6 +++---
->  include/linux/ratelimit.h           |  4 ++--
->  include/linux/rhashtable.h          |  6 +++---
->  include/linux/siox.h                |  2 +-
->  include/linux/skbuff.h              |  2 +-
->  include/linux/sysfs.h               |  2 +-
->  include/net/mac80211.h              |  2 +-
->  include/net/pkt_sched.h             |  2 +-
->  include/rdma/rdmavt_qp.h            |  2 +-
->  18 files changed, 42 insertions(+), 36 deletions(-)
-> ---
-> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-> change-id: 20250221-rmv_return-f1dc82d492f0
-> 
-> Best regards,
+That might not be enough. Ultimately, if the user configures both
+modules to be built-in, then there is no way to tell where a trusted
+skb kptr in a bpf program is from.
 
-Is this something that could be done with a coccinelle script?
+Two possible ways to solve this:
+
+1. Make the dtor be able to tell whether the skb is from qdisc or cls.
+Since we are both in the TC layer, maybe we can use skb->cb for this?
+
+2. Associate KF_ACQUIRE kfuncs with the corresponding KF_RELEASE
+kfuncs somehow. Carry this additional information as the kptr
+propagates in the bpf world so that we know which dtor to call. This
+seems to be overly complicated.
+
+
+> >
+> > >     return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, =
+&bpf_kfunc_set_tcp_reqsk);
+> > >   }
+> > >   late_initcall(bpf_kfunc_init);
+> >
 
