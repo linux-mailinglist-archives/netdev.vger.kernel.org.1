@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-168575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB86A3F60D
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:33:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD61A3F611
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:34:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7768A189E5BD
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:33:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A20A4223F1
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6B8207A2E;
-	Fri, 21 Feb 2025 13:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0477C20E02A;
+	Fri, 21 Feb 2025 13:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="EpITq16N"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="CFStWvYM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f100.google.com (mail-lf1-f100.google.com [209.85.167.100])
+Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A970520AF86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD47520CCFA
 	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 13:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740144707; cv=none; b=AUOOdysdKLMyqIsuzzSOcg1uWKDt9JPdSULvJDRBo+n3vWR1hW9moDurh4u4+cgN05NWzXZ6BMzZrABbXS0hZgTeYtZUWTz1gdB2iwyiGcplNmEJvNbONvEpYdrsH6EWzGi3YU4qSifxj3LV+Vv3IWOG5vVWgc5PteiKDIAY9DQ=
+	t=1740144707; cv=none; b=HlF1+o6P5fERdrF1QKTGGpth2QvuxlJFYzMPpEgpGsT1K/I/hwEQBN8W1o9iCMaElK7THz/4o1Pd8UTuibJj7GJH/j410EikBJRJRKGQ6ksqPw8JRgow0d+arepeliPYSWazDMEDBx/v2pj+aIhtDM7sdOGAtXyOw3RpIuqAnoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740144707; c=relaxed/simple;
-	bh=Lrwg3dqiChUw2jCOTYm4KIye/W7dlhttaIbNpRzChLg=;
+	bh=V2963nK+B0X6rGi/ZVUQgn260cb3UBiVHbS+ah81Zu8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L/HJZgmpvWEr8g8d7g1ussHaOwOOhRKxNh+NYf2Jom/JWv2u37l+s+Kr9vcZFgM7ntVXLAITTEWAJydmN4AxpyIB7cb3GTNDml9sj83KI5q35okq71aPpI7H74jwKLAWZJTUCefdj5im8APPEXeCjSBGeUVG1CC+VgcWG/zfMKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=EpITq16N; arc=none smtp.client-ip=209.85.167.100
+	 MIME-Version; b=uI4UoK1yFmyUmerbRonvdRZXOp5Mr3gMxmDs+i+LG54YNMp/gEbdmgQYcJUb4MnsoB3Qx1NLYm4VBgovjDWOevQbZ/Hi1Yi7g6FhK8I+LEBW9aRmx8u5Ammfes0qQbqXWVLn/gmR7f20Uf6geIzuhytDN6x50sktaco7zNgVRRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=CFStWvYM; arc=none smtp.client-ip=209.85.167.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f100.google.com with SMTP id 2adb3069b0e04-54692061fc0so253678e87.0
+Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-54621bc7f44so268113e87.2
         for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 05:31:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1740144704; x=1740749504; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dqaokd5Ov8Mlde9/JfrdceLq0+Q85Ciz/R3Zdo2flDk=;
-        b=EpITq16NsRI3DPDnt5pv3HvWhS1zERfBy8Fg2iSY5zUfiC22x7iusHXmxuSoWWBNqw
-         0wryOBs8wDTGmK0EWw1guDbZjYfKUF0tMnQelAqBWyxLyN3IkRS8Mn3H38Zpg0w+ZpJ9
-         yR8EOU/C5KZk9NktUpnfvowsOVnNPKECTorXYCxPijFEtGAE+4YnPFXMTNjx2p2qtteT
-         Y3tSufru5L5Y6M/WapOmi1TngjfgIm77HZ7uCvpGzpayjPIzanaHUU3HZa96fPEdQlP3
-         /iFpAToISdZI3m2nyMm6L/Bpsji4Du9AaLw0qrKUEWocmbBLoBpOJGdBymMT4Xj6sX9O
-         rhUw==
+        bh=PA016DeSEFu+cxP8XzHZyfB40HWht8sismSdjYZCkXs=;
+        b=CFStWvYM7eScIEmHBSZmYVs/dFawLYfgjAfEn77Qu2ltyr16Adaw/VH2uiJ8ms9L84
+         N1YVyHvsno1iuuKHYD2o4ZIQ2+HD0tGWlGIvmUfjpaSiQLHvg8nWCN0p8n00AEoQ4AJa
+         BviSaS5ANKXrqaqIqgkJ9Hn31FnvCs9eP+dwJ6OVqoTGc3Pt1Zn9WiNOilEE4znTO3hk
+         9a3w57c9qQStSjYWuNxlmQAsR7zG/sSbeuU61o0UTGHGxYErwylqHri6nYyOTtCaFrhN
+         2rHhUvJLTIWHQI4LI3no324TfEtbB6kTwO+MP7Lb9EwCQKVEwqKtijO9cgjMwjY0E8/k
+         8+RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1740144704; x=1740749504;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dqaokd5Ov8Mlde9/JfrdceLq0+Q85Ciz/R3Zdo2flDk=;
-        b=VrsW5X4gWRDvk9byaLCEENrfexgrVkR2W1FW+mLEuptL0eOyJ6rQxjGNumRb27rUgt
-         /QKkgyEZSOtY9LbHy7s4/EnO+FOC6AnM+4D7fzR1MgRpOwTG9PejgttsWAxScWYhRsxL
-         LDsOyjZvHEQ1cIA5v7c9DOeyaWU/d6OxNiH5QujAFGHjIOOhduTwe6MCaHFoYQMl6QPy
-         2E9fiAsn2AlFLWvm3ZO3OBZlABE+XIKYcvIKHEnp92rLwtbX2AzhTf741BJjuhp+LeVz
-         lMgSnkz8kG7FVn/nEDSdZ0DSCapQlV4iP1Mx/C1L/6/nXSL5vRgXH9tzi7pCaqeEKQg/
-         QNjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXneT/YIPBJpMdeyTkgexGwS6ZfEY9RNk5VsZVc/VcAMynaKZnFyKV7jnShwzAVZLRcbmHWhFQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIbgPhQFa3U7Cnl8CzKGpjOjsFTju8nIAd8glgvW2/ak0jZElz
-	JgkZPoplsYvBYQWwJIslRRC1hsT4NdMlyW6wgrS5Fkh9+BAq8hTUgizVBCNXgxyUytdKQVP3+sI
-	eB4YCKq+2Y0U2PAwoz1t5q8Adigdcf6Q3
-X-Gm-Gg: ASbGnctrQJid5AuixZxiI6uPZQD4qT2cs2EhcJ53x909whC0VIz3Ssn+no+y67TgUqL
-	l3jCwti2kxKqKpoEwf61075gv9zYCOWOn5Qea3wPlwtp9IEgZ0O/BvzuvXf7bUdkwLeBRtdyUA5
-	uxhsWcso8tFP8+yS+MItMTgktQ8/q27VHCLLh5HCKRa26lkr5XyC3WJSRuThKsRsxYT/nGHQW5X
-	dDuZn+JChlBYbHew3IdYOQn+UTGzt1QObQAEAksAVe73pMarDNwvIEhYH6NYadJ7F9AprFND1Nf
-	j/ll9zHFjcoKVez5c/CKKCVT10JHfE50b5LIlivqYEEUlXR3H0iTR3Fh4Sa6VEsg9YuZ9NM=
-X-Google-Smtp-Source: AGHT+IHQGxZ0fmt+W/zgN5uNEXAqhlW4r4i6rMqrCCC3hJRiadAGnnkxr9wVbjZE6drxj5qi2UEVvj7wGzdo
-X-Received: by 2002:a05:6512:138b:b0:545:3033:4373 with SMTP id 2adb3069b0e04-54838ee9327mr437163e87.6.1740144703675;
+        bh=PA016DeSEFu+cxP8XzHZyfB40HWht8sismSdjYZCkXs=;
+        b=bcH/0m+RVulq8IJtm3EZyJo4XsQ48J54b6AFFy8LU8McStvvoE6HUv/KF1rA+XkR9B
+         gINsTdvM7Ocmo0eCAptj6XHYy9uphUkGv7BnEqx/GAa4yKw+dfZcoE0JUpCi32OPlHEG
+         VLfJIMSc/STZvceaSSafetzVtwDIFS10R7dLnM/Sq4dYz1oMWg0jqb4LtUotmmRjZbvV
+         9Qc6AcdE/mHiOL5ub+YI8iJKoygCMHRg4elka+FTJ/RDgA7C4q1yGH1cgBy/mU3qZUTU
+         1j0dBM715iujggU7ITgUdezlBBK/BF6JTKlEMfOl3urw0lpxuK4MauLj91gPmhyeFAQr
+         s7aA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHqbirToryo+r6ZbcQFctBvEtqAaeBvH/ldxyOFq6NMXNjS/BnbnMtSD7LovukeqxLt86FQX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxH3BG3/z3BBCribObMdxIsyJBo0GBAdV33+ZoZ8Pf7ppn/cU8G
+	RbUD/fA4URV3KPoMTcSinSIJW4qy09IsD4VzTHTsHkJwHlJ7pTLzEMz1dRFUNa7eOl4k5HDbPrs
+	vfToS7d/wRteRhn/u9rHvMUFEwWfO+W+u
+X-Gm-Gg: ASbGncsa8gRD14CNDg96kN98+DXC/p9ELUR08MMG1Bji+n3bpbPuWkfW4IvBt2Ro8DS
+	X+eORhWqSiA5fpMEM0HNUXxZ1u6PL9VmxE82tMwp5Vk33Wd9XRtL6EzaLtNQU0mXVkZF7r4r6Hs
+	1uDTwUoKNn6SQW9YDdm9vxDls/O4CuJr3cuFVXhpM2JvePMEPDCoWH23MfGwxgw/a4Enp/tf0rx
+	H3X7PwwYlpnT2IDZ0uDkEYPROzz8tL0WrFtdAtqaINFKsLEvfXLxKBBzvIecV4xZkLfIYVEvBtq
+	5MzsdncsyNlBMSdmKJnCZ53ANOxP3hGyoEv89wWJ/M9EXTPKhQEL3BwvdytUp7YGWWl4PlU=
+X-Google-Smtp-Source: AGHT+IFF57seK4w2bdkUyYlurelqAp9dLJqTGBgLrs61vmVRanEE0nrNLcoYgURpLIJD+5csXJjEDIpBuyPs
+X-Received: by 2002:a05:6512:3b8d:b0:545:5bd:bf3e with SMTP id 2adb3069b0e04-54838f824afmr396734e87.13.1740144703692;
         Fri, 21 Feb 2025 05:31:43 -0800 (PST)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-5452efc766asm566289e87.122.2025.02.21.05.31.43;
+        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-54625bcb69esm351970e87.104.2025.02.21.05.31.43;
         Fri, 21 Feb 2025 05:31:43 -0800 (PST)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 45DB413E9A;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 4BEB513E9B;
 	Fri, 21 Feb 2025 14:31:43 +0100 (CET)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1tlT83-008b6g-17; Fri, 21 Feb 2025 14:31:43 +0100
+	id 1tlT83-008b6j-1t; Fri, 21 Feb 2025 14:31:43 +0100
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -90,9 +90,9 @@ Cc: Ido Schimmel <idosch@idosch.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	netdev@vger.kernel.org,
 	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next v4 2/3] net: advertise netns_immutable property via netlink
-Date: Fri, 21 Feb 2025 14:30:27 +0100
-Message-ID: <20250221133136.2049165-3-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next v4 3/3] net: plumb extack in __dev_change_net_namespace()
+Date: Fri, 21 Feb 2025 14:30:28 +0100
+Message-ID: <20250221133136.2049165-4-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250221133136.2049165-1-nicolas.dichtel@6wind.com>
 References: <20250221133136.2049165-1-nicolas.dichtel@6wind.com>
@@ -104,74 +104,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since commit 05c1280a2bcf ("netdev_features: convert NETIF_F_NETNS_LOCAL to
-dev->netns_local"), there is no way to see if the netns_immutable property
-s set on a device. Let's add a netlink attribute to advertise it.
+It could be hard to understand why the netlink command fails. For example,
+if dev->netns_immutable is set, the error is "Invalid argument".
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- Documentation/netlink/specs/rt_link.yaml | 3 +++
- include/uapi/linux/if_link.h             | 1 +
- net/core/rtnetlink.c                     | 3 +++
- 3 files changed, 7 insertions(+)
+ include/linux/netdevice.h |  5 +++--
+ net/core/dev.c            | 40 +++++++++++++++++++++++++++++++--------
+ net/core/rtnetlink.c      |  2 +-
+ 3 files changed, 36 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 0d492500c7e5..d13b14c6b9d7 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -1148,6 +1148,9 @@ attribute-sets:
-         name: max-pacing-offload-horizon
-         type: uint
-         doc: EDT offload horizon supported by the device (in nsec).
-+      -
-+        name: netns-immutable
-+        type: u8
-   -
-     name: af-spec-attrs
-     attributes:
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index bfe880fbbb24..a2b6cfde7162 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -378,6 +378,7 @@ enum {
- 	IFLA_GRO_IPV4_MAX_SIZE,
- 	IFLA_DPLL_PIN,
- 	IFLA_MAX_PACING_OFFLOAD_HORIZON,
-+	IFLA_NETNS_IMMUTABLE,
- 	__IFLA_MAX
- };
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 598acba04329..f4dcc2fbec29 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4156,12 +4156,13 @@ int dev_change_flags(struct net_device *dev, unsigned int flags,
+ int dev_set_alias(struct net_device *, const char *, size_t);
+ int dev_get_alias(const struct net_device *, char *, size_t);
+ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+-			       const char *pat, int new_ifindex);
++			       const char *pat, int new_ifindex,
++			       struct netlink_ext_ack *extack);
+ static inline
+ int dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 			     const char *pat)
+ {
+-	return __dev_change_net_namespace(dev, net, pat, 0);
++	return __dev_change_net_namespace(dev, net, pat, 0, NULL);
+ }
+ int __dev_set_mtu(struct net_device *, int);
+ int dev_set_mtu(struct net_device *, int);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 91b07fd1c86d..2f5554927fb8 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -12003,6 +12003,7 @@ EXPORT_SYMBOL(unregister_netdev);
+  *	      is already taken in the destination network namespace.
+  *	@new_ifindex: If not zero, specifies device index in the target
+  *	              namespace.
++ *	@extack: netlink extended ack
+  *
+  *	This function shuts down a device interface and moves it
+  *	to a new network namespace. On success 0 is returned, on
+@@ -12012,7 +12013,8 @@ EXPORT_SYMBOL(unregister_netdev);
+  */
+ 
+ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+-			       const char *pat, int new_ifindex)
++			       const char *pat, int new_ifindex,
++			       struct netlink_ext_ack *extack)
+ {
+ 	struct netdev_name_node *name_node;
+ 	struct net *net_old = dev_net(dev);
+@@ -12023,12 +12025,16 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 
+ 	/* Don't allow namespace local devices to be moved. */
+ 	err = -EINVAL;
+-	if (dev->netns_immutable)
++	if (dev->netns_immutable) {
++		NL_SET_ERR_MSG(extack, "The interface netns is immutable");
+ 		goto out;
++	}
+ 
+ 	/* Ensure the device has been registered */
+-	if (dev->reg_state != NETREG_REGISTERED)
++	if (dev->reg_state != NETREG_REGISTERED) {
++		NL_SET_ERR_MSG(extack, "The interface isn't registered");
+ 		goto out;
++	}
+ 
+ 	/* Get out if there is nothing todo */
+ 	err = 0;
+@@ -12041,30 +12047,48 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 	err = -EEXIST;
+ 	if (netdev_name_in_use(net, dev->name)) {
+ 		/* We get here if we can't use the current device name */
+-		if (!pat)
++		if (!pat) {
++			NL_SET_ERR_MSG(extack,
++				       "An interface with the same name exists in the target netns");
+ 			goto out;
++		}
+ 		err = dev_prep_valid_name(net, dev, pat, new_name, EEXIST);
+-		if (err < 0)
++		if (err < 0) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "Unable to use '%s' for the new interface name",
++					   pat);
+ 			goto out;
++		}
+ 	}
+ 	/* Check that none of the altnames conflicts. */
+ 	err = -EEXIST;
+ 	netdev_for_each_altname(dev, name_node)
+-		if (netdev_name_in_use(net, name_node->name))
++		if (netdev_name_in_use(net, name_node->name)) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "An interface with the altname %s exists in the target netns",
++					   name_node->name);
+ 			goto out;
++		}
+ 
+ 	/* Check that new_ifindex isn't used yet. */
+ 	if (new_ifindex) {
+ 		err = dev_index_reserve(net, new_ifindex);
+-		if (err < 0)
++		if (err < 0) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "The ifindex %d is not available in the target netns",
++					   new_ifindex);
+ 			goto out;
++		}
+ 	} else {
+ 		/* If there is an ifindex conflict assign a new one */
+ 		err = dev_index_reserve(net, dev->ifindex);
+ 		if (err == -EBUSY)
+ 			err = dev_index_reserve(net, 0);
+-		if (err < 0)
++		if (err < 0) {
++			NL_SET_ERR_MSG(extack,
++				       "Unable to allocate a new ifindex in the target netns");
+ 			goto out;
++		}
+ 		new_ifindex = err;
+ 	}
  
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index abe1a461ea67..a76f63b926df 100644
+index a76f63b926df..1bcc98e342f2 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -1292,6 +1292,7 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 	       + nla_total_size(4) /* IFLA_TSO_MAX_SEGS */
- 	       + nla_total_size(1) /* IFLA_OPERSTATE */
- 	       + nla_total_size(1) /* IFLA_LINKMODE */
-+	       + nla_total_size(1) /* IFLA_NETNS_IMMUTABLE */
- 	       + nla_total_size(4) /* IFLA_CARRIER_CHANGES */
- 	       + nla_total_size(4) /* IFLA_LINK_NETNSID */
- 	       + nla_total_size(4) /* IFLA_GROUP */
-@@ -2046,6 +2047,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 		       netif_running(dev) ? READ_ONCE(dev->operstate) :
- 					    IF_OPER_DOWN) ||
- 	    nla_put_u8(skb, IFLA_LINKMODE, READ_ONCE(dev->link_mode)) ||
-+	    nla_put_u8(skb, IFLA_NETNS_IMMUTABLE, dev->netns_immutable) ||
- 	    nla_put_u32(skb, IFLA_MTU, READ_ONCE(dev->mtu)) ||
- 	    nla_put_u32(skb, IFLA_MIN_MTU, READ_ONCE(dev->min_mtu)) ||
- 	    nla_put_u32(skb, IFLA_MAX_MTU, READ_ONCE(dev->max_mtu)) ||
-@@ -2234,6 +2236,7 @@ static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
- 	[IFLA_ALLMULTI]		= { .type = NLA_REJECT },
- 	[IFLA_GSO_IPV4_MAX_SIZE]	= NLA_POLICY_MIN(NLA_U32, MAX_TCP_HEADER + 1),
- 	[IFLA_GRO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
-+	[IFLA_NETNS_IMMUTABLE]	= { .type = NLA_REJECT },
- };
+@@ -3028,7 +3028,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
  
- static const struct nla_policy ifla_info_policy[IFLA_INFO_MAX+1] = {
+ 		new_ifindex = nla_get_s32_default(tb[IFLA_NEW_IFINDEX], 0);
+ 
+-		err = __dev_change_net_namespace(dev, tgt_net, pat, new_ifindex);
++		err = __dev_change_net_namespace(dev, tgt_net, pat, new_ifindex, extack);
+ 		if (err)
+ 			goto errout;
+ 
 -- 
 2.47.1
 
