@@ -1,173 +1,138 @@
-Return-Path: <netdev+bounces-168407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F77EA3ED58
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:33:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB496A3ED62
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C8833B77DD
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 07:33:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CCE716DD66
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 07:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A37F1D89E4;
-	Fri, 21 Feb 2025 07:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D353E1FF7CC;
+	Fri, 21 Feb 2025 07:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QBSprflo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6JpJ457"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1621FCFCE
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 07:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064691E47C2;
+	Fri, 21 Feb 2025 07:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740123210; cv=none; b=LrkNFnU9CRTSMy/woduYUoKPUEMmxB2QV/iiPt2RVy3l/UNTk0GcZ8vqST4enhstw/+cCTlsAKJl3P+UTgm0TdzSf7GUJ7ngvQ7MZciQgf2LPRDkvcuPbVNVn3t+Y+Yho6UzekU/xjQNvKCu12iNgeLgkZTQkpvYz6f0EzCdMIA=
+	t=1740123307; cv=none; b=b6QpijdsajTn9HX83LQdDAsHeLBroWxbK0IwPFO7d4Lbzkuu2SVO4Gd5nUa/2p0I1hyexcKj0nzgZ6F0EkwPEneS6NYWjNT+hUrtLKMN4IDdVMjHOvwOVBQW5XC4quSvWluRDvSxzFCeXneQR16ep/wPF9ZMom8MlzSpwhG8lSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740123210; c=relaxed/simple;
-	bh=5FP/eBS7lGDumhr02aFKydBB7pfzPWOJwwdAwCYLHHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kka8S6JF2Z2yb79wozhAq7DiPA4/jnJfqeqCXg5gWBJOcArqb8GEQZpVTJTo0RRn+1WJNkdXPUQ+ZoUxz4Vt9TotpuP6YBfmAWY/u2QvctiMAh7lW86LYxutwI0OJJcMMw4OevxPioAutep7re4kJ090e4lDiybaD7vOutW9Jvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QBSprflo; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740123209; x=1771659209;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5FP/eBS7lGDumhr02aFKydBB7pfzPWOJwwdAwCYLHHQ=;
-  b=QBSprflouZy8QnfkVLcfupGvv5LO3gXCslB/UZ5p8nkgRWeaLBc80zg1
-   iwdHtlPJPTLQWAsU737U9XIYsxb73W+yYf+C50bOAP78McrM3yFm7wzQP
-   I+Q/96qhRTlUguBl+3yUcQ55uskJmoSPcOyylGF9Iu9YCXKRJyWC6vSYW
-   eR/iSBIC7XxZgCvuS3SZpTDtIQxVv19/ggR2boHLXibPosd0NEu4Xba+f
-   Xncha8d2/YFoX1obbSQoa/Op8hgGTHgI5WQ7J9kM7Oi0x2SDhsuNpXcYu
-   h2umXyxiNtwRJ5AvuZSj2R5zlabmTt2y590GJqWbG6Gd5JPyB1ROnmckn
-   Q==;
-X-CSE-ConnectionGUID: XTRFHasSR+e/YioykeMIFQ==
-X-CSE-MsgGUID: gN3OFCdWQoa3Crv6XgZ9LQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="40852336"
-X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
-   d="scan'208";a="40852336"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 23:33:28 -0800
-X-CSE-ConnectionGUID: yGKCJylvT5KUfXSbr4aR9A==
-X-CSE-MsgGUID: T13jXwgkSCeJXm2BARMUGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
-   d="scan'208";a="115294573"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 23:33:26 -0800
-Date: Fri, 21 Feb 2025 08:29:50 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: Re: [PATCH iwl-net] ice: fix Get Tx Topology AQ command error on E830
-Message-ID: <Z7grbgy/g4cJTqYb@mev-dev.igk.intel.com>
-References: <20250218-jk-e830-ddp-loading-fix-v1-1-47dc8e8d4ab5@intel.com>
- <Z7WmcXf8J5j/ksNX@mev-dev.igk.intel.com>
- <55fcbc58-fccb-4db5-afa2-21b53a89fdc3@intel.com>
+	s=arc-20240116; t=1740123307; c=relaxed/simple;
+	bh=T1VOQiQtQXiQ9wkvgL+WC9xJqcl7iT4O6gvw688nMkU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=udBIafiy8mpy5ULEuGxuht3LzdHn/7U6dr10U7rsu06kkFkWs9QeGu+s7yZwCLUKxxWdtRkZE+/WVXBx694fxSMk5sAl+JdeP6KthDalOmq+H8ndYPI1+vZtyEiZgzDbsJ1SShVlIgDbbURH7UuhVVm/bhvVVNTxCJDxPafEQ/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6JpJ457; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38f2b7ce319so1464011f8f.2;
+        Thu, 20 Feb 2025 23:35:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740123304; x=1740728104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z+QeLQVPsYwD13WdLTO9iwIZOqXlzHUuuYA44GHEnsU=;
+        b=U6JpJ457jP2izXV8r/eMuvXycpbgUpO7ekUzuySgQ/mxiwuQADcgrrGQ24uLCn3zLv
+         yZYPnrzne7VNjkMkUwRtTh5pfnISomK95JFYM3us61r7XNqNzo3QJV39bJSQjJ2ppSeY
+         zyWFUmS8XpsLxbrYFfKk92rRcrj5cxbhnwaR01Qmo9WVq6cG3KboI9EHo4pkMrOLEdT1
+         IuHawhQKlwB0U1ah4y7L0PjiN9S8bef5ZwgoMI+IIfe6kDX0YH4wLR8BTCr2L9S7hz6g
+         gQQ7wNtEdGvxkwvuk7xiRwFFUteObuw/hSuAl+ZzcXsEabp4D3wNdhDARer7tt7AzU/h
+         SxWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740123304; x=1740728104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z+QeLQVPsYwD13WdLTO9iwIZOqXlzHUuuYA44GHEnsU=;
+        b=XmxsRYtWEC496Z7ZsXLaLpC/H5vEKVpw+Zq2Klmy+tP6bgsC2h6biVOLP6qWVMlFbF
+         kmRodck5JG679E9Mgx7ospyvlShrPfywJeyGiZ9PE4BqJ+Gc2QfCKHW4kxJCxHC0ko6I
+         IuIl0raCi1mel8PGkgvu9Pvb50lGpebRN4f29wNkXhgnndDen0lwldd/vWe15CbgvQHD
+         EhQsR3j5NyoO+KmKxadyC/3RGZB0wki6BNhZ+mKDULcYhDi2Et+gKk/0d6pmR7mjIm7Q
+         tf4RK11qCL4HxCPzwhOBsKhuPqJE2a1U1sWSiidz5FbdU4D0CmDgudANR67eeOb2m3Np
+         HbnA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9P+XNvRzAvk1jFKczjlrFOkuagMQSeJmIF4BaOxm/Di53yfkwD1/W3cqycDtlmfuRF1QrWzfLX5vpQQ==@vger.kernel.org, AJvYcCULxHTsdTum9DUSghT+QNq82RmXpLIzEsBr1cMF5YioE/Heyq4kdQ5m1bR3CY4YPU418yyf4GsSHLHkCQ==@vger.kernel.org, AJvYcCUi/6+SSFnRDyxgrsE/+yPkfZm0GbMRQ1jXT9yb9imSidW+SKSOB6pfwiHXtxrkNtGqNvVPOOm6t8RlinTz4EE=@vger.kernel.org, AJvYcCVBkCunSMgHIAazgRoWurTNMJKG7WlUl3cImzlc90uNCUjhjc1bcvxV+a/SMtSzsclMIzv+cTev58bIDJ+5@vger.kernel.org, AJvYcCVmC/0jWlNj1U+vrvhHC39R0O95XIqzIEWHW0gUaUfDBvqC3zMSwsgXoIS/4sGqStuG6HFzZftsXxbe@vger.kernel.org, AJvYcCWXnVF9jHY0+KAU1zucfOJCd1lgmy36OZlUHtvsoJdwSLsxnKU778KwplDU4Ry3t6+grBkdFvqK9ZfX/hhGQ5F5@vger.kernel.org, AJvYcCX+GU5TA1jp7gAx6VQCazY9fzPjT0cseS9eMoL9UrZZ3P9gMOi3D6R2AFdGmnDnSPN1vHA4eUls@vger.kernel.org, AJvYcCXXZdkX6yCGLQJ6v12VcINeYXBhLErs4peKZ9aBYGYIcKgqN5WhYY+UXNKspL4g44O83K0=@vger.kernel.org, AJvYcCXbSLj2op01AnruCL4TDWcyVqbiOn3XtxyS+qeumcp91VtzZoiA6/Aj4dmPr75rMCeeFKlUUSCQk9yX@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOysp3c2b71HetMD2mwvwOLmw3YMNU7cu3Dej2JbN7xDoS2JcO
+	zashF8skDnQcwKD53cl8Fv+EBMoAYBrd5veQCWwTL/ptJosdwEDcn0LEOUDNBEVVXMtheJJg0mJ
+	YjUePpKlJFXebC/PEhc4H2Frg3ZI=
+X-Gm-Gg: ASbGnctrC+gmKyKMoxLzbnq4IEI0b9IvQCjViA/mdnJdyXoP3ebwrtP14Jos1jJqtA9
+	2NPemW/bmeIFpgx+lJlePZ/e5ki5yLw7tSwyk00WZBG6ANKLixpEB80LCfQBNy1Q+Kg9RTE9O75
+	DX6mDvwg==
+X-Google-Smtp-Source: AGHT+IEnf7T/XWdU9Kctt2h3J5gBBMYg3Bh51JvuIgDPQVVK7cGhz8HpBuMv8GGd62Uk1SqkypkvwsyahBFfgLBFMsQ=
+X-Received: by 2002:a05:6000:4026:b0:38f:2856:7d9a with SMTP id
+ ffacd0b85a97d-38f6e7563cfmr1756891f8f.3.1740123304054; Thu, 20 Feb 2025
+ 23:35:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55fcbc58-fccb-4db5-afa2-21b53a89fdc3@intel.com>
+References: <20250219125039.18024-8-shaw.leon@gmail.com> <20250221040641.77646-1-kuniyu@amazon.com>
+In-Reply-To: <20250221040641.77646-1-kuniyu@amazon.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Fri, 21 Feb 2025 15:34:27 +0800
+X-Gm-Features: AWEUYZnNy9JuajIA_7tDw52YSOa4CSIEVEzv6mMTGyYFjN7-s6b2UXlhoSAg5e4
+Message-ID: <CABAhCOS3BC+spLNrb_P8Ovzo18BwHU6UEc6Aq80_YKUoc8rfMQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 07/13] net: ipv6: Init tunnel link-netns
+ before registering dev
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alex.aring@gmail.com, andrew+netdev@lunn.ch, 
+	b.a.t.m.a.n@lists.open-mesh.org, bpf@vger.kernel.org, bridge@lists.linux.dev, 
+	davem@davemloft.net, donald.hunter@gmail.com, dsahern@kernel.org, 
+	edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	osmocom-net-gprs@lists.osmocom.org, pabeni@redhat.com, shuah@kernel.org, 
+	stefan@datenfreihafen.org, steffen.klassert@secunet.com, 
+	wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 20, 2025 at 02:45:41PM -0800, Jacob Keller wrote:
-> 
-> 
-> On 2/19/2025 1:37 AM, Michal Swiatkowski wrote:
-> > On Tue, Feb 18, 2025 at 04:46:34PM -0800, Jacob Keller wrote:
-> >> From: Paul Greenwalt <paul.greenwalt@intel.com>
-> >>
-> >> With E830 Get Tx Topology AQ command (opcode 0x0418) returns an error when
-> >> setting the AQ command read flag, and since the get command is a direct
-> >> command there is no need to set the read flag.
-> >>
-> >> Fix this by only setting read flag on set command.
-> > 
-> > Why it isn't true for other hw? I mean, why not:
-> > if (set)
-> > 	RD_FLAG
-> > else 
-> > 	NOT_RD_FLAG
-> > Other hw needs RD flag in case of get too?
-> > 
-> 
-> From what I understand, we didn't anticipate this flow changing. E810
-> and E822 hardware require FLAG_RD for both get and set, while E825-C and
-> E830 expect FLAG_RD only for set, but not for get.
-> 
+On Fri, Feb 21, 2025 at 12:07=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> From: Xiao Liang <shaw.leon@gmail.com>
+> Date: Wed, 19 Feb 2025 20:50:33 +0800
+> > Currently some IPv6 tunnel drivers set tnl->net to dev_net(dev) in
+> > ndo_init(), which is called in register_netdevice(). However, it lacks
+> > the context of link-netns when we enable cross-net tunnels at device
+> > registration time.
+> >
+> > Let's move the init of tunnel link-netns before register_netdevice().
+> >
+> > ip6_gre has already initialized netns, so just remove the redundant
+> > assignment.
+> >
+> > Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
+>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>
+> left a small comment, but not a blocker.
+>
+>
+> > @@ -1565,6 +1565,7 @@ static int ipip6_newlink(struct net_device *dev,
+> >       int err;
+> >
+> >       nt =3D netdev_priv(dev);
+> > +     nt->net =3D net;
+>
+> This hunk is not necessary as we'll call ipip6_tunnel_locate(),
+> but it's harmless and not worth reposting the whole series given
+> we are alredy in v10.  You can just post a follow-up patch after
+> the series is applied.
 
-Thanks for explanation. Seems resonable from driver perspective and not
-so reasonable from firmware, but maybe this difference is somehow
-important.
+Seems ipip6_tunnel_locate() only sets netns for newly created
+devices (for ioctl). ipip6_newlink() is calling it to check for
+conflicts, so we might need this line.
 
-Thanks,
-Michal
-
-> >>
-> > 
-> > Don't you need fixes tag?
-> 
-> You're correct. I'll add it in v2
-> 
-> >> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> >> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> >> ---
-> >>  drivers/net/ethernet/intel/ice/ice_ddp.c | 10 +++++-----
-> >>  1 file changed, 5 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-> >> index 03988be03729b76e96188864896527060c8c4d5b..49bd49ab3ccf36c990144894e887341459377a2d 100644
-> >> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-> >> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-> >> @@ -2345,15 +2345,15 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
-> >>  			cmd->set_flags |= ICE_AQC_TX_TOPO_FLAGS_SRC_RAM |
-> >>  					  ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW;
-> >>  
-> >> -		if (ice_is_e825c(hw))
-> >> -			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-> >> +		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-> >>  	} else {
-> >>  		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_tx_topo);
-> >>  		cmd->get_flags = ICE_AQC_TX_TOPO_GET_RAM;
-> >> -	}
-> >>  
-> >> -	if (!ice_is_e825c(hw))
-> >> -		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-> >> +		if (hw->mac_type != ICE_MAC_GENERIC_3K_E825 &&
-> >> +		    hw->mac_type != ICE_MAC_E830)
-> >> +			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-> >> +	}
-> >>  
-> >>  	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-> >>  	if (status)
-> >>
-> > 
-> > In general looks fine, only one question.
-> > 
-> > Thanks,
-> > Michal
-> 
-> Thanks for the review, I'll send a v2 with this cleaned up and include a
-> fixes tag.
-> 
-> > 
-> >> ---
-> >> base-commit: f5da7c45188eea71394bf445655cae2df88a7788
-> >> change-id: 20250218-jk-e830-ddp-loading-fix-9efdbdfc270a
-> >>
-> >> Best regards,
-> >> -- 
-> >> Jacob Keller <jacob.e.keller@intel.com>
-> 
+Thanks for your review!
 
