@@ -1,187 +1,236 @@
-Return-Path: <netdev+bounces-168578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28933A3F655
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:50:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97ADFA3F65C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:51:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34612188E309
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:50:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA10618853F0
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20862080C0;
-	Fri, 21 Feb 2025 13:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C19B192B74;
+	Fri, 21 Feb 2025 13:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DeTHIE5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3066088F
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 13:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740145808; cv=none; b=VtCJIDJOH6525K0L366EEYYAjWD8e2DLsSlN1For0o6fg81mj4bpj0VwtZXOZDlYV5PgcAGANJUZSRLnbUm8hv7MPtf1+fab9yyWVVd4KEG8khe2H1pUo3g85O376lvvgQI0lDqqGDj36Ck+kfE06A3E3ckgfJZ1fnioGFLPM0s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740145808; c=relaxed/simple;
-	bh=+OGK6S7sr/csBxUsXpd2Oq8bTN43O0NJ2ft0Ngbg0qM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u4vIN2D6/XrBswBXMPhWX4hdVtFdWWPdb70213mmHYDSV/Hi3TWD8/mLF48ZNGjIoxtD32V3R9IhTI9JU+8w5rfynlNWHTHfm6kE1zMpOcMazqtdfJjpbxgwcP11/jVi1jxk5rhjhbmrIdbAHmuff0RGsHa0Ne/HU7YO8S8kKCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tlTPA-0005C2-FE; Fri, 21 Feb 2025 14:49:24 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tlTP7-0026xT-29;
-	Fri, 21 Feb 2025 14:49:21 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tlTP7-009zCt-1g;
-	Fri, 21 Feb 2025 14:49:21 +0100
-Date: Fri, 21 Feb 2025 14:49:21 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 07/12] net: ethtool: Add PSE new budget
- evaluation strategy support feature
-Message-ID: <Z7iEYQzsdpUFmfZE@pengutronix.de>
-References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
- <20250218-feature_poe_port_prio-v5-7-3da486e5fd64@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791922AD13
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 13:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740145892; cv=fail; b=q02rCYT26zZkDON20hD9MA9+0ROaKAvTaUdbSjhT4rgclTgtjLUDDEg+Fb03V283VAOOu+BhR1R7210W99jdnl6SbuZdIBbwu7tdqz8Orc/uZPaieye5wdkYN0lR8j8lGvlJacoJcRkzZH3BOcKpUe6WzHwgnXnvdJm32zEienE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740145892; c=relaxed/simple;
+	bh=m8BB/IhpaezHp86bzuaZ5kCaSQqr2EYHBpRMNwxB55U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dwr+EbGbzBo1XgQQ9tKvnU2rHBire8T80lZIHRAVgDikZhELEssU0hXse690hcSeStbi98QjMIQEScslNliHMGkhyeOp9az21Ck8E129Yp8wubV380MxsrysI1DM6sGxUAdcNAzRIrooaXsIs9JykDFu3KdSqaFxz+WLRSs2yAw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DeTHIE5y; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740145890; x=1771681890;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=m8BB/IhpaezHp86bzuaZ5kCaSQqr2EYHBpRMNwxB55U=;
+  b=DeTHIE5yi6/zWtfoT7JbUY5lWWTZPYmxhz0GVIy9+cSJ3DFMBZNZpkeV
+   sx1H5iEHdrD5HgXNYxlA4+4Zlg0M4/F7AjeKwgUn/QXeNlOjcl0L4DeXz
+   ShFDNsjIG+l7Q9ium9sRKqbiP6g116oGPK0qibEa6M+0f3oMSuoLbwZgo
+   1QS9PHCUjMwJJsvIiM/waiK38Qvxbsb0IUU8KR5Q33NG8qKF8QwxR2uEo
+   KmBbIkFr0+SbUuaO+vm8frVUoxtvS3nF7ZghvNEWWJzpowbm6g5Eq9U7q
+   Oa2vbgn/IdMnu3U3XeUugJ2XsJMWy9fvTtyV0LIVVeFhwqFUjCngEYOYY
+   Q==;
+X-CSE-ConnectionGUID: 7xJznOwaSiygkC9O2z5sPw==
+X-CSE-MsgGUID: JxQ+lU+dQUyLxLM1fRvK1A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="51606405"
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="51606405"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:51:29 -0800
+X-CSE-ConnectionGUID: u8fPzBWDSeyj+lcLZqWG0g==
+X-CSE-MsgGUID: bp2UqllYQeOAic0uHN/8aQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="120306671"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:51:30 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 21 Feb 2025 05:51:29 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 21 Feb 2025 05:51:29 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 21 Feb 2025 05:51:28 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W8EunlrL4WfPpb1jX/1a5xE2QsOaL7aLB72mTFPf5BzHk83mJ3rNkmGuqIaYbMqoI7vVfNLVg2tMhi/ym51iN0NfW5NVhnWtfm/z5jzuHAnWEghVxmuDEcj0jJNmwrtgVYS83wHmK86TIk+nXac1T0RpF8HsPfDK1G2uycIgXgYP5he29/UPw2QpqQYltB8lZ47CGwpqFHXaqlYH3HP7k+6RuH4LWHY62kDgmkxICTJDAPPL1zo+kXahIjo2VKPMTd0SiwFXkWCpauVxO/y/SZrzBMB5DHe0E3T7uZHbK7myMCMAupQHtktiSXwErVminJ+ax2Wyi9fn8uYwyDaoGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pLuX1W4iYt1Cx0jwmlk4Gk+zj4GKM3ZVQPEF7gVrxcY=;
+ b=A4OD4s/M9Ae3Cli7c7H2N/Uo6fAhvtJ/Vo2QhGObw/GHfeGq2C0UyzaRv5WTIWJ3kPZqR9+zy69XBVvrvb0ERg3qJqxk/fsuo2IL5oJy+pct4w00PASVXzN7BCDbDfKeTdu7nneOiqY2HnRAOrmxeqlFMxQg68Kv94KHiMBHEZ4tpuhSpBmlgEamk8qZdlqW3uTJFe3c7yc2rl4tJfas6/WiuoDuFkhZG6jFvxzyXsdqZjUxb+t5HFE9JJVzHMKNoGK8mBza2vn6jVm54Ljl3qDWBo0hBAebDZ7vr16VxhE6rInwAZYRzE7yBoY9rJx1vn+evhBb8u68jQPMZKXCXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
+ by DM4PR11MB6479.namprd11.prod.outlook.com (2603:10b6:8:8c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Fri, 21 Feb
+ 2025 13:51:26 +0000
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::265f:31c0:f775:c25b]) by SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::265f:31c0:f775:c25b%4]) with mapi id 15.20.8466.015; Fri, 21 Feb 2025
+ 13:51:26 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Damato, Joe" <jdamato@fastly.com>, Kurt Kanzenbach <kurt@linutronix.de>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Sebastian
+ Andrzej Siewior" <bigeasy@linutronix.de>, Gerhard Engleder
+	<gerhard@engleder-embedded.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support for
+ persistent NAPI config
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support for
+ persistent NAPI config
+Thread-Index: AQHbgS+LHkO17VzUqk+5drVD2uzj17NNkgAAgAQ68WA=
+Date: Fri, 21 Feb 2025 13:51:26 +0000
+Message-ID: <SJ0PR11MB5866C1D10FDD48A5DCA3FD89E5C72@SJ0PR11MB5866.namprd11.prod.outlook.com>
+References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
+ <20250217-igb_irq-v2-3-4cb502049ac2@linutronix.de>
+ <Z7T4XHtw9-EN-ifm@LQ3V64L9R2>
+In-Reply-To: <Z7T4XHtw9-EN-ifm@LQ3V64L9R2>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|DM4PR11MB6479:EE_
+x-ms-office365-filtering-correlation-id: 610bef4d-067b-48e9-91c4-08dd527ed5c5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?nFP2OARmEy86k/Kzr8rOkAueYI4orxL53BYILPEiKNiV6gLjgX4A/35laB3d?=
+ =?us-ascii?Q?1kiw+g0c5FIcoc+9ZkpKTejwoCWSiAV/2nPzua0gYutxi9GV++7fuZYv2wIt?=
+ =?us-ascii?Q?gXh+m/lnZ1pSZF0LvEa7iEtJqx6CQJ0mQFzOeKFSeffq2M3VTZP+5LstCF0u?=
+ =?us-ascii?Q?ZCMi7bUIYS+bj3VmlC6pJfL7mH9PPpT23Spt8q9Dkp+ozrbQvLbn6XOU0B6x?=
+ =?us-ascii?Q?LhNHbx5D7SmePLGhgOe9caDL2AGw7sq1iQ8RLDfmOEH8C4BwIEoE0L61f1cD?=
+ =?us-ascii?Q?zQzNorr84/qlcNmv4DH0REBHsdpALZRr7pM6RUP4fvQizuUt2thlE40SXfYB?=
+ =?us-ascii?Q?9V9pPHLwCCtIpCEaOFQ4un2KkDzui8gF5j7tZf/qEqa4TmHl5n6K7PlgmrhM?=
+ =?us-ascii?Q?3hkaEUg4Xbc96ihoP6RscNn/56qY/NACkA6ZRpgYl04a8nikb7jwu+jO+F43?=
+ =?us-ascii?Q?s2dAoL2x8SRY04jtpbEIL0v3+k2JUpGSV0XelAsYCbDPRG+Q0w1RZoFNkoKy?=
+ =?us-ascii?Q?dDp6Yqmf+LKgyH+JyYoWSM7BXs+bpBFPt79ypdHixZc/Ho7vmEQa1elkt0sK?=
+ =?us-ascii?Q?3F7zrk2OWju0WpHWxaqTHWeEbzYugLamqPQT+cP51uXP/005vwKh4y2IBd1x?=
+ =?us-ascii?Q?RMGd82ApIVfzsdIkCSBoqUePkVtT/C3mgsefrIUFAgoYEAGVfaL8U3uY0p//?=
+ =?us-ascii?Q?m8uNbMQNnZ3tgzTd8fsr/NDjtAzmHIQdJgTLOPkh1d5Ds2LBD6FwPs25fvX+?=
+ =?us-ascii?Q?0j+7bwBnoqVNobWjJ2Q8Sm4PdSUNFpy+MCuL9Xaz653wkHmmdwjdGYwi23Ay?=
+ =?us-ascii?Q?52i/oyDSbSJ5bsMwkI8UI5jNhAka6WPf2cuTjn2appZoIhefxf1+jQmyPLJB?=
+ =?us-ascii?Q?srhXfjDSdwaqhx+bESdszKtHUTACPt0Ac1yaYNYmWt0cLhykEVhupmy4VcXe?=
+ =?us-ascii?Q?mXKTW7EfSyN+naX4ODYcPG45ToP4BUVM9wKIsYdpPW1uTArBsJ7BDt35tac6?=
+ =?us-ascii?Q?TcshVKXn4f+f09iP8ZXLSHElw0OdqgjM2nAzHjt2znWs5ksT1T8RrmgXkKFw?=
+ =?us-ascii?Q?N6XQs56DOL5b5wO2BnUNGFpVUrTagBA8dhyGSP1i7RcVW5ae2y+XPI2WBrug?=
+ =?us-ascii?Q?G54nhBfYhfDILaQ24iQYmITyHtiX0pCWEky6X8yK6yj+OfkPoUNZr4BEWmyw?=
+ =?us-ascii?Q?F1dkIQeSz3ZcZvTFU4LWeXpYBvlVPPnLef/NQt/juweZP+5spzADS5Y3gjpg?=
+ =?us-ascii?Q?64L003l+/1DP+mNzHGToa8ERd8wNdFtDlmq4asOpzcSvOxV2hF++g1jFhggm?=
+ =?us-ascii?Q?ic9qzUi0iqxT44nkl58r06GoNF/TaqpyV3IkL1M5lMwJ+pHhVCZ8dUQJ9Bhe?=
+ =?us-ascii?Q?OW2xv7T0SlxBEoO2ff9wDleh0KYfk9GNrkjv4zhPdcwi5s30D9B56qMSCKXy?=
+ =?us-ascii?Q?bgnfRqUhWUWYh1QIGuKyDgQCQPup9xT4?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ssP8vfq3NR8RFQqUJaTy7uxz3EKrkkQXY+Nwz/9SR+kWaEPGASQvMDEcooSm?=
+ =?us-ascii?Q?XMsnXfGhbP+bcvQp8DH45aEH+bIvoqAJ+meHSu+x0az7uf3zoeM1XaLb9FDG?=
+ =?us-ascii?Q?kLZT7gQCkr/kWXJFhXSJiryEoAP3GsQ5IFPBwpMNcshkHbcC1745Uvp4ZQVF?=
+ =?us-ascii?Q?yL8ppB5gzuj8ndQ62+ZMRn2SRpSvJx0DWiLeab7wHZS2wOi3HpYVHgGSlfuQ?=
+ =?us-ascii?Q?fXwdHFtJAqSGFVtWVP8m4QhpZ9EygECqRoqmEN+w1Dx05UED+i4UYGGuH55F?=
+ =?us-ascii?Q?whXplBjaAHWlRad/44rM++dEArijLjx9Ssk5f6gsz8b0KNbPL2dGSbB2lfpn?=
+ =?us-ascii?Q?qkyvR99M7YmtIrv14milHVHfw5fNWlhpIgh2Xn7Knbj2pbiOk3m9mtzH8tg5?=
+ =?us-ascii?Q?zkrOwRBMpNuxXPV8EmhFqO6lZzHMuTuG4sp6iRjqqoAu38sh+318XY3C/b+Q?=
+ =?us-ascii?Q?VZP4L9CDZnrVibE25j6aRzvoLi/W12qfKb37c32HB5tqlOQHq6HDlLAWJn1M?=
+ =?us-ascii?Q?FWW5izJzG+NwvRvvsPP7WeQQivUOQmL5gDWv8GvmoYRRJg7NjyqAk888IiCP?=
+ =?us-ascii?Q?S9wQrn4pe0yVVOaCi+YjIWBOzqdvaR6M9+s8/9eQ+68Ofwbwa4ilhc5rQGwH?=
+ =?us-ascii?Q?l8pQ5m9j4uJ+KHJ+Sx6djzKyobJFNk2gYcyoEJPUB3DfLHiEtimKP8dhpBB1?=
+ =?us-ascii?Q?sqhwgTJmLaB6k1XISm8BQ166LkbbqPByMGAcx0iPKGi7Hi5ORaG10TbhBewL?=
+ =?us-ascii?Q?+CpIV/iB46AqDfoOpelsLZvpWgjlI/M9Jl6wLuKO95uaL3E8VrK7veIIvvUh?=
+ =?us-ascii?Q?jnuqV2IgLEg0bsu1cdQq63Xx55ZqMTddHy5Tbh5nx2UT016Wy+OQvE+RdI6e?=
+ =?us-ascii?Q?eJ1uV32QFmyZ+tZx0TlsEpbgNO2AhltNWeSuzF/PF7JesiGVpFpAskn/wdJe?=
+ =?us-ascii?Q?I7SI+fqHCklZumLMXQOm3GV7N8onsmcP/6dLxcX+FSfA8sfV+Mo3szUtjVE3?=
+ =?us-ascii?Q?eNax74mleFIDC178W5tFZY7xP62bWWRiOVXafLR7CC5EsPiA/JomDrzvMU0p?=
+ =?us-ascii?Q?VDmO5z4nKCMmHk2iSLCAGaaCDxXRZUiIeh0E3C+EH6KFxi87rXerhEenOOfy?=
+ =?us-ascii?Q?bgwVehoGqU+X5NgMan1FUlft5NHWtb5qH+FXL7NU8zFOUX4X2Z9wUWaDO9JC?=
+ =?us-ascii?Q?4G0cMGAk01q/txE11yREygBEs6aPQbCUUkh2P/2AYDcFhmZ20e57YzY96HWq?=
+ =?us-ascii?Q?W6QXmYxl9YsrSzc8v6bbJU5vzWCIKIi8my76D/cvFcADQw5RB7afkbEl+8Iu?=
+ =?us-ascii?Q?ZAPjdqxVvdxFlTmrFIgWaya/tb8zDyllvi3qDFVQa2gBIud8oOzJtwZntuE9?=
+ =?us-ascii?Q?UPpqJ5gM+su/xE5QrhtVyQ4hHtpN+J7bgM2Mi1+veaKmNvvFpPue1tLa8o2X?=
+ =?us-ascii?Q?JwXxjaMl07ukXZp+ZwZSBatzD5LY7MAQAlUuR09oiN5fz8wIYyCW1aFvjAN6?=
+ =?us-ascii?Q?m7wpHThD5w31+wNeDvPvlGuJTJI9r49wRDZCCiCGmun9/+8S6Fi8AJAOyJJf?=
+ =?us-ascii?Q?BuJpzf9XmKGWaTWtdbKUU2RBPEMXhvo6gn8HjJnwuXDDQQGrN7dRcOVPwHOC?=
+ =?us-ascii?Q?mA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250218-feature_poe_port_prio-v5-7-3da486e5fd64@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 610bef4d-067b-48e9-91c4-08dd527ed5c5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2025 13:51:26.2246
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VRFm/IOWc34vztdyCK+SEgVcCXhG2F51hjFx0sf5cZ4jBlTmtLMjvUBZxThmJB1urOOaqheYYTpVRJy2AOg5cApKc5dP0ewN0iG/9J805oE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6479
+X-OriginatorOrg: intel.com
 
-Hi Kory,
 
-On Tue, Feb 18, 2025 at 05:19:11PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> This patch expands the status information provided by ethtool for PSE c33
-> with current port priority and max port priority. It also adds a call to
-> pse_ethtool_set_prio() to configure the PSE port priority.
 
-Thank you! Here are some comments...
-
-> --- a/Documentation/networking/ethtool-netlink.rst
-> +++ b/Documentation/networking/ethtool-netlink.rst
-> @@ -1790,6 +1790,12 @@ Kernel response contents:
->    ``ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES``       nested  Supported power limit
->                                                        configuration ranges.
->    ``ETHTOOL_A_PSE_PW_D_ID``                      u32  Index of the PSE power domain
-> +  ``ETHTOOL_A_C33_PSE_BUDGET_EVAL_STRAT``        u32  Budget evaluation strategy
-> +                                                      of the PSE
-> +  ``ETHTOOL_A_C33_PSE_PRIO_MAX``                 u32  Priority maximum configurable
-> +                                                      on the PoE PSE
-> +  ``ETHTOOL_A_C33_PSE_PRIO``                     u32  Priority of the PoE PSE
-> +                                                      currently configured
-
-Please remove _C33_ from these fields, as they are not specific to Clause 33.
-
->    ==========================================  ======  =============================
->  
->  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
-> @@ -1866,6 +1872,51 @@ equal.
->  The ``ETHTOOL_A_PSE_PW_D_ID`` attribute identifies the index of PSE power
->  domain.
->  
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO_SUPP_MODES`` attribute
-> +identifies the priority mode supported by the C33 PSE.
-> +When set, the optional ``ETHTOOL_A_C33_PSE_BUDGET_EVAL_STRAT`` attributes is used to
-> +identifies the currently configured C33 PSE budget evaluation strategy.
-> +The available strategies are:
-> +
-> +1. Disabled:
-> +
-> +   In this mode, the port is excluded from active budget evaluation. It
-> +   allows the port to violate the budget and is intended primarily for testing
-> +   purposes.
-> +
-> +2. Static Method:
-> +
-> +   This method involves distributing power based on PD classification. It’s
-> +   straightforward and stable, with the PSE core keeping track of the budget
-> +   and subtracting the power requested by each PD’s class. This is the
-> +   safest option and should be used by default.
-> +
-> +   Advantages: Every PD gets its promised power at any time, which guarantees
-> +   reliability.
-> +
-> +   Disadvantages: PD classification steps are large, meaning devices request
-> +   much more power than they actually need. As a result, the power supply may
-> +   only operate at, say, 50% capacity, which is inefficient and wastes money.
-> +
-> +3. Dynamic Method:
-> +
-> +   This method monitors the current consumption per port and subtracts it from
-> +   the available power budget. When the budget is exceeded, lower-priority
-> +   ports are shut down. This method is managed by the PSE controller itself.
-> +
-> +   Advantages: This method optimizes resource utilization, saving costs.
-> +
-> +   Disadvantages: Low-priority devices may experience instability.
-> +
-> +.. kernel-doc:: include/uapi/linux/ethtool.h
-> +    :identifiers: ethtool_pse_budget_eval_strategies
-> +
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO_MAX`` attribute identifies
-> +the C33 PSE maximum priority value.
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO`` attributes is used to
-> +identifies the currently configured C33 PSE priority.
-> +For a description of PSE priority attributes, see ``PSE_SET``.
-> +
->  PSE_SET
->  =======
->  
-> @@ -1879,6 +1930,8 @@ Request contents:
->    ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
->    ``ETHTOOL_A_C33_PSE_AVAIL_PWR_LIMIT``      u32  Control PoE PSE available
->                                                    power limit
-> +  ``ETHTOOL_A_C33_PSE_PRIO``                 u32  Control priority of the
-> +                                                  PoE PSE
-
-Please remove _C33_ from these field, as they are not specific to
-Clause 33.
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+oe
+> Damato
+> Sent: Tuesday, February 18, 2025 10:15 PM
+> To: Kurt Kanzenbach <kurt@linutronix.de>
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Sebastian Andrzej Siewior <bigeasy@linutronix.de>;
+> Gerhard Engleder <gerhard@engleder-embedded.com>; intel-wired-
+> lan@lists.osuosl.org; netdev@vger.kernel.org
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support f=
+or
+> persistent NAPI config
+>=20
+> On Mon, Feb 17, 2025 at 12:31:23PM +0100, Kurt Kanzenbach wrote:
+> > Use netif_napi_add_config() to assign persistent per-NAPI config.
+> >
+> > This is useful for preserving NAPI settings when changing queue counts
+> > or for user space programs using SO_INCOMING_NAPI_ID.
+> >
+> > Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> > ---
+> >  drivers/net/ethernet/intel/igb/igb_main.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+>=20
+> Thanks for adding this.
+>=20
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
