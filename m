@@ -1,105 +1,115 @@
-Return-Path: <netdev+bounces-168615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A089A3FB23
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:26:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A85B8A3FB08
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 649537074F6
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:12:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB48E4433BA
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7493221506B;
-	Fri, 21 Feb 2025 16:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2F521516D;
+	Fri, 21 Feb 2025 16:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="DpIzh2tH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAqR+Rxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BE721506A
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 16:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F087E215163
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 16:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740154182; cv=none; b=Wanir9OjZ6EBOXDiyrobFiAUY+yFB4BF/OFP2hssY+L0Jiumic5zJ/oAsMNoLOAcv+1OTIQ7Ps6RG+26BMw8k9wBTfibtua10JODJDYGK2bpRksnpQmtcIBCOS6uPVIOCp630GR2v77M5nORBb4jwycDfwLFlM8uAjwfC20nhiQ=
+	t=1740154471; cv=none; b=AuiA6lVAmopvfxMvrkzIQwZOk62FKcP3gvuXW2oTBUdPEdu741ppBosS3TZy6ZEJHfDPpaiNfgecvtKaHH+zYyT8ujwb96rGEe4BeJ6l2+bwtGg0PXNC8VYKjJIsUXfd5y+DUE1zydUf1baBDYCFhDS6alZKksYi0mDddpZBmcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740154182; c=relaxed/simple;
-	bh=7OlRJG02e4MjVQGvLWIkfzHlMS56A+sC61fT8RGXD04=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqhLFBSBNtG9dC/qT2PB7WMaPCd6Tx5DAbVGtjqShQNYIwFFR4sigAAqRBJa7i+ECX8G53njUHIlF7Rk8Ot4Bq35TInuYJvpaQJq4hnb06gxH5KpqVnu21lBmF035+s/FWzxp6TZ0ucB23yar4GBykohFMUaHxUytCMzK0zzomU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=DpIzh2tH; arc=none smtp.client-ip=45.157.188.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Yzw7N4lbJzmDM;
-	Fri, 21 Feb 2025 17:09:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1740154176;
-	bh=am3mS88qb0aUbz/powxHvGIkVv9GbvnKoerku9NQmK8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DpIzh2tHNwuvQ88Qe/YKJ1R0qS3OMp9PWbicHX02KIPPhTw0xdq5GEfUVjg4rSZnX
-	 7cVvK33EJk0ZY76TnAhP8pdQXhUB3b0EZjjLKnwKIPXPT/oDRXIQpjK4WXvzJTwpk5
-	 tGwvZCg5dnhLKpwLhyuPswKKLN7MDBlKHhvx1Jvg=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Yzw7N0ChRzPQY;
-	Fri, 21 Feb 2025 17:09:35 +0100 (CET)
-Date: Fri, 21 Feb 2025 17:09:35 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v3 0/3] Fix non-TCP sockets restriction
-Message-ID: <20250221.yie2Naiquea0@digikod.net>
-References: <20250205093651.1424339-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1740154471; c=relaxed/simple;
+	bh=hLxk2Ic4xyTQDKeXAxbqDq8niaFTtdHTs3PNwXmNuwk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IYdPtLWX7zyozQJh7OB5rf1b1sgS8E6Bhhnz2VG2H7M5xtUXvfOEyApFAVJJOUbKbu4paMj9UnK9Ib/ZBGhISTjFNJS3FJCfWGZKYguBg+FQmxmPblN1iEbv2fRC1M+XDGN4oaTSIoVDexyN5DhQeQtJ+yVw8kQ7BvDaPyBLfMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAqR+Rxb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740154467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=c1WB965ckxf2wQP2lFTjkhbk5jOg6ny1d5eOCbOADhQ=;
+	b=DAqR+RxbMCQhRpHmNeAu6lbTP5cZcYptrBm3UgQucyY2rkg/1/nvoKWqKt/fljcdh2SzNQ
+	oaKFe74WZDwBiTTC6KqXy17dEdhyw9EWVhgOt3zU9vJAprE05Ukam7XXMuEbYD5Wb45Wba
+	+TVmkPKzDYpKC9HP5/UssSOOgGFcD8U=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-1-wzI8wtNpNdS2ceE8dJxj-A-1; Fri,
+ 21 Feb 2025 11:14:26 -0500
+X-MC-Unique: wzI8wtNpNdS2ceE8dJxj-A-1
+X-Mimecast-MFC-AGG-ID: wzI8wtNpNdS2ceE8dJxj-A_1740154465
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4C064180087A
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 16:14:25 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.47.238.14])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 10011180035F;
+	Fri, 21 Feb 2025 16:14:23 +0000 (UTC)
+From: Mohammad Heib <mheib@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net] net: Clear old fragment checksum value in napi_get_frags
+Date: Fri, 21 Feb 2025 18:14:05 +0200
+Message-ID: <20250221161405.1921296-1-mheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250205093651.1424339-1-ivanov.mikhail1@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Thanks Mikhail, it's been in my tree for more than 10 days, I'll include
-it in a fix PR next week.
+In certain cases, napi_get_frags() returns an skb that points to an old
+received fragment, This skb may have its skb->ip_summed, csum, and other
+fields set from previous fragment handling.
 
-On Wed, Feb 05, 2025 at 05:36:48PM +0800, Mikhail Ivanov wrote:
-> Hello!
-> 
-> This patch fixes incorrect restriction of non-TCP bind/connect actions.
-> There is two commits that extend TCP tests with MPTCP test suits and
-> IPPROTO_TCP test suits.
-> 
-> Closes: https://github.com/landlock-lsm/linux/issues/40
-> 
-> General changes after v2
-> ========================
->  * Rebases on current linux-mic/next
->  * Extracts non-TCP restriction fix into separate patchset
-> 
-> Previous versions
-> =================
-> v2: https://lore.kernel.org/all/20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com/
-> v1: https://lore.kernel.org/all/20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com/
-> 
-> Mikhail Ivanov (3):
->   landlock: Fix non-TCP sockets restriction
->   selftests/landlock: Test TCP accesses with protocol=IPPROTO_TCP
->   selftests/landlock: Test that MPTCP actions are not restricted
-> 
->  security/landlock/net.c                     |   3 +-
->  tools/testing/selftests/landlock/common.h   |   1 +
->  tools/testing/selftests/landlock/config     |   2 +
->  tools/testing/selftests/landlock/net_test.c | 124 +++++++++++++++++---
->  4 files changed, 114 insertions(+), 16 deletions(-)
-> 
-> 
-> base-commit: 24a8e44deae4b549b0fe5fbb271fe8d169f0933f
-> -- 
-> 2.34.1
-> 
-> 
+Some network drivers set skb->ip_summed to either CHECKSUM_COMPLETE or
+CHECKSUM_UNNECESSARY when getting skb from napi_get_frags(), while
+others only set skb->ip_summed when RX checksum offload is enabled on
+the device, and do not set any value for skb->ip_summed when hardware
+checksum offload is disabled, assuming that the skb->ip_summed
+initiated to zero by napi_get_frags.
+
+This inconsistency sometimes leads to checksum validation issues in the
+upper layers of the network stack.
+
+To resolve this, this patch clears the skb->ip_summed value for each skb
+returned by napi_get_frags(), ensuring that the caller is responsible
+for setting the correct checksum status. This eliminates potential
+checksum validation issues caused by improper handling of
+skb->ip_summed.
+
+Fixes: 76620aafd66f ("gro: New frags interface to avoid copying shinfo")
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
+---
+ net/core/gro.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 78b320b63174..e98007d8f26f 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -675,6 +675,8 @@ struct sk_buff *napi_get_frags(struct napi_struct *napi)
+ 			napi->skb = skb;
+ 			skb_mark_napi_id(skb, napi);
+ 		}
++	} else {
++		skb->ip_summed = CHECKSUM_NONE;
+ 	}
+ 	return skb;
+ }
+-- 
+2.48.1
+
 
