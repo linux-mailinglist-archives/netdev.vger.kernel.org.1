@@ -1,785 +1,196 @@
-Return-Path: <netdev+bounces-168652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD387A4001F
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:57:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF16A4003F
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 21:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73C45423C69
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:57:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6366D1630FB
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2411C253326;
-	Fri, 21 Feb 2025 19:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCD71FF7CC;
+	Fri, 21 Feb 2025 20:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1piDK0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20BE254AE0
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 19:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC331FCFF2;
+	Fri, 21 Feb 2025 20:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740167784; cv=none; b=PoILbFRqzUbQUeP40fZQFkIkdAI3YomQwXLVh0Vvz0s4IWPpJYJLIYqeDx0tCJPYhDBQgSmKSw7X7MFqO1f4BUd7MBmgz+yCtNhSDp8UfLsV3kv1fCdNjy9dUrIWQad+eBvvR9+oFAXYQ0EPtlulsyYgbI1LmVM53h0TneNnVnw=
+	t=1740168030; cv=none; b=HvB4PfRh0jewVmwfdXwUY/ja9bQ2Rln/Pz6n1OwgslglHxlV6BHOlMbs6GbeQ/bA5Gq70Z8Od+g74hyBW0nLhCdBqPAKHJwr+y9bwUdZhnxnJzEY9QbklqiZ6NvWWPcZJVO2xBmXdAIszApp18I3K8mltj60hhdWLJAoo2W3CtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740167784; c=relaxed/simple;
-	bh=7ljkwb2Z213abQR9SnQYav8EeaLSIPIjbFudEQhSC98=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B6Kdnz+EyX8d1f4JW0rHoqSQHjQOjHtqxnAgrepLrI14qRDR6N+3/9Ywm3Q8lleM7SOQS+t+/LVJLMXSEBk3pBdynr0di7nbqszwZTtAN0ik4bT0M70vMOwejmsdZ1bvtq/CGuwEe1dJUeNnVGZaJrwHDNU4awEkjQtD6tOOQkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+	s=arc-20240116; t=1740168030; c=relaxed/simple;
+	bh=JeF6DqOgaMLhxI91Dr59kKL8+DhZtDJL0b2peQiXBBQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PlIGVqKK7DPP/xJ4o/FU5uW2OsRQJxNNclNrm8VHUDfUgjxgNjy/RT8YlvJCD0AuLaYrKhgOci84o0GoDxixY2yj9QMfxd/FcA8y4h02AParcrK2Jatll6yisjn6iDMqPxKmvK/04IouaZl7tf+BgBW7o3s5fSO7U33HH8lkfwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B1piDK0x; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220e989edb6so70469385ad.1
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:56:21 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso440891866b.1;
+        Fri, 21 Feb 2025 12:00:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740168027; x=1740772827; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=n/bDV0FJprpFaWKwMkQmi8YDMou1+i2MOt8dZqdBO6I=;
+        b=B1piDK0xP1Dn/1ro5+Bhp0kBXMe/kYAH8wsAzbPq0YNdyZ4gpViw0oOa7rMStSVEoV
+         R1VX4xIkpFeWF7rOQ+xepdz/nCQrIvDHEZ5ZNZO9iiK204H5B5pYDa5DzsnhiS6W34pA
+         KHPElzE8KT4GBrq3tKkPgJKyaq3LJLz4+Xig3SDMTNBIKt9sP7g08vzWFi9YgseE5HYq
+         KpC4z3bws1WqklfO2Iw45Y5aPhzwYYzKcyIS1+9a5Y335wQSpJLq/+NarDbbU1jZJpOD
+         WUlgY3OtVv20XWyjO4rQOIsHLK6Gk7FwmT0gK88UlrtGcyoz6KrziqFfQdUW4tqf3Qbp
+         aX0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740167781; x=1740772581;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rq5I/lcNnUUsuMTt00nWdAdil6CkwFh75BecHU8fGgc=;
-        b=s78B/hHMleFC6t2CjuD8X6sO8o6/Q1yxtm5xLpLm5TfJYDebCJllo6nDDWfVCNS6M8
-         YrSbJY1LfFSu0z/sKRMvL3cBdB33xNpzxi3auSj6U7+q6FQqAMhruCVcThKiYZenc1ft
-         +YvqY8ZUjFNY3P74fwW6YoHhkX9LoEkDhUqvosrWMKw41nqLZUOuAbBmzqfhc3FNH7Jt
-         zz3ZlLP+TaMJNWjlQQHWE6xH2P1dg5LJdzhTJJUpFjZcMAo4dMxY/rm7PLS9yAJSqVTD
-         bRhP5W4nUtDsEjzLPJrd4d+r879hg7uYOJKBCPrZDQMDLskLNTDYwrLUK6ZP3jlyTXCx
-         WMiQ==
-X-Gm-Message-State: AOJu0YyzJlZyONHfFQcARLPJJDoZktJ4TT76JnPKzqrfZT29iShlPp9u
-	WsIvDLyai1uSlDqD7OWTW8mMjd41dRyNqVGPcidc1wr2/l6Jh+WM8r+NXR0=
-X-Gm-Gg: ASbGncsSpwpGvZgfOXzEC03thff1M2DgKZeq5fkkLCoF3P4ZMThZNhzmpwF/6qKhpFC
-	Z05Rjgq85Cr5snwfF1pDiZPo9xh+IBM6HRjHn9uMR5bccm98jQeVhAR6AqJVi5Zc5aJtHcoNoid
-	iHvPQLjCyKNYFVPRVpy5ecv3K3Y2W651CbRNltWv+HDXVRpi2GJfRArzJJWsr2XeFW8mXpf6bAO
-	/Mtq7PJ4QC3dafMJS7X2qoHsMpcgB3rQykojvq+9t7YfNYnq2A0QOkBsYv33z0sEP5kmewBTm0b
-	05HlwRBS2NtLC+eHzjfgeI820g==
-X-Google-Smtp-Source: AGHT+IHiLXkY6ISKVC88MHJCLt9e5RzoJC/c5OZiTXbyHrKHE6Lo9ABNUH28TWyMZVklMyc+N0sBpg==
-X-Received: by 2002:a17:902:d4d0:b0:216:7cde:51a with SMTP id d9443c01a7336-2219ff61db3mr84891635ad.28.1740167780593;
-        Fri, 21 Feb 2025 11:56:20 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d5349019sm141834205ad.36.2025.02.21.11.56.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 11:56:20 -0800 (PST)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>
-Subject: [PATCH net-next v6 12/12] eth: bnxt: remove most dependencies on RTNL
-Date: Fri, 21 Feb 2025 11:56:04 -0800
-Message-ID: <20250221195604.2103132-13-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250221195604.2103132-1-sdf@fomichev.me>
-References: <20250221195604.2103132-1-sdf@fomichev.me>
+        d=1e100.net; s=20230601; t=1740168027; x=1740772827;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n/bDV0FJprpFaWKwMkQmi8YDMou1+i2MOt8dZqdBO6I=;
+        b=aPxFuz1clMZpdquzVxIwJStfdbbRnX3KIS5z33Y0//pA2V7+0oIJ3bL/KBfgb2vR+Z
+         Nkwr77NoV2rsWd7LZbYpvZJp90NvxYCzHjPtMp9rF/Fv866Icx5qZarw6xeh9XH4KfAA
+         aZUEXg9YEV8mjG49rFWzyx1HzngHgj3hQzHmcbg47DGKuYAkFpNyJWu9wUMEaMFvI+sS
+         HJVgPtyoOsJEYRvM3mGsa4ogtyEzJRRcO9TYp6FGG52bjv4Je1ewUq26Ls9JnahP3qED
+         wn6U6cDACu8/K6dhaiC7Seb50O+YeWyf81f0yywNo3lqoLnGSoGLysuchykDpLDYzEaR
+         x/YA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5dvSAPxRQM4UuPt4Z7bwNUMotaH6hU6SkVEYDcpyiIpWZI5EcR6A7ZOPhhr0tHtF6DQQLWgf0R5J0ABA=@vger.kernel.org, AJvYcCXi2j4jROa2yU8t0cK+nihioJ1Z5kLkFF6xsXATXTrUoAJk7OS0sx4fyPPylvA5+ENiv+f2G+VGdGMF@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB1TqJIo6U7kp1faqMOW6JqFkhbdDzvDmjDgFthlIPklai/OoV
+	DYzxJTPjS9Ds2AROYKtXiT/35t8a1JO+iwLLnPru5s76cMN8MZ1ncVz6vGL6
+X-Gm-Gg: ASbGnctBHIttW/bK6c4BAivl5TfHm0BJvFxc6ZFuEzN+IuNt47f63LYOxbfpEwKDEAB
+	RBhnMLpx0iaMymlfX++onrJ89ll0OLeBtOU9fud6emwprGdjwbItmb2ljYw7B5HVascnXHB2kXS
+	1we15/J6cu4sFNo0NWvX1dTJMDa3yxdlPwIqs40t0Z+M5GgDf/ywb4DddHuMZiv9P9XM9nkI+i+
+	joZHFDTEHa4GJF/7WgveJf5PHJOimXl6ykdDCuMXeeg+brlzZm/6OXUpIKtFHPdTBwCnosAyanA
+	bx38KRfpbgeDpicDGqvGS5UcGvzHPQQ66yDKlUXjMfPra6GiNeWEVIIwrphY06ywI5ukEkm2lHT
+	TLNgHQTwdttzCzJc1mi6W5p3MuCIgB0tgcjXjj+wflUcBo0km9qJDZG2KfKehtfJSiKgxKhyVLA
+	wM8/pTBrobJ07T
+X-Google-Smtp-Source: AGHT+IH7sCibLyLZK+FdM59FBs+/kdsPTeFwVDuE9WC/Cq46tw/WEd3zp1lpAqulE7WN3k2fvR+JIg==
+X-Received: by 2002:a17:907:3ea8:b0:ab7:d10b:e1de with SMTP id a640c23a62f3a-abc0d9deb71mr375904366b.13.1740168026317;
+        Fri, 21 Feb 2025 12:00:26 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b29e:900:9dc2:647a:dfc:6311? (dynamic-2a02-3100-b29e-0900-9dc2-647a-0dfc-6311.310.pool.telefonica.de. [2a02:3100:b29e:900:9dc2:647a:dfc:6311])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-abba358ec3asm947077466b.35.2025.02.21.12.00.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Feb 2025 12:00:25 -0800 (PST)
+Message-ID: <8eadd7db-aeb8-4c2a-8758-e4dbd06788ca@gmail.com>
+Date: Fri, 21 Feb 2025 21:01:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] r8169: disable RTL8126 ZRX-DC timeout
+To: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Bjorn Helgaas <bhelgaas@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
+References: <20250221071828.12323-439-nic_swsd@realtek.com>
+ <20250221071828.12323-442-nic_swsd@realtek.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20250221071828.12323-442-nic_swsd@realtek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Only devlink and sriov paths are grabbing rtnl explicitly. The rest is
-covered by netdev instance lock which the core now grabs, so there is
-no need to manage rtnl in most places anymore.
+On 21.02.2025 08:18, ChunHao Lin wrote:
+> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
+> device will exit L1 substate every 100ms. Disable it for saving more power
+> in L1 substate.
+> 
+Is this compliant with the PCIe spec? Not being an expert on this topic,
+but when I read e.g. the following then my understanding is that this wakeup
+every 100ms is the expected behavior.
 
-On the core side we can now try to drop rtnl in some places
-(do_setlink for example) for the drivers that signal non-rtnl
-mode (TBD).
+https://lore.kernel.org/all/1610033323-10560-4-git-send-email-shradha.t@samsung.com/T/
 
-Boot-tested and with `ethtool -L eth1 combined 24` to trigger reset.
 
-Cc: Saeed Mahameed <saeed@kernel.org>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 117 +++++++++---------
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   9 ++
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  16 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c |  18 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   3 +-
- include/linux/netdevice.h                     |   5 +
- 7 files changed, 101 insertions(+), 73 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ead9fcaad6bd..1a1e6da77777 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5246,8 +5246,10 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
- {
- 	int i;
- 
--	/* Under rtnl_lock and all our NAPIs have been disabled.  It's
--	 * safe to delete the hash table.
-+	netdev_assert_locked(bp->dev);
-+
-+	/* Under netdev instance lock and all our NAPIs have been disabled.
-+	 * It's safe to delete the hash table.
- 	 */
- 	for (i = 0; i < BNXT_NTP_FLTR_HASH_SIZE; i++) {
- 		struct hlist_head *head;
-@@ -12789,7 +12791,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- int bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- {
- 	int rc = 0;
-@@ -12805,9 +12806,9 @@ int bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	return rc;
- }
- 
--/* rtnl_lock held, open the NIC half way by allocating all resources, but
-- * NAPI, IRQ, and TX are not enabled.  This is mainly used for offline
-- * self tests.
-+/* netdev instance lock held, open the NIC half way by allocating all
-+ * resources, but NAPI, IRQ, and TX are not enabled.  This is mainly used
-+ * for offline self tests.
-  */
- int bnxt_half_open_nic(struct bnxt *bp)
- {
-@@ -12842,8 +12843,8 @@ int bnxt_half_open_nic(struct bnxt *bp)
- 	return rc;
- }
- 
--/* rtnl_lock held, this call can only be made after a previous successful
-- * call to bnxt_half_open_nic().
-+/* netdev instance lock held, this call can only be made after a previous
-+ * successful call to bnxt_half_open_nic().
-  */
- void bnxt_half_close_nic(struct bnxt *bp)
- {
-@@ -12952,10 +12953,11 @@ void bnxt_close_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		/* If we get here, it means firmware reset is in progress
- 		 * while we are trying to close.  We can safely proceed with
--		 * the close because we are holding rtnl_lock().  Some firmware
--		 * messages may fail as we proceed to close.  We set the
--		 * ABORT_ERR flag here so that the FW reset thread will later
--		 * abort when it gets the rtnl_lock() and sees the flag.
-+		 * the close because we are holding netdev instance lock.
-+		 * Some firmware messages may fail as we proceed to close.
-+		 * We set the ABORT_ERR flag here so that the FW reset thread
-+		 * will later abort when it gets the netdev instance lock
-+		 * and sees the flag.
- 		 */
- 		netdev_warn(bp->dev, "FW reset in progress during close, FW reset will be aborted\n");
- 		set_bit(BNXT_STATE_ABORT_ERR, &bp->state);
-@@ -13046,7 +13048,7 @@ static int bnxt_hwrm_port_phy_write(struct bnxt *bp, u16 phy_addr, u16 reg,
- 	return hwrm_req_send(bp, req);
- }
- 
--/* rtnl_lock held */
-+/* netdev instance lock held */
- static int bnxt_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- {
- 	struct mii_ioctl_data *mdio = if_mii(ifr);
-@@ -13965,30 +13967,31 @@ static void bnxt_timer(struct timer_list *t)
- 	mod_timer(&bp->timer, jiffies + bp->current_interval);
- }
- 
--static void bnxt_rtnl_lock_sp(struct bnxt *bp)
-+static void bnxt_lock_sp(struct bnxt *bp)
- {
- 	/* We are called from bnxt_sp_task which has BNXT_STATE_IN_SP_TASK
- 	 * set.  If the device is being closed, bnxt_close() may be holding
--	 * rtnl() and waiting for BNXT_STATE_IN_SP_TASK to clear.  So we
--	 * must clear BNXT_STATE_IN_SP_TASK before holding rtnl().
-+	 * netdev instance lock and waiting for BNXT_STATE_IN_SP_TASK to clear.
-+	 * So we must clear BNXT_STATE_IN_SP_TASK before holding netdev
-+	 * instance lock.
- 	 */
- 	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- }
- 
--static void bnxt_rtnl_unlock_sp(struct bnxt *bp)
-+static void bnxt_unlock_sp(struct bnxt *bp)
- {
- 	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- }
- 
- /* Only called from bnxt_sp_task() */
- static void bnxt_reset(struct bnxt *bp, bool silent)
- {
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
- 		bnxt_reset_task(bp, silent);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- /* Only called from bnxt_sp_task() */
-@@ -13996,9 +13999,9 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- {
- 	int i;
- 
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
--		bnxt_rtnl_unlock_sp(bp);
-+		bnxt_unlock_sp(bp);
- 		return;
- 	}
- 	/* Disable and flush TPA before resetting the RX ring */
-@@ -14037,7 +14040,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- 	}
- 	if (bp->flags & BNXT_FLAG_TPA)
- 		bnxt_set_tpa(bp, true);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- static void bnxt_fw_fatal_close(struct bnxt *bp)
-@@ -14093,7 +14096,7 @@ static bool is_bnxt_fw_ok(struct bnxt *bp)
- 	return false;
- }
- 
--/* rtnl_lock is acquired before calling this function */
-+/* netdev instance lock is acquired before calling this function */
- static void bnxt_force_fw_reset(struct bnxt *bp)
- {
- 	struct bnxt_fw_health *fw_health = bp->fw_health;
-@@ -14136,9 +14139,9 @@ void bnxt_fw_exception(struct bnxt *bp)
- 	netdev_warn(bp->dev, "Detected firmware fatal condition, initiating reset\n");
- 	set_bit(BNXT_STATE_FW_FATAL_COND, &bp->state);
- 	bnxt_ulp_stop(bp);
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	bnxt_force_fw_reset(bp);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- /* Returns the number of registered VFs, or 1 if VF configuration is pending, or
-@@ -14168,7 +14171,7 @@ static int bnxt_get_registered_vfs(struct bnxt *bp)
- void bnxt_fw_reset(struct bnxt *bp)
- {
- 	bnxt_ulp_stop(bp);
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state) &&
- 	    !test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-@@ -14214,7 +14217,7 @@ void bnxt_fw_reset(struct bnxt *bp)
- 		bnxt_queue_fw_reset_work(bp, tmo);
- 	}
- fw_reset_exit:
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- static void bnxt_chk_missed_irq(struct bnxt *bp)
-@@ -14413,7 +14416,7 @@ static void bnxt_sp_task(struct work_struct *work)
- static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
- 				int *max_cp);
- 
--/* Under rtnl_lock */
-+/* Under netdev instance lock */
- int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 		     int tx_xdp)
- {
-@@ -14841,10 +14844,10 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			return;
- 		}
- 		bp->fw_reset_timestamp = jiffies;
--		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (test_bit(BNXT_STATE_ABORT_ERR, &bp->state)) {
- 			bnxt_fw_reset_abort(bp, rc);
--			rtnl_unlock();
-+			netdev_unlock(bp->dev);
- 			goto ulp_start;
- 		}
- 		bnxt_fw_reset_close(bp);
-@@ -14855,7 +14858,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bp->fw_reset_state = BNXT_FW_RESET_STATE_ENABLE_DEV;
- 			tmo = bp->fw_reset_min_dsecs * HZ / 10;
- 		}
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		bnxt_queue_fw_reset_work(bp, tmo);
- 		return;
- 	}
-@@ -14929,7 +14932,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
- 		fallthrough;
- 	case BNXT_FW_RESET_STATE_OPENING:
--		while (!rtnl_trylock()) {
-+		while (!netdev_trylock(bp->dev)) {
- 			bnxt_queue_fw_reset_work(bp, HZ / 10);
- 			return;
- 		}
-@@ -14937,7 +14940,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		if (rc) {
- 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
- 			bnxt_fw_reset_abort(bp, rc);
--			rtnl_unlock();
-+			netdev_unlock(bp->dev);
- 			goto ulp_start;
- 		}
- 
-@@ -14956,13 +14959,13 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bnxt_dl_health_fw_recovery_done(bp);
- 			bnxt_dl_health_fw_status_update(bp, true);
- 		}
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		bnxt_ulp_start(bp, 0);
- 		bnxt_reenable_sriov(bp);
--		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		bnxt_vf_reps_alloc(bp);
- 		bnxt_vf_reps_open(bp);
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		break;
- 	}
- 	return;
-@@ -14975,9 +14978,9 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		netdev_err(bp->dev, "fw_health_status 0x%x\n", sts);
- 	}
- fw_reset_abort:
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	bnxt_fw_reset_abort(bp, rc);
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- ulp_start:
- 	bnxt_ulp_start(bp, rc);
- }
-@@ -15069,13 +15072,14 @@ static int bnxt_init_board(struct pci_dev *pdev, struct net_device *dev)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- static int bnxt_change_mac_addr(struct net_device *dev, void *p)
- {
- 	struct sockaddr *addr = p;
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
-+	netdev_assert_locked(dev);
-+
- 	if (!is_valid_ether_addr(addr->sa_data))
- 		return -EADDRNOTAVAIL;
- 
-@@ -15096,11 +15100,12 @@ static int bnxt_change_mac_addr(struct net_device *dev, void *p)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- static int bnxt_change_mtu(struct net_device *dev, int new_mtu)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 
-+	netdev_assert_locked(dev);
-+
- 	if (netif_running(dev))
- 		bnxt_close_nic(bp, true, false);
- 
-@@ -16257,7 +16262,7 @@ int bnxt_restore_pf_fw_resources(struct bnxt *bp)
- {
- 	int rc;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(bp->dev);
- 	bnxt_hwrm_func_qcaps(bp);
- 
- 	if (netif_running(bp->dev))
-@@ -16657,7 +16662,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 	if (!dev)
- 		return;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	bp = netdev_priv(dev);
- 	if (!bp)
- 		goto shutdown_exit;
-@@ -16675,7 +16680,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 	}
- 
- shutdown_exit:
--	rtnl_unlock();
-+	netdev_unlock(dev);
- }
- 
- #ifdef CONFIG_PM_SLEEP
-@@ -16687,7 +16692,7 @@ static int bnxt_suspend(struct device *device)
- 
- 	bnxt_ulp_stop(bp);
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	if (netif_running(dev)) {
- 		netif_device_detach(dev);
- 		rc = bnxt_close(dev);
-@@ -16696,7 +16701,7 @@ static int bnxt_suspend(struct device *device)
- 	bnxt_ptp_clear(bp);
- 	pci_disable_device(bp->pdev);
- 	bnxt_free_ctx_mem(bp, false);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return rc;
- }
- 
-@@ -16706,7 +16711,7 @@ static int bnxt_resume(struct device *device)
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	rc = pci_enable_device(bp->pdev);
- 	if (rc) {
- 		netdev_err(dev, "Cannot re-enable PCI device during resume, err = %d\n",
-@@ -16749,7 +16754,7 @@ static int bnxt_resume(struct device *device)
- 	}
- 
- resume_exit:
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- 	bnxt_ulp_start(bp, rc);
- 	if (!rc)
- 		bnxt_reenable_sriov(bp);
-@@ -16784,7 +16789,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 
- 	bnxt_ulp_stop(bp);
- 
--	rtnl_lock();
-+	netdev_lock(netdev);
- 	netif_device_detach(netdev);
- 
- 	if (test_and_set_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
-@@ -16793,7 +16798,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 	}
- 
- 	if (abort || state == pci_channel_io_perm_failure) {
--		rtnl_unlock();
-+		netdev_unlock(netdev);
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
- 
-@@ -16812,7 +16817,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 	if (pci_is_enabled(pdev))
- 		pci_disable_device(pdev);
- 	bnxt_free_ctx_mem(bp, false);
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 
- 	/* Request a slot slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
-@@ -16842,7 +16847,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
- 	    test_bit(BNXT_STATE_PCI_CHANNEL_IO_FROZEN, &bp->state))
- 		msleep(900);
- 
--	rtnl_lock();
-+	netdev_lock(netdev);
- 
- 	if (pci_enable_device(pdev)) {
- 		dev_err(&pdev->dev,
-@@ -16897,7 +16902,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
- reset_exit:
- 	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
- 	bnxt_clear_reservations(bp, true);
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 
- 	return result;
- }
-@@ -16916,7 +16921,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	int err;
- 
- 	netdev_info(bp->dev, "PCI Slot Resume\n");
--	rtnl_lock();
-+	netdev_lock(netdev);
- 
- 	err = bnxt_hwrm_func_qcaps(bp);
- 	if (!err) {
-@@ -16929,7 +16934,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	if (!err)
- 		netif_device_attach(netdev);
- 
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 	bnxt_ulp_start(bp, err);
- 	if (!err)
- 		bnxt_reenable_sriov(bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-index ef8288fd68f4..b06fcddfc81c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-@@ -439,14 +439,17 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT: {
- 		bnxt_ulp_stop(bp);
- 		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (bnxt_sriov_cfg(bp)) {
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "reload is unsupported while VFs are allocated or being configured");
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			bnxt_ulp_start(bp, 0);
- 			return -EOPNOTSUPP;
- 		}
- 		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			bnxt_ulp_start(bp, 0);
- 			return -ENODEV;
-@@ -459,6 +462,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to deregister");
- 			if (netif_running(bp->dev))
- 				dev_close(bp->dev);
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			break;
- 		}
-@@ -479,7 +483,9 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 			return -EPERM;
- 		}
- 		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			return -ENODEV;
- 		}
-@@ -493,6 +499,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 		if (rc) {
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to activate firmware");
- 			clear_bit(BNXT_STATE_FW_ACTIVATE, &bp->state);
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 		}
- 		break;
-@@ -568,7 +575,9 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 		}
- 		*actions_performed |= BIT(action);
- 	} else if (netif_running(bp->dev)) {
-+		netdev_lock(bp->dev);
- 		dev_close(bp->dev);
-+		netdev_unlock(bp->dev);
- 	}
- 	rtnl_unlock();
- 	if (action == DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index 12b6ed51fd88..5ddddd89052f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -946,7 +946,9 @@ void bnxt_sriov_disable(struct bnxt *bp)
- 
- 	/* Reclaim all resources for the PF. */
- 	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	bnxt_restore_pf_fw_resources(bp);
-+	netdev_unlock(bp->dev);
- 	rtnl_unlock();
- }
- 
-@@ -956,17 +958,21 @@ int bnxt_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	struct bnxt *bp = netdev_priv(dev);
- 
- 	rtnl_lock();
-+	netdev_lock(dev);
- 	if (!netif_running(dev)) {
- 		netdev_warn(dev, "Reject SRIOV config request since if is down!\n");
-+		netdev_unlock(dev);
- 		rtnl_unlock();
- 		return 0;
- 	}
- 	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		netdev_warn(dev, "Reject SRIOV config request when FW reset is in progress\n");
-+		netdev_unlock(dev);
- 		rtnl_unlock();
- 		return 0;
- 	}
- 	bp->sriov_cfg = true;
-+	netdev_unlock(dev);
- 	rtnl_unlock();
- 
- 	if (pci_vfs_assigned(bp->pdev)) {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index e4a7f37036ed..a8e930d5dbb0 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -112,7 +112,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	struct bnxt_ulp *ulp;
- 	int rc = 0;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	mutex_lock(&edev->en_dev_lock);
- 	if (!bp->irq_tbl) {
- 		rc = -ENODEV;
-@@ -138,7 +138,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	edev->flags |= BNXT_EN_FLAG_MSIX_REQUESTED;
- exit:
- 	mutex_unlock(&edev->en_dev_lock);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return rc;
- }
- EXPORT_SYMBOL(bnxt_register_dev);
-@@ -151,7 +151,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 	int i = 0;
- 
- 	ulp = edev->ulp_tbl;
--	rtnl_lock();
-+	netdev_lock(dev);
- 	mutex_lock(&edev->en_dev_lock);
- 	if (ulp->msix_requested)
- 		edev->flags &= ~BNXT_EN_FLAG_MSIX_REQUESTED;
-@@ -169,7 +169,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 		i++;
- 	}
- 	mutex_unlock(&edev->en_dev_lock);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return;
- }
- EXPORT_SYMBOL(bnxt_unregister_dev);
-@@ -309,12 +309,14 @@ void bnxt_ulp_irq_stop(struct bnxt *bp)
- 		if (!ulp->msix_requested)
- 			return;
- 
--		ops = rtnl_dereference(ulp->ulp_ops);
-+		netdev_lock(bp->dev);
-+		ops = rcu_dereference(ulp->ulp_ops);
- 		if (!ops || !ops->ulp_irq_stop)
- 			return;
- 		if (test_bit(BNXT_STATE_FW_RESET_DET, &bp->state))
- 			reset = true;
- 		ops->ulp_irq_stop(ulp->handle, reset);
-+		netdev_unlock(bp->dev);
- 	}
- }
- 
-@@ -333,7 +335,8 @@ void bnxt_ulp_irq_restart(struct bnxt *bp, int err)
- 		if (!ulp->msix_requested)
- 			return;
- 
--		ops = rtnl_dereference(ulp->ulp_ops);
-+		netdev_lock(bp->dev);
-+		ops = rcu_dereference(ulp->ulp_ops);
- 		if (!ops || !ops->ulp_irq_restart)
- 			return;
- 
-@@ -345,6 +348,7 @@ void bnxt_ulp_irq_restart(struct bnxt *bp, int err)
- 			bnxt_fill_msix_vecs(bp, ent);
- 		}
- 		ops->ulp_irq_restart(ulp->handle, ent);
-+		netdev_unlock(bp->dev);
- 		kfree(ent);
- 	}
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-index 1467b94a6427..619f0844e778 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-@@ -257,8 +257,7 @@ bool bnxt_dev_is_vf_rep(struct net_device *dev)
- 
- /* Called when the parent PF interface is closed:
-  * As the mode transition from SWITCHDEV to LEGACY
-- * happens under the rtnl_lock() this routine is safe
-- * under the rtnl_lock()
-+ * happens under the netdev instance lock this routine is safe
-  */
- void bnxt_vf_reps_close(struct bnxt *bp)
- {
-@@ -278,8 +277,7 @@ void bnxt_vf_reps_close(struct bnxt *bp)
- 
- /* Called when the parent PF interface is opened (re-opened):
-  * As the mode transition from SWITCHDEV to LEGACY
-- * happen under the rtnl_lock() this routine is safe
-- * under the rtnl_lock()
-+ * happen under the netdev instance lock this routine is safe
-  */
- void bnxt_vf_reps_open(struct bnxt *bp)
- {
-@@ -348,7 +346,7 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- 	/* Ensure that parent PF's and VF-reps' RX/TX has been quiesced
- 	 * before proceeding with VF-rep cleanup.
- 	 */
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	if (netif_running(bp->dev)) {
- 		bnxt_close_nic(bp, false, false);
- 		closed = true;
-@@ -365,10 +363,10 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- 		bnxt_open_nic(bp, false, false);
- 		bp->eswitch_mode = DEVLINK_ESWITCH_MODE_SWITCHDEV;
- 	}
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- 
--	/* Need to call vf_reps_destroy() outside of rntl_lock
--	 * as unregister_netdev takes rtnl_lock
-+	/* Need to call vf_reps_destroy() outside of netdev instance lock
-+	 * as unregister_netdev takes it
- 	 */
- 	__bnxt_vf_reps_destroy(bp);
- }
-@@ -376,7 +374,7 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- /* Free the VF-Reps in firmware, during firmware hot-reset processing.
-  * Note that the VF-Rep netdevs are still active (not unregistered) during
-  * this process. As the mode transition from SWITCHDEV to LEGACY happens
-- * under the rtnl_lock() this routine is safe under the rtnl_lock().
-+ * under the netdev instance lock this routine is safe.
-  */
- void bnxt_vf_reps_free(struct bnxt *bp)
- {
-@@ -413,7 +411,7 @@ static int bnxt_alloc_vf_rep(struct bnxt *bp, struct bnxt_vf_rep *vf_rep,
- /* Allocate the VF-Reps in firmware, during firmware hot-reset processing.
-  * Note that the VF-Rep netdevs are still active (not unregistered) during
-  * this process. As the mode transition from SWITCHDEV to LEGACY happens
-- * under the rtnl_lock() this routine is safe under the rtnl_lock().
-+ * under the netdev instance lock this routine is safe.
-  */
- int bnxt_vf_reps_alloc(struct bnxt *bp)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index e6c64e4bd66c..0caf6e9bccb8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -382,13 +382,14 @@ int bnxt_xdp_xmit(struct net_device *dev, int num_frames,
- 	return nxmit;
- }
- 
--/* Under rtnl_lock */
- static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
- {
- 	struct net_device *dev = bp->dev;
- 	int tx_xdp = 0, tx_cp, rc, tc;
- 	struct bpf_prog *old;
- 
-+	netdev_assert_locked(dev);
-+
- 	if (prog && !prog->aux->xdp_has_frags &&
- 	    bp->dev->mtu > BNXT_MAX_PAGE_MODE_MTU) {
- 		netdev_warn(dev, "MTU %d larger than %d without XDP frag support.\n",
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 950d91f43fc7..4cdd199a5fdd 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2734,6 +2734,11 @@ static inline void netdev_lock(struct net_device *dev)
- 	mutex_lock(&dev->lock);
- }
- 
-+static inline bool netdev_trylock(struct net_device *dev)
-+{
-+	return mutex_trylock(&dev->lock);
-+}
-+
- static inline void netdev_unlock(struct net_device *dev)
- {
- 	mutex_unlock(&dev->lock);
--- 
-2.48.1
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 9953eaa01c9d..7a5b99d54e12 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -2851,6 +2851,21 @@ static u32 rtl_csi_read(struct rtl8169_private *tp, int addr)
+>  		RTL_R32(tp, CSIDR) : ~0;
+>  }
+>  
+> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
+> +{
+> +	struct pci_dev *pdev = tp->pci_dev;
+> +	u8 val;
+> +
+> +	if (pdev->cfg_size > 0x0890 &&
+> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
+> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
+> +		return;
+> +
+> +	netdev_notice_once(tp->dev,
+> +		"No native access to PCI extended config space, falling back to CSI\n");
+> +	rtl_csi_write(tp, 0x0890, rtl_csi_read(tp, 0x0890) & ~BIT(0));
+> +}
+> +
+>  static void rtl_set_aspm_entry_latency(struct rtl8169_private *tp, u8 val)
+>  {
+>  	struct pci_dev *pdev = tp->pci_dev;
+> @@ -3930,6 +3945,7 @@ static void rtl_hw_start_8125d(struct rtl8169_private *tp)
+>  
+>  static void rtl_hw_start_8126a(struct rtl8169_private *tp)
+>  {
+> +	rtl_disable_zrxdc_timeout(tp);
+>  	rtl_set_def_aspm_entry_latency(tp);
+>  	rtl_hw_start_8125_common(tp);
+>  }
 
 
