@@ -1,146 +1,155 @@
-Return-Path: <netdev+bounces-168628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5EDA3FDF1
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:52:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA2AA3FE0F
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019F5427545
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:52:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCF418988F4
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9636424FBF7;
-	Fri, 21 Feb 2025 17:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8232505AB;
+	Fri, 21 Feb 2025 17:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="YZvkcRGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CDF36AF5;
-	Fri, 21 Feb 2025 17:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A25524FC1E
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 17:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740160298; cv=none; b=KTE72FtX3NQjPi9V/pAMnLJBJdr1oSNDCxpbPWi1XSMeF/Ycw8iRTsYOkFTg+DpYYGqOMfg3cvNdGg3c5XcQT2FhGkC/dPmDkQEuR7o1jn5EGQZqcYcmzMp03rJwV3V3bPIPf7GZQZB/ZbcuThMfUuLE9/EjW5ZVkWgBzoUW3JU=
+	t=1740160772; cv=none; b=noHkDAyw1WMMNpGVBHfLFZtLNFpka8vw+QkwOz+Uh2OQrWoFJVx6xDMF2KWWpTUaNI1mubWKMDL9842cmfYnDGSXEIoaotT5I28u+j7s78FdAsGu1ORhZ8nLb+qtb+cE6wxormpHerMBsFXwLFk9txTbgwhiCosCmPKpq3KXEo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740160298; c=relaxed/simple;
-	bh=y8JOWFlcKlRL/xItMQwGuALZ+brY3FmxUzxUvjwziu4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WEdo0E2W39zXrADv8zJhIzuDW2KBZhtjWe/+akITTZ8QklMKubA818rw/mJW4kqKjTCSB6Xk8N/vmcQkwsuWA07BCEesKILY9wc5VUS/QYkLLElxMLPPi7/BP534Ae3geh6KMcV+EfcB+159Jc8Nn/pRVMhWC7FgY8T/KxMnbz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso420850266b.1;
-        Fri, 21 Feb 2025 09:51:36 -0800 (PST)
+	s=arc-20240116; t=1740160772; c=relaxed/simple;
+	bh=Rg+Eu2K/iaZKLCV1bEX16lULBsUzCm/Bpp/hRlrSuGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X0jA+qhni29+yrDTLR3Y/pzewZz2gFcTcNESfLBjd4GK7W2XIXup4f/yfN761yf+pJWjS7zuaQrTo78f8V5aR4YsGPOVVUg/Nr1IpLxNkoFPh+5R5QTeKOporTyTvDgdZNMNKQ2dSBw/KlwXwh9UjJbJ2NRNg13aVhn/MA0M1FI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=YZvkcRGm; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c089b2e239so252758085a.0
+        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:59:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1740160769; x=1740765569; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KLb8crReTH8G5XQzUpCmv5c6erOQlEwozixzAzmY5o0=;
+        b=YZvkcRGmiAkoTTMvTq6e3GUDG0Sy+RR3WsQtpkl5OlO+m2idJ1cPU60J4Tgn+Li4fU
+         9bSfzVrta+nPoJ9Rx6tyXIVAEZlSNFYKqtM0fbF/68zTT3FF+xIzxftsqNls/wINDAx3
+         09JyJJnEe4Oqeepd/M7qjtLD52BwjEKQom/rw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740160295; x=1740765095;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B+9QldxJW0IqP6a4oCK6OLGUXE4hkp56gGwvn/eRJp4=;
-        b=KgeLHQpCsRHMk+d3PGqKvut8kBv1v0TGj3hKVdb8BMbDAS1e0GJmkxG2IkfmwTVHQT
-         MYgSccesgUb5NWIosLdUl/dCsIMTwHPO44e3DzrmFYI/yWiv0/fC2ylOK4bEQAoAuTF8
-         PyUw+c1y205ePEWgZJL+mehxzsSVvuT/KJbuvVJHsD3kr0uDwpZ4FYdf5dlB+mKZvlVu
-         3PoWV/rUJ1zqS0a4QCaV2IxPA1Xed5wD2MJg97GzYqGQjYYDl2oCYyio7/3/65R3Sr1r
-         /CwO/bZnPbXdMUq2uV7qg9rpexoeaSDcXkoe7GErcilqRWo2RTB3mLMLDWIEAzVyyS11
-         fWcw==
-X-Forwarded-Encrypted: i=1; AJvYcCULfN0iVPGIpwoZkKck8JZFifxZi9iOe4iLHpV973T3QmAQY1FQVZqmh5bLs0DRr1eEznKohbegPvU12Wc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHDLADsReT+zI7bAOXV/CskGE4uDQOyY7tYRH+0K5h2dGRLcIj
-	ltQoARRiRQftGh+9Z9MbQyZZIbWIZbPmsuhklUz+w/0v1Add5Me+
-X-Gm-Gg: ASbGncu/nfbucCtzmVyrl61onI8JGEVxUSNWlKp/+TPJHNjMFfCbwbhK6Wr1i7tb0jA
-	Y+hC56ki/GwQKDdUE/bNPTnMZyU8NNg4Yqj9z8yxdkkrVY//lrvTQGVD31wUxgd/doN1LsUi4+i
-	FVRRPR58FJpIfsYvTgm3E43Pd+HkDsg2iqYXVDPyi3ZA1FmDkdZ1bfu5lFIUMqRfJ/MoyaRCRvs
-	c4Nip3s4kHRJrGFQM2lKFQ4HQiQZkoIJ+MUU1pT9zK+1YEukL2PZXQDewxNSFbb2GhbioG2OdBA
-	yL6TW56yfbIGtA+W
-X-Google-Smtp-Source: AGHT+IGYLJh7w1anpQnxC4OGPpeD5+o88IWTi19oeIwm0m7RMhONixihj+fm9H0mSYLLGRLcJOebVQ==
-X-Received: by 2002:a17:907:d2a:b0:ab7:fc9a:28e1 with SMTP id a640c23a62f3a-abc0de5a487mr400273066b.52.1740160294328;
-        Fri, 21 Feb 2025 09:51:34 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:7::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb9faab9f1sm954428266b.49.2025.02.21.09.51.33
+        d=1e100.net; s=20230601; t=1740160769; x=1740765569;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KLb8crReTH8G5XQzUpCmv5c6erOQlEwozixzAzmY5o0=;
+        b=p/rcRyA+uEl3Wg6RVzI6t2CQodxr7huiF1+I5JTxJ34RNgW8UVkxGHORZXU2WHkEwM
+         /q67gm9NcPE46zSajurqoCVXsBTsRPqlSsaaX52h61lhUbEqE6lExiJRWV2hhJIHXM/6
+         Qx7+5IWaKE3/KBJHGCVyra8aSU2gc9giHWwmH5o3S0cbtvJYTRUBnsEgQNPz/9W6wXyb
+         ADPVhfVtkKndrXZ15pOQOhnQ7n6feKE/kQcoWhhtzKnprJFtugGL4Og3IuIBU038ZAu9
+         9NpcDQFr44vYBT2oKjSPqtG6CCUwZOQ7XQOtwSvmPhoX3JmVvVOi8aIgWalG7yFrD/gA
+         6OWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVDEUpJVRGw0i6ahEeeVrOq9VWMJ33LGpUndvCNUwrXBvloKG56n3LVIzfmU0iejXocm0E6Ayk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSWQg9SE1HKrffFhpid+EHE/FUPglbdsXvVfwd/ZwFiwsOvkap
+	xb4rjrSR8lcvFd8OV95dZiiGO9xvWRvNF22bMmJWly5nWNQ3OHwvOhWOMwdQAgw=
+X-Gm-Gg: ASbGnctB25JURbvpxMghb5QiF7ES3MxuQIaMZAfPJJXkHtL0429vQtQnurjZ8R6hLkA
+	ihoiypU9fjyoHH0cUL4n35VhtZSp8Gx5k7lOYJrhUnmt9i1RQk2omofRKei3MFWSMEDHYcM5OIG
+	uVrG0SCwWBPtaCXcnh/41/hzhFIvQc5ZmA0ohmOBIHhYOaDOZVzmRWRFAx7Dnt6xlnm7DiDOy+F
+	SFBP6xv1Dw7xtt6ytqH4zsXxpZWtf9o/8LA1Gh7ZD+C3eUiZBoBE3p7GzpdmLapLv2Ntt7V742/
+	o0laPPXAR3Dm+4n2fkWnzMqF9Q/Yl36gAom6mPdQxLADnHQjctugMGVl+qmXwTkR
+X-Google-Smtp-Source: AGHT+IFymuqeiQwh9aOSDNeLongiyvckhPPNRjiwNf5oRAbqWTcgEvxl2sVwpcX2b5KlcbEpZbteLQ==
+X-Received: by 2002:a05:620a:1983:b0:7b6:67e1:b4ff with SMTP id af79cd13be357-7c0cf194c26mr555829985a.28.1740160769186;
+        Fri, 21 Feb 2025 09:59:29 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0a07aa37asm617171585a.24.2025.02.21.09.59.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 09:51:33 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 21 Feb 2025 09:51:27 -0800
-Subject: [PATCH net-next] net: Remove shadow variable in netdev_run_todo()
+        Fri, 21 Feb 2025 09:59:28 -0800 (PST)
+Date: Fri, 21 Feb 2025 12:59:26 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Francois Romieu <romieu@fr.zoreil.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH] net: Handle napi_schedule() calls from non-interrupt
+Message-ID: <Z7i-_p_115kr8aj1@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Francois Romieu <romieu@fr.zoreil.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+References: <20250221173009.21742-1-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250221-netcons_fix_shadow-v1-1-dee20c8658dd@debian.org>
-X-B4-Tracking: v=1; b=H4sIAB69uGcC/x3MQQqDMBAF0KuEvzaQDNS2uUopInGss5mUTGgD4
- t0F3wHeDuMqbEhuR+WfmBRFcnFwyNusH/ayIDlQoFsgil655aI2rdIn2+al/D3TGO55fFCkJwa
- Hb+VV+pW+oNy8cm94H8cJP+e0pW4AAAA=
-X-Change-ID: 20250221-netcons_fix_shadow-e2607c682129
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1686; i=leitao@debian.org;
- h=from:subject:message-id; bh=y8JOWFlcKlRL/xItMQwGuALZ+brY3FmxUzxUvjwziu4=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnuL0keDLdEUqOMqti3Ip7Ok7dZB4VTvINdySSK
- vU0SccifXeJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ7i9JAAKCRA1o5Of/Hh3
- bS9ID/49ZmHa4XYMc2QOk+FBzngsRBTzHh7YZE74Ros/HsqhI3dDEEr1junleOxCeTp94GRv/t/
- llSzo3u43FBhqhTpa2lCMSGOwprFs0hEumzZdM7c1+I+MIQQXGjJq90XCQ1ileaoGuP8Nt8NZo2
- htSGS75cSt4KeaTrR1jVBAGHDze3NbQdjcQsQnSbF2J7L1pXwKoOgIerWWYwv1W5d1BiqxOBrNt
- wuqk/h/Mmtffk1m1pjsC+llzb009cTjaL5g55IBR6e4wYg579RBIt4uwlEbJAd89+Z57U2sRWtD
- IVAEcEvlBskcvjZfrROKXEm3HGxGj0qVOC29WVppVFfvpQ17ikd2FGhgVn2w9bEkv4BPFRq2PdR
- 9EyT/7uaIc575JiJPzAFCFGmwfYlDufqweSt+VDlbIdQTKT03mDuWsNMU6AvpbJEh3v+jsrIaqN
- C3nx7p9w/bgm1tpTpUs62kVr1gTswwxB7K07gqIxnpMLC5NFa/jmlgDLKaodhpLAySDRbATdi/E
- Fvk6NsEwiYZ3VfecH4gNnKYBRNkBAuYYnPCVh3JGsxdrXzQvwJSDhd9+YiQf+1FkFG+tz8XW2nM
- /fx4Tnuc2Z+zVcPdLR+5c302nYP2CGTnjCv5aBhJbZ3AtT/dhgepsh3hL7sZbaZ+AvNQSM/n8G6
- vPrgnf+4wreS+HQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250221173009.21742-1-frederic@kernel.org>
 
-Fix a shadow variable warning in net/core/dev.c when compiled with
-CONFIG_LOCKDEP enabled. The warning occurs because 'dev' is redeclared
-inside the while loop, shadowing the outer scope declaration.
+On Fri, Feb 21, 2025 at 06:30:09PM +0100, Frederic Weisbecker wrote:
+> napi_schedule() is expected to be called either:
+> 
+> * From an interrupt, where raised softirqs are handled on IRQ exit
+> 
+> * From a softirq disabled section, where raised softirqs are handled on
+>   the next call to local_bh_enable().
+> 
+> * From a softirq handler, where raised softirqs are handled on the next
+>   round in do_softirq(), or further deferred to a dedicated kthread.
+> 
+> Other bare tasks context may end up ignoring the raised NET_RX vector
+> until the next random softirq handling opportunity, which may not
+> happen before a while if the CPU goes idle afterwards with the tick
+> stopped.
+> 
+> Such "misuses" have been detected on several places thanks to messages
+> of the kind:
+> 
+> 	"NOHZ tick-stop error: local softirq work is pending, handler #08!!!"
 
-	net/core/dev.c:11211:22: warning: declaration shadows a local variable [-Wshadow]
-		struct net_device *dev = list_first_entry(&unlink_list,
+Might be helpful to include the stack trace of the offender you did
+find which led to this change?
 
-	net/core/dev.c:11202:21: note: previous declaration is here
-		struct net_device *dev, *tmp;
+> Chasing each and every misuse can be a long journey given the amount of
+> existing callers. Fixing them can also prove challenging if the caller
+> may be called from different kind of context.
 
-Remove the redundant declaration since the variable is already defined
-in the outer scope and will be overwritten in the subsequent
-list_for_each_entry_safe() loop anyway.
+Any way to estimate how many misuses there are with coccinelle or
+similar to get a grasp on the scope?
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Sending this against `net-next` and not using "Fixes:" tag since I don't
-think we want this to be backported to stable tree.
----
- net/core/dev.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Based on the scope of the problem it might be better to fix the
+known offenders and add a WARN_ON_ONCE or something instead of the
+proposed change? Not sure, but having more information might help
+make that determination.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 18064be6cf3e3ae0949722a4ffffdc25fdd16b2e..c36b9b05364bab117ce51f3cc6ea5839245fd182 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11208,9 +11208,8 @@ void netdev_run_todo(void)
- 	list_replace_init(&net_unlink_list, &unlink_list);
- 
- 	while (!list_empty(&unlink_list)) {
--		struct net_device *dev = list_first_entry(&unlink_list,
--							  struct net_device,
--							  unlink_list);
-+		dev = list_first_entry(&unlink_list, struct net_device,
-+				       unlink_list);
- 		list_del_init(&dev->unlink_list);
- 		dev->nested_level = dev->lower_level - 1;
- 	}
+> Therefore fix this from napi_schedule() itself with waking up ksoftirqd
+> when softirqs are raised from task contexts.
+> 
+> Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> Closes: 354a2690-9bbf-4ccb-8769-fa94707a9340@molgen.mpg.de
 
----
-base-commit: bb3bb6c92e5719c0f5d7adb9d34db7e76705ac33
-change-id: 20250221-netcons_fix_shadow-e2607c682129
+AFAIU, Closes tags should point to URLs not message IDs.
 
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
+If this is a fix, the subject line should be:
+   [PATCH net]
 
+And there should be a Fixes tag referencing the SHA which caused the
+issue and the patch should CC stable.
+
+See:
+
+https://www.kernel.org/doc/html/v6.13/process/maintainer-netdev.html#netdev-faq
 
