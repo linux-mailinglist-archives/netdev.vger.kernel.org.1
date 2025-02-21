@@ -1,73 +1,85 @@
-Return-Path: <netdev+bounces-168610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9E1A3F978
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:54:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C59AA3F980
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1448316626C
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:49:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AE631670C2
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48CC1DB958;
-	Fri, 21 Feb 2025 15:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F161DBB0C;
+	Fri, 21 Feb 2025 15:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ddtQf4ko"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPjcOssX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2DF1DB366
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 15:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B721DC075;
+	Fri, 21 Feb 2025 15:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152965; cv=none; b=ayDN4X3+kw67qUTkWxGEsbXgtiowzZSuPSfrebaZjQ6XYqNfA3DAc2ZfO6wEVlheNTjIWEJNWyNuZFNKSlMgD0IvRs7Bh4bIhsVATlu8RNKEC/F6Mv6y8feH0wC5+OWNj1vify8Yu2h+SaZ5FtIO/dF2OhzeIxRHdlqeeuQue1s=
+	t=1740152986; cv=none; b=nRBfb5ZYpS2f7/OI7DxdZAIOl7ds82CRJlYxGNeOhqvN8HqjMKogz4ouLlGrGaLvlPL5FFXQrzaUbQ57KRsk5NK7HUa+pUGw2OsCOTbknmEloa2m5Hk5TOk/Amhumy5BQC9bmmxCGe50bO/YR90NSaBg6KaCkfF/wM7BK3DtM6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152965; c=relaxed/simple;
-	bh=Safi/ZaRImAt4ByykRE6KlGbcE2+yBZJn6XUR51YY70=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EoVo24Sbwy9IzpZGbAGiW3RUqlSf8JfRr5pDYCgW/gYtxPoqkVAwmLF4QRQjyYCeSgZfcEHVi3oK6okMtE6mdCC0P8jcYntIqfWkXO1W7T4COOOdblrEp94Hiyg8xpWKYfn488SZNI+vwPuRqBG/afrVT+VOkP+w4ScBJydj0eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ddtQf4ko; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740152964; x=1771688964;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Safi/ZaRImAt4ByykRE6KlGbcE2+yBZJn6XUR51YY70=;
-  b=ddtQf4koXIUIOtSZldkDJBWVbG+grJQvsU8lA6t+BrI/+21YRAs1DaDG
-   vWzcW7SPCwEzCxY2R3hRx+jwWyGRkU/MJsFTvhkFWTdwim+aGJ7tt/NHX
-   vt80PyJogroA35p9gvUrxUK6PVI4VTQbT47P19LbEqtLg6L3YxjiyORB5
-   1r1aINMiqa/pDgNyOuJUqYB92iI+FMBhmWLtTsbtIbGISbivS7gYQQVCb
-   P8R15ULMYtAukZWW9kC013T5l0vI+YJ8ssu7zADsA8w6FOS3xKraawF/4
-   U0JnSgBe3Zfpj81m9jffFcaeAsaVIFcwxM88bph2g9EVd/HiRiCosLPhA
-   A==;
-X-CSE-ConnectionGUID: QrfjYbDJRhOnP51Y3MpzhA==
-X-CSE-MsgGUID: mmiCS+W1TImHGCCX5StQaw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="28568988"
-X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
-   d="scan'208";a="28568988"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 07:49:23 -0800
-X-CSE-ConnectionGUID: HYrdzkobSkC8CkxPmeC3sg==
-X-CSE-MsgGUID: Z9anu8g5TTOG9gVQOHA3AA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
-   d="scan'208";a="120503049"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.119.85])
-  by fmviesa004.fm.intel.com with ESMTP; 21 Feb 2025 07:49:21 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	andrew@lunn.ch,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v3] ixgbe: fix media type detection for E610 device
-Date: Fri, 21 Feb 2025 16:49:17 +0100
-Message-ID: <20250221154917.3710-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1740152986; c=relaxed/simple;
+	bh=1fvhA8V0g/vtY2mcylWXQXy8upiIo6youGRqM1lFRmE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Or0EbaKK/bvDAScqF+kHR/lt/KR2gmNd7cZWiePeVfFGR5SVDjS+Lqr2ESOIWhs7j9yRW/HBQ7APsTdVTKiYU9PnYjCy1aeJqzQ+xEqCdXgswSNmnZpjIS6zbpbMBUPwoR4WGmcRfKZUjjMJiSDCG/2T4BKqj/41FrRZU8kUTCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPjcOssX; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f666c94285so20425027b3.3;
+        Fri, 21 Feb 2025 07:49:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740152984; x=1740757784; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MKWPUDJyTigYpO/lDMrucISTaNX7hl65i0Al0sTxzuI=;
+        b=fPjcOssX1gkhvRGafZq4OmX/yjwo7rPmUb2T24B5I3qOUQCJURPDNz7CxIK4x01qX7
+         3Gk5ExBIzZUAyTH0b+OJNQYoPB6rYYFeOMb3EQNKvD1PfgpVGFhz4aijyRJimdztQ81a
+         l7+//IdegTFTUB4SdGv8gTxd7jvaEDQqPdj4FHbs8DW67dh+Eq+qFIR4FapuvRYiKgxZ
+         MArcecoer1OK8COpgrxtoBm36vlBhjiRRWReCvIDXnLgXFbaV8tIvSJ1Wy/qDVI1ieoO
+         wu4UoBMp/A7Vhd+3mItuWNn+ULj55LKW9fJrGCFuNLfgLfUNP5gMVjpTVAzmehi6ycxI
+         U8ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740152984; x=1740757784;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MKWPUDJyTigYpO/lDMrucISTaNX7hl65i0Al0sTxzuI=;
+        b=nurGlEV6DCxh/Ep9gj9xQrzxV/r0usroIgp18XUJmRdJON9/f292TLdk+O150cFqCV
+         ZDCSDEXHpeACwqPLUtegpqQ+WCnUiLHZLefQC9JbMtdN2bSXJ1zBoJZA8jpbnacu7aoj
+         RxmpJBsjtKB3MranUxpcyzzowlRC5QFmyxeA5lc8ajFxznQHCxnqjNAIq0ohK+LIbXQR
+         f/3I8l8t3XANmWr7l6E4c9LCb5nVTDJ5f+Yi6tyYpWBzQeWT3NmXQO2Y+gIjV36u0VdM
+         w+uQtuhNs6TG0MCzEz9N3jyU9uBSGMxJQr2nXiwS+ON9k1VfkDEWD83FubwllT8Lja/O
+         PUOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTHz8qfs7q5k3rWG20kxDdi2cZn69/Wx1IOvACXF7QtlU0ukPBYvDFNEjcUE+iarE3wYIFJXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhWyeyFNuPvyk9hjEl4gluKbebx15JogU3vnC8S1/ptFvtrHgo
+	aj9ecryeHK0z1Zeet8cjDBBgzJSGPFLpJUeYf3z0dAyg2IYniNNd
+X-Gm-Gg: ASbGnctOeOP36G3OLTyRXCOezJ03R3oAadz80vkqz2qtthi+byXNDhyZdIt44iSYx7v
+	vAufuRhNB4p1+TCq340Y2qNxsvCye9Tqzgy9hN7dok5LXQ9GjB9sNsW/o//hARCIHXkaWtFXgkx
+	zKb8ebCbACq1vo4WWfxeYI43hC3e8zOANWtVMLpGssusL1aQ9Zk/V6LL0NSeRdfpQmq1OAv4Le3
+	4Mkyre13Mn+Nnxt6nH04viaaxzjobecVQd0wbVr5Vbw5/K9nqzfjL3p+SXTlUsN/0BsKRImP8pP
+	FKqboOTyO/khS8Pua9w+U0DgRa/19RZnj5HtNsv2WIySvDVDdtYVj7PBp3V22Sv/ZGlEp1uCkg=
+	=
+X-Google-Smtp-Source: AGHT+IH0070/1+amarEXhfBwE99xp6dPZjIGqV0cdKiEdMf3DYfggBUyl9h8TS2yf1QdpUC2qH4tvg==
+X-Received: by 2002:a05:690c:c18:b0:6f9:9d40:35cb with SMTP id 00721157ae682-6fbcc73d9f0mr37626637b3.6.1740152983585;
+        Fri, 21 Feb 2025 07:49:43 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fb35f669fbsm41864487b3.31.2025.02.21.07.49.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 07:49:42 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-02-21
+Date: Fri, 21 Feb 2025 10:49:41 -0500
+Message-ID: <20250221154941.2139043-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,54 +88,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The commit 23c0e5a16bcc ("ixgbe: Add link management support for E610
-device") introduced incorrect media type detection for E610 device. It
-reproduces when advertised speed is modified after driver reload. Clear
-the previous outdated PHY type high value.
+The following changes since commit dd3188ddc4c49cb234b82439693121d2c1c69c38:
 
-Reproduction steps:
-modprobe ixgbe
-ethtool -s eth0 advertise 0x1000000000000
-modprobe -r ixgbe
-modprobe ixgbe
-ethtool -s eth0 advertise 0x1000000000000
-Result before the fix:
-netlink error: link settings update failed
-netlink error: Invalid argument
-Result after the fix:
-No output error
+  Merge branch 'net-remove-the-single-page-frag-cache-for-good' (2025-02-20 10:53:32 +0100)
 
-Fixes: 23c0e5a16bcc ("ixgbe: Add link management support for E610 device")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
----
-v1 -> v2
-  More commit message details and reproduction steps added
-v2 -> v3
-  More details in reproduction steps added
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 683c668..0dfefd2 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -1453,9 +1453,11 @@ enum ixgbe_media_type ixgbe_get_media_type_e610(struct ixgbe_hw *hw)
- 			hw->link.link_info.phy_type_low = 0;
- 		} else {
- 			highest_bit = fls64(le64_to_cpu(pcaps.phy_type_low));
--			if (highest_bit)
-+			if (highest_bit) {
- 				hw->link.link_info.phy_type_low =
- 					BIT_ULL(highest_bit - 1);
-+				hw->link.link_info.phy_type_high = 0;
-+			}
- 		}
- 	}
- 
--- 
-2.43.0
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-02-21
 
+for you to fetch changes up to b25120e1d5f2ebb3db00af557709041f47f7f3d0:
+
+  Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response (2025-02-20 13:25:11 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btusb: Always allow SCO packets for user channel
+ - L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+
+----------------------------------------------------------------
+Hsin-chen Chuang (1):
+      Bluetooth: Always allow SCO packets for user channel
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+
+ drivers/bluetooth/btusb.c  | 6 ++++--
+ net/bluetooth/l2cap_core.c | 9 +++++++--
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
