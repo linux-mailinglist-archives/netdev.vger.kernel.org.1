@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-168599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D6BA3F945
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:45:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E458A3F949
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8521E424011
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:44:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0132C4244F7
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCDA1DDA1E;
-	Fri, 21 Feb 2025 15:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7061A1E570E;
+	Fri, 21 Feb 2025 15:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3xfLFHa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rp0YZpns"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20291D88A6;
-	Fri, 21 Feb 2025 15:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440A61DBB0C;
+	Fri, 21 Feb 2025 15:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152651; cv=none; b=U8zzr5WU66BVS8Z+/o5D4eV3IGbgBRxHWiuHSRhNzAD/s/rOy3eWE47iZJsiCRoN1d1QYiF0R3tQDP92JdVcq9h8mdWvhWspt9+9u6vTYGV6l2T4xWYIBiZ8fT2wGeulmy/vVuiMR5bslxLECJTkgwDHWTQy+CAtCPd3jD3LEeE=
+	t=1740152653; cv=none; b=Ejt+LPf9XZTKrmN99maNDhMhwyYXSfAxi8msrfSVeGS5y/BAuxsjuh9Nta1CvJubd/PCIMhwV6yd62FbVsSTVffQTUZ66Azt1yOqbZNpGZE5hfT0Dc5RL5JRmvXJkUTnqGWZVCllk8jPnTViQLMala14IjgGWM8QnjKx4ngoQ6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152651; c=relaxed/simple;
-	bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rkCZXOJB3pcgFDqJpcQTbqv2qYEQpzswraqrnP3LYRql7mdhW5FUWzIgVrmIt2HNNgKc0VErULX4qlMIHIgmPQnN415wPdNM3G+i5eh8380AVGjBHxdBS6fy7yKVivfLFICyWpOZiIX0N9pDbApspuomL5dOGymCSn5AUn9LGF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3xfLFHa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 366D8C4CEE2;
-	Fri, 21 Feb 2025 15:44:08 +0000 (UTC)
+	s=arc-20240116; t=1740152653; c=relaxed/simple;
+	bh=nTY0AoEf626hk3bDfIL98/ogDyGvSyTa0s0+ixLE/18=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=MStu5U3acllh/mupiH6IhFfL7U/v7QRCln+Clf/Vf84dfB5+X/VLy1Y3DyyXg+MXTFQBfFH3dtXpMbZSO2fD3Lf4LcUyqK7wx/9snHISrp75d/QhNCpfO+hrOWQmCUIaNq6MPJJkq6U/OgWWCt7J8yYAMGxZQKVg0Zg8tcVfsj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rp0YZpns; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4543C4CED6;
+	Fri, 21 Feb 2025 15:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740152650;
-	bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
-	h=From:Subject:Date:To:Cc:From;
-	b=L3xfLFHaTXNPRSgBEBEB7wDZXFIxpLfqHQG6E52G7wanftxnUhcfB4cqyJ5tBifAD
-	 yD+T3SErGxaa3VzeBZwqxrbwuwfwiww9i/sRwDPsFzrr9+/hmWQ1UBLsmSDvPhsWEC
-	 7DXDqQBz23Gbn3prceUaEHKsY8Ag/gu/6WeC++ZgIMnL5qd3nbPX2EZwZkr8LyoP3s
-	 qvmBxjwp8yDMozvF3D1a02OFRxlBB21U5zAIQIhNDqqCTi51UfLp3cNVexs94TCwoE
-	 PZJikR1C4HaTOKaa66ws1Ik3DLeSMXL+kR34G3KQbrxplLZPNdVVv+Z9I+JBqy5D9/
-	 nX6HdjkAYT3oQ==
+	s=k20201202; t=1740152652;
+	bh=nTY0AoEf626hk3bDfIL98/ogDyGvSyTa0s0+ixLE/18=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=Rp0YZpns+e2+2h0FizGL838vFjMu6TNEfrzID319KAzIKo/Nl2VyL9KWXmjTcRUgh
+	 xFRcRdFrLOWoiDUqyR2VKhZ/dTzlxYNuExHrydevbrAw7KDWI0MAn3AXe/yHOd7qxY
+	 JM3G2ebYnQcsgakOeG4qSQubgWFn9FtU/wc81GUgD6c5JMzeRLyM3XutLViHsnH1iZ
+	 n/puprImXULOPssstd2uD9J0gpCXYlSweWoO0r9Fd85zlLCGimTht66uQOPipgYjmh
+	 dtwQDSG4gXEGnIKw12KNy8X8niaIv0zOXLv0zINGUvh07pt0qgXTVdYM5fqbt84g/Q
+	 x5LGvd6Zjygdg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Subject: [PATCH net-next 00/10] mptcp: pm: misc cleanups, part 3
-Date: Fri, 21 Feb 2025 16:43:53 +0100
-Message-Id: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
+Date: Fri, 21 Feb 2025 16:43:54 +0100
+Subject: [PATCH net-next 01/10] mptcp: pm: remove unused ret value to set
+ flags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,90 +53,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIADmfuGcC/zWNQQqDMBBFryKz7oCJRLFXERdhOtUBkw5JFEG8e
- 0Ohi7d4i/f/BZmTcIZnc0HiQ7J8YhXzaIBWHxdGeVUH21rXWmswcqmcBYMWUtSAQTIhbezjrti
- hMzxSP/jR+R7qjCZ+y/m7mOBfw3zfX5CZzTx8AAAA
-X-Change-ID: 20250221-net-next-mptcp-pm-misc-cleanup-3-51e9c67a95a6
+Message-Id: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-1-2b70ab1cee79@kernel.org>
+References: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
+In-Reply-To: <20250221-net-next-mptcp-pm-misc-cleanup-3-v1-0-2b70ab1cee79@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
  Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <geliang@kernel.org>
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2226; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=5xIZs9W549Xl8TwcsXMDbVpU7kZ56K33008AxiD5hAk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnuJ9HhkFtcSdI0pq/r71f3+yfnMsMTWMaANsVn
- pw5f989CIaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7ifRwAKCRD2t4JPQmmg
- c47LD/wJvbAHFVUh74E/WMql26dDfM539dzX27+2+Deoj5pLLuRW7bxzUFZa+U4hvUP04f6OnTE
- fL5W5u2OyDn2oSZuu84Gn4TlxmtP88+W+o6XGc8Eoh60RtdocahunuVkrw7zsICBY/6nC5VY52A
- lBh/YSAOHmf8xfNoezYy9+eWKEKuFyrMxcaQh0I2qIUYrWooaJc/mwjy5IIH7TxBpYdacNBZ6sz
- PLpB6/1PUokyL161xf8d1uTFfVK5LtnKszyxKBIrmnrwHsFUHy9gRFvNeArkueIkPmbXR72bT89
- 3fFOg0N8OskzfZ//mja016HZ2hqoEPa4pFHB6eQ3GTUkh6MhhZRdAOKWcj5L6w8tTJuvRWwgMEL
- utVBk2o1yzUB9Q9FZxbJgglz3Q5TgE8+EsV0zV4M04VOK/zlMgw5B+V9KC5bKh015vuaq1yJr7k
- GH2JX5kjMsSC4/YIc2CIjwXsCIW1lH5sMd2BFA6SKUqjbM1H4skhFAVr3t9ALWPYK8gUsNPNZBj
- 9UPBTD6JV74PxqWk8qJMo+PAyVp5ntL2YDEA1vHR/WBj3XRA0MdLAG/uf9MyAjZnjauqSjCEcF0
- XvZ7VzdRYLaFbhjDzoXmU49CIoZgxRhDGName8IWWJU5qd0JBYsa2Zyk5M78/xnVV/6Dt9taZab
- CxLgBqLeaxxYmXg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1622; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=nTY0AoEf626hk3bDfIL98/ogDyGvSyTa0s0+ixLE/18=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnuJ9Hjzhmm/kHONJh/qVhCK3dXllW6av+mFC6J
+ h8I3E3r9++JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7ifRwAKCRD2t4JPQmmg
+ c181D/oD2aaKKTBgk5W4fUnr6hL/m+fqfcmEyStfbs0JJLwbuehvSEF0tWovw8yNOws7lnHd7Ce
+ g2XYLLL279MFYWdvJ9TSIX9l0jIqA5IW9vkQ1Co8ZTDWunXimTmo2aqkmxMgRR7/Qpc/k67B4zh
+ kMvm2oPyzQrwb07C2vbQkOpka2PCSX+ZjAV61M8N8fDUfDab/9QXmDRtj93TSZcTFvEdhCc1n/r
+ UmOcJDZIz4NbBBUpiTZo5yDYdVr9jA2rGOsL5+daHnm/WvIWWCJW0XrRV/dCsmjdjjOP0oAoSX2
+ wfMsQWTjhgplHUS0YYv2zTBdN+iWl5M0+rZnB9ZrYv1/pt1TGpTYJ18C4zt611StPGohbbVd31E
+ 3MCa+iFQDng7+mWs0VQqk5H23qT1CxIj7W7DEVfVhJY3XQZpz+kzYC4+gOmqbvzIytGmgi4cKrC
+ 7aP6rTo2uqRg9lGcuEO6nsNPARns1uFxDhv4dT90LaFlCnEk4ghGCgCwzFrReczbcYiIVmPuMvJ
+ +i6Q4t1HE8bm3mIkscPF3mhgyLr0/1LyYzUjNoIampKmYJ77A0+yqbhdmYpJ3CW4jPJJK+j8/7v
+ 38z0jTob5Efo3GlxgMLMIV7PIYOKIP/sWRxScFXiV31Xv0PP75sOHOJhLiKZ2iqk+WDfb7d/WMb
+ vrjWhEclKap5jaw==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-These cleanups lead the way to the unification of the path-manager
-interfaces, and allow future extensions. The following patches are not
-all linked to each others, but are all related to the path-managers,
-except the last three.
+The returned value is not used, it can then be dropped.
 
-- Patch 1: remove unused returned value in mptcp_nl_set_flags().
-
-- Patch 2: new flag: avoid iterating over all connections if not needed.
-
-- Patch 3: add a build check making sure there is enough space in cb-ctx.
-
-- Patch 4: new mptcp_pm_genl_fill_addr helper to reduce duplicated code.
-
-- Patch 5: simplify userspace_pm_append_new_local_addr helper.
-
-- Patch 6: drop unneeded inet6_sk().
-
-- Patch 7: use ipv6_addr_equal() instead of !ipv6_addr_cmp()
-
-- Patch 8: scheduler: split an interface in two.
-
-- Patch 9: scheduler: save 64 bytes of currently unused data.
-
-- Patch 10: small optimisation to exit early in case of retransmissions.
-
+Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Geliang Tang (6):
-      mptcp: pm: add a build check for userspace_pm_dump_addr
-      mptcp: pm: add mptcp_pm_genl_fill_addr helper
-      mptcp: pm: drop match in userspace_pm_append_new_local_addr
-      mptcp: pm: drop inet6_sk after inet_sk
-      mptcp: pm: use ipv6_addr_equal in addresses_equal
-      mptcp: sched: split get_subflow interface into two
+ net/mptcp/pm_netlink.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-Matthieu Baerts (NGI0) (4):
-      mptcp: pm: remove unused ret value to set flags
-      mptcp: pm: change to fullmesh only for 'subflow'
-      mptcp: sched: reduce size for unused data
-      mptcp: blackhole: avoid checking the state twice
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index 99705a9c2238c6be96e320e8cd1d12bfa0e0e7f0..ff1e5695dc1db5e32d5f45bef7cf22e43aea0ef1 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -1922,13 +1922,11 @@ static void mptcp_pm_nl_fullmesh(struct mptcp_sock *msk,
+ 	spin_unlock_bh(&msk->pm.lock);
+ }
+ 
+-static int mptcp_nl_set_flags(struct net *net,
+-			      struct mptcp_addr_info *addr,
+-			      u8 bkup, u8 changed)
++static void mptcp_nl_set_flags(struct net *net, struct mptcp_addr_info *addr,
++			       u8 bkup, u8 changed)
+ {
+ 	long s_slot = 0, s_num = 0;
+ 	struct mptcp_sock *msk;
+-	int ret = -EINVAL;
+ 
+ 	while ((msk = mptcp_token_iter_next(net, &s_slot, &s_num)) != NULL) {
+ 		struct sock *sk = (struct sock *)msk;
+@@ -1938,7 +1936,7 @@ static int mptcp_nl_set_flags(struct net *net,
+ 
+ 		lock_sock(sk);
+ 		if (changed & MPTCP_PM_ADDR_FLAG_BACKUP)
+-			ret = mptcp_pm_nl_mp_prio_send_ack(msk, addr, NULL, bkup);
++			mptcp_pm_nl_mp_prio_send_ack(msk, addr, NULL, bkup);
+ 		if (changed & MPTCP_PM_ADDR_FLAG_FULLMESH)
+ 			mptcp_pm_nl_fullmesh(msk, addr);
+ 		release_sock(sk);
+@@ -1948,7 +1946,7 @@ static int mptcp_nl_set_flags(struct net *net,
+ 		cond_resched();
+ 	}
+ 
+-	return ret;
++	return;
+ }
+ 
+ int mptcp_pm_nl_set_flags(struct mptcp_pm_addr_entry *local,
 
- include/net/mptcp.h      |  5 +++--
- net/mptcp/ctrl.c         | 32 ++++++++++++++++++--------------
- net/mptcp/pm.c           | 21 +++++++++++++++++++++
- net/mptcp/pm_netlink.c   | 46 ++++++++++++++++------------------------------
- net/mptcp/pm_userspace.c | 29 +++++++----------------------
- net/mptcp/protocol.h     |  3 +++
- net/mptcp/sched.c        | 39 ++++++++++++++++++++++++++-------------
- 7 files changed, 94 insertions(+), 81 deletions(-)
----
-base-commit: bb3bb6c92e5719c0f5d7adb9d34db7e76705ac33
-change-id: 20250221-net-next-mptcp-pm-misc-cleanup-3-51e9c67a95a6
-
-Best regards,
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+2.47.1
 
 
