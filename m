@@ -1,176 +1,103 @@
-Return-Path: <netdev+bounces-168433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40878A3F071
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:36:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 160DFA3F08C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09EEE701749
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:34:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE8F189D777
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BCC2046B8;
-	Fri, 21 Feb 2025 09:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9914C20459E;
+	Fri, 21 Feb 2025 09:37:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFBD2045BC;
-	Fri, 21 Feb 2025 09:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D082040BF;
+	Fri, 21 Feb 2025 09:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740130475; cv=none; b=nkn5hnSjvnb1hnRAD/aQEN5qR+Sl0X80VAslbPS4y4el6CvUu9wJ/BtRzeVCUw59TD9+PPr2SSzcwqkpLtxF3m0f8ThvfhyIUxK64PFI5d/9OhtMq6BAUwEpFzFV3TAdCVT8QiYcm/SIzZCkAEMswIKhba583JUjU9fVDwF2yko=
+	t=1740130673; cv=none; b=FpAK4BgTaTULp3aBrjyNjnrd5Aw8erDTQ5bgnflNcTF2YI+u7gpXSnbWMOcwW287uNMJT6ijMoBH167hGC/w3bxOaSDEKFDQaoxBYeBHDyQm3PHiyvVQ81jpq+7Tr1LqSIr5rR215Fz7uG0mQXodjLto1o0zL/e2wvOdm866x+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740130475; c=relaxed/simple;
-	bh=UrE4zNeA6rGUajNEitvvWzIh6MglysOpeI2P5JxANP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WU55k9ffti/1mCydPUJ82xGOQpXMrMkL5tnQreBqwBJyw/yr5pNBA/VfG6kTwdGxpgmd+hwh+OoTse7BVfPFREkMsWM7KmPnya/X3cLlI1v7OoD4ttF1EeXO8+KXe9RXjdijPcO5BNcAROYNCi1I7irotd+LMukh7XNENgOq3mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YzlG03WHwzdb9B;
-	Fri, 21 Feb 2025 17:29:44 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 57A03140158;
-	Fri, 21 Feb 2025 17:34:23 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 21 Feb 2025 17:34:22 +0800
-Message-ID: <e55e4dd4-9f80-4b2b-a84e-4bcfa4cf40be@huawei.com>
-Date: Fri, 21 Feb 2025 17:34:22 +0800
+	s=arc-20240116; t=1740130673; c=relaxed/simple;
+	bh=bAeLxz+c1Ts7bphdqbep71s5QSoID+9JDJSBujnvkVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTa0lLFtgsi8EIoBsr4qMZlP4nBTQ7UNB4eylam/vuXw/g1N5GnwdaTUm6PY8IvA+9xlkkimhCviP9ldArRjopNfbDyzm+QgGhhYuVBsysyQqvBVXzp+wVj6G1LtBW7Dsw5Zwnxltg9YkGdmF/1RE9OzqtcKdGTPi6FQ1nMSmXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e02eba02e8so2546139a12.0;
+        Fri, 21 Feb 2025 01:37:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740130670; x=1740735470;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3fSnnglnDE4OxiijvbfYtwaf+0cH0qRVW0DkL1E6oSo=;
+        b=SL6l8pTjeZhaMjbGdiCmhWn+Ujqr5Hc5eI5ywWCZwV4I2g9xfsAL+R1sJ732+/7fmw
+         w1RzBLFQvwKB/Ymeq/O25hVLLIbGrWVQwh7rOyJAPLyx/uCUqhbFtDdROCS+e/Rg3QVB
+         HJUZN9SmP3V3XDGh/7Yu1UrUMA/aXswRj1K5sQuv7unRAisHdCpyyK/2tKwqoTNptw24
+         lh2P3RvJyhzHljM4lMYdlz0KW936esz7dqI4WWJb772gE4zb5ZxiIaMMCUyulmz1Vono
+         Af194fj0LsueuajEifH+5CL4w4qtZzcFOX57vJFUKRb3KelGPB9ckmq9+bYrsJ8eVNgB
+         Dkzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMDNmbSrj+4FmfJPThzsoEmd2UQ9KGWf4LSw62hzur4pNKBGVv6Elb8hO1vNE4y0DUVtq1W6bnAM2KX2/Y6O8=@vger.kernel.org, AJvYcCV5W4lcc/GQ0RuaktH8pBb00uLgeoCbJtFEiX/gTrPqtNlpBj4bOVal4wn/a+Qvta9vK7efL0zw@vger.kernel.org, AJvYcCVKe6q7Mc1I6HQX2qolCFYcW0fKckr0Ap319chJ8VMSN028EI9+W3x1Hvz9WbbgRJKzKDUTWQlUBpT6gHFK@vger.kernel.org, AJvYcCXDTtBpLu4nBc6ssomFMe1eOc/lqSb7KKdzn2e94XOrkiMzNugD2vllpo2gxiI+9iMGwWzPW4Dad1M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZQ2NdPmlZwqHjOiXf/SI0IUG1F1ZWnq03q6tpN0H4xlSHhdmX
+	Qe6gtO+G40Ln3GKLuffozuwkU/SdAbNyK9Qw/i3nBqRY8nAIzOHm
+X-Gm-Gg: ASbGnctXoa5b+tP6ewtVR4btyb/IkHLaWepTqyxIt0YEOP6ekjF/XFy/UBmMs+1Z9as
+	ezQ3DVb00UywEyCFNJ1sBMOLzQd0H88KadhxMwqqx5U7buBfH6XtZgCjiZH3uH4Bc0oXaluZWbp
+	YFPjjijfBalF9Oo54y4yxWE2LIN0CDqpQwmbE13vSjIxxZXkPmR6fjpGoZDKu5SHLjp8OZ/yBEo
+	WP9MMWUS5SxzYXHtVp1rmgxDr9+qLnmJepe5eB3InuAK3/VwQW7nHEd3wbm1Y81d9Ikv066fHoy
+	LLjiBDgohSmQaFCQ
+X-Google-Smtp-Source: AGHT+IHWNmEkqGtajxkcN65Dyk2qU9qs752a20orApMklK9etxurXq/hZktNRXLRI1CrjEYJmjdFLg==
+X-Received: by 2002:a05:6402:50c7:b0:5dc:cc02:5d25 with SMTP id 4fb4d7f45d1cf-5e0b70d5729mr2037533a12.11.1740130669931;
+        Fri, 21 Feb 2025 01:37:49 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e07464bcc7sm6281773a12.33.2025.02.21.01.37.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 01:37:49 -0800 (PST)
+Date: Fri, 21 Feb 2025 01:37:46 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH net-next v5 1/2] net, treewide: define and use
+ MAC_ADDR_STR_LEN
+Message-ID: <20250221-glorious-evasive-piculet-40ad13@leitao>
+References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
+ <20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] mm: alloc_pages_bulk: remove assumption of populating only
- NULL elements
-To: Chuck Lever <chuck.lever@oracle.com>, Yishai Hadas <yishaih@nvidia.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
- Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
-	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
-	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
-CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
-	<mgorman@techsingularity.net>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>
-References: <20250217123127.3674033-1-linyunsheng@huawei.com>
- <abc3ae0b-620a-4e4a-8dd8-f8e7d3764b3a@oracle.com>
- <cc6fc730-e5f4-485b-b0b6-ec70374b3ab1@huawei.com>
- <7b7492c0-a3a7-470b-b7aa-697ac790a94b@oracle.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <7b7492c0-a3a7-470b-b7aa-697ac790a94b@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
 
-On 2025/2/18 22:17, Chuck Lever wrote:
-> On 2/18/25 4:16 AM, Yunsheng Lin wrote:
->> On 2025/2/17 22:20, Chuck Lever wrote:
->>> On 2/17/25 7:31 AM, Yunsheng Lin wrote:
->>>> As mentioned in [1], it seems odd to check NULL elements in
->>>> the middle of page bulk allocating,
->>>
->>> I think I requested that check to be added to the bulk page allocator.
->>>
->>> When sending an RPC reply, NFSD might release pages in the middle of
->>
->> It seems there is no usage of the page bulk allocation API in fs/nfsd/
->> or fs/nfs/, which specific fs the above 'NFSD' is referring to?
+On Thu, Feb 20, 2025 at 06:29:20PM -0700, Uday Shankar wrote:
+> There are a few places in the tree which compute the length of the
+> string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
+> constant for this and use it where relevant. No functionality changes
+> are expected.
 > 
-> NFSD is in fs/nfsd/, and it is the major consumer of
-> net/sunrpc/svc_xprt.c.
-> 
-> 
->>> the rq_pages array, marking each of those array entries with a NULL
->>> pointer. We want to ensure that the array is refilled completely in this
->>> case.
->>>
->>
->> I did some researching, it seems you requested that in [1]?
->> It seems the 'holes are always at the start' for the case in that
->> discussion too, I am not sure if the case is referring to the caller
->> in net/sunrpc/svc_xprt.c? If yes, it seems caller can do a better
->> job of bulk allocating pages into a whole array sequentially without
->> checking NULL elements first before doing the page bulk allocation
->> as something below:
->>
->> +++ b/net/sunrpc/svc_xprt.c
->> @@ -663,9 +663,10 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
->>                 pages = RPCSVC_MAXPAGES;
->>         }
->>
->> -       for (filled = 0; filled < pages; filled = ret) {
->> -               ret = alloc_pages_bulk(GFP_KERNEL, pages, rqstp->rq_pages);
->> -               if (ret > filled)
->> +       for (filled = 0; filled < pages; filled += ret) {
->> +               ret = alloc_pages_bulk(GFP_KERNEL, pages - filled,
->> +                                      rqstp->rq_pages + filled);
->> +               if (ret)
->>                         /* Made progress, don't sleep yet */
->>                         continue;
->>
->> @@ -674,7 +675,7 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
->>                         set_current_state(TASK_RUNNING);
->>                         return false;
->>                 }
->> -               trace_svc_alloc_arg_err(pages, ret);
->> +               trace_svc_alloc_arg_err(pages, filled);
->>                 memalloc_retry_wait(GFP_KERNEL);
->>         }
->>         rqstp->rq_page_end = &rqstp->rq_pages[pages];
->>
->>
->> 1. https://lkml.iu.edu/hypermail/linux/kernel/2103.2/09060.html
-> 
-> I still don't see what is broken about the current API.
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
-As mentioned in [1], the page bulk alloc API before this patch may
-have some space for improvement from performance and easy-to-use
-perspective as the most existing calllers of page bulk alloc API
-are trying to bulk allocate the page for the whole array sequentially.
-
-1. https://lore.kernel.org/all/c9950a79-7bcb-41c2-a59e-af315dc6d7ff@huawei.com/
-
-> 
-> Anyway, any changes in svc_alloc_arg() will need to be run through the
-> upstream NFSD CI suite before they are merged.
-
-Is there any web link pointing to the above NFSD CI suite, so that I can
-test it if removing assumption of populating only NULL elements is indeed
-possible?
-
-Look more closely, it seems svc_rqst_release_pages()/svc_rdma_save_io_pages()
-does set rqstp->rq_respages[i] to NULL based on rqstp->rq_next_page,
-and the original code before using the page bulk alloc API does seem to only
-allocate page for NULL elements as can see from the below patch：
-https://lore.kernel.org/all/20210325114228.27719-8-mgorman@techsingularity.net/T/#u
-
-The clearing of rqstp->rq_respages[] to NULL does seems sequentially, is it
-possible to only pass NULL elements in rqstp->rq_respages[] to alloc_pages_bulk()
-so that bulk alloc API does not have to do the NULL checking and use the array only
-as output parameter?
-
-> 
-> 
+Reviwed-by: Breno Leitao <leitao@debian.org>
 
