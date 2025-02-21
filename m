@@ -1,236 +1,165 @@
-Return-Path: <netdev+bounces-168579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97ADFA3F65C
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:51:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7730EA3F662
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:52:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA10618853F0
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:51:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5084917A4DC
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C19B192B74;
-	Fri, 21 Feb 2025 13:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DeTHIE5y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9905C20AF93;
+	Fri, 21 Feb 2025 13:52:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791922AD13
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 13:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740145892; cv=fail; b=q02rCYT26zZkDON20hD9MA9+0ROaKAvTaUdbSjhT4rgclTgtjLUDDEg+Fb03V283VAOOu+BhR1R7210W99jdnl6SbuZdIBbwu7tdqz8Orc/uZPaieye5wdkYN0lR8j8lGvlJacoJcRkzZH3BOcKpUe6WzHwgnXnvdJm32zEienE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740145892; c=relaxed/simple;
-	bh=m8BB/IhpaezHp86bzuaZ5kCaSQqr2EYHBpRMNwxB55U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dwr+EbGbzBo1XgQQ9tKvnU2rHBire8T80lZIHRAVgDikZhELEssU0hXse690hcSeStbi98QjMIQEScslNliHMGkhyeOp9az21Ck8E129Yp8wubV380MxsrysI1DM6sGxUAdcNAzRIrooaXsIs9JykDFu3KdSqaFxz+WLRSs2yAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DeTHIE5y; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740145890; x=1771681890;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=m8BB/IhpaezHp86bzuaZ5kCaSQqr2EYHBpRMNwxB55U=;
-  b=DeTHIE5yi6/zWtfoT7JbUY5lWWTZPYmxhz0GVIy9+cSJ3DFMBZNZpkeV
-   sx1H5iEHdrD5HgXNYxlA4+4Zlg0M4/F7AjeKwgUn/QXeNlOjcl0L4DeXz
-   ShFDNsjIG+l7Q9ium9sRKqbiP6g116oGPK0qibEa6M+0f3oMSuoLbwZgo
-   1QS9PHCUjMwJJsvIiM/waiK38Qvxbsb0IUU8KR5Q33NG8qKF8QwxR2uEo
-   KmBbIkFr0+SbUuaO+vm8frVUoxtvS3nF7ZghvNEWWJzpowbm6g5Eq9U7q
-   Oa2vbgn/IdMnu3U3XeUugJ2XsJMWy9fvTtyV0LIVVeFhwqFUjCngEYOYY
-   Q==;
-X-CSE-ConnectionGUID: 7xJznOwaSiygkC9O2z5sPw==
-X-CSE-MsgGUID: JxQ+lU+dQUyLxLM1fRvK1A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="51606405"
-X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
-   d="scan'208";a="51606405"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:51:29 -0800
-X-CSE-ConnectionGUID: u8fPzBWDSeyj+lcLZqWG0g==
-X-CSE-MsgGUID: bp2UqllYQeOAic0uHN/8aQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
-   d="scan'208";a="120306671"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:51:30 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 21 Feb 2025 05:51:29 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 21 Feb 2025 05:51:29 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 21 Feb 2025 05:51:28 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W8EunlrL4WfPpb1jX/1a5xE2QsOaL7aLB72mTFPf5BzHk83mJ3rNkmGuqIaYbMqoI7vVfNLVg2tMhi/ym51iN0NfW5NVhnWtfm/z5jzuHAnWEghVxmuDEcj0jJNmwrtgVYS83wHmK86TIk+nXac1T0RpF8HsPfDK1G2uycIgXgYP5he29/UPw2QpqQYltB8lZ47CGwpqFHXaqlYH3HP7k+6RuH4LWHY62kDgmkxICTJDAPPL1zo+kXahIjo2VKPMTd0SiwFXkWCpauVxO/y/SZrzBMB5DHe0E3T7uZHbK7myMCMAupQHtktiSXwErVminJ+ax2Wyi9fn8uYwyDaoGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pLuX1W4iYt1Cx0jwmlk4Gk+zj4GKM3ZVQPEF7gVrxcY=;
- b=A4OD4s/M9Ae3Cli7c7H2N/Uo6fAhvtJ/Vo2QhGObw/GHfeGq2C0UyzaRv5WTIWJ3kPZqR9+zy69XBVvrvb0ERg3qJqxk/fsuo2IL5oJy+pct4w00PASVXzN7BCDbDfKeTdu7nneOiqY2HnRAOrmxeqlFMxQg68Kv94KHiMBHEZ4tpuhSpBmlgEamk8qZdlqW3uTJFe3c7yc2rl4tJfas6/WiuoDuFkhZG6jFvxzyXsdqZjUxb+t5HFE9JJVzHMKNoGK8mBza2vn6jVm54Ljl3qDWBo0hBAebDZ7vr16VxhE6rInwAZYRzE7yBoY9rJx1vn+evhBb8u68jQPMZKXCXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
- by DM4PR11MB6479.namprd11.prod.outlook.com (2603:10b6:8:8c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Fri, 21 Feb
- 2025 13:51:26 +0000
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b]) by SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b%4]) with mapi id 15.20.8466.015; Fri, 21 Feb 2025
- 13:51:26 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Damato, Joe" <jdamato@fastly.com>, Kurt Kanzenbach <kurt@linutronix.de>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Sebastian
- Andrzej Siewior" <bigeasy@linutronix.de>, Gerhard Engleder
-	<gerhard@engleder-embedded.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support for
- persistent NAPI config
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support for
- persistent NAPI config
-Thread-Index: AQHbgS+LHkO17VzUqk+5drVD2uzj17NNkgAAgAQ68WA=
-Date: Fri, 21 Feb 2025 13:51:26 +0000
-Message-ID: <SJ0PR11MB5866C1D10FDD48A5DCA3FD89E5C72@SJ0PR11MB5866.namprd11.prod.outlook.com>
-References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
- <20250217-igb_irq-v2-3-4cb502049ac2@linutronix.de>
- <Z7T4XHtw9-EN-ifm@LQ3V64L9R2>
-In-Reply-To: <Z7T4XHtw9-EN-ifm@LQ3V64L9R2>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|DM4PR11MB6479:EE_
-x-ms-office365-filtering-correlation-id: 610bef4d-067b-48e9-91c4-08dd527ed5c5
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?nFP2OARmEy86k/Kzr8rOkAueYI4orxL53BYILPEiKNiV6gLjgX4A/35laB3d?=
- =?us-ascii?Q?1kiw+g0c5FIcoc+9ZkpKTejwoCWSiAV/2nPzua0gYutxi9GV++7fuZYv2wIt?=
- =?us-ascii?Q?gXh+m/lnZ1pSZF0LvEa7iEtJqx6CQJ0mQFzOeKFSeffq2M3VTZP+5LstCF0u?=
- =?us-ascii?Q?ZCMi7bUIYS+bj3VmlC6pJfL7mH9PPpT23Spt8q9Dkp+ozrbQvLbn6XOU0B6x?=
- =?us-ascii?Q?LhNHbx5D7SmePLGhgOe9caDL2AGw7sq1iQ8RLDfmOEH8C4BwIEoE0L61f1cD?=
- =?us-ascii?Q?zQzNorr84/qlcNmv4DH0REBHsdpALZRr7pM6RUP4fvQizuUt2thlE40SXfYB?=
- =?us-ascii?Q?9V9pPHLwCCtIpCEaOFQ4un2KkDzui8gF5j7tZf/qEqa4TmHl5n6K7PlgmrhM?=
- =?us-ascii?Q?3hkaEUg4Xbc96ihoP6RscNn/56qY/NACkA6ZRpgYl04a8nikb7jwu+jO+F43?=
- =?us-ascii?Q?s2dAoL2x8SRY04jtpbEIL0v3+k2JUpGSV0XelAsYCbDPRG+Q0w1RZoFNkoKy?=
- =?us-ascii?Q?dDp6Yqmf+LKgyH+JyYoWSM7BXs+bpBFPt79ypdHixZc/Ho7vmEQa1elkt0sK?=
- =?us-ascii?Q?3F7zrk2OWju0WpHWxaqTHWeEbzYugLamqPQT+cP51uXP/005vwKh4y2IBd1x?=
- =?us-ascii?Q?RMGd82ApIVfzsdIkCSBoqUePkVtT/C3mgsefrIUFAgoYEAGVfaL8U3uY0p//?=
- =?us-ascii?Q?m8uNbMQNnZ3tgzTd8fsr/NDjtAzmHIQdJgTLOPkh1d5Ds2LBD6FwPs25fvX+?=
- =?us-ascii?Q?0j+7bwBnoqVNobWjJ2Q8Sm4PdSUNFpy+MCuL9Xaz653wkHmmdwjdGYwi23Ay?=
- =?us-ascii?Q?52i/oyDSbSJ5bsMwkI8UI5jNhAka6WPf2cuTjn2appZoIhefxf1+jQmyPLJB?=
- =?us-ascii?Q?srhXfjDSdwaqhx+bESdszKtHUTACPt0Ac1yaYNYmWt0cLhykEVhupmy4VcXe?=
- =?us-ascii?Q?mXKTW7EfSyN+naX4ODYcPG45ToP4BUVM9wKIsYdpPW1uTArBsJ7BDt35tac6?=
- =?us-ascii?Q?TcshVKXn4f+f09iP8ZXLSHElw0OdqgjM2nAzHjt2znWs5ksT1T8RrmgXkKFw?=
- =?us-ascii?Q?N6XQs56DOL5b5wO2BnUNGFpVUrTagBA8dhyGSP1i7RcVW5ae2y+XPI2WBrug?=
- =?us-ascii?Q?G54nhBfYhfDILaQ24iQYmITyHtiX0pCWEky6X8yK6yj+OfkPoUNZr4BEWmyw?=
- =?us-ascii?Q?F1dkIQeSz3ZcZvTFU4LWeXpYBvlVPPnLef/NQt/juweZP+5spzADS5Y3gjpg?=
- =?us-ascii?Q?64L003l+/1DP+mNzHGToa8ERd8wNdFtDlmq4asOpzcSvOxV2hF++g1jFhggm?=
- =?us-ascii?Q?ic9qzUi0iqxT44nkl58r06GoNF/TaqpyV3IkL1M5lMwJ+pHhVCZ8dUQJ9Bhe?=
- =?us-ascii?Q?OW2xv7T0SlxBEoO2ff9wDleh0KYfk9GNrkjv4zhPdcwi5s30D9B56qMSCKXy?=
- =?us-ascii?Q?bgnfRqUhWUWYh1QIGuKyDgQCQPup9xT4?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ssP8vfq3NR8RFQqUJaTy7uxz3EKrkkQXY+Nwz/9SR+kWaEPGASQvMDEcooSm?=
- =?us-ascii?Q?XMsnXfGhbP+bcvQp8DH45aEH+bIvoqAJ+meHSu+x0az7uf3zoeM1XaLb9FDG?=
- =?us-ascii?Q?kLZT7gQCkr/kWXJFhXSJiryEoAP3GsQ5IFPBwpMNcshkHbcC1745Uvp4ZQVF?=
- =?us-ascii?Q?yL8ppB5gzuj8ndQ62+ZMRn2SRpSvJx0DWiLeab7wHZS2wOi3HpYVHgGSlfuQ?=
- =?us-ascii?Q?fXwdHFtJAqSGFVtWVP8m4QhpZ9EygECqRoqmEN+w1Dx05UED+i4UYGGuH55F?=
- =?us-ascii?Q?whXplBjaAHWlRad/44rM++dEArijLjx9Ssk5f6gsz8b0KNbPL2dGSbB2lfpn?=
- =?us-ascii?Q?qkyvR99M7YmtIrv14milHVHfw5fNWlhpIgh2Xn7Knbj2pbiOk3m9mtzH8tg5?=
- =?us-ascii?Q?zkrOwRBMpNuxXPV8EmhFqO6lZzHMuTuG4sp6iRjqqoAu38sh+318XY3C/b+Q?=
- =?us-ascii?Q?VZP4L9CDZnrVibE25j6aRzvoLi/W12qfKb37c32HB5tqlOQHq6HDlLAWJn1M?=
- =?us-ascii?Q?FWW5izJzG+NwvRvvsPP7WeQQivUOQmL5gDWv8GvmoYRRJg7NjyqAk888IiCP?=
- =?us-ascii?Q?S9wQrn4pe0yVVOaCi+YjIWBOzqdvaR6M9+s8/9eQ+68Ofwbwa4ilhc5rQGwH?=
- =?us-ascii?Q?l8pQ5m9j4uJ+KHJ+Sx6djzKyobJFNk2gYcyoEJPUB3DfLHiEtimKP8dhpBB1?=
- =?us-ascii?Q?sqhwgTJmLaB6k1XISm8BQ166LkbbqPByMGAcx0iPKGi7Hi5ORaG10TbhBewL?=
- =?us-ascii?Q?+CpIV/iB46AqDfoOpelsLZvpWgjlI/M9Jl6wLuKO95uaL3E8VrK7veIIvvUh?=
- =?us-ascii?Q?jnuqV2IgLEg0bsu1cdQq63Xx55ZqMTddHy5Tbh5nx2UT016Wy+OQvE+RdI6e?=
- =?us-ascii?Q?eJ1uV32QFmyZ+tZx0TlsEpbgNO2AhltNWeSuzF/PF7JesiGVpFpAskn/wdJe?=
- =?us-ascii?Q?I7SI+fqHCklZumLMXQOm3GV7N8onsmcP/6dLxcX+FSfA8sfV+Mo3szUtjVE3?=
- =?us-ascii?Q?eNax74mleFIDC178W5tFZY7xP62bWWRiOVXafLR7CC5EsPiA/JomDrzvMU0p?=
- =?us-ascii?Q?VDmO5z4nKCMmHk2iSLCAGaaCDxXRZUiIeh0E3C+EH6KFxi87rXerhEenOOfy?=
- =?us-ascii?Q?bgwVehoGqU+X5NgMan1FUlft5NHWtb5qH+FXL7NU8zFOUX4X2Z9wUWaDO9JC?=
- =?us-ascii?Q?4G0cMGAk01q/txE11yREygBEs6aPQbCUUkh2P/2AYDcFhmZ20e57YzY96HWq?=
- =?us-ascii?Q?W6QXmYxl9YsrSzc8v6bbJU5vzWCIKIi8my76D/cvFcADQw5RB7afkbEl+8Iu?=
- =?us-ascii?Q?ZAPjdqxVvdxFlTmrFIgWaya/tb8zDyllvi3qDFVQa2gBIud8oOzJtwZntuE9?=
- =?us-ascii?Q?UPpqJ5gM+su/xE5QrhtVyQ4hHtpN+J7bgM2Mi1+veaKmNvvFpPue1tLa8o2X?=
- =?us-ascii?Q?JwXxjaMl07ukXZp+ZwZSBatzD5LY7MAQAlUuR09oiN5fz8wIYyCW1aFvjAN6?=
- =?us-ascii?Q?m7wpHThD5w31+wNeDvPvlGuJTJI9r49wRDZCCiCGmun9/+8S6Fi8AJAOyJJf?=
- =?us-ascii?Q?BuJpzf9XmKGWaTWtdbKUU2RBPEMXhvo6gn8HjJnwuXDDQQGrN7dRcOVPwHOC?=
- =?us-ascii?Q?mA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B774E20B1EE;
+	Fri, 21 Feb 2025 13:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740145938; cv=none; b=pjUbYmScS5SRX1Mk0SFt+P9pUIzjcKi8zHRWTGcNO7hiD43aVB8VE2PJafSRXd1qm2hG0onnlKTCxySboYxyVbrbf6u97/hYcbfditaCgqpByOQjp//UgkixjD52XUWuBiMPcLXpNZ02Z7rlnhP4FCroKDD3uHGWLz5VyF8qwcc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740145938; c=relaxed/simple;
+	bh=KNyRJ5gPHfOGhVm0BSRcfzsZfkbzWBQYKqTFFX+aN1E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jWNAD7ayYWtVgJXTsLAv/n5dRzKr6IwcqEmNguvfuubmxX5YAevVElO5snTwJDwHM76mGfV1CE4Mdg+wSTRvtRdgzll1E5T36TVRHHagoJMMYPQUdQFjAKcbjAQasEVTgGIhtWvgYDNlUB20Z6krGqBN6KeYSgK/og5EDpSDyTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e0813bd105so3566597a12.1;
+        Fri, 21 Feb 2025 05:52:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740145935; x=1740750735;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G3oFKAHX+y7IXkxMkoz08VOctLMaAIQOwDYtmMeUUrk=;
+        b=OrD9sonN9hQKfRMj5fLN99Wr95/CYHrkLWsJWALMCUmjH6MF+tBbho7AAJiGSVwnPR
+         BDJFSATbHsZpngxgFvCVmukhByR6d2h68Ryf/K85FMbWpg828MZQRHcACyls9T7h5t7G
+         +LadwsMw8IENNYRinbjpRlGQbxKsZ4EYbpM5OU58YTSw2R5Adz/yzK3eRY3wN2B/BT++
+         zVzJHhvoInspF1EUOZS86C9yovLWHkd9GBFVcycPR4h1ewX3pZQOCLiFmoyKcErY34bb
+         CmxKyKqjj9rDb+ComQAuvNfen/PWgX8FsxmMMkqJJ2BSXhas50HGjofHd4Fuykeg0Rgb
+         A6+g==
+X-Forwarded-Encrypted: i=1; AJvYcCVsNQwqyTg+V9EPHgV/z42X6K4mxYQZkeS89XUmVuwB/KmUjmdIXTF33ORZB9mAq8jzelN9awqq4g21XTT3@vger.kernel.org, AJvYcCWvfUABxFBe6TSfdjAu05wZximRXX8ZAr5wHJXrZwjAZEYsy/MSw75noUK3cz6OXp1TTvp7MfSHxrtBQYsE8iJN@vger.kernel.org, AJvYcCX4rEkW/7gAs5WGZkNO0F+52gDmmW/VPPKLGp7YWdl/yLKrlVn1PPJBPO5QgW8D6F9Y/MORYn9mjGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjEbLdP4B0ODjZuhTyIW+ptlR/85RjJqFKqS5vVrBEZDpE+9qa
+	Kn1N2pIqM6MZtanP6tprN0626xI5v5LkXpiZ7t+zj2LQpnaCEPqCrAgXvQ==
+X-Gm-Gg: ASbGncuAd7cEknIEubxuEqBd+g1RVXQAvuDtEgRtL3kP0eMshxo7gHKIkgsBszG8ltc
+	fTxr0jwHD4SzEgVE4MbrqJawHc36AYlvCHHcuxBbZyDvGKqWWz+raLHxsJg049r5xtU4fMhuqAY
+	MGJfXQK5l3xq7zxqhRPCar7waev0LAA28anixsgruKzccaNLDND9SXd5STTWsq9N/2AROzo6IjA
+	g0uQHvqlUthlYZG8PGuKCjpNY5YdAaDpBKA4U5CLQlXTbx2s2wFWz/gqwgpM63bCyqJApuo2sYl
+	mIQpq5NunYiFRmPn
+X-Google-Smtp-Source: AGHT+IFa7iRLy/hgX1BmFYjDm4LnPVjvrh/qouy0nlzcXeQk/glGT1aFhCh7Oy0oarhJdx5Q5Y9XqQ==
+X-Received: by 2002:a17:907:2d14:b0:abb:feb0:547c with SMTP id a640c23a62f3a-abc09e38f64mr311411666b.51.1740145934323;
+        Fri, 21 Feb 2025 05:52:14 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba5323225fsm1646605366b.24.2025.02.21.05.52.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 05:52:13 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/7] netconsole: Add taskname sysdata support
+Date: Fri, 21 Feb 2025 05:52:05 -0800
+Message-Id: <20250221-netcons_current-v1-0-21c86ae8fc0d@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 610bef4d-067b-48e9-91c4-08dd527ed5c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2025 13:51:26.2246
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VRFm/IOWc34vztdyCK+SEgVcCXhG2F51hjFx0sf5cZ4jBlTmtLMjvUBZxThmJB1urOOaqheYYTpVRJy2AOg5cApKc5dP0ewN0iG/9J805oE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6479
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAWFuGcC/z3NQQqDMBBA0auEWRvQkajkKkUkTcZ2Fh3bJAZBv
+ HtpK11/eH+HRJEpgVU7RCqceBGwqqkU+LuTG2kOYBVgjabGptdC2S+SJr/GSJI1+q41szNXCg4
+ qBc9IM29f8QJCWQttGcZfifRaOXE+8/9g1enjxw9UEj80miFg6HBoemNLC+NxvAFS9ibKrwAAA
+ A==
+X-Change-ID: 20250217-netcons_current-2c635fa5beda
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2786; i=leitao@debian.org;
+ h=from:subject:message-id; bh=KNyRJ5gPHfOGhVm0BSRcfzsZfkbzWBQYKqTFFX+aN1E=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnuIUMuvyHww9/83zLB/3J7lliuhDrECh6+YQMA
+ HyDbAQ3F3SJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ7iFDAAKCRA1o5Of/Hh3
+ bcwYD/9XZxrNdkpAp5bo4apGu8GIx/ziwjEtvxWilweM8ZgP5c5C9tHfsKFZpd1pmHL8SoQZaLG
+ vhRlS8VuQSInsv/6gX7hzfvscmfZA9BdZDvnsvwfNj+bAzDSNk5Wnwp+O13ThDcjdtQUtCUJ2jK
+ abPZJ6hYYY9O5fhOnWUe0wihT0IBNkHbIFnwATI7L9j4jK2VI0R5XjocG+qKV9gGTCBQuEFrToR
+ fdjadTkBEPJ/ukIbbr7PjqvW306kfdH8J7TbuTe+3UUhXn4IuZERdiraPWu82en6YAWtu8QecVl
+ pyqUv1N4wvI3wYpPpl9nTFuwAwYfqzM9oA+8TiKgwgiBIZVUj4raRl+UtpCawGkmGqNZAzzqqJP
+ 7jmfKnVRP4c9z1Mhdq7JVbia8Hpm6sa82Dw0org8O6Jfht0O967sjmx6ymRFucAngifEEPkU7BE
+ CPAR+f8zrJsapCirWm3PMVTLoIBQYBTA8lJtBgAN8BIttmdgTS6wDMAzO4iD7L5nubeyA8mXCyT
+ 61eE9hNAYZUAl6VE55u7nyCWFlXBfoiFNmELea+a1P0SG683bRe6P8nQORwCPfPZhQ7aBun2jmI
+ pe5uWN1quZuyifIk/bOkhnLH8s2DZuxT2HwsiP4Qi4p53BI88ABRGE85zDUBP9X+KnZBPJyHCVH
+ TqFCrjCMrCthPeQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
+This patchset introduces a new feature to the netconsole extradata
+subsystem that enables the inclusion of the current task's name in the
+sysdata output of netconsole messages.
 
+This enhancement is particularly valuable for large-scale deployments,
+such as Meta's, where netconsole collects messages from millions of
+servers and stores them in a data warehouse for analysis. Engineers
+often rely on these messages to investigate issues and assess kernel
+health.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
-oe
-> Damato
-> Sent: Tuesday, February 18, 2025 10:15 PM
-> To: Kurt Kanzenbach <kurt@linutronix.de>
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
-> David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Sebastian Andrzej Siewior <bigeasy@linutronix.de>;
-> Gerhard Engleder <gerhard@engleder-embedded.com>; intel-wired-
-> lan@lists.osuosl.org; netdev@vger.kernel.org
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/4] igb: Add support f=
-or
-> persistent NAPI config
->=20
-> On Mon, Feb 17, 2025 at 12:31:23PM +0100, Kurt Kanzenbach wrote:
-> > Use netif_napi_add_config() to assign persistent per-NAPI config.
-> >
-> > This is useful for preserving NAPI settings when changing queue counts
-> > or for user space programs using SO_INCOMING_NAPI_ID.
-> >
-> > Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> > ---
-> >  drivers/net/ethernet/intel/igb/igb_main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
->=20
-> Thanks for adding this.
->=20
-> Reviewed-by: Joe Damato <jdamato@fastly.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+One common challenge we face is determining the context in which
+a particular message was generated. By including the task name
+(task->comm) with each message, this feature provides a direct answer to
+the frequently asked question: "What was running when this message was
+generated?"
+
+This added context will significantly improve our ability to diagnose
+and troubleshoot issues, making it easier to interpret output of
+netconsole.
+
+The patchset consists of seven patches that implement the following changes:
+
+ * Refactor CPU number formatting into a separate function
+ * Prefix CPU_NR sysdata feature with SYSDATA_
+ * Add configfs controls for taskname sysdata feature
+ * Add taskname to extradata entry count
+ * Add support for including task name in netconsole's extra data output
+ * Document the task name feature in Documentation/networking/netconsole.rst
+ * Add test coverage for the task name feature to the existing sysdata selftest script
+
+These changes allow users to enable or disable the task name feature via
+configfs and provide additional context for kernel messages by showing
+which task generated each console message.
+
+I have tested these patches on some servers and they seem to work as
+expected.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Breno Leitao (7):
+      netconsole: prefix CPU_NR sysdata feature with SYSDATA_
+      netconsole: refactor CPU number formatting into separate function
+      netconsole: add taskname to extradata entry count
+      netconsole: add configfs controls for taskname sysdata feature
+      netconsole: add task name to extra data fields
+      netconsole: docs: document the task name feature
+      netconsole: selftest: add task name append testing
+
+ Documentation/networking/netconsole.rst            | 28 +++++++
+ drivers/net/netconsole.c                           | 98 ++++++++++++++++++----
+ .../selftests/drivers/net/netcons_sysdata.sh       | 51 +++++++++--
+ 3 files changed, 156 insertions(+), 21 deletions(-)
+---
+base-commit: bb3bb6c92e5719c0f5d7adb9d34db7e76705ac33
+change-id: 20250217-netcons_current-2c635fa5beda
+prerequisite-change-id: 20250212-netdevsim-258d2d628175:v3
+prerequisite-patch-id: 4ecfdbc58dd599d2358655e4ad742cbb9dde39f3
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
