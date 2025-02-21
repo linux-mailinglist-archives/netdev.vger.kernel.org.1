@@ -1,76 +1,101 @@
-Return-Path: <netdev+bounces-168692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0762A4034E
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 00:10:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E3DA4034F
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 00:10:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE9A18995E0
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68DD9189E8A0
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1969B204685;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D430205AC4;
 	Fri, 21 Feb 2025 23:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFYwwobX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iof8DAg2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E703C202C4A
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 23:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F79C204C0E;
+	Fri, 21 Feb 2025 23:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740179401; cv=none; b=AKSOLaL0/pCb43yiKuR4uxXE7l2aSU4bMyAdXVi3Rfs75JXYNIOGl+HpUl34kW2EzqxtwcIADy5Px6x9xbeMBtIYq0RhykLQH6h/Pko6P6dmFDRcri6AVCgPfEAT5FGY32CMdqqcN5bO1820GM+6l1y7dyGq7izw3H7HvcmQRtU=
+	t=1740179401; cv=none; b=PWkQzG9MFEW1AssZnoI69X3LduireLVQPXIGTqv3i7eglQe8K8K9E7DGVuJ+fmZiMl42LCrnjMuzFC+0pxGe+Xek1whDIsjVRWmjGW6z/QSYGxgfq3dOSJDcGPoLyJ17br6RsumNfRe+KuQblQVG2b8fz7pgyUgbyKykUJv5REw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740179401; c=relaxed/simple;
-	bh=Cf23GGLqZyUYiLVvfWf1R1mpv38mYgykmRZovfAV2d0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nmga9o7FZmGmpPVXfAVXhzbMEWTVO/2ZYZyqVIKqgxV1Vw2GxhQoNjXDgjMNJvKONdQGhIjpQh/YomtoNc+W7i/DU4b/V8E6hxU5u8uyyE/qyLqul3giQVwPh0wLpUc+IGhq3Gdzw5RxttwCTK3zrecdhic6E8Jl6HceDWY+Zkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFYwwobX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E082C4CED6;
+	bh=iyuxnVnQuTrsFsc4O1vreET7eNP3Ti4uW2MASu5/uBA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OKzAYjD7cEfeUinm2JbFt3fqyjgSZ1LvY9uisAtTslVDw+/gsZSHD5MC5PHITj6gxNi+fFfM950RKEeKwXM+eOHoktVgdZ26dIytL+6zDVhKcbfrJDZxQJe/X8eJeFO1WgToKhQ2j90lCy+tpoztUoU5G5pstb7dSpVshmgUAEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iof8DAg2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B99D9C4CEE4;
 	Fri, 21 Feb 2025 23:10:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740179400;
-	bh=Cf23GGLqZyUYiLVvfWf1R1mpv38mYgykmRZovfAV2d0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZFYwwobX5Lp1Y1nVbD8HJltFsTGWciMz3c1TgpAvf9RTgQw9fyb3vutU6AOcABUgB
-	 ChqDGwOUnjs9ZBjGwstKXwMYDIOB1T/EaQ5AndBAept0bP7SqfR7pen+Nnu74H1JLx
-	 jvkRUjVtMTXubsLDo6cpi3hAiOgdQq7r+kv0J0WDIHB5wAcxI79iwnbysvrIPaB+Uj
-	 wBLrco0GUroljMscjCQJHWIzON3LCWs1yQ8a6158OGLv4MPY024Xo2or6yZ9SKz96e
-	 w8MJQuoruoPxohgCNM1+qNdSvOnZgdtBS0OhIKhUlDsqyDUcMaYJZHkEZDqO7LC9pZ
-	 4SkdOAX9LiUJQ==
-Date: Fri, 21 Feb 2025 15:09:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King - ARM Linux
- <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH RESUBMIT net-next] net: phy: add phylib-internal.h
-Message-ID: <20250221150959.16c8cbbb@kernel.org>
-In-Reply-To: <82e4dfdb-5140-4b8f-8f61-099a52545389@gmail.com>
-References: <82e4dfdb-5140-4b8f-8f61-099a52545389@gmail.com>
+	bh=iyuxnVnQuTrsFsc4O1vreET7eNP3Ti4uW2MASu5/uBA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iof8DAg2CtvyT75sTZTtDIwImyHTetW5e3Z+W4u4TEKFOwHUIYo3+smnE8eyyEij4
+	 86JavVnifYd3aGrS8+obehtw1YtTIYvqIDOm0UbtAwlojEmt8j7/LhEwsFusWtTvWO
+	 dyJcu8RzQfQCg+/qwXBJHpUoGQKzWkU1qgQg5T8Z21eh+t26+ugMijCPSOUNNt6BLf
+	 01eh9iZvq+cX2et40zkn44HcRVGj37b+dHLL8n46tS77H/UH7PLOFPBsPY335ki9GY
+	 XzjhHOGedD1PSalKVuKbkekA91P4cnTJtBALZeWlumjaHeE44rnDrNIRsJgpK62JV4
+	 kFB6tAZIOD94A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF38380CEEC;
+	Fri, 21 Feb 2025 23:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] rxrpc, afs: Miscellaneous fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174017943176.2232673.6967417998548585164.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Feb 2025 23:10:31 +0000
+References: <20250218192250.296870-1-dhowells@redhat.com>
+In-Reply-To: <20250218192250.296870-1-dhowells@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On Wed, 19 Feb 2025 07:52:04 +0100 Heiner Kallweit wrote:
-> +++ b/drivers/net/phy/phylib-internal.h
-> @@ -0,0 +1,25 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
+Hello:
 
-nit: checkpatch is displeased with the comment style:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-WARNING: Improper SPDX comment style for 'drivers/net/phy/phylib-internal.h', please use '/*' instead
-#100: FILE: drivers/net/phy/phylib-internal.h:1:
-+// SPDX-License-Identifier: GPL-2.0-or-later
+On Tue, 18 Feb 2025 19:22:43 +0000 you wrote:
+> Here are some miscellaneous fixes for rxrpc and afs:
+> 
+>  (1) In the rxperf test server, make it correctly receive and decode the
+>      terminal magic cookie.
+> 
+>  (2) In rxrpc, get rid of the peer->mtu_lock as it is not only redundant,
+>      it now causes a lockdep complaint.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/5] rxrpc: rxperf: Fix missing decoding of terminal magic cookie
+    https://git.kernel.org/netdev/net/c/c34d999ca314
+  - [net,2/5] rxrpc: peer->mtu_lock is redundant
+    https://git.kernel.org/netdev/net/c/833fefa07444
+  - [net,3/5] rxrpc: Fix locking issues with the peer record hash
+    https://git.kernel.org/netdev/net/c/71f5409176f4
+  - [net,4/5] afs: Fix the server_list to unuse a displaced server rather than putting it
+    https://git.kernel.org/netdev/net/c/add117e48df4
+  - [net,5/5] afs: Give an afs_server object a ref on the afs_cell object it points to
+    https://git.kernel.org/netdev/net/c/1f0fc3374f33
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
