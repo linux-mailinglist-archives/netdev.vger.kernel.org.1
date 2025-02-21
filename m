@@ -1,94 +1,84 @@
-Return-Path: <netdev+bounces-168350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 197CEA3EA07
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:31:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFEDBA3EA0A
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A98421055
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:31:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF6A3BE5B4
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECEF31D6DBB;
-	Fri, 21 Feb 2025 01:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B067192B74;
+	Fri, 21 Feb 2025 01:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHONPBGP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CL6zrgea"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EE72AE84;
-	Fri, 21 Feb 2025 01:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCD2156CA;
+	Fri, 21 Feb 2025 01:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740101405; cv=none; b=dJ2qeWv4DJPvXhn9Ij200a0+LYdeqcG7FqUuoJBOiasQfWcq6rwV4jUJKT3GO3SWyf0nipif8ry+4VV/3QQsRh/PQpwvij11Lc5o8TXuJO/DoEKf334LYm3K/cpgKW0BGcmYK3c3XDnfzEaZ/DxFhJ3Tp5km4BEuGYfDTIA6v/Q=
+	t=1740101444; cv=none; b=U06xXtSU1Qol2e+7uFNe0Cxl5JMuLcCl+xgzNpMUigUduTn0ukBNfeg2GeBNdmrTXnYbk9CbPXeO7W6A/6GszTVDouacEbNxAJdMMZ5X5l+8hfsQxVfzfDNkPx/wbWLincyoGnxJEV+RWTwSc+uso0taOPvo+4upMgr6/QU8xWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740101405; c=relaxed/simple;
-	bh=8jveZet82L53lEmI6sZO2JxHVF4Ze223BTjGLS073wg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CkGVu5s3VWPp+sOkAzA3vWlfTFw3gYFMS0/vpdNVkH+QHDxKFIPkii2ExgCw5Tfp9v5nYMxoWRuZqtNnycbKNc3BMwMVVaeEErLVezWO6MxxqkwM6X7t8oMykd+oOzfB+fbrvqYEQ1wubVgHjT2m2BwfYbjoeSlHBEVhP2lQqf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHONPBGP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33CDBC4CEE3;
-	Fri, 21 Feb 2025 01:30:05 +0000 (UTC)
+	s=arc-20240116; t=1740101444; c=relaxed/simple;
+	bh=/8UmgPu2wvkSnDmb6bJOb4aHRER+/nqUBeLBnh7XACs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bZ33zKI4J04UCRNqoyWVGKYJqt1RDI7Jkv6zQrHjV9dcV/qnLQP2gLwhck+WB9NtyM1QCwUgYVBH1aGXFKPaOaxNa+UfF+spllb6QTN74tXB98V5DVqShxAN1UIioHjNBuulciSHjZJb316846MuEvhZ8jvDmSUY6avcSl4CRMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CL6zrgea; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27F94C4CEE3;
+	Fri, 21 Feb 2025 01:30:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740101405;
-	bh=8jveZet82L53lEmI6sZO2JxHVF4Ze223BTjGLS073wg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uHONPBGPgyIaiZ7Gu0FKo8QNgSt05CDummdUww0R887YxvHGjd5FC1dQ/SbJaNzOC
-	 RiDwqqhk2xYsn/Z2pdCCxqykG1ByYKEpsEGZK+0TAL3DXMTLvl9SuwbEYCOuiu5A32
-	 3T8Vo1VD8d2duvZttd/cmF/PDyK5qrWPNUJ02sr97+K5ZipQQbEvX5yARy6RPqJBAr
-	 ZGoAx4Lwf5aeBZHwjVVR/5HWUtFEIQ6HFuZKLv/fUhstV0cWT0trEQS4alXKd4kGu8
-	 FH3Ny3cXW1kZeYEV6yw0TxczklnB+mxHtd16EBAbU46sJ3v7y3vvqtsLzZPa/3NDGZ
-	 B7VbBkjZCzfiw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DB1380CEE2;
-	Fri, 21 Feb 2025 01:30:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1740101443;
+	bh=/8UmgPu2wvkSnDmb6bJOb4aHRER+/nqUBeLBnh7XACs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CL6zrgeavfP91BB8Ugl1ZT1V+qKiCh3g3gfmsHS9bRYmEsvWGjpf6nW9PEcrPmAB9
+	 D+92gL5waawA9e3vyHwkEe1Zc9tJ19Y2IuhKsR2J9TWNDBZGKg3Gy5r2jzuQwcZKIh
+	 5tqyZukAKAZ7YRxL8dQoPjC4lGHOFTyA5ssa3x2iKtqmW3aGDzpKHIq3ld6IRnGUl2
+	 G4u6SwwTupEqP8g5Q+oUnhOhC8Xy40UAbhtPTnK7e9fS7hQeAotD4Q866Ev0IeW/iX
+	 TLxSnAujOF/zGJyzV6ho834EB8oQWJU1wdf0mbIUha85ryFFnVaZ8pZDfSrS/Sxm3b
+	 Ui07QwB+Tt/eA==
+Date: Thu, 20 Feb 2025 17:30:42 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Marcelo Ricardo
+ Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>,
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [RESEND PATCH] sctp: Replace zero-length array with flexible
+ array member
+Message-ID: <20250220173042.3b6384ce@kernel.org>
+In-Reply-To: <202502191824.74DAF797@keescook>
+References: <20250219112637.4319-1-thorsten.blum@linux.dev>
+	<202502191824.74DAF797@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] af_unix: Fix undefined 'other' error
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174010143576.1536213.862503926616277176.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Feb 2025 01:30:35 +0000
-References: <20250218141045.38947-1-purvayeshi550@gmail.com>
-In-Reply-To: <20250218141045.38947-1-purvayeshi550@gmail.com>
-To: Purva Yeshi <purvayeshi550@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, skhan@linuxfoundation.org, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 18 Feb 2025 19:40:45 +0530 you wrote:
-> Fix an issue detected by the Smatch static analysis tool where an
-> "undefined 'other'" error occurs due to `__releases(&unix_sk(other)->lock)`
-> being placed before 'other' is in scope.
+On Wed, 19 Feb 2025 18:24:36 -0800 Kees Cook wrote:
+> On Wed, Feb 19, 2025 at 12:26:36PM +0100, Thorsten Blum wrote:
+> > Replace the deprecated zero-length array with a modern flexible array
+> > member in the struct sctp_idatahdr.
+> > 
+> > Link: https://github.com/KSPP/linux/issues/78
+> > Reviewed-by: Kees Cook <kees@kernel.org>
+> > Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>  
 > 
-> Remove the `__releases()` annotation from the `unix_wait_for_peer()`
-> function to eliminate the Smatch warning. The annotation references `other`
-> before it is declared, leading to a false positive error during static
-> analysis.
+> I assume this will be picked up by netdev. I see 2 sctp patches pending
+> on patchwork:
 > 
-> [...]
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=&submitter=&state=&q=sctp&archive=&delegate=
 
-Here is the summary with links:
-  - [net-next,v3] af_unix: Fix undefined 'other' error
-    https://git.kernel.org/netdev/net-next/c/1340461e5168
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+TIL patchwork supports q= 
+Thanks! :)
 
