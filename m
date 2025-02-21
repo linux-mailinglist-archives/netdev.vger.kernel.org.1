@@ -1,72 +1,71 @@
-Return-Path: <netdev+bounces-168648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F413A4002E
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:59:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0286CA4001C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 20:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A0CA3AD7C8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:56:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A21D219E103B
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 19:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7529250C05;
-	Fri, 21 Feb 2025 19:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8218253F1E;
+	Fri, 21 Feb 2025 19:56:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE10B253F17
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 19:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11B9253F29
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 19:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740167778; cv=none; b=GqMipcQ4M6QJER3z9C5cm/XxRzJm8t69SMHWCVUU862eP8k21ZzVdfdfpC4mpsKZzlrpvIrWOU81xothmj4lNVHL1f8WI+uJFEsjXt3IGNUnHbysYkn91af3HXPlFMM4eXkhxcpO/M1axczKIUnrDoK7ZU1ypUEMy5GE1bJ+4UM=
+	t=1740167779; cv=none; b=JxUAG1YgJvClx3bWI2p+fsqljmxUs0luWPowRSJ3jp1ctAZRRIFv5QN4X3xcRvMDptE7o51UzT0ziTNE6eBty0HDWpWf4edPK/Iva7vszsXSO0nJ2zN05txFMADsERfOYCrZg+5mUczdBlEpVP/lfm+6JI0F8T1/9nMOi5WV6vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740167778; c=relaxed/simple;
-	bh=EBJEm3uOOwo++nqoaQLlh3XpR4upt6zELAHmWj7uL90=;
+	s=arc-20240116; t=1740167779; c=relaxed/simple;
+	bh=FFRYWgT+YRbNKZATXi7oo8qIyG9clSDPBcHIFeN+0JA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uVREQNyfT8QwYTNhv+qLF6tdZbVoR5KLrejfKHP+GQ39NPCM4np5o1P2BgZP2igSIgQhlNtY1mOD//GJCgShyIi39Q3y3cNEirCU3dSTKwZqUqwofTUiRaj6HVw8PL1JP6QULTFzN0ywJ0xFpWfE7P5qnUQqXivqn7QSACR0LLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=j3FFX8jQglevszFOSlxqm/sLrnj7ziqDRYsILxICxV+kh/MM08ZT6cDV/gIY7g2V/Xkp88eiUNrVrQV/jqVTFEt+0RoxfPh+VGLIbkPnnwJVNP+2rRfF0sGAjj/XXA/4kqriBqbd4diBU63ecE3LHufl3BE4sJ5LKHWa8WtIvFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2211acda7f6so56386415ad.3
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:56:16 -0800 (PST)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso3970520a91.1
+        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:56:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740167776; x=1740772576;
+        d=1e100.net; s=20230601; t=1740167777; x=1740772577;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f8cSKPM9eQVZJ4mZzUjjY/Oy/5nHt9i5a/OHtDUGw68=;
-        b=qthQRqiccTOqX5aRR4X3sSpzUwuoBmKSW2+AD3nXt7sCw1ZjCXmrT/KJ1KGYPueuxA
-         sa0VzvAAAmogSnEJ3wszdTyfT/zTi23LvCSa7XWX9BnYx1AjGJ7+o47li8NhYp6V400u
-         QeEPB6jtgVpJklRjY0f+t9Du/+RsSlSXXcYWgUjY+4EqpByt0yooVnXcINxjYZhhRLq6
-         GAest9CXGzE/JvikhSl4c4L+qnmXnL/grFoyfoG1DJaT9rCOs8XhAP3T4aMjjE34Oftu
-         GAFFTi3hdQA9K1QK21xhD+GnZRFARbSIoeUN1wzQeq0Uco/rIl84KXV1glwDCGGe4nKY
-         uskg==
-X-Gm-Message-State: AOJu0Yzz2wLY95jgYAsu31oix7jrQAZTYt8QD4QeWZ4TT9wrQxLzHjU0
-	eKtp0ZkpSpVwkOjYAhpU8OsCZRF/dyMDT++fPkK6xwvMhNf4wtiwYpNC
-X-Gm-Gg: ASbGncugfJTMvKlG/ToQThH5zf0lWJC7QjTPXVzhf7DxujYN6CRneW96TRz132sf1PY
-	UOmUd+vEwlM9HEXrR5Nv4Iyk9YGGrzW2w1mcXwDaoLLwDWz3SUKvKUppow1V+SSaWxJGody6HAR
-	ISPpx+8qs9/bsf16Avt0vL+DG++7BEl2qhL4lR3xCwZ5MiYQok4+hbQaCqSuI/5Ips3+oFmPDsB
-	GGd1bc/YcGIdUaaHADAqB5Db3/aAlR+LvyIMAjUjN/kcPBDZdV2O0vK/7bP2yy3NQpcXCgxXA5V
-	KTVAcZIB6oXHtYLd0H+GeRMcRQ==
-X-Google-Smtp-Source: AGHT+IFo7jHYsLA0FGQiO9pOgxQKl9H0BHqH9aFoE5yvM9QSXmUPQhKk5BAk1QAa8XCblMfANUWliw==
-X-Received: by 2002:a17:903:1c6:b0:21b:d105:26b9 with SMTP id d9443c01a7336-2219ff4e333mr67413195ad.16.1740167775739;
-        Fri, 21 Feb 2025 11:56:15 -0800 (PST)
+        bh=q4OXv2r+e9Nq3J4RReW3KRpmyfOGcVtiFIpa6uKk2F8=;
+        b=aMjIaa6TgCwCquq1+Ef90/4NQ0F4WnA4UdzvjcVe2QY7LizT/rGqSLmCZCtUcMtpiH
+         nh7o5mOF65lt1jII4GARSPG89sZqyIVeldNBMOTO6CZpNw5MCWSH7dzJ85T/n4OMNi0k
+         STcYgzDmc3yA1bB0FEScRpNnUu4xjApN1KZx+IzlW/9mxbFsJ5TP/wH3xNR3cWjvWmit
+         J3U3jcTDzIatijbJQGhdhopPkRkwPZtEM0J+s1pECgrM4iV+gec14bBzbkeegPdQmwmW
+         HRA8eC+6Zpcgp9lBsM52bqoP3PAdMOB2/JinGymnzOUNkQ0GdEZr2oT1EK/JEbAdEIe+
+         D5NA==
+X-Gm-Message-State: AOJu0YwGU991On1/TwHxT3b9z9UO39v6MhATgln/7czPuxNHSi2o8SaK
+	1SNWN0Z8dtNhk/NAQQC0dvz5GprvtGDsX1CyNS+KgKhs1aT/0wDbVSsS
+X-Gm-Gg: ASbGncsiwU3WocmXFlAIuLjOj4h9l1Ib4vRx0QLAxwMYP574NHu5r/5JRXWZX2Gpn9h
+	XFzCGkcfTY1OQRTGqs1dgNAs9t4WHzS8KFCa+bghMRReEyFi7jpIxy09D2R2R+9KRpdpzQcz55v
+	68Zu9hvEp/1f3oPhgJnZV/Yd0tLOYm7V6LXLeo/JX+/BL6aKQRNHFEVZtFzmBFHFhQOHVkAvqCm
+	nGwmH5qmHkWwnqfNRSICLOLYsO2NG8grWTR3oMfmjadgvVLh1l7xLXzrGMNBh7xguo2xQYS/w1i
+	eHtefWHBwRlqUmZK+fIGDb8YsA==
+X-Google-Smtp-Source: AGHT+IFLL8nr5UK94vBQcaLI54cTS10RE3izyy9KwW0/+X+wDpgME1ghW30GtsG4ynT+jfM2vUrUQw==
+X-Received: by 2002:a17:90b:1f8c:b0:2ee:e317:69ab with SMTP id 98e67ed59e1d1-2fce75eb4f0mr8747763a91.0.1740167776927;
+        Fri, 21 Feb 2025 11:56:16 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d53490absm141978635ad.41.2025.02.21.11.56.15
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fceb12dc27sm1818546a91.45.2025.02.21.11.56.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 11:56:15 -0800 (PST)
+        Fri, 21 Feb 2025 11:56:16 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>
-Subject: [PATCH net-next v6 08/12] net: ethtool: try to protect all callback with netdev instance lock
-Date: Fri, 21 Feb 2025 11:56:00 -0800
-Message-ID: <20250221195604.2103132-9-sdf@fomichev.me>
+	pabeni@redhat.com
+Subject: [PATCH net-next v6 09/12] net: replace dev_addr_sem with netdev instance lock
+Date: Fri, 21 Feb 2025 11:56:01 -0800
+Message-ID: <20250221195604.2103132-10-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250221195604.2103132-1-sdf@fomichev.me>
 References: <20250221195604.2103132-1-sdf@fomichev.me>
@@ -78,515 +77,270 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+Lockdep reports possible circular dependency in [0]. Instead of
+fixing the ordering, replace global dev_addr_sem with netdev
+instance lock. Most of the paths that set/get mac are RTNL
+protected. Two places where it's not, convert to explicit
+locking:
+- sysfs address_show
+- dev_get_mac_address via dev_ioctl
 
-Protect all ethtool callbacks and PHY related state with the netdev
-instance lock, for drivers which want / need to have their ops
-instance-locked. Basically take the lock everywhere we take rtnl_lock.
-It was tempting to take the lock in ethnl_ops_begin(), but turns
-out we actually nest those calls (when generating notifications).
+0: https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/993321/24-router-bridge-1d-lag-sh/stderr
 
-Cc: Saeed Mahameed <saeed@kernel.org>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/netdevsim/ethtool.c |  2 --
- net/dsa/conduit.c               | 16 +++++++++++++++-
- net/ethtool/cabletest.c         | 20 ++++++++++++--------
- net/ethtool/cmis_fw_update.c    |  7 ++++++-
- net/ethtool/features.c          |  6 ++++--
- net/ethtool/ioctl.c             |  6 ++++++
- net/ethtool/module.c            |  8 +++++---
- net/ethtool/netlink.c           | 12 ++++++++++++
- net/ethtool/phy.c               | 20 ++++++++++++++------
- net/ethtool/rss.c               |  2 ++
- net/ethtool/tsinfo.c            |  9 ++++++---
- net/sched/sch_taprio.c          |  5 ++++-
- 12 files changed, 86 insertions(+), 27 deletions(-)
+ drivers/net/tap.c         |  2 +-
+ drivers/net/tun.c         |  2 +-
+ include/linux/netdevice.h |  6 +----
+ net/core/dev.c            | 52 ++++++++++++++++++++-------------------
+ net/core/dev.h            |  3 +--
+ net/core/dev_api.c        | 17 ++-----------
+ net/core/dev_ioctl.c      |  2 +-
+ net/core/net-sysfs.c      |  7 ++----
+ net/core/rtnetlink.c      |  6 ++++-
+ 9 files changed, 41 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
-index 5c80fbee7913..72a369cd21a2 100644
---- a/drivers/net/netdevsim/ethtool.c
-+++ b/drivers/net/netdevsim/ethtool.c
-@@ -107,10 +107,8 @@ nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
- 	struct netdevsim *ns = netdev_priv(dev);
- 	int err;
- 
--	netdev_lock(dev);
- 	err = netif_set_real_num_queues(dev, ch->combined_count,
- 					ch->combined_count);
--	netdev_unlock(dev);
- 	if (err)
- 		return err;
- 
-diff --git a/net/dsa/conduit.c b/net/dsa/conduit.c
-index 3dfdb3cb47dc..f21bb2551bed 100644
---- a/net/dsa/conduit.c
-+++ b/net/dsa/conduit.c
-@@ -26,7 +26,9 @@ static int dsa_conduit_get_regs_len(struct net_device *dev)
- 	int len;
- 
- 	if (ops->get_regs_len) {
-+		netdev_lock_ops(dev);
- 		len = ops->get_regs_len(dev);
-+		netdev_unlock_ops(dev);
- 		if (len < 0)
- 			return len;
- 		ret += len;
-@@ -57,11 +59,15 @@ static void dsa_conduit_get_regs(struct net_device *dev,
- 	int len;
- 
- 	if (ops->get_regs_len && ops->get_regs) {
-+		netdev_lock_ops(dev);
- 		len = ops->get_regs_len(dev);
--		if (len < 0)
-+		if (len < 0) {
-+			netdev_unlock_ops(dev);
- 			return;
-+		}
- 		regs->len = len;
- 		ops->get_regs(dev, regs, data);
-+		netdev_unlock_ops(dev);
- 		data += regs->len;
- 	}
- 
-@@ -91,8 +97,10 @@ static void dsa_conduit_get_ethtool_stats(struct net_device *dev,
- 	int count = 0;
- 
- 	if (ops->get_sset_count && ops->get_ethtool_stats) {
-+		netdev_lock_ops(dev);
- 		count = ops->get_sset_count(dev, ETH_SS_STATS);
- 		ops->get_ethtool_stats(dev, stats, data);
-+		netdev_unlock_ops(dev);
- 	}
- 
- 	if (ds->ops->get_ethtool_stats)
-@@ -114,8 +122,10 @@ static void dsa_conduit_get_ethtool_phy_stats(struct net_device *dev,
- 		if (count >= 0)
- 			phy_ethtool_get_stats(dev->phydev, stats, data);
- 	} else if (ops->get_sset_count && ops->get_ethtool_phy_stats) {
-+		netdev_lock_ops(dev);
- 		count = ops->get_sset_count(dev, ETH_SS_PHY_STATS);
- 		ops->get_ethtool_phy_stats(dev, stats, data);
-+		netdev_unlock_ops(dev);
- 	}
- 
- 	if (count < 0)
-@@ -132,11 +142,13 @@ static int dsa_conduit_get_sset_count(struct net_device *dev, int sset)
- 	struct dsa_switch *ds = cpu_dp->ds;
- 	int count = 0;
- 
-+	netdev_lock_ops(dev);
- 	if (sset == ETH_SS_PHY_STATS && dev->phydev &&
- 	    !ops->get_ethtool_phy_stats)
- 		count = phy_ethtool_get_sset_count(dev->phydev);
- 	else if (ops->get_sset_count)
- 		count = ops->get_sset_count(dev, sset);
-+	netdev_unlock_ops(dev);
- 
- 	if (count < 0)
- 		count = 0;
-@@ -163,6 +175,7 @@ static void dsa_conduit_get_strings(struct net_device *dev, uint32_t stringset,
- 	/* We do not want to be NULL-terminated, since this is a prefix */
- 	pfx[sizeof(pfx) - 1] = '_';
- 
-+	netdev_lock_ops(dev);
- 	if (stringset == ETH_SS_PHY_STATS && dev->phydev &&
- 	    !ops->get_ethtool_phy_stats) {
- 		mcount = phy_ethtool_get_sset_count(dev->phydev);
-@@ -176,6 +189,7 @@ static void dsa_conduit_get_strings(struct net_device *dev, uint32_t stringset,
- 			mcount = 0;
- 		ops->get_strings(dev, stringset, data);
- 	}
-+	netdev_unlock_ops(dev);
- 
- 	if (ds->ops->get_strings) {
- 		ndata = data + mcount * len;
-diff --git a/net/ethtool/cabletest.c b/net/ethtool/cabletest.c
-index f22051f33868..d4a79310b33f 100644
---- a/net/ethtool/cabletest.c
-+++ b/net/ethtool/cabletest.c
-@@ -72,23 +72,24 @@ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info)
- 	dev = req_info.dev;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	phydev = ethnl_req_get_phydev(&req_info,
- 				      tb[ETHTOOL_A_CABLE_TEST_HEADER],
- 				      info->extack);
- 	if (IS_ERR_OR_NULL(phydev)) {
- 		ret = -EOPNOTSUPP;
--		goto out_rtnl;
-+		goto out_unlock;
- 	}
- 
- 	ops = ethtool_phy_ops;
- 	if (!ops || !ops->start_cable_test) {
- 		ret = -EOPNOTSUPP;
--		goto out_rtnl;
-+		goto out_unlock;
- 	}
- 
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
--		goto out_rtnl;
-+		goto out_unlock;
- 
- 	ret = ops->start_cable_test(phydev, info->extack);
- 
-@@ -97,7 +98,8 @@ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info)
- 	if (!ret)
- 		ethnl_cable_test_started(phydev, ETHTOOL_MSG_CABLE_TEST_NTF);
- 
--out_rtnl:
-+out_unlock:
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 	ethnl_parse_header_dev_put(&req_info);
- 	return ret;
-@@ -339,23 +341,24 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
- 		goto out_dev_put;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	phydev = ethnl_req_get_phydev(&req_info,
- 				      tb[ETHTOOL_A_CABLE_TEST_TDR_HEADER],
- 				      info->extack);
- 	if (IS_ERR_OR_NULL(phydev)) {
- 		ret = -EOPNOTSUPP;
--		goto out_rtnl;
-+		goto out_unlock;
- 	}
- 
- 	ops = ethtool_phy_ops;
- 	if (!ops || !ops->start_cable_test_tdr) {
- 		ret = -EOPNOTSUPP;
--		goto out_rtnl;
-+		goto out_unlock;
- 	}
- 
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
--		goto out_rtnl;
-+		goto out_unlock;
- 
- 	ret = ops->start_cable_test_tdr(phydev, info->extack, &cfg);
- 
-@@ -365,7 +368,8 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
- 		ethnl_cable_test_started(phydev,
- 					 ETHTOOL_MSG_CABLE_TEST_TDR_NTF);
- 
--out_rtnl:
-+out_unlock:
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- out_dev_put:
- 	ethnl_parse_header_dev_put(&req_info);
-diff --git a/net/ethtool/cmis_fw_update.c b/net/ethtool/cmis_fw_update.c
-index 48aef6220f00..946830af3e7c 100644
---- a/net/ethtool/cmis_fw_update.c
-+++ b/net/ethtool/cmis_fw_update.c
-@@ -418,8 +418,13 @@ cmis_fw_update_commit_image(struct ethtool_cmis_cdb *cdb,
- static int cmis_fw_update_reset(struct net_device *dev)
- {
- 	__u32 reset_data = ETH_RESET_PHY;
-+	int ret;
- 
--	return dev->ethtool_ops->reset(dev, &reset_data);
-+	netdev_lock_ops(dev);
-+	ret = dev->ethtool_ops->reset(dev, &reset_data);
-+	netdev_unlock_ops(dev);
-+
-+	return ret;
- }
- 
- void
-diff --git a/net/ethtool/features.c b/net/ethtool/features.c
-index b6cb101d7f19..ccffd64d5a87 100644
---- a/net/ethtool/features.c
-+++ b/net/ethtool/features.c
-@@ -234,9 +234,10 @@ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info)
- 	dev = req_info.dev;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
--		goto out_rtnl;
-+		goto out_unlock;
- 	ethnl_features_to_bitmap(old_active, dev->features);
- 	ethnl_features_to_bitmap(old_wanted, dev->wanted_features);
- 	ret = ethnl_parse_bitset(req_wanted, req_mask, NETDEV_FEATURE_COUNT,
-@@ -286,7 +287,8 @@ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info)
- 
- out_ops:
- 	ethnl_ops_complete(dev);
--out_rtnl:
-+out_unlock:
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 	ethnl_parse_header_dev_put(&req_info);
- 	return ret;
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 271c7cef9ef3..f2ed09506371 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -2317,6 +2317,7 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 	 */
- 	busy = true;
- 	netdev_hold(dev, &dev_tracker, GFP_KERNEL);
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 
- 	if (rc == 0) {
-@@ -2331,8 +2332,10 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 
- 		do {
- 			rtnl_lock();
-+			netdev_lock_ops(dev);
- 			rc = ops->set_phys_id(dev,
- 				    (i++ & 1) ? ETHTOOL_ID_OFF : ETHTOOL_ID_ON);
-+			netdev_unlock_ops(dev);
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index d4ece538f1b2..4382f5e323b0 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1017,7 +1017,7 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
  			rtnl_unlock();
- 			if (rc)
- 				break;
-@@ -2341,6 +2344,7 @@ static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
- 	}
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	netdev_put(dev, &dev_tracker);
- 	busy = false;
- 
-@@ -3140,6 +3144,7 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
- 			return -EPERM;
- 	}
- 
-+	netdev_lock_ops(dev);
- 	if (dev->dev.parent)
- 		pm_runtime_get_sync(dev->dev.parent);
- 
-@@ -3373,6 +3378,7 @@ __dev_ethtool(struct net *net, struct ifreq *ifr, void __user *useraddr,
- out:
- 	if (dev->dev.parent)
- 		pm_runtime_put(dev->dev.parent);
-+	netdev_unlock_ops(dev);
- 
- 	return rc;
- }
-diff --git a/net/ethtool/module.c b/net/ethtool/module.c
-index 6988e07bdcd6..d3d2e135e45e 100644
---- a/net/ethtool/module.c
-+++ b/net/ethtool/module.c
-@@ -419,19 +419,21 @@ int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info)
- 	dev = req_info.dev;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
--		goto out_rtnl;
-+		goto out_unlock;
- 
- 	ret = ethnl_module_fw_flash_validate(dev, info->extack);
- 	if (ret < 0)
--		goto out_rtnl;
-+		goto out_unlock;
- 
- 	ret = module_flash_fw(dev, tb, skb, info);
- 
- 	ethnl_ops_complete(dev);
- 
--out_rtnl:
-+out_unlock:
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 	ethnl_parse_header_dev_put(&req_info);
- 	return ret;
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index b4c45207fa32..dee36f5cc228 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -90,6 +90,8 @@ int ethnl_ops_begin(struct net_device *dev)
- 	if (dev->dev.parent)
- 		pm_runtime_get_sync(dev->dev.parent);
- 
-+	netdev_ops_assert_locked(dev);
-+
- 	if (!netif_device_present(dev) ||
- 	    dev->reg_state >= NETREG_UNREGISTERING) {
- 		ret = -ENODEV;
-@@ -490,7 +492,11 @@ static int ethnl_default_doit(struct sk_buff *skb, struct genl_info *info)
- 	ethnl_init_reply_data(reply_data, ops, req_info->dev);
- 
- 	rtnl_lock();
-+	if (req_info->dev)
-+		netdev_lock_ops(req_info->dev);
- 	ret = ops->prepare_data(req_info, reply_data, info);
-+	if (req_info->dev)
-+		netdev_unlock_ops(req_info->dev);
- 	rtnl_unlock();
- 	if (ret < 0)
- 		goto err_cleanup;
-@@ -548,7 +554,9 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
- 
- 	ethnl_init_reply_data(ctx->reply_data, ctx->ops, dev);
- 	rtnl_lock();
-+	netdev_lock_ops(ctx->req_info->dev);
- 	ret = ctx->ops->prepare_data(ctx->req_info, ctx->reply_data, info);
-+	netdev_unlock_ops(ctx->req_info->dev);
- 	rtnl_unlock();
- 	if (ret < 0)
- 		goto out;
-@@ -693,6 +701,7 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	dev = req_info.dev;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(dev);
- 	dev->cfg_pending = kmemdup(dev->cfg, sizeof(*dev->cfg),
- 				   GFP_KERNEL_ACCOUNT);
- 	if (!dev->cfg_pending) {
-@@ -720,6 +729,7 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	kfree(dev->cfg_pending);
- out_tie_cfg:
- 	dev->cfg_pending = dev->cfg;
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- out_dev:
- 	ethnl_parse_header_dev_put(&req_info);
-@@ -777,6 +787,8 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
- 	req_info->dev = dev;
- 	req_info->flags |= ETHTOOL_FLAG_COMPACT_BITSETS;
- 
-+	netdev_ops_assert_locked(dev);
-+
- 	ethnl_init_reply_data(reply_data, ops, dev);
- 	ret = ops->prepare_data(req_info, reply_data, &info);
- 	if (ret < 0)
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index ed8f690f6bac..2b428bc80c9b 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -158,18 +158,19 @@ int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
- 		return ret;
- 
- 	rtnl_lock();
-+	netdev_lock_ops(req_info.base.dev);
- 
- 	ret = ethnl_phy_parse_request(&req_info.base, tb, info->extack);
- 	if (ret < 0)
--		goto err_unlock_rtnl;
-+		goto err_unlock;
- 
- 	/* No PHY, return early */
- 	if (!req_info.pdn)
--		goto err_unlock_rtnl;
-+		goto err_unlock;
- 
- 	ret = ethnl_phy_reply_size(&req_info.base, info->extack);
- 	if (ret < 0)
--		goto err_unlock_rtnl;
-+		goto err_unlock;
- 	reply_len = ret + ethnl_reply_header_size();
- 
- 	rskb = ethnl_reply_init(reply_len, req_info.base.dev,
-@@ -178,13 +179,14 @@ int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
- 				info, &reply_payload);
- 	if (!rskb) {
- 		ret = -ENOMEM;
--		goto err_unlock_rtnl;
-+		goto err_unlock;
- 	}
- 
- 	ret = ethnl_phy_fill_reply(&req_info.base, rskb);
- 	if (ret)
- 		goto err_free_msg;
- 
-+	netdev_unlock_ops(req_info.base.dev);
- 	rtnl_unlock();
- 	ethnl_parse_header_dev_put(&req_info.base);
- 	genlmsg_end(rskb, reply_payload);
-@@ -193,7 +195,8 @@ int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
- 
- err_free_msg:
- 	nlmsg_free(rskb);
--err_unlock_rtnl:
-+err_unlock:
-+	netdev_unlock_ops(req_info.base.dev);
- 	rtnl_unlock();
- 	ethnl_parse_header_dev_put(&req_info.base);
- 	return ret;
-@@ -290,10 +293,15 @@ int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	rtnl_lock();
- 
- 	if (ctx->phy_req_info->base.dev) {
--		ret = ethnl_phy_dump_one_dev(skb, ctx->phy_req_info->base.dev, cb);
-+		dev = ctx->phy_req_info->base.dev;
-+		netdev_lock_ops(dev);
-+		ret = ethnl_phy_dump_one_dev(skb, dev, cb);
-+		netdev_unlock_ops(dev);
- 	} else {
- 		for_each_netdev_dump(net, dev, ctx->ifindex) {
-+			netdev_lock_ops(dev);
- 			ret = ethnl_phy_dump_one_dev(skb, dev, cb);
-+			netdev_unlock_ops(dev);
- 			if (ret)
- 				break;
- 
-diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 58df9ad02ce8..ec41d1d7eefe 100644
---- a/net/ethtool/rss.c
-+++ b/net/ethtool/rss.c
-@@ -345,7 +345,9 @@ int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (ctx->match_ifindex && ctx->match_ifindex != ctx->ifindex)
- 			break;
- 
-+		netdev_lock_ops(dev);
- 		ret = rss_dump_one_dev(skb, cb, dev);
-+		netdev_unlock_ops(dev);
- 		if (ret)
- 			break;
- 	}
-diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-index 691be6c445b3..73b6a89b8731 100644
---- a/net/ethtool/tsinfo.c
-+++ b/net/ethtool/tsinfo.c
-@@ -448,12 +448,15 @@ int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 	rtnl_lock();
- 	if (ctx->req_info->base.dev) {
--		ret = ethnl_tsinfo_dump_one_net_topo(skb,
--						     ctx->req_info->base.dev,
--						     cb);
-+		dev = ctx->req_info->base.dev;
-+		netdev_lock_ops(dev);
-+		ret = ethnl_tsinfo_dump_one_net_topo(skb, dev, cb);
-+		netdev_unlock_ops(dev);
- 	} else {
- 		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
-+			netdev_lock_ops(dev);
- 			ret = ethnl_tsinfo_dump_one_net_topo(skb, dev, cb);
-+			netdev_unlock_ops(dev);
- 			if (ret < 0 && ret != -EOPNOTSUPP)
- 				break;
- 			ctx->pos_phyindex = 0;
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 10548bb78da1..edcb163d23ad 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1620,8 +1620,11 @@ static int taprio_parse_clockid(struct Qdisc *sch, struct nlattr **tb,
- 			goto out;
+ 			return -ENOLINK;
  		}
+-		ret = dev_set_mac_address_user(tap->dev, &sa, NULL);
++		ret = dev_set_mac_address(tap->dev, &sa, NULL);
+ 		tap_put_tap_dev(tap);
+ 		rtnl_unlock();
+ 		return ret;
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index d8f4d3e996a7..1e645d5e225c 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -3175,7 +3175,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
  
--		if (ops && ops->get_ts_info)
-+		if (ops && ops->get_ts_info) {
-+			netdev_lock_ops(dev);
- 			err = ops->get_ts_info(dev, &info);
-+			netdev_unlock_ops(dev);
-+		}
+ 	case SIOCSIFHWADDR:
+ 		/* Set hw address */
+-		ret = dev_set_mac_address_user(tun->dev, &ifr.ifr_hwaddr, NULL);
++		ret = dev_set_mac_address(tun->dev, &ifr.ifr_hwaddr, NULL);
+ 		break;
  
- 		if (err || info.phc_index < 0) {
- 			NL_SET_ERR_MSG(extack,
+ 	case TUNGETSNDBUF:
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 7eabcb203e92..57dff4cc5cee 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2463,7 +2463,7 @@ struct net_device {
+ 	 *
+ 	 * Protects:
+ 	 *	@gro_flush_timeout, @napi_defer_hard_irqs, @napi_list,
+-	 *	@net_shaper_hierarchy, @reg_state, @threaded
++	 *	@net_shaper_hierarchy, @reg_state, @threaded, @dev_addr
+ 	 *
+ 	 * Partially protects (writers must hold both @lock and rtnl_lock):
+ 	 *	@up
+@@ -4224,10 +4224,6 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 			  struct netlink_ext_ack *extack);
+ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 			struct netlink_ext_ack *extack);
+-int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+-			       struct netlink_ext_ack *extack);
+-int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+-			     struct netlink_ext_ack *extack);
+ int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
+ int dev_get_port_parent_id(struct net_device *dev,
+ 			   struct netdev_phys_item_id *ppid, bool recurse);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index abbc7603ed5a..1c2bf0b1da00 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1058,6 +1058,28 @@ struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex)
+ 	return __netdev_put_lock(dev);
+ }
+ 
++/**
++ * netdev_get_by_name_lock() - find a device by its name
++ * @net: the applicable net namespace
++ * @name: name of device
++ *
++ * Search for an interface by name. If a valid device
++ * with @name is found it will be returned with netdev->lock held.
++ * netdev_unlock() must be called to release it.
++ *
++ * Return: pointer to a device with lock held, NULL if not found.
++ */
++struct net_device *netdev_get_by_name_lock(struct net *net, const char *name)
++{
++	struct net_device *dev;
++
++	dev = dev_get_by_name(net, name);
++	if (!dev)
++		return NULL;
++
++	return __netdev_put_lock(dev);
++}
++
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 		    unsigned long *index)
+@@ -9462,44 +9484,24 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 	return 0;
+ }
+ 
+-DECLARE_RWSEM(dev_addr_sem);
+-
+-int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+-			       struct netlink_ext_ack *extack)
+-{
+-	int ret;
+-
+-	down_write(&dev_addr_sem);
+-	ret = netif_set_mac_address(dev, sa, extack);
+-	up_write(&dev_addr_sem);
+-	return ret;
+-}
+-
+ int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
+ {
+ 	size_t size = sizeof(sa->sa_data_min);
+ 	struct net_device *dev;
+-	int ret = 0;
+ 
+-	down_read(&dev_addr_sem);
+-	rcu_read_lock();
++	dev = netdev_get_by_name_lock(net, dev_name);
++	if (!dev)
++		return -ENODEV;
+ 
+-	dev = dev_get_by_name_rcu(net, dev_name);
+-	if (!dev) {
+-		ret = -ENODEV;
+-		goto unlock;
+-	}
+ 	if (!dev->addr_len)
+ 		memset(sa->sa_data, 0, size);
+ 	else
+ 		memcpy(sa->sa_data, dev->dev_addr,
+ 		       min_t(size_t, size, dev->addr_len));
+ 	sa->sa_family = dev->type;
++	netdev_unlock(dev);
+ 
+-unlock:
+-	rcu_read_unlock();
+-	up_read(&dev_addr_sem);
+-	return ret;
++	return 0;
+ }
+ EXPORT_SYMBOL(dev_get_mac_address);
+ 
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 41b0831aba60..b50ca645c086 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -28,6 +28,7 @@ netdev_napi_by_id_lock(struct net *net, unsigned int napi_id);
+ struct net_device *dev_get_by_napi_id(unsigned int napi_id);
+ 
+ struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex);
++struct net_device *netdev_get_by_name_lock(struct net *net, const char *name);
+ struct net_device *__netdev_put_lock(struct net_device *dev);
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+@@ -69,8 +70,6 @@ extern int		weight_p;
+ extern int		dev_weight_rx_bias;
+ extern int		dev_weight_tx_bias;
+ 
+-extern struct rw_semaphore dev_addr_sem;
+-
+ /* rtnl helpers */
+ extern struct list_head net_todo_list;
+ void netdev_run_todo(void);
+diff --git a/net/core/dev_api.c b/net/core/dev_api.c
+index 0db20ed086d3..68d294e6d48d 100644
+--- a/net/core/dev_api.c
++++ b/net/core/dev_api.c
+@@ -82,19 +82,6 @@ void dev_set_group(struct net_device *dev, int new_group)
+ 	netdev_unlock_ops(dev);
+ }
+ 
+-int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+-			     struct netlink_ext_ack *extack)
+-{
+-	int ret;
+-
+-	netdev_lock_ops(dev);
+-	ret = netif_set_mac_address_user(dev, sa, extack);
+-	netdev_unlock_ops(dev);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(dev_set_mac_address_user);
+-
+ /**
+  * dev_change_net_namespace() - move device to different nethost namespace
+  * @dev: device
+@@ -310,9 +297,9 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ {
+ 	int ret;
+ 
+-	netdev_lock_ops(dev);
++	netdev_lock(dev);
+ 	ret = netif_set_mac_address(dev, sa, extack);
+-	netdev_unlock_ops(dev);
++	netdev_unlock(dev);
+ 
+ 	return ret;
+ }
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index d9f350593121..296e52d1395d 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -574,7 +574,7 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
+ 	case SIOCSIFHWADDR:
+ 		if (dev->addr_len > sizeof(struct sockaddr))
+ 			return -EINVAL;
+-		return dev_set_mac_address_user(dev, &ifr->ifr_hwaddr, NULL);
++		return dev_set_mac_address(dev, &ifr->ifr_hwaddr, NULL);
+ 
+ 	case SIOCSIFHWBROADCAST:
+ 		if (ifr->ifr_hwaddr.sa_family != dev->type)
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 35f79a308d7b..960c78f1fa21 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -262,14 +262,11 @@ static ssize_t address_show(struct device *dev, struct device_attribute *attr,
+ 	struct net_device *ndev = to_net_dev(dev);
+ 	ssize_t ret = -EINVAL;
+ 
+-	down_read(&dev_addr_sem);
+-
+-	rcu_read_lock();
++	netdev_lock(ndev);
+ 	if (dev_isalive(ndev))
+ 		ret = sysfs_format_mac(buf, ndev->dev_addr, ndev->addr_len);
+-	rcu_read_unlock();
++	netdev_unlock(ndev);
+ 
+-	up_read(&dev_addr_sem);
+ 	return ret;
+ }
+ static DEVICE_ATTR_RO(address);
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index c5e42e665f3a..8af0db79f72c 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3085,7 +3085,11 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ 		sa->sa_family = dev->type;
+ 		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
+ 		       dev->addr_len);
+-		err = netif_set_mac_address_user(dev, sa, extack);
++		if (!netdev_need_ops_lock(dev))
++			netdev_lock(dev);
++		err = netif_set_mac_address(dev, sa, extack);
++		if (!netdev_need_ops_lock(dev))
++			netdev_unlock(dev);
+ 		kfree(sa);
+ 		if (err)
+ 			goto errout;
 -- 
 2.48.1
 
