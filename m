@@ -1,297 +1,448 @@
-Return-Path: <netdev+bounces-168357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7B7A3EA42
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:42:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3D1A3EA48
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 353F117796C
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 105063B6402
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C51149C4D;
-	Fri, 21 Feb 2025 01:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA861494BB;
+	Fri, 21 Feb 2025 01:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="i/OiunM/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c7+xkN4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2061.outbound.protection.outlook.com [40.107.21.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F7E84D2B;
-	Fri, 21 Feb 2025 01:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740102131; cv=fail; b=OVo+PSqD8NRIeM3jy+LY4J8pl7Q0SM1cwSqfDnTmudkaEUOdfxBNWiyKjP+r+wwI4EQ+WA+B1WoE7DRzsOW8r12aCV/GW5EZnZFzo1bSa+HDLcCTUO3qzBtpHo5MDtLs771KFEVlrISZa1sV/A+D5ORAMVMpab7nFQrE8L8Q0gE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740102131; c=relaxed/simple;
-	bh=Gd6VnTzJQETJsY4POptwaj3yXCLKwl8yHrjkZrObgoM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gjGcDqRvPj3HIbZihulDX+Qf8M+wsBzcMyN/TyaKXJ93EDbRBcoRtdBPg/TMocio0WlSilGgUk+AC5GO3mLmbbxeWt2T0707E2I8hOSeIWCjBTykuHye03qf4msmn7DlREcXV5zIJSOKVN1C5soWtEQ/phRWwJMpyWW6N0c5fhA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=i/OiunM/; arc=fail smtp.client-ip=40.107.21.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NagRE/AMOyP7KOouhciZdsDy9fA0ezYo2Lk6EruN8uya4KUV//vb0cqtpd7JNsFASTqvNNh39yQNtEG2Qs4zJzAyHpUggB85LGu0vDIZ+D1YGckxebRTPzE5mmZWLMGAGLhOJdRaRiPjW15mUovSqQqPFcm3ysnpL2R4qYGUELEzD7zbMJfxrKW+8A/CiUwlymDse9JkAV/u9J0BauV5IdtoN+s8tVmDnRCJclk9l+k8mI8HNGvU7UL2R8SH8akjvlwcSb55uFXO4aCUcym5zGoyorZf/0X9JAuPF+1USo+BKKpOB6HFn3djEYiqLj6kawmjY2ZoyRdyaAaAxJUPQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3A1yt8UIyJnW55/4H1TEUpUr5BF2rENadQbNNuT1r08=;
- b=kHNJlmIzllbMEKcfHEZI7TtSPl6/RI+TOl8YytSs3Pd4XsqNhGtdAP+YjvxNEUElQCy7V4bPWa0gYHLRHtGOotGBPEDLSbpEs99Y4kFH+FSwgAL1kNSROYrAXm+MAfLQOx+ex2betitG42symgo1Ax0bBbYLBYGrK/oo+LO4Ljzy5m4TrAP33b1dGHSxxJOVGcyZ7astQYJhYnH/CmrRV4fl00YpZsqIlGmm7M7zRxhlq0avBC9QdNaBv5QtRUNx1shAqD2KxaguR7FCnJaMIj4t4THP660PWA/2Byynwybo4RGQ699t3yKx+xDctfftUpk33TauWUh6tl7r4Q0CbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3A1yt8UIyJnW55/4H1TEUpUr5BF2rENadQbNNuT1r08=;
- b=i/OiunM/miIpG59UvJn3GwnCsNBiC+l6AAWtt66da18HbByezr1gf2Cx7pSXqjvOvcvUK9jcfFA8g9xcz/jKdv/5pPu73U0mH/hb41NEKlva+JiC4G0aRO8Qs+hn+ALpwmSWW098tXP2TGX5s4RzXV0Uk33HX1huqZ97RbKkyMePsJ7cF73TSNhk+L34JbHIw2SvJvlnMhPXednLc+U+qxzyZ5wGEfSKKkcgGNPqJV51tlt6DY2dl/HgckZx5A9SFWe5S2QqcmEi+Vv2WSj0WYsjwtE+v2CXgkBe8RDqNIQS2jU3HSkV++TwA2IHg1BBiKNIAWBhoTETUTi55BSBAQ==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by VI0PR04MB10371.eurprd04.prod.outlook.com (2603:10a6:800:23a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Fri, 21 Feb
- 2025 01:42:05 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8445.011; Fri, 21 Feb 2025
- 01:42:05 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Ioana Ciornei
-	<ioana.ciornei@nxp.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
-	"michal.swiatkowski@linux.intel.com" <michal.swiatkowski@linux.intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH v2 net 2/9] net: enetc: correct the tx_swbd statistics
-Thread-Topic: [PATCH v2 net 2/9] net: enetc: correct the tx_swbd statistics
-Thread-Index: AQHbgpN/Xw1oIgK130OBsitj8eB9+LNQXDmAgACfT2A=
-Date: Fri, 21 Feb 2025 01:42:05 +0000
-Message-ID:
- <PAXPR04MB8510D3ACAB9DD6C86AC87E5488C72@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250219054247.733243-1-wei.fang@nxp.com>
- <20250219054247.733243-3-wei.fang@nxp.com>
- <20250220160123.5evmuxlbuzo7djgr@skbuf>
-In-Reply-To: <20250220160123.5evmuxlbuzo7djgr@skbuf>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VI0PR04MB10371:EE_
-x-ms-office365-filtering-correlation-id: a93ff65e-4f13-42e7-f58b-08dd5218f216
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?6ArIi51xwmJHZLVvo2gQuJIeiS6aLgqHxd/YAPDCp0y9QjIY66o4VgFpoxuY?=
- =?us-ascii?Q?GnHweL8ooEyR7Uh0+beRFs56ot88bFNCHWo0/dlmwUdlQkhbvsN8rR+VykqR?=
- =?us-ascii?Q?lkBw5MJc5IJETiSKjIoy/r+2lHxA6fp4BAdW6lpFzDpgl4steheyAto+yzL6?=
- =?us-ascii?Q?t01lcYD+EnLpotctfcj2+a0VHDiY8rVkLNp6T2sw8ACeCnN9dnK0T9/Dfte5?=
- =?us-ascii?Q?f5vjbkYQy7J68VJGkxk988GrDEY4lyCDyj1HWgUQWrG63PD7xyCh0jiX/z4u?=
- =?us-ascii?Q?HUtDo1GAN58+RtIkG/JrWijsgs6p3j9Mm6s8cCQRCfqLo1a3AMrmu6OIikl/?=
- =?us-ascii?Q?J4VJMAwOSUbPW50G6T5E4f0FdE+k0tL94MvsNech4U8pIPMOquj653wV+CIg?=
- =?us-ascii?Q?s4PIDHsg5XPi5da3mo3vELRjpp6ejgJ+gjuhTPLhijIwQm5uOklsIo4Ep/hA?=
- =?us-ascii?Q?wxJDg8f8arntiCnneF4e//6vfbvTznWBvPnkUj6AS58HMs4qrO5sEyQ0FkIY?=
- =?us-ascii?Q?pjVA+AptUsrL/Dz1Xs+yElFwyo1iEjgAGXQ3vbL+ufDXzVbOntxhOMX6O6WQ?=
- =?us-ascii?Q?5JkvozFXZ0mxUm7lKEvAxg5HVRjk9ZLOrlXufs4x5hOGPT0qa9Yvm43vT431?=
- =?us-ascii?Q?PHBqNvKmcg1j1IQqlUERPKMSxUr+aF24+6hX6EtcQMGT9J+AY+GdYdI4fPN7?=
- =?us-ascii?Q?X29dV5WnhChQq0G6zwUgC/J8yB8rhHpRPsXqjxDZmK4UJb0ibvjTM6qaxI6w?=
- =?us-ascii?Q?PIL+CtmvDAOUaeABUukJ+OBEH5GrX6cKqW0PUtRUFAaAHIXR9rtmd3bQg8N6?=
- =?us-ascii?Q?rkf7PVkW1pvhaGDk5r1Jpsu8QBCDqD0WvGmLw6c77P4dLZFv8/jMn4dQECbv?=
- =?us-ascii?Q?R+Wq9frGRSlewMt7etCWbMeerD00fY6yb1Ol/acAAFtxXZvctmlvnGkq8iFm?=
- =?us-ascii?Q?d9Cq2tgIB1jGyBzq/Kg+F0nHK5NEJHLBb2TflDTEHkE01cAB8agu5ghy7T9B?=
- =?us-ascii?Q?Th8eHYA/bZbElfwvJnCQsblYV3oqyEVkvvIPrvJnNREt9qWFCfD7P9/ByIuM?=
- =?us-ascii?Q?bcPinbHDN+g9Lpz7hUpPtLBk1rCwT8uIE+P85iOW8uFHp+l0sR7JQrvpY61J?=
- =?us-ascii?Q?xLPmahNIihOmNHZ9QIexyaGIqByNLIgQ8yl681uFwRszDpTVUSU01K6hij6q?=
- =?us-ascii?Q?Hedv9veZwR8TiOYKWZgjFlnnf5m06up1wvewbiSK2h72pX4AxlBK28IHFuQc?=
- =?us-ascii?Q?rPWrk992Up6tvJhaCZD0dnkQtOmYbW3Empdn//KLDA7eQuaHr3KKpm9dq7vC?=
- =?us-ascii?Q?cSPCQFei0PiOjAHQWJhthSHQDuWhC+w4faN4BkYfnnIwr5bHeLatDumwRJig?=
- =?us-ascii?Q?zzq9EbzXHMvJsG2XAtARlCg3kzwDQAtXWhy/20dxFNhVOaXrodTjR0PPii+5?=
- =?us-ascii?Q?/XqzjzG6VpjosVs0688HmkcRvu7oylfw?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ViE6qLzWxsebbiPiK62R0gKDsbnvriDIP2Jc1GoO3TiNVuAH9dn1xHdRRKUD?=
- =?us-ascii?Q?NdMvchAlLjji/C3nOTzlj4v5s/kXP6COhbxZpYS119Fu8eIh3Uu8n6TRsPtG?=
- =?us-ascii?Q?GIwqfkW1rE6/mmETd2SyRB4YwOKAz/9G5F1PH+n/34LuZlQ9r5460hWmx605?=
- =?us-ascii?Q?++INEf1jJwtaFyrb40Udi7e/KZ8KUC8Gl/7LW3yraGbPH3OG8oFP6/NOI2Fj?=
- =?us-ascii?Q?q4t4HF7b5DAwZIR4so3EgSJCHh431la46o9J1JHBFfBYOIhYasxOYA+p2OET?=
- =?us-ascii?Q?e0sO2f8aebY34ygr5kr0DwDuyKsmkp6iZxdTUaOicntKTs7KU4QmfXtsGKnm?=
- =?us-ascii?Q?2BFmw11hKVoTLkHxiKETwyIre2FQM2Kz5MFkvj7saOl10CWxlnC6yDISfUsl?=
- =?us-ascii?Q?NnTdT9A537uFVihxyS28b3Az//ZUHKdgT248V7UrdXIhlFcXLmyDIHqU8NNR?=
- =?us-ascii?Q?3RBr5T4u7SmVZ5kl5he/kLrCINMlu+caB3u9gIorXM7yV6Wgnt5d2h9bVWx3?=
- =?us-ascii?Q?fCZOOb/k7+ig5SLieTrhLPRZtODdqOcBFp4mJhi7LeIowGCl/BZuP8a7XouA?=
- =?us-ascii?Q?cDPcUQZMW3V/2TdUzyIZF4m2e6BoBhdQXbBR5MSpPCU2LDfB+Ui43VvfGl4Z?=
- =?us-ascii?Q?SnIrkjh0BTKr+idUSH06gVYXs6mKVOffQBxc+gz/V5PqJBi5lVHBt4W9/Zuf?=
- =?us-ascii?Q?bEWjh1L3cfuLuspu+G1tQqRSfjB6k6m6sPHSGmP9YPRf2VZq4JvhwrTivTXw?=
- =?us-ascii?Q?wXDMKuoGDkGzpOMMBU/+LkxcQgScdnF9EHyxqkU7Id2Co7yt7wRaH8vMP2cg?=
- =?us-ascii?Q?XP+KdSH1W2XvoEWgrlJJkTyyVZ0zzVnbTBpKKi4SRjF/PyermbR7YkN5Y1XW?=
- =?us-ascii?Q?0z+2tCEpId+G+NC+oIKPK/UYXjsjbAa/U8TBCKNK3uZrjeZyYUDLiaYKE69n?=
- =?us-ascii?Q?pyJhjCP9Jeq02PhbvDod3d8Lrc0xcW2TOY490nSkUoBtG5YjTyFIvZO3Z2n/?=
- =?us-ascii?Q?nbN3SCJu88Fb38SgpAFHg9yvJ98lzQxytOJIiWPIpZGaGSRHeVnzrBi0CsCc?=
- =?us-ascii?Q?lCwd+jmHIyenl7TC8vSqJYaDHAa47VIBKpXDqxFzbQTeV72QGKE3eromVE61?=
- =?us-ascii?Q?uWkYJ8QYeOyifw2nHUKtixCrYynx0H/Sy4jxs8tnlrgmLX5yu7l4ipjWXB2W?=
- =?us-ascii?Q?SyPluBVHsrMZdFlDrZkSI1qpwFtiNzIhSRyr+vLflxEdUWZiCs2G6NHDT8hK?=
- =?us-ascii?Q?+bZm3QmYW2tUpMVw4NTxtrnAwtBFDudLjKvBZttvEQh5l/0uQ0GIirwpP2A1?=
- =?us-ascii?Q?nLr/Fd2MZRdVuxSv1UfFzrlUIitLEzxV4CkRh+Bky2TuaZoDnPIotIdKLhvQ?=
- =?us-ascii?Q?8bNrAsYv9/fS6XxM1CWOcoMNK1mkao6n6oBcjoF2t8kqPdJeql9mHu1Ojez7?=
- =?us-ascii?Q?TvZw/RviApgA0aaXTUicGKgRFA85aYfKQTZiYQSrtEWpZta6K+78ACeTJF/m?=
- =?us-ascii?Q?FzFBSjYLiJbxOTWv5jSYg9AZrAZEfTiiXZ2r17M08T8tWeAqUTXnC0JfqfSl?=
- =?us-ascii?Q?LXnktKjfIT8e8GgUItU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA50078F52
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 01:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740102167; cv=none; b=R/b43+n0hTtbzxAQiRGG1mh483QPmmJGRnnCYFatBJFcuNo3u1YpLM+uwyyiD1jB/uxUQPqFHOiDuhMf2iOmAu2dql53K2ncrojWmBHLDp4BBOQffrFXc6qvLgzkz2waU4A++mcAslAYD5GLw53juthzRUPZBAGnwUaSNUX3dGA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740102167; c=relaxed/simple;
+	bh=qsb/qAM/w6ThPYz0i3XfWMcwV6tAC/0iGnqjqFvKufY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Uma6ucGUvlteeYakh+BG7wC0wWd1moKn5DKrG4NS+q9v0FkDisSfY1CBlBlozGl0pKaRfqec1Qx4QHsZDpavJ0xdScuvW3jj5hmcXXIA54OH1xthyKDpzdck0kOQcKEYwULDmZbijD+A8l3VMXGj2f1hFpmErnL9aqiESpCH00E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c7+xkN4z; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6fb73240988so10921257b3.3
+        for <netdev@vger.kernel.org>; Thu, 20 Feb 2025 17:42:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740102163; x=1740706963; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cq5wW7Mlxo5wbIWOTLy11yQHQNcqPwg4CfQNw3smvx8=;
+        b=c7+xkN4zus6B77uMCft+l8gAl5H5NPR7G24krwTEGv8A2GwQVQckfvlHVKp63Hw5Ja
+         J147u1DPkKIh9gmaaQqA+rfQUvD6UNGJAHWCWwcuHq3IJRclkBcyz4lKoFwpOxWbZDVa
+         Xcisx3womfsK01Hx5+6mehkSREZDQ27PpYa4AY8FeqW0ixNCeXIpq3xxxKv8fleKyEiQ
+         SpzmAULpMf4OOfFGnckgntitJpdjQdZDezzgElAZukQcyI0xBBSEmzp4cQInwvbEgUlr
+         AfaKVUjfX62Za+iop9h1jJK4mW4Z5umijpmSXjwo+ce4zIg6r3javDjZjgq5DpTJ4WNo
+         T4GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740102163; x=1740706963;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cq5wW7Mlxo5wbIWOTLy11yQHQNcqPwg4CfQNw3smvx8=;
+        b=Dmc3xl0vaA2eqQqvPYVHKYzif+bgvoeE55RFs7bXV2mGuXZZmJAKzDzpen4TXkvzbS
+         h4wgbTV9Xd+eVG+Vn/YVVmwQSxcVGXvqLnKnEHETMK/fwH/N9ST+XGufkX/31hXrjrY+
+         jYe4Y1BfOEryUwziEwBrw4sDnQs7pNwLoxU3t/UhWoCIawcK1Wm/9zabYAngP9XquoiM
+         mSEIndy1oKrFLH16VAAZW0jV1Ig8bKbqLmMZSasPDnxR6uQxuU21FYIMkUlo7xzTalog
+         em1t+b9Kjc1KIQG1/FXbmOQxhrGxJTYq8THB5ByDKcI71eoFnHTLuH6nUR9o9dqHD2Pb
+         E7Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCUA939Fx20Re8hTmXQH1Wx3kZ1Qd2j/7jcjIheo+wfedv0mK9iPnsuy7EeI5mhUQX7tPm8jVLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1ib8aZ4wxSXbIqzpqOuWVh0qStm7cppaLdB3zxPkh8mlwQrhx
+	53ptkFlb1DUC42qs19Khpwkjt5v4Q4pwzem2WzLyrzCqDUwLPi0XeeM57minoVz2re7QAoObS47
+	3Ro30marwcMpfdk1ODdwg+a/svNjCzj9/nWa3
+X-Gm-Gg: ASbGncvxYyzR1vSjuZmftaMcCw8vCYZwaG2PkV1p9jdPdEz+xz9m/HSX3mtjJf2S0gR
+	C5ds92oWlsqMgjsRvlrXEzc7SJ1YPC/FsoDP4bd7Je/1XGT5OVEglFBKVs2/sCjwa20Mi5jEmhL
+	ffagbbWCRU
+X-Google-Smtp-Source: AGHT+IHcO3NCLnBWYIcEnl3NgEG/pKUlRKt5tc+j8CKkuF05USkQ/01cpeODP4jWohKAsfkPcPOYjh1IQ0HbztY5gr8=
+X-Received: by 2002:a05:6902:230d:b0:e5a:cece:f38d with SMTP id
+ 3f1490d57ef6-e5e245e77edmr1162202276.13.1740102163233; Thu, 20 Feb 2025
+ 17:42:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a93ff65e-4f13-42e7-f58b-08dd5218f216
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2025 01:42:05.0711
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Offi4S4yhZUpg/lUAukhGNEVZ5c6Q5MyzY5cHTcHJZTeaLhJCQ+RG6eJl0exBqJkiRQdKZO0qVliAZqA40KZQA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10371
+References: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+In-Reply-To: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Fri, 21 Feb 2025 09:42:16 +0800
+X-Gm-Features: AWEUYZlQLidDoKhTdpV_KHzPWs-VkWpNfJwvrhAjNMOnNOTN7JpIBytEj46gzRk
+Message-ID: <CADg1FFfCjXupCu3VaGprdVtQd3HFn3+rEANBCaJhSZQVkm9e4g@mail.gmail.com>
+Subject: Re: [PATCH v7] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
+	gregkh@linuxfoundation.org
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I'm not sure "correct the statistics" is the best way to describe this
-> change. Maybe "keep track of correct TXBD count in
-> enetc_map_tx_tso_buffs()"?
-
-Hi Vladimir,
-
-Inspired by Michal, I think we don't need to keep the count variable, becau=
-se
-we already have index "i", we just need to record the value of the initial =
-i at the
-beginning. So I plan to do this optimization on the net-next tree in the fu=
-ture.
-So I don't think it is necessary to modify enetc_map_tx_tso_hdr().
-
-> The bug is that not all TX buffers are freed on error, not that some
-> statistics are wrong.
->=20
-> >  drivers/net/ethernet/freescale/enetc/enetc.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > index 01c09fd26f9f..0658c06a23c1 100644
-> > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > @@ -759,6 +759,7 @@ static int enetc_lso_hw_offload(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb)
-> >  static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk=
-_buff
-> *skb)
-> >  {
-> >  	struct enetc_ndev_priv *priv =3D netdev_priv(tx_ring->ndev);
-> > +	bool ext_bd =3D skb_vlan_tag_present(skb);
-> >  	int hdr_len, total_len, data_len;
-> >  	struct enetc_tx_swbd *tx_swbd;
-> >  	union enetc_tx_bd *txbd;
-> > @@ -792,7 +793,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb
-> >  		csum =3D enetc_tso_hdr_csum(&tso, skb, hdr, hdr_len, &pos);
-> >  		enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd, &i, hdr_len,
-> data_len);
-> >  		bd_data_num =3D 0;
-> > -		count++;
-> > +		count +=3D ext_bd ? 2 : 1;
-> >
-> >  		while (data_len > 0) {
-> >  			int size;
-> > --
-> > 2.34.1
-> >
->=20
-> stylistic nitpick: I think this implementation choice obscures the fact,
-> to an unfamiliar reader, that the requirement for an extended TXBD comes
-> from enetc_map_tx_tso_hdr(). This is because you repeat the condition
-> for skb_vlan_tag_present(), but it's not obvious it's correlated to the
-> other one. Something like the change below is more expressive in this
-> regard, in my opinion:
->=20
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> b/drivers/net/ethernet/freescale/enetc/enetc.c
-> index fe3967268a19..6178157611db 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> @@ -410,14 +410,15 @@ static int enetc_map_tx_buffs(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb)
->  	return 0;
->  }
->=20
-> -static void enetc_map_tx_tso_hdr(struct enetc_bdr *tx_ring, struct sk_bu=
-ff
-> *skb,
-> -				 struct enetc_tx_swbd *tx_swbd,
-> -				 union enetc_tx_bd *txbd, int *i, int hdr_len,
-> -				 int data_len)
-> +static int enetc_map_tx_tso_hdr(struct enetc_bdr *tx_ring, struct sk_buf=
-f
-> *skb,
-> +				struct enetc_tx_swbd *tx_swbd,
-> +				union enetc_tx_bd *txbd, int *i, int hdr_len,
-> +				int data_len)
->  {
->  	union enetc_tx_bd txbd_tmp;
->  	u8 flags =3D 0, e_flags =3D 0;
->  	dma_addr_t addr;
-> +	int count =3D 1;
->=20
->  	enetc_clear_tx_bd(&txbd_tmp);
->  	addr =3D tx_ring->tso_headers_dma + *i * TSO_HEADER_SIZE;
-> @@ -460,7 +461,10 @@ static void enetc_map_tx_tso_hdr(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb,
->  		/* Write the BD */
->  		txbd_tmp.ext.e_flags =3D e_flags;
->  		*txbd =3D txbd_tmp;
-> +		count++;
->  	}
+On Wed, Feb 19, 2025 at 10:03=E2=80=AFPM Hsin-chen Chuang <chharry@google.c=
+om> wrote:
+>
+> From: Hsin-chen Chuang <chharry@chromium.org>
+>
+> Expose the isoc_alt attr with device group to avoid the racing.
+>
+> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
+> it also becomes the parent device of hci dev.
+>
+> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control US=
+B alt setting")
+> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> ---
+>
+> Changes in v7:
+> - Use container_of() rather than dev_set_drvdata() + dev_get_drvdata()
+>
+> Changes in v6:
+> - Fix EXPORT_SYMBOL -> EXPORT_SYMBOL_GPL
+> - Use container_of() rather than dev_set_drvdata() + dev_get_drvdata()
+>
+> Changes in v5:
+> - Merge the ABI doc into this patch
+> - Manage the driver data with device
+>
+> Changes in v4:
+> - Create a dev node for btusb. It's now hci dev's parent and the
+>   isoc_alt now belongs to it.
+> - Since the changes is almost limitted in btusb, no need to add the
+>   callbacks in hdev anymore.
+>
+> Changes in v3:
+> - Make the attribute exported only when the isoc_alt is available.
+> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
+>   (which calls hci_init_sysfs).
+> - Since hci_init_sysfs is called before btusb could modify the hdev,
+>   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
+>
+> Changes in v2:
+> - The patch has been removed from series
+>
+>  .../ABI/stable/sysfs-class-bluetooth          |  13 ++
+>  drivers/bluetooth/btusb.c                     | 114 +++++++++++++-----
+>  include/net/bluetooth/hci_core.h              |   1 +
+>  net/bluetooth/hci_sysfs.c                     |   3 +-
+>  4 files changed, 103 insertions(+), 28 deletions(-)
+>
+> diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documentati=
+on/ABI/stable/sysfs-class-bluetooth
+> index 36be02471174..c1024c7c4634 100644
+> --- a/Documentation/ABI/stable/sysfs-class-bluetooth
+> +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
+> @@ -7,3 +7,16 @@ Description:   This write-only attribute allows users to=
+ trigger the vendor reset
+>                 The reset may or may not be done through the device trans=
+port
+>                 (e.g., UART/USB), and can also be done through an out-of-=
+band
+>                 approach such as GPIO.
 > +
-> +	return count;
->  }
->=20
->  static int enetc_map_tx_tso_data(struct enetc_bdr *tx_ring, struct sk_bu=
-ff
-> *skb,
-> @@ -786,7 +790,6 @@ static int enetc_lso_hw_offload(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb)
->  static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_b=
-uff
-> *skb)
+> +What:          /sys/class/bluetooth/btusb<usb-intf>/isoc_alt
+> +Date:          13-Feb-2025
+> +KernelVersion: 6.13
+> +Contact:       linux-bluetooth@vger.kernel.org
+> +Description:   This attribute allows users to configure the USB Alternat=
+e setting
+> +               for the specific HCI device. Reading this attribute retur=
+ns the
+> +               current setting, and writing any supported numbers would =
+change
+> +               the setting. See the USB Alternate setting definition in =
+Bluetooth
+> +               core spec 5, vol 4, part B, table 2.1.
+> +               If the HCI device is not yet init-ed, the write fails wit=
+h -ENODEV.
+> +               If the data is not a valid number, the write fails with -=
+EINVAL.
+> +               The other failures are vendor specific.
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index de3fa725d210..495f0ceba95d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -920,6 +920,8 @@ struct btusb_data {
+>         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+>
+>         struct qca_dump_info qca_dump;
+> +
+> +       struct device dev;
+>  };
+>
+>  static void btusb_reset(struct hci_dev *hdev)
+> @@ -3682,7 +3684,7 @@ static ssize_t isoc_alt_show(struct device *dev,
+>                              struct device_attribute *attr,
+>                              char *buf)
 >  {
->  	struct enetc_ndev_priv *priv =3D netdev_priv(tx_ring->ndev);
-> -	bool ext_bd =3D skb_vlan_tag_present(skb);
->  	int hdr_len, total_len, data_len;
->  	struct enetc_tx_swbd *tx_swbd;
->  	union enetc_tx_bd *txbd;
-> @@ -818,9 +821,9 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr
-> *tx_ring, struct sk_buff *skb
->=20
->  		/* compute the csum over the L4 header */
->  		csum =3D enetc_tso_hdr_csum(&tso, skb, hdr, hdr_len, &pos);
-> -		enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd, &i, hdr_len,
-> data_len);
-> +		count +=3D enetc_map_tx_tso_hdr(tx_ring, skb, tx_swbd, txbd, &i,
-> +					      hdr_len, data_len);
->  		bd_data_num =3D 0;
-> -		count +=3D ext_bd ? 2 : 1;
->=20
->  		while (data_len > 0) {
->  			int size;
+> -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> +       struct btusb_data *data =3D container_of(dev, struct btusb_data, =
+dev);
+>
+>         return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+>  }
+> @@ -3691,10 +3693,13 @@ static ssize_t isoc_alt_store(struct device *dev,
+>                               struct device_attribute *attr,
+>                               const char *buf, size_t count)
+>  {
+> -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> +       struct btusb_data *data =3D container_of(dev, struct btusb_data, =
+dev);
+>         int alt;
+>         int ret;
+>
+> +       if (!data->hdev)
+> +               return -ENODEV;
+> +
+>         if (kstrtoint(buf, 10, &alt))
+>                 return -EINVAL;
+>
+> @@ -3704,6 +3709,36 @@ static ssize_t isoc_alt_store(struct device *dev,
+>
+>  static DEVICE_ATTR_RW(isoc_alt);
+>
+> +static struct attribute *btusb_sysfs_attrs[] =3D {
+> +       NULL,
+> +};
+> +ATTRIBUTE_GROUPS(btusb_sysfs);
+> +
+> +static void btusb_sysfs_release(struct device *dev)
+> +{
+> +       struct btusb_data *data =3D container_of(dev, struct btusb_data, =
+dev);
+> +
+> +       kfree(data);
+> +}
+> +
+> +static const struct device_type btusb_sysfs =3D {
+> +       .name    =3D "btusb",
+> +       .release =3D btusb_sysfs_release,
+> +       .groups  =3D btusb_sysfs_groups,
+> +};
+> +
+> +static struct attribute *btusb_sysfs_isoc_alt_attrs[] =3D {
+> +       &dev_attr_isoc_alt.attr,
+> +       NULL,
+> +};
+> +ATTRIBUTE_GROUPS(btusb_sysfs_isoc_alt);
+> +
+> +static const struct device_type btusb_sysfs_isoc_alt =3D {
+> +       .name    =3D "btusb",
+> +       .release =3D btusb_sysfs_release,
+> +       .groups  =3D btusb_sysfs_isoc_alt_groups,
+> +};
+> +
+>  static int btusb_probe(struct usb_interface *intf,
+>                        const struct usb_device_id *id)
+>  {
+> @@ -3745,7 +3780,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                         return -ENODEV;
+>         }
+>
+> -       data =3D devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
+> +       data =3D kzalloc(sizeof(*data), GFP_KERNEL);
+>         if (!data)
+>                 return -ENOMEM;
+>
+> @@ -3768,8 +3803,10 @@ static int btusb_probe(struct usb_interface *intf,
+>                 }
+>         }
+>
+> -       if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep)
+> -               return -ENODEV;
+> +       if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep) {
+> +               err =3D -ENODEV;
+> +               goto out_free_data;
+> +       }
+>
+>         if (id->driver_info & BTUSB_AMP) {
+>                 data->cmdreq_type =3D USB_TYPE_CLASS | 0x01;
+> @@ -3823,16 +3860,46 @@ static int btusb_probe(struct usb_interface *intf=
+,
+>
+>         data->recv_acl =3D hci_recv_frame;
+>
+> +       if (id->driver_info & BTUSB_AMP) {
+> +               /* AMP controllers do not support SCO packets */
+> +               data->isoc =3D NULL;
+> +       } else {
+> +               /* Interface orders are hardcoded in the specification */
+> +               data->isoc =3D usb_ifnum_to_if(data->udev, ifnum_base + 1=
+);
+> +               data->isoc_ifnum =3D ifnum_base + 1;
+> +       }
+> +
+> +       if (id->driver_info & BTUSB_BROKEN_ISOC)
+> +               data->isoc =3D NULL;
+> +
+> +       /* Init a dev for btusb. The attr depends on the support of isoc.=
+ */
+> +       if (data->isoc)
+> +               data->dev.type =3D &btusb_sysfs_isoc_alt;
+> +       else
+> +               data->dev.type =3D &btusb_sysfs;
+> +       data->dev.class =3D &bt_class;
+> +       data->dev.parent =3D &intf->dev;
+> +
+> +       err =3D dev_set_name(&data->dev, "btusb%s", dev_name(&intf->dev))=
+;
+> +       if (err)
+> +               goto out_free_data;
+> +
+> +       err =3D device_register(&data->dev);
+> +       if (err < 0)
+> +               goto out_put_sysfs;
+> +
+>         hdev =3D hci_alloc_dev_priv(priv_size);
+> -       if (!hdev)
+> -               return -ENOMEM;
+> +       if (!hdev) {
+> +               err =3D -ENOMEM;
+> +               goto out_free_sysfs;
+> +       }
+>
+>         hdev->bus =3D HCI_USB;
+>         hci_set_drvdata(hdev, data);
+>
+>         data->hdev =3D hdev;
+>
+> -       SET_HCIDEV_DEV(hdev, &intf->dev);
+> +       SET_HCIDEV_DEV(hdev, &data->dev);
+>
+>         reset_gpio =3D gpiod_get_optional(&data->udev->dev, "reset",
+>                                         GPIOD_OUT_LOW);
+> @@ -3971,15 +4038,6 @@ static int btusb_probe(struct usb_interface *intf,
+>                 hci_set_msft_opcode(hdev, 0xFD70);
+>         }
+>
+> -       if (id->driver_info & BTUSB_AMP) {
+> -               /* AMP controllers do not support SCO packets */
+> -               data->isoc =3D NULL;
+> -       } else {
+> -               /* Interface orders are hardcoded in the specification */
+> -               data->isoc =3D usb_ifnum_to_if(data->udev, ifnum_base + 1=
+);
+> -               data->isoc_ifnum =3D ifnum_base + 1;
+> -       }
+> -
+>         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
+>             (id->driver_info & BTUSB_REALTEK)) {
+>                 btrtl_set_driver_name(hdev, btusb_driver.name);
+> @@ -4012,9 +4070,6 @@ static int btusb_probe(struct usb_interface *intf,
+>                         set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirk=
+s);
+>         }
+>
+> -       if (id->driver_info & BTUSB_BROKEN_ISOC)
+> -               data->isoc =3D NULL;
+> -
+>         if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+>                 set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirk=
+s);
+>
+> @@ -4067,10 +4122,6 @@ static int btusb_probe(struct usb_interface *intf,
+>                                                  data->isoc, data);
+>                 if (err < 0)
+>                         goto out_free_dev;
+> -
+> -               err =3D device_create_file(&intf->dev, &dev_attr_isoc_alt=
+);
+> -               if (err)
+> -                       goto out_free_dev;
+>         }
+>
+>         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+> @@ -4101,6 +4152,16 @@ static int btusb_probe(struct usb_interface *intf,
+>         if (data->reset_gpio)
+>                 gpiod_put(data->reset_gpio);
+>         hci_free_dev(hdev);
+> +
+> +out_free_sysfs:
+> +       device_del(&data->dev);
+> +
+> +out_put_sysfs:
+> +       put_device(&data->dev);
+> +       return err;
+> +
+> +out_free_data:
+> +       kfree(data);
+>         return err;
+>  }
+>
+> @@ -4117,10 +4178,8 @@ static void btusb_disconnect(struct usb_interface =
+*intf)
+>         hdev =3D data->hdev;
+>         usb_set_intfdata(data->intf, NULL);
+>
+> -       if (data->isoc) {
+> -               device_remove_file(&intf->dev, &dev_attr_isoc_alt);
+> +       if (data->isoc)
+>                 usb_set_intfdata(data->isoc, NULL);
+> -       }
+>
+>         if (data->diag)
+>                 usb_set_intfdata(data->diag, NULL);
+> @@ -4152,6 +4211,7 @@ static void btusb_disconnect(struct usb_interface *=
+intf)
+>                 gpiod_put(data->reset_gpio);
+>
+>         hci_free_dev(hdev);
+> +       device_unregister(&data->dev);
+>  }
+>
+>  #ifdef CONFIG_PM
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 05919848ea95..776dd6183509 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1843,6 +1843,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_dev =
+*hdev);
+>
+>  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+>
+> +extern const struct class bt_class;
+>  void hci_init_sysfs(struct hci_dev *hdev);
+>  void hci_conn_init_sysfs(struct hci_conn *conn);
+>  void hci_conn_add_sysfs(struct hci_conn *conn);
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 041ce9adc378..f8c2c1c3e887 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -6,9 +6,10 @@
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+>
+> -static const struct class bt_class =3D {
+> +const struct class bt_class =3D {
+>         .name =3D "bluetooth",
+>  };
+> +EXPORT_SYMBOL_GPL(bt_class);
+>
+>  static void bt_link_release(struct device *dev)
+>  {
+> --
+> 2.48.1.601.g30ceb7b040-goog
+>
+
+Hi Luiz and Greg,
+
+Friendly ping for review, thanks.
+
+--=20
+Best Regards,
+Hsin-chen
 
