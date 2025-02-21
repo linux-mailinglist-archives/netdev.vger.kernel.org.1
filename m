@@ -1,174 +1,164 @@
-Return-Path: <netdev+bounces-168623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2091FA3FD33
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:17:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2E0A3FD4D
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD289188C0BB
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:16:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 207FE188EF9A
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE22224E4C9;
-	Fri, 21 Feb 2025 17:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04FB24FC1E;
+	Fri, 21 Feb 2025 17:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="evyTDHtF"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LAXfqUnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E79024E4A2
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 17:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8FE24FC18
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 17:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740158163; cv=none; b=MAojNSqWoWB4MuJaC6fpWktfYYy/O9Md9ikrviBFs7slT/PZW51SAYi2UnUZdhHN5aUgOHWyDDdhEyEJxwnbRmettorgCRgTlZckxFgvCFW2FnGi7Yea9XGvCOm1v3lkEY0IYS/ZZNjDWfORte1E67NVMgABPSWeQoiOtwxK3oI=
+	t=1740158506; cv=none; b=dhJwS3F096qK2TT/b6YBuPz/Q4KfYo5fmIdGs8Sm2FYRHI3KUWkYuO92seepxj4PpFkootVg0GccLH+ZKoBS4RJyinsh3l9Oms8VRXJPtojG00SEnJ0yz364ZAXEeBWWm+mUfXgk3jm00IUUVmfgMjgHCwabYzTxls3ryU9mo1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740158163; c=relaxed/simple;
-	bh=LuYSFr/mRUT4yzTGhbrQavfUfsRw5mdDa/QJCVAmfhY=;
+	s=arc-20240116; t=1740158506; c=relaxed/simple;
+	bh=0Hht/jYaEq1V8iN+xgQCAvSA0pIDp8nvaC/arD4DlrU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hTqIAo/0lJv94txm6lgwWGRA26Px7AUUqIcTQXuuk9wciLB1+qNcjn4GEG9JdWOzEs7nuIDWeMPIN0T+JIozO2Ic1p4M5O0IVlJA6pOQ89dI/casfANLyqM6Au+tVnCK99c0LELivPufHNlekcwIdgEQJOdJ5pQOOrAvg93VuRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=evyTDHtF; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-220c8eb195aso53113105ad.0
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:16:01 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=eCSrT0CoZoqiZ6CpCScvGBQLxSg3GkPzpK3d6E5eiSQVl9AmTWGjPf78T1Stpzd3Ftx0oJdCvQr9Sv986pPAYblnVwu17BYf9ydyToM6LaMZDly/2DbC6cpQtSTRi51OgjlC0TEf4tT+VuEKBquC2y5z8fCpLSkMSwe1XvgrgwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LAXfqUnP; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c04df48a5bso248240285a.2
+        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:21:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740158161; x=1740762961; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TKHhhdXji6Dk04xw36WFay3nDgbF5w60+ErEsgzhfgo=;
-        b=evyTDHtFgt/4PWs8uTI4ncd6uILO/DPPgspgNkMHUx/8Y2egh6fmo2Pa3Zo+Mhepny
-         W2vcan9XK2+d2pIqNq71Kk5tveFqbYdBNiNhPD3IUk2ZEqzAV8gLOZ4aqbRv0Gms5Xhg
-         PVyJRqlL5asoGiiRneZH2NTBoeWN4ZYFsnu3A53SSqQvNbMmjUQAXD/wbdVTJd8pizn4
-         ORXYlSl9Dv/RWgGQHepSGulS3GDIHXoSNj+v25iPEAs++i4UUeTtCRREUbMIaVzj0u6x
-         j5DcMHZj4AUyobhiVJ0VK4hY4bDm9u5X0Oq/iA4DO++An1/xIo3+OO0/lfA+eDl7WN6b
-         PiZA==
+        d=fastly.com; s=google; t=1740158503; x=1740763303; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8Znmx94mCfsGvvpL2DgWVIQn2SIQ9TykkZQScUK21z0=;
+        b=LAXfqUnPP4SciW5tWH6wau7VX8MEpjhJaR+lFYbNhUY/W2Jm7z/EXglv4dKQc5EcSm
+         hfeH78weamMs75MDrx8ez10xf0PeIg2KJo3OVpva2/xISuEDu2+ov3fK1g7Svx8xEepk
+         IQ4HPSIB8knAB9lL/dJpBtMSrvyz7XkT0ZQFA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740158161; x=1740762961;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TKHhhdXji6Dk04xw36WFay3nDgbF5w60+ErEsgzhfgo=;
-        b=xRM9O9f2Fbals6fUbjn/OeZZ+umw0kx3p2yXHiEiHn2AEt9CBrCW9WMMQlNTJ2+CjW
-         D9zQ/LeBS1Ribof3C5aKQUuYOdEVa89GHo83h1mViH4dVggzcZEp4gF33AdYkpoNTzn/
-         2x/CusQ5U5xusZnn698uhtrJoCSgpqqBrAK+TPYisqk6dHY3BSo6OXKvM6UxrTVOgu/f
-         Z4Kxkp5UhBBpHh6wc3sB0fBAw1oSPm6+xBOmry0PR0qw+1UfbqxjoNmYu5BpsKDbnDd0
-         XLhJMPw19qAvDP8AmbzM4LfyqJSDwyC2RNih1eK65XuEro1+Ri6GvxrVtHyBJzpedMFf
-         qySQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcdY12nVS142oaHI/iwgemTNNiF8Dx0EiZ9CbKsXsbc0MWbpUgWCjCgdP9eDijF52UBUnwpCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsFU+zIk0uZXG0Ez9yxHwn9hOIOwfr9HnBjhEJ6az887YHZX43
-	gDpXfxLsSdWuqk3VzAq6NFYGv9za282T2M5ved4PzXITqJZAxog=
-X-Gm-Gg: ASbGncuJjn8qswvDxzVrKOpO4wDaf0ASZjauSkEeAQ6SnQgBNmMUXTLvnpzGBp9z9Bd
-	ZnSCDKdxyAT65Tnfqm1N0LoewfX4A494/DXLzZXGagH8SCrmx6PCwE9iTqAXOjMlHlcrno0CKGv
-	RwjFQDQkgKTcueEGYlSnDjTtFzd+aqEVEXs0/1BcunI1V1CA0V7wOm4KaAmM31kt8x2cy+s2Ryy
-	skiDywPxTTYdHvUdFOehtOVmAPjKONtyk3jKbDjgyt2wkrAK4OM6t2zhbAd7vrKDM3BNi5b/5PX
-	9N3rk+MXCIS1kIKDc0jKjxRfhQ==
-X-Google-Smtp-Source: AGHT+IEoMrLniW+2g43e/c/2ugLcYqeUnoGhc55ymwlUuNgcwJHifNeOdL3t+62iP2d5vbEzsfDz2Q==
-X-Received: by 2002:a17:902:fc8f:b0:220:cd23:3cd with SMTP id d9443c01a7336-2219fff2ad7mr80081745ad.44.1740158161309;
-        Fri, 21 Feb 2025 09:16:01 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d558fe3asm138651425ad.234.2025.02.21.09.16.00
+        d=1e100.net; s=20230601; t=1740158503; x=1740763303;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Znmx94mCfsGvvpL2DgWVIQn2SIQ9TykkZQScUK21z0=;
+        b=HduF3vIDiCvBCCI9bDi274BvDe9f3iJMqJVh+oeKneq3mu034NhbSOmrUmrapP57jx
+         xwvbB0AAtmhctNFzecS+v2/jxxKvvL5WMsCAGsCaeMkdVRnB92FEpkvZMxsO5y8UuwTu
+         FJ5bvsjvXU2YHR2Bsntwv+FpLYXFswLm8bmBkZ6sKn9ISLV8iMSaIos3beThRihtRVC4
+         WhkGJ7Ya5DRGTD34DkQoDLMmCU44Bn8136OLkTqgFlkhbE0qXrpP6zGzE4VwiXfRKjD/
+         Tn1amFKUNyJ2rI79t52EENVezJ65lAQiojYXZDHlDPsmNa4lGvtal0YVDZsp9EnFgXYm
+         ikgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbqTdX5ZblDav19o5kjlYgqsDpZ5WSFdNAVNkVqEf+Zwzy5lT+XWWuCpCfjFih+ayiIiTgz7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcj3CgqgewrJviEsqNK/kEfug0i1HByRLvN45BWmVstqCmjQXV
+	JQ4k9GzxXcORF2VSQiHXf8ZYPP14NXe+232P/c0EPHLAYl4jn8cmFr9A3EWKUv50tkdK8CnwKBP
+	6
+X-Gm-Gg: ASbGnctPBmp/U1h2FFSVm6awepzNVrwddz6xhKtZU9mvMpov9rO5YJwDEeQuEZDSoD7
+	4CPlXUfH1aPlg28jABe3Bt8yN2VP6XL1yJvckS29khG/ZiUDyIfuKbBdefQZPj1h7nBIZ9gg/3n
+	dVryGoFWs+rWUmubY4nJ2S6YGRgLziHiKPLDIyz6LnwJV7tDE6yX9IC8HJCKF+VQErZ5RgYQCZ3
+	3ewIEzLBL/lWm7b1NyfmccUbbX7P7TJeWuERV/wsUaiaKWMpQluEUhLwG7pitzoDSN/BRq1+hO9
+	i9y4ZI5k3rgTQBM35DHzKeykGrW+UdPTxJ7ee2qVK4W+Ndt3IpqkU65EfXTu0RZp
+X-Google-Smtp-Source: AGHT+IHo/d78nx0q8o83gfhXEWNKkI1eKr24evaOrGuWvpwqOUkM+xFI9To4CNDvCQ8NQyKa3feC1Q==
+X-Received: by 2002:a05:620a:488c:b0:7c0:a0ba:2029 with SMTP id af79cd13be357-7c0cef535b2mr650712185a.40.1740158503521;
+        Fri, 21 Feb 2025 09:21:43 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0b368d200sm398593785a.99.2025.02.21.09.21.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 09:16:00 -0800 (PST)
-Date: Fri, 21 Feb 2025 09:16:00 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [PATCH net-next v5 03/12] net: hold netdev instance lock during
- queue operations
-Message-ID: <Z7i00BqilLK2xAWU@mini-arch>
-References: <20250219202719.957100-1-sdf@fomichev.me>
- <20250219202719.957100-4-sdf@fomichev.me>
- <Z7dGFLSom9mnWFdB@hog>
- <Z7dfqFr-knB3Bv0G@mini-arch>
- <Z7inYue3xLFjlu5C@hog>
+        Fri, 21 Feb 2025 09:21:42 -0800 (PST)
+Date: Fri, 21 Feb 2025 12:21:40 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>
+Subject: Re: [PATCH net-next 1/2] page_pool: Convert page_pool_recycle_stats
+ to u64_stats_t.
+Message-ID: <Z7i2JHiKX6rggsUz@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>
+References: <20250221115221.291006-1-bigeasy@linutronix.de>
+ <20250221115221.291006-2-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z7inYue3xLFjlu5C@hog>
+In-Reply-To: <20250221115221.291006-2-bigeasy@linutronix.de>
 
-On 02/21, Sabrina Dubroca wrote:
-> 2025-02-20, 09:00:24 -0800, Stanislav Fomichev wrote:
-> > On 02/20, Sabrina Dubroca wrote:
-> > > 2025-02-19, 12:27:10 -0800, Stanislav Fomichev wrote:
-> > > > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-> > > > index 533e659b15b3..cf9bd08d04b2 100644
-> > > > --- a/drivers/net/ethernet/google/gve/gve_main.c
-> > > > +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> > > > @@ -1886,7 +1886,7 @@ static void gve_turndown(struct gve_priv *priv)
-> > > >  			netif_queue_set_napi(priv->dev, idx,
-> > > >  					     NETDEV_QUEUE_TYPE_TX, NULL);
-> > > >  
-> > > > -		napi_disable(&block->napi);
-> > > > +		napi_disable_locked(&block->napi);
-> > > 
-> > > I don't think all the codepaths that can lead to gve_turndown have the
-> > > required netdev_lock():
-> > > 
-> > > gve_resume -> gve_reset_recovery -> gve_turndown
-> > Good catch, looks like suspend is missing the netdev lock as well, will
-> > add.
-> > 
-> > > gve_user_reset -> gve_reset -> gve_reset_recovery
-> > I believe this should be covered by patch "net: ethtool: try to protect
-> > all callback with netdev instance lock", no?
-> > 
-> > __dev_ethtool
-> >   netdev_lock_ops
-> >   ethtool_reset
-> >     gve_user_reset
-> 
-> Ah, right, sorry, I missed that.
-> 
-> > Or is there some other reset path I'm missing?
-> 
-> Looking at net/ethtool, maybe cmis_fw_update_reset?
-> module_flash_fw_work -> ethtool_cmis_fw_update -> cmis_fw_update_reset -> ->reset()
-> 
-> (no idea if it can ever be called for those drivers)
+On Fri, Feb 21, 2025 at 12:52:20PM +0100, Sebastian Andrzej Siewior wrote:
+> Using u64 for statistics can lead to inconsistency on 32bit because an
+> update and a read requires to access two 32bit values.
+> This can be avoided by using u64_stats_t for the counters and
+> u64_stats_sync for the required synchronisation on 32bit platforms. The
+> synchronisation is a NOP on 64bit architectures.
 
-Hmm, and this workqueue work doesn't grab rtnl_lock, interesting..
-Let me add netdev_lock_ops just in case, won't hurt.
+As mentioned in my response to the cover letter, I'd want to see
+before/after 32bit assembly to ensure that this assertion is
+correct.
 
-> > > (and nit:) There's also a few places in the series (bnxt, ethtool
-> > > calling __netdev_update_features) where the lockdep
-> > > annotation/_locked() variant gets introduced before the patch adding
-> > > the corresponding lock.
-> > 
-> > This is mostly about ethtool patch and queue ops patch?
-> 
-> Patch 04 also adds a lockdep annotation to __netdev_update_features,
-> which gets call (unlocked until the ethtool patch) from ethtool.
-> 
-> > The latter
-> > converts most of the napi/netif calls to _locked variant leaving
-> > a small window where some of the paths might be not properly locked.
-> > Not sure what to do about it, but probably nothing since everything
-> > is still rtnl_lock-protected and the issue is mostly about (temporary)
-> > wrong lockdep annotations?
-> 
-> Yes, it's temporary (I didn't check the final bnxt patch to see if it
-> covers all paths).
-> 
-> > Any other suggestions?
-> 
-> I guess the alternative would be introducing netdev_lock where it
-> belongs before adding the lockdep annotations/switching to _locked()
-> variants.
-> 
-> Maybe it's not worth the pain of reworking this patchset if it ends up
-> in the correct state anyway, I don't know. Probably more a question
-> for the maintainers, depending on what they prefer.
+[...]
 
-SG! I did try to to do this initially (adding extra locking, then
-removing extra locking), but it seemed to only make everything more
-difficult to review (imo), so I reverted to a simplified way :-)
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> index 611ec4b6f3709..baff961970f25 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> @@ -501,7 +501,7 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+>  {
+>  	struct mlx5e_rq_stats *rq_stats = c->rq.stats;
+>  	struct page_pool *pool = c->rq.page_pool;
+> -	struct page_pool_stats stats = { 0 };
+> +	struct page_pool_stats stats = { };
+>  
+>  	if (!page_pool_get_stats(pool, &stats))
+>  		return;
+> @@ -513,11 +513,11 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+>  	rq_stats->pp_alloc_waive = stats.alloc_stats.waive;
+>  	rq_stats->pp_alloc_refill = stats.alloc_stats.refill;
+>  
+> -	rq_stats->pp_recycle_cached = stats.recycle_stats.cached;
+> -	rq_stats->pp_recycle_cache_full = stats.recycle_stats.cache_full;
+> -	rq_stats->pp_recycle_ring = stats.recycle_stats.ring;
+> -	rq_stats->pp_recycle_ring_full = stats.recycle_stats.ring_full;
+> -	rq_stats->pp_recycle_released_ref = stats.recycle_stats.released_refcnt;
+> +	rq_stats->pp_recycle_cached = u64_stats_read(&stats.recycle_stats.cached);
+> +	rq_stats->pp_recycle_cache_full = u64_stats_read(&stats.recycle_stats.cache_full);
+> +	rq_stats->pp_recycle_ring = u64_stats_read(&stats.recycle_stats.ring);
+> +	rq_stats->pp_recycle_ring_full = u64_stats_read(&stats.recycle_stats.ring_full);
+> +	rq_stats->pp_recycle_released_ref = u64_stats_read(&stats.recycle_stats.released_refcnt);
+>  }
+>  #else
+>  static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+
+It might be better to convert mlx5 to
+page_pool_ethtool_stats_get_strings and
+page_pool_ethtool_stats_get_count instead ?
 
