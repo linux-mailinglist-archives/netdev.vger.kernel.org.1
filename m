@@ -1,171 +1,267 @@
-Return-Path: <netdev+bounces-168682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E020A40289
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:18:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBFDFA402E7
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 23:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD467864684
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:18:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71B0B18959A0
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 22:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE1B204595;
-	Fri, 21 Feb 2025 22:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8282A20F083;
+	Fri, 21 Feb 2025 22:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2U+dnPK"
+	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="VHjwrsTL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bumble.maple.relay.mailchannels.net (bumble.maple.relay.mailchannels.net [23.83.214.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF882040A4;
-	Fri, 21 Feb 2025 22:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740176301; cv=none; b=KaHcJCgsEd726GrjAqnXqB70e31GZNkw82oMnXJ6+OGag2E1OhtwtDKA8OQKOz/7qornYgnhKd+FCr8qFdNPJ5K5Z6uI4wz9I3aQ+wF9geR94ixxi+lu9/r9hOu1YVdx5Cs4cS9haG9VjtENWwpRblXlvOijvcqvmlMSokAx/U4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740176301; c=relaxed/simple;
-	bh=p9H7eWFtI6uqcSrVYZwPwU1BZADxWA8u2LXEpyQb6Ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=glNX/KIswLhNMttuRI2u/wCwzM9uw4rosFwwbfoKMzaN8n5liKWpFOeq70USCGpjqQw2TRurgoU0nVnaOW1cYIatmw94HgZQC/hU07dj4DtdO3c8GHOiXOjN+MGCrW2zxMe4hF2Te9/dqrynm6aS+7cBg9kOhXe02mLKtG36GbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b2U+dnPK; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43989226283so18165245e9.1;
-        Fri, 21 Feb 2025 14:18:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740176297; x=1740781097; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ipxGsEkSd2zt5hVzi7gIQRAM/kjjmR0+rET13GoS3gg=;
-        b=b2U+dnPKg3OjAlN1MyhiIBVQ+m1aKOIJbm9ByGTZKGM8tgl4425roPQKYXygLWkMZq
-         Gy8QtYdJXJcdbosBUKZ7Yj4fFZLhes5poJJh08Nkx4hgjJyE82lVlykl3lDh45oL+4tO
-         ul0fi2XWWebZsCeRRJFuJOABuHlMfSUk888dBaLihGTGJUssn/dhH1DMOJGFb/i+EYyn
-         l066WYG9ypwQDmPCKl5940gU7khSqPjgy7fEw51LnbnRgK7Rd4kWzMHrSx84VTpwKtRd
-         Fabuiu1GV1hho4wbi0vsRnJyAq3WQsqj6zEVgQBXo08k25VnwQroBuU2YytKeSXvEEvX
-         Ey2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740176297; x=1740781097;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ipxGsEkSd2zt5hVzi7gIQRAM/kjjmR0+rET13GoS3gg=;
-        b=IjlMF9JLduimKKGJP9SeMwk8ljpafXeQR+G/08PqxHIZ6oFVQikIFyvc5RcP/kK9U1
-         g4gfMznllLERkGGpDb4vne0ih8TzHOTcrLwGBHCgtgkcfC40JUwMT+znCV5FnUsBQyaj
-         mjA+6lhFlyZusZvN7Nbqiv8ji9xouyXKwmAcvAz6ghSmKmQwEGZT7ku6LKX8Kgq0UEyy
-         JnSSp3moeolYfL6SGqnw0LKxzUA79u2f+bfcsIdeVgKG3rN54FE69E79dbvkTcrVjKXP
-         XXx7PFBEnnwiG+WUIjb8/s/rKChKjSUeu4T1HtZr62bqcN3u/8lD2zcX7pvniRcSL6Qf
-         ahFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuardKGLMNxEba/g1OzKbfPVBIhoymm3ECiWQ5DOr1RkZVWSQQm7/Fcuga0sicY6jlGx6Ss+j3hAMq4G0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWfK9e9VmFMKNIXlfrkeM1/4BoD5eztiqtZBHkh5gx/AwrhD/E
-	8vaoXfZuiqZjaGAATBzdHjW6EG+9CcikxlvbXO3DzjYNWC39UBoi
-X-Gm-Gg: ASbGncslOhr/jAwUSxvTaihSDe2lPVjUvlv/A5kWht5G0exlRWFIH9rbBZXqf3sM/ni
-	6szwv61zvfkz467UFrhwXz8aNEtHnYkwvyoQAG+8zBhVqjLQk42XcU1hc1WXWlFMgtxwvOfXGm0
-	fDL1Q7tXHPcimC/AQuYDYSCTdIL39v517Ln1aOWc7wCyccbg4L7NoNcBRh+SYMsxobQBfIAFNC8
-	s0eyLKH1qrGF6jdTKc2DRnRuvYjK9tgaH9hYtsLzzEpw/8zKRoWNXUyCnOxX6W9Adf3mRktieh/
-	Ta2FCRXqDtgLhN1LwuskLzPQP0eCJvly4vkm3mg6tIjBleHiJc98DWQDmglET5LQ
-X-Google-Smtp-Source: AGHT+IHfSNAxS9poe8hCk4HjjTTlxpVzxb3L3wSfcoQW9kHs/5esAuFuB29zyHNCAXBmcj+Hc+dXZw==
-X-Received: by 2002:a05:600c:4e86:b0:439:9f19:72ab with SMTP id 5b1f17b1804b1-439b6afbbe3mr21474455e9.23.1740176297168;
-        Fri, 21 Feb 2025 14:18:17 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02e6cf4sm29222245e9.19.2025.02.21.14.18.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 14:18:16 -0800 (PST)
-Date: Fri, 21 Feb 2025 22:18:15 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
- nick.child@ibm.com, pmladek@suse.com, rostedt@goodmis.org,
- john.ogness@linutronix.de, senozhatsky@chromium.org
-Subject: Re: [PATCH net-next v3 1/3] hexdump: Implement macro for converting
- large buffers
-Message-ID: <20250221221815.53455e22@pumpkin>
-In-Reply-To: <Z7jLE-GKWPPn-cBT@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20250219211102.225324-1-nnac123@linux.ibm.com>
-	<20250219211102.225324-2-nnac123@linux.ibm.com>
-	<20250220220050.61aa504d@pumpkin>
-	<Z7i56s7jwc_y0cIz@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-	<20250221180435.4bbf8c8f@pumpkin>
-	<Z7jLE-GKWPPn-cBT@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1852397BF
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.214.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740177517; cv=pass; b=JNjrPyvZz6GvfXuVawrFTl9CsZif1AbijTjNij68h0uvzgjsZzOASDsQzPxdNWmbzxhtbqvH6dm7fhbbzEcw2BNOEC7E+h4GbKMk2k4KrRQ9H5uCM2AaFbEIJh/TCD1C2x3keNkS619kjuSbKmrilXaROVnJ/2AIe7wJuGTrt54=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740177517; c=relaxed/simple;
+	bh=9AiURpy5+R8gJDma4ZT4sR33rNzMijv+iTmDFgc4Sxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eQgN3NqL/vrbJywNeum8syy3yTkFC+dv5ZW8XD1SGvr5cMv72Hq282BADRidCudCU7LP71Yjwfpe1or04UDi9w4VyblMyVh+0FMj+uNyW6+X+g08nsCgc4PFw4sw/M+zSfT6DdLmYu8Z4Ybxo8wxoo1Yt/s5ZT8bGnydn2mVF7E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=VHjwrsTL; arc=pass smtp.client-ip=23.83.214.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id C0210844A3F
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:21:48 +0000 (UTC)
+Received: from pdx1-sub0-mail-a248.dreamhost.com (100-105-11-97.trex-nlb.outbound.svc.cluster.local [100.105.11.97])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 749A58448E1
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 22:21:48 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1740176508; a=rsa-sha256;
+	cv=none;
+	b=4+zPv/Yn0LsAHsHEzKbWRU4Kq8VOttfayUf4lgnmQbFB1SNXiySWe/ttpL3Hj9zm2QLimy
+	C03EjM36HsivBpy0xioKQFqgNVt6DqyPa4gCBL+eCWPj1kim3f8PGFytLDKID7/LnZh2ya
+	Va2xtbmL6+OwQ79XIMXpEGUdD56rH7IvGadgqafxrEnxNmEsydJWBUo2la5ls6fHDEaKT7
+	o8VXxPKS1//5FIRcgdwAXQKaw40EiRzhsA6BgecwHnuLVsDyLeFQArvPlQLNGRJNeUaJ8y
+	9I1ju/bNnyQx1HJbUZEhvnSU7o5jrHgUbzgcLlqDh5+b1x3UJ6BuEZBy88/OMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1740176508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 dkim-signature; bh=SLywbHCLFlDtyJM4PIS4UgxATDmGldjtWxcXN7vCIu4=;
+	b=3c0o1uJ9lM87O6TiYMuIyvu0wsn8TJB8651GuekcmXzOxaFi2ttkcI/B6K5rhTlHIHyCaC
+	YmGhuDqbo3/ix6pROTzppd7Q1dS39t0gqIhdHkinHrLkWgQDi7NWRkxp4iirnN2elWsPWZ
+	tfkYZwwO6idGPEwLQ97WZH/jrYmgd3Wiza9T8zhvyIBb3i9RAEtVHSpk4XhdCJ2Vi8KOOa
+	CbHnPOKMn02544eacGjifI3DO+XswZXY+FzU67FiqcAoqO2bhAE6J/b1W2RonKcPZ2yLgo
+	n5zkPy+QQBu9kx2SBPjSQs8l5CtWozdsVznGk0koeVeDSUZ6+hCx6FkilFwpLQ==
+ARC-Authentication-Results: i=1;
+	rspamd-78ddd997cc-w9rnd;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MailChannels-Auth-Id: dreamhost
+X-Oafish-Juvenile: 0d726792692c29f9_1740176508682_4090014334
+X-MC-Loop-Signature: 1740176508682:1043141164
+X-MC-Ingress-Time: 1740176508682
+Received: from pdx1-sub0-mail-a248.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.105.11.97 (trex/7.0.2);
+	Fri, 21 Feb 2025 22:21:48 +0000
+Received: from kmjvbox.templeofstupid.com (c-73-70-109-47.hsd1.ca.comcast.net [73.70.109.47])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kjlx@templeofstupid.com)
+	by pdx1-sub0-mail-a248.dreamhost.com (Postfix) with ESMTPSA id 4Z04Nr0ycyzmv
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:21:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
+	s=dreamhost; t=1740176508;
+	bh=SLywbHCLFlDtyJM4PIS4UgxATDmGldjtWxcXN7vCIu4=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=VHjwrsTLU5Uob/P46sOlEdEUBaYhu6habDOgD8IYpPWhBqcJY/Z3MsTw0E9mgHo/i
+	 z4TIdpIQbkCIl7IvnA6STE/YepIA5eo4dxNoVQfwcNKOD+NE1M39Nc/ipkhDyuTYOU
+	 soNuNxG1HAl+ns5rDabPgGScfD+bFatge7JpQogsZlvETltcv/iD/VZU/miSQoBeLl
+	 tZQq7uOfcV4gyCzV3TyTRJhnaxVO9fQQVwp+D840r3A69mMIEdZ1pShIf5kS1a6Gy3
+	 nHAYjHB3peOUUt5Ngp3/ECIObPudxL4bxRRC7Ev+c9zzZz5CwzqRPsiJPfd+QHQCJf
+	 XrNppiU/uNW+w==
+Received: from johansen (uid 1000)
+	(envelope-from kjlx@templeofstupid.com)
+	id e0047
+	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.12);
+	Fri, 21 Feb 2025 14:21:46 -0800
+Date: Fri, 21 Feb 2025 14:21:46 -0800
+From: Krister Johansen <kjlx@templeofstupid.com>
+To: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>
+Cc: Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH mptcp] mptcp: fix 'scheduling while atomic' in
+ mptcp_pm_nl_append_new_local_addr
+Message-ID: <20250221222146.GA1896@templeofstupid.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Fri, 21 Feb 2025 12:50:59 -0600
-Nick Child <nnac123@linux.ibm.com> wrote:
+If multiple connection requests attempt to create an implicit mptcp
+endpoint in parallel, more than one caller may end up in
+mptcp_pm_nl_append_new_local_addr because none found the address in
+local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
+case, the concurrent new_local_addr calls may delete the address entry
+created by the previous caller.  These deletes use synchronize_rcu, but
+this is not permitted in some of the contexts where this function may be
+called.  During packet recv, the caller may be in a rcu read critical
+section and have preemption disabled.
 
-> On Fri, Feb 21, 2025 at 06:04:35PM +0000, David Laight wrote:
-> > On Fri, 21 Feb 2025 11:37:46 -0600
-> > Nick Child <nnac123@linux.ibm.com> wrote:  
-> > > On Thu, Feb 20, 2025 at 10:00:50PM +0000, David Laight wrote:  
-> > > > You could do:
-> > > > #define for_each_line_in_hex_dump(buf_offset, rowsize, linebuf, linebuflen, groupsize, buf, len, ascii) \
-> > > > for (unsigned int _offset = 0, _rowsize = (rowsize), _len = (len); \
-> > > > 	((offset) = _offset) < _len && (hex_dump_to_buffer((const char *)(buf) + _offset, _len - _offset, \  
-> >           ^ needs to be buf_offset.
-> >   
-> > > > 		_rowsize, (groupsize), (linebuf), (linebuflen), (ascii)), 1); \
-> > > > 	_offset += _rowsize )
-> > > > 
-> > > > (Assuming I've not mistyped it.)
-> > > >     
-> > >
-> > > Trying to understand the reasoning for declaring new tmp variables;
-> > > Is this to prevent the values from changing in the body of the loop?  
-> >
-> > No, it is to prevent side-effects happening more than once.
-> > Think about what would happen if someone passed 'foo -= 4' for len.
-> >  
-> 
-> If we are protecting against those cases then linebuf, linebuflen,
-> groupsize and ascii should also be stored into tmp variables since they
-> are referenced in the loop conditional every iteration.
-> At which point the loop becomes too messy IMO.
-> Are any other for_each implementations taking these precautions?
+An example stack:
 
-No, it only matters if they appear in the text expansion of the #define
-more than once.
-It may be unlikely here, but for things like min(a,b) where:
-#define min(a, b) ((a) < (b) ? (a) : (b))
-causes:
-	a = 3;
-	b = min(a += 3, 7);
-to set b to 9 it has to be avoided.
+   BUG: scheduling while atomic: swapper/2/0/0x00000302
 
-> 
-> Not trying to come off dismissive, I genuinely appreciate all the
-> insight, trying to learn more for next time.
-> 
-> > > I tried to avoid declaring new vars in this design because I thought it
-> > > would recive pushback due to possible name collision and variable
-> > > declaration inside for loop initializer.  
-> >
-> > The c std level got upped recently to allow declarations inside loops.
-> > Usually for a 'loop iterator' - but I think you needed that to be
-> > exposed outsize the loop.
-> > (Otherwise you don't need _offset and buf_offset.
-> >  
-> 
-> As in decrementing _len and increasing a _buf var rather than tracking
-> offset?
-> I don't really care for exposing the offset, during design I figured
-> some caller may make use of it but I think it is worth removing to reduce
-> the number of arguments.
+   Call Trace:
+   <IRQ>
+   dump_stack_lvl+0x76/0xa0
+   dump_stack+0x10/0x20
+   __schedule_bug+0x64/0x80
+   schedule_debug.constprop.0+0xdb/0x130
+   __schedule+0x69/0x6a0
+   schedule+0x33/0x110
+   schedule_timeout+0x157/0x170
+   wait_for_completion+0x88/0x150
+   __wait_rcu_gp+0x150/0x160
+   synchronize_rcu+0x12d/0x140
+   mptcp_pm_nl_append_new_local_addr+0x1bd/0x280
+   mptcp_pm_nl_get_local_id+0x121/0x160
+   mptcp_pm_get_local_id+0x9d/0xe0
+   subflow_check_req+0x1a8/0x460
+   subflow_v4_route_req+0xb5/0x110
+   tcp_conn_request+0x3a4/0xd00
+   subflow_v4_conn_request+0x42/0xa0
+   tcp_rcv_state_process+0x1e3/0x7e0
+   tcp_v4_do_rcv+0xd3/0x2a0
+   tcp_v4_rcv+0xbb8/0xbf0
+   ip_protocol_deliver_rcu+0x3c/0x210
+   ip_local_deliver_finish+0x77/0xa0
+   ip_local_deliver+0x6e/0x120
+   ip_sublist_rcv_finish+0x6f/0x80
+   ip_sublist_rcv+0x178/0x230
+   ip_list_rcv+0x102/0x140
+   __netif_receive_skb_list_core+0x22d/0x250
+   netif_receive_skb_list_internal+0x1a3/0x2d0
+   napi_complete_done+0x74/0x1c0
+   igb_poll+0x6c/0xe0 [igb]
+   __napi_poll+0x30/0x200
+   net_rx_action+0x181/0x2e0
+   handle_softirqs+0xd8/0x340
+   __irq_exit_rcu+0xd9/0x100
+   irq_exit_rcu+0xe/0x20
+   common_interrupt+0xa4/0xb0
+   </IRQ>
 
-Except the loop body needs it - so it needs to be a caller-defined name,
-even if they don't declare the variable.
+This problem seems particularly prevalent if the user advertises an
+endpoint that has a different external vs internal address.  In the case
+where the external address is advertised and multiple connections
+already exist, multiple subflow SYNs arrive in parallel which tends to
+trigger the race during creation of the first local_addr_list entries
+which have the internal address instead.
 
-	David
+Fix this problem by switching mptcp_pm_nl_append_new_local_addr to use
+call_rcu .  As part of plumbing this up, make
+__mptcp_pm_release_addr_entry take a rcu_head which is used by all
+callers regardless of cleanup method.
 
-> 
-> Thanks again,
-> Nick
+Cc: stable@vger.kernel.org
+Fixes: d045b9eb95a9 ("mptcp: introduce implicit endpoints")
+Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+---
+ net/mptcp/pm_netlink.c | 19 ++++++++++++-------
+ net/mptcp/protocol.h   |  1 +
+ 2 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index c0e47f4f7b1a..4115b83cc2c3 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -967,9 +967,15 @@ static bool address_use_port(struct mptcp_pm_addr_entry *entry)
+ 		MPTCP_PM_ADDR_FLAG_SIGNAL;
+ }
+ 
+-/* caller must ensure the RCU grace period is already elapsed */
+-static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
++/*
++ * Caller must ensure the RCU grace period is already elapsed or call this
++ * via a RCU callback.
++ */
++static void __mptcp_pm_release_addr_entry(struct rcu_head *head)
+ {
++	struct mptcp_pm_addr_entry *entry;
++
++	entry = container_of(head, struct mptcp_pm_addr_entry, rcu_head);
+ 	if (entry->lsk)
+ 		sock_release(entry->lsk);
+ 	kfree(entry);
+@@ -1064,8 +1070,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 
+ 	/* just replaced an existing entry, free it */
+ 	if (del_entry) {
+-		synchronize_rcu();
+-		__mptcp_pm_release_addr_entry(del_entry);
++		call_rcu(&del_entry->rcu_head, __mptcp_pm_release_addr_entry);
+ 	}
+ 	return ret;
+ }
+@@ -1443,7 +1448,7 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
+ 	return 0;
+ 
+ out_free:
+-	__mptcp_pm_release_addr_entry(entry);
++	__mptcp_pm_release_addr_entry(&entry->rcu_head);
+ 	return ret;
+ }
+ 
+@@ -1623,7 +1628,7 @@ int mptcp_pm_nl_del_addr_doit(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	mptcp_nl_remove_subflow_and_signal_addr(sock_net(skb->sk), entry);
+ 	synchronize_rcu();
+-	__mptcp_pm_release_addr_entry(entry);
++	__mptcp_pm_release_addr_entry(&entry->rcu_head);
+ 
+ 	return ret;
+ }
+@@ -1689,7 +1694,7 @@ static void __flush_addrs(struct list_head *list)
+ 		cur = list_entry(list->next,
+ 				 struct mptcp_pm_addr_entry, list);
+ 		list_del_rcu(&cur->list);
+-		__mptcp_pm_release_addr_entry(cur);
++		__mptcp_pm_release_addr_entry(&cur->rcu_head);
+ 	}
+ }
+ 
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index ad21925af061..29c4ee64cd0b 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -250,6 +250,7 @@ struct mptcp_pm_addr_entry {
+ 	u8			flags;
+ 	int			ifindex;
+ 	struct socket		*lsk;
++	struct rcu_head		rcu_head;
+ };
+ 
+ struct mptcp_data_frag {
+-- 
+2.25.1
 
 
