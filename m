@@ -1,146 +1,161 @@
-Return-Path: <netdev+bounces-168418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F52A3EF31
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:54:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B30DA3EF5C
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3DB03B53D0
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 08:53:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4C5919C3718
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 09:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C49520124F;
-	Fri, 21 Feb 2025 08:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8562036E8;
+	Fri, 21 Feb 2025 09:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcZy8D0z"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u07y66J+";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="q5R1m988"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20D633EA;
-	Fri, 21 Feb 2025 08:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25944200110
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 09:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740127992; cv=none; b=GUKpvNrUHfnUhsvvPS1hSNjjn3UFyue+6mAphZSAmvYTHTDMav+rKP6zD2of3fk9UsJbOvUOUlCqwk+3+8LWW+8gPeEamS+gNbZIWERVNJ2oTALd3AyjecXJBsvyc4hNtBxJHAbqU9//U/RU837bHS0n/hukf7bSIW+zE/ffP+w=
+	t=1740128498; cv=none; b=ihJOvViEfcOjkEzGBcKwnkgirwqU97DEnhqivHB5hu230H7Y+cWV2rp1fkmvvW5f0CGqzXNDPC14G4SR2Snd+08OPtTiayVhLpBkscS4+kfG2k9FM6J5AEk26PjfHoUEVbQ3I+O1PDpZJPMMOq9S1rHGtPnEjrKHIImve7j5DIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740127992; c=relaxed/simple;
-	bh=AvdfNC/0fw6razFiLTY/gc9KZ7drgzB6pWKOjhOrLtc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D5WtD3qdRA22DNJoXD+ru+V9A+bepUJJG//is+yzlLlmi1VnUWS5kignSryzXr3tnPynqCi6lPrC5hbpm39lkPRnF9IiJ1y2mGnBBey1QuLb7QSrRvr5zdIqVAaobkKRc9YL1qf5H0TBOVA4eFv9HFC52tvSUvfqf6yAZQ+CTqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcZy8D0z; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6f7031ea11cso16164097b3.2;
-        Fri, 21 Feb 2025 00:53:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740127989; x=1740732789; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+jR358HQpp23LJWIOUBf9DeNyqJuGtgcMhAeCjLmW/U=;
-        b=BcZy8D0zto9bjrGUALgdbZvc/nZroEIhS+3OzzreZRG1XCfkn0YF4qhIHHK+Q5e8ss
-         xpUUiFx5evDgFkzF7l/J9VCLs0ldWZW4VZgb+v85U51vsbBmSTDraa8A8bceAdyG+0op
-         9l6JhmrVQPTtN9eQmMD+V6nCj/Agt9uFezCu/lBqhT388n834In7S2Cjf0qmmdK1WxW+
-         KVnRTTGDIJfEZ4inqnv8Ndm3MsSGsArgo8q6opvKAWSllktM1+CHF9+wVZ99EcLZMIX1
-         qngGiMpvKREXrxJq+ravfW3qkU8y+yITohanqx14OhPZH9VQNFFKmkeUqjEX/ZqkpRjt
-         aoVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740127989; x=1740732789;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+jR358HQpp23LJWIOUBf9DeNyqJuGtgcMhAeCjLmW/U=;
-        b=pw1KJiewqGZO3Ul9nb8hHiNzAVD11V9i1+Jl/4RMcL6dHn8ZY2kK4fTIcun4buoTyR
-         1Wv+DDLwxf8PXSCyyY/aP4koG0i0Wcty4GbHFLxLjTxFesvrxugmdAWL1maUzSUofgaP
-         83GBfxdaNYffycF8jugevhy/DTeRLAYbOuQPo9ha2ieCBmAhTgI0wPw9w0lrRUcFpUf1
-         vmvKMZ5HF72yykvhgSKS83gYbbd6gaoE4X3GVpHFQoBKA4Vdhohvr/jpiNLFV22G//MB
-         zuQi3ELw0Or33aHOBb3Y/mjJhrTyGsM2zWYl+3HP9llZBvGjnWT4UnRARsfUanRxFhIw
-         BQ0w==
-X-Forwarded-Encrypted: i=1; AJvYcCU5mJSkHEHcZB9YiY89VxGl/C0YHD3jckCLQhsecmaZAHyWhzV5s4/JCRvTDehV//N9qobuO38c0E8d@vger.kernel.org, AJvYcCUQZywXUxSOFy8zYuyqYGUDww2mrqurpkBs3FFB+yVCwiVsSGyLqz4Q2Onk5PBxdazI9vZrc8XwO6YXIkE=@vger.kernel.org, AJvYcCV39mu1d6k0eholjyEd+3JQR9ynfMX15am0fqvQlReoZ2hWMBrZ5KHEkgK77naQ7GCHb8W3UCMBVUx3@vger.kernel.org, AJvYcCVyp2XVrou/0GVWi45WLX96f4CWtdRiSaeHnLWGMQbxQAFbYO4leZnu1/RcR42kklW8r7DZNaw+yVozjTQJ@vger.kernel.org, AJvYcCW0JhW8LWooe3xt+9zXjSuOt4532MYJGFruWC9LyDsa6LfVeG9BXQs9FwuJf3qS/bwfBBDCfrn4F0c=@vger.kernel.org, AJvYcCW9LyWJKwZ3EL8Vbca7I5pfs69dfv233WjskQqwBs+M/EbeR6R0iC8t0YS0nX3O38CwIF6HvlUpWJZDCh734OQ=@vger.kernel.org, AJvYcCWRVG0Mts+744JG/7ZKH2aCfXi0Fe3re02d5m82mnDp6ie66LFlbWlUwyOnTqpM+G+rEEoU8xBnn3mpQQ==@vger.kernel.org, AJvYcCWsLr7OIjJiAEAYKzCGeMsWLxYiC2LskkBF2tf0L+bQh69YcU6/6sknu0vz8Agd6aaN0012JGDyt7Lq@vger.kernel.org, AJvYcCXkA87qHcCLpd67LPxH5FwH9v5v7pP2y+6jU7YCV6e5q605S7mE97+YTrAxH8xGbaPxSqt2F0j8@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfD4zQQMt5vn+FYW7Dj3JFe+lmrTe6Fo6WCx2B/WMMmMNETNyC
-	VAByooZInZeknR7VEJUJiOoxLdlr4nn+8LOW778KnNny8xfbRLwUWPuYUhOA2fgkOdKltsWVZtH
-	44CfuiUJklvc05xyuMmw5Uno4OJ8=
-X-Gm-Gg: ASbGncuTtMSpJjKNNJKVNMmu3n09ys+BHDXvKGdFVYQ3Xwy7BH+3mxVOjrcD2fmMSKs
-	0amYW/mMMO13TE/Dxq2REksD088qPhGSfbAerx/7R4lyFvkJN5NX1w3wsvDTHkwfv5pUgeDwzbG
-	K+DEFOQcNdNOW0mbK7tDUz4+og6CXuqUnn55RTV36ntw==
-X-Google-Smtp-Source: AGHT+IFFTv7mQS14e9HKcqRG3/KsgEtYDi7b0s/xnrbTYOGNNlU/jBMS8OnkWwa2w46rPzinCnYjeg60XgLeZT96Nxo=
-X-Received: by 2002:a05:690c:6404:b0:6f9:a33a:4c09 with SMTP id
- 00721157ae682-6fbcc25ef84mr21019997b3.18.1740127989379; Fri, 21 Feb 2025
- 00:53:09 -0800 (PST)
+	s=arc-20240116; t=1740128498; c=relaxed/simple;
+	bh=r9rBCmeQKzxhIzCh4QeTAQRwIUZN3cU/99UjTTkhDFk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tVy+8IDGKJaDT31ljhc3rbB6XyINv73RRke0plYw7cTv/iDusQVdTVBmcmC0MzkyIORTdOarypB1x2YhwDwM0nRcCAVStN7GQAuxeOSho1sybvFMSVBWlXcxceIsiemYWi6lSShzibkuoRf/KuJlP1/0AQs//UfMjJ7TqKTCqec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u07y66J+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=q5R1m988; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1740128495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UwYnNoDhPmLp2LRB/MupwvXiwDscd4G1TWpjxtDLSkM=;
+	b=u07y66J+eauJ37KDcFDyBnapa1Jzo2dpj2akzcrFdrpmxTWAop5tvZn5wS68lklRXDW/Sh
+	2fNE/20efuCVZifp0fFYTjA26aIzKnj7e/VGJsROL0djKl9dbsSCq/A9PuT/NyXHGiyz7x
+	6RcMZ082C8CBN+kY+rMSd9WEdDS3PQScM/3xEN/WS0OtvjmJ7lfkhkAD/oEf0ZXff1AQ+K
+	f4uxsxpYPLuYVzRwNObaaGiI5m50epQvGcHEsyt78sM7Pr4JCfUXkE2x38WK+wjo5bOG88
+	c9egF4bo1Fq1MGBF8EuoQz1Yzmav6KQYNG8IOKkCxilh4niPwUh5lz7VsY5iMg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1740128495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UwYnNoDhPmLp2LRB/MupwvXiwDscd4G1TWpjxtDLSkM=;
+	b=q5R1m9888X+oKhVUlab1XBjhnqVOiAkSzWy35UGyQ5gqKzCYM10r74Q20FAL1jw1TQ3NW5
+	47IgEgERocOomADQ==
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next] igc: Change Tx mode for MQPRIO offloading
+In-Reply-To: <6ff37238-ff0e-43c9-a88d-1258fd4ce7ef@linux.intel.com>
+References: <20250217-igc_mqprio_tx_mode-v1-1-3a402fe1f326@linutronix.de>
+ <6ff37238-ff0e-43c9-a88d-1258fd4ce7ef@linux.intel.com>
+Date: Fri, 21 Feb 2025 10:01:33 +0100
+Message-ID: <87wmdj8ydu.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-5-a0282524688@gmail.com> <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
- <CAOoeyxX4guHzUap1ieQ_L3PrvpBAYbMiQKrb6ko=MGsF5RcXLg@mail.gmail.com> <20250221-light-neat-doberman-1166a5-mkl@pengutronix.de>
-In-Reply-To: <20250221-light-neat-doberman-1166a5-mkl@pengutronix.de>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 21 Feb 2025 16:52:58 +0800
-X-Gm-Features: AWEUYZk6by-3vXQ6oDlfBy8kG3O6ZrNx-AUodUyxeYU9X_L9LPdI1eCwguWgvdM
-Message-ID: <CAOoeyxXaCdFS+BLh_2ESyHF3Sf50iVM2A7ys5R+sRFx4gK_U0Q@mail.gmail.com>
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B42=E6=9C=8821=
-=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=884:08=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> On 21.02.2025 16:01:07, Ming Yu wrote:
-> > Hi Marc,
-> >
-> > Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B42=E6=9C=
-=887=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=888:15=E5=AF=AB=E9=81=93=
-=EF=BC=9A
-> > >
-> > > > +static irqreturn_t nct6694_can_irq(int irq, void *data)
-> > > > +{
-> > > > +     struct net_device *ndev =3D data;
-> > > > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > > > +     struct nct6694_can_event *evt =3D priv->event;
-> > > > +     struct nct6694_cmd_header cmd_hd =3D {
-> > > > +             .mod =3D NCT6694_CAN_MOD,
-> > > > +             .cmd =3D NCT6694_CAN_EVENT,
-> > > > +             .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, NCT6694=
-_CAN_EVENT_MASK),
-> > > > +             .len =3D cpu_to_le16(sizeof(priv->event))
-> > > > +     };
-> > > > +     irqreturn_t handled =3D IRQ_NONE;
-> > > > +     int can_idx =3D priv->can_idx;
-> > > > +     int ret;
-> > >
-> > > it would make sense to have a event pointer here instead of the can_i=
-dx?
-> > >
-> > >         const struct nct6694_can_event *event =3D &priv->event[priv->=
-can_idx];
-> > >
-> > The CAN Event command always returns 16bytes: the first 8 bytes
-> > correspond to the CAN0 event, and the last 8 bytes correspond to the
-> > CAN1 event. Therefore, the event pointer here refers to both event
-> > buffers.
->
-> Yes, but in the following code uses "priv->event[can_idx]" several
-> times, this is why I proposed to have a dedicated "struct
-> nct6694_can_event *event" variable.
->
-Okay, I'll update the code.
+On Fri Feb 21 2025, Abdul Rahim, Faizal wrote:
+> On 17/2/2025 7:45 pm, Kurt Kanzenbach wrote:
+>> The current MQPRIO offload implementation uses the legacy TSN Tx mode. In
+>> this mode the hardware uses four packet buffers and considers queue
+>> priorities.
+>>=20
+>> In order to harmonize the TAPRIO implementation with MQPRIO switch to the
+> Missed "," ?
+> In order to harmonize the TAPRIO implementation with MQPRIO, switch to the
 
+Ok.
 
-Thanks,
-Ming
+>
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethe=
+rnet/intel/igc/igc_tsn.c
+>> index 1e44374ca1ffbb86e9893266c590f318984ef574..6e4582de9602db2c6667f173=
+6cc2acaa4d4b5201 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> @@ -47,7 +47,7 @@ static unsigned int igc_tsn_new_flags(struct igc_adapt=
+er *adapter)
+>>   		new_flags |=3D IGC_FLAG_TSN_QAV_ENABLED;
+>>=20=20=20
+>>   	if (adapter->strict_priority_enable)
+>> -		new_flags |=3D IGC_FLAG_TSN_LEGACY_ENABLED;
+>> +		new_flags |=3D IGC_FLAG_TSN_QBV_ENABLED;
+>>=20=20=20
+>>   	return new_flags;
+>>   }
+>
+> IGC_FLAG_TSN_QBV_ENABLED is set multiple times in different lines:
+>
+> 	if (adapter->taprio_offload_enable)
+> 		new_flags |=3D IGC_FLAG_TSN_QBV_ENABLED;
+>
+> 	if (is_any_launchtime(adapter))
+> 		new_flags |=3D IGC_FLAG_TSN_QBV_ENABLED;
+>
+> 	if (is_cbs_enabled(adapter))
+> 		new_flags |=3D IGC_FLAG_TSN_QAV_ENABLED;
+>
+> 	if (adapter->strict_priority_enable)
+> 		new_flags |=3D IGC_FLAG_TSN_QBV_ENABLED;
+>
+> 	return new_flags;
+> }
+>
+> We can combine the conditions to simplify:
+> 	if (adapter->taprio_offload_enable ||
+>              is_any_launchtime(adapter) ||
+>              adapter->strict_priority_enable)
+> 		new_flags |=3D IGC_FLAG_TSN_QBV_ENABLED;
+
+Sure.
+
+Should I send a v2 or do you want to carry this patch in your next fpe
+series?
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAme4QO0THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgh0qD/9XL1gTqU5iRLiQwEpYlubwGg2K/UQY
+/8aVDtneU77knwNaef98gMahwyId3kUhVVxOER9iiWYVmmj/MnAJOHdjBnkbB2Gb
+Uz9G2imrxmMQotLqPfApvcs+sweMBNc+tLS7xHYQuaPf5A8cwzrncdEHOKxxKVBj
+EvGH4gN3CS6rR7vf8PgsJTlNOkvNlFyn4O8Rv7BrpxhTn8frSXoqzPUW/r3bW1by
+otFkXHALqdiL+BvjNtaSeQ6BxANW5zoFMVJXg7erIpVYfT+WKWACD6kDp/ht5Isr
+D1GeFO3V+VxuCqSLHIwPVO5MHG0E6Qy4+T1tbNZInU0RXToFqjXj2cb3ea34I9/E
+pPb7DIJ8VRSBfWPXakwUdpuWKIhiRSCxS1kIlBU07+mouTRjsmDsd1/Mv6riNfaJ
+3aN5HMskynCsgAkyT2t2E76EjUqcYpyvlL9AWCcvu2PqR6BNsjan/d/KUW1gLtdN
+pAdnibQ2j8ZvqnZrulcoEc79Lz0I/5zmerjd7h0yg/HfxVkDI5i/YPcJ88n/I4PI
+V1IBOeGmR8KGRijf7UJGdWfZdUbZWbxHyts+TLHhQdHx3xs14kphgCfl0TDnssbM
+RoOp1FuR1jA74Q88xBlU/hmb6UCrSLmk7Q0Ep6yxPJlk/OWBnOEyPRtJwNGVV6qx
+SRG02XOCIL8mjw==
+=ZeO1
+-----END PGP SIGNATURE-----
+--=-=-=--
 
