@@ -1,230 +1,151 @@
-Return-Path: <netdev+bounces-168572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13EC8A3F5C8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:22:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8A7A3F608
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:33:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C418609B8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:18:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EF163B6D38
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC79920E6E1;
-	Fri, 21 Feb 2025 13:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8C320E70D;
+	Fri, 21 Feb 2025 13:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SKYK1koq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CIf3ZSMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF3E208A7;
-	Fri, 21 Feb 2025 13:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6663820D4E8;
+	Fri, 21 Feb 2025 13:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740143878; cv=none; b=vBUzaeA5P1d2TyZ8oViZ+TpN/jO6U905sHAJUOpINfpQKytt4JjMCr6TEWKSTW+ktu92EL/6UzR/kLir9m3XZIbzT3mpP+mve/4Vg5vnIYnXB3+7k3qccebQSNvRjzOUUuRnjPREnI2ICN8gtcVbzm1pqPxAp4J+a+0Ythp+Lqc=
+	t=1740144625; cv=none; b=AKPV/Z/25EmoLsZVhPUvXNLg1/xcrsidcRnZnOqjtl2D/i0EfXi7GqBBBX3XAnWJY9S+NjEKvqLaVt3cODqCeKlMWZLC7YqNMNf3gNZHhbYU7lmozUtaaXEi31r9rEKVz5Xt5GhjzPqpfAIROHAzaTnZlD+Ic6rrRfELW9m5yzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740143878; c=relaxed/simple;
-	bh=DT9iRaIBL+udRMxD97hQUdsy12XVo3Yu70K5bIC7KA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ckW4hKsme0nbzzfPK4iZ5DUpEb/MDiZJNcwioddKYAvOouhRpHQZdphRPG8/xzJrDfDKaSgroYR5XL3HxxFIo4IqVXPbf6sTEbtx2tgsDIiiJLB1V/B9eBRb2qSth55neV2XrH3Yg+p8hyT3QTQChUd0H1hVc/5GfhdIEPxJkOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SKYK1koq; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4399deda38cso12715605e9.1;
-        Fri, 21 Feb 2025 05:17:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740143875; x=1740748675; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pxdkO4eWzOxPQ8e7BEH1y1sIplAqxNP+2Y/WjifVMvg=;
-        b=SKYK1koqKRU8ILVWPCFMz2hFueMQ03hzECDL4lQcHW0vRuK4/+JCpdF6ZnnpbyK3KA
-         1tfrBUMR1jHT1Ks+iiaC3Ljcx2qEEhrPiStNGnD7BQuGTc3Q3plZqbfW9n80/CZQBToG
-         aOi0i/H2xi3yFP3oNqSfVc2Nkv8ivHPiBnRI7rliIaygr7IM6t+rAAeevvtVTB+8Haut
-         q0KsBkMYRQ4PiimrQZnuF8ck1Qy8Q+BRfdZmC9/ez4HSN9IHUkTOlE/zs9KSPV7/NfwL
-         GWSVQkVVwSB93omIFvXebkbdmCot65bIKXcvGd4DWjcefWeS9T1xi7gcwu4PUk4RWDAU
-         gDFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740143875; x=1740748675;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pxdkO4eWzOxPQ8e7BEH1y1sIplAqxNP+2Y/WjifVMvg=;
-        b=dqP6RUcwzh7b2r2O8SD23zHEPau7TUh+ZWQRw2FGy+t2p061Fu/f0IABBr6buRn9Rz
-         BBA991R7f9WPVydm/Y7T6DAIP2uq65EKPrZCnCNqHkcHHzrenPbA//igCosqLjMlqdtx
-         dEb2r/MjCXW/NXFQu+pZeT+UpJ6P3EdVKAhUxSlOrWwddw0szwqelYr2hl1C7x9oFQX5
-         MMcYVvcNA8PUdai+3P1rfiNDEzKKWzh0HAzFFSizy+JqQmKS8/h0D6hDiAIGcpIVKvOh
-         DI1Bt3V1Z50OAhfBg57FC4cbMgUXNEbOi1GSvORu/RGG9t9bq6QDUhVAVMqCiJ76r1Dy
-         DvsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUyaEKhNO4unm+h91uby5erwe+kqZFggUeXL2J58CkRzyk/d+HMEsU82YlVZ9sg8EYXZH+Xpu30@vger.kernel.org, AJvYcCVKhqVpYCSpYv5D5OUpvoOWGKcH9Nhxczl0EjU47tVmLWVNwlPfR7xehF1BBSdLUEuxnI0ps6pO9NP7aZs7@vger.kernel.org, AJvYcCVKzS8qfpEL7pX4SOf3eDaaHh1xpcBO+VwMNEI6YRJ1jV3Gbmng9AUe5i1pHerdVS4UPaluAYDZXmWcGyqqmpM=@vger.kernel.org, AJvYcCVO4iE/aqFoQhB4b9c6BeZpNhNlgIdiHL4p3cx4gG9FjJZu24DJgg0otWiD1amL3FNRfuNaigGu1po=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9KYOC2cknAEkIGj7ciKvKO+amTWTvUBNqcFjYAx9Q5lNyUpL6
-	J/+Vh3Vbu/6uSm5JPOubhJqi4JXUWu1CTok7JW7PDD2T5lolWaV/
-X-Gm-Gg: ASbGnctPwJ6XlH2mrBbJqbvzwFgzTE+4be556F+yRSgW6LdLR9PMKGt7zMSTFDZIBfA
-	5yyNCnh03TXBNyeRY2Yg2Hq98vf0qECGxv/iX8fihB2eMqwmBiBPyhpOgt2LB7pcVWpUBtFG1K3
-	aEZ158Uduj/PE7gqVboBfQ+KDdm3kXAYwSRBufBM4HYcf30oyn1583uMTK6/7kF+oVx1ZNUaqSr
-	2DQi4+51ljRd8rm9+pScFEGnh1Dlmaj5j3w5sEMH+I+mC/5BX/83hQ4x39TRxea/VMjUS41tptL
-	wqDDtsDheArmqbnQBb4jdw76NczBgOEqMpGlwTbNJlf33KuPkkxr41Dyfyx5eRnl
-X-Google-Smtp-Source: AGHT+IFEnb3Uy5SAyhF1sfaPGDZjAZ8t6tjaoxEn8/OFHajHLngrqu73q5GLsLafJuQQBeGZShNTew==
-X-Received: by 2002:a05:600c:458e:b0:439:8340:637 with SMTP id 5b1f17b1804b1-439ae21e4c8mr31896855e9.30.1740143874844;
-        Fri, 21 Feb 2025 05:17:54 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02ce685sm17224815e9.2.2025.02.21.05.17.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 05:17:53 -0800 (PST)
-Date: Fri, 21 Feb 2025 13:17:50 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, Simon Horman
- <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Johannes
- Berg <johannes@sipsolutions.net>, Jonathan Corbet <corbet@lwn.net>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-doc@vger.kernel.org, Michal
- Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH net-next v5 1/2] net, treewide: define and use
- MAC_ADDR_STR_LEN
-Message-ID: <20250221131750.0630c720@pumpkin>
-In-Reply-To: <20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
-References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
-	<20250220-netconsole-v5-1-4aeafa71debf@purestorage.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1740144625; c=relaxed/simple;
+	bh=yrgPSzS1iVpcnrrmsNx/lFzIbzwcOZjCNokDJvcWQ3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S0GpbRIezTYOPDcI4KGi4fY8FiyxT710Umq6AZ1+djZY3PlgBoNi4YgM8T9+zrPmfffHDxn3xjQkWcaYzU2iw2TBqZspW8zsiwt7MMZB+osyyDAq31uU0y9QtrXJPrjflO1uBzQwWM2ME1KtREEz3HrhI+l12yzVw4z42g0XL5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CIf3ZSMX; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740144624; x=1771680624;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=yrgPSzS1iVpcnrrmsNx/lFzIbzwcOZjCNokDJvcWQ3s=;
+  b=CIf3ZSMX1nmKSHmNXl96Aea/7otTl25rRQTxYIZPQ8fRomVnz4fgX+/P
+   p2gB3HhZkqx7Rf5pd4rLkQbFROj4pklqBhMuBxW1m24EyZZ/ilNZSnbsO
+   VVXF1FeHCPfMfUQdh+VmbgNrr8ULsnxJvIvgvzy8nedU0J8oqkJ8wWCgq
+   aDVulbrDV7qdl/kJywiwOhBy/z42dXOZWKnqVgaWoqAz9Y0UVoan5MuzA
+   RYZmQlJxsj5qjHO0JCXDrYi7py03MoVREqD2BK9OeSYmvX2z/PWFAd9uC
+   p1ziHL/b4KiLavA5wBfR3coae88WGBDI+KX2nT8cah0XERpBBcZyBWhde
+   g==;
+X-CSE-ConnectionGUID: j/bm6XUJSq+D913a6mFo6A==
+X-CSE-MsgGUID: k+ieUTekRi2e2FzyPimLPQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="58510784"
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="58510784"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:30:22 -0800
+X-CSE-ConnectionGUID: Yyg/CP+UTXO0VBzS4RNfow==
+X-CSE-MsgGUID: k5Pn0+0ERjyzbmGZjjCwkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="120614996"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.60.175]) ([10.247.60.175])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 05:30:11 -0800
+Message-ID: <3fbe3955-48b8-449d-93ff-2699a7efcd8d@linux.intel.com>
+Date: Fri, 21 Feb 2025 21:30:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v5 1/9] net: ethtool: mm: extract stmmac
+ verification logic into common library
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+References: <20250220025349.3007793-1-faizal.abdul.rahim@linux.intel.com>
+ <20250220025349.3007793-2-faizal.abdul.rahim@linux.intel.com>
+ <20250221174249.000000cc@gmail.com> <20250221095651.npjpkoy2y6nehusy@skbuf>
+ <20250221182409.00006fd1@gmail.com> <20250221104333.6s7nvn2wwco3axr3@skbuf>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20250221104333.6s7nvn2wwco3axr3@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Feb 2025 18:29:20 -0700
-Uday Shankar <ushankar@purestorage.com> wrote:
 
-> There are a few places in the tree which compute the length of the
-> string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
-> constant for this and use it where relevant. No functionality changes
-> are expected.
 
-The fact that you have to keep adding 1 or 2 is a good indication that
-it really isn't a good idea.
-
-	David
-
+On 21/2/2025 6:43 pm, Vladimir Oltean wrote:
+> On Fri, Feb 21, 2025 at 06:24:09PM +0800, Furong Xu wrote:
+>> Your fix is better when link is up/down, so I vote verify_enabled.
 > 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
-> ---
->  drivers/net/netconsole.c           | 2 +-
->  drivers/nvmem/brcm_nvram.c         | 2 +-
->  drivers/nvmem/layouts/u-boot-env.c | 2 +-
->  include/linux/if_ether.h           | 3 +++
->  lib/net_utils.c                    | 4 +---
->  net/mac80211/debugfs_sta.c         | 7 ++++---
->  6 files changed, 11 insertions(+), 9 deletions(-)
+> Hmmm... I thought this was a bug in stmmac that was carried over to
+> ethtool_mmsv, but it looks like it isn't.
 > 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index f77eddf221850fe2778cd479e49c91ad695aba3c..12699831e3c9fdbafd4862a339aea4ef04cf522b 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -721,7 +721,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
->  
->  	if (!mac_pton(buf, remote_mac))
->  		goto out_unlock;
-> -	if (buf[3 * ETH_ALEN - 1] && buf[3 * ETH_ALEN - 1] != '\n')
-> +	if (buf[MAC_ADDR_STR_LEN] && buf[MAC_ADDR_STR_LEN] != '\n')
->  		goto out_unlock;
->  	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
->  
-> diff --git a/drivers/nvmem/brcm_nvram.c b/drivers/nvmem/brcm_nvram.c
-> index b810df727b446b1762a1851750f743e0de6e8788..b4cf245fb2467d281111001bb7ed8db5993a09b2 100644
-> --- a/drivers/nvmem/brcm_nvram.c
-> +++ b/drivers/nvmem/brcm_nvram.c
-> @@ -100,7 +100,7 @@ static int brcm_nvram_read_post_process_macaddr(void *context, const char *id, i
->  {
->  	u8 mac[ETH_ALEN];
->  
-> -	if (bytes != 3 * ETH_ALEN - 1)
-> +	if (bytes != MAC_ADDR_STR_LEN)
->  		return -EINVAL;
->  
->  	if (!mac_pton(buf, mac))
-> diff --git a/drivers/nvmem/layouts/u-boot-env.c b/drivers/nvmem/layouts/u-boot-env.c
-> index 731e6f4f12b2bf28e4547d128954a095545ad461..436426d4e8f910b51b92f88acddfbb40d374587a 100644
-> --- a/drivers/nvmem/layouts/u-boot-env.c
-> +++ b/drivers/nvmem/layouts/u-boot-env.c
-> @@ -37,7 +37,7 @@ static int u_boot_env_read_post_process_ethaddr(void *context, const char *id, i
->  {
->  	u8 mac[ETH_ALEN];
->  
-> -	if (bytes != 3 * ETH_ALEN - 1)
-> +	if (bytes != MAC_ADDR_STR_LEN)
->  		return -EINVAL;
->  
->  	if (!mac_pton(buf, mac))
-> diff --git a/include/linux/if_ether.h b/include/linux/if_ether.h
-> index 8a9792a6427ad9cf58b50c79cbfe185615800dcb..61b7335aa037c7232a0caa45572043057c02dde3 100644
-> --- a/include/linux/if_ether.h
-> +++ b/include/linux/if_ether.h
-> @@ -19,6 +19,9 @@
->  #include <linux/skbuff.h>
->  #include <uapi/linux/if_ether.h>
->  
-> +/* XX:XX:XX:XX:XX:XX */
-> +#define MAC_ADDR_STR_LEN (3 * ETH_ALEN - 1)
-> +
->  static inline struct ethhdr *eth_hdr(const struct sk_buff *skb)
->  {
->  	return (struct ethhdr *)skb_mac_header(skb);
-> diff --git a/lib/net_utils.c b/lib/net_utils.c
-> index 42bb0473fb22f977409f7a6792bb1340f4e911c3..215cda672fee1b5a029c2b61529c6813c0edab11 100644
-> --- a/lib/net_utils.c
-> +++ b/lib/net_utils.c
-> @@ -7,11 +7,9 @@
->  
->  bool mac_pton(const char *s, u8 *mac)
->  {
-> -	size_t maxlen = 3 * ETH_ALEN - 1;
->  	int i;
->  
-> -	/* XX:XX:XX:XX:XX:XX */
-> -	if (strnlen(s, maxlen) < maxlen)
-> +	if (strnlen(s, MAC_ADDR_STR_LEN) < MAC_ADDR_STR_LEN)
->  		return false;
->  
->  	/* Don't dirty result unless string is valid MAC. */
-> diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
-> index a67a9d3160086ac492d77092a0c8a74d2384b28c..a8948f4d983e5edee45d90ad267582657ed38e38 100644
-> --- a/net/mac80211/debugfs_sta.c
-> +++ b/net/mac80211/debugfs_sta.c
-> @@ -457,11 +457,12 @@ static ssize_t link_sta_addr_read(struct file *file, char __user *userbuf,
->  				  size_t count, loff_t *ppos)
->  {
->  	struct link_sta_info *link_sta = file->private_data;
-> -	u8 mac[3 * ETH_ALEN + 1];
-> +	u8 mac[MAC_ADDR_STR_LEN + 2];
->  
->  	snprintf(mac, sizeof(mac), "%pM\n", link_sta->pub->addr);
->  
-> -	return simple_read_from_buffer(userbuf, count, ppos, mac, 3 * ETH_ALEN);
-> +	return simple_read_from_buffer(userbuf, count, ppos, mac,
-> +				       MAC_ADDR_STR_LEN + 1);
->  }
->  
->  LINK_STA_OPS(addr);
-> @@ -1240,7 +1241,7 @@ void ieee80211_sta_debugfs_add(struct sta_info *sta)
->  	struct ieee80211_local *local = sta->local;
->  	struct ieee80211_sub_if_data *sdata = sta->sdata;
->  	struct dentry *stations_dir = sta->sdata->debugfs.subdir_stations;
-> -	u8 mac[3*ETH_ALEN];
-> +	u8 mac[MAC_ADDR_STR_LEN + 1];
->  
->  	if (!stations_dir)
->  		return;
+> In fact, looking at the original refactoring patch I had attached in
+> this email:
+> https://lore.kernel.org/netdev/20241217002254.lyakuia32jbnva46@skbuf/
 > 
+> these 2 lines in ethtool_mmsv_link_state_handle() didn't exist at all.
+> 
+> 	} else {
+>>>>> 		mmsv->status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
+>>>>> 		mmsv->verify_retries = ETHTOOL_MM_MAX_VERIFY_RETRIES;
+> 
+> 		/* No link or pMAC not enabled */
+> 		ethtool_mmsv_configure_pmac(mmsv, false);
+> 		ethtool_mmsv_configure_tx(mmsv, false);
+> 	}
+> 
+> Faizal, could you remind me why they were added? I don't see this
+> explained in change logs.
+> 
+
+Hi Vladimir,
+
+Yeah, it wasn’t there originally. I added that change because it failed the 
+link down/link up test.
+After a successful verification, if the link partner goes down, the status 
+still shows ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED, which isn’t correct—so 
+that’s why I added it.
+
+Sorry for not mentioning it earlier. I assumed you’d check the delta 
+between the original patch and the upstream one, my bad, should have 
+mentioned this logic change.
+
+Should I update it to the latest suggestion?
+
+
 
 
