@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-168353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8A3A3EA1A
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:33:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D401BA3EA24
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 02:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D35E9163069
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:33:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A11A188BF44
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 01:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891DE38F9C;
-	Fri, 21 Feb 2025 01:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F21D38F9C;
+	Fri, 21 Feb 2025 01:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pC49XDJt"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pr2JqZ8I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE8717991;
-	Fri, 21 Feb 2025 01:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7577C1876;
+	Fri, 21 Feb 2025 01:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740101607; cv=none; b=idCNQT17uio/dyHy/TTAvf5ZGf0x/Zm/CM1BlHVgO/xztjYzOEN93wSe9w3IJ2Q2ihiO+VdIMXxqX3jxWmWug3/WTdx7USP7uV9IHLqfrssduneTmRZfrQeAZ9xo4FhT2puIVF/2GwoeXT4W0RDaDskIBm0YoVVf+7f36obR9VE=
+	t=1740101821; cv=none; b=DbTskASCPdTaej2WzsvHvLk5JnuSI2rHyG2eht6it0DvCF/bBFTFtNkhHZETVEXJ68Ky/MWj5Bc7ETH2hs6HVa0V6iwWwyxXU8uYYMaWpWfG5ZIK+8D8IOcfhR9u7/9ZVB45Zqv5uGNKsU3N8pbTGOfTBKS4G+CxCN1ogB8Sy3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740101607; c=relaxed/simple;
-	bh=bQJH/FIssL3KJG4ZfidMolApnK0ieInyDpttYutmRik=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pYHngMS8egsf6pkor7Cn5B02xwDKOzJjzsiaUqVLvhfSzKn5kaiyiivmGDu4CePM12daeHbjREv62+5PwX2038lRtQ3v24C1WEAQ+cuBjMOpkxiUs4GTDDXz8o/n34t9KIrplojjYQcv5k6Fn0IvhScKsEcOf8AsCnWriKANaeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pC49XDJt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36408C4CED1;
-	Fri, 21 Feb 2025 01:33:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740101606;
-	bh=bQJH/FIssL3KJG4ZfidMolApnK0ieInyDpttYutmRik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pC49XDJtGAICDewUYtW9kAXXf8f+pvIorspfAtOEww2XHPEQcrULEgOjtHwHAuuog
-	 bcXMZ8cw5uBMm0svC4Z8W/BmBfD+wIDJ/X8lj9MA5+6eZnqh0f8lUpnIviBl5l7JEh
-	 bEeqwmdVOY1DIpvyQsH7pLsQ0CvQZ4171eCReVG1Ql+dMsw/yrHwiJYp029B1BNxyB
-	 1iEQHYtwRFqL4mz8YF+RL4Fi8sqJNlANTu68xsytAWkNFjWB2mgKjhfxETrUOZMeDv
-	 sSJRJcFolhQRCqsnwd386fVmm8yqzgvxs74jvf39EMmcr6yVr1eUhJVqaZlFOMhidr
-	 uXOdAjLjYksbA==
-Date: Thu, 20 Feb 2025 17:33:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Xin Long <lucien.xin@gmail.com>, Kees Cook <kees@kernel.org>,
- linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [RESEND PATCH] sctp: Replace zero-length array with flexible
- array member
-Message-ID: <20250220173325.0349e913@kernel.org>
-In-Reply-To: <20250219112637.4319-1-thorsten.blum@linux.dev>
-References: <20250219112637.4319-1-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1740101821; c=relaxed/simple;
+	bh=w9uXlUtp2MUHgEVCKb3zHQZaq49R1+Z0/aG5BVel54M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cthOiCfIBj2ARonJPV6PSc+3t3L6YXKfo2ojJsBglK2FAHCc5eazNvCwFON19RB62fD9iYYMvteaF8Uh7tfyF62jGmx8QOVdd0AsCXGIyIyKlASSn0Rg+5c0QGnSiQnjEN2ku/78aoJnrL5SE/1Vg/mj5bjgrYknMG9HRj62sno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pr2JqZ8I; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1740101809; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=yIFTQsyRa5E5ivx4nFPeX1Tx1YoivCBFKzAh+s3sw6Y=;
+	b=pr2JqZ8IMQUbRZwQQqirZTMiyhG7VZJGC0xvkR9x+KwD/chmab5fvGj7Iw0aroWM3MkbPUjICY+CcoSu+1cBfgppAuFQH2Txqvf49skyOLwmZYN2FlmbZZ6V8oLwZgvPpUUh/pNlnGKaQf1EBib9o5K+qDITN53V8vu1qyUUO5o=
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WPuR6rc_1740101808 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 21 Feb 2025 09:36:48 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	asml.silence@gmail.com,
+	willemb@google.com,
+	almasrymina@google.com,
+	chopps@labn.net,
+	aleksander.lobakin@intel.com,
+	nicolas.dichtel@6wind.com,
+	dust.li@linux.alibaba.com,
+	hustcat@gmail.com,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ipvs: Always clear ipvs_property flag in skb_scrub_packet()
+Date: Fri, 21 Feb 2025 09:36:48 +0800
+Message-Id: <20250221013648.35716-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Feb 2025 12:26:36 +0100 Thorsten Blum wrote:
-> Replace the deprecated zero-length array with a modern flexible array
-> member in the struct sctp_idatahdr.
-> 
-> Link: https://github.com/KSPP/linux/issues/78
-> Reviewed-by: Kees Cook <kees@kernel.org>
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  include/linux/sctp.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/sctp.h b/include/linux/sctp.h
-> index 836a7e200f39..19eaaf3948ed 100644
-> --- a/include/linux/sctp.h
-> +++ b/include/linux/sctp.h
-> @@ -239,7 +239,7 @@ struct sctp_idatahdr {
->  		__u32 ppid;
->  		__be32 fsn;
->  	};
-> -	__u8 payload[0];
-> +	__u8 payload[];
->  };
->  
->  struct sctp_idata_chunk {
+We found an issue when using bpf_redirect with ipvs NAT mode after
+commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+the same name space"). Particularly, we use bpf_redirect to return
+the skb directly back to the netif it comes from, i.e., xnet is
+false in skb_scrub_packet(), and then ipvs_property is preserved
+and SNAT is skipped in the rx path.
 
-Builds for me with this field completely delete...
-I think we should prefer deleting when possible.
+ipvs_property has been already cleared when netns is changed in
+commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
+SKB net namespace changed"). This patch just clears it in spite of
+netns.
+
+Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+---
+This is in fact a fix patch, and the issue was found after commit
+ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+the same name space"). But I'm not sure if a "Fixes" tag should be
+added to that commit.
+---
+ net/core/skbuff.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 7b03b64fdcb2..b1c81687e9d8 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6033,11 +6033,11 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
+ 	skb->offload_fwd_mark = 0;
+ 	skb->offload_l3_fwd_mark = 0;
+ #endif
++	ipvs_reset(skb);
+ 
+ 	if (!xnet)
+ 		return;
+ 
+-	ipvs_reset(skb);
+ 	skb->mark = 0;
+ 	skb_clear_tstamp(skb);
+ }
 -- 
-pw-bot: cr
+2.32.0.3.g01195cf9f
+
 
