@@ -1,114 +1,167 @@
-Return-Path: <netdev+bounces-168597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6C9A3F8F5
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:36:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E09A3F928
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:42:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEC8C704C37
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:32:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46D317D761
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC93F215F41;
-	Fri, 21 Feb 2025 15:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5981DB551;
+	Fri, 21 Feb 2025 15:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKKcZSMa"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Aua5F14v";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hK/x4O6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5C3215F40
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 15:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04601D5CCC;
+	Fri, 21 Feb 2025 15:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740151780; cv=none; b=CzIHBYQ/szRmAa3tdViSeCUYZH4JZumj6g/k/SjMuosr9ViKw8yvf9HGELB8Ofbum0kwLZBKjLhzniO+jy8yuHGPNkiZWDR8iNzAbGvYveDn5hrrB4qZbmzH/JELlAlT1lV5GYGYpay2y9bH28w7CL+OYb+MFewlf/pRBYvKvmA=
+	t=1740152532; cv=none; b=Mdx1IT/hsDFGOs8qoan9jttG/uhTSegkMlG843mNtdOwGYF4iM6Ue35+I0M9vQX8QmmShKghlWQgn8dQk8X/zXrRb3h2BiqyKHcoh9cP1/3pE3bT9XWccEa0UJgUVDr8dOzZn5jq1NauABA20fyRB0X24ndpOFbY0env+4bfbUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740151780; c=relaxed/simple;
-	bh=ikHWh3FRsOR6LUazjmLmkD2YnjUSzsqIxCeGiizeZKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eHF+mzXb0zAQmRT3F/De5FwxJkxDZHbxSmbR6dCfA/6QDjDKuXMprthcAXAJErqfZEjdPTOkdSt99dzLDjDzU5UNU/HrPMxR3AQfO9DCuHHrP7BSYa8R2bpYvTt10LrqI2w9KiAnyJ3MLhClp09qYVejvZ6R3oTp2YC9atABJrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VKKcZSMa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740151778;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iD0T11rD05jyFUl2KQwuGENbXxLi1JAwcITzeBwqvlE=;
-	b=VKKcZSMaG0L9JpmFLMLutzp7teA54zOvC5pl+EmJ7q7opn18a7YWP7FqwQQk5iIoHQyv0k
-	suZ7DYiiRZxjh0YWmF0OlLt8uKtOHYAnK7XfwYQehzIzNewE8on3F+Bv/Q3wW3xbZsboQr
-	CNoPGtJnTEQupaCIe2DOlcSh0fPgwTA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-me5nQbhWPrS0dz6HnYEXnw-1; Fri, 21 Feb 2025 10:29:36 -0500
-X-MC-Unique: me5nQbhWPrS0dz6HnYEXnw-1
-X-Mimecast-MFC-AGG-ID: me5nQbhWPrS0dz6HnYEXnw_1740151775
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38f4c0c1738so1914813f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 07:29:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740151775; x=1740756575;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iD0T11rD05jyFUl2KQwuGENbXxLi1JAwcITzeBwqvlE=;
-        b=M76LeKNVuDczENfj8JsBZaE0o8+MkNHCceY4xpB2pLgBErJs6U6BkvmRDRfPEX2DVT
-         QIImQGo0A2xllf19kw8kjjdv7eFyttJq6k3EUgWc7iEePT+DUMHr3Q9FUyC+ykFxeBYB
-         i3TuEHBq/vdeS3WIUrOfB8nZwvwlZym8mMemtC9xldM6plBmqwb28SsJPxsxDO6H+DYE
-         SKrEtwfJ//X2ze4/G7l0Q8tr0ol2oBIeF0l8SlmlNV+4EAzrzjmY7dwBVEkzZYvUTr7h
-         m9sUyD07nMT1af4NdrCZ293WmWsTwjNT1re5DqiUviZykoYAQoo1XEj8v4fKgrnoU/wM
-         7THw==
-X-Gm-Message-State: AOJu0Ywo9vJqdhPhCCaW3P+1Fzbck+xcMOfTONaXwd6rh5yjJEIP9m3p
-	MPpAgKiehfLs48zC5vsc1TDsMxTKEcLqbGQAb/7TsepnJPCvqR2tGS52xgwJfif2RFux8x/WYAI
-	IBaWUUP12hcr181SHRk5KtpWm0GV88LzZNFN4/LtNnmJJFP8GnU1xtA==
-X-Gm-Gg: ASbGncttdsynVTRVH1JpDvKHFtZl7nkLL85puJcZWMymIFjnQBm7DAplhAvZCwLA/VF
-	j+PUC3pfU3rwYAsW/3RiotyYEvyrIDJA6ndmdK3MjOCljMxu1lHazrsPOquZ0ZhGGdWBezTnZzF
-	yQ5DcYVGJy4fIhoICWZI+gAWDe7yp9jNpI8DJNwL8gHQ4u8oYH1t8+BjDPWJivZA1VSuB/TXDzK
-	Ej6j1DHrqd+1lZ6cjgknMfIuSThvSl64cIKdYqOJ+PCCIg/oyA4AQLs4CyFbbUahoq4kkv7CzgU
-	2cE=
-X-Received: by 2002:a5d:6da4:0:b0:38d:d371:e04d with SMTP id ffacd0b85a97d-38f6f0b0107mr2585230f8f.34.1740151775485;
-        Fri, 21 Feb 2025 07:29:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHHQjh+C1d1kCVEo3ko6Ux+i5NDRIN9dOQxZ+viLDi6iYlXOKtTeBReMP40EggjNf5Au3S+Lw==
-X-Received: by 2002:a5d:6da4:0:b0:38d:d371:e04d with SMTP id ffacd0b85a97d-38f6f0b0107mr2585205f8f.34.1740151775190;
-        Fri, 21 Feb 2025 07:29:35 -0800 (PST)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d94acsm24050773f8f.75.2025.02.21.07.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 07:29:34 -0800 (PST)
-Date: Fri, 21 Feb 2025 16:29:31 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
-	donald.hunter@gmail.com, dsahern@kernel.org, petrm@nvidia.com
-Subject: Re: [PATCH net-next 0/6] net: fib_rules: Add DSCP mask support
-Message-ID: <Z7ib21vF8rJ5K+Pe@debian>
-References: <20250220080525.831924-1-idosch@nvidia.com>
+	s=arc-20240116; t=1740152532; c=relaxed/simple;
+	bh=QqbTVfRf9FmdvF8GodySpCwEsO8rjlDVjLOto+qoQ2k=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=WnXfwK3fqOvm3TRp1PBrUIB9WXVsnICw4/qc3hI6slLLAuHcK9BbiYmNd08HfNAm2Blj0qv1vakQ+4Rb/t8yGiQmY19PIJ3ls4l7Y6iFxdQnQO4yK8hs3Sp38AqNdZd4WSEWfg/+/tWWsd5vwA39OEeXlFU0SwmAT7Jr1sTgRD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Aua5F14v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hK/x4O6o; arc=none smtp.client-ip=103.168.172.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailflow.phl.internal (Postfix) with ESMTP id 68A162008E9;
+	Fri, 21 Feb 2025 10:42:07 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-11.internal (MEProxy); Fri, 21 Feb 2025 10:42:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1740152527;
+	 x=1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=
+	Aua5F14vWebL0DOxXVcNVFiZkYyvO+ZDn0lBIGthpSro7L8yySiSiaVg08WR7pLs
+	JojgEjUtKFzq3p96R+2HmZUtkfnB835nBY2UB1NRwsKhE3G6/KpCcrJCM9nOPLjg
+	2axdv5yBZa5jZAlSVtFXsSKh6/ocWFYVTAyli8xq5LHUWD1AKQJ5G4+Mr/4ewUSx
+	Yn/azkxhSGwazkgtAuJI1r5HiztAgb54Hy57zjASBXgbNstUSX1FQ056H8+WzBWb
+	bY73DEtylf/GOrATlkUX6KJLQyEzNftkEsaFLVyJSfRZdT3QoOtN3rFZ19iqpA5R
+	KJtz9HVtMoMVC5CtzTJTYw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740152527; x=
+	1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=h
+	K/x4O6oyNBPbMt/oANZVu7iwmMXMPEIsjZuQL8HZIOTsUUJO7Auhm1hFIArdijoJ
+	AB7VBKyq2IuRmCYnjPjcsdGs9S/cnI6aMm4jXLNLxVrlFDCnDgv/of6zLAJcxDcI
+	eL4AzPwv+QV8bY2ycaIOH64w/uZlZdCJ8e62DGEoD1siZA0vWqTZ/ReNgiqYKlv1
+	mihPOMp/ykpji+1Q19VspQRFz5r4aZTlYen0gNe9e7yhu15yzjE/MGurq1TMqurP
+	hR+5nH3l3BZzUbTYF6NMvpDtU6o63shcpD1jG8+Rp04xMu2H9dbuLLoa9S/eymhA
+	yXXAttMvAK8zmGaHmjzhA==
+X-ME-Sender: <xms:zJ64Z_O-mJRwvj1sCRG9GGTKNu1XV-MwxBvTkYAwkyjdP5scRxTp6w>
+    <xme:zJ64Z5-7kYr4fO9OJH0gelcDWR2xhP9EYBEJ8--FzYH7AgrGrnjPAP3VTDrGorGbV
+    -A7lGF4HomKqch4ruc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejtdegtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
+    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
+    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
+    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeeg
+    gedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhosghinhdrmhhurhhphhihse
+    grrhhmrdgtohhmpdhrtghpthhtohepsghrghhlsegsghguvghvrdhplhdprhgtphhtthho
+    pehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepug
+    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnphhighhgihhnsehg
+    mhgrihhlrdgtohhmpdhrtghpthhtohepgihihihouhdrfigrnhhgtghonhhgsehgmhgrih
+    hlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdho
+    rhhgrdgruhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
+    hpthhtohepiihijhhunhgphhhusehitghlohhuugdrtghomh
+X-ME-Proxy: <xmx:zJ64Z-QUkr7NyVicJsKDYCmEUML1cB41zvxitesRRl9w-vpZ4FIx9Q>
+    <xmx:zJ64ZzspC6JLy2xq6-H8dKC9b0W5UnN9XvAeR1biFGIhHAZHAhfaHQ>
+    <xmx:zJ64Z3dUc26wh_PxcfOohxsJWUrbvmi2AkE15Toc-0r6NXyMPFxzTg>
+    <xmx:zJ64Z_18mDWkVYuOyPdwsKM_ggsOAz5LQTjd3DnTKUlYpcS_8aoEYw>
+    <xmx:z564Z_SJKpL1igBqLIymTzZOJvFYGQRqn-AF7i_kx_KjtJ_VxT8ih3L7>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 469352220072; Fri, 21 Feb 2025 10:42:04 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250220080525.831924-1-idosch@nvidia.com>
+Date: Fri, 21 Feb 2025 16:40:58 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Zijun Hu" <quic_zijuhu@quicinc.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Will Deacon" <will@kernel.org>,
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Thomas Gleixner" <tglx@linutronix.de>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Rafael J . Wysocki" <rafael@kernel.org>,
+ "Danilo Krummrich" <dakr@kernel.org>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Jamal Hadi Salim" <jhs@mojatatu.com>,
+ "Cong Wang" <xiyou.wangcong@gmail.com>, "Jiri Pirko" <jiri@resnulli.us>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
+ "Linus Walleij" <linus.walleij@linaro.org>,
+ "Bartosz Golaszewski" <brgl@bgdev.pl>, "Lee Jones" <lee@kernel.org>,
+ "Thomas Graf" <tgraf@suug.ch>, "Christoph Hellwig" <hch@lst.de>,
+ "Marek Szyprowski" <m.szyprowski@samsung.com>,
+ "Robin Murphy" <robin.murphy@arm.com>,
+ "Miquel Raynal" <miquel.raynal@bootlin.com>,
+ "Richard Weinberger" <richard@nod.at>,
+ "Vignesh Raghavendra" <vigneshr@ti.com>
+Cc: "Zijun Hu" <zijun_hu@icloud.com>, Linux-Arch <linux-arch@vger.kernel.org>,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+ linux-mtd@lists.infradead.org
+Message-Id: <5d662c4c-76f7-4e5c-82f3-2aeeaf9e3311@app.fastmail.com>
+In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void APIs
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 20, 2025 at 10:05:19AM +0200, Ido Schimmel wrote:
-> In some deployments users would like to encode path information into
-> certain bits of the IPv6 flow label, the UDP source port and the DSCP
-> field and use this information to route packets accordingly.
-> 
-> Redirecting traffic to a routing table based on specific bits in the
-> DSCP field is not currently possible. Only exact match is currently
-> supported by FIB rules.
-> 
-> This patchset extends FIB rules to match on the DSCP field with an
-> optional mask.
-> 
+On Fri, Feb 21, 2025, at 14:02, Zijun Hu wrote:
+> This patch series is to remove weird and needless 'return' for
+> void APIs under include/ with the following pattern:
+>
+> api_header.h:
+>
+> void api_func_a(...);
+>
+> static inline void api_func_b(...)
+> {
+> 	return api_func_a(...);
+> }
+>
+> Remove the needless 'return' in api_func_b().
+>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+I have no objection to the changes, but I think you should
+describe the motivation for them beyond them being 'weird'.
 
+Do these 'return' statements get in the way of some other
+work you are doing? Is there a compiler warning you want
+to enable to ensure they don't come back? Is this all of
+the instances in the kernel or just the ones you found by
+inspection?
+
+    Arnd
 
