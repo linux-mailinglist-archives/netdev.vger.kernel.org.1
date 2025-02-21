@@ -1,140 +1,98 @@
-Return-Path: <netdev+bounces-168592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFB1A3F6FE
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:16:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 031F5A3F6FB
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 15:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E72E2861428
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:15:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 434618616A7
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 14:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08931C1AAA;
-	Fri, 21 Feb 2025 14:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A885B70821;
+	Fri, 21 Feb 2025 14:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="i7UoQF2b"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0/Sbe6zB"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62D31420DD
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA9F7080D
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 14:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740147348; cv=none; b=PW4srYpj5SaEJnjgusYoJSNaA7Js9dxiyeCmqFpt36u6c/jDCWbPpAKmtHIJCqAdUlQWPVY0Cm5tj+PwcZZ3MTXLNzhWXehnR0/LVidsKb5CMT9FwfWZ2OGjilUa3Q37zfHakIxJAWjg7YiT++/34Yam5VmJG2PrS+AADVxHAMI=
+	t=1740147336; cv=none; b=pYBifoxgjV6DPf9IJc8vIJ+e8Rn9IfrNuIlelyMTj/ANZUQO4GJeNO/Xx07W6H5FxEYRow7MTp5RQDkY4Kn4/jZChwwV1tYRmikSpQQEcAX36EjA/Q+KKcGRhVhghCI2IatvmFCebqq0YqNnO0h3HCOd5THl9O/z49K+vbP8TwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740147348; c=relaxed/simple;
-	bh=YemvC5bOPnL6ooIpDML9rolxQ3QUmWjyxqSB3deoy6o=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=uC1uxE3tF3cKjkYnKVwM0vIbIC8XmHTp9b+A7/7jtQGm/x1bOVYDGnsyJGbJqlQDlscnW3A6JjaNnXMTYud2X4OAgM6Yqc78GLIqSM5PX3LpsPw1EKiiEzXuSGKqWo3QUzhITc2x+xt5t2QJGnmCmuaUGizhykhjGqmfQb1S9Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=i7UoQF2b; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1740147336; c=relaxed/simple;
+	bh=H5yh3XlqfVet82WCCkr5ue7OJLEw93JfvwdwqcALVHA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fqbHc4NCKzVCk/dBQ/Begd/4FMRv2CMYrqzN7AmIyUiohlzd6nekB1nwWX7goDu3EVZR24KyLFe/CqX9GJ44J37Yhcx3hRSyHXLp0LrIyyaaQEd3Q0wdjK8a2w5OhI/njKmfuNQkv2zTAjVTA+1rqkDEXqDt+2HQVh2jjJWGpvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0/Sbe6zB; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YmtTGwJJXhwMoenv9f1jJWRnRB0B2anyfjKqb6F0t6g=; b=i7UoQF2blTPs6VW1UGIaXkZX+k
-	IJh5rrOMM3jtyTYE0yyIPfqvAgr5J7kr8tlhOag8TsD7uog8dTn/hrI9Zonguyry25QPpZ6Macig8
-	Hnfw5IrCLzLsHbISCogcINMGXG0py/E+l9QG6MhzVO2xlW5UhzyKnu3PEP0H0JRM4QI1524TREqMO
-	tV9vQsuHBH7ZBNmMBz9SoBHIM1/vgqeF6ghyFxiJBucJK2OlbNDI03ABq7My+5Y2QHYmErA/5CQsd
-	UBZEl6/LX14f1p5R6sq5zrh3OTMqFZRvRu8MJh3bAJVUpaeM9S93akICrUQNRteaalKd0QlFOXt0x
-	Gp6cO1Pw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:50498 helo=rmk-PC.armlinux.org.uk)
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZN090mxAPz84RAmjDf1ffqgTe4ng9t/Mi1/ZHq++UpE=; b=0/Sbe6zBOF5wWfA8ZGcllkkHOu
+	tAQPGfV0LWLk2aLeX2iOW3NchjXJWQjzLAX652zVJ8XRPNZc6RRylLZVEzVtOfzgC9GgS5bxFd0WC
+	TyG0hSJXiSZSnId8QQCxJVWSdnr1ccNyBUxwUx0Wsbxx/C06VxWuEhNFProVooYVF1ShrIV7i1MK8
+	An9WxG+DHPwaJGy8aCFnKRKK0unAJjNtjvSfjl1/AKDj+Ie8ttmp2B+12n5mUEaV0gG5nJ5hFmGEM
+	ln+zk/UrQfwec/G+KuVUJakLk7zIqlAG/lv3zM2UoOrSb/ooFhNywzerlCXYNVMnb2+tfUS8S9WuJ
+	ZhqypXRQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33718)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tlToX-0004o0-1B;
-	Fri, 21 Feb 2025 14:15:37 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tlToD-004W3g-HB; Fri, 21 Feb 2025 14:15:17 +0000
-In-Reply-To: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
-References: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tlToH-0004nV-1b;
+	Fri, 21 Feb 2025 14:15:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tlToD-00023s-0v;
+	Fri, 21 Feb 2025 14:15:17 +0000
+Date: Fri, 21 Feb 2025 14:15:17 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <drew@pdp7.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Fu Wei <wefu@redhat.com>,
-	Guo Ren <guoren@kernel.org>,
+	Drew Fustini <drew@pdp7.com>, Eric Dumazet <edumazet@google.com>,
+	Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-riscv@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 2/2] net: stmmac: thead: ensure divisor gives proper
- rate
+Subject: [PATCH net-next 0/2] net: stmmac: thead: clean up clock rate setting
+Message-ID: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tlToD-004W3g-HB@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 21 Feb 2025 14:15:17 +0000
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-thead was checking that the stmmac_clk rate was a multiple of the
-RGMII rates for 1G and 100M, but didn't check for 10M. Rather than
-use this with hard-coded speeds, check that the calculated divisor
-gives the required rate by multplying the transmit clock rate back
-up to the stmmac clock rate and checking that it agrees.
+Hi,
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+This series cleans up the thead clock rate setting to use the
+rgmii_clock() helper function added to phylib.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-index f16fa341aadb..f9f2bd65959f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-@@ -45,9 +45,6 @@
- #define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
- #define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
- 
--#define GMAC_GMII_RGMII_RATE	125000000
--#define GMAC_MII_RATE		25000000
--
- struct thead_dwmac {
- 	struct plat_stmmacenet_data *plat;
- 	void __iomem *apb_base;
-@@ -124,11 +121,6 @@ static void thead_dwmac_fix_speed(void *priv, int speed, unsigned int mode)
- 	case PHY_INTERFACE_MODE_RGMII_RXID:
- 	case PHY_INTERFACE_MODE_RGMII_TXID:
- 		rate = clk_get_rate(plat->stmmac_clk);
--		if (!rate || rate % GMAC_GMII_RGMII_RATE != 0 ||
--		    rate % GMAC_MII_RATE != 0) {
--			dev_err(dwmac->dev, "invalid gmac rate %ld\n", rate);
--			return;
--		}
- 
- 		writel(0, dwmac->apb_base + GMAC_PLLCLK_DIV);
- 
-@@ -139,6 +131,10 @@ static void thead_dwmac_fix_speed(void *priv, int speed, unsigned int mode)
- 		}
- 
- 		div = rate / tx_rate;
-+		if (rate != tx_rate * div) {
-+			dev_err(dwmac->dev, "invalid gmac rate %lu\n", rate);
-+			return;
-+		}
- 
- 		reg = FIELD_PREP(GMAC_PLLCLK_DIV_EN, 1) |
- 		      FIELD_PREP(GMAC_PLLCLK_DIV_NUM, div);
+The first patch switches over to using the rgmii_clock() helper,
+and the second patch cleans up the verification that the desired
+clock rate is achievable, allowing the private clock rate
+definitions to be removed.
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 28 ++++++++---------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
+
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
