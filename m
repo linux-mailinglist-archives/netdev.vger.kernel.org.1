@@ -1,102 +1,105 @@
-Return-Path: <netdev+bounces-168617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E96A3FB41
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:29:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F94A3FB22
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:26:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEF1E706D10
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:19:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0636519C65D6
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 16:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D0421639A;
-	Fri, 21 Feb 2025 16:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFE42080FB;
+	Fri, 21 Feb 2025 16:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dC5RwDqf"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="bL2Ed5zI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uf5PGZ4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C46215F7F;
-	Fri, 21 Feb 2025 16:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9F01E2838
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 16:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740154496; cv=none; b=rlbJBL8NPC5OVovXUZv+j2QRIRCrBHrqTG1K8JuYCDrPQcSbR/7rCRDq3UfFgRNVbuOLfbrI5qeWWvnKzgXXAptJW910oZG0Ev7/MhWRTkT7qr8nPmu8bh9LOTiBVTDGpJCIiC2/QkUSF/D1vRrAgjatpvTWD7vi4OJLTqh9Vj4=
+	t=1740154730; cv=none; b=kWlqVaWh2a5cv075q+arn6mFfuWsdgnKSAmJeXADV4roQJMoG2t0wSKFRUbFYewobYGhlgR2eEhdbEAX7RTsIkx3ThKBj+eKVmJkDazap8IBA8tKuE8R7aV3V+PfyoOgk095uqDNuHO6rvd2T2cwPP8nfjTvbY0X7QkzHu/DL3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740154496; c=relaxed/simple;
-	bh=Mwb/+mIr9sIX1Vh/JjcDwlfuWKiF8GcXc20i7qJ1zco=;
+	s=arc-20240116; t=1740154730; c=relaxed/simple;
+	bh=sEgAnWjyBzhe4XifTOYbPIh7pKkdRflEWEo0q/ceaoc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P2/zsqpuZxT2/rrCN7LtNNepqZWwLE8zQyQb7eYe/cqaTZ6P/DwOYZ9e2xZsYEJjR5Vwf25tZw1XoH2yR8atBCPJCIT3HAteyOGZOJKvIlnWyw3ORYBXKPdFWz+dVs15G6UJZ+fQJaR+r8o73rnE4eIspLmraCCIO4JgUeN6tdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dC5RwDqf; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22128b7d587so45464895ad.3;
-        Fri, 21 Feb 2025 08:14:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740154494; x=1740759294; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VRw10QmKS+pwaQiTD1eJol1DMaMXwa3QEswpCoiMVg8=;
-        b=dC5RwDqfrNNXICUHQjpS74W8u4rTYbongzm2rw/IGp3a8zR6rJ9/lrYxzs0ugWzoKY
-         1RKPy6xZRkeEZSofKw6obno+Yc266XH59HEuixZSNC4KUc2iARQR3rMdqgBVqTMsC/td
-         PDy8lLR2PMpwjftnll2u9U+yggWXq77Gf6Cr+o1RCQvyvUTiGr5RNAyg7JdhA2CnR6LH
-         T4wlIy9oAgH4sAM/WPGSfMCW2nfRoeyjYuMEbFluWaggIkNUw81Crf7kK650Z0+OcLcZ
-         zlgVjyAMOF9thHSA+5T4y3rbX17D9/rePwnFUWGAsyW5kMw2b8Gi5scF0XPyzXgoDc4Y
-         wxqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740154494; x=1740759294;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VRw10QmKS+pwaQiTD1eJol1DMaMXwa3QEswpCoiMVg8=;
-        b=TxImKnXKvftJNqlyGK/+JuhLGBLUvA5XE6a7RLgfAdt5iQ9ZVaVWC7xEhwYMRS1nSq
-         DJZ94zqLwHgchTMItvKajWL22zq0TFgPGAA5yJMip2MqX0qE5diGvE8wGgRi0NOe9HD3
-         MunBN6J2bzxMyW0jFDTzSmNp6H7IwnoFyrQIr+b++8OoBdmOS/8nShUTODiPWN6fksar
-         Hk6QgeG70nS4ygbJaEB0rABDJZZ/Vpt9QetW8hfOMBlJ7nzcRlpmTmmGqoifT9f8SwTQ
-         1gBSKQhg2nh+Rg/+E9EXYj4FB5nXfp9ez8rcPXQTTU8LH07V67fgVMhQqaEG1AwrfDDt
-         t+Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCVqtr39imLCEZP88MC8NpNzz8vkHVFvxYco5SL0B69j40fumr1c6CuDeAy9gAPxG3G4EGUh0jSXo23tpbtt2U1x@vger.kernel.org, AJvYcCWC1JC7K5Hl7UB2w57XJXKhycLWKjFNl7/vKCefVuKEZgfEdTHU8qz85azjgl04csKPfgg=@vger.kernel.org, AJvYcCWS1hmHRDLVx6wE4YbjocIVJ+tAcz/z82F8xhM6qYn68Dw3Y5C/nIUg8oZmkmI9A2DX25nXtlzC@vger.kernel.org, AJvYcCWwp6g7oxIXBrieIrxPKKf3EKtC6mscsHvFHKkJjP+/jfIEHso1+XwMB3pqtceFu0rF1+xD2bmnoeSfWXd9@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvnJTW+2CZ9nBc6bg1SFJm+foUwdvhjPkGBFJIFqvWv35FzsF4
-	FrmVzRNGF+YQT7FxxOJfR3QG8Ksu+BD0doC7NTwSCeFfJG7H4YM=
-X-Gm-Gg: ASbGncv0VqOahLgLLDCkT4LN9YiZRgb/pF/HSzcbaHm1PelTGPuoHAWf4ykR+uSE/n6
-	s4I+sSTem+fdqUBPmghc1P5/dnTq7C5JbwEkgwd7sRRnf8l5fvOxirowLZcG9qfHdYJAw0C+PkG
-	891hIlAkHQ6QxIQzDF9w6yG69t74L+FTkczTZxZk42EnnCVz6Idl1MhFAPfhR7uOP/+yF1zunpY
-	fj0cbcykfp1QpONGCTQlIpOM10HA7CKH7ESEVwqi6L2uMaWLqqb0b4ncSz1dGbglTFPho29HQzK
-	47JgXxyciw2Lk35hS0tBJkQzwA==
-X-Google-Smtp-Source: AGHT+IFriNgiLyWVrFraOkel3ezG8+RV3+l5DHO1UXAqXjqjIc4HYuUR8iAH7/VmO5yu8/AkmsOQ1A==
-X-Received: by 2002:a05:6a00:4f8c:b0:730:8e2c:e53b with SMTP id d2e1a72fcca58-73426c8e2b8mr5469542b3a.5.1740154493744;
-        Fri, 21 Feb 2025 08:14:53 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-732642d908esm12253499b3a.159.2025.02.21.08.14.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 08:14:53 -0800 (PST)
-Date: Fri, 21 Feb 2025 08:14:52 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Migrate test_xdp_vlan.sh
- into test_progs
-Message-ID: <Z7imfH-Adq5qUUsB@mini-arch>
-References: <20250221-xdp_vlan-v1-0-7d29847169af@bootlin.com>
- <20250221-xdp_vlan-v1-2-7d29847169af@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DI/ZteoKDeWvtFTE+fDY05DHh2GLbFsnHmXTSWyA6hxRlyIJg5fSPsLP0hLujEXqsPm3ghhBjK7jD6xs0l6n4UbnO5mXMWq6HwPP27QnKAJ6O5t+yQ9VIlsdhTvDakV4KhzI6gCALEbKm8MSE8pfG7QGMVy64QKTkFIyCaOEBrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=bL2Ed5zI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uf5PGZ4O; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id DC43D2540126;
+	Fri, 21 Feb 2025 11:18:45 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Fri, 21 Feb 2025 11:18:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1740154725; x=
+	1740241125; bh=UyS5p1NFcFL5rsm/FqITfVGDDrnDXLUguvtyIkhZ0Pw=; b=b
+	L2Ed5zI8N38wZbfWKH7LohyYMXcTsOngyp71ygNAiIsd++6+ehpjuJmoVgYpmPwE
+	pSNMlUO+NNKOe2b70V/7Ua4F5JjkQOOXtyvdspr8SHovAB53sJTZF49NHPUZNDlw
+	j09bmYsX72uZPeX8BxId/bFda2zkpsEsmW2ILdPN1FMhMOMmNgGCO84T3TrRFHYU
+	QJWJlCKq4I8p/HHfsJbNg26qDwLnosyZ66mR73V/R5526e38zCvCyttB+pvSJ6CU
+	DroXMHyIR/+1QswvLZXPs5AEUAC2WL+DNB4YLzHbTujKZ8+HwYAM8f9JPZUynKc5
+	8ynPEcrtv2l0zTQaltZzg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1740154725; x=1740241125; bh=UyS5p1NFcFL5rsm/FqITfVGDDrnDXLUguvt
+	yIkhZ0Pw=; b=uf5PGZ4O47FNwmJqAW5l3KaGFjsqEwlZMaUk0rOp9fIK3niO++E
+	IOQLZtblIjUdDpd60jyzpM/xD92LnJMhLGW2w0oWU7C4dgBHD6XjKczxu0RkFZcD
+	t5QNBiR263G5w/ImwlqfytC0CJvb7/d5cun6fdYKQ7XT8/IhXZNNd2JTJd/jMNv5
+	6k3vm0hVKhlEVaRdQzpzRVRO21dQYpCjhviOdBroZ8yZ+sLWpkQM7aTzIKJNgWyX
+	5lAkjaUZIwbV0cuZlqIFtltkHDisAv+uwEs8/XNJLKUsOT4+hMY1Q+uz0e/Z8Jv/
+	9fE+p0UFYgl7p3/uAE8FT3TKuIP50uPxcvQ==
+X-ME-Sender: <xms:ZKe4Z7CyGaQvrn90C-8t2aeJ22Gpf101QvN27jGvQryw0gRZLShggg>
+    <xme:ZKe4ZxhRsZf0hQus88LsMlTNcs6dut-xwwCe-qorP4GXlBzk7ikqJW-vCgeMGl8g4
+    t1ME3OW4iftItqieKE>
+X-ME-Received: <xmr:ZKe4Z2lv2260YtQh89BApHpVkh777GtwMkh-NO-ua_52O-H40xlyqU3h9G6t>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejtdegjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
+    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
+    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
+    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
+    pghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtfhhomh
+    hitghhvghvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshgufhesfhhomhhitghhvghv
+    rdhmvgdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvggu
+    uhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphht
+    thhopehsrggvvggusehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Zae4Z9wxNmGjKQEm3Gcm-XeV4Sj_-XxK2jx9w_pHn7UwvebJJZru1w>
+    <xmx:Zae4ZwSn8g-Lb0OwkmJXGkiWkXIiCk7arp5jRWb2ffp2zZzBIKgZiQ>
+    <xmx:Zae4ZwZR9bzvRfzbiJQGnMUfBzafWsyaHDpqYc3LDX5NS-az3P1z1A>
+    <xmx:Zae4ZxR1ZDO5w7nipdqILSC83lJr2iWrvRPsEhnnJ5fevV0sUk_fJg>
+    <xmx:Zae4ZzEE2e-LcbxzXOOVYxOsDPVokc0WO66RW4QZXaudfU3nq2NuUQ2k>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 21 Feb 2025 11:18:44 -0500 (EST)
+Date: Fri, 21 Feb 2025 17:18:42 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
+Subject: Re: [PATCH net-next v5 03/12] net: hold netdev instance lock during
+ queue operations
+Message-ID: <Z7inYue3xLFjlu5C@hog>
+References: <20250219202719.957100-1-sdf@fomichev.me>
+ <20250219202719.957100-4-sdf@fomichev.me>
+ <Z7dGFLSom9mnWFdB@hog>
+ <Z7dfqFr-knB3Bv0G@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,200 +108,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250221-xdp_vlan-v1-2-7d29847169af@bootlin.com>
+In-Reply-To: <Z7dfqFr-knB3Bv0G@mini-arch>
 
-On 02/21, Bastien Curutchet (eBPF Foundation) wrote:
-> test_xdp_vlan.sh isn't used by the BPF CI.
+2025-02-20, 09:00:24 -0800, Stanislav Fomichev wrote:
+> On 02/20, Sabrina Dubroca wrote:
+> > 2025-02-19, 12:27:10 -0800, Stanislav Fomichev wrote:
+> > > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+> > > index 533e659b15b3..cf9bd08d04b2 100644
+> > > --- a/drivers/net/ethernet/google/gve/gve_main.c
+> > > +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> > > @@ -1886,7 +1886,7 @@ static void gve_turndown(struct gve_priv *priv)
+> > >  			netif_queue_set_napi(priv->dev, idx,
+> > >  					     NETDEV_QUEUE_TYPE_TX, NULL);
+> > >  
+> > > -		napi_disable(&block->napi);
+> > > +		napi_disable_locked(&block->napi);
+> > 
+> > I don't think all the codepaths that can lead to gve_turndown have the
+> > required netdev_lock():
+> > 
+> > gve_resume -> gve_reset_recovery -> gve_turndown
+> Good catch, looks like suspend is missing the netdev lock as well, will
+> add.
 > 
-> Migrate test_xdp_vlan.sh in prog_tests/xdp_vlan.c.
-> It uses the same BPF programs located in progs/test_xdp_vlan.c and the
-> same network topology.
-> Remove test_xdp_vlan*.sh and their Makefile entries.
+> > gve_user_reset -> gve_reset -> gve_reset_recovery
+> I believe this should be covered by patch "net: ethtool: try to protect
+> all callback with netdev instance lock", no?
 > 
-> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
-> ---
->  tools/testing/selftests/bpf/Makefile               |   4 +-
->  tools/testing/selftests/bpf/prog_tests/xdp_vlan.c  | 175 ++++++++++++++++
->  tools/testing/selftests/bpf/test_xdp_vlan.sh       | 233 ---------------------
->  .../selftests/bpf/test_xdp_vlan_mode_generic.sh    |   9 -
->  .../selftests/bpf/test_xdp_vlan_mode_native.sh     |   9 -
->  5 files changed, 176 insertions(+), 254 deletions(-)
+> __dev_ethtool
+>   netdev_lock_ops
+>   ethtool_reset
+>     gve_user_reset
+
+Ah, right, sorry, I missed that.
+
+> Or is there some other reset path I'm missing?
+
+Looking at net/ethtool, maybe cmis_fw_update_reset?
+module_flash_fw_work -> ethtool_cmis_fw_update -> cmis_fw_update_reset -> ->reset()
+
+(no idea if it can ever be called for those drivers)
+
+> > (and nit:) There's also a few places in the series (bnxt, ethtool
+> > calling __netdev_update_features) where the lockdep
+> > annotation/_locked() variant gets introduced before the patch adding
+> > the corresponding lock.
 > 
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-> index 5dc9c84ed30f6e5a46572a9e428f692a79623469..09c1f731b8280696c729e3c87020ef749fee9dcb 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -103,8 +103,6 @@ TEST_PROGS := test_kmod.sh \
->  	test_tunnel.sh \
->  	test_lwt_seg6local.sh \
->  	test_lirc_mode2.sh \
-> -	test_xdp_vlan_mode_generic.sh \
-> -	test_xdp_vlan_mode_native.sh \
->  	test_lwt_ip_encap.sh \
->  	test_tc_tunnel.sh \
->  	test_tc_edt.sh \
-> @@ -118,7 +116,7 @@ TEST_PROGS := test_kmod.sh \
->  
->  TEST_PROGS_EXTENDED := \
->  	ima_setup.sh verify_sig_setup.sh \
-> -	test_xdp_vlan.sh test_bpftool.py
-> +	test_bpftool.py
->  
->  TEST_KMODS := bpf_testmod.ko bpf_test_no_cfi.ko bpf_test_modorder_x.ko \
->  	bpf_test_modorder_y.ko
-> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c b/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..18dd25344de768aa83a162a0c091f28a4e5f505e
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c
-> @@ -0,0 +1,175 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +/*
-> + * Network topology:
-> + *  -----------        -----------
-> + *  |  NS1    |        |   NS2   |
-> + *  | veth0  -|--------|- veth0  |
-> + *  -----------        -----------
-> + *
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <net/if.h>
-> +#include <uapi/linux/if_link.h>
-> +
-> +#include "network_helpers.h"
-> +#include "test_progs.h"
-> +#include "test_xdp_vlan.skel.h"
-> +
-> +
-> +#define VETH_NAME	"veth0"
-> +#define NS_MAX_SIZE	32
-> +#define NS1_NAME	"ns-xdp-vlan-1-"
-> +#define NS2_NAME	"ns-xdp-vlan-2-"
-> +#define NS1_IP_ADDR	"100.64.10.1"
-> +#define NS2_IP_ADDR	"100.64.10.2"
-> +#define VLAN_ID		4011
-> +
-> +static int setup_network(char *ns1, char *ns2)
-> +{
-> +	if (!ASSERT_OK(append_tid(ns1, NS_MAX_SIZE), "create ns1 name"))
-> +		goto fail;
-> +	if (!ASSERT_OK(append_tid(ns2, NS_MAX_SIZE), "create ns2 name"))
-> +		goto fail;
-> +
+> This is mostly about ethtool patch and queue ops patch?
 
-[..]
+Patch 04 also adds a lockdep annotation to __netdev_update_features,
+which gets call (unlocked until the ethtool patch) from ethtool.
 
-> +	SYS(fail, "ip netns add %s", ns1);
-> +	SYS(fail, "ip netns add %s", ns2);
+> The latter
+> converts most of the napi/netif calls to _locked variant leaving
+> a small window where some of the paths might be not properly locked.
+> Not sure what to do about it, but probably nothing since everything
+> is still rtnl_lock-protected and the issue is mostly about (temporary)
+> wrong lockdep annotations?
 
-Will replacing these with open_netns work? Or we don't setup up enough
-state to cooperate with 'ip' tool? (same for cleanup_network if it
-works)
+Yes, it's temporary (I didn't check the final bnxt patch to see if it
+covers all paths).
 
-> +	SYS(fail, "ip -n %s link add %s type veth peer name %s netns %s",
-> +	    ns1, VETH_NAME, VETH_NAME, ns2);
-> +
-> +	/* NOTICE: XDP require VLAN header inside packet payload
-> +	 *  - Thus, disable VLAN offloading driver features
-> +	 */
-> +	SYS(fail, "ip netns exec %s ethtool -K %s rxvlan off txvlan off", ns1, VETH_NAME);
-> +	SYS(fail, "ip netns exec %s ethtool -K %s rxvlan off txvlan off", ns2, VETH_NAME);
-> +
-> +	/* NS1 configuration */
-> +	SYS(fail, "ip -n %s addr add %s/24 dev %s", ns1, NS1_IP_ADDR, VETH_NAME);
-> +	SYS(fail, "ip -n %s link set %s up", ns1, VETH_NAME);
-> +
-> +	/* NS2 configuration */
-> +	SYS(fail, "ip -n %s link add link %s name %s.%d type vlan id %d",
-> +	    ns2, VETH_NAME, VETH_NAME, VLAN_ID, VLAN_ID);
-> +	SYS(fail, "ip -n %s addr add %s/24 dev %s.%d", ns2, NS2_IP_ADDR, VETH_NAME, VLAN_ID);
-> +	SYS(fail, "ip -n %s link set %s up", ns2, VETH_NAME);
-> +	SYS(fail, "ip -n %s link set %s.%d up", ns2, VETH_NAME, VLAN_ID);
-> +
-> +	/* At this point ping should fail because VLAN tags are only used by NS2 */
-> +	return !SYS_NOFAIL("ip netns exec %s ping -W 1 -c1 %s", ns2, NS1_IP_ADDR);
-> +
-> +fail:
-> +	return -1;
-> +}
-> +
-> +static void cleanup_network(const char *ns1, const char *ns2)
-> +{
-> +	SYS_NOFAIL("ip netns del %s", ns1);
-> +	SYS_NOFAIL("ip netns del %s", ns2);
-> +}
-> +
-> +static void xdp_vlan(struct bpf_program *xdp, struct bpf_program *tc, u32 flags)
-> +{
-> +	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_EGRESS);
-> +	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
-> +	char ns1[NS_MAX_SIZE] = NS1_NAME;
-> +	char ns2[NS_MAX_SIZE] = NS2_NAME;
-> +	struct nstoken *nstoken = NULL;
-> +	int interface;
-> +	int ret;
-> +
-> +	if (!ASSERT_OK(setup_network(ns1, ns2), "setup network"))
-> +		goto cleanup;
-> +
-> +	nstoken = open_netns(ns1);
-> +	if (!ASSERT_OK_PTR(nstoken, "open NS1"))
-> +		goto cleanup;
-> +
-> +	interface = if_nametoindex(VETH_NAME);
-> +	if (!ASSERT_NEQ(interface, 0, "get interface index"))
-> +		goto cleanup;
-> +
-> +	ret = bpf_xdp_attach(interface, bpf_program__fd(xdp), flags, NULL);
-> +	if (!ASSERT_OK(ret, "attach xdp_vlan_change"))
-> +		goto cleanup;
-> +
-> +	tc_hook.ifindex = interface;
-> +	ret = bpf_tc_hook_create(&tc_hook);
-> +	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
-> +		goto detach_xdp;
-> +
-> +	/* Now we'll use BPF programs to pop/push the VLAN tags */
-> +	tc_opts.prog_fd = bpf_program__fd(tc);
-> +	ret = bpf_tc_attach(&tc_hook, &tc_opts);
-> +	if (!ASSERT_OK(ret, "bpf_tc_attach"))
-> +		goto detach_xdp;
-> +
-> +	close_netns(nstoken);
-> +	nstoken = NULL;
-> +
-> +	/* Now the namespaces can reach each-other, test with pings */
-> +	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns1, NS2_IP_ADDR);
-> +	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns2, NS1_IP_ADDR);
-> +
-> +
-> +detach_tc:
-> +	bpf_tc_detach(&tc_hook, &tc_opts);
-> +detach_xdp:
-> +	bpf_xdp_detach(interface, flags, NULL);
-> +cleanup:
-> +	close_netns(nstoken);
-> +	cleanup_network(ns1, ns2);
-> +}
-> +
-> +/* First test: Remove VLAN by setting VLAN ID 0, using "xdp_vlan_change"
-> + * egress use TC to add back VLAN tag 4011
-> + */
-> +void test_xdp_vlan_change(void)
-> +{
-> +	struct test_xdp_vlan *skel;
-> +
-> +	skel = test_xdp_vlan__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "xdp_vlan__open_and_load"))
-> +		return;
-> +
+> Any other suggestions?
 
-[..]
+I guess the alternative would be introducing netdev_lock where it
+belongs before adding the lockdep annotations/switching to _locked()
+variants.
 
-> +	if (test__start_subtest("0"))
-> +		xdp_vlan(skel->progs.xdp_vlan_change, skel->progs.tc_vlan_push, 0);
+Maybe it's not worth the pain of reworking this patchset if it ends up
+in the correct state anyway, I don't know. Probably more a question
+for the maintainers, depending on what they prefer.
 
-Does the original test also test with flags=0? What is the purpose?
+> Thanks for the review!
+
+Thanks
+
+-- 
+Sabrina
 
