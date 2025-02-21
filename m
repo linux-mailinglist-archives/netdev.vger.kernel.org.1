@@ -1,101 +1,107 @@
-Return-Path: <netdev+bounces-168518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C7A3F385
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:56:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDF6A3F47D
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 13:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3E927A9C55
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:54:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFCE63AE987
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4675209F33;
-	Fri, 21 Feb 2025 11:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20AA209F4E;
+	Fri, 21 Feb 2025 12:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="J4o+ey0M"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dwNQPBxS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0C9202F65;
-	Fri, 21 Feb 2025 11:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2712D205518
+	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 12:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740138937; cv=none; b=gn2qvIvX2WJQ7DSYSVICbR9EfCsfG+5a5gQS+nD03asjC7kzKVqXMgjii8pIoAJuZfwnAhyqHCyYLHmcP5RQhChXeURUHTW275W34Z9HVqOm1jXXOH8i6pmfYF378fOixYItV6Bk+NyiBIoWJcOGsgK29dKNNEBGMY+0J8D3BRs=
+	t=1740141303; cv=none; b=VZ5hBws9TnMWa8SuRKheCmthXASISDvGxbdk8b5olv6QFIDJ5W8S5ibVF8qBr+BsrKy4tJJEBJh2ebrTTfm9yhAjftp3BAVuxGWvMiBEaeiKwsko5FP7W7fyI8KuPsOXItAR7Mtf6QuisNUoSv6gnizfk4G+RslcmXp304uTVxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740138937; c=relaxed/simple;
-	bh=JC8ogyqOI8xN8zaQhdtMlNxpZBkM46jcluP/sZz9IUk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TpGRO7rHeBtUEfBpjazBMxrFpT6HErFXe9rchhOCygk1PAIivuO/s8GIJ9vW5riZlbi/iY6hG8o1fUdJMf0RuE7rQVB8q20sHROStVM2QvKBmwvlWi0Mx5WUcUH06k1mZYTdLL29SLfyAMcGHXItTSTpbH7Eg68yVwP8QRiv4+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=J4o+ey0M; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1740138929; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=rhCWKZ300d1LYGozeyZzfCVOrsA+uIHUJ8oJ+AoQ8Fw=;
-	b=J4o+ey0MdqpYv+khiciAaqTqGoIShlNMfrBa7/8RXZ1N5Q/50PTC96y1nSQjDqFeI6GKpQ0eW7fGmYOZQOM+FKiPAZKG6Nh9GkjllH/hAT/okO2rmlKk4cf3zuc5dXW45HJd+DINg73C8Y5Tm0iQGqvMYg0tWWcLtIW0h+izYZI=
-Received: from 30.221.144.133(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WPwJ1x1_1740138927 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 21 Feb 2025 19:55:28 +0800
-Message-ID: <365859bd-1457-4f83-91f4-34a7f21e1d8f@linux.alibaba.com>
-Date: Fri, 21 Feb 2025 19:55:27 +0800
+	s=arc-20240116; t=1740141303; c=relaxed/simple;
+	bh=R/+7sPe6uNOKfySZ6Knz9K0A5nD2QRvniqLznl4Lung=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sa6PgpXbH/fREuAJryY5Aq7XeFucYY+czZAL4MM9gNeHRWrsGG29HwcNRessEJW4guXgOqjUJxA48IsywymhzwAAh9q0KAcOwGCTD38t0gOA37Glcfv75nSSgd3rqhftF8F/ePl1oispWCxDZ4oF4u98J2TqM26kVvEFUNLTwvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dwNQPBxS; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740141302; x=1771677302;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=R/+7sPe6uNOKfySZ6Knz9K0A5nD2QRvniqLznl4Lung=;
+  b=dwNQPBxSxCGH8DqMr/osneSFD5ZIgFf/GqKz6JMM0P8AWK01AMztA7tB
+   fGJrFxz24mzBayCaH/aAdDrrmBiGgOMqGiL8LGFTDx4n+E1RvEz9S+UYz
+   l9E0OEN+qKjwmaegnG0MyBoQjNkwirjfo1Pg2MLZNIqQGQ/2HJG+XSo7E
+   VTgzigZXBTB+e2/ASVxIFdYSW5w7FNT5uYIubGgqcTnayklFie2qZJQxC
+   YUt02Wvs0OW7a4jUwJReG9P6AKZG/vU2R2iFJezRYH1IDkKhgXprcC4QM
+   LP43aH0Cwmy9xc1iZKK/xcBmFgrCG641ttcIS2LZkGwYQh9MRuZuqdtuI
+   w==;
+X-CSE-ConnectionGUID: HTdviUYjSaKGMqcLNkmTWg==
+X-CSE-MsgGUID: 1d06hyf2Ru6AoQlMI9dI+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="66321387"
+X-IronPort-AV: E=Sophos;i="6.13,304,1732608000"; 
+   d="scan'208";a="66321387"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 04:35:01 -0800
+X-CSE-ConnectionGUID: jqfNv3xsQJeaJpeZMGLFAw==
+X-CSE-MsgGUID: 0gmIV+uIRGeDaDns+h3u5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="115862544"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by orviesa007.jf.intel.com with ESMTP; 21 Feb 2025 04:35:01 -0800
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v1 0/3] E825C timesync dual NAC support
+Date: Fri, 21 Feb 2025 13:31:20 +0100
+Message-Id: <20250221123123.2833395-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipvs: Always clear ipvs_property flag in
- skb_scrub_packet()
-To: Julian Anastasov <ja@ssi.bg>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- asml.silence@gmail.com, willemb@google.com, almasrymina@google.com,
- chopps@labn.net, aleksander.lobakin@intel.com, nicolas.dichtel@6wind.com,
- dust.li@linux.alibaba.com, hustcat@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250221013648.35716-1-lulie@linux.alibaba.com>
- <610b255c-51e4-0460-05a2-ab9cd8c43295@ssi.bg>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <610b255c-51e4-0460-05a2-ab9cd8c43295@ssi.bg>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+
+This patch series adds full support for timesync operations for E8225C
+devices which are configured in so called 2xNAC mode (Network
+Acceleration Complex). 2xNAC mode is the mode in which IO die
+is housing two complexes and each of them has its own PHY connected
+to it. The complex which controls time transmitter is referred as
+primary complex.
+
+The series solves known configuration issues in dual config mode:
+- side-band queue (SBQ) addressing when configuring the ports on the PHY
+  on secondary NAC
+- access to timesync config from the second NAC as only one PF in
+  primary NAC controls time transmitter clock
+Karol Kolacinski (3):
+  ice: remove SW side band access workaround for E825
+  ice: refactor ice_sbq_msg_dev enum
+  ice: enable timesync operation on 2xNAC E825 devices
+
+ drivers/net/ethernet/intel/ice/ice.h         | 60 +++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_common.c  |  8 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 49 +++++++++---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 82 ++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |  5 --
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h | 11 +--
+ drivers/net/ethernet/intel/ice/ice_type.h    |  1 +
+ 7 files changed, 149 insertions(+), 67 deletions(-)
 
 
-
-On 2025/2/21 19:42, Julian Anastasov wrote:
-> 
-> 	Hello,
-> 
-> On Fri, 21 Feb 2025, Philo Lu wrote:
-> 
->> We found an issue when using bpf_redirect with ipvs NAT mode after
->> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
->> the same name space"). Particularly, we use bpf_redirect to return
->> the skb directly back to the netif it comes from, i.e., xnet is
->> false in skb_scrub_packet(), and then ipvs_property is preserved
->> and SNAT is skipped in the rx path.
->>
->> ipvs_property has been already cleared when netns is changed in
->> commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
->> SKB net namespace changed"). This patch just clears it in spite of
->> netns.
->>
->> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->> ---
->> This is in fact a fix patch, and the issue was found after commit
->> ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
->> the same name space"). But I'm not sure if a "Fixes" tag should be
->> added to that commit.
-> 
-> 	You can add 2b5ec1a5f973 as a Fixes tag in v2 and I'll ack it.
-
-Thank you, Julian. You also solve my worries. I'll post v2 soon.
-
+base-commit: 692375ca2a4e6916ddc2ef0d73faa37c7a93cd1a
 -- 
-Philo
+2.39.3
 
 
