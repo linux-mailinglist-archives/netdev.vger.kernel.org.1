@@ -1,185 +1,178 @@
-Return-Path: <netdev+bounces-168508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647CEA3F317
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:39:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7959A3F334
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 12:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E4DE171457
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:39:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2587E19C1B13
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D499E20898C;
-	Fri, 21 Feb 2025 11:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79462209F30;
+	Fri, 21 Feb 2025 11:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GDinz2Zq"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="ymShszHt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D539E208965
-	for <netdev@vger.kernel.org>; Fri, 21 Feb 2025 11:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F39209669;
+	Fri, 21 Feb 2025 11:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740137940; cv=none; b=MxmMJSzQAciWFE5L9gU6UUnxX1vwn2egVoWO3Syq7+kIAS4D7ZqUxqcy9KiyogPj7m4F31pUEfeQySeRIxQN6X7Ul5bspa8ItKo6Y1wBzoRYM3ZT9MUjO7+6sOXt8EnmcCqAB6uyyJ+xcioB42pDDgP+UZdGa7O6Bp9N2qNwlIY=
+	t=1740138175; cv=none; b=XuFzdMiV8yJaIw+qgiBPYOwzgLbbv44/4YznQRIgpY5e+xYz9x/B3hp62fnlmYxyqEgr9OcdOWD8ryDRvcMsWtvi9IrdQ9kI01OTuvo9esAv5B8SE8JSXaqJU3N+Vmf9QeY59hd6pmrLOKjIkPKA1Fw4bQZfPN5r1q9wiJQQ7xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740137940; c=relaxed/simple;
-	bh=Q5C9jZ75/J4LVn1spUgkX1rO5finnriKgEaNk1n8gB0=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=Je7IorjrSJy6pvtFABssFPxF7Wig3qzSlOvv9BMF5jQv/9XOKzpNsM24uKCxsgP/lJQAyB/5tqC0lKk2n+NdqCYH4FQJ/q01T3utWr0/LSd6YOcovDrRWkgXuVItmT/FHJeo4ZKmtM7IXEX5zAx/4Oop6zcTllyRTy1A4sNDbTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GDinz2Zq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ubcFVw06F0SKzsJM+Oly32EtkAMHW1V2VY1dtGf6Alk=; b=GDinz2ZqhbKxZ7xTfoyg7eURJ5
-	SwOazIMBpniKA2cButKSocN5EZvGiEwiq4h8n+KUQiO7cF0fw8UE8j4q1CMPaluCdSBDORArxrDdn
-	jIS5wfETvNOhAoekSOUV+RqiFv5sa1vCyru2vWfriOUjxBQjoG18rUWrXGaPhaHNdZAfKnw56VNKF
-	nsRMSvl+hk6YE1ywQAyCDu1jcbhuUMK0X92lkygkwuNUb7VEXMArWWp1zr1wcTeCY1bxs53/hNI5g
-	TEcgsgQYhrqo4rveuK9XTv73cnLVLpOVs/bdX7lEpWLZPnVtSdxS3YsyrFFOoT13r1zSElx0iFF3x
-	jM46SR0w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33920 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tlRMj-0004Pv-2i;
-	Fri, 21 Feb 2025 11:38:45 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tlRMP-004Vt5-W1; Fri, 21 Feb 2025 11:38:26 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: dwc-qos: clean up clock initialisation
+	s=arc-20240116; t=1740138175; c=relaxed/simple;
+	bh=rHO1TE402i+X64ecIGyWE4iQT9eVIwC498+u0VfYSmM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=oGj6/oa2cgzqmUYdNhFw4qYZr+sdMr3gpPMl8UvBL+Pq+PuBEDu4vI7spKCaNG4xmG7IIBI087GwA64XlceyAYo7lT+v75ySOvNM17B/qgwTTVOQTzz9BHnhY/eB6wfWhEWFSX+Jz84uEq0UXqGaov5bMtURP1X/7zmLMktiVgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=ymShszHt; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 7DD7822C81;
+	Fri, 21 Feb 2025 13:42:36 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=Rvmmn/22ErC/lFdIKwmR7DRAR2odvCfMBz7Z7y4EnLs=; b=ymShszHtW9yj
+	NVSoY/HVnCviiGK64bWkr3OF0NU1esvPFv1zwF2SaJgTi/BEkF9jCEG/yy3WF6tQ
+	XZ2Bl4LfgNwWIw759/4pYk60BjSLuQ0AsmL+jXFBZlpgScS7dId1Zz5I+IJxswUD
+	F+d0D8cZYc6f64Q+XXLjVTQaW3fpOBN5soUTdOGtTezEH9DNXS6tsZ4y4QGrurYP
+	chDZZ/kwncjh5sVZiipXNmZFXtNGSkLNt4F26QspBIqYfI4EqfhLj6kT1cOerD/b
+	/bYU/L5jKwwfI+P/glvtLHZCphSQnqB2NzEuvkdzZE69zNdKOvZPO7oRO6wct0Hn
+	WidWEYmlX4/5buNFASeiqMwPmWsV6MH7dMvhHsadMm7Rplqbl/YB+4tRQtNo4uvC
+	7laVojkyBWtETNYxUq0to1Q72sSQvcAYbQsXjUfUKf6U2TWPvddzCmiu74dh1xD6
+	hN0zDhPGTcPXddusn3Sek2y/RI0MP7dsPJ9uPsoO799SoWC47kQTW7X+OO10GaeQ
+	uC9zYhsRZA/Y9dzunplwUU/kqiM2j2ps+UpnqyTgBimRE9PfLNbkm2flXYF6F/GD
+	HiGFFTreSpj48pJTDfdTyLIBrmZsSB06iesRVfT2PQaYBWiLiY17litAe1Qa7PZ1
+	+JTmdWuNz/N3U8hUAxNi3XCmstiS4gs=
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Fri, 21 Feb 2025 13:42:35 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 93ECD15EA8;
+	Fri, 21 Feb 2025 13:42:25 +0200 (EET)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 51LBgGPs027564;
+	Fri, 21 Feb 2025 13:42:17 +0200
+Date: Fri, 21 Feb 2025 13:42:16 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: Philo Lu <lulie@linux.alibaba.com>
+cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        asml.silence@gmail.com, willemb@google.com, almasrymina@google.com,
+        chopps@labn.net, aleksander.lobakin@intel.com,
+        nicolas.dichtel@6wind.com, dust.li@linux.alibaba.com,
+        hustcat@gmail.com, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ipvs: Always clear ipvs_property flag in
+ skb_scrub_packet()
+In-Reply-To: <20250221013648.35716-1-lulie@linux.alibaba.com>
+Message-ID: <610b255c-51e4-0460-05a2-ab9cd8c43295@ssi.bg>
+References: <20250221013648.35716-1-lulie@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tlRMP-004Vt5-W1@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 21 Feb 2025 11:38:25 +0000
+Content-Type: text/plain; charset=US-ASCII
 
-Clean up the clock initialisation by providing a helper to find a
-named clock in the bulk clocks, and provide the name of the stmmac
-clock in match data so we can locate the stmmac clock in generic
-code.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-dwc_eth_find_clk() should probably become a generic helper given that
-plat_dat->clks is part of the core platform support code, but that
-can be done later when converting more drivers - which I will get
-around to once I've got the set_clk_tx_rate() patch series out that
-someone else needs to make progress.
+	Hello,
 
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 32 +++++++++++--------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+On Fri, 21 Feb 2025, Philo Lu wrote:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 392574bdd4a4..9e2035d1fb86 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -35,6 +35,16 @@ struct tegra_eqos {
- 	struct gpio_desc *reset;
- };
- 
-+static struct clk *dwc_eth_find_clk(struct plat_stmmacenet_data *plat_dat,
-+				    const char *name)
-+{
-+	for (int i = 0; i < plat_dat->num_clks; i++)
-+		if (strcmp(plat_dat->clks[i].id, name) == 0)
-+			return plat_dat->clks[i].clk;
-+
-+	return 0;
-+}
-+
- static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
- 				   struct plat_stmmacenet_data *plat_dat)
- {
-@@ -121,12 +131,7 @@ static int dwc_qos_probe(struct platform_device *pdev,
- 			 struct plat_stmmacenet_data *plat_dat,
- 			 struct stmmac_resources *stmmac_res)
- {
--	for (int i = 0; i < plat_dat->num_clks; i++) {
--		if (strcmp(plat_dat->clks[i].id, "apb_pclk") == 0)
--			plat_dat->stmmac_clk = plat_dat->clks[i].clk;
--		else if (strcmp(plat_dat->clks[i].id, "phy_ref_clk") == 0)
--			plat_dat->pclk = plat_dat->clks[i].clk;
--	}
-+	plat_dat->pclk = dwc_eth_find_clk(plat_dat, "phy_ref_clk");
- 
- 	return 0;
- }
-@@ -237,18 +242,12 @@ static int tegra_eqos_probe(struct platform_device *pdev,
- 
- 	eqos->dev = &pdev->dev;
- 	eqos->regs = res->addr;
-+	eqos->clk_slave = data->stmmac_clk;
- 
- 	if (!is_of_node(dev->fwnode))
- 		goto bypass_clk_reset_gpio;
- 
--	for (int i = 0; i < data->num_clks; i++) {
--		if (strcmp(data->clks[i].id, "slave_bus") == 0) {
--			eqos->clk_slave = data->clks[i].clk;
--			data->stmmac_clk = eqos->clk_slave;
--		} else if (strcmp(data->clks[i].id, "tx") == 0) {
--			eqos->clk_tx = data->clks[i].clk;
--		}
--	}
-+	eqos->clk_tx = dwc_eth_find_clk(data, "tx");
- 
- 	eqos->reset = devm_gpiod_get(&pdev->dev, "phy-reset", GPIOD_OUT_HIGH);
- 	if (IS_ERR(eqos->reset)) {
-@@ -312,15 +311,18 @@ struct dwc_eth_dwmac_data {
- 		     struct plat_stmmacenet_data *data,
- 		     struct stmmac_resources *res);
- 	void (*remove)(struct platform_device *pdev);
-+	const char *stmmac_clk_name;
- };
- 
- static const struct dwc_eth_dwmac_data dwc_qos_data = {
- 	.probe = dwc_qos_probe,
-+	.stmmac_clk_name = "apb_pclk",
- };
- 
- static const struct dwc_eth_dwmac_data tegra_eqos_data = {
- 	.probe = tegra_eqos_probe,
- 	.remove = tegra_eqos_remove,
-+	.stmmac_clk_name = "slave_bus",
- };
- 
- static int dwc_eth_dwmac_probe(struct platform_device *pdev)
-@@ -360,6 +362,8 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret, "Failed to enable clocks\n");
- 
-+	data->stmmac_clk = dwc_eth_find_clk(plat_dat, data->stmmac_clk_name);
-+
- 	ret = data->probe(pdev, plat_dat, &stmmac_res);
- 	if (ret < 0) {
- 		dev_err_probe(&pdev->dev, ret, "failed to probe subdriver\n");
--- 
-2.30.2
+> We found an issue when using bpf_redirect with ipvs NAT mode after
+> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+> the same name space"). Particularly, we use bpf_redirect to return
+> the skb directly back to the netif it comes from, i.e., xnet is
+> false in skb_scrub_packet(), and then ipvs_property is preserved
+> and SNAT is skipped in the rx path.
+> 
+> ipvs_property has been already cleared when netns is changed in
+> commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
+> SKB net namespace changed"). This patch just clears it in spite of
+> netns.
+> 
+> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+> ---
+> This is in fact a fix patch, and the issue was found after commit
+> ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+> the same name space"). But I'm not sure if a "Fixes" tag should be
+> added to that commit.
+
+	You can add 2b5ec1a5f973 as a Fixes tag in v2 and I'll ack it.
+
+	Nowadays, ipvs_property prevents unneeded connection
+lookups while the packet traverses the hooks (different IPVS
+hook handlers can see the same packet in same or next hook).
+This includes the case where packet can be routed to local server,
+eg. via loopback_xmit(), for example:
+
+Packet from device:
+	LOCAL_IN: set ipvs_property=1
+	Reroute to local server ?
+		Then to hit the local server continue the NF hook
+	Otherwise, route via device:
+		LOCAL_OUT: use ipvs_property to avoid conn lookup
+			and rerouting
+		LOCAL_OUT:
+			Unexpected divert to local server by someone else?
+			=> LOCAL_IN: use ipvs_property to avoid conn
+			lookup and rerouting
+
+Packet from local client:
+	LOCAL_OUT: set ipvs_property=1
+	Reroute to local server?
+		Then continue via loopback_xmit() without 
+			skb_scrub_packet()
+		LOCAL_IN: use ipvs_property to avoid conn lookup and
+			rerouting
+		Hit the local server
+	Otherwise, route via device:
+		Others at LOCAL_OUT: Unexpected divert to local server by 
+			someone else ?
+			=> LOCAL_IN: use ipvs_property to avoid conn 
+			lookup and rerouting
+
+	So, we need ipvs_property set only during the normal
+path where packet is received and sent, possibly to local
+server via local route. We do not care if the packet leaves
+this path. Currently, ipvs_property was cleared if netns
+changes but it is a safe option. What matters is if packet
+is routed via local route. Other paths can reset the flag
+safely.
+
+> ---
+>  net/core/skbuff.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 7b03b64fdcb2..b1c81687e9d8 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -6033,11 +6033,11 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
+>  	skb->offload_fwd_mark = 0;
+>  	skb->offload_l3_fwd_mark = 0;
+>  #endif
+> +	ipvs_reset(skb);
+>  
+>  	if (!xnet)
+>  		return;
+>  
+> -	ipvs_reset(skb);
+>  	skb->mark = 0;
+>  	skb_clear_tstamp(skb);
+>  }
+> -- 
+> 2.32.0.3.g01195cf9f
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
