@@ -1,133 +1,96 @@
-Return-Path: <netdev+bounces-168477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B9CCA3F1D6
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:21:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD9BFA3F23B
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 11:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A1817A32C8
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:21:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14B2419C25D5
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 10:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCEA20102C;
-	Fri, 21 Feb 2025 10:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDAF0204F86;
+	Fri, 21 Feb 2025 10:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvcUqRO/"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="Zaacu6yf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68071C1F2F;
-	Fri, 21 Feb 2025 10:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E80204588;
+	Fri, 21 Feb 2025 10:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740133309; cv=none; b=eSzmWC7X8UsFxUSVj1J4NaixKFmkEWs/NDx5WPfnJGT9LaFYSHxEk2smQmk7VHFLKqvORSeYEnpuZRGcuOyv80YDKve+9ou/dJLrHkzrrUeu2Nc0i28cYSqBl/YpfeA+k1A2wV2+ewKRr18Ja8AHdatix44tvlmlhy4cRuIRi4s=
+	t=1740134295; cv=none; b=K5MgbiTK8yk58I35NVWVWS1LzjNN72fPqWiOAM6F26jpwNrJvkjlODbXUYc0Bc/73ZGzoEV1h5DcTqoc6dGwOeSmp6tX3AvXyvrGeReBOgIaA94CivnKAW9S5LbjXbgwaY1DhIYDQJCxLEjOX6icwMcy48I0tZxWV2BCrAFg9Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740133309; c=relaxed/simple;
-	bh=XGK2u8TzDSVYk6sYqHcLEUtV1chH/9Nf1/m1rp6PLFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LaGlTS/uDFrkw2P23Vaoh+vuZdHJTI1oXMxi+MsbbbqvmS7/j3x25giQKnZrb3pTGz0hIccpDqyK7v+JYhKTvspyII6dnoc+N236YMoDgaJOvPrs03C51NwGerx/zS7sfmVONmP1u+zrZTj/gQRB1t7iWOqBVrFYY0Kgq5vUMC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvcUqRO/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8CB3C4CED6;
-	Fri, 21 Feb 2025 10:21:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740133309;
-	bh=XGK2u8TzDSVYk6sYqHcLEUtV1chH/9Nf1/m1rp6PLFk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TvcUqRO/wdyzQqZ5+SB544WaloOOKDZNuHTBCKvW+7CKs50oi/U8PLV45rCydbztx
-	 eI03a66HfPq+gU/kWT3snjZAMEzAdno1YL2FwkdFu79HZY60KB2YVpGSd7lH05mpfq
-	 NEOHRSOBFjmBUin5DC+CUoLSCFl1pNq+hwQGu4bJSC/TZnd1VJeFJ5+Nkq/anr72XT
-	 Srd42611UD0zqqp3wNGozkxmgbOhJEvmsPB6lJf0UDrGa6yfMdgLE4xos9FNIm0eyj
-	 739Y04BzEU5Zc5miWg53unjJMXGzla/6gHq6nZvheOQXrmMBKyUwu56ZJ9n9q7Efib
-	 4TjYeFeJhLMuw==
-Date: Fri, 21 Feb 2025 11:21:46 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next v5 12/15] net: airoha: Introduce Airoha NPU
- support
-Message-ID: <Z7hTujrG-zOiBcZe@lore-desk>
-References: <20250217-airoha-en7581-flowtable-offload-v5-0-28be901cb735@kernel.org>
- <20250217-airoha-en7581-flowtable-offload-v5-12-28be901cb735@kernel.org>
- <20250220143839.5ea18735@kernel.org>
+	s=arc-20240116; t=1740134295; c=relaxed/simple;
+	bh=zsuGkG9pt7DR8lIBmmpcoQmZuYi7n9jRkvURlQJZYoI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fYqOz9mFdNv5y+fa0ApasnN2t1bMf2IzTebTJVGS3ELNJcYyuZ2F4y32XyRZwzbAVlhIPFSEFotKlAJ5ZFMPKI8+Y61qDWcdOcTrRkAlB62Eqo5Ut+CquWVmiJJfTY0E4Ds9OIG35Hc9MT2jTwhCgYFN74qY4DdC75bpLsqckwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=Zaacu6yf; arc=none smtp.client-ip=220.197.31.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=4wsFt
+	kC/20HRHnGDtuXh0yXz80WT2rBNa6hfJHDeBME=; b=Zaacu6yfs0qHHjg4DEJMj
+	QkSPtptluZiHuUdTEd0GCsyEETN8GuqkFCKinoERecPPWPA5NZVNf7GfEAnEW0Zu
+	1lpArqGlF0OhbC1Sh7VWecETumJWxa33xNIX36Ru4shGLYGHKgueSHiWLwb3tvQz
+	tWCDssmGaW+tPJjhBajal8=
+Received: from ubuntu.. (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDnzzbSU7hnU7KwBA--.55096S2;
+	Fri, 21 Feb 2025 18:22:11 +0800 (CST)
+From: wh_bin@126.com
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	hongbin wang <wh_bin@126.com>
+Subject: [PATCH] netfilter: conntrack do not print ah and esp as unknown via /proc
+Date: Fri, 21 Feb 2025 10:21:53 +0000
+Message-Id: <20250221102153.4625-1-wh_bin@126.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RxJWLYxefS/CP3b0"
-Content-Disposition: inline
-In-Reply-To: <20250220143839.5ea18735@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnzzbSU7hnU7KwBA--.55096S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JF47CrykJFW8XF4fWry3Jwb_yoW3Arg_A3
+	97WF18XFs5JF9Fvr4Duw4fCry2ka4rZr93Xr9ruayI9a45GryI9rWkWrnYv345GwsYgFyx
+	Crs8try2v3yvkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRKksgUUUUUU==
+X-CM-SenderInfo: xzkbuxbq6rjloofrz/1tbiOgb6ome4TsNZowAAsM
 
+From: hongbin wang <wh_bin@126.com>
 
---RxJWLYxefS/CP3b0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+/proc/net/nf_conntrack shows ah and esp as unknown.
 
-On Feb 20, Jakub Kicinski wrote:
-> On Mon, 17 Feb 2025 14:01:16 +0100 Lorenzo Bianconi wrote:
-> > +static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
-> > +			       void *p, int size)
-> > +{
-> > +	u16 core =3D 0; /* FIXME */
-> > +	u32 val, offset =3D core << 4;
-> > +	dma_addr_t dma_addr;
-> > +	void *addr;
-> > +	int ret;
-> > +
-> > +	addr =3D kzalloc(size, GFP_ATOMIC | GFP_DMA);
->=20
-> You need the actual "zone DMA" memory from ISA times?
-> I think that's what GFP_DMA is for. Any kmalloc'd memory
-> can be DMA'ed to/from.
+Signed-off-by: hongbin wang <wh_bin@126.com>
+---
+ net/netfilter/nf_conntrack_standalone.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-ack, I agree. We can drop it. I will fix it in v6.
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 502cf10aab41..29fb5a07a6c2 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -266,6 +266,8 @@ static const char* l4proto_name(u16 proto)
+ 	case IPPROTO_SCTP: return "sctp";
+ 	case IPPROTO_UDPLITE: return "udplite";
+ 	case IPPROTO_ICMPV6: return "icmpv6";
++	case IPPROTO_ESP: return "esp";
++	case IPPROTO_AH: return "ah";
+ 	}
+ 
+ 	return "unknown";
+-- 
+2.34.1
 
->=20
-> > +	if (dma_set_coherent_mask(dev, 0xbfffffff))
->=20
-> Coherent mask is not contiguous on purpose?
-> Quick grep reveals no such cases at present, not sure if it works.
-> Maybe add a comment, at least ?
-
-Ack, right. I think it is wrong. I will fix it in v6.
-
-Regards,
-Lorenzo
-
-> --=20
-> pw-bot: cr
-
---RxJWLYxefS/CP3b0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ7hTugAKCRA6cBh0uS2t
-rANTAQDEQ8k7BX7x63iA2wmUooQvqpv1wCUZnNUKVcwf10KapgEAwCZGXymtR/Vg
-ssK3jSJEkoXsWRojYyqODeH7VvJcfgA=
-=KhfQ
------END PGP SIGNATURE-----
-
---RxJWLYxefS/CP3b0--
 
