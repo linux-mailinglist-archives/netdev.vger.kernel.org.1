@@ -1,194 +1,146 @@
-Return-Path: <netdev+bounces-168627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368DCA3FD94
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:38:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5EDA3FDF1
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 18:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CE97162480
-	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:38:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019F5427545
+	for <lists+netdev@lfdr.de>; Fri, 21 Feb 2025 17:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAE12505CE;
-	Fri, 21 Feb 2025 17:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hXIN3Z5O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9636424FBF7;
+	Fri, 21 Feb 2025 17:51:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5C31E9B31;
-	Fri, 21 Feb 2025 17:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CDF36AF5;
+	Fri, 21 Feb 2025 17:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740159479; cv=none; b=SqkTxrUimJC90bVmm1fizEz/CzHdoRv8ij6Q+RyL9oreC7u1Ce7DYAkPeqRC0ziCGKU9jzhX7qAzF43EAXn7d6x5COKDO+b+9RL3xdr2lxh3qcKSIpHEG5orTfBySu0BDuJz4AlgB2k0T+Ie9jLA6r+Gi7+v4f9Xl/9LIjZMDy4=
+	t=1740160298; cv=none; b=KTE72FtX3NQjPi9V/pAMnLJBJdr1oSNDCxpbPWi1XSMeF/Ycw8iRTsYOkFTg+DpYYGqOMfg3cvNdGg3c5XcQT2FhGkC/dPmDkQEuR7o1jn5EGQZqcYcmzMp03rJwV3V3bPIPf7GZQZB/ZbcuThMfUuLE9/EjW5ZVkWgBzoUW3JU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740159479; c=relaxed/simple;
-	bh=wIc0LcJDOs1i48hZA97m2pwA+nhyQVyiw2aP2OkNwEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hL7Lv+HEZGCpItVEZy1HTYPqGXmMAc4gr3Nh6W6tcDKA5Tw0nwfEMCAKBA/yN4EoBIPQs/ANBeRMT2efoUK/xijoxvLivkhXbjheL+ufXR0hV72Sx5SyN93KMSjvxAmhyhP+nsUZs+vFNprdVdtn+ouylJ0WmmD9O2GPY5yyG4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hXIN3Z5O; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51LB9LDm001350;
-	Fri, 21 Feb 2025 17:37:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=669DWXN4P39AfzDosqBdxQgy1+JPQG
-	AZQsinsyWix10=; b=hXIN3Z5OQhdJBooRXXuRybv72DWfi0kzbRw3tBKXSmyexI
-	l/1r0sxqOHQLqTM7omTY0IpqkOHdxY9kMV1dcyuZHujcnmRXWLS8IcmNiki0JXrn
-	O85p/x2//JuwQPxAFmbt5hz8VGJ1d1dTlkb3hKMKP59lM0gs5fOvtWwOUvJ0lJXs
-	IboyORKLziWRIJBm2//6Kj9re4WKeEszYUzJj74W4WJAWbDFBTkqAhX0rd0Y4IrS
-	A+xmuesKCPEQ5DV7VY7qjS7ITCk0lFKlrYqFIl15gZg2ZPzrgeSlkTm6RdMo52Qs
-	HbEH0SatpHGDzAWJooa67Cuw3rzyegxO3ousRgdg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44xdhaw01a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 17:37:49 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51LHbmpr032575;
-	Fri, 21 Feb 2025 17:37:49 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44xdhaw016-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 17:37:48 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51LFZSUF002348;
-	Fri, 21 Feb 2025 17:37:48 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44w03xh906-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 17:37:48 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51LHblr828836508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 21 Feb 2025 17:37:47 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5379858059;
-	Fri, 21 Feb 2025 17:37:47 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 327565804B;
-	Fri, 21 Feb 2025 17:37:47 +0000 (GMT)
-Received: from localhost (unknown [9.61.179.202])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 21 Feb 2025 17:37:47 +0000 (GMT)
-Date: Fri, 21 Feb 2025 11:37:46 -0600
-From: Nick Child <nnac123@linux.ibm.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
-        nick.child@ibm.com, pmladek@suse.com, rostedt@goodmis.org,
-        john.ogness@linutronix.de, senozhatsky@chromium.org
-Subject: Re: [PATCH net-next v3 1/3] hexdump: Implement macro for converting
- large buffers
-Message-ID: <Z7i56s7jwc_y0cIz@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20250219211102.225324-1-nnac123@linux.ibm.com>
- <20250219211102.225324-2-nnac123@linux.ibm.com>
- <20250220220050.61aa504d@pumpkin>
+	s=arc-20240116; t=1740160298; c=relaxed/simple;
+	bh=y8JOWFlcKlRL/xItMQwGuALZ+brY3FmxUzxUvjwziu4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WEdo0E2W39zXrADv8zJhIzuDW2KBZhtjWe/+akITTZ8QklMKubA818rw/mJW4kqKjTCSB6Xk8N/vmcQkwsuWA07BCEesKILY9wc5VUS/QYkLLElxMLPPi7/BP534Ae3geh6KMcV+EfcB+159Jc8Nn/pRVMhWC7FgY8T/KxMnbz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso420850266b.1;
+        Fri, 21 Feb 2025 09:51:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740160295; x=1740765095;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B+9QldxJW0IqP6a4oCK6OLGUXE4hkp56gGwvn/eRJp4=;
+        b=KgeLHQpCsRHMk+d3PGqKvut8kBv1v0TGj3hKVdb8BMbDAS1e0GJmkxG2IkfmwTVHQT
+         MYgSccesgUb5NWIosLdUl/dCsIMTwHPO44e3DzrmFYI/yWiv0/fC2ylOK4bEQAoAuTF8
+         PyUw+c1y205ePEWgZJL+mehxzsSVvuT/KJbuvVJHsD3kr0uDwpZ4FYdf5dlB+mKZvlVu
+         3PoWV/rUJ1zqS0a4QCaV2IxPA1Xed5wD2MJg97GzYqGQjYYDl2oCYyio7/3/65R3Sr1r
+         /CwO/bZnPbXdMUq2uV7qg9rpexoeaSDcXkoe7GErcilqRWo2RTB3mLMLDWIEAzVyyS11
+         fWcw==
+X-Forwarded-Encrypted: i=1; AJvYcCULfN0iVPGIpwoZkKck8JZFifxZi9iOe4iLHpV973T3QmAQY1FQVZqmh5bLs0DRr1eEznKohbegPvU12Wc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHDLADsReT+zI7bAOXV/CskGE4uDQOyY7tYRH+0K5h2dGRLcIj
+	ltQoARRiRQftGh+9Z9MbQyZZIbWIZbPmsuhklUz+w/0v1Add5Me+
+X-Gm-Gg: ASbGncu/nfbucCtzmVyrl61onI8JGEVxUSNWlKp/+TPJHNjMFfCbwbhK6Wr1i7tb0jA
+	Y+hC56ki/GwQKDdUE/bNPTnMZyU8NNg4Yqj9z8yxdkkrVY//lrvTQGVD31wUxgd/doN1LsUi4+i
+	FVRRPR58FJpIfsYvTgm3E43Pd+HkDsg2iqYXVDPyi3ZA1FmDkdZ1bfu5lFIUMqRfJ/MoyaRCRvs
+	c4Nip3s4kHRJrGFQM2lKFQ4HQiQZkoIJ+MUU1pT9zK+1YEukL2PZXQDewxNSFbb2GhbioG2OdBA
+	yL6TW56yfbIGtA+W
+X-Google-Smtp-Source: AGHT+IGYLJh7w1anpQnxC4OGPpeD5+o88IWTi19oeIwm0m7RMhONixihj+fm9H0mSYLLGRLcJOebVQ==
+X-Received: by 2002:a17:907:d2a:b0:ab7:fc9a:28e1 with SMTP id a640c23a62f3a-abc0de5a487mr400273066b.52.1740160294328;
+        Fri, 21 Feb 2025 09:51:34 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb9faab9f1sm954428266b.49.2025.02.21.09.51.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 09:51:33 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 21 Feb 2025 09:51:27 -0800
+Subject: [PATCH net-next] net: Remove shadow variable in netdev_run_todo()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250220220050.61aa504d@pumpkin>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5xECC4AGJpgVrmjDK2pr7w7ca8IzgKH_
-X-Proofpoint-ORIG-GUID: UX1jSzdChIvbnXu7-wKNUaqVzIJJz7xz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-21_05,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- mlxlogscore=927 mlxscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 suspectscore=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502210122
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250221-netcons_fix_shadow-v1-1-dee20c8658dd@debian.org>
+X-B4-Tracking: v=1; b=H4sIAB69uGcC/x3MQQqDMBAF0KuEvzaQDNS2uUopInGss5mUTGgD4
+ t0F3wHeDuMqbEhuR+WfmBRFcnFwyNusH/ayIDlQoFsgil655aI2rdIn2+al/D3TGO55fFCkJwa
+ Hb+VV+pW+oNy8cm94H8cJP+e0pW4AAAA=
+X-Change-ID: 20250221-netcons_fix_shadow-e2607c682129
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1686; i=leitao@debian.org;
+ h=from:subject:message-id; bh=y8JOWFlcKlRL/xItMQwGuALZ+brY3FmxUzxUvjwziu4=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnuL0keDLdEUqOMqti3Ip7Ok7dZB4VTvINdySSK
+ vU0SccifXeJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ7i9JAAKCRA1o5Of/Hh3
+ bS9ID/49ZmHa4XYMc2QOk+FBzngsRBTzHh7YZE74Ros/HsqhI3dDEEr1junleOxCeTp94GRv/t/
+ llSzo3u43FBhqhTpa2lCMSGOwprFs0hEumzZdM7c1+I+MIQQXGjJq90XCQ1ileaoGuP8Nt8NZo2
+ htSGS75cSt4KeaTrR1jVBAGHDze3NbQdjcQsQnSbF2J7L1pXwKoOgIerWWYwv1W5d1BiqxOBrNt
+ wuqk/h/Mmtffk1m1pjsC+llzb009cTjaL5g55IBR6e4wYg579RBIt4uwlEbJAd89+Z57U2sRWtD
+ IVAEcEvlBskcvjZfrROKXEm3HGxGj0qVOC29WVppVFfvpQ17ikd2FGhgVn2w9bEkv4BPFRq2PdR
+ 9EyT/7uaIc575JiJPzAFCFGmwfYlDufqweSt+VDlbIdQTKT03mDuWsNMU6AvpbJEh3v+jsrIaqN
+ C3nx7p9w/bgm1tpTpUs62kVr1gTswwxB7K07gqIxnpMLC5NFa/jmlgDLKaodhpLAySDRbATdi/E
+ Fvk6NsEwiYZ3VfecH4gNnKYBRNkBAuYYnPCVh3JGsxdrXzQvwJSDhd9+YiQf+1FkFG+tz8XW2nM
+ /fx4Tnuc2Z+zVcPdLR+5c302nYP2CGTnjCv5aBhJbZ3AtT/dhgepsh3hL7sZbaZ+AvNQSM/n8G6
+ vPrgnf+4wreS+HQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hi David,
+Fix a shadow variable warning in net/core/dev.c when compiled with
+CONFIG_LOCKDEP enabled. The warning occurs because 'dev' is redeclared
+inside the while loop, shadowing the outer scope declaration.
 
-On Thu, Feb 20, 2025 at 10:00:50PM +0000, David Laight wrote:
-> On Wed, 19 Feb 2025 15:11:00 -0600
-> Nick Child <nnac123@linux.ibm.com> wrote:
-> 
-> > ---
-> >  include/linux/printk.h | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/include/linux/printk.h b/include/linux/printk.h
-> > index 4217a9f412b2..12e51b1cdca5 100644
-> > --- a/include/linux/printk.h
-> > +++ b/include/linux/printk.h
-> > +				   buf, len) \
-> > +	for ((i) = 0;							\
-> > +	     (i) < (len) &&						\
-> > +	     hex_dump_to_buffer((unsigned char *)(buf) + (i),		\
-> > +				(len) - (i), (rowsize), (groupsize),	\
-> > +				(linebuf), (linebuflen), false);	\
-> 
-> You can avoid the compiler actually checking the function result
-> it you try a bit harder - see below.
-> 
+	net/core/dev.c:11211:22: warning: declaration shadows a local variable [-Wshadow]
+		struct net_device *dev = list_first_entry(&unlink_list,
 
-This was an extra precaution against infinite loops, breaking when
-hex_dump_to_buffer returns 0 when len is 0. Technically this won't happen
-since we check i < len first, and increment i by at least 16 (though
-your proposal removes the latter assertion). 
+	net/core/dev.c:11202:21: note: previous declaration is here
+		struct net_device *dev, *tmp;
 
-My other thought was to check for error case by checking if
-the return value was > linebuflen. But I actually prefer the behavior
-of continuing with the truncated result.
+Remove the redundant declaration since the variable is already defined
+in the outer scope and will be overwritten in the subsequent
+list_for_each_entry_safe() loop anyway.
 
-I think I prefer it how it is rather than completely ignoring it.
-Open to other opinons though.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Sending this against `net-next` and not using "Fixes:" tag since I don't
+think we want this to be backported to stable tree.
+---
+ net/core/dev.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> > +	     (i) += (rowsize) == 32 ? 32 : 16				\
-> > +	    )
-> 
-> If you are doing this as a #define you really shouldn't evaluate the
-> arguments more than once.
-> I'd also not add more code that relies on the perverse and pointless
-> code that enforces rowsize of 16 or 32.
-> Maybe document it, but there is no point changing the stride without
-> doing the equivalent change to the rowsize passed to hex_dump_to_buffer.
-> 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 18064be6cf3e3ae0949722a4ffffdc25fdd16b2e..c36b9b05364bab117ce51f3cc6ea5839245fd182 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11208,9 +11208,8 @@ void netdev_run_todo(void)
+ 	list_replace_init(&net_unlink_list, &unlink_list);
+ 
+ 	while (!list_empty(&unlink_list)) {
+-		struct net_device *dev = list_first_entry(&unlink_list,
+-							  struct net_device,
+-							  unlink_list);
++		dev = list_first_entry(&unlink_list, struct net_device,
++				       unlink_list);
+ 		list_del_init(&dev->unlink_list);
+ 		dev->nested_level = dev->lower_level - 1;
+ 	}
 
-The equivalent conditonal exists in hex_dump_to_buffer so doing it
-again seemed unnecessary. I understand your recent patch [1] is trying
-to replace the rowsize is 16 or 32 rule with rowsize is a power of 2
-and multiple of groupsize. I suppose the most straightforward and
-flexible thing the for_each loop can do is to just assume rowsize is
-valid.
+---
+base-commit: bb3bb6c92e5719c0f5d7adb9d34db7e76705ac33
+change-id: 20250221-netcons_fix_shadow-e2607c682129
 
-> You could do:
-> #define for_each_line_in_hex_dump(buf_offset, rowsize, linebuf, linebuflen, groupsize, buf, len, ascii) \
-> for (unsigned int _offset = 0, _rowsize = (rowsize), _len = (len); \
-> 	((offset) = _offset) < _len && (hex_dump_to_buffer((const char *)(buf) + _offset, _len - _offset, \
-> 		_rowsize, (groupsize), (linebuf), (linebuflen), (ascii)), 1); \
-> 	_offset += _rowsize )
-> 
-> (Assuming I've not mistyped it.)
-> 
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
-Trying to understand the reasoning for declaring new tmp variables;
-Is this to prevent the values from changing in the body of the loop?
-I tried to avoid declaring new vars in this design because I thought it
-would recive pushback due to possible name collision and variable
-declaration inside for loop initializer.
-I suppose both implementations come with tradeoffs.
-
-> As soon as 'ascii' gets replaced by 'flags' you'll need to pass it through.
-> 
-
-Yes, if hex_dump_to_buffer becomes a wrapper around a new function
-(which accepts flag arg), I think there is an opportunity for a lot
-of confusion to clear up. Old behaviour of hex_dump_to_buffer will be
-respected but the underlying function will be more flexible.
-
-Appreciate the review!
-- Nick
-
-[1] - https://lore.kernel.org/lkml/20250216201901.161781-1-david.laight.linux@gmail.com/
 
