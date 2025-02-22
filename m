@@ -1,125 +1,96 @@
-Return-Path: <netdev+bounces-168729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D75A40503
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 02:56:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53F0AA40548
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 04:30:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C03519C46C5
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 01:56:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A5023B871D
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 03:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4391150980;
-	Sat, 22 Feb 2025 01:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294E41FFC41;
+	Sat, 22 Feb 2025 03:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPgsAvvm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beMgBMXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA2A73451;
-	Sat, 22 Feb 2025 01:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23D21FECCA;
+	Sat, 22 Feb 2025 03:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740189372; cv=none; b=Eg46BKCKVMAJOqi0a7Sd+TBY87UQ4DXB5D856lVCd6hNDf7HuPdEwrL+P9ab4mRWTjM4oDKrE5AC6YYHiBiuZCzjbkF78Mkncl0yHPCT0rQRT7IFbieZ886Dq2iSDpP90U6Jk70hy60IG1ujaJRZFiyqIcpTnV39nPl51TfvMMA=
+	t=1740195011; cv=none; b=AvS5zrXDvF3c98E/gRtbS7vQj/OXYFGWffa3/1f/f3uMtVpBcEMjwepV1R1LDEtHeh3JEy8lcF81VRkXbkYZ0U71yxW8oJBv8UUni30DKuUZpRfqKrXitKaWtygyigz5WdzzWDTWDWxpWQhQyHz3VbOVgkBjuWML2hpXcb/0Gy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740189372; c=relaxed/simple;
-	bh=RY4VlOezbPA+2VOOCDGzqzmmDbSMlVAZBXXSvC922gM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iWxKCV5gb8B03G4cfcH53N95vF/7Id/AYv+HmqS+MyZUW3K4SjSOkCxo2nomkhGuqrXCx/6m7VWL+lpc9aQ+7rsqZh0fBj9OGp5caAVCiW+NKkQKlcKg0XXAL7CIxMrOFn6FySSXRJ/H7se+nJPqSgcdiZwE7rXlFLDxgb/c/ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gPgsAvvm; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4399d14334aso23749885e9.0;
-        Fri, 21 Feb 2025 17:56:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740189369; x=1740794169; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RY4VlOezbPA+2VOOCDGzqzmmDbSMlVAZBXXSvC922gM=;
-        b=gPgsAvvm4wExgVHw3igIehOeZbj0tSEq5wN9HzrKzGIau4KaY1Gd1gN1z2XP4LB0Vg
-         /VGQx28QjsF0Mgxpu2YTGEfy3Ow9uiMFELGYiCbjz3KyPgUklDyMangRa+0U3hm4VVvQ
-         9zxWbk0gRNIfXGBuXcdMabqAE11aV1wsAWCqkjSVZGOfcegnAxusuatLrThBhs4P+W2y
-         Mb4lKwCLbt6U7Qspk36xD8t9uAzvXk9xsWWY8xkOaKD4kZDBJYanjs/Plei1ZAJpjAaX
-         MXa3Rt6Kn1PVXq1ETwPOkvt9xGHAJZFdeVe7t30FJqcQthZ2rHjjOIlpsP+gF1V7irgE
-         T2JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740189369; x=1740794169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RY4VlOezbPA+2VOOCDGzqzmmDbSMlVAZBXXSvC922gM=;
-        b=nld9hiVWeQi/B/zDeOOAhRRbheSKRlBzs1ATSdBxeEezQQ7uKum8+3+yKWH8m/jpI9
-         8dtJJ89U6u98l8vHGaBahh5idMwM63V0cbJS0SwM3wPxXwugVvYdVzDiyclu3venLSAs
-         oTilfjTMUYIHWNiz38XbhVGxBvoGEiWaSp6JUSQ7z+hCY1NINJbccexZ1NI+v9pfhfVZ
-         vxQaCayfNJ/YrNjxFd7iGrJPJlbe25iB8KB4ISFdV9xn+Q8fRqePNiJ6w3Pqso9rPDEG
-         U5Xt5by3NCmIreQS/+PalkeuC88rFGz1VUF1WdKLeum3XVxoA00/DAZUvY+AM9b4KkcS
-         QWOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfzEM9HtuG5+AamNRmO7HMr1MEttSC2CxO0peI3SDiU29dEKRoAMhCjYPykvn8aV86tTgNFNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTrX4rckKyU9yTB+JIZz/qF6ptfK18SELG0VmuT6seIuy5Qhc5
-	istTWIT5GeDLmaB+q1/sfIt7kp5KTjPCiNgQT0NPZX34msEqrtkSVVbk7gP54WXzPjgQyrCR9Hy
-	SaMmmwQ8fdniJ4QcCaNVAlBiDEuY=
-X-Gm-Gg: ASbGnct/fPxMfiWmW+JDhAz6iVto1KK7C5aPzxkfZ6MqPFsCRJo1yr93zX/Z+jAD/qX
-	/m8kVBg216nljf0VCNGYZfFvDNIuSIuCy1RU+GO/YSf7dOS+xk13IFtVsDrS1ev8VWCqg77gC+G
-	8Cbxz/piZw9GuozUAMD3646/Q=
-X-Google-Smtp-Source: AGHT+IGUt9lxMCForB8fxdE/uadnu63TkMepZUGQKc8CHcSzqpYg+ngZRc9FTOE0Bv1pBd8x15jArQveoaa6UghcLvA=
-X-Received: by 2002:a05:600c:3b09:b0:439:9985:6984 with SMTP id
- 5b1f17b1804b1-439ae223b3fmr53728475e9.30.1740189368847; Fri, 21 Feb 2025
- 17:56:08 -0800 (PST)
+	s=arc-20240116; t=1740195011; c=relaxed/simple;
+	bh=LvHxA7Jof8KdmS9QjcNsAFD6oimlu1jYgF80NuH5rAI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XYw+A1dsKD0UdHgdTwiccZ2UFO7XsXDa03jikKxMQ1BKdCLUFpnLOdZUbFAUKdakguEHa3uODNwAAEpdFRe6PiyBWzQZKG9eBTY8F97cmsuSxy+iWcCNaaUYIOO0eE1nk5EpmEEiyXrM+GtVdmo6L2A+9Yoi1p9aoOB8C1vLvIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beMgBMXT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721D3C4CED1;
+	Sat, 22 Feb 2025 03:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740195010;
+	bh=LvHxA7Jof8KdmS9QjcNsAFD6oimlu1jYgF80NuH5rAI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=beMgBMXTwmAJoQ6KLaxNscEMNABtl/P0naicy9xC6ERc7iFTDtpruvPdmEI7ZbHL4
+	 R7Zx1gZfjfzYv4XcogE/VWKJHx1Gqz6qojNFPpxmfIaEOB0oUxTco326Dmp2JBu2ZP
+	 SgquTocbT5u6On1bmW21iHyiV7+g3ZVsrusbKZfPugA0v0CakukT53Z6hzD5bLmSRX
+	 Zwp5ITImgdccn1ZfqpWcpXMlzpt/BvPfv1r5MoF/NBfL8xgu+QVlxzWZ4zo8EORbTV
+	 p5gt1buW3xwQeKZdD83VnwzIWpZV8TgWG3uE7A2jgkkS/UiBddB/M59GBEgcKtAYcR
+	 Z71c6QE5cOThw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE076380CEF7;
+	Sat, 22 Feb 2025 03:30:42 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 21 Feb 2025 17:55:57 -0800
-X-Gm-Features: AWEUYZlbyFc46Jtd6tU2h5iTuLFGWUU94Vs5OUXucmd_TsvTmS_kScWCAmyGP6o
-Message-ID: <CAADnVQKYkwV1jc3aLwWqzgP7TKaPvq_NjpwvYdOXOgDQ3QZfeA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 0/3] bpf: introduce skb refcount kfuncs
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] mctp: Add MCTP-over-USB hardware transport
+ binding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174019504120.2279798.1941572582766631045.git-patchwork-notify@kernel.org>
+Date: Sat, 22 Feb 2025 03:30:41 +0000
+References: <20250221-dev-mctp-usb-v3-0-3353030fe9cc@codeconstruct.com.au>
+In-Reply-To: <20250221-dev-mctp-usb-v3-0-3353030fe9cc@codeconstruct.com.au>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: matt@codeconstruct.com.au, gregkh@linuxfoundation.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, spuranik@nvidia.com
 
-On Thu, Feb 20, 2025 at 5:45=E2=80=AFAM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> Hi!
->
-> This patchset provides what is needed for storing skbs as kptrs in bpf
-> maps. We start with necessary kernel change as discussed at [0] with
-> Martin, then next patch adds kfuncs for handling skb refcount and on top
-> of that a test case is added where one program stores skbs and then next
-> program is able to retrieve them from map.
->
-> Martin, regarding the kernel change I decided to go with boolean
-> approach instead of what you initially suggested. Let me know if it
-> works for you.
->
-> Thanks,
-> Maciej
->
-> [0]: https://lore.kernel.org/bpf/Z0X%2F9PhIhvQwsgfW@boxer/
+Hello:
 
-Before we go further we need a lot more details on "why" part.
-In the old thread I was able to find:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> On TC egress hook skb is stored in a map ...
-> During TC ingress hook on the same interface, the skb that was previously
-stored in map is retrieved ...
+On Fri, 21 Feb 2025 08:56:56 +0800 you wrote:
+> Add an implementation of the DMTF standard DSP0283, providing an MCTP
+> channel over high-speed USB.
+> 
+> This is a fairly trivial first implementation, in that we only submit
+> one tx and one rx URB at a time. We do accept multi-packet transfers,
+> but do not yet generate them on transmit.
+> 
+> [...]
 
-This is too cryptic. I see several concerns with such use case
-including netns crossing, L2/L3 mismatch, skb_scrub.
+Here is the summary with links:
+  - [net-next,v3,1/2] usb: Add base USB MCTP definitions
+    https://git.kernel.org/netdev/net-next/c/dcc35baae732
+  - [net-next,v3,2/2] net: mctp: Add MCTP USB transport driver
+    https://git.kernel.org/netdev/net-next/c/0791c0327a6e
 
-I doubt we can make such "skb stash in a map" safe without
-restricting the usage, so please provide detailed
-description of the use case.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
