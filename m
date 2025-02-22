@@ -1,196 +1,294 @@
-Return-Path: <netdev+bounces-168786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8780BA40B12
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 19:59:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F5C8A40B27
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 20:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61A7917E5EB
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 18:59:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C57EC3AE8AB
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 19:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6EF20CCCC;
-	Sat, 22 Feb 2025 18:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E94A211A2E;
+	Sat, 22 Feb 2025 19:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dDEtRWaU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bRjTXhvB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88D770830;
-	Sat, 22 Feb 2025 18:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FC120125D
+	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 19:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740250756; cv=none; b=GcjA7mOuVM9WLhHxxHZ7esS7710JqLINTqO8HZxIs9UT9eW0F6W0YWtC3YKg1KVJ/wYejlcE0iMjZJ3gyAddepdrY3K6SHXgVzIKZ//YRJGA1/MHxhgiJ0ZDlkqJ1x3X/rEglnv6SuduiGi+QCgp4Csn/G9Qcz8ZOHpa75NMUio=
+	t=1740251722; cv=none; b=BmtKIFJ2tUOO/qPF0IV2uPjLAhVHfG0InrM8MHxJrwSH5jNEl5CG9Pr6XpmoZWOsGx3JQG5DJ0mQMN3XrhC1qloNAZXPrXif4yBPwajUNYBHMy0JhIT3XwKC1qlEWL8osKxLXoCl/hipelTFk5yt7N2nUNQG6ApeaaVGbwRX6jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740250756; c=relaxed/simple;
-	bh=a1n8mbonW/ltuhbkEhLcRvyUAwIM2wIPwysaaxQHI2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ksx6LP40Yjq9u9V9kZ/n1drmhKJ8KNgE6xYsPM6CPqZ3I68mi26QHlLge2Z6sZutcc3ADubmgC50G1tbnHduI/r1NK/yVy8fEWrhwoU8GS+r2AOr8EcGUxk4tZR8Exxc/CyKTP180bC92EEkiLlDeCChlm8o4M/1z32li/Mms44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dDEtRWaU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51M52SrI013794;
-	Sat, 22 Feb 2025 18:58:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=6k21L+G3uHD1bwvHi+nq+IxpQx8pcs
-	NP5Fah9ageCUA=; b=dDEtRWaU+HcgOPNc9lS47gho4o9SHmWVP0c8dIZqhaGN1I
-	7k4uQs3LOmCwOgj/0lpjGEqwJ4O1QlU6CgETGIvweSByWQ3TeS/+CDonxS6uyiOt
-	ahLs789skK4HfLP7ByflMOKU+G4sfaxmBEhj8vUdP8+9kycx/cS6PIjvOotIGs8H
-	KvLS5XhldPewo+P7qju/OAHkYtqioRsDIS3nkAXJUXTApTTkj5zgSFy96P9YAe3e
-	/wru9Su64rP+wsr3KKXcqG43Kxgx/bNUoz7nlJOlawtn4aFFlNegflmWyzviSbua
-	+psEHWkuEoSexP8wId+zP85domwZZhHvVM8r2bNw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44y82xj62h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 22 Feb 2025 18:58:50 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51MIt3R8003088;
-	Sat, 22 Feb 2025 18:58:50 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44y82xj62f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 22 Feb 2025 18:58:49 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51MH3HFi002330;
-	Sat, 22 Feb 2025 18:58:49 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44w03xpjr1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 22 Feb 2025 18:58:49 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51MIwmul24117930
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 22 Feb 2025 18:58:49 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D7F635805A;
-	Sat, 22 Feb 2025 18:58:48 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C3C5F5803F;
-	Sat, 22 Feb 2025 18:58:48 +0000 (GMT)
-Received: from localhost (unknown [9.61.179.202])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Sat, 22 Feb 2025 18:58:48 +0000 (GMT)
-Date: Sat, 22 Feb 2025 12:58:48 -0600
-From: Nick Child <nnac123@linux.ibm.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
-        nick.child@ibm.com, pmladek@suse.com, rostedt@goodmis.org,
-        john.ogness@linutronix.de, senozhatsky@chromium.org
-Subject: Re: [PATCH net-next v3 1/3] hexdump: Implement macro for converting
- large buffers
-Message-ID: <Z7oeaHxXnwrlA_d9@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20250219211102.225324-1-nnac123@linux.ibm.com>
- <20250219211102.225324-2-nnac123@linux.ibm.com>
- <20250220220050.61aa504d@pumpkin>
- <Z7i56s7jwc_y0cIz@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
- <20250221180435.4bbf8c8f@pumpkin>
- <Z7jLE-GKWPPn-cBT@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
- <20250221221815.53455e22@pumpkin>
+	s=arc-20240116; t=1740251722; c=relaxed/simple;
+	bh=ir1qB8HnIi3Ii1PxbK6zlnbBiac3wq7tFAwcMrnUPYY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Fbq74ltb0s9S1GciwzfsDL7jzhYZDfZVRH8y6SWyf5x/trbbBEbwRRrIl1UxXsUH9cvQOVA5BBYF9HPLBRARrxV3ulOMZ9R7c05kx1EgjrtPnnO3w0H+BVBhz9V4Htl8XMr/PpgbN8nUNRLvQ5GajGlit8zdKEM1T5JtHgcnqGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bRjTXhvB; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220d6c10a17so78467525ad.0
+        for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 11:15:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740251720; x=1740856520; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/hrdNtY9WUkzOdaqOkzuhbx1FDzjloxj8IUvvmSCyDw=;
+        b=bRjTXhvBqinrBPrkmbfpoOW+q7cDLW3Gm/3xT2U/j2BPC8kk/3VLgtdh6YbOOuxGT1
+         CTLLJMRR27PNYmusEppnlhlDsWqIzp1hYs+saivzFTfIc3HuGxjLU4Pbzov43UfIACuv
+         jYxXQddHg3ZKd9Ffg5BhOzrpz3GbX6Or3JGsAUPzbwi09uKhsIdWXgS/7Bc+IDhxnOkQ
+         3dsR0mkn2UgY/RUSlxeIZKCluY84R5OC0lw5BrVu5GO0QguwEXpmjMXdmGFSu328kHDW
+         2hlK5h5frtIF0HdQtEmgwN9E5L8Ib3h+yOzZtaSh+SDzpswHZMghAykX22mdU1+xc/n4
+         mQmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740251720; x=1740856520;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/hrdNtY9WUkzOdaqOkzuhbx1FDzjloxj8IUvvmSCyDw=;
+        b=UZIP7Xz83DA183rdj0vmkqQ4CUYFq+N0PxTx7UxUhxF7j30VOYSlC232gyTXRJ5klB
+         Fu6z+DSYT3S5WQ57XBkaBlPMV/3GI7/k+ssD5ZY6uFRzIvxFni0EhwOP29OXvkriR2LJ
+         Xe1/NJE+ouVgOuPO0VtwtdGxZx2fSGpfWVhG5HJgXxYZAFcZwWvoAiZB1FEc0b6awUSU
+         5jhnsZUJW65oc1zxN+Hfy3YSVqzmXgMDLrTqqnMztKuZx+Gg402pmvdY4/vlcE9Jbm0Z
+         ZJIRKuLpRQtZ5YTTl4QgGZ/IxM2ZU6kuH1OVhQTQxqcpvPUK+Ogc3sz7GBVTsh/e9KWQ
+         4olA==
+X-Gm-Message-State: AOJu0YyyVBL376WV7FAaEqvuhb+RxDLooqdKAHdRGxZ7vPfvpmk8fAS/
+	/RetHoDSb8XXHNXVD/8+dwQYysSWPLIOFq4ZhRSoy3OHFQtYLj/Sd1l4pz/PtAc1vqZNGGXdufL
+	sutU1CX6Njf5RdkKuSu5qYGi9LDmDNlu1nlAEM+g9Pnj33cdcs3/40EdVwi4wmcOzlVXNKYEH9F
+	Oay8eKk3SuqgyB74KUiJi9ZItG8aRxxyp+FL/2EGpgO9dY9dxPWrJQBCwD+L4=
+X-Google-Smtp-Source: AGHT+IG8Uyqn6l/kTJ4hV3f3dWDM5b4w/8+8MUISFMXP33YKJDaTmcErKuc6awua76yuDjCuhEQgo8wL6kcjTPrenw==
+X-Received: from pfud6.prod.google.com ([2002:a05:6a00:10c6:b0:730:7b0c:592c])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1906:b0:730:940f:4fbf with SMTP id d2e1a72fcca58-73425b39e17mr14486758b3a.2.1740251720027;
+ Sat, 22 Feb 2025 11:15:20 -0800 (PST)
+Date: Sat, 22 Feb 2025 19:15:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250221221815.53455e22@pumpkin>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LwrSWcezto44dGm5tATOZCL_FqxAnFBf
-X-Proofpoint-GUID: oQyAzNcx0SsPvFagp-60dWbHcn75LF3M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-22_08,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- impostorscore=0 adultscore=0 suspectscore=0 clxscore=1015 bulkscore=0
- mlxlogscore=999 spamscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2502220147
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250222191517.743530-1-almasrymina@google.com>
+Subject: [PATCH net-next v5 0/9] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 21, 2025 at 10:18:15PM +0000, David Laight wrote:
-> On Fri, 21 Feb 2025 12:50:59 -0600
-> Nick Child <nnac123@linux.ibm.com> wrote:
-> 
-> > On Fri, Feb 21, 2025 at 06:04:35PM +0000, David Laight wrote:
-> > > On Fri, 21 Feb 2025 11:37:46 -0600
-> > > Nick Child <nnac123@linux.ibm.com> wrote:  
-> > > > On Thu, Feb 20, 2025 at 10:00:50PM +0000, David Laight wrote:  
-> > > > > You could do:
-> > > > > #define for_each_line_in_hex_dump(buf_offset, rowsize, linebuf, linebuflen, groupsize, buf, len, ascii) \
-> > > > > for (unsigned int _offset = 0, _rowsize = (rowsize), _len = (len); \
-> > > > > 	((offset) = _offset) < _len && (hex_dump_to_buffer((const char *)(buf) + _offset, _len - _offset, \  
-> > >           ^ needs to be buf_offset.
-> > >   
-> > > > > 		_rowsize, (groupsize), (linebuf), (linebuflen), (ascii)), 1); \
-> > > > > 	_offset += _rowsize )
-> > > > > 
-> > > > > (Assuming I've not mistyped it.)
-> > > > >     
-> > > >
-> > > > Trying to understand the reasoning for declaring new tmp variables;
-> > > > Is this to prevent the values from changing in the body of the loop?  
-> > >
-> > > No, it is to prevent side-effects happening more than once.
-> > > Think about what would happen if someone passed 'foo -= 4' for len.
-> > >  
-> > 
-> > If we are protecting against those cases then linebuf, linebuflen,
-> > groupsize and ascii should also be stored into tmp variables since they
-> > are referenced in the loop conditional every iteration.
-> > At which point the loop becomes too messy IMO.
-> > Are any other for_each implementations taking these precautions?
-> 
-> No, it only matters if they appear in the text expansion of the #define
-> more than once.
+v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@google.com/
+===
 
-But the operation is still executed more than once when the variable
-appears in the loop conditional. This still sounds like the same type
-of unexpected behaviour. For example, when I set groupsize = 1 then
-invoke for_each_line_in_hex_dump with groupsize *= 2 I get:
-[    4.688870][  T145] HD: 0100 0302 0504 0706 0908 0b0a 0d0c 0f0e
-[    4.688949][  T145] HD: 13121110 17161514 1b1a1918 1f1e1d1c
-[    4.688969][  T145] HD: 2726252423222120 2f2e2d2c2b2a2928
-[    4.688983][  T145] HD: 30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f
-Similarly if I run with buf: buf += 8:
-[    5.019031][  T149] HD: 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17
-[    5.019057][  T149] HD: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
-[    5.019069][  T149] HD: 38 39 3a 3b 3c 3d 3e 3f 98 1a 6a 95 de e6 9a 71
-[    5.019081][  T149] HD: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+v5 has no major changes; it clears up the relatively minor issues
+pointed out to in v4, and rebases the series on top of net-next to
+resolve the conflict with a patch that raced to the tree. It also
+collects the review tags from v4.
 
-The operations are getting executed more than once. Should this be
-classified as expected behaviour just because those vars are technically
-only expanded once in the macro?
+Changes:
+- Rebase to net-next
+- Fix issues in selftest (Stan).
+- Address comments in the devmem and netmem driver docs (Stan and Bagas)
+- Fix zerocopy_fill_skb_from_devmem return error code (Stan).
 
-> > Not trying to come off dismissive, I genuinely appreciate all the
-> > insight, trying to learn more for next time.
-> > 
-> > > > I tried to avoid declaring new vars in this design because I thought it
-> > > > would recive pushback due to possible name collision and variable
-> > > > declaration inside for loop initializer.  
-> > >
-> > > The c std level got upped recently to allow declarations inside loops.
-> > > Usually for a 'loop iterator' - but I think you needed that to be
-> > > exposed outsize the loop.
-> > > (Otherwise you don't need _offset and buf_offset.
-> > >  
-> > 
-> > As in decrementing _len and increasing a _buf var rather than tracking
-> > offset?
-> > I don't really care for exposing the offset, during design I figured
-> > some caller may make use of it but I think it is worth removing to reduce
-> > the number of arguments.
-> 
-> Except the loop body needs it - so it needs to be a caller-defined name,
-> even if they don't declare the variable.
-> 
-> 	David
-> 
-> > 
-> > Thanks again,
-> > Nick
-> 
+v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@google.com/
+===
+
+v4 mainly addresses the critical driver support issue surfaced in v3 by
+Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+may come from dma-bufs.
+
+Additionally other feedback from v3 is addressed.
+
+Major changes:
+- Add helpers to handle netmem dma-addrs. Add GVE support for
+  netmem_tx.
+- Fix binding->tx_vec not being freed on error paths during the
+  tx binding.
+- Add a minimal devmem_tx test to devmem.py.
+- Clean up everything obsolete from the cover letter (Paolo).
+
+v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
+===
+
+Address minor comments from RFCv2 and fix a few build warnings and
+ynl-regen issues. No major changes.
+
+RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
+=======
+
+RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+something close to this as net-next  reopens, sending it slightly early
+to get feedback if any.
+
+Major changes:
+--------------
+
+- much improved UAPI as suggested by Stan. We now interpret the iov_base
+  of the passed in iov from userspace as the offset into the dmabuf to
+  send from. This removes the need to set iov.iov_base = NULL which may
+  be confusing to users, and enables us to send multiple iovs in the
+  same sendmsg() call. ncdevmem and the docs show a sample use of that.
+
+- Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+  this is good improvment as it was confusing to keep track of
+  2 iterators for the same sendmsg, and mistracking both iterators
+  caused a couple of bugs reported in the last iteration that are now
+  resolved with this streamlining.
+
+- Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+  and sending multiple iovs in the same sendmsg() is tested.
+
+- Fixed issue where dmabuf unmapping was happening in invalid context
+  (Stan).
+
+====================================================================
+
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
+
+Full outline on usage of the TX path is detailed in the documentation
+included with this series.
+
+Test example is available via the kselftest included in the series as well.
+
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
+
+Patch Overview:
+---------------
+
+1. Documentation & tests to give high level overview of the feature
+   being added.
+
+1. Add netmem refcounting needed for the TX path.
+
+2. Devmem TX netlink API.
+
+3. Devmem TX net stack implementation.
+
+4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+   freed from contexts where we can't sleep.
+
+5. Add devmem TX documentation.
+
+6. Add scaffolding enabling driver support for netmem_tx. Add helpers, driver
+feature flag, and docs to enable drivers to declare netmem_tx support.
+
+7. Guard netmem_tx against being enabled against drivers that don't
+   support it.
+
+8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+   devmem.py.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>
+
+
+Mina Almasry (8):
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+  net: devmem: make dmabuf unbinding scheduled work
+  net: add devmem TCP TX documentation
+  net: enable driver support for netmem TX
+  gve: add netmem TX support to GVE DQO-RDA mode
+  net: check for driver support in netmem TX
+  selftests: ncdevmem: Implement devmem TCP TX
+
+Stanislav Fomichev (1):
+  net: devmem: TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 150 ++++++++-
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ Documentation/networking/netdev-features.rst  |   5 +
+ Documentation/networking/netmem.rst           |  23 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   4 +
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  17 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |  23 ++
+ include/net/sock.h                            |   1 +
+ include/uapi/linux/netdev.h                   |   1 +
+ net/core/datagram.c                           |  48 ++-
+ net/core/dev.c                                |   3 +
+ net/core/devmem.c                             | 113 ++++++-
+ net/core/devmem.h                             |  69 +++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  73 ++++-
+ net/core/skbuff.c                             |  48 ++-
+ net/core/sock.c                               |   6 +
+ net/ipv4/ip_output.c                          |   3 +-
+ net/ipv4/tcp.c                                |  46 ++-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/vmw_vsock/virtio_transport_common.c       |   5 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/devmem.py        |  26 +-
+ .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+ 29 files changed, 938 insertions(+), 71 deletions(-)
+
+
+base-commit: b66e19dcf684b21b6d3a1844807bd1df97ad197a
+-- 
+2.48.1.601.g30ceb7b040-goog
+
 
