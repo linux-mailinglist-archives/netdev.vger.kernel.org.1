@@ -1,70 +1,56 @@
-Return-Path: <netdev+bounces-168738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 854D6A406D3
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 10:26:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DAEEA406B9
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 10:18:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3D34173D3B
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 09:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF3F3B7339
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 09:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3925207651;
-	Sat, 22 Feb 2025 09:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XYst5pqH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056581FC0FF;
+	Sat, 22 Feb 2025 09:18:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D6B206F3A
-	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 09:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71A746434;
+	Sat, 22 Feb 2025 09:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740216389; cv=none; b=tlFT+h2LgxFWu/2VkBdV2IOic4IBO/tdRanImCh19P6xN8gEz8yIzPSHFb+XLTbWcHC5QdqjWM5WqUg7aIKkTCKWj9Gp/d+QjSi8qWPX32tsC4I51vIvAKVJXuIOYcYk263ncQAK67AH5sYylJvRxPi8yWwJVtp6bRbjhvPoTk0=
+	t=1740215903; cv=none; b=A/sQ24DM+Rs4fW84zfv+Q+BrYyDvcXxP6tfIc9qbh/PWU2SSsivn7JQH796L8NLr2/Vu1H4NUZEuWRYY9VnVGURFTOBaamZVt8tVTO2DRruCJWs7W+QCqUQ3bolHIS4PAbPbq7D6szyQKOEpZWWFBHKXtnb9bpA7islZf4g8S50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740216389; c=relaxed/simple;
-	bh=sfIpC4mK60ZTxM8L5Lg3oNfU+bsuIGzSy6AGc6+L+74=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kfxzx1K4RDco732ZfljRHjiVeMf8qN0gZ+kO5YPjNypheBv0nYLIrwCcwJBrOBmLkLVOeJd7lSRR8pHDDD2FsatLmkv7A1m7p8cm6Q/Yxacl3Hzuc5tYkp0w488wbHcSmc8AD+vsY0P1tN57ZMXuIasqgVzjwNzDURZwP/RNnbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XYst5pqH; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740216385;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tdgFqFXXtd2PsA/56XMx8Rklb2PiwMNcWaN1bikm/tE=;
-	b=XYst5pqH/ObdTqPVLmnwxWcsYwNoZwvPpQc2HFwBJoXoSTiy15eALlQ6UOgftY0KcQxXAx
-	N1pYOPF+7gqVS9tlPyRPPFa+9eHUnbUR17v7EVFmJKIWLNCl80giCbxW0vNQstQwqg2lDV
-	w6/W5Y8Xe1gs/Yf9IIoxxbZNrYoCZLg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ricardo@marliere.net,
-	jiayuan.chen@linux.dev,
-	viro@zeniv.linux.org.uk,
-	dmantipov@yandex.ru,
-	aleksander.lobakin@intel.com,
-	linux-ppp@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mrpre@163.com,
-	syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Subject: [PATCH net-next v3 1/1] ppp: Fix KMSAN warning by initializing 2-byte header
-Date: Sat, 22 Feb 2025 17:25:56 +0800
-Message-ID: <20250222092556.274267-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20250222092556.274267-1-jiayuan.chen@linux.dev>
-References: <20250222092556.274267-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1740215903; c=relaxed/simple;
+	bh=Mk6WuBoS1O12+dATtOsdWAT4h5ydjVAjz1XhAIFEwiY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NsaTNq4+ZzezWp7jomDzH0i12zG4JFeb0aXkWrDj1P3cw4gbX4YDoXGG2tK7ISTts63zZ9xQmVll+s6MOnuooUxVIA3dohGjzhqlHZ9gXzYhTOM7AdUzNJ2WpVOIC0IhJAs8scamo1qu9SDz7ueA8d0z3DJzYNrY8rK4J49Onbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Z0Lrq1NGSz1GDfB;
+	Sat, 22 Feb 2025 17:13:31 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0A055140336;
+	Sat, 22 Feb 2025 17:18:11 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
+ (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 22 Feb
+ 2025 17:18:09 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<maciej.fijalkowski@intel.com>, <jonathan.lemon@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net] xsk: fix __xsk_generic_xmit() error code when cq is full
+Date: Sat, 22 Feb 2025 17:30:07 +0800
+Message-ID: <20250222093007.3607691-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,50 +58,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-The PPP driver adds an extra 2-byte header to enable socket filters to run
-correctly. However, the driver only initializes the first byte, which
-indicates the direction. For normal BPF programs, this is not a problem
-since they only read the first byte.
+When the cq reservation is failed, the error code is not set which is
+initialized to zero in __xsk_generic_xmit(). That means the packet is not
+send successfully but sendto() return ok.
 
-Nevertheless, for carefully crafted BPF programs, if they read the second
-byte, this will trigger a KMSAN warning for reading uninitialized data.
+Set the error code and make xskq_prod_reserve_addr()/xskq_prod_reserve()
+return values more meaningful when the queue is full.
 
-Reported-by: syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/bpf/000000000000dea025060d6bc3bc@google.com/
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
 ---
- drivers/net/ppp/ppp_generic.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ net/xdp/xsk.c       | 3 ++-
+ net/xdp/xsk_queue.h | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 4583e15ad03a..29a7a21cb096 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -1762,10 +1762,17 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 89d2bef96469..7d0d2f40ca57 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -802,7 +802,8 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 		 * if there is space in it. This avoids having to implement
+ 		 * any buffering in the Tx path.
+ 		 */
+-		if (xsk_cq_reserve_addr_locked(xs->pool, desc.addr))
++		err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
++		if (err)
+ 			goto out;
  
- 	if (proto < 0x8000) {
- #ifdef CONFIG_PPP_FILTER
--		/* check if we should pass this packet */
--		/* the filter instructions are constructed assuming
--		   a four-byte PPP header on each packet */
--		*(u8 *)skb_push(skb, 2) = 1;
-+		/* Check if we should pass this packet.
-+		 * The filter instructions are constructed assuming
-+		 * a four-byte PPP header on each packet. The first byte
-+		 * indicates the direction, and the second byte is meaningless,
-+		 * but we still need to initialize it to prevent crafted BPF
-+		 * programs from reading them which would cause reading of
-+		 * uninitialized data.
-+		 */
-+		skb_push(skb, 2);
-+		skb->data[0] = 1;
-+		skb->data[1] = 0;
- 		if (ppp->pass_filter &&
- 		    bpf_prog_run(ppp->pass_filter, skb) == 0) {
- 			if (ppp->debug & 1)
+ 		skb = xsk_build_skb(xs, &desc);
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 46d87e961ad6..ac90b7fcc027 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -371,7 +371,7 @@ static inline void xskq_prod_cancel_n(struct xsk_queue *q, u32 cnt)
+ static inline int xskq_prod_reserve(struct xsk_queue *q)
+ {
+ 	if (xskq_prod_is_full(q))
+-		return -ENOSPC;
++		return -ENOBUFS;
+ 
+ 	/* A, matches D */
+ 	q->cached_prod++;
+@@ -383,7 +383,7 @@ static inline int xskq_prod_reserve_addr(struct xsk_queue *q, u64 addr)
+ 	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
+ 
+ 	if (xskq_prod_is_full(q))
+-		return -ENOSPC;
++		return -ENOBUFS;
+ 
+ 	/* A, matches D */
+ 	ring->desc[q->cached_prod++ & q->ring_mask] = addr;
 -- 
-2.47.1
+2.34.1
 
 
