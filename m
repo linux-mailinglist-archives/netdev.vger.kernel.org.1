@@ -1,354 +1,259 @@
-Return-Path: <netdev+bounces-168799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0909BA40BBC
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 22:29:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11BF8A40BED
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 23:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68633B8920
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 21:28:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B60D3A8DCD
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 22:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6F32040BE;
-	Sat, 22 Feb 2025 21:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB8F1FFC73;
+	Sat, 22 Feb 2025 22:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OxzJT5Xq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7161DDE9
-	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 21:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6CA18EB0;
+	Sat, 22 Feb 2025 22:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740259701; cv=none; b=o2sc91UlqPewe2RsMxWk4JjmqyedKJN0Ngr4Ds5ZYX4OuG/jD/qCJxoP5e6l0LXQh2K+vUQ6Z0cww3VsQ8kTMut/RZlJBD1OMZjbb9r7Q1j2N1RK/DsVaNqxRTMXCFvBrktOxVfh3ke85xOrk8UtKJg97rlf1F0d8nKGcr2qv+I=
+	t=1740264753; cv=none; b=LXUwpq7LkAMO+2Ow1Mlpe+1qAMk5ZRDaP0r8Q0+3ld+yCiIUcNp4yABs0RTCrLSYYjy6ny2QImNPkda8zNIpslsdMBeiaWbZ3vXe74HuOILiTESK59tOeftRldrUGQESkHaLcRKK5QxTLB6Q10CNnO2DYO1MOQF8qyj2Tw7HSKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740259701; c=relaxed/simple;
-	bh=rrUPmthSZymIJllcQ+NtdBq8igi0G5OV3N5Dh2FAI2A=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Mwdc1XalZkls2sHRTEOYgPeIzCWbeQ8tB3vmdUpmQahBqmsA+r/iF/IPGaFHStHgXiU32aEGERgZ1XVjv4/FwG7xZkZJIK9Q7GvmySw/SmTwBJjjHHXbx98q69OZGziBMg9f+F86RPjp6qP/llRU9XU8bldEa0IKsNgimWS2r18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d060cfe752so25163315ab.2
-        for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 13:28:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740259698; x=1740864498;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nMvR6VQwoiSvHdEtmggzmS+ZR2UuWrCXxkffOuRiO/8=;
-        b=BM8ob1/Pyir2Wxd/udiiUj830LeYKHsr3NMWFlV71gJpO8i0TQdPr4Y9ECGeRQhWej
-         NRf8xE67Flj/nt8uZXy7y15PGWZJkMSeMdpjCOwqInZuOvToeKbfcWSE4aGqfVhwQ5BL
-         kMRHyt2py0+ZBXoGxcDYJI/kT7Nf8I9AhO4+g/g5nqzAVEVMq0iMZ6wMYZNtoVQ9gF+i
-         34gWn6rAQZ59CD/Mjtlj4L0zDIvEsO7hxDCAj7v663OcNVdc1Rr9ApPsFPG8r+qIvH8Y
-         JgrmUayjmDWEJhMEM1L9XmSitX3/LIXYUdwv2wAs0y4qE6pE0POb0EB4lOv89YRJy3GW
-         mRzA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2xzzzyg5cPHTt7yl/EYjFIe51qe30qD7Ya4O460leGE3sKPe1SyP0Gl1cgJWlUtwlzasPPNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8BQvRXt2pTGHDyIyxAlfDBKP4KpVd+h5pQmdNsnQjGdssiGJY
-	1fditf9aVYKscG8LjD1vJft0t+/7OqLrKT3FzVRbv4Y3yAqNvqu1ttK+KPn5ks4Yv0JGYJ+9s4m
-	cwApKyJR4m69OqMNm/3w9XdejUEs0MnDqWL0HKY2u/91RdMm7Q3kcVEY=
-X-Google-Smtp-Source: AGHT+IEwB438rF8gnGs3M3wvUu+QC7cusa+f51xI7QQ0r2qdtyma4J6xKMgS5JWlLazsdO4Rxtq3+o/3xtOXEDZiny34oww5fZV/
+	s=arc-20240116; t=1740264753; c=relaxed/simple;
+	bh=Nd6QA6/cYeZst96/ye9TyeT7k2VCgW2t+UlxpiR8J9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozRmJ26p9YQOxb+d2EYQFDKFmGeR1JziKvXPeYp4E2QspX/8zojwX4rzWzPbOzWA3BfplnXrKoqnlzlSFB4z0E9vyC2GRpypBCt6AeRZvMfLdjnLYkQmKPQAWx6NzG29MFAYUSjRyGKCkyKGiXVPOyVs7OqW/oYmJMqjGWZnAFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OxzJT5Xq; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740264752; x=1771800752;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Nd6QA6/cYeZst96/ye9TyeT7k2VCgW2t+UlxpiR8J9Y=;
+  b=OxzJT5XqBk6WnPKUzPmFHVO2TU1lsmZ9RJW+c5qMjwJVLPzEVrQo742e
+   0sMykq6oUtzRuPW9DeMptTAcNWWXcgMPPTnEM5aPJY2sqAOtvXDOWkvo+
+   BKZpGcisZdUt44abzZnKq+fERGiCWzim9c2/q31NnxVLedO6PKsRHiUrQ
+   13F7eqaIO2kEFKer3dgZtaE2dPJFrWUju6hI6RlAewHpJrF4L3ajR7JB9
+   3TlfQxNhYrG7jj78lWPxTtfZmjDUhSsqQIYcu7BaHCa6pAuOu+UVkMkoH
+   BYRAgMroGKmwtbd5Rh2ykXDxZ+vPFhoCIuVBX2tACXmQD0HUDuI+qdFgq
+   g==;
+X-CSE-ConnectionGUID: CTQC0RWFQ2ey/QSXDtWhEw==
+X-CSE-MsgGUID: mth7HNrnShC97oqGGUA/WQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11353"; a="44708768"
+X-IronPort-AV: E=Sophos;i="6.13,308,1732608000"; 
+   d="scan'208";a="44708768"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2025 14:52:32 -0800
+X-CSE-ConnectionGUID: LQxw2WKxTcGTo6alwSGThA==
+X-CSE-MsgGUID: KgyCal27QVKdc/FqrjGA4Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,308,1732608000"; 
+   d="scan'208";a="115720660"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 22 Feb 2025 14:52:25 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tlyMB-0006xr-0W;
+	Sat, 22 Feb 2025 22:52:23 +0000
+Date: Sun, 23 Feb 2025 06:51:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	dsahern@kernel.org, kuniyu@amazon.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+	ykolal@fb.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for
+ bpf_setsockopt
+Message-ID: <202502230656.sZc7duhR-lkp@intel.com>
+References: <20250219081333.56378-2-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3dc4:b0:3ce:4b12:fa17 with SMTP id
- e9e14a558f8ab-3d2cb52d4bfmr76842325ab.19.1740259698500; Sat, 22 Feb 2025
- 13:28:18 -0800 (PST)
-Date: Sat, 22 Feb 2025 13:28:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67ba4172.050a0220.bbfd1.0001.GAE@google.com>
-Subject: [syzbot] [net?] [s390?] possible deadlock in smc_sendmsg
-From: syzbot <syzbot+6cc62f8d77a830dba3a7@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
-	jaka@linux.ibm.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250219081333.56378-2-kerneljasonxing@gmail.com>
 
-Hello,
+Hi Jason,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    6537cfb395f3 Merge tag 'sound-6.14-rc4' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=146177df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f4f6914bcba459be
-dashboard link: https://syzkaller.appspot.com/bug?extid=6cc62f8d77a830dba3a7
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on bpf-next/master]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/bpf-support-TCP_RTO_MAX_MS-for-bpf_setsockopt/20250219-161637
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250219081333.56378-2-kerneljasonxing%40gmail.com
+patch subject: [PATCH bpf-next v3 1/2] bpf: support TCP_RTO_MAX_MS for bpf_setsockopt
+config: i386-buildonly-randconfig-004-20250220 (https://download.01.org/0day-ci/archive/20250223/202502230656.sZc7duhR-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250223/202502230656.sZc7duhR-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-6537cfb3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c6f2faba4c42/vmlinux-6537cfb3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/16fc32b66fc0/bzImage-6537cfb3.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502230656.sZc7duhR-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6cc62f8d77a830dba3a7@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-block nbd4: NBD_DISCONNECT
-======================================================
-WARNING: possible circular locking dependency detected
-6.14.0-rc3-syzkaller-00060-g6537cfb395f3 #0 Not tainted
-------------------------------------------------------
-syz.4.3048/15507 is trying to acquire lock:
-ffff88804ed2bbd8 (sk_lock-AF_SMC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1624 [inline]
-ffff88804ed2bbd8 (sk_lock-AF_SMC){+.+.}-{0:0}, at: smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
-
-but task is already holding lock:
-ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: send_disconnects drivers/block/nbd.c:1394 [inline]
-ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_disconnect+0x321/0x540 drivers/block/nbd.c:1410
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #6 (&nsock->tx_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       sock_shutdown+0x16f/0x280 drivers/block/nbd.c:410
-       nbd_clear_sock drivers/block/nbd.c:1416 [inline]
-       nbd_config_put+0x1e6/0x750 drivers/block/nbd.c:1440
-       nbd_release+0xb7/0x190 drivers/block/nbd.c:1735
-       blkdev_put_whole+0xad/0xf0 block/bdev.c:679
-       bdev_release+0x47e/0x6d0 block/bdev.c:1102
-       blkdev_release+0x15/0x20 block/fops.c:660
-       __fput+0x3ff/0xb70 fs/file_table.c:464
-       task_work_run+0x14e/0x250 kernel/task_work.c:227
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-       exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-       syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
-       do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&nbd->config_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       refcount_dec_and_mutex_lock+0x51/0xc0 lib/refcount.c:118
-       nbd_config_put+0x31/0x750 drivers/block/nbd.c:1423
-       nbd_release+0xb7/0x190 drivers/block/nbd.c:1735
-       blkdev_put_whole+0xad/0xf0 block/bdev.c:679
-       bdev_release+0x47e/0x6d0 block/bdev.c:1102
-       blkdev_release+0x15/0x20 block/fops.c:660
-       __fput+0x3ff/0xb70 fs/file_table.c:464
-       __fput_sync+0xa1/0xc0 fs/file_table.c:550
-       __do_sys_close fs/open.c:1580 [inline]
-       __se_sys_close fs/open.c:1565 [inline]
-       __x64_sys_close+0x86/0x100 fs/open.c:1565
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (&disk->open_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       bdev_open+0x41a/0xe20 block/bdev.c:903
-       bdev_file_open_by_dev block/bdev.c:1017 [inline]
-       bdev_file_open_by_dev+0x17d/0x210 block/bdev.c:992
-       disk_scan_partitions+0x1ed/0x320 block/genhd.c:374
-       add_disk_fwnode+0x1006/0x1320 block/genhd.c:526
-       pmem_attach_disk+0x9a1/0x13e0 drivers/nvdimm/pmem.c:576
-       nd_pmem_probe+0x1a9/0x1f0 drivers/nvdimm/pmem.c:649
-       nvdimm_bus_probe+0x169/0x5d0 drivers/nvdimm/bus.c:94
-       call_driver_probe drivers/base/dd.c:579 [inline]
-       really_probe+0x23e/0xa90 drivers/base/dd.c:658
-       __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
-       driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
-       __driver_attach+0x283/0x580 drivers/base/dd.c:1216
-       bus_for_each_dev+0x13c/0x1d0 drivers/base/bus.c:370
-       bus_add_driver+0x2e9/0x690 drivers/base/bus.c:678
-       driver_register+0x15c/0x4b0 drivers/base/driver.c:249
-       __nd_driver_register+0x103/0x1a0 drivers/nvdimm/bus.c:622
-       do_one_initcall+0x128/0x700 init/main.c:1257
-       do_initcall_level init/main.c:1319 [inline]
-       do_initcalls init/main.c:1335 [inline]
-       do_basic_setup init/main.c:1354 [inline]
-       kernel_init_freeable+0x5c7/0x900 init/main.c:1568
-       kernel_init+0x1c/0x2b0 init/main.c:1457
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
--> #3 (&nvdimm_namespace_key){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       device_lock include/linux/device.h:1030 [inline]
-       uevent_show+0x188/0x3b0 drivers/base/core.c:2729
-       dev_attr_show+0x53/0xe0 drivers/base/core.c:2423
-       sysfs_kf_seq_show+0x23e/0x410 fs/sysfs/file.c:59
-       seq_read_iter+0x4f4/0x12b0 fs/seq_file.c:230
-       kernfs_fop_read_iter+0x414/0x580 fs/kernfs/file.c:279
-       new_sync_read fs/read_write.c:484 [inline]
-       vfs_read+0x886/0xbf0 fs/read_write.c:565
-       ksys_read+0x12b/0x250 fs/read_write.c:708
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #2 (kn->active#5){++++}-{0:0}:
-       kernfs_drain+0x48f/0x590 fs/kernfs/dir.c:500
-       __kernfs_remove+0x281/0x670 fs/kernfs/dir.c:1487
-       kernfs_remove_by_name_ns+0xb2/0x130 fs/kernfs/dir.c:1695
-       sysfs_remove_file include/linux/sysfs.h:794 [inline]
-       device_remove_file drivers/base/core.c:3047 [inline]
-       device_remove_file drivers/base/core.c:3043 [inline]
-       device_del+0x381/0x9f0 drivers/base/core.c:3852
-       unregister_netdevice_many_notify+0x13aa/0x1f30 net/core/dev.c:11838
-       unregister_netdevice_many net/core/dev.c:11866 [inline]
-       unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11736
-       unregister_netdevice include/linux/netdevice.h:3335 [inline]
-       unregister_netdev+0x21/0x30 net/core/dev.c:11886
-       sixpack_close+0x1e7/0x2f0 drivers/net/hamradio/6pack.c:661
-       tty_ldisc_close+0x111/0x1a0 drivers/tty/tty_ldisc.c:455
-       tty_ldisc_kill+0x8e/0x150 drivers/tty/tty_ldisc.c:613
-       tty_ldisc_release+0x116/0x2a0 drivers/tty/tty_ldisc.c:781
-       tty_release_struct+0x23/0xe0 drivers/tty/tty_io.c:1690
-       tty_release+0xe25/0x1410 drivers/tty/tty_io.c:1861
-       __fput+0x3ff/0xb70 fs/file_table.c:464
-       task_work_run+0x14e/0x250 kernel/task_work.c:227
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-       exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-       syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
-       do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (rtnl_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1908
-       __smc_connect+0x44d/0x4890 net/smc/af_smc.c:1520
-       smc_connect+0x2fc/0x760 net/smc/af_smc.c:1696
-       __sys_connect_file+0x13e/0x1a0 net/socket.c:2045
-       __sys_connect+0x14f/0x170 net/socket.c:2064
-       __do_sys_connect net/socket.c:2070 [inline]
-       __se_sys_connect net/socket.c:2067 [inline]
-       __x64_sys_connect+0x72/0xb0 net/socket.c:2067
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (sk_lock-AF_SMC){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3163 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3282 [inline]
-       validate_chain kernel/locking/lockdep.c:3906 [inline]
-       __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
-       lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3645
-       lock_sock include/net/sock.h:1624 [inline]
-       smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
-       sock_sendmsg_nosec net/socket.c:718 [inline]
-       __sock_sendmsg net/socket.c:733 [inline]
-       sock_sendmsg+0x3d3/0x490 net/socket.c:756
-       __sock_xmit+0x1e8/0x4f0 drivers/block/nbd.c:574
-       sock_xmit drivers/block/nbd.c:602 [inline]
-       send_disconnects drivers/block/nbd.c:1395 [inline]
-       nbd_disconnect+0x390/0x540 drivers/block/nbd.c:1410
-       __nbd_ioctl drivers/block/nbd.c:1580 [inline]
-       nbd_ioctl+0x8d1/0xd60 drivers/block/nbd.c:1642
-       blkdev_ioctl+0x276/0x6d0 block/ioctl.c:693
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:906 [inline]
-       __se_sys_ioctl fs/ioctl.c:892 [inline]
-       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  sk_lock-AF_SMC --> &nbd->config_lock --> &nsock->tx_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&nsock->tx_lock);
-                               lock(&nbd->config_lock);
-                               lock(&nsock->tx_lock);
-  lock(sk_lock-AF_SMC);
-
- *** DEADLOCK ***
-
-2 locks held by syz.4.3048/15507:
- #0: ffff888026642198 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_ioctl+0x151/0xd60 drivers/block/nbd.c:1635
- #1: ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: send_disconnects drivers/block/nbd.c:1394 [inline]
- #1: ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_disconnect+0x321/0x540 drivers/block/nbd.c:1410
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 15507 Comm: syz.4.3048 Not tainted 6.14.0-rc3-syzkaller-00060-g6537cfb395f3 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x490/0x760 kernel/locking/lockdep.c:2076
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2208
- check_prev_add kernel/locking/lockdep.c:3163 [inline]
- check_prevs_add kernel/locking/lockdep.c:3282 [inline]
- validate_chain kernel/locking/lockdep.c:3906 [inline]
- __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
- lock_sock_nested+0x3a/0xf0 net/core/sock.c:3645
- lock_sock include/net/sock.h:1624 [inline]
- smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg net/socket.c:733 [inline]
- sock_sendmsg+0x3d3/0x490 net/socket.c:756
- __sock_xmit+0x1e8/0x4f0 drivers/block/nbd.c:574
- sock_xmit drivers/block/nbd.c:602 [inline]
- send_disconnects drivers/block/nbd.c:1395 [inline]
- nbd_disconnect+0x390/0x540 drivers/block/nbd.c:1410
- __nbd_ioctl drivers/block/nbd.c:1580 [inline]
- nbd_ioctl+0x8d1/0xd60 drivers/block/nbd.c:1642
- blkdev_ioctl+0x276/0x6d0 block/ioctl.c:693
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl fs/ioctl.c:892 [inline]
- __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0b5198cde9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0b52883038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f0b51ba6080 RCX: 00007f0b5198cde9
-RDX: 0000000000000000 RSI: 000000000000ab08 RDI: 0000000000000006
-RBP: 00007f0b51a0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f0b51ba6080 R15: 00007ffce7c4c0d8
- </TASK>
-block nbd4: Send disconnect failed -107
-block nbd4: Disconnected due to user request.
-block nbd4: shutting down sockets
+   net/core/filter.c:1726:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    1726 |         .arg3_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:2041:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    2041 |         .arg1_type      = ARG_PTR_TO_MEM | PTR_MAYBE_NULL | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~
+   net/core/filter.c:2043:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    2043 |         .arg3_type      = ARG_PTR_TO_MEM | PTR_MAYBE_NULL | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~
+   net/core/filter.c:2580:35: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    2580 |         .arg2_type      = ARG_PTR_TO_MEM | PTR_MAYBE_NULL | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~
+   net/core/filter.c:4649:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    4649 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:4663:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    4663 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:4863:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    4863 |         .arg2_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:4891:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    4891 |         .arg2_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5063:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5063 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5077:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5077 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5126:45: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5126 |         .arg1_type      = ARG_PTR_TO_BTF_ID_SOCK_COMMON | PTR_MAYBE_NULL,
+         |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~
+>> net/core/filter.c:5385:7: error: use of undeclared identifier 'TCP_RTO_MAX_MS'; did you mean 'TCA_RED_MAX_P'?
+    5385 |         case TCP_RTO_MAX_MS:
+         |              ^~~~~~~~~~~~~~
+         |              TCA_RED_MAX_P
+   include/uapi/linux/pkt_sched.h:258:2: note: 'TCA_RED_MAX_P' declared here
+     258 |         TCA_RED_MAX_P,
+         |         ^
+   net/core/filter.c:5562:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5562 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5596:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5596 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5630:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5630 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5664:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5664 |         .arg4_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:5839:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    5839 |         .arg2_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:6376:46: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    6376 |         .arg3_type      = ARG_PTR_TO_FIXED_SIZE_MEM | MEM_WRITE | MEM_ALIGNED,
+         |                           ~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~
+   net/core/filter.c:6388:46: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    6388 |         .arg3_type      = ARG_PTR_TO_FIXED_SIZE_MEM | MEM_WRITE | MEM_ALIGNED,
+         |                           ~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~
+   net/core/filter.c:6474:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    6474 |         .arg3_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   net/core/filter.c:6484:30: warning: bitwise operation between different enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    6484 |         .arg3_type      = ARG_PTR_TO_MEM | MEM_RDONLY,
+         |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+   20 warnings and 1 error generated.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +5385 net/core/filter.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+  5365	
+  5366	static int sol_tcp_sockopt(struct sock *sk, int optname,
+  5367				   char *optval, int *optlen,
+  5368				   bool getopt)
+  5369	{
+  5370		if (sk->sk_protocol != IPPROTO_TCP)
+  5371			return -EINVAL;
+  5372	
+  5373		switch (optname) {
+  5374		case TCP_NODELAY:
+  5375		case TCP_MAXSEG:
+  5376		case TCP_KEEPIDLE:
+  5377		case TCP_KEEPINTVL:
+  5378		case TCP_KEEPCNT:
+  5379		case TCP_SYNCNT:
+  5380		case TCP_WINDOW_CLAMP:
+  5381		case TCP_THIN_LINEAR_TIMEOUTS:
+  5382		case TCP_USER_TIMEOUT:
+  5383		case TCP_NOTSENT_LOWAT:
+  5384		case TCP_SAVE_SYN:
+> 5385		case TCP_RTO_MAX_MS:
+  5386			if (*optlen != sizeof(int))
+  5387				return -EINVAL;
+  5388			break;
+  5389		case TCP_CONGESTION:
+  5390			return sol_tcp_sockopt_congestion(sk, optval, optlen, getopt);
+  5391		case TCP_SAVED_SYN:
+  5392			if (*optlen < 1)
+  5393				return -EINVAL;
+  5394			break;
+  5395		case TCP_BPF_SOCK_OPS_CB_FLAGS:
+  5396			if (*optlen != sizeof(int))
+  5397				return -EINVAL;
+  5398			if (getopt) {
+  5399				struct tcp_sock *tp = tcp_sk(sk);
+  5400				int cb_flags = tp->bpf_sock_ops_cb_flags;
+  5401	
+  5402				memcpy(optval, &cb_flags, *optlen);
+  5403				return 0;
+  5404			}
+  5405			return bpf_sol_tcp_setsockopt(sk, optname, optval, *optlen);
+  5406		default:
+  5407			if (getopt)
+  5408				return -EINVAL;
+  5409			return bpf_sol_tcp_setsockopt(sk, optname, optval, *optlen);
+  5410		}
+  5411	
+  5412		if (getopt) {
+  5413			if (optname == TCP_SAVED_SYN) {
+  5414				struct tcp_sock *tp = tcp_sk(sk);
+  5415	
+  5416				if (!tp->saved_syn ||
+  5417				    *optlen > tcp_saved_syn_len(tp->saved_syn))
+  5418					return -EINVAL;
+  5419				memcpy(optval, tp->saved_syn->data, *optlen);
+  5420				/* It cannot free tp->saved_syn here because it
+  5421				 * does not know if the user space still needs it.
+  5422				 */
+  5423				return 0;
+  5424			}
+  5425	
+  5426			return do_tcp_getsockopt(sk, SOL_TCP, optname,
+  5427						 KERNEL_SOCKPTR(optval),
+  5428						 KERNEL_SOCKPTR(optlen));
+  5429		}
+  5430	
+  5431		return do_tcp_setsockopt(sk, SOL_TCP, optname,
+  5432					 KERNEL_SOCKPTR(optval), *optlen);
+  5433	}
+  5434	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
