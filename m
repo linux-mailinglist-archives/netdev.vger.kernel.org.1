@@ -1,132 +1,143 @@
-Return-Path: <netdev+bounces-168778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E718A40AF3
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 19:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0AF3A40AF5
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 19:31:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D653F1897933
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 18:29:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E555C189810F
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 18:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9DE20B1F9;
-	Sat, 22 Feb 2025 18:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7487520AF86;
+	Sat, 22 Feb 2025 18:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nc3fpnuV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LaWgSSmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFF618C0C;
-	Sat, 22 Feb 2025 18:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DD335961;
+	Sat, 22 Feb 2025 18:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740248944; cv=none; b=JH/IwZQBFFNekofaTgiarorPQYdbFfmYdjjxLBXyAGDknV37U9PA6qTWB+vjmsy4t5n161xdnVZ7RbmtZ7UE83mJ3GFkMRSktA/FffxD4GEBgPdSbJReWPFufnSzHW75iBC/xiiILRaXbo97yOveiamhBrc42dzZaefobRc0NQ0=
+	t=1740249068; cv=none; b=ASmRyn+gCFi+3WqWkW8WMVlAYUgMqolzni34VMlQJd4bFtHmLNasZKGnC1+Hpr5Ot3wvWLO9DockCW7PncNBR5OfdFh9pBDIKTIH4Wj8KsNtB+1PybMwhqM9hp8lXgKpJynhovfEyAsq356a/tui39sjrqHAF7w1d+ikQDWUQYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740248944; c=relaxed/simple;
-	bh=2ihQX9u9K3sL0h1y3ZuxOKbm7qAky/Nw4YGKusOjRos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pCJHery+bUhiGk6lld0FGLR7M19Ft2VNNYhdVcM7J2r91dA7EbbLgB2t/ShjBIxyW8m94MOhalhp4oKHb8apZP42s2guAnvoUbW/O4V+zPSnyAjsBMGrkLcOyLw2OgFPuXxRhbsSNjqHe5t0aTAlZdJO9mqahKUQ/TumQR/2vz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nc3fpnuV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE3FEC4CED1;
-	Sat, 22 Feb 2025 18:29:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740248943;
-	bh=2ihQX9u9K3sL0h1y3ZuxOKbm7qAky/Nw4YGKusOjRos=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nc3fpnuViIVxv5g5qSVEO0+QoHzF+Vc0eo9P4Kw+jXhtQFIKNAGsGfV8HYdtJrvH/
-	 h9Cv0skM+N5iT0LA2XeYupWmP7s7H9l4rbG1YEjjJ2Abviju53lrs/1hFILW7JeFym
-	 8GU+r7i35+15XNx56MY76tfKRafkIHv+oZ4VuMvqz7YCNNVjLEk8luknVdU/Yj1MGC
-	 byKZtShKWYiK5hJjoD1z/krswnW+wGElMSN6MII1K2nDKQ6ze4N4O9AAFJadsSi00J
-	 Ju5iyisL07EVGpZ2twSqWkPOh7Cd/NqRM6f1M5kxY4Ie4Pjrdok6OP4iarfQTKpXgY
-	 ng+PGdjmZlXpg==
-Date: Sat, 22 Feb 2025 20:29:00 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: jgg@nvidia.com, andrew.gospodarek@broadcom.com,
-	aron.silverton@oracle.com, dan.j.williams@intel.com,
-	daniel.vetter@ffwll.ch, dave.jiang@intel.com, dsahern@kernel.org,
-	gospo@broadcom.com, hch@infradead.org, itayavr@nvidia.com,
-	jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
-	lbloch@nvidia.com, saeedm@nvidia.com, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	brett.creeley@amd.com
-Subject: Re: [RFC PATCH fwctl 3/5] pds_fwctl: initial driver framework
-Message-ID: <20250222182900.GU53094@unreal>
-References: <20250211234854.52277-1-shannon.nelson@amd.com>
- <20250211234854.52277-4-shannon.nelson@amd.com>
- <20250218195132.GB53094@unreal>
- <39ec35d0-56a2-4473-a67d-9a6727c61693@amd.com>
- <20250219082554.GD53094@unreal>
- <6e023017-27ac-4182-8a87-313d2b34f5e4@amd.com>
+	s=arc-20240116; t=1740249068; c=relaxed/simple;
+	bh=F370KETrMWzBfCAknccZHirCmbB67waMtTvyv7WFlGM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ewZYfN21mFUdfx3U28LwabbCff5uSYAFqQOFn2rv76105+wO9reZz7f2opOWa3UWraE/M8TdyMDEEDCq63puQmtqMk5dHbBe4sH0X/NcNa4Hjlx1aAI3ZBwOHuhidd17GSUXpMposb2xP8O730Es8YbRbF6tRCLpv9CQ2uvb7Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LaWgSSmr; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-221206dbd7eso64681675ad.2;
+        Sat, 22 Feb 2025 10:31:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740249066; x=1740853866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JO23ucqLx5sqqdPCYez77ZwthsWLwhAUyq51soFFXxk=;
+        b=LaWgSSmrwRIh99Lby8ICka4GG9LFkdgkgz7x/gqHdPl6Pj8pkiMZFZxtA+vbHv+fEX
+         Ws1SBxLEiUXvqd5/bXKnY5Ha31nqlXkG+cw6zfbJQ6tb5xuU+IkWeymOxAqf+uWSE8Dv
+         X+bLFq6GHa6U6o9nN83LRoh82rpQc/fpa36fpeUjyL11aVbD6GvBkF5xhTpTyAgTDIc4
+         zou47m09meZehfyETshMEv9UWuy4SNFvfgpqWLYwGVu66a03DUpXDCBh2bWUOVRzrCzg
+         HmxXkoN6WdbUb9h2NQq5yl9EhkJQoXOoHeF02nQH0cenrPLDOOOkyzWaQZyC59D/RZXL
+         9AUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740249066; x=1740853866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JO23ucqLx5sqqdPCYez77ZwthsWLwhAUyq51soFFXxk=;
+        b=LHJHfka02thcysTwN0eAn6EVizc9D8cAKfUpTzYtakDvQfSODlCaWr/qAnebZedBx1
+         0GuHPnqFLvRRuNIiMgtyGtp7LbHHEzJULufNTM33Mgfk+l7FYwzfM5mQFNJFc916zBk4
+         nEdcGVtCJbnjCLDxmj0ZMd0suh0P4JBGFu4N+jj6RYihBQdBl75tN76YnKKC4e7gMyZr
+         M5ggZFrOr1jeYtPy4nDlfkqEMIREYsp6GJRmyBRzvCcw3RYGSqmN888se5dp+saAFreB
+         EKmAF5ydfMT3b2wMa8lF5bB7LkfxPNGwLOGlNZvMW77i49GjIxJm+Gg8+7gHHVoEd0v+
+         RJCw==
+X-Gm-Message-State: AOJu0Yx9Z/vo8urq6Qg9AiKENlYpWoEXhaHwFIB9sFluYt9D7KEQf2oD
+	tqDX8yiEtk5grV5Gqs+iXtWJ/PWeOqOCwM1gxj0AEc5E8wPUWaLd9NPwyQ==
+X-Gm-Gg: ASbGncseQ43dmH3groonh1ttSOnhQfnOQJ1RXkVk142bsx+QIXGBrAbH0JNZU9Gz2Ya
+	46w2aJoJj70nbHQw6zhow1kwk96QDhwFsxEGoXrdufLk4Xy+rZm5iSzWFMsHcTLBeqFURWfQSlv
+	Jz1A88xqnb2M1SuIpQqiRQaOpfSHjqkR3qdtJNbeh6Kj1btOmRewZXN/2vVQBGv31/yC6eGOAJw
+	gghhbZiUMmRnLiD1HI7Mo1skgrtackr23fDOZEeD3M5G9YlTXViRBUF/z980dYxrFqs4xPuSUTh
+	qOnEgyTIT/5PDJZ0SPkZGRf7Op9cy9IeF+A2qvs1gslGzx07CaLV51o=
+X-Google-Smtp-Source: AGHT+IHhOYfix2yw/nhson6NU50l6sm551VjCRHt0U4RfUKlhoZbwPgbkLHcVLk4h/MRnKMVs0ZC3w==
+X-Received: by 2002:a05:6a00:4f8f:b0:730:9242:e68 with SMTP id d2e1a72fcca58-73426d96062mr10895518b3a.23.1740249065716;
+        Sat, 22 Feb 2025 10:31:05 -0800 (PST)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:2714:159c:631a:37c0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73250dd701bsm16442959b3a.131.2025.02.22.10.31.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Feb 2025 10:31:05 -0800 (PST)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	zhoufeng.zf@bytedance.com,
+	zijianzhang@bytedance.com,
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch bpf-next 0/4] tcp_bpf: improve ingress redirection performance with message corking
+Date: Sat, 22 Feb 2025 10:30:53 -0800
+Message-Id: <20250222183057.800800-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e023017-27ac-4182-8a87-313d2b34f5e4@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 20, 2025 at 03:27:37PM -0800, Nelson, Shannon wrote:
-> On 2/19/2025 12:25 AM, Leon Romanovsky wrote:
-> > 
-> > On Tue, Feb 18, 2025 at 02:19:03PM -0800, Nelson, Shannon wrote:
-> > > On 2/18/2025 11:51 AM, Leon Romanovsky wrote:
-> > > > 
-> > > > On Tue, Feb 11, 2025 at 03:48:52PM -0800, Shannon Nelson wrote:
-> > > > > Initial files for adding a new fwctl driver for the AMD/Pensando PDS
-> > > > > devices.  This sets up a simple auxiliary_bus driver that registers
-> > > > > with fwctl subsystem.  It expects that a pds_core device has set up
-> > > > > the auxiliary_device pds_core.fwctl
-> > > > > 
-> > > > > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> > > > > ---
-> > > > >    MAINTAINERS                    |   7 ++
-> > > > >    drivers/fwctl/Kconfig          |  10 ++
-> > > > >    drivers/fwctl/Makefile         |   1 +
-> > > > >    drivers/fwctl/pds/Makefile     |   4 +
-> > > > >    drivers/fwctl/pds/main.c       | 195 +++++++++++++++++++++++++++++++++
-> > > > >    include/linux/pds/pds_adminq.h |  77 +++++++++++++
-> > > > >    include/uapi/fwctl/fwctl.h     |   1 +
-> > > > >    include/uapi/fwctl/pds.h       |  27 +++++
-> > > > >    8 files changed, 322 insertions(+)
-> > > > >    create mode 100644 drivers/fwctl/pds/Makefile
-> > > > >    create mode 100644 drivers/fwctl/pds/main.c
-> > > > >    create mode 100644 include/uapi/fwctl/pds.h
-> > > > 
-> > > > <...>
-> > 
-> > <...>
-> > 
-> > > > > +             return err;
-> > > > > +     }
-> > > > > +
-> > > > > +     cmd.fwctl_ident.opcode = PDS_FWCTL_CMD_IDENT;
-> > > > > +     cmd.fwctl_ident.version = 0;
-> > > > 
-> > > > How will you manage this version field?
-> > > 
-> > > Since there is only version 0 at this point, there is not much to manage.  I
-> > > wanted to explicitly show the setting to version 0, but maybe that can be
-> > > assumed by the basic struct init.
-> > 
-> > But the question is slightly different "How will you manage this version field?"
-> 
-> If we find we have to change the interface in a non-backward-compatable way,
-> we'll increment the version number that we support, and watch for the
-> version number supported by the firmware as reported in the ident struct
-> data and interpret the data appropriately.  Similarly, if the firmware sees
-> that the host driver is at a lower version number, it will handle data in
-> the older format.
+This patchset improves skmsg ingress redirection performance by a)
+sophisticated batching with kworker; b) skmsg allocation caching with
+kmem cache.
 
-Thanks.
+As a result, our patches significantly outperforms the vanilla kernel
+in terms of throughput for almost all packet sizes. The percentage
+improvement in throughput ranges from 3.13% to 160.92%, with smaller
+packets showing the highest improvements.
 
-> 
-> sln
-> 
-> 
-> 
+For Latency, it induces slightly higher latency across most packet sizes
+compared to the vanilla, which is also expected since this is a natural
+side effect of batching.
+
+Please see the detailed benchmarks:
+
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+| Throughput  | 64     | 128    | 256    | 512    | 1k     | 4k     | 16k    | 32k    | 64k    | 128k   | 256k   |
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+| Vanilla     | 0.17±0.02 | 0.36±0.01 | 0.72±0.02 | 1.37±0.05 | 2.60±0.12 | 8.24±0.44 | 22.38±2.02 | 25.49±1.28 | 43.07±1.36 | 66.87±4.14 | 73.70±7.15 |
+| Patched     | 0.41±0.01 | 0.82±0.02 | 1.62±0.05 | 3.33±0.01 | 6.45±0.02 | 21.50±0.08 | 46.22±0.31 | 50.20±1.12 | 45.39±1.29 | 68.96±1.12 | 78.35±1.49 |
+| Percentage  | 141.18%   | 127.78%   | 125.00%   | 143.07%   | 148.08%   | 160.92%   | 106.52%    | 97.00%     | 5.38%      | 3.13%      | 6.32%      |
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+| Latency     | 64        | 128       | 256       | 512       | 1k        | 4k        | 16k       | 32k       | 63k       |
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+| Vanilla     | 5.80±4.02 | 5.83±3.61 | 5.86±4.10 | 5.91±4.19 | 5.98±4.14 | 6.61±4.47 | 8.60±2.59 | 10.96±5.50| 15.02±6.78|
+| Patched     | 6.18±3.03 | 6.23±4.38 | 6.25±4.44 | 6.13±4.35 | 6.32±4.23 | 6.94±4.61 | 8.90±5.49 | 11.12±6.10| 14.88±6.55|
+| Percentage  | 6.55%     | 6.87%     | 6.66%     | 3.72%     | 5.68%     | 4.99%     | 3.49%     | 1.46%     |-0.93%     |
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+
+---
+Cong Wang (2):
+  skmsg: rename sk_msg_alloc() to sk_msg_expand()
+  skmsg: use bitfields for struct sk_psock
+
+Zijian Zhang (2):
+  skmsg: implement slab allocator cache for sk_msg
+  tcp_bpf: improve ingress redirection performance with message corking
+
+ include/linux/skmsg.h |  48 +++++++---
+ net/core/skmsg.c      | 173 ++++++++++++++++++++++++++++++++---
+ net/ipv4/tcp_bpf.c    | 204 +++++++++++++++++++++++++++++++++++++++---
+ net/tls/tls_sw.c      |   6 +-
+ net/xfrm/espintcp.c   |   2 +-
+ 5 files changed, 394 insertions(+), 39 deletions(-)
+
+-- 
+2.34.1
+
 
