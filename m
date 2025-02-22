@@ -1,175 +1,354 @@
-Return-Path: <netdev+bounces-168798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F264CA40BB8
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 22:27:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0909BA40BBC
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 22:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2A4C16CB29
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 21:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68633B8920
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 21:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C27520125B;
-	Sat, 22 Feb 2025 21:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6g+hzxv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6F32040BE;
+	Sat, 22 Feb 2025 21:28:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D18378F4E;
-	Sat, 22 Feb 2025 21:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7161DDE9
+	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 21:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740259648; cv=none; b=bmU2IjClrs3m/zDw6K/eh0HDK0fy5iY4bh2U6rzk4Xm5b4R/MDl2iHFA/Us/1+kXip6pn7mEGY9FiUG0DOV1y/9BqLO9juR7IP+wYfxLHdakCpUsY5qDNSS/aBISNDQQ8dW2/M4A7maO5D4aG3UCUYnw/L1oKGha2xWaggFeK3A=
+	t=1740259701; cv=none; b=o2sc91UlqPewe2RsMxWk4JjmqyedKJN0Ngr4Ds5ZYX4OuG/jD/qCJxoP5e6l0LXQh2K+vUQ6Z0cww3VsQ8kTMut/RZlJBD1OMZjbb9r7Q1j2N1RK/DsVaNqxRTMXCFvBrktOxVfh3ke85xOrk8UtKJg97rlf1F0d8nKGcr2qv+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740259648; c=relaxed/simple;
-	bh=HnWBOw/QY2fTfYTDn9OY1S4zp2jsVEiYSMCUMn+aT+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hZ95kpMe01kAEOhugtaUDCMzjZw/KVi0aPH2SUFnaEoU3cXLHA4BdNKT4iLpmn2JTEvdwvrs3De60w0NclDKH25k2CG1sp1oE0Yh+c01zhZrz08y6RvMbm9H+DEgRrFmDkpVaUu+f321nwsW7vYPTpm5JvIjQbS5A+56AjMnLoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6g+hzxv; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38f3486062eso2776081f8f.0;
-        Sat, 22 Feb 2025 13:27:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740259645; x=1740864445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YIyZqct4dbR7282FQbD+mjFPTLurG9NzJyoBOEIO9Hs=;
-        b=S6g+hzxvVjTY+rqX01ZkDy3dUinr+15Ky2Koz3bVrP5wL9fVDVWkp0SuqLC55+/mDF
-         EX35X/xvk0GXfWO5/qfLeUBi1ei/j7kzx8wiAaivMDB1gl7S9MMWxZ+UIBnVse6HFFub
-         ARxVCeSxPkXPFuqF1/rOrpkvT4SrHJTG33k4WVHKoq5aVbSi0VXT8HjbxAoe8P1xxeuF
-         QQ7xsB8c6wBcizj/iciBuz4/Bs4CrqLPsqeLQiN2JG3ZNTXhj+Zn/ruv9112iwc4crnb
-         RXJb5XX1LPrFxjdWaR914S70qeVb1vRmcXh7gvRuftSjUztfBhz/F6YLNlFdzjncu+j0
-         Zf9g==
+	s=arc-20240116; t=1740259701; c=relaxed/simple;
+	bh=rrUPmthSZymIJllcQ+NtdBq8igi0G5OV3N5Dh2FAI2A=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Mwdc1XalZkls2sHRTEOYgPeIzCWbeQ8tB3vmdUpmQahBqmsA+r/iF/IPGaFHStHgXiU32aEGERgZ1XVjv4/FwG7xZkZJIK9Q7GvmySw/SmTwBJjjHHXbx98q69OZGziBMg9f+F86RPjp6qP/llRU9XU8bldEa0IKsNgimWS2r18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d060cfe752so25163315ab.2
+        for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 13:28:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740259645; x=1740864445;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YIyZqct4dbR7282FQbD+mjFPTLurG9NzJyoBOEIO9Hs=;
-        b=nmbsXmGZZ6Cx4A48HPSPuf9n6c3rpct0Owa13BZKns8zj9pmNBpftvtVzUX8KFguok
-         3mJTnDJF+LJztVC7cUWBmcUmuB+lZyDx9g8SHlJ+H4gwRsYPyBwuiULEM/IPnltJdhf0
-         fiCOuP3FNfpti8nlOe0MCSDtCYWusIdd5j7wJQux1ikHYOqFCLVghgbQn43wz0e9PSpj
-         LfN4Mkl3+E0q4ZBtAX0+1UWz+aFy3v80KZrUw3eKGpglkzmpj3yX43ixcwEIbes0dj1L
-         46lAgDLpMdfJAAnaN6eIgXdzIAsOq29ezQi5Lg37LV8unkSNkj84IJhqSmKelR5JVmo5
-         Fz7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXbEs7ZcP62w+AY6v2y3XOaJBt1S5VOJcDqDjSVXMoFyYBgBggnDRE+QDWtM3bpYKJ12KtwFomnPItkNf4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIwUf+XNZaITiCyYhr4CzIbk3tBQJHDNuUVYIhyUhF7zKQSQ2c
-	+nWVzFiMhkoMBPk21Kb96un32n7WMemeBxITU9+K0WS6fbYMrdtwM5PdAw==
-X-Gm-Gg: ASbGnct3+D0iyc54580lXvrmqgqOfapVZi8H28c9BUtBZEZaMXyp51zo8oxMtVVILEy
-	BJzMO8kymRO05U1Uy15hlJdj047vEQWBvuqPV8WbZfXN/4Rkw+SFg9BEklg31N2zus3TFtLKMc7
-	Z6/wkwDJEzPHOm1T1LbZx3jxvPZBffecyaeAw/5o5+kYxyjSQ+4XRWfP/CJbIksk2AYLmTi8V/9
-	XuBAUV/Um4R4fctpS+Y+B64St42vyrljC9kasSTS7PCTZFqLyOdky0LvnzqdfQU+gGi5CvN6lcX
-	jBGSm5fHW92+aC3qSm/rLv3bas7F6P1aDZgo3J6/2CVnD1r+D829ZU2x9m2fVc05
-X-Google-Smtp-Source: AGHT+IFSxpKxu8CO66ihEeidKT1wivDUlJpVub6/WwFcVib8ByHwq+d5wiakyUZoodnjNdR5YejPNg==
-X-Received: by 2002:a5d:59a7:0:b0:38f:3d10:6ab7 with SMTP id ffacd0b85a97d-38f6e97880cmr7792054f8f.23.1740259644580;
-        Sat, 22 Feb 2025 13:27:24 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ddbb2sm26744591f8f.40.2025.02.22.13.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Feb 2025 13:27:24 -0800 (PST)
-Date: Sat, 22 Feb 2025 21:27:23 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
- nick.child@ibm.com, pmladek@suse.com, rostedt@goodmis.org,
- john.ogness@linutronix.de, senozhatsky@chromium.org
-Subject: Re: [PATCH net-next v3 1/3] hexdump: Implement macro for converting
- large buffers
-Message-ID: <20250222212723.4db1e0c7@pumpkin>
-In-Reply-To: <Z7oeaHxXnwrlA_d9@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-References: <20250219211102.225324-1-nnac123@linux.ibm.com>
-	<20250219211102.225324-2-nnac123@linux.ibm.com>
-	<20250220220050.61aa504d@pumpkin>
-	<Z7i56s7jwc_y0cIz@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-	<20250221180435.4bbf8c8f@pumpkin>
-	<Z7jLE-GKWPPn-cBT@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-	<20250221221815.53455e22@pumpkin>
-	<Z7oeaHxXnwrlA_d9@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20230601; t=1740259698; x=1740864498;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nMvR6VQwoiSvHdEtmggzmS+ZR2UuWrCXxkffOuRiO/8=;
+        b=BM8ob1/Pyir2Wxd/udiiUj830LeYKHsr3NMWFlV71gJpO8i0TQdPr4Y9ECGeRQhWej
+         NRf8xE67Flj/nt8uZXy7y15PGWZJkMSeMdpjCOwqInZuOvToeKbfcWSE4aGqfVhwQ5BL
+         kMRHyt2py0+ZBXoGxcDYJI/kT7Nf8I9AhO4+g/g5nqzAVEVMq0iMZ6wMYZNtoVQ9gF+i
+         34gWn6rAQZ59CD/Mjtlj4L0zDIvEsO7hxDCAj7v663OcNVdc1Rr9ApPsFPG8r+qIvH8Y
+         JgrmUayjmDWEJhMEM1L9XmSitX3/LIXYUdwv2wAs0y4qE6pE0POb0EB4lOv89YRJy3GW
+         mRzA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2xzzzyg5cPHTt7yl/EYjFIe51qe30qD7Ya4O460leGE3sKPe1SyP0Gl1cgJWlUtwlzasPPNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8BQvRXt2pTGHDyIyxAlfDBKP4KpVd+h5pQmdNsnQjGdssiGJY
+	1fditf9aVYKscG8LjD1vJft0t+/7OqLrKT3FzVRbv4Y3yAqNvqu1ttK+KPn5ks4Yv0JGYJ+9s4m
+	cwApKyJR4m69OqMNm/3w9XdejUEs0MnDqWL0HKY2u/91RdMm7Q3kcVEY=
+X-Google-Smtp-Source: AGHT+IEwB438rF8gnGs3M3wvUu+QC7cusa+f51xI7QQ0r2qdtyma4J6xKMgS5JWlLazsdO4Rxtq3+o/3xtOXEDZiny34oww5fZV/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:3dc4:b0:3ce:4b12:fa17 with SMTP id
+ e9e14a558f8ab-3d2cb52d4bfmr76842325ab.19.1740259698500; Sat, 22 Feb 2025
+ 13:28:18 -0800 (PST)
+Date: Sat, 22 Feb 2025 13:28:18 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67ba4172.050a0220.bbfd1.0001.GAE@google.com>
+Subject: [syzbot] [net?] [s390?] possible deadlock in smc_sendmsg
+From: syzbot <syzbot+6cc62f8d77a830dba3a7@syzkaller.appspotmail.com>
+To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	jaka@linux.ibm.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 22 Feb 2025 12:58:48 -0600
-Nick Child <nnac123@linux.ibm.com> wrote:
+Hello,
 
-> On Fri, Feb 21, 2025 at 10:18:15PM +0000, David Laight wrote:
-> > On Fri, 21 Feb 2025 12:50:59 -0600
-> > Nick Child <nnac123@linux.ibm.com> wrote:
-> >   
-> > > On Fri, Feb 21, 2025 at 06:04:35PM +0000, David Laight wrote:  
-> > > > On Fri, 21 Feb 2025 11:37:46 -0600
-> > > > Nick Child <nnac123@linux.ibm.com> wrote:    
-> > > > > On Thu, Feb 20, 2025 at 10:00:50PM +0000, David Laight wrote:    
-> > > > > > You could do:
-> > > > > > #define for_each_line_in_hex_dump(buf_offset, rowsize, linebuf, linebuflen, groupsize, buf, len, ascii) \
-> > > > > > for (unsigned int _offset = 0, _rowsize = (rowsize), _len = (len); \
-> > > > > > 	((offset) = _offset) < _len && (hex_dump_to_buffer((const char *)(buf) + _offset, _len - _offset, \    
-> > > >           ^ needs to be buf_offset.
-> > > >     
-> > > > > > 		_rowsize, (groupsize), (linebuf), (linebuflen), (ascii)), 1); \
-> > > > > > 	_offset += _rowsize )
-> > > > > > 
-> > > > > > (Assuming I've not mistyped it.)
-> > > > > >       
-> > > > >
-> > > > > Trying to understand the reasoning for declaring new tmp variables;
-> > > > > Is this to prevent the values from changing in the body of the loop?    
-> > > >
-> > > > No, it is to prevent side-effects happening more than once.
-> > > > Think about what would happen if someone passed 'foo -= 4' for len.
-> > > >    
-> > > 
-> > > If we are protecting against those cases then linebuf, linebuflen,
-> > > groupsize and ascii should also be stored into tmp variables since they
-> > > are referenced in the loop conditional every iteration.
-> > > At which point the loop becomes too messy IMO.
-> > > Are any other for_each implementations taking these precautions?  
-> > 
-> > No, it only matters if they appear in the text expansion of the #define
-> > more than once.  
-> 
-> But the operation is still executed more than once when the variable
-> appears in the loop conditional. This still sounds like the same type
-> of unexpected behaviour. For example, when I set groupsize = 1 then
-> invoke for_each_line_in_hex_dump with groupsize *= 2 I get:
-> [    4.688870][  T145] HD: 0100 0302 0504 0706 0908 0b0a 0d0c 0f0e
-> [    4.688949][  T145] HD: 13121110 17161514 1b1a1918 1f1e1d1c
-> [    4.688969][  T145] HD: 2726252423222120 2f2e2d2c2b2a2928
-> [    4.688983][  T145] HD: 30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3f
-> Similarly if I run with buf: buf += 8:
-> [    5.019031][  T149] HD: 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17
-> [    5.019057][  T149] HD: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f
-> [    5.019069][  T149] HD: 38 39 3a 3b 3c 3d 3e 3f 98 1a 6a 95 de e6 9a 71
-> [    5.019081][  T149] HD: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 
-> The operations are getting executed more than once. Should this be
-> classified as expected behaviour just because those vars are technically
-> only expanded once in the macro?
+syzbot found the following issue on:
 
-Brain fade on my side :-(
+HEAD commit:    6537cfb395f3 Merge tag 'sound-6.14-rc4' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=146177df980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f4f6914bcba459be
+dashboard link: https://syzkaller.appspot.com/bug?extid=6cc62f8d77a830dba3a7
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-While you can copy all the integers, all the variables defined in a for(;;)
-statement have to have the same type - so you can't take a copy of the
-pointers.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-So maybe this is actually unwritable without having odd side effects and
-probably doesn't really save much text in any place it is used.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-6537cfb3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c6f2faba4c42/vmlinux-6537cfb3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/16fc32b66fc0/bzImage-6537cfb3.xz
 
-I did a scan of the kernel sources earlier.
-Everything sets rowsize to 16 or 32, so it doesn't matter if hexdump_to_buffer()
-just uses the supplied value.
-I didn't look at the history.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6cc62f8d77a830dba3a7@syzkaller.appspotmail.com
 
-	David
+block nbd4: NBD_DISCONNECT
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-rc3-syzkaller-00060-g6537cfb395f3 #0 Not tainted
+------------------------------------------------------
+syz.4.3048/15507 is trying to acquire lock:
+ffff88804ed2bbd8 (sk_lock-AF_SMC){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1624 [inline]
+ffff88804ed2bbd8 (sk_lock-AF_SMC){+.+.}-{0:0}, at: smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
+
+but task is already holding lock:
+ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: send_disconnects drivers/block/nbd.c:1394 [inline]
+ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_disconnect+0x321/0x540 drivers/block/nbd.c:1410
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #6 (&nsock->tx_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
+       sock_shutdown+0x16f/0x280 drivers/block/nbd.c:410
+       nbd_clear_sock drivers/block/nbd.c:1416 [inline]
+       nbd_config_put+0x1e6/0x750 drivers/block/nbd.c:1440
+       nbd_release+0xb7/0x190 drivers/block/nbd.c:1735
+       blkdev_put_whole+0xad/0xf0 block/bdev.c:679
+       bdev_release+0x47e/0x6d0 block/bdev.c:1102
+       blkdev_release+0x15/0x20 block/fops.c:660
+       __fput+0x3ff/0xb70 fs/file_table.c:464
+       task_work_run+0x14e/0x250 kernel/task_work.c:227
+       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+       exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+       syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
+       do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #5 (&nbd->config_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
+       refcount_dec_and_mutex_lock+0x51/0xc0 lib/refcount.c:118
+       nbd_config_put+0x31/0x750 drivers/block/nbd.c:1423
+       nbd_release+0xb7/0x190 drivers/block/nbd.c:1735
+       blkdev_put_whole+0xad/0xf0 block/bdev.c:679
+       bdev_release+0x47e/0x6d0 block/bdev.c:1102
+       blkdev_release+0x15/0x20 block/fops.c:660
+       __fput+0x3ff/0xb70 fs/file_table.c:464
+       __fput_sync+0xa1/0xc0 fs/file_table.c:550
+       __do_sys_close fs/open.c:1580 [inline]
+       __se_sys_close fs/open.c:1565 [inline]
+       __x64_sys_close+0x86/0x100 fs/open.c:1565
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #4 (&disk->open_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
+       bdev_open+0x41a/0xe20 block/bdev.c:903
+       bdev_file_open_by_dev block/bdev.c:1017 [inline]
+       bdev_file_open_by_dev+0x17d/0x210 block/bdev.c:992
+       disk_scan_partitions+0x1ed/0x320 block/genhd.c:374
+       add_disk_fwnode+0x1006/0x1320 block/genhd.c:526
+       pmem_attach_disk+0x9a1/0x13e0 drivers/nvdimm/pmem.c:576
+       nd_pmem_probe+0x1a9/0x1f0 drivers/nvdimm/pmem.c:649
+       nvdimm_bus_probe+0x169/0x5d0 drivers/nvdimm/bus.c:94
+       call_driver_probe drivers/base/dd.c:579 [inline]
+       really_probe+0x23e/0xa90 drivers/base/dd.c:658
+       __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+       driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+       __driver_attach+0x283/0x580 drivers/base/dd.c:1216
+       bus_for_each_dev+0x13c/0x1d0 drivers/base/bus.c:370
+       bus_add_driver+0x2e9/0x690 drivers/base/bus.c:678
+       driver_register+0x15c/0x4b0 drivers/base/driver.c:249
+       __nd_driver_register+0x103/0x1a0 drivers/nvdimm/bus.c:622
+       do_one_initcall+0x128/0x700 init/main.c:1257
+       do_initcall_level init/main.c:1319 [inline]
+       do_initcalls init/main.c:1335 [inline]
+       do_basic_setup init/main.c:1354 [inline]
+       kernel_init_freeable+0x5c7/0x900 init/main.c:1568
+       kernel_init+0x1c/0x2b0 init/main.c:1457
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+-> #3 (&nvdimm_namespace_key){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
+       device_lock include/linux/device.h:1030 [inline]
+       uevent_show+0x188/0x3b0 drivers/base/core.c:2729
+       dev_attr_show+0x53/0xe0 drivers/base/core.c:2423
+       sysfs_kf_seq_show+0x23e/0x410 fs/sysfs/file.c:59
+       seq_read_iter+0x4f4/0x12b0 fs/seq_file.c:230
+       kernfs_fop_read_iter+0x414/0x580 fs/kernfs/file.c:279
+       new_sync_read fs/read_write.c:484 [inline]
+       vfs_read+0x886/0xbf0 fs/read_write.c:565
+       ksys_read+0x12b/0x250 fs/read_write.c:708
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #2 (kn->active#5){++++}-{0:0}:
+       kernfs_drain+0x48f/0x590 fs/kernfs/dir.c:500
+       __kernfs_remove+0x281/0x670 fs/kernfs/dir.c:1487
+       kernfs_remove_by_name_ns+0xb2/0x130 fs/kernfs/dir.c:1695
+       sysfs_remove_file include/linux/sysfs.h:794 [inline]
+       device_remove_file drivers/base/core.c:3047 [inline]
+       device_remove_file drivers/base/core.c:3043 [inline]
+       device_del+0x381/0x9f0 drivers/base/core.c:3852
+       unregister_netdevice_many_notify+0x13aa/0x1f30 net/core/dev.c:11838
+       unregister_netdevice_many net/core/dev.c:11866 [inline]
+       unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11736
+       unregister_netdevice include/linux/netdevice.h:3335 [inline]
+       unregister_netdev+0x21/0x30 net/core/dev.c:11886
+       sixpack_close+0x1e7/0x2f0 drivers/net/hamradio/6pack.c:661
+       tty_ldisc_close+0x111/0x1a0 drivers/tty/tty_ldisc.c:455
+       tty_ldisc_kill+0x8e/0x150 drivers/tty/tty_ldisc.c:613
+       tty_ldisc_release+0x116/0x2a0 drivers/tty/tty_ldisc.c:781
+       tty_release_struct+0x23/0xe0 drivers/tty/tty_io.c:1690
+       tty_release+0xe25/0x1410 drivers/tty/tty_io.c:1861
+       __fput+0x3ff/0xb70 fs/file_table.c:464
+       task_work_run+0x14e/0x250 kernel/task_work.c:227
+       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+       exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+       syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
+       do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (rtnl_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
+       smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1908
+       __smc_connect+0x44d/0x4890 net/smc/af_smc.c:1520
+       smc_connect+0x2fc/0x760 net/smc/af_smc.c:1696
+       __sys_connect_file+0x13e/0x1a0 net/socket.c:2045
+       __sys_connect+0x14f/0x170 net/socket.c:2064
+       __do_sys_connect net/socket.c:2070 [inline]
+       __se_sys_connect net/socket.c:2067 [inline]
+       __x64_sys_connect+0x72/0xb0 net/socket.c:2067
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (sk_lock-AF_SMC){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3163 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+       validate_chain kernel/locking/lockdep.c:3906 [inline]
+       __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
+       lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
+       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3645
+       lock_sock include/net/sock.h:1624 [inline]
+       smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
+       sock_sendmsg_nosec net/socket.c:718 [inline]
+       __sock_sendmsg net/socket.c:733 [inline]
+       sock_sendmsg+0x3d3/0x490 net/socket.c:756
+       __sock_xmit+0x1e8/0x4f0 drivers/block/nbd.c:574
+       sock_xmit drivers/block/nbd.c:602 [inline]
+       send_disconnects drivers/block/nbd.c:1395 [inline]
+       nbd_disconnect+0x390/0x540 drivers/block/nbd.c:1410
+       __nbd_ioctl drivers/block/nbd.c:1580 [inline]
+       nbd_ioctl+0x8d1/0xd60 drivers/block/nbd.c:1642
+       blkdev_ioctl+0x276/0x6d0 block/ioctl.c:693
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl fs/ioctl.c:892 [inline]
+       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_SMC --> &nbd->config_lock --> &nsock->tx_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&nsock->tx_lock);
+                               lock(&nbd->config_lock);
+                               lock(&nsock->tx_lock);
+  lock(sk_lock-AF_SMC);
+
+ *** DEADLOCK ***
+
+2 locks held by syz.4.3048/15507:
+ #0: ffff888026642198 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_ioctl+0x151/0xd60 drivers/block/nbd.c:1635
+ #1: ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: send_disconnects drivers/block/nbd.c:1394 [inline]
+ #1: ffff888028f74e70 (&nsock->tx_lock){+.+.}-{4:4}, at: nbd_disconnect+0x321/0x540 drivers/block/nbd.c:1410
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 15507 Comm: syz.4.3048 Not tainted 6.14.0-rc3-syzkaller-00060-g6537cfb395f3 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x490/0x760 kernel/locking/lockdep.c:2076
+ check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2208
+ check_prev_add kernel/locking/lockdep.c:3163 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+ validate_chain kernel/locking/lockdep.c:3906 [inline]
+ __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
+ lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
+ lock_sock_nested+0x3a/0xf0 net/core/sock.c:3645
+ lock_sock include/net/sock.h:1624 [inline]
+ smc_sendmsg+0x47/0x520 net/smc/af_smc.c:2775
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg net/socket.c:733 [inline]
+ sock_sendmsg+0x3d3/0x490 net/socket.c:756
+ __sock_xmit+0x1e8/0x4f0 drivers/block/nbd.c:574
+ sock_xmit drivers/block/nbd.c:602 [inline]
+ send_disconnects drivers/block/nbd.c:1395 [inline]
+ nbd_disconnect+0x390/0x540 drivers/block/nbd.c:1410
+ __nbd_ioctl drivers/block/nbd.c:1580 [inline]
+ nbd_ioctl+0x8d1/0xd60 drivers/block/nbd.c:1642
+ blkdev_ioctl+0x276/0x6d0 block/ioctl.c:693
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f0b5198cde9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0b52883038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f0b51ba6080 RCX: 00007f0b5198cde9
+RDX: 0000000000000000 RSI: 000000000000ab08 RDI: 0000000000000006
+RBP: 00007f0b51a0e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f0b51ba6080 R15: 00007ffce7c4c0d8
+ </TASK>
+block nbd4: Send disconnect failed -107
+block nbd4: Disconnected due to user request.
+block nbd4: shutting down sockets
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
