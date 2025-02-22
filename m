@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-168733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD134A4063A
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 09:12:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E2BA4063C
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 09:14:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1785423DC1
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 08:12:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCDC016D811
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 08:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE932063E0;
-	Sat, 22 Feb 2025 08:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018DF2063D9;
+	Sat, 22 Feb 2025 08:13:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EF51DE4E5;
-	Sat, 22 Feb 2025 08:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4411DE4E5;
+	Sat, 22 Feb 2025 08:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740211918; cv=none; b=LGuov/9cu1PEZyfegep/GNw+4lEe+spp19qi03ezUcKwOohtQPrrSaUN7lOUsgfiiS7r/XIlQoRBM21+PQSzmFWR13/KFW8dV13axu1JFuJ2hhDEpUz7Ydp0tMRroRhGBO+b0Ks49MAMozJ1GnvCVom/VJO1HQ0mL5cAxbwIzME=
+	t=1740212020; cv=none; b=jEL/cRmWJoP60xqRf80uJf/PcM/EMY2GwU9KiG8y9daUPm1Jhn682O908pG6h9995jyk/oi+il3eROTrq3Un132bzk+pXg5oLWl95Umi84pYL1fQy+DYJPmrL+zIOhaLqNCjZ5z8YA0mPW576TqhbHSsyNmGiDeMcNaeUmpHQjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740211918; c=relaxed/simple;
-	bh=4m8KhPfmPys8alzz58S3fE6vnQq0+jk5CAly0Nr2FN4=;
+	s=arc-20240116; t=1740212020; c=relaxed/simple;
+	bh=GMoX2tBScugygoGQzRb2GiIUU3kckzmKbsI3tR/lUK0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jspAeJYZvpx8JkgiQKOQRb8tUkHsOLV2sfIHiRPpr3xKSVlo9wlCnQhGuzdmOfSjk8AmODLVo7Twb5aMSUac3T4H4ilOJypk+5Gm5NbNqpgaeWVhdkzs4GBICAY54JJNHXDnw03gzckUo+DNpLd3qRna5E10VET7NgEWxVeun14=
+	 In-Reply-To:Content-Type; b=NGaBUoKPc+A+q/VqhJi33mkSGVttPi+Z6lOXPnUAv0ndwinpIxdqkTNpSK8c5CTO8/2nggVbz4zrYGxkDWqy7EXqOfQ2+qZl/gvmGFQvJ+ZU4rly4sLuQA/1Utk0LAVRCuPKkYCdOg5GEgbRJeqU5+mSSDjSZcX6S46rpwy+6+8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Z0KNH6gM6zdb8k;
-	Sat, 22 Feb 2025 16:07:11 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Z0KQJ0kgRzdb8f;
+	Sat, 22 Feb 2025 16:08:56 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0428B1400CF;
-	Sat, 22 Feb 2025 16:11:52 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 2F3A01800D9;
+	Sat, 22 Feb 2025 16:13:36 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 22 Feb 2025 16:11:51 +0800
-Message-ID: <24321916-549d-4b76-8ca5-a268432f54e7@huawei.com>
-Date: Sat, 22 Feb 2025 16:11:51 +0800
+ 15.2.1544.11; Sat, 22 Feb 2025 16:13:35 +0800
+Message-ID: <307939b7-8f51-437a-b5b2-ac5342630504@huawei.com>
+Date: Sat, 22 Feb 2025 16:13:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,101 +48,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/4] page_pool: support unlimited number of
- inflight pages
-To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
- Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250212092552.1779679-1-linyunsheng@huawei.com>
- <20250212092552.1779679-4-linyunsheng@huawei.com>
- <640946c8-237d-40de-b64e-0f8fd8f1a600@kernel.org>
+Subject: Re: [PATCH net-next 1/2] page_pool: Convert page_pool_recycle_stats
+ to u64_stats_t.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Leon Romanovsky <leon@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Simon Horman
+	<horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Thomas Gleixner
+	<tglx@linutronix.de>
+References: <20250221115221.291006-1-bigeasy@linutronix.de>
+ <20250221115221.291006-2-bigeasy@linutronix.de>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <640946c8-237d-40de-b64e-0f8fd8f1a600@kernel.org>
+In-Reply-To: <20250221115221.291006-2-bigeasy@linutronix.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2025/2/21 18:12, Jesper Dangaard Brouer wrote:
+On 2025/2/21 19:52, Sebastian Andrzej Siewior wrote:
+>  
+>  static const char pp_stats[][ETH_GSTRING_LEN] = {
+> @@ -82,6 +88,7 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
+>  bool page_pool_get_stats(const struct page_pool *pool,
+>  			 struct page_pool_stats *stats)
+>  {
+> +	unsigned int start;
+>  	int cpu = 0;
+>  
+>  	if (!stats)
+> @@ -99,11 +106,19 @@ bool page_pool_get_stats(const struct page_pool *pool,
+>  		const struct page_pool_recycle_stats *pcpu =
+>  			per_cpu_ptr(pool->recycle_stats, cpu);
+>  
+> -		stats->recycle_stats.cached += pcpu->cached;
+> -		stats->recycle_stats.cache_full += pcpu->cache_full;
+> -		stats->recycle_stats.ring += pcpu->ring;
+> -		stats->recycle_stats.ring_full += pcpu->ring_full;
+> -		stats->recycle_stats.released_refcnt += pcpu->released_refcnt;
+> +		do {
+> +			start = u64_stats_fetch_begin(&pcpu->syncp);
+> +			u64_stats_add(&stats->recycle_stats.cached,
+> +				      u64_stats_read(&pcpu->cached));
+> +			u64_stats_add(&stats->recycle_stats.cache_full,
+> +				      u64_stats_read(&pcpu->cache_full));
+> +			u64_stats_add(&stats->recycle_stats.ring,
+> +				      u64_stats_read(&pcpu->ring));
+> +			u64_stats_add(&stats->recycle_stats.ring_full,
+> +				      u64_stats_read(&pcpu->ring_full));
+> +			u64_stats_add(&stats->recycle_stats.released_refcnt,
+> +				      u64_stats_read(&pcpu->released_refcnt));
 
-...
+It seems the above u64_stats_add() may be called more than one time
+if the below u64_stats_fetch_retry() returns true, which might mean
+the stats is added more than it is needed.
 
->> @@ -513,10 +517,43 @@ static struct page_pool_item *page_pool_fast_item_alloc(struct page_pool *pool)
->>       return llist_entry(first, struct page_pool_item, lentry);
->>   }
->>   +#define PAGE_POOL_SLOW_ITEM_BLOCK_BIT            BIT(0)
->> +static struct page_pool_item *page_pool_slow_item_alloc(struct page_pool *pool)
->> +{
->> +    if (unlikely(!pool->slow_items.block ||
->> +             pool->slow_items.next_to_use >= ITEMS_PER_PAGE)) {
->> +        struct page_pool_item_block *block;
->> +        struct page *page;
->> +
->> +        page = alloc_pages_node(pool->p.nid, GFP_ATOMIC | __GFP_NOWARN |
->> +                    __GFP_ZERO, 0);
->> +        if (!page) {
->> +            alloc_stat_inc(pool, item_slow_failed);
->> +            return NULL;
->> +        }
-> 
-> We also need stats on how many pages we allocate for these item_blocks
-> (and later free). This new scheme of keeping track of all pages
-> allocated via page_pool, is obviously going to consume more memory.
-> 
-> I want to be able to find out how much memory a page_pool is consuming.
-> (E.g. Kuba added a nice interface for querying inflight packets, even
-> though this is kept as two different counters).
+It seems more correct to me that pool->alloc_stats is read into a
+local varible in the while loop and then do the addition outside
+the while loop?
 
-Does additional stats is needed? as I was thinking list_for_each_entry()
-for pool->item_blocks might be used to tell how much memory it is used
-for slow item, and how much each item_block is fragmented by looking at
-the block->ref with the protection of pool->item_lock if needed.
-
-> 
-> What I worry about, is that fragmentation happens inside these
-> item_blocks. (I hope you understand what I mean by fragmentation, else
-> let me know).
-> 
-> Could you explain how code handles or avoids fragmentation?
-
-Currently fragmentation is not handled or avoided yet.
-For inflight pages which are using slow item, it seems there is hardly
-anything we can do about that.
-
-For pages which sit in the page_pool, it seems possible to change
-the pages using slow item to use fast item when they are allocated
-from or recycled back into page_pool if fast item is available, or
-those pages are simply disconnected from page_pool by calling
-page_pool_return_page() when page_pool_put_unrefed_netmem() is
-called?
-
-I am not sure how severe the fragmentation problem might become and
-which way to handle it is better, maybe add interface to query the
-fragmentation info as mentioned above first, and deal with it when
-it does become a severe problem?
-
-> 
-> 
->> +
->> +        block = page_address(page);
->> +        block->pp = pool;
->> +        block->flags |= PAGE_POOL_SLOW_ITEM_BLOCK_BIT;
->> +        refcount_set(&block->ref, ITEMS_PER_PAGE);
->> +        pool->slow_items.block = block;
->> +        pool->slow_items.next_to_use = 0;
->> +
->> +        spin_lock_bh(&pool->item_lock);
->> +        list_add(&block->list, &pool->item_blocks);
->> +        spin_unlock_bh(&pool->item_lock);
->> +    }
->> +
->> +    return &pool->slow_items.block->items[pool->slow_items.next_to_use++];
->> +}
->> +
+> +		} while (u64_stats_fetch_retry(&pcpu->syncp, start));
+>  	}
+>  
+>  	return true;
 
