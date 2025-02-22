@@ -1,153 +1,128 @@
-Return-Path: <netdev+bounces-168753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD3AA4077C
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 11:40:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D88A40787
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 11:41:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F3677AC9CB
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 10:39:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CF9A3BBC11
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 10:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16DF208992;
-	Sat, 22 Feb 2025 10:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="yYDN+E04"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B95206F19;
+	Sat, 22 Feb 2025 10:41:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10012001.me.com (pv50p00im-ztdg10012001.me.com [17.58.6.51])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18BF2080D2
-	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 10:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3BF2063E3;
+	Sat, 22 Feb 2025 10:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740220782; cv=none; b=NkGG7u4AeNQrf/DT2/RzYJ9OEjI/oIcyZFeCbxH19ySA7tiRSlm8/yZYezIwrH8Lj5T6QIFyuGHN8qfOD46+4kWbPqUmy0aUt0NdOUTXVpzb3iOlrnnlWWFRNww7UroFMgZ3Ry2ZrX+MLkmvLQXsVV06wcflfoNORygEs5+lNrU=
+	t=1740220914; cv=none; b=OGNPbzSqggmKA8ex/FpjztLIA9zuZTA0eLxB0meTarHoDN60CFYUPG5eGiCXZPUcBw0G30kiS6nFSU/znJN/lMXF77wecsd7LHUVml/MV4dLTsZc6s86OdMA3xdewJwhYEcJka7W2URUNpaGDu8DuOWcOac7L9O3LEn+I+gMv6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740220782; c=relaxed/simple;
-	bh=+MM+Sj3Py0FG+77MBxvX9ur6eehoj2ClCYpV/HT4iwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ItzG7x6oqTDwx1ewyHxhGKemVIC8adqXDriu4CWtZt3o8ELMo0md7iBATiv58/oq82J92QHMUXwxVlPu86jsICafj7MLKXddFLmFSHSKzI6VQIFzKGRUzUcIdKBKoP2nLsfse1O4yvis4ZNLVpBBE3nnvnvQ/49QvvoVJJ2xcQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=yYDN+E04; arc=none smtp.client-ip=17.58.6.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=mbxficQPTzs09LWwBbFhdunStNbxz1Db5LUu+U2NlSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
-	b=yYDN+E04f3AdizaUiroUuQGY41SPVVZcRqALdOpH6NFQhX3QCjWpHGcmHdHvZgXyw
-	 lY1ddO0XjuI5jwoyQLYS2xsXRa555rOew3qMgB02ajNFY2naY0JiMg3EzOtw/vDBsm
-	 rNcbU3RkjyAdmQBUnnLpBha3Hg45RvWSCLNO8oK0o5dE+ouOgYdV9O7OaddprvalcC
-	 F7e6FcKQyQxquf6C4CR09WnXr4uHh4OXsP+wDyxaBcn55oVkRsljjd3IOmoDXx5njY
-	 kMIwNWVp9xmRX9kyVkPTFuHEolnlCaw5jRp5Hj9sFk69BnUaESstfS78tB+JnoKuuq
-	 DJolzLt315u8g==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10012001.me.com (Postfix) with ESMTPSA id 00694A0092;
-	Sat, 22 Feb 2025 10:38:11 +0000 (UTC)
-Message-ID: <732f9f29-f794-4491-b942-45ad01b01db5@icloud.com>
-Date: Sat, 22 Feb 2025 18:38:06 +0800
+	s=arc-20240116; t=1740220914; c=relaxed/simple;
+	bh=5DYs1irPqt7cPrMB77J9YZFN/QuunE3iyUnI3OiY398=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L1G6uL1idOS53b48XNEs39ry9oo6/F3T4l333mJgnTEWtj+OO5vTd7AguyisV0HXQEyOD/L4Lca5nWSWNq7DHGpoTVCACUPfkgR7ok64NPx8mJGYZkpR3zEvZUxJSp7VS5R54K3xz1kyDNZqHtN+7cyzFbnKLmG5jZIMk3mMzxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Z0NkQ5G0RzvWpW;
+	Sat, 22 Feb 2025 18:38:06 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 63BF11800E5;
+	Sat, 22 Feb 2025 18:41:49 +0800 (CST)
+Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 22 Feb 2025 18:41:49 +0800
+Received: from huawei.com (10.175.113.133) by kwepemn100006.china.huawei.com
+ (7.202.194.109) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 22 Feb
+ 2025 18:41:47 +0800
+From: Wang Hai <wanghai38@huawei.com>
+To: <kerneljasonxing@gmail.com>, <edumazet@google.com>,
+	<ncardwell@google.com>, <kuniyu@amazon.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <zhangchangzhong@huawei.com>, <liujian56@huawei.com>,
+	<yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net v2] tcp: Defer ts_recent changes until req is owned
+Date: Sat, 22 Feb 2025 18:39:28 +0800
+Message-ID: <20250222103928.12104-1-wanghai38@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void
- APIs
-To: Arnd Bergmann <arnd@arndb.de>, Zijun Hu <quic_zijuhu@quicinc.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Nicholas Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- "Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich
- <dakr@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org,
- linux-rdma@vger.kernel.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <5d662c4c-76f7-4e5c-82f3-2aeeaf9e3311@app.fastmail.com>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <5d662c4c-76f7-4e5c-82f3-2aeeaf9e3311@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 5BaBpFy7OfeZq74ITSrzTheUfV5JFE1_
-X-Proofpoint-ORIG-GUID: 5BaBpFy7OfeZq74ITSrzTheUfV5JFE1_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-22_04,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0
- mlxlogscore=999 suspectscore=0 bulkscore=0 clxscore=1011 phishscore=0
- malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2502220085
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemn100006.china.huawei.com (7.202.194.109)
 
-On 2025/2/21 23:40, Arnd Bergmann wrote:
->> This patch series is to remove weird and needless 'return' for
->> void APIs under include/ with the following pattern:
->>
->> api_header.h:
->>
->> void api_func_a(...);
->>
->> static inline void api_func_b(...)
->> {
->> 	return api_func_a(...);
->> }
->>
->> Remove the needless 'return' in api_func_b().
->>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> I have no objection to the changes, but I think you should
-> describe the motivation for them beyond them being 'weird'.
-> 
+The same 5-tuple packet may be processed by different CPUSs, so two
+CPUs may receive different ack packets at the same time when the
+state is TCP_NEW_SYN_RECV.
 
-yes. C spec such as C17 have this description about return
-statement:
+In that case, req->ts_recent in tcp_check_req may be changed concurrently,
+which will probably cause the newsk's ts_recent to be incorrectly large.
+So that tcp_validate_incoming will fail.
 
-6.8.6.4:
-A return statement with an expression shall not appear in a function
-whose return type is void. A return statement without an expression
-shall only appear in a function whose return type is void.
+cpu1                                    cpu2
+tcp_check_req
+                                        tcp_check_req
+ req->ts_recent = rcv_tsval = t1
+                                         req->ts_recent = rcv_tsval = t2
 
-do we need to treat below return statement as bad code style ?
+ syn_recv_sock
+  newsk->ts_recent = req->ts_recent = t2 // t1 < t2
+tcp_child_process
+ tcp_rcv_state_process
+  tcp_validate_incoming
+   tcp_paws_check
+    if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win)
+	// t2 - t1 > paws_win, failed
 
-void api_func_a(...);
-void api_func_b(...) {
-...
-	return api_func_a(...); // return void function in void func
-...
-}
+In tcp_check_req, Defer ts_recent changes to this skb's to fix this bug.
 
-> Do these 'return' statements get in the way of some other
-> work you are doing? Is there a compiler warning you want
-> to enable to ensure they don't come back? Is this all of
-> the instances in the kernel or just the ones you found by
-> inspection?
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Wang Hai <wanghai38@huawei.com>
+---
+v1->v2: Modified the fix logic based on Eric's suggestion. Also modified the msg
+ net/ipv4/tcp_minisocks.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-actually, i find this weird return usage by reading code by accident
-in driver core firstly:
-https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git/commit/?h=driver-core-testing&id=a44073c28bc6d4118891d61e31c9fa9dc4333dc0
-
-then i check folder include/ and work out this patch series.
-
-not sure if there are still such instances in current kernel tree.
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index b089b08e9617..53700206f498 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -815,12 +815,6 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 
+ 	/* In sequence, PAWS is OK. */
+ 
+-	/* TODO: We probably should defer ts_recent change once
+-	 * we take ownership of @req.
+-	 */
+-	if (tmp_opt.saw_tstamp && !after(TCP_SKB_CB(skb)->seq, tcp_rsk(req)->rcv_nxt))
+-		WRITE_ONCE(req->ts_recent, tmp_opt.rcv_tsval);
+-
+ 	if (TCP_SKB_CB(skb)->seq == tcp_rsk(req)->rcv_isn) {
+ 		/* Truncate SYN, it is out of window starting
+ 		   at tcp_rsk(req)->rcv_isn + 1. */
+@@ -869,6 +863,9 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	if (!child)
+ 		goto listen_overflow;
+ 
++	if (own_req && tmp_opt.saw_tstamp && !after(TCP_SKB_CB(skb)->seq, tcp_rsk(req)->rcv_nxt))
++		tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
++
+ 	if (own_req && rsk_drop_req(req)) {
+ 		reqsk_queue_removed(&inet_csk(req->rsk_listener)->icsk_accept_queue, req);
+ 		inet_csk_reqsk_queue_drop_and_put(req->rsk_listener, req);
+-- 
+2.17.1
 
 
