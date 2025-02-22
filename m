@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-168768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91268A408FF
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 15:29:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7DADA4090A
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 15:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BB64188ADFF
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 14:28:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 168B13A78D0
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 14:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACB92063E5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CD3209695;
 	Sat, 22 Feb 2025 14:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kg+yXU3f"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UwkO6pHj"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D99198E76;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E33E1AA782;
 	Sat, 22 Feb 2025 14:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740234467; cv=none; b=XPs4p3iE7WEGvn3ibKCYYV/DIXzuDvSY61KWmeJN2oJsXPQSuhsud2pz0MG/tUq7i0ATDWU+zrASbZhKSDi0VoeZtWv8wq0CXQoVhM4MBv54IQIOi3rrT6nkKo9JQiLLvitWBbuVnWeOfR1gcT94O4iKrPAiTYktCMs1ALr//KI=
+	t=1740234467; cv=none; b=t2IUJIYJw3RPyY6ZxyuyAr6F2Mr+yPlbT8wBFrZLBeyaOlFab076TdgDz9aPdmBy2m4cJKeGNu+3tzMroE+krMo2X/E907j5tpJohHwCptfnmzZkFAEASuxt5ybrZK/BNlBH4bHnpPZJZqO488BcdJYpF9f8ViyxLQY++HDNTNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740234467; c=relaxed/simple;
-	bh=17W5DpwWLDJnjZP+zIQ9TCJhoF/q9wgqNkB2qi1qqE8=;
+	bh=SgH/tdQ5eGR9MmAJk66dTB5ozUtmrIvmCRV+MoODCXg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WPPPVha2VP2Xh+6eaeKjjwNOjb4JsCbHiAkR8pVu64SYIMbPS0neaFG3aLCKado18/ySbD9dxaUUy6IScVnYJ+Gps/O28Piy7tJ4KDR7LDapaxdfIo6f2lbuhlGna0ZO26/BLgK/x/xHIDQuDDy5aOAbo0tyMc5FC8pbcuzT0S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kg+yXU3f; arc=none smtp.client-ip=217.70.183.199
+	 MIME-Version; b=breHw4Y+tDszHziJdmQGSAA8CX1KKux1ze77SUxBvEs586pTaTQyB10TNekAFJJKUwuqBRBDL+MdGgtAsayqARcf+8JLanixwzbSeEEkb3uesDCm6zc4r1eAYYpboSEc6IZfgE7zVcrOhGEEU/3CPQYyOH9LXsTXZMgn9+z9cLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UwkO6pHj; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8A4D54427C;
-	Sat, 22 Feb 2025 14:27:35 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BE2E54427F;
+	Sat, 22 Feb 2025 14:27:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740234456;
+	t=1740234457;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mE0nVjhMYce8SyWUFO7qJ6cOt2Ec4eykh043tqwW/j0=;
-	b=kg+yXU3fy/ljhnW2SfxHbOcJ67Ex9VH0ep52fRRup+5/aYbcewrM0MbzER5B8P2SO4HToU
-	zKsnv2OVEh5ts8pYGj8S6ri/Px+fBQ4M084e38zviC53p5sZrZ1c0A7e5UxY4vw/jySoqk
-	JdUvrWFWp79xxQmwcr/4jcvHK50mcOwyqWHx90rTfVPLaYctkLGeSWwYFi9g/vIuKQmD6S
-	3UQWh5ZLdd99QW16w8LE6E5tfQOBxTBfREpSr2MzLJcxkpWRMcMl242pKbScO70o9n3bXr
-	y1sctQzljJXJ4jx/bZOh2BW4IZTdlOOsZZRplZpmlh/DfZGHMMI4y063TlsmrQ==
+	bh=YdchaK13VmH/KWyaurnt+Ioq9gcH0xCKoqYGbWhcKcA=;
+	b=UwkO6pHjx8dLlFg1C9L19tWWAWKWpl+cdv8r3cO/+/BsHKSGWJ8pvf94MgJjXtwBkH67ue
+	0r3pJ9Y7KxJt9Ic8QKv9esJef6etBTUfgdxCPzR7qlQEyxXug8p95tbkKT1UKxeBgjTaCI
+	c7JFCIuyXlMZXInFjDPgxuDNmlY22Id3dfezybWxYjj2kjUMCU/TmwQrfOWLBKSWCOiQ3j
+	qMdYie4JEthDckpDkn2CUlA0TGf7RQci3fc8NMonulUFCFbUcF0gNAj7gMGTUk0Av5ftnL
+	pVoXr4eFYg1YVH++DfWKU1YYo1BQ7muKEmmF1SqSNUeBuSz1rrJVpthCWU1Ayg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next 03/13] net: phy: phylink: Extract getting the max speed for a given interface
-Date: Sat, 22 Feb 2025 15:27:15 +0100
-Message-ID: <20250222142727.894124-4-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 04/13] net: ethtool: Export the link_mode_params definitions
+Date: Sat, 22 Feb 2025 15:27:16 +0100
+Message-ID: <20250222142727.894124-5-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250222142727.894124-1-maxime.chevallier@bootlin.com>
 References: <20250222142727.894124-1-maxime.chevallier@bootlin.com>
@@ -85,217 +85,76 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejfeduiecutefuodetggdotef
  igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Make the phylink helper 'phylink_interface_max_speed' part of the
-phy_caps helper set, making phy_interface_t parameter handling
-accessible for other uses.
+link_mode_params contains a lookup table of all 802.3 link modes that
+are currently supported with structured data about each mode's speed,
+duplex, number of lanes and mediums.
+
+As a preparation for a port representation, export that table for the
+rest of the net stack to use.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy-caps.h |  1 +
- drivers/net/phy/phy_caps.c | 72 +++++++++++++++++++++++++++++++++++
- drivers/net/phy/phylink.c  | 77 ++------------------------------------
- 3 files changed, 76 insertions(+), 74 deletions(-)
+ include/linux/ethtool.h | 8 ++++++++
+ net/ethtool/common.c    | 1 +
+ net/ethtool/common.h    | 7 -------
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-index ecb63b28c5fb..9580754fff1f 100644
---- a/drivers/net/phy/phy-caps.h
-+++ b/drivers/net/phy/phy-caps.h
-@@ -10,5 +10,6 @@
- void linkmode_from_caps(unsigned long *linkmode, unsigned long caps);
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 870994cc3ef7..feaada411579 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -210,6 +210,14 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
  
- unsigned long phy_interface_caps(phy_interface_t interface);
-+int phy_interface_max_speed(phy_interface_t interface);
+ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
  
- #endif /* __PHY_CAPS_H */
-diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 59e4505b7336..cf68a2829bde 100644
---- a/drivers/net/phy/phy_caps.c
-+++ b/drivers/net/phy/phy_caps.c
-@@ -251,3 +251,75 @@ unsigned long phy_interface_caps(phy_interface_t interface)
- 	return caps;
- }
- EXPORT_SYMBOL_GPL(phy_interface_caps);
++struct link_mode_info {
++	int                             speed;
++	u8                              lanes;
++	u8                              duplex;
++};
 +
-+/**
-+ * phy_interface_max_speed() - get the maximum speed of a phy interface
-+ * @interface: phy interface mode defined by &typedef phy_interface_t
-+ *
-+ * Determine the maximum speed of a phy interface. This is intended to help
-+ * determine the correct speed to pass to the MAC when the phy is performing
-+ * rate matching.
-+ *
-+ * Return: The maximum speed of @interface
-+ */
-+int phy_interface_max_speed(phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_100BASEX:
-+	case PHY_INTERFACE_MODE_REVRMII:
-+	case PHY_INTERFACE_MODE_RMII:
-+	case PHY_INTERFACE_MODE_SMII:
-+	case PHY_INTERFACE_MODE_REVMII:
-+	case PHY_INTERFACE_MODE_MII:
-+		return SPEED_100;
++extern const struct link_mode_info link_mode_params[];
 +
-+	case PHY_INTERFACE_MODE_TBI:
-+	case PHY_INTERFACE_MODE_MOCA:
-+	case PHY_INTERFACE_MODE_RTBI:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_1000BASEKX:
-+	case PHY_INTERFACE_MODE_TRGMII:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_PSGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+	case PHY_INTERFACE_MODE_QUSGMII:
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_GMII:
-+		return SPEED_1000;
-+
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		return SPEED_2500;
-+
-+	case PHY_INTERFACE_MODE_5GBASER:
-+		return SPEED_5000;
-+
-+	case PHY_INTERFACE_MODE_XGMII:
-+	case PHY_INTERFACE_MODE_RXAUI:
-+	case PHY_INTERFACE_MODE_XAUI:
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_10GKR:
-+	case PHY_INTERFACE_MODE_USXGMII:
-+		return SPEED_10000;
-+
-+	case PHY_INTERFACE_MODE_25GBASER:
-+		return SPEED_25000;
-+
-+	case PHY_INTERFACE_MODE_XLGMII:
-+		return SPEED_40000;
-+
-+	case PHY_INTERFACE_MODE_INTERNAL:
-+	case PHY_INTERFACE_MODE_NA:
-+	case PHY_INTERFACE_MODE_MAX:
-+		/* No idea! Garbage in, unknown out */
-+		return SPEED_UNKNOWN;
-+	}
-+
-+	/* If we get here, someone forgot to add an interface mode above */
-+	WARN_ON_ONCE(1);
-+	return SPEED_UNKNOWN;
-+}
-+EXPORT_SYMBOL_GPL(phy_interface_max_speed);
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c05c0921c5d0..af04be1d23c5 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -221,77 +221,6 @@ static unsigned int phylink_interface_signal_rate(phy_interface_t interface)
- 	}
- }
+ /* declare a link mode bitmap */
+ #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+ 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 7149d07e90c6..6b0178c09d72 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -422,6 +422,7 @@ const struct link_mode_info link_mode_params[] = {
+ 	__DEFINE_LINK_MODE_PARAMS(800000, VR4, Full),
+ };
+ static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
++EXPORT_SYMBOL_GPL(link_mode_params);
  
--/**
-- * phylink_interface_max_speed() - get the maximum speed of a phy interface
-- * @interface: phy interface mode defined by &typedef phy_interface_t
-- *
-- * Determine the maximum speed of a phy interface. This is intended to help
-- * determine the correct speed to pass to the MAC when the phy is performing
-- * rate matching.
-- *
-- * Return: The maximum speed of @interface
-- */
--static int phylink_interface_max_speed(phy_interface_t interface)
--{
--	switch (interface) {
--	case PHY_INTERFACE_MODE_100BASEX:
--	case PHY_INTERFACE_MODE_REVRMII:
--	case PHY_INTERFACE_MODE_RMII:
--	case PHY_INTERFACE_MODE_SMII:
--	case PHY_INTERFACE_MODE_REVMII:
--	case PHY_INTERFACE_MODE_MII:
--		return SPEED_100;
--
--	case PHY_INTERFACE_MODE_TBI:
--	case PHY_INTERFACE_MODE_MOCA:
--	case PHY_INTERFACE_MODE_RTBI:
--	case PHY_INTERFACE_MODE_1000BASEX:
--	case PHY_INTERFACE_MODE_1000BASEKX:
--	case PHY_INTERFACE_MODE_TRGMII:
--	case PHY_INTERFACE_MODE_RGMII_TXID:
--	case PHY_INTERFACE_MODE_RGMII_RXID:
--	case PHY_INTERFACE_MODE_RGMII_ID:
--	case PHY_INTERFACE_MODE_RGMII:
--	case PHY_INTERFACE_MODE_PSGMII:
--	case PHY_INTERFACE_MODE_QSGMII:
--	case PHY_INTERFACE_MODE_QUSGMII:
--	case PHY_INTERFACE_MODE_SGMII:
--	case PHY_INTERFACE_MODE_GMII:
--		return SPEED_1000;
--
--	case PHY_INTERFACE_MODE_2500BASEX:
--	case PHY_INTERFACE_MODE_10G_QXGMII:
--		return SPEED_2500;
--
--	case PHY_INTERFACE_MODE_5GBASER:
--		return SPEED_5000;
--
--	case PHY_INTERFACE_MODE_XGMII:
--	case PHY_INTERFACE_MODE_RXAUI:
--	case PHY_INTERFACE_MODE_XAUI:
--	case PHY_INTERFACE_MODE_10GBASER:
--	case PHY_INTERFACE_MODE_10GKR:
--	case PHY_INTERFACE_MODE_USXGMII:
--		return SPEED_10000;
--
--	case PHY_INTERFACE_MODE_25GBASER:
--		return SPEED_25000;
--
--	case PHY_INTERFACE_MODE_XLGMII:
--		return SPEED_40000;
--
--	case PHY_INTERFACE_MODE_INTERNAL:
--	case PHY_INTERFACE_MODE_NA:
--	case PHY_INTERFACE_MODE_MAX:
--		/* No idea! Garbage in, unknown out */
--		return SPEED_UNKNOWN;
--	}
--
--	/* If we get here, someone forgot to add an interface mode above */
--	WARN_ON_ONCE(1);
--	return SPEED_UNKNOWN;
--}
--
- static struct {
- 	unsigned long mask;
- 	int speed;
-@@ -371,7 +300,7 @@ static unsigned long phylink_get_capabilities(phy_interface_t interface,
- 					      unsigned long mac_capabilities,
- 					      int rate_matching)
- {
--	int max_speed = phylink_interface_max_speed(interface);
-+	int max_speed = phy_interface_max_speed(interface);
- 	unsigned long caps = phy_interface_caps(interface);
- 	unsigned long matched_caps = 0;
+ const char netif_msg_class_names[][ETH_GSTRING_LEN] = {
+ 	[NETIF_MSG_DRV_BIT]		= "drv",
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index 58e9e7db06f9..b9f99fb1d8e1 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -15,12 +15,6 @@
+ #define __SOF_TIMESTAMPING_CNT (const_ilog2(SOF_TIMESTAMPING_LAST) + 1)
+ #define __HWTSTAMP_FLAG_CNT (const_ilog2(HWTSTAMP_FLAG_LAST) + 1)
  
-@@ -1418,7 +1347,7 @@ static void phylink_link_up(struct phylink *pl,
- 		 * the link_state) to the interface speed, and will send
- 		 * pause frames to the MAC to limit its transmission speed.
- 		 */
--		speed = phylink_interface_max_speed(link_state.interface);
-+		speed = phy_interface_max_speed(link_state.interface);
- 		duplex = DUPLEX_FULL;
- 		rx_pause = true;
- 		break;
-@@ -1428,7 +1357,7 @@ static void phylink_link_up(struct phylink *pl,
- 		 * the link_state) to the interface speed, and will cause
- 		 * collisions to the MAC to limit its transmission speed.
- 		 */
--		speed = phylink_interface_max_speed(link_state.interface);
-+		speed = phy_interface_max_speed(link_state.interface);
- 		duplex = DUPLEX_HALF;
- 		break;
- 	}
+-struct link_mode_info {
+-	int				speed;
+-	u8				lanes;
+-	u8				duplex;
+-};
+-
+ struct genl_info;
+ struct hwtstamp_provider_desc;
+ 
+@@ -33,7 +27,6 @@ tunable_strings[__ETHTOOL_TUNABLE_COUNT][ETH_GSTRING_LEN];
+ extern const char
+ phy_tunable_strings[__ETHTOOL_PHY_TUNABLE_COUNT][ETH_GSTRING_LEN];
+ extern const char link_mode_names[][ETH_GSTRING_LEN];
+-extern const struct link_mode_info link_mode_params[];
+ extern const char netif_msg_class_names[][ETH_GSTRING_LEN];
+ extern const char wol_mode_names[][ETH_GSTRING_LEN];
+ extern const char sof_timestamping_names[][ETH_GSTRING_LEN];
 -- 
 2.48.1
 
