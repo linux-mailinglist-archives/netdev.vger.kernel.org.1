@@ -1,137 +1,154 @@
-Return-Path: <netdev+bounces-168776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A58A40AAA
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 18:28:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 180BDA40AF0
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 19:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E14917A8BE
-	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 17:28:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7597E3BFEC4
+	for <lists+netdev@lfdr.de>; Sat, 22 Feb 2025 18:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2C51F1506;
-	Sat, 22 Feb 2025 17:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3E720ADFE;
+	Sat, 22 Feb 2025 18:26:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERDzn3Md"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RVHJzVTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D611FBEB0
-	for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 17:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E4C433A8;
+	Sat, 22 Feb 2025 18:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740245326; cv=none; b=jwkarHBAqFQhBXkCsqM3mP7z2KjSv6MXOqAckAAWdZssZvqQxBB3V3HPDl3KdnOIMJZ0eGqPSDX7Zxix6xdFoVprK6yJ7Qq3vuymgStFAzqKHPuDHZdhJ/2P0033uC2rBTkgIXPJ8w3aWp5mynWMi1JsNzd84BHW5G3XUK5zKBA=
+	t=1740248778; cv=none; b=KzitAIKwJmMy8f0iZhb5aO6wCIGS/h5UWG7S1j10z8Co/0XCmzksKKtTcyC15+ph+VSVrappLoY+R7Vp4K3sY2WU0wouTW1R3P6FpI8upt7CZc4DoRCVn5HvahriZibwCgtXfKnGjtsj2ihKCw+uFEV8XsLvWISHJLz4wJIhzFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740245326; c=relaxed/simple;
-	bh=sUY+mAD4rVfn0dOlPNKHIluujoJqqFXA+7Rn7ec1kZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ipxh7PzNYDIkaqnH6RGPp6ItPyzRJP7G7HcLSh9tx3pAViBCfgg5A9zSTyBTHXgzuXAhJdnR3zR3xkxM4luo0JsadjiFNw+JeeuUNS72goC5gFRKBPRWHo1mvHvc3VShExOcz6QXtbLkm0/HFWvrU2Y0rrvtaBA5PES/EhsXOGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ERDzn3Md; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c0ade6036aso417649085a.0
-        for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 09:28:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740245324; x=1740850124; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZtcPRn+RBYTuznfR8B+d0bc0I99buE84oIwPzVN52k0=;
-        b=ERDzn3MdmoGFfG4EOZ3XT4LSkFfQz/JKOCG3w/SUwSxEwCYcSvjpy1xPaF6AEIxuyF
-         KVgt2lLa/15UnlOnvhHQ9zdy1rxvqUEAbfSgs3TG+8+GcMYwsM0mUUkasXVavEHkiaKD
-         T5+q4ufKTVh/liG1g8CPpT0CptZIgks6OoXaslp3y2rydsYZi0kufAGO8EY1Y6HUj8Qa
-         V/Txat5ootOTymJrGHrH2payG7dn451yw6gl0h6CfFnwxcKzCtGDQuztAKXtMtVoAnFG
-         FrbQrZ4qK+QgNma61ofVznExBD507wR7nmO+zZNCD0K6dvcuWS5DDZ58lUPR89Ty39Oj
-         YuPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740245324; x=1740850124;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZtcPRn+RBYTuznfR8B+d0bc0I99buE84oIwPzVN52k0=;
-        b=HgX0DcvghfcmwsZmvvYl7yi2MYpOGs4vCV+qSe2OqeKuKpWKDWau8TlKAdsXknxX4g
-         heLOC7vkNzGWGWg886bie4qx466+4JGVLCzwRtqTlKcHXml9ukGXIXXP8ZQL6mCHCM2d
-         NipS4vnTVHLNtB6qvLp3f+Q4ZKvT+7HAkesfBimAbvtDXO85FRCyMRB0SB7LZOzGGhHk
-         ZjAxAUtic1vpEaAzHX/LNlEEOprRNVCOddsgqqy4KVproAgxvPYxOGGAjYardXtgW0Ny
-         1U5zSDWvTOcSW30fZGV+GXESdPYwdtG9d8yMrc2IILzs3r1JZXxBHoeJHVihMnd8YG9S
-         pijA==
-X-Gm-Message-State: AOJu0YwlQO1YFqCrHdvLMa7dH51Z5AbbTxATXtEQufLwc6Z+teUBd7gH
-	9BWqhfiTaMjl9wBcsCsjwADOO8OsM3GwuNvXNpl8gEsLnYdvUbkZsXf/NQ==
-X-Gm-Gg: ASbGncvDxtO0fkPH+mUKoAZT8SyM/NOR2ySyB5FBPbXJkNKaIitu1jyEp9oqbIp6oHL
-	3sjdl+59cPjDqR8yMrAKoLimkz1LYmixuNCXCPYD8ZdlvLCniV+Ld5JuVrWiT+uvnjww56VGv6D
-	3X6jRfslYl3QFIG12zpTwaVFTBh51OAgZ4SLxZT71A5mP+c9xWWJl2wGFrMkRC/Iih6EkbLYNtu
-	PJB28mJaIS552Syxm5JM48f6d2zdYSz108GomsWP1G77wS7EIQpgkNy7tDnKhOkA9wLdXmb0EKb
-	Jo0YdTZFUSTC2s6axgxwmo08o3egSuSMiwcTrqeSyleF2ZnmWOt9uvANiM5qZwVcZIClVG9qxQ5
-	+eMhxVz00J446nj8ixwARUUhnfQ==
-X-Google-Smtp-Source: AGHT+IGxU/yVUSaS/NyHI1gfTrganCT362QBPTytYsmsnLLPG4npE1J6GN4sJoY77kiGViGtG+4rHQ==
-X-Received: by 2002:a05:620a:1790:b0:7c0:a5c6:ba19 with SMTP id af79cd13be357-7c0c218f469mr1703110785a.8.1740245323904;
-        Sat, 22 Feb 2025 09:28:43 -0800 (PST)
-Received: from willemb.c.googlers.com.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d77920csm111119606d6.15.2025.02.22.09.28.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Feb 2025 09:28:43 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kerneljasonxing@gmail.com,
-	kernelxing@tencent.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net] MAINTAINERS: socket timestamping: add Jason Xing as reviewer
-Date: Sat, 22 Feb 2025 12:28:04 -0500
-Message-ID: <20250222172839.642079-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+	s=arc-20240116; t=1740248778; c=relaxed/simple;
+	bh=qYJfd141m8+GrAfi283GiZ92nyulY8bsm7dQ5ckPxUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hXONLCBiULG8uWtIKrSmxTy9ItJaU/wDY6OK351so0aVSiWzEkRU3KUIvzZiKWrlHdesTSkRCcmVyUtT9VV4aloWAgYwG9tNhxrzuTY5qjHN/pl7DHkVxCyeLn2if1zA6KIVc1o2W040IR+SVm/muNse0/vGYlM7XUZBFmwTqew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVHJzVTG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83E90C4CED1;
+	Sat, 22 Feb 2025 18:26:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740248778;
+	bh=qYJfd141m8+GrAfi283GiZ92nyulY8bsm7dQ5ckPxUY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RVHJzVTG/qXYzNFwdyjpxT64w+V9rbrlDZxTcn8yKDy2ECpSR/SQStCF4uopJaL5K
+	 goSjP/DdQZUV37ncJ+Z2AbMCOUhewyGcxJ5h8cQoqkLdnn97ukStlNxkKCE2+AMYR+
+	 1DReToJhw+sAVg1CO1AKiot5pRCkMqRl8xTwUH3MiBt9jMH4+FuEMWbQxyprYH3m/H
+	 xstBHhuv+/uFU0szsoSthg3Zw8PnLbMAvTLfiX85LJ+tVHZsGblj3/CCxZOlfAbN3O
+	 FsdGSv7/B1Bo/H5KJrWMNs6ZIMKJoJm6hn2idFCF8EwenoRkoehZx7x6h6bcOFZgFc
+	 Qs4ZIhhaU58BQ==
+Date: Sat, 22 Feb 2025 20:26:14 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: "Nelson, Shannon" <shannon.nelson@amd.com>
+Cc: jgg@nvidia.com, andrew.gospodarek@broadcom.com,
+	aron.silverton@oracle.com, dan.j.williams@intel.com,
+	daniel.vetter@ffwll.ch, dave.jiang@intel.com, dsahern@kernel.org,
+	gospo@broadcom.com, hch@infradead.org, itayavr@nvidia.com,
+	jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+	lbloch@nvidia.com, saeedm@nvidia.com, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	brett.creeley@amd.com
+Subject: Re: [RFC PATCH fwctl 2/5] pds_core: add new fwctl auxilary_device
+Message-ID: <20250222182614.GT53094@unreal>
+References: <20250211234854.52277-1-shannon.nelson@amd.com>
+ <20250211234854.52277-3-shannon.nelson@amd.com>
+ <20250218192822.GA53094@unreal>
+ <604b058d-88e8-436d-abf7-229a624d9386@amd.com>
+ <20250219082405.GC53094@unreal>
+ <6fc8dae5-9bfb-4b74-b741-b85159a0daef@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6fc8dae5-9bfb-4b74-b741-b85159a0daef@amd.com>
 
-From: Willem de Bruijn <willemb@google.com>
+On Thu, Feb 20, 2025 at 03:20:14PM -0800, Nelson, Shannon wrote:
+> On 2/19/2025 12:24 AM, Leon Romanovsky wrote:
+> > 
+> > On Tue, Feb 18, 2025 at 12:00:52PM -0800, Nelson, Shannon wrote:
+> > > On 2/18/2025 11:28 AM, Leon Romanovsky wrote:
+> > > > 
+> > > > On Tue, Feb 11, 2025 at 03:48:51PM -0800, Shannon Nelson wrote:
+> > > > > Add support for a new fwctl-based auxiliary_device for creating a
+> > > > > channel for fwctl support into the AMD/Pensando DSC.
+> > > > > 
+> > > > > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> > > > > ---
+> > > > >    drivers/net/ethernet/amd/pds_core/auxbus.c |  3 +--
+> > > > >    drivers/net/ethernet/amd/pds_core/core.c   |  7 +++++++
+> > > > >    drivers/net/ethernet/amd/pds_core/core.h   |  1 +
+> > > > >    drivers/net/ethernet/amd/pds_core/main.c   | 10 ++++++++++
+> > > > >    include/linux/pds/pds_common.h             |  2 ++
+> > > > >    5 files changed, 21 insertions(+), 2 deletions(-)
+> > > > 
+> > > > <...>
+> > > > 
+> > > > My comment is only slightly related to the patch itself, but worth to
+> > > > write it anyway.
+> > > > 
+> > > > > diff --git a/include/linux/pds/pds_common.h b/include/linux/pds/pds_common.h
+> > > > > index 5802e1deef24..b193adbe7cc3 100644
+> > > > > --- a/include/linux/pds/pds_common.h
+> > > > > +++ b/include/linux/pds/pds_common.h
+> > > > > @@ -29,6 +29,7 @@ enum pds_core_vif_types {
+> > > > >         PDS_DEV_TYPE_ETH        = 3,
+> > > > >         PDS_DEV_TYPE_RDMA       = 4,
+> > > > >         PDS_DEV_TYPE_LM         = 5,
+> > > > > +     PDS_DEV_TYPE_FWCTL      = 6,
+> > > > 
+> > > > This enum and defines below should be cleaned from unsupported types.
+> > > > I don't see any code for RDMA, LM and ETH.
+> > > > 
+> > > > Thanks
+> > > 
+> > > I've looked at those a few times over the life of this code, but I continue
+> > > to leave them there because they are part of the firmware interface
+> > > definition, whether we use them or not.
+> > 
+> > How? You are passing some number which FW is not aware of it. You can
+> > pass any number you want there. Even it is not true, you can
+> > PDS_DEV_TYPE_FWCTL = 6 here, but remove rest of enums and *_STR defines.
+> 
+> When pds_core starts up it gets ident/config information from the firmware
+> in a struct pds_core_dev_identity, which includes the vif_types[] array
+> which tells us how many of each PDS_DEV_TYPE_xx are supported in the FW.
+> This is indexed by enum pds_core_vif_types.
 
-Jason has been helping as reviewer for this area already, and has
-contributed various features directly, notably BPF timestamping.
+So just leave in the kernel, the PDS_DEV_TYPE_XXX which you support.
 
-Also extend coverage to all timestamping tests, including those new
-with BPF timestamping.
+> 
+> > 
+> > > 
+> > > You're right, there is no ETH or RDMA type code, they exist as historical
+> > > artifacts of the early interface design.
+> > 
+> > This make me wonder why netdev merged this code which has nothing to do
+> > with netdev subsystem at all.
+> 
+> The pds_core was originally brought in for supporting pds_vdpa and
+> pds_vfio_pci.  At the time, it was essentially following the example of the
+> mlx core module; at the time there wasn't any push back or suggestions of a
+> different place to land.  Maybe further fwctl and "core" related discussions
+> will suggest another approach.
 
-Link: https://lore.kernel.org/netdev/20250220072940.99994-1-kerneljasonxing@gmail.com/
-Signed-off-by: Willem de Bruijn <willemb@google.com>
+The understanding of that "core" drivers don't belong to netdev was
+always there.
 
----
+Thanks
 
-Sending to net, following recent examples for MAINTAINERS changes.
-
-But note that the BPF changes are only in net-next at this point.
-I can resubmit against net-next is more sensible.
----
- MAINTAINERS | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ac15093537c6..c92bcd02049e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21923,10 +21923,13 @@ F:	sound/soc/uniphier/
- 
- SOCKET TIMESTAMPING
- M:	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-+R:	Jason Xing <kernelxing@tencent.com>
- S:	Maintained
- F:	Documentation/networking/timestamping.rst
- F:	include/linux/net_tstamp.h
- F:	include/uapi/linux/net_tstamp.h
-+F:	tools/testing/selftests/bpf/*/net_timestamping*
-+F:	tools/testing/selftests/net/*timestamp*
- F:	tools/testing/selftests/net/so_txtime.c
- 
- SOEKRIS NET48XX LED SUPPORT
--- 
-2.48.1.658.g4767266eb4-goog
-
+> 
+> sln
+> 
+> > 
+> > Thanks
+> 
+> 
 
