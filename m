@@ -1,108 +1,124 @@
-Return-Path: <netdev+bounces-168810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42EBDA40E0A
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 11:21:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACB0A40E12
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 11:32:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C27189801E
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 10:21:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7619A1899B85
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 10:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2309F204685;
-	Sun, 23 Feb 2025 10:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD6B1FCFC6;
+	Sun, 23 Feb 2025 10:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dejo+nlk"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PJu2gik0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02EC335BA
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 10:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2D61EB36;
+	Sun, 23 Feb 2025 10:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740306091; cv=none; b=L5SdJQXmY0R/r1tEqIZni++11TV5OgKP+gl3v4RKcSoSOSljL7Yyzu9U9IYkU218yEgCpw4YbjkDtCODeeGCNvLWq1pX/y5vH4MvvVLMzdycgn3pSljdPd143ZrWutmTohqlTXWgsUymgl7sHwJO5AUoW9YboOyC+UR5i9njFJA=
+	t=1740306765; cv=none; b=O34EGB0NF5CsGfVwgByvmF9OOLBL6WGiObtS/Y9UnZ2VP73XdlPaE0ZBnWCF0ohCyDLAi9VUR8doBE2xn3HnqD22vOJg0hId8zk4vfibbjAji6vt9wvkw0LEm0VxhPqY2Ol8AWXfIfTo7zEJPP9TnomM98Xu7HUqvgMysBjwffY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740306091; c=relaxed/simple;
-	bh=/bxfSrUOURWj32mv9Nd0r62CA8Ts9Mz5b5TOmHtaMOk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tZgaeUdL6mWjxSo7D2fyoLtLu20wm1EJwlrk+iNcTGABBWT0966PFFGxDmykJS9srDMjDl6bzbb7sClznB/pmwS60QhPtRJ5N+/b8XnlR+7P4Ox2FEi3HvIkcpKhigHkSlhxMj+NuvNDUsaaLhYLELO2LZL5psWgUOcH6cl7HCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dejo+nlk; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3ce76b8d5bcso33187125ab.0
-        for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 02:21:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740306088; x=1740910888; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/bxfSrUOURWj32mv9Nd0r62CA8Ts9Mz5b5TOmHtaMOk=;
-        b=Dejo+nlkvCc9mRGBID+vOx79sH9xDIIx/bT5Wmmi4zqGFuI4WfqSn3po940QC+FuZc
-         /2Bq3wG1HU08r93dZ1XekdfdPTtnqtiVP3U93j5mMNyvbl2RXsF7+FUKHvB6T7tFGB6B
-         G/16GRA/dNijL4FpoHGsLKtdUkTI0mbF/dBcsuD9mA9TJbe9QJw43xhrc+3vh166cNb6
-         CObzXjvqB2ZeDnuLH6soufrcLdNJfz1HtOJDLIfCFLj8c90enZTkVc8bJ+xVIO4barWx
-         JdKP/4AHNJadIdpjQi4kq6WSuDtTGBPtEyXzh/J1K2cGnWnIA+uJVjSh7LEny1ZcUZ8H
-         Gf9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740306088; x=1740910888;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/bxfSrUOURWj32mv9Nd0r62CA8Ts9Mz5b5TOmHtaMOk=;
-        b=HUhu5Wnk8+4+CpfK/jEi+5ZlZlzI/1Lalq1OeXkD1qPrRQI5Humfy1nzeXO5j5zAW/
-         KbJKe9kSPl5FXyqNIq0Oq2mdKcZhc3mAF0Spkiw5ZTjEhMwfn3kK/yR7oti0QZ1NEzYo
-         2IP7xWTlZB3/M+Ezm8stnX9Lpqy/UscgjCgoLeExcX0g+JlMpT04PBbGJFgbvTdaUy4f
-         pJMnVOTS6s8Z+qxOhaX9Cl6QBKTpKsj4DGbn4I/QR9lOaLWPV/33ZIC0kqxyECnmRyKS
-         uDT7vBD1I6ma2sFrjH092ROqRhUChiWfoWjzR1QWc2XbarFm8/RUry43LLnwaOAv8MWO
-         7sCw==
-X-Gm-Message-State: AOJu0YxH7r1ayqoGHI7olxHgQaPlaH69i/T166ssgovlK1NDUQYQROxn
-	2+nvDQSmwYm66X0j0NfU+Jfggm+jlL4gYk5rSQEy9U5OKSFLhuS2I8nWLQltIrUtfGyf6ybUrkL
-	dUo7HipY9FkTVdCIVgOdBTXoz6RI=
-X-Gm-Gg: ASbGncuixy8DiRGgg1wZ5I/Xo27tWKTKxYA5/uVzGPxBeDDUxoPXEZoP/fClNT2D30u
-	NeeY1uhcRwPCFhwqGdVYhnX6cbZg+Nkdw9nGALVNJ5aPILAaofMXPHpnLeG+eaK3VdWYV7IX+h9
-	6NskYSDA==
-X-Google-Smtp-Source: AGHT+IE//QxN+GIZK6aAx2hg42/eIF2H8btpcPOWPgray+5NJqiWstSEhLgDF6YsrfA4rBKYc7ISGEfsB0MmdF2aPUc=
-X-Received: by 2002:a05:6e02:1aa4:b0:3d1:9cee:3d1d with SMTP id
- e9e14a558f8ab-3d2caf09719mr87109485ab.19.1740306088517; Sun, 23 Feb 2025
- 02:21:28 -0800 (PST)
+	s=arc-20240116; t=1740306765; c=relaxed/simple;
+	bh=UeSf7qZC3uC+4elUHoxZwfMIm5R2qsKyGGBBhDQVbTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jbdOCgMBUIeaBp6ImMjBPYThf1hSkDHjpb7hRUw2Gth+Q5vO+Ef4BULiJMT+bvHiOonUS8x0BE4VZcIPHmwsMmYEQ93jE+Ib4gGtCqXTK4YspOWGIYOlwG4rZnaXuL2SGwDVBd20/e7bBRJxkkgYSFaF17V8UG+dyzA7VNltCTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PJu2gik0; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3C30043317;
+	Sun, 23 Feb 2025 10:32:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740306755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3q8V+cm8pIkEgY8WNYRuv1HhLOCUVuFOZ7NL4x+JRvA=;
+	b=PJu2gik02LsnUsoTvziJ0WU+C7YYrfTfpv4qiGLeG4lV/hz3f1REW+aKTVJKdNgZ4qyaqa
+	FPYvCWviN3Vq0QEyp3Wk5OwGyDrNaZXKBdtYdj73/VWi0RWk6jeSIi0Y9OuplS+G4BwmaY
+	kgL/7pzrLp+gEuaBi0/mLCS428JAQaYXnT3wVlAV8J0K6BNEmQsIec6uZKwHBq2ClJUStX
+	LlcYSIZF96a7YLBswGAg5PJRgAi4kILQ7GR+g5y+/t43ECpdnEmRFJbBO18zhf8q22f8Fb
+	sl3vWCF2CaG2+O3jiINfvWnLgNADVXy8EZx9Had0oUgdKREYQcxMyCC26oYavQ==
+Date: Sun, 23 Feb 2025 11:32:32 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
+Cc: hfdevel@gmx.net, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, FUJITA
+ Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 4/7] net: phy: aquantia: add essential
+ functions to aqr105 driver
+Message-ID: <20250223113232.3092a990@fedora.home>
+In-Reply-To: <20250222-tn9510-v3a-v5-4-99365047e309@gmx.net>
+References: <20250222-tn9510-v3a-v5-0-99365047e309@gmx.net>
+	<20250222-tn9510-v3a-v5-4-99365047e309@gmx.net>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250222172839.642079-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20250222172839.642079-1-willemdebruijn.kernel@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 23 Feb 2025 18:20:52 +0800
-X-Gm-Features: AWEUYZmJkJ3lIBLyxFY8x6rCB_vjJRpfArluHRUgZ2ZdbTOjczT3Oc3KuFYftMU
-Message-ID: <CAL+tcoAf=6dwcKY+YYYg57umA=0Vo7gVa5ckObZb2CPevx2-XQ@mail.gmail.com>
-Subject: Re: [PATCH net] MAINTAINERS: socket timestamping: add Jason Xing as reviewer
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	kernelxing@tencent.com, Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejheehlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopeguvghvnhhulhhlodhhfhguvghvvghlrdhgmhigrdhnvghtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhfhguvghvvghlsehgmhigrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnn
+ hdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Sun, Feb 23, 2025 at 1:28=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> From: Willem de Bruijn <willemb@google.com>
->
-> Jason has been helping as reviewer for this area already, and has
-> contributed various features directly, notably BPF timestamping.
->
-> Also extend coverage to all timestamping tests, including those new
-> with BPF timestamping.
->
-> Link: https://lore.kernel.org/netdev/20250220072940.99994-1-kerneljasonxi=
-ng@gmail.com/
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
+Hi,
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+On Sat, 22 Feb 2025 10:49:31 +0100
+Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
+wrote:
 
-Thank you!
+> From: Hans-Frieder Vogt <hfdevel@gmx.net>
+> 
+> This patch makes functions that were provided for aqr107 applicable to
+> aqr105, or replaces generic functions with specific ones. Since the aqr105
+> was introduced before NBASE-T was defined (or 802.3bz), there are a number
+> of vendor specific registers involved in the definition of the
+> advertisement, in auto-negotiation and in the setting of the speed. The
+> functions have been written following the downstream driver for TN4010
+> cards with aqr105 PHY, and use code from aqr107 functions wherever it
+> seemed to make sense.
+> 
+> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+> ---
+>  drivers/net/phy/aquantia/aquantia_main.c | 242 ++++++++++++++++++++++++++++++-
+>  1 file changed, 240 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+> index 86b0e63de5d88fa1050919a8826bdbec4bbcf8ba..38c6cf7814da1fb9a4e715f242249eee15a3cc85 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -33,6 +33,9 @@
+>  #define PHY_ID_AQR115C	0x31c31c33
+>  #define PHY_ID_AQR813	0x31c31cb2
+>  
+> +#define MDIO_AN_10GBT_CTRL_ADV_LTIM		BIT(0)
+
+This is a standard C45 definition, from :
+45.2.7.10.15 10GBASE-T LD loop timing ability (7.32.0)
+
+So if you need this advertising capability, you should add that in the
+generic definitions for C45 registers in include/uapi/linux/mdio.h
+
+That being said, as it looks this is the first driver using this
+feature, do you actually need to advertise Loop Timing ability here ?
+I guess it comes from the vendor driver ?
+
+Thanks,
+
+Maxime
 
