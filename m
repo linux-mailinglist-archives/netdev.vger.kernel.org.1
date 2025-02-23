@@ -1,138 +1,147 @@
-Return-Path: <netdev+bounces-168804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C79A40C77
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 02:18:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57814A40CDA
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 06:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 265DF7A4134
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 01:17:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EE781899DF1
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 05:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A163A8472;
-	Sun, 23 Feb 2025 01:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B591B2182;
+	Sun, 23 Feb 2025 05:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="LSx/2S5F";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZvTI64S7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bb8cRfOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9909B23B0
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 01:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945852AE97;
+	Sun, 23 Feb 2025 05:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740273476; cv=none; b=onmZQu8vBc+nnH/gnI/hn7i0bnd5XMVFHgod/ayB9WUgKgfXzDZH4puln4bGszUeSSlTh3JwM/HKUMSyhyQaOvH8OEmvL++lkG/enBlb+/Ix5upbw0VfZt0N+1nciQntsIM6uP8T0kAWP+D6l2Qfufd2wBE03oudee1TpZrDnbE=
+	t=1740289206; cv=none; b=nZ0XCYtUbr3duyG6WA8YzcJdMuHK3v2hJh2Qcz7BPX0ejQLPsSYXteu5KDLFYTWxlmpP6a/Vc9dw2xp5SFLUE/qaAP1dTFLdefdJgZYqfpix8V26GLdBde8f1l9LyH9qU7v0hNPSVDlJtH8UbHKf5h/N2nfDnf4gQIJKkxBQqLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740273476; c=relaxed/simple;
-	bh=uhirDOc/3ziZe2NAuAsrHaQ7NkvJq8q08e0hJiM5fGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qKSIMb7WJ2Q7ZXur60RJcwUHh2VDjAqHJjDh2MWTwp1Qb7wW6uNK3wIL//e/oZo9ze2vIJz87HW1PGBLFqGi4Fbm1NhHIBM5SIuymr6mSiSXlRHbsVVuLKb5Mqt0pWKzJ1KpP8ErUl896pVaXacMzpyWLIpTBvtpdSPZTZRPp38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=LSx/2S5F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZvTI64S7; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 6D0FF1140136;
-	Sat, 22 Feb 2025 20:17:53 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Sat, 22 Feb 2025 20:17:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1740273473; x=1740359873; bh=qSFzTmkGtB
-	xLNsG2xqwLHkqRFImk+TdEPF6qvITryro=; b=LSx/2S5F7cWxyQvl2/c4sV4mmL
-	0UtN9aaUxb/kPVh73+2kPHWM8D3OMCJ8Y9EYqjZsXH5bUIkdafdzKwS6OZNJvW3E
-	67SzvYUGUQhi9uPdze9dKKuKxQO5moN9RX+lHXGILeEj9CmLrotrS3gBHcNVeTHW
-	N0AfBi5jCuWfSzKFBPi2q66vAGAeJBcpVbrJWKIGpz/jpz0nqCTGRo6C+XwecmYe
-	4CJatAi0kvnKstC2jhVNklqW6Dyqx/wjA2vyIy5jVHn9WYto5C9O3JjwJddTnrcX
-	UuiIzqt+dkTe9SL12wmgFWVn1ISDxB0YsMI04u4ABoCv+kf30vogFK0gpNOA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1740273473; x=1740359873; bh=qSFzTmkGtBxLNsG2xqwLHkqRFImk+TdEPF6
-	qvITryro=; b=ZvTI64S7KWB54QGdG6Xj1w1KYhuL6k3mWnjWKkz2w1PvOVdEW/l
-	V4bo+q5yBKiDuxIsUD/AmF4cJPz+WE8te0/mP1oS91ToTaMiXCfZHe8VxSEZOfZ5
-	Sj+434lZCdVNo3M9KTtFsHy/Jri+CBqDySdn61EYShdia9V9uaE/VwQRpQwa3epV
-	wCJvkzPj2Z1UIvCo74mDmvghGRcA/i0rLCf6q1bG7Gf0XNodo/GSr8dlERAVA7k4
-	TRcElwLDf7gpuFMdGQdSkqvpBsJb5VDXopawjOo8fQKCq98ujJWBWh/XkriYONVr
-	YTfG4v+vCsya0OzX2nHtUdKzHNQO5h+6rTg==
-X-ME-Sender: <xms:QHe6ZwIrKYoWSMPeEGlxsq6hiijs6iW1u-5n9oDK1m-zT2NQYxASYw>
-    <xme:QHe6ZwI4-XkwD7JCzLdKLBT-C2UZVwnfvyNPCE8kzk4kcG2Hcsmu7xsvtd6JcJdFT
-    zwY9AzY81keRXjm9g>
-X-ME-Received: <xmr:QHe6Zwv9piycBRjrT1xHBMva5MHqjKFk9WSv1BHZAKzA_oFuTQWee-TpB0Ap55SQyvvm_g1n4zhaIUpDWLxiO0xwg6QhES_OVrO80FveugKABg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejgeegjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculd
-    efhedmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhep
-    ffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrh
-    hnpefgleetueetkeegieekheethfffleetkeeiiefgueffhedvveeiteehkeffgeduveen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghp
-    thhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhr
-    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihes
-    rhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunh
-    hnrdgthhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehmihgthhgrvghlrdgthhgrnhessghrohgruggtohhmrdgtohhmpdhrtghpthhtoheprg
-    hpgedvtddtjeefsehgmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:QHe6Z9YLeR8-D1HQMx-BH3yXvaMT8zG4Dizbml16vedj6NihKlCHvQ>
-    <xmx:QHe6Z3YSuOCpXZx17ycmVVxUBtsN-dvomw4nihTA7SSuJBwPtr1eOg>
-    <xmx:QHe6Z5B8pOgpe79FXcDhUQkMxwWz_YrztxoA57oYZVHBy5GwAufrTw>
-    <xmx:QHe6Z9b6T_0MFAiW4AqdiP77dKdU6qob72jsdoew74MAc6pxf8WAZA>
-    <xmx:QXe6ZxnO4Km2ykYuXHjcC3_OMvTqUciTZD7hE5o3y64kgXbuQiTnNBQG>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 22 Feb 2025 20:17:51 -0500 (EST)
-Date: Sat, 22 Feb 2025 18:17:50 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	michael.chan@broadcom.com, ap420073@gmail.com
-Subject: Re: [PATCH net v2 1/2] net: ethtool: fix ioctl confusing drivers
- about desired HDS user config
-Message-ID: <hzrkounydzlnimuuucnlxe35rkka4g2xntnseq7cg6lslkpt3r@g7jv662zwezy>
-References: <20250221025141.1132944-1-kuba@kernel.org>
+	s=arc-20240116; t=1740289206; c=relaxed/simple;
+	bh=GWnXskB+Vnogo6jwBuCS8eCJI1+64mIPToLBsPkUOtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MvVIGzbkdCJ4hYIIb6ZrhKEQlSvK9Q4q6VdzGO1Na1Cg7kyxvKfBSlnf3X9C3Oh0iKncJ6wTy3AQRUiM/0f5RKr8VAkyn6W0IRr/9JB6z1CtMWxXxU6vSfSaPAsgJZSyjO+jPqIzyjCv/ZAg5KhIswznkvvq4gX9oxZ+0jLgEUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bb8cRfOI; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2fbfe16cc39so6908280a91.3;
+        Sat, 22 Feb 2025 21:40:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740289204; x=1740894004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BfvuWvSB4FrYuL3Q9W8pUmNF8XrVHM6syd74IbIbqmI=;
+        b=bb8cRfOIDBvRVwrkc9TaYxxGtTt+onBQv/sYuOod8yGAkMJYKmvTU9pXIURG2Rlltc
+         fr0XdS1tgECDQxtQ0iyDi8P/uxdhqItpiaNxVbwXLIhMX0gioC8y0oq4f8o7xS8gDvs9
+         1FX/IrQcPjGHzA2RRLnT0XkYZBbmVDm/obzWO7nOdQZHu284Dj4ATSyOrhhUXQYekUjT
+         d89daMHeSySrTnSa5KG9jZZbhUuqk4LYQ9FHtUNilHZ8ZTbrdgBW+Hm1nYK8l99PkZRL
+         TytJvcEHRdhgRSe2k512oVSCjUWbLQ5LFc4szZH5BiWBiWmVFvXYMvXMKABdBuHE3Ko8
+         KaYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740289204; x=1740894004;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BfvuWvSB4FrYuL3Q9W8pUmNF8XrVHM6syd74IbIbqmI=;
+        b=oAZu5paSMBx3dEiX4JCrHWrqNQt4MWB2fBIwC/8yeZuimINvPX8U6eoaBo0yes3eVq
+         t1m0vsCi6l09RwFiFY5Aygx2RnYzlN6B2O5TDN4Ediv+ZqKzRqI9xNmZlDne3ZYROxZa
+         fB+sX1iLESgy0vEV6IdMCY6h5MXWWKCkobWb6kGhOUtoSKmNgSjoNvbLLBk2JTm+eIWC
+         /ZTNlRo2IUm5wD9sBVO69m/reLgCrhlaiF7tODz5YKPtc/tIAOPg32Hq7hANNyZ4thHu
+         WRHtC2ZUcYn/rMrrkMlTDhy1ZQxSG7R5PO8EyLaAw2HunYU9z4pCiwwkgW7ldI9dWejY
+         B3hw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDeSUCbGq/Xb/DiHb9YOf33AC+Z28GLKtCpZdiyaSDbu1cGtAZGeF1ktTKgExzWD3JRv4WvfEg@vger.kernel.org, AJvYcCWM6jsqKq7Z6hKQ7lB3QJ6hiyqO1SdFuGnlq0+jPuNfaMsTFW9vJ1M43nLdjyCvttrAL8YAKh9AL2Px1NXF@vger.kernel.org, AJvYcCXQ0Y0KNZf+Hmh0Oexb1EZPgkXYgFsiJq14pz0n/BTzSX+hRicKXylHCTbTOBPzJIA5zzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUi7aczZQcm/364mgozTY01aj28TxnbuxBKEBrE555UiQ6APP5
+	fQVtw9Bs1oAWwld5MxEujwDf+s8hYi8ZgIM328pV9SDNSNqFy4od
+X-Gm-Gg: ASbGncuX1T9NmlQAeXz9ylfHGMADYDGXFd51N+rHuN90UMp150at/RWDwBk9+ykt83T
+	j0jyWUo7qpCj/IE2wAGbI8emo/h6ftZcPr+O7lVJM0dd3X0eImjRgS0reVY7oBLJl1gyCZgUvyj
+	VyhRlIwc46Y5bP9eNqGpBIaN9cRfRtxnwZiBODSfdr1m2C4/7hmctSOd1ghdqI7aYM4azit54Nv
+	UcgoOqZ76/hnTd+DkCciAGw7Ub9nfM6mm21sWBWC69/2bMLNG7Owyp9ckUbio6rkTai4aOnzcWX
+	kxAInh0HVnv+rRs9hhp8S8Y=
+X-Google-Smtp-Source: AGHT+IEsyitKBEB+TjtOIJ7j0ghQQ1PUySgYsjd6ENH+ooYHWDcum4IoJa9MuHEv9g0sOVIJCIQYCA==
+X-Received: by 2002:a05:6a20:8403:b0:1ee:efa5:6573 with SMTP id adf61e73a8af0-1eef52c9981mr17773167637.8.1740289203622;
+        Sat, 22 Feb 2025 21:40:03 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73261ca7831sm15022814b3a.104.2025.02.22.21.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Feb 2025 21:40:03 -0800 (PST)
+Date: Sun, 23 Feb 2025 13:39:47 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Simon Horman <horms@kernel.org>, Russell
+ King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Russell King
+ <rmk+kernel@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Serge Semin <fancer.lancer@gmail.com>, Xiaolei Wang
+ <xiaolei.wang@windriver.com>, Suraj Jaiswal <quic_jsuraj@quicinc.com>, Kory
+ Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>, Jesper
+ Nilsson <jesper.nilsson@axis.com>, Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>, Kunihiko Hayashi
+ <hayashi.kunihiko@socionext.com>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v5 1/9] net: ethtool: mm: extract stmmac
+ verification logic into common library
+Message-ID: <20250223133947.00002f06@gmail.com>
+In-Reply-To: <20250220025349.3007793-2-faizal.abdul.rahim@linux.intel.com>
+References: <20250220025349.3007793-1-faizal.abdul.rahim@linux.intel.com>
+	<20250220025349.3007793-2-faizal.abdul.rahim@linux.intel.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250221025141.1132944-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 20, 2025 at 06:51:40PM -0800, Jakub Kicinski wrote:
-> The legacy ioctl path does not have support for extended attributes.
-> So we issue a GET to fetch the current settings from the driver,
-> in an attempt to keep them unchanged. HDS is a bit "special" as
-> the GET only returns on/off while the SET takes a "ternary" argument
-> (on/off/default). If the driver was in the "default" setting -
-> executing the ioctl path binds it to on or off, even tho the user
-> did not intend to change HDS config.
-> 
-> Factor the relevant logic out of the netlink code and reuse it.
-> 
-> Fixes: 87c8f8496a05 ("bnxt_en: add support for tcp-data-split ethtool command")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - fix the core rather than the driver
-> v1: https://lore.kernel.org/20250220005318.560733-1-kuba@kernel.org
-> 
-> CC: michael.chan@broadcom.com
-> CC: ap420073@gmail.com
-> ---
->  net/ethtool/common.h |  6 ++++++
->  net/ethtool/common.c | 16 ++++++++++++++++
->  net/ethtool/ioctl.c  |  4 ++--
->  net/ethtool/rings.c  |  9 ++++-----
->  4 files changed, 28 insertions(+), 7 deletions(-)
+On Wed, 19 Feb 2025 21:53:41 -0500, Faizal Rahim <faizal.abdul.rahim@linux.intel.com> wrote:
 
-Tested-by: Daniel Xu <dxu@dxuuu.xyz>
+> @@ -1258,23 +1236,8 @@ static int stmmac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
+>  	if (err)
+>  		return err;
+>  
+> -	/* Wait for the verification that's currently in progress to finish */
+> -	timer_shutdown_sync(&fpe_cfg->verify_timer);
+> -
+> -	spin_lock_irqsave(&fpe_cfg->lock, flags);
+> -
+> -	fpe_cfg->verify_enabled = cfg->verify_enabled;
+> -	fpe_cfg->pmac_enabled = cfg->pmac_enabled;
+> -	fpe_cfg->verify_time = cfg->verify_time;
+> -	fpe_cfg->tx_enabled = cfg->tx_enabled;
+> -
+> -	if (!cfg->verify_enabled)
+> -		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+> -
+> +	ethtool_mmsv_set_mm(&priv->fpe_cfg.mmsv, cfg);
+>  	stmmac_fpe_set_add_frag_size(priv, frag_size);
+> -	stmmac_fpe_apply(priv);
+
+Well, I would prefer keeping stmmac_fpe_set_add_frag_size() before
+ethtool_mmsv_set_mm(), but not after, the VERIFY process should be
+triggered after all the parameters are set.
+
+> -
+> -	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
+>  
+>  	return 0;
+>  }
+
 
