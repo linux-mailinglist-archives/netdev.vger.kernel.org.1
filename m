@@ -1,155 +1,168 @@
-Return-Path: <netdev+bounces-168815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D201EA40E80
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 12:49:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F09A40E68
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 12:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2520177839
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 11:49:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DC347A78F3
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 11:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23BE20551A;
-	Sun, 23 Feb 2025 11:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFFA2036EB;
+	Sun, 23 Feb 2025 11:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="h45+iB0H"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FIAYQaLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8162F1FC7DA
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 11:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCB23D984
+	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 11:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740311353; cv=none; b=DJGVkQdeX6RtCWI67DddZTFR5IitUUoqLI9HLLD3JP7KVpRC35HF3MT3h2IYUoLQUQ+IoyyzjUH/z3YkLqNY5A4SaVavtsBDz/xDPMvkE3MwGPXnJa9ie1tx45i8D/LUlLzgBNAYhNA/y4FBvOtnteDmaC7AwN3UL8Frxwnms28=
+	t=1740310841; cv=none; b=dea0x2GPzG/qbi+hLenmCWoITYWfjy6gmfBoswnm1jDUo0wEeqwzvf9bqPmI65JrWhPiC97KhZaqx1FluKtZOL0dXWlh2mPEY60xfUjUTDpfUQcGRbmbw3YGnqJzD1pIdVt31IpTZDAmYeBRYDJ2EEzx5c+uPcUrjyxhp7jnEQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740311353; c=relaxed/simple;
-	bh=12/3eubhDFm4sLNlZh3gp0omW2qRBKiQ+TpFOHKn8i8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A2RUREye0ceNCDkwGGIMs9uggWvnwYEsBm3VEMeot1lnnQ2hDaMvggjH/5dmaGqlKcwYuhcmOw9SoWK7gYplFRaCt+97k0JJIJ+Xsyw3Q5TDVPUA19UwIwknylK4PLown17MV0uc7deJNdCLEDZhq11neTzonnIW/X8IJEWl5Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=h45+iB0H; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=h45+iB0H;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10de:2e00:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 51NBY5n1913617
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 11:34:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1740310444; bh=yG+72XPi+ZhAmV+0LiZ7iiClG9t9cXwxWcaWLrxHyGA=;
-	h=From:To:Subject:Date:Message-ID:From;
-	b=h45+iB0HCIIqoHNnGOzGNWZV4GqlxjWDCD8oK5p0J1ZE/AOGYq7v10xix07DkXYbC
-	 PbZV/hTJ5jLTHueRA0Ld/gvKQPSMBZkhltCjhu0NVRllatSZPPpLItud3YmgiagKZy
-	 eLdduhQ16s48JuFAx//fagJEgy2JWVCxiOu9nimQ=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10de:2e0a:149a:2079:3a3a:3457])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 51NBY45v2201663
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 12:34:04 +0100
-Received: (nullmailer pid 927749 invoked by uid 1000);
-	Sun, 23 Feb 2025 11:34:04 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: netdev@vger.kernel.org
-Subject: Phy access methods for copper SFP+ disguised as SR
-Organization: m
-Date: Sun, 23 Feb 2025 12:34:04 +0100
-Message-ID: <874j0kvqs3.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1740310841; c=relaxed/simple;
+	bh=ublvBogodnw8msiGU0MgAbXyEzVxq+O95rFu42etUUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=obcLbRU2g1lhVf4qH8FAo3XmRpPNyz8GCQU9okQROBq3D55eeD51MDHmwSYr95hbeI7Oj2Z0ojdH7o3qw+ogUceUgqrqqkkHANvC9tZhhIE5dAoYERF6lWV0ALZ06hhh3NIM9hfAzSSSS8Bwq+wsfAnR0/w/FcZDiWBiFhstOIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FIAYQaLj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NgBWyniUF/OIJUlHK2K7BrSpGMn7fltVSGcDSX0c/GY=; b=FIAYQaLjg14eiUynjgEta+jcV6
+	ncxKfDn7c5vT5jHvjLpNKBzxSR2LuYPX5WP+/lc2+LAqfFPlpt7Qs4BD2AwPzTyEXn/UpwVRDUZB3
+	/MRe/uM63FmDNZdf5bVjldLKiOO1nIkxngExo/E4aGlwssrsJ5oRcJc73KZviwtFnlzarbFIpvB7p
+	6AltjBZbgtnoHheNlX2hixabQQ3/c4pvYzicE+QOJ/cthdCVawlAKTjsC0HSNUB8kgr1FexuYxrVE
+	tvEw6B+danCezT63cQdu8rdfSQ/T23RYTBcHT9sAi6W1Hp8G/z8cU5awaH0e5pWTXn66r9afrOw1U
+	y05zJiOw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54522)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tmALM-0002rw-1T;
+	Sun, 23 Feb 2025 11:40:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tmALG-0003y2-2N;
+	Sun, 23 Feb 2025 11:40:14 +0000
+Date: Sun, 23 Feb 2025 11:40:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Joe Perches <joe@perches.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Drew Fustini <drew@pdp7.com>, Eric Dumazet <edumazet@google.com>,
+	Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/2] net: stmmac: thead: clean up clock rate
+ setting
+Message-ID: <Z7sJHuiqbr4GU05c@shell.armlinux.org.uk>
+References: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.0.7 at canardo.mork.no
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Got myself a couple of cheap 10GBase-T SFP+s and am struggling to figure
-out how to talk to the phy.  The phy does not appear to be directly
-accessible on 0x56, and it does not respond using the Rollball protocol
-either.
+Adding Joe Perches.
 
-Are there any other well known methods out there, or am I stuck with
-whatever SR emulation the SFP vendor implemented?
+On Fri, Feb 21, 2025 at 02:15:17PM +0000, Russell King (Oracle) wrote:
+> Hi,
+> 
+> This series cleans up the thead clock rate setting to use the
+> rgmii_clock() helper function added to phylib.
+> 
+> The first patch switches over to using the rgmii_clock() helper,
+> and the second patch cleans up the verification that the desired
+> clock rate is achievable, allowing the private clock rate
+> definitions to be removed.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 28 ++++++++---------------
+>  1 file changed, 9 insertions(+), 19 deletions(-)
 
-This is all it shows, and 0x56 just reads zeroes no matter what I do:
+I've been investigating why the NIPA bot complains about maintainers
+not being Cc'd, such as for patch 1 of this series:
 
-root@s508cl:~# i2cdetect -y 8
-     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-00:                         -- -- -- -- -- -- -- --=20
-10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --=20
-20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --=20
-30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --=20
-40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --=20
-50: 50 51 -- -- -- -- 56 -- -- -- -- -- -- -- -- --=20
-60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --=20
-70: -- -- -- -- -- -- -- --=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20
-root@s508cl:~# i2cdump -y 8 0x50
-No size specified (using byte-data access)
-     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f    0123456789abcdef
-00: 03 04 07 10 00 00 00 00 00 00 00 06 67 00 00 00    ????.......?g...
-10: 08 02 00 1e 4f 45 4d 20 20 20 20 20 20 20 20 20    ??.?OEM=20=20=20=20=
-=20=20=20=20=20
-20: 20 20 20 20 00 00 00 00 53 46 50 2d 31 30 47 2d        ....SFP-10G-
-30: 54 38 20 20 20 20 20 20 41 20 20 20 00 00 00 0c    T8      A   ...?
-40: 00 1a 00 00 46 32 35 30 31 31 34 54 30 30 31 30    .?..F250114T0010
-50: 20 20 20 20 32 35 30 31 31 35 20 20 68 f0 03 eb        250115  h???
-60: 00 00 11 6b e0 e7 c2 e1 ff ff 18 79 21 c8 24 ed    ..?k????..?y!?$?
-70: d8 45 85 00 00 00 00 00 00 00 00 00 1c 24 98 22    ?E?.........?$?"
-80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-90: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-a0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-b0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-c0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-d0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-e0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-f0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
-root@s508cl:~# i2cdump -y 8 0x51
-No size specified (using byte-data access)
-     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f    0123456789abcdef
-00: 50 00 f6 00 4b 00 fb 00 8c 9f 71 48 88 b8 75 30    P.?.K.?.??qH??u0
-10: 1d 4c 01 f4 19 64 03 e8 2b d4 07 46 27 10 09 28    ?L???d??+??F'??(
-20: 2b d4 02 85 27 10 03 2c 00 00 00 00 00 00 00 00    +???'??,........
-30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-40: 00 00 00 00 3f 80 00 00 00 00 00 00 01 00 00 00    ....??......?...
-50: 01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 7e    ?...?...?......~
-60: 42 33 7f ca 0b b8 13 92 13 92 00 00 00 00 00 00    B3????????......
-70: 00 00 00 00 00 00 00 00 00 00 40 00 00 00 00 00    ..........@.....
-80: 43 4f 55 49 41 38 4e 43 41 41 31 30 2d 32 34 31    COUIA8NCAA10-241
-90: 35 2d 30 33 56 30 33 20 01 00 46 00 00 00 00 c6    5-03V03 ?.F....?
-a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 aa aa    ..............??
-c0: 53 46 50 2d 31 30 47 2d 53 52 20 20 20 20 20 20    SFP-10G-SR=20=20=20=
-=20=20=20
-d0: 20 20 20 20 33 32 00 00 00 00 00 00 00 00 00 35        32.........5
-e0: 1e 28 2e 2e 31 34 29 36 00 00 00 00 00 00 00 00    ?(..14)6........
-f0: 00 00 00 00 00 66 00 00 ff ff ff ff ff ff 29 e3    .....f........)?
-root@s508cl:~# i2cdump -y 8 0x56
-No size specified (using byte-data access)
-     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f    0123456789abcdef
-00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
-f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+https://netdev.bots.linux.dev/static/nipa/936447/13985595/cc_maintainers/stdout
 
+I think this is a bug in either get_maintainers.pl or the NIPA bot.
 
-Bj=C3=B8rn
+On the bare patch without any Cc: header added:
+
+$ scripts/get_maintainer.pl 0001-net-stmmac-thead-use-rgmii_clock-for-RGMII-clock-rat.patch
+Drew Fustini <drew@pdp7.com> (maintainer:RISC-V THEAD SoC SUPPORT)
+Guo Ren <guoren@kernel.org> (maintainer:RISC-V THEAD SoC SUPPORT)
+Fu Wei <wefu@redhat.com> (maintainer:RISC-V THEAD SoC SUPPORT)
+Andrew Lunn <andrew+netdev@lunn.ch> (maintainer:NETWORKING DRIVERS)
+"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32 ARCHITECTURE)
+Alexandre Torgue <alexandre.torgue@foss.st.com> (maintainer:ARM/STM32 ARCHITECTURE)
+linux-riscv@lists.infradead.org (open list:RISC-V THEAD SoC SUPPORT)
+netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER)
+linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE)
+linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE)
+
+If I add those maintainers to a Cc header in the patch file (as it would
+be if NIPA runs on the unmodified received email), and then re-run
+get_maintainer.pl, then:
+
+$ scripts/get_maintainer.pl 0001-net-stmmac-thead-use-rgmii_clock-for-RGMII-clock-rat.patch
+Drew Fustini <drew@pdp7.com> (maintainer:RISC-V THEAD SoC SUPPORT)
+Guo Ren <guoren@kernel.org> (maintainer:RISC-V THEAD SoC SUPPORT)
+Fu Wei <wefu@redhat.com> (maintainer:RISC-V THEAD SoC SUPPORT)
+Andrew Lunn <andrew+netdev@lunn.ch> (maintainer:NETWORKING DRIVERS)
+"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32 ARCHITECTURE)
+Alexandre Torgue <alexandre.torgue@foss.st.com> (maintainer:ARM/STM32 ARCHITECTURE)
+Paul Walmsley <paul.walmsley@sifive.com> (supporter:RISC-V ARCHITECTURE:Keyword:riscv)
+Palmer Dabbelt <palmer@dabbelt.com> (supporter:RISC-V ARCHITECTURE:Keyword:riscv)
+Albert Ou <aou@eecs.berkeley.edu> (supporter:RISC-V ARCHITECTURE:Keyword:riscv)
+linux-riscv@lists.infradead.org (open list:RISC-V THEAD SoC SUPPORT)
+netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER)
+linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE)
+linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE)
+linux-kernel@vger.kernel.org (open list)
+
+Note the addition of Paul Walmsley, Palmer Dabbelt and Albert Ou that
+was not in the original.
+
+It seems that K: is fed everything in the file, including all headers.
+In the second run, the addition of the linux-riscv@lists.infradead.org
+mailing list in the headers then causes a subseqent run of
+get_maintainer.pl (and nipa's run of get_maintainer.pl) to then match
+using K: riscv in the "RISC-V ARCHITECTURE" entry.
+
+So, it seems running get_maintainer.pl on an email received from
+mailing lists without first stripping many of the email headers can
+lead to false K: matches.
+
+This makes NIPA's cc_maintainers test unreliable.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
