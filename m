@@ -1,76 +1,138 @@
-Return-Path: <netdev+bounces-168835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28026A40F8F
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 16:43:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DCB5A40FD0
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 17:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE5916FAAB
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 15:42:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B1217549A
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 16:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349DE20CCE3;
-	Sun, 23 Feb 2025 15:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3755D131E2D;
+	Sun, 23 Feb 2025 16:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ffkj0MM/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRPIiQjd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8BC20C490
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 15:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95953AC;
+	Sun, 23 Feb 2025 16:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740325315; cv=none; b=hS7/ve7rv2E6bLEpx0NF0kvVnW0S93EmBmVjiFofVijMrosqioMlagcUvd0VMa4xA9ND4uVh8F1vyuw875jJQuhm5sqmBmxI0ikUlQhjTaPnkfdFyODz0nO7ataSPm9r06DIxvAGENi0zyCs3QqbGCDEcQV5MA+wf8khlxQFyiA=
+	t=1740328970; cv=none; b=Xt7bgMtqyn8DhpbTo8bLgSn7LF0RTX8j/W7B3YYRDsme63mHrenySPAtp5RCkDp8K+E2jre12HBcWmbKWgeG7XtCD+jGXEJBQRd/yp3LVeQQYkt/cxWG9LfCG5dLuQ2y3yKnSjNd+k4gI35Wf8iJMeKuvtt6rOHWjhk0JnUV+8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740325315; c=relaxed/simple;
-	bh=ZGGr8CpUC2KsJpl4JTjnc3CvTn1h9z7S+oOYdP7bE20=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JY4seh+G1+qExXwrxYXVxEwdUTsgwKYMdDoO5pH8zCOoC29uYddtr/s+2f+jzO4no2kFz99RVBQkgGPxt+d3mDEMEpbpQK7y5wQOhCLnjG6Ep5EJ8AoJ/2WTvkp0pI0kQWMssjbg3goLzLIoRZ/PFNwcQ+mIUQe6QWnsgMnF6tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ffkj0MM/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740325312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qvywjBt9qiVEE9rGZyn5DkXXMEjJbM4TB/T7cbHYBEo=;
-	b=Ffkj0MM/C4SAaRHKIe2Jr3MWTR9rGMGiFgZzHHyIT2Jh52qe7wDwjD1mrszn6Co+vJUBVT
-	LcE7BP2Kbc4rHU1IOUARYFbkR9Fj9SFd1mQXW//AVFy/f3OlkheJzAF9wqdIgsBp6G+Y8L
-	m2shsbUG94RRkffL38NU/jK2nE3KAGc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-191-B0X9Vo8lOo6-dJW4ojwo4g-1; Sun,
- 23 Feb 2025 10:41:47 -0500
-X-MC-Unique: B0X9Vo8lOo6-dJW4ojwo4g-1
-X-Mimecast-MFC-AGG-ID: B0X9Vo8lOo6-dJW4ojwo4g_1740325304
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9510519783BA;
-	Sun, 23 Feb 2025 15:41:44 +0000 (UTC)
-Received: from server.redhat.com (unknown [10.72.112.28])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1EEEE1800359;
-	Sun, 23 Feb 2025 15:41:39 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: lulu@redhat.com,
-	jasowang@redhat.com,
-	mst@redhat.com,
-	michael.christie@oracle.com,
-	sgarzare@redhat.com,
+	s=arc-20240116; t=1740328970; c=relaxed/simple;
+	bh=8XZ+LCP+IJ1T0NsJnmk05Bo9WbAvIux7frjHXYDMeLk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GlF6zS9tRay79s6ofn93fFBm5UKOoWuRKowq8Ais8/9vE/4e0fk3yx/UTd5nDX1pns0rtQSurd98bP/4N0G1tlJd9+VHtuAJ3aFj4iOBXjjsXfjt/NexAj4IycmUsIxaFgTjnE/s86lzo10J+8IqtxjWVEmLdEVb1gSHlsLuIw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRPIiQjd; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2fc0bd358ccso7495510a91.2;
+        Sun, 23 Feb 2025 08:42:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740328968; x=1740933768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cC9XqKWpwoW6kaiQnMTAJRMWrDuUOdRDnNZLQfAjkgk=;
+        b=GRPIiQjddhJzUHQpYvDfou3r119xqd1cvidotyv7brVgIKsKxSBxFEK2Z5Erq4RFHA
+         1OZegso9ij4SjtTfpI7C2065u5Eh4oc6a+dwKqEQGHaqnBI9NISQ9kW4hFQ9shaw+Tl9
+         OaP7LYLPtTmSLDTME+qBh17Lkt93dhJsn6p2Snkt4DFuq1SjR0bPprABAAg/BI85eIl3
+         t2Z6xjWyKAUV+9LkHIPyro7+P8XBJF3p/Br2p1EdWFFxogs21zuF+YztoKLzcXY2TOhR
+         DaYWahcEmCIQWgBZSvPPNGQ0luNs6Jg+fB1jazhaCImRj4qbeD/F6c0kvi/kXLomdHUX
+         ukJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740328968; x=1740933768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cC9XqKWpwoW6kaiQnMTAJRMWrDuUOdRDnNZLQfAjkgk=;
+        b=QNEJgEqSDwAVwQ75959ZfU321gFfDPwn6hTmsDIpVEcnVeWItYo6XQpSLRmu67GY3/
+         BVrDF0XRr/PgYs14E1f+egTBou/SpWFgdFoUluDmBXSgXfza+Nn0L8t+5tEKAAVB8jWL
+         Cv7mPM7c0XlVvQp2PCXXHq4V6jlJSaAhD00zualj96NkVLNsaCEa481NxjoYAWrsJ3wv
+         7rchfkSWKLimizObNi520wfhBpLRq4J79iLC9bBVDA+ingRz9XAs6BmrUkGnNQjiXbhk
+         8WUkVDBpR6CEyEvoma5ptfmmPecAZVdRxnqixhnWPhiUbwIJqTxAxwVp6jRT2Dlj63kL
+         ZD5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV/uIRslZP3XFTb64BoITBN/aH7egPb39l0YVD2TrIyv6kAzcAJ3cPGpBPmPN2AAjbpVqUYW5mzir0uWT+Xppk=@vger.kernel.org, AJvYcCVJ+ub+8HtMnWObF0w6s0jI2LrrbpzjznlngYp60hL/AAHxufdzRehDCgTpSTMvVozXq9/UJmtBUEJkoYRD@vger.kernel.org, AJvYcCVvxWG0YLv4uPfejjPLiUsomQbNUEzwdIXj3kdbW7f4AA0schy1RBEDQGY8FO3Mv8VeXa5oTBLEgfyrfDk=@vger.kernel.org, AJvYcCWiQ5CWAFrTfyV4cMACS66w6WgFKconxcQbBdR+kTB1zMUbWwcMj5sE02BrO933YbjLMZk=@vger.kernel.org, AJvYcCXPc6wBUuVUrYMRYlAZlMmRCyrsdg1yOAy70ZQa0gnQ+8YeZZwOvlcOcgEOK7BEqka6ElFJi24i@vger.kernel.org, AJvYcCXbdrbSu62NN25npmuZGXb8F1RHS5K35Cj0Nq20FDmf7GYLSJfND8ADgWXvcWcdzVSTD8Yf4vStSXXNMNU=@vger.kernel.org, AJvYcCXt24Qc4P7Zseza7fNMKbJdkgOczuuUmdXOzYYpCJCIslMRY9BEj7UaI0JDDYfp/9ioqbBagHDXa9vN4tGr@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwL6DIdY9R8JbMPcjehOUNgMGx9nK9bJxfNGp6UroixcrJWb8o
+	ToziF6JBkkq0pO9R+BSqO1jdKLvkUTj/1N5KjjHDrbH8O9S/bHth
+X-Gm-Gg: ASbGnctyIKnOAOVAC5bT1M8kPs9AsXj/kDAmYLq7MnlVPoIXqlbPbDJku3d5U1HqPzH
+	B/1kU2nOuegqTQdXwbSaZrk1JOfFfbimeJNxIhk22j/eIlXmXST9CVV4JgukJv3+Mwa5lgn8kb0
+	78h4zlwBT7tdTScJBiv1/YkQ7AFD83ecqstQv7nR8/VifvoyFpFHTTcaheNp2ZT6O8EhQG1V0lB
+	H90Dp0VSZ+4+LabPAWPafuXOb+gxBsmsrV/awCKoyBn6M28xFBMnOKZhBUbkML6+gIRFNVbIIWT
+	pYSf33A8Ddl2TdjkPlYM1r3pzj3B6WikGkhj4+Fwz1RcWiQB8vVqzPk9
+X-Google-Smtp-Source: AGHT+IE9IoeqkqZm6OQjrr5kPJ0U3iRTenWYdpH7xXhEtXcp87aYt41gR2kUOpfxylsV56aTy8WbdA==
+X-Received: by 2002:a17:90b:2e44:b0:2f5:63a:44f9 with SMTP id 98e67ed59e1d1-2fce7b0acaamr15072669a91.23.1740328967814;
+        Sun, 23 Feb 2025 08:42:47 -0800 (PST)
+Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb09f6e0sm4935080a91.44.2025.02.23.08.42.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Feb 2025 08:42:47 -0800 (PST)
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	jk@ozlabs.org,
+	joel@jms.id.au,
+	eajames@linux.ibm.com,
+	andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org,
+	rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	tzimmermann@suse.de,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	dmitry.torokhov@gmail.com,
+	mchehab@kernel.org,
+	awalls@md.metrocast.net,
+	hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com,
+	richard@nod.at,
+	vigneshr@ti.com,
+	louis.peens@corigine.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com,
+	arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	yury.norov@gmail.com,
+	akpm@linux-foundation.org
+Cc: hpa@zytor.com,
+	alistair@popple.id.au,
+	linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com,
+	jonas@kwiboo.se,
+	jernej.skrabec@gmail.com,
+	kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v6 6/6] vhost: Add check for inherit_owner status
-Date: Sun, 23 Feb 2025 23:36:21 +0800
-Message-ID: <20250223154042.556001-7-lulu@redhat.com>
-In-Reply-To: <20250223154042.556001-1-lulu@redhat.com>
-References: <20250223154042.556001-1-lulu@redhat.com>
+	linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org,
+	linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org,
+	jserv@ccns.ncku.edu.tw,
+	Kuan-Wei Chiu <visitorckw@gmail.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: [PATCH 00/17] Introduce and use generic parity32/64 helper
+Date: Mon, 24 Feb 2025 00:42:00 +0800
+Message-Id: <20250223164217.2139331-1-visitorckw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,35 +140,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-The VHOST_NEW_WORKER requires the inherit_owner
-setting to be true. So we need to add a check for this.
+Several parts of the kernel contain redundant implementations of parity
+calculations for 32-bit and 64-bit values. Introduces generic
+parity32() and parity64() helpers in bitops.h, providing a standardized
+and optimized implementation.  
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/vhost/vhost.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Subsequent patches refactor various kernel components to replace
+open-coded parity calculations with the new helpers, reducing code
+duplication and improving maintainability.  
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 45d8f5c5bca9..26da561c6685 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1017,6 +1017,13 @@ long vhost_worker_ioctl(struct vhost_dev *dev, unsigned int ioctl,
- 	switch (ioctl) {
- 	/* dev worker ioctls */
- 	case VHOST_NEW_WORKER:
-+		/*
-+		 * vhost_tasks will account for worker threads under the parent's
-+		 * NPROC value but kthreads do not. To avoid userspace overflowing
-+		 * the system with worker threads inherit_owner must be true.
-+		 */
-+		if (!dev->inherit_owner)
-+			return -EFAULT;
- 		ret = vhost_new_worker(dev, &state);
- 		if (!ret && copy_to_user(argp, &state, sizeof(state)))
- 			ret = -EFAULT;
+Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+
+Kuan-Wei Chiu (17):
+  bitops: Add generic parity calculation for u32
+  bitops: Add generic parity calculation for u64
+  x86: Replace open-coded parity calculation with parity8()
+  media: media/test_drivers: Replace open-coded parity calculation with
+    parity8()
+  media: pci: cx18-av-vbi: Replace open-coded parity calculation with
+    parity8()
+  media: saa7115: Replace open-coded parity calculation with parity8()
+  serial: max3100: Replace open-coded parity calculation with parity8()
+  lib/bch: Replace open-coded parity calculation with parity32()
+  Input: joystick - Replace open-coded parity calculation with
+    parity32()
+  net: ethernet: oa_tc6: Replace open-coded parity calculation with
+    parity32()
+  wifi: brcm80211: Replace open-coded parity calculation with parity32()
+  rm/bridge: dw-hdmi: Replace open-coded parity calculation with
+    parity32()
+  mtd: ssfdc: Replace open-coded parity calculation with parity32()
+  fsi: i2cr: Replace open-coded parity calculation with parity32()
+  fsi: i2cr: Replace open-coded parity calculation with parity64()
+  Input: joystick - Replace open-coded parity calculation with
+    parity64()
+  nfp: bpf: Replace open-coded parity calculation with parity64()
+
+ arch/x86/kernel/bootflag.c                    | 18 ++------
+ drivers/fsi/fsi-master-i2cr.c                 | 18 ++------
+ .../drm/bridge/synopsys/dw-hdmi-ahb-audio.c   |  8 +---
+ drivers/input/joystick/grip_mp.c              | 17 +-------
+ drivers/input/joystick/sidewinder.c           | 24 +++--------
+ drivers/media/i2c/saa7115.c                   | 12 +-----
+ drivers/media/pci/cx18/cx18-av-vbi.c          | 12 +-----
+ .../media/test-drivers/vivid/vivid-vbi-gen.c  |  8 +---
+ drivers/mtd/ssfdc.c                           | 17 +-------
+ drivers/net/ethernet/netronome/nfp/nfp_asm.c  |  7 +--
+ drivers/net/ethernet/oa_tc6.c                 | 19 ++------
+ .../broadcom/brcm80211/brcmsmac/dma.c         | 16 +------
+ drivers/tty/serial/max3100.c                  |  3 +-
+ include/linux/bitops.h                        | 43 +++++++++++++++++++
+ lib/bch.c                                     | 14 +-----
+ 15 files changed, 74 insertions(+), 162 deletions(-)
+
 -- 
-2.45.0
+2.34.1
 
 
