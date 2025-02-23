@@ -1,126 +1,154 @@
-Return-Path: <netdev+bounces-168861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3868AA4117E
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 21:17:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD8DA4118A
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 21:26:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 996DE1894F07
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 20:17:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 550DF188CDD4
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 20:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C3123770D;
-	Sun, 23 Feb 2025 20:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D4623A98E;
+	Sun, 23 Feb 2025 20:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANC+MySE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOwLQwd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C312155327;
-	Sun, 23 Feb 2025 20:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE615383;
+	Sun, 23 Feb 2025 20:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740341839; cv=none; b=PUcDoLRi8oLGLdYPEMA9VSso4fGzKRw7tup00TcGE6gvBaEO2JcjxWtlyZgZkirUn8RyVtQT6qsw8EcSvNgQtPdA/GGMEUVmUYPFZqcaLpah+ZaGvCgk8mS1HRf9XQSTGPBgYXP8qX+0c4HMW7vsPYhY8ss8qrEDvpxNKbYRqyg=
+	t=1740342349; cv=none; b=CsZnXysJimq0Im4hj7scGdMUYV+Bapyup4UAQTfewh1BX6Yf/ipwMR/Ye0j5YQM9grqDXgIAy91cSC4vRLQ37qThiB/oI6Q0S6vxUFjZi2F4ir6ZmONU44vS6OHNIshElNF2aUca4iwofiTIcYsU2Nnaq1bvTI7aWfTP47ylOpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740341839; c=relaxed/simple;
-	bh=Lcz9oIvIMtu0OBEbeURtBLsHVo3py6JmyZZ3rHW7W0o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MqGLpDIBebkIeQvozn4KTCrISMS6tTA+YG5+F6DmDWvdxUfRRPZpQdypIEh3DSo+DEF/HHtn62yn6dO5iuAzVS2K/aSlNGBhLuHZgoFb/ZgFQgj1hb+sVosxsHiTPGHtwXJR7VD5r8uq/ze84DwxX6naEZxSjfDgHOfJD/T7n+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ANC+MySE; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1740342349; c=relaxed/simple;
+	bh=3yjKIYgRIOVvhYFiwNZ7Mv6DvekS5KCI6HkyIkBNqjw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QhN4QEcKdBlbi7g+pYMdRaB2VGCMXPGsuVMp3me5tKXOmjS3YBQCvb31XvxhZ3sgWV8R8vX3VDxNWiDsyPpmY1SN4zEzSg+lSjzaqZ+Rlr9xBf+KIeUo8PoibqpV6TfIv4rpEAtLKjVoN3XeN7lBMid62VMngiCdPLgtXv+5gEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LOwLQwd0; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e44fda56e3so37589276d6.1;
-        Sun, 23 Feb 2025 12:17:14 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abb8d63b447so476933466b.0;
+        Sun, 23 Feb 2025 12:25:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740341834; x=1740946634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/8ZnynSf18TQjdyqnQ5CECi+H03cXqzc3RLft7bPUFk=;
-        b=ANC+MySEfPw2uJu2y97ojgFt+DLT+peaWbIdbRk1ZM7mhNeecDL6CfaImDOJl9uM4q
-         yUbf9qLTIn9L8H4yGwN2YFxXfMWVCePIKk/uzyXf6g1Atb0BW0fxCppmYvV/13V5D5Pv
-         iqG79la0e18Iwfe/iHihiJ8CvylFYoYWnzwYztYbHyVPUq3R9bczXbNCssRZ1TH36xLC
-         YGRbhDp5xjXkGVmGLhxURHM2WhLQje/LBmZI3t2b6RqQVDB1Xp7X0b+LFhB+5+gRTNk7
-         Ip+I+WJXqxusBuoZ6gHBfmZq81enXk9E7X3Gk0Iw7p+nl9RIp0ZRn73Ugk4heT/czSdz
-         OVjg==
+        d=gmail.com; s=20230601; t=1740342346; x=1740947146; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KO/NRoKuG8XetnuWE85hFK1fCgTrWENxYrVqAq/LSbo=;
+        b=LOwLQwd0M8LRhLR7CcdbRek0krkmzr4tJ2xMBNYOiJImX6w/9xk+SWXv2lSAOrwWdd
+         +oV8Ka9/OSvR/smJVHjO+p6LLiWnOxrcxobJGgqT/ER9HCHJCswk/NYshODNR3V2whqY
+         +8W0IGn1fNlSBzUyCXGrtj8lLxIti1Fii0qL5pgmgqzPqlqvh8iiDbyoTTfD4inQCUDE
+         diRinKyaElCu9NuYDudVMVYg5XriQOePiCdjbPcPxEgPsrPoxeiTeFx1cLG+5gnV+NGz
+         ZYiJ9LkTd5YWFNMt0jyy3BBCxbVxYA6Win+o6Z3ku9nt/VTaUo+l8OCfMa3MhPxj/fgn
+         HxSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740341834; x=1740946634;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/8ZnynSf18TQjdyqnQ5CECi+H03cXqzc3RLft7bPUFk=;
-        b=TmpYOVLkDLag4cm+1w2Xl33Stx6VQa/zFpULnvRXHHvL3Tevmh+AFHtQLBMdPdZoV6
-         +9Ql2nWfE9D77kBgPGwAyenob5L27ZY0ytdeF1gbHdJT3hmpyODRFB9Ad+qwkSag4vUw
-         lbPRUM7BgEaodEX5FQptwVxvmXHZaJqAA5mR/CoDggXHd5VxJywtmM5M8tQvrl17Ch/l
-         ZC7xaiqWCWuDcTtR4/FtAe816qLw8Pp54YSDNkj3y4TGdbJlS0CCSAERM6j5S1CyJ2zs
-         8PXaZvp6Zzeeq8wbfubmN4CVRg5UCwVqOldyLww4mRl8KRmmcQ569upYrZ0eLNfjR54x
-         7Dig==
-X-Forwarded-Encrypted: i=1; AJvYcCWZamwS/O2k0fCL0vWbKirjf+Nvt+jAwgxaZe8HccY5ZY1h50cx0fybys7LgsfSyu5+yJZsILQ+@vger.kernel.org, AJvYcCXyoYkhOHhiAfPXnsiOcEc8TIQcsIFJWAMFTJhCVFC+ot9CQ2D4l3FD2g5z2xE6ainUj31Q9fJzAJux8Zg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCzWBxSJRjVohnbNN1ummxrLRI5zNo+1NxOScP2zvMK+JvrpNP
-	/i+MlAgale6mmtytRu4zO//bNj/0ONjn01FM3TZiMRnC9SYckGWQseqEcA==
-X-Gm-Gg: ASbGncvW/3RMgq/5WfEu0iiJuoM67N3Dg+wS/8viUW6sCDRZ1jvPzg8IfEEQ1qrScGv
-	WVzaZcp7y/N03yBH5dehEy+kZtwEdmjAAOcxoLTwpvXHzku27hkGs8zaaU2LCRRBnZSbcDwbMqK
-	PVUzON2uoPzT5lxUxcFtVT+ZXccDde0v1GlylAERwQB98/6WZBm0sPloUmH36E0KIxB9lGM576Z
-	BiF3f4YjGQU6BYBorhE26PnMkqgnTgnP3ENW05rgmd1knVOs6+3gopJGhq7UebSHEMC9DZc3AiO
-	IfaeqG/WQl2Q6Dp5uMQJAAiRBmVuhcCNGWrFTaYAgAHz50AZ
-X-Google-Smtp-Source: AGHT+IEAD1BHa1kewHfO0OtMm6kfhsPzvnxmiAMaWzuqtLlP5DmMQ9O2gvT7ceYLImmvtpDklDPmvg==
-X-Received: by 2002:a05:6214:19ce:b0:6e4:2561:48a7 with SMTP id 6a1803df08f44-6e6ae8628d3mr154661636d6.17.1740341832577;
-        Sun, 23 Feb 2025 12:17:12 -0800 (PST)
-Received: from newman.cs.purdue.edu ([128.10.127.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d779332sm124942036d6.24.2025.02.23.12.17.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Feb 2025 12:17:12 -0800 (PST)
-From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-To: vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	jan.glaza@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jiasheng Jiang <jiashengjiangcool@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] dpll: Add a check before kfree() to match the existing check before kmemdup()
-Date: Sun, 23 Feb 2025 20:17:09 +0000
-Message-Id: <20250223201709.4917-1-jiashengjiangcool@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1740342346; x=1740947146;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KO/NRoKuG8XetnuWE85hFK1fCgTrWENxYrVqAq/LSbo=;
+        b=FEcMpsoB/YjPSJL/M8nU33bxsFYnJ4L0Njc5eO3ovOCE95qUVI4Ps9B6XhHfSm9ud/
+         Mdy3UJiUmvmi7GWVn7daI7ZXqVt+6Me8lzoNMt6EWad+TPyykVpPmE2gxpjHyqqOT+Or
+         /0YRexageJZNdTa1TzoWIGJyYyu85H00mf65zdEWuQdzVztDz/T4TLvWkRXHltAIK95N
+         lwgBkwjDI9q+3UslhtrU92jgesR4oe5lmQxR2n+MISUF8ZXO4tvNpz3+981RMyRRpCsU
+         ATiRiWhULJF+k592zBZOidbtG620IK5vpqzqUsG62iqZpE3qZxk3zbe37IO3Y32p/gHj
+         cVEA==
+X-Forwarded-Encrypted: i=1; AJvYcCURD/9W5PNUNUfDY6kS5p+l6AJhLr6eOWdJq2md2Vd+xP++U3s0BO9uruUmugsv8dScpTk=@vger.kernel.org, AJvYcCUfsxJjD0AKVL4HewWtKJjpWJGjl7fR1JGDixrQzBNuSDH8RpoQXxYPkbvjK5pBNxnTzwh9PjEyjJ6tbJl1@vger.kernel.org, AJvYcCVNSWNYm8c3auuvf/MlifN1yRiDZA+sXjhLFyPlOnv5tqTC6+Bah8DqWL8qiVUC8CnPfUoUKn/A@vger.kernel.org, AJvYcCVWKRcXyzwQgUBY0ybWdJRZfRHY2pOmd+036ROFck6H/gUsWIwi1DWLkblOI7bWmhzCW6b74C/D/igXO+1GzFE=@vger.kernel.org, AJvYcCVXhQpKQJXjw5/Nm98L0v2S+r44NM/dOPxdhe9Gk5u6SC8qe63KgRaBbWRzHVSFLmFZcxlzs+3DI6RwdT8=@vger.kernel.org, AJvYcCWoiN1r0NC84EsXeCwSlXdpJA3cbW4m5zhznSUnqZx40tJuIaQr272adQ+mjH9ecb8dvQmm56MZRfbxYKs=@vger.kernel.org, AJvYcCXno489TQCns5mk3gcEqf4Di9Sryzgl6r5DxcMmMi1lASdDvz7+aMrg+3e3OfZiI2e4WGZPJRQVRltOS8MX@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEmtkMoYXyOxiVQDQ+wtAsYE2k2emxAprGVKGxhDcHurqhYhfi
+	gcEjXxykNuN3JjkYHFQ87qbR2yEvcz0btKApnZOD7UT22XEYlbCi
+X-Gm-Gg: ASbGncugjrP0Ab07AZ+biXLJg7mpalkI1oW6K4jW58XRfbzi8ip+GfkclXYgXQ0RlCF
+	zCV5gRPkyDQEbsZKSmY1+QP87APkECxPm+AHtPc0sGp96n2lt++TPZso1RJuXFezDBVvKW/55ZX
+	Hkors6FSNxjvQYp3ZEiEPkgoiUTHYBhq4geGOTnZwsVAu4bf9Ep4jBOhDemQaSjxy7jsq/XJNCd
+	6kOP+ww4S070622LbQd3/6b9GthnCvAGftvACbKHy1nkR26MxZlM1tUq5AM49vgzqcHeSOlI6Nl
+	39joOLi/kd4RcJb+0YZX1i8pISE=
+X-Google-Smtp-Source: AGHT+IEASkBZDUs2HV66FfbppKxrXfiPEOQdWl35/1TkX9MbOUwdnZRhQOYUiSPPWnjZ/EnkcBUtNQ==
+X-Received: by 2002:a17:907:1b26:b0:ab7:be81:8944 with SMTP id a640c23a62f3a-abc099b88ccmr1174431166b.6.1740342346244;
+        Sun, 23 Feb 2025 12:25:46 -0800 (PST)
+Received: from [192.168.1.100] ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abbbe74100asm1142813766b.95.2025.02.23.12.25.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Feb 2025 12:25:45 -0800 (PST)
+Message-ID: <602e03fd-ce4b-feef-5053-e95834ab35d7@gmail.com>
+Date: Sun, 23 Feb 2025 21:25:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 00/17] Introduce and use generic parity32/64 helper
+To: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
+ andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, simona@ffwll.ch, dmitry.torokhov@gmail.com,
+ mchehab@kernel.org, awalls@md.metrocast.net, hverkuil@xs4all.nl,
+ miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+ louis.peens@corigine.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, parthiban.veerasooran@microchip.com,
+ arend.vanspriel@broadcom.com, johannes@sipsolutions.net,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, yury.norov@gmail.com,
+ akpm@linux-foundation.org
+Cc: hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk,
+ Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+ jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+ linux-input@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+ Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250223164217.2139331-1-visitorckw@gmail.com>
+Content-Language: en-US
+From: Uros Bizjak <ubizjak@gmail.com>
+In-Reply-To: <20250223164217.2139331-1-visitorckw@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When src->freq_supported is not NULL but src->freq_supported_num is 0,
-dst->freq_supported is equal to src->freq_supported.
-In this case, if the subsequent kstrdup() fails, src->freq_supported may
-be freed without being set to NULL, potentially leading to a
-use-after-free or double-free error.
 
-Fixes: 830ead5fb0c5 ("dpll: fix pin dump crash for rebound module")
-Cc: <stable@vger.kernel.org> # v6.8+
-Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
----
- drivers/dpll/dpll_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 32019dc33cca..7d147adf8455 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -475,7 +475,8 @@ static int dpll_pin_prop_dup(const struct dpll_pin_properties *src,
- err_panel_label:
- 	kfree(dst->board_label);
- err_board_label:
--	kfree(dst->freq_supported);
-+	if (src->freq_supported_num)
-+		kfree(dst->freq_supported);
- 	return -ENOMEM;
- }
- 
--- 
-2.25.1
+On 23. 02. 25 17:42, Kuan-Wei Chiu wrote:
+> Several parts of the kernel contain redundant implementations of parity
+> calculations for 32-bit and 64-bit values. Introduces generic
+> parity32() and parity64() helpers in bitops.h, providing a standardized
+> and optimized implementation.
+> 
+> Subsequent patches refactor various kernel components to replace
+> open-coded parity calculations with the new helpers, reducing code
+> duplication and improving maintainability.
 
+Please note that GCC (and clang) provide __builtin_parity{,l,ll}() 
+family of builtin functions. Recently, I have tried to use this builtin 
+in a couple of places [1], [2], but I had to retract the patches, 
+because __builtin functions aren't strictly required to be inlined and 
+can generate a library call [3].
+
+As explained in [2], the compilers are able to emit optimized 
+target-dependent code (also automatically using popcnt insn when 
+avaialble), so ideally the generic parity64() and parity32() would be 
+implemented using __builtin_parity(), where the generic library would 
+provide a fallback __paritydi2() and __paritysi2() functions, otherwise 
+provided by the compiler support library.
+
+For x86, we would like to exercise the hardware parity calculation or 
+optimized code sequences involving HW parity calculation, as shown in 
+[1] and [2].
+
+[1] https://lore.kernel.org/lkml/20250129205746.10963-1-ubizjak@gmail.com/
+
+[2] https://lore.kernel.org/lkml/20250129154920.6773-2-ubizjak@gmail.com/
+
+[3] 
+https://lore.kernel.org/linux-mm/CAKbZUD0N7bkuw_Le3Pr9o1V2BjjcY_YiLm8a8DPceubTdZ00GQ@mail.gmail.com/
+
+Thanks,
+Uros.
 
