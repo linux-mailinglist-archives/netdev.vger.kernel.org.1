@@ -1,105 +1,119 @@
-Return-Path: <netdev+bounces-168824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABCB2A40F21
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 14:41:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39026A40F45
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 15:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50C577AA109
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 13:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D851189363E
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 14:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E6520766A;
-	Sun, 23 Feb 2025 13:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728B2205AB6;
+	Sun, 23 Feb 2025 14:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oBlq8azH"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="4EeOOFLX"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A268205E31;
-	Sun, 23 Feb 2025 13:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CB4163
+	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 14:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740318056; cv=none; b=tpHOAIbuau7V45JTNMW9d047HQn068giE64GpmymOoFqExy8vGOHn3NpdOgFnAHUVw0E7YQwNd/nf/CXnz5GUELCl29jGqxUQZxasjv7G/OKwMxyts246QtAtPJhaVFYVWRYxmYgZCa9mnpqvjzG+k6v16w/NWUNAP7zdurVtH4=
+	t=1740320987; cv=none; b=KV99JZBckFbkrsqTBQZz/vjVT5YAqqT45A0RlyeG0tChxT3RCB9V5DUk9A8HEPZIEhMmE9Yn//qjx3TlT5dlvkJgqZclodF0vgRxfZKbfDob2SsG/AB5h2DAfmD1s0KcC1z6mvqwd7Dn7M6Y8OwhBN+ww5Y8uiRmulTZg12MFSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740318056; c=relaxed/simple;
-	bh=hcf7+7C3MEhs4rmBsctVJxr+hv1xZgTKJoSQHXSsCz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WV0D8lQZ7Hd4npYIfgk3UhS/GCVH9g+RnbdxNracDuJoaJSTfVA+AS2uICpGQCDNd0CdZITV/wPpOG5TzX3SqeMTlk/x4J8btn8gDPH7fVta7MZuHaYPQflQoBvnfW2lQgZrashtTxBM6cy465yIIxv4mqPmCfVvxvN3hh0bpvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oBlq8azH; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D908844388;
-	Sun, 23 Feb 2025 13:40:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740318045;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K6bIJuULWhsZxJCwa0hMVmk2iWw7cX6L/3fW6XmaZJY=;
-	b=oBlq8azH+BF3Jjf44h2fXFP4YWqwNaegZtOSOGTfSqIOT1AFfSfYqFmyz5BobJH+FtwYxX
-	7rUdaZtPc/VvY69ZzMXGzrvYXIwY2/SSLKHiIIchfSsW1sRCgkLv2NAQuQ8bMTw2Y+g/0r
-	WoTcPJ5UU2/7+qzv/EsMrNX0aohLiMbKuVMkn16JUdTb5jQwX3VQL6ZTv1dl9vl3DsdfAu
-	gcIZy5TWsnQU1dUPVNKhJiwHoutc5YyMTCH3KwfwUFaSUF0tVh7/lr4Rt035QzlGD5jdgQ
-	ioXiVTa6R6kIl+KSX1yjoJJYSPXoBm3rhqwgPtbU3jB1X0wM22iqVIuDVHTkUg==
-Date: Sun, 23 Feb 2025 14:40:41 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: kernel test robot <lkp@intel.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, oe-kbuild-all@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 08/13] net: phy: phy_caps: Introduce
- link_caps_valid
-Message-ID: <20250223144041.1bf253ca@fedora.home>
-In-Reply-To: <202502231409.QTfXTqrD-lkp@intel.com>
-References: <20250222142727.894124-9-maxime.chevallier@bootlin.com>
-	<202502231409.QTfXTqrD-lkp@intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740320987; c=relaxed/simple;
+	bh=N9eYfn2zn9bHh7uK3ZU9xbTbkTkqKFJE5iIHBeiZWyw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fwf6HIlHn6hFZ/8s4ZqCCYHX5GsboISwERBHy9TEofOZvZsodKNNpfcRf/2mk32Lx3BeCtMPk8kq89bjElxgj/sBFDf/N5jCMAjNvZdbqZ3T3WKHbMp7HGohfkLN/eAH1IsHOx/Bbergga3rejHbFq7pmiJVT18IMg77OXjp1Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=4EeOOFLX; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5C7221140141;
+	Sun, 23 Feb 2025 09:29:44 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Sun, 23 Feb 2025 09:29:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1740320984; x=1740407384; bh=WC5+Wt6Y2zwG4QUlmEplEm8BOPI04Pmx396
+	1hisxzGs=; b=4EeOOFLXdonpqxb2wQ+5ahsvSc8Uol1/fddofg+XpoXMLun41YP
+	N6tozDv+4qxyYUPpYe0THg3X1wWA5YqPR4PAA9zMXpOEiZxIaKEdNeFX4piNipJl
+	kibuPVR4poS9f+G/M91guurJWbvsnwmVW1jwK7v/kV7KGkVW2Ja9wFHjVmhUlj7P
+	FdeTL/5T8+tqT9rmjqKOrTtySPRAhsr+YCHCUtNYIF/mhK64pYd5SkyRa1OvY3Xf
+	/q+zmdZJw2Du1KAAE/vGv3OIOvToGD0IpXxKaIX3xgcPSKQI4BE/FklYJFuuUgWb
+	Wbyh7uHjmAwP7uOzS+KwG81a/tkte4Om5gg==
+X-ME-Sender: <xms:1zC7ZyAgJp0zpWF_3VG3V1NKGmawiuSl_qJo5aVHZGYWdtQiyPHaNQ>
+    <xme:1zC7Z8iJjs_bfyeC608DttK2R3lDDljcU-be-oX0vQRDvwnqi_ePYRJmG7YnRdLee
+    nuNfMYEnadOaJc>
+X-ME-Received: <xmr:1zC7Z1myOttygyp6YXaUrG8gY9phdf842PtG5QZyAVGlJbZTrux75wFc8UVU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejiedtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpeejgeejhfffiefggfehveefffetkeevkeduueeh
+    ieeiudelgedtleelteekvdefkeenucffohhmrghinheptghonhhfrdguvghvnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehi
+    ughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpd
+    hrtghpthhtohepghhnrghulhhtsehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghv
+    vghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthht
+    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegrnhhtohhnihhosehmrghnuggvlhgsihhtrdgtohhm
+X-ME-Proxy: <xmx:1zC7ZwxSKfHXyEXRG8801JddgvrwEZ3o5JRIbbduJMpD0eqTFbSzjA>
+    <xmx:1zC7Z3R7ohUWelbAShIDIJ4tdUjcoGkwpyZtJD9txEABJKnMDUNeJQ>
+    <xmx:1zC7Z7Zk7xjBJTD4r5e-gRD3uToKIiGzp7J4wen7pC5bY73-NdtGGA>
+    <xmx:1zC7ZwT3ztBtvs0h893p5P_2XEzho_2BpbdU_sWHpr4nJDOjxDxgXw>
+    <xmx:2DC7ZyHjToddmfBR3v1OTXGcAIza8wUWQUPj8WsN_JCjZ8SEjlllkTlQ>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 23 Feb 2025 09:29:43 -0500 (EST)
+Date: Sun, 23 Feb 2025 16:29:40 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Antonio Quartulli <antonio@mandelbit.com>
+Subject: Re: [PATCH net v2 2/2] selftests: Add IPv6 link-local address
+ generation tests for GRE devices.
+Message-ID: <Z7sw1PPY48pkEMxB@shredder>
+References: <cover.1740129498.git.gnault@redhat.com>
+ <5c40747f9c67a54f8ceba9478924a75755c42b07.1740129498.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejheeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvuddprhgtphhtthhopehlkhhpsehinhhtvghlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgesk
- hgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5c40747f9c67a54f8ceba9478924a75755c42b07.1740129498.git.gnault@redhat.com>
 
-On Sun, 23 Feb 2025 14:38:46 +0800
-kernel test robot <lkp@intel.com> wrote:
-
-> >> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'speed' not described in 'phy_caps_valid'
-> >> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'duplex' not described in 'phy_caps_valid'
-> >> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'linkmodes' not described in 'phy_caps_valid'  
+On Fri, Feb 21, 2025 at 10:24:10AM +0100, Guillaume Nault wrote:
+> GRE devices have their special code for IPv6 link-local address
+> generation that has been the source of several regressions in the past.
 > 
+> Add selftest to check that all gre, ip6gre, gretap and ip6gretap get an
+> IPv6 link-link local address in accordance with the
+> net.ipv6.conf.<dev>.addr_gen_mode sysctl.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
-Ah indeed, I'm missing the kdoc description here.
+There are some helpers from lib.sh that could have been used, but the
+test is very clean and easy to follow, so:
 
-Meh and the commit title should be :
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
-	net: phy: phy_caps: Introduce phy_caps_valid
-
-I'll wait a bit for reviews and fix that in the next round.
-
-Thanks mister robot,
-
-Maxime
-
+Thanks!
 
