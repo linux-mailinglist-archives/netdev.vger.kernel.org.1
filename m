@@ -1,144 +1,169 @@
-Return-Path: <netdev+bounces-168806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36592A40CFC
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 07:39:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D587A40D45
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 08:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 775CF7AB018
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 06:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C45E3ABBC1
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 07:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD61F1CBEAA;
-	Sun, 23 Feb 2025 06:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 076D41FC7D5;
+	Sun, 23 Feb 2025 07:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDtaXut0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J/G3YDKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EF4156F41;
-	Sun, 23 Feb 2025 06:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DEB1DC9AF
+	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 07:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740292758; cv=none; b=SSEIPxBO9wsPCkHq8BgQbC+5/yoPqfo1jHfhT6aGdXmBS67Nk/mXy1C9jfFWxikO4ZzXeB0QInB4AVsqd5JVmLbC4StS7r685d95j8nYPTlAqu2Dm/hIjwsgGQvkBM9k+4aEYDBRWRXprZPZtxemkZ1A59SY4OtK0pyGSE9/vk0=
+	t=1740296224; cv=none; b=ojLLH2o47Deykoyjne0kPLZNEid1yWwqZdFtIECEt4NetltUJkJPvOR0SJd2mrjgRKYUaQLaLQhTjJJAICUsW/IaW6dPttaFruuZH3zNGV+spyq+sy/sx6EMgnUp8NOTsjgBz1blIyoCQT9/3AjFzQMhFofUJ5oFJOlT86cMmAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740292758; c=relaxed/simple;
-	bh=I+4KPvRzypPtuDrJMCOOp4HSPrPDgHBgGBkD6P6VHUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u2iJvnF9zyU3zdz9GfiFACvgl5zs28oGBf//ULYS7Q8kMHLE2Wp+Ha3MIHpTpnkVsQiaJYC/IFsxFVVgJVOLXRsg+gbAJuFelhEqrxL+D75fpvxTBzI/Y0DrsSp4USy/yrE4tpD5aHkLcZcJl5F1gsb/lCkEA3ITDvxNKw/K804=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDtaXut0; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740292757; x=1771828757;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I+4KPvRzypPtuDrJMCOOp4HSPrPDgHBgGBkD6P6VHUI=;
-  b=LDtaXut0yFZzr0DFoGMduGECsxn21PFszWURTI4IMCiPngIzlHJqL2qm
-   2c91xkuH0orN7la+sUWHwYwjdDS+maFbKNy54IeR79X0SUlT9EKyeuddI
-   o2sVIPTgodYHv66oKxQssGKDsMHtD1+LiZF6MsFxU+koqxYXSjhnapEuf
-   /V2F5r1RhbYaJj3lRnYliuqUrMev5iUviumhPc2pfgwR9T7drtsCUZS4C
-   pRuxxbRerpIlBzqqRFKvA3praAYyHVsHVX26lzZXh/GJ4hUBeKeWjevl0
-   A0YC+Vg5dIUePbNHqJtMxojh1E6udOML/j7m6lBgLWQH78MTfmADd8u8z
-   w==;
-X-CSE-ConnectionGUID: dH928nDoSxOqM4521yTauQ==
-X-CSE-MsgGUID: deh/3TVlRTCiiYkV3TUraQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11353"; a="44849615"
-X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
-   d="scan'208";a="44849615"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2025 22:39:16 -0800
-X-CSE-ConnectionGUID: 5uG0uvraSIuqsYe9IW/NcQ==
-X-CSE-MsgGUID: ia23rpyKQ7SEVYI3PsLXiw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
-   d="scan'208";a="115719579"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 22 Feb 2025 22:39:11 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tm5ds-0007Al-2M;
-	Sun, 23 Feb 2025 06:39:08 +0000
-Date: Sun, 23 Feb 2025 14:38:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 08/13] net: phy: phy_caps: Introduce
- link_caps_valid
-Message-ID: <202502231409.QTfXTqrD-lkp@intel.com>
-References: <20250222142727.894124-9-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1740296224; c=relaxed/simple;
+	bh=wErTi4756Ynjumj/XyH5jU6b8LO5JVWVPhoAX6mvnDw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FDo022sJyGGlK8RfWi1jnfc5rQiD4vwLxcPv9cu6DHStaqBADOmmw6dzi6CWPK1jK+lsBQ87yF1ajUKq9eZKzVu6m1jALoBIohYJ9uw90exzsjtX7le1uaQSx4OzR/4llbS3KtNvUJELbaVRYjn/EaYRO6axmEgRwn2FpMLL8Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J/G3YDKc; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5dca468c5e4so6156311a12.1
+        for <netdev@vger.kernel.org>; Sat, 22 Feb 2025 23:37:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740296220; x=1740901020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N8goVZQ95WyGU+2ZEZvM7AhD/4mdcpJhd77dwy4JYII=;
+        b=J/G3YDKc+cBEN5MuNc8YHuqVDkCwzGd6Lrm3pwLKpkBSGvitkDrNjNxvoy8LD9/g5k
+         yhsQtBy+evGNk3T46/m/ZVez9guOyIWad5PIqBySQ1vqYv5dDIlzaSvNcWEuWdD9t/vP
+         pYHrAFIExKztEg1/x8PcwggU13Us7pp1swxjupMXp2+hYP3y4IbtB4BxEj6kZTRpJuXN
+         viaIevm+pMoohrDOfqaywaIhMiKrhTiHWcjgtX/7TFQHj3xeTs1VnAk+/vug4lX58Ew6
+         rm8slWkUx2fm/fpLGBOn3FYMQ4D3XzmJaj/tQ9CjzIsHFDy14+n1qn6dNftYad91JjII
+         fNVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740296220; x=1740901020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N8goVZQ95WyGU+2ZEZvM7AhD/4mdcpJhd77dwy4JYII=;
+        b=meA1UZXFkMldF5t9PVPfil6kG4XAzabBrNxj3NJM+lELzMf/iUbO1ZrxoTU3hZwlIZ
+         m46tr6yTZGvsgayvBII6DU6WfN5j392MvS7sNg1xhuONWcIzkBz0j7Y1yYEy9P4biEcw
+         WUmHsPTaFnMR5Wknz3ZeWMu1wbGDBJ9C89ttf0jj1a8qIuMzEqHD98i2p2aSZfpWVGDQ
+         CG9zNm+9Q/Dg2jyPXKgRcGth5OdZRhljN16gydrPajLNB/KYb7DbLOnQfgG/Zmp3bVfj
+         dFERqxM3zTdJjgpGoconAjuRUKdJCL28NOtAp33bCdmZgp1Kqc/T4EVhqnb1bShX8qjP
+         +QYA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0b7d2WgA0WsKrQ+5HakZSQzBhx9AIUhP1JwAUxMrTVw4HtZ81To5JPgqrycl7bWCVuFulQVQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHJsON9nGjT+L6Q/T1pcjMK1FS6HT6j433nHXnswVi6N7lrKZC
+	kJj0+v5+gFVF+8eK8AmvATfKpi5m11BiKhL5mTDuEOvIu4CKYC/lT1rA+4VgepKJotN9Z4DmIFC
+	/XOgXWG46dHqu6AI2bvuCZK1vF9iXjum2Abbv
+X-Gm-Gg: ASbGncugY8+zRzhA5nDecl3Rj6XN1IH+vQCrsQ7QksnxrHSsN5/yqrrvxq9dyvbGg9u
+	LsySDX+pO2pkBpH/n61RQMBgqszyMN3vjK4/11SUgzhhpIWMA5qkO18Xm8zEPXYB5uo3Y6W7vbr
+	CHHSYrdK8=
+X-Google-Smtp-Source: AGHT+IHJAHo6n65GT48nDSDcLG1tHqaBenUUdZAbJqEJkFd2nwDXzXtAB6KeYT9LB2o8SHPWvs+dT8ECCdua9bOGGL0=
+X-Received: by 2002:a05:6402:1f03:b0:5e0:3447:f6b7 with SMTP id
+ 4fb4d7f45d1cf-5e0b70e4cebmr7543654a12.8.1740296220091; Sat, 22 Feb 2025
+ 23:37:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250222142727.894124-9-maxime.chevallier@bootlin.com>
+References: <20250222103928.12104-1-wanghai38@huawei.com>
+In-Reply-To: <20250222103928.12104-1-wanghai38@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 23 Feb 2025 08:36:48 +0100
+X-Gm-Features: AWEUYZkKvGc5WMjNlOKJij0qTrmTigftM57iXQWpByQ31Fz6enSlI53uTzAQfMk
+Message-ID: <CANn89iJfnmsZHtcc7O1oQSutgC5m_Jrhkxy3EYeOxQnjz4wwUQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] tcp: Defer ts_recent changes until req is owned
+To: Wang Hai <wanghai38@huawei.com>
+Cc: kerneljasonxing@gmail.com, ncardwell@google.com, kuniyu@amazon.com, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, zhangchangzhong@huawei.com, liujian56@huawei.com, 
+	yuehaibing@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Maxime,
+On Sat, Feb 22, 2025 at 11:41=E2=80=AFAM Wang Hai <wanghai38@huawei.com> wr=
+ote:
+>
+> The same 5-tuple packet may be processed by different CPUSs, so two
+> CPUs may receive different ack packets at the same time when the
+> state is TCP_NEW_SYN_RECV.
+>
+> In that case, req->ts_recent in tcp_check_req may be changed concurrently=
+,
+> which will probably cause the newsk's ts_recent to be incorrectly large.
+> So that tcp_validate_incoming will fail.
+>
+> cpu1                                    cpu2
+> tcp_check_req
+>                                         tcp_check_req
+>  req->ts_recent =3D rcv_tsval =3D t1
+>                                          req->ts_recent =3D rcv_tsval =3D=
+ t2
+>
+>  syn_recv_sock
+>   newsk->ts_recent =3D req->ts_recent =3D t2 // t1 < t2
+> tcp_child_process
+>  tcp_rcv_state_process
+>   tcp_validate_incoming
+>    tcp_paws_check
+>     if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <=3D paws_win)
+>         // t2 - t1 > paws_win, failed
+>
+> In tcp_check_req, Defer ts_recent changes to this skb's to fix this bug.
 
-kernel test robot noticed the following build warnings:
+I think this sentence is a bit misleading.
 
-[auto build test WARNING on net-next/main]
+What your patch does is to no longer change req->ts_recent,
+but conditionally update tcp_sk(child)->rx_opt.ts_recent
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-phy-Extract-the-speed-duplex-to-linkmode-conversion-from-phylink/20250222-223310
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250222142727.894124-9-maxime.chevallier%40bootlin.com
-patch subject: [PATCH net-next 08/13] net: phy: phy_caps: Introduce link_caps_valid
-config: x86_64-buildonly-randconfig-004-20250223 (https://download.01.org/0day-ci/archive/20250223/202502231409.QTfXTqrD-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250223/202502231409.QTfXTqrD-lkp@intel.com/reproduce)
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+> ---
+> v1->v2: Modified the fix logic based on Eric's suggestion. Also modified =
+the msg
+>  net/ipv4/tcp_minisocks.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> index b089b08e9617..53700206f498 100644
+> --- a/net/ipv4/tcp_minisocks.c
+> +++ b/net/ipv4/tcp_minisocks.c
+> @@ -815,12 +815,6 @@ struct sock *tcp_check_req(struct sock *sk, struct s=
+k_buff *skb,
+>
+>         /* In sequence, PAWS is OK. */
+>
+> -       /* TODO: We probably should defer ts_recent change once
+> -        * we take ownership of @req.
+> -        */
+> -       if (tmp_opt.saw_tstamp && !after(TCP_SKB_CB(skb)->seq, tcp_rsk(re=
+q)->rcv_nxt))
+> -               WRITE_ONCE(req->ts_recent, tmp_opt.rcv_tsval);
+> -
+>         if (TCP_SKB_CB(skb)->seq =3D=3D tcp_rsk(req)->rcv_isn) {
+>                 /* Truncate SYN, it is out of window starting
+>                    at tcp_rsk(req)->rcv_isn + 1. */
+> @@ -869,6 +863,9 @@ struct sock *tcp_check_req(struct sock *sk, struct sk=
+_buff *skb,
+>         if (!child)
+>                 goto listen_overflow;
+>
+> +       if (own_req && tmp_opt.saw_tstamp && !after(TCP_SKB_CB(skb)->seq,=
+ tcp_rsk(req)->rcv_nxt))
+> +               tcp_sk(child)->rx_opt.ts_recent =3D tmp_opt.rcv_tsval;
+> +
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502231409.QTfXTqrD-lkp@intel.com/
+Please split this long line.
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'speed' not described in 'phy_caps_valid'
->> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'duplex' not described in 'phy_caps_valid'
->> drivers/net/phy/phy_caps.c:152: warning: Function parameter or struct member 'linkmodes' not described in 'phy_caps_valid'
-
-
-vim +152 drivers/net/phy/phy_caps.c
-
-   147	
-   148	/**
-   149	 * phy_caps_valid() - Validate a linkmodes set agains given speed and duplex
-   150	 */
-   151	bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes)
- > 152	{
-   153		int capa = speed_duplex_to_capa(speed, duplex);
-   154	
-   155		if (capa < 0)
-   156			return false;
-   157	
-   158		return linkmode_intersects(link_caps[capa].linkmodes, linkmodes);
-   159	}
-   160	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+ if (own_req && tmp_opt.saw_tstamp &&
+    !after(TCP_SKB_CB(skb)->seq, tcp_rsk(req)->rcv_nxt))
 
