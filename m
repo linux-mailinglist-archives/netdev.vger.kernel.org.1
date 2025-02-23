@@ -1,115 +1,91 @@
-Return-Path: <netdev+bounces-168868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6A2A41213
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 23:54:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9B5A41246
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 00:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EDD11885149
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 22:54:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23D7C3B19D1
+	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 23:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4580A15667B;
-	Sun, 23 Feb 2025 22:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B9E2045B6;
+	Sun, 23 Feb 2025 23:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DX5BZ2v+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8421035966
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 22:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E9415666B
+	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 23:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740351276; cv=none; b=SuDg5KVch123AkOde26lCNytp5fYBMqA9C67mqISkvt6ADmFF5sLtq5PJh7YDo81iL6Df2vgv9iPje/pL9p6ITBsW7qlE9cnBJxADH4hYRV/OIvxx6MO5jIq3FXrtvsCXMnMj2Zp2U7qErFy6jaly3NfHGlJYpsYFJYv9MSxmns=
+	t=1740353822; cv=none; b=GFzu/bGZNhMZda5oIhFEwJ53da+UV2w0X9cb00EHyVrRCBmeSCOnoHz2AdjnPN8wtuB9hgAbYh9fUEI9kdTu6Ws5EdA2qFV9NMbDi++GuZevUxX36HfQsZc0j8p9ZZj0E24WJZLtykKcX1EsUTiYwkl7f6mdeR1D8KjSpdVQgyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740351276; c=relaxed/simple;
-	bh=A9tRPwRJg47rbVzydlVKJQe8RfHlCrveWqmVxO+4Agk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=I8GNjoUrmEuMErFYc1le1RNGxnZuutNaQThGZAw7oe569WkV0BcHIG+jR3SgdDlQpf5BZ4HC1V8M7RakUvC3SJDV23Xv8hwQsMWMWGkNgdFhCPJ/NhW9rpDVxdsz/HUBuYdwaFP84keZBm8ulAFag/F0SqXRe3MSoHsHG/ZlieM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=fail smtp.mailfrom=iki.fi; arc=none smtp.client-ip=185.67.36.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=iki.fi
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id CCE4C240104
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 23:52:56 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4Z1Jzk60Wtz9rxD;
-	Sun, 23 Feb 2025 23:52:50 +0100 (CET)
-Message-ID: <3059054fea81ac877d36becf46f248a0aae6f4a1.camel@iki.fi>
-Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx
- completion
-From: Pauli Virtanen <pav@iki.fi>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Xing
-	 <kerneljasonxing@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, gerhard@engleder-embedded.com
-Date: Sun, 23 Feb 2025 22:52:48 +0000
-In-Reply-To: <67b7b88c60ea0_292289294bb@willemb.c.googlers.com.notmuch>
-References: <cover.1739988644.git.pav@iki.fi>
-	 <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
-	 <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
-	 <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
-	 <CAL+tcoDJAYDce6Ud49q1+srq-wJ=04JxMm1w-Yzcdd1FGE3U7g@mail.gmail.com>
-	 <67b74c47c14c7_261ab62943@willemb.c.googlers.com.notmuch>
-	 <67b7b88c60ea0_292289294bb@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1740353822; c=relaxed/simple;
+	bh=Yop4/s+Sou9hbYrxOiyrJs6aEMFpqGj2bcNw28tiP8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oyIGdeU1tjLtCBdAgXyKPmMN3kYJiDBup+LBZy98eJWQCtGh3ugxjin1kJFZoCUmz8V4N2LF98gxjLMleJ5Z5CK+EOXGb17yljEWGPCRoEF94Yau+EDXA1eMHrEy+U9SpcOrO3mmhXgbLyiV9mORLaPEEF4xCIO2MM8vfYpAeFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DX5BZ2v+; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740353817;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=grsJR/twTl2brq13919098Zme6VKzC6hvEwh05sMYbY=;
+	b=DX5BZ2v+mQUIlO/ehTV1XQALgHmqYmtHOpF6dwJ1+9U96jvcS9z5JsD4ftaQfWD+PNKgOS
+	RajwQ2m6VmvKQ543blqvE+cSKW8YZW7Vs3kcr5hK/Kj5ctPU6eJDyvZBFaZmK8lMGcZsfG
+	O7tDVlE5LuokcqU7y1KrrR0Qnd67C50=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: ethernet: renesas: rcar_gen4_ptp: Remove bool conversion
+Date: Mon, 24 Feb 2025 00:36:11 +0100
+Message-ID: <20250223233613.100518-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+Remove the unnecessary bool conversion and simplify the code.
 
-to, 2025-02-20 kello 18:19 -0500, Willem de Bruijn kirjoitti:
-> Willem de Bruijn wrote:
-[clip]
-> >=20
-> > Reclaiming space is really up to whoever needs it.
-> >=20
-> > I'll take a quick look, just to see if there is an obvious path and
-> > we can postpone this whole conversation to next time we need a bit.
->=20
-> SKBTX_HW_TSTAMP_USE_CYCLES is only true if SOF_TIMESTAMPING_BIND_PHC.
-> It cannot be set per cmsg (is not in SOF_TIMESTAMPING_TX_RECORD_MASK),
-> so no need to record it per skb.
->=20
-> It only has two drivers using it, which can easily be updated:
->=20
-> 	-                if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_USE_CYC=
-LES)
-> 	+                if (skb->sk &&
-> 	+                    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_BIND_P=
-HC)
-> 					tx_flags |=3D IGC_TX_FLAGS_TSTAMP_TIMER_1;
->=20
-> They later call skb_tstamp_tx, which does nothing if !skb->sk.
-> Only cost is a higher cost of accessing the sk cacheline.
->=20
-> SKBTX_WIFI_STATUS essentially follows the same argument. It can only
-> be set in the sockopt. It has a handful more callsites that would need
-> to be updated. sock_flag(sk, SOCK_WIFI_STATUS) will be tested without
-> the socket lock held. But this is already the case in the UDP lockless
-> fast path through ip_make_skb.
->=20
-> SKBTX_HW_TSTAMP_NETDEV is only used on Rx. Could shadow another bit
-> that is used only on Tx.
->=20
-> SKBTX_IN_PROGRESS is only used by the driver to suppress the software
-> tx timestamp from skb_tx_timestamp if a later hardware timestamp will
-> be generated. Predates SOF_TIMESTAMPING_OPT_TX_SWHW.
->=20
-> In short plenty of bits we can reclaim if we try.
->=20
-> SKBTX_BPF was just merged, so we will have to reclaim one. The first
-> one seems most straightforward.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ok, I'll go back to tx_flags bit for v5 (=3D v3 + the minor cleanups),
-going on top of "net: skb: free up one bit in tx_flags" then.
+diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
+index 72e7fcc56693..4c3e8cc5046f 100644
+--- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
++++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
+@@ -29,8 +29,8 @@ static const struct rcar_gen4_ptp_reg_offset gen4_offs = {
+ static int rcar_gen4_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ {
+ 	struct rcar_gen4_ptp_private *ptp_priv = ptp_to_priv(ptp);
+-	bool neg_adj = scaled_ppm < 0 ? true : false;
+ 	s64 addend = ptp_priv->default_addend;
++	bool neg_adj = scaled_ppm < 0;
+ 	s64 diff;
+ 
+ 	if (neg_adj)
+-- 
+2.48.1
 
---=20
-Pauli Virtanen
 
