@@ -1,109 +1,166 @@
-Return-Path: <netdev+bounces-169188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA711A42E43
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:48:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1F8A42E74
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:58:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB89B174750
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C70B1886AF6
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D1C206F16;
-	Mon, 24 Feb 2025 20:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA2261393;
+	Mon, 24 Feb 2025 20:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rR5L7oO7"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="lPItqs9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9D915530B;
-	Mon, 24 Feb 2025 20:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFF625C6E1
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 20:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740430112; cv=none; b=a1E2GzafAJfGfhrg8KMFct5cq0EgoAq6I1Z7W8887OrGclTeKrqa9yel7LlM4lyGnOnxcDJIJDviWMOSi5+pdQ+yybkuDu930lQbNVM4ytpBGUGyCsDqiJfvxm1LJIV06yMOpZQhanXXqwaFO3VyXjKLxnX5cotjadDR6XIyJS0=
+	t=1740430705; cv=none; b=dqXXCj54knCauylSPMrSdVZOLgZx6tby7797AQutikOq4sDn0sl5r0KY/HrNKy5TOafCSGvjb/ZVGIa4eNsWCZEyDxkYPv87omBTAByC34iYOfSfS06FKdSUPa/Ad7I2G7eMLJniecTQXQHVt952DJiMGGOoBR5i58fEC5Cx9yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740430112; c=relaxed/simple;
-	bh=L/c/t+4leGMdBLaivVIb/ruUCGGyN6yH6eKmpNXGc2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=THx8tF9ujs0bvmpCRrpPjeCCywIpIMiDfeLhrcnKq3wERQOzhB7Y4ye//6UcfiK6txlfQl/JklrTd17Zcojj9TpHeiJvkx7dAMbBFOcwVZGEmFmBqhRc7ocJonVIVRA5kOooV+D8uZ+zBRSdxecmLRH+yAXS+ZB5hFsfHQGoF94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rR5L7oO7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEDE1C4CED6;
-	Mon, 24 Feb 2025 20:48:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740430112;
-	bh=L/c/t+4leGMdBLaivVIb/ruUCGGyN6yH6eKmpNXGc2o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rR5L7oO73pbxW1Tp6OyFl6IPvMI7SeiW5CWBmFL8Wzz0blPqdw2Z9dJGlQZBcYE2H
-	 Lo4aKLtD2ewupSzD9DQdovx3VYjWzOCZ02ZXzQ0JG8XbANPxGetyXZ0V7nj0Bab2OH
-	 sFq7pkGePnfdHqJps9ZXCitTRpMIqjagtvWy2+MijrizzNiKFE8O374VA/AtPco5vA
-	 aLvsB05YypPHldbAKVWOBKQDdn8mBPVPm6hw9MyXmgmZjXVyG1m0Ufa0EuJVpPV3i7
-	 KoEG2Ab+CvB9XkOKjtq8peYTxJRjAVPLrVXDIXwbi8O3KFLYd0bZyI49Hzsm5hqeYm
-	 yqHnPmtXb5afg==
-Date: Mon, 24 Feb 2025 12:48:30 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kevin Krakauer <krakauer@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
-Subject: Re: [PATCH] selftests/net: deflake GRO tests and fix return value
- and output
-Message-ID: <20250224124830.7c38608a@kernel.org>
-In-Reply-To: <20250223151949.1886080-1-krakauer@google.com>
-References: <20250220170409.42cce424@kernel.org>
-	<20250223151949.1886080-1-krakauer@google.com>
+	s=arc-20240116; t=1740430705; c=relaxed/simple;
+	bh=5NTBVZtPucMG0j4onj8D4B3Tzw8Ztr68uizMJjq18iU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JfnzOkr0irR4rkEupe5T/fN0wdh0B1t8reFalk8A7jF8nrIojL9HMu/iU2aU0IbmvZCjrf26udRmleJsMHgQRf9JZpDYi5GXvTKOnIuCEQcEcBlTcs9gTWrFXh1JeSYt+nep5CjCBO849OEpl5XaSo34WcYo7E3QXEY22klFH6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=lPItqs9C; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 45891240103
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 21:58:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1740430701; bh=5NTBVZtPucMG0j4onj8D4B3Tzw8Ztr68uizMJjq18iU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:From;
+	b=lPItqs9CzEX3MHXDUteuWzg/eh47rC4iOuc0Nm5GK65+l2ZAsJ8ft7ZoO8yMutuwx
+	 a7ne/OwJHenS0lA6f0UYTpoGv1sKQCNbpyTamlYIsfoP9kzAXteH9o+oEeF+9MrIET
+	 3d9nnVEKTYM5M9wMFP1Bliy4QS/+FKrHwYQJBjRUjTbteQuqF7GTsKxPqjOyr01nnb
+	 IP4cuiktw+YifxM8GGgqDbleIUbE4OBVgFxqjvU+UPcuPpUd5rsCKk7jQbCFZmnhET
+	 nsZPdYZlionomJXwguYa/TmkvcsDt0X9LRmZshn5E2yv0PWIxRRBqlzfZ4SEeHrkIQ
+	 XM2loQdI6DGYw==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4Z1tP74dwRz9rxD;
+	Mon, 24 Feb 2025 21:58:19 +0100 (CET)
+Date: Mon, 24 Feb 2025 20:58:19 +0000
+From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+To: Rob Herring <robh@kernel.org>
+Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] dt-bindings: net: Convert fsl,gianfar-{mdio,tbi} to
+ YAML
+Message-ID: <Z7zdawaVsQbBML95@probook>
+References: <20250220-gianfar-yaml-v1-0-0ba97fd1ef92@posteo.net>
+ <20250220-gianfar-yaml-v1-1-0ba97fd1ef92@posteo.net>
+ <20250221163651.GA4130188-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250221163651.GA4130188-robh@kernel.org>
 
-On Sun, 23 Feb 2025 07:19:49 -0800 Kevin Krakauer wrote:
-> Thanks for the review! I'll split this up. Do you think it's better as two
-> patchsets -- one for stability/deflaking, one for return value and output
-> cleanup -- or as a single patchset with several commits?
+On Fri, Feb 21, 2025 at 10:36:51AM -0600, Rob Herring wrote:
+> On Thu, Feb 20, 2025 at 06:29:21PM +0100, J. Neuschäfer wrote:
+> > Move the information related to the Freescale Gianfar (TSEC) MDIO bus
+> > and the Ten-Bit Interface (TBI) from fsl-tsec-phy.txt to a new binding
+> > file in YAML format, fsl,gianfar-mdio.yaml.
+> > 
+> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> > ---
+[...]
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - fsl,gianfar-tbi
+> > +      - fsl,gianfar-mdio
+> > +      - fsl,etsec2-tbi
+> > +      - fsl,etsec2-mdio
+> > +      - fsl,ucc-mdio
+> > +      - gianfar
+> 
+> Can you just comment out this to avoid the duplicate issue.
+> 
+> Though I think if you write a custom 'select' which looks for 
+> 'device_type = "mdio"' with gianfar compatible and similar in the other 
+> binding, then the warning will go away. 
 
-Should be fine either way, they will both end up in net-next.
-One patchset may be easier to merge, as we can't CI-test two
-conflicting series on the list.
+I'm not sure how the 'select' syntax works, is there a reference
+document I could read?
 
-> > To be clear - are you running this over veth or a real device?  
 > 
-> Over a veth.
+> > +      - ucc_geth_phy
+> > +
+> > +  reg:
+> > +    minItems: 1
+> > +    items:
+> > +      - description:
+> > +          Offset and length of the register set for the device
+> > +
+> > +      - description:
+> > +          Optionally, the offset and length of the TBIPA register (TBI PHY
+> > +          address register). If TBIPA register is not specified, the driver
+> > +          will attempt to infer it from the register set specified (your
+> > +          mileage may vary).
+> > +
+> > +  device_type:
+> > +    const: mdio
+> > +
 > 
-> >> Set the device's napi_defer_hard_irqs to 50 so that GRO is less likely
-> >> to immediately flush. This already happened in setup_loopback.sh, but
-> >> wasn't added to setup_veth.sh. This accounts for most of the reduction
-> >> in flakiness.  
-> >
-> >That doesn't make intuitive sense to me. If we already defer flushes
-> >why do we need to also defer IRQs?  
+> > +  "#address-cells":
+> > +    const: 1
+> > +
+> > +  "#size-cells":
+> > +    const: 0
 > 
-> Yep, the behavior here is weird. I ran `gro.sh -t large` 1000 times with each of
-> the following setups (all inside strace to increase flakiness):
-> 
-> - gro_flush_timeout=1ms, napi_defer_hard_irqs=0  --> failed to GRO 29 times
-> - gro_flush_timeout=5ms, napi_defer_hard_irqs=0  --> failed to GRO 45 times
-> - gro_flush_timeout=50ms, napi_defer_hard_irqs=0 --> failed to GRO 35 times
-> - gro_flush_timeout=1ms, napi_defer_hard_irqs=1  --> failed to GRO 0 times
-> - gro_flush_timeout=1ms, napi_defer_hard_irqs=50 --> failed to GRO 0 times
-> 
-> napi_defer_hard_irqs is clearly having an effect. And deferring once is enough.
-> I believe that deferring IRQs prevents anything else from causing a GRO flush
-> before gro_flush_timeout expires. While waiting for the timeout to expire, an
-> incoming packet can cause napi_complete_done and thus napi_gro_flush to run.
-> Outgoing packets from the veth can also cause this: veth_xmit calls
-> __veth_xdp_flush, which only actually does anything when IRQs are enabled.
-> 
-> So napi_defer_hard_irqs=1 seems sufficient to allow the full gro_flush_timeout
-> to expire before flushing GRO.
+> These are defined in mdio.yaml, so drop them here.
 
-With msec-long deferrals we'll flush due to jiffies change. At least
-that explains a bit. Could you maybe try lower timeouts than 1msec?
-Previously we'd just keep partially-completed packets in GRO for up 
-to 1msec, now we'll delay all packet processing for 1msec, that's a lot.
+Will do.
+
+> 
+> > +
+> > +required:
+> > +  - reg
+> > +  - "#address-cells"
+> > +  - "#size-cells"
+> > +
+> > +allOf:
+> > +  - $ref: mdio.yaml#
+> > +
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            enum:
+> > +              - gianfar
+> > +              - ucc_geth_phy
+> > +    then:
+> > +      required:
+> > +        - device_type
+> 
+> Essentially, move this to the 'select' schema and add that property 
+> device_type must be 'mdio'. You won't need it here anymore because it 
+> had to be true for the schema to be applied.
+
+I'll have to read up on how select works.
+
+
+Best Regards,
+J. Neuschäfer
 
