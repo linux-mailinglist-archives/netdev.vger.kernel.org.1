@@ -1,172 +1,117 @@
-Return-Path: <netdev+bounces-169155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33F2A42B2F
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:24:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D8E8A42AF8
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 662903B8862
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:24:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8160B3B802E
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F462676EA;
-	Mon, 24 Feb 2025 18:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A31264A84;
+	Mon, 24 Feb 2025 18:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="P4xwMRZx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uwkbPPry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDECA64;
-	Mon, 24 Feb 2025 18:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B142C24394F;
+	Mon, 24 Feb 2025 18:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740421353; cv=none; b=JVC8xAitD7zCQy/VeDEY5Sp3WsI0CZff1NGwYLK9DR1MrDuyy2BQXXoB402eKXOeCjlzcpiVxoab7LywyxwyAVuQqziyOOJ/28eGJo2NcpZrEyNEThVVqweVNoG1bLwZeaaTtBOP6w4kEuADNInpl3YoXcuOvAfynrH8C7TvAYo=
+	t=1740421161; cv=none; b=WpU1C6PYaNdZocj1LB1gODrd/OKxKk8BxsIsZPQIMhI2BMKvZb118zOEMqemdMPFaQysqCiPzs+NVbkhOhGlsSNxG5kbYrrciZ9JdpBK1GcGBsNJr3psgT4FJjdmWHjniw0gjw8PKQCmP011wFIAE1mVSO7qMm6LEfCZcedMUE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740421353; c=relaxed/simple;
-	bh=lHMlBKWdkJyWJ/ZNdPbig2n/AkyDPvY7GCSxBIUEiPU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BSJCIG/+9/PyCdMoliysBIQNg0D5mk1OQBzKPlj7Ywjvaao4VQmei0h3I1peKNH0NY+Qgx8HkeX9d1FkoZ4Xp5tgTDWCkZgEl+u9kE/ABTqklJQ4EimFrr3oHNyThfpOmtPUHT9A01bIcVFv8yexOe+ig3enko98IybIwPsFSU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=P4xwMRZx; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1740421348; x=1741026148; i=hfdevel@gmx.net;
-	bh=s56f0o7oXiJ7g53XxI4zCe4QREjxnu0AzfGzWl/KBy8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=P4xwMRZxFl/i0cfVxDKoCDDYMEBSQofRCpiditFUo/nnI9qDGqroC+sAkb60cBOl
-	 Aspf+LQ/s5l0vraKpipxWWalUQDL9YeJiZnuN1wk7m237wihfMmNhZ7IhpkdHHzJ3
-	 P47grf9ObO6c7XmnFPufH0+idE6eBBau+YP2wE/0NAiYdCs1hVBZ8lYoKAcxOmyWd
-	 r3OjjN2qRLpwcy5rwC5ruFZHgwFG2gll7qpL+pse5IsUzkvTE3+Z5mTpTXB7+ge5u
-	 M1BO9NziQ3oeLbl9Au3Iz4st0EJCdWqhZZhc/01nsEAIS9QkdmfF9s/yBNrsZr9L6
-	 DaKDIhyQnVYnpQNZ9A==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N3bWr-1tMwwf2kwl-015nKq; Mon, 24
- Feb 2025 19:11:42 +0100
-Message-ID: <355d0805-61df-4834-a266-e74117e21302@gmx.net>
-Date: Mon, 24 Feb 2025 19:11:39 +0100
+	s=arc-20240116; t=1740421161; c=relaxed/simple;
+	bh=uwyoOtIyHLqC9nZ97BA9itdUvfRcvpHiv3XhxZ/ILuE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FJr8D258Y18iGOwiGegEewOs002WbBuJIbUaLNGMfxmxcEZvBP+b+trMI0d93JbAJ+5wJ+4EuCOyU6uhcuf/94XaCylLXT5t9j2VfWejXmUZmbrQwOjPosAlLDuB5HsrvcEVxxP6cqRGL8yD5aHzBhYIREwjq2jIyGkF49xYmdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uwkbPPry; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF33C4CED6;
+	Mon, 24 Feb 2025 18:13:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740421161;
+	bh=uwyoOtIyHLqC9nZ97BA9itdUvfRcvpHiv3XhxZ/ILuE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=uwkbPPryHUMDqO+hc+E4Fusjct9SUtD4RluVMaGMy6omU7WWpmxk9a0DzT5Wq6xgI
+	 SZ/idgHZo8u9AjCsIgjGDdTv8Hh9GhLqiQlWQalyNfMSW8TesrHZYqlEgbGnJ2vkSG
+	 QULe7bVc3zDt3Rbm/p7PByJVlgRYP59zKQWxcQ1+2mTGmJ1eNLWgUYbH7mkyzQdoC8
+	 C6YGQpOSNfrNkDXPrjDbWOpy9GkM2TJ9vrJHr/vScNqtKchPHc9MI6/vl85iHMsjlg
+	 /l+4h5LtsMHqKxtO6mt1/fzHb7ryyexS+E2rCvFCaQH7/9dXbsiB/TWjd45owW+CDy
+	 pF2zX3ZGSWGqw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] mptcp: misc. fixes
+Date: Mon, 24 Feb 2025 19:11:49 +0100
+Message-Id: <20250224-net-mptcp-misc-fixes-v1-0-f550f636b435@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/7] net: tn40xx: create swnode for mdio and
- aqr105 phy and add to mdiobus
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250222-tn9510-v3a-v5-0-99365047e309@gmx.net>
- <20250222-tn9510-v3a-v5-5-99365047e309@gmx.net>
- <20250224040838.GA1655046@maili.marvell.com>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20250224040838.GA1655046@maili.marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ee78AkA0+pD13CQ5EnSHbst9pHFtKJ3LOD+UBaP/M/x+o/fOqo5
- 99jPSvi0WOR8WuZaL9U800rDZ2fGwwIizbfrnsUUahUpy/ZP8oMJpWu5BZJM3SacBGC+2xI
- /n4trkxwTjHMSAxeCMT5Ls/UPIQJygTVGij4a/lvQdrB1TZyDmoSZBeH0eDwmxF21xxk3M4
- 2vFqcL2h7eKbJhJQ2oOyA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Z6qiYfGX9J8=;2e/eCYPQzvtB2PATz+zm4749US3
- JIArM80/lUKmmqyuNqC5skhqDJXS2LcO5LLsAi5+ZOA/7V8ASkY2mPh9hN2qzA9o720z0M+g4
- F40xm9A14jpLluZQF7HgtxDXY/Jr+BJ8e+nVmAnUf4pX8s7V2LZM88g4khXp7SU6hCVMzesrl
- qj/IIiXzPNt+J1Vc1nKCbogEBv1mvH9jbkHnAsQWiyjmBm/ZH+4V4b0uphwaHV0dNVi/KNFFR
- rDWVW5VQ/gseGrgTquyND7dvvkGZlarCWBitzofEw7vFknlNRlcoCKcQmquE0rogfQxziLaUi
- V8Kmfqf+RbiOZb7Nl3paG6uVpw/iRzx+O42Z/qKvuR4shIG/TuCrf66AKdUR8X4ks5DahkWwo
- stIEwNBIuowwwo3/G/dELTkyGhhbjcGUNhhH4woEIqAFSv5skVni0rYWtPjACN47PgMdVbJXG
- Z5jZ4BCzuJJQEZW8cVufKuko8PZY4MVTssLjFzE8x8LnbzxzpWR40FjG8P6B0/kR+zyol4lUk
- y7vkDL7XYSTWSqK6oBzYxbURIjE+jkVdol+TJwfYBH043cYqAT1eDxYaE70Yw1o/O4XL0AtIF
- 9z1en9+Wl1pEYK9lj4PbrwHkOIIS6gU0n2h0y8GGvJcHcHsYLK0Lz7puosGqR8NPNcuaY2z0J
- OJF/AXGReB4W8RG2dwCJrdl3CY6Az+i8McIAmDbrJ+w7jhYDCEHQW3rvZhYpcGFZ6VdKhl6it
- LanHRBWimMZpsPlzTcAeU2rsDQeJnE/fcATTdN2b7ahKrGIEtx7xMJfTH4OuNgybt/7z0O6UC
- b+rPbx6eUEzfeW9DSUALyU8befnmOCfBEUKQXXT80KC9AQ0ZAtfzs6FeVgFl51V0bZS7bzesy
- zhuJxADlVsb3c7XL2IABPvPIuB/2dbkAxZRMR5eqgH/BQ5gAJTqzTASJVqf2I4YwD72MPSVRn
- RzNZalNMDaMHvGpF3FpoeMsxiHpNad3GocEnP/FKj1x+wqPtvCeNafDOJF/CP7qx3kOjPJShf
- T1MOjLl/orHyjGd5GILBIoTWz1PqWMa4V6Rks0jkdULnECYWiLFH7r+Ie2YMAUC2oTLfT1Ppy
- 9Ddti/wXP93FrWTebdDnQA6kDXhz31ITmxpaVQ4TYDgokTx+H3wYqt70zUtgC2o9MwvAhStvt
- jJsrohKzUaLeCxbe6KdLXOCg1F3/7eBI301jd+1AF6+N+U5QxT7u2OWc0Cwoc/HYGH8oF3x5q
- 9hOSWoz6jlW4VBuzwvQHQhkHJpQc0GU9kFTaXn8O8nFt/Bqrfor7t7JJ9FCqVmuEuvZS5rAzQ
- NHfa3xk1w87k4bVhFjqbGmfNWfgMlIBJX/BOeID9llkgf3H2idnmwDSOwQIVVY6xpWwYuMeBu
- 7YdOQn8Gnyl47jI0j7aUXz56S+9DbUqT3qfxo=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGW2vGcC/x3LSwqAMAwA0atI1gZq8YdXERdSU82itTQiQvHuB
+ pfD8AoIZSaBqSqQ6WbhM2o0dQXuWONOyJs2WGM7Y22LkS4M6XIJA4tDzw8Jjqsfh741mycPSlO
+ mf6icQQUs7/sBGPPiHGsAAAA=
+X-Change-ID: 20250224-net-mptcp-misc-fixes-8af87640dfef
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ syzbot+cd3ce3d03a3393ae9700@syzkaller.appspotmail.com, 
+ "Chester A. Unal" <chester.a.unal@xpedite-tech.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1036; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=uwyoOtIyHLqC9nZ97BA9itdUvfRcvpHiv3XhxZ/ILuE=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnvLbE/Sc41iqtpNEO42OrCzrDoc6CwtVMpsVom
+ V2EeuGwq+WJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ7y2xAAKCRD2t4JPQmmg
+ c2ifD/9eV4Mq4huRH7bhLHLHZmYz25C/ayWVEGmV+T3aYi1PviW3XMbUXwRGPUzYSRldUPPgpRk
+ Q4haHwrGxYQYN1UTFr0t9a0pbVn9yo0Pm2fzNNfHhlsTVvnE1kJOKxnM5+K1kIr8xwNUFgxx3J0
+ 2nI3ZZzOe5eJRxOklVBBV3G4Gx8KoS6pSRgI0WQePW0rhGwa1mN+hvCVaGzjJMnKwXnH0SZkiCp
+ 8dT1wL8RfxiR8PJc3oMQKaaonCHE40Bhf5bzg5deA7eEDOZDt7C7r2Dasskkz0Sx2zsLOt8DqGV
+ FMIoN7lI13p+bEBYt/T4z6frDwVOjnNUBGnUNc6oQo5iTvTd2wUbrdnyQROywvfXS/Wy+kS6ybr
+ t7X/gMnSljSo3E84ycpskSqTzUaMh1GGAWRofGCqKi7dqcbK3gkruaRNNv+21uvWys5tsYbSsMX
+ rTg0qKgEtdcun6yHJTAGS+dDx1JFiCF8Sp3fCQdxUMCd2w5wBlMWU2b6XceP5o9/uQoRltrTw0P
+ 7mKmBU1Fkv1VpQk9FD1Jbp0A5qx30ZFlqGtJ2dWZr9Z18Jm/FEh3yOgves0LFMTRdVbHPF+vxDo
+ fqqrST11wbT2R/PF6WtoF1KePl2lnK+wR1DTY8QlPUCuCe9uXXuDvWbqPsDg0Rq5CDl6+hCjAw9
+ SYRaijJWjcekdMA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hi Kannoth,
+Here are two unrelated fixes, plus an extra patch:
 
-On 24.02.2025 05.08, Ratheesh Kannoth wrote:
-> On 2025-02-22 at 15:19:32, Hans-Frieder Vogt via B4 Relay (devnull+hfdev=
-el.gmx.net@kernel.org) wrote:
->> From: Hans-Frieder Vogt <hfdevel@gmx.net>
->>   int tn40_mdiobus_init(struct tn40_priv *priv)
->>   {
->>   	struct pci_dev *pdev =3D priv->pdev;
->> @@ -129,14 +181,36 @@ int tn40_mdiobus_init(struct tn40_priv *priv)
->>
->>   	bus->read_c45 =3D tn40_mdio_read_c45;
->>   	bus->write_c45 =3D tn40_mdio_write_c45;
->> +	priv->mdio =3D bus;
->> +
->> +	/* provide swnodes for AQR105-based cards only */
->> +	if (pdev->device =3D=3D 0x4025) {
->> +		ret =3D tn40_swnodes_register(priv);
->> +		if (ret) {
->> +			pr_err("swnodes failed\n");
->> +			return ret;
->> +		}
->> +
->> +		ret =3D device_add_software_node(&bus->dev,
->> +					       priv->nodes.group[SWNODE_MDIO]);
->> +		if (ret) {
->> +			dev_err(&pdev->dev,
->> +				"device_add_software_node failed: %d\n", ret);
-> No need to return on this error ?
-Good catch. Yes, indeed, all TN4010-based cards that I know of need to
-load the firmware from
-the filesystem. And this will only work if the software node is
-available to provide a file
-name.
-I'll add a
-return ret;
-in the next version.
->> +		}
->> +	}
->>
->>   	ret =3D devm_mdiobus_register(&pdev->dev, bus);
->>   	if (ret) {
->>   		dev_err(&pdev->dev, "failed to register mdiobus %d %u %u\n",
->>   			ret, bus->state, MDIOBUS_UNREGISTERED);
->> -		return ret;
->> +		goto err_swnodes_cleanup;
->>   	}
->>   	tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_6MHZ);
->> -	priv->mdio =3D bus;
->>   	return 0;
->> +
->> +err_swnodes_cleanup:
-> No need to call device_remove_software_node() ?
-It is called from tn40_swnodes_cleanup.
->> +	tn40_swnodes_cleanup(priv);
->> +	return ret;
->>   }
->> +
->> +MODULE_FIRMWARE(AQR105_FIRMWARE);
->>
->> --
->> 2.47.2
->>
->>
-Thanks,
-Hans-Frieder
+- Patch 1: prevent a warning by removing an unneeded and incorrect small
+  optimisation in the path-manager. A fix for v5.10.
+
+- Patch 2: reset a subflow when MPTCP opts have been dropped after
+  having correctly added a new path. A fix for v5.19.
+
+- Patch 3: add a safety check to prevent issues like the one fixed by
+  the second patch.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (2):
+      mptcp: reset when MPTCP opts are dropped after join
+      mptcp: safety check before fallback
+
+Paolo Abeni (1):
+      mptcp: always handle address removal under msk socket lock
+
+ net/mptcp/pm_netlink.c |  5 -----
+ net/mptcp/protocol.h   |  2 ++
+ net/mptcp/subflow.c    | 15 +--------------
+ 3 files changed, 3 insertions(+), 19 deletions(-)
+---
+base-commit: f15176b8b6e72ac30e14fd273282d2b72562d26b
+change-id: 20250224-net-mptcp-misc-fixes-8af87640dfef
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
