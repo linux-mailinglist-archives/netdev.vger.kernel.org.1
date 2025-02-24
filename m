@@ -1,310 +1,212 @@
-Return-Path: <netdev+bounces-169000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F1BA41DFF
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:59:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF591A41D81
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A00440896
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:53:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E4D37A294D
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743D825EFB4;
-	Mon, 24 Feb 2025 11:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YUB/A82K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4471A2571D8;
+	Mon, 24 Feb 2025 11:22:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D57525EF88
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 11:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740397031; cv=fail; b=rx/vtbctMBjRrbrCffgfTLmddJDq20TpDrPNKd4vLlzlcqcdxs9ytrca8VAMqjCqnaqO/0H35NOUAVffzz3rhPsb3X9eWwcUJBIyowTKc9OBa4t8mV+lCU7W8pWQElcGWAKRFD4Em9IpRu4PmwtmRSUSJvy1kPSMsyh+8FF8ELI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740397031; c=relaxed/simple;
-	bh=bgFq8JNbP3xByHSyzOMUkcVkjn9aZ0kwm3HfgjLhY2g=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tt4Hg/JjHrAgxOlSoCJmx1vb1Y91j7WJaB2r17Y4oErSYWai8+FOn1/6LzbgInBabVqS/PbBMtWgl8ojc8PPMaUzm36S9RUBzckwsSbpXF4rHEbXTMHoRWMt9Xll68dexpEds2JchKaAOGpiQdVf4IzO1XDUDQwDSYuOomk06gM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YUB/A82K; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740397030; x=1771933030;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=bgFq8JNbP3xByHSyzOMUkcVkjn9aZ0kwm3HfgjLhY2g=;
-  b=YUB/A82K5MxBWGTZIBtm6xB/6lU72nXzVKDq1XV/nFZWzAo24Bac0q6+
-   aZtoDygi/9aEWJLR+GtFXwozA7yLVtITPa8YFMOwniw0QRyg0hSUsdS0E
-   Pl2Ik7JUadp4JHiv7Dhk/LCZcVAxUKBuFadkEVO3DUWAWzK9ciRt4TFpe
-   W+wv7MXCflT2pRIpUtOaIs2CSaDy3pf71Dg674GjD0oEw7wxHg2y930ue
-   gXfCoYQYlXS5ogWUR3OGvZtaXGEnIp553JRYTIcB3R3KnbMMpc8BfQkdp
-   0hIs3HCvq5BJaoJ/haybpMHwTJ+0bCmikvua+1T7a6MbyV4L0U9cA8pL9
-   w==;
-X-CSE-ConnectionGUID: 7Mq20hzGTDK3oueL3Yu6kw==
-X-CSE-MsgGUID: PDChN66iTYylkbUgRLJuhQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11354"; a="51785673"
-X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
-   d="scan'208";a="51785673"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 03:37:09 -0800
-X-CSE-ConnectionGUID: 9ZFPma/gTNShpzGYHFwg8g==
-X-CSE-MsgGUID: zIDsYjQWSw61LnfomjbmXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="153236418"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Feb 2025 03:37:09 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 24 Feb 2025 03:37:08 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 24 Feb 2025 03:37:08 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 24 Feb 2025 03:37:07 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cVFhOVMcHN84QELh2Mx6oY770JnMa3LlfP8eYMsB9IjK7GzzcdQtAK+5FaUkK6A5K62OzcOQ5+jMhbZJ79WxH7R0IT02RrU+EsSzn+kLoUFwTBHQ6WwlNcIwJtt8Zrtu8Va9+PHqgWEsF0DOC3za+t6XiJXHqx57FqNMBMqWiCTXhsDdRwQluTXBV1TNLYFyfTquszk02mVA6N9963htin+sAXxtaRjAOb+3qvR4kYfu5l1Ch2i+ZpcEP0uCWCRkCUoH1iH8H/umaIoYJsMuJW+BqvNauHyKJKX+jD+eL+XQTO0XZpPMUBWSU0cRTgQr/7t8E6U79SAACz5yxzRoVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/D5P6hPPpyX5WuVxszSk74/Ihar23IswPugABfun9Hc=;
- b=NTLqfvWmzXtb9vkbJGMvfeSJNTeq8u029VtaXCRwxj8J0alukHQyD86X6XZVWZZiga/5qKsjxgNgCJ6q74sNJFlz58iner9fflYrMMHd0Z2PwNpvvv2b4qct1zNNmvcXpIbpTwCP+gi54bOI8P2dtzV4YiscfnsRpNY6Ms0BGvF6y3D5O0yEFYxd/dN5qDJG9aqrMxfW+894USblD2tsgfdFC8W/JoovsCwNtdnozw1vDxgvhR27sPcwOsC8cKLAwWe21Xnl8/EkYYBFENU9UVXhFxElkrd8fB0DTvoda5yWdTjzlb0WoZHmaOwkGH3NHxZ17Q/q/gJBoDGMbtKrLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA1PR11MB7016.namprd11.prod.outlook.com (2603:10b6:806:2b6::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 11:36:23 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8466.016; Mon, 24 Feb 2025
- 11:36:23 +0000
-Message-ID: <eddc733e-2587-45ed-a2b4-a395afc0064b@intel.com>
-Date: Mon, 24 Feb 2025 12:36:18 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] ice: ensure periodic output start time is in the
- future
-To: Jacob Keller <jacob.e.keller@intel.com>, Anthony Nguyen
-	<anthony.l.nguyen@intel.com>
-CC: Karol Kolacinski <karol.kolacinski@intel.com>, netdev
-	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, Simon Horman <horms@kernel.org>
-References: <20250212-jk-gnrd-ptp-pin-patches-v1-1-7cbae692ac97@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250212-jk-gnrd-ptp-pin-patches-v1-1-7cbae692ac97@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR06CA0180.eurprd06.prod.outlook.com
- (2603:10a6:803:c8::37) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F82C2571CA;
+	Mon, 24 Feb 2025 11:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740396168; cv=none; b=PrALUMgywsCFS6XYWOMZMCKNnHi5yEkX26PZommrr3PtbeF8bVXzPH0nYYXx3rb43JECX+JAADDzuYczP6F/crU7t3d5heNLEGrsHBWKnd3d2IcWbXk5GW2Juo0U+C6g3Mj7K5ZBB4dCkmewSw0TcR8vucVZDT+2wWIDD2fV4tQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740396168; c=relaxed/simple;
+	bh=2VBeICYAdpP3CQ+os4Dl26dJqSt4EBKdy3++w+ibvzQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=V3O518wzx09B0TfwuA6d01pgUvy+yZU1zBV/b/iB8sRWIWOLKm6V+zSpr+lKZD/Q2EaIWMrZ30DgsKaXWVvetnpHAyOW2/UfcSaF2N+ulDcH4yr04Itg/rXB4KYcpjvSl18zD8K0k+w/LdN/XfwWbKiq3FB99V7dBBQOfHjm1AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Z1dYj04vNz6M4lh;
+	Mon, 24 Feb 2025 19:19:53 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9A9361400DA;
+	Mon, 24 Feb 2025 19:22:36 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 24 Feb
+ 2025 12:22:25 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, Cai Huoqing <cai.huoqing@linux.dev>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+	<shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+	<wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Meny Yossefi
+	<meny.yossefi@huawei.com>, Suman Ghosh <sumang@marvell.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v05 0/1] net: hinic3: Add a driver for Huawei 3rd gen NIC
+Date: Mon, 24 Feb 2025 13:39:38 +0200
+Message-ID: <cover.1740312670.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB7016:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad8edd0a-1026-4d91-7a3c-08dd54c7777a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UEVGTXYrS3RZdDBuanRXVy82VXAxSDNNL1ZRQ2V3Y3hrVWs4dmJZMWRYY2JB?=
- =?utf-8?B?VU1rcGxvTUY1VldLUVMvMEdZek45MVJmR0ZUZWlyYjRlTXNGb0dFRDZneUJs?=
- =?utf-8?B?NnAyT3YyTTQ4cmJoT055UndEMUwrTkdtNnpkWXpSYUZuS2JaNG1UdldwUTVh?=
- =?utf-8?B?ZUd0aTZRaHNNbXFRbDRmUEhBM3FWT1NYWGFaRER3aWVzeVd6M3lpN1NiOEdL?=
- =?utf-8?B?OEtHbDBjc05XcVMyRkVUZloxUVc4K1Vwa0s0VS9SQVV6NjJiL2o2QWxSRWVS?=
- =?utf-8?B?aVJmT0Q4eXdVYzhjcHlkbjdQa2xObXZzbWJtZElPQkZlMEMwZFBHRlZ0UGlN?=
- =?utf-8?B?eW96VzBDL0NYT0gyMEVPc0dJdDJiTC9NakhSYmZFRXFadk0yQ3plQ3VMejYz?=
- =?utf-8?B?RDBxSDF6eENUcUJjSk93cytpNjhjL0NXUm9TRmQwMlBNNGhFVUhqdFJpN0ts?=
- =?utf-8?B?R1V3VGpWdE9QT0cxSXd0cVpRVzQzMkhXckJLRDdBM3VLSDU0Nzc3NUNjRHpE?=
- =?utf-8?B?Wkx5T1diendLM0dyekFtVXpObmQ0Zjk3dnJONTR0MmhSRFpkN1FMQ3R6RDho?=
- =?utf-8?B?Si9QZTlYRHhWRklScWVIOHhJR041b1UzZUx0MUFPOEw5ZUFucmFER0FWeElp?=
- =?utf-8?B?bjJYem9tekZGQjZjeG44V2dRdEZpdHZKUUdUZGx3UHRXNjVNL21RaXRhYit6?=
- =?utf-8?B?ZFJQWkh3cDQxR2FGSnVOUkdCanhFM1dYVUJDc3FPYi9VUWR0cG5rRElHSmhN?=
- =?utf-8?B?RTVVTHZzQmI4a2FDVlI3TURDUEwrdWxvSGRaUzFaT213SlZYOE44bGZkZ3BZ?=
- =?utf-8?B?TmtlVUFiMk5UMWxlc0kzRFJaMm5Da2NXd0UyMWsxOCtRb1FhVkcwTkovTG5s?=
- =?utf-8?B?UGFXODU5SEU4UnpVTHhJZHFuSGF5RDhleTBrT1FNNldQNUY2SDZ4QXNpY2dC?=
- =?utf-8?B?TDcvdHFXYTZYTEdUNGZyRzlZS2NBcWF2R2gzNXRteGg4U2dETStHTEx0ODFS?=
- =?utf-8?B?SlMzak9VcDhPN3llZHd0eGxCUjl2V2txUENFOXJDa3A5VHA1ZEZoMGEwMERG?=
- =?utf-8?B?WUYxN2JjNHJoT2o5UVR5RUZVSHdpaEZFWXdwTkh1eU50TWk5VjZUUHF1QjQv?=
- =?utf-8?B?YzgyOFFja0NpYlFheWZpM3JoMjkxM2V5MzR6eXcxc2FPUURla21VSTFjcTg0?=
- =?utf-8?B?cHRzY1RQRENKaUc5UHNtRjRta0hWaGVjNldmK0RtdHZQSlpTaGdObFMzV2ZW?=
- =?utf-8?B?MEdhU3RQTFdGZ3VxSHptZ2pZaitTbnFiWTVrV0svWFh3NlBpdEl0cVhGYmRE?=
- =?utf-8?B?THVPaGZ3VU0zWmFZUE1xTHpFNHFjK01FelVOeWdiOHc4dG5qSHAycCtvZGFI?=
- =?utf-8?B?QmRCZWpuL3VNZjlTbldTZUFBOWJhbDlyYldVQ0VWdTA4SURwOE9Bc29kSnpV?=
- =?utf-8?B?UndnZENGZnZmTld6cWdwQk1MazJOZFZPL201ZklBRzlxK1c3akRoVnFTaEVp?=
- =?utf-8?B?QjJMd0U0Tk40Z2ZYTzhqT0o3Um44Sml6QUFTVm9UZE9hS0J1cTYrWUlKR1FC?=
- =?utf-8?B?Qm5iNmJ4NWgyQnhEcE8xMDB2V01haW1lU2Vpc2lyYThTcDRFMkNjd2l6cFRq?=
- =?utf-8?B?WENCNzF6MDQ0NkZBeE5CTEl5b3J5elFITGUrN1FPVGVQeWJtUGVaTEVnZHFy?=
- =?utf-8?B?NVpIdGNZNkd4UlViNnUyczFpcXpSQnhFY2NxeC9ueDBIbTB3aS9IOHl4RTNC?=
- =?utf-8?B?UEV2MWxaZllHc1psVHd2MmpXTjV1dktyVmFNcW9ZN0hzVEM3dzNSKzFyZ2NC?=
- =?utf-8?B?czZqeU0xWjgvMGFaRmpHWGEyTG9iM3piU0hOTjR3VXNFYnZlc1loeGZHYVlH?=
- =?utf-8?Q?NKvR73t/IAwsO?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dzNVak9HQm5JdFJxOWd4NUZCNW1oN1pGVnJZODBLY2dkKytyM0dZM2p4TU9T?=
- =?utf-8?B?WnFVd2RHUlpscU1VSklwNVBuUzhFaytjN2NZT2VickhOd3UrNC9vaGpFeit6?=
- =?utf-8?B?Sk1BdWlrb3hVREx5WUhQUCtwM0pZNlNPWFQxRDVTZ1BsYzlhV3I0M05aa2dp?=
- =?utf-8?B?eGJhVVlhY2taakFBaTZXOEZXUnk3RmpBaHB4UHYwUXM3R3lhMXBnM3MwcXNw?=
- =?utf-8?B?ZzhDbXlsR2dCczlGWlNneHBrSlI1TmhwU2VHRWZVVkdrcEFuMnpOWlZOYWFv?=
- =?utf-8?B?cU0rUDNQS0cvb3pUU0pZZW1iMFFNSE9OUXdwM0lOc0F3RDl1V1JERFBtVlZB?=
- =?utf-8?B?cDVkc1VpS0hHSzlYQWluVGdJcE4wQjhHVkFLU29WTHZuRXpuZlR3dVRiTzI0?=
- =?utf-8?B?ZnZ6dUhXczRQSFhmR2VTMmUwVFhFenhTNnVQOG5mYlJJZHU1RFh0NnVVWkFG?=
- =?utf-8?B?UnNkMEtzWDB5b3Y5TktobmN6RXlqVlAwd2hjcVZvU2g0WjhDRytVWHJrdlpy?=
- =?utf-8?B?aU5OUGZraUtuWGR6aVY3bytMNUE5eDZ6TjRTMUlUS2FZM0k3djhkaFprMklY?=
- =?utf-8?B?QjJlaGRaL3dyMWdKRVJKVDM1R1hnUEsyd1JuU3FHWlJ1aExZS2tTRE9WbURp?=
- =?utf-8?B?TGJGcUJjWWU2WmhqQXFRbG5mckN1dUQvYU53MXVpT1dwTlVieDFqVTJsTyti?=
- =?utf-8?B?dmt4ZVhNREJyaEovYnl6Y3VqRkxER0sraFMxOXcwSGdzbWVuemNxMlFNR1pX?=
- =?utf-8?B?dDF4bCtmWWhKdzRqY2NKbWJZQTdVRFRZMzY2NldJMlVaODdhb0xVdS9mcTRw?=
- =?utf-8?B?MVU0L2dndS92a25aSFZDYnRVTnFyTzF5cmFXbWdIazdMK2FkbEVFN0pnK3ZE?=
- =?utf-8?B?MC9hSVFrQ2RYajQ5dmdxVnFicWFlMExDUFZ1MmhiN2FyU1dLWWdNQjM0NGFN?=
- =?utf-8?B?UkZiQ0ZJUCtxQ0VLdW84cW5GTnlLS3hvUDlXRWMxbjVHdWE0SjJmNDhsaG1v?=
- =?utf-8?B?aXc4Y0R5RGNKLys4T3hXREJHdEl3QzRFMElTWUhkZXc2MGlXbXQ4MllscFJs?=
- =?utf-8?B?aDlIVk05aHo5ejIzR0J0R0pmS0dVNEZqT2dvQndCb0F4dzhYSWZOUTJSU3NW?=
- =?utf-8?B?TGdreW51T1BsaUYzbTVGRmtYS0NqY3hVR05lRjJiV2d2RlE3MlVwTVdsRWVz?=
- =?utf-8?B?OFl4RUluYWhnNGkrb05OUGxRYXhnOEdrb0FIS3dkWnNKL0RSRDM0VnhDNW44?=
- =?utf-8?B?Ym9NYTlrdmgrL1BPS01wY1hmMnZ5S0U0NGxIbHpIcHV2djRNSUJBMDFmVmpW?=
- =?utf-8?B?MFFTRkgzaFd2RVpJaHBZS2dpMVpicUVweVFRRkRZZ1dCczNPcGZReHRwMFNI?=
- =?utf-8?B?c0FJS1M2cHJMZ3R1cjBnM3Z2Zk04ZzRjeWF2RzlZMjhWdlhIMGZFY1R2L0Ey?=
- =?utf-8?B?TVJlK1R4VW1VWEt6dmMxVVArQ3ZhVFZxbitzTXQ5Y2VSL2dDQkVHdlRGZzgx?=
- =?utf-8?B?ekt2NXN0QWNuamtHdVR1L2kwTWFPbXRFZXVYODBmQ2cvQlB1R1c0dkk0U3lC?=
- =?utf-8?B?a1FQamZtT0RzYUQzVzhzcGprK3FEcGFNWXRST1phempEeDJQL3ZlNXcrREt2?=
- =?utf-8?B?a1dEckpBZHBtbTg4WVdlQmpLQ1p4T29qOXpBcXI2R29DV0M0dkRTa01BdE5a?=
- =?utf-8?B?eVZ3eEEyeS9paXhtdWpmVjZ1b0FGS2Z3SmQ3OWtQK0ZLcUxVbW5iTnROdk1r?=
- =?utf-8?B?RjNQWjFkZFU3MHgrL05VeUJLRTEvNmhPeE9YZ2FRWXhPVWNMNWpxRHQ3ZFhO?=
- =?utf-8?B?andnNFZnbjV6VlBmclkrRm5DSktkekJmaDZINXhObDZhU2ZMNFNhd2JPRm5r?=
- =?utf-8?B?QUxNTEFVRXZnZzdsV1Avdk12NDJSbXJtNkZkOGFSeDZTM0dvOWFkeDNZZzht?=
- =?utf-8?B?cWtTV0hvK3NpV1kwQ250Um9UTHhqcmJuaFNtdGJTTXlNTFN6RlY3SFBjWW5M?=
- =?utf-8?B?WDNuZnk5dTNXSk95Ry9NYUUxU3B5bFVBWHJSaW82YVZVZjhzRjlSYnRHSEtO?=
- =?utf-8?B?WWpIelhQSU15NGZCU1RUS0U3bnJXU0dkWWZyZWtXMnJPTG1pYTdBRXh1NVl1?=
- =?utf-8?B?YkEwanRpdmJQbGJiL2tSMjZ2NVRjSkVTSWFxVzRVbHRQSSt4SnBZNEZRR3d1?=
- =?utf-8?B?Ymc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad8edd0a-1026-4d91-7a3c-08dd54c7777a
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 11:36:23.7036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7/kDsgxNouYUPxv0h2MSrNtqT0Nf7c18t5l1huKNMpkIzNNn+fvI3FjIbwqynrOkzOjMCEd2sCkf5SN/RnvBakUcpL7A9t9/kUltZnk2FW8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7016
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On 2/13/25 00:54, Jacob Keller wrote:
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
-> 
-> On E800 series hardware, if the start time for a periodic output signal is
-> programmed into GLTSYN_TGT_H and GLTSYN_TGT_L registers, the hardware logic
-> locks up and the periodic output signal never starts. Any future attempt to
-> reprogram the clock function is futile as the hardware will not reset until
-> a power on.
-> 
-> The ice_ptp_cfg_perout function has logic to prevent this, as it checks if
-> the requested start time is in the past. If so, a new start time is
-> calculated by rounding up.
-> 
-> Since commit d755a7e129a5 ("ice: Cache perout/extts requests and check
-> flags"), the rounding is done to the nearest multiple of the clock period,
-> rather than to a full second. This is more accurate, since it ensures the
-> signal matches the user request precisely.
-> 
-> Unfortunately, there is a race condition with this rounding logic. If the
-> current time is close to the multiple of the period, we could calculate a
-> target time that is extremely soon. It takes time for the software to
-> program the registers, during which time this requested start time could
-> become a start time in the past. If that happens, the periodic output
-> signal will lock up.
-> 
-> For large enough periods, or for the logic prior to the mentioned commit,
-> this is unlikely. However, with the new logic rounding to the period and
-> with a small enough period, this becomes inevitable.
-> 
-> For example, attempting to enable a 10MHz signal requires a period of 100
-> nanoseconds. This means in the *best* case, we have 99 nanoseconds to
-> program the clock output. This is essentially impossible, and thus such a
-> small period practically guarantees that the clock output function will
-> lock up.
-> 
-> To fix this, add some slop to the clock time used to check if the start
-> time is in the past. Because it is not critical that output signals start
-> immediately, but it *is* critical that we do not brick the function, 0.5
-> seconds is selected. This does mean that any requested output will be
-> delayed by at least 0.5 seconds.
-> 
-> This slop is applied before rounding, so that we always round up to the
-> nearest multiple of the period that is at least 0.5 seconds in the future,
-> ensuring a minimum of 0.5 seconds to program the clock output registers.
-> 
-> Finally, to ensure that the hardware registers programming the clock output
-> complete in a timely manner, add a write flush to the end of
-> ice_ptp_write_perout. This ensures we don't risk any issue with PCIe
-> transaction batching.
-> 
-> Strictly speaking, this fixes a race condition all the way back at the
-> initial implementation of periodic output programming, as it is
-> theoretically possible to trigger this bug even on the old logic when
-> always rounding to a full second. However, the window is narrow, and the
-> code has been refactored heavily since then, making a direct backport not
-> apply cleanly.
-> 
-> Fixes: d755a7e129a5 ("ice: Cache perout/extts requests and check flags")
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+This is the 1/3 patch of the patch-set described below.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-https://lore.kernel.org/netdev/20250215145941.GQ1615191@kernel.org/
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-> ---
->   drivers/net/ethernet/intel/ice/ice_ptp.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index e26320ce52ca17b30a9538b11b754c7cf57c9af9..a99e0fbd0b8b55ad72a2bc7d13851562a6f2f5bd 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -1783,6 +1783,7 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
->   				  8 + chan + (tmr_idx * 4));
->   
->   	wr32(hw, GLGEN_GPIO_CTL(gpio_pin), val);
-> +	ice_flush(hw);
->   
->   	return 0;
->   }
-> @@ -1843,9 +1844,10 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
->   		div64_u64_rem(start, period, &phase);
->   
->   	/* If we have only phase or start time is in the past, start the timer
-> -	 * at the next multiple of period, maintaining phase.
-> +	 * at the next multiple of period, maintaining phase at least 0.5 second
-> +	 * from now, so we have time to write it to HW.
->   	 */
-> -	clk = ice_ptp_read_src_clk_reg(pf, NULL);
-> +	clk = ice_ptp_read_src_clk_reg(pf, NULL) + NSEC_PER_MSEC * 500;
->   	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - prop_delay_ns)
->   		start = div64_u64(clk + period - 1, period) * period + phase;
->   
-> 
-> ---
-> base-commit: e589adf5b70c07b1ab974d077046fdbf583b2f36
-> change-id: 20250212-jk-gnrd-ptp-pin-patches-42561da45ec1
-> 
-> Best regards,
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional. The RFC02 submission contains overall view of the entire
+driver but every patch will be posted as a standalone submission.
+
+Changes:
+
+RFC V01: https://lore.kernel.org/netdev/cover.1730290527.git.gur.stavi@huawei.com
+
+RFC V02: https://lore.kernel.org/netdev/cover.1733990727.git.gur.stavi@huawei.com
+* Reduce overall line of code by removing optional functionality.
+* Break down into smaller patches.
+
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1734599672.git.gur.stavi@huawei.com
+* Documentation style and consistency fixes (from Bjorn Helgaas)
+* Use ipoll instead of custom code (from Andrew Lunn)
+* Move dev_set_drvdata up in initialization order (from Andrew Lunn)
+* Use netdev's max_mtu, min_mtu (from Andrew Lunn)
+* Fix variable 'xxx' set but not used warnings (from Linux patchwork)
+
+PATCH 01 V02: https://lore.kernel.org/netdev/cover.1735206602.git.gur.stavi@huawei.com
+* Add comment regarding usage of random MAC. (Andrew Lunn)
+* Add COMPILE_TEST to Kconfig (Jakub Kicinski)
+
+PATCH 01 V03: https://lore.kernel.org/netdev/cover.1735735608.git.gur.stavi@huawei.com
+* Rephrase Kconfig comment (Jakub Kicinski)
+* Kconfig: add 'select AUXILIARY_BUS' (Kernel test robot)
+* ARCH=um: missing include 'net/ip6_checksum.h' (Kernel test robot)
+
+PATCH 01 V04: https://lore.kernel.org/netdev/cover.1737013558.git.gur.stavi@huawei.com
+* Improve naming consistency, missing hinic3 prefixes (Suman Ghosh)
+* Change hinic3_remove_func to void (Suman Ghosh)
+* Add adev_event_unregister (Suman Ghosh)
+* Add comment for service types enum (Suman Ghosh)
+
+PATCH 01 V05:
+* Fix signed-by signatures (Przemek Kitszel)
+* Expand initials in documentation (Przemek Kitszel)
+* Update copyright messages to 2025 (Przemek Kitszel)
+* Sort filenames in makefile (Przemek Kitszel)
+* Sort include statements (Przemek Kitszel)
+* Reduce padding in irq allocation struct (Przemek Kitszel)
+* Replace memset of zero with '= {}' init (Przemek Kitszel)
+* Revise mbox API to avoid using same pointer twice (Przemek Kitszel)
+* Use 2 underscores for header file ifdef guards (Przemek Kitszel)
+* Remove 'Intelligent' from Kconfig (Przemek Kitszel)
+* Documentation, fix line length mismatch to header (Simon Horman)
+
+Fan Gong (1):
+  hinic3: module initialization and tx/rx logic
+
+ .../device_drivers/ethernet/huawei/hinic3.rst | 137 ++++
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/huawei/Kconfig           |   1 +
+ drivers/net/ethernet/huawei/Makefile          |   1 +
+ drivers/net/ethernet/huawei/hinic3/Kconfig    |  19 +
+ drivers/net/ethernet/huawei/hinic3/Makefile   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  27 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  25 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  54 ++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  32 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 113 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  81 ++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  15 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  50 ++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   | 416 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.h   |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 420 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |  15 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  13 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 105 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  77 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 230 ++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  39 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   | 100 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    |  21 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 118 +++
+ .../huawei/hinic3/hinic3_queue_common.c       |  67 ++
+ .../huawei/hinic3/hinic3_queue_common.h       |  54 ++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  12 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 402 ++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  91 +++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 693 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 130 ++++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    |  29 +
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  76 ++
+ 40 files changed, 3842 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/huawei/hinic3.rst
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Kconfig
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Makefile
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.h
+
+
+base-commit: b66e19dcf684b21b6d3a1844807bd1df97ad197a
+-- 
+2.45.2
 
 
