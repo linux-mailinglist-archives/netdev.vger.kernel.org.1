@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-169130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B40A42A50
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:50:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7189A42A68
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852BC17179A
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:49:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0DE23B671C
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EB325B667;
-	Mon, 24 Feb 2025 17:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44360264A85;
+	Mon, 24 Feb 2025 17:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXX48o7v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRxdA9Qm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A5713B298
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 17:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB36F263F4C;
+	Mon, 24 Feb 2025 17:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740419392; cv=none; b=LqVYo3uWkX8gZer+wSXJTfrcjBgnduzZVgPZDdqnvJPVQRhSAz9Z+EnAsyWH9jU3iTU15MOZZfdhdZg3cz48z+uddDM9DH7HCIIKCg4yKDc6IdEDC6qeuIPG5vpdcBTJ2NSbg7Vc+I40FAuhVEvyIsPI9zwKgXkyni86gWyetDo=
+	t=1740419659; cv=none; b=GYDiw8SP3uC98TM38DwyhSB/L+86lRCTajp79CZFVLDu/kW0dqYnsQ0x33QJg/BpElp5ure3h6I0sMDt5fzUuP0W4Tfam/bgQSXZj3l+rNHeRcIzIHh7yDR8K1CxOrn+JBWdyu4dnR49XTivj2Yb6fsPz4I5+2N81cb8BlqznPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740419392; c=relaxed/simple;
-	bh=GB1IhONeKR4syl6c0o1osF2NhlaAdl+Sqob8s88LdDU=;
+	s=arc-20240116; t=1740419659; c=relaxed/simple;
+	bh=XnnclfgnjJGNnAA52fTfntiaxNx9k5+h16ZPEYb+gJU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btSRWJPQeyATSS/mvYRqdgH96eKqwfsXNCyIAgJEbApguhkydikF9etGTrrz4RR5FFwDB3TlHZX/HGQVDy1/C39aNSl2x/b7yrWiu+338X9iqvwvZbbOSyCBJIwEVnrZhpmdq6TjKu+dlPDCb0QXd/UVzhWsSg1sDl9zfztz448=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PXX48o7v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740419389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0HtjuCc448nfsO3TqmBzP4Az8dPXtOK2W5dQj7pab48=;
-	b=PXX48o7v3jbYnYGgV0eb4VFeeRS/U/VJMrUXHVisW8ypJ5QJNZ4NonTahDB/Kg+zlkkuqw
-	TfwFGOGOu9NibHGHxkh+7JvfJArBgQ/FEKVUNQ+NSap+DyFQf/mn+igLKOLFdZMl02TdnD
-	UBCJczv77Y324ddo5i8OH6XjglBTvd4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-JhKDN2X0OkSRGeuF4w7Ftw-1; Mon, 24 Feb 2025 12:49:48 -0500
-X-MC-Unique: JhKDN2X0OkSRGeuF4w7Ftw-1
-X-Mimecast-MFC-AGG-ID: JhKDN2X0OkSRGeuF4w7Ftw_1740419387
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38f31e96292so3090959f8f.3
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:49:47 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UnkrsjpBMJuMMw1b0ObZ5gaqXG8e8QOHI7QjkpRB5J0QlwgIc2Y5+jHFKeO2IYQyspbK/BFo0vNbzhLa1hQjyswKRjzDxNGkx044bIZLAMdmk/0Al9GCSqCaUYyQ8S7T91cXtIgkhkJz2CV5LFk8mMdqeIcu4OQqImo+EyZbBCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QRxdA9Qm; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-220ca204d04so76249705ad.0;
+        Mon, 24 Feb 2025 09:54:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740419657; x=1741024457; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=49hFWAS6BPi17cq0UX9zIx62B0WnB3kN7+csrm3gvss=;
+        b=QRxdA9QmLXriQ978u1EiPntVJye3dlz3vsW1rUeVem0xCR66nt0R7Tn2VCl8PukbyC
+         l1fcTf/IHJfUVHW45cOoiI166SSIcBFnMwDuaBHuaJsbrvrchjSgWZj4n9aInLUqGIY4
+         TgavKTO2j938hLTSTEzupqWMHoE2YWVm4h8SNcZUWCfwim+3x33NSX2QGTSuTevIVifq
+         /RTXOPhYottEemC3sc4IbMW9aEswHo+kla1Dij/6ZsUk6kJ7gKYskEDZEvBHd6nTaEXq
+         wc7/AwbZS5NOv8uAZCfsdgxXFXESmErX+HPrB/5WU7njZ+4MNgTlXs5jCmf4KJB3p3B6
+         rPHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740419387; x=1741024187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0HtjuCc448nfsO3TqmBzP4Az8dPXtOK2W5dQj7pab48=;
-        b=DsHwcQJSw7ocA46Qe904hlv/u395I+qvzrxQffaRjFx4Y4+ML6QgugAxVrZ8R9SIN1
-         5I3pZZKgx8h1lOJht/2xqD6xaR0OvGJzoIgHDu/wS65d6X3t2B/ziVJs0TH6U+UNmEQm
-         PGh3U8DC8vQuuHGrvPLZhOGJRtRNlwVRW3nL3LogpIvuIeM1RX/n2L3b5sZAOedD/faL
-         H1PliwLjtT+9btzNJMBPqhZ4LoLpx4nOdRKlk5wJvYJX2dhWbdiDDhiNiV5JrinCUOoS
-         oJz+NhTVAVXm8dnAXW/JD/lYAsrbmGZzOG/lbKPhpxmWJc8/OXH5i7TsPbfWC3o4BDAt
-         /2cg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlcQ+W7KjJim7b9N4UHweo9ozt3dH3fbGMlX/xgOTLmkrTMpxegjnBo3Q7K1vb0/YD60XYBEU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNb9m5NsgAoADLVGxC9MnzV8yeLelhrJY8GDiWzcOfBHruoA3b
-	UQraRtX7hTMJ4Ur9tlToQfpQ0XFYyZe7WWOdzgqybwRZehNmJJ19d4AOBKZXwXVbcSCCpmhHUG8
-	G4PE3K0rVJg1b6qM/zEV1VP0S+B6qLZ0gegPirtj5SfECVz99miW38A==
-X-Gm-Gg: ASbGncuUZfGA9Q/M391oEHjSNRo3s89ikSStfCnZjW9hccFRI6t1BkgAfEM9zG6vGIo
-	w3Rg5A5zp7N/wIfUEzjor2RJOW2Ko1pZiCIGdwEGE5S/U60n0NipWiZxWRnVrhaDsCfT19TIvU7
-	tH/EsGoxKGBVCgH2jizK4znhtiC8dUNl4mE8ZMIhZ6tKO/gFmDh/Fq1X8VYaL6aVUHlZoyoSgGd
-	7OzqCTTDAMt7NrmEQfuEtes2adZE2I++yw/fjYNIACj9yV3Mciey+xpsVJDaqB/IW8eUXepk3qK
-	RO8=
-X-Received: by 2002:adf:f889:0:b0:38a:8ec6:f46f with SMTP id ffacd0b85a97d-38f6f0d540fmr11039294f8f.53.1740419386873;
-        Mon, 24 Feb 2025 09:49:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG3kEEAF2Ft0BUqbiG2kHcWQ0Y8SKztf5bPzMA6yvnwfDLuqLbiz9E6nJJUVOQTr6tM+U2Xew==
-X-Received: by 2002:adf:f889:0:b0:38a:8ec6:f46f with SMTP id ffacd0b85a97d-38f6f0d540fmr11039268f8f.53.1740419386540;
-        Mon, 24 Feb 2025 09:49:46 -0800 (PST)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f7979sm31859506f8f.83.2025.02.24.09.49.45
+        d=1e100.net; s=20230601; t=1740419657; x=1741024457;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=49hFWAS6BPi17cq0UX9zIx62B0WnB3kN7+csrm3gvss=;
+        b=CcppDVcrK7DKLR8CfPwxTVDdrxhv8wZDiXWwWntxDdo99sOH8bwaad9YuOxqpkmCDW
+         dMvictKtoHi0OlIaYs3Xk58T+aCl9sX5ORor+jhgU9cteeUt4Mu3HU1519Ih3YHMLmc5
+         OgroHrJ3sdgnlyNFHlQEto9I1v862N32xb+nZvNArnWRe7STdcTB1Rh+n+a9L5tQ0a0h
+         8CUD3bFXAYNwGtcm4s6tYSYVowLm+JPb8EHp18ax68G3kspMlv470DH78m3c4auwDn3j
+         K8T/RvoFQ4azG9ghV/L6EYFLnV5YOt3KMFvOCQ4Cx7kTWia6+zlLYYTh9dUOqKqsqp3e
+         Qprg==
+X-Forwarded-Encrypted: i=1; AJvYcCUC2hyB2FQCprkTEMqETGLZjia6Q9AcMivneFWo26T7C4HIQdXBQ1jfO7cIsxAj13Iiu02Koonu3faW4eCz@vger.kernel.org, AJvYcCWj38ePJkVc+U7JOWIgRJUNbr7FhJ2lvu0cX1Y6pnQcIojwGEd1YZ+/TivKX724c/Qycaz6g5A46CnMX1K0GD1i@vger.kernel.org, AJvYcCWsmCU4+RO/PUddcFlejuePQnVBLoEghA4jbSEW1vNWihydLbv2tbjs5H0t4cH8y49XHXvYHCUIgA2I@vger.kernel.org, AJvYcCXDaoR6un+a6kIVh36rRnaQBbBxMURQmPdNNojuuS1WTTrgPRB2wePi3ltYPhqoiLIs7d8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB5NTJK8sJF5kvTYLoAs0tdqxFAdXSQGp0uDRliNl1TB5owNfi
+	d65PRcBGMAMl7BPl3yVlEFOmhchkxHD+5kt+nuVys3r8bCGORvmqrstyb4s=
+X-Gm-Gg: ASbGnctq/CuqI+xhHZrzGFb6g2koIGEVCf98EckgyHEUmssLIXRB5btwzHXXGYmXfhP
+	hjkYUo2fTYI54snGvQExfiBDbUOYOGwC7wZG8dScTuS0tqvNif8y1ocE1SbZJnvrSymAV0HmwyH
+	HQMQV6TEJj1N7Ej2vpfCvd5uceNf42wVfy5czHm7mN5lOchahtCOFvhE7ToD5OeZpr6iPMkTrHe
+	3J/nFTGkrlbTL5D09fFH/KFjqebSo7vNRTRcd1zQD3KQV82/Okyxg0r3gPhydCyWIdSih6ac4cF
+	U00nO7qqQCbOH2PLRuxgnB1wJQ==
+X-Google-Smtp-Source: AGHT+IEo+qn0GrfRoEoT6iMqO7/d+JhNhLZkzb0haVeC/Qk31b9/5jQycW3R+yfCTVCSg4EuX/UngA==
+X-Received: by 2002:a17:903:2343:b0:220:fb23:48df with SMTP id d9443c01a7336-2219ffa759bmr230045575ad.36.1740419656914;
+        Mon, 24 Feb 2025 09:54:16 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-732581df0bbsm18607889b3a.156.2025.02.24.09.54.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 09:49:46 -0800 (PST)
-Date: Mon, 24 Feb 2025 18:49:43 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+        Mon, 24 Feb 2025 09:54:16 -0800 (PST)
+Date: Mon, 24 Feb 2025 09:54:15 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
 	David Ahern <dsahern@kernel.org>,
-	Antonio Quartulli <antonio@mandelbit.com>
-Subject: Re: [PATCH net v2 2/2] selftests: Add IPv6 link-local address
- generation tests for GRE devices.
-Message-ID: <Z7yxN/S1BI4xwy+M@debian>
-References: <cover.1740129498.git.gnault@redhat.com>
- <5c40747f9c67a54f8ceba9478924a75755c42b07.1740129498.git.gnault@redhat.com>
- <Z7sw1PPY48pkEMxB@shredder>
+	Neal Cardwell <ncardwell@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v5 9/9] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <Z7yyR9oRhHXv9a9z@mini-arch>
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-10-almasrymina@google.com>
+ <Z7ypMjORvm99q6L0@mini-arch>
+ <CAHS8izM9xMqWnJB5Cm=DMMBV1BuUemFjKSv9So8V_xQ8ToTRqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z7sw1PPY48pkEMxB@shredder>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izM9xMqWnJB5Cm=DMMBV1BuUemFjKSv9So8V_xQ8ToTRqA@mail.gmail.com>
 
-On Sun, Feb 23, 2025 at 04:29:40PM +0200, Ido Schimmel wrote:
-> On Fri, Feb 21, 2025 at 10:24:10AM +0100, Guillaume Nault wrote:
-> > GRE devices have their special code for IPv6 link-local address
-> > generation that has been the source of several regressions in the past.
-> > 
-> > Add selftest to check that all gre, ip6gre, gretap and ip6gretap get an
-> > IPv6 link-link local address in accordance with the
-> > net.ipv6.conf.<dev>.addr_gen_mode sysctl.
-> > 
-> > Signed-off-by: Guillaume Nault <gnault@redhat.com>
+On 02/24, Mina Almasry wrote:
+> On Mon, Feb 24, 2025 at 9:15 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 02/22, Mina Almasry wrote:
+> > > Add support for devmem TX in ncdevmem.
+> > >
+> > > This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> > > which included the TX path, and work by Stan to include the netlink API
+> > > and refactored on top of his generic memory_provider support.
+> > >
+> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> >
+> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> >
+> > We need exit_wait=True for check_rx as well, but I'll send this change
+> > separately.
 > 
-> There are some helpers from lib.sh that could have been used,
+> Yes, I discovered the same thing, and I have that change locally along
+> with some other fix ups I'm readying up for review in a separate
+> series.
 
-Yes, I reused a personnal template that predates lib.sh. Given how
-simple is the setup of this selftest, I'm not sure if it's worth
-including lib.sh. But I might consider doing that in v2.
-
-> but the test is very clean and easy to follow, so:
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Tested-by: Ido Schimmel <idosch@nvidia.com>
-> 
-> Thanks!
-> 
-
+Perfect, then I'll wait for you to address it separately!
 
