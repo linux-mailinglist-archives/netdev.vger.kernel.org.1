@@ -1,244 +1,339 @@
-Return-Path: <netdev+bounces-168944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C0FA41A5D
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:11:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CBDBA41AA9
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BBDB1887E00
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:09:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A08B172525
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB2124A05B;
-	Mon, 24 Feb 2025 10:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369762500B6;
+	Mon, 24 Feb 2025 10:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlKJjgca"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ah1lQ5x3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEF224A062
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 10:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740391767; cv=none; b=jMEW2txpQe7U1EtjX9hMujyiRLj2QqEEjRulSU9ApEp4wp+4aYtUEI+ZHtPk/faVCQopewTzjgPJlBieWssbLJGu/uTBYMFusM51ldRjFDRBgRXsxOT9OWEfCwQ9PQkUfddOK2CbwnlWjTFku5UmY+hCrvTixgZLdFgn8raL1tA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740391767; c=relaxed/simple;
-	bh=OWyKa8ptHkaxnDRPZ9/w8sCzsrhha62MtGM3wPrXjdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dZ6U6c9vELVBkbiQJkXqmxB4mUr5PT1E4FIo4rvXvsAkJ0VfVJ2vqG5IHU7MRwhK2Bgx009aiGzeOeanSYLgzUFHUhc3I+4qaMMatcHgsJ4ArylizYQ+wkVUqT+YcrmiPJGLMpOhNfxmMwIffhSncv7/Qm+7RSg/H6NaxFGfyk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OlKJjgca; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740391765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qiAHvV/pLQygl1IHlcIkR9ngI2lLMS2rvadb1azQMOs=;
-	b=OlKJjgcaUzk4V9OBk03nOPznNgUxHiL0vVuKw8ZIn3EB0fo1HZcO5/iVBQ2GU6MckIYbS0
-	HfgeEIL1O/vltMUM4kq/9ZgEs2HVAdkNy4g9FmUjV88GjVYhpgdyBLpyACdcKrvMOOiYjw
-	z19fcvmFhddVLddZQ6DXE1w4d5LWASQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-413-SiDfiuoXPliZNpmxoipK_A-1; Mon, 24 Feb 2025 05:09:21 -0500
-X-MC-Unique: SiDfiuoXPliZNpmxoipK_A-1
-X-Mimecast-MFC-AGG-ID: SiDfiuoXPliZNpmxoipK_A_1740391760
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38f255d44acso1782475f8f.0
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 02:09:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740391760; x=1740996560;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qiAHvV/pLQygl1IHlcIkR9ngI2lLMS2rvadb1azQMOs=;
-        b=dQlPNdS5Jh46c+fVAxHfUhOYGJfEXqgsY/Q3humBzlrUoFlOzNZJE24NZWp7kzx7Lz
-         F9JVyfBXoL++TwBlpw+qXR3DrfPodDRedu+0GS0T9pEdxaIdPBCOKHybgcenxHea0lIe
-         b6UcmSxtqqN6onSZ3S/cRMEZuLXFh4GKS1ztHuYzZq/Yj8RG6hYuSAnGvYoaeP0z4Ezr
-         vsyvlLWPk1mQEHdzuFfsJCxSHvJ+T0/UzqU6q+49hpY0JyFnFGRTj1Ih6hgYnP2DNPXA
-         rvioWlXHvaYdpaVF2DwkR04wQ4WFoVWV2FtO4HW964H3vew1jPL4Nug6/TDNdVC+q+ql
-         x2pw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOX+qzUQ5FtJzhfIflAp+I/YrVlXjfe2JGN/lO9u6xstPDGXtZH3bs1jssUwdaKFBNYvTjG2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpUQZQcwlS778jQxbCA5xznZ6fXVgNoWcyBv34WovdY+YPoddS
-	Uh9YXmu241ckkoVgUWKJqxNDvz96T6uiyak7BA9XmS7H4EQQgV7Sazmk3B1ffERNKY+raGXo9V/
-	twFsc0X+ZOwwtTwlwF8gBdUnQ+SmJEAbrdj2l4zVzb7pGqkdHit0CyQ==
-X-Gm-Gg: ASbGnctgAtw/HdOyXY51JvDEhLbDVaLonOoRxrEw9RUJX5Uk/5hDsIkk7wId29E6m8Y
-	QlkZG5dbnERAlomsnoHykhLIwFGo0FqD3nPXYZ+iu8HqXS6WbfIYxqmN/vnOvwDvcoILaHOnxdE
-	J+ZmUWGSrgFz0HR83lRUOauqbwjEXyq+tjmec3VCLtykcrg2bKLqM/CjF64Y4cU0g0rMG4L/X6H
-	oH7YGPPGot7kOSufPZ4PgnCldDG64+5P8fG+hnoGpTRCIaxCPW6U+ofga9faFoEzqzJGQjaxTt1
-	r19T5FtDCA9FVEV6Unr4xfv6s7VzPaCf/WiBLmbhvKw=
-X-Received: by 2002:adf:f3c9:0:b0:38f:2b59:3f78 with SMTP id ffacd0b85a97d-38f6f0ac5a3mr8457412f8f.45.1740391759658;
-        Mon, 24 Feb 2025 02:09:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG7eusrm5SqCT8mF5AbrGxULnH9g0Ag6sQkU6il6PYpOhUlbaMjBtTXltIszKDNSUXqGotYsA==
-X-Received: by 2002:adf:f3c9:0:b0:38f:2b59:3f78 with SMTP id ffacd0b85a97d-38f6f0ac5a3mr8457385f8f.45.1740391759262;
-        Mon, 24 Feb 2025 02:09:19 -0800 (PST)
-Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b030b2c8sm101817405e9.25.2025.02.24.02.09.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2025 02:09:18 -0800 (PST)
-Message-ID: <9ef28d50-dad0-4dc6-8a6d-b3f82521fba1@redhat.com>
-Date: Mon, 24 Feb 2025 11:09:17 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E754917557C;
+	Mon, 24 Feb 2025 10:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740392175; cv=fail; b=SVzqIIz1PishtGtZPMKuZD2NCc7xZlmEywsine3moqBKYa79MJjY+KW0/+2V/2NtrVBaKpuiUAYtn2RipwmuMBYq0Pgl8ojTiDborbeOtc5ZnvqU3rExFQIGZ//fQaNktsFaWPijBDOhf+jGTmyF1DSvwy346ETBhkxwOEk5l9k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740392175; c=relaxed/simple;
+	bh=QpviWaTc92ljMKYlE7SAni0hfsU4XCK3nF0Zu3FePnk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VsyrGweUAfWIs9G0ZskTinjNu2L4F3nLNVTBt8tcXsb/w48Gr8MgI5QyjBshA9k7vctVYJRimRhm8h8DA+zS1n5SRurP5Vk0CnVv9ptWuF2eTC/CwXCSITAfHa/YFQpg7WZ5qhDx9ZbRxF2kznaHH9oF9wo2cE5+UV6MQR+yGEs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ah1lQ5x3; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740392173; x=1771928173;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QpviWaTc92ljMKYlE7SAni0hfsU4XCK3nF0Zu3FePnk=;
+  b=ah1lQ5x3q0egAI67dKIm9n+r/PMXIPEMqSAOgyf533JfJfJSJ/atUEkk
+   MvRjXIZY2LEoaq4rlhXtP1yLjVyWJ0YHnMMdwTwhIqe043zKBOBknG+Ci
+   IiFRa0zVrAkJ8uOQGSRnvgIRp7UMDkzLWVVET9wLcX2ELuoJSsEMSXlnU
+   f3RUYlYUIXXcvqPXniFnKA4t4LFz3SlhycvDS9PLHtUSUgtY1Lx0noRJ5
+   9+fv2L8gxOfevgwtGGQoIAOOM4QybK+LVAqfWtBC3bFjz/+caOIIndtTI
+   4bAdxVLkc3BgBH3ia2PrYIZ5sk1B+zRBZf2RjtavQ0p3XMId8pSLCdCkD
+   A==;
+X-CSE-ConnectionGUID: 55hW/k2gTyyXUbArFGAZjQ==
+X-CSE-MsgGUID: XNzXkkRdT/CVvXLPCNTuAw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11354"; a="43969637"
+X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
+   d="scan'208";a="43969637"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 02:16:12 -0800
+X-CSE-ConnectionGUID: Cs9WO3XcToSQ8LN/J3LF6Q==
+X-CSE-MsgGUID: sJuXH1nORP21orkOJb8hgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
+   d="scan'208";a="116036509"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Feb 2025 02:16:04 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 24 Feb 2025 02:15:42 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 24 Feb 2025 02:15:42 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 24 Feb 2025 02:15:42 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=N9DF6EqZZUHyIfNUuuG2q8VumtkH06fxLoCwqhqlsxbtarSnx7d2ghV5mmnsFjFUdUhKABP0b9XsobD0eHPCfcQuE6x5RMmyZCW7Uo/gDZX+9OO+fa70tDNp8INC6LZaWeIZqk/l6VUkemxMJWc5T8LDtQEhfqyjAgqAifvnr55WArHQijy4L21YWNn7ktU9eWndaKpwpgjrRaUDaQ+D88QtvJbAWYe8ysZLICNr/TBKjVpmLHhLJYIoSEu6tG2EFFO3VgmyovyMS98Kj/b/DVyyKgMCtwoIXLONNdDw49oBWYT6KuC2w9QMYequwj4lHAFcPx8BXjoi92p2xXqYnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/pOJz1SvPSMOXrHV1KQ7zupj1S5GEzG8vEB80OhcarI=;
+ b=hBWypcc+ynLcA31nv0XhtTOLHYASdTwtX/mWe6YxzZHvryVgHU26WE3/ta9KrhhX1XoxpgTvY/heJEX2b/G94uO4mKIodSUc5h0BK72dHiBKphyfYAhYS7FCXAxbe6KoMkoMaQz8C/3KLqDaBNg93b3ezFs3HVc7GNLSYFZNfAxAlzvgXxQqpDVb0LkoCEHA8cvWd88O8gHj0ueyZB22VR+6xjzbkYgb/JVcvQMEDLVuyF3b8KhIaO4JAd7D17A17p082wt+JXfbcST5laM9bLj0afXjJslYpP/RePWtRgr1iVbH/M0Jsj4t40e5jS8jLYocDTZgleDXYPRlYIsmvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by BY1PR11MB8077.namprd11.prod.outlook.com (2603:10b6:a03:527::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.21; Mon, 24 Feb
+ 2025 10:15:40 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8466.016; Mon, 24 Feb 2025
+ 10:15:40 +0000
+Message-ID: <0f3cd937-8a10-47c3-8016-4ff7f31e506b@intel.com>
+Date: Mon, 24 Feb 2025 11:15:33 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v2 1/2] devlink: add whole device devlink instance
+To: Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>
+CC: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>, <netdev@vger.kernel.org>, Konrad Knitter
+	<konrad.knitter@intel.com>, <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>, <linux-kernel@vger.kernel.org>, ITP Upstream
+	<nxne.cnse.osdt.itp.upstreaming@intel.com>, Carolina Jubran
+	<cjubran@nvidia.com>
+References: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
+ <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
+ <20250220174512.578eebe8@kernel.org>
+ <2a8a5ef5-af9f-4c16-887b-514b614b8c80@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <2a8a5ef5-af9f-4c16-887b-514b614b8c80@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI2P293CA0003.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::16) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH mptcp] mptcp: fix 'scheduling while atomic' in
- mptcp_pm_nl_append_new_local_addr
-To: Krister Johansen <kjlx@templeofstupid.com>,
- Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>
-Cc: Geliang Tang <geliang@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev
-References: <20250221222146.GA1896@templeofstupid.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250221222146.GA1896@templeofstupid.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|BY1PR11MB8077:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fbd0196-0f8d-4c1e-1f32-08dd54bc305a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MkdsZlRQUk4wWnVlamE1RmsvRnYrb0d6dVB0aGZJNXgxdFk1ME5tOTNvc0t3?=
+ =?utf-8?B?b1N3VEJERTBaSTh1MXN1My9BNm9QMndSRG92UmpTWk1MRG0yeVZ6d3JkRlYx?=
+ =?utf-8?B?d2xsaVBCSnlLc1I3blpMb2tQUDVFUmxwTHQ2cTZTTWUyUjJ0TzhjanNwazM3?=
+ =?utf-8?B?TTBkS1dmNzY2WTJZMGVQTnBuOGJqT0F1OFRvY2QwNVhJekpCdDBpWXlEZGhZ?=
+ =?utf-8?B?T0hoaUZhSE1welFEWWdhTndjVUNRSUZMUmdyNXNOOVptektiTGEweFRLb3dz?=
+ =?utf-8?B?b3RxZnVUdzJ2RlNSYWVqMUlsN0RHU3E4NkVzZmRJekdjNFpieWl4MTVUSGcy?=
+ =?utf-8?B?STNLdVJ1VERqcy9qS2t1bklZSFFMTTk5eW00RnYrbldaQkc4Z2pXaXNFM1VF?=
+ =?utf-8?B?cXYzaG0veEFzTWVFMWFQWXNGLzR2VldoVmlsZ1dNWXhPMnh1UUMyb3ZDUkhv?=
+ =?utf-8?B?WXQ2NXB4bS9zanA1Ky9zL01jRTk3K2dzQ2V1ckNObkZqdExBbFFiNTkvS0lp?=
+ =?utf-8?B?MlpnYlh4ZFQ2SzM3VWpXZTRNNUE5KzJWbStIb3JnbUQxOXJiSFE3Tk8vbjZ2?=
+ =?utf-8?B?TlU5ME5yZGkwSzRYRlgwN0JyUXRSZkpCbUlnWjlGaTA4cGU5VnhzbE9mYVgy?=
+ =?utf-8?B?dXRWODFXNU42SEdmbXF3c3J4TWk0Y0ZKb0JQNWtMR2VXajBERVNRc2hPb3Zi?=
+ =?utf-8?B?ZU5MTXJWbVljWUh1eURWeEpmVk8xWEVmYnhJb2k3NW9NUFVZUjUwb3NxMDBh?=
+ =?utf-8?B?M0FTN3l5Mi9GQzJLK2t0TFRISDVEeDhIeUZoVG5VeUpyOXY3SXhoVk1JS2R5?=
+ =?utf-8?B?MXdrMXFhTWpwQWY1UlZ3QUFKRG1Jb1htMDgrV0dKalYzTURzNkdVYnd1SFhI?=
+ =?utf-8?B?SFovMitYRG9VVktyY3Ruak1wZ0FUUGhBSEU0TDhBUzFuQWFra0VjSlpiRU1P?=
+ =?utf-8?B?UmtPenVDUXNHd2RCVFo4L1FRTDJvNlltaFNQZmQrZkZYMkJXMHVnV1QwY3lh?=
+ =?utf-8?B?Qy9NSEVubXY2NHY2QW5YYjVsVTRDcm5Na2VacXU1K1VPR2VmLzh3NERJOVU2?=
+ =?utf-8?B?aTBmK1NHWHdWdndOL28zRmhQZjlYeGRRYk51bGFtUTR5OXRJUUpmSlF6WHEx?=
+ =?utf-8?B?UUNBODlzMVNGd3FZdElWWEwweExQV20yNHVETDB6Z1Vibk1TUnB3bDhSSWdY?=
+ =?utf-8?B?aEd6SmJCYmx3WXc2T3VEcGgyWkdIanBqaDdLcDVCZU1Lc3JjWFowM2t2alFV?=
+ =?utf-8?B?TjFKSURFR2tNZ2pkUnlsdWp0clE3Q2k4SGt3WmlocVREQWZmRGlMZ1M1RlVX?=
+ =?utf-8?B?K0lrcmk2MTFDYjdJbHdqb1V1clBMNGlvS3BkMitndDEybDlUcXp2V1E2Y3Nn?=
+ =?utf-8?B?LzVnQXpSYWxWWmd3WVkxSHd1VVRpQ0N6eDVrOVVSQkJnblc5Z25oV3NuOEYy?=
+ =?utf-8?B?QTdMTUNmTUY4MDhqWktWdGtIdXMwaWRHWk96eS9sdUdWalR3OSthcTV3TWtD?=
+ =?utf-8?B?VU1jcnpXTjlsZmxFU1dycENDN2pKbC91cTRBOWtORlZtTlZqMnVKTm5jbUl5?=
+ =?utf-8?B?K3hGUmJLZm9WVkZXYlFYU1FBNGN6dXhoMU1PRHFwRXlYbEhUK2RmWjBnazBn?=
+ =?utf-8?B?UGZiQkRhUDZlUEYxRSt4R1p2Ryt6YklmVHd3aXNEVkt2NDB2T1JDMEVaamhU?=
+ =?utf-8?B?MytJQW45SFdSeDN0dEYwdjdpY2RzZFg0VC85Kzk1TmNiNkxRNmpoNDBTVVFy?=
+ =?utf-8?B?OTBWdk9XaWdsMWJLYXc1a3JWRFd2Q1dETEp5Tnc4RzkraStlM0k4L1MzTEx3?=
+ =?utf-8?B?NEtYek84Ti9UWk9IUUkvbGNLRWtFZHVWaWhqTWdhTEN6NUJFZlZPSVpLaDk1?=
+ =?utf-8?Q?opc8jNYzXejkm?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDdMckRnTjduZ3crYm9HNUJiRnVLaGE3dzBpNld6NThrNmt1UGhLTWhtc2tV?=
+ =?utf-8?B?ZWdPQWRSMHpHVEdmeWJMWnlKUXUzQjhjT2M1UmRSZU8zSThYRmdMOUlxUkhF?=
+ =?utf-8?B?eExOeE5LWVB1MWVPZ0ZiZlllcExKME5UaU5MS1krYzU4RXE2eU8wbk5aa2J4?=
+ =?utf-8?B?Vjh1M0R5M3pNdXlVV1RaQnkxL3pTeUFFYmpnTi95UDN2dkpheS83dmZpRlJx?=
+ =?utf-8?B?TU91VVJmWkxWWjNoK3VjekYvbG1MNmRQbXAyQ0xIeW5wRXB1bFFncVhodTA5?=
+ =?utf-8?B?aWtTSTlnUlBaUG5odERxOEVBMytrNHUra0xhVE1BR3ppU2o1RGppRkl2OU1q?=
+ =?utf-8?B?VzJHbzNNaEhsR3E3TEhtbmk4aHNvcUk2TVFBQjlobGZXWlc3ZVNzQ1dEcGVH?=
+ =?utf-8?B?anRkYXNpbXNOMFl0anNkUmc5UDVrVHFNWWRoQXlxY3VQcHJhdUhBWkZ6Tk4x?=
+ =?utf-8?B?U2JnZjJ3aENzRlNsbCtnczVnVmhLNTZxeWxtT2NaZlBpejlmNE84MzVwV0M0?=
+ =?utf-8?B?clRhUUxqZDM0bjNrc0Rud3FjQnRQWVNWdFJNY1hoRm8vb0MxYVVOMDVyaWF0?=
+ =?utf-8?B?TGM3TmpJNkFTVE5kc1JzY3Mrb1VvZ0g1TTZ3M3VKTk0wTUIwem5aeU9iVEtF?=
+ =?utf-8?B?NER3ZlpXWEI1YlZHZkxaV1pycnRXM21jZEcybEgzK1Jmb1lBWW5KdXBvcXda?=
+ =?utf-8?B?bnBKQzVBSlV6MnRZZmRKbWZDUzdiTExESmRSbTRnQ2M4UFY2M2EvY1lqNERv?=
+ =?utf-8?B?eEszdlkvd3BPYll5Z0pvT1F5NFUxTVN2Z0s3M3JDMG1hTkNyYkEraTQvelNr?=
+ =?utf-8?B?Z1pQZTdER3p3cUlwVDkrUkxXM2JvajF3bkZrMURVOHNLdk5JdHdPajdkNkpn?=
+ =?utf-8?B?MXZIeFZHdG9kVXVKVHZxdGY5ODVjT01OVFdGWldUdWN6ckh3TW5DMy8xakp1?=
+ =?utf-8?B?R2R1L1Z1RFlsUDJhZ0UxSllvc0VocWdHQXZhUzhOaHhHTHJaV3NOSmZCYW1x?=
+ =?utf-8?B?WnZKZnc2dWJHVFcwMWt5NWVlTmdYNko1MWd2WXlWZDZCYjN0TmluVW1QVjZp?=
+ =?utf-8?B?bUsvQ2QyZHlITmhiUkc2Vkd5M3BrSC9la0ttQjE5QkdXLzZyTTZCakxubGlI?=
+ =?utf-8?B?cmpWWVpjR2NpZE93UHJzc21oc0ZxZkdOYlYwZ1p6UDdzMDh4YThXanNpUjQx?=
+ =?utf-8?B?NWVIcU5FT2x3KzVUMzF2WU5WSndBbFQ3OFQrUEc2bDZRWEZuN3p4eXpvUTVC?=
+ =?utf-8?B?Y1g4ejIyWGdTK0FUZnJJeGxpOGpyb24wM0FVTVpPMGVGblpxU0lEZHczOGpZ?=
+ =?utf-8?B?N1Zkclc0WkhkZmxmR29lMTd5d0MxL1QweURKdzdzNzMyY3dqYXlybFpoc1Y2?=
+ =?utf-8?B?aE05T0VpZGpQUHJHbVpvK2dDb1JyQnVUUXIvNHp3b1JQL3RBT1JXRmx1aDVp?=
+ =?utf-8?B?U3BpQ1lUNURNckZhMER4UHA0bkZHNU1vRmYxWS9UKzFqbk5QaHQ5KzF6UUNB?=
+ =?utf-8?B?VTBJbExXTFJGekVmVEhuNk9yTzFQbUZ1RkJnenNnL3JyaWhOZVFhUjFTUzUy?=
+ =?utf-8?B?RjI2TjhQb3huUjZlRGtUWm9ieTRJY2EwQ2dXNVozN1A1QnFya2theHd4ZzYx?=
+ =?utf-8?B?VGNTWktDYWVrcXYxMzBkSTNjRHhua3B5dy9vWUFka3VTOEFNcXRmalZXc1NG?=
+ =?utf-8?B?UjNtczRSSldjdlExVmtZR1RGWWRuVmtDcHcwWUNEOFlBbWE4ajNOQ29Temc0?=
+ =?utf-8?B?QWZQYlFjRStSZGJnY3VreXV0RStHWkw2RDQzOGJPdXA3OWtMTndHUTc0TUcw?=
+ =?utf-8?B?TTNITlN2ckM3TFVnd2FHNFFBRmNvYm5vOFBlY0czQ2RkZU5TOERjNEZFVUdy?=
+ =?utf-8?B?ZndsNkpKZERLdW80ejVoRnVMbklObFhqdFFNWmZoMEVBNDZ6dDRKclhmaUFC?=
+ =?utf-8?B?UlpZa2ZRRzlkb3I5YzZ3eVUxWE9zWlZJTXRuYzR4OVlOTkNkN0Z6ZTVUN1dI?=
+ =?utf-8?B?SXhlSDIwRkJMRmRNRmtGRW9EWmZieDVtaitvVUVzbnVYeTdjcFpjdDBrMU44?=
+ =?utf-8?B?V3ovQlpQUjVkeVJSUFV3S0pNTURGVEFMeEttUHlRekpSQitjQnBmRVcvMlAw?=
+ =?utf-8?B?cXZGc3NsbThyaDdXdDdyN0NzVFJkcnZXNG5IRSswdzgrNjNvSEszN1h0N0gx?=
+ =?utf-8?B?UXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fbd0196-0f8d-4c1e-1f32-08dd54bc305a
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 10:15:40.0019
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fDayY6AMs6ndq8rnsgF3yNjdweZPBqdwP7UWtJymTRUhJUOQtBCbmRsza2v5ND+QeYhFs9rfY3z4OT/wF+iLvOP+vVZV9K3Yf3gDMeCMubM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8077
+X-OriginatorOrg: intel.com
 
-Hi,
-
-On 2/21/25 11:21 PM, Krister Johansen wrote:
-> If multiple connection requests attempt to create an implicit mptcp
-> endpoint in parallel, more than one caller may end up in
-> mptcp_pm_nl_append_new_local_addr because none found the address in
-> local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
-> case, the concurrent new_local_addr calls may delete the address entry
-> created by the previous caller.  These deletes use synchronize_rcu, but
-> this is not permitted in some of the contexts where this function may be
-> called.  During packet recv, the caller may be in a rcu read critical
-> section and have preemption disabled.
+On 2/21/25 23:50, Jacob Keller wrote:
 > 
-> An example stack:
 > 
->    BUG: scheduling while atomic: swapper/2/0/0x00000302
+> On 2/20/2025 5:45 PM, Jakub Kicinski wrote:
+>> On Wed, 19 Feb 2025 17:32:54 +0100 Przemek Kitszel wrote:
+>>> Add a support for whole device devlink instance. Intented as a entity
+>>> over all PF devices on given physical device.
+>>>
+>>> In case of ice driver we have multiple PF devices (with their devlink
+>>> dev representation), that have separate drivers loaded. However those
+>>> still do share lots of resources due to being the on same HW. Examples
+>>> include PTP clock and RSS LUT. Historically such stuff was assigned to
+>>> PF0, but that was both not clear and not working well. Now such stuff
+>>> is moved to be covered into struct ice_adapter, there is just one instance
+>>> of such per HW.
+>>>
+>>> This patch adds a devlink instance that corresponds to that ice_adapter,
+>>> to allow arbitrage over resources (as RSS LUT) via it (further in the
+>>> series (RFC NOTE: stripped out so far)).
+>>>
+>>> Thanks to Wojciech Drewek for very nice naming of the devlink instance:
+>>> PF0:		pci/0000:00:18.0
+>>> whole-dev:	pci/0000:00:18
+>>> But I made this a param for now (driver is free to pass just "whole-dev").
+>>
+>> Which only works nicely if you're talking about functions not full
+>> separate links :) When I was thinking about it a while back my
+
+that's why I have make the name as a param, instead letting devlink
+infer it
+
+I admit that with ice/e800 we could have done better with splitting
+into devlink and devlink port parts at beginning, but with growing
+complexities of devices, we are going to hit the "we need something
+above" issue anyway.
+
+>> intuition was that we should have a single instance, just accessible
+>> under multiple names. But I'm not married to that direction if there
+>> are problems with it.
+>>
 > 
->    Call Trace:
->    <IRQ>
->    dump_stack_lvl+0x76/0xa0
->    dump_stack+0x10/0x20
->    __schedule_bug+0x64/0x80
->    schedule_debug.constprop.0+0xdb/0x130
->    __schedule+0x69/0x6a0
->    schedule+0x33/0x110
->    schedule_timeout+0x157/0x170
->    wait_for_completion+0x88/0x150
->    __wait_rcu_gp+0x150/0x160
->    synchronize_rcu+0x12d/0x140
->    mptcp_pm_nl_append_new_local_addr+0x1bd/0x280
->    mptcp_pm_nl_get_local_id+0x121/0x160
->    mptcp_pm_get_local_id+0x9d/0xe0
->    subflow_check_req+0x1a8/0x460
->    subflow_v4_route_req+0xb5/0x110
->    tcp_conn_request+0x3a4/0xd00
->    subflow_v4_conn_request+0x42/0xa0
->    tcp_rcv_state_process+0x1e3/0x7e0
->    tcp_v4_do_rcv+0xd3/0x2a0
->    tcp_v4_rcv+0xbb8/0xbf0
->    ip_protocol_deliver_rcu+0x3c/0x210
->    ip_local_deliver_finish+0x77/0xa0
->    ip_local_deliver+0x6e/0x120
->    ip_sublist_rcv_finish+0x6f/0x80
->    ip_sublist_rcv+0x178/0x230
->    ip_list_rcv+0x102/0x140
->    __netif_receive_skb_list_core+0x22d/0x250
->    netif_receive_skb_list_internal+0x1a3/0x2d0
->    napi_complete_done+0x74/0x1c0
->    igb_poll+0x6c/0xe0 [igb]
->    __napi_poll+0x30/0x200
->    net_rx_action+0x181/0x2e0
->    handle_softirqs+0xd8/0x340
->    __irq_exit_rcu+0xd9/0x100
->    irq_exit_rcu+0xe/0x20
->    common_interrupt+0xa4/0xb0
->    </IRQ>
+> I would also prefer to see a single devlink instance + one port for each
+> function. I think thats the most natural fit to how devlink works, and
+> it gives us a natural entry point for "whole device" configuration. It
+> also limits the amount of duplicate data, for example "devlink dev info"
+> reports once for each function.
 > 
-> This problem seems particularly prevalent if the user advertises an
-> endpoint that has a different external vs internal address.  In the case
-> where the external address is advertised and multiple connections
-> already exist, multiple subflow SYNs arrive in parallel which tends to
-> trigger the race during creation of the first local_addr_list entries
-> which have the internal address instead.
 > 
-> Fix this problem by switching mptcp_pm_nl_append_new_local_addr to use
-> call_rcu .  As part of plumbing this up, make
-> __mptcp_pm_release_addr_entry take a rcu_head which is used by all
-> callers regardless of cleanup method.
+> The main things I think this causes problems for are:
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: d045b9eb95a9 ("mptcp: introduce implicit endpoints")
-> Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+> 1) PCIe direct assignment with IOV
+> 
+> This could be an issue in cases where someone assigns only one function
+> to a VM. The VM would only see one function and the functions outside
+> the VM would not interact with it. IMHO this is not a big deal as I
+> think simply assigning the entire device into the VM is more preferable.
+> 
+> We also already have this issue with ice_adapter, and we've seen that we
+> need to do this in order to make the device and software function
+> properly. Assigning single functions does not make much sense to me. In
+> addition, there is SR-IOV if you want to assign a portion of the device
+> to a VM.
+> 
+> 2) locking may get complicated
+> 
 
-The proposed patch looks functionally correct to me, but I think it
-would be better to avoid adding new fields to mptcp_pm_addr_entry, if
-not strictly needed.
+if any driver would go the "plain devlink" + "port devlink" route,
+the devl_lock(devlink) and devl_lock(devlink_port) should be enough
 
-What about the following? (completely untested!). When inplicit
-endpoints creations race one with each other, we don't need to replace
-the existing one, we could simply use it.
+> If we have entry point which needs to interact with ice_pf data the
+> locking could get a little complicated, but I think this is also an
+> issue we can solve with ice_adapter, as a natural place to put
+> whole-device functionality.
+> 
+> I have also investigated in the past if it was possible to make the PCI
+> bus subsystem wrap the functions together somehow to represent them to
+> the host as a sort of pseudo "single-function" even tho the hardware is
+> multi-function. This seemed like a natural way to prevent direct
+> assignment of the whole device.. but I was never able to figure out how
+> to even start on such a path.
 
-That would additionally prevent an implicit endpoint created from a
-subflow from overriding the flags set by a racing user-space endpoint add.
+I get that the general sentiment is to "leave the complexities to the
+driver/other layers", but it was based on reading only limited amount
+of internal (non networking) mailing lists.
 
-If that works/fits you feel free to take/use it.
----
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 572d160edca3..dcb27b479824 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -977,7 +977,7 @@ static void __mptcp_pm_release_addr_entry(struct
-mptcp_pm_addr_entry *entry)
+It will be great when devlink will be finally used by non networking
+drivers :)
 
- static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 					     struct mptcp_pm_addr_entry *entry,
--					     bool needs_id)
-+					     bool needs_id, bool replace)
- {
- 	struct mptcp_pm_addr_entry *cur, *del_entry = NULL;
- 	unsigned int addr_max;
-@@ -1017,6 +1017,12 @@ static int
-mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 			if (entry->addr.id)
- 				goto out;
+> 
+>>> $ devlink dev # (Interesting part of output only)
+>>> pci/0000:af:00:
+>>>    nested_devlink:
+>>>      pci/0000:af:00.0
+>>>      pci/0000:af:00.1
 
-+			if (!replace) {
-+				kfree(entry);
-+				ret = cur->addr.id;
-+				goto out;
-+			}
-+
- 			pernet->addrs--;
- 			entry->addr.id = cur->addr.id;
- 			list_del_rcu(&cur->list);
-@@ -1165,7 +1171,7 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock
-*msk, struct mptcp_addr_info *skc
- 	entry->ifindex = 0;
- 	entry->flags = MPTCP_PM_ADDR_FLAG_IMPLICIT;
- 	entry->lsk = NULL;
--	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true);
-+	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true, false);
- 	if (ret < 0)
- 		kfree(entry);
+BTW, I have local version that adds SR-IOV VF's devlink instances
+as nested ones to PF ones:
+pci/0000:af:00.1:
+   nested_devlink:
+     pci/0000:af:05.0
 
-@@ -1433,7 +1439,8 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb,
-struct genl_info *info)
- 		}
- 	}
- 	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry,
--						!mptcp_pm_has_addr_attr_id(attr, info));
-+						!mptcp_pm_has_addr_attr_id(attr, info),
-+						true);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG_FMT(info, "too many addresses or duplicate one: %d",
-ret);
- 		goto out_free;
+>>>      pci/0000:af:00.2
+>>>      pci/0000:af:00.3
+>>>      pci/0000:af:00.4
+>>>      pci/0000:af:00.5
+>>>      pci/0000:af:00.6
+>>>      pci/0000:af:00.7
+>>
+>> Could you go into more details on what stays on the "nested" instances
+>> and what moves to the "whole-dev"? Jiri recently pointed out to y'all
+>> cases where stuff that should be a port attribute was an instance
+>> attribute.
 
+My initial assumption was that everything stays as-is
 
+> 
+> I suspect this is a case of "we have separate devlink instances per
+> function, so we just put it in the devlink".
+
+That's true that our 1:1 mapping of PF:devlink made this naively obvious
+
+moving almost all the stuff we now have under "PF" devlink into devlink
+port instances is likely too much of uAPI change, but let's make the
+question vocal: should we?
 
