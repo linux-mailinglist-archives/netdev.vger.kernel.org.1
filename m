@@ -1,180 +1,130 @@
-Return-Path: <netdev+bounces-168902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D21FA41600
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 08:11:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCD5BA41612
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 08:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E9A16DF07
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 07:10:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C5F43A4D63
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 07:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD1424167A;
-	Mon, 24 Feb 2025 07:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB461C863D;
+	Mon, 24 Feb 2025 07:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FFicEGbS"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="APteWDir"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C21B1DF963;
-	Mon, 24 Feb 2025 07:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3032C155747;
+	Mon, 24 Feb 2025 07:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740380997; cv=none; b=OTISCSAYBlcavBnIiqFAE1BBitL0hfotO8UxlUC0LOOTXq/m5kKxd5aSmaXjOSkl9sabv3jjRsd4B6cy82EQhmdHfFjzKSESMHsy8U52jZX2gmNKwTkLYDMh/XV1jaXlfvndY/g5Blo3vyw298kNGxtUzPfScLgtWgGkI/bncHY=
+	t=1740381358; cv=none; b=Q40UC5GDcPAExt9zCJxA9XqXJjW7sQiuIRbURkF0nNNbSjbBfFsihrgQ8lOCp/yLrhxKz9yEG99MUG/PnQfQHly11wImUh++IHFW3FDdWxzKvf8y+LHMNB/DQeBpZpAO8qhxXzMla2rGNJByzEdWLA+bJdWqUbcG6qvmuP1pFGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740380997; c=relaxed/simple;
-	bh=fkASXmTFBo3Vl/klcz2dL1xKweKD4YSi26z5tvTK/J4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vAFy4pOywzmnZCemICpHZIglVjKx/rcOjhnxAxq6d4JXNC4L5qYuhyVuZkmsXN0EuePfx7TBPGUuEI3W/Ox6o1KLlOUajXP8K9v0qxfo+HoovaviHZDnz9tTpiXalcOpWABSa9EghVfvb81iTRxEtaWe5VjggFPTqLcJwVu3PIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FFicEGbS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03944C4CED6;
-	Mon, 24 Feb 2025 07:09:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740380996;
-	bh=fkASXmTFBo3Vl/klcz2dL1xKweKD4YSi26z5tvTK/J4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FFicEGbSi56eSM0TXBdNGJZR6fyVj+36fd8Gmxf4LjhTEySCctA9GqzxpCjUDpfSL
-	 08Dx0KXfpmwPYGDHCDryGnRcCWDrE/aZF5kNI8zw1N4i9gU8E2AhbeTcQjT1TJqMNA
-	 7ykt4xwW+uATbSuqvLn2zrI+hZSeC+1/RAttYQTvRzkwbCUVR++Xv8GzLBF7nbG80w
-	 JZblYfa/c4q/ZdVDmLtzW/ix78wFgASzmTk9H/f+Z51ByZZhEvlKT9bGXwtBj1WjDq
-	 Pww4k4uxAbknRXPdJkgCEAFJpaVEcCST592dPPd9SJ3YLnKwsyg2B+yILZVl8zJg7A
-	 8hY8zjq85rorg==
-Message-ID: <bde62fee-4617-4db7-b92c-59fb958c4ca6@kernel.org>
-Date: Mon, 24 Feb 2025 08:09:43 +0100
+	s=arc-20240116; t=1740381358; c=relaxed/simple;
+	bh=LA91jSsheMxR4yC/e7jbT3VZ1jyx/nEH3cVwjan9ivs=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=q666mwewvLixZAJ7KQAMhzfuxNOWyWFJezyDFg96Hh0kKxVHiopG211wJbudKM0C+U9zamUbkG/qWs0/OfJk5dy9hrzmRgBXnbbLQ6pyqvxFyFAHEp79tA8HwM+x9ktnys0t8mwdKAex8ZJLjMDjg6+IXt6S6Y6IQV3+XSw/7Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=APteWDir; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=APteWDir;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10de:2e00:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 51O7DMHp962698
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Mon, 24 Feb 2025 07:13:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1740381202; bh=Qo7e4pHJOv6pCynpF4eYP+eH0PAvvJnROAiF5yvl18E=;
+	h=From:To:Cc:Subject:References:Date:Message-ID:From;
+	b=APteWDira/AXiyCs1XJGdVNQe0uORaD7fKVMZsPgRho24EY8j0hRfDA9xKEhWdcCd
+	 Pt13IlQACmkp6BeE++HlBME+psh/mEZ/TX/uyw6UWFwEik6KyHkdCAqq+8jz6jVHhL
+	 j9IWqvAACBD658BiBsuIlePq50N5Z27/l2raZw5I=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10de:2e0a:149a:2079:3a3a:3457])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 51O7DMxE2373751
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Mon, 24 Feb 2025 08:13:22 +0100
+Received: (nullmailer pid 997267 invoked by uid 1000);
+	Mon, 24 Feb 2025 07:13:22 -0000
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        =?utf-8?Q?K=C3=B6ry?= Maincent <kory.maincent@bootlin.com>,
+        Simon Horman <horms@kernel.org>,
+        Romain Gantois <romain.gantois@bootlin.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>
+Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
+ access
+Organization: m
+References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
+	<87r03otsmm.fsf@miraculix.mork.no>
+	<Z7uFhc1EiPpWHGfa@shell.armlinux.org.uk>
+	<3c6b7b3f-04a2-48ce-b3a9-2ea71041c6d2@lunn.ch>
+Date: Mon, 24 Feb 2025 08:13:22 +0100
+In-Reply-To: <3c6b7b3f-04a2-48ce-b3a9-2ea71041c6d2@lunn.ch> (Andrew Lunn's
+	message of "Mon, 24 Feb 2025 04:32:29 +0100")
+Message-ID: <87ikozu86l.fsf@miraculix.mork.no>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/17] bitops: Add generic parity calculation for u64
-To: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
- andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- airlied@gmail.com, simona@ffwll.ch, dmitry.torokhov@gmail.com,
- mchehab@kernel.org, awalls@md.metrocast.net, hverkuil@xs4all.nl,
- miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
- louis.peens@corigine.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, parthiban.veerasooran@microchip.com,
- arend.vanspriel@broadcom.com, johannes@sipsolutions.net,
- gregkh@linuxfoundation.org, yury.norov@gmail.com, akpm@linux-foundation.org
-Cc: hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk,
- Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
- jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
- linux-input@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
- Yu-Chun Lin <eleanor15x@gmail.com>
-References: <20250223164217.2139331-1-visitorckw@gmail.com>
- <20250223164217.2139331-3-visitorckw@gmail.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20250223164217.2139331-3-visitorckw@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Scanned: clamav-milter 1.0.7 at canardo.mork.no
+X-Virus-Status: Clean
 
-On 23. 02. 25, 17:42, Kuan-Wei Chiu wrote:
-> Several parts of the kernel open-code parity calculations using
-> different methods. Add a generic parity64() helper implemented with the
-> same efficient approach as parity8().
-> 
-> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> ---
->   include/linux/bitops.h | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
-> 
-> diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> index fb13dedad7aa..67677057f5e2 100644
-> --- a/include/linux/bitops.h
-> +++ b/include/linux/bitops.h
-> @@ -281,6 +281,28 @@ static inline int parity32(u32 val)
->   	return (0x6996 >> (val & 0xf)) & 1;
->   }
->   
-> +/**
-> + * parity64 - get the parity of an u64 value
-> + * @value: the value to be examined
-> + *
-> + * Determine the parity of the u64 argument.
-> + *
-> + * Returns:
-> + * 0 for even parity, 1 for odd parity
-> + */
-> +static inline int parity64(u64 val)
-> +{
-> +	/*
-> +	 * One explanation of this algorithm:
-> +	 * https://funloop.org/codex/problem/parity/README.html
-> +	 */
-> +	val ^= val >> 32;
+Andrew Lunn <andrew@lunn.ch> writes:
 
-Do we need all these implementations? Can't we simply use parity64() for 
-any 8, 16 and 32-bit values too? I.e. have one parity().
+>> So, not only do I think that hwmon should be disabled if using SMBus,
+>> but I also think that the kernel should print a warning that SMBus is
+>> being used and therefore e.g. copper modules will be unreliable. We
+>> don't know how the various firmwares in various microprocessors that
+>> convert I2C to MDIO will behave when faced with SMBus transfers.
+>
+> I agree, hwmon should be disabled, and that the kernel should printing
+> a warning that the hardware is broken and that networking is not
+> guaranteed to be reliable.
 
-> +	val ^= val >> 16;
-> +	val ^= val >> 8;
-> +	val ^= val >> 4;
-> +	return (0x6996 >> (val & 0xf)) & 1;
-> +}
-> +
->   /**
->    * __ffs64 - find first set bit in a 64 bit word
->    * @word: The 64 bit word
+What do you think will be the effect of such a warning?  Who is the
+target audience?
+
+You can obviously add it, and I don't really care.  But I believe the
+result will be an endless stream of end users worrying about this scary
+warning and wanting to know what they can do about it.  What will be
+your answer?
+
+No SoC/phy designer will ever see the warning.  They finished designing
+these chips decades ago.  The switch designers might see it. But
+probably not. They're not worried about running mainline Linux at all.
+They have they're vendor SDK.  Linux based of course, but it's never
+going to have that warning no matter what you do.  Firmware developers?
+Same as switch designers really.
+
+The hardware exists. It's not perfect. We agree so far.  But I do not
+understand your way of dealing with that.
+
+If your intention is detecting this hardware problem in bug reports etc,
+then it makes more sense to me.  But I believe a more subtle method will
+be more effeicient than a standalone and scary warning. Like embedding
+"smbus" or similar in existing debug/warning/error messages, e.g by
+making it part of the mdio bus name.
 
 
--- 
-js
-suse labs
+Bj=C3=B8rn
 
