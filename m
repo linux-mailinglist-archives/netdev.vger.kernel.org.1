@@ -1,310 +1,249 @@
-Return-Path: <netdev+bounces-168931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D802A41935
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:33:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07E44A4193C
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:34:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99FC73A3A67
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:28:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D6A63A1D70
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC8E24BC05;
-	Mon, 24 Feb 2025 09:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908661D540;
+	Mon, 24 Feb 2025 09:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TR+l/N2h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eMcZNRfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D03245027;
-	Mon, 24 Feb 2025 09:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740389265; cv=none; b=p8MOq4L54wuQ/LA0DAjUfzWGRQZGgQ9kfaZWFQivX2TD9x1A7vROBhBi9CKlHYGSZMUqZZjGa/N4iK9JJqIKoVzeG3H9/We2+0f+JbeFMxpglPoT6lzN8sVl0qXqDYMiC3iRHSPRVRn6xKwF/NolnylG+8C1bb4cCS2G5y44COs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740389265; c=relaxed/simple;
-	bh=xtPJ+9TPcQnIoTApT2qVmDx4XC/2epsxSLv0GCkiSg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j6wxrIW+Yo3clv5k0Suw2zYWxrQwKCLrWYu9fbvB0rHrtHjr1FNfVkEfXo/z8OotuKAJhYIxLrG8SwoPIKmyb4O/hHtaWFtaMp55noxUQIQOo/A1szeWXmkVopkvBx6/uy93PAl9728h+F1PIQt9/EGuQEM5uMPct9Vn0hOQcm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TR+l/N2h; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56299433F8;
-	Mon, 24 Feb 2025 09:27:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740389259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bv9esbM3X3XFxLbrYON0o0vsKE/aVAnt/YyaYFae7xk=;
-	b=TR+l/N2hF7PDXRr6GdLqFUHz4pzP3rrdAMLp9Fd8O7SLWvARUubTLB8RON9mdUxDC7Pmdp
-	4TfRCP7DzbIf0gRofSK86Hj0EHJrAehc8USbBKCJ0Fu4f/+skggRj281kRW9Z+dMRMSNdP
-	Pljh70F0KT7m8e3YrCXONvSk2F3fy21YLeK0hXf/xyC/9BY9CjZ3GArRlHFPj51qn+vcL3
-	trc1MnIn3Rg/0nN78UwGsAjZW1/XD73s/kC9ZwPE6RPBCPoz4LAlKJr1lh4zYYWYL/i5Qf
-	4S7iNp39MdMwdfeOork7R7Rj5sUa1fEGUfpthSJaQ6uD1VDV71rqs8vtNmxq/g==
-Message-ID: <4c39f9cf-a9cb-493b-b44f-b9ac264019c6@bootlin.com>
-Date: Mon, 24 Feb 2025 10:27:37 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B0243370;
+	Mon, 24 Feb 2025 09:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740389539; cv=fail; b=n6ahtuzddANVb7HMHWOHbvIZ/NCcIt7pfGk4XyL7i6S8KB27qedhfLdqyj5b3cpSsHumZ1EOEz6VeyZDw3OxRknga6BarHXXzXsGRkSW26MHLrzMEsOsEyTzk7V+L11bm5dWTIlhuV0RKiwajEfk2cCeuejLQ2WN4GiB8QxVS7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740389539; c=relaxed/simple;
+	bh=2Zf6CSo/waSMMjg6gOHDAvDN3w06du9k8MEVJv/z40s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IpNwKeU2A3pLDfTs3shGZZO+KLE7fvSb/Ecn2c7yPqTiw/yX4gvATBQIukdqLIXtHzc0ZqkWKFxbbBZ67UxsVYAIuyP0gqs4UPwt0LPITd/uNSXdZX+a4qXGxbRbXGwi2iIEUeLWuYuEoxqvL043ne/tirF8WB69tbt4dWUhW8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eMcZNRfQ; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740389538; x=1771925538;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2Zf6CSo/waSMMjg6gOHDAvDN3w06du9k8MEVJv/z40s=;
+  b=eMcZNRfQkoJjuLFBIeoKW3SSL/xqxLwXlRZtOxK/z+PIX0i2mj5KQTzr
+   OTmn52ouBnBNkVTIBlwQSOMdaRss9iM/XUp0tvwTw9BxL4Q283wXexvuF
+   yeD85+qfMsfBoAT2Ww7a1pJXoDW1z9lTAsYegnRMILODwzg+PfMKUxb2C
+   tzmbLuxEsD2zMhxqpo6omf9YdSBj+pNXzGhNj30uWXQKyNxkzPzkVV8hK
+   k7vIeq5HsG1KuJdfaxBinjDa7ncW6ZXt5N2bbNEikebNpJU8o/SzjIMiJ
+   9IklkVVvGqQb82iWoAYh0vgUUZerIMCzEC8dvcIAEtfX/d2lADcqm/7hZ
+   A==;
+X-CSE-ConnectionGUID: z5zfXIOrT06OywjoYqLWLw==
+X-CSE-MsgGUID: pcU0D8FeQdqWmtXJc1oiUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11354"; a="44913358"
+X-IronPort-AV: E=Sophos;i="6.13,309,1732608000"; 
+   d="scan'208";a="44913358"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 01:32:17 -0800
+X-CSE-ConnectionGUID: SPXo2UeIRayXDvkdacCPYA==
+X-CSE-MsgGUID: urrj859RQ52K4HN5nf21Wg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="120131621"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 01:32:17 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 24 Feb 2025 01:32:15 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 24 Feb 2025 01:32:15 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 24 Feb 2025 01:32:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nqIi9ugB2c9rETQWphosmgEiPLOIny445+v2E5KkNdkQ+3U4l2nyuNcxqQ0unV9kd2EcSEV0X7NGVD4bcoWbLei1PrUKbrRF74SHguMW7xcqsba//S8peTqXU06i9chyxabZ+3bYR472hxpzdkNQoOComgz1Sh0ifZE0DM/Sd/ipZPfl1el8SL0sNBJNd9Zq8fge6Grl0TWlKFlFlXnSZQBDxP7yTzA7sZnf+AHYXN7jMhnKQX+251wj4bukFRcM+sPnKx4TzVpvekIozVnULtYhPN1iaBzYfKxxkTxIq8gySPr/xUYkILjJM/bX3bOdtWIAL0OIWrr7lakcIULQew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Q8pCUZeztYy+d5GwsSemC32yg6Mb2ZERu4N9ff+j/5g=;
+ b=l0hbdXk/L1AMosJxkhzPQaX2V9VhVKlKTVjuLxDX2VkOonFyGnNz/pFWg9MuIr4JwQBoUnhw7ArgPya4JuraTWRppWwHNusV0Q/RSf4NdtEedbaR5fjnWTCUCsGMOwgFlYgR+33WsLS5CQsH/Ja8h3Bt6TzVH8J0sIAN6sQ55GPGCPVL69zrxY9Kz6XlgTGxGSYNVC44b252sczJtNeFWVFdYQKbakRHtwZlWgNjQEK6AvN/udQfwz/Jk9KwFd48WnbpDZ0ZMPHpokuYWkQPW02YM50vBYE5f92747sssFeN71teAFet6HE9IUPWnyAY93lgpEIWno9FTdAAYbog6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ IA1PR11MB7318.namprd11.prod.outlook.com (2603:10b6:208:426::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.19; Mon, 24 Feb 2025 09:31:27 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::1d5f:5927:4b71:853a]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::1d5f:5927:4b71:853a%6]) with mapi id 15.20.8466.016; Mon, 24 Feb 2025
+ 09:31:27 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jiasheng Jiang <jiashengjiangcool@gmail.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "jiri@resnulli.us" <jiri@resnulli.us>,
+	"davem@davemloft.net" <davem@davemloft.net>, "Glaza, Jan"
+	<jan.glaza@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH] dpll: Add a check before kfree() to match the existing
+ check before kmemdup()
+Thread-Topic: [PATCH] dpll: Add a check before kfree() to match the existing
+ check before kmemdup()
+Thread-Index: AQHbhi/zs7hnAFB/d0meSi67d6h7Z7NWKHbg
+Date: Mon, 24 Feb 2025 09:31:27 +0000
+Message-ID: <DM6PR11MB4657A297365AE59DE960AA899BC02@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20250223201709.4917-1-jiashengjiangcool@gmail.com>
+In-Reply-To: <20250223201709.4917-1-jiashengjiangcool@gmail.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|IA1PR11MB7318:EE_
+x-ms-office365-filtering-correlation-id: 5067423e-eb41-401f-3b21-08dd54b6035e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?8lfjPP8UZ8p95eRdUng0pB6jpaO+YP5dadrnLR1uxrNxDtKEYNGYxoEfdlkZ?=
+ =?us-ascii?Q?by0tjI1v1Z40RKVD/Xhwzb6ycJfae83AZMafU4fOlujBz39o/addaZ1waOUt?=
+ =?us-ascii?Q?0iorM2uoNehKHogb4/0C1zaGAAWaYvvr3pAVwstT9lkyE/1PAVH4/2YAWRM0?=
+ =?us-ascii?Q?BW3rnsAtCzyTvODm6NDHK+dXCf7gni8ZP5JHEUAZhhEzluzgCYxYCuoiUz1g?=
+ =?us-ascii?Q?YAZlYdgUoG7k0KTQYPqhzqUt6MX8VACVAEDAd1tGTOSFzj4UfohaWTc+jFvM?=
+ =?us-ascii?Q?u6t5XOiVgm4OLbj6C/+OmAQvQ+C5aCdyCAwM+Dc1HPHT7aeD8p5TCjgAcUa1?=
+ =?us-ascii?Q?2ESEqogUKfB9UhcvbF4Jj+16Dia7c+GR5w0uIC8qd2bUOQvwNl9CL/3ZAaj/?=
+ =?us-ascii?Q?4ErSmlQjda5dQZOKyoAezoirE8PRC+zhBtVeRXN4AhnZl6V7PxT4dq7coMH7?=
+ =?us-ascii?Q?PnndQEi9PDNaI0p97Zimne4x/BxHmXMCbwsEobDN3u9o1Aepw5poYF/E4F8Q?=
+ =?us-ascii?Q?TVZ0VPbdXmcrcAcmlzWxyH+z8ZW49irb7AXmnC9CdBAKjr+tRBQ1NoLtdJ43?=
+ =?us-ascii?Q?Cfo8St1h4awV8/wHdx3LtnnSOiVi9iZA+yClV/BR8R8GcVOt5dvhU7DVmTii?=
+ =?us-ascii?Q?cMEx2+Yf3D5oPOGJ/DoYC8iOWPls+ZVDPkOslp41r0FQBmJxLck9g8ty/F0j?=
+ =?us-ascii?Q?4rJzOg2HAyzQ5d5D7wc0t42xKTVNx3nf8II8ibnB+aKy2pD4hSO/yPOKsNrw?=
+ =?us-ascii?Q?5vXoY9Jg1MRblzpOHp1SEVAZlFWaM0v+05I+6dw7KO7QiDy8HFVsSmYKLJom?=
+ =?us-ascii?Q?BFf0NwwwNero420KgNwm/LPJbwnmq5u8omD2WvsaAOPyU3rZf55k/kQ9dsgW?=
+ =?us-ascii?Q?A5jyhHb2W2BLss3uYaBzQjLmTERLjFxKYdv5CIbjiXEz5ubFUG6/Q/VVdgB0?=
+ =?us-ascii?Q?4UTgbzzKs6lLA/6J3I/j+7cmtLh2xi98Wzw3wa+WWTN1IGa/sA2dqqErPs3Y?=
+ =?us-ascii?Q?5Pf0q7riVJc8WyTYQGjlXzXXVEux/taVfhMX3cUHu4fnX0PUCcKTr6E/tEqu?=
+ =?us-ascii?Q?kQTDwmdfYRJsP1xA1G8qO1up845Xg2iEbWu2tw8jQhe7VjtSTKGVQmH5tWmc?=
+ =?us-ascii?Q?FC5/eGl4+VnILymZXzwbiFhcOnklonbRds3DWVUIDZUpgM20uvgrVPpmzKYH?=
+ =?us-ascii?Q?hvjQMrD0xqYu4frnfKY/+yy/RpkWD0uHNdly6CJJMQAGyHpjkgNM96vW6URs?=
+ =?us-ascii?Q?2IpBwDdrM/5xYY566lpAxHf2ETcyUT5IJFh7ScdCOVFiLuSUZ9bAVhxKh0Eb?=
+ =?us-ascii?Q?AfdpXylbWmmknH32LAH5cG8NfoVNmq6YtMQjw/NZc+VGpTLd9TOd3SgrstrX?=
+ =?us-ascii?Q?QRPyIPuxFuCJAepMKyWge35C9kjLtQh4faMyIi3LiWNgQ268nonGCQpHTDN8?=
+ =?us-ascii?Q?zWu6VJtZv8InM2KTzdswZReA5jOt6m8K?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/9qdoZX0TWmkD4B8tuvE+nXguoN9kRKmvEuXojNgYEq/JwMvY4fbFCldvSSj?=
+ =?us-ascii?Q?LeiSqiUXnL2pETfrdSZA2NJcrgQ6RK4E/joXlfNUA/Hz7vDGakD1hrQsWmE5?=
+ =?us-ascii?Q?/bXAs3BFSzHiXIkh2bv4W59751urEsgADtj6QBoBb9aSVyTEM9pS6CeWm3j3?=
+ =?us-ascii?Q?4cJPxOdnosJMYq/13KqsstSi/bN22iFohe9zwxACQqiqqApesOG/i49VsT7Z?=
+ =?us-ascii?Q?eDskiGEUzdlck0HSgjft2qOQR2xYY9ib0V1ofxo0It1+TeCfnO6zFvh8WpNG?=
+ =?us-ascii?Q?RcxjyJPsPw7eCP/jVFQeolhjQpoGtlQHbwN5uSOBd1S5IlHsz6oaq4rX08pZ?=
+ =?us-ascii?Q?0S28Bp20N86noAr0Gouf8x/idmX3j6nxaXDs+3qFzhZ2W/QYY0iD7Yux07mp?=
+ =?us-ascii?Q?d5q+huq4OHxlpULhj6hEwWCeAmnTtEFwSbyiClpqSncKH8iOqJ7EE4RNWsHo?=
+ =?us-ascii?Q?h4Jp7i/IfmvsVB0DHeJcBYiSTW6gOHAdjg2l8GbP9pxWnopE+TQHZDEGTEdE?=
+ =?us-ascii?Q?5hy5Y1KqUCXHHSF2yTj1oFqMyUuMmao2TotlSDJEp3I/RaXcbPvq/CZ6A9qe?=
+ =?us-ascii?Q?ebtLYx9HA0XddAJ/hcS+NGgKFdfcNLdrb2HwRVVx0qLN4Gb+UwEXMYURrXOQ?=
+ =?us-ascii?Q?6SyyCsp8r0Yvvay02SsN9cHn1Uqq9XfVi/bzPfjL6RVTmZbYv4d18PeQMx2a?=
+ =?us-ascii?Q?fod4X5Me2/3gtjn419rU00gfsOiIHIVJF4x9m8kXkBLtb5IWVF55fOS4wNJF?=
+ =?us-ascii?Q?gZLUDK3De8aXE8rvcFllwJbIzr1zSm0pSWFGfBW6MlbKzuEBykaIGEQ9M8IO?=
+ =?us-ascii?Q?mPNCAAxZdNrm+MnPtNnX2MhoZOiLDLaoWRtNc3RrNUSibrQNR4Li6n4q9n3b?=
+ =?us-ascii?Q?Yon5qD6sP+LdgEEaVoAUfnyrTJEZ4K5b6RdRxGTjkAtNTCuyNug3ogQ2jHKb?=
+ =?us-ascii?Q?LYOD9XARhqzpFkhAHZlPhJMrEe8MFCf+Bn7IDMbzcLkbYwR98B0OAYYUE5MJ?=
+ =?us-ascii?Q?A5/GPAEJXMNszfnroNS7lZf3T6QZROH4IyvTf/+fbcbKpD6B8vfV3SxUECfl?=
+ =?us-ascii?Q?EXaZ/AHWdzfZRrTpOA5rGDg03HpOacaHnSQ1630BdxFBO8Ed3q9CswVZwHYK?=
+ =?us-ascii?Q?5DRMkrPmXj/V574t04BlLkFvCF9qempat4oop2eveu9aEMPeoLBlQ7aNFoEe?=
+ =?us-ascii?Q?7yrpZ/j3zb3fH1TWb1XN0zmbogdo9RJBNcsKb83z2jzhz7kb1xBiPj6XwLWK?=
+ =?us-ascii?Q?GlZe/km59aIPYkqjxIvrIHxkifs/FFRjLibiLLsFg+n6/+pa+30dO+P6bmKU?=
+ =?us-ascii?Q?abxS8ckEWymffpYHDpoqCxUhIf4px3OhypM/zRXNH2hS51pz4g3MbSOAMyRO?=
+ =?us-ascii?Q?M8vBUqtwIf5zPaoQAvEntNSPp4C7tSdhzs8DssSxwc0THR63jt45T5RzowBa?=
+ =?us-ascii?Q?OXhGXOjbFGm66zWEGJp2NrvKWJ2GMkL6Easv+yQBwIH33Eq5QlYwX3PTL4dW?=
+ =?us-ascii?Q?73X/IQN2hW9dgjYHPe4V8REFz8ZWW1dbK//0eW7+hmws3LgQVjZ90vBEmEHm?=
+ =?us-ascii?Q?v8ToXLK+Ox9eXu7Iw31Li0Exq4UQytHBYi29sDSmPK+5u/2iGMsujzKyFv5/?=
+ =?us-ascii?Q?hQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Migrate test_xdp_vlan.sh into
- test_progs
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250221-xdp_vlan-v1-0-7d29847169af@bootlin.com>
- <20250221-xdp_vlan-v1-2-7d29847169af@bootlin.com>
- <Z7imfH-Adq5qUUsB@mini-arch>
-Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <Z7imfH-Adq5qUUsB@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpeeurghsthhivghnucevuhhruhhttghhvghtuceosggrshhtihgvnhdrtghurhhuthgthhgvthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfehgefgteffkeehveeuvdekvddvueefgeejvefgleevveevteffveefgfehieejnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrudegngdpmhgrihhlfhhrohhmpegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvgedprhgtphhtthhopehsthhfohhmihgthhgvvhesghhmrghilhdrtghomhdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtt
- hhopehhrgifkheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: bastien.curutchet@bootlin.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5067423e-eb41-401f-3b21-08dd54b6035e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2025 09:31:27.3177
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4J5Hqt0zCTLD12fbsD83zdrEdYK2Mw1zt+PYNCVaU4EKEa2ORApM6+RJn8zmc4G4D0/LaxFPyEPwtwwUBPxP94VqLEr1UlecxMdhP5h37Ho=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7318
+X-OriginatorOrg: intel.com
 
-Hi Stanislav,
+Hi Jiasheng, many thanks for the patch!
 
-On 2/21/25 5:14 PM, Stanislav Fomichev wrote:
-> On 02/21, Bastien Curutchet (eBPF Foundation) wrote:
->> test_xdp_vlan.sh isn't used by the BPF CI.
->>
->> Migrate test_xdp_vlan.sh in prog_tests/xdp_vlan.c.
->> It uses the same BPF programs located in progs/test_xdp_vlan.c and the
->> same network topology.
->> Remove test_xdp_vlan*.sh and their Makefile entries.
->>
->> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
->> ---
->>   tools/testing/selftests/bpf/Makefile               |   4 +-
->>   tools/testing/selftests/bpf/prog_tests/xdp_vlan.c  | 175 ++++++++++++++++
->>   tools/testing/selftests/bpf/test_xdp_vlan.sh       | 233 ---------------------
->>   .../selftests/bpf/test_xdp_vlan_mode_generic.sh    |   9 -
->>   .../selftests/bpf/test_xdp_vlan_mode_native.sh     |   9 -
->>   5 files changed, 176 insertions(+), 254 deletions(-)
->>
->> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
->> index 5dc9c84ed30f6e5a46572a9e428f692a79623469..09c1f731b8280696c729e3c87020ef749fee9dcb 100644
->> --- a/tools/testing/selftests/bpf/Makefile
->> +++ b/tools/testing/selftests/bpf/Makefile
->> @@ -103,8 +103,6 @@ TEST_PROGS := test_kmod.sh \
->>   	test_tunnel.sh \
->>   	test_lwt_seg6local.sh \
->>   	test_lirc_mode2.sh \
->> -	test_xdp_vlan_mode_generic.sh \
->> -	test_xdp_vlan_mode_native.sh \
->>   	test_lwt_ip_encap.sh \
->>   	test_tc_tunnel.sh \
->>   	test_tc_edt.sh \
->> @@ -118,7 +116,7 @@ TEST_PROGS := test_kmod.sh \
->>   
->>   TEST_PROGS_EXTENDED := \
->>   	ima_setup.sh verify_sig_setup.sh \
->> -	test_xdp_vlan.sh test_bpftool.py
->> +	test_bpftool.py
->>   
->>   TEST_KMODS := bpf_testmod.ko bpf_test_no_cfi.ko bpf_test_modorder_x.ko \
->>   	bpf_test_modorder_y.ko
->> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c b/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c
->> new file mode 100644
->> index 0000000000000000000000000000000000000000..18dd25344de768aa83a162a0c091f28a4e5f505e
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_vlan.c
->> @@ -0,0 +1,175 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +/*
->> + * Network topology:
->> + *  -----------        -----------
->> + *  |  NS1    |        |   NS2   |
->> + *  | veth0  -|--------|- veth0  |
->> + *  -----------        -----------
->> + *
->> + */
->> +
->> +#define _GNU_SOURCE
->> +#include <net/if.h>
->> +#include <uapi/linux/if_link.h>
->> +
->> +#include "network_helpers.h"
->> +#include "test_progs.h"
->> +#include "test_xdp_vlan.skel.h"
->> +
->> +
->> +#define VETH_NAME	"veth0"
->> +#define NS_MAX_SIZE	32
->> +#define NS1_NAME	"ns-xdp-vlan-1-"
->> +#define NS2_NAME	"ns-xdp-vlan-2-"
->> +#define NS1_IP_ADDR	"100.64.10.1"
->> +#define NS2_IP_ADDR	"100.64.10.2"
->> +#define VLAN_ID		4011
->> +
->> +static int setup_network(char *ns1, char *ns2)
->> +{
->> +	if (!ASSERT_OK(append_tid(ns1, NS_MAX_SIZE), "create ns1 name"))
->> +		goto fail;
->> +	if (!ASSERT_OK(append_tid(ns2, NS_MAX_SIZE), "create ns2 name"))
->> +		goto fail;
->> +
-> 
-> [..]
-> 
->> +	SYS(fail, "ip netns add %s", ns1);
->> +	SYS(fail, "ip netns add %s", ns2);
-> 
-> Will replacing these with open_netns work? Or we don't setup up enough
-> state to cooperate with 'ip' tool? (same for cleanup_network if it
-> works)
-> 
+>From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+>Sent: Sunday, February 23, 2025 9:17 PM
+>
+>When src->freq_supported is not NULL but src->freq_supported_num is 0,
+>dst->freq_supported is equal to src->freq_supported.
+>In this case, if the subsequent kstrdup() fails, src->freq_supported may
 
-Yes, it will work. Initially I planned to use it but it isn't very 
-convenient in this case because struct netns_obj is defined in 
-test_progs.c, not in the header. This means you can't access ns->nsname 
-to get the namespace name and as I use append_tid() this name is 
-dynamic. So using netns_new / close_netns / netns_free would require 
-keeping both the namespace names (for further ip commands / open_netns) 
-and the netns_objs objects (for netns_free) whereas here I only keep the 
-namespace name.
+The src->freq_supported is not being freed in this function,
+you ment dst->freq_supported?
+But also it is not true.
+dst->freq_supported is being freed already, this patch adds only additional
+condition over it..
+From kfree doc: "If @object is NULL, no operation is performed.".
 
-I can send a V2 using netns_* helpers if you prefer, though. Maybe I can 
-also either move the netns_obj definition in test_progs.h or create a 
-'get_nsname()' helper ?
+>be freed without being set to NULL, potentially leading to a
+>use-after-free or double-free error.
+>
 
->> +	SYS(fail, "ip -n %s link add %s type veth peer name %s netns %s",
->> +	    ns1, VETH_NAME, VETH_NAME, ns2);
->> +
->> +	/* NOTICE: XDP require VLAN header inside packet payload
->> +	 *  - Thus, disable VLAN offloading driver features
->> +	 */
->> +	SYS(fail, "ip netns exec %s ethtool -K %s rxvlan off txvlan off", ns1, VETH_NAME);
->> +	SYS(fail, "ip netns exec %s ethtool -K %s rxvlan off txvlan off", ns2, VETH_NAME);
->> +
->> +	/* NS1 configuration */
->> +	SYS(fail, "ip -n %s addr add %s/24 dev %s", ns1, NS1_IP_ADDR, VETH_NAME);
->> +	SYS(fail, "ip -n %s link set %s up", ns1, VETH_NAME);
->> +
->> +	/* NS2 configuration */
->> +	SYS(fail, "ip -n %s link add link %s name %s.%d type vlan id %d",
->> +	    ns2, VETH_NAME, VETH_NAME, VLAN_ID, VLAN_ID);
->> +	SYS(fail, "ip -n %s addr add %s/24 dev %s.%d", ns2, NS2_IP_ADDR, VETH_NAME, VLAN_ID);
->> +	SYS(fail, "ip -n %s link set %s up", ns2, VETH_NAME);
->> +	SYS(fail, "ip -n %s link set %s.%d up", ns2, VETH_NAME, VLAN_ID);
->> +
->> +	/* At this point ping should fail because VLAN tags are only used by NS2 */
->> +	return !SYS_NOFAIL("ip netns exec %s ping -W 1 -c1 %s", ns2, NS1_IP_ADDR);
->> +
->> +fail:
->> +	return -1;
->> +}
->> +
->> +static void cleanup_network(const char *ns1, const char *ns2)
->> +{
->> +	SYS_NOFAIL("ip netns del %s", ns1);
->> +	SYS_NOFAIL("ip netns del %s", ns2);
->> +}
->> +
->> +static void xdp_vlan(struct bpf_program *xdp, struct bpf_program *tc, u32 flags)
->> +{
->> +	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_EGRESS);
->> +	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
->> +	char ns1[NS_MAX_SIZE] = NS1_NAME;
->> +	char ns2[NS_MAX_SIZE] = NS2_NAME;
->> +	struct nstoken *nstoken = NULL;
->> +	int interface;
->> +	int ret;
->> +
->> +	if (!ASSERT_OK(setup_network(ns1, ns2), "setup network"))
->> +		goto cleanup;
->> +
->> +	nstoken = open_netns(ns1);
->> +	if (!ASSERT_OK_PTR(nstoken, "open NS1"))
->> +		goto cleanup;
->> +
->> +	interface = if_nametoindex(VETH_NAME);
->> +	if (!ASSERT_NEQ(interface, 0, "get interface index"))
->> +		goto cleanup;
->> +
->> +	ret = bpf_xdp_attach(interface, bpf_program__fd(xdp), flags, NULL);
->> +	if (!ASSERT_OK(ret, "attach xdp_vlan_change"))
->> +		goto cleanup;
->> +
->> +	tc_hook.ifindex = interface;
->> +	ret = bpf_tc_hook_create(&tc_hook);
->> +	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
->> +		goto detach_xdp;
->> +
->> +	/* Now we'll use BPF programs to pop/push the VLAN tags */
->> +	tc_opts.prog_fd = bpf_program__fd(tc);
->> +	ret = bpf_tc_attach(&tc_hook, &tc_opts);
->> +	if (!ASSERT_OK(ret, "bpf_tc_attach"))
->> +		goto detach_xdp;
->> +
->> +	close_netns(nstoken);
->> +	nstoken = NULL;
->> +
->> +	/* Now the namespaces can reach each-other, test with pings */
->> +	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns1, NS2_IP_ADDR);
->> +	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns2, NS1_IP_ADDR);
->> +
->> +
->> +detach_tc:
->> +	bpf_tc_detach(&tc_hook, &tc_opts);
->> +detach_xdp:
->> +	bpf_xdp_detach(interface, flags, NULL);
->> +cleanup:
->> +	close_netns(nstoken);
->> +	cleanup_network(ns1, ns2);
->> +}
->> +
->> +/* First test: Remove VLAN by setting VLAN ID 0, using "xdp_vlan_change"
->> + * egress use TC to add back VLAN tag 4011
->> + */
->> +void test_xdp_vlan_change(void)
->> +{
->> +	struct test_xdp_vlan *skel;
->> +
->> +	skel = test_xdp_vlan__open_and_load();
->> +	if (!ASSERT_OK_PTR(skel, "xdp_vlan__open_and_load"))
->> +		return;
->> +
-> 
-> [..]
-> 
->> +	if (test__start_subtest("0"))
->> +		xdp_vlan(skel->progs.xdp_vlan_change, skel->progs.tc_vlan_push, 0);
-> 
-> Does the original test also test with flags=0? What is the purpose?
+kfree does not set to NULL from what I know. How would it lead to
+use-after-free/double-free?
+Why the one would use the memory after the function returns -ENOMEM?
 
-The original test allows testing the 'xdp', 'xdpgeneric' and 'xdpdrv' 
-modes. My understanding is that flags=0 is the 'xdp' equivalent. IIRC, 
-there are fallbacks that will set these flags to SKB or DRV mode at some 
-point but, since it's allowed by the bpf_xdp_attach API, I thought it 
-was worth testing. This way, if the fallbacks stop working at some 
-point, we'll be noticed.
+I don't think this patch is needed or resolves anything.
 
-Best regards,
-Bastien
+Thank you!
+Arkadiusz
+
+>Fixes: 830ead5fb0c5 ("dpll: fix pin dump crash for rebound module")
+>Cc: <stable@vger.kernel.org> # v6.8+
+>Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+>---
+> drivers/dpll/dpll_core.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>index 32019dc33cca..7d147adf8455 100644
+>--- a/drivers/dpll/dpll_core.c
+>+++ b/drivers/dpll/dpll_core.c
+>@@ -475,7 +475,8 @@ static int dpll_pin_prop_dup(const struct
+>dpll_pin_properties *src,
+> err_panel_label:
+> 	kfree(dst->board_label);
+> err_board_label:
+>-	kfree(dst->freq_supported);
+>+	if (src->freq_supported_num)
+>+		kfree(dst->freq_supported);
+> 	return -ENOMEM;
+> }
+>
+>--
+>2.25.1
+
 
