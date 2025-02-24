@@ -1,155 +1,155 @@
-Return-Path: <netdev+bounces-168956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3FEA41C2B
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:13:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EA4A41C3A
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BD9F3AAD42
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57B0C1747DD
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595BC259499;
-	Mon, 24 Feb 2025 11:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C59923A9B4;
+	Mon, 24 Feb 2025 11:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="ATyj8RyJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tFmwMZHN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jw8IrwSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30051A3165;
-	Mon, 24 Feb 2025 11:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1687E802;
+	Mon, 24 Feb 2025 11:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740395634; cv=none; b=NxxsvjeevMlYnT1MVK3rtCmlw5uCLD038u2dOrhy+FrFR2z4te2twR8B0swgKqZ7uwMgJ6zStDkJZEFFLz8ysO4OQpBltbUU08MRjJQW3wMT8yLENoOt34pqp/74z5/RvdxVgtrrfdhnkKcvibzhkOAzUnkpeHgMJosIfujr2Vo=
+	t=1740395802; cv=none; b=KTosUJZ2cAAsccfJK/CLoNAJ5d6qWTCvQDtChlqFraI6xwbD8gnw+yweY+oPxttJd5G8xA0AuZYV6SCq7pHSikwb9Ax607bEoavp8RC73FsmB+m411V7btlbuk6H83G61JLMEI3IwRP9MOM7eZecPtyKJfNvLIpdHxGmgsZVV3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740395634; c=relaxed/simple;
-	bh=MMDvmvrS0Eti+sDwqqljVm+32DgG/Q1qSKrXEPDeg1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bnKFxFZm6gWw+K9Y28Lr0+hJn1a3n9gaH4F4NHk8v0z+V4XJDn7wt+6rdCgB5Qirb8CVsQx6F0nYgnMi69i+rupMFHu27ZAQJvdYKxZsTeDWereB0dUCi6ETPPqnka1iD4WO8Ow/cBO0NwKfxZhSFdnquTR++cXxtb9X73NtAsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=ATyj8RyJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tFmwMZHN; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 74B3E11401A8;
-	Mon, 24 Feb 2025 06:13:50 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Mon, 24 Feb 2025 06:13:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1740395630;
-	 x=1740482030; bh=q/WWSDIGgNonfOGqFQW8MDgJxWFPr0j3B1LaVBN50m4=; b=
-	ATyj8RyJFEpx9ntfoEb0XJVpHPglhp/VYcjO5drWWVbly+IpDt3SCtrzKNDDnmpy
-	NwZNub4OomTQJTVvntGiStaPEXKVh6dBx/3DR53foxcrnmhazx0sw5iwZEeR4pJu
-	H4Hyx93EgaMEAdaa9Lkq1BZn/vzD3Maji1EC36+1pBBAqlXq0llOww5daN32SQmE
-	cn2nqyn7qSpxbbpFzaVZy0jSw9i1FmxeCF/IPAP8JHizlA6woeBL86Qg4eJEPZLz
-	aWkTAk2tl4GIfNMIdty8uuxAyVJ0wLIT6YIgr/Uc7ZCI4mzwXPFxOo7YNN74JskE
-	s1l6uxQZrtlmbcB2Hn4+LA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740395630; x=
-	1740482030; bh=q/WWSDIGgNonfOGqFQW8MDgJxWFPr0j3B1LaVBN50m4=; b=t
-	FmwMZHNbO3SAGIGlIrXxFhUXMXBjrDjJx8NVwtB4cnXF0+450RHcVmxlrEsRQGHv
-	asfh//fePK2G7dKVMEHDwG/jNVJ9MUXkfOnpLepYIzaNxb0y73y6JBhduKZGNr2j
-	FXJfhraa9H5CKwob+wfhB390PQoPvMJo1p63nhb/QLnkWI/vDpp7ykq/i+6aBXC+
-	D5tGy6kKyOVXQAtiHycsZRzMc7ZPVIA6C4lURl5FSubu02BRua570T4yfiP97rkb
-	h4pUTzI/+uZbxcVwlYNIb1yRvZsRHq3QUOpoVrReOmrubc5feSmllEhHWMdSt683
-	cR4m247FYh2tt76hAbRqg==
-X-ME-Sender: <xms:bVS8Zz3BQXUlKScqpdzDYt26Em9b1OMM80kp6k6KSE_FdTVvPUhi4Q>
-    <xme:bVS8ZyExzlKHL6SEvyWje-pG1SwS9Jrar1mcmjEThmV6VCf0QNe6BWb1YHClME5Nb
-    uuLcdnEFjz9h0ieB_U>
-X-ME-Received: <xmr:bVS8Zz7pumG2B9tGFl6dsP_e2iPRHAkUpPLx5VT8Kx9RkwQ__jShOcU-XVHPpkG4x-82aS7yx3daG3TmOFthxRZz6S1jt31Glg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeeigecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
-    jeenucfhrhhomheppfhikhhlrghsucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsoh
-    guvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepveet
-    gedtvddvhfdtkeeghfeffeehteehkeekgeefjeduieduueelgedtheekkeetnecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhs
-    ohguvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepuddupd
-    hmohguvgepshhmthhpohhuthdprhgtphhtthhopehthhhorhhsthgvnhdrsghluhhmsehl
-    ihhnuhigrdguvghvpdhrtghpthhtohephihoshhhihhhihhrohdrshhhihhmohgurgdruh
-    hhsehrvghnvghsrghsrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhes
-    lhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
-    drtghomhdprhgtphhtthhopehrihgthhgrrhgutghotghhrhgrnhesghhmrghilhdrtgho
-    mhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:bVS8Z41vLpiI9rB0Ozt0FTyRXKF6zDrRcGdoj7W41S-YZzFwcKi4mA>
-    <xmx:bVS8Z2HxPdy4S07mwEc0fiXpr1uG2YHx5dhSyjpPzinkJmu5ecpifQ>
-    <xmx:bVS8Z5-Ij5G48d5MIu8BqNqW5HzsmLUee7XVo_kmfFAfBHpSrZDImw>
-    <xmx:bVS8ZzmXDTYaFzoiqb_8n6bbZU1rAmdP83NhjJ-rf2fKvJZXM04Y4A>
-    <xmx:blS8Zx8BJdsM12M13ne8aWv1vIYQeH5EYPgAFHFO-3bIeBPEA-ICfslX>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 24 Feb 2025 06:13:48 -0500 (EST)
-Date: Mon, 24 Feb 2025 12:13:45 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ethernet: renesas: rcar_gen4_ptp: Remove
- bool conversion
-Message-ID: <20250224111345.GG515486@ragnatech.se>
-References: <20250223233613.100518-2-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1740395802; c=relaxed/simple;
+	bh=snZu7pL4BcHs/H3bClvaolJQqBjKqx8IvUNhokoLJz4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=de+/IHaS9o1euyAwnQViny8qZI8Ljn4ZnsyFMJeaNPSCe6shTgeAsglJddhObkPaXHf2tSzknYsYBJR9nMr6TjheBEdzjlI5vFkpVdTNLFGCnRTyQhQUCvdcMVGtLd6q0TblFBpZrSUN/WNQn3QKxT8Cjmc9xdu+3nghjcph7t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jw8IrwSa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192F3C4CED6;
+	Mon, 24 Feb 2025 11:16:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740395801;
+	bh=snZu7pL4BcHs/H3bClvaolJQqBjKqx8IvUNhokoLJz4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jw8IrwSaKWeGIPfpQhyp+dPmmFivRly2UKmQzKTMy7IoxX9ELcIb0uA6/gPv+WpHV
+	 VsHJczbCMFx7YjRm0NQ2xjxVo4Ne4CGeFA8bVYgMl8/N1eucjINXARYZTSywQExGzf
+	 ABS0tH94oKRIcXPAZ6TQg1Kf20WsHx+sX2pfh7TCeWPEdcHXZh+OrvxpZLJwy9h73Y
+	 /kj1wh1X7narHrN3oVFt4M1pvP2MTEU8i4nCnAlFlQZinbqfrzQvaHTwcI2ofVVCME
+	 QjDO6cS8PLvNkZ8h1bK+D4YJhKdlEpJa4KX8DHAs5DFX52ayd8bIQgHD7ds+oWrSri
+	 eSsDteTvEFqQw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Shigeru Yoshida <syoshida@redhat.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.13 01/32] selftests/bpf: Adjust data size to have ETH_HLEN
+Date: Mon, 24 Feb 2025 06:16:07 -0500
+Message-Id: <20250224111638.2212832-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.13.4
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250223233613.100518-2-thorsten.blum@linux.dev>
 
-Hi Thorsten,
+From: Shigeru Yoshida <syoshida@redhat.com>
 
-Thanks for your work.
+[ Upstream commit c7f2188d68c114095660a950b7e880a1e5a71c8f ]
 
-On 2025-02-24 00:36:11 +0100, Thorsten Blum wrote:
-> Remove the unnecessary bool conversion and simplify the code.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+The function bpf_test_init() now returns an error if user_size
+(.data_size_in) is less than ETH_HLEN, causing the tests to
+fail. Adjust the data size to ensure it meets the requirement of
+ETH_HLEN.
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+Link: https://patch.msgid.link/20250121150643.671650-2-syoshida@redhat.com
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ .../testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c  | 4 ++--
+ .../testing/selftests/bpf/prog_tests/xdp_devmap_attach.c  | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-> ---
->  drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-> index 72e7fcc56693..4c3e8cc5046f 100644
-> --- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-> +++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-> @@ -29,8 +29,8 @@ static const struct rcar_gen4_ptp_reg_offset gen4_offs = {
->  static int rcar_gen4_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
->  {
->  	struct rcar_gen4_ptp_private *ptp_priv = ptp_to_priv(ptp);
-> -	bool neg_adj = scaled_ppm < 0 ? true : false;
->  	s64 addend = ptp_priv->default_addend;
-> +	bool neg_adj = scaled_ppm < 0;
->  	s64 diff;
->  
->  	if (neg_adj)
-> -- 
-> 2.48.1
-> 
-> 
-
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
+index c7f74f068e788..df27535995af8 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
+@@ -52,10 +52,10 @@ static void test_xdp_with_cpumap_helpers(void)
+ 	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to cpumap entry prog_id");
+ 
+ 	/* send a packet to trigger any potential bugs in there */
+-	char data[10] = {};
++	char data[ETH_HLEN] = {};
+ 	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+ 			    .data_in = &data,
+-			    .data_size_in = 10,
++			    .data_size_in = sizeof(data),
+ 			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
+ 			    .repeat = 1,
+ 		);
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
+index 27ffed17d4be3..461ab18705d5c 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
+@@ -23,7 +23,7 @@ static void test_xdp_with_devmap_helpers(void)
+ 	__u32 len = sizeof(info);
+ 	int err, dm_fd, dm_fd_redir, map_fd;
+ 	struct nstoken *nstoken = NULL;
+-	char data[10] = {};
++	char data[ETH_HLEN] = {};
+ 	__u32 idx = 0;
+ 
+ 	SYS(out_close, "ip netns add %s", TEST_NS);
+@@ -58,7 +58,7 @@ static void test_xdp_with_devmap_helpers(void)
+ 	/* send a packet to trigger any potential bugs in there */
+ 	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+ 			    .data_in = &data,
+-			    .data_size_in = 10,
++			    .data_size_in = sizeof(data),
+ 			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
+ 			    .repeat = 1,
+ 		);
+@@ -158,7 +158,7 @@ static void test_xdp_with_devmap_helpers_veth(void)
+ 	struct nstoken *nstoken = NULL;
+ 	__u32 len = sizeof(info);
+ 	int err, dm_fd, dm_fd_redir, map_fd, ifindex_dst;
+-	char data[10] = {};
++	char data[ETH_HLEN] = {};
+ 	__u32 idx = 0;
+ 
+ 	SYS(out_close, "ip netns add %s", TEST_NS);
+@@ -208,7 +208,7 @@ static void test_xdp_with_devmap_helpers_veth(void)
+ 	/* send a packet to trigger any potential bugs in there */
+ 	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+ 			    .data_in = &data,
+-			    .data_size_in = 10,
++			    .data_size_in = sizeof(data),
+ 			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
+ 			    .repeat = 1,
+ 		);
 -- 
-Kind Regards,
-Niklas Söderlund
+2.39.5
+
 
