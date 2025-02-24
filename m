@@ -1,156 +1,164 @@
-Return-Path: <netdev+bounces-169002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A118A41E75
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:09:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620DBA41F29
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D6117D9FC
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:04:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9F4A1888736
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235CA205AAF;
-	Mon, 24 Feb 2025 12:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BFA233714;
+	Mon, 24 Feb 2025 12:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OuyGjVsi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GYESaaql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4108B2571B8
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 12:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9AA1A317A;
+	Mon, 24 Feb 2025 12:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740398652; cv=none; b=HKfLCXeZutbKjbr1rj3OsvrOCwBUTzO8fmMELz9UkSjUYm0FtSYgwdnTqFipu3BYjsPsk+q2fGrRNfPwoG22Fthaf2VZngFdKtyz3FAUelwBHYpHrJhJFRInuoaVdmYLDIp4iRGCTwB1IL0OwpKG6L6UMifBuLpUNFzgV4OBsJg=
+	t=1740400401; cv=none; b=aKjeF1AeTA7EjfjSiQVUA8oduV6Gs4vhbd5/SEI6wIl6jbLf4WMCptSZfXkmXlDR34dvCDA1P+XexXcLW4gyO5NVTT+9ciX96orKI/YFN8rwd76IPkGd+RIsAmJNbsHpbCVJakW4nwm86X/FRAARBQndcbnjBk+aMN8yCQEW/hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740398652; c=relaxed/simple;
-	bh=+L3PhZEmgQaSbRAuJHWLglYt4qjvAOIrF1s42gg9W6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oRqr2k6Ynt1vtiLAypyUJ+jHL0+Mkl5A90DfYWgJz9spibUCFmK/EqRD5nfiWR1crMhyovHynjoA70mMptaG8Od7ahJ+DY+Vxy+fmOZYUdgVwicx1Drht09GX2J3dcqvd+E+UE79ILggA4+D+URufNU7sClrCYse0/fAD/gsh+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=OuyGjVsi; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-439a4fc2d65so39945905e9.3
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 04:04:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740398646; x=1741003446; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0onFnRxIs2kBe+jELL7hIQKKJxUK1QSzk168t3wEz8E=;
-        b=OuyGjVsi0z40guKq/yLMns9O69WhUyg5/ww9DyvsjsWoTKLbuhYaPy5toSyCNZbFhP
-         Nt9mWOVxzC2IrPcYYEEEzELdIwYnQv0URlGr62FU+c6MeogXORACb/G+OcC3K3VRkeBe
-         kwWEu6HwRzhZaEV5NCqrG0fE6cNbR+RyQWnZfGZ5qol/rSewIt0Mwt9w8HZfLGd6Run7
-         +YoOa8iRNamF6+7p+ONrXMbyZUMuQx1W/Ho0ujUy97ZA8K4ZuvTKe4ts/4695iQmnAE7
-         5myDGC5hJxmN6mXOFXO8OvHXdNZQ6EHq/ojv6nYJQ6+iFAV0tIltNm6syymGLxDoq2Nq
-         i8ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740398646; x=1741003446;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0onFnRxIs2kBe+jELL7hIQKKJxUK1QSzk168t3wEz8E=;
-        b=I+uB/PyHXLswojh4h4hB3eMgEPCxsnNNQWnG3Cr1hYau9TFv64KDdxj7375K/t6ihs
-         93xjeDdQw34YlWJY8RESBKxTAjAqLzsyNAVrNTICP2TTMRcos+xMK/ZeRPxqbLt+yFso
-         nak8zJpVXkIadkuVyASmwLxPGdCFMGdpSAeH3SLMGCm8yngily57K/wM3x5PMzjiIYnO
-         b1tdZOrk3uvHczHtHmILzws8e2c7UABmOokS6jVCD6goQme1J26FUer49FWNAUVUpjs5
-         kuRbYVrInaOESabJQH7DA1YQQTw/E9QcnUiWYzr4/CjgkpSs3/B6dktqdFFDZR44OIZW
-         PptQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXReQMiarpzPgF6y/KTya0JqzzAgOdJxSTK741cqT4BbQ3NHgOpnXGVrjKhTGLWJpN1ixtaYmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIFsF7RpJQF3pyuNnjbJhdcaeV/8gaWJu4BWj9kR0fE0qMeRHK
-	V735gHlGE4zD9FKAP3PQh8mopc2GX6uyajdPML5xPAd0GlOqaQoL05sArWaPlL4=
-X-Gm-Gg: ASbGnctrt/WC3ieclG5t5uPj7mCkF4BzpMFnN3PxfADQLkFpBet3G6GB2zSrFCo/GmA
-	+SKQW8lvJLfEliQD9Sz/AIbaMdNRWBbxHjzur+FAolV19HqEiFUM/Gd43xZrmAPLrxP3XlDkQZV
-	jVoMwi/Gj7j+IeHcur1h08ZXtIXmPgAmV3vzFFUHENWz8F4tM/UAenvKrzDu1TD2Twm/UDau2H6
-	QougbsyW9pA8L3qFDN0PM+jZq50G6+qgDCQC7XigyI2MD/mvn2Cl1VXLto6ny7B8AvVi8GIb5kb
-	Va7jaL3FmItdeX39nJbawZC0keeIPt4S+r7AaoLIqVXjMhi+6y55
-X-Google-Smtp-Source: AGHT+IGRKIPeXT1LNLoxtMfDiXfqTI3VfaUvrkEcTwnu3mVHJKxvqex6Qwlkx3D50c356CoRnS0VIw==
-X-Received: by 2002:a5d:6daa:0:b0:38f:474f:f3f3 with SMTP id ffacd0b85a97d-38f6e95bd66mr11180365f8f.13.1740398646115;
-        Mon, 24 Feb 2025 04:04:06 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([208.127.45.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258eb141sm30819875f8f.41.2025.02.24.04.04.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 04:04:05 -0800 (PST)
-Date: Mon, 24 Feb 2025 13:04:02 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Jiasheng Jiang <jiashengjiangcool@gmail.com>, 
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"Glaza, Jan" <jan.glaza@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] dpll: Add a check before kfree() to match the existing
- check before kmemdup()
-Message-ID: <kwdkfmt2adru7wk7qwyw67rp6b6e3s63rbx4dqijl6roegsg3f@erishkbcfmbm>
-References: <20250223201709.4917-1-jiashengjiangcool@gmail.com>
- <DM6PR11MB4657A297365AE59DE960AA899BC02@DM6PR11MB4657.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1740400401; c=relaxed/simple;
+	bh=6rPFs7hzmUkKaQrVsGuEz1DL+CQFnxE27A0sX3lKafE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ronvZ0PjpNoI20QrLsBwBfQE/Dr9K/OGQpXiV8mIomUtDoj4rdIaQ7GMet8kaAZC4EjxxAWzxDJBznpD6oYjFPyGP4lILtHPuWHraObXi3l2OKdRt6PHFuq7gOqtlKerK+aYZRWZx2zlrCTkShxGylqa0KttR8odLqaCNhjx9RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GYESaaql; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E91D744181;
+	Mon, 24 Feb 2025 12:33:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740400396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FnIzeA4pJWQRQR33/yIE0LmlDF+4NGNUEAEh4smthcI=;
+	b=GYESaaqlSkjxyaXK6Azd/IDvQ2sQbctDLWXd3q+eh/bblOU4khcJiSwbLRjpahNLnHNShc
+	9DrQSKh+vT/LinxLd8n8vIxidgcJsWzai1t6WLBdLx6H2NPamO8EX31h1ycAdonM/ouRzX
+	Jmox9KOaTTtiexCUFG8UtlmgIoaNemap0orZwaBS6DuM9EeR90G1z46UlZYS54Wkw8Kc2y
+	ytrJRvpsU625KJRP/at8EUsixdcJhkeesdNBfQRfT8RmgB4w9XGysxlKjMYbC0MGLuPC5A
+	qV3GM2FYYs83pVv2WNAbgzr0aooywQ0Qchq9SXy1zgIhNlBDDQ3Ozc+a2IuTPA==
+Date: Mon, 24 Feb 2025 13:33:12 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
+ <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+ <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 02/12] net: pse-pd: Add support for
+ reporting events
+Message-ID: <20250224133312.008291bc@kmaincent-XPS-13-7390>
+In-Reply-To: <20250220164201.469fdf6d@kernel.org>
+References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
+	<20250218-feature_poe_port_prio-v5-2-3da486e5fd64@bootlin.com>
+	<20250220164201.469fdf6d@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB4657A297365AE59DE960AA899BC02@DM6PR11MB4657.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeejlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvgedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
+ ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Mon, Feb 24, 2025 at 10:31:27AM +0100, arkadiusz.kubalewski@intel.com wrote:
->Hi Jiasheng, many thanks for the patch!
->
->>From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
->>Sent: Sunday, February 23, 2025 9:17 PM
->>
->>When src->freq_supported is not NULL but src->freq_supported_num is 0,
->>dst->freq_supported is equal to src->freq_supported.
->>In this case, if the subsequent kstrdup() fails, src->freq_supported may
->
->The src->freq_supported is not being freed in this function,
->you ment dst->freq_supported?
->But also it is not true.
->dst->freq_supported is being freed already, this patch adds only additional
->condition over it..
->From kfree doc: "If @object is NULL, no operation is performed.".
->
->>be freed without being set to NULL, potentially leading to a
->>use-after-free or double-free error.
->>
->
->kfree does not set to NULL from what I know. How would it lead to
->use-after-free/double-free?
->Why the one would use the memory after the function returns -ENOMEM?
->
->I don't think this patch is needed or resolves anything.
+Hello Jakub,
 
-I'm sure it's not needed.
+On Thu, 20 Feb 2025 16:42:01 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
+> On Tue, 18 Feb 2025 17:19:06 +0100 Kory Maincent wrote:
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >=20
+> > Add support for devm_pse_irq_helper() to register PSE interrupts. This =
+aims
+> > to report events such as over-current or over-temperature conditions
+> > similarly to how the regulator API handles them but using a specific PSE
+> > ethtool netlink socket. =20
+>=20
+> I think you should CC HWMON ML on this.
+> Avoid any surprises.
 
->
->Thank you!
->Arkadiusz
->
->>Fixes: 830ead5fb0c5 ("dpll: fix pin dump crash for rebound module")
->>Cc: <stable@vger.kernel.org> # v6.8+
->>Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
->>---
->> drivers/dpll/dpll_core.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>index 32019dc33cca..7d147adf8455 100644
->>--- a/drivers/dpll/dpll_core.c
->>+++ b/drivers/dpll/dpll_core.c
->>@@ -475,7 +475,8 @@ static int dpll_pin_prop_dup(const struct
->>dpll_pin_properties *src,
->> err_panel_label:
->> 	kfree(dst->board_label);
->> err_board_label:
->>-	kfree(dst->freq_supported);
->>+	if (src->freq_supported_num)
->>+		kfree(dst->freq_supported);
->> 	return -ENOMEM;
->> }
->>
->>--
->>2.25.1
->
+You mean regulator maintainers right?
+=20
+> > diff --git a/Documentation/netlink/specs/ethtool.yaml
+> > b/Documentation/netlink/specs/ethtool.yaml index 655d8d10fe24..da78c5da=
+f537
+> > 100644 --- a/Documentation/netlink/specs/ethtool.yaml
+> > +++ b/Documentation/netlink/specs/ethtool.yaml
+> > @@ -1526,6 +1526,22 @@ attribute-sets:
+> >          name: hwtstamp-flags
+> >          type: nest
+> >          nested-attributes: bitset
+> > +  -
+> > +    name: pse-ntf
+> > +    attr-cnt-name: __ethtool-a-pse-ntf-cnt
+> > +    attributes:
+> > +      -
+> > +        name: unspec
+> > +        type: unused
+> > +        value: 0 =20
+>=20
+> Please don't add the unused entries unless your code actually needs
+> them. YNL will id real ones from 1 anyway.
+
+ok.
+
+> > +      -
+> > +        name: header
+> > +        type: nest
+> > +        nested-attributes: header
+> > +      -
+> > +        name: events
+> > +        type: nest
+> > +        nested-attributes: bitset =20
+>=20
+> Do we really need a bitset here? Much more manual work to make a bitset
+> than just a uint + enum with the bits. enum is much easier to use with
+> YNL based user space, and it's more self-documenting than a list of bits
+> buried in the source of the kernel.
+
+Ok will change it in next version.=20
+
+> >  operations:
+> >    enum-model: directional
+> > @@ -2382,3 +2398,13 @@ operations:
+> >            attributes: *tsconfig
+> >          reply:
+> >            attributes: *tsconfig
+> > +    -
+> > +      name: pse-ntf
+> > +      doc: Notification for pse events. =20
+>=20
+> s/pse/PSE/
+
+Oh thanks!
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
