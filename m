@@ -1,218 +1,146 @@
-Return-Path: <netdev+bounces-168915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23195A417FD
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:00:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D0BA4180C
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 761933A4936
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:00:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 086E818918C1
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBB6242912;
-	Mon, 24 Feb 2025 09:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QKn7u7lE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230B219F11F;
+	Mon, 24 Feb 2025 09:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF3723CF08
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC30EEB5;
+	Mon, 24 Feb 2025 09:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740387619; cv=none; b=MRoqIBwG6sCkeYkOZavd7JCtFctWQVJ+lePBu9cV3hNu5hQHNV3LwnQxzvJmsN7RZGtspniCBShzDGnybVtU6KwxXX4Dmd7lEt9nDkA2jinpBaaPSEgQ2eRVp8FusuB4wij4Ex5nnbo1SOz7xZ4thE9Pv1W3fZe1NC9F7Jg0BNU=
+	t=1740387797; cv=none; b=en7iHcYvk/r2nkLDzJ14vS5xMYu7ntlkmejwRkn2imOVAcJHbbsxiPxXCQE9N2IHuMW4e52+jc44GARvK7HIhMJz1SF/AcnusmSHT+BqSHE2fLPIsKXgNv1eyqXT74wb3FCL5CRVj6cDsy9F+Zx5pBZQ7/wborRNVQbiHk+ZTI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740387619; c=relaxed/simple;
-	bh=PixDCnEeAQ3D7Efu+RAjO/ulrL8/4igNruqwXDK7djw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LE6YEFJGxmwbayvBX2Gv8xE2ipluKuq+Bv92385i7wQ+Xyazkk7l+lwTiNohJHmT9ne06JO/XtYKm92o2kJ+DlhHMeaQHIYPaIs5WQ60WSI42KEsSApyUaIFfniKVR5bD4wOPJaC4efOcnLcXMu2dP0e6PNKfj0kvYiMxrK5zNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QKn7u7lE; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5fd0c7be155so1878123eaf.1
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 01:00:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1740387617; x=1740992417; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PixDCnEeAQ3D7Efu+RAjO/ulrL8/4igNruqwXDK7djw=;
-        b=QKn7u7lECDe07DTiZZ9WkD4bx1nqzoK3UK1+Yz3qjJdwTxUAn941Ad1I+u89bfzZtn
-         Pxb8rPrI1dWKiyzyFQ1xVgX3uBZuBZ/f9eloyI87DOQ53j2C7WW8TzVTmtYtAUrgYxWN
-         MS6DCa859Ti0tdIa1RGmWW3HxsLlCCQhZMLew=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740387617; x=1740992417;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PixDCnEeAQ3D7Efu+RAjO/ulrL8/4igNruqwXDK7djw=;
-        b=ksqvwAGtrI/wOAM77htnvQ5VBNRlGP44WbmUzUHDTR0C3AF8uH2NOqY+i27UGDxoEU
-         KlWuXXxnS539rykOsiNrsKRjKR5o+6Ptkmvk46rv8DCGA52SbtPKdIToFC2Pn1+KLGE7
-         zSkgST2Z3kA8qgsslOFC+pS+FqX9AUw6Kch6P9ubCy73l7hwS4cR13nb4ucu5BD/iC4w
-         2dxxkxpKB+nQhqrOdnDlUV+kSGkwyFTeuaAY0M5YrkRDkw5mflnJFxKZ7sxo7lVzNIlY
-         nXmbCkpah6fwNT5oSZVZuzaaap6EexC4dioGfQ0ihgXjS8Xu8K+t3a2KFzymdDoXFgtO
-         NdbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWK4qKb1RGBxoBV1In0Nz00h1JLZaV7vqiAMoglrvPfjweNKHuHR7GKnSKe76Zq/z9hQr5PlH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+U68Lj7C22/6xsG5GTakG2B4Eu0ybWrvLEfKw12qNIC4Od07O
-	pBslAfwLDLTavgEHn+S4M8SZT4Bp0HxubVBF/ELW0A5m5SA4rrwvzn3AlMoj9tBgVHtr7tnDxhF
-	sD2Ll6PVg9P/+nsO9iV5JEaZxLniKV2v8G04x
-X-Gm-Gg: ASbGncsLzZbek0Mg1Hy3HWfAhRFUn0mFgwDFV+/9WeveHwsfAT5b8NXdPEcY5cBcCkE
-	gXoJ3kWnFDTRlU7TLulmy447uT/sILEpuQxTX6o1pjk7m4jseNuAXKzhphcb/jm2GaUi/N2ksWk
-	WhBT6kCJBv
-X-Google-Smtp-Source: AGHT+IF+E4//s2y4VgMubTDSl5iSy1aAs3L+0lHZFTZgV1cC3NriWLyMlC+IWWQGCmst2T9kOdY8tUBjOECNMM0OXiE=
-X-Received: by 2002:a05:6820:4901:b0:5fc:f2b7:9853 with SMTP id
- 006d021491bc7-5fd0ad6257emr11420798eaf.0.1740387616784; Mon, 24 Feb 2025
- 01:00:16 -0800 (PST)
+	s=arc-20240116; t=1740387797; c=relaxed/simple;
+	bh=vJ2USaPUJjTmBBCLDYOLZUd493kJxSxBFveztP1SVow=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rSD+8juJsPYDAbD+KgPjLGoU/vXFeeDD2o0A69RcNgB+kAwq55xZXm+miEHAkEzXwvn3OK3LebPwyCRy3Z6U8xtT/Wzx08PXI93PsqNk63cOzMCa7qzRQ6UuXsCPAALoXborDo0mLlaLExV9o5CBheUbi9YoCtBJjgw4WojSOjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z1ZS13530zCs7m;
+	Mon, 24 Feb 2025 16:59:45 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 31BA1140134;
+	Mon, 24 Feb 2025 17:03:11 +0800 (CST)
+Received: from kwepemn100006.china.huawei.com (7.202.194.109) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 24 Feb 2025 17:03:10 +0800
+Received: from huawei.com (10.175.113.133) by kwepemn100006.china.huawei.com
+ (7.202.194.109) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 24 Feb
+ 2025 17:03:09 +0800
+From: Wang Hai <wanghai38@huawei.com>
+To: <kerneljasonxing@gmail.com>, <edumazet@google.com>,
+	<ncardwell@google.com>, <kuniyu@amazon.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <zhangchangzhong@huawei.com>, <liujian56@huawei.com>,
+	<yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 net] tcp: Defer ts_recent changes until req is owned
+Date: Mon, 24 Feb 2025 17:00:47 +0800
+Message-ID: <20250224090047.50748-1-wanghai38@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1740076496-14227-1-git-send-email-selvin.xavier@broadcom.com> <20250223133456.GA53094@unreal>
-In-Reply-To: <20250223133456.GA53094@unreal>
-From: Selvin Xavier <selvin.xavier@broadcom.com>
-Date: Mon, 24 Feb 2025 14:30:04 +0530
-X-Gm-Features: AWEUYZnVIziCUIInlPq1jE68iiIIVs8MBnThc1DKUedrT8PjVStL1hXI_uoFip4
-Message-ID: <CA+sbYW3VdewdCrU+PtvAksXXyi=zgGm6Yk=BHNNfbp1DDjRKcQ@mail.gmail.com>
-Subject: Re: [PATCH rdma-next 0/9] RDMA/bnxt_re: Driver Debug Enhancements
-To: Leon Romanovsky <leon@kernel.org>
-Cc: jgg@ziepe.ca, linux-rdma@vger.kernel.org, andrew.gospodarek@broadcom.com, 
-	kalesh-anakkur.purayil@broadcom.com, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, abeni@redhat.com, 
-	horms@kernel.org, michael.chan@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b0f8d1062edf9161"
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemn100006.china.huawei.com (7.202.194.109)
 
---000000000000b0f8d1062edf9161
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Recently a bug was discovered where the server had entered TCP_ESTABLISHED
+state, but the upper layers were not notified.
 
-On Sun, Feb 23, 2025 at 7:05=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> On Thu, Feb 20, 2025 at 10:34:47AM -0800, Selvin Xavier wrote:
-> > For debugging issues in the field, we need to track some of
-> > the resources destroyed in the past. This is primarily required
-> > for tracking certain QPs that encountered errors, leading to
-> > application exits. A framework has been implemented to
-> > save this information and retrieve it during coredump collection.
-> >
-> > The Broadcom bnxt L2 driver supports collecting driver dumps
-> > using the ethtool -w option. This feature now also supports
-> > collecting coredump information from the bnxt_re auxiliary driver.
-> > Two new callbacks have been implemented to exchange dump
-> > information supported by the auxbus bnxt_re driver.
-> >
-> > The bnxt_re driver caches certain hardware information before
-> > resources are destroyed in the HW.
->
-> Unfortunately, no. The idea that you will cache kernel objects and they
-> live beyond their HW counterpart doesn't fit RDMA object model.
-Since the scale of the resources are in thousands usually, we can not dump
-the debug information to the system logs. So we are not having much context=
- of
-the failure and this is the reason for having this new mechanism.
->
-> I'm aware that you are not keeping objects itself, but their shadow
-> copy. So if you want, your FW can store these failed objects and you
-> will retrieve them through existing netdev side (ethtool -w ...).
-FW doesn't have enough memory to backup this info. It needs to
-be backed up in the host memory and FW has to write it to host memory
-when an error happens. This is possible in some newer FW versions.
-But itt is not just the HW context that we are caching here. We need to bac=
-kup
-some host side driver/lib info also to correlate with the HW context.
-We have been debugging issues like this using our Out of box driver
-and we find it useful to get the context
-of failure. Some of the internal tools can decode this information and
-we want to
-have the same behavior between inbox and Out of Box driver.
+The same 5-tuple packet may be processed by different CPUSs, so two
+CPUs may receive different ack packets at the same time when the
+state is TCP_NEW_SYN_RECV.
 
->
-> Thanks
+In that case, req->ts_recent in tcp_check_req may be changed concurrently,
+which will probably cause the newsk's ts_recent to be incorrectly large.
+So that tcp_validate_incoming will fail. At this point, newsk will not be
+able to enter the TCP_ESTABLISHED.
 
---000000000000b0f8d1062edf9161
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+cpu1                                    cpu2
+tcp_check_req
+                                        tcp_check_req
+ req->ts_recent = rcv_tsval = t1
+                                         req->ts_recent = rcv_tsval = t2
 
-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
-FYMZp2DojLAq9f4Oi2OBetbnWxo0WGycXpmq/jC4PUx2u9mazQ79i80VLagGRshWniESXuf+SYG8
-+zBimjld9ZZnwm7itHAZdtme4YYFxx+EHa4PUxPV8t+hPHhsiIjirPa1pVXPbQIDAQABo4IB2zCC
-AdcwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDov
-L3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAu
-Y3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29u
-YWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0
-cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBA
-MD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2Ey
-MDIwLmNybDAlBgNVHREEHjAcgRpzZWx2aW4ueGF2aWVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU3TaH
-dsgUhTW3LwObmZ20fj+8Xj8wDQYJKoZIhvcNAQELBQADggEBAAbt6Sptp6ZlTnhM2FDhkVXks68/
-iqvfL/e8wSPVdBxOuiP+8EXGLV3E72KfTTJXMbkcmFpK2K11poBDQJhz0xyOGTESjXNnN6Eqq+iX
-hQtF8xG2lzPq8MijKI4qXk5Vy5DYfwsVfcF0qJw5AhC32nU9uuIPJq8/mQbZfqmoanV/yadootGr
-j1Ze9ndr+YDXPpCymOsynmmw0ErHZGGW1OmMpAEt0A+613glWCURLDlP8HONi1wnINV6aDiEf0ad
-9NMGxDsp+YWiRXD3txfo2OMQbpIxM90QfhKKacX8t1J1oAAWxDrLVTJBXBNvz5tr+D1sYwuye93r
-hImmkM1unboxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIw
-Agxy+Cu4x/7lM0zxY7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGjmyldl/iRU
-Euy5akIF3qOStDIAWAeCJciWrcl+SglYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTI1MDIyNDA5MDAxN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJ
-YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcN
-AQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCa49m4gB6O3M0DwS8j08HSZyErcU2I
-hq+SUctFvpegpCUo8dudSl1HGjoDEr21sE/AaumE+3YaS8r95+8ZHEgYzCnGYON5OX3yGr3NeKul
-GMW/Q2+/31v8lTO38pUh051dcR++BNShJfmUJs3DdBZhxbgYp+Y7eisf4nP6gTOGrmapSukvuBKH
-wGN5cldUIJwQuZiNS0FrL8rzNvMYj2nVx8652/eutGnWZHmz48rSyQruXlLDLmYtMmrN5SgIQhTP
-KWaAvn/XPkPttshw/MAa3VvBD5CNlYyeH10AM2MAiNCsdjjZ1AHhhPU4M33UCRBiE60Fcfr24GsR
-FZpU+T7d
---000000000000b0f8d1062edf9161--
+ syn_recv_sock
+  tcp_sk(child)->rx_opt.ts_recent = req->ts_recent = t2 // t1 < t2
+tcp_child_process
+ tcp_rcv_state_process
+  tcp_validate_incoming
+   tcp_paws_check
+    if ((s32)(rx_opt->ts_recent - rx_opt->rcv_tsval) <= paws_win)
+        // t2 - t1 > paws_win, failed
+                                        tcp_v4_do_rcv
+                                         tcp_rcv_state_process
+                                         // TCP_ESTABLISHED
+
+The cpu2's skb or a newly received skb will call tcp_v4_do_rcv to get
+the newsk into the TCP_ESTABLISHED state, but at this point it is no
+longer possible to notify the upper layer application. A notification
+mechanism could be added here, but the fix is more complex, so the
+current fix is used.
+
+In tcp_check_req, req->ts_recent is used to assign a value to
+tcp_sk(child)->rx_opt.ts_recent, so removing the change in req->ts_recent
+and changing tcp_sk(child)->rx_opt.ts_recent directly after owning the
+req fixes this bug.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Wang Hai <wanghai38@huawei.com>
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+---
+v2->v3: changed code format and commit msg.
+ net/ipv4/tcp_minisocks.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index b089b08e9617..dfdb7a4608a8 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -815,12 +815,6 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 
+ 	/* In sequence, PAWS is OK. */
+ 
+-	/* TODO: We probably should defer ts_recent change once
+-	 * we take ownership of @req.
+-	 */
+-	if (tmp_opt.saw_tstamp && !after(TCP_SKB_CB(skb)->seq, tcp_rsk(req)->rcv_nxt))
+-		WRITE_ONCE(req->ts_recent, tmp_opt.rcv_tsval);
+-
+ 	if (TCP_SKB_CB(skb)->seq == tcp_rsk(req)->rcv_isn) {
+ 		/* Truncate SYN, it is out of window starting
+ 		   at tcp_rsk(req)->rcv_isn + 1. */
+@@ -869,6 +863,10 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	if (!child)
+ 		goto listen_overflow;
+ 
++	if (own_req && tmp_opt.saw_tstamp &&
++	    !after(TCP_SKB_CB(skb)->seq, tcp_rsk(req)->rcv_nxt))
++		tcp_sk(child)->rx_opt.ts_recent = tmp_opt.rcv_tsval;
++
+ 	if (own_req && rsk_drop_req(req)) {
+ 		reqsk_queue_removed(&inet_csk(req->rsk_listener)->icsk_accept_queue, req);
+ 		inet_csk_reqsk_queue_drop_and_put(req->rsk_listener, req);
+-- 
+2.17.1
+
 
