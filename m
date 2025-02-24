@@ -1,100 +1,189 @@
-Return-Path: <netdev+bounces-169220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D037A42FEE
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:21:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18AEFA43001
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 067E917AABC
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:21:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01848169E3B
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9241FFC7F;
-	Mon, 24 Feb 2025 22:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B42B204F63;
+	Mon, 24 Feb 2025 22:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJN2lbHG"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ozIDGTPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85EB1FC0E0
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 22:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A31A1FC7E0;
+	Mon, 24 Feb 2025 22:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740435666; cv=none; b=YKqwEDE4etItsWlBPJAk4iJaThJGTJDULAC7qCe1buewEVvPBVqE4eIGWCWAs6/dCY06Yn4eTAug39Wh0sp9jZ5dYbDIUIJoBNeWMtEaOCDfd2O//fFYrGAIsCpdOn4HLQiPoI1a1WhYbSKTmeAWzB1nOXfkQrkC9vJc8jMSxQs=
+	t=1740435872; cv=none; b=U9i7ICCVxSB2/eJuFWnLKF5XMoJeNovISrSXA+nrlAdOdxfBcQOr4TsgmLg33fwkby5FSs7N0ZECc5qsQYQU7BGN4DfYgQBSb79Ko2AZHMlySDxxuWXyeSRINxaSldcREjlGKS9GBEBnQ0Y0UCWlPZDPR74T8I9IKULuwBFjBb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740435666; c=relaxed/simple;
-	bh=vCBtutVOiqBw8zPVXIXZiaY8om9WDbsJ/tcVLA6Nx6g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ojn5cANIT+vLe2OJf8ZzMqDNJ6ALD8043IAEZ5xibuRaNc2pOJ+9vUujRyqQVXB4FUuy3oo3vevAyzztLFGRUPaLe2JHtmC1tKMMv3vAimCkdbqJs4uPFJcIjZB9H5J6sryMTjW8ixrbVFPlkr9v2vXmE5Tla+/WcDfCX57z1FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJN2lbHG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 138E0C4CED6;
-	Mon, 24 Feb 2025 22:21:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740435665;
-	bh=vCBtutVOiqBw8zPVXIXZiaY8om9WDbsJ/tcVLA6Nx6g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sJN2lbHGx5xNFtmm2PNLy9iF+o/DBWaR5ZlXkgOMaGhU+i1j23ErY2B5hwtE0PHVp
-	 x/MQWRlShyJwPVHf5nQx6iHLzAEq5Hp+A4nOhJyU4UQKjG1V3TgjIiznzlCWqi1vl6
-	 A6X6l9psarWMTWOqPS26szZgEl+I4TXITnQnAsc02wJBl/RKAYFR0/ct+dPVJMjMGt
-	 yhZZemiQxsV04roZb56FO7pcolnHQ9Z7V57sh5+xWUH1oDonQCeRMuB3C6l//IMXPn
-	 logbQMOfpUYdLIOKppBxyZn/ctp/WzHyFSHVJbvcqlnRAXSRda9aB8aM6QJFJwWye1
-	 2f7HoiojvII1g==
-Date: Mon, 24 Feb 2025 14:21:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, kerneljasonxing@gmail.com, pav@iki.fi,
- gerhard@engleder-embedded.com, vinicius.gomes@intel.com,
- anthony.l.nguyen@intel.com, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next] net: skb: free up one bit in tx_flags
-Message-ID: <20250224142104.14f44a27@kernel.org>
-In-Reply-To: <20250221035938.2891898-1-willemdebruijn.kernel@gmail.com>
-References: <20250221035938.2891898-1-willemdebruijn.kernel@gmail.com>
+	s=arc-20240116; t=1740435872; c=relaxed/simple;
+	bh=zeoycR9oJIvshsvmElPOgnL5CAwyhvnlZN86Qa02vbA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=ue9lvT/uBFDjcnQhBlEOfrxdz4qhoKriSPmKOnnNukOgpN8UyX3WWtdSB9kQC/rpwjgiJXo8kVGT9XR8v5NpOcA2pUFQNBqjGQTpmYCcqBIMUeyo+RX/dy0Q28z7Yh0Cdz7c3egokX9GZfYvBH2eNrdzdNafwd3xv1nOesD8Mqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ozIDGTPs; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51OMLFn9936187
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 24 Feb 2025 14:21:15 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51OMLFn9936187
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1740435678;
+	bh=5y6QG8ugMZ9OSeEQQS3XKHClehNKu6IU395FCDCL8FQ=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=ozIDGTPsS/eMemS9AsjAyI4wW35RmD+flU4K02cgRllCs1/EXoq/zU8D0Tj+XR7s7
+	 MZg8YLCegaqa2yDyfMJvQGv6t1kOvN+0q04sz5ZxYB9YM677zH/ZIZY6vdUkX4NcwW
+	 oWm3ILA+YRJqBweAX9swGouBRul9ocwk3Q4qIuvrww8+7C/Rb1K/Ta0mh5A75CR1rh
+	 llGqPQI+Pf0RG87x37cpP0mls9qUS/4UTdrDt6e6zhpWuYAFbE/uu9ouHgosTRW+LS
+	 bO/GR8jYaz6trMtVFpY/lvVshl8fmlaN9/CCCKUp5lafSOK9eftKm/xvIxMal4//D3
+	 SjMlyohWFvQfg==
+Date: Mon, 24 Feb 2025 14:21:13 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Yury Norov <yury.norov@gmail.com>
+CC: Uros Bizjak <ubizjak@gmail.com>, Kuan-Wei Chiu <visitorckw@gmail.com>,
+        tglx@linutronix.de, Ingo Molnar <mingo@redhat.com>, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+        joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+        neil.armstrong@linaro.org, rfoss@kernel.org,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
+        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
+        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+        jirislaby@kernel.org, akpm@linux-foundation.org, mingo@kernel.org,
+        alistair@popple.id.au, linux@rasmusvillemoes.dk,
+        Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+        jernej.skrabec@gmail.com, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+        oss-drivers@corigine.com, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+        Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_03/17=5D_x86=3A_Replace_open-c?=
+ =?US-ASCII?Q?oded_parity_calculation_with_parity8=28=29?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <Z7zv-c4A76jeMAKf@thinkpad>
+References: <20250223164217.2139331-1-visitorckw@gmail.com> <20250223164217.2139331-4-visitorckw@gmail.com> <d080a2d6-9ec7-1c86-4cf4-536400221f68@gmail.com> <e0b1c299-7f19-4453-a1ce-676068601213@zytor.com> <Z7zv-c4A76jeMAKf@thinkpad>
+Message-ID: <68F1ED19-B0C2-4E78-B504-2F7C040ACC0A@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 20 Feb 2025 22:58:20 -0500 Willem de Bruijn wrote:
-> The linked series wants to add skb tx completion timestamps.
-> That needs a bit in skb_shared_info.tx_flags, but all are in use.
-> 
-> A per-skb bit is only needed for features that are configured on a
-> per packet basis. Per socket features can be read from sk->sk_tsflags.
-> 
-> Per packet tsflags can be set in sendmsg using cmsg, but only those in
-> SOF_TIMESTAMPING_TX_RECORD_MASK.
-> 
-> Per packet tsflags can also be set without cmsg by sandwiching a
-> send inbetween two setsockopts:
-> 
->     val |= SOF_TIMESTAMPING_$FEATURE;
->     setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &val, sizeof(val));
->     write(fd, buf, sz);
->     val &= ~SOF_TIMESTAMPING_$FEATURE;
->     setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &val, sizeof(val));
-> 
-> Changing a datapath test from skb_shinfo(skb)->tx_flags to
-> skb->sk->sk_tsflags can change behavior in that case, as the tx_flags
-> is written before the second setsockopt updates sk_tsflags.
-> 
-> Therefore, only bits can be reclaimed that cannot be set by cmsg and
-> are also highly unlikely to be used to target individual packets
-> otherwise.
-> 
-> Free up the bit currently used for SKBTX_HW_TSTAMP_USE_CYCLES. This
-> selects between clock and free running counter source for HW TX
-> timestamps. It is probable that all packets of the same socket will
-> always use the same source.
+On February 24, 2025 2:17:29 PM PST, Yury Norov <yury=2Enorov@gmail=2Ecom> =
+wrote:
+>On Mon, Feb 24, 2025 at 01:55:28PM -0800, H=2E Peter Anvin wrote:
+>> On 2/24/25 07:24, Uros Bizjak wrote:
+>> >=20
+>> >=20
+>> > On 23=2E 02=2E 25 17:42, Kuan-Wei Chiu wrote:
+>> > > Refactor parity calculations to use the standard parity8() helper=
+=2E This
+>> > > change eliminates redundant implementations and improves code
+>> > > efficiency=2E
+>> >=20
+>> > The patch improves parity assembly code in bootflag=2Eo from:
+>> >=20
+>> >  =C2=A0 58:=C2=A0=C2=A0=C2=A0 89 de=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 mov=C2=A0=C2=A0=C2=A0 %ebx,%esi
+>> >  =C2=A0 5a:=C2=A0=C2=A0=C2=A0 b9 08 00 00 00=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 $0x8,%ecx
+>> >  =C2=A0 5f:=C2=A0=C2=A0=C2=A0 31 d2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 xor=C2=A0=C2=A0=C2=A0 %edx,%edx
+>> >  =C2=A0 61:=C2=A0=C2=A0=C2=A0 89 f0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 mov=C2=A0=C2=A0=C2=A0 %esi,%eax
+>> >  =C2=A0 63:=C2=A0=C2=A0=C2=A0 89 d7=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 mov=C2=A0=C2=A0=C2=A0 %edx,%edi
+>> >  =C2=A0 65:=C2=A0=C2=A0=C2=A0 40 d0 ee=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shr=C2=
+=A0=C2=A0=C2=A0 %sil
+>> >  =C2=A0 68:=C2=A0=C2=A0=C2=A0 83 e0 01=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 and=C2=
+=A0=C2=A0=C2=A0 $0x1,%eax
+>> >  =C2=A0 6b:=C2=A0=C2=A0=C2=A0 31 c2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 xor=C2=A0=C2=A0=C2=A0 %eax,%edx
+>> >  =C2=A0 6d:=C2=A0=C2=A0=C2=A0 83 e9 01=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sub=C2=
+=A0=C2=A0=C2=A0 $0x1,%ecx
+>> >  =C2=A0 70:=C2=A0=C2=A0=C2=A0 75 ef=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 jne=C2=A0=C2=A0=C2=A0 61 <sbf_init+0x51>
+>> >  =C2=A0 72:=C2=A0=C2=A0=C2=A0 39 c7=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 cmp=C2=A0=C2=A0=C2=A0 %eax,%edi
+>> >  =C2=A0 74:=C2=A0=C2=A0=C2=A0 74 7f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 je=C2=A0=C2=A0=C2=A0=C2=A0 f5 <sbf_init+0xe5>
+>> >  =C2=A0 76:
+>> >=20
+>> > to:
+>> >=20
+>> >  =C2=A0 54:=C2=A0=C2=A0=C2=A0 89 d8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 mov=C2=A0=C2=A0=C2=A0 %ebx,%eax
+>> >  =C2=A0 56:=C2=A0=C2=A0=C2=A0 ba 96 69 00 00=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 $0x6996,%edx
+>> >  =C2=A0 5b:=C2=A0=C2=A0=C2=A0 c0 e8 04=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 shr=C2=
+=A0=C2=A0=C2=A0 $0x4,%al
+>> >  =C2=A0 5e:=C2=A0=C2=A0=C2=A0 31 d8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 xor=C2=A0=C2=A0=C2=A0 %ebx,%eax
+>> >  =C2=A0 60:=C2=A0=C2=A0=C2=A0 83 e0 0f=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 and=C2=
+=A0=C2=A0=C2=A0 $0xf,%eax
+>> >  =C2=A0 63:=C2=A0=C2=A0=C2=A0 0f a3 c2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bt=C2=A0=
+=C2=A0=C2=A0=C2=A0 %eax,%edx
+>> >  =C2=A0 66:=C2=A0=C2=A0=C2=A0 73 64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 jae=C2=A0=C2=A0=C2=A0 cc <sbf_init+0xbc>
+>> >  =C2=A0 68:
+>> >=20
+>> > which is faster and smaller (-10 bytes) code=2E
+>> >=20
+>>=20
+>> Of course, on x86, parity8() and parity16() can be implemented very sim=
+ply:
+>>=20
+>> (Also, the parity functions really ought to return bool, and be flagged
+>> __attribute_const__=2E)
+>
+>There was a discussion regarding return type when parity8() was added=2E
+>The integer type was taken over bool with a sort of consideration that
+>bool should be returned as an answer to some question, like parity_odd()=
+=2E
+>
+>To me it's not a big deal=2E We can switch to boolean and describe in
+>comment what the 'true' means for the parity() function=2E
 
-This needs a respin, presumably because Jason's series reached net-next
-already.
--- 
-pw-bot: cr
+Bool is really the single-bit type, and gives the compiler more informatio=
+n=2E You could argue that the function really should be called parity_odd*(=
+) in general, but that's kind of excessive IMO=2E
 
