@@ -1,79 +1,101 @@
-Return-Path: <netdev+bounces-169257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06595A43138
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:48:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF16A4313C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CB5D19C2FA9
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:46:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75BD81891697
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:46:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326B82144BA;
-	Mon, 24 Feb 2025 23:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2909204687;
+	Mon, 24 Feb 2025 23:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXgSqi9P"
+	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="WeYowFtJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from rcdn-iport-5.cisco.com (rcdn-iport-5.cisco.com [173.37.86.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F99214218
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B25C204F8B
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740440595; cv=none; b=lqrFnwq7gZCWKmqolqxc0543b8OIYIYfe/Ax9gH2nQvt7cAqgJnwYGCK/2txqwxqY6DZEiPhi7YmXVnX3hCEHz7/h2tVTJ/Ha2g2DRrCplFpPFih4JmbnGbfNeI6luRIIvUNm52wdE3/+6RZZJaAT9PvhUaek69Bmm0I0yCM7D8=
+	t=1740440649; cv=none; b=D071oohEbsyZh1s2zU/mwR4d2c7EqVVNrum9+VpcxPjy/3c6mr5qmFpMHr6gzbrOQ7+OM0X6yR8DwT1ZqHAsR2V4RogYGIjpCET/Yakf/hpHIHTR2cLVEz+clxrndVBzqk+aU6pHnPVLhX9PkkRfHRLw20KswXhxV69RNZaNHkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740440595; c=relaxed/simple;
-	bh=qgEjn67W7WMuVEff3XRK+6grIeTt/3kHkp8vqk3plpU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KTIvXK31OBpVWcw5kDrsxpuDxkarxucHy/ESSw/3OYHlv9AmoXjbkw7LpuNuDh3CE8H/Bi2cdhUSbAaDYrbHq16rXeO/HkE871ptMwEf/bxIn4jG/M8aNaZPD6iruOqBV/uFS4ql1RddKR7iU7she1+yFb7ATaU5fVDsHcpOtno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MXgSqi9P; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740440591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NgNtnG+SJi6gXT3e1JgMl+mgJxCRwFe3YXk4wSqcBUM=;
-	b=MXgSqi9P/AKZaR/pBuvhNM0PV7WuWRdePBRh2PXzDSSr5VJMFiuH7Ss/Ou2j7C7/zQX6oy
-	qDoJFOyFYW0qQ5rXmcrH7WlHwdSnki3JcrcJY7jR7jhBp2kF/G/GYew+Ytg8GNjAX6iuf+
-	yOTw0FszQwpPE71tIQWLKrSQjQEt2po=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-621-YvCjwAi4NqawYlT_dmjPiQ-1; Mon,
- 24 Feb 2025 18:43:09 -0500
-X-MC-Unique: YvCjwAi4NqawYlT_dmjPiQ-1
-X-Mimecast-MFC-AGG-ID: YvCjwAi4NqawYlT_dmjPiQ_1740440588
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4ACEC19783B7;
-	Mon, 24 Feb 2025 23:43:08 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.9])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C2BD41800359;
-	Mon, 24 Feb 2025 23:43:04 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 15/15] afs: Simplify cell record handling
-Date: Mon, 24 Feb 2025 23:41:52 +0000
-Message-ID: <20250224234154.2014840-16-dhowells@redhat.com>
-In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
-References: <20250224234154.2014840-1-dhowells@redhat.com>
+	s=arc-20240116; t=1740440649; c=relaxed/simple;
+	bh=d4turpF9X9f2NM3FiwT+FvE08uNAcenl7rCCNPQk5bE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KatnwBq6q8BCbY+eZLOKvQnwxtCwyK02vPdbuCqMatAjKZTy/u4lLzzNJN+MjzFDTRuVdkJXyqfOYjsdugIuEigEhNlOh4YPjRhh5wRER73N7ugfZWCSjIo6K/v0fWCkgRNl8F9fa8AlaC4sefBoXY4bnBJ1Z3fnYA5oF9Xwx0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=WeYowFtJ; arc=none smtp.client-ip=173.37.86.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=321; q=dns/txt;
+  s=iport01; t=1740440648; x=1741650248;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ffHZRcMhg5E1JPb1sUv04Tt48bVmVyvDlHyyZn9diO8=;
+  b=WeYowFtJPREGAcry+ZZr5Z1t3XIbzaMI+zPVJNwHovg3OQAHwwXI3gXi
+   6xnv3FoLQ9eRrcvdkJyudL/BqqXRu6F7UpUTVOB8odBmV469DO8TzWOYB
+   o70DkKpTtq616tzIWwOl8DgkKOd7gxjZIQyzfIwIdec/flWcPv/b1pH1D
+   blPW7QY8ws0JfSMdp3fa/9DD92ommA2Sz9BCn9zEsjDr00uKL52J9Ioj+
+   HaudtZEuS/RdXVlyFqJeTsSS94v7U2wJs2OmoVDPHx3QV9OvfzZOpEA8a
+   B95muwciYiCIUqqoghQPXVvMfSmCeioBaTlRe5/PG52emBP7sEoBiij1n
+   A==;
+X-CSE-ConnectionGUID: 6qkWC5z/Qe65ANU0Bc+HxQ==
+X-CSE-MsgGUID: b93pinouT6WByX62eOwRwQ==
+X-IPAS-Result: =?us-ascii?q?A0ANAADiAr1n/4v/Ja1aGwEBAQEBAQEBBQEBARIBAQEDA?=
+ =?us-ascii?q?wEBAYF/BgEBAQsBgkqBT0NIjHJfpwuBJQNWDwEBAQ9EBAEBhQeLEgImNAkOA?=
+ =?us-ascii?q?QIEAQEBAQMCAwEBAQEBAQEBAQEBCwEBBQEBAQIBBwWBDhOGCIZdNgFGgQwyE?=
+ =?us-ascii?q?oMCgmUDriaCLIEB3jSBboFIAYVrh19whHcnG4FJRIR9hRCFdwSCL4FAg2ynM?=
+ =?us-ascii?q?UiBIQNZLAFVEw0KCwcFgTk4AyAKCwwLEhwVAhQdDwYQBGpDN4JFaUk6Ag0CN?=
+ =?us-ascii?q?YIeJFiCK4RWhEOEQoI/UYJCghFxgRqJL4NIQAMLGA1IESw3Bg4bBj5uB6AMP?=
+ =?us-ascii?q?IQ1exOCXaVXoQSEJYFjn2UaM4NwAaZkmH0ipCiEZoFnPIFZMxoIGxWDIlIZD?=
+ =?us-ascii?q?94SJTI8AgcLAQEDCZFlAQE?=
+IronPort-Data: A9a23:W15TJKlmaU8ncnQVcV2p9HPo5gyjJ0RdPkR7XQ2eYbSJt1+Wr1Gzt
+ xIcD2zSOPaIajHwedEgbdyw8klU65bTyoQyTgtp+3pkHltH+JHPbTi7wugcHM8zwunrFh8PA
+ xA2M4GYRCwMZiaC4E/rav658CEUOZigHtLUEPTDNj16WThqQSIgjQMLs+Mii+aEu/Dha++2k
+ Y20+pa31GONgWYubzpOsf7b9HuDgdyr0N8mlg1mDRx0lAe2e0k9VPo3Oay3Jn3kdYhYdsbSb
+ /rD1ryw4lTC9B4rDN6/+p6jGqHdauePVeQmoiM+t5mK2nCulARrukoIHKZ0hXNsttm8t4sZJ
+ OOhGnCHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqHLWyOE/hlgMK05FdMB+dlcXHMJz
+ PFGdRkrU0ipjKGW0IvuH4GAhux7RCXqFJkUtnclyXTSCuwrBMiZBa7L/tRfmjw3g6iiH96HO
+ JFfMmUpNkmdJUQUaz/7C7pm9Ausrnv4cztUoVaYjaE2+GPUigd21dABNfKOIIDVH5QLxRvwS
+ mTu9TWiGhAcM8GjlwWv40Ly3OLoghnkYddHfFG/3rsw6LGJ/UQfAQMbUHO3qOe0j0q5Vc4ZL
+ UEIkgIjobU3/V6mUvHyWBq3pHPCtRkZM/JTDuczwAKA0KzZ50CeHGdsZjdHZMYrq4wwSCAm2
+ 0Ghm87vA3pksNW9UXuX+7GVhSm/NSgcMSkJYipsZQ0I/9XuvqktgR/VCNVuCqi4ipvyAz6Y/
+ tyRhDI1i7NWiYsA0L+2uAidxTmtvZPOCAUy4207Q16Y0++wX6b9D6TA1LQRxa8owFqxJrVZg
+ EU5pg==
+IronPort-HdrOrdr: A9a23:odwsR6ojebwEvIOy+30g8aIaV5ogeYIsimQD101hICG9vPb2qy
+ nIpoV/6faaslcssR0b9OxoW5PwI080i6QU3WB5B97LN2PbUQCTQr2Kg7GP/9SZIVycygaYvp
+ 0QFJSXz7bLfDxHsfo=
+X-Talos-CUID: =?us-ascii?q?9a23=3AOii+IGtCio9ytNL+u6+UKgls6It7a37i5yrCZHa?=
+ =?us-ascii?q?1VztAboDNY1TT2LNdxp8=3D?=
+X-Talos-MUID: 9a23:sAH6iwZiaqiet+BTvW63nDBkM9pUvZuEGXBTy5ghpPObDHkl
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.13,312,1732579200"; 
+   d="scan'208";a="324729635"
+Received: from rcdn-l-core-02.cisco.com ([173.37.255.139])
+  by rcdn-iport-5.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 24 Feb 2025 23:44:00 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-02.cisco.com (Postfix) with ESMTP id 91BCB18000224;
+	Mon, 24 Feb 2025 23:44:00 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id 57C2320F2003; Mon, 24 Feb 2025 15:44:00 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next 0/1] enic: add dependency on Page Pool
+Date: Mon, 24 Feb 2025 15:43:49 -0800
+Message-Id: <20250224234350.23157-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,851 +103,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-02.cisco.com
 
-Simplify afs_cell record handling to avoid very occasional races that cause
-module removal to hang (it waits for all cell records to be removed).
+Driver was not configured to select page_pool, causing a compile error
+if page pool module was not already selected.
 
-There are two things that particularly contribute to the difficulty:
-firstly, the code tries to pass a ref on the cell to the cell's maintenance
-work item (which gets awkward if the work item is already queued); and,
-secondly, there's an overall cell manager that tries to use just one timer
-for the entire cell collection (to avoid having loads of timers).  However,
-both of these are probably unnecessarily restrictive.
+Signed-off-by: John Daley <johndale@cisco.com>
 
-To simplify this, the following changes are made:
+John Daley (1):
+  enic: Add dependency on Page Pool
 
- (1) The cell record collection manager is removed.  Each cell record
-     manages itself individually.
+ drivers/net/ethernet/cisco/enic/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
- (2) Each afs_cell is given a second work item (cell->destroyer) that is
-     queued when its refcount reaches zero.  This is not done in the
-     context of the putting thread as it might be in an inconvenient place
-     to sleep.
-
- (3) Each afs_cell is given its own timer.  The timer is used to expire the
-     cell record after a period of unuse if not otherwise pinned and can
-     also be used for other maintenance tasks if necessary (of which there
-     are currently none as DNS refresh is triggered by filesystem
-     operations).
-
- (4) The afs_cell manager work item (cell->manager) is no longer given a
-     ref on the cell when queued; rather, the manager must be deleted.
-     This does away with the need to deal with the consequences of losing a
-     race to queue cell->manager.  Clean up of extra queuing is deferred to
-     the destroyer.
-
- (5) The cell destroyer work item makes sure the cell timer is removed and
-     that the normal cell work is cancelled before farming the actual
-     destruction off to RCU.
-
- (6) When a network namespace is destroyed or the kafs module is unloaded,
-     it's now a simple matter of marking the namespace as dead then just
-     waking up all the cell work items.  They will then remove and destroy
-     themselves once all remaining activity counts and/or a ref counts are
-     dropped.  This makes sure that all server records are dropped first.
-
- (7) The cell record state set is reduced to just four states: SETTING_UP,
-     ACTIVE, REMOVING and DEAD.  The record persists in the active state
-     even when it's not being used until the time comes to remove it rather
-     than downgrading it to an inactive state from whence it can be
-     restored.
-
-     This means that the cell still appears in /proc and /afs when not in
-     use until it switches to the REMOVING state - at which point it is
-     removed.
-
-     Note that the REMOVING state is included so that someone wanting to
-     resurrect the cell record is forced to wait whilst the cell is torn
-     down in that state.  Once it's in the DEAD state, it has been removed
-     from net->cells tree and is no longer findable and can be replaced.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- fs/afs/cell.c              | 404 +++++++++++++++----------------------
- fs/afs/dynroot.c           |   4 +-
- fs/afs/internal.h          |  16 +-
- fs/afs/main.c              |   3 -
- fs/afs/server.c            |   8 +-
- fs/afs/vl_rotate.c         |   2 +-
- include/trace/events/afs.h |  23 +--
- 7 files changed, 187 insertions(+), 273 deletions(-)
-
-diff --git a/fs/afs/cell.c b/fs/afs/cell.c
-index 67632205edfd..e62181920907 100644
---- a/fs/afs/cell.c
-+++ b/fs/afs/cell.c
-@@ -20,8 +20,9 @@ static unsigned __read_mostly afs_cell_min_ttl = 10 * 60;
- static unsigned __read_mostly afs_cell_max_ttl = 24 * 60 * 60;
- static atomic_t cell_debug_id;
- 
--static void afs_queue_cell_manager(struct afs_net *);
--static void afs_manage_cell_work(struct work_struct *);
-+static void afs_cell_timer(struct timer_list *timer);
-+static void afs_destroy_cell_work(struct work_struct *work);
-+static void afs_manage_cell_work(struct work_struct *work);
- 
- static void afs_dec_cells_outstanding(struct afs_net *net)
- {
-@@ -29,19 +30,11 @@ static void afs_dec_cells_outstanding(struct afs_net *net)
- 		wake_up_var(&net->cells_outstanding);
- }
- 
--/*
-- * Set the cell timer to fire after a given delay, assuming it's not already
-- * set for an earlier time.
-- */
--static void afs_set_cell_timer(struct afs_net *net, time64_t delay)
-+static void afs_set_cell_state(struct afs_cell *cell, enum afs_cell_state state)
- {
--	if (net->live) {
--		atomic_inc(&net->cells_outstanding);
--		if (timer_reduce(&net->cells_timer, jiffies + delay * HZ))
--			afs_dec_cells_outstanding(net);
--	} else {
--		afs_queue_cell_manager(net);
--	}
-+	smp_store_release(&cell->state, state); /* Commit cell changes before state */
-+	smp_wmb(); /* Set cell state before task state */
-+	wake_up_var(&cell->state);
- }
- 
- /*
-@@ -115,7 +108,7 @@ static struct afs_cell *afs_alloc_cell(struct afs_net *net,
- 				       const char *name, unsigned int namelen,
- 				       const char *addresses)
- {
--	struct afs_vlserver_list *vllist;
-+	struct afs_vlserver_list *vllist = NULL;
- 	struct afs_cell *cell;
- 	int i, ret;
- 
-@@ -162,7 +155,9 @@ static struct afs_cell *afs_alloc_cell(struct afs_net *net,
- 	cell->net = net;
- 	refcount_set(&cell->ref, 1);
- 	atomic_set(&cell->active, 0);
-+	INIT_WORK(&cell->destroyer, afs_destroy_cell_work);
- 	INIT_WORK(&cell->manager, afs_manage_cell_work);
-+	timer_setup(&cell->management_timer, afs_cell_timer, 0);
- 	init_rwsem(&cell->vs_lock);
- 	cell->volumes = RB_ROOT;
- 	INIT_HLIST_HEAD(&cell->proc_volumes);
-@@ -218,6 +213,7 @@ static struct afs_cell *afs_alloc_cell(struct afs_net *net,
- 	if (ret == -EINVAL)
- 		printk(KERN_ERR "kAFS: bad VL server IP address\n");
- error:
-+	afs_put_vlserverlist(cell->net, vllist);
- 	kfree(cell->name - 1);
- 	kfree(cell);
- 	_leave(" = %d", ret);
-@@ -294,26 +290,28 @@ struct afs_cell *afs_lookup_cell(struct afs_net *net,
- 
- 	cell = candidate;
- 	candidate = NULL;
--	atomic_set(&cell->active, 2);
--	trace_afs_cell(cell->debug_id, refcount_read(&cell->ref), 2, afs_cell_trace_insert);
-+	afs_use_cell(cell, trace);
- 	rb_link_node_rcu(&cell->net_node, parent, pp);
- 	rb_insert_color(&cell->net_node, &net->cells);
- 	up_write(&net->cells_lock);
- 
--	afs_queue_cell(cell, afs_cell_trace_get_queue_new);
-+	afs_queue_cell(cell, afs_cell_trace_queue_new);
- 
- wait_for_cell:
--	trace_afs_cell(cell->debug_id, refcount_read(&cell->ref), atomic_read(&cell->active),
--		       afs_cell_trace_wait);
- 	_debug("wait_for_cell");
--	wait_var_event(&cell->state,
--		       ({
--			       state = smp_load_acquire(&cell->state); /* vs error */
--			       state == AFS_CELL_ACTIVE || state == AFS_CELL_REMOVED;
--		       }));
-+	state = smp_load_acquire(&cell->state); /* vs error */
-+	if (state != AFS_CELL_ACTIVE &&
-+	    state != AFS_CELL_DEAD) {
-+		afs_see_cell(cell, afs_cell_trace_wait);
-+		wait_var_event(&cell->state,
-+			       ({
-+				       state = smp_load_acquire(&cell->state); /* vs error */
-+				       state == AFS_CELL_ACTIVE || state == AFS_CELL_DEAD;
-+			       }));
-+	}
- 
- 	/* Check the state obtained from the wait check. */
--	if (state == AFS_CELL_REMOVED) {
-+	if (state == AFS_CELL_DEAD) {
- 		ret = cell->error;
- 		goto error;
- 	}
-@@ -395,7 +393,6 @@ int afs_cell_init(struct afs_net *net, const char *rootcell)
- 
- 	/* install the new cell */
- 	down_write(&net->cells_lock);
--	afs_see_cell(new_root, afs_cell_trace_see_ws);
- 	old_root = net->ws_cell;
- 	net->ws_cell = new_root;
- 	up_write(&net->cells_lock);
-@@ -528,30 +525,14 @@ static void afs_cell_destroy(struct rcu_head *rcu)
- 	_leave(" [destroyed]");
- }
- 
--/*
-- * Queue the cell manager.
-- */
--static void afs_queue_cell_manager(struct afs_net *net)
--{
--	int outstanding = atomic_inc_return(&net->cells_outstanding);
--
--	_enter("%d", outstanding);
--
--	if (!queue_work(afs_wq, &net->cells_manager))
--		afs_dec_cells_outstanding(net);
--}
--
--/*
-- * Cell management timer.  We have an increment on cells_outstanding that we
-- * need to pass along to the work item.
-- */
--void afs_cells_timer(struct timer_list *timer)
-+static void afs_destroy_cell_work(struct work_struct *work)
- {
--	struct afs_net *net = container_of(timer, struct afs_net, cells_timer);
-+	struct afs_cell *cell = container_of(work, struct afs_cell, destroyer);
- 
--	_enter("");
--	if (!queue_work(afs_wq, &net->cells_manager))
--		afs_dec_cells_outstanding(net);
-+	afs_see_cell(cell, afs_cell_trace_destroy);
-+	timer_delete_sync(&cell->management_timer);
-+	cancel_work_sync(&cell->manager);
-+	call_rcu(&cell->rcu, afs_cell_destroy);
- }
- 
- /*
-@@ -583,7 +564,7 @@ void afs_put_cell(struct afs_cell *cell, enum afs_cell_trace reason)
- 		if (zero) {
- 			a = atomic_read(&cell->active);
- 			WARN(a != 0, "Cell active count %u > 0\n", a);
--			call_rcu(&cell->rcu, afs_cell_destroy);
-+			WARN_ON(!queue_work(afs_wq, &cell->destroyer));
- 		}
- 	}
- }
-@@ -595,10 +576,9 @@ struct afs_cell *afs_use_cell(struct afs_cell *cell, enum afs_cell_trace reason)
- {
- 	int r, a;
- 
--	r = refcount_read(&cell->ref);
--	WARN_ON(r == 0);
-+	__refcount_inc(&cell->ref, &r);
- 	a = atomic_inc_return(&cell->active);
--	trace_afs_cell(cell->debug_id, r, a, reason);
-+	trace_afs_cell(cell->debug_id, r + 1, a, reason);
- 	return cell;
- }
- 
-@@ -610,6 +590,7 @@ void afs_unuse_cell(struct afs_cell *cell, enum afs_cell_trace reason)
- {
- 	unsigned int debug_id;
- 	time64_t now, expire_delay;
-+	bool zero;
- 	int r, a;
- 
- 	if (!cell)
-@@ -624,13 +605,15 @@ void afs_unuse_cell(struct afs_cell *cell, enum afs_cell_trace reason)
- 		expire_delay = afs_cell_gc_delay;
- 
- 	debug_id = cell->debug_id;
--	r = refcount_read(&cell->ref);
- 	a = atomic_dec_return(&cell->active);
--	trace_afs_cell(debug_id, r, a, reason);
--	WARN_ON(a == 0);
--	if (a == 1)
-+	if (!a)
- 		/* 'cell' may now be garbage collected. */
--		afs_set_cell_timer(cell->net, expire_delay);
-+		afs_set_cell_timer(cell, expire_delay);
-+
-+	zero = __refcount_dec_and_test(&cell->ref, &r);
-+	trace_afs_cell(debug_id, r - 1, a, reason);
-+	if (zero)
-+		WARN_ON(!queue_work(afs_wq, &cell->destroyer));
- }
- 
- /*
-@@ -650,9 +633,27 @@ void afs_see_cell(struct afs_cell *cell, enum afs_cell_trace reason)
-  */
- void afs_queue_cell(struct afs_cell *cell, enum afs_cell_trace reason)
- {
--	afs_get_cell(cell, reason);
--	if (!queue_work(afs_wq, &cell->manager))
--		afs_put_cell(cell, afs_cell_trace_put_queue_fail);
-+	queue_work(afs_wq, &cell->manager);
-+}
-+
-+/*
-+ * Cell-specific management timer.
-+ */
-+static void afs_cell_timer(struct timer_list *timer)
-+{
-+	struct afs_cell *cell = container_of(timer, struct afs_cell, management_timer);
-+
-+	afs_see_cell(cell, afs_cell_trace_see_mgmt_timer);
-+	if (refcount_read(&cell->ref) > 0 && cell->net->live)
-+		queue_work(afs_wq, &cell->manager);
-+}
-+
-+/*
-+ * Set/reduce the cell timer.
-+ */
-+void afs_set_cell_timer(struct afs_cell *cell, unsigned int delay_secs)
-+{
-+	timer_reduce(&cell->management_timer, jiffies + delay_secs * HZ);
- }
- 
- /*
-@@ -735,212 +736,125 @@ static void afs_deactivate_cell(struct afs_net *net, struct afs_cell *cell)
- 	_leave("");
- }
- 
-+static bool afs_has_cell_expired(struct afs_cell *cell, time64_t *_next_manage)
-+{
-+	const struct afs_vlserver_list *vllist;
-+	time64_t expire_at = cell->last_inactive;
-+	time64_t now = ktime_get_real_seconds();
-+
-+	if (atomic_read(&cell->active))
-+		return false;
-+	if (!cell->net->live)
-+		return true;
-+
-+	vllist = rcu_dereference_protected(cell->vl_servers, true);
-+	if (vllist && vllist->nr_servers > 0)
-+		expire_at += afs_cell_gc_delay;
-+
-+	if (expire_at <= now)
-+		return true;
-+	if (expire_at < *_next_manage)
-+		*_next_manage = expire_at;
-+	return false;
-+}
-+
- /*
-  * Manage a cell record, initialising and destroying it, maintaining its DNS
-  * records.
-  */
--static void afs_manage_cell(struct afs_cell *cell)
-+static bool afs_manage_cell(struct afs_cell *cell)
- {
- 	struct afs_net *net = cell->net;
--	int ret, active;
-+	time64_t next_manage = TIME64_MAX;
-+	int ret;
- 
- 	_enter("%s", cell->name);
- 
--again:
- 	_debug("state %u", cell->state);
- 	switch (cell->state) {
--	case AFS_CELL_INACTIVE:
--	case AFS_CELL_FAILED:
--		down_write(&net->cells_lock);
--		active = 1;
--		if (atomic_try_cmpxchg_relaxed(&cell->active, &active, 0)) {
--			rb_erase(&cell->net_node, &net->cells);
--			trace_afs_cell(cell->debug_id, refcount_read(&cell->ref), 0,
--				       afs_cell_trace_unuse_delete);
--			smp_store_release(&cell->state, AFS_CELL_REMOVED);
--		}
--		up_write(&net->cells_lock);
--		if (cell->state == AFS_CELL_REMOVED) {
--			wake_up_var(&cell->state);
--			goto final_destruction;
--		}
--		if (cell->state == AFS_CELL_FAILED)
--			goto done;
--		smp_store_release(&cell->state, AFS_CELL_UNSET);
--		wake_up_var(&cell->state);
--		goto again;
--
--	case AFS_CELL_UNSET:
--		smp_store_release(&cell->state, AFS_CELL_ACTIVATING);
--		wake_up_var(&cell->state);
--		goto again;
--
--	case AFS_CELL_ACTIVATING:
--		ret = afs_activate_cell(net, cell);
--		if (ret < 0)
--			goto activation_failed;
-+	case AFS_CELL_SETTING_UP:
-+		goto set_up_cell;
-+	case AFS_CELL_ACTIVE:
-+		goto cell_is_active;
-+	case AFS_CELL_REMOVING:
-+		WARN_ON_ONCE(1);
-+		return false;
-+	case AFS_CELL_DEAD:
-+		return false;
-+	default:
-+		_debug("bad state %u", cell->state);
-+		WARN_ON_ONCE(1); /* Unhandled state */
-+		return false;
-+	}
- 
--		smp_store_release(&cell->state, AFS_CELL_ACTIVE);
--		wake_up_var(&cell->state);
--		goto again;
-+set_up_cell:
-+	ret = afs_activate_cell(net, cell);
-+	if (ret < 0) {
-+		cell->error = ret;
-+		goto remove_cell;
-+	}
- 
--	case AFS_CELL_ACTIVE:
--		if (atomic_read(&cell->active) > 1) {
--			if (test_and_clear_bit(AFS_CELL_FL_DO_LOOKUP, &cell->flags)) {
--				ret = afs_update_cell(cell);
--				if (ret < 0)
--					cell->error = ret;
--			}
--			goto done;
--		}
--		smp_store_release(&cell->state, AFS_CELL_DEACTIVATING);
--		wake_up_var(&cell->state);
--		goto again;
-+	afs_set_cell_state(cell, AFS_CELL_ACTIVE);
- 
--	case AFS_CELL_DEACTIVATING:
--		if (atomic_read(&cell->active) > 1)
--			goto reverse_deactivation;
--		afs_deactivate_cell(net, cell);
--		smp_store_release(&cell->state, AFS_CELL_INACTIVE);
--		wake_up_var(&cell->state);
--		goto again;
-+cell_is_active:
-+	if (afs_has_cell_expired(cell, &next_manage))
-+		goto remove_cell;
- 
--	case AFS_CELL_REMOVED:
--		goto done;
-+	if (test_and_clear_bit(AFS_CELL_FL_DO_LOOKUP, &cell->flags)) {
-+		ret = afs_update_cell(cell);
-+		if (ret < 0)
-+			cell->error = ret;
-+	}
- 
--	default:
--		break;
-+	if (next_manage < TIME64_MAX && cell->net->live) {
-+		time64_t now = ktime_get_real_seconds();
-+
-+		if (next_manage - now <= 0)
-+			afs_queue_cell(cell, afs_cell_trace_queue_again);
-+		else
-+			afs_set_cell_timer(cell, next_manage - now);
- 	}
--	_debug("bad state %u", cell->state);
--	BUG(); /* Unhandled state */
-+	_leave(" [done %u]", cell->state);
-+	return false;
- 
--activation_failed:
--	cell->error = ret;
--	afs_deactivate_cell(net, cell);
-+remove_cell:
-+	down_write(&net->cells_lock);
- 
--	smp_store_release(&cell->state, AFS_CELL_FAILED); /* vs error */
--	wake_up_var(&cell->state);
--	goto again;
-+	if (atomic_read(&cell->active)) {
-+		up_write(&net->cells_lock);
-+		goto cell_is_active;
-+	}
- 
--reverse_deactivation:
--	smp_store_release(&cell->state, AFS_CELL_ACTIVE);
--	wake_up_var(&cell->state);
--	_leave(" [deact->act]");
--	return;
-+	/* Make sure that the expiring server records are going to see the fact
-+	 * that the cell is caput.
-+	 */
-+	afs_set_cell_state(cell, AFS_CELL_REMOVING);
- 
--done:
--	_leave(" [done %u]", cell->state);
--	return;
-+	afs_deactivate_cell(net, cell);
-+	afs_purge_servers(cell);
-+
-+	rb_erase(&cell->net_node, &net->cells);
-+	afs_see_cell(cell, afs_cell_trace_unuse_delete);
-+	up_write(&net->cells_lock);
- 
--final_destruction:
- 	/* The root volume is pinning the cell */
- 	afs_put_volume(cell->root_volume, afs_volume_trace_put_cell_root);
- 	cell->root_volume = NULL;
--	afs_purge_servers(cell);
--	afs_put_cell(cell, afs_cell_trace_put_destroy);
-+
-+	afs_set_cell_state(cell, AFS_CELL_DEAD);
-+	return true;
- }
- 
- static void afs_manage_cell_work(struct work_struct *work)
- {
- 	struct afs_cell *cell = container_of(work, struct afs_cell, manager);
-+	bool final_put;
- 
--	afs_manage_cell(cell);
--	afs_put_cell(cell, afs_cell_trace_put_queue_work);
--}
--
--/*
-- * Manage the records of cells known to a network namespace.  This includes
-- * updating the DNS records and garbage collecting unused cells that were
-- * automatically added.
-- *
-- * Note that constructed cell records may only be removed from net->cells by
-- * this work item, so it is safe for this work item to stash a cursor pointing
-- * into the tree and then return to caller (provided it skips cells that are
-- * still under construction).
-- *
-- * Note also that we were given an increment on net->cells_outstanding by
-- * whoever queued us that we need to deal with before returning.
-- */
--void afs_manage_cells(struct work_struct *work)
--{
--	struct afs_net *net = container_of(work, struct afs_net, cells_manager);
--	struct rb_node *cursor;
--	time64_t now = ktime_get_real_seconds(), next_manage = TIME64_MAX;
--	bool purging = !net->live;
--
--	_enter("");
--
--	/* Trawl the cell database looking for cells that have expired from
--	 * lack of use and cells whose DNS results have expired and dispatch
--	 * their managers.
--	 */
--	down_read(&net->cells_lock);
--
--	for (cursor = rb_first(&net->cells); cursor; cursor = rb_next(cursor)) {
--		struct afs_cell *cell =
--			rb_entry(cursor, struct afs_cell, net_node);
--		unsigned active;
--		bool sched_cell = false;
--
--		active = atomic_read(&cell->active);
--		trace_afs_cell(cell->debug_id, refcount_read(&cell->ref),
--			       active, afs_cell_trace_manage);
--
--		ASSERTCMP(active, >=, 1);
--
--		if (purging) {
--			if (test_and_clear_bit(AFS_CELL_FL_NO_GC, &cell->flags)) {
--				active = atomic_dec_return(&cell->active);
--				trace_afs_cell(cell->debug_id, refcount_read(&cell->ref),
--					       active, afs_cell_trace_unuse_pin);
--			}
--		}
--
--		if (active == 1) {
--			struct afs_vlserver_list *vllist;
--			time64_t expire_at = cell->last_inactive;
--
--			read_lock(&cell->vl_servers_lock);
--			vllist = rcu_dereference_protected(
--				cell->vl_servers,
--				lockdep_is_held(&cell->vl_servers_lock));
--			if (vllist->nr_servers > 0)
--				expire_at += afs_cell_gc_delay;
--			read_unlock(&cell->vl_servers_lock);
--			if (purging || expire_at <= now)
--				sched_cell = true;
--			else if (expire_at < next_manage)
--				next_manage = expire_at;
--		}
--
--		if (!purging) {
--			if (test_bit(AFS_CELL_FL_DO_LOOKUP, &cell->flags))
--				sched_cell = true;
--		}
--
--		if (sched_cell)
--			afs_queue_cell(cell, afs_cell_trace_get_queue_manage);
--	}
--
--	up_read(&net->cells_lock);
--
--	/* Update the timer on the way out.  We have to pass an increment on
--	 * cells_outstanding in the namespace that we are in to the timer or
--	 * the work scheduler.
--	 */
--	if (!purging && next_manage < TIME64_MAX) {
--		now = ktime_get_real_seconds();
--
--		if (next_manage - now <= 0) {
--			if (queue_work(afs_wq, &net->cells_manager))
--				atomic_inc(&net->cells_outstanding);
--		} else {
--			afs_set_cell_timer(net, next_manage - now);
--		}
--	}
--
--	afs_dec_cells_outstanding(net);
--	_leave(" [%d]", atomic_read(&net->cells_outstanding));
-+	afs_see_cell(cell, afs_cell_trace_manage);
-+	final_put = afs_manage_cell(cell);
-+	afs_see_cell(cell, afs_cell_trace_managed);
-+	if (final_put)
-+		afs_put_cell(cell, afs_cell_trace_put_final);
- }
- 
- /*
-@@ -949,6 +863,7 @@ void afs_manage_cells(struct work_struct *work)
- void afs_cell_purge(struct afs_net *net)
- {
- 	struct afs_cell *ws;
-+	struct rb_node *cursor;
- 
- 	_enter("");
- 
-@@ -958,12 +873,19 @@ void afs_cell_purge(struct afs_net *net)
- 	up_write(&net->cells_lock);
- 	afs_unuse_cell(ws, afs_cell_trace_unuse_ws);
- 
--	_debug("del timer");
--	if (del_timer_sync(&net->cells_timer))
--		atomic_dec(&net->cells_outstanding);
-+	_debug("kick cells");
-+	down_read(&net->cells_lock);
-+	for (cursor = rb_first(&net->cells); cursor; cursor = rb_next(cursor)) {
-+		struct afs_cell *cell = rb_entry(cursor, struct afs_cell, net_node);
-+
-+		afs_see_cell(cell, afs_cell_trace_purge);
- 
--	_debug("kick mgr");
--	afs_queue_cell_manager(net);
-+		if (test_and_clear_bit(AFS_CELL_FL_NO_GC, &cell->flags))
-+			afs_unuse_cell(cell, afs_cell_trace_unuse_pin);
-+
-+		afs_queue_cell(cell, afs_cell_trace_queue_purge);
-+	}
-+	up_read(&net->cells_lock);
- 
- 	_debug("wait");
- 	wait_var_event(&net->cells_outstanding,
-diff --git a/fs/afs/dynroot.c b/fs/afs/dynroot.c
-index a34b45f97d30..0b66865e3535 100644
---- a/fs/afs/dynroot.c
-+++ b/fs/afs/dynroot.c
-@@ -282,8 +282,8 @@ static int afs_dynroot_readdir_cells(struct afs_net *net, struct dir_context *ct
- 		cell = idr_get_next(&net->cells_dyn_ino, &ix);
- 		if (!cell)
- 			return 0;
--		if (READ_ONCE(cell->state) == AFS_CELL_FAILED ||
--		    READ_ONCE(cell->state) == AFS_CELL_REMOVED) {
-+		if (READ_ONCE(cell->state) == AFS_CELL_REMOVING ||
-+		    READ_ONCE(cell->state) == AFS_CELL_DEAD) {
- 			ctx->pos += 2;
- 			ctx->pos &= ~1;
- 			continue;
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index bbc272caf31b..addce2f03562 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -289,8 +289,6 @@ struct afs_net {
- 	struct rb_root		cells;
- 	struct idr		cells_dyn_ino;	/* cell->dynroot_ino mapping */
- 	struct afs_cell		*ws_cell;
--	struct work_struct	cells_manager;
--	struct timer_list	cells_timer;
- 	atomic_t		cells_outstanding;
- 	struct rw_semaphore	cells_lock;
- 	struct mutex		cells_alias_lock;
-@@ -339,13 +337,10 @@ struct afs_net {
- extern const char afs_init_sysname[];
- 
- enum afs_cell_state {
--	AFS_CELL_UNSET,
--	AFS_CELL_ACTIVATING,
-+	AFS_CELL_SETTING_UP,
- 	AFS_CELL_ACTIVE,
--	AFS_CELL_DEACTIVATING,
--	AFS_CELL_INACTIVE,
--	AFS_CELL_FAILED,
--	AFS_CELL_REMOVED,
-+	AFS_CELL_REMOVING,
-+	AFS_CELL_DEAD,
- };
- 
- /*
-@@ -376,7 +371,9 @@ struct afs_cell {
- 	struct afs_cell		*alias_of;	/* The cell this is an alias of */
- 	struct afs_volume	*root_volume;	/* The root.cell volume if there is one */
- 	struct key		*anonymous_key;	/* anonymous user key for this cell */
-+	struct work_struct	destroyer;	/* Destroyer for cell */
- 	struct work_struct	manager;	/* Manager for init/deinit/dns */
-+	struct timer_list	management_timer; /* General management timer */
- 	struct hlist_node	proc_link;	/* /proc cell list link */
- 	time64_t		dns_expiry;	/* Time AFSDB/SRV record expires */
- 	time64_t		last_inactive;	/* Time of last drop of usage count */
-@@ -1053,8 +1050,7 @@ extern struct afs_cell *afs_get_cell(struct afs_cell *, enum afs_cell_trace);
- extern void afs_see_cell(struct afs_cell *, enum afs_cell_trace);
- extern void afs_put_cell(struct afs_cell *, enum afs_cell_trace);
- extern void afs_queue_cell(struct afs_cell *, enum afs_cell_trace);
--extern void afs_manage_cells(struct work_struct *);
--extern void afs_cells_timer(struct timer_list *);
-+void afs_set_cell_timer(struct afs_cell *cell, unsigned int delay_secs);
- extern void __net_exit afs_cell_purge(struct afs_net *);
- 
- /*
-diff --git a/fs/afs/main.c b/fs/afs/main.c
-index bff0363286b0..c845c5daaeba 100644
---- a/fs/afs/main.c
-+++ b/fs/afs/main.c
-@@ -78,9 +78,6 @@ static int __net_init afs_net_init(struct net *net_ns)
- 	net->cells = RB_ROOT;
- 	idr_init(&net->cells_dyn_ino);
- 	init_rwsem(&net->cells_lock);
--	INIT_WORK(&net->cells_manager, afs_manage_cells);
--	timer_setup(&net->cells_timer, afs_cells_timer, 0);
--
- 	mutex_init(&net->cells_alias_lock);
- 	mutex_init(&net->proc_cells_lock);
- 	INIT_HLIST_HEAD(&net->proc_cells);
-diff --git a/fs/afs/server.c b/fs/afs/server.c
-index 487e2134aea4..c530d1ca15df 100644
---- a/fs/afs/server.c
-+++ b/fs/afs/server.c
-@@ -103,7 +103,7 @@ static struct afs_server *afs_install_server(struct afs_cell *cell,
- 	afs_get_cell(cell, afs_cell_trace_get_server);
- 
- exists:
--	afs_use_server(server, true, afs_server_trace_get_install);
-+	afs_use_server(server, true, afs_server_trace_use_install);
- 	return server;
- }
- 
-@@ -356,7 +356,7 @@ void afs_unuse_server_notime(struct afs_net *net, struct afs_server *server,
- 
- 	if (atomic_dec_and_test(&server->active)) {
- 		if (test_bit(AFS_SERVER_FL_EXPIRED, &server->flags) ||
--		    READ_ONCE(server->cell->state) >= AFS_CELL_FAILED)
-+		    READ_ONCE(server->cell->state) >= AFS_CELL_REMOVING)
- 			schedule_work(&server->destroyer);
- 	}
- 
-@@ -374,7 +374,7 @@ void afs_unuse_server(struct afs_net *net, struct afs_server *server,
- 
- 	if (atomic_dec_and_test(&server->active)) {
- 		if (!test_bit(AFS_SERVER_FL_EXPIRED, &server->flags) &&
--		    READ_ONCE(server->cell->state) < AFS_CELL_FAILED) {
-+		    READ_ONCE(server->cell->state) < AFS_CELL_REMOVING) {
- 			time64_t unuse_time = ktime_get_real_seconds();
- 
- 			server->unuse_time = unuse_time;
-@@ -424,7 +424,7 @@ static bool afs_has_server_expired(const struct afs_server *server)
- 		return false;
- 
- 	if (server->cell->net->live ||
--	    server->cell->state >= AFS_CELL_FAILED) {
-+	    server->cell->state >= AFS_CELL_REMOVING) {
- 		trace_afs_server(server->debug_id, refcount_read(&server->ref),
- 				 0, afs_server_trace_purging);
- 		return true;
-diff --git a/fs/afs/vl_rotate.c b/fs/afs/vl_rotate.c
-index d8f79f6ada3d..6ad9688d8f4b 100644
---- a/fs/afs/vl_rotate.c
-+++ b/fs/afs/vl_rotate.c
-@@ -48,7 +48,7 @@ static bool afs_start_vl_iteration(struct afs_vl_cursor *vc)
- 	    cell->dns_expiry <= ktime_get_real_seconds()) {
- 		dns_lookup_count = smp_load_acquire(&cell->dns_lookup_count);
- 		set_bit(AFS_CELL_FL_DO_LOOKUP, &cell->flags);
--		afs_queue_cell(cell, afs_cell_trace_get_queue_dns);
-+		afs_queue_cell(cell, afs_cell_trace_queue_dns);
- 
- 		if (cell->dns_source == DNS_RECORD_UNAVAILABLE) {
- 			if (wait_var_event_interruptible(
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index 02f8b2a6977c..8857f5ea77d4 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -131,7 +131,6 @@ enum yfs_cm_operation {
- 	EM(afs_server_trace_destroy,		"DESTROY  ") \
- 	EM(afs_server_trace_free,		"FREE     ") \
- 	EM(afs_server_trace_gc,			"GC       ") \
--	EM(afs_server_trace_get_install,	"GET inst ") \
- 	EM(afs_server_trace_get_probe,		"GET probe") \
- 	EM(afs_server_trace_purging,		"PURGE    ") \
- 	EM(afs_server_trace_put_cbi,		"PUT cbi  ") \
-@@ -149,6 +148,7 @@ enum yfs_cm_operation {
- 	EM(afs_server_trace_use_cm_call,	"USE cm-cl") \
- 	EM(afs_server_trace_use_get_caps,	"USE gcaps") \
- 	EM(afs_server_trace_use_give_up_cb,	"USE gvupc") \
-+	EM(afs_server_trace_use_install,	"USE inst ") \
- 	E_(afs_server_trace_wait_create,	"WAIT crt ")
- 
- #define afs_volume_traces \
-@@ -171,37 +171,36 @@ enum yfs_cm_operation {
- 
- #define afs_cell_traces \
- 	EM(afs_cell_trace_alloc,		"ALLOC     ") \
-+	EM(afs_cell_trace_destroy,		"DESTROY   ") \
- 	EM(afs_cell_trace_free,			"FREE      ") \
- 	EM(afs_cell_trace_get_atcell,		"GET atcell") \
--	EM(afs_cell_trace_get_queue_dns,	"GET q-dns ") \
--	EM(afs_cell_trace_get_queue_manage,	"GET q-mng ") \
--	EM(afs_cell_trace_get_queue_new,	"GET q-new ") \
- 	EM(afs_cell_trace_get_server,		"GET server") \
- 	EM(afs_cell_trace_get_vol,		"GET vol   ") \
--	EM(afs_cell_trace_insert,		"INSERT    ") \
--	EM(afs_cell_trace_manage,		"MANAGE    ") \
-+	EM(afs_cell_trace_purge,		"PURGE     ") \
- 	EM(afs_cell_trace_put_atcell,		"PUT atcell") \
- 	EM(afs_cell_trace_put_candidate,	"PUT candid") \
--	EM(afs_cell_trace_put_destroy,		"PUT destry") \
--	EM(afs_cell_trace_put_queue_work,	"PUT q-work") \
--	EM(afs_cell_trace_put_queue_fail,	"PUT q-fail") \
-+	EM(afs_cell_trace_put_final,		"PUT final ") \
- 	EM(afs_cell_trace_put_server,		"PUT server") \
- 	EM(afs_cell_trace_put_vol,		"PUT vol   ") \
-+	EM(afs_cell_trace_queue_again,		"QUE again ") \
-+	EM(afs_cell_trace_queue_dns,		"QUE dns   ") \
-+	EM(afs_cell_trace_queue_new,		"QUE new   ") \
-+	EM(afs_cell_trace_queue_purge,		"QUE purge ") \
-+	EM(afs_cell_trace_manage,		"MANAGE    ") \
-+	EM(afs_cell_trace_managed,		"MANAGED   ") \
- 	EM(afs_cell_trace_see_source,		"SEE source") \
--	EM(afs_cell_trace_see_ws,		"SEE ws    ") \
-+	EM(afs_cell_trace_see_mgmt_timer,	"SEE mtimer") \
- 	EM(afs_cell_trace_unuse_alias,		"UNU alias ") \
- 	EM(afs_cell_trace_unuse_check_alias,	"UNU chk-al") \
- 	EM(afs_cell_trace_unuse_delete,		"UNU delete") \
- 	EM(afs_cell_trace_unuse_dynroot_mntpt,	"UNU dyn-mp") \
- 	EM(afs_cell_trace_unuse_fc,		"UNU fc    ") \
--	EM(afs_cell_trace_unuse_lookup,		"UNU lookup") \
- 	EM(afs_cell_trace_unuse_lookup_dynroot,	"UNU lu-dyn") \
- 	EM(afs_cell_trace_unuse_lookup_error,	"UNU lu-err") \
- 	EM(afs_cell_trace_unuse_mntpt,		"UNU mntpt ") \
- 	EM(afs_cell_trace_unuse_no_pin,		"UNU no-pin") \
- 	EM(afs_cell_trace_unuse_parse,		"UNU parse ") \
- 	EM(afs_cell_trace_unuse_pin,		"UNU pin   ") \
--	EM(afs_cell_trace_unuse_probe,		"UNU probe ") \
- 	EM(afs_cell_trace_unuse_sbi,		"UNU sbi   ") \
- 	EM(afs_cell_trace_unuse_ws,		"UNU ws    ") \
- 	EM(afs_cell_trace_use_alias,		"USE alias ") \
+-- 
+2.39.3
 
 
