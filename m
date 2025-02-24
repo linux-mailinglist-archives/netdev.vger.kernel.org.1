@@ -1,115 +1,126 @@
-Return-Path: <netdev+bounces-169034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125CCA42279
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:10:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36B21A422CB
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDAF7A7F1B
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BB0C17CD4F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580611917F1;
-	Mon, 24 Feb 2025 14:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8265613A244;
+	Mon, 24 Feb 2025 14:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFfsv1Ow"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SHxmHNgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4F8191493;
-	Mon, 24 Feb 2025 14:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6377713959D;
+	Mon, 24 Feb 2025 14:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740405923; cv=none; b=clv6Z9htUEgF7kejIjL0CX0oiXsG9am9dJE1YSsnsa8K+7/uk58f06Te03DqlSZwj7bzoizqHRIBEs+MJYVSN2w0ykfBbszg9Or2E7CIgMhxx8dGlWsPQyD9KtBRuTFDwKHJmdc3EDvY6kBTOQw7gNywWLeDPpXOVmVDlR3ZA+c=
+	t=1740406417; cv=none; b=hYBFbdmOqdk4qf+8nb0BkaBGvH03xYOV30m+H50/XyzyT5t5kqqg3upmfUXQsNKY/71Fe9PxcivbXK3gIGPTdym7ddC+2vWhrIGbcLoGXUk2dIUN+SIxYsQmMABgB4mC5LOH8M2ZHybzKujqmzqe60YO+zsQxgjCHcpKQQxNi6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740405923; c=relaxed/simple;
-	bh=yaaa9DErqlOYGiiygCaNCc4wZLpOdhOh1CUotZF4UGo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rz1gJ5D0UBa6Qk7l2m1e3IDSc5TM9+hYhtIrrDddcoduQp3XhT6FLPM1p/cXSdvVoFoKO8QX2Z9db80PzKqxRLFTH4AYny1rx5a0H1CDO1eeNZBrnPL+0zQePm8snDgQKBbUZsPhTnEoctoJ30RF+aqF3QKzmFZMLNRAcDqq0Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AFfsv1Ow; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38532C4CEE6;
-	Mon, 24 Feb 2025 14:05:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740405923;
-	bh=yaaa9DErqlOYGiiygCaNCc4wZLpOdhOh1CUotZF4UGo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AFfsv1Owz3nA3xcFyVinBg8oGSoPrfQCtuFHU9NMmxE4MzSx92nI9Y9hhWG4urdLd
-	 cJWR3y6nEXZemMBO1SxNoID4e3CbW7Gfl3yB81uuW4k5u7MIPZ2rsZc+9Bj27ljCG+
-	 WKwHfaAixtdnK+u0grbFNNTu2c/tkpkbAuoaaD5njlIjkO31cQJM/xqLflqBx5tgOc
-	 lh+HvfpOSxdLL8qoNfMzAo8LvzjC6RQpfRwUtW6OgwOU1NZR8+3dqw3xB9PjmBfGD9
-	 COAKXHp2yejCCJcqd3g5qXqmT5NTLgU9ypaIqpKoePmb7B3w56zpYJeok6yPAjXjft
-	 loFSHzf23v51w==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: wangxun: fix LIBWX dependencies
-Date: Mon, 24 Feb 2025 15:05:06 +0100
-Message-Id: <20250224140516.1168214-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1740406417; c=relaxed/simple;
+	bh=kNAuwtXcim562dObXcreoHv9UBgRaM0ANCRSQx86Ebg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J3SrLZc6VccKQ4D0eIvIBV613uY77sSHncaH1v27wdUQUztqqEitzxhJRslgikNvXHrPs5aqtABehqOV4dVr9VyGQ+aQuelI4peyx2HcXEM/BohVEYy2cW0ZcO7UHlzREmlQ3vbgYjUTLgggu3S6NfE9o1xsKSaj0yhzcbOmT/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SHxmHNgq; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3905044280;
+	Mon, 24 Feb 2025 14:13:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740406413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w6ddd5eN9n7fNFqvJfwSzJ+NMubkWkXegBbLwCG/opI=;
+	b=SHxmHNgqUIQfAjO5+M0vS07kR4vJdlM2Q61kzT1i3NSw2SLqTYRO4iSTx39hTusWiDbcfy
+	YwSkMFjxJO9IJNe7x/060jHUw0D+Ye4V1Yzx1cinWqlsJopQeiwC4+BbMkRtLBaNfspYNE
+	8DG8TPBkI8JOAS9jaxL1aE5Qs395CVZj0Yg36ovmBtTPNQBUKomEMtT97a/QSJqL6Eizi2
+	P9JsXsUwhBvLTe0qvZtqkhUFsYgwFa8SCFvUpmne+1j+cN9OKUHmEwfifQZ5wdUksIiPgU
+	SHLfUolVwn0DNEfcHj9M+/1hPprlSO4mgSjExqk434LItWh6v+5K0QaUfO9URg==
+Date: Mon, 24 Feb 2025 15:13:30 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next 01/13] net: phy: Extract the speed/duplex to
+ linkmode conversion from phylink
+Message-ID: <20250224151330.2e0d95e4@fedora>
+In-Reply-To: <Z7x7p3W0ZpkFu44m@shell.armlinux.org.uk>
+References: <20250222142727.894124-1-maxime.chevallier@bootlin.com>
+	<20250222142727.894124-2-maxime.chevallier@bootlin.com>
+	<Z7x7p3W0ZpkFu44m@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeellecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudelpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvn
+ hhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 24 Feb 2025 14:01:11 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Selecting LIBWX requires that its dependencies are met first:
+> On Sat, Feb 22, 2025 at 03:27:13PM +0100, Maxime Chevallier wrote:
+> > Phylink uses MAC capabilities to represent the Pause, AsymPause, Speed
+> > and Duplex capabilities of a given MAC device. These capabilities are
+> > used internally by phylink for link validation and get a coherent set of
+> > linkmodes that we can effectively use on a given interface.
+> > 
+> > The conversion from MAC capabilities to linkmodes is done in a dedicated
+> > function, that associates speed/duplex to linkmodes.
+> > 
+> > As preparation work for phy_port, extract this logic away from phylink
+> > and have it in a dedicated file that will deal with all the conversions
+> > between capabilities, linkmodes and interfaces.  
+> 
+> Fundamental question: why do you want to extract MAC capabilities from
+> phylink?
+> 
+> At the moment, only phylink uses the MAC capabilities (they're a phylink
+> thing.) Why should they be made generic, and what use will they be
+> applied to as something generic?
+> 
+> If there's no answer for that, then I worry that they'll get abused.
+> 
 
-WARNING: unmet direct dependencies detected for LIBWX
-  Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PTP_1588_CLOCK_OPTIONAL [=m]
-  Selected by [y]:
-  - TXGBE [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_WANGXUN [=y] && PCI [=y] && COMMON_CLK [=y] && I2C_DESIGNWARE_PLATFORM [=y]
-ld.lld-21: error: undefined symbol: ptp_schedule_worker
->>> referenced by wx_ptp.c:747 (/home/arnd/arm-soc/drivers/net/ethernet/wangxun/libwx/wx_ptp.c:747)
->>>               drivers/net/ethernet/wangxun/libwx/wx_ptp.o:(wx_ptp_reset) in archive vmlinux.a
+I only have a blurry answer for you, so that probably wont cut it, but
+for phy_port (which I have ready) and stackable PHY support (which I
+have not), I foresee that we may need to specify what can the PHY do on
+its MII serdes port.
 
-Add the smae dependency on PTP_1588_CLOCK_OPTIONAL to the two driver
-using this library module.
+TBH the only real stuff that will be needed is "Given a set of
+phy_interface_t supported by a PHY downstream port, what linkmodes can
+we get out of these". The phylink code uses the mac_capabilities as an
+intermediate between phylink_get_capabilities and
+phylink_caps_to_linkmodes(). Given that this series introduces very very
+similar enums in the form of the LINK_CAPA_XXX, we might be able to
+keep the MAC_CAPABILITIES a phylink-specific set of values. I can
+include that in V2.
 
-Fixes: 06e75161b9d4 ("net: wangxun: Add support for PTP clock")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/wangxun/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
-index 6b60173fe1f5..47e3e8434b9e 100644
---- a/drivers/net/ethernet/wangxun/Kconfig
-+++ b/drivers/net/ethernet/wangxun/Kconfig
-@@ -26,6 +26,7 @@ config LIBWX
- config NGBE
- 	tristate "Wangxun(R) GbE PCI Express adapters support"
- 	depends on PCI
-+	depends on PTP_1588_CLOCK_OPTIONAL
- 	select LIBWX
- 	select PHYLINK
- 	help
-@@ -43,6 +44,7 @@ config TXGBE
- 	depends on PCI
- 	depends on COMMON_CLK
- 	depends on I2C_DESIGNWARE_PLATFORM
-+	depends on PTP_1588_CLOCK_OPTIONAL
- 	select MARVELL_10G_PHY
- 	select REGMAP
- 	select PHYLINK
--- 
-2.39.5
-
+Maxime
 
