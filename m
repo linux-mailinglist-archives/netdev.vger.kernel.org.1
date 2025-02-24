@@ -1,486 +1,283 @@
-Return-Path: <netdev+bounces-169039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE2EA4233D
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:37:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EE31A422A9
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:15:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6BE83AB2AD
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 426D542359D
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C92D19ADA6;
-	Mon, 24 Feb 2025 14:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBFB254840;
+	Mon, 24 Feb 2025 14:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="o5Q4PGYr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="twFOJMVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD7021D3C2
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 14:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740407320; cv=fail; b=a8RFuEP/3AXEyNaKqrmP9BuRF5aBK3TiN+BHbYZG/ubwpwTjebkxtfosszQbxKS7P32ibohGDqmHJ8DnC7+/YTlZ5u0x6uty+n+UYYsFYXokVZcnscv+yNjnBdfp2J/7HaSyciVI1nz+HVR3Q1qn/AJJwk0Cyy6PK3OpqhCRtrc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740407320; c=relaxed/simple;
-	bh=6fIVFanTiZBCeOYb4cMM8zb7BwNazElRX+G5ZuzE98c=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=oGY9gllb9HC3J23U+MoWWVuFkQz5RgTa+Rv12heUimYM2OoeaJAASye0HdbzkUctCj0unF+AOutdwI75+AzgWA7fOB3w+Kb4/piuom+bsQ73xEgj1UeMy7FiGNPcU6vuJ7fObx8XDUk5lTPVBZIEWjWXnR0wb51OBgh4RfEJg4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=o5Q4PGYr; arc=fail smtp.client-ip=40.107.94.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FFrCuOJ9Ve3TisYzsBUf+NH7XTNaau8BspGKPmxCGWeLTpNkDUv2+wdoZsRZDp3cBXRReySCd1hA2g7BUy4hWV/R+nBi+GUIfk6XzPZznfDF43LwdH+dYBf09B7Nj818l8dx2iObalxA8LAdIeZinF1T55D/M7u/w19dISJBvLegTAxHohaswQzoOCtVq4VCk86cNsbIPrCaxvZ1+UmrLWIMWNpl9bjQ44y94PX0ArLVxy9VE2Ky48xSY/yGVOUqyGBlPBXhcvp5y/bn4dOc0wABCfsFCnEKEBZVjMXUPgzhL4tNuECC16bYtSibWjl3DXyjDlirAnTxYexVC32qFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J2YjuRG7YgX976eX5pCQjLn0Z5qLsKTiMo+cOU0TcLc=;
- b=quiMeYq0bU6ERapLDaq58LHq3BYV9+U7oLnYBMl/UdBxhxFjW3X+yEAeH3IdGPUpiLnU3IJQ768IltyQqHc7MD/nWY8bEmFE+YP4p5yyY1M77W5NsJNuBCr8xOW2EfrIxszgfFa8JHFS7AXWSoE5fYLCo/SoruR9nZXQBcQE3FsP5LKZvBRTt/BeOq4ufckpqcf/jDsD+rI1n08G+sU/1+kKLCt9sgBb8TOG0Wax/PcPxHf5xyERJ1PI2cNum3Fim546J/N1f3+4UaDRVfjcxgYyTBumQ/OmLfULagN2DFVkruZCcX4akZWWC7CaBZPeUNXmOxHZMNr0JiHu8wZS8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J2YjuRG7YgX976eX5pCQjLn0Z5qLsKTiMo+cOU0TcLc=;
- b=o5Q4PGYrY4DwBmaYqzeCfWW6gJQaDZfekrTlu8sp0aFMA4RHyXXlNkLQ+F0wZLKM7oBvs1V/UakTxCBl+MYsl3YOD+dJkJAKVjJE+EmiiNl9lTSh+lxqLrmoz1ZOvniNqFlq31gfp6a3g6H8IKcHjC5hiP9cAOjc8PyFHn/RWlPgP8zxZOKJaMbaMAVLcCNpYipOVyY6DOu+HZzx5kr/8t9pG31Cb1OsVQ7JQWbIN+4c/SzXemqDozlFsT3VRCAjg4jDkh9UIHMv2AS5xodEVLzLRXY1ZGOnYJCQCFWY8mMvRozAXLGIt0wONzHzQfA87P4cyBvrwV3HDhyjjiS6jg==
-Received: from SJ0PR05CA0130.namprd05.prod.outlook.com (2603:10b6:a03:33d::15)
- by DM4PR12MB7600.namprd12.prod.outlook.com (2603:10b6:8:108::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 14:28:29 +0000
-Received: from MWH0EPF000971E3.namprd02.prod.outlook.com
- (2603:10b6:a03:33d:cafe::f8) by SJ0PR05CA0130.outlook.office365.com
- (2603:10b6:a03:33d::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.19 via Frontend Transport; Mon,
- 24 Feb 2025 14:28:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MWH0EPF000971E3.mail.protection.outlook.com (10.167.243.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8466.11 via Frontend Transport; Mon, 24 Feb 2025 14:28:29 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Feb
- 2025 06:28:05 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 24 Feb
- 2025 06:28:02 -0800
-References: <20250224065241.236141-1-idosch@nvidia.com>
- <20250224065241.236141-5-idosch@nvidia.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-CC: <netdev@vger.kernel.org>, <stephen@networkplumber.org>,
-	<dsahern@gmail.com>, <gnault@redhat.com>, <petrm@nvidia.com>
-Subject: Re: [PATCH iproute2-next 4/5] iprule: Add port mask support
-Date: Mon, 24 Feb 2025 15:03:25 +0100
-In-Reply-To: <20250224065241.236141-5-idosch@nvidia.com>
-Message-ID: <87o6yrju35.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A212512D2;
+	Mon, 24 Feb 2025 14:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740405865; cv=none; b=XN+aGo0gqnwFAhk3jDyQr6NY/P8QpHEgw46LCRkr0f3N9L/H7ZnAjjhmW6pmfR21yufU/kil+icsLlL4q7w0A4Dny+axtY+b3Rfb0zNHrD7mOeeXqzW9uaYbhdl+fwhkFK0c0gyltmR5kvAfyQrZB66hnO6PCg5J9N8KwxNOLRM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740405865; c=relaxed/simple;
+	bh=RXW/ZqUOQYh3ddriGjB0hHXuPMRg08vkWdJ+G3tf8Y4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lkvT7TkEe5u0TsfDYd3HYHX2CX02DpodSXOKVQWFQ9kzg0wVY74P2d26eueytxpCGw7m6AkUndkjTIDyFc/Gg0/+Md7+wvZlNa5p5mDeN9pDjeJlAc2DaMfJAB2q0C8Czeirt95d3mnqLYTWurWwCnwWTeLGHiHtVEsiKo+9B/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=twFOJMVq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB72C4CEE9;
+	Mon, 24 Feb 2025 14:04:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740405864;
+	bh=RXW/ZqUOQYh3ddriGjB0hHXuPMRg08vkWdJ+G3tf8Y4=;
+	h=From:Date:Subject:To:Cc:From;
+	b=twFOJMVqdEv5QVyeDoKMweZN6mRyubp9DagLsKOnb+9z3smFvnM8yv1IG8E3cTGDh
+	 ffkYJWEEyF8uLOrAXVXItgqKljOY5Wj7gyiMti7IXly37KyySivjZgVxd1L8IvBWnY
+	 p1bc3V6qjlzWLl5p4vFI3tt7e4sjTNWufMwSfce1ttbI0dahCRL9wJbYPg40vjz4iH
+	 Vd6NaqKImLxcKSaYMDshe2h/qfI/en/Umv8J43WmQ5nHS9cP/DTdfQeOJxQMzlur8N
+	 74cQBR3TjcOOMaaNmrHjWLiZsqTGJizz6YULfzYTJTRDmz6UfBkGtW8jVpPXgIzrj7
+	 K8wRPOLxEYwLA==
+From: Roger Quadros <rogerq@kernel.org>
+Date: Mon, 24 Feb 2025 16:04:17 +0200
+Subject: [PATCH v2] dmaengine: ti: k3-udma-glue: Drop skip_fdq argument
+ from k3_udma_glue_reset_rx_chn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E3:EE_|DM4PR12MB7600:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77c5f36b-fce7-4da8-8de5-08dd54df821c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?C/FqV3JsYEYtw4vghk0bLy5vaKqQ77QQEErSP2HC4RSLST0AY5Ia+Yo40s6t?=
- =?us-ascii?Q?WxRnMSOkWYS6xSFhuJytHM+vUXU/IP1ba+oU56iB/DV/VjLk1KEEgLP6sfJ3?=
- =?us-ascii?Q?PsbDahNN954MF7taFm8HW8LH/aTIIPP1DJZFgnrpyofoBfVBph2DZQorJ3gN?=
- =?us-ascii?Q?q26IuUOryTqXaVH0A3PoM3EwzSpeck7MhpMOxRQ0HTTug4kvjMtvGnYTQj1Y?=
- =?us-ascii?Q?Ypaa6DrwxCIA0vNbXBtMPCQlhUf2zVOUNm6b+5JaWHuMwCVUoRWlfO2r2/tQ?=
- =?us-ascii?Q?4EUVqEr6MkUwmkljvGHDT9wHntM9nxjBA9aF2eiB9IZ+IeBY51ubkbAuGzxq?=
- =?us-ascii?Q?wOYqccb/8sTXGz+F6asRHKfc4r0y8rEy7k0cUdOGE/JeM9DkYgnife2bd4iA?=
- =?us-ascii?Q?Ra5y/RR3zfVLHRK9S6mWFdFIV5EFtuF+Gc9AapTbPuwcfhxSh2u3NMgUujyS?=
- =?us-ascii?Q?rh41u2RHQNDpufXTGPIdbxlvLdYhVU9h567mEoPjcT08K0IQJHxACL2zcZ6w?=
- =?us-ascii?Q?/dlqJ0MRK5g4J4BVC/h7PVn3VGpJ9cS/rHnpoMlDZj1cRNORpLkkUTL5yqYn?=
- =?us-ascii?Q?W+XY8k1r1cK5fKm/If7WjJnd4K2VQE4jdg0eurCx1LBbz84LxEMxzIkLBz9g?=
- =?us-ascii?Q?vLuE3JHU3woLa27h8wpeSBP+pyRiaiEWp18w54a9G/Bgd32IRb2rYvAFC4+r?=
- =?us-ascii?Q?SQoZYNdwfxpcs4I7Ueg4YyT58fZev4jNU38lFXLdrVrXFLES408wH4dmB0v5?=
- =?us-ascii?Q?NfL108GCwfjLrkm+oGQFWXXY4nhaeTZNky2Gg9NUh4v3ck6N1PJTsdEg6SYS?=
- =?us-ascii?Q?ewgV2hKKD5Mo6USUR2yK2n6Au3eMN8NfykKTrNp2oS/aI4DJsgo9OVSPwVNR?=
- =?us-ascii?Q?0kQiBFo/4oYJS+lf8oTXJ782znMpSjWSjN9ou4HxMhVAwMqDz1O8VJF0w9mv?=
- =?us-ascii?Q?VWQyo5a7GOTUG3hdgnZQJ4e69uKerVN2JcrC0WApOb+o0pzP64E2CQPqg+/1?=
- =?us-ascii?Q?P5xGh/jSqmSLMcNrEqpAdv9Lx2Wg8cts51iYxhpyjubjxeUC8/nNVrenvk7F?=
- =?us-ascii?Q?fGZlXsYXFajwqUpwGkxfvbc6nlqayBVExBIE/7qhrISw18iWLZvBpbFp102f?=
- =?us-ascii?Q?LUybZcvgMQDoEtWF8Ts+p3uWGGu5Hta1ZxyjZyd2TM3cSys3jD1LWY/R+r1R?=
- =?us-ascii?Q?jqttlXmXIj/sm8boatPd0hbIblWH3h9CKp8xe15nLx7B+aLijpOqtgtMZiki?=
- =?us-ascii?Q?wHDfdzLLoSZrH7OEQwFgHhoeNHJfq/+ig4aU9OXapISx/t/hRei6FEtQEsJK?=
- =?us-ascii?Q?5XJmO2nleg8pmatk+uaneRzw12/RyxjX45SC0XujhYi2YLLYbo0yFoCUktD3?=
- =?us-ascii?Q?zo1irEH8MQgRXXpOUND8kWkggj1RQe1SWoZR/JTUwrE0cFbzobsgbqF1NWSH?=
- =?us-ascii?Q?n017VuG0phs/rYW10I0d1N30PbyMqYTveBQniznHlUB8xZDTd3m9Cybk9vB+?=
- =?us-ascii?Q?ePlp6rYHhdwFkVk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 14:28:29.2890
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77c5f36b-fce7-4da8-8de5-08dd54df821c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250224-k3-udma-glue-single-fdq-v2-1-cbe7621f2507@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGB8vGcC/4WNQQ6CMBBFr0Jm7ZiWWoiuvIdhUehQJmDRVoiG9
+ O5WLuDyveS/v0GkwBThUmwQaOXIs89QHgroBuMdIdvMUIpSCykrHBUu9m7QTQthZO8mwt4+sTO
+ taPVJy7rXkNePQD2/9/KtyTxwfM3hsx+t8mf/N1eJEo2wVCtSlTqL60jB03Scg4MmpfQFBACwY
+ 78AAAA=
+To: Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
+ Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ MD Danish Anwar <danishanwar@ti.com>, 
+ Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Vignesh Raghavendra <vigneshr@ti.com>
+Cc: srk@ti.com, dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9147; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=RXW/ZqUOQYh3ddriGjB0hHXuPMRg08vkWdJ+G3tf8Y4=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnvHxkkQdvyAX77vJ/a7sVrxyWK6821R2zdC697
+ VqHbXsMlM2JAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ7x8ZAAKCRDSWmvTvnYw
+ k/pID/9FSlGfkZ6vilty0fgHJK8vVS2uSqpDVjzQCnB8TQkV++dO38zDtkRpfCFSxHGCAlszPcy
+ rmFNyiRJzdt3Mx+sr7VE8bUToW3Oxm6oBa7AQeuaud/eE/3DIzyd4W2jMrzUsu9glB1Ij/Qvuk4
+ 1NwO84x+YuNP65OH0N4MnquaIBmK6vZE4mfZSHb4HsS1rM5aoDr8WjtH1c4hoQu5FAc0TpB1zdp
+ mGQPX3Fyk/14NX0pleLIOfoWBMzt97Jqwkd2hy1+D3CuXIMWWD0B/8FgZtJJeTavHhEPS/JVxXg
+ j7KaCE4gERbPgl1cgTbvzUsu9GSx3pk4vICbARGZAEBOiRKolxgoRn7w9wpXl1ImfeVue0t02Rr
+ rmR2py5yiGutuXdNReHqcypjFDV27GkGc5Qz/DnHr5SkcDnr4r/E9poHftKUGI9900TGhH77Mdj
+ n7Fyh/Sexj6HRkoDwpKKiT9MPw8P1K2h1XLwGW5MzHraQ3wD+Qs4Y6W7RQaId8d7AZdZIRHyx8V
+ /7WOix7fRKJar/BE6iU2rDR6odflaygeKisGtfs/k3+J0dAUaqJDmqszs7TVEKqRyYn2wx6XfYa
+ o2+sV9BVMtCxtTzxnA9ibNKR3ZTwo1qUDt0jR7wk30bsjnBonxLZB+iq99pYsGMOEN1EIXTbv57
+ 9f5vq1VkNthWH3w==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
+The user of k3_udma_glue_reset_rx_chn() e.g. ti_am65_cpsw_nuss can
+run on multiple platforms having different DMA architectures.
+On some platforms there can be one FDQ for all flows in the RX channel
+while for others there is a separate FDQ for each flow in the RX channel.
 
-Ido Schimmel <idosch@nvidia.com> writes:
+So far we have been relying on the skip_fdq argument of
+k3_udma_glue_reset_rx_chn().
 
-> Add port mask support, allowing users to specify a source or destination
-> port with an optional mask. Example:
->
->  # ip rule add sport 80 table 100
->  # ip rule add sport 90/0xffff table 200
->  # ip rule add dport 1000-2000 table 300
->  # ip rule add sport 0x123/0xfff table 400
->  # ip rule add dport 0x4/0xff table 500
->  # ip rule add dport 0x8/0xf table 600
->  # ip rule del dport 0x8/0xf table 600
->
-> In non-JSON output, the mask is not printed in case of exact match:
->
->  $ ip rule show
->  0:      from all lookup local
->  32761:  from all dport 0x4/0xff lookup 500
->  32762:  from all sport 0x123/0xfff lookup 400
->  32763:  from all dport 1000-2000 lookup 300
->  32764:  from all sport 90 lookup 200
->  32765:  from all sport 80 lookup 100
->  32766:  from all lookup main
->  32767:  from all lookup default
->
-> Dump can be filtered by port value and mask:
->
->  $ ip rule show sport 80
->  32765:  from all sport 80 lookup 100
->  $ ip rule show sport 90
->  32764:  from all sport 90 lookup 200
->  $ ip rule show sport 0x123/0x0fff
->  32762:  from all sport 0x123/0xfff lookup 400
->  $ ip rule show dport 4/0xff
->  32761:  from all dport 0x4/0xff lookup 500
->
-> In JSON output, the port mask is printed as an hexadecimal string to be
-> consistent with other masks. The port value is printed as an integer in
-> order not to break existing scripts:
->
->  $ ip -j -p rule show sport 0x123/0xfff table 400
->  [ {
->          "priority": 32762,
->          "src": "all",
->          "sport": 291,
->          "sport_mask": "0xfff",
->          "table": "400"
->      } ]
->
-> The mask attribute is only sent to the kernel in case of inexact match
-> so that iproute2 will continue working with kernels that do not support
-> the attribute.
->
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Instead of relying on the user to provide this information, infer it
+based on DMA architecture during k3_udma_glue_request_rx_chn() and save it
+in an internal flag 'single_fdq'. Use that flag at
+k3_udma_glue_reset_rx_chn() to deicide if the FDQ needs
+to be cleared for every flow or just for flow 0.
 
-Two minor suggestions and a couple notes to self below. Looks OK overall.
+Fixes the below issue on ti_am65_cpsw_nuss driver on AM62-SK.
 
-> ---
->  ip/iprule.c           | 103 +++++++++++++++++++++++++++++++++++++-----
->  man/man8/ip-rule.8.in |  14 +++---
->  2 files changed, 100 insertions(+), 17 deletions(-)
->
-> diff --git a/ip/iprule.c b/ip/iprule.c
-> index 64d389bebb76..fbe69a3b6293 100644
-> --- a/ip/iprule.c
-> +++ b/ip/iprule.c
-> @@ -23,6 +23,8 @@
->  #include "ip_common.h"
->  #include "json_print.h"
->  
-> +#define PORT_MAX_MASK 0xFFFF
-> +
->  enum list_action {
->  	IPRULE_LIST,
->  	IPRULE_FLUSH,
-> @@ -44,8 +46,8 @@ static void usage(void)
->  		"            [ iif STRING ] [ oif STRING ] [ pref NUMBER ] [ l3mdev ]\n"
->  		"            [ uidrange NUMBER-NUMBER ]\n"
->  		"            [ ipproto PROTOCOL ]\n"
-> -		"            [ sport [ NUMBER | NUMBER-NUMBER ]\n"
-> -		"            [ dport [ NUMBER | NUMBER-NUMBER ] ]\n"
-> +		"            [ sport [ NUMBER[/MASK] | NUMBER-NUMBER ]\n"
-> +		"            [ dport [ NUMBER[/MASK] | NUMBER-NUMBER ] ]\n"
->  		"            [ dscp DSCP ] [ flowlabel FLOWLABEL[/MASK] ]\n"
->  		"ACTION := [ table TABLE_ID ]\n"
->  		"          [ protocol PROTO ]\n"
-> @@ -80,6 +82,7 @@ static struct
->  	int protocolmask;
->  	struct fib_rule_port_range sport;
->  	struct fib_rule_port_range dport;
-> +	__u16 sport_mask, dport_mask;
->  	__u8 ipproto;
->  } filter;
->  
-> @@ -186,8 +189,9 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
->  			return false;
->  	}
->  
-> -	if (filter.sport.start) {
-> +	if (filter.sport_mask) {
+> ip link set eth1 down
+> ip link set eth0 down
+> ethtool -L eth0 rx 8
+> ip link set eth0 up
+> modprobe -r ti_am65_cpsw_nuss
 
-OK, sport_mask now implies sport.start because of the changes in
-iprule_port_parse().
+[  103.045726] ------------[ cut here ]------------
+[  103.050505] k3_knav_desc_pool size 512000 != avail 64000
+[  103.050703] WARNING: CPU: 1 PID: 450 at drivers/net/ethernet/ti/k3-cppi-desc-pool.c:33 k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.068810] Modules linked in: ti_am65_cpsw_nuss(-) k3_cppi_desc_pool snd_soc_hdmi_codec crct10dif_ce snd_soc_simple_card snd_soc_simple_card_utils display_connector rtc_ti_k3 k3_j72xx_bandgap tidss drm_client_lib snd_soc_davinci_mcas
+p drm_dma_helper tps6598x phylink snd_soc_ti_udma rti_wdt drm_display_helper snd_soc_tlv320aic3x_i2c typec at24 phy_gmii_sel snd_soc_ti_edma snd_soc_tlv320aic3x sii902x snd_soc_ti_sdma sa2ul omap_mailbox drm_kms_helper authenc cfg80211 r
+fkill fuse drm drm_panel_orientation_quirks backlight ip_tables x_tables ipv6 [last unloaded: k3_cppi_desc_pool]
+[  103.119950] CPU: 1 UID: 0 PID: 450 Comm: modprobe Not tainted 6.13.0-rc7-00001-g9c5e3435fa66 #1011
+[  103.119968] Hardware name: Texas Instruments AM625 SK (DT)
+[  103.119974] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  103.119983] pc : k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.148007] lr : k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.154709] sp : ffff8000826ebbc0
+[  103.158015] x29: ffff8000826ebbc0 x28: ffff0000090b6300 x27: 0000000000000000
+[  103.165145] x26: 0000000000000000 x25: 0000000000000000 x24: ffff0000019df6b0
+[  103.172271] x23: ffff0000019df6b8 x22: ffff0000019df410 x21: ffff8000826ebc88
+[  103.179397] x20: 000000000007d000 x19: ffff00000a3b3000 x18: 0000000000000000
+[  103.186522] x17: 0000000000000000 x16: 0000000000000000 x15: 000001e8c35e1cde
+[  103.193647] x14: 0000000000000396 x13: 000000000000035c x12: 0000000000000000
+[  103.200772] x11: 000000000000003a x10: 00000000000009c0 x9 : ffff8000826eba20
+[  103.207897] x8 : ffff0000090b6d20 x7 : ffff00007728c180 x6 : ffff00007728c100
+[  103.215022] x5 : 0000000000000001 x4 : ffff000000508a50 x3 : ffff7ffff6146000
+[  103.222147] x2 : 0000000000000000 x1 : e300b4173ee6b200 x0 : 0000000000000000
+[  103.229274] Call trace:
+[  103.231714]  k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool] (P)
+[  103.238408]  am65_cpsw_nuss_free_rx_chns+0x28/0x4c [ti_am65_cpsw_nuss]
+[  103.244942]  devm_action_release+0x14/0x20
+[  103.249040]  release_nodes+0x3c/0x68
+[  103.252610]  devres_release_all+0x8c/0xdc
+[  103.256614]  device_unbind_cleanup+0x18/0x60
+[  103.260876]  device_release_driver_internal+0xf8/0x178
+[  103.266004]  driver_detach+0x50/0x9c
+[  103.269571]  bus_remove_driver+0x6c/0xbc
+[  103.273485]  driver_unregister+0x30/0x60
+[  103.277401]  platform_driver_unregister+0x14/0x20
+[  103.282096]  am65_cpsw_nuss_driver_exit+0x18/0xff4 [ti_am65_cpsw_nuss]
+[  103.288620]  __arm64_sys_delete_module+0x17c/0x25c
+[  103.293404]  invoke_syscall+0x44/0x100
+[  103.297149]  el0_svc_common.constprop.0+0xc0/0xe0
+[  103.301845]  do_el0_svc+0x1c/0x28
+[  103.305155]  el0_svc+0x28/0x98
+[  103.308207]  el0t_64_sync_handler+0xc8/0xcc
+[  103.312384]  el0t_64_sync+0x198/0x19c
+[  103.316040] ---[ end trace 0000000000000000 ]---
 
->  		const struct fib_rule_port_range *r;
-> +		__u16 sport_mask = PORT_MAX_MASK;
->  
->  		if (!tb[FRA_SPORT_RANGE])
->  			return false;
-> @@ -196,10 +200,16 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
->  		if (r->start != filter.sport.start ||
->  		    r->end != filter.sport.end)
->  			return false;
-> +
-> +		if (tb[FRA_SPORT_MASK])
-> +			sport_mask = rta_getattr_u16(tb[FRA_SPORT_MASK]);
-> +		if (filter.sport_mask != sport_mask)
-> +			return false;
->  	}
->  
-> -	if (filter.dport.start) {
-> +	if (filter.dport_mask) {
->  		const struct fib_rule_port_range *r;
-> +		__u16 dport_mask = PORT_MAX_MASK;
->  
->  		if (!tb[FRA_DPORT_RANGE])
->  			return false;
-> @@ -208,6 +218,11 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
->  		if (r->start != filter.dport.start ||
->  		    r->end != filter.dport.end)
->  			return false;
-> +
-> +		if (tb[FRA_DPORT_MASK])
-> +			dport_mask = rta_getattr_u16(tb[FRA_DPORT_MASK]);
-> +		if (filter.dport_mask != dport_mask)
-> +			return false;
->  	}
->  
->  	if (filter.tun_id) {
-> @@ -390,7 +405,26 @@ int print_rule(struct nlmsghdr *n, void *arg)
->  		struct fib_rule_port_range *r = RTA_DATA(tb[FRA_SPORT_RANGE]);
->  
->  		if (r->start == r->end) {
-> -			print_uint(PRINT_ANY, "sport", " sport %u", r->start);
-> +			if (tb[FRA_SPORT_MASK]) {
-> +				__u16 mask;
-> +
-> +				mask = rta_getattr_u16(tb[FRA_SPORT_MASK]);
-> +				print_uint(PRINT_JSON, "sport", NULL, r->start);
-> +				print_0xhex(PRINT_JSON, "sport_mask", NULL,
-> +					    mask);
-> +				if (mask == PORT_MAX_MASK) {
-> +					print_uint(PRINT_FP, NULL, " sport %u",
-> +						   r->start);
-> +				} else {
-> +					print_0xhex(PRINT_FP, NULL,
-> +						    " sport %#x", r->start);
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Peter Ujfalusi <peter.ujfalusi@gmail.com>
+---
+Changes in v2:
+- Rebased on dmaengine/testing
+- Added Acked-by tags from Jakub and Peter.
+- Link to v1: https://lore.kernel.org/r/20250116-k3-udma-glue-single-fdq-v1-1-a0de73e36390@kernel.org
+---
+ drivers/dma/ti/k3-udma-glue.c                | 15 +++++++++++----
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c     |  4 ++--
+ drivers/net/ethernet/ti/icssg/icssg_common.c |  2 +-
+ include/linux/dma/k3-udma-glue.h             |  3 +--
+ 4 files changed, 15 insertions(+), 9 deletions(-)
 
-Looks good, for JSON we always emit as uint, for FP we emit uint in
-backward-compatible scenarios.
-
-> +					print_0xhex(PRINT_FP, NULL, "/%#x",
-> +						    mask);
-> +				}
-> +			} else {
-> +				print_uint(PRINT_ANY, "sport", " sport %u",
-> +					   r->start);
-
-Hm, yeah, and on an old kernel we don't even get the mask in JSON.
-Makes sense.
-
-> +			}
->  		} else {
->  			print_uint(PRINT_ANY, "sport_start", " sport %u",
->  				   r->start);
-> @@ -402,7 +436,26 @@ int print_rule(struct nlmsghdr *n, void *arg)
->  		struct fib_rule_port_range *r = RTA_DATA(tb[FRA_DPORT_RANGE]);
->  
->  		if (r->start == r->end) {
-> -			print_uint(PRINT_ANY, "dport", " dport %u", r->start);
-> +			if (tb[FRA_DPORT_MASK]) {
-> +				__u16 mask;
-> +
-> +				mask = rta_getattr_u16(tb[FRA_DPORT_MASK]);
-> +				print_uint(PRINT_JSON, "dport", NULL, r->start);
-> +				print_0xhex(PRINT_JSON, "dport_mask", NULL,
-> +					    mask);
-> +				if (mask == 0xFFFF) {
-> +					print_uint(PRINT_FP, NULL, " dport %u",
-> +						   r->start);
-> +				} else {
-> +					print_0xhex(PRINT_FP, NULL,
-> +						    " dport %#x", r->start);
-> +					print_0xhex(PRINT_FP, NULL, "/%#x",
-> +						    mask);
-> +				}
-> +			} else {
-> +				print_uint(PRINT_ANY, "dport", " dport %u",
-> +					   r->start);
-> +			}
->  		} else {
->  			print_uint(PRINT_ANY, "dport_start", " dport %u",
->  				   r->start);
-> @@ -600,10 +653,13 @@ static int flush_rule(struct nlmsghdr *n, void *arg)
->  	return 0;
->  }
->  
-> -static void iprule_port_parse(char *arg, struct fib_rule_port_range *r)
-> +static void iprule_port_parse(char *arg, struct fib_rule_port_range *r,
-> +			      __u16 *mask)
->  {
->  	char *sep;
->  
-> +	*mask = PORT_MAX_MASK;
-> +
->  	sep = strchr(arg, '-');
->  	if (sep) {
->  		*sep = '\0';
-> @@ -617,6 +673,21 @@ static void iprule_port_parse(char *arg, struct fib_rule_port_range *r)
->  		return;
->  	}
->  
-> +	sep = strchr(arg, '/');
-> +	if (sep) {
-> +		*sep = '\0';
-> +
-> +		if (get_u16(&r->start, arg, 0))
-> +			invarg("invalid port", arg);
-> +
-> +		r->end = r->start;
-> +
-> +		if (get_u16(mask, sep + 1, 0))
-> +			invarg("invalid mask", sep + 1);
-> +
-> +		return;
-> +	}
-> +
->  	if (get_u16(&r->start, arg, 0))
->  		invarg("invalid port", arg);
->  
-
-I think this duplicates the port number parsing unnecessarily. How
-about:
-
-+	sep = strchr(arg, '/');
-+	if (sep) {
-+		*sep = '\0';
-+		if (get_u16(mask, sep + 1, 0))
-+			invarg("invalid mask", sep + 1);
+diff --git a/drivers/dma/ti/k3-udma-glue.c b/drivers/dma/ti/k3-udma-glue.c
+index 7c224c3ab7a0..f87d244cc2d6 100644
+--- a/drivers/dma/ti/k3-udma-glue.c
++++ b/drivers/dma/ti/k3-udma-glue.c
+@@ -84,6 +84,7 @@ struct k3_udma_glue_rx_channel {
+ 	struct k3_udma_glue_rx_flow *flows;
+ 	u32 flow_num;
+ 	u32 flows_ready;
++	bool single_fdq;	/* one FDQ for all flows */
+ };
+ 
+ static void k3_udma_chan_dev_release(struct device *dev)
+@@ -970,10 +971,13 @@ k3_udma_glue_request_rx_chn_priv(struct device *dev, const char *name,
+ 
+ 	ep_cfg = rx_chn->common.ep_config;
+ 
+-	if (xudma_is_pktdma(rx_chn->common.udmax))
++	if (xudma_is_pktdma(rx_chn->common.udmax)) {
+ 		rx_chn->udma_rchan_id = ep_cfg->mapped_channel_id;
+-	else
++		rx_chn->single_fdq = false;
++	} else {
+ 		rx_chn->udma_rchan_id = -1;
++		rx_chn->single_fdq = true;
 +	}
-+
- 	if (get_u16(&r->start, arg, 0))
- 		invarg("invalid port", arg);
+ 
+ 	/* request and cfg UDMAP RX channel */
+ 	rx_chn->udma_rchanx = xudma_rchan_get(rx_chn->common.udmax,
+@@ -1103,6 +1107,9 @@ k3_udma_glue_request_remote_rx_chn_common(struct k3_udma_glue_rx_channel *rx_chn
+ 		rx_chn->common.chan_dev.dma_coherent = true;
+ 		dma_coerce_mask_and_coherent(&rx_chn->common.chan_dev,
+ 					     DMA_BIT_MASK(48));
++		rx_chn->single_fdq = false;
++	} else {
++		rx_chn->single_fdq = true;
+ 	}
+ 
+ 	ret = k3_udma_glue_allocate_rx_flows(rx_chn, cfg);
+@@ -1453,7 +1460,7 @@ EXPORT_SYMBOL_GPL(k3_udma_glue_tdown_rx_chn);
+ 
+ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 		u32 flow_num, void *data,
+-		void (*cleanup)(void *data, dma_addr_t desc_dma), bool skip_fdq)
++		void (*cleanup)(void *data, dma_addr_t desc_dma))
+ {
+ 	struct k3_udma_glue_rx_flow *flow = &rx_chn->flows[flow_num];
+ 	struct device *dev = rx_chn->common.dev;
+@@ -1465,7 +1472,7 @@ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 	dev_dbg(dev, "RX reset flow %u occ_rx %u\n", flow_num, occ_rx);
+ 
+ 	/* Skip RX FDQ in case one FDQ is used for the set of flows */
+-	if (skip_fdq)
++	if (rx_chn->single_fdq && flow_num)
+ 		goto do_reset;
+ 
+ 	/*
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index b663271e79f7..a1a482ca955f 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -515,7 +515,7 @@ static void am65_cpsw_destroy_rxq(struct am65_cpsw_common *common, int id)
+ 	napi_disable(&flow->napi_rx);
+ 	hrtimer_cancel(&flow->rx_hrtimer);
+ 	k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, id, rx_chn,
+-				  am65_cpsw_nuss_rx_cleanup, !!id);
++				  am65_cpsw_nuss_rx_cleanup);
+ 
+ 	for (port = 0; port < common->port_num; port++) {
+ 		if (!common->ports[port].ndev)
+@@ -3406,7 +3406,7 @@ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
+ 	for (i = 0; i < common->rx_ch_num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(rx_chan->rx_chn, i,
+ 					  rx_chan,
+-					  am65_cpsw_nuss_rx_cleanup, !!i);
++					  am65_cpsw_nuss_rx_cleanup);
+ 
+ 	k3_udma_glue_disable_rx_chn(rx_chan->rx_chn);
+ 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 74f0f200a89d..62065416e886 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -955,7 +955,7 @@ void prueth_reset_rx_chan(struct prueth_rx_chn *chn,
+ 
+ 	for (i = 0; i < num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(chn->rx_chn, i, chn,
+-					  prueth_rx_cleanup, !!i);
++					  prueth_rx_cleanup);
+ 	if (disable)
+ 		k3_udma_glue_disable_rx_chn(chn->rx_chn);
+ }
+diff --git a/include/linux/dma/k3-udma-glue.h b/include/linux/dma/k3-udma-glue.h
+index 2dea217629d0..5d43881e6fb7 100644
+--- a/include/linux/dma/k3-udma-glue.h
++++ b/include/linux/dma/k3-udma-glue.h
+@@ -138,8 +138,7 @@ int k3_udma_glue_rx_get_irq(struct k3_udma_glue_rx_channel *rx_chn,
+ 			    u32 flow_num);
+ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 		u32 flow_num, void *data,
+-		void (*cleanup)(void *data, dma_addr_t desc_dma),
+-		bool skip_fdq);
++		void (*cleanup)(void *data, dma_addr_t desc_dma));
+ int k3_udma_glue_rx_flow_enable(struct k3_udma_glue_rx_channel *rx_chn,
+ 				u32 flow_idx);
+ int k3_udma_glue_rx_flow_disable(struct k3_udma_glue_rx_channel *rx_chn,
 
-> @@ -770,10 +841,12 @@ static int iprule_list_flush_or_save(int argc, char **argv, int action)
->  			filter.ipproto = ipproto;
->  		} else if (strcmp(*argv, "sport") == 0) {
->  			NEXT_ARG();
-> -			iprule_port_parse(*argv, &filter.sport);
-> +			iprule_port_parse(*argv, &filter.sport,
-> +					  &filter.sport_mask);
->  		} else if (strcmp(*argv, "dport") == 0) {
->  			NEXT_ARG();
-> -			iprule_port_parse(*argv, &filter.dport);
-> +			iprule_port_parse(*argv, &filter.dport,
-> +					  &filter.dport_mask);
->  		} else if (strcmp(*argv, "dscp") == 0) {
->  			__u32 dscp;
->  
-> @@ -1043,18 +1116,26 @@ static int iprule_modify(int cmd, int argc, char **argv)
->  			addattr8(&req.n, sizeof(req), FRA_IP_PROTO, ipproto);
->  		} else if (strcmp(*argv, "sport") == 0) {
->  			struct fib_rule_port_range r;
-> +			__u16 sport_mask;
->  
->  			NEXT_ARG();
-> -			iprule_port_parse(*argv, &r);
-> +			iprule_port_parse(*argv, &r, &sport_mask);
->  			addattr_l(&req.n, sizeof(req), FRA_SPORT_RANGE, &r,
->  				  sizeof(r));
-> +			if (sport_mask != PORT_MAX_MASK)
-> +				addattr16(&req.n, sizeof(req), FRA_SPORT_MASK,
-> +					  sport_mask);
->  		} else if (strcmp(*argv, "dport") == 0) {
->  			struct fib_rule_port_range r;
-> +			__u16 dport_mask;
->  
->  			NEXT_ARG();
-> -			iprule_port_parse(*argv, &r);
-> +			iprule_port_parse(*argv, &r, &dport_mask);
->  			addattr_l(&req.n, sizeof(req), FRA_DPORT_RANGE, &r,
->  				  sizeof(r));
-> +			if (dport_mask != PORT_MAX_MASK)
-> +				addattr16(&req.n, sizeof(req), FRA_DPORT_MASK,
-> +					  dport_mask);
->  		} else if (strcmp(*argv, "dscp") == 0) {
->  			__u32 dscp;
->  
-> diff --git a/man/man8/ip-rule.8.in b/man/man8/ip-rule.8.in
-> index 6fc741d4f470..4945ccd55076 100644
-> --- a/man/man8/ip-rule.8.in
-> +++ b/man/man8/ip-rule.8.in
-> @@ -52,10 +52,10 @@ ip-rule \- routing policy database management
->  .B ipproto
->  .IR PROTOCOL " ] [ "
->  .BR sport " [ "
-> -.IR NUMBER " | "
-> +.IR NUMBER\fR[\fB/\fIMASK "] | "
->  .IR NUMBER "-" NUMBER " ] ] [ "
->  .BR dport " [ "
-> -.IR NUMBER " | "
-> +.IR NUMBER\fR[\fB/\fIMASK "] | "
->  .IR NUMBER "-" NUMBER " ] ] [ "
->  .B  tun_id
->  .IR TUN_ID " ] [ "
-> @@ -270,12 +270,14 @@ value to match.
->  select the ip protocol value to match.
->  
->  .TP
-> -.BI sport " NUMBER | NUMBER-NUMBER"
-> -select the source port value to match. supports port range.
-> +.BI sport " NUMBER\fR[\fB/\fIMASK\fR] | NUMBER-NUMBER"
-> +select the source port value to match with an optional mask. supports port
-> +range.
+---
+base-commit: 76ed9b7d177ed5aa161a824ea857619b88542de1
+change-id: 20250116-k3-udma-glue-single-fdq-cab0b54517f5
 
-s/supports/Supports/. And below.
-
->  
->  .TP
-> -.BI dport " NUMBER | NUMBER-NUMBER"
-> -select the destination port value to match. supports port range.
-> +.BI dport " NUMBER\fR[\fB/\fIMASK\fR] | NUMBER-NUMBER"
-> +select the destination port value to match with an optional mask. supports port
-> +range.
->  
->  .TP
->  .BI priority " PREFERENCE"
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
 
 
