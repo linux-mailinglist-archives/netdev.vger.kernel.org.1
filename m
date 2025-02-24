@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-169187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B0FA42DD0
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:30:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA711A42E43
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1592818974AB
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:30:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB89B174750
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15951ACEAD;
-	Mon, 24 Feb 2025 20:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D1C206F16;
+	Mon, 24 Feb 2025 20:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gE2Ay2AE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rR5L7oO7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB9F15886C
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 20:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9D915530B;
+	Mon, 24 Feb 2025 20:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740429036; cv=none; b=ULXNEMHWROBgLVAjfLtCF5Qdlvj+AAvXSv5PHQFBDDaK1OQTWYzzKy6I/G76/j5iKjWZnCdnS9yKomBeo+RmSTj3KxexJHr278m5JI5In93D/keHbvj1sl/p0UrO3cp3NE/J9potSzXW8TgiQmJxri9N7hTnYxgod+xWx0JavV4=
+	t=1740430112; cv=none; b=a1E2GzafAJfGfhrg8KMFct5cq0EgoAq6I1Z7W8887OrGclTeKrqa9yel7LlM4lyGnOnxcDJIJDviWMOSi5+pdQ+yybkuDu930lQbNVM4ytpBGUGyCsDqiJfvxm1LJIV06yMOpZQhanXXqwaFO3VyXjKLxnX5cotjadDR6XIyJS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740429036; c=relaxed/simple;
-	bh=E8iE2CUWjYzHO6G4WlPRDQsPP77jDQo194ttItCJdf4=;
+	s=arc-20240116; t=1740430112; c=relaxed/simple;
+	bh=L/c/t+4leGMdBLaivVIb/ruUCGGyN6yH6eKmpNXGc2o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bo2wjybgDegYGZkYGEyFOApK2qwoMAGiMoxjz7wJQ5tbOzwE4CaHDDr0e2Yp924ABvlNGKKkNNuqdRmxitmD2YVb7gg3jnb1P9F6NZHpygmVvU+wHFaZtv5cC6y2fxSRibi6bhgWfMHxo17OHrsFftXh4ZX09cJpChEERf68CK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gE2Ay2AE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B3AC4CED6;
-	Mon, 24 Feb 2025 20:30:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=THx8tF9ujs0bvmpCRrpPjeCCywIpIMiDfeLhrcnKq3wERQOzhB7Y4ye//6UcfiK6txlfQl/JklrTd17Zcojj9TpHeiJvkx7dAMbBFOcwVZGEmFmBqhRc7ocJonVIVRA5kOooV+D8uZ+zBRSdxecmLRH+yAXS+ZB5hFsfHQGoF94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rR5L7oO7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEDE1C4CED6;
+	Mon, 24 Feb 2025 20:48:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740429036;
-	bh=E8iE2CUWjYzHO6G4WlPRDQsPP77jDQo194ttItCJdf4=;
+	s=k20201202; t=1740430112;
+	bh=L/c/t+4leGMdBLaivVIb/ruUCGGyN6yH6eKmpNXGc2o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gE2Ay2AEwB9oH8XRJeuc9um31uHexLX+1IBxvPrrD03baximtpTS4JGg80OWWV/Fa
-	 aSIvacCs+mrP9Fy92uOf1SYOP0d3S3IkrYQtyQ/OfftjpKisTl9oFfeuCvNdXZjNrz
-	 lySwh9bQ5EAF08pxYVC7yfZKCmA51qUadjDB+tunIlpIgpZcG6rJtBHvzT9fAaKeps
-	 JJedrQJusSDvidUwslOia4mZgVephhZfNmbPmKW8AbSvoyQlfgrFIJmpLK1W2XTNAn
-	 anISwZA87w8deNRfL9/6ScAfMDZmAhFdHFSzR2+GCwDXQki+vgnBwSxKuHpMQ3V+hI
-	 tGoWLOXHKD/Gw==
-Date: Mon, 24 Feb 2025 12:30:34 -0800
+	b=rR5L7oO73pbxW1Tp6OyFl6IPvMI7SeiW5CWBmFL8Wzz0blPqdw2Z9dJGlQZBcYE2H
+	 Lo4aKLtD2ewupSzD9DQdovx3VYjWzOCZ02ZXzQ0JG8XbANPxGetyXZ0V7nj0Bab2OH
+	 sFq7pkGePnfdHqJps9ZXCitTRpMIqjagtvWy2+MijrizzNiKFE8O374VA/AtPco5vA
+	 aLvsB05YypPHldbAKVWOBKQDdn8mBPVPm6hw9MyXmgmZjXVyG1m0Ufa0EuJVpPV3i7
+	 KoEG2Ab+CvB9XkOKjtq8peYTxJRjAVPLrVXDIXwbi8O3KFLYd0bZyI49Hzsm5hqeYm
+	 yqHnPmtXb5afg==
+Date: Mon, 24 Feb 2025 12:48:30 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
- jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, andrew+netdev@lunn.ch, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com, Olga Albisser
- <olga@albisser.org>, Olivier Tilmans <olivier.tilmans@nokia.com>, Henrik
- Steen <henrist@henrist.net>, Bob Briscoe <research@bobbriscoe.net>, Pedro
- Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH v5 net-next 1/1] sched: Add dualpi2 qdisc
-Message-ID: <20250224123034.675e0446@kernel.org>
-In-Reply-To: <20250222100725.27838-2-chia-yu.chang@nokia-bell-labs.com>
-References: <20250222100725.27838-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250222100725.27838-2-chia-yu.chang@nokia-bell-labs.com>
+To: Kevin Krakauer <krakauer@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
+Subject: Re: [PATCH] selftests/net: deflake GRO tests and fix return value
+ and output
+Message-ID: <20250224124830.7c38608a@kernel.org>
+In-Reply-To: <20250223151949.1886080-1-krakauer@google.com>
+References: <20250220170409.42cce424@kernel.org>
+	<20250223151949.1886080-1-krakauer@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,30 +62,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 22 Feb 2025 11:07:25 +0100 chia-yu.chang@nokia-bell-labs.com
-wrote:
-> From: Koen De Schepper <koen.de_schepper@nokia-bell-labs.com>
+On Sun, 23 Feb 2025 07:19:49 -0800 Kevin Krakauer wrote:
+> Thanks for the review! I'll split this up. Do you think it's better as two
+> patchsets -- one for stability/deflaking, one for return value and output
+> cleanup -- or as a single patchset with several commits?
+
+Should be fine either way, they will both end up in net-next.
+One patchset may be easier to merge, as we can't CI-test two
+conflicting series on the list.
+
+> > To be clear - are you running this over veth or a real device?  
 > 
-> DualPI2 provides L4S-type low latency & loss to traffic that uses a
-> scalable congestion controller (e.g. TCP-Prague, DCTCP) without
-> degrading the performance of 'classic' traffic (e.g. Reno,
-> Cubic etc.). It is intended to be the reference implementation of the
-> IETF's DualQ Coupled AQM.
+> Over a veth.
+> 
+> >> Set the device's napi_defer_hard_irqs to 50 so that GRO is less likely
+> >> to immediately flush. This already happened in setup_loopback.sh, but
+> >> wasn't added to setup_veth.sh. This accounts for most of the reduction
+> >> in flakiness.  
+> >
+> >That doesn't make intuitive sense to me. If we already defer flushes
+> >why do we need to also defer IRQs?  
+> 
+> Yep, the behavior here is weird. I ran `gro.sh -t large` 1000 times with each of
+> the following setups (all inside strace to increase flakiness):
+> 
+> - gro_flush_timeout=1ms, napi_defer_hard_irqs=0  --> failed to GRO 29 times
+> - gro_flush_timeout=5ms, napi_defer_hard_irqs=0  --> failed to GRO 45 times
+> - gro_flush_timeout=50ms, napi_defer_hard_irqs=0 --> failed to GRO 35 times
+> - gro_flush_timeout=1ms, napi_defer_hard_irqs=1  --> failed to GRO 0 times
+> - gro_flush_timeout=1ms, napi_defer_hard_irqs=50 --> failed to GRO 0 times
+> 
+> napi_defer_hard_irqs is clearly having an effect. And deferring once is enough.
+> I believe that deferring IRQs prevents anything else from causing a GRO flush
+> before gro_flush_timeout expires. While waiting for the timeout to expire, an
+> incoming packet can cause napi_complete_done and thus napi_gro_flush to run.
+> Outgoing packets from the veth can also cause this: veth_xmit calls
+> __veth_xdp_flush, which only actually does anything when IRQs are enabled.
+> 
+> So napi_defer_hard_irqs=1 seems sufficient to allow the full gro_flush_timeout
+> to expire before flushing GRO.
 
-Pedro reports that you're missing:
-
-diff --git a/tools/testing/selftests/tc-testing/tdc.sh 
-b/tools/testing/selftests/tc-testing/tdc.sh
-index cddff1772..e64e8acb7 100755
---- a/tools/testing/selftests/tc-testing/tdc.sh
-+++ b/tools/testing/selftests/tc-testing/tdc.sh
-@@ -63,4 +63,5 @@ try_modprobe sch_hfsc
-  try_modprobe sch_hhf
-  try_modprobe sch_htb
-  try_modprobe sch_teql
-+try_modprobe sch_dualpi2
-  ./tdc.py -J`nproc`
-
--- 
-pw-bot: cr
+With msec-long deferrals we'll flush due to jiffies change. At least
+that explains a bit. Could you maybe try lower timeouts than 1msec?
+Previously we'd just keep partially-completed packets in GRO for up 
+to 1msec, now we'll delay all packet processing for 1msec, that's a lot.
 
