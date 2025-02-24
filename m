@@ -1,224 +1,271 @@
-Return-Path: <netdev+bounces-168934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB81A41950
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:39:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B5D5A4194C
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9E1B3A50C5
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:38:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C43C27A444F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CA51B041E;
-	Mon, 24 Feb 2025 09:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF22200121;
+	Mon, 24 Feb 2025 09:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SIFP+mS5"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="EwzBQAI5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF83D12CDBE;
-	Mon, 24 Feb 2025 09:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBD678F2E;
+	Mon, 24 Feb 2025 09:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740389907; cv=none; b=FH6psJFm3s6VZwdS6z2UxBsI9KIcPQzzte85rCqjLSnlkzKAO0yGo2FTjVGy37CJxguByDHLrinSR8XEWrui5QMxGFUWRXx9owPH2VitV70qY0RRzyREjziz9XKfZ+TS0Ug5rxWhPbuWPwYS8VUEaMhAobX9osVfAAs4r/Pnzqw=
+	t=1740389947; cv=none; b=ra4IDYWYu2WeiA1cDMm+5eB+41/OfXrGXMdu3Xy9+m53GC3fSN0FIZYF4KIVZvfGQLyIciQZGGYOTOWwybDJf+CNNc449lCzpLWGTreQKUyopcY63C70XSAVnkRfhHAyFpOLxyliajqepQEEHV6g4h9smk2FDgqnJfImXXQNjOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740389907; c=relaxed/simple;
-	bh=Y45OZf5AEVqbMLHC2vetp5A95pNeIRg/N3EqYrtFEj0=;
+	s=arc-20240116; t=1740389947; c=relaxed/simple;
+	bh=/HpH0//Sd9ANVoi0x2M7SEPliUKtNSAcq4jivyv/0Z0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qKs40XrH1wdLUZ4qstn2WIJwUlumXiTqUUd1q///a3Bv+oYHObo9nikZ7VPz1VdhrXV8xkJvL7i3B38eAGEJTfytwsTs3GkkrWupmFK0BXctr/2KXj3maV7fwWQUX2heBgu81Cks0RzE+AQzj1/2YUvy3ljb5nC4zccAgUz9DJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SIFP+mS5; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8DC571F764;
-	Mon, 24 Feb 2025 09:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740389897;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8U5EMMWlFDym6d2qg1LTT9H9US9Iiqf+zo1LbUZs+SQ=;
-	b=SIFP+mS5sChUesjRmTYG6lyyKcqt01GNDyNN6oB3oI+9J9I7EykFplii+zPokEJVKrb+Fv
-	ECI+OoafKYZhwK4dcpBpThrzdJyHTkUnsw7VKeLBb1ZUctViSrhI/eB5YvhDJuXEZl5VI4
-	+q0IyvzuqaLQrKn0TH8IMLM5ON66QyUKEohR6MFpgQgKStc7vIU5g5I4klVHW44JFxU4QF
-	QIoHHqI1aONLT4S/SLbEStHAAuiZHk+LI913EYDXT61Aq3zwgiDsXAcyyLhK/W/Dvg0OA6
-	Ucz2FC+jFWZzbNXuWqiQf4W8mDqPGtYuYFa9vB1D42RJW1QbcqcYn9XZ3VYT5w==
-Date: Mon, 24 Feb 2025 10:38:14 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: =?UTF-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Florian
- Fainelli <f.fainelli@gmail.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Simon Horman <horms@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Antoine Tenart <atenart@kernel.org>,
- Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <20250224103814.7d60bfbd@fedora>
-In-Reply-To: <87r03otsmm.fsf@miraculix.mork.no>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
-	<87r03otsmm.fsf@miraculix.mork.no>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 MIME-Version:Content-Type; b=TAn7AU+wqjWLbGMi0V5uHP72Zz79dYSbxhT10/Y0cVPUIPN7EVYblcvaVkpeuBNtE20VtBdOvucSA0V/FfW4V2fAFIFnM5BKWQT2sXSkTk+6GmhoIkjzdpFpwhmbRYDpj4iAsyITe7dh5zpzZDolCX6JnTpY/IqVE7MqgGIEkxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=EwzBQAI5; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1740389938; x=1740994738; i=ps.report@gmx.net;
+	bh=rBw6xYsOHK0PSghpi+JD9vE8vBfcTAhCyiK4cG4ZtPM=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=EwzBQAI5W4GW7NjWUqX3x/kSnzdJGWK+fVeAIG3RwIrH2CWTJuKdrxNx5W+2RJnG
+	 M/ZEA9t/pqNJAjnBsPqe9KnWpJG1BqsKhhmM01lEReMAHByYRlIRJ0HJWObz0ok3D
+	 ci0ThekP6wjle6BJ6AEw2MIF6wT4H9GO06148tbr9HJEVMH0Nh+BI8Byxp++VBsz2
+	 Op3GzyGmlc6GdvoJivOUVSbfQxj1oh8zh+V6boB47ikZ8GbLzYrI+m4B35wvlwszc
+	 tO6aJbfbYHh+yOPwFWas7lDIvmulw4INvVyViv6Z8FltyWP9wYH5w/Otb5CZA185y
+	 yFgKZFjkavV/BoS4DA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([82.135.81.227]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M3UZG-1tn2tE1ABu-00DwCy; Mon, 24
+ Feb 2025 10:38:58 +0100
+Date: Mon, 24 Feb 2025 10:38:56 +0100
+From: Peter Seiderer <ps.report@gmx.net>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Artem Chernyshev <artem.chernyshev@red-soft.ru>,
+ Frederic Weisbecker <frederic@kernel.org>, Nam Cao <namcao@linutronix.de>
+Subject: Re: [PATCH net-next v7 1/8] net: pktgen: fix mix of int/long
+Message-ID: <20250224103856.31dc0260@gmx.net>
+In-Reply-To: <20250224092242.13192-2-ps.report@gmx.net>
+References: <20250224092242.13192-1-ps.report@gmx.net>
+	<20250224092242.13192-2-ps.report@gmx.net>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeegfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeftddujeeliefhkeegkeehueekkeeivdejjeevtefhffduuddujeevueeihfehgeenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepsghjohhrnhesmhhorhhkrdhnohdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesg
- hhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-Provags-ID: V03:K1:tisrOSfy4uCVTiyzps2E/dGQ4F2zlzbHDtizmbtjmAcn4nVKxyv
+ XZ1eS2CyhWPPNl/fgHp4uGRNa/zvU1DzBVgoijD6BeivKwgwzDADhIhe2DVv6QgDQEy75rx
+ GtLCQIdYHY8x9jnLy/Sjx77/uFBPGn+mJ7VuGewIHtFIT6qPLgrZkpF2zjzxAFg5qFoYBbH
+ AM5U77NqVMLbIbFxDpXLQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:AmSkhg488Mo=;iHJ7wqyPGccxdVNfniaDHrlnSjv
+ z3GK1A0d6uwxgax1oFN+z31CkEZWbqcGaUFzG2MOATvgdDuDIKC7bDH4lKa3dPEQKoiQ01Uzg
+ ueJU6FxX67/zPE2xH54Wz8YT5ZMouuu2ZlB3LzT/rLRVMQ/dxv+jYiVZ0d8Dm8UEDdFfkQOpL
+ q2XBF//HcgYKYOylor+UYxQEEvsDUPdDLcrvaZgT+CWVRWibAKJiihxFbkafAQHQbl9tRqAbE
+ QvFzE/Adt0YCxni1I9amxOtVRh2z/TSGVPW/KI3qFERrMeZOfA0aTR6+uRL9HBTVA9Bsnq5uH
+ gMAD7CLAFx6dRBQldpobHmb+5agBboDOfhOREMcLMNYDUcRIq5zFqGHir3aa3d04aJHSK+ir4
+ WJ59S7R0iWVWQN6QsFBBH4Y0Zc3wVF6HnbV81LG5gbitOw6tWfdfrsq1ezCPtHMNGw9wQuXkJ
+ PdVW0S7IWnE2UTfV+9Ph+wZdfXcoviTa530kLpv1vsGKWL83ahTtzjZoTPAp0OJpnfakP+EtP
+ 2YMI17ff3yii1t5Lu4F3uU3YhGitxnJvkaMdCtTrHm0b/oKJArGY15p7rJ/TCORC0A53uYIOg
+ 7fhUelzRnPTcDT1YSt1G2zC+PnhD0qcIjj3qqttPtW0eUiUS4OrYyOqLnx0KNM3QC65VQ+AFc
+ F0q35wNN2AE7zXttpMB9/NzXGURhZT5FPgJl6pmXjOrKMRhRDUFH9dFdFSnMFtkPFr++buLqP
+ Y9xVIDzqRyN7O2XfffDPj8AiZteUQ2SZWvoWSZPaa7KJBsHvsKK1OBW8SHhwrLB/YxeZr8aFa
+ yRuLYlFo+1nnCG1PPd38+aKsikqtrSlVoPyrECm8kRfF2yCqQtz/L0LK5PEWduAr4Wf3ixrUj
+ CnvzlhBHekotbKA17U2v2wFMEN5U2oY0maQ1AIHMEpniXyTY2nQOWfxTGsTAFz4cM0MABsTpo
+ 8OcKFWyPoe6MIF2S9NQWTBx/+G4aiDDMvd12OA14zTsonsqCgQeZmj5oN27HakbsoWsr8gvr0
+ te25PEIBQ6Vhyf5na8+3VgWe25QPNMZtRrDAdLD6HJ86M+DGOCNtrmJEriPOpprhHGQ+GUTa/
+ BttVZkejqacglR/5BsXUtMYS2+VxFAOB0OmoPhB/Pe9UzUrQnuAgfKAYjrOW3gn+1iNmlBlY/
+ ZTTL0YXgB5R3uDV5ylVKnAiHhGrdHVTQDPjN6TXozeNA5CYYD4EDRhD0txd/1w9jTaW2wvoX9
+ 10DB5yxSBccl+wgzepqGOCF4SNXeoBITJma8/XPcp5/bbGKVUp7v5zkBHDjXOgvgBS8sOHogY
+ DlIVyokCsOhlkBEdS2b3aQVlBp+uCwxtElRgd+Vt/vIMMgIV3zQQtpfFj/Wt6ohpj40o7O8Bw
+ EdRF3Tb0YqU8xzMCj1fTZdQ2Gsa41HlV06dM9OXeXtgzMKtnzZ8BwL2j7T
 
-Hi Bj=C3=B8rn,
+Hello *,
 
-On Sun, 23 Feb 2025 19:37:05 +0100
-Bj=C3=B8rn Mork <bjorn@mork.no> wrote:
+On Mon, 24 Feb 2025 10:22:35 +0100, Peter Seiderer <ps.report@gmx.net> wro=
+te:
 
-> Maxime Chevallier <maxime.chevallier@bootlin.com> writes:
->=20
-> > Hi everyone,
-> >
-> > Some PHYs such as the VSC8552 have embedded "Two-wire Interfaces" desig=
-ned to
-> > access SFP modules downstream. These controllers are actually SMBus con=
-trollers
-> > that can only perform single-byte accesses for read and write.
-> >
-> > This series adds support for accessing SFP modules through single-byte =
-SMBus,
-> > which could be relevant for other setups.
-> >
-> > The first patch deals with the SFP module access by itself, for address=
-es 0x50
-> > and 0x51.
-> >
-> > The second patch allows accessing embedded PHYs within the module with =
-single-byte
-> > SMBus, adding this in the mdio-i2c driver.
-> >
-> > As raw i2c transfers are always more efficient, we make sure that the s=
-mbus accesses
-> > are only used if we really have no other choices.
-> >
-> > This has been tested with the following modules (as reported upon modul=
-e insertion)
-> >
-> > Fiber modules :
-> >
-> > 	UBNT             UF-MM-1G         rev      sn FT20051201212    dc 2005=
-12
-> > 	PROLABS          SFP-1GSXLC-T-C   rev A1   sn PR2109CA1080     dc 2206=
-07
-> > 	CISCOSOLIDOPTICS CWDM-SFP-1490    rev 1.0  sn SOSC49U0891      dc 1810=
-08
-> > 	CISCOSOLIDOPTICS CWDM-SFP-1470    rev 1.0  sn SOSC47U1175      dc 1906=
-20
-> > 	OEM              SFP-10G-SR       rev 02   sn CSSSRIC3174      dc 1812=
-01
-> > 	FINISAR CORP.    FTLF1217P2BTL-HA rev A    sn PA3A0L6          dc 2307=
-16
-> > 	OEM              ES8512-3LCD05    rev 10   sn ESC22SX296055    dc 2207=
-22
-> > 	SOURCEPHOTONICS  SPP10ESRCDFF     rev 10   sn E8G2017450       dc 1407=
-15
-> > 	CXR              SFP-STM1-MM-850  rev 0000 sn K719017031       dc 2007=
-20
-> >
-> >  Copper modules
-> >
-> > 	OEM              SFT-7000-RJ45-AL rev 11.0 sn EB1902240862     dc 1903=
-13
-> > 	FINISAR CORP.    FCLF8521P2BTL    rev A    sn P1KBAPD          dc 1905=
-08
-> > 	CHAMPION ONE     1000SFPT         rev -    sn     GBC59750     dc 1911=
-0401
-> >
-> > DAC :
-> >
-> > 	OEM              SFP-H10GB-CU1M   rev R    sn CSC200803140115  dc 2008=
-27
-> >
-> > In all cases, read/write operations happened without errors, and the in=
-ternal
-> > PHY (if any) was always properly detected and accessible
-> >
-> > I haven't tested with any RollBall SFPs though, as I don't have any, an=
-d I don't
-> > have Copper modules with anything else than a Marvell 88e1111 inside. T=
-he support
-> > for the VSC8552 SMBus may follow at some point.
-> >
-> > Thanks,
-> >
-> > Maxime
-> >
-> > Maxime Chevallier (2):
-> >   net: phy: sfp: Add support for SMBus module access
-> >   net: mdio: mdio-i2c: Add support for single-byte SMBus operations
-> >
-> >  drivers/net/mdio/mdio-i2c.c | 79 ++++++++++++++++++++++++++++++++++++-
-> >  drivers/net/phy/sfp.c       | 65 +++++++++++++++++++++++++++---
-> >  2 files changed, 138 insertions(+), 6 deletions(-) =20
->=20
-> Nice!  Don't know if you're aware, but OpenWrt have had patches for
-> SMBus access to SFPs for some time:
->=20
-> https://github.com/openwrt/openwrt/blob/main/target/linux/realtek/patches=
--6.6/714-net-phy-sfp-add-support-for-SMBus.patch
-> https://github.com/openwrt/openwrt/blob/main/target/linux/realtek/patches=
--6.6/712-net-phy-add-an-MDIO-SMBus-library.patch
->=20
-> The reason they carry these is that they support Realtek rtl930x based
-> switches.  The rtl930x SoCs include an 8 channel SMBus host which is
-> typically connected to any SFP+ slots on the switch.
->=20
-> There has been work going on for a while to bring the support for these
-> SoCs to mainline, and the SMBus host driver is already here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
-/drivers/i2c/busses/i2c-rtl9300.c?id=3Dc366be720235301fdadf67e6f1ea6ff32669=
-c074
->=20
-> I assume DSA and ethernet eventually will follow, making SMBus SFP
-> support necessary for this platform too.
->=20
-> So thanks for doing this!
+> Fix mix of int/long (and multiple conversion from/to) by using consequen=
+tly
+> size_t for i and max and ssize_t for len and adjust function signatures
+> of hex32_arg(), count_trail_chars(), num_arg() and strn_len() accordingl=
+y.
+>
+> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
 
-Good to know this is useful to you ! So there's at least 2 different
-classes of products out there with SMBus that advertise that it's
-"designed for SFP" ._.
+Actual missing the rev-by Simon Horman given for the v5 version of the
+patch set (see [1]) and indicated in the change description v5->v6...
 
-> FWIW, I don't think the OpenWrt mdio patch works at all.  I've recently
-> been playing with an 8 SFP+ port switch based on rtl9303, and have tried
-> to fixup both the clause 22 support and add RollBall and clause 45.
-> This is still a somewhat untested hack, and I was not planning on
-> presenting it here as such, but since this discussion is open:
-> https://github.com/openwrt/openwrt/pull/17950/commits/c40387104af62a06579=
-7bc3e23dfb9f36e03851b
->=20
-> Sorry for the format.  This is a patch for the patch already present in
-> OpenWrt. Let me know if you want me to post the complete patched
-> mdio-smbus.c for easier reading.
->=20
-> The main point I wanted to make is that we also need RollBall and clause
-> 45 over SMBus.  Maybe not today, but at some point.  Ideally, the code
-> should be shared with the i2c implementation, but I found that very hard
-> to do as it is.
+Regards,
+Peter
 
-I don't have anything to test that, and yeah that can be considered as
-a second step, however I don't even know if this can work at all with
-single byte accesses :(
+[1] https://lore.kernel.org/netdev/20250216135748.GD1615191@kernel.org/
 
-Thanks,
+> ---
+> Changes v6 -> v7
+>   - rebased on actual net-next/main
+>   - no changes
+>
+> Changes v5 -> v6
+>   - adjust to dropped patch ''net: pktgen: use defines for the various
+>     dec/hex number parsing digits lengths'
+>   - add rev-by Simon Horman
+>   - fix line break (suggested by Simon Horman)
+>
+> Changes v4 -> v5
+>   - split up patchset into part i/ii (suggested by Simon Horman)
+>   - instead of align to most common pattern (int) adjust all usages to
+>     size_t for i and max and ssize_t for len and adjust function signatu=
+res
+>     of hex32_arg(), count_trail_chars(), num_arg() and strn_len() accord=
+ingly
+>   - respect reverse xmas tree order for local variable declarations (whe=
+re
+>     possible without too much code churn)
+>   - update subject line and patch description
+>   - fix checkpatch warning '"foo * bar" should be "foo *bar"' for
+>     count_trail_chars() and strn_len()
+>
+> Changes v3 -> v4
+>   - new patch (factored out of patch 'net: pktgen: fix access outside of=
+ user
+>     given buffer in pktgen_if_write()')
+> ---
+>  net/core/pktgen.c | 38 ++++++++++++++++++++------------------
+>  1 file changed, 20 insertions(+), 18 deletions(-)
+>
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index 55064713223e..cd6b6c0dc0dc 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -746,10 +746,11 @@ static int pktgen_if_show(struct seq_file *seq, vo=
+id *v)
+>  }
+>
+>
+> -static int hex32_arg(const char __user *user_buffer, unsigned long maxl=
+en,
+> -		     __u32 *num)
+> +static ssize_t hex32_arg(const char __user *user_buffer, size_t maxlen,
+> +			 __u32 *num)
+>  {
+> -	int i =3D 0;
+> +	size_t i =3D 0;
+> +
+>  	*num =3D 0;
+>
+>  	for (; i < maxlen; i++) {
+> @@ -768,10 +769,9 @@ static int hex32_arg(const char __user *user_buffer=
+, unsigned long maxlen,
+>  	return i;
+>  }
+>
+> -static int count_trail_chars(const char __user * user_buffer,
+> -			     unsigned int maxlen)
+> +static ssize_t count_trail_chars(const char __user *user_buffer, size_t=
+ maxlen)
+>  {
+> -	int i;
+> +	size_t i;
+>
+>  	for (i =3D 0; i < maxlen; i++) {
+>  		char c;
+> @@ -793,10 +793,10 @@ static int count_trail_chars(const char __user * u=
+ser_buffer,
+>  	return i;
+>  }
+>
+> -static long num_arg(const char __user *user_buffer, unsigned long maxle=
+n,
+> -				unsigned long *num)
+> +static ssize_t num_arg(const char __user *user_buffer, size_t maxlen,
+> +		       unsigned long *num)
+>  {
+> -	int i;
+> +	size_t i;
+>  	*num =3D 0;
+>
+>  	for (i =3D 0; i < maxlen; i++) {
+> @@ -812,9 +812,9 @@ static long num_arg(const char __user *user_buffer, =
+unsigned long maxlen,
+>  	return i;
+>  }
+>
+> -static int strn_len(const char __user * user_buffer, unsigned int maxle=
+n)
+> +static ssize_t strn_len(const char __user *user_buffer, size_t maxlen)
+>  {
+> -	int i;
+> +	size_t i;
+>
+>  	for (i =3D 0; i < maxlen; i++) {
+>  		char c;
+> @@ -844,9 +844,9 @@ static int strn_len(const char __user * user_buffer,=
+ unsigned int maxlen)
+>  static ssize_t get_imix_entries(const char __user *buffer,
+>  				struct pktgen_dev *pkt_dev)
+>  {
+> -	const int max_digits =3D 10;
+> -	int i =3D 0;
+> -	long len;
+> +	const size_t max_digits =3D 10;
+> +	size_t i =3D 0;
+> +	ssize_t len;
+>  	char c;
+>
+>  	pkt_dev->n_imix_entries =3D 0;
+> @@ -895,9 +895,9 @@ static ssize_t get_imix_entries(const char __user *b=
+uffer,
+>  static ssize_t get_labels(const char __user *buffer, struct pktgen_dev =
+*pkt_dev)
+>  {
+>  	unsigned int n =3D 0;
+> +	size_t i =3D 0;
+> +	ssize_t len;
+>  	char c;
+> -	ssize_t i =3D 0;
+> -	int len;
+>
+>  	pkt_dev->nr_labels =3D 0;
+>  	do {
+> @@ -956,7 +956,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>  {
+>  	struct seq_file *seq =3D file->private_data;
+>  	struct pktgen_dev *pkt_dev =3D seq->private;
+> -	int i, max, len;
+> +	size_t i, max;
+> +	ssize_t len;
+>  	char name[16], valstr[32];
+>  	unsigned long value =3D 0;
+>  	char *pg_result =3D NULL;
+> @@ -1883,7 +1884,8 @@ static ssize_t pktgen_thread_write(struct file *fi=
+le,
+>  {
+>  	struct seq_file *seq =3D file->private_data;
+>  	struct pktgen_thread *t =3D seq->private;
+> -	int i, max, len, ret;
+> +	size_t i, max;
+> +	ssize_t len, ret;
+>  	char name[40];
+>  	char *pg_result;
+>
 
-Maxime
 
