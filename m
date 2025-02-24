@@ -1,101 +1,128 @@
-Return-Path: <netdev+bounces-169017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B8CA420A4
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:31:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12BA2A420D6
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA9E17A2B23
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:30:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B924169B17
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CBB23BCE8;
-	Mon, 24 Feb 2025 13:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A46024886A;
+	Mon, 24 Feb 2025 13:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xlxUzMBl"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MXBoTjUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FBE1DACA1;
-	Mon, 24 Feb 2025 13:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6491624889B;
+	Mon, 24 Feb 2025 13:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740403913; cv=none; b=AmD8BiGFEdcQ2/kpukRvV3iIDORbgf660l8YD1UzqFmvVxxSZqHwcyvEOzOUoXRd5PxgSQRyKzoujesBjO64sLzaDVTnFlfKFRNL8QoanqNqFXWVt5teFyOE8u8rR8rMehnnbTlSe9fZSbNvHGcwDZ5R0YcIALVfUKnUcTPKrtA=
+	t=1740404028; cv=none; b=mpELaj2H/d71GH1uLe2+BE8RkXjHWecOP2x8WRrjXOOdwDrdFjDWba1catR5tcF9KQYMqAACFNZiHm7c8v3ze1r44Yp0Fv34BqMAzkZk0AOMj/uazRXEJYmUPbHxdJYOwMqbRi2hBQBseisnUeAqI3TqQAUPcEjqCNkYZ1tPLEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740403913; c=relaxed/simple;
-	bh=N7H3lcseBwrt2LpQoJb1h1KpVqI7UGXZ/rgcJ04vhZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LfbIIo3TvttM6gNEVim8USAFIkz9Nk9alyY6efuiSSMOOjiOqlnEfT+SVdfSgL+eqE4ILY6Sw8XjkleWAmJLUbHSKKTrDJTr8v4IIlmiI9UFvietz1ZdfQQb3y/XdrGoY8lhkP5XNDAzzHz+eDc5PuBfJlf28qgnu9pGjBD/+5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xlxUzMBl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3UjwgQbSq/Gm2Q1/ZS3x1PVVVlPqGioobTaKF3okpsk=; b=xlxUzMBll/3CDSt/Xozd/5RN+M
-	qqDxZcCgljY8cM6UJ3qcigv2eXTqXtY/D6LIsYBP7IfUB6RDrbMOrR9zWZpOU25IQ6PyKOXUuUW7X
-	eHahzsVG5z0g1aUNsHsdhbsZUASOp8264r/wayMtoXx0OPYSRwk4co1ENUGdY9CwNecM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tmYYh-00HAYs-0X; Mon, 24 Feb 2025 14:31:43 +0100
-Date: Mon, 24 Feb 2025 14:31:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <7c456101-6643-44d1-812a-2eae3bce9068@lunn.ch>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
- <87r03otsmm.fsf@miraculix.mork.no>
- <Z7uFhc1EiPpWHGfa@shell.armlinux.org.uk>
- <3c6b7b3f-04a2-48ce-b3a9-2ea71041c6d2@lunn.ch>
- <87ikozu86l.fsf@miraculix.mork.no>
+	s=arc-20240116; t=1740404028; c=relaxed/simple;
+	bh=2dHd4KnjPWv2ykRzFr7ZhW+iP+q3WqoFHN6uZ4GxReo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BvY52QgfEdcTxZCGpLwEcBpGUEFoIvqXuBPCCyocVj28S2xu4oE8v0DmZZDZZ0WST6f8CIIbr5+W0E+B+unWVRRPG6K+UnLl0KBI0ndT1RykILhpm61AgIZ/E9OD1xRskEPwL3zXEfNSN/dR0ITtRe9p33235fYiX8KaVUQT6Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MXBoTjUs; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A855B204D6;
+	Mon, 24 Feb 2025 13:33:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740404023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2dHd4KnjPWv2ykRzFr7ZhW+iP+q3WqoFHN6uZ4GxReo=;
+	b=MXBoTjUsFDtLVczTsN4dMXf43jF2koAdK5EIfBKg4ENAdHqXp5w2JEb1xVZAL6fqsOKdRq
+	U0rOBTWHDmhx0vGFHc32l5Y4k0HmuAK8EEGnvezGIjoE8XSQsC31wsDM/+UPAp/HxBrXQ0
+	Nfx8PuANGov2QhT2D8jqZHHqulPFcj164vujplLNOH8h6mV/JDF7kDNJ9qjKTFa4PbCr2S
+	lqrN8qM/9KDYn/eiCl4tLrb8SQ0YrEjJ4toQ/rvdYwicwc+hWZzm3pmrCEJ9Lu3fg7DeqM
+	Mq/3B4D585JjQveoylMrg/DJD2OK+Y5LfbtXioJHcnOu6pUB5R/5MtsurRT0eQ==
+Date: Mon, 24 Feb 2025 14:33:39 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
+ Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next 05/13] net: phy: Use an internal, searchable
+ storage for the linkmodes
+Message-ID: <20250224143339.3e9ba797@kmaincent-XPS-13-7390>
+In-Reply-To: <20250222142727.894124-6-maxime.chevallier@bootlin.com>
+References: <20250222142727.894124-1-maxime.chevallier@bootlin.com>
+	<20250222142727.894124-6-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ikozu86l.fsf@miraculix.mork.no>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepv
+ gguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-> What do you think will be the effect of such a warning?  Who is the
-> target audience?
+On Sat, 22 Feb 2025 15:27:17 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-It will act as a disclaimer. The kernel is doing its best with broken
-hardware, but don't blame the kernel when it does not work
-correctly....
+Only small typos:
 
-> You can obviously add it, and I don't really care.  But I believe the
-> result will be an endless stream of end users worrying about this scary
-> warning and wanting to know what they can do about it.  What will be
-> your answer?
+> The canonical definition for all the link modes is in linux/ethtol.h,
 
-I agree that the wording needs to be though about. Maybe something
-like:
+ethtool
 
-This hardware is broken by design, and there is nothing the kernel, or
-the community can do about it. The kernel will try its best, but some
-standard SFP features are disabled, and the features which are
-implemented may not work correctly because of the design errors. Use
-with caution, and don't blame the kernel when it all goes horribly
-wrong.
+> which is complemented by the link_mode_params array stored in
+> net/ethtool/common.h . That array contains all the metadata about each
+> of these modes, including the Speed and Duplex information.
+>=20
+> Phylib and phylink needs that information as well for internal
+> managmement of the link, which was done by duplicating that information
 
-	Andrew
+management
+
+> in locally-stored arrays and lookup functions. This makes it easy for
+> developpers adding new modes to forget modifying phylib and phylink
+> accordingly.
+>=20
+> However, the link_mode_params array in net/ethtool/common.c is fairly
+> inefficient to search through, as it isn't sorted in any manner. Phylib
+> and phylink perform a lot of lookup operations, mostly to filter modes
+> by speed and/or duplex.
+>=20
+> We therefore introduce the link_caps private array in phy_caps.c, that
+> indexes linkmodes in a more efficient manner. Each element associated a
+> tuple <speed, duplex> to a bitfield of all the linkmodes runs at these
+> speed/duplex.
+>=20
+> We end-up with an array that's fairly short, easily addressable and that
+> it optimised for the typical use-cases of phylib/phylink.
+>=20
+> That array is initialized at the same time as phylib. As the
+> link_mode_params array is part of the net stack, which phylink depends
+> on, it should always be accessible from phylib.
+
+The rest looks ok for me.
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
