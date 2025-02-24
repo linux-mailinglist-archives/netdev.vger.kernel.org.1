@@ -1,190 +1,213 @@
-Return-Path: <netdev+bounces-169114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEB70A429C7
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:31:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA6A6A429C3
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411903A6C62
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:28:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B4E2188E98F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C04262809;
-	Mon, 24 Feb 2025 17:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B701726560F;
+	Mon, 24 Feb 2025 17:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="oG5JBKWt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWlJOvps"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2043.outbound.protection.outlook.com [40.107.103.43])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B17262D37;
-	Mon, 24 Feb 2025 17:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740418041; cv=fail; b=ugdIqcT4JHkwixYj4EcisuzWUOArgVhPQw+Yg3eW7i/u6RFh71UTpu2z/NNOSIDwp0o0BZ3E8TpsPzu6hgnpc1x0F+ZyXWSoSk1f7PYPvjZzfPnkZ47oFDiVID5D4FKQbBUvewptGGNX1UOfgfYT1ZKnkKGu3+ypKx4VLluOBs8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740418041; c=relaxed/simple;
-	bh=5KCBV0ux8UGCD1/wmChbl/z+nPJjN19hatRf9RBQxM8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Rupkq9CJzo9oaptiuCduATy1A7PL50rLHRKTZGiv5NZYxYLFoGgz2+oi3Gdll62eYMTAYzOUhTGGn+5QHOQgEtDtchng6HHroGZAPRA1MxiEvjRSzMQ2WtZ0wRihmIrULFjMkc1hCnccnGZZ4FPIBeOL50VyuQMXZZBo8ztDPsQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=oG5JBKWt; arc=fail smtp.client-ip=40.107.103.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uBsaPIxfMOTv72ZbWcYLM2dZ/MTjsfC/Fa2edRUXnnTjsJJ9FfRZRTy0cDdh5y3UZCyXHRldmHrz+Mq7XnVYLky6rKoFBKcQ4ye2vPr6/UHWyrjdqP4OI0zD6+ijODXp+LtXa/UVOeW6MGLt1PYLSTp+rFPd8IYuxkm860NgjXm4+WLGjo/A6/jcgIXmGipzOEW0xc11P3Dpur+JASGK0QANfKgyAMWBOEnUbt/04mgnNrtkYRW/RMl4njaAtQJ0kMLOYoEDBIi9DJOtWoaaVC+UsPMEJIo3WD5g66cJXhsmYXfiG92rR+vxcNP/DpDA+WQsBfTnip99f2eanuj2qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5KCBV0ux8UGCD1/wmChbl/z+nPJjN19hatRf9RBQxM8=;
- b=wGgmgaE+aPNcT5uFfUeYLHnO21VffGnf6mPzEFeUqHl7UVkCwgWHtW8XfXyEIHA44RVWu0UjmuYN1hQy3i7+UKVa5NKaSR+BBq5v7C5gTt1hg4th2jT0OUetFjj3WV0LSidS0rLLLbMvAuZ9EvdMuwdZSjDbODj2FvlZaMMEwMJ/kb0Wmm/Rqm2F1o6QvhBmoaf9qMgpDjFP/DFk8dYjtgI8/SgmEXL03tqBGlCZu8uIPLQnY98fLQdxAWAnA/G0Ubk6cKoAWpTFGfNz5LH6ILlnwjDfEeWX6ls/y6m7Xn1jWKLzkYaTirKWM1un0xHmd5FXa8rhz6gr6eCGDzSTAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5KCBV0ux8UGCD1/wmChbl/z+nPJjN19hatRf9RBQxM8=;
- b=oG5JBKWtqp3axCbxgepowTu81vxInrO3NJNGhn0ySfZF/akRW70rudZpHAM3U6G7ki4TUJtIQt7Ee+RFICvgecBYxQUW6MqzXbyECjXdJM4I12AVGEPrP3fp/evUz/MMlphV/MuSIWaoORoJ9t1zl3fBqHH67N3cVvpoT3ExwujmcCgZLicteirx05c9VPJls77JdqIGW5cI8w/044RVijTaxOBlp9xC5jWnTy8TX29Awpw6S8vfUlRikNANV1pChGwjIvZDfxmmtmp0lLjYSMrTuX2aDsbShyqC+R7qnyj8W4pZ0ifkDNVqMAFpHD8fr8nOiTQyxBBkJjpAAYMEZg==
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com (2603:10a6:20b:42c::17)
- by VI2PR04MB11169.eurprd04.prod.outlook.com (2603:10a6:800:299::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.26; Mon, 24 Feb
- 2025 17:27:13 +0000
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684]) by AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684%7]) with mapi id 15.20.8445.013; Mon, 24 Feb 2025
- 17:27:13 +0000
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: Ioana Ciornei <ioana.ciornei@nxp.com>, "Y.B. Lu" <yangbo.lu@nxp.com>,
-	"michal.swiatkowski@linux.intel.com" <michal.swiatkowski@linux.intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH v3 net 2/8] net: enetc: keep track of correct Tx BD count
- in enetc_map_tx_tso_buffs()
-Thread-Topic: [PATCH v3 net 2/8] net: enetc: keep track of correct Tx BD count
- in enetc_map_tx_tso_buffs()
-Thread-Index: AQHbhq9y+DDo2BO/uUaRTnlkOTNY5bNWtP4g
-Date: Mon, 24 Feb 2025 17:27:13 +0000
-Message-ID:
- <AS8PR04MB88498F1FED4B4BD367D4B9E996C02@AS8PR04MB8849.eurprd04.prod.outlook.com>
-References: <20250224111251.1061098-1-wei.fang@nxp.com>
- <20250224111251.1061098-3-wei.fang@nxp.com>
-In-Reply-To: <20250224111251.1061098-3-wei.fang@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR04MB8849:EE_|VI2PR04MB11169:EE_
-x-ms-office365-filtering-correlation-id: c84e7b31-9fa6-48fa-00fb-08dd54f87a18
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?hVDTsSsyk6KNwrGWHUgHQDbWF6l6HBinnmwR99r8TbBNq/w8u2QtiBVZxAIA?=
- =?us-ascii?Q?Y0F/xnQwqUrPAaSvjuxaS7pRHOCy5Su8oRQnHvFfDDqjaxETcd03ghevSZu/?=
- =?us-ascii?Q?5Z83RuThgzef3C3TPUx+ARNdRuH5P00Di0C1bxq+O7i9bRVd29ppbu0bMEos?=
- =?us-ascii?Q?BxLbd48Rj+nwFG32kGmv7IdtNrhPzf4hm0ZzHMt3/631MvlZfHJohzKeJH/0?=
- =?us-ascii?Q?PrgakwVmxD42Q8f9/hV4LJm4AOqjlwkpAeC20Pxu3Mr0N6BvPWvUUA7YUPrd?=
- =?us-ascii?Q?uJywDS/HT5O4vGaaPUcWL4HgmEIgjXaQOx1jd+ukkJpJk30y+AMBvFh+91B9?=
- =?us-ascii?Q?APFF5yYhgyDgJ5ytnzobzyGWSxZJ+uptLyAcsdlEpubDzLRaHPGma4xU5vB1?=
- =?us-ascii?Q?utNSj/e4ub3YwlzYYvMflB1tBFwd3kBaYN1gpWZeYEoCxb02jRnHEnA9Gn2V?=
- =?us-ascii?Q?N6jLeYce0h418hIw81enRXBhFfAcdoiOlAjM8j6wNWjAyQPjt7xix0blHsSq?=
- =?us-ascii?Q?XatPYp1Zn24Qz8bQo+Mtzsnw3TSZik6lPViJ2T4VrxVY1Y80q/YzoJITZJHZ?=
- =?us-ascii?Q?SdfjbkVquUN55a6xUK7GwqNxP0yF5cuVfp1+GTmGrb65PNgIHSjpWifkM/99?=
- =?us-ascii?Q?Uts1GtTrfCT5cgRBd4mTHGP34XyjMbq7ELErmhLdKzgOQvTPjj0Re+hfknej?=
- =?us-ascii?Q?keSx2vj1p398dI/Z9c2eBS68Kk7zjzFEQHFXDCAea7R+Cz4OSFt8/vMW97r+?=
- =?us-ascii?Q?rgcdQ1MG1fd0icOXi+ftmLYE0boYmoB/zB4L2IHSB1/KFkCrGlqVC+J++MlU?=
- =?us-ascii?Q?PR3GLRYgBr9VWxmj8ttYlQhEVub2njbrKAIB1Q3TUbQ1+FjjKYJO2Og8kJBI?=
- =?us-ascii?Q?Lht1eWJhbk0LKJdPQCWW6vytLdNtiadqcYHdLQTFEIO8tqf1Q0PYwj7TfUTt?=
- =?us-ascii?Q?ERVBk9eRWtENPTWFE1vDHDu2O/0uYChBsEJoKx237UWD8ne8U215Wn891w5X?=
- =?us-ascii?Q?yy9nJq3BurLIKRgvzC7j6EATm4+3Z3FgTZNbaPH6vaFWuLQ7vrvwB18aD6cc?=
- =?us-ascii?Q?f3KAIsoUExRAfaza6O1sFhQdwgSNGu40f/GxfsR2Ohq+kRiFZlrX8cDBV9AF?=
- =?us-ascii?Q?tjq7fPMyMBz0RSgLc4qH63eKZze6dixgorjlJ08F8aActqnappq0nbuJ6Tm7?=
- =?us-ascii?Q?4eIu58CdNLMcLYtNQPrNLm4qIfwxGo/E7aussrF37YmyOM2nSoVu1hC0tpAG?=
- =?us-ascii?Q?U25HmemrQAQpnfYkxFgUh4gNSR/wbDPIzy9GLiM2hFeaJ5GVypxbIKAfH/9L?=
- =?us-ascii?Q?KTigLr95zShGlVwDD2xGjtSDzXaz1x4S9QuH00JPPQBLQi/Cgv0moFO2Oh/1?=
- =?us-ascii?Q?U+9STbbC0VxlQgNpDkzOjKzu0MAaEdrOP67btzB2Itdsxp9jl2NRC+Ekb3wO?=
- =?us-ascii?Q?bqQDP0tW6C8gq4I5LVLiqaL4gV05ci1J?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8849.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Iy4HqYjrCYQ+NAUGHnoHZszPtqrnl3IuDfF0gA+HkGZeu5+bgNczKHPohZpu?=
- =?us-ascii?Q?S/92g8I+11Zu2zQW5/NGhcHbJf7EITYKSCEmcX1sGCol44JHU3A0saglLLyd?=
- =?us-ascii?Q?7aCIjDKAD5PxGGjkXoGhg56TLFTDcZUCXtX+qu8F/sIlDdRjGd1ojY2qmwul?=
- =?us-ascii?Q?HUdWLX8GyoOpc4n8gBs5fI2m3LQ2lFO2kdRhtjq2+jRnpS+sVVkqKhmR39hB?=
- =?us-ascii?Q?yUlQyllWwkqYlRl6mVPzEuBjw+ClK8ld/DgZe0j9gMlf7n6ex5L7wRFgm4rh?=
- =?us-ascii?Q?YZwiwHavoJ0vmw2WM041mhNub0iNOSPNeQsftxkhU0uJ3nLWtqaKSnRnZ3Y/?=
- =?us-ascii?Q?jBrRKfatdS1pL2E6XIvkfdr5XHNCYpodUJB7rqYrut6O+5b1jTKYp8MJlyFG?=
- =?us-ascii?Q?mWBOg/9/vLeqcshcnmTY6nGnbyAt5YT7SEWNbr0IXK6GlZJUlEju3j83RDp9?=
- =?us-ascii?Q?nSjEQXxt/Q27Yfm297WG/Jr0dic58V8U4AIyj3DQGT2Is25hjZaDYenDeURZ?=
- =?us-ascii?Q?CLzWbyLn0I1Pf7hzwpeucbNMhZ+3bUZ09XlbzOpDx/Fo850acEh0zbh48Bcj?=
- =?us-ascii?Q?fcCaXMiTnG8ngxXR98VeOZCucCybWfrKSkIZTBMq09v9eLThKtIM+KJIzqsE?=
- =?us-ascii?Q?bRrh3KVI0NRwraAz0v3q/NOHED2vBpzwxD07SipNnzm1s6fc/4i2ERtTn5ki?=
- =?us-ascii?Q?Heilci935Aa/mabW62h9Ydfq9BM7Z1iOQBz6nerG6veU6z1Ysqhvfy9h5C5q?=
- =?us-ascii?Q?/eZPRWYa1UCyPNTayeBYSet4/qEKhjin6cpBOAL2G+/fkQBd2g8kIfSDagxR?=
- =?us-ascii?Q?Km3VpRX+gfo++dHXCETAZiaiTyrM0W1u3EwdnS7YlvDwEIeTrhhd4V2rxH+R?=
- =?us-ascii?Q?jpNUeAIsUUsDJwTJeMgw2v1tNr9/0mnuSpO218o0F3xPiOs2evbqUMsE9CER?=
- =?us-ascii?Q?G7tru6lfqtXw7X2sMs7kLPH/29atpYllf3VZUgGhQSel7vCb155Pl/MpkEKY?=
- =?us-ascii?Q?bSJ03oqz8xHtuoLmKukclskqL8+vm+LycpU1tBGO8p4zz9xQqpYPSFdYioAT?=
- =?us-ascii?Q?k80NAcpJ8xtkT3rhgz/cnzEEG8R9qxR+B/S4gQ/xdMbCmA0icz0m6RWE7GCd?=
- =?us-ascii?Q?d8MMWucRV8L9Q02nPuSPXKtkZy/ij7/r5H74+6N+HLGW+4p6BdTjPob3JYAz?=
- =?us-ascii?Q?zkr5tlSNf/R5HoJWgr9nzMTbe3QxtKaseWTxX9rJLYjrdPB+JeORVmkoDL5S?=
- =?us-ascii?Q?KIVHSBdrQRNZvbBm0RHXWEHFiKiAkTrE6Ycy/wY7ZSxcvYlULmQ+XwMokk+D?=
- =?us-ascii?Q?T2gjs0qzJARLhZQrmPI4v+NHQ5gkVYKzJD5FyGszDKN776JEwU15sTHxie1/?=
- =?us-ascii?Q?0hpGXUAHFcOFS0AN/RKeNQwK3vLUwNAjaWN8U4H8kr17OCLQRWuywG7Z053V?=
- =?us-ascii?Q?9Fo87hm7SsxQo117ZNFlVcc1pE8QT/DF8amwUGrnq4QXOLNsTOQhLDBCra46?=
- =?us-ascii?Q?KHPEHjJO4UzB8rDR7boWoeBZP/Ag1xjyQx46XZrFje9ALvUi4V3tpy5mglnV?=
- =?us-ascii?Q?21/wksfKM0ArzJsTcgEvBk1xKLrXBW9FPwK4aFxK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FE1264613
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 17:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740418085; cv=none; b=cTA89looRL1GcZC//eyOc3G4ln1RkfOhYjPCRZ0cbzZmuw7A68UG/raatHlYY3vgxOw9jVcoKCFXqUOAxdvxmlSWOhmCfbu0w2LUVXHvWr2Nw/F2mvTXlLhmKkoWvuyDqdbKAs6lHvtvO+dL7J2OY985NdPNi5J7H7e5x0Mbc6Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740418085; c=relaxed/simple;
+	bh=RCQ9NA0K8F4QBrplAQzVHFLsVqL7FvrrFe0zodxcmns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XhDP6zUogkdS/pP7mhjAiaQJ6sIFfz8p2QjhK7UzIZQrsC346PgMW3Meg6kNXeO3pAZRRVb3HzPaS8wW3//w+u3invF/wYGjItonDSH++kFb+3DdUAUv+47jes6o1rsafcYMRY3hOrBZT7I5KGYqYtQEDpmvWle8BNm77N1M85I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GWlJOvps; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740418082;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6HxVWH4sT/O5UUwrwlG8z94/6x2ivxPf/BjQ/uICxxM=;
+	b=GWlJOvps+o8T03xgFDf6Y1mWhk6Sc9T0E0coOsYjd2nuHykpt1nc6y48ASfAzTEU1jRKdT
+	/PKlcgHuxkHMcE5MHPJcVg+5fHGoddIvZSxbrOzmbGD7np42JC8vLBHYov5otOC/+bGP9A
+	kKHdNIkKbR7XFnImxnZ9rmqergWyIUg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-388-cUKKvoQQNSesIOaQytEqVQ-1; Mon, 24 Feb 2025 12:28:01 -0500
+X-MC-Unique: cUKKvoQQNSesIOaQytEqVQ-1
+X-Mimecast-MFC-AGG-ID: cUKKvoQQNSesIOaQytEqVQ_1740418080
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4394c489babso25830535e9.1
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:28:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740418080; x=1741022880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6HxVWH4sT/O5UUwrwlG8z94/6x2ivxPf/BjQ/uICxxM=;
+        b=U3gNDQT6oECBfqsr7BCxsGFHlnvY9AOfi+MxzfnBOJVC3KxMMX7o11F2HXJe/A4U/G
+         UfTSQNlCwoc6PkQoteemcM39riioYILeyNUAEMnDoqRC2q/mugXQ+hM8LCnDQ5ATgPaL
+         O/xKlSm6rlwceUnOBqR5xKTqu9XBy3hB/98ax0Mp7ARTlgdVvN49PJFRuR4yvc5Zqadl
+         BhBooE7e0S7HNOEogmJKCjoJCXqxEmkZIcgc8y7/IMKWVbz0QEyQzlmKsSCIzntFG6Is
+         hP4vl62Uq3Ksxz08T9Tw2TG7kUh06UscoPvx4myUSNYXQUY+33IUqTF1Jinx5YfD0RMc
+         Oelg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvBAfQjoNpVup0+fJbxdPXIlsVFTuUU1fvOcl74IFuAmVtgw/nAFKk0ZTk7XHccZaeUXZTI2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywp9LapEbPpENa1ldcdMROKRK2L2hnv6h7hDH/Znxl461anZFox
+	rV8snS9vXG62BYYlo99yH6cug2OaR5R713B/GxijeSH+dUbbfOHOZpVnM71BiyTJUBT/XygoRGG
+	Qb++1NpW6tHG+3GFBVlzWYkCmNKiwI3rAre4H459Zgdf4IEnpkhlyTA==
+X-Gm-Gg: ASbGncv8C8HPv8ihub/9UKn631TOFuZgte6aFQKo9ymvAYMb8EWLtRVTLHPcVy5gnmJ
+	4B84MEZX9tojyJm8cCKtUOonv2TFdaBjXFbIGY/DlVvn4pVtkLs/H5pUTtr45YkYxIfieaRd1xP
+	IdH/6uz/AUm+Lf2L/li0gAwhyBR/IWI9fHt80WEXsyGXsMMzMhJEnmoFEl697nbha84DqWkGfbM
+	nI2r8XxwiuTOn6tJ4pkIQ83LiX442qn+EUxVhhZmWZLL/2uDKRzOLtJUvuvhec6qewLiO5xD1g7
+	ZBs=
+X-Received: by 2002:a05:600c:468e:b0:439:9828:c44b with SMTP id 5b1f17b1804b1-43ab0f3ccddmr1505725e9.14.1740418080061;
+        Mon, 24 Feb 2025 09:28:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHRmQ8RM+y+/J+KDbrVfaH0j+iu/NZY1piRY61UaE4/1JgE02nhnCocoZohhxlX6dSptlrHEw==
+X-Received: by 2002:a05:600c:468e:b0:439:9828:c44b with SMTP id 5b1f17b1804b1-43ab0f3ccddmr1505485e9.14.1740418079714;
+        Mon, 24 Feb 2025 09:27:59 -0800 (PST)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02ce65dsm112835695e9.1.2025.02.24.09.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 09:27:59 -0800 (PST)
+Date: Mon, 24 Feb 2025 18:27:56 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Antonio Quartulli <antonio@mandelbit.com>
+Subject: Re: [PATCH net v2 1/2] gre: Fix IPv6 link-local address generation.
+Message-ID: <Z7ysHMi4NociwDgR@debian>
+References: <cover.1740129498.git.gnault@redhat.com>
+ <942aa62423e0d7721abd99a5ca1069f4e4901a6d.1740129498.git.gnault@redhat.com>
+ <Z7sfmLG4V_kHKRfy@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8849.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c84e7b31-9fa6-48fa-00fb-08dd54f87a18
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2025 17:27:13.3234
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hk4UjGoMcB9RO9K59DXInwQrQIpGNk4UbIKgIb+tGaWuUaGDuGjJOS5v0j2uv3Gt7d+UU5249QEn7JbADOv41w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB11169
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7sfmLG4V_kHKRfy@shredder>
 
-> -----Original Message-----
-> From: Wei Fang <wei.fang@nxp.com>
-> Sent: Monday, February 24, 2025 1:13 PM
-[...]
-> Subject: [PATCH v3 net 2/8] net: enetc: keep track of correct Tx BD count=
- in
-> enetc_map_tx_tso_buffs()
->=20
-> When creating a TSO header, if the skb is VLAN tagged, the extended BD
-> will be used and the 'count' should be increased by 2 instead of 1.
-> Otherwise, when an error occurs, less tx_swbd will be freed than the
-> actual number.
->=20
-> Fixes: fb8629e2cbfc ("net: enetc: add support for software TSO")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
+On Sun, Feb 23, 2025 at 03:16:08PM +0200, Ido Schimmel wrote:
+> On Fri, Feb 21, 2025 at 10:24:04AM +0100, Guillaume Nault wrote:
+> > Use addrconf_addr_gen() to generate IPv6 link-local addresses on GRE
+> > devices in most cases and fall back to using add_v4_addrs() only in
+> > case the GRE configuration is incompatible with addrconf_addr_gen().
+> > 
+> > GRE used to use addrconf_addr_gen() until commit e5dd729460ca
+> > ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL
+> > address") restricted this use to gretap devices and created
+> 
+> It's not always clear throughout the commit message to which devices you
+> are referring to.
 
-Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
+Yes, that's a problem I had when writing the commit message: I couldn't
+find a proper way to name the different GRE device types unambiguously.
+
+By reusing the device types of "ip link" we don't know if "gre" refers
+to all GRE types or if it's only for IPv4 encapsulation. But using the
+ARPHRD_* types wouldn't help, as that wouldn't allow to distinguish
+between gretap and ip6gretap.
+
+Maybe the following terms would be clearer:
+'ip4gre', 'ip4gretap', 'ip6gre', 'ip6gretap' (and potentially 'ipXgre'
+and 'ipXgretap' when considering both the IPv4 and IPv6 tunnel
+versions). Would you find these terms clearer?
+
+> For example, here, by "gretap" you mean both "gretap"
+> and "ip6gretap", no?
+
+Yes.
+
+> BTW, I believe the check against 'ARPHRD_ETHER' in addrconf_gre_config()
+> is dead code. addrconf_gre_config() is only called for ARPHRD_IP{,6}GRE
+> devices.
+
+Yes, that was dead code. But I'm reusing that condition to minimise
+code changes so to make the fix simpler. Do you mean I should write
+explicitely, somewhere, that it was dead code but isn't anymore?
+
+> > add_v4_addrs() (borrowed from SIT) for non-Ethernet GRE ones.
+> > 
+> > The original problem came when commit 9af28511be10 ("addrconf: refuse
+> > isatap eui64 for INADDR_ANY") made __ipv6_isatap_ifid() fail when its
+> > addr parameter was 0. The commit says that this would create an invalid
+> > address, however, I couldn't find any RFC saying that the generated
+> > interface identifier would be wrong. Anyway, since plain gre devices
+> > pass their local tunnel address to __ipv6_isatap_ifid(), that commit
+> > broke their IPv6 link-local address generation when the local address
+> > was unspecified.
+> 
+> By "plain gre devices" you mean "ipgre"? Because addrconf_ifid_ip6tnl()
+> is called for "ip6gre" and it doesn't fail, unlike __ipv6_isatap_ifid().
+
+Exactly. I tried to use the "plain" adjective to say that's the kind of
+device you get with the "gre" keyword in "ip link".
+
+> > Then commit e5dd729460ca ("ip/ip6_gre: use the same logic as SIT
+> > interfaces when computing v6LL address") tried to fix that case by
+> > defining add_v4_addrs() and calling it to generated the IPv6 link-local
+> 
+> s/generated/generate/
+> 
+> > address instead of using addrconf_addr_gen() (appart for gretap devices
+> 
+> s/appart/apart/
+
+Will fix both.
+
+> > which would still use the regular addrconf_addr_gen(), since they have
+> > a MAC address).
+> 
+> Assuming what I wrote is correct, I'm not sure why e5dd729460ca didn't
+> restrict the fix to "ipgre" and applied it to "ip6gre" as well.
+
+I asked myself the same question. Antonio might have an answer to this.
+But in my understanding the changes brought by e5dd729460ca were much too
+broad.
+
+> > -	if (dev->type == ARPHRD_ETHER) {
+> > +	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
+> > +	 * unless we have an IPv4 GRE device not bound to an IP address and
+> > +	 * which is in EUI64 mode (as __ipv6_isatap_ifid() would fail in this
+> > +	 * case). Such devices fall back to add_v4_addrs() instead.
+> > +	 */
+> > +	if (!(dev->type == ARPHRD_IPGRE && *(__be32 *)dev->dev_addr == 0 &&
+> 
+> Doesn't this mean that the 'ARPHRD_IP6GRE' case (and the
+> 'CONFIG_IPV6_GRE' checks) can be removed from
+> addrconf_init_auto_addrs()? That is, only call addrconf_gre_config() for
+> "ipgre", but not for "ip6gre".
+
+Yes. But I didn't want to do that here, to keep the fix as simple as
+possible. Because that'd mean we'd also have to add a
+"(dev->type != ARPHRD_IP6GRE)" condition in the test at the beginning
+of addrconf_dev_config(), and I feel that'd be a distraction from the
+core of the patch. So I prefer to do that in net-next.
+
+> > +	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
+> >  		addrconf_addr_gen(idev, true);
+> >  		return;
+> >  	}
+> > -- 
+> > 2.39.2
+> > 
+> > 
+> 
+
+Thanks a lot for your review.
+
 
