@@ -1,175 +1,122 @@
-Return-Path: <netdev+bounces-169161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FF6A42C34
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:00:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CD0DA42C47
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:05:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 102147A8AA6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:59:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE90B3B14D7
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF871EA7F9;
-	Mon, 24 Feb 2025 19:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEA11C84AF;
+	Mon, 24 Feb 2025 19:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRG3NEaj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1yyjpECE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F28F1EA7F5;
-	Mon, 24 Feb 2025 19:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F99282F0
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740423615; cv=none; b=Hwnj1JRkjeH6I0nCkHjpMqYYQB4HOZG4jmcSr8SK02qe7nD5dBoJF7M6asXZuL8mD8PNyrpHIMQBu8GkhSPpEWGZ0I8dhr2+QHkSrAbGqzKuMDRz3clonsu391Y/OJBbHkM9X/zMPaGLtOTsz8mPDdv7bd8Z0a0K10NXmnP3e8k=
+	t=1740423852; cv=none; b=MagU2XWMUndR3e4QP6sEf+k+1VOjwmJBmPWxi0C7swg64BBW9LTXIwcFortJCmpWWqXAiGMKDjm2al2t2nXjwxuW1y1SbT3vNU+q6e+fUynCqRisKNOYkgmVJQZmxNptkasqGmDd/wzLwbTShV05/nRbfRHwXcECBsJ+g/lPZpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740423615; c=relaxed/simple;
-	bh=rRzI+z2ajIxRRUGlvU9sCaGc7lpzj0vAIq9Bs546a34=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=VRQ8jL1gitwD81rUSanjj5m1eTLD0loD7LhRLSYMQvRbRmi2KYB1v0KVcW6tqoYADWZ2l5U7xCjIo1eC8+edPA8Ti2fGeT48ruFIzQ8VT+F0KQJn7UkyYw2+YxHDZ+4uEAk4YR8RvKzAjdVWXn3vyQn+JAQzd9pA81rk6pVx8pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRG3NEaj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CACC4CED6;
-	Mon, 24 Feb 2025 19:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740423614;
-	bh=rRzI+z2ajIxRRUGlvU9sCaGc7lpzj0vAIq9Bs546a34=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=pRG3NEajpiumXR6hcxs0jbECWDvqIbeir6FHSoIC/RFiuomiqRhLZtSq+ErPxDhey
-	 C6bnEnWDwdd+BhsyEx6HCghdlQTQBJ34dzqkQ5pa+jQPeOLs0CUQzAo48NsVfGpYV0
-	 rbNZMODQQmfV84VPoepOTK6cMDFtU2ir0cRGb01flNvx2WpxKibBW0suAEVOFilKcc
-	 Ob9wjmb1qxTE6YO09A1x81F1yGNNJdYheyztRn+Q3+ZHVE+wU9kUhd1DX472ma41yp
-	 YiCbssvfGG9urnDhKCoZeTq3iDv7+Gp9GYVTmOs/Lyq5CA4RotLe4BPY9a4ZBg7VBL
-	 +J6GHK1MIj1Rw==
-Date: Mon, 24 Feb 2025 13:00:13 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Hau <hau@realtek.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd <nic_swsd@realtek.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/3] r8169: enable
- RTL8168H/RTL8168EP/RTL8168FP/RTL8125/RTL8126 LTR support
-Message-ID: <20250224190013.GA469168@bhelgaas>
+	s=arc-20240116; t=1740423852; c=relaxed/simple;
+	bh=a7KIxKD7aoeoZOqCkxW8MiXflXZAnlr6LQmmaXMfXYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hOLyxWIZzY73FViTdd2n3I0e5NGdhdFJkADH8dn44ika/4lHUSYAlCGAtQvuZP6S3dFh9ru7KgnJHXPucOCATScPvPHfuSaa4oLNGQLh07XK4AKZLdD7CA6W7j1z+eGIsRxuexT4/QPFG7H2EYo+SZZ79GSU7+TDXm8O1ePTIAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1yyjpECE; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5dccaaca646so8367444a12.0
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 11:04:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740423849; x=1741028649; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4nSSnIUgykCsOJjoRoPgBIV/Do11WjZXMG8oFwcXmD8=;
+        b=1yyjpECEC4FwpamKSMT98G/jqqz0XOq+OwoJdHIsFjHqkj4Lo+y22qQdFqgBX+0T46
+         CUL89o4mvo8J28S+iULL5fNo8DgpecmGspw7puUVQ4Z5rmtzZk4rtuQ9F4rCxqZyscTc
+         jgSg2n8WzivwS/HTvHS9bdhpW0WU7oZzlLMEU8+qWsPM3OHGMcct6Yk1japA5v3cT5Wx
+         s70mLRm047ZAW2urgoRQ/XZJVw0y9LeBSvmz2J5P3DQDMOh71LFMwI+NvPrxzGFWvhye
+         GsL4eX6LSTe+vfXwtMaJXXiRLYFPDtw8qnFxpD10o2e7qP6y75BCflNhfSzYLJroZdfS
+         T+lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740423849; x=1741028649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4nSSnIUgykCsOJjoRoPgBIV/Do11WjZXMG8oFwcXmD8=;
+        b=sp3YiPOT+aZ1+ekJ4dbBuqRe6n22opsQ0qSpzbPsnI8WV0kmg1VTjQPfpxzlaI9tfn
+         JMTcfJkYMa93fs2AVBdrSn8uEva9+RCLH9mCpYKtJTF4tEHkIe6DelrIKEdRHAZJHltm
+         88tCwEBE9oaI/qtRrNfaOfyrAQ8aBAnNu4BRQgAa6YuQ8S0/hfDQP4ovLY8EvBNgt0Dx
+         Zw+vQM7cbMDfIjCB1TFWPr3LU4TZ93rnSCkViNyOcJYWnd2on/UGAbBHFNf4LYRSq514
+         QUW93omgbCrcjl6ZZVfrmeeq4q7/Mz1mZj7uG4BARVtq515LUrE09xBfueNLVqrL7FOh
+         C1Wg==
+X-Forwarded-Encrypted: i=1; AJvYcCUafM7z1bXpNprInLmv2+kZ+2Z+4y4lTZDCJWD6AIvGgo1fDG9zXvoUzI19W6lRXV2QWoWimWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI/3SamqKAMpqZsf11kDc5peN0aNyv29ev25jyL6zU4XW0FVpk
+	9evvtFKtv3v2rlawF5Oh+21P6xkO2J3ehhrx3y8k+saz/LyYWVy5CErvKM+gJdsbEBlJfHDDbJQ
+	B0n5Tk7zmRK6Hli5mY7uNBs2ucGdbTuu73gsk
+X-Gm-Gg: ASbGnct6n/6dFldRA69W43eVBArtfEhtvXE6ZxjJMh14Z9xrjcBXgLRzdtoh4hlEslT
+	mp5Z+fdkAJvtUmXo23z1hFnmTmBk3gqR8QnK5hC4JF/EhfBLuOgFKfcz9e5yU57X7x2mvvPLNsG
+	Muk1cvAA==
+X-Google-Smtp-Source: AGHT+IGgQflHbqJ4UhoDf/fk2E5dvSe6cFNlfrPYK7uSbM45dr7J0xkIHLkRgPNbQ8e5rSTMONtTWGu2Ja+QKsZlfN8=
+X-Received: by 2002:a05:6402:26d1:b0:5de:572c:72cf with SMTP id
+ 4fb4d7f45d1cf-5e0a12b7c27mr19854821a12.10.1740423848811; Mon, 24 Feb 2025
+ 11:04:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544e50b9e4c4ee6a6d8ba6a777c2f07@realtek.com>
+References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+In-Reply-To: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 24 Feb 2025 20:03:57 +0100
+X-Gm-Features: AWEUYZnNdis7E0SVF0S-h6-AU7K1RTAWbc2V10Km6GwZSmwi5zbMocT2Sf-WWMY
+Message-ID: <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
+Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
+To: Breno Leitao <leitao@debian.org>
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, kernel-team@meta.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 24, 2025 at 04:33:50PM +0000, Hau wrote:
-> > On 21.02.2025 08:18, ChunHao Lin wrote:
-> > > This patch will enable RTL8168H/RTL8168EP/RTL8168FP/RTL8125/RTL8126
-> > > LTR support on the platforms that have tested with LTR enabled.
-> > 
-> > Where in the code is the check whether platform has been tested with LTR?
-> > 
-> LTR is for L1,2. But L1 will be disabled when rtl_aspm_is_safe()
-> return false. So LTR needs rtl_aspm_is_safe() to return true.
-> 
-> > > Signed-off-by: ChunHao Lin <hau@realtek.com>
-> > > ---
-> > >  drivers/net/ethernet/realtek/r8169_main.c | 108
-> > > ++++++++++++++++++++++
-> > >  1 file changed, 108 insertions(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/realtek/r8169_main.c
-> > > b/drivers/net/ethernet/realtek/r8169_main.c
-> > > index 731302361989..9953eaa01c9d 100644
-> > > --- a/drivers/net/ethernet/realtek/r8169_main.c
-> > > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> > > @@ -2955,6 +2955,111 @@ static void rtl_disable_exit_l1(struct
-> > rtl8169_private *tp)
-> > >       }
-> > >  }
-> > >
-> > > +static void rtl_set_ltr_latency(struct rtl8169_private *tp) {
-> > > +     switch (tp->mac_version) {
-> > > +     case RTL_GIGA_MAC_VER_70:
-> > > +     case RTL_GIGA_MAC_VER_71:
-> > > +             r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcde8, 0x887a);
-> > > +             r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);
-> > > +             r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);
-> > > +             break;
-> > > +     case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-> > > +             r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x889c);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x8c30);
-> > > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcde8, 0x883e);
-> > > +             r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdec, 0x889c);
-> > > +             r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf0, 0x8C09);
-> > > +             r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
-> > > +             break;
-> > > +     case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_53:
-> > > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);
-> > > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-> > > +             break;
-> > > +     default:
-> > > +             break;
-> > > +     }
-> > > +}
-> > > +
-> > > +static void rtl_reset_pci_ltr(struct rtl8169_private *tp) {
-> > > +     struct pci_dev *pdev = tp->pci_dev;
-> > > +     u16 cap;
-> > > +
-> > > +     pcie_capability_read_word(pdev, PCI_EXP_DEVCTL2, &cap);
-> > > +     if (cap & PCI_EXP_DEVCTL2_LTR_EN) {
-> > > +             pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL2,
-> > > +                                        PCI_EXP_DEVCTL2_LTR_EN);
-> > > +             pcie_capability_set_word(pdev, PCI_EXP_DEVCTL2,
-> > > +                                      PCI_EXP_DEVCTL2_LTR_EN);
-> > 
-> > I'd prefer that only PCI core deals with these registers
-> > (functions like pci_configure_ltr()). Any specific reason for this
-> > reset? Is it something which could be applicable for other devices
-> > too, so that the PCI core should be extended?
-> > 
-> It is for specific platform. On that platform driver needs to do
-> this to let LTR works.
+On Mon, Feb 24, 2025 at 7:24=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> Add a lightweight tracepoint to monitor TCP sendmsg operations, enabling
+> the tracing of TCP messages being sent.
+>
+> Meta has been using BPF programs to monitor this function for years,
+> indicating significant interest in observing this important
+> functionality. Adding a proper tracepoint provides a stable API for all
+> users who need visibility into TCP message transmission.
+>
+> The implementation uses DECLARE_TRACE instead of TRACE_EVENT to avoid
+> creating unnecessary trace event infrastructure and tracefs exports,
+> keeping the implementation minimal while stabilizing the API.
+>
+> Given that this patch creates a rawtracepoint, you could hook into it
+> using regular tooling, like bpftrace, using regular rawtracepoint
+> infrastructure, such as:
+>
+>         rawtracepoint:tcp_sendmsg_tp {
+>                 ....
+>         }
 
-This definitely looks like code that should not be in a driver.
-Drivers shouldn't need to touch ASPM or LTR configuration unless
-there's a device defect to work around, and that should use a PCI core
-interface.  Depending on what the defect is, we may need to add a new
-interface.
+I would expect tcp_sendmsg() being stable enough ?
 
-This clear/set of PCI_EXP_DEVCTL2_LTR_EN when it was already set could
-work around some kind of device defect, or it could be a hint that
-something in the PCI core is broken.  Maybe the core is configuring
-ASPM/LTR incorrectly.
-
-Bjorn
+kprobe:tcp_sendmsg {
+}
 
