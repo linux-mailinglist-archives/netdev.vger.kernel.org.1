@@ -1,150 +1,151 @@
-Return-Path: <netdev+bounces-169052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D22A42651
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:33:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD99DA4267B
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:39:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 404E33A7CCE
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:27:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FCF719C122F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4671FC7FC;
-	Mon, 24 Feb 2025 15:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410C1254856;
+	Mon, 24 Feb 2025 15:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+3Hp/Tn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5E9qslO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B1F1DC998;
-	Mon, 24 Feb 2025 15:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76CD14A627;
+	Mon, 24 Feb 2025 15:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740410838; cv=none; b=ICCLgVQz+WNPxxOTX97mAb6sj4InZUJFFQNN6RrQv4b1c1WNN1ynP1+q365l48aIav98+SNIRBGzbzNdRM9oLDayK+qeNyNEkG2p5DEC80Q3vjwbfvJZH4+Ag1PNjFgc6LQhqTm2Va7M9Mrbxfvo6G7gy/qifRsW9D1yYpBQsx8=
+	t=1740411041; cv=none; b=ZM8Elg8nAyX7sjW4tIF8KWszuooH5cttQ32+SiKLgS0C+Oh5ETidgz2RY9/YdGaYweYxpticYuZJLguqcU0UMCGWTISwXJlrWt2u14TpjLWyyDfHpPRx0S4oQ9BE5ePa3QIAb7m7NV5n+e5R7UoKhhXXdUTWchhIiJvaNBrvVYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740410838; c=relaxed/simple;
-	bh=rhmDr4HJgDLSEVXyelVTEjpXOHwjjqq78Ihle3V/xZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2D+ODWhP5lNdxHa8iD/Qic2EcG1xiPOsB6AnqikBgenSZxeSJXrcslXmERLCY49+nW4xTWAwP0IgcSYwvzT6sm01KJct7WjV0I5SWcXYf/bVhVdpeIMpkMsiUG9IEChtBtQTRN5L62ckX1POK6DR2IHAwNAAV6SwI1L2GdSCQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+3Hp/Tn; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1740411041; c=relaxed/simple;
+	bh=9GsHZ0uWFGERQSLMdeBUy4lnnkfD5bg12vUs6N4mbcA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sjglHfaSH/MLYEX/E8fS8aNNLNH0lDKAOHnv8BcOhpif57XYirHEux0ho+JCYNzJNaEiMaIlqtet7zyDoiuJ30uiY7IFUshJGOP6kTy5MJ5dV+244w8dyxdhvxosD9qMEg01lHIeU0kO/0AoU1oHV+/8GDBIiqWF+uGRbL3c2PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5E9qslO; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-220c665ef4cso78434685ad.3;
-        Mon, 24 Feb 2025 07:27:16 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2fc0d44a876so7307302a91.3;
+        Mon, 24 Feb 2025 07:30:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740410836; x=1741015636; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVMni6CCCY2us6Xo8mKZ2xt3KdSK/Spp1dIxAZpVn4s=;
-        b=T+3Hp/TnVcXMMguVhvfXZg8Cq+yBW91eosEjUnxOGMHghb4fjftMeUdVHv7Z4Hd/3L
-         WeEGAt1zapTkYM5jt7WGPd9cqabJdJSudG730OZENCKm14YfEwQdAfxpeiK5oBBOJTuj
-         aiJwoA1AuaphBCxmHPCHDTwpbMG59IJV4sLBjax0uTn8hbxyHaxCWeqrIFUcYwfmKSBv
-         fmtDLPmDfrU2nktkS9xPuhHQ6LpkCaYfcZDNw5YO7IuK/MmZQE5VeEjjrirkrEHm7gcD
-         ZGxFtCR4U26GckMXkNPEOcrQoHvnJ709Tv1Ug2frkx3tP09+nFp1fdX25I4roUwCFBY7
-         yaPA==
+        d=gmail.com; s=20230601; t=1740411039; x=1741015839; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WhmASDOQInyvXr70wajSDlxu87HIS0H9xeXcz6t5iMo=;
+        b=Q5E9qslO+OTDnNCE+L7o9Ca9QqBDO59URGGhjKHjq48rFlHL6zhZ/ip3EM5BNyiXiW
+         W7MDxysRmIga1NgImilEi5vJq8ItDQyKIycH/d5ywrATMTukFAsnWE+F35jmanCtJZpu
+         dLpgbpRIJPG4cX8wVWmOcrhxT/LNMnOTtzkXsjSXpeTxBQ1svTN+fN2MKYabLESwcsS2
+         eyW9ApHvnH8gGOIUgMuv4u0tsDq4RAuzUkVngMsVEpPRVY2jluwiKJGXZRoJhtqZNgRG
+         o0fnAqwMn/uIDpR/PFL5P//vIi6FwCkW2GsS4iV2nN7Z2kJqg2V3Vq2jC7gVT/fzeKLs
+         EF4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740410836; x=1741015636;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NVMni6CCCY2us6Xo8mKZ2xt3KdSK/Spp1dIxAZpVn4s=;
-        b=eNrFgmgrD6+EoKLZYpgOuIwN26dfiLe3vZ946mxdXGEvPrLfn4KFuFG7OB1wiO3OZj
-         7bm2TgDcsH2UZZgS7ERO3y9PanlEFSnRtBn3ZgY+cf2DZQQ5BUiItKbl/s9p9gIRKxA1
-         mDOuyN0n8auqSnjz2fHLkCRp4PZp9sbHo1NBC2Sx23cmVpPTAci1l+4we2z0tkw1EKDE
-         akmy685HV7e4iEA41608O9+WZzSHIByNtstRwZLIVIdEg8GRCDA6rLv5jzKp9XnFR1eZ
-         WSFqbYfn0aOo2BkzH68pWSdXh0Z4RmqKAIGA8Y/lcWZNVgUkN1UdX1pf1DgJBz1UmnZt
-         Vrxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUpV1vgHxuKl9I/zewx0LSG5/cn57JgneIZ4is5rUn40iMrflS3fjsNEFNBkKeY7QEB+kb5X6oLjBzxr0c=@vger.kernel.org, AJvYcCVFXG8VVgSlcphL0ww8A2rSue5WCq0kuGf6x54vdoIbGXiDjJqmmSX1uMycR4xMiyUoFKo0EsiEMWq7cUQTcAM=@vger.kernel.org, AJvYcCVQTb/YlOv6ERcWqv8zgElOcRhfUTHkiPzBdEOFU0NhdfEJawCcuBG9MJo0JnWO9nG8xiqBXKun@vger.kernel.org, AJvYcCVnWpGs9ZvDK/OvaH6AdfUD74hqu8ojan8szZfbUN6LRXtHifU68clHxNuksAFVs23cEMSXUSdWJEFSQzs=@vger.kernel.org, AJvYcCWbbf14bV+UcSAjtNd1KDDqKqa+2dT/QfTz7FOgGKSxKe2T8WXasxWR6IvtDEt0w5/RZdKv/G9mEbG1f7+N@vger.kernel.org, AJvYcCWf4tIiVuCKLJgZjCNeoXemIAb7Frfzn7mnuTvEa9i3+PEqONh4XRh0Fjn1h1SB0JH4wGE=@vger.kernel.org, AJvYcCWuBoqxQM0PrGJx/KTHikviz868Xs3ty3WTZhUy5cznQypV7UNFOUCwxtab9f0KkdT7VHH3MRVsW8GUmze+@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOgFvFYzk+4RUhxCK1/JbJ/iY8sj42d+IwLcNsdjwr7N7Ks8Tm
-	u5OnQyYAr8dZ+M5bODp+Dmeobup1WDLiAjx09t+4PsValQl5no0f
-X-Gm-Gg: ASbGncvsLG3uA8Lch5q0eomY+zTvXzASLlW898iM5ZEGXsYBcgQ16ClYkiK8pBAGAP7
-	h1Hm0ztMllyDxcLaG+A14Y1SYB3YJkFop4X13iDbDrUX6iz/zH3DXacB+OjukoDha4OVJvNOtBx
-	ykslQCQxLnchI1Y6RB3Fn4KpJ5z7Gouv9JRNkCiHDPpDv6mmjPmC9xtlOgi8WDIg8JY+osjbrVC
-	oYNeCQFpdAFWevhqg+4zmwdL+6HXQ8c/gdPB598iyOkZXonv5rH+T0NQwQAuwEbkJ2de99IRVIN
-	OtclIJP89P3IB0z0FbTBpwkMBtEK
-X-Google-Smtp-Source: AGHT+IFl+fmLe2Snker6fx4GB6SiAhwknYLzw9iuDcRtyo7AdhlkRr95Yy6wYLAjG0rHC6oLfbqCGA==
-X-Received: by 2002:a05:6a00:cce:b0:732:6214:35f5 with SMTP id d2e1a72fcca58-73426c8d21fmr17154986b3a.1.1740410835401;
-        Mon, 24 Feb 2025 07:27:15 -0800 (PST)
-Received: from eleanor-wkdl ([140.116.96.203])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7346d9b1af1sm1359758b3a.71.2025.02.24.07.27.06
+        d=1e100.net; s=20230601; t=1740411039; x=1741015839;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WhmASDOQInyvXr70wajSDlxu87HIS0H9xeXcz6t5iMo=;
+        b=jHRpfB4Kqz/4Skg17nYM3Oad0dQMJG+idMoXrg+kJezcRw6gFmMu7M02Bgsg1Zekhh
+         IYVDFhAdTaayHJ0eZ5UPaFRA3h5eRH+gX74prE4Fg7qBWdrrhOEhzpk5K9bFLbaJpyh7
+         s8eRvoBB2Xd3XHxy5+7ecg9vufvdI0TuxJ3rlQKzquoNb7bSRCz0cAJf9SxVlGBBSOww
+         SE23VxQo6IhXcnz7SzIpE5Q97LZCQsItBSY3ephywuH989XSW05F+g6+JHGx4BZBrQP/
+         vKM9E7a+JDxAZaO4RM1r561FzKC84AXDEIjuGZP8FPOyHd+MYC2TmzNJMauXUBVjVqE3
+         5tCg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7wqvxOuo79vLniQ0datzjCBWEwGJ1CdGjncN0MgC7kJGiNs8OdeXpa3q6BCFGzQXImQ7Qwo1Z@vger.kernel.org, AJvYcCWH6XXyeFX9ys6YH5UuCPtF6rWb48L/WEdV9EIXFMgs3XTUVizsB9xAMJ+CkmNHIQxGGd+nh3JHltOV5mM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKERNmpWacUUww7LQwQRieEHQ8zhv/AOisD4XMZCxYUrbMCsxa
+	rXlnH0V9kPnjndGptXgNpV/om17Se+LKnru+wYrmOkvp3+l4fhwNRpIY7X2v
+X-Gm-Gg: ASbGnct6PXsJUwhwlXVj+qBryqZ8w3wHWPFODMY02mr2P+GqgnOk0cs1xOMvFXEY0mX
+	nR68AjEDf6OhzG9c+Pt5xppjWblBRoEp/3iuCJ42AdSmQTXci7bbhJc63a/4WKwhbti31bhyz0c
+	NXA+z4BL24Hgy9eem8z++9kdkl+TtSzOS4+zabi6DW4jMyVefmyBdXT3eGqDXiVIKx3e4kxRZUt
+	+oUQEx+4bODNp9vmJ7Yq+9PHrKK/wvsIPYS8XII9N6fQ3RtVr9DQ/xoKGP5X9T4xkFRVBKYBgYO
+	SVbwHcylrv0qKGZTCtTyxL/ImWyagYJR/XZTO0nDisG+SlSIxt9mpu0iZ4aiIUZ06bMG6VobPOi
+	tVgSNOXYL
+X-Google-Smtp-Source: AGHT+IHDtb5JrFiaPGMhffUhvx3dhN8y94hLjdsSH4uZOiIHwdMeD6rXeQmlcXEAz/gxx1PdC1W2cw==
+X-Received: by 2002:a17:90b:48cb:b0:2ee:e961:303d with SMTP id 98e67ed59e1d1-2fce7b4b904mr22754862a91.35.1740411037786;
+        Mon, 24 Feb 2025 07:30:37 -0800 (PST)
+Received: from AHUANG12-3ZHH9X.lenovo.com (220-143-194-76.dynamic-ip.hinet.net. [220.143.194.76])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb04e525sm6592432a91.20.2025.02.24.07.30.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 07:27:14 -0800 (PST)
-Date: Mon, 24 Feb 2025 23:27:01 +0800
-From: Yu-Chun Lin <eleanor15x@gmail.com>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
-	eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, yury.norov@gmail.com,
-	akpm@linux-foundation.org, hpa@zytor.com, alistair@popple.id.au,
-	linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-	jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw
-Subject: Re: [PATCH 00/17] Introduce and use generic parity32/64 helper
-Message-ID: <Z7yPxdiLLXlsWSQN@eleanor-wkdl>
-References: <20250223164217.2139331-1-visitorckw@gmail.com>
- <602e03fd-ce4b-feef-5053-e95834ab35d7@gmail.com>
+        Mon, 24 Feb 2025 07:30:37 -0800 (PST)
+From: Adrian Huang <adrianhuang0701@gmail.com>
+X-Google-Original-From: Adrian Huang <ahuang12@lenovo.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Adrian Huang <ahuang12@lenovo.com>
+Subject: [PATCH 1/1] af_unix: Fix memory leak in unix_dgram_sendmsg()
+Date: Mon, 24 Feb 2025 23:28:46 +0800
+Message-Id: <20250224152846.13650-1-ahuang12@lenovo.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <602e03fd-ce4b-feef-5053-e95834ab35d7@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 23, 2025 at 09:25:42PM +0100, Uros Bizjak wrote:
-> 
-> Please note that GCC (and clang) provide __builtin_parity{,l,ll}() family of
-> builtin functions. Recently, I have tried to use this builtin in a couple of
-> places [1], [2], but I had to retract the patches, because __builtin
-> functions aren't strictly required to be inlined and can generate a library
-> call [3].
-> 
-> As explained in [2], the compilers are able to emit optimized
-> target-dependent code (also automatically using popcnt insn when avaialble),
-> so ideally the generic parity64() and parity32() would be implemented using
-> __builtin_parity(), where the generic library would provide a fallback
-> __paritydi2() and __paritysi2() functions, otherwise provided by the
-> compiler support library.
-> 
-> For x86, we would like to exercise the hardware parity calculation or
-> optimized code sequences involving HW parity calculation, as shown in [1]
-> and [2].
-> 
-> [1] https://lore.kernel.org/lkml/20250129205746.10963-1-ubizjak@gmail.com/
-> 
-> [2] https://lore.kernel.org/lkml/20250129154920.6773-2-ubizjak@gmail.com/
-> 
-> [3] https://lore.kernel.org/linux-mm/CAKbZUD0N7bkuw_Le3Pr9o1V2BjjcY_YiLm8a8DPceubTdZ00GQ@mail.gmail.com/
+From: Adrian Huang <ahuang12@lenovo.com>
 
-Hi Uros,
-Thanks for your information.
+After running the 'sendmsg02' program of Linux Test Project (LTP),
+kmemleak reports the following memory leak:
 
-We originally planned to implement hardware optimizations after this
-patch series. However, for V2, We will incorporate __builtin_parity(),
-while keeping our current implementation as the fallback function.
+  # cat /sys/kernel/debug/kmemleak
+  unreferenced object 0xffff888243866800 (size 2048):
+    comm "sendmsg02", pid 67, jiffies 4294903166
+    hex dump (first 32 bytes):
+      00 00 00 00 00 00 00 00 5e 00 00 00 00 00 00 00  ........^.......
+      01 00 07 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
+    backtrace (crc 7e96a3f2):
+      kmemleak_alloc+0x56/0x90
+      kmem_cache_alloc_noprof+0x209/0x450
+      sk_prot_alloc.constprop.0+0x60/0x160
+      sk_alloc+0x32/0xc0
+      unix_create1+0x67/0x2b0
+      unix_create+0x47/0xa0
+      __sock_create+0x12e/0x200
+      __sys_socket+0x6d/0x100
+      __x64_sys_socket+0x1b/0x30
+      x64_sys_call+0x7e1/0x2140
+      do_syscall_64+0x54/0x110
+      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Best regards,
-Yu-Chun Lin
+Commit 689c398885cc ("af_unix: Defer sock_put() to clean up path in
+unix_dgram_sendmsg().") defers sock_put() in the error handling path.
+However, it fails to account for the condition 'msg->msg_namelen != 0',
+resulting in a memory leak when the code jumps to the 'lookup' label.
+
+Fix issue by calling sock_put() if 'msg->msg_namelen != 0' is met.
+
+Fixes: 689c398885cc ("af_unix: Defer sock_put() to clean up path in unix_dgram_sendmsg().")
+Signed-off-by: Adrian Huang <ahuang12@lenovo.com>
+---
+ net/unix/af_unix.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 34945de1fb1f..cf37a1f92831 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2100,6 +2100,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		if (!msg->msg_namelen) {
+ 			err = -ECONNRESET;
+ 			goto out_sock_put;
++		} else {
++			sock_put(other);
+ 		}
+ 
+ 		goto lookup;
+-- 
+2.34.1
+
 
