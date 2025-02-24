@@ -1,182 +1,83 @@
-Return-Path: <netdev+bounces-169030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BFE1A4225F
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:06:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20EE7A42263
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B7C3A4EE4
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70CBC3BD3CF
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD2A25A632;
-	Mon, 24 Feb 2025 13:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16380259499;
+	Mon, 24 Feb 2025 13:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D7Eg3/Sh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o1k1I8O8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1803525A2C8;
-	Mon, 24 Feb 2025 13:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8425B25744A;
+	Mon, 24 Feb 2025 13:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740405230; cv=none; b=OCZ37VMRA25AWc/+4JGM00r2GTY1z5ZOnWMRWwdExo5W54Mlilv0Re9jWybPU69NOCyxAt22eieNtjIVQ3eEgHLIJLWgUGUiMQ6UA9zlujHhZfK9aReMg5RT8FQrdS4kMLAa1aErsJIVXbkzDQg/IZqi6P9IG/vWe2LIGONs4Q4=
+	t=1740405225; cv=none; b=DaP+XSH2FtVTLaHQAKjHmtYvvH1eeQiINIfcWaPEktYTWeRtWYW4Hejx0DheH9TsymYtcico1S/EjkxdXDeYM+OheySOjhw94SZbPcNXuYCITeZifXNEXOEQISfob9bAeBcsXUDo3FjgMYvBFo8EKt00w/R0QEiHlyky6DYDYqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740405230; c=relaxed/simple;
-	bh=6AJEKimFGREFIv6dQXE7i5boQezEtjb7GqUPTRe+6Ac=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qQZsK+Cf9/IBjqvMl4YmYe0Lb9g28c+umZrclSXRICDm4MrWAsd3f7jkpgevN7R23np+bjPk8E3uXHAAZXQ7/ZknLIQTQsTyDdwOeoLFwsiNS0HmXpvi6PXyM4swig7hiQkndjT5Ygg4CoVnjOBRDzOvvwrTmgpjf1kmV0BuHpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D7Eg3/Sh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC87FC4CEEE;
-	Mon, 24 Feb 2025 13:53:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740405229;
-	bh=6AJEKimFGREFIv6dQXE7i5boQezEtjb7GqUPTRe+6Ac=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D7Eg3/ShhVOZNOsWWOj84nY2fquvYuZpUvYenGvAUgmhWX+mAYZmO8am9h6dT564f
-	 qWxqcrxt8f5SmxaXCrtJA/Kr+reZx49QhlqCD5oERYLLmTZ6LohaoUS4hHIcZUO3xr
-	 j7yPRbs6Q+cmjY8fpLQqppHnIi+5rjc68Ml18F0WSPZTRXLlE4GXBuUliqg8dh0VOW
-	 c7PvPlDqqHCh+x8e+beLjNp/mb5IGNQBuHJcYEVu8W7gqfy18bq4TvJbjCL3+Q++MA
-	 bqUta3GptmlhDmQiKV7euT29ujamO7V/lxBE0BLojb7usecjMaVMC6jq6tY/oIMDZE
-	 MvATDSRqbdLbw==
-From: Philipp Stanner <phasta@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Feiyang Chen <chenfeiyang@loongson.cn>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Qing Zhang <zhangqing@loongson.cn>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 4/4] stmmac: Replace deprecated PCI functions
-Date: Mon, 24 Feb 2025 14:53:22 +0100
-Message-ID: <20250224135321.36603-6-phasta@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250224135321.36603-2-phasta@kernel.org>
-References: <20250224135321.36603-2-phasta@kernel.org>
+	s=arc-20240116; t=1740405225; c=relaxed/simple;
+	bh=+0fVRFojAPaGCk0kjhWR6deAUNC6V61mrO7QnJO5Gec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VeUmhAlaMyrH6eoH6Q3WzDcqUQ227P8yVaOo1S/O6/yT9A5UAZVGbLkhrGZxaJw1vHcUMK7ay130fRNnhgBV4OHrz9cRcssVGYK5UbUtxW+EfADbTtycXkqiY9G+MV3ctPZ5vBUi0IAftJ0p64b23Eo7cog6+rIPW4CApatmHUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o1k1I8O8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kmukkXqExqlfdB9kboV9/OW7eMvGP0k7DUtnzMx2NWI=; b=o1k1I8O8vos488sLu1Z1Xz7Aya
+	bbsLP3VWce1GaquLcOsAZqj/NenU3zopHgdEzZjx+s7x/tHQP19WkdDPyt4Jubfa0G3/uKbnrr8/F
+	Pfabdj3Sr0ulTaYOW/Kd6ezpKjIZ/5kxqhFWp7NpMpoU41E5etSPRB98ELmkQzu1Y4Xs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tmYtk-00HAy6-EH; Mon, 24 Feb 2025 14:53:28 +0100
+Date: Mon, 24 Feb 2025 14:53:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: lxu@maxlinear.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH net-next 2/2] net: phy: mxl-gpy: add LED dimming support
+Message-ID: <ce7d9ef9-e788-4e36-84ec-ef8b858c1050@lunn.ch>
+References: <20250222183814.3315-1-olek2@wp.pl>
+ <20250222183814.3315-2-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250222183814.3315-2-olek2@wp.pl>
 
-From: Philipp Stanner <pstanner@redhat.com>
+On Sat, Feb 22, 2025 at 07:38:14PM +0100, Aleksander Jan Bajkowski wrote:
+> Some PHYs support LED dimming. The use case is a router that dims LEDs
+> at night. In the GPY2xx series, the PWM control register is common to
+> all LEDs. To avoid confusing users, only the first LED used has
+> brightness control enabled.
 
-The PCI functions
-  - pcim_iomap_regions() and
-  - pcim_iomap_table()
-have been deprecated.
+Please Cc: the LED mailing list, and Lee Jones.
 
-Replace them with their successor function, pcim_iomap_region().
+I've no idea myself what is the normal way to represent a single
+brightness control shared by a number of LEDs. I would like to ensure
+whatever we do with PHYs is the same as what other LEDs do. I had a
+quick look at leds-class.rst, but i did not see anything there.
 
-Make variable declaration order at closeby places comply with reverse
-christmas tree order.
+    Andrew
 
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   | 11 ++++-------
- drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c   | 14 ++++++--------
- 2 files changed, 10 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index f3ea6016be68..25ef7b9c5dce 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -521,10 +521,10 @@ static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
- static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct plat_stmmacenet_data *plat;
-+	struct stmmac_resources res = {};
- 	struct stmmac_pci_info *info;
--	struct stmmac_resources res;
- 	struct loongson_data *ld;
--	int ret, i;
-+	int ret;
- 
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
- 	if (!plat)
-@@ -554,13 +554,11 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 	pci_set_master(pdev);
- 
- 	/* Get the base address of device */
--	ret = pcim_iomap_regions(pdev, BIT(0), DRIVER_NAME);
-+	res.addr = pcim_iomap_region(pdev, 0, DRIVER_NAME);
-+	ret = PTR_ERR_OR_ZERO(res.addr);
- 	if (ret)
- 		goto err_disable_device;
- 
--	memset(&res, 0, sizeof(res));
--	res.addr = pcim_iomap_table(pdev)[0];
--
- 	plat->bsp_priv = ld;
- 	plat->setup = loongson_dwmac_setup;
- 	ld->dev = &pdev->dev;
-@@ -603,7 +601,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
- 	struct net_device *ndev = dev_get_drvdata(&pdev->dev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
- 	struct loongson_data *ld;
--	int i;
- 
- 	ld = priv->plat->bsp_priv;
- 	stmmac_dvr_remove(&pdev->dev);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 91ff6c15f977..37fc7f55a7e4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -155,9 +155,9 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- {
- 	struct stmmac_pci_info *info = (struct stmmac_pci_info *)id->driver_data;
- 	struct plat_stmmacenet_data *plat;
--	struct stmmac_resources res;
--	int i;
-+	struct stmmac_resources res = {};
- 	int ret;
-+	int i;
- 
- 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
- 	if (!plat)
-@@ -188,13 +188,13 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 		return ret;
- 	}
- 
--	/* Get the base address of device */
-+	/* The first BAR > 0 is the base IO addr of our device. */
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 		if (pci_resource_len(pdev, i) == 0)
- 			continue;
--		ret = pcim_iomap_regions(pdev, BIT(i), pci_name(pdev));
--		if (ret)
--			return ret;
-+		res.addr = pcim_iomap_region(pdev, i, STMMAC_RESOURCE_NAME);
-+		if (IS_ERR(res.addr))
-+			return PTR_ERR(res.addr);
- 		break;
- 	}
- 
-@@ -204,8 +204,6 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 	if (ret)
- 		return ret;
- 
--	memset(&res, 0, sizeof(res));
--	res.addr = pcim_iomap_table(pdev)[i];
- 	res.wol_irq = pdev->irq;
- 	res.irq = pdev->irq;
- 
--- 
-2.48.1
-
+pw-bot: cr
 
