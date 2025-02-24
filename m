@@ -1,118 +1,85 @@
-Return-Path: <netdev+bounces-169013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C36A42051
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:17:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB66A42052
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:18:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A25F189245E
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:17:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7761F164795
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E213F21931A;
-	Mon, 24 Feb 2025 13:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAE91B041E;
+	Mon, 24 Feb 2025 13:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fxmtDWxV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SI8tpfzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938D5195;
-	Mon, 24 Feb 2025 13:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E003E158D96
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 13:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740403043; cv=none; b=LETJ4Vu8ZGvAeENQC9qyzdUxUhbvjzKKYCOWccunNji74teKWJ8cKdFn/TdzJ0NeDoLb42OJfyaaCaAkdgXMHQ65t7YgP+GhoKYA4uk37YpnIvuk8RGrd6rTBmzmGZwy2rdqIZ9OOmjJUHWxVreA6akJPnLUh+PRiHcHe25mYKc=
+	t=1740403103; cv=none; b=PPJKasg5yF5qAzHNirr2rMN3pmnFe8YGY1WG6y8cKMYEuTiE1M53LM6tj/IdonXVQjwNEOw7U0TR/3Fo+b1fCE1GAS1mSBINzbt+MUAOYBLUlNdDlhXnIBTYW0B35jC91B0dQTuYBflcnJUakGrp/D5q1tm7vYXbnc+dnXxxib8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740403043; c=relaxed/simple;
-	bh=iJujQgrFpeR89LdUfnOUutmKKbuFiKdlZWu5H+P8p/0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aiSaz5A7rqkLzoQBLlOwJdSTRHhv3rANzxryEhzQSFKy+P+V4Bsgf/rRBNSlkqJiKNKdl5z54SRa3tQTIL83q2fPWC8PQk2SFE4hhhiVzGR3Zpy2orVZ93Knu5WgtiRORNF62/6L45b1ilrytUAGzDJzKCNcoNx8p47KDvtrtzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fxmtDWxV; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4A6D941C15;
-	Mon, 24 Feb 2025 13:17:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740403038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ksTMumsP+uok8AykLK2ZoU0DRsvBnKMfzttvPsXkX04=;
-	b=fxmtDWxVENVonUC0M6cX011xhIvC7sD7bgnqfraUtHc94+VeM1D9puG3DYiF9td+Qom/bj
-	5svpFk+lUN6BTRzWiysDJn9zjQa4DCzQwMihqQXoaVj50V43KjoQ9W/Xw07BUctlWNg4Jc
-	F3E7O1unVUsoGW7/XUmeFK7zhHMsZoDKMV31hO+Dcr/m34eD9TLyb1us+61Zq7d7750IQQ
-	4wUi7kEht2uBnBeQkW7qSwBxgaR8OSz3owt1/b7uoXumL99XMKYsZtXee50rCacwx4EC5H
-	J42tqD4W+z/j1hzQtw5JrktRBkYxAirE/q1T+Ny1rOi8/WOCoLEpCfExNlBcNA==
-Date: Mon, 24 Feb 2025 14:17:16 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 09/12] net: pse-pd: pd692x0: Add support for
- controller and manager power supplies
-Message-ID: <20250224141716.01751dc4@fedora>
-In-Reply-To: <Z7xqz-Z5UhqBQXnc@shell.armlinux.org.uk>
-References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
-	<20250218-feature_poe_port_prio-v5-9-3da486e5fd64@bootlin.com>
-	<20250224134222.358b28d8@fedora>
-	<Z7xqz-Z5UhqBQXnc@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740403103; c=relaxed/simple;
+	bh=CtE4kOp+CRbRH340BnBBUxRvSan+7x+GqmL3ATG0zSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GzgLO7p/zabAAIBAUJqOJNcgSa8N7OM/zqvhook7UiRxp5HW+8XO6ng7nadwYJ90Wiakrxj5x+e16ZYwvrImzXWAzQ3h0HfzhMY3rd8oWKpRDUxCgeXsjFFQhWNkSHiAQW9b6yw8k6wCv3IQdcNVUQEbpd2OCB54tI1/BwzsoQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SI8tpfzg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ku7Js3X5Nj95xO2vzKklKiqsoYh4kNw12uKQOjV+q3c=; b=SI
+	8tpfzgG2lcxqH5vIqbpZ3wEzPvTEFWS/0KpAuGNyanHf2xhCkUkSf93dThPpoAZJd5xVQoQTP6sNC
+	ZjVGo0yEKNQIQua5qIPGbVHIfADJ96aE9musUNy4z65jTB6JMyw05+Emd/CJSTAS81ddGdcgpiWY6
+	wH/llo3TV1S2ywg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tmYLh-00HALP-A3; Mon, 24 Feb 2025 14:18:17 +0100
+Date: Mon, 24 Feb 2025 14:18:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Cc: netdev@vger.kernel.org
+Subject: Re: Phy access methods for copper SFP+ disguised as SR
+Message-ID: <eb92da6a-b614-4deb-9321-df5a57ed987d@lunn.ch>
+References: <874j0kvqs3.fsf@miraculix.mork.no>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnv
- ghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874j0kvqs3.fsf@miraculix.mork.no>
 
-On Mon, 24 Feb 2025 12:49:19 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-
-> On Mon, Feb 24, 2025 at 01:42:22PM +0100, Maxime Chevallier wrote:
-> > On Tue, 18 Feb 2025 17:19:13 +0100
-> > Kory Maincent <kory.maincent@bootlin.com> wrote:  
-> > > diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-> > > index 44ded2aa6fca..c9fa60b314ce 100644
-> > > --- a/drivers/net/pse-pd/pd692x0.c
-> > > +++ b/drivers/net/pse-pd/pd692x0.c
-> > > @@ -976,8 +976,10 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
-> > >  	reg_name_len = strlen(dev_name(dev)) + 23;
-> > >  
-> > >  	for (i = 0; i < nmanagers; i++) {
-> > > +		static const char * const regulators[] = { "vaux5", "vaux3p3" };  
-> > 
-> > Looks like the 'static' is not needed here :)  
+On Sun, Feb 23, 2025 at 12:34:04PM +0100, Bjørn Mork wrote:
+> Got myself a couple of cheap 10GBase-T SFP+s and am struggling to figure
+> out how to talk to the phy.  The phy does not appear to be directly
+> accessible on 0x56, and it does not respond using the Rollball protocol
+> either.
 > 
-> Have you checked the compiler output before saying that?
+> Are there any other well known methods out there, or am I stuck with
+> whatever SR emulation the SFP vendor implemented?
 
-No I have not
+Those are the two i know of. The problem is, copper SFP modules are
+not part of any standard, so manufactures are free to do whatever they
+want.
 
-> I've seen plenty of instances where "static" should be there but isn't,
-> leading to the compiler generating inline code to create the
-> array/struct on the stack.
+For 1G, the Marvell 88e1111 is often used, since it has a built in i2c
+device. For 10G the Marvell 88X3310 is often used, but that does not
+have i2c, as far as i know, and there is a small microprocessor which
+implements the Rollball protocol, talking MDIO to the PHY. Since it is
+not build into the PHY the MCU could well be talking a different
+protocol.
 
-Makes sense then, so it should be good here.
-
-Thanks,
-
-Maxime
+	Andrew
 
