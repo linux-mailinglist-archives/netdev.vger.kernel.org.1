@@ -1,138 +1,145 @@
-Return-Path: <netdev+bounces-168883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FAEFA41459
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 04:56:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65548A41460
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 05:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875C716B3DA
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 03:56:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1391C7A42BB
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 04:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB87B19E97C;
-	Mon, 24 Feb 2025 03:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A001A3153;
+	Mon, 24 Feb 2025 04:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="B7WggNNN"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dp5aZ59p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19212F37;
-	Mon, 24 Feb 2025 03:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25870EACE;
+	Mon, 24 Feb 2025 04:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740369393; cv=none; b=Zwd1O9CSnZ8CxXD3Y2/pIxbN3Wqb9Gu6svxJxW/ijHwYAACx5N2usJxC36ga7+ddX8gI9lc5iK613xbv43RCo+K8tTZpvCbjoxDQmXSca08OgkfEf0Gm4sUrI4xmOvhSkl/qyp5k6+alzWI45h8KElntSNm2nLqzMh1RW3wxEck=
+	t=1740370154; cv=none; b=t7qIHzO2/TucpElPQIX/s+lIrgo4QE+2tXbXLhlFOVchJVEOJ/ICcd3DkMj7nrv4xJMFHOUUNnmz9oR5PwtlwCGa9dW97/6Olzn/H/ZbxSgvn0xCdCLfLAxrgZmK+Lgx4Zub60RFlNIfZ7ldWAA/TOxD+eN06E6F/SCROGAKoC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740369393; c=relaxed/simple;
-	bh=ZrrQ99Vyl/imGW9oIU17Kg2bfSqIyf0dcSZrlT3KtyE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B9QJEUkKUDA322xVAciXARkMwbZr3BRy1MSiMLddlxtPSjiuDMXQrzC6nWXNB+2xmW/EGwuCPSQ+0rCJn3GtZIMtC3IOjkWh8kKp/EuWnG/IH3l36a7RP+XaMJuCcb6A/zXEDUd6FcuEZB8GYP8pdsaxSvxIUi3OmmDp4v+fzTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=B7WggNNN; arc=none smtp.client-ip=67.231.148.174
+	s=arc-20240116; t=1740370154; c=relaxed/simple;
+	bh=603MhIoDIG5eFmq189ghXU/BNq49N6zz5Jz6S1Bur2Q=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZT1lx8qX798InVllv/SjQOL4Ln0UR0Mw2VPy8d+m7oCpgtyFqo2vCzxjou7scRRDGNSQdlaFFndXFifnYJyyeUNqzhqjpvmH5JJOhficZ0jPfUt/obnyV1FPHkw2daVTibZBuZOxdmyHtqQOT+VQjK3/MClmJ1pAW5njOCZvWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=dp5aZ59p; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51O0xAie024648;
-	Sun, 23 Feb 2025 19:56:09 -0800
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51NNwPsL005215;
+	Sun, 23 Feb 2025 20:08:44 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=P2suAZguiIOX2XVuwMAyT/U
-	jhnCDHVAZBb35/FSP19Q=; b=B7WggNNNIMyVxfyZ40MnueiTBHm19bfxiDxgOwS
-	F+Pu2MWmu2hJkBGFR2592kyFaDeNO1GwMfwaIrfNNlfxVgEUStZxGYLAc3fM9R/K
-	ZPcttQRNCVWBjRFEbaVCmhjrBMJHxjv4yI4SjiiIiCCSBeOfJGnARMHWSYPzht3S
-	nyDuSfhu/Gkb4LHC2Y9HGAwpJo02nQ9fX2GqGKkpGFYOFoDIwh3uGMuoW1bEbZD6
-	3CE0DdEI81RImDAPeQ8idLXGgUZcr9S6EtgiXNBc/M4HwT8QS51fd+amimwHgU2k
-	d6lmWu03lXSzunYG+G+vay/Bb6oGlIJOu89hTSTRi/KNgQw==
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=dMA+Qv9h5KBgwgNmQIaajGuLz
+	HS3+FjnopuYPOJKf7w=; b=dp5aZ59pabOoPHhyIYXtQZlaHFfrdtmM9OOeeq4Na
+	OD+YE0GOgeCjAdCEJ9xs4BvVHNwAx/F+FiBA3KEE7ZuzOEIo9jar9nAD6xGANKeH
+	6GQ7lkDgova9BvFj9yd2BdFBKqrZb5+D89vVQ1PaQ7qitXhkQc/sHYG9tZycQzS2
+	6v5ZGkuob+3Mr86GolajaTi42TdmbtYXluUQiNwciOnoQh62tj63uayAS6jcrAo3
+	UX90ELb/GVIXo4SDr6DB755V4TMadlZ3H51SzA+N0wYhpxQ3hfL1TGuVafu+9aO5
+	wZd+xLGlrZItuhmCmk9P1Lg8LxXBZs8dbgWhzGWnsF7mA==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4503qbs32u-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 44yeyktng5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 23 Feb 2025 19:56:09 -0800 (PST)
+	Sun, 23 Feb 2025 20:08:44 -0800 (PST)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 23 Feb 2025 19:56:08 -0800
+ 15.2.1544.4; Sun, 23 Feb 2025 20:08:43 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 23 Feb 2025 19:56:08 -0800
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 95F483F7068;
-	Sun, 23 Feb 2025 19:56:04 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: [net-next] Octeontx2-af: RPM: Register driver with PCI subsys IDs
-Date: Mon, 24 Feb 2025 09:26:03 +0530
-Message-ID: <20250224035603.1220913-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+ Transport; Sun, 23 Feb 2025 20:08:43 -0800
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id CA0FB3F7067;
+	Sun, 23 Feb 2025 20:08:39 -0800 (PST)
+Date: Mon, 24 Feb 2025 09:38:38 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <hfdevel@gmx.net>
+CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        FUJITA Tomonori
+	<fujita.tomonori@gmail.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 5/7] net: tn40xx: create swnode for mdio and
+ aqr105 phy and add to mdiobus
+Message-ID: <20250224040838.GA1655046@maili.marvell.com>
+References: <20250222-tn9510-v3a-v5-0-99365047e309@gmx.net>
+ <20250222-tn9510-v3a-v5-5-99365047e309@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: ipWuP4qWKcLSoxhqpJ5jbPR9PMcTDRPZ
-X-Proofpoint-ORIG-GUID: ipWuP4qWKcLSoxhqpJ5jbPR9PMcTDRPZ
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250222-tn9510-v3a-v5-5-99365047e309@gmx.net>
+X-Proofpoint-ORIG-GUID: 102jm9nJXvzcgV6BcdZHPn9t9HadZn2M
+X-Proofpoint-GUID: 102jm9nJXvzcgV6BcdZHPn9t9HadZn2M
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-24_01,2025-02-20_02,2024-11-22_01
 
-Although the PCI device ID and Vendor ID for the RPM (MAC) block
-have remained the same across Octeon CN10K and the next-generation
-CN20K silicon, Hardware architecture has changed (NIX mapped RPMs
-and RFOE Mapped RPMs).
-
-Add PCI Subsystem IDs to the device table to ensure that this driver
-can be probed from NIX mapped RPM devices only.
-
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 14 ++++++++++++--
- drivers/net/ethernet/marvell/octeontx2/af/rvu.h |  2 ++
- 2 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 8216f843a7cd..0b27a695008b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -66,8 +66,18 @@ static int cgx_fwi_link_change(struct cgx *cgx, int lmac_id, bool en);
- /* Supported devices */
- static const struct pci_device_id cgx_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_OCTEONTX2_CGX) },
--	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM) },
--	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN10K_A) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF10K_A) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF10K_B) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN10K_B) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN20KA) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
-+	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF20KA) },
- 	{ 0, }  /* end of table */
- };
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index a383b5ef5b2d..60f085b00a8c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -30,6 +30,8 @@
- #define PCI_SUBSYS_DEVID_CNF10K_A	       0xBA00
- #define PCI_SUBSYS_DEVID_CNF10K_B              0xBC00
- #define PCI_SUBSYS_DEVID_CN10K_B               0xBD00
-+#define PCI_SUBSYS_DEVID_CN20KA                0xC220
-+#define PCI_SUBSYS_DEVID_CNF20KA               0xC320
- 
- /* PCI BAR nos */
- #define	PCI_AF_REG_BAR_NUM			0
--- 
-2.43.0
-
+On 2025-02-22 at 15:19:32, Hans-Frieder Vogt via B4 Relay (devnull+hfdevel.gmx.net@kernel.org) wrote:
+> From: Hans-Frieder Vogt <hfdevel@gmx.net>
+>  int tn40_mdiobus_init(struct tn40_priv *priv)
+>  {
+>  	struct pci_dev *pdev = priv->pdev;
+> @@ -129,14 +181,36 @@ int tn40_mdiobus_init(struct tn40_priv *priv)
+>
+>  	bus->read_c45 = tn40_mdio_read_c45;
+>  	bus->write_c45 = tn40_mdio_write_c45;
+> +	priv->mdio = bus;
+> +
+> +	/* provide swnodes for AQR105-based cards only */
+> +	if (pdev->device == 0x4025) {
+> +		ret = tn40_swnodes_register(priv);
+> +		if (ret) {
+> +			pr_err("swnodes failed\n");
+> +			return ret;
+> +		}
+> +
+> +		ret = device_add_software_node(&bus->dev,
+> +					       priv->nodes.group[SWNODE_MDIO]);
+> +		if (ret) {
+> +			dev_err(&pdev->dev,
+> +				"device_add_software_node failed: %d\n", ret);
+No need to return on this error ?
+> +		}
+> +	}
+>
+>  	ret = devm_mdiobus_register(&pdev->dev, bus);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "failed to register mdiobus %d %u %u\n",
+>  			ret, bus->state, MDIOBUS_UNREGISTERED);
+> -		return ret;
+> +		goto err_swnodes_cleanup;
+>  	}
+>  	tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_6MHZ);
+> -	priv->mdio = bus;
+>  	return 0;
+> +
+> +err_swnodes_cleanup:
+No need to call device_remove_software_node() ?
+> +	tn40_swnodes_cleanup(priv);
+> +	return ret;
+>  }
+> +
+> +MODULE_FIRMWARE(AQR105_FIRMWARE);
+>
+> --
+> 2.47.2
+>
+>
 
