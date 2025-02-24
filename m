@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-169250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2529EA43128
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:45:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3ED1A43131
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:46:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C70757A6D9C
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:43:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0E81894F39
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B8220DD40;
-	Mon, 24 Feb 2025 23:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DE920FA86;
+	Mon, 24 Feb 2025 23:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPLSNk2i"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eG3osvWp"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32078211476
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D7F20DD5A
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740440566; cv=none; b=piawB+ssEBoJx+k602xBwWCKKS3hYSqNaKSmZGLUKL+XKar8qX69HhOYjWlu5gHQMT/Fv8rEOa6TfJLgGo/BHcn1RCTaQx031fb5lJ3wqeP6AtsE/jn/yBHE+YCsetHra12nu8gbyQpc7Hm50PXi0lLHvGQ5Bhw8+GCV2KQHoxQ=
+	t=1740440571; cv=none; b=sSspYErrsUj5cTOMmRuigF3nFeIdhphNu5aFkVsuJN9GtOPpbEKuU6vLLa+K1LsJtO5ToxeJ+C4BK/S8OhIJd94nctMFkn1WIzPD3h9hCw0xuYYl+nNN2IlClFFkrbG+yc66def58Ql3tWY+aLJd3GZeoLTkb2cVxkhgkHmSKKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740440566; c=relaxed/simple;
-	bh=uWeiT+1xVVDMPmHbQYp+hU7kEdI797i6pjlm/t6kV4s=;
+	s=arc-20240116; t=1740440571; c=relaxed/simple;
+	bh=bpjjkkgI8qN2Jz1CB8CZPSqqM/uWhxzK31+nJdUFGD4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sGaUaWhj3TjAiMmAeRqcpbC6tFk+MG59/RmV7m0/0usgAyIA+RZzvtB3iMxdRlU9u3VuIwed1Y79cxb6Sm1D5cJRxI0MGsFWfowqDff1iObMtZ60HQEGErJKDtadNidkOwtEqKs4jAEKMoGLQ3wkoD7Ps/od3uOTRmKhJrsx67Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cPLSNk2i; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=DBUImW/lYIazIni3dkAwZhZyAR08N62r/wUcP7F0ybUwbvst6jcXWOP6FRcp6J1/b1EShx8jHFnZNRR/qqjm9AI//Mu4JC+gxFNQv38WDd/KpXSdMarE3BkMzKy1W3TnpiaSE48czgOb3XjYkYArvnWcIKnYERePtmt2aOUOt+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eG3osvWp; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740440564;
+	s=mimecast20190719; t=1740440568;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pEjw7fxonTaV44564ll+XhxsCuf1s5tZ1MB5XWAbMQQ=;
-	b=cPLSNk2i6qUYeR4rifkPD6qISGtRjxNs7+LNL4uzZrXmjrihP6G+6leNO6nAKAzpoIwsD2
-	l1lZ67cHFmkK+zfiXLTj7BOvkAyjHzfQ6cE1yicZq41h39K2raTF+exvEa6osvS4LHryr6
-	QUQXMu2SbyWBPCkeI3yXZ15YIc4PctY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=qt3MUZYI6xKRH9u2P0Md1Im0HF5ENEnctvns3u/UBs0=;
+	b=eG3osvWpz454y9uiX/pMMyEpTEnCNgLdw5ed5XQh+ee2VKWsFZFMCMVhK9xIp5HEeVKJBh
+	Jb4xiO2eDFvTyjbC8iEKaJBkXAKreQeeXBwPfhg+S4mDf2iekmrrXhCYwr5EQvDDzPgbWo
+	ljPmgMOhbvlYv3Zq9qb2/v/tIlNVYtg=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-501-o3JMLdP-PBqvP9jONwGEvg-1; Mon,
- 24 Feb 2025 18:42:38 -0500
-X-MC-Unique: o3JMLdP-PBqvP9jONwGEvg-1
-X-Mimecast-MFC-AGG-ID: o3JMLdP-PBqvP9jONwGEvg_1740440557
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-235-LBVwjxxZM-KZdG8v_nl5Eg-1; Mon,
+ 24 Feb 2025 18:42:43 -0500
+X-MC-Unique: LBVwjxxZM-KZdG8v_nl5Eg-1
+X-Mimecast-MFC-AGG-ID: LBVwjxxZM-KZdG8v_nl5Eg_1740440561
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A25519783B2;
-	Mon, 24 Feb 2025 23:42:37 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CB6C1800878;
+	Mon, 24 Feb 2025 23:42:41 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.9])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6642A180035E;
-	Mon, 24 Feb 2025 23:42:34 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8880C1955BD4;
+	Mon, 24 Feb 2025 23:42:38 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -69,9 +69,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 08/15] afs: Improve afs_volume tracing to display a debug ID
-Date: Mon, 24 Feb 2025 23:41:45 +0000
-Message-ID: <20250224234154.2014840-9-dhowells@redhat.com>
+Subject: [PATCH net-next 09/15] afs: Improve server refcount/active count tracing
+Date: Mon, 24 Feb 2025 23:41:46 +0000
+Message-ID: <20250224234154.2014840-10-dhowells@redhat.com>
 In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
 References: <20250224234154.2014840-1-dhowells@redhat.com>
 Precedence: bulk
@@ -81,14 +81,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Improve the tracing of afs_volume objects to include displaying a debug ID
-so that different instances of volumes with the same "vid" can be
-distinguished.
-
-Also be consistent about displaying the volume's refcount (and not the
-cell's).
+Improve server refcount/active count tracing to distinguish between simply
+getting/putting a ref and using/unusing the server record (which changes
+the activity count as well as the refcount).  This makes it a bit easier to
+work out what's going on.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -100,143 +98,169 @@ cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- fs/afs/internal.h          |  1 +
- fs/afs/volume.c            | 15 +++++++++------
- include/trace/events/afs.h | 18 +++++++++++-------
- 3 files changed, 21 insertions(+), 13 deletions(-)
+ fs/afs/fsclient.c          |  4 ++--
+ fs/afs/rxrpc.c             |  2 +-
+ fs/afs/server.c            | 11 ++++++-----
+ fs/afs/server_list.c       |  4 ++--
+ include/trace/events/afs.h | 27 +++++++++++++++------------
+ 5 files changed, 26 insertions(+), 22 deletions(-)
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 89be1014968d..bbd550d496a7 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -623,6 +623,7 @@ struct afs_volume {
- 	afs_volid_t		vid;		/* The volume ID of this volume */
- 	afs_volid_t		vids[AFS_MAXTYPES]; /* All associated volume IDs */
- 	refcount_t		ref;
-+	unsigned int		debug_id;	/* Debugging ID for traces */
- 	time64_t		update_at;	/* Time at which to next update */
- 	struct afs_cell		*cell;		/* Cell to which belongs (pins ref) */
- 	struct rb_node		cell_node;	/* Link in cell->volumes */
-diff --git a/fs/afs/volume.c b/fs/afs/volume.c
-index af3a3f57c1b3..0efff3d25133 100644
---- a/fs/afs/volume.c
-+++ b/fs/afs/volume.c
-@@ -10,6 +10,7 @@
- #include "internal.h"
+diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
+index 1d9ecd5418d8..9f46d9aebc33 100644
+--- a/fs/afs/fsclient.c
++++ b/fs/afs/fsclient.c
+@@ -1653,7 +1653,7 @@ int afs_fs_give_up_all_callbacks(struct afs_net *net, struct afs_server *server,
+ 	bp = call->request;
+ 	*bp++ = htonl(FSGIVEUPALLCALLBACKS);
  
- static unsigned __read_mostly afs_volume_record_life = 60 * 60;
-+static atomic_t afs_volume_debug_id;
+-	call->server = afs_use_server(server, afs_server_trace_give_up_cb);
++	call->server = afs_use_server(server, afs_server_trace_use_give_up_cb);
+ 	afs_make_call(call, GFP_NOFS);
+ 	afs_wait_for_call_to_complete(call);
+ 	ret = call->error;
+@@ -1760,7 +1760,7 @@ bool afs_fs_get_capabilities(struct afs_net *net, struct afs_server *server,
+ 		return false;
  
- static void afs_destroy_volume(struct work_struct *work);
+ 	call->key	= key;
+-	call->server	= afs_use_server(server, afs_server_trace_get_caps);
++	call->server	= afs_use_server(server, afs_server_trace_use_get_caps);
+ 	call->peer	= rxrpc_kernel_get_peer(estate->addresses->addrs[addr_index].peer);
+ 	call->probe	= afs_get_endpoint_state(estate, afs_estate_trace_get_getcaps);
+ 	call->probe_index = addr_index;
+diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+index 886416ea1d96..de9e10575bdd 100644
+--- a/fs/afs/rxrpc.c
++++ b/fs/afs/rxrpc.c
+@@ -179,7 +179,7 @@ static void afs_free_call(struct afs_call *call)
+ 	if (call->type->destructor)
+ 		call->type->destructor(call);
  
-@@ -59,7 +60,7 @@ static void afs_remove_volume_from_cell(struct afs_volume *volume)
- 	struct afs_cell *cell = volume->cell;
+-	afs_unuse_server_notime(call->net, call->server, afs_server_trace_put_call);
++	afs_unuse_server_notime(call->net, call->server, afs_server_trace_unuse_call);
+ 	kfree(call->request);
  
- 	if (!hlist_unhashed(&volume->proc_link)) {
--		trace_afs_volume(volume->vid, refcount_read(&cell->ref),
-+		trace_afs_volume(volume->debug_id, volume->vid, refcount_read(&volume->ref),
- 				 afs_volume_trace_remove);
- 		write_seqlock(&cell->volume_lock);
- 		hlist_del_rcu(&volume->proc_link);
-@@ -84,6 +85,7 @@ static struct afs_volume *afs_alloc_volume(struct afs_fs_context *params,
- 	if (!volume)
- 		goto error_0;
+ 	o = atomic_read(&net->nr_outstanding_calls);
+diff --git a/fs/afs/server.c b/fs/afs/server.c
+index 4504e16b458c..923e07c37032 100644
+--- a/fs/afs/server.c
++++ b/fs/afs/server.c
+@@ -33,7 +33,7 @@ struct afs_server *afs_find_server(struct afs_net *net, const struct rxrpc_peer
  
-+	volume->debug_id	= atomic_inc_return(&afs_volume_debug_id);
- 	volume->vid		= vldb->vid[params->type];
- 	volume->update_at	= ktime_get_real_seconds() + afs_volume_record_life;
- 	volume->cell		= afs_get_cell(params->cell, afs_cell_trace_get_vol);
-@@ -115,7 +117,7 @@ static struct afs_volume *afs_alloc_volume(struct afs_fs_context *params,
+ 	do {
+ 		if (server)
+-			afs_unuse_server_notime(net, server, afs_server_trace_put_find_rsq);
++			afs_unuse_server_notime(net, server, afs_server_trace_unuse_find_rsq);
+ 		server = NULL;
+ 		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+ 		read_seqbegin_or_lock(&net->fs_addr_lock, &seq);
+@@ -49,7 +49,7 @@ struct afs_server *afs_find_server(struct afs_net *net, const struct rxrpc_peer
+ 		server = NULL;
+ 		continue;
+ 	found:
+-		server = afs_maybe_use_server(server, afs_server_trace_get_by_addr);
++		server = afs_maybe_use_server(server, afs_server_trace_use_by_addr);
  
- 	*_slist = slist;
- 	rcu_assign_pointer(volume->servers, slist);
--	trace_afs_volume(volume->vid, 1, afs_volume_trace_alloc);
-+	trace_afs_volume(volume->debug_id, volume->vid, 1, afs_volume_trace_alloc);
- 	return volume;
+ 	} while (need_seqretry(&net->fs_addr_lock, seq));
  
- error_1:
-@@ -247,7 +249,7 @@ static void afs_destroy_volume(struct work_struct *work)
- 	afs_remove_volume_from_cell(volume);
- 	afs_put_serverlist(volume->cell->net, slist);
- 	afs_put_cell(volume->cell, afs_cell_trace_put_vol);
--	trace_afs_volume(volume->vid, refcount_read(&volume->ref),
-+	trace_afs_volume(volume->debug_id, volume->vid, refcount_read(&volume->ref),
- 			 afs_volume_trace_free);
- 	kfree_rcu(volume, rcu);
+@@ -76,7 +76,7 @@ struct afs_server *afs_find_server_by_uuid(struct afs_net *net, const uuid_t *uu
+ 		 * changes.
+ 		 */
+ 		if (server)
+-			afs_unuse_server(net, server, afs_server_trace_put_uuid_rsq);
++			afs_unuse_server(net, server, afs_server_trace_unuse_uuid_rsq);
+ 		server = NULL;
+ 		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+ 		read_seqbegin_or_lock(&net->fs_lock, &seq);
+@@ -91,7 +91,7 @@ struct afs_server *afs_find_server_by_uuid(struct afs_net *net, const uuid_t *uu
+ 			} else if (diff > 0) {
+ 				p = p->rb_right;
+ 			} else {
+-				afs_use_server(server, afs_server_trace_get_by_uuid);
++				afs_use_server(server, afs_server_trace_use_by_uuid);
+ 				break;
+ 			}
  
-@@ -262,7 +264,7 @@ bool afs_try_get_volume(struct afs_volume *volume, enum afs_volume_trace reason)
- 	int r;
- 
- 	if (__refcount_inc_not_zero(&volume->ref, &r)) {
--		trace_afs_volume(volume->vid, r + 1, reason);
-+		trace_afs_volume(volume->debug_id, volume->vid, r + 1, reason);
- 		return true;
- 	}
- 	return false;
-@@ -278,7 +280,7 @@ struct afs_volume *afs_get_volume(struct afs_volume *volume,
- 		int r;
- 
- 		__refcount_inc(&volume->ref, &r);
--		trace_afs_volume(volume->vid, r + 1, reason);
-+		trace_afs_volume(volume->debug_id, volume->vid, r + 1, reason);
- 	}
- 	return volume;
+@@ -273,7 +273,8 @@ static struct afs_addr_list *afs_vl_lookup_addrs(struct afs_cell *cell,
  }
-@@ -290,12 +292,13 @@ struct afs_volume *afs_get_volume(struct afs_volume *volume,
- void afs_put_volume(struct afs_volume *volume, enum afs_volume_trace reason)
- {
- 	if (volume) {
-+		unsigned int debug_id = volume->debug_id;
- 		afs_volid_t vid = volume->vid;
- 		bool zero;
- 		int r;
  
- 		zero = __refcount_dec_and_test(&volume->ref, &r);
--		trace_afs_volume(vid, r - 1, reason);
-+		trace_afs_volume(debug_id, vid, r - 1, reason);
- 		if (zero)
- 			schedule_work(&volume->destructor);
+ /*
+- * Get or create a fileserver record.
++ * Get or create a fileserver record and return it with an active-use count on
++ * it.
+  */
+ struct afs_server *afs_lookup_server(struct afs_cell *cell, struct key *key,
+ 				     const uuid_t *uuid, u32 addr_version)
+diff --git a/fs/afs/server_list.c b/fs/afs/server_list.c
+index d20cd902ef94..784236b9b2a9 100644
+--- a/fs/afs/server_list.c
++++ b/fs/afs/server_list.c
+@@ -16,7 +16,7 @@ void afs_put_serverlist(struct afs_net *net, struct afs_server_list *slist)
+ 	if (slist && refcount_dec_and_test(&slist->usage)) {
+ 		for (i = 0; i < slist->nr_servers; i++)
+ 			afs_unuse_server(net, slist->servers[i].server,
+-					 afs_server_trace_put_slist);
++					 afs_server_trace_unuse_slist);
+ 		kfree_rcu(slist, rcu);
  	}
+ }
+@@ -98,7 +98,7 @@ struct afs_server_list *afs_alloc_server_list(struct afs_volume *volume,
+ 		if (j < slist->nr_servers) {
+ 			if (slist->servers[j].server == server) {
+ 				afs_unuse_server(volume->cell->net, server,
+-						 afs_server_trace_put_slist_isort);
++						 afs_server_trace_unuse_slist_isort);
+ 				continue;
+ 			}
+ 
 diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index c19132605f41..cf94bf1e8286 100644
+index cf94bf1e8286..24d99fbc298f 100644
 --- a/include/trace/events/afs.h
 +++ b/include/trace/events/afs.h
-@@ -1539,25 +1539,29 @@ TRACE_EVENT(afs_server,
- 	    );
+@@ -132,22 +132,25 @@ enum yfs_cm_operation {
+ 	EM(afs_server_trace_destroy,		"DESTROY  ") \
+ 	EM(afs_server_trace_free,		"FREE     ") \
+ 	EM(afs_server_trace_gc,			"GC       ") \
+-	EM(afs_server_trace_get_by_addr,	"GET addr ") \
+-	EM(afs_server_trace_get_by_uuid,	"GET uuid ") \
+-	EM(afs_server_trace_get_caps,		"GET caps ") \
+ 	EM(afs_server_trace_get_install,	"GET inst ") \
+-	EM(afs_server_trace_get_new_cbi,	"GET cbi  ") \
+ 	EM(afs_server_trace_get_probe,		"GET probe") \
+-	EM(afs_server_trace_give_up_cb,		"giveup-cb") \
+ 	EM(afs_server_trace_purging,		"PURGE    ") \
+-	EM(afs_server_trace_put_call,		"PUT call ") \
+ 	EM(afs_server_trace_put_cbi,		"PUT cbi  ") \
+-	EM(afs_server_trace_put_find_rsq,	"PUT f-rsq") \
+ 	EM(afs_server_trace_put_probe,		"PUT probe") \
+-	EM(afs_server_trace_put_slist,		"PUT slist") \
+-	EM(afs_server_trace_put_slist_isort,	"PUT isort") \
+-	EM(afs_server_trace_put_uuid_rsq,	"PUT u-req") \
+-	E_(afs_server_trace_update,		"UPDATE")
++	EM(afs_server_trace_see_expired,	"SEE expd ") \
++	EM(afs_server_trace_unuse_call,		"UNU call ") \
++	EM(afs_server_trace_unuse_create_fail,	"UNU cfail") \
++	EM(afs_server_trace_unuse_find_rsq,	"UNU f-rsq") \
++	EM(afs_server_trace_unuse_slist,	"UNU slist") \
++	EM(afs_server_trace_unuse_slist_isort,	"UNU isort") \
++	EM(afs_server_trace_unuse_uuid_rsq,	"PUT u-req") \
++	EM(afs_server_trace_update,		"UPDATE   ") \
++	EM(afs_server_trace_use_by_addr,	"USE addr ") \
++	EM(afs_server_trace_use_by_uuid,	"USE uuid ") \
++	EM(afs_server_trace_use_cm_call,	"USE cm-cl") \
++	EM(afs_server_trace_use_get_caps,	"USE gcaps") \
++	EM(afs_server_trace_use_give_up_cb,	"USE gvupc") \
++	E_(afs_server_trace_wait_create,	"WAIT crt ")
  
- TRACE_EVENT(afs_volume,
--	    TP_PROTO(afs_volid_t vid, int ref, enum afs_volume_trace reason),
-+	    TP_PROTO(unsigned int debug_id, afs_volid_t vid, int ref,
-+		     enum afs_volume_trace reason),
- 
--	    TP_ARGS(vid, ref, reason),
-+	    TP_ARGS(debug_id, vid, ref, reason),
- 
- 	    TP_STRUCT__entry(
-+		    __field(unsigned int,		debug_id)
- 		    __field(afs_volid_t,		vid)
- 		    __field(int,			ref)
- 		    __field(enum afs_volume_trace,	reason)
- 			     ),
- 
- 	    TP_fast_assign(
--		    __entry->vid = vid;
--		    __entry->ref = ref;
--		    __entry->reason = reason;
-+		    __entry->debug_id	= debug_id;
-+		    __entry->vid	= vid;
-+		    __entry->ref	= ref;
-+		    __entry->reason	= reason;
+ #define afs_volume_traces \
+ 	EM(afs_volume_trace_alloc,		"ALLOC         ") \
+@@ -1531,7 +1534,7 @@ TRACE_EVENT(afs_server,
+ 		    __entry->reason = reason;
  			   ),
  
--	    TP_printk("V=%llx %s ur=%d",
--		      __entry->vid,
-+	    TP_printk("V=%08x %s vid=%llx r=%d",
-+		      __entry->debug_id,
- 		      __print_symbolic(__entry->reason, afs_volume_traces),
-+		      __entry->vid,
- 		      __entry->ref)
- 	    );
- 
+-	    TP_printk("s=%08x %s u=%d a=%d",
++	    TP_printk("s=%08x %s r=%d a=%d",
+ 		      __entry->server,
+ 		      __print_symbolic(__entry->reason, afs_server_traces),
+ 		      __entry->ref,
 
 
