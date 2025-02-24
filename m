@@ -1,74 +1,222 @@
-Return-Path: <netdev+bounces-169199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC04A42ED6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:18:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66171A42EDE
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DE9816ED53
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:18:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C762F1890E23
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF141D86E8;
-	Mon, 24 Feb 2025 21:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D531D959B;
+	Mon, 24 Feb 2025 21:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r06LxFpP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LqNDiC82"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497131D6DB9
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 21:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6273719F48D
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 21:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740431925; cv=none; b=ZMOIuwAN1T83BXfj9xvp1AwIPiu4ApbAhqNC5f2Zmg7klmPj8Tog/VbbkLxrSgFuDWFw5C0Ry58YKLY9BBugRMyh8JsDPLTy98tS4ldIe4slSBECnxGumt6n8XaubltWDU0666BkmioFiLlnAr0oNvidmxPJL3nq7nyxjG2EuJ0=
+	t=1740431942; cv=none; b=ma7YMvjjz4InpOnql0ljNP+saZp34kVb8mcA/E0rBBUjJ70lC2krg9vll25yhHFvZrpOk2+fq/M2LQtBukaNjgcfz9+DK4pjUjdF5SLYIHtAelwT5abOJEIIBvUbTQrrEXDAFAa1zIqEQlmY0ITZbs0MFPgT9SUp4vOE2lBu8Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740431925; c=relaxed/simple;
-	bh=3EcKWlNLl1gHbLuiJReP3k+3EKQB91E9pGuFaGy+VZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LzJdn0pQsThNANEBKMbrkD0pQ89Bli7uiVwfVX7CR5n8t/5eCVeaZTqq9SlLMTOwOGPAY/NH+1dvnf3QOQpNKeWGYMqRpgHab1TuBq+19qtOTPe68DVvUl9/Aefx/rjbw9gl+0kv1vyXJP4IoPEF2hujnY9KQuzts2PxNGTaGVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r06LxFpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96C32C4CED6;
-	Mon, 24 Feb 2025 21:18:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740431924;
-	bh=3EcKWlNLl1gHbLuiJReP3k+3EKQB91E9pGuFaGy+VZA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r06LxFpPnm1sienapYgnUftrOmmcOPbFp8voDzqm3Ujx3dc/0pPBEeFgNQVf7IuWX
-	 hw1sKpPhY8TxHZTg67bfZxUPvLCh5ePOwVkPfXCPLaGRYf12+Ab/N/1H11tC75+D2l
-	 70EvE9SoLoEaG6PYb65PVAlUHgbYs7mH9mmJDD3WuiIrL84B0TrTcAUgCXDkpxCltC
-	 nvFTZLpCiqEZKFcMPmyxXGT5Ay7FDK748zafAkaAAXQ9GMMk/7oNGjmH7yQxmNbnAI
-	 QT1C3CBuEIw6rJ2+3k2NzjNvH6+yNh88qZ8//GGHu3gD65Vv86wG9plViaS7FJ1XTJ
-	 Dzpf0z4Dk2wIA==
-Date: Mon, 24 Feb 2025 13:18:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mohammad Heib <mheib@redhat.com>
-Cc: netdev@vger.kernel.org, benve@cisco.com, satishkh@cisco.com
-Subject: Re: [PATCH net] enic: Avoid removing IPv6 address when updating
- rings size.
-Message-ID: <20250224131843.4ef2307d@kernel.org>
-In-Reply-To: <20250223214203.2159676-1-mheib@redhat.com>
-References: <20250223214203.2159676-1-mheib@redhat.com>
+	s=arc-20240116; t=1740431942; c=relaxed/simple;
+	bh=/PQO7ZUzimjU555KfQCQmRzVBItJMZqfMDY7mblzjks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=la/cNfgsW7wJpKX2+UVbvYnYFLFIzmbUN1EIC0V5ahwMdbD2TEktWPPnnnDFvtD7aQRF8wwMwzDqBeWfLYNnaagXpu5r25ZK0Qd1gPZKr9waDUIy27/+AUTX41k4fbH2wy9WRlAKrh6TGwG8SgmRzrHJHVBjrmdmSeAnZvfil0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LqNDiC82; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740431939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b4ChK7d4tTnyUI2qkV4nzn6rGiBQ0dJ69F8Ua/liB9M=;
+	b=LqNDiC82vdKj1lUIj1FS67vvq8PZ5rplEr6vO1z6gyh/KpT6vwmkrV9Jgm5oGjlVUFEuKr
+	mlHM0YPZY4UBNxw/fzWxblNHAdc4m2hbuHAHPnThiMrv0eLVsRUm2+qzrWC/xfd+N4kzUQ
+	D4ZGHDulm68HHC1rOUnm7SFruY5cOWw=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-39PIt6DXN-SO_uNd7IyN9A-1; Mon, 24 Feb 2025 16:18:57 -0500
+X-MC-Unique: 39PIt6DXN-SO_uNd7IyN9A-1
+X-Mimecast-MFC-AGG-ID: 39PIt6DXN-SO_uNd7IyN9A_1740431937
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-abb9d1c8113so367214366b.0
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 13:18:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740431937; x=1741036737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b4ChK7d4tTnyUI2qkV4nzn6rGiBQ0dJ69F8Ua/liB9M=;
+        b=hZ8+Wa25jSix1nQSX9PON27An8FqRUY2UbdFONG5jLO4S50YW0AtLieMU6CBy6xLVR
+         pTVGKCTBOaM22vRYa4UFAesRHW1R94Kg2BO2ZSVg3r+uI2FoPadDLtS0DejyITb3vkdb
+         b4IQPR+YQgOCu5gPZLUO8EH2QyI+sM3IPEfXuMU8ZoDGO6Dz3AjrJ1EGr3mL9JfYtJ4i
+         BWfxOJT4i70M66T6cewWCr1xneQvoMHwwSlOwCoTTvaPH9Jp2bQ6CCCQ/NE1m1fFxB8N
+         hfUab6hJKis7UNXWbz7kXspWHrUwRCKNIFUPuTdCG7/9XxaCsj+QNUjmEU5XKyXYYura
+         BQaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmiHroiw0xtZTtORBN7bEKklPpSEgs6UYVQczrEyzkcaNlZ977+mtae1tAfboVQauPvK8/YjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzi9WwVHSRmeYTnRT81n6Pti1lsPOQV0kbSXYHlGK+8ehG6lqWa
+	9DasH/jIWbYzZfcsj6SE+TDNeDv0yoJ+EALxyNER65mH0ckW2TW/A0AivRdGW+l3A7we/Mr1ZFL
+	d30IcXl6GOyOAjfGC21VE2VKKhU5aVmnHuk5M7yY+Ja3RMQ3awA+f0g==
+X-Gm-Gg: ASbGncufDofTJQKqWdHd/0Fd8M0ZlwxPDw+UYdKMlVl+XBm9JcSaGJ77LUK7EYfy8Uh
+	FgrhclG9u65dYaat1+pOwA4wW7K9RZwm/lrowy9uOyYBw/8DfyfJ/s71DrnTXyZxqZg/2JdJDWm
+	lQAjbgUPrsLrhEPIE1pv8wOALs7v3z4X0XfdUJo05a88gsHw+POLQu3RbPi5HrdNv5dFEx6yow3
+	dsogNs5y5IanzIDliwyqcfocOormw28A2DEjPqzXlBnCM9WqFOqa7VxWG3fo9NWELR97ek8W5uJ
+	MnvWsDB1uA==
+X-Received: by 2002:a17:906:3151:b0:aba:5e50:6984 with SMTP id a640c23a62f3a-abc099ead3amr1385573166b.2.1740431936617;
+        Mon, 24 Feb 2025 13:18:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHYEBC44CLKnEsK0LbK9e6zpwdED/WRkdl8e2EWDOlyh5Ynisvb1G99K7KkazLO1N5pYn2zMA==
+X-Received: by 2002:a17:906:3151:b0:aba:5e50:6984 with SMTP id a640c23a62f3a-abc099ead3amr1385570066b.2.1740431936166;
+        Mon, 24 Feb 2025 13:18:56 -0800 (PST)
+Received: from redhat.com ([2a0d:6fc7:441:1929:22c5:4595:d9bc:489e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed20134fdsm23497166b.94.2025.02.24.13.18.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 13:18:55 -0800 (PST)
+Date: Mon, 24 Feb 2025 16:18:47 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	James Smart <james.smart@broadcom.com>,
+	Dick Kennedy <dick.kennedy@broadcom.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Matt Wu <wuqiang.matt@bytedance.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>
+Subject: Re: [PATCH v2 00/13] cpumask: cleanup cpumask_next_wrap()
+ implementation and usage
+Message-ID: <20250224161832-mutt-send-email-mst@kernel.org>
+References: <20250128164646.4009-1-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250128164646.4009-1-yury.norov@gmail.com>
 
-On Sun, 23 Feb 2025 23:42:03 +0200 Mohammad Heib wrote:
-> To avoid this behavior, this patch temporarily sets the interface config
-> `keep_addr_on_down` to 1 before closing the device during the rings
-> update, and restores the original value of `keep_addr_on_down` after
-> updating the device rings, this will prevent the ipv6 stack from
-> removing the current ipv6 addresses during the rings update.
+On Tue, Jan 28, 2025 at 11:46:29AM -0500, Yury Norov wrote:
+> cpumask_next_wrap() is overly complicated, comparing to it's generic
+> version find_next_bit_wrap(), not mentioning it duplicates the above.
+> It roots to the times when the function was used in the implementation
+> of for_each_cpu_wrap() iterator. The function has 2 additional parameters
+> that were used to catch loop termination condition for the iterator.
+> (Although, only one is needed.)
+> 
+> Since 4fe49b3b97c262 ("lib/bitmap: introduce for_each_set_bit_wrap()
+> macro"), for_each_cpu_wrap() is wired to corresponding generic
+> wrapping bitmap iterator, and additional complexity of
+> cpumask_next_wrap() is not needed anymore.
+> 
+> All existing users call cpumask_next_wrap() in a manner that makes
+> it possible to turn it to a straight and simple alias to
+> find_next_bit_wrap().
+> 
+> This series replaces historical 4-parameter cpumask_next_wrap() with a
+> thin 2-parameter wrapper around find_next_bit_wrap().
+> 
+> Where it's possible to use for_each_cpu_wrap() iterator, the code is
+> switched to use it because it's always preferable to use iterators over
+> open loops.
+> 
+> This series touches various scattered subsystems and To-list for the
+> whole series is quite a long. To minimize noise, I send cover-letter and
+> key patches #5 and 6 to every person involved. All other patches are sent
+> individually to those pointed by scripts/get_maintainers.pl.
+> 
+> I'd like to move the series with my bitmap-for-next branch as a whole.
 
-Wrong direction, you should support reconfiguration natively 
-in the driver. Pre-allocate all the resources for the new config
-and swap it with the running one.
--- 
-pw-bot: cr
+
+virtio-net changes are straight-forward, so
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> v1: https://lore.kernel.org/netdev/20241228184949.31582-1-yury.norov@gmail.com/T/
+> v2:
+>  - rebase on top of today's origin/master;
+>  - drop #v1-10: not needed since v6.14 @ Sagi Grinberg;
+>  - #2, #3: fix picking next unused CPU @ Nick Child;
+>  - fix typos, cleanup comments @ Bjorn Helgaas, Alexander Gordeev;
+>  - CC Christoph Hellwig for the whole series.
+> 
+> Yury Norov (13):
+>   objpool: rework objpool_pop()
+>   virtio_net: simplify virtnet_set_affinity()
+>   ibmvnic: simplify ibmvnic_set_queue_affinity()
+>   powerpc/xmon: simplify xmon_batch_next_cpu()
+>   cpumask: deprecate cpumask_next_wrap()
+>   cpumask: re-introduce cpumask_next{,_and}_wrap()
+>   cpumask: use cpumask_next_wrap() where appropriate
+>   padata: switch padata_find_next() to using cpumask_next_wrap()
+>   s390: switch stop_machine_yield() to using cpumask_next_wrap()
+>   scsi: lpfc: switch lpfc_irq_rebalance() to using cpumask_next_wrap()
+>   scsi: lpfc: rework lpfc_next_{online,present}_cpu()
+>   PCI: hv: Switch hv_compose_multi_msi_req_get_cpu() to using
+>     cpumask_next_wrap()
+>   cpumask: drop cpumask_next_wrap_old()
+> 
+>  arch/powerpc/xmon/xmon.c            |  6 +--
+>  arch/s390/kernel/processor.c        |  2 +-
+>  drivers/net/ethernet/ibm/ibmvnic.c  | 18 +++++---
+>  drivers/net/virtio_net.c            | 12 ++---
+>  drivers/pci/controller/pci-hyperv.c |  3 +-
+>  drivers/scsi/lpfc/lpfc.h            | 23 +++-------
+>  drivers/scsi/lpfc/lpfc_init.c       |  2 +-
+>  include/linux/cpumask.h             | 69 ++++++++++++++++++++---------
+>  include/linux/objpool.h             |  7 ++-
+>  kernel/padata.c                     |  2 +-
+>  lib/cpumask.c                       | 37 +---------------
+>  11 files changed, 81 insertions(+), 100 deletions(-)
+> 
+> -- 
+> 2.43.0
+
 
