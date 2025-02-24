@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-169254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7568AA4313B
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:48:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2FCA4312D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF7743B49CB
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 472991626DD
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2A3213235;
-	Mon, 24 Feb 2025 23:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819342139C9;
+	Mon, 24 Feb 2025 23:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ff0diw0K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAT3R5Dk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBB62135CA
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7D52135D7
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740440583; cv=none; b=KCGjyLADyvKMb6R4mx0gl22Po71mt48L+jbcD+UnNXGVUUiS8ZGpomEttIPEThC48FrA6m7nZ95PT8D8kwGr0IAB7VmR1tuNhAQjHsoJCHLYnDaw/ggwP/C00tHrA16eQGCEeD2d17EmkOlMZENCo1iC/sJTmPno9iDaz0gob4Q=
+	t=1740440587; cv=none; b=tkpKHTBhMzr6gFZ2pMCJiDB+bSAaN2cyah5lS2mMaPgrMOKeD8oNS8JyseX8kbv+VOtZ2Q1vux2BV2JiyWt/9Mnd1cZULNXyP6E004FPf/+HonktM/W51JCZ5W/FvVGPHBlRydMdN1nTRyDnxHHQnfNUibhtEA4TIINMenSnPi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740440583; c=relaxed/simple;
-	bh=7GSX7JKuB/vKM5jaru61sD+LYgBzM0cIZr1NEMjQElc=;
+	s=arc-20240116; t=1740440587; c=relaxed/simple;
+	bh=Q0BA5gjvk977xbCrLjpmhWqjx+hEkNWlFcia2JuuILc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dFOrVnyLsoFNqwA7YpAkRXTDkCjVq/nRZE6H8MQd5g6aV8ELzejkVVLRyquTaIoVq7EBmY52rhLRW4qSKKy4Q99lwzOMCsgVeI1EkJsueRbq8TZ1td9pWcq+6ozIQDxoHkHDGvqVjIUD9aTXWKN7cX5uVx6R6Y4mE8dY6EVQMmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ff0diw0K; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ffTlJwY+uETy0RYymu+8AD/Pmph0XAwbyU/8PiQeOfSi8A5WgyaTR/g4+YQweIRu3fkNhqYZVTpnF0OfmR72WjCOzugxMIqwgDUSzoMOzkB1cB6tLy07vDD+iMIbvRQh29KjAJtu8cWPmzDuUu0vDf8f3LnB1XZOVwzNIhQDCk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fAT3R5Dk; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740440581;
+	s=mimecast20190719; t=1740440584;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=q5ues3zY+9vJROA+24t/iPCUg8VWVFjV9Q9yVGRjWjU=;
-	b=Ff0diw0K15yFG179nptsxzZiN3N3G1ig0pCVwN42KG3jT42becMnQqdxZKnPlCmdh8aBpS
-	hlmsl2o4KTxrJm4sqNb4IkolcMUe3drFbZ4p5fNk4HHHNWjxUDLQTjJOjO9JmEK4VOObFm
-	7ZI/fSCzTz5SiPv3B46SnsgTWL/TVjs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=JqRP6+B4vUKaQBcH12f3hD8auaak33wCem06F1VD/2Q=;
+	b=fAT3R5DkNhJDMptAjsdSYOKuow3K0qZK5hW6KhJDjXfBh1/VxWzZgjOhH2wetXqws9YNPS
+	wObI8zhXEHgU+dqq8dkFrQq0ugwTAKs+/YyxBhHTtW2ER6e9GnDe5JHCC8liQIywyHP15k
+	A7Yuug5+/io6dAm+Cvj31JX/GpuIexA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-Q7eUhoPUMHK8NKDGFirnfg-1; Mon,
- 24 Feb 2025 18:42:56 -0500
-X-MC-Unique: Q7eUhoPUMHK8NKDGFirnfg-1
-X-Mimecast-MFC-AGG-ID: Q7eUhoPUMHK8NKDGFirnfg_1740440574
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-196-75w83OFMP-Gka926ufNZQQ-1; Mon,
+ 24 Feb 2025 18:43:00 -0500
+X-MC-Unique: 75w83OFMP-Gka926ufNZQQ-1
+X-Mimecast-MFC-AGG-ID: 75w83OFMP-Gka926ufNZQQ_1740440579
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7703A19039CA;
-	Mon, 24 Feb 2025 23:42:54 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AFDED18EB2C3;
+	Mon, 24 Feb 2025 23:42:58 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.9])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B33C31955BD4;
-	Mon, 24 Feb 2025 23:42:51 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ED7661954B00;
+	Mon, 24 Feb 2025 23:42:55 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -69,9 +69,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 12/15] rxrpc: Allow the app to store private data on peer structs
-Date: Mon, 24 Feb 2025 23:41:49 +0000
-Message-ID: <20250224234154.2014840-13-dhowells@redhat.com>
+Subject: [PATCH net-next 13/15] afs: Use the per-peer app data provided by rxrpc
+Date: Mon, 24 Feb 2025 23:41:50 +0000
+Message-ID: <20250224234154.2014840-14-dhowells@redhat.com>
 In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
 References: <20250224234154.2014840-1-dhowells@redhat.com>
 Precedence: bulk
@@ -83,13 +83,13 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Provide a way for the application (e.g. the afs filesystem) to store
-private data on the rxrpc_peer structs for later retrieval via the call
-object.
+Make use of the per-peer application data that rxrpc now allows the
+application to store on the rxrpc_peer struct to hold a back pointer to the
+afs_server record that peer represents an endpoint for.
 
-This will allow afs to store a pointer to the afs_server object on the
-rxrpc_peer struct, thereby obviating the need for afs to keep lookup tables
-by which it can associate an incoming call with server that transmitted it.
+Then, when a call comes in to the AFS cache manager, this can be used to
+map it to the correct server record rather than having to use a
+UUID-to-server mapping table and having to do an additional lookup.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -101,69 +101,509 @@ cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- include/net/af_rxrpc.h  |  2 ++
- net/rxrpc/ar-internal.h |  1 +
- net/rxrpc/peer_object.c | 26 ++++++++++++++++++++++++++
- 3 files changed, 29 insertions(+)
+ fs/afs/addr_list.c         | 50 +++++++++++++++++++++++
+ fs/afs/cmservice.c         | 82 ++++++--------------------------------
+ fs/afs/fs_probe.c          | 32 ++++++++++-----
+ fs/afs/internal.h          |  9 +++--
+ fs/afs/proc.c              | 10 ++++-
+ fs/afs/rxrpc.c             |  6 +++
+ fs/afs/server.c            | 46 ++++++---------------
+ include/trace/events/afs.h |  4 +-
+ net/rxrpc/peer_object.c    |  4 +-
+ 9 files changed, 120 insertions(+), 123 deletions(-)
 
-diff --git a/include/net/af_rxrpc.h b/include/net/af_rxrpc.h
-index 0754c463224a..cf793d18e5df 100644
---- a/include/net/af_rxrpc.h
-+++ b/include/net/af_rxrpc.h
-@@ -69,6 +69,8 @@ struct rxrpc_peer *rxrpc_kernel_get_peer(struct rxrpc_peer *peer);
- struct rxrpc_peer *rxrpc_kernel_get_call_peer(struct socket *sock, struct rxrpc_call *call);
- const struct sockaddr_rxrpc *rxrpc_kernel_remote_srx(const struct rxrpc_peer *peer);
- const struct sockaddr *rxrpc_kernel_remote_addr(const struct rxrpc_peer *peer);
-+unsigned long rxrpc_kernel_set_peer_data(struct rxrpc_peer *peer, unsigned long app_data);
-+unsigned long rxrpc_kernel_get_peer_data(const struct rxrpc_peer *peer);
- unsigned int rxrpc_kernel_get_srtt(const struct rxrpc_peer *);
- int rxrpc_kernel_charge_accept(struct socket *, rxrpc_notify_rx_t,
- 			       rxrpc_user_attach_call_t, unsigned long, gfp_t,
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index a64a0cab1bf7..3cc3af15086f 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -344,6 +344,7 @@ struct rxrpc_peer {
- 	struct hlist_head	error_targets;	/* targets for net error distribution */
- 	struct rb_root		service_conns;	/* Service connections */
- 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
-+	unsigned long		app_data;	/* Application data (e.g. afs_server) */
- 	time64_t		last_tx_at;	/* Last time packet sent here */
- 	seqlock_t		service_conn_lock;
- 	spinlock_t		lock;		/* access lock */
+diff --git a/fs/afs/addr_list.c b/fs/afs/addr_list.c
+index 6d42f85c6be5..e941da5b6dd9 100644
+--- a/fs/afs/addr_list.c
++++ b/fs/afs/addr_list.c
+@@ -362,3 +362,53 @@ int afs_merge_fs_addr6(struct afs_net *net, struct afs_addr_list *alist,
+ 	alist->nr_addrs++;
+ 	return 0;
+ }
++
++/*
++ * Set the app data on the rxrpc peers an address list points to
++ */
++void afs_set_peer_appdata(struct afs_server *server,
++			  struct afs_addr_list *old_alist,
++			  struct afs_addr_list *new_alist)
++{
++	unsigned long data = (unsigned long)server;
++	int n = 0, o = 0;
++
++	if (!old_alist) {
++		/* New server.  Just set all. */
++		for (; n < new_alist->nr_addrs; n++)
++			rxrpc_kernel_set_peer_data(new_alist->addrs[n].peer, data);
++		return;
++	}
++	if (!new_alist) {
++		/* Dead server.  Just remove all. */
++		for (; o < old_alist->nr_addrs; o++)
++			rxrpc_kernel_set_peer_data(old_alist->addrs[o].peer, 0);
++		return;
++	}
++
++	/* Walk through the two lists simultaneously, setting new peers and
++	 * clearing old ones.  The two lists are ordered by pointer to peer
++	 * record.
++	 */
++	while (n < new_alist->nr_addrs && o < old_alist->nr_addrs) {
++		struct rxrpc_peer *pn = new_alist->addrs[n].peer;
++		struct rxrpc_peer *po = old_alist->addrs[o].peer;
++
++		if (pn == po)
++			continue;
++		if (pn < po) {
++			rxrpc_kernel_set_peer_data(pn, data);
++			n++;
++		} else {
++			rxrpc_kernel_set_peer_data(po, 0);
++			o++;
++		}
++	}
++
++	if (n < new_alist->nr_addrs)
++		for (; n < new_alist->nr_addrs; n++)
++			rxrpc_kernel_set_peer_data(new_alist->addrs[n].peer, data);
++	if (o < old_alist->nr_addrs)
++		for (; o < old_alist->nr_addrs; o++)
++			rxrpc_kernel_set_peer_data(old_alist->addrs[o].peer, 0);
++}
+diff --git a/fs/afs/cmservice.c b/fs/afs/cmservice.c
+index 99a3f20bc786..1a906805a9e3 100644
+--- a/fs/afs/cmservice.c
++++ b/fs/afs/cmservice.c
+@@ -138,49 +138,6 @@ bool afs_cm_incoming_call(struct afs_call *call)
+ 	}
+ }
+ 
+-/*
+- * Find the server record by peer address and record a probe to the cache
+- * manager from a server.
+- */
+-static int afs_find_cm_server_by_peer(struct afs_call *call)
+-{
+-	struct sockaddr_rxrpc srx;
+-	struct afs_server *server;
+-	struct rxrpc_peer *peer;
+-
+-	peer = rxrpc_kernel_get_call_peer(call->net->socket, call->rxcall);
+-
+-	server = afs_find_server(call->net, peer);
+-	if (!server) {
+-		trace_afs_cm_no_server(call, &srx);
+-		return 0;
+-	}
+-
+-	call->server = server;
+-	return 0;
+-}
+-
+-/*
+- * Find the server record by server UUID and record a probe to the cache
+- * manager from a server.
+- */
+-static int afs_find_cm_server_by_uuid(struct afs_call *call,
+-				      struct afs_uuid *uuid)
+-{
+-	struct afs_server *server;
+-
+-	rcu_read_lock();
+-	server = afs_find_server_by_uuid(call->net, call->request);
+-	rcu_read_unlock();
+-	if (!server) {
+-		trace_afs_cm_no_server_u(call, call->request);
+-		return 0;
+-	}
+-
+-	call->server = server;
+-	return 0;
+-}
+-
+ /*
+  * Clean up a cache manager call.
+  */
+@@ -322,10 +279,7 @@ static int afs_deliver_cb_callback(struct afs_call *call)
+ 
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+-
+-	/* we'll need the file server record as that tells us which set of
+-	 * vnodes to operate upon */
+-	return afs_find_cm_server_by_peer(call);
++	return 0;
+ }
+ 
+ /*
+@@ -349,18 +303,10 @@ static void SRXAFSCB_InitCallBackState(struct work_struct *work)
+  */
+ static int afs_deliver_cb_init_call_back_state(struct afs_call *call)
+ {
+-	int ret;
+-
+ 	_enter("");
+ 
+ 	afs_extract_discard(call, 0);
+-	ret = afs_extract_data(call, false);
+-	if (ret < 0)
+-		return ret;
+-
+-	/* we'll need the file server record as that tells us which set of
+-	 * vnodes to operate upon */
+-	return afs_find_cm_server_by_peer(call);
++	return afs_extract_data(call, false);
+ }
+ 
+ /*
+@@ -373,8 +319,6 @@ static int afs_deliver_cb_init_call_back_state3(struct afs_call *call)
+ 	__be32 *b;
+ 	int ret;
+ 
+-	_enter("");
+-
+ 	_enter("{%u}", call->unmarshall);
+ 
+ 	switch (call->unmarshall) {
+@@ -421,9 +365,13 @@ static int afs_deliver_cb_init_call_back_state3(struct afs_call *call)
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+ 
+-	/* we'll need the file server record as that tells us which set of
+-	 * vnodes to operate upon */
+-	return afs_find_cm_server_by_uuid(call, call->request);
++	if (memcmp(call->request, &call->server->_uuid, sizeof(call->server->_uuid)) != 0) {
++		pr_notice("Callback UUID does not match fileserver UUID\n");
++		trace_afs_cm_no_server_u(call, call->request);
++		return 0;
++	}
++
++	return 0;
+ }
+ 
+ /*
+@@ -455,7 +403,7 @@ static int afs_deliver_cb_probe(struct afs_call *call)
+ 
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+-	return afs_find_cm_server_by_peer(call);
++	return 0;
+ }
+ 
+ /*
+@@ -533,7 +481,7 @@ static int afs_deliver_cb_probe_uuid(struct afs_call *call)
+ 
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+-	return afs_find_cm_server_by_peer(call);
++	return 0;
+ }
+ 
+ /*
+@@ -593,7 +541,7 @@ static int afs_deliver_cb_tell_me_about_yourself(struct afs_call *call)
+ 
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+-	return afs_find_cm_server_by_peer(call);
++	return 0;
+ }
+ 
+ /*
+@@ -667,9 +615,5 @@ static int afs_deliver_yfs_cb_callback(struct afs_call *call)
+ 
+ 	if (!afs_check_call_state(call, AFS_CALL_SV_REPLYING))
+ 		return afs_io_error(call, afs_io_error_cm_reply);
+-
+-	/* We'll need the file server record as that tells us which set of
+-	 * vnodes to operate upon.
+-	 */
+-	return afs_find_cm_server_by_peer(call);
++	return 0;
+ }
+diff --git a/fs/afs/fs_probe.c b/fs/afs/fs_probe.c
+index b516d05b0fef..07a8bfbdd9b9 100644
+--- a/fs/afs/fs_probe.c
++++ b/fs/afs/fs_probe.c
+@@ -235,20 +235,20 @@ void afs_fileserver_probe_result(struct afs_call *call)
+  * Probe all of a fileserver's addresses to find out the best route and to
+  * query its capabilities.
+  */
+-void afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
+-			     struct afs_addr_list *new_alist, struct key *key)
++int afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
++			    struct afs_addr_list *new_alist, struct key *key)
+ {
+ 	struct afs_endpoint_state *estate, *old;
+-	struct afs_addr_list *alist;
++	struct afs_addr_list *old_alist = NULL, *alist;
+ 	unsigned long unprobed;
+ 
+ 	_enter("%pU", &server->uuid);
+ 
+ 	estate = kzalloc(sizeof(*estate), GFP_KERNEL);
+ 	if (!estate)
+-		return;
++		return -ENOMEM;
+ 
+-	refcount_set(&estate->ref, 1);
++	refcount_set(&estate->ref, 2);
+ 	estate->server_id = server->debug_id;
+ 	estate->rtt = UINT_MAX;
+ 
+@@ -256,21 +256,31 @@ void afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
+ 
+ 	old = rcu_dereference_protected(server->endpoint_state,
+ 					lockdep_is_held(&server->fs_lock));
+-	estate->responsive_set = old->responsive_set;
+-	estate->addresses = afs_get_addrlist(new_alist ?: old->addresses,
+-					     afs_alist_trace_get_estate);
++	if (old) {
++		estate->responsive_set = old->responsive_set;
++		if (!new_alist)
++			new_alist = old->addresses;
++	}
++
++	if (old_alist != new_alist)
++		afs_set_peer_appdata(server, old_alist, new_alist);
++
++	estate->addresses = afs_get_addrlist(new_alist, afs_alist_trace_get_estate);
+ 	alist = estate->addresses;
+ 	estate->probe_seq = ++server->probe_counter;
+ 	atomic_set(&estate->nr_probing, alist->nr_addrs);
+ 
++	if (new_alist)
++		server->addr_version = new_alist->version;
+ 	rcu_assign_pointer(server->endpoint_state, estate);
+-	set_bit(AFS_ESTATE_SUPERSEDED, &old->flags);
+ 	write_unlock(&server->fs_lock);
++	if (old)
++		set_bit(AFS_ESTATE_SUPERSEDED, &old->flags);
+ 
+ 	trace_afs_estate(estate->server_id, estate->probe_seq, refcount_read(&estate->ref),
+ 			 afs_estate_trace_alloc_probe);
+ 
+-	afs_get_address_preferences(net, alist);
++	afs_get_address_preferences(net, new_alist);
+ 
+ 	server->probed_at = jiffies;
+ 	unprobed = (1UL << alist->nr_addrs) - 1;
+@@ -293,6 +303,8 @@ void afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
+ 	}
+ 
+ 	afs_put_endpoint_state(old, afs_estate_trace_put_probe);
++	afs_put_endpoint_state(estate, afs_estate_trace_put_probe);
++	return 0;
+ }
+ 
+ /*
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index 388f60b5c995..4925d9ad1fb2 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -1010,6 +1010,9 @@ extern int afs_merge_fs_addr4(struct afs_net *net, struct afs_addr_list *addr,
+ 			      __be32 xdr, u16 port);
+ extern int afs_merge_fs_addr6(struct afs_net *net, struct afs_addr_list *addr,
+ 			      __be32 *xdr, u16 port);
++void afs_set_peer_appdata(struct afs_server *server,
++			  struct afs_addr_list *old_alist,
++			  struct afs_addr_list *new_alist);
+ 
+ /*
+  * addr_prefs.c
+@@ -1207,8 +1210,8 @@ struct afs_endpoint_state *afs_get_endpoint_state(struct afs_endpoint_state *est
+ 						  enum afs_estate_trace where);
+ void afs_put_endpoint_state(struct afs_endpoint_state *estate, enum afs_estate_trace where);
+ extern void afs_fileserver_probe_result(struct afs_call *);
+-void afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
+-			     struct afs_addr_list *new_addrs, struct key *key);
++int afs_fs_probe_fileserver(struct afs_net *net, struct afs_server *server,
++			    struct afs_addr_list *new_alist, struct key *key);
+ int afs_wait_for_fs_probes(struct afs_operation *op, struct afs_server_state *states, bool intr);
+ extern void afs_probe_fileserver(struct afs_net *, struct afs_server *);
+ extern void afs_fs_probe_dispatcher(struct work_struct *);
+@@ -1509,7 +1512,7 @@ extern void __exit afs_clean_up_permit_cache(void);
+  */
+ extern spinlock_t afs_server_peer_lock;
+ 
+-extern struct afs_server *afs_find_server(struct afs_net *, const struct rxrpc_peer *);
++struct afs_server *afs_find_server(const struct rxrpc_peer *peer);
+ extern struct afs_server *afs_find_server_by_uuid(struct afs_net *, const uuid_t *);
+ extern struct afs_server *afs_lookup_server(struct afs_cell *, struct key *, const uuid_t *, u32);
+ extern struct afs_server *afs_get_server(struct afs_server *, enum afs_server_trace);
+diff --git a/fs/afs/proc.c b/fs/afs/proc.c
+index f07c1c52ef5d..0af94c846504 100644
+--- a/fs/afs/proc.c
++++ b/fs/afs/proc.c
+@@ -444,8 +444,6 @@ static int afs_proc_servers_show(struct seq_file *m, void *v)
+ 	}
+ 
+ 	server = list_entry(v, struct afs_server, proc_link);
+-	estate = rcu_dereference(server->endpoint_state);
+-	alist = estate->addresses;
+ 	seq_printf(m, "%pU %3d %3d %s\n",
+ 		   &server->uuid,
+ 		   refcount_read(&server->ref),
+@@ -455,10 +453,16 @@ static int afs_proc_servers_show(struct seq_file *m, void *v)
+ 		   server->flags, server->rtt);
+ 	seq_printf(m, "  - probe: last=%d\n",
+ 		   (int)(jiffies - server->probed_at) / HZ);
++
++	estate = rcu_dereference(server->endpoint_state);
++	if (!estate)
++		goto out;
+ 	failed = estate->failed_set;
+ 	seq_printf(m, "  - ESTATE pq=%x np=%u rsp=%lx f=%lx\n",
+ 		   estate->probe_seq, atomic_read(&estate->nr_probing),
+ 		   estate->responsive_set, estate->failed_set);
++
++	alist = estate->addresses;
+ 	seq_printf(m, "  - ALIST v=%u ap=%u\n",
+ 		   alist->version, alist->addr_pref_version);
+ 	for (i = 0; i < alist->nr_addrs; i++) {
+@@ -471,6 +475,8 @@ static int afs_proc_servers_show(struct seq_file *m, void *v)
+ 			   rxrpc_kernel_get_srtt(addr->peer),
+ 			   addr->last_error, addr->prio);
+ 	}
++
++out:
+ 	return 0;
+ }
+ 
+diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+index de9e10575bdd..d5e480a33859 100644
+--- a/fs/afs/rxrpc.c
++++ b/fs/afs/rxrpc.c
+@@ -766,8 +766,14 @@ static void afs_rx_discard_new_call(struct rxrpc_call *rxcall,
+ static void afs_rx_new_call(struct sock *sk, struct rxrpc_call *rxcall,
+ 			    unsigned long user_call_ID)
+ {
++	struct afs_call *call = (struct afs_call *)user_call_ID;
+ 	struct afs_net *net = afs_sock2net(sk);
+ 
++	call->peer = rxrpc_kernel_get_call_peer(sk->sk_socket, call->rxcall);
++	call->server = afs_find_server(call->peer);
++	if (!call->server)
++		trace_afs_cm_no_server(call, rxrpc_kernel_remote_srx(call->peer));
++
+ 	queue_work(afs_wq, &net->charge_preallocation_work);
+ }
+ 
+diff --git a/fs/afs/server.c b/fs/afs/server.c
+index 923e07c37032..1140773f7aed 100644
+--- a/fs/afs/server.c
++++ b/fs/afs/server.c
+@@ -21,42 +21,13 @@ static void __afs_put_server(struct afs_net *, struct afs_server *);
+ /*
+  * Find a server by one of its addresses.
+  */
+-struct afs_server *afs_find_server(struct afs_net *net, const struct rxrpc_peer *peer)
++struct afs_server *afs_find_server(const struct rxrpc_peer *peer)
+ {
+-	const struct afs_endpoint_state *estate;
+-	const struct afs_addr_list *alist;
+-	struct afs_server *server = NULL;
+-	unsigned int i;
+-	int seq = 1;
+-
+-	rcu_read_lock();
+-
+-	do {
+-		if (server)
+-			afs_unuse_server_notime(net, server, afs_server_trace_unuse_find_rsq);
+-		server = NULL;
+-		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+-		read_seqbegin_or_lock(&net->fs_addr_lock, &seq);
+-
+-		hlist_for_each_entry_rcu(server, &net->fs_addresses, addr_link) {
+-			estate = rcu_dereference(server->endpoint_state);
+-			alist = estate->addresses;
+-			for (i = 0; i < alist->nr_addrs; i++)
+-				if (alist->addrs[i].peer == peer)
+-					goto found;
+-		}
++	struct afs_server *server = (struct afs_server *)rxrpc_kernel_get_peer_data(peer);
+ 
+-		server = NULL;
+-		continue;
+-	found:
+-		server = afs_maybe_use_server(server, afs_server_trace_use_by_addr);
+-
+-	} while (need_seqretry(&net->fs_addr_lock, seq));
+-
+-	done_seqretry(&net->fs_addr_lock, seq);
+-
+-	rcu_read_unlock();
+-	return server;
++	if (!server)
++		return NULL;
++	return afs_maybe_use_server(server, afs_server_trace_use_cm_call);
+ }
+ 
+ /*
+@@ -468,9 +439,16 @@ static void afs_give_up_callbacks(struct afs_net *net, struct afs_server *server
+  */
+ static void afs_destroy_server(struct afs_net *net, struct afs_server *server)
+ {
++	struct afs_endpoint_state *estate;
++
+ 	if (test_bit(AFS_SERVER_FL_MAY_HAVE_CB, &server->flags))
+ 		afs_give_up_callbacks(net, server);
+ 
++	/* Unbind the rxrpc_peer records from the server. */
++	estate = rcu_access_pointer(server->endpoint_state);
++	if (estate)
++		afs_set_peer_appdata(server, estate->addresses, NULL);
++
+ 	afs_put_server(net, server, afs_server_trace_destroy);
+ }
+ 
+diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
+index 82d20c28dc0d..4d798b9e43bf 100644
+--- a/include/trace/events/afs.h
++++ b/include/trace/events/afs.h
+@@ -140,12 +140,10 @@ enum yfs_cm_operation {
+ 	EM(afs_server_trace_see_expired,	"SEE expd ") \
+ 	EM(afs_server_trace_unuse_call,		"UNU call ") \
+ 	EM(afs_server_trace_unuse_create_fail,	"UNU cfail") \
+-	EM(afs_server_trace_unuse_find_rsq,	"UNU f-rsq") \
+ 	EM(afs_server_trace_unuse_slist,	"UNU slist") \
+ 	EM(afs_server_trace_unuse_slist_isort,	"UNU isort") \
+ 	EM(afs_server_trace_unuse_uuid_rsq,	"PUT u-req") \
+ 	EM(afs_server_trace_update,		"UPDATE   ") \
+-	EM(afs_server_trace_use_by_addr,	"USE addr ") \
+ 	EM(afs_server_trace_use_by_uuid,	"USE uuid ") \
+ 	EM(afs_server_trace_use_cm_call,	"USE cm-cl") \
+ 	EM(afs_server_trace_use_get_caps,	"USE gcaps") \
+@@ -1281,7 +1279,7 @@ TRACE_EVENT(afs_bulkstat_error,
+ 	    );
+ 
+ TRACE_EVENT(afs_cm_no_server,
+-	    TP_PROTO(struct afs_call *call, struct sockaddr_rxrpc *srx),
++	    TP_PROTO(struct afs_call *call, const struct sockaddr_rxrpc *srx),
+ 
+ 	    TP_ARGS(call, srx),
+ 
 diff --git a/net/rxrpc/peer_object.c b/net/rxrpc/peer_object.c
-index 56e09d161a97..a0c0e4d590f5 100644
+index a0c0e4d590f5..71b6e07bf161 100644
 --- a/net/rxrpc/peer_object.c
 +++ b/net/rxrpc/peer_object.c
-@@ -520,3 +520,29 @@ const struct sockaddr *rxrpc_kernel_remote_addr(const struct rxrpc_peer *peer)
- 		(peer ? &peer->srx.transport : &rxrpc_null_addr.transport);
+@@ -461,7 +461,7 @@ void rxrpc_destroy_all_peers(struct rxrpc_net *rxnet)
+ 			continue;
+ 
+ 		hlist_for_each_entry(peer, &rxnet->peer_hash[i], hash_link) {
+-			pr_err("Leaked peer %u {%u} %pISp\n",
++			pr_err("Leaked peer %x {%u} %pISp\n",
+ 			       peer->debug_id,
+ 			       refcount_read(&peer->ref),
+ 			       &peer->srx.transport);
+@@ -478,7 +478,7 @@ void rxrpc_destroy_all_peers(struct rxrpc_net *rxnet)
+  */
+ struct rxrpc_peer *rxrpc_kernel_get_call_peer(struct socket *sock, struct rxrpc_call *call)
+ {
+-	return call->peer;
++	return rxrpc_get_peer(call->peer, rxrpc_peer_get_application);
  }
- EXPORT_SYMBOL(rxrpc_kernel_remote_addr);
-+
-+/**
-+ * rxrpc_kernel_set_peer_data - Set app-specific data on a peer.
-+ * @peer: The peer to alter
-+ * @app_data: The data to set
-+ *
-+ * Set the app-specific data on a peer.  AF_RXRPC makes no effort to retain
-+ * anything the data might refer to.  The previous app_data is returned.
-+ */
-+unsigned long rxrpc_kernel_set_peer_data(struct rxrpc_peer *peer, unsigned long app_data)
-+{
-+	return xchg(&peer->app_data, app_data);
-+}
-+EXPORT_SYMBOL(rxrpc_kernel_set_peer_data);
-+
-+/**
-+ * rxrpc_kernel_get_peer_data - Get app-specific data from a peer.
-+ * @peer: The peer to query
-+ *
-+ * Retrieve the app-specific data from a peer.
-+ */
-+unsigned long rxrpc_kernel_get_peer_data(const struct rxrpc_peer *peer)
-+{
-+	return peer->app_data;
-+}
-+EXPORT_SYMBOL(rxrpc_kernel_get_peer_data);
+ EXPORT_SYMBOL(rxrpc_kernel_get_call_peer);
+ 
 
 
