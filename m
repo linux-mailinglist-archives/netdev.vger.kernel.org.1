@@ -1,91 +1,115 @@
-Return-Path: <netdev+bounces-168869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9B5A41246
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 00:37:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D463FA412AF
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 02:36:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23D7C3B19D1
-	for <lists+netdev@lfdr.de>; Sun, 23 Feb 2025 23:36:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB59718947A4
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 01:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B9E2045B6;
-	Sun, 23 Feb 2025 23:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512121624CD;
+	Mon, 24 Feb 2025 01:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DX5BZ2v+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCMhpl96"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E9415666B
-	for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 23:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194A61509BD
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 01:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740353822; cv=none; b=GFzu/bGZNhMZda5oIhFEwJ53da+UV2w0X9cb00EHyVrRCBmeSCOnoHz2AdjnPN8wtuB9hgAbYh9fUEI9kdTu6Ws5EdA2qFV9NMbDi++GuZevUxX36HfQsZc0j8p9ZZj0E24WJZLtykKcX1EsUTiYwkl7f6mdeR1D8KjSpdVQgyw=
+	t=1740361003; cv=none; b=aA2RtgsxQoNPu8WCeSK+f01I15sewa8WjL/o6rlWzaGZt73AFbTuYMiYajFwGf0PPaLE8/ofzmfApgvO6CfT1vg9m8gExsBIIHmxBmNtFhs35x5ARcodIleuIGty9ik7sO9d+cHrwHVACf4Khia/onFbLifq/QEz4LjnOe4T7wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740353822; c=relaxed/simple;
-	bh=Yop4/s+Sou9hbYrxOiyrJs6aEMFpqGj2bcNw28tiP8M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oyIGdeU1tjLtCBdAgXyKPmMN3kYJiDBup+LBZy98eJWQCtGh3ugxjin1kJFZoCUmz8V4N2LF98gxjLMleJ5Z5CK+EOXGb17yljEWGPCRoEF94Yau+EDXA1eMHrEy+U9SpcOrO3mmhXgbLyiV9mORLaPEEF4xCIO2MM8vfYpAeFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DX5BZ2v+; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740353817;
+	s=arc-20240116; t=1740361003; c=relaxed/simple;
+	bh=xotTqisRghDcxyjI2q2t2iC1Av+pZimZy4YwMWpa64Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jd2MZoAc62kYsA9qp+zA/M9S2i3i7sdSccAeL52a64wnN8XHiuBsargt53IS8/nO7R91VrnzUOQ5Qwwz5DzlMOd0CRl6rLSiU9VKcBdm7N6Nj0/K5SyVbHqy3NPOM/4yHn06HNvkv16tbUCn+eLoA9YDfSiY+Mo73srVjRBGtoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eCMhpl96; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740360997;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=grsJR/twTl2brq13919098Zme6VKzC6hvEwh05sMYbY=;
-	b=DX5BZ2v+mQUIlO/ehTV1XQALgHmqYmtHOpF6dwJ1+9U96jvcS9z5JsD4ftaQfWD+PNKgOS
-	RajwQ2m6VmvKQ543blqvE+cSKW8YZW7Vs3kcr5hK/Kj5ctPU6eJDyvZBFaZmK8lMGcZsfG
-	O7tDVlE5LuokcqU7y1KrrR0Qnd67C50=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: ethernet: renesas: rcar_gen4_ptp: Remove bool conversion
-Date: Mon, 24 Feb 2025 00:36:11 +0100
-Message-ID: <20250223233613.100518-2-thorsten.blum@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xotTqisRghDcxyjI2q2t2iC1Av+pZimZy4YwMWpa64Q=;
+	b=eCMhpl96XYYmBqFtOOMWx/TVZJ/XkFtPUbEXK+sehs7VKFdD91C4ktxJNOHcRAun2DzgYX
+	FBLMAV4zOizHUTRiGdpCK3UnuzNzUKXuGOBH1hyO0G8iwhhl5Ro5AyZTg+V61vXT/vdXG6
+	6ANUN9CQPkIaxcH72ZeoBuNdsKyIF+E=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-L3nUEQMhN_W2uikYzYT7HQ-1; Sun, 23 Feb 2025 20:36:35 -0500
+X-MC-Unique: L3nUEQMhN_W2uikYzYT7HQ-1
+X-Mimecast-MFC-AGG-ID: L3nUEQMhN_W2uikYzYT7HQ_1740360994
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2fbfa786aa4so7864940a91.0
+        for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 17:36:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740360993; x=1740965793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xotTqisRghDcxyjI2q2t2iC1Av+pZimZy4YwMWpa64Q=;
+        b=MRLxx3aQhZsPYQJjQJ1HlhWcrzDysU4ldLh5mxQu6J8EZi80rkWZqoQoZMYEwWzM8z
+         GcF4qNvuPgjHzZAi26RyMG8HHRPSRWMZmIp03y6Je54Ps1jh32YQbWCqcFfprD77u/2a
+         L+rZBF/kOSkYWGuei7y+UARmDpY4cRf10TCq8E2PSImKUoKXy8LUQTYQujVpGr4xSGLo
+         uAScqWDyZgfX5HMca6irgDkSxU4Q6UK9sr2rcqWrkD+nwdiv3+0Ohp0XFQJn+ZbrB/mE
+         52IFeQhM1DyRmDh5DmcImQ5MjXyY2KfKwdtleWnQdmc9h7qU8lvEEWiL+cz6CzS2K2Wm
+         3LJg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXrUoDTVgDLnM4g0syrb/n7PASrfZmwTm4qnxjROHhR0Z8/FqJSKQ+8ZMB2ZpeqxStU0Ge0gU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQTQYYJGUvFN8SGNYtfxn1PFyKMg5u996vkucrVF3aZrWzm7If
+	5DrgLMC4wiyo+RZ4+H3dfrXDI46JdBK/whjVpD0XQxi2qgqs7KES0TSjbWft/MNKtqUyQHVZfvg
+	R18x2pH7lwT0k4Ke0WzzVToH1XJc3YVSTwtwTIvEKjj1KTMDCbaDPA39C1hoP23aPZ1JNTfUyKF
+	NpMC89aVxXOIM4g/fRI/cCZBmgE/oy
+X-Gm-Gg: ASbGncvlzwQ422M7Q65GYYRznEtChmW07Gpo9HIKkzJOtp4zNYBylJQrOEvesBi2mZ1
+	mu7oaG3cFpaOAqN3Ezxoru/wQSpp1r95vHoZ2cYxZrsa/NmGTJHBbIoP7OlLMlZBS5B53THezWg
+	==
+X-Received: by 2002:a17:90b:4c04:b0:2ee:8253:9a9f with SMTP id 98e67ed59e1d1-2fccc97a25bmr26776708a91.11.1740360993720;
+        Sun, 23 Feb 2025 17:36:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEdpEZuC2ughhZHzH398Wnf911hWUS3XNFhm3aiYtLUwM/DJUati7wFDAoaJ6jggj1FoQ8gleBOESVt4o4W74c=
+X-Received: by 2002:a17:90b:4c04:b0:2ee:8253:9a9f with SMTP id
+ 98e67ed59e1d1-2fccc97a25bmr26776675a91.11.1740360993337; Sun, 23 Feb 2025
+ 17:36:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250223154042.556001-1-lulu@redhat.com> <20250223154042.556001-2-lulu@redhat.com>
+In-Reply-To: <20250223154042.556001-2-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 24 Feb 2025 09:36:22 +0800
+X-Gm-Features: AWEUYZkkWiq9RM5OoXawlOjb8hi-Xzqh0EdRsTvUVm2UbTIaH-IMbmewVYe9VzM
+Message-ID: <CACGkMEtRQguy5dg9X_8AYj=88DC_yn+HXPx0Lu_=e1JK02PhtA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/6] vhost: Add a new parameter in vhost_dev to allow
+ user select kthread
+To: Cindy Lu <lulu@redhat.com>
+Cc: mst@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove the unnecessary bool conversion and simplify the code.
+On Sun, Feb 23, 2025 at 11:40=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> The vhost now uses vhost_task and workers as a child of the owner thread.
+> While this aligns with containerization principles,it confuses some legac=
+y
+> userspace app, Therefore, we are reintroducing kthread API support.
+>
+> Introduce a new parameter to enable users to choose between
+> kthread and task mode.
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-index 72e7fcc56693..4c3e8cc5046f 100644
---- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-+++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-@@ -29,8 +29,8 @@ static const struct rcar_gen4_ptp_reg_offset gen4_offs = {
- static int rcar_gen4_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- {
- 	struct rcar_gen4_ptp_private *ptp_priv = ptp_to_priv(ptp);
--	bool neg_adj = scaled_ppm < 0 ? true : false;
- 	s64 addend = ptp_priv->default_addend;
-+	bool neg_adj = scaled_ppm < 0;
- 	s64 diff;
- 
- 	if (neg_adj)
--- 
-2.48.1
+Thanks
 
 
