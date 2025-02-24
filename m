@@ -1,116 +1,133 @@
-Return-Path: <netdev+bounces-169041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31CEA423B2
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:47:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E80AA42470
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 15:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A764417B1
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:40:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45DAC16FC1B
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4BA191493;
-	Mon, 24 Feb 2025 14:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F292561C6;
+	Mon, 24 Feb 2025 14:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WzZfFuix"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="QlrLaWEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from pv50p00im-ztdg10021801.me.com (pv50p00im-ztdg10021801.me.com [17.58.6.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110FD245006;
-	Mon, 24 Feb 2025 14:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715C81519B9
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 14:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740407949; cv=none; b=pODkmrW/hAQLsXZ1SNU/oomeg0VWQ3iKlxB3ywjRFffS0hr7G7ZwtIC6i/Mfe4VaynNKtSbdsCUBy59vE5db+hVgpnf/6o5baMu9BszaX/6v0q8ABgIwy2AvthIkMt4UTofpcsafpJiQgaV0QHZH6i48he/1gx3qPUfbEw/GqTE=
+	t=1740408372; cv=none; b=Hn+PfC9nhYKGrSGVfRv37UWTOWTDIzNVEzTegYbSudI621okHry2dw5wiKngHmqshjKQFzF51o6gKXrQvnXVeRETZpxY2ed4G5TsEfw07hDAEu1cEGFk6+VVQpBaEUsuKWu7ACAu7OpQ0jZ2+ZEWjtcxrC2oQztg9c8Q9p9dehc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740407949; c=relaxed/simple;
-	bh=fMonh/pKAVHu07dY8Vw+0UdrpHd7C1ki/HDFFIv2F+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AZYFQyKWhW/4HvFgHB5iNYsbylRH2uWP0QLlHKWY6ePs/baFcLCeKwCds6dNF+4QgGnmgSy09kEeYemTbeSg80aPfA6EEwsO9kUSz1jE6vOoqdpxczR9I81XUduqhkkF+jvgyZVEopMLEvv62Db4Ze4J4F671b/hrEsd+ZmQuFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WzZfFuix; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oZBH+BBvL/hgtaMob59TY/eIeJhL38EKvFH99ZsXxXM=; b=WzZfFuixs4bggs/CuH1/ino7Aq
-	kP5Ug2KPxPDM+7ABlB53uXRnElwtHPfiscmCflcSs8jBFu2/xx0YBSYR4QxgzgXqDkGkDTfpmJzdx
-	EWdrBl9RkuIAFyPw3p/MKcWazcymxG1zaa88y+kNqeBpeSjn4s/JTC/rx89AKUptrb7qmtrdmxh+2
-	6Fk68d72cl+rQxN9Qz+yowEPnXW2l/Di61nbL3AWdUZSFTHvSyDPJTcWP2E8WoI5uuhBzl4KYF9Wi
-	Vy27njJqV9t6KPeDjMbFosJdHdF7W3x02uXi+RnelsTQ33Gx//mBkKx/+XnhrGGIvOAJaGxAq17sh
-	v3Gcpy3w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52904)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmZbm-0006da-26;
-	Mon, 24 Feb 2025 14:38:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmZbk-00054V-1k;
-	Mon, 24 Feb 2025 14:38:56 +0000
-Date: Mon, 24 Feb 2025 14:38:56 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <Z7yEgFR9scO2aRYh@shell.armlinux.org.uk>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
- <87r03otsmm.fsf@miraculix.mork.no>
- <Z7uFhc1EiPpWHGfa@shell.armlinux.org.uk>
- <3c6b7b3f-04a2-48ce-b3a9-2ea71041c6d2@lunn.ch>
- <87ikozu86l.fsf@miraculix.mork.no>
- <7c456101-6643-44d1-812a-2eae3bce9068@lunn.ch>
- <Z7x4oxR5_KtyvSYg@shell.armlinux.org.uk>
- <kqur446k5sryspwh4zzndytfqhpupfybimhgbtq5m7fm7vom7s@hhqlh3llrsxl>
+	s=arc-20240116; t=1740408372; c=relaxed/simple;
+	bh=fxHn5PpLrOvrhy3T9+DU0/Qq00yPM+Mp8t95xmMWsSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ppREOxntXM4gV6nKSftPh4K3ywf56l/61J0pDsgXD9QSUDRp0WKVO6uh7NQfuVkJXLCLuc400wfwEvzJJj4ZtAqIYX1r8XWpEhKoHkEGKb5E1r9WsIAKmGmoFZ1GwL9dnOYj6/5wmEqfrn0QFOVyJ/aw13ZBCF4jseOwLvaI7Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=QlrLaWEd; arc=none smtp.client-ip=17.58.6.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; bh=SxARc5+mPnL0BjR2iW5rWJ4TF8233iOHpKnJbbHiSqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
+	b=QlrLaWEdYFkfsu8fuz6nbUdcj79Q8tJSmKk2HA1yeaCmsuHQSOTGqxvHL7yUmSH26
+	 akU6WkcZrQNFnHq+BJaLeGPq0iB3wrn9quZ3+XX7TL6W2416KdFvIkp5eq2vQ9b1mC
+	 1W3KDPpIj0DisqfGR5RfGhPUGajT30GJk6SpSRctraMh5Bn8xJKesYr+HLgu8FHVrW
+	 5Dfwx7CMvdnY4JwcEN6gg2auvHgazI6WEAwJkihz3N6RwdjmSunhSudO5G6dDlNdEp
+	 B1QbwPUm6oUVtf0ONAKjCUdMnGgia+x/d6OTzrZdtjaV4ethm0Xnv3yRyjfFnT2Mpt
+	 tk5oRw9q9GBwg==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10021801.me.com (Postfix) with ESMTPSA id 01FF82010282;
+	Mon, 24 Feb 2025 14:45:49 +0000 (UTC)
+Message-ID: <a28f04e5-ccde-4a08-b8fa-a9fa685240b1@icloud.com>
+Date: Mon, 24 Feb 2025 22:45:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <kqur446k5sryspwh4zzndytfqhpupfybimhgbtq5m7fm7vom7s@hhqlh3llrsxl>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
+ void API tlb_remove_page()
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
+ Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
+ Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+ linux-mtd@lists.infradead.org
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+ <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
+ <20250221200137.GH7373@noisy.programming.kicks-ass.net>
+ <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
+ <20250224132354.GC11590@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20250224132354.GC11590@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: rwcKYw_iCScrLPUxt294xX4BCs8xvrO1
+X-Proofpoint-GUID: rwcKYw_iCScrLPUxt294xX4BCs8xvrO1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-24_06,2025-02-24_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=911 mlxscore=0 bulkscore=0
+ adultscore=0 spamscore=0 malwarescore=0 phishscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2502240105
 
-On Mon, Feb 24, 2025 at 03:32:43PM +0100, Marek Behún wrote:
-> On Mon, Feb 24, 2025 at 01:48:19PM +0000, Russell King (Oracle) wrote:
+On 2025/2/24 21:23, Peter Zijlstra wrote:
+> On Sat, Feb 22, 2025 at 07:00:28PM +0800, Zijun Hu wrote:
+>> On 2025/2/22 04:01, Peter Zijlstra wrote:
+>>>>   */
+>>>>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
+>>>>  {
+>>>> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
+>>>> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
+>>>>  }
+>>> So I don't mind removing it, but note that that return enforces
+>>> tlb_remove_page_size() has void return type.
+>>>
+>>
+>> tlb_remove_page_size() is void function already. (^^)
 > 
-> ...
+> Yes, but if you were to change that, the above return would complain.
 > 
-> > "Please note:
-> > This hardware is broken by design. There is nothing that the kernel or
+>>> It might not be your preferred coding style, but it is not completely
+>>> pointless.
+>>
+>> based on below C spec such as C17 description. i guess language C does
+>> not like this usage "return void function in void function";
 > 
-> Doesn't "broken by design" mean "broken intentionally" ?
+> This is GNU extension IIRC. Note kernel uses GNU11, not C11
 
-The point of this part of the discussion is to find a form of words
-that folk are happy with, so please feel free to suggest an
-alternative.
+any link to share about GNU11's description for this aspect ? (^^)
 
-To put it bluntly, it does come down to "broken by the hardware
-engineer not having full knowledge of the requirements of SFP modules
-as documented in the SNIA documentation and selecting hardware that
-violates some of the requirements."
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
 
