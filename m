@@ -1,141 +1,159 @@
-Return-Path: <netdev+bounces-169008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6669A41FC6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:00:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18946A41FDD
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:04:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3807F7AB8F6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:59:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64D5216FEDB
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB87233734;
-	Mon, 24 Feb 2025 13:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1512233736;
+	Mon, 24 Feb 2025 13:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjqkHba0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/e4hWjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A0205AAF;
-	Mon, 24 Feb 2025 13:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E656C221F2E
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 13:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740402024; cv=none; b=T6WYaI/iZT7ysQJuhmAnq00HuOuOUcosMqeR224TUZdYoVOqdnz5fQ00sfDWfdXspCnrXqEizQtPqFtbSBawNanfZAkInuNuf6Rx5lPpQ4lpOB/Vfs+sAML5bZQuehxsM9vuBriEBe63HEr0E3b97oWG7Qa9XN5VDuqlQ60jAIA=
+	t=1740402063; cv=none; b=Bg+bbfmuirg+gYtb2PCkPULRXCa/lnZuo1BOjdvkUCUtmQGjCR2K52cnNh80ccZl/fIF9/L+6yb0GpgFHyx4muULGTuAirnG9xPeQYobSSvm/eT8US4h5c6HTBWxHe5u8vj6K7OzErl3AYvkU0IjffA5XRKxn8ntU9ZX3Tsc+c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740402024; c=relaxed/simple;
-	bh=ZkYg8riK3g+YIJUhasp+/tnIiDVINYAMP80vM8syvUI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mH9durmViLEP2a9VXD5Py1EUHFnZR4+VvGSviFaJAwJOar78BGTKhHpu2gNQ18k8PqRbETISABD8tR9kKAjXIpKgqMd9Pg7YVvJBcieHJm4KE8oXlRLoqku6joLaa4P5JsdarbETIv9VAY51f90tw+Izr8P07rpbcYp8FZe+G7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjqkHba0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7240DC4CED6;
-	Mon, 24 Feb 2025 13:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740402023;
-	bh=ZkYg8riK3g+YIJUhasp+/tnIiDVINYAMP80vM8syvUI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EjqkHba0WU1jmT/H2NcmNT7qlZFOYr+PgMuGNJ6cSz7SGMl+qqQSfu5/be83sOU5l
-	 J5c1alTfOsnp8FAFII+rCxK2HJsUJcWF8FtXbUcHYjvDRXZZwbFGCMnTmJkf9UDVZH
-	 coiCFAWI49hV8N0X0TmjlvKPktaMXY4dIZm3o0M8pcxowUUZYWZBQKGoGTIB5xhmy5
-	 ppB3ta5CtIA/t7Se2zAZPKni3Q/0Fl589D4zIe6Fpj0kqVP9w1TpZ18Tk8VJw9uJeE
-	 Y7L8bxn36NecDspSKFIosnqLOSwe9mthHWu0lWWP2MrdNScZt25Z0k+pDXsL2ZR6ID
-	 49lrz6VYXWMaA==
-Message-ID: <870ae0a7-dc04-4ae2-8485-df9db23db697@kernel.org>
-Date: Mon, 24 Feb 2025 15:00:17 +0200
+	s=arc-20240116; t=1740402063; c=relaxed/simple;
+	bh=VLAsrmSAb3kGU++2nwWF9OOXrMTkn8/dEIc9dcvkfZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f+95xTvhLUwjA+4wI4fLmGgE09gApTHd3uKJkAJBcmvijyA188vwEpb9gRbcXCkzYW1IWjUJpRTQXH65DIZwrPENSky1cJw/Bark0/SEabUDiDBUGdzFyHL4liDskMlNuqwxZRpvmRSUGbGlyFxydslZ9V2/NHQ+O778bfCZGsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a/e4hWjb; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so9812969a12.1
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 05:01:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740402060; x=1741006860; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MhW5lfJWyyYPvccFPixIiNXBgnolkSq4aXYrSR9SgFo=;
+        b=a/e4hWjbw3SCOQKLAOSA2deLBukfIRHLaufE/ILL++8Licuw30hnwLS6iDdlvbiV86
+         qdQpGQMTqkwwoFlWxumbygs0GtgVmMHXj43PI3TyQNfuNP54q52LMyCxaUJXev6ejHLY
+         jUnVZ4G5SjQjwpu1daxW4ufP5WuDN3sRZkXlq9260CxJfyqi0kWuWySaVpqJfRjLiaG9
+         jCKxr0HHaIZWU6edb7NH8UvtVjwM2bi+LqMC/+V/r2q9v4JxLNYesSsTJAvJ0uEnh7AE
+         mkkOFAJ02Aus0ezeEoy4U3QYky40qLgQXqisauPerKyV7h+j/G4lbeLqGphULqNzNLtK
+         vemQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740402060; x=1741006860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MhW5lfJWyyYPvccFPixIiNXBgnolkSq4aXYrSR9SgFo=;
+        b=ah2N6A8l3PtuenIYiXdYW8oIj5jxhrTvveUS0fFUDeFmjbRflLs8YTLvWlevBntfeQ
+         +xX0iExigoeipI1gLbi0u23OcMh7zpg6bTXZMzo+oi7cVZsTSkEVNOpW73j92St4yHER
+         BO6/XqvHxAfo9TpZIwAMGAA86zqz9geJjgt1sc5eZ2Mvbqp7XXw0i2gAStoWU9iffzL7
+         /M88mK1TKIol02Vg3QR2yZiJjzJEuDTxUymOVGM9Xkyw9J3fLuhAj8ISXw6wN/5eBDCi
+         4ma0CS6juRWjFiZiRLK0j9/cB7hy1ao2RTYPHIVYd2RON598qyMzst6Vz2VRLeZ2zH5Q
+         eI7w==
+X-Gm-Message-State: AOJu0YwbrAAdHvR7hlAaQ3m8+nLG8ea81YuM1vq+gIwxDHyiIxuAIYGi
+	y/1tG+83+bCdDuQsyStS4C6fWmK9wj+uCLu8OCuQR1vrDh63I6cutizxDn1fgcyygRCRiWjZxwu
+	X74OPxuWvQ+QzHZO4OIJ6enN6KhdVBr0KXO+jwxIrzEgU95r0R6gLVPo=
+X-Gm-Gg: ASbGnctSkbTYKt0B50kEsjsBJZ2f9HnD9BneeF6haz36OvD/5fQqnkIl1bakOsyAa/1
+	ZL0FDytbnswvmlCVjeN94YQ1W6QLR0XGTd7lcr/KZa+6z9Hin+WRa8AEYrFvNG0We98rjQU4xuX
+	MOEOMoZQ==
+X-Google-Smtp-Source: AGHT+IFxP6DKH9JVVKKeu9MfUZc742Xg3JoJpQSL6FzFgLaRmR+KL/fy1Rt8P0ne+rwSe6Uj+SiEwuDzYufljb0FcKg=
+X-Received: by 2002:a17:907:c49b:b0:abb:8926:5b9f with SMTP id
+ a640c23a62f3a-abbeda29d05mr1318984066b.6.1740402059256; Mon, 24 Feb 2025
+ 05:00:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/5] net: ethernet: ti: am65_cpsw: move
- am65_cpsw_put_page() out of am65_cpsw_run_xdp()
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>,
- Md Danish Anwar <danishanwar@ti.com>, srk@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250217-am65-cpsw-zc-prep-v1-0-ce450a62d64f@kernel.org>
- <20250217-am65-cpsw-zc-prep-v1-4-ce450a62d64f@kernel.org>
- <20250218180340.GF1615191@kernel.org>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20250218180340.GF1615191@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250224112046.52304-1-nbd@nbd.name>
+In-Reply-To: <20250224112046.52304-1-nbd@nbd.name>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 24 Feb 2025 14:00:46 +0100
+X-Gm-Features: AWEUYZnf60BoIkKhs_5P3lIQAgrUMsntAC8uHFiAbLzqhf9ShLWOsjDaDtw-1wY
+Message-ID: <CANn89iLi-NC=4jbNfFW7DELtHS2_JNAHiwRs7GbfZP2E9rGqXA@mail.gmail.com>
+Subject: Re: [PATCH net] net: ipv6: fix TCP GSO segmentation with NAT
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Feb 24, 2025 at 12:21=E2=80=AFPM Felix Fietkau <nbd@nbd.name> wrote=
+:
+>
+> When updating the source/destination address, the TCP/UDP checksum needs =
+to
+> be updated as well.
+>
+> Fixes: bee88cd5bd83 ("net: add support for segmenting TCP fraglist GSO pa=
+ckets")
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/ipv6/tcpv6_offload.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
+> index a45bf17cb2a1..5d0fcdbf57a1 100644
+> --- a/net/ipv6/tcpv6_offload.c
+> +++ b/net/ipv6/tcpv6_offload.c
+> @@ -113,24 +113,36 @@ static struct sk_buff *__tcpv6_gso_segment_list_csu=
+m(struct sk_buff *segs)
+>         struct sk_buff *seg;
+>         struct tcphdr *th2;
+>         struct ipv6hdr *iph2;
+> +       bool addr_equal;
+>
+>         seg =3D segs;
+>         th =3D tcp_hdr(seg);
+>         iph =3D ipv6_hdr(seg);
+>         th2 =3D tcp_hdr(seg->next);
+>         iph2 =3D ipv6_hdr(seg->next);
+> +       addr_equal =3D ipv6_addr_equal(&iph->saddr, &iph2->saddr) &&
+> +                    ipv6_addr_equal(&iph->daddr, &iph2->daddr);
+>
+>         if (!(*(const u32 *)&th->source ^ *(const u32 *)&th2->source) &&
+> -           ipv6_addr_equal(&iph->saddr, &iph2->saddr) &&
+> -           ipv6_addr_equal(&iph->daddr, &iph2->daddr))
+> +           addr_equal)
+>                 return segs;
+>
+>         while ((seg =3D seg->next)) {
+>                 th2 =3D tcp_hdr(seg);
+>                 iph2 =3D ipv6_hdr(seg);
+>
+> -               iph2->saddr =3D iph->saddr;
+> -               iph2->daddr =3D iph->daddr;
+> +               if (!addr_equal) {
+> +                       inet_proto_csum_replace16(&th2->check, seg,
+> +                                                 iph2->saddr.s6_addr32,
+> +                                                 iph->saddr.s6_addr32,
+> +                                                 true);
+> +                       inet_proto_csum_replace16(&th2->check, seg,
+> +                                                 iph2->daddr.s6_addr32,
+> +                                                 iph->daddr.s6_addr32,
+> +                                                 true);
+> +                       iph2->saddr =3D iph->saddr;
+> +                       iph2->daddr =3D iph->daddr;
+> +               }
+>                 __tcpv6_gso_segment_csum(seg, &th2->source, th->source);
+>                 __tcpv6_gso_segment_csum(seg, &th2->dest, th->dest);
 
+Good catch !
 
-On 18/02/2025 20:03, Simon Horman wrote:
-> On Mon, Feb 17, 2025 at 09:31:49AM +0200, Roger Quadros wrote:
->> This allows us to re-use am65_cpsw_run_xdp() for zero copy
->> case. Add AM65_CPSW_XDP_TX case for successful XDP_TX so we don't
->> free the page while in flight.
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
->> ---
->>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 13 ++++++++-----
->>  1 file changed, 8 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> 
-> ...
-> 
->> @@ -1230,9 +1230,6 @@ static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
->>  		ndev->stats.rx_dropped++;
->>  	}
->>  
->> -	page = virt_to_head_page(xdp->data);
->> -	am65_cpsw_put_page(flow, page, true);
->> -
->>  	return ret;
-> 
-> It seems that before and after this patch ret is always initialised to
-> AM65_CPSW_XDP_CONSUMED and never changed. So it can be removed.
-> 
-> Given that with this patch the function only returns after the switch
-> statement, I think this would be a nice follow-up.
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 20a4fc3e579f..4052c9153632 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -1172,7 +1172,6 @@ static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
->  {
->  	struct am65_cpsw_common *common = flow->common;
->  	struct net_device *ndev = port->ndev;
-> -	int ret = AM65_CPSW_XDP_CONSUMED;
->  	struct am65_cpsw_tx_chn *tx_chn;
->  	struct netdev_queue *netif_txq;
->  	int cpu = smp_processor_id();
-> @@ -1228,9 +1227,8 @@ static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
->  		fallthrough;
->  	case XDP_DROP:
->  		ndev->stats.rx_dropped++;
-> +		return AM65_CPSW_XDP_CONSUMED;
->  	}
-> -
-> -	return ret;
->  }
->  
->  /* RX psdata[2] word format - checksum information */
-> 
-> ...
+I note that __tcpv4_gso_segment_csum() does the needed csum changes
+for both ports and address components.
 
-Thank you for this suggestion. I will add this cleanup in my next set of patches.
-
--- 
-cheers,
--roger
-
+Have you considered using the same logic for IPv6, to keep
+__tcpv6_gso_segment_list_csum()
+and __tcpv4_gso_segment_list_csum() similar ?
 
