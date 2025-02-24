@@ -1,93 +1,152 @@
-Return-Path: <netdev+bounces-169171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAA69A42C90
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:18:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A011DA42CA5
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B45F1174C51
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:18:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B323175522
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30CAC1FFC56;
-	Mon, 24 Feb 2025 19:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634CB1FDA79;
+	Mon, 24 Feb 2025 19:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FdAcFNF7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tHgcLj00"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6725C1FECD5
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8865C1FCFE1
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740424671; cv=none; b=mjyOxIRzZFIzead6VaQCRFcOt+fHXSc6P0MQytvU/ky6CeqFLCaMmeg4OlO5ZRu2j9pDcAq9gHzKAXyd7v6SoxPsuup2VHMoJmbYT3fY5lRxKN2o47oc6X1IyOKizrN0wi1lJzKdv1R5R6lPmlXpNNr+1uIEhy1aKT3dt7JnUgo=
+	t=1740424996; cv=none; b=orLGUSionmagZAFenDQNXFXv54YbhtrAlCvq5gN3zQVlslRbvCMKnOywAdbGPDAVmXnHvLCy6JkbqlWGntDO5132YNw3yhwx7Nl0SlYMNsVXLf9bAU1J4UCf2TwIuRtT4tlYQ8n7xaZIAWzH3eTkAa44Etjd16yH/Ue1qkEubmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740424671; c=relaxed/simple;
-	bh=bUWK8l5gYIguME8vJzYlwyCxo6qiVuoCXzW7Ml5FjjU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OiErNuh9yGByc/4Ie8fjFoKwH0CyAYRfNV/kImMydYMuTYzkN8pmNNYNq+gGUC3Engue/PuQaXqAHWMGm81qrbEHpnl8k/Q9UYxTDti3si0OPDsi++dKDm3UQr4tI+JGS8lkLC7DSqud8P/XKFQ0e0SA6u+xn1zYjugWcSBHZUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FdAcFNF7; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1740424996; c=relaxed/simple;
+	bh=MuxBrNIX06+MBlaJPoUCPaS8vE9mO1mdJznRkFGE6ag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k8yiwAVMcX1VBu7XaknrnjHqTpStsffhaoYK0XmsmudEtmw8JB+lfkBQnquh7S9XcrdM3cWG7QUbpRrdZJl3/nmLtM1aypGlGHWUwMVvm2NpEMZBvxZifkVIy5niGYbAW+VJYOX4NoM/UAu0NNb5Hc9nhkA2oxUnuzxJiH0glcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tHgcLj00; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5ded368fcd9so6823529a12.1
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 11:23:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740424670; x=1771960670;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1B7gOb+VXTeeZXN+t7SZ8gts/WvHKQv6jz5sYF0KJBA=;
-  b=FdAcFNF7OtAHblTWZzQXux7XxVNye2hqvjOrfJZV7ZvGMcBvxyJQI150
-   1Ts143bQTjmKwN4rMGSZP56Pb0X3FK8Lg95JfqJhSuz0EztvZ3gSEUV4l
-   75ATKU4/AGTgp/GAF3gm53YkFbuX/NwXv2GYwG1gypl4M/QKkHlzQJJRj
-   M=;
-X-IronPort-AV: E=Sophos;i="6.13,312,1732579200"; 
-   d="scan'208";a="273938525"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 19:17:46 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:17631]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.70:2525] with esmtp (Farcaster)
- id d31405ad-8d3b-49c5-9fd3-6c95802a0764; Mon, 24 Feb 2025 19:17:45 +0000 (UTC)
-X-Farcaster-Flow-ID: d31405ad-8d3b-49c5-9fd3-6c95802a0764
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 19:17:44 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.221.99) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 19:17:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <nicolas.dichtel@6wind.com>
-CC: <aleksander.lobakin@intel.com>, <andrew@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <idosch@idosch.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v4 1/3] net: rename netns_local to netns_immutable
-Date: Mon, 24 Feb 2025 11:17:32 -0800
-Message-ID: <20250224191732.78895-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250221133136.2049165-2-nicolas.dichtel@6wind.com>
-References: <20250221133136.2049165-2-nicolas.dichtel@6wind.com>
+        d=google.com; s=20230601; t=1740424993; x=1741029793; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4G9JOwMMqctfXuBGODgzmfMVslmCh5Emd9i+EC8Wh/o=;
+        b=tHgcLj00AAnkKI8aQt7gSbFjqqkq0FGg7X/srfkxhdwKmExjXzgED7als5mQMK6irq
+         W0RCnO0SBUxfdvsUac1heVRRDwYxKYGsVpkgNFjJm2gJAk4j0JtMQnm8hV8nykP2TPJJ
+         +mPCkbU+1rWl74XxVSH2JVuqjDE9XRuRpwzayRRn5lCH6sIFgrrYLbrunru4qAHumRbK
+         8y2UF10CGMThGr8jOZEY1RIN2OSxTBKiXs6lLG/l1XujrekTrJ7El8D8cnHKGhYA4vfP
+         dPDNFH6Tib3yLXQdsymufPstsZN4t9kd3zufgz8SgKtDeoBwz/xEjaGuxk7k0jcdYg6w
+         /WsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740424993; x=1741029793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4G9JOwMMqctfXuBGODgzmfMVslmCh5Emd9i+EC8Wh/o=;
+        b=Og6gqRhhJ64MZNId7MCyxk8m0iaa7sUdk07I+zQ5t9Z+Jl0LwX9Cro3shh1oZM2OrY
+         BacWjwlllgSXr7jytJZc45hDBDSAG98znVFNL0BF7zOlwm5DGqMw7T11GAdnKRbohiye
+         le2RnQfexJU9AmKBkBkSrQzxmhJ0QFLmR1k9rBVdbRIOj9OkIc4G4kIoxTOlHziLxKSF
+         af1W3/wPKcb6EyxjvHu4y6ArFvLVpJveyy4qZVEh2v+B43npErtMjPp+d3SjAvZnB/dg
+         jAyHTW92haN2WYMUbJIf2FrIHrnLSuLCG+ylb1n/8i0PxzCSyr5dakaXx4Sa0qBNTgVg
+         Dntw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0+gxGW0DqcaS5VZ5mXfCkCoeymGH7UOfBq3lB3SWhk71c/uA2+L4CiV2vtqyX7An14CULIio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG1F+GCItDuBGyqlhQCvBGlvvQdmOVCMVWX38w/ytVLPPyOESB
+	aWnd/HdztggdWXQi67DkJOa596fTnWROjd6X3h/8CYc/Uff7CNI5zAgueKUWdLZ7QGcmS9V1kWD
+	THvczaOlChhghJ6kRNIxcO7DjBJloragrZGNC
+X-Gm-Gg: ASbGncvMVJFy5TCxQ4zyNl3tIWtRWqFCKp3xjTTcISVgEwZgt1yhSzO4BmTSW0wG8fe
+	rXu8rFfiirDRRmYNBq5dGBdmMiPNvBLVi3mfTx/lidcyJfu9+Pie+p97wjAOxawmYS2IU0GSUss
+	GdotApuQ==
+X-Google-Smtp-Source: AGHT+IGfiIchpM9eOMnXtJ/WcKCVUkgDFUa2p/xrMF61h/aNYjj6Fhs5Fbn5eztpvP2RHcdoRWctJt81jVevyjeHkjo=
+X-Received: by 2002:a05:6402:238f:b0:5e0:348a:e33c with SMTP id
+ 4fb4d7f45d1cf-5e0b70d674amr10053613a12.10.1740424992694; Mon, 24 Feb 2025
+ 11:23:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+ <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com> <SA3PR15MB5630CFBB36C212008DA8ACC7CAC02@SA3PR15MB5630.namprd15.prod.outlook.com>
+In-Reply-To: <SA3PR15MB5630CFBB36C212008DA8ACC7CAC02@SA3PR15MB5630.namprd15.prod.outlook.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 24 Feb 2025 20:23:00 +0100
+X-Gm-Features: AWEUYZnUmpoUUWnKefqPzOGV3a3YKaKSZHqzoRXrvSuNNgfx9ij51R1mq4ffPRc
+Message-ID: <CANn89i+zxMje+wbQzLKbSq_WKYnwGdMyAdStMm4GqkdJCvWPOg@mail.gmail.com>
+Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
+To: Yonghong Song <yhs@meta.com>
+Cc: Breno Leitao <leitao@debian.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	"kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, Kernel Team <kernel-team@meta.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Date: Fri, 21 Feb 2025 14:30:26 +0100
-> The name 'netns_local' is confusing. A following commit will export it via
-> netlink, so let's use a more explicit name.
-> 
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+On Mon, Feb 24, 2025 at 8:13=E2=80=AFPM Yonghong Song <yhs@meta.com> wrote:
+>
+> > ________________________________________
+> >
+> > On Mon, Feb 24, 2025 at 7:24=E2=80=AFPM Breno Leitao <leitao@debian.org=
+> wrote:
+> >>
+> >> Add a lightweight tracepoint to monitor TCP sendmsg operations, enabli=
+ng
+> >> the tracing of TCP messages being sent.
+> >>
+> >> Meta has been using BPF programs to monitor this function for years,
+> >> indicating significant interest in observing this important
+> >> functionality. Adding a proper tracepoint provides a stable API for al=
+l
+> >> users who need visibility into TCP message transmission.
+> >>
+> >> The implementation uses DECLARE_TRACE instead of TRACE_EVENT to avoid
+> >> creating unnecessary trace event infrastructure and tracefs exports,
+> >> keeping the implementation minimal while stabilizing the API.
+> >>
+> >> Given that this patch creates a rawtracepoint, you could hook into it
+> >> using regular tooling, like bpftrace, using regular rawtracepoint
+> >> infrastructure, such as:
+> >>
+> >>         rawtracepoint:tcp_sendmsg_tp {
+> >>                 ....
+> >>         }
+> >
+> > I would expect tcp_sendmsg() being stable enough ?
+> >
+> > kprobe:tcp_sendmsg {
+> > }
+>
+> In LTO mode, tcp_sendmsg could be inlined cross files. For example,
+>
+>   net/ipv4/tcp.c:
+>        int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>   net/ipv4/tcp_bpf.c:
+>        ...
+>       return tcp_sendmsg(sk, msg, size);
+>   net/ipv6/af_inet6.c:
+>        ...
+>        return INDIRECT_CALL_2(prot->sendmsg, tcp_sendmsg, udpv6_sendmsg, =
+...)
+>
+> And this does happen in our production environment.
 
-It seems this patch does not apply cleanly to net-next.git and needs
-a rebase.
+And we do not have a way to make the kprobe work even if LTO decided
+to inline a function ?
+
+This seems like a tracing or LTO issue, this could be addressed there
+in a generic way
+and avoid many other patches to work around this.
 
