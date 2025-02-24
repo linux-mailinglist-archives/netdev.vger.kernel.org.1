@@ -1,95 +1,159 @@
-Return-Path: <netdev+bounces-169076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84444A42805
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:36:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9946A4280B
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 170427A44BD
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:35:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 540953A6C42
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E4C262D05;
-	Mon, 24 Feb 2025 16:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828D261570;
+	Mon, 24 Feb 2025 16:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="sPHKhG4y"
+	dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b="cMFoXYGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0BF261565
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 16:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5AA157465
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 16:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740414991; cv=none; b=WY0CHo+etLfmIHBXNPmu2U+tl7pRB66CbtEghQqLQgZhgqqLKBh8/NGSxF8NgshgMi8RYtmhfARm3F8We1Pb4z6nVLbu3u9g0F9Vpu84EUuebNnKUkilziYfpQ3W+7AwtwCxyVEewQaxQBv2PU0AS8FwYhWk5xoy8In2d8R9r9s=
+	t=1740415007; cv=none; b=NUl5ly/eTOkCNb7ffi0UHhGz61IQLFAiNEo4fuEXNwrvC/GWkZdhajS3X8R+MMEhaT61/Z/jcogCDROPaTiQ8C1sjgaR8Ylwg4jJWAx86FgVt19Kijn3jY3ueCVZpmYtWsAiCgcA6uRWKDl6XsGLlJSnDuHYcIXpxbLWCx4OlHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740414991; c=relaxed/simple;
-	bh=FofER6M6N889eNt3Vtq1U6v45RWXpE3Xmo3mKD2WXSY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qy7EF6vdfwN8vHkW5Lvo950s8oylFqDraic2ohnQXuvwntAhGWLY4Va3RkVZCYjvBBkiCl+U7sCSzhi6BLPGH4pk5dem5OFEr+Reic8Q3njOfHGnomTGYDMUIkJbN+trTPzsxrA0WQuYNV6eyS0NZsmzB+MqftWWZRodqLXSwHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=sPHKhG4y; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-471f4cf0f52so1776491cf.2
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 08:36:30 -0800 (PST)
+	s=arc-20240116; t=1740415007; c=relaxed/simple;
+	bh=0uYjuk6mE2snGziB67mxxRwlBE5PpWNdoZF1RzbiQr8=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Mt/3stgduqSCnQeY+SsWcCd3+tCnBFE7DiP5SZXRBjB636dnJR5edclrhJS9Td7FSXbfQvAELBkNuW+0YCrxa8ZfayQwBQujsLbGnMTXIJfhU46UqZEKflC2+hFIWOsuO1BxgMUD4uWCbS7mmifQoD5+FMmWIOVzMa91Gt52oiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com; spf=pass smtp.mailfrom=8x8.com; dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b=cMFoXYGI; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8x8.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6dd43aa1558so38522206d6.0
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 08:36:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1740414989; x=1741019789; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FofER6M6N889eNt3Vtq1U6v45RWXpE3Xmo3mKD2WXSY=;
-        b=sPHKhG4y9kRelVjgTpHP1h0PxbwpndNeL0iJb1yDA0nO4HGaFL+JwJAzkf0zR2VRWx
-         WtC1vj4mVtgk3o5KXcWi3OoL8vL33p8Y5E13sIQLG3Z9vqs4NnlnHX/q87USFHsWTlD3
-         sVWoWrHlWhQo6ltchhxt4pOHc3/rei/5/IDUqth86JjWMZeLWCgZ/x4tAE9cGqRLu9f/
-         IMmKEgvbksEbK4CRvXC94MwHVAQbDED/rdhiT/UwbkVBFI+VaMwICuBLw/i9VqhvscrK
-         yR7Ewa+5Qmn0u7caFi9SjVKfbk9OYfmO5aWTRP88HOqaEPMMWClGkK5wSsGKKpD/aeQ1
-         K/NQ==
+        d=8x8.com; s=googlemail; t=1740415003; x=1741019803; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DVuSofnGaHccOc0CbLUNBzJ0KuW/Yx2ONRYAm3brts0=;
+        b=cMFoXYGIshLlbb6+jgKu905QNQ83OrCT5U8jQY0oxuJU8KPkd1//jCc9UkIfKT/nn4
+         y7/iWbpnStFj+zW2JDmxu3pEwvULb+U/T96+2VhHrj51XYrAkpaTc+Dog1qFO1vWWfbb
+         i6YwRl/H7viVfS92fun/wamt387HDXTSvZQbo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740414989; x=1741019789;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FofER6M6N889eNt3Vtq1U6v45RWXpE3Xmo3mKD2WXSY=;
-        b=QQLKpZBrqNow2hTzHhNW5qtRmlbp87JGdQtaLMQxnmxG44rr/Fw5DnNVj+WaumtGP0
-         BjNKMBZXKnEC12coNV2x1++yiTui/cTLxe66Fzdxibng/GDopW7gkb5nmU2S6pzcHoVk
-         hkvdF7kFZpvdxkXI8kTdN2nWTssLP6pMjSwLSpMu3MyZ51xgxBInFy4O/H7+MlI6wZJl
-         ElXwN8zQJuZ3eU4zHbs2n4AghC5l2UxQNCUqpSpSi2Ldn2BfI3+bPfOsB05LhvAwziZZ
-         F4v0VG5HseelRIfyXzv9ZsJo3C5IdKynCZ/Q/Ki6Ut+8553H3vfYS2jgd/OjVHF5vX2g
-         VUcA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+foUfKwbbhny16CEEa0RRZfU2ksFvJrhnobSH0LPXhQYEEGALfXnO1Jy/R2DIPb3ql0IgUW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3v4GFUTCuSXq1tkgIXYnX6VMm6n8DrOgwIkTUKZ114toHQrmJ
-	RruauxROBevYfB/jwvOUnFRVIGjrNxx2jYYFyhK93P+oKpU6gHzxmDsMBmQsnUk3c4we0YUfO4i
-	Lbo0n2fgQEd5tJsDHQdtSgY8ZgrQychSY34ajNLgyWZWsxerh7vNggQ==
-X-Gm-Gg: ASbGnctEK/NoJZV4mmWGj86MYzz1tA4WC8TP59Q62+RfDWNv133tCCZwRGwq7CFbcUV
-	HUeY9y1Glu/TSRjsnxBHKqBl7EwzYIdiC+ACX8TcupZYwubTQdk7pTmaSvIt9W3sS64oltmsdLz
-	2XAUcudaxtXA==
-X-Google-Smtp-Source: AGHT+IF8KC1kGRHKNLGmuA1fEsqQuYPYOAnpFqm62S+6tS8417diws1ydavrvl6UcE/zOP+v04wqsYOVJ/yWyLcFDwY=
-X-Received: by 2002:a05:622a:3cb:b0:471:f185:cdda with SMTP id
- d75a77b69052e-472228d9e7emr76279521cf.9.1740414989090; Mon, 24 Feb 2025
- 08:36:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740415003; x=1741019803;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DVuSofnGaHccOc0CbLUNBzJ0KuW/Yx2ONRYAm3brts0=;
+        b=YZOIBAoxeAxr0ZIyZNzavVPAdgJyCPZ2b7BfxThp2Jgw8nNULTkfDtgdiWhUGClrmR
+         Z5Ogdy6QhWyILmlXV6uy2BcQzOT6cjt9eLxBDgDZBrZTJK42yEniq+dB7bVIKzXkBI0Z
+         XjPrXmYnAPulRifMkWIFDIxyfeX0o3h6uMOginKjp+38fGGZFm+ZLgAokrP7mwP2KTX0
+         xGNWCuY2WtJEqUBL6Nd0WeqFFSdhXJ3Xm0dDZE5X8lqlAFKkmMEQVNEDmifkk3bNfr85
+         l9HPfjZQ+Fz+7lvZHq/HuBW176AxwkwFJkAKqcSmDEFFnWMzG4RM+nlirlUUYszTxljI
+         8jzA==
+X-Gm-Message-State: AOJu0YzyuDsv32PWxRljaxU/g0g3QcI4DKiHxTOrkEqNuiSKPDIgowvO
+	qlNkmyqyaRVFc+FSUzulX1zIBH1/6Z/rBv4OWs+ukpgRd0Oof5HO+NTQvBfn+/gx0uoEkzDIXuk
+	=
+X-Gm-Gg: ASbGncs0yE41y7TsNWyOFpwl4Gaw63A8J63x75hiEeTXTzawvtK1QMJDpaqVVZEQUa9
+	RsnVVqNGyzAPflAK1ZwdYLMbogbj/jFfYvHMqnBTz1fQFvWaRNzhDrTEEbY90pLXo/WDKGOtNiG
+	eEdeHdmzpu0XAarU5EhwW6v8gfH347UdGMqT9tbdhzfmXoG1MlK354SFBQxkAEnNPPlRwp/LhBB
+	HxH+SmWClRilbAIqdkdPQOuWXIAbm/ebnJuoNBmmUhbOA+MjnVvJuTOghRBMJ+aTWNGdx8D9mG8
+	2iTWgmgxNpN3OejmTBN8PzyUSYaLFbBviAdNfSuVBrJ9c5NspYo96cQB
+X-Google-Smtp-Source: AGHT+IHyTDHr9r5xle+1v0EgjaG5t758xy8ylh5kD14mCT2drAU6K7Mo+oMmiEUkbR4qnijm4VKUkg==
+X-Received: by 2002:a05:6214:ca4:b0:6e4:3cf1:5628 with SMTP id 6a1803df08f44-6e6ae7c96c9mr191271516d6.3.1740415002653;
+        Mon, 24 Feb 2025 08:36:42 -0800 (PST)
+Received: from smtpclient.apple ([2601:8c:4e80:49b0:a51d:1829:4848:c3d6])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d77a2bdsm134500356d6.11.2025.02.24.08.36.41
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Feb 2025 08:36:41 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250222204151.1145706-1-jordan@jrife.io> <1cb55499-f560-4296-a44c-e5af7a3d1758@blackwall.org>
- <ce7053c5-b06c-45e2-b0f0-eb1a33131853@blackwall.org>
-In-Reply-To: <ce7053c5-b06c-45e2-b0f0-eb1a33131853@blackwall.org>
-From: Jordan Rife <jordan@jrife.io>
-Date: Mon, 24 Feb 2025 08:36:18 -0800
-X-Gm-Features: AWEUYZnbgHkAM5wRqm7e8vFrY7BRqStG7Haygi4CkmWWYZOpqTkNsxGuqOic0No
-Message-ID: <CABi4-ojtcyN1TONmgEqZKpW=F9yOREj6kCy3AbKgO19iHGSv7Q@mail.gmail.com>
-Subject: Re: [PATCH iproute2] ip: link: netkit: Support scrub options
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	stephen@networkplumber.org, dsahern@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Re: [PATCH iproute2 v2] tc: Fix rounding in tc_calc_xmittime and
+ tc_calc_xmitsize.
+From: Jonathan Lennox <jonathan.lennox@8x8.com>
+In-Reply-To: <395fdc3a-258c-494f-914d-5da3861c0496@kernel.org>
+Date: Mon, 24 Feb 2025 11:36:30 -0500
+Cc: netdev@vger.kernel.org,
+ Stephen Hemminger <stephen@networkplumber.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <789337E1-213F-4FAE-A5D4-4647C0A288E1@8x8.com>
+References: <20250216221444.6a94a0fe@hermes.local>
+ <B6A0B441-A9C9-40B5-8944-B596CB57CF0E@8x8.com>
+ <395fdc3a-258c-494f-914d-5da3861c0496@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+X-Mailer: Apple Mail (2.3776.700.51.11.1)
 
-> Aargh, just noticed one minor nit:
-> "Usage: ... %s [ mode MODE ] [ POLICY ] [scrub SCRUB] [ peer [ POLICY <options> ] ]\n"
 
-Yeah, that's annoying. I'll fix this and send out a v2.
 
--Jordan
+> On Feb 23, 2025, at 10:06=E2=80=AFPM, David Ahern <dsahern@kernel.org> =
+wrote:
+>=20
+> On 2/18/25 1:10 PM, Jonathan Lennox wrote:
+>>=20
+>=20
+> lacking a commit message. What is the problem with the current code =
+and
+> how do this patch fix it. Add an example that led you down this path =
+as
+> well.
+>=20
+>> Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
+>> ---
+>> tc/tc_core.c | 6 +++---
+>> tc/tc_core.h | 2 +-
+>> 2 files changed, 4 insertions(+), 4 deletions(-)
+>>=20
+>=20
+
+Sorry; this was the v2 patch and I explained it in the v1, but I don=E2=80=
+=99t think the
+threading worked.
+
+The problem is that tc_calc_xmittime and tc_calc_xmitsize round from
+double to int three times =E2=80=94 once when they call =
+tc_core_time2tick / tc_core_tick2time
+(whose argument is int), once when those functions return (their return =
+value is int),
+and then finally when the tc_calc_* functions return.  This leads to =
+extremely
+granular and inaccurate conversions.
+
+As a result, for example, on my test system (where tick_in_usec=3D15.625,
+clock_factor=3D1, and hz=3D1000000000) for a bitrate of 1Gbps, all tc =
+htb burst
+values between 0 and 999 bytes get encoded as 0 ticks; all values =
+between
+1000 and 1999 bytes get encoded as 15 ticks (equivalent to 960 bytes); =
+all
+values between 2000 and 2999 bytes as 31 ticks (1984 bytes); etc.
+
+The patch changes the code so these calculations are done internally in
+floating-point, and only rounded to integer values when the value is =
+returned.
+It also changes tc_calc_xmittime to round its calculated value up, =
+rather than
+down, to ensure that the calculated time is actually sufficient for the =
+requested
+size.
+
+
+Can you let me know the desired style for commit messages =E2=80=94 how =
+much of this
+explanation should be in it?  I can submit a v3 with the desired =
+explanation in
+the commit message.
+
+Thanks!
+
+Jonathan Lennox
+
 
