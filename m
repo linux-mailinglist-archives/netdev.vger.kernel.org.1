@@ -1,208 +1,172 @@
-Return-Path: <netdev+bounces-169218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71494A42FDD
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:17:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD71A42FE4
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:17:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CF4E1789F1
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:17:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1349C3AA368
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C101C84D3;
-	Mon, 24 Feb 2025 22:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB521FFC7F;
+	Mon, 24 Feb 2025 22:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RB5kyk4E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QSJCPTNg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111E51C84CC
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 22:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BBF5383;
+	Mon, 24 Feb 2025 22:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740435439; cv=none; b=fi6qxV3WfTffG42cuNgVl0d+nrLMzi3tDm5rwg9sixL0hDhE3U2avyTbyFlWEDDyGNC0trIBR1dXxMADv+8d8kCVKQBXFI4bmWYacFaI/cjfattP7of7qwHMhA5lmY6n00lbsnASqpvaFYBswqgKbZdEZ+ET1Ek/GfomxJTrMKs=
+	t=1740435455; cv=none; b=I69DsBChTnmNfeRBRAvrMdnRonb3HGriiNJB2i4VgrcQ+RE3CDHdrKtS2NRqPuFbuJzY2XJdgRrliyVm6sLXcRJGagpnsE5mnesfOmAg9h47CCS2FfF4XIVfcLF6ATfLYvoCS8BXclDd5LNShHcT/fAlrERwT4MIjSJqZpksT+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740435439; c=relaxed/simple;
-	bh=6I6gIpt3bVko5RjvZ4H9eDX59jqR3+rvBA+wsQTJsQE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YB1G0t+lpjC9DdbfgXHfwPlTHNLcfZcqXaqNlS5kGRJfbrZoddAzfuq0EHHOlQwb/5Pj26iZcJKRhIZawprZO3uVqn0LT7yUc9qGVTWJu3havD+T3/zIvuffsq1OG3u34R8QRAGn/EstIr5ZFYsJu8/rFWaxBlSSdq20qE/fgJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RB5kyk4E; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740435436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VO3ESmQirbqY5so2iTZIj7nmzxGwm5/ayAG9pogSbb0=;
-	b=RB5kyk4ERtoCDiuZrGE1+S+xq21V8DHswACsJEwkHIjfMe6x+1tLZurC/+SEDbXzzWncoG
-	bdJkaGfki4JMfVzTCy7b1ScyRvicHB7c51zwfv4LuN1pIa+NQKYoixlJxKAVCH5xKD6EUj
-	/DpM/4XpE3nq1co7RS/1r5wZyOuMFqs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-355-5xQJlxJtPjG07fMfcPAs2A-1; Mon, 24 Feb 2025 17:17:13 -0500
-X-MC-Unique: 5xQJlxJtPjG07fMfcPAs2A-1
-X-Mimecast-MFC-AGG-ID: 5xQJlxJtPjG07fMfcPAs2A_1740435433
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38f42f21f54so1872989f8f.1
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 14:17:13 -0800 (PST)
+	s=arc-20240116; t=1740435455; c=relaxed/simple;
+	bh=fsXk7cQiXABl/mlEd5HYoSOLhw00DiL9RvUkyobxBIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=thjIdZyACJTJZb4lkwxVCtp+qsKJKZnpOBX83h1yhlFCO4o70V7DYpw0mrf4n1336CrJmpaRBTQpNR9a/TTYdVCu5ZYhRCJUo/VsgyEKgM99CrUshBmhsr8QlAJiHMsOrvtwZK0FEtpq1ZMvGVheGB6Q21Rfgr5Fb7kAEJ8Wz/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QSJCPTNg; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22101839807so107242785ad.3;
+        Mon, 24 Feb 2025 14:17:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740435453; x=1741040253; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MIAmGwREzfChZxhZrA3OzxmyUXhIuIWMIVivU3ALR/o=;
+        b=QSJCPTNgqJn5+1Kmn4+YsJFUjbK68+I0xGHyhSuCHnrdlmTQFHOyMuYyow7TyI/8b9
+         oSL1xsvYOxw2CJP3cO1FdqIptyRTn0PKkJuaibIlK3U2kwAFBejMK0Z923clllySER07
+         P9UHSHyHdllIbuK+67PlFxqVPmBiKt4mV2gNGlBHRsBSHE0PQX7U99lclGluo/sNENs8
+         QDhp/pfhrdl/eBjKznWXrJy7I7bw5IeszqsLExXMngL0jlk5KU2WmmNFXFFGGaQxqach
+         0G4f12uIpl52WJ7a1+VdBsrakGEkXHPZwoe8RI706GZ+8GriutDZL99/5CXvjoDzGUOW
+         MLuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740435432; x=1741040232;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1740435453; x=1741040253;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VO3ESmQirbqY5so2iTZIj7nmzxGwm5/ayAG9pogSbb0=;
-        b=qYkWI5TnllMjn76qTb/VdF71LF6RCN3zrxlvqfgL3p2QvWi18GW8QKZ/TfGI0paFVI
-         3YMsDMeeNBCJM9YQMF12Pk1i0up6QegE9e7ADW5EhQptC8/mldEZmI5sfmzMh1YnCOTs
-         arpGKPFICoiL3uqEzemjp96i6h4epX9VSr65XiWAkWKEOjgQHADeDzSiLSetmWiXMZll
-         nrQDJiDCH65wydpX0Iy6I9HySWTNgavfr8IDyc2Zo+5nfbdv9QaoBn1A+hZkiqr7GfY7
-         9yKqG5QXVTiftYqR2bYTfUyymdVdJLKLuJg4j2WC3AMVgmqUK8ZuVFeQ1DRBrl3OaG8Y
-         4/yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu5nAiVZiWHaQEreygtu55TNPOsOW3wTX4nhoubYgqSsYyNztwq+ROsPcR4/zu9CbC86aYceA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEmnDTvi4twn2dGEZ5WJdut3zJy2YS+lHm/op08gXMvy9qOBwS
-	90fVWawAIJ67qKbSKe5i99HojJ+zHZZEj5aXCRz4rlI5WIqEQEa2oFEm1ozxuLgja8N2FGICRke
-	thz4KDY0Zvc2JRVRgnpSsCv15lHewsBwia6255xKc+1Nls7d+dKsjtw==
-X-Gm-Gg: ASbGncs1M3PZqVXuH7JNa0k1ApDnQTIjgcvipt34fIM8P+2c/LOWgPrMc706dUOUsGL
-	m3wGEZkgDpVR9J2wtrP7mkgvBML8sa5tdMmZU+SAIVbv2ReVfjmUhj6EiItc/X1gDYUSeMl2T05
-	/hTSKetPc3DSaZfiggwGvKOfn1NDd+jIEfvC+gEVT0N67dL9kBVx15q7Aixzv79BL4INGMpZtV2
-	014TKP2WFAfobgv5+p9nHCSUp5427ms89ClG5IXW/edzPjXfNwtN/JH443qnUE5WQTrjCDJxzGD
-	2Tz90z3zfcgFI8/qVVNITR7TwZbQQfo85YxNow+Eu3o=
-X-Received: by 2002:a05:6000:1a85:b0:38d:d759:3dea with SMTP id ffacd0b85a97d-38f707a6294mr9861690f8f.26.1740435432622;
-        Mon, 24 Feb 2025 14:17:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHze0RjPiJrFADXDrPBaNgZTI7fMEu+LsHBcBEYc2raJkpNyOBmQ+s2HpPi82cXscdyWHaANg==
-X-Received: by 2002:a05:6000:1a85:b0:38d:d759:3dea with SMTP id ffacd0b85a97d-38f707a6294mr9861672f8f.26.1740435432233;
-        Mon, 24 Feb 2025 14:17:12 -0800 (PST)
-Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ab1532f20sm4391425e9.8.2025.02.24.14.17.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2025 14:17:11 -0800 (PST)
-Message-ID: <3dc42e5c-2944-47d9-9082-9dc347a70802@redhat.com>
-Date: Mon, 24 Feb 2025 23:17:10 +0100
+        bh=MIAmGwREzfChZxhZrA3OzxmyUXhIuIWMIVivU3ALR/o=;
+        b=cFdYYOkFr1z+FhW+ExsInt3eCPINfJnrsV6kM/OaC7qYJuc9nGH1GxP/06BG7KT7cz
+         W3VGfJTa5PHomzWsMX1wHpJv2ZgTq9kMHMGzTicT0TgDXaoasth95xMoPorAOtnlKvMp
+         6wkLbyMYNOAWD9ScpBpQt+RPT+eip4CHl9g8vKLq0XEyZgkG1+MbsoxD1x5Eh3WbvfMY
+         1fDsawerInbszDPPdZ7FSVJBohGKvNk8aO2O3BMJyR/7wSrHZGW6Q7ABzbLxUC8NijC7
+         mGbLTAYJ1uAyu2gxvJy9yWcjFUWbFea93eM/wt7G6AsgCnJ17RTL8NgE8bn4FtLP4j9S
+         meRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNMsFmIVI9aCkMGolehgomnXbnI9IL4mZvHZmgpCKW8ZhHyS6Kfo+bhaz/I03fNoV+7ih8ZUvl@vger.kernel.org, AJvYcCVBL+Jmu8Jnj8WM21BsX0cu9qeho73VRlvbsVNNiyTOcjIGWqo49NejP5RuKsifsBN7U5KjU0eo9nUhB6Cs@vger.kernel.org, AJvYcCVdTlyFpNMhl3kARTfQSmHEaCFzC9eQ8O/bu3cAqxMQoYn3FRgVi/nRLNZW1cSKuEuZ3VTC5P3fI74zWd0=@vger.kernel.org, AJvYcCWhokx6FTMxOBHHBUE2iNrKdIDpTG9EtBHiiKK3lmYZUQO/tdgQ8LU48/Fd4yVA6bxrOgJua7uZuyZ/he0=@vger.kernel.org, AJvYcCX5p3fSN95may0i4GMiz/0bCKAeBV4XoYnWFdt9W0OdQrMtgZXsZBu5/08jVWS9zTQc0jmv+Y/JkU3RsAddqhU=@vger.kernel.org, AJvYcCXhLNARRLMki/vmiR3t7oUbZnhsNcqTe+sMQmfdkRpacn9X7Pq5nnOQA/a1b3W0loW7Y20=@vger.kernel.org, AJvYcCXjMp5HMpVf/x/qsFz3nHDX3dfpej1sD3bVtnqkkKyeU9fu22QJMeaERZa3jWuIlGlpD0fwX5vdmX3HeOnK@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXAAG5IWQdT79iJg0WD4dAzva5oJytiAZox8FqlJjqOT6QkL99
+	wUXsNru/TaS3ocAR0MasPXZlJfsKDgtJXtWU7OR/x3ozCVmbLocz
+X-Gm-Gg: ASbGncvSnOH/81VuNCSnFu/ytb4X23N1wmsJlW92rX9o5fmIkTSepC+u4/8fcCTZ46I
+	1qBe5q7Zqw3FKuwleJZxcVTOoYs6IxCYhBViNhU2+j1Gpi5ANg0pPOUqWROyLcu5rRixL5G+mBQ
+	lOeLhX+WTQGUdZW7t1Qh9cnZEqrKWm35YrFWQvSeZ/km4vFW9Ug22fyKeSpxiJiV4jK+0cu49Ir
+	BI/5bOCVPCeEb7uXYSp8SlOLfRIv4poNqLW0S4KjOX8PAwOYg7GcFFj+Kn2YsdMjS45HtSJ5s3i
+	klRkufGvdmLnJjkk0ydlV/ftYo76EuPQz03wxVrCbO+7hYagdg==
+X-Google-Smtp-Source: AGHT+IHUNZzOI1ZFK/Wig2ECxEjG2LCeoTVF/IwXlP7H5EbtmMAu2d6RHqgduSyhdb+wHec1lfRRUA==
+X-Received: by 2002:a17:903:2a8d:b0:21f:6584:2085 with SMTP id d9443c01a7336-2219ffc4928mr267486635ad.42.1740435452344;
+        Mon, 24 Feb 2025 14:17:32 -0800 (PST)
+Received: from localhost (maglev-oncall.nvidia.com. [216.228.125.128])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2230a01fe28sm1125415ad.100.2025.02.24.14.17.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 14:17:31 -0800 (PST)
+Date: Mon, 24 Feb 2025 17:17:29 -0500
+From: Yury Norov <yury.norov@gmail.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Uros Bizjak <ubizjak@gmail.com>, Kuan-Wei Chiu <visitorckw@gmail.com>,
+	tglx@linutronix.de, Ingo Molnar <mingo@redhat.com>, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org, rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+	dmitry.torokhov@gmail.com, mchehab@kernel.org,
+	awalls@md.metrocast.net, hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+	louis.peens@corigine.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, akpm@linux-foundation.org, mingo@kernel.org,
+	alistair@popple.id.au, linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+	jernej.skrabec@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH 03/17] x86: Replace open-coded parity calculation with
+ parity8()
+Message-ID: <Z7zv-c4A76jeMAKf@thinkpad>
+References: <20250223164217.2139331-1-visitorckw@gmail.com>
+ <20250223164217.2139331-4-visitorckw@gmail.com>
+ <d080a2d6-9ec7-1c86-4cf4-536400221f68@gmail.com>
+ <e0b1c299-7f19-4453-a1ce-676068601213@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND,PATCH net-next v7 7/8] net: txgbe: Add netdev features
- support
-To: Mengyuan Lou <mengyuanlou@net-swift.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Alexander Duyck <alexander.duyck@gmail.com>
-Cc: jiawenwu@trustnetic.com, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemb@google.com>
-References: <20230530022632.17938-1-mengyuanlou@net-swift.com>
- <20230530022632.17938-8-mengyuanlou@net-swift.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20230530022632.17938-8-mengyuanlou@net-swift.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e0b1c299-7f19-4453-a1ce-676068601213@zytor.com>
 
-Hi,
-
-I just stumbled upon the following while working on something slightly
-related. Adding a bunch of people hopefully interested.
-
-On 5/30/23 4:26 AM, Mengyuan Lou wrote:
-> Add features and hw_features that ngbe can support.
+On Mon, Feb 24, 2025 at 01:55:28PM -0800, H. Peter Anvin wrote:
+> On 2/24/25 07:24, Uros Bizjak wrote:
+> > 
+> > 
+> > On 23. 02. 25 17:42, Kuan-Wei Chiu wrote:
+> > > Refactor parity calculations to use the standard parity8() helper. This
+> > > change eliminates redundant implementations and improves code
+> > > efficiency.
+> > 
+> > The patch improves parity assembly code in bootflag.o from:
+> > 
+> >    58:    89 de                    mov    %ebx,%esi
+> >    5a:    b9 08 00 00 00           mov    $0x8,%ecx
+> >    5f:    31 d2                    xor    %edx,%edx
+> >    61:    89 f0                    mov    %esi,%eax
+> >    63:    89 d7                    mov    %edx,%edi
+> >    65:    40 d0 ee                 shr    %sil
+> >    68:    83 e0 01                 and    $0x1,%eax
+> >    6b:    31 c2                    xor    %eax,%edx
+> >    6d:    83 e9 01                 sub    $0x1,%ecx
+> >    70:    75 ef                    jne    61 <sbf_init+0x51>
+> >    72:    39 c7                    cmp    %eax,%edi
+> >    74:    74 7f                    je     f5 <sbf_init+0xe5>
+> >    76:
+> > 
+> > to:
+> > 
+> >    54:    89 d8                    mov    %ebx,%eax
+> >    56:    ba 96 69 00 00           mov    $0x6996,%edx
+> >    5b:    c0 e8 04                 shr    $0x4,%al
+> >    5e:    31 d8                    xor    %ebx,%eax
+> >    60:    83 e0 0f                 and    $0xf,%eax
+> >    63:    0f a3 c2                 bt     %eax,%edx
+> >    66:    73 64                    jae    cc <sbf_init+0xbc>
+> >    68:
+> > 
+> > which is faster and smaller (-10 bytes) code.
+> > 
 > 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
-> ---
-> @@ -596,11 +597,25 @@ static int txgbe_probe(struct pci_dev *pdev,
->  		goto err_free_mac_table;
->  	}
->  
-> -	netdev->features |= NETIF_F_HIGHDMA;
-> -	netdev->features = NETIF_F_SG;
-> -
-> +	netdev->features = NETIF_F_SG |
-> +			   NETIF_F_TSO |
-> +			   NETIF_F_TSO6 |
-> +			   NETIF_F_RXHASH |
-> +			   NETIF_F_RXCSUM |
-> +			   NETIF_F_HW_CSUM;
-> +
-> +	netdev->gso_partial_features =  NETIF_F_GSO_ENCAP_ALL;
-> +	netdev->features |= netdev->gso_partial_features;
-> +	netdev->features |= NETIF_F_SCTP_CRC;
-> +	netdev->vlan_features |= netdev->features | NETIF_F_TSO_MANGLEID;
-> +	netdev->hw_enc_features |= netdev->vlan_features;
+> Of course, on x86, parity8() and parity16() can be implemented very simply:
+> 
+> (Also, the parity functions really ought to return bool, and be flagged
+> __attribute_const__.)
 
-This driver does not implement the .ndo_features_check callback, meaning
-it will happily accept TSO_V4 over any IP tunnel, even when ID mangling
-is explicitly not allowed.
+There was a discussion regarding return type when parity8() was added.
+The integer type was taken over bool with a sort of consideration that
+bool should be returned as an answer to some question, like parity_odd().
 
-The above in turn looks inconsistent. If the device is able to update
-the (outer) IP (and IP csum) while performing TSO, than it should be
-able to fully offload NETIF_F_GSO_GRE: such offload should not be
-included in the partial ones.
-
-Otherwise, if the device is not able to perform the mentioned tasks, the
-driver should implement a suitable ndo_features_check op, stripping
-NETIF_F_TSO for tunneled packet that could be potentially fragmented,
-that is, when `features` lacks the `NETIF_F_TSO_MANGLEID` bit.
-
-Alike what several intel drivers (ixgbe, igc, etc.) do.
-
-Assuming I did not misread something relevant, and the above is somewhat
-correct, I'm wondering if we should move the mentioned check into the
-core; preventing future similar errors and avoiding some driver code
-duplication.
-
-Something alike the following, completely untested:
----
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d5ab9a4b318e..2fdfcddf9c3b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3668,15 +3668,6 @@ static netdev_features_t gso_features_check(const
-struct sk_buff *skb,
- 		return features & ~NETIF_F_GSO_MASK;
- 	}
-
--	/* Support for GSO partial features requires software
--	 * intervention before we can actually process the packets
--	 * so we need to strip support for any partial features now
--	 * and we can pull them back in after we have partially
--	 * segmented the frame.
--	 */
--	if (!(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL))
--		features &= ~dev->gso_partial_features;
--
- 	/* Make sure to clear the IPv4 ID mangling feature if the
- 	 * IPv4 header has the potential to be fragmented.
- 	 */
-@@ -3684,10 +3675,24 @@ static netdev_features_t
-gso_features_check(const struct sk_buff *skb,
- 		struct iphdr *iph = skb->encapsulation ?
- 				    inner_ip_hdr(skb) : ip_hdr(skb);
-
--		if (!(iph->frag_off & htons(IP_DF)))
-+		if (!(iph->frag_off & htons(IP_DF))) {
- 			features &= ~NETIF_F_TSO_MANGLEID;
-+			if (features & dev->gso_partial_features &
-+			    (NETIF_F_GSO_GRE | NETIF_F_GSO_IPXIP4 |
-+			     NETIF_F_GSO_IPXIP6 | NETIF_F_GSO_UDP_TUNNEL))
-+				features &= ~NETIF_F_TSO;
-+		}
- 	}
-
-+	/* Support for GSO partial features requires software
-+	 * intervention before we can actually process the packets
-+	 * so we need to strip support for any partial features now
-+	 * and we can pull them back in after we have partially
-+	 * segmented the frame.
-+	 */
-+	if (!(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL))
-+		features &= ~dev->gso_partial_features;
-+
- 	return features;
- }
-
+To me it's not a big deal. We can switch to boolean and describe in
+comment what the 'true' means for the parity() function.
 
