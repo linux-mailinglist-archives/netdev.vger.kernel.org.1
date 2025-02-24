@@ -1,108 +1,79 @@
-Return-Path: <netdev+bounces-168878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C567A41348
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 03:17:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3851DA413DC
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 04:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D43601893F5F
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 02:17:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12861891DA5
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 03:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8CC3B7A8;
-	Mon, 24 Feb 2025 02:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175C41991C1;
+	Mon, 24 Feb 2025 03:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PKAXxAg5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FENZbBJj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E6B4A1D;
-	Mon, 24 Feb 2025 02:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E520D157A5C
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 03:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740363451; cv=none; b=OvcYB+lacpVEHnfWxBnYGn3IX1vjHh3wgDSaIkzmgJCwR+bohZYIs1uZ0Sl9eC4eX6T43PEdoaQz8koaN6rC2X7cq0xhBHJKB4eOq+qZUdM4/z2OaDOgz2UVECxdAka2LaXOqoD6kxsqMn+D6XWKdZsFqQbCIM7COV65N727/wI=
+	t=1740366398; cv=none; b=I5YQkdnOhNjRLCK6Hq247V9n98bgOuvvm0wUHESyLgckOuD20gu0WZuij7ru5GMvlns5olnqk0OL0WLeORoFnH+4hqOgrccMrp/J/83tA0VwcDdnE1i1ldg9uVG0JWG29/PPJf+hWDJA7mUp1d/tI6h31SSjACU/06Z4/wo9uhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740363451; c=relaxed/simple;
-	bh=tgG2P8UhUYLgFEY9nLp1PIXBbGTZVN4KJP3DJfE7n2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=cJbaftrB5k8E/b0JB498wibf67kDR4TeWzTSn4YBViytTLPxynBxtn4DihTotviDnJQNTlIQYhHUct32CAd0wnhBhXIaTH6wwilWH59dA8urbtlHCkMZk1gTKF1upSl6WR2zCoMt2eT7i1To87okjxBdPKgjvMXAj+U3CScLCpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=PKAXxAg5; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1740363445;
-	bh=JstdTH7nzAAXg36O5wRnVAOFiuKCDOPbMBnHrd3Px6k=;
-	h=Date:From:To:Cc:Subject:From;
-	b=PKAXxAg539sXm7OziZBj8mmWM8ov9UorRT/bsc4pFiYu5MrprEYdm+StTZk80Btng
-	 xKmnAVmikGbCy5cM1N7lWfTNUYQBrPmuqam8WNPIyyKPs/TYQVU+RZtCdMFcXKZ2YD
-	 chgwNm7MdOfk/7D6grsh4SR+Kg6kU6gRCGgCFAyVR/EjxFqRQCFPiV9S9QPvdPWYCV
-	 a/8vJHxZukywnFImxzFzdzR8CNOFvuXu/Jdk9p4nZD6FyuYoqjI32voN0p2YKypKov
-	 XUy+2wEhuzpfys8t2yDZfDGMk4unXEnZcsicJRxYjgcdTxOwRGoiut/CbL5JwzFmMS
-	 ywZA1Z2qGv7Vg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Z1PWm6sNLz4wbR;
-	Mon, 24 Feb 2025 13:17:24 +1100 (AEDT)
-Date: Mon, 24 Feb 2025 13:17:24 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20250224131724.3041d38c@canb.auug.org.au>
+	s=arc-20240116; t=1740366398; c=relaxed/simple;
+	bh=FypSvXs26AxTGuO5Psk7CjjFhNw9vBrRBMlLY9ga5Ec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sAXEhJj/RkgWmq8qqsrn3+oO+XUBgTyFacAURjSXKERyjz1qJpDFZvt/RHyQ4oTt7/w6UpEQDmKOO8xgz2koG+iz55RdbNnsQIZVfMa0wNqMT/IjCyMFWKTq5AdNU4wyKkiKyCeZzzWGv/N+WXfaYYa/3xP+P7/v5h4TMa2RuhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FENZbBJj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B480C4CEDD;
+	Mon, 24 Feb 2025 03:06:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740366397;
+	bh=FypSvXs26AxTGuO5Psk7CjjFhNw9vBrRBMlLY9ga5Ec=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FENZbBJjzCx+fIcxOk3PQm1kyiAPOAZJqyeRrio4IlsvpMQ4e7a1B79WXOgWEkbej
+	 1g6sA/tEdFEXb1r5cJmRDRbpZ7di3OR4VkbVlH4G74jmPOhkNxc4DYuUOZ/tPDpHck
+	 FNK2VphQZ8NseLOlEDVfg0YksZzUKdRQQCc7UWQdMy7NzljIpieTlCZgB/z3Q/XI+6
+	 T20RVvoB8cqa0tci39s8ItJEqnajnAYoKczv5lVmUCU1JvY6dsHJFSpz6oM52IbhlD
+	 pyKWvyh6PFCoItfmaR2Mh34OW3pUQwOeMm87bdk8uAwd+SdaWFGVIJl99kSx79I3Bi
+	 k1lpv0yj33+iA==
+Message-ID: <395fdc3a-258c-494f-914d-5da3861c0496@kernel.org>
+Date: Sun, 23 Feb 2025 20:06:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/gDrUxv88XNURJTnne+.ghVX";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2 v2] tc: Fix rounding in tc_calc_xmittime and
+ tc_calc_xmitsize.
+Content-Language: en-US
+To: Jonathan Lennox <jonathan.lennox@8x8.com>, netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+References: <20250216221444.6a94a0fe@hermes.local>
+ <B6A0B441-A9C9-40B5-8944-B596CB57CF0E@8x8.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <B6A0B441-A9C9-40B5-8944-B596CB57CF0E@8x8.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---Sig_/gDrUxv88XNURJTnne+.ghVX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 2/18/25 1:10 PM, Jonathan Lennox wrote:
+> 
 
-Hi all,
+lacking a commit message. What is the problem with the current code and
+how do this patch fix it. Add an example that led you down this path as
+well.
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+> Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
+> ---
+> tc/tc_core.c | 6 +++---
+> tc/tc_core.h | 2 +-
+> 2 files changed, 4 insertions(+), 4 deletions(-)
+> 
 
-  2a509818ec2d ("Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response")
-  980d6e2904df ("Bluetooth: Always allow SCO packets for user channel")
-
-These are commits
-
-  b25120e1d5f2 ("Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response")
-  bd30e8d7bfa6 ("Bluetooth: Always allow SCO packets for user channel")
-
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/gDrUxv88XNURJTnne+.ghVX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAme71rQACgkQAVBC80lX
-0Gwp6AgAjdYNUZnJ53fEsb8D9f3gJlmte0nuVRbq6tyahdQ/4zXHxbL1oMsLQW+T
-ssBMVkk6IsF0E7lY+a+iJsHpWKlNgrX09qxBfPBIT0bnkuu4bZIKDAjnM9IJu6qY
-r04Bv6/RbwbzL88Z2mBOcNEY29dp00s1gcr7xgnKSPsMgnJTEUBNhuwzGEvLHLig
-Uyq7UcYt/++ip8ksBqAjhIcWUlEJYeeIEk1tzGSZx+kFWaS1eOhANObghWngA4JR
-z3+c2Cn7jt2DtL8wrzCUkgPyr5g3VDMc+mjupsIU1HAdHA3qSM0m5j7LNca2DBJK
-tBOOMpXEAh+H3XPFJddcGBjRN0nU7g==
-=lyxX
------END PGP SIGNATURE-----
-
---Sig_/gDrUxv88XNURJTnne+.ghVX--
 
