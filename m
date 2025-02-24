@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-168963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8A2A41D03
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:37:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0279BA41D01
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:37:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1DC16FEA8
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:32:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA0D41888E50
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198E126A0E5;
-	Mon, 24 Feb 2025 11:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C4826E161;
+	Mon, 24 Feb 2025 11:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVadt+n9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYJtztpp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E372626A0DC;
-	Mon, 24 Feb 2025 11:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D9E26E153;
+	Mon, 24 Feb 2025 11:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740395987; cv=none; b=U+vEFxeaBRcS5wGxSLv7ulkzlTDuaBA5h7tzA/YbkPAIpI9tnDS4fAD2sty2kNw5q1czXPoJzMC4+OchyGN7LoIayMTyfTF/kK1yLu+UIFwBNpKdoJrD3ZxSu5FMNoTugkQo5tAS9z7JAdE8voMXUHc08fSIlTdD+ZP5qMCWWJE=
+	t=1740395997; cv=none; b=TUQksiBNcv5BPB2WQa+CvskFnd/COppjK6TRIMtcJbGeO3Kbn7OMQdGHO1FsJJ03TeRErdQ1d0vtNcmyuojY65lvtDa7oK2iIsvUaAYZHGiW0HqAgkb53pmD217pccz7+7m2KE3ZKrjvcTCJq7jDTCXqmf/qA2LHyp7fD/+Pd5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740395987; c=relaxed/simple;
-	bh=wVM7Fg9mbLhbpPGHcE7vm6JVTRUgaylB7Bi7YqUzAa8=;
+	s=arc-20240116; t=1740395997; c=relaxed/simple;
+	bh=gNhpMd6xhiiiI7IQjUh5qom9njguHMcExPCIvyTQ+oE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SJuv2vhmKf+KJsUSmvLGCYAqlEM20EM+sNQNteGdKA6RUAIFz2wPwMzuM4rjVhCtbNeZET2DdtDWdPwHNfl7CKDbHaYfrrDBNUC1bnqTatuJ4R8k7qQzSkEqCoEZTxr1+9o9hoX/tAwb7axPDKwAynlbqxJTlAxpn3CbNRaVD3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVadt+n9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C8F4C4CED6;
-	Mon, 24 Feb 2025 11:19:45 +0000 (UTC)
+	 MIME-Version; b=eBMZ1zCHDr1mMou2i1Nzhvn+eG+jbOerRskku71p2n6/ow84evFxFHVWVnVWYAtOWB7mkuaiRhrliWuXfNivNy45mAMlTIvkkNYfOcVxSKcoLDCid+sn3m0DfZ+p6JdHZqCUm/1Rju/r5NvSAFLll8TDI5MfJth0Mp+CEc6bFJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYJtztpp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EBFC4CEE6;
+	Mon, 24 Feb 2025 11:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740395986;
-	bh=wVM7Fg9mbLhbpPGHcE7vm6JVTRUgaylB7Bi7YqUzAa8=;
+	s=k20201202; t=1740395997;
+	bh=gNhpMd6xhiiiI7IQjUh5qom9njguHMcExPCIvyTQ+oE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dVadt+n9iHyd6+WrborhDvz92l6asll4mxmA01bmnMbp1ftVf6WG6FF0w+QhUJwCM
-	 0+1jJY4qKMbGB/YKIF5yRkAoBkFFSQQUwygVP4Vvrss5vRRbNEH5eYSBr7qxJkHUig
-	 qOsnsCSVf63bk4pComUNqlgACG/r+otW+BO2BpRRJKb254I6AilZWzwTrTBibo7nmS
-	 fDxbs1LUzZ1KZxXIGd6fcVQzIm3WAgT5/JrfEqWHsSC1pkyrW8+6cggrwb+kofK3RX
-	 UM1uu1VNg6J2+rj5VeCllVpZ0D/jiQYXktTm5AY/ECDN49GMRiBVlSRM73UZ0cCd6l
-	 rhsyO0N65isDA==
+	b=eYJtztppVaYV0rSMzKY16Lmu9W8L9YQzYpbrOT00uZG2y509JHc91qIIjfJCZTkNF
+	 qE/ObRvOMwG9fjn8LYVZNR1FcyD3qdoUPP/6AvJlWYQej07NJyHW6reBVpZm//NOQ/
+	 p332jqd+H0+9wWVKGk6R9qJOssvQIA3nDPDbLtJ9M8x4uHijUqG3UdTL/VJDgv7QKO
+	 FUS0fKXtwnc9QH7hNKpLHrg2TpBhoagqFiX7clyNoUW7zGcVPLAITeP8dcYuvilaf0
+	 DNhhxCRAZJpPmDEpodqL2CTIbgLPuOIY9iaupN+7thFasiP+4/Lau1a0H+cA3Ydvmh
+	 ZNX5goPZuB4kQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Stephan Gerhold <stephan.gerhold@linaro.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+Cc: Yu-Chun Lin <eleanor15x@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	ryazanov.s.a@gmail.com,
-	andrew+netdev@lunn.ch,
+	marcelo.leitner@gmail.com,
+	lucien.xin@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	linux-sctp@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 11/20] net: wwan: mhi_wwan_mbim: Silence sequence number glitch errors
-Date: Mon, 24 Feb 2025 06:19:04 -0500
-Message-Id: <20250224111914.2214326-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 18/20] sctp: Fix undefined behavior in left shift operation
+Date: Mon, 24 Feb 2025 06:19:11 -0500
+Message-Id: <20250224111914.2214326-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250224111914.2214326-1-sashal@kernel.org>
 References: <20250224111914.2214326-1-sashal@kernel.org>
@@ -72,59 +71,41 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.79
 Content-Transfer-Encoding: 8bit
 
-From: Stephan Gerhold <stephan.gerhold@linaro.org>
+From: Yu-Chun Lin <eleanor15x@gmail.com>
 
-[ Upstream commit 0d1fac6d26aff5df21bb4ec980d9b7a11c410b96 ]
+[ Upstream commit 606572eb22c1786a3957d24307f5760bb058ca19 ]
 
-When using the Qualcomm X55 modem on the ThinkPad X13s, the kernel log is
-constantly being filled with errors related to a "sequence number glitch",
-e.g.:
+According to the C11 standard (ISO/IEC 9899:2011, 6.5.7):
+"If E1 has a signed type and E1 x 2^E2 is not representable in the result
+type, the behavior is undefined."
 
-	[ 1903.284538] sequence number glitch prev=16 curr=0
-	[ 1913.812205] sequence number glitch prev=50 curr=0
-	[ 1923.698219] sequence number glitch prev=142 curr=0
-	[ 2029.248276] sequence number glitch prev=1555 curr=0
-	[ 2046.333059] sequence number glitch prev=70 curr=0
-	[ 2076.520067] sequence number glitch prev=272 curr=0
-	[ 2158.704202] sequence number glitch prev=2655 curr=0
-	[ 2218.530776] sequence number glitch prev=2349 curr=0
-	[ 2225.579092] sequence number glitch prev=6 curr=0
+Shifting 1 << 31 causes signed integer overflow, which leads to undefined
+behavior.
 
-Internet connectivity is working fine, so this error seems harmless. It
-looks like modem does not preserve the sequence number when entering low
-power state; the amount of errors depends on how actively the modem is
-being used.
+Fix this by explicitly using '1U << 31' to ensure the shift operates on
+an unsigned type, avoiding undefined behavior.
 
-A similar issue has also been seen on USB-based MBIM modems [1]. However,
-in cdc_ncm.c the "sequence number glitch" message is a debug message
-instead of an error. Apply the same to the mhi_wwan_mbim.c driver to
-silence these errors when using the modem.
-
-[1]: https://lists.freedesktop.org/archives/libmbim-devel/2016-November/000781.html
-
-Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
-Reviewed-by: Loic Poulain <loic.poulain@linaro.org>
-Acked-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Link: https://patch.msgid.link/20250212-mhi-wwan-mbim-sequence-glitch-v1-1-503735977cbd@linaro.org
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Link: https://patch.msgid.link/20250218081217.3468369-1-eleanor15x@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/wwan/mhi_wwan_mbim.c | 2 +-
+ net/sctp/stream.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index 3f72ae943b294..b1b2870a054ba 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -209,7 +209,7 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
- 	if (mbim->rx_seq + 1 != le16_to_cpu(nth16->wSequence) &&
- 	    (mbim->rx_seq || le16_to_cpu(nth16->wSequence)) &&
- 	    !(mbim->rx_seq == 0xffff && !le16_to_cpu(nth16->wSequence))) {
--		net_err_ratelimited("sequence number glitch prev=%d curr=%d\n",
-+		net_dbg_ratelimited("sequence number glitch prev=%d curr=%d\n",
- 				    mbim->rx_seq, le16_to_cpu(nth16->wSequence));
- 	}
- 	mbim->rx_seq = le16_to_cpu(nth16->wSequence);
+diff --git a/net/sctp/stream.c b/net/sctp/stream.c
+index c241cc552e8d5..bfcff6d6a4386 100644
+--- a/net/sctp/stream.c
++++ b/net/sctp/stream.c
+@@ -735,7 +735,7 @@ struct sctp_chunk *sctp_process_strreset_tsnreq(
+ 	 *     value SHOULD be the smallest TSN not acknowledged by the
+ 	 *     receiver of the request plus 2^31.
+ 	 */
+-	init_tsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map) + (1 << 31);
++	init_tsn = sctp_tsnmap_get_ctsn(&asoc->peer.tsn_map) + (1U << 31);
+ 	sctp_tsnmap_init(&asoc->peer.tsn_map, SCTP_TSN_MAP_INITIAL,
+ 			 init_tsn, GFP_ATOMIC);
+ 
 -- 
 2.39.5
 
