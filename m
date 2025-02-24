@@ -1,49 +1,46 @@
-Return-Path: <netdev+bounces-168908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50672A4172A
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:20:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F25BA41737
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:23:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C616F18958F4
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 08:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3A918953C3
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 08:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935F2186E56;
-	Mon, 24 Feb 2025 08:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639F11EB5B;
+	Mon, 24 Feb 2025 08:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KioprYjf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2aAkUrF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655CB78F37;
-	Mon, 24 Feb 2025 08:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF078C11
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 08:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740385199; cv=none; b=eXvSs07LBKhpLjA3VFt6OL+p19KGSJYVSHC7JrbUk8EFYNS6zzt9as8OIPPwCCbQcoiuvCzaus89+mFWIBITM83Ls5xfM8SSONh2bsCfSyGLJJerfDOFjZqt3dGZ/JxIMwrSyDAcOW+Oy6MtAwRE9qxhC2dMAhBeHau5SK2XdpU=
+	t=1740385399; cv=none; b=a5IL7JOls3UG9xPT0FcwyB2yTzeszj+p1wEyfqGWCgsYrpBSWuQu14swOYuo4+Ye/qUQaCinm3pWeL9P21wTwU5HN5Dx2VIaFbSwIWyoy9z7gveMvnLB0NIHrJkrsVXunzG35X4KpHIfZC0Yl7290sMgtZ6OTwAJqDRf+yHJ9zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740385199; c=relaxed/simple;
-	bh=WRw3GU6KiQoW+w4MXfMGNhDMrQVEmkbV4uPnsG3VKG8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UPEM4ftkRXPCAzRsyZKparz2zJNUW7d7nFO4X2YOh8sRUZxDirI3PdybI4gOOYq7dNDS/0A/TllwqOcPHAThvOJd7iF+XHYhvhapgfi13+tBcZaxvNaySWPcQNgUN3BiOWXL06zWnOE4BDoSwKlR1Ag62uIQWbSp3qo4zRgUGmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KioprYjf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20D0C4CED6;
-	Mon, 24 Feb 2025 08:19:58 +0000 (UTC)
+	s=arc-20240116; t=1740385399; c=relaxed/simple;
+	bh=JKQLC08/PidfoBEYxZgzOtPrEzCNTJ6k8jhweXZMlQI=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=ISZukMIkIUnJLce7LbHhWD8cr+5myxF0+KfP4SXaCXdSWP/egfoaEnNFIQBHn6uIu8RXrtX3f8Sj+ywGxihG/3GLt5cTe35aX1udlk4nwXv1rApxn0CDW5TYGZGYDM/SrjpL6o6mi8uPZf4HiqKHSo4qkGYZu4wo2M1xEiNa94c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2aAkUrF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C3B0C4CED6;
+	Mon, 24 Feb 2025 08:23:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740385198;
-	bh=WRw3GU6KiQoW+w4MXfMGNhDMrQVEmkbV4uPnsG3VKG8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KioprYjfkW1/mlNCa+plyyJfoYmYZMq9olgl7Hqj5bx1rryFQT3wpFU60apUe2LrP
-	 y1wOYtMuUqP4iW1BPL8AccuOr2jThYxMU/cQHc1IdyGP3SdqxM/B5r1d3+WtChLNZU
-	 ewPSBaBDer8cXVPafVza/xCmXW6cMk8k1wi5xr2xje5VwS7ausun7WdfRe9hlAkfQD
-	 wrXgAB5RQQOn6bh3h284gRxq/T/3suR9Hd1/KmQtDZQAJkcCBoPzbxLMNwSRmDlYlS
-	 dCFJ6C2syMBUyt/MA26gKfQCxemrSrNgWuF48Itt1hzWuXq22W/SUdJ/8vF2ZjgdDU
-	 gV8Z9/ilvRvzA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D89380CEE5;
-	Mon, 24 Feb 2025 08:20:31 +0000 (UTC)
+	s=k20201202; t=1740385398;
+	bh=JKQLC08/PidfoBEYxZgzOtPrEzCNTJ6k8jhweXZMlQI=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=V2aAkUrFCCf1riqUveoWeGpPXuqsntYw4lYwHFdm1/MNLsGsAFY6jPXtETEgsg7lj
+	 BOU5RZjh+3P7QTfoO1bSdjj+wZI1PYnTpNa0EkrCdrNh1yfrrDkL63UXwCzLfJmzQK
+	 wXCY9iMeZ5gMaFcoa/wDWGe8MmP39AILRIRUxr1bgEREBuQDHtNfH3YHVSdGzkyFfI
+	 FeN/eqEqgL7XAcza6ZFjbyxWSxnBRHp2XcOh8EGAG/ql+Ya2m7Q625ZaGDKJ4xcnjy
+	 rY58COACv6Sp3Srke2EIz4gtLbNESPc0maI0n3BmYAxRxZQfep6gHuN0WGrJNLPwww
+	 7CaMFxrhQa2AQ==
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -51,47 +48,82 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] virtio-net: tweak for better TX performance in NAPI
- mode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174038523026.3048719.1870378720430783513.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Feb 2025 08:20:30 +0000
-References: <20250218023908.1755-1-jasowang@redhat.com>
-In-Reply-To: <20250218023908.1755-1-jasowang@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
- eperezma@redhat.com, virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250221051223.576726-1-edumazet@google.com>
+References: <20250221051223.576726-1-edumazet@google.com>
+Subject: Re: [PATCH net-next] net-sysfs: restore behavior for not running devices
+From: Antoine Tenart <atenart@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+To: David S . Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Date: Mon, 24 Feb 2025 09:23:14 +0100
+Message-ID: <174038539478.5230.15576331549988523716@kwain>
 
-Hello:
+Quoting Eric Dumazet (2025-02-21 06:12:23)
+> modprobe dummy dumdummies=3D1
+>=20
+> Old behavior :
+>=20
+> $ cat /sys/class/net/dummy0/carrier
+> cat: /sys/class/net/dummy0/carrier: Invalid argument
+>=20
+> After blamed commit, an empty string is reported.
+>=20
+> $ cat /sys/class/net/dummy0/carrier
+> $
+>=20
+> In this commit, I restore the old behavior for carrier,
+> speed and duplex attributes.
+>=20
+> Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attribut=
+es")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Reviewed-by: Antoine Tenart <atenart@kernel.org>
 
-On Tue, 18 Feb 2025 10:39:08 +0800 you wrote:
-> There are several issues existed in start_xmit():
-> 
-> - Transmitted packets need to be freed before sending a packet, this
->   introduces delay and increases the average packets transmit
->   time. This also increase the time that spent in holding the TX lock.
-> - Notification is enabled after free_old_xmit_skbs() which will
->   introduce unnecessary interrupts if TX notification happens on the
->   same CPU that is doing the transmission now (actually, virtio-net
->   driver are optimized for this case).
-> 
-> [...]
+Thanks!
 
-Here is the summary with links:
-  - [net-next] virtio-net: tweak for better TX performance in NAPI mode
-    https://git.kernel.org/netdev/net-next/c/e13b6da7045f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> ---
+>  net/core/net-sysfs.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 3fe2c521e5740436687f09c572754c5d071038f4..f61c1d829811941671981a395=
+fc4cbc57cf48d23 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -313,12 +313,13 @@ static ssize_t carrier_show(struct device *dev,
+>                             struct device_attribute *attr, char *buf)
+>  {
+>         struct net_device *netdev =3D to_net_dev(dev);
+> -       int ret =3D -EINVAL;
+> +       int ret;
+> =20
+>         ret =3D sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+>         if (ret)
+>                 return ret;
+> =20
+> +       ret =3D -EINVAL;
+>         if (netif_running(netdev)) {
+>                 /* Synchronize carrier state with link watch,
+>                  * see also rtnl_getlink().
+> @@ -349,6 +350,7 @@ static ssize_t speed_show(struct device *dev,
+>         if (ret)
+>                 return ret;
+> =20
+> +       ret =3D -EINVAL;
+>         if (netif_running(netdev)) {
+>                 struct ethtool_link_ksettings cmd;
+> =20
+> @@ -376,6 +378,7 @@ static ssize_t duplex_show(struct device *dev,
+>         if (ret)
+>                 return ret;
+> =20
+> +       ret =3D -EINVAL;
+>         if (netif_running(netdev)) {
+>                 struct ethtool_link_ksettings cmd;
+> =20
+> --=20
+> 2.48.1.601.g30ceb7b040-goog
+>=20
+>
 
