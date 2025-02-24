@@ -1,156 +1,242 @@
-Return-Path: <netdev+bounces-169159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA945A42C1F
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:58:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B20A42C2C
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5E3A7A5D1F
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E8B83AFB46
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E600226139E;
-	Mon, 24 Feb 2025 18:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F0F26659D;
+	Mon, 24 Feb 2025 18:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="SpaDFfXo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOCHo+VO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E423D10E4
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 18:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51CF266577
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 18:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740423472; cv=none; b=ryG8wByVOWGDg2J264/bDwYihOMUdu7Hekj4hNK1xb3ewspSUM2o7M6i4MWzbh7mzL0w4k54abxDHEr/PenpbpekI2Wiii9btQv4/foZCoQb8RWbtGNtBsb2SPbH2pELbzDWuvaeZXwZU2hotMUQm98rPvGrn6EUXZd1w0UJC8I=
+	t=1740423503; cv=none; b=oyzHifNQ9Pk7QKINT20LIK+/fxDazEGVUJeVyvNJwAPMaXeg7zE6w+HSJZm62xjXqO5Zy9lgA8LIS4JfDq960KrBKwxPurf5E2A/qgOTXbAG1EaaCUNpmYfjOEGduaf3sTmOQ6nVZaN82HCmbgHUWk7jkSRpWW3nq/pA3btQNyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740423472; c=relaxed/simple;
-	bh=/HsJPSNZ8uCzLZAt5O5uy1H6E5vVFOxhA/N7L7NIUG4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JPTeFqUd4mlkrMvVaCZCO1REs/m1u2dYfgjcmSWLpy5EayWh/wMldSQffh7APMdMIzDrkwZ65+FnuWbXW/uZcT7iV4SqgQq+y+O7UT0TOEpO/E1uZjBGVm30hmxW92tarNcdH0JumhXl0V4+L/XrmLBJkRVUl+x/V1hp/CMu8Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=SpaDFfXo; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740423471; x=1771959471;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LYT2zOqjFLeCDOZGIkFpB5sRaslgpfFq/2iQsPTtWyI=;
-  b=SpaDFfXodh1zTYL1YYz/Yfh3V73XLlFEGRh+XQikk/XBjaj9qJ8PVIwK
-   JvsvApr5gf+Wj+vEuq6rJwbnADbnGIAJ7PvcV3b50caJZoP1E+f4TbV2z
-   TuNAzHxMzfThNHmdAcoVUcKrh1Y7HUvCNTK2CZSBJzGu7VXOq4ZnTdIQN
-   A=;
-X-IronPort-AV: E=Sophos;i="6.13,312,1732579200"; 
-   d="scan'208";a="474901419"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 18:57:48 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:2270]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.69:2525] with esmtp (Farcaster)
- id d07f6826-f469-48d0-a19b-2c87d7f9b6eb; Mon, 24 Feb 2025 18:57:47 +0000 (UTC)
-X-Farcaster-Flow-ID: d07f6826-f469-48d0-a19b-2c87d7f9b6eb
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 18:57:46 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.221.99) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 18:57:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <kernel-team@meta.com>, <netdev@vger.kernel.org>, <saeedm@nvidia.com>,
-	<tariqt@nvidia.com>, <thevlad@meta.com>
-Subject: Re: mlx5: WARNING: register_netdevice_notifier_dev_net
-Date: Mon, 24 Feb 2025 10:57:36 -0800
-Message-ID: <20250224185736.76447-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250224-noisy-cordial-roadrunner-fad40c@leitao>
-References: <20250224-noisy-cordial-roadrunner-fad40c@leitao>
+	s=arc-20240116; t=1740423503; c=relaxed/simple;
+	bh=GJD2KbvJCN9C6Ga1EVtQz4NoCE/898ZrrE6zbyRx+E8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HQ7DgARgK9jkQsWYaQCY+Eb93r7iKdMhyC+0b1feB+SDa0/5wkGCmL+WrGa3LpkMWcnWHLsjR1/VKaKIlk14z5MlU0AgtQ75aBEn5qDy75VYfAjvrJ6xwJFsrjxdRqgznwO9zOmDX9FZwxjKa0xM+lcA/2Bj03JNhoFElRhnvMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOCHo+VO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15F52C4CED6;
+	Mon, 24 Feb 2025 18:58:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740423502;
+	bh=GJD2KbvJCN9C6Ga1EVtQz4NoCE/898ZrrE6zbyRx+E8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MOCHo+VOP8hZ6V9tnf13p5aWjiOt6JyidBQkZRJ6lc/y//WD3bDidC6Yp60nJBII/
+	 evwNUO9ZiY24wtEQDrLgX2lJ3+TYyxMVlDRE8MNOY5YME6WUtN7jtIeRfPE8BulZpM
+	 BrVAth68m0Rw/RGaTunkPttkQW6tCiHEKk2zZq7axVLc5GIwBstbHSYSJoUM01dM4K
+	 hndbIxbnbKpzAJO2GhYEF+byl/17uVXqGc0julcl4o6IgwfaMaSc3RP6Y74RKHLjHI
+	 n1RgFJnb47p0rVAPi6wFtOOMimbM1IVqB2tC6Cgnsf83kvkoWXJ/6MjEZujOshvCPz
+	 qUEPe6y+HaJfA==
+Date: Mon, 24 Feb 2025 18:58:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: tianx <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, parthiban.veerasooran@microchip.com,
+	masahiroy@kernel.org
+Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
+Message-ID: <20250224185817.GH1615191@kernel.org>
+References: <20250213091402.2067626-1-tianx@yunsilicon.com>
+ <20250213091412.2067626-6-tianx@yunsilicon.com>
+ <20250218171036.GB1615191@kernel.org>
+ <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com>
 
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 24 Feb 2025 10:04:23 -0800
-> Hello,
+On Thu, Feb 20, 2025 at 11:35:26PM +0800, tianx wrote:
+> On 2025/2/19 1:10, Simon Horman wrote:
+> > On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
+
+...
+
+> >> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> > ...
+> >
+> >> +/* Handling for queue buffers -- we allocate a bunch of memory and
+> >> + * register it in a memory region at HCA virtual address 0.  If the
+> >> + * requested size is > max_direct, we split the allocation into
+> >> + * multiple pages, so we don't require too much contiguous memory.
+> >> + */
+> > I can't help but think there is an existing API to handle this.
+> failed to find one
+
+Yes, me neither.
+
+> >> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
+> > I think unsigned long would be slightly better types for size and max_direct.
+> yes, will modify
+> >> +		  struct xsc_buf *buf)
+> >> +{
+> >> +	dma_addr_t t;
+> >> +
+> >> +	buf->size = size;
+> >> +	if (size <= max_direct) {
+> >> +		buf->nbufs        = 1;
+> >> +		buf->npages       = 1;
+> >> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
+> >> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
+> >> +						       size,
+> >> +						       &t,
+> >> +						       GFP_KERNEL | __GFP_ZERO);
+> >> +		if (!buf->direct.buf)
+> >> +			return -ENOMEM;
+> >> +
+> >> +		buf->direct.map = t;
+> >> +
+> >> +		while (t & ((1 << buf->page_shift) - 1)) {
+> > I think GENMASK() can be used here.
+> ok
+> >> +			--buf->page_shift;
+> >> +			buf->npages *= 2;
+> >> +		}
+> >> +	} else {
+> >> +		int i;
+> >> +
+> >> +		buf->direct.buf  = NULL;
+> >> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+> > I think this is open-coding DIV_ROUND_UP
+> right, I'll change
+> >> +		buf->npages      = buf->nbufs;
+> >> +		buf->page_shift  = PAGE_SHIFT;
+> >> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
+> >> +					   GFP_KERNEL);
+> >> +		if (!buf->page_list)
+> >> +			return -ENOMEM;
+> >> +
+> >> +		for (i = 0; i < buf->nbufs; i++) {
+> >> +			buf->page_list[i].buf =
+> >> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
+> >> +						   &t, GFP_KERNEL | __GFP_ZERO);
+> >> +			if (!buf->page_list[i].buf)
+> >> +				goto err_free;
+> >> +
+> >> +			buf->page_list[i].map = t;
+> >> +		}
+> >> +
+
+> >> +		if (BITS_PER_LONG == 64) {
+> >> +			struct page **pages;
+> >> +
+> >> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
+> >> +					      GFP_KERNEL);
+> >> +			if (!pages)
+> >> +				goto err_free;
+> >> +			for (i = 0; i < buf->nbufs; i++) {
+> >> +				void *addr = buf->page_list[i].buf;
+> >> +
+> >> +				if (is_vmalloc_addr(addr))
+> >> +					pages[i] = vmalloc_to_page(addr);
+> >> +				else
+> >> +					pages[i] = virt_to_page(addr);
+> >> +			}
+> >> +			buf->direct.buf = vmap(pages, buf->nbufs,
+> >> +					       VM_MAP, PAGE_KERNEL);
+> >> +			kfree(pages);
+> >> +			if (!buf->direct.buf)
+> >> +				goto err_free;
+> >> +		}
+> > I think some explanation is warranted of why the above is relevant
+> > only when BITS_PER_LONG == 64.
+> Some strange historical reasons, and no need for the check now. I'll 
+> clean this up
+
+Thanks.
+
+If you do need 64bit only logic, then perhaps it can be moved to a
+separate function. It could guard code using something like this.
+
+int some_func(struct xsc_buf *buf)
+{
+	if (!IS_ENABLED(CONFIG_64BIT))
+		return 0;
+
+	...
+}
+
+Or if that is not possible, something like this:
+
+#ifdef CONFIG_64BIT
+int some_func(struct xsc_buf *buf)
+{
+	...
+}
+#else /* CONFIG_64BIT */
+int some_func(struct xsc_buf *buf) { return 0; }
+#fi /* CONFIG_64BIT */
+
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +
+> >> +err_free:
+> >> +	xsc_buf_free(xdev, buf);
+> >> +
+> >> +	return -ENOMEM;
+> >> +}
+> > ...
+> >
+> >> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
+> > As per my comment on unsigned long in my response to another patch,
+> > I think npages can be unsigned long.
+> ok
+> >> +{
+> >> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
+> >> +	int mask = (1 << shift) - 1;
+> > Likewise, I think that mask should be an unsigned long.
+> > Or, both shift and mask could be #defines, as they are compile-time
+> > constants.
+> >
+> > Also, mask can be generated using GENMASK, e.g.
+> >
+> > #define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
+> > #define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
+> >
+> > And I note, in the (common) case of 4k pages, that both shift and mask are 0.
 > 
-> I've begun noticing these messages in version 6.14, and they persist in
-> 6.14-rc4 as in 082ecbc71e9 (“Linux 6.14-rc4"). As I haven't found any
-> reports about this issue, I'm bringing it to your attention.
+> Thank you for the suggestion, but that's not quite the case here. The 
+> |shift| and |mask| are not used to extract fields from data. Instead, 
+> they are part of a calculation. In |xsc_buf_alloc|, we allocate the 
+> buffer based on the system's page size. However, in this function, we 
+> need to break each page in the |buflist| into 4KB chunks, populate the 
+> |pas| array with the corresponding DMA addresses, and then map them to 
+> hardware.
 > 
-> 	WARNING: CPU: 25 PID: 849 at net/core/dev.c:2150 register_netdevice_notifier_dev_net (net/core/dev.c:2150)
-> 	
-> 	<TASK>
-> 	? __warn (kernel/panic.c:242 kernel/panic.c:748)
-> 	? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
-> 	? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
-> 	? report_bug (lib/bug.c:? lib/bug.c:219)
-> 	? handle_bug (arch/x86/kernel/traps.c:285)
-> 	? exc_invalid_op (arch/x86/kernel/traps.c:309)
-> 	? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:621)
-> 	? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
-> 	19:02:13 ? register_netdevice_notifier_dev_net (./include/net/net_namespace.h:406 ./include/linux/netdevice.h:2663 net/core/dev.c:2144)
-> 	mlx5e_mdev_notifier_event+0x9f/0xf0 mlx5_ib
-> 	notifier_call_chain.llvm.12241336988804114627 (kernel/notifier.c:85)
-> 	blocking_notifier_call_chain (kernel/notifier.c:380)
-> 	mlx5_core_uplink_netdev_event_replay (drivers/net/ethernet/mellanox/mlx5/core/main.c:352)
-> 	mlx5_ib_roce_init.llvm.12447516292400117075+0x1c6/0x550 mlx5_ib
-> 	mlx5r_probe+0x375/0x6a0 mlx5_ib
-> 	? kernfs_put (./include/linux/instrumented.h:96 ./include/linux/atomic/atomic-arch-fallback.h:2278 ./include/linux/atomic/atomic-instrumented.h:1384 fs/kernfs/dir.c:557)
-> 	? auxiliary_match_id (drivers/base/auxiliary.c:174)
-> 	? mlx5r_mp_remove+0x160/0x160 mlx5_ib
-> 	really_probe (drivers/base/dd.c:? drivers/base/dd.c:658)
-> 	driver_probe_device (drivers/base/dd.c:830)
-> 	__driver_attach (drivers/base/dd.c:1217)
-> 	bus_for_each_dev (drivers/base/bus.c:369)
-> 	? driver_attach (drivers/base/dd.c:1157)
-> 	bus_add_driver (drivers/base/bus.c:679)
-> 	driver_register (drivers/base/driver.c:249)
-> 	__auxiliary_driver_register (drivers/ba
+> The |shift| is calculated as |PAGE_SHIFT - PAGE_SHIFT_4K|, allowing us 
+> to convert the 4KB chunk index (|i|) to the corresponding page index in 
+> |buflist| with |i >> shift|. The |i & mask| gives us the offset of the 
+> current 4KB chunk within the page, and by applying |((i & mask) << 
+> PAGE_SHIFT_4K)|, we can compute the offset of that chunk within the page.
+> 
+> I hope this makes things clearer!
 
-Looks like my assumption was simply wrong...
+Thanks, that is clear.
 
-I'll post a patch with this diff:
+I do still think that the shift and mask could
+be compile-time constants rather than local variables.
+And it does seem to me that GENMASK can be used to generate the mask.
 
----8<---
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 1b252e9459fd..70c01bd1799e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2141,21 +2141,15 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
- 					struct notifier_block *nb,
- 					struct netdev_net_notifier *nn)
- {
--	struct net *net = dev_net(dev);
- 	int err;
- 
--	/* rtnl_net_lock() assumes dev is not yet published by
--	 * register_netdevice().
--	 */
--	DEBUG_NET_WARN_ON_ONCE(!list_empty(&dev->dev_list));
--
--	rtnl_net_lock(net);
--	err = __register_netdevice_notifier_net(net, nb, false);
-+	rtnl_net_dev_lock(dev);
-+	err = __register_netdevice_notifier_net(dev_net(dev), nb, false);
- 	if (!err) {
- 		nn->nb = nb;
- 		list_add(&nn->list, &dev->net_notifier_list);
- 	}
--	rtnl_net_unlock(net);
-+	rtnl_net_dev_unlock(dev);
- 
- 	return err;
- }
----8<---
-
-Thanks!
+...
 
