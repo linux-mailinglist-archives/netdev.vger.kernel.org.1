@@ -1,110 +1,333 @@
-Return-Path: <netdev+bounces-168876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC818A41311
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 02:59:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4592DA41316
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 03:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD4C63B5519
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 01:58:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 597E81894D3F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 01:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154201DE4C3;
-	Mon, 24 Feb 2025 01:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6DC189F57;
+	Mon, 24 Feb 2025 01:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZSIjvnS"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="gHgxLdmb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBE51DB34E
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 01:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865B315696E;
+	Mon, 24 Feb 2025 01:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740362216; cv=none; b=GYbyZpxdwUpP1r+vCUYE4EpvSl5sa/HdKNZ6SmpcXkmErm+puiJ/o+ovARWa7ZabPYk66ecmu7ci/nnzWu+Foi8TscpQ05kObrrgtpXfXp90ZmkL9iZKGW7fdNokzWsU+xeycjaii3YMjThRhzWq44L31DHfzXwMuXHo4rJdZfo=
+	t=1740362336; cv=none; b=bhEjNAWh8IUdeH8O0f7V2RWopfmw/Oq0GyleA9ggrUvNKryDToM1o8f+H0dlaAW2J8Crl/eSnEOlgGDo/aPactSb3ZmwHqeD90jP4M5fy05sdbE6h7Uj0bmekStY2Sq6w4Uz4YNRUIfIb4T6GAzK6X8/SYT7Z8ee/JIwl6O7zMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740362216; c=relaxed/simple;
-	bh=ph9e6jXUOHtZqZ/sNNJYjaIfG6bADSRZTI8XfhufIIc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMsfPyTI5YCf3IobsheyFbAfWh4XoV07XCoCnPoCKNq5ODm0EH+WsiUeQUHfDJRQ+jDlUhSp4XuomcZ8sOReRYI2h5M65/FDpdoHSBslPDoLg8zRMwerIqMAZv7wFuPe3Y3vg9kP10BuphUWFTPOPZLX6CHbQlRLVmevNA/aIOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WZSIjvnS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740362212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ph9e6jXUOHtZqZ/sNNJYjaIfG6bADSRZTI8XfhufIIc=;
-	b=WZSIjvnSiOLOnQZdA1bQlzQIxrlODPhzDehnLwdEIGTiizx6lruk88p99hZHn1EyAGtI3H
-	wG5LfXr4+pAOX6pPWBVWfilLJfqicQEvhGSUB9bm4Sp3+UihH944G+9hZQolNd5dG/0TGA
-	qSCoNL/l8nx7n9CYfJUTulqQIoPjl6Q=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-473-HxcB3qgTOIuPprtZxQFhkg-1; Sun, 23 Feb 2025 20:56:48 -0500
-X-MC-Unique: HxcB3qgTOIuPprtZxQFhkg-1
-X-Mimecast-MFC-AGG-ID: HxcB3qgTOIuPprtZxQFhkg_1740362207
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2fc4dc34291so7591484a91.3
-        for <netdev@vger.kernel.org>; Sun, 23 Feb 2025 17:56:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740362207; x=1740967007;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ph9e6jXUOHtZqZ/sNNJYjaIfG6bADSRZTI8XfhufIIc=;
-        b=LVIpoXIkfmBUGhvbSKKyIbHfCQKnmeW5ws7o2CsKRSTXGPZ/zqJEqC3PNXrFqYPXbj
-         9z8/ygjO+exzHsQt8nPpzHxqoTvA5E+504DSjaffXkfvSlchMRq2JgZA6TN29zXEbc/F
-         NuF4yezWO9PtZIjPE/9lSvdkoq49UJsEsDPBo3oesjbJ3fUC3ypvegmywpCRKUxKnAYK
-         O1JkKJtLskmnwupcSL6cjkLsllZAleFLogcAjUl/2V4VFPtN2W5YyI4ws9DmuDBDU5dJ
-         Y7Pwkl0QJud3DnHmps49sMGQ2w1vRvxHkQD58dYwfLKgi8A2GHTRhv2u3lBsXg3CfmmM
-         hJfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZZv9LQlAxVniSb7UWAE0iX/PqPdZbu8agIZ6QKumZVIhSxLgPhO6kpAJC4j6SOn1qBE2eqco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCGMn/Igy3zuNn8vL1Kj+0gRrgisqjy/dh/SXnYxnvDMLt3b4X
-	jQzgadHL9hU0DVVyLR8I5wIm4Uqppya3SlXMM1e8JNHLU1KLdaGBGA8AbJqMGvVgQTZwIIatl0T
-	EptA+R/hiUF18dB+XxS7VJB88O5wB4wxYieDJIoPq0tdxh2w9VSPbbqYT5DxAVCCvzCnn0aS8Ca
-	xdgEuSnUQVsc4u/dd+bYcRtw9jfNeC
-X-Gm-Gg: ASbGnct/D4ilii/mJuuXqEqss/C2FAmunMHqLw/tqGDV7lgYwqItmZIdbk50ibaiWsZ
-	SZrDpPymN3lUHwFyMSRzIpaiETzyf531klqxYtmLrlwqAxTvV+9WvwE0IV/vTKW59WxkzLo6oSw
-	==
-X-Received: by 2002:a17:90b:2241:b0:2fa:228d:5af2 with SMTP id 98e67ed59e1d1-2fce78b778cmr19847389a91.15.1740362207076;
-        Sun, 23 Feb 2025 17:56:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHK9sEU4lgBSITBL7R7PIYPYfLCTP2jbN12H8uxVsQOHPrTrgk0YL/YWTUrigbXbtwUKlN+8N0guiwDqc1+JHc=
-X-Received: by 2002:a17:90b:2241:b0:2fa:228d:5af2 with SMTP id
- 98e67ed59e1d1-2fce78b778cmr19847371a91.15.1740362206706; Sun, 23 Feb 2025
- 17:56:46 -0800 (PST)
+	s=arc-20240116; t=1740362336; c=relaxed/simple;
+	bh=ORlFFla8sC1IpgaS/KRaD+T3b765e/z0A+g0jIZemO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=naCFaQ1AWYK0G01dE4IPNuPsgxp880SmlQNX6R+nMT2FQXEp2tyuOUDXRticJ3VO5WgTpkqiYPCAhHcbUwalz6YiCbDgcpuo9ZKLraJBC2kg0irDIsLH4w5CpWmM93knSFTiVUR3u5a11h6j85YrFpaL85paGaEZVtLqkW6lbak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=gHgxLdmb; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1740362330;
+	bh=QUU/uAf5++LoUnqMdvxhIP8nL0SijKpkWviqlxn7xFY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=gHgxLdmbp3i4D55NxYZ58AIzLG4Gly+dDXhewUykgAFRYXcTCRTkTNSc2iOs9z8JF
+	 l0L61p8HSTWOTEwnus8Mw+RqG+mAAEpONEHAoWZBHbNwSgUVrwnoj08/d8u8jZigDc
+	 9e8duQo0eCNEgNp6+Xxg2SRXJ2L/jHgJ+LqVpgdewm0yjt5CuATbTogfn1O6OHa+Bs
+	 5DZG0nRSIE0SdL//8+AMVyg/mZ9KEKovcCmxPx1HmQ8svziKqB8eRQBjRkYfcMtOnt
+	 o8CDZmWVNFeGnurteO9F3zaJgXNlobC5U/UfRGQ2l8ckFKG9fHH6IyN56r1IZvLCWw
+	 3cVNY6tcCm5iw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Z1P6L13zZz4wcj;
+	Mon, 24 Feb 2025 12:58:49 +1100 (AEDT)
+Date: Mon, 24 Feb 2025 12:58:48 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Sean Anderson <sean.anderson@linux.dev>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20250224125848.68ee63e5@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250223154042.556001-1-lulu@redhat.com> <20250223154042.556001-7-lulu@redhat.com>
-In-Reply-To: <20250223154042.556001-7-lulu@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 24 Feb 2025 09:56:34 +0800
-X-Gm-Features: AWEUYZl6ERtQHmg9Ng-G9gBzggonYtkd5NQ0JEzUKKMbmNT88IJbeaW3-Ohq2ks
-Message-ID: <CACGkMEvf-WEuFUH7FwyM9w9Ay8qkz0edL3MHfGJa3CPkrzfm0g@mail.gmail.com>
-Subject: Re: [PATCH v6 6/6] vhost: Add check for inherit_owner status
-To: Cindy Lu <lulu@redhat.com>
-Cc: mst@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/0UNaU7tt1dg19JS56+g3vVb";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/0UNaU7tt1dg19JS56+g3vVb
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 23, 2025 at 11:41=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> The VHOST_NEW_WORKER requires the inherit_owner
-> setting to be true. So we need to add a check for this.
->
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
+Hi all,
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Thanks
+  drivers/net/ethernet/cadence/macb_main.c
 
+between commit:
+
+  fa52f15c745c ("net: cadence: macb: Synchronize stats calculations")
+
+from the net tree and commit:
+
+  75696dd0fd72 ("net: cadence: macb: Convert to get_stats64")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/cadence/macb_main.c
+index c1f57d96e63f,5345f3e1a795..000000000000
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@@ -3096,16 -3108,12 +3110,13 @@@ static void gem_update_stats(struct mac
+  			bp->ethtool_stats[idx++] =3D *stat;
+  }
+ =20
+- static struct net_device_stats *gem_get_stats(struct macb *bp)
++ static void gem_get_stats(struct macb *bp, struct rtnl_link_stats64 *nsta=
+t)
+  {
+  	struct gem_stats *hwstat =3D &bp->hw_stats.gem;
+- 	struct net_device_stats *nstat =3D &bp->dev->stats;
+-=20
+- 	if (!netif_running(bp->dev))
+- 		return nstat;
+ =20
+ +	spin_lock_irq(&bp->stats_lock);
+- 	gem_update_stats(bp);
++ 	if (netif_running(bp->dev))
++ 		gem_update_stats(bp);
+ =20
+  	nstat->rx_errors =3D (hwstat->rx_frame_check_sequence_errors +
+  			    hwstat->rx_alignment_errors +
+@@@ -3134,9 -3142,6 +3145,7 @@@
+  	nstat->tx_aborted_errors =3D hwstat->tx_excessive_collisions;
+  	nstat->tx_carrier_errors =3D hwstat->tx_carrier_sense_errors;
+  	nstat->tx_fifo_errors =3D hwstat->tx_underrun;
+ +	spin_unlock_irq(&bp->stats_lock);
+-=20
+- 	return nstat;
+  }
+ =20
+  static void gem_get_ethtool_stats(struct net_device *dev,
+@@@ -3188,17 -3192,19 +3197,20 @@@ static void gem_get_ethtool_strings(str
+  	}
+  }
+ =20
+- static struct net_device_stats *macb_get_stats(struct net_device *dev)
++ static void macb_get_stats(struct net_device *dev,
++ 			   struct rtnl_link_stats64 *nstat)
+  {
+  	struct macb *bp =3D netdev_priv(dev);
+- 	struct net_device_stats *nstat =3D &bp->dev->stats;
+  	struct macb_stats *hwstat =3D &bp->hw_stats.macb;
+ =20
+- 	if (macb_is_gem(bp))
+- 		return gem_get_stats(bp);
++ 	netdev_stats_to_stats64(nstat, &bp->dev->stats);
++ 	if (macb_is_gem(bp)) {
++ 		gem_get_stats(bp, nstat);
++ 		return;
++ 	}
+ =20
+  	/* read stats from hardware */
+ +	spin_lock_irq(&bp->stats_lock);
+  	macb_update_stats(bp);
+ =20
+  	/* Convert HW stats into netdevice stats */
+@@@ -3232,9 -3238,154 +3244,155 @@@
+  	nstat->tx_carrier_errors =3D hwstat->tx_carrier_errors;
+  	nstat->tx_fifo_errors =3D hwstat->tx_underruns;
+  	/* Don't know about heartbeat or window errors... */
+ +	spin_unlock_irq(&bp->stats_lock);
++ }
+ =20
+- 	return nstat;
++ static void macb_get_pause_stats(struct net_device *dev,
++ 				 struct ethtool_pause_stats *pause_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct macb_stats *hwstat =3D &bp->hw_stats.macb;
++=20
++ 	macb_update_stats(bp);
++ 	pause_stats->tx_pause_frames =3D hwstat->tx_pause_frames;
++ 	pause_stats->rx_pause_frames =3D hwstat->rx_pause_frames;
++ }
++=20
++ static void gem_get_pause_stats(struct net_device *dev,
++ 				struct ethtool_pause_stats *pause_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct gem_stats *hwstat =3D &bp->hw_stats.gem;
++=20
++ 	gem_update_stats(bp);
++ 	pause_stats->tx_pause_frames =3D hwstat->tx_pause_frames;
++ 	pause_stats->rx_pause_frames =3D hwstat->rx_pause_frames;
++ }
++=20
++ static void macb_get_eth_mac_stats(struct net_device *dev,
++ 				   struct ethtool_eth_mac_stats *mac_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct macb_stats *hwstat =3D &bp->hw_stats.macb;
++=20
++ 	macb_update_stats(bp);
++ 	mac_stats->FramesTransmittedOK =3D hwstat->tx_ok;
++ 	mac_stats->SingleCollisionFrames =3D hwstat->tx_single_cols;
++ 	mac_stats->MultipleCollisionFrames =3D hwstat->tx_multiple_cols;
++ 	mac_stats->FramesReceivedOK =3D hwstat->rx_ok;
++ 	mac_stats->FrameCheckSequenceErrors =3D hwstat->rx_fcs_errors;
++ 	mac_stats->AlignmentErrors =3D hwstat->rx_align_errors;
++ 	mac_stats->FramesWithDeferredXmissions =3D hwstat->tx_deferred;
++ 	mac_stats->LateCollisions =3D hwstat->tx_late_cols;
++ 	mac_stats->FramesAbortedDueToXSColls =3D hwstat->tx_excessive_cols;
++ 	mac_stats->FramesLostDueToIntMACXmitError =3D hwstat->tx_underruns;
++ 	mac_stats->CarrierSenseErrors =3D hwstat->tx_carrier_errors;
++ 	mac_stats->FramesLostDueToIntMACRcvError =3D hwstat->rx_overruns;
++ 	mac_stats->InRangeLengthErrors =3D hwstat->rx_length_mismatch;
++ 	mac_stats->FrameTooLongErrors =3D hwstat->rx_oversize_pkts;
++ }
++=20
++ static void gem_get_eth_mac_stats(struct net_device *dev,
++ 				  struct ethtool_eth_mac_stats *mac_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct gem_stats *hwstat =3D &bp->hw_stats.gem;
++=20
++ 	gem_update_stats(bp);
++ 	mac_stats->FramesTransmittedOK =3D hwstat->tx_frames;
++ 	mac_stats->SingleCollisionFrames =3D hwstat->tx_single_collision_frames;
++ 	mac_stats->MultipleCollisionFrames =3D
++ 		hwstat->tx_multiple_collision_frames;
++ 	mac_stats->FramesReceivedOK =3D hwstat->rx_frames;
++ 	mac_stats->FrameCheckSequenceErrors =3D
++ 		hwstat->rx_frame_check_sequence_errors;
++ 	mac_stats->AlignmentErrors =3D hwstat->rx_alignment_errors;
++ 	mac_stats->OctetsTransmittedOK =3D hwstat->tx_octets;
++ 	mac_stats->FramesWithDeferredXmissions =3D hwstat->tx_deferred_frames;
++ 	mac_stats->LateCollisions =3D hwstat->tx_late_collisions;
++ 	mac_stats->FramesAbortedDueToXSColls =3D hwstat->tx_excessive_collisions;
++ 	mac_stats->FramesLostDueToIntMACXmitError =3D hwstat->tx_underrun;
++ 	mac_stats->CarrierSenseErrors =3D hwstat->tx_carrier_sense_errors;
++ 	mac_stats->OctetsReceivedOK =3D hwstat->rx_octets;
++ 	mac_stats->MulticastFramesXmittedOK =3D hwstat->tx_multicast_frames;
++ 	mac_stats->BroadcastFramesXmittedOK =3D hwstat->tx_broadcast_frames;
++ 	mac_stats->MulticastFramesReceivedOK =3D hwstat->rx_multicast_frames;
++ 	mac_stats->BroadcastFramesReceivedOK =3D hwstat->rx_broadcast_frames;
++ 	mac_stats->InRangeLengthErrors =3D hwstat->rx_length_field_frame_errors;
++ 	mac_stats->FrameTooLongErrors =3D hwstat->rx_oversize_frames;
++ }
++=20
++ /* TODO: Report SQE test errors when added to phy_stats */
++ static void macb_get_eth_phy_stats(struct net_device *dev,
++ 				   struct ethtool_eth_phy_stats *phy_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct macb_stats *hwstat =3D &bp->hw_stats.macb;
++=20
++ 	macb_update_stats(bp);
++ 	phy_stats->SymbolErrorDuringCarrier =3D hwstat->rx_symbol_errors;
++ }
++=20
++ static void gem_get_eth_phy_stats(struct net_device *dev,
++ 				  struct ethtool_eth_phy_stats *phy_stats)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct gem_stats *hwstat =3D &bp->hw_stats.gem;
++=20
++ 	gem_update_stats(bp);
++ 	phy_stats->SymbolErrorDuringCarrier =3D hwstat->rx_symbol_errors;
++ }
++=20
++ static void macb_get_rmon_stats(struct net_device *dev,
++ 				struct ethtool_rmon_stats *rmon_stats,
++ 				const struct ethtool_rmon_hist_range **ranges)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct macb_stats *hwstat =3D &bp->hw_stats.macb;
++=20
++ 	macb_update_stats(bp);
++ 	rmon_stats->undersize_pkts =3D hwstat->rx_undersize_pkts;
++ 	rmon_stats->oversize_pkts =3D hwstat->rx_oversize_pkts;
++ 	rmon_stats->jabbers =3D hwstat->rx_jabbers;
++ }
++=20
++ static const struct ethtool_rmon_hist_range gem_rmon_ranges[] =3D {
++ 	{   64,    64 },
++ 	{   65,   127 },
++ 	{  128,   255 },
++ 	{  256,   511 },
++ 	{  512,  1023 },
++ 	{ 1024,  1518 },
++ 	{ 1519, 16384 },
++ 	{ },
++ };
++=20
++ static void gem_get_rmon_stats(struct net_device *dev,
++ 			       struct ethtool_rmon_stats *rmon_stats,
++ 			       const struct ethtool_rmon_hist_range **ranges)
++ {
++ 	struct macb *bp =3D netdev_priv(dev);
++ 	struct gem_stats *hwstat =3D &bp->hw_stats.gem;
++=20
++ 	gem_update_stats(bp);
++ 	rmon_stats->undersize_pkts =3D hwstat->rx_undersized_frames;
++ 	rmon_stats->oversize_pkts =3D hwstat->rx_oversize_frames;
++ 	rmon_stats->jabbers =3D hwstat->rx_jabbers;
++ 	rmon_stats->hist[0] =3D hwstat->rx_64_byte_frames;
++ 	rmon_stats->hist[1] =3D hwstat->rx_65_127_byte_frames;
++ 	rmon_stats->hist[2] =3D hwstat->rx_128_255_byte_frames;
++ 	rmon_stats->hist[3] =3D hwstat->rx_256_511_byte_frames;
++ 	rmon_stats->hist[4] =3D hwstat->rx_512_1023_byte_frames;
++ 	rmon_stats->hist[5] =3D hwstat->rx_1024_1518_byte_frames;
++ 	rmon_stats->hist[6] =3D hwstat->rx_greater_than_1518_byte_frames;
++ 	rmon_stats->hist_tx[0] =3D hwstat->tx_64_byte_frames;
++ 	rmon_stats->hist_tx[1] =3D hwstat->tx_65_127_byte_frames;
++ 	rmon_stats->hist_tx[2] =3D hwstat->tx_128_255_byte_frames;
++ 	rmon_stats->hist_tx[3] =3D hwstat->tx_256_511_byte_frames;
++ 	rmon_stats->hist_tx[4] =3D hwstat->tx_512_1023_byte_frames;
++ 	rmon_stats->hist_tx[5] =3D hwstat->tx_1024_1518_byte_frames;
++ 	rmon_stats->hist_tx[6] =3D hwstat->tx_greater_than_1518_byte_frames;
++ 	*ranges =3D gem_rmon_ranges;
+  }
+ =20
+  static int macb_get_regs_len(struct net_device *netdev)
+
+--Sig_/0UNaU7tt1dg19JS56+g3vVb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAme70lgACgkQAVBC80lX
+0GzbMAf9F8infYGSg4z0wZAzJCJEQ1EV7KmE16Urixg/tsmekjzPWR3ychvF5jVs
+ATEQMkhDA7WClxQVLQuu1IwsJDPCgLMgzPg6BAL5NbwqNiruSWZJBD221rFo2qrb
+dQcbQj109sK2W0d9mukf2wPyauDJFsWH6bht549/qDDV5IvfiP+g/mwTyFoPtXil
+McK4L4hPiIcV1y8v7oxbEWqgNzVetFjxUasZCwMIYzus9aDVvS+K37hk4gCg07YJ
+xLRy3a1T/zJSulbvJOr9E1O5aPc0bIOCL4gOcymMNvPsKu8XxRWLadEzw99Ofhqa
+w+gNzSLV6+IFRGzKkz1jitI7UHapJw==
+=pAt5
+-----END PGP SIGNATURE-----
+
+--Sig_/0UNaU7tt1dg19JS56+g3vVb--
 
