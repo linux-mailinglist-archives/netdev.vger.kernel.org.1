@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-169097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A81A4296A
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:22:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC296A42919
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0393D3B31A1
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:14:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 132AB7A56D8
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9C5263F32;
-	Mon, 24 Feb 2025 17:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D37A13B298;
+	Mon, 24 Feb 2025 17:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCNY/Mzv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jy6jSQb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA49262D37;
-	Mon, 24 Feb 2025 17:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98470263C72;
+	Mon, 24 Feb 2025 17:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740417286; cv=none; b=c/ih9EhxYzEa3lMjRaoDccseF4BFmbjoQ8PHxC1g0ZJe478QveVZhS+YS84DpQrzZTkwv9A+QpBqaTwZbfsDCvHnpY2Z7V8QB8CDowsde0kiQtKMr1/44ENlMUlSswmtFuDItlwsrWc9UTH3k0fkaaCqH2fNoQmnQniYQoWdLpA=
+	t=1740417334; cv=none; b=XMFAsg3YqebMz3OOJiVejwswaXCUMm8N9pCqr8o1pSy63+EdV5n8cIdcRwDZ8c5pE8gymyTj7lTjul1PEm2ltm6RUtc1Z458kEzY8I3wJ3RMTrM7NfcHHN5zm+hyE8Xl8aO23cm2HqqE2/+c6Yh8irqbuU1guP8Sw+FqpEs00+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740417286; c=relaxed/simple;
-	bh=gZ/60pQGfPHcDbNWoh9hwuZHc1QKAlEJbSSImLK0ISU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WK9oG9JzawNfrcVqKPtNM6AHVtkkWy81W7CdEJQUFAgo3XEqsSlM9lNV5iLfhmk2mxU/6S9+yrHAAXPs4QmLFIU3hUw/SH4ioIeNITXVXfCrhqYS7Hj5yscEef+REGi8bfKwXBwmuAuGjbdaNHhofeDoOo2EQtQbVIjOwun3v2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCNY/Mzv; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1740417334; c=relaxed/simple;
+	bh=7zX5aWXKrLXXfHIknWWq+MssxzWYqqZPISFTHBTePAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e+kGUvEgOZ68yNHsyon4WL63tJJgo8VkTg6oCiYYeK8cxJktXwf1bkNn4r7en7J8MfERLt62dVBC71++eJbYCud6duA5tl8p1WPVcN4ocvYjNAjSgR8W7wV25szmjs1Vpk7i3d5GnvAQvDXtjnQ8xVIqpyft9eVxxMJ3B5s2CJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jy6jSQb2; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7be6fdeee35so907913685a.1;
-        Mon, 24 Feb 2025 09:14:45 -0800 (PST)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2fcb6c42c47so7296428a91.1;
+        Mon, 24 Feb 2025 09:15:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740417284; x=1741022084; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NJFv2sRe5sNDuKfZTnRa+Yu9FtU3aInI73rlmPJFCkQ=;
-        b=FCNY/Mzv6qc3AP1xWnlItDyCor3bn1w1s4epKaJ5z7LHIliYmjeGvRkFlbdvxZxnGH
-         t699Lz2dNqBpM6G8pQsbF4wpQ9f02cxkcFq8Yte9VcV9JdrYuAW84wKE9tJiyk12rBVY
-         1Eg0WrFCHS6oSPaH1vH8CfwSCnvMXJqTehRX2tRFDjGYWSHGqhBp/T3NnkpCqHStSnl4
-         EzN4iLxrhwmiGackhMiEVF669yAbWOXmTyugL9rq/2iLkTluQnoiVhvuX1EgP4Z56R/3
-         uxccTyT0pLLGD/mLBfYG2EgWOHTP8lA5yjhrpkTF9cWI2q/NIdDavPtaaL0CMdFCWnD1
-         vwFw==
+        d=gmail.com; s=20230601; t=1740417332; x=1741022132; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LSwmMkmIgLqpokeXm1Oy2RMQPP6UHGDY7f3neUmxahM=;
+        b=Jy6jSQb2ke7CzY6l9eflfyDKMjNQXyizH/wdsR6CQSYjgM5V1GAmjuuSz95ij89cCV
+         zzIxkRyQCB64TM22djdKo0dJsWUnJ5gDN6PsZ56vQV2LLY1+v3gnHfQ+Jy1fxwgMqeFg
+         8jMwDS0K906JCXQ0ajmTtD6gQ+5GdadUCaBLmpdPbOlhbb2UKQEXzNWw7IiPJs/Zhe1J
+         YvEdPW9jJph7sK4J0IDvvGuNeXabJeidF20M7oeqXJaM6+aiwO9yf5hhvC05VU8aJ+2x
+         zQ4rI6idpft2yDEf3MNUcfl1Xe4MSziW6smr3jQHFSxKR+3V0Gs6JmLkfeGG5vatNU9K
+         2lAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740417284; x=1741022084;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NJFv2sRe5sNDuKfZTnRa+Yu9FtU3aInI73rlmPJFCkQ=;
-        b=knfILxwEztIe962SbKJcBAHCpalVY3Sv9u0VJ52wlvIyBNBGB9u/sUEk5khawlcvC+
-         rlkZaTKRP79GcwXXUI0ygCoABnP0Nwb+VUuQrTT9qo6kMo6JHu5WtrHISlkZTl9CSng5
-         dtqw2b7ezY+rlFMgVtKZAAZ4GX3TgjeQp5RKjHAfaJo2sOsnSy/nfYOUwcXXzbkz/ioV
-         igR6gnnO1fzuUHnUAWpXLliJGpJY3jpeZEwL5R1mkuZ4q1bClzbE8Bw/h0Md8R5o8TBd
-         DA8U9pVmduO3hN3PidDIuQ4umuQbm6nLKvZuxTiwfNAgQnsavkadSt52Bn5djQDL6HM5
-         y9ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUXy5LUOGlSZmNFXcGK7nMvcjaJBoyUpqDQXzUKXw6xdoHFZUshmJf0ITQeVANmm5ULJZ8=@vger.kernel.org, AJvYcCV4hWDA+uEeHqLKWwJs5iFrH1F+3aDCPaKf2gn8Q8ZaLPHbnGvEPEOUH8Zqcm31zgC8LcdwYbATdXtWoHEq@vger.kernel.org, AJvYcCXt9/I6gdAuUTIqdV6bg6rH5CxNfTKsJEG7CwnqhgIXMnEY7RY2WMX6SXOE1ooJ3+kJcEPzhS/q@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyLW/n4t2lfxPzjPJu0uoluaCaSdZVLm3AlyLF+08/H2NgOlo3
-	gr7NqWQK+7khdOfk4y7a27Eu8uurvrC1rDeQ9bIJ87DDovfLgaaYaOWnIIf0WTHpkZrZkg1vFcY
-	k+MQ0dXDiX9IWZwlkyXTGJxoqf2A=
-X-Gm-Gg: ASbGncvI+aIR8SB4Cj6gcXSRi/AXmk24iLIhpJQHNvzHgb+mdPXzIpQQG5ICI5YKdFF
-	OvA3HQL7KM3NKAC+MmUj4nbBwsEBQzke92y45tfQAvA7sK9DBsyxb9bO/MvsNkNbO/ObgMfmxeA
-	XEoMG9fqLQTg==
-X-Google-Smtp-Source: AGHT+IH/Xed1bhDry9SC0hcfGPFO3s0go6hZSqTqhwLcMNUSsf5ZuwLICj++B+Yj1hmx4K/qqdzZ/phnn4riUyrQ2vA=
-X-Received: by 2002:a05:620a:4143:b0:7c0:ab74:eefd with SMTP id
- af79cd13be357-7c0cef0b343mr1863584785a.31.1740417284105; Mon, 24 Feb 2025
- 09:14:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740417332; x=1741022132;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LSwmMkmIgLqpokeXm1Oy2RMQPP6UHGDY7f3neUmxahM=;
+        b=LbeB7Bo/Bo59490bnqjjB6U+2PxZwi7GGDAtpSI6Dqih7/T428Sn2HnGUFuoJ9j+Jn
+         djsVIMlqCBDdw4oL4h2b4t+MWERZs0DXTrjNPP+nMaZn1R86pNvHgcuPNla7jw9PYQgR
+         Nvq8UN5dCBsi2yepZ6yahsmy5W2w5emg8E3HP2BScRPxHYARrHkqmm34mM8YKrLoLzA9
+         PkvwbMWpexTHES3KIeybJRFw3KfWOLyZehrXNz9OJVYhnpp/aPT0y1ar3hfuXDzL503H
+         Uj+yFcBsyggwdNUOKp06Gx23ba/eD5eip6NIySRaZfB4gin26p3oVMPW3QW6EBpiJB3A
+         T6Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkLl2SfdpMxHq16KK63d/MQh/WlK7ZRUpACftw7r2dywthqZvSbi7XckJwZ5MPjsZLNZs=@vger.kernel.org, AJvYcCV32FVJREuFTWXH97VROK6InwF3/RSW29rlqTRbvJovHyZTUTQ7wjuJpWXAx06IuC5oaauJWR3gR1DAjPPOw0d/@vger.kernel.org, AJvYcCXKTTnIFWBNXm2zWImnENG+ZsOh159NHr0NaR7cVNZ4XZ7sinZlGhfd7l+14yplrsixB2O9J6O5O2YbHFEC@vger.kernel.org, AJvYcCXMycuzWFmD4qhs3k1hrFu2wakDYxG939SC76HEZzEc2ojGxbs/pUzoyWObwMg7iglyJVq+Jrp31oFA@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5UZ6SqDn9JIkj3CLsbUJdy4uSD7gyOaJ1LTFD0JjZswAjEYMK
+	PYAy6i86X5R65vU623IXyygO+SWkvFCVLq223wa3iFYO2sJ+CtY=
+X-Gm-Gg: ASbGncsD2+QxdHhJDek9vrV/rALNgIY4W6IYju+nRw+OYagunDhdbsCBFMlByiFeNwn
+	zSvZyiPI6IqFmsLNBXqhP87hHhEWMopCAbrdQ/j6W+/9j37oomwgn79gubpaQehAtqLWxK6npNf
+	xih6NmK8chRINyu+gKIU0dAnYTJheIWp7Iql71A/SLNqmSI8IKNwfsmJKtQjfpr4OL9rQzn18iB
+	AQsSIyGVXrPDnGQ/JThojiPIQs8MhgEMXG5owLRTnU2+RfqUG3oHrR7JXDUCE/tcreh/2/h+x0s
+	/oo/Kg6pAFEFwsjMMJWd+fh4NQ==
+X-Google-Smtp-Source: AGHT+IFWarbUxrrczcIr8TarroVGKxHwHMvRfgBRrDRlPG93ZRUc7qqfwewXv5vW5TnFkQrdpVqUBw==
+X-Received: by 2002:a17:90b:1f91:b0:2fa:1e3e:9be5 with SMTP id 98e67ed59e1d1-2fce75f1e43mr28310275a91.0.1740417331691;
+        Mon, 24 Feb 2025 09:15:31 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fceb10fb5bsm6766211a91.33.2025.02.24.09.15.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 09:15:31 -0800 (PST)
+Date: Mon, 24 Feb 2025 09:15:30 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v5 9/9] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <Z7ypMjORvm99q6L0@mini-arch>
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-10-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250222093007.3607691-1-wangliang74@huawei.com>
- <CAJ8uoz1fZ3zYVKergPn-QYRQEpPfC_jNgtY3wzoxxJWFF22LKA@mail.gmail.com> <Z7yXhHezJTgYh76T@mini-arch>
-In-Reply-To: <Z7yXhHezJTgYh76T@mini-arch>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Mon, 24 Feb 2025 18:14:33 +0100
-X-Gm-Features: AWEUYZmZmVfLSXv628Ijcc-OVmT7wr2Z7KMdXDQdb9K-axbmTon1GMe_HQAfX5Q
-Message-ID: <CAJ8uoz12bmCPsr_LFwCDypiwzmH+U7TeLqqykgRhp=8vKX4nQw@mail.gmail.com>
-Subject: Re: [PATCH net] xsk: fix __xsk_generic_xmit() error code when cq is full
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Wang Liang <wangliang74@huawei.com>, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250222191517.743530-10-almasrymina@google.com>
 
-On Mon, 24 Feb 2025 at 17:00, Stanislav Fomichev <stfomichev@gmail.com> wrote:
->
-> On 02/24, Magnus Karlsson wrote:
-> > On Sat, 22 Feb 2025 at 10:18, Wang Liang <wangliang74@huawei.com> wrote:
-> > >
-> > > When the cq reservation is failed, the error code is not set which is
-> > > initialized to zero in __xsk_generic_xmit(). That means the packet is not
-> > > send successfully but sendto() return ok.
-> > >
-> > > Set the error code and make xskq_prod_reserve_addr()/xskq_prod_reserve()
-> > > return values more meaningful when the queue is full.
-> >
-> > Hi Wang,
-> >
-> > I agree that this would have been a really good idea if it was
-> > implemented from day one, but now I do not dare to change this since
-> > it would be changing the uapi. Let us say you have the following quite
-> > common code snippet for sending a packet with AF_XDP in skb mode:
-> >
-> > err = sendmsg();
-> > if (err && err != -EAGAIN && err != -EBUSY)
-> >     goto die_due_to_error;
-> > continue with code
-> >
-> > This code would with your change go and die suddenly when the
-> > completion ring is full instead of working. Maybe there is a piece of
-> > code that cleans the completion ring after these lines of code and
-> > next time sendmsg() is called, the packet will get sent, so the
-> > application used to work.
-> >
-> > So I say: let us not do this. But if anyone has another opinion, please share.
->
-> Can we return -EBUSY from this 'if (xsk_cq_reserve_addr_locked())' case as
-> well?
+On 02/22, Mina Almasry wrote:
+> Add support for devmem TX in ncdevmem.
+> 
+> This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> which included the TX path, and work by Stan to include the netlink API
+> and refactored on top of his generic memory_provider support.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-That is a good idea! Though I would return -EAGAIN. When -EBUSY is
-returned, the buffer was consumed but not sent. But -EAGAIN means that
-the user just has to perform then sendmsg() again and that is exactly
-what the user has to do here too.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+
+We need exit_wait=True for check_rx as well, but I'll send this change
+separately.
 
