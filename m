@@ -1,147 +1,164 @@
-Return-Path: <netdev+bounces-169157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BECA42BCA
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:41:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8A9A42BD6
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27AEC179B78
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:41:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F5818873AD
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 18:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5017926657E;
-	Mon, 24 Feb 2025 18:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A57266184;
+	Mon, 24 Feb 2025 18:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tz7V9Gvt"
+	dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b="lMQY0cdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE481266184;
-	Mon, 24 Feb 2025 18:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D1B262D38
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 18:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740422467; cv=none; b=iT7rZ3//Q2o7LdPTcItJDYUXsFADCkMyvqMXlG0EtRas3FIC7pBkqsON4FSofU/E6AGuuz6YKDC4fCyehVsMWpVOfsWbz9YwR4mMv1EnkdEZZp4y6PZo637sDBS21Od4ctiPlmYGKFqCLRcJBLSb1hTPButrQ3TB1eVYu26tcBM=
+	t=1740422590; cv=none; b=TGxZ/FJNvjF9EZu2yaA/CEjdlVwL4vriDbxpLggO0xNbLi478iSTjt1R6S4wgizVl/ehryaIapVoOkOmY3xQMqJCVojK1paN+9olUD5oF0bgZjLn3/xT9FsncldJ5V+/ViUikhavhO7+fj8BB6XCrXEPk00Cszfd3l0VI4sB+VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740422467; c=relaxed/simple;
-	bh=cphWkFLix8d6i9Z1K5YLAhd8RuvGZJxPpG66vWFcP9A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ma2GxsX90yDOSdFZnQGaFzJKp7VJsbdy3hETaMfuUkzrjtAEjA2AJlL5yV0A4WS/oNKyYU8mv/UxjMAsGciOUHZRLJWnw9+YM2nychmxw/69hoqZ7JnhrGeuQAkiGrgUEiKbTuZ4ZnI+/hAZIxxXKlE/cDNZ1tBOTAPZzkDdyVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tz7V9Gvt; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1740422590; c=relaxed/simple;
+	bh=9C7igh+fNqX5yqcRwkvJslw/1KToWxfKrzs75Qf2AdQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=eUZCLpjk5tbSYCZJ7Fg1akAgHkkAUfkrLufsECajxrfgzFLcXrUyshXVEe+8/Ix+Rf6DqDXj77XX+OpKDMOsLr3Zw2UHZJxVizKGactw2vbekmaDO2+N3JtGdtxujIgqUrE3uioQixWPo7I3ElbOvCBpwGPb4MZDLvg20nyi5mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com; spf=pass smtp.mailfrom=8x8.com; dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b=lMQY0cdS; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8x8.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-472003f8c47so43749551cf.1
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 10:43:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740422465; x=1771958465;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LEFCqhcG8wpp885eIFR7TiqnC7q8YedBfxREnJ154Sw=;
-  b=Tz7V9Gvtq+acp7yDcAaZaDUPN90lIxX0CvaVK+dRLXNNxH9+ShbD3Gwm
-   iwFLjNq+/UpC2xD3nVwBdfHoBgKx5uQjltA5nNEgfiD6XQPHZ7coI2b2i
-   dA+0E5yf34jWyD4S7qr8jda82gsxXUDb2H2nJ6mcl+s/tRXQh08RNKr+k
-   o=;
-X-IronPort-AV: E=Sophos;i="6.13,312,1732579200"; 
-   d="scan'208";a="68815604"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 18:41:01 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:29075]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.58:2525] with esmtp (Farcaster)
- id 329f09ea-1828-467a-b87d-a103d2ae36e4; Mon, 24 Feb 2025 18:41:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 329f09ea-1828-467a-b87d-a103d2ae36e4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 18:40:56 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.221.99) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 24 Feb 2025 18:40:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <adrianhuang0701@gmail.com>
-CC: <ahuang12@lenovo.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH 1/1] af_unix: Fix memory leak in unix_dgram_sendmsg()
-Date: Mon, 24 Feb 2025 10:40:45 -0800
-Message-ID: <20250224184045.74801-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250224152846.13650-1-ahuang12@lenovo.com>
-References: <20250224152846.13650-1-ahuang12@lenovo.com>
+        d=8x8.com; s=googlemail; t=1740422587; x=1741027387; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oIX2cYq6RA9Ewe7XHAqMPt9l+R/vxbk5Vh7fsVgslJ4=;
+        b=lMQY0cdSiT2HEvXL0YdBg5jKqoZbh1Ara+bMAZ9lzsGSidSzDbRmi0O1yq7cFBKbSJ
+         GjYpwO9uB/+HxZwcpuSlAn7ZFK6L1CtNDF1zC8CkU11xFTXHWBYt8ALEJCcQpeZep3X3
+         gCN+bxX32l9g/Z+LYUDo+s2B5RpCm13bh+z7U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740422587; x=1741027387;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oIX2cYq6RA9Ewe7XHAqMPt9l+R/vxbk5Vh7fsVgslJ4=;
+        b=BuXzRPxXSH8ZZlTy21TuTyITwzmJhwcw1UuFtqlqB4kFYtmO4DaKnLnCT7W00Z4DL5
+         c/nrxCFG75JTFii53MyeZcY0gENiU4RdTvLncVAnBwesj7rx4p+L0ffegOtmtw1N9G6l
+         ZFCQ136avkz9lk18rrORXGHGrPuTsLEZ462vp3XOvQIE3EfCmcd6OCWb8Bdeu6PTBjr3
+         PlRNzD7gdQKfaY3IdBiM37O1ZvfuAJoMNATOhzCqltGKOKCsKonkY1jG4QciKxZemBsu
+         Gmpi2/C3/HFkq+45OhTklyD+M/LphGeXsCPsUx8DrsdoWWPDohea3ymBQ4kczGjYhUFp
+         9c0w==
+X-Gm-Message-State: AOJu0YwSZeP/hottykB2yzrakHTMWBB3DGC7QJvU0W9dSPxxaBDQD0Hj
+	ZbwbVUHy2he3haJdmP8bRXAU3HsHkzwWLsP2ruvcy0zvzBTEEaGmo25BMNH6SfBzFcbDAjUxTpw
+	=
+X-Gm-Gg: ASbGncsyAcfQcuQe0tYrovRXXmdTOSmOXHRV0/wzkevVMsdI0bt01QkY2ut62AhI4cr
+	RvkcB2CTuFgxIDoFvVJDSa1t+DFyFjLzNhKj+bYOGCOV6Npix4VOx5zD/XcsVeFJURETl0bw36H
+	7VxVsUPUCqeYay1s62l+n0oKTJYSdDxgFwgU8uRb3lgYUXqTq53z9m55WlMgq4KlKVr/IvObCDO
+	tpGH/gG1RJdrRyk7wgrcMJXvTf9r4Y1wtj4DPo/O1zjGzG4887lrrRgZrUsW/P/X+Eti5zoAyl0
+	aRI0GXlaGJH8kcYluxcVdReZwgP5ZETq6hasF1mvnzf8AuFEpAfE7KLM
+X-Google-Smtp-Source: AGHT+IE7f3IBQXWUKpgpCxdfMYcLAujwZA44brEfNKww0MwrTQN098XElV8+zuWpu/uswiM8xGhRAA==
+X-Received: by 2002:ac8:7e82:0:b0:472:789:4702 with SMTP id d75a77b69052e-4722299d2cbmr213207361cf.0.1740422587058;
+        Mon, 24 Feb 2025 10:43:07 -0800 (PST)
+Received: from smtpclient.apple ([2601:8c:4e80:49b0:a51d:1829:4848:c3d6])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471f0bfe304sm96357761cf.55.2025.02.24.10.43.05
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Feb 2025 10:43:06 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: [PATCH iproute2 v3] tc: Fix rounding in tc_calc_xmittime and
+ tc_calc_xmitsize.
+From: Jonathan Lennox <jonathan.lennox@8x8.com>
+In-Reply-To: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
+Date: Mon, 24 Feb 2025 13:42:55 -0500
+Cc: netdev@vger.kernel.org,
+ Stephen Hemminger <stephen@networkplumber.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <952BE2E8-CE07-4D82-A47D-D181C229720A@8x8.com>
+References: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+X-Mailer: Apple Mail (2.3776.700.51.11.1)
 
-From: Adrian Huang <adrianhuang0701@gmail.com>
-Date: Mon, 24 Feb 2025 23:28:46 +0800
-> From: Adrian Huang <ahuang12@lenovo.com>
-> 
-> After running the 'sendmsg02' program of Linux Test Project (LTP),
-> kmemleak reports the following memory leak:
-> 
->   # cat /sys/kernel/debug/kmemleak
->   unreferenced object 0xffff888243866800 (size 2048):
->     comm "sendmsg02", pid 67, jiffies 4294903166
->     hex dump (first 32 bytes):
->       00 00 00 00 00 00 00 00 5e 00 00 00 00 00 00 00  ........^.......
->       01 00 07 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
->     backtrace (crc 7e96a3f2):
->       kmemleak_alloc+0x56/0x90
->       kmem_cache_alloc_noprof+0x209/0x450
->       sk_prot_alloc.constprop.0+0x60/0x160
->       sk_alloc+0x32/0xc0
->       unix_create1+0x67/0x2b0
->       unix_create+0x47/0xa0
->       __sock_create+0x12e/0x200
->       __sys_socket+0x6d/0x100
->       __x64_sys_socket+0x1b/0x30
->       x64_sys_call+0x7e1/0x2140
->       do_syscall_64+0x54/0x110
->       entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Commit 689c398885cc ("af_unix: Defer sock_put() to clean up path in
-> unix_dgram_sendmsg().") defers sock_put() in the error handling path.
-> However, it fails to account for the condition 'msg->msg_namelen != 0',
-> resulting in a memory leak when the code jumps to the 'lookup' label.
-> 
-> Fix issue by calling sock_put() if 'msg->msg_namelen != 0' is met.
-> 
-> Fixes: 689c398885cc ("af_unix: Defer sock_put() to clean up path in unix_dgram_sendmsg().")
-> Signed-off-by: Adrian Huang <ahuang12@lenovo.com>
-> ---
->  net/unix/af_unix.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 34945de1fb1f..cf37a1f92831 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -2100,6 +2100,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
->  		if (!msg->msg_namelen) {
->  			err = -ECONNRESET;
->  			goto out_sock_put;
-> +		} else {
-> +			sock_put(other);
->  		}
->  
->  		goto lookup;
 
-nit: else is not needed:
+Currently, tc_calc_xmittime and tc_calc_xmitsize round from double to
+int three times =E2=80=94 once when they call tc_core_time2tick /
+tc_core_tick2time (whose argument is int), once when those functions
+return (their return value is int), and then finally when the tc_calc_*
+functions return.  This leads to extremely granular and inaccurate
+conversions.
 
-	if (!msg->msg_namelen) {
-		err = -ECONNRESET;
-		goto out_sock_put;
-	}
+As a result, for example, on my test system (where tick_in_usec=3D15.625,
+clock_factor=3D1, and hz=3D1000000000) for a bitrate of 1Gbps, all tc =
+htb
+burst values between 0 and 999 bytes get encoded as 0 ticks; all values
+between 1000 and 1999 bytes get encoded as 15 ticks (equivalent to 960
+bytes); all values between 2000 and 2999 bytes as 31 ticks (1984 bytes);
+etc.
 
-	sock_put(other);
-	goto lookup;
+The patch changes the code so these calculations are done internally in
+floating-point, and only rounded to integer values when the value is
+returned. It also changes tc_calc_xmittime to round its calculated value
+up, rather than down, to ensure that the calculated time is actually
+sufficient for the requested size.
 
-Thanks!
+Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
+---
+tc/tc_core.c | 6 +++---
+tc/tc_core.h | 2 +-
+2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tc/tc_core.c b/tc/tc_core.c
+index 37547e9b..32fd094f 100644
+--- a/tc/tc_core.c
++++ b/tc/tc_core.c
+@@ -23,12 +23,12 @@
+static double tick_in_usec =3D 1;
+static double clock_factor =3D 1;
+
+-static unsigned int tc_core_time2tick(unsigned int time)
++static double tc_core_time2tick(double time)
+{
+	return time * tick_in_usec;
+}
+
+-unsigned int tc_core_tick2time(unsigned int tick)
++double tc_core_tick2time(double tick)
+{
+	return tick / tick_in_usec;
+}
+@@ -45,7 +45,7 @@ unsigned int tc_core_ktime2time(unsigned int ktime)
+
+unsigned int tc_calc_xmittime(__u64 rate, unsigned int size)
+{
+-	return =
+tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate));
++	return =
+ceil(tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate)));
+}
+
+unsigned int tc_calc_xmitsize(__u64 rate, unsigned int ticks)
+diff --git a/tc/tc_core.h b/tc/tc_core.h
+index 7a986ac2..c0fb7481 100644
+--- a/tc/tc_core.h
++++ b/tc/tc_core.h
+@@ -12,7 +12,7 @@ enum link_layer {
+};
+
+
+-unsigned tc_core_tick2time(unsigned tick);
++double tc_core_tick2time(double tick);
+unsigned tc_core_time2ktime(unsigned time);
+unsigned tc_core_ktime2time(unsigned ktime);
+unsigned tc_calc_xmittime(__u64 rate, unsigned size);
 
