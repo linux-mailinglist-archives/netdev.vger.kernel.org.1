@@ -1,152 +1,106 @@
-Return-Path: <netdev+bounces-169172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A011DA42CA5
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:24:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86D1A42CAD
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B323175522
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:23:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D0B18939AB
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634CB1FDA79;
-	Mon, 24 Feb 2025 19:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31C61FCFE2;
+	Mon, 24 Feb 2025 19:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tHgcLj00"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FjydXtq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8865C1FCFE1
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B35DB674
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740424996; cv=none; b=orLGUSionmagZAFenDQNXFXv54YbhtrAlCvq5gN3zQVlslRbvCMKnOywAdbGPDAVmXnHvLCy6JkbqlWGntDO5132YNw3yhwx7Nl0SlYMNsVXLf9bAU1J4UCf2TwIuRtT4tlYQ8n7xaZIAWzH3eTkAa44Etjd16yH/Ue1qkEubmk=
+	t=1740425065; cv=none; b=STe+p31cL+Q3cwk2SpcOr1CVO+nEOewnwUvlRwyPD52IM3DlpNLB4e1Ptc8vBdtVsrHyfYE8n8kNEhQxgzYbNvYIjs/cRM+Rm6fzX853645gWmfX6zbEXBLVtSa79ReKTyssJ4ysaMaQZMld43jBWntaoR8NDG6U39TtX/lTQ44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740424996; c=relaxed/simple;
-	bh=MuxBrNIX06+MBlaJPoUCPaS8vE9mO1mdJznRkFGE6ag=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k8yiwAVMcX1VBu7XaknrnjHqTpStsffhaoYK0XmsmudEtmw8JB+lfkBQnquh7S9XcrdM3cWG7QUbpRrdZJl3/nmLtM1aypGlGHWUwMVvm2NpEMZBvxZifkVIy5niGYbAW+VJYOX4NoM/UAu0NNb5Hc9nhkA2oxUnuzxJiH0glcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tHgcLj00; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5ded368fcd9so6823529a12.1
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 11:23:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740424993; x=1741029793; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4G9JOwMMqctfXuBGODgzmfMVslmCh5Emd9i+EC8Wh/o=;
-        b=tHgcLj00AAnkKI8aQt7gSbFjqqkq0FGg7X/srfkxhdwKmExjXzgED7als5mQMK6irq
-         W0RCnO0SBUxfdvsUac1heVRRDwYxKYGsVpkgNFjJm2gJAk4j0JtMQnm8hV8nykP2TPJJ
-         +mPCkbU+1rWl74XxVSH2JVuqjDE9XRuRpwzayRRn5lCH6sIFgrrYLbrunru4qAHumRbK
-         8y2UF10CGMThGr8jOZEY1RIN2OSxTBKiXs6lLG/l1XujrekTrJ7El8D8cnHKGhYA4vfP
-         dPDNFH6Tib3yLXQdsymufPstsZN4t9kd3zufgz8SgKtDeoBwz/xEjaGuxk7k0jcdYg6w
-         /WsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740424993; x=1741029793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4G9JOwMMqctfXuBGODgzmfMVslmCh5Emd9i+EC8Wh/o=;
-        b=Og6gqRhhJ64MZNId7MCyxk8m0iaa7sUdk07I+zQ5t9Z+Jl0LwX9Cro3shh1oZM2OrY
-         BacWjwlllgSXr7jytJZc45hDBDSAG98znVFNL0BF7zOlwm5DGqMw7T11GAdnKRbohiye
-         le2RnQfexJU9AmKBkBkSrQzxmhJ0QFLmR1k9rBVdbRIOj9OkIc4G4kIoxTOlHziLxKSF
-         af1W3/wPKcb6EyxjvHu4y6ArFvLVpJveyy4qZVEh2v+B43npErtMjPp+d3SjAvZnB/dg
-         jAyHTW92haN2WYMUbJIf2FrIHrnLSuLCG+ylb1n/8i0PxzCSyr5dakaXx4Sa0qBNTgVg
-         Dntw==
-X-Forwarded-Encrypted: i=1; AJvYcCW0+gxGW0DqcaS5VZ5mXfCkCoeymGH7UOfBq3lB3SWhk71c/uA2+L4CiV2vtqyX7An14CULIio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG1F+GCItDuBGyqlhQCvBGlvvQdmOVCMVWX38w/ytVLPPyOESB
-	aWnd/HdztggdWXQi67DkJOa596fTnWROjd6X3h/8CYc/Uff7CNI5zAgueKUWdLZ7QGcmS9V1kWD
-	THvczaOlChhghJ6kRNIxcO7DjBJloragrZGNC
-X-Gm-Gg: ASbGncvMVJFy5TCxQ4zyNl3tIWtRWqFCKp3xjTTcISVgEwZgt1yhSzO4BmTSW0wG8fe
-	rXu8rFfiirDRRmYNBq5dGBdmMiPNvBLVi3mfTx/lidcyJfu9+Pie+p97wjAOxawmYS2IU0GSUss
-	GdotApuQ==
-X-Google-Smtp-Source: AGHT+IGfiIchpM9eOMnXtJ/WcKCVUkgDFUa2p/xrMF61h/aNYjj6Fhs5Fbn5eztpvP2RHcdoRWctJt81jVevyjeHkjo=
-X-Received: by 2002:a05:6402:238f:b0:5e0:348a:e33c with SMTP id
- 4fb4d7f45d1cf-5e0b70d674amr10053613a12.10.1740424992694; Mon, 24 Feb 2025
- 11:23:12 -0800 (PST)
+	s=arc-20240116; t=1740425065; c=relaxed/simple;
+	bh=sijCdm7BK9jNRuk83wOBPOqVRzI55feIjEF9zfy9nJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qCSlb1+FUYWSCeG5rPaa1JWURuQQVNUD0Wobg3R2WWXQeqUmzGRqO3B5MsIQwgjnqFgH5qt7H3HHtsUhV6mxyx9UipUXidgahiEn2Q7lHoDpDqdKUctYs2jK8PtZ/D7LCFqn3HuyHHdwuSW1p6JZKXXqAwtXZyQeywAU9J8nTcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FjydXtq8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9fNRf84FTtJjHliYcAUhh7w6jjxdbYy6571+0WzKs8U=; b=FjydXtq8/upia+NN3lmp+mKknf
+	lL8PdXsnIs4kBH71ncA9vo3jC18J02I8lHXuvCw8olTvs1dr2d4xlZEy/IIfy0tKRFA1N+h4KSKqt
+	j0l9RqdLq4S1GDTAvgIb8thmaEiKA5CxmSloYiJmrxmcj5ZT0PecVTcD5RwlC/Cjsyi0+kT8VKa2C
+	r6YO6J2VuRfb6yCT5U3Sp08LyWlA+iNQ58K9eUQ3ekGQ2OCGPB9IrY180vVSOEjCoLvQ+1pCF2Q3b
+	puAVRKj4x7rFujSibeSUCWJIRdWZZmbkAK5pIKz1O7XGjsThwahg4JjK50UDHQuyi7yWVHIpVJuJ4
+	+JQg74ow==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50622)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tme3p-0007O7-2i;
+	Mon, 24 Feb 2025 19:24:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tme3l-0005G0-14;
+	Mon, 24 Feb 2025 19:24:09 +0000
+Date: Mon, 24 Feb 2025 19:24:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: dwc-qos: clean up clock
+ initialisation
+Message-ID: <Z7zHWceA9SmtcXPm@shell.armlinux.org.uk>
+References: <E1tlRMP-004Vt5-W1@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
- <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com> <SA3PR15MB5630CFBB36C212008DA8ACC7CAC02@SA3PR15MB5630.namprd15.prod.outlook.com>
-In-Reply-To: <SA3PR15MB5630CFBB36C212008DA8ACC7CAC02@SA3PR15MB5630.namprd15.prod.outlook.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 24 Feb 2025 20:23:00 +0100
-X-Gm-Features: AWEUYZnUmpoUUWnKefqPzOGV3a3YKaKSZHqzoRXrvSuNNgfx9ij51R1mq4ffPRc
-Message-ID: <CANn89i+zxMje+wbQzLKbSq_WKYnwGdMyAdStMm4GqkdJCvWPOg@mail.gmail.com>
-Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
-To: Yonghong Song <yhs@meta.com>
-Cc: Breno Leitao <leitao@debian.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	"kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, Kernel Team <kernel-team@meta.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tlRMP-004Vt5-W1@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Feb 24, 2025 at 8:13=E2=80=AFPM Yonghong Song <yhs@meta.com> wrote:
->
-> > ________________________________________
-> >
-> > On Mon, Feb 24, 2025 at 7:24=E2=80=AFPM Breno Leitao <leitao@debian.org=
-> wrote:
-> >>
-> >> Add a lightweight tracepoint to monitor TCP sendmsg operations, enabli=
-ng
-> >> the tracing of TCP messages being sent.
-> >>
-> >> Meta has been using BPF programs to monitor this function for years,
-> >> indicating significant interest in observing this important
-> >> functionality. Adding a proper tracepoint provides a stable API for al=
-l
-> >> users who need visibility into TCP message transmission.
-> >>
-> >> The implementation uses DECLARE_TRACE instead of TRACE_EVENT to avoid
-> >> creating unnecessary trace event infrastructure and tracefs exports,
-> >> keeping the implementation minimal while stabilizing the API.
-> >>
-> >> Given that this patch creates a rawtracepoint, you could hook into it
-> >> using regular tooling, like bpftrace, using regular rawtracepoint
-> >> infrastructure, such as:
-> >>
-> >>         rawtracepoint:tcp_sendmsg_tp {
-> >>                 ....
-> >>         }
-> >
-> > I would expect tcp_sendmsg() being stable enough ?
-> >
-> > kprobe:tcp_sendmsg {
-> > }
->
-> In LTO mode, tcp_sendmsg could be inlined cross files. For example,
->
->   net/ipv4/tcp.c:
->        int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->   net/ipv4/tcp_bpf.c:
->        ...
->       return tcp_sendmsg(sk, msg, size);
->   net/ipv6/af_inet6.c:
->        ...
->        return INDIRECT_CALL_2(prot->sendmsg, tcp_sendmsg, udpv6_sendmsg, =
-...)
->
-> And this does happen in our production environment.
+On Fri, Feb 21, 2025 at 11:38:25AM +0000, Russell King (Oracle) wrote:
+> Clean up the clock initialisation by providing a helper to find a
+> named clock in the bulk clocks, and provide the name of the stmmac
+> clock in match data so we can locate the stmmac clock in generic
+> code.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> dwc_eth_find_clk() should probably become a generic helper given that
+> plat_dat->clks is part of the core platform support code, but that
+> can be done later when converting more drivers - which I will get
+> around to once I've got the set_clk_tx_rate() patch series out that
+> someone else needs to make progress.
 
-And we do not have a way to make the kprobe work even if LTO decided
-to inline a function ?
+Jakub,
 
-This seems like a tracing or LTO issue, this could be addressed there
-in a generic way
-and avoid many other patches to work around this.
+This one can also be removed from patchwork.
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
