@@ -1,187 +1,139 @@
-Return-Path: <netdev+bounces-168948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B3BA41B41
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:36:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1379EA41BFA
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 12:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8009B7A39F6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:35:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7F7D7A211D
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 11:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422E3250BE7;
-	Mon, 24 Feb 2025 10:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C222586EC;
+	Mon, 24 Feb 2025 11:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bxix02Ya"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="bVluDuFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDF21A08C5;
-	Mon, 24 Feb 2025 10:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88222586DF;
+	Mon, 24 Feb 2025 11:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740393383; cv=none; b=s1X5K9GJC+9vgkw88nc2enKvcgdwskQbaVGvPA4vSRTJWmjpFs0/wGYplsoDeR4plHh1gvzzt2kaUowUrUVsxF6sLpkJd9B2UuHbAR6d79FP1Zs2siwS4AoViguaiYBUH27WP0EjeakvGRzwhaeioas2ccuWXwW45pMSSN7rUTA=
+	t=1740394921; cv=none; b=RxXw6ibH0kq7JPyPlEgYFwN/hhS/akENHWkgekEN3tzJ4ugf2NF9SQ00BjklxXSpGuc/B8WIXojKuxkPssXmY0NEaCH0EDlZHTzUSwgBIsTpoJRNWOLEcy6BBuwMArPKNLr+wcK3iI0hD82StIjfo+MTd3xHXyvEgMsEKXnm7po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740393383; c=relaxed/simple;
-	bh=LWj+rzbXhdbUWEizLtYOJLzuzvQIQbJfgxH7xmLfWRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EY5RpGemfd0DvDGeL7CCp441FAoVgKvYmUyuFaL/5nIsZLR4kjYOPVldRijkCxWy708nsX+dzwgbXI8+xvNwWvLqxSxaFytdpWd8A0WCa5bczjwb8oFdAEC/u+6OLhWeh9lMsq/2niWN0uQlgC3o3GuGzGWHrRraSmxmCcQY2J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bxix02Ya; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22990C4CED6;
-	Mon, 24 Feb 2025 10:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740393382;
-	bh=LWj+rzbXhdbUWEizLtYOJLzuzvQIQbJfgxH7xmLfWRk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bxix02YacPDlWmFsV1+Bblcqo22T/1wsSdlOB5ypmFsUZdM5t535aZ0YS6n3zeyUN
-	 3dL6GLrekriU/4LvbioQMRyKHwoFq8+fPXPCKYG6gg0RF9lzogej12m8ZDKeLawbog
-	 JwFtQXtjInRCgA+gOd2y/wSu/6Dl2FxsDF/RfQYPL980nmVN+HD1cPr4UCQZ8GOTa9
-	 ywbB/Lg+nVr5xyHLh123FdkRAi4kvQWqX7dOvMzzpfDKi+zn4bb7yNoGnMsqsG89Ho
-	 esDGUlFal9bjs1EIXBvusnDiyv6f1ZX+ndgyeMjZI1kOBG9MNtdfbNlKDBe5R9eWy5
-	 Bu6V40h7k+Saw==
-Date: Mon, 24 Feb 2025 11:36:16 +0100
-From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: =?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>, davem@davemloft.net, 
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, 
-	Florian Fainelli <f.fainelli@gmail.com>, =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, 
-	Simon Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, 
-	Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <ihxsrolj75ufuhyfu4r2dalth4dzkmamh5naat5fa74iwu3mrb@5vl453qcsoj7>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
- <87r03otsmm.fsf@miraculix.mork.no>
- <20250224103814.7d60bfbd@fedora>
+	s=arc-20240116; t=1740394921; c=relaxed/simple;
+	bh=q18mKMH72Y4UUcWf73SfinzZFUcLW4FTQuzaM83ivAc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ly8O+8GP93tyaRv3zLCvZx2ZKr+0yigcoZQVGlcVCCWaNddMY7EAOZdQlKWSo2/qIdBj/ogDT89DPIDxONPl8SmJ+Xndeous/HKku7IqOOEFDqVFKwUWi0+ydJ4UgpmQWKXvcUXLbHI4QUjvby7MibKf0N3qd6sQQKTw2BVOLk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=bVluDuFu; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51OB174G874420
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 24 Feb 2025 05:01:07 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1740394867;
+	bh=UrJwRS5j0Znv8WvcVKXlmtyolIJX3daZq7dyAqxKQS4=;
+	h=From:To:CC:Subject:Date;
+	b=bVluDuFu35aMtK+DaebNDRkm+5h3txflRDrM7o2icA9EPwTddFpXH9qdhbB9vHqOF
+	 pIs5ILC2tGzJXUuBLOhrDEnR51Ex+Bj/CYw5hj5kB5GFWcAWMxpA/LfihhyTxqMgq1
+	 9+j4xElOK7g4OMf2v7J7V5XrFngbtO3L9/cf1xW0=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51OB17lt106562
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 24 Feb 2025 05:01:07 -0600
+Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 24
+ Feb 2025 05:01:06 -0600
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 24 Feb 2025 05:01:07 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51OB16qV093011;
+	Mon, 24 Feb 2025 05:01:06 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 51OB16T6002030;
+	Mon, 24 Feb 2025 05:01:06 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <u.kleine-koenig@baylibre.com>, <matthias.schiffer@ew.tq-group.com>,
+        <dan.carpenter@linaro.org>, <m-malladi@ti.com>,
+        <schnelle@linux.ibm.com>, <diogo.ivo@siemens.com>,
+        <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: [PATCH net-next v3 0/3] net: ti: icssg-prueth: Add native mode XDP support
+Date: Mon, 24 Feb 2025 16:30:59 +0530
+Message-ID: <20250224110102.1528552-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250224103814.7d60bfbd@fedora>
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Mon, Feb 24, 2025 at 10:38:14AM +0100, Maxime Chevallier wrote:
-> Hi Bjørn,
-> 
-> On Sun, 23 Feb 2025 19:37:05 +0100
-> Bjørn Mork <bjorn@mork.no> wrote:
-> 
-> > Maxime Chevallier <maxime.chevallier@bootlin.com> writes:
-> > 
-> > > Hi everyone,
-> > >
-> > > Some PHYs such as the VSC8552 have embedded "Two-wire Interfaces" designed to
-> > > access SFP modules downstream. These controllers are actually SMBus controllers
-> > > that can only perform single-byte accesses for read and write.
-> > >
-> > > This series adds support for accessing SFP modules through single-byte SMBus,
-> > > which could be relevant for other setups.
-> > >
-> > > The first patch deals with the SFP module access by itself, for addresses 0x50
-> > > and 0x51.
-> > >
-> > > The second patch allows accessing embedded PHYs within the module with single-byte
-> > > SMBus, adding this in the mdio-i2c driver.
-> > >
-> > > As raw i2c transfers are always more efficient, we make sure that the smbus accesses
-> > > are only used if we really have no other choices.
-> > >
-> > > This has been tested with the following modules (as reported upon module insertion)
-> > >
-> > > Fiber modules :
-> > >
-> > > 	UBNT             UF-MM-1G         rev      sn FT20051201212    dc 200512
-> > > 	PROLABS          SFP-1GSXLC-T-C   rev A1   sn PR2109CA1080     dc 220607
-> > > 	CISCOSOLIDOPTICS CWDM-SFP-1490    rev 1.0  sn SOSC49U0891      dc 181008
-> > > 	CISCOSOLIDOPTICS CWDM-SFP-1470    rev 1.0  sn SOSC47U1175      dc 190620
-> > > 	OEM              SFP-10G-SR       rev 02   sn CSSSRIC3174      dc 181201
-> > > 	FINISAR CORP.    FTLF1217P2BTL-HA rev A    sn PA3A0L6          dc 230716
-> > > 	OEM              ES8512-3LCD05    rev 10   sn ESC22SX296055    dc 220722
-> > > 	SOURCEPHOTONICS  SPP10ESRCDFF     rev 10   sn E8G2017450       dc 140715
-> > > 	CXR              SFP-STM1-MM-850  rev 0000 sn K719017031       dc 200720
-> > >
-> > >  Copper modules
-> > >
-> > > 	OEM              SFT-7000-RJ45-AL rev 11.0 sn EB1902240862     dc 190313
-> > > 	FINISAR CORP.    FCLF8521P2BTL    rev A    sn P1KBAPD          dc 190508
-> > > 	CHAMPION ONE     1000SFPT         rev -    sn     GBC59750     dc 19110401
-> > >
-> > > DAC :
-> > >
-> > > 	OEM              SFP-H10GB-CU1M   rev R    sn CSC200803140115  dc 200827
-> > >
-> > > In all cases, read/write operations happened without errors, and the internal
-> > > PHY (if any) was always properly detected and accessible
-> > >
-> > > I haven't tested with any RollBall SFPs though, as I don't have any, and I don't
-> > > have Copper modules with anything else than a Marvell 88e1111 inside. The support
-> > > for the VSC8552 SMBus may follow at some point.
-> > >
-> > > Thanks,
-> > >
-> > > Maxime
-> > >
-> > > Maxime Chevallier (2):
-> > >   net: phy: sfp: Add support for SMBus module access
-> > >   net: mdio: mdio-i2c: Add support for single-byte SMBus operations
-> > >
-> > >  drivers/net/mdio/mdio-i2c.c | 79 ++++++++++++++++++++++++++++++++++++-
-> > >  drivers/net/phy/sfp.c       | 65 +++++++++++++++++++++++++++---
-> > >  2 files changed, 138 insertions(+), 6 deletions(-)  
-> > 
-> > Nice!  Don't know if you're aware, but OpenWrt have had patches for
-> > SMBus access to SFPs for some time:
-> > 
-> > https://github.com/openwrt/openwrt/blob/main/target/linux/realtek/patches-6.6/714-net-phy-sfp-add-support-for-SMBus.patch
-> > https://github.com/openwrt/openwrt/blob/main/target/linux/realtek/patches-6.6/712-net-phy-add-an-MDIO-SMBus-library.patch
-> > 
-> > The reason they carry these is that they support Realtek rtl930x based
-> > switches.  The rtl930x SoCs include an 8 channel SMBus host which is
-> > typically connected to any SFP+ slots on the switch.
-> > 
-> > There has been work going on for a while to bring the support for these
-> > SoCs to mainline, and the SMBus host driver is already here:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/i2c/busses/i2c-rtl9300.c?id=c366be720235301fdadf67e6f1ea6ff32669c074
-> > 
-> > I assume DSA and ethernet eventually will follow, making SMBus SFP
-> > support necessary for this platform too.
-> > 
-> > So thanks for doing this!
-> 
-> Good to know this is useful to you ! So there's at least 2 different
-> classes of products out there with SMBus that advertise that it's
-> "designed for SFP" ._.
-> 
-> > FWIW, I don't think the OpenWrt mdio patch works at all.  I've recently
-> > been playing with an 8 SFP+ port switch based on rtl9303, and have tried
-> > to fixup both the clause 22 support and add RollBall and clause 45.
-> > This is still a somewhat untested hack, and I was not planning on
-> > presenting it here as such, but since this discussion is open:
-> > https://github.com/openwrt/openwrt/pull/17950/commits/c40387104af62a065797bc3e23dfb9f36e03851b
-> > 
-> > Sorry for the format.  This is a patch for the patch already present in
-> > OpenWrt. Let me know if you want me to post the complete patched
-> > mdio-smbus.c for easier reading.
-> > 
-> > The main point I wanted to make is that we also need RollBall and clause
-> > 45 over SMBus.  Maybe not today, but at some point.  Ideally, the code
-> > should be shared with the i2c implementation, but I found that very hard
-> > to do as it is.
-> 
-> I don't have anything to test that, and yeah that can be considered as
-> a second step, however I don't even know if this can work at all with
-> single byte accesses :(
+This series adds native XDP support using page_pool.
+XDP zero copy support is not included in this patch series.
 
-I will send you some RollBall modules, Maxime.
+Patch 1/3: Replaces skb with page pool for Rx buffer allocation
+Patch 2/3: Adds prueth_swdata struct for SWDATA for all swdata cases
+Patch 3/3: Introduces native mode XDP support
 
-Marek
+v2: https://lore.kernel.org/all/20250210103352.541052-1-m-malladi@ti.com/
+
+Changes since v2 (v3-v2):
+0/3:
+- Update cover letter subject line to add details of the driver as suggested by
+Jesper Dangaard Brouer <hawk@kernel.org>
+1/3:
+- few cosmetic changes for all the patches
+2/3:
+- Fix leaking tx descriptor in emac_tx_complete_packets()
+- Free rx descriptor if swdata type is not page in emac_rx_packet()
+- Revert back the size of PRUETH_NAV_SW_DATA_SIZE
+- Use build time check for prueth_swdata size
+- re-write prueth_swdata to have enum type as first member in the struct
+and prueth_data union embedded in the struct
+3/3:
+- Use page_pool contained in the page instead of using passing page_pool
+(rx_chn) as part of swdata
+- dev_sw_netstats_tx_add() instead of incrementing the stats directly
+- Add missing ndev->stats.tx_dropped++ wherever applicable
+- Move k3_cppi_desc_pool_alloc() before the DMA mapping for easier cleanup
+on failure
+- Replace rxp->napi_id with emac->napi_rx.napi_id in prueth_create_xdp_rxqs()
+
+All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+
+Roger Quadros (3):
+  net: ti: icssg-prueth: Use page_pool API for RX buffer allocation
+  net: ti: icssg-prueth: introduce and use prueth_swdata struct for
+    SWDATA
+  net: ti: icssg-prueth: Add XDP support
+
+ drivers/net/ethernet/ti/Kconfig               |   1 +
+ drivers/net/ethernet/ti/icssg/icssg_common.c  | 421 ++++++++++++++----
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 128 +++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  47 +-
+ .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  23 +-
+ 5 files changed, 529 insertions(+), 91 deletions(-)
+
+
+base-commit: e13b6da7045f997e1a5a5efd61d40e63c4fc20e8
+-- 
+2.43.0
+
 
