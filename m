@@ -1,199 +1,101 @@
-Return-Path: <netdev+bounces-169084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D422BA4284D
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:52:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A749A42845
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 17:50:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D6A93B467A
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:49:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83A401894199
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 16:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C978C262D0E;
-	Mon, 24 Feb 2025 16:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAB5262D10;
+	Mon, 24 Feb 2025 16:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="wPsbUf4C"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hSOMAMi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B74A261370
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 16:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1C3261593
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 16:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740415755; cv=none; b=PB64m2qI6sMR/tsu2d33wUA+s03IMQnC1Jiy0F2oSAUl6z+vS4TcEVoGVFhpzHApLVGmbVyfq58RqRteGye429A/+lsVyl8c2ypnEp8WCHLF1ulJE6zGhj6FJfog2Y2QkPuV+/ildTaPV4BS12M/faTZRj6Vx/SuElepidtdfug=
+	t=1740415806; cv=none; b=NGmnGwD1iSx7BSCHRrQt71Y61tPKDXejs2luwl+qoHWnDFKUaW8+SgxIgAt2FpYDi2W1oWbs4tgeeq2mJiYR2rnt1kflrBipnn0F4SAmGhxAf8jxIJuyoC8XBi2wtAKVCHA71KJ/OPReJy2msiaMA39hqBbCael8ansMcuC+fAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740415755; c=relaxed/simple;
-	bh=0owWw1cuo+cX4j4Ih/WHzBKYOaqO9Rssv7adgvP7S50=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f78fgKRuMWIYqchEDVp4FP/yEQxLiKgwSPzRqGkeevG78/75JJk7cMcNrBc0d8Mi1jaNsQS3mYYJuaFrWKEXEbalItgNNHJgOeiFcde6bGkb2dRcny4B77PONbf27bEGTDllmQJ1OgWhJbKKGquMpRK22FLYbHl1N1bHS0uUpkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=wPsbUf4C; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-220d27fcdaaso9652205ad.0
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 08:49:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1740415753; x=1741020553; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UeyntKBy7kGuKLN3CHbZwgt0kVqLbpOMJBlnkYeB+/4=;
-        b=wPsbUf4CEFx6qtIzkRrg1utqSv+bWcuu1+iyRIQxzjKtuLSt0Kin2kgA9OCs1QrE3z
-         FxCsnT0HCBnJ1j/3V2zvg5lgfX0akbCluiCTCz9QE0raMkdShTBccXuiVtLQV+VN/QU5
-         F5NI5FN9HktZVB+CUOAC2HtNHKEDTjVSHWnYxGfIostdUd1k/eYcVcPoRFMY6ZAPzJ3K
-         4BAOumMSkpHTKQyXE35lclXZWSn3dR/iRTUceFBSKN/Dcrg/Mm0EfgLwadxUpF4fcFBy
-         J34qyIvzP7AgpoImSi2sakaLeWMukrpRwxwXfZ3bfcb5xyMnHxPUXN5KVZspI2Nxkl9B
-         Ucnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740415753; x=1741020553;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UeyntKBy7kGuKLN3CHbZwgt0kVqLbpOMJBlnkYeB+/4=;
-        b=TDLLxh+Ix7tMKNuCbdRX+S+J4J6KatAyRRf+29NuC5npsbTt6TsAFAP/kvfrjoyIr7
-         Tzghf1uTfi3EbFMxciW/XcHJdklHuQKGPnYWwodIdQ61FqSR/SKXQyva25bvhFs4Uqd0
-         hFsshC2/JR2wP2Tm16Gvkw+U0nlFiyoIkuUhbo6UyknuMisAUI1gq6y0DfsTcqqNv+eb
-         mzztbzPsxe+xFsi1Q74mfDmVlqruZL4Yi32g4YV7v94YTLNI+pUfBr9msHQlkTPGmtsc
-         Dtkmm0uaSRmDxKrLQ2cQ274nrz//2alfK570f30Y0YRVY4MWAxE9k8Xrw+lBZUFpZm1c
-         QjPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0JKgko1j7POF6W4mqBWp0drzuHG2D8WOtLLStFCnq0v1LHb4yrCaiPqsIbvhYJbFeaFQG6gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGnkZYsZiQ3j1Q02ZDoomr+6NSaohwdR4qOShBbMDK/OHhCPn9
-	rhaiaXEc9KVhX6e9sxAPQNgy5AP7FpRxSNMiuZIRVquc9io+wimLud0IX2WYinA=
-X-Gm-Gg: ASbGncv3dvoV+JVekLeFNnoxND80JJh78NtXr/ij5fxouE0wXWtTq2Yr8naqgnxB1VC
-	uXmnUzsGujPFACz3Xg7zT+b3aXJvjBCJXcSrD1Lh9rcgpIyI/WTJ9ZlCJVhacOQBmRxPVSrGCGW
-	gwR9CW4cZnLkGEdyMgSLFCbwJeZOkrSxvYDw9TkBOJcnPAvdfEcX8LBhJPhOn8aOFaz7kv7KN9r
-	lM6GXPTzb56w4STXa7Nq43gtO9cp9JQEQn1zuyOUgKiO/v1sr7YY1WInsiKRA2MeOp+RhqxEFx0
-	fF9G1APCL1w9SS4=
-X-Google-Smtp-Source: AGHT+IH778xCAayJCWhZcoKEZgbQQMZL7qHzpXFDag5SlCSeSKmNLD4Sz8UTadasHcx2Pict6gMw6w==
-X-Received: by 2002:a05:6a00:1409:b0:730:915c:b77 with SMTP id d2e1a72fcca58-73426c7c787mr8312631b3a.1.1740415753476;
-        Mon, 24 Feb 2025 08:49:13 -0800 (PST)
-Received: from t14.. ([2001:5a8:4528:b100:7b8c:7570:b6d6:368f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7346d9b1af1sm1465573b3a.71.2025.02.24.08.49.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 08:49:13 -0800 (PST)
-From: Jordan Rife <jordan@jrife.io>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Jordan Rife <jordan@jrife.io>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	stephen@networkplumber.org,
-	dsahern@kernel.org
-Subject: [PATCH iproute2-next v2] ip: link: netkit: Support scrub options
-Date: Mon, 24 Feb 2025 08:49:00 -0800
-Message-ID: <20250224164903.138865-1-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1740415806; c=relaxed/simple;
+	bh=ILU8bWKcokWDvIEhMlgHkISsvtiYy9HbZ016Gnz7fdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZBhWYQxrGoA7Tz5J5VZwvaOtyLOKi08mA53dp6dTMDxjqPSdVAyI143jJtaU164nAT+slaH7QtayedgAT2PyVvpmHkbbzmARa48eslFkprPqKbrRUgCu2MI8oPw7Yt3XvAeZGgpAAXMsDLWq+w9celIEtfQFN9PjH8vsZj5q+L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hSOMAMi9; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=prs4XZf+LQU37XZYihXYMGUtI4UK9gIDbyzuWPk6b1E=; b=hSOMAMi9NWkbX+qi46VgOYrtHj
+	0FIRcy3jMwJHS5h0X7nTJhRshYOj7P1iQ9S3NN14gjB10MDLPMt20tG5OxmlFWEv+Ir8EtI+PXKSO
+	0BrL4bPpgcFnwWXHgDoynSFy8DbAzrJkf1LxfkcwmlahEqMs0b5UmkqL/n7iIOHGdWXEKcQuoUFsl
+	EGDOfS9FzdbLp6nX8flr5mj4XDI2H1PBi3Po4MMXjsZLldXe30ESJeADGlsmy9cix9S0riSdY1Mr5
+	YdX9Mezq+Bj8KU9f+tjMhYaWB7DGJxAugpfVyP8lFSXtbAABEERdGvPGxHf4ljz3Zd4IAt0dOv4tr
+	mwilkKsw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41954)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tmbeU-0006zA-1n;
+	Mon, 24 Feb 2025 16:49:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tmbeR-0005AB-0I;
+	Mon, 24 Feb 2025 16:49:51 +0000
+Date: Mon, 24 Feb 2025 16:49:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/2] net: stmmac: dwc-qos: clean up clock
+ initialisation
+Message-ID: <Z7yjLjfNq89vPnOd@shell.armlinux.org.uk>
+References: <Z7yGdNuX2mYph8X8@shell.armlinux.org.uk>
+ <E1tmZjr-004uJP-82@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tmZjr-004uJP-82@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add "scrub" option to configure IFLA_NETKIT_SCRUB and
-IFLA_NETKIT_PEER_SCRUB when setting up a link. Add "scrub" and
-"peer scrub" to device details as well when printing.
+On Mon, Feb 24, 2025 at 02:47:19PM +0000, Russell King (Oracle) wrote:
+> Clean up the clock initialisation by providing a helper to find a
+> named clock in the bulk clocks, and provide the name of the stmmac
+> clock in match data so we can locate the stmmac clock in generic
+> code.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-$ sudo ./ip/ip link add jordan type netkit scrub default peer scrub none
-$ ./ip/ip -details link show jordan
-43: jordan@nk0: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    netkit mode l3 type primary policy forward peer policy forward scrub default peer scrub none numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 524280 tso_max_segs 65535 gro_max_size 65536 gso_ipv4_max_size 65536 gro_ipv4_max_size 65536
+Yet more warnings and errors from NIPA, yet this patch passes my local
+build tests.
 
-v1->v2: Added some spaces around "scrub SCRUB" in the help message.
+As no one looked at v1, I don't see the point of waiting 24h before
+posting v3... no one is probably looking at v2.
 
-Link: https://lore.kernel.org/netdev/20241004101335.117711-1-daniel@iogearbox.net/
-
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- ip/iplink_netkit.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
-
-diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
-index 49550a2e..818da119 100644
---- a/ip/iplink_netkit.c
-+++ b/ip/iplink_netkit.c
-@@ -24,13 +24,19 @@ static const char * const netkit_policy_strings[] = {
- 	[NETKIT_DROP]		= "blackhole",
- };
- 
-+static const char * const netkit_scrub_strings[] = {
-+	[NETKIT_SCRUB_NONE]	= "none",
-+	[NETKIT_SCRUB_DEFAULT]	= "default",
-+};
-+
- static void explain(struct link_util *lu, FILE *f)
- {
- 	fprintf(f,
--		"Usage: ... %s [ mode MODE ] [ POLICY ] [ peer [ POLICY <options> ] ]\n"
-+		"Usage: ... %s [ mode MODE ] [ POLICY ] [ scrub SCRUB ] [ peer [ POLICY <options> ] ]\n"
- 		"\n"
- 		"MODE: l3 | l2\n"
- 		"POLICY: forward | blackhole\n"
-+		"SCRUB: default | none\n"
- 		"(first values are the defaults if nothing is specified)\n"
- 		"\n"
- 		"To get <options> type 'ip link add help'.\n",
-@@ -91,6 +97,23 @@ static int netkit_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (seen_peer)
- 				duparg("peer", *(argv + 1));
- 			seen_peer = true;
-+		} else if (strcmp(*argv, "scrub") == 0) {
-+			int attr_name = seen_peer ?
-+					IFLA_NETKIT_PEER_SCRUB :
-+					IFLA_NETKIT_SCRUB;
-+			enum netkit_scrub scrub;
-+
-+			NEXT_ARG();
-+
-+			if (strcmp(*argv, "none") == 0) {
-+				scrub = NETKIT_SCRUB_NONE;
-+			} else if (strcmp(*argv, "default") == 0) {
-+				scrub = NETKIT_SCRUB_DEFAULT;
-+			} else {
-+				fprintf(stderr, "Error: scrub must be either \"none\" or \"default\"\n");
-+				return -1;
-+			}
-+			addattr32(n, 1024, attr_name, scrub);
- 		} else {
- 			char *type = NULL;
- 
-@@ -144,6 +167,15 @@ static const char *netkit_print_mode(__u32 mode)
- 	return netkit_mode_strings[mode] ? : inv;
- }
- 
-+static const char *netkit_print_scrub(enum netkit_scrub scrub)
-+{
-+	const char *inv = "UNKNOWN";
-+
-+	if (scrub >= ARRAY_SIZE(netkit_scrub_strings))
-+		return inv;
-+	return netkit_scrub_strings[scrub] ? : inv;
-+}
-+
- static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
- 	if (!tb)
-@@ -172,6 +204,18 @@ static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		print_string(PRINT_ANY, "peer_policy", "peer policy %s ",
- 			     netkit_print_policy(policy));
- 	}
-+	if (tb[IFLA_NETKIT_SCRUB]) {
-+		enum netkit_scrub scrub = rta_getattr_u32(tb[IFLA_NETKIT_SCRUB]);
-+
-+		print_string(PRINT_ANY, "scrub", "scrub %s ",
-+			     netkit_print_scrub(scrub));
-+	}
-+	if (tb[IFLA_NETKIT_PEER_SCRUB]) {
-+		enum netkit_scrub scrub = rta_getattr_u32(tb[IFLA_NETKIT_PEER_SCRUB]);
-+
-+		print_string(PRINT_ANY, "peer_scrub", "peer scrub %s ",
-+			     netkit_print_scrub(scrub));
-+	}
- }
- 
- static void netkit_print_help(struct link_util *lu,
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
