@@ -1,71 +1,57 @@
-Return-Path: <netdev+bounces-168893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A0EA41556
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 07:30:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87211A41580
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 07:37:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 037D43B3F44
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 06:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB8F63AFEAE
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 06:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30641CBEAA;
-	Mon, 24 Feb 2025 06:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="i3IiGxEc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5B41D619F;
+	Mon, 24 Feb 2025 06:37:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BB41C6FF3;
-	Mon, 24 Feb 2025 06:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934991AB531;
+	Mon, 24 Feb 2025 06:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740378600; cv=none; b=qLCLOEASZ45ZD62tFfBveiZLwQHgz4PqzRhd0eWOLQJoGeY2WoMI2h29FMA+j+xqNrI0HV/tYpijl6SMP3hW6+OlOLOa0BrGCosuNP25AmzAiIwR5XTHwL00pnkQN3Ai3mzLACq6yrE9mp7trve3ZGtHiefrN1w4bI/FrTALa44=
+	t=1740379038; cv=none; b=naKswtc94TFUl/5w0PhCFjzcCwAvXWAi1crFLUo5vRoi2WHI/UhCC2SZ+ATC1bRkgRvBv0IDUGVq6Mu8ue6NzpCJL/dGt9H8M+I9P0VwzjarAO9o2EZ88on8E6PNFmZG4WxoMxp5c44JhqAOjz/Jfg22+IX5Nza5P1cpbvM2Jog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740378600; c=relaxed/simple;
-	bh=YVsDtyqTxPJIZHLawY8vKzQMRCjme0GSRmVavCWwFtU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pAPcbz3gY3VFalgA+Dg2myD/81ta1UWu870d55zAc75MwjdGGSgOV4OA/J7sKYaWS6QdsDVpN091y9jpNzhhR7s3cn08LP1TUygZOnVG33DZ9S/i4ZIRiVixICil9Ok6J7ZMFr/l1LAU54sxaO3rzSRisgBsfzLnsHeuvtcUtco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=i3IiGxEc; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51O519nw003072;
-	Sun, 23 Feb 2025 22:29:44 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=LaVl+u1W0NCCSosgbI0Qoc6
-	M45Ml9akeZq79noOTqVI=; b=i3IiGxEcNg/v0qmEtzgYmifx3l+9FIUtYOyI5qC
-	cj2ikCX2b2LWaqjMMdpKvE6YfuZoJhtdpc+KvwIbHp0i1lLPkH1IIbs0fDPQRhxx
-	dOD7pRm1riU8u1IlwpFT+T+wBEO1e52R6L3v2+7m5lXMA/hvb/m0bXFjxkAT4e3c
-	am8/jvioqySiohNq+oVBgX3Xqt76L364Tvd/KnQ3BKjEpQTJnR+rlK2kZaQHpZ2v
-	BKS/5nkUrqSvUu0pNAlZYvQT4wSUOaTu7uq9erMmigaI/C586HGKoJ9tQx1T6YEl
-	ckvZa9NPD/S0rOArpuwwDMh1Yk83uc+TCmyy0dkIDJ5ZwWg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 44yeyktw2d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 23 Feb 2025 22:29:44 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 23 Feb 2025 22:29:29 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 23 Feb 2025 22:29:29 -0800
-Received: from localhost.localdomain (unknown [10.111.135.16])
-	by maili.marvell.com (Postfix) with ESMTP id A07613F7067;
-	Sun, 23 Feb 2025 22:29:29 -0800 (PST)
-From: Harshal Chaudhari <hchaudhari@marvell.com>
-To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
-        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Harshal
- Chaudhari" <hchaudhari@marvell.com>
-Subject: [PATCH v2 1/1] net: mvpp2: cls: Fixed Non IP flow, with vlan tag flow defination.
-Date: Sun, 23 Feb 2025 22:29:27 -0800
-Message-ID: <20250224062927.2829186-1-hchaudhari@marvell.com>
+	s=arc-20240116; t=1740379038; c=relaxed/simple;
+	bh=Jc+2WNUmjLGHyuFYszJFy8/ImzfdaZ4fJ76+p/vwYoc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kqb845et3U3BmdG+RyCM+3o5iU3wn3mnbI/XJCEnb0WUE1yuZmH59KDQcrmT5v2x4eNAMO36/7P2glvI3EIZURw1nx0pivF10uW/VHCJh0ptLVqV3ETg9nMF6tLA8XRWVtb4coqZYDyROeQbeaZ0lbGSjIxo9x3ZwP7T6aTy+vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51O5C2RX002897;
+	Sun, 23 Feb 2025 22:36:55 -0800
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 44yar7hp93-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sun, 23 Feb 2025 22:36:54 -0800 (PST)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Sun, 23 Feb 2025 22:36:54 -0800
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Sun, 23 Feb 2025 22:36:50 -0800
+From: <jianqi.ren.cn@windriver.com>
+To: <stable@vger.kernel.org>
+CC: <cratiu@nvidia.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <roid@nvidia.com>, <netdev@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <dtatulea@nvidia.com>, <tariqt@nvidia.com>, <zhe.he@windriver.com>
+Subject: [PATCH 6.6.y] net/mlx5e: Don't call cleanup on profile rollback failure
+Date: Mon, 24 Feb 2025 14:36:50 +0800
+Message-ID: <20250224063650.2397912-1-jianqi.ren.cn@windriver.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,40 +61,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: x6nw1Yxnm5QMTamh5MLJ1SqtlQAR4of2
-X-Proofpoint-GUID: x6nw1Yxnm5QMTamh5MLJ1SqtlQAR4of2
+X-Proofpoint-ORIG-GUID: woJEHtJ8A_wJquBsPPk-rp0fIpslxwCZ
+X-Authority-Analysis: v=2.4 cv=Be0i0qt2 c=1 sm=1 tr=0 ts=67bc1386 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=T2h4t0Lz3GQA:10 a=Ikd4Dj_1AAAA:8 a=20KFwNOVAAAA:8 a=t7CeM3EgAAAA:8 a=Ba9Sw2FB-nAdYA35_e8A:9 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: woJEHtJ8A_wJquBsPPk-rp0fIpslxwCZ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-24_02,2025-02-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.21.0-2502100000
+ definitions=main-2502240047
 
-Fixes: 1274daede3ef ("net: mvpp2: cls: Add steering based on vlan Id and priority.")
+From: Cosmin Ratiu <cratiu@nvidia.com>
 
-Non IP flow, with vlan tag not working as expected while
-running below command for vlan-priority. fixed that.
+[ Upstream commit 4dbc1d1a9f39c3711ad2a40addca04d07d9ab5d0 ]
 
-ethtool -N eth1 flow-type ether vlan 0x8000 vlan-mask 0x1fff action 0 loc 0
+When profile rollback fails in mlx5e_netdev_change_profile, the netdev
+profile var is left set to NULL. Avoid a crash when unloading the driver
+by not calling profile->cleanup in such a case.
 
-Change from v1:
-	* Added the fixes tag
+This was encountered while testing, with the original trigger that
+the wq rescuer thread creation got interrupted (presumably due to
+Ctrl+C-ing modprobe), which gets converted to ENOMEM (-12) by
+mlx5e_priv_init, the profile rollback also fails for the same reason
+(signal still active) so the profile is left as NULL, leading to a crash
+later in _mlx5e_remove.
 
-Signed-off-by: Harshal Chaudhari <hchaudhari@marvell.com>
+ [  732.473932] mlx5_core 0000:08:00.1: E-Switch: Unload vfs: mode(OFFLOADS), nvfs(2), necvfs(0), active vports(2)
+ [  734.525513] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.557372] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.559187] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: new profile init failed, -12
+ [  734.560153] workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+ [  734.589378] mlx5_core 0000:08:00.1: mlx5e_netdev_init_profile:6235:(pid 6086): mlx5e_priv_init failed, err=-12
+ [  734.591136] mlx5_core 0000:08:00.1 eth3: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+ [  745.537492] BUG: kernel NULL pointer dereference, address: 0000000000000008
+ [  745.538222] #PF: supervisor read access in kernel mode
+<snipped>
+ [  745.551290] Call Trace:
+ [  745.551590]  <TASK>
+ [  745.551866]  ? __die+0x20/0x60
+ [  745.552218]  ? page_fault_oops+0x150/0x400
+ [  745.555307]  ? exc_page_fault+0x79/0x240
+ [  745.555729]  ? asm_exc_page_fault+0x22/0x30
+ [  745.556166]  ? mlx5e_remove+0x6b/0xb0 [mlx5_core]
+ [  745.556698]  auxiliary_bus_remove+0x18/0x30
+ [  745.557134]  device_release_driver_internal+0x1df/0x240
+ [  745.557654]  bus_remove_device+0xd7/0x140
+ [  745.558075]  device_del+0x15b/0x3c0
+ [  745.558456]  mlx5_rescan_drivers_locked.part.0+0xb1/0x2f0 [mlx5_core]
+ [  745.559112]  mlx5_unregister_device+0x34/0x50 [mlx5_core]
+ [  745.559686]  mlx5_uninit_one+0x46/0xf0 [mlx5_core]
+ [  745.560203]  remove_one+0x4e/0xd0 [mlx5_core]
+ [  745.560694]  pci_device_remove+0x39/0xa0
+ [  745.561112]  device_release_driver_internal+0x1df/0x240
+ [  745.561631]  driver_detach+0x47/0x90
+ [  745.562022]  bus_remove_driver+0x84/0x100
+ [  745.562444]  pci_unregister_driver+0x3b/0x90
+ [  745.562890]  mlx5_cleanup+0xc/0x1b [mlx5_core]
+ [  745.563415]  __x64_sys_delete_module+0x14d/0x2f0
+ [  745.563886]  ? kmem_cache_free+0x1b0/0x460
+ [  745.564313]  ? lockdep_hardirqs_on_prepare+0xe2/0x190
+ [  745.564825]  do_syscall_64+0x6d/0x140
+ [  745.565223]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ [  745.565725] RIP: 0033:0x7f1579b1288b
+
+Fixes: 3ef14e463f6e ("net/mlx5e: Separate between netdev objects and mlx5e profiles initialization")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
- drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Verified the build test.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-index 1641791a2d5b..8ed83fb98862 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-@@ -324,7 +324,7 @@ static const struct mvpp2_cls_flow cls_flows[MVPP2_N_PRS_FLOWS] = {
- 		       MVPP2_PRS_RI_VLAN_MASK),
- 	/* Non IP flow, with vlan tag */
- 	MVPP2_DEF_FLOW(MVPP22_FLOW_ETHERNET, MVPP2_FL_NON_IP_TAG,
--		       MVPP22_CLS_HEK_OPT_VLAN,
-+		       MVPP22_CLS_HEK_TAGGED,
- 		       0, 0),
- };
- 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 6e431f587c23..b34f57ab9755 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -6110,7 +6110,9 @@ static void mlx5e_remove(struct auxiliary_device *adev)
+ 	mlx5e_dcbnl_delete_app(priv);
+ 	unregister_netdev(priv->netdev);
+ 	mlx5e_suspend(adev, state);
+-	priv->profile->cleanup(priv);
++	/* Avoid cleanup if profile rollback failed. */
++	if (priv->profile)
++		priv->profile->cleanup(priv);
+ 	mlx5e_destroy_netdev(priv);
+ 	mlx5e_devlink_port_unregister(mlx5e_dev);
+ 	mlx5e_destroy_devlink(mlx5e_dev);
 -- 
 2.25.1
 
