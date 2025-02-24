@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-169020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B703FA421A9
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:45:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D859A421D0
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C4B7188D34B
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:44:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC073A5EF5
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E90243369;
-	Mon, 24 Feb 2025 13:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C367623BCE9;
+	Mon, 24 Feb 2025 13:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rY3e3h66"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fnUouyOp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3479A23BCE9
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 13:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE9723372B;
+	Mon, 24 Feb 2025 13:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740404674; cv=none; b=JjwJfvD6kKH58pTTE0HLrCC6svaHlyWSPbOXp2ReN8FCU1S5bV1FRd8maOY53BlQ6VoJ/OH9BWgeqJZp50MbHiNwBeAKus6vchr9aCjz6+8+qFV8e63U8GIPuR+qsh6QOngjbTXyi5rXa6FdCAxK/c5lUlCPDNCU8NX3fTiRqKo=
+	t=1740404683; cv=none; b=DhNITY3Qa5qigW0yKBWlJjU9KPwlI/eDia8ExqwXm85QxrIlmG1aIb1KVkTICBUDFt8zvS4pedfy3amDSp5BiXqRj1fBh4ZDkm1xiCnbQKzxWwUR1w4uJ+/vGwPVBLejEg6aD48hAGrbKhIXdqMlbR/WJ1bEJRYTsBKig9OBGik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740404674; c=relaxed/simple;
-	bh=HX53bO0KAJksNvzKZN0MZEfaDlVJyjY4t4szONmBIY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X49dkRIITvrLy/3BouC1ZUwn1/neaLl56bZ2ecacFdHwIjlXgnMTQEyyYySGSHxWPRSwUKWU6ENHW8iWsk3VqYjAYEijNunRDaU4urtDOrnKAwEjaE0kHoOap8chDZ+BDeuachqXJOq14fACH5Is9u2Zb9sflpK48ycZnGR7d74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rY3e3h66; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 495BCC4CEE8;
+	s=arc-20240116; t=1740404683; c=relaxed/simple;
+	bh=ChsQpr6FpnfFUMruwBSOsWL9jwA+YIJCuxM/Udd+VnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UNp65zKQbsQFTBwcC2deAbJ+yQfuwzuZ6xQ3Xn2Fen7SP5I3+cJ96cNtoWf1G4RycAmFBkEI/J8d70vILLXy5pZc82Ij0Q3cM8zm7oQVPAFaYDvRAU0lRmLncUUoVePuS8S5cgoMM+DruH5A2Kxl75msLux6nKSCMLOOcUHRAyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fnUouyOp; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 80E21443ED;
 	Mon, 24 Feb 2025 13:44:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740404673;
-	bh=HX53bO0KAJksNvzKZN0MZEfaDlVJyjY4t4szONmBIY4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rY3e3h66CPPftwVdWnsUU589FhcXb2eUVkTTNGlhvA2e/a5+uGe5AQ2818vKuJCZw
-	 RPQj3kIW+hesN15v9kStypYtfzWZw7Im9cxUUhYPnnysB4dJ8gG0qcqSpsVeP9cJkX
-	 kf9ZKoSszsXOBg8ctoIHv1zcZ0nrLSEXsN5MeH6hWULZkUj8swir8Q5AuBRVUjB9A/
-	 63fAMFp0soit6Crx8EYjHqfJoQZmXSK9oKAXIhzUJ3Owbl2ZiyW1mNDCb/a5/XDSc3
-	 kxi/ReMOWqpN4jy0f+NshX6rBxc8/uknMz/UPUbJVOtMb8gU8kadQq3PeuRy5QKaRt
-	 tRdSzh5kOiHRA==
-Date: Mon, 24 Feb 2025 13:44:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pablo Martin Medrano <pablmart@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net v2] selftests/net: big_tcp: return xfail on slow
- machines
-Message-ID: <20250224134430.GA2858114@kernel.org>
-References: <23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740404674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gduisQ65ckcL60BLQX/XNFI+VFiFYoC2kP8U8Fmb59o=;
+	b=fnUouyOpgPmeRPmgEGs06nupx3E7oHo1z4CT9wU71pkwuoCZDz9g1v9k837TIAJXohvjJL
+	EsGg0HBhaK8EcjD3WbjbIO02c8tRgVa02e2uUokVEQS2/W49AjC9gQ4SDCBBStSy02ay7t
+	INLIEXLelC1yTqM4kI8uo3tIXRO653y6rkGWWX/0VwEmzFpWAySiUqHB8h6d0iowJbGg7e
+	eHhYG+LlpW9f2Rx/XojkGw4ysoEgJFaUC9jMNqDeTDf38bQLTB8QJg4DURba6P1oWLw5VN
+	jUwEIBhSPCGE7zPx4FaDWw0v+/CApeQ/nHjuG4iBMKreBkUk1wLbbOAN17GBNQ==
+Date: Mon, 24 Feb 2025 14:44:31 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
+ Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next 12/13] net: phy: phylink: Use phy_caps_lookup
+ for fixed-link configuration
+Message-ID: <20250224144431.2dca9d19@kmaincent-XPS-13-7390>
+In-Reply-To: <20250222142727.894124-13-maxime.chevallier@bootlin.com>
+References: <20250222142727.894124-1-maxime.chevallier@bootlin.com>
+	<20250222142727.894124-13-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejkeelfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepv
+ gguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, Feb 19, 2025 at 06:07:58PM +0100, Pablo Martin Medrano wrote:
-> After debugging the following output for big_tcp.sh on a board:
-> 
-> CLI GSO | GW GRO | GW GSO | SER GRO
-> on        on       on       on      : [PASS]
-> on        off      on       off     : [PASS]
-> off       on       on       on      : [FAIL_on_link1]
-> on        on       off      on      : [FAIL_on_link1]
-> 
-> Davide Caratti found that by default the test duration 1s is too short
-> in slow systems to reach the correct cwd size necessary for tcp/ip to
-> generate at least one packet bigger than 65536 (matching the iptables
-> match on length rule the test evaluates)
-> 
-> This skips (with xfail) the aforementioned failing combinations when
-> KSFT_MACHINE_SLOW is set. For that the test has been modified to use
-> facilities from net/lib.sh.
-> 
-> The new output for the test will look like this (example with a forced
-> XFAIL)
-> 
-> Testing for BIG TCP:
->       CLI GSO | GW GRO | GW GSO | SER GRO
-> TEST: on        on       on       on                    [ OK ]
-> TEST: on        off      on       off                   [ OK ]
-> TEST: off       on       on       on                    [XFAIL]
-> 
-> Changes in v2:
-> - Don't break the loop and use lib.sh facilities (thanks Peter Machata)
-> - Rephrased the subject from "longer netperf session on slow machines"
->   as the patch is not configuring a longer session but skipping
-> - Added tags and SOB and the Fixes: hash (thank you Davide Caratti)
-> - Link to v1: https://lore.kernel.org/all/b800a71479a24a4142542051636e980c3b547434.1739794830.git.pablmart@redhat.com/
+On Sat, 22 Feb 2025 15:27:24 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-Hi Pablo,
-
-FWIIW, I think this can be moved to below the scissors ("---").
-
-> Fixes: a19747c3b9b ("selftests: net: let big_tcp test cope with slow env")
-
-Checkpatch complains that fixes tags should have 12 or more characters of
-sha1 hash.
-
-Fixes: a19747c3b9bf ("selftests: net: let big_tcp test cope with slow env")
-
-Lastly, and most importantly, it seems that there is new feedback on a
-predecessor of this patch, which probably needs to be addressed.
-
-- Re: [PATCH net] selftests/net: big_tcp: longer netperf session on slow machines
-  https://lore.kernel.org/all/20250221144408.784cc642@kernel.org/
-
-> Suggested-by: Davide Caratti <dcaratti@redhat.com>
-> Suggested-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Pablo Martin Medrano <pablmart@redhat.com>
-> ---
->  tools/testing/selftests/net/big_tcp.sh | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
+> When phylink creates a fixed-link configuration, it finds a matching
+> linkmode to set as the advertised, lp_advertising and supported modes
+> based on the speed and duplex of the fixed link.
+>=20
+> Use the newly introduced phy_caps_lookup to get these modes instead of
+> phy_lookup_settings(). This has the side effect that the matched
+> settings and configured linkmodes may now contain several linkmodes (the
+> intersection of supported linkmodes from the phylink settings and the
+> linkmodes that match speed/duplex) instead of the one from
+> phy_lookup_settings().
 
 ...
+
+> =20
+>  	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
+>  	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
+> @@ -588,9 +591,9 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+> =20
+>  	phylink_set(pl->supported, MII);
+> =20
+> -	if (s) {
+> -		__set_bit(s->bit, pl->supported);
+> -		__set_bit(s->bit, pl->link_config.lp_advertising);
+> +	if (c) {
+> +		linkmode_or(pl->supported, pl->supported, match);
+> +		linkmode_or(pl->link_config.lp_advertising,
+> pl->supported, match);
+
+You are doing the OR twice. You should use linkmode_copy() instead.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
