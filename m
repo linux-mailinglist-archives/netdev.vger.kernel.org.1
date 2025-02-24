@@ -1,147 +1,94 @@
-Return-Path: <netdev+bounces-168919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F781A418A3
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:19:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B37A418E0
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5949D1898B08
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:17:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 572A87A6C8A
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D14D24502C;
-	Mon, 24 Feb 2025 09:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9181724BBF7;
+	Mon, 24 Feb 2025 09:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="k2mfxxUs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msyrKkEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0932D24501A
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC5C86340
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740388181; cv=none; b=UmGt8V8exWMFZnrsSi9u3n9RWqmwiiEHgYUjbko1G8jkv4mvFFTri4VNoGRcVfvMkMMNfoXb70UnqooPBEZNrFQVnj9McuhzZd4ugU7MzEqHd7bYbh8AZdH7LKQB4xs2NKGjzmjPT7P0ee6eBu7LH2YB1PnxnFWLdSM6Gjr+1SE=
+	t=1740388800; cv=none; b=nrisOWFQV4buxEBVdzxeH+aduAGkosUMA6JcHI/edmBYt8E+w3Sl0gyY4VOwgl8XwqMs/cKmd1Gi3kPcYmtYnyr8Pp7R8lMODz1MvXm6pENtYP4IskcdINiAL/NUfoRh7XgpuxXduBamfFfBZBdV/70zHMenXMxbrguiREXzrzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740388181; c=relaxed/simple;
-	bh=swRtZW74gLP0QkyAEAJcViyXMZk7ZNDdNaOjhBJmf2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ISa0aJBg/T+VRvs7EvtwD0Hh2DjrVxrVV89AQsAHEwTYXygM89dSzgXK+peX+LEUQYvdTXqtbqEM0gobDUoofMpkaisSBrKwLhYeSITRYcsUD1eZ7syMayMSogtcF2MmwBNDxMxs4KySDnpiFvdxCYXzsRtk71DwfyCawFBqftM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=k2mfxxUs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pTALlKbSKJ0pfCW0bKggFYFpg7EFYynYFxwssKh+C9Q=; b=k2mfxxUsJMg20o414L508A20Sz
-	IsMmCXwHj9Pve7EakuteAeW2Mijmx7tgNQvJFjEMhorcIp13CSNZUzKt7Sw/+drbSmQypPhFIjkzH
-	zSL/HW3fMprv+bGoQucs7FWZUZLr/RMkNONqdbRoDhV5EI89H9aB0fCgWH5dUQcANxgEmiOVsLKAz
-	Tysehk9IQp3OMgJLLqPeUuhrLaLXDkHr36NrY34n0hTZqRyIN8OlWEoVVqktJ84ZrUAnZHGM2puSo
-	h+If2Gf1Ilku7oFCtXW2jEi1cWQQod7w61T/fqr2D7bPOCjw2noB8r+UstUy4m8wsDIb5gDNbE7V+
-	gJemzfpw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53832)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmUSs-0005bT-1N;
-	Mon, 24 Feb 2025 09:09:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmUSo-0004sM-28;
-	Mon, 24 Feb 2025 09:09:22 +0000
-Date: Mon, 24 Feb 2025 09:09:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Joe Perches <joe@perches.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Drew Fustini <drew@pdp7.com>, Eric Dumazet <edumazet@google.com>,
-	Fu Wei <wefu@redhat.com>, Guo Ren <guoren@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/2] net: stmmac: thead: clean up clock rate
- setting
-Message-ID: <Z7w3QhcYhrzQk_5K@shell.armlinux.org.uk>
-References: <Z7iKdaCp4hLWWgJ2@shell.armlinux.org.uk>
- <Z7sJHuiqbr4GU05c@shell.armlinux.org.uk>
- <7bf9577f4b6dcb818785be73c175bcd19b3b4f0c.camel@perches.com>
+	s=arc-20240116; t=1740388800; c=relaxed/simple;
+	bh=t1za7wnmR1L7Lv5M8y1FSf5NXzUtNaCTpSMZVGanyDo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=elYMMhwUndAfE04aq3LKhPTye1wVykkGDwn+LIkbWFp0x6ztzff2H85unv6wmObn78prgSuuluydfPwMXIcgF+gbXjSX/ZbvWjPuckJVQuwSc0UNhxExCV2nDvrqoqNqgiH/dvoBA0NyFeW13ck9QtQg1zjxkYlNxrDYnCguL4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msyrKkEV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2133C4CED6;
+	Mon, 24 Feb 2025 09:19:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740388799;
+	bh=t1za7wnmR1L7Lv5M8y1FSf5NXzUtNaCTpSMZVGanyDo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=msyrKkEVneJ/eEEjKQMssLT+9lZYBMRGfIhgS3snDdpTyoFXDc69xcLxv4gHWQxdl
+	 9B5iOIuhi4er6Qm0FoMqcOb3wCZ3x5T/oFCuDdW0gyltoI9A7r6oqd2dWN0fY1ZGRo
+	 0n7ENmyBbfgvA795j1Yjp5dHYEtKOTO5a09H7t5Op3fZmajf61xIwFY4Ak7kWzOVIj
+	 FIqVLr3p2dbmSvXRnC9VzLUiMp36Fg+hqYRNKIgPLMeOxvaDmzlROeX5vh1Od1AEPu
+	 Ynu8YDSnw+Gk3QkP6OtYhAjCYL2l8pUBfN5RjYqtzpsyM5QMOtomuNIVxZgGoQf39+
+	 QGW7buCm9SM6Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710F2380CEE5;
+	Mon, 24 Feb 2025 09:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7bf9577f4b6dcb818785be73c175bcd19b3b4f0c.camel@perches.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] net: dsa: rtl8366rb: Fix compilation problem
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174038883127.3064328.15382079866284721155.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Feb 2025 09:20:31 +0000
+References: <20250220-rtl8366rb-leds-compile-issue-v3-1-ecce664f1a27@linaro.org>
+In-Reply-To: <20250220-rtl8366rb-leds-compile-issue-v3-1-ecce664f1a27@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: alsi@bang-olufsen.dk, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ luizluca@gmail.com, netdev@vger.kernel.org, lkp@intel.com
 
-On Sun, Feb 23, 2025 at 06:33:44AM -0800, Joe Perches wrote:
-> On Sun, 2025-02-23 at 11:40 +0000, Russell King (Oracle) wrote:
-> > Adding Joe Perches.
-> > 
-> > On Fri, Feb 21, 2025 at 02:15:17PM +0000, Russell King (Oracle) wrote:
-> []
-> > I've been investigating why the NIPA bot complains about maintainers
-> > not being Cc'd, such as for patch 1 of this series:
-> > 
-> > https://netdev.bots.linux.dev/static/nipa/936447/13985595/cc_maintainers/stdout
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 20 Feb 2025 19:48:15 +0100 you wrote:
+> When the kernel is compiled without LED framework support the
+> rtl8366rb fails to build like this:
 > 
-> Additional maintainers added or missing?
+> rtl8366rb.o: in function `rtl8366rb_setup_led':
+> rtl8366rb.c:953:(.text.unlikely.rtl8366rb_setup_led+0xe8):
+>   undefined reference to `led_init_default_state_get'
+> rtl8366rb.c:980:(.text.unlikely.rtl8366rb_setup_led+0x240):
+>   undefined reference to `devm_led_classdev_register_ext'
+> 
+> [...]
 
-Let me be clear - NIPA is not something under my control. It is a bot
-run by Jakub on netdev patches that are received by patchwork - so
-patches that have been emailed out, and thus contain at least the
-To:, Cc: and Subject: header lines, possibly all header lines that
-have been added such as Received: etc. I don't know what it actually
-does.
+Here is the summary with links:
+  - [v3] net: dsa: rtl8366rb: Fix compilation problem
+    https://git.kernel.org/netdev/net/c/f15176b8b6e7
 
-Now let me restate the problem, because the answer to your question
-is in the problem description. Here's the short version:
-
-	K: entries match email headers.
-
-Here's the long version:
-
-If one runs get_maintainers.pl on a patch produced from git, it
-comes out with a list of maintainers. In the case of dwmac-thead.c,
-this includes an email address that contains "riscv".
-
-If one adds this list of maintainers to email headers in the patch
-prior to sending it out and then re-runs get_maintainers.pl on it,
-or if one receives the patch after it having been emailed out, and
-then runs get_maintainers.pl to validate that all appropriate
-maintainers were sent a copy of the patch, then get_maintainers.pl
-comes out with *extra* *additional* maintainers because the "K: riscv"
-line matches *email* *headers*.
-
-In this exact case of dwmac-thead.c, the first run prior to sending
-out reports an email address containing "riscv". On these subsequent
-runs with the maintainers added to email headers, the presence of
-"K: riscv" in MAINTAINERS causes get_maintainers.pl to report the
-three maintains for the "RISCV ARCHITECTURE" entry.
-
-This is an issue for you as get_maintainers.pl maintainer and Jakub
-as NIPA bot author to hash out - either get_maintainers.pl is
-acting incorrectly and needs to be fixed, or NIPA is abusing
-get_maintainers.pl in a way that it's not designed to be used.
-
-I'm merely an observer of this behaviour and am merely reporting the
-problem - that NIPA's cc_maintainers claim that maintainers were not
-copied in my patch submission is incorrect and I've done the research
-to identify _why_ it's incorrect. It's now up to you two to decide
-where the problem lies and what the solution should be.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
