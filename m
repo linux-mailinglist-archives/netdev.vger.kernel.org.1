@@ -1,307 +1,361 @@
-Return-Path: <netdev+bounces-168916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-168918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230F8A41803
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:01:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C0EA41832
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 10:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09736171F74
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:01:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF6F188A2B4
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 09:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A2719067C;
-	Mon, 24 Feb 2025 09:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D820186346;
+	Mon, 24 Feb 2025 09:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qglvDVLm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PwOH2XVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2050.outbound.protection.outlook.com [40.107.95.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC7FEEB5
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740387710; cv=fail; b=mEd3RvsNrUSLP59MZ98/GJzwyXae4+yO3pckWB43pXAZwUWvPGSbowHeCRDyoxF+nyRO3hOtj1DkLcAQO7vuK8SPpjSgqWERVFNBLRuK8CVjidAzLKo496rE3s5BjMdB3alfjxsi1JD0cLlMxlRmo1vxyhXiG+iXJHEfaK+orsQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740387710; c=relaxed/simple;
-	bh=tjHdXygWR4nZWa/t0lt3BUSLc48qarmpUdD3k69mCWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=V/xuOlE2B7P66Y5QH3AlVOGYsn+1ZBLUFPrasIdHRgU3YkjrcrgLGsS1/c7Ryn7bxts73jvdLsKsPCofcw0IeqT5n8pAt5Yb3pr0Et5W0/dNGVqYjZv9teKRx1mMltmYopTJuARRhXGUE/npjjcfvUF0IBlPSEpRctB3kFgcCdU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qglvDVLm; arc=fail smtp.client-ip=40.107.95.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GHLjbufS4VzkKKi9BEuvEylxM3gPu+SoueRBLuccE4EYPTsVlbNF6GpQ2uZqmL+X2hXFTYvGxYDys/oHnglMnpasbsg7FXLRioYvEHgzfUDSGgUGff+omskMcWm6KIFl97uI63ehwgawAJmDm8LaUl1+ry4dw9IIl6FxNv7LkngCV8C1KpdxXVk33WxutyggAc3/glVAk3jYY5RYocFstwzelB2JpaawIpqkKJd0XJ4zDKrdROxgYdX6cYdnl2HnJ9J9RI+nY9OKOP4rifwLOGFoa5os2OEJ4X/bpwSGJJ/z/J0K3HxGbmBvDZV1UkYxywr9oMFR3fCufEB9Mhf5jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xGfHrqaOOpnIJ6TQSVAL2yW3JxDWPUoSFLzxWu1Wk7E=;
- b=s1Khp/zFdxyelq3YLylgA2S2ooqy9e2x9QapFdJ8JhrQCqjUSf65hRjrDxroPRuzmRNq8iptUd0RTEdGi8v8gOHeqO4KDL3VTnQ7u/q7/So6NPpne1qEQMyehIQGX6r3ebkDoLZhRGq9ZSpayKgy8kkVMi/YF2w011AsVqVDdo8xBvaPjARIaOSkkJqtOgJtcGuUmd0bZf+TkWakvFTBJeFqnvtNLWjwbL2SMaF6waWLLG4Z6KCK3OdixAEauKjMCnCYFMD5BteSw8KrpeJFGKse63x6+z02pGtkFhpMTP6B0DPJsrmc1oTftNu1r0h0rjuFctowP7OBW5RytelbzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xGfHrqaOOpnIJ6TQSVAL2yW3JxDWPUoSFLzxWu1Wk7E=;
- b=qglvDVLmNykFtjPR72t6Ce/U9mjeZZFSG/rqFLr/1OvZODisvSZ6TXxj5oLzRH3TBCP9/ejVgiBLAq3nXk3d5QcpmP+N8FT6dStHGdaW7g+0IRr9P2PAdDxtK8zMnEoX+VsXTI35D7cLom9RuydFIkaSEPtjgA1Ax0sTKUoSnsBrlYBUkb+wgXpDGR6ArFesaDMFcIL/waAXPPNLGca2Dv5hzwKCH157DpexFjsWC/5V+sljFmmdg1bvBIv1v6PFwpRd2eFMja5NdmGSzYiaazwabAqp0xoCTQcYMudVoKRODRX+hgUZ60Q1LH/GQ+JhNWIOvZn7kHJHONaa/Y2oYA==
-Received: from BY5PR17CA0071.namprd17.prod.outlook.com (2603:10b6:a03:167::48)
- by IA0PR12MB7750.namprd12.prod.outlook.com (2603:10b6:208:431::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 09:01:44 +0000
-Received: from SJ5PEPF00000203.namprd05.prod.outlook.com
- (2603:10b6:a03:167:cafe::69) by BY5PR17CA0071.outlook.office365.com
- (2603:10b6:a03:167::48) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.17 via Frontend Transport; Mon,
- 24 Feb 2025 09:01:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF00000203.mail.protection.outlook.com (10.167.244.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.16 via Frontend Transport; Mon, 24 Feb 2025 09:01:44 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Feb
- 2025 01:01:31 -0800
-Received: from [10.19.165.164] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 24 Feb
- 2025 01:01:28 -0800
-Message-ID: <2ee4d016-5e57-4d86-9dca-e4685cb183bb@nvidia.com>
-Date: Mon, 24 Feb 2025 17:01:25 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70BB158558
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 09:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740388135; cv=none; b=iLVvzQhPq1Q07tjDn8icbND27lc4PwHb8GF/q40ol6LyzEF6jY/wsRLaCHg+dSG2mNXwEV9lOPowyhzl7Uh4ZIL7VoMr0r4vET6SgjIUAzduLcHcWP2uiQns5VlL3Dw6lh/vl62C4HA+G9BPyqighXNK/raA/RxRUOXJSNs5yGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740388135; c=relaxed/simple;
+	bh=ebdNwdtfXJLB75mGSYkH+k5n1hTAiaOeNj0QO9BJS+8=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=twdPwI1UWTDJBiDYz1TDhzZ73uVr3ccasDPUdzyZ4zCAAAYLzRRUwmwcaj1kfjSswiqNsRPOMxDqx53eRzF7q9cAq5XWgBFsNzFxU41hU7/ncPNYN/GEM86Z6l61biv9BRU+aknEz0Af/BBggcw4Rsbi5wpJc1gas9hUDfQIeCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PwOH2XVa; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-38a8b17d7a7so2235275f8f.2
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 01:08:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740388132; x=1740992932; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FWfjp8j/b4Jqm6YF5dmMZc5uiqXe2eQtNz8toYpbQOc=;
+        b=PwOH2XVa9Cyb+QPVT/1M3RohXtZG6g1GYglzjI8FXD2jlY4U+56ms9wRdBPZ8ymKJr
+         suWeZ2wkOEHrWVXmeaMhi+TgUyqDSXp0jjLGs3THvSXtKyhDonruRUd0XYGIlxlK9EiC
+         5qQxzzNrKAkDmfHddHS8EDbx8fSyrfU2h20xEcpVwmKZpAfN5utSBnF+CUTDhWnMAyux
+         hGf0SMcCeaD+JdHc0w+Y5UnUAKMvSX1PJr+xhV/7dQ1zddma7U0927D4HLOzPY9Apr8b
+         Ef/7MPKymAMz56J6UuaKWdELKI7XP4kRzmjsS0zbkwAP3HQAI5mSxB2TVGaNlwLutDlN
+         rr4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740388132; x=1740992932;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FWfjp8j/b4Jqm6YF5dmMZc5uiqXe2eQtNz8toYpbQOc=;
+        b=l2TysaKN78xoHHQaXXs0cyByfeoMPe+Zi46BohCEAWdTDpfhvkJ/6VGLn1/Qm0a3uX
+         14wabhAUP4Xcu/5THf+bRIr+m69r/c6paaooNu3cHIcsCxHwsqL5cLoX9tE/26QdSctE
+         qhXXzroTxlp2W5knUjhizU1DQKYiIqaQEp2Zt+ri9HjM0LgXKNZAl1KbqE/zec/owjvg
+         YwxOD2MwwLLFfLzE6vXyrsgjwar/UGvcar/6QscqTQ3j2lHUcrk0TzcNQ+NFeXVoxx4l
+         1c0UkbKM1yk01O9c4yLPfHwX3E9G5+OFCmnKMmu9ECZD0lBayufC20PGAFWTvOE+5rHh
+         QpUw==
+X-Gm-Message-State: AOJu0YzoeF+yF/0LC80gSHI3wVmrcjebtNPAf39rbwV0MARUofDxAt+Z
+	PfHDVLsemUlvFSsGp+jLaHGnO6xpiulEXsY8zVSqMaiFsPKzXAuc
+X-Gm-Gg: ASbGncvKb40lzNvwf/wFUjRLjbq+gXdJ6w7Ilv69jp04czo4OU1s6fvJv9mlclxxECY
+	BkpFrKgFbD77FUyG1e/iCd20DEVOIqfz1bwdw6ExG21tQEY1tZjw+tvxax3z+T3nZ6zG6Lm8zw+
+	1+jC1QTmXfv/avWiQqS/EMg7YFa2UGFk5wBPjaa5m0GfIqxtX8PzmlfWuBawvVmh/9kuKit/3ZX
+	Ho0ZkZfj0OmcwzbjGhxrgTMyuOyGcrPRNByA8veB4ruUUr/yUPHiVQRlydmwwCDyLIIubS7S5ax
+	ZdM22eyknopA45VRp2BDxqCUt4MW22qwoXYZygTACA==
+X-Google-Smtp-Source: AGHT+IHaf7KXTlLE9eJoMVptdUuTkeNL/5fWDwIiOyZjkAYDZ/OO5gbzwdT2iX9MMeL7DKeYygj9Xg==
+X-Received: by 2002:a5d:47ca:0:b0:38d:e078:43a0 with SMTP id ffacd0b85a97d-38f6f0b1c8cmr14023800f8f.38.1740388131673;
+        Mon, 24 Feb 2025 01:08:51 -0800 (PST)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f25913f5asm31469209f8f.52.2025.02.24.01.08.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Feb 2025 01:08:51 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
- counting in conntrack
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
-	<dev@openvswitch.org>, <ovs-dev@openvswitch.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar
-	<pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>, Aaron Conole
-	<aconole@redhat.com>, Florian Westphal <fw@strlen.de>
-References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Jianbo Liu <jianbol@nvidia.com>
-In-Reply-To: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF00000203:EE_|IA0PR12MB7750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ceb61ac-ff8a-4a91-6648-08dd54b1dc84
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z3l4VmlIK3g2OHRrTUdaTnBtNU85V3NIblQvRzJBQjU1K3VVNkV0cmxpVGh6?=
- =?utf-8?B?eUo5OExmWTBYMDBiZjBraUt1VWtZL2hLSVVDYUdsL3MxVHdFbEc5SFFEdmF1?=
- =?utf-8?B?S1ExTzNKcXlNWi92QzhyVG0rMkVjYVJDQTQ3NFpCMTVidFZweThxK0swQ3li?=
- =?utf-8?B?THB0a2JpRFdlUm5rbC9IOUZneDJlWit0QWpVZFQvVXc4V3pubFZYano5ZTha?=
- =?utf-8?B?dE9XSGJjLzYrOUtXd0plOW1YcTF1NzVvZGxHbzliWGMwQ2o3Q3JoYVpkbjBP?=
- =?utf-8?B?Z3AvU0oxRXBJNkxqTEpSU2hZUmNyVTBJNUszMDRPMzRzNFkvTDlXcFhCeTVC?=
- =?utf-8?B?WEx0MGdyN0s1aks2aktxVHRiTGxaVXdvTkswaDJIWjl5Z0J1RGVEVWFhWEdV?=
- =?utf-8?B?RzhlSkJoVDkraUFYNGFGbkdGUTRuZlBseWordXdXaEJVbjFEekxuQm5VcENZ?=
- =?utf-8?B?MEFTYmlUUkpwR0Y1YjFuaGpRQnBkL0xJUVdVUGwrOXdpQTUzcmN0cG5vb2JP?=
- =?utf-8?B?a0hEamRTdHhVUWRIZ1RzK3BDMnF4cG9UZ3pCQlRwOG45OVZGYmhkaDJZZE5R?=
- =?utf-8?B?aGR0TEU1Ykw3S2VaMS9VSmxybWo4WUtoNGc5VE56NGZibGtCRnZhcmVaL2lN?=
- =?utf-8?B?UGtLZGp3TWZZNGZGWjJOa0hEUVdYRkRYb1lrRFJuYkhTK1UyNlFycGZIdnMx?=
- =?utf-8?B?a0lld0h4ZGZvKy9uMnFsRGlQNmdTWWdWdG9aSmtudkVTZGlGeG5lRVdPSzJn?=
- =?utf-8?B?SmFpSGFYNkhFRktsZmxISkNLQWIrZ1g2MzV1YlBrNFZVb1F3dXdISWEwWHBq?=
- =?utf-8?B?WWlpYXVwMFpZcEFXeHFjblRsNnJEa21GUWpRb3Y2TGRHL0VOaUdmK2puNEVN?=
- =?utf-8?B?akYwYk94clZta3g3a3dISEl0a0ljZHlFbWtBTlQ1VzdITmt1ZnhlNGVueHJ3?=
- =?utf-8?B?VTJwYnQ0WVN5em9hV2dIdGRYL1puTXQreGtoOUNXb3RDUktMZSt5M3EzcHdD?=
- =?utf-8?B?Wk9QdzhhTUFtUVppVW5nMm9XM0JmcVBXaE1SOFlRb1JLcUVZcDFvYURHK2kw?=
- =?utf-8?B?UnQ0elRnUXRNNGppMGY5blh2OVh4aTBFYmlLTlNzK0NkVW54dk03c0QvaFJO?=
- =?utf-8?B?VXRUTGtYaUVrV3RZVjBKYzE2cmRUZTVuUHBkTHF0NjUxYkRJM29GV0pvN1RG?=
- =?utf-8?B?UWtMODVLeFZQaDQ1S1dlVHlWU2JjZUtYUGd1azZQV2tXZ1hhN1k3SW1lWE80?=
- =?utf-8?B?TDgzdUgvKzJGZmw2akpEdXJ1andnNTh3OXFNOS9UdHlCUFl4Mk5BTWg1YkpY?=
- =?utf-8?B?RWVyMHNMOTg1SEhscEwyRzNNY2k4alpKeDR1R0hNUkpENXVBQnJVcGpNMDh2?=
- =?utf-8?B?WWc0cGpoNHNXMi9CdEorR1FNb3hlbHhXbExSOTM4R1R3RWNJdElVa2ZmT0RT?=
- =?utf-8?B?MGN4Qm5RRW5xbFM4dzdqR2lHS2xTZDZsRjhUYzJkS3d3RUNzQkkxUHJRMFFa?=
- =?utf-8?B?ejJLQlM1Vk5sMUpoaHhBRVE5b0U2WG9wc0l0VWJjSWwzaFJDNWVCMHl1U0Vi?=
- =?utf-8?B?Nng3OGRNTUhXMkk1QWVWcXRBM3o5RDRiMUR5dDhudUlhZGZvM3dWZlIxVjB0?=
- =?utf-8?B?T0F6ZmxpdGxCRWY2RUZQQ291dUJRQXVVdVVyZjY3b2tCWSsyZXdIV09DVm54?=
- =?utf-8?B?OXFMT2lIa2t2UG0zUXdjWEY5NFNhOThKdTBPdVEvcGZrUFZ1S3ZCV00waU9p?=
- =?utf-8?B?R1g0c3VZdmdIVHNjYldKVGVGUzhIL2taUGdlM0g3aWx4NmppeVE5dFk0Vk5y?=
- =?utf-8?B?eWdKb1ExdlBpNzgwdm1wNTNoSitiNThudWpOSnh5UmxXWTE3VTZEYXowWTZs?=
- =?utf-8?B?bXJBWlRyazJRSVBZVlhBQWQvK2lEOXEwMm44aHQ5VE9rQ2lKT3REdXN3REdj?=
- =?utf-8?B?L0t5SWszanEzT3RWVThnWm1vbEl6OEtQQXJHaGlnMlhkVTZSamlBRC8yUlIr?=
- =?utf-8?Q?xtKQHlGPu+VyachA65N1raJHn+EWFk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 09:01:44.1775
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ceb61ac-ff8a-4a91-6648-08dd54b1dc84
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF00000203.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7750
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: Bug Report in Virtio_net driver and skb_try_coalesce
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <CANn89iJU9D5b6yYotQ1zVuxDv-pVwqeiT7YsB6Axh69YotKQnA@mail.gmail.com>
+Date: Mon, 24 Feb 2025 11:08:40 +0200
+Cc: netdev@vger.kernel.org,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ willemb@google.com,
+ lulie@linux.alibaba.com,
+ aleksander.lobakin@intel.com,
+ dust.li@linux.alibaba.com,
+ hustcat@gmail.com,
+ jasowang@redhat.com,
+ jdamato@fastly.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <87C19B32-53F2-435C-8B9F-15F80639226D@gmail.com>
+References: <4115C55D-7699-41BF-8412-89C80A6C1A7B@gmail.com>
+ <CANn89iJU9D5b6yYotQ1zVuxDv-pVwqeiT7YsB6Axh69YotKQnA@mail.gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+
+Hey Eric,
+
+Yes i find a issue : =
+https://patchwork.kernel.org/project/netdevbpf/patch/20240419222328.323107=
+5-1-dwilder@us.ibm.com/#25819022=20
+
+this patch i apply before many months , and this patch make issueee=E2=80=A6=
+..
+
+
+Sorry for disturbed you !!!
+
+
+Best regards,
+Martin
 
 
 
-On 8/13/2024 1:17 AM, Xin Long wrote:
-> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-action
-> label counting"), we should also switch to per-action label counting
-> in openvswitch conntrack, as Florian suggested.
-> 
-> The difference is that nf_connlabels_get() is called unconditionally
-> when creating an ct action in ovs_ct_copy_action(). As with these
-> flows:
-> 
->    table=0,ip,actions=ct(commit,table=1)
->    table=1,ip,actions=ct(commit,exec(set_field:0xac->ct_label),table=2)
-> 
-> it needs to make sure the label ext is created in the 1st flow before
-> the ct is committed in ovs_ct_commit(). Otherwise, the warning in
-> nf_ct_ext_add() when creating the label ext in the 2nd flow will
-> be triggered:
-> 
->     WARN_ON(nf_ct_is_confirmed(ct));
-> 
+P.S.
 
-Hi Xin Long,
+Thanks for fast response.=20
 
-The ct can be committed before openvswitch handles packets with CT 
-actions. And we can trigger the warning by creating VF and running ping 
-over it with the following configurations:
+And sorry again!
 
-ovs-vsctl add-br br
-ovs-vsctl add-port br eth2
-ovs-vsctl add-port br eth4
-ovs-ofctl add-flow br "table=0, in_port=eth4,ip,ct_state=-trk 
-actions=ct(table=1)"
-ovs-ofctl add-flow br "table=1, in_port=eth4,ip,ct_state=+trk+new 
-actions=ct(exec(set_field:0xef7d->ct_label), commit), output:eth2"
-ovs-ofctl add-flow br "table=1, in_port=eth4,ip,ct_label=0xef7d, 
-ct_state=+trk+est actions=output:eth2"
+> On 24 Feb 2025, at 9:21, Eric Dumazet <edumazet@google.com> wrote:
+>=20
+> On Mon, Feb 24, 2025 at 6:13=E2=80=AFAM Martin Zaharinov =
+<micron10@gmail.com> wrote:
+>>=20
+>> Hello all,
+>>=20
+>> i have this issue fro kernel 6.12 and still is here with kernel =
+6.13.4
+>>=20
+>> when run vm with virtio_net as ethernet card
+>> start traffic like try to scp file to this vm and machine crash with =
+second debug.
+>> First is when system boot .
+>>=20
+>> any help to fix this .
+>>=20
+>> Best regards,
+>> Martin
+>>=20
+>> [   19.070538][    C7] ------------[ cut here ]------------
+>> [   19.071165][    C7] WARNING: CPU: 7 PID: 0 at =
+net/core/skbuff.c:6075 skb_try_coalesce+0x495/0x520
+>=20
+> This is a bit strange, because in 6.13.4 the WARN_ON_ONCE(delta <
+> len); should be at line 6072
+>=20
+>> [   19.072094][    C7] Modules linked in: nf_conntrack_sip(-) =
+nf_conntrack_ftp nf_conntrack_pptp nft_ct nft_nat nft_chain_nat nf_nat =
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables netconsole vmxnet3 =
+virtio_net net_failover failover virtio_pci virtio_pci_legacy_dev =
+virtio_pci_modern_dev virtio virtio_ring e1000 e1000e tap tun =
+aesni_intel gf128mul crypto_simd cryptd
+>> [   19.075316][    C7] CPU: 7 UID: 0 PID: 0 Comm: swapper/7 Tainted: =
+G           O       6.13.4 #2
+>> [   19.076047][    C7] Tainted: [O]=3DOOT_MODULE
+>> [   19.076456][    C7] Hardware name: QEMU Standard PC (Q35 + ICH9, =
+2009), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+>> [   19.077608][    C7] RIP: 0010:skb_try_coalesce+0x495/0x520
+>> [   19.078049][    C7] Code: 00 00 0f 85 ef fd ff ff 49 8b 11 80 e2 =
+40 0f 84 e3 fd ff ff 49 8b 51 48 f6 c2 01 0f 84 d6 fd ff ff 4c 8d 4a ff =
+e9 cd fd ff ff <0f> 0b e9 fc fd ff ff 0f 0b 31 c0 e9 cd fe ff ff 4c 8d =
+4e ff e9 b4
+>> [   19.079500][    C7] RSP: 0018:ffff9aaf002a4c90 EFLAGS: 00010297
+>> [   19.079969][    C7] RAX: ffff9aaf002a4d03 RBX: ffff917408a6b900 =
+RCX: 00000000000000c0
+>> [   19.080582][    C7] RDX: 00000000fffffdc0 RSI: ffff9174059e3800 =
+RDI: 0000000000000598
+>> [   19.081178][    C7] RBP: ffff917408a6b100 R08: 0000000000000001 =
+R09: 0000000000000000
+>> [   19.081781][    C7] R10: 0000000000000000 R11: 00000000000000c0 =
+R12: ffff9aaf002a4d04
+>> [   19.082600][    C7] R13: 0000000000000598 R14: ffff9175059e35c0 =
+R15: ffff9175059e2dc0
+>> [   19.083465][    C7] FS:  0000000000000000(0000) =
+GS:ffff917577dc0000(0000) knlGS:0000000000000000
+>> [   19.084492][    C7] CS:  0010 DS: 0000 ES: 0000 CR0: =
+0000000080050033
+>> [   19.085203][    C7] CR2: 00007f56364bdd78 CR3: 0000000104866000 =
+CR4: 00000000003506f0
+>> [   19.086077][    C7] Call Trace:
+>> [   19.086436][    C7]  <IRQ>
+>> [   19.086751][    C7]  ? show_trace_log_lvl+0x1a2/0x260
+>> [   19.087312][    C7]  ? inet_frag_reasm_finish+0xef/0x380
+>> [   19.087903][    C7]  ? skb_try_coalesce+0x495/0x520
+>> [   19.088442][    C7]  ? __warn.cold+0x90/0x9e
+>> [   19.088917][    C7]  ? skb_try_coalesce+0x495/0x520
+>> [   19.089460][    C7]  ? report_bug+0xf2/0x1f0
+>> [   19.089934][    C7]  ? handle_bug+0x4f/0x90
+>> [   19.090397][    C7]  ? exc_invalid_op+0x17/0x160
+>> [   19.090907][    C7]  ? asm_exc_invalid_op+0x16/0x20
+>> [   19.091447][    C7]  ? skb_try_coalesce+0x495/0x520
+>> [   19.091993][    C7]  inet_frag_reasm_finish+0xef/0x380
+>> [   19.092560][    C7]  ip_frag_queue+0x507/0x670
+>> [   19.093059][    C7]  ip_defrag+0x93/0x130
+>> [   19.093493][    C7]  ip_local_deliver+0x38/0xc0
+>> [   19.094013][    C7]  process_backlog+0xcb/0x1f0
+>> [   19.094516][    C7]  __napi_poll+0x20/0x130
+>> [   19.094992][    C7]  net_rx_action+0x306/0x3e0
+>> [   19.095486][    C7]  ? enqueue_dl_entity+0x42f/0xa80
+>> [   19.096047][    C7]  ? enqueue_task_fair+0x21a/0xb00
+>> [   19.096595][    C7]  ? __napi_schedule+0x97/0xa0
+>> [   19.097101][    C7]  handle_softirqs+0xde/0x1d0
+>> [   19.097605][    C7]  irq_exit_rcu+0xac/0xd0
+>> [   19.097964][    C7]  common_interrupt+0x79/0xa0
+>> [   19.098414][    C7]  </IRQ>
+>> [   19.098737][    C7]  <TASK>
+>> [   19.099055][    C7]  asm_common_interrupt+0x22/0x40
+>> [   19.099599][    C7] RIP: 0010:default_idle+0xb/0x10
+>> [   19.100144][    C7] Code: 07 76 e7 48 89 07 49 c7 c0 08 00 00 00 =
+4d 29 c8 4c 01 c7 4c 29 c2 e9 72 ff ff ff cc cc cc cc eb 07 0f 00 2d 37 =
+f9 33 00 fb f4 <fa> c3 0f 1f 00 65 48 8b 35 98 ff 55 7c f0 80 4e 02 20 =
+48 8b 06 a8
+>> [   19.102223][    C7] RSP: 0018:ffff9aaf000efef0 EFLAGS: 00000202
+>> [   19.102825][    C7] RAX: ffff917577dc0000 RBX: ffff91740083bdc0 =
+RCX: 00000000ffffffff
+>> [   19.103447][    C7] RDX: 0000000000000000 RSI: 000000046bc5c460 =
+RDI: 00000000000234d4
+>> [   19.104075][    C7] RBP: 0000000000000007 R08: 0000000000000001 =
+R09: 00000000fff8da2a
+>> [   19.104703][    C7] R10: 0000000000000001 R11: 0000000000001800 =
+R12: 0000000000000000
+>> [   19.105326][    C7] R13: 0000000000000000 R14: 0000000000000000 =
+R15: 0000000000000000
+>> [   19.105953][    C7]  default_idle_call+0x20/0x40
+>> [   19.106334][    C7]  do_idle+0x1a4/0x1d0
+>> [   19.106658][    C7]  cpu_startup_entry+0x20/0x30
+>> [   19.107042][    C7]  start_secondary+0xe1/0xf0
+>> [   19.107405][    C7]  common_startup_64+0x13e/0x148
+>> [   19.107802][    C7]  </TASK>
+>> [   19.108041][    C7] ---[ end trace 0000000000000000 ]=E2=80=94
+>>=20
+>>=20
+>>=20
+>> [  101.473110][    C5] BUG: unable to handle page fault for address: =
+ffff91742f6ed1ec
+>> [  101.473731][    C5] #PF: supervisor write access in kernel mode
+>> [  101.474181][    C5] #PF: error_code(0x0003) - permissions =
+violation
+>> [  101.474661][    C5] PGD 233c01067 P4D 233c01067 PUD 101bbf063 PMD =
+13f3cf063 PTE 800000012f6ed121
+>> [  101.475326][    C5] Oops: Oops: 0003 [#1] SMP
+>> [  101.475662][    C5] CPU: 5 UID: 0 PID: 0 Comm: swapper/5 Tainted: =
+G        W  O       6.13.4 #2
+>> [  101.476318][    C5] Tainted: [W]=3DWARN, [O]=3DOOT_MODULE
+>> [  101.476706][    C5] Hardware name: QEMU Standard PC (Q35 + ICH9, =
+2009), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+>> [  101.477616][    C5] RIP: 0010:memcpy_orig+0x68/0x110
+>> [  101.477997][    C5] Code: 83 c2 20 eb 44 48 01 d6 48 01 d7 48 83 =
+ea 20 0f 1f 00 48 83 ea 20 4c 8b 46 f8 4c 8b 4e f0 4c 8b 56 e8 4c 8b 5e =
+e0 48 8d 76 e0 <4c> 89 47 f8 4c 89 4f f0 4c 89 57 e8 4c 89 5f e0 48 8d =
+7f e0 73 d2
+>> [  101.479467][    C5] RSP: 0018:ffff9aaf0022cc58 EFLAGS: 00010206
+>> [  101.479918][    C5] RAX: ffff91742f6ec840 RBX: ffff91740ac63100 =
+RCX: 0000000000000000
+>> [  101.480519][    C5] RDX: 0000000000000974 RSI: ffff917400396630 =
+RDI: ffff91742f6ed1f4
+>> [  101.481110][    C5] RBP: 00000000000009b4 R08: bd71b2c82ec828b5 =
+R09: 516abfaa22e30e4c
+>> [  101.481705][    C5] R10: 70129ddb96fbe60f R11: 877be8f28680b588 =
+R12: ffff917400395c90
+>> [  101.482294][    C5] R13: 000000000000000c R14: 0000000000005c9c =
+R15: fffff4a18400e400
+>> [  101.482889][    C5] FS:  0000000000000000(0000) =
+GS:ffff917577d40000(0000) knlGS:0000000000000000
+>> [  101.483554][    C5] CS:  0010 DS: 0000 ES: 0000 CR0: =
+0000000080050033
+>> [  101.484041][    C5] CR2: ffff91742f6ed1ec CR3: 0000000109555000 =
+CR4: 00000000003506f0
+>> [  101.484635][    C5] Call Trace:
+>> [  101.484878][    C5]  <IRQ>
+>> [  101.485088][    C5]  ? show_trace_log_lvl+0x1a2/0x260
+>> [  101.485478][    C5]  ? page_to_skb+0x378/0x5e0 [virtio_net]
+>> [  101.485903][    C5]  ? __die+0x4d/0x8a
+>> [  101.486190][    C5]  ? page_fault_oops+0x83/0x190
+>> [  101.486553][    C5]  ? =
+kernelmode_fixup_or_oops.constprop.0+0x33/0x1d0
+>> [  101.487049][    C5]  ? exc_page_fault+0x91/0xa0
+>> [  101.487395][    C5]  ? asm_exc_page_fault+0x22/0x30
+>> [  101.487771][    C5]  ? memcpy_orig+0x68/0x110
+>> [  101.488103][    C5]  page_to_skb+0x378/0x5e0 [virtio_net]
+>> [  101.488518][    C5]  receive_buf+0x2ba/0xb70 [virtio_net]
+>> [  101.488930][    C5]  ? kmem_cache_free+0x287/0x2d0
+>> [  101.489295][    C5]  virtnet_poll+0x4f6/0x6c0 [virtio_net]
+>> [  101.489717][    C5]  __napi_poll+0x20/0x130
+>> [  101.490037][    C5]  net_rx_action+0x1c7/0x3e0
+>> [  101.490376][    C5]  ? __napi_schedule+0x97/0xa0
+>> [  101.490732][    C5]  handle_softirqs+0xde/0x1d0
+>> [  101.491078][    C5]  irq_exit_rcu+0xac/0xd0
+>> [  101.491398][    C5]  common_interrupt+0x79/0xa0
+>> [  101.491755][    C5]  </IRQ>
+>> [  101.491972][    C5]  <TASK>
+>> [  101.492188][    C5]  asm_common_interrupt+0x22/0x40
+>> [  101.492564][    C5] RIP: 0010:default_idle+0xb/0x10
+>> [  101.492939][    C5] Code: 07 76 e7 48 89 07 49 c7 c0 08 00 00 00 =
+4d 29 c8 4c 01 c7 4c 29 c2 e9 72 ff ff ff cc cc cc cc eb 07 0f 00 2d 37 =
+f9 33 00 fb f4 <fa> c3 0f 1f 00 65 48 8b 35 98 ff 55 7c f0 80 4e 02 20 =
+48 8b 06 a8
+>> [  101.494404][    C5] RSP: 0018:ffff9aaf000dfef0 EFLAGS: 00000212
+>> [  101.494860][    C5] RAX: ffff917577d40000 RBX: ffff917400839b40 =
+RCX: 00000000ffffffff
+>> [  101.495455][    C5] RDX: 0000000000000000 RSI: 000000179b776480 =
+RDI: 00000000000510ec
+>> [  101.496048][    C5] RBP: 0000000000000005 R08: 0000000000000001 =
+R09: 00000000fffaf2b0
+>> [  101.496643][    C5] R10: 0000000000000001 R11: 0000000000016c00 =
+R12: 0000000000000000
+>> [  101.497234][    C5] R13: 0000000000000000 R14: 0000000000000000 =
+R15: 0000000000000000
+>> [  101.497829][    C5]  default_idle_call+0x20/0x40
+>> [  101.498183][    C5]  do_idle+0x1a4/0x1d0
+>> [  101.498488][    C5]  cpu_startup_entry+0x20/0x30
+>> [  101.498842][    C5]  start_secondary+0xe1/0xf0
+>> [  101.499183][    C5]  common_startup_64+0x13e/0x148
+>> [  101.499553][    C5]  </TASK>
+>> [  101.499777][    C5] Modules linked in: xsk_diag unix_diag pppoe =
+pppox ppp_generic slhc nf_conntrack_sip nf_conntrack_ftp =
+nf_conntrack_pptp nft_ct nft_nat nft_chain_nat nf_nat nf_conntrack =
+nf_defrag_ipv6 nf_defrag_ipv4 nf_tables netconsole vmxnet3 virtio_net =
+net_failover failover virtio_pci virtio_pci_legacy_dev =
+virtio_pci_modern_dev virtio virtio_ring e1000 e1000e tap tun =
+aesni_intel gf128mul crypto_simd cryptd
+>> [  101.502860][    C5] CR2: ffff91742f6ed1ec
+>> [  101.503168][    C5] ---[ end trace 0000000000000000 ]---
+>> [  101.503578][    C5] RIP: 0010:memcpy_orig+0x68/0x110
+>> [  101.503959][    C5] Code: 83 c2 20 eb 44 48 01 d6 48 01 d7 48 83 =
+ea 20 0f 1f 00 48 83 ea 20 4c 8b 46 f8 4c 8b 4e f0 4c 8b 56 e8 4c 8b 5e =
+e0 48 8d 76 e0 <4c> 89 47 f8 4c 89 4f f0 4c 89 57 e8 4c 89 5f e0 48 8d =
+7f e0 73 d2
+>> [  101.505439][    C5] RSP: 0018:ffff9aaf0022cc58 EFLAGS: 00010206
+>> [  101.505897][    C5] RAX: ffff91742f6ec840 RBX: ffff91740ac63100 =
+RCX: 0000000000000000
+>> [  101.506492][    C5] RDX: 0000000000000974 RSI: ffff917400396630 =
+RDI: ffff91742f6ed1f4
+>> [  101.507084][    C5] RBP: 00000000000009b4 R08: bd71b2c82ec828b5 =
+R09: 516abfaa22e30e4c
+>> [  101.507679][    C5] R10: 70129ddb96fbe60f R11: 877be8f28680b588 =
+R12: ffff917400395c90
+>> [  101.508269][    C5] R13: 000000000000000c R14: 0000000000005c9c =
+R15: fffff4a18400e400
+>> [  101.508864][    C5] FS:  0000000000000000(0000) =
+GS:ffff917577d40000(0000) knlGS:0000000000000000
+>> [  101.509533][    C5] CS:  0010 DS: 0000 ES: 0000 CR0: =
+0000000080050033
+>> [  101.510024][    C5] CR2: ffff91742f6ed1ec CR3: 0000000109555000 =
+CR4: 00000000003506f0
+>> [  101.510631][    C5] Kernel panic - not syncing: Fatal exception in =
+interrupt
+>> [  101.511284][    C5] Kernel Offset: 0x2000000 from =
+0xffffffff81000000 (relocation range: =
+0xffffffff80000000-0xffffffffbfffffff)
+>> [  101.512159][    C5] Rebooting in 10 seconds..
 
-The eth2 is PF, and eth4 is VF's representor.
-Would you like to fix it?
-
-Thanks!
-Jianbo
-
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
-> v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
-> ---
->   net/openvswitch/conntrack.c | 30 ++++++++++++------------------
->   net/openvswitch/datapath.h  |  3 ---
->   2 files changed, 12 insertions(+), 21 deletions(-)
-> 
-> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-> index 8eb1d644b741..a3da5ee34f92 100644
-> --- a/net/openvswitch/conntrack.c
-> +++ b/net/openvswitch/conntrack.c
-> @@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_attr attr)
->   	    attr == OVS_KEY_ATTR_CT_MARK)
->   		return true;
->   	if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
-> -	    attr == OVS_KEY_ATTR_CT_LABELS) {
-> -		struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
-> -
-> -		return ovs_net->xt_label;
-> -	}
-> +	    attr == OVS_KEY_ATTR_CT_LABELS)
-> +		return true;
->   
->   	return false;
->   }
-> @@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
->   		       const struct sw_flow_key *key,
->   		       struct sw_flow_actions **sfa,  bool log)
->   {
-> +	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
->   	struct ovs_conntrack_info ct_info;
->   	const char *helper = NULL;
->   	u16 family;
-> @@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
->   		return -ENOMEM;
->   	}
->   
-> +	if (nf_connlabels_get(net, n_bits - 1)) {
-> +		nf_ct_tmpl_free(ct_info.ct);
-> +		OVS_NLERR(log, "Failed to set connlabel length");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
->   	if (ct_info.timeout[0]) {
->   		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
->   				      ct_info.timeout))
-> @@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ovs_conntrack_info *ct_info)
->   	if (ct_info->ct) {
->   		if (ct_info->timeout[0])
->   			nf_ct_destroy_timeout(ct_info->ct);
-> +		nf_connlabels_put(nf_ct_net(ct_info->ct));
->   		nf_ct_tmpl_free(ct_info->ct);
->   	}
->   }
-> @@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_family __ro_after_init = {
->   
->   int ovs_ct_init(struct net *net)
->   {
-> -	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
-> +#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
->   	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
->   
-> -	if (nf_connlabels_get(net, n_bits - 1)) {
-> -		ovs_net->xt_label = false;
-> -		OVS_NLERR(true, "Failed to set connlabel length");
-> -	} else {
-> -		ovs_net->xt_label = true;
-> -	}
-> -
-> -#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
->   	return ovs_ct_limit_init(net, ovs_net);
->   #else
->   	return 0;
-> @@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
->   
->   void ovs_ct_exit(struct net *net)
->   {
-> +#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
->   	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
->   
-> -#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
->   	ovs_ct_limit_exit(net, ovs_net);
->   #endif
-> -
-> -	if (ovs_net->xt_label)
-> -		nf_connlabels_put(net);
->   }
-> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-> index 9ca6231ea647..365b9bb7f546 100644
-> --- a/net/openvswitch/datapath.h
-> +++ b/net/openvswitch/datapath.h
-> @@ -160,9 +160,6 @@ struct ovs_net {
->   #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
->   	struct ovs_ct_limit_info *ct_limit_info;
->   #endif
-> -
-> -	/* Module reference for configuring conntrack. */
-> -	bool xt_label;
->   };
->   
->   /**
 
 
