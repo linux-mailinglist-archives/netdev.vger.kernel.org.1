@@ -1,130 +1,137 @@
-Return-Path: <netdev+bounces-169022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA91A421C9
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:48:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3BE6A4221E
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 14:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CCDE188D2D1
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:48:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E2FB188F326
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 13:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F47158870;
-	Mon, 24 Feb 2025 13:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A49F24A06C;
+	Mon, 24 Feb 2025 13:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g7JUOe4q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMv1bGV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B859157A48;
-	Mon, 24 Feb 2025 13:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F722233735;
+	Mon, 24 Feb 2025 13:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740404911; cv=none; b=qu1DRRK4FZhyas5v/EP2jYC2c2ngibdOqxPoL1p1D+uMsW3rr96titrEKk6Yc+x9lC5cTCvAMXz6x6lpcpEQpsQrt+B7+zEOrsg6/59UyHSDx0FjahOARlpfR9kT29ZRzYC3brWUNWNGTLa6O2MCJxNWaBckplkBt4rtfha4li8=
+	t=1740405199; cv=none; b=Z5ZbnvrBKOL/BdkqpdFbpv0nzpGRza9vWpubp2rDFZcx4Mt/b0tVmGaD1kuBO7tB5HqEdEEI5x3DqafxzPxQfp/Ut6g5Qv1fVSh9fxzv1VvpSLgdm28tY8CpXTLhrctASxFE2aIlz+wWdclEJaCE7lsklVfLtQRE2NeT8moJFeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740404911; c=relaxed/simple;
-	bh=JRkq7wjYrgvh+yhnqspJzZKgEwp94XGB8+ID6BQtyYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kiLR07Ln4gFj3S+4PQ3YwT/0myvp3ac0DWtxxZJsWSwtaAl9/dQKlZr4m4q5InIiRUC4kc0bJPBfmcI1XgaqxR3F+tobGjTQ7kqswqgyjwbB2WJS+7dJnTPKe30ck/V+ZmDG3PsWUHc7N7gPK3GCkVHmX378AMvnN6hI+/kTwdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g7JUOe4q; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EQ1Y9woIJ04CcEe49xqkqna1RhXAAY88omG8TRUbg6k=; b=g7JUOe4q43m4jzeSptGOHh9Fxt
-	baNOGbGELH05179VyqTjo+0LLnp9uJ2Ym+FP3yRGxy59ecyCXwfcU0g3f33+ZMXxvk/g5k98J2mCe
-	BHdJFQqj6KOW9+D3U3FFqx6NyWmM2sHBZHfd2DpfsILsGmfxD3byxV+8T5+ZIZ4iNKhCl8/+hwdpD
-	rMrXqBmH8Qh8zzfpyeXF7Lswr4IYul+b+WqV/lTDQgd/+DhgShbpuNuRvUM0uEMDLb+yGcctI1Tpj
-	Qe0xwB5f8L7PErdbzebV7WktTc/Pc24wpsOiGP4Aj+FzcLoeA4WQ//CAmJ5VMPOLo859AzNAj+XQM
-	70CSx78w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40326)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmYon-0006S9-2z;
-	Mon, 24 Feb 2025 13:48:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmYol-00052k-1c;
-	Mon, 24 Feb 2025 13:48:19 +0000
-Date: Mon, 24 Feb 2025 13:48:19 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <Z7x4oxR5_KtyvSYg@shell.armlinux.org.uk>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
- <87r03otsmm.fsf@miraculix.mork.no>
- <Z7uFhc1EiPpWHGfa@shell.armlinux.org.uk>
- <3c6b7b3f-04a2-48ce-b3a9-2ea71041c6d2@lunn.ch>
- <87ikozu86l.fsf@miraculix.mork.no>
- <7c456101-6643-44d1-812a-2eae3bce9068@lunn.ch>
+	s=arc-20240116; t=1740405199; c=relaxed/simple;
+	bh=XzVKp8DOYSAwQIIVGcLtS5J68UGhDZBREKxOESHXpK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UIYhl3O3dUcK2fuEEXqRiLlHoquwLjIr11e1tDCxGWd5jaslXznmn0qMAJaQMswAoul/PvgYGd0bKOEwGeiehY5QgBjHwUYTPCwQHkHBwIBQG/xPfLWiBDIe24h+wp8e6yryOkmfEqYOXDRcyJElaulMzL0djPaXo7kAr1VHLME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMv1bGV3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60593C4CEE6;
+	Mon, 24 Feb 2025 13:53:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740405198;
+	bh=XzVKp8DOYSAwQIIVGcLtS5J68UGhDZBREKxOESHXpK8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TMv1bGV3Sq/3ZBwDazBVnnzRM/h34i2qUVQLeaRWcV98aJw9MQnsS4CZ1kDe7mFua
+	 3YrNV2Dqt3IaLap7hUHbxY8OV+JwSxTm4xJLAHSgYLqkZXfPeb0Cky7HaQyeZDA/I7
+	 7AdUXcY6Sa+Veg4bB/euN0pW7Jz6KLJgbKKWPdtqdrQsK90+4auSpUdIvLgVUo9+LU
+	 Vvwu+kgzuX8MsufwZDLidn9wsWpe/q/C9H5ZE2la8/euz3YyoivJcJZJsZd6PThfOw
+	 A42aYUD5XnC6gpZjaeNutl8RzO3zQfhSX/+54kpDX1/ozKOsGdfVnO0L/tiFONWFpS
+	 ry0IjueP/iKsw==
+Message-ID: <b7bbe504-d6f3-4262-af19-1edad4129fa9@kernel.org>
+Date: Mon, 24 Feb 2025 14:53:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c456101-6643-44d1-812a-2eae3bce9068@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] selftests/net: ensure mptcp is enabled in netns
+Content-Language: en-GB
+To: Hangbin Liu <liuhangbin@gmail.com>, Davide Caratti <dcaratti@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250224094013.13159-1-liuhangbin@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250224094013.13159-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 24, 2025 at 02:31:42PM +0100, Andrew Lunn wrote:
-> > What do you think will be the effect of such a warning?  Who is the
-> > target audience?
-> 
-> It will act as a disclaimer. The kernel is doing its best with broken
-> hardware, but don't blame the kernel when it does not work
-> correctly....
+Hi Hangbin, Davide,
 
-Indeed.
+On 24/02/2025 10:40, Hangbin Liu wrote:
+> Some distributions may not enable MPTCP by default. All other MPTCP tests
+> source mptcp_lib.sh to ensure MPTCP is enabled before testing. However,
+> the ip_local_port_range test is the only one that does not include this
+> step.
 
-> > You can obviously add it, and I don't really care.  But I believe the
-> > result will be an endless stream of end users worrying about this scary
-> > warning and wanting to know what they can do about it.  What will be
-> > your answer?
-> 
-> I agree that the wording needs to be though about. Maybe something
-> like:
-> 
-> This hardware is broken by design, and there is nothing the kernel, or
-> the community can do about it. The kernel will try its best, but some
-> standard SFP features are disabled, and the features which are
-> implemented may not work correctly because of the design errors. Use
-> with caution, and don't blame the kernel when it all goes horribly
-> wrong.
+This modification is OK for me, but would it not be time to stop
+patching the kernel of these distributions to disable MPTCP by default?
 
-I was hoping for something shorter, but I think it needs to be expansive
-so that users can fully understand. Another idea based on your
-suggestion above:
+As far as I know, only one Linux distribution is doing that, and that's
+the one supporting MPTCP the best :)
+It was making sense when MPTCP was backported to older kernels, but now
+that v6.12 is used as a new base, it probably no longer makes sense, no?
 
-"Please note:
-This hardware is broken by design. There is nothing that the kernel or
-community can do to fix it. The kernel will try best efforts, but some
-features are disabled, other features may be unreliable or sporadically
-fail. Use with caution. Please verify any problems on hardware that
-supports multi-byte I2C transactions."
+> Let's also ensure MPTCP is enabled in netns for ip_local_port_range so
+> that it passes on all distributions.
 
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Cheers,
+Matt
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sponsored by the NGI0 Core fund.
+
 
