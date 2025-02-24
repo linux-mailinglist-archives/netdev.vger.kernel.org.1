@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-169179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647C2A42D28
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:56:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F33BA42D2D
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:57:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E4A2178DD8
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6854F178DD8
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552F3205502;
-	Mon, 24 Feb 2025 19:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F977200138;
+	Mon, 24 Feb 2025 19:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bOIMyNRz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="D30BMwIh"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950F2200138;
-	Mon, 24 Feb 2025 19:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA470838;
+	Mon, 24 Feb 2025 19:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740426994; cv=none; b=daYBufPqXD6e8UsnhR4RLW+1p/lXjfZaX5URgiUHdISC9+JSwPk6CtpbaJjCVGSSj5LXnrb4hilR5zxINJxIkdh8HZ/6584tc7L74/66FWDWr4sUZjVgN+DWgQRf09nQ8PI9lpYFcEHOubIUYUHB7CqF9F7+0RTdKiUHDJrhzrQ=
+	t=1740427039; cv=none; b=CuonBRQL2Yw2FoEPPP36c7FnzqV5ELceoIgEKWWm/hdj5CGF0yFpGHH168RzV+SwoyKazTpf4vbxnCKEGGHgV9qZaWUda5svrso34nBF0KlSsoqBsrZW/zocv9cHpJmdSA3daSxyg6gdOTnxGFB/uD2hMpY15sQ731AyWnTsmJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740426994; c=relaxed/simple;
-	bh=1r5p8CPzhU3u1LS4d40KUW3g2MBS9kzMW8z+LQbSyp8=;
+	s=arc-20240116; t=1740427039; c=relaxed/simple;
+	bh=E6P1z8HuC+hJEgKpjMkGpsb5+onEhRP3Ewo4oxXLpOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ChSdr8obyO9Ik1eA3Mt3/fFP+/Jauu8q21dC4G0z/zfppdQJFxIEt+0tY8m76fM6SOr1jEST1+kpVKjhMIWKWQS3JvrIveKvCnBFICE9LPIMKNXwirGKDNMq1Iegj9eUFcHbpK0wnf3kib3pzEcArKvmKjDTKKvr+4M4xb2NE+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bOIMyNRz; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZMIXFoZTnPVXgr8mnXVOBR7tpZtDJpUyC1JzARPnaVd2FACp6lmiD792aIJFsHw7HLd0wshOgm11xk8IMFS5oU4wWA/7KdVAchuPX2iygrsgyy/0fF5DGdTvc/QBj/d/5e7Tdm2EVcak29AnZ8R/AjtOTgXoGB6xQIlWaJp7g6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=D30BMwIh; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vsWVUTlT5IhFb0LzL3cca1uMum0uWzsxWdOe223isrk=; b=bOIMyNRzV9lEe2ed5JBnzEhmPZ
-	7+r3qNFhdOJAh6rp0T0JQT70UdRlB/FPImLv6QJBisym68/lXTC+fYoyhu0QBQTvOwW+VRJQlYBmm
-	SxLTSFMYs2Pr5wPiWGFtY9w5tRSKjV/VjbGvJSPZRbgd6bwThgf9CKqyxhewTMsozo14=;
+	bh=5QVl9iy0l5UnFA6SQ8VJ9JGtMs/TG/0zOp+vPNzgOlQ=; b=D30BMwIh5uAVK85OGIK+vv6wqa
+	HwTaGh1ozXQCKfX8l9l458ZM65bqiKbHNz5MpwzSWQQQanobmjVf6lIBlEMgoZz5YK2Yo2miH7WBE
+	SiZi0pbWvjnZYAetzsbfLfS0+jOkHiirImQhYhDr9BLynFUpVhBAKMC34qT+Nz7qqbG8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tmeYu-00HHAM-N1; Mon, 24 Feb 2025 20:56:20 +0100
-Date: Mon, 24 Feb 2025 20:56:20 +0100
+	id 1tmeZd-00HHCL-F6; Mon, 24 Feb 2025 20:57:05 +0100
+Date: Mon, 24 Feb 2025 20:57:05 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Philipp Stanner <phasta@kernel.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -60,11 +60,10 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Qing Zhang <zhangqing@loongson.cn>, netdev@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/4] stmmac: Remove pcim_* functions for
- driver detach
-Message-ID: <5b41e2b5-a676-4082-8f3b-0ed3c81c383a@lunn.ch>
+Subject: Re: [PATCH net-next v3 4/4] stmmac: Replace deprecated PCI functions
+Message-ID: <0cfca9c6-c2ff-49c1-8e87-51747640712e@lunn.ch>
 References: <20250224135321.36603-2-phasta@kernel.org>
- <20250224135321.36603-5-phasta@kernel.org>
+ <20250224135321.36603-6-phasta@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,16 +72,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250224135321.36603-5-phasta@kernel.org>
+In-Reply-To: <20250224135321.36603-6-phasta@kernel.org>
 
-On Mon, Feb 24, 2025 at 02:53:21PM +0100, Philipp Stanner wrote:
-> Functions prefixed with "pcim_" are managed devres functions which
-> perform automatic cleanup once the driver unloads. It is, thus, not
-> necessary to call any cleanup functions in remove() callbacks.
+On Mon, Feb 24, 2025 at 02:53:22PM +0100, Philipp Stanner wrote:
+> From: Philipp Stanner <pstanner@redhat.com>
 > 
-> Remove the pcim_ cleanup function calls in the remove() callbacks.
+> The PCI functions
+>   - pcim_iomap_regions() and
+>   - pcim_iomap_table()
+> have been deprecated.
 > 
-> Signed-off-by: Philipp Stanner <phasta@kernel.org>
+> Replace them with their successor function, pcim_iomap_region().
+> 
+> Make variable declaration order at closeby places comply with reverse
+> christmas tree order.
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
