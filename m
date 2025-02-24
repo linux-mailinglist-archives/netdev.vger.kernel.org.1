@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-169251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3ED1A43131
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:46:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E09A43137
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0E81894F39
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:44:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1F5C3AF132
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DE920FA86;
-	Mon, 24 Feb 2025 23:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9943E212F8A;
+	Mon, 24 Feb 2025 23:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eG3osvWp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbF12Qe5"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D7F20DD5A
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59DE212B0D
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740440571; cv=none; b=sSspYErrsUj5cTOMmRuigF3nFeIdhphNu5aFkVsuJN9GtOPpbEKuU6vLLa+K1LsJtO5ToxeJ+C4BK/S8OhIJd94nctMFkn1WIzPD3h9hCw0xuYYl+nNN2IlClFFkrbG+yc66def58Ql3tWY+aLJd3GZeoLTkb2cVxkhgkHmSKKw=
+	t=1740440574; cv=none; b=jmP+3t2FH1+PDk323WRUDUJSPr378JKjTAzHHBu2MNv1Gf5JRR3qqVhoqlohtPHx2ktENEOA6XmVOnjmpPwwcTnUHG+i8AQnNj76FOkELVWp4fmhRrgTky2xIe6Vsm415mxljPR4r/cy6hiID3opJd385RB5GgjoCvCHOPbLyUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740440571; c=relaxed/simple;
-	bh=bpjjkkgI8qN2Jz1CB8CZPSqqM/uWhxzK31+nJdUFGD4=;
+	s=arc-20240116; t=1740440574; c=relaxed/simple;
+	bh=wti+nj9OPTh/bErQ5E4oKhRSKmC0KR1tHufxQXAG6jo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DBUImW/lYIazIni3dkAwZhZyAR08N62r/wUcP7F0ybUwbvst6jcXWOP6FRcp6J1/b1EShx8jHFnZNRR/qqjm9AI//Mu4JC+gxFNQv38WDd/KpXSdMarE3BkMzKy1W3TnpiaSE48czgOb3XjYkYArvnWcIKnYERePtmt2aOUOt+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eG3osvWp; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=QM9zzcCgd4MRi2cChFqrYf0ghx2OZFtlYaSOydR8BHm73vyOGeD9A41A9LiOaSCTpSwXMAfUh7casXK1KU3gUWvVmIUtX0XnweIQ9UD98wOR3hO4x9sw3U47uSgX+VSPSvlYlJsz/p7VfU8WgvJLe7SYkcxBtVjNIrbum74NEbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbF12Qe5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740440568;
+	s=mimecast20190719; t=1740440572;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qt3MUZYI6xKRH9u2P0Md1Im0HF5ENEnctvns3u/UBs0=;
-	b=eG3osvWpz454y9uiX/pMMyEpTEnCNgLdw5ed5XQh+ee2VKWsFZFMCMVhK9xIp5HEeVKJBh
-	Jb4xiO2eDFvTyjbC8iEKaJBkXAKreQeeXBwPfhg+S4mDf2iekmrrXhCYwr5EQvDDzPgbWo
-	ljPmgMOhbvlYv3Zq9qb2/v/tIlNVYtg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=xhNgi6WOoRTfLf6jGt4MeG/7EO7nsIITUX1Wg/NI4TM=;
+	b=GbF12Qe5zJJaGMsTzdWSDfDS1LVq+a0FYT/Pc4XWoET8IiPIjWfBjxbVcoqHbb0cdu65jV
+	/Z15yA1Q0xvRnlpXcf8FFQBwxuJC2/Dd2Tc5uq776VsW7BBFG0W9fXl/QfQos0A6CtMwXU
+	dXFOm6IuRQeUnyw9QCyS5KUFD7ORFKs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-235-LBVwjxxZM-KZdG8v_nl5Eg-1; Mon,
- 24 Feb 2025 18:42:43 -0500
-X-MC-Unique: LBVwjxxZM-KZdG8v_nl5Eg-1
-X-Mimecast-MFC-AGG-ID: LBVwjxxZM-KZdG8v_nl5Eg_1740440561
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-BudGJgQyN6uppa6OnIc8Ow-1; Mon,
+ 24 Feb 2025 18:42:47 -0500
+X-MC-Unique: BudGJgQyN6uppa6OnIc8Ow-1
+X-Mimecast-MFC-AGG-ID: BudGJgQyN6uppa6OnIc8Ow_1740440565
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CB6C1800878;
-	Mon, 24 Feb 2025 23:42:41 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAA7A1800878;
+	Mon, 24 Feb 2025 23:42:45 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.9])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8880C1955BD4;
-	Mon, 24 Feb 2025 23:42:38 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C71B719560AE;
+	Mon, 24 Feb 2025 23:42:42 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -69,9 +69,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 09/15] afs: Improve server refcount/active count tracing
-Date: Mon, 24 Feb 2025 23:41:46 +0000
-Message-ID: <20250224234154.2014840-10-dhowells@redhat.com>
+Subject: [PATCH net-next 10/15] afs: Make afs_lookup_cell() take a trace note
+Date: Mon, 24 Feb 2025 23:41:47 +0000
+Message-ID: <20250224234154.2014840-11-dhowells@redhat.com>
 In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
 References: <20250224234154.2014840-1-dhowells@redhat.com>
 Precedence: bulk
@@ -81,12 +81,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Improve server refcount/active count tracing to distinguish between simply
-getting/putting a ref and using/unusing the server record (which changes
-the activity count as well as the refcount).  This makes it a bit easier to
-work out what's going on.
+Pass a note to be added to the afs_cell tracepoint to afs_lookup_cell() so
+that different callers can be distinguished.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
@@ -98,169 +96,172 @@ cc: Simon Horman <horms@kernel.org>
 cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 ---
- fs/afs/fsclient.c          |  4 ++--
- fs/afs/rxrpc.c             |  2 +-
- fs/afs/server.c            | 11 ++++++-----
- fs/afs/server_list.c       |  4 ++--
- include/trace/events/afs.h | 27 +++++++++++++++------------
- 5 files changed, 26 insertions(+), 22 deletions(-)
+ fs/afs/cell.c              | 13 ++++++++-----
+ fs/afs/dynroot.c           |  3 ++-
+ fs/afs/internal.h          |  6 ++++--
+ fs/afs/mntpt.c             |  3 ++-
+ fs/afs/proc.c              |  3 ++-
+ fs/afs/super.c             |  3 ++-
+ fs/afs/vl_alias.c          |  3 ++-
+ include/trace/events/afs.h |  7 ++++++-
+ 8 files changed, 28 insertions(+), 13 deletions(-)
 
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 1d9ecd5418d8..9f46d9aebc33 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -1653,7 +1653,7 @@ int afs_fs_give_up_all_callbacks(struct afs_net *net, struct afs_server *server,
- 	bp = call->request;
- 	*bp++ = htonl(FSGIVEUPALLCALLBACKS);
- 
--	call->server = afs_use_server(server, afs_server_trace_give_up_cb);
-+	call->server = afs_use_server(server, afs_server_trace_use_give_up_cb);
- 	afs_make_call(call, GFP_NOFS);
- 	afs_wait_for_call_to_complete(call);
- 	ret = call->error;
-@@ -1760,7 +1760,7 @@ bool afs_fs_get_capabilities(struct afs_net *net, struct afs_server *server,
- 		return false;
- 
- 	call->key	= key;
--	call->server	= afs_use_server(server, afs_server_trace_get_caps);
-+	call->server	= afs_use_server(server, afs_server_trace_use_get_caps);
- 	call->peer	= rxrpc_kernel_get_peer(estate->addresses->addrs[addr_index].peer);
- 	call->probe	= afs_get_endpoint_state(estate, afs_estate_trace_get_getcaps);
- 	call->probe_index = addr_index;
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 886416ea1d96..de9e10575bdd 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -179,7 +179,7 @@ static void afs_free_call(struct afs_call *call)
- 	if (call->type->destructor)
- 		call->type->destructor(call);
- 
--	afs_unuse_server_notime(call->net, call->server, afs_server_trace_put_call);
-+	afs_unuse_server_notime(call->net, call->server, afs_server_trace_unuse_call);
- 	kfree(call->request);
- 
- 	o = atomic_read(&net->nr_outstanding_calls);
-diff --git a/fs/afs/server.c b/fs/afs/server.c
-index 4504e16b458c..923e07c37032 100644
---- a/fs/afs/server.c
-+++ b/fs/afs/server.c
-@@ -33,7 +33,7 @@ struct afs_server *afs_find_server(struct afs_net *net, const struct rxrpc_peer
- 
- 	do {
- 		if (server)
--			afs_unuse_server_notime(net, server, afs_server_trace_put_find_rsq);
-+			afs_unuse_server_notime(net, server, afs_server_trace_unuse_find_rsq);
- 		server = NULL;
- 		seq++; /* 2 on the 1st/lockless path, otherwise odd */
- 		read_seqbegin_or_lock(&net->fs_addr_lock, &seq);
-@@ -49,7 +49,7 @@ struct afs_server *afs_find_server(struct afs_net *net, const struct rxrpc_peer
- 		server = NULL;
- 		continue;
- 	found:
--		server = afs_maybe_use_server(server, afs_server_trace_get_by_addr);
-+		server = afs_maybe_use_server(server, afs_server_trace_use_by_addr);
- 
- 	} while (need_seqretry(&net->fs_addr_lock, seq));
- 
-@@ -76,7 +76,7 @@ struct afs_server *afs_find_server_by_uuid(struct afs_net *net, const uuid_t *uu
- 		 * changes.
- 		 */
- 		if (server)
--			afs_unuse_server(net, server, afs_server_trace_put_uuid_rsq);
-+			afs_unuse_server(net, server, afs_server_trace_unuse_uuid_rsq);
- 		server = NULL;
- 		seq++; /* 2 on the 1st/lockless path, otherwise odd */
- 		read_seqbegin_or_lock(&net->fs_lock, &seq);
-@@ -91,7 +91,7 @@ struct afs_server *afs_find_server_by_uuid(struct afs_net *net, const uuid_t *uu
- 			} else if (diff > 0) {
- 				p = p->rb_right;
- 			} else {
--				afs_use_server(server, afs_server_trace_get_by_uuid);
-+				afs_use_server(server, afs_server_trace_use_by_uuid);
- 				break;
- 			}
- 
-@@ -273,7 +273,8 @@ static struct afs_addr_list *afs_vl_lookup_addrs(struct afs_cell *cell,
- }
- 
- /*
-- * Get or create a fileserver record.
-+ * Get or create a fileserver record and return it with an active-use count on
-+ * it.
+diff --git a/fs/afs/cell.c b/fs/afs/cell.c
+index 9f5d8bc2bc5f..acdcd955f644 100644
+--- a/fs/afs/cell.c
++++ b/fs/afs/cell.c
+@@ -231,6 +231,7 @@ static struct afs_cell *afs_alloc_cell(struct afs_net *net,
+  * @namesz:	The strlen of the cell name.
+  * @vllist:	A colon/comma separated list of numeric IP addresses or NULL.
+  * @excl:	T if an error should be given if the cell name already exists.
++ * @trace:	The reason to be logged if the lookup is successful.
+  *
+  * Look up a cell record by name and query the DNS for VL server addresses if
+  * needed.  Note that that actual DNS query is punted off to the manager thread
+@@ -239,7 +240,8 @@ static struct afs_cell *afs_alloc_cell(struct afs_net *net,
   */
- struct afs_server *afs_lookup_server(struct afs_cell *cell, struct key *key,
- 				     const uuid_t *uuid, u32 addr_version)
-diff --git a/fs/afs/server_list.c b/fs/afs/server_list.c
-index d20cd902ef94..784236b9b2a9 100644
---- a/fs/afs/server_list.c
-+++ b/fs/afs/server_list.c
-@@ -16,7 +16,7 @@ void afs_put_serverlist(struct afs_net *net, struct afs_server_list *slist)
- 	if (slist && refcount_dec_and_test(&slist->usage)) {
- 		for (i = 0; i < slist->nr_servers; i++)
- 			afs_unuse_server(net, slist->servers[i].server,
--					 afs_server_trace_put_slist);
-+					 afs_server_trace_unuse_slist);
- 		kfree_rcu(slist, rcu);
- 	}
- }
-@@ -98,7 +98,7 @@ struct afs_server_list *afs_alloc_server_list(struct afs_volume *volume,
- 		if (j < slist->nr_servers) {
- 			if (slist->servers[j].server == server) {
- 				afs_unuse_server(volume->cell->net, server,
--						 afs_server_trace_put_slist_isort);
-+						 afs_server_trace_unuse_slist_isort);
- 				continue;
- 			}
+ struct afs_cell *afs_lookup_cell(struct afs_net *net,
+ 				 const char *name, unsigned int namesz,
+-				 const char *vllist, bool excl)
++				 const char *vllist, bool excl,
++				 enum afs_cell_trace trace)
+ {
+ 	struct afs_cell *cell, *candidate, *cursor;
+ 	struct rb_node *parent, **pp;
+@@ -249,7 +251,7 @@ struct afs_cell *afs_lookup_cell(struct afs_net *net,
+ 	_enter("%s,%s", name, vllist);
  
+ 	if (!excl) {
+-		cell = afs_find_cell(net, name, namesz, afs_cell_trace_use_lookup);
++		cell = afs_find_cell(net, name, namesz, trace);
+ 		if (!IS_ERR(cell))
+ 			goto wait_for_cell;
+ 	}
+@@ -325,7 +327,7 @@ struct afs_cell *afs_lookup_cell(struct afs_net *net,
+ 	if (excl) {
+ 		ret = -EEXIST;
+ 	} else {
+-		afs_use_cell(cursor, afs_cell_trace_use_lookup);
++		afs_use_cell(cursor, trace);
+ 		ret = 0;
+ 	}
+ 	up_write(&net->cells_lock);
+@@ -380,8 +382,9 @@ int afs_cell_init(struct afs_net *net, const char *rootcell)
+ 	if (cp && cp < rootcell + len)
+ 		return -EINVAL;
+ 
+-	/* allocate a cell record for the root cell */
+-	new_root = afs_lookup_cell(net, rootcell, len, vllist, false);
++	/* allocate a cell record for the root/workstation cell */
++	new_root = afs_lookup_cell(net, rootcell, len, vllist, false,
++				   afs_cell_trace_use_lookup_ws);
+ 	if (IS_ERR(new_root)) {
+ 		_leave(" = %ld", PTR_ERR(new_root));
+ 		return PTR_ERR(new_root);
+diff --git a/fs/afs/dynroot.c b/fs/afs/dynroot.c
+index 0cf5a196d4d7..d5bb5668e788 100644
+--- a/fs/afs/dynroot.c
++++ b/fs/afs/dynroot.c
+@@ -108,7 +108,8 @@ static struct dentry *afs_dynroot_lookup_cell(struct inode *dir, struct dentry *
+ 		dotted = true;
+ 	}
+ 
+-	cell = afs_lookup_cell(net, name, len, NULL, false);
++	cell = afs_lookup_cell(net, name, len, NULL, false,
++			       afs_cell_trace_use_lookup_dynroot);
+ 	if (IS_ERR(cell)) {
+ 		ret = PTR_ERR(cell);
+ 		goto out_no_cell;
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index bbd550d496a7..fcef2f7cb8ad 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -1046,8 +1046,10 @@ static inline bool afs_cb_is_broken(unsigned int cb_break,
+ extern int afs_cell_init(struct afs_net *, const char *);
+ extern struct afs_cell *afs_find_cell(struct afs_net *, const char *, unsigned,
+ 				      enum afs_cell_trace);
+-extern struct afs_cell *afs_lookup_cell(struct afs_net *, const char *, unsigned,
+-					const char *, bool);
++struct afs_cell *afs_lookup_cell(struct afs_net *net,
++				 const char *name, unsigned int namesz,
++				 const char *vllist, bool excl,
++				 enum afs_cell_trace trace);
+ extern struct afs_cell *afs_use_cell(struct afs_cell *, enum afs_cell_trace);
+ extern void afs_unuse_cell(struct afs_net *, struct afs_cell *, enum afs_cell_trace);
+ extern struct afs_cell *afs_get_cell(struct afs_cell *, enum afs_cell_trace);
+diff --git a/fs/afs/mntpt.c b/fs/afs/mntpt.c
+index 507c25a5b2cb..4a3edb9990b0 100644
+--- a/fs/afs/mntpt.c
++++ b/fs/afs/mntpt.c
+@@ -107,7 +107,8 @@ static int afs_mntpt_set_params(struct fs_context *fc, struct dentry *mntpt)
+ 		if (size > AFS_MAXCELLNAME)
+ 			return -ENAMETOOLONG;
+ 
+-		cell = afs_lookup_cell(ctx->net, p, size, NULL, false);
++		cell = afs_lookup_cell(ctx->net, p, size, NULL, false,
++				       afs_cell_trace_use_lookup_mntpt);
+ 		if (IS_ERR(cell)) {
+ 			pr_err("kAFS: unable to lookup cell '%pd'\n", mntpt);
+ 			return PTR_ERR(cell);
+diff --git a/fs/afs/proc.c b/fs/afs/proc.c
+index e7614f4f30c2..8e71720a86bb 100644
+--- a/fs/afs/proc.c
++++ b/fs/afs/proc.c
+@@ -122,7 +122,8 @@ static int afs_proc_cells_write(struct file *file, char *buf, size_t size)
+ 	if (strcmp(buf, "add") == 0) {
+ 		struct afs_cell *cell;
+ 
+-		cell = afs_lookup_cell(net, name, strlen(name), args, true);
++		cell = afs_lookup_cell(net, name, strlen(name), args, true,
++				       afs_cell_trace_use_lookup_add);
+ 		if (IS_ERR(cell)) {
+ 			ret = PTR_ERR(cell);
+ 			goto done;
+diff --git a/fs/afs/super.c b/fs/afs/super.c
+index dfc109f48ad5..aa6a3ccf39b5 100644
+--- a/fs/afs/super.c
++++ b/fs/afs/super.c
+@@ -290,7 +290,8 @@ static int afs_parse_source(struct fs_context *fc, struct fs_parameter *param)
+ 	/* lookup the cell record */
+ 	if (cellname) {
+ 		cell = afs_lookup_cell(ctx->net, cellname, cellnamesz,
+-				       NULL, false);
++				       NULL, false,
++				       afs_cell_trace_use_lookup_mount);
+ 		if (IS_ERR(cell)) {
+ 			pr_err("kAFS: unable to lookup cell '%*.*s'\n",
+ 			       cellnamesz, cellnamesz, cellname ?: "");
+diff --git a/fs/afs/vl_alias.c b/fs/afs/vl_alias.c
+index f9e76b604f31..ffcfba1725e6 100644
+--- a/fs/afs/vl_alias.c
++++ b/fs/afs/vl_alias.c
+@@ -269,7 +269,8 @@ static int yfs_check_canonical_cell_name(struct afs_cell *cell, struct key *key)
+ 	if (!name_len || name_len > AFS_MAXCELLNAME)
+ 		master = ERR_PTR(-EOPNOTSUPP);
+ 	else
+-		master = afs_lookup_cell(cell->net, cell_name, name_len, NULL, false);
++		master = afs_lookup_cell(cell->net, cell_name, name_len, NULL, false,
++					 afs_cell_trace_use_lookup_canonical);
+ 	kfree(cell_name);
+ 	if (IS_ERR(master))
+ 		return PTR_ERR(master);
 diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index cf94bf1e8286..24d99fbc298f 100644
+index 24d99fbc298f..42c3a51db72b 100644
 --- a/include/trace/events/afs.h
 +++ b/include/trace/events/afs.h
-@@ -132,22 +132,25 @@ enum yfs_cm_operation {
- 	EM(afs_server_trace_destroy,		"DESTROY  ") \
- 	EM(afs_server_trace_free,		"FREE     ") \
- 	EM(afs_server_trace_gc,			"GC       ") \
--	EM(afs_server_trace_get_by_addr,	"GET addr ") \
--	EM(afs_server_trace_get_by_uuid,	"GET uuid ") \
--	EM(afs_server_trace_get_caps,		"GET caps ") \
- 	EM(afs_server_trace_get_install,	"GET inst ") \
--	EM(afs_server_trace_get_new_cbi,	"GET cbi  ") \
- 	EM(afs_server_trace_get_probe,		"GET probe") \
--	EM(afs_server_trace_give_up_cb,		"giveup-cb") \
- 	EM(afs_server_trace_purging,		"PURGE    ") \
--	EM(afs_server_trace_put_call,		"PUT call ") \
- 	EM(afs_server_trace_put_cbi,		"PUT cbi  ") \
--	EM(afs_server_trace_put_find_rsq,	"PUT f-rsq") \
- 	EM(afs_server_trace_put_probe,		"PUT probe") \
--	EM(afs_server_trace_put_slist,		"PUT slist") \
--	EM(afs_server_trace_put_slist_isort,	"PUT isort") \
--	EM(afs_server_trace_put_uuid_rsq,	"PUT u-req") \
--	E_(afs_server_trace_update,		"UPDATE")
-+	EM(afs_server_trace_see_expired,	"SEE expd ") \
-+	EM(afs_server_trace_unuse_call,		"UNU call ") \
-+	EM(afs_server_trace_unuse_create_fail,	"UNU cfail") \
-+	EM(afs_server_trace_unuse_find_rsq,	"UNU f-rsq") \
-+	EM(afs_server_trace_unuse_slist,	"UNU slist") \
-+	EM(afs_server_trace_unuse_slist_isort,	"UNU isort") \
-+	EM(afs_server_trace_unuse_uuid_rsq,	"PUT u-req") \
-+	EM(afs_server_trace_update,		"UPDATE   ") \
-+	EM(afs_server_trace_use_by_addr,	"USE addr ") \
-+	EM(afs_server_trace_use_by_uuid,	"USE uuid ") \
-+	EM(afs_server_trace_use_cm_call,	"USE cm-cl") \
-+	EM(afs_server_trace_use_get_caps,	"USE gcaps") \
-+	EM(afs_server_trace_use_give_up_cb,	"USE gvupc") \
-+	E_(afs_server_trace_wait_create,	"WAIT crt ")
- 
- #define afs_volume_traces \
- 	EM(afs_volume_trace_alloc,		"ALLOC         ") \
-@@ -1531,7 +1534,7 @@ TRACE_EVENT(afs_server,
- 		    __entry->reason = reason;
- 			   ),
- 
--	    TP_printk("s=%08x %s u=%d a=%d",
-+	    TP_printk("s=%08x %s r=%d a=%d",
- 		      __entry->server,
- 		      __print_symbolic(__entry->reason, afs_server_traces),
- 		      __entry->ref,
+@@ -208,7 +208,12 @@ enum yfs_cm_operation {
+ 	EM(afs_cell_trace_use_check_alias,	"USE chk-al") \
+ 	EM(afs_cell_trace_use_fc,		"USE fc    ") \
+ 	EM(afs_cell_trace_use_fc_alias,		"USE fc-al ") \
+-	EM(afs_cell_trace_use_lookup,		"USE lookup") \
++	EM(afs_cell_trace_use_lookup_add,	"USE lu-add") \
++	EM(afs_cell_trace_use_lookup_canonical,	"USE lu-can") \
++	EM(afs_cell_trace_use_lookup_dynroot,	"USE lu-dyn") \
++	EM(afs_cell_trace_use_lookup_mntpt,	"USE lu-mpt") \
++	EM(afs_cell_trace_use_lookup_mount,	"USE lu-mnt") \
++	EM(afs_cell_trace_use_lookup_ws,	"USE lu-ws ") \
+ 	EM(afs_cell_trace_use_mntpt,		"USE mntpt ") \
+ 	EM(afs_cell_trace_use_pin,		"USE pin   ") \
+ 	EM(afs_cell_trace_use_probe,		"USE probe ") \
 
 
