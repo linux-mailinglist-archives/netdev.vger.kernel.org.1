@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-169236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314EFA430C3
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:25:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD93A430C2
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:24:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD3519C1E76
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:24:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E48C3BACFC
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8466620CCE8;
-	Mon, 24 Feb 2025 23:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA5B20CCCD;
+	Mon, 24 Feb 2025 23:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f28pyVoK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eUs4RxNy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731A920C488
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F8A20C488
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740439368; cv=none; b=Sp9JESv+678fVo5BNXvvF3FGRd37W3K2QBSImEFJyo6cB5Niybf09L+61DFUlCGIqe5xNtvy/weFjDx4e13rvDjmMyzlDVi9Ilk6u7Te9kGi+GAIrqIBFYJiF27JSXAMbkaq9wMigO8GdOcN4iuOhpGe8L6R99zp0dsyvMocKmc=
+	t=1740439374; cv=none; b=uI3XBoJVdGqis+5gMxatAsOVImnCGoKbGuDfQQR+TPop6cKYUPPREpdD1LO5dncnqh+Md87Dje06ARX9Z3tYGs65VYCPjtqLAnFzS6+N2HqC/Y0NDf8VZbzEzYJFHXZb+NSybGWB9sDgJEsbks3km8PPddmDFhqNEv2w5qpqWLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740439368; c=relaxed/simple;
-	bh=hW5wv2GOLyYdvuKpkKh0bU5hgNwkWWIFnPl2fgqiD0U=;
+	s=arc-20240116; t=1740439374; c=relaxed/simple;
+	bh=W3fPwahZBmhefKb6ZWdykoKfhNI+QJZyOsBRqs7FwmM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DV1sSC5HJ70F2hd8HqI6amkBcy9cYHXe7WaHVP6utwBfbGJgbAAFx6rrIPWsGVzsUeKqMqj4z7SbLWQGEKM7Zd+f3gtTrhRXjXbLT/kkDWr7sY+Q1zXoiRh9CZx/kXPXrH4YnxeBKv68ZjyEEnozWJTA30vhpDJhA37V3xOuFLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f28pyVoK; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=UT0q6K7VTOPSzNgZfCpadK5svjr178IC0YAlkzWDgSRPtRr8jIp7KaBKrkWhOKFbyhA+eSlcouLEsTE11jEbwD+M2KABiitQCzC2bxa4YrJ6iyIwILTk2vFR5wYZbAPT+MefUtQgVCa7AfpeuG7J5Bz7ndm7RMwxhfjz++TFCXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eUs4RxNy; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740439367; x=1771975367;
+  t=1740439373; x=1771975373;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hW5wv2GOLyYdvuKpkKh0bU5hgNwkWWIFnPl2fgqiD0U=;
-  b=f28pyVoKcNK5gzEwQuvv4GeY/B9Q2nQvxYoi3jy9G5J1k9jV31sm5F2M
-   TQ1U4bOe8Fu0ko+6fOUMsmRqlJnddhvPESJ9wb0HNGsXBUxxr2Vl6peQY
-   VI6X/bKLTuGoUcjVQ4CO3CIvXxMhcM0KaDgUtl7vcrxB9WbbXvS8TVDMn
-   aiIUXtasaIKv7P6yWNgCufHc7h9xV39gqauvJAZRqbc2cf1gFOSnK+STg
-   DO88DTaLhwaSdq2xPtGkNeTGyBa8sL95+K0T82/Gj7OAm3YXN+AUTWZ8x
-   MX5oFD1kl6lBN52YsGf7umlloptjA0thGtwjR/mO12gaI+ZQV+Ojx8FfT
+  bh=W3fPwahZBmhefKb6ZWdykoKfhNI+QJZyOsBRqs7FwmM=;
+  b=eUs4RxNyohSBIgpTVD486aiSygZnPyZrHRad/vmXzWl+Zh7CHVwShDwH
+   WEOKdtEAaP7iDJ4dP8Y+1B1OAa4TQnm1+Nw7DbogWeHMLwApkUi+loFq0
+   0i1gT7hysAHs8XSCxvNjFtRdWohHo2bm1GE9sBE7WB0cTs4g/vRveiQmq
+   yN+Bf4+7i5XlYBloaAGV7/b8V/qxPht047hr7+fnXDMNZ010aA+W2uLL1
+   2kQzQI9mFHD+JHcG7avfImD+HbZPzzJaCVwciW/0Et5cN9nrUh47ZCLgX
+   KbIXnZhs8O6xBJfnnayrLOw80VNXbxUv39Gf8qRcOITHez0wEzVGJHqdn
    g==;
-X-CSE-ConnectionGUID: eA8OdtQpT8GhEwKR01aXPA==
-X-CSE-MsgGUID: 48mVw8MgQoGoPf0IOhP59w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40406622"
+X-CSE-ConnectionGUID: ytO0LHS6QRuouPeLNO8xYQ==
+X-CSE-MsgGUID: XnGkchDBSleiJHbOAuCh5g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40406641"
 X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="40406622"
+   d="scan'208";a="40406641"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:22:46 -0800
-X-CSE-ConnectionGUID: 8V3z5tDOTZuWp+7JwoHoZw==
-X-CSE-MsgGUID: XwBzmx8ARqmZAoOTBEycnw==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:22:53 -0800
+X-CSE-ConnectionGUID: Q1o1dBEaTsGcFBKM0zzBjQ==
+X-CSE-MsgGUID: oqbw88BhRnySdvNnFULF6Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="115997766"
+   d="scan'208";a="115997787"
 Received: from pgcooper-mobl3.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.245.244.43])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:22:40 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:22:46 -0800
 From: Ahmed Zaki <ahmed.zaki@intel.com>
 To: netdev@vger.kernel.org
 Cc: intel-wired-lan@lists.osuosl.org,
@@ -75,10 +75,11 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	shayd@nvidia.com,
 	akpm@linux-foundation.org,
 	shayagr@amazon.com,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v9 1/6] net: move aRFS rmap management and CPU affinity to core
-Date: Mon, 24 Feb 2025 16:22:22 -0700
-Message-ID: <20250224232228.990783-2-ahmed.zaki@intel.com>
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	David Arinzon <darinzon@amazon.com>
+Subject: [PATCH net-next v9 2/6] net: ena: use napi's aRFS rmap notifers
+Date: Mon, 24 Feb 2025 16:22:23 -0700
+Message-ID: <20250224232228.990783-3-ahmed.zaki@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250224232228.990783-1-ahmed.zaki@intel.com>
 References: <20250224232228.990783-1-ahmed.zaki@intel.com>
@@ -88,373 +89,98 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-A common task for most drivers is to remember the user-set CPU affinity
-to its IRQs. On each netdev reset, the driver should re-assign the user's
-settings to the IRQs. Unify this task across all drivers by moving the CPU
-affinity to napi->config.
+Use the core's rmap notifiers and delete our own.
 
-However, to move the CPU affinity to core, we also need to move aRFS
-rmap management since aRFS uses its own IRQ notifiers.
-
-For the aRFS, add a new netdev flag "rx_cpu_rmap_auto". Drivers supporting
-aRFS should set the flag via netif_enable_cpu_rmap() and core will allocate
-and manage the aRFS rmaps. Freeing the rmap is also done by core when the
-netdev is freed. For better IRQ affinity management, move the IRQ rmap
-notifier inside the napi_struct and add new notify.notify and
-notify.release functions: netif_irq_cpu_rmap_notify() and
-netif_napi_affinity_release().
-
-Now we have the aRFS rmap management in core, add CPU affinity mask to
-napi_config. To delegate the CPU affinity management to the core, drivers
-must:
- 1 - set the new netdev flag "irq_affinity_auto":
-                                       netif_enable_irq_affinity(netdev)
- 2 - create the napi with persistent config:
-                                       netif_napi_add_config()
- 3 - bind an IRQ to the napi instance: netif_napi_set_irq()
-
-the core will then make sure to use re-assign affinity to the napi's
-IRQ.
-
-The default IRQ mask is set to one cpu starting from the closest NUMA.
-
+Acked-by: David Arinzon <darinzon@amazon.com>
 Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 ---
- Documentation/networking/scaling.rst |   6 +-
- include/linux/cpu_rmap.h             |   1 +
- include/linux/netdevice.h            |  24 +++-
- lib/cpu_rmap.c                       |   2 +-
- net/core/dev.c                       | 169 +++++++++++++++++++++++++++
- 5 files changed, 195 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/amazon/ena/ena_netdev.c | 43 +-------------------
+ 1 file changed, 1 insertion(+), 42 deletions(-)
 
-diff --git a/Documentation/networking/scaling.rst b/Documentation/networking/scaling.rst
-index 4eb50bcb9d42..e5d4d3ecb980 100644
---- a/Documentation/networking/scaling.rst
-+++ b/Documentation/networking/scaling.rst
-@@ -427,8 +427,10 @@ rps_dev_flow_table. The stack consults a CPU to hardware queue map which
- is maintained by the NIC driver. This is an auto-generated reverse map of
- the IRQ affinity table shown by /proc/interrupts. Drivers can use
- functions in the cpu_rmap (“CPU affinity reverse map”) kernel library
--to populate the map. For each CPU, the corresponding queue in the map is
--set to be one whose processing CPU is closest in cache locality.
-+to populate the map. Alternatively, drivers can delegate the cpu_rmap
-+management to the Kernel by calling netif_enable_cpu_rmap(). For each CPU,
-+the corresponding queue in the map is set to be one whose processing CPU is
-+closest in cache locality.
+diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+index c1295dfad0d0..6aab85a7c60a 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
++++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+@@ -5,9 +5,6 @@
  
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
  
- Accelerated RFS Configuration
-diff --git a/include/linux/cpu_rmap.h b/include/linux/cpu_rmap.h
-index 20b5729903d7..2fd7ba75362a 100644
---- a/include/linux/cpu_rmap.h
-+++ b/include/linux/cpu_rmap.h
-@@ -32,6 +32,7 @@ struct cpu_rmap {
- #define CPU_RMAP_DIST_INF 0xffff
- 
- extern struct cpu_rmap *alloc_cpu_rmap(unsigned int size, gfp_t flags);
-+extern void cpu_rmap_get(struct cpu_rmap *rmap);
- extern int cpu_rmap_put(struct cpu_rmap *rmap);
- 
- extern int cpu_rmap_add(struct cpu_rmap *rmap, void *obj);
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 9a387d456592..2094d3edda73 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -352,6 +352,7 @@ struct napi_config {
- 	u64 gro_flush_timeout;
- 	u64 irq_suspend_timeout;
- 	u32 defer_hard_irqs;
-+	cpumask_t affinity_mask;
- 	unsigned int napi_id;
- };
- 
-@@ -394,6 +395,8 @@ struct napi_struct {
- 	struct list_head	dev_list;
- 	struct hlist_node	napi_hash_node;
- 	int			irq;
-+	struct irq_affinity_notify notify;
-+	int			napi_rmap_idx;
- 	int			index;
- 	struct napi_config	*config;
- };
-@@ -409,6 +412,7 @@ enum {
- 	NAPI_STATE_PREFER_BUSY_POLL,	/* prefer busy-polling over softirq processing*/
- 	NAPI_STATE_THREADED,		/* The poll is performed inside its own thread*/
- 	NAPI_STATE_SCHED_THREADED,	/* Napi is currently scheduled in threaded mode */
-+	NAPI_STATE_HAS_NOTIFIER,	/* Napi has an IRQ notifier */
- };
- 
- enum {
-@@ -422,6 +426,7 @@ enum {
- 	NAPIF_STATE_PREFER_BUSY_POLL	= BIT(NAPI_STATE_PREFER_BUSY_POLL),
- 	NAPIF_STATE_THREADED		= BIT(NAPI_STATE_THREADED),
- 	NAPIF_STATE_SCHED_THREADED	= BIT(NAPI_STATE_SCHED_THREADED),
-+	NAPIF_STATE_HAS_NOTIFIER	= BIT(NAPI_STATE_HAS_NOTIFIER),
- };
- 
- enum gro_result {
-@@ -1989,6 +1994,15 @@ enum netdev_reg_state {
-  *
-  *	@threaded:	napi threaded mode is enabled
-  *
-+ *	@irq_affinity_auto: driver wants the core to store and re-assign the IRQ
-+ *			    affinity. Set by netif_enable_irq_affinity(), then
-+ *			    the driver must create a persistent napi by
-+ *			    netif_napi_add_config() and finally bind the napi to
-+ *			    IRQ (via netif_napi_set_irq()).
-+ *
-+ *	@rx_cpu_rmap_auto: driver wants the core to manage the ARFS rmap.
-+ *	                   Set by calling netif_enable_cpu_rmap().
-+ *
-  *	@see_all_hwtstamp_requests: device wants to see calls to
-  *			ndo_hwtstamp_set() for all timestamp requests
-  *			regardless of source, even if those aren't
-@@ -2396,6 +2410,8 @@ struct net_device {
- 	struct lock_class_key	*qdisc_tx_busylock;
- 	bool			proto_down;
- 	bool			threaded;
-+	bool			irq_affinity_auto;
-+	bool			rx_cpu_rmap_auto;
- 
- 	/* priv_flags_slow, ungrouped to save space */
- 	unsigned long		see_all_hwtstamp_requests:1;
-@@ -2724,10 +2740,7 @@ static inline void netdev_assert_locked_or_invisible(struct net_device *dev)
- 		netdev_assert_locked(dev);
+-#ifdef CONFIG_RFS_ACCEL
+-#include <linux/cpu_rmap.h>
+-#endif /* CONFIG_RFS_ACCEL */
+ #include <linux/ethtool.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -162,30 +159,6 @@ int ena_xmit_common(struct ena_adapter *adapter,
+ 	return 0;
  }
  
--static inline void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
+-static int ena_init_rx_cpu_rmap(struct ena_adapter *adapter)
 -{
--	napi->irq = irq;
+-#ifdef CONFIG_RFS_ACCEL
+-	u32 i;
+-	int rc;
+-
+-	adapter->netdev->rx_cpu_rmap = alloc_irq_cpu_rmap(adapter->num_io_queues);
+-	if (!adapter->netdev->rx_cpu_rmap)
+-		return -ENOMEM;
+-	for (i = 0; i < adapter->num_io_queues; i++) {
+-		int irq_idx = ENA_IO_IRQ_IDX(i);
+-
+-		rc = irq_cpu_rmap_add(adapter->netdev->rx_cpu_rmap,
+-				      pci_irq_vector(adapter->pdev, irq_idx));
+-		if (rc) {
+-			free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
+-			adapter->netdev->rx_cpu_rmap = NULL;
+-			return rc;
+-		}
+-	}
+-#endif /* CONFIG_RFS_ACCEL */
+-	return 0;
 -}
-+void netif_napi_set_irq_locked(struct napi_struct *napi, int irq);
- 
- static inline void netif_napi_set_irq(struct napi_struct *napi, int irq)
+-
+ static void ena_init_io_rings_common(struct ena_adapter *adapter,
+ 				     struct ena_ring *ring, u16 qid)
  {
-@@ -2865,6 +2878,9 @@ static inline void netif_napi_del(struct napi_struct *napi)
- 	synchronize_net();
- }
+@@ -1596,7 +1569,7 @@ static int ena_enable_msix(struct ena_adapter *adapter)
+ 		adapter->num_io_queues = irq_cnt - ENA_ADMIN_MSIX_VEC;
+ 	}
  
-+int netif_enable_cpu_rmap(struct net_device *dev, unsigned int num_irqs);
-+void netif_set_affinity_auto(struct net_device *dev);
-+
- struct packet_type {
- 	__be16			type;	/* This is really htons(ether_type). */
- 	bool			ignore_outgoing;
-diff --git a/lib/cpu_rmap.c b/lib/cpu_rmap.c
-index 4c348670da31..f03d9be3f06b 100644
---- a/lib/cpu_rmap.c
-+++ b/lib/cpu_rmap.c
-@@ -73,7 +73,7 @@ static void cpu_rmap_release(struct kref *ref)
-  * cpu_rmap_get - internal helper to get new ref on a cpu_rmap
-  * @rmap: reverse-map allocated with alloc_cpu_rmap()
-  */
--static inline void cpu_rmap_get(struct cpu_rmap *rmap)
-+void cpu_rmap_get(struct cpu_rmap *rmap)
- {
- 	kref_get(&rmap->refcount);
- }
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 3f525278a871..b0ab0169f507 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6943,11 +6943,175 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
- }
- EXPORT_SYMBOL(netif_queue_set_napi);
+-	if (ena_init_rx_cpu_rmap(adapter))
++	if (netif_enable_cpu_rmap(adapter->netdev, adapter->num_io_queues))
+ 		netif_warn(adapter, probe, adapter->netdev,
+ 			   "Failed to map IRQs to CPUs\n");
  
-+static void
-+netif_napi_irq_notify(struct irq_affinity_notify *notify,
-+		      const cpumask_t *mask)
-+{
-+	struct napi_struct *napi =
-+		container_of(notify, struct napi_struct, notify);
-+#ifdef CONFIG_RFS_ACCEL
-+	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-+	int err;
-+#endif
-+
-+	if (napi->config && napi->dev->irq_affinity_auto)
-+		cpumask_copy(&napi->config->affinity_mask, mask);
-+
-+#ifdef CONFIG_RFS_ACCEL
-+	if (napi->dev->rx_cpu_rmap_auto) {
-+		err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
-+		if (err)
-+			netdev_warn(napi->dev, "RMAP update failed (%d)\n",
-+				    err);
-+	}
-+#endif
-+}
-+
-+#ifdef CONFIG_RFS_ACCEL
-+static void netif_napi_affinity_release(struct kref *ref)
-+{
-+	struct napi_struct *napi =
-+		container_of(ref, struct napi_struct, notify.kref);
-+	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-+
-+	netdev_assert_locked(napi->dev);
-+	WARN_ON(test_and_clear_bit(NAPI_STATE_HAS_NOTIFIER,
-+				   &napi->state));
-+
-+	if (!napi->dev->rx_cpu_rmap_auto)
-+		return;
-+	rmap->obj[napi->napi_rmap_idx] = NULL;
-+	napi->napi_rmap_idx = -1;
-+	cpu_rmap_put(rmap);
-+}
-+
-+int netif_enable_cpu_rmap(struct net_device *dev, unsigned int num_irqs)
-+{
-+	if (dev->rx_cpu_rmap_auto)
-+		return 0;
-+
-+	dev->rx_cpu_rmap = alloc_irq_cpu_rmap(num_irqs);
-+	if (!dev->rx_cpu_rmap)
-+		return -ENOMEM;
-+
-+	dev->rx_cpu_rmap_auto = true;
-+	return 0;
-+}
-+EXPORT_SYMBOL(netif_enable_cpu_rmap);
-+
-+static void netif_del_cpu_rmap(struct net_device *dev)
-+{
-+	struct cpu_rmap *rmap = dev->rx_cpu_rmap;
-+
-+	if (!dev->rx_cpu_rmap_auto)
-+		return;
-+
-+	/* Free the rmap */
-+	cpu_rmap_put(rmap);
-+	dev->rx_cpu_rmap = NULL;
-+	dev->rx_cpu_rmap_auto = false;
-+}
-+
-+#else
-+static void netif_napi_affinity_release(struct kref *ref)
-+{
-+}
-+
-+int netif_enable_cpu_rmap(struct net_device *dev, unsigned int num_irqs)
-+{
-+	return 0;
-+}
-+EXPORT_SYMBOL(netif_enable_cpu_rmap);
-+
-+static void netif_del_cpu_rmap(struct net_device *dev)
-+{
-+}
-+#endif
-+
-+void netif_set_affinity_auto(struct net_device *dev)
-+{
-+	unsigned int i, maxqs, numa;
-+
-+	maxqs = max(dev->num_tx_queues, dev->num_rx_queues);
-+	numa = dev_to_node(&dev->dev);
-+
-+	for (i = 0; i < maxqs; i++)
-+		cpumask_set_cpu(cpumask_local_spread(i, numa),
-+				&dev->napi_config[i].affinity_mask);
-+
-+	dev->irq_affinity_auto = true;
-+}
-+EXPORT_SYMBOL(netif_set_affinity_auto);
-+
-+void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
-+{
-+	int rc;
-+
-+	netdev_assert_locked_or_invisible(napi->dev);
-+
-+	if (napi->irq == irq)
-+		return;
-+
-+	/* Remove existing resources */
-+	if (test_and_clear_bit(NAPI_STATE_HAS_NOTIFIER, &napi->state))
-+		irq_set_affinity_notifier(napi->irq, NULL);
-+
-+	napi->irq = irq;
-+	if (irq < 0 ||
-+	    (!napi->dev->rx_cpu_rmap_auto && !napi->dev->irq_affinity_auto))
-+		return;
-+
-+	/* Abort for buggy drivers */
-+	if (napi->dev->irq_affinity_auto && WARN_ON_ONCE(!napi->config))
-+		return;
-+
-+#ifdef CONFIG_RFS_ACCEL
-+	if (napi->dev->rx_cpu_rmap_auto) {
-+		rc = cpu_rmap_add(napi->dev->rx_cpu_rmap, napi);
-+		if (rc < 0)
-+			return;
-+
-+		cpu_rmap_get(napi->dev->rx_cpu_rmap);
-+		napi->napi_rmap_idx = rc;
-+	}
-+#endif
-+
-+	/* Use core IRQ notifier */
-+	napi->notify.notify = netif_napi_irq_notify;
-+	napi->notify.release = netif_napi_affinity_release;
-+	rc = irq_set_affinity_notifier(irq, &napi->notify);
-+	if (rc) {
-+		netdev_warn(napi->dev, "Unable to set IRQ notifier (%d)\n",
-+			    rc);
-+		goto put_rmap;
-+	}
-+
-+	set_bit(NAPI_STATE_HAS_NOTIFIER, &napi->state);
-+	return;
-+
-+put_rmap:
-+#ifdef CONFIG_RFS_ACCEL
-+	if (napi->dev->rx_cpu_rmap_auto) {
-+		cpu_rmap_put(napi->dev->rx_cpu_rmap);
-+		napi->dev->rx_cpu_rmap->obj[napi->napi_rmap_idx] = NULL;
-+		napi->napi_rmap_idx = -1;
-+	}
-+#endif
-+	napi->notify.notify = NULL;
-+	napi->notify.release = NULL;
-+}
-+EXPORT_SYMBOL(netif_napi_set_irq_locked);
-+
- static void napi_restore_config(struct napi_struct *n)
- {
- 	n->defer_hard_irqs = n->config->defer_hard_irqs;
- 	n->gro_flush_timeout = n->config->gro_flush_timeout;
- 	n->irq_suspend_timeout = n->config->irq_suspend_timeout;
-+
-+	if (n->dev->irq_affinity_auto &&
-+	    test_bit(NAPI_STATE_HAS_NOTIFIER, &n->state))
-+		irq_set_affinity(n->irq, &n->config->affinity_mask);
-+
- 	/* a NAPI ID might be stored in the config, if so use it. if not, use
- 	 * napi_hash_add to generate one for us.
+@@ -1742,13 +1715,6 @@ static void ena_free_io_irq(struct ena_adapter *adapter)
+ 	struct ena_irq *irq;
+ 	int i;
+ 
+-#ifdef CONFIG_RFS_ACCEL
+-	if (adapter->msix_vecs >= 1) {
+-		free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
+-		adapter->netdev->rx_cpu_rmap = NULL;
+-	}
+-#endif /* CONFIG_RFS_ACCEL */
+-
+ 	for (i = ENA_IO_IRQ_FIRST_IDX; i < ENA_MAX_MSIX_VEC(io_queue_count); i++) {
+ 		irq = &adapter->irq_tbl[i];
+ 		irq_set_affinity_hint(irq->vector, NULL);
+@@ -4131,13 +4097,6 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
+ 	ena_dev = adapter->ena_dev;
+ 	netdev = adapter->netdev;
+ 
+-#ifdef CONFIG_RFS_ACCEL
+-	if ((adapter->msix_vecs >= 1) && (netdev->rx_cpu_rmap)) {
+-		free_irq_cpu_rmap(netdev->rx_cpu_rmap);
+-		netdev->rx_cpu_rmap = NULL;
+-	}
+-
+-#endif /* CONFIG_RFS_ACCEL */
+ 	/* Make sure timer and reset routine won't be called after
+ 	 * freeing device resources.
  	 */
-@@ -7168,6 +7332,9 @@ void __netif_napi_del_locked(struct napi_struct *napi)
- 	/* Make sure NAPI is disabled (or was never enabled). */
- 	WARN_ON(!test_bit(NAPI_STATE_SCHED, &napi->state));
- 
-+	if (test_and_clear_bit(NAPI_STATE_HAS_NOTIFIER, &napi->state))
-+		irq_set_affinity_notifier(napi->irq, NULL);
-+
- 	if (napi->config) {
- 		napi->index = -1;
- 		napi->config = NULL;
-@@ -11720,6 +11887,8 @@ void free_netdev(struct net_device *dev)
- 
- 	netdev_napi_exit(dev);
- 
-+	netif_del_cpu_rmap(dev);
-+
- 	ref_tracker_dir_exit(&dev->refcnt_tracker);
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	free_percpu(dev->pcpu_refcnt);
 -- 
 2.43.0
 
