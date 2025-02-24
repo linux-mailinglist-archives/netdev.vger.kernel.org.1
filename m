@@ -1,265 +1,294 @@
-Return-Path: <netdev+bounces-169174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDC0CA42CB3
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:26:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA3F4A42CBA
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 192311898FB5
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:25:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA4717686F
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 19:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521441FF7C4;
-	Mon, 24 Feb 2025 19:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BD3202F9A;
+	Mon, 24 Feb 2025 19:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h4wF+U0z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4q+SHA7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3521204F9B
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740425109; cv=fail; b=LQvHddR5pANk9k3nkDpISAus2y71epZWirUOezuRv5z8rkYX1rn37WBj+44D09G/+qZ7Sw/ZhpDyzNTf8gVmkehFd9NwQmGnWiuLN+BihvjOiSQGRCJon4TRm5gw2lIJqZ2m0iUc4izuRU6U/UynjFfNYBEY08DujG7trkX7Tnc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740425109; c=relaxed/simple;
-	bh=XhdQ3EQ5rHmun4UfkiQJVWV/W3rPY7DCA5nXbbeWcFI=;
-	h=Message-ID:Date:From:Subject:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TYNb6LZc0KB9Mto40bvfYdLRrFSlPzJmno3iAZQas9RkoNm+ZriPRb4SEoxqOLIai1XvXrhuLGbFGJyKVtTCpU5ifhHFr8bdyG4O47krMwMED675NTra5zSEGXFsAC0nileHTgfn1XTqsrJlwKr4eAGN8WYwqjUeqjugKZ1Tb3Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h4wF+U0z; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740425107; x=1771961107;
-  h=message-id:date:from:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XhdQ3EQ5rHmun4UfkiQJVWV/W3rPY7DCA5nXbbeWcFI=;
-  b=h4wF+U0zpj5wGuxWbXVN4n0xGD14Q4+k/CKxgKiRKghzvrTSFHm+xbfQ
-   0b+6kc0h2yWkXdaGNgLNB2ufiGgnOhcaEE1pSC/GDxHUGdxRZ+AhP6Ya8
-   sfX89Z/OczD8r6MV0xGQtMRT1Yqb6XaPHFfLGqSHnqqiuaCyYecRWFcy5
-   LWAAn2jxCa8PKUWqA9XDoMyA9VrF9TS0nMPKh4ImDH1J9GPUdtZkUCtjl
-   DZo3BvF5fJacS97J9Ew6UzXj76kZOvWDC8T0AbSNznGu6ObQJW2wB9nON
-   wkc+0VIyT8RBEDrNow8+QV6Cgb+oBEVbyB8RaNqhqMhw8Nq+0sz28QZM8
-   Q==;
-X-CSE-ConnectionGUID: cmPAeUlHRQKBDC11UlrkPg==
-X-CSE-MsgGUID: iNWZx9pqTJaspuwzMV7BYQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="41080507"
-X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="41080507"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 11:24:59 -0800
-X-CSE-ConnectionGUID: CloZhbN1SgObSDs43/Si8w==
-X-CSE-MsgGUID: P4x8oUidQmWEGUpsK5mkPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="116780903"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Feb 2025 11:24:58 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 24 Feb 2025 11:24:58 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Mon, 24 Feb 2025 11:24:58 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 24 Feb 2025 11:24:56 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RpQFHnvU5y0JAinEjyi9bgSMPi922tz5qTosNHrpAVA6BXGaU0etyS6Y9pVO3A9FUu0f27QvgtpL6kIyB+dxNsemzKLd75L5Es1nf3FqY9PtwvRRcCbfzL1IQOAtM4nX4YcFc3hAFWEgui6a835AOpysRJ1k7ftjNVLQf2hwBfdACZgElWnyKeVOEkmgNjKosv3+KVwfjXfUPC2+YXR/2xAGr2L/wqDH17WRA6/daYNsUh5HK2+JNJSGfdY3jfbOaTYR2uHhuiCogokjFKiVv5q4jjbsvmF0Q8HOaWoPD+15TQoWlbL/nt4KI/xBXLrcjN2jYo3hLJ/tfVW45UcgRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=skXyT80oHx+W02lkXKVVWIj/MS8M+MXCf9N3KgCIUys=;
- b=EoK4CEVOaVIdCVXTHeVxyVsEiWTjNDApQqtwrgYFeuZzxn207VSxkeKsr7K7rzkS8OX3zaDyOeUiyNFfctun7GXZjPkxatCS2e0dTGrzhXz4mOXfimgoT/HXgyqEQM19A1icAtZN9cv86xdmxQnUO8KryD1rtl0LjSbOgVoNPYld5S5CfVvOrmF+CVym3HlkdhMcvvlkaG5H29fKwZkEzBIEBXkj0u4IgLPX9SLIOpD+SV72KacnKkS9Jn0B/IGbt3n3aWk+j2PoDxVLXXJXzshoKwJan2UuHIGh5rFboat+En0/JQC6vdT8c0SnMxIWo2agAya+nIdPFmEiYDNsrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by LV8PR11MB8771.namprd11.prod.outlook.com (2603:10b6:408:206::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Mon, 24 Feb
- 2025 19:24:22 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab%5]) with mapi id 15.20.8466.016; Mon, 24 Feb 2025
- 19:24:20 +0000
-Message-ID: <3c26c81b-455f-4cff-82b5-5f38ee602c71@intel.com>
-Date: Mon, 24 Feb 2025 11:24:17 -0800
-User-Agent: Mozilla Thunderbird
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v3] ixgbe: fix media type
- detection for E610 device
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <pmenzel@molgen.mpg.de>, <andrew@lunn.ch>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20250221154917.3710-1-piotr.kwapulinski@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250221154917.3710-1-piotr.kwapulinski@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0365.namprd04.prod.outlook.com
- (2603:10b6:303:81::10) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757591EDA0F;
+	Mon, 24 Feb 2025 19:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740425229; cv=none; b=cclm2t5G++aynQHLJLWuhmPXQudPRbQpYBMYlxI0aCcMwSypjiVM5YLCv0A/LAdvoRuMuMXa9eSjl19OsZYifb+dtZS33lJMeGf3C8R2+c9hyw21JEl1KxmbLNpCm8smqWlhZaRpagbX/VH6qJtEo8lOP4qos79BmMQCFiRjJvs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740425229; c=relaxed/simple;
+	bh=zms8AwfScWDNRnCzKtbTRceK4ozgPM3XizahJfE+6tI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p7GhyiyUVnT1yRTNL9fMSdPDqtmE9zMWFrlg0KRKnm9PPQpJZhIHWjqiiX++MNWCV3jyhJ7jYg+G7UYOxbFpFrKrbHuj95Fbu+UW+mAa7vxz19h1b1JcVs0m9kSi1DXYKuTympQXLNUqXnr1Y/KeBZBQapdbt+ypynVFUv93Eag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4q+SHA7; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2fbfa8c73a6so9616717a91.2;
+        Mon, 24 Feb 2025 11:27:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740425227; x=1741030027; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fNLdUwijT6W41ZsoblnFA+2AFZPup2ylwdIktRpNhS8=;
+        b=j4q+SHA7EXf0knh8DM6GL/5Og6eZo6oZM6cSRjq4gqADlhgYT4gukZ1QGPtCsBihtH
+         BLVVI/DwEe7J2F1a6rAtV5SfbhncGYtNJAlYgBx9h13EUPh1uJzqn5Dmffa80o/2fLBI
+         1tUd26LAmdyunCp4Eh1Oj5Yg8Tv8YfsmGn8HfqITk1P0UfX4NApKA4uo0q0m6FJBDPlN
+         3Rfzmw4XyjCFV1NkjafHGKrrjAVgbLOXxGNEOZZEXCTtFi2DUty88sIq7BWcT1xHmzmo
+         y5DirFpC3T4gSE3b4Q5z14px4GdYPctnLMkWXL0nuLeGmiUx+dzOamueqQC/UkyIM3ss
+         oKsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740425227; x=1741030027;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fNLdUwijT6W41ZsoblnFA+2AFZPup2ylwdIktRpNhS8=;
+        b=kgp8QZIxb98RP24ZmcHLLgN0vAPgBaP4qfG63wyVJ04U41fDbvOZ4K4KNEyCoIEMqp
+         nCmsjsc7/dOSzHPhuTl6CVXxea/2WMqYkozT4SgRYe/IG6s50IZ8muaARJrM38722MJD
+         +DBl+mQwfpndVY9fBFmqesHJ7LKaqRksWMUzm2Dr2EJeyvEquhXvZAdXzmKEkrn1qn33
+         lQVgcFUdL6Oku3Sd9oLyzQwHrO/bCx1Fhs3+Zvh5Kn4ba9FYOsgcoGkGfzFqn7pwc/n7
+         CJtAE1en4JL+sI0gGV8+gmJvZ5XI2ft0n/WLFPcbgswOvWK1JG4e3PvfIuc1pu6r0hkU
+         Fusg==
+X-Forwarded-Encrypted: i=1; AJvYcCVo+24H2n6s1NmNizHYw1Q3Q4YtGmWl4l8Eg1wlxo+WSR8Ri69zUjh7zvBViKkVG+7dmchvCwgQak0vZa0=@vger.kernel.org, AJvYcCVo6wzUwuk1Sa5Ghlc6klClWEcsEuJsj0ayuXvLaHwEd24vlVNswETrj9Gf7WcxtZv4usE=@vger.kernel.org, AJvYcCW/8tFvT2PEFpPLVjI8A1G7IVa0aFk5EUmUJ+Ynrx5jpC635ZpY3kg77SoZWa07zs/0E76WsIe5NJ7Iay3Ni30=@vger.kernel.org, AJvYcCW9uELGb6sfcagREh6YWsJyYOvlTb+/MXqU5B7X0vCyLda0XtPyR6+/t6mIU/+Ao44iO3/6a7NnPjDaHc4E@vger.kernel.org, AJvYcCWAJPTxxwInFlBgAS/ehVMhO2fT6Y07TpxBz4Twa09BsdwE16eXYY30kM5MD8fBNO/6hr7Xn0sllnf92eY=@vger.kernel.org, AJvYcCWlo1rtLxuGqu62bLDODjtj8ItqOTX2tn2CnGFwjGtGNAWi1O7yWcWR5fE4iwikr61j56i8UonCx7nshIew@vger.kernel.org, AJvYcCWpr2XrYzwJq/kf4Zu2ElH1yxXfaGA5jYPJrwCHT/CEe56zweEu1SHE4/h3nFq8xch/ybAAQZ53@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1z2cWOtNzHmZC1FeZL25CsRi53MqFEN7IfGOX7XQR0OLFvu9x
+	wBnDqX14OHOuyqqQQ6+HlHb87viLHqHQ1n5D/yYMeUDlbRj0zO2S
+X-Gm-Gg: ASbGncsGuZ7wjRMB2Gjp/GNDozuepRqQFwiZ2aYesZi0E9cJi931jagv+n+W71ZYH4l
+	7Dkkzi//rwVlwxEP5dDXt+yxLX4wVxrftANsfBqsOQIU6ZixJRh2AdOvhfNMSAP3Nf9wyAof58r
+	Uza6656YWI6MKHMV1uNwieo18izVgj/ZyL537+uEPwY6H0/Uo+DwH3p64cEDwdHRoFCnbpGMwUV
+	6/S3olmjAthWDxq9kZ7Ta6pqRZz3hIixcBKTsjd0UBBUMjx5Ghj0u5FMtn4S0i8BUu9hOf/KUf6
+	aUZaiZYgZ0UbxBaHPtkr64O/4Q6BouUOm6jIxZHdny/4brC+jA==
+X-Google-Smtp-Source: AGHT+IH68TTuhENvYMBVibjVTmGrUAIBmwlMSF4lzlrMkZQD90CN6i4oKdfqdXSCYQRlTI+LIK96VA==
+X-Received: by 2002:a17:90b:38ca:b0:2ee:e945:5355 with SMTP id 98e67ed59e1d1-2fce86cf118mr21465186a91.19.1740425226496;
+        Mon, 24 Feb 2025 11:27:06 -0800 (PST)
+Received: from localhost (maglev-oncall.nvidia.com. [216.228.125.128])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe6a3da759sm31947a91.13.2025.02.24.11.27.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 11:27:05 -0800 (PST)
+Date: Mon, 24 Feb 2025 14:27:03 -0500
+From: Yury Norov <yury.norov@gmail.com>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org, rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+	dmitry.torokhov@gmail.com, mchehab@kernel.org,
+	awalls@md.metrocast.net, hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+	louis.peens@corigine.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, akpm@linux-foundation.org, hpa@zytor.com,
+	alistair@popple.id.au, linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+	jernej.skrabec@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH 02/17] bitops: Add generic parity calculation for u64
+Message-ID: <Z7zIBwH4aUA7G9MY@thinkpad>
+References: <20250223164217.2139331-1-visitorckw@gmail.com>
+ <20250223164217.2139331-3-visitorckw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|LV8PR11MB8771:EE_
-X-MS-Office365-Filtering-Correlation-Id: f09ea50c-43c9-4907-350c-08dd5508d643
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bWFscndkK243eHlzTVF5d2ltT014aEQxa2pzTVhFend6dCtsQmtoM3BGdHpN?=
- =?utf-8?B?NTA0Wnl0bStTcDBFOWVWVVNpYVhWWGJBVHZiYXc0TUZ0TkhTMmY0NlNqeGFQ?=
- =?utf-8?B?MkhUMVNENmM5MjhHbFEyWWtDVG9KRXRoWCtOYWNubGlhYTRvL05tMlpzeGtu?=
- =?utf-8?B?Mjl5Z09UQjRiUFhNclpZZFpSUnYwWmhFRm1oVzJpZjU0eStjWWR4Z2U1NjFW?=
- =?utf-8?B?NDJVTEREYkhQTFdUbUYyQ2hncUhuNGVhR0FqZ1ViWVlERXl5WDM3cG9TeUdZ?=
- =?utf-8?B?UmFRRzgzV014bVNpU2xOYTNqcHdzbGpaSXVyV2VocUtVREJFUVF5QklLdlZO?=
- =?utf-8?B?ZnJNWG1VUmJjTUJ5bGUvZVcrWWdKOHVIWUZYWmE1RHVBVnM3bVBpWG9TdHBG?=
- =?utf-8?B?VWpnZUt4VjdIZ0tGTUJ1cmRISmMycVROTlZnSXhtY0ZGM01nNjljeEs3UWNE?=
- =?utf-8?B?c1FlQWRUNUFhcDhTN3h0b1JnYythT3pQdkxwOFZURTlmQzFFMGhaRUZYTktR?=
- =?utf-8?B?UUdPVmFrNkNqYW1JekkwbWVpODFEK2FZK0g0N0FLUytvOTBqUFVtSThYRE9o?=
- =?utf-8?B?d0FOVUtwNnhJcTI2NTlySjVoNWFrMTVwUTFoTEhDU1J4SGZyV1g5ektZTUt2?=
- =?utf-8?B?Z3krTDlPZzdSZ3VIRmo3Tm5lcFFPVDhUQXZJNnJ0UENIR29zM0dEUWZTSXlL?=
- =?utf-8?B?OEJaN1FncHU5WlZaZHpVRjhFWTJGWVJMR3FSNXMrUVVWdmQwemtyYjFnNS9Q?=
- =?utf-8?B?a3FEYlJMQVBqemhBZjNmMXlxaE40bjA1RDVwK2hXRjhjR0pnUFlmQVAyaWhS?=
- =?utf-8?B?S0ZGcUZhNEl4RVhwYkMrUUp6bi9PN21iVUpJaHI3ZjQ3RmFIYVRNOEk0U2V5?=
- =?utf-8?B?Z0VYYjVVMVVubWxxaExwVUtTTUFITHN0eGF3MllUNG85dWp5RjY1K2MwUGR3?=
- =?utf-8?B?UjdDdm9GS0dmdklTNFI3VzVJMzZ6RzZEYlUwRXJGdEpTUVdsOFlIcE1JYmFI?=
- =?utf-8?B?WGF2ZkEvSEp2QjlxL0hjUEpweWNsR0RBNUM5dng1YUFYUm1HTWNyeW84MkEy?=
- =?utf-8?B?cGVsQjFpZHBwdlZ5cXFzcW5pazBKQ0YycHgyOUppVVlTejFiMHRxdExvOS9v?=
- =?utf-8?B?NXVIZkNiTS9MRkpVeTBDOGVmcjY3dVVoMUM0Lzd4cVZmMlE3VVFXM1g3U2NZ?=
- =?utf-8?B?RHd6RFJRTzBMQ3VCb0hjT1UzbGIrOGpqdDA4Tkdib2JiVXVLYk0xdEd4RWVQ?=
- =?utf-8?B?WjVMa1BQNXJYTE8xZ3FXOFpzV21DZVVGWUtxYXBENDFLaXU1UGxUVFVJRFVm?=
- =?utf-8?B?aVlhbnJZZCtCTWN4ZVNiSCtNTlhtKzJYOFduaE41WHlGeE1ybHk5QkNzK1g5?=
- =?utf-8?B?c3lDYWJWcU9BUlo1K0VIQXpJZGlXSmZKa3J0M2VPN2xMT0lkWlAzTVVDczRz?=
- =?utf-8?B?V3BIZlhIYzBUUS8xMlBHSzdCT3dKVUxGOU9jVWQzSG9TZERTME4ybkQxR2F6?=
- =?utf-8?B?MzlMTk5sdkY4MTU2V3VpRldlNldrN1NPVEtoM2NnU1llS2hsbDNEVHJPcDFM?=
- =?utf-8?B?UGRXdk41UGtXdjBXOFlOMFdiSXVCNWZuQ2ZxL2R5Mzhja3hWaWx3eUY0MlhK?=
- =?utf-8?B?aktCK3ZEZk8rVFdlaTJHeFV6QmZQaE43WFh4VnFVdzAzalY1ejNBemdwV1JE?=
- =?utf-8?B?bytNbmY3YkVDQTZyaGduWk9HbnhHRVdsK3JXVmo5Vzh6WFQ0UlhIMUNabXZl?=
- =?utf-8?B?Z1I5cVN1ckdmUVNMWEpMWXV2a1BDZENsRnhEckk2b2xBRGd5MmpCMGRVQkow?=
- =?utf-8?B?b2k3NlRyUWxkYXVrSURkQT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Uk1xZ0lPU2cydmZ6NUJOYVpqQWN6a1VtUGtGZkwyQW5hUjRoc1pud0xTcXVa?=
- =?utf-8?B?WU82Mnp3V1ZLVys1MElxeGtTb0xzWlVKd1g2LzlQRWdXRmFnd2ZRNUtIQjNU?=
- =?utf-8?B?Z3p0bW1iU01IRWRscVRwM04zNDZOanZtVEdtWDdRbmZRK3RWQXdBOXFqNkF0?=
- =?utf-8?B?N29Sak1EODJycG9YaFFvM09nWllYODVqQlVybFhYUGNMTTJuS1RJWG1GQ1dR?=
- =?utf-8?B?NXNwWTRRRnh0SkVzR3pjKzFua0lYR0ZWR1Z3bGpLUlZSZGEydi96QUJUekVO?=
- =?utf-8?B?T0prTk9jREhlT2NkdXVRS3JIVGY4SXIzbzUvVEt6QlhYdFo3NTk2dFpWSzQw?=
- =?utf-8?B?UkIycGJVSUhMZ3ZPalJwMVRDa1I5QkJ4RGxhUDJBb2U4RXJEYkNvcDNrVkd6?=
- =?utf-8?B?YlA5L0Z2MHhBSVJBWmVpSW5yT0pCVGtWRlNWZWpHUVlJUVpQeW05eVNEVnRK?=
- =?utf-8?B?K1p4ZDN3eHFvNnRtV3BQM2xxTXJWRE1uc3kzSnNqZzRSWkdhZjVHQzNKVHI3?=
- =?utf-8?B?NjNiUlkzRjFBQWppYSt2Q0dLUUgxcUw1MXkzNTlybTg5Y3EyNy9uVjFDY2J5?=
- =?utf-8?B?c3lJcm5QZHppbTVra1NkZ29qRVZkbG5lRENkbkxkUjU3TFRucnkyUDVSZWpu?=
- =?utf-8?B?NVBNU1lKTnRvam52eVVLYllrVEY2V3JaYkVGbXFmOC8zaGZqU3hQY2lKOVND?=
- =?utf-8?B?cVRuUU5jTU9FQ0syazI4TjEwTXZ1MEJyVFR4ajhJV1F6RnR4SVNweUZPSkMr?=
- =?utf-8?B?ZVRRTlkyRHJuV21ZMHgyK1F5NUJ0eHlsWC8wWERhQXZnZDVCKzkwODEzZnA4?=
- =?utf-8?B?N1JOcHBzWG1JSVFRSmN1bVNyc2tFdE0zZnRpRnRzWkdhczZsQWRqU211THZy?=
- =?utf-8?B?SkwycXN6emk2U2lSZVNGeEw2NlZ4VUkxRDB2QUNJZ1diUVJnS25LVm1Nd0cv?=
- =?utf-8?B?ajJ3eklHZTdrK1dxUzdheVpVUlRvQUJQYzhzK25kRDNtQ1RlRm9Nei8ydE41?=
- =?utf-8?B?QVh6L0xLaGFhRFVCd2xFaC9TMkpKaUpUelhzUWNJUkU4UERZNTc1KzNxcmNR?=
- =?utf-8?B?VmcxV1RnaVFrWG1tblh4WklTQlJOMXJsaEFQSUg5VVdjUUQvR0RaSG1ZTUUv?=
- =?utf-8?B?ZWo4WmRWekU4V05XdzFWUmd2Y1NJVFg3U1IzV2VCQVBzVXdBS2dUTDZQRnpY?=
- =?utf-8?B?cWhUZVhYUjRXMWVlMEtJZUNoT1Z0dVUrTTFyakhlc2htc3F0S0JhQkpsTWo5?=
- =?utf-8?B?UE5SRUYvMkFsTXRuaHY0OG5aSWFtYTdnYyt4ZE1mRlZLWjk5VUIreEIwRDhR?=
- =?utf-8?B?aTYxVzFmRkpIWXBBeG1ha3Y5QnhJVSt6bXFHV3RIeGxTZmY3YUhjNUlzM3Iz?=
- =?utf-8?B?ZFo2OWdMWVpmcHE3TlZrV01LWHYzbGVzN1UwRm9LR0dNb2ZRYnlMaGNwTHFa?=
- =?utf-8?B?bDNFbC92SU1tcXZ0UTZQd3RiZDZ2V09BWForNU1lS0p0Wjl0bUU5clcxN0xr?=
- =?utf-8?B?QmZxRndjbnk4MnNHaW9jK3ZFUGVsbFdidXo1bTJRQjI2SVpDMDh5Y0Vxb1pV?=
- =?utf-8?B?dWt5dFpXNlJOMTB3RDF4T0ZkZUNCajJ6Y3c2MU4xeGVCcC9SckRUaVNKam9h?=
- =?utf-8?B?cityZmY0V1k0RWxjRmwwN29Pc21PZHlUZ3phOVlTT3Y0TmlvaFc3RjYxVUUr?=
- =?utf-8?B?cEt4OCthVW1zc3JXL3lsRjJnSEJqM0tVT0RIT0NIZmY0RHZtcDNzOWhCRjRD?=
- =?utf-8?B?YUlvakRhWGwyUmxMZ0ptV0piRnB0bjBvSlR0b2lsSmxkbVY5cEZ6Rzc3K1o2?=
- =?utf-8?B?Z3Bvd2N1L2REWk5oQmVIdkZ2ejlzNzV6aVhGV1duOVZhd0NCekQvNmh0SkFz?=
- =?utf-8?B?THdpTDV1L0I0QlphNUVsNFdxZG9BbDFwR1NmSG8vSEl4TktrWEZhb2JTblcv?=
- =?utf-8?B?TmQwN0VET2ViL2JjM1dMa2NGVnQ1Wm9TUkxKVXc0bVp4RjVteCs5N3hNSS9w?=
- =?utf-8?B?eXAvc3dyQXkzYnBadWxIeW03OEZoeEtYRTJUYjhWTkZLc0ZnamdvaGI1WlZy?=
- =?utf-8?B?aTBCUGF6NWsvM0xtb0R4dVQ1UFV3a25ieWlrOGVQQnhOSjg0OVVHdmF1WkFq?=
- =?utf-8?B?THpUUjl2VUQrM0hnMXF1Z01OZ3VRbWFiQ2R3QkJ1cnNCK2NnTmIydjkvaVRS?=
- =?utf-8?B?Y1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f09ea50c-43c9-4907-350c-08dd5508d643
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2025 19:24:20.1201
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mUzR+1LQGshtYJtvaixGBR7x+ZSkM5B0KpV73UYss2mOznHQF+WzEuBogU5E9xzB5jeZWnV7qGRzssUxf+1wcpoFlIXsBTvVcIYO1GYR4lI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8771
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250223164217.2139331-3-visitorckw@gmail.com>
 
+On Mon, Feb 24, 2025 at 12:42:02AM +0800, Kuan-Wei Chiu wrote:
+> Several parts of the kernel open-code parity calculations using
+> different methods. Add a generic parity64() helper implemented with the
+> same efficient approach as parity8().
 
-
-On 2/21/2025 7:49 AM, Piotr Kwapulinski wrote:
-> The commit 23c0e5a16bcc ("ixgbe: Add link management support for E610
-> device") introduced incorrect media type detection for E610 device. It
-> reproduces when advertised speed is modified after driver reload. Clear
-> the previous outdated PHY type high value.
-> 
-> Reproduction steps:
-> modprobe ixgbe
-> ethtool -s eth0 advertise 0x1000000000000
-> modprobe -r ixgbe
-> modprobe ixgbe
-> ethtool -s eth0 advertise 0x1000000000000
-> Result before the fix:
-> netlink error: link settings update failed
-> netlink error: Invalid argument
-> Result after the fix:
-> No output error
-> 
-> Fixes: 23c0e5a16bcc ("ixgbe: Add link management support for E610 device")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+No reason to add parity32() and parity64() in separate patches
+ 
+> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
 > ---
-> v1 -> v2
->    More commit message details and reproduction steps added
-> v2 -> v3
->    More details in reproduction steps added
-
-Please remember you must wait at least 24 hours between submissions that 
-include netdev
-https://docs.kernel.org/process/maintainer-netdev.html#resending-after-review
-
-Thanks,
-Tony
-
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>  include/linux/bitops.h | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> index 683c668..0dfefd2 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> @@ -1453,9 +1453,11 @@ enum ixgbe_media_type ixgbe_get_media_type_e610(struct ixgbe_hw *hw)
->   			hw->link.link_info.phy_type_low = 0;
->   		} else {
->   			highest_bit = fls64(le64_to_cpu(pcaps.phy_type_low));
-> -			if (highest_bit)
-> +			if (highest_bit) {
->   				hw->link.link_info.phy_type_low =
->   					BIT_ULL(highest_bit - 1);
-> +				hw->link.link_info.phy_type_high = 0;
-> +			}
->   		}
->   	}
->   
+> diff --git a/include/linux/bitops.h b/include/linux/bitops.h
+> index fb13dedad7aa..67677057f5e2 100644
+> --- a/include/linux/bitops.h
+> +++ b/include/linux/bitops.h
+> @@ -281,6 +281,28 @@ static inline int parity32(u32 val)
+>  	return (0x6996 >> (val & 0xf)) & 1;
+>  }
+>  
+> +/**
+> + * parity64 - get the parity of an u64 value
+> + * @value: the value to be examined
+> + *
+> + * Determine the parity of the u64 argument.
+> + *
+> + * Returns:
+> + * 0 for even parity, 1 for odd parity
+> + */
+> +static inline int parity64(u64 val)
+> +{
+> +	/*
+> +	 * One explanation of this algorithm:
+> +	 * https://funloop.org/codex/problem/parity/README.html
+
+This is already referenced in sources. No need to spread it for more.
+
+> +	 */
+> +	val ^= val >> 32;
+> +	val ^= val >> 16;
+> +	val ^= val >> 8;
+> +	val ^= val >> 4;
+> +	return (0x6996 >> (val & 0xf)) & 1;
+
+It's better to avoid duplicating the same logic again and again.
+
+> +}
+> +
+
+So maybe make it a macro?
+
+
+From f17a28ae3429f49825d65ebc0f7717c6a191a3e2 Mon Sep 17 00:00:00 2001
+From: Yury Norov <yury.norov@gmail.com>
+Date: Mon, 24 Feb 2025 14:14:27 -0500
+Subject: [PATCH] bitops: generalize parity8()
+
+The generic parity calculation approach may be easily generalized for
+other standard types. Do that and drop sub-optimal implementation of
+parity calculation in x86 code.
+
+Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+---
+ arch/x86/kernel/bootflag.c | 14 +-----------
+ include/linux/bitops.h     | 47 +++++++++++++++++++++++++++-----------
+ 2 files changed, 35 insertions(+), 26 deletions(-)
+
+diff --git a/arch/x86/kernel/bootflag.c b/arch/x86/kernel/bootflag.c
+index 3fed7ae58b60..4a85c69a28f8 100644
+--- a/arch/x86/kernel/bootflag.c
++++ b/arch/x86/kernel/bootflag.c
+@@ -2,6 +2,7 @@
+ /*
+  *	Implement 'Simple Boot Flag Specification 2.0'
+  */
++#include <linux/bitops.h>
+ #include <linux/types.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+@@ -20,19 +21,6 @@
+ 
+ int sbf_port __initdata = -1;	/* set via acpi_boot_init() */
+ 
+-static int __init parity(u8 v)
+-{
+-	int x = 0;
+-	int i;
+-
+-	for (i = 0; i < 8; i++) {
+-		x ^= (v & 1);
+-		v >>= 1;
+-	}
+-
+-	return x;
+-}
+-
+ static void __init sbf_write(u8 v)
+ {
+ 	unsigned long flags;
+diff --git a/include/linux/bitops.h b/include/linux/bitops.h
+index c1cb53cf2f0f..29601434f5f4 100644
+--- a/include/linux/bitops.h
++++ b/include/linux/bitops.h
+@@ -230,10 +230,10 @@ static inline int get_count_order_long(unsigned long l)
+ }
+ 
+ /**
+- * parity8 - get the parity of an u8 value
++ * parity - get the parity of a value
+  * @value: the value to be examined
+  *
+- * Determine the parity of the u8 argument.
++ * Determine parity of the argument.
+  *
+  * Returns:
+  * 0 for even parity, 1 for odd parity
+@@ -241,24 +241,45 @@ static inline int get_count_order_long(unsigned long l)
+  * Note: This function informs you about the current parity. Example to bail
+  * out when parity is odd:
+  *
+- *	if (parity8(val) == 1)
++ *	if (parity(val) == 1)
+  *		return -EBADMSG;
+  *
+  * If you need to calculate a parity bit, you need to draw the conclusion from
+  * this result yourself. Example to enforce odd parity, parity bit is bit 7:
+  *
+- *	if (parity8(val) == 0)
++ *	if (parity(val) == 0)
+  *		val ^= BIT(7);
++ *
++ * One explanation of this algorithm:
++ * https://funloop.org/codex/problem/parity/README.html
+  */
+-static inline int parity8(u8 val)
+-{
+-	/*
+-	 * One explanation of this algorithm:
+-	 * https://funloop.org/codex/problem/parity/README.html
+-	 */
+-	val ^= val >> 4;
+-	return (0x6996 >> (val & 0xf)) & 1;
+-}
++#define parity(val)					\
++({							\
++	u64 __v = (val);				\
++	int __ret;					\
++	switch (BITS_PER_TYPE(val)) {			\
++	case 64:					\
++		__v ^= __v >> 32;			\
++		fallthrough;				\
++	case 32:					\
++		__v ^= __v >> 16;			\
++		fallthrough;				\
++	case 16:					\
++		__v ^= __v >> 8;			\
++		fallthrough;				\
++	case 8:						\
++		__v ^= __v >> 4;			\
++		__ret =  (0x6996 >> (__v & 0xf)) & 1;	\
++		break;					\
++	default:					\
++		BUILD_BUG();				\
++	}						\
++	__ret;						\
++})
++
++#define parity8(val)	parity((u8)(val))
++#define parity32(val)	parity((u32)(val))
++#define parity64(val)	parity((u64)(val))
+ 
+ /**
+  * __ffs64 - find first set bit in a 64 bit word
+-- 
+2.43.0
 
 
