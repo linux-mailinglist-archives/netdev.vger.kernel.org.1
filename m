@@ -1,87 +1,74 @@
-Return-Path: <netdev+bounces-169241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F916A430C6
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:25:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 199FBA43118
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 00:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BFC3BB45A
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:24:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05B8616ACE5
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 23:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C499E20E33F;
-	Mon, 24 Feb 2025 23:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED7A20B814;
+	Mon, 24 Feb 2025 23:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lKbwJDOJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmYYiaDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FEA20E6E0
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07C01C8602
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 23:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740439397; cv=none; b=XIpdlVMKIwYiUTV95jPKy3UPFqNTLyBQInwmsQfGG/XrW9/EzZnSzFjIBIWLXciDI9pOrnIoN7qNnt/OrRumBahUiAF05ca7ddVcv9f/f0tTvB5Fr04cbBdFbw2YhOYWvEOJQHiFmnm3pTMzPOSypV2HuVUeG29ZR03k0FbS2hM=
+	t=1740440530; cv=none; b=U35glny3T6s7ttpFa6xJSLPcq3rwijWMNh1MhMtq87Unuylm3ZE/V17D4e5kFl4E4IK+Sdt9y2jUMIGIyGI1kpjM7z2jgwPfBjw5Gl0/IaamXNSN6H2SuAFZWUHQkKVPlgoTKWY50VdR7Jc7/cmr+5eE9Pw23evKtiMmOBve7eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740439397; c=relaxed/simple;
-	bh=hPujxlQXl1wFkVtGHaPX61YAUwQi+g+Z5zLvtQWyEu0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AnzXmaw9Ax7ETB4HeQZzuHI/jRPf72yMgaOqeCA6fJHmkL9VRiUGqQHAz6iH8EaHyzMzAsGR0pJsijy221ludlF2FD78J9KLV0ApluytxFS756DUO4PreY9d1q4cCqy8IVoiVTaWIW7IsjKSk8bN4cS4mOBUs2M6c3Ca5uC62jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lKbwJDOJ; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740439396; x=1771975396;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hPujxlQXl1wFkVtGHaPX61YAUwQi+g+Z5zLvtQWyEu0=;
-  b=lKbwJDOJinK53TjWj2+Op/C0UvU/UJTvlg7wL6DOLUMGlcuVLJEvel3b
-   dfO+7e/P7qLGeOGHTLHcBuv2GMP7TJ83BNpIM7rE61OhJw7jPeRytz5pN
-   DQLycqz0hT7IV3ZfOmivtzWd2UndVxvv/qeJFBctJkobXouzecXqlfR8B
-   YVd2pnIvtVnYR93lCCHGJ20AKiEQGusaBk+20ZIO4SdZmFYFtAnL0fxyo
-   mNezMFQjcxgbfxQLuZTVPcqv6oinmaDn3vUkYv396PJ4s+EqEaMQLoiDT
-   mA3aW8mI3fJCBMjNi0xEyu1RC2OOV0Tvgpr3kUDpJgTtpoFw/T/A3KfVN
-   A==;
-X-CSE-ConnectionGUID: IU+x8ltSSVeV3yUt4sQ82Q==
-X-CSE-MsgGUID: qmggP9YZSiuGgq9DASoIMA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40406735"
-X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="40406735"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:23:16 -0800
-X-CSE-ConnectionGUID: IeYZEdD0SDC/I4K0ahO3bQ==
-X-CSE-MsgGUID: S9jyQtTjT32k7VP+6oSkeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
-   d="scan'208";a="115997860"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.245.244.43])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 15:23:10 -0800
-From: Ahmed Zaki <ahmed.zaki@intel.com>
+	s=arc-20240116; t=1740440530; c=relaxed/simple;
+	bh=16zL/XF6wfUSDCzrCVzmUwXhl5SdLyuBXgX+5oIZkWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ixudhOQwIYy1FAtqel7B9uZcvaiGcXjhksnYfdxHvV5IcTQqH+8x25ZfhE5POBn8E/79401DcKlr9EzkjZo2fZ09X6z6isU6b2YvaKGfNthLN++Dng3QkwwPYh7zcjMX5g65bBM9B6zU6f+r5Pma/61/g5qqrXB7CJKnMCVsEAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PmYYiaDG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740440527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=93uY6gagY63USM5e5KI9PRClg9kYawtsBZpalOdSzx0=;
+	b=PmYYiaDGmwPhkupT6IwGWxcPaVfOngREktU8QhtdSA1x9fKMXeAh1LPg0RC+o9VcBKC9AQ
+	XLm5/9rkt2mzrmNIVW3cn+tPnO7AdZxR49llpI2/qR0lwyG6j1a89J2qNPjk+5E8YEYP1c
+	sNuSlHnVragTn0FWKIRUsNq6xVwQ7bI=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-275-j6czRUGhMUiy3r8HCtlU9Q-1; Mon,
+ 24 Feb 2025 18:42:02 -0500
+X-MC-Unique: j6czRUGhMUiy3r8HCtlU9Q-1
+X-Mimecast-MFC-AGG-ID: j6czRUGhMUiy3r8HCtlU9Q_1740440520
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 88B08196E078;
+	Mon, 24 Feb 2025 23:42:00 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.9])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B6DA81800945;
+	Mon, 24 Feb 2025 23:41:57 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	michael.chan@broadcom.com,
-	tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jdamato@fastly.com,
-	shayd@nvidia.com,
-	akpm@linux-foundation.org,
-	shayagr@amazon.com,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v9 6/6] selftests: drv-net: add tests for napi IRQ affinity notifiers
-Date: Mon, 24 Feb 2025 16:22:27 -0700
-Message-ID: <20250224232228.990783-7-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250224232228.990783-1-ahmed.zaki@intel.com>
-References: <20250224232228.990783-1-ahmed.zaki@intel.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 00/15] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
+Date: Mon, 24 Feb 2025 23:41:37 +0000
+Message-ID: <20250224234154.2014840-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,211 +76,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: Jakub Kicinski <kuba@kernel.org>
+Here are some patches that fix an occasional hang that's only really
+encountered when rmmod'ing the kafs module.  Arguably, this could also go
+through the vfs tree, but I have a bunch more primarily crypto and rxrpc
+patches that need to go through net-next on top of this[1].
 
-Add tests to check that the napi retained the IRQ after down/up,
-multiple changes in the number of rx queues and after
-attaching/releasing XDP program.
+Now, at the beginning of this set, I've included five fix patches that are
+already committed to the net/main branch but that need to be applied first,
+but haven't made their way into net-next/main or upstream as yet:
 
-Tested on ice and idpf:
+    rxrpc: rxperf: Fix missing decoding of terminal magic cookie
+    rxrpc: peer->mtu_lock is redundant
+    rxrpc: Fix locking issues with the peer record hash
+    afs: Fix the server_list to unuse a displaced server rather than putting it
+    afs: Give an afs_server object a ref on the afs_cell object it points to
 
-   # NETIF=<iface> tools/testing/selftests/drivers/net/hw/irq.py
-    KTAP version 1
-    1..4
-    ok 1 irq.check_irqs_reported
-    ok 2 irq.check_reconfig_queues
-    ok 3 irq.check_reconfig_xdp
-    ok 4 irq.check_down
-    # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+On top of those, I have:
 
-Tested-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../testing/selftests/drivers/net/hw/Makefile |  4 +
- tools/testing/selftests/drivers/net/hw/irq.py | 99 +++++++++++++++++++
- .../selftests/drivers/net/hw/xdp_dummy.bpf.c  | 13 +++
- .../selftests/drivers/net/lib/py/env.py       |  8 +-
- 4 files changed, 123 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/drivers/net/hw/irq.py
- create mode 100644 tools/testing/selftests/drivers/net/hw/xdp_dummy.bpf.c
+ (1) Remove the "-o autocell" mount option.  This is obsolete with the
+     dynamic root and removing it makes the next patch slightly easier.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index ae783e18be83..73e7b826a141 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -10,6 +10,7 @@ TEST_PROGS = \
- 	ethtool_rmon.sh \
- 	hw_stats_l3.sh \
- 	hw_stats_l3_gre.sh \
-+	irq.py \
- 	loopback.sh \
- 	nic_link_layer.py \
- 	nic_performance.py \
-@@ -33,9 +34,12 @@ TEST_INCLUDES := \
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := ncdevmem
- TEST_GEN_FILES += $(YNL_GEN_FILES)
-+TEST_GEN_FILES += $(patsubst %.c,%.o,$(wildcard *.bpf.c))
- 
- include ../../../lib.mk
- 
- # YNL build
- YNL_GENS := ethtool netdev
- include ../../../net/ynl.mk
-+
-+include ../../../net/bpf.mk
-diff --git a/tools/testing/selftests/drivers/net/hw/irq.py b/tools/testing/selftests/drivers/net/hw/irq.py
-new file mode 100755
-index 000000000000..42ab98370245
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/irq.py
-@@ -0,0 +1,99 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_ge, ksft_eq
-+from lib.py import KsftSkipEx
-+from lib.py import ksft_disruptive
-+from lib.py import EthtoolFamily, NetdevFamily
-+from lib.py import NetDrvEnv
-+from lib.py import cmd, ip, defer
-+
-+
-+def read_affinity(irq) -> str:
-+    with open(f'/proc/irq/{irq}/smp_affinity', 'r') as fp:
-+        return fp.read().lstrip("0,").strip()
-+
-+
-+def write_affinity(irq, what) -> str:
-+    if what != read_affinity(irq):
-+        with open(f'/proc/irq/{irq}/smp_affinity', 'w') as fp:
-+            fp.write(what)
-+
-+
-+def check_irqs_reported(cfg) -> None:
-+    """ Check that device reports IRQs for NAPI instances """
-+    napis = cfg.netnl.napi_get({"ifindex": cfg.ifindex}, dump=True)
-+    irqs = sum(['irq' in x for x in napis])
-+
-+    ksft_ge(irqs, 1)
-+    ksft_eq(irqs, len(napis))
-+
-+
-+def _check_reconfig(cfg, reconfig_cb) -> None:
-+    napis = cfg.netnl.napi_get({"ifindex": cfg.ifindex}, dump=True)
-+    for n in reversed(napis):
-+        if 'irq' in n:
-+            break
-+    else:
-+        raise KsftSkipEx(f"Device has no NAPI with IRQ attribute (#napis: {len(napis)}")
-+
-+    old = read_affinity(n['irq'])
-+    # pick an affinity that's not the current one
-+    new = "3" if old != "3" else "5"
-+    write_affinity(n['irq'], new)
-+    defer(write_affinity, n['irq'], old)
-+
-+    reconfig_cb(cfg)
-+
-+    ksft_eq(read_affinity(n['irq']), new, comment="IRQ affinity changed after reconfig")
-+
-+
-+def check_reconfig_queues(cfg) -> None:
-+    def reconfig(cfg) -> None:
-+        channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
-+        if channels['combined-count'] == 0:
-+            rx_type = 'rx'
-+        else:
-+            rx_type = 'combined'
-+        cur_queue_cnt = channels[f'{rx_type}-count']
-+        max_queue_cnt = channels[f'{rx_type}-max']
-+
-+        cmd(f"ethtool -L {cfg.ifname} {rx_type} 1")
-+        cmd(f"ethtool -L {cfg.ifname} {rx_type} {max_queue_cnt}")
-+        cmd(f"ethtool -L {cfg.ifname} {rx_type} {cur_queue_cnt}")
-+
-+    _check_reconfig(cfg, reconfig)
-+
-+
-+def check_reconfig_xdp(cfg) -> None:
-+    def reconfig(cfg) -> None:
-+        ip(f"link set dev %s xdp obj %s sec xdp" %
-+            (cfg.ifname, cfg.rpath("xdp_dummy.bpf.o")))
-+        ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+    _check_reconfig(cfg, reconfig)
-+
-+
-+@ksft_disruptive
-+def check_down(cfg) -> None:
-+    def reconfig(cfg) -> None:
-+        ip("link set dev %s down" % cfg.ifname)
-+        ip("link set dev %s up" % cfg.ifname)
-+
-+    _check_reconfig(cfg, reconfig)
-+
-+
-+def main() -> None:
-+    with NetDrvEnv(__file__, nsim_test=False) as cfg:
-+        cfg.ethnl = EthtoolFamily()
-+        cfg.netnl = NetdevFamily()
-+
-+        ksft_run([check_irqs_reported, check_reconfig_queues,
-+                  check_reconfig_xdp, check_down],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/drivers/net/hw/xdp_dummy.bpf.c b/tools/testing/selftests/drivers/net/hw/xdp_dummy.bpf.c
-new file mode 100644
-index 000000000000..d988b2e0cee8
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xdp_dummy.bpf.c
-@@ -0,0 +1,13 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#define KBUILD_MODNAME "xdp_dummy"
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+
-+SEC("xdp")
-+int xdp_dummy_prog(struct xdp_md *ctx)
-+{
-+	return XDP_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index 96b33b5ef9dd..fd4d674e6c72 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -58,14 +58,20 @@ class NetDrvEnv(NetDrvEnvBase):
-     """
-     Class for a single NIC / host env, with no remote end
-     """
--    def __init__(self, src_path, **kwargs):
-+    def __init__(self, src_path, nsim_test=None, **kwargs):
-         super().__init__(src_path)
- 
-         self._ns = None
- 
-         if 'NETIF' in self.env:
-+            if nsim_test is True:
-+                raise KsftXfailEx("Test only works on netdevsim")
-+
-             self.dev = ip("-d link show dev " + self.env['NETIF'], json=True)[0]
-         else:
-+            if nsim_test is False:
-+                raise KsftXfailEx("Test does not work on netdevsim")
-+
-             self._ns = NetdevSimDev(**kwargs)
-             self.dev = self._ns.nsims[0].dev
-         self.ifname = self.dev['ifname']
--- 
-2.43.0
+ (2) Change how the dynamic root mount is constructed.  Currently, the root
+     directory is (de)populated when it is (un)mounted if there are cells
+     already configured and, further, pairs of automount points have to be
+     created/removed each time a cell is added/deleted.
+
+     This is changed so that readdir on the root dir lists all the known
+     cell automount pairs plus the @cell symlinks and the inodes and
+     dentries are constructed by lookup on demand.  This simplifies the
+     cell management code.
+
+ (3) A few improvements to the afs_volume tracepoint.
+
+ (4) A few improvements to the afs_server tracepoint.
+
+ (5) Pass trace info into the afs_lookup_cell() function to allow the trace
+     log to indicate the purpose of the lookup.
+
+ (6) Remove the 'net' parameter from afs_unuse_cell() as it's superfluous.
+
+ (7) In rxrpc, allow a kernel app (such as kafs) to store a word of
+     information on rxrpc_peer records.
+
+ (8) Use the information stored on the rxrpc_peer record to point to the
+     afs_server record.  This allows the server address lookup to be done
+     away with.
+
+ (9) Simplify the afs_server ref/activity accounting to make each one
+     self-contained and not garbage collected from the cell management work
+     item.
+
+(10) Simplify the afs_cell ref/activity accounting to make each one of
+     these also self-contained and not driven by a central management work
+     item.
+
+     The current code was intended to make it such that a single timer for
+     the namespace and one work item per cell could do all the work
+     required to maintain these records.  This, however, made for some
+     sequencing problems when cleaning up these records.  Further, the
+     attempt to pass refs along with timers and work items made getting it
+     right rather tricky when the timer or work item already had a ref
+     attached and now a ref had to be got rid of.
+
+David
+
+The patches can be found on this branch also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-next
+
+Link: http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5 [1]
+
+David Howells (15):
+  rxrpc: rxperf: Fix missing decoding of terminal magic cookie
+  rxrpc: peer->mtu_lock is redundant
+  rxrpc: Fix locking issues with the peer record hash
+  afs: Fix the server_list to unuse a displaced server rather than
+    putting it
+  afs: Give an afs_server object a ref on the afs_cell object it points
+    to
+  afs: Remove the "autocell" mount option
+  afs: Change dynroot to create contents on demand
+  afs: Improve afs_volume tracing to display a debug ID
+  afs: Improve server refcount/active count tracing
+  afs: Make afs_lookup_cell() take a trace note
+  afs: Drop the net parameter from afs_unuse_cell()
+  rxrpc: Allow the app to store private data on peer structs
+  afs: Use the per-peer app data provided by rxrpc
+  afs: Fix afs_server ref accounting
+  afs: Simplify cell record handling
+
+ fs/afs/addr_list.c         |  50 +++
+ fs/afs/cell.c              | 436 +++++++++++----------------
+ fs/afs/cmservice.c         |  82 +----
+ fs/afs/dir.c               |   5 +-
+ fs/afs/dynroot.c           | 484 ++++++++++++-----------------
+ fs/afs/fs_probe.c          |  32 +-
+ fs/afs/fsclient.c          |   4 +-
+ fs/afs/internal.h          |  98 +++---
+ fs/afs/main.c              |  16 +-
+ fs/afs/mntpt.c             |   5 +-
+ fs/afs/proc.c              |  15 +-
+ fs/afs/rxrpc.c             |   8 +-
+ fs/afs/server.c            | 602 ++++++++++++++++---------------------
+ fs/afs/server_list.c       |   6 +-
+ fs/afs/super.c             |  25 +-
+ fs/afs/vl_alias.c          |   7 +-
+ fs/afs/vl_rotate.c         |   2 +-
+ fs/afs/volume.c            |  15 +-
+ include/net/af_rxrpc.h     |   2 +
+ include/trace/events/afs.h |  85 +++---
+ net/rxrpc/ar-internal.h    |   2 +-
+ net/rxrpc/input.c          |   2 -
+ net/rxrpc/peer_event.c     |   9 +-
+ net/rxrpc/peer_object.c    |  35 ++-
+ net/rxrpc/rxperf.c         |  12 +
+ 25 files changed, 922 insertions(+), 1117 deletions(-)
 
 
