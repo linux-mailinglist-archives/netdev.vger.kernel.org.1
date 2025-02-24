@@ -1,166 +1,128 @@
-Return-Path: <netdev+bounces-169189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE1F8A42E74
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:58:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF49A42E8B
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 22:03:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C70B1886AF6
-	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 20:58:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6513B2A79
+	for <lists+netdev@lfdr.de>; Mon, 24 Feb 2025 21:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA2261393;
-	Mon, 24 Feb 2025 20:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC0413C3F6;
+	Mon, 24 Feb 2025 21:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="lPItqs9C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6slrNY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFF625C6E1
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 20:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889C284A35
+	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 21:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740430705; cv=none; b=dqXXCj54knCauylSPMrSdVZOLgZx6tby7797AQutikOq4sDn0sl5r0KY/HrNKy5TOafCSGvjb/ZVGIa4eNsWCZEyDxkYPv87omBTAByC34iYOfSfS06FKdSUPa/Ad7I2G7eMLJniecTQXQHVt952DJiMGGOoBR5i58fEC5Cx9yc=
+	t=1740431007; cv=none; b=FcXtWfvub7lv+jshQXCDRLHwcOwk6O7DWZ+Ofmfl1qjcpmqZjajhXnqBhxtKJjKrr1OxjHfyLJJbHW4gld6023y/vL9CKdA7fStRCHa46udARis/AGj4Y8yTkS6wf9hM3fenO/V5NivtabKcft58jCys5WdkceDu308/O0p3WdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740430705; c=relaxed/simple;
-	bh=5NTBVZtPucMG0j4onj8D4B3Tzw8Ztr68uizMJjq18iU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JfnzOkr0irR4rkEupe5T/fN0wdh0B1t8reFalk8A7jF8nrIojL9HMu/iU2aU0IbmvZCjrf26udRmleJsMHgQRf9JZpDYi5GXvTKOnIuCEQcEcBlTcs9gTWrFXh1JeSYt+nep5CjCBO849OEpl5XaSo34WcYo7E3QXEY22klFH6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=lPItqs9C; arc=none smtp.client-ip=185.67.36.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id 45891240103
-	for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 21:58:21 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1740430701; bh=5NTBVZtPucMG0j4onj8D4B3Tzw8Ztr68uizMJjq18iU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:From;
-	b=lPItqs9CzEX3MHXDUteuWzg/eh47rC4iOuc0Nm5GK65+l2ZAsJ8ft7ZoO8yMutuwx
-	 a7ne/OwJHenS0lA6f0UYTpoGv1sKQCNbpyTamlYIsfoP9kzAXteH9o+oEeF+9MrIET
-	 3d9nnVEKTYM5M9wMFP1Bliy4QS/+FKrHwYQJBjRUjTbteQuqF7GTsKxPqjOyr01nnb
-	 IP4cuiktw+YifxM8GGgqDbleIUbE4OBVgFxqjvU+UPcuPpUd5rsCKk7jQbCFZmnhET
-	 nsZPdYZlionomJXwguYa/TmkvcsDt0X9LRmZshn5E2yv0PWIxRRBqlzfZ4SEeHrkIQ
-	 XM2loQdI6DGYw==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4Z1tP74dwRz9rxD;
-	Mon, 24 Feb 2025 21:58:19 +0100 (CET)
-Date: Mon, 24 Feb 2025 20:58:19 +0000
-From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-To: Rob Herring <robh@kernel.org>
-Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] dt-bindings: net: Convert fsl,gianfar-{mdio,tbi} to
- YAML
-Message-ID: <Z7zdawaVsQbBML95@probook>
-References: <20250220-gianfar-yaml-v1-0-0ba97fd1ef92@posteo.net>
- <20250220-gianfar-yaml-v1-1-0ba97fd1ef92@posteo.net>
- <20250221163651.GA4130188-robh@kernel.org>
+	s=arc-20240116; t=1740431007; c=relaxed/simple;
+	bh=FecevnrZjEY6MuxSUygLgUocjSQRIPcMELLd9y7TwaY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lb++n9MDISr7SwwReYRbKKeAgJWI/kYogoAJ/wclQzN5O9FeKaRJoKS7GidX6wohXFm6+KbQNUXjHb5o4AgyZG05JfB+gcWmTReUkVl/0somWsH1T+BN5xUSifRs+4lSHH7H6xfYtqn0wsAjGDCmoPuIA5JzUu+ur5EYKuAXONA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6slrNY/; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740431006; x=1771967006;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FecevnrZjEY6MuxSUygLgUocjSQRIPcMELLd9y7TwaY=;
+  b=n6slrNY/SL6+awQYMOn4iG3SrulH7OQjiG5J70Nzp1gphSfel1TtiLyu
+   6qw1WO1RGjY79S5vKECC6OrqQRCKPmMhQ07GevBiePSYMziqEA9fXdFne
+   sUF4iLeTNCEjGjagVHMZ8bnDhKDbDfaZ8OvsWpgh7643Gcuk0jxBJdMIi
+   ejP8IiU9sydP5glaUJRQ9Hu05Gf/UsBsMYwOAPluDBCptqXfQ9v8uvhvU
+   8Y1hriTDJiSiVl7tdiyWXQ/MWkuVP30LNJGTUer7pgRlOonc1zM9ZOVBU
+   Am0FopoSIdbyZDw8jk01/qTOCD3L30KuB7yomPHRYxJNYmsHQxEicSVPD
+   Q==;
+X-CSE-ConnectionGUID: SvW1aGK9R6ywWcWfg05Bag==
+X-CSE-MsgGUID: e/5sa79CRr2LFyJ8XCB0oA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="41470669"
+X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
+   d="scan'208";a="41470669"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 13:03:25 -0800
+X-CSE-ConnectionGUID: mQGPtJhjRQm+iy1rFWkBrA==
+X-CSE-MsgGUID: LP/yvMm5SL2xdY/pfLtUhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="121426750"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by orviesa005.jf.intel.com with ESMTP; 24 Feb 2025 13:03:23 -0800
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH iwl-next v2] ice: Allow 100M speed for E825C SGMII device
+Date: Mon, 24 Feb 2025 21:59:24 +0100
+Message-Id: <20250224205924.2861584-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250221163651.GA4130188-robh@kernel.org>
 
-On Fri, Feb 21, 2025 at 10:36:51AM -0600, Rob Herring wrote:
-> On Thu, Feb 20, 2025 at 06:29:21PM +0100, J. Neuschäfer wrote:
-> > Move the information related to the Freescale Gianfar (TSEC) MDIO bus
-> > and the Ten-Bit Interface (TBI) from fsl-tsec-phy.txt to a new binding
-> > file in YAML format, fsl,gianfar-mdio.yaml.
-> > 
-> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
-> > ---
-[...]
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - fsl,gianfar-tbi
-> > +      - fsl,gianfar-mdio
-> > +      - fsl,etsec2-tbi
-> > +      - fsl,etsec2-mdio
-> > +      - fsl,ucc-mdio
-> > +      - gianfar
-> 
-> Can you just comment out this to avoid the duplicate issue.
-> 
-> Though I think if you write a custom 'select' which looks for 
-> 'device_type = "mdio"' with gianfar compatible and similar in the other 
-> binding, then the warning will go away. 
+Add E825C 10GbE SGMII device to the list of devices supporting 100Mbit
+link mode. Without that change, 100Mbit link mode is ignored in ethtool
+interface. This change was missed while adding the support for E825C
+devices family.
 
-I'm not sure how the 'select' syntax works, is there a reference
-document I could read?
+Testing hints (please note, for previous version, 100baseT/Full entry
+was missing):
+[root@localhost]# ethtool eth3
+Settings for eth3:
+        Supported ports: [ TP ]
+        Supported link modes:   100baseT/Full
+                                1000baseT/Full
+                                10000baseT/Full
+        Supported pause frame use: Symmetric
+        Supports auto-negotiation: Yes
+        Supported FEC modes: None
+        Advertised link modes:  100baseT/Full
+                                1000baseT/Full
+                                10000baseT/Full
+	...
 
-> 
-> > +      - ucc_geth_phy
-> > +
-> > +  reg:
-> > +    minItems: 1
-> > +    items:
-> > +      - description:
-> > +          Offset and length of the register set for the device
-> > +
-> > +      - description:
-> > +          Optionally, the offset and length of the TBIPA register (TBI PHY
-> > +          address register). If TBIPA register is not specified, the driver
-> > +          will attempt to infer it from the register set specified (your
-> > +          mileage may vary).
-> > +
-> > +  device_type:
-> > +    const: mdio
-> > +
-> 
-> > +  "#address-cells":
-> > +    const: 1
-> > +
-> > +  "#size-cells":
-> > +    const: 0
-> 
-> These are defined in mdio.yaml, so drop them here.
+Fixes: f64e189442332 ("ice: introduce new E825C devices family")
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Will do.
+---
+Changes in v2:
+- improved commit meassege (added testing hint)
+---
+ drivers/net/ethernet/intel/ice/ice_common.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> > +
-> > +required:
-> > +  - reg
-> > +  - "#address-cells"
-> > +  - "#size-cells"
-> > +
-> > +allOf:
-> > +  - $ref: mdio.yaml#
-> > +
-> > +  - if:
-> > +      properties:
-> > +        compatible:
-> > +          contains:
-> > +            enum:
-> > +              - gianfar
-> > +              - ucc_geth_phy
-> > +    then:
-> > +      required:
-> > +        - device_type
-> 
-> Essentially, move this to the 'select' schema and add that property 
-> device_type must be 'mdio'. You won't need it here anymore because it 
-> had to be true for the schema to be applied.
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 7a2a2e8da8fa..caf3af2a32c3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -3180,6 +3180,7 @@ bool ice_is_100m_speed_supported(struct ice_hw *hw)
+ 	case ICE_DEV_ID_E822L_SGMII:
+ 	case ICE_DEV_ID_E823L_1GBE:
+ 	case ICE_DEV_ID_E823C_SGMII:
++	case ICE_DEV_ID_E825C_SGMII:
+ 		return true;
+ 	default:
+ 		return false;
 
-I'll have to read up on how select works.
+base-commit: bf7e01518c9f3f77c220bf153411d9d3d2511f16
+-- 
+2.39.3
 
-
-Best Regards,
-J. Neuschäfer
 
