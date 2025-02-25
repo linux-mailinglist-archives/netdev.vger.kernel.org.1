@@ -1,252 +1,264 @@
-Return-Path: <netdev+bounces-169483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DB07A442BE
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:29:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073A4A442D6
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BC863AC513
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:27:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B444919C0AED
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EE026A1A0;
-	Tue, 25 Feb 2025 14:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649FE269AE6;
+	Tue, 25 Feb 2025 14:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="uZKXyjii"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z0YrFnr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999BE2698BB
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 14:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740493630; cv=none; b=pXgdAtWhP3ajOdByvk+si6wZUSz0zcNo+T5ng4LAYexwK87MMCLWZErwHKhTEkNDmYq5+Qa9zJ6pxjsJ3Ik8xvlhDrShBqNBsotua+EhH39ohObkwYydnSf/knaHTbZ4V7TyO8cICZlD3JG+gI0rybsTWnc7RaQyJRDZoYokDsg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740493630; c=relaxed/simple;
-	bh=C3ccY3ZwLQzrjCIq91J7594C9RCW7z3ZBoYXdo9TRY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JfwSB/73fbXPbrI7XZiN1PeayagsGF14biDK3vwXBWoHq3PYCv03y3JECq1evJ33+URe5GmYNWtbbFO4SwCftMYTcE0/lJSnACNIqCdnCQGtSEjL7WJ04jDWAD+Ksc6NzETZNPZXhogfPPjqQEIew5t9QMpFDMtTLIKwL6DxO5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=uZKXyjii; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso3019365f8f.3
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 06:27:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1740493626; x=1741098426; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9QMi4VwrXU66Ki1nrs6Wu07Na08oHbBCCOqst7KVciY=;
-        b=uZKXyjiirVKrZtOv4mtkmz5YbjG90NsdeG1q9ISWkKMi+E06Yf/GnBcR02ARkbNqgD
-         OQorZi0DdW+aCHk8fUZum2yqczwUu226l0xEtr0vEw1S1rOBxTwSZDdWFBeH+nGwVcj7
-         cdaW6GFS3DlrP+x6/bpzrMM2IsrXYlTFRe1kkg/tqH+dG5xQSregssHVd/ryB/XV4iOk
-         E76SfbbE3KZMEN/xZVuEktQJMCfPMogEQqkwVtrSBtZHfFUkUCwG2c+aJL41LjSrdqZ/
-         7DUwT1sTjvpGEsD5INGLjuVRE735/5MKLKs97nFKJmzgxHPwUqdeOFNCnH4qsSToYpva
-         8jKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740493626; x=1741098426;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QMi4VwrXU66Ki1nrs6Wu07Na08oHbBCCOqst7KVciY=;
-        b=BZQpaQr72WeyXjPCGaaXejJf9V7vnZoSVWbX41QCv0r/ZfzPa4moNG+YQOFdVSyurH
-         VsS89tuk1EETqd+bKFJzMKn6VTMBBxsoVsFRDTLvXFk93wZMq3q0AKG4vr99KQWh77ha
-         aLv13y3Pn11U45jqfrvT7NxFClLwWcg1Q8HEoI9yJprPM5Vt/JtcL1GuZ04pm8Pruh+1
-         OTXjlip7ndqvS0A4t5AMKHJulwZ49dfmNxPAG28Numq0CP/jOV1UxAGCU2EEux3GY2s7
-         HlOrY7319JvCmXEHNkSL2HxVEerGo9WsAPEZH62qlOXiDunKBibEWuA8pmnhbqclJSKT
-         haMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWk/rMhfj7Y9BRVlcUgdZz3dqIH6AbD8IpNjrvNdWKR+fPtAyA3UZk2mVLvlafeUQ3Y4JMzR8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNN14zMqILuAv5X+QX6CVN7G3oi1rYVUlDZo4lSZ3+b8OigktH
-	Ckyyf76dYZ12ryIdpGpvYxS9WdRo7bANg3OZd/iLxzlapZ0XIW+mwzQ1vtUdjVM=
-X-Gm-Gg: ASbGncs8IJ9c3Oc3xOZY37hWyhjBw+HjD9O/hw17XAS68pESDV2jABAidN38vdEujcb
-	2z2TWqWUYGSeoWOP7QpWsHF8U1PmFWzzb6fDalWBOo8hhJlk+IiUekbQ266klNgk4ljMFU9IzMt
-	sk7HEONtonkZmJ082dVFKrI393mqFifvGhAZFQIdL33iCykYALNCli6Me2ta6B0/YsI6uQ83tlp
-	G9PO9JO1k8FAVyDZc4PsXPCbKsWJlgDYfezkxxXpj8PBEokdmq8KOXc2XlmrrGrMaxyoSaSIu9n
-	9k/At+X1Tp5pLBG1F2v3CMiCIVgPfyhby0/SgSl1AneWeVkhbv8H0buTYg==
-X-Google-Smtp-Source: AGHT+IFNcS5uUX050ewRgWcIyhrXix/tCXL61jbnelT4nfWUEiLJOaKXbpfRwTQNi9QiybtpYofh5A==
-X-Received: by 2002:a5d:5846:0:b0:38d:dc4d:3473 with SMTP id ffacd0b85a97d-390cc63e06dmr2928097f8f.51.1740493625602;
-        Tue, 25 Feb 2025 06:27:05 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390cd8fbc31sm2390594f8f.85.2025.02.25.06.27.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 06:27:05 -0800 (PST)
-Message-ID: <70c953c7-f442-4e38-9071-c7bb6ad5fedc@blackwall.org>
-Date: Tue, 25 Feb 2025 16:27:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8F6269CE0;
+	Tue, 25 Feb 2025 14:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740493664; cv=fail; b=axi24MD6sUYOfRUAx2R8/LWvqLaGG81PfPXMWT767OV2WI3nU4njbuG02HMwV1CR1G1UJNMf5GK2FKT7xKao6d1uI/91BIFRZWRh0yJ3zStusSTI97gkXCqdeC280re6WT0DebETEYcxOyeLVHXM6RAEs4RlXcJBDAI5IHNtQUM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740493664; c=relaxed/simple;
+	bh=vny4E/F7yW/iSUFXLrlUZE/9yi22wm2/yB63haix8Lw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ieSzxFQLr69g/u+gm7sK3nsyCsVEctxNWozGGWfP4gLC2S/lH1FzP5y3uMONL8VkKxzm7DpnNTaFJfGqlBdC5Q08Lz84tyeuXmNtIzSIdzJiYsIXH1ydLa0Hjr4JtvkNVwz0IFwDjotJAeDIqsMIzL5enQkSeh7iv46ERfwwP0w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z0YrFnr7; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740493660; x=1772029660;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=vny4E/F7yW/iSUFXLrlUZE/9yi22wm2/yB63haix8Lw=;
+  b=Z0YrFnr7vLdMWyKR4Xofgmtf/wOBv+eCOPxYXnnNRzeKVL5im5aA+mAO
+   ewTRT0Nr+t3IDqlTL5QBvoCcMD7TZO3yeLEpOo0E6d0HKk9A+QA35z7xo
+   sPZTFUcSzNb6LA63w24LXSmfJDH3wOKbK37kVwPQoYJlZE0POS7fzUOAD
+   jo6piTHjK8b/gRGjcITflC6dCQvm2Sf5/m9DUD2zd38GAifk1Fkpd/8kI
+   7NCfxbKzqW473FMlDTnk/SCSPv+/2kqHGAhZVX1ToffIEsZWnvPP9uqhY
+   ooNuZEjq3d/QY/gbK+x7izKzZqOgFTJhM7LTCbq1aHxGGPYldkhAYtDi7
+   A==;
+X-CSE-ConnectionGUID: q37maCs2TZqudKR/qbbWCw==
+X-CSE-MsgGUID: Nss68fYlQJKIilzejA1wGQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="41214447"
+X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
+   d="scan'208";a="41214447"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 06:27:39 -0800
+X-CSE-ConnectionGUID: PFP0y+9DQj2G69bI977SLg==
+X-CSE-MsgGUID: 40Vs/4uQRWeZNOUy0G/qeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="153590889"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 06:27:40 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 25 Feb 2025 06:27:39 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 25 Feb 2025 06:27:39 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 25 Feb 2025 06:27:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IWp+mijti5//f4WcuOriqmZksWBG15bwmn7UumK+XjU6nlRMbtSpyEef/hh7Vim00mkUPqy35dW+q2/kTdLT34rJYbPe22oPkbkVPhLoHL+o9nTJR6Aihr/dZjAVfH38t11kLs0uJUjKM0aXT1az5FD/Y2p/d1Xs3TOe+QVPev1sxkJvKU3sxBhx1SmKFiwkJj0p38jH0BCx1A95cED8YynRi40mosxdSGJBlWIcmvqiTu+342AaXejyW395eX+mJzXJ1EQcZ+iy2cAeQ6j2jXrlXcU91Nqdckny1sH4w6PuLf9tG4+hpH0knWoX7u9n2+sE66Tv3X50+LRdyuYwHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=g5kmfFSmIj4f5BGA4Yad2SW/od1ldlcrbnRB7tNHzHw=;
+ b=Z1qOQhMv76Bt6wPUaIJ33VHgqTG3A0WhguLjuBSugbr43Ixcw9Wb+iUyuMCWHBz2SZ0ilgsM18r2IHPiMHOJ/6V5RyM+Cv8NQ+T4C/J6SCZvHkSi1X185khew8bPCACpIPYeLUsCVds4L1Xb5SAidKQnyztfq8UfNYTbInCaO6sNocRXr9nXcOcFEGBpkZzPl7I5hMl23n8YP6IkGs1kZklHZESE762u+33Vqpk3Dh5I7YwX0EBjrlhoa7JkoaAwR5BX/5DhmLnLiz6/qKk1I/uXJkQ3mFGiWfvP0pcwGjXSJjVPmPDSX2H+9I+dvpLJu578oSkPgpRDNf0LuuPEJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ MW4PR11MB5870.namprd11.prod.outlook.com (2603:10b6:303:187::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.19; Tue, 25 Feb 2025 14:27:35 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%3]) with mapi id 15.20.8466.020; Tue, 25 Feb 2025
+ 14:27:35 +0000
+Date: Tue, 25 Feb 2025 15:27:23 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+CC: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	"Network Development" <netdev@vger.kernel.org>, "Karlsson, Magnus"
+	<magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>
+Subject: Re: [PATCH bpf-next 0/3] bpf: introduce skb refcount kfuncs
+Message-ID: <Z73TS/tjk9okSqlC@boxer>
+References: <20250220134503.835224-1-maciej.fijalkowski@intel.com>
+ <CAADnVQKYkwV1jc3aLwWqzgP7TKaPvq_NjpwvYdOXOgDQ3QZfeA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQKYkwV1jc3aLwWqzgP7TKaPvq_NjpwvYdOXOgDQ3QZfeA@mail.gmail.com>
+X-ClientProxiedBy: MI1P293CA0010.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:2::7)
+ To DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net 1/3] bonding: move mutex lock to a work queue for
- XFRM GC tasks
-To: Cosmin Ratiu <cratiu@nvidia.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "liuhangbin@gmail.com" <liuhangbin@gmail.com>
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "jarod@redhat.com" <jarod@redhat.com>,
- "davem@davemloft.net" <davem@davemloft.net>, Tariq Toukan
- <tariqt@nvidia.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "shuah@kernel.org" <shuah@kernel.org>,
- "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
- "jv@jvosburgh.net" <jv@jvosburgh.net>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- Jianbo Liu <jianbol@nvidia.com>
-References: <20250225094049.20142-1-liuhangbin@gmail.com>
- <20250225094049.20142-2-liuhangbin@gmail.com>
- <d298da7bc638c323e6d492b2dec7f1b9ea1e1350.camel@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <d298da7bc638c323e6d492b2dec7f1b9ea1e1350.camel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MW4PR11MB5870:EE_
+X-MS-Office365-Filtering-Correlation-Id: b23f7d1f-61bc-4fbe-8227-08dd55a88c47
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?OURaYk5IT0ZhRi9PL2dwWmlmYkFMbGZSZ3NYVGc0UGlxSWN4QlhtT0VQZWsz?=
+ =?utf-8?B?aWZPVmg5WnNBajZjN2ttS3UvNUg2OTBJblp2c2lQTEd5bndrSW9mNVkzYXRn?=
+ =?utf-8?B?YWh5eHRaby9uYjJ3RmlvWThicWVOakdvMlhzS3phS2g4Rk1vT3dtSk55ZDRL?=
+ =?utf-8?B?a0FuM0JKRUE3bC9aWmg1cHRTYWw1aFo4OXZQMWF5RVZWZ3BmV1R5a0dLb2hj?=
+ =?utf-8?B?U3BqZGJpOGdMUHF1NE1sTitGQ08xVmJnd2xyV0d2WGIyRStDT1U0a2NZcFRx?=
+ =?utf-8?B?M2xnQW5TeWJ1RUJWbklQNmFDcTJCUTMxMG9abFVLZWhvYUx6aGNoL3hUSEJG?=
+ =?utf-8?B?ME5BbEwrbVp5UVRtaUtNQkdzUjcxK2RqN05kclQ4YjBxM21zOHUyUTNhaW5S?=
+ =?utf-8?B?cDhnYnFUa3QrUmpOV3diWktleVV5SWkwamFKSFJ2cld4bE5MdGFXL3hTalNv?=
+ =?utf-8?B?WWwxa29TWEdrV2tYTkFLbkRZY1BiMlM0Ui8wMlNFNkNTR081TXphTit2aERE?=
+ =?utf-8?B?ckx3Nm1JV3JvTUZpTzhueURTM2d3VFpIamYrczNWYm1kcmVYYWkxeno5c0l0?=
+ =?utf-8?B?dU9aMnBGME9aeUw1Z1JwcWlIT1B1SXBldHc2ZFpub2s3OVdwU0tLU2N1eVR0?=
+ =?utf-8?B?RjkxQWNyZllPSHdIYWdJZU5Fb0tLbFdTbmVTSTNmRUdmS0lkQyt6M3pQUHdp?=
+ =?utf-8?B?M2FsdmsxbjJCdGZPeWcwclRjR0hmbUZRNytVNlRvT2N6ajhUQ0d1SlR2VXpD?=
+ =?utf-8?B?clg4c3VaeEo2cXhqaXk3d1JjRFBEZ3BGQlNMMjkvNERSUDMrNEJQaWc3b0lk?=
+ =?utf-8?B?emlPaGIzaDl1V1JjZ0JndXRrMzlZREZ2THVkMExndCs5WVFjSHg0VjJnR0d3?=
+ =?utf-8?B?UUVqQVVLZ2FtUGxCWjB2WlRZS2V0eUFWNTVVTS9XaVMyanRmVmN4RCtoUm5K?=
+ =?utf-8?B?eXpib0lFT0lMelU4VDhnbXZaWW4xWkFPS3YrOHdRT0s4eUxMTDdiV2RjTXZ1?=
+ =?utf-8?B?RWQ4UlE0U3hic1NsbEJBTHZTc3l2SThhVXQ2WXVKWTdDNk9keUxjSWVhYlZZ?=
+ =?utf-8?B?b215TVNwNExOS2pyd1loU1MxS2JmeDJjN1Z0SjZjWVpWeDlTUTVkcUNmR0M1?=
+ =?utf-8?B?b1BQSWw2NHk4MUgrdEFHVmF6NUpYMlI0Z2V5NS9xYXJ1bmdmUXE1U3NqSDFG?=
+ =?utf-8?B?RnF2YnBsRzBWYTNZZFEwWjdsalRub2xEVGFtZ0l0NGpiWTMzWU5uYkZCaWxy?=
+ =?utf-8?B?RzJDYU1ibkEyd1dMQkViUXZIaWRrbjIvVERoNUNaT3d3VHpWQ3JLejROZUJY?=
+ =?utf-8?B?dEFqQ3M1S3VaRkJaR1JjNi9IbXUrcTlSUnpWcDJNaWNYb2JzeVhrUDhEbUto?=
+ =?utf-8?B?eFZGK1V2RkxqZWJJbDZGREo4d3M2WE9yRDVISXd4OEd5bEpGcTByMVhLUERk?=
+ =?utf-8?B?UGVQTmN2cUZFNXJZTlZsakl0TU1Zb1pkSUoySmNlRGI0ZFdCQmQxZ005Y3o5?=
+ =?utf-8?B?QVJaQTJDc1hUZm1mUnNTR0F5ZUJzMU43RTdvcjBiRkh3ZG5qZHlYd3VPcURi?=
+ =?utf-8?B?cGJCOXNzeXZrcjNpdGpqTE1ESTZpdlFGSjZKcnlOWkxHeW12TlBtSU9tTE5N?=
+ =?utf-8?B?b0ZzNnJPQ1lpTEFXQ01vdGtBYnZZLy95b2ZRQmgwSVhJVE5oWlpTdDBwQkVz?=
+ =?utf-8?B?cEwrbThlUWV4WVBBMDM4N3h2WlhWUG52UWhRMGxzVlp6V3pTUUcxMlVTRS9G?=
+ =?utf-8?B?ZHBWMEFwR0N0TllNRStWakI4QUhWbVlYTzNpVHJGVjVRSmdJWnMydFNiUjdV?=
+ =?utf-8?B?Ty9ZQk9zaExNcHpDZHA2QT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0trKzV6TEliOHE4blhSOXFQTnoyQmcySUtKMi8vY1F3bG81cm5mTjZ3Slgy?=
+ =?utf-8?B?b0xJTnBsYyt0NnNLU2NwcHMrTDhNWGRab2NsZW41ZnJ0TFFjc09NZThjZGFr?=
+ =?utf-8?B?TlA3bjhKM2ZIRG90MUlENVBNeVF5RUJLa3ZpWThlZzRYajJld2k4d3phTWxH?=
+ =?utf-8?B?Y0ZLUzlnUVgvSUR5eG1sNjNFWE8vbm5xZFBzenYrendhZkx0bld5TG9Vb05M?=
+ =?utf-8?B?dktCZUt3dTVCZlRGSHBTNW55bmNIajduYkxVZy9RdFR6c3NPek53REY0ejVO?=
+ =?utf-8?B?dUNhVTl0UTBnTlN6NXRnelB3UWpQS2loTXlMZjFwTHN0d1M3ZkhtcnFXdTRx?=
+ =?utf-8?B?R3JEMEcwNTFoUXdPQVNKb1docm92SDVzbjQ3ZkgrbVJVUERaMjllREIvWkFn?=
+ =?utf-8?B?Q0FJNXk0MTRZQ0JwTHM5NkNOcFRWbEYwQVBIMVRjTHZxa1VubTFYY3BHR0JK?=
+ =?utf-8?B?cTNxMHF2QTd4RmY0eGdQekEzd0pZUDlIenUxU1F3MlBWWjRLaExPdFk4a1hD?=
+ =?utf-8?B?TFRFNFJveHJ3OWVjRTkxbURxSXhuVm1DWWh5Z0x4TG90Ly8vWGlPVDZEbEJj?=
+ =?utf-8?B?UGxUcmhyRE9NekJhODFCdngvY2lVelpOU0NWWnlmVHlxOW1yUjYwYXBMVnFW?=
+ =?utf-8?B?bG15Q3N6bWFzb3BTNkVmMXN5dGhkU3VUS1dKWE5TNDlyLy9ZRDB3QndhMWdr?=
+ =?utf-8?B?R2tRNXhXajNVOGUyZ05XeEtnd2hDdllKUUd4aWhGTFl3TGdOSllPY3ovbGF5?=
+ =?utf-8?B?aTRtVjRya25wZnhVdS9mSVBIc1IwbHVmd2FYdGlKT2tQb0ttbUZNWitzQkx1?=
+ =?utf-8?B?VVRJalJLdWhmUEZFZGZLTlJtdkd0aGZHZmlibzhEMGdMdmVWeEJmNUtzaWFm?=
+ =?utf-8?B?RlEwZDdwaHozNjVtckhuR05SVy9DSnIvT2lxNm1EQkEzVXdtYTBONlByMzl2?=
+ =?utf-8?B?djlqMFRaTEhxdnVzczYyOHVMSk55VGhUVGJWNVRpZ3pGZ1JySk9vdi92OUox?=
+ =?utf-8?B?WU1ISmpML3EvK0pndVk4UUpRWXJqTXNDalIxdlFibDBraGZnaGpVdVM1a1dy?=
+ =?utf-8?B?dGpqc3JIYm42U1ZFYUtLYlFXRGVSMDFvbTZ1VzZIN0pYK09aK1I3a1JCZjlU?=
+ =?utf-8?B?LzUwWk4rZ1o4MlM3MVF6OWFocSt0ODFVZDJOaGJZNEVibDEwbCsxajhvYUNF?=
+ =?utf-8?B?L0pueG5JMDVUQTBMY3g2MEY1cGUzMS9PNmxIT0ppZWpvRGJIeVJMejlOeEh4?=
+ =?utf-8?B?bmR6Y0lkMUQxUlNCRUNNNUpRbThJYWFSelBXSFcwdFdXTFFucTQzVHg1V1k1?=
+ =?utf-8?B?bWU4b25XekNMciswcUx2V1UzTWJ5ek1uT1JFbFYvLzFXa1dVYUdTUHlhelNs?=
+ =?utf-8?B?ZW5Zb0QzMkM5Sjc2TnNJNmpjeWNYS2VMT1hKTUVLRFl6OHJINXRpMG9SMHFC?=
+ =?utf-8?B?SmMxM0RHOGVJdmhTc2FVaSs4bXRZZ2dhQmliejQwS2VTdUVxWW9PYzMrSlRx?=
+ =?utf-8?B?Wk1tSHNWTXVEZ1NZeEZvN3B4NDIzVWxwbzFobThnZnNZeWZIVTJmTUc3US9E?=
+ =?utf-8?B?YzBTYTNBTWpIN2VtSmMvWTVaQnQ5Q3BQTXdiZHFKMG05QjBLRFJONUVlUzlZ?=
+ =?utf-8?B?T3cxdlBWdDBJNDY2YkUrUGE4T0NhcUR2aGdKNDF6UjFicW1SOHlvYmlJUldi?=
+ =?utf-8?B?aTBHSVRGV0tsKzBIUFBmejhjVkVJQmFzcXBFY2Fqdk5oRjdNNHV2VlgxdXU5?=
+ =?utf-8?B?QkI2TEhkY1NwL0R1N2hpTEZHeUljUjI4MTZ6dlFTeTdqK3pqR0ZKaTVUK0Fm?=
+ =?utf-8?B?NmpjUGNyTGhJU1NXbjM0ckhNZjl4R29pVG1SK0JtNzZiN3RET2FVZkJpd2lq?=
+ =?utf-8?B?ZXdINjBKL21rZGpJdktOOXpEY3Q3RERtU2hvb3RrcXVJSit5TkQ1Vnh4UklO?=
+ =?utf-8?B?dHd1VWF3NWpOc2lFak1MUkYzaXh2cFlXUzgwdHJrVXRzQzVmN3pRaTM3UUZs?=
+ =?utf-8?B?aEk5ZHpaSDVWQ2RrbzlaVmlGRTFHZDdMek9aQ1lqeFRwY21QbzJBZC9pUDVm?=
+ =?utf-8?B?T2U4M0lQMHJ3VFJlS2IzcVlEQzB3RzlXeXA2UGppYzlybVZqT09UR3plNnBF?=
+ =?utf-8?B?clVhY0lLL0s2ZTRmMys3UzRiMWc0R1JSV0pOclJwWHRpa2QxTlFjSTR3VWZW?=
+ =?utf-8?B?NHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b23f7d1f-61bc-4fbe-8227-08dd55a88c47
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 14:27:35.5586
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 34zWu7vIqC5mfVU+mv70InUrhiV0sWoynoa5wsLOvWGw770jJ3a3Haf0LRrJVYcXUPSW1mC43rMYyhaP2pSAVaAOeCGQKN0PPk65XtxGYnk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5870
+X-OriginatorOrg: intel.com
 
-On 2/25/25 16:00, Cosmin Ratiu wrote:
-> On Tue, 2025-02-25 at 09:40 +0000, Hangbin Liu wrote:
->> The fixed commit placed mutex_lock() inside spin_lock_bh(), which
->> triggers
->> a warning like:
->>
->> BUG: sleeping function called from invalid context at...
->>
->> Fix this by moving the mutex_lock() operation to a work queue.
->>
->> Fixes: 2aeeef906d5a ("bonding: change ipsec_lock from spin lock to
->> mutex")
->> Reported-by: Jakub Kicinski <kuba@kernel.org>
->> Closes:
->> https://lore.kernel.org/netdev/20241212062734.182a0164@kernel.org
->> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->> ---
->>  drivers/net/bonding/bond_main.c | 41 +++++++++++++++++++++++++------
->> --
->>  include/net/bonding.h           |  6 +++++
->>  2 files changed, 37 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/net/bonding/bond_main.c
->> b/drivers/net/bonding/bond_main.c
->> index e45bba240cbc..cc7064aa4b35 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -551,6 +551,25 @@ static void bond_ipsec_add_sa_all(struct bonding
->> *bond)
->>  	mutex_unlock(&bond->ipsec_lock);
->>  }
->>  
->> +static void bond_xfrm_state_gc_work(struct work_struct *work)
->> +{
->> +	struct bond_xfrm_work *xfrm_work = container_of(work, struct
->> bond_xfrm_work, work);
->> +	struct bonding *bond = xfrm_work->bond;
->> +	struct xfrm_state *xs = xfrm_work->xs;
->> +	struct bond_ipsec *ipsec;
->> +
->> +	mutex_lock(&bond->ipsec_lock);
->> +	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
->> +		if (ipsec->xs == xs) {
->> +			list_del(&ipsec->list);
->> +			kfree(ipsec);
->> +			xfrm_state_put(xs);
+On Fri, Feb 21, 2025 at 05:55:57PM -0800, Alexei Starovoitov wrote:
+> On Thu, Feb 20, 2025 at 5:45 AM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > Hi!
+> >
+> > This patchset provides what is needed for storing skbs as kptrs in bpf
+> > maps. We start with necessary kernel change as discussed at [0] with
+> > Martin, then next patch adds kfuncs for handling skb refcount and on top
+> > of that a test case is added where one program stores skbs and then next
+> > program is able to retrieve them from map.
+> >
+> > Martin, regarding the kernel change I decided to go with boolean
+> > approach instead of what you initially suggested. Let me know if it
+> > works for you.
+> >
+> > Thanks,
+> > Maciej
+> >
+> > [0]: https://lore.kernel.org/bpf/Z0X%2F9PhIhvQwsgfW@boxer/
 > 
-> I would expect xfrm_state_put to be called from outside the loop,
-> regardless of whether an entry is found in the list or not, because it
-> was unconditionally referenced when the work was created.
+> Before we go further we need a lot more details on "why" part.
+> In the old thread I was able to find:
 > 
->> +			break;
->> +		}
->> +	}
->> +	mutex_unlock(&bond->ipsec_lock);
->> +}
->> +
->>  /**
->>   * bond_ipsec_del_sa - clear out this specific SA
->>   * @xs: pointer to transformer state struct
->> @@ -558,9 +577,9 @@ static void bond_ipsec_add_sa_all(struct bonding
->> *bond)
->>  static void bond_ipsec_del_sa(struct xfrm_state *xs)
->>  {
->>  	struct net_device *bond_dev = xs->xso.dev;
->> +	struct bond_xfrm_work *xfrm_work;
->>  	struct net_device *real_dev;
->>  	netdevice_tracker tracker;
->> -	struct bond_ipsec *ipsec;
->>  	struct bonding *bond;
->>  	struct slave *slave;
->>  
->> @@ -592,15 +611,17 @@ static void bond_ipsec_del_sa(struct xfrm_state
->> *xs)
->>  	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
->>  out:
->>  	netdev_put(real_dev, &tracker);
->> -	mutex_lock(&bond->ipsec_lock);
->> -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
->> -		if (ipsec->xs == xs) {
->> -			list_del(&ipsec->list);
->> -			kfree(ipsec);
->> -			break;
->> -		}
->> -	}
->> -	mutex_unlock(&bond->ipsec_lock);
->> +
->> +	xfrm_work = kmalloc(sizeof(*xfrm_work), GFP_ATOMIC);
->> +	if (!xfrm_work)
->> +		return;
->> +
->> +	INIT_WORK(&xfrm_work->work, bond_xfrm_state_gc_work);
->> +	xfrm_work->bond = bond;
->> +	xfrm_work->xs = xs;
->> +	xfrm_state_hold(xs);
->> +
->> +	queue_work(bond->wq, &xfrm_work->work);
->>  }
->>  
->>  static void bond_ipsec_del_sa_all(struct bonding *bond)
->> diff --git a/include/net/bonding.h b/include/net/bonding.h
->> index 8bb5f016969f..d54ba5e3affb 100644
->> --- a/include/net/bonding.h
->> +++ b/include/net/bonding.h
->> @@ -209,6 +209,12 @@ struct bond_ipsec {
->>  	struct xfrm_state *xs;
->>  };
->>  
->> +struct bond_xfrm_work {
->> +	struct work_struct work;
->> +	struct bonding *bond;
->> +	struct xfrm_state *xs;
->> +};
+> > On TC egress hook skb is stored in a map ...
+> > During TC ingress hook on the same interface, the skb that was previously
+> stored in map is retrieved ...
 > 
-> Also, like Nikolai said, something needs to wait on all in-flight work
-> items.
+> This is too cryptic. I see several concerns with such use case
+> including netns crossing, L2/L3 mismatch, skb_scrub.
 > 
-> This got me to stare at the code again. What if we move the removal of
-> the xs from bond->ipsec from bond_ipsec_del_sa to bond_ipsec_free_sa?
-> bond_ipsec_free_sa, unlike bond_ipsec_del_sa, is not called with x-
->> lock held. It is called from the xfrm gc task or directly via
-> xfrm_state_put_sync and therefore wouldn't suffer from the locking
-> issue.
-> 
-> The tricky part is to make sure that inactive bond->ipsec entries
-> (after bond_ipsec_del_sa calls) do not cause issues if there's a
-> migration (bond_ipsec_del_sa_all is called) happening before
-> bond_ipsec_free_sa. Perhaps filtering by x->km.state != XFRM_STATE_DEAD
-> in bond_ipsec_del_sa_all.
-> 
-> What do you think about this idea?
-> 
-> Cosmin.
+> I doubt we can make such "skb stash in a map" safe without
+> restricting the usage, so please provide detailed
+> description of the use case.
 
-I know the question was for Hangbin, but I do like this solution. I missed
-the xdo_dev_state_free callback, it could lead to a much simpler solution
-with some care.
+Hi Alexei,
 
-Cheers,
- Nik
+We have a system with two nodes: one is a fully fledged Linux system (big node)
+and the other one a smaller embedded system. The big node runs Linux PTP for
+time synchronization, the smaller node we have no control over (might run Linux
+or something else). The problem is that we would like to use the Tx timestamps
+from the small node in the Linux PTP application on the big node. When a packet
+is sent out from the big node it arrives at the small node that send it out one
+of its interfaces. It then replies with another packet back to the big node
+with the Tx timestamp in it.
+
+Our current PoC for attacking this is to store the skb in a map (using this
+patch set) when it is sent out from the big node then retrieve it from the map
+when the reply from the small node is received. We then take the timestamp from
+the packet and put it in the skb and send it up to the socket error queue so
+that Linux PTP works out of the box.
+
+Note that for the purpose of setting skb->hwtstamp and sending it up to the
+error queue we are adding a kfunc (bpf_tx_tstamp) responsible for it, which is
+not included in this set, so I understand it is not obvious what we achieved
+with the current form of this patch set being discussed.
+
+We did not consider the restrictions that should be implemented from netns POV,
+so that is a good point. How would you see this being fixed?
 
 
