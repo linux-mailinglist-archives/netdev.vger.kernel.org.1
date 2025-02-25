@@ -1,97 +1,132 @@
-Return-Path: <netdev+bounces-169471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C778A4414F
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:51:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 438F7A4418E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7753A25D1
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:51:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91B627AC0F0
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5B26988C;
-	Tue, 25 Feb 2025 13:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B15126E178;
+	Tue, 25 Feb 2025 13:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UP4byKOg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hQfY6BZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF54F233714;
-	Tue, 25 Feb 2025 13:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0493826AA8A;
+	Tue, 25 Feb 2025 13:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740491480; cv=none; b=lsYrSN+Arub2xzWob0VtRjBKcnTQLGVy6X9qz47/TsEWyyIF3+81sBNNKjnxrTlL7Sbp5pMLqHID1MOMAH5JGG+kpZoNiUGtpyCGOmT1Shd2oTaYoqOVEeYCbvdd6QOi7Gke6lX0cFeglEhdVawrD4Amiiw095kdeh3py6HDU4w=
+	t=1740491783; cv=none; b=SeMFw9WhLGGVCx00y+j7lExUTI0oMWdDsNRN4dfGk3ogMtqS8ENpND0+VH8g3Bwpv01AUoBTpEP1R5f4DznqWzLfcxRRhf2OYy2n1yIurD/JZtkR7Vzq96fuWg3vv8Vq8xsQaP9daIjojuTl5aY9TYl2MRM0ok3h9PiJl4yJyh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740491480; c=relaxed/simple;
-	bh=PcXWHDco3CAdDPQSPgA+cZxIc/cAUc3MY9VoBBcOWbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RM52yVYfkLgm47UhxD/Q5yW8v0mCBISHt6tWFVlw8+tEWo7F+F/brgNuzwZ85ofN9KC7alemU9lzu6Z1wlUpRvbXAfPSLQYEJZPJ3byYjn46qzYcX9gKk0+g0brIM/4rx0Iw4y0idvNVrNRoI7jrNTVAH4JNMl/sl3FfJmkxPSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UP4byKOg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=e3VmXvqmgpmlkacg4yCqG6k/DWw/7LO2D1NyxSJiktc=; b=UP4byKOgV4ukVo21U5njdpdZC0
-	G4UYijU2274eCrrlkKTfbuZSamLwWkZdjJYtqnNdcNL8pIQoMObhFrr6qyHdQig4KiT6Wdj18Yzhx
-	yy/ckGOZzVfYTDYy1YR18vgMtRIB9TN5Uees+9P8PejyiR+5lwuHi2M5UswRsCsj1DPo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tmvKu-00HWpb-CB; Tue, 25 Feb 2025 14:51:00 +0100
-Date: Tue, 25 Feb 2025 14:51:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/3] net: phy: mediatek: Add 2.5Gphy firmware
- dt-bindings and dts node
-Message-ID: <176f8fe1-f4cf-4bbd-9aea-5f407cef8ac5@lunn.ch>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
- <a15cfd5d-7c1a-45b2-af14-aa4e8761111f@lunn.ch>
- <Z7X5Dta3oUgmhnmk@makrotopia.org>
- <ff96f5d38e089fdd76294265f33d7230c573ba69.camel@mediatek.com>
+	s=arc-20240116; t=1740491783; c=relaxed/simple;
+	bh=sk3A+C/3YF/aw+qmXdV3WY5MUHEfjGuEtG3jNw8Ywxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qJ44/ndax4XheYh9FQ8Ay3F/CqZXlanXIbAcbr08hyOSc9JAx0/c1BOB3DJOAlvL9RKsBoSE/rn1cerDzJmI90LvNS2VJSQSy4bDNnpOVHrl3Tyvj5KmcENtVAL/Hwj44iNAdZLf+6AGCMFLMns6cUdBwY9EjEMfKPCE9rtr2FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hQfY6BZT; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BD31320454;
+	Tue, 25 Feb 2025 13:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740491779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l0xoAglwtX05uIrcTfA8VEz2V2/yZL+wn+pNIMqwOKM=;
+	b=hQfY6BZTgnQRGkyolkYMlC3w1c05S8eOuj/k7QAOQcU4IskjRGDKoIn9qGyG1Zhh3w6dF2
+	74FOFCZ6IYqlKrRlmL5sX218RHQEhskI22OvTf449QGkDJFaNhB6s+Wtkzfa+zN0hlh8r7
+	MrnQ9B9kq61hbTgA5jWgz5BmBVvGhGbypU38kRnCqUaLiUEkJriEGCu2xVu+izR5pXYvCs
+	WbSKlrS54Qrdq1lpEQTGcTWtQQcN66JF9qFIIhaFDcZEYQKtWOzFQjzknaB2hyjNqwo5Le
+	WRDnpryLYW71H24FSrh2yPy+LGwriC33taRpoQ5pp1OdWXKy6ZYfB018eHvGKA==
+Date: Tue, 25 Feb 2025 14:56:17 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
+ <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
+ Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
+ <bjorn@mork.no>
+Subject: Re: [PATCH net-next v2 1/2] net: phy: sfp: Add support for SMBus
+ module access
+Message-ID: <20250225145617.1ed1833d@fedora.home>
+In-Reply-To: <6ff4a225-07c0-40f6-9509-c4fa79966266@lunn.ch>
+References: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
+	<20250225112043.419189-2-maxime.chevallier@bootlin.com>
+	<6ff4a225-07c0-40f6-9509-c4fa79966266@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff96f5d38e089fdd76294265f33d7230c573ba69.camel@mediatek.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekudekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedukedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughum
+ hgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-> > Would using a 'reserved-memory' region be an option maybe?
-> Or maybe just leave those mapped registers' addresses in driver code
-> (mtk-2p5ge.c)? Like:
-> #define MT7988_2P5GE_PMB_BASE (0x0f100000)
-> #define MT7988_2P5GE_PMB_LEN  (0x20000)
+Hi Andrew,
 
-The problem with hard coding them is you need some way to know which
-set of hard coded values to use, because the hardware engineers will
-not guarantee to never move them, or change the bit layout for the
-next generation of devices.
+> > -static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
+> > +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,  
+> 
+> Maybe call this sfp_smbus_byte_read(), leaving space for
+> sfp_smbus_word_read() in the future.
 
-PHYs don't use compatibles because they have an ID in register 2 and
-3. Is this ID specific to the MT7988?
+Good idea, I'll do that :)
 
-	Andrew
+> > +			  size_t len)
+> >  {
+> > -	if (!i2c_check_functionality(i2c, I2C_FUNC_I2C))
+> > -		return -EINVAL;
+> > +	u8 bus_addr = a2 ? 0x51 : 0x50;
+> > +	union i2c_smbus_data smbus_data;
+> > +	u8 *data = buf;
+> > +	int ret;
+> > +
+> > +	while (len) {
+> > +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+> > +				     I2C_SMBUS_READ, dev_addr,
+> > +				     I2C_SMBUS_BYTE_DATA, &smbus_data);
+> > +		if (ret < 0)
+> > +			return ret;  
+> 
+> Isn't this the wrong order? You should do the upper byte first, then
+> the lower?
+
+You might be correct. As I have been running that code out-of-tree for
+a while, I was thinking that surely I'd have noticed if this was
+wrong, however there are only a few cases where we actually write to
+SFP :
+
+ - sfp_modify_u8(...) => one-byte write
+ - in sfp_cotsworks_fixup_check(...) there are 2 writes : one 1-byte
+write and a 3-bytes write.
+
+As I don't have any cotsworks SFP, then it looks like having the writes
+mis-ordered would have stayed un-noticed on my side as I only
+stressed the 1 byte write path...
+
+So, good catch :) Let me triple-check and see if I can find any
+conceivable way of testing that...
+
+Thanks,
+
+Maxime
 
