@@ -1,221 +1,209 @@
-Return-Path: <netdev+bounces-169536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE9FA44809
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:29:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95707A447E7
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:24:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22F59880612
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:18:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 714AE17B8CE
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628531FDA65;
-	Tue, 25 Feb 2025 17:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368391FAC52;
+	Tue, 25 Feb 2025 17:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1yVAKjmb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XYeN1Pop"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2053.outbound.protection.outlook.com [40.107.101.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B7A1FC7DA;
-	Tue, 25 Feb 2025 17:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740503760; cv=none; b=K8TxOH0pNiSzHsdei5KyijCUrs3wKECocj3d1PaMa2mT36QqG1NuBoytFM776T7QZZ7+/T087Tc1M/fEj1SWXzt+V6DLjK54vMcdBLPPDNteYOYoMArLUj3j0vv60xbHXYe52BsF5p86ejUT3INGXK+f6OR4OCWdQSYBNxVHhbY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740503760; c=relaxed/simple;
-	bh=ezGAIeWPAxlOHhFgXBsoCU/huFK7irSzPAfTK2ZAJS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aydX+5BztW5/9ZOZat4JmgnxUJcN3O9Tn087btyCvPY8Kr5Pn5Cw5LVc0kSzcAhpTJzrIBmDsBKbwc/Mcgb2WwJtcnwguRk4moa0OX+GC1aKyN9ZdzfxFD6ZEx7SqNLD25rdHGRFuH+p7a/dzEvTCvVfCsCJOKqkzqaknzHKM3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1yVAKjmb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/FcX+G+I0G7bVNTYmPL3UUc4quzJ0eDdIDeI93mfRq4=; b=1yVAKjmbmU93d92TuCfnf1frpT
-	Ctf7Dl/Dn1l9OVlm84zGxCeBlX9Zv9JEVa6tjGwapcEtkUtsGTuZ7t+K2wJhfdlwEvcJKpkX5sFI3
-	BGP9rghzWaJoFB0ZNBRdIqJobvwLoYMiNcpamgI8sn2P/L167nbuejfNXIz9DBSKlK2Sd6Z5UcpYw
-	ww+g6HT3LJ0mDrE47fL8Ub3g9Pu+3yGH4V9OsvMicaTw9+7CfeQHGmKGRMsNM4m1OKvN0EDPKmy+O
-	WNkems2wavszyCNaSshvxuPTEQ8qtvBocuSKQEd5XrGVt5qQYhmbIiFy7qA1d3VvBySy1ec8eXqQr
-	+EM822Pw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38584)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmyWy-00023F-0v;
-	Tue, 25 Feb 2025 17:15:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmyWu-0006Bl-33;
-	Tue, 25 Feb 2025 17:15:36 +0000
-Date: Tue, 25 Feb 2025 17:15:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
- access
-Message-ID: <Z736uAVe5MqRn7Se@shell.armlinux.org.uk>
-References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
- <Z7tdlaGfVHuaWPaG@shell.armlinux.org.uk>
- <87o6yqrygp.fsf@miraculix.mork.no>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0096E1A073F
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740503769; cv=fail; b=LTB5gqx1GLZSo4agEKgg73SwVOgWNqSl476KNh+mRdSnVCRr3cVO+r+wWCjxJVU6Mbo5Knj6U4I/repJQdVwbPW8cI0sdMM1n1CDrP+vNYLvS6hVVpFdIHUVPfZlwfdaCH4eqRRM+BCEC2nZA0UPNIPNewoe6x2/WGNSSqCA+b0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740503769; c=relaxed/simple;
+	bh=nuemk7EeOeML260u8A29vpkzXGcgIVp4dEN11cymZzo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 Content-Type:MIME-Version; b=KmA+ThTeN21CeTsiDlygzje/sBCf+GQMtHsApbFcpNTsgVta5onHatyCjW6oLj3DYG/EUG1yyMSOpnemsgpks3b0Gn/azOr+rCB/qPj04fsUYFccK/R5MN7iO19lz7rYhuUCYPijcnRDQ9pFGZYuU5e8j8q5IgeuCNDA8OxpvsM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XYeN1Pop; arc=fail smtp.client-ip=40.107.101.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XE4jGgUSKNzsNhM1DFgT/LMVLWTkbjYLDOEMb7J9gxV+5JlGBukdCWF7/j9P7bZQasSdH9QcmDCLImqwBIBJ5n2PRShIKqBncZgecfGJ83gxf3qgPdleg5RGyBArmRvoh+8UA6tGl6JufIzhI1bUR/HfcTYJsR9yasy1PWozMV23bixGjtWA6PLQhTTt/HTXtN7KQnOipjAvmFNzKQNGVAhgS/2zU8vBfysgZTtwcpT/BRJP/HP8Cz0DPqHoqAkqFRNsSA6HezGsRLuwxPgYgkkSpAYjAlm1vgmehIMwzT67Gq1iJ9/1OphJ2flLrOq2lbY+zpYSiF8xkcTCZeB8KQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6uAgRQHXELFfAcoEGsGtPAesMuChlY6SYbJDZjKoq8g=;
+ b=H+npxeJZwm1GCyVEXEmnmiBX0l8AzT7mz4AvF/Caa2lduVjXjVh9t61aFvPRbmnsT8FHY0RWPB2F37nlNBMOAwtkCxxMPcgJZ7u0twa4FhXF1jVwUoKJBDfzNp9iMiW43n67bU5Oi225ggeGEjWh/KrK/24TY+4E+CI6RUwQtxf+Mbq5idzio3iMh7XLg8Hf60+D26y9U8HQOU/02/dOa+wiyzuum9wAPdzV2A27ipOpmdGFEdtvGDSZIKSv8t1USr89F1NHQQH5AHaxv7TXWG0pXMGpMqGS661+aJ0Pik9qVPJzmzGWusdtMCCCT06xJ1aGohZsZ43FJZOZ8heqRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6uAgRQHXELFfAcoEGsGtPAesMuChlY6SYbJDZjKoq8g=;
+ b=XYeN1PopTZZgDSmeWD97PRNeJKE6xOYCge9HA/0B/5VYhFjASdooA/Ie/r9L+JPn+XaJsttHxAjOiDi6nVuam8795+UDSSmKFt4eoDpxzzqKxS0P//u9IyoWVRt2H7QjrpK8tFOxYGnL6Wi8tTNeNKTalEmn7xnOiV5Wr0lnzRWdaXpQAu1xa8QtQJJlEL8CSZ3Jev9fkUOuIlrc4lWdOysr0ePr8wwVZNCcIyxGql0t0jcyHs7oTFveyUionVjS1K4C44ER2D8GWu71MHYbry/74qttQaTPeUan7QMHKYQUOSQIuoyEFRO80WdjtmtLYAmYiVYmW2lGdqHeJcU7MA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
+ by PH8PR12MB6674.namprd12.prod.outlook.com (2603:10b6:510:1c1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.18; Tue, 25 Feb
+ 2025 17:16:01 +0000
+Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
+ ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
+ ([fe80::7577:f32f:798c:87cc%5]) with mapi id 15.20.8466.016; Tue, 25 Feb 2025
+ 17:16:01 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Paolo Abeni <pabeni@redhat.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+ apw@canonical.com, joe@perches.com, dwaipayanray1@gmail.com,
+ lukas.bulwahn@gmail.com
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
+ edumazet@google.com, dsahern@kernel.org, ast@kernel.org,
+ jacob.e.keller@intel.com
+Subject: Re: [PATCH v26 01/20] net: Introduce direct data placement tcp offload
+In-Reply-To: <253seo2ywq6.fsf@nvidia.com>
+References: <20250221095225.2159-1-aaptel@nvidia.com>
+ <20250221095225.2159-2-aaptel@nvidia.com>
+ <9d381da6-cef7-431e-be82-fd2888fc480a@redhat.com>
+ <253seo2ywq6.fsf@nvidia.com>
+Date: Tue, 25 Feb 2025 19:15:57 +0200
+Message-ID: <253mseaymgi.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: LO4P123CA0434.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a9::7) To SJ2PR12MB8943.namprd12.prod.outlook.com
+ (2603:10b6:a03:547::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87o6yqrygp.fsf@miraculix.mork.no>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|PH8PR12MB6674:EE_
+X-MS-Office365-Filtering-Correlation-Id: 369d7930-6292-4e31-2a99-08dd55c013fd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Jo9MQ9CYye97hDf/XKN35m/UfwYUP67pRGoVnJHI4CzPLLEglNbICNWp9uKB?=
+ =?us-ascii?Q?vLMK4oD375L8fhjs+DeW365+uvp1err1nRYznt4Es9e1LdZ3v1UUESmeXTHY?=
+ =?us-ascii?Q?Hmbu4Q7cDvbUW9zAReQk6uOhryS3/JKeRZYt1MMm37kSZR9vTPLgQiq81CVI?=
+ =?us-ascii?Q?B8Avxh9VPXiCf4BBuWVH9CnO6Nw1XOeYI0ZjuCPPiRcjNzCz4NFc6LpR8w2D?=
+ =?us-ascii?Q?c0SZqc8UcYruQnUvdDfQvsErp3Ezsgtz9ooStQnWbjYwUuSILb+BRKf2707g?=
+ =?us-ascii?Q?oE1CctJM6BNpIlqQDae5xt7Eib1BqYLtSEGNHr5Fja+DyYKGZnMWHpv9Ayza?=
+ =?us-ascii?Q?hUXiTL0zZMjIs0L5dXg8hI4K62T6NiC7DSW/pvRbwi5SKgWbLYptkEGYzzOm?=
+ =?us-ascii?Q?NKtvYyPYplpu83wMbLVPg2GS2kD/uFG7Zy9mZhU5hTtXKKBpaPsLh49IO2rb?=
+ =?us-ascii?Q?l3cIZhd9Fc0jRz3CQHPTUeTPDaR/MYuB+Y5K0Ik5G68whr1a4oly6/jFKakM?=
+ =?us-ascii?Q?42YHHXvBCHwXBH04eETE83ndnMnhCQlE18OYVMprTr+r58IGGx1jk5hFXjLW?=
+ =?us-ascii?Q?38whr23Oa11D8XiouJsOoOpBupxBMcRpjgZpJDy90pU6kftxUfQ5LOhSfBb8?=
+ =?us-ascii?Q?SujHIlkqnE7mx8Cj0eIzDNhyldxG6+O/pzuhKPcKhXQQofY9Ec0s84PeqY86?=
+ =?us-ascii?Q?N/EearQONyrcfY+cnF3ObsiZjVMTErCuctdFI41uP2YgEiYMIQBjfUZlA59O?=
+ =?us-ascii?Q?KK57he0vXFo5LX5yFQElCYMZrk+j1xTQKLe+3rkVJS5Mkh+kZ/vuc2ci/D1c?=
+ =?us-ascii?Q?yPCIP6I599ImnNkpdO0zZ+Jd96D3csmA1FAPS1pucQHPSjZs0N3TbHmR2g9Y?=
+ =?us-ascii?Q?7qUoKJRn0I3/3oJ/USxHsC5mNPc2h3hAGyN79MhHrAQZxQ567T5+udSC//gt?=
+ =?us-ascii?Q?Y6jTVy3F5HyAlCO45FL092fdjZUsn/Cdj/1gU4xR/Wdwmg95klQc9pSK2Ibk?=
+ =?us-ascii?Q?tXmXqNfQNWYM7MW4eHq3BN1pX432uyX9nD2zLR4BeLJZ4DyDwTO2TPJp1wmo?=
+ =?us-ascii?Q?30l41ZFEPBiUZNqAyqIfQZwGjHgWYwNJAJ1+k2i0AMBw+Bj+vOCxy7xGKPO3?=
+ =?us-ascii?Q?KCAwjS546/g7QNz9B01t9/sjSFTkWxYyThoOwTjVUPrrl/SQiqGn03D9H0XL?=
+ =?us-ascii?Q?Zx3QWJGwmsG7lmxj53U8k4rhePVl94ZZf332Ymnmdb9j6mSiGNrLait8INGm?=
+ =?us-ascii?Q?cHSXp5HvBF9XBgsMyY0SWmeZ30fF3y1IsVHgy2J3FEJqw5xk9K6wrQxgwiVd?=
+ =?us-ascii?Q?LnruaYKmDU5qHKSrXq44b4pJjusTamOYn8exCEXHB3XG3LqjzY/FDNvsKO3g?=
+ =?us-ascii?Q?JP1LwlJU1inh5quWR3bVxSaX37EYHt/9qgkp5Pnnok8KZOHbKEIQz3ZChlpI?=
+ =?us-ascii?Q?GzAyPhuZyZ4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CzSsSRPHPhJjoBZz5htbuiDj8xiDuv1ro44wuZgUT/oZ7m80WVuowpzwcj3N?=
+ =?us-ascii?Q?33UjtUKNlLTAkHuUjBj8AN814zjPYrW+X6BHl/jLsmn+LPACi3dz1l/tpM49?=
+ =?us-ascii?Q?xXYiAhBbwgH6GlPL07fXFRoqhUAJm4o9C9SFFSHqGNxYltEJ/n4ZLDelc/h8?=
+ =?us-ascii?Q?s1tgdaehcMDKjJ0UV0eT2yIMifwy5A9cgqpEYy/sY+7b+WPP4sG45opSZJrP?=
+ =?us-ascii?Q?Wu3p87L5mJmrVI/icrD6RoVxoOHbhYJPLmIZuSD26WwVR65oGH+CKqUsFnEE?=
+ =?us-ascii?Q?zOwIUKOpeHXM8jYO7tTlB3KhhVSeWRaZgvvKBak5ImTHIaC+xWPysByF+rXw?=
+ =?us-ascii?Q?mv+I8bxVxxMG9NgXCdAssYpM9C5MmD0JlnunmpuGHsuTlVtTy9nVoA97Vq24?=
+ =?us-ascii?Q?MLk35Si5dMyox/QPl4AJwuyPZjZ2HIwWeQkP0Y0IMsOV1ar8k87JUSkHlGfQ?=
+ =?us-ascii?Q?QjFYZqy8SblgdwZvsJZdkoheuVM/kHQexvFD7LAl1nRRWd6CblX1rbb8iVxu?=
+ =?us-ascii?Q?mXkLWgdpyQN3Dt88iiUPeA6Ebq+ecayW9FlQanHGL5l17qYSLzIdhXLURoln?=
+ =?us-ascii?Q?GwQ74Kj1KiEPNG8cgEUaBgO1Otc8DmJaCRjE3gLoboxaRn9orrZq1WRa9pjw?=
+ =?us-ascii?Q?hGv0C4HR3bVdWIsGvRJ9yETV1lsydobT9Sru0hh7FvUpr6nmRJp9rEfokUoT?=
+ =?us-ascii?Q?Pac6EPNpvA7jMANIYBmTgBxktRrB7RA8WBFu0obZvE9EJon/0XXAPt+aKzak?=
+ =?us-ascii?Q?HeRiIdH14HW51rym8elfQ91/orG+IAh3bDAY0YnEhgqcduNj8Ab5qww6cTwF?=
+ =?us-ascii?Q?XO3XxSdX5rv/p02czdZmKO5peIkL8OM2Peyk5j+NVH3lvfkWaAJ7HZ/ZTgJw?=
+ =?us-ascii?Q?ilBChyYrdcHbEx8E3I9QK3SdxGdqxqXN9SlOTcRumqUcnxDAcsSYXQhUyeh5?=
+ =?us-ascii?Q?I8mK4dtzAwLeafadNG8pvJre7JtXaVZGU5ag9NYBarR+cSQxaPImZjtCiYC1?=
+ =?us-ascii?Q?wnNgD4/q1/43fK6DM/QrVDOKqmwV6NlDpxVaK5UzWvLwPOlh6Hezv0T/vWr5?=
+ =?us-ascii?Q?NAjM0qzx7oQpi0qaif3t8AkqTh0JcDwjrXxC7yt8YvEYl7rmbJe0rYcaA1rU?=
+ =?us-ascii?Q?4O6lsMk826EPtoFdHQFE/R/NevAaypGKZJ09NocfnzgWwO++Mz1mwnevgdJL?=
+ =?us-ascii?Q?MUi/ntVZk7VL3UvQSK+bcTHREsMceoSmy45TIZfmVSYBntN3oAyh8i1apGHb?=
+ =?us-ascii?Q?xt8oeMv06LEYGcl8KnnuZF9PuORAwtQ4suusKLNn8LxmpaoTQ41zO1BcNtvR?=
+ =?us-ascii?Q?jRN72LuaA6U8TmLbzbBIj/gba2cDJo3Aun58dACHMS3tFaJi5vQTovieRDTU?=
+ =?us-ascii?Q?b58BbH3QN3X+FnUgw+lOHtVYPFTr0iyDh61vucXuWaFzvuOiyuMGwKVgiQOH?=
+ =?us-ascii?Q?vtL149dwleDdbZS7uDoWCVoxPQKbpr0zxxiLoD55KvEj2a/rbjaEQP5FkQX5?=
+ =?us-ascii?Q?3qanSNiOR1ciOvt+k3s11nE2shQ8k512HHCu9TxCFTXS1trTx3xLFemsceye?=
+ =?us-ascii?Q?ZQK9zYB1AjloGjYzKThayoUX0pKlpQ4Lma4CdJPS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 369d7930-6292-4e31-2a99-08dd55c013fd
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 17:16:01.7224
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CnPwtVlkhR4c8qznLNCT+NGUEj59mP8KC+BKs7cCn3b6Mt1ioHYnpHGjtDR4HtuV9lLVEwOiLlaw07Ed8RBrGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6674
 
-On Tue, Feb 25, 2025 at 01:38:30PM +0100, Bjørn Mork wrote:
-> "Russell King (Oracle)" <linux@armlinux.org.uk> writes:
-> > On Sun, Feb 23, 2025 at 06:28:45PM +0100, Maxime Chevallier wrote:
-> >> Hi everyone,
-> >> 
-> >> Some PHYs such as the VSC8552 have embedded "Two-wire Interfaces" designed to
-> >> access SFP modules downstream. These controllers are actually SMBus controllers
-> >> that can only perform single-byte accesses for read and write.
-> >
-> > This goes against SFF-8472, and likely breaks atomic access to 16-bit
-> > PHY registers.
-> >
-> > For the former, I quote from SFF-8472:
-> >
-> > "To guarantee coherency of the diagnostic monitoring data, the host is
-> > required to retrieve any multi-byte fields from the diagnostic
-> > monitoring data structure (e.g. Rx Power MSB - byte 104 in A2h, Rx
-> > Power LSB - byte 105 in A2h) by the use of a single two-byte read
-> > sequence across the 2-wire interface."
-> >
-> > So, if using a SMBus controller, I think we should at the very least
-> > disable exporting the hwmon parameters as these become non-atomic
-> > reads.
-> 
-> Would SMBus word reads be an alternative for hwmon, if the SMBus
-> controller support those?  Should qualify as "a single two-byte read
-> sequence across the 2-wire interface."
 
-Looking at the SNIA documents, this should work, so if a SMBus supports
-two-byte reads, then we should be able to support hwmon with such a
-controller. However, if only single-byte reads are supported, then I
-think we should disable hwmon as we'd be going against the statement
-I provided above from the docs.
+Aurelien Aptel <aaptel@nvidia.com> writes:
+> Paolo Abeni <pabeni@redhat.com> writes:
+>>> +     /* put in ulp_ddp_sk_del() */
+>>> +     dev_hold(netdev);
+>>
+>> You should use netdev_hold()/netdev_put() instead, with a paired reftracker.
+>
+> Ok, we will pass the tracker as argument.
 
-> > Whether PHY access works correctly or not is probably module specific.
-> > E.g. reading the MII_BMSR register may not return latched link status
-> > because the reads of the high and low bytes may be interpreted as two
-> > seperate distinct accesses.
-> 
-> Bear with me.  Trying to learn here.  AFAIU, we only have a defacto
-> specification of the clause 22 phy interface over i2c, based on the
-> 88E1111 implementation.  As Maxime pointed out, this explicitly allows
-> two sequential distinct byte transactions to read or write the 16bit
-> registers. See figures 27 and 30 in
-> https://www.marvell.com/content/dam/marvell/en/public-collateral/transceivers/marvell-phys-transceivers-alaska-88e1111-datasheet.pdf
+There is currently a bug in checkpatch, it seems it cannot deal with kernel
+typedefs when they are inside a ifdef:
 
-However, note that it's:
+    $ cat > test.h
+    /* SPDX-License-Identifier: MIT */
+    #if x
+    int a(netdevice_tracker *p);
+    #endif
+    ^D
 
- START ADDR(W) REG RE-START ADDR(R) HIGH STOP
- START ADDR(W) REG RE-START ADDR(R) LOW STOP
+    $ ./scripts/checkpatch.pl -f test.h
+    ERROR: need consistent spacing around '*' (ctx:WxV)
+    #3: FILE: test.h:3:
+    +int a(netdevice_tracker *p);
+                             ^
+    
+    total: 1 errors, 0 warnings, 4 lines checked
+    
+    NOTE: For some of the reported defects, checkpatch may be able to
+          mechanically convert to the typical style using --fix or --fix-inplace.
+    
+    test.h has style problems, please review.
+    
+    NOTE: If any of the errors are false positives, please report
+          them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-and not:
 
- START ADDR(W) REG STOP START ADDR(R) HIGH STOP
- ...
+If you remove the #if/#endif it is quiet.
 
-I forget whether SMBus can do re-starts.
+I'm reporting this since NIPA is so strict on checkpatch errors.
+I've added checkpatch.pl maintainers in the loop.
+In the meantime maybe let's ignore this warning in NIPA?
 
-> Looks like the latch timing restrictions are missing, but I still do not
-> think that's enough reason to disallow access to phys over SMBus.  If
-> this is all the interface specification we have?
-
-I'm not sure what you're referring to here with "latch timing
-restrictions".
-
-Reading more of the 88E1111, if one only transfers an odd number of
-bytes for a register, it looks like that could cause problems. It
-doesn't appear to specify what happens if it receives a write e.g.
-for upper byte of register 0, and then receives a write for
-register 4 (as a hypothetical example - caused where the lower byte of
-register 0 transfer failed.)
-
-We do need to think about these corner cases!
-
-> I have been digging around for the RollBall protocol spec, but Google
-> isn't very helpful.  This list and the mdio-i2c.c implementation is all
-> that comes up.  It does use 4 and 6 byte transactions which will be
-> difficult to emulate on SMBus.  But the
-> 
-> 	/* By experiment it takes up to 70 ms to access a register for these
-> 	 * SFPs. Sleep 20ms between iterations and try 10 times.
-> 	 */
-> 
-> comment in i2c_rollball_mii_poll() indicates that it isn't very timing
-> sensitive at all. The RollBall SFP+ I have ("FS", "SFP-10G-T") is faster
-> than the comment indicates, but still leaves plenty of time for the
-> single byte SMBus transactions to complete.
-
-The "RollBall" protocol isn't official afaics. It got called that
-because of the first module that Marek happened to have that implemented
-it. Having taken several of these modules apart, it's implemented by a
-microcontroller, which may be an Arm Cortex based controller, or might
-be 8051 based. Whether the firmware implementation at the high-level
-code is the same or not is anyone's guess. We just don't know. It
-could be entirely different implementations - and that's the problem.
-We already know that the timings for this protocol vary depending on
-the module (possibly because of differing implementations) which brings
-questions up about the behaviour in obscure cases like single-byte
-reads.
-
-> Haven't found any formal specification of i2c clause 45 access either.
-> But some SFP+ vendors have been nice enough to document their protocol
-> in datasheets.  Examples:
-> 
-> https://www.repotec.com/download/managed-ethernet/ds-ml/01-MOD-M10GTP-DS-verB.pdf
-> https://www.apacoe.com.tw/files/ASFPT-TNBT-X-NA%20V1.4.pdf
-> 
-> They all seem to agree that 2/4/6 byte accesses are required, and they
-> offer no single byte alternative even if the presence of a "smart"
-> bridge should allow intelligent latching.  So this might be
-> "impossible" (aka "hard") to do over SMBus.   I have no such SFP+ so I
-> cannot even try.
-
-Indeed. So maybe we need a stronger kernel message to basically blame
-the hardware designer and refuse to operate with modules that _might_
-use the Rollball protocol. (Note, it's "might" because if we can't
-access the PHY, we don't know for certain that this module is a
-copper module.)
-
-> > In an ideal world, I'd prefer to say no to hardware designs like this,
-> > but unfortunately, hardware designers don't know these details of the
-> > protocol, and all they see is "two wire, oh SMBus will do".
-> 
-> I believe you are reading more into the spec than what's actually there.
-
-So I'm making up the quote above from SFF-8472.  Okay, if that's where
-this discussion is going, I'm done here.
-
-NAK to this patch set.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks
 
