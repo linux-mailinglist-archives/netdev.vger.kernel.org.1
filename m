@@ -1,118 +1,93 @@
-Return-Path: <netdev+bounces-169521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F33A4453C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:01:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D89A44572
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:07:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 434D818890A2
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9272422E1A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C96516EB54;
-	Tue, 25 Feb 2025 16:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E087118DB18;
+	Tue, 25 Feb 2025 16:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZflnUnB+"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zHh4LHk9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DEE15C14B
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C807918DB09
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740499256; cv=none; b=sb90PEjCLUxgGnyv3lO2TYFMTTUrpmJxIxMjOn3fqaH05B+R+gKOCyNWIo54udSrHsxsNMM+Cs6He9hGEVWwLK3MeVBDAJXbxgxLSFc+1vENZaNrZNp6f+rQthxMjhflxT1NW1f6h6YbM4cZXuCTqvrSFM8Ss6vgPZpLMpRV2Eg=
+	t=1740499548; cv=none; b=mz9MhzfFE5JKNuSlVsxblrSmKwhtSR68QdVpEc8mIuw6IiO6kOAb/Jkjy2ygTZkc7vYQkWx54SBa/BXRQdILPDaPtXJv6jb8CKx0KFIuBqEjBS48UTpLTIScP9DObP8KzxiT27UyuR9iRwj4+bQKXGoTIakCRFegx3kNJRsptFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740499256; c=relaxed/simple;
-	bh=4/6WNfOFt0tBeL4b4ZFXpp6KrBRycH/p/0PSMwuLqJE=;
+	s=arc-20240116; t=1740499548; c=relaxed/simple;
+	bh=f1gB/U017DI3+yOGGw3YzckoQCKCbGxHsePswjmt4UE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OAQMR6fzn/zL/IZtrnmK2l5V4GBNngzXtEpnluh7xDOWmacKKgJw3ddwSxCO1/DbPhJ0W7FiWxWxOqzu40FDM2d6fZrkjQlOQBiOqtQznHarqBY2blzSUvGp3iO9k56j00IMROcwpYbAxlINwAtj7Gsq+fqRCn58V1Lp+K2adcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZflnUnB+; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6e65e0a3f7eso26190106d6.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:00:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740499253; x=1741104053; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qfo6+lok37Xv4JW+s09KuDgrT6+5xL1zebJ3c/AEumA=;
-        b=ZflnUnB+PeZMI4/b70E6a2cU58jPeq62/pEaWrYrSHi9ULd94fG0+uXeSktADpAa9I
-         1OJik1HxEM5/2LHJ5ykJEKPhL6GN0qY+l6JkpHnTO0nnNnkIoYwpTl7BKG9Eet3Pnt2R
-         U1a1mLyAlbVoTu3p1lnQI7D7LZnoWYKd+GmpM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740499253; x=1741104053;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qfo6+lok37Xv4JW+s09KuDgrT6+5xL1zebJ3c/AEumA=;
-        b=I5LMTxiWdLUZEFLed5wcbzGRKi0iCKt3E6hXyz8RL18nbn/+gK0gm/CSXp9+7jW9aS
-         DMqWgf5t3Fz1RFsJ7pkcA0OWQTDyKFW0V0WGrAy6PpVaSlWx4pxpm3+6GrCVKqdSdL72
-         b/9Vo311dUEXtYz77twI2eswlvmRroBiDwBd+n+HM7Fl5mi3HPrvU4s1Pr7Qyn8OkQxw
-         Kmly/yEhiWpXrviwwavu8QlGY/WFxWLxRFrls8fltuPa6D4CT19yPrqRr/qeLXNEfNXv
-         o/7HqO15tsWkh48r6PUG0OIC0d8F5BuTEhdT8Zo8HTitK6zD8VgfgwMYSDuderDWlBy/
-         YP5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWcQYg770xarNng0utNeiTCm/wpQ4sEVlDvHZ1XJrS/P3c+wQRbhPsWQiZaHy2q72mvGaKS0x4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBITcR9O31yQSeeq47m4wPBTc2gSkw2wdSWRDbPFcAuZl45i8z
-	vpN50eEHxjPbg4l/bhwuvtn9zNQQYH7wAinFlG2F6fMtx+XYEBJeizL7jgLk4CDSTE0ZPmUce6z
-	8
-X-Gm-Gg: ASbGncsCZpL12GNo6ywVc9WwZgvnTZzseSOfmX3L07yqqPAA+jvo7p+OE16AI0aFyN9
-	shiBa055uRMqLc648Pv7k9xt4h4ClxsPVSVxLncjSZ6haxDAD/E4UsypJBAyJmZnpdy+yLfd2t/
-	oGfPcbIwx6yjzjzqBNBbbaRDHN5xZuC1OESHTtJPgjLHsxj3gpEhdT77XhxRKPltwVmPE2E0Qjq
-	BV7MM930s4vGDLHaylu0fMjs0DcBq2o8CGAhClsoi9lyYuy2UqR7mUoQBq56coeDZiLWvAeZMYf
-	3SPPUQA9HMWX185in9/vLtGrTn7X7MGQKRX6SoAhl7cg2dDXYjlaWVI+OBkSPohx
-X-Google-Smtp-Source: AGHT+IFy8cr87IYs/ikvSPfJnNOc6xW3Y53Ei4eNhSOWrUVVAE6ouMuggS+w7Eme1vNlh671mSTUjA==
-X-Received: by 2002:ad4:5bea:0:b0:6e6:4969:f005 with SMTP id 6a1803df08f44-6e6ae994f63mr168782136d6.30.1740499252509;
-        Tue, 25 Feb 2025 08:00:52 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e87b176c02sm10540366d6.110.2025.02.25.08.00.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 08:00:51 -0800 (PST)
-Date: Tue, 25 Feb 2025 11:00:49 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Cai Huoqing <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next v06 1/1] hinic3: module initialization and tx/rx
- logic
-Message-ID: <Z73pMXNsYprCcbmk@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Cai Huoqing <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <cover.1740487707.git.gur.stavi@huawei.com>
- <0e13370a2a444eb4e906e49276b2d5c4b8862616.1740487707.git.gur.stavi@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FXTKBbm9TKqq6/myOWLANnh5NtDk9qHQrklqP3Ks2xDPaEv+quyfIovf86Ik1mbpQN2GXFiSlcfqa5bhyjfVZKODLtjShGSqZO1px/c/LYklYH7BwW/nA4eAeR86dGsxxD4mAQZZVfKmI7xrUfV3LbGnTwRME2VaAmoiq3ESGbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zHh4LHk9; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id BCF2213801A6;
+	Tue, 25 Feb 2025 11:05:44 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Tue, 25 Feb 2025 11:05:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1740499544; x=1740585944; bh=HSzbiwKLkoSh2DwEr9eobg0mlFMzZpLYpuK
+	OmkOpl3c=; b=zHh4LHk91KF+f3gHIiPZ8Fc0Ngu8uhB6Le7n8laPXXJ9CTzJLkx
+	8vWLJOGNNL7jv4I2+XNmAoQxWylsrhRlHOqpFx2WGwkcGEneFmjO5MC6V4rjPsr+
+	UsLOEqhI3mQmQbeZwr4sU1Y1lQRWQsNmye57NvtjQOo2I2jHqwnU75iT/HEM5x4i
+	129El2jWmWO3VH6+EwqPGOyWjDpS460xE4oTQsEzUTbC29rCR5UnGjMTcy+rDhSO
+	nbPHgN2TdbGrlazPmWxkBs+/AwKDip6WtbPH7Pn6mdCfx+KWER3/93X2XwAYXwDl
+	No+YXn2+TktRiCSWkBd0/8ixzKqWneRsdMg==
+X-ME-Sender: <xms:WOq9Z8S_xKEPksVLv6Thdyg032jol6R_vH0gfhwv2N2tMJHCJT2VBg>
+    <xme:WOq9Z5zata3apSXNtvDo0hK7_SKSuNUEgmv6J7-VvVtuXBUz8bSxOMaiW9DG118vk
+    Nvym-2YkNMEBwU>
+X-ME-Received: <xmr:WOq9Z52UBiDk9NpkGFt4sp8LNP9mnB0sDxXz5xjx8X22rNoHnCQwY-ACywIFr0Ch3y1HfmF973jcPN_Llsa0AzW_N9bJag>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekvddugecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehgnhgruhhlthesrhgvug
+    hhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
+    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnh
+    hisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
+    rdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughsrghh
+    vghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnthhonhhiohesmhgrnhguvg
+    hlsghithdrtghomh
+X-ME-Proxy: <xmx:WOq9ZwDB8fdusgDKC7bZYciKK4Z_AZtusrYfpYhnQsuqf0Z5L8o-RA>
+    <xmx:WOq9Z1jxmO1xlXufiHf9NlrOIK9hIORi93p8Fnw3S6qnIHw2tBYfdQ>
+    <xmx:WOq9Z8pu-uDAQvLdBIyFqAW8t9deRzHhDzyUAVKK1MgTeJMvR3cXFA>
+    <xmx:WOq9Z4g5AIvVQ9_AG1b56mZv_WQQ1ycpOy1p5MEUyxQJkq_IFmRYPA>
+    <xmx:WOq9Z2Xep53WXeyBLl3cZ4oAlB_1heB1To0Xym3FEDx594u-rMmHNW_Z>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Feb 2025 11:05:43 -0500 (EST)
+Date: Tue, 25 Feb 2025 18:05:40 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Antonio Quartulli <antonio@mandelbit.com>
+Subject: Re: [PATCH net v3 1/2] gre: Fix IPv6 link-local address generation.
+Message-ID: <Z73qVCxg8r34i_Pg@shredder>
+References: <cover.1740493813.git.gnault@redhat.com>
+ <dd92b7f4b6bb81ce64e304381bedaf0d15ff5613.1740493813.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,268 +96,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0e13370a2a444eb4e906e49276b2d5c4b8862616.1740487707.git.gur.stavi@huawei.com>
+In-Reply-To: <dd92b7f4b6bb81ce64e304381bedaf0d15ff5613.1740493813.git.gnault@redhat.com>
 
-On Tue, Feb 25, 2025 at 04:53:30PM +0200, Gur Stavi wrote:
-> From: Fan Gong <gongfan1@huawei.com>
+On Tue, Feb 25, 2025 at 03:43:20PM +0100, Guillaume Nault wrote:
+> Use addrconf_addr_gen() to generate IPv6 link-local addresses on GRE
+> devices in most cases and fall back to using add_v4_addrs() only in
+> case the GRE configuration is incompatible with addrconf_addr_gen().
 > 
-> This is [1/3] part of hinic3 Ethernet driver initial submission.
-> With this patch hinic3 is a valid kernel module but non-functional
-> driver.
+> GRE used to use addrconf_addr_gen() until commit e5dd729460ca
+> ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL
+> address") restricted this use to gretap and ip6gretap devices, and
+> created add_v4_addrs() (borrowed from SIT) for non-Ethernet GRE ones.
+> 
+> The original problem came when commit 9af28511be10 ("addrconf: refuse
+> isatap eui64 for INADDR_ANY") made __ipv6_isatap_ifid() fail when its
+> addr parameter was 0. The commit says that this would create an invalid
+> address, however, I couldn't find any RFC saying that the generated
+> interface identifier would be wrong. Anyway, since gre over IPv4
+> devices pass their local tunnel address to __ipv6_isatap_ifid(), that
+> commit broke their IPv6 link-local address generation when the local
+> address was unspecified.
+> 
+> Then commit e5dd729460ca ("ip/ip6_gre: use the same logic as SIT
+> interfaces when computing v6LL address") tried to fix that case by
+> defining add_v4_addrs() and calling it to generate the IPv6 link-local
+> address instead of using addrconf_addr_gen() (apart for gretap and
+> ip6gretap devices, which would still use the regular
+> addrconf_addr_gen(), since they have a MAC address).
+> 
+> That broke several use cases because add_v4_addrs() isn't properly
+> integrated into the rest of IPv6 Neighbor Discovery code. Several of
+> these shortcomings have been fixed over time, but add_v4_addrs()
+> remains broken on several aspects. In particular, it doesn't send any
+> Router Sollicitations, so the SLAAC process doesn't start until the
+> interface receives a Router Advertisement. Also, add_v4_addrs() mostly
+> ignores the address generation mode of the interface
+> (/proc/sys/net/ipv6/conf/*/addr_gen_mode), thus breaking the
+> IN6_ADDR_GEN_MODE_RANDOM and IN6_ADDR_GEN_MODE_STABLE_PRIVACY cases.
+> 
+> Fix the situation by using add_v4_addrs() only in the specific scenario
+> where the normal method would fail. That is, for interfaces that have
+> all of the following characteristics:
+> 
+>   * run over IPv4,
+>   * transport IP packets directly, not Ethernet (that is, not gretap
+>     interfaces),
+>   * tunnel endpoint is INADDR_ANY (that is, 0),
+>   * device address generation mode is EUI64.
+> 
+> In all other cases, revert back to the regular addrconf_addr_gen().
+> 
+> Also, remove the special case for ip6gre interfaces in add_v4_addrs(),
+> since ip6gre devices now always use addrconf_addr_gen() instead.
+> 
+> Fixes: e5dd729460ca ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL address")
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
-IMHO, there's a huge amount of code so it makes reviewing pretty
-difficult.
-
-Is there no way to split this into multiple smaller patches? I am
-sure his was asked and answered in a previous thread that I missed.
-
-I took a quick pass over the code, but probably missed many things
-due to the large amount of code in a single patch.
-
-[...]
-
-> +static void init_intr_coal_param(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	struct hinic3_intr_coal_info *info;
-> +	u16 i;
-> +
-> +	for (i = 0; i < nic_dev->max_qps; i++) {
-> +		info = &nic_dev->intr_coalesce[i];
-> +		info->pending_limt = HINIC3_DEAULT_TXRX_MSIX_PENDING_LIMIT;
-> +		info->coalesce_timer_cfg = HINIC3_DEAULT_TXRX_MSIX_COALESC_TIMER_CFG;
-> +		info->resend_timer_cfg = HINIC3_DEAULT_TXRX_MSIX_RESEND_TIMER_CFG;
-> +	}
-> +}
-> +
-> +static int hinic3_init_intr_coalesce(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-> +	u64 size;
-> +
-> +	size = sizeof(*nic_dev->intr_coalesce) * nic_dev->max_qps;
-> +	if (!size) {
-> +		dev_err(hwdev->dev, "Cannot allocate zero size intr coalesce\n");
-> +		return -EINVAL;
-> +	}
-> +	nic_dev->intr_coalesce = kzalloc(size, GFP_KERNEL);
-> +	if (!nic_dev->intr_coalesce)
-> +		return -ENOMEM;
-> +
-> +	init_intr_coal_param(netdev);
-> +	return 0;
-> +}
-> +
-> +static void hinic3_free_intr_coalesce(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +
-> +	kfree(nic_dev->intr_coalesce);
-> +}
-
-Do you need the IRQ coalescing code in this version of the patch? It
-looks like hinic3_alloc_rxqs is unimplemented... so it's a bit
-confusing to see code for IRQ coalescing but none for queue
-allocation ?
-
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
-> new file mode 100644
-> index 000000000000..4a166c13eb38
-> --- /dev/null
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
-> @@ -0,0 +1,24 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
-> +
-> +#include "hinic3_hwdev.h"
-> +#include "hinic3_hwif.h"
-> +#include "hinic3_nic_cfg.h"
-> +#include "hinic3_nic_dev.h"
-> +#include "hinic3_rss.h"
-> +
-> +void hinic3_clear_rss_config(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +
-> +	kfree(nic_dev->rss_hkey);
-> +	nic_dev->rss_hkey = NULL;
-> +
-> +	kfree(nic_dev->rss_indir);
-> +	nic_dev->rss_indir = NULL;
-> +}
-
-Do you need the above code in hinic3_clear_rss_config?
-
-I probably missed it but hinic3_try_to_enable_rss is empty, so I'm
-not sure why you'd need to implement the de-allocaion of the
-rss_hkey and rss_indir in this patch ?
-
-> +static void hinic3_reuse_rx_page(struct hinic3_rxq *rxq,
-> +				 struct hinic3_rx_info *old_rx_info)
-> +{
-> +	struct hinic3_rx_info *new_rx_info;
-> +	u16 nta = rxq->next_to_alloc;
-> +
-> +	new_rx_info = &rxq->rx_info[nta];
-> +
-> +	/* update, and store next to alloc */
-> +	nta++;
-> +	rxq->next_to_alloc = (nta < rxq->q_depth) ? nta : 0;
-> +
-> +	new_rx_info->page = old_rx_info->page;
-> +	new_rx_info->page_offset = old_rx_info->page_offset;
-> +	new_rx_info->buf_dma_addr = old_rx_info->buf_dma_addr;
-> +
-> +	/* sync the buffer for use by the device */
-> +	dma_sync_single_range_for_device(rxq->dev, new_rx_info->buf_dma_addr,
-> +					 new_rx_info->page_offset,
-> +					 rxq->buf_len,
-> +					 DMA_FROM_DEVICE);
-> +}
-
-Are you planning to use the page pool in future revisions to
-simplify the code ?
-
-> +static void hinic3_add_rx_frag(struct hinic3_rxq *rxq,
-> +			       struct hinic3_rx_info *rx_info,
-> +			       struct sk_buff *skb, u32 size)
-> +{
-> +	struct page *page;
-> +	u8 *va;
-> +
-> +	page = rx_info->page;
-> +	va = (u8 *)page_address(page) + rx_info->page_offset;
-> +	prefetch(va);
-
-net_prefetch ?
-
-> +
-> +	dma_sync_single_range_for_cpu(rxq->dev,
-> +				      rx_info->buf_dma_addr,
-> +				      rx_info->page_offset,
-> +				      rxq->buf_len,
-> +				      DMA_FROM_DEVICE);
-> +
-> +	if (size <= HINIC3_RX_HDR_SIZE && !skb_is_nonlinear(skb)) {
-> +		memcpy(__skb_put(skb, size), va,
-> +		       ALIGN(size, sizeof(long)));
-> +
-> +		/* page is not reserved, we can reuse buffer as-is */
-> +		if (likely(page_to_nid(page) == numa_node_id()))
-> +			goto reuse_rx_page;
-> +
-> +		/* this page cannot be reused so discard it */
-> +		put_page(page);
-> +		goto err_reuse_buffer;
-> +	}
-> +
-> +	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page,
-> +			rx_info->page_offset, size, rxq->buf_len);
-> +
-> +	/* avoid re-using remote pages */
-> +	if (unlikely(page_to_nid(page) != numa_node_id()))
-> +		goto err_reuse_buffer;
-> +
-> +	/* if we are the only owner of the page we can reuse it */
-> +	if (unlikely(page_count(page) != 1))
-> +		goto err_reuse_buffer;
-
-Are you planning to use the page pool in future revisions to
-simplify the code ?
-
-> +static struct sk_buff *hinic3_fetch_rx_buffer(struct hinic3_rxq *rxq,
-> +					      u32 pkt_len)
-> +{
-> +	struct net_device *netdev = rxq->netdev;
-> +	struct sk_buff *skb;
-> +	u32 sge_num;
-> +
-> +	skb = netdev_alloc_skb_ip_align(netdev, HINIC3_RX_HDR_SIZE);
-> +	if (unlikely(!skb))
-> +		return NULL;
-> +
-> +	sge_num = hinic3_get_sge_num(rxq, pkt_len);
-> +
-> +	prefetchw(skb->data);
-
-net_prefetchw ?
-
-> +int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(rxq->netdev);
-> +	u32 sw_ci, status, pkt_len, vlan_len;
-> +	struct hinic3_rq_cqe *rx_cqe;
-> +	u32 num_wqe = 0;
-> +	int nr_pkts = 0;
-> +	u16 num_lro;
-> +
-> +	while (likely(nr_pkts < budget)) {
-> +		sw_ci = rxq->cons_idx & rxq->q_mask;
-> +		rx_cqe = rxq->cqe_arr + sw_ci;
-> +		status = rx_cqe->status;
-> +		if (!RQ_CQE_STATUS_GET(status, RXDONE))
-> +			break;
-> +
-> +		/* make sure we read rx_done before packet length */
-> +		rmb();
-> +
-> +		vlan_len = rx_cqe->vlan_len;
-> +		pkt_len = RQ_CQE_SGE_GET(vlan_len, LEN);
-> +		if (recv_one_pkt(rxq, rx_cqe, pkt_len, vlan_len, status))
-> +			break;
-> +
-> +		nr_pkts++;
-> +		num_lro = RQ_CQE_STATUS_GET(status, NUM_LRO);
-> +		if (num_lro)
-> +			num_wqe += hinic3_get_sge_num(rxq, pkt_len);
-> +
-> +		rx_cqe->status = 0;
-> +
-> +		if (num_wqe >= nic_dev->lro_replenish_thld)
-> +			break;
-> +	}
-> +
-> +	if (rxq->delta >= HINIC3_RX_BUFFER_WRITE)
-> +		hinic3_rx_fill_buffers(rxq);
-
-Doesn't this function need to re-enable hw IRQs? Maybe it does
-somewhere in one of the helpers and I missed it?
-
-Even so, it should probably be checking napi_complete_done before
-re-enabling IRQs and I don't see a call to that anywhere, but maybe
-I missed it?
-
-I also don't see any calls to netif_napi_add, so I'm not sure if
-this code needs to be included in this patch ?
-
-> +#define HINIC3_BDS_PER_SQ_WQEBB \
-> +	(HINIC3_SQ_WQEBB_SIZE / sizeof(struct hinic3_sq_bufdesc))
-> +
-> +int hinic3_tx_poll(struct hinic3_txq *txq, int budget)
-> +{
-> +	struct net_device *netdev = txq->netdev;
-> +	u16 hw_ci, sw_ci, q_id = txq->sq->q_id;
-> +	struct hinic3_nic_dev *nic_dev;
-> +	struct hinic3_tx_info *tx_info;
-> +	u16 wqebb_cnt = 0;
-> +	int pkts = 0;
-> +
-> +	nic_dev = netdev_priv(netdev);
-> +	hw_ci = hinic3_get_sq_hw_ci(txq->sq);
-> +	dma_rmb();
-> +	sw_ci = hinic3_get_sq_local_ci(txq->sq);
-> +
-> +	do {
-> +		tx_info = &txq->tx_info[sw_ci];
-> +
-> +		/* Did all wqebb of this wqe complete? */
-> +		if (hw_ci == sw_ci ||
-> +		    ((hw_ci - sw_ci) & txq->q_mask) < tx_info->wqebb_cnt)
-> +			break;
-> +
-> +		sw_ci = (sw_ci + tx_info->wqebb_cnt) & (u16)txq->q_mask;
-> +		prefetch(&txq->tx_info[sw_ci]);
-
-net_prefetch ?
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
