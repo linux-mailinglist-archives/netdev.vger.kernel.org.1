@@ -1,247 +1,183 @@
-Return-Path: <netdev+bounces-169404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C74A43B87
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:28:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DBCA43BAC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBF7A3BDDAB
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:24:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBB2D19C0D6E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9AF267F42;
-	Tue, 25 Feb 2025 10:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6544267AEF;
+	Tue, 25 Feb 2025 10:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrNSTlVL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8Qfom2G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D2267B9C
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3134B267384
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740478934; cv=none; b=aebACTB4gJw7pLubECseFOIQ2Wz32aTbRbvoacQ2KEVJuua2kHcXl4MauDfSvppld7bo/2NhO3aaAfEUlng44MRF2uBKK8gyEGTj4362drbnJ2XySo2ps+MdqLcJvi9OXBVzUfzfkwO+rrCz0ym5aRPc6D3pTGpFxMEtjMcYOaY=
+	t=1740479016; cv=none; b=Vw2aJp5Trsjd6onHVE5WFHoCRcsLI8j0qXReaXVRL04Q+0x8aruNsh7LUfMC7uNmW1T3s1KiRz6JTd8IpUqUwyyIMbSsvZCGbF/jzSpb02DsHc47V1xIXvRqLonchzyzxxYCTjFud14cGGtxHl9v3sBpmz6UaYpdnXpcjZuKPgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740478934; c=relaxed/simple;
-	bh=v9twrmLMUDvtPrU79VyArvUo+LlqBK8BJXTwvQSKJQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ony5Xhe9Khl6Vl946j6koApjwqhP2SpwJ9Ez6e+npJ6NoGdHKCb18iwS++eUk5YiLoFQmi8zL3ldwdYvFO/EV0zEvReb7cZQ0pULip9xqD8JT+YSXP4R9s+YGIsAKgNwNsNAqRKdtGAo4b3ZmajSTYnwURKtAnZs8FW+j4WxxjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrNSTlVL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC0CDC4CEE8;
-	Tue, 25 Feb 2025 10:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740478933;
-	bh=v9twrmLMUDvtPrU79VyArvUo+LlqBK8BJXTwvQSKJQw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YrNSTlVLchFo7ick0DndFzAAKh75PBrP95jjkzQQpZxxtvRfFOLq93T16vkxpxwy7
-	 9k3IQxUs1jEHUjUsmLQqRYBrqW+SBv650zTmFRjStkVUyq2V0M55+y3trGDPWCnVMB
-	 RdeBTAxv+kfqE2FYtsk9PNz2kLhx4nckcrnVL8u6+2WEE0twtpNt4G/hqQAw/VHeOA
-	 RemgyC/Fp3xVZQ+MAsY9Uq0Uz08O99RckHT6XYFwpwegIYBRIrYfS3DdAlZ46CHCfw
-	 KN2i0DViHp+garDsxpKE8N5r/GRm19I6NyemV/dmLJv0sSKJ84iWJNM9Zd+5an701B
-	 o4p356k4TLtpg==
-Date: Tue, 25 Feb 2025 10:22:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
-	wanry@yunsilicon.com, parthiban.veerasooran@microchip.com,
-	masahiroy@kernel.org
-Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
-Message-ID: <20250225102208.GS1615191@kernel.org>
-References: <20250213091402.2067626-1-tianx@yunsilicon.com>
- <20250213091412.2067626-6-tianx@yunsilicon.com>
- <20250218171036.GB1615191@kernel.org>
- <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com>
- <20250224185817.GH1615191@kernel.org>
- <9b96cab4-e433-4752-a668-1d8ff262be2a@yunsilicon.com>
+	s=arc-20240116; t=1740479016; c=relaxed/simple;
+	bh=O1FgopGcYJ35ObRP1Xk/qskuRkSW8a6T+txTQ6TzWj4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=heYiCwlOPe5K/JMoDkz+BHCaUIGLACdRu9WKl+zNbjoWUU0/Abutx0xB70CLwigFDmZop3IhdmalD4obLY/racqP5YrpbqivL2wWE1anbs7JFunbSFLVtFoEUOcvPE0KA2Pz9dA8MhPCZ/043wqKcB5cLSmzEkG8Xk4r0mvOxXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f8Qfom2G; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740479013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nFvercYRlsaQmbbEmex586DDS54p3SFZRkpRH2olSTU=;
+	b=f8Qfom2GnJ3Vkhe+bNjPjBhKXN3hfLicacATPGEQAbrRXlvVTFIdagHv8PA1hs05dFZEAS
+	HAyW/kIl2oPkKAI5HX3HHrImfe9vY+HDhJT6Id1YJXh3utnkfTTXDwcQusXcj7DtXP0ujv
+	F6ZN3EjdlM4Bw8Y5SVRBq+h1ja+Dn/U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-9LJNOGQOOK232ijti1njtA-1; Tue, 25 Feb 2025 05:23:32 -0500
+X-MC-Unique: 9LJNOGQOOK232ijti1njtA-1
+X-Mimecast-MFC-AGG-ID: 9LJNOGQOOK232ijti1njtA_1740479011
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43947a0919aso51619755e9.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:23:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740479011; x=1741083811;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFvercYRlsaQmbbEmex586DDS54p3SFZRkpRH2olSTU=;
+        b=lJwYe1Z8faKMsDHU4LO0iACJI1cPsJO/bwKebs6TpZ+7dQhL0V41ub7RViWowlV2mK
+         kSL2Pnuh1X292J92TImd2RleFtSbCCf7IN2GPDpVKV5z4tlwZBQA+AWdCgZJKztrijKV
+         BLMlH+TR4yRqJxTOCFK20GuMvrZpt8/sRaioOdPgYTqAjogX7PhWciVEPpJm/rYqPLWx
+         DkYoGamcXxdzrSI33GrUHiXRvba0l5v/pATow3aiHV4/YmBRSc8roKOepegCFW/zfjRb
+         3ZU5ks/Qrz+/IxwxTQ07q4Ti4S036BNo0uL1bMeVQfibCy43TGtPCDcmA+wgIFpZJ9nr
+         1cpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWhPmKyh8c/SDVXrNW23++46ZJpgMWMzU0QvkuR5VgBOXVURQB8Uzybs6yvRoPIVDlZuw7hU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCwnzpuYdgBVxE6h2o7RqDxJwRthq8yPchZqhpq7PWI+BrGcaL
+	K94MV/9jLqRonp9lNdx36us3I5o9RLwWmh+1UrG6nLw0Q/DdYoX/AEiBKnhHsj3aPA8pW7IFfCP
+	iV7SgJWNK3FV+qgZdNBLN6+b1t57+AaJoAJIikbUozYlOOVUf7I0TfA==
+X-Gm-Gg: ASbGncspdIHLBamOKG1zj/2Zbw+VtnZK28urd8PXdwid0V/io2eZ6k3XMARKks4aGRn
+	Cw9kz7ubEFxtggQJGC7ZfzupFnlMPNfDXPF3yzKfdc+LJNb2O1AZPtcLGtqHO3iNnLUIFGUxQP1
+	1J9iPk4pS0JLUbDTCvHFwY1h1kDTMvPWkX5jHi7dC5x04x/kkfYrPIUVpRyfpT2cxfr4BoaHm3J
+	G0A2A35q+L0nAZiFJnNUfOf+lzs1/NDMH1xPdSnHUSbDqJTXhP120JJ34DesuSR2yxJC1BrqWDT
+	oSaQn1qYeQXXNU7lHNe7YOnUqIMvGVmIkTB3Smqq0lA=
+X-Received: by 2002:a5d:6d8c:0:b0:38d:c087:98d5 with SMTP id ffacd0b85a97d-390cc5f573emr2347338f8f.8.1740479010969;
+        Tue, 25 Feb 2025 02:23:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFz4JZUAibWUrdhy9yrIVRgWtK2z4/VkN+tAG5NwhKKNfEC0TXMFvvpKpTwouW0wrrU1Rw5vw==
+X-Received: by 2002:a5d:6d8c:0:b0:38d:c087:98d5 with SMTP id ffacd0b85a97d-390cc5f573emr2347296f8f.8.1740479010610;
+        Tue, 25 Feb 2025 02:23:30 -0800 (PST)
+Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ab1532f20sm21118625e9.8.2025.02.25.02.23.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 02:23:30 -0800 (PST)
+Message-ID: <9d381da6-cef7-431e-be82-fd2888fc480a@redhat.com>
+Date: Tue, 25 Feb 2025 11:23:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b96cab4-e433-4752-a668-1d8ff262be2a@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v26 01/20] net: Introduce direct data placement tcp
+ offload
+To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
+ edumazet@google.com, dsahern@kernel.org, ast@kernel.org,
+ jacob.e.keller@intel.com
+References: <20250221095225.2159-1-aaptel@nvidia.com>
+ <20250221095225.2159-2-aaptel@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250221095225.2159-2-aaptel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 10:34:24AM +0800, Xin Tian wrote:
-> On 2025/2/25 2:58, Simon Horman wrote:
-> > On Thu, Feb 20, 2025 at 11:35:26PM +0800, tianx wrote:
-> >> On 2025/2/19 1:10, Simon Horman wrote:
-> >>> On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
-> > ...
-> >
-> >>>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
-> >>> ...
-> >>>
-> >>>> +/* Handling for queue buffers -- we allocate a bunch of memory and
-> >>>> + * register it in a memory region at HCA virtual address 0.  If the
-> >>>> + * requested size is > max_direct, we split the allocation into
-> >>>> + * multiple pages, so we don't require too much contiguous memory.
-> >>>> + */
-> >>> I can't help but think there is an existing API to handle this.
-> >> failed to find one
-> > Yes, me neither.
-> >
-> >>>> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
-> >>> I think unsigned long would be slightly better types for size and max_direct.
-> >> yes, will modify
-> >>>> +		  struct xsc_buf *buf)
-> >>>> +{
-> >>>> +	dma_addr_t t;
-> >>>> +
-> >>>> +	buf->size = size;
-> >>>> +	if (size <= max_direct) {
-> >>>> +		buf->nbufs        = 1;
-> >>>> +		buf->npages       = 1;
-> >>>> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
-> >>>> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
-> >>>> +						       size,
-> >>>> +						       &t,
-> >>>> +						       GFP_KERNEL | __GFP_ZERO);
-> >>>> +		if (!buf->direct.buf)
-> >>>> +			return -ENOMEM;
-> >>>> +
-> >>>> +		buf->direct.map = t;
-> >>>> +
-> >>>> +		while (t & ((1 << buf->page_shift) - 1)) {
-> >>> I think GENMASK() can be used here.
-> >> ok
-> >>>> +			--buf->page_shift;
-> >>>> +			buf->npages *= 2;
-> >>>> +		}
-> >>>> +	} else {
-> >>>> +		int i;
-> >>>> +
-> >>>> +		buf->direct.buf  = NULL;
-> >>>> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
-> >>> I think this is open-coding DIV_ROUND_UP
-> >> right, I'll change
-> >>>> +		buf->npages      = buf->nbufs;
-> >>>> +		buf->page_shift  = PAGE_SHIFT;
-> >>>> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
-> >>>> +					   GFP_KERNEL);
-> >>>> +		if (!buf->page_list)
-> >>>> +			return -ENOMEM;
-> >>>> +
-> >>>> +		for (i = 0; i < buf->nbufs; i++) {
-> >>>> +			buf->page_list[i].buf =
-> >>>> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
-> >>>> +						   &t, GFP_KERNEL | __GFP_ZERO);
-> >>>> +			if (!buf->page_list[i].buf)
-> >>>> +				goto err_free;
-> >>>> +
-> >>>> +			buf->page_list[i].map = t;
-> >>>> +		}
-> >>>> +
-> >>>> +		if (BITS_PER_LONG == 64) {
-> >>>> +			struct page **pages;
-> >>>> +
-> >>>> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
-> >>>> +					      GFP_KERNEL);
-> >>>> +			if (!pages)
-> >>>> +				goto err_free;
-> >>>> +			for (i = 0; i < buf->nbufs; i++) {
-> >>>> +				void *addr = buf->page_list[i].buf;
-> >>>> +
-> >>>> +				if (is_vmalloc_addr(addr))
-> >>>> +					pages[i] = vmalloc_to_page(addr);
-> >>>> +				else
-> >>>> +					pages[i] = virt_to_page(addr);
-> >>>> +			}
-> >>>> +			buf->direct.buf = vmap(pages, buf->nbufs,
-> >>>> +					       VM_MAP, PAGE_KERNEL);
-> >>>> +			kfree(pages);
-> >>>> +			if (!buf->direct.buf)
-> >>>> +				goto err_free;
-> >>>> +		}
-> >>> I think some explanation is warranted of why the above is relevant
-> >>> only when BITS_PER_LONG == 64.
-> >> Some strange historical reasons, and no need for the check now. I'll
-> >> clean this up
-> > Thanks.
-> >
-> > If you do need 64bit only logic, then perhaps it can be moved to a
-> > separate function. It could guard code using something like this.
-> >
-> > int some_func(struct xsc_buf *buf)
-> > {
-> > 	if (!IS_ENABLED(CONFIG_64BIT))
-> > 		return 0;
-> >
-> > 	...
-> > }
-> >
-> > Or if that is not possible, something like this:
-> >
-> > #ifdef CONFIG_64BIT
-> > int some_func(struct xsc_buf *buf)
-> > {
-> > 	...
-> > }
-> > #else /* CONFIG_64BIT */
-> > int some_func(struct xsc_buf *buf) { return 0; }
-> > #fi /* CONFIG_64BIT */
-> >
-> >>>> +	}
-> >>>> +
-> >>>> +	return 0;
-> >>>> +
-> >>>> +err_free:
-> >>>> +	xsc_buf_free(xdev, buf);
-> >>>> +
-> >>>> +	return -ENOMEM;
-> >>>> +}
-> >>> ...
-> >>>
-> >>>> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
-> >>> As per my comment on unsigned long in my response to another patch,
-> >>> I think npages can be unsigned long.
-> >> ok
-> >>>> +{
-> >>>> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
-> >>>> +	int mask = (1 << shift) - 1;
-> >>> Likewise, I think that mask should be an unsigned long.
-> >>> Or, both shift and mask could be #defines, as they are compile-time
-> >>> constants.
-> >>>
-> >>> Also, mask can be generated using GENMASK, e.g.
-> >>>
-> >>> #define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
-> >>> #define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
-> >>>
-> >>> And I note, in the (common) case of 4k pages, that both shift and mask are 0.
-> >> Thank you for the suggestion, but that's not quite the case here. The
-> >> |shift| and |mask| are not used to extract fields from data. Instead,
-> >> they are part of a calculation. In |xsc_buf_alloc|, we allocate the
-> >> buffer based on the system's page size. However, in this function, we
-> >> need to break each page in the |buflist| into 4KB chunks, populate the
-> >> |pas| array with the corresponding DMA addresses, and then map them to
-> >> hardware.
-> >>
-> >> The |shift| is calculated as |PAGE_SHIFT - PAGE_SHIFT_4K|, allowing us
-> >> to convert the 4KB chunk index (|i|) to the corresponding page index in
-> >> |buflist| with |i >> shift|. The |i & mask| gives us the offset of the
-> >> current 4KB chunk within the page, and by applying |((i & mask) <<
-> >> PAGE_SHIFT_4K)|, we can compute the offset of that chunk within the page.
-> >>
-> >> I hope this makes things clearer!
-> > Thanks, that is clear.
-> >
-> > I do still think that the shift and mask could
-> > be compile-time constants rather than local variables.
-> > And it does seem to me that GENMASK can be used to generate the mask.
-> 
-> Hi, Simon,
-> 
-> Assuming we use GENMASK, the mask should be defined as GENMASK(shift - 
-> 1, 0).
-> 
-> When the system page size is 4K, shift will be 0, which will cause an error.
+On 2/21/25 10:52 AM, Aurelien Aptel wrote:
+> +int ulp_ddp_sk_add(struct net_device *netdev,
+> +		   struct sock *sk,
+> +		   struct ulp_ddp_config *config,
+> +		   const struct ulp_ddp_ulp_ops *ops)
+> +{
+> +	int ret;
+> +
+> +	/* put in ulp_ddp_sk_del() */
+> +	dev_hold(netdev);
 
-Understood, so much for that idea.
+You should use netdev_hold()/netdev_put() instead, with a paired reftracker.
+
+> +
+> +	ret = netdev->netdev_ops->ulp_ddp_ops->sk_add(netdev, sk, config);
+> +	if (ret) {
+> +		dev_put(netdev);
+> +		return ret;
+> +	}
+> +
+> +	inet_csk(sk)->icsk_ulp_ddp_ops = ops;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(ulp_ddp_sk_add);
+> +
+> +void ulp_ddp_sk_del(struct net_device *netdev,
+> +		    struct sock *sk)
+> +{
+> +	netdev->netdev_ops->ulp_ddp_ops->sk_del(netdev, sk);
+> +	inet_csk(sk)->icsk_ulp_ddp_ops = NULL;
+> +	dev_put(netdev);
+> +}
+> +EXPORT_SYMBOL_GPL(ulp_ddp_sk_del);
+> +
+> +bool ulp_ddp_is_cap_active(struct net_device *netdev, int cap_bit_nr)
+> +{
+> +	struct ulp_ddp_dev_caps caps;
+> +
+> +	if (!netdev->netdev_ops->ulp_ddp_ops)
+> +		return false;
+> +	netdev->netdev_ops->ulp_ddp_ops->get_caps(netdev, &caps);
+> +	return test_bit(cap_bit_nr, caps.active);
+> +}
+> +EXPORT_SYMBOL_GPL(ulp_ddp_is_cap_active);
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index fbb67a098543..771720c6e0da 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -5474,6 +5474,8 @@ tcp_collapse(struct sock *sk, struct sk_buff_head *list, struct rb_root *root,
+>  
+>  		memcpy(nskb->cb, skb->cb, sizeof(skb->cb));
+>  		skb_copy_decrypted(nskb, skb);
+> +		skb_copy_no_condense(nskb, skb);
+> +		skb_copy_ulp_crc(nskb, skb);
+>  		TCP_SKB_CB(nskb)->seq = TCP_SKB_CB(nskb)->end_seq = start;
+>  		if (list)
+>  			__skb_queue_before(list, skb, nskb);
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 2308665b51c5..bcb8055bbb0f 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -346,6 +346,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
+>  
+>  	flush |= (ntohl(th2->seq) + skb_gro_len(p)) ^ ntohl(th->seq);
+>  	flush |= skb_cmp_decrypted(p, skb);
+> +	flush |= skb_is_ulp_crc(p) != skb_is_ulp_crc(skb);
+
+Possibly a `skb_cmp_ulp_crc()` helper would be cleaner.
+
+Thanks,
+
+Paolo
+
 
