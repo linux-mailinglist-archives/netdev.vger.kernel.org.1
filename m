@@ -1,193 +1,181 @@
-Return-Path: <netdev+bounces-169439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABE3A43EC3
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:07:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB422A43EF8
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:13:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CCD3A7EEC
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:04:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 853F516F945
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749F7267F5F;
-	Tue, 25 Feb 2025 12:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6664020C012;
+	Tue, 25 Feb 2025 12:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=xpedite-tech.com header.i=@xpedite-tech.com header.b="gff+HtU6"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O0bl42Jf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB2829CF0
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF975241CA6
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740485095; cv=none; b=sHMVG/7FT7H0dKjBM8nCkl4jzr3BQa7MXZGyRm8vSWFjG27au2KXMimOHSSzXvV3dnxw/IMuc04QiMOjrSUngfcjgXVZkz0UrRW5KgRe1VY8cthO5I+lrd0oonnxypmIX/msICR88Qu7EwtXghOE0UHC64fcpbgMyVP98RltmX4=
+	t=1740485313; cv=none; b=bBj0F5uS+Vm2QUKZDf5LfZsTvPTwSJxTh/wSvCYZS3anulDtnJfVlHZVg06bAQftJ/ix8R8PPpnwKNACNRMrQkrx1kanh6v+V2iEZZD904L8ok9A/JsSkB4XMBkiANOcRID86DuDXwCJkrBj/iS1R+NedK+PWYiDelk/cdn9XL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740485095; c=relaxed/simple;
-	bh=yE7H22V0uFiCtzVppDgh3WMuasTY8OzGkcgWsvhIhOI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BkS+2/JzjLuksOIJDbB7/7uTxGlOoEQsqBvgc1m7zd6rTGPN/xiSDkj0+hwwQgB6l3PdgmwjgyYkTRjM1J5ujIXQC68KP/lYSAHLNvhaUBtmChhW6QywzHXjwcDLxkmf31Donkv6rCQneeefzuxVaZ1CWRLk4naJDmHZuyo3VPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xpedite-tech.com; spf=pass smtp.mailfrom=xpedite-tech.com; dkim=temperror (0-bit key) header.d=xpedite-tech.com header.i=@xpedite-tech.com header.b=gff+HtU6; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xpedite-tech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xpedite-tech.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-72726025fa5so1469249a34.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 04:04:53 -0800 (PST)
+	s=arc-20240116; t=1740485313; c=relaxed/simple;
+	bh=Q9LTud62PiNP68Npcecb+Y8o1+UPT1AVOMCQPZBgGqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P2gBsolz7aRRMb1UNY297is3Q6jhlHCvouaNQXSTRTw6fmPD9b2w4q/oZAZ3VZvaaT8upibPCVcg2ZtgQDRk/UFGTbpOBV3eCxvMg+tfLBCNgiY6eSBt/suBB0/LQrSolsIazClTAsgpVMmB+N3N4j+94vT6ENEvojZFkUWhzoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=O0bl42Jf; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1100392666b.1
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 04:08:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=xpedite-tech.com; s=google; t=1740485092; x=1741089892; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zSfp0wqtDDyworITem6k3T9z2pfFqgSsCHRMw5eT8PE=;
-        b=gff+HtU6fuXVRtr4npGqdQAYRZPTvpM8vu15HNwgiQiu7mq3MHAyq/S1nVDQI3Y0/G
-         gQJFniExDFs38+gfdLB0Y4IefLJW4CbYXBhmiFPlX7n8XTor8Vo5LnHc8o3famx1K3aU
-         z7MahuRppxS7MkOmxcxgKslUtNRC+XoiLl8Vjmr1MqjlL0k77a5yI0dOj9taZicA5KK+
-         neTxRvuE71Jy+RvIpUuSENfATAjLNyEG2lKxIIrbp/1Iz8HTkoyfBCiMBqc0z+f0+fCv
-         jYwxCQIOv4WI2qcRRSxiVXeJzFISc8K0NbXMCY0jPtOC2CY+as3PjZi2rUNfD8syigVN
-         3Gtw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740485307; x=1741090107; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uSFcV+r5E4WxO2+xTlVlzsifVYmK0gkUHuM2wDK2xfs=;
+        b=O0bl42JfY9iW9MVVQmivUg+zLcrBvsDb1fxDe857MejbJOhKV++ywxFzxdGE5zAWS5
+         gzsaR+V9C+DnsxbwKuryVhd0Tl9f6rJyv50w8HY/Wt1b/VLiuJAMB70b71+sJNUypyWe
+         I0TgZUbKv4FfJxop1eTMAKrJ0T/vvwqlg8efNcDcXRtHSS7HCMFlxHE3Y7ftRSOnePhF
+         LQACcCDB+q8TFXvb0HQHUbtSBD4U4QWLcjsrgSJMmK1TnW5Tg0nUQH7PizlFwoOxvjTh
+         P+GnZyrCGT4CQemAhPQHglyZgG2S0qsSdWIbFuY87BlFpVuZ8C5NfjCu79cKcWoGR4nS
+         zE4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740485092; x=1741089892;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zSfp0wqtDDyworITem6k3T9z2pfFqgSsCHRMw5eT8PE=;
-        b=LB5RrFdWS9Y86oMjHFy4tD8mR0NoOwrSObOhtg5eu+j1k1z8DtX+AccwRoaB/X9Kue
-         e7WZDx/NhsF+BmgGu5dsFiEQMsg8Wdfrhg9/H4jGaFzpvPPxkE4UGOh0JBMp/vhQG/ro
-         Skq+Fx/cGG0OZ30p1lUeVKWpUheYVpyJfc68FoElPaCOD6/rZnIESxyfp1RTRl5FjnPF
-         PnqV/V51B6CwhxbSY4e5ImtrO/s2OwegaRUaFTE4vjFgyv+uE35c0+njPibfDHNTnyBH
-         Kpx/CeLxHWkU26tK9uxgXVMUuSxN6zzh2c7vLI6LU7RwMPr4Whoaqd+7L3um/60N7+0L
-         7VKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVAD+cP7blHjtI1orvsT1Mu5EQDM8/gpj4zM2p8ZIDUsgqmDQ+ataZtefID6c5fgo7mfjD1sKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYYX5S/VeOahcpv2LarPrZNi3BlLBbmW3JloPY7u2bkyaXZOOo
-	rrSgM3hhsq0xgocwycsFhVR/a8bAP4SFMzNlNfHcemIY/mIkzgE6VF7UVXrwT6HryOVqigOBeqa
-	Z7GC+1UcfETS1lOyym9AMvhLNLPi3sVmPcp2KBg==
-X-Gm-Gg: ASbGncuk7MdgPoOKpi5oXHZYGyhpsZF8C7KJ5nVmE7Vpy1TzN58HRrblsHgTNSFRq+h
-	IKbABRBfvGdWAwPhXw8Fns7VhCy5je0OHUSDTSFHu769hirbj+C/gpq7/T5/t1HMGya9GNiC7sQ
-	+Ia2Yc
-X-Google-Smtp-Source: AGHT+IFxChJjsQmtkzVHbDEsQnJtoP2zQ4RwuNhq/gb8zO9vyDTiERJo6F2GgebR20h2a1YsTQFsY6jfVQR1EP1ys30=
-X-Received: by 2002:a05:6830:65c2:b0:727:42cb:db25 with SMTP id
- 46e09a7af769-7289d1840e1mr2276551a34.25.1740485092672; Tue, 25 Feb 2025
- 04:04:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740485307; x=1741090107;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uSFcV+r5E4WxO2+xTlVlzsifVYmK0gkUHuM2wDK2xfs=;
+        b=wvDtbAZS+ngmZWL2ShHgEUX4vK9WBmwdiRK2E3X2m8/eO4EdLyX0139VC7eiXeXPH2
+         y7pOWdPwPfg4fb9WvHIkjDCRuQKHCP3SXorSXx08R/07UIAZvRq5GcqQVOXYtQrr+FoV
+         aivErB6Yv0KMulaxCnumfj2XuAzmwIyR31nAoBc3tc2LEqlYxqtJxQsIJjiahhjYv/pD
+         3hr7Tr1rhwYKF4p8E2fXGmHOihQccEBGL7f1MRzsqObh6qL1DSdi4cM46EWN/9EHb78U
+         +AGksD3lukOTkELI8nNzA65hQ3Un5eZSR6rcVU5BrQONtraLsI3KZWI5Sp1zoEuKx3Am
+         n4ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmd3HG+BUpak5R1LxuCsolG+Y+gTJzTlLgo7hQfD15n1H8PZ0tewzlL8YMm7y+BdtCSPFcBYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+/DJfLzaMZDiRCxeSQBn8Yk+Jz4e++uAxMx3lxTtIPGuIdyuy
+	HVBgZt6xVbdvSUE5fQLJ0LNT4AJ14LF5U/eD3NmthDXsLa5/WqEcugArJfhniv0=
+X-Gm-Gg: ASbGnctVBgJeWaQyE6ae7Bu8gpslzFbM8tX/ULYLI1lG35dl0CHEPDr3mmXtR/CS+JU
+	913PUit8qKSZG/N/21Q/ztiX0198ZKUQQXaaZaCCHG9YwRkDnpVJ6fhfELsFhNVPY0QcYkngDAl
+	QAp8XhN8EbQiIakRfDqne61BoQ2SLRK6TJMeCJG2g6PamQnWyDKuq3xRjIRY2eeFEy2uQ+jiQNG
+	QOXto7rdmi3/XOkMPbzzQtAMQWURF3GWAYE2qVWodrdZgeYuC30bs0OuuUKwPns0f23Jcgppbr9
+	rcLf0uKPKDRBeEhL2p0CQdoCiaZaMJv3l41kZqtNJoRacPDb5Sg94Nt6xGyN/PNTXqXHWTPXYEZ
+	VYXawS1tlgHkXtuk=
+X-Google-Smtp-Source: AGHT+IH3gdzX3PeChiwCGAsoV3Kg3a9bzz9OmkI9aT6t+gpVTMMM2ymgKcITTcD1763s9dbf6zqhuA==
+X-Received: by 2002:a17:907:9686:b0:ab7:d7fd:6250 with SMTP id a640c23a62f3a-abed1015488mr297536566b.43.1740485306884;
+        Tue, 25 Feb 2025 04:08:26 -0800 (PST)
+Received: from jiri-mlt.client.nvidia.com (194-212-255-194.customers.tmcz.cz. [194.212.255.194])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed2057276sm131230566b.142.2025.02.25.04.08.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 04:08:26 -0800 (PST)
+Date: Tue, 25 Feb 2025 13:08:24 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>, 
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"Glaza, Jan" <jan.glaza@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] dpll: Add a check before kfree() to match the existing
+ check before kmemdup()
+Message-ID: <txrxpe7tmpsyiu4cwjd2gbs3udogmzdo5ertjwmhbeynu23iep@dcryfdoi7o5x>
+References: <20250223201709.4917-1-jiashengjiangcool@gmail.com>
+ <DM6PR11MB4657A297365AE59DE960AA899BC02@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <kwdkfmt2adru7wk7qwyw67rp6b6e3s63rbx4dqijl6roegsg3f@erishkbcfmbm>
+ <CANeGvZVoy20axVTOd4L=d0rwgMWvH_TJqV6ip=_TaDNPJVEqkQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224-net-mptcp-misc-fixes-v1-0-f550f636b435@kernel.org> <20250224-net-mptcp-misc-fixes-v1-2-f550f636b435@kernel.org>
-In-Reply-To: <20250224-net-mptcp-misc-fixes-v1-2-f550f636b435@kernel.org>
-From: "Chester A. Unal" <chester.a.unal@xpedite-tech.com>
-Date: Tue, 25 Feb 2025 12:04:41 +0000
-X-Gm-Features: AWEUYZks3-zpV9BgaLEsplR7ehMtt5Cm16964KCfO-pnDzVnFeXwC2kQ-zE55-c
-Message-ID: <CAD501Os6sdNrc0PaD8Lnew1UO8nWRVd+0z=DgLEuUttus3aDQw@mail.gmail.com>
-Subject: Re: [PATCH net 2/3] mptcp: reset when MPTCP opts are dropped after join
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Zenon van Deventer <zenon@xpedite-tech.com>, 
-	dwayne Du Preez <dwayne.dupreez@xpedite-tech.com>, 
-	Alexander Scholten <alexander.scholten@xpedite-tech.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANeGvZVoy20axVTOd4L=d0rwgMWvH_TJqV6ip=_TaDNPJVEqkQ@mail.gmail.com>
 
-Tested-by: Chester A. Unal <chester.a.unal@xpedite-tech.com>
+Mon, Feb 24, 2025 at 05:47:04PM +0100, jiashengjiangcool@gmail.com wrote:
+>Hi Jiri,
+>
+>On Mon, Feb 24, 2025 at 7:04 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Mon, Feb 24, 2025 at 10:31:27AM +0100, arkadiusz.kubalewski@intel.com wrote:
+>> >Hi Jiasheng, many thanks for the patch!
+>> >
+>> >>From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+>> >>Sent: Sunday, February 23, 2025 9:17 PM
+>> >>
+>> >>When src->freq_supported is not NULL but src->freq_supported_num is 0,
+>> >>dst->freq_supported is equal to src->freq_supported.
+>> >>In this case, if the subsequent kstrdup() fails, src->freq_supported may
+>> >
+>> >The src->freq_supported is not being freed in this function,
+>> >you ment dst->freq_supported?
+>> >But also it is not true.
+>> >dst->freq_supported is being freed already, this patch adds only additional
+>> >condition over it..
+>> >From kfree doc: "If @object is NULL, no operation is performed.".
+>> >
+>> >>be freed without being set to NULL, potentially leading to a
+>> >>use-after-free or double-free error.
+>> >>
+>> >
+>> >kfree does not set to NULL from what I know. How would it lead to
+>> >use-after-free/double-free?
+>> >Why the one would use the memory after the function returns -ENOMEM?
+>> >
+>> >I don't think this patch is needed or resolves anything.
+>>
+>> I'm sure it's not needed.
+>>
+>
+>After "memcpy(dst, src, sizeof(*dst))", dst->freq_supported will point
+>to the same memory as src->freq_supported.
+>When src->freq_supported is not NULL but src->freq_supported_num is 0,
+>dst->freq_supported still points to the same memory as src->freq_supported.
+>Then, if the subsequent kstrdup() fails, dst->freq_supported is freed,
+>and src->freq_supported becomes a Dangling Pointer,
+>potentially leading to a use-after-free or double-free error.
 
-Thanks a ton!
-Chester A.
+Okay. This condition should not happen, driver is broken in that case.
+Better add an assertion for it.
 
-On Mon, Feb 24, 2025 at 6:19=E2=80=AFPM Matthieu Baerts (NGI0)
-<matttbe@kernel.org> wrote:
+
 >
-> Before this patch, if the checksum was not used, the subflow was only
-> reset if map_data_len was !=3D 0. If there were no MPTCP options or an
-> invalid mapping, map_data_len was not set to the data len, and then the
-> subflow was not reset as it should have been, leaving the MPTCP
-> connection in a wrong fallback mode.
+>-Jiasheng
 >
-> This map_data_len condition has been introduced to handle the reception
-> of the infinite mapping. Instead, a new dedicated mapping error could
-> have been returned and treated as a special case. However, the commit
-> 31bf11de146c ("mptcp: introduce MAPPING_BAD_CSUM") has been introduced
-> by Paolo Abeni soon after, and backported later on to stable. It better
-> handle the csum case, and it means the exception for valid_csum_seen in
-> subflow_can_fallback(), plus this one for the infinite mapping in
-> subflow_check_data_avail(), are no longer needed.
->
-> In other words, the code can be simplified there: a fallback should only
-> be done if msk->allow_infinite_fallback is set. This boolean is set to
-> false once MPTCP-specific operations acting on the whole MPTCP
-> connection vs the initial path have been done, e.g. a second path has
-> been created, or an MPTCP re-injection -- yes, possible even with a
-> single subflow. The subflow_can_fallback() helper can then be dropped,
-> and replaced by this single condition.
->
-> This also makes the code clearer: a fallback should only be done if it
-> is possible to do so.
->
-> While at it, no need to set map_data_len to 0 in get_mapping_status()
-> for the infinite mapping case: it will be set to skb->len just after, at
-> the end of subflow_check_data_avail(), and not read in between.
->
-> Fixes: f8d4bcacff3b ("mptcp: infinite mapping receiving")
-> Cc: stable@vger.kernel.org
-> Reported-by: Chester A. Unal <chester.a.unal@xpedite-tech.com>
-> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/544
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  net/mptcp/subflow.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
->
-> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-> index dfcbef9c46246983d21c827d9551d4eb2c95430e..9f18217dddc865bc467a2c5c3=
-4aa4bf23bf3ac75 100644
-> --- a/net/mptcp/subflow.c
-> +++ b/net/mptcp/subflow.c
-> @@ -1142,7 +1142,6 @@ static enum mapping_status get_mapping_status(struc=
-t sock *ssk,
->         if (data_len =3D=3D 0) {
->                 pr_debug("infinite mapping received\n");
->                 MPTCP_INC_STATS(sock_net(ssk), MPTCP_MIB_INFINITEMAPRX);
-> -               subflow->map_data_len =3D 0;
->                 return MAPPING_INVALID;
->         }
->
-> @@ -1286,18 +1285,6 @@ static void subflow_sched_work_if_closed(struct mp=
-tcp_sock *msk, struct sock *ss
->                 mptcp_schedule_work(sk);
->  }
->
-> -static bool subflow_can_fallback(struct mptcp_subflow_context *subflow)
-> -{
-> -       struct mptcp_sock *msk =3D mptcp_sk(subflow->conn);
-> -
-> -       if (subflow->mp_join)
-> -               return false;
-> -       else if (READ_ONCE(msk->csum_enabled))
-> -               return !subflow->valid_csum_seen;
-> -       else
-> -               return READ_ONCE(msk->allow_infinite_fallback);
-> -}
-> -
->  static void mptcp_subflow_fail(struct mptcp_sock *msk, struct sock *ssk)
->  {
->         struct mptcp_subflow_context *subflow =3D mptcp_subflow_ctx(ssk);
-> @@ -1393,7 +1380,7 @@ static bool subflow_check_data_avail(struct sock *s=
-sk)
->                         return true;
->                 }
->
-> -               if (!subflow_can_fallback(subflow) && subflow->map_data_l=
-en) {
-> +               if (!READ_ONCE(msk->allow_infinite_fallback)) {
->                         /* fatal protocol error, close the socket.
->                          * subflow_error_report() will introduce the appr=
-opriate barriers
->                          */
->
-> --
-> 2.47.1
->
+>> >
+>> >Thank you!
+>> >Arkadiusz
+>> >
+>> >>Fixes: 830ead5fb0c5 ("dpll: fix pin dump crash for rebound module")
+>> >>Cc: <stable@vger.kernel.org> # v6.8+
+>> >>Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+>> >>---
+>> >> drivers/dpll/dpll_core.c | 3 ++-
+>> >> 1 file changed, 2 insertions(+), 1 deletion(-)
+>> >>
+>> >>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>> >>index 32019dc33cca..7d147adf8455 100644
+>> >>--- a/drivers/dpll/dpll_core.c
+>> >>+++ b/drivers/dpll/dpll_core.c
+>> >>@@ -475,7 +475,8 @@ static int dpll_pin_prop_dup(const struct
+>> >>dpll_pin_properties *src,
+>> >> err_panel_label:
+>> >>      kfree(dst->board_label);
+>> >> err_board_label:
+>> >>-     kfree(dst->freq_supported);
+>> >>+     if (src->freq_supported_num)
+>> >>+             kfree(dst->freq_supported);
+>> >>      return -ENOMEM;
+>> >> }
+>> >>
+>> >>--
+>> >>2.25.1
+>> >
 
