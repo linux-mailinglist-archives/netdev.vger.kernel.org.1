@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-169444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA29A43F65
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC32A43F67
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1ED0189CFA4
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:30:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54026189D19A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BAD267B86;
-	Tue, 25 Feb 2025 12:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90FCC26868B;
+	Tue, 25 Feb 2025 12:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7kesyG/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QeeQTGRN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58C5266B4D
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647E4267F79;
+	Tue, 25 Feb 2025 12:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740486600; cv=none; b=qr776I/4eRBrCCbI39sQDGTtXp+vWEEJTHg+xYM6wXle+M5gbDlFA3B8BSPas6+enCcg9XUdz75Pgvr5itD73ma59WWdfusmrP4murqv2kaMzKTJtMiCG3Lmh58KpRgF8NeJkdd2zLVnWkbSakrMMK/8snyxV4j5Qd3b+pZdw4A=
+	t=1740486601; cv=none; b=loi6IOZQbjet8rZ9FS8rt/IxHxjGr9t0vP2OcTGyfckwFXFTZuHLdeR12H9D5ZB5GbdJ3rjA8fa2vlxWt6CqsT8f6RG3eprOBrrpSFDjeKtC9T5/xS/lb90BoB+etqU0psfr4k7ylegi6pld12HnWRbWkhBH+RMSHOiwxt1Kx18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740486600; c=relaxed/simple;
-	bh=CCZZVLrAd+VY3mI5UVR9eb10N1U94kjdMS/sPyBJNgo=;
+	s=arc-20240116; t=1740486601; c=relaxed/simple;
+	bh=XW++pQBAsxBSIdf5lR6Pzeu7mCFc5KfkHsVWatPr7xY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SccJFtnDo0/WZq5ezRTYcnNvzlFzgPpgbMRfoUJ0RWL26JqlRgUipWFwRX4ARih2ckuxShOX4aXLMZPVo19E/iopThIvDINHrj7taxgCoqXQzDj/PEUhKiufATR436uIl4bNJyHWfvkV5qymRNtRfmELoG79Ag01TwYl9xY/AsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O7kesyG/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656C3C4CEDD;
-	Tue, 25 Feb 2025 12:29:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AVyFFPXbM36ThFQQUGdi0MN//NUm2za5+dyoDrfslBdTX1MMOatFL+BnbWzWEtFaEcfSzGxJmY9/RQEoiRC7Iti5ip7aOLTvxFKtmsKoEC8/gUl7qXzl7QXnrp2OOdBoawpQMIzV7cblBMuWGK0Ekvkc9DHcwl4HHFtqTxYlqdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QeeQTGRN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D661AC4CEE6;
+	Tue, 25 Feb 2025 12:30:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740486599;
-	bh=CCZZVLrAd+VY3mI5UVR9eb10N1U94kjdMS/sPyBJNgo=;
+	s=k20201202; t=1740486600;
+	bh=XW++pQBAsxBSIdf5lR6Pzeu7mCFc5KfkHsVWatPr7xY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O7kesyG/qK51aMKM2K1lsdiMwdCfV6pfjWGQBo5nXMNDR84xRjI8zuQO/AYJS7Roz
-	 6VKNMNERKjt5NtNQdc1fkn03UTjVM2Gghcbz/4j4mKC3AODpZlVsr4LYmVpR1GlsNv
-	 +w6AUCZHz7bk85reo9NpyHLu7Vp1TdTPgx5kWMpSp8NYDmTvsUHb6xI7iABFxjwbjx
-	 cn4kpgmv006ZwI8uAlpGNZdQRDAcmY8q1rwOn/luW9MkJBRwdsf8onr3FNdqKvkGfA
-	 HvjClOOTG7eHzqqrwTgK71yBE5oKEenfL9R8mqRiUMbQ9apDOWOK3vW0deNjaX/mfm
-	 r9G0S+s6b6miw==
+	b=QeeQTGRNf8ilQEL/BUq6EgWqHOHZbEGh+/gMGjZOjkwVlHz/Y7uhEcpsXa/qAxYIL
+	 /KuhjjGoyjw+H26qgwk2v/rGZHYVrKufYRgKaoIC/8N3kY6GP43YhPMbmMABqiOEKc
+	 X+sI4O1IYvMwCNMc0WBMm++4CgvqnFv/AQ8b3MSXFCQlN/q5BbOmyaR+3dnqzWjLob
+	 30SaHquotf2hRdfufJccdJkG2jD+da/51hRN9XmTImqzilg/1EJ9sQdm7M6JWdGnIL
+	 tjL0hDWudGjHEvLsqcRd1bgOGDu3W+zClB4pKvaqv7XSDeg8tVfXILzDhMNRmb1IpJ
+	 RPIelKAGbkcCw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F98380CEDC;
-	Tue, 25 Feb 2025 12:30:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD60380CEDC;
+	Tue, 25 Feb 2025 12:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] MAINTAINERS: socket timestamping: add Jason Xing as
- reviewer
+Subject: Re: [PATCHv2 net] ipvs: Always clear ipvs_property flag in
+ skb_scrub_packet()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174048663100.4155054.3311142438178219679.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Feb 2025 12:30:31 +0000
-References: <20250222172839.642079-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20250222172839.642079-1-willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- kerneljasonxing@gmail.com, kernelxing@tencent.com, willemb@google.com
+ <174048663224.4155054.13422794267665315194.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Feb 2025 12:30:32 +0000
+References: <20250222033518.126087-1-lulie@linux.alibaba.com>
+In-Reply-To: <20250222033518.126087-1-lulie@linux.alibaba.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, asml.silence@gmail.com,
+ willemb@google.com, almasrymina@google.com, chopps@labn.net,
+ aleksander.lobakin@intel.com, nicolas.dichtel@6wind.com,
+ dust.li@linux.alibaba.com, hustcat@gmail.com, ja@ssi.bg, horms@verge.net.au,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sat, 22 Feb 2025 12:28:04 -0500 you wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Jason has been helping as reviewer for this area already, and has
-> contributed various features directly, notably BPF timestamping.
-> 
-> Also extend coverage to all timestamping tests, including those new
-> with BPF timestamping.
+On Sat, 22 Feb 2025 11:35:18 +0800 you wrote:
+> We found an issue when using bpf_redirect with ipvs NAT mode after
+> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
+> the same name space"). Particularly, we use bpf_redirect to return
+> the skb directly back to the netif it comes from, i.e., xnet is
+> false in skb_scrub_packet(), and then ipvs_property is preserved
+> and SNAT is skipped in the rx path.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] MAINTAINERS: socket timestamping: add Jason Xing as reviewer
-    https://git.kernel.org/netdev/net/c/bc50682128bd
+  - [PATCHv2,net] ipvs: Always clear ipvs_property flag in skb_scrub_packet()
+    https://git.kernel.org/netdev/net/c/de2c211868b9
 
 You are awesome, thank you!
 -- 
