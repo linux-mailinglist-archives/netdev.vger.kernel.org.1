@@ -1,247 +1,147 @@
-Return-Path: <netdev+bounces-169283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C11A8A4331B
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:34:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D99A43324
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0143C3A90C2
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF80168971
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE34B1CAB3;
-	Tue, 25 Feb 2025 02:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD0314830F;
+	Tue, 25 Feb 2025 02:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="KfnjNFpl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VMp/m9Ag"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-52.ptr.blmpb.com (va-2-52.ptr.blmpb.com [209.127.231.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F664433D1
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BD113C9B8;
+	Tue, 25 Feb 2025 02:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740450885; cv=none; b=WWRnbbVo4uKPhN0GcN6JA8/ALx7ryXzu8RSbXEZaY9uNUYcc9454Rr3RQrVc7EKwCbeEg70HQ57CVaj3kPVcZWUTPwr2GcQTyPajRdMdch9lfX1u5UnEo1SsBPesCHMUXnyFWmF7/hO9GJZQOo4+ZhzWu7BAKIjeA24gVrvSQHg=
+	t=1740450986; cv=none; b=diCgcyJ7vXIwlG0i2p50gEctlUdyZ7HC5JKh+y9ZEh7FQH1kTnq6X51gObzS9RKRsWz9HXt1g5/mXAApWpbOzCHDc3TiLGhBPWlzrQ8Y6/qJ6jYLAb4XA6z7cA+UFrADyfmhhWQOT/5M+EFqmGaY7LcPURVtvCJHUHCZEmQAsyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740450885; c=relaxed/simple;
-	bh=vtWe8La/5sR1aKe+brYkhc81Uw7Zs3bXUpbCsjEXqAY=;
-	h=To:Date:References:In-Reply-To:From:Message-Id:Content-Type:Cc:
-	 Subject:Mime-Version; b=VUrtNRAvI+qRQickgT6iW3laeIWbVLN8XF1it1M7J0eJWEQD6CrQD3sQFJejDkSs55Yi5hYr2MDJyP4kAZO1jMDlxl/Yu58Hk2/La817kfSPaxwB5FIsMWJpppITHPIr/iCJcPaff2JyANOnVEdaAW5zS/v+gVhZXam2nlGjz9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=KfnjNFpl; arc=none smtp.client-ip=209.127.231.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1740450869; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=nJ3rL96eWpm3FW2wAvIwiJyEXvFF6g+f2WIdIeJVNiQ=;
- b=KfnjNFplGXJx2vtQiYKxphQHQHS3VQTO/ZJZsAWkVfWQs0rqRv4uLz3BTJuk9+pqe6NIql
- H0e3qa/N8xlCBq/M6V4mrRAUHVEXicW8OGs3bok3XuVFqDBqldpFskkepOdT7QqStyhIXU
- EmiC2Rlih4sMdrK8xwHX5oKVpHFfKed0smBH5osBistMG2IWXjaoWj6M5vfelQ6Nxs+wNZ
- jmAderKZBPw+eg14mMZcRwxz0Can4fj8//4ZKoJsfNtVOlDOy3Rls6vo8T/88eGDpjdalC
- MGlstYhSMGJuC9D24xLXpmynFs3ZE6Ja4B8EU6wmUfwRo/cND5gyjP/13ORUfA==
-To: "Simon Horman" <horms@kernel.org>
-Date: Tue, 25 Feb 2025 10:34:24 +0800
-References: <20250213091402.2067626-1-tianx@yunsilicon.com> <20250213091412.2067626-6-tianx@yunsilicon.com> <20250218171036.GB1615191@kernel.org> <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com> <20250224185817.GH1615191@kernel.org>
-In-Reply-To: <20250224185817.GH1615191@kernel.org>
-User-Agent: Mozilla Thunderbird
-From: "Xin Tian" <tianx@yunsilicon.com>
-Message-Id: <9b96cab4-e433-4752-a668-1d8ff262be2a@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, 
-	<davem@davemloft.net>, <jeff.johnson@oss.qualcomm.com>, 
-	<przemyslaw.kitszel@intel.com>, <weihg@yunsilicon.com>, 
-	<wanry@yunsilicon.com>, <parthiban.veerasooran@microchip.com>, 
-	<masahiroy@kernel.org>
-Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
+	s=arc-20240116; t=1740450986; c=relaxed/simple;
+	bh=BCGQGMljga26411sT5xP4jNnIMcUcH9wHX8obGdlcoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AV8DnSZb0uOHLM//Q6DrJcVYg637UvBpQ5Du8/xJFSh7M+XusGLNxYVYdwf8edn7W1L8Z7BbwFPjjJzqYkYV11H/B/ChEpOp9mE5iCDNrnuDcLdMuoNIhVHk5m5BggA1+ll5dm2keqMvrVQ2RJ4tv21zLACoxgi/aLwA5g4myCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VMp/m9Ag; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740450984; x=1771986984;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BCGQGMljga26411sT5xP4jNnIMcUcH9wHX8obGdlcoA=;
+  b=VMp/m9AgYiBP3wuDioRwBiQ4YcSSrlDDpRipNvIS75O9TwBDOGwfToyk
+   0HgOCPhhmy4DoLuG6Xp0aJ+whAq4hWZHspQLK1yGH7G7DzXxyUMQgjPtH
+   dTTFs9az8ASPzOFt9xOorQkBgjNsJ4Qnbb48+UDsrKE2yvdN/cm5HxDk2
+   F4KFZHmoYI7s6GP0Y4pD7y/pPzT19OOiz+TG+SPqyQ20gZlWPTLRHxqwK
+   1to9p1lh221nHl/fevpaKOQmt+7js8XxRsM3/BqVkEXHe0ueMplBEhptI
+   vnJfuWHZi798RTUdcCbqP/rwtJnsb+VsEp/EyigYd6Ja6709anodlHAcN
+   A==;
+X-CSE-ConnectionGUID: tjLyQ6vNSomKiJ/g/Xfzgg==
+X-CSE-MsgGUID: oJawWvqiT0GcW4iaYGApQQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40427843"
+X-IronPort-AV: E=Sophos;i="6.13,312,1732608000"; 
+   d="scan'208";a="40427843"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 18:36:23 -0800
+X-CSE-ConnectionGUID: iahtX+s+TBylmQ62GnhRlQ==
+X-CSE-MsgGUID: zXweUOBFQV6DheV6xB0S7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="120351003"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 24 Feb 2025 18:36:21 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tmknz-0009fD-1D;
+	Tue, 25 Feb 2025 02:36:19 +0000
+Date: Tue, 25 Feb 2025 10:35:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, mst@redhat.com,
+	michael.christie@oracle.com, sgarzare@redhat.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v6 3/6] vhost: Add the cgroup related function
+Message-ID: <202502251038.6UlCIMJy-lkp@intel.com>
+References: <20250223154042.556001-4-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Lms-Return-Path: <lba+267bd2c33+3014ca+vger.kernel.org+tianx@yunsilicon.com>
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Tue, 25 Feb 2025 10:34:26 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250223154042.556001-4-lulu@redhat.com>
 
-On 2025/2/25 2:58, Simon Horman wrote:
-> On Thu, Feb 20, 2025 at 11:35:26PM +0800, tianx wrote:
->> On 2025/2/19 1:10, Simon Horman wrote:
->>> On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
-> ...
->
->>>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
->>> ...
->>>
->>>> +/* Handling for queue buffers -- we allocate a bunch of memory and
->>>> + * register it in a memory region at HCA virtual address 0.  If the
->>>> + * requested size is > max_direct, we split the allocation into
->>>> + * multiple pages, so we don't require too much contiguous memory.
->>>> + */
->>> I can't help but think there is an existing API to handle this.
->> failed to find one
-> Yes, me neither.
->
->>>> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
->>> I think unsigned long would be slightly better types for size and max_direct.
->> yes, will modify
->>>> +		  struct xsc_buf *buf)
->>>> +{
->>>> +	dma_addr_t t;
->>>> +
->>>> +	buf->size = size;
->>>> +	if (size <= max_direct) {
->>>> +		buf->nbufs        = 1;
->>>> +		buf->npages       = 1;
->>>> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
->>>> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
->>>> +						       size,
->>>> +						       &t,
->>>> +						       GFP_KERNEL | __GFP_ZERO);
->>>> +		if (!buf->direct.buf)
->>>> +			return -ENOMEM;
->>>> +
->>>> +		buf->direct.map = t;
->>>> +
->>>> +		while (t & ((1 << buf->page_shift) - 1)) {
->>> I think GENMASK() can be used here.
->> ok
->>>> +			--buf->page_shift;
->>>> +			buf->npages *= 2;
->>>> +		}
->>>> +	} else {
->>>> +		int i;
->>>> +
->>>> +		buf->direct.buf  = NULL;
->>>> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
->>> I think this is open-coding DIV_ROUND_UP
->> right, I'll change
->>>> +		buf->npages      = buf->nbufs;
->>>> +		buf->page_shift  = PAGE_SHIFT;
->>>> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
->>>> +					   GFP_KERNEL);
->>>> +		if (!buf->page_list)
->>>> +			return -ENOMEM;
->>>> +
->>>> +		for (i = 0; i < buf->nbufs; i++) {
->>>> +			buf->page_list[i].buf =
->>>> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
->>>> +						   &t, GFP_KERNEL | __GFP_ZERO);
->>>> +			if (!buf->page_list[i].buf)
->>>> +				goto err_free;
->>>> +
->>>> +			buf->page_list[i].map = t;
->>>> +		}
->>>> +
->>>> +		if (BITS_PER_LONG == 64) {
->>>> +			struct page **pages;
->>>> +
->>>> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
->>>> +					      GFP_KERNEL);
->>>> +			if (!pages)
->>>> +				goto err_free;
->>>> +			for (i = 0; i < buf->nbufs; i++) {
->>>> +				void *addr = buf->page_list[i].buf;
->>>> +
->>>> +				if (is_vmalloc_addr(addr))
->>>> +					pages[i] = vmalloc_to_page(addr);
->>>> +				else
->>>> +					pages[i] = virt_to_page(addr);
->>>> +			}
->>>> +			buf->direct.buf = vmap(pages, buf->nbufs,
->>>> +					       VM_MAP, PAGE_KERNEL);
->>>> +			kfree(pages);
->>>> +			if (!buf->direct.buf)
->>>> +				goto err_free;
->>>> +		}
->>> I think some explanation is warranted of why the above is relevant
->>> only when BITS_PER_LONG == 64.
->> Some strange historical reasons, and no need for the check now. I'll
->> clean this up
-> Thanks.
->
-> If you do need 64bit only logic, then perhaps it can be moved to a
-> separate function. It could guard code using something like this.
->
-> int some_func(struct xsc_buf *buf)
-> {
-> 	if (!IS_ENABLED(CONFIG_64BIT))
-> 		return 0;
->
-> 	...
-> }
->
-> Or if that is not possible, something like this:
->
-> #ifdef CONFIG_64BIT
-> int some_func(struct xsc_buf *buf)
-> {
-> 	...
-> }
-> #else /* CONFIG_64BIT */
-> int some_func(struct xsc_buf *buf) { return 0; }
-> #fi /* CONFIG_64BIT */
->
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +
->>>> +err_free:
->>>> +	xsc_buf_free(xdev, buf);
->>>> +
->>>> +	return -ENOMEM;
->>>> +}
->>> ...
->>>
->>>> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
->>> As per my comment on unsigned long in my response to another patch,
->>> I think npages can be unsigned long.
->> ok
->>>> +{
->>>> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
->>>> +	int mask = (1 << shift) - 1;
->>> Likewise, I think that mask should be an unsigned long.
->>> Or, both shift and mask could be #defines, as they are compile-time
->>> constants.
->>>
->>> Also, mask can be generated using GENMASK, e.g.
->>>
->>> #define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
->>> #define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
->>>
->>> And I note, in the (common) case of 4k pages, that both shift and mask are 0.
->> Thank you for the suggestion, but that's not quite the case here. The
->> |shift| and |mask| are not used to extract fields from data. Instead,
->> they are part of a calculation. In |xsc_buf_alloc|, we allocate the
->> buffer based on the system's page size. However, in this function, we
->> need to break each page in the |buflist| into 4KB chunks, populate the
->> |pas| array with the corresponding DMA addresses, and then map them to
->> hardware.
->>
->> The |shift| is calculated as |PAGE_SHIFT - PAGE_SHIFT_4K|, allowing us
->> to convert the 4KB chunk index (|i|) to the corresponding page index in
->> |buflist| with |i >> shift|. The |i & mask| gives us the offset of the
->> current 4KB chunk within the page, and by applying |((i & mask) <<
->> PAGE_SHIFT_4K)|, we can compute the offset of that chunk within the page.
->>
->> I hope this makes things clearer!
-> Thanks, that is clear.
->
-> I do still think that the shift and mask could
-> be compile-time constants rather than local variables.
-> And it does seem to me that GENMASK can be used to generate the mask.
+Hi Cindy,
 
-Hi, Simon,
+kernel test robot noticed the following build warnings:
 
-Assuming we use GENMASK, the mask should be defined as GENMASK(shift - 
-1, 0).
+[auto build test WARNING on v6.14-rc3]
+[also build test WARNING on linus/master next-20250224]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-When the system page size is 4K, shift will be 0, which will cause an error.
+url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vhost-Add-a-new-parameter-in-vhost_dev-to-allow-user-select-kthread/20250223-234405
+base:   v6.14-rc3
+patch link:    https://lore.kernel.org/r/20250223154042.556001-4-lulu%40redhat.com
+patch subject: [PATCH v6 3/6] vhost: Add the cgroup related function
+config: x86_64-buildonly-randconfig-002-20250224 (https://download.01.org/0day-ci/archive/20250225/202502251038.6UlCIMJy-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250225/202502251038.6UlCIMJy-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502251038.6UlCIMJy-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vhost/vhost.c:275: warning: Function parameter or struct member 'ignore_attachment' not described in '__vhost_worker_flush'
 
 
->
-> ...
+vim +275 drivers/vhost/vhost.c
+
+0921dddcb589803 Mike Christie 2023-06-26  266  
+228a27cf78afc63 Mike Christie 2023-06-26  267  /**
+ba704ff4e142fd3 Mike Christie 2024-03-15  268   * __vhost_worker_flush - flush a worker
+228a27cf78afc63 Mike Christie 2023-06-26  269   * @worker: worker to flush
+228a27cf78afc63 Mike Christie 2023-06-26  270   *
+ba704ff4e142fd3 Mike Christie 2024-03-15  271   * The worker's flush_mutex must be held.
+228a27cf78afc63 Mike Christie 2023-06-26  272   */
+84e88426e3bc18f Cindy Lu      2025-02-23  273  static void __vhost_worker_flush(struct vhost_worker *worker,
+84e88426e3bc18f Cindy Lu      2025-02-23  274  				 bool ignore_attachment)
+a6fc04739be7cd8 Mike Christie 2023-06-26 @275  {
+228a27cf78afc63 Mike Christie 2023-06-26  276  	struct vhost_flush_struct flush;
+228a27cf78afc63 Mike Christie 2023-06-26  277  
+84e88426e3bc18f Cindy Lu      2025-02-23  278  	if ((!ignore_attachment && !worker->attachment_cnt) || worker->killed)
+ba704ff4e142fd3 Mike Christie 2024-03-15  279  		return;
+ba704ff4e142fd3 Mike Christie 2024-03-15  280  
+228a27cf78afc63 Mike Christie 2023-06-26  281  	init_completion(&flush.wait_event);
+228a27cf78afc63 Mike Christie 2023-06-26  282  	vhost_work_init(&flush.work, vhost_flush_work);
+228a27cf78afc63 Mike Christie 2023-06-26  283  
+228a27cf78afc63 Mike Christie 2023-06-26  284  	vhost_worker_queue(worker, &flush.work);
+ba704ff4e142fd3 Mike Christie 2024-03-15  285  	/*
+ba704ff4e142fd3 Mike Christie 2024-03-15  286  	 * Drop mutex in case our worker is killed and it needs to take the
+ba704ff4e142fd3 Mike Christie 2024-03-15  287  	 * mutex to force cleanup.
+ba704ff4e142fd3 Mike Christie 2024-03-15  288  	 */
+ba704ff4e142fd3 Mike Christie 2024-03-15  289  	mutex_unlock(&worker->mutex);
+228a27cf78afc63 Mike Christie 2023-06-26  290  	wait_for_completion(&flush.wait_event);
+ba704ff4e142fd3 Mike Christie 2024-03-15  291  	mutex_lock(&worker->mutex);
+ba704ff4e142fd3 Mike Christie 2024-03-15  292  }
+ba704ff4e142fd3 Mike Christie 2024-03-15  293  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
