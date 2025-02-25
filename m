@@ -1,133 +1,119 @@
-Return-Path: <netdev+bounces-169296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE25A433AD
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:39:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51FFA43410
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 05:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36365176FE2
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:39:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19DCA3B795A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62D0242912;
-	Tue, 25 Feb 2025 03:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF221459EA;
+	Tue, 25 Feb 2025 04:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQCvo8XH"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SYTO+lSf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D9D367;
-	Tue, 25 Feb 2025 03:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63122EEA9;
+	Tue, 25 Feb 2025 04:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740454764; cv=none; b=CRCwl6wR0IAhQ7AyvmCcirmSfHBzSQnXM4r7bnxyuVX5OWFNVjy9tztNC9phbYKfTLj4/kG0hfs8XiliDoq6Mlop2N80+V2CrvKYrqNqZR1qmZe9477nhSrPKq0Fizw1kn14L0XRGRp9eZKjZ7pGY4yv2W/SrF/OnQnzKNNErlg=
+	t=1740457304; cv=none; b=ZbStciJoEA0l+mJ1SQIIystm14TPO83QxuyFe9iRdZdOAbd00Q6COHjRwtjU21f6lsxdIZBl9jOv2ZFYjUzwguIoF6VRDL/rfYJ0kqmVQTbpQvGIYtChEjHqal+O2ZaStuSICxL4NAGke+6DHw0Bcy/1uf8i3MzJLOM9SzQdwmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740454764; c=relaxed/simple;
-	bh=Eo3O7fQNmnRYNoxJI3fzcjSQ+wsxJAPEukzQ+8e8wO4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=V7aKcr3FxS5xYBeHoXzXK5Olpk72J4UnuPaRk1wDc3HtR+bvYw4nvJX7OJa590Jq12V+m8Un4wJyoPx+AL0LfB5+ndZbFvTmoX2X7Sg9tYuYQjxBX7XWR4cYvNBlJpd7dJOnyId6Dcn39c7+QA4BCMXMmONUKZfAGvQ4KZ5O7A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nQCvo8XH; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-220bfdfb3f4so1385995ad.2;
-        Mon, 24 Feb 2025 19:39:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740454762; x=1741059562; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OjW4eNmpXZQk2be1o0LYhrX91M7wCrQClmxQ5N6YUyE=;
-        b=nQCvo8XHmknVktvCiq/cRSXVin9K6oBBiRG1QZXA7UiA1aDSTNyldc13kWPxME1yk5
-         oB/T+kQV5vz0jh2IVAZVtX+a/dlwMRHraJiKn3xSKTJ3Lf03zNadME3vaxQg6ahJ4eYR
-         87tns2swmTlWY/PMyF+Fa++m3i6QYeW5EUSsV9pfVpDh+enHupZwhCvpkOSm5QSUwM04
-         VQPdxGr9CiA0aqIeslz/TqRsaCcN11jX0rcjpdhNFFahUbJrXAlSdJitP5SpKhWavn1f
-         jp+8nZmB8aTPUJvw5ODDqix6aO+/fZw8l5n5uGkpH5Oa3Ssqsse/gKvNJU/MPFJDBuoy
-         E+Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740454762; x=1741059562;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OjW4eNmpXZQk2be1o0LYhrX91M7wCrQClmxQ5N6YUyE=;
-        b=Ya5nQMR3+NEFS8S/7YroaesRVRPwgPAlzfpUEh2vE8QBHEj6FNlxtsScpsrxT6CLH/
-         Knwb9ioZbKXXmnDOUGJGGa+gMho9shHqjJphmNp3boe6UK/ldQsw6bdYNq7BU/mzYW54
-         3hpo/h5rKJvlrM+/1Dp8hLe7wvsuEBMY5Pz3mIfg44IqvcUrS3/eFA0rHPR9lEUHYgwU
-         SCdQJ1PA0l24T7Eu1l8Stncaw0vCtdPw+2qls4oHfyJ5JKDJUgq7EmDe2vH6u4t0qB01
-         0q6OnBeRKvR3ngOlK5eMGEPGvglxWHysA4HonDBkcF4giXH5jMvEm4zskdpD/LK8MVO/
-         vDow==
-X-Forwarded-Encrypted: i=1; AJvYcCXvSdV6jhyUKColIKFLQRtpGcMykgh1SGGd3j3BDFaJ0dKKu8A0Ob9Z+zxnRmh9I93/l4C0mz7xlbA/P3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzxr3JjoK4AX1UV46abaWgLtiCyl19s1+xXxBPRmDUAy+Knd9YQ
-	dQMu31rZHWpwliUc6LgMDQ0vNQaWHUKy+a/qD2di0shyDMY3aCEJ6BMzh5t3l8+hqA==
-X-Gm-Gg: ASbGncslJW1vuqCpEgYvlEhjeDB/i9OVvxmDZakpXechxVmUqc+fIvQ9gxxDu18xX5Q
-	NLwvND7Jcqxevz6GOkLWM6G62SuExUpLPIfN7eB1vs0+m2eqjJGMyvJbvL/YLLgV0lCKQ+nHWJa
-	+ZHOpVzsHUjkKyBNwjMuNxrDmFeLIGp9vjX9T0plqeurFC5RdSV6cve06UXFZpishlxQMNasU0P
-	dGqNgqt1dvZAuhshF8oz26ZRgnvMkLEbOUclQljhS5iaTTTlScUSQpYST952GMNt9I5p3bfpKAq
-	yUJr2K910HvYKSrrGfZrvlDGa/zj+RPxpLMwQbd2NdH/3g==
-X-Google-Smtp-Source: AGHT+IEua4ozRUVgbw0wJY0ruAcgA1qyqPJMaJdoCsoBPJXy70mZg7lI8EW4WJuJ0MbsV8veWza8mw==
-X-Received: by 2002:a05:6a00:3e0e:b0:732:7fc1:92b with SMTP id d2e1a72fcca58-73426ce7706mr26476942b3a.14.1740454762314;
-        Mon, 24 Feb 2025 19:39:22 -0800 (PST)
-Received: from fedora.dns.podman ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a7f8258sm414205b3a.112.2025.02.24.19.39.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 19:39:21 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next] bonding: report duplicate MAC address in all situations
-Date: Tue, 25 Feb 2025 03:39:14 +0000
-Message-ID: <20250225033914.18617-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1740457304; c=relaxed/simple;
+	bh=H4OmXnztUEsPC7v/SI96osX4EalFKkfsxVy36yEaTZQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i4Og9rMV17wYtBci1LyUcA/ZklzOLEGmXpwNHRciq8en8mGVERS/4OBTsPHxxeJ5Pmd3mZ+1Awjs5uxL2zZ+DrLcL/YwTc+CvarjHGOjI45ImwWYDYm3AGme1BZREsGk5xh8rWFGuF+VLtFoTlyQ4TBFgwp1eAGtRh31GIywoHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SYTO+lSf; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51ONUUHQ004527;
+	Mon, 24 Feb 2025 20:21:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=5owx7nFq6qHKJn0Te52Tnn3
+	1Lk4PLT722UG2bOCfBHc=; b=SYTO+lSfbIhvU+SDUPHOfjxkDrcLJl3C0JSoJ8z
+	kXo+RseHHDN0Nj0pVrLn6y7lmUAUY2GLEQPrEYp2UV3vEqghXLED4xZVPkhovqMT
+	l3AzMJONV/lf9Iso7DRwfUqeB5gRme0PgzhWMZf9Mel/NslpT4tms8B1bbaWK84x
+	+4AdqQLagu2NDj6HcRfRIQE8T+NKxaGZafddF8bCTwlppbXus+iuUWlLVg8xbxwN
+	g4KsBS7AJi61PZ5V2B9N/K/ft77u9XfArm0LPesRpuns/bhCThuULnxEpaAzUOMd
+	Xw0SxFtYHfodAHDtqWgxGpBjKsJJcEtuyKr/Sz/ye6YMkcw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4512ge0hd5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 24 Feb 2025 20:21:15 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 24 Feb 2025 20:21:00 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 24 Feb 2025 20:21:00 -0800
+Received: from localhost.localdomain (unknown [10.111.135.16])
+	by maili.marvell.com (Postfix) with ESMTP id 551D13F7065;
+	Mon, 24 Feb 2025 20:21:00 -0800 (PST)
+From: Harshal Chaudhari <hchaudhari@marvell.com>
+To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
+        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Harshal
+ Chaudhari" <hchaudhari@marvell.com>
+Subject: [PATCH v2] net: mvpp2: cls: Fixed Non IP flow, with vlan tag flow defination.
+Date: Mon, 24 Feb 2025 20:20:58 -0800
+Message-ID: <20250225042058.2643838-1-hchaudhari@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=P6XAhjAu c=1 sm=1 tr=0 ts=67bd453c cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=T2h4t0Lz3GQA:10 a=M5GUcnROAAAA:8 a=kR3TKN_x4rxgODecb9QA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: yUy462nxTJJH6JGJpKveUrqDc4m4wxGx
+X-Proofpoint-ORIG-GUID: yUy462nxTJJH6JGJpKveUrqDc4m4wxGx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-25_01,2025-02-24_02,2024-11-22_01
 
-Normally, a bond uses the MAC address of the first added slave as the bond’s
-MAC address. And the bond will set active slave’s MAC address to bond’s
-address if fail_over_mac is set to none (0) or follow (2).
+Non IP flow, with vlan tag not working as expected while
+running below command for vlan-priority. fixed that.
 
-When the first slave is removed, the bond will still use the removed slave’s
-MAC address, which can lead to a duplicate MAC address and potentially cause
-issues with the switch. To avoid confusion, let's warn the user in all
-situations, including when fail_over_mac is set to 2 or not in active-backup
-mode.
+ethtool -N eth1 flow-type ether vlan 0x8000 vlan-mask 0x1fff action 0 loc 0
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Fixes: 1274daede3ef ("net: mvpp2: cls: Add steering based on vlan Id and priority.")
+Signed-off-by: Harshal Chaudhari <hchaudhari@marvell.com>
 ---
 
-v2: add fail_over_mac != BOND_FOM_ACTIVE to condition (Jakub Kicinski)
+Notes:
+    Change from v1:
+            - Added the fixes tag
+    Change from v2:
+            - Corrected description format.
 
----
- drivers/net/bonding/bond_main.c | 2 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 7d716e90a84c..7d98fee5a27f 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2548,7 +2548,7 @@ static int __bond_release_one(struct net_device *bond_dev,
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
+index 1641791a2d5b..8ed83fb98862 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
+@@ -324,7 +324,7 @@ static const struct mvpp2_cls_flow cls_flows[MVPP2_N_PRS_FLOWS] = {
+ 		       MVPP2_PRS_RI_VLAN_MASK),
+ 	/* Non IP flow, with vlan tag */
+ 	MVPP2_DEF_FLOW(MVPP22_FLOW_ETHERNET, MVPP2_FL_NON_IP_TAG,
+-		       MVPP22_CLS_HEK_OPT_VLAN,
++		       MVPP22_CLS_HEK_TAGGED,
+ 		       0, 0),
+ };
  
- 	RCU_INIT_POINTER(bond->current_arp_slave, NULL);
- 
--	if (!all && (!bond->params.fail_over_mac ||
-+	if (!all && (bond->params.fail_over_mac != BOND_FOM_ACTIVE ||
- 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
- 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
- 		    bond_has_slaves(bond))
 -- 
-2.46.0
+2.25.1
 
 
