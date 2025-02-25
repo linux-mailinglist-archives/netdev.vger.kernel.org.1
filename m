@@ -1,213 +1,230 @@
-Return-Path: <netdev+bounces-169530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF06A44656
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:40:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B21A44716
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:58:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3DFE19C26DB
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:37:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8286319C10FF
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63511195980;
-	Tue, 25 Feb 2025 16:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B291F15990C;
+	Tue, 25 Feb 2025 16:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/ZP9X5t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1E21946DF
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8E92F2F
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740501442; cv=none; b=aRklietJzm7qiDp7u5XN6U9PeTtsXWrueHBMWYBQxJXzdvM+iR+pVBfk1YEUGjJY3Ip4g30EptmqQyDOIroUbTtAYIOH1s/pn8Qy5Pc4d9e4GoNcHjLseilXvbRNuOZtycnuAwrxGn+zK+Drxq7QCon24p26TSvGXKhzF7hHRz8=
+	t=1740502578; cv=none; b=mKn6Hpmg5Y+wZXwGKvpwrpj3iVNl3YkckAfCtliVKFEzh8lMX9nt3BCwmH0RC0rEh4DN4AOFWVmaA9rGR3E7VQTZCjWJVpytIgfYrCzgiBzyd+eARcM6H7hwh+U7yShvG9P7r0TOIN7k4OvF3FbxyqdySeSWOvV5ZdUX1T0bChA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740501442; c=relaxed/simple;
-	bh=JXGNsMAKA/cIr0fw23heKnD8Fpk+70VhQUoueMIU+dA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=WR2faLop9jECzipDSSiZq0IvkdWBdaxzZ/4+bbIwTN/OYkkNTpt9jHyjmHSuZGQ3rhbCj2QHpbUc2DEKrYTYdlOMelgbVwK7CQq1HclAsrZ65CMvd9mgo+Fc66KTGiqKHbUQEiYuw/y6z8WzkH3s3YfVoqeEQo/OrSWQ11/RMZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=devklog.net; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=devklog.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-867129fdb0aso3565849241.1
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:37:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740501439; x=1741106239;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bE1Bm++4+aG0JvqzXHtfxZSxbwfywYe7NdW94QidQIg=;
-        b=ce7PZlxV/g021h+uweascBG+TmYtkg3JDP8Z3qteQdQ6RAyQzOJkUpRkhd/AqSE9xm
-         5Ig5YkiAV70YJ6lAjww4LUPwW+uPjkN3m3jWZjkPexegiEIFwX4jrgOsxLHWGd8FRqJR
-         UTNXOx5CMCapGT1cdiWsWWDyzO2FclUCvn1RuRHVEwLOZp//VNu6jVxjxhsMkIp8mspy
-         DUgqhRmuO6Vgef5/ah3puhdMDXlOoTV0gptQQeQ9X13iRycAPxctrUcPX/4k76Xwg0Fn
-         hhI1pXGHoxcYk9DJk7B9Rv9LDywLekojb8nyFAU6FsdIyc0JBIPk1cAQjLwh1X0R3Zw9
-         VY4A==
-X-Gm-Message-State: AOJu0YwO6ruXAfxmpWBx7w48VnC8KUdxBxuc0tDX09ZKlgmnc8WUkj0O
-	HF6PWH/BtvpcQz6PMqnRxYCWN/1C1TE1R5L/L0wp59kifI/ie6LdP/wzvQ==
-X-Gm-Gg: ASbGncst8hYgHr+B0hc+VmXUPhu5wLBb+k6dVmpkKofrru/zBolSp6WRagcVkHp0Oh0
-	Ni6ajwS0L8Q7aCazorEa7LVJ4wAutVmVar3ZhY7Cwp9zeIF0wd3BCp/Zu/mNG7d7Tm+oJnY4CLG
-	2s8Ca5ZDh3SxXehZal/hU4xSyN2HztVyUtSFYHKTzg68Mqv1oXjEeO7XkI/jMLGd4svNgawV2Kv
-	AgbiYQMF/br1adppgkoTCnDPlta7MTt0aDlI4Vo6/JqSltZhnTMZeux96uyKGx25ALXyUjciUX2
-	o/lLQGNkuHVrVNhxTV8fyI34aoTq6VmnY5HO87hygNE9b+e5rKuvsOnv
-X-Google-Smtp-Source: AGHT+IGtphQAYN6SnLqeaj5u52N4Txa3SVmxouAupr2eOfFq6jmRr6ZOtpRRvyUVwLWR4d77hzbivQ==
-X-Received: by 2002:a05:6102:2928:b0:4bb:e36f:6a35 with SMTP id ada2fe7eead31-4bfc280482fmr9208524137.14.1740501438955;
-        Tue, 25 Feb 2025 08:37:18 -0800 (PST)
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ed6eb5esm404222241.16.2025.02.25.08.37.18
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 08:37:18 -0800 (PST)
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-868f19a9421so3642165241.2
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:37:18 -0800 (PST)
-X-Received: by 2002:a05:6102:cd4:b0:4bb:e8c5:b157 with SMTP id
- ada2fe7eead31-4bfc29465dcmr9309040137.25.1740501438406; Tue, 25 Feb 2025
- 08:37:18 -0800 (PST)
+	s=arc-20240116; t=1740502578; c=relaxed/simple;
+	bh=1OJOoPI5qtFJXpM87YzISjpXcQNxedDIKGa1xAyMAI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ViaBHhtNrgFyap6s2kb6ufa+6/HeIFIE/J9TWLPC0gUtcWrQcuHoWMBD6cCT97zSTOMd5BxOXVHP8cC6rvOrkUAhkrBbr/AzQKGNnQ06ytosqXtfShRTw0XJ5mO1cFvW2ahGe/qe3LD9XjCV1Byt41VbwwmQL5hf4LvRhApKum0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/ZP9X5t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB5E2C4CEDD;
+	Tue, 25 Feb 2025 16:56:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740502577;
+	bh=1OJOoPI5qtFJXpM87YzISjpXcQNxedDIKGa1xAyMAI4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i/ZP9X5tCJYBiH3RIi7IghhvoeYXvQeDXB9QSwjRcvQFg60D3e978Xgd7XDEulEPX
+	 kLr3zwR5pjT2VI/1FKdJ8A6dj8YwF0SsdhJ/lPR5L5iVLhisBC4dp/NDT/OZAW2C/W
+	 e1abcl8ZxvTouhVXin/ZDILmZTRthUTxqsAoLeZ6YwKIr8NvRoP6+jmrrg1Atr6yN2
+	 elR+ga/ElQLpA6xknULB8TmdnsfozMkW0oVHywIvorwZR0RXZwl0TyfFPRe+AyVvE5
+	 ovWecvKh7i9X9UaoyknWuTkz2L3BT0RgOCER80vkk+USVlLTddzJJinq0zkJVIQe87
+	 2aFFMCNQaTRWw==
+Message-ID: <f970e46e-7153-4000-beef-f2d621998a8e@kernel.org>
+Date: Tue, 25 Feb 2025 17:56:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?B?SmVhbi1GcmFuw6dvaXMgUm95?= <jf@devklog.net>
-Date: Tue, 25 Feb 2025 08:37:07 -0800
-X-Gmail-Original-Message-ID: <CAE8T=_Go-A_W9j18oO+5S52pXKwgFDcR8XgHiywwSRSZmO2LEw@mail.gmail.com>
-X-Gm-Features: AQ5f1Jo3XzyJQ3CwFhNx5fD629OTGZIyNneongY_0kMjUOJ_-HTtCNaCYjZWHvM
-Message-ID: <CAE8T=_Go-A_W9j18oO+5S52pXKwgFDcR8XgHiywwSRSZmO2LEw@mail.gmail.com>
-Subject: mlx5e_xmit: detected field-spanning write (6.12.16)
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
+ SYN_RECV state
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Jakub Kicinski <kuba@kernel.org>, Yong-Hao Zou <yonghaoz1994@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Neal Cardwell <ncardwell@google.com>
+References: <20250224110654.707639-1-edumazet@google.com>
+ <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
+ <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org>
+ <CANn89iJfXJi7CL2ekBo9Zn9KtVTRxwMCZiSxdC21uNfkdNU1Jg@mail.gmail.com>
+ <927c8b04-5944-4577-b6bd-3fc50ef55e7e@kernel.org>
+ <CANn89iJu5dPMF3BFN7bbNZR-zZF_xjxGqstHucmBc3EvcKZXJw@mail.gmail.com>
+ <40fcf43d-b9c2-439a-9375-d2ff78be203f@kernel.org>
+ <CANn89iLH_SgpWgAXvDjRbpFtVjWS-yLSiX0FbCweWjAJgzaASg@mail.gmail.com>
+ <CANn89i+Zs2bLC7h2N5v15Xh=aTWdoa3v2d_A-EvRirsnFEPgwQ@mail.gmail.com>
+ <CANn89iLf5hOnT=T+a9+msJ7=atWMMZQ+3syG75-8Nih8_MwHmw@mail.gmail.com>
+ <8beaf62e-6257-452d-904a-fec6b21c891e@kernel.org>
+ <CANn89i+3M1bJf=gXMH1zK3LiR-=XMRPe+qR8HNu94o2Xzm4vQQ@mail.gmail.com>
+Content-Language: en-GB
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CANn89i+3M1bJf=gXMH1zK3LiR-=XMRPe+qR8HNu94o2Xzm4vQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-I'm regularly seeing field-spanning write dumps from the mlx5 driver
-on one of my Talos Linux + Cilium nodes running Linux 6.12.16. I don't
-know if this is caused by a bug in one of Cilum's bpf programs or if
-it's a legitimate issue with the driver.
+Hi Eric,
 
-kantai1: kern: warning: [2025-02-25T16:19:43.741311529Z]:
-------------[ cut here ]------------
-kantai1: kern: warning: [2025-02-25T16:19:43.741322529Z]: memcpy:
-detected field-spanning write (size 32) of single field "h6 + 1" at
-drivers/net/ethernet/mellanox/mlx5/core/en_tx.c:469 (size 0)
-kantai1: kern: warning: [2025-02-25T16:19:43.741350529Z]: WARNING:
-CPU: 2 PID: 5273 at
-drivers/net/ethernet/mellanox/mlx5/core/en_tx.c:469
-mlx5e_xmit+0x99b/0xe00 [mlx5_core]
-kantai1: kern: warning: [2025-02-25T16:19:43.741401529Z]: Modules
-linked in: nbd nvme_tcp nvme_fabrics nvme_keyring nvidia_uvm(O)
-nvidia_modeset(O) nvidia(O) zfs(PO) spl(O) mlx5_ib nvme mlx5_core ahci
-ixgbe sp5100_tco nvme_core mpt3sas ccp mlxfw libahci mdio watchdog
-k10temp
-kantai1: kern: warning: [2025-02-25T16:19:43.741426529Z]: CPU: 2 UID:
-50 PID: 5273 Comm: apid Tainted: P           O       6.12.16-talos #1
-kantai1: kern: warning: [2025-02-25T16:19:43.741433529Z]: Tainted:
-[P]=PROPRIETARY_MODULE, [O]=OOT_MODULE
-kantai1: kern: warning: [2025-02-25T16:19:43.741435529Z]: Hardware
-name: To Be Filled By O.E.M. ROMED8-2T/ROMED8-2T, BIOS P3.80
-08/01/2023
-kantai1: kern: warning: [2025-02-25T16:19:43.741439529Z]: RIP:
-0010:mlx5e_xmit+0x99b/0xe00 [mlx5_core]
-kantai1: kern: warning: [2025-02-25T16:19:43.741470529Z]: Code: 48 c7
-c2 30 98 52 c0 4c 89 ce 89 04 24 48 c7 c7 78 98 52 c0 44 89 44 24 18
-4c 89 5c 24 10 c6 05 08 1d 0c 00 01 e8 25 63 72 f2 <0f> 0b 44 8b 44 24
-18 4c 8b 5c 24 10 8b 04 24 e9 9a fe ff ff 48 8b
-kantai1: kern: warning: [2025-02-25T16:19:43.741474529Z]: RSP:
-0018:ffffb42af65274f0 EFLAGS: 00010282
-kantai1: kern: warning: [2025-02-25T16:19:43.741478529Z]: RAX:
-0000000000000000 RBX: ffff8ebf75968840 RCX: 0000000000000027
-kantai1: kern: warning: [2025-02-25T16:19:43.741482529Z]: RDX:
-ffff8efd8d91bbc8 RSI: 0000000000000001 RDI: ffff8efd8d91bbc0
-kantai1: kern: warning: [2025-02-25T16:19:43.741484529Z]: RBP:
-ffff8ec29b976ee8 R08: 0000000000000000 R09: 732d646c65696620
-kantai1: kern: warning: [2025-02-25T16:19:43.741487529Z]: R10:
-ffffb42af6527290 R11: 203a7970636d656d R12: ffff8ebf7596f930
-kantai1: kern: warning: [2025-02-25T16:19:43.741489529Z]: R13:
-ffffb42ac29a34c0 R14: ffffb42ac29a34e0 R15: ffff8ebfc8411040
-kantai1: kern: warning: [2025-02-25T16:19:43.741492529Z]: FS:
-000000c000102e98(0000) GS:ffff8efd8d900000(0000)
-knlGS:0000000000000000
-kantai1: kern: warning: [2025-02-25T16:19:43.741495529Z]: CS:  0010
-DS: 0000 ES: 0000 CR0: 0000000080050033
-kantai1: kern: warning: [2025-02-25T16:19:43.741498529Z]: CR2:
-000000c0116fd000 CR3: 0000000174728002 CR4: 0000000000f70ef0
-kantai1: kern: warning: [2025-02-25T16:19:43.741501529Z]: PKRU: 55555554
-kantai1: kern: warning: [2025-02-25T16:19:43.741503529Z]: Call Trace:
-kantai1: kern: warning: [2025-02-25T16:19:43.741507529Z]:  <TASK>
-kantai1: kern: warning: [2025-02-25T16:19:43.741509529Z]:  ?
-mlx5e_xmit+0x99b/0xe00 [mlx5_core]
-kantai1: kern: warning: [2025-02-25T16:19:43.741533529Z]:  ?
-__warn.cold+0x93/0xe0
-kantai1: kern: warning: [2025-02-25T16:19:43.741539529Z]:  ?
-mlx5e_xmit+0x99b/0xe00 [mlx5_core]
-kantai1: kern: warning: [2025-02-25T16:19:43.741568529Z]:  ?
-report_bug+0xeb/0x130
-kantai1: kern: warning: [2025-02-25T16:19:43.741573529Z]:  ?
-handle_bug+0x53/0x90
-kantai1: kern: warning: [2025-02-25T16:19:43.741578529Z]:  ?
-exc_invalid_op+0x17/0x70
-kantai1: kern: warning: [2025-02-25T16:19:43.741581529Z]:  ?
-asm_exc_invalid_op+0x1a/0x20
-kantai1: kern: warning: [2025-02-25T16:19:43.741588529Z]:  ?
-mlx5e_xmit+0x99b/0xe00 [mlx5_core]
-kantai1: kern: warning: [2025-02-25T16:19:43.741611529Z]:  ?
-netif_skb_features+0xc1/0x2e0
-kantai1: kern: warning: [2025-02-25T16:19:43.741616529Z]:
-dev_hard_start_xmit+0x64/0x1a0
-kantai1: kern: warning: [2025-02-25T16:19:43.741622529Z]:
-sch_direct_xmit+0xb0/0x360
-kantai1: kern: warning: [2025-02-25T16:19:43.741627529Z]:
-__qdisc_run+0x143/0x590
-kantai1: kern: warning: [2025-02-25T16:19:43.741630529Z]:
-__dev_queue_xmit+0x578/0xe00
-kantai1: kern: warning: [2025-02-25T16:19:43.741636529Z]:
-ip6_finish_output2+0x2b7/0x600
-kantai1: kern: warning: [2025-02-25T16:19:43.741641529Z]:  ?
-nf_nat_ipv6_out+0x18/0x100
-kantai1: kern: warning: [2025-02-25T16:19:43.741644529Z]:  ?
-nf_hook_slow+0x41/0xe0
-kantai1: kern: warning: [2025-02-25T16:19:43.741650529Z]:
-ip6_finish_output+0x186/0x340
-kantai1: kern: warning: [2025-02-25T16:19:43.741654529Z]:  ip6_xmit+0x2cd/0x630
-kantai1: kern: warning: [2025-02-25T16:19:43.741657529Z]:  ?
-ip6_output+0x150/0x150
-kantai1: kern: warning: [2025-02-25T16:19:43.741661529Z]:  ?
-__sk_dst_check+0x39/0xa0
-kantai1: kern: warning: [2025-02-25T16:19:43.741665529Z]:  ?
-inet6_csk_route_socket+0x138/0x200
-kantai1: kern: warning: [2025-02-25T16:19:43.741671529Z]:
-inet6_csk_xmit+0xce/0x130
-kantai1: kern: warning: [2025-02-25T16:19:43.741676529Z]:
-__tcp_transmit_skb+0x583/0xca0
-kantai1: kern: warning: [2025-02-25T16:19:43.741682529Z]:
-tcp_write_xmit+0x495/0x1580
-kantai1: kern: warning: [2025-02-25T16:19:43.741688529Z]:
-__tcp_push_pending_frames+0x32/0xc0
-kantai1: kern: warning: [2025-02-25T16:19:43.741693529Z]:
-tcp_sendmsg_locked+0xb0b/0xf50
-kantai1: kern: warning: [2025-02-25T16:19:43.741699529Z]:  tcp_sendmsg+0x2b/0x40
-kantai1: kern: warning: [2025-02-25T16:19:43.741703529Z]:
-sock_write_iter+0x12d/0x1a0
-kantai1: kern: warning: [2025-02-25T16:19:43.741709529Z]:  vfs_write+0x37e/0x430
-kantai1: kern: warning: [2025-02-25T16:19:43.741716529Z]:  ksys_write+0xb9/0xf0
-kantai1: kern: warning: [2025-02-25T16:19:43.741721529Z]:
-do_syscall_64+0x6b/0xa60
-kantai1: kern: warning: [2025-02-25T16:19:43.741729529Z]:
-entry_SYSCALL_64_after_hwframe+0x55/0x5d
-kantai1: kern: warning: [2025-02-25T16:19:43.741736529Z]: RIP: 0033:0x480c0e
-kantai1: kern: warning: [2025-02-25T16:19:43.741741529Z]: Code: 24 28
-44 8b 44 24 2c e9 70 ff ff ff cc cc cc cc cc cc cc cc cc cc cc cc cc
-cc cc cc 49 89 f2 48 89 fa 48 89 ce 48 89 df 0f 05 <48> 3d 01 f0 ff ff
-76 15 48 f7 d8 48 89 c1 48 c7 c0 ff ff ff ff 48
-kantai1: kern: warning: [2025-02-25T16:19:43.741747529Z]: RSP:
-002b:000000c00087d730 EFLAGS: 00000212 ORIG_RAX: 0000000000000001
-kantai1: kern: warning: [2025-02-25T16:19:43.741753529Z]: RAX:
-ffffffffffffffda RBX: 000000000000000d RCX: 0000000000480c0e
-kantai1: kern: warning: [2025-02-25T16:19:43.741756529Z]: RDX:
-0000000000004016 RSI: 000000c000b4a000 RDI: 000000000000000d
-kantai1: kern: warning: [2025-02-25T16:19:43.741760529Z]: RBP:
-000000c00087d770 R08: 0000000000000000 R09: 0000000000000000
-kantai1: kern: warning: [2025-02-25T16:19:43.741764529Z]: R10:
-0000000000000000 R11: 0000000000000212 R12: 000000c00087d8a0
-kantai1: kern: warning: [2025-02-25T16:19:43.741768529Z]: R13:
-000000000000000a R14: 000000c000685a40 R15: 000000c00067c640
-kantai1: kern: warning: [2025-02-25T16:19:43.741773529Z]:  </TASK>
-kantai1: kern: warning: [2025-02-25T16:19:43.741777529Z]: ---[ end
-trace 0000000000000000 ]---
+On 25/02/2025 11:51, Eric Dumazet wrote:
+> On Tue, Feb 25, 2025 at 11:48 AM Matthieu Baerts <matttbe@kernel.org> wrote:
+>>
+>> On 25/02/2025 11:42, Eric Dumazet wrote:
+>>> On Tue, Feb 25, 2025 at 11:39 AM Eric Dumazet <edumazet@google.com> wrote:
+>>>>
+>>>
+>>>>
+>>>> Yes, this would be it :
+>>>>
+>>>> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+>>>> index 728bce01ccd3ddb1f374fa96b86434a415dbe2cb..3555567ba4fb1ccd5c5921e39d11ff08f1d0cafd
+>>>> 100644
+>>>> --- a/net/ipv4/tcp_timer.c
+>>>> +++ b/net/ipv4/tcp_timer.c
+>>>> @@ -477,8 +477,8 @@ static void tcp_fastopen_synack_timer(struct sock
+>>>> *sk, struct request_sock *req)
+>>>>          * regular retransmit because if the child socket has been accepted
+>>>>          * it's not good to give up too easily.
+>>>>          */
+>>>> -       inet_rtx_syn_ack(sk, req);
+>>>>         req->num_timeout++;
+>>>> +       inet_rtx_syn_ack(sk, req);
+>>>>         tcp_update_rto_stats(sk);
+>>>>         if (!tp->retrans_stamp)
+>>>>                 tp->retrans_stamp = tcp_time_stamp_ts(tp);
+>>>
+>>> Obviously, I need to refine the patch and send a V2 later.
+>>
+>> Sorry, I still have the issue with this modification. I also checked
+>> with the previous patch, just to be sure, but the problem is still there
+>> as well.
+> 
+> I said "req->num_timeout" is not updated where I thought it was.
+
+I think that in case of SYN+ACK retransmission, req->num_timeout is
+incremented after tcp_synack_options():
+
+  reqsk_timer_handler()
+  --> inet_rtx_syn_ack()
+    --> tcp_rtx_synack()
+      --> tcp_v6_send_synack()
+        --> tcp_make_synack()
+          --> tcp_synack_options()
+  then: req->num_timeout++
+
+> Look at all the places were req->num_timeout or req->num_retrans are
+> set/changed.... this will give you some indications.
+
+I'm probably missing something obvious, but if the goal is to set
+snt_tsval_first only the first time, why can we not simply set
+
+  tcp_rsk(req)->snt_tsval_first = 0;
+
+in tcp_conn_request(), and only set it to tsval in tcp_synack_options()
+when it is 0? Something like that:
+
+
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 217a8747a79b..26b3daa5efd2 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -7249,6 +7249,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+>         tcp_rsk(req)->af_specific = af_ops;
+>         tcp_rsk(req)->ts_off = 0;
+>         tcp_rsk(req)->req_usec_ts = false;
+> +       tcp_rsk(req)->snt_tsval_first = 0;
+>  #if IS_ENABLED(CONFIG_MPTCP)
+>         tcp_rsk(req)->is_mptcp = 0;
+>  #endif
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 485ca131091e..020c624532d7 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -943,7 +943,7 @@ static unsigned int tcp_synack_options(const struct sock *sk,
+>                 opts->options |= OPTION_TS;
+>                 opts->tsval = tcp_skb_timestamp_ts(tcp_rsk(req)->req_usec_ts, skb) +
+>                               tcp_rsk(req)->ts_off;
+> -               if (!req->num_timeout)
+> +               if (!tcp_rsk(req)->snt_tsval_first)
+>                         tcp_rsk(req)->snt_tsval_first = opts->tsval;
+>                 WRITE_ONCE(tcp_rsk(req)->snt_tsval_last, opts->tsval);
+>                 opts->tsecr = READ_ONCE(req->ts_recent)
+
+
+Or is the goal to update this field as long as the timeout didn't fire?
+In this case maybe req->num_timeout should be updated before calling
+inet_rtx_syn_ack() in reqsk_timer_handler(), no?
+
+> Do not worry, I will make sure V2 is fine.
+
+I don't doubt about that, thank you! :)
+
+>> (In the v2, do you mind also removing the underscore from the MIB entry
+>> name (TcpExtTSECR_Rejected) please? It looks like that's the only MIB
+>> entry with an underscore.)
+> 
+> ok
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
