@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-169298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51FFA43410
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 05:21:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E57B0A4346C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 06:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19DCA3B795A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:21:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4C63B5F7A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 05:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF221459EA;
-	Tue, 25 Feb 2025 04:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E04146D59;
+	Tue, 25 Feb 2025 05:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SYTO+lSf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gzU9worL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63122EEA9;
-	Tue, 25 Feb 2025 04:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A569C7EF09;
+	Tue, 25 Feb 2025 05:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740457304; cv=none; b=ZbStciJoEA0l+mJ1SQIIystm14TPO83QxuyFe9iRdZdOAbd00Q6COHjRwtjU21f6lsxdIZBl9jOv2ZFYjUzwguIoF6VRDL/rfYJ0kqmVQTbpQvGIYtChEjHqal+O2ZaStuSICxL4NAGke+6DHw0Bcy/1uf8i3MzJLOM9SzQdwmA=
+	t=1740459935; cv=none; b=sZorCbjWwRQjVi/szb7blp3q4GUvQT3BApYzsH+aeQj70k9/BUDitXHbxlPetjIOtlQ8zi1QPsncVpGJlr228lwGQFmTErCHH5EGS3agxFC3pLN64YyydLLg90qZognupNCXXMOKnGvvuR4BOFLH8pT/inzagi2nH3DAa9TG14U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740457304; c=relaxed/simple;
-	bh=H4OmXnztUEsPC7v/SI96osX4EalFKkfsxVy36yEaTZQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i4Og9rMV17wYtBci1LyUcA/ZklzOLEGmXpwNHRciq8en8mGVERS/4OBTsPHxxeJ5Pmd3mZ+1Awjs5uxL2zZ+DrLcL/YwTc+CvarjHGOjI45ImwWYDYm3AGme1BZREsGk5xh8rWFGuF+VLtFoTlyQ4TBFgwp1eAGtRh31GIywoHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SYTO+lSf; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51ONUUHQ004527;
-	Mon, 24 Feb 2025 20:21:16 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=5owx7nFq6qHKJn0Te52Tnn3
-	1Lk4PLT722UG2bOCfBHc=; b=SYTO+lSfbIhvU+SDUPHOfjxkDrcLJl3C0JSoJ8z
-	kXo+RseHHDN0Nj0pVrLn6y7lmUAUY2GLEQPrEYp2UV3vEqghXLED4xZVPkhovqMT
-	l3AzMJONV/lf9Iso7DRwfUqeB5gRme0PgzhWMZf9Mel/NslpT4tms8B1bbaWK84x
-	+4AdqQLagu2NDj6HcRfRIQE8T+NKxaGZafddF8bCTwlppbXus+iuUWlLVg8xbxwN
-	g4KsBS7AJi61PZ5V2B9N/K/ft77u9XfArm0LPesRpuns/bhCThuULnxEpaAzUOMd
-	Xw0SxFtYHfodAHDtqWgxGpBjKsJJcEtuyKr/Sz/ye6YMkcw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4512ge0hd5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Feb 2025 20:21:15 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 24 Feb 2025 20:21:00 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 24 Feb 2025 20:21:00 -0800
-Received: from localhost.localdomain (unknown [10.111.135.16])
-	by maili.marvell.com (Postfix) with ESMTP id 551D13F7065;
-	Mon, 24 Feb 2025 20:21:00 -0800 (PST)
-From: Harshal Chaudhari <hchaudhari@marvell.com>
-To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
-        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Harshal
- Chaudhari" <hchaudhari@marvell.com>
-Subject: [PATCH v2] net: mvpp2: cls: Fixed Non IP flow, with vlan tag flow defination.
-Date: Mon, 24 Feb 2025 20:20:58 -0800
-Message-ID: <20250225042058.2643838-1-hchaudhari@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1740459935; c=relaxed/simple;
+	bh=4EoFHydMSPUuRYDVxFvSPsyBP8kzcKATNbkRd22e18M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GX96liVvEntx2arA9bE8wZV1Z0BCsVpG97BgTrZQ653gykRFGBqUWC8TBVgFNZoJ8Q+hY3FiXnvG33d+bMDE4z1zLtqqmsM7iu+EyBLGnWgLboTDaKccrwsLeJb3Dgx9dQ7loGiYcpcWCRXQFI/IQ+DKpOB0Q+oMJlKatuN04tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gzU9worL; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740459934; x=1771995934;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4EoFHydMSPUuRYDVxFvSPsyBP8kzcKATNbkRd22e18M=;
+  b=gzU9worLgiDMPi4x7gqVtqYaYpPZ/oC9g9h6imqF74HTrwkYezH4kohp
+   eGd1zpo+dt80pn1b5OoB4i0yr3h02mLrHZII2YYQLr/6WqfpDrZ6EC4rZ
+   ULrBH1hkdZb2k1nCXIr0gZLoKLmKEMIAq/ehcbrYH9pJhIWJFOMXphQVM
+   MhaRvXXy40xsVhbS/kTsHZloV5LGuUeAMQOwlnXDjU2J67KXpUU4h8LpF
+   5+S3LR/qPeWlf8iIxVE3wSFoOpglC+fuJ2itskJ0GZ4fD/fEECEJF6+co
+   kk7IsS5l1cSKyvr7xf14XForZDSNVs+vRCrA0GWCrbWN+u5w2303JWmmb
+   Q==;
+X-CSE-ConnectionGUID: QsW4Ala4SNygNAGPbOH9JQ==
+X-CSE-MsgGUID: pSMTjAPMToaXYqLIl0WRag==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="44075725"
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="44075725"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 21:05:33 -0800
+X-CSE-ConnectionGUID: LXeW1j1sRqGQzAwchtkDbA==
+X-CSE-MsgGUID: xmQadiNhQfCRcpXFG2Q8RA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="116773605"
+Received: from tenikolo-mobl1.amr.corp.intel.com ([10.246.115.109])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2025 21:05:32 -0800
+From: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+To: jgg@nvidia.com,
+	leon@kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	david.m.ertman@intel.com,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+Subject: [iwl-next v4 0/1] Add RDMA support for Intel IPU E2000 (GEN3)
+Date: Mon, 24 Feb 2025 23:04:27 -0600
+Message-Id: <20250225050428.2166-1-tatyana.e.nikolova@intel.com>
+X-Mailer: git-send-email 2.28.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,46 +76,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=P6XAhjAu c=1 sm=1 tr=0 ts=67bd453c cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=T2h4t0Lz3GQA:10 a=M5GUcnROAAAA:8 a=kR3TKN_x4rxgODecb9QA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: yUy462nxTJJH6JGJpKveUrqDc4m4wxGx
-X-Proofpoint-ORIG-GUID: yUy462nxTJJH6JGJpKveUrqDc4m4wxGx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-25_01,2025-02-24_02,2024-11-22_01
 
-Non IP flow, with vlan tag not working as expected while
-running below command for vlan-priority. fixed that.
+To align with review comments, the patch series [1] introducing RDMA
+RoCEv2 support for the Intel Infrastructure Processing Unit (IPU) E2000
+line of products is going to be submitted in three parts:
 
-ethtool -N eth1 flow-type ether vlan 0x8000 vlan-mask 0x1fff action 0 loc 0
+1. Allow for multiple consumers in the Inter-Driver Communication (IDC)
+interface and modify ice to use the generalized IDC definitions. 
 
-Fixes: 1274daede3ef ("net: mvpp2: cls: Add steering based on vlan Id and priority.")
-Signed-off-by: Harshal Chaudhari <hchaudhari@marvell.com>
----
+2. Adapt idpf to the IDC definitions and add RDMA support to idpf.
 
-Notes:
-    Change from v1:
-            - Added the fixes tag
-    Change from v2:
-            - Corrected description format.
+3. Add RDMA RoCEv2 support for the E2000 products, referred to as GEN3
+in irdma.
 
- drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This first part is a single patch - "iidc/ice/irdma: Update IDC to support
+multiple consumers" which allows for multiple consumers using auxiliary bus,
+implementing an "ops" struct and core_dev_info struct.
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-index 1641791a2d5b..8ed83fb98862 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-@@ -324,7 +324,7 @@ static const struct mvpp2_cls_flow cls_flows[MVPP2_N_PRS_FLOWS] = {
- 		       MVPP2_PRS_RI_VLAN_MASK),
- 	/* Non IP flow, with vlan tag */
- 	MVPP2_DEF_FLOW(MVPP22_FLOW_ETHERNET, MVPP2_FL_NON_IP_TAG,
--		       MVPP22_CLS_HEK_OPT_VLAN,
-+		       MVPP22_CLS_HEK_TAGGED,
- 		       0, 0),
- };
- 
+This patch is based on v6.14-rc1.
+
+[1] https://lore.kernel.org/intel-wired-lan/20250207194931.1569-1-tatyana.e.nikolova@intel.com/
+
+Dave Ertman (1):
+  iidc/ice/irdma: Update IDC to support multiple consumers
+
+ drivers/infiniband/hw/irdma/main.c            | 110 ++++----
+ drivers/infiniband/hw/irdma/main.h            |   3 +-
+ drivers/infiniband/hw/irdma/osdep.h           |   4 +-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  40 ++-
+ drivers/net/ethernet/intel/ice/ice.h          |   6 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |  46 +++-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.h  |   4 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   8 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c      | 255 +++++++++++-------
+ drivers/net/ethernet/intel/ice/ice_idc_int.h  |   5 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  18 +-
+ include/linux/net/intel/idc_rdma.h            | 138 ++++++++++
+ include/linux/net/intel/iidc.h                | 107 --------
+ include/linux/net/intel/iidc_rdma.h           |  67 +++++
+ 14 files changed, 527 insertions(+), 284 deletions(-)
+ create mode 100644 include/linux/net/intel/idc_rdma.h
+ delete mode 100644 include/linux/net/intel/iidc.h
+ create mode 100644 include/linux/net/intel/iidc_rdma.h
+
 -- 
-2.25.1
+2.37.3
 
 
