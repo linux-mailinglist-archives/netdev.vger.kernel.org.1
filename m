@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-169390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09408A43ACC
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:08:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BB1A43B14
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 885B91887790
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:06:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A679C42465A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11872661B5;
-	Tue, 25 Feb 2025 10:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBE926658A;
+	Tue, 25 Feb 2025 10:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SD7zgkkd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiYyfaev"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58A8266190
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24589260A53
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740477669; cv=none; b=XVCUGsN3EnPuOAb+Zt1GqON0XI7ukicrGg/0w4/p7YJCVlaHUQC3Bk8juM0+9fQZ4qsHm5TSCmYzKAxkGDYxj5HmKLjQJQEHi7oko+1sXZFcok6BcHOLG8fISMBHnxTNCkl/s4l00jtQROYrJuw89py8RL6fBNxM0sgITv8wl4Q=
+	t=1740478196; cv=none; b=bKCegLIabbYL/p+g5vK6qk/ixNLsy1hNtZY+DmseI0btxzT2K9TvPP/E7kxZx/W+ZuWHeMHZRVdb1fdtd7LMBZO0OVnrEXWmLBsqpFp6VjbOY/wytcGW48y3k/VcZlewSTPp3moeP0xFML0DOacOBq8YRJIVbNQv230DzCxsK14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740477669; c=relaxed/simple;
-	bh=3bC23Lm0sU818T2eCu4YUuz5ydF3G+EgdBGxHisgwAo=;
+	s=arc-20240116; t=1740478196; c=relaxed/simple;
+	bh=Q9OwlfFNVRpynkPihH+iL4s32tdwTroJsl6wZjeIzd4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JVPU4MzgXhtLQG4KxO8A+zPRdWNc/aiTCsh++auniatSJMlqjviQ32tWxpZ0bvQewf1DTVjyH0iJ8pSUbc6XQfBnNK2kq7NxO4e4U7RSZBJLko5WLHGqNcd5MscahJOkMFuXcHxmRcDwwFCyOE0vM0+ud7f5PUCpeGSgGc9l8lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SD7zgkkd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA62BC4CEDD;
-	Tue, 25 Feb 2025 10:01:06 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=uPLpiWziMilkSwJ9y//fxL1x62uWHzjH9mxpvUy7dvR1bFxcLpIlkdhM2C/LTL/1BQf20M4GF3TCDDmfduV7srRKfciOrZCEUb8+ceOuOxzXWamzn7uU4e+MKvyWbGEk19x5wmEoAGeZpndntR2z9m/3FJAZDDmthZNSyyb/QUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiYyfaev; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A6BC4CEE2;
+	Tue, 25 Feb 2025 10:09:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740477669;
-	bh=3bC23Lm0sU818T2eCu4YUuz5ydF3G+EgdBGxHisgwAo=;
+	s=k20201202; t=1740478195;
+	bh=Q9OwlfFNVRpynkPihH+iL4s32tdwTroJsl6wZjeIzd4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SD7zgkkdS1JNr9J2V+IhVexeFdtxTbw6bpVWpAfojDG/+wM8LUP5kDK/We0nEby7Q
-	 ByQdI0oels9P1w/tzgy6UMShhi7gj8VMyvJebr2LfP4javtJh/KQym1ShJjcsxzFRv
-	 qpOGtROD+Lf1+DoY6GYrG+GfExm3dmWMKpGSf8SLRlkNA1PBjXfDtCJsf9J1To4Znd
-	 fq4+JZ0JQLO0oL+s16MrgCqxGqhheNz120qCLlNwXWfi/qewS8kGXbc3eTjeCVoeqr
-	 r0YtomSN5J9jkU/zrRD9Ip4/zschXSeBfMvGpY7vTIW1TxHl7SUKEgsZDxWLKyXUEL
-	 ZHxUfEDbrWcrA==
-Message-ID: <4bf331f1-123a-4290-868f-798c12a1f3f4@kernel.org>
-Date: Tue, 25 Feb 2025 11:01:03 +0100
+	b=JiYyfaevbCMLwIWX1gPx2HbX5RqOIA6wPyeWiafIv4wuSsuq/hDKQ0In3HRa5je/b
+	 MMDHmF/cwZJMoHzQMV6NJC71/PPg5EEtp1SpZZp5WXeXBmglK4VcNG5E/hrvobHO76
+	 s0RFobHb4LYUB3PNq2Y8wy1cCmsN5//rrEs9t/dWQG+xjb5IpKo6CpFRGeFZ+bK9u+
+	 U0YHl6gQKBmLonKKgOJKbweugkhXVrHTvuULK9WHoalNv5fNZIBMqCGPEa1QDvJkV+
+	 FN52D8IDY7sddbBXC53OaPe3hccM9mZiyR7FbeFSgwgsM1nqo/1tULQd/Trq+KFSC/
+	 ypsz9yxkenidw==
+Message-ID: <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org>
+Date: Tue, 25 Feb 2025 11:09:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,13 +53,14 @@ User-Agent: Mozilla Thunderbird Beta
 Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
  SYN_RECV state
 Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
  Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, Yong-Hao Zou <yonghaoz1994@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+ eric.dumazet@gmail.com, Jakub Kicinski <kuba@kernel.org>,
+ Yong-Hao Zou <yonghaoz1994@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Neal Cardwell <ncardwell@google.com>
 References: <20250224110654.707639-1-edumazet@google.com>
+ <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -105,166 +106,48 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20250224110654.707639-1-edumazet@google.com>
+In-Reply-To: <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Eric,
+Hi Paolo, Eric,
 
-On 24/02/2025 12:06, Eric Dumazet wrote:
-> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
-> for flows using TCP TS option (RFC 7323)
-> 
-> As hinted by an old comment in tcp_check_req(),
-> we can check the TSecr value in the incoming packet corresponds
-> to one of the SYNACK TSval values we have sent.
-> 
-> In this patch, I record the oldest and most recent values
-> that SYNACK packets have used.
-> 
-> Send a challenge ACK if we receive a TSecr outside
-> of this range, and increase a new SNMP counter.
-
-Thank you for this patch!
-
-Sadly, it looks like it breaks MPTCP selftests, see [1] and [2]. When
-there is a failure, we can see that the new counter is incremented [3]:
-
-> # selftests: net/mptcp: mptcp_join.sh
+On 25/02/2025 10:59, Paolo Abeni wrote:
+> On 2/24/25 12:06 PM, Eric Dumazet wrote:
+>> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+>> for flows using TCP TS option (RFC 7323)
+>>
+>> As hinted by an old comment in tcp_check_req(),
+>> we can check the TSecr value in the incoming packet corresponds
+>> to one of the SYNACK TSval values we have sent.
+>>
+>> In this patch, I record the oldest and most recent values
+>> that SYNACK packets have used.
+>>
+>> Send a challenge ACK if we receive a TSecr outside
+>> of this range, and increase a new SNMP counter.
+>>
+>> nstat -az | grep TcpExtTSECR_Rejected
+>> TcpExtTSECR_Rejected            0                  0.0
 
 (...)
 
-> # 045 add multiple subflows IPv6
-> #       currently established: 1            [ OK ]
-> #       ack rx                              [FAIL] got 1 JOIN[s] ack rx expected 2
-> # Server ns stats
-> # TcpPassiveOpens                 2                  0.0
-> # TcpAttemptFails                 1                  0.0
-> # TcpInSegs                       51                 0.0
-> # TcpOutSegs                      59                 0.0
-> # TcpRetransSegs                  3                  0.0
-> # TcpExtEmbryonicRsts             1                  0.0
-> # TcpExtTW                        1                  0.0
+> It looks like this change causes mptcp self-test failures:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-mptcp/results/6642/1-mptcp-join-sh/stdout
+> 
+> ipv6 subflows creation fails due to the added check:
+> 
 > # TcpExtTSECR_Rejected            3                  0.0
-> # TcpExtDelayedACKs               7                  0.0
-> # TcpExtTCPPureAcks               19                 0.0
-> # TcpExtTCPTimeouts               2                  0.0
-> # TcpExtTCPSynRetrans             3                  0.0
-> # TcpExtTCPOrigDataSent           24                 0.0
-> # TcpExtTCPACKSkippedSynRecv      2                  0.0
-> # TcpExtTCPDelivered              24                 0.0
-> # MPTcpExtMPCapableSYNRX          1                  0.0
-> # MPTcpExtMPCapableACKRX          1                  0.0
-> # MPTcpExtMPJoinSynRx             2                  0.0
-> # MPTcpExtMPJoinAckRx             1                  0.0
-> # Client ns stats
-> # TcpActiveOpens                  3                  0.0
-> # TcpEstabResets                  1                  0.0
-> # TcpInSegs                       59                 0.0
-> # TcpOutSegs                      50                 0.0
-> # TcpRetransSegs                  1                  0.0
-> # TcpInErrs                       3                  0.0
-> # TcpOutRsts                      1                  0.0
-> # TcpExtTW                        2                  0.0
-> # TcpExtDelayedACKs               1                  0.0
-> # TcpExtTCPPureAcks               29                 0.0
-> # TcpExtTCPTimeouts               1                  0.0
-> # TcpExtTCPChallengeACK           2                  0.0
-> # TcpExtTCPSYNChallenge           3                  0.0
-> # TcpExtTCPSynRetrans             1                  0.0
-> # TcpExtTCPOrigDataSent           24                 0.0
-> # TcpExtTCPACKSkippedChallenge    1                  0.0
-> # TcpExtTCPDelivered              27                 0.0
-> # TcpExtTcpTimeoutRehash          1                  0.0
-> # MPTcpExtMPCapableSYNTX          1                  0.0
-> # MPTcpExtMPCapableSYNACKRX       1                  0.0
-> # MPTcpExtMPJoinSynAckRx          2                  0.0
-> # MPTcpExtMPJoinSynTx             2                  0.0
-> # MPTcpExtMPRstTx                 1                  0.0
-> # MPTcpExtRcvWndShared            2                  0.0
-> #       join Rx                             [FAIL] see above
-> #       join Tx                             [ OK ]
-> #       currently established: 0            [ OK ]
-(...)
 
-> # 064 simult IPv4 and IPv6 subflows, fullmesh 2x2
-> #       ack rx                              [FAIL] got 2 JOIN[s] ack rx expected 4
-> # Server ns stats
-> # TcpPassiveOpens                 3                  0.0
-> # TcpAttemptFails                 2                  0.0
-> # TcpInSegs                       77                 0.0
-> # TcpOutSegs                      74                 0.0
-> # TcpRetransSegs                  6                  0.0
-> # TcpExtEmbryonicRsts             2                  0.0
-> # TcpExtTW                        3                  0.0
-> # TcpExtTSECR_Rejected            6                  0.0
-> # TcpExtDelayedACKs               8                  0.0
-> # TcpExtTCPPureAcks               36                 0.0
-> # TcpExtTCPTimeouts               4                  0.0
-> # TcpExtTCPSynRetrans             6                  0.0
-> # TcpExtTCPOrigDataSent           25                 0.0
-> # TcpExtTCPACKSkippedSynRecv      4                  0.0
-> # TcpExtTCPDelivered              25                 0.0
-> # MPTcpExtMPCapableSYNRX          1                  0.0
-> # MPTcpExtMPCapableACKRX          1                  0.0
-> # MPTcpExtMPJoinSynRx             4                  0.0
-> # MPTcpExtMPJoinAckRx             2                  0.0
-> # MPTcpExtDuplicateData           1                  0.0
-> # MPTcpExtAddAddrTx               2                  0.0
-> # MPTcpExtEchoAdd                 2                  0.0
-> # MPTcpExtRcvWndShared            2                  0.0
-> # Client ns stats
-> # TcpActiveOpens                  5                  0.0
-> # TcpEstabResets                  2                  0.0
-> # TcpInSegs                       74                 0.0
-> # TcpOutSegs                      75                 0.0
-> # TcpRetransSegs                  2                  0.0
-> # TcpInErrs                       6                  0.0
-> # TcpOutRsts                      2                  0.0
-> # TcpExtTW                        3                  0.0
-> # TcpExtDelayedACKs               7                  0.0
-> # TcpExtTCPPureAcks               38                 0.0
-> # TcpExtTCPTimeouts               2                  0.0
-> # TcpExtTCPChallengeACK           4                  0.0
-> # TcpExtTCPSYNChallenge           6                  0.0
-> # TcpExtTCPSynRetrans             2                  0.0
-> # TcpExtTCPOrigDataSent           26                 0.0
-> # TcpExtTCPACKSkippedChallenge    2                  0.0
-> # TcpExtTCPDelivered              31                 0.0
-> # TcpExtTcpTimeoutRehash          2                  0.0
-> # MPTcpExtMPCapableSYNTX          1                  0.0
-> # MPTcpExtMPCapableSYNACKRX       1                  0.0
-> # MPTcpExtMPTCPRetrans            1                  0.0
-> # MPTcpExtMPJoinSynAckRx          4                  0.0
-> # MPTcpExtMPJoinSynTx             4                  0.0
-> # MPTcpExtAddAddr                 2                  0.0
-> # MPTcpExtEchoAddTx               2                  0.0
-> # MPTcpExtMPRstTx                 2                  0.0
-> # MPTcpExtRcvWndShared            4                  0.0
-> #       join Rx                             [FAIL] see above
-> #       join Tx                             [ OK ]
+You have been faster to report the issue :-)
 
-This is easy to reproduce apparently with a "non-debug" kernel:
+> (for unknown reasons the ipv4 variant of the test is successful)
 
- $ ./mptcp_join.sh "add multiple subflows IPv6"
- $ ./mptcp_join.sh "simult IPv4 and IPv6 subflows, fullmesh 2x2"
-
-I didn't check yet, but I prefer to already send this email to delay
-this patch if that's OK. Maybe you already have an idea on what is
-wrong? Maybe something checked in tcp_check_req() and not initialised on
-MPTCP side?
-
-[1] https://netdev.bots.linux.dev/flakes.html?tn-needle=mptcp
-[2]
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-mptcp&ld-cases=1&pass=0&skip=0
-[3]
-https://netdev-3.bots.linux.dev/vmksft-mptcp/results/6642/1-mptcp-join-sh/stdout
-
-> nstat -az | grep TcpExtTSECR_Rejected
-> TcpExtTSECR_Rejected            0                  0.0
-
-It looks strange to have the underscore in the name. Maybe better
-without it?
+Please note that it is not the first time the MPTCP test suite caught
+issues with the IPv6 stack. It is likely possible the IPv6 stack is less
+covered than the v4 one in the net selftests. (Even if I guess here the
+issue is only on MPTCP side.)
 
 Cheers,
 Matt
