@@ -1,172 +1,160 @@
-Return-Path: <netdev+bounces-169271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC7AA432CF
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:07:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8BCA432DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:11:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7ABD189E4CA
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:06:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFFE1189E339
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3D11632E6;
-	Tue, 25 Feb 2025 02:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E570446426;
+	Tue, 25 Feb 2025 02:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="SeVNVpXz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRC3M5Y+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48197081B
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3F6440C;
+	Tue, 25 Feb 2025 02:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740449119; cv=none; b=e+kF6T60z7rCnIUYA+O6RAOp7yaI977r1NvE9KetPbalF/BlBSqf272kFLo3xH1+WSP63FI71dwKGJkvI8/TrL3jBK6M2Ez2xcTOSFU7fWs00cgi2+9+rqJUt7j3uFCri4MQC7iXPUxvgyt1USIH1GDBbKnbb1ysSFVhEawBKTg=
+	t=1740449478; cv=none; b=m/nRznEA7HjDLH5dOkXiLlE9Hk/idkMJUE6k6m5sPpFE7rpB5khWQ1DNMBL3MsFZLrmN3xtM0xtE6ofjzfWK84KaP99RLVqvX0yjxqrpd2T88EqxqD+KCKb4oMbuM46Ob96+V0nDu8poNQxanTbno0YDvc9r5tYvnqFBuIgWK94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740449119; c=relaxed/simple;
-	bh=sqHw+hydx5+J+3nTg7GiF/z4kDtuYCJJCVEcYQMUN3E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q9xgwTaZA1Q9M+hkkfvQIm0hG0265fOvreuIjz2GbMr8BmEwHHSIq4HbY4q1/Z7GK2QY7TZhxthn6eVB7nLDPxUyIhwhcLujay6555w/oE0m+S7M3dwd6U/AMAjGW1tJ6x90sAKp6jVCOubuRBJQ8lMp3JuW0stvaiDFC+ETAfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=SeVNVpXz; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-220f4dd756eso105245225ad.3
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 18:05:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740449116; x=1741053916; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6jTrPXbJae2NFrVRDORH6UMqB3L+3yI0Uf5GqI0AUQw=;
-        b=SeVNVpXzBVmWL24GcetM5Sq9Fmxm4MTy37KknoKqfo5uz6UzqUGpwtSyIm/7WLmRsg
-         QhDzFre74qNDcOkHjyAfLiVs0BO5XF/gn0zjMmxaWMINkhXwgAd+j35CUtA/CUj6CWxR
-         GGWZ5dTw0Hn7mHgDI1+QxSJ657/ymjj2DpgwA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740449116; x=1741053916;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6jTrPXbJae2NFrVRDORH6UMqB3L+3yI0Uf5GqI0AUQw=;
-        b=jINXRmetZce10ziODdtFBduInknHDMCW9CknUyI72S3Zd6qkN6voP2nLqDd0ozvhD+
-         YhCrcsuCM+jNV/aInEpDFF2pGUo/RKHJOp1LlUZQbDg7mcvpptp/meGdMPfftL37RWJt
-         GoKg4emavhDyLk4FBWjpJ94ftNTFXYfJA+QNIQfh1Zz9wR4sJoo6pq4EtQApDmfXN8kS
-         WOCAsqj5V4TRZeLGDd64stv6bx3+xCo/sESbqCjMOL31Gvs6deBMkDOGBTge5hH4vFA1
-         3p8bUgNpDzvo6j24nzLfvxg4pqJG1JmIDUXTXzWfFy8wvbK3sWbSfN6jd0tLl7XAKTJi
-         /YDw==
-X-Gm-Message-State: AOJu0YygNqg+s2Cx9f6qaBWM0CqTBCQmwBomO++iVjd0XrUgJyX9CQ99
-	Z9xQ/lEWEvqUsbycuDeSvj0uz7fX1ljOh2UCthjP8raDlfrL/on3eQcFvNDccVWpQTZGEUoVaxY
-	RrvM2yjlhLGYpyKkqZ1sDT/eHCCieLc/w5bdW0At0YKaSqTfN2X96DsOqQ1qdwfx1IVscLGxwum
-	HzkfyTVFpba0B7FqtRmjfBVO3yFNQV31R08QFnsA==
-X-Gm-Gg: ASbGncujxms+m81jhaM7vwCw/ahOAt/ijFC8rZMpF9z2h2fCZ/+j16Psat6BNMrBZ5Q
-	Z67rE90drjxtPV4txD5C5NwdZRUEKTdJRgc1KmRvQuShkJ/IPweVfTVuLkcFrZ1x+J8isLwhuTI
-	X/e0TMPGQLwjEmjxZR6/LvU3W0wroi2ryVPLYnqaItIactMPznKHptAVyR5TTDlTiQiSG8Jld1F
-	L4qjFylJPen3tChVO7NR2Np7OlXUoLqDWaXSOTF4aH2BBQdSqmmhz55io4S0c+f2Zf0Wi9Vw0Ds
-	2Yv0OjIRuXwDPASRbLTJmntBxPKXgX/e0Q==
-X-Google-Smtp-Source: AGHT+IGbedvJQbC1f3rBktTR2fDXpQeCE8dIxMRlL1M+qlTRLacNZdzhniWMjgESJ1sAs0pz8D4XNA==
-X-Received: by 2002:a17:90b:4a41:b0:2ee:4b8f:a5b1 with SMTP id 98e67ed59e1d1-2fe68cf3fc4mr2493123a91.24.1740449116365;
-        Mon, 24 Feb 2025 18:05:16 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2230a021909sm2926985ad.94.2025.02.24.18.05.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 18:05:16 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	gerhard@engleder-embedded.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	kuba@kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v4 4/4] virtio-net: Use persistent NAPI config
-Date: Tue, 25 Feb 2025 02:04:51 +0000
-Message-ID: <20250225020455.212895-5-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250225020455.212895-1-jdamato@fastly.com>
-References: <20250225020455.212895-1-jdamato@fastly.com>
+	s=arc-20240116; t=1740449478; c=relaxed/simple;
+	bh=d3eqK0aEkRk/IZn107FKcXpClMaxinMjhwGUee/i/5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iR1BZwfM+k4wDP1lFhe/SVytpq/e2HwtP5OsmCVIH4w94k/8DKMwkMqCcb4S6DZKE06RFQMLDex83LI+OLyGMYv37pAkSL5sdNUXMePVW0StXjwEeS0lwGa249JVMJJA4USQwVqWgMe9e86yUh/r/kt1/h3yckDtdT3Wd8LV1Fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRC3M5Y+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E27D6C4CED6;
+	Tue, 25 Feb 2025 02:11:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740449478;
+	bh=d3eqK0aEkRk/IZn107FKcXpClMaxinMjhwGUee/i/5M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fRC3M5Y+t9/nvzMpC8jx+fdTA+d9imccbNLRSWaLasSEPLnjCwRa1LqvHwjhPdQxk
+	 TUtDjoy/7WitBrjz3HKbaogjFj71kMjO4hjxEYwHSLKRBuSqudejeDVP/z6sHgE8xA
+	 SP1hJwVLrd0Yh3E7qUKvoT7dNz/8A7xBWz6fdQ61bNOdUe6K8sBhbunju5qklHxden
+	 90pbBWYEpHT614fdJztdXSFlWXGWaPUIm4xVEFa9CK4gFGq1eYpM1vD4qCUMsd5zhc
+	 WBQf7wMxvuAl0Arfs7EkMhl1aJnuCstH+ud4OejEVq2eiGYlK2FatabSsZ4qAnJecH
+	 hnMD3KkEPqc4A==
+Date: Mon, 24 Feb 2025 18:11:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: admiyo@os.amperecomputing.com
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
+ <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>, Jonathan
+ Cameron <Jonathan.Cameron@huawei.com>, Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v18 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <20250224181117.21ad7ab1@kernel.org>
+In-Reply-To: <20250220183411.269407-2-admiyo@os.amperecomputing.com>
+References: <20250220183411.269407-1-admiyo@os.amperecomputing.com>
+	<20250220183411.269407-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use persistent NAPI config so that NAPI IDs are not renumbered as queue
-counts change.
+On Thu, 20 Feb 2025 13:34:10 -0500 admiyo@os.amperecomputing.com wrote:
+> +MANAGEMENT COMPONENT TRANSPORT PROTOCOL (MCTP) over PCC (MCTP-PCC) Driver
+> +M:	Adam Young <admiyo@os.amperecomputing.com>
+> +L:	netdev@vger.kernel.org
 
-$ sudo ethtool -l ens4  | tail -5 | egrep -i '(current|combined)'
-Current hardware settings:
-Combined:       4
+You can drop the L:, AFAIK, it's going to be inherited from next layer
+of entries.
 
-$ ./tools/net/ynl/pyynl/cli.py \
-    --spec Documentation/netlink/specs/netdev.yaml \
-    --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'type': 'tx'},
- {'id': 2, 'ifindex': 2, 'type': 'tx'},
- {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+> +S:	Maintained
+> +F:	drivers/net/mctp/mctp-pcc.c
+> +
 
-Now adjust the queue count, note that the NAPI IDs are not renumbered:
+> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+> +{
+> +	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
+> +	struct mctp_pcc_hdr  *mctp_pcc_header;
+> +	void __iomem *buffer;
+> +	unsigned long flags;
+> +	int len = skb->len;
+> +
+> +	dev_dstats_tx_add(ndev, len);
 
-$ sudo ethtool -L ens4 combined 1
-$ ./tools/net/ynl/pyynl/cli.py \
-    --spec Documentation/netlink/specs/netdev.yaml \
-    --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'type': 'tx'}]
+To be safe you should call:
 
-$ sudo ethtool -L ens4 combined 8
-$ ./tools/net/ynl/pyynl/cli.py \
-    --spec Documentation/netlink/specs/netdev.yaml \
-    --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
- {'id': 4, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
- {'id': 5, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
- {'id': 6, 'ifindex': 2, 'napi-id': 8199, 'type': 'rx'},
- {'id': 7, 'ifindex': 2, 'napi-id': 8200, 'type': 'rx'},
- [...]
+	if (skb_cow_head(skb, ..
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/virtio_net.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+to make sure skb isn't a clone.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 13bb4a563073..186030693eeb 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -6454,8 +6454,9 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 	INIT_DELAYED_WORK(&vi->refill, refill_work);
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		vi->rq[i].pages = NULL;
--		netif_napi_add_weight(vi->dev, &vi->rq[i].napi, virtnet_poll,
--				      napi_weight);
-+		netif_napi_add_config(vi->dev, &vi->rq[i].napi, virtnet_poll,
-+				      i);
-+		vi->rq[i].napi.weight = napi_weight;
- 		netif_napi_add_tx_weight(vi->dev, &vi->sq[i].napi,
- 					 virtnet_poll_tx,
- 					 napi_tx ? napi_weight : 0);
+> +	spin_lock_irqsave(&mpnd->lock, flags);
+> +	mctp_pcc_header = skb_push(skb, sizeof(struct mctp_pcc_hdr));
+> +	buffer = mpnd->outbox.chan->shmem;
+> +	mctp_pcc_header->signature = cpu_to_le32(PCC_MAGIC | mpnd->outbox.index);
+> +	mctp_pcc_header->flags = cpu_to_le32(PCC_HEADER_FLAGS);
+> +	memcpy(mctp_pcc_header->mctp_signature, MCTP_SIGNATURE,
+> +	       MCTP_SIGNATURE_LENGTH);
+> +	mctp_pcc_header->length = cpu_to_le32(len + MCTP_SIGNATURE_LENGTH);
+> +
+> +	memcpy_toio(buffer, skb->data, skb->len);
+> +	mpnd->outbox.chan->mchan->mbox->ops->send_data(mpnd->outbox.chan->mchan,
+> +						    NULL);
+> +	spin_unlock_irqrestore(&mpnd->lock, flags);
+> +
+> +	dev_consume_skb_any(skb);
+> +	return NETDEV_TX_OK;
+> +}
+
+> +static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
+> +{
+> +	struct mctp_pcc_lookup_context context = {0, 0, 0};
+> +	struct mctp_pcc_ndev *mctp_pcc_ndev;
+> +	struct device *dev = &acpi_dev->dev;
+> +	struct net_device *ndev;
+> +	acpi_handle dev_handle;
+> +	acpi_status status;
+> +	int mctp_pcc_mtu;
+> +	char name[32];
+> +	int rc;
+> +
+> +	dev_dbg(dev, "Adding mctp_pcc device for HID %s\n",
+> +		acpi_device_hid(acpi_dev));
+> +	dev_handle = acpi_device_handle(acpi_dev);
+> +	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
+> +				     &context);
+> +	if (!ACPI_SUCCESS(status)) {
+> +		dev_err(dev, "FAILURE to lookup PCC indexes from CRS\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	//inbox initialization
+
+Prefer C comments, please.
+
+> +	snprintf(name, sizeof(name), "mctpipcc%d", context.inbox_index);
+> +	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM,
+
+Enum means the kernel assigns the ID, you're fully formatting the name
+in the driver based on fixed device attributes, so NET_NAME_PREDICTABLE
+
+> +			    mctp_pcc_setup);
+> +	if (!ndev)
+> +		return -ENOMEM;
+
+> +	return devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
+> +cleanup_netdev:
+
+rename the label to free_netdev, please, to match with the first action
+
+> +	free_netdev(ndev);
+> +	return rc;
+> +}
 -- 
-2.45.2
-
+pw-bot: cr
 
