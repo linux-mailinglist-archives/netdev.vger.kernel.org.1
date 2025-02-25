@@ -1,174 +1,226 @@
-Return-Path: <netdev+bounces-169551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1186A448B1
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:45:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C518FA448CE
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8256886E36
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:36:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C664A882128
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B8B19E998;
-	Tue, 25 Feb 2025 17:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5529919ABAB;
+	Tue, 25 Feb 2025 17:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hmWP05Xu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fhpO8Rmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1117118C91F
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63F81991DD
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740504725; cv=none; b=HGzBvJUK8OL4uXDjXUS5bjDioHqOhgcOnjlCpQknAaK3AlJ8aUlkCi7h/9X+xFSr0ad18lMglF69a0TKuQVOdERTlPQSWgNIY8k/eQy9+bmc7oGl5FnLh8WJzZ6htU8qSRBBIThJF3e5d43Q06o7xBzIAPCwC90jpofGQ6oaqfk=
+	t=1740505318; cv=none; b=Oa9nxoX/r25DoZGc40++Cb0jIM4FWZUfZO4FvpOCtKBzvoRgxSycEPnGAfgV67Og048zpWacfJRkLUyz5DJnPBBsozBv+g+6erKjgKyI4xQbuL819N1xBM9oWUWkqFW+zYDaU8DCOpnF0+FOOvqjdNowva5tAAtrMcXEnH3s8LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740504725; c=relaxed/simple;
-	bh=LlsxapL7zz/UY2W32nnrlFbGV8Jz0hmZdlyZFk67JUA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ihDm8XDiwxlxX1UiuYN6v+BzTpWd/qZfDdSv3/emy32NydIjAOI5oSjPU8P0zm1H+Rduuf4T+jiKGMljqJKyQhC94Bg2AXHsNaypyu8qdDddtJ6pDkYihrphAfdq2NIyIwI0V6ohyLUjmbkgijX0zk45PcvmQlEg9C+kryqPJ9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hmWP05Xu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78047C4CEDD;
-	Tue, 25 Feb 2025 17:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740504724;
-	bh=LlsxapL7zz/UY2W32nnrlFbGV8Jz0hmZdlyZFk67JUA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hmWP05XuQR9dODIzhR4acarx1/+zBAanwF8tvkrq9Rs1IZ/6t4ul4L4X7Ty+9dWkD
-	 sFa9Znuw3pgkU+3zDKrheKD7AwRqBMi59X2+Rzfc29QnImL3VXXfkwoEHVVWjQcuf7
-	 RFmC1hnck2Fv0fzxSxfnTPZ98DKzqUE6BqTXg2lHpYfpp6gZjaWHhadJPA7jMnNXLn
-	 KHxbNzga5vWpfIJqAWX6Bc0XNaAsll5K/YlfkCKW7CfH1lFeVSno/hzVf8dV6VwEvb
-	 3wCNbZI+JJqDPNe3zCQlTBefb86sPC3AnKA5Gr+4H8+luO91pVDA8HBSExop4xcMK8
-	 GOijhlAjvurfw==
-Message-ID: <8e05636a-0214-4009-a751-3ed355b5e7f7@kernel.org>
-Date: Tue, 25 Feb 2025 18:31:58 +0100
+	s=arc-20240116; t=1740505318; c=relaxed/simple;
+	bh=iCX+nG23CjC2fxQmPixSN8EXGqI2yLXhnVoBGQ220Lk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IZsFEeGBBUmHjS9YTdY8ZPpJpsTAlP9rfMG2qC1WIIwqjyihgJvz4pkz5oNpNEKIPMkUV6GXjfpK+XhoPKuAr2mdvQTOwvrFY180WRM2ete02Vj4Q8jdOjcT2AfuhMsBrajbHV0tdxgCMUe8SFkqVSNWaXD3o9sUzS1iJlYYfVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fhpO8Rmx; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2212222d4cdso3495ad.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:41:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740505315; x=1741110115; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vqjq5AFXxwlxfq4VPVA6M5Ee2CpyweWj+2y/hfe9AzE=;
+        b=fhpO8RmxBeBGKT/5ZKbYywJBbdjJlmt3ng8Wjc4s/xgU+uY7xS01nlIK/TUBh6YfxA
+         dMg04rKf1e6n12Aq9NXmheY6VKIokCil6E/Cn6Dt1d0bsyOlT8ODB/9XEAm4JcQPT3ZB
+         Dhto1cUSl6rI9dZly5XAVVQSDEkOlMNtfNbF1AxgMbSmatvMLQR7mpKdD+6Mq4hv+D/6
+         Rktp688V8SegHs1CqB2RF1hNZjq2TgXtIQt6bAXicdTVTn4MHN42Ds++qsKdCkYASL2E
+         q0s7RUrtkkIkdmIabrI68/KioDWhOPMPpFp2Ig6fRmct79NFZedPvxpDISLltrLfgb91
+         c9+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740505315; x=1741110115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vqjq5AFXxwlxfq4VPVA6M5Ee2CpyweWj+2y/hfe9AzE=;
+        b=eP5G3IBnl0MmTXp6djhaW7qzh7BYc2aONuigyT5uFHoNEtuwaxsvm5jsjuGAhGYeoY
+         wr0XXeJyzajMZ8ZTBf8DLh17ShUnrxwJrT9ahyaTdRBlclE5KkJS+DCt/1PjAmxvLT/E
+         2jhk5OFZou2npOyuF26iV2lIDDa8LPou+t4GoNelLtTrt4PewasAavY1ZEn8ZYvPYDVY
+         K6nTBSapnyrJILzpGB8ldrnqHFSWD5KnBoPRfg1RaXJInfX3AdK0M4TedQ4R4LLknCEz
+         RQUpHVs4RxtswOZCo0JdVXcnyfixUNGGs17qCI/CXN15TlBd3BLq0w4QYpTpsvWMVRGP
+         fJyg==
+X-Gm-Message-State: AOJu0YyLg8RuWWDetVdX1Y6+edhoWXdAwR3C8RfXgBQG/9HTQ8yDd9/h
+	b8AXq38/hL/5pJl9DTRRSy+mK6te82ib/yXM/G7huyciDvqJ7oDpQi+/mB4rR7d/6zNMrQM+Ejq
+	Jqpk7AJmpE3FdyWSOz1XXfJMYJ61L7RBzbupM
+X-Gm-Gg: ASbGnct5zrXa0OiuPWFJel1b14y9aMNqkWtOHfaUXmivynYAJpXaOdH2BymdWzYihhf
+	qx5mAFBAF+dlQpKaFXFF/6XUBuEKXtNKcJEIatw6wZRr+H+hghucX4BM8C6HGaCYPMwFYs04Rvi
+	HjsYTFx2M=
+X-Google-Smtp-Source: AGHT+IHPa/zeMhv5rS+FoFIXRfGiR3W5Ojq1INXwGU+EkhH1BWbASSdZ3ThN+JgVulgi4m91g+jKNlJGa8ARq6KoZcI=
+X-Received: by 2002:a17:902:d50a:b0:21f:3e29:9cd4 with SMTP id
+ d9443c01a7336-22307a98cbcmr3805795ad.20.1740505314655; Tue, 25 Feb 2025
+ 09:41:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while
- in SYN_RECV state
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Yong-Hao Zou <yonghaoz1994@gmail.com>
-References: <20250225171048.3105061-1-edumazet@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250225171048.3105061-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-4-almasrymina@google.com> <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+In-Reply-To: <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 25 Feb 2025 09:41:41 -0800
+X-Gm-Features: AWEUYZlYYSHH7_9N4ByWFALTxxtUrWQmHLefEElJbkJw4zmyNRZgN3GST52xcig
+Message-ID: <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/9] net: devmem: Implement TX path
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+On Tue, Feb 25, 2025 at 5:04=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 2/22/25 8:15 PM, Mina Almasry wrote:
+> [...]
+> > @@ -119,6 +122,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dm=
+abuf_binding *binding)
+> >       unsigned long xa_idx;
+> >       unsigned int rxq_idx;
+> >
+> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+> > +
+> > +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after th=
+e
+> > +      * erase.
+> > +      */
+> > +     synchronize_net();
+>
+> Is the above statement always true? can the dmabuf being stuck in some
+> qdisc? or even some local socket due to redirect?
+>
 
-On 25/02/2025 18:10, Eric Dumazet wrote:
-> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
-> for flows using TCP TS option (RFC 7323)
-> 
-> As hinted by an old comment in tcp_check_req(),
-> we can check the TSEcr value in the incoming packet corresponds
-> to one of the SYNACK TSval values we have sent.
-> 
-> In this patch, I record the oldest and most recent values
-> that SYNACK packets have used.
-> 
-> Send a challenge ACK if we receive a TSEcr outside
-> of this range, and increase a new SNMP counter.
-> 
-> nstat -az | grep TSEcrRejected
-> TcpExtTSEcrRejected            0                  0.0
-> 
-> Due to TCP fastopen implementation, do not apply yet these checks
-> for fastopen flows.
-> 
-> v2: No longer use req->num_timeout, but treq->snt_tsval_first
->     to detect when first SYNACK is prepared. This means
->     we make sure to not send an initial zero TSval.
->     Make sure MPTCP and TCP selftests are passing.
->     Change MIB name to TcpExtTSEcrRejected
+Yes, we could have have netmems in the TX path in the qdisc or waiting
+for retransmits that still have references to the dmabuf, and that's
+fine here I think.
 
-Thank you for the v2, and for having ran the MPTCP selftests!
+What is happening here is that tcp_sendmsg_locked() will look for a
+binding in net_devmem_dmabuf_bindings with binding->id =3D=3D
+sockc.dmabuf_id, and then grab a reference on it.
 
-And sorry if my previous replies on the v1 felt like I was rushing you
-to send a v2, that was absolutely not my intension!
+In parallel, net_devmem_unbind_dmabuf will remove the binding from
+net_devmem_dmabuf_bindings, and then drop its refcount (which may be
+the last one if the 'get' in tcp_sendmsg_locked has not yet executed,
+triggering the binding to be freed).
 
-The v2 looks good to me, just a small detail in the doc. Apart from that:
+I need to make sure the lookup + get of the dmabuf in
+net_devmem_lookup_dmabuf() doesn't race with the erase + put in
+net_devmem_unbind_dmabuf() in a way that causes UAF, and I use
+rcu_read_lock for that coupled with synchronize_net().
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Note that net_devmem_dmabuf_binding_put() won't free the dmabuf unless
+we put the last ref, so any netmems stuck in retransmit paths or qdisc
+will still pin the underlying dmabuf.
 
-(...)
+Let me know if you still see an issue here.
 
-> diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
-> index 90ca2d92547d44fa5b4d28cb9d00820662c3f0fd..bc96efc92cf5b888c1e441412c78f3974be1f587 100644
-> --- a/Documentation/networking/net_cachelines/snmp.rst
-> +++ b/Documentation/networking/net_cachelines/snmp.rst
-> @@ -36,6 +36,7 @@ unsigned_long  LINUX_MIB_TIMEWAITRECYCLED
->  unsigned_long  LINUX_MIB_TIMEWAITKILLED
->  unsigned_long  LINUX_MIB_PAWSACTIVEREJECTED
->  unsigned_long  LINUX_MIB_PAWSESTABREJECTED
-> +unsigned_long  LINUX_MIB_TSECR_REJECTED
 
-Small detail, I guess it should be without the extra underscore:
-LINUX_MIB_TSECRREJECTED.
+> > @@ -252,13 +261,23 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
+signed int dmabuf_fd,
+> >        * binding can be much more flexible than that. We may be able to
+> >        * allocate MTU sized chunks here. Leave that for future work...
+> >        */
+> > -     binding->chunk_pool =3D
+> > -             gen_pool_create(PAGE_SHIFT, dev_to_node(&dev->dev));
+> > +     binding->chunk_pool =3D gen_pool_create(PAGE_SHIFT,
+> > +                                           dev_to_node(&dev->dev));
+> >       if (!binding->chunk_pool) {
+> >               err =3D -ENOMEM;
+> >               goto err_unmap;
+> >       }
+> >
+> > +     if (direction =3D=3D DMA_TO_DEVICE) {
+> > +             binding->tx_vec =3D kvmalloc_array(dmabuf->size / PAGE_SI=
+ZE,
+> > +                                              sizeof(struct net_iov *)=
+,
+> > +                                              GFP_KERNEL);
+> > +             if (!binding->tx_vec) {
+> > +                     err =3D -ENOMEM;
+> > +                     goto err_free_chunks;
+>
+> Possibly my comment on v3 has been lost:
+>
+> """
+> It looks like the later error paths (in the for_each_sgtable_dma_sg()
+> loop) could happen even for 'direction =3D=3D DMA_TO_DEVICE', so I guess =
+an
+> additional error label is needed to clean tx_vec on such paths.
+> """
+>
 
->  unsigned_long  LINUX_MIB_DELAYEDACKLOST
->  unsigned_long  LINUX_MIB_LISTENOVERFLOWS
->  unsigned_long  LINUX_MIB_LISTENDROPS
-(...)
+I think I fixed the issue pointed to in v3, but please correct me if I
+missed anything. I added kvfree(), but we don't really need an
+additional error label.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+If we hit any of the error paths conditions in
+for_each_sgtable_dma_sg, we will `goto err_free_chunks;`, which will
+free all the genpool chunks, destroy the gen pool, then do
+`kvfree(binding->tx_vec);` to free the memory allocated for tx_vec.
 
+> [...]
+> > @@ -1071,6 +1072,16 @@ int tcp_sendmsg_locked(struct sock *sk, struct m=
+sghdr *msg, size_t size)
+> >
+> >       flags =3D msg->msg_flags;
+> >
+> > +     sockc =3D (struct sockcm_cookie){ .tsflags =3D READ_ONCE(sk->sk_t=
+sflags),
+> > +                                     .dmabuf_id =3D 0 };
+> > +     if (msg->msg_controllen) {
+> > +             err =3D sock_cmsg_send(sk, msg, &sockc);
+> > +             if (unlikely(err)) {
+> > +                     err =3D -EINVAL;
+> > +                     goto out_err;
+> > +             }
+> > +     }
+>
+> I'm unsure how much that would be a problem, but it looks like that
+> unblocking sendmsg(MSG_FASTOPEN) with bad msg argument will start to
+> fail on top of this patch, while they should be successful (EINPROGRESS)
+> before.
+>
+
+Thanks for catching indeed. I guess what I can do here is record that
+the cmsg is invalid, then process up to MSG_FASTOPEN, and return
+EINVAL after that.
+
+Although that complicates this already complicated function a bit. Let
+me know if you have a better/different solution in mind.
+
+--
+Thanks,
+Mina
 
