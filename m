@@ -1,215 +1,174 @@
-Return-Path: <netdev+bounces-169421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D617FA43D19
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:14:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97EF1A43D06
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B9C13BD887
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:08:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB83D19C35D3
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854FC2686AD;
-	Tue, 25 Feb 2025 11:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="GhDBSjHS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0775F265610;
+	Tue, 25 Feb 2025 11:09:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72423207E03
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 11:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A99264A7C;
+	Tue, 25 Feb 2025 11:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740481532; cv=none; b=S9jo8nNJzn/ghFQu1tQ0EAh4Al0hii+hAE9FGSYevYbf6CsGGoaJbM+tEd/OhC74ZjPCiHwAkwtzQBc0sq3nq8ApvGY3utGjlR93ZukXCbWRAW1tNKOAsH9L1mtFrqHgzjujj3abQnI6DseMdxYrU3bpYOFDwYazR+hE19m62aY=
+	t=1740481766; cv=none; b=LT/QYMEF5T0uUEdtDC4PTPvUkZN9KRYKYi3nlNpO3Gu4nzANIDMlKoc3jIY9U56BwjZNjcjgLCnqOKZ6YbHZsKqj5OXgGVkldsOghVlbn+jEilAq2SS/5XNKceK4eZDC3CtcuRTN2vladxadJrjY5O7tY1TNwoApLZ5QcJz62a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740481532; c=relaxed/simple;
-	bh=aEXBdctr5lNL6y49esuCSJvaeiXkXyVBBu5rr2gf1mg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lohzXJmei0Dd94ApaGu1wWbSTB8rBt+zE0SywUrCHoInKOzQ/6RtYrLd0N6gBcVpmMzm5m6CRc07yhVtNKbhU4cbTTTojGzF8bYj19lQFdswKp7zPAxWdSdJ9KWRxJBVUWuy7nXt9D2EcyrImcv7zoiQq+Xn+7Ws6EDryYPDxAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=GhDBSjHS; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-38f504f087eso4287684f8f.1
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 03:05:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1740481528; x=1741086328; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oijdNUsjFcALDUXEJZ3Jn2gl36QQtJ0DV7NEsfpNP/g=;
-        b=GhDBSjHSCNCvn8PhfCXLlDQ+odAZA6EQrlW/wyslfhO1BhEIYRi95Q0pJM24xtU8Gr
-         oKxu6k+wd+pLiUAagGoICEy0HMvf/1zXUOJgaPDfPD4oU8NRa72/2UMwGjPQz7lgIbON
-         sN9BwFehjZRyqrQ7BOwPxHt5Ihdi6vFFySZ3TfkcDztcxWEpVqdznov39sSNa9boeDYy
-         FwUUTf8XKdKGKkSEKe3HIU13hDeG3oB48r32R+WA/ujtwNJ9EPelDDHhxjvOIo5h1/2R
-         8/mM8CUjHRE5pLRnD5KqxhZhxSUvN52PQAXrauMXHwaIP0lOszW78BeGQg14hY/TblWE
-         Hufw==
+	s=arc-20240116; t=1740481766; c=relaxed/simple;
+	bh=TtBQCEIEL2mTq/30X9Qjp4A9+mPF9QER9TihXX7Hng8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VkZjVI8VevC0q3mehy8jhSptuadGIvwpsI8TSMIISDAhahO6u7n1cPS1nzC1Ns2Jp+0T659EvgoqFAi+lCNCchY+XFtvsLFoAMAhFi5N/lwgliV6BxlQud8d/WDHMkRhYqCm3RTnMCnl/0LlK5aCVtfy8U6Aq1OL7zCMXwb0JwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so11670170a12.1;
+        Tue, 25 Feb 2025 03:09:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740481528; x=1741086328;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oijdNUsjFcALDUXEJZ3Jn2gl36QQtJ0DV7NEsfpNP/g=;
-        b=hDPvlOPczRCTI6TZqw7rpVLE4Ur0ztr16G/7Qp4UdcH+0KzaR5F/HnR54w4McjWsUM
-         4kAg2RP4ymPDI7gmlEgdQrUuqRwdJ2sUSaQ0yYbKzSVWGnwz2PvZlAoxEQHOZ+iphAvu
-         fvZxp4+qIZYx9gQ1kqR0Gm7H7YxuIdfOL4zi1QGqAwuhYmSfw+X86WOVrikL4ksy53yY
-         jsBBzTydVxqk8oXEtl+bE8ZIPqeHVjk/zpkqFLAT6ZauwKJdDRd0XZvq58p4mWVmMR9o
-         Rd/1azDnG6TC2dHHmlLRPMxw/qH48YmX+3kd14sneoa4tXEO85hto8sX9oww0ZFoDsGo
-         KJXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQptckbjgcnqSbFFGJIbY4NFzVr7TuvCOGmWs30fzuw+GWdmS9WaUJ4efGQtQrbFevkklJ/jI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoYnbRCVm5m4L0xyVNbgViWF3Gk9P6jsWMMbGUZ01539baxVtA
-	8ETovtJU+Tev49Ur5fGWG1gSLDREtibNC5o27L1Q/mEaWabj8+OtKSByd8E6YxU=
-X-Gm-Gg: ASbGncsq0drwoW4rCtOzVdY0T4qejROdf1swlPyyJcph5sXMpqh8S98Hlybtj2pVEyz
-	D9+Sb/+sy8b1J+lCX6Q4zcTEKfdBeIL0j6zniCo+esM9PFCnxnPW0sczXFsgXXRoVFLFYY8oUxR
-	IIzvx4ZzmGNb9sfq/eHMZYU1+02yES+E8DoA7tgPVmHbtVPrkPATNPC9mR2FvrkhMBmjWUUiXWS
-	FpzocezYbb9p2H/sPgbpx+TaJS6sTX9c45GZX1UvMQnEgCiOTIm4CMjcYmQd9SSNB8p8CQ2KCDO
-	RCCa7QTzZIeqVKfcuMCx/XXBloHgLu+5q2cQwur1y5eDW6bJTe186NRRwQ==
-X-Google-Smtp-Source: AGHT+IG2xH9B5u1dDk4QWKBV/GBsT+RYSX6ctwfXsQLP5EsocYKyv24QKv5mom87WEbHTozESZO4yg==
-X-Received: by 2002:a5d:6daa:0:b0:38a:87cc:fb42 with SMTP id ffacd0b85a97d-38f6e95d5famr14803550f8f.21.1740481527619;
-        Tue, 25 Feb 2025 03:05:27 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390cd8fc1f9sm1840718f8f.88.2025.02.25.03.05.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 03:05:27 -0800 (PST)
-Message-ID: <a658145a-df99-4c79-92a2-0f67dd5c157b@blackwall.org>
-Date: Tue, 25 Feb 2025 13:05:24 +0200
+        d=1e100.net; s=20230601; t=1740481763; x=1741086563;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/HP9OZuJ6AU1JfkSYo6B6srazy0msILW/CieEyyhb2E=;
+        b=JpYnkp+cLzs8KSyOIghHt1J/SsOOobj9vE3UHHAo4/zPPSdMjAoBMH+UomrAEXZBsn
+         KPTrf3qOEC4qfy73VjJR/Xb4qWI4Qn0Fnef4kqiM6giFQR9iszgtkpm0KSETtxubpDn/
+         bRGFtEx1BkwhheizlyPwG5MtnaRoHDrN+ZZYBnbNuu1qLBj6naG/5lCuK+1Je7pPgDDB
+         AK+YQAqNYYmyIdXjxJZTn9+av73Kfeh/eFvKFI6Vpjn+EoNC1D1L9XwWu0u8h2Ft7tHb
+         bDkhX6d7hL5h+f3Gg6P85sVxb4opUDKmLck77GPQLnrymdl7VWam8D/FRli+JW4Di3oc
+         q46g==
+X-Forwarded-Encrypted: i=1; AJvYcCV0ORY8thReyEB6FIchyHbWm8MA0XQ1WVXSFNHePJR1dyS4+l1nkgeoL05OUzFxGpAwTy54C3zHmHWvHAAK@vger.kernel.org, AJvYcCVd0ehRGZfRl2JmPIJxfAYhwEh6AfAjY/+VfKV4LHoqYMlLM7zLpqn3VrYzMXU5JzURv/WmNRUE/HA=@vger.kernel.org, AJvYcCVeQIoJxIykyLvNBN2+MkRAuAf3muGexVmKjx7Q2DRmceokiJhF5ZPa2Jr8hBmMww+VnVLdEZTx@vger.kernel.org, AJvYcCXJ37uYE0BzcDu2pSIpPDVrmP5HJAUxvwzAM42UvgX904r0mdFbzabc9IbmrHHgZH10mSiHiZdA9CkeNfqoICXa@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRi6Mprtmx8COUiTPVdmvhgV1OFlKodl8rySTfWKLbeLyRUqmW
+	Egv9nkrr7ts/N1LO+YhWv7woxqOAT+0zb5dwbfdfPCz4//hl4BIg
+X-Gm-Gg: ASbGncu0a+XLLERzJmy53fPfMwayQJqQOiNpW7u03gMpx2c22arD7fz3p51SCSSB9wM
+	BzVqIprA0j6LsfQdQCGuBMyoVUntr08VZsAKDR7G1llCmcQDqBGUcKdnrcfL2RwvJPtDcyO5PST
+	jJgmYOtPS7R+az0mc7OTUnIaonH9GmRota+dx+ujJAZjk7uPnmUSiGcsarhUpT8NAgku1de9p8o
+	ahaGcy0sA1vcCRkb+6+z04ZD19VlZ7PLfIDkzdbtuOdpz7NlgzAvi/M//UDbREhJSWuuHceT5tW
+	713IInsuoNUZJt8m
+X-Google-Smtp-Source: AGHT+IFtEU/qbtI5q4s+/3i4tDPt/bCCUO0KkhYar0f3IBw5ANItfNk//tImV+wtlwslPGilHyVkQQ==
+X-Received: by 2002:a17:907:c015:b0:abb:61b0:faa5 with SMTP id a640c23a62f3a-abbeda27eacmr2004055666b.4.1740481763220;
+        Tue, 25 Feb 2025 03:09:23 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed20b81a0sm120938266b.180.2025.02.25.03.09.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 03:09:22 -0800 (PST)
+Date: Tue, 25 Feb 2025 03:09:20 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next 2/7] netconsole: refactor CPU number formatting
+ into separate function
+Message-ID: <20250225-diamond-gaur-of-anger-b0f77e@leitao>
+References: <20250221-netcons_current-v1-0-21c86ae8fc0d@debian.org>
+ <20250221-netcons_current-v1-2-21c86ae8fc0d@debian.org>
+ <20250225101748.GL1615191@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net 1/3] bonding: move mutex lock to a work queue for
- XFRM GC tasks
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
- Jarod Wilson <jarod@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Cosmin Ratiu <cratiu@nvidia.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250225094049.20142-1-liuhangbin@gmail.com>
- <20250225094049.20142-2-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250225094049.20142-2-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225101748.GL1615191@kernel.org>
 
-On 2/25/25 11:40, Hangbin Liu wrote:
-> The fixed commit placed mutex_lock() inside spin_lock_bh(), which triggers
-> a warning like:
+Hello Simon,
+
+On Tue, Feb 25, 2025 at 10:17:48AM +0000, Simon Horman wrote:
+> On Fri, Feb 21, 2025 at 05:52:07AM -0800, Breno Leitao wrote:
+> > Extract CPU number formatting logic from prepare_extradata() into a new
+> > append_cpu_nr() function.
+> > 
+> > This refactoring improves code organization by isolating CPU number
+> > formatting into its own function while reducing the complexity of
+> > prepare_extradata().
+> > 
+> > The change prepares the codebase for the upcoming taskname feature by
+> > establishing a consistent pattern for handling sysdata features.
+> > 
+> > The CPU number formatting logic itself remains unchanged; only its
+> > location has moved to improve maintainability.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  drivers/net/netconsole.c | 18 +++++++++++-------
+> >  1 file changed, 11 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index c086e2fe51f874812379e6f89c421d7d32980f91..26ff2ed4de16bce58e9eeaf8b5b362dfaafaca0a 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -1117,13 +1117,21 @@ static void populate_configfs_item(struct netconsole_target *nt,
+> >  	init_target_config_group(nt, target_name);
+> >  }
+> >  
+> > +static int append_cpu_nr(struct netconsole_target *nt, int offset)
+> > +{
+> > +	/* Append cpu=%d at extradata_complete after userdata str */
+> > +	return scnprintf(&nt->extradata_complete[offset],
+> > +			 MAX_EXTRADATA_ENTRY_LEN, " cpu=%u\n",
+> > +			 raw_smp_processor_id());
+> > +}
+> > +
+> >  /*
+> >   * prepare_extradata - append sysdata at extradata_complete in runtime
+> >   * @nt: target to send message to
+> >   */
+> >  static int prepare_extradata(struct netconsole_target *nt)
+> >  {
+> > -	int sysdata_len, extradata_len;
+> > +	int extradata_len;
+> >  
+> >  	/* userdata was appended when configfs write helper was called
+> >  	 * by update_userdata().
+> > @@ -1133,12 +1141,8 @@ static int prepare_extradata(struct netconsole_target *nt)
+> >  	if (!(nt->sysdata_fields & SYSDATA_CPU_NR))
+> >  		goto out;
+> >  
+> > -	/* Append cpu=%d at extradata_complete after userdata str */
+> > -	sysdata_len = scnprintf(&nt->extradata_complete[nt->userdata_length],
+> > -				MAX_EXTRADATA_ENTRY_LEN, " cpu=%u\n",
+> > -				raw_smp_processor_id());
+> > -
+> > -	extradata_len += sysdata_len;
+> > +	if (nt->sysdata_fields & SYSDATA_CPU_NR)
+> > +		extradata_len += append_cpu_nr(nt, nt->userdata_length);
 > 
-> BUG: sleeping function called from invalid context at...
+> Hi Breno,
 > 
-> Fix this by moving the mutex_lock() operation to a work queue.
-> 
-> Fixes: 2aeeef906d5a ("bonding: change ipsec_lock from spin lock to mutex")
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Closes: https://lore.kernel.org/netdev/20241212062734.182a0164@kernel.org
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/bonding/bond_main.c | 41 +++++++++++++++++++++++++--------
->  include/net/bonding.h           |  6 +++++
->  2 files changed, 37 insertions(+), 10 deletions(-)
-> 
+> As this is the only caller of append_cpu_nr() I'm wondering
+> if it would be nicer if nt was the only argument to append_cpu_nr().
 
-Hi,
-I think there are a few issues with this solution, comments below.
+Yes, I can do it. I just kept both functions the same:
 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index e45bba240cbc..cc7064aa4b35 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -551,6 +551,25 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
->  	mutex_unlock(&bond->ipsec_lock);
->  }
->  
-> +static void bond_xfrm_state_gc_work(struct work_struct *work)
-> +{
-> +	struct bond_xfrm_work *xfrm_work = container_of(work, struct bond_xfrm_work, work);
-> +	struct bonding *bond = xfrm_work->bond;
-> +	struct xfrm_state *xs = xfrm_work->xs;
-> +	struct bond_ipsec *ipsec;
-> +
-> +	mutex_lock(&bond->ipsec_lock);
-> +	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-> +		if (ipsec->xs == xs) {
-> +			list_del(&ipsec->list);
-> +			kfree(ipsec);
-> +			xfrm_state_put(xs);
-> +			break;
-> +		}
-> +	}
-> +	mutex_unlock(&bond->ipsec_lock);
-> +}
-> +
->  /**
->   * bond_ipsec_del_sa - clear out this specific SA
->   * @xs: pointer to transformer state struct
-> @@ -558,9 +577,9 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
->  static void bond_ipsec_del_sa(struct xfrm_state *xs)
->  {
->  	struct net_device *bond_dev = xs->xso.dev;
-> +	struct bond_xfrm_work *xfrm_work;
->  	struct net_device *real_dev;
->  	netdevice_tracker tracker;
-> -	struct bond_ipsec *ipsec;
->  	struct bonding *bond;
->  	struct slave *slave;
->  
-> @@ -592,15 +611,17 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
->  	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
->  out:
->  	netdev_put(real_dev, &tracker);
-> -	mutex_lock(&bond->ipsec_lock);
-> -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-> -		if (ipsec->xs == xs) {
-> -			list_del(&ipsec->list);
-> -			kfree(ipsec);
-> -			break;
-> -		}
-> -	}
-> -	mutex_unlock(&bond->ipsec_lock);
-> +
-> +	xfrm_work = kmalloc(sizeof(*xfrm_work), GFP_ATOMIC);
-> +	if (!xfrm_work)
-> +		return;
-> +
+  static int append_taskname(struct netconsole_target *nt, int offset)
+  static int append_cpu_nr(struct netconsole_target *nt, int offset)
 
-What happens if this allocation fails? I think you'll leak memory and
-potentially call the xdo_dev callbacks for this xs again because it's
-still in the list. Also this xfrm_work memory doesn't get freed anywhere, so
-you're leaking it as well.
+Another option is to use extradata_len as the second argument, instead
+of nt->userdata_length. That might(?) make the code easier to read? it
+would look like the following:
 
-Perhaps you can do this allocation in add_sa, it seems you can sleep
-there and potentially return an error if it fails, so this can never
-fail later. You'll have to be careful with the freeing dance though.
-Alternatively, make the work a part of struct bond so it doesn't need
-memory management, but then you need a mechanism to queue these items (e.g.
-a separate list with a spinlock) and would have more complexity with freeing
-in parallel.
+          extradata_len = nt->userdata_length;
+          if (nt->sysdata_fields & SYSDATA_CPU_NR)
+                  extradata_len += append_cpu_nr(nt, extradata_len);
+          if (nt->sysdata_fields & SYSDATA_TASKNAME)
+                  extradata_len += append_taskname(nt, extradata_len);
 
-> +	INIT_WORK(&xfrm_work->work, bond_xfrm_state_gc_work);
-> +	xfrm_work->bond = bond;
-> +	xfrm_work->xs = xs;
-> +	xfrm_state_hold(xs);
-> +
-> +	queue_work(bond->wq, &xfrm_work->work);
+What would you write yourself?
 
-Note that nothing waits for this work anywhere and .ndo_uninit runs before
-bond's .priv_destructor which means ipsec_lock will be destroyed and will be
-used afterwards when destroying bond->wq from the destructor if there were
-any queued works.
-
-[snip]
-
-Cheers,
- Nik
-
+Thank you very much for the review,
+--breno
 
