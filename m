@@ -1,149 +1,134 @@
-Return-Path: <netdev+bounces-169592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC66A44AA7
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:38:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF25A44ACE
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:45:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790E517FA58
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:37:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 112FD3A5F72
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5762819F42C;
-	Tue, 25 Feb 2025 18:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D5919AD90;
+	Tue, 25 Feb 2025 18:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9BXYcqX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Gc+p7HjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759FA18C903
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 18:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E92A14F9C4;
+	Tue, 25 Feb 2025 18:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740508672; cv=none; b=tZuRMBnF3F+20Re3li45kqh/Gs09Xu24Y0ikQZOd/Eu6qRkyNb5VnVKG1fAe9zHG7D0gR1frKuWTfqq2+EZ/iZcsWZxyvMa6hGdm1sJx1BWFfL5rh+/2QaByb/15CGlfQu5lvC9amt3UTGPf4h/1veTLkiFUamLQGrFlGUAka8o=
+	t=1740508815; cv=none; b=cyvIptu//dc3iV6mkqWX3FKrc3aDupQtjMbUyNYiXDKZA7OpkpoWR05haP6xr6i1Jscc0xe+Mn7J0Y6u4um33BqSMLxZZk/H3S9+FZ+mXJXoetDhtx/UAhR149I/XYMb8o8tdvHti+Le3zrBAohEtr09jiijkr+W6K3sYeZFzG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740508672; c=relaxed/simple;
-	bh=mtc5kHV4yfcg8CvyLXlfl9YFsPEAtSKI4leOBz+u5+c=;
+	s=arc-20240116; t=1740508815; c=relaxed/simple;
+	bh=wPEnV2mno5xbUH0szyTczg3utgP780YBBIdVg1C/AqA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HddaZ3JJTZCnI+oURUpzbwCKEm82rwZW9qm9DuN4it1Xxqjd0uyo/Mt8zC40Si3TRYAkBvneLdNLWyH7TxERztFu65jN8lCxnt0yosMhSyzNmHbmoTaUWIFI2DbUJG3oIltetlxaoby3WnTASjo9J/143nMMHF8ezzJYrWkuv8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9BXYcqX; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4398738217aso52181675e9.3
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:37:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740508669; x=1741113469; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3iaVHc4/XfXA2DF9jl+povuubBeCM8bFfr3Gc9B5VcM=;
-        b=H9BXYcqXQ7E++rZhRJiuDcUzKyE2g4XZyAToIdHlMt/lkZlhTYgIL5Wfqp5boPA7E/
-         pE8YlKFcd0xdMnDxGNKW8rJq6gtF04PgS/3l2S7yXbDbhW3ZmMjZiRBEBX7dij3ZqJo/
-         0YA2Sx9q3afM44clKvtUN9EFLcXy2zeKF+ii5Oikvlkz1i/bk+Y1hBDxUkp3iJu2QPHt
-         mzS5cej0gyiHsxPeXuER4CbMIn6JwHgFrU4FBroTD8wNkpnJWeKWfS2CKoeswCvtpA6I
-         aBS/2apF9K1FHD7hYKTnz4bs1Aje9Cu04JLeqv24JERPrMS15c2a2vOaJGjpTZ6cGkh1
-         figA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740508669; x=1741113469;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3iaVHc4/XfXA2DF9jl+povuubBeCM8bFfr3Gc9B5VcM=;
-        b=HVkr7Pk2Zz5ljy4b4R3x3YjOXW0cR/v8bZXUblSSh4fWN8HtR+/prR+M1qmdMzOBiK
-         tA/sIRTMYTLtn/+VbTitvx76zEUj01MplBvJsLG0VJTGaKJaTd2WIz2gpkfRBUlmOCEw
-         DJDwe/21MpJzv7aRdHPcymc8GxHiH0HaoG5gaPgShJJIkj3Jnk9YxOp4txSR4PLB3FD8
-         fmeLK0bnY/eUvepkCscxOrVntxjb79kX1yT7mQRDMR2h1BP1+jlxMJ65Hi6v0BJBFlxa
-         9ywi/zWfDaaHDq8xNFlB3Pf6GAdpB//Dec1TX4l8S+pGi+4kasg4q/YvPIR4bluqKQda
-         W5BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWFqLH8qOx4JqnstBzWWvEksdZwJb8JoNycAjD8YeVLhR64ESCVPXS0mPR8PgQGoGO+fh/baI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFTbmvrwgeRbLnwN2TSvYkp9mfK/Wlx4ers02RMwxGGdWuf521
-	BxXLQEC3jD4nAK02QFLXrIT3Xg5Jxhe5Atab6pgvSl8cT4mQ37rt
-X-Gm-Gg: ASbGnctEkNXztQDpPsBcnh0fiP1oI+s+G1+BUxCrWdkJbxFAJYF7t3547N52fWz+oEj
-	v5UjJqnN+OYIupTWy2TNI6XtGKVAidcjdGC20bqxLD6qBotjt4MUE58B1n1DctEU44wombp470q
-	LwUr1GCHgcxThtJttnpK+EWLK4K6lv+5pn2zJosWV/51cNqS+GcsTNUth3UgSukrIZQAdoPvw4Z
-	6Meel6UpSWW8lSJwDOf+u9bmjL0gDrlwtfwPI7KaF3uqEkMCfCkfT5Zj7fW3i1WafgckXT7RbSq
-	fLDFn8qIiO3gFGjm7bIrnbr5rAAn3Nj8aHHK7h1xF1I1ugnZQfP7ipkb6MPSGTkiovGYa8WZp3G
-	vg0PegGpTRgWE
-X-Google-Smtp-Source: AGHT+IH5jV0WLJwr4meYw5t5geNhiZJeRS99N5uTizzJ/xzS+uRzG3Le5O1v29l/A3y6EY3d135kgQ==
-X-Received: by 2002:a05:600c:1d0e:b0:439:6712:643d with SMTP id 5b1f17b1804b1-43ab8fd8620mr5118395e9.9.1740508668374;
-        Tue, 25 Feb 2025 10:37:48 -0800 (PST)
-Received: from orome (p200300e41f187700f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f18:7700:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02ce735sm149842745e9.3.2025.02.25.10.37.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 10:37:46 -0800 (PST)
-Date: Tue, 25 Feb 2025 19:37:44 +0100
-From: Thierry Reding <thierry.reding@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 0/2] net: stmmac: dwc-qos: clean up clock
- initialisation
-Message-ID: <5qx6hg33brb2zjjqzk3cr7dt56m5jxcwzioejtw5woweemskg5@suu43pp3nsg4>
-References: <Z7yj_BZa6yG02KcI@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=onL2mqDn7OWTdwtCubJeVk+kNRx+shEUJ2sLQPY9he694PTquxARoGIdV2H1o6PLOfzj95J6qzTH7peMFuwbrhSYRbXeAMH8125YdA7pCvskaF2PrJ40YG1uYglOtl+yumqbdDgXHENBjMVre78L2onVxT0uMGxZ1JFtFDZQKG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Gc+p7HjV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yUfKzzXtlpJWqtPSPd4z1n+cY2G3l5tCTWaTRMTYygo=; b=Gc+p7HjVwSLB2cvSP1VX7+u4aH
+	6x3nzVo50UXGlopSXeCZoHiG+QvWrgIJRyqCMalndwWsqsdIwEFPiAIXD19GHM3jYekUD0tvJZq4S
+	iw585gQqpIF/cSvsitrtGfb0uZ2sNQ0vRhRCk846xEhB8XaP5RCocopykXnTRCSzVCqzT0sM2jqoO
+	kR9AadyJRJaGpsC+7JkRliEVc5uSDcW0FdubG4koA2DltdyC9jVWcksAiGW7JcVvPxChh6ZVxDsdr
+	i1th8Sxxqh0ZQ/cbw0/RLFNEXQ7WtHtSkb2eDjmNC9lO35RI/DGfAWCQAzfHi9nZhGtRk/narLx8p
+	KF7CAyFA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39570)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tmzqf-0002G5-1b;
+	Tue, 25 Feb 2025 18:40:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tmzqc-0006FQ-0o;
+	Tue, 25 Feb 2025 18:40:02 +0000
+Date: Tue, 25 Feb 2025 18:40:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
+ access
+Message-ID: <Z74OgoixUyD5BLDs@shell.armlinux.org.uk>
+References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
+ <Z7tdlaGfVHuaWPaG@shell.armlinux.org.uk>
+ <87o6yqrygp.fsf@miraculix.mork.no>
+ <Z736uAVe5MqRn7Se@shell.armlinux.org.uk>
+ <87h64hsxsi.fsf@miraculix.mork.no>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="f3i4x2skmc3z4dxx"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Z7yj_BZa6yG02KcI@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87h64hsxsi.fsf@miraculix.mork.no>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Tue, Feb 25, 2025 at 07:07:41PM +0100, Bjørn Mork wrote:
+> "Russell King (Oracle)" <linux@armlinux.org.uk> writes:
+> 
+> >> I believe you are reading more into the spec than what's actually there.
+> >
+> > So I'm making up the quote above from SFF-8472.  Okay, if that's where
+> > this discussion is going, I'm done here.
+> 
+> No, not at all.  That was not what I meant.  Please accept my apologies.
+> This came out wrong. You are absolutely correct about reading the 16bit
+> diagnostic registers you quoted. I would never doubt that. I have an
+> extreme respect for you and your knowledge of these standards and the
+> practical hardware implications.
+> 
+> It was the conclusion that this fact prevents SMBus hosts I wanted to
+> question.  I still don't see that.  Some SMBus hosts might be able do 2
+> byte reads.  And if they can't, then I believe they can safely ignore
+> these registers without being out of spec.  Like the proposed solution.
 
---f3i4x2skmc3z4dxx
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v3 0/2] net: stmmac: dwc-qos: clean up clock
- initialisation
-MIME-Version: 1.0
+It doesn't prevent SMBus hosts, but it does prevent SMBus hosts from
+being able to be used *reliably* with the diagnostics "EEPROM" to read
+the values in a coherent manner.
 
-On Mon, Feb 24, 2025 at 04:53:16PM +0000, Russell King (Oracle) wrote:
-> Hi,
->=20
-> My single v1 patch has become two patches as a result of the build
-> error, as it appears this code uses "data" differently from others.
-> v2 still produced build warnings despite local builds being clean,
-> so v3 addresses those.
->=20
-> The first patch brings some consistency with other drivers, naming
-> local variables that refer to struct plat_stmmacenet_data as
-> "plat_dat", as is used elsewhere in this driver.
->=20
->  .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    | 53 ++++++++++++----=
-------
->  1 file changed, 29 insertions(+), 24 deletions(-)
+It also prevents being able to identify the Nokia 3FE46541AA module,
+because the module's I2C locks the bus when a single-byte read of
+offset 0x51 in the "identity" EEPROM at 0xA0/0x50.
 
-Tested and works fine on Jetson TX2:
+We do already have single-byte mode in the SFP driver, which is
+necessary to work around the broken I2C interface on RTL8672 and
+RTL9601C which emulate that EEPROM.
 
-Tested-by: Thierry Reding <treding@nvidia.com>
+There's a lot of "brokenness" out there, and what I've learnt from
+dealing with SFPs over the last 10+ years is to be cautious about
+*everything*. One thing that can be guaranteed is that a module will
+be broken in unexpected ways, and using a different behaviour for
+working modules will turn out to break.
 
---f3i4x2skmc3z4dxx
-Content-Type: application/pgp-signature; name="signature.asc"
+The Nokia 3FE46541AA is a brilliant example of a module that
+emulates all accesses and fails with single-byte reads, thus making
+it incompatible with a SMBus that can only read single bytes.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAme+DfgACgkQ3SOs138+
-s6Hc5xAAns6YS5EqizTjVtcybrFLTInegeZ0X+D5ciydxOvm9iHAwZY2/4ywuY9e
-gq6UePIgB51vAzfDfxy5R5X4GvK5+922IL841tyDAJejg54ylBHTFiDoWJVNXUll
-QJbbhM+dL0vRRaxTqPzJfJzkIO7ZyU0BylQwr3GYka21DUkYK4J/LnTleP1b3LMu
-1W0QlEMWq5DznlUJuQ8C9Tn1C4Pr4+ZRmDjSPF7t8coFAP5XNs9Db5KK0DWkTWto
-P0HugDfCHPdDHodfPFzHnT9QxCESDiIHjX4P+PTcR9w4eqg+gjMkiXq1EDpTYu/O
-ph05+xPdywaHeGftW0K2RAf3ZdSRep1YWI90autg4U/g0JTq/P9fCyOwR8p3WEen
-AtGz3MvZmcGbe6FGY7ZjnY/tVKAwPVP07DVSJcD1DzTe+YusCryfWRUTIHfpe69L
-Ric7GRdggYEOZL88Y/bpybtv6kb3baNOpUDwKHj8xDn72FA8coa6Xl8KYDhZvzQe
-4jxMzrghudcWAQ8XKxgxB2q+lZ7B+ZFRt1xU6jc7x+KdMsAGI8XHXc1Y0LiiJMfs
-xNyl8+5hHbissm7ie2JbC/UyuXB4pCtB51+qfRJrzdZs+DTHXbyZZT5TtUWbtHpB
-AzcgVhxrv05jSv7AzsbQiFjNoCC9WZvdMfzZg3Ja2bAh62bFw+o=
-=BS53
------END PGP SIGNATURE-----
-
---f3i4x2skmc3z4dxx--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
