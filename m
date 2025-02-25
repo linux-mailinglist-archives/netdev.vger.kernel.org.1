@@ -1,50 +1,90 @@
-Return-Path: <netdev+bounces-169275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14692A432EC
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:20:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 453ECA432FC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:24:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67CA17AADED
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:19:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20372172491
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4118513AD11;
-	Tue, 25 Feb 2025 02:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17533136341;
+	Tue, 25 Feb 2025 02:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/6QoWtp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGKXgsRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135D0136352;
-	Tue, 25 Feb 2025 02:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8529E38DD1;
+	Tue, 25 Feb 2025 02:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740450005; cv=none; b=tjP6+HjdwfGxdPL8uiJ3kn2VvVBtsE4aR6kksyC9OVNNZrAlPbv6rjEIK5qFRA8OZGx3GPFXxQOj8E9zhJQDkmJbinQ6XIMcydwKuPpnO81SFShVv6moWdX/MMM5uAsIK2jjF9Vc61+4ijxqdVPNh+tnf4DyOW2XgSMJOAz5P+c=
+	t=1740450278; cv=none; b=G1fLICuKYoOiRsowWLlwlQcCeyH9y9e0LCX8y0pyrfnZTaxfYxtNaOTNnwgTptUxgjUahTBEuF+ZIHvTs9Lh8QKyk4lDPIDWG/Yiu1xKFN4F1+71JyQYs22wWqLDRzc6p63/mpZD7BojA7Rw5MJzB685WJfwJ+PJBks/2dReiI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740450005; c=relaxed/simple;
-	bh=g8R/KExjsjMHU++fl86tL9WrJhnFGwtWyWYnw0yoGxk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J9YGP80aC2MMeXWbDvwThW/zWcgvH/CEeQl4WLx81V+fcGJiT51NVXSyzqZdugK5bXP6wDVQxKKQlXdmhIVkIRT2ZLajjK6PHVRxE2sO9blHJyXCGtg6nOgDAT/H/g6Hmb7Z6kQSl+SyMzrbuAA27AnTZPWdGo0J6kn3G2KnthI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/6QoWtp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E75C4CEEA;
-	Tue, 25 Feb 2025 02:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740450004;
-	bh=g8R/KExjsjMHU++fl86tL9WrJhnFGwtWyWYnw0yoGxk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y/6QoWtpVm1ilManSvBLWHMWj7U8Nrqe1tpc0pfVugX92GijdTke6VPJqW+HPPZef
-	 2LVeQGQvgrhZmimKUpuViZ3RQAzK93a3PW/fo581/g5CKyOwmG9FT6PG3aW3le7QX9
-	 YB0yu1eROyWsaFqEsNqBaUGpeiXSgrLCo3r1c+bvG+P6av6aF98fRv6xoyUgb5Xf+d
-	 H0uP0jNG+HAJxI/Cv+pVwzzlFSe50h0AnPVuANLrZZt8JeQ+iMyDXGZRm62AosCYKD
-	 vCDKAWDMkm5nwwuzqehaO9vP1iEIS/YR8fEWlpgTEN+OvBea+3ZrVUvK6a6v6Ovfzl
-	 wPsI3TFyhkzQw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD27380CFD8;
-	Tue, 25 Feb 2025 02:20:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1740450278; c=relaxed/simple;
+	bh=DpksTJSb4j/ATW59F2HwSfc/OSb7paCv2PAf/vMZoF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qt6j4pBRCG4VbnjbjHIqAGRw5g0C/dL7Foi9tHEwY38iAXS3D5ckb+du0Se/FIYICx1MuyTol4hgtwuA39FnEZDeC6gdcI7OgWY83ZoRZdnocx1nAERD6pxnvZBM+xCmYyWkf7OvO4dfCWHuZJg973sePb2tTcEiqda052yJRHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SGKXgsRE; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e66a7e2754so40526916d6.3;
+        Mon, 24 Feb 2025 18:24:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740450275; x=1741055075; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEfyPPBTeKStGDGpfSNDF3cOWQtH3sIOWk57hC8LSc4=;
+        b=SGKXgsRE50Ocq65s+4CqGY4Dd7CHIM1krcj6ogDduO20s+a5SRl+9s/+Dwh7x75HzP
+         JHQYlSYaP0wAcQGnOhB7ufIFcybSSKLFb+6xXNfyGR+WkAm05Pd7El7oNRIV1i+X3+Ma
+         /PqzwFsoDh13bBXWffKSzWArIBjMTIEzkk7fQsDpuSmzk/pd6a30J56//J7pvpPUQt0V
+         YB1lj8dyjxR01CdMISfUAdszkRAV7t3NjxfmmCcch+V+YuoMZ/dd50Wt/tpaE1oYEfc7
+         dzNNc+mQ0JAbtVj6C+TMaz91sm9/nrw6E8EMgtzqpPJdbcVFWrPtCvJxdSYf8hqcdsR7
+         0FRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740450275; x=1741055075;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oEfyPPBTeKStGDGpfSNDF3cOWQtH3sIOWk57hC8LSc4=;
+        b=B4sr/2sBrXBn/h+eTEhrgISd/FFO7AuPTbydblEkP1/gcC3ib1XsxHAdz8LW+GP99V
+         GwyKQDdsqI74ztiMSZnEP1Atwd8lLEZGUnFJr7NG6DmFmqKcSzfiQX/lUEVFO+kytZ1h
+         G+odch3Kgx+oBRnn6unnE+krWalEby05tzg6oI8/oHu6/mSJzp86I1DQlrRTUypMeynx
+         T3nE2NGXojD8vODR8FPlCCBCTnQfxnuC0wnboLY7BbI2FCzWVnmdh6NyUvISDZGCZbCu
+         1/RP4v6MhA156O2wXBVRiMhyCLd3mOcpSeXOmfw3+63p5QJsfu2i7VZ8HCvi8tt+10SX
+         xMkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVr1SrRqzFgPtgIq16qzAqujP7/JmGqkm/iXmuO8AEWm5D1R9FjbkNFOoWdvgszhQ6yp4AM3payDwhuwwUnwSc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqzsikVeyDaiUGoyyg0olBkoFkYrC1DR2DPYFuZxUApiungYEC
+	CdYlV3duk4tqHm5DtEWdX1KhT9/Kr4JNwIRK6BRRHHE1yFdGFIqx/RV5gA==
+X-Gm-Gg: ASbGncswRXj3qMkHFLXXq0dQbRu4EI7aI3x+LHEvlPAA0S05giGATfrlG1UszV1tJCS
+	ibVkK9JsOx/vWZrJfmUyGqlo/ABBmWL1iKyeb9o4iNIJi/MFg2LCUx45jFqJtQrHGbgS++u7Uff
+	ctwEE3bDs7OZEDxWhRgS9B4h+PsJ3BrMV2zuUesoQ9srLap+ebk1IjckRX44JaegIABtyXPcHip
+	uqLPjr9bKaJsjafpfePIKKQG+7AQY89YstS52Xp4h3Mo0LZ8otSYs6DMEkvTfqmLiDj6w9baabz
+	FF7trGIGhLtRwb/tkUpzPfid1Twgbk7Y4GbSgEcFzXaXSsd9hdvyia2xzu3q/5NpVbRy88lRsfa
+	yEPSJtv/Ty0ZeVP0tPK+/aVlw1A==
+X-Google-Smtp-Source: AGHT+IE42oC/4OLqAnv8aB71Y6UNwiOougp0wx4tj3WFwbadgg4/ysQwd043qbniEAWYhob7BqwG1Q==
+X-Received: by 2002:a05:6214:1c44:b0:6e4:407c:fcfc with SMTP id 6a1803df08f44-6e6ae7c9a17mr192265476d6.4.1740450275367;
+        Mon, 24 Feb 2025 18:24:35 -0800 (PST)
+Received: from willemb.c.googlers.com.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e87b09c5b8sm4368996d6.55.2025.02.24.18.24.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 18:24:34 -0800 (PST)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next 0/2] expand cmsg_ipv6.sh with ipv4 support
+Date: Mon, 24 Feb 2025 21:23:57 -0500
+Message-ID: <20250225022431.2083926-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +92,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethernet: renesas: rcar_gen4_ptp: Remove bool
- conversion
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174045003649.3679724.9544329181307344377.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Feb 2025 02:20:36 +0000
-References: <20250223233613.100518-2-thorsten.blum@linux.dev>
-In-Reply-To: <20250223233613.100518-2-thorsten.blum@linux.dev>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: yoshihiro.shimoda.uh@renesas.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+From: Willem de Bruijn <willemb@google.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Expand IPV6_TCLASS to also cover IP_TOS.
+Expand IPV6_HOPLIMIT to also cover IP_TTL.
 
-On Mon, 24 Feb 2025 00:36:11 +0100 you wrote:
-> Remove the unnecessary bool conversion and simplify the code.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+A series of two patches for basic readability (patch 1 is a noop),
+and so that git does not interpret code changes + file rename as
+a whole file del + add.
 
-Here is the summary with links:
-  - [net-next] net: ethernet: renesas: rcar_gen4_ptp: Remove bool conversion
-    https://git.kernel.org/netdev/net-next/c/6538c8ca8ee1
+Willem de Bruijn (2):
+  selftests/net: prepare cmsg_ipv6.sh for ipv4
+  selftests/net: expand cmsg_ipv6.sh with ipv4
 
-You are awesome, thank you!
+ tools/testing/selftests/net/Makefile      |   2 +-
+ tools/testing/selftests/net/cmsg_ip.sh    | 184 ++++++++++++++++++++++
+ tools/testing/selftests/net/cmsg_ipv6.sh  | 154 ------------------
+ tools/testing/selftests/net/cmsg_sender.c |  90 +++++++----
+ 4 files changed, 240 insertions(+), 190 deletions(-)
+ create mode 100755 tools/testing/selftests/net/cmsg_ip.sh
+ delete mode 100755 tools/testing/selftests/net/cmsg_ipv6.sh
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.48.1.658.g4767266eb4-goog
 
 
