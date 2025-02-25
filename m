@@ -1,100 +1,111 @@
-Return-Path: <netdev+bounces-169372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E864A43966
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:26:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D80A43971
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67BD21889FB8
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE5DF1882903
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89F713A88A;
-	Tue, 25 Feb 2025 09:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DE020C026;
+	Tue, 25 Feb 2025 09:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kgq8EhGF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FPbN64AZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C9C4C80
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A294C80
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740475332; cv=none; b=T9oMzKXHRUnLjUCYhvLI/uxJ9Lr/llJXDXNinVgzcwbGBrOsonUPVG+dJ0zaETj7TRZR+On6S205WdMAsroj+NVwPegpWV9TtaakQYowEDD9iw+3Jnf2zeFO1Ho6pELPaYsG1QwjSqWekgBzIsXFiKwFJwD1nbAYzJXxNOFCbYk=
+	t=1740475448; cv=none; b=gHhF3GyPwsG9B0G4GdX7l6mqrPKcEy69aG26/cQUEuyWM3acJkoN/Z3SW4VZPxBkthluywE4OK9JFMBjs5acLrSisTZeoTl7C2m03H6ntm1i7t3GrEiPokGzkWU/Afhgm127x6hJrNDS1hNqPYzuxTS4jBQ15Q6kXg6yQFrFtsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740475332; c=relaxed/simple;
-	bh=ghBZlERKySYoRjKVYWwh2srPu0NK7DrzmXz35z9CGgY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEqhawojvJ9H/L8RWTDyWenpIW0kw0lbb+DDuF9DzijgpzIYfuFCAOpKimS+Fkbihy1b3bLNmrVGQZGZ/7mhvZu7mSQgv8TGgaeAsuLcZnmVLNyWWujG7HVT9rt9OUnrJ2dMwUXkYNlL2sxYrj/BQNRrtKYuMhkl8FgVu5a3D0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kgq8EhGF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F440C4CEDD;
-	Tue, 25 Feb 2025 09:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740475332;
-	bh=ghBZlERKySYoRjKVYWwh2srPu0NK7DrzmXz35z9CGgY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kgq8EhGFOBvEr+lDUqQMUft8W0Eex2vjLKXaMPTtHyOp65FAZAhbk7dixQUJHZVO/
-	 f09b0xkMNYR0+veIo7MAbv8UvviKwmrN3a/trLZpzX7QazYVjYILp6gvJReIC/ULpf
-	 fCea9/GtDn8uzUNlZNogtnsZ0JR1YIjc8nBBgLpHp1BIs+dFWEZVJ/VlEPPH3nLGqx
-	 w5RYQu/D5lTll/ClZD3dXZdSJNCzjii3cls1ZET9Z4XPgaR4DjCvZfHEnO5rCvZCLd
-	 vvqAYV0ROp2V8UsYbPuc5tLy/vOvEgTQVZVGiK9kydDIr52WW+r/r5yCCGLVpVGqUj
-	 W90LkEYjq6ibQ==
-Date: Tue, 25 Feb 2025 11:22:06 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au
-Subject: Re: [PATCH ipsec-next] xfrm: remove hash table alloc/free helpers
-Message-ID: <20250225092206.GG53094@unreal>
-References: <20250224171055.15951-1-fw@strlen.de>
- <20250225080440.GE53094@unreal>
- <20250225082832.GA6982@breakpoint.cc>
+	s=arc-20240116; t=1740475448; c=relaxed/simple;
+	bh=kC00upbw2CNPSxlB1c1v2NPeDqUKHdWijPcrPdFqNQU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bUAG35VX3iH5NknE30TbZujkbFGWJIEaopr7dQLG8FjUGJ1sRA5PCr+NQ9jISzYBEmKSZ51TRQR2fa8qnrxdCCiNNw2yi9JIS3x8vTdwgVV1t732WHhk/Ktq3GDFOmMjEoflObmLxa3Xiqsztkq5T58XlvWy6tyVnAg4zRK+/1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FPbN64AZ; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740475447; x=1772011447;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kC00upbw2CNPSxlB1c1v2NPeDqUKHdWijPcrPdFqNQU=;
+  b=FPbN64AZZE2n9/D2kbvPymeb+8JH0x8g/qTtybVayuCjk/VLzzBfVOia
+   /5F75XUHDnhwSPOVNhRqFsYnVWm0BGzCtj27GaCmml/0Wr/OOBLaCGVKq
+   MQP5VpPAIe0BpAeoXIHrUhIHFJ7gWfggxWa8lojy5znggE95C9+2GmASN
+   dclTLTje1sq+gQjXrF/oc9xuwBoyjXJqKQNY4fxvshfcIs7F6mRBDYd8/
+   4Q8btojsQLcKcKuAFS/Xw8ZvAwG8RYBytApYNewzjfmGvWm8qsSGLt46V
+   cJKzHsvkX29Twe5ydZBALOTm/zz/pOPOTbul3xakr0MP5DgXt95DJaBrg
+   A==;
+X-CSE-ConnectionGUID: 5nkrn+1ASWq0ONCtnTm1Rg==
+X-CSE-MsgGUID: Cybm8B9DSDOtYGLLNiVFdw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40508222"
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="40508222"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 01:24:05 -0800
+X-CSE-ConnectionGUID: Aa5eIeEKTQeWDyLsGULWuQ==
+X-CSE-MsgGUID: JvZ6gVF+T++oBW7DINoAew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117262505"
+Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.112.135]) ([10.245.112.135])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 01:24:04 -0800
+Message-ID: <95382347-8e05-4164-98b8-eca168bf3969@linux.intel.com>
+Date: Tue, 25 Feb 2025 10:24:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225082832.GA6982@breakpoint.cc>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [iwl-net 0/4] ice: improve validation of virtchnl parameters
+To: Simon Horman <horms@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20250217102744.300357-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250218194415.GL1615191@kernel.org>
+Content-Language: en-US
+From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
+In-Reply-To: <20250218194415.GL1615191@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 09:28:32AM +0100, Florian Westphal wrote:
-> Leon Romanovsky <leon@kernel.org> wrote:
-> > > xfrm_hash_free() is kept around because of 'struct hlist_head *' arg type
-> > > instead of 'void *'.
-> > 
-> > <...>
-> > 
-> > > -struct hlist_head *xfrm_hash_alloc(unsigned int sz);
-> > > -void xfrm_hash_free(struct hlist_head *n, unsigned int sz);
-> > > +static inline struct hlist_head *xfrm_hash_alloc(unsigned int sz)
-> > > +{
-> > > +	return kvzalloc(sz, GFP_KERNEL);
-> > > +}
-> > >  
-> > > +static inline void xfrm_hash_free(struct hlist_head *n)
-> > > +{
-> > > +	kvfree(n);
-> > > +}
-> > 
-> > Sorry, what does this wrapper give us?
-> > You are passing pointer as is and there is no any pointer type check
-> > that this construction will give us.
+
+
+On 2/18/2025 8:44 PM, Simon Horman wrote:
+> On Mon, Feb 17, 2025 at 11:27:41AM +0100, Martyna Szapar-Mudlaw wrote:
+>> This patch series introduces improvements to the `ice` driver and `virtchnl`
+>> interface by adding stricter validation checks and preventing potential
+>> out-of-bounds scenarios.
 > 
-> Compiler will warn when the argument is something other than a pointer
-> to a hlist_head.
-
-I personally didn't see any bug where wrong pointer was passed to kfree :).
-
+> Hi Martyna,
 > 
-> I can send a v2 with this wrapper removed if you don't think its worth it.
-
-It is up to you.
-
+> The above talks about this patchset in terms of improvements rather than
+> bug fixes (that manifest). If so, I think this should be targeted at
+> iwl-next (i.e. net-next) rather than iwl-net (net). And the Fixes tags
+> should be dropped.
 > 
-> Thanks for reviewing.
+
+Hi Simon,
+
+Thank for looking into this. I believe these patches provide fixes and 
+would fit better with iwl-net since they correct improper value 
+checking, ensuring that the driver can properly handle and reject 
+invalid inputs from potentially malicious VFs.
+I sent v2 with rephrased cover letter and some commit messages.
+
+Thanks.
+Martyna
+
+> ...
 > 
+
 
