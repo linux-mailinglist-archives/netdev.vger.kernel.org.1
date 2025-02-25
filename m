@@ -1,144 +1,130 @@
-Return-Path: <netdev+bounces-169366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45EE9A43944
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:21:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DF4A43928
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:19:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB753188AF10
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:14:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B245816087E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B1D2676DA;
-	Tue, 25 Feb 2025 09:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308A926773B;
+	Tue, 25 Feb 2025 09:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DDefn0rw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbtKSI2x"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD12673BE
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809CA26772D
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740474671; cv=none; b=cerQCJiHe78Nua7UNe+xZXdNIR9RSqMSs6KIfWDRD8xmk/SuN4bO4lHImbS99/ABejdUpMsDQyemeaf32zwOnJwdjiHUm5sAVD5/ZrkFVgJeVOWmMrZ+UTBu6vcqhGe80Y1vgnqdiMeJ8ZNq/PFAqDp3yUQ9FcJpm2s+Tpy21pY=
+	t=1740474735; cv=none; b=smKBzQ/3UJGcfxsv2m/xLRkMzxCJ8W3drCvo29xQHOic9qDhCkbajbO0IfwYSUPtbpn9UbDPBXHNPbP2b5zfZnKExa7uCcxJpPoWhrQWLWRZ/clRB9glS9c9mclS/udqMC7i/yM0Cc4Y3UNe39P2FGBX9uDQZmTqMGTgcMaNjls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740474671; c=relaxed/simple;
-	bh=ULVdGn7V1+B9/1+UvwyE2gO5D3tyEjU/3bIQJWQvo9w=;
+	s=arc-20240116; t=1740474735; c=relaxed/simple;
+	bh=I/ncJfEJtEiSeoSCR2blElAGuBHz/yWCQD1ugBNnzD8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QEbShvCZcJPACf//mwIu4NAYsg+wTWDy8qNSjPI7wT9wHAjBxPAFI+gzQsLHgd5Y9sck6pvr+f0I6ruN/F/Q3hH71q5LPazP58UCwcsVRQjOX7nf6khUB1i+3dr3CGTJNUePFKysXy2Q+bZZaF2CkIUxCZ+gYdGniNhEvdZe0ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DDefn0rw; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <425215fb-8fb5-4412-87e7-1d29c4ac0b7f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740474667;
+	 In-Reply-To:Content-Type; b=L5ijr/Ml67tjHO/F6/bb3iQhwnLdIuMEvazJK/9LFYxXB4YwxfiKKlyiqs97l0lJVtk3kw7M4cvQSQ8XRmMVKrjZK3OAGWuZ62K3IHlsz8Z9SYYKySeJ/MeqtNL5s6kR2P8x0tCQfMy5RQsb6GTr4FwlFejGA6lmSitStrCeyNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbtKSI2x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740474732;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z+uneR/mJS3GnAKzOPOj3taPV7XZaDcHgKVZzaJi0fo=;
-	b=DDefn0rw48FmnpU4dE1uzQN58xOKblryXKII2hPkQlzaPz9m/h8jhLz7SHxlkpRBfpxqtO
-	zqlhWACWT2n6KotMuGTBKZH/4KDxrB1BeTioPMtSI5wvaY4aXn8wOp8uFvSG3FE52bafWy
-	gbI0sciBbXJFt9Pdp4DL92u1CiJP6VA=
-Date: Tue, 25 Feb 2025 17:10:58 +0800
+	bh=dlIg0iX5rLeI1/17Pjh/O9LHmXIOARF0OAc7AU9Migc=;
+	b=MbtKSI2xQNk/V1HxCMrVWJ9W7oqf4wvFgsYbF8OazDcVU6pyNMi/2jqPPNz0/SsREasNM5
+	2CQzIeZeU4+JqekhMKe9HZY7fCY0H76HShxF6FEHyao3CktoE7HxmC1GE4twD0Dhmojre6
+	x3aQju7X6k6E0V1mI3l93z5gTLdyiL4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-B9op4tKOPYC05GXGaqtyXA-1; Tue, 25 Feb 2025 04:12:10 -0500
+X-MC-Unique: B9op4tKOPYC05GXGaqtyXA-1
+X-Mimecast-MFC-AGG-ID: B9op4tKOPYC05GXGaqtyXA_1740474729
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38f455a8e43so2014112f8f.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 01:12:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740474729; x=1741079529;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dlIg0iX5rLeI1/17Pjh/O9LHmXIOARF0OAc7AU9Migc=;
+        b=iOGl8WKid9o9HbaLu3zfz6SF0gTSJ4JIuUBWfONFcuC8PsTMbPYXbGRJRHanpukhR0
+         YigbI/xkPxc6XIatuNe29Rk1YRN6kYLQy7VDRrpOqJ/Ob170u5LMDftVLPsKtR10M6ly
+         EL/jlP+8IakAT8Ol8t/2BFEm1VIHdhHDA9lOB9hj6rxV8kVIs8ZNux97iz9zGHBUrOfw
+         iHDx8WZtnfxJ6E3VtJjyqSCjL+xaFRD1IILhcTsgy6XMI8gpkfGKI6b5EqWgbaBZMEB9
+         oMe08ZJNPqNhPEhwPk8VAx0htZlLRhEeQFSS7L5l5VLNoHEIsnPrKojGUIoqdz+yVXLh
+         5CXg==
+X-Forwarded-Encrypted: i=1; AJvYcCU47lMK7cNGO+BkqQW1sTQ4NLhZkRsQ1i098zpRJYNIIyGLwSvl33JZV6ADBVwL/3DjobbkETs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyllrbAEnWiUDDIhxclrmiCK32eG6Cdh7Dd4JtxMB4cBIkn0RM4
+	ANkQTEnSCjvLoQLqx8xqLlAj9EuDjJEL50KJM98Fg2hbw40Dpq3v7PwZntZDw5pn6Ar8//5+Qzt
+	jSEmwwduJ8qmrt4HM4VfeTOnqVdNw/23FCkSx6hSVnbOHH1nEcq+zzg==
+X-Gm-Gg: ASbGncugFrdbrNFatrhDHlJoGX6ajIe4QWIuxP1x3jpd8FnfU5NXC2Wa0XOLRYXxLO6
+	q404DcjqSnNavYvDQE2RVKpQBaMAwcF6GNHzOtZ84W+KGOmVX0F9d6i9VMbFwPQQovnKa+46wMQ
+	icZ/+gagvhhlvlfyGImIGlyzun5/HlwFuYABKwOzrzWps/yEwZcri3mI6nnDwvADy3Wg7RHdX1l
+	uIeVE9lpaS8w1cC5x20MO3MZz2DQQk4NVMWs8PrSG4v8uvI7ZCiVZXSmVNYXCCr67+i0kbeqQLs
+	lNBkhXE7u169E/TgSN3DpJ8zvcLfwS2K/y9vKPnxF9M=
+X-Received: by 2002:a05:6000:1548:b0:38d:daf3:be60 with SMTP id ffacd0b85a97d-390cc63ccf0mr2071739f8f.48.1740474729252;
+        Tue, 25 Feb 2025 01:12:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEolJkbGKjJj6h9uEQW/S7a4oRbKctMUQh95C2XKh9ehqDL16AcT96CB9ug5umxMfHDYCtt4w==
+X-Received: by 2002:a05:6000:1548:b0:38d:daf3:be60 with SMTP id ffacd0b85a97d-390cc63ccf0mr2071706f8f.48.1740474728801;
+        Tue, 25 Feb 2025 01:12:08 -0800 (PST)
+Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390cd866dc4sm1624406f8f.11.2025.02.25.01.12.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 01:12:08 -0800 (PST)
+Message-ID: <910cae0c-3d45-4cd3-b38a-49ab805a231e@redhat.com>
+Date: Tue, 25 Feb 2025 10:12:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 3/4] stmmac: Remove pcim_* functions for
- driver detach
-To: Philipp Stanner <phasta@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Huacai Chen <chenhuacai@kernel.org>, Yinggang Gu <guyinggang@loongson.cn>,
- Feiyang Chen <chenfeiyang@loongson.cn>, Philipp Stanner
- <pstanner@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Qing Zhang <zhangqing@loongson.cn>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250224135321.36603-2-phasta@kernel.org>
- <20250224135321.36603-5-phasta@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/8] net: phy: add getters for public members of
+ struct phy_package_shared
+To: Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org
+References: <c02c50ab-da01-4cfa-af72-4bed109fa8e2@gmail.com>
+ <b505ed6a-533d-42ad-82d0-93315ce27e7f@gmail.com>
+ <20250224180152.6e0d3a8b@kernel.org>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <20250224135321.36603-5-phasta@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250224180152.6e0d3a8b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 2/25/25 3:01 AM, Jakub Kicinski wrote:
+> On Wed, 19 Feb 2025 22:04:47 +0100 Heiner Kallweit wrote:
+>> +struct device_node *phy_package_shared_get_node(struct phy_device *phydev);
+>> +void *phy_package_shared_get_priv(struct phy_device *phydev);
+> 
+> A bit sad that none of the users can fit in a line with this naming.
+> Isn't "shared" implied by "package" here ?
+> How would you feel about phy_package_get_priv() ?
 
-在 2/24/25 9:53 PM, Philipp Stanner 写道:
-> Functions prefixed with "pcim_" are managed devres functions which
-> perform automatic cleanup once the driver unloads. It is, thus, not
-> necessary to call any cleanup functions in remove() callbacks.
->
-> Remove the pcim_ cleanup function calls in the remove() callbacks.
->
-> Signed-off-by: Philipp Stanner <phasta@kernel.org>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c |  7 -------
->   drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c     | 10 ----------
->   2 files changed, 17 deletions(-)
->
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index e3cacd085b3f..f3ea6016be68 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -614,13 +614,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
->   	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
->   		loongson_dwmac_msi_clear(pdev);
->   
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i) == 0)
-> -			continue;
-> -		pcim_iounmap_regions(pdev, BIT(i));
-> -		break;
-> -	}
-> -
->   	pci_disable_device(pdev);
->   }
->   
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> index 352b01678c22..91ff6c15f977 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> @@ -227,20 +227,10 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
->    *
->    * @pdev: platform device pointer
+FWIW I personally agree the latter would be a better name.
 
->    * Description: this function calls the main to free the net resources
+@Heiner: could you please give that naming schema a shot here?
 
-There is a missing full stop. You commented on the next email,
+/P
 
-and it seems that you are already preparing for v4.  With this
-
-
-Reviewed-by: Yanteng Si <si.yanteng@linux.dev>
-
-Thanks,
-Yanteng
-
-> - * and releases the PCI resources.
->    */
->   static void stmmac_pci_remove(struct pci_dev *pdev)
->   {
-> -	int i;
-> -
->   	stmmac_dvr_remove(&pdev->dev);
-> -
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i) == 0)
-> -			continue;
-> -		pcim_iounmap_regions(pdev, BIT(i));
-> -		break;
-> -	}
->   }
->   
->   static int __maybe_unused stmmac_pci_suspend(struct device *dev)
 
